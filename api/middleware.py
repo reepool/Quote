@@ -72,7 +72,19 @@ class AnnualReportTrustedIdentityMiddleware(BaseHTTPMiddleware):
             and request.query_params.get("operator", "").strip().lower()
             not in {"", "0", "false", "no", "off"}
         )
-        if not self._is_protected(path, request.method) and not operator_readiness:
+        candidate_diagnostic = (
+            request.method.upper() == "GET"
+            and path.endswith(("/business-profile", "/commodity-exposures"))
+            and request.query_params.get("include_candidates", "")
+            .strip()
+            .lower()
+            in {"1", "true", "yes", "on"}
+        )
+        if (
+            not self._is_protected(path, request.method)
+            and not operator_readiness
+            and not candidate_diagnostic
+        ):
             return await call_next(request)
         research_config = config_manager.get_research_config()
         modules = getattr(research_config, "modules", {}) or {}

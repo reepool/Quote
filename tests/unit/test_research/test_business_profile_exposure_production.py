@@ -141,6 +141,26 @@ def test_fact_production_rejects_candidate_activity(tmp_path):
         )
 
 
+def test_unknown_unit_is_not_silently_classified_as_volume(tmp_path):
+    repository = BusinessProfileRepository(_storage(tmp_path))
+    activity = {
+        "activity_id": "activity-unknown-unit",
+        "instrument_id": "601088.SH",
+        "report_period": "2025-12-31",
+        "action": "purchases",
+        "object_raw": "特殊材料",
+        "object_id": "material.special",
+        "value": 12,
+        "unit": "未知计量单位",
+        "evidence_id": "evidence-1",
+        "review_status": "approved",
+    }
+    fact = BusinessProfileExposureFactProducer(repository).build_from_activity(activity)
+    assert fact["exposure_fact_type"] == "purchase_activity"
+    assert fact["value_normalized"] is None
+    assert fact["metadata"]["publication_blocker"] == "unit_normalization_failed"
+
+
 def test_mapping_resolution_preserves_identity_without_unique_market_series():
     candidate = GovernedCommodityMappingResolver(_catalog(candidate_only=True)).resolve(
         product_id="coal.coking_coal",
@@ -201,11 +221,11 @@ def test_known_commodity_identity_publishes_without_forcing_market_series(
 
     published = BusinessProfileExposurePublisher(repository).publish_basic(
         fact_id=fact["fact_id"], knowledge_cutoff="2026-04-30"
-    )["exposure"]
+    )
 
-    assert published["commodity_id"] == commodity_id
-    assert published["price_series_id"] is None
-    assert published["metadata"]["market_series_status"] == "unresolved"
+    assert published["status"] == "fact_only"
+    assert published["reason"] == "market_series_unresolved"
+    assert published["mapping"]["commodity_id"] == commodity_id
 
 
 def test_composite_process_fact_is_retained_without_false_publication_gap(tmp_path):

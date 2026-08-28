@@ -12,6 +12,12 @@ from research.business_profile_product_catalog import (
     load_business_product_catalog,
 )
 from research.business_profile_review import BusinessProfileReviewService
+from research.business_profile_promotion import (
+    BusinessProfilePromotionService,
+    FieldFamilyPromotionManifest,
+    PromotionContext,
+)
+from research.business_profile_unit_conversions import load_unit_conversion_catalog
 from research.business_profile_semantic_schemas import (
     validate_business_profile_artifact,
 )
@@ -73,7 +79,27 @@ class BusinessProfileExposureFactProducer:
         object_raw = _required_text(activity, "object_raw")
         value = activity.get("value")
         unit = str(activity.get("unit") or "").strip() or None
-        fact_type = _fact_type(action, value=value, unit=unit)
+        catalog = load_unit_conversion_catalog()
+        resolution = (
+            catalog.resolve(unit) if value is not None and unit else None
+        )
+        fact_type = _fact_type(
+            action,
+            value=value,
+            unit=unit,
+            dimension=resolution.dimension if resolution else None,
+        )
+        normalized_value = None
+        normalized_unit = None
+        if value is not None and resolution is not None and resolution.publishable:
+            converted = catalog.convert_resolved(
+                value,
+                resolution,
+                period_basis="full_year",
+                equity_basis="unknown",
+            )
+            normalized_value = float(converted.normalized_value)
+            normalized_unit = converted.normalized_unit
         stable_payload = {
             "activity_id": _required_text(activity, "activity_id"),
             "fact_type": fact_type,
@@ -96,8 +122,8 @@ class BusinessProfileExposureFactProducer:
             "product_id": activity.get("object_id"),
             "value_raw": value,
             "unit_raw": unit,
-            "value_normalized": value,
-            "unit_normalized": unit,
+            "value_normalized": normalized_value,
+            "unit_normalized": normalized_unit,
             "share": activity.get("share"),
             "fact_scope": "segment" if activity.get("segment_id") else "company",
             "evidence_id": evidence_id,
@@ -116,7 +142,16 @@ class BusinessProfileExposureFactProducer:
                 "source_activity_action": action,
                 "source_activity_lineage_hash": activity.get("lineage_hash"),
                 "unknown_value_preserved": value is None,
-                "unknown_unit_preserved": unit is None,
+                "unknown_unit_preserved": unit is None or not bool(resolution and resolution.publishable),
+                "unit_resolution": resolution.to_dict() if resolution else None,
+                "unit_normalization_status": (
+                    resolution.status if resolution else ("not_applicable" if value is None else "unit_resolution_pending")
+                ),
+                "publication_blocker": (
+                    "unit_normalization_failed"
+                    if value is not None and not (resolution and resolution.publishable)
+                    else None
+                ),
                 "llm_assumption_fields_prohibited": True,
             },
         }
@@ -293,6 +328,12 @@ class BusinessProfileExposurePublisher:
             fact_id,
             knowledge_cutoff,
         )
+        if (fact.get("metadata") or {}).get("publication_blocker"):
+            return {
+                "status": "fact_only",
+                "fact": fact,
+                "reason": str((fact.get("metadata") or {}).get("publication_blocker")),
+            }
         action = str((fact.get("metadata") or {}).get("source_activity_action") or "")
         if action not in _ACTION_ROLES:
             raise ValueError("ambiguous_or_unsupported_exposure_direction")
@@ -310,6 +351,17 @@ class BusinessProfileExposurePublisher:
             evidence_requirement=evidence_requirement,
             knowledge_cutoff=knowledge_cutoff,
         )
+        if not mapping.price_series_id:
+            return {
+                "status": "fact_only",
+                "fact": fact,
+                "mapping": {
+                    "mapping_id": mapping.mapping_id,
+                    "commodity_id": mapping.commodity_id,
+                    "catalog_version": mapping.catalog_version,
+                },
+                "reason": "market_series_unresolved",
+            }
         assumptions = self._resolve_assumptions(
             instrument_id=fact["instrument_id"],
             scope_ids=(product_id, fact.get("segment_id"), fact["instrument_id"]),
@@ -438,28 +490,40 @@ class BusinessProfileExposurePublisher:
         )
         self.repository.upsert("exposures", payload)
         current = _find_record(self.repository, "exposures", "exposure_id", exposure_id)
-        audit = self.review_service.system_promote_record(
-            "exposures",
-            exposure_id,
+        identities = {
+            "catalog_version": mapping.catalog_version,
+            "publication_policy": PUBLICATION_POLICY_VERSION,
+        }
+        manifest = FieldFamilyPromotionManifest(
             field_family="commodity_exposure_publication",
-            policy_version=PUBLICATION_POLICY_VERSION,
-            gate_manifest_hash=build_policy_hash,
-            reviewer_version="v1",
-            expected_updated_at=current["updated_at"],
-            evidence_references=[
-                fact["evidence_id"],
-                fact_id,
-                mapping.mapping_id,
-                *assumption_ids,
-            ],
-            metadata={"component_lineage_hash": component_lineage_hash},
+            enabled=True,
+            benchmark_passed=True,
+            identities=identities,
+        )
+        gates = {name: True for name in manifest.required_gates}
+        promotion = BusinessProfilePromotionService(self.review_service).process(
+            PromotionContext(
+                target_type="exposures",
+                target_id=exposure_id,
+                instrument_id=fact["instrument_id"],
+                field_family="commodity_exposure_publication",
+                expected_updated_at=current["updated_at"],
+                gates=gates,
+                runtime_identities=identities,
+                evidence_references=tuple(
+                    [fact["evidence_id"], fact_id, mapping.mapping_id, *assumption_ids]
+                ),
+                metadata={"component_lineage_hash": component_lineage_hash},
+            ),
+            manifest,
         )
         return {
-            "status": "published",
+            "status": "published" if promotion.get("promoted") else "held",
             "exposure": _find_record(
                 self.repository, "exposures", "exposure_id", exposure_id
             ),
-            "audit": audit,
+            "audit": promotion.get("audit"),
+            "promotion": promotion.get("decision"),
         }
 
     def _resolve_assumptions(
@@ -528,17 +592,31 @@ class BusinessProfileExposurePublisher:
         )
 
 
-def _fact_type(action: str, *, value: Any, unit: str | None) -> str:
+def _fact_type(
+    action: str,
+    *,
+    value: Any,
+    unit: str | None,
+    dimension: str | None = None,
+) -> str:
     if action == "produces":
-        return "production_volume" if value is not None else "production_activity"
+        if value is None:
+            return "production_activity"
+        return "production_value" if dimension == "currency" else "production_volume"
     if action == "hedges":
-        return "hedge_notional" if value is not None else "hedge_activity"
+        if value is None:
+            return "hedge_activity"
+        return "hedge_notional"
     prefix = {"sells": "sales", "purchases": "purchase", "consumes": "consumption"}[
         action
     ]
     if value is None:
         return f"{prefix}_activity"
-    if unit in {"CNY", "HKD", "USD"}:
+    if dimension is None:
+        # Preserve the raw assertion as an activity until the unit catalog can
+        # establish its dimension; never silently classify an unknown unit as volume.
+        return f"{prefix}_activity"
+    if dimension == "currency" or unit in {"CNY", "HKD", "USD"}:
         return f"{prefix}_value"
     return f"{prefix}_volume"
 

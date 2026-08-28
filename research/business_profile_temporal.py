@@ -92,20 +92,23 @@ TEMPORAL_POLICIES: tuple[BusinessProfileTemporalPolicy, ...] = (
     BusinessProfileTemporalPolicy(
         "activities",
         BusinessProfileTemporalClass.POINT_IN_TIME_STATE,
-        ("instrument_id", "action", "object_type", "object_id", "segment_id"),
+        (
+            "instrument_id", "action", "object_type", "object_id", "segment_id",
+            "object_raw", "evidence_id",
+        ),
         "report_period",
         "valid_from",
         "valid_to",
-        550,
+        None,
     ),
     BusinessProfileTemporalPolicy(
         "value_chain_roles",
         BusinessProfileTemporalClass.POINT_IN_TIME_STATE,
-        ("instrument_id", "segment_id", "role"),
+        ("instrument_id", "segment_id", "role", "evidence_id"),
         "report_period",
         "valid_from",
         "valid_to",
-        550,
+        None,
     ),
     BusinessProfileTemporalPolicy(
         "relationships",
@@ -115,11 +118,14 @@ TEMPORAL_POLICIES: tuple[BusinessProfileTemporalPolicy, ...] = (
             "relationship_type",
             "counterparty_name_normalized",
             "scope_id",
+            "object_raw",
+            "object_id",
+            "evidence_id",
         ),
         "report_period",
         "valid_from",
         "valid_to",
-        550,
+        None,
     ),
     BusinessProfileTemporalPolicy(
         "exposure_facts",
@@ -159,7 +165,7 @@ TEMPORAL_POLICIES: tuple[BusinessProfileTemporalPolicy, ...] = (
         "report_period",
         "effective_from",
         "effective_to",
-        550,
+        None,
     ),
 )
 

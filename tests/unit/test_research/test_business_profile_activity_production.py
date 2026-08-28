@@ -54,18 +54,74 @@ def test_exact_entity_resolution_and_ambiguity_fail_closed():
     assert exception["ranked_local_choices"] == ["entity-a", "entity-b"]
 
 
-def test_official_filing_legal_name_gets_stable_local_identity():
+def test_directory_missing_legal_name_remains_unresolved():
     resolver = GovernedCounterpartyResolver(entities=[])
 
     first = resolver.resolve("内蒙古蒙东矿建工程有限公司")
     repeated = resolver.resolve("内蒙古蒙东矿建工程有限公司")
 
-    assert first.status == "resolved"
-    assert first.entity_id == repeated.entity_id
-    assert first.entity_id.startswith("local-entity:")
-    assert first.normalized_name == "内蒙古蒙东矿建工程有限公司"
-    assert first.basis == "official_filing_exact_name"
+    assert first.status == "unresolved"
+    assert first.entity_id is None
+    assert repeated.status == "unresolved"
     assert resolver.resolve("第一大供应商").status == "unresolved"
+
+
+def test_relationship_identity_includes_object_and_source_row():
+    producer = BusinessProfileActivityProducer(_Repository())
+    resolver = GovernedCounterpartyResolver(
+        entities=[{"entity_id": "supplier-1", "legal_name": "供应商甲"}]
+    )
+    base = {
+        "instrument_id": "601088.SH",
+        "report_period": "2025-12-31",
+        "relationship_type": "buys_from",
+        "counterparty_name_raw": "供应商甲",
+        "scope_id": "group",
+        "confidence": 1.0,
+    }
+    _, first = producer.build_relationship_or_concentration_candidate(
+        {**base, "object_raw": "原料A", "source_row_key": "row-a"},
+        resolution=resolver.resolve("供应商甲"),
+        evidence_id="evidence-1",
+        run_id="run-1",
+        data_available_date="2026-03-28",
+    )
+    _, second = producer.build_relationship_or_concentration_candidate(
+        {**base, "object_raw": "原料B", "source_row_key": "row-b"},
+        resolution=resolver.resolve("供应商甲"),
+        evidence_id="evidence-1",
+        run_id="run-1",
+        data_available_date="2026-03-28",
+    )
+    assert first["relationship_id"] != second["relationship_id"]
+
+
+def test_activity_identity_is_not_changed_by_processing_run():
+    producer = BusinessProfileActivityProducer(_Repository())
+    assertion = {
+        "instrument_id": "601088.SH",
+        "report_period": "2025-12-31",
+        "subject_scope": "issuer",
+        "action": "produces",
+        "object_type": "product",
+        "object_raw": "动力煤",
+        "object_id": "coal.thermal_coal",
+    }
+    first = producer.build_activity_candidate(
+        assertion,
+        evidence_id="evidence-1",
+        run_id="run-a",
+        data_available_date="2026-03-28",
+        extraction_method="semantic_verified",
+    )
+    second = producer.build_activity_candidate(
+        assertion,
+        evidence_id="evidence-1",
+        run_id="run-b",
+        data_available_date="2026-03-28",
+        extraction_method="semantic_verified",
+    )
+    assert first["activity_id"] == second["activity_id"]
 
 
 def test_activity_candidate_is_atomic_and_role_is_derived_locally():

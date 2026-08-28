@@ -2,10 +2,9 @@
 
 from __future__ import annotations
 
-import hashlib
 import json
+import hashlib
 import math
-import re
 from dataclasses import dataclass
 from typing import Any, Iterable, Mapping, Sequence
 
@@ -120,32 +119,10 @@ class GovernedCounterpartyResolver:
         ]
         if alias_matches:
             return _resolution(alias_matches, "approved_exact_alias")
-        disclosed_legal_name = _normalized_complete_legal_name(name)
-        if disclosed_legal_name:
-            return EntityResolution(
-                "resolved",
-                "local-entity:"
-                + hashlib.sha256(disclosed_legal_name.encode("utf-8")).hexdigest()[:24],
-                disclosed_legal_name,
-                "official_filing_exact_name",
-            )
+        # A legal-looking string is evidence, not a registry identity.  Do not
+        # synthesize a local entity id: without a unique master-data match the
+        # relationship must remain unresolved for review.
         return EntityResolution("unresolved", None, None, None)
-
-
-def _normalized_complete_legal_name(value: str) -> str | None:
-    """Accept a disclosed legal name without claiming registry-level identity."""
-
-    normalized = re.sub(r"[\s\u3000]+", "", str(value or ""))
-    if len(normalized) < 6 or re.search(r"[A-Za-z0-9]$", normalized):
-        return None
-    return (
-        normalized
-        if re.search(
-            r"(?:股份有限公司|有限责任公司|集团有限公司|有限公司|集团公司)$",
-            normalized,
-        )
-        else None
-    )
 
 
 class BusinessProfileActivityProducer:
@@ -191,8 +168,9 @@ class BusinessProfileActivityProducer:
             "object_raw": object_raw,
             "object_id": assertion.get("object_id"),
             "segment_id": assertion.get("segment_id"),
+            "source_row_key": assertion.get("source_row_key"),
+            "contract_reference_raw": assertion.get("contract_reference_raw"),
             "evidence_id": evidence_id,
-            "run_id": run_id,
         }
         activity_id = _stable_id("activity", stable_payload)
         return {
@@ -215,6 +193,8 @@ class BusinessProfileActivityProducer:
             "metadata": {
                 "schema_version": ACTIVITY_PRODUCTION_SCHEMA_VERSION,
                 "semantic_verification_id": assertion.get("verification_id"),
+                "source_row_key": assertion.get("source_row_key"),
+                "contract_reference_raw": assertion.get("contract_reference_raw"),
             },
         }
 
@@ -325,6 +305,10 @@ class BusinessProfileActivityProducer:
                 "relationship_type": relationship_type,
                 "counterparty_entity_id": resolution.entity_id,
                 "scope_id": assertion.get("scope_id"),
+                "object_raw": assertion.get("object_raw"),
+                "object_id": assertion.get("object_id"),
+                "source_row_key": assertion.get("source_row_key"),
+                "contract_reference_raw": assertion.get("contract_reference_raw"),
                 "evidence_id": evidence_id,
             },
         )
@@ -343,6 +327,8 @@ class BusinessProfileActivityProducer:
             "scope_id": str(assertion.get("scope_id") or instrument_id),
             "object_raw": assertion.get("object_raw"),
             "object_id": assertion.get("object_id"),
+            "source_row_key": assertion.get("source_row_key"),
+            "contract_reference_raw": assertion.get("contract_reference_raw"),
             "disclosed_value": assertion.get("disclosed_value"),
             "disclosed_unit": assertion.get("disclosed_unit"),
             "disclosed_share": assertion.get("disclosed_share"),
@@ -360,6 +346,8 @@ class BusinessProfileActivityProducer:
             "metadata": {
                 "entity_resolution": resolution.to_dict(),
                 "schema_version": ACTIVITY_PRODUCTION_SCHEMA_VERSION,
+                "source_row_key": assertion.get("source_row_key"),
+                "contract_reference_raw": assertion.get("contract_reference_raw"),
             },
         }
 

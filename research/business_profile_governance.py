@@ -1390,6 +1390,51 @@ class BusinessProfileRepository:
             "tables": tables,
         }
 
+    def identity_collision_report(
+        self, *, instrument_id: Optional[str] = None, limit: int = 10000
+    ) -> Dict[str, Any]:
+        """Report records that share a legacy temporal identity.
+
+        This is intentionally read-only and uses the same policy fields as
+        ``get_approved_as_of``.  It exposes legacy compression risk without
+        rewriting historical rows whose source lineage cannot be reconstructed.
+        """
+        report: Dict[str, Any] = {"instrument_id": instrument_id, "record_types": {}}
+        for record_type in (
+            "activities", "operating_facts", "relationships", "exposure_facts", "exposures"
+        ):
+            policy = get_business_profile_temporal_policy(record_type)
+            rows = self.list_records(record_type, instrument_id=instrument_id, limit=limit)
+            groups: Dict[tuple[str, ...], list[str]] = {}
+            for row in rows:
+                values = []
+                for field in policy.stable_identity_fields:
+                    value = row.get(field)
+                    if value is None:
+                        value = (row.get("metadata") or {}).get(field)
+                    values.append(str(value or ""))
+                key = tuple(values)
+                record_id = str(
+                    row.get("record_id")
+                    or row.get("activity_id")
+                    or row.get("relationship_id")
+                    or row.get("fact_id")
+                    or row.get("exposure_id")
+                    or "unknown"
+                )
+                groups.setdefault(key, []).append(record_id)
+            collisions = [
+                {"identity": list(key), "record_ids": ids}
+                for key, ids in groups.items()
+                if len(ids) > 1
+            ]
+            report["record_types"][record_type] = {
+                "rows": len(rows),
+                "collision_groups": collisions,
+                "collision_count": len(collisions),
+            }
+        return report
+
     def list_records_page(
         self,
         record_type: str,
@@ -1521,7 +1566,27 @@ class BusinessProfileRepository:
                 "AND successor.data_available_date <= ?)"
             )
             params.append(cutoff)
-        partition = ", ".join(f"{alias}.{field}" for field in policy.stable_identity_fields)
+        def identity_expr(field: str) -> str:
+            if field in spec["columns"]:
+                return f"{alias}.{field}"
+            # Lineage fields are stored in metadata_json for schema compatibility.
+            return f"json_extract({alias}.metadata_json, '$.{field}')"
+
+        partition_fields = [identity_expr(field) for field in policy.stable_identity_fields]
+        if record_type in {"activities", "relationships"}:
+            # Source-row and contract lineage live in metadata_json for schema
+            # compatibility and must participate in temporal de-duplication.
+            partition_fields.extend(
+                [
+                    "json_extract(r.metadata_json, '$.source_row_key')",
+                    "json_extract(r.metadata_json, '$.contract_reference_raw')",
+                ]
+            )
+        partition = ", ".join(partition_fields)
+        def output_order_expr(field: str) -> str:
+            if field in spec["columns"]:
+                return field
+            return f"json_extract(metadata_json, '$.{field}')"
         order_fields = []
         if policy.observation_period_field:
             order_fields.append(f"{alias}.{policy.observation_period_field} DESC")
@@ -1543,7 +1608,7 @@ class BusinessProfileRepository:
             )
             SELECT * FROM eligible
             WHERE eligibility_rank = 1
-            ORDER BY {', '.join(field + ' ASC' for field in policy.stable_identity_fields)}
+            ORDER BY {', '.join(output_order_expr(field) + ' ASC' for field in policy.stable_identity_fields)}
         """
         if limit is not None:
             sql += " LIMIT ?"
@@ -1979,7 +2044,8 @@ class BusinessProfileResolver:
         end_field = "effective_to" if record_type == "exposures" else "valid_to"
         start = _date_key(record.get(start_field))
         end = _date_key(record.get(end_field))
-        return (not start or start <= cutoff) and (not end or end >= cutoff)
+        # Validity intervals are half-open: [valid_from, valid_to).
+        return (not start or start <= cutoff) and (not end or cutoff < end)
 
     def _load_resolver_history(
         self,
@@ -2199,7 +2265,7 @@ class BusinessProfileResolver:
     def _mapping_date_eligible(mapping: Dict[str, Any], cutoff: str) -> bool:
         start = _date_key(mapping.get("valid_from"))
         end = _date_key(mapping.get("valid_to"))
-        return (not start or start <= cutoff) and (not end or end >= cutoff)
+        return (not start or start <= cutoff) and (not end or cutoff < end)
 
     def _company_executable_mappings(
         self,
@@ -2272,13 +2338,17 @@ class BusinessProfileResolver:
         company: List[Dict[str, Any]], industry: List[Dict[str, Any]]
     ) -> List[Dict[str, Any]]:
         selected = list(company)
-        company_keys = {
-            (str(item.get("product_name") or "").lower(), str(item.get("exposure_role") or "revenue"))
-            for item in company
-        }
+        def key(item: Mapping[str, Any]) -> tuple[str, str, str, str]:
+            return (
+                str(item.get("commodity_id") or item.get("product_name") or "").lower(),
+                str(item.get("exposure_role") or "revenue"),
+                str(item.get("revenue_series_id") or ""),
+                ",".join(sorted(str(value) for value in (item.get("spread_ids") or []))),
+            )
+
+        company_keys = {key(item) for item in company}
         for mapping in industry:
-            key = (str(mapping.get("product_name") or "").lower(), "revenue")
-            if key not in company_keys:
+            if key(mapping) not in company_keys:
                 selected.append(mapping)
         return selected
 
@@ -2288,10 +2358,19 @@ class BusinessProfileResolver:
     ) -> List[Dict[str, Any]]:
         conflicts: List[Dict[str, Any]] = []
         industry_by_product = {
-            str(item.get("product_name") or "").lower(): item for item in industry
+            (
+                str(item.get("commodity_id") or item.get("product_name") or "").lower(),
+                str(item.get("exposure_role") or "revenue"),
+            ): item
+            for item in industry
         }
         for item in company:
-            default = industry_by_product.get(str(item.get("product_name") or "").lower())
+            default = industry_by_product.get(
+                (
+                    str(item.get("commodity_id") or item.get("product_name") or "").lower(),
+                    str(item.get("exposure_role") or "revenue"),
+                )
+            )
             if default and default.get("direction") != item.get("direction"):
                 conflicts.append(
                     {
