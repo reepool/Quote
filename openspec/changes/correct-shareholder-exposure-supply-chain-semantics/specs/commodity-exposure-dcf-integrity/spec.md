@@ -15,6 +15,10 @@ Exposure publication identity and predecessor selection MUST include the source 
 - **WHEN** synonymous assumption names such as `pass_through` and `pass_through_score` are supplied
 - **THEN** they are canonicalized before selection and conflicting duplicates fail closed rather than using last-write-wins.
 
+#### Scenario: Correct purchase and consumption publications coexist
+- **WHEN** current publications already preserve separate purchase and consumption action lineage for the same commodity
+- **THEN** repair treats that state as valid and does not report or hold it merely because two action classes coexist.
+
 ### Requirement: Exposure role and direction are program-governed
 The system MUST derive publication role and financial direction from deterministic action and approved product/catalog rules, not from an unconstrained LLM calculation or a default revenue role.
 
@@ -60,6 +64,10 @@ The automatic company DCF path MUST accept only current mappings sourced from ap
 - **WHEN** an exposure is candidate, held, stale, superseded, or fact-only
 - **THEN** it cannot enter executable DCF mappings even if its commodity has an industry price series.
 
+#### Scenario: Exposure or assumption validity has ended
+- **WHEN** an approved exposure or assumption has an effective end at or before the valuation cutoff
+- **THEN** repository as-of selection and every executable consumer exclude it using the same half-open validity rule.
+
 #### Scenario: Diagnostic candidates change
 - **WHEN** candidate facts, relationships, or exposures change but approved executable business-profile inputs do not
 - **THEN** DCF model inputs, `profile_version`, executable input hash, and valuation lineage remain unchanged.
@@ -93,6 +101,10 @@ The system MUST provide a dry-run-first idempotent audit and repair flow for old
 #### Scenario: Cost exposure was superseded by a different action
 - **WHEN** audit finds purchase and consumption publications linked by the old predecessor key
 - **THEN** apply mode reconstructs distinct current lineages from approved facts and preserves their evidence IDs.
+
+#### Scenario: Audit distinguishes collision from valid coexistence
+- **WHEN** repair compares approved facts, predecessor/supersession pointers, and current publication lineage
+- **THEN** it reports a collision only when a distinct approved leg was lost, overwritten, or linked by the old identity, not when all expected legs are already current.
 
 #### Scenario: Industry-only context was labeled governed
 - **WHEN** an existing DCF context contains no approved company mapping but is labeled governed business profile

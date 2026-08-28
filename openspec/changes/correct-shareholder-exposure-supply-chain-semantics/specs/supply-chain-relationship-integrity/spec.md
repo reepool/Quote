@@ -19,6 +19,18 @@ The system MUST preserve a clearly disclosed named customer or supplier without 
 - **WHEN** a disclosed name matches only a unique securities short name or historical ticker name
 - **THEN** uniqueness alone does not create an approved alias or resolved legal entity.
 
+#### Scenario: Legacy company-name column contains a display name
+- **WHEN** a local provider stores the same securities display name in both `company_name` and `short_name`, or its source contract does not guarantee a full legal name
+- **THEN** the value is not eligible as `legal_name` and cannot produce `resolved_entity` without separately governed identity evidence.
+
+#### Scenario: Governed entity set is empty
+- **WHEN** named relationships are extracted but no governed local full-name entity is available
+- **THEN** the task continues, preserves each clearly disclosed name as `disclosed_name_only`, and does not fail the document or invent an entity.
+
+#### Scenario: Ticker is only a local entity key
+- **WHEN** a local listed company entity is keyed by `instrument_id`
+- **THEN** the ticker may identify the local record but is not exposed or matched as an official corporate identifier unless its identifier type is explicitly governed.
+
 ### Requirement: Relationship approval preserves identity meaning
 Approval MUST either bind a governed entity or explicitly approve the evidence-backed disclosed-name-only status; a generic approval MUST NOT silently convert an unresolved name into a resolved entity.
 
@@ -29,6 +41,14 @@ Approval MUST either bind a governed entity or explicitly approve the evidence-b
 #### Scenario: Later governed resolution
 - **WHEN** a disclosed-name-only relationship later resolves to an approved governed entity
 - **THEN** the new occurrence supersedes the prior current occurrence while preserving the earlier audit record and evidence.
+
+#### Scenario: Resolved relationship enters promotion
+- **WHEN** production resolves a relationship to a governed entity and writes canonical `identity_status=resolved_entity`
+- **THEN** promotion, exception routing, review, and API projection recognize the same status and do not add a catalog-proposal blocker because of a legacy status spelling.
+
+#### Scenario: Legacy status is read
+- **WHEN** an existing relationship contains legacy `resolution_status` or resolver-internal `resolved` / `unresolved` values
+- **THEN** one compatibility mapping derives the canonical status, new writes do not persist conflicting status fields, and later resolution updates identity and status coherently.
 
 ### Requirement: Relationship current state is report-aware
 The system MUST separate evidence occurrence identity from stable relationship lineage and MUST select the newest eligible occurrence per lineage at the knowledge cutoff.
@@ -52,6 +72,10 @@ The system MUST separate evidence occurrence identity from stable relationship l
 #### Scenario: Relationship ends explicitly
 - **WHEN** evidence or review supplies a valid end date
 - **THEN** the relationship is not current on or after that half-open interval boundary.
+
+#### Scenario: Point-in-time business record ends explicitly
+- **WHEN** an activity or value-chain role has a valid business end date at or before the requested cutoff
+- **THEN** repository as-of selection, resolver output, API projection, and readiness all exclude it using the same half-open interval rule.
 
 ### Requirement: Concentration semantics are deterministic
 Anonymous concentration facts MUST reconcile the disclosed label, relationship direction, raw value, and raw unit in program code before approval.
@@ -101,3 +125,7 @@ The repair flow MUST derive corrected lineages, current selections, and resoluti
 #### Scenario: Short-name auto-resolution was previously approved
 - **WHEN** a relationship was approved solely through an automatically approved securities short-name alias
 - **THEN** audit identifies it and apply mode either binds supported governed identity evidence or moves it to disclosed-name-only/held status without recalling the extraction LLM.
+
+#### Scenario: Legacy resolution basis is stored outside metadata root
+- **WHEN** a historical relationship stores its basis in the `resolution_basis` column or nested entity-resolution metadata, including a legacy basis name
+- **THEN** audit evaluates those authoritative locations and does not miss the row because `metadata.resolution_basis` is absent.

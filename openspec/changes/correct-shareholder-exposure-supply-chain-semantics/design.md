@@ -57,7 +57,10 @@ CLI, scheduler, Telegram, API, and the repair operator are adapters around these
 - one normalized report-date representation is used for comparison, hashes, persistence, and readiness;
 - a selected shareholder value and its source/raw provenance change together;
 - a disclosed counterparty name is not equivalent to a governed legal entity;
+- a column named `company_name` is not authoritative by itself; its provider field contract must prove that it contains a full legal name rather than a securities display name;
+- relationship identity state has one canonical vocabulary across production, promotion, review, query, and repair;
 - occurrence evidence is not a stable cross-report relationship identity;
+- every as-of query applies the same knowledge and half-open business-validity predicate before selecting current records;
 - diagnostic candidates never affect approved model inputs or their fingerprints;
 - `degraded` means useful partial work with unresolved gaps, never unqualified success; and
 - historical repair changes only locally reconstructable derived state and is dry-run by default.
@@ -91,12 +94,20 @@ Relationship records use two explicit identities:
 
 Current-state selection first chooses the newest eligible report cohort for each stable lineage, subject to explicit half-open validity and the configured relationship freshness window, then retains every distinct occurrence inside that cohort. This makes the same customer in consecutive annual reports one current lineage while preserving two contracts disclosed in the same report. A source-row key that embeds `evidence_id` cannot be used as cross-report lineage. Historical occurrences remain queryable; physical supersession fields may support audit, but they do not replace correct as-of selection.
 
-Counterparty identity is resolved only from local governed identity data at the knowledge cutoff. `company_profiles.company_name` or an equivalent governed full-name field supplies legal names. `instruments.name`, ticker labels, and company-profile short names are securities display names and never become `legal_name` merely because they are unique. Explicitly reviewed aliases remain allowed. Counterparty status has two valid business meanings:
+Counterparty identity is resolved only from local governed identity data at the knowledge cutoff. A field becomes eligible as `legal_name` only when its owner and source contract establish that it contains a full legal company name. Existing PyTDX/BaoStock display-name fields, `instruments.name`, ticker labels, company-profile short names, and legacy rows where `company_name == short_name` are not promoted to legal names merely because the column is named `company_name` or the value is unique. The company-profile sync owner must either persist the value as a short name or mark the full-name authority explicitly; the relationship pipeline must not invent this authority. Explicitly reviewed aliases remain allowed.
+
+The local `instrument_id` remains the governed entity key but is not presented as an official corporate identifier. A real official identifier is used only when its identifier type and value are locally governed. If no governed full-name entity exists, named-relationship extraction continues and preserves the annual-report disclosure as `disclosed_name_only`; absence of the optional local entity catalog must not fail the whole `named_relationships` task.
+
+Counterparty status has two canonical business meanings:
 
 - `resolved_entity`: exact governed legal name, official identifier, or explicitly approved alias resolves to a local entity ID.
 - `disclosed_name_only`: the annual report clearly names an external counterparty but no governed local entity is available. The relationship may be approved as a disclosure fact without claiming legal-entity resolution or enabling cross-company joins.
 
 Unique ticker short names are not approved aliases. Human review of an unresolved name must explicitly choose `disclosed_name_only` or bind a governed entity; a generic approve action cannot silently claim entity resolution. This avoids requiring a world-wide company catalog while keeping evidence-backed suppliers and customers.
+
+`identity_status` is the canonical persisted and API-facing field. Production, promotion gates, review rules, exception closure, temporal successors, and repair compare the same values above. Legacy `resolution_status`, resolver-internal `resolved` / `unresolved`, and historical basis names are normalized at the boundary; two status fields must never disagree inside a newly written record. A later entity resolution writes a coherent successor with both governed identity and `resolved_entity` status before closing catalog exceptions.
+
+The repository owns the common as-of predicate. It first applies data availability and the half-open knowledge interval, then the record type's half-open business interval whenever start/end fields exist, and finally applies report cutoff/freshness where the temporal policy defines them. Relationship current-state selection then chooses the latest eligible report cohort and preserves distinct same-cohort occurrences. Resolver and API layers may report why rows were excluded but must not implement a different current-state rule.
 
 Anonymous concentration facts are selected by deterministic aggregate labels and direction together. Labels such as top-five customers/suppliers may force anonymous concentration even when the LLM omits the flag. Generic labels such as `关联方` do not by themselves establish anonymity or customer/supplier direction. Program code normalizes raw percentages/fractions, validates a finite `[0, 1]` value, and rejects contradictory or unit-ambiguous inputs. The LLM does not perform the percentage calculation.
 
@@ -125,15 +136,15 @@ One bounded repair application service performs `audit` and `apply` modes; `audi
 
 The audit identifies at least:
 
-- inferred controller fields unsupported by local control history;
+- aggregate-source controller fields that can be proven to be first-holder inference and are unsupported by local official control evidence;
 - scope labels unsupported by actual snapshot fields;
 - older or lower-authority scope values incorrectly retained;
-- approved short-name resolutions and relationship lineages left concurrently current;
-- purchase/consumption or consumer publications linked by the old collision key;
+- approved short-name resolutions by reading the persisted resolution column and nested entity-resolution metadata, including legacy basis names, plus relationship lineages left concurrently current;
+- purchase/consumption or consumer publications that lost or superseded a distinct leg under the old collision key, while treating correctly coexisting legs as valid;
 - fact-only gaps incorrectly closed; and
 - DCF contexts labeled governed using industry-only mappings.
 
-Apply mode runs transactionally per instrument, records before/after counts and stable IDs, and is idempotent. It recomputes from local raw payloads, approved evidence, semantic artifacts, control history, facts, and catalogs. Unsupported inferred fields are cleared; historical relationships are superseded rather than erased; derived exposure publications are replayed from approved facts. Rows that cannot be reconstructed locally are marked incomplete/held and reported for normal owner-managed follow-up, not silently guessed or remotely reacquired by the repair command.
+Apply mode runs transactionally per instrument, records before/after counts and stable IDs, and is idempotent. It recomputes from local raw payloads, approved evidence, semantic artifacts, control history, facts, and catalogs. A controller is cleared only when local provenance positively identifies an aggregate/fallback inference and no eligible official source supports it; absence of a row in the newer control-history table is insufficient proof, so official or ambiguous values remain unchanged and are reported for review. Historical relationships transition through the normal review/temporal owner; derived exposure publications replay through the current publisher. Rows that cannot be reconstructed locally are marked incomplete/held and reported for normal owner-managed follow-up, not silently guessed or remotely reacquired by the repair command.
 
 Source documents, evidence, valid historical occurrences, and review decisions are immutable audit inputs and are never deleted by repair. Incorrect derived rows normally move through existing held/rejected/superseded states. Physical deletion is limited to exact machine-derived duplicates that were never independently valid, have no inbound lineage/review references, and are listed with a reason in both audit and apply reports.
 
@@ -143,6 +154,9 @@ The repair report distinguishes `would_change`, `changed`, `unchanged`, `held`, 
 
 - [Corrected readiness may fall sharply] -> Report old and corrected coverage side by side during audit and do not call the drop a sync failure.
 - [Removing inferred controllers creates temporary nulls] -> Prefer an honest missing value and local control-history recovery over a false controller; normal shareholder sync remains the owner of later replenishment.
+- [A legacy official controller has no control-history row] -> Do not clear it from negative evidence alone; require aggregate-source inference provenance or hold the case for review.
+- [The local company profile contains only securities display names] -> Continue named-relationship production as `disclosed_name_only`; do not fail the batch or manufacture a legal entity.
+- [Legacy relationship statuses use several spellings] -> Normalize them at one compatibility boundary and write only the canonical status thereafter.
 - [Relationship lineage can collapse genuinely distinct relationships] -> Keep contract reference and same-period occurrence identity, and test repeated counterparties with multiple contracts.
 - [Approved short-name relationships may be demoted] -> Audit by resolution basis and retain raw evidence; allow explicit `disclosed_name_only` approval without fabricating an entity.
 - [DCF results change after industry fallback is removed] -> Emit a valuation-lineage reason showing that no approved company mapping was available and compare representative valuations before rollout.
@@ -152,11 +166,13 @@ The repair report distinguishes `would_change`, `changed`, `unchanged`, `held`, 
 ## Migration Plan
 
 1. Implement and test future-write shareholder field/merge/readiness rules without changing production data.
-2. Implement relationship and exposure identity/publication corrections, including dual reading of existing records where necessary.
-3. Enforce DCF executable-source and role-direction rules; validate representative revenue, cost, mixed, and industry-only cases.
-4. Run the repair audit on a temporary database copy and review counts/samples for all affected categories.
-5. Deploy code, run bounded apply by instrument cohort, and verify shareholder APIs, business-profile APIs, exposure APIs, and DCF lineage after each cohort.
-6. Remove compatibility handling only after no old collision/current-state rows remain and targeted backfills succeed.
+2. Correct the governed full-name source contract and canonical relationship status mapping; prove that an empty governed entity set degrades to disclosed-name relationships rather than aborting the task.
+3. Centralize repository as-of eligibility and then validate relationship cohorts, explicit end dates, expired activities/roles/assumptions/exposures, and approved-only API/DCF reads.
+4. Correct repair classifiers before enabling writes: distinguish official controller evidence from aggregate inference, read all persisted relationship basis locations, and distinguish lost legacy exposure legs from valid coexistence.
+5. Enforce DCF executable-source and role-direction rules; validate representative revenue, cost, mixed, and industry-only cases.
+6. Run audit and bounded apply on a temporary database copy, review every issue category and before/after API result, and permit production cohorts only when the audit has no destructive false positives.
+7. Deploy code, run bounded apply by instrument cohort, and verify shareholder APIs, business-profile APIs, exposure APIs, and DCF lineage after each cohort.
+8. Remove compatibility handling only after no old collision/current-state rows remain and targeted backfills succeed.
 
 Rollback consists of disabling repair apply, reverting the code release, and restoring affected local database files from the normal backup made before migration. The audit report contains stable IDs needed to verify restoration; no remote source mutation occurs.
 

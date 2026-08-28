@@ -108,6 +108,14 @@ The system MUST provide a dry-run-first, idempotent repair mode that recomputes 
 - **WHEN** an aggregate-source controller equals the first top holder and no eligible local control record supports that inference
 - **THEN** audit reports it and apply mode clears the controller fields and recalculates coverage.
 
+#### Scenario: Official controller predates local control history
+- **WHEN** a controller value has attributable official-source provenance but the newer local control-history table has no matching row
+- **THEN** audit does not classify the value as inferred from absence alone, and apply mode leaves it unchanged or holds it for explicit review.
+
+#### Scenario: Controller provenance is ambiguous
+- **WHEN** local records cannot prove whether a controller was officially disclosed or inferred from the first top holder
+- **THEN** repair reports an ambiguous held case and performs no destructive change.
+
 #### Scenario: Local evidence is insufficient
 - **WHEN** a required scope cannot be reconstructed from local persisted data
 - **THEN** apply mode marks the scope incomplete and reports owner-managed follow-up instead of inventing a value or calling a provider.
