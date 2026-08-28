@@ -14,6 +14,7 @@ from typing import Any, Dict, List, Optional, Set
 from research.providers import ShareholderProviderRegistry
 from research.providers.base import ShareholderSnapshot
 from research.empty_support import allows_optional_empty_exchange
+from research.shareholder_control_sync import persist_shareholder_control_changes
 from research.shareholder_snapshot_policy import incoming_shareholder_snapshot_is_weaker
 from research.source_policy import ResearchSourcePolicyResolver
 from research.storage import ResearchStorageManager
@@ -83,6 +84,21 @@ class ShareholderShadowSyncService:
                 )
             )
 
+        mapping_instruments: List[Dict[str, Any]] = []
+        for exchange in target_exchanges:
+            instruments = await self.db_ops.get_instruments_by_exchange(exchange)
+            mapping_instruments.extend(
+                instrument
+                for instrument in instruments
+                if instrument.get("type") == "stock" and instrument.get("is_active", True)
+            )
+        control_stats = persist_shareholder_control_changes(
+            storage=self.storage,
+            provider=self.registry.get("cninfo"),
+            instruments=mapping_instruments,
+            ingestion_run_id=None,
+        )
+
         total_written = sum(result.snapshots_written for result in results)
         success_count = sum(1 for result in results if result.status == "success")
 
@@ -93,6 +109,8 @@ class ShareholderShadowSyncService:
             "write_policy": write_policy,
             "successful_exchanges": success_count,
             "attempted_exchanges": len(results),
+            "control_changes_written": control_stats["history_upserted"],
+            "control_clues_patched": control_stats["snapshots_patched"],
         }
 
     async def _sync_exchange(

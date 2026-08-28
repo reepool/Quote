@@ -1496,6 +1496,193 @@ class ResearchStorageManager:
         }
         return stats if return_stats else None
 
+    def upsert_shareholder_control_changes(
+        self,
+        records: List[Dict[str, Any]],
+        *,
+        ingestion_run_id: Optional[int] = None,
+    ) -> int:
+        """Upsert CNInfo actual-controller change history rows."""
+        if not records:
+            return 0
+        now = get_shanghai_time().isoformat()
+        written = 0
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            for record in records:
+                instrument_id = str(record.get("instrument_id") or "").strip()
+                change_date = str(record.get("change_date") or "").strip()
+                if not instrument_id or not change_date:
+                    continue
+                change_key = "|".join(
+                    [
+                        change_date,
+                        str(record.get("control_type") or ""),
+                        str(record.get("actual_controller_name") or ""),
+                        str(record.get("direct_controller_name") or ""),
+                    ]
+                )
+                conn.execute(
+                    """
+                    INSERT INTO shareholder_control_changes (
+                        instrument_id,
+                        change_key,
+                        symbol,
+                        exchange,
+                        change_date,
+                        actual_controller_name,
+                        direct_controller_name,
+                        control_type,
+                        control_holding_shares,
+                        control_holding_ratio,
+                        source,
+                        source_mode,
+                        payload_json,
+                        ingestion_run_id,
+                        created_at,
+                        updated_at
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    ON CONFLICT(instrument_id, change_key)
+                    DO UPDATE SET
+                        symbol = excluded.symbol,
+                        exchange = excluded.exchange,
+                        change_date = excluded.change_date,
+                        actual_controller_name = excluded.actual_controller_name,
+                        direct_controller_name = excluded.direct_controller_name,
+                        control_type = excluded.control_type,
+                        control_holding_shares = excluded.control_holding_shares,
+                        control_holding_ratio = excluded.control_holding_ratio,
+                        source = excluded.source,
+                        source_mode = excluded.source_mode,
+                        payload_json = excluded.payload_json,
+                        ingestion_run_id = excluded.ingestion_run_id,
+                        updated_at = excluded.updated_at
+                    """,
+                    (
+                        instrument_id,
+                        change_key,
+                        str(record.get("symbol") or "").strip(),
+                        str(record.get("exchange") or "").strip(),
+                        change_date,
+                        record.get("actual_controller_name"),
+                        record.get("direct_controller_name"),
+                        record.get("control_type"),
+                        record.get("control_holding_shares"),
+                        record.get("control_holding_ratio"),
+                        str(record.get("source") or "cninfo"),
+                        str(record.get("source_mode") or "direct"),
+                        json.dumps(
+                            record.get("payload") or {},
+                            ensure_ascii=False,
+                            sort_keys=True,
+                            default=str,
+                        ),
+                        ingestion_run_id,
+                        now,
+                        now,
+                    ),
+                )
+                written += 1
+            conn.commit()
+        return written
+
+    def list_shareholder_control_changes(
+        self,
+        instrument_id: str,
+    ) -> List[Dict[str, Any]]:
+        """Return actual-controller change history for one instrument."""
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            rows = conn.execute(
+                """
+                SELECT
+                    instrument_id,
+                    symbol,
+                    exchange,
+                    change_date,
+                    actual_controller_name,
+                    direct_controller_name,
+                    control_type,
+                    control_holding_shares,
+                    control_holding_ratio,
+                    source,
+                    source_mode,
+                    payload_json,
+                    ingestion_run_id,
+                    created_at,
+                    updated_at
+                FROM shareholder_control_changes
+                WHERE instrument_id = ?
+                ORDER BY change_date ASC, control_type ASC
+                """,
+                (str(instrument_id).strip(),),
+            ).fetchall()
+        result: List[Dict[str, Any]] = []
+        for row in rows:
+            item = dict(row)
+            item["payload"] = self._deserialize_json(item.pop("payload_json", None)) or {}
+            result.append(item)
+        return result
+
+    def merge_shareholder_ownership_clues(
+        self,
+        instrument_id: str,
+        clues: Dict[str, Any],
+        *,
+        ingestion_run_id: Optional[int] = None,
+        source_key: str = "cninfo:direct",
+    ) -> bool:
+        """Patch ownership clues on an existing snapshot without replacing holders."""
+        existing = self.get_shareholder_snapshot(instrument_id)
+        if existing is None:
+            return False
+        snapshot_json = dict(existing.get("snapshot") or {})
+        ownership_clues = {
+            "control_owner_name": clues.get("control_owner_name"),
+            "control_owner_ratio": clues.get("control_owner_ratio"),
+            "report_date": clues.get("report_date"),
+            "direct_controller_name": clues.get("direct_controller_name"),
+            "control_type": clues.get("control_type"),
+            "control_holding_shares": clues.get("control_holding_shares"),
+        }
+        current_clues = snapshot_json.get("ownership_clues") or {}
+        if current_clues == ownership_clues and existing.get("control_owner_name") == ownership_clues[
+            "control_owner_name"
+        ] and existing.get("control_owner_ratio") == ownership_clues["control_owner_ratio"]:
+            return False
+        coverage_scope = {
+            str(item).strip()
+            for item in snapshot_json.get("coverage_scope", []) or []
+            if str(item).strip()
+        }
+        coverage_scope.add("reference_only_ownership_clues")
+        scope_sources = dict(snapshot_json.get("scope_sources") or {})
+        scope_sources["reference_only_ownership_clues"] = source_key
+        snapshot_json["ownership_clues"] = ownership_clues
+        snapshot_json["coverage_scope"] = sorted(coverage_scope)
+        snapshot_json["scope_sources"] = scope_sources
+        self.upsert_shareholder_snapshot(
+            ShareholderSnapshot(
+                instrument_id=str(existing.get("instrument_id") or instrument_id),
+                symbol=str(existing.get("symbol") or ""),
+                exchange=str(existing.get("exchange") or ""),
+                coverage_status=str(existing.get("coverage_status") or "reference_only"),
+                holder_count=existing.get("holder_count"),
+                holder_count_report_date=existing.get("holder_count_report_date"),
+                top_holders_report_date=existing.get("top_holders_report_date"),
+                top_holders_count=existing.get("top_holders_count"),
+                top_holders_total_ratio=existing.get("top_holders_total_ratio"),
+                control_owner_name=ownership_clues["control_owner_name"],
+                control_owner_ratio=ownership_clues["control_owner_ratio"],
+                schema_version=str(existing.get("schema_version") or "shareholders.v1"),
+                source=str(existing.get("source") or "cninfo"),
+                source_mode=str(existing.get("source_mode") or "direct"),
+                snapshot_json=snapshot_json,
+            ),
+            ingestion_run_id=ingestion_run_id,
+        )
+        return True
+
     def upsert_financial_statement_bundle(
         self,
         bundle: FinancialStatementBundle,
@@ -12955,6 +13142,30 @@ class ResearchStorageManager:
 
             CREATE INDEX IF NOT EXISTS idx_shareholder_snapshots_exchange_source
             ON shareholder_snapshots(exchange, source, updated_at);
+
+            CREATE TABLE IF NOT EXISTS shareholder_control_changes (
+                instrument_id TEXT NOT NULL,
+                change_key TEXT NOT NULL,
+                symbol TEXT NOT NULL,
+                exchange TEXT NOT NULL,
+                change_date TEXT NOT NULL,
+                actual_controller_name TEXT,
+                direct_controller_name TEXT,
+                control_type TEXT,
+                control_holding_shares REAL,
+                control_holding_ratio REAL,
+                source TEXT NOT NULL,
+                source_mode TEXT NOT NULL,
+                payload_json TEXT NOT NULL DEFAULT '{}',
+                ingestion_run_id INTEGER,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                PRIMARY KEY (instrument_id, change_key),
+                FOREIGN KEY (ingestion_run_id) REFERENCES ingestion_runs(id)
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_shareholder_control_changes_date
+            ON shareholder_control_changes(instrument_id, change_date);
 
             CREATE TABLE IF NOT EXISTS announcement_scan_state (
                 purpose_key TEXT NOT NULL,

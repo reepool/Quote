@@ -656,3 +656,61 @@ async def test_incremental_pending_recheck_survives_next_run_without_new_announc
     assert pending[0]["metadata"]["announcement_ids"]
     assert pending[0]["metadata"]["first_pending_at"]
     assert stored["holder_count"] == 200
+
+
+class _CninfoHistoryProvider(_ShareholderProvider):
+    def __init__(self):
+        super().__init__(holder_count=90, report_date="2026-06-30")
+        self._control_change_records = [
+            {
+                "source_symbol": "600519",
+                "security_name": "贵州茅台",
+                "change_date": "2014-06-30",
+                "actual_controller_name": "贵州省国有资产监督管理委员会",
+                "direct_controller_name": "茅台集团",
+                "control_type": "单独控制",
+                "control_holding_shares": 74126.0,
+                "control_holding_ratio": 64.9,
+                "payload": {"变动日期": "2014-06-30"},
+            }
+        ]
+
+    def drain_control_change_records(self):
+        records = list(self._control_change_records)
+        self._control_change_records = []
+        return records
+
+
+@pytest.mark.asyncio
+async def test_incremental_persists_cninfo_control_change_history(tmp_path):
+    config = _build_config(tmp_path)
+    storage = ResearchStorageManager(config)
+    storage.initialize()
+    instrument = {
+        "instrument_id": "600519.SH",
+        "symbol": "600519",
+        "name": "贵州茅台",
+        "exchange": "SSE",
+        "type": "stock",
+        "is_active": True,
+    }
+    storage.upsert_shareholder_snapshot(_complete_snapshot(instrument))
+    service = ShareholderIncrementalSyncService(
+        db_ops=_MockDbOps([instrument]),
+        storage=storage,
+        research_config=config,
+        resolver=ResearchSourcePolicyResolver(config),
+        registry=ShareholderProviderRegistry({"cninfo": _CninfoHistoryProvider()}),
+        announcement_service=_FakeAnnouncementService(
+            [_quarter_report_announcement(instrument)]
+        ),
+    )
+
+    result = await service.sync(exchanges=["SSE"], pending_recheck_days=0)
+
+    history = storage.list_shareholder_control_changes("600519.SH")
+    stored = storage.get_shareholder_snapshot("600519.SH")
+    assert result["control_changes_written"] == 1
+    assert [item["change_date"] for item in history] == ["2014-06-30"]
+    assert stored["snapshot"]["ownership_clues"]["control_type"] == "单独控制"
+    assert stored["snapshot"]["ownership_clues"]["direct_controller_name"] == "茅台集团"

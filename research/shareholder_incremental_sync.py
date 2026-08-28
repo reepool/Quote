@@ -29,6 +29,7 @@ from research.shareholder_announcement_filters import (
     shareholder_announcement_filter,
     shareholder_announcement_stream_specs,
 )
+from research.shareholder_control_sync import persist_shareholder_control_changes
 from research.shareholder_snapshot_policy import incoming_shareholder_snapshot_is_weaker
 from research.shareholder_sync import ShareholderExchangeSyncResult, ShareholderShadowSyncService
 from research.source_policy import ResearchSourcePolicyResolver
@@ -214,6 +215,13 @@ class ShareholderIncrementalSyncService:
                 run_id=run_id,
                 dry_run=dry_run,
             )
+            control_stats = persist_shareholder_control_changes(
+                storage=self.storage,
+                provider=self.registry.get("cninfo"),
+                instruments=all_instruments,
+                ingestion_run_id=run_id,
+                dry_run=dry_run,
+            )
 
             status = self._derive_status(
                 candidate_count=len(candidates),
@@ -231,6 +239,8 @@ class ShareholderIncrementalSyncService:
                 "unchanged_instruments": write_result["unchanged_instruments"],
                 "pending_rechecks": write_result["pending_rechecks"],
                 "failed_instruments": write_result["failed_instruments"],
+                "control_changes_written": control_stats["history_upserted"],
+                "control_clues_patched": control_stats["snapshots_patched"],
                 "attempted_sources": sorted(attempted_sources),
                 "successful_sources": sorted(successful_sources),
                 "scan_errors": scan_result["errors"][:10],
@@ -1011,6 +1021,9 @@ def _normalize_ownership(value: Dict[str, Any]) -> Dict[str, Any]:
         "control_owner_name": _clean_text(value.get("control_owner_name")),
         "control_owner_ratio": _to_float(value.get("control_owner_ratio")),
         "report_date": _clean_text(value.get("report_date")),
+        "direct_controller_name": _clean_text(value.get("direct_controller_name")),
+        "control_type": _clean_text(value.get("control_type")),
+        "control_holding_shares": _to_float(value.get("control_holding_shares")),
     }
 
 

@@ -51,6 +51,9 @@ class CninfoShareholdersProvider(BaseShareholderProvider):
         self.retry_attempts = max(0, retry_attempts)
         self.retry_backoff_seconds = max(0.0, retry_backoff_seconds)
         self.tls_config = HttpTlsConfig(source_name=self.source_name)
+        self._control_table_loaded = False
+        self._control_change_records: List[Dict[str, Any]] = []
+        self._control_rows_by_symbol: Dict[str, Dict[str, Any]] = {}
 
     async def fetch_shareholder_snapshots(
         self,
@@ -216,30 +219,72 @@ class CninfoShareholdersProvider(BaseShareholderProvider):
                     unresolved_symbols.discard(symbol)
         return result
 
+    def drain_control_change_records(self) -> List[Dict[str, Any]]:
+        """Return and clear CNInfo actual-controller change rows from the last load."""
+        records = list(self._control_change_records)
+        self._control_change_records = []
+        return records
+
     def _load_control_holder_rows(
         self,
         akshare: Any,
         symbols: set[str],
     ) -> Dict[str, Dict[str, Any]]:
+        self._ensure_control_table(akshare)
+        return {
+            symbol: row
+            for symbol, row in self._control_rows_by_symbol.items()
+            if symbol in symbols
+        }
+
+    def _ensure_control_table(self, akshare: Any) -> None:
+        if self._control_table_loaded:
+            return
+        self._control_table_loaded = True
         try:
             frame = akshare.stock_hold_control_cninfo(symbol="全部")
         except Exception:
-            return {}
+            return
         if frame is None or frame.empty:
-            return {}
+            return
 
         rows = frame.where(pd.notnull(frame), None).to_dict(orient="records")
-        result: Dict[str, Dict[str, Any]] = {}
+        latest_rows: Dict[str, Dict[str, Any]] = {}
+        records: List[Dict[str, Any]] = []
         for row in rows:
             symbol = str(row.get("证券代码") or "").strip()
-            if not symbol or symbol not in symbols:
+            if not symbol:
                 continue
-            current = result.get(symbol)
+            record = self._normalize_control_change_record(row)
+            if record.get("change_date") is None:
+                continue
+            records.append(record)
+            current = latest_rows.get(symbol)
             if current is None or self._date_sort_key(
-                self._normalize_date(row.get("变动日期"))
+                record["change_date"]
             ) >= self._date_sort_key(self._normalize_date(current.get("变动日期"))):
-                result[symbol] = row
-        return result
+                latest_rows[symbol] = row
+        records.sort(
+            key=lambda item: (
+                str(item.get("source_symbol") or ""),
+                str(item.get("change_date") or ""),
+            )
+        )
+        self._control_change_records = records
+        self._control_rows_by_symbol = latest_rows
+
+    def _normalize_control_change_record(self, row: Dict[str, Any]) -> Dict[str, Any]:
+        return {
+            "source_symbol": str(row.get("证券代码") or "").strip(),
+            "security_name": self._pick_first(row, ("证券简称",)),
+            "change_date": self._normalize_date(row.get("变动日期")),
+            "actual_controller_name": self._pick_first(row, ("实际控制人名称",)),
+            "direct_controller_name": self._pick_first(row, ("直接控制人名称",)),
+            "control_type": self._pick_first(row, ("控制类型",)),
+            "control_holding_shares": self._to_float(row.get("控股数量")),
+            "control_holding_ratio": self._to_float(row.get("控股比例")),
+            "payload": self._json_ready(row),
+        }
 
     def _load_top_holder_bundles(
         self,
@@ -597,6 +642,11 @@ class CninfoShareholdersProvider(BaseShareholderProvider):
         control_owner_report_date = self._normalize_date(
             self._pick_first(control_row, ("变动日期",))
         )
+        direct_controller_name = self._pick_first(control_row, ("直接控制人名称",))
+        control_type = self._pick_first(control_row, ("控制类型",))
+        control_holding_shares = self._to_float(
+            None if control_row is None else control_row.get("控股数量")
+        )
         top_holders = list((top_holder_bundle or {}).get("top_holders") or [])
         top_holders_report_date = (top_holder_bundle or {}).get(
             "top_holders_report_date"
@@ -634,6 +684,9 @@ class CninfoShareholdersProvider(BaseShareholderProvider):
                 "control_owner_name": control_owner_name,
                 "control_owner_ratio": control_owner_ratio,
                 "report_date": control_owner_report_date,
+                "direct_controller_name": direct_controller_name,
+                "control_type": control_type,
+                "control_holding_shares": control_holding_shares,
             },
         }
         raw_payload = {

@@ -2483,6 +2483,8 @@ def _format_shareholder_shadow_scheduler_report(
         f"本次写入/刷新快照: {total_written}",
         f"本次无需改写快照: {unchanged_total}",
         f"本次未补齐标的: {missing_total}",
+        f"实控人变动入库: {int(result.get('control_changes_written', 0) or 0)}",
+        f"实控人线索回补: {int(result.get('control_clues_patched', 0) or 0)}",
     ]
 
     if isinstance(readiness, dict):
@@ -2850,6 +2852,8 @@ def _format_shareholder_incremental_scheduler_report(
         f"未变化: {unchanged}",
         f"待复查: {pending}",
         f"失败: {failed}",
+        f"实控人变动入库: {int(result.get('control_changes_written', 0) or 0)}",
+        f"实控人线索回补: {int(result.get('control_clues_patched', 0) or 0)}",
     ]
     if dry_run:
         lines.append(f"dry_run 预计写入: {would_write}")

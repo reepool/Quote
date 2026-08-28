@@ -327,6 +327,8 @@ def test_cninfo_shareholders_provider_builds_partial_snapshot(monkeypatch):
                         "变动日期": date(2025, 12, 31),
                         "实际控制人名称": "贵州省人民政府国有资产监督管理委员会",
                         "控股比例": 54.07,
+                        "控股数量": 74126.0,
+                        "控制类型": "单独控制",
                         "直接控制人名称": "中国贵州茅台酒厂（集团）有限责任公司",
                     }
                 ]
@@ -358,6 +360,14 @@ def test_cninfo_shareholders_provider_builds_partial_snapshot(monkeypatch):
         "holder_count",
         "reference_only_ownership_clues",
     ]
+    assert snapshot.snapshot_json["ownership_clues"] == {
+        "control_owner_name": "贵州省人民政府国有资产监督管理委员会",
+        "control_owner_ratio": 54.07,
+        "report_date": "2025-12-31",
+        "direct_controller_name": "中国贵州茅台酒厂（集团）有限责任公司",
+        "control_type": "单独控制",
+        "control_holding_shares": 74126.0,
+    }
     assert snapshot.raw_payload["holder_count"]["变动日期"] == "2025-12-31"
     assert snapshot.raw_payload["control_holder"]["变动日期"] == "2025-12-31"
 
@@ -444,6 +454,78 @@ def test_cninfo_shareholders_provider_builds_top10_snapshot(monkeypatch):
     ]
     assert snapshot.snapshot_json["top_holders"][0]["holding_shares"] == 778821955
     assert snapshot.raw_payload["request_symbol"] == "600519"
+
+
+def test_cninfo_shareholders_provider_keeps_control_change_history(monkeypatch):
+    provider = CninfoShareholdersProvider(request_interval_seconds=0)
+    monkeypatch.setattr(
+        provider,
+        "_candidate_report_dates",
+        lambda limit=8: ["20251231"],
+    )
+    monkeypatch.setattr(
+        "research.providers.cninfo_shareholders.load_akshare",
+        lambda mode="direct": SimpleNamespace(
+            stock_hold_num_cninfo=lambda **kwargs: pd.DataFrame(
+                [
+                    {
+                        "证券代码": "600519",
+                        "证券简称": "贵州茅台",
+                        "变动日期": date(2025, 12, 31),
+                        "本期股东人数": 87654,
+                    }
+                ]
+            ),
+            stock_hold_control_cninfo=lambda symbol="全部": pd.DataFrame(
+                [
+                    {
+                        "证券代码": "600519",
+                        "证券简称": "贵州茅台",
+                        "变动日期": date(2014, 6, 30),
+                        "实际控制人名称": "贵州省国有资产监督管理委员会",
+                        "控股比例": 64.9,
+                        "控股数量": 74126.0,
+                        "控制类型": "单独控制",
+                        "直接控制人名称": "中国贵州茅台酒厂(集团)有限责任公司",
+                    },
+                    {
+                        "证券代码": "600519",
+                        "证券简称": "贵州茅台",
+                        "变动日期": date(2020, 1, 15),
+                        "实际控制人名称": "贵州省人民政府国有资产监督管理委员会",
+                        "控股比例": 54.07,
+                        "控股数量": 77882.0,
+                        "控制类型": "单独控制",
+                        "直接控制人名称": "中国贵州茅台酒厂（集团）有限责任公司",
+                    },
+                ]
+            ),
+        ),
+    )
+    monkeypatch.setattr(provider, "_load_top_holder_bundles", lambda *args: {})
+
+    snapshots = provider._fetch_shareholder_snapshots_sync(
+        [
+            {
+                "instrument_id": "600519.SH",
+                "symbol": "600519",
+                "exchange": "SSE",
+                "type": "stock",
+            }
+        ],
+        "SSE",
+    )
+
+    assert snapshots[0].snapshot_json["ownership_clues"]["report_date"] == "2020-01-15"
+    assert (
+        snapshots[0].snapshot_json["ownership_clues"]["control_owner_name"]
+        == "贵州省人民政府国有资产监督管理委员会"
+    )
+    history = provider.drain_control_change_records()
+    assert [item["change_date"] for item in history] == ["2014-06-30", "2020-01-15"]
+    assert history[0]["source_symbol"] == "600519"
+    assert history[1]["control_type"] == "单独控制"
+    assert provider.drain_control_change_records() == []
 
 
 def test_cninfo_shareholders_provider_continues_to_older_reports_for_unresolved_symbols(
