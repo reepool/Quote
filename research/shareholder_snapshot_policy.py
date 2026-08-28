@@ -2,9 +2,66 @@
 
 from __future__ import annotations
 
-from typing import Any, Dict, Optional, Set
+from typing import Any, Dict, List, Optional, Set
 
 from research.providers.base import ShareholderSnapshot
+
+
+MAIN_BOARD_TOP10_EXCHANGES = frozenset({"SSE", "SZSE"})
+REQUIRED_MAIN_BOARD_TOP_HOLDERS = 10
+
+
+def top_holders_satisfy_required_scope(exchange: str, top_holders: Any) -> bool:
+    """Return whether a top-holder list satisfies the exchange coverage rule."""
+    holders = top_holders if isinstance(top_holders, list) else []
+    count = len(holders)
+    if str(exchange or "").strip().upper() in MAIN_BOARD_TOP10_EXCHANGES:
+        return count >= REQUIRED_MAIN_BOARD_TOP_HOLDERS
+    return count > 0
+
+
+def actual_shareholder_coverage_scope(
+    *,
+    exchange: str,
+    snapshot_json: Optional[Dict[str, Any]] = None,
+    holder_count: Any = None,
+) -> Set[str]:
+    """Return coverage actually present, not just claimed coverage_scope values."""
+    payload = snapshot_json if isinstance(snapshot_json, dict) else {}
+    claimed = coverage_scope_of(payload)
+    actual: Set[str] = set()
+
+    holder_value = holder_count
+    holder_blob = payload.get("holder_count")
+    if holder_value is None and isinstance(holder_blob, dict):
+        holder_value = holder_blob.get("value")
+    if holder_value is not None:
+        actual.add("holder_count")
+
+    if top_holders_satisfy_required_scope(exchange, payload.get("top_holders") or []):
+        actual.add("top10_holders")
+
+    if "reference_only_ownership_clues" in claimed:
+        actual.add("reference_only_ownership_clues")
+    return actual
+
+
+def build_shareholder_coverage_scope(
+    *,
+    exchange: str,
+    holder_count: Any,
+    top_holders: Any,
+    has_ownership_clues: bool,
+) -> List[str]:
+    """Build coverage_scope using exchange-specific top10 completeness."""
+    scope: List[str] = []
+    if holder_count is not None:
+        scope.append("holder_count")
+    if top_holders_satisfy_required_scope(exchange, top_holders):
+        scope.append("top10_holders")
+    if has_ownership_clues:
+        scope.append("reference_only_ownership_clues")
+    return scope
 
 
 def coverage_scope_of(snapshot_json: Optional[Dict[str, Any]]) -> Set[str]:
@@ -35,12 +92,47 @@ def incoming_shareholder_snapshot_is_weaker(
     existing_json = stored_snapshot_json(existing_snapshot)
     if existing_json is None:
         return False
-    if required_scope and not required_scope.issubset(coverage_scope_of(existing_json)):
-        return False
 
+    exchange = str(
+        (existing_snapshot or {}).get("exchange")
+        or incoming.exchange
+        or ""
+    )
     incoming_json = incoming.snapshot_json if isinstance(incoming.snapshot_json, dict) else {}
-    if required_scope and not required_scope.issubset(coverage_scope_of(incoming_json)):
-        return True
+    existing_actual = actual_shareholder_coverage_scope(
+        exchange=exchange,
+        snapshot_json=existing_json,
+        holder_count=(
+            existing_snapshot.get("holder_count") if existing_snapshot else None
+        ),
+    )
+    incoming_actual = actual_shareholder_coverage_scope(
+        exchange=str(incoming.exchange or exchange),
+        snapshot_json=incoming_json,
+        holder_count=incoming.holder_count,
+    )
+    existing_tops = (
+        existing_json.get("top_holders") if isinstance(existing_json, dict) else []
+    ) or []
+    incoming_tops = (
+        incoming_json.get("top_holders") if isinstance(incoming_json, dict) else []
+    ) or []
+
+    if required_scope and required_scope.issubset(existing_actual):
+        if required_scope and not required_scope.issubset(incoming_actual):
+            return True
+    elif required_scope and required_scope.issubset(incoming_actual):
+        return False
+    else:
+        if set(existing_actual) - set(incoming_actual):
+            return True
+        if len(incoming_tops) > len(existing_tops if isinstance(existing_tops, list) else []):
+            return False
+        if len(incoming_tops if isinstance(incoming_tops, list) else []) < len(
+            existing_tops if isinstance(existing_tops, list) else []
+        ):
+            return True
+        return False
 
     existing_holder_date = _holder_count_report_date(existing_json) or _normalize_report_date(
         existing_snapshot.get("holder_count_report_date") if existing_snapshot else None

@@ -127,7 +127,7 @@ class _ShareholderProvider(BaseShareholderProvider):
                 ),
                 holder_count_report_date=self.report_date,
                 top_holders_report_date=self.report_date if has_top else None,
-                top_holders_count=1 if has_top else 0,
+                top_holders_count=10 if has_top else 0,
                 top_holders_total_ratio=50.0 if has_top else None,
                 control_owner_name="控股股东A" if has_owner else None,
                 control_owner_ratio=50.0 if has_owner else None,
@@ -142,14 +142,15 @@ class _ShareholderProvider(BaseShareholderProvider):
                     "top_holders": (
                         [
                             {
-                                "rank": 1,
-                                "holder_name": "控股股东A",
+                                "rank": index,
+                                "holder_name": f"股东{index}",
                                 "holding_shares": 1000000,
-                                "holding_ratio": 50.0,
+                                "holding_ratio": 5.0,
                                 "holder_type": "流通A股",
                                 "change": "未变",
                                 "report_date": self.report_date,
                             }
+                            for index in range(1, 11)
                         ]
                         if has_top
                         else []
@@ -179,7 +180,7 @@ def _complete_snapshot(
         holder_count=holder_count,
         holder_count_report_date=report_date,
         top_holders_report_date=report_date,
-        top_holders_count=1,
+        top_holders_count=10,
         top_holders_total_ratio=50.0,
         control_owner_name="控股股东A",
         control_owner_ratio=50.0,
@@ -194,14 +195,15 @@ def _complete_snapshot(
             "holder_count": {"value": holder_count, "report_date": report_date},
             "top_holders": [
                 {
-                    "rank": 1,
-                    "holder_name": "控股股东A",
+                    "rank": index,
+                    "holder_name": f"股东{index}",
                     "holding_shares": 1000000,
-                    "holding_ratio": 50.0,
+                    "holding_ratio": 5.0,
                     "holder_type": "流通A股",
                     "change": "未变",
                     "report_date": report_date,
                 }
+                for index in range(1, 11)
             ],
             "ownership_clues": {
                 "control_owner_name": "控股股东A",
@@ -520,7 +522,7 @@ async def test_incremental_does_not_overwrite_complete_snapshot_with_partial(tmp
     assert result["pending_rechecks"] == 1
     assert result["failed_instruments"] == 0
     assert stored["holder_count"] == 200
-    assert stored["top_holders_count"] == 1
+    assert stored["top_holders_count"] == 10
     assert stored["snapshot"]["top_holders"]
     pending = storage.list_pending_shareholder_rechecks()
     assert [item["instrument_id"] for item in pending] == ["600519.SH"]
@@ -602,7 +604,7 @@ async def test_incremental_keeps_failed_announcement_names_in_pending_recheck(tm
     assert result["pending_rechecks"] == 1
     assert result["failed_instruments"] == 0
     assert stored["holder_count"] == 200
-    assert stored["top_holders_count"] == 1
+    assert stored["top_holders_count"] == 10
     assert [item["instrument_id"] for item in pending] == ["600519.SH"]
     assert pending[0]["status"] == "pending_recheck"
     assert pending[0]["content_hash"]

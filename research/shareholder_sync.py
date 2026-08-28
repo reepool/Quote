@@ -15,7 +15,11 @@ from research.providers import ShareholderProviderRegistry
 from research.providers.base import ShareholderSnapshot
 from research.empty_support import allows_optional_empty_exchange
 from research.shareholder_control_sync import persist_shareholder_control_changes
-from research.shareholder_snapshot_policy import incoming_shareholder_snapshot_is_weaker
+from research.shareholder_snapshot_policy import (
+    actual_shareholder_coverage_scope,
+    incoming_shareholder_snapshot_is_weaker,
+    top_holders_satisfy_required_scope,
+)
 from research.source_policy import ResearchSourcePolicyResolver
 from research.storage import ResearchStorageManager
 from utils import dm_logger
@@ -715,7 +719,12 @@ class ShareholderShadowSyncService:
             return False
         if not required_scope:
             return True
-        return required_scope.issubset(self._extract_scope_set(snapshot))
+        actual = actual_shareholder_coverage_scope(
+            exchange=snapshot.exchange,
+            snapshot_json=snapshot.snapshot_json,
+            holder_count=snapshot.holder_count,
+        )
+        return required_scope.issubset(actual)
 
     def _merge_snapshots(
         self,
@@ -765,7 +774,25 @@ class ShareholderShadowSyncService:
 
         existing_top_holders = list(existing.snapshot_json.get("top_holders", []) or [])
         incoming_top_holders = list(incoming.snapshot_json.get("top_holders", []) or [])
-        merged_top_holders = existing_top_holders or incoming_top_holders
+        existing_top10_complete = top_holders_satisfy_required_scope(
+            existing.exchange,
+            existing_top_holders,
+        )
+        incoming_top10_complete = top_holders_satisfy_required_scope(
+            incoming.exchange,
+            incoming_top_holders,
+        )
+        use_incoming_top_holders = (
+            incoming_top10_complete and not existing_top10_complete
+        ) or (
+            not existing_top10_complete
+            and len(incoming_top_holders) > len(existing_top_holders)
+        )
+        merged_top_holders = (
+            incoming_top_holders
+            if use_incoming_top_holders
+            else existing_top_holders or incoming_top_holders
+        )
 
         existing_ownership = dict(existing.snapshot_json.get("ownership_clues", {}) or {})
         incoming_ownership = dict(incoming.snapshot_json.get("ownership_clues", {}) or {})
@@ -781,6 +808,8 @@ class ShareholderShadowSyncService:
         scope_sources = dict(existing_scope_sources)
         for scope in incoming_scope:
             if incoming_has_authoritative_control and scope == "reference_only_ownership_clues":
+                scope_sources[scope] = f"{incoming.source}:{incoming.source_mode}"
+            elif use_incoming_top_holders and scope == "top10_holders":
                 scope_sources[scope] = f"{incoming.source}:{incoming.source_mode}"
             else:
                 scope_sources.setdefault(scope, f"{incoming.source}:{incoming.source_mode}")
@@ -806,14 +835,29 @@ class ShareholderShadowSyncService:
                 if should_replace_holder_count
                 else existing.holder_count_report_date or incoming.holder_count_report_date
             ),
-            top_holders_report_date=existing.top_holders_report_date
-            or incoming.top_holders_report_date,
-            top_holders_count=existing.top_holders_count
-            if existing.top_holders_count not in (None, 0)
-            else incoming.top_holders_count,
-            top_holders_total_ratio=existing.top_holders_total_ratio
-            if existing.top_holders_total_ratio is not None
-            else incoming.top_holders_total_ratio,
+            top_holders_report_date=(
+                incoming.top_holders_report_date
+                if use_incoming_top_holders
+                else existing.top_holders_report_date or incoming.top_holders_report_date
+            ),
+            top_holders_count=(
+                incoming.top_holders_count
+                if use_incoming_top_holders
+                else (
+                    existing.top_holders_count
+                    if existing.top_holders_count not in (None, 0)
+                    else incoming.top_holders_count
+                )
+            ),
+            top_holders_total_ratio=(
+                incoming.top_holders_total_ratio
+                if use_incoming_top_holders
+                else (
+                    existing.top_holders_total_ratio
+                    if existing.top_holders_total_ratio is not None
+                    else incoming.top_holders_total_ratio
+                )
+            ),
             control_owner_name=(
                 incoming.control_owner_name
                 if incoming_has_authoritative_control

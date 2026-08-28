@@ -130,7 +130,6 @@ def test_akshare_shareholders_provider_builds_normalized_snapshot(monkeypatch):
     assert snapshot.control_owner_name == "中国贵州茅台酒厂（集团）有限责任公司"
     assert snapshot.snapshot_json["coverage_scope"] == [
         "holder_count",
-        "top10_holders",
         "reference_only_ownership_clues",
     ]
     assert snapshot.raw_payload["holder_count"][0]["股东户数统计截止日"] == "2026-03-31"
@@ -449,11 +448,101 @@ def test_cninfo_shareholders_provider_builds_top10_snapshot(monkeypatch):
     assert snapshot.top_holders_total_ratio == 54.07
     assert snapshot.snapshot_json["coverage_scope"] == [
         "holder_count",
-        "top10_holders",
         "reference_only_ownership_clues",
     ]
     assert snapshot.snapshot_json["top_holders"][0]["holding_shares"] == 778821955
     assert snapshot.raw_payload["request_symbol"] == "600519"
+
+
+def test_cninfo_shareholders_provider_does_not_claim_incomplete_sse_top10(monkeypatch):
+    provider = CninfoShareholdersProvider(request_interval_seconds=0)
+    monkeypatch.setattr(provider, "_candidate_report_dates", lambda limit=8: [])
+    monkeypatch.setattr(
+        "research.providers.cninfo_shareholders.load_akshare",
+        lambda mode="direct": SimpleNamespace(
+            stock_hold_num_cninfo=lambda **kwargs: pd.DataFrame(),
+            stock_hold_control_cninfo=lambda symbol="全部": pd.DataFrame(),
+        ),
+    )
+    one_holder = [
+        {
+            "rank": 1,
+            "holder_name": "周孝伟",
+            "holding_ratio": 32.75,
+            "report_date": "2026-06-30",
+        }
+    ]
+    monkeypatch.setattr(
+        provider,
+        "_load_top_holder_bundles",
+        lambda *args: {
+            "003003.SZ": {
+                "top_holders": one_holder,
+                "top_holders_report_date": "2026-06-30",
+                "top_holders_total_ratio": 32.75,
+            }
+        },
+    )
+
+    snapshots = provider._fetch_shareholder_snapshots_sync(
+        [
+            {
+                "instrument_id": "003003.SZ",
+                "symbol": "003003",
+                "exchange": "SZSE",
+                "type": "stock",
+            }
+        ],
+        "SZSE",
+    )
+
+    assert snapshots[0].top_holders_count == 1
+    assert "top10_holders" not in snapshots[0].snapshot_json["coverage_scope"]
+
+
+def test_cninfo_shareholders_provider_keeps_partial_top10_scope_on_bse(monkeypatch):
+    provider = CninfoShareholdersProvider(request_interval_seconds=0)
+    monkeypatch.setattr(provider, "_candidate_report_dates", lambda limit=8: [])
+    monkeypatch.setattr(
+        "research.providers.cninfo_shareholders.load_akshare",
+        lambda mode="direct": SimpleNamespace(
+            stock_hold_num_cninfo=lambda **kwargs: pd.DataFrame(),
+            stock_hold_control_cninfo=lambda symbol="全部": pd.DataFrame(),
+        ),
+    )
+    monkeypatch.setattr(
+        provider,
+        "_load_top_holder_bundles",
+        lambda *args: {
+            "920193.BJ": {
+                "top_holders": [
+                    {
+                        "rank": 1,
+                        "holder_name": "宋文超",
+                        "holding_ratio": 20.0,
+                        "report_date": "2026-06-30",
+                    }
+                ],
+                "top_holders_report_date": "2026-06-30",
+                "top_holders_total_ratio": 20.0,
+            }
+        },
+    )
+
+    snapshots = provider._fetch_shareholder_snapshots_sync(
+        [
+            {
+                "instrument_id": "920193.BJ",
+                "symbol": "920193",
+                "exchange": "BSE",
+                "type": "stock",
+            }
+        ],
+        "BSE",
+    )
+
+    assert snapshots[0].top_holders_count == 1
+    assert "top10_holders" in snapshots[0].snapshot_json["coverage_scope"]
 
 
 def test_cninfo_shareholders_provider_keeps_control_change_history(monkeypatch):
@@ -865,7 +954,6 @@ def test_efinance_shareholders_provider_scopes_only_fields_that_exist():
     assert top_only.holder_count is None
     assert top_only.top_holders_count == 1
     assert top_only.snapshot_json["coverage_scope"] == [
-        "top10_holders",
         "reference_only_ownership_clues",
     ]
 

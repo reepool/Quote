@@ -95,7 +95,7 @@ class _ShareholderProvider(BaseShareholderProvider):
                 top_holders_report_date=(
                     "2026-03-31" if "top10_holders" in self.coverage_scope else None
                 ),
-                top_holders_count=2 if "top10_holders" in self.coverage_scope else 0,
+                top_holders_count=10 if "top10_holders" in self.coverage_scope else 0,
                 top_holders_total_ratio=(
                     62.5 if "top10_holders" in self.coverage_scope else None
                 ),
@@ -114,7 +114,7 @@ class _ShareholderProvider(BaseShareholderProvider):
                 snapshot_json={
                     "coverage_scope": self.coverage_scope,
                     "top_holders": (
-                        [{"holder_name": "中国贵州茅台酒厂（集团）有限责任公司"}]
+                        _ten_top_holders("2026-03-31")
                         if "top10_holders" in self.coverage_scope
                         else []
                     ),
@@ -170,7 +170,7 @@ class _BatchThenSingleRecoveryProvider(BaseShareholderProvider):
                 top_holders_report_date=(
                     "2026-03-31" if "top10_holders" in coverage_scope else None
                 ),
-                top_holders_count=2 if "top10_holders" in coverage_scope else 0,
+                top_holders_count=10 if "top10_holders" in coverage_scope else 0,
                 top_holders_total_ratio=62.5 if "top10_holders" in coverage_scope else None,
                 control_owner_name="中国贵州茅台酒厂（集团）有限责任公司",
                 control_owner_ratio=54.0,
@@ -179,7 +179,7 @@ class _BatchThenSingleRecoveryProvider(BaseShareholderProvider):
                 snapshot_json={
                     "coverage_scope": coverage_scope,
                     "top_holders": (
-                        [{"holder_name": "中国贵州茅台酒厂（集团）有限责任公司"}]
+                        _ten_top_holders("2026-03-31")
                         if "top10_holders" in coverage_scope
                         else []
                     ),
@@ -192,6 +192,101 @@ class _BatchThenSingleRecoveryProvider(BaseShareholderProvider):
                     "provider": self.source_name,
                     "call_size": len(selected),
                 },
+            )
+            for instrument in selected
+        ]
+
+
+def _ten_top_holders(report_date: str = "2026-03-31"):
+    return [
+        {
+            "rank": index,
+            "holder_name": f"股东{index}",
+            "holding_ratio": 5.0,
+            "report_date": report_date,
+        }
+        for index in range(1, 11)
+    ]
+
+
+class _IncompleteCninfoTop10Provider(BaseShareholderProvider):
+    source_name = "cninfo"
+    supported_modes = {"direct"}
+
+    async def fetch_shareholder_snapshots(self, *, instruments, exchange, mode="direct", limit=None):
+        selected = instruments[:limit] if limit is not None else instruments
+        return [
+            ShareholderSnapshot(
+                instrument_id=instrument["instrument_id"],
+                symbol=instrument["symbol"],
+                exchange=exchange,
+                coverage_status="reference_only",
+                holder_count=15867,
+                holder_count_report_date="2026-03-31",
+                top_holders_report_date="2026-06-30",
+                top_holders_count=1,
+                top_holders_total_ratio=32.75,
+                control_owner_name="周孝伟;罗素玲",
+                control_owner_ratio=47.32,
+                source="cninfo",
+                source_mode=mode,
+                snapshot_json={
+                    "coverage_scope": [
+                        "holder_count",
+                        "top10_holders",
+                        "reference_only_ownership_clues",
+                    ],
+                    "holder_count": {"value": 15867, "report_date": "2026-03-31"},
+                    "top_holders": [
+                        {
+                            "rank": 1,
+                            "holder_name": "周孝伟",
+                            "holding_ratio": 32.75,
+                            "report_date": "2026-06-30",
+                        }
+                    ],
+                    "ownership_clues": {
+                        "control_owner_name": "周孝伟;罗素玲",
+                        "control_owner_ratio": 47.32,
+                    },
+                },
+                raw_payload={"provider": "cninfo"},
+            )
+            for instrument in selected
+        ]
+
+
+class _CompleteAkshareTop10Provider(BaseShareholderProvider):
+    source_name = "akshare"
+    supported_modes = {"direct", "proxy_patch"}
+
+    def __init__(self):
+        self.calls: list[tuple[str, int]] = []
+
+    async def fetch_shareholder_snapshots(self, *, instruments, exchange, mode="direct", limit=None):
+        selected = instruments[:limit] if limit is not None else instruments
+        self.calls.append((mode, len(selected)))
+        tops = _ten_top_holders("2026-03-31")
+        return [
+            ShareholderSnapshot(
+                instrument_id=instrument["instrument_id"],
+                symbol=instrument["symbol"],
+                exchange=exchange,
+                coverage_status="reference_only",
+                holder_count=15867,
+                holder_count_report_date="2026-03-31",
+                top_holders_report_date="2026-03-31",
+                top_holders_count=10,
+                top_holders_total_ratio=50.0,
+                source="akshare",
+                source_mode=mode,
+                snapshot_json={
+                    "coverage_scope": ["holder_count", "top10_holders"],
+                    "holder_count": {"value": 15867, "report_date": "2026-03-31"},
+                    "top_holders": tops,
+                    "ownership_clues": {},
+                },
+                raw_payload={"provider": "akshare"},
             )
             for instrument in selected
         ]
@@ -582,7 +677,7 @@ async def test_shareholder_sync_merges_missing_scope_from_later_provider(tmp_pat
     snapshot = storage.get_shareholder_snapshot("600519.SH")
     assert snapshot is not None
     assert snapshot["source"] == "akshare"
-    assert snapshot["top_holders_count"] == 2
+    assert snapshot["top_holders_count"] == 10
     assert snapshot["control_owner_name"] == "中国贵州茅台酒厂（集团）有限责任公司"
     assert snapshot["snapshot"]["scope_sources"] == {
         "holder_count": "akshare:direct",
@@ -647,7 +742,7 @@ async def test_shareholder_sync_force_merges_cninfo_control_owner(tmp_path):
     snapshot = storage.get_shareholder_snapshot("920489.BJ")
     assert snapshot is not None
     assert snapshot["holder_count"] == 123456
-    assert snapshot["top_holders_count"] == 2
+    assert snapshot["top_holders_count"] == 10
     assert snapshot["control_owner_name"] == "蚌埠市人民政府国有资产监督管理委员会"
     assert snapshot["snapshot"]["scope_sources"] == {
         "holder_count": "akshare:direct",
@@ -729,6 +824,71 @@ def test_shareholder_sync_merge_updates_holder_count_report_date_when_filling_va
     assert merged.snapshot_json["scope_sources"]["holder_count"] == "cninfo:direct"
 
 
+def test_shareholder_sync_merge_replaces_incomplete_sse_top10_with_backup(tmp_path):
+    research_config = _build_research_config(tmp_path)
+    storage = ResearchStorageManager(research_config)
+    service = ShareholderShadowSyncService(
+        db_ops=_MockDbOps(instruments=[]),
+        storage=storage,
+        research_config=research_config,
+        resolver=ResearchSourcePolicyResolver(research_config),
+        registry=ShareholderProviderRegistry({}),
+    )
+    existing = ShareholderSnapshot(
+        instrument_id="003003.SZ",
+        symbol="003003",
+        exchange="SZSE",
+        holder_count=15867,
+        holder_count_report_date="2026-03-31",
+        top_holders_report_date="2026-06-30",
+        top_holders_count=1,
+        top_holders_total_ratio=32.75,
+        control_owner_name="周孝伟;罗素玲",
+        source="cninfo",
+        source_mode="direct",
+        snapshot_json={
+            "coverage_scope": [
+                "holder_count",
+                "top10_holders",
+                "reference_only_ownership_clues",
+            ],
+            "top_holders": [
+                {
+                    "rank": 1,
+                    "holder_name": "周孝伟",
+                    "holding_ratio": 32.75,
+                    "report_date": "2026-06-30",
+                }
+            ],
+            "ownership_clues": {"control_owner_name": "周孝伟;罗素玲"},
+            "scope_sources": {"top10_holders": "cninfo:direct"},
+        },
+    )
+    incoming = ShareholderSnapshot(
+        instrument_id="003003.SZ",
+        symbol="003003",
+        exchange="SZSE",
+        top_holders_report_date="2026-03-31",
+        top_holders_count=10,
+        top_holders_total_ratio=50.0,
+        source="akshare",
+        source_mode="proxy_patch",
+        snapshot_json={
+            "coverage_scope": ["top10_holders"],
+            "top_holders": _ten_top_holders("2026-03-31"),
+            "scope_sources": {"top10_holders": "akshare:proxy_patch"},
+        },
+    )
+
+    merged = service._merge_snapshots(existing, incoming)
+
+    assert merged.top_holders_count == 10
+    assert len(merged.snapshot_json["top_holders"]) == 10
+    assert merged.top_holders_report_date == "2026-03-31"
+    assert merged.snapshot_json["scope_sources"]["top10_holders"] == "akshare:proxy_patch"
+    assert merged.control_owner_name == "周孝伟;罗素玲"
+
+
 @pytest.mark.asyncio
 async def test_shareholder_sync_runs_same_source_recovery_for_missing_scope(tmp_path):
     research_config = _build_research_config(tmp_path)
@@ -778,7 +938,7 @@ async def test_shareholder_sync_runs_same_source_recovery_for_missing_scope(tmp_
 
     snapshot = storage.get_shareholder_snapshot("600519.SH")
     assert snapshot is not None
-    assert snapshot["top_holders_count"] == 2
+    assert snapshot["top_holders_count"] == 10
     with storage.get_connection() as conn:
         row = conn.execute(
             """
@@ -939,6 +1099,63 @@ async def test_shareholder_sync_reports_degraded_when_some_instruments_remain_mi
     second_snapshot = storage.get_shareholder_snapshot("600000.SH")
     assert first_snapshot is not None
     assert second_snapshot is None
+
+
+@pytest.mark.asyncio
+async def test_shareholder_sync_falls_back_when_cninfo_sse_top10_is_incomplete(tmp_path):
+    research_config = _build_research_config(tmp_path)
+    research_config.budget.default_mode = "availability_first"
+    research_config.budget.allow_paid_proxy = True
+    research_config.modules["shareholders"]["same_source_recovery_candidates"] = []
+    research_config.modules["shareholders"]["force_merge_candidates"] = ["cninfo:direct"]
+    research_config.modules["shareholders"][
+        "skip_same_source_full_fallback_after_success"
+    ] = True
+    research_config.routing["shareholders"] = {
+        "free_chain": [{"source": "cninfo", "mode": "direct"}],
+        "paid_chain": [{"source": "akshare", "mode": "proxy_patch"}],
+        "fallback_chain": [{"source": "akshare", "mode": "direct"}],
+    }
+    storage = ResearchStorageManager(research_config)
+    storage.initialize()
+    instrument = {
+        "instrument_id": "003003.SZ",
+        "symbol": "003003",
+        "name": "天元股份",
+        "exchange": "SZSE",
+        "type": "stock",
+        "is_active": True,
+    }
+    backup = _CompleteAkshareTop10Provider()
+    service = ShareholderShadowSyncService(
+        db_ops=_MockDbOps(instruments=[instrument]),
+        storage=storage,
+        research_config=research_config,
+        resolver=ResearchSourcePolicyResolver(research_config),
+        registry=ShareholderProviderRegistry(
+            {
+                "cninfo": _IncompleteCninfoTop10Provider(),
+                "akshare": backup,
+            }
+        ),
+    )
+
+    result = await service.sync(
+        exchanges=["SZSE"],
+        limit_per_exchange=1,
+        budget_mode="availability_first",
+        allow_paid_proxy=True,
+        write_policy="changed_only",
+    )
+
+    stored = storage.get_shareholder_snapshot("003003.SZ")
+    assert result["status"] == "success"
+    assert result["exchanges"][0]["missing_instruments"] == 0
+    assert backup.calls == [("proxy_patch", 1)]
+    assert stored is not None
+    assert stored["top_holders_count"] == 10
+    assert len(stored["snapshot"]["top_holders"]) == 10
+    assert stored["control_owner_name"] == "周孝伟;罗素玲"
 
 
 @pytest.mark.asyncio

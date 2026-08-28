@@ -13,6 +13,8 @@ from typing import Any, Dict, Iterable, List, Optional, Tuple
 
 import pandas as pd
 
+from research.shareholder_snapshot_policy import build_shareholder_coverage_scope
+
 from .base import BaseShareholderProvider, ShareholderSnapshot
 
 
@@ -215,15 +217,16 @@ class EfinanceShareholdersProvider(BaseShareholderProvider):
         if holder_count is None and not top_holders:
             return None
 
-        coverage_scope: List[str] = []
-        if holder_count is not None:
-            coverage_scope.append("holder_count")
-        if top_holders:
-            coverage_scope.append("top10_holders")
-        if control_owner_name or control_owner_ratio is not None:
-            coverage_scope.append("reference_only_ownership_clues")
-        elif top_holders:
-            coverage_scope.append("reference_only_ownership_clues")
+        coverage_scope = build_shareholder_coverage_scope(
+            exchange=exchange,
+            holder_count=holder_count,
+            top_holders=top_holders,
+            has_ownership_clues=bool(
+                control_owner_name
+                or control_owner_ratio is not None
+                or top_holders
+            ),
+        )
 
         snapshot_json = {
             "coverage_scope": coverage_scope,
