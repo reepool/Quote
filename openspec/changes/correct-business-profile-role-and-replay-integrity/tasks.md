@@ -3,6 +3,8 @@
 - [ ] 1.1 Define the atomic-versus-derived layer contract in the existing business-profile schemas and add explicit internal-inventory and external-service classification fields without changing raw LLM values or units.
 - [ ] 1.2 Extend operating-fact occurrence identity so source row/contract keys are derived from immutable evidence and used consistently in record ids, fact scopes, temporal keys, metadata, ambiguity groups, and publication lineage.
 - [ ] 1.3 Add compatibility decoding for legacy activities and operating facts, preserving approved records when row/contract identity cannot be reconstructed reliably.
+- [ ] 1.4 Add closed storage classification validation (`internal_inventory|external_service|unknown`) and require service-recipient evidence before any `storage_provider` derivation.
+- [ ] 1.5 Add deterministic row/occurrence ordinal handling and an explicit unresolved identity quality for parser outputs that lack row provenance; prohibit model-generated or value-only durable ids.
 
 ## 2. Role derivation and temporal integrity
 
@@ -10,6 +12,7 @@
 - [ ] 2.2 Group qualifying external-service activities by instrument, scope, role, report cohort/business regime, and rule version; produce or reuse one deterministic role while retaining sorted supporting activity/evidence lineage.
 - [ ] 2.3 Align value-chain role record identity and temporal stable identity, and make derived-role publication reuse existing compatible approved/current roles without weakening temporal conflict checks.
 - [ ] 2.4 Isolate one role/fact group’s evidence, identity, or temporal failure from unrelated derived roles, exposure facts, and publications; persist typed non-provider diagnostics.
+- [ ] 2.5 Centralize role business-identity construction for record ids, temporal validation, reuse lookup, and lineage merging; add a regression test proving evidence changes do not create overlapping same-scope roles.
 
 ## 3. Reuse, replace, and local replay
 
@@ -17,6 +20,7 @@
 - [ ] 3.2 Implement local upgrade/replay for legacy contract facts using persisted evidence and semantic artifacts; create row-aware successors only when occurrence identity is proven and preserve approved history otherwise.
 - [ ] 3.3 Ensure reuse does not promote incompatible legacy candidates over approved records and replace creates normal governed successors without last-write-wins or evidence deletion.
 - [ ] 3.4 Add origin and token accounting for `llm_extracted`, `semantic_reused`, `local_replayed`, and `program_derived`; count tokens only from actual gateway calls.
+- [ ] 3.5 Define and persist separate program-derived aggregate facts with input occurrence keys and rule versions; never replace contract-level facts with totals.
 
 ## 4. Historical audit and repair
 
@@ -24,6 +28,7 @@
 - [ ] 4.2 Audit inventory-derived storage roles, duplicate role identities, broad-identity contract conflicts, and incompatible reusable artifacts with stable ids, evidence, proposed action, and reason codes.
 - [ ] 4.3 Apply only evidence-positive corrections transactionally per instrument/group; transition or delete unreferenced invalid machine-derived records when permitted, replay dependent publications, and hold unreconstructable cases.
 - [ ] 4.4 Make repair idempotent, network/LLM-free, and explicit about `would_change`, `changed`, `unchanged`, `held`, and `failed`; prove audit performs zero writes.
+- [ ] 4.5 Verify repair/replay calls the existing repository, temporal, promotion, and publication owners and contains no direct parallel table-writing algorithm.
 
 ## 5. Verification and rollout
 

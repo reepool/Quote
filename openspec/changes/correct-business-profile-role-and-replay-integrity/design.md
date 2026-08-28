@@ -48,6 +48,9 @@ The rejected alternative is to merge atomic records until temporal writes succee
 
 The canonical meaning of the existing `stores` action becomes internal holding/storage of an object. It never derives `storage_provider` by itself. The semantic schema will represent explicit externally supplied storage/warehousing service separately, using an external-service classification and evidence-backed service/counterparty context. Program code validates the closed classification and required exact-evidence linkage; unknown scope remains an atomic record and yields a reason-coded role gap rather than a role.
 
+The classification is a closed program-facing contract, not a free-form model role:
+`storage_semantics=internal_inventory|external_service|unknown`. The semantic response may provide Chinese source wording and raw service/recipient hints, but program code derives the enum from those fields and exact evidence. `external_service` additionally requires a non-empty service marker and a beneficiary scope of `third_party|customer|named_counterparty`; `internal_inventory` requires no recipient. Missing or contradictory fields resolve to `unknown`.
+
 Only a governed external storage-service activity maps to `storage_provider`. This keeps linguistic interpretation in semantic extraction while leaving the executable derivation rule deterministic. A confidence score alone cannot satisfy the external-service gate.
 
 The rejected alternatives are mapping every `stores` action, which is demonstrably false, and relying only on a hard-coded Chinese phrase list, which cannot cover annual-report language reliably.
@@ -56,11 +59,15 @@ The rejected alternatives are mapping every `stores` action, which is demonstrab
 
 A derived role's business identity is the instrument, optional business segment/scope, role, report cohort/business regime, and derivation-rule version. Supporting activity ids and evidence ids are lineage, not competing role identities. All qualifying supports in the same role group are sorted, deduplicated, and stored on one role record. The role record id and temporal stable identity use compatible business keys; evidence id is not used to manufacture parallel roles for one capability.
 
+The implementation MUST make this key explicit in one shared helper used both by record-id generation and temporal validation. `evidence_id` and supporting activity ids MUST remain metadata only for a company/scoped capability role. A changed support set for the same report cohort updates lineage on the same role identity or creates a governed successor according to `replace`; it MUST NOT create a second overlapping role.
+
 Object detail is never discarded because it remains in the atomic activities referenced by the role. If a future role is genuinely object-specific, object identity must be added to both record identity and temporal identity in the same change; this change does not create such roles.
 
 ### 4. Make contract facts occurrence-specific from evidence
 
 Every new contract/table fact uses a program-derived occurrence key based on immutable document/table identity, one-based physical page, row ordinal or occurrence ordinal, ordered raw cells, and explicit contract reference when present. Raw values and raw units remain unchanged LLM/source outputs; normalization and aggregation remain programmatic.
+
+The preferred source is deterministic table provenance (`table_id`, physical page, row ordinal, ordered cells). If the parser does not expose a row ordinal, the runtime MUST use a deterministic occurrence ordinal within the immutable evidence span and mark `occurrence_identity_quality=derived_from_evidence`; if even that is unavailable, it MUST mark the identity `unresolved` and hold only the ambiguous group. It MUST NOT use a model-generated id or a value-only hash as a substitute for row identity.
 
 The occurrence key participates consistently in record id, fact scope, temporal stable identity, persisted metadata, ambiguity grouping, and publication lineage. Equal product labels therefore do not imply equal facts. If two source-supported contracts disclose `4.18 亿元` and `0 亿元`, both contract facts remain available. A company-level total can only be a separately typed program-derived aggregate with explicit inclusion rules.
 

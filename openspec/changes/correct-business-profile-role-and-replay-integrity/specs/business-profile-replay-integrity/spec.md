@@ -15,6 +15,10 @@ The selected `result_policy` MUST be propagated consistently through semantic ar
 - **WHEN** `result_policy=replace` produces a fresh observation
 - **THEN** the system MUST persist it through normal successor, review, temporal, and publication rules without deleting source evidence or using last-write-wins
 
+#### Scenario: Reuse reaches derived publication
+- **WHEN** a reused semantic artifact is sent to role or exposure publication
+- **THEN** the derived writer MUST receive the same `result_policy`, perform compatibility checks, and reuse/hold deterministically rather than calling a second implicit policy or blindly upserting
+
 ### Requirement: Approved history is protected during reuse and repair
 Reuse and repair MUST preserve valid approved history, held decisions, immutable evidence, and review audit. A conflicting candidate MUST NOT overwrite an approved record, and absence of a reconstructable successor MUST NOT authorize deletion of the approved record.
 
@@ -36,6 +40,13 @@ A deterministic evidence, identity, or temporal failure MUST be isolated to the 
 #### Scenario: Gateway returns a retryable failure
 - **WHEN** an actual LLM gateway request fails with a retryable provider response
 - **THEN** the existing bounded retry, backoff, and gateway classification MUST apply without conflating it with local data-contract failures
+
+### Requirement: One business-profile write owner handles repair and replay
+Semantic backfill, derived publication, and integrity repair MUST use the existing governed repository, promotion service, and domain producers as their only write owners. Repair and replay MUST NOT implement a parallel merge or publication loop in a script, API route, scheduler adapter, or compatibility facade.
+
+#### Scenario: Repair replays a corrected contract fact
+- **WHEN** local audit proves a legacy occurrence can be upgraded
+- **THEN** the repair service MUST call the existing fact/temporal/publication owners and MUST record the owner result, rather than writing tables directly with a second algorithm
 
 ### Requirement: Historical repair is bounded, local, and idempotent
 The system MUST provide one business-profile integrity repair service with zero-write audit mode by default and explicit scoped apply mode. Repair MUST use local evidence, semantic artifacts, governed records, and existing domain owners only; it MUST perform no network or LLM call and repeated apply MUST converge without creating new records or transitions.
