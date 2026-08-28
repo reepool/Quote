@@ -457,7 +457,7 @@ def test_anonymous_disclosure_creates_concentration_fact_without_edge():
     assert fact["metadata"]["no_relationship_edge_created"] is True
 
 
-def test_distinct_anonymous_concentrations_in_same_evidence_have_distinct_ids():
+def test_generic_related_party_label_is_not_anonymous_concentration():
     producer = BusinessProfileActivityProducer(_Repository())
     common = {
         "instrument_id": "601088.SH",
@@ -480,9 +480,10 @@ def test_distinct_anonymous_concentrations_in_same_evidence_have_distinct_ids():
         run_id="run-1",
         data_available_date="2026-03-28",
     )
-    _, related_parties = producer.build_relationship_or_concentration_candidate(
+    related_type, related_parties = producer.build_relationship_or_concentration_candidate(
         {
             **common,
+            "anonymous": False,
             "counterparty_name_raw": "关联方",
             "disclosed_share": 0.323,
         },
@@ -492,10 +493,9 @@ def test_distinct_anonymous_concentrations_in_same_evidence_have_distinct_ids():
         data_available_date="2026-03-28",
     )
 
-    assert top_five["record_id"] != related_parties["record_id"]
-    assert top_five["fact_scope"] != related_parties["fact_scope"]
+    assert related_type == "relationships"
     assert top_five["metadata"]["anonymous_label"] == "前五大客户"
-    assert related_parties["metadata"]["anonymous_label"] == "关联方"
+    assert related_parties["metadata"]["resolution_status"] == "disclosed_name_only"
 
     _, top_five_alias = producer.build_relationship_or_concentration_candidate(
         {

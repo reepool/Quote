@@ -385,18 +385,15 @@ def test_legacy_migration_decomposes_only_uniquely_proven_rows(tmp_path):
         row["exposure_id"]: row for row in repository.list_records("exposures")
     }
 
-    assert result["componentized"] == 1
-    assert result["legacy_compatible"] == 1
-    successor = exposures["legacy-coal-exposure:componentized:v1"]
-    assert successor["review_status"] == "approved"
-    assert successor["fact_ids"] == ["legacy-coal-exposure:fact:v1"]
-    assert successor["supersedes_exposure_id"] == "legacy-coal-exposure"
+    assert result["componentized"] == 0
+    assert result["legacy_compatible"] == 2
+    assert "legacy-coal-exposure:componentized:v1" not in exposures
     assert exposures["legacy-coal-exposure"]["review_status"] == "approved"
     assert exposures["legacy-incomplete"]["component_lineage_hash"] is None
 
     replay = BusinessProfileExposureComponentMigrator(repository).migrate()
     assert replay["componentized"] == 0
-    assert replay["already_componentized"] >= 1
+    assert replay["componentized"] == 0
 
 
 def test_legacy_migration_never_promotes_an_unapproved_source(tmp_path):

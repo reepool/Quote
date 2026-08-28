@@ -1264,7 +1264,7 @@ class BusinessProfileRepository:
         policy = get_business_profile_temporal_policy(record_type)
         if not cls._same_stable_identity(policy.stable_identity_fields, left, right):
             return False
-        if record_type in {"activities", "relationships"}:
+        if record_type == "activities":
             for field in ("source_row_key", "contract_reference_raw"):
                 left_value = cls._lineage_value(left, field)
                 right_value = cls._lineage_value(right, field)
@@ -1274,6 +1274,11 @@ class BusinessProfileRepository:
                     and left_value != right_value
                 ):
                     return False
+        elif record_type == "relationships":
+            left_value = cls._lineage_value(left, "relationship_occurrence_key")
+            right_value = cls._lineage_value(right, "relationship_occurrence_key")
+            if left_value is not None and right_value is not None and left_value != right_value:
+                return False
         return True
 
     @staticmethod
@@ -1568,6 +1573,14 @@ class BusinessProfileRepository:
                 f"OR {alias}.{policy.validity_start_field} <= ?)"
             )
             params.append(cutoff)
+        if policy.temporal_class == BusinessProfileTemporalClass.PERSISTENT_RELATIONSHIP:
+            clauses.append(f"{alias}.{policy.observation_period_field} <= ?")
+            params.append(cutoff)
+            if policy.freshness_days is not None:
+                clauses.append(
+                    f"julianday(?) - julianday({alias}.{policy.observation_period_field}) <= ?"
+                )
+                params.extend([cutoff, policy.freshness_days])
             clauses.append(
                 f"({alias}.{policy.validity_end_field} IS NULL "
                 f"OR {alias}.{policy.validity_end_field} > ?)"
@@ -1614,7 +1627,7 @@ class BusinessProfileRepository:
             return f"json_extract({alias}.metadata_json, '$.{field}')"
 
         partition_fields = [identity_expr(field) for field in policy.stable_identity_fields]
-        if record_type in {"activities", "relationships"}:
+        if record_type == "activities":
             # Source-row and contract lineage live in metadata_json for schema
             # compatibility and must participate in temporal de-duplication.
             partition_fields.extend(
@@ -1624,6 +1637,10 @@ class BusinessProfileRepository:
                 ]
             )
         partition = ", ".join(partition_fields)
+        occurrence_partition = (
+            "COALESCE(json_extract(r.metadata_json, '$.relationship_occurrence_key'), "
+            "json_extract(r.metadata_json, '$.contract_reference_raw'), '')"
+        )
         def output_order_expr(field: str) -> str:
             if field in spec["columns"]:
                 return field
@@ -1636,7 +1653,30 @@ class BusinessProfileRepository:
         if "version" in spec["columns"]:
             order_fields.append(f"{alias}.version DESC")
         order_fields.extend([f"{alias}.updated_at DESC", f"{alias}.{spec['pk']} DESC"])
-        sql = f"""
+        if record_type == "relationships":
+            sql = f"""
+            WITH eligible AS (
+                SELECT {alias}.*,
+                       MAX({alias}.{policy.observation_period_field}) OVER (
+                           PARTITION BY {partition}
+                       ) AS latest_report_period
+                FROM {spec['table']} {alias}
+                {join}
+                WHERE {' AND '.join(clauses)}
+            ), latest_cohort AS (
+                SELECT *, ROW_NUMBER() OVER (
+                    PARTITION BY {partition}, {occurrence_partition}
+                    ORDER BY {', '.join(order_fields)}
+                ) AS eligibility_rank
+                FROM eligible r
+                WHERE {policy.observation_period_field} = latest_report_period
+            )
+            SELECT * FROM latest_cohort
+            WHERE eligibility_rank = 1
+            ORDER BY {', '.join(output_order_expr(field) + ' ASC' for field in policy.stable_identity_fields)}
+            """
+        else:
+            sql = f"""
             WITH eligible AS (
                 SELECT {alias}.*,
                        ROW_NUMBER() OVER (
@@ -1650,7 +1690,7 @@ class BusinessProfileRepository:
             SELECT * FROM eligible
             WHERE eligibility_rank = 1
             ORDER BY {', '.join(output_order_expr(field) + ' ASC' for field in policy.stable_identity_fields)}
-        """
+            """
         if limit is not None:
             sql += " LIMIT ?"
             params.append(max(1, min(int(limit), 10000)))
@@ -1866,7 +1906,7 @@ class BusinessProfileResolver:
                     and regime_eligible
                 ):
                     approved[fact_type].append(fact)
-                elif include_candidates:
+                else:
                     diagnostic = dict(fact)
                     diagnostic["eligibility"] = {
                         "date_eligible": eligible_date,
@@ -2073,15 +2113,21 @@ class BusinessProfileResolver:
         if knowledge_from > cutoff or (knowledge_to and cutoff >= knowledge_to):
             return False
         policy = get_business_profile_temporal_policy(record_type)
-        if policy.temporal_class == BusinessProfileTemporalClass.REPORT_FLOW:
+        if policy.temporal_class in {
+            BusinessProfileTemporalClass.REPORT_FLOW,
+            BusinessProfileTemporalClass.PERSISTENT_RELATIONSHIP,
+        }:
             observed = _date_key(record.get(policy.observation_period_field or ""))
             if not observed or observed > cutoff:
                 return False
             if policy.freshness_days is None:
-                return True
-            return (date.fromisoformat(cutoff) - date.fromisoformat(observed)).days <= (
-                policy.freshness_days
-            )
+                fresh = True
+            else:
+                fresh = (date.fromisoformat(cutoff) - date.fromisoformat(observed)).days <= (
+                    policy.freshness_days
+                )
+            if not fresh:
+                return False
         start_field = "effective_from" if record_type == "exposures" else "valid_from"
         end_field = "effective_to" if record_type == "exposures" else "valid_to"
         start = _date_key(record.get(start_field))
@@ -2386,7 +2432,7 @@ class BusinessProfileResolver:
         def key(item: Mapping[str, Any]) -> tuple[str, str, str, str]:
             return (
                 str(item.get("commodity_id") or item.get("product_name") or "").lower(),
-                str(item.get("exposure_role") or "revenue"),
+                str(item.get("exposure_role") or ""),
                 str(item.get("revenue_series_id") or ""),
                 ",".join(sorted(str(value) for value in (item.get("spread_ids") or []))),
             )
@@ -2405,7 +2451,7 @@ class BusinessProfileResolver:
         industry_by_product = {
             (
                 str(item.get("commodity_id") or item.get("product_name") or "").lower(),
-                str(item.get("exposure_role") or "revenue"),
+                str(item.get("exposure_role") or ""),
             ): item
             for item in industry
         }
@@ -2413,7 +2459,7 @@ class BusinessProfileResolver:
             default = industry_by_product.get(
                 (
                     str(item.get("commodity_id") or item.get("product_name") or "").lower(),
-                    str(item.get("exposure_role") or "revenue"),
+                    str(item.get("exposure_role") or ""),
                 )
             )
             if default and default.get("direction") != item.get("direction"):

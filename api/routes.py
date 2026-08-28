@@ -1024,12 +1024,19 @@ async def get_research_official_mapping_override_review(
 async def get_research_company_profile(
     instrument_id: str,
     include_snapshot: bool = Query(True, description="是否包含标准化快照详情"),
+    as_of_date: Optional[date] = Query(None, description="股东本地数据可得日截止"),
 ):
     """获取研究域公司档案快照。"""
     try:
+        target_date = _normalize_optional_query(as_of_date)
         profile = await data_manager.get_research_company_profile(
             instrument_id,
             include_snapshot=include_snapshot,
+            as_of_date=(
+                target_date.isoformat()
+                if isinstance(target_date, date)
+                else target_date
+            ),
         )
         if not profile:
             raise HTTPException(status_code=404, detail="Research company profile not found")

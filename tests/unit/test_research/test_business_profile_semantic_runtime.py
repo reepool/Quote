@@ -4498,6 +4498,19 @@ def test_production_counterparty_resolver_reads_governed_a_share_master(tmp_path
                 ("00700.HK", "腾讯控股有限公司", "stock", "HKEX", None, None),
             ],
         )
+    with storage.get_connection() as conn:
+        conn.execute(
+            "INSERT INTO company_profiles ("
+            "instrument_id, symbol, company_name, short_name, exchange, market, "
+            "status, source, source_mode, data_as_of, profile_json, created_at, updated_at"
+            ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '{}', ?, ?)",
+            (
+                "600000.SH", "600000", "浦发银行股份有限公司", "浦发银行",
+                "SSE", "A股", "active", "official", "direct", "2026-08-04",
+                "2026-08-04T00:00:00+08:00", "2026-08-04T00:00:00+08:00",
+            ),
+        )
+        conn.commit()
 
     resolver = runtime_module.build_business_profile_counterparty_resolver(storage)
 
@@ -4510,7 +4523,7 @@ def test_production_counterparty_resolver_reads_governed_a_share_master(tmp_path
     assert external.basis is None
 
 
-def test_production_counterparty_resolver_uses_only_unique_governed_aliases(tmp_path):
+def test_production_counterparty_resolver_resolves_full_name_not_security_short_name(tmp_path):
     storage = _storage(tmp_path)
     with sqlite3.connect(storage.quotes_db_path) as conn:
         conn.execute(
@@ -4607,9 +4620,9 @@ def test_production_counterparty_resolver_uses_only_unique_governed_aliases(tmp_
         knowledge_cutoff="2026-08-04",
     )
 
-    assert {item["alias"] for item in resolver.aliases} == {"唯一示例"}
+    assert resolver.aliases == ()
     assert resolver.resolve("浦发银行").status == "unresolved"
-    assert resolver.resolve("唯一示例").entity_id == "600002.SH"
+    assert resolver.resolve("唯一示例").status == "unresolved"
     assert resolver.resolve("上海浦东发展银行股份有限公司").entity_id == "600000.SH"
 
 

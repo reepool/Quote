@@ -608,20 +608,31 @@ def build_business_profile_counterparty_resolver(
                 "named relationship production requires the instruments table"
             )
         rows = conn.execute(
-            "SELECT instrument_id, name, listed_date, delisted_date "
+            "SELECT instrument_id, listed_date, delisted_date "
             "FROM instruments WHERE type = 'stock' "
             "AND exchange IN ('SSE', 'SZSE', 'BSE') "
-            "AND instrument_id IS NOT NULL AND TRIM(name) <> ''"
+            "AND instrument_id IS NOT NULL"
         ).fetchall()
+    with storage.get_connection() as conn:
+        storage._apply_pragmas(conn)
+        profiles = conn.execute(
+            "SELECT instrument_id, company_name FROM company_profiles "
+            "WHERE company_name IS NOT NULL AND TRIM(company_name) <> ''"
+        ).fetchall()
+    legal_names = {
+        str(row["instrument_id"]): str(row["company_name"]).strip()
+        for row in profiles
+    }
     entities_by_id = {
         str(row["instrument_id"]): {
             "entity_id": str(row["instrument_id"]),
             "official_identifier": str(row["instrument_id"]),
-            "legal_name": str(row["name"]).strip(),
+            "legal_name": legal_names[str(row["instrument_id"])],
             "valid_from": str(row["listed_date"] or "")[:10] or None,
             "valid_to": str(row["delisted_date"] or "")[:10] or None,
         }
         for row in rows
+        if str(row["instrument_id"]) in legal_names
     }
     # Security short names and historical ticker labels are not legal-entity
     # aliases.  Resolution deliberately uses only governed legal names here;

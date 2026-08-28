@@ -10328,6 +10328,56 @@ class ScheduledTasks:
         finally:
             self._active_tasks.discard(task_id)
 
+    async def business_profile_semantic_repair(
+        self,
+        instrument_ids: Optional[List[str]] = None,
+        apply: bool = False,
+        all_scope: bool = False,
+        job_config: Optional[JobConfig] = None,
+    ) -> bool:
+        """Run the local-only business-profile semantic audit or bounded apply."""
+        task_id = "business_profile_semantic_repair"
+        self._active_tasks.add(task_id)
+        try:
+            result = await data_manager.run_business_profile_semantic_repair(
+                instrument_ids=instrument_ids,
+                apply=apply,
+                all_scope=all_scope,
+            )
+            failures = int((result.get("change_counts") or {}).get("failed", 0))
+            held = int((result.get("change_counts") or {}).get("held", 0))
+            status = "success" if failures == 0 and held == 0 else "warning"
+            await self._send_task_report(
+                report_data={
+                    "name": "公司画像语义本地修复报告",
+                    "status": status,
+                    "tasks_completed": int(result.get("write_count") or 0),
+                    "duration": "N/A",
+                    "content": (
+                        f"模式: `{result.get('mode')}`\n"
+                        f"标的: {len(result.get('instruments') or [])}\n"
+                        f"问题: {result.get('issue_counts') or {}}\n"
+                        f"变更: {result.get('change_counts') or {}}\n"
+                        "数据源: 本地数据库；网络调用: 否；LLM 调用: 否"
+                    ),
+                    "maintenance_tasks": [
+                        {
+                            "task_name": task_id,
+                            "status": status,
+                        }
+                    ],
+                },
+                report_type="maintenance_report",
+                task_name="公司画像语义本地修复",
+                job_config=job_config,
+            )
+            return failures == 0 and held == 0
+        except Exception as exc:
+            scheduler_logger.error("[Scheduler] Business-profile semantic repair failed: %s", exc)
+            return False
+        finally:
+            self._active_tasks.discard(task_id)
+
     async def special_commodity_observation_backfill(
         self,
         scope_id: Optional[str] = None,
@@ -11577,11 +11627,11 @@ class ScheduledTasks:
                 readiness = None
 
             status = result.get('status', 'failed')
-            success = status in {'success', 'degraded'}
+            success = status == 'success'
 
             report_data = {
                 'name': '股东摘要每日增量检查报告',
-                'status': 'success' if success else 'error',
+                'status': 'warning' if status == 'degraded' else ('success' if success else 'error'),
                 'tasks_completed': result.get('changed_instruments', 0),
                 'duration': 'N/A',
                 'content': _format_shareholder_incremental_scheduler_report(

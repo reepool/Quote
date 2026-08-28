@@ -688,7 +688,10 @@ async def test_shareholder_sync_merges_missing_scope_from_later_provider(tmp_pat
     ]
     snapshot = storage.get_shareholder_snapshot("600519.SH")
     assert snapshot is not None
-    assert snapshot["source"] == "akshare"
+    assert snapshot["source"] == "composite"
+    assert snapshot["source_mode"] == "per_scope"
+    assert snapshot["snapshot"]["scope_raw_provenance"]["top10_holders"]["source"] == "akshare"
+    assert snapshot["snapshot"]["scope_raw_provenance"]["reference_only_ownership_clues"]["source"] == "cninfo"
     assert snapshot["top_holders_count"] == 10
     assert snapshot["control_owner_name"] == "中国贵州茅台酒厂（集团）有限责任公司"
     assert snapshot["snapshot"]["scope_sources"] == {

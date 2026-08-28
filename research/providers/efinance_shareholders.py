@@ -129,15 +129,30 @@ class EfinanceShareholdersProvider(BaseShareholderProvider):
                 instrument.get("instrument_id"),
                 symbol,
             )
-            holder_count_payload = self._fetch_holder_count_payload(symbol)
-            top_holders_payload = self._fetch_top_holders_payload(symbol)
-            snapshot = self._build_snapshot(
-                instrument=instrument,
-                exchange=exchange,
-                mode=mode,
-                holder_count_payload=holder_count_payload,
-                top_holders_payload=top_holders_payload,
-            )
+            try:
+                holder_count_payload = self._fetch_holder_count_payload(symbol)
+                top_holders_payload = self._fetch_top_holders_payload(symbol)
+                snapshot = self._build_snapshot(
+                    instrument=instrument,
+                    exchange=exchange,
+                    mode=mode,
+                    holder_count_payload=holder_count_payload,
+                    top_holders_payload=top_holders_payload,
+                )
+            except Exception as exc:
+                _logger.warning(
+                    "[EfinanceShareholders] Instrument fetch failed: "
+                    "exchange=%s mode=%s index=%s/%s instrument_id=%s symbol=%s "
+                    "reason=instrument_fetch_failed error=%s",
+                    exchange,
+                    mode,
+                    index,
+                    len(target_instruments),
+                    instrument.get("instrument_id"),
+                    symbol,
+                    exc,
+                )
+                continue
             if snapshot is not None:
                 snapshots.append(snapshot)
                 _logger.debug(

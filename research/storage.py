@@ -1624,6 +1624,72 @@ class ResearchStorageManager:
             result.append(item)
         return result
 
+    def get_shareholder_profile_projection(
+        self,
+        instrument_id: str,
+        *,
+        knowledge_cutoff: str,
+    ) -> Dict[str, Any]:
+        """Project local shareholder facts at a cutoff without acquisition."""
+        cutoff = str(knowledge_cutoff or "")[:10]
+        snapshot = self.get_shareholder_snapshot(instrument_id, include_snapshot=True)
+        if snapshot is None:
+            return {
+                "status": "local_data_gap",
+                "reason": "shareholder_snapshot_missing",
+                "knowledge_cutoff": cutoff,
+                "top_holders": [],
+                "actual_controller": None,
+            }
+        snapshot_available = str(snapshot.get("data_as_of") or "")[:10]
+        if not cutoff or not snapshot_available or snapshot_available > cutoff:
+            return {
+                "status": "local_data_gap",
+                "reason": "shareholder_snapshot_not_available_at_cutoff",
+                "knowledge_cutoff": cutoff,
+                "top_holders": [],
+                "actual_controller": None,
+            }
+        payload = snapshot.get("snapshot") if isinstance(snapshot.get("snapshot"), dict) else {}
+        eligible_history = [
+            item
+            for item in self.list_shareholder_control_changes(instrument_id)
+            if str(item.get("change_date") or "")[:10] <= cutoff
+            and str(item.get("created_at") or "")[:10] <= cutoff
+            and str(item.get("actual_controller_name") or "").strip()
+        ]
+        controller = None
+        if eligible_history:
+            selected = max(
+                eligible_history,
+                key=lambda item: (
+                    str(item.get("change_date") or ""),
+                    str(item.get("updated_at") or ""),
+                ),
+            )
+            controller = {
+                "actual_controller_name": selected.get("actual_controller_name"),
+                "direct_controller_name": selected.get("direct_controller_name"),
+                "control_method": selected.get("control_type"),
+                "control_holding_ratio": selected.get("control_holding_ratio"),
+                "source": selected.get("source"),
+                "source_mode": selected.get("source_mode"),
+                "report_date": selected.get("change_date"),
+                "availability_date": str(selected.get("created_at") or "")[:10],
+            }
+        return {
+            "status": "success",
+            "knowledge_cutoff": cutoff,
+            "holder_count": snapshot.get("holder_count"),
+            "holder_count_report_date": snapshot.get("holder_count_report_date"),
+            "top_holders": list(payload.get("top_holders") or []),
+            "top_holders_report_date": snapshot.get("top_holders_report_date"),
+            "actual_controller": controller,
+            "snapshot_source": snapshot.get("source"),
+            "snapshot_source_mode": snapshot.get("source_mode"),
+            "snapshot_availability_date": snapshot_available,
+        }
+
     def merge_shareholder_ownership_clues(
         self,
         instrument_id: str,

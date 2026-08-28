@@ -35,7 +35,6 @@ _ANONYMOUS_CONCENTRATION_LABEL_ALIASES = {
     "前五大供应商": "top_five_suppliers",
     "前五名供应商": "top_five_suppliers",
     "前五供应商": "top_five_suppliers",
-    "关联方": "related_parties",
 }
 
 _ANONYMOUS_CONCENTRATION_OBJECT_ALIASES = {
@@ -221,7 +220,11 @@ class BusinessProfileActivityProducer:
         )
         instrument_id = _required_text(assertion, "instrument_id")
         report_period = _required_text(assertion, "report_period")
-        anonymous = assertion.get("anonymous") is True
+        anonymous_label = str(assertion.get("counterparty_name_raw") or "").strip()
+        anonymous = (
+            assertion.get("anonymous") is True
+            or _is_anonymous_concentration_label(anonymous_label)
+        )
         if anonymous:
             share = assertion.get("disclosed_share")
             if share is None:
@@ -307,6 +310,23 @@ class BusinessProfileActivityProducer:
         normalized_share, share_rule = _normalize_disclosed_share(
             assertion.get("disclosed_share"), assertion.get("disclosed_share_unit")
         )
+        contract_reference_raw = str(
+            assertion.get("contract_reference_raw") or ""
+        ).strip() or None
+        relationship_occurrence_key = _stable_id(
+            "relationship-occurrence",
+            {
+                "contract_reference_raw": contract_reference_raw,
+                "relationship_type": relationship_type,
+                "counterparty_name_raw": raw_name,
+                "scope_id": assertion.get("scope_id"),
+                "object_raw": assertion.get("object_raw"),
+                "object_id": assertion.get("object_id"),
+                "disclosed_value": assertion.get("disclosed_value"),
+                "disclosed_unit": assertion.get("disclosed_unit"),
+                "disclosed_share": normalized_share,
+            },
+        )
         relationship_id = _stable_id(
             "relationship",
             {
@@ -318,7 +338,7 @@ class BusinessProfileActivityProducer:
                 "object_raw": assertion.get("object_raw"),
                 "object_id": assertion.get("object_id"),
                 "source_row_key": assertion.get("source_row_key"),
-                "contract_reference_raw": assertion.get("contract_reference_raw"),
+                "contract_reference_raw": contract_reference_raw,
                 "evidence_id": evidence_id,
             },
         )
@@ -366,7 +386,8 @@ class BusinessProfileActivityProducer:
                 ),
                 "schema_version": ACTIVITY_PRODUCTION_SCHEMA_VERSION,
                 "source_row_key": assertion.get("source_row_key"),
-                "contract_reference_raw": assertion.get("contract_reference_raw"),
+                "contract_reference_raw": contract_reference_raw,
+                "relationship_occurrence_key": relationship_occurrence_key,
                 "numeric_reconciliation": {
                     "schema_version": "business_profile_ratio_validation.v1",
                     "status": "passed" if normalized_share is not None else "not_applicable",
@@ -710,6 +731,15 @@ def _anonymous_concentration_key(
     if not normalized:
         return None
     return aliases.get(normalized, normalized)
+
+
+def _is_anonymous_concentration_label(value: Any) -> bool:
+    normalized = "".join(
+        character.lower()
+        for character in str(value or "").strip()
+        if character.isalnum()
+    )
+    return bool(normalized and normalized in _ANONYMOUS_CONCENTRATION_LABEL_ALIASES)
 
 
 def _stable_id(prefix: str, value: Any) -> str:

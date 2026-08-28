@@ -198,6 +198,58 @@ def test_shareholder_incremental_sync_task_reports_change_summary(monkeypatch):
     assert "shareholder_incremental_sync" not in task._active_tasks
 
 
+def test_shareholder_incremental_sync_reports_degraded_as_warning(monkeypatch):
+    task = ScheduledTasks.__new__(ScheduledTasks)
+    task.config = Mock()
+    task.telegram_enabled = False
+    task._active_tasks = set()
+    task._send_task_report = AsyncMock()
+    data_manager = Mock()
+    data_manager.run_shareholder_incremental_sync = AsyncMock(
+        return_value={"status": "degraded", "changed_instruments": 0}
+    )
+    data_manager.get_research_shareholder_readiness = AsyncMock(return_value={})
+    monkeypatch.setattr(task_module, "data_manager", data_manager)
+
+    result = asyncio.run(task.shareholder_incremental_sync(dry_run=True))
+
+    assert result is False
+    report = task._send_task_report.await_args.kwargs["report_data"]
+    assert report["status"] == "warning"
+
+
+def test_business_profile_semantic_repair_reports_local_only_warning(monkeypatch):
+    task = ScheduledTasks.__new__(ScheduledTasks)
+    task.config = Mock()
+    task.telegram_enabled = False
+    task._active_tasks = set()
+    task._send_task_report = AsyncMock()
+    data_manager = Mock()
+    data_manager.run_business_profile_semantic_repair = AsyncMock(
+        return_value={
+            "mode": "apply",
+            "instruments": [{"instrument_id": "601088.SH"}],
+            "issue_counts": {"relationship_short_name_auto_resolution": 1},
+            "change_counts": {"held": 1},
+            "write_count": 0,
+        }
+    )
+    monkeypatch.setattr(task_module, "data_manager", data_manager)
+
+    result = asyncio.run(task.business_profile_semantic_repair(
+        instrument_ids=["601088.SH"], apply=True,
+    ))
+
+    assert result is False
+    data_manager.run_business_profile_semantic_repair.assert_awaited_once_with(
+        instrument_ids=["601088.SH"], apply=True, all_scope=False,
+    )
+    report = task._send_task_report.await_args.kwargs["report_data"]
+    assert report["status"] == "warning"
+    assert "网络调用: 否；LLM 调用: 否" in report["content"]
+    assert "held" in report["content"]
+
+
 def test_shareholder_reconciliation_sync_uses_changed_only_policy(monkeypatch):
     task = ScheduledTasks.__new__(ScheduledTasks)
     task.config = Mock()

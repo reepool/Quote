@@ -2890,15 +2890,20 @@ class ProfessionalDcfEngine:
         else:
             normalized_margin = reported_margin
             source = "reported_margin_clamped_to_midcycle_band"
-            cycle_adjusted = self._cycle_adjusted_margin(
+            economic_role = str(cycle_context.get("economic_role") or "").strip()
+            if economic_role not in {"revenue", "feedstock_cost", "energy_cost"}:
+                warnings.append("cyclical_commodity_role_missing_cycle_adjustment_skipped")
+                cycle_adjusted = None
+            else:
+                cycle_adjusted = self._cycle_adjusted_margin(
                 reported_margin=reported_margin,
                 floor=floor,
                 cap=cap,
                 cycle_percentile=cycle_percentile,
                 cycle_state=cycle_state,
-                economic_role=str(cycle_context.get("economic_role") or "revenue"),
+                economic_role=economic_role,
                 overrides=overrides,
-            )
+                )
             if cycle_adjusted is not None and cycle_adjusted != normalized_margin:
                 normalized_margin = cycle_adjusted
                 source = "reported_margin_adjusted_by_futures_cycle_to_midcycle_band"

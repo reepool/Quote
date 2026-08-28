@@ -456,6 +456,40 @@ def test_shareholder_hash_is_stable_for_reordered_top_holders():
     )
 
 
+def test_shareholder_hash_normalizes_compact_report_dates():
+    left = {
+        "holder_count": {"value": 100, "report_date": "20260331"},
+        "top_holders": [{"rank": 1, "holder_name": "A", "report_date": "20260331"}],
+    }
+    right = {
+        "holder_count": {"value": 100, "report_date": "2026-03-31"},
+        "top_holders": [{"rank": 1, "holder_name": "A", "report_date": "2026-03-31"}],
+    }
+
+    assert compute_shareholder_content_hashes(left) == compute_shareholder_content_hashes(right)
+
+
+def test_shareholder_incremental_candidate_limit_prefers_missing_scope_then_newest():
+    candidates = {
+        "600001.SH": ShareholderAnnouncementCandidate(
+            instrument_id="600001.SH", symbol="600001", exchange="SSE",
+            reasons=["announcement_change"], latest_announcement_time="2026-08-01T00:00:00+08:00",
+        ),
+        "600002.SH": ShareholderAnnouncementCandidate(
+            instrument_id="600002.SH", symbol="600002", exchange="SSE",
+            reasons=["missing_required_scope"], latest_announcement_time="2026-07-01T00:00:00+08:00",
+        ),
+        "600003.SH": ShareholderAnnouncementCandidate(
+            instrument_id="600003.SH", symbol="600003", exchange="SSE",
+            reasons=["announcement_change"], latest_announcement_time="2026-08-02T00:00:00+08:00",
+        ),
+    }
+
+    selected = ShareholderIncrementalSyncService._limit_candidates(candidates, 2)
+
+    assert list(selected) == ["600002.SH", "600003.SH"]
+
+
 def test_pending_recheck_deadline_does_not_extend_for_same_announcement():
     now = datetime.fromisoformat("2026-05-10T09:00:00+08:00")
     candidate = ShareholderAnnouncementCandidate(

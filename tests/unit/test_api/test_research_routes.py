@@ -1376,6 +1376,7 @@ class TestResearchRoutes:
         mock_dm.get_research_company_profile.assert_awaited_once_with(
             "600000.SH",
             include_snapshot=True,
+            as_of_date=None,
         )
 
     @patch("api.routes.data_manager")
@@ -1402,6 +1403,7 @@ class TestResearchRoutes:
         mock_dm.get_research_company_profile.assert_awaited_once_with(
             "600000.SH",
             include_snapshot=False,
+            as_of_date=None,
         )
 
     @patch("api.routes.data_manager")

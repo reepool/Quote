@@ -18,6 +18,7 @@ from research.shareholder_control_sync import persist_shareholder_control_change
 from research.shareholder_snapshot_policy import (
     actual_shareholder_coverage_scope,
     incoming_shareholder_snapshot_is_weaker,
+    normalize_shareholder_report_date,
     top_holders_satisfy_required_scope,
 )
 from research.source_policy import ResearchSourcePolicyResolver
@@ -787,14 +788,19 @@ class ShareholderShadowSyncService:
                 scope: self._scope_period(incoming, scope)
                 for scope in sorted(incoming_scope)
             }
+            scope_raw_provenance = {
+                scope: self._scope_raw_provenance(incoming, scope)
+                for scope in sorted(incoming_scope)
+            }
+            incoming_snapshot_json["scope_raw_provenance"] = scope_raw_provenance
             return ShareholderSnapshot(
                 instrument_id=incoming.instrument_id,
                 symbol=incoming.symbol,
                 exchange=incoming.exchange,
                 coverage_status=incoming.coverage_status,
                 holder_count=incoming.holder_count,
-                holder_count_report_date=incoming.holder_count_report_date,
-                top_holders_report_date=incoming.top_holders_report_date,
+                holder_count_report_date=self._scope_period(incoming, "holder_count"),
+                top_holders_report_date=self._scope_period(incoming, "top10_holders"),
                 top_holders_count=incoming.top_holders_count,
                 top_holders_total_ratio=incoming.top_holders_total_ratio,
                 control_owner_name=incoming.control_owner_name,
@@ -803,7 +809,7 @@ class ShareholderShadowSyncService:
                 source=incoming.source,
                 source_mode=incoming.source_mode,
                 snapshot_json=incoming_snapshot_json,
-                raw_payload=incoming.raw_payload,
+                raw_payload=self._composite_raw_payload(scope_raw_provenance),
             )
 
         existing_scope = actual_shareholder_coverage_scope(
@@ -841,6 +847,19 @@ class ShareholderShadowSyncService:
         merged_snapshot_json["scope_periods"] = {
             scope: self._scope_period(source, scope) for scope, source in selected.items()
         }
+        scope_raw_provenance = {
+            scope: self._scope_raw_provenance(source, scope)
+            for scope, source in selected.items()
+        }
+        merged_snapshot_json["scope_raw_provenance"] = scope_raw_provenance
+        selected_sources = {
+            (str(source.source), str(source.source_mode))
+            for source in selected.values()
+        }
+        if len(selected_sources) == 1:
+            top_level_source, top_level_mode = next(iter(selected_sources))
+        else:
+            top_level_source, top_level_mode = "composite", "per_scope"
 
         return ShareholderSnapshot(
             instrument_id=existing.instrument_id,
@@ -855,11 +874,46 @@ class ShareholderShadowSyncService:
             control_owner_name=ownership_source.control_owner_name,
             control_owner_ratio=ownership_source.control_owner_ratio,
             schema_version=existing.schema_version,
-            source=existing.source,
-            source_mode=existing.source_mode,
+            source=top_level_source,
+            source_mode=top_level_mode,
             snapshot_json=merged_snapshot_json,
-            raw_payload=existing.raw_payload,
+            raw_payload=self._composite_raw_payload(scope_raw_provenance),
         )
+
+    @staticmethod
+    def _scope_raw_provenance(
+        snapshot: ShareholderSnapshot,
+        scope: str,
+    ) -> Dict[str, Any]:
+        """Keep each merged scope attributable to its selected provider payload."""
+        raw_payload = snapshot.raw_payload if isinstance(snapshot.raw_payload, dict) else {}
+        payload_key = {
+            "holder_count": "holder_count",
+            "top10_holders": "top_holders",
+            "reference_only_ownership_clues": "ownership_clues",
+        }.get(scope)
+        scope_payload = raw_payload.get(payload_key) if payload_key else None
+        if scope_payload is None:
+            scope_payload = raw_payload
+        return {
+            "source": snapshot.source,
+            "source_mode": snapshot.source_mode,
+            "payload": ShareholderShadowSyncService._json_ready(scope_payload),
+        }
+
+    @staticmethod
+    def _composite_raw_payload(
+        scope_raw_provenance: Dict[str, Dict[str, Any]],
+    ) -> Dict[str, Any]:
+        return {
+            "schema_version": "shareholder_scope_raw_provenance.v1",
+            "scope_payloads": scope_raw_provenance,
+        }
+
+    @staticmethod
+    def _json_ready(value: Any) -> Any:
+        """Make provider payload provenance safe for snapshot JSON persistence."""
+        return json.loads(json.dumps(value, ensure_ascii=False, default=str))
 
     def _scope_is_preferred(
         self,
@@ -888,8 +942,7 @@ class ShareholderShadowSyncService:
         else:
             raw = (payload.get("ownership_clues") or {}).get("report_date") if isinstance(payload.get("ownership_clues"), dict) else None
             raw = raw or snapshot.top_holders_report_date or snapshot.holder_count_report_date
-        digits = "".join(character for character in str(raw or "") if character.isdigit())
-        return f"{digits[:4]}-{digits[4:6]}-{digits[6:8]}" if len(digits) >= 8 else None
+        return normalize_shareholder_report_date(raw)
 
     @staticmethod
     def _scope_completeness(snapshot: ShareholderSnapshot, scope: str) -> int:

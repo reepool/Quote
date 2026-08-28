@@ -210,6 +210,61 @@ def test_current_activity_selection_prefers_catalog_normalized_replay():
     assert [item["activity_id"] for item in selected] == ["normalized"]
 
 
+def test_relationship_as_of_keeps_latest_cohort_and_same_period_contracts(tmp_path):
+    storage, _ = _storage(tmp_path)
+    repository = BusinessProfileRepository(storage)
+    _governed_upsert(repository, "evidence", _approved_evidence())
+    base = {
+        "instrument_id": "601088.SH",
+        "relationship_type": "buys_from",
+        "direction": "inbound",
+        "counterparty_name_raw": "供应商甲有限公司",
+        "counterparty_name_normalized": None,
+        "counterparty_entity_id": None,
+        "resolution_basis": None,
+        "anonymous": 0,
+        "scope_type": "company",
+        "scope_id": "601088.SH",
+        "object_raw": "煤炭",
+        "object_id": None,
+        "evidence_id": "evidence-2025-ar",
+        "data_available_date": "2026-03-28",
+        "confidence": 0.9,
+        "review_status": "approved",
+        "valid_from": "2025-01-01",
+        "metadata": {},
+    }
+    for record in (
+        {**base, "relationship_id": "rel-2024", "report_period": "2024-12-31", "metadata": {"relationship_occurrence_key": "contract-old"}},
+        {**base, "relationship_id": "rel-2025-a", "report_period": "2025-12-31", "metadata": {"relationship_occurrence_key": "contract-a"}},
+        {**base, "relationship_id": "rel-2025-b", "report_period": "2025-12-31", "metadata": {"relationship_occurrence_key": "contract-b"}},
+    ):
+        _governed_upsert(repository, "relationships", record)
+
+    current = repository.get_approved_as_of(
+        "relationships", instrument_id="601088.SH", cutoff="2026-04-30"
+    )
+
+    assert {item["relationship_id"] for item in current} == {"rel-2025-a", "rel-2025-b"}
+
+
+def test_relationship_as_of_excludes_stale_persistent_evidence(tmp_path):
+    storage, _ = _storage(tmp_path)
+    repository = BusinessProfileRepository(storage)
+    _governed_upsert(repository, "evidence", _approved_evidence())
+    _governed_upsert(repository, "relationships", {
+        "relationship_id": "rel-stale", "instrument_id": "601088.SH", "report_period": "2024-12-31",
+        "relationship_type": "buys_from", "direction": "inbound", "counterparty_name_raw": "供应商甲有限公司",
+        "anonymous": 0, "scope_type": "company", "scope_id": "601088.SH", "object_raw": "煤炭",
+        "evidence_id": "evidence-2025-ar", "data_available_date": "2026-03-28", "confidence": 0.9,
+        "review_status": "approved", "valid_from": "2024-01-01", "metadata": {"relationship_occurrence_key": "contract-a"},
+    })
+
+    assert repository.get_approved_as_of(
+        "relationships", instrument_id="601088.SH", cutoff="2027-01-01"
+    ) == []
+
+
 def _governed_upsert(repository, record_type, record):
     """Insert test records through the same candidate-first audited path as production."""
 

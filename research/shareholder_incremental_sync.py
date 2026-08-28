@@ -29,7 +29,10 @@ from research.shareholder_announcement_filters import (
     shareholder_announcement_filter,
     shareholder_announcement_stream_specs,
 )
-from research.shareholder_snapshot_policy import actual_shareholder_coverage_scope
+from research.shareholder_snapshot_policy import (
+    actual_shareholder_coverage_scope,
+    normalize_shareholder_report_date,
+)
 from research.shareholder_control_sync import persist_shareholder_control_changes
 from research.shareholder_snapshot_policy import incoming_shareholder_snapshot_is_weaker
 from research.shareholder_sync import ShareholderExchangeSyncResult, ShareholderShadowSyncService
@@ -510,7 +513,11 @@ class ShareholderIncrementalSyncService:
             candidates.values(),
             key=lambda item: (
                 "missing_required_scope" not in item.reasons,
-                -(self._time_sort_key(item.latest_announcement_time)),
+                -(
+                    ShareholderIncrementalSyncService._time_sort_key(
+                        item.latest_announcement_time
+                    )
+                ),
                 item.instrument_id,
             ),
         )
@@ -594,9 +601,26 @@ class ShareholderIncrementalSyncService:
                 )
                 continue
             accepted = 0
+            expected_instruments = {
+                str(item.get("instrument_id") or ""): item
+                for item in fetch_instruments
+            }
             for snapshot in snapshots or []:
                 instrument_id = str(snapshot.instrument_id)
                 if instrument_id not in remaining_ids:
+                    continue
+                expected = expected_instruments.get(instrument_id)
+                if expected is None or not self.shadow_helper._snapshot_matches_instrument(
+                    snapshot, expected
+                ):
+                    dm_logger.warning(
+                        "[ShareholderIncremental] Provider snapshot rejected: "
+                        "exchange=%s source=%s instrument_id=%s "
+                        "reason=response_identity_mismatch",
+                        exchange,
+                        candidate.source,
+                        instrument_id,
+                    )
                     continue
                 merged_snapshots[instrument_id] = self.shadow_helper._merge_snapshots(
                     merged_snapshots.get(instrument_id),
@@ -992,7 +1016,7 @@ def compute_shareholder_content_hashes(snapshot_json: Dict[str, Any]) -> Dict[st
 def _normalize_holder_count(value: Dict[str, Any]) -> Dict[str, Any]:
     return {
         "value": _to_int(value.get("value")),
-        "report_date": _clean_text(value.get("report_date")),
+        "report_date": normalize_shareholder_report_date(value.get("report_date")),
     }
 
 
@@ -1009,7 +1033,7 @@ def _normalize_top_holders(values: List[Dict[str, Any]]) -> List[Dict[str, Any]]
                 "holding_ratio": _to_float(row.get("holding_ratio")),
                 "holder_type": _clean_text(row.get("holder_type")),
                 "change": _clean_text(row.get("change")),
-                "report_date": _clean_text(row.get("report_date")),
+                "report_date": normalize_shareholder_report_date(row.get("report_date")),
             }
         )
     rows.sort(
@@ -1026,7 +1050,7 @@ def _normalize_ownership(value: Dict[str, Any]) -> Dict[str, Any]:
     return {
         "control_owner_name": _clean_text(value.get("control_owner_name")),
         "control_owner_ratio": _to_float(value.get("control_owner_ratio")),
-        "report_date": _clean_text(value.get("report_date")),
+        "report_date": normalize_shareholder_report_date(value.get("report_date")),
         "direct_controller_name": _clean_text(value.get("direct_controller_name")),
         "control_type": _clean_text(value.get("control_type")),
         "control_holding_shares": _to_float(value.get("control_holding_shares")),

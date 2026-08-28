@@ -1560,12 +1560,14 @@ def test_data_manager_get_research_company_profile_delegates_to_storage(tmp_path
 
     storage = Mock()
     storage.get_company_profile.return_value = {"instrument_id": "600000.SH"}
+    storage.get_shareholder_profile_projection.return_value = {"status": "local_data_gap"}
     manager.research_storage = storage
 
     result = _run(manager.get_research_company_profile("600000.SH"))
 
     assert result["instrument_id"] == "600000.SH"
     storage.get_company_profile.assert_called_once_with("600000.SH", include_snapshot=True)
+    storage.get_shareholder_profile_projection.assert_called_once()
 
 
 def test_data_manager_get_research_company_profile_returns_optional_empty_bse_placeholder(tmp_path):
@@ -3110,6 +3112,7 @@ def test_data_manager_dcf_futures_context_prefers_governed_company_mapping(tmp_p
                 "cost_series_ids": [],
                 "spread_ids": [],
                 "direction": "positive",
+                "exposure_role": "revenue",
                 "source": "approved_company_business_profile",
             }
         ],

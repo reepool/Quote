@@ -19,7 +19,7 @@ def top_holders_satisfy_required_scope(exchange: str, top_holders: Any) -> bool:
         return False
     ranks = [item.get("rank") for item in holders]
     names = [str(item.get("holder_name") or "").strip() for item in holders]
-    dates = {_normalize_report_date(item.get("report_date")) for item in holders}
+    dates = {normalize_shareholder_report_date(item.get("report_date")) for item in holders}
     if not all(names) or len(set(names)) != len(names) or None in dates or len(dates) != 1:
         return False
     if str(exchange or "").strip().upper() in MAIN_BOARD_TOP10_EXCHANGES:
@@ -64,7 +64,7 @@ def build_shareholder_coverage_scope(
 ) -> List[str]:
     """Build coverage_scope using exchange-specific top10 completeness."""
     scope: List[str] = []
-    if _valid_holder_count(holder_count) and _normalize_report_date(holder_count_report_date):
+    if _valid_holder_count(holder_count) and normalize_shareholder_report_date(holder_count_report_date):
         scope.append("holder_count")
     if top_holders_satisfy_required_scope(exchange, top_holders):
         scope.append("top10_holders")
@@ -143,16 +143,16 @@ def incoming_shareholder_snapshot_is_weaker(
             return True
         return False
 
-    existing_holder_date = _holder_count_report_date(existing_json) or _normalize_report_date(
+    existing_holder_date = _holder_count_report_date(existing_json) or normalize_shareholder_report_date(
         existing_snapshot.get("holder_count_report_date") if existing_snapshot else None
     )
-    incoming_holder_date = _holder_count_report_date(incoming_json) or _normalize_report_date(
+    incoming_holder_date = _holder_count_report_date(incoming_json) or normalize_shareholder_report_date(
         incoming.holder_count_report_date
     )
-    existing_top_date = _top_holders_report_date(existing_json) or _normalize_report_date(
+    existing_top_date = _top_holders_report_date(existing_json) or normalize_shareholder_report_date(
         existing_snapshot.get("top_holders_report_date") if existing_snapshot else None
     )
-    incoming_top_date = _top_holders_report_date(incoming_json) or _normalize_report_date(
+    incoming_top_date = _top_holders_report_date(incoming_json) or normalize_shareholder_report_date(
         incoming.top_holders_report_date
     )
     return _report_date_regressed(
@@ -166,7 +166,7 @@ def _holder_count_report_date(snapshot_json: Optional[Dict[str, Any]]) -> Option
         return None
     holder_count = snapshot_json.get("holder_count")
     if isinstance(holder_count, dict):
-        return _normalize_report_date(holder_count.get("report_date"))
+        return normalize_shareholder_report_date(holder_count.get("report_date"))
     return None
 
 
@@ -177,7 +177,7 @@ def _top_holders_report_date(snapshot_json: Optional[Dict[str, Any]]) -> Optiona
     top_holders = snapshot_json.get("top_holders") or []
     if isinstance(top_holders, list):
         dates.extend(
-            _normalize_report_date(item.get("report_date"))
+            normalize_shareholder_report_date(item.get("report_date"))
             for item in top_holders
             if isinstance(item, dict)
         )
@@ -223,10 +223,14 @@ def _report_date_regressed(
     return bool(existing_date and not incoming_date)
 
 
-def _normalize_report_date(value: Any) -> Optional[str]:
+def normalize_shareholder_report_date(value: Any) -> Optional[str]:
+    """Normalize one shareholder report date to the persisted ISO date form."""
     if value in (None, ""):
         return None
     digits = "".join(character for character in str(value).strip() if character.isdigit())
     if len(digits) >= 8:
         return f"{digits[:4]}-{digits[4:6]}-{digits[6:8]}"
     return None
+
+
+_normalize_report_date = normalize_shareholder_report_date

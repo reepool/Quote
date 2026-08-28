@@ -723,6 +723,9 @@ class ResearchCompanyProfileResponse(BaseModel):
     created_at: datetime = Field(..., description="创建时间")
     updated_at: datetime = Field(..., description="更新时间")
     profile: Optional[Dict[str, Any]] = Field(None, description="标准化快照详情")
+    shareholder_context: Optional[Dict[str, Any]] = Field(
+        None, description="本地股东快照与控制权历史的时点投影"
+    )
 
 
 class ResearchAnnualReportAssetLineage(BaseModel):

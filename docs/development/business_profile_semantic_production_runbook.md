@@ -367,6 +367,45 @@ signature 和排序后的本地候选。
 网络中断或主动取消后由队列按指数退避自动重领并复用检查点。如果目录、模型、
 规则或 policy 已变化，应以新处理身份创建新工作项，不能在旧检查点上混合身份。
 
+### 8.2 本地语义修复（股东、供应链、商品暴露）
+
+`business_profile_semantic_repair` 只检查并修复已持久化的本地派生状态。它不会
+获取公告、调用 CNInfo/其他股东 Provider，或调用 LLM；因此不能把它用于补采缺失
+的原始股东数据或年报内容。默认是只读审计：
+
+```text
+/run business_profile_semantic_repair instrument_ids=601088.SH,300708.SZ
+```
+
+审计输出 `issue_counts`、稳定 issue ID 以及每只股票的 before/after 诊断，
+`write_count` 必须为 `0`。常见结果包括：
+
+- `shareholder_inferred_controller`：历史快照把第一大股东误写为实控人；apply 会在
+  本地没有控制权历史支持时清除该派生字段。
+- `shareholder_scope_mismatch` 或 `shareholder_noncanonical_report_date`：按当前
+  scope 归并规则重建快照及每个 scope 的 source/raw provenance。
+- 关系简称解析、跨年 cohort 和历史暴露碰撞：当前时点读取已按新规则避免错误消费；
+  如果本地证据不足以无损改写，会报告 `held`，而不会删除证据、重调 LLM 或伪造批准。
+
+先在复制库完成审计后，才可对限定股票执行 apply：
+
+```text
+/run business_profile_semantic_repair instrument_ids=601088.SH,300708.SZ apply=true
+```
+
+全库 apply 必须同时明确 `apply=true all_scope=true`；不允许省略标的后隐式写入。
+执行前使用部署中配置的 research SQLite 路径创建可回滚副本，例如：
+
+```bash
+sqlite3 /path/to/research.db ".backup '/path/to/research.before-semantic-repair.db'"
+```
+
+`changed` 表示本地可重建快照已经写入，`unchanged` 表示重复执行没有产生新写入，
+`held` 表示需要既有审核/发布 owner 的后续处理，`failed` 表示该股票局部失败且其余
+股票继续执行。收到 `warning` 时必须查看 `failed` 和 `held` 的 reason；它不是全量
+修复成功。回滚时停止该任务和相关写入后，从已验证的副本恢复数据库，不删除原始
+evidence、review audit 或有效历史行来“回滚”。
+
 ## 8.1 年报季容量与背压
 
 公告发现使用稳定市场 scope、官方年报分类和完整性标记。CNInfo 将统一分类映射为

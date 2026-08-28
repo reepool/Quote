@@ -3951,6 +3951,7 @@ class DataManager:
         instrument_id: str,
         *,
         include_snapshot: bool = True,
+        as_of_date: Optional[str] = None,
     ) -> Optional[Dict[str, Any]]:
         """读取研究域 company profile。"""
         storage = self._require_research_storage()
@@ -3961,6 +3962,12 @@ class DataManager:
             include_snapshot=include_snapshot,
         )
         if profile is not None:
+            cutoff = str(as_of_date or get_shanghai_time().date().isoformat())[:10]
+            profile["shareholder_context"] = await asyncio.to_thread(
+                storage.get_shareholder_profile_projection,
+                normalized_id,
+                knowledge_cutoff=cutoff,
+            )
             return profile
 
         instrument = await self._get_research_instrument_info(normalized_id)
@@ -3979,7 +3986,7 @@ class DataManager:
         instrument_id: str,
         *,
         as_of_date: Optional[str] = None,
-        include_candidates: bool = True,
+        include_candidates: bool = False,
     ) -> Dict[str, Any]:
         """Read the governed local business profile for one company."""
         storage = self._require_research_storage()
@@ -4042,12 +4049,37 @@ class DataManager:
             "history": history,
         }
 
+    async def run_business_profile_semantic_repair(
+        self,
+        *,
+        instrument_ids: Optional[List[str]] = None,
+        apply: bool = False,
+        all_scope: bool = False,
+    ) -> Dict[str, Any]:
+        """Run bounded local semantic repair; audit is the default mode."""
+        from research.business_profile_semantic_repair import (
+            BusinessProfileSemanticRepairService,
+        )
+
+        storage = self._require_research_storage()
+        normalized_ids = [
+            convert_to_database_format(item)
+            for item in (instrument_ids or [])
+            if str(item).strip()
+        ]
+        return await asyncio.to_thread(
+            BusinessProfileSemanticRepairService(storage).run,
+            instrument_ids=normalized_ids,
+            apply=apply,
+            all_scope=all_scope,
+        )
+
     async def get_research_company_commodity_exposures(
         self,
         instrument_id: str,
         *,
         as_of_date: Optional[str] = None,
-        include_candidates: bool = True,
+        include_candidates: bool = False,
     ) -> Dict[str, Any]:
         """Read governed and executable commodity exposure for one company."""
         context = await self.get_research_company_business_profile(
@@ -10231,7 +10263,7 @@ class DataManager:
             normalized_id,
             valuation_date=target_valuation_date,
             industry_membership=industry_membership,
-            include_candidates=True,
+            include_candidates=False,
         )
         financial_bundle["business_profile_context"] = business_profile_context
         profile_lineage = financial_bundle.get("lineage")
@@ -11229,7 +11261,7 @@ class DataManager:
         eligible_mappings = sorted(
             payload.get("mappings") or [],
             key=lambda item: (
-                -float(item.get("transmission_strength") or 0.0),
+                -self._dcf_mapping_strength(item.get("transmission_strength")),
                 str(item.get("exposure_role") or ""),
                 str(item.get("mapping_id") or ""),
             ),
@@ -11237,10 +11269,13 @@ class DataManager:
         if not eligible_mappings:
             return None
         selected_mapping = eligible_mappings[0]
-        top_strength = float(selected_mapping.get("transmission_strength") or 0.0)
+        top_strength = self._dcf_mapping_strength(
+            selected_mapping.get("transmission_strength")
+        )
         equally_material = [
             item for item in eligible_mappings
-            if float(item.get("transmission_strength") or 0.0) == top_strength
+            if self._dcf_mapping_strength(item.get("transmission_strength"))
+            == top_strength
         ]
         if len(equally_material) > 1:
             return None
@@ -11314,6 +11349,20 @@ class DataManager:
                 else None
             ),
         }
+
+    @staticmethod
+    def _dcf_mapping_strength(value: Any) -> float:
+        """Normalize the persisted categorical/decimal mapping materiality."""
+        if isinstance(value, str):
+            normalized = value.strip().lower()
+            categorical = {"low": 0.25, "medium": 0.5, "high": 0.75}
+            if normalized in categorical:
+                return categorical[normalized]
+            value = normalized
+        try:
+            return float(value or 0.0)
+        except (TypeError, ValueError):
+            return 0.0
 
     def _enrich_dcf_bundle_with_broker_risk_control_facts(
         self,
