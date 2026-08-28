@@ -17,7 +17,7 @@
 ## 3. Reuse, replace, and local replay
 
 - [x] 3.1 Propagate `result_policy` from the backfill application entry point through semantic reuse, atomic persistence, role derivation, exposure publication, promotion, and repair, with explicit policy diagnostics at each boundary.
-- [ ] 3.2 Implement local upgrade/replay for legacy contract facts using persisted evidence and semantic artifacts; create row-aware successors only when occurrence identity is proven and preserve approved history otherwise.
+- [x] 3.2 Implement local upgrade/replay for legacy contract facts using persisted evidence and semantic artifacts; create row-aware successors only when occurrence identity is proven and preserve approved history otherwise.
 - [x] 3.3 Ensure reuse does not promote incompatible legacy candidates over approved records and replace creates normal governed successors without last-write-wins or evidence deletion.
 - [x] 3.4 Add origin and token accounting for `llm_extracted`, `semantic_reused`, `local_replayed`, and `program_derived`; count tokens only from actual gateway calls.
 - [ ] 3.5 Define and persist separate program-derived aggregate facts with input occurrence keys and rule versions; never replace contract-level facts with totals.

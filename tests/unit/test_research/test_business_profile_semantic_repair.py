@@ -361,3 +361,57 @@ def test_repair_holds_legacy_internal_inventory_storage_role(tmp_path):
     assert applied["change_counts"]["changed"] == 1
     assert repository.get_record("evidence", evidence["evidence_id"])["review_status"] == "approved"
     assert service.run(instrument_ids=["000858.SZ"], apply=True)["change_counts"]["unchanged"] == 1
+
+
+def test_repair_replays_distinct_candidate_contract_occurrences(tmp_path):
+    storage = _storage(tmp_path)
+    repository = BusinessProfileRepository(storage)
+    base = {
+        "instrument_id": "601012.SH", "report_period": "2025-12-31",
+        "segment_id": "segment-polysilicon", "fact_type": "purchase_amount",
+        "unit_raw": "亿元", "value_normalized": 0, "unit_normalized": "CNY",
+        "fact_scope": "多晶硅料:采购金额#legacy-broad", "equity_basis": "source_reported_unknown",
+        "data_available_date": "2026-03-30", "confidence": 1.0,
+        "review_status": "candidate", "valid_from": "2025-01-01",
+        "knowledge_from": "2026-03-30",
+    }
+    for evidence_id in ("evidence-contract-1", "evidence-contract-2"):
+        repository.upsert(
+            "evidence",
+            {
+                "evidence_id": evidence_id,
+                "instrument_id": "601012.SH",
+                "source_document_id": "annual-report-2025",
+                "source_tier": "official_filing",
+                "document_hash": "contract-document-hash",
+                "data_available_date": "2026-03-30",
+                "availability_quality": "actual",
+                "evidence_text_hash": evidence_id + "-text",
+                "extraction_method": "native_text",
+                "confidence": 1.0,
+                "review_status": "candidate",
+            },
+        )
+    for record_id, value, evidence_id, quote in (
+        ("legacy-contract-1", 4.18, "evidence-contract-1", "合同一 67.46 4.18亿元"),
+        ("legacy-contract-2", 0, "evidence-contract-2", "合同二 1.25 0亿元"),
+    ):
+        repository.upsert(
+            "operating_facts",
+            {
+                **base,
+                "record_id": record_id,
+                "value_raw": value,
+                "evidence_id": evidence_id,
+                "metadata": {"source_row_key": "legacy-broad", "exact_evidence": {"quote": quote}},
+            },
+        )
+    service = BusinessProfileSemanticRepairService(storage)
+    audit = service.run(instrument_ids=["601012.SH"])
+    issue = next(item for item in audit["instruments"][0]["issues"] if item["code"] == "operating_fact_occurrence_conflict")
+    assert issue["details"]["reconstructable"] is True
+    applied = service.run(instrument_ids=["601012.SH"], apply=True)
+    assert applied["change_counts"]["changed"] == 2
+    rows = repository.list_records("operating_facts", instrument_id="601012.SH")
+    assert {row["review_status"] for row in rows} == {"held", "candidate"}
+    assert len([row for row in rows if row["review_status"] == "candidate"]) == 2

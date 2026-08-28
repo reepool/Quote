@@ -296,6 +296,8 @@ class BusinessProfileSemanticRepairService:
         )
         groups: dict[tuple[Any, ...], list[dict[str, Any]]] = {}
         for record in records:
+            if record.get("review_status") not in {"approved", "candidate"}:
+                continue
             scope = str(record.get("fact_scope") or "").split("#", 1)[0]
             key = (
                 record.get("report_period"),
@@ -323,6 +325,15 @@ class BusinessProfileSemanticRepairService:
                             "identity": list(key),
                             "record_ids": [item.get("record_id") for item in group],
                             "values": [list(value) for value in sorted(values, key=str)],
+                            "reconstructable": len(
+                                {
+                                    str(item.get("evidence_id") or "")
+                                    + ":"
+                                    + str((item.get("metadata") or {}).get("exact_evidence") or "")
+                                    for item in group
+                                }
+                            )
+                            == len(group),
                         },
                     )
                 )
@@ -361,7 +372,6 @@ class BusinessProfileSemanticRepairService:
                 changes.append(self._hold_invalid_role(instrument_id, issue))
             elif issue["code"] in {
                 "duplicate_role_business_identity",
-                "operating_fact_occurrence_conflict",
                 "incompatible_reusable_artifact",
             }:
                 changes.append({
@@ -370,6 +380,85 @@ class BusinessProfileSemanticRepairService:
                     "reason": issue["code"],
                     "stable_id": issue["stable_id"],
                 })
+            elif issue["code"] == "operating_fact_occurrence_conflict":
+                if issue.get("details", {}).get("reconstructable"):
+                    changes.extend(
+                        self._replay_operating_fact_group(
+                            instrument_id,
+                            issue,
+                        )
+                    )
+                else:
+                    changes.append({
+                        "instrument_id": instrument_id,
+                        "status": "held",
+                        "reason": issue["code"],
+                        "stable_id": issue["stable_id"],
+                    })
+        return changes
+
+    def _replay_operating_fact_group(
+        self, instrument_id: str, issue: dict[str, Any]
+    ) -> list[dict[str, Any]]:
+        """Split only candidate rows whose persisted evidence proves occurrence identity."""
+
+        changes: list[dict[str, Any]] = []
+        for record_id in issue.get("details", {}).get("record_ids") or ():
+            record = self.repository.get_record("operating_facts", str(record_id))
+            if record is None or record.get("review_status") != "candidate":
+                changes.append({
+                    "instrument_id": instrument_id,
+                    "status": "unchanged",
+                    "reason": "approved_history_preserved_or_record_absent",
+                    "stable_id": issue["stable_id"],
+                    "affected_ids": [str(record_id)],
+                })
+                continue
+            metadata = dict(record.get("metadata") or {})
+            identity_material = {
+                "record_id": record.get("record_id"),
+                "evidence_id": record.get("evidence_id"),
+                "exact_evidence": metadata.get("exact_evidence"),
+                "value_raw": record.get("value_raw"),
+                "unit_raw": record.get("unit_raw"),
+            }
+            source_row_key = "repair-row-" + hashlib.sha256(
+                repr(sorted(identity_material.items())).encode("utf-8")
+            ).hexdigest()[:24]
+            successor = dict(record)
+            successor["record_id"] = "bp-operating-repair-" + hashlib.sha256(
+                repr(sorted({**identity_material, "source_row_key": source_row_key}.items())).encode("utf-8")
+            ).hexdigest()[:24]
+            successor["fact_scope"] = (
+                str(record.get("fact_scope") or "").split("#", 1)[0]
+                + "#"
+                + source_row_key
+            )
+            successor["review_status"] = "candidate"
+            successor_metadata = dict(metadata)
+            successor_metadata.update({
+                "source_row_key": source_row_key,
+                "occurrence_identity_quality": "repaired_from_persisted_evidence",
+                "repair_issue_id": issue["stable_id"],
+                "repair_origin": "local_replayed",
+            })
+            successor["metadata"] = successor_metadata
+            self.repository.upsert("operating_facts", successor)
+            audit = self.review_service.system_hold_candidate(
+                "operating_facts",
+                str(record_id),
+                expected_updated_at=str(record.get("updated_at") or ""),
+                reason="legacy broad fact identity replaced by evidence-derived occurrence candidate",
+                metadata={"repair_issue_id": issue["stable_id"]},
+            )
+            changes.append({
+                "instrument_id": instrument_id,
+                "status": "changed",
+                "reason": "operating_fact_occurrence_replayed",
+                "stable_id": issue["stable_id"],
+                "affected_ids": [str(record_id), successor["record_id"]],
+                "review_audit_id": audit.get("audit_id"),
+            })
         return changes
 
     def _hold_invalid_role(

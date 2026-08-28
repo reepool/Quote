@@ -360,6 +360,35 @@ class BusinessProfileReviewService:
                 raise
         return audit
 
+    def system_hold_candidate(
+        self,
+        record_type: str,
+        record_id: str,
+        *,
+        expected_updated_at: str,
+        reason: str,
+        metadata: Optional[Dict[str, Any]] = None,
+    ) -> Dict[str, Any]:
+        """Hold a machine candidate through the audited review owner."""
+
+        return self.review_record(
+            record_type,
+            record_id,
+            decision="held",
+            reviewer=SYSTEM_PROMOTION_REVIEWER_PREFIX + "integrity_hold.v1",
+            reason=reason,
+            expected_review_status="candidate",
+            expected_updated_at=expected_updated_at,
+            metadata={
+                **dict(metadata or {}),
+                "system_integrity_hold": {
+                    "schema_version": "business_profile_system_integrity_hold.v1",
+                    "prior_status": "candidate",
+                },
+            },
+            _system_promotion=True,
+        )
+
     def list_review_audit(
         self,
         *,
