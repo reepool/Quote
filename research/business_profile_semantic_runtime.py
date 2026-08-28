@@ -1510,6 +1510,7 @@ class BusinessProfileSemanticRuntime:
             "errors": 0,
             "machine_rework_recovered": 0,
             "by_field_family": {},
+            "origin_counts": {},
         }
         joint_semantic_cache: dict[str, tuple[Any, str]] = {}
         # A catalog release may make an older quarantined proposal provable.
@@ -1554,6 +1555,8 @@ class BusinessProfileSemanticRuntime:
                 runtime_identities=scope.identities,
             )
             if reusable is not None:
+                origin = "semantic_reused"
+                _record_family_origin(metrics, item["field_family"], origin)
                 metrics["semantic_field_families_reused"] += 1
                 _increment_family_metrics(
                     metrics["by_field_family"],
@@ -1578,7 +1581,7 @@ class BusinessProfileSemanticRuntime:
                         metrics["joint_semantic_sibling_reuses"] = int(
                             metrics.get("joint_semantic_sibling_reuses") or 0
                         ) + 1
-                outputs.append({**item, **reusable, "reused": True})
+                outputs.append({**item, **reusable, "reused": True, "origin": origin})
                 logger.info(
                     "business-profile semantic family reused instrument_id=%s "
                     "field_family=%s source_document_id=%s run_id=%s records=%s",
@@ -1599,6 +1602,7 @@ class BusinessProfileSemanticRuntime:
             semantic_records: list[tuple[str, dict[str, Any]]] = []
             semantic_artifact_id: str | None = None
             structured_fallback_used = False
+            origin = "program_derived"
             expected_non_disclosure = False
             semantic_family_complete = True
             unit_conversion_pending: list[dict[str, Any]] = []
@@ -1625,6 +1629,7 @@ class BusinessProfileSemanticRuntime:
                     else None
                 )
                 if replay is not None:
+                    origin = "local_replayed"
                     semantic_artifact_id = str(replay["artifact_id"])
                     replay_payload = dict(replay.get("response") or {})
                     structured_fallback_used = True
@@ -1818,6 +1823,7 @@ class BusinessProfileSemanticRuntime:
                             )
                         )
                         structured_fallback_used = True
+                        origin = "llm_extracted"
                         semantic_audit = envelope.audit.to_dict()
                         artifact_identity = _structured_artifact_identity(
                             item, selected
@@ -2198,10 +2204,15 @@ class BusinessProfileSemanticRuntime:
                             )
                             semantic_artifact_id = str(artifact["artifact_id"])
                             reuse_source = "llm"
-                        joint_semantic_cache[cache_key] = (
-                            envelope,
-                            semantic_artifact_id,
-                        )
+                    origin = (
+                        "llm_extracted"
+                        if reuse_source == "llm"
+                        else "semantic_reused"
+                    )
+                    joint_semantic_cache[cache_key] = (
+                        envelope,
+                        semantic_artifact_id,
+                    )
                     logger.info(
                         "business-profile joint semantic response instrument_id=%s "
                         "source_document_id=%s consumer_field_family=%s source=%s "
@@ -2437,6 +2448,7 @@ class BusinessProfileSemanticRuntime:
                             "runtime_schema_version": RUNTIME_SCHEMA_VERSION,
                             "runtime_identities": dict(scope.identities),
                             "result_policy": self.result_policy,
+                            "origin": origin,
                             "document_hash": item["document"].get("content_hash"),
                             "evidence_context_hash": _evidence_context_hash(
                                 str(item["document"].get("identity") or ""),
@@ -2516,6 +2528,7 @@ class BusinessProfileSemanticRuntime:
                     **item,
                     "run_id": run_id,
                     "reused": reuse,
+                    "origin": origin,
                     "record_ids": {
                         key: [_record_id(key, row) for row in rows]
                         for key, rows in records_by_type.items()
@@ -2536,6 +2549,7 @@ class BusinessProfileSemanticRuntime:
                     ),
                 }
             )
+            _record_family_origin(metrics, item["field_family"], origin)
             _increment_family_metrics(
                 metrics["by_field_family"],
                 item["field_family"],
@@ -2620,6 +2634,11 @@ class BusinessProfileSemanticRuntime:
                     "blocked_configuration": blocked_configuration,
                     "blocked_configuration_reasons": blocked_configuration_reasons,
                     "machine_rework_reasons": machine_rework_reasons,
+                    **(
+                        {"origin_counts": dict(metrics.get("origin_counts") or {})}
+                        if metrics.get("origin_counts")
+                        else {}
+                    ),
                 },
                 "metrics": metrics,
             }
@@ -2644,6 +2663,11 @@ class BusinessProfileSemanticRuntime:
                 "blocked_configuration": blocked_configuration,
                 "blocked_configuration_reasons": blocked_configuration_reasons,
                 "machine_rework_reasons": machine_rework_reasons,
+                **(
+                    {"origin_counts": dict(metrics.get("origin_counts") or {})}
+                    if metrics.get("origin_counts")
+                    else {}
+                ),
                 "structured_fallback_required": int(
                     metrics["structured_fallback_required"]
                 ),
@@ -3555,6 +3579,7 @@ class BusinessProfileSemanticRuntime:
         gap_targets.update(
             str(item.get("target_id") or f"derived:{index}")
             for index, item in enumerate(derived["gaps"])
+            if item.get("tier") != "informational"
         )
         publication_gaps = len(gap_targets)
         return {
@@ -3563,7 +3588,11 @@ class BusinessProfileSemanticRuntime:
             "source_revision": effective_scope.source_revision,
             "quality": {
                 "stage": "promote",
+                # The promote handler completed even when a governed group is
+                # held; callers use ``fully_complete``/publication_gaps to
+                # distinguish execution success from data completeness.
                 "stage_ready": True,
+                "fully_complete": publication_gaps == 0,
                 "candidate_records": candidate_records,
                 "verified_records": len(verified.get("verifications") or []),
                 "promoted_records": promoted_records,
@@ -3750,7 +3779,9 @@ class BusinessProfileSemanticRuntime:
         evidence: list[dict[str, Any]] = []
         output: dict[str, list[dict[str, Any]]] = {"evidence": evidence}
         for table in tables:
-            for row in table.rows:
+            for row_ordinal, raw_row in enumerate(table.rows, start=1):
+                row = dict(raw_row)
+                row.setdefault("row_ordinal", row_ordinal)
                 evidence_row = _table_evidence(item, selected, table, row)
                 evidence.append(evidence_row)
                 if (
@@ -3782,8 +3813,12 @@ class BusinessProfileSemanticRuntime:
         output: dict[str, list[dict[str, Any]]] = {"evidence": []}
         runtime_unit_rules = self.unit_rule_registry.overlay_rules()
         pending_units: list[PendingStructuredUnit] = []
-        for raw in rows:
+        for occurrence_ordinal, raw in enumerate(rows, start=1):
             row = dict(raw)
+            # The model does not own durable row identity. When the shared
+            # parser has no row ordinal, the ordered response occurrence is
+            # the deterministic local fallback within this immutable bundle.
+            row.setdefault("_occurrence_ordinal", occurrence_ordinal)
             evidence = _semantic_evidence(item, selected, row)
             validation = evidence.setdefault("metadata", {}).setdefault(
                 "promotion_validation", {}
@@ -4064,7 +4099,9 @@ class BusinessProfileSemanticRuntime:
                 _bind_promotion_validation(record, projection_evidence)
                 output.append(("activities", record))
 
-                for assertion, evidence in grouped:
+                for occurrence_ordinal, (assertion, evidence) in enumerate(
+                    grouped, start=1
+                ):
                     if not _has_atomic_measurement(assertion):
                         continue
                     fact = _atomic_activity_operating_fact(
@@ -4072,6 +4109,7 @@ class BusinessProfileSemanticRuntime:
                         assertion,
                         activity_id=record["activity_id"],
                         evidence_id=evidence["evidence_id"],
+                        occurrence_ordinal=occurrence_ordinal,
                         runtime_unit_rules=runtime_unit_rules,
                     )
                     _bind_promotion_validation(fact, evidence)
@@ -4414,9 +4452,131 @@ class BusinessProfileSemanticRuntime:
                             "field_family": "derived_value_chain_roles",
                             "source_document_id": activity.get("evidence_id"),
                             "target_id": activity.get("activity_id"),
-                            "tier": "machine_rework",
+                            # Internal inventory is an expected atomic
+                            # disclosure, not a failed role derivation. Keep
+                            # it observable without retry debt or blocking the
+                            # role family.
+                            "tier": (
+                                "informational"
+                                if gap_reason == "internal_inventory_not_storage_provider"
+                                else "machine_rework"
+                            ),
                             "reason_code": gap_reason,
                             "evidence_reference": activity.get("evidence_id"),
+                        }
+                        if gap["tier"] != "informational":
+                            self._persist_runtime_exception(
+                                gap,
+                                scope=scope,
+                                manifest=manifest,
+                            )
+                        result["gaps"].append(gap)
+                for role in self.activity_producer.derive_role_candidates(
+                    activities,
+                    supporting_facts=operating_facts,
+                ):
+                    evidence_ids = list(
+                        dict.fromkeys(
+                            str(value)
+                            for value in (
+                                (role.get("metadata") or {}).get(
+                                    "supporting_evidence_ids"
+                                )
+                                or [role.get("evidence_id")]
+                            )
+                            if str(value or "").strip()
+                        )
+                    )
+                    evidence = self.repository.get_record(
+                        "evidence", str(role.get("evidence_id") or "")
+                    )
+                    if evidence is None:
+                        raise ValueError("derived role source evidence is missing")
+                    missing_evidence = [
+                        evidence_id
+                        for evidence_id in evidence_ids
+                        if self.repository.get_record("evidence", evidence_id) is None
+                    ]
+                    if missing_evidence:
+                        raise ValueError(
+                            "derived role supporting evidence is missing: "
+                            + ",".join(missing_evidence)
+                        )
+                    _bind_promotion_validation(role, evidence)
+                    reused_role = None
+                    if self.result_policy == "reuse":
+                        role_identity = (role.get("metadata") or {}).get(
+                            "role_business_identity"
+                        )
+                        for existing_role in self.repository.get_approved_as_of(
+                            "value_chain_roles",
+                            instrument_id=instrument_id,
+                            cutoff=scope.knowledge_cutoff,
+                        ):
+                            existing_identity = (existing_role.get("metadata") or {}).get(
+                                "role_business_identity"
+                            ) or {
+                                "instrument_id": existing_role.get("instrument_id"),
+                                "segment_id": existing_role.get("segment_id"),
+                                "role": existing_role.get("role"),
+                                "report_period": existing_role.get("report_period"),
+                                "business_regime_id": existing_role.get(
+                                    "business_regime_id"
+                                ),
+                                "rule_version": (existing_role.get("metadata") or {}).get(
+                                    "role_rule_version"
+                                ),
+                            }
+                            if (
+                                existing_identity == role_identity
+                                or all(
+                                    existing_identity.get(key) == role_identity.get(key)
+                                    for key in (
+                                        "instrument_id",
+                                        "segment_id",
+                                        "role",
+                                        "report_period",
+                                        "business_regime_id",
+                                    )
+                                )
+                            ):
+                                reused_role = existing_role
+                                break
+                    if reused_role is not None:
+                        for activity_id in (role.get("metadata") or {}).get(
+                            "supporting_activity_ids", []
+                        ) or ():
+                            self.promotion_service.resolve_open_exceptions_for_target(
+                                target_id=str(activity_id),
+                                field_family="derived_value_chain_roles",
+                            )
+                        result["roles"].append(
+                            {
+                                "field_family": "derived_value_chain_roles",
+                                "record_id": reused_role.get("record_id"),
+                                "promoted": True,
+                                "reused": True,
+                                "supporting_activity_ids": (role.get("metadata") or {}).get(
+                                    "supporting_activity_ids", []
+                                ),
+                            }
+                        )
+                        continue
+                    try:
+                        self.repository.upsert("value_chain_roles", role)
+                    except (ValueError, KeyError) as exc:
+                        gap = {
+                            "instrument_id": instrument_id,
+                            "field_family": "derived_value_chain_roles",
+                            "source_document_id": role.get("evidence_id"),
+                            "target_id": role.get("record_id"),
+                            "tier": "machine_rework",
+                            "reason_code": "derived_role_identity_conflict",
+                            "evidence_reference": role.get("evidence_id"),
+                            "diagnostics": {
+                                "error_type": type(exc).__name__,
+                                "error": str(exc)[:500],
+                            },
                         }
                         self._persist_runtime_exception(
                             gap,
@@ -4424,17 +4584,7 @@ class BusinessProfileSemanticRuntime:
                             manifest=manifest,
                         )
                         result["gaps"].append(gap)
-                for role in self.activity_producer.derive_role_candidates(
-                    activities,
-                    supporting_facts=operating_facts,
-                ):
-                    evidence = self.repository.get_record(
-                        "evidence", str(role.get("evidence_id") or "")
-                    )
-                    if evidence is None:
-                        raise ValueError("derived role source evidence is missing")
-                    _bind_promotion_validation(role, evidence)
-                    self.repository.upsert("value_chain_roles", role)
+                        continue
                     current = self._find_record("value_chain_roles", role["record_id"])
                     if manifest is not None:
                         promotion = self._promote_record(
@@ -4466,26 +4616,47 @@ class BusinessProfileSemanticRuntime:
                         "hedges",
                     }:
                         continue
-                    fact = producer.build_from_activity(activity)
-                    evidence = self.repository.get_record(
-                        "evidence", str(fact.get("evidence_id") or "")
-                    )
-                    if evidence is None:
-                        raise ValueError("exposure fact source evidence is missing")
-                    _bind_promotion_validation(fact, evidence)
-                    self.repository.upsert("exposure_facts", fact)
-                    fact = self._find_record("exposure_facts", fact["fact_id"])
-                    if manifest is not None:
-                        result["exposure_facts"].append(
-                            self._promote_record(
-                                "exposure_facts",
-                                fact,
-                                family="commodity_exposure_facts",
-                                manifest=manifest,
-                                scope=scope,
-                                semantic_proof=True,
-                            )
+                    try:
+                        fact = producer.build_from_activity(activity)
+                        evidence = self.repository.get_record(
+                            "evidence", str(fact.get("evidence_id") or "")
                         )
+                        if evidence is None:
+                            raise ValueError("exposure fact source evidence is missing")
+                        _bind_promotion_validation(fact, evidence)
+                        self.repository.upsert("exposure_facts", fact)
+                        fact = self._find_record("exposure_facts", fact["fact_id"])
+                        if manifest is not None:
+                            result["exposure_facts"].append(
+                                self._promote_record(
+                                    "exposure_facts",
+                                    fact,
+                                    family="commodity_exposure_facts",
+                                    manifest=manifest,
+                                    scope=scope,
+                                    semantic_proof=True,
+                                )
+                            )
+                    except (ValueError, KeyError) as exc:
+                        gap = {
+                            "instrument_id": instrument_id,
+                            "field_family": "commodity_exposure_facts",
+                            "source_document_id": activity.get("evidence_id"),
+                            "target_id": activity.get("activity_id"),
+                            "tier": "machine_rework",
+                            "reason_code": "exposure_fact_group_failed",
+                            "evidence_reference": activity.get("evidence_id"),
+                            "diagnostics": {
+                                "error_type": type(exc).__name__,
+                                "error": str(exc)[:500],
+                            },
+                        }
+                        self._persist_runtime_exception(
+                            gap,
+                            scope=scope,
+                            manifest=manifest,
+                        )
+                        result["gaps"].append(gap)
             if "commodity_exposure_publication" in scope.field_families:
                 publisher = BusinessProfileExposurePublisher(self.repository)
                 facts = self.repository.get_approved_as_of(
@@ -5449,7 +5620,11 @@ def _operating_records(
     source_row_key = _source_row_key(
         table_id=str(table.table_id),
         row_label=str(row.get("row_label") or ""),
-        cells=row.get("cells") or {},
+        cells={
+            **(row.get("cells") or {}),
+            "_physical_page": row.get("page_number") or row.get("physical_page"),
+            "_row_ordinal": row.get("row_ordinal") or row.get("ordinal"),
+        },
         evidence_id=evidence_id,
     )
     for header, raw in row["cells"].items():
@@ -5470,8 +5645,8 @@ def _operating_records(
             + _stable_hash(
                 {
                     "table": table.table_id,
-                "row": row["row_label"],
-                "source_row_key": source_row_key,
+                    "row": row["row_label"],
+                    "source_row_key": source_row_key,
                     "header": header,
                     "raw": raw,
                     "document": item["document"]["identity"],
@@ -5506,6 +5681,7 @@ def _operating_records(
                     "signature_id": table.signature_id,
                     "source_header": header,
                     "source_row_key": source_row_key,
+                    "occurrence_identity_quality": "derived_from_evidence",
                     "source_row_label": row["row_label"],
                     "numeric_reconciliation_status": "not_applicable",
                     "numeric_reconciliation_valid": bool(
@@ -5632,6 +5808,7 @@ def _atomic_activity_operating_fact(
     *,
     activity_id: str,
     evidence_id: str,
+    occurrence_ordinal: int | None = None,
     runtime_unit_rules: Sequence[Mapping[str, Any]] = (),
 ) -> dict[str, Any]:
     value_raw = assertion.get("source_value")
@@ -5656,6 +5833,7 @@ def _atomic_activity_operating_fact(
             "label": source_label or assertion.get("action") or fact_type,
             "value": value_raw,
             "unit": unit_raw,
+            "occurrence_ordinal": occurrence_ordinal,
         },
         evidence_id=evidence_id,
     )
@@ -5751,6 +5929,7 @@ def _atomic_activity_operating_fact(
             "object_raw": object_raw,
             "source_label_raw": source_label or fact_scope,
             "source_row_key": source_row_key,
+            "occurrence_identity_quality": "derived_from_evidence",
             "contract_reference_raw": assertion.get("contract_reference_raw"),
             "source_value_raw": value_raw,
             "source_unit_raw": unit_raw,
@@ -5778,6 +5957,8 @@ def _semantic_operating_record(
         )
     )
     start, end = derive_report_observation_interval(item["document"]["report_period"])
+    occurrence_ordinal = row.get("_occurrence_ordinal")
+    provided_source_row_key = bool(str(row.get("source_row_key") or "").strip())
     source_row_key = str(row.get("source_row_key") or "").strip() or _source_row_key(
         table_id="semantic_row",
         row_label=str(row.get("segment_name_raw") or ""),
@@ -5786,6 +5967,7 @@ def _semantic_operating_record(
             "fact_scope": row.get("fact_scope"),
             "value": value,
             "unit": raw_unit,
+            "occurrence_ordinal": occurrence_ordinal,
         },
         evidence_id=evidence_id,
     )
@@ -5838,6 +6020,9 @@ def _semantic_operating_record(
             "semantic_summary_zh": row.get("semantic_summary_zh"),
             "source_label_raw": row.get("source_label_raw") or row["segment_name_raw"],
             "source_row_key": source_row_key,
+            "occurrence_identity_quality": (
+                "parser_supplied" if provided_source_row_key else "derived_from_evidence"
+            ),
             "contract_reference_raw": row.get("contract_reference_raw"),
             "canonical_segment_name": canonical_name,
             "model_derived_hints": dict(row.get("model_derived_hints") or {}),
@@ -6837,6 +7022,28 @@ def _increment_family_metrics(
     row = metrics.setdefault(str(family), {})
     for key, value in values.items():
         row[key] = float(row.get(key) or 0) + float(value)
+
+
+def _record_family_origin(
+    metrics: dict[str, Any], family: str, origin: str
+) -> None:
+    """Record the single authoritative origin for one processed family."""
+
+    normalized = str(origin or "").strip()
+    if normalized not in {
+        "llm_extracted",
+        "semantic_reused",
+        "local_replayed",
+        "program_derived",
+    }:
+        raise ValueError(f"unsupported business-profile origin: {normalized}")
+    counts = metrics.setdefault("origin_counts", {})
+    counts[normalized] = int(counts.get(normalized) or 0) + 1
+    family_metrics = metrics.setdefault("by_field_family", {}).setdefault(
+        str(family), {}
+    )
+    family_origins = family_metrics.setdefault("origin_counts", {})
+    family_origins[normalized] = int(family_origins.get(normalized) or 0) + 1
 
 
 def _accumulate_span_metrics(

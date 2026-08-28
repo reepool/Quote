@@ -2664,6 +2664,9 @@ def _normalize_activity(
         "report_period": report_period,
         "value": raw.get("source_value", raw.get("value")),
         "unit": raw.get("source_unit_raw", raw.get("unit")),
+        "source_label_raw": raw.get("source_label_raw"),
+        "semantic_summary_zh": raw.get("semantic_summary_zh"),
+        "model_derived_hints": dict(raw.get("model_derived_hints") or {}),
         "evidence": evidence,
         "semantic_synthesis": True,
     }

@@ -4,6 +4,10 @@ from research.business_profile_activity_production import (
     BusinessProfileActivityProducer,
     GovernedCounterpartyResolver,
     classify_entity_resolution_exception,
+    STORAGE_SEMANTICS_EXTERNAL,
+    STORAGE_SEMANTICS_INTERNAL,
+    STORAGE_SEMANTICS_UNKNOWN,
+    storage_semantics,
 )
 
 
@@ -240,6 +244,83 @@ def test_activity_candidate_is_atomic_and_role_is_derived_locally():
     assert roles[0]["role"] == "producer"
     assert roles[0]["metadata"]["supporting_activity_ids"] == [activity["activity_id"]]
     assert roles[0]["metadata"]["valuation_effects"] == {}
+
+
+def test_internal_inventory_objects_do_not_create_storage_provider_roles():
+    producer = BusinessProfileActivityProducer(_Repository())
+    activities = []
+    for object_raw in ("成品酒", "半成品酒（含陶坛基酒）"):
+        candidate = producer.build_activity_candidate(
+            {
+                "instrument_id": "000858.SZ",
+                "report_period": "2025-12-31",
+                "subject_scope": "issuer",
+                "action": "stores",
+                "object_type": "inventory",
+                "object_raw": object_raw,
+                "segment_id": "白酒",
+                "confidence": 1.0,
+            },
+            evidence_id="evidence-inventory",
+            run_id="run-1",
+            data_available_date="2026-03-28",
+            extraction_method="semantic_verified",
+        )
+        activities.append({**candidate, "review_status": "approved"})
+
+    assert storage_semantics(activities[0]) == STORAGE_SEMANTICS_INTERNAL
+    assert storage_semantics(activities[1]) == STORAGE_SEMANTICS_INTERNAL
+    assert producer.derive_role_candidates(activities) == []
+    gaps = producer.role_derivation_gaps(activities)
+    assert set(gaps.values()) == {"internal_inventory_not_storage_provider"}
+
+
+def test_external_storage_service_is_explicit_and_roles_are_grouped():
+    producer = BusinessProfileActivityProducer(_Repository())
+    activities = []
+    for object_raw, marker in (("仓储服务", "为客户提供仓储"), ("物流仓储", "为第三方保管")):
+        candidate = producer.build_activity_candidate(
+            {
+                "instrument_id": "000858.SZ",
+                "report_period": "2025-12-31",
+                "subject_scope": "issuer",
+                "action": "stores",
+                "object_type": "service",
+                "object_raw": object_raw,
+                "segment_id": "物流服务",
+                "confidence": 1.0,
+                "model_derived_hints": {
+                    "storage_semantics": "external_service",
+                    "storage_service_recipient_scope": "customer",
+                    "storage_service_marker": marker,
+                },
+            },
+            evidence_id=f"evidence-{object_raw}",
+            run_id="run-1",
+            data_available_date="2026-03-28",
+            extraction_method="semantic_verified",
+        )
+        activities.append({**candidate, "review_status": "approved"})
+
+    assert storage_semantics(activities[0]) == STORAGE_SEMANTICS_EXTERNAL
+    roles = producer.derive_role_candidates(activities)
+    assert len(roles) == 1
+    assert roles[0]["role"] == "storage_provider"
+    assert set(roles[0]["metadata"]["supporting_activity_ids"]) == {
+        item["activity_id"] for item in activities
+    }
+    assert len(roles[0]["metadata"]["supporting_evidence_ids"]) == 2
+
+
+def test_external_storage_without_recipient_or_marker_is_unknown():
+    activity = {
+        "action": "stores",
+        "model_derived_hints": {
+            "storage_semantics": "external_service",
+            "storage_service_recipient_scope": "customer",
+        },
+    }
+    assert storage_semantics(activity) == STORAGE_SEMANTICS_UNKNOWN
 
 
 def test_multiple_segment_roles_are_preserved_and_scope_ambiguity_fails_closed():

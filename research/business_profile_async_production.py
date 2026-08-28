@@ -2804,8 +2804,9 @@ class BusinessProfileAsyncProductionService:
                     "empty_output_reasons",
                     "blocked_configuration_reasons",
                     "machine_rework_reasons",
+                    "origin_counts",
                 ):
-                    if counter_name == "recovery_states" and not quality.get(
+                    if counter_name in {"recovery_states", "origin_counts"} and not quality.get(
                         counter_name
                     ):
                         # Recovery provenance is optional. Do not manufacture an

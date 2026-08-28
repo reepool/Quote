@@ -104,7 +104,13 @@ TEMPORAL_POLICIES: tuple[BusinessProfileTemporalPolicy, ...] = (
     BusinessProfileTemporalPolicy(
         "value_chain_roles",
         BusinessProfileTemporalClass.POINT_IN_TIME_STATE,
-        ("instrument_id", "segment_id", "role", "evidence_id"),
+        (
+            "instrument_id",
+            "segment_id",
+            "role",
+            "report_period",
+            "business_regime_id",
+        ),
         "report_period",
         "valid_from",
         "valid_to",

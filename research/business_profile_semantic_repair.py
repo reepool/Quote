@@ -9,9 +9,14 @@ from __future__ import annotations
 
 from collections import Counter
 import hashlib
+import json
 from typing import Any, Iterable
 
 from research.business_profile_governance import BusinessProfileRepository
+from research.business_profile_activity_production import (
+    STORAGE_SEMANTICS_EXTERNAL,
+    storage_semantics,
+)
 from research.business_profile_review import BusinessProfileReviewService
 from research.providers.base import ShareholderSnapshot
 from research.shareholder_snapshot_policy import (
@@ -19,6 +24,7 @@ from research.shareholder_snapshot_policy import (
     normalize_shareholder_report_date,
 )
 from research.shareholder_sync import ShareholderShadowSyncService
+from research.business_profile_semantic_runtime import RUNTIME_SCHEMA_VERSION
 from utils.date_utils import get_shanghai_time
 
 
@@ -39,7 +45,11 @@ class BusinessProfileSemanticRepairService:
         instrument_ids: Iterable[str] | None = None,
         apply: bool = False,
         all_scope: bool = False,
+        result_policy: str = "reuse",
     ) -> dict[str, Any]:
+        result_policy = str(result_policy or "reuse").strip().lower()
+        if result_policy not in {"reuse", "replace"}:
+            raise ValueError("business-profile repair result_policy must be reuse or replace")
         ids = sorted({str(item).strip() for item in instrument_ids or () if str(item).strip()})
         if apply and not ids and not all_scope:
             raise ValueError("repair apply requires instrument_ids or all_scope=True")
@@ -48,13 +58,14 @@ class BusinessProfileSemanticRepairService:
         if all_scope:
             ids = self._all_local_instrument_ids()
         if not ids:
-            return self._report([], apply=apply)
+            return self._report([], apply=apply, result_policy=result_policy)
 
         findings = [self._audit_instrument(instrument_id) for instrument_id in ids]
         before_projections = self._current_projections(ids)
         result = self._report(
             findings,
             apply=apply,
+            result_policy=result_policy,
             before_projections=before_projections,
         )
         if not apply:
@@ -92,6 +103,9 @@ class BusinessProfileSemanticRepairService:
             "shareholder_snapshots",
             "company_business_profile_relationships",
             "company_commodity_exposures",
+            "company_business_activities",
+            "company_operating_facts",
+            "company_value_chain_roles",
         )
         identifiers: set[str] = set()
         with self.storage.get_connection() as conn:
@@ -161,8 +175,158 @@ class BusinessProfileSemanticRepairService:
                     "counterparty_name_raw": record.get("counterparty_name_raw"),
                     "resolution_basis": self._relationship_resolution_basis(record, metadata),
                 }))
+        issues.extend(self._activity_and_role_findings(instrument_id))
+        issues.extend(self._operating_fact_findings(instrument_id))
+        issues.extend(self._incompatible_artifact_findings(instrument_id))
         issues.extend(self._exposure_collision_findings(instrument_id))
         return {"instrument_id": instrument_id, "issues": issues}
+
+    def _incompatible_artifact_findings(self, instrument_id: str) -> list[dict[str, Any]]:
+        """Report completed artifacts that cannot safely satisfy current reuse."""
+
+        findings: list[dict[str, Any]] = []
+        with self.storage.get_connection() as conn:
+            self.storage._apply_pragmas(conn)
+            table = conn.execute(
+                "SELECT 1 FROM sqlite_master WHERE type='table' "
+                "AND name='business_profile_semantic_runs'"
+            ).fetchone()
+            if table is None:
+                return findings
+            rows = conn.execute(
+                "SELECT run_id, field_family, source_document_id, metadata_json "
+                "FROM business_profile_semantic_runs "
+                "WHERE instrument_id = ? AND status = 'completed'",
+                (instrument_id,),
+            ).fetchall()
+        for row in rows:
+            try:
+                metadata = json.loads(row["metadata_json"] or "{}")
+            except (TypeError, ValueError):
+                metadata = {}
+            if str(metadata.get("result_policy") or "reuse") != "reuse":
+                continue
+            if str(metadata.get("runtime_schema_version") or "") == RUNTIME_SCHEMA_VERSION:
+                continue
+            findings.append(
+                self._issue(
+                    "incompatible_reusable_artifact",
+                    instrument_id,
+                    {
+                        "run_id": row["run_id"],
+                        "field_family": row["field_family"],
+                        "source_document_id": row["source_document_id"],
+                        "artifact_runtime_schema_version": metadata.get(
+                            "runtime_schema_version"
+                        ),
+                        "expected_runtime_schema_version": RUNTIME_SCHEMA_VERSION,
+                        "proposed_action": "local_replay_or_bounded_reextract",
+                    },
+                )
+            )
+        return findings
+
+    def _activity_and_role_findings(self, instrument_id: str) -> list[dict[str, Any]]:
+        activities = self.repository.list_records(
+            "activities", instrument_id=instrument_id, limit=10000
+        )
+        by_id = {
+            str(item.get("activity_id") or ""): item
+            for item in activities
+            if str(item.get("activity_id") or "")
+        }
+        roles = self.repository.list_records(
+            "value_chain_roles", instrument_id=instrument_id, limit=10000
+        )
+        findings: list[dict[str, Any]] = []
+        role_groups: dict[tuple[Any, ...], list[dict[str, Any]]] = {}
+        for role in roles:
+            metadata = role.get("metadata") if isinstance(role.get("metadata"), dict) else {}
+            supports = []
+            for raw_activity_id in metadata.get("supporting_activity_ids") or ():
+                activity_id = str(raw_activity_id or "")
+                if activity_id in by_id:
+                    supports.append(by_id[activity_id])
+            if (
+                role.get("role") == "storage_provider"
+                and supports
+                and all(
+                    str(activity.get("action") or "") == "stores"
+                    and storage_semantics(activity) != STORAGE_SEMANTICS_EXTERNAL
+                    for activity in supports
+                )
+            ):
+                findings.append(
+                    self._issue(
+                        "inventory_derived_storage_role",
+                        instrument_id,
+                        {
+                            "record_id": role.get("record_id"),
+                            "supporting_activity_ids": [
+                                item.get("activity_id") for item in supports
+                            ],
+                        },
+                    )
+                )
+            key = (
+                role.get("instrument_id"),
+                role.get("segment_id"),
+                role.get("role"),
+                role.get("report_period"),
+                role.get("business_regime_id"),
+            )
+            role_groups.setdefault(key, []).append(role)
+        for key, group in role_groups.items():
+            if len(group) > 1:
+                findings.append(
+                    self._issue(
+                        "duplicate_role_business_identity",
+                        instrument_id,
+                        {
+                            "identity": list(key),
+                            "record_ids": [item.get("record_id") for item in group],
+                        },
+                    )
+                )
+        return findings
+
+    def _operating_fact_findings(self, instrument_id: str) -> list[dict[str, Any]]:
+        records = self.repository.list_records(
+            "operating_facts", instrument_id=instrument_id, limit=10000
+        )
+        groups: dict[tuple[Any, ...], list[dict[str, Any]]] = {}
+        for record in records:
+            scope = str(record.get("fact_scope") or "").split("#", 1)[0]
+            key = (
+                record.get("report_period"),
+                record.get("segment_id"),
+                record.get("fact_type"),
+                scope,
+                record.get("unit_normalized"),
+            )
+            groups.setdefault(key, []).append(record)
+        findings: list[dict[str, Any]] = []
+        for key, group in groups.items():
+            identities = {
+                str((item.get("metadata") or {}).get("source_row_key") or "")
+                for item in group
+            }
+            values = {
+                (item.get("value_raw"), item.get("unit_raw")) for item in group
+            }
+            if len(group) > 1 and len(values) > 1 and len(identities) <= 1:
+                findings.append(
+                    self._issue(
+                        "operating_fact_occurrence_conflict",
+                        instrument_id,
+                        {
+                            "identity": list(key),
+                            "record_ids": [item.get("record_id") for item in group],
+                            "values": [list(value) for value in sorted(values, key=str)],
+                        },
+                    )
+                )
+        return findings
 
     def _apply_instrument(self, instrument_id: str, finding: dict[str, Any]) -> list[dict[str, Any]]:
         changes: list[dict[str, Any]] = []
@@ -193,7 +357,51 @@ class BusinessProfileSemanticRepairService:
                     "reason": issue["code"],
                     "stable_id": issue["stable_id"],
                 })
+            elif issue["code"] == "inventory_derived_storage_role":
+                changes.append(self._hold_invalid_role(instrument_id, issue))
+            elif issue["code"] in {
+                "duplicate_role_business_identity",
+                "operating_fact_occurrence_conflict",
+                "incompatible_reusable_artifact",
+            }:
+                changes.append({
+                    "instrument_id": instrument_id,
+                    "status": "held",
+                    "reason": issue["code"],
+                    "stable_id": issue["stable_id"],
+                })
         return changes
+
+    def _hold_invalid_role(
+        self, instrument_id: str, issue: dict[str, Any]
+    ) -> dict[str, Any]:
+        record_id = str(issue.get("details", {}).get("record_id") or "")
+        record = self.repository.get_record("value_chain_roles", record_id)
+        if record is None or record.get("review_status") != "approved":
+            return {
+                "instrument_id": instrument_id,
+                "status": "unchanged",
+                "reason": "role_already_absent_or_not_approved",
+                "stable_id": issue["stable_id"],
+            }
+        audit = self.review_service.system_hold_approved_record(
+            "value_chain_roles",
+            record_id,
+            expected_updated_at=str(record.get("updated_at") or ""),
+            reason="role derived from internal inventory, not external storage service",
+            metadata={
+                "repair_issue_id": issue["stable_id"],
+                "preserved_evidence_id": record.get("evidence_id"),
+            },
+        )
+        return {
+            "instrument_id": instrument_id,
+            "status": "changed",
+            "reason": "inventory_derived_storage_role_held",
+            "stable_id": issue["stable_id"],
+            "affected_ids": [record_id],
+            "review_audit_id": audit.get("audit_id"),
+        }
 
     def _hold_unsafe_relationship(
         self, instrument_id: str, issue: dict[str, Any]
@@ -560,6 +768,7 @@ class BusinessProfileSemanticRepairService:
         findings: list[dict[str, Any]],
         *,
         apply: bool,
+        result_policy: str = "reuse",
         before_projections: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
         issues = [item for finding in findings for item in finding["issues"]]
@@ -570,12 +779,14 @@ class BusinessProfileSemanticRepairService:
                 "shareholder_noncanonical_report_date",
                 "shareholder_inferred_controller",
                 "relationship_short_name_auto_resolution",
+                "inventory_derived_storage_role",
             }
             for item in issues
         )
         return {
             "schema_version": REPAIR_SCHEMA_VERSION,
             "mode": "apply" if apply else "audit",
+            "result_policy": result_policy,
             "network_access": False,
             "llm_access": False,
             "write_count": 0,

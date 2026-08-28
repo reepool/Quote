@@ -12,13 +12,24 @@ ACTIVITY_PRODUCTION_SCHEMA_VERSION = "business_profile_activity_production.v1"
 ROLE_RULE_VERSION = "business_profile_activity_role_rules.v1"
 ENTITY_RESOLUTION_POLICY_VERSION = "business_profile_entity_resolution.v2"
 
+STORAGE_SEMANTICS_INTERNAL = "internal_inventory"
+STORAGE_SEMANTICS_EXTERNAL = "external_service"
+STORAGE_SEMANTICS_UNKNOWN = "unknown"
+STORAGE_SEMANTICS = {
+    STORAGE_SEMANTICS_INTERNAL,
+    STORAGE_SEMANTICS_EXTERNAL,
+    STORAGE_SEMANTICS_UNKNOWN,
+}
+
 ACTIVITY_ROLE_RULES = {
     "extracts": "producer",
     "cultivates": "producer",
     "produces": "producer",
     "transports": "logistics_provider",
-    "stores": "storage_provider",
     "trades": "trader",
+}
+ACTIVITY_ACTIONS = set(ACTIVITY_ROLE_RULES) | {
+    "processes", "purchases", "consumes", "sells", "stores", "hedges"
 }
 
 RELATIONSHIP_DIRECTIONS = {
@@ -175,8 +186,7 @@ class BusinessProfileActivityProducer:
         action = _required_choice(
             assertion,
             "action",
-            set(ACTIVITY_ROLE_RULES)
-            | {"processes", "purchases", "consumes", "sells", "hedges"},
+            ACTIVITY_ACTIONS,
         )
         instrument_id = _required_text(assertion, "instrument_id")
         report_period = _required_text(assertion, "report_period")
@@ -236,6 +246,7 @@ class BusinessProfileActivityProducer:
                 "semantic_verification_id": assertion.get("verification_id"),
                 "source_row_key": assertion.get("source_row_key"),
                 "contract_reference_raw": assertion.get("contract_reference_raw"),
+                **_storage_metadata(assertion),
             },
         }
 
@@ -445,6 +456,7 @@ class BusinessProfileActivityProducer:
             supporting_facts,
         )
         output: list[dict[str, Any]] = []
+        grouped: dict[tuple[Any, ...], dict[str, Any]] = {}
         for activity in activity_rows:
             if activity.get("review_status") != "approved":
                 continue
@@ -454,10 +466,10 @@ class BusinessProfileActivityProducer:
                 activities_by_id=activities_by_id,
                 facts_by_id=facts_by_id,
             )
-            role = (
-                "processor"
-                if action == "processes" and transformation is not None
-                else ACTIVITY_ROLE_RULES.get(action)
+            role = _derived_role_for_activity(
+                activity,
+                action=action,
+                transformation=transformation,
             )
             if role is None:
                 continue
@@ -471,16 +483,30 @@ class BusinessProfileActivityProducer:
                 )
             )
             supporting_fact_ids = list(transformation[1] if transformation else ())
-            record_id = _stable_id(
-                "value-chain-role",
+            identity = role_business_identity(activity, role)
+            group_key = tuple(sorted(identity.items()))
+            grouped.setdefault(
+                group_key,
                 {
-                    "supporting_activity_ids": supporting_activity_ids,
-                    "supporting_fact_ids": supporting_fact_ids,
+                    "activity": activity,
                     "role": role,
-                    "segment_id": activity.get("segment_id"),
-                    "rule_version": ROLE_RULE_VERSION,
+                    "supporting_activity_ids": [],
+                    "supporting_fact_ids": [],
+                    "supporting_evidence_ids": [],
                 },
             )
+            group = grouped[group_key]
+            group["supporting_activity_ids"].extend(supporting_activity_ids)
+            group["supporting_fact_ids"].extend(supporting_fact_ids)
+            group["supporting_evidence_ids"].append(activity["evidence_id"])
+        for group in grouped.values():
+            activity = group["activity"]
+            role = group["role"]
+            supporting_activity_ids = sorted(set(group["supporting_activity_ids"]))
+            supporting_fact_ids = sorted(set(group["supporting_fact_ids"]))
+            supporting_evidence_ids = sorted(set(group["supporting_evidence_ids"]))
+            identity = role_business_identity(activity, role)
+            record_id = _stable_id("value-chain-role", identity)
             output.append(
                 {
                     "record_id": record_id,
@@ -491,9 +517,14 @@ class BusinessProfileActivityProducer:
                     "materiality": None,
                     "revenue_share": None,
                     "mapping_basis": "approved_atomic_activity_rule",
-                    "evidence_id": activity["evidence_id"],
+                    "evidence_id": supporting_evidence_ids[0],
                     "data_available_date": activity["data_available_date"],
-                    "confidence": activity["confidence"],
+                    "confidence": max(
+                        float(item.get("confidence") or 0.0)
+                        for item in activity_rows
+                        if str(item.get("activity_id") or "")
+                        in supporting_activity_ids
+                    ),
                     "review_status": "candidate",
                     "valid_from": activity.get("valid_from"),
                     "valid_to": activity.get("valid_to"),
@@ -504,6 +535,8 @@ class BusinessProfileActivityProducer:
                     "metadata": {
                         "supporting_activity_ids": supporting_activity_ids,
                         "supporting_fact_ids": supporting_fact_ids,
+                        "supporting_evidence_ids": supporting_evidence_ids,
+                        "role_business_identity": identity,
                         "role_rule_version": ROLE_RULE_VERSION,
                         "valuation_effects": {},
                     },
@@ -556,7 +589,127 @@ class BusinessProfileActivityProducer:
                 is None
             ):
                 gaps[activity_id] = "transformation_lineage_missing"
+            if (
+                activity.get("review_status") == "approved"
+                and str(activity.get("action") or "") == "stores"
+                and storage_semantics(activity) != STORAGE_SEMANTICS_EXTERNAL
+            ):
+                gaps[activity_id] = (
+                    "storage_service_scope_missing"
+                    if storage_semantics(activity) == STORAGE_SEMANTICS_UNKNOWN
+                    else "internal_inventory_not_storage_provider"
+                )
         return gaps
+
+
+def storage_semantics(assertion: Mapping[str, Any]) -> str:
+    """Return the closed, program-facing meaning of a storage activity."""
+
+    if str(assertion.get("action") or "") != "stores":
+        return STORAGE_SEMANTICS_UNKNOWN
+    metadata = assertion.get("metadata")
+    if not isinstance(metadata, Mapping):
+        metadata = {}
+    hints = assertion.get("model_derived_hints")
+    if not isinstance(hints, Mapping):
+        hints = metadata.get("model_derived_hints")
+    if not isinstance(hints, Mapping):
+        hints = {}
+    declared = str(
+        assertion.get("storage_semantics")
+        or metadata.get("storage_semantics")
+        or hints.get("storage_semantics")
+        or ""
+    ).strip().lower()
+    if declared in STORAGE_SEMANTICS:
+        if declared != STORAGE_SEMANTICS_EXTERNAL:
+            return declared
+        recipient = str(
+            assertion.get("storage_service_recipient_scope")
+            or metadata.get("storage_service_recipient_scope")
+            or hints.get("storage_service_recipient_scope")
+            or ""
+        ).strip().lower()
+        marker = str(
+            assertion.get("storage_service_marker")
+            or metadata.get("storage_service_marker")
+            or hints.get("storage_service_marker")
+            or ""
+        ).strip()
+        if recipient in {"third_party", "customer", "named_counterparty"} and marker:
+            return STORAGE_SEMANTICS_EXTERNAL
+        return STORAGE_SEMANTICS_UNKNOWN
+    explicit_external = bool(
+        assertion.get("external_storage_service") is True
+        or metadata.get("external_storage_service") is True
+        or hints.get("external_storage_service") is True
+    )
+    if explicit_external:
+        recipient = str(
+            assertion.get("storage_service_recipient_scope")
+            or hints.get("storage_service_recipient_scope")
+            or ""
+        ).strip().lower()
+        marker = str(
+            assertion.get("storage_service_marker")
+            or hints.get("storage_service_marker")
+            or ""
+        ).strip()
+        return (
+            STORAGE_SEMANTICS_EXTERNAL
+            if recipient in {"third_party", "customer", "named_counterparty"} and marker
+            else STORAGE_SEMANTICS_UNKNOWN
+        )
+    # A plain stores action is an internal inventory disclosure by default.
+    return STORAGE_SEMANTICS_INTERNAL
+
+
+def _storage_metadata(assertion: Mapping[str, Any]) -> dict[str, Any]:
+    if str(assertion.get("action") or "") != "stores":
+        return {}
+    semantics = storage_semantics(assertion)
+    hints = assertion.get("model_derived_hints")
+    if not isinstance(hints, Mapping):
+        hints = {}
+    return {
+        "storage_semantics": semantics,
+        "storage_service_recipient_scope": str(
+            assertion.get("storage_service_recipient_scope")
+            or hints.get("storage_service_recipient_scope")
+            or ""
+        ).strip() or None,
+        "storage_service_marker": str(
+            assertion.get("storage_service_marker")
+            or hints.get("storage_service_marker")
+            or ""
+        ).strip() or None,
+    }
+
+
+def role_business_identity(activity: Mapping[str, Any], role: str) -> dict[str, Any]:
+    """Stable identity for a scoped capability, independent of its evidence set."""
+
+    return {
+        "instrument_id": str(activity.get("instrument_id") or ""),
+        "segment_id": activity.get("segment_id"),
+        "role": role,
+        "report_period": activity.get("report_period"),
+        "business_regime_id": activity.get("business_regime_id"),
+        "rule_version": ROLE_RULE_VERSION,
+    }
+
+
+def _derived_role_for_activity(
+    activity: Mapping[str, Any],
+    *,
+    action: str,
+    transformation: tuple[tuple[str, ...], tuple[str, ...]] | None,
+) -> str | None:
+    if action == "processes":
+        return "processor" if transformation is not None else None
+    if action == "stores":
+        return "storage_provider" if storage_semantics(activity) == STORAGE_SEMANTICS_EXTERNAL else None
+    return ACTIVITY_ROLE_RULES.get(action)
 
 
 def classify_entity_resolution_exception(

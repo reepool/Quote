@@ -2858,6 +2858,7 @@ def test_ambiguous_operating_table_uses_bounded_semantic_fallback(
             ).fetchone()[0]
         )
     assert semantic_run["semantic_family_complete"] is True
+    assert semantic_run["origin"] == "llm_extracted"
     assert semantic_run["record_ids"]["operating_facts"] == [fact["record_id"]]
     assert semantic_run["evidence_ids"]
     assert (
@@ -3286,6 +3287,11 @@ def test_deterministic_structured_rows_bypass_semantic_fallback(tmp_path, monkey
 
     assert gateway.requests == []
     assert len(repository.list_records("segments", instrument_id="601088.SH")) == 1
+    extract_artifact = pipeline.checkpoint_store.load()["artifacts"]["extract"]
+    extract_payload = pipeline.handlers["extract"].__self__.stage_store.read(
+        extract_artifact, expected_stage="extract"
+    )
+    assert extract_payload["outputs"][0]["origin"] == "program_derived"
 
 
 def test_ambiguous_structured_table_reports_configuration_blocker(

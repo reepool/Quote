@@ -1,6 +1,7 @@
 from research.business_profile_semantic_repair import BusinessProfileSemanticRepairService
 from research.business_profile_governance import BusinessProfileRepository
 from research.business_profile_review import BusinessProfileReviewService
+from research.business_profile_activity_production import BusinessProfileActivityProducer
 from research.providers.base import CompanyProfileSnapshot, ShareholderSnapshot
 from research.storage import ResearchStorageManager
 from utils.config_manager import ResearchBudgetConfig, ResearchConfig, ResearchStorageConfig
@@ -281,3 +282,82 @@ def test_repair_does_not_override_human_reviewed_short_name_resolution(tmp_path)
     assert repository.get_record("relationships", "repair-relationship")["review_status"] == "approved"
     assert applied["change_counts"]["held"] == 1
     assert applied["change_counts"]["changed"] == 0
+
+
+def test_repair_holds_legacy_internal_inventory_storage_role(tmp_path):
+    storage = _storage(tmp_path)
+    repository = BusinessProfileRepository(storage)
+    evidence = {
+        "evidence_id": "inventory-repair-evidence",
+        "instrument_id": "000858.SZ",
+        "source_document_id": "annual-report-2025",
+        "source_tier": "official_filing",
+        "document_hash": "inventory-document-hash",
+        "data_available_date": "2026-03-30",
+        "availability_quality": "actual",
+        "evidence_text_hash": "inventory-text-hash",
+        "extraction_method": "native_text",
+        "confidence": 1.0,
+        "review_status": "candidate",
+    }
+    repository.upsert("evidence", evidence)
+    review = BusinessProfileReviewService(repository)
+    evidence_current = repository.get_record("evidence", evidence["evidence_id"])
+    review.system_promote_record(
+        "evidence", evidence["evidence_id"], field_family="test:evidence",
+        policy_version="test.v1", gate_manifest_hash="inventory-evidence",
+        reviewer_version="v1", expected_updated_at=evidence_current["updated_at"],
+    )
+    producer = BusinessProfileActivityProducer(repository)
+    activity = producer.build_activity_candidate(
+        {
+            "instrument_id": "000858.SZ", "report_period": "2025-12-31",
+            "subject_scope": "issuer", "action": "stores",
+            "object_type": "inventory", "object_raw": "成品酒",
+            "segment_id": "白酒", "confidence": 1.0,
+        }, evidence_id=evidence["evidence_id"], run_id="repair-run",
+        data_available_date="2026-03-30", extraction_method="semantic_verified",
+    )
+    repository.upsert("activities", activity)
+    activity_current = repository.get_record("activities", activity["activity_id"])
+    review.system_promote_record(
+        "activities", activity["activity_id"], field_family="test:activities",
+        policy_version="test.v1", gate_manifest_hash="inventory-activity",
+        reviewer_version="v1", expected_updated_at=activity_current["updated_at"],
+        evidence_references=[evidence["evidence_id"]],
+    )
+    role = {
+        "record_id": "legacy-inventory-storage-role",
+        "instrument_id": "000858.SZ", "report_period": "2025-12-31",
+        "segment_id": "白酒", "role": "storage_provider",
+        "mapping_basis": "legacy_stores_rule", "evidence_id": evidence["evidence_id"],
+        "data_available_date": "2026-03-30", "confidence": 1.0,
+        "review_status": "candidate", "valid_from": "2025-01-01",
+        "business_regime_id": None, "knowledge_from": "2026-03-30",
+        "metadata": {
+            "supporting_activity_ids": [activity["activity_id"]],
+            "role_business_identity": {
+                "instrument_id": "000858.SZ", "segment_id": "白酒",
+                "role": "storage_provider", "report_period": "2025-12-31",
+                "business_regime_id": None,
+            },
+        },
+    }
+    repository.upsert("value_chain_roles", role)
+    role_current = repository.get_record("value_chain_roles", role["record_id"])
+    review.system_promote_record(
+        "value_chain_roles", role["record_id"], field_family="test:roles",
+        policy_version="test.v1", gate_manifest_hash="inventory-role",
+        reviewer_version="v1", expected_updated_at=role_current["updated_at"],
+        evidence_references=[evidence["evidence_id"]],
+    )
+
+    service = BusinessProfileSemanticRepairService(storage)
+    audit = service.run(instrument_ids=["000858.SZ"])
+    assert audit["change_counts"]["would_change"] == 1
+    applied = service.run(instrument_ids=["000858.SZ"], apply=True)
+    repaired = repository.get_record("value_chain_roles", role["record_id"])
+    assert repaired["review_status"] == "held"
+    assert applied["change_counts"]["changed"] == 1
+    assert repository.get_record("evidence", evidence["evidence_id"])["review_status"] == "approved"
+    assert service.run(instrument_ids=["000858.SZ"], apply=True)["change_counts"]["unchanged"] == 1
