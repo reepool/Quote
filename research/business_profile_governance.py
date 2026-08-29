@@ -1159,6 +1159,13 @@ class BusinessProfileRepository:
                 continue
             if self._temporal_versions_conflict(record_type, payload, existing):
                 if self._equivalent_report_flow_content(record_type, payload, existing):
+                    if allow_reuse_conflict and record_type == "activities":
+                        # A legacy approved activity may predate durable
+                        # source-row identity.  Under reuse, an identical
+                        # replay must complete against that immutable row
+                        # instead of inserting a second temporal version.
+                        prepared["skip_write"] = True
+                        return
                     # A replay can produce a new record id when evidence spans
                     # are regenerated, while the reported fact is unchanged.
                     # Link it to the governed version instead of treating the
@@ -1204,8 +1211,15 @@ class BusinessProfileRepository:
     ) -> bool:
         """Return whether two report-flow rows carry the same reported fact."""
 
-        if record_type not in {"operating_facts", "segments"}:
+        if record_type not in {"activities", "operating_facts", "segments"}:
             return False
+        if record_type == "activities":
+            fields = (
+                "instrument_id", "report_period", "subject_scope", "action",
+                "object_type", "object_raw", "object_id", "segment_id",
+                "value", "unit", "share", "valid_from", "valid_to",
+            )
+            return all(left.get(field) == right.get(field) for field in fields)
         fields = (
             (
                 "report_period", "segment_id", "project_id", "fact_type",
@@ -1264,6 +1278,10 @@ class BusinessProfileRepository:
         policy = get_business_profile_temporal_policy(record_type)
         if not cls._same_stable_identity(policy.stable_identity_fields, left, right):
             return False
+        left_occurrence = cls._lineage_value(left, "occurrence_identity")
+        right_occurrence = cls._lineage_value(right, "occurrence_identity")
+        if left_occurrence and right_occurrence:
+            return left_occurrence == right_occurrence
         if record_type == "activities":
             for field in ("source_row_key", "contract_reference_raw"):
                 left_value = cls._lineage_value(left, field)

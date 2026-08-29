@@ -3539,6 +3539,7 @@ class DataManager:
             build_business_profile_counterparty_resolver,
             compute_business_profile_semantic_source_revision,
             discover_business_profile_semantic_scope,
+            RUNTIME_SCHEMA_VERSION,
         )
         from research.business_profile_source_assets import (
             load_business_profile_source_assets,
@@ -3770,6 +3771,10 @@ class DataManager:
             with write_scope:
                 try:
                     result = pipeline.run(mode, scope=scope)
+                    # Expose the exact semantic runtime revision used for the
+                    # run so operators can detect stale worker processes
+                    # before spending another LLM batch.
+                    result["runtime_source_revision"] = RUNTIME_SCHEMA_VERSION
                     if result.get("pipeline_status") == "completed":
                         from research.business_profile_production_operations import (
                             BusinessProfileAnnouncementFrontierRepository,

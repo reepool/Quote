@@ -1982,6 +1982,8 @@ def _extraction_schema(field_family: str, *, max_items: int) -> dict[str, Any]:
             "unit": {"type": ["string", "null"]},
             "source_value": {"type": ["number", "null"]},
             "source_unit_raw": {"type": ["string", "null"]},
+            "source_row_key": {"type": ["string", "null"]},
+            "contract_reference_raw": {"type": ["string", "null"]},
             "model_derived_hints": {"type": "object"},
             "evidence_span_ids": evidence_span_ids,
         },
@@ -2004,6 +2006,10 @@ def _extraction_schema(field_family: str, *, max_items: int) -> dict[str, Any]:
             "semantic_summary_zh": {"type": "string", "minLength": 1},
             "model_derived_hints": {"type": "object"},
             "anonymous": {"type": "boolean"},
+            "relationship_scope": {"enum": ["ordinary", "concentration"]},
+            "source_row_key": {"type": ["string", "null"]},
+            "contract_reference_raw": {"type": ["string", "null"]},
+            "disclosed_share_unit": {"type": ["string", "null"]},
             "disclosed_share": {
                 "type": ["number", "null"],
                 "minimum": 0,
@@ -2770,6 +2776,8 @@ def _normalize_activity(
         "value": raw.get("source_value", raw.get("value")),
         "unit": raw.get("source_unit_raw", raw.get("unit")),
         "source_label_raw": raw.get("source_label_raw"),
+        "source_row_key": raw.get("source_row_key"),
+        "contract_reference_raw": raw.get("contract_reference_raw"),
         "semantic_summary_zh": raw.get("semantic_summary_zh"),
         "model_derived_hints": dict(raw.get("model_derived_hints") or {}),
         "evidence": evidence,
@@ -2804,10 +2812,19 @@ def _normalize_relationship(
     disclosed_share = raw.get("disclosed_share")
     if not counterparty:
         raise ValueError("counterparty label is required")
+    inferred_scope = (
+        "concentration"
+        if _is_anonymous_concentration_label(counterparty)
+        or (anonymous and disclosed_share is not None)
+        else "ordinary"
+    )
+    relationship_scope = str(raw.get("relationship_scope") or inferred_scope).strip().lower()
+    if relationship_scope not in {"ordinary", "concentration"}:
+        raise ValueError("relationship_scope must be ordinary or concentration")
     # An unnamed customer/supplier is a valid ordinary relationship.  The
     # disclosed-share requirement applies only to concentration rows (the
     # explicit ``前五大客户/供应商`` labels), not to every anonymous contract.
-    if _is_anonymous_concentration_label(counterparty) and disclosed_share is None:
+    if relationship_scope == "concentration" and disclosed_share is None:
         raise ValueError("anonymous concentration requires disclosed_share")
     evidence = _resolve_exact_evidence(
         raw.get("evidence_span_ids"),
@@ -2824,8 +2841,12 @@ def _normalize_relationship(
         "relationship_type": str(raw["relationship_type"]),
         "counterparty_name_raw": counterparty,
         "anonymous": anonymous,
+        "relationship_scope": relationship_scope,
         "disclosed_share": disclosed_share,
+        "disclosed_share_unit": raw.get("disclosed_share_unit"),
         "object_raw": object_raw or None,
+        "source_row_key": raw.get("source_row_key"),
+        "contract_reference_raw": raw.get("contract_reference_raw"),
         "evidence": evidence,
         "semantic_synthesis": True,
     }
@@ -2843,10 +2864,13 @@ def _is_anonymous_concentration_label(value: Any) -> bool:
         for character in str(value or "").strip()
         if character.isalnum()
     )
-    return normalized in {
+    aliases = {
         "".join(character.lower() for character in label if character.isalnum())
         for label in _ANONYMOUS_CONCENTRATION_LABELS
     }
+    return normalized in aliases or (
+        "前五" in normalized and ("客户" in normalized or "供应商" in normalized)
+    )
 
 
 def _evidence_catalog(
@@ -3345,6 +3369,7 @@ def _failure_category(exc: Exception) -> str:
         or "target ids" in message
         or "target_id" in message
         or "target decisions" in message
+        or "requires local target id" in message
         or "identity collision" in message
     ):
         return "schema_validation_failed"
@@ -3364,12 +3389,13 @@ def _failure_category(exc: Exception) -> str:
     if "evidence" in message or "offset" in message or "quote" in message:
         return "evidence_provenance_failed"
     if (
-        "anonymous" in message
+        "anonymous concentration" in message
+        or "relationship_scope" in message
         or "scope mismatch" in message
         or "report period mismatch" in message
-        or "requires local target id" in message
-        or "unsupported semantic" in message
     ):
+        return "business_rule_validation_failed"
+    if "unsupported semantic" in message:
         return "unsupported_semantic_output"
     return "gateway_or_validation_failure"
 

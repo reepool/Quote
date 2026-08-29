@@ -96,6 +96,19 @@ class BusinessProfileSemanticRepairService:
         result["after_current_projections"] = self._current_projections(ids)
         result["change_counts"] = self._change_counts(changes)
         result["write_count"] = sum(item["status"] == "changed" for item in changes)
+        result["deletion_manifest"] = [
+            {
+                "instrument_id": item.get("instrument_id"),
+                "reason": item.get("reason"),
+                "affected_ids": list(item.get("affected_ids") or []),
+            }
+            for item in changes
+            if item.get("status") == "changed"
+            and (
+                "deleted" in str(item.get("reason") or "")
+                or "cleanup" in str(item.get("reason") or "")
+            )
+        ]
         return result
 
     def _all_local_instrument_ids(self) -> list[str]:
@@ -106,6 +119,12 @@ class BusinessProfileSemanticRepairService:
             "company_business_activities",
             "company_operating_facts",
             "company_value_chain_roles",
+            # Lifecycle-only rows must also participate in all-scope repair;
+            # an instrument with only a failed receipt/work item has no
+            # business record yet, but still needs cleanup before reuse.
+            "business_profile_semantic_artifacts",
+            "business_profile_semantic_runs",
+            "business_profile_work_items",
         )
         identifiers: set[str] = set()
         with self.storage.get_connection() as conn:
@@ -126,6 +145,7 @@ class BusinessProfileSemanticRepairService:
 
     def _audit_instrument(self, instrument_id: str) -> dict[str, Any]:
         issues: list[dict[str, Any]] = []
+        inventory = self._inventory_instrument(instrument_id)
         snapshot = self.storage.get_shareholder_snapshot(instrument_id, include_snapshot=True)
         if snapshot is not None:
             payload = snapshot.get("snapshot") if isinstance(snapshot.get("snapshot"), dict) else {}
@@ -180,7 +200,63 @@ class BusinessProfileSemanticRepairService:
         issues.extend(self._incompatible_artifact_findings(instrument_id))
         issues.extend(self._exposure_collision_findings(instrument_id))
         issues.extend(self._failed_work_item_findings(instrument_id))
-        return {"instrument_id": instrument_id, "issues": issues}
+        return {"instrument_id": instrument_id, "inventory": inventory, "issues": issues}
+
+    def _inventory_instrument(self, instrument_id: str) -> dict[str, Any]:
+        """Return a read-only lifecycle inventory used by repair and operators."""
+        inventory: dict[str, Any] = {
+            "semantic_receipts": Counter(),
+            "work_items": Counter(),
+            "candidate_records": Counter(),
+            "approved_records": Counter(),
+        }
+        with self.storage.get_connection() as conn:
+            self.storage._apply_pragmas(conn)
+            tables = {
+                str(row[0]) for row in conn.execute(
+                    "SELECT name FROM sqlite_master WHERE type='table'"
+                ).fetchall()
+            }
+            if "business_profile_semantic_artifacts" in tables:
+                rows = conn.execute(
+                    "SELECT e.status, COUNT(*) AS n "
+                    "FROM business_profile_semantic_artifacts a "
+                    "JOIN business_profile_semantic_artifact_events e "
+                    "ON e.artifact_id = a.artifact_id "
+                    "WHERE a.instrument_id = ? AND e.rowid IN "
+                    "(SELECT MAX(rowid) FROM business_profile_semantic_artifact_events GROUP BY artifact_id) "
+                    "GROUP BY e.status",
+                    (instrument_id,),
+                ).fetchall()
+                inventory["semantic_receipts"] = Counter({str(r[0]): int(r[1]) for r in rows})
+            if "business_profile_work_items" in tables:
+                rows = conn.execute(
+                    "SELECT status, COUNT(*) AS n FROM business_profile_work_items "
+                    "WHERE instrument_id = ? GROUP BY status",
+                    (instrument_id,),
+                ).fetchall()
+                inventory["work_items"] = Counter({str(r[0]): int(r[1]) for r in rows})
+            record_tables = {
+                "activities": "company_business_activities",
+                "operating_facts": "company_operating_facts",
+                "relationships": "company_supply_chain_relationships",
+                "value_chain_roles": "company_value_chain_roles",
+                "exposures": "company_commodity_exposures",
+                "exposure_facts": "company_commodity_exposure_facts",
+            }
+            for kind, table in record_tables.items():
+                if table not in tables:
+                    continue
+                rows = conn.execute(
+                    f"SELECT review_status, COUNT(*) AS n FROM {table} "
+                    "WHERE instrument_id = ? GROUP BY review_status",
+                    (instrument_id,),
+                ).fetchall()
+                for row in rows:
+                    status = str(row[0] or "")
+                    target = inventory["candidate_records"] if status == "candidate" else inventory["approved_records"]
+                    target[kind] += int(row[1])
+        return {key: dict(value) for key, value in inventory.items()}
 
     def _failed_work_item_findings(self, instrument_id: str) -> list[dict[str, Any]]:
         with self.storage.get_connection() as conn:

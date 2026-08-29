@@ -270,12 +270,18 @@ class BusinessProfileActivityProducer:
             or _is_anonymous_concentration_label(anonymous_label)
         )
         # ``anonymous=true`` also legitimately describes an unnamed contract
-        # counterparty (for example ``客户 A(1)``).  Only a recognized
-        # concentration label, or an anonymous assertion carrying a disclosed
-        # share, is a concentration fact.
-        is_concentration = _is_anonymous_concentration_label(anonymous_label) or (
-            anonymous and assertion.get("disclosed_share") is not None
-        )
+        # counterparty (for example ``客户 A(1)``).  The extraction layer
+        # supplies the explicit scope; retain the label fallback for older
+        # callers that construct assertions directly.
+        relationship_scope = str(assertion.get("relationship_scope") or "").strip().lower()
+        if relationship_scope not in {"ordinary", "concentration"}:
+            relationship_scope = (
+                "concentration"
+                if _is_anonymous_concentration_label(anonymous_label)
+                or (anonymous and assertion.get("disclosed_share") is not None)
+                else "ordinary"
+            )
+        is_concentration = relationship_scope == "concentration"
         if is_concentration:
             share = assertion.get("disclosed_share")
             if share is None:
@@ -337,6 +343,7 @@ class BusinessProfileActivityProducer:
                     "run_id": run_id,
                     "scope_id": assertion.get("scope_id"),
                     "anonymous_label": anonymous_label,
+                    "relationship_scope": relationship_scope,
                     "anonymous_label_key": anonymous_label_key,
                     "object_raw": object_raw,
                     "object_key": object_key,

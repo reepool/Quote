@@ -101,6 +101,39 @@ def test_semantic_artifact_replay_reopens_only_after_unit_rule_change(tmp_path):
     assert repository.find_replay(_identity())["artifact_id"] == artifact["artifact_id"]
 
 
+def test_converted_semantic_artifact_is_replayable(tmp_path):
+    storage = _Storage(tmp_path / "research.db")
+    repository = BusinessProfileSemanticArtifactRepository(storage)
+    artifact = repository.receive(
+        _identity(),
+        response={"rows": [{"unit_raw": "吨", "value": 10}]},
+        response_hash="",
+        evidence_ids=["span-1"],
+    )
+    repository.mark(artifact["artifact_id"], "converted")
+    replay = repository.find_replay(_identity())
+    assert replay is not None
+    assert replay["artifact_id"] == artifact["artifact_id"]
+
+
+def test_partial_row_rejection_is_not_replayable_after_conversion(tmp_path):
+    storage = _Storage(tmp_path / "research.db")
+    repository = BusinessProfileSemanticArtifactRepository(storage)
+    artifact = repository.receive(
+        _identity(),
+        response={"rows": [{"unit_raw": "吨", "value": 10}]},
+        response_hash="",
+        evidence_ids=["span-1"],
+    )
+    repository.mark(artifact["artifact_id"], "converted")
+    repository.mark(
+        artifact["artifact_id"],
+        "conversion_pending",
+        reason_code="partial_row_rejection",
+    )
+    assert repository.find_replay(_identity()) is None
+
+
 def test_semantic_artifact_latest_event_uses_insertion_order_for_tied_timestamps(
     tmp_path,
 ):

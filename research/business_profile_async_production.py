@@ -2305,6 +2305,56 @@ class BusinessProfileAsyncProductionService:
                 "bound annual-report processing requires exactly its instrument "
                 "and latest_annual_only policy"
             )
+        # Broad runs must not spend provider tokens while the local lifecycle
+        # still contains known identity collisions or non-reusable receipts.
+        # Single-instrument runs remain available for targeted repair/replay.
+        pre_batch_gate: dict[str, Any] | None = None
+        if len(tuple(instrument_ids)) > 1:
+            from research.business_profile_semantic_repair import (
+                BusinessProfileSemanticRepairService,
+            )
+
+            audit = await self._run_storage_operation(
+                BusinessProfileSemanticRepairService(self.repository.storage).run,
+                instrument_ids=tuple(instrument_ids),
+                apply=False,
+            )
+            blocking_codes = {
+                "operating_fact_occurrence_conflict",
+                "duplicate_role_business_identity",
+                "incompatible_reusable_artifact",
+                "legacy_semantic_artifact",
+                "failed_semantic_artifact",
+                "failed_work_item",
+            }
+            blockers = [
+                {
+                    "instrument_id": item.get("instrument_id"),
+                    "issues": [
+                        issue for issue in item.get("issues", [])
+                        if issue.get("code") in blocking_codes
+                    ],
+                }
+                for item in audit.get("instruments", [])
+            ]
+            blockers = [item for item in blockers if item["issues"]]
+            if blockers:
+                return {
+                    "schema_version": ASYNC_REPORT_SCHEMA_VERSION,
+                    "status": "not_ready",
+                    "reason_codes": ["pre_batch_gate_blocked"],
+                    "operation": "business_profile_backfill",
+                    "selection_policy": policy,
+                    "result_policy": result_policy,
+                    "pre_batch_gate": {
+                        "status": "blocked",
+                        "blocking_instruments": blockers,
+                        "audit_issue_counts": audit.get("issue_counts", {}),
+                        "llm_calls": 0,
+                    },
+                    "elapsed_seconds": round(time.monotonic() - started, 3),
+                }
+            pre_batch_gate = {"status": "passed", "llm_calls": 0}
         logger.info(
             "business-profile backfill start cutoff=%s policy=%s instruments=%s "
             "start_date=%s end_date=%s document_types=%s result_policy=%s stages=%s",
@@ -2468,6 +2518,8 @@ class BusinessProfileAsyncProductionService:
             "writer": {**writer, **self._readiness_metrics()},
             "elapsed_seconds": round(time.monotonic() - started, 3),
         }
+        if pre_batch_gate is not None:
+            report["pre_batch_gate"] = pre_batch_gate
         if bound_asset is not None:
             report["bound_shared_asset"] = bound_asset
         self._log_completion(report)
@@ -2837,8 +2889,13 @@ class BusinessProfileAsyncProductionService:
                     machine_rework_reasons = dict(
                         quality.get("machine_rework_reasons") or {}
                     )
+                    deterministic_reasons = {
+                        reason
+                        for reason in machine_rework_reasons
+                        if reason != "gateway_failure"
+                    }
                     if int(quality.get("blocking_machine_rework") or 0) > 0 and (
-                        "gateway_failure" not in machine_rework_reasons
+                        stage not in {"semantic", "verify"} or deterministic_reasons
                     ):
                         reasons = ",".join(sorted(machine_rework_reasons))
                         deferred_status = await self._run_storage_operation(
@@ -2861,6 +2918,7 @@ class BusinessProfileAsyncProductionService:
                     if (
                         stage in {"semantic", "verify"}
                         and "gateway_failure" in machine_rework_reasons
+                        and not deterministic_reasons
                     ):
                         raise RuntimeError(
                             "business-profile semantic provider congestion: gateway_failure"

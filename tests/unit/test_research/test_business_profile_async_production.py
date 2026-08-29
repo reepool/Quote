@@ -2454,6 +2454,74 @@ def test_invalid_backfill_scope_fails_before_discovery(tmp_path):
     discover.assert_not_awaited()
 
 
+def test_broad_backfill_pre_batch_gate_blocks_known_lifecycle_findings(
+    tmp_path, monkeypatch
+):
+    storage = _storage(tmp_path)
+    queue = BusinessProfileWorkRepository(
+        storage, checkpoint_root=tmp_path / "checkpoints"
+    )
+    discover = AsyncMock(return_value={"status": "success"})
+    stage_runner = AsyncMock(return_value={"status": "success"})
+
+    def audit(_service, *, instrument_ids, apply=False, **_kwargs):
+        assert tuple(instrument_ids) == ("600000.SH", "000001.SZ")
+        assert apply is False
+        return {
+            "issue_counts": {"failed_work_item": 1},
+            "instruments": [
+                {
+                    "instrument_id": "600000.SH",
+                    "issues": [
+                        {
+                            "code": "failed_work_item",
+                            "stable_id": "failed_work_item:600000.SH:1",
+                            "details": {"work_id": "work-1"},
+                        }
+                    ],
+                },
+                {"instrument_id": "000001.SZ", "issues": []},
+            ],
+        }
+
+    monkeypatch.setattr(
+        "research.business_profile_semantic_repair.BusinessProfileSemanticRepairService.run",
+        audit,
+    )
+    service = BusinessProfileAsyncProductionService(
+        repository=queue,
+        discovery_runner=discover,
+        stage_runner=stage_runner,
+    )
+
+    report = asyncio.run(
+        service.run_backfill(
+            knowledge_cutoff="2026-08-30",
+            processing_identity={"rules": "gate"},
+            instrument_ids=("600000.SH", "000001.SZ"),
+            discovery_kwargs={"start_date": "2026-01-01"},
+        )
+    )
+
+    assert report["status"] == "not_ready"
+    assert report["reason_codes"] == ["pre_batch_gate_blocked"]
+    assert report["pre_batch_gate"]["llm_calls"] == 0
+    assert report["pre_batch_gate"]["blocking_instruments"] == [
+        {
+            "instrument_id": "600000.SH",
+            "issues": [
+                {
+                    "code": "failed_work_item",
+                    "stable_id": "failed_work_item:600000.SH:1",
+                    "details": {"work_id": "work-1"},
+                }
+            ],
+        }
+    ]
+    discover.assert_not_awaited()
+    stage_runner.assert_not_awaited()
+
+
 def test_stage_consumers_run_independently_without_download_blocking_parse(tmp_path):
     storage = _storage(tmp_path)
     _frontier(storage)

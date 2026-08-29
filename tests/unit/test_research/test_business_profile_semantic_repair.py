@@ -63,6 +63,34 @@ def test_repair_deletes_failed_semantic_receipt_and_converges(tmp_path):
     assert repeated["change_counts"]["unchanged"] == 1
 
 
+def test_all_scope_includes_instruments_with_only_failed_lifecycle_rows(tmp_path):
+    storage = _storage(tmp_path)
+    artifacts = BusinessProfileSemanticArtifactRepository(storage)
+    identity = SemanticArtifactIdentity(
+        instrument_id="699999.SH",
+        source_document_id="annual-report-2025",
+        document_hash="a" * 64,
+        report_period="2025-12-31",
+        field_family="atomic_activities",
+        evidence_scope_hash="b" * 64,
+        input_hash="c" * 64,
+        prompt_version="prompt.v1",
+        schema_version="schema.v1",
+    )
+    artifact = artifacts.receive(
+        identity,
+        response={"activities": []},
+        response_hash="",
+        evidence_ids=[],
+    )
+    artifacts.mark(artifact["artifact_id"], "rejected", reason_code="schema_failure")
+
+    audit = BusinessProfileSemanticRepairService(storage).run(all_scope=True)
+
+    assert [item["instrument_id"] for item in audit["instruments"]] == ["699999.SH"]
+    assert audit["issue_counts"]["failed_semantic_artifact"] == 1
+
+
 def test_repair_audit_is_read_only_and_apply_requires_explicit_scope(tmp_path):
     storage = _storage(tmp_path)
     storage.upsert_shareholder_snapshot(ShareholderSnapshot(

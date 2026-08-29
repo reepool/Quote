@@ -51,6 +51,10 @@ from research.business_profile_numeric_reconciliation import (
     normalize_ratio,
     reconcile_gross_margin,
 )
+from research.business_profile_occurrence import (
+    normalize_occurrence_material,
+    occurrence_identity_key,
+)
 from research.business_profile_pdf_artifacts import (
     BusinessProfilePdfArtifactStore,
     BusinessProfilePdfPageCache,
@@ -94,6 +98,7 @@ from research.business_profile_semantic_extraction import (
     BusinessProfileSemanticExtractor,
     build_semantic_extraction_request,
     deterministic_semantic_verification_decision,
+    _is_anonymous_concentration_label,
 )
 from research.business_profile_semantic_pipeline import SemanticProductionConfig
 from research.business_profile_source_assets import (
@@ -1971,6 +1976,20 @@ class BusinessProfileSemanticRuntime:
                             )
                         if rejected_rows:
                             semantic_family_complete = False
+                            if semantic_artifact_id is not None:
+                                # A partially accepted table is not a complete
+                                # replay receipt.  Keep the valid rows for the
+                                # current attempt, but force the next run to
+                                # request the missing rows instead of reusing
+                                # this incomplete response.
+                                self.semantic_artifacts.mark(
+                                    semantic_artifact_id,
+                                    "conversion_pending",
+                                    unit_catalog_version=load_unit_conversion_catalog().catalog_version,
+                                    runtime_version=RUNTIME_SCHEMA_VERSION,
+                                    reason_code="partial_row_rejection",
+                                    metadata={"rows_rejected": rejected_row_count},
+                                )
                             machine_rework.append(
                                 _rework_item(
                                     item,
@@ -4044,6 +4063,19 @@ class BusinessProfileSemanticRuntime:
             for raw in envelope.activities:
                 assertion = dict(raw)
                 evidence = _semantic_evidence(item, selected, assertion)
+                # Model output does not own durable row identity.  Derive it
+                # from immutable evidence and row content before activity
+                # construction so a replay produces the same occurrence key
+                # even when assertion ordering or model ids change.
+                assertion["source_row_key"] = _source_row_key(
+                    table_id="semantic_activity",
+                    row_label=str(assertion.get("object_raw") or ""),
+                    cells={
+                        "action": assertion.get("action"),
+                        "contract_reference_raw": assertion.get("contract_reference_raw"),
+                    },
+                    evidence_id=evidence["evidence_id"],
+                )
                 evidence_by_id[evidence["evidence_id"]] = evidence
                 resolution = product_catalog.resolve_alias(assertion["object_raw"])
                 assertion.update(
@@ -4120,6 +4152,15 @@ class BusinessProfileSemanticRuntime:
                     }
                 )
                 _bind_promotion_validation(record, projection_evidence)
+                _bind_occurrence_identity(
+                    record,
+                    source_document_id=str(item["document"]["identity"]),
+                    evidence_id=projection_evidence["evidence_id"],
+                    action_or_relationship=str(record.get("action") or ""),
+                    object_raw=record.get("object_raw"),
+                    source_row_key=record.get("metadata", {}).get("source_row_key"),
+                    contract_reference_raw=record.get("metadata", {}).get("contract_reference_raw"),
+                )
                 output.append(("activities", record))
 
                 for occurrence_ordinal, (assertion, evidence) in enumerate(
@@ -4136,6 +4177,16 @@ class BusinessProfileSemanticRuntime:
                         runtime_unit_rules=runtime_unit_rules,
                     )
                     _bind_promotion_validation(fact, evidence)
+                    _bind_occurrence_identity(
+                        fact,
+                        source_document_id=str(item["document"]["identity"]),
+                        evidence_id=evidence["evidence_id"],
+                        action_or_relationship=str(assertion.get("action") or ""),
+                        object_raw=assertion.get("object_raw"),
+                        source_row_key=fact.get("metadata", {}).get("source_row_key"),
+                        contract_reference_raw=assertion.get("contract_reference_raw"),
+                        occurrence_ordinal=occurrence_ordinal,
+                    )
                     output.append(("operating_facts", fact))
 
         relationships = (
@@ -4144,6 +4195,26 @@ class BusinessProfileSemanticRuntime:
         for raw in relationships:
             assertion = dict(raw)
             evidence = _semantic_evidence(item, selected, assertion)
+            counterparty = str(assertion.get("counterparty_name_raw") or "").strip()
+            assertion["relationship_scope"] = str(
+                assertion.get("relationship_scope")
+                or (
+                    "concentration"
+                    if _is_anonymous_concentration_label(counterparty)
+                    else "ordinary"
+                )
+            ).strip().lower()
+            assertion["source_row_key"] = _source_row_key(
+                table_id="semantic_relationship",
+                row_label=counterparty,
+                cells={
+                    "relationship_type": assertion.get("relationship_type"),
+                    "object_raw": assertion.get("object_raw"),
+                    "disclosed_share": assertion.get("disclosed_share"),
+                    "relationship_scope": assertion["relationship_scope"],
+                },
+                evidence_id=evidence["evidence_id"],
+            )
             anonymous = assertion.get("anonymous") is True
             resolution = (
                 EntityResolution("unresolved", None, None, None)
@@ -4200,6 +4271,15 @@ class BusinessProfileSemanticRuntime:
                 }
             )
             _bind_promotion_validation(record, evidence)
+            _bind_occurrence_identity(
+                record,
+                source_document_id=str(item["document"]["identity"]),
+                evidence_id=evidence["evidence_id"],
+                action_or_relationship=str(assertion.get("relationship_type") or ""),
+                object_raw=assertion.get("object_raw"),
+                source_row_key=assertion.get("source_row_key"),
+                contract_reference_raw=assertion.get("contract_reference_raw"),
+            )
             output.append((record_type, record))
         records["evidence"] = list(evidence_by_id.values())
         return records, output, exceptions
@@ -5826,6 +5906,8 @@ def _semantic_activity_group_key(assertion: Mapping[str, Any]) -> tuple[Any, ...
         str(assertion.get("segment_id") or ""),
         str(assertion.get("geography") or ""),
         str(assertion.get("business_regime_id") or ""),
+        str(assertion.get("source_row_key") or ""),
+        str(assertion.get("contract_reference_raw") or ""),
     )
 
 
@@ -6158,14 +6240,52 @@ def _source_row_key(
     as hints only and cannot change the identity used for persistence.
     """
 
-    return "row-" + _stable_hash(
-        {
-            "table_id": table_id,
-            "row_label": str(row_label).strip(),
-            "cells": {str(key): str(value) for key, value in cells.items()},
-            "evidence_id": evidence_id,
-        }
-    )[:24]
+    material = normalize_occurrence_material(
+        instrument_id="",
+        report_period="",
+        source_document_id=table_id,
+        evidence_id=evidence_id,
+        source_row_key=row_label,
+        object_raw=row_label,
+        action_or_relationship=table_id,
+    )
+    material["cells"] = {str(key): str(value) for key, value in cells.items()}
+    return "row-" + occurrence_identity_key(material).split(":", 1)[1][:24]
+
+
+def _bind_occurrence_identity(
+    record: dict[str, Any],
+    *,
+    source_document_id: str,
+    evidence_id: str,
+    action_or_relationship: str,
+    object_raw: Any = None,
+    source_row_key: Any = None,
+    contract_reference_raw: Any = None,
+    occurrence_ordinal: Any = None,
+) -> None:
+    """Attach the canonical material used by replay and temporal governance."""
+
+    metadata = record.setdefault("metadata", {})
+    material = normalize_occurrence_material(
+        instrument_id=record.get("instrument_id"),
+        report_period=record.get("report_period"),
+        source_document_id=source_document_id,
+        evidence_id=evidence_id,
+        page_number=metadata.get("page_number"),
+        section_id=metadata.get("section_id"),
+        source_row_key=source_row_key or metadata.get("source_row_key"),
+        contract_reference_raw=contract_reference_raw
+        or metadata.get("contract_reference_raw"),
+        subject_scope=record.get("subject_scope"),
+        object_raw=object_raw or record.get("object_raw") or metadata.get("object_raw"),
+        object_id=record.get("object_id"),
+        action_or_relationship=action_or_relationship,
+        segment_id=record.get("segment_id"),
+        occurrence_ordinal=occurrence_ordinal,
+    )
+    metadata["occurrence_material"] = material
+    metadata["occurrence_identity"] = occurrence_identity_key(material)
 
 
 def _ambiguous_operating_row_groups(
@@ -6921,6 +7041,13 @@ def _semantic_failure_reason(exc: Exception) -> str:
         return "unit_normalization_failed"
     if "evidence_provenance_failed" in row_categories:
         return "evidence_provenance_failed"
+    if (
+        "anonymous concentration" in text
+        or "relationship_scope" in text
+        or "temporal conflict" in text
+        or "identity" in text and isinstance(exc, ValueError)
+    ):
+        return "business_rule_validation_failed"
     if "context" in text or "selector" in text:
         return "context_incomplete"
     # Local conversion, identity, and temporal contract violations are

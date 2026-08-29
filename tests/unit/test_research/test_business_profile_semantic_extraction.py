@@ -22,6 +22,7 @@ from research.business_profile_semantic_extraction import (
     _build_evidence_span_catalog,
     build_semantic_extraction_request,
     deterministic_semantic_verification_decision,
+    _failure_category,
 )
 from utils.llm import LlmResponse, LlmUsage
 
@@ -84,6 +85,21 @@ def _response(data, *, model="provider-model-v2"):
         warnings=(),
         lineage={},
     )
+
+
+@pytest.mark.parametrize(
+    ("message", "expected"),
+    [
+        ("anonymous concentration requires disclosed_share", "business_rule_validation_failed"),
+        ("relationship_scope must be ordinary or concentration", "business_rule_validation_failed"),
+        ("semantic verification batch target requires local target id", "schema_validation_failed"),
+        ("unsupported semantic field family", "unsupported_semantic_output"),
+    ],
+)
+def test_failure_category_separates_business_rules_from_unsupported_output(
+    message, expected
+):
+    assert _failure_category(ValueError(message)) == expected
 
 
 class _FakeGateway:
@@ -845,6 +861,7 @@ async def test_anonymous_contract_relationship_without_share_is_preserved():
     )
     assert envelope.relationships[0]["anonymous"] is True
     assert envelope.relationships[0]["disclosed_share"] is None
+    assert envelope.relationships[0]["relationship_scope"] == "ordinary"
 
 
 @pytest.mark.asyncio
@@ -883,6 +900,7 @@ async def test_anonymous_concentration_with_explicit_share_is_normalized():
 
     assert envelope.relationships[0]["anonymous"] is True
     assert envelope.relationships[0]["disclosed_share"] == 0.25
+    assert envelope.relationships[0]["relationship_scope"] == "concentration"
 
 
 @pytest.mark.asyncio

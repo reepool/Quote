@@ -176,7 +176,7 @@ class BusinessProfileSemanticArtifactRepository:
         # pending state that may be replayed is one explicitly reopened by a
         # governed unit-rule change; all other pending states must be freshly
         # extracted instead of looping over the same bad response.
-        replayable = latest_status in {"received", "replayed"} or (
+        replayable = latest_status in {"received", "converted", "replayed"} or (
             latest_status == "conversion_pending"
             and latest_reason.startswith("unit_rule_")
         )
