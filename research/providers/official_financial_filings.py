@@ -16,7 +16,9 @@ from urllib.parse import urljoin, urlparse
 
 import requests
 
+from research.financial_fetch_progress import log_financial_fetch_progress
 from research.official_financial_source_profiles import source_profile_metadata
+from utils import dm_logger
 from utils.http_transport import HttpTlsConfig, create_requests_session
 
 from .base import (
@@ -841,6 +843,16 @@ class ConfiguredOfficialFinancialFilingProvider(BaseOfficialFinancialFilingProvi
         mode: str,
     ) -> List[FinancialFilingPayload]:
         payloads: List[FinancialFilingPayload] = []
+        started_at = time.monotonic()
+        total = len(instruments) * max(1, len(report_periods))
+        processed = 0
+        dm_logger.info(
+            "[FinancialFetch] %s start instruments=%s periods=%s exchange=%s",
+            self.source_name or "official",
+            len(instruments),
+            list(report_periods),
+            exchange,
+        )
         for instrument in instruments:
             for report_period in report_periods:
                 context = self._context(instrument, exchange, report_period)
@@ -883,6 +895,16 @@ class ConfiguredOfficialFinancialFilingProvider(BaseOfficialFinancialFilingProvi
                     )
                 if self.request_interval > 0:
                     time.sleep(self.request_interval)
+                processed += 1
+                log_financial_fetch_progress(
+                    dm_logger,
+                    channel=self.source_name or "official",
+                    processed=processed,
+                    total=total,
+                    elapsed_seconds=time.monotonic() - started_at,
+                    exchange=exchange,
+                    report_period=report_period,
+                )
         return payloads
 
     def _fetch_from_manifest(

@@ -16,6 +16,7 @@ from research.financial_disclosure_events import (
     ACCEPTED_FINANCIAL_DISCLOSURE_CLASSIFICATIONS,
 )
 from research.storage import ResearchStorageManager
+from utils import dm_logger
 from utils.config_manager import ResearchConfig
 
 
@@ -113,6 +114,11 @@ class FinancialMaintenanceRepairRouter:
         summary = self.default_summary()
         summary["source_order"] = source_order
         summary["fallback_sources"] = fallback_sources
+        dm_logger.info(
+            "[FinancialMaintenanceRepair] start targets=%s source_order=%s",
+            len(targets),
+            source_order,
+        )
 
         if "cninfo_data20" in source_order:
             cninfo_summary = await self._run_cninfo_data20_import(
@@ -188,6 +194,12 @@ class FinancialMaintenanceRepairRouter:
             if target.classification in accepted_classification_set
         }
         for report_period, period_targets in grouped.items():
+            dm_logger.info(
+                "[FinancialFetch] fallback start report_period=%s targets=%s sources=%s",
+                report_period,
+                len(period_targets),
+                fallback_sources,
+            )
             live_targets = [
                 LiveAuditTarget(
                     target.instrument_id,
@@ -340,6 +352,12 @@ class FinancialMaintenanceRepairRouter:
         ) as temp_name:
             temp_dir = Path(temp_name)
             for (exchange, report_period), period_targets in grouped.items():
+                dm_logger.info(
+                    "[FinancialFetch] cninfo_data20 start exchange=%s report_period=%s targets=%s",
+                    exchange,
+                    report_period,
+                    len(period_targets),
+                )
                 try:
                     result = await run_batches(
                         instrument_ids=[

@@ -14,6 +14,7 @@ import pandas as pd
 import requests
 
 from research.financial_fact_aliases import describe_core_financial_fact_alias
+from research.financial_fetch_progress import log_financial_fetch_progress
 from utils import dm_logger
 from utils.http_transport import create_requests_session
 from .akshare_support import load_akshare
@@ -283,8 +284,19 @@ class AkshareFinancialStatementsProvider(BaseFinancialStatementsProvider):
         akshare_module = self._akshare(mode)
         bundles: List[FinancialStatementBundle] = []
         target_periods = set(report_periods or [])
+        started_at = time.monotonic()
+        total = len(target_instruments)
+        exchange = ""
+        if target_instruments:
+            exchange = str((target_instruments[0] or {}).get("exchange") or "")
+        dm_logger.info(
+            "[FinancialFetch] ths_sina start instruments=%s periods=%s exchange=%s",
+            total,
+            sorted(target_periods) if target_periods else [],
+            exchange,
+        )
 
-        for instrument in target_instruments:
+        for index, instrument in enumerate(target_instruments, start=1):
             if target_periods:
                 bundles.extend(
                     self._fetch_target_period_bundles_with_statement_fallback(
@@ -294,36 +306,46 @@ class AkshareFinancialStatementsProvider(BaseFinancialStatementsProvider):
                         target_periods=target_periods,
                     )
                 )
-                continue
+            else:
+                for statement_interface in self.statement_interface_order:
+                    try:
+                        balance_df, profit_df, cashflow_df = self._fetch_statement_frames(
+                            akshare_module,
+                            instrument=instrument,
+                            statement_interface=statement_interface,
+                        )
+                    except Exception as exc:
+                        dm_logger.warning(
+                            "[AkshareFinancialStatementsProvider] %s failed for %s: %s",
+                            statement_interface,
+                            instrument.get("instrument_id"),
+                            exc,
+                        )
+                        continue
 
-            for statement_interface in self.statement_interface_order:
-                try:
-                    balance_df, profit_df, cashflow_df = self._fetch_statement_frames(
-                        akshare_module,
+                    instrument_bundles = self._build_bundles(
                         instrument=instrument,
+                        mode=mode,
+                        balance_df=balance_df,
+                        profit_df=profit_df,
+                        cashflow_df=cashflow_df,
+                        report_periods=target_periods or None,
                         statement_interface=statement_interface,
                     )
-                except Exception as exc:
-                    dm_logger.warning(
-                        "[AkshareFinancialStatementsProvider] %s failed for %s: %s",
-                        statement_interface,
-                        instrument.get("instrument_id"),
-                        exc,
-                    )
-                    continue
-
-                instrument_bundles = self._build_bundles(
-                    instrument=instrument,
-                    mode=mode,
-                    balance_df=balance_df,
-                    profit_df=profit_df,
-                    cashflow_df=cashflow_df,
-                    report_periods=target_periods or None,
-                    statement_interface=statement_interface,
-                )
-                if instrument_bundles:
-                    bundles.extend(instrument_bundles)
-                    break
+                    if instrument_bundles:
+                        bundles.extend(instrument_bundles)
+                        break
+            log_financial_fetch_progress(
+                dm_logger,
+                channel="ths_sina",
+                processed=index,
+                total=total,
+                elapsed_seconds=time.monotonic() - started_at,
+                exchange=str(instrument.get("exchange") or exchange),
+                report_period=(
+                    sorted(target_periods)[0] if len(target_periods) == 1 else None
+                ),
+            )
 
         return bundles
 

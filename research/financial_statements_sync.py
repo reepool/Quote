@@ -365,6 +365,15 @@ class FinancialStatementsShadowSyncService:
                 if official_provider is not None and official_provider.supports_mode(
                     candidate.mode
                 ):
+                    dm_logger.info(
+                        "[FinancialStatementsSync] fetching official source=%s mode=%s "
+                        "exchange=%s instruments=%s periods=%s",
+                        candidate.source,
+                        candidate.mode,
+                        exchange,
+                        len(stock_instruments),
+                        report_periods,
+                    )
                     official_result = await self._process_official_candidate(
                         source=candidate.source,
                         mode=candidate.mode,
@@ -418,6 +427,15 @@ class FinancialStatementsShadowSyncService:
                     continue
 
                 try:
+                    dm_logger.info(
+                        "[FinancialStatementsSync] fetching fallback source=%s mode=%s "
+                        "exchange=%s instruments=%s periods=%s",
+                        candidate.source,
+                        candidate.mode,
+                        exchange,
+                        len(stock_instruments),
+                        report_periods,
+                    )
                     bundles = await provider.fetch_financial_statement_bundles(
                         instruments=stock_instruments,
                         exchange=exchange,

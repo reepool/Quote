@@ -1392,6 +1392,10 @@ class FinancialDisclosureIncrementalSyncService:
         }
         outcomes: List[Dict[str, Any]] = []
         if to_fetch and not dry_run:
+            dm_logger.info(
+                "[FinancialDisclosureIncremental] targeted import start candidates=%s",
+                len(to_fetch),
+            )
             try:
                 repair_summary = await self._run_targeted_import(
                     candidates=to_fetch,

@@ -348,7 +348,7 @@ async def run_local_core_dryrun(
     exchanges = sorted({target.exchange for target in targets})
     LOGGER.info(
         "[L1LocalCoreDryRun] storage initialized seeded_memberships=%s exchanges=%s",
-        seeded_memberships,
+        len(seeded_memberships),
         exchanges,
     )
 
