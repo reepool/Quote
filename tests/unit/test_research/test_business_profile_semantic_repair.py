@@ -431,6 +431,77 @@ def test_repair_holds_legacy_internal_inventory_storage_role(tmp_path):
     assert applied["change_counts"]["changed"] == 1
     assert repository.get_record("evidence", evidence["evidence_id"])["review_status"] == "approved"
     assert service.run(instrument_ids=["000858.SZ"], apply=True)["change_counts"]["unchanged"] == 1
+    assert service.run(instrument_ids=["000858.SZ"])["issue_counts"] == {}
+
+
+def test_repair_consolidates_machine_approved_duplicate_roles(tmp_path):
+    storage = _storage(tmp_path)
+    repository = BusinessProfileRepository(storage)
+    repository.upsert(
+        "evidence",
+        {
+            "evidence_id": "role-dedup-evidence",
+            "instrument_id": "300750.SZ",
+            "source_document_id": "annual-report-2025",
+            "source_tier": "official_filing",
+            "document_hash": "role-dedup-document",
+            "data_available_date": "2026-03-30",
+            "availability_quality": "actual",
+            "evidence_text_hash": "role-dedup-text",
+            "extraction_method": "native_text",
+            "confidence": 1.0,
+            "review_status": "candidate",
+        },
+    )
+    for record_id, activity_id in (
+        ("legacy-producer-role-a", "activity-a"),
+        ("legacy-producer-role-b", "activity-b"),
+    ):
+        repository.upsert(
+            "value_chain_roles",
+            {
+                "record_id": record_id,
+                "instrument_id": "300750.SZ",
+                "report_period": "2025-12-31",
+                "segment_id": None,
+                "role": "producer",
+                "mapping_basis": "approved_atomic_activity_rule",
+                "evidence_id": "role-dedup-evidence",
+                "data_available_date": "2026-03-30",
+                "confidence": 1.0,
+                "review_status": "candidate",
+                "valid_from": "2025-12-31",
+                "metadata": {
+                    "role_rule_version": "business_profile_activity_role_rules.v1",
+                    "supporting_activity_ids": [activity_id],
+                },
+            },
+        )
+    # Production-shaped legacy state: both rows were machine-approved before
+    # role business identity aggregation was introduced.
+    with storage.get_connection() as conn:
+        conn.execute(
+            "UPDATE company_value_chain_roles SET review_status = 'approved' "
+            "WHERE instrument_id = '300750.SZ'"
+        )
+        conn.commit()
+
+    service = BusinessProfileSemanticRepairService(storage)
+    applied = service.run(instrument_ids=["300750.SZ"], apply=True)
+
+    rows = repository.list_records(
+        "value_chain_roles", instrument_id="300750.SZ", limit=10
+    )
+    assert {row["review_status"] for row in rows} == {"approved", "held"}
+    assert applied["change_counts"] == {
+        "would_change": 0,
+        "changed": 1,
+        "unchanged": 0,
+        "held": 0,
+        "failed": 0,
+    }
+    assert applied["changes"][0]["reason"] == "duplicate_machine_roles_consolidated"
+    assert service.run(instrument_ids=["300750.SZ"])["issue_counts"] == {}
 
 
 def test_repair_replays_distinct_candidate_contract_occurrences(tmp_path):

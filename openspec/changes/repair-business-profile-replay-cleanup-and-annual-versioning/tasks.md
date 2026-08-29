@@ -30,6 +30,7 @@
 - [x] 5.2 Execute cleanup transactionally for the selected production scope, preserving approved records, evidence, and review audit; emit a deletion manifest with counts and IDs.
 - [x] 5.3 Make replay lookup exclude deleted/unusable receipts and prevent old failed outputs from re-entering `reuse`.
 - [x] 5.4 Add an explicit pre-batch gate that blocks broad backfill while identity collisions or unusable receipts remain unresolved.
+- [x] 5.5 Make repair converge after legacy machine-approved role duplication by retaining one current role, auditing duplicate rows out of current reads, and ignoring already-held history.
 
 ## 6. End-to-end acceptance
 

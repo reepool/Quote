@@ -472,7 +472,8 @@ class BusinessProfileSemanticRepairService:
                 if activity_id in by_id:
                     supports.append(by_id[activity_id])
             if (
-                role.get("role") == "storage_provider"
+                role.get("review_status") in {"approved", "candidate"}
+                and role.get("role") == "storage_provider"
                 and supports
                 and all(
                     str(activity.get("action") or "") == "stores"
@@ -492,6 +493,8 @@ class BusinessProfileSemanticRepairService:
                         },
                     )
                 )
+            if role.get("review_status") not in {"approved", "candidate"}:
+                continue
             key = (
                 role.get("instrument_id"),
                 role.get("segment_id"),
@@ -633,18 +636,54 @@ class BusinessProfileSemanticRepairService:
         record_ids = [str(value) for value in issue.get("details", {}).get("record_ids") or ()]
         if len(record_ids) < 2:
             return {"instrument_id": instrument_id, "status": "unchanged", "reason": "duplicate_role_already_resolved", "stable_id": issue["stable_id"]}
-        removable: list[str] = []
-        for record_id in sorted(record_ids)[1:]:
+        records: list[dict[str, Any]] = []
+        for record_id in record_ids:
             record = self.repository.get_record("value_chain_roles", record_id)
-            metadata = record.get("metadata") if isinstance(record, dict) else {}
-            if (
-                record
-                and record.get("review_status") == "candidate"
-                and str(metadata.get("role_rule_version") or "").startswith("business_profile_")
-            ):
-                removable.append(record_id)
-        if not removable:
+            if record and record.get("review_status") in {"approved", "candidate"}:
+                records.append(record)
+        if len(records) < 2:
+            return {"instrument_id": instrument_id, "status": "unchanged", "reason": "duplicate_role_already_resolved", "stable_id": issue["stable_id"]}
+        if any(
+            not str(
+                (record.get("metadata") or {}).get("role_rule_version") or ""
+            ).startswith("business_profile_")
+            for record in records
+        ):
             return {"instrument_id": instrument_id, "status": "held", "reason": "duplicate_role_requires_review", "stable_id": issue["stable_id"]}
+
+        # Prefer the oldest approved machine role as the current canonical
+        # identity.  The role is a company/report capability; the other rows
+        # are duplicate evidence projections, not independent roles.
+        records.sort(
+            key=lambda record: (
+                record.get("review_status") != "approved",
+                str(record.get("created_at") or ""),
+                str(record.get("record_id") or ""),
+            )
+        )
+        canonical = records[0]
+        canonical_id = str(canonical.get("record_id") or "")
+        duplicate_records = records[1:]
+        for record in duplicate_records:
+            if record.get("review_status") != "approved":
+                continue
+            audits = self.review_service.list_review_audit(
+                record_type="value_chain_roles",
+                record_id=str(record.get("record_id") or ""),
+            )
+            if any(
+                not str(audit.get("reviewer") or "").startswith(
+                    ("system:", "automation:")
+                )
+                for audit in audits
+            ):
+                return {"instrument_id": instrument_id, "status": "held", "reason": "duplicate_role_requires_review", "stable_id": issue["stable_id"]}
+
+        removable = [
+            str(record.get("record_id") or "")
+            for record in duplicate_records
+            if record.get("review_status") == "candidate"
+        ]
         with self.storage.get_connection() as conn:
             self.storage._apply_pragmas(conn)
             conn.execute("BEGIN IMMEDIATE")
@@ -659,12 +698,33 @@ class BusinessProfileSemanticRepairService:
             except Exception:
                 conn.rollback()
                 raise
+
+        held_ids: list[str] = []
+        audit_ids: list[str] = []
+        for record in duplicate_records:
+            if record.get("review_status") != "approved":
+                continue
+            record_id = str(record.get("record_id") or "")
+            audit = self.review_service.system_hold_approved_record(
+                "value_chain_roles",
+                record_id,
+                expected_updated_at=str(record.get("updated_at") or ""),
+                reason="duplicate machine-derived role consolidated into canonical role",
+                metadata={
+                    "repair_issue_id": issue["stable_id"],
+                    "canonical_record_id": canonical_id,
+                },
+            )
+            held_ids.append(record_id)
+            audit_ids.append(str(audit.get("audit_id") or ""))
         return {
             "instrument_id": instrument_id,
             "status": "changed",
-            "reason": "duplicate_machine_roles_deleted",
+            "reason": "duplicate_machine_roles_consolidated",
             "stable_id": issue["stable_id"],
-            "affected_ids": removable,
+            "canonical_record_id": canonical_id,
+            "affected_ids": [*removable, *held_ids],
+            "review_audit_ids": audit_ids,
         }
 
     def _delete_unusable_artifact(
