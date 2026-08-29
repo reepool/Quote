@@ -17645,6 +17645,7 @@ class DataManager:
         from data_sources.hkex_instrument_master import (
             HKEX_PRODUCT_CESSATION_SOURCE,
             is_hkex_sticky_untradable_local,
+            prolonged_suspension_market_from_row,
         )
         allowed_product_types = set(config.get('allowed_product_types') or ['ordinary_equity', 'reit', 'etf'])
         valid_fields = {
@@ -17662,6 +17663,8 @@ class DataManager:
                 continue
             if meta.get('is_canonical') is False:
                 continue
+            official_status = str(row.get('status') or 'active').lower()
+            is_official_suspended = official_status == 'suspended'
             item = {
                 'instrument_id': instrument_id,
                 'symbol': row.get('symbol'),
@@ -17669,9 +17672,13 @@ class DataManager:
                 'exchange': 'HKEX',
                 'type': 'stock',
                 'currency': row.get('currency') or meta.get('counter_currency') or 'HKD',
-                'status': 'active',
+                'status': 'suspended' if is_official_suspended else 'active',
                 'is_active': True,
-                'trading_status': 0 if row.get('trading_status') in (0, '0', False) else 1,
+                'trading_status': (
+                    0
+                    if is_official_suspended or row.get('trading_status') in (0, '0', False)
+                    else 1
+                ),
             }
             local = local_by_id.get(instrument_id) or {}
             if preserve_untradable and local.get('trading_status') in (0, '0', False):
@@ -17688,6 +17695,9 @@ class DataManager:
             ):
                 item['trading_status'] = 0
                 item['source'] = HKEX_PRODUCT_CESSATION_SOURCE
+            market = prolonged_suspension_market_from_row(row)
+            if market:
+                item['market'] = market
             if row.get('listed_date'):
                 item['listed_date'] = row.get('listed_date')
             if row.get('lot_size') is not None:
@@ -17709,7 +17719,9 @@ class DataManager:
             HKEXSourceEvidencePolicy,
             build_quote_availability_diagnostics,
             hkex_official_row_is_untradable,
-            should_skip_prolonged_suspension_reactivation,
+            hkex_source_usage_key,
+            prolonged_suspension_market_from_row,
+            should_write_hkex_reactivation,
         )
 
         config = self._get_hkex_instrument_master_sync_config()
@@ -17813,7 +17825,11 @@ class DataManager:
         allowed_reactivation_count = sum(
             1
             for item in decisions.get('reactivation_candidates', [])
-            if item.get('instrument_id') in allowed_lifecycle_ids
+            if should_write_hkex_reactivation(
+                item,
+                source_evidence_policy,
+                allowed_lifecycle_ids,
+            )
         )
         allowed_suspension_count = sum(
             1
@@ -17891,26 +17907,15 @@ class DataManager:
                         delisted_count += 1
             if official_active_rows:
                 for item in decisions.get('reactivation_candidates', []):
-                    if not source_evidence_policy.get('reactivation_write_allowed'):
-                        continue
-                    local = item.get('local') or {}
-                    official = item.get('official') or {}
-                    local_status = str(local.get('status') or '')
-                    if (
-                        local_status == 'suspended'
-                        and not source_evidence_policy.get('suspension_source_available')
-                    ):
-                        continue
-                    if should_skip_prolonged_suspension_reactivation(
-                        local,
-                        official,
+                    if not should_write_hkex_reactivation(
+                        item,
                         source_evidence_policy,
+                        allowed_lifecycle_ids,
                     ):
-                        continue
-                    if item.get('instrument_id') not in allowed_lifecycle_ids:
                         continue
                     if not hasattr(self.db_ops, 'mark_instrument_active'):
                         continue
+                    official = item.get('official') or {}
                     updated = await self.db_ops.mark_instrument_active(
                         item.get('instrument_id'),
                         source=official.get('source') or 'hkex_securities_list',
@@ -17926,9 +17931,15 @@ class DataManager:
                     official = item.get('official') or {}
                     if not hasattr(self.db_ops, 'mark_instrument_suspended'):
                         continue
+                    suspend_kwargs = {
+                        'source': official.get('source') or 'hkex_official_suspension',
+                    }
+                    market = prolonged_suspension_market_from_row(official)
+                    if market:
+                        suspend_kwargs['market'] = market
                     updated = await self.db_ops.mark_instrument_suspended(
                         item.get('instrument_id'),
-                        source=official.get('source') or 'hkex_official_suspension',
+                        **suspend_kwargs,
                     )
                     if updated:
                         suspended_count += 1
@@ -17950,6 +17961,11 @@ class DataManager:
                         )
 
         after = await self._get_instrument_master_snapshot('HKEX')
+        source_usage: Dict[str, int] = {}
+        for snapshot in source_bundle.get('snapshots') or []:
+            usage_key = hkex_source_usage_key(snapshot)
+            if usage_key:
+                source_usage[usage_key] = snapshot.diagnostics.get('row_count', 0)
         exchange_result = {
             'status': result['status'],
             'mode': selected_mode,
@@ -17967,10 +17983,7 @@ class DataManager:
                 'status_counts': after['status_counts'],
                 'source_counts': after['source_counts'],
             },
-            'source_usage': {
-                snapshot.source: snapshot.diagnostics.get('row_count', 0)
-                for snapshot in source_bundle.get('snapshots') or []
-            },
+            'source_usage': source_usage,
             'source_evidence_policy': source_evidence_policy,
             'official_active_count': len(official_active_rows),
             'official_delisted_count': len(official_delisted_rows),

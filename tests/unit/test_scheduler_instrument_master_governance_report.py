@@ -60,6 +60,7 @@ def test_format_instrument_master_governance_summary_hkex_details():
         },
         "exchanges": {
             "HKEX": {
+                "status": "warning",
                 "mode": "audit_only",
                 "official_active_count": 8,
                 "official_delisted_count": 2,
@@ -70,6 +71,14 @@ def test_format_instrument_master_governance_summary_hkex_details():
                 "source_usage": {
                     "hkex_securities_list": 8,
                     "hkexnews_active_list": 4,
+                    "hkexnews_suspension_report:Main Board": 12,
+                    "hkexnews_suspension_report:GEM": 3,
+                },
+                "source_evidence_policy": {
+                    "prolonged_suspension_markets": {
+                        "Main Board": {"status": "failed", "row_count": 0},
+                        "GEM": {"status": "success", "row_count": 3},
+                    }
                 },
                 "quote_availability": {
                     "no_local_quote_count": 1314,
@@ -83,7 +92,9 @@ def test_format_instrument_master_governance_summary_hkex_details():
 
     assert "HKEX: mode=audit_only，official_active=8，official_delisted=2，supplemental=5，safe_write候选=4" in summary
     assert "HKEX生命周期候选: 可复活=1，可停牌=0" in summary
-    assert "HKEX源: hkex_securities_list:8，hkexnews_active_list:4" in summary
+    assert "HKEX源: hkex_securities_list:8，hkexnews_active_list:4，hkexnews_suspension_report:Main Board:12，hkexnews_suspension_report:GEM:3" in summary
+    assert "HKEX长期停牌月报: Main Board=failed/0，GEM=success/3" in summary
+    assert "HKEX治理未完整，行情沿用库内生命周期" in summary
     assert "HKEX行情诊断: 无本地行情=1314，过旧=1611" in summary
 
 

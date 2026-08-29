@@ -1396,6 +1396,7 @@ class DatabaseOperations:
         instrument_id: str,
         *,
         source: str,
+        market: Optional[str] = None,
     ) -> bool:
         """Mark one instrument suspended using confirmed official lifecycle evidence."""
         if not instrument_id or not source:
@@ -1413,6 +1414,8 @@ class DatabaseOperations:
                 record.is_active = True
                 record.trading_status = 0
                 record.source = source
+                if market:
+                    record.market = str(market).strip()
                 record.updated_at = get_shanghai_time()
                 await session.commit()
                 return True

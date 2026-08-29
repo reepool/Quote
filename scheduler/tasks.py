@@ -2166,9 +2166,21 @@ def _format_instrument_master_governance_summary(governance: Optional[Dict[str, 
         source_usage = hkex.get("source_usage")
         if isinstance(source_usage, dict) and source_usage:
             source_text = "，".join(
-                f"{source}:{count}" for source, count in list(source_usage.items())[:4]
+                f"{source}:{count}" for source, count in list(source_usage.items())[:6]
             )
             lines.append(f"HKEX源: {source_text}")
+        policy = hkex.get("source_evidence_policy") or {}
+        markets = policy.get("prolonged_suspension_markets") if isinstance(policy, dict) else None
+        if isinstance(markets, dict) and markets:
+            market_text = "，".join(
+                f"{name}={info.get('status', 'unknown')}/{info.get('row_count', 0)}"
+                for name, info in markets.items()
+                if isinstance(info, dict)
+            )
+            if market_text:
+                lines.append(f"HKEX长期停牌月报: {market_text}")
+        if str(hkex.get("status") or "") in {"warning", "error"}:
+            lines.append("HKEX治理未完整，行情沿用库内生命周期")
         quote_availability = hkex.get("quote_availability")
         if isinstance(quote_availability, dict):
             lines.append(

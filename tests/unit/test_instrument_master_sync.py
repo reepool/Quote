@@ -171,6 +171,96 @@ def _attach_hkex_mock_db(manager: DataManager, *, local_rows=None):
     return manager.db_ops
 
 
+def test_filter_hkex_safe_write_uses_official_suspended_status_and_market():
+    manager = _manager()
+    rows = manager._filter_hkex_safe_write_rows(
+        [
+            {
+                'instrument_id': '00362.HK',
+                'symbol': '00362',
+                'name': 'CHINA TIANRUI',
+                'status': 'suspended',
+                'trading_status': 0,
+                'source': 'hkexnews_suspension_report',
+                'market': 'Main Board',
+                'product_type': 'ordinary_equity',
+            }
+        ],
+        config=_hkex_sync_config(),
+        metadata_rows=[
+            {
+                'instrument_id': '00362.HK',
+                'product_type': 'ordinary_equity',
+                'is_canonical': True,
+            }
+        ],
+    )
+
+    assert len(rows) == 1
+    assert rows[0]['status'] == 'suspended'
+    assert rows[0]['is_active'] is True
+    assert rows[0]['trading_status'] == 0
+    assert rows[0]['market'] == 'Main Board'
+    assert rows[0]['source'] == 'hkexnews_suspension_report'
+
+
+@pytest.mark.asyncio
+async def test_hkex_source_usage_keeps_main_board_and_gem_separately():
+    manager = _manager()
+    _attach_hkex_mock_db(manager)
+    manager._get_hkex_instrument_master_sync_config = Mock(
+        return_value=_hkex_sync_config("audit_only")
+    )
+    manager._fetch_hkex_instrument_master_sources = AsyncMock(return_value={
+        'snapshots': [
+            HKEXProviderSnapshot(
+                source='hkexnews_suspension_report',
+                source_url='fixture://mb',
+                parser_version='test',
+                raw_snapshot_hash='mb',
+                rows=[{
+                    'instrument_id': '00005.HK',
+                    'status': 'suspended',
+                    'source': 'hkexnews_suspension_report',
+                    'market': 'Main Board',
+                }],
+                diagnostics={'row_count': 12, 'market': 'Main Board'},
+            ),
+            HKEXProviderSnapshot(
+                source='hkexnews_suspension_report',
+                source_url='fixture://gem',
+                parser_version='test',
+                raw_snapshot_hash='gem',
+                rows=[{
+                    'instrument_id': '00823.HK',
+                    'status': 'suspended',
+                    'source': 'hkexnews_suspension_report',
+                    'market': 'GEM',
+                }],
+                diagnostics={'row_count': 3, 'market': 'GEM'},
+            ),
+        ],
+        'official_active_rows': [],
+        'official_delisted_rows': [],
+        'supplemental_rows': [],
+        'suspension_rows': [],
+        'untradable_rows': [],
+        'warnings': [],
+        'errors': [],
+        'prolonged_suspension_markets': {
+            'Main Board': {'status': 'success', 'row_count': 12},
+            'GEM': {'status': 'success', 'row_count': 3},
+        },
+    })
+
+    result = await manager.sync_hkex_instrument_master()
+
+    assert result['exchanges']['HKEX']['source_usage'] == {
+        'hkexnews_suspension_report:Main Board': 12,
+        'hkexnews_suspension_report:GEM': 3,
+    }
+
+
 def test_hkex_active_merge_preserves_primary_product_classification():
     manager = _manager()
 
@@ -845,6 +935,10 @@ async def test_hkex_sync_suspension_evidence_marks_trading_status_zero(tmp_path)
     assert result['exchanges']['HKEX']['official_suspension_count'] == 1
     manager.db_ops.mark_instrument_suspended.assert_awaited_once()
     assert manager.db_ops.mark_instrument_suspended.await_args.args[0] == '00005.HK'
+    assert manager.db_ops.mark_instrument_suspended.await_args.kwargs['source'] == (
+        'hkexnews_suspension_report'
+    )
+    assert manager.db_ops.mark_instrument_suspended.await_args.kwargs['market'] == 'Main Board'
 
 
 @pytest.mark.asyncio
@@ -894,6 +988,11 @@ async def test_hkex_trading_halt_announcement_marks_short_halt_and_does_not_reac
     manager.db_ops.mark_instrument_suspended.assert_awaited_once()
     assert manager.db_ops.mark_instrument_suspended.await_args.args[0] == '00005.HK'
     assert manager.db_ops.mark_instrument_suspended.await_args.kwargs['source'] == 'hkexnews_trading_halt'
+    assert manager.db_ops.mark_instrument_suspended.await_args.kwargs.get('market') in {
+        None,
+        'Main Board',
+        'GEM',
+    }
     manager.db_ops.mark_instrument_active.assert_not_awaited()
     assert result['exchanges']['HKEX']['source_evidence_policy']['suspension_source_available'] is True
     assert result['exchanges']['HKEX']['official_suspension_count'] == 1
@@ -1243,6 +1342,9 @@ async def test_hkex_failed_main_board_pdf_does_not_reactivate_from_gem_list(tmp_
     assert policy['prolonged_suspension_all_configured_available'] is False
     assert policy['prolonged_suspension_source_available'] is True
     assert any('Main Board' in warning for warning in result['exchanges']['HKEX']['warnings'])
+    assert result['exchanges']['HKEX']['source_usage']['hkexnews_suspension_report:GEM'] == 1
+    assert 'hkexnews_suspension_report:Main Board' not in result['exchanges']['HKEX']['source_usage']
+    assert result['exchanges']['HKEX']['allowed_reactivation_count'] == 1
 
 
 @pytest.mark.asyncio

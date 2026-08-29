@@ -15,7 +15,7 @@ import time
 from dataclasses import dataclass, field
 from datetime import date, datetime, timezone
 from io import BytesIO, StringIO
-from typing import Any, Dict, Iterable, List, Mapping, Optional, Set, Tuple
+from typing import AbstractSet, Any, Dict, Iterable, List, Mapping, Optional, Set, Tuple
 
 import pandas as pd
 
@@ -1778,6 +1778,45 @@ def should_skip_prolonged_suspension_reactivation(
     if str(official_row.get("source") or "") not in HKEX_LISTING_PRESENCE_SOURCES:
         return False
     return not allow_prolonged_suspension_reactivation(local_row, policy)
+
+
+def hkex_source_usage_key(snapshot: Any) -> str:
+    """Return a report key that keeps Main Board / GEM PDFs distinct."""
+    source = str(getattr(snapshot, "source", "") or "").strip()
+    if source == HKEX_PROLONGED_SUSPENSION_SOURCE:
+        market = _snapshot_prolonged_suspension_market(snapshot)
+        if market:
+            return f"{source}:{market}"
+    return source
+
+
+def should_write_hkex_reactivation(
+    item: Optional[Mapping[str, Any]],
+    policy: Optional[Mapping[str, Any]],
+    allowed_lifecycle_ids: Optional[AbstractSet[str]] = None,
+) -> bool:
+    """Return True when a reactivation candidate would actually be written."""
+    payload = item or {}
+    instrument_id = payload.get("instrument_id")
+    if not instrument_id:
+        return False
+    if allowed_lifecycle_ids is not None and instrument_id not in allowed_lifecycle_ids:
+        return False
+    policy_payload = policy or {}
+    if not policy_payload.get("reactivation_write_allowed"):
+        return False
+    local = payload.get("local") or {}
+    official = payload.get("official") or {}
+    if (
+        str(local.get("status") or "") == "suspended"
+        and not policy_payload.get("suspension_source_available")
+    ):
+        return False
+    return not should_skip_prolonged_suspension_reactivation(
+        local,
+        official,
+        policy_payload,
+    )
 
 
 class HKEXSourceEvidencePolicy:

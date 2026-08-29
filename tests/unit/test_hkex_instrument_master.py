@@ -17,7 +17,9 @@ from data_sources.hkex_instrument_master import (
     classify_hkex_product,
     hkex_instrument_id,
     normalize_hkex_code,
+    hkex_source_usage_key,
     should_skip_prolonged_suspension_reactivation,
+    should_write_hkex_reactivation,
 )
 from research.announcements import AnnouncementRecord, build_announcement_key
 
@@ -244,6 +246,32 @@ def test_suspension_parse_pdf_uses_shared_profile_router(monkeypatch):
     assert snapshot.rows[0]["instrument_id"] == "02323.HK"
 
 
+def test_suspension_native_pdf_with_approved_gpu_profile_bypasses_unavailable_worker(monkeypatch, tmp_path):
+    from data_sources.hkex_instrument_master import HKEXSuspensionReportProvider
+    from tests.unit.pdf_gpu_caller_test_support import (
+        configure_approved_gpu_profile_with_unavailable_worker,
+        text_pdf_bytes,
+    )
+
+    worker_calls = configure_approved_gpu_profile_with_unavailable_worker(monkeypatch, tmp_path)
+    snapshot = HKEXSuspensionReportProvider(
+        source_url="fixture://psuspenrep_mb.pdf",
+        market="Main Board",
+        profile_name="pdfium_paddleocr_gpu",
+    ).parse_pdf(
+        text_pdf_bytes(
+            "11 Renco Holdings",
+            "(2323)",
+            "20-Jan-2025 19-Jul-2026 1. Conduct an investigation",
+            "Link to HKEXnews",
+        )
+    )
+
+    assert snapshot.rows[0]["instrument_id"] == "02323.HK"
+    assert snapshot.diagnostics["pdf_profile"] == "pdfium_paddleocr_gpu"
+    assert worker_calls == []
+
+
 def test_source_evidence_policy_treats_empty_suspension_snapshot_as_unavailable():
     official = HKEXSecuritiesListProvider(
         source_url="fixture://hkex_securities_list.csv"
@@ -363,6 +391,80 @@ def test_listing_presence_cannot_clear_pdf_suspension_from_failed_market():
         resumption,
         policy,
     )
+
+
+def test_source_usage_key_keeps_main_board_and_gem_separate():
+    main_board = HKEXSuspensionReportProvider(
+        source_url="fixture://psuspenrep_mb.pdf",
+        market="Main Board",
+    ).parse_text(
+        """
+        1  HSBC HOLDINGS
+        (5)
+        20-Jan-2025 19-Jul-2026 1. Conduct an independent forensic investigation
+        Link to HKEXnews
+        """
+    )
+    gem = HKEXSuspensionReportProvider(
+        source_url="fixture://psuspenrep_gem.pdf",
+        market="GEM",
+    ).parse_text(
+        """
+        1  LINK REIT
+        (823)
+        20-Jan-2025 19-Jul-2026 1. Conduct an independent forensic investigation
+        Link to HKEXnews
+        """
+    )
+    listing = HKEXProviderSnapshot(
+        source="hkex_securities_list",
+        source_url="fixture://list",
+        parser_version="test",
+        raw_snapshot_hash="list",
+        rows=[],
+        diagnostics={"row_count": 8},
+    )
+
+    assert hkex_source_usage_key(main_board) == "hkexnews_suspension_report:Main Board"
+    assert hkex_source_usage_key(gem) == "hkexnews_suspension_report:GEM"
+    assert hkex_source_usage_key(listing) == "hkex_securities_list"
+
+
+def test_should_write_hkex_reactivation_matches_write_gates():
+    policy = {
+        "reactivation_write_allowed": True,
+        "suspension_source_available": True,
+        "prolonged_suspension_available_markets": ["GEM"],
+        "prolonged_suspension_all_configured_available": False,
+    }
+    listing = {"source": "hkex_securities_list", "status": "active"}
+    skipped = {
+        "instrument_id": "00005.HK",
+        "local": {
+            "status": "suspended",
+            "source": "hkexnews_suspension_report",
+            "market": "Main Board",
+        },
+        "official": listing,
+    }
+    allowed = {
+        "instrument_id": "00823.HK",
+        "local": {
+            "status": "suspended",
+            "source": "hkexnews_suspension_report",
+            "market": "GEM",
+        },
+        "official": listing,
+    }
+    allowed_ids = {"00005.HK", "00823.HK"}
+
+    assert should_write_hkex_reactivation(skipped, policy, allowed_ids) is False
+    assert should_write_hkex_reactivation(allowed, policy, allowed_ids) is True
+    assert should_write_hkex_reactivation(
+        allowed,
+        {**policy, "reactivation_write_allowed": False},
+        allowed_ids,
+    ) is False
 
 
 def test_manual_review_provider_turns_operator_conclusions_into_lifecycle_evidence():
