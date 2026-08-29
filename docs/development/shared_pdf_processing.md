@@ -10,8 +10,9 @@ table interpretation, evidence gates, and database writes.
 - `pypdf_native`: configuration-only rollback profile.
 - `pdfium_paddleocr_cpu`: PDFium-first native chain with an isolated CPU OCR
   worker for explicit page recovery.
-- `pdfium_paddleocr_gpu`: canary-only GPU worker profile. It is rejected unless
-  a new expanded PDFium-rendered approval and a healthy isolated worker exist.
+- `pdfium_paddleocr_gpu`: canary-only GPU profile. It is rejected unless a new
+  expanded PDFium-rendered static approval exists; a healthy isolated worker is
+  required only when an uncached page is routed to GPU OCR.
 
 `pdf-inspector` is no longer a production native engine. It remains installed
 only for existing evaluator/classifier/OCR roles until those roles have a

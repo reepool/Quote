@@ -32,6 +32,24 @@ def test_official_index_pdf_text_uses_authoritative_shared_router(monkeypatch):
     assert calls == ["pdfium_native"]
 
 
+def test_official_index_native_pdf_with_approved_gpu_profile_bypasses_unavailable_worker(monkeypatch, tmp_path):
+    from tests.unit.pdf_gpu_caller_test_support import (
+        configure_approved_gpu_profile_with_unavailable_worker,
+        text_pdf_bytes,
+    )
+
+    worker_calls = configure_approved_gpu_profile_with_unavailable_worker(monkeypatch, tmp_path)
+    monkeypatch.setenv("QUOTE_PDF_ENGINE_PROFILE", "pdfium_paddleocr_gpu")
+
+    text = OfficialIndexLifecycleParser.extract_pdf_text(
+        text_pdf_bytes("Index lifecycle notice", "The index will terminate on 31-Dec-2026.")
+    )
+
+    assert "Index lifecycle notice" in text
+    assert "31-Dec-2026" in text
+    assert worker_calls == []
+
+
 def test_cnindex_index_list_excel_parses_master_rows():
     frame = pd.DataFrame([
         {
