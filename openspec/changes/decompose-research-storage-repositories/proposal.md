@@ -24,5 +24,5 @@ None.
 ## Impact
 
 - Affects `research/storage.py`, `research/migrations/`, research services, scripts that construct storage, and storage contract tests.
-- Depends on W4 application-service boundaries so consumers can migrate to narrow interfaces.
+- Depends on W4 application-service boundaries so consumers can migrate to narrow interfaces. W5 may be implemented per domain slice as soon as that slice's W4 service boundary is accepted; it does not require all of W4 to finish first. The framework matrix records this as `W4（按已验收域切片可穿插）`.
 - Implements W5, FR-07, and FR-11 while preserving database layout and production data.

@@ -1,6 +1,6 @@
 ## Context
 
-`ResearchStorageManager` contains 212 methods, multiple database scopes, cross-domain SQL, schema initialization, migrations, and compatibility helpers. Many services import the entire manager even when they use one table family. Existing financial repository code and coordinated SQLite wrappers provide migration patterns that can be reused without merging databases.
+`ResearchStorageManager` contains about 220 methods, multiple database scopes, cross-domain SQL, schema initialization, migrations, and compatibility helpers. Many services import the entire manager even when they use one table family. Existing financial repository code and coordinated SQLite wrappers provide migration patterns that can be reused without merging databases.
 
 ## Goals / Non-Goals
 
@@ -25,6 +25,7 @@
 3. **Split schema by owner using existing migrations.** The manager's table initializer becomes explicit idempotent schema modules/migrations, with no destructive table rebuild.
 4. **Retain a delegating ResearchStorageManager.** Existing imports continue to work while new services migrate to repositories; delegates carry removal metadata.
 5. **Preserve attach and financial scope behavior.** Any cross-database read remains an explicit operation with tests; repository splitting must not create hidden cross-database writes.
+6. **Treat W4 as a domain-boundary dependency, not a whole-workstream barrier.** A repository slice may start only after its corresponding W4 application-service boundary is accepted; unrelated W5 slices may proceed while other W4 slices remain unfinished.
 
 Alternatives rejected: merging all tables would change operational failure domains; a new ORM would add risk; copying SQL into repositories without shared transaction ownership would create a second storage implementation.
 

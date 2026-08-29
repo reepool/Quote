@@ -18,8 +18,10 @@
 - [ ] 3.3 Extract valuation repository while preserving compact payload, database scope, and history semantics.
 - [ ] 3.4 Extract financial repositories while preserving `financials.db`, source manifests, facts, mappings, and coverage queries.
 - [ ] 3.5 Extract reports and sentiment repositories in an owner-bounded slice.
-- [ ] 3.6 Extract risk, technical, and profile repositories in an owner-bounded slice.
-- [ ] 3.7 Extract the risk-free-rate repository in an owner-bounded slice.
+- [ ] 3.6 Extract the risk repository in an owner-bounded slice.
+- [ ] 3.7 Extract the technical repository in an owner-bounded slice.
+- [ ] 3.8 Extract the profile repository in an owner-bounded slice.
+- [ ] 3.9 Extract the risk-free-rate repository in an owner-bounded slice.
 
 ## 4. Compatibility And Consumers
 

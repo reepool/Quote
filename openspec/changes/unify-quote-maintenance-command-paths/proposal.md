@@ -26,4 +26,4 @@ None.
 
 - Affects `data_manager.py`, quote/gap scripts, scheduler quote tasks, Telegram handlers, API management routes, and quote maintenance tests.
 - Depends on the instrument identity and authoritative equity-calendar boundary from W2.
-- Implements W3, FR-01, FR-02, FR-06, and FR-12 without expanding market coverage.
+- Implements W3, FR-01, FR-02, FR-06, FR-12, and FR-16 without expanding market coverage.

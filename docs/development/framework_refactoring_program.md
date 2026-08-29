@@ -39,6 +39,7 @@
 - 不在生产数据库上进行重构试验；
 - 不改变复权、交易日、可得日、生命周期和回测时点口径；
 - 不在迁移期运行两套会同时写同一业务数据的实现；
+- 同一核心文件集合（包括 `data_manager.py`、`research/storage.py`、`scheduler/tasks.py`、`api/routes.py` 和 `database/operations.py`）同一时间只允许一个直接修改它的 change 处于 active；
 - 每个 change 在合并前具备可回滚点和代表性业务验证。
 
 任何工作流如果无法证明这些不变量，应暂停实施，不能以“只是重构”为由继续。
@@ -265,7 +266,7 @@ W2 标识/主数据/股票日历
           W1-W9 -----------------> W8 遗留清理
 ```
 
-允许 W3、W4、W6 在 W2 稳定后并行规划，但由于三者都触碰 `data_manager.py`，实施必须按文件单写者原则串行；真实关键路径为 W1 → W2 →（W3、W4、W6 依次实施，W5 穿插在 W4 的域切片中）→ W7 → W8。W7 依赖应用服务已经存在，不能只做机械拆文件。W8 必须最后执行。
+允许 W3、W4、W6 在 W2 稳定后并行规划，但由于它们触碰同一核心文件集合，实施必须按文件单写者原则串行；真实关键路径为 W1 → W2 →（W3、W4、W6 依次实施，W5 穿插在 W4 的域切片中）→（W7 与 W9 按各自域完成）→ W8。W7/W9 依赖应用服务已经存在，不能只做机械拆文件。W8 必须最后执行。
 
 ## 7. 文档清理需求
 
@@ -300,7 +301,6 @@ W2 标识/主数据/股票日历
 
 - 根目录 `implementation_plan.md`；
 
-- 一次性修复说明：`docs/INSTRUMENT_DOWNLOAD_UPDATE.md`；
 - API 需求回执：`quote_api_data_capability_response.md`、`quote_api_data_confirmation_response.md`；
 - 已完成迁移计划：`quote_data_volume_cleanup.md`、`quote_data_volume_migration.md`；
 - 阶段性 shadow/baseline/pilot/benchmark 文档；
@@ -333,9 +333,9 @@ W2 标识/主数据/股票日历
 | W2 | `unify-instrument-master-and-identity-boundaries` | apply-ready（0/16） | W1 |
 | W3 | `unify-quote-maintenance-command-paths` | apply-ready（0/23） | W2 |
 | W4 | `extract-research-application-services` | apply-ready（0/22） | W2 |
-| W5 | `decompose-research-storage-repositories` | apply-ready（0/21） | W4 |
-| W6 | `extract-corporate-action-application-services` | apply-ready（0/21） | W2 |
-| W7 | `split-scheduler-domain-task-adapters` | apply-ready（0/23） | W3、W4、W6 |
+| W5 | `decompose-research-storage-repositories` | apply-ready（0/23） | W4（按已验收域切片可穿插） |
+| W6 | `extract-corporate-action-application-services` | apply-ready（0/20） | W2 |
+| W7 | `split-scheduler-domain-task-adapters` | apply-ready（0/25） | W3、W4、W6 |
 | W9 | `split-api-domain-route-adapters` | apply-ready（0/14） | W2、W3、W4、W6 |
 | W8 | `retire-obsolete-entry-points-and-tools` | apply-ready（0/18） | W1-W7、W9 |
 

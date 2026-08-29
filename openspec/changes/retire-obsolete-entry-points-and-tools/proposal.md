@@ -25,5 +25,5 @@ None.
 ## Impact
 
 - Affects compatibility facades, `scripts/`, root probe files, old operational helpers, docs, tests, and OpenSpec lifecycle.
-- Depends on W1 through W7 and is intentionally the final implementation workstream.
+- Depends on W1 through W7 and W9 and is intentionally the final implementation workstream.
 - Implements W8, FR-02, FR-12, and FR-13 without deleting production or recovery capabilities.

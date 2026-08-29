@@ -24,6 +24,7 @@ The API is a public entry point, not an application-service owner. `api/routes.p
 3. **Make backtest ownership explicit.** Existing `BacktestQuoteStore` and `FinancialVintageStore` remain their current storage implementations initially, behind a named backtest query boundary; no data-store merge is implied.
 4. **Keep compatibility at assembly level.** Existing imports of `api.routes.router` continue to work while endpoint functions move to domain modules.
 5. **Migrate in vertical slices.** Each route family moves with dependency wiring, response snapshots, and a rollback binding before the next family.
+6. **Keep route-file ownership singular.** W4 may rebind the minimum research endpoints required to prove service extraction; the file-level decomposition of `api/routes.py` and final route-family ownership belongs exclusively to W9.
 
 ## Migration Plan
 

@@ -60,5 +60,5 @@ Status-complete changes SHALL be archived after durable specs are current and no
 The retirement workstream SHALL report remaining production script imports, Telegram subprocess production paths, compatibility callers, obsolete candidates, and unarchived complete changes.
 
 #### Scenario: Framework program is proposed complete
-- **WHEN** W1 through W8 acceptance is evaluated
+- **WHEN** W1 through W9 acceptance is evaluated
 - **THEN** each residue count is zero or has an explicit external blocker recorded in the program

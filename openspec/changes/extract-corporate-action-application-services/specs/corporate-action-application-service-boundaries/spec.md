@@ -49,6 +49,13 @@ Extraction MUST preserve current TDX/CNInfo/manual evidence, accepted decisions,
 - **WHEN** the pre-migration and extracted paths process the fixture
 - **THEN** canonical events, factor rows, and adjusted quote outputs are equivalent
 
+### Requirement: The extraction baseline includes completed triage behavior
+Corporate-action service extraction MUST use the post-`triage-announcement-only-xdxr-candidates` behavior as its baseline and preserve announcement-only modes, provisional case metadata, inactive-watch/reactivation semantics, and associated reports.
+
+#### Scenario: Announcement-only case is replayed during W6 extraction
+- **WHEN** the extracted stages process a fixture created after the triage slice
+- **THEN** mode behavior, case lineage, inactive-watch/reactivation outcomes, and report fields remain equivalent while canonical promotion ownership stays unchanged
+
 ### Requirement: Compatibility paths do not duplicate logic
 Retained DataManager and operator methods SHALL delegate to stage services and SHALL be removed after their callers migrate.
 
