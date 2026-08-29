@@ -131,5 +131,5 @@ OpenSpec CLI 位于：
 - `framework_refactoring_program.md`：框架改造需求和进度；
 - `open_issues_backlog.md`：当前数据能力问题；
 - `research_data_engine_execution.md`：研究引擎实施主线；
-- `../architecture.md`：系统架构概览，待 W1 按当前代码重写；
+- `../architecture.md`：按当前代码和配置维护的系统架构概览；
 - `../README.md`：完整文档索引。

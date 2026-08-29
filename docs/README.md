@@ -11,7 +11,7 @@
 
 ## 当前系统
 
-- `docs/architecture.md`：系统架构概览；框架改造 W1 将按当前代码重写
+- `docs/architecture.md`：按当前代码和配置维护的系统架构概览
 - `docs/api/restful_api.md`：RESTful API 参考
 - `docs/configuration/config_file.md`：分文件配置参考
 - `docs/database_guide.md`：SQLite 存储布局与调优

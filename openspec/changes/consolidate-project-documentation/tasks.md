@@ -8,10 +8,10 @@
 
 ## 2. Current Documentation
 
-- [ ] 2.1 Finalize `project_development_governance.md`, `framework_refactoring_program.md`, and their mandatory AGENTS references.
-- [ ] 2.2 Rewrite `docs/architecture.md` from current code/configuration, including modular boundaries, databases, entry points, and canonical paths.
-- [ ] 2.3 Replace the historical development guide with the concise current developer entry and verification workflow.
-- [ ] 2.4 Rebuild `docs/README.md` as the only current index and add lifecycle labels or sections that distinguish current, runbook, and active requirements.
+- [x] 2.1 Finalize `project_development_governance.md`, `framework_refactoring_program.md`, and their mandatory AGENTS references.
+- [x] 2.2 Rewrite `docs/architecture.md` from current code/configuration, including modular boundaries, databases, entry points, and canonical paths.
+- [x] 2.3 Replace the historical development guide with the concise current developer entry and verification workflow.
+- [x] 2.4 Rebuild `docs/README.md` as the only current index and add lifecycle labels or sections that distinguish current, runbook, and active requirements.
 
 ## 3. Capability Consolidation
 
@@ -25,6 +25,6 @@
 
 - [ ] 4.1 Archive status-complete OpenSpec changes whose durable requirements are current and whose live artifacts have no active dependency.
 - [ ] 4.2 Run Markdown link/path checks and repository reference scans for all deleted or renamed documents.
-- [ ] 4.3 Verify production code, configuration, scheduler catalog, and database files are unchanged by the documentation-only change.
+- [x] 4.3 Verify production code, configuration, scheduler catalog, and database files are unchanged by the documentation-only change.
 - [ ] 4.4 Update `framework_refactoring_program.md` W1 status and document unresolved cleanup candidates with concrete blockers.
 - [ ] 4.5 Record the completed `triage-announcement-only-xdxr-candidates` change's archive decision separately from the broader W6 implementation baseline.
