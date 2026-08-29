@@ -95,3 +95,20 @@ The semantic verifier request and response MUST identify targets using a bounded
 #### Scenario: Batch indices are malformed
 - **WHEN** a response repeats, omits, or invents an index
 - **THEN** only decisions with valid unique in-range indices MAY be accepted, the affected targets MUST become machine rework, and the issue MUST be classified as a schema/identity failure rather than provider congestion
+
+### Requirement: Failed semantic state is deleted before another reuse attempt
+The runtime MUST NOT replay a semantic artifact whose latest conversion state is a
+deterministic failure. `conversion_pending` is reusable only when its latest reason
+code explicitly records a governed unit-rule reopening; schema, context, numeric,
+identity, and normalization failures MUST require fresh extraction. The local repair
+service MUST physically delete failed receipts, their unapproved run outputs, and
+terminal/machine-rework work items in an explicit apply operation while preserving
+source evidence, approved history, and immutable review audit.
+
+#### Scenario: Failed conversion is encountered on a rerun
+- **WHEN** a matching artifact has latest status `conversion_pending` with a non-unit-rule failure reason
+- **THEN** replay lookup MUST return no artifact and the next run MUST perform fresh extraction
+
+#### Scenario: Operator purges unsuccessful historical state
+- **WHEN** `business_profile_semantic_repair` runs with `apply=true`
+- **THEN** rejected artifacts, deterministic-failure pending artifacts, candidate outputs explicitly listed by those runs, and terminal/machine-rework work items MUST be deleted transactionally and the report MUST list every affected id

@@ -145,7 +145,10 @@ class BusinessProfileSemanticArtifactRepository:
                 SELECT a.*,
                        (SELECT status FROM business_profile_semantic_artifact_events e
                         WHERE e.artifact_id = a.artifact_id
-                        ORDER BY e.created_at DESC, e.rowid DESC LIMIT 1) latest_status
+                        ORDER BY e.created_at DESC, e.rowid DESC LIMIT 1) latest_status,
+                       (SELECT reason_code FROM business_profile_semantic_artifact_events e
+                        WHERE e.artifact_id = a.artifact_id
+                        ORDER BY e.created_at DESC, e.rowid DESC LIMIT 1) latest_reason_code
                 FROM business_profile_semantic_artifacts a
                 WHERE instrument_id = ? AND source_document_id = ?
                   AND document_hash = ? AND report_period = ? AND field_family = ?
@@ -165,11 +168,19 @@ class BusinessProfileSemanticArtifactRepository:
                     identity.schema_version,
                 ),
             ).fetchone()
-        if row is None or str(row["latest_status"]) not in {
-            "received",
-            "conversion_pending",
-            "replayed",
-        }:
+        if row is None:
+            return None
+        latest_status = str(row["latest_status"] or "")
+        latest_reason = str(row["latest_reason_code"] or "")
+        # A failed conversion is not a reusable semantic result.  The only
+        # pending state that may be replayed is one explicitly reopened by a
+        # governed unit-rule change; all other pending states must be freshly
+        # extracted instead of looping over the same bad response.
+        replayable = latest_status in {"received", "replayed"} or (
+            latest_status == "conversion_pending"
+            and latest_reason.startswith("unit_rule_")
+        )
+        if not replayable:
             return None
         return self._decode(dict(row))
 

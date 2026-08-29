@@ -29,6 +29,7 @@
 - [x] 4.2 Audit inventory-derived storage roles, duplicate role identities, broad-identity contract conflicts, and incompatible reusable artifacts with stable ids, evidence, proposed action, and reason codes.
 - [x] 4.3 Apply only evidence-positive corrections transactionally per instrument/group; delete unreferenced invalid machine-derived candidates and terminal work items while preserving evidence and valid approved history, replay dependent publications, and hold unreconstructable cases.
 - [x] 4.6 Add a bounded operator cleanup/re-extraction path for incompatible legacy semantic artifacts; default reuse must not select those artifacts and apply removes their persisted receipts so the next run performs fresh extraction.
+- [x] 4.7 Delete deterministic-failure semantic receipts and their unapproved run outputs, exclude them from replay, and add an explicit regression test for failed-conversion reruns and idempotent cleanup.
 - [x] 4.4 Make repair idempotent, network/LLM-free, and explicit about `would_change`, `changed`, `unchanged`, `held`, and `failed`; prove audit performs zero writes.
 - [x] 4.5 Verify repair/replay calls the existing repository, temporal, promotion, and publication owners and contains no direct parallel table-writing algorithm.
 

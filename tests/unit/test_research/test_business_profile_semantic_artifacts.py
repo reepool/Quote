@@ -62,7 +62,7 @@ def _identity(**overrides):
     return SemanticArtifactIdentity(**values)
 
 
-def test_semantic_artifact_is_idempotent_and_exact_scope_replayable(tmp_path):
+def test_semantic_artifact_failed_conversion_is_not_replayable(tmp_path):
     storage = _Storage(tmp_path / "research.db")
     repository = BusinessProfileSemanticArtifactRepository(storage)
     first = repository.receive(
@@ -80,8 +80,25 @@ def test_semantic_artifact_is_idempotent_and_exact_scope_replayable(tmp_path):
     )
     assert first["artifact_id"] == second["artifact_id"]
     repository.mark(first["artifact_id"], "conversion_pending")
-    assert repository.find_replay(_identity())["artifact_id"] == first["artifact_id"]
+    assert repository.find_replay(_identity()) is None
     assert repository.find_replay(_identity(input_hash="d" * 64)) is None
+
+
+def test_semantic_artifact_replay_reopens_only_after_unit_rule_change(tmp_path):
+    storage = _Storage(tmp_path / "research.db")
+    repository = BusinessProfileSemanticArtifactRepository(storage)
+    artifact = repository.receive(
+        _identity(),
+        response={"rows": [{"unit_raw": "万盒", "value": 10}]},
+        response_hash="",
+        evidence_ids=["span-1"],
+    )
+    repository.mark(
+        artifact["artifact_id"],
+        "conversion_pending",
+        reason_code="unit_rule_auto_approved",
+    )
+    assert repository.find_replay(_identity())["artifact_id"] == artifact["artifact_id"]
 
 
 def test_semantic_artifact_latest_event_uses_insertion_order_for_tied_timestamps(

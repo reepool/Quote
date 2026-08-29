@@ -101,7 +101,7 @@ class BusinessProfileSemanticRepairService:
     def _all_local_instrument_ids(self) -> list[str]:
         tables = (
             "shareholder_snapshots",
-            "company_business_profile_relationships",
+            "company_supply_chain_relationships",
             "company_commodity_exposures",
             "company_business_activities",
             "company_operating_facts",
@@ -241,6 +241,12 @@ class BusinessProfileSemanticRepairService:
                 continue
             if str(metadata.get("runtime_schema_version") or "") == RUNTIME_SCHEMA_VERSION:
                 continue
+            # A stale runtime version alone does not make a completed result
+            # garbage.  Only runs whose persisted record identities are
+            # demonstrably legacy are unsafe to reuse.  Receipts with explicit
+            # failure/legacy payloads are classified separately below.
+            if not self._metadata_has_legacy_occurrence_identity(metadata):
+                continue
             findings.append(
                 self._issue(
                     "incompatible_reusable_artifact",
@@ -269,12 +275,18 @@ class BusinessProfileSemanticRepairService:
                 (instrument_id,),
             ).fetchall()
             event_rows = conn.execute(
-                "SELECT artifact_id, status FROM business_profile_semantic_artifact_events "
+                "SELECT artifact_id, status, reason_code FROM business_profile_semantic_artifact_events "
                 "WHERE artifact_id IN (SELECT artifact_id FROM business_profile_semantic_artifacts WHERE instrument_id = ?) "
                 "AND rowid IN (SELECT MAX(rowid) FROM business_profile_semantic_artifact_events GROUP BY artifact_id)",
                 (instrument_id,),
             ).fetchall()
-        latest_status = {str(row["artifact_id"]): str(row["status"]) for row in event_rows}
+        latest_event = {
+            str(row["artifact_id"]): {
+                "status": str(row["status"] or ""),
+                "reason_code": str(row["reason_code"] or ""),
+            }
+            for row in event_rows
+        }
         known = {
             str(item.get("details", {}).get("artifact_id") or "")
             for item in findings
@@ -286,26 +298,59 @@ class BusinessProfileSemanticRepairService:
             except (TypeError, ValueError, json.JSONDecodeError):
                 response = {}
             legacy = self._response_has_legacy_occurrence_identity(response)
-            rejected = latest_status.get(artifact_id) in {"rejected", "conversion_pending"}
-            if not legacy and not rejected:
+            event = latest_event.get(artifact_id, {})
+            latest_status = str(event.get("status") or "")
+            latest_reason = str(event.get("reason_code") or "")
+            failed = latest_status == "rejected" or (
+                latest_status == "conversion_pending"
+                and not latest_reason.startswith("unit_rule_")
+            )
+            if not legacy and not failed:
                 continue
             if artifact_id in known:
                 continue
+            issue_code = "failed_semantic_artifact" if failed else "legacy_semantic_artifact"
             findings.append(
                 self._issue(
-                    "legacy_semantic_artifact",
+                    issue_code,
                     instrument_id,
                     {
                         "artifact_id": artifact_id,
                         "field_family": row["field_family"],
                         "source_document_id": row["source_document_id"],
-                        "latest_status": latest_status.get(artifact_id),
+                        "latest_status": latest_status,
+                        "latest_reason_code": latest_reason,
                         "legacy_occurrence_identity": legacy,
                         "proposed_action": "delete_and_reextract",
                     },
                 )
             )
         return findings
+
+    def _metadata_has_legacy_occurrence_identity(self, metadata: dict[str, Any]) -> bool:
+        """Check persisted record ids before treating an old run as garbage."""
+
+        record_ids = dict(metadata.get("record_ids") or {})
+        for record_type, values in record_ids.items():
+            for record_id in values or ():
+                record = self.repository.get_record(str(record_type), str(record_id))
+                if not isinstance(record, dict):
+                    continue
+                if str(record_type) == "activities":
+                    if str(record.get("action") or "") not in {
+                        "produces", "sells", "purchases", "consumes", "stores", "transports"
+                    }:
+                        continue
+                    metadata_row = record.get("metadata") or {}
+                    if not str(metadata_row.get("source_row_key") or "").strip() and not str(
+                        metadata_row.get("contract_reference_raw") or ""
+                    ).strip():
+                        return True
+                elif str(record_type) == "operating_facts":
+                    metadata_row = record.get("metadata") or {}
+                    if not str(metadata_row.get("source_row_key") or "").strip():
+                        return True
+        return False
 
     @staticmethod
     def _response_has_legacy_occurrence_identity(response: Any) -> bool:
@@ -492,7 +537,11 @@ class BusinessProfileSemanticRepairService:
                         "reason": issue["code"],
                         "stable_id": issue["stable_id"],
                     })
-            elif issue["code"] in {"incompatible_reusable_artifact", "legacy_semantic_artifact"}:
+            elif issue["code"] in {
+                "incompatible_reusable_artifact",
+                "legacy_semantic_artifact",
+                "failed_semantic_artifact",
+            }:
                 changes.append(self._delete_unusable_artifact(instrument_id, issue))
             elif issue["code"] == "failed_work_item":
                 # Deletion is performed once per instrument below so duplicate
@@ -545,11 +594,12 @@ class BusinessProfileSemanticRepairService:
     def _delete_unusable_artifact(
         self, instrument_id: str, issue: dict[str, Any]
     ) -> dict[str, Any]:
-        """Physically remove only a rejected/legacy model receipt.
+        """Physically remove a failed/legacy model receipt and its junk outputs.
 
-        Evidence and governed records are intentionally untouched.  Removing
-        the receipt prevents the old response from being selected again; the
-        next backfill must perform a fresh extraction.
+        Only candidate records explicitly listed by the failed semantic run are
+        removed.  Evidence, approved history, and review audit rows remain
+        immutable.  Removing the receipt prevents the failed response from
+        being selected again; the next backfill performs fresh extraction.
         """
         artifact_id = str(issue.get("details", {}).get("artifact_id") or "").strip()
         run_id = str(issue.get("details", {}).get("run_id") or "").strip()
@@ -572,15 +622,13 @@ class BusinessProfileSemanticRepairService:
                             "stable_id": issue["stable_id"],
                         }
                     metadata = json.loads(row["metadata_json"] or "{}")
-                    metadata.update({
-                        "reuse_blocked": True,
-                        "cleanup_reason": "incompatible_legacy_run_without_receipt",
-                    })
+                    deleted_records = self._delete_candidate_records_from_metadata(
+                        conn, instrument_id, metadata
+                    )
                     conn.execute(
-                        "UPDATE business_profile_semantic_runs SET metadata_json = ?, updated_at = ? "
+                        "DELETE FROM business_profile_semantic_runs "
                         "WHERE run_id = ? AND instrument_id = ?",
-                        (json.dumps(metadata, ensure_ascii=False, sort_keys=True),
-                         get_shanghai_time().isoformat(), run_id, instrument_id),
+                        (run_id, instrument_id),
                     )
                     conn.commit()
                 except Exception:
@@ -589,9 +637,9 @@ class BusinessProfileSemanticRepairService:
             return {
                 "instrument_id": instrument_id,
                 "status": "changed",
-                "reason": "incompatible_legacy_run_reuse_blocked",
+                "reason": "incompatible_legacy_run_deleted",
                 "stable_id": issue["stable_id"],
-                "affected_ids": [run_id],
+                "affected_ids": [run_id, *deleted_records],
             }
         if not artifact_id:
             return {
@@ -617,6 +665,22 @@ class BusinessProfileSemanticRepairService:
                         "reason": "artifact_already_absent",
                         "stable_id": issue["stable_id"],
                     }
+                run_rows = conn.execute(
+                    "SELECT run_id, metadata_json FROM business_profile_semantic_runs "
+                    "WHERE instrument_id = ? AND metadata_json LIKE ?",
+                    (instrument_id, f"%{artifact_id}%"),
+                ).fetchall()
+                deleted_records: list[str] = []
+                for run_row in run_rows:
+                    try:
+                        run_metadata = json.loads(run_row["metadata_json"] or "{}")
+                    except (TypeError, ValueError, json.JSONDecodeError):
+                        run_metadata = {}
+                    deleted_records.extend(
+                        self._delete_candidate_records_from_metadata(
+                            conn, instrument_id, run_metadata
+                        )
+                    )
                 conn.execute(
                     "DELETE FROM business_profile_semantic_artifact_events WHERE artifact_id = ?",
                     (artifact_id,),
@@ -655,8 +719,59 @@ class BusinessProfileSemanticRepairService:
             "status": "changed",
             "reason": "unusable_semantic_artifact_deleted",
             "stable_id": issue["stable_id"],
-            "affected_ids": [artifact_id],
+            "affected_ids": [artifact_id, *dict.fromkeys(deleted_records)],
         }
+
+    @staticmethod
+    def _delete_candidate_records_from_metadata(
+        conn: Any, instrument_id: str, metadata: dict[str, Any]
+    ) -> list[str]:
+        """Delete only candidate outputs explicitly recorded by one semantic run."""
+
+        tables = {
+            "activities": ("company_business_activities", "activity_id"),
+            "operating_facts": ("company_operating_facts", "record_id"),
+            "relationships": ("company_supply_chain_relationships", "relationship_id"),
+            "value_chain_roles": ("company_value_chain_roles", "record_id"),
+            "exposures": ("company_commodity_exposures", "exposure_id"),
+            "exposure_facts": ("company_commodity_exposure_facts", "fact_id"),
+        }
+        existing_tables = {
+            str(row[0])
+            for row in conn.execute(
+                "SELECT name FROM sqlite_master WHERE type = 'table'"
+            ).fetchall()
+        }
+        deleted: list[str] = []
+        for record_type, record_ids in dict(metadata.get("record_ids") or {}).items():
+            table_spec = tables.get(str(record_type))
+            if table_spec is None or table_spec[0] not in existing_tables:
+                continue
+            table, primary_key = table_spec
+            for raw_id in record_ids or ():
+                record_id = str(raw_id or "").strip()
+                if not record_id:
+                    continue
+                row = conn.execute(
+                    f"SELECT review_status FROM {table} WHERE {primary_key} = ? "
+                    "AND instrument_id = ?",
+                    (record_id, instrument_id),
+                ).fetchone()
+                if row is None or str(row["review_status"] or "") != "candidate":
+                    continue
+                conn.execute(
+                    f"DELETE FROM {table} WHERE {primary_key} = ? "
+                    "AND instrument_id = ? AND review_status = 'candidate'",
+                    (record_id, instrument_id),
+                )
+                if "business_profile_exceptions" in existing_tables:
+                    conn.execute(
+                        "DELETE FROM business_profile_exceptions WHERE target_id = ? "
+                        "AND instrument_id = ?",
+                        (record_id, instrument_id),
+                    )
+                deleted.append(f"{record_type}:{record_id}")
+        return deleted
 
     def _cleanup_failed_work_items(self, instrument_id: str) -> list[dict[str, Any]]:
         """Drop terminal machine failures after their diagnostics are persisted."""
@@ -1192,6 +1307,7 @@ class BusinessProfileSemanticRepairService:
                 "inventory_derived_storage_role",
                 "incompatible_reusable_artifact",
                 "legacy_semantic_artifact",
+                "failed_semantic_artifact",
                 "failed_work_item",
             }
             for item in issues

@@ -405,11 +405,14 @@ signature 和排序后的本地候选。
 sqlite3 /path/to/research.db ".backup '/path/to/research.before-semantic-repair.db'"
 ```
 
-`changed` 表示本地可重建快照已经写入，`unchanged` 表示重复执行没有产生新写入，
-`held` 表示需要既有审核/发布 owner 的后续处理，`failed` 表示该股票局部失败且其余
-股票继续执行。收到 `warning` 时必须查看 `failed` 和 `held` 的 reason；它不是全量
-修复成功。回滚时停止该任务和相关写入后，从已验证的副本恢复数据库，不删除原始
-evidence、review audit 或有效历史行来“回滚”。
+`changed` 表示本地可重建快照或明确失败状态已经写入/删除，`unchanged` 表示重复执行
+没有产生新写入，`held` 表示需要既有审核/发布 owner 的后续处理，`failed` 表示该股票
+局部失败且其余股票继续执行。失败语义 receipt 的 apply 行为是物理删除：包括
+`rejected`、非 `unit_rule_*` 原因的 `conversion_pending`、关联的未批准机器产物，
+以及 `terminal_failure`/`machine_rework` work item；由单位规则变更显式重新打开的
+pending 仍保留用于零 token 重放。收到 `warning` 时必须查看 `failed` 和 `held` 的
+reason；它不是全量修复成功。回滚时停止该任务和相关写入后，从已验证的副本恢复数据库，
+不删除原始 evidence、review audit 或有效历史行来“回滚”。
 
 ## 8.1 年报季容量与背压
 

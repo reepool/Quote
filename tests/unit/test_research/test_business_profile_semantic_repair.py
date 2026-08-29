@@ -1,4 +1,8 @@
 from research.business_profile_semantic_repair import BusinessProfileSemanticRepairService
+from research.business_profile_semantic_artifacts import (
+    BusinessProfileSemanticArtifactRepository,
+    SemanticArtifactIdentity,
+)
 from research.business_profile_governance import BusinessProfileRepository
 from research.business_profile_review import BusinessProfileReviewService
 from research.business_profile_activity_production import BusinessProfileActivityProducer
@@ -19,6 +23,44 @@ def _storage(tmp_path):
     storage = ResearchStorageManager(config)
     storage.initialize()
     return storage
+
+
+def test_repair_deletes_failed_semantic_receipt_and_converges(tmp_path):
+    storage = _storage(tmp_path)
+    artifacts = BusinessProfileSemanticArtifactRepository(storage)
+    identity = SemanticArtifactIdentity(
+        instrument_id="600000.SH",
+        source_document_id="annual-report-2025",
+        document_hash="a" * 64,
+        report_period="2025-12-31",
+        field_family="atomic_activities",
+        evidence_scope_hash="b" * 64,
+        input_hash="c" * 64,
+        prompt_version="prompt.v1",
+        schema_version="schema.v1",
+    )
+    artifact = artifacts.receive(
+        identity,
+        response={"activities": []},
+        response_hash="",
+        evidence_ids=[],
+    )
+    artifacts.mark(
+        artifact["artifact_id"],
+        "conversion_pending",
+        reason_code="unit_normalization_failed",
+    )
+    service = BusinessProfileSemanticRepairService(storage)
+
+    audit = service.run(instrument_ids=["600000.SH"])
+    assert audit["issue_counts"]["failed_semantic_artifact"] == 1
+    assert audit["write_count"] == 0
+
+    applied = service.run(instrument_ids=["600000.SH"], apply=True)
+    assert applied["change_counts"]["changed"] == 1
+    assert artifacts.find_replay(identity) is None
+    repeated = service.run(instrument_ids=["600000.SH"], apply=True)
+    assert repeated["change_counts"]["unchanged"] == 1
 
 
 def test_repair_audit_is_read_only_and_apply_requires_explicit_scope(tmp_path):
