@@ -4975,6 +4975,20 @@ class BusinessProfileSemanticRuntime:
             record = self.repository.get_record("operating_facts", str(record_id))
             if not isinstance(record, Mapping):
                 continue
+            if str(record.get("fact_type") or "") not in {
+                "sales_revenue",
+                "sales_volume",
+                "production_volume",
+                "inventory_volume",
+                "purchase_amount",
+                "purchase_volume",
+                "reserve_or_resource",
+                "other_measurement",
+            }:
+                # Concentration facts and other relationship projections use
+                # operating_facts as a storage table but do not participate
+                # in contract/table occurrence identity.
+                continue
             metadata = record.get("metadata") or {}
             if not isinstance(metadata, Mapping) or not metadata.get("semantic_synthesis"):
                 continue

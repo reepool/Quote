@@ -156,8 +156,9 @@ def test_operating_fact_row_identity_keeps_same_product_contracts_separate():
 def test_legacy_semantic_run_is_not_reused_without_occurrence_identity():
     repository = Mock()
     repository.get_record.side_effect = [
-        {"metadata": {"semantic_synthesis": True}},
+        {"fact_type": "purchase_amount", "metadata": {"semantic_synthesis": True}},
         {
+            "fact_type": "purchase_amount",
             "metadata": {
                 "semantic_synthesis": True,
                 "source_row_key": "row-contract-1",
@@ -172,6 +173,19 @@ def test_legacy_semantic_run_is_not_reused_without_occurrence_identity():
     ) is True
     assert runtime._semantic_reuse_has_legacy_occurrence_identity(
         {"operating_facts": ["current-fact"]}
+    ) is False
+
+
+def test_concentration_projection_is_not_blocked_by_contract_identity_gate():
+    repository = Mock()
+    repository.get_record.return_value = {
+        "fact_type": "customer_concentration_share",
+        "metadata": {"semantic_synthesis": True},
+    }
+    runtime = object.__new__(BusinessProfileSemanticRuntime)
+    runtime.repository = repository
+    assert runtime._semantic_reuse_has_legacy_occurrence_identity(
+        {"operating_facts": ["concentration-fact"]}
     ) is False
 
 
