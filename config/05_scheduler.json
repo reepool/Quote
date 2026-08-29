@@ -1120,6 +1120,22 @@
           "max_runtime_seconds": 60
         }
       },
+      "business_profile_semantic_repair": {
+        "enabled": true,
+        "manual_only": true,
+        "description": "公司画像语义结果本地审计与失败数据清理（不调用网络或 LLM）",
+        "report": true,
+        "pre_run_notify": false,
+        "max_instances": 1,
+        "misfire_grace_time": 300,
+        "coalesce": true,
+        "parameters": {
+          "instrument_ids": [],
+          "apply": false,
+          "all_scope": false,
+          "result_policy": "reuse"
+        }
+      },
       "business_profile_unit_rule_control": {
         "enabled": true,
         "manual_only": true,

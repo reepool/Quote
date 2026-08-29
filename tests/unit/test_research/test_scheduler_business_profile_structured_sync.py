@@ -208,3 +208,29 @@ def test_structured_business_profile_weekly_trigger_is_not_due_immediately():
     next_fire = parsed.trigger.get_next_fire_time(None, now)
 
     assert next_fire > now
+
+
+def test_business_profile_semantic_repair_job_is_manual_and_defaults_to_reuse():
+    config_manager = UnifiedConfigManager("config")
+    raw_job = config_manager.get_scheduler_config().jobs[
+        "business_profile_semantic_repair"
+    ]
+
+    assert raw_job["enabled"] is True
+    assert raw_job["manual_only"] is True
+    assert raw_job.get("trigger") is None
+    assert raw_job["parameters"] == {
+        "instrument_ids": [],
+        "apply": False,
+        "all_scope": False,
+        "result_policy": "reuse",
+    }
+
+    parsed = JobConfigManager(task_module.config_manager)._parse_job_config(
+        "business_profile_semantic_repair",
+        raw_job,
+        config_manager.get_scheduler_config(),
+    )
+    assert parsed is not None
+    assert parsed.manual_only is True
+    assert parsed.trigger is None
