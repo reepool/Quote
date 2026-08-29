@@ -42,6 +42,13 @@ DataManager, ResearchStorageManager, and ScheduledTasks compatibility methods SH
 - **WHEN** repository search, static checks, and tests confirm zero callers
 - **THEN** the method and its duplicate implementation are removed in the retirement change
 
+### Requirement: Compatibility aliases have a bounded deprecation period
+Compatibility methods with plausible external consumers MUST publish a replacement map and emit a deprecation warning for one documented transition cycle before physical deletion.
+
+#### Scenario: Repository search finds no local callers
+- **WHEN** a facade method may still be used by an external notebook or operator script
+- **THEN** deletion waits for the documented transition cycle and warning evidence rather than treating local zero callers as sufficient
+
 ### Requirement: Completed OpenSpec changes are archived safely
 Status-complete changes SHALL be archived after durable specs are current and no in-progress dependency requires the live change directory.
 

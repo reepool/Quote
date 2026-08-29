@@ -25,4 +25,5 @@ None.
 
 - Affects large corporate-action regions in `data_manager.py`, `data_sources/cninfo_*`, factor governance modules, scheduler tasks, operator tools, and regression tests.
 - Depends on W2 identity boundaries and precedes the corporate-action portion of W7 scheduler migration.
+- Its baseline includes the completed `triage-announcement-only-xdxr-candidates` W6 vertical slice (commit `809cdc2`) and must not compare against the pre-triage daily workflow.
 - Implements W6, FR-06, FR-10, and FR-11 without changing factor values or backtest adjustment semantics.

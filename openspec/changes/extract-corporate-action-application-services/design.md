@@ -2,6 +2,8 @@
 
 Company-action behavior spans CNInfo/TDX acquisition, candidate discovery, semantic decisions, operator review, canonical selection/promotion, factor rebuilding, validation, and historical backfill. DataManager currently contains the largest methods in the repository, while scheduler jobs encode stage order by naming and call patterns.
 
+The completed `triage-announcement-only-xdxr-candidates` slice is part of the current behavior baseline. W6 extraction must preserve its announcement-only modes, case metadata, inactive-watch/reactivation semantics, and report fields while moving ownership outward.
+
 ## Goals / Non-Goals
 
 **Goals:**
@@ -24,6 +26,7 @@ Company-action behavior spans CNInfo/TDX acquisition, candidate discovery, seman
 3. **Keep provider modules source-specific.** CNInfo/TDX request, parsing, and transport remain provider concerns; services consume normalized records.
 4. **Keep canonical authority singular.** Rebuilds and candidate analysis may write staging/evidence tables, but only the canonical application service can promote the authoritative factor path.
 5. **Use compatibility delegates during migration.** Existing DataManager and scheduler entry points invoke the new service; no parallel state machine is introduced.
+6. **Keep scheduler migration staged.** W6 may rebind existing job methods to stage services, but domain handler extraction and final job resolution remain W7 responsibilities.
 
 Alternatives rejected: a single rewrite risks factor regressions; keeping job-specific orchestration preserves hidden state flow; moving provider parsing into application services would duplicate source contracts.
 

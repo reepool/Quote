@@ -4,6 +4,7 @@
 - [ ] 1.2 Document current state tables, business keys, checkpoints, canonical authority, job triggers, operator commands, and result/report consumers.
 - [ ] 1.3 Build frozen fixtures covering CNInfo/TDX matches, asymmetric events, unresolved dates, non-factor events, BSE, suspension, and manual decisions.
 - [ ] 1.4 Capture baseline canonical event/factor rows and adjusted quote outputs for fixture replay.
+- [ ] 1.5 Re-run the baseline inventory against the post-`triage-announcement-only-xdxr-candidates` code and include announcement-only mode, case, inactive-watch, reactivation, and report semantics.
 
 ## 2. Stage Contracts
 
@@ -16,7 +17,7 @@
 ## 3. Entry-Point Migration
 
 - [ ] 3.1 Convert relevant DataManager methods to stage-service delegates in bounded method groups and remove migrated business blocks.
-- [ ] 3.2 Rebind scheduler jobs to stage services while preserving job ids, parameters, dependencies, readiness, and reports.
+- [ ] 3.2 Rebind only existing scheduler callables to stage services; defer domain handler extraction and final job-resolution changes to W7.
 - [ ] 3.3 Rebind API, Telegram, and operator scripts to the same review/canonical services and remove alternate state transitions.
 - [ ] 3.4 Add dependency tests that keep provider modules source-specific and prevent application services from importing global facades.
 
@@ -26,4 +27,5 @@
 - [ ] 4.2 Test retry/resume/idempotency across every stage and verify no duplicate decisions or canonical writes.
 - [ ] 4.3 Run corporate-action database, governance, scheduler, API, factor, and backtest regression suites.
 - [ ] 4.4 Verify old and new stage implementations are never enabled simultaneously and document rollback bindings.
-- [ ] 4.5 Update the corporate-action current architecture/state-flow document and mark W6 complete in the framework program.
+- [ ] 4.5 Verify cutover occurs while affected jobs are idle, observe the first natural run, and record rollback criteria for canonical and announcement-only outputs.
+- [ ] 4.6 Update the corporate-action current architecture/state-flow document and mark W6 complete in the framework program.

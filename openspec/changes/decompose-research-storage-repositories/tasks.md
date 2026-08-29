@@ -17,7 +17,9 @@
 - [ ] 3.2 Extract industry and shareholder repositories with business-key, history, and transaction equivalence tests.
 - [ ] 3.3 Extract valuation repository while preserving compact payload, database scope, and history semantics.
 - [ ] 3.4 Extract financial repositories while preserving `financials.db`, source manifests, facts, mappings, and coverage queries.
-- [ ] 3.5 Extract reports, sentiment, risk, technical, profile, and risk-free-rate repositories in owner-bounded slices.
+- [ ] 3.5 Extract reports and sentiment repositories in an owner-bounded slice.
+- [ ] 3.6 Extract risk, technical, and profile repositories in an owner-bounded slice.
+- [ ] 3.7 Extract the risk-free-rate repository in an owner-bounded slice.
 
 ## 4. Compatibility And Consumers
 

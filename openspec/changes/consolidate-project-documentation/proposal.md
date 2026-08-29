@@ -10,6 +10,7 @@ Quote documentation mixes current architecture, operator runbooks, completed req
 - Merge documents that describe the same current capability and delete superseded requirements, receipts, investigations, and migration notes after preserving valid rules.
 - Add a documented replacement and reference check for every deleted document.
 - Reconcile completed OpenSpec changes with the current spec/archive lifecycle.
+- Include the root-level `implementation_plan.md` in the inventory and disposition matrix.
 
 ## Capabilities
 

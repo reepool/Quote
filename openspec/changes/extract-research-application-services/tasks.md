@@ -15,9 +15,12 @@
 
 - [ ] 3.1 Migrate the industry application slice, including command, current domain service, storage/provider dependencies, adapters, and tests.
 - [ ] 3.2 Migrate the shareholder application slice with equivalent availability, incremental, and reconciliation semantics.
-- [ ] 3.3 Migrate valuation and financial application slices without changing calculation, report-period, or available-date semantics.
-- [ ] 3.4 Migrate futures, FX, and special-commodity facade orchestration to their existing domain services.
-- [ ] 3.5 Defer business-profile/announcement slices that overlap an active change and record the exact dependency instead of partial migration.
+- [ ] 3.3 Migrate the valuation application slice without changing calculation, report-period, or available-date semantics.
+- [ ] 3.4 Migrate the financial application slice without changing source, report-period, or available-date semantics.
+- [ ] 3.5 Migrate the futures facade orchestration to its existing domain service.
+- [ ] 3.6 Migrate the FX facade orchestration to its existing domain service.
+- [ ] 3.7 Migrate the special-commodity facade orchestration to its existing domain service.
+- [ ] 3.8 Defer business-profile/announcement slices only while their active changes remain incomplete; start them when those changes are archived, production acceptance is green, and no same-domain working-tree change remains.
 
 ## 4. Callers And Cleanup
 

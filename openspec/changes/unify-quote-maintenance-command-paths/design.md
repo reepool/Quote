@@ -24,6 +24,7 @@ Daily updates and backfills are exposed through CLI, API, scheduler, and Telegra
 3. **Make gap repair authoritative.** Detection, lifecycle filtering, skip policy, fill, factor follow-up, persistence verification, and report data live in one service.
 4. **Keep scripts as adapters.** Existing scripts parse operator arguments and call the service; they do not own SQL/download loops.
 5. **Use a single-flight guard at the application boundary.** API, scheduler, and Telegram cannot launch concurrent writes for the same maintenance scope.
+6. **Treat `database/operations.py` as an explicit quote-storage boundary.** The baseline must map its instrument, calendar, quote-write, and watermark methods to owners. Quote maintenance may extract narrow persistence ports or record a bounded follow-up storage change, but it must not leave the file as an unowned sixth core implementation.
 
 Alternatives rejected: leaving scripts as independent implementations preserves the bug; a single untyped `run_data(mode=...)` would hide incompatible semantics; rewriting all CLI/API contracts would unnecessarily break operators.
 
@@ -43,6 +44,8 @@ Alternatives rejected: leaving scripts as independent implementations preserves 
 5. Remove subprocess execution and script business loops.
 6. Migrate daily/range/historical modes and then reduce DataManager methods to delegates.
 7. Rollback by rebinding adapters to the prior DataManager methods while retaining the new service tests; do not run both writers concurrently.
+
+Before production rebinding, the cutover requires a no-write resolution check, confirmation that affected jobs are idle, one writer binding, and a first natural scheduler run observed for watermarks, reports, and rollback criteria.
 
 ## Open Questions
 

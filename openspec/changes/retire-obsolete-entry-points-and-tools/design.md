@@ -25,6 +25,7 @@ The repository contains root-level live probes, completed migration scripts, dev
 3. **Delete true obsolete code.** Git history is the archive; retained operational tools remain in clear directories with runbooks.
 4. **Remove production script dependencies first.** Functions still needed by production move to formal modules before scripts are classified.
 5. **Run cleanup after W1-W7.** Deletion is the final step after canonical paths and service owners are stable.
+6. **External consumers get a bounded transition.** Compatibility aliases emit a deprecation warning for one documented release/maintenance cycle, publish the replacement map, then become eligible for deletion after repository and operator evidence is rechecked.
 
 Alternatives rejected: keeping every old file in `legacy/` perpetuates ambiguity; deleting by naming convention risks recovery loss; a generic deprecation framework is unnecessary.
 

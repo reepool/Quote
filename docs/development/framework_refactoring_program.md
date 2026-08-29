@@ -59,9 +59,9 @@
 
 | ID | 问题 | 改造要求 |
 |---|---|---|
-| FR-06 | `DataManager` 约 3.8 万行、433 个方法，兼具门面和业务实现 | 按行情、主数据、研究、公司行为等能力迁出应用服务；旧方法只转发并限期删除 |
-| FR-07 | `ResearchStorageManager` 约 1.4 万行、212 个方法，跨多个数据域 | 保留连接/事务协调，按数据库和表 owner 拆 repository；外部服务依赖窄接口 |
-| FR-08 | `ScheduledTasks` 约 1.3 万行、111 个方法，任务内包含业务循环和报告 | 按域拆 task adapter，业务循环进入应用服务，报告格式化独立 |
+| FR-06 | `DataManager` 约 3.9 万行、约 430 个方法，兼具门面和业务实现 | 按行情、主数据、研究、公司行为等能力迁出应用服务；旧方法只转发并限期删除 |
+| FR-07 | `ResearchStorageManager` 约 1.4 万行、约 220 个方法，跨多个数据域 | 保留连接/事务协调，按数据库和表 owner 拆 repository；外部服务依赖窄接口 |
+| FR-08 | `scheduler/tasks.py` 约 1.4 万行，其中 `ScheduledTasks` 类体约 9.5 千行、约 110 个方法，另有模块级任务函数 | 按域拆 task adapter，业务循环进入应用服务，报告格式化独立；类外业务函数同样必须纳入迁移清单 |
 | FR-09 | `api/routes.py` 集中且部分路由直接依赖全局门面 | 随各业务服务迁移按域拆路由，新路由依赖 query/command service |
 | FR-10 | 公司行为约占 `DataManager` 1.7 万行，阶段边界隐含在方法和 job 名中 | 显式拆分观察、决议、审核、canonical 因子和重建状态流 |
 
@@ -74,6 +74,8 @@
 | FR-13 | 大量 completed OpenSpec change 未及时归档 | 完成即归档，当前总纲只保留在途 change 和依赖状态 |
 | FR-14 | 需求稿、回执、调查、运行手册和当前设计混在 `docs/development` | 合并同类 current 文档，删除已吸收的历史材料，重建索引 |
 | FR-15 | 共享能力可能因新需求再次被各域自行实现 | 在 AGENTS 和总纲中强制 owner/复用/单路径检查 |
+| FR-16 | `database/operations.py` 约 9.8 千行、单类承担主数据、行情、日历和写入协调，未纳入框架拆分 | W3 必须先登记其 quote-storage owner 和拆分边界；迁移期不得继续堆业务逻辑，若暂不拆分须记录理由、风险和后续 change |
+| FR-17 | 长周期改造期间业务代码会继续演进，静态冻结规则缺少例外和切换门禁 | 建立移动目标协议、例外登记、切换前运行状态检查、单 writer 切换和首个自然调度观察/回滚条件 |
 
 ## 5. 工作流与 OpenSpec change
 
@@ -92,6 +94,7 @@
 - 已完成需求稿、调查、回执和迁移记录在内容吸收后删除；
 - completed OpenSpec 按依赖和当前工作区状态逐项归档；
 - AGENTS 强制引用长期开发总纲。
+- W1 先建立归档批次清单；不得把一百余个完成 change 的判断压缩成一次无证据的批处理。
 
 验收：从索引可以找到每个生产域的当前架构、运行入口和权威规范；索引不存在失效路径或历史材料冒充当前设计。
 
@@ -109,6 +112,7 @@
 - 股票主数据治理成为所有相关 universe 的权威 owner；
 - 写入、缺口和日更只使用 `quotes.db` 权威股票交易日历；
 - 主数据刷新作为行情命令显式前置步骤和报告字段，不在入口自行实现。
+- 明确 `database/operations.py` 的 quote-storage owner；本 W2 不得留下未登记的第六个核心巨型文件。
 
 验收：常见别名映射到唯一 key；同一 universe 在 CLI/API/Scheduler 中一致；调休日不产生假缺口。
 
@@ -125,6 +129,7 @@
 - 合并 `DataManager`、scheduler 和两个缺口脚本中的写入逻辑；
 - Telegram 不再 subprocess 执行缺口或因子生产工具；
 - 脚本只作为 operator adapter，生产模块不得 import 脚本；
+- 生产 import 边界检查进入 CI，且在 W3 完成，不推迟到 W8；
 - 保持现有命令、API 和 job id 兼容。
 
 验收：同一输入从不同入口得到相同候选、写入集合和失败结果；迁移期不存在双写。
@@ -142,6 +147,8 @@
 - 新 API 和 scheduler adapter 直接依赖窄服务；
 - `DataManager` 只保留装配和兼容转发；
 - 每个切片必须删除原门面中的真实逻辑，而不是只增加 wrapper。
+- DCF、业务画像和公告资产若仍由 `DataManager` 编排，必须登记为独立后续纵向切片及启动条件。
+- 业务画像/公告资产切片的启动条件为：相关在途 change 已完成并归档、生产验收为绿，且当前工作区无同域未提交改动；不得无限期以“延期”结束 W4。
 
 验收：迁出域的新调用方不依赖全局 `DataManager`；结果、错误和本地只读语义保持兼容。
 
@@ -176,6 +183,7 @@
 - 迁移 `DataManager` 中千行级方法，保持当前 TDX/CNInfo/canonical 表语义；
 - scheduler job 继续作为阶段触发器，不成为第二套状态机；
 - 所有回测和查询继续读取同一 canonical 因子口径。
+- W6 的等价性基线必须以已完成的 `triage-announcement-only-xdxr-candidates` 代码和数据语义为准。
 
 验收：状态和权威表可从一份文档及代码入口解释；原方法成为薄转发或删除；因子结果与迁移前一致。
 
@@ -198,8 +206,25 @@ owner 内增加公告-only 案例聚合、可切换 LLM 分流、inactive watch 
 - 千行历史回补、缺口循环和其他业务编排不得原样搬入 handler；
 - `ScheduledTasks` 在兼容期按 job id 转发；
 - 报告格式化不参与写库和业务决策。
+- 类外模块级任务函数也必须迁入对应 adapter 或应用服务，不能只缩减 `ScheduledTasks` 类体。
 
 验收：配置中的每个 job 仍可解析；自动任务集合、时间和依赖不变；handler 无复制业务循环。
+
+### W9 API 域路由适配器
+
+**Change**：`split-api-domain-route-adapters`
+
+**覆盖需求**：FR-09、FR-11、FR-17
+
+具体要求：
+
+- 按 quotes、instruments/master、research、corporate-actions、backtest-data、system/operations 拆分路由模块；
+- 路由只负责 HTTP 参数校验、鉴权、调用 query/command service 和响应模型转换；
+- 现有路径、状态码、响应字段和错误语义保持兼容；
+- `api/routes.py` 过渡期只做 router 装配和兼容委托，不增加业务实现；
+- 回测专用 `BacktestQuoteStore`、`FinancialVintageStore` 读旁路必须明确归属为 backtest query service，不能因不依赖 `DataManager` 而成为未登记的第二查询链。
+
+验收：每个现有端点有唯一路由 owner；新路由不直接访问全局门面或拼接业务 SQL；旧入口只保留装配/兼容职责。
 
 ### W8 遗留入口和工具退出
 
@@ -215,6 +240,7 @@ owner 内增加公告-only 案例聚合、可切换 LLM 分流、inactive watch 
 - 保留的 operator 工具必须调用权威应用服务并有 runbook；
 - 归档全部完成且不再作为在途依赖的 OpenSpec change；
 - 更新总纲最终状态并删除临时审计/改造材料。
+- 删除兼容 alias 前至少经历一个带 replacement map 和 deprecation warning 的过渡周期。
 
 验收：无生产模块 import `scripts`；无 Telegram 生产 subprocess 旁路；obsolete 清单归零或有明确外部阻塞。
 
@@ -234,10 +260,12 @@ W2 标识/主数据/股票日历
                                   |
           W3 + W4 + W6 ----------> W7 Scheduler 适配器
                                   |
-          W1-W7 -----------------> W8 遗留清理
+          W9 API 适配器 -----------+
+                                  |
+          W1-W9 -----------------> W8 遗留清理
 ```
 
-允许 W3、W4、W6 在 W2 稳定后并行规划，但同一文件同一时间只允许一个实施 change 修改。W7 依赖应用服务已经存在，不能只做机械拆文件。W8 必须最后执行。
+允许 W3、W4、W6 在 W2 稳定后并行规划，但由于三者都触碰 `data_manager.py`，实施必须按文件单写者原则串行；真实关键路径为 W1 → W2 →（W3、W4、W6 依次实施，W5 穿插在 W4 的域切片中）→ W7 → W8。W7 依赖应用服务已经存在，不能只做机械拆文件。W8 必须最后执行。
 
 ## 7. 文档清理需求
 
@@ -270,6 +298,8 @@ W2 标识/主数据/股票日历
 
 只有内容已进入 current 文档/OpenSpec spec 且无当前运行引用后才删除：
 
+- 根目录 `implementation_plan.md`；
+
 - 一次性修复说明：`docs/INSTRUMENT_DOWNLOAD_UPDATE.md`；
 - API 需求回执：`quote_api_data_capability_response.md`、`quote_api_data_confirmation_response.md`；
 - 已完成迁移计划：`quote_data_volume_cleanup.md`、`quote_data_volume_migration.md`；
@@ -291,20 +321,23 @@ W2 标识/主数据/股票日历
 5. 无生产数据写入型 live 验证，除非用户单独授权；
 6. 核心大文件新增业务行数为零，完成切片后应净减少；
 7. 被替代实现同步删除或登记限期兼容；
-8. 文档、OpenSpec tasks 和本纲要状态同步更新。
+8. 文档、OpenSpec tasks 和本纲要状态同步更新；
+9. 生产切换前确认受影响 job 未运行，执行 no-write 解析并确保只有一个 writer；首次自然调度/请求完成后检查 watermark、业务 key、报告和错误，满足回滚条件时在下一窗口前恢复旧绑定；
+10. 已完成域遵守移动目标协议，新增业务只进入新 owner；旧门面新增代码必须有例外登记、替代目标和最晚清理阶段。
 
 ## 9. 进度矩阵
 
 | 工作流 | Change | 状态 | 依赖 |
 |---|---|---|---|
-| W1 | `consolidate-project-documentation` | apply-ready（0/16） | 无 |
+| W1 | `consolidate-project-documentation` | apply-ready（0/19） | 无 |
 | W2 | `unify-instrument-master-and-identity-boundaries` | apply-ready（0/16） | W1 |
-| W3 | `unify-quote-maintenance-command-paths` | apply-ready（0/20） | W2 |
-| W4 | `extract-research-application-services` | apply-ready（0/19） | W2 |
-| W5 | `decompose-research-storage-repositories` | apply-ready（0/19） | W4 |
-| W6 | `extract-corporate-action-application-services` | apply-ready（0/18） | W2 |
-| W7 | `split-scheduler-domain-task-adapters` | apply-ready（0/19） | W3、W4、W6 |
-| W8 | `retire-obsolete-entry-points-and-tools` | apply-ready（0/16） | W1-W7 |
+| W3 | `unify-quote-maintenance-command-paths` | apply-ready（0/23） | W2 |
+| W4 | `extract-research-application-services` | apply-ready（0/22） | W2 |
+| W5 | `decompose-research-storage-repositories` | apply-ready（0/21） | W4 |
+| W6 | `extract-corporate-action-application-services` | apply-ready（0/21） | W2 |
+| W7 | `split-scheduler-domain-task-adapters` | apply-ready（0/23） | W3、W4、W6 |
+| W9 | `split-api-domain-route-adapters` | apply-ready（0/14） | W2、W3、W4、W6 |
+| W8 | `retire-obsolete-entry-points-and-tools` | apply-ready（0/18） | W1-W7、W9 |
 
 Program 状态使用 planned、apply-ready、active、blocked、complete、archived。OpenSpec CLI 会把“工件已齐全但尚无 task 完成”的 change 显示为 `in-progress`；本计划将 `completedTasks=0` 且尚未进入实施的 change 记为 apply-ready，而不是 active。任一时刻原则上只允许一个直接修改同一核心文件集合的 change 处于 active。
 
@@ -318,15 +351,16 @@ Program 状态使用 planned、apply-ready、active、blocked、complete、archi
 - 不为了达到行数指标机械拆文件；
 - 不在本计划中改变业务数据覆盖范围或投资模型；
 - 不把所有理论改进都变成阻塞项。
+- 不把 `database/operations.py` 作为未说明的规划外巨型文件；其保留或拆分必须有明确 owner 和理由。
 
 ## 11. 计划完成定义
 
 框架改造计划完成意味着：
 
-- W1-W8 全部完成并归档；
+- W1-W9 全部完成并归档；
 - 当前生产采集和维护任务持续稳定；
 - 核心业务动作具有可追踪的唯一执行链；
-- 三个核心大类只剩薄门面或已被移除；
+- `DataManager`、`ResearchStorageManager`、`ScheduledTasks`、`api/routes.py` 和 `database/operations.py` 均已完成 owner 决策；前四者只剩薄门面或已被移除，后者已按 quote-storage 边界拆分或完成有证据的保留决策；
 - 研究存储按 owner 拆分且数据库语义不变；
 - 过时代码、脚本、兼容和文档已经删除；
 - 所有未来 AI 开发由 AGENTS 和长期总纲约束。

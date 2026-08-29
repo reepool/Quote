@@ -49,6 +49,13 @@ The global ScheduledTasks facade SHALL delegate existing job-id methods to domai
 - **WHEN** no caller imports a migrated facade method
 - **THEN** the method is removed or the facade is reduced to the minimal job resolution surface
 
+### Requirement: Module-level scheduler logic has an owner
+Module-level business task functions and report helpers in `scheduler/tasks.py` SHALL be assigned to a domain adapter, application service, or explicit operations owner during migration.
+
+#### Scenario: Class methods are migrated but module functions remain
+- **WHEN** the `ScheduledTasks` class has been reduced
+- **THEN** remaining module-level business functions are not counted as completed migration and cannot remain as an unowned parallel path
+
 ### Requirement: Scheduler migration cannot duplicate jobs
 Old and new handlers MUST NOT both be registered for the same job id during migration.
 

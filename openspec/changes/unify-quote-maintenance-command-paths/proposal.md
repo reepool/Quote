@@ -9,6 +9,7 @@ Daily updates mostly converge on `DataManager`, but gap detection and repair sti
 - Move gap detection and repair business logic out of scheduler and standalone scripts into one application service.
 - Route CLI, API, scheduler, Telegram, and operator scripts through the same services.
 - Remove production imports from `scripts/dev_validation` and remove Telegram subprocess production bypasses.
+- Include an explicit ownership decision for `database/operations.py` on the quote-storage side; this change does not silently leave that core file outside the program.
 - Preserve existing API, CLI, Telegram, job ids, schedules, database schemas, and report compatibility.
 
 ## Capabilities

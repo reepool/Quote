@@ -4,6 +4,7 @@
 - [ ] 1.2 Map daily, target-date, range, historical, and gap-repair inputs, outputs, write tables, factor follow-up, and failure semantics.
 - [ ] 1.3 Inventory all gap implementations, Telegram subprocess paths, and production imports from `scripts`/`scripts.dev_validation`.
 - [ ] 1.4 Create temporary-database characterization fixtures for A-share, HKEX, index lifecycle, no-data, skip-list, and persistence-failure cases.
+- [ ] 1.5 Map `database/operations.py` quote-storage methods, assign owners, and record whether each method is extracted in this change or in a named follow-up.
 
 ## 2. Command Boundary
 
@@ -24,7 +25,8 @@
 - [ ] 4.1 Migrate target-date and range backfill entry points to explicit commands with compatible parameters and reports.
 - [ ] 4.2 Migrate daily and historical download orchestration while preserving source, master refresh, resume, and factor semantics.
 - [ ] 4.3 Move production-required validation helpers out of scripts and add a static test forbidding production imports from `scripts`.
-- [ ] 4.4 Reduce migrated DataManager and scheduler methods to documented delegates and delete duplicate business loops.
+- [ ] 4.4 Add the production import-boundary check to `.github/workflows/test.yml` and make it fail on production imports from `scripts` or `scripts.dev_validation`.
+- [ ] 4.5 Reduce migrated DataManager and scheduler methods to documented delegates and delete duplicate business loops.
 
 ## 5. Acceptance
 
@@ -32,3 +34,4 @@
 - [ ] 5.2 Compare representative temporary-database row keys, dates, factors, watermarks, and reports across all entry points.
 - [ ] 5.3 Verify automatic job configuration and production database files are unchanged; document rollback binding and remaining delegates.
 - [ ] 5.4 Update quote maintenance runbook and mark W3 complete in the framework program.
+- [ ] 5.5 Perform the documented no-write cutover check, verify affected jobs are idle, observe the first natural scheduler run, and record rollback evidence.

@@ -55,3 +55,17 @@ Quote command equivalence SHALL be proven with fixtures or temporary database co
 #### Scenario: New gap service is evaluated
 - **WHEN** the implementation is compared with the existing path
 - **THEN** the comparison writes only to an isolated database and records candidate/write/result differences
+
+### Requirement: Quote storage ownership is explicit
+The quote-maintenance change MUST record the owner and migration disposition of `database/operations.py` methods used by master, calendar, quote-write, and watermark paths.
+
+#### Scenario: Quote command is migrated while storage remains shared
+- **WHEN** a command binds to a new application service
+- **THEN** its persistence calls resolve through a named quote-storage owner or a documented follow-up change, with no second SQL writer introduced
+
+### Requirement: Production cutover is observable and reversible
+Before a production binding changes, the change MUST verify affected jobs are idle, resolve exactly one writer, perform a no-write command check, and define first-run observation and rollback conditions.
+
+#### Scenario: New quote command is enabled
+- **WHEN** the first natural scheduler run completes
+- **THEN** watermarks, persisted keys, report fields, and errors are compared with the baseline before the old binding can be retired

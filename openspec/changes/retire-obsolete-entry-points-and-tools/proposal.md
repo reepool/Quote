@@ -7,6 +7,7 @@ Compatibility methods, root-level live probes, one-time migrations, old backup e
 - Inventory compatibility callers for DataManager, ResearchStorageManager, ScheduledTasks, scripts, and old operator commands.
 - Classify every candidate as production, operator, migration, compatibility, or obsolete.
 - Migrate remaining callers and delete zero-caller compatibility paths rather than keeping permanent aliases.
+- Use a deprecation period and replacement map for compatibility aliases that may be consumed outside the repository before physical deletion.
 - Remove root-level probe files, completed migrations, obsolete dev-validation tools, and deprecated backup/maintenance entry points after proving replacement coverage.
 - Require retained operator tools to call authoritative application services and have current runbooks.
 - Archive completed OpenSpec changes and close the framework program only after all prior workstreams pass.

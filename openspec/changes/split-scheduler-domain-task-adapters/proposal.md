@@ -24,5 +24,6 @@ None.
 ## Impact
 
 - Affects `scheduler/tasks.py`, scheduler job resolution, report helpers, Telegram direct-run callers, and scheduler tests.
+- The migration inventory covers both `ScheduledTasks` methods and module-level task/report functions in `scheduler/tasks.py`; reducing class size alone is insufficient.
 - Depends on W3, W4, and W6 application services; must not begin as a file-only split.
 - Implements W7, FR-08, FR-09, and FR-11 without changing the automatic job set or production schedule.
