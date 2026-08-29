@@ -189,6 +189,24 @@ def test_concentration_projection_is_not_blocked_by_contract_identity_gate():
     ) is False
 
 
+def test_legacy_joint_response_is_rejected_before_durable_replay():
+    assert BusinessProfileSemanticRuntime._semantic_response_has_legacy_occurrence_identity({
+        "activities": [{"action": "produces", "object_raw": "农药", "value": 1, "unit": "吨"}]
+    }) is True
+    assert BusinessProfileSemanticRuntime._semantic_response_has_legacy_occurrence_identity({
+        "activities": [{
+            "action": "produces", "object_raw": "农药", "value": 1, "unit": "吨",
+            "source_row_key": "row-1",
+        }]
+    }) is False
+
+
+def test_local_value_error_is_not_classified_as_gateway_congestion():
+    assert _semantic_failure_reason(ValueError("business profile temporal conflict")) == (
+        "business_rule_validation_failed"
+    )
+
+
 def test_scoped_exception_backlog_ignores_historical_reports_and_identities(tmp_path):
     runtime = BusinessProfileSemanticRuntime(
         repository=BusinessProfileRepository(_storage(tmp_path)),

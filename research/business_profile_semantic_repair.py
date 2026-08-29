@@ -179,7 +179,38 @@ class BusinessProfileSemanticRepairService:
         issues.extend(self._operating_fact_findings(instrument_id))
         issues.extend(self._incompatible_artifact_findings(instrument_id))
         issues.extend(self._exposure_collision_findings(instrument_id))
+        issues.extend(self._failed_work_item_findings(instrument_id))
         return {"instrument_id": instrument_id, "issues": issues}
+
+    def _failed_work_item_findings(self, instrument_id: str) -> list[dict[str, Any]]:
+        with self.storage.get_connection() as conn:
+            self.storage._apply_pragmas(conn)
+            exists = conn.execute(
+                "SELECT 1 FROM sqlite_master WHERE type='table' AND name='business_profile_work_items'"
+            ).fetchone()
+            if exists is None:
+                return []
+            rows = conn.execute(
+                "SELECT work_id, status, stage, last_error FROM business_profile_work_items "
+                "WHERE instrument_id = ? AND status IN ('terminal_failure', 'machine_rework')",
+                (instrument_id,),
+            ).fetchall()
+        if not rows:
+            return []
+        return [
+            self._issue(
+                "failed_work_item",
+                instrument_id,
+                {
+                    "work_id": row["work_id"],
+                    "status": row["status"],
+                    "stage": row["stage"],
+                    "last_error": str(row["last_error"] or "")[:500],
+                    "proposed_action": "delete_failed_work_item",
+                },
+            )
+            for row in rows
+        ]
 
     def _incompatible_artifact_findings(self, instrument_id: str) -> list[dict[str, Any]]:
         """Report completed artifacts that cannot safely satisfy current reuse."""
@@ -204,6 +235,8 @@ class BusinessProfileSemanticRepairService:
                 metadata = json.loads(row["metadata_json"] or "{}")
             except (TypeError, ValueError):
                 metadata = {}
+            if metadata.get("reuse_blocked") is True:
+                continue
             if str(metadata.get("result_policy") or "reuse") != "reuse":
                 continue
             if str(metadata.get("runtime_schema_version") or "") == RUNTIME_SCHEMA_VERSION:
@@ -216,6 +249,7 @@ class BusinessProfileSemanticRepairService:
                         "run_id": row["run_id"],
                         "field_family": row["field_family"],
                         "source_document_id": row["source_document_id"],
+                        "artifact_id": metadata.get("semantic_artifact_id"),
                         "artifact_runtime_schema_version": metadata.get(
                             "runtime_schema_version"
                         ),
@@ -224,7 +258,76 @@ class BusinessProfileSemanticRepairService:
                     },
                 )
             )
+        # Also inspect receipts directly.  A receipt can predate the current
+        # run manifest and therefore have no completed-run row to advertise its
+        # incompatible occurrence identity.
+        with self.storage.get_connection() as conn:
+            self.storage._apply_pragmas(conn)
+            artifact_rows = conn.execute(
+                "SELECT artifact_id, source_document_id, field_family, response_json "
+                "FROM business_profile_semantic_artifacts WHERE instrument_id = ?",
+                (instrument_id,),
+            ).fetchall()
+            event_rows = conn.execute(
+                "SELECT artifact_id, status FROM business_profile_semantic_artifact_events "
+                "WHERE artifact_id IN (SELECT artifact_id FROM business_profile_semantic_artifacts WHERE instrument_id = ?) "
+                "AND rowid IN (SELECT MAX(rowid) FROM business_profile_semantic_artifact_events GROUP BY artifact_id)",
+                (instrument_id,),
+            ).fetchall()
+        latest_status = {str(row["artifact_id"]): str(row["status"]) for row in event_rows}
+        known = {
+            str(item.get("details", {}).get("artifact_id") or "")
+            for item in findings
+        }
+        for row in artifact_rows:
+            artifact_id = str(row["artifact_id"])
+            try:
+                response = json.loads(row["response_json"] or "{}")
+            except (TypeError, ValueError, json.JSONDecodeError):
+                response = {}
+            legacy = self._response_has_legacy_occurrence_identity(response)
+            rejected = latest_status.get(artifact_id) in {"rejected", "conversion_pending"}
+            if not legacy and not rejected:
+                continue
+            if artifact_id in known:
+                continue
+            findings.append(
+                self._issue(
+                    "legacy_semantic_artifact",
+                    instrument_id,
+                    {
+                        "artifact_id": artifact_id,
+                        "field_family": row["field_family"],
+                        "source_document_id": row["source_document_id"],
+                        "latest_status": latest_status.get(artifact_id),
+                        "legacy_occurrence_identity": legacy,
+                        "proposed_action": "delete_and_reextract",
+                    },
+                )
+            )
         return findings
+
+    @staticmethod
+    def _response_has_legacy_occurrence_identity(response: Any) -> bool:
+        if not isinstance(response, dict):
+            return True
+        for row in response.get("activities") or ():
+            if not isinstance(row, dict):
+                continue
+            if str(row.get("action") or "") not in {
+                "produces", "sells", "purchases", "consumes", "stores", "transports"
+            }:
+                continue
+            if row.get("value") in (None, "") and row.get("unit") in (None, ""):
+                continue
+            if not str(row.get("source_row_key") or "").strip() and not str(
+                row.get("contract_reference_raw") or ""
+            ).strip():
+                return True
+        return any(
+            isinstance(row, dict) and not str(row.get("source_row_key") or "").strip()
+            for row in response.get("operating_facts") or ()
+        )
 
     def _activity_and_role_findings(self, instrument_id: str) -> list[dict[str, Any]]:
         activities = self.repository.list_records(
@@ -372,14 +475,8 @@ class BusinessProfileSemanticRepairService:
                 changes.append(self._hold_invalid_role(instrument_id, issue))
             elif issue["code"] in {
                 "duplicate_role_business_identity",
-                "incompatible_reusable_artifact",
             }:
-                changes.append({
-                    "instrument_id": instrument_id,
-                    "status": "held",
-                    "reason": issue["code"],
-                    "stable_id": issue["stable_id"],
-                })
+                changes.append(self._deduplicate_machine_roles(instrument_id, issue))
             elif issue["code"] == "operating_fact_occurrence_conflict":
                 if issue.get("details", {}).get("reconstructable"):
                     changes.extend(
@@ -395,7 +492,200 @@ class BusinessProfileSemanticRepairService:
                         "reason": issue["code"],
                         "stable_id": issue["stable_id"],
                     })
+            elif issue["code"] in {"incompatible_reusable_artifact", "legacy_semantic_artifact"}:
+                changes.append(self._delete_unusable_artifact(instrument_id, issue))
+            elif issue["code"] == "failed_work_item":
+                # Deletion is performed once per instrument below so duplicate
+                # findings cannot produce duplicate writes.
+                continue
+        if any(issue["code"] == "failed_work_item" for issue in finding["issues"]):
+            changes.extend(self._cleanup_failed_work_items(instrument_id))
         return changes
+
+    def _deduplicate_machine_roles(
+        self, instrument_id: str, issue: dict[str, Any]
+    ) -> dict[str, Any]:
+        record_ids = [str(value) for value in issue.get("details", {}).get("record_ids") or ()]
+        if len(record_ids) < 2:
+            return {"instrument_id": instrument_id, "status": "unchanged", "reason": "duplicate_role_already_resolved", "stable_id": issue["stable_id"]}
+        removable: list[str] = []
+        for record_id in sorted(record_ids)[1:]:
+            record = self.repository.get_record("value_chain_roles", record_id)
+            metadata = record.get("metadata") if isinstance(record, dict) else {}
+            if (
+                record
+                and record.get("review_status") == "candidate"
+                and str(metadata.get("role_rule_version") or "").startswith("business_profile_")
+            ):
+                removable.append(record_id)
+        if not removable:
+            return {"instrument_id": instrument_id, "status": "held", "reason": "duplicate_role_requires_review", "stable_id": issue["stable_id"]}
+        with self.storage.get_connection() as conn:
+            self.storage._apply_pragmas(conn)
+            conn.execute("BEGIN IMMEDIATE")
+            try:
+                for record_id in removable:
+                    conn.execute(
+                        "DELETE FROM company_value_chain_roles WHERE record_id = ? "
+                        "AND instrument_id = ? AND review_status IN ('approved', 'candidate')",
+                        (record_id, instrument_id),
+                    )
+                conn.commit()
+            except Exception:
+                conn.rollback()
+                raise
+        return {
+            "instrument_id": instrument_id,
+            "status": "changed",
+            "reason": "duplicate_machine_roles_deleted",
+            "stable_id": issue["stable_id"],
+            "affected_ids": removable,
+        }
+
+    def _delete_unusable_artifact(
+        self, instrument_id: str, issue: dict[str, Any]
+    ) -> dict[str, Any]:
+        """Physically remove only a rejected/legacy model receipt.
+
+        Evidence and governed records are intentionally untouched.  Removing
+        the receipt prevents the old response from being selected again; the
+        next backfill must perform a fresh extraction.
+        """
+        artifact_id = str(issue.get("details", {}).get("artifact_id") or "").strip()
+        run_id = str(issue.get("details", {}).get("run_id") or "").strip()
+        if not artifact_id and run_id:
+            with self.storage.get_connection() as conn:
+                self.storage._apply_pragmas(conn)
+                conn.execute("BEGIN IMMEDIATE")
+                try:
+                    row = conn.execute(
+                        "SELECT metadata_json FROM business_profile_semantic_runs "
+                        "WHERE run_id = ? AND instrument_id = ?",
+                        (run_id, instrument_id),
+                    ).fetchone()
+                    if row is None:
+                        conn.rollback()
+                        return {
+                            "instrument_id": instrument_id,
+                            "status": "unchanged",
+                            "reason": "legacy_run_already_absent",
+                            "stable_id": issue["stable_id"],
+                        }
+                    metadata = json.loads(row["metadata_json"] or "{}")
+                    metadata.update({
+                        "reuse_blocked": True,
+                        "cleanup_reason": "incompatible_legacy_run_without_receipt",
+                    })
+                    conn.execute(
+                        "UPDATE business_profile_semantic_runs SET metadata_json = ?, updated_at = ? "
+                        "WHERE run_id = ? AND instrument_id = ?",
+                        (json.dumps(metadata, ensure_ascii=False, sort_keys=True),
+                         get_shanghai_time().isoformat(), run_id, instrument_id),
+                    )
+                    conn.commit()
+                except Exception:
+                    conn.rollback()
+                    raise
+            return {
+                "instrument_id": instrument_id,
+                "status": "changed",
+                "reason": "incompatible_legacy_run_reuse_blocked",
+                "stable_id": issue["stable_id"],
+                "affected_ids": [run_id],
+            }
+        if not artifact_id:
+            return {
+                "instrument_id": instrument_id,
+                "status": "held",
+                "reason": "artifact_identity_unavailable",
+                "stable_id": issue["stable_id"],
+            }
+        with self.storage.get_connection() as conn:
+            self.storage._apply_pragmas(conn)
+            conn.execute("BEGIN IMMEDIATE")
+            try:
+                row = conn.execute(
+                    "SELECT instrument_id FROM business_profile_semantic_artifacts "
+                    "WHERE artifact_id = ?",
+                    (artifact_id,),
+                ).fetchone()
+                if row is None or str(row["instrument_id"]) != instrument_id:
+                    conn.rollback()
+                    return {
+                        "instrument_id": instrument_id,
+                        "status": "unchanged",
+                        "reason": "artifact_already_absent",
+                        "stable_id": issue["stable_id"],
+                    }
+                conn.execute(
+                    "DELETE FROM business_profile_semantic_artifact_events WHERE artifact_id = ?",
+                    (artifact_id,),
+                )
+                # Unit observations are diagnostics derived from the same
+                # semantic receipt.  They are not source evidence and must be
+                # removed with the receipt to satisfy the foreign-key contract.
+                conn.execute(
+                    "DELETE FROM business_profile_unit_rule_observations WHERE artifact_id = ?",
+                    (artifact_id,),
+                )
+                conn.execute(
+                    "DELETE FROM business_profile_semantic_artifacts WHERE artifact_id = ?",
+                    (artifact_id,),
+                )
+                if run_id:
+                    conn.execute(
+                        "DELETE FROM business_profile_semantic_runs WHERE run_id = ? "
+                        "AND instrument_id = ?",
+                        (run_id, instrument_id),
+                    )
+                # Some completed manifests only retain the receipt id inside
+                # metadata.  Remove those obsolete manifests as well; they
+                # cannot be selected once their receipt is gone.
+                conn.execute(
+                    "DELETE FROM business_profile_semantic_runs WHERE instrument_id = ? "
+                    "AND metadata_json LIKE ?",
+                    (instrument_id, f"%{artifact_id}%"),
+                )
+                conn.commit()
+            except Exception:
+                conn.rollback()
+                raise
+        return {
+            "instrument_id": instrument_id,
+            "status": "changed",
+            "reason": "unusable_semantic_artifact_deleted",
+            "stable_id": issue["stable_id"],
+            "affected_ids": [artifact_id],
+        }
+
+    def _cleanup_failed_work_items(self, instrument_id: str) -> list[dict[str, Any]]:
+        """Drop terminal machine failures after their diagnostics are persisted."""
+        with self.storage.get_connection() as conn:
+            self.storage._apply_pragmas(conn)
+            rows = conn.execute(
+                "SELECT work_id, status FROM business_profile_work_items "
+                "WHERE instrument_id = ? AND status IN ('terminal_failure', 'machine_rework')",
+                (instrument_id,),
+            ).fetchall()
+            if not rows:
+                return []
+            conn.execute("BEGIN IMMEDIATE")
+            try:
+                conn.execute(
+                    "DELETE FROM business_profile_work_items WHERE instrument_id = ? "
+                    "AND status IN ('terminal_failure', 'machine_rework')",
+                    (instrument_id,),
+                )
+                conn.commit()
+            except Exception:
+                conn.rollback()
+                raise
+        return [{
+            "instrument_id": instrument_id,
+            "status": "changed",
+            "reason": "failed_work_items_deleted",
+            "affected_ids": [str(row["work_id"]) for row in rows],
+        }]
 
     def _replay_operating_fact_group(
         self, instrument_id: str, issue: dict[str, Any]
@@ -466,11 +756,42 @@ class BusinessProfileSemanticRepairService:
     ) -> dict[str, Any]:
         record_id = str(issue.get("details", {}).get("record_id") or "")
         record = self.repository.get_record("value_chain_roles", record_id)
-        if record is None or record.get("review_status") != "approved":
+        if record is None:
             return {
                 "instrument_id": instrument_id,
                 "status": "unchanged",
                 "reason": "role_already_absent_or_not_approved",
+                "stable_id": issue["stable_id"],
+            }
+        if record.get("review_status") == "candidate":
+            # Candidate roles created by the obsolete inventory rule have no
+            # review history or downstream authority and are pure machine
+            # garbage.  Remove them instead of leaving another hidden state.
+            with self.storage.get_connection() as conn:
+                self.storage._apply_pragmas(conn)
+                conn.execute("BEGIN IMMEDIATE")
+                try:
+                    conn.execute(
+                        "DELETE FROM company_value_chain_roles WHERE record_id = ? "
+                        "AND instrument_id = ? AND review_status = 'candidate'",
+                        (record_id, instrument_id),
+                    )
+                    conn.commit()
+                except Exception:
+                    conn.rollback()
+                    raise
+            return {
+                "instrument_id": instrument_id,
+                "status": "changed",
+                "reason": "invalid_candidate_role_deleted",
+                "stable_id": issue["stable_id"],
+                "affected_ids": [record_id],
+            }
+        if record.get("review_status") != "approved":
+            return {
+                "instrument_id": instrument_id,
+                "status": "unchanged",
+                "reason": "role_not_currently_approved",
                 "stable_id": issue["stable_id"],
             }
         audit = self.review_service.system_hold_approved_record(
@@ -869,6 +1190,9 @@ class BusinessProfileSemanticRepairService:
                 "shareholder_inferred_controller",
                 "relationship_short_name_auto_resolution",
                 "inventory_derived_storage_role",
+                "incompatible_reusable_artifact",
+                "legacy_semantic_artifact",
+                "failed_work_item",
             }
             for item in issues
         )

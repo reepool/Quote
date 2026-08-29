@@ -4055,6 +4055,7 @@ class DataManager:
         instrument_ids: Optional[List[str]] = None,
         apply: bool = False,
         all_scope: bool = False,
+        result_policy: str = "reuse",
     ) -> Dict[str, Any]:
         """Run bounded local semantic repair; audit is the default mode."""
         from research.business_profile_semantic_repair import (
@@ -4072,6 +4073,7 @@ class DataManager:
             instrument_ids=normalized_ids,
             apply=apply,
             all_scope=all_scope,
+            result_policy=result_policy,
         )
 
     async def get_research_company_commodity_exposures(

@@ -89,6 +89,10 @@ _ANONYMOUS_COUNTERPARTY = (
     "unnamed customer",
     "unnamed supplier",
 )
+_ANONYMOUS_CONCENTRATION_LABELS = {
+    "前五大客户", "前五名客户", "前五客户",
+    "前五大供应商", "前五名供应商", "前五供应商",
+}
 _STRUCTURED_FIELD_FAMILIES = (
     "structured_segments",
     "tabular_operating_facts",
@@ -2800,7 +2804,10 @@ def _normalize_relationship(
     disclosed_share = raw.get("disclosed_share")
     if not counterparty:
         raise ValueError("counterparty label is required")
-    if anonymous and disclosed_share is None:
+    # An unnamed customer/supplier is a valid ordinary relationship.  The
+    # disclosed-share requirement applies only to concentration rows (the
+    # explicit ``前五大客户/供应商`` labels), not to every anonymous contract.
+    if _is_anonymous_concentration_label(counterparty) and disclosed_share is None:
         raise ValueError("anonymous concentration requires disclosed_share")
     evidence = _resolve_exact_evidence(
         raw.get("evidence_span_ids"),
@@ -2827,6 +2834,18 @@ def _normalize_relationship(
         **core,
         "counterparty_entity_id": None,
         "review_status": "candidate",
+    }
+
+
+def _is_anonymous_concentration_label(value: Any) -> bool:
+    normalized = "".join(
+        character.lower()
+        for character in str(value or "").strip()
+        if character.isalnum()
+    )
+    return normalized in {
+        "".join(character.lower() for character in label if character.isalnum())
+        for label in _ANONYMOUS_CONCENTRATION_LABELS
     }
 
 

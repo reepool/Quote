@@ -2105,6 +2105,29 @@ class BusinessProfileSemanticRuntime:
                         reuse_source = "in_run"
                     else:
                         replay = self.semantic_artifacts.find_replay(artifact_identity)
+                        # A durable joint response created before occurrence
+                        # identity was introduced must never be replayed.  It
+                        # can contain two same-label contract/table rows that
+                        # the converter cannot distinguish, so only a fresh
+                        # extraction from the current report may repair it.
+                        if replay is not None and self._semantic_response_has_legacy_occurrence_identity(
+                            replay.get("response") or {}
+                        ):
+                            self.semantic_artifacts.mark(
+                                str(replay["artifact_id"]),
+                                "rejected",
+                                runtime_version=RUNTIME_SCHEMA_VERSION,
+                                reason_code="legacy_occurrence_identity_requires_reextract",
+                            )
+                            logger.warning(
+                                "business-profile semantic durable replay rejected "
+                                "legacy occurrence identity instrument_id=%s field_family=%s "
+                                "artifact_id=%s",
+                                item.get("instrument_id"),
+                                item.get("field_family"),
+                                replay.get("artifact_id"),
+                            )
+                            replay = None
                         if replay is not None:
                             semantic_artifact_id = str(replay["artifact_id"])
                             envelope = extractor.replay_validated_response(
@@ -4877,6 +4900,8 @@ class BusinessProfileSemanticRuntime:
                 metadata = json.loads(row["metadata_json"] or "{}")
             except (TypeError, json.JSONDecodeError):
                 continue
+            if metadata.get("reuse_blocked") is True:
+                continue
             if metadata.get("semantic_family_complete") is not True:
                 continue
             if "record_ids" not in metadata or "evidence_ids" not in metadata:
@@ -5000,6 +5025,33 @@ class BusinessProfileSemanticRuntime:
                 "derived_from_evidence",
                 "parser_supplied",
             }:
+                return True
+        return False
+
+    @staticmethod
+    def _semantic_response_has_legacy_occurrence_identity(
+        response: Mapping[str, Any],
+    ) -> bool:
+        """Detect pre-row-aware contract facts before durable replay."""
+
+        measurement_actions = {
+            "produces", "sells", "purchases", "consumes", "stores", "transports"
+        }
+        for row in response.get("activities") or ():
+            if not isinstance(row, Mapping):
+                continue
+            if str(row.get("action") or "") not in measurement_actions:
+                continue
+            if row.get("value") in (None, "") and row.get("unit") in (None, ""):
+                continue
+            if not str(row.get("source_row_key") or "").strip() and not str(
+                row.get("contract_reference_raw") or ""
+            ).strip():
+                return True
+        for row in response.get("operating_facts") or ():
+            if isinstance(row, Mapping) and not str(
+                row.get("source_row_key") or ""
+            ).strip():
                 return True
         return False
 
@@ -6871,6 +6923,21 @@ def _semantic_failure_reason(exc: Exception) -> str:
         return "evidence_provenance_failed"
     if "context" in text or "selector" in text:
         return "context_incomplete"
+    # Local conversion, identity, and temporal contract violations are
+    # deterministic data-quality failures.  They must be surfaced as machine
+    # rework and never masquerade as provider congestion/retryable gateway
+    # errors.
+    if "gateway_failure" in text or "provider congestion" in text:
+        return "gateway_failure"
+    if isinstance(exc, ValueError) and (
+        "temporal conflict" in text
+        or "anonymous concentration" in text
+        or "business profile" in text
+        or "relationship" in text
+        or "activity" in text
+        or "identity" in text
+    ):
+        return "business_rule_validation_failed"
     return "gateway_failure"
 
 

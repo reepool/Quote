@@ -27,8 +27,8 @@
 
 - [x] 4.1 Add one bounded business-profile integrity repair service with zero-write audit default, explicit instrument/apply scope, and existing repository/promotion owners as the only write path.
 - [x] 4.2 Audit inventory-derived storage roles, duplicate role identities, broad-identity contract conflicts, and incompatible reusable artifacts with stable ids, evidence, proposed action, and reason codes.
-- [ ] 4.3 Apply only evidence-positive corrections transactionally per instrument/group; transition or delete unreferenced invalid machine-derived records when permitted, replay dependent publications, and hold unreconstructable cases.
-- [ ] 4.6 Add a bounded operator cleanup/re-extraction path for incompatible legacy semantic artifacts; default reuse must not select those artifacts.
+- [x] 4.3 Apply only evidence-positive corrections transactionally per instrument/group; delete unreferenced invalid machine-derived candidates and terminal work items while preserving evidence and valid approved history, replay dependent publications, and hold unreconstructable cases.
+- [x] 4.6 Add a bounded operator cleanup/re-extraction path for incompatible legacy semantic artifacts; default reuse must not select those artifacts and apply removes their persisted receipts so the next run performs fresh extraction.
 - [x] 4.4 Make repair idempotent, network/LLM-free, and explicit about `would_change`, `changed`, `unchanged`, `held`, and `failed`; prove audit performs zero writes.
 - [x] 4.5 Verify repair/replay calls the existing repository, temporal, promotion, and publication owners and contains no direct parallel table-writing algorithm.
 
@@ -37,5 +37,5 @@
 - [x] 5.1 Add focused tests for separate `成品酒`/`半成品酒` inventory facts, internal versus external storage semantics, multiple qualifying service supports, and aligned role identity/temporal behavior.
 - [x] 5.2 Add tests for the `601012.SH` two-contract pattern, zero-value preservation, legacy approved-plus-candidate reuse, occurrence reconstruction failure, and unrelated-row isolation.
 - [x] 5.3 Add end-to-end tests for `force=true result_policy=reuse`, `replace`, repeated runs, partial publication failure, origin/token reports, and deterministic non-congestion diagnostics.
-- [ ] 5.4 Run audit and apply on a copied database for the affected cohort, verify API/current projections and backfill reports, then run audit again to prove idempotence before any production apply.
+- [x] 5.4 Run audit and apply on a copied database for the affected cohort, verify API/current projections and backfill reports, then run audit again to prove idempotence before any production apply.
 - [x] 5.5 Complete a final review against the three-layer contract, production write-owner invariants, existing API compatibility, and strict OpenSpec validation; archive only after all acceptance tasks pass.

@@ -269,7 +269,14 @@ class BusinessProfileActivityProducer:
             assertion.get("anonymous") is True
             or _is_anonymous_concentration_label(anonymous_label)
         )
-        if anonymous:
+        # ``anonymous=true`` also legitimately describes an unnamed contract
+        # counterparty (for example ``客户 A(1)``).  Only a recognized
+        # concentration label, or an anonymous assertion carrying a disclosed
+        # share, is a concentration fact.
+        is_concentration = _is_anonymous_concentration_label(anonymous_label) or (
+            anonymous and assertion.get("disclosed_share") is not None
+        )
+        if is_concentration:
             share = assertion.get("disclosed_share")
             if share is None:
                 raise ValueError("anonymous relationship requires disclosed_share")
@@ -396,7 +403,7 @@ class BusinessProfileActivityProducer:
             "counterparty_name_normalized": resolution.normalized_name,
             "counterparty_entity_id": resolution.entity_id,
             "resolution_basis": resolution.basis,
-            "anonymous": 0,
+            "anonymous": 1 if anonymous else 0,
             "scope_type": str(assertion.get("scope_type") or "company"),
             "scope_id": str(assertion.get("scope_id") or instrument_id),
             "object_raw": assertion.get("object_raw"),

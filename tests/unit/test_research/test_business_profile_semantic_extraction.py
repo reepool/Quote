@@ -814,7 +814,7 @@ async def test_model_supplied_governed_id_is_rejected_by_local_closed_schema():
 
 
 @pytest.mark.asyncio
-async def test_anonymous_relationship_requires_disclosed_share():
+async def test_anonymous_contract_relationship_without_share_is_preserved():
     selected = _selected("主要业务：公司向客户A销售动力煤。")
     quote = "公司向客户A销售动力煤"
     relationship = {
@@ -835,15 +835,16 @@ async def test_anonymous_relationship_requires_disclosed_share():
             }
         ],
     }
-    with pytest.raises(ValueError, match="requires disclosed_share"):
-        await BusinessProfileSemanticExtractor(
-            _FakeGateway([relationship])
-        ).extract_async(
-            field_family="named_relationships",
-            instrument_id="601088.SH",
-            report_period="2025-12-31",
-            selected=selected,
-        )
+    envelope = await BusinessProfileSemanticExtractor(
+        _FakeGateway([relationship])
+    ).extract_async(
+        field_family="named_relationships",
+        instrument_id="601088.SH",
+        report_period="2025-12-31",
+        selected=selected,
+    )
+    assert envelope.relationships[0]["anonymous"] is True
+    assert envelope.relationships[0]["disclosed_share"] is None
 
 
 @pytest.mark.asyncio

@@ -93,8 +93,8 @@ TEMPORAL_POLICIES: tuple[BusinessProfileTemporalPolicy, ...] = (
         "activities",
         BusinessProfileTemporalClass.POINT_IN_TIME_STATE,
         (
-            "instrument_id", "action", "object_type", "object_id", "segment_id",
-            "object_raw", "evidence_id",
+            "instrument_id", "subject_scope", "action", "object_type",
+            "object_id", "segment_id", "object_raw", "evidence_id",
         ),
         "report_period",
         "valid_from",

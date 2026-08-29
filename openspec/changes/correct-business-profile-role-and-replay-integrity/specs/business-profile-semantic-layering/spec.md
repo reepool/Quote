@@ -69,3 +69,10 @@ Exposure and publication consumers MUST use governed current atomic facts and de
 #### Scenario: Invalid inventory-derived role exists historically
 - **WHEN** a historical `storage_provider` role is supported only by internal inventory activities
 - **THEN** the corrected current projection and downstream publication MUST exclude that role while preserving its audit history until repair is applied
+
+### Requirement: Anonymous contracts remain relationships unless they are concentration facts
+An LLM assertion with an unnamed counterparty (for example ``客户 A(1)``) MUST remain a normal relationship when no concentration label or disclosed share is present. The disclosed-share requirement applies only to explicit concentration labels such as ``前五大客户`` or ``前五大供应商``.
+
+#### Scenario: Anonymous contract has no share
+- **WHEN** a report identifies an unnamed customer or supplier for a specific contract or transaction and ``disclosed_share`` is absent
+- **THEN** the system MUST persist a disclosed-name-only relationship edge with ``anonymous=true`` and MUST NOT reject the entire semantic batch

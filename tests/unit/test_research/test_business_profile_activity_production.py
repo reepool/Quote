@@ -538,6 +538,28 @@ def test_anonymous_disclosure_creates_concentration_fact_without_edge():
     assert fact["metadata"]["no_relationship_edge_created"] is True
 
 
+def test_anonymous_contract_without_share_creates_relationship_edge():
+    producer = BusinessProfileActivityProducer(_Repository())
+    record_type, relationship = producer.build_relationship_or_concentration_candidate(
+        {
+            "instrument_id": "300750.SZ",
+            "report_period": "2025-12-31",
+            "relationship_type": "sells_to",
+            "counterparty_name_raw": "客户 A(1)",
+            "anonymous": True,
+            "object_raw": "锂电池",
+            "scope_id": "company",
+        },
+        resolution=GovernedCounterpartyResolver(entities=[]).resolve("客户 A(1)"),
+        evidence_id="evidence-anonymous-contract",
+        run_id="run-1",
+        data_available_date="2026-03-28",
+    )
+    assert record_type == "relationships"
+    assert relationship["anonymous"] == 1
+    assert relationship["disclosed_share"] is None
+
+
 def test_generic_related_party_label_is_not_anonymous_concentration():
     producer = BusinessProfileActivityProducer(_Repository())
     common = {
