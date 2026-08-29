@@ -1019,6 +1019,101 @@ async def test_ten_report_replay_uses_one_batch_verification_call_per_report():
 
 
 @pytest.mark.asyncio
+async def test_batch_verification_uses_short_indices_and_restores_local_ids():
+    selected = _selected()
+    section = selected.sections[0]
+    targets = []
+    for target_index in range(2):
+        target_id = f"activity-with-a-long-durable-hash-{target_index}-" + ("x" * 80)
+        target = {
+            "activity_id": target_id,
+            "instrument_id": "601088.SH",
+            "report_period": "2025-12-31",
+            "subject_scope": "issuer",
+            "action": "produces",
+            "object_raw": "动力煤",
+            "evidence": {
+                "section_id": section.section_id,
+                "page_number": section.page_number,
+                "section_hash": section.section_hash,
+                "quote": section.normalized_text,
+                "quote_hash": hashlib.sha256(section.normalized_text.encode()).hexdigest(),
+            },
+        }
+        targets.append({"target_type": "activity", "verification_target": target, "selected": selected})
+
+    def indexed_response(request):
+        payload = json.loads(request.messages[-1].content)
+        assert all(len(record["target_id"]) <= 12 for record in payload["records"])
+        assert all("activity-with-a-long" not in json.dumps(record) for record in payload["records"])
+        checks = {key: True for key in ("subject", "action", "object", "scope", "period", "evidence")}
+        return {
+            "schema_version": "business_profile_semantic_batch_verifier.v2",
+            "decisions": [
+                {"target_index": record["target_index"], "decision": "supported", "checks": checks,
+                 "failed_aspects": [], "reason_zh": "公告证据完整支持该业务断言"}
+                for record in reversed(payload["records"])
+            ],
+        }
+
+    gateway = _RequestAwareGateway(indexed_response)
+    decisions, _audit = await BusinessProfileSemanticExtractor(gateway).verify_batch_async(targets=targets)
+    assert {item["target_id"] for item in decisions} == {
+        item["verification_target"]["activity_id"] for item in targets
+    }
+
+
+@pytest.mark.asyncio
+async def test_batch_verification_index_coverage_is_strict():
+    selected = _selected()
+    section = selected.sections[0]
+    targets = []
+    for target_index in range(2):
+        target_id = f"activity-index-{target_index}"
+        targets.append({
+            "target_type": "activity",
+            "verification_target": {
+                "activity_id": target_id,
+                "instrument_id": "601088.SH",
+                "report_period": "2025-12-31",
+                "subject_scope": "issuer",
+                "action": "produces",
+                "object_raw": "动力煤",
+                "evidence": {
+                    "section_id": section.section_id,
+                    "page_number": section.page_number,
+                    "section_hash": section.section_hash,
+                    "quote": section.normalized_text,
+                    "quote_hash": hashlib.sha256(section.normalized_text.encode()).hexdigest(),
+                },
+            },
+            "selected": selected,
+        })
+
+    def malformed_index_response(_request):
+        checks = {key: True for key in ("subject", "action", "object", "scope", "period", "evidence")}
+        return {
+            "schema_version": "business_profile_semantic_batch_verifier.v2",
+            "decisions": [
+                {"target_index": 0, "decision": "supported", "checks": checks,
+                 "failed_aspects": [], "reason_zh": "公告证据完整支持该业务断言"},
+                {"target_index": 0, "decision": "supported", "checks": checks,
+                 "failed_aspects": [], "reason_zh": "重复序号应被隔离"},
+                {"target_index": 9, "decision": "supported", "checks": checks,
+                 "failed_aspects": [], "reason_zh": "越界序号应被隔离"},
+            ],
+        }
+
+    extractor = BusinessProfileSemanticExtractor(
+        _RequestAwareGateway(malformed_index_response)
+    )
+    decisions, audit = await extractor.verify_batch_async(targets=targets)
+    assert len(decisions) == 1
+    assert audit.validation_gates["target_ids"] is False
+    assert any(issue.get("reason") == "target_index_out_of_range" for issue in audit.diagnostics["response_issues"])
+
+
+@pytest.mark.asyncio
 async def test_batch_verification_salvages_valid_decision_from_bad_target_ids():
     selected = _selected()
     section = selected.sections[0]

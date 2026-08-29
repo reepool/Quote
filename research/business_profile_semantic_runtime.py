@@ -4885,6 +4885,19 @@ class BusinessProfileSemanticRuntime:
                 str(key): [str(value) for value in values]
                 for key, values in dict(metadata.get("record_ids") or {}).items()
             }
+            # A completed run can carry the current runtime version while its
+            # semantic artifact was produced before occurrence identity was
+            # added. Such rows are not safely reusable: force the normal
+            # extraction path so the source report is analyzed again.
+            if self._semantic_reuse_has_legacy_occurrence_identity(record_ids):
+                logger.warning(
+                    "business-profile semantic reuse rejected legacy occurrence identity "
+                    "instrument_id=%s field_family=%s run_id=%s",
+                    item.get("instrument_id"),
+                    item.get("field_family"),
+                    row["run_id"],
+                )
+                continue
             evidence_ids = [str(value) for value in metadata.get("evidence_ids") or []]
             complete = all(
                 self.repository.get_record(record_type, record_id) is not None
@@ -4947,6 +4960,34 @@ class BusinessProfileSemanticRuntime:
                 },
             }
         return None
+
+    def _semantic_reuse_has_legacy_occurrence_identity(
+        self, record_ids: Mapping[str, Sequence[str]]
+    ) -> bool:
+        """Return true when semantic contract facts lack row identity.
+
+        Only semantic-synthesis operating facts are checked. Deterministic
+        concentration facts and unrelated record families do not use the
+        contract-row identity and must remain reusable.
+        """
+
+        for record_id in record_ids.get("operating_facts") or ():
+            record = self.repository.get_record("operating_facts", str(record_id))
+            if not isinstance(record, Mapping):
+                continue
+            metadata = record.get("metadata") or {}
+            if not isinstance(metadata, Mapping) or not metadata.get("semantic_synthesis"):
+                continue
+            source_row_key = str(metadata.get("source_row_key") or "").strip()
+            identity_quality = str(
+                metadata.get("occurrence_identity_quality") or ""
+            ).strip()
+            if not source_row_key or identity_quality not in {
+                "derived_from_evidence",
+                "parser_supplied",
+            }:
+                return True
+        return False
 
     def _validate_semantic_reuse_context(
         self,

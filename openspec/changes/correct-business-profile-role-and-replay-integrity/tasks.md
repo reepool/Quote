@@ -21,12 +21,14 @@
 - [x] 3.3 Ensure reuse does not promote incompatible legacy candidates over approved records and replace creates normal governed successors without last-write-wins or evidence deletion.
 - [x] 3.4 Add origin and token accounting for `llm_extracted`, `semantic_reused`, `local_replayed`, and `program_derived`; count tokens only from actual gateway calls.
 - [ ] 3.5 Define and persist separate program-derived aggregate facts with input occurrence keys and rule versions; never replace contract-level facts with totals.
+- [x] 3.6 Replace long durable target ids in batch semantic verification with batch-local short indices, retaining strict coverage and identity diagnostics.
 
 ## 4. Historical audit and repair
 
 - [x] 4.1 Add one bounded business-profile integrity repair service with zero-write audit default, explicit instrument/apply scope, and existing repository/promotion owners as the only write path.
 - [x] 4.2 Audit inventory-derived storage roles, duplicate role identities, broad-identity contract conflicts, and incompatible reusable artifacts with stable ids, evidence, proposed action, and reason codes.
 - [ ] 4.3 Apply only evidence-positive corrections transactionally per instrument/group; transition or delete unreferenced invalid machine-derived records when permitted, replay dependent publications, and hold unreconstructable cases.
+- [ ] 4.6 Add a bounded operator cleanup/re-extraction path for incompatible legacy semantic artifacts; default reuse must not select those artifacts.
 - [x] 4.4 Make repair idempotent, network/LLM-free, and explicit about `would_change`, `changed`, `unchanged`, `held`, and `failed`; prove audit performs zero writes.
 - [x] 4.5 Verify repair/replay calls the existing repository, temporal, promotion, and publication owners and contains no direct parallel table-writing algorithm.
 

@@ -77,3 +77,21 @@ For every requested field family, run reporting MUST distinguish `llm_extracted`
 #### Scenario: One group remains held
 - **WHEN** valid groups publish but one required group remains unresolved
 - **THEN** the field family MUST NOT be reported as fully complete and the held reason MUST be visible in the run result
+
+### Requirement: Legacy semantic results are re-extracted when the identity contract changed
+Completed semantic runs that predate the current occurrence-identity contract MUST NOT be reused when they contain contract/table facts without a reliable `source_row_key` or current processing-contract marker. The default `result_policy=reuse` MUST fall back to a fresh semantic extraction for that family; it MUST NOT silently promote or merge the legacy rows.
+
+#### Scenario: Legacy two-contract artifact is encountered
+- **WHEN** a completed artifact contains two same-label measurements with no occurrence identity and its processing contract is older than the current contract
+- **THEN** the runtime MUST mark the artifact incompatible, skip reuse, and re-extract from the shared report asset so each source row can receive a distinct occurrence identity
+
+### Requirement: Batch verification uses short model references
+The semantic verifier request and response MUST identify targets using a bounded batch-local integer `target_index` (or equivalent short alias), never a durable record id or long hash. The runtime MUST map accepted indices back to the original target ids and MUST reject duplicate, missing, negative, non-integer, or out-of-range indices without modifying unrelated decisions.
+
+#### Scenario: Model alters a durable id
+- **WHEN** a model returns a valid decision for each batch index but cannot reproduce a long durable id
+- **THEN** the runtime MUST accept the decision through its index mapping and persist the original local target id
+
+#### Scenario: Batch indices are malformed
+- **WHEN** a response repeats, omits, or invents an index
+- **THEN** only decisions with valid unique in-range indices MAY be accepted, the affected targets MUST become machine rework, and the issue MUST be classified as a schema/identity failure rather than provider congestion

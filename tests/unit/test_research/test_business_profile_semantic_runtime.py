@@ -153,6 +153,28 @@ def test_operating_fact_row_identity_keeps_same_product_contracts_separate():
     )
 
 
+def test_legacy_semantic_run_is_not_reused_without_occurrence_identity():
+    repository = Mock()
+    repository.get_record.side_effect = [
+        {"metadata": {"semantic_synthesis": True}},
+        {
+            "metadata": {
+                "semantic_synthesis": True,
+                "source_row_key": "row-contract-1",
+                "occurrence_identity_quality": "derived_from_evidence",
+            }
+        },
+    ]
+    runtime = object.__new__(BusinessProfileSemanticRuntime)
+    runtime.repository = repository
+    assert runtime._semantic_reuse_has_legacy_occurrence_identity(
+        {"operating_facts": ["legacy-fact"]}
+    ) is True
+    assert runtime._semantic_reuse_has_legacy_occurrence_identity(
+        {"operating_facts": ["current-fact"]}
+    ) is False
+
+
 def test_scoped_exception_backlog_ignores_historical_reports_and_identities(tmp_path):
     runtime = BusinessProfileSemanticRuntime(
         repository=BusinessProfileRepository(_storage(tmp_path)),
@@ -3841,7 +3863,6 @@ def test_verify_resumes_partial_batch_without_repeating_completed_targets(
     assert len(partial["machine_rework"]) == 1
 
     first_payload = json.loads(gateway.requests[1].messages[-1].content)
-    first_success_id = first_payload["records"][0]["target_id"]
     first_missing_id = first_payload["records"][1]["target_id"]
 
     resumed = pipeline.run("resume", scope=scope)
@@ -3854,10 +3875,13 @@ def test_verify_resumes_partial_batch_without_repeating_completed_targets(
     ]
     final_reference = pipeline.checkpoint_store.load()["artifacts"]["verify"]
     final = runtime.stage_store.read(final_reference, expected_stage="verify")
-    assert {item["target_id"] for item in final["verifications"]} == {
-        first_success_id,
-        first_missing_id,
-    }
+    # The model-facing aliases are intentionally short; persisted
+    # verifications must still carry the original durable activity ids.
+    assert len(final["verifications"]) == 2
+    assert all(
+        str(item["target_id"]).startswith("activity:")
+        for item in final["verifications"]
+    )
     assert final["machine_rework"] == []
     assert final["resume"] == {
         "reused_verifications": 1,
