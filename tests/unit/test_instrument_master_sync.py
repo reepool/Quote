@@ -1153,6 +1153,242 @@ async def test_hkex_later_resumption_reactivates_pdf_suspended_name(tmp_path):
     ] is True
 
 
+def _prolonged_suspension_text(code: str, name: str) -> str:
+    return f"""
+        1  {name}
+        ({code})
+        20-Jan-2025 19-Jul-2026 1. Conduct an independent forensic investigation
+        Link to HKEXnews
+        """
+
+
+@pytest.mark.asyncio
+async def test_hkex_failed_main_board_pdf_does_not_reactivate_from_gem_list(tmp_path):
+    mb_pdf = tmp_path / "psuspenrep_mb.pdf"
+    gem_pdf = tmp_path / "psuspenrep_gem.pdf"
+    mb_pdf.write_bytes(b"%PDF-1.4 mb")
+    gem_pdf.write_bytes(b"%PDF-1.4 gem")
+    manager = _manager()
+    _attach_hkex_mock_db(manager, local_rows=[
+        {
+            'instrument_id': '00005.HK',
+            'symbol': '00005',
+            'name': 'HSBC HOLDINGS',
+            'exchange': 'HKEX',
+            'type': 'stock',
+            'status': 'suspended',
+            'is_active': 1,
+            'trading_status': 0,
+            'source': 'hkexnews_suspension_report',
+            'updated_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+        },
+        {
+            'instrument_id': '09988.HK',
+            'symbol': '09988',
+            'name': 'ALIBABA GROUP-SW',
+            'exchange': 'HKEX',
+            'type': 'stock',
+            'status': 'suspended',
+            'is_active': 1,
+            'trading_status': 0,
+            'source': 'hkexnews_suspension_report',
+            'market': 'GEM',
+            'updated_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+        },
+        {
+            'instrument_id': '00823.HK',
+            'symbol': '00823',
+            'name': 'LINK REIT',
+            'exchange': 'HKEX',
+            'type': 'stock',
+            'status': 'active',
+            'is_active': 1,
+            'trading_status': 1,
+            'source': 'hkex_securities_list',
+            'updated_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+        },
+    ])
+    cfg = _hkex_sync_config("lifecycle_write")
+    cfg['hkexnews_suspension_main_board_file'] = str(mb_pdf)
+    cfg['hkexnews_suspension_gem_file'] = str(gem_pdf)
+    manager._get_hkex_instrument_master_sync_config = Mock(return_value=cfg)
+
+    def fake_parse(self, raw_pdf):
+        if self.market == "Main Board":
+            raise RuntimeError("GPU PDF profile requires a healthy isolated CUDA OCR worker")
+        from data_sources.hkex_instrument_master import HKEXSuspensionReportProvider
+
+        return HKEXSuspensionReportProvider(
+            source_url=str(gem_pdf),
+            market="GEM",
+        ).parse_text(_prolonged_suspension_text("823", "LINK REIT"))
+
+    with patch(
+        "data_sources.hkex_instrument_master.HKEXSuspensionReportProvider.parse_pdf",
+        new=fake_parse,
+    ):
+        result = await manager.sync_hkex_instrument_master()
+
+    reactivated = [
+        call.args[0] for call in manager.db_ops.mark_instrument_active.await_args_list
+    ]
+    suspended = [
+        call.args[0] for call in manager.db_ops.mark_instrument_suspended.await_args_list
+    ]
+    policy = result['exchanges']['HKEX']['source_evidence_policy']
+    assert '00005.HK' not in reactivated
+    assert '09988.HK' in reactivated
+    assert '00823.HK' in suspended
+    assert policy['prolonged_suspension_available_markets'] == ['GEM']
+    assert policy['prolonged_suspension_all_configured_available'] is False
+    assert policy['prolonged_suspension_source_available'] is True
+    assert any('Main Board' in warning for warning in result['exchanges']['HKEX']['warnings'])
+
+
+@pytest.mark.asyncio
+async def test_hkex_failed_gem_pdf_does_not_clear_gem_pdf_suspension(tmp_path):
+    mb_pdf = tmp_path / "psuspenrep_mb.pdf"
+    gem_pdf = tmp_path / "psuspenrep_gem.pdf"
+    mb_pdf.write_bytes(b"%PDF-1.4 mb")
+    gem_pdf.write_bytes(b"%PDF-1.4 gem")
+    manager = _manager()
+    _attach_hkex_mock_db(manager, local_rows=[
+        {
+            'instrument_id': '00005.HK',
+            'symbol': '00005',
+            'name': 'HSBC HOLDINGS',
+            'exchange': 'HKEX',
+            'type': 'stock',
+            'status': 'suspended',
+            'is_active': 1,
+            'trading_status': 0,
+            'source': 'hkexnews_suspension_report',
+            'market': 'Main Board',
+            'updated_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+        },
+        {
+            'instrument_id': '09988.HK',
+            'symbol': '09988',
+            'name': 'ALIBABA GROUP-SW',
+            'exchange': 'HKEX',
+            'type': 'stock',
+            'status': 'suspended',
+            'is_active': 1,
+            'trading_status': 0,
+            'source': 'hkexnews_suspension_report',
+            'market': 'GEM',
+            'updated_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+        },
+    ])
+    cfg = _hkex_sync_config("lifecycle_write")
+    cfg['hkexnews_suspension_main_board_file'] = str(mb_pdf)
+    cfg['hkexnews_suspension_gem_file'] = str(gem_pdf)
+    manager._get_hkex_instrument_master_sync_config = Mock(return_value=cfg)
+
+    def fake_parse(self, raw_pdf):
+        if self.market == "GEM":
+            raise RuntimeError("GEM suspension report unavailable")
+        from data_sources.hkex_instrument_master import HKEXSuspensionReportProvider
+
+        return HKEXSuspensionReportProvider(
+            source_url=str(mb_pdf),
+            market="Main Board",
+        ).parse_text(_prolonged_suspension_text("5", "HSBC HOLDINGS"))
+
+    with patch(
+        "data_sources.hkex_instrument_master.HKEXSuspensionReportProvider.parse_pdf",
+        new=fake_parse,
+    ):
+        result = await manager.sync_hkex_instrument_master()
+
+    reactivated = [
+        call.args[0] for call in manager.db_ops.mark_instrument_active.await_args_list
+    ]
+    policy = result['exchanges']['HKEX']['source_evidence_policy']
+    assert '00005.HK' not in reactivated
+    assert '09988.HK' not in reactivated
+    assert policy['prolonged_suspension_available_markets'] == ['Main Board']
+    assert policy['prolonged_suspension_all_configured_available'] is False
+
+
+@pytest.mark.asyncio
+async def test_hkex_later_resumption_still_clears_pdf_name_when_other_market_fails(tmp_path):
+    mb_pdf = tmp_path / "psuspenrep_mb.pdf"
+    gem_pdf = tmp_path / "psuspenrep_gem.pdf"
+    mb_pdf.write_bytes(b"%PDF-1.4 mb")
+    gem_pdf.write_bytes(b"%PDF-1.4 gem")
+    manager = _manager()
+    _attach_hkex_mock_db(manager, local_rows=[
+        {
+            'instrument_id': '00005.HK',
+            'symbol': '00005',
+            'name': 'HSBC HOLDINGS',
+            'exchange': 'HKEX',
+            'type': 'stock',
+            'status': 'suspended',
+            'is_active': 1,
+            'trading_status': 0,
+            'source': 'hkexnews_suspension_report',
+            'updated_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+        }
+    ])
+    cfg = _hkex_sync_config("lifecycle_write")
+    cfg['hkexnews_suspension_main_board_file'] = str(mb_pdf)
+    cfg['hkexnews_suspension_gem_file'] = str(gem_pdf)
+    cfg['trading_status_announcement_scan_enabled'] = True
+    manager._get_hkex_instrument_master_sync_config = Mock(return_value=cfg)
+    resume_snapshot = HKEXProviderSnapshot(
+        source='hkexnews_trading_halt',
+        source_url='https://www1.hkexnews.hk/search/titlesearch.xhtml',
+        parser_version='test',
+        raw_snapshot_hash='resume',
+        rows=[
+            {
+                'instrument_id': '00005.HK',
+                'symbol': '00005',
+                'name': 'HSBC HOLDINGS',
+                'exchange': 'HKEX',
+                'type': 'stock',
+                'status': 'active',
+                'is_active': True,
+                'trading_status': 1,
+                'source': 'hkexnews_trading_resumption',
+                'lifecycle_evidence_at': '2026-08-17T00:46:00+00:00',
+            }
+        ],
+        diagnostics={'row_count': 1},
+    )
+    manager._scan_hkex_trading_status_announcements = AsyncMock(
+        return_value=resume_snapshot
+    )
+
+    def fake_parse(self, raw_pdf):
+        if self.market == "Main Board":
+            raise RuntimeError("main board PDF unavailable")
+        from data_sources.hkex_instrument_master import HKEXSuspensionReportProvider
+
+        return HKEXSuspensionReportProvider(
+            source_url=str(gem_pdf),
+            market="GEM",
+        ).parse_text(_prolonged_suspension_text("823", "LINK REIT"))
+
+    with patch(
+        "data_sources.hkex_instrument_master.HKEXSuspensionReportProvider.parse_pdf",
+        new=fake_parse,
+    ):
+        result = await manager.sync_hkex_instrument_master()
+
+    manager.db_ops.mark_instrument_active.assert_awaited()
+    assert manager.db_ops.mark_instrument_active.await_args.args[0] == '00005.HK'
+    assert (
+        manager.db_ops.mark_instrument_active.await_args.kwargs['source']
+        == 'hkexnews_trading_resumption'
+    )
+    assert result['exchanges']['HKEX']['source_evidence_policy'][
+        'prolonged_suspension_all_configured_available'
+    ] is False
+
+
 @pytest.mark.asyncio
 async def test_hkex_trading_arrangement_keeps_listed_status_and_clears_trading_status():
     manager = _manager()

@@ -15,7 +15,7 @@ import time
 from dataclasses import dataclass, field
 from datetime import date, datetime, timezone
 from io import BytesIO, StringIO
-from typing import Any, Dict, Iterable, List, Optional, Set, Tuple
+from typing import Any, Dict, Iterable, List, Mapping, Optional, Set, Tuple
 
 import pandas as pd
 
@@ -78,6 +78,14 @@ HKEX_LISTING_ACTIVE_SOURCES = frozenset(
         HKEX_MANUAL_REVIEW_SOURCE,
     }
 )
+HKEX_LISTING_PRESENCE_SOURCES = frozenset(
+    {
+        "hkex_securities_list",
+        "hkexnews_active_list",
+    }
+)
+HKEX_PROLONGED_SUSPENSION_SOURCE = "hkexnews_suspension_report"
+HKEX_PROLONGED_SUSPENSION_MARKETS = ("Main Board", "GEM")
 HKEX_STICKY_CESSATION_OVERRIDE_SOURCES = frozenset(
     {
         HKEX_MANUAL_REVIEW_SOURCE,
@@ -1469,6 +1477,7 @@ class HKEXSuspensionReportProvider:
         snapshot.diagnostics["format"] = "pdf"
         snapshot.diagnostics["page_count"] = result.page_count
         snapshot.diagnostics["pdf_profile"] = profile.name
+        snapshot.diagnostics["market"] = self.market
         return snapshot
 
     _DATE_RE = re.compile(r"\b\d{1,2}-[A-Za-z]{3}-\d{4}\b")
@@ -1572,7 +1581,12 @@ class HKEXSuspensionReportProvider:
             parser_version=HKEX_MASTER_PARSER_VERSION,
             raw_snapshot_hash=_snapshot_hash(raw_text),
             rows=rows,
-            diagnostics={"row_count": len(rows), "skipped_count": skipped, "format": "text"},
+            diagnostics={
+                "row_count": len(rows),
+                "skipped_count": skipped,
+                "format": "text",
+                "market": self.market,
+            },
         )
 
 
@@ -1680,6 +1694,92 @@ class HKEXManualReviewProvider:
         )
 
 
+def normalize_hkex_prolonged_suspension_market(value: Any) -> str:
+    """Normalize Main Board / GEM labels used by prolonged-suspension PDFs."""
+    text = str(value or "").strip()
+    lowered = text.lower().replace("_", " ")
+    if lowered in {"main board", "mainboard", "mb"}:
+        return "Main Board"
+    if lowered == "gem":
+        return "GEM"
+    return text
+
+
+def prolonged_suspension_market_from_row(row: Optional[Mapping[str, Any]]) -> str:
+    """Return the prolonged-suspension market stored on a local or official row."""
+    payload = dict(row or {})
+    evidence = payload.get("lifecycle_evidence")
+    if not isinstance(evidence, Mapping):
+        evidence = {}
+    for candidate in (payload.get("market"), evidence.get("market")):
+        market = normalize_hkex_prolonged_suspension_market(candidate)
+        if market in HKEX_PROLONGED_SUSPENSION_MARKETS:
+            return market
+    return ""
+
+
+def _snapshot_prolonged_suspension_market(snapshot: Any) -> str:
+    diagnostics = getattr(snapshot, "diagnostics", None) or {}
+    market = normalize_hkex_prolonged_suspension_market(diagnostics.get("market"))
+    if market in HKEX_PROLONGED_SUSPENSION_MARKETS:
+        return market
+    rows = getattr(snapshot, "rows", None) or ()
+    if rows:
+        return prolonged_suspension_market_from_row(rows[0])
+    return ""
+
+
+def infer_prolonged_suspension_markets(
+    snapshots: Iterable[Any],
+) -> Dict[str, Dict[str, Any]]:
+    """Build a Main Board / GEM ledger from parsed prolonged-suspension snapshots."""
+    ledger: Dict[str, Dict[str, Any]] = {}
+    for snapshot in snapshots or []:
+        if getattr(snapshot, "source", None) != HKEX_PROLONGED_SUSPENSION_SOURCE:
+            continue
+        market = _snapshot_prolonged_suspension_market(snapshot)
+        if not market:
+            continue
+        rows = list(getattr(snapshot, "rows", None) or [])
+        ledger[market] = {
+            "status": "success" if rows else "empty",
+            "row_count": len(rows),
+        }
+    return ledger
+
+
+def allow_prolonged_suspension_reactivation(
+    local: Optional[Mapping[str, Any]],
+    policy: Optional[Mapping[str, Any]],
+) -> bool:
+    """Return True when the successful prolonged-suspension list covers this name."""
+    available = [
+        normalize_hkex_prolonged_suspension_market(item)
+        for item in (policy or {}).get("prolonged_suspension_available_markets") or []
+    ]
+    market = prolonged_suspension_market_from_row(local)
+    if market:
+        return market in available
+    return bool((policy or {}).get("prolonged_suspension_all_configured_available"))
+
+
+def should_skip_prolonged_suspension_reactivation(
+    local: Optional[Mapping[str, Any]],
+    official: Optional[Mapping[str, Any]],
+    policy: Optional[Mapping[str, Any]],
+) -> bool:
+    """Skip listing-only clearance when that market's prolonged PDF is unavailable."""
+    local_row = local or {}
+    official_row = official or {}
+    if str(local_row.get("status") or "") != "suspended":
+        return False
+    if str(local_row.get("source") or "") != HKEX_PROLONGED_SUSPENSION_SOURCE:
+        return False
+    if str(official_row.get("source") or "") not in HKEX_LISTING_PRESENCE_SOURCES:
+        return False
+    return not allow_prolonged_suspension_reactivation(local_row, policy)
+
+
 class HKEXSourceEvidencePolicy:
     """Summarize source quorum and write gates for HKEX sync modes."""
 
@@ -1691,6 +1791,7 @@ class HKEXSourceEvidencePolicy:
         official_active_rows: Iterable[Dict[str, Any]],
         official_delisted_rows: Iterable[Dict[str, Any]],
         trading_status_scan: Optional[Dict[str, Any]] = None,
+        prolonged_suspension_markets: Optional[Mapping[str, Mapping[str, Any]]] = None,
     ) -> Dict[str, Any]:
         snapshot_list = list(snapshots or [])
         sources = {snapshot.source for snapshot in snapshot_list}
@@ -1698,8 +1799,40 @@ class HKEXSourceEvidencePolicy:
         primary_active_available = "hkex_securities_list" in sources
         fallback_active_available = "hkexnews_active_list" in sources
         delisted_available = "hkexnews_delisted_list" in sources or "hkex_manual_review" in sources
-        prolonged_suspension_available = any(
-            snapshot.source == "hkexnews_suspension_report" and snapshot.rows
+        prolonged_ledger = {
+            normalize_hkex_prolonged_suspension_market(name): dict(info or {})
+            for name, info in dict(prolonged_suspension_markets or {}).items()
+            if normalize_hkex_prolonged_suspension_market(name)
+        }
+        if not prolonged_ledger:
+            prolonged_ledger = infer_prolonged_suspension_markets(snapshot_list)
+        available_markets = [
+            market
+            for market, info in prolonged_ledger.items()
+            if str(info.get("status") or "") == "success"
+            and int(info.get("row_count") or 0) > 0
+        ]
+        available_markets = [
+            market
+            for market in HKEX_PROLONGED_SUSPENSION_MARKETS
+            if market in available_markets
+        ] + [
+            market
+            for market in available_markets
+            if market not in HKEX_PROLONGED_SUSPENSION_MARKETS
+        ]
+        configured_markets = [
+            market
+            for market, info in prolonged_ledger.items()
+            if str(info.get("status") or "") != "not_configured"
+        ]
+        all_configured_available = bool(configured_markets) and all(
+            str(prolonged_ledger[market].get("status") or "") == "success"
+            and int(prolonged_ledger[market].get("row_count") or 0) > 0
+            for market in configured_markets
+        )
+        prolonged_suspension_available = bool(available_markets) or any(
+            snapshot.source == HKEX_PROLONGED_SUSPENSION_SOURCE and snapshot.rows
             for snapshot in snapshot_list
         )
         suspension_available = False
@@ -1734,6 +1867,9 @@ class HKEXSourceEvidencePolicy:
             "delisted_source_available": delisted_available,
             "suspension_source_available": suspension_available,
             "prolonged_suspension_source_available": prolonged_suspension_available,
+            "prolonged_suspension_markets": prolonged_ledger,
+            "prolonged_suspension_available_markets": available_markets,
+            "prolonged_suspension_all_configured_available": all_configured_available,
             "trading_status_scan_complete": scan_complete,
             "untradable_restore_allowed": scan_complete,
             "safe_write_allowed": primary_active_available and has_active_rows and not error_list,

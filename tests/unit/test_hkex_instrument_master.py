@@ -17,6 +17,7 @@ from data_sources.hkex_instrument_master import (
     classify_hkex_product,
     hkex_instrument_id,
     normalize_hkex_code,
+    should_skip_prolonged_suspension_reactivation,
 )
 from research.announcements import AnnouncementRecord, build_announcement_key
 
@@ -290,6 +291,78 @@ def test_source_evidence_policy_accepts_nonempty_suspension_snapshot():
 
     assert policy["suspension_source_available"] is True
     assert policy["suspension_write_allowed"] is True
+
+
+def test_source_evidence_policy_accounts_prolonged_suspension_markets_separately():
+    official = HKEXSecuritiesListProvider(
+        source_url="fixture://hkex_securities_list.csv"
+    ).parse_csv(_fixture("hkex_securities_list.csv"))
+    gem = HKEXSuspensionReportProvider(
+        source_url="fixture://psuspenrep_gem.pdf",
+        market="GEM",
+    ).parse_text(
+        """
+        1  LINK REIT
+        (823)
+        20-Jan-2025 19-Jul-2026 1. Conduct an independent forensic investigation
+        Link to HKEXnews
+        """
+    )
+
+    policy = HKEXSourceEvidencePolicy.assess(
+        snapshots=[official, gem],
+        errors=[],
+        official_active_rows=official.rows,
+        official_delisted_rows=[],
+        prolonged_suspension_markets={
+            "Main Board": {"status": "failed", "row_count": 0},
+            "GEM": {"status": "success", "row_count": 1},
+        },
+    )
+
+    assert policy["prolonged_suspension_source_available"] is True
+    assert policy["prolonged_suspension_available_markets"] == ["GEM"]
+    assert policy["prolonged_suspension_all_configured_available"] is False
+    assert policy["prolonged_suspension_markets"]["Main Board"]["status"] == "failed"
+    assert policy["prolonged_suspension_markets"]["GEM"]["status"] == "success"
+
+
+def test_listing_presence_cannot_clear_pdf_suspension_from_failed_market():
+    policy = {
+        "prolonged_suspension_available_markets": ["GEM"],
+        "prolonged_suspension_all_configured_available": False,
+    }
+    listing = {"source": "hkex_securities_list", "status": "active"}
+    resumption = {"source": "hkexnews_trading_resumption", "status": "active"}
+
+    assert should_skip_prolonged_suspension_reactivation(
+        {"status": "suspended", "source": "hkexnews_suspension_report"},
+        listing,
+        policy,
+    )
+    assert should_skip_prolonged_suspension_reactivation(
+        {
+            "status": "suspended",
+            "source": "hkexnews_suspension_report",
+            "market": "Main Board",
+        },
+        listing,
+        policy,
+    )
+    assert not should_skip_prolonged_suspension_reactivation(
+        {
+            "status": "suspended",
+            "source": "hkexnews_suspension_report",
+            "market": "GEM",
+        },
+        listing,
+        policy,
+    )
+    assert not should_skip_prolonged_suspension_reactivation(
+        {"status": "suspended", "source": "hkexnews_suspension_report"},
+        resumption,
+        policy,
+    )
 
 
 def test_manual_review_provider_turns_operator_conclusions_into_lifecycle_evidence():

@@ -17306,6 +17306,7 @@ class DataManager:
             'suspension_rows': [],
             'untradable_rows': [],
             'trading_status_scan': None,
+            'prolonged_suspension_markets': {},
             'warnings': [],
             'errors': [],
         }
@@ -17398,6 +17399,12 @@ class DataManager:
             ),
             ('hkexnews_suspension_gem_file', 'hkexnews_suspension_gem_url', 'GEM'),
         ):
+            if not (config.get(config_file_key) or config.get(config_url_key)):
+                result['prolonged_suspension_markets'][market] = {
+                    'status': 'not_configured',
+                    'row_count': 0,
+                }
+                continue
             try:
                 provider = HKEXSuspensionReportProvider(
                     source_url=config.get(config_url_key) or config.get(config_file_key) or '',
@@ -17414,16 +17421,34 @@ class DataManager:
                     )
                 else:
                     snapshot = None
-                if snapshot is not None:
-                    result['snapshots'].append(snapshot)
+                if snapshot is None:
+                    result['prolonged_suspension_markets'][market] = {
+                        'status': 'not_configured',
+                        'row_count': 0,
+                    }
+                    continue
+                result['snapshots'].append(snapshot)
+                if snapshot.rows:
+                    result['prolonged_suspension_markets'][market] = {
+                        'status': 'success',
+                        'row_count': len(snapshot.rows),
+                    }
                     result['suspension_rows'].extend(snapshot.rows)
                     result['official_active_rows'].extend(snapshot.rows)
-                    if not snapshot.rows:
-                        result['warnings'].append(
-                            f"HKEX suspension report parsed 0 rows ({market}); "
-                            "treating source as unavailable"
-                        )
+                else:
+                    result['prolonged_suspension_markets'][market] = {
+                        'status': 'empty',
+                        'row_count': 0,
+                    }
+                    result['warnings'].append(
+                        f"HKEX suspension report parsed 0 rows ({market}); "
+                        "treating source as unavailable"
+                    )
             except Exception as exc:
+                result['prolonged_suspension_markets'][market] = {
+                    'status': 'failed',
+                    'row_count': 0,
+                }
                 result['warnings'].append(f"HKEX suspension report fetch/parse failed ({market}): {exc}")
 
         if config.get('trading_status_announcement_scan_enabled', True):
@@ -17684,6 +17709,7 @@ class DataManager:
             HKEXSourceEvidencePolicy,
             build_quote_availability_diagnostics,
             hkex_official_row_is_untradable,
+            should_skip_prolonged_suspension_reactivation,
         )
 
         config = self._get_hkex_instrument_master_sync_config()
@@ -17758,6 +17784,7 @@ class DataManager:
             official_active_rows=official_active_rows,
             official_delisted_rows=official_delisted_rows,
             trading_status_scan=source_bundle.get('trading_status_scan'),
+            prolonged_suspension_markets=source_bundle.get('prolonged_suspension_markets'),
         )
         quote_diagnostics = build_quote_availability_diagnostics(
             local_rows=quote_rows,
@@ -17867,24 +17894,21 @@ class DataManager:
                     if not source_evidence_policy.get('reactivation_write_allowed'):
                         continue
                     local = item.get('local') or {}
+                    official = item.get('official') or {}
                     local_status = str(local.get('status') or '')
-                    local_source = str(local.get('source') or '')
                     if (
                         local_status == 'suspended'
                         and not source_evidence_policy.get('suspension_source_available')
                     ):
                         continue
-                    if (
-                        local_status == 'suspended'
-                        and local_source == 'hkexnews_suspension_report'
-                        and not source_evidence_policy.get(
-                            'prolonged_suspension_source_available'
-                        )
+                    if should_skip_prolonged_suspension_reactivation(
+                        local,
+                        official,
+                        source_evidence_policy,
                     ):
                         continue
                     if item.get('instrument_id') not in allowed_lifecycle_ids:
                         continue
-                    official = item.get('official') or {}
                     if not hasattr(self.db_ops, 'mark_instrument_active'):
                         continue
                     updated = await self.db_ops.mark_instrument_active(
