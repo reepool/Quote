@@ -440,6 +440,10 @@ def test_incremental_sync_uses_periodic_and_narrow_anomaly_scopes(tmp_path):
         (None, "披露"),
         (None, "定期报告"),
     ]
+    assert all(
+        query.scope.source_options.get("adaptive_pagination") is True
+        for query in announcement_service.queries
+    )
     assert result["selected_announcements"] == 2
     assert result["event_count"] == 2
     assert result["errors"] == []
@@ -483,16 +487,17 @@ def test_incremental_sync_reports_incomplete_announcement_stream_as_degraded(tmp
         market="SZSE",
         symbols=["002731"],
     )
+    announcement_service = _FakeAnnouncementService(
+        [record],
+        status="degraded",
+        is_complete=False,
+        stop_reason="max_pages_exhausted",
+    )
     service = FinancialDisclosureIncrementalSyncService(
         db_ops=_FakeDbOps(),
         storage=_FakeStorage(ready=True),
         research_config=_research_config(tmp_path),
-        announcement_service=_FakeAnnouncementService(
-            [record],
-            status="degraded",
-            is_complete=False,
-            stop_reason="max_pages_exhausted",
-        ),
+        announcement_service=announcement_service,
     )
 
     result = _run(
@@ -506,6 +511,7 @@ def test_incremental_sync_reports_incomplete_announcement_stream_as_degraded(tmp
     assert result["status"] == "degraded"
     assert result["candidate_count"] == 1
     assert any("max_pages_exhausted" in item for item in result["scan_errors"])
+    assert all(query.scope.max_pages == 0 for query in announcement_service.queries)
 
 
 def test_incremental_sync_accepts_delayed_report_without_source_retry(tmp_path):

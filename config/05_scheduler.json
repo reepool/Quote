@@ -2210,7 +2210,7 @@
           "lookback_days": 14,
           "overlap_days": 3,
           "page_size": 30,
-          "max_pages_per_market": 40,
+          "max_pages_per_market": 0,
           "max_candidates": 0,
           "pending_recheck_days": 7,
           "target_instrument_ids": null,

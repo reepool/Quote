@@ -22,6 +22,7 @@ from research.announcements.models import (
     AnnouncementRecord,
     AnnouncementScanResult,
     ProviderCursor,
+    announcement_page_budget,
     build_announcement_key,
     normalize_published_at,
 )
@@ -227,9 +228,11 @@ class _CninfoTransport:
         is_complete = False
         stop_reason = "max_pages_exhausted"
 
-        page_budget = max(1, int(config.max_pages))
+        finite_budget = announcement_page_budget(config.max_pages)
+        unbounded = finite_budget is None
+        page_budget = 1 if unbounded else finite_budget
         page_num = start_page
-        while page_num < start_page + page_budget:
+        while unbounded or page_num < start_page + page_budget:
             payload: Optional[Dict[str, Any]] = None
             page_started = time.monotonic()
             LOGGER.info(
@@ -260,14 +263,16 @@ class _CninfoTransport:
             )
             if observed_total_pages is not None:
                 total_pages = observed_total_pages
-                if config.adaptive_pagination:
+                if config.adaptive_pagination or unbounded:
                     # CNInfo totals are scoped to the current date-filtered query.
                     # Use max_pages as an initial budget, then expand to the
                     # market's reported result set once the first page arrives.
+                    # max_pages <= 0 means no caller cap; still honor reported total.
                     page_budget = max(
                         page_budget,
                         max(1, total_pages - start_page + 1),
                     )
+                    unbounded = False
 
             try:
                 raw_records = self._extract_records(payload)
@@ -364,9 +369,10 @@ class _CninfoTransport:
             if (
                 config.preflight_page_bound
                 and not config.adaptive_pagination
+                and finite_budget is not None
                 and page_num == start_page == 1
                 and total_pages is not None
-                and total_pages > max(1, int(config.max_pages))
+                and total_pages > finite_budget
             ):
                 stop_reason = "estimated_pages_exceed_bound"
                 LOGGER.info(
@@ -831,7 +837,7 @@ class CninfoAnnouncementProvider:
                 "adaptive_pagination": bool(
                     (scope.source_options or {}).get("adaptive_pagination", False)
                 ),
-                "page_budget": max(1, int(scope.max_pages)),
+                "page_budget": announcement_page_budget(scope.max_pages) or 0,
                 "reported_total_pages": raw_result.total_pages,
                 "market_config": dict(market_config),
                 "identity": identity or {},

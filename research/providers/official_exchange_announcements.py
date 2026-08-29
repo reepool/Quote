@@ -25,6 +25,7 @@ from research.announcements.models import (
     AnnouncementRecord,
     AnnouncementScanResult,
     ProviderCursor,
+    announcement_page_budget,
     build_announcement_key,
     build_derived_announcement_id,
     normalize_published_at,
@@ -181,15 +182,16 @@ class OfficialExchangeAnnouncementProvider:
         reached_prior_cursor = False
         start_page = max(1, int(scope.start_page))
         last_page_scanned: Optional[int] = None
-
-        for page_num in range(start_page, start_page + scope.max_pages):
+        finite_budget = announcement_page_budget(scope.max_pages)
+        page_num = start_page
+        while finite_budget is None or page_num < start_page + finite_budget:
             page_started = time.monotonic()
             LOGGER.info(
                 "official announcement page started: source=%s symbol=%s page=%s/%s effective_page_size=%s",
                 self.source_name,
                 scope.symbol,
                 page_num,
-                scope.max_pages,
+                finite_budget if finite_budget is not None else "unlimited",
                 page_size,
             )
             try:
@@ -300,6 +302,7 @@ class OfficialExchangeAnnouncementProvider:
                 break
             if self.config.request_interval_seconds > 0:
                 time.sleep(self.config.request_interval_seconds)
+            page_num += 1
 
         records = self._deduplicate_records(records)
         if errors:

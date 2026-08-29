@@ -488,6 +488,7 @@ def test_financial_disclosure_jobs_process_all_candidates_same_day():
     reconciliation = jobs["financial_disclosure_reconciliation_sync"]["parameters"]
 
     assert incremental["max_candidates"] == 0
+    assert incremental["max_pages_per_market"] == 0
     assert reconciliation["max_candidates"] == 0
     assert incremental["max_runtime_seconds"] >= 14400
     assert reconciliation["max_runtime_seconds"] >= 18000

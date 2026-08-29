@@ -24,7 +24,10 @@ from research.announcements import (
     load_announcement_acquisition_config,
     normalize_published_at,
 )
-from research.announcements.models import build_derived_announcement_id
+from research.announcements.models import (
+    announcement_page_budget,
+    build_derived_announcement_id,
+)
 from research.providers.cninfo_announcements import (
     CninfoAnnouncementProvider,
 )
@@ -101,6 +104,13 @@ def test_scope_key_excludes_run_window_and_bounds_but_includes_stream_identity()
         source_options={"adaptive_pagination": True},
     ).scope_key
     assert left.scope_key != different.scope_key
+
+
+def test_scope_keeps_zero_max_pages_as_unlimited():
+    scope = AnnouncementScope(exchange="SSE", max_pages=0)
+
+    assert scope.max_pages == 0
+    assert announcement_page_budget(scope.max_pages) is None
 
 
 def test_source_qualified_and_derived_identity_are_deterministic():
@@ -718,6 +728,42 @@ def test_cninfo_provider_adapts_page_budget_to_reported_market_total():
     assert result.pages_scanned == 3
     assert result.announcements_seen == 61
     assert result.diagnostics["adaptive_pagination"] is True
+    assert [call["data"]["pageNum"] for call in session.calls] == ["1", "2", "3"]
+
+
+def test_cninfo_provider_unlimited_pages_follow_reported_total():
+    full_page = [
+        {
+            "announcementId": f"unlimited-{index}",
+            "announcementTitle": f"公告{index}",
+            "announcementTime": 1777392000000 - index,
+        }
+        for index in range(30)
+    ]
+    tail_page = [
+        {
+            "announcementId": "unlimited-tail",
+            "announcementTitle": "公告尾页",
+            "announcementTime": 1777391999000,
+        }
+    ]
+    session = _Session(
+        payloads=[
+            {"announcements": full_page, "totalpages": 3},
+            {"announcements": full_page, "totalpages": 3},
+            {"announcements": tail_page, "totalpages": 3},
+        ]
+    )
+
+    result = _cninfo_provider(session).discover(
+        _query(page_size=30, max_pages=0)
+    )
+
+    assert result.status == "success"
+    assert result.is_complete is True
+    assert result.stop_reason == "last_page"
+    assert result.pages_scanned == 3
+    assert result.diagnostics["page_budget"] == 0
     assert [call["data"]["pageNum"] for call in session.calls] == ["1", "2", "3"]
 
 

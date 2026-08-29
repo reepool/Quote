@@ -70,6 +70,7 @@ _BSE_PERIODIC_ANNOUNCEMENT_ENDPOINT = (
 )
 DEFAULT_STALE_RUNNING_TIMEOUT_SECONDS = 6 * 60 * 60
 DEFAULT_MAX_CANDIDATES = 0  # 0 = unlimited; finish every selected candidate in the same run
+DEFAULT_MAX_PAGES_PER_MARKET = 0  # 0 = no page cap; stop at watermark/last page/reported total
 STALE_FINANCIAL_JOB_NAMES = (
     "financial_disclosure_incremental_sync",
     "financial_disclosure_reconciliation_sync",
@@ -222,7 +223,7 @@ class FinancialDisclosureIncrementalSyncService:
         overlap = int(maintenance_cfg.get("overlap_days", 3) if overlap_days is None else overlap_days)
         scan_page_size = int(maintenance_cfg.get("page_size", 30) if page_size is None else page_size)
         max_pages = int(
-            maintenance_cfg.get("max_pages_per_market", 40)
+            maintenance_cfg.get("max_pages_per_market", DEFAULT_MAX_PAGES_PER_MARKET)
             if max_pages_per_market is None
             else max_pages_per_market
         )
@@ -569,6 +570,7 @@ class FinancialDisclosureIncrementalSyncService:
                     page_size=page_size,
                     max_pages=max_pages_per_market,
                     overlap_days=overlap_days,
+                    source_options={"adaptive_pagination": True},
                 )
                 with self.storage.financial_database_scope():
                     state = self.storage.get_announcement_scan_state(

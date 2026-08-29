@@ -16,6 +16,14 @@ SHANGHAI_TZ = ZoneInfo("Asia/Shanghai")
 SUCCESSFUL_SCAN_STATUSES = frozenset({"success", "success_empty"})
 
 
+def announcement_page_budget(max_pages: int) -> Optional[int]:
+    """Return a finite page cap, or None when the caller asked for no upper bound."""
+    value = int(max_pages)
+    if value <= 0:
+        return None
+    return value
+
+
 def _stable_json(value: Mapping[str, Any]) -> str:
     return json.dumps(
         dict(value),
@@ -175,7 +183,7 @@ class AnnouncementScope:
             normalize_announcement_category(self.category),
         )
         object.__setattr__(self, "page_size", max(1, int(self.page_size)))
-        object.__setattr__(self, "max_pages", max(1, int(self.max_pages)))
+        object.__setattr__(self, "max_pages", int(self.max_pages))
         object.__setattr__(self, "overlap_days", max(0, int(self.overlap_days)))
         object.__setattr__(self, "start_page", max(1, int(self.start_page)))
         object.__setattr__(
