@@ -9,7 +9,7 @@
 
 - [ ] 2.1 Move still-required production functions out of scripts/dev_validation and convert scripts to authoritative service adapters.
 - [ ] 2.2 Migrate remaining facade callers to application services/repositories/task adapters and verify replacement equivalence.
-- [ ] 2.3 Publish a replacement map and enable deprecation warnings for compatibility aliases with possible external consumers; record the transition-cycle end date.
+- [ ] 2.3 Publish a replacement map and enable deprecation warnings for compatibility aliases with possible external consumers; record the transition-cycle end date and any moving-target exception in `framework_refactoring_program.md` section 8.1.
 - [ ] 2.4 Convert retained manual tools to operator status with current runbooks, bounded inputs, and no copied write logic.
 - [ ] 2.5 Preserve migration/recovery tools only until their documented rollback window and acceptance close.
 

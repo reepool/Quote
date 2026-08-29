@@ -43,7 +43,7 @@ DataManager, ResearchStorageManager, and ScheduledTasks compatibility methods SH
 - **THEN** the method and its duplicate implementation are removed in the retirement change
 
 ### Requirement: Compatibility aliases have a bounded deprecation period
-Compatibility methods with plausible external consumers MUST publish a replacement map and emit a deprecation warning for one documented transition cycle before physical deletion.
+Compatibility methods with plausible external consumers MUST publish a replacement map and emit a deprecation warning for one documented transition cycle before physical deletion. Any moving-target exception MUST be recorded in `framework_refactoring_program.md` section 8.1 with its reason, replacement owner/change, and latest cleanup workstream.
 
 #### Scenario: Repository search finds no local callers
 - **WHEN** a facade method may still be used by an external notebook or operator script

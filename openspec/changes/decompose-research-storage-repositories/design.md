@@ -25,7 +25,7 @@
 3. **Split schema by owner using existing migrations.** The manager's table initializer becomes explicit idempotent schema modules/migrations, with no destructive table rebuild.
 4. **Retain a delegating ResearchStorageManager.** Existing imports continue to work while new services migrate to repositories; delegates carry removal metadata.
 5. **Preserve attach and financial scope behavior.** Any cross-database read remains an explicit operation with tests; repository splitting must not create hidden cross-database writes.
-6. **Treat W4 as a domain-boundary dependency, not a whole-workstream barrier.** A repository slice may start only after its corresponding W4 application-service boundary is accepted; unrelated W5 slices may proceed while other W4 slices remain unfinished.
+6. **Treat W4 as a domain-boundary dependency, not a whole-workstream barrier.** A repository slice may start only after its corresponding W4 application-service boundary is accepted; unrelated W5 slices may proceed while other W4 slices remain unfinished. The ingestion-metadata slice and shared connection coordinator are infrastructure work, so they are exempt from the per-domain W4 gate and may start after W5 storage inventory and ownership are accepted.
 
 Alternatives rejected: merging all tables would change operational failure domains; a new ORM would add risk; copying SQL into repositories without shared transaction ownership would create a second storage implementation.
 
