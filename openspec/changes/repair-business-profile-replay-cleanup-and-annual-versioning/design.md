@@ -1,0 +1,57 @@
+## Context
+
+本 change 针对画像生产链路中已经在真实批次复现的两个阻塞问题：同一报告的经营事实重跑生成不同 activity identity 并触发 temporal conflict；普通匿名合同关系在转换时被当作匿名集中度，业务错误又被 worker 包装为 gateway failure。现有代码还保留部分 `conversion_pending` receipt，并允许 `reuse` 看到历史结构或不完整身份，导致错误结果反复进入队列。
+
+画像数据同时需要支持三种时间场景：新年度报告应追加新的报告期事实；同一报告重跑应幂等复用；更正报告应产生明确的替代版本。已批准的真实历史不能被删除或静默覆盖，但确认不可复用的失败结果和候选垃圾必须物理清理。
+
+## Goals / Non-Goals
+
+**Goals:**
+
+- 建立由报告、物理页、证据 span、表格/来源行、合同引用、主体范围和客体组成的稳定 occurrence identity。
+- 使同一 occurrence 的重跑在 `reuse` 下复用，`replace` 仅对同一报告流产生显式新版本；不同报告期、合同或表格行不能碰撞。
+- 将普通匿名关系与匿名集中度建模为不同关系语义，只有集中度记录要求 `disclosed_share`。
+- 让业务规则、schema、证据、单位和网关错误保留原始分类；只有真实 provider congestion 才进入网关重试。
+- 提供受规则约束的清理迁移，删除不可复用 receipt、失败工作项和其 candidate 输出，同时保护 approved 历史。
+- 用真实生产回放验证 002496.SZ、300750.SZ，并验证新年度和更正报告不会被历史记录永久阻塞。
+
+**Non-Goals:**
+
+- 不更换 PDF 解析器、LLM 模型或公共网关。
+- 不删除真实的 approved 历史事实、证据和审计记录。
+- 不新增通用数据治理平台或第二套画像写入 owner。
+
+## Decisions
+
+1. **Occurrence identity 单一生成入口。** 在语义转换层生成规范化 occurrence material，活动、经营事实和关系均使用同一套来源行/合同/客体字段；治理层使用完全相同的字段集合计算 temporal identity。缺字段时记录 `identity_incomplete` 并进入 machine rework，不用随机或活动 ID 作为替代。
+
+2. **三种报告生命周期显式区分。** 新报告期按新的 `report_period + source_document_id` 追加；同报告重跑在内容 hash 和 occurrence material 相同时复用；更正报告使用新的 source revision 并由 `replace` 产生后继版本，保留原 approved 记录和 lineage。`force` 只控制入队，不能绕过 identity 或治理门禁。
+
+3. **匿名关系类型显式化。** 在规范化关系中增加可判定的 `relationship_scope`（`ordinary` 或 `concentration`），或由集中度标签确定该值。`客户 A(1)` 等普通匿名合同属于 `ordinary`，允许 `disclosed_share=null`；`前五名客户/供应商` 属于 `concentration`，必须有有限的 `disclosed_share`。
+
+4. **错误分类沿异常对象传递。** 转换异常必须携带稳定 reason code 和 retryable 标志；worker 不根据字符串把所有 machine rework 改写成 `gateway_failure`。只有 provider 返回 429、超时、传输错误等才触发退避重试，确定性业务错误直接终态 machine rework。
+
+5. **清理先审计后删除。** repair 先生成按 instrument/report/source 的清理清单；删除范围仅包括 rejected、不可复用 conversion pending、旧结构 receipt、terminal/machine work item 及其 candidate 输出。approved 记录、源证据和 review audit 不删除。清理后 `find_replay` 不得再返回被删 receipt。
+
+6. **批量前门禁。** 11 只样本批量前必须通过 identity collision scan、unusable receipt scan 和 worker error taxonomy scan；任一阻塞项存在时只允许定向重放，不启动全量 LLM 批次。
+
+## Risks / Trade-offs
+
+- [Risk] 更细的 occurrence identity 会使历史候选数量增加。→ 只对可重建的来源行生成新候选，无法重建的记录保持 machine rework，不自动批准。
+- [Risk] 清理 pending receipt 可能失去可重放的模型结果。→ 清理清单区分真正可重放的 `unit_rule_*` receipt；只有用户确认的不可复用旧结构/失败结果才删除，删除后由新抽取重建。
+- [Risk] 新报告和更正报告可能同时存在重叠记录。→ source revision、report period 和 lineage 纳入唯一性校验，更正只允许显式 replace，不允许 reuse 静默覆盖。
+- [Risk] 旧运行进程加载旧代码。→ 运行时报告加入 source revision/runtime identity，部署后先执行进程版本 smoke test，再运行定向回放。
+
+## Migration Plan
+
+1. 部署代码和回归测试，但先不启动批量回补。
+2. 对目标样本执行只读扫描，输出 occurrence 冲突、匿名关系分类、receipt 状态和候选依赖。
+3. 在事务中清理确认不可复用的失败 receipt/work item/candidate，保留 approved、evidence 和 audit，并记录清理报告。
+4. 定向重放 002496.SZ 与 300750.SZ；要求零 identity conflict、零错误 gateway 包装、零无效重试。
+5. 验证一份新年度报告和一份同年度更正报告的追加/替代行为。
+6. 通过门禁后恢复 11 只股票批量；任一步失败则停止批量，不自动扩大重试范围。
+
+## Open Questions
+
+- 更正报告的 API 是否需要返回原报告与更正报告的显式 lineage 字段；本 change 默认在内部保存 lineage，保持现有查询兼容。
+- `unit_rule_superseded` receipt 是否由本 change 统一删除，还是在单位目录修复后保留一次受控本地重放；实现前以清理扫描结果决定，不能静默删除可复用结果。
