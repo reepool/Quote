@@ -23,7 +23,7 @@ The system MUST append a new report-period occurrence for a new annual report an
 - **THEN** `result_policy=replace` creates a linked successor version and `result_policy=reuse` does not silently overwrite the approved predecessor
 
 ### Requirement: Unusable result cleanup
-The system MUST physically remove rejected or otherwise non-reusable semantic receipts, obsolete shadow runs, superseded or failed work items, and candidate outputs explicitly owned by those receipts or runs. Work is considered retired shadow work only when its persisted processing mode is `rollout_phase=structured_shadow` or it carries an explicit, immutable `retirement_marker` with a reason and timestamp; a field-family name alone MUST NOT make an otherwise active work item eligible for deletion. Approved records, source evidence, and audit records MUST NOT be deleted.
+The system MUST physically remove rejected or otherwise non-reusable semantic receipts, obsolete shadow runs, superseded or failed work items, and candidate outputs explicitly owned by those receipts or runs. Work is considered retired shadow work only when its persisted processing mode is `rollout_phase=structured_shadow` or it carries an explicit, immutable `retirement_marker` with a reason and timestamp; a field-family name alone MUST NOT make an otherwise active work item eligible for deletion. New semantic runs and durable receipts MUST persist the processing identity needed for this decision; the retirement migration MUST write an immutable marker to selected legacy runs/receipts that lack it before cleanup. Approved records, source evidence, and audit records MUST NOT be deleted.
 
 #### Scenario: Failed receipt cleanup
 - **WHEN** repair marks a receipt as rejected or non-reusable conversion pending

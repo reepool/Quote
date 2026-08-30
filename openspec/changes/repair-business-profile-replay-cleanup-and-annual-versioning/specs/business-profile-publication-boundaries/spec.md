@@ -40,6 +40,10 @@ Gross-margin reconciliation MUST account for the precision and unit of the repor
 - **WHEN** the calculated margin is `35.249%` and the report discloses `35%`
 - **THEN** the result is evaluated using the disclosed precision and is not rejected solely because the normalized difference exceeds a fixed `0.01%` tolerance
 
+#### Scenario: Missing cost cannot validate an out-of-range margin
+- **WHEN** segment cost is missing or not applicable and a reported margin is outside the canonical fraction range or conflicts with its declared/header unit
+- **THEN** reconciliation records a publication blocker and the row cannot be automatically promoted merely because cost reconciliation is not applicable
+
 ### Requirement: Gross-margin normalization has one owner
 Deterministic segment extraction MUST carry the table-header percent unit (or an explicit row unit) into the margin normalizer. Gross margins MUST be converted to the canonical fraction exactly once before reconciliation and publication; downstream validation MUST NOT divide an already normalized fraction again or infer a percent unit from the numeric magnitude alone.
 
@@ -50,7 +54,3 @@ Deterministic segment extraction MUST carry the table-header percent unit (or an
 #### Scenario: Explicit fraction is preserved
 - **WHEN** a deterministic source already supplies a canonical fraction such as `0.35249`
 - **THEN** reconciliation consumes that fraction unchanged and records the source unit as fraction rather than treating it as a percent value
-
-#### Scenario: Missing cost cannot validate an out-of-range margin
-- **WHEN** segment cost is missing or not applicable and a reported margin is outside the canonical fraction range or conflicts with its declared/header unit
-- **THEN** reconciliation records a publication blocker and the row cannot be automatically promoted merely because cost reconciliation is not applicable

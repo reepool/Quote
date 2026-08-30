@@ -33,7 +33,7 @@
 
 4. **错误分类沿异常对象传递。** 转换异常必须携带稳定 reason code 和 retryable 标志；worker 不根据字符串把所有 machine rework 改写成 `gateway_failure`。只有 provider 返回 429、超时、传输错误等才触发退避重试，确定性业务错误直接终态 machine rework。
 
-5. **清理先审计后删除。** repair 先生成按 instrument/report/source 的清理清单；删除范围包括 rejected、不可复用 conversion pending、明确标记为 `rollout_phase=structured_shadow` 的旧 receipt/run/work、superseded 或 terminal/machine work item、superseded run manifest 及其 candidate 输出。对没有该 rollout phase 但确需退役的历史执行态，迁移必须写入带非空 reason 和 timestamp 的不可变 `retirement_marker`，后续清理只读取这两个权威条件。`structured_segments` 和 `tabular_operating_facts` 的 family 名称不是退役依据。approved 记录、源证据和 review audit 不删除。清理后 `find_replay` 不得再返回被删 receipt，旧 shadow work 不得继续被 worker 领取。
+5. **清理先审计后删除。** repair 先生成按 instrument/report/source 的清理清单；删除范围包括 rejected、不可复用 conversion pending、明确标记为 `rollout_phase=structured_shadow` 的旧 receipt/run/work、superseded 或 terminal/machine work item、superseded run manifest 及其 candidate 输出。所有新建 semantic run 和 durable receipt 必须持久化包含 `rollout_phase` 的 processing identity；对没有该信息但确需退役的存量 run/receipt，迁移必须先按关联 work、创建期 phase 或人工确认写入带非空 reason 和 timestamp 的不可变 `retirement_marker`，再执行清理。后续清理只读取这两个权威条件。`structured_segments` 和 `tabular_operating_facts` 的 family 名称不是退役依据。approved 记录、源证据和 review audit 不删除。清理后 `find_replay` 不得再返回被删 receipt，旧 shadow work 不得继续被 worker 领取。
 
 6. **执行态文件与数据库同一 owner。** repair 删除 work row 时先在数据库事务中记录精确 checkpoint manifest，提交成功后仅删除配置 checkpoint 根目录直属、名称匹配 `bp-work-*.json` 的文件。无任何保留 work row 引用的同类文件视为孤儿并物理删除；越界路径拒绝删除，文件删除失败必须报告失败并可在下一次 repair 幂等重试。enqueue 遇到旧 scope 或孤儿 checkpoint 时使用新的空路径，并在数据库切换成功后删除不再被引用的旧文件，不建立 quarantine/legacy 目录。
 
@@ -91,3 +91,4 @@
 - 东财 200 行截断：依赖该端点前补分页和完整性校验。
 - GBK 编码处理：用代表性 fixture 单独补来源兼容 change。
 - `bookmark_title` 死路径：书签选择成为权威路径时删除或接通。
+- legacy `BusinessProfileLLMClient` / `llm.py` null 校验死路径：画像生产路径重新启用该客户端时，先补调用链、null 语义和回归测试，再单独清理 legacy 实现。
