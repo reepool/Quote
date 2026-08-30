@@ -43,3 +43,17 @@ The system MUST block broad LLM backfill when identity collisions or non-reusabl
 #### Scenario: Clean scope
 - **WHEN** the selected scope passes collision and receipt scans
 - **THEN** the batch may proceed to semantic extraction
+
+### Requirement: Replay execution-state isolation
+The system MUST bind a backfill only to checkpoint state that belongs to the
+current durable work row and logical scope. A targeted backfill MUST consume
+only the work IDs selected by that invocation, while reusable semantic receipts
+remain independent from transient pipeline checkpoints.
+
+#### Scenario: Cleanup leaves an orphan checkpoint file
+- **WHEN** lifecycle cleanup removes a failed work row but its deterministic checkpoint path still exists
+- **THEN** recreating the work row rotates to an empty checkpoint path and does not load the orphaned scope
+
+#### Scenario: Targeted backfill shares a processing identity with queued work
+- **WHEN** a single-instrument backfill runs while other instruments have claimable work under the same processing identity
+- **THEN** its workers claim only the work IDs selected by the current backfill and leave unrelated queued work unchanged

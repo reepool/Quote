@@ -331,7 +331,7 @@ class BusinessProfileWorkRepository:
         end_date: str | None = None,
         max_attempts: int = 3,
         force: bool = False,
-    ) -> dict[str, int]:
+    ) -> dict[str, Any]:
         cutoff = _date_text(knowledge_cutoff, "knowledge_cutoff")
         normalized_start = _date_text(start_date, "start_date") if start_date else None
         normalized_end = _date_text(end_date, "end_date") if end_date else None
@@ -371,7 +371,7 @@ class BusinessProfileWorkRepository:
         asset: Mapping[str, Any],
         max_attempts: int = 3,
         force: bool = False,
-    ) -> dict[str, int]:
+    ) -> dict[str, Any]:
         """Enqueue only the immutable shared observation selected by a caller."""
 
         binding = _normalize_bound_shared_asset(asset)
@@ -419,7 +419,7 @@ class BusinessProfileWorkRepository:
         document_types: Sequence[str] = (),
         max_attempts: int = 3,
         force: bool = False,
-    ) -> dict[str, int]:
+    ) -> dict[str, Any]:
         cutoff = _date_text(knowledge_cutoff, "knowledge_cutoff")
         normalized_instruments = tuple(
             sorted({str(item).strip() for item in instrument_ids if str(item).strip()})
@@ -462,6 +462,7 @@ class BusinessProfileWorkRepository:
         lease_owner: str,
         lease_seconds: int,
         processing_identity_hash: str | None = None,
+        include_work_ids: Sequence[str] | None = None,
         exclude_work_ids: Sequence[str] = (),
     ) -> tuple[dict[str, Any], ...]:
         normalized_stage = _stage(stage)
@@ -474,6 +475,18 @@ class BusinessProfileWorkRepository:
             identity_clause = (
                 "AND processing_identity_hash = ?" if processing_identity_hash else ""
             )
+            included = (
+                tuple(sorted({str(value) for value in include_work_ids if str(value)}))
+                if include_work_ids is not None
+                else None
+            )
+            inclusion_clause = (
+                "AND work_id IN (" + ",".join("?" for _ in included) + ")"
+                if included
+                else "AND 0"
+                if included is not None
+                else ""
+            )
             excluded = tuple(
                 sorted({str(value) for value in exclude_work_ids if str(value)})
             )
@@ -485,6 +498,8 @@ class BusinessProfileWorkRepository:
             params: list[Any] = [normalized_stage, now_text, now_text]
             if processing_identity_hash:
                 params.append(str(processing_identity_hash))
+            if included:
+                params.extend(included)
             params.extend(excluded)
             params.append(max(1, int(limit)))
             rows = conn.execute(
@@ -497,6 +512,7 @@ class BusinessProfileWorkRepository:
                     OR (status = 'running' AND lease_expires_at <= ?)
                   )
                   {identity_clause}
+                  {inclusion_clause}
                   {exclusion_clause}
                 ORDER BY report_period DESC, updated_at, created_at, work_id
                 LIMIT ?
@@ -534,6 +550,7 @@ class BusinessProfileWorkRepository:
         stage: str,
         *,
         processing_identity_hash: str | None = None,
+        include_work_ids: Sequence[str] | None = None,
         exclude_work_ids: Sequence[str] = (),
     ) -> bool:
         """Probe queue availability without taking the SQLite writer."""
@@ -542,6 +559,18 @@ class BusinessProfileWorkRepository:
         now_text = get_shanghai_time().isoformat()
         identity_clause = (
             "AND processing_identity_hash = ?" if processing_identity_hash else ""
+        )
+        included = (
+            tuple(sorted({str(value) for value in include_work_ids if str(value)}))
+            if include_work_ids is not None
+            else None
+        )
+        inclusion_clause = (
+            "AND work_id IN (" + ",".join("?" for _ in included) + ")"
+            if included
+            else "AND 0"
+            if included is not None
+            else ""
         )
         excluded = tuple(
             sorted({str(value) for value in exclude_work_ids if str(value)})
@@ -554,6 +583,8 @@ class BusinessProfileWorkRepository:
         params: list[Any] = [normalized_stage, now_text, now_text]
         if processing_identity_hash:
             params.append(str(processing_identity_hash))
+        if included:
+            params.extend(included)
         params.extend(excluded)
         with self.storage.get_connection() as conn:
             self.storage._apply_pragmas(conn)
@@ -567,6 +598,7 @@ class BusinessProfileWorkRepository:
                     OR (status = 'running' AND lease_expires_at <= ?)
                   )
                   {identity_clause}
+                  {inclusion_clause}
                   {exclusion_clause}
                 LIMIT 1
                 """,
@@ -1628,23 +1660,37 @@ class BusinessProfileWorkRepository:
         stage: str,
         *,
         processing_identity_hash: str | None = None,
+        include_work_ids: Sequence[str] | None = None,
     ) -> int:
         identity_clause = (
             " AND processing_identity_hash = ?" if processing_identity_hash else ""
         )
-        params: tuple[Any, ...] = (
-            (_stage(stage), str(processing_identity_hash))
-            if processing_identity_hash
-            else (_stage(stage),)
+        included = (
+            tuple(sorted({str(value) for value in include_work_ids if str(value)}))
+            if include_work_ids is not None
+            else None
         )
+        inclusion_clause = (
+            " AND work_id IN (" + ",".join("?" for _ in included) + ")"
+            if included
+            else " AND 0"
+            if included is not None
+            else ""
+        )
+        params: list[Any] = [_stage(stage)]
+        if processing_identity_hash:
+            params.append(str(processing_identity_hash))
+        if included:
+            params.extend(included)
         with self.storage.get_connection() as conn:
             self.storage._apply_pragmas(conn)
             return int(
                 conn.execute(
                     "SELECT COUNT(*) FROM business_profile_work_items "
                     "WHERE stage = ? AND status IN ('pending', 'retry_due')"
-                    + identity_clause,
-                    params,
+                    + identity_clause
+                    + inclusion_clause,
+                    tuple(params),
                 ).fetchone()[0]
             )
 
@@ -1698,7 +1744,7 @@ class BusinessProfileWorkRepository:
         force: bool = False,
         supersede_older: bool,
         bound_shared_asset: Mapping[str, Any] | None = None,
-    ) -> dict[str, int]:
+    ) -> dict[str, Any]:
         identity_hash = _stable_hash(processing_identity)
         replacement_requested = (
             str(processing_identity.get("result_policy") or "reuse").strip().lower()
@@ -1729,12 +1775,14 @@ class BusinessProfileWorkRepository:
                 )
                 checkpoint = self.checkpoint_root / f"{work_id}.json"
                 existing = conn.execute(
-                    "SELECT stage, status, metadata_json, checkpoint_path "
+                    "SELECT stage, status, lease_expires_at, metadata_json, "
+                    "checkpoint_path "
                     "FROM business_profile_work_items WHERE work_id = ?",
                     (work_id,),
                 ).fetchone()
                 if existing is not None:
                     existing_status = str(existing["status"])
+                    checkpoint_rotated_for_existing = False
                     try:
                         existing_metadata = json.loads(
                             existing["metadata_json"] or "{}"
@@ -1763,6 +1811,85 @@ class BusinessProfileWorkRepository:
                             "updated_at = ? WHERE work_id = ?",
                             (_canonical_json(existing_metadata), now, work_id),
                         )
+                    # A claimable item can outlive a cutoff or runtime identity
+                    # change.  Do this check at enqueue time because the recovery
+                    # sweep runs before discovery/enqueue and cannot see a stale
+                    # checkpoint attached to a newly selected scope.
+                    previous_checkpoint = Path(
+                        str(existing["checkpoint_path"] or checkpoint)
+                    )
+                    checkpoint_is_claimable = (
+                        existing_status in CLAIMABLE_STATUSES
+                        or (
+                            existing_status == "running"
+                            and str(existing["lease_expires_at"] or "") <= now
+                        )
+                    )
+                    if (
+                        checkpoint_is_claimable
+                        and previous_checkpoint.is_file()
+                        and not _checkpoint_matches_work_scope(
+                            previous_checkpoint,
+                            instrument_id=str(row["instrument_id"]),
+                            knowledge_cutoff=knowledge_cutoff,
+                            processing_identity=processing_identity,
+                        )
+                    ):
+                        replay_token = hashlib.sha256(
+                            f"enqueue-stale:{work_id}:{now}".encode("utf-8")
+                        ).hexdigest()[:12]
+                        checkpoint = _rotated_checkpoint_path(
+                            previous_checkpoint,
+                            checkpoint_root=self.checkpoint_root,
+                            work_id=work_id,
+                            token=f"stale-scope-{replay_token}",
+                        )
+                        invalidated_stage_results = existing_metadata.pop(
+                            "stage_results", {}
+                        )
+                        history = list(existing_metadata.get("recovery_history") or [])
+                        history.append(
+                            {
+                                "reason": "stale_scope_checkpoint_rotated_at_enqueue",
+                                "recovered_at": now,
+                                "from_stage": str(existing["stage"]),
+                                "from_status": existing_status,
+                                "from_checkpoint_path": str(previous_checkpoint),
+                                "to_checkpoint_path": str(checkpoint),
+                                "invalidated_stage_result_names": sorted(
+                                    str(stage)
+                                    for stage in dict(
+                                        invalidated_stage_results
+                                        if isinstance(
+                                            invalidated_stage_results, Mapping
+                                        )
+                                        else {}
+                                    )
+                                ),
+                            }
+                        )
+                        existing_metadata["recovery_history"] = history[-10:]
+                        existing_metadata["knowledge_cutoff"] = knowledge_cutoff
+                        existing_metadata["processing_identity"] = dict(
+                            processing_identity
+                        )
+                        conn.execute(
+                            "UPDATE business_profile_work_items SET stage = 'acquire', "
+                            "status = 'pending', attempt_count = 0, next_attempt_at = NULL, "
+                            "lease_owner = NULL, lease_expires_at = NULL, last_error = NULL, "
+                            "completed_at = NULL, checkpoint_path = ?, metadata_json = ?, "
+                            "updated_at = ? WHERE work_id = ?",
+                            (
+                                str(checkpoint),
+                                _canonical_json(existing_metadata),
+                                now,
+                                work_id,
+                            ),
+                        )
+                        reset += 1
+                        checkpoint_rotated += 1
+                        checkpoint_rotated_for_existing = True
+                        existing_status = "pending"
                     # Explicit replacement is a bounded, idempotent replay of the
                     # same work item.  It must rotate the checkpoint even when
                     # force=false, while retries of the rotated item continue to
@@ -1770,7 +1897,7 @@ class BusinessProfileWorkRepository:
                     replay_requested = (
                         force or replacement_requested
                     ) and existing_status in FORCE_REPLAYABLE_STATUSES
-                    if replay_requested:
+                    if replay_requested and not checkpoint_rotated_for_existing:
                         invalidated_stage_results = existing_metadata.pop(
                             "stage_results", {}
                         )
@@ -1849,9 +1976,25 @@ class BusinessProfileWorkRepository:
                         )
                         reset += 1
                         checkpoint_rotated += 1
-                    else:
+                    elif not checkpoint_rotated_for_existing:
                         reused += 1
                 else:
+                    # The work row may have been deleted by lifecycle cleanup
+                    # while its deterministic checkpoint file remained on disk.
+                    # Never attach that orphaned execution state to a new row:
+                    # semantic results are reused independently through receipts.
+                    orphan_checkpoint = checkpoint if checkpoint.is_file() else None
+                    if orphan_checkpoint is not None:
+                        replay_token = hashlib.sha256(
+                            f"enqueue-orphan:{work_id}:{now}".encode("utf-8")
+                        ).hexdigest()[:12]
+                        checkpoint = _rotated_checkpoint_path(
+                            orphan_checkpoint,
+                            checkpoint_root=self.checkpoint_root,
+                            work_id=work_id,
+                            token=f"orphan-{replay_token}",
+                        )
+                        checkpoint_rotated += 1
                     prior_completed_identity = conn.execute(
                         "SELECT 1 FROM business_profile_work_items "
                         "WHERE frontier_id = ? AND policy = ? "
@@ -1872,6 +2015,15 @@ class BusinessProfileWorkRepository:
                     }
                     if normalized_binding is not None:
                         metadata["bound_shared_asset"] = normalized_binding
+                    if orphan_checkpoint is not None:
+                        metadata["recovery_history"] = [
+                            {
+                                "reason": "orphan_checkpoint_rotated_at_enqueue",
+                                "recovered_at": now,
+                                "from_checkpoint_path": str(orphan_checkpoint),
+                                "to_checkpoint_path": str(checkpoint),
+                            }
+                        ]
                     conn.execute(
                         """
                         INSERT INTO business_profile_work_items (
@@ -1963,9 +2115,7 @@ class BusinessProfileWorkRepository:
             "checkpoint_rotated": checkpoint_rotated,
             "superseded": superseded,
             "identity_superseded": identity_superseded,
-        }
-        if normalized_binding is not None:
-            result["work_ids"] = [
+            "work_ids": [
                 "bp-work-"
                 + _stable_hash(
                     {
@@ -1976,7 +2126,8 @@ class BusinessProfileWorkRepository:
                     }
                 )[:24]
                 for row in rows
-            ]
+            ],
+        }
         return result
 
 
@@ -2487,6 +2638,7 @@ class BusinessProfileAsyncProductionService:
         workers = await self._run_workers(
             stage_budgets or {},
             processing_identity=processing_identity,
+            include_work_ids=tuple(enqueue.get("work_ids") or ()),
             should_stop=should_stop,
         )
         throughput = _business_profile_throughput(enqueue, workers)
@@ -2643,6 +2795,7 @@ class BusinessProfileAsyncProductionService:
         stage_budgets: Mapping[str, StageBudget],
         *,
         processing_identity: Mapping[str, Any] | None = None,
+        include_work_ids: Sequence[str] | None = None,
         should_stop: Callable[[], bool] | None = None,
     ) -> dict[str, Any]:
         processing_identity_hash = (
@@ -2650,10 +2803,15 @@ class BusinessProfileAsyncProductionService:
             if processing_identity is not None
             else None
         )
+        depth_kwargs: dict[str, Any] = {
+            "processing_identity_hash": processing_identity_hash,
+        }
+        if include_work_ids is not None:
+            depth_kwargs["include_work_ids"] = include_work_ids
         semantic_depth = await _run_thread_call(
             self.repository.claimable_count,
             "semantic",
-            processing_identity_hash=processing_identity_hash,
+            **depth_kwargs,
         )
         semantic_limit = stage_budgets.get("semantic")
         acquire_backpressured = bool(
@@ -2707,6 +2865,7 @@ class BusinessProfileAsyncProductionService:
                     stage,
                     budget,
                     processing_identity_hash=processing_identity_hash,
+                    include_work_ids=include_work_ids,
                     upstream_done=upstream_done,
                     should_stop=should_stop,
                 )
@@ -2740,6 +2899,7 @@ class BusinessProfileAsyncProductionService:
         budget: StageBudget,
         *,
         processing_identity_hash: str | None = None,
+        include_work_ids: Sequence[str] | None = None,
         upstream_done: asyncio.Event | None = None,
         should_stop: Callable[[], bool] | None = None,
     ) -> dict[str, Any]:
@@ -3022,6 +3182,8 @@ class BusinessProfileAsyncProductionService:
                         "processing_identity_hash": processing_identity_hash,
                         "exclude_work_ids": tuple(claimed_work_ids),
                     }
+                    if include_work_ids is not None:
+                        claim_kwargs["include_work_ids"] = include_work_ids
                     probe = getattr(self.repository, "has_claimable", None)
                     claimable = True
                     if callable(probe):

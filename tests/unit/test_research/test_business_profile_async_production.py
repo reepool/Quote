@@ -174,6 +174,153 @@ def test_enqueue_current_identity_supersedes_obsolete_failed_work(tmp_path):
     assert [tuple(row) for row in groups] == [("pending", 1), ("superseded", 1)]
 
 
+def test_new_work_rotates_orphan_checkpoint_left_by_cleanup(tmp_path):
+    storage = _storage(tmp_path)
+    _frontier(storage)
+    queue = BusinessProfileWorkRepository(
+        storage,
+        checkpoint_root=tmp_path / "checkpoints",
+    )
+    identity = _processing_identity()
+    queue.enqueue_latest_annual(
+        knowledge_cutoff="2026-08-30",
+        processing_identity=identity,
+    )
+    with storage.get_connection() as conn:
+        row = conn.execute(
+            "SELECT work_id, checkpoint_path FROM business_profile_work_items"
+        ).fetchone()
+        work_id = row["work_id"]
+        orphan_path = Path(row["checkpoint_path"])
+        conn.execute(
+            "DELETE FROM business_profile_work_items WHERE work_id = ?",
+            (work_id,),
+        )
+        conn.commit()
+    orphan_path.parent.mkdir(parents=True, exist_ok=True)
+    orphan_path.write_text(
+        json.dumps(
+            {
+                "scope": {
+                    "instruments": ["600000.SH"],
+                    "field_families": list(identity["field_families"]),
+                    "knowledge_cutoff": "2026-08-01",
+                    "identities": identity["runtime_identities"],
+                    "promotion_manifest_hashes": {},
+                },
+                "completed_stages": ["plan", "select", "extract"],
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    result = queue.enqueue_latest_annual(
+        knowledge_cutoff="2026-08-30",
+        processing_identity=identity,
+    )
+
+    assert result["inserted"] == 1
+    assert result["checkpoint_rotated"] == 1
+    recovered = queue.get(work_id)
+    assert recovered["checkpoint_path"] != str(orphan_path)
+    assert orphan_path.exists()
+    assert not Path(recovered["checkpoint_path"]).exists()
+    assert recovered["metadata"]["recovery_history"][-1]["reason"] == (
+        "orphan_checkpoint_rotated_at_enqueue"
+    )
+
+
+def test_claim_scope_only_returns_work_ids_selected_by_current_backfill(tmp_path):
+    storage = _storage(tmp_path)
+    _frontier(storage)
+    queue = BusinessProfileWorkRepository(
+        storage,
+        checkpoint_root=tmp_path / "checkpoints",
+    )
+    enqueue = queue.enqueue_scoped(
+        knowledge_cutoff="2026-08-30",
+        processing_identity=_processing_identity(),
+        instrument_ids=("600000.SH",),
+        start_date="2025-01-01",
+    )
+    selected = tuple(enqueue["work_ids"][:1])
+
+    claimed = queue.claim(
+        "acquire",
+        limit=10,
+        lease_owner="targeted-backfill",
+        lease_seconds=30,
+        include_work_ids=selected,
+    )
+    empty_scope = queue.claim(
+        "acquire",
+        limit=10,
+        lease_owner="empty-backfill",
+        lease_seconds=30,
+        include_work_ids=(),
+    )
+
+    assert [item["work_id"] for item in claimed] == list(selected)
+    assert empty_scope == ()
+    assert queue.claimable_count("acquire") == enqueue["eligible"] - 1
+
+
+def test_enqueue_rotates_stale_checkpoint_for_expired_running_work(tmp_path):
+    storage = _storage(tmp_path)
+    _frontier(storage)
+    queue = BusinessProfileWorkRepository(
+        storage,
+        checkpoint_root=tmp_path / "checkpoints",
+    )
+    identity = _processing_identity()
+    queue.enqueue_latest_annual(
+        knowledge_cutoff="2026-08-30",
+        processing_identity=identity,
+    )
+    with storage.get_connection() as conn:
+        row = conn.execute(
+            "SELECT work_id, checkpoint_path FROM business_profile_work_items"
+        ).fetchone()
+        stale_path = Path(row["checkpoint_path"])
+        conn.execute(
+            "UPDATE business_profile_work_items SET status = 'running', "
+            "stage = 'semantic', lease_owner = 'dead-worker', "
+            "lease_expires_at = '2026-08-01T00:00:00+08:00' WHERE work_id = ?",
+            (row["work_id"],),
+        )
+        conn.commit()
+    stale_path.parent.mkdir(parents=True, exist_ok=True)
+    stale_path.write_text(
+        json.dumps(
+            {
+                "scope": {
+                    "instruments": ["600000.SH"],
+                    "field_families": list(identity["field_families"]),
+                    "knowledge_cutoff": "2026-08-01",
+                    "identities": identity["runtime_identities"],
+                    "promotion_manifest_hashes": {},
+                }
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    result = queue.enqueue_latest_annual(
+        knowledge_cutoff="2026-08-30",
+        processing_identity=identity,
+    )
+
+    recovered = queue.get(row["work_id"])
+    assert result["reset"] == 1
+    assert result["checkpoint_rotated"] == 1
+    assert recovered["stage"] == "acquire"
+    assert recovered["status"] == "pending"
+    assert recovered["checkpoint_path"] != str(stale_path)
+    assert recovered["metadata"]["recovery_history"][-1]["from_status"] == (
+        "running"
+    )
+
+
 def test_new_runtime_identity_reprocesses_completed_coverage(tmp_path):
     storage = _storage(tmp_path)
     _frontier(storage)
@@ -2037,6 +2184,50 @@ def test_backfill_discovery_failure_does_not_block_existing_queue(tmp_path):
         "verify": 0,
         "publish": 0,
     }
+
+
+def test_targeted_backfill_does_not_claim_unrelated_same_identity_work(tmp_path):
+    storage = _storage(tmp_path)
+    _frontier(storage)
+    queue = BusinessProfileWorkRepository(
+        storage,
+        checkpoint_root=tmp_path / "checkpoints",
+    )
+    identity = _processing_identity()
+    unrelated = queue.enqueue_scoped(
+        knowledge_cutoff="2026-08-30",
+        processing_identity=identity,
+        instrument_ids=("600000.SH",),
+        start_date="2025-01-01",
+    )
+    processed: list[str] = []
+
+    async def stage_runner(_stage, item):
+        processed.append(str(item["work_id"]))
+        return {"status": "success"}
+
+    service = BusinessProfileAsyncProductionService(
+        repository=queue,
+        discovery_runner=AsyncMock(return_value={"status": "success"}),
+        stage_runner=stage_runner,
+    )
+    report = asyncio.run(
+        service.run_backfill(
+            knowledge_cutoff="2026-08-30",
+            processing_identity=identity,
+            instrument_ids=("600000.SH",),
+            selection_policy="latest_annual_only",
+            stage_budgets={
+                "acquire": StageBudget(max_items=10, max_concurrency=2),
+            },
+        )
+    )
+
+    assert processed == report["enqueue"]["work_ids"]
+    assert set(processed).isdisjoint(unrelated["work_ids"])
+    assert queue.claimable_count(
+        "acquire", include_work_ids=unrelated["work_ids"]
+    ) == len(unrelated["work_ids"])
 
 
 def test_backfill_worker_terminal_failure_degrades_top_level_status(tmp_path):
