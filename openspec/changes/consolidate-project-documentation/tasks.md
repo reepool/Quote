@@ -1,7 +1,7 @@
 ## 1. Baseline And Classification
 
 - [ ] 1.1 Inventory every `docs/` file with title, type, current owner, inbound references, related OpenSpec change, and proposed disposition.
-- [ ] 1.2 Record the current code/configuration evidence for architecture, databases, public entry points, and scheduler job categories.
+- [x] 1.2 Record the current code/configuration evidence for architecture, databases, public entry points, and scheduler job categories.
 - [ ] 1.3 Identify same-capability document families and assign one target current document and any necessary runbook for each family.
 - [ ] 1.4 Identify complete OpenSpec changes and record active cross-change references that block archive.
 - [ ] 1.5 Partition status-complete changes into reviewable archive batches and record each batch's dependency scan; do not treat the full backlog as one bulk deletion.

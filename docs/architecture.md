@@ -57,10 +57,13 @@ CLI (main.py)          API (api/app.py)          Scheduler (scheduler/scheduler.
 - `data/research.db`：研究域通用记录、行业、股东、报告和画像相关研究数据；
 - `data/financials.db`：财务事实、来源清单、映射和可得日信息；
 - `data/valuation.db`：估值输入、历史和模型相关记录；
-- `data/interests.db`：关注标的及相关研究记录；
-- `data/fx.db`、商品/期货等域数据库：按对应配置和域模块管理。
+- `data/interests.db`：无风险利率序列和观测值；
+- `data/futures.db`：商品期货主数据、交易日历、行情和连续序列；
+- `data/fx.db`：外汇主数据、发布日历和汇率序列。
 
 数据库路径、表名、canonical key、连接 scope、WAL/超时和事务语义属于兼容约束。框架重构不得合并数据库、改变目录或在迁移期引入第二个写入实现。
+
+本节的可复核代码和配置来源见 [W1 当前运行时证据](../openspec/changes/consolidate-project-documentation/evidence/current-runtime-evidence.md)。
 
 ## 5. 业务执行链
 
