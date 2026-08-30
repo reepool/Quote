@@ -80,7 +80,7 @@
 ## 10. Production migration and acceptance
 
 - [x] 10.1 Run read-only scans for as-of visibility, unit anomalies (including legacy `mw`/`mW` values), stale reuse identities, pending rows, legacy exposure action lineage, held records and latest hold owners, retired runs/receipts, and lease-risk work before any LLM call. Evidence: `docs/development/business_profile_10_1_read_only_scan_20260831.md`.
-- [ ] 10.2 Apply cleanup only to confirmed non-reusable receipts/runs/work/candidates and orphan checkpoints, including mode/marker-qualified retired runs; preserve approved records, evidence, and review audits; emit a deletion manifest.
+- [x] 10.2 Apply cleanup only to confirmed non-reusable receipts/runs/work/candidates and orphan checkpoints, including mode/marker-qualified retired runs; preserve approved records, evidence, and review audits; emit a deletion manifest. Evidence: `docs/development/business_profile_10_2_cleanup_20260831.md`.
 - [ ] 10.3 Re-run targeted `002415.SZ`, `002496.SZ`, and `300750.SZ` flows with `result_policy=reuse`; require zero temporal collisions, false gateway classifications, stale reuse, duplicate exposure lineage, and verify missing-cost margin blockers plus `mW` megawatt resolution.
 - [ ] 10.4 Validate a new annual report and same-period correction report for append/successor behavior, approved-history visibility, and no accidental deletion.
 - [ ] 10.5 Run the 11-instrument batch only after all gates pass; record LLM calls, retry counts, worker lease events, dropped anchors, publication gaps, and final statuses.

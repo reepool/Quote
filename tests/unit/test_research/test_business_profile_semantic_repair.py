@@ -104,6 +104,73 @@ def test_repair_deletes_failed_semantic_receipt_and_converges(tmp_path):
     assert repeated["change_counts"]["unchanged"] == 1
 
 
+def test_repair_marks_run_with_missing_governed_record_reference_unreusable(tmp_path):
+    storage = _storage(tmp_path)
+    artifacts = BusinessProfileSemanticArtifactRepository(storage)
+    identity = SemanticArtifactIdentity(
+        instrument_id="600000.SH",
+        source_document_id="annual-report-2025",
+        document_hash="d" * 64,
+        report_period="2025-12-31",
+        field_family="atomic_activities",
+        evidence_scope_hash="e" * 64,
+        input_hash="f" * 64,
+        prompt_version="prompt.v1",
+        schema_version="schema.v1",
+    )
+    artifact = artifacts.receive(
+        identity,
+        response={"activities": []},
+        response_hash="response-hash",
+        evidence_ids=[],
+    )
+    artifacts.mark(artifact["artifact_id"], "converted")
+    now = "2026-08-30T12:00:00+08:00"
+    with storage.get_connection() as conn:
+        conn.execute(
+            "INSERT INTO business_profile_semantic_runs ("
+            "run_id, instrument_id, source_document_id, field_family, status, "
+            "bundle_hash, metadata_json, started_at, completed_at, created_at, updated_at"
+            ") VALUES (?, ?, ?, ?, 'completed', ?, ?, ?, ?, ?, ?)",
+            (
+                "run-with-missing-record",
+                "600000.SH",
+                "annual-report-2025",
+                "atomic_activities",
+                "bundle",
+                json.dumps({
+                    "semantic_audit": {
+                        "semantic_artifact_id": artifact["artifact_id"],
+                    },
+                    "result_policy": "reuse",
+                    "runtime_schema_version": "business_profile_semantic_runtime.v8",
+                    "record_ids": {"activities": ["activity:missing-governed-record"]},
+                }),
+                now,
+                now,
+                now,
+                now,
+            ),
+        )
+        conn.commit()
+
+    service = BusinessProfileSemanticRepairService(storage)
+    audit = service.run(instrument_ids=["600000.SH"])
+    assert audit["issue_counts"]["incompatible_reusable_artifact"] == 1
+    assert audit["instruments"][0]["issues"][0]["details"]["reason"] == (
+        "missing_governed_record_reference"
+    )
+
+    applied = service.run(instrument_ids=["600000.SH"], apply=True)
+    assert applied["change_counts"]["changed"] == 1
+    assert artifacts.find_replay(identity) is None
+    with storage.get_connection() as conn:
+        assert conn.execute(
+            "SELECT COUNT(*) FROM business_profile_semantic_runs "
+            "WHERE run_id = 'run-with-missing-record'"
+        ).fetchone()[0] == 0
+
+
 def test_legacy_exposure_action_collision_recovers_actions_from_facts(tmp_path):
     service = BusinessProfileSemanticRepairService(_storage(tmp_path))
     exposures = [
@@ -390,6 +457,51 @@ def test_cleanup_only_does_not_apply_unrelated_business_repairs(tmp_path):
     assert applied["change_counts"]["changed"] == 0
     snapshot = storage.get_shareholder_snapshot("600009.SH", include_snapshot=True)
     assert snapshot["snapshot"]["coverage_scope"] == ["incorrect_scope"]
+
+
+def test_cleanup_only_deletes_candidate_with_missing_run_owner(tmp_path):
+    storage = _storage(tmp_path)
+    repository = BusinessProfileRepository(storage)
+    repository.upsert("evidence", {
+        "evidence_id": "orphan-evidence",
+        "instrument_id": "600009.SH",
+        "source_document_id": "annual-report-2025",
+        "source_tier": "official_filing",
+        "document_hash": "orphan-document-hash",
+        "data_available_date": "2026-03-30",
+        "availability_quality": "actual",
+        "evidence_text_hash": "orphan-text-hash",
+        "extraction_method": "native_text",
+        "confidence": 1.0,
+        "review_status": "candidate",
+    })
+    repository.upsert("exposure_facts", {
+        "fact_id": "orphan-exposure-fact",
+        "instrument_id": "600009.SH",
+        "report_period": "2025-12-31",
+        "exposure_fact_type": "sales_value",
+        "object_raw": "orphan product",
+        "fact_scope": "issuer",
+        "evidence_id": "orphan-evidence",
+        "run_id": "deleted-semantic-run",
+        "data_available_date": "2026-03-30",
+        "confidence": 1.0,
+        "review_status": "candidate",
+        "knowledge_from": "2026-03-30",
+        "metadata": {},
+    })
+    service = BusinessProfileSemanticRepairService(storage)
+
+    audit = service.run(
+        instrument_ids=["600009.SH"], cleanup_only=True
+    )
+    assert audit["issue_counts"]["orphan_candidate_records"] == 1
+
+    applied = service.run(
+        instrument_ids=["600009.SH"], apply=True, cleanup_only=True
+    )
+    assert applied["change_counts"]["changed"] == 1
+    assert repository.get_record("exposure_facts", "orphan-exposure-fact") is None
 
 
 def test_repair_refuses_checkpoint_outside_owned_root(tmp_path):

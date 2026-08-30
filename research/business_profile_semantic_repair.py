@@ -361,7 +361,13 @@ class BusinessProfileSemanticRepairService:
             self._write_immutable_retirement_marker(
                 metadata, reason=reason, timestamp=timestamp, label=str(row["run_id"])
             )
-            artifact_id = str(metadata.get("semantic_artifact_id") or "").strip()
+            semantic_audit = metadata.get("semantic_audit")
+            semantic_audit = semantic_audit if isinstance(semantic_audit, dict) else {}
+            artifact_id = str(
+                metadata.get("semantic_artifact_id")
+                or semantic_audit.get("semantic_artifact_id")
+                or ""
+            ).strip()
             if artifact_id:
                 artifact_ids.add(artifact_id)
             conn.execute(
@@ -409,7 +415,7 @@ class BusinessProfileSemanticRepairService:
             raise ValueError(f"retirement marker is immutable for {label}")
 
     def _all_lifecycle_instrument_ids(self) -> list[str]:
-        """Return instruments that own semantic receipts or run manifests."""
+        """Return instruments that own any semantic lifecycle output or work."""
 
         identifiers: set[str] = set()
         with self.storage.get_connection() as conn:
@@ -417,6 +423,10 @@ class BusinessProfileSemanticRepairService:
             for table in (
                 "business_profile_semantic_artifacts",
                 "business_profile_semantic_runs",
+                "business_profile_work_items",
+                "company_business_activities",
+                "company_supply_chain_relationships",
+                "company_commodity_exposure_facts",
             ):
                 exists = conn.execute(
                     "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = ?",
@@ -893,8 +903,55 @@ class BusinessProfileSemanticRepairService:
         return {
             "instrument_id": instrument_id,
             "inventory": self._inventory_instrument(instrument_id),
-            "issues": self._incompatible_artifact_findings(instrument_id),
+            "issues": [
+                *self._incompatible_artifact_findings(instrument_id),
+                *self._orphan_candidate_findings(instrument_id),
+            ],
         }
+
+    def _orphan_candidate_findings(self, instrument_id: str) -> list[dict[str, Any]]:
+        """Find candidate outputs whose semantic run owner no longer exists."""
+
+        table_specs = {
+            "activities": ("company_business_activities", "activity_id"),
+            "relationships": (
+                "company_supply_chain_relationships",
+                "relationship_id",
+            ),
+            "exposure_facts": (
+                "company_commodity_exposure_facts",
+                "fact_id",
+            ),
+        }
+        findings: list[dict[str, Any]] = []
+        with self.storage.get_connection() as conn:
+            self.storage._apply_pragmas(conn)
+            for record_type, (table, primary_key) in table_specs.items():
+                rows = conn.execute(
+                    f"SELECT {primary_key} AS record_id, run_id FROM {table} "
+                    "WHERE instrument_id = ? AND review_status = 'candidate' "
+                    "AND run_id IS NOT NULL AND TRIM(run_id) <> '' "
+                    "AND NOT EXISTS ("
+                    "SELECT 1 FROM business_profile_semantic_runs r "
+                    f"WHERE r.run_id = {table}.run_id"
+                    ")",
+                    (instrument_id,),
+                ).fetchall()
+                if not rows:
+                    continue
+                findings.append(
+                    self._issue(
+                        "orphan_candidate_records",
+                        instrument_id,
+                        {
+                            "record_type": record_type,
+                            "record_ids": [str(row["record_id"]) for row in rows],
+                            "run_ids": sorted({str(row["run_id"]) for row in rows}),
+                            "proposed_action": "delete_orphan_candidates",
+                        },
+                    )
+                )
+        return findings
 
     def _inventory_instrument(self, instrument_id: str) -> dict[str, Any]:
         """Return a read-only lifecycle inventory used by repair and operators."""
@@ -987,7 +1044,13 @@ class BusinessProfileSemanticRepairService:
                 metadata = json.loads(row["metadata_json"] or "{}")
             except (TypeError, ValueError):
                 metadata = {}
-            artifact_id = str(metadata.get("semantic_artifact_id") or "").strip()
+            semantic_audit = metadata.get("semantic_audit")
+            semantic_audit = semantic_audit if isinstance(semantic_audit, dict) else {}
+            artifact_id = str(
+                metadata.get("semantic_artifact_id")
+                or semantic_audit.get("semantic_artifact_id")
+                or ""
+            ).strip()
             if str(row["status"] or "") == "superseded":
                 findings.append(
                     self._issue(
@@ -998,6 +1061,24 @@ class BusinessProfileSemanticRepairService:
                             "field_family": row["field_family"],
                             "source_document_id": row["source_document_id"],
                             "proposed_action": "delete_obsolete_run_manifest",
+                        },
+                    )
+                )
+                continue
+            missing_record_ids = self._missing_record_references(metadata)
+            if missing_record_ids:
+                findings.append(
+                    self._issue(
+                        "incompatible_reusable_artifact",
+                        instrument_id,
+                        {
+                            "run_id": row["run_id"],
+                            "field_family": row["field_family"],
+                            "source_document_id": row["source_document_id"],
+                            "artifact_id": artifact_id,
+                            "missing_record_ids": missing_record_ids,
+                            "reason": "missing_governed_record_reference",
+                            "proposed_action": "delete_and_reextract",
                         },
                     )
                 )
@@ -1113,6 +1194,32 @@ class BusinessProfileSemanticRepairService:
                 )
             )
         return findings
+
+    def _missing_record_references(self, metadata: dict[str, Any]) -> list[str]:
+        """Return governed record IDs persisted by a run but no longer present.
+
+        A completed run with a missing record reference cannot be reused: its
+        receipt describes a semantic result that local governance can no longer
+        reconstruct.  Treat it as stale so cleanup removes its candidate
+        descendants and the next replay extracts the current source again.
+        """
+
+        missing: list[str] = []
+        for record_type, record_ids in dict(metadata.get("record_ids") or {}).items():
+            if str(record_type) not in {
+                "activities",
+                "operating_facts",
+                "relationships",
+                "value_chain_roles",
+                "exposures",
+                "exposure_facts",
+            }:
+                continue
+            for raw_record_id in record_ids or ():
+                record_id = str(raw_record_id or "").strip()
+                if record_id and self.repository.get_record(str(record_type), record_id) is None:
+                    missing.append(f"{record_type}:{record_id}")
+        return sorted(set(missing))
 
     def _metadata_has_legacy_occurrence_identity(self, metadata: dict[str, Any]) -> bool:
         """Check persisted record ids before treating an old run as garbage."""
@@ -1339,7 +1446,92 @@ class BusinessProfileSemanticRepairService:
                 "superseded_semantic_run",
             }:
                 changes.append(self._delete_obsolete_semantic_run(instrument_id, issue))
+            elif issue["code"] == "orphan_candidate_records":
+                changes.append(self._delete_orphan_candidate_records(instrument_id, issue))
         return changes
+
+    def _delete_orphan_candidate_records(
+        self, instrument_id: str, issue: dict[str, Any]
+    ) -> dict[str, Any]:
+        table_specs = {
+            "activities": ("company_business_activities", "activity_id"),
+            "relationships": (
+                "company_supply_chain_relationships",
+                "relationship_id",
+            ),
+            "exposure_facts": (
+                "company_commodity_exposure_facts",
+                "fact_id",
+            ),
+        }
+        record_type = str(issue.get("details", {}).get("record_type") or "")
+        table_spec = table_specs.get(record_type)
+        record_ids = [
+            str(value)
+            for value in issue.get("details", {}).get("record_ids") or ()
+            if str(value).strip()
+        ]
+        if table_spec is None or not record_ids:
+            return {
+                "instrument_id": instrument_id,
+                "status": "unchanged",
+                "reason": "orphan_candidates_already_absent",
+                "stable_id": issue["stable_id"],
+            }
+        table, primary_key = table_spec
+        deleted: list[str] = []
+        with self.storage.get_connection() as conn:
+            self.storage._apply_pragmas(conn)
+            conn.execute("BEGIN IMMEDIATE")
+            try:
+                existing_tables = {
+                    str(item[0])
+                    for item in conn.execute(
+                        "SELECT name FROM sqlite_master WHERE type='table'"
+                    ).fetchall()
+                }
+                for record_id in record_ids:
+                    row = conn.execute(
+                        f"SELECT run_id, review_status FROM {table} "
+                        f"WHERE {primary_key} = ? AND instrument_id = ?",
+                        (record_id, instrument_id),
+                    ).fetchone()
+                    if row is None or str(row["review_status"] or "") != "candidate":
+                        continue
+                    run_id = str(row["run_id"] or "").strip()
+                    owner = conn.execute(
+                        "SELECT 1 FROM business_profile_semantic_runs WHERE run_id = ?",
+                        (run_id,),
+                    ).fetchone()
+                    if not run_id or owner is not None:
+                        continue
+                    if "business_profile_exceptions" in existing_tables:
+                        conn.execute(
+                            "DELETE FROM business_profile_exceptions "
+                            "WHERE target_id = ? AND instrument_id = ?",
+                            (record_id, instrument_id),
+                        )
+                    conn.execute(
+                        f"DELETE FROM {table} WHERE {primary_key} = ? "
+                        "AND instrument_id = ? AND review_status = 'candidate'",
+                        (record_id, instrument_id),
+                    )
+                    deleted.append(f"{record_type}:{record_id}")
+                conn.commit()
+            except Exception:
+                conn.rollback()
+                raise
+        return {
+            "instrument_id": instrument_id,
+            "status": "changed" if deleted else "unchanged",
+            "reason": (
+                "orphan_candidate_records_deleted"
+                if deleted
+                else "orphan_candidates_already_absent"
+            ),
+            "stable_id": issue["stable_id"],
+            "affected_ids": deleted,
+        }
 
     def _deduplicate_machine_roles(
         self, instrument_id: str, issue: dict[str, Any]
@@ -2335,6 +2527,7 @@ class BusinessProfileSemanticRepairService:
                 "superseded_semantic_run",
                 "obsolete_work_items",
                 "orphan_checkpoint_files",
+                "orphan_candidate_records",
             }
             for item in issues
         )
