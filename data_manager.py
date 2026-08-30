@@ -4061,6 +4061,7 @@ class DataManager:
         apply: bool = False,
         all_scope: bool = False,
         result_policy: str = "reuse",
+        cleanup_only: bool = False,
     ) -> Dict[str, Any]:
         """Run bounded local semantic repair; audit is the default mode."""
         from research.business_profile_semantic_repair import (
@@ -4068,17 +4069,27 @@ class DataManager:
         )
 
         storage = self._require_research_storage()
+        module = self.research_config.modules.get("business_profile_evidence", {})
+        operations = dict(module.get("production_operations") or {})
+        checkpoint_root = Path(
+            operations.get("checkpoint_root")
+            or "data/checkpoints/business_profile_async"
+        )
         normalized_ids = [
             convert_to_database_format(item)
             for item in (instrument_ids or [])
             if str(item).strip()
         ]
         return await asyncio.to_thread(
-            BusinessProfileSemanticRepairService(storage).run,
+            BusinessProfileSemanticRepairService(
+                storage,
+                checkpoint_root=checkpoint_root,
+            ).run,
             instrument_ids=normalized_ids,
             apply=apply,
             all_scope=all_scope,
             result_policy=result_policy,
+            cleanup_only=cleanup_only,
         )
 
     async def get_research_company_commodity_exposures(

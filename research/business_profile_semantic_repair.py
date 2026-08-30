@@ -10,8 +10,14 @@ from __future__ import annotations
 from collections import Counter
 import hashlib
 import json
+from pathlib import Path
 from typing import Any, Iterable
 
+from research.business_profile_checkpoint_lifecycle import (
+    delete_owned_checkpoint_file,
+    list_owned_checkpoint_files,
+    owned_checkpoint_path,
+)
 from research.business_profile_governance import BusinessProfileRepository
 from research.business_profile_activity_production import (
     STORAGE_SEMANTICS_EXTERNAL,
@@ -29,15 +35,30 @@ from utils.date_utils import get_shanghai_time
 
 
 REPAIR_SCHEMA_VERSION = "business_profile_semantic_repair.v1"
+LEGACY_SHADOW_FIELD_FAMILIES = frozenset(
+    {"structured_segments", "tabular_operating_facts"}
+)
+OBSOLETE_WORK_STATUSES = frozenset(
+    {"machine_rework", "superseded", "terminal_failure"}
+)
+MANIFEST_ID_SAMPLE_LIMIT = 100
 
 
 class BusinessProfileSemanticRepairService:
     """Audit and apply locally reconstructable semantic corrections only."""
 
-    def __init__(self, storage: Any) -> None:
+    def __init__(
+        self,
+        storage: Any,
+        *,
+        checkpoint_root: str | Path | None = None,
+    ) -> None:
         self.storage = storage
         self.repository = BusinessProfileRepository(storage)
         self.review_service = BusinessProfileReviewService(self.repository)
+        self.checkpoint_root = (
+            Path(checkpoint_root) if checkpoint_root is not None else None
+        )
 
     def run(
         self,
@@ -46,6 +67,7 @@ class BusinessProfileSemanticRepairService:
         apply: bool = False,
         all_scope: bool = False,
         result_policy: str = "reuse",
+        cleanup_only: bool = False,
     ) -> dict[str, Any]:
         result_policy = str(result_policy or "reuse").strip().lower()
         if result_policy not in {"reuse", "replace"}:
@@ -56,17 +78,32 @@ class BusinessProfileSemanticRepairService:
         if all_scope and ids:
             raise ValueError("repair accepts instrument_ids or all_scope, not both")
         if all_scope:
-            ids = self._all_local_instrument_ids()
-        if not ids:
-            return self._report([], apply=apply, result_policy=result_policy)
+            ids = (
+                self._all_lifecycle_instrument_ids()
+                if cleanup_only
+                else self._all_local_instrument_ids()
+            )
 
-        findings = [self._audit_instrument(instrument_id) for instrument_id in ids]
+        findings = [
+            (
+                self._audit_cleanup_instrument(instrument_id)
+                if cleanup_only
+                else self._audit_instrument(instrument_id)
+            )
+            for instrument_id in ids
+        ]
+        execution_state = self._audit_execution_state(
+            instrument_ids=None if all_scope else ids,
+            include_orphans=all_scope,
+        )
         before_projections = self._current_projections(ids)
         result = self._report(
             findings,
             apply=apply,
             result_policy=result_policy,
             before_projections=before_projections,
+            execution_state=execution_state,
+            cleanup_only=cleanup_only,
         )
         if not apply:
             return result
@@ -92,6 +129,21 @@ class BusinessProfileSemanticRepairService:
                         "reason": f"repair_exception:{type(exc).__name__}:{exc}",
                     }
                 )
+        try:
+            execution_change = self._cleanup_execution_state(execution_state)
+            if execution_change is not None:
+                changes.append(execution_change)
+        except Exception as exc:
+            changes.append(
+                {
+                    "instrument_id": None,
+                    "status": "failed",
+                    "reason": (
+                        "execution_state_cleanup_exception:"
+                        f"{type(exc).__name__}:{exc}"
+                    ),
+                }
+            )
         result["changes"] = changes
         result["after_current_projections"] = self._current_projections(ids)
         result["change_counts"] = self._change_counts(changes)
@@ -101,6 +153,18 @@ class BusinessProfileSemanticRepairService:
                 "instrument_id": item.get("instrument_id"),
                 "reason": item.get("reason"),
                 "affected_ids": list(item.get("affected_ids") or []),
+                "affected_count": int(
+                    item.get("affected_ids_count")
+                    or len(item.get("affected_ids") or [])
+                ),
+                "affected_ids_hash": item.get("affected_ids_hash"),
+                "checkpoint_paths": list(item.get("checkpoint_paths") or []),
+                "checkpoint_count": int(
+                    item.get("checkpoint_paths_count")
+                    or len(item.get("checkpoint_paths") or [])
+                ),
+                "checkpoint_paths_hash": item.get("checkpoint_paths_hash"),
+                "checkpoint_bytes": int(item.get("checkpoint_bytes") or 0),
             }
             for item in changes
             if item.get("status") == "changed"
@@ -111,6 +175,30 @@ class BusinessProfileSemanticRepairService:
         ]
         return result
 
+    def _all_lifecycle_instrument_ids(self) -> list[str]:
+        """Return instruments that own semantic receipts or run manifests."""
+
+        identifiers: set[str] = set()
+        with self.storage.get_connection() as conn:
+            self.storage._apply_pragmas(conn)
+            for table in (
+                "business_profile_semantic_artifacts",
+                "business_profile_semantic_runs",
+            ):
+                exists = conn.execute(
+                    "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = ?",
+                    (table,),
+                ).fetchone()
+                if not exists:
+                    continue
+                identifiers.update(
+                    str(row["instrument_id"] or "").strip()
+                    for row in conn.execute(
+                        f"SELECT DISTINCT instrument_id FROM {table}"
+                    ).fetchall()
+                )
+        return sorted(item for item in identifiers if item)
+
     def _all_local_instrument_ids(self) -> list[str]:
         tables = (
             "shareholder_snapshots",
@@ -119,12 +207,11 @@ class BusinessProfileSemanticRepairService:
             "company_business_activities",
             "company_operating_facts",
             "company_value_chain_roles",
-            # Lifecycle-only rows must also participate in all-scope repair;
-            # an instrument with only a failed receipt/work item has no
-            # business record yet, but still needs cleanup before reuse.
+            # Semantic lifecycle rows still need instrument-level candidate
+            # cleanup. Work/checkpoint state is audited in one bounded pass so
+            # retired whole-market shadow queues do not expand this loop.
             "business_profile_semantic_artifacts",
             "business_profile_semantic_runs",
-            "business_profile_work_items",
         )
         identifiers: set[str] = set()
         with self.storage.get_connection() as conn:
@@ -142,6 +229,360 @@ class BusinessProfileSemanticRepairService:
                         ).fetchall()
                     )
         return sorted(item for item in identifiers if item)
+
+    def _audit_execution_state(
+        self,
+        *,
+        instrument_ids: Iterable[str] | None,
+        include_orphans: bool,
+    ) -> dict[str, Any]:
+        selected_ids = tuple(
+            sorted({str(value).strip() for value in instrument_ids or () if str(value).strip()})
+        )
+        if instrument_ids is not None:
+            if not selected_ids:
+                rows: list[dict[str, Any]] = []
+        with self.storage.get_connection() as conn:
+            self.storage._apply_pragmas(conn)
+            all_rows = [
+                dict(row)
+                for row in conn.execute(
+                    "SELECT work_id, instrument_id, status, stage, lease_expires_at, "
+                    "checkpoint_path, metadata_json FROM business_profile_work_items"
+                ).fetchall()
+            ]
+            if instrument_ids is None:
+                rows = all_rows
+            elif selected_ids:
+                selected = set(selected_ids)
+                rows = [row for row in all_rows if str(row["instrument_id"]) in selected]
+
+        now = get_shanghai_time().isoformat()
+        deletable: list[dict[str, Any]] = []
+        retained: list[dict[str, Any]] = []
+        active_legacy: list[dict[str, Any]] = []
+        reasons: Counter[str] = Counter()
+        for row in rows:
+            reason = self._obsolete_work_reason(row, now=now)
+            if reason is None:
+                retained.append(row)
+                if self._legacy_shadow_work(row):
+                    active_legacy.append(row)
+                continue
+            item = {**row, "cleanup_reason": reason}
+            deletable.append(item)
+            reasons[reason] += 1
+
+        checkpoint_files: dict[str, Any] = {
+            "enabled": self.checkpoint_root is not None,
+            "root": str(self.checkpoint_root) if self.checkpoint_root is not None else None,
+            "delete_paths": [],
+            "orphan_paths": [],
+            "unsafe_paths": [],
+            "delete_bytes": 0,
+        }
+        if self.checkpoint_root is not None:
+            deletable_ids = {str(row["work_id"]) for row in deletable}
+            retained_paths = {
+                candidate
+                for row in all_rows
+                if str(row["work_id"]) not in deletable_ids
+                for candidate in (
+                    owned_checkpoint_path(
+                        str(row.get("checkpoint_path") or ""),
+                        checkpoint_root=self.checkpoint_root,
+                    ),
+                )
+                if candidate is not None
+            }
+            all_referenced_paths = {
+                candidate
+                for row in all_rows
+                for candidate in (
+                    owned_checkpoint_path(
+                        str(row.get("checkpoint_path") or ""),
+                        checkpoint_root=self.checkpoint_root,
+                    ),
+                )
+                if candidate is not None
+            }
+            delete_paths: set[Path] = set()
+            unsafe_paths: set[str] = set()
+            for row in deletable:
+                raw_path = str(row.get("checkpoint_path") or "")
+                candidate = owned_checkpoint_path(
+                    raw_path, checkpoint_root=self.checkpoint_root
+                )
+                if candidate is None:
+                    unsafe_paths.add(raw_path)
+                elif candidate not in retained_paths and candidate.is_file():
+                    delete_paths.add(candidate)
+            orphan_paths: set[Path] = set()
+            if include_orphans:
+                orphan_paths = {
+                    path
+                    for path in list_owned_checkpoint_files(self.checkpoint_root)
+                    if path not in all_referenced_paths
+                }
+                delete_paths.update(orphan_paths)
+            delete_bytes = 0
+            for path in delete_paths:
+                try:
+                    delete_bytes += int(path.stat().st_size)
+                except OSError:
+                    continue
+            checkpoint_files.update(
+                {
+                    "delete_paths": [str(path) for path in sorted(delete_paths, key=str)],
+                    "orphan_paths": [str(path) for path in sorted(orphan_paths, key=str)],
+                    "unsafe_paths": sorted(unsafe_paths),
+                    "delete_bytes": delete_bytes,
+                }
+            )
+
+        issues: list[dict[str, Any]] = []
+        if deletable:
+            issues.append(
+                {
+                    "code": "obsolete_work_items",
+                    "stable_id": "obsolete_work_items:execution_state",
+                    "details": {
+                        "count": len(deletable),
+                        "reason_counts": dict(reasons),
+                        **self._id_summary(
+                            [str(row["work_id"]) for row in deletable],
+                            key="work_ids",
+                        ),
+                        **self._id_summary(
+                            [str(row["instrument_id"]) for row in deletable],
+                            key="instrument_ids",
+                        ),
+                    },
+                }
+            )
+        if checkpoint_files["orphan_paths"]:
+            orphan_summary = self._id_summary(
+                checkpoint_files["orphan_paths"], key="paths"
+            )
+            issues.append(
+                {
+                    "code": "orphan_checkpoint_files",
+                    "stable_id": "orphan_checkpoint_files:execution_state",
+                    "details": {
+                        "count": len(checkpoint_files["orphan_paths"]),
+                        **orphan_summary,
+                        "bytes": checkpoint_files["delete_bytes"],
+                    },
+                }
+            )
+        if checkpoint_files["unsafe_paths"]:
+            issues.append(
+                {
+                    "code": "unsafe_checkpoint_paths",
+                    "stable_id": "unsafe_checkpoint_paths:execution_state",
+                    "details": self._id_summary(
+                        checkpoint_files["unsafe_paths"], key="paths"
+                    ),
+                }
+            )
+        if active_legacy:
+            issues.append(
+                {
+                    "code": "active_legacy_work_items",
+                    "stable_id": "active_legacy_work_items:execution_state",
+                    "details": {
+                        **self._id_summary(
+                            [str(row["work_id"]) for row in active_legacy],
+                            key="work_ids",
+                        ),
+                        **self._id_summary(
+                            [str(row["instrument_id"]) for row in active_legacy],
+                            key="instrument_ids",
+                        ),
+                    },
+                }
+            )
+        return {
+            "include_orphans": include_orphans,
+            "work_items": {
+                "delete_count": len(deletable),
+                "reason_counts": dict(reasons),
+                **self._id_summary(
+                    [str(row["work_id"]) for row in deletable],
+                    key="work_ids",
+                ),
+                "_delete_work_ids": [str(row["work_id"]) for row in deletable],
+            },
+            "checkpoint_files": checkpoint_files,
+            "issues": issues,
+        }
+
+    def _cleanup_execution_state(
+        self, audit: dict[str, Any]
+    ) -> dict[str, Any] | None:
+        requested_ids = tuple(
+            str(value)
+            for value in (
+                audit.get("work_items", {}).get("_delete_work_ids")
+                or audit.get("work_items", {}).get("work_ids")
+                or ()
+            )
+        )
+        include_orphans = bool(audit.get("include_orphans"))
+        deleted_ids: list[str] = []
+        selected_paths: list[str] = []
+        now = get_shanghai_time().isoformat()
+        if requested_ids:
+            with self.storage.get_connection() as conn:
+                self.storage._apply_pragmas(conn)
+                conn.execute("BEGIN IMMEDIATE")
+                try:
+                    for offset in range(0, len(requested_ids), 800):
+                        chunk = requested_ids[offset : offset + 800]
+                        placeholders = ",".join("?" for _ in chunk)
+                        rows = conn.execute(
+                            "SELECT work_id, instrument_id, status, stage, "
+                            "lease_expires_at, checkpoint_path, metadata_json "
+                            "FROM business_profile_work_items "
+                            f"WHERE work_id IN ({placeholders})",
+                            chunk,
+                        ).fetchall()
+                        current_ids = [
+                            str(row["work_id"])
+                            for row in rows
+                            if self._obsolete_work_reason(dict(row), now=now) is not None
+                        ]
+                        selected_paths.extend(
+                            str(row["checkpoint_path"] or "")
+                            for row in rows
+                            if str(row["work_id"]) in current_ids
+                        )
+                        if current_ids:
+                            current_placeholders = ",".join("?" for _ in current_ids)
+                            conn.execute(
+                                "DELETE FROM business_profile_work_items "
+                                f"WHERE work_id IN ({current_placeholders})",
+                                tuple(current_ids),
+                            )
+                            deleted_ids.extend(current_ids)
+                    conn.commit()
+                except Exception:
+                    conn.rollback()
+                    raise
+
+        deleted_paths: list[str] = []
+        deleted_bytes = 0
+        file_failures: list[dict[str, str]] = []
+        if self.checkpoint_root is not None:
+            with self.storage.get_connection() as conn:
+                self.storage._apply_pragmas(conn)
+                retained_paths = {
+                    candidate
+                    for row in conn.execute(
+                        "SELECT checkpoint_path FROM business_profile_work_items"
+                    ).fetchall()
+                    for candidate in (
+                        owned_checkpoint_path(
+                            str(row["checkpoint_path"] or ""),
+                            checkpoint_root=self.checkpoint_root,
+                        ),
+                    )
+                    if candidate is not None
+                }
+            candidates: set[Path] = set()
+            for raw_path in selected_paths:
+                candidate = owned_checkpoint_path(
+                    raw_path, checkpoint_root=self.checkpoint_root
+                )
+                if candidate is None:
+                    file_failures.append(
+                        {"path": raw_path, "reason": "checkpoint_path_outside_owned_root"}
+                    )
+                elif candidate not in retained_paths:
+                    candidates.add(candidate)
+            if include_orphans:
+                candidates.update(
+                    path
+                    for path in list_owned_checkpoint_files(self.checkpoint_root)
+                    if path not in retained_paths
+                )
+            for path in sorted(candidates, key=str):
+                try:
+                    size = int(path.stat().st_size) if path.is_file() else 0
+                    if delete_owned_checkpoint_file(
+                        path, checkpoint_root=self.checkpoint_root
+                    ):
+                        deleted_paths.append(str(path))
+                        deleted_bytes += size
+                except (OSError, ValueError) as exc:
+                    file_failures.append(
+                        {"path": str(path), "reason": f"{type(exc).__name__}:{exc}"}
+                    )
+
+        if not deleted_ids and not deleted_paths and not file_failures:
+            return None
+        affected_summary = self._id_summary(deleted_ids, key="affected_ids")
+        checkpoint_summary = self._id_summary(
+            deleted_paths, key="checkpoint_paths"
+        )
+        return {
+            "instrument_id": None,
+            "status": "failed" if file_failures else "changed",
+            "reason": (
+                "execution_state_cleanup_incomplete"
+                if file_failures
+                else "obsolete_execution_state_deleted"
+            ),
+            **affected_summary,
+            **checkpoint_summary,
+            "checkpoint_bytes": deleted_bytes,
+            "file_failures": file_failures,
+        }
+
+    @staticmethod
+    def _id_summary(values: Iterable[str], *, key: str) -> dict[str, Any]:
+        ordered = sorted({str(value) for value in values if str(value)})
+        digest = hashlib.sha256("\n".join(ordered).encode("utf-8")).hexdigest()
+        return {
+            key: ordered[:MANIFEST_ID_SAMPLE_LIMIT],
+            f"{key}_count": len(ordered),
+            f"{key}_hash": digest,
+            f"{key}_truncated": len(ordered) > MANIFEST_ID_SAMPLE_LIMIT,
+        }
+
+    @staticmethod
+    def _legacy_shadow_work(row: dict[str, Any]) -> bool:
+        try:
+            metadata = json.loads(row.get("metadata_json") or "{}")
+        except (TypeError, ValueError, json.JSONDecodeError):
+            metadata = {}
+        processing_identity = (
+            dict(metadata.get("processing_identity") or {})
+            if isinstance(metadata, dict)
+            else {}
+        )
+        families = {
+            str(value)
+            for value in processing_identity.get("field_families") or ()
+        }
+        return (
+            str(processing_identity.get("rollout_phase") or "")
+            == "structured_shadow"
+            or bool(families & LEGACY_SHADOW_FIELD_FAMILIES)
+        )
+
+    @classmethod
+    def _obsolete_work_reason(
+        cls, row: dict[str, Any], *, now: str
+    ) -> str | None:
+        status = str(row.get("status") or "")
+        if status in OBSOLETE_WORK_STATUSES:
+            return f"work_status_{status}"
+        if not cls._legacy_shadow_work(row):
+            return None
+        if status == "running" and str(row.get("lease_expires_at") or "") > now:
+            return None
+        return "retired_structured_shadow"
 
     def _audit_instrument(self, instrument_id: str) -> dict[str, Any]:
         issues: list[dict[str, Any]] = []
@@ -199,8 +640,16 @@ class BusinessProfileSemanticRepairService:
         issues.extend(self._operating_fact_findings(instrument_id))
         issues.extend(self._incompatible_artifact_findings(instrument_id))
         issues.extend(self._exposure_collision_findings(instrument_id))
-        issues.extend(self._failed_work_item_findings(instrument_id))
         return {"instrument_id": instrument_id, "inventory": inventory, "issues": issues}
+
+    def _audit_cleanup_instrument(self, instrument_id: str) -> dict[str, Any]:
+        """Audit only lifecycle rows that are eligible for physical deletion."""
+
+        return {
+            "instrument_id": instrument_id,
+            "inventory": self._inventory_instrument(instrument_id),
+            "issues": self._incompatible_artifact_findings(instrument_id),
+        }
 
     def _inventory_instrument(self, instrument_id: str) -> dict[str, Any]:
         """Return a read-only lifecycle inventory used by repair and operators."""
@@ -258,36 +707,6 @@ class BusinessProfileSemanticRepairService:
                     target[kind] += int(row[1])
         return {key: dict(value) for key, value in inventory.items()}
 
-    def _failed_work_item_findings(self, instrument_id: str) -> list[dict[str, Any]]:
-        with self.storage.get_connection() as conn:
-            self.storage._apply_pragmas(conn)
-            exists = conn.execute(
-                "SELECT 1 FROM sqlite_master WHERE type='table' AND name='business_profile_work_items'"
-            ).fetchone()
-            if exists is None:
-                return []
-            rows = conn.execute(
-                "SELECT work_id, status, stage, last_error FROM business_profile_work_items "
-                "WHERE instrument_id = ? AND status IN ('terminal_failure', 'machine_rework')",
-                (instrument_id,),
-            ).fetchall()
-        if not rows:
-            return []
-        return [
-            self._issue(
-                "failed_work_item",
-                instrument_id,
-                {
-                    "work_id": row["work_id"],
-                    "status": row["status"],
-                    "stage": row["stage"],
-                    "last_error": str(row["last_error"] or "")[:500],
-                    "proposed_action": "delete_failed_work_item",
-                },
-            )
-            for row in rows
-        ]
-
     def _incompatible_artifact_findings(self, instrument_id: str) -> list[dict[str, Any]]:
         """Report completed artifacts that cannot safely satisfy current reuse."""
 
@@ -301,16 +720,58 @@ class BusinessProfileSemanticRepairService:
             if table is None:
                 return findings
             rows = conn.execute(
-                "SELECT run_id, field_family, source_document_id, metadata_json "
+                "SELECT run_id, field_family, source_document_id, status, metadata_json "
                 "FROM business_profile_semantic_runs "
-                "WHERE instrument_id = ? AND status = 'completed'",
+                "WHERE instrument_id = ?",
                 (instrument_id,),
             ).fetchall()
+            artifact_rows = conn.execute(
+                "SELECT artifact_id, source_document_id, field_family, response_json "
+                "FROM business_profile_semantic_artifacts WHERE instrument_id = ?",
+                (instrument_id,),
+            ).fetchall()
+            event_rows = conn.execute(
+                "SELECT artifact_id, status, reason_code FROM business_profile_semantic_artifact_events "
+                "WHERE artifact_id IN (SELECT artifact_id FROM business_profile_semantic_artifacts WHERE instrument_id = ?) "
+                "AND rowid IN (SELECT MAX(rowid) FROM business_profile_semantic_artifact_events GROUP BY artifact_id)",
+                (instrument_id,),
+            ).fetchall()
+        artifact_ids = {str(row["artifact_id"]) for row in artifact_rows}
         for row in rows:
             try:
                 metadata = json.loads(row["metadata_json"] or "{}")
             except (TypeError, ValueError):
                 metadata = {}
+            artifact_id = str(metadata.get("semantic_artifact_id") or "").strip()
+            if str(row["status"] or "") == "superseded":
+                findings.append(
+                    self._issue(
+                        "superseded_semantic_run",
+                        instrument_id,
+                        {
+                            "run_id": row["run_id"],
+                            "field_family": row["field_family"],
+                            "source_document_id": row["source_document_id"],
+                            "proposed_action": "delete_obsolete_run_manifest",
+                        },
+                    )
+                )
+                continue
+            if str(row["field_family"] or "") in LEGACY_SHADOW_FIELD_FAMILIES:
+                if not artifact_id or artifact_id not in artifact_ids:
+                    findings.append(
+                        self._issue(
+                            "legacy_shadow_semantic_run",
+                            instrument_id,
+                            {
+                                "run_id": row["run_id"],
+                                "field_family": row["field_family"],
+                                "source_document_id": row["source_document_id"],
+                                "proposed_action": "delete_obsolete_run_manifest",
+                            },
+                        )
+                    )
+                continue
             if metadata.get("reuse_blocked") is True:
                 continue
             if str(metadata.get("result_policy") or "reuse") != "reuse":
@@ -340,22 +801,8 @@ class BusinessProfileSemanticRepairService:
                     },
                 )
             )
-        # Also inspect receipts directly.  A receipt can predate the current
-        # run manifest and therefore have no completed-run row to advertise its
-        # incompatible occurrence identity.
-        with self.storage.get_connection() as conn:
-            self.storage._apply_pragmas(conn)
-            artifact_rows = conn.execute(
-                "SELECT artifact_id, source_document_id, field_family, response_json "
-                "FROM business_profile_semantic_artifacts WHERE instrument_id = ?",
-                (instrument_id,),
-            ).fetchall()
-            event_rows = conn.execute(
-                "SELECT artifact_id, status, reason_code FROM business_profile_semantic_artifact_events "
-                "WHERE artifact_id IN (SELECT artifact_id FROM business_profile_semantic_artifacts WHERE instrument_id = ?) "
-                "AND rowid IN (SELECT MAX(rowid) FROM business_profile_semantic_artifact_events GROUP BY artifact_id)",
-                (instrument_id,),
-            ).fetchall()
+        # Also inspect receipts directly. A receipt can predate the current run
+        # manifest, and retired shadow receipts must never remain replayable.
         latest_event = {
             str(row["artifact_id"]): {
                 "status": str(row["status"] or ""),
@@ -381,11 +828,20 @@ class BusinessProfileSemanticRepairService:
                 latest_status == "conversion_pending"
                 and not latest_reason.startswith("unit_rule_")
             )
-            if not legacy and not failed:
+            legacy_shadow = (
+                str(row["field_family"] or "") in LEGACY_SHADOW_FIELD_FAMILIES
+            )
+            if not legacy and not failed and not legacy_shadow:
                 continue
             if artifact_id in known:
                 continue
-            issue_code = "failed_semantic_artifact" if failed else "legacy_semantic_artifact"
+            issue_code = (
+                "legacy_shadow_semantic_artifact"
+                if legacy_shadow
+                else "failed_semantic_artifact"
+                if failed
+                else "legacy_semantic_artifact"
+            )
             findings.append(
                 self._issue(
                     issue_code,
@@ -619,15 +1075,15 @@ class BusinessProfileSemanticRepairService:
             elif issue["code"] in {
                 "incompatible_reusable_artifact",
                 "legacy_semantic_artifact",
+                "legacy_shadow_semantic_artifact",
                 "failed_semantic_artifact",
             }:
                 changes.append(self._delete_unusable_artifact(instrument_id, issue))
-            elif issue["code"] == "failed_work_item":
-                # Deletion is performed once per instrument below so duplicate
-                # findings cannot produce duplicate writes.
-                continue
-        if any(issue["code"] == "failed_work_item" for issue in finding["issues"]):
-            changes.extend(self._cleanup_failed_work_items(instrument_id))
+            elif issue["code"] in {
+                "legacy_shadow_semantic_run",
+                "superseded_semantic_run",
+            }:
+                changes.append(self._delete_obsolete_semantic_run(instrument_id, issue))
         return changes
 
     def _deduplicate_machine_roles(
@@ -732,10 +1188,11 @@ class BusinessProfileSemanticRepairService:
     ) -> dict[str, Any]:
         """Physically remove a failed/legacy model receipt and its junk outputs.
 
-        Only candidate records explicitly listed by the failed semantic run are
-        removed.  Evidence, approved history, and review audit rows remain
-        immutable.  Removing the receipt prevents the failed response from
-        being selected again; the next backfill performs fresh extraction.
+        Candidate records explicitly listed by the failed semantic run, plus
+        candidate descendants directly linked by ``run_id``, are removed.
+        Evidence, approved history, and review audit rows remain immutable.
+        Removing the receipt prevents the failed response from being selected
+        again; the next backfill performs fresh extraction.
         """
         artifact_id = str(issue.get("details", {}).get("artifact_id") or "").strip()
         run_id = str(issue.get("details", {}).get("run_id") or "").strip()
@@ -760,6 +1217,11 @@ class BusinessProfileSemanticRepairService:
                     metadata = json.loads(row["metadata_json"] or "{}")
                     deleted_records = self._delete_candidate_records_from_metadata(
                         conn, instrument_id, metadata
+                    )
+                    deleted_records.extend(
+                        self._delete_candidate_records_from_run_id(
+                            conn, instrument_id, run_id
+                        )
                     )
                     conn.execute(
                         "DELETE FROM business_profile_semantic_runs "
@@ -817,6 +1279,11 @@ class BusinessProfileSemanticRepairService:
                             conn, instrument_id, run_metadata
                         )
                     )
+                    deleted_records.extend(
+                        self._delete_candidate_records_from_run_id(
+                            conn, instrument_id, str(run_row["run_id"])
+                        )
+                    )
                 conn.execute(
                     "DELETE FROM business_profile_semantic_artifact_events WHERE artifact_id = ?",
                     (artifact_id,),
@@ -857,6 +1324,111 @@ class BusinessProfileSemanticRepairService:
             "stable_id": issue["stable_id"],
             "affected_ids": [artifact_id, *dict.fromkeys(deleted_records)],
         }
+
+    def _delete_obsolete_semantic_run(
+        self, instrument_id: str, issue: dict[str, Any]
+    ) -> dict[str, Any]:
+        """Delete one obsolete run manifest and only its candidate descendants."""
+
+        run_id = str(issue.get("details", {}).get("run_id") or "").strip()
+        if not run_id:
+            return {
+                "instrument_id": instrument_id,
+                "status": "failed",
+                "reason": "semantic_run_identity_unavailable",
+                "stable_id": issue["stable_id"],
+            }
+        with self.storage.get_connection() as conn:
+            self.storage._apply_pragmas(conn)
+            conn.execute("BEGIN IMMEDIATE")
+            try:
+                row = conn.execute(
+                    "SELECT metadata_json FROM business_profile_semantic_runs "
+                    "WHERE run_id = ? AND instrument_id = ?",
+                    (run_id, instrument_id),
+                ).fetchone()
+                if row is None:
+                    conn.rollback()
+                    return {
+                        "instrument_id": instrument_id,
+                        "status": "unchanged",
+                        "reason": "semantic_run_already_absent",
+                        "stable_id": issue["stable_id"],
+                    }
+                try:
+                    metadata = json.loads(row["metadata_json"] or "{}")
+                except (TypeError, ValueError, json.JSONDecodeError):
+                    metadata = {}
+                deleted_records = self._delete_candidate_records_from_metadata(
+                    conn, instrument_id, metadata
+                )
+                deleted_records.extend(
+                    self._delete_candidate_records_from_run_id(
+                        conn, instrument_id, run_id
+                    )
+                )
+                conn.execute(
+                    "DELETE FROM business_profile_semantic_runs "
+                    "WHERE run_id = ? AND instrument_id = ?",
+                    (run_id, instrument_id),
+                )
+                conn.commit()
+            except Exception:
+                conn.rollback()
+                raise
+        return {
+            "instrument_id": instrument_id,
+            "status": "changed",
+            "reason": "obsolete_semantic_run_deleted",
+            "stable_id": issue["stable_id"],
+            "affected_ids": [run_id, *dict.fromkeys(deleted_records)],
+        }
+
+    @staticmethod
+    def _delete_candidate_records_from_run_id(
+        conn: Any, instrument_id: str, run_id: str
+    ) -> list[str]:
+        """Delete candidate descendants directly linked to an obsolete run."""
+
+        tables = (
+            ("exposure_facts", "company_commodity_exposure_facts", "fact_id"),
+            ("relationships", "company_supply_chain_relationships", "relationship_id"),
+            ("activities", "company_business_activities", "activity_id"),
+        )
+        existing_tables = {
+            str(row[0])
+            for row in conn.execute(
+                "SELECT name FROM sqlite_master WHERE type = 'table'"
+            ).fetchall()
+        }
+        deleted: list[str] = []
+        for record_type, table, primary_key in tables:
+            if table not in existing_tables:
+                continue
+            record_ids = [
+                str(row[0])
+                for row in conn.execute(
+                    f"SELECT {primary_key} FROM {table} "
+                    "WHERE instrument_id = ? AND run_id = ? "
+                    "AND review_status = 'candidate'",
+                    (instrument_id, run_id),
+                ).fetchall()
+            ]
+            for record_id in record_ids:
+                if "business_profile_exceptions" in existing_tables:
+                    conn.execute(
+                        "DELETE FROM business_profile_exceptions WHERE target_id = ? "
+                        "AND instrument_id = ?",
+                        (record_id, instrument_id),
+                    )
+                conn.execute(
+                    f"DELETE FROM {table} WHERE {primary_key} = ? "
+                    "AND instrument_id = ? AND run_id = ? "
+                    "AND review_status = 'candidate'",
+                    (record_id, instrument_id, run_id),
+                )
+                deleted.append(f"{record_type}:{record_id}")
+        return deleted
 
     @staticmethod
     def _delete_candidate_records_from_metadata(
@@ -908,35 +1480,6 @@ class BusinessProfileSemanticRepairService:
                     )
                 deleted.append(f"{record_type}:{record_id}")
         return deleted
-
-    def _cleanup_failed_work_items(self, instrument_id: str) -> list[dict[str, Any]]:
-        """Drop terminal machine failures after their diagnostics are persisted."""
-        with self.storage.get_connection() as conn:
-            self.storage._apply_pragmas(conn)
-            rows = conn.execute(
-                "SELECT work_id, status FROM business_profile_work_items "
-                "WHERE instrument_id = ? AND status IN ('terminal_failure', 'machine_rework')",
-                (instrument_id,),
-            ).fetchall()
-            if not rows:
-                return []
-            conn.execute("BEGIN IMMEDIATE")
-            try:
-                conn.execute(
-                    "DELETE FROM business_profile_work_items WHERE instrument_id = ? "
-                    "AND status IN ('terminal_failure', 'machine_rework')",
-                    (instrument_id,),
-                )
-                conn.commit()
-            except Exception:
-                conn.rollback()
-                raise
-        return [{
-            "instrument_id": instrument_id,
-            "status": "changed",
-            "reason": "failed_work_items_deleted",
-            "affected_ids": [str(row["work_id"]) for row in rows],
-        }]
 
     def _replay_operating_fact_group(
         self, instrument_id: str, issue: dict[str, Any]
@@ -1431,8 +1974,44 @@ class BusinessProfileSemanticRepairService:
         apply: bool,
         result_policy: str = "reuse",
         before_projections: dict[str, Any] | None = None,
+        execution_state: dict[str, Any] | None = None,
+        cleanup_only: bool = False,
     ) -> dict[str, Any]:
-        issues = [item for finding in findings for item in finding["issues"]]
+        execution_state = execution_state or {
+            "work_items": {"delete_count": 0, "reason_counts": {}, "work_ids": []},
+            "checkpoint_files": {
+                "enabled": False,
+                "root": None,
+                "delete_paths": [],
+                "orphan_paths": [],
+                "unsafe_paths": [],
+                "delete_bytes": 0,
+            },
+            "issues": [],
+        }
+        checkpoint_files = dict(execution_state.get("checkpoint_files") or {})
+        public_checkpoint_files = {
+            **checkpoint_files,
+            **BusinessProfileSemanticRepairService._id_summary(
+                checkpoint_files.get("delete_paths") or (), key="delete_paths"
+            ),
+            **BusinessProfileSemanticRepairService._id_summary(
+                checkpoint_files.get("orphan_paths") or (), key="orphan_paths"
+            ),
+        }
+        public_execution_state = {
+            **execution_state,
+            "work_items": {
+                key: value
+                for key, value in dict(execution_state.get("work_items") or {}).items()
+                if not str(key).startswith("_")
+            },
+            "checkpoint_files": public_checkpoint_files,
+        }
+        issues = [
+            *[item for finding in findings for item in finding["issues"]],
+            *list(execution_state.get("issues") or []),
+        ]
         would_change = sum(
             item["code"]
             in {
@@ -1443,8 +2022,12 @@ class BusinessProfileSemanticRepairService:
                 "inventory_derived_storage_role",
                 "incompatible_reusable_artifact",
                 "legacy_semantic_artifact",
+                "legacy_shadow_semantic_artifact",
                 "failed_semantic_artifact",
-                "failed_work_item",
+                "legacy_shadow_semantic_run",
+                "superseded_semantic_run",
+                "obsolete_work_items",
+                "orphan_checkpoint_files",
             }
             for item in issues
         )
@@ -1452,10 +2035,12 @@ class BusinessProfileSemanticRepairService:
             "schema_version": REPAIR_SCHEMA_VERSION,
             "mode": "apply" if apply else "audit",
             "result_policy": result_policy,
+            "cleanup_only": cleanup_only,
             "network_access": False,
             "llm_access": False,
             "write_count": 0,
             "instruments": findings,
+            "execution_state": public_execution_state,
             "issue_counts": dict(Counter(item["code"] for item in issues)),
             "before_current_projections": before_projections or {},
             "after_current_projections": before_projections or {},

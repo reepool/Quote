@@ -31,9 +31,11 @@
 
 4. **错误分类沿异常对象传递。** 转换异常必须携带稳定 reason code 和 retryable 标志；worker 不根据字符串把所有 machine rework 改写成 `gateway_failure`。只有 provider 返回 429、超时、传输错误等才触发退避重试，确定性业务错误直接终态 machine rework。
 
-5. **清理先审计后删除。** repair 先生成按 instrument/report/source 的清理清单；删除范围仅包括 rejected、不可复用 conversion pending、旧结构 receipt、terminal/machine work item 及其 candidate 输出。approved 记录、源证据和 review audit 不删除。清理后 `find_replay` 不得再返回被删 receipt。
+5. **清理先审计后删除。** repair 先生成按 instrument/report/source 的清理清单；删除范围包括 rejected、不可复用 conversion pending、旧 `structured_shadow` receipt/run/work、superseded 或 terminal/machine work item、superseded run manifest 及其 candidate 输出。approved 记录、源证据和 review audit 不删除。清理后 `find_replay` 不得再返回被删 receipt，旧 shadow work 不得继续被 worker 领取。
 
-6. **批量前门禁。** 11 只样本批量前必须通过 identity collision scan、unusable receipt scan 和 worker error taxonomy scan；任一阻塞项存在时只允许定向重放，不启动全量 LLM 批次。
+6. **执行态文件与数据库同一 owner。** repair 删除 work row 时先在数据库事务中记录精确 checkpoint manifest，提交成功后仅删除配置 checkpoint 根目录直属、名称匹配 `bp-work-*.json` 的文件。无任何保留 work row 引用的同类文件视为孤儿并物理删除；越界路径拒绝删除，文件删除失败必须报告失败并可在下一次 repair 幂等重试。enqueue 遇到旧 scope 或孤儿 checkpoint 时使用新的空路径，并在数据库切换成功后删除不再被引用的旧文件，不建立 quarantine/legacy 目录。
+
+7. **批量前门禁。** 11 只样本批量前必须通过 identity collision scan、unusable receipt scan 和 worker error taxonomy scan；任一阻塞项存在时只允许定向重放，不启动全量 LLM 批次。
 
 ## Risks / Trade-offs
 
@@ -46,7 +48,7 @@
 
 1. 部署代码和回归测试，但先不启动批量回补。
 2. 对目标样本执行只读扫描，输出 occurrence 冲突、匿名关系分类、receipt 状态和候选依赖。
-3. 在事务中清理确认不可复用的失败 receipt/work item/candidate，保留 approved、evidence 和 audit，并记录清理报告。
+3. 在事务中清理确认不可复用的失败或旧 shadow receipt/run/work/candidate，提交后删除失效和孤儿 checkpoint；保留 approved、evidence 和 audit，并记录数据库与文件删除报告。
 4. 定向重放 002496.SZ 与 300750.SZ；要求零 identity conflict、零错误 gateway 包装、零无效重试。
 5. 验证一份新年度报告和一份同年度更正报告的追加/替代行为。
 6. 通过门禁后恢复 11 只股票批量；任一步失败则停止批量，不自动扩大重试范围。

@@ -16,8 +16,12 @@ from contextlib import contextmanager
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Any, Awaitable, Callable, Mapping, Sequence
+from typing import Any, Awaitable, Callable, Iterable, Mapping, Sequence
 
+from research.business_profile_checkpoint_lifecycle import (
+    delete_owned_checkpoint_file,
+    owned_checkpoint_path,
+)
 from utils.date_utils import get_shanghai_time
 
 
@@ -1400,6 +1404,7 @@ class BusinessProfileWorkRepository:
         ).hexdigest()[:12]
         recovered_ids: list[str] = []
         preserved = rotated = 0
+        checkpoints_to_delete: set[Path] = set()
         with self.storage.get_connection() as conn:
             self.storage._apply_pragmas(conn)
             conn.execute("BEGIN IMMEDIATE")
@@ -1483,12 +1488,18 @@ class BusinessProfileWorkRepository:
                         preserved += 1
                     else:
                         rotated += 1
+                        checkpoints_to_delete.add(checkpoint)
             conn.commit()
+        checkpoint_cleanup = self._delete_unreferenced_checkpoints(
+            checkpoints_to_delete
+        )
         return {
             "eligible_stale_scope_items": len(rows),
             "requeued": len(recovered_ids),
             "checkpoint_preserved": preserved,
             "checkpoint_rotated": rotated,
+            "checkpoint_deleted": checkpoint_cleanup["deleted"],
+            "checkpoint_delete_failures": checkpoint_cleanup["failures"],
             "processing_identity_filtered": processing_identity is not None,
             "work_ids": recovered_ids,
         }
@@ -1758,6 +1769,7 @@ class BusinessProfileWorkRepository:
         now = get_shanghai_time().isoformat()
         inserted = reused = superseded = identity_superseded = reset = 0
         checkpoint_rotated = 0
+        checkpoints_to_delete: set[Path] = set()
         with self.storage.get_connection() as conn:
             self.storage._apply_pragmas(conn)
             conn.execute("BEGIN IMMEDIATE")
@@ -1888,6 +1900,7 @@ class BusinessProfileWorkRepository:
                         )
                         reset += 1
                         checkpoint_rotated += 1
+                        checkpoints_to_delete.add(previous_checkpoint)
                         checkpoint_rotated_for_existing = True
                         existing_status = "pending"
                     # Explicit replacement is a bounded, idempotent replay of the
@@ -1976,6 +1989,7 @@ class BusinessProfileWorkRepository:
                         )
                         reset += 1
                         checkpoint_rotated += 1
+                        checkpoints_to_delete.add(previous_checkpoint)
                     elif not checkpoint_rotated_for_existing:
                         reused += 1
                 else:
@@ -1995,6 +2009,7 @@ class BusinessProfileWorkRepository:
                             token=f"orphan-{replay_token}",
                         )
                         checkpoint_rotated += 1
+                        checkpoints_to_delete.add(orphan_checkpoint)
                     prior_completed_identity = conn.execute(
                         "SELECT 1 FROM business_profile_work_items "
                         "WHERE frontier_id = ? AND policy = ? "
@@ -2107,12 +2122,17 @@ class BusinessProfileWorkRepository:
                         )
                         superseded += int(cursor.rowcount or 0)
             conn.commit()
+        checkpoint_cleanup = self._delete_unreferenced_checkpoints(
+            checkpoints_to_delete
+        )
         result: dict[str, Any] = {
             "eligible": len(rows),
             "inserted": inserted,
             "reused": reused,
             "reset": reset,
             "checkpoint_rotated": checkpoint_rotated,
+            "checkpoint_deleted": checkpoint_cleanup["deleted"],
+            "checkpoint_delete_failures": checkpoint_cleanup["failures"],
             "superseded": superseded,
             "identity_superseded": identity_superseded,
             "work_ids": [
@@ -2129,6 +2149,54 @@ class BusinessProfileWorkRepository:
             ],
         }
         return result
+
+    def _delete_unreferenced_checkpoints(
+        self, paths: Iterable[Path]
+    ) -> dict[str, Any]:
+        candidates = {
+            candidate
+            for path in paths
+            for candidate in (
+                owned_checkpoint_path(path, checkpoint_root=self.checkpoint_root),
+            )
+            if candidate is not None
+        }
+        if not candidates:
+            return {"deleted": 0, "failures": []}
+        with self.storage.get_connection() as conn:
+            self.storage._apply_pragmas(conn)
+            retained = {
+                candidate
+                for row in conn.execute(
+                    "SELECT checkpoint_path FROM business_profile_work_items"
+                ).fetchall()
+                for candidate in (
+                    owned_checkpoint_path(
+                        str(row["checkpoint_path"] or ""),
+                        checkpoint_root=self.checkpoint_root,
+                    ),
+                )
+                if candidate is not None
+            }
+        deleted = 0
+        failures: list[dict[str, str]] = []
+        for path in sorted(candidates - retained, key=str):
+            try:
+                deleted += int(
+                    delete_owned_checkpoint_file(
+                        path, checkpoint_root=self.checkpoint_root
+                    )
+                )
+            except (OSError, ValueError) as exc:
+                failures.append(
+                    {"path": str(path), "reason": f"{type(exc).__name__}:{exc}"}
+                )
+        if failures:
+            logger.warning(
+                "business-profile checkpoint cleanup incomplete failures=%s",
+                failures,
+            )
+        return {"deleted": deleted, "failures": failures}
 
 
 class BusinessProfileFrontierBoundAcquirer:
@@ -2466,7 +2534,10 @@ class BusinessProfileAsyncProductionService:
             )
 
             audit = await self._run_storage_operation(
-                BusinessProfileSemanticRepairService(self.repository.storage).run,
+                BusinessProfileSemanticRepairService(
+                    self.repository.storage,
+                    checkpoint_root=self.repository.checkpoint_root,
+                ).run,
                 instrument_ids=tuple(instrument_ids),
                 apply=False,
             )
@@ -2476,6 +2547,9 @@ class BusinessProfileAsyncProductionService:
                 "incompatible_reusable_artifact",
                 "legacy_semantic_artifact",
                 "failed_semantic_artifact",
+                "legacy_shadow_semantic_artifact",
+                "legacy_shadow_semantic_run",
+                "superseded_semantic_run",
                 "failed_work_item",
             }
             blockers = [
@@ -2489,6 +2563,23 @@ class BusinessProfileAsyncProductionService:
                 for item in audit.get("instruments", [])
             ]
             blockers = [item for item in blockers if item["issues"]]
+            execution_issues = [
+                issue
+                for issue in audit.get("execution_state", {}).get("issues", [])
+                if issue.get("code")
+                in {
+                    "obsolete_work_items",
+                    "active_legacy_work_items",
+                    "unsafe_checkpoint_paths",
+                }
+            ]
+            if execution_issues:
+                blockers.append(
+                    {
+                        "instrument_id": "__execution_state__",
+                        "issues": execution_issues,
+                    }
+                )
             if blockers:
                 return {
                     "schema_version": ASYNC_REPORT_SCHEMA_VERSION,

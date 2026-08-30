@@ -174,7 +174,7 @@ def test_enqueue_current_identity_supersedes_obsolete_failed_work(tmp_path):
     assert [tuple(row) for row in groups] == [("pending", 1), ("superseded", 1)]
 
 
-def test_new_work_rotates_orphan_checkpoint_left_by_cleanup(tmp_path):
+def test_new_work_deletes_orphan_checkpoint_left_by_cleanup(tmp_path):
     storage = _storage(tmp_path)
     _frontier(storage)
     queue = BusinessProfileWorkRepository(
@@ -221,9 +221,11 @@ def test_new_work_rotates_orphan_checkpoint_left_by_cleanup(tmp_path):
 
     assert result["inserted"] == 1
     assert result["checkpoint_rotated"] == 1
+    assert result["checkpoint_deleted"] == 1
+    assert result["checkpoint_delete_failures"] == []
     recovered = queue.get(work_id)
     assert recovered["checkpoint_path"] != str(orphan_path)
-    assert orphan_path.exists()
+    assert not orphan_path.exists()
     assert not Path(recovered["checkpoint_path"]).exists()
     assert recovered["metadata"]["recovery_history"][-1]["reason"] == (
         "orphan_checkpoint_rotated_at_enqueue"
@@ -313,6 +315,7 @@ def test_enqueue_rotates_stale_checkpoint_for_expired_running_work(tmp_path):
     recovered = queue.get(row["work_id"])
     assert result["reset"] == 1
     assert result["checkpoint_rotated"] == 1
+    assert result["checkpoint_deleted"] == 1
     assert recovered["stage"] == "acquire"
     assert recovered["status"] == "pending"
     assert recovered["checkpoint_path"] != str(stale_path)
@@ -1657,7 +1660,7 @@ def test_force_requeues_terminal_item_without_changing_work_identity(tmp_path):
     ]
     assert metadata["reprocess_complete_coverage"] is True
     assert "stage_results" not in metadata
-    assert checkpoint_path.exists()
+    assert not checkpoint_path.exists()
 
 
 def test_force_rotates_retry_due_checkpoint_requeued_by_contract_recovery(tmp_path):
@@ -1724,6 +1727,7 @@ def test_force_rotates_retry_due_checkpoint_requeued_by_contract_recovery(tmp_pa
 
     assert result["reset"] == 1
     assert result["checkpoint_rotated"] == 1
+    assert result["checkpoint_deleted"] == 1
     assert result["reused"] == 0
     recovered = queue.get(row["work_id"])
     assert recovered["stage"] == "acquire"
@@ -1738,7 +1742,7 @@ def test_force_rotates_retry_due_checkpoint_requeued_by_contract_recovery(tmp_pa
         "semantic",
         "verify",
     ]
-    assert checkpoint_path.exists()
+    assert not checkpoint_path.exists()
 
 
 def test_replace_policy_rotates_completed_work_without_force(tmp_path):

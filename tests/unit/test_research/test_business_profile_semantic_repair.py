@@ -1,3 +1,6 @@
+import json
+from pathlib import Path
+
 from research.business_profile_semantic_repair import BusinessProfileSemanticRepairService
 from research.business_profile_semantic_artifacts import (
     BusinessProfileSemanticArtifactRepository,
@@ -23,6 +26,44 @@ def _storage(tmp_path):
     storage = ResearchStorageManager(config)
     storage.initialize()
     return storage
+
+
+def _insert_work_item(
+    storage,
+    *,
+    work_id,
+    instrument_id,
+    status,
+    checkpoint_path,
+    processing_identity,
+):
+    now = "2026-08-30T12:00:00+08:00"
+    metadata = {
+        "schema_version": "business_profile_work_item.v1",
+        "processing_identity": processing_identity,
+    }
+    with storage.get_connection() as conn:
+        conn.execute(
+            "INSERT INTO business_profile_work_items ("
+            "work_id, frontier_id, instrument_id, source, announcement_id, "
+            "report_period, document_type, policy, processing_identity_hash, "
+            "stage, status, checkpoint_path, metadata_json, created_at, updated_at"
+            ") VALUES (?, ?, ?, 'cninfo', ?, '2025-12-31', 'annual_report', "
+            "'expanded', ?, 'acquire', ?, ?, ?, ?, ?)",
+            (
+                work_id,
+                f"frontier-{work_id}",
+                instrument_id,
+                f"announcement-{work_id}",
+                f"identity-{work_id}",
+                status,
+                str(checkpoint_path),
+                json.dumps(metadata),
+                now,
+                now,
+            ),
+        )
+        conn.commit()
 
 
 def test_repair_deletes_failed_semantic_receipt_and_converges(tmp_path):
@@ -89,6 +130,236 @@ def test_all_scope_includes_instruments_with_only_failed_lifecycle_rows(tmp_path
 
     assert [item["instrument_id"] for item in audit["instruments"]] == ["699999.SH"]
     assert audit["issue_counts"]["failed_semantic_artifact"] == 1
+
+
+def test_repair_removes_obsolete_work_and_orphan_checkpoints(tmp_path):
+    storage = _storage(tmp_path)
+    checkpoint_root = tmp_path / "checkpoints"
+    checkpoint_root.mkdir()
+    legacy_identity = {
+        "rollout_phase": "structured_shadow",
+        "field_families": ["structured_segments", "tabular_operating_facts"],
+    }
+    current_identity = {
+        "rollout_phase": "semantic_complete_targeted",
+        "field_families": ["atomic_activities", "named_relationships"],
+    }
+    paths = {
+        "legacy": checkpoint_root / "bp-work-legacy.json",
+        "failed": checkpoint_root / "bp-work-failed.json",
+        "superseded": checkpoint_root / "bp-work-superseded.json",
+        "current": checkpoint_root / "bp-work-current.json",
+        "orphan": checkpoint_root / "bp-work-orphan.json",
+    }
+    for path in paths.values():
+        path.write_text("{}", encoding="utf-8")
+    _insert_work_item(
+        storage,
+        work_id="bp-work-legacy",
+        instrument_id="600001.SH",
+        status="pending",
+        checkpoint_path=paths["legacy"],
+        processing_identity=legacy_identity,
+    )
+    _insert_work_item(
+        storage,
+        work_id="bp-work-failed",
+        instrument_id="600002.SH",
+        status="terminal_failure",
+        checkpoint_path=paths["failed"],
+        processing_identity=current_identity,
+    )
+    _insert_work_item(
+        storage,
+        work_id="bp-work-superseded",
+        instrument_id="600003.SH",
+        status="superseded",
+        checkpoint_path=paths["superseded"],
+        processing_identity=current_identity,
+    )
+    _insert_work_item(
+        storage,
+        work_id="bp-work-current",
+        instrument_id="600004.SH",
+        status="retry_due",
+        checkpoint_path=paths["current"],
+        processing_identity=current_identity,
+    )
+    control = checkpoint_root / "control" / "backfill_progress.json"
+    control.parent.mkdir()
+    control.write_text("{}", encoding="utf-8")
+    service = BusinessProfileSemanticRepairService(
+        storage, checkpoint_root=checkpoint_root
+    )
+
+    audit = service.run(all_scope=True)
+
+    assert audit["execution_state"]["work_items"]["delete_count"] == 3
+    assert audit["execution_state"]["work_items"]["work_ids_count"] == 3
+    assert "_delete_work_ids" not in audit["execution_state"]["work_items"]
+    assert audit["issue_counts"] == {
+        "obsolete_work_items": 1,
+        "orphan_checkpoint_files": 1,
+    }
+    applied = service.run(all_scope=True, apply=True)
+    assert applied["change_counts"]["failed"] == 0
+    execution_change = next(
+        item for item in applied["changes"] if item.get("instrument_id") is None
+    )
+    assert execution_change["affected_ids_count"] == 3
+    assert execution_change["checkpoint_paths_count"] == 4
+    with storage.get_connection() as conn:
+        remaining = conn.execute(
+            "SELECT work_id FROM business_profile_work_items ORDER BY work_id"
+        ).fetchall()
+    assert [row[0] for row in remaining] == ["bp-work-current"]
+    assert paths["current"].exists()
+    assert control.exists()
+    assert all(not paths[name].exists() for name in ("legacy", "failed", "superseded", "orphan"))
+    repeated = service.run(all_scope=True)
+    assert repeated["issue_counts"] == {}
+
+
+def test_cleanup_only_does_not_apply_unrelated_business_repairs(tmp_path):
+    storage = _storage(tmp_path)
+    storage.upsert_shareholder_snapshot(ShareholderSnapshot(
+        instrument_id="600009.SH",
+        symbol="600009",
+        exchange="SSE",
+        source="local",
+        holder_count=1,
+        holder_count_report_date="20251231",
+        snapshot_json={"coverage_scope": ["incorrect_scope"]},
+    ))
+    service = BusinessProfileSemanticRepairService(storage)
+
+    audit = service.run(all_scope=True, cleanup_only=True)
+    applied = service.run(all_scope=True, apply=True, cleanup_only=True)
+
+    assert audit["cleanup_only"] is True
+    assert "shareholder_scope_mismatch" not in audit["issue_counts"]
+    assert applied["change_counts"]["changed"] == 0
+    snapshot = storage.get_shareholder_snapshot("600009.SH", include_snapshot=True)
+    assert snapshot["snapshot"]["coverage_scope"] == ["incorrect_scope"]
+
+
+def test_repair_refuses_checkpoint_outside_owned_root(tmp_path):
+    storage = _storage(tmp_path)
+    checkpoint_root = tmp_path / "checkpoints"
+    checkpoint_root.mkdir()
+    outside = tmp_path / "bp-work-outside.json"
+    outside.write_text("{}", encoding="utf-8")
+    _insert_work_item(
+        storage,
+        work_id="bp-work-outside",
+        instrument_id="600005.SH",
+        status="terminal_failure",
+        checkpoint_path=outside,
+        processing_identity={"field_families": ["atomic_activities"]},
+    )
+    service = BusinessProfileSemanticRepairService(
+        storage, checkpoint_root=checkpoint_root
+    )
+
+    audit = service.run(all_scope=True)
+    assert audit["issue_counts"]["unsafe_checkpoint_paths"] == 1
+    applied = service.run(all_scope=True, apply=True)
+
+    assert outside.exists()
+    assert applied["change_counts"]["failed"] == 1
+    with storage.get_connection() as conn:
+        assert conn.execute(
+            "SELECT COUNT(*) FROM business_profile_work_items"
+        ).fetchone()[0] == 0
+
+
+def test_repair_deletes_retired_shadow_artifact_and_run(tmp_path):
+    storage = _storage(tmp_path)
+    repository = BusinessProfileRepository(storage)
+    artifacts = BusinessProfileSemanticArtifactRepository(storage)
+    identity = SemanticArtifactIdentity(
+        instrument_id="600006.SH",
+        source_document_id="annual-report-2025",
+        document_hash="a" * 64,
+        report_period="2025-12-31",
+        field_family="structured_segments",
+        evidence_scope_hash="b" * 64,
+        input_hash="c" * 64,
+        prompt_version="business_profile_structured_extraction.v4",
+        schema_version="business_profile_structured_extraction.v4",
+    )
+    artifact = artifacts.receive(
+        identity,
+        response={"segments": []},
+        response_hash="",
+        evidence_ids=[],
+    )
+    artifacts.mark(artifact["artifact_id"], "converted")
+    now = "2026-08-30T12:00:00+08:00"
+    with storage.get_connection() as conn:
+        conn.execute(
+            "INSERT INTO business_profile_semantic_runs ("
+            "run_id, instrument_id, source_document_id, field_family, status, "
+            "bundle_hash, metadata_json, started_at, completed_at, created_at, updated_at"
+            ") VALUES ('legacy-run', '600006.SH', 'annual-report-2025', "
+            "'structured_segments', 'completed', 'bundle', ?, ?, ?, ?, ?)",
+            (
+                json.dumps({"semantic_artifact_id": artifact["artifact_id"]}),
+                now,
+                now,
+                now,
+                now,
+            ),
+        )
+        conn.commit()
+    repository.upsert("evidence", {
+        "evidence_id": "legacy-evidence",
+        "instrument_id": "600006.SH",
+        "source_document_id": "annual-report-2025",
+        "source_tier": "official_filing",
+        "document_hash": "document-hash",
+        "data_available_date": "2026-03-28",
+        "availability_quality": "actual",
+        "evidence_text_hash": "text-hash",
+        "extraction_method": "native_text",
+        "confidence": 1.0,
+        "review_status": "candidate",
+    })
+    repository.upsert("exposure_facts", {
+        "fact_id": "legacy-candidate-exposure-fact",
+        "instrument_id": "600006.SH",
+        "report_period": "2025-12-31",
+        "activity_id": "legacy-activity",
+        "exposure_fact_type": "sales_value",
+        "object_raw": "legacy product",
+        "value_raw": 1.0,
+        "unit_raw": "CNY",
+        "value_normalized": 1.0,
+        "unit_normalized": "CNY",
+        "fact_scope": "issuer",
+        "evidence_id": "legacy-evidence",
+        "run_id": "legacy-run",
+        "data_available_date": "2026-03-28",
+        "confidence": 1.0,
+        "review_status": "candidate",
+        "knowledge_from": "2026-03-28",
+        "version": 1,
+        "metadata": {},
+    })
+
+    applied = BusinessProfileSemanticRepairService(storage).run(
+        all_scope=True, apply=True
+    )
+
+    assert applied["issue_counts"]["legacy_shadow_semantic_artifact"] == 1
+    assert artifacts.find_replay(identity) is None
+    assert repository.get_record(
+        "exposure_facts", "legacy-candidate-exposure-fact"
+    ) is None
+    with storage.get_connection() as conn:
+        assert conn.execute(
+            "SELECT COUNT(*) FROM business_profile_semantic_runs"
+        ).fetchone()[0] == 0
 
 
 def test_repair_audit_is_read_only_and_apply_requires_explicit_scope(tmp_path):

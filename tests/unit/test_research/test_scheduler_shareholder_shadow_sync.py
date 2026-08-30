@@ -242,7 +242,8 @@ def test_business_profile_semantic_repair_reports_local_only_warning(monkeypatch
 
     assert result is False
     data_manager.run_business_profile_semantic_repair.assert_awaited_once_with(
-        instrument_ids=["601088.SH"], apply=True, all_scope=False, result_policy="reuse",
+        instrument_ids=["601088.SH"], apply=True, all_scope=False,
+        result_policy="reuse", cleanup_only=False,
     )
     report = task._send_task_report.await_args.kwargs["report_data"]
     assert report["status"] == "warning"

@@ -23,7 +23,7 @@ The system MUST append a new report-period occurrence for a new annual report an
 - **THEN** `result_policy=replace` creates a linked successor version and `result_policy=reuse` does not silently overwrite the approved predecessor
 
 ### Requirement: Unusable result cleanup
-The system MUST physically remove rejected or otherwise non-reusable semantic receipts, their failed work items, and candidate outputs explicitly owned by those receipts. Approved records, source evidence, and audit records MUST NOT be deleted.
+The system MUST physically remove rejected or otherwise non-reusable semantic receipts, obsolete shadow runs, superseded or failed work items, and candidate outputs explicitly owned by those receipts or runs. Work created for the retired `structured_shadow` processing mode MUST be removed regardless of queue status so it cannot be claimed by the current worker. Approved records, source evidence, and audit records MUST NOT be deleted.
 
 #### Scenario: Failed receipt cleanup
 - **WHEN** repair marks a receipt as rejected or non-reusable conversion pending
@@ -32,6 +32,10 @@ The system MUST physically remove rejected or otherwise non-reusable semantic re
 #### Scenario: Approved history protection
 - **WHEN** a failed receipt references an occurrence with an approved historical record
 - **THEN** cleanup preserves the approved record, evidence, and audit while deleting only the failed receipt and its candidate descendants
+
+#### Scenario: Retired shadow lifecycle remains queued
+- **WHEN** a work item or semantic run belongs to `structured_shadow` or the retired `structured_segments` and `tabular_operating_facts` field families
+- **THEN** repair physically deletes its execution row and owned candidate descendants even if the work status is pending, retry due, or completed
 
 ### Requirement: Pre-batch lifecycle gate
 The system MUST block broad LLM backfill when identity collisions or non-reusable receipts remain in the selected scope, and MUST report the blocking instruments and reasons.
@@ -52,7 +56,15 @@ remain independent from transient pipeline checkpoints.
 
 #### Scenario: Cleanup leaves an orphan checkpoint file
 - **WHEN** lifecycle cleanup removes a failed work row but its deterministic checkpoint path still exists
-- **THEN** recreating the work row rotates to an empty checkpoint path and does not load the orphaned scope
+- **THEN** repair physically deletes the orphan file and recreating the work row starts from an empty checkpoint path
+
+#### Scenario: Replay rotates a stale checkpoint
+- **WHEN** enqueue replaces a stale-scope, force-replay, or orphan checkpoint path
+- **THEN** the database first points to the new empty path and the old file is physically deleted after it is no longer referenced
+
+#### Scenario: Checkpoint path is outside the owned root
+- **WHEN** cleanup encounters a checkpoint path outside the configured root or without the `bp-work-*.json` ownership shape
+- **THEN** it refuses deletion and reports a typed cleanup failure without deleting the external file
 
 #### Scenario: Targeted backfill shares a processing identity with queued work
 - **WHEN** a single-instrument backfill runs while other instruments have claimable work under the same processing identity

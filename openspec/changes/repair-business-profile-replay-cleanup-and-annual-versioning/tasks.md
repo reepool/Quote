@@ -32,6 +32,7 @@
 - [x] 5.4 Add an explicit pre-batch gate that blocks broad backfill while identity collisions or unusable receipts remain unresolved.
 - [x] 5.5 Make repair converge after legacy machine-approved role duplication by retaining one current role, auditing duplicate rows out of current reads, and ignoring already-held history.
 - [x] 5.6 Isolate replay execution state by rotating orphan/stale checkpoints at enqueue and restricting targeted backfill workers to the current invocation's work IDs.
+- [x] 5.7 Replace checkpoint quarantine-by-rotation with owned-file deletion; remove retired shadow lifecycle rows, superseded runs/work, and orphan checkpoints while preserving approved records, evidence, review audit, active current work, and current receipts.
 
 ## 6. End-to-end acceptance
 
