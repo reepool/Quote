@@ -520,6 +520,7 @@ class BusinessProfileExposurePublisher:
             "legacy_compatibility_status": "componentized",
             "metadata": {
                 "mapping_reference_type": mapping.reference_type,
+                "source_activity_action": action,
                 "market_series_status": (
                     "resolved" if mapping.price_series_id else "unresolved"
                 ),
@@ -619,6 +620,11 @@ class BusinessProfileExposurePublisher:
         return selected
 
     def _find_predecessor(self, payload: Mapping[str, Any]) -> dict[str, Any] | None:
+        source_action = str(
+            (payload.get("metadata") or {}).get("source_activity_action") or ""
+        ).strip()
+        if not source_action:
+            return None
         matches = [
             item
             for item in self.repository.list_records(
@@ -631,8 +637,8 @@ class BusinessProfileExposurePublisher:
             and item.get("scope_id") == payload.get("scope_id")
             and item.get("commodity_id") == payload.get("commodity_id")
             and item.get("exposure_role") == payload.get("exposure_role")
-            and str((item.get("metadata") or {}).get("source_activity_action") or "")
-            == str((payload.get("metadata") or {}).get("source_activity_action") or "")
+            and str((item.get("metadata") or {}).get("source_activity_action") or "").strip()
+            == source_action
             and str((item.get("metadata") or {}).get("consumer_id") or "")
             == str((payload.get("metadata") or {}).get("consumer_id") or "")
             and item.get("exposure_id") != payload.get("exposure_id")

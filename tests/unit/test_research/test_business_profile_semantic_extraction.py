@@ -609,6 +609,30 @@ async def test_structured_extraction_isolates_invalid_rows_and_audits_partial_re
 
 
 @pytest.mark.asyncio
+async def test_structured_english_summary_is_soft_rejected_with_row_diagnostic():
+    selected = _selected(
+        "分部信息 单位：万元\n分产品 营业收入 营业成本 毛利率\n煤炭 100 60 40%",
+        field_family="structured_segments",
+    )
+    response = _structured_response(selected)
+    response["rows"][0]["semantic_summary_zh"] = "Coal segment revenue and cost"
+
+    result = await BusinessProfileSemanticExtractor(
+        _FakeGateway([response])
+    ).extract_structured_async(
+        field_family="structured_segments",
+        instrument_id="601088.SH",
+        report_period="2025-12-31",
+        selected=selected,
+    )
+
+    assert len(result.rows) == 1
+    assert result.rows[0]["field_rejections"] == [
+        {"field": "semantic_summary_zh", "reason": "language_contract_invalid"}
+    ]
+
+
+@pytest.mark.asyncio
 async def test_structured_unknown_span_is_row_local_with_stable_code():
     selected = _selected(
         "分部信息 单位：万元\n分产品 营业收入 营业成本 毛利率\n煤炭 100 60 40%",

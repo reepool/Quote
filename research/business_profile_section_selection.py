@@ -237,21 +237,13 @@ class BusinessProfileSectionSelector:
             reasons_by_page.setdefault(page_number, set()).add("explicit_page")
             section_key_by_page.setdefault(page_number, "explicit_page")
 
-        if explicit_pages:
-            selected_pages = _expand_pages(
-                reasons_by_page,
-                page_numbers=selection_pages_by_number,
-                context_pages=self.context_pages,
-            )
-        else:
-            selected_pages = _ranked_bounded_pages(
-                reasons_by_page,
-                pages_by_number=selection_pages_by_number,
-                context_pages=self.context_pages,
-                max_pages=effective_max_pages,
-            )
-        if len(selected_pages) > effective_max_pages:
-            selected_pages = sorted(selected_pages)[:effective_max_pages]
+        selected_pages = _ranked_bounded_pages(
+            reasons_by_page,
+            pages_by_number=selection_pages_by_number,
+            context_pages=self.context_pages,
+            max_pages=effective_max_pages,
+        )
+        dropped_anchor_pages = sorted(set(reasons_by_page) - set(selected_pages))
         if not selected_pages:
             raise ValueError(f"no governed pages selected for field family: {family}")
         sections: list[SelectedSection] = []
@@ -348,6 +340,11 @@ class BusinessProfileSectionSelector:
                         else "global_page_safety_limit"
                     )
                 ),
+                "dropped_anchor_pages": dropped_anchor_pages,
+                "dropped_anchor_reasons": {
+                    str(page): sorted(reasons_by_page[page])
+                    for page in dropped_anchor_pages
+                },
             },
             "window_index": max(0, int(window_index)),
             "window_count": max(1, int(window_count)),
@@ -583,55 +580,33 @@ def _ranked_bounded_pages(
     anchors = sorted(reasons_by_page)
     if not anchors:
         return []
-    gap = max(1, context_pages * 2 + 1)
-    clusters: list[list[int]] = []
-    for anchor in anchors:
-        if not clusters or anchor - clusters[-1][-1] > gap:
-            clusters.append([anchor])
-        else:
-            clusters[-1].append(anchor)
-
-    ranked_clusters = sorted(
-        clusters,
-        key=lambda cluster: (
-            -sum(_page_score(page, reasons_by_page[page], pages_by_number[page]) for page in cluster),
-            cluster[0],
+    ranked_anchors = sorted(
+        anchors,
+        key=lambda page: (
+            -_page_score(page, reasons_by_page[page], pages_by_number[page]),
+            page,
         ),
     )
-    selected: set[int] = set()
-    for cluster in ranked_clusters:
-        candidate = set()
-        for page in range(
-            min(cluster) - context_pages,
-            max(cluster) + context_pages + 1,
-        ):
-            if page in pages_by_number:
-                candidate.add(page)
-        available = max_pages - len(selected)
-        if available <= 0:
+    # Anchors are governed evidence.  Context is valuable only after every
+    # fitting anchor has been retained; never let an earlier page-number sort
+    # silently replace an explicit/table/heading page with its context.
+    selected: set[int] = set(ranked_anchors[:max_pages])
+    for anchor in ranked_anchors:
+        if len(selected) >= max_pages:
             break
-        if len(candidate) <= available:
-            selected.update(candidate)
-            continue
-        # A dense cluster can still exceed the budget. Keep its strongest anchors
-        # and their immediate context rather than failing the whole document.
-        for anchor in sorted(
-            cluster,
-            key=lambda page: (
-                -_page_score(page, reasons_by_page[page], pages_by_number[page]),
-                page,
-            ),
-        ):
-            window = [
+        context = sorted(
+            (
                 page
                 for page in range(anchor - context_pages, anchor + context_pages + 1)
-                if page in pages_by_number
-            ]
-            additions = [page for page in window if page not in selected]
-            selected.update(additions[: max(0, max_pages - len(selected))])
+                if page in pages_by_number and page not in selected
+            ),
+            key=lambda page: (abs(page - anchor), page),
+        )
+        for page in context:
+            selected.add(page)
             if len(selected) >= max_pages:
                 break
-    return sorted(selected)[:max_pages]
+    return sorted(selected)
 
 
 def _page_score(

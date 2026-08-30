@@ -2069,6 +2069,86 @@ def test_expired_worker_cannot_acknowledge_reclaimed_lease(tmp_path):
         )
 
 
+def test_long_running_stage_renews_lease_before_another_worker_can_claim(tmp_path):
+    storage = _storage(tmp_path)
+    _frontier(storage)
+    queue = BusinessProfileWorkRepository(
+        storage,
+        checkpoint_root=tmp_path / "checkpoints",
+    )
+    queue.enqueue_latest_annual(
+        knowledge_cutoff="2026-08-30",
+        processing_identity={"rules": "v1"},
+    )
+
+    async def stage_runner(_stage, _item):
+        await asyncio.sleep(1.2)
+        return {"status": "success"}
+
+    service = BusinessProfileAsyncProductionService(
+        repository=queue,
+        discovery_runner=AsyncMock(),
+        stage_runner=stage_runner,
+        lease_seconds=1,
+        progress_log_interval_seconds=0.05,
+    )
+
+    async def assert_not_reclaimed():
+        await asyncio.sleep(1.05)
+        return queue.claim(
+            "acquire", limit=1, lease_owner="second-worker", lease_seconds=30
+        )
+
+    async def run():
+        return await asyncio.gather(
+            service._drain_stage(
+                "acquire",
+                StageBudget(max_items=1, max_concurrency=1, max_elapsed_seconds=5),
+            ),
+            assert_not_reclaimed(),
+        )
+
+    result, competing_claim = asyncio.run(run())
+
+    assert competing_claim == ()
+    assert result["completed"] == 1
+    assert queue.claimable_count("parse") == 1
+
+
+def test_claim_storage_failure_is_reported_without_escaping_stage(tmp_path, monkeypatch):
+    storage = _storage(tmp_path)
+    _frontier(storage)
+    queue = BusinessProfileWorkRepository(
+        storage,
+        checkpoint_root=tmp_path / "checkpoints",
+    )
+    queue.enqueue_latest_annual(
+        knowledge_cutoff="2026-08-30",
+        processing_identity={"rules": "v1"},
+    )
+    monkeypatch.setattr(
+        queue,
+        "claim",
+        lambda *_args, **_kwargs: (_ for _ in ()).throw(sqlite3.OperationalError("locked")),
+    )
+    service = BusinessProfileAsyncProductionService(
+        repository=queue,
+        discovery_runner=AsyncMock(),
+        stage_runner=AsyncMock(),
+    )
+
+    result = asyncio.run(
+        service._drain_stage(
+            "acquire",
+            StageBudget(max_items=1, max_concurrency=1, max_elapsed_seconds=5),
+        )
+    )
+
+    assert result["status"] == "stopped"
+    assert result["terminal_failures"] == 1
+    assert result["errors"][0]["reason_code"] == "claim_storage_error"
+
+
 def test_scoped_backfill_honors_end_date_against_existing_frontier(tmp_path):
     storage = _storage(tmp_path)
     _frontier(storage)

@@ -104,6 +104,25 @@ class StructuredBusinessProfileCandidateWriter:
                 "segment_candidates_written": 0,
                 "diagnostics": ["missing_payload_hash"],
             }
+        missing_basis_periods = sorted(
+            {
+                str(row.report_period)
+                for row in source_result.rows
+                if _requires_explicit_period_basis(row.report_period)
+            }
+        )
+        if missing_basis_periods:
+            # This source has no basis field for interim composition rows.  Do
+            # not invent a monthly interval or persist a candidate that would
+            # look annual downstream.
+            return {
+                "status": "blocked",
+                "evidence_written": 0,
+                "segment_candidates_written": 0,
+                "diagnostics": [
+                    "period_basis_required:" + ",".join(missing_basis_periods)
+                ],
+            }
 
         evidence_id = _stable_id(
             "evidence",
@@ -407,6 +426,16 @@ def _validated_gross_margin(
     if not math.isfinite(value) or value > 1:
         return None, "source_gross_margin_out_of_range"
     return value, None
+
+
+def _requires_explicit_period_basis(report_period: str) -> bool:
+    """Interim reports need a declared basis before deriving an interval."""
+
+    try:
+        month = int(str(report_period).strip()[5:7])
+    except (TypeError, ValueError, IndexError):
+        return False
+    return month in {3, 6, 9}
 
 
 def _source_url(source: str, instrument_id: str) -> str:

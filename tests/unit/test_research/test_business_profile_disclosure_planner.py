@@ -2,6 +2,7 @@ import hashlib
 from research.business_profile_disclosure_planner import (
     BusinessProfileCoverageInspector,
     BusinessProfileDisclosurePlanner,
+    _document_from_candidate,
 )
 from research.business_profile_discovery import BusinessProfileDocumentCandidate
 from research.business_profile_documents import classify_business_profile_document
@@ -177,6 +178,23 @@ def test_future_disclosures_are_excluded_and_approved_coverage_short_circuits(tm
     assert plan.included == ()
     assert plan.coverage.complete is True
     assert plan.omitted[0]["decision_reason"] == "future_knowledge_excluded"
+
+
+def test_discovered_document_uses_current_title_classification_once():
+    document = _document_from_candidate(
+        "600000.SH",
+        {
+            "announcement_id": "current-title-wins",
+            "title": "某公司2025年年度报告（修订版）",
+            "announcement_time": "2026-04-01",
+            "adjunct_type": "PDF",
+            # Discovery snapshots can carry stale decoration; the planner's
+            # current classifier is the sole authority for its candidate.
+            "classification": {"document_type": "annual_report"},
+        },
+    )
+
+    assert document.document_type == "annual_report_correction"
 
 
 def test_reprocess_complete_coverage_selects_effective_annual(tmp_path):

@@ -610,6 +610,28 @@ class BusinessProfileWorkRepository:
             ).fetchone()
         return row is not None
 
+    def renew_lease(
+        self,
+        work_id: str,
+        *,
+        lease_owner: str,
+        lease_seconds: int,
+    ) -> bool:
+        """Extend an owned running lease without changing its attempt count."""
+
+        now = get_shanghai_time()
+        expires_at = (now + timedelta(seconds=max(1, int(lease_seconds)))).isoformat()
+        with self.storage.get_connection() as conn:
+            self.storage._apply_pragmas(conn)
+            cursor = conn.execute(
+                "UPDATE business_profile_work_items "
+                "SET lease_expires_at = ?, updated_at = ? "
+                "WHERE work_id = ? AND status = 'running' AND lease_owner = ?",
+                (expires_at, now.isoformat(), str(work_id), str(lease_owner)),
+            )
+            conn.commit()
+        return int(cursor.rowcount or 0) == 1
+
     def acknowledge(
         self,
         work_id: str,
@@ -2963,8 +2985,35 @@ class BusinessProfileAsyncProductionService:
             finally:
                 stage_done[stage].set()
 
-        results = await asyncio.gather(*(run_stage(stage) for stage in WORK_STAGES))
-        workers = dict(results)
+        stage_results = await asyncio.gather(
+            *(run_stage(stage) for stage in WORK_STAGES), return_exceptions=True
+        )
+        workers: dict[str, dict[str, Any]] = {}
+        for stage, result in zip(WORK_STAGES, stage_results):
+            if isinstance(result, Exception):
+                logger.exception(
+                    "business-profile stage escaped stage=%s error_type=%s",
+                    stage,
+                    type(result).__name__,
+                    exc_info=result,
+                )
+                workers[stage] = {
+                    "status": "failed",
+                    "claimed": 0,
+                    "completed": 0,
+                    "retried": 0,
+                    "terminal_failures": 1,
+                    "errors": [
+                        {
+                            "reason_code": "stage_exception",
+                            "error_type": type(result).__name__,
+                            "error": str(result)[:1000],
+                        }
+                    ],
+                }
+            else:
+                resolved_stage, payload = result
+                workers[resolved_stage] = dict(payload)
         logger.info(
             "business-profile workers end stages=%s writer=%s",
             {
@@ -3046,8 +3095,38 @@ class BusinessProfileAsyncProductionService:
             item_started = time.monotonic()
             if active_interval_started is None:
                 active_interval_started = item_started
+            lease_stop = asyncio.Event()
+            lease_errors: list[Exception] = []
+
+            async def renew_lease() -> None:
+                interval = max(0.1, self.lease_seconds / 3)
+                while True:
+                    try:
+                        await asyncio.wait_for(lease_stop.wait(), timeout=interval)
+                        return
+                    except asyncio.TimeoutError:
+                        pass
+                    try:
+                        renewed = await self._run_storage_operation(
+                            self.repository.renew_lease,
+                            str(item["work_id"]),
+                            lease_owner=lease_owner,
+                            lease_seconds=self.lease_seconds,
+                        )
+                    except Exception as exc:  # storage failure is a typed worker failure
+                        lease_errors.append(exc)
+                        return
+                    if not renewed:
+                        lease_errors.append(
+                            RuntimeError("business-profile lease renewal lost ownership")
+                        )
+                        return
+
+            heartbeat = asyncio.create_task(renew_lease())
             try:
                 result = dict(await self.stage_runner(stage, item))
+                if lease_errors:
+                    raise lease_errors[0]
                 execution_mode = str(result.get("execution_mode") or "").strip()
                 if execution_mode:
                     execution_modes.add(execution_mode)
@@ -3201,14 +3280,24 @@ class BusinessProfileAsyncProductionService:
                 )
                 if congestion_failure:
                     provider_congestion_failures += 1
-                terminal_status = await self._run_storage_operation(
-                    self.repository.fail,
-                    str(item["work_id"]),
-                    lease_owner=lease_owner,
-                    error=f"{type(exc).__name__}: {exc}",
-                    retryable=_retryable(exc),
-                    initial_backoff_seconds=self.retry_backoff_seconds,
-                )
+                try:
+                    terminal_status = await self._run_storage_operation(
+                        self.repository.fail,
+                        str(item["work_id"]),
+                        lease_owner=lease_owner,
+                        error=f"{type(exc).__name__}: {exc}",
+                        retryable=_retryable(exc),
+                        initial_backoff_seconds=self.retry_backoff_seconds,
+                    )
+                except Exception as storage_exc:
+                    terminal_status = "storage_failure"
+                    errors.append(
+                        {
+                            "work_id": str(item["work_id"]),
+                            "reason_code": "failure_recording_storage_error",
+                            "error": f"{type(storage_exc).__name__}: {storage_exc}"[:1000],
+                        }
+                    )
                 if terminal_status == "retry_due":
                     retried += 1
                 elif terminal_status == "lease_lost":
@@ -3240,6 +3329,8 @@ class BusinessProfileAsyncProductionService:
                     exc_info=True,
                 )
             finally:
+                lease_stop.set()
+                await heartbeat
                 logger.info(
                     "business-profile stage item stage=%s work_id=%s instrument_id=%s "
                     "duration_seconds=%.3f claimed=%s completed=%s retried=%s "
@@ -3275,20 +3366,33 @@ class BusinessProfileAsyncProductionService:
                     }
                     if include_work_ids is not None:
                         claim_kwargs["include_work_ids"] = include_work_ids
-                    probe = getattr(self.repository, "has_claimable", None)
-                    claimable = True
-                    if callable(probe):
-                        claimable = await _run_thread_call(
-                            probe, stage, **claim_kwargs
+                    try:
+                        probe = getattr(self.repository, "has_claimable", None)
+                        claimable = True
+                        if callable(probe):
+                            claimable = await _run_thread_call(
+                                probe, stage, **claim_kwargs
+                            )
+                        if claimable:
+                            items = await self._run_storage_operation(
+                                self.repository.claim,
+                                stage,
+                                limit=batch_limit,
+                                lease_owner=lease_owner,
+                                lease_seconds=self.lease_seconds,
+                                **claim_kwargs,
+                            )
+                    except Exception as exc:
+                        stopped = True
+                        failed += 1
+                        errors.append(
+                            {
+                                "reason_code": "claim_storage_error",
+                                "error": f"{type(exc).__name__}: {exc}"[:1000],
+                            }
                         )
-                    if claimable:
-                        items = await self._run_storage_operation(
-                            self.repository.claim,
-                            stage,
-                            limit=batch_limit,
-                            lease_owner=lease_owner,
-                            lease_seconds=self.lease_seconds,
-                            **claim_kwargs,
+                        logger.exception(
+                            "business-profile claim failed stage=%s", stage
                         )
                     if items:
                         claimed += len(items)

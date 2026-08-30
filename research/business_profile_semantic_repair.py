@@ -35,9 +35,6 @@ from utils.date_utils import get_shanghai_time
 
 
 REPAIR_SCHEMA_VERSION = "business_profile_semantic_repair.v1"
-LEGACY_SHADOW_FIELD_FAMILIES = frozenset(
-    {"structured_segments", "tabular_operating_facts"}
-)
 OBSOLETE_WORK_STATUSES = frozenset(
     {"machine_rework", "superseded", "terminal_failure"}
 )
@@ -68,15 +65,33 @@ class BusinessProfileSemanticRepairService:
         all_scope: bool = False,
         result_policy: str = "reuse",
         cleanup_only: bool = False,
+        retirement_work_ids: Iterable[str] | None = None,
+        retirement_reason: str | None = None,
     ) -> dict[str, Any]:
         result_policy = str(result_policy or "reuse").strip().lower()
         if result_policy not in {"reuse", "replace"}:
             raise ValueError("business-profile repair result_policy must be reuse or replace")
         ids = sorted({str(item).strip() for item in instrument_ids or () if str(item).strip()})
-        if apply and not ids and not all_scope:
+        retired_work_ids = tuple(
+            sorted(
+                {
+                    str(item).strip()
+                    for item in retirement_work_ids or ()
+                    if str(item).strip()
+                }
+            )
+        )
+        marker_reason = str(retirement_reason or "").strip()
+        if apply and not ids and not all_scope and not retired_work_ids:
             raise ValueError("repair apply requires instrument_ids or all_scope=True")
         if all_scope and ids:
             raise ValueError("repair accepts instrument_ids or all_scope, not both")
+        if retired_work_ids and not marker_reason:
+            raise ValueError(
+                "retirement_work_ids require a non-empty retirement_reason"
+            )
+        if retired_work_ids and not apply:
+            raise ValueError("retirement marker migration requires apply=True")
         if all_scope:
             ids = (
                 self._all_lifecycle_instrument_ids()
@@ -144,6 +159,26 @@ class BusinessProfileSemanticRepairService:
                     ),
                 }
             )
+        if retired_work_ids:
+            try:
+                marker_change = self._write_retirement_markers(
+                    retired_work_ids,
+                    reason=marker_reason,
+                    instrument_ids=ids if not all_scope else None,
+                )
+                if marker_change is not None:
+                    changes.append(marker_change)
+            except Exception as exc:
+                changes.append(
+                    {
+                        "instrument_id": None,
+                        "status": "failed",
+                        "reason": (
+                            "retirement_marker_migration_exception:"
+                            f"{type(exc).__name__}:{exc}"
+                        ),
+                    }
+                )
         result["changes"] = changes
         result["after_current_projections"] = self._current_projections(ids)
         result["change_counts"] = self._change_counts(changes)
@@ -174,6 +209,102 @@ class BusinessProfileSemanticRepairService:
             )
         ]
         return result
+
+    def _write_retirement_markers(
+        self,
+        work_ids: Iterable[str],
+        *,
+        reason: str,
+        instrument_ids: Iterable[str] | None,
+    ) -> dict[str, Any] | None:
+        """Persist an explicit, immutable retirement decision for selected work.
+
+        Historical rows without a retained rollout phase cannot be classified from
+        their field families.  A caller must therefore nominate exact work IDs and
+        a reason.  Markers are written in a separate repair invocation from the
+        eventual cleanup so the decision remains auditable before deletion.
+        """
+        requested = tuple(sorted({str(value).strip() for value in work_ids if str(value).strip()}))
+        selected_instruments = {
+            str(value).strip() for value in instrument_ids or () if str(value).strip()
+        }
+        now = get_shanghai_time().isoformat()
+        changed: list[str] = []
+        unchanged: list[str] = []
+        held: list[str] = []
+        missing: list[str] = []
+        with self.storage.get_connection() as conn:
+            self.storage._apply_pragmas(conn)
+            conn.execute("BEGIN IMMEDIATE")
+            try:
+                for work_id in requested:
+                    row = conn.execute(
+                        "SELECT work_id, instrument_id, status, lease_expires_at, metadata_json "
+                        "FROM business_profile_work_items WHERE work_id = ?",
+                        (work_id,),
+                    ).fetchone()
+                    if row is None:
+                        missing.append(work_id)
+                        continue
+                    if selected_instruments and str(row["instrument_id"]) not in selected_instruments:
+                        held.append(work_id)
+                        continue
+                    if (
+                        str(row["status"] or "") == "running"
+                        and str(row["lease_expires_at"] or "") > now
+                    ):
+                        held.append(work_id)
+                        continue
+                    try:
+                        metadata = json.loads(row["metadata_json"] or "{}")
+                    except (TypeError, ValueError, json.JSONDecodeError) as exc:
+                        raise ValueError(
+                            f"retirement marker requires object metadata for {work_id}"
+                        ) from exc
+                    if not isinstance(metadata, dict):
+                        raise ValueError(
+                            f"retirement marker requires object metadata for {work_id}"
+                        )
+                    marker = metadata.get("retirement_marker")
+                    if marker is not None:
+                        if not isinstance(marker, dict):
+                            raise ValueError(
+                                f"retirement marker is malformed for {work_id}"
+                            )
+                        if (
+                            str(marker.get("reason") or "").strip() != reason
+                            or not str(marker.get("timestamp") or "").strip()
+                        ):
+                            raise ValueError(
+                                f"retirement marker is immutable for {work_id}"
+                            )
+                        unchanged.append(work_id)
+                        continue
+                    metadata["retirement_marker"] = {
+                        "reason": reason,
+                        "timestamp": now,
+                    }
+                    conn.execute(
+                        "UPDATE business_profile_work_items "
+                        "SET metadata_json = ?, updated_at = ? WHERE work_id = ?",
+                        (json.dumps(metadata, ensure_ascii=True, sort_keys=True), now, work_id),
+                    )
+                    changed.append(work_id)
+                conn.commit()
+            except Exception:
+                conn.rollback()
+                raise
+        if not changed and not unchanged and not held and not missing:
+            return None
+        return {
+            "instrument_id": None,
+            "status": "failed" if missing else ("held" if held and not changed else "changed"),
+            "reason": "retirement_marker_migrated",
+            **self._id_summary(changed, key="affected_ids"),
+            "unchanged_ids": unchanged,
+            "held_ids": held,
+            "missing_ids": missing,
+        }
 
     def _all_lifecycle_instrument_ids(self) -> list[str]:
         """Return instruments that own semantic receipts or run manifests."""
@@ -561,14 +692,13 @@ class BusinessProfileSemanticRepairService:
             if isinstance(metadata, dict)
             else {}
         )
-        families = {
-            str(value)
-            for value in processing_identity.get("field_families") or ()
-        }
+        if str(processing_identity.get("rollout_phase") or "") == "structured_shadow":
+            return True
+        marker = metadata.get("retirement_marker") if isinstance(metadata, dict) else None
         return (
-            str(processing_identity.get("rollout_phase") or "")
-            == "structured_shadow"
-            or bool(families & LEGACY_SHADOW_FIELD_FAMILIES)
+            isinstance(marker, dict)
+            and bool(str(marker.get("reason") or "").strip())
+            and bool(str(marker.get("timestamp") or "").strip())
         )
 
     @classmethod
@@ -757,7 +887,7 @@ class BusinessProfileSemanticRepairService:
                     )
                 )
                 continue
-            if str(row["field_family"] or "") in LEGACY_SHADOW_FIELD_FAMILIES:
+            if self._legacy_shadow_work({"metadata_json": row["metadata_json"]}):
                 if not artifact_id or artifact_id not in artifact_ids:
                     findings.append(
                         self._issue(
@@ -814,6 +944,11 @@ class BusinessProfileSemanticRepairService:
             str(item.get("details", {}).get("artifact_id") or "")
             for item in findings
         }
+        retired_artifact_ids = {
+            str(json.loads(row["metadata_json"] or "{}").get("semantic_artifact_id") or "")
+            for row in rows
+            if self._legacy_shadow_work({"metadata_json": row["metadata_json"]})
+        }
         for row in artifact_rows:
             artifact_id = str(row["artifact_id"])
             try:
@@ -828,9 +963,7 @@ class BusinessProfileSemanticRepairService:
                 latest_status == "conversion_pending"
                 and not latest_reason.startswith("unit_rule_")
             )
-            legacy_shadow = (
-                str(row["field_family"] or "") in LEGACY_SHADOW_FIELD_FAMILIES
-            )
+            legacy_shadow = artifact_id in retired_artifact_ids
             if not legacy and not failed and not legacy_shadow:
                 continue
             if artifact_id in known:

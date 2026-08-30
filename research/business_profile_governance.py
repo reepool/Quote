@@ -1595,13 +1595,19 @@ class BusinessProfileRepository:
                     "<= ?"
                 )
                 params.extend([cutoff, policy.freshness_days])
-        if policy.validity_start_field:
+        if (
+            policy.temporal_class != BusinessProfileTemporalClass.REPORT_FLOW
+            and policy.validity_start_field
+        ):
             clauses.append(
                 f"({alias}.{policy.validity_start_field} IS NULL "
                 f"OR {alias}.{policy.validity_start_field} <= ?)"
             )
             params.append(cutoff)
-        if policy.validity_end_field:
+        if (
+            policy.temporal_class != BusinessProfileTemporalClass.REPORT_FLOW
+            and policy.validity_end_field
+        ):
             clauses.append(
                 f"({alias}.{policy.validity_end_field} IS NULL "
                 f"OR {alias}.{policy.validity_end_field} > ?)"
@@ -2157,6 +2163,8 @@ class BusinessProfileResolver:
                 )
             if not fresh:
                 return False
+        if policy.temporal_class == BusinessProfileTemporalClass.REPORT_FLOW:
+            return True
         start = _date_key(record.get(policy.validity_start_field or ""))
         end = _date_key(record.get(policy.validity_end_field or ""))
         # Validity intervals are half-open: [valid_from, valid_to).

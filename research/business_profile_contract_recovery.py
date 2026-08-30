@@ -32,6 +32,7 @@ class BusinessProfileContractRecovery:
 
     def run(self, *, limit: int = 5000) -> dict[str, Any]:
         rejected = reopened = approved_blockers = requeued = scanned = 0
+        human_held = 0
         affected: list[dict[str, str]] = []
         for record_type in ("segments", "operating_facts"):
             rows = [
@@ -59,6 +60,19 @@ class BusinessProfileContractRecovery:
                 if status == "approved":
                     self._upsert_blocker(record_type, record_id, row, reasons)
                     approved_blockers += 1
+                    continue
+                if status == "held" and not self._automation_owned_hold(row):
+                    # A hold is an explicit review decision.  Contract recovery
+                    # may only revisit a hold that carries automation provenance.
+                    human_held += 1
+                    affected.append(
+                        {
+                            "record_type": record_type,
+                            "record_id": record_id,
+                            "instrument_id": str(row.get("instrument_id") or ""),
+                            "status": "human_held",
+                        }
+                    )
                     continue
                 if status not in {"candidate", "held"}:
                     continue
@@ -127,10 +141,25 @@ class BusinessProfileContractRecovery:
             "rejected": rejected,
             "reopened": reopened,
             "approved_history_blockers": approved_blockers,
+            "human_held": human_held,
             "requeued": requeued,
             "affected": affected[:100],
             "unit_blocked_recovery": unit_recovery,
         }
+
+    @staticmethod
+    def _automation_owned_hold(row: Mapping[str, Any]) -> bool:
+        """Return true only for a hold carrying explicit automation provenance."""
+
+        metadata = row.get("metadata")
+        if not isinstance(metadata, Mapping):
+            return False
+        provenance = str(
+            metadata.get("hold_provenance")
+            or metadata.get("review_provenance")
+            or ""
+        ).strip()
+        return provenance.startswith("automation:")
 
     def _obsolete_rows(
         self,

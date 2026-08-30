@@ -489,20 +489,10 @@ def _document_from_candidate(
     if isinstance(raw, BusinessProfileDocumentCandidate):
         candidate = raw
     else:
-        classification_raw = raw.get("classification")
         classification = classify_business_profile_document(
             str(raw.get("title") or ""),
             adjunct_type=str(raw.get("adjunct_type") or "PDF"),
         )
-        if isinstance(classification_raw, Mapping):
-            document_type = str(
-                classification_raw.get("document_type") or classification.document_type
-            )
-            if document_type != classification.document_type:
-                classification = classify_business_profile_document(
-                    str(raw.get("title") or ""),
-                    adjunct_type=str(raw.get("adjunct_type") or "PDF"),
-                )
         candidate = BusinessProfileDocumentCandidate(
             announcement_id=str(raw.get("announcement_id") or ""),
             title=str(raw.get("title") or ""),

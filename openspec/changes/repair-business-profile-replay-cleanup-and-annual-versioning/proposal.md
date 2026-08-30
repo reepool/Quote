@@ -10,6 +10,10 @@
 - 清理不可复用的历史语义 receipt、旧 shadow run、失效工作项、孤儿 checkpoint 及其候选输出；对 `conversion_pending`、旧结构和失败状态按明确规则决定删除或保留，禁止旧垃圾被 `reuse` 或 worker 再次选中。
 - 明确新年度报告、同年度更正报告和同报告重跑的版本与写入规则：保留已批准历史，新报告生成新 occurrence，更正报告显式替换或后继，不能因历史记录永久拒绝新结果。
 - 增加生产数据库审计、定向重放和批量前门禁，验证清理后不会重复调用无效 LLM 结果。
+- 修正报告流事实的 as-of 可见性，避免报告观察区间与知识窗口互相排斥。
+- 修正大小写敏感的 SI 前缀、百分比单位传播和披露舍入容差，禁止确定性数值污染。
+- 使结构化中文修复、单位 pending、exposure action lineage 和复用身份检查真正可达、可观测、可验收。
+- 为长运行 worker 增加租约续期和阶段级异常收口，避免重复领取或整轮失控。
 
 ## Capabilities
 
@@ -19,6 +23,7 @@
 - `business-profile-semantic-error-contract`: 定义匿名关系类型、业务校验、schema/证据/网关错误分类及重试边界。
 - `business-profile-fact-integrity`: 定义来源行/合同 occurrence identity 的稳定复用和历史批准记录兼容规则。
 - `business-profile-publication-boundaries`: 定义发布前的历史清理、候选隔离和失败结果不得污染正式发布的要求。
+- `business-profile-execution-integrity`: 定义运行时身份、租约续期、阶段异常收口、页预算锚点和周期口径门禁。
 
 ### Modified Capabilities
 
@@ -29,4 +34,4 @@
 - 影响 `research/business_profile_semantic_extraction.py`、`research/business_profile_semantic_runtime.py`、`research/business_profile_async_production.py`、`research/business_profile_governance.py`、`research/business_profile_semantic_artifacts.py`、`research/business_profile_semantic_repair.py` 及相关测试。
 - 影响画像语义队列、语义 receipt、活动/经营事实/供应链关系写入、checkpoint 生命周期和年度报告回补入口。
 - 不改公共 PDF 解析器、LLM provider 或股东信息来源；不删除已批准且属于真实历史的业务事实。
-- 需要一次性对现有生产库执行受规则约束的失败数据清理，并在清理后对 `002496.SZ`、`300750.SZ` 做定向重放验收。
+- 需要一次性对现有生产库执行受规则约束的失败数据清理，并在清理后对 `002415.SZ`、`002496.SZ`、`300750.SZ` 做定向重放验收。

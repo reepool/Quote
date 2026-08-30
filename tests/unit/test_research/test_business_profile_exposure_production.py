@@ -198,6 +198,51 @@ def test_failed_gate_does_not_reuse_approved_publication_as_success(tmp_path):
     assert result["reason"] == "publication_gates_failed"
 
 
+def test_publication_preserves_source_activity_action_in_metadata(tmp_path):
+    repository = BusinessProfileRepository(_storage(tmp_path))
+    _approved_evidence(repository)
+    activity = _approved_sales_activity(repository, action="sells")
+    fact = BusinessProfileExposureFactProducer(repository).persist_from_activity_id(
+        activity["activity_id"]
+    )
+    _promote(repository, "exposure_facts", fact["fact_id"], references=["evidence-2025-ar"])
+
+    result = BusinessProfileExposurePublisher(
+        repository, mapping_resolver=GovernedCommodityMappingResolver(_catalog())
+    ).publish_basic(
+        fact_id=fact["fact_id"], knowledge_cutoff="2026-04-30", **_publication_context()
+    )
+
+    assert result["status"] == "published"
+    assert result["exposure"]["metadata"]["source_activity_action"] == "sells"
+
+
+def test_predecessor_does_not_cross_link_sells_and_produces(tmp_path):
+    repository = BusinessProfileRepository(_storage(tmp_path))
+    _approved_evidence(repository)
+    sales = _approved_sales_activity(repository, action="sells")
+    fact = BusinessProfileExposureFactProducer(repository).persist_from_activity_id(
+        sales["activity_id"]
+    )
+    _promote(repository, "exposure_facts", fact["fact_id"], references=["evidence-2025-ar"])
+    publisher = BusinessProfileExposurePublisher(
+        repository, mapping_resolver=GovernedCommodityMappingResolver(_catalog())
+    )
+    published = publisher.publish_basic(
+        fact_id=fact["fact_id"], knowledge_cutoff="2026-04-30", **_publication_context()
+    )["exposure"]
+    produces_payload = {
+        **published,
+        "exposure_id": "exposure-produced-coking-coal",
+        "metadata": {
+            **published["metadata"],
+            "source_activity_action": "produces",
+        },
+    }
+
+    assert publisher._find_predecessor(produces_payload) is None
+
+
 def test_fact_production_rejects_candidate_activity(tmp_path):
     repository = BusinessProfileRepository(_storage(tmp_path))
     with pytest.raises(ValueError, match="approved activity"):

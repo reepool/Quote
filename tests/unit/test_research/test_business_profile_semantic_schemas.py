@@ -44,6 +44,8 @@ def test_atomic_activity_rejects_unknown_fields_and_broad_roles():
         "object_raw": "thermal coal",
         "object_id": None,
         "segment_id": None,
+        "source_row_key": "report-1:31:section-1:row-1",
+        "contract_reference_raw": None,
         "report_period": "2025-12-31",
         "value": 100.0,
         "unit": "tonne",

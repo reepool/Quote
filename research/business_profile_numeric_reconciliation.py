@@ -77,7 +77,8 @@ def reconcile_gross_margin(
             segment_cost=cost_value,
         )
     try:
-        reported = normalize_ratio(reported_margin, reported_margin_unit)
+        reported_source = decimal_value(reported_margin, "reported_margin")
+        reported = normalize_ratio(reported_source, reported_margin_unit)
     except ValueError:
         return _result(
             "failed",
@@ -89,6 +90,8 @@ def reconcile_gross_margin(
     tolerance = precision_aware_tolerance(
         revenue_value,
         cost_value,
+        reported_margin=reported_source,
+        reported_margin_unit=reported_margin_unit,
         floor=tolerance_floor,
         ceiling=tolerance_ceiling,
     )
@@ -112,6 +115,8 @@ def precision_aware_tolerance(
     revenue: Decimal,
     segment_cost: Decimal,
     *,
+    reported_margin: Optional[Decimal] = None,
+    reported_margin_unit: str = "fraction",
     floor: Decimal = DEFAULT_TOLERANCE_FLOOR,
     ceiling: Decimal = DEFAULT_TOLERANCE_CEILING,
 ) -> Decimal:
@@ -125,7 +130,14 @@ def precision_aware_tolerance(
             (revenue_error + cost_error) / abs(revenue)
             + abs(revenue - segment_cost) * revenue_error / (revenue * revenue)
         )
-    return min(ceiling, max(floor, propagated))
+    base_tolerance = max(floor, propagated)
+    if reported_margin is not None:
+        base_tolerance += _reported_rounding_error(
+            reported_margin, reported_margin_unit
+        )
+    # Keep an absolute safety bound while allowing disclosed precision to
+    # explain a rounded integer percentage (for example 35% vs 35.249%).
+    return min(Decimal("0.01"), min(ceiling, base_tolerance) if reported_margin is None else base_tolerance)
 
 
 def normalize_ratio(value: Any, source_unit: str) -> Decimal:
@@ -204,6 +216,12 @@ def authoritative_confidence(
 
 def _rounding_error(value: Decimal) -> Decimal:
     return Decimal("0.5").scaleb(value.as_tuple().exponent)
+
+
+def _reported_rounding_error(value: Decimal, source_unit: str) -> Decimal:
+    error = _rounding_error(value)
+    unit = normalize_unit_lexeme(source_unit or "fraction").lower()
+    return error * Decimal("0.01") if unit in {"%", "percent", "百分比"} else error
 
 
 def _result(

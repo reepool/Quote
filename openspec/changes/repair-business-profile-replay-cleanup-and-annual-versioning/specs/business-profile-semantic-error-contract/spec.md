@@ -32,3 +32,24 @@ The system MUST validate that each verification response contains exactly one de
 #### Scenario: Duplicate target decision
 - **WHEN** a model response returns the same target ID more than once
 - **THEN** the batch is classified as schema failure and no gateway retry is scheduled
+
+### Requirement: Reachable structured-language handling
+The structured extraction language contract MUST have one reachable behavior. If strict language validation is intended to trigger a repair request, the language exception MUST escape row-level validation and the repair request MUST be executable. If row-level soft rejection is intended, invalid summaries MUST be retained as typed row diagnostics and the dead document-level repair branch MUST be removed. Adding an unused function parameter alone is not sufficient.
+
+#### Scenario: English-only structured summary
+- **WHEN** a structured row contains an English-only `semantic_summary_zh`
+- **THEN** the configured strict-repair or soft-rejection path is actually executed and its audit records the outcome without a `TypeError`
+
+### Requirement: Share normalization has one owner
+`disclosed_share` MUST have one canonical internal unit of fraction. A value already in fraction form MUST NOT be divided by 100 again merely because a model also supplied `%`; percent-form values MUST be converted exactly once, with the source and normalized values recorded.
+
+#### Scenario: Fraction with percent label
+- **WHEN** the model returns `disclosed_share=0.352` and `disclosed_share_unit="%"`
+- **THEN** the system either rejects the contradictory payload deterministically or applies an explicitly documented compatibility rule, but MUST NOT silently persist `0.00352`
+
+### Requirement: Null source fallback
+When a semantic activity contains both `source_value` and `value`, an explicit null `source_value` MUST fall back to the non-null `value`; the same rule applies to source unit fields.
+
+#### Scenario: Null source value
+- **WHEN** `source_value=null` and `value=4.18`
+- **THEN** the normalized activity preserves `4.18` as the source value used for downstream conversion

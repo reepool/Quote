@@ -186,7 +186,7 @@ def test_changed_snapshot_only_writes_new_or_changed_source_rows(tmp_path):
     writer.write(original, industry_group="coal")
     new_row = BusinessCompositionRow(
         instrument_id="601088.SH",
-        report_period="2026-06-30",
+        report_period="2026-12-31",
         classification_type="product",
         item_name="动力煤",
         revenue=1100,
@@ -279,3 +279,30 @@ def test_writer_does_not_turn_empty_source_response_into_business_evidence(tmp_p
 
     assert result["evidence_written"] == 0
     assert repository.get_profile_history("601088.SH")["evidence"] == []
+
+
+def test_interim_structured_rows_require_explicit_period_basis(tmp_path):
+    repository = _repository(tmp_path)
+    snapshot = _snapshot()
+    interim = replace(
+        snapshot.composition.rows[0],
+        report_period="2026-06-30",
+        source_row_hash="interim-row",
+    )
+
+    result = StructuredBusinessProfileCandidateWriter(repository).write(
+        replace(
+            snapshot,
+            composition=replace(
+                snapshot.composition,
+                payload_hash="interim-payload",
+                rows=(interim,),
+            ),
+        )
+    )
+
+    assert result["source_results"]["eastmoney_main_composition"]["status"] == "blocked"
+    assert result["source_results"]["eastmoney_main_composition"]["diagnostics"] == [
+        "period_basis_required:2026-06-30"
+    ]
+    assert repository.get_profile_history("601088.SH")["segments"] == []

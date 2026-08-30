@@ -2452,6 +2452,20 @@ def test_joint_semantic_families_call_llm_once_and_restart_from_artifact(
         ).fetchone()[0]
     assert artifact_count == 1
 
+    same_scope_restart = BusinessProfileSemanticPipeline(
+        config=pipeline.config,
+        checkpoint_store=SemanticProductionCheckpointStore(
+            tmp_path / "same-scope-restart-checkpoint.json"
+        ),
+        handlers=pipeline.handlers,
+    )
+    for stage in ("plan", "select"):
+        assert same_scope_restart.run(stage, scope=scope)["status"] == "success"
+    durable_replay = same_scope_restart.run("extract", scope=scope)
+
+    assert durable_replay["status"] == "success"
+    assert len(gateway.requests) == 1, durable_replay
+
     restarted = BusinessProfileSemanticPipeline(
         config=pipeline.config,
         checkpoint_store=SemanticProductionCheckpointStore(
@@ -2468,11 +2482,13 @@ def test_joint_semantic_families_call_llm_once_and_restart_from_artifact(
     replayed = restarted.run("extract", scope=restarted_scope)
 
     assert replayed["status"] == "success"
-    assert replayed["metrics"]["joint_semantic_durable_replays"] == 1
+    # A changed runtime identity invalidates both the completed run and the
+    # raw joint receipt; only the sibling in this new invocation may reuse it.
+    assert replayed["metrics"].get("joint_semantic_durable_replays", 0) == 0
     assert replayed["metrics"]["joint_semantic_sibling_reuses"] == 1
-    assert replayed["metrics"]["joint_semantic_saved_llm_calls"] == 2
-    assert replayed["metrics"]["tokens"] == 0
-    assert len(gateway.requests) == 1
+    assert replayed["metrics"]["joint_semantic_saved_llm_calls"] == 1
+    assert replayed["metrics"]["tokens"] > 0
+    assert len(gateway.requests) == 2
 
 
 def test_due_context_rework_expands_lineaged_pages_and_recovers(tmp_path, monkeypatch):
@@ -2958,7 +2974,7 @@ def test_semantic_unit_alias_absent_from_source_is_normalized(tmp_path, monkeypa
     assert fact["unit_normalized"] == "tonne"
 
 
-def test_unit_conversion_pending_persists_raw_row_without_blocking_stage(
+def test_unit_conversion_pending_blocks_family_and_persists_raw_row(
     tmp_path, monkeypatch
 ):
     repository, pipeline, scope = _deterministic_runtime(
@@ -2982,12 +2998,15 @@ def test_unit_conversion_pending_persists_raw_row_without_blocking_stage(
         assert pipeline.run(stage, scope=scope)["status"] == "success"
     extracted = pipeline.run("extract", scope=scope)
 
-    assert extracted["status"] == "success"
-    assert extracted["quality"]["stage_ready"] is True
-    assert extracted["quality"]["blocking_machine_rework"] == 0
+    assert extracted["status"] == "stopped"
+    assert extracted["reason"].startswith("quality_gate:extract:")
+    assert extracted["quality"]["stage_ready"] is False
+    assert extracted["quality"]["blocking_machine_rework"] == 1
     assert extracted["metrics"]["semantic_rows_unit_pending"] == 1
     assert repository.list_records("operating_facts", instrument_id="601088.SH") == []
-    assert repository.list_exceptions(instrument_id="601088.SH") == []
+    exceptions = repository.list_exceptions(instrument_id="601088.SH")
+    assert len(exceptions) == 1
+    assert exceptions[0]["reason_codes"] == ["unit_normalization_failed"]
     with repository.storage.get_connection() as conn:
         artifact = conn.execute(
             "SELECT response_json FROM business_profile_semantic_artifacts"
@@ -3016,7 +3035,7 @@ def test_unit_conversion_pending_persists_raw_row_without_blocking_stage(
     )
 
 
-def test_pending_unit_row_does_not_block_independently_convertible_row(
+def test_pending_unit_row_keeps_independent_row_candidate_but_blocks_family(
     tmp_path, monkeypatch
 ):
     repository, pipeline, scope = _deterministic_runtime(
@@ -3041,9 +3060,10 @@ def test_pending_unit_row_does_not_block_independently_convertible_row(
     extracted = pipeline.run("extract", scope=scope)
     facts = repository.list_records("operating_facts", instrument_id="601088.SH")
 
-    assert extracted["status"] == "success"
-    assert extracted["quality"]["stage_ready"] is True
-    assert extracted["quality"]["blocking_machine_rework"] == 0
+    assert extracted["status"] == "stopped"
+    assert extracted["reason"].startswith("quality_gate:extract:")
+    assert extracted["quality"]["stage_ready"] is False
+    assert extracted["quality"]["blocking_machine_rework"] == 1
     assert extracted["metrics"]["semantic_rows_unit_pending"] == 1
     assert [(row["segment_id"], row["unit_normalized"]) for row in facts]
     assert len(facts) == 1
@@ -3056,17 +3076,9 @@ def test_pending_unit_row_does_not_block_independently_convertible_row(
         )
     assert metadata["semantic_family_complete"] is False
     assert metadata["unit_conversion_pending"][0]["source_unit"] == "T/KL"
-    verified = pipeline.run("verify", scope=scope)
-    assert verified["status"] == "success"
-    assert verified["quality"]["verified_records"] == 1
-    promoted = pipeline.run("promote", scope=scope)
-    assert promoted["status"] == "success"
-    assert (
-        repository.list_records("operating_facts", instrument_id="601088.SH")[0][
-            "review_status"
-        ]
-        == "approved"
-    )
+    assert repository.list_records("operating_facts", instrument_id="601088.SH")[0][
+        "review_status"
+    ] == "candidate"
 
 
 def test_auto_approved_unit_rule_is_replayed_inline_without_extraction_retry(
@@ -3522,7 +3534,7 @@ def test_promotion_fails_closed_when_bound_validation_metadata_is_missing(
     assert exception["metadata"]["source_document_id"] == "source-2025"
 
 
-def test_deterministic_operating_table_normalizes_volume_and_unknown_unit_rolls_back(
+def test_deterministic_operating_table_normalizes_volume_and_unknown_unit_isolated(
     tmp_path, monkeypatch
 ):
     valid_root = tmp_path / "valid"
@@ -3558,13 +3570,16 @@ def test_deterministic_operating_table_normalizes_volume_and_unknown_unit_rolls_
     )
     assert invalid_pipeline.run("plan", scope=invalid_scope)["status"] == "success"
     assert invalid_pipeline.run("select", scope=invalid_scope)["status"] == "success"
-    with pytest.raises(ValueError, match="unknown business-profile unit"):
-        invalid_pipeline.run("extract", scope=invalid_scope)
+    result = invalid_pipeline.run("extract", scope=invalid_scope)
+    assert result["status"] == "stopped"
+    assert result["reason"].startswith("quality_gate:extract:")
     assert (
         invalid_repository.list_records("operating_facts", instrument_id="601088.SH")
         == []
     )
-    assert invalid_repository.list_records("evidence", instrument_id="601088.SH") == []
+    # The failed row is isolated, but its source evidence remains available for
+    # targeted machine rework rather than being discarded with the row.
+    assert len(invalid_repository.list_records("evidence", instrument_id="601088.SH")) == 1
 
 
 def test_selected_character_budget_stops_before_extraction_and_resume_reuse(

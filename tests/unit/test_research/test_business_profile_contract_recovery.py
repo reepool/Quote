@@ -259,6 +259,29 @@ def test_relationship_concentration_fact_is_not_a_structured_contract_row():
     assert obsolete_contract_reasons("operating_facts", record) == ()
 
 
+def test_contract_recovery_preserves_human_held_record(tmp_path):
+    storage = _storage(tmp_path)
+    repository = BusinessProfileRepository(storage)
+    _add_evidence(repository)
+    _add_segment(repository, record_id="segment-human-held")
+    candidate = repository.get_record("segments", "segment-human-held")
+    BusinessProfileReviewService(repository).review_record(
+        "segments",
+        "segment-human-held",
+        decision="held",
+        reviewer="analyst@example",
+        reason="needs human assessment",
+        expected_review_status="candidate",
+        expected_updated_at=candidate["updated_at"],
+        evidence_references=["evidence-1"],
+    )
+
+    result = BusinessProfileContractRecovery(repository).run()
+
+    assert result["human_held"] == 1
+    assert repository.get_record("segments", "segment-human-held")["review_status"] == "held"
+
+
 def test_structured_operating_fact_still_uses_structured_contract():
     record = {
         "metadata": {

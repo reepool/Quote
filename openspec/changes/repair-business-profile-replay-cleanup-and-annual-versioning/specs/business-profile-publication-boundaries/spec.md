@@ -21,3 +21,28 @@ The system MUST expose publication gaps and their deterministic reasons without 
 #### Scenario: Complete publication
 - **WHEN** all required components and identity gates pass
 - **THEN** the system publishes the derived record once and a replay does not duplicate it
+
+### Requirement: Action-preserving exposure lineage
+The exposure fact, publication payload, predecessor lookup, and repair audit MUST use the same non-empty `source_activity_action` for action-sensitive lineage. Actions that share a market role, such as `sells` and `produces`, MUST remain distinguishable in lineage and MUST NOT be linked as predecessor/successor solely because their derived role is equal.
+
+#### Scenario: Same commodity with different actions
+- **WHEN** one approved exposure is derived from `sells` and another from `produces` for the same commodity and scope
+- **THEN** predecessor lookup does not cross-link the two actions, and the collision audit can report an action mismatch if an old record already contains such a link
+
+### Requirement: Reported numeric precision is part of publication validation
+Gross-margin reconciliation MUST account for the precision and unit of the reported margin itself, in addition to revenue and cost rounding. Missing cost MUST NOT cause an out-of-range or unit-inconsistent reported margin to be treated as valid.
+
+#### Scenario: Rounded integer percentage
+- **WHEN** the calculated margin is `35.249%` and the report discloses `35%`
+- **THEN** the result is evaluated using the disclosed precision and is not rejected solely because the normalized difference exceeds a fixed `0.01%` tolerance
+
+### Requirement: Gross-margin normalization has one owner
+Deterministic segment extraction MUST carry the table-header percent unit (or an explicit row unit) into the margin normalizer. Gross margins MUST be converted to the canonical fraction exactly once before reconciliation and publication; downstream validation MUST NOT divide an already normalized fraction again or infer a percent unit from the numeric magnitude alone.
+
+#### Scenario: Header percent is normalized once
+- **WHEN** a segment table declares `%` in its header and reports a gross margin of `35%`
+- **THEN** the extracted and published value is the fraction `0.35`, with provenance showing the header unit, and a second conversion is not applied
+
+#### Scenario: Explicit fraction is preserved
+- **WHEN** a deterministic source already supplies a canonical fraction such as `0.35249`
+- **THEN** reconciliation consumes that fraction unchanged and records the source unit as fraction rather than treating it as a percent value

@@ -10347,6 +10347,8 @@ class ScheduledTasks:
         all_scope: bool = False,
         result_policy: str = "reuse",
         cleanup_only: bool = False,
+        retirement_work_ids: Optional[List[str]] = None,
+        retirement_reason: Optional[str] = None,
         job_config: Optional[JobConfig] = None,
     ) -> bool:
         """Run the local-only business-profile semantic audit or bounded apply."""
@@ -10359,6 +10361,8 @@ class ScheduledTasks:
                 all_scope=all_scope,
                 result_policy=result_policy,
                 cleanup_only=cleanup_only,
+                retirement_work_ids=retirement_work_ids,
+                retirement_reason=retirement_reason,
             )
             failures = int((result.get("change_counts") or {}).get("failed", 0))
             held = int((result.get("change_counts") or {}).get("held", 0))

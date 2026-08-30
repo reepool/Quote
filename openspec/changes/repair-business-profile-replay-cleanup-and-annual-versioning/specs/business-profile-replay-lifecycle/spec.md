@@ -23,7 +23,7 @@ The system MUST append a new report-period occurrence for a new annual report an
 - **THEN** `result_policy=replace` creates a linked successor version and `result_policy=reuse` does not silently overwrite the approved predecessor
 
 ### Requirement: Unusable result cleanup
-The system MUST physically remove rejected or otherwise non-reusable semantic receipts, obsolete shadow runs, superseded or failed work items, and candidate outputs explicitly owned by those receipts or runs. Work created for the retired `structured_shadow` processing mode MUST be removed regardless of queue status so it cannot be claimed by the current worker. Approved records, source evidence, and audit records MUST NOT be deleted.
+The system MUST physically remove rejected or otherwise non-reusable semantic receipts, obsolete shadow runs, superseded or failed work items, and candidate outputs explicitly owned by those receipts or runs. Work is considered retired shadow work only when its persisted processing mode is `rollout_phase=structured_shadow` or it carries an explicit, immutable `retirement_marker` with a reason and timestamp; a field-family name alone MUST NOT make an otherwise active work item eligible for deletion. Approved records, source evidence, and audit records MUST NOT be deleted.
 
 #### Scenario: Failed receipt cleanup
 - **WHEN** repair marks a receipt as rejected or non-reusable conversion pending
@@ -33,9 +33,13 @@ The system MUST physically remove rejected or otherwise non-reusable semantic re
 - **WHEN** a failed receipt references an occurrence with an approved historical record
 - **THEN** cleanup preserves the approved record, evidence, and audit while deleting only the failed receipt and its candidate descendants
 
-#### Scenario: Retired shadow lifecycle remains queued
-- **WHEN** a work item or semantic run belongs to `structured_shadow` or the retired `structured_segments` and `tabular_operating_facts` field families
+#### Scenario: Retired shadow lifecycle is removed
+- **WHEN** a work item or semantic run has the persisted retired processing mode `rollout_phase=structured_shadow` or an explicit `retirement_marker` with a reason and timestamp
 - **THEN** repair physically deletes its execution row and owned candidate descendants even if the work status is pending, retry due, or completed
+
+#### Scenario: Active field family is protected
+- **WHEN** an otherwise active work item uses `structured_segments` or `tabular_operating_facts` under a non-retired rollout phase
+- **THEN** repair MUST NOT delete it solely because of its field-family name
 
 ### Requirement: Pre-batch lifecycle gate
 The system MUST block broad LLM backfill when identity collisions or non-reusable receipts remain in the selected scope, and MUST report the blocking instruments and reasons.

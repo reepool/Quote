@@ -25,6 +25,17 @@ def test_matching_reported_margin_passes_with_decimal_diagnostics():
     assert result.tolerance is not None
 
 
+def test_integer_percent_disclosure_uses_its_own_rounding_precision():
+    result = reconcile_gross_margin(
+        revenue="1000",
+        segment_cost="647.51",
+        reported_margin="35",
+        reported_margin_unit="%",
+    )
+    assert result.calculated_value == Decimal("0.35249")
+    assert result.status == "passed"
+
+
 def test_inconsistent_margin_fails_without_overwriting_reported_value():
     result = reconcile_gross_margin(
         revenue="1000",

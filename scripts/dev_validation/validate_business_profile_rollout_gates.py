@@ -26,6 +26,8 @@ from research.business_profile_governance import (
     BusinessProfileRepository,
     BusinessProfileResolver,
 )
+from research.business_profile_fact_catalog import load_business_fact_catalog
+from research.business_profile_product_catalog import load_business_product_catalog
 from research.business_profile_promotion import (
     BusinessProfilePromotionService,
     FieldFamilyPromotionManifest,
@@ -358,8 +360,8 @@ def _run_rollback_drill(path: Path) -> bool:
                 "source_document_id": "rollback-document",
                 "field_family": "atomic_activities",
                 "bundle_hash": "rollback-bundle",
-                "fact_catalog_version": "business_profile_facts.2026.2",
-                "product_catalog_version": "business_profile_products.2026.4",
+                "fact_catalog_version": load_business_fact_catalog().catalog_version,
+                "product_catalog_version": load_business_product_catalog().catalog_version,
                 "metadata": {"drill": "foreign_key_rollback"},
             },
             records_by_type={

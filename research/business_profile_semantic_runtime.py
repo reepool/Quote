@@ -1555,10 +1555,15 @@ class BusinessProfileSemanticRuntime:
             selected = _load_selected(
                 self.section_store, item["selected_artifact_path"]
             )
-            reusable = self._reusable_semantic_family(
+            reusable, stale_reuse_reason = self._reusable_semantic_family(
                 item=item,
                 runtime_identities=scope.identities,
             )
+            if stale_reuse_reason:
+                stale_reuse_reasons = metrics.setdefault("stale_reuse_reasons", {})
+                stale_reuse_reasons[stale_reuse_reason] = (
+                    int(stale_reuse_reasons.get(stale_reuse_reason) or 0) + 1
+                )
             if reusable is not None:
                 origin = "semantic_reused"
                 _record_family_origin(metrics, item["field_family"], origin)
@@ -1615,7 +1620,30 @@ class BusinessProfileSemanticRuntime:
                 "structured_segments",
                 "tabular_operating_facts",
             }:
-                records_by_type = self._deterministic_records(item, selected, tables)
+                deterministic = self._deterministic_records(item, selected, tables)
+                records_by_type = deterministic.records_by_type
+                unit_conversion_pending = [
+                    dict(pending.diagnostic) for pending in deterministic.pending_units
+                ]
+                semantic_family_complete = not unit_conversion_pending
+                if unit_conversion_pending:
+                    machine_rework.extend(
+                        _rework_item(
+                            item,
+                            item["document"],
+                            str(
+                                diagnostic.get("reason_code")
+                                or "unit_normalization_failed"
+                            ),
+                            diagnostics=diagnostic,
+                        )
+                        for diagnostic in unit_conversion_pending
+                    )
+                    _increment_family_metrics(
+                        metrics["by_field_family"],
+                        item["field_family"],
+                        machine_rework=len(unit_conversion_pending),
+                    )
                 deterministic_count = sum(
                     len(rows)
                     for key, rows in records_by_type.items()
@@ -1630,7 +1658,7 @@ class BusinessProfileSemanticRuntime:
                 artifact_identity = _structured_artifact_identity(item, selected)
                 replay = (
                     self.semantic_artifacts.find_replay(artifact_identity)
-                    if deterministic_count == 0
+                    if deterministic_count == 0 and not unit_conversion_pending
                     else None
                 )
                 if replay is not None:
@@ -1738,6 +1766,23 @@ class BusinessProfileSemanticRuntime:
                             metrics["semantic_rows_unit_pending"] = int(
                                 metrics.get("semantic_rows_unit_pending") or 0
                             ) + len(unit_conversion_pending)
+                            machine_rework.extend(
+                                _rework_item(
+                                    item,
+                                    item["document"],
+                                    str(
+                                        diagnostic.get("reason_code")
+                                        or "unit_normalization_failed"
+                                    ),
+                                    diagnostics=diagnostic,
+                                )
+                                for diagnostic in unit_conversion_pending
+                            )
+                            _increment_family_metrics(
+                                metrics["by_field_family"],
+                                item["field_family"],
+                                machine_rework=len(unit_conversion_pending),
+                            )
                         else:
                             self.semantic_artifacts.mark(
                                 semantic_artifact_id,
@@ -1769,7 +1814,11 @@ class BusinessProfileSemanticRuntime:
                         )
                 fallback_reason = (
                     _structured_fallback_reason(selected, diagnostics)
-                    if deterministic_count == 0 and replay is None
+                    if (
+                        deterministic_count == 0
+                        and replay is None
+                        and not unit_conversion_pending
+                    )
                     else None
                 )
                 if fallback_reason is not None:
@@ -1932,6 +1981,23 @@ class BusinessProfileSemanticRuntime:
                             metrics["semantic_rows_unit_pending"] = int(
                                 metrics.get("semantic_rows_unit_pending") or 0
                             ) + len(unit_conversion_pending)
+                            machine_rework.extend(
+                                _rework_item(
+                                    item,
+                                    item["document"],
+                                    str(
+                                        diagnostic.get("reason_code")
+                                        or "unit_normalization_failed"
+                                    ),
+                                    diagnostics=diagnostic,
+                                )
+                                for diagnostic in unit_conversion_pending
+                            )
+                            _increment_family_metrics(
+                                metrics["by_field_family"],
+                                item["field_family"],
+                                machine_rework=len(unit_conversion_pending),
+                            )
                         else:
                             self.semantic_artifacts.mark(
                                 semantic_artifact_id,
@@ -2110,6 +2176,7 @@ class BusinessProfileSemanticRuntime:
                         item,
                         selected,
                         request_context,
+                        runtime_identities=scope.identities,
                     )
                     cache_key = artifact_identity.input_hash
                     cached = joint_semantic_cache.get(cache_key)
@@ -2489,6 +2556,8 @@ class BusinessProfileSemanticRuntime:
                         "metadata": {
                             "runtime_schema_version": RUNTIME_SCHEMA_VERSION,
                             "runtime_identities": dict(scope.identities),
+                            "fact_catalog_version": load_business_fact_catalog().catalog_version,
+                            "product_catalog_version": load_business_product_catalog().catalog_version,
                             "result_policy": self.result_policy,
                             "origin": origin,
                             "document_hash": item["document"].get("content_hash"),
@@ -3817,33 +3886,66 @@ class BusinessProfileSemanticRuntime:
         item: Mapping[str, Any],
         selected: SelectedSectionArtifact,
         tables: Sequence[Any],
-    ) -> dict[str, list[dict[str, Any]]]:
+    ) -> StructuredSemanticConversion:
         evidence: list[dict[str, Any]] = []
         output: dict[str, list[dict[str, Any]]] = {"evidence": evidence}
+        pending_units: list[PendingStructuredUnit] = []
         for table in tables:
             for row_ordinal, raw_row in enumerate(table.rows, start=1):
                 row = dict(raw_row)
                 row.setdefault("row_ordinal", row_ordinal)
                 evidence_row = _table_evidence(item, selected, table, row)
                 evidence.append(evidence_row)
-                if (
-                    item["field_family"] == "structured_segments"
-                    and "segment" in table.signature_id
-                ):
-                    record = _segment_record(
-                        item, table, row, evidence_row["evidence_id"]
-                    )
-                    _bind_promotion_validation(record, evidence_row)
-                    output.setdefault("segments", []).append(record)
-                elif item["field_family"] == "tabular_operating_facts":
-                    records = _operating_records(
-                        item, table, row, evidence_row["evidence_id"]
-                    )
-                    for record in records:
+                try:
+                    if (
+                        item["field_family"] == "structured_segments"
+                        and "segment" in table.signature_id
+                    ):
+                        record = _segment_record(
+                            item, table, row, evidence_row["evidence_id"]
+                        )
                         _bind_promotion_validation(record, evidence_row)
-                    output.setdefault("operating_facts", []).extend(records)
+                        output.setdefault("segments", []).append(record)
+                    elif item["field_family"] == "tabular_operating_facts":
+                        records = _operating_records(
+                            item, table, row, evidence_row["evidence_id"]
+                        )
+                        for record in records:
+                            _bind_promotion_validation(record, evidence_row)
+                        output.setdefault("operating_facts", []).extend(records)
+                except UnitResolutionPendingError as exc:
+                    pending_units.append(
+                        PendingStructuredUnit(
+                            resolution=exc.resolution,
+                            diagnostic=_pending_structured_unit_diagnostic(
+                                item,
+                                row,
+                                evidence_row["evidence_id"],
+                                exc.resolution,
+                            ),
+                        )
+                    )
+                except (TypeError, ValueError, ArithmeticError) as exc:
+                    # Parsing a single deterministic row must not crash the
+                    # whole checkpoint.  Preserve enough context for targeted
+                    # repair and keep independent rows available.
+                    pending_units.append(
+                        PendingStructuredUnit(
+                            resolution=_deterministic_row_failure_resolution(exc),
+                            diagnostic=_deterministic_row_failure_diagnostic(
+                                item,
+                                table,
+                                row,
+                                evidence_row["evidence_id"],
+                                exc,
+                            ),
+                        )
+                    )
         _annotate_ambiguous_operating_facts(output.get("operating_facts") or [])
-        return output
+        return StructuredSemanticConversion(
+            records_by_type=output,
+            pending_units=tuple(pending_units),
+        )
 
     def _structured_semantic_records(
         self,
@@ -4954,9 +5056,9 @@ class BusinessProfileSemanticRuntime:
         *,
         item: Mapping[str, Any],
         runtime_identities: Mapping[str, str],
-    ) -> dict[str, Any] | None:
+    ) -> tuple[dict[str, Any] | None, str | None]:
         if self.result_policy != "reuse":
-            return None
+            return None, None
         # Joint activities/relationships are persisted as ordinary completed
         # semantic runs as well.  Reuse the governed record identities first;
         # replaying the raw joint artifact would regenerate evidence/record
@@ -4982,10 +5084,26 @@ class BusinessProfileSemanticRuntime:
                 continue
             if metadata.get("reuse_blocked") is True:
                 continue
+            persisted_identities = dict(metadata.get("runtime_identities") or {})
+            if persisted_identities != dict(runtime_identities):
+                logger.warning(
+                    "business-profile semantic reuse rejected runtime identity "
+                    "instrument_id=%s field_family=%s run_id=%s",
+                    item.get("instrument_id"),
+                    item.get("field_family"),
+                    row["run_id"],
+                )
+                return None, "stale_runtime_identity"
+            if str(metadata.get("runtime_schema_version") or "") != RUNTIME_SCHEMA_VERSION:
+                return None, "stale_runtime_schema"
+            if str(metadata.get("fact_catalog_version") or "") != load_business_fact_catalog().catalog_version:
+                return None, "stale_fact_catalog"
+            if str(metadata.get("product_catalog_version") or "") != load_business_product_catalog().catalog_version:
+                return None, "stale_product_catalog"
             if metadata.get("semantic_family_complete") is not True:
                 continue
             if "record_ids" not in metadata or "evidence_ids" not in metadata:
-                continue
+                return None, "legacy_occurrence_identity"
             record_ids = {
                 str(key): [str(value) for value in values]
                 for key, values in dict(metadata.get("record_ids") or {}).items()
@@ -5002,25 +5120,8 @@ class BusinessProfileSemanticRuntime:
                     item.get("field_family"),
                     row["run_id"],
                 )
-                continue
+                return None, "legacy_occurrence_identity"
             evidence_ids = [str(value) for value in metadata.get("evidence_ids") or []]
-            complete = all(
-                self.repository.get_record(record_type, record_id) is not None
-                for record_type, record_values in record_ids.items()
-                for record_id in record_values
-            ) and all(
-                self.repository.get_record("evidence", evidence_id) is not None
-                for evidence_id in evidence_ids
-            )
-            if not complete:
-                logger.warning(
-                    "business-profile semantic reuse rejected missing records "
-                    "instrument_id=%s field_family=%s run_id=%s",
-                    item.get("instrument_id"),
-                    item.get("field_family"),
-                    row["run_id"],
-                )
-                continue
             source_path = str(metadata.get("selected_artifact_path") or "")
             source_hash = str(row["bundle_hash"] or "")
             source_artifact, rejection_reason = self._validate_semantic_reuse_context(
@@ -5038,7 +5139,27 @@ class BusinessProfileSemanticRuntime:
                     row["run_id"],
                     rejection_reason,
                 )
-                continue
+                return None, str(rejection_reason or "missing_persisted_record")
+            current_selected_hash = str(item.get("selected_artifact_hash") or "")
+            if current_selected_hash and source_artifact.artifact_hash != current_selected_hash:
+                return None, "stale_selected_section_identity"
+            complete = all(
+                self.repository.get_record(record_type, record_id) is not None
+                for record_type, record_values in record_ids.items()
+                for record_id in record_values
+            ) and all(
+                self.repository.get_record("evidence", evidence_id) is not None
+                for evidence_id in evidence_ids
+            )
+            if not complete:
+                logger.warning(
+                    "business-profile semantic reuse rejected missing records "
+                    "instrument_id=%s field_family=%s run_id=%s",
+                    item.get("instrument_id"),
+                    item.get("field_family"),
+                    row["run_id"],
+                )
+                return None, "missing_persisted_record"
             source_context_hash = _evidence_context_hash(
                 document_id, source_artifact.artifact_hash
             )
@@ -5063,8 +5184,8 @@ class BusinessProfileSemanticRuntime:
                     "selected_artifact_path": source_path,
                     "evidence_context_hash": source_context_hash,
                 },
-            }
-        return None
+            }, None
+        return None, None
 
     def _semantic_reuse_has_legacy_occurrence_identity(
         self, record_ids: Mapping[str, Sequence[str]]
@@ -5304,6 +5425,8 @@ def _joint_semantic_artifact_identity(
     item: Mapping[str, Any],
     selected: SelectedSectionArtifact,
     request_context: Any,
+    *,
+    runtime_identities: Mapping[str, str],
 ) -> SemanticArtifactIdentity:
     document = item["document"]
     return SemanticArtifactIdentity(
@@ -5324,7 +5447,15 @@ def _joint_semantic_artifact_identity(
                 for span in request_context.evidence_spans
             ]
         ),
-        input_hash=str(request_context.input_hash),
+        input_hash=_stable_hash(
+            {
+                "request_input_hash": str(request_context.input_hash),
+                "runtime_identities": dict(sorted(runtime_identities.items())),
+                "selected_artifact_hash": selected.artifact_hash,
+                "fact_catalog_version": load_business_fact_catalog().catalog_version,
+                "product_catalog_version": load_business_product_catalog().catalog_version,
+            }
+        ),
         prompt_version=SEMANTIC_EXTRACTION_PROMPT_VERSION,
         schema_version=SEMANTIC_EXTRACTION_SCHEMA_VERSION,
     )
@@ -6331,7 +6462,11 @@ def _pending_structured_unit_diagnostic(
     evidence_id: str,
     resolution: UnitResolution,
 ) -> dict[str, Any]:
-    source_value = row.get("source_value", row.get("value"))
+    source_value = (
+        row.get("source_value")
+        if row.get("source_value") is not None
+        else row.get("value")
+    )
     source_unit = str(row.get("source_unit_raw") or row.get("unit_raw") or "")
     row_identity = {
         "instrument_id": item.get("instrument_id"),
@@ -6349,6 +6484,56 @@ def _pending_structured_unit_diagnostic(
         **row_identity,
         "resolution": resolution.to_dict(),
         "reason_code": "unit_normalization_failed",
+    }
+
+
+def _deterministic_row_failure_resolution(exc: Exception) -> UnitResolution:
+    """Represent a deterministic row failure without treating it as gateway work."""
+
+    return UnitResolution(
+        source_unit="",
+        normalized_lexeme="",
+        dimension=None,
+        canonical_unit=None,
+        multiplier=None,
+        numerator=(),
+        denominator=(),
+        rule_ids=(),
+        catalog_version=load_unit_conversion_catalog().catalog_version,
+        status="unit_resolution_pending",
+        reason=f"deterministic_conversion_failed:{type(exc).__name__}",
+    )
+
+
+def _deterministic_row_failure_diagnostic(
+    item: Mapping[str, Any],
+    table: Any,
+    row: Mapping[str, Any],
+    evidence_id: str,
+    exc: Exception,
+) -> dict[str, Any]:
+    return {
+        "pending_row_id": "bp-deterministic-row-"
+        + _stable_hash(
+            {
+                "document": (item.get("document") or {}).get("identity"),
+                "family": item.get("field_family"),
+                "table": getattr(table, "table_id", ""),
+                "row": row,
+                "error": type(exc).__name__,
+            }
+        )[:24],
+        "instrument_id": item.get("instrument_id"),
+        "source_document_id": (item.get("document") or {}).get("identity"),
+        "field_family": item.get("field_family"),
+        "table_id": getattr(table, "table_id", None),
+        "page_number": row.get("page_number") or row.get("physical_page"),
+        "row_ordinal": row.get("row_ordinal"),
+        "row_label": row.get("row_label"),
+        "evidence_id": evidence_id,
+        "reason_code": "deterministic_numeric_conversion_failed",
+        "error_type": type(exc).__name__,
+        "error": str(exc)[:500],
     }
 
 
@@ -6842,11 +7027,20 @@ def _cell_number(cells: Mapping[str, Any], needle: str) -> float | None:
 
 
 def _cell_fraction(cells: Mapping[str, Any], needle: str) -> float | None:
-    value = next((value for key, value in cells.items() if needle in key), None)
+    match = next(((key, value) for key, value in cells.items() if needle in key), None)
+    if match is None:
+        return None
+    key, value = match
     parsed = _parse_number(value)
     if parsed is None:
         return None
-    return parsed / 100 if "%" in str(value) else parsed
+    unit = _header_unit(str(key))
+    if unit is None:
+        unit = "%" if "%" in str(value) else "fraction"
+    try:
+        return float(normalize_ratio(parsed, unit))
+    except ValueError:
+        return None
 
 
 def _parse_number(value: Any) -> float | None:

@@ -702,49 +702,18 @@ class BusinessProfileSemanticExtractor:
                     content_is_untrusted=True,
                 )
             )
-            try:
-                rows, rejected_rows, rejected_row_count = (
-                    _validate_structured_extraction_response(
-                        response.data,
-                        field_family=field_family,
-                        instrument_id=instrument_id,
-                        report_period=report_period,
-                        selected=selected,
-                        evidence_spans=evidence_spans,
-                        max_items=self.policy.max_items_per_response,
-                    )
+            rows, rejected_rows, rejected_row_count = (
+                _validate_structured_extraction_response(
+                    response.data,
+                    field_family=field_family,
+                    instrument_id=instrument_id,
+                    report_period=report_period,
+                    selected=selected,
+                    evidence_spans=evidence_spans,
+                    max_items=self.policy.max_items_per_response,
+                    language_fail_soft=True,
                 )
-            except ChineseLanguageContractError as language_error:
-                response = await _repair_chinese_response(
-                    self.llm_client,
-                    profile=self.policy.extraction_profile,
-                    response_data=response.data,
-                    error=language_error,
-                    response_schema=_structured_extraction_schema(
-                        field_family,
-                        max_items=self.policy.max_items_per_response,
-                        language_fail_soft=True,
-                    ),
-                    schema_version=STRUCTURED_EXTRACTION_SCHEMA_VERSION,
-                    policy=self.policy,
-                    metadata={
-                        "stage": "structured_semantic_chinese_repair",
-                        "business_item_key": (
-                            f"{instrument_id}:{report_period}:{field_family}"
-                        ),
-                    },
-                )
-                rows, rejected_rows, rejected_row_count = (
-                    _validate_structured_extraction_response(
-                        response.data,
-                        field_family=field_family,
-                        instrument_id=instrument_id,
-                        report_period=report_period,
-                        selected=selected,
-                        evidence_spans=evidence_spans,
-                        max_items=self.policy.max_items_per_response,
-                    )
-                )
+            )
             if rejected_rows and not rows:
                 raise StructuredRowsRejectedError(
                     rejected_rows,
@@ -2703,11 +2672,15 @@ def _validate_structured_row(
     item.setdefault("source_label_raw", segment_name)
     item.setdefault("semantic_summary_zh", segment_name)
     if field_family == "tabular_operating_facts":
-        item.setdefault("source_value", item.get("value"))
-        item.setdefault("source_unit_raw", item.get("unit_raw"))
+        if item.get("source_value") is None:
+            item["source_value"] = item.get("value")
+        if item.get("source_unit_raw") is None:
+            item["source_unit_raw"] = item.get("unit_raw")
     else:
-        item.setdefault("revenue_unit_raw", item.get("currency_unit"))
-        item.setdefault("cost_unit_raw", item.get("currency_unit"))
+        if item.get("revenue_unit_raw") is None:
+            item["revenue_unit_raw"] = item.get("currency_unit")
+        if item.get("cost_unit_raw") is None:
+            item["cost_unit_raw"] = item.get("currency_unit")
     item["semantic_synthesis"] = True
     return item
 
@@ -2773,8 +2746,16 @@ def _normalize_activity(
         "action": str(raw["action"]),
         "object_raw": object_raw,
         "report_period": report_period,
-        "value": raw.get("source_value", raw.get("value")),
-        "unit": raw.get("source_unit_raw", raw.get("unit")),
+        "value": (
+            raw.get("source_value")
+            if raw.get("source_value") is not None
+            else raw.get("value")
+        ),
+        "unit": (
+            raw.get("source_unit_raw")
+            if raw.get("source_unit_raw") is not None
+            else raw.get("unit")
+        ),
         "source_label_raw": raw.get("source_label_raw"),
         "source_row_key": raw.get("source_row_key"),
         "contract_reference_raw": raw.get("contract_reference_raw"),
@@ -2834,6 +2815,11 @@ def _normalize_relationship(
     object_raw = str(raw.get("object_raw") or "").strip()
     if disclosed_share is not None:
         _validate_finite_number(disclosed_share, "relationship disclosed_share")
+        share_unit = str(raw.get("disclosed_share_unit") or "").strip().lower()
+        if share_unit in {"%", "percent", "percentage", "百分点"} and 0 < float(disclosed_share) < 1:
+            raise ValueError(
+                "relationship disclosed_share fraction conflicts with percent unit"
+            )
     core = {
         "instrument_id": instrument_id,
         "report_period": report_period,

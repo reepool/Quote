@@ -275,6 +275,29 @@ def test_explicit_page_context_remains_inside_page_scope():
     assert [item.page_number for item in selected.sections] == [2, 3]
 
 
+def test_page_budget_keeps_explicit_anchor_and_reports_dropped_anchor():
+    artifact = _artifact(
+        "主要业务：公司生产煤炭。",
+        "普通上下文",
+        "主要业务：公司销售煤炭。",
+    )
+    selected = BusinessProfileSectionSelector(context_pages=1, max_pages=1).select(
+        artifact=artifact,
+        instrument_id="601088.SH",
+        source_document_id="report-anchor-budget",
+        field_family="atomic_activities",
+        templates=_templates(),
+        explicit_pages=(3,),
+    )
+
+    assert [item.page_number for item in selected.sections] == [3]
+    dropped = selected.bundle["page_budget"]["dropped_anchor_pages"]
+    assert dropped == [1]
+    assert "heading_alias" in " ".join(
+        selected.bundle["page_budget"]["dropped_anchor_reasons"]["1"]
+    )
+
+
 def test_conflicting_duplicate_rows_fail_closed():
     artifact = _artifact(
         "煤炭产销量\n|项目|原煤产量|商品煤产量|商品煤销量|\n|一矿|10|8|7|",

@@ -754,6 +754,10 @@ def _normalize_disclosed_share(value: Any, unit: Any) -> tuple[float | None, str
         raise ValueError("relationship disclosed_share must be finite")
     normalized_unit = str(unit or "").strip().lower()
     if normalized_unit in {"%", "percent", "percentage", "百分点"}:
+        if 0 < numeric < 1:
+            raise ValueError(
+                "relationship disclosed_share fraction conflicts with percent unit"
+            )
         numeric /= 100.0
         rule = "percent_to_fraction"
     elif normalized_unit in {"fraction", "ratio", "", "decimal"}:

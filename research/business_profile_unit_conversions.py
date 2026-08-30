@@ -792,9 +792,8 @@ def unit_magnitude_multiplier(raw_unit: Any) -> Decimal:
 
 def _compose_unit(normalized: str, *, catalog_version: str) -> UnitResolution:
     source = normalized
-    lower = normalized.lower()
     # A parenthesized classifier denotes an alternative, e.g. 万台（套）.
-    alternative_match = re.fullmatch(r"(.+?)\(([^()]+)\)", lower)
+    alternative_match = re.fullmatch(r"(.+?)\(([^()]+)\)", normalized)
     if alternative_match:
         primary_text, alternative_text = alternative_match.groups()
         primary = _resolve_primitive(primary_text)
@@ -827,7 +826,7 @@ def _compose_unit(normalized: str, *, catalog_version: str) -> UnitResolution:
         return _pending_composed(source, catalog_version, "ambiguous_alternative")
 
     # Slash between classifiers is an alternative rather than a rate.
-    parts = lower.split("/")
+    parts = normalized.split("/")
     alternatives = (
         [_resolve_primitive(part) for part in parts]
         if 2 <= len(parts) <= MAX_CLASSIFIER_ALTERNATIVES
@@ -853,7 +852,7 @@ def _compose_unit(normalized: str, *, catalog_version: str) -> UnitResolution:
             "count",
             "unit",
             next(iter(multipliers)),
-            lower,
+            normalized,
             ("classifier_alternative", *rules),
         )
         return _resolution_from_primitive(
@@ -885,7 +884,7 @@ def _compose_unit(normalized: str, *, catalog_version: str) -> UnitResolution:
             status="resolved",
         )
 
-    primitive = _resolve_primitive(lower)
+    primitive = _resolve_primitive(normalized)
     if primitive is None:
         return _pending_composed(source, catalog_version, "unknown_unit_token")
     return _resolution_from_primitive(source, primitive, catalog_version)
@@ -893,11 +892,13 @@ def _compose_unit(normalized: str, *, catalog_version: str) -> UnitResolution:
 
 def _resolve_primitive(text: str) -> Optional[_PrimitiveResolution]:
     token = text.strip()
-    if token in _COUNT_ALIASES:
+    if token in _COUNT_ALIASES or token.lower() in _COUNT_ALIASES:
         return _PrimitiveResolution(
-            "count", "unit", Decimal("1"), token, (f"classifier:{token}",)
+            "count", "unit", Decimal("1"), token, (f"classifier:{token.lower()}",)
         )
     direct = _PRIMITIVES.get(token)
+    if direct is None and token not in {"M", "G", "k"}:
+        direct = _PRIMITIVES.get(token.lower())
     if direct is not None:
         dimension, canonical, multiplier = direct
         return _PrimitiveResolution(
@@ -924,14 +925,19 @@ def _resolve_primitive(text: str) -> Optional[_PrimitiveResolution]:
             base = _resolve_primitive(token[: -len(suffix)])
             if base is not None:
                 return _scale_primitive(base, multiplier, f"magnitude:{suffix}")
-    # SI prefix matching remains case-insensitive after NFKC/case normalization.
+    # Preserve SI case: m/g are base units and only a complete compound token
+    # may use m/M/G/k as a prefix (for example mm, Mt, or kt).
     for prefix, multiplier in (
-        ("g", Decimal("1000000000")),
-        ("m", Decimal("1000000")),
+        ("G", Decimal("1000000000")),
+        ("M", Decimal("1000000")),
+        ("m", Decimal("0.001")),
         ("k", Decimal("1000")),
     ):
         if token.startswith(prefix) and len(token) > 1:
-            base = _PRIMITIVES.get(token[len(prefix) :])
+            remainder = token[len(prefix) :]
+            # Prefix case is semantic; base-unit aliases retain the catalog's
+            # existing ASCII case-insensitive compatibility (e.g. kW).
+            base = _PRIMITIVES.get(remainder) or _PRIMITIVES.get(remainder.lower())
             if base is not None:
                 dimension, canonical, base_multiplier = base
                 return _PrimitiveResolution(
@@ -939,7 +945,7 @@ def _resolve_primitive(text: str) -> Optional[_PrimitiveResolution]:
                     canonical,
                     multiplier * base_multiplier,
                     token,
-                    (f"si_prefix:{prefix}", f"primitive:{token[len(prefix):]}"),
+                    (f"si_prefix:{prefix}", f"primitive:{remainder}"),
                 )
     return None
 

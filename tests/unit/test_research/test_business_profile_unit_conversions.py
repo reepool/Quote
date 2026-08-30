@@ -248,6 +248,31 @@ def test_compositional_resolution_handles_chinese_and_si_units(
     assert resolution.multiplier == multiplier
 
 
+@pytest.mark.parametrize(
+    ("raw_unit", "dimension", "canonical", "multiplier"),
+    [
+        ("m", "length", "meter", Decimal("1")),
+        ("g", "mass", "tonne", Decimal("0.000001")),
+        ("mm", "length", "meter", Decimal("0.001")),
+        ("mg", "mass", "tonne", Decimal("0.000000001")),
+        ("Mt", "mass", "tonne", Decimal("1000000")),
+        ("kt", "mass", "tonne", Decimal("1000")),
+    ],
+)
+def test_si_prefix_case_and_complete_tokens(raw_unit, dimension, canonical, multiplier):
+    resolution = load_unit_conversion_catalog().resolve(raw_unit)
+    assert resolution.status == "resolved"
+    assert resolution.dimension == dimension
+    assert resolution.canonical_unit == canonical
+    assert resolution.multiplier == multiplier
+
+
+@pytest.mark.parametrize("raw_unit", ["M", "G", "k"])
+def test_bare_si_prefix_is_pending(raw_unit):
+    resolution = load_unit_conversion_catalog().resolve(raw_unit)
+    assert resolution.status == "unit_resolution_pending"
+
+
 def test_unknown_unit_is_pending_and_does_not_raise():
     resolution = load_unit_conversion_catalog().resolve("每百枚神秘单位")
     assert resolution.status == "unit_resolution_pending"

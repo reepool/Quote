@@ -220,6 +220,94 @@ def test_repair_removes_obsolete_work_and_orphan_checkpoints(tmp_path):
     assert repeated["issue_counts"] == {}
 
 
+def test_active_structured_family_is_not_retired_by_name(tmp_path):
+    storage = _storage(tmp_path)
+    checkpoint_root = tmp_path / "checkpoints"
+    checkpoint_root.mkdir()
+    path = checkpoint_root / "bp-work-active.json"
+    path.write_text("{}", encoding="utf-8")
+    _insert_work_item(
+        storage,
+        work_id="bp-work-active",
+        instrument_id="600010.SH",
+        status="pending",
+        checkpoint_path=path,
+        processing_identity={
+            "rollout_phase": "daily_incremental",
+            "field_families": ["structured_segments"],
+        },
+    )
+
+    service = BusinessProfileSemanticRepairService(
+        storage, checkpoint_root=checkpoint_root
+    )
+    audit = service.run(all_scope=True)
+
+    assert audit["execution_state"]["work_items"]["delete_count"] == 0
+    assert path.exists()
+
+
+def test_explicit_retirement_marker_is_immutable_and_drives_later_cleanup(tmp_path):
+    storage = _storage(tmp_path)
+    checkpoint_root = tmp_path / "checkpoints"
+    checkpoint_root.mkdir()
+    path = checkpoint_root / "bp-work-retired-by-marker.json"
+    path.write_text("{}", encoding="utf-8")
+    _insert_work_item(
+        storage,
+        work_id="bp-work-retired-by-marker",
+        instrument_id="600011.SH",
+        status="pending",
+        checkpoint_path=path,
+        processing_identity={
+            "rollout_phase": "daily_incremental",
+            "field_families": ["structured_segments"],
+        },
+    )
+    service = BusinessProfileSemanticRepairService(
+        storage, checkpoint_root=checkpoint_root
+    )
+
+    migration = service.run(
+        apply=True,
+        retirement_work_ids=["bp-work-retired-by-marker"],
+        retirement_reason="completed structured-shadow retirement migration",
+    )
+
+    marker_change = next(
+        item
+        for item in migration["changes"]
+        if item["reason"] == "retirement_marker_migrated"
+    )
+    assert marker_change["status"] == "changed"
+    with storage.get_connection() as conn:
+        row = conn.execute(
+            "SELECT metadata_json FROM business_profile_work_items "
+            "WHERE work_id = 'bp-work-retired-by-marker'"
+        ).fetchone()
+    marker = json.loads(row[0])["retirement_marker"]
+    assert marker["reason"] == "completed structured-shadow retirement migration"
+    assert marker["timestamp"]
+    assert path.exists()
+
+    repeated_migration = service.run(
+        apply=True,
+        retirement_work_ids=["bp-work-retired-by-marker"],
+        retirement_reason="different retirement reason",
+    )
+    assert repeated_migration["change_counts"]["failed"] == 1
+
+    cleanup = service.run(all_scope=True, apply=True, cleanup_only=True)
+    assert cleanup["execution_state"]["work_items"]["delete_count"] == 1
+    with storage.get_connection() as conn:
+        remaining = conn.execute(
+            "SELECT COUNT(*) FROM business_profile_work_items "
+            "WHERE work_id = 'bp-work-retired-by-marker'"
+        ).fetchone()[0]
+    assert remaining == 0
+    assert not path.exists()
+
+
 def test_cleanup_only_does_not_apply_unrelated_business_repairs(tmp_path):
     storage = _storage(tmp_path)
     storage.upsert_shareholder_snapshot(ShareholderSnapshot(
@@ -304,7 +392,12 @@ def test_repair_deletes_retired_shadow_artifact_and_run(tmp_path):
             ") VALUES ('legacy-run', '600006.SH', 'annual-report-2025', "
             "'structured_segments', 'completed', 'bundle', ?, ?, ?, ?, ?)",
             (
-                json.dumps({"semantic_artifact_id": artifact["artifact_id"]}),
+                json.dumps(
+                    {
+                        "semantic_artifact_id": artifact["artifact_id"],
+                        "processing_identity": {"rollout_phase": "structured_shadow"},
+                    }
+                ),
                 now,
                 now,
                 now,

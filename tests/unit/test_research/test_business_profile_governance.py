@@ -359,6 +359,37 @@ def test_as_of_excludes_every_expired_validity_interval(
     assert at_end == []
 
 
+def test_report_flow_fact_remains_visible_after_publication_window(tmp_path):
+    storage, _ = _storage(tmp_path)
+    repository = BusinessProfileRepository(storage)
+    _governed_upsert(repository, "evidence", _approved_evidence("002415.SZ"))
+    _governed_upsert(
+        repository,
+        "segments",
+        {
+            "record_id": "segment-002415-2025",
+            "instrument_id": "002415.SZ",
+            "report_period": "2025-12-31",
+            "segment_id": "segment-product-main",
+            "segment_name_raw": "主营产品",
+            "segment_type": "product",
+            "evidence_id": "evidence-2025-ar",
+            "data_available_date": "2026-04-17",
+            "knowledge_from": "2026-04-17",
+            "valid_from": "2025-01-01",
+            "valid_to": "2025-12-31",
+            "confidence": 1.0,
+            "review_status": "approved",
+        },
+    )
+
+    approved = repository.get_approved_as_of(
+        "segments", instrument_id="002415.SZ", cutoff="2026-04-30"
+    )
+
+    assert [item["record_id"] for item in approved] == ["segment-002415-2025"]
+
+
 def _governed_upsert(repository, record_type, record):
     """Insert test records through the same candidate-first audited path as production."""
 
