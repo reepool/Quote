@@ -335,7 +335,7 @@ W2 标识/主数据/股票日历
 
 | 工作流 | Change | 状态 | 依赖 |
 |---|---|---|---|
-| W1 | `consolidate-project-documentation` | active（6/19） | 无 |
+| W1 | `consolidate-project-documentation` | active（12/19） | 无 |
 | W2 | `unify-instrument-master-and-identity-boundaries` | apply-ready（0/16） | W1 |
 | W3 | `unify-quote-maintenance-command-paths` | apply-ready（0/23） | W2 |
 | W4 | `extract-research-application-services` | apply-ready（0/22） | W2 |
