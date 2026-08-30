@@ -15,7 +15,7 @@
 
 ## 3. Capability Consolidation
 
-- [ ] 3.1 Consolidate quote download, historical backfill, single-instrument, and gap runbooks; verify every retained command against current entry points.
+- [x] 3.1 Consolidate quote download, historical backfill, single-instrument, and gap runbooks; verify every retained command against current entry points.
 - [ ] 3.2 Consolidate instrument-master and A-share corporate-action/factor document families without changing domain rules.
 - [ ] 3.3 Consolidate LLM, backup, and stable research-domain document families, deferring any family with an active overlapping change.
 - [ ] 3.4 Delete each superseded document only after recording its replacement, preserved rules, reference scan, and rollback source commit.

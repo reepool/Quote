@@ -21,9 +21,7 @@
 
 ## 行情与主数据
 
-- `docs/features/historical_data_download.md`：历史数据下载
-- `docs/single_instrument_download_guide.md`：单标的下载
-- `docs/gap_detection_usage.md`：行情缺口检测与修复
+- `docs/features/quote_maintenance.md`：日线行情维护、历史回补、单标的下载和缺口处理
 - `docs/features/trading_calendar_management.md`：交易日历
 - `docs/development/instrument_master_sync.md`：证券主数据同步与治理
 - `docs/development/stock_adjustment_factor_framework.md`：复权因子当前框架
