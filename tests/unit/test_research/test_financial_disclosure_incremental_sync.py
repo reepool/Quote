@@ -41,6 +41,19 @@ class _FakeDbOps:
         ]
 
 
+class _FakeStCuihuaDbOps:
+    async def get_instruments_by_exchange(self, exchange):
+        return [
+            {
+                "instrument_id": "002731.SZ",
+                "symbol": "002731",
+                "exchange": "SZSE",
+                "type": "stock",
+                "is_active": True,
+            }
+        ]
+
+
 class _FakeLifecycleDbOps:
     async def get_instruments_by_exchange(self, exchange):
         return [
@@ -868,6 +881,183 @@ def test_incremental_sync_expires_pending_state_without_retry(tmp_path):
     )
 
 
+_ST_CUIHUA_RISK_TITLE = (
+    "关于预计无法在规定期限内披露2025年年度报告暨股票可能被终止上市"
+    "暨无法在预约日期及预计无法在法定期限内披露2026年半年度报告的风险提示公告"
+)
+
+
+def test_reconciliation_accepts_expired_delisting_risk_instead_of_blocker(tmp_path):
+    storage = _FakeStorage(
+        ready=False,
+        pending_states=[
+            {
+                "instrument_id": "002731.SZ",
+                "symbol": "002731",
+                "exchange": "SZSE",
+                "report_period": "2025-12-31",
+                "announcement_id": "1225480944",
+                "announcement_time": "2026-08-18T16:00:00+00:00",
+                "title": _ST_CUIHUA_RISK_TITLE,
+                "status": "pending_recheck_expired",
+                "classification": "pending_delisting_risk",
+                "selection_reasons": [
+                    "periodic_report_delayed",
+                    "periodic_report_related_trading_risk",
+                    "pending_delisting_risk",
+                    "pending_recheck_expired",
+                ],
+                "first_pending_at": "2026-08-19T21:52:13+08:00",
+                "pending_recheck_until": "2026-08-26T21:52:13+08:00",
+            }
+        ],
+        audit_rows=[
+            {
+                "instrument_id": "002731.SZ",
+                "source_announcement_id": "1225480944",
+                "title": _ST_CUIHUA_RISK_TITLE,
+                "published_at": "2026-08-18T16:00:00+00:00",
+                "selection_reasons": [
+                    "periodic_report_delayed",
+                    "pending_delisting_risk",
+                ],
+            }
+        ],
+    )
+    service = FinancialDisclosureIncrementalSyncService(
+        db_ops=_FakeStCuihuaDbOps(),
+        storage=storage,
+        research_config=_research_config(tmp_path),
+        announcement_service=_FakeAnnouncementService([]),
+    )
+
+    async def _unexpected_import(**kwargs):
+        raise AssertionError("expired delisting-risk gaps must not call source repair")
+
+    service._run_targeted_import = _unexpected_import
+
+    result = _run(
+        service.sync(
+            exchanges=["SZSE"],
+            report_periods=["2025-12-31"],
+            dry_run=False,
+            reconciliation=True,
+        )
+    )
+
+    assert result["status"] == "success"
+    assert result["blocking_gap_count"] == 0
+    assert result["source_missing_gap_count"] == 0
+    assert result["accepted_gap_count"] == 1
+    assert result["pending_delisting_risk_count"] == 1
+    assert result["source_routing"]["cninfo_attempts"] == 0
+    outcomes = [item for item in result["outcomes"] if item["instrument_id"] == "002731.SZ"]
+    assert outcomes[0]["report_period"] == "2025-12-31"
+    assert outcomes[0]["status"] in {"accepted_disclosure_gap", "pending_delisting_risk"}
+
+
+def test_reconciliation_accepts_expired_q1_delisting_risk_without_period_in_title(tmp_path):
+    storage = _FakeStorage(
+        ready=False,
+        pending_states=[
+            {
+                "instrument_id": "002731.SZ",
+                "symbol": "002731",
+                "exchange": "SZSE",
+                "report_period": "2026-03-31",
+                "announcement_id": "1225320415",
+                "announcement_time": "2026-05-26T16:00:00+00:00",
+                "title": "关于定期报告披露进展暨股票交易可能被实施退市风险警示的风险提示公告",
+                "status": "pending_recheck_expired",
+                "classification": "pending_delisting_risk",
+                "selection_reasons": [
+                    "pending_delisting_risk",
+                    "pending_recheck_expired",
+                ],
+                "first_pending_at": "2026-05-26T19:16:37+08:00",
+                "pending_recheck_until": "2026-06-03T21:46:25+08:00",
+            }
+        ],
+    )
+    service = FinancialDisclosureIncrementalSyncService(
+        db_ops=_FakeStCuihuaDbOps(),
+        storage=storage,
+        research_config=_research_config(tmp_path),
+        announcement_service=_FakeAnnouncementService([]),
+    )
+
+    async def _unexpected_import(**kwargs):
+        raise AssertionError("expired delisting-risk gaps must not call source repair")
+
+    service._run_targeted_import = _unexpected_import
+
+    result = _run(
+        service.sync(
+            exchanges=["SZSE"],
+            report_periods=["2026-03-31"],
+            dry_run=False,
+            reconciliation=True,
+        )
+    )
+
+    assert result["status"] == "success"
+    assert result["blocking_gap_count"] == 0
+    assert result["accepted_gap_count"] == 1
+    assert result["pending_delisting_risk_count"] == 1
+
+
+def test_incremental_sync_keeps_expired_delisting_risk_as_accepted_gap(tmp_path):
+    storage = _FakeStorage(
+        ready=False,
+        pending_states=[
+            {
+                "instrument_id": "002731.SZ",
+                "symbol": "002731",
+                "exchange": "SZSE",
+                "report_period": "2026-06-30",
+                "announcement_id": "1225480944",
+                "announcement_time": "2026-08-18T16:00:00+00:00",
+                "title": _ST_CUIHUA_RISK_TITLE,
+                "status": "pending_delisting_risk",
+                "classification": "pending_delisting_risk",
+                "selection_reasons": [
+                    "periodic_report_delayed",
+                    "pending_delisting_risk",
+                ],
+                "first_pending_at": "2026-08-19T21:52:13+08:00",
+                "pending_recheck_until": "2026-08-26T21:52:13+08:00",
+            }
+        ],
+    )
+    service = FinancialDisclosureIncrementalSyncService(
+        db_ops=_FakeStCuihuaDbOps(),
+        storage=storage,
+        research_config=_research_config(tmp_path),
+        announcement_service=_FakeAnnouncementService([]),
+    )
+
+    async def _unexpected_import(**kwargs):
+        raise AssertionError("expired delisting-risk gaps must not call source repair")
+
+    service._run_targeted_import = _unexpected_import
+
+    result = _run(
+        service.sync(
+            exchanges=["SZSE"],
+            latest_report_period="2026Q1",
+            dry_run=False,
+        )
+    )
+
+    assert result["status"] == "success"
+    assert result["expired_pending_count"] == 1
+    assert result["blocking_gap_count"] == 0
+    assert result["accepted_gap_count"] == 1
+    assert result["pending_delisting_risk_count"] == 1
+    assert storage.states[-1]["status"] == "accepted_disclosure_gap"
+    assert storage.states[-1]["classification"] == "pending_delisting_risk"
+
+
 def test_incremental_sync_keeps_active_pending_state(tmp_path):
     storage = _FakeStorage(
         ready=True,
@@ -1128,7 +1318,7 @@ def test_incremental_sync_is_degraded_for_unresolved_pending_recheck(tmp_path):
     assert result["status"] == "degraded"
 
 
-def test_incremental_sync_filters_progress_pending_delisting_risk(tmp_path):
+def test_incremental_sync_keeps_stored_progress_delisting_risk(tmp_path):
     storage = _FakeStorage(
         ready=False,
         pending_states=[
@@ -1152,6 +1342,11 @@ def test_incremental_sync_filters_progress_pending_delisting_risk(tmp_path):
         announcement_service=_FakeAnnouncementService([]),
     )
 
+    async def _unexpected_import(**kwargs):
+        raise AssertionError("stored delisting-risk gaps must not call source repair")
+
+    service._run_targeted_import = _unexpected_import
+
     result = _run(
         service.sync(
             exchanges=["SZSE"],
@@ -1160,8 +1355,10 @@ def test_incremental_sync_filters_progress_pending_delisting_risk(tmp_path):
         )
     )
 
-    assert result["candidate_sources"]["filtered_stale_pending"] == 1
-    assert result["candidate_sources"]["pending_state"] == 0
+    assert result["candidate_sources"]["filtered_stale_pending"] == 0
+    assert result["candidate_sources"]["pending_state"] == 1
+    assert result["pending_delisting_risk_count"] == 1
+    assert result["blocking_gap_count"] == 0
 
 
 def test_readiness_accepts_cninfo_data20_official_fact_for_missing_core(tmp_path):

@@ -62,6 +62,13 @@ ACCEPTED_MAINTENANCE_GAP_CLASSIFICATIONS = (
     ACCEPTED_FINANCIAL_DISCLOSURE_CLASSIFICATIONS
     | ACCEPTED_LIFECYCLE_GAP_CLASSIFICATIONS
 )
+DISCLOSURE_RISK_SELECTION_REASONS = frozenset(
+    {
+        "pending_delisting_risk",
+        "periodic_report_delayed",
+        "periodic_report_related_trading_risk",
+    }
+)
 PERIODIC_REPORT_ANNOUNCEMENT_CATEGORY = "periodic_report"
 PERIODIC_REPORT_ANOMALY_CATEGORY = "periodic_report_anomaly"
 DISCLOSURE_ANOMALY_SEARCH_KEYS = ("披露", "定期报告")
@@ -734,7 +741,11 @@ class FinancialDisclosureIncrementalSyncService:
             existing = candidates.setdefault(candidate.key, candidate)
             if existing is not candidate:
                 self._merge_candidate_event(existing, event)
-        persisted_statuses = ["pending_recheck", "pending_delisting_risk"]
+        persisted_statuses = [
+            "pending_recheck",
+            "pending_delisting_risk",
+            "pending_recheck_expired",
+        ]
         if report_periods:
             persisted_statuses.append("accepted_disclosure_gap")
         with self.storage.financial_database_scope():
@@ -747,8 +758,10 @@ class FinancialDisclosureIncrementalSyncService:
             if instrument is None:
                 continue
             state_status = str(state.get("status") or "")
+            has_risk = self._state_has_disclosure_risk_reasons(state)
             if (
                 state_status != "accepted_disclosure_gap"
+                and not has_risk
                 and self._is_stale_filtered_pending_state(state)
             ):
                 filtered_stale_pending += 1
@@ -759,21 +772,30 @@ class FinancialDisclosureIncrementalSyncService:
                     dry_run=dry_run,
                 )
                 continue
-            if (
+            horizon_expired = (
                 state_status in {"pending_recheck", "pending_delisting_risk"}
                 and self._pending_state_is_expired(state, now=now)
-            ):
+            )
+            if horizon_expired:
                 expired_pending += 1
-                self._remove_expired_state_event(candidates, state)
                 self._record_expired_pending_state(
                     state,
                     run_id=run_id,
                     dry_run=dry_run,
                 )
+                if not has_risk:
+                    self._remove_expired_state_event(candidates, state)
+                    continue
+            elif state_status == "pending_recheck_expired" and not has_risk:
                 continue
             state_reasons = list(state.get("selection_reasons") or [])
             if state_status and state_status not in state_reasons:
                 state_reasons.append(state_status)
+            if has_risk and (
+                horizon_expired or state_status == "pending_recheck_expired"
+            ):
+                if "pending_recheck_expired" not in state_reasons:
+                    state_reasons.append("pending_recheck_expired")
             event = FinancialDisclosureEvent(
                 instrument_id=str(state.get("instrument_id") or ""),
                 report_period=str(state.get("report_period") or ""),
@@ -975,6 +997,7 @@ class FinancialDisclosureIncrementalSyncService:
         reasons = list(state.get("selection_reasons") or [])
         if "pending_recheck_expired" not in reasons:
             reasons.append("pending_recheck_expired")
+        keep_as_accepted_gap = self._state_has_disclosure_risk_reasons(state)
         with self.storage.financial_database_scope():
             self.storage.upsert_financial_disclosure_event_state(
                 instrument_id=str(state.get("instrument_id") or ""),
@@ -982,7 +1005,11 @@ class FinancialDisclosureIncrementalSyncService:
                 announcement_id=str(state.get("announcement_id") or "pending"),
                 symbol=state.get("symbol"),
                 exchange=state.get("exchange"),
-                status="pending_recheck_expired",
+                status=(
+                    "accepted_disclosure_gap"
+                    if keep_as_accepted_gap
+                    else "pending_recheck_expired"
+                ),
                 classification=str(
                     state.get("classification") or FINANCIAL_PERIODIC_REPORT_CLASSIFICATION
                 ),
@@ -999,6 +1026,36 @@ class FinancialDisclosureIncrementalSyncService:
                 },
                 ingestion_run_id=run_id,
             )
+
+    @classmethod
+    def _state_has_disclosure_risk_reasons(cls, state: Mapping[str, Any]) -> bool:
+        classification = str(state.get("classification") or "")
+        if classification in ACCEPTED_FINANCIAL_DISCLOSURE_CLASSIFICATIONS:
+            return True
+        reasons = {str(item) for item in state.get("selection_reasons") or []}
+        if reasons & DISCLOSURE_RISK_SELECTION_REASONS:
+            return True
+        title = str(state.get("title") or "")
+        if not title:
+            return False
+        current_reasons = financial_disclosure_event_filter(
+            AnnouncementRecord(
+                source="local_pending_state",
+                source_announcement_id=str(
+                    state.get("announcement_id") or "pending"
+                ),
+                announcement_key=build_announcement_key(
+                    "local_pending_state",
+                    str(state.get("announcement_id") or "pending"),
+                ),
+                title=title,
+                published_at=state.get("announcement_time"),
+                market=str(state.get("exchange") or ""),
+                exchange=str(state.get("exchange") or ""),
+                symbols=(str(state.get("symbol") or ""),),
+            )
+        )
+        return bool(set(current_reasons) & DISCLOSURE_RISK_SELECTION_REASONS)
 
     @staticmethod
     def _is_stale_filtered_pending_state(state: Mapping[str, Any]) -> bool:
@@ -1203,7 +1260,12 @@ class FinancialDisclosureIncrementalSyncService:
             if announcement_time is None:
                 continue
             days_after_period = (announcement_time.date() - period_end.date()).days
-            if days_after_period < 0 or days_after_period > 180:
+            title_matches_period = candidate.report_period in infer_report_periods_from_title(
+                str(audit.get("title") or "")
+            )
+            if days_after_period < 0:
+                continue
+            if not title_matches_period and days_after_period > 180:
                 continue
             reasons = [str(item) for item in audit.get("selection_reasons") or []]
             classification = (
@@ -1444,7 +1506,11 @@ class FinancialDisclosureIncrementalSyncService:
                 elif candidate.classification == "post_delisting_or_no_disclosure":
                     lifecycle_summary["post_delisting"] += 1
             elif candidate.classification == PENDING_DELISTING_RISK_CLASSIFICATION:
-                status = "pending_delisting_risk"
+                status = (
+                    "accepted_disclosure_gap"
+                    if "pending_recheck_expired" in candidate.reasons
+                    else "pending_delisting_risk"
+                )
                 pending_delisting += 1
                 accepted += 1
                 lifecycle_summary["disclosure_events"] += 1
