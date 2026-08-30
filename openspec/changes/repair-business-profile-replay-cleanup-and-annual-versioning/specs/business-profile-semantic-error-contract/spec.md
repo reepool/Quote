@@ -47,6 +47,10 @@ The structured extraction language contract MUST have one reachable behavior. If
 - **WHEN** the model returns `disclosed_share=0.352` and `disclosed_share_unit="%"`
 - **THEN** the system either rejects the contradictory payload deterministically or applies an explicitly documented compatibility rule, but MUST NOT silently persist `0.00352`
 
+#### Scenario: Sub-one-percent disclosure is fail-closed
+- **WHEN** the model returns a value between `0` and `1` together with a percent unit, such as `disclosed_share=0.5` and `disclosed_share_unit="%"`
+- **THEN** the system records a deterministic ambiguous/contradictory-share diagnostic and sends the row to machine rework; it MUST NOT guess whether the value means `0.5%` or a canonical fraction
+
 ### Requirement: Null source fallback
 When a semantic activity contains both `source_value` and `value`, an explicit null `source_value` MUST fall back to the non-null `value`; the same rule applies to source unit fields.
 

@@ -41,6 +41,10 @@ The system MUST physically remove rejected or otherwise non-reusable semantic re
 - **WHEN** an otherwise active work item uses `structured_segments` or `tabular_operating_facts` under a non-retired rollout phase
 - **THEN** repair MUST NOT delete it solely because of its field-family name
 
+#### Scenario: Retired run metadata is removable
+- **WHEN** a semantic run or durable receipt carries `rollout_phase=structured_shadow` or an immutable `retirement_marker` with a reason and timestamp
+- **THEN** cleanup removes the run/receipt and owned candidates, and replay lookup cannot return it even when the work-item row is already absent
+
 ### Requirement: Pre-batch lifecycle gate
 The system MUST block broad LLM backfill when identity collisions or non-reusable receipts remain in the selected scope, and MUST report the blocking instruments and reasons.
 

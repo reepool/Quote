@@ -19,11 +19,15 @@ Long-running work MUST renew its lease before expiry. Claim, acknowledge, failur
 - **THEN** the stage reports a typed storage/worker failure and the operation does not discard the status of unrelated stages
 
 ### Requirement: Human-held records are protected
-Automatic contract recovery MUST NOT reject or otherwise override a record in `held` status when its hold was created by a human reviewer. Only an automation-owned hold with explicit provenance may be changed automatically.
+Automatic contract recovery MUST NOT reject or otherwise override a record in `held` status when its latest hold decision was created by a human reviewer. Only an automation-owned hold with explicit provenance may be changed automatically. The owner MUST be determined from the most recent hold audit ordered by `reviewed_at` and `audit_id`; an older automation audit MUST NOT override a later human hold.
 
 #### Scenario: Human hold on obsolete-looking record
 - **WHEN** contract recovery scans a human-held candidate
 - **THEN** the record remains held and the report identifies it as requiring human action
+
+#### Scenario: Latest human hold wins
+- **WHEN** a record has an earlier system hold followed by a later human hold
+- **THEN** recovery treats the current hold as human-owned, leaves it held, and does not reclassify it as automation-owned because of the older audit
 
 ### Requirement: Page-budget anchor preservation
 Page selection MUST treat page budgets as semantic-context limits, not PDF parser limits. Explicit pages and pages matching governed table signatures or section anchors MUST be retained before adding context pages. If the budget cannot retain all anchors, the selector MUST emit a dropped-anchor diagnostic and allow a targeted expansion path.

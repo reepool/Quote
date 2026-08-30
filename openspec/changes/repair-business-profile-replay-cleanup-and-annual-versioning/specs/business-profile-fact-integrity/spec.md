@@ -44,7 +44,7 @@ An operating fact with unresolved unit, invalid numeric reconciliation, incomple
 - **THEN** the family quality is not ready, a machine-rework target is persisted, and the candidate cannot be promoted or reused as a complete family
 
 ### Requirement: Case-sensitive SI unit conversion
-Deterministic unit parsing MUST preserve SI prefix case and resolve the complete unit token before applying any compound-unit conversion. Bare `m` MUST mean metre and bare `g` MUST mean gram; bare `M`, `G`, or `k` are incomplete prefix tokens and MUST produce a typed unit error. Compound units `mm`, `mg`, `Mt`, and `kt` MUST resolve to millimetre, milligram, megatonne, and kilotonne respectively, without substring or case-folding substitutions.
+Deterministic unit parsing MUST preserve SI prefix case and resolve the complete unit token before applying any compound-unit conversion. Bare `m` MUST mean metre and bare `g` MUST mean gram; bare `M`, `G`, or `k` are incomplete prefix tokens and MUST produce a typed unit error. Compound units `mm`, `mg`, `Mt`, and `kt` MUST resolve to millimetre, milligram, megatonne, and kilotonne respectively, without substring or case-folding substitutions. The governed power-unit catalog is an explicit compatibility exception: `MW`, `mw`, and mixed-case `mW` in a power context MUST resolve to megawatt (10^6 watt), because annual-report power disclosures and upstream PDF text extraction use these spellings interchangeably. This exception MUST NOT be generalized to other dimensions or prefixes.
 
 #### Scenario: Bare base units are not prefixes
 - **WHEN** a source row contains bare tokens `m` or `g`
@@ -53,3 +53,7 @@ Deterministic unit parsing MUST preserve SI prefix case and resolve the complete
 #### Scenario: Compound units use their complete token
 - **WHEN** a source row contains `mm`, `mg`, `Mt`, or `kt`
 - **THEN** the parser resolves the complete token to the correct physical dimension and multiplier, and an incompatible dimension is rejected as a typed unit error
+
+#### Scenario: Power aliases locate megawatt
+- **WHEN** a power value contains `MW`, `mw`, or mixed-case `mW`
+- **THEN** the governed power catalog resolves each spelling to megawatt with multiplier `1000000`, and the result records the power-catalog compatibility rule rather than treating `mW` as milliwatt

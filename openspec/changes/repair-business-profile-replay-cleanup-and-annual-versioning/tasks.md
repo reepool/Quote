@@ -34,6 +34,7 @@
 - [x] 5.6 Isolate replay execution state by rotating orphan/stale checkpoints at enqueue and restricting targeted backfill workers to the current invocation's work IDs.
 - [x] 5.7 Replace checkpoint quarantine-by-rotation with owned-file deletion; remove retired shadow lifecycle rows, superseded runs/work, and orphan checkpoints while preserving approved records, evidence, review audit, active current work, and current receipts.
 - [x] 5.8 Make retired-shadow detection mode-based: update `_legacy_shadow_work` and `_obsolete_work_reason` to use persisted `rollout_phase=structured_shadow` or a canonical immutable `retirement_marker` (reason plus timestamp), never a field-family name alone; write the marker during the retirement migration and add a regression proving an active `structured_segments` or `tabular_operating_facts` work item in a non-retired phase is preserved.
+- [ ] 5.9 Extend retired-shadow cleanup to semantic runs and durable receipts, using the same mode/marker predicate and proving replay lookup cannot return a retired run after its work row is removed.
 
 ## 6. End-to-end acceptance
 
@@ -52,6 +53,8 @@
 - [x] 7.3 Carry table-header percent units through deterministic segment extraction, normalize all gross margins to fraction exactly once, and reject invalid values when reconciliation is not applicable.
 - [x] 7.4 Include reported-margin disclosure precision in propagated reconciliation tolerance while retaining a bounded ceiling; add `35.249%` calculated versus `35%` disclosed and a true mismatch regression.
 - [x] 7.5 Catch deterministic unknown-unit and numeric conversion failures per row/document, persist typed machine-rework diagnostics, continue independent rows, and prevent deterministic checkpoint crash loops.
+- [ ] 7.6 When gross-margin reconciliation is `not_applicable` because cost is missing, normalize and range-check the reported margin anyway; emit `publication_blocker` for out-of-range or unit-inconsistent values and prevent automatic promotion.
+- [ ] 7.7 Add a governed power-unit compatibility rule and regression matrix proving `MW`, `mw`, and `mW` all resolve to megawatt (`10^6 W`) while non-power SI compounds retain case-sensitive semantics.
 
 ## 8. Semantic contract and lineage corrections
 
@@ -61,6 +64,7 @@
 - [x] 8.4 Require current runtime/schema/prompt/catalog identities in semantic reuse and report a deterministic stale-reuse reason; verify `reuse` does not replay obsolete runs.
 - [x] 8.5 Treat atomic unit-pending, incomplete identity, and missing evidence as family-blocking conditions; persist machine-rework targets and exclude them from automatic promotion and complete-family reuse.
 - [x] 8.6 Write `source_activity_action` into exposure publication metadata and use the same field in predecessor lookup and collision repair; add `sells` versus `produces` same-commodity lineage tests.
+- [ ] 8.7 Make exposure collision repair recover `source_activity_action` from referenced facts for legacy publications; report `lineage_incomplete` when the fact is absent or action remains unknown, with a sells/produces supersession regression.
 
 ## 9. Worker, recovery, and selection reliability
 
@@ -70,13 +74,15 @@
 - [x] 9.4 Change page selection to preserve explicit pages and table/heading anchors before context pages; emit dropped-anchor diagnostics and avoid silent final page-number truncation.
 - [x] 9.5 Gate quarterly and half-year ingestion on explicit `period_basis`; add a disabled/blocked test proving no monthly interval is inferred when basis is absent.
 - [x] 9.6 Remove the planner's no-op persisted-classification comparison or make the persisted classification authoritative, and add a focused test for the chosen behavior.
+- [ ] 9.7 Determine automation ownership from the latest hold audit (`reviewed_at`, `audit_id`, and reviewer prefix), preserving a later human hold even when an earlier system hold exists.
+- [ ] 9.8 Document the fail-closed policy for `0 < disclosed_share < 1` with a percent unit: emit deterministic machine rework rather than guessing between `0.5%` and fraction `0.5`.
 
 ## 10. Production migration and acceptance
 
-- [ ] 10.1 Run read-only scans for as-of visibility, unit anomalies, stale reuse identities, pending rows, action lineage, held records, and lease-risk work before any LLM call.
-- [ ] 10.2 Apply cleanup only to confirmed non-reusable receipts/runs/work/candidates and orphan checkpoints; preserve approved records, evidence, and review audits; emit a deletion manifest.
-- [ ] 10.3 Re-run targeted `002415.SZ`, `002496.SZ`, and `300750.SZ` flows with `result_policy=reuse`; require zero temporal collisions, false gateway classifications, stale reuse, and duplicate exposure lineage.
+- [ ] 10.1 Run read-only scans for as-of visibility, unit anomalies (including legacy `mw`/`mW` values), stale reuse identities, pending rows, legacy exposure action lineage, held records and latest hold owners, retired runs/receipts, and lease-risk work before any LLM call.
+- [ ] 10.2 Apply cleanup only to confirmed non-reusable receipts/runs/work/candidates and orphan checkpoints, including mode/marker-qualified retired runs; preserve approved records, evidence, and review audits; emit a deletion manifest.
+- [ ] 10.3 Re-run targeted `002415.SZ`, `002496.SZ`, and `300750.SZ` flows with `result_policy=reuse`; require zero temporal collisions, false gateway classifications, stale reuse, duplicate exposure lineage, and verify missing-cost margin blockers plus `mW` megawatt resolution.
 - [ ] 10.4 Validate a new annual report and same-period correction report for append/successor behavior, approved-history visibility, and no accidental deletion.
 - [ ] 10.5 Run the 11-instrument batch only after all gates pass; record LLM calls, retry counts, worker lease events, dropped anchors, publication gaps, and final statuses.
-- [ ] 10.6 Review the implementation against the current HEAD, run focused and business-profile regression suites, and update this change with evidence before archive.
+- [ ] 10.6 Review the implementation against the current HEAD, run focused and business-profile regression suites (including latest-human-hold, legacy-fact-action, missing-cost margin, sub-one-percent share, and power-alias cases), and update this change with evidence before archive.
 - [ ] 10.7 Update the `Deferred Backlog Register` in `design.md` with the disposition of non-blocking findings (format checker, NFKC normalization, structured sync watermark, large-record pagination, approval supersession persistence, catalog monotonicity, source truncation, GBK handling, and bookmark-title dead path) before archive; each item must have an owner or explicit follow-up change.

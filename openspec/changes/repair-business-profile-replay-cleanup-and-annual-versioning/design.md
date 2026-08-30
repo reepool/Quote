@@ -41,17 +41,21 @@
 
 8. **报告流可见性。** `segments` 和 `operating_facts` 的 `valid_from/valid_to` 表示报告观察期间，不得与 `knowledge_from/knowledge_to` 一起形成互斥的当前可见门禁；approved-as-of 查询必须能在公告日及其后 freshness 窗口内返回已批准报告事实。
 
-9. **数值单位语义。** SI 前缀必须区分大小写（`M`/`m`、`G`/`g`、`k`），百分比必须在表头或显式单位进入统一 fraction 表示；披露值的有效精度必须参与 reconciliation 容差计算。
+9. **数值单位语义。** 一般 SI 前缀必须区分大小写（`M`/`m`、`G`/`g`、`k`），百分比必须在表头或显式单位进入统一 fraction 表示；披露值的有效精度必须参与 reconciliation 容差计算。功率目录是明确的业务兼容例外：`MW`、`mw` 和混合大小写 `mW` 均定位为兆瓦，统一换算为 `10^6 W`；该例外不得扩展到其他维度，且必须由目录规则和回归测试锁定。
 
 10. **结构化失败收口。** 未知单位、非法数值和语言契约错误必须在记录或行级转为 typed diagnostic/machine rework；不得让单页或单文档异常逃出 scope，也不得把确定性错误包装成网关拥塞。
 
 11. **复用和并发收敛。** `reuse` 必须比较当前 runtime identities；长任务必须在 lease 到期前续期；stage 级异常必须进入 worker 报告，不能令兄弟任务脱管。人工 `held` 记录不得被自动 contract recovery 拒绝。
 
-12. **派生 lineage。** exposure 的 action 必须同时存在于事实、发布 payload 和 predecessor/collision 审计读取的记录中；`sells` 与 `produces` 的同商品记录不得因缺失 action 被错误串接。
+12. **派生 lineage。** exposure 的 action 必须同时存在于事实、发布 payload 和 predecessor/collision 审计读取的记录中；`sells` 与 `produces` 的同商品记录不得因缺失 action 被错误串接。审计读取旧数据时应优先从 `fact_ids` 反查事实 action，反查不到时显式报告 lineage incomplete。
 
 13. **页面选择不丢锚点。** 页预算是画像上下文预算，不是 PDF 解析器限制。预算不足时必须优先保留显式页和结构化表格锚点，再分配上下文页，并在报告中记录被截断的锚点。
 
 14. **Planner classification 必须有单一权威来源。** 若 planner 持久化 document classification，则后续候选构造和文档族选择必须使用该值；若当前流程不需要持久化值，则删除无效的重复比较，避免看似校验但不影响行为的 no-op 分支。该项为 P2，不得阻塞 P0/P1 主路径。
+
+15. **审核持有权以最新决策为准。** contract recovery 判断 held 记录是否可自动处理时，只读取该记录最新一次 hold 审计的 reviewer 和 decision；早期 system hold 不能覆盖后续 human hold。缺失审计或无法确定 owner 时 fail-closed，保持 held 并报告人工处理。
+
+16. **缺成本仍需先做范围校验。** `segment_cost` 缺失只表示无法执行成本对账，不代表毛利率天然有效。归一化后的 reported margin 越界、单位冲突或无法确定单位时，必须生成 publication blocker 并阻止自动晋升。
 
 ## Risks / Trade-offs
 
@@ -63,9 +67,9 @@
 ## Migration Plan
 
 1. 部署代码和回归测试，但先不启动批量回补。
-2. 对目标样本执行只读扫描，输出 occurrence 冲突、匿名关系分类、receipt 状态和候选依赖。
+2. 对目标样本执行只读扫描，输出 occurrence 冲突、匿名关系分类、receipt 状态和候选依赖；额外统计历史 `mw`/`mW` 功率单位、缺失 action 的 exposure、最新 hold owner 以及 run/receipt 的退役标记。
 3. 在事务中清理确认不可复用的失败或旧 shadow receipt/run/work/candidate，提交后删除失效和孤儿 checkpoint；保留 approved、evidence 和 audit，并记录数据库与文件删除报告。
-4. 定向重放 002415.SZ、002496.SZ 与 300750.SZ；要求零 identity conflict、零错误 gateway 包装、零无效重试。
+4. 定向重放 002415.SZ、002496.SZ 与 300750.SZ；要求零 identity conflict、零错误 gateway 包装、零无效重试，并验证功率单位 `mW` 按兆瓦规则解析。
 5. 验证一份新年度报告和一份同年度更正报告的追加/替代行为。
 6. 通过门禁后恢复 11 只股票批量；任一步失败则停止批量，不自动扩大重试范围。
 
