@@ -3318,6 +3318,7 @@ class DataManager:
                     or 0
                 ),
                 "result_policy": result_policy,
+                "rollout_phase": str(semantic.get("rollout_phase") or ""),
             }
             bound_shared_asset = dict(
                 (item.get("metadata") or {}).get("bound_shared_asset") or {}
@@ -3497,6 +3498,7 @@ class DataManager:
         bound_annual_report_asset: Optional[Mapping[str, Any]] = None,
         reprocess_complete_coverage: bool = False,
         replacement_generation: int = 0,
+        rollout_phase: Optional[str] = None,
     ) -> Dict[str, Any]:
         """Run one real, explicitly scoped semantic-production stage or resume step."""
         if not self.research_config.enabled:
@@ -3733,6 +3735,7 @@ class DataManager:
             identities=identities,
             promotion_manifest_hashes=computed_manifest_hashes,
             source_revision=source_revision,
+            rollout_phase=str(rollout_phase or ""),
         )
         if checkpoint_path:
             resolved_checkpoint = Path(checkpoint_path)

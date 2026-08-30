@@ -233,13 +233,14 @@ class BusinessProfileSemanticRepairService:
         unchanged: list[str] = []
         held: list[str] = []
         missing: list[str] = []
+        lifecycle_ids: list[str] = []
         with self.storage.get_connection() as conn:
             self.storage._apply_pragmas(conn)
             conn.execute("BEGIN IMMEDIATE")
             try:
                 for work_id in requested:
                     row = conn.execute(
-                        "SELECT work_id, instrument_id, status, lease_expires_at, metadata_json "
+                        "SELECT work_id, instrument_id, announcement_id, status, lease_expires_at, metadata_json "
                         "FROM business_profile_work_items WHERE work_id = ?",
                         (work_id,),
                     ).fetchone()
@@ -279,17 +280,40 @@ class BusinessProfileSemanticRepairService:
                                 f"retirement marker is immutable for {work_id}"
                             )
                         unchanged.append(work_id)
-                        continue
-                    metadata["retirement_marker"] = {
-                        "reason": reason,
-                        "timestamp": now,
-                    }
-                    conn.execute(
-                        "UPDATE business_profile_work_items "
-                        "SET metadata_json = ?, updated_at = ? WHERE work_id = ?",
-                        (json.dumps(metadata, ensure_ascii=True, sort_keys=True), now, work_id),
+                    else:
+                        metadata["retirement_marker"] = {
+                            "reason": reason,
+                            "timestamp": now,
+                        }
+                        conn.execute(
+                            "UPDATE business_profile_work_items "
+                            "SET metadata_json = ?, updated_at = ? WHERE work_id = ?",
+                            (json.dumps(metadata, ensure_ascii=True, sort_keys=True), now, work_id),
+                        )
+                        changed.append(work_id)
+                    lifecycle_ids.extend(
+                        self._stamp_retired_lifecycle_rows(
+                            conn,
+                            instrument_id=str(row["instrument_id"]),
+                            source_document_id=str(
+                                metadata.get("source_document_id")
+                                or row["announcement_id"]
+                                or ""
+                            ).strip(),
+                            field_families=tuple(
+                                str(value).strip()
+                                for value in (
+                                    (metadata.get("processing_identity") or {}).get(
+                                        "field_families"
+                                    )
+                                    or ()
+                                )
+                                if str(value).strip()
+                            ),
+                            reason=reason,
+                            timestamp=now,
+                        )
                     )
-                    changed.append(work_id)
                 conn.commit()
             except Exception:
                 conn.rollback()
@@ -300,11 +324,89 @@ class BusinessProfileSemanticRepairService:
             "instrument_id": None,
             "status": "failed" if missing else ("held" if held and not changed else "changed"),
             "reason": "retirement_marker_migrated",
-            **self._id_summary(changed, key="affected_ids"),
+            **self._id_summary([*changed, *lifecycle_ids], key="affected_ids"),
             "unchanged_ids": unchanged,
             "held_ids": held,
             "missing_ids": missing,
         }
+
+    def _stamp_retired_lifecycle_rows(
+        self,
+        conn: Any,
+        *,
+        instrument_id: str,
+        source_document_id: str,
+        field_families: tuple[str, ...],
+        reason: str,
+        timestamp: str,
+    ) -> list[str]:
+        """Mark only runs/receipts explicitly linked to selected work metadata."""
+
+        if not source_document_id:
+            return []
+        clauses = ["instrument_id = ?", "source_document_id = ?"]
+        params: list[Any] = [instrument_id, source_document_id]
+        if field_families:
+            clauses.append("field_family IN (" + ",".join("?" for _ in field_families) + ")")
+            params.extend(field_families)
+        where = " AND ".join(clauses)
+        run_rows = conn.execute(
+            "SELECT run_id, metadata_json FROM business_profile_semantic_runs WHERE " + where,
+            params,
+        ).fetchall()
+        artifact_ids: set[str] = set()
+        affected: list[str] = []
+        for row in run_rows:
+            metadata = self._json_mapping(row["metadata_json"])
+            self._write_immutable_retirement_marker(
+                metadata, reason=reason, timestamp=timestamp, label=str(row["run_id"])
+            )
+            artifact_id = str(metadata.get("semantic_artifact_id") or "").strip()
+            if artifact_id:
+                artifact_ids.add(artifact_id)
+            conn.execute(
+                "UPDATE business_profile_semantic_runs SET metadata_json = ?, updated_at = ? WHERE run_id = ?",
+                (json.dumps(metadata, ensure_ascii=True, sort_keys=True), timestamp, row["run_id"]),
+            )
+            affected.append(str(row["run_id"]))
+        artifact_rows = conn.execute(
+            "SELECT artifact_id, authority_json FROM business_profile_semantic_artifacts WHERE " + where,
+            params,
+        ).fetchall()
+        for row in artifact_rows:
+            artifact_ids.add(str(row["artifact_id"]))
+        for artifact_id in sorted(artifact_ids):
+            row = conn.execute(
+                "SELECT authority_json FROM business_profile_semantic_artifacts WHERE artifact_id = ?",
+                (artifact_id,),
+            ).fetchone()
+            if row is None:
+                continue
+            authority = self._json_mapping(row["authority_json"])
+            self._write_immutable_retirement_marker(
+                authority, reason=reason, timestamp=timestamp, label=artifact_id
+            )
+            conn.execute(
+                "UPDATE business_profile_semantic_artifacts SET authority_json = ? WHERE artifact_id = ?",
+                (json.dumps(authority, ensure_ascii=True, sort_keys=True), artifact_id),
+            )
+            affected.append(artifact_id)
+        return affected
+
+    @staticmethod
+    def _write_immutable_retirement_marker(
+        payload: dict[str, Any], *, reason: str, timestamp: str, label: str
+    ) -> None:
+        marker = payload.get("retirement_marker")
+        if marker is None:
+            payload["retirement_marker"] = {"reason": reason, "timestamp": timestamp}
+            return
+        if (
+            not isinstance(marker, dict)
+            or str(marker.get("reason") or "").strip() != reason
+            or not str(marker.get("timestamp") or "").strip()
+        ):
+            raise ValueError(f"retirement marker is immutable for {label}")
 
     def _all_lifecycle_instrument_ids(self) -> list[str]:
         """Return instruments that own semantic receipts or run manifests."""
@@ -683,18 +785,31 @@ class BusinessProfileSemanticRepairService:
 
     @staticmethod
     def _legacy_shadow_work(row: dict[str, Any]) -> bool:
+        metadata = BusinessProfileSemanticRepairService._json_mapping(
+            row.get("metadata_json")
+        )
+        return BusinessProfileSemanticRepairService._retired_lifecycle_metadata(
+            metadata
+        )
+
+    @staticmethod
+    def _json_mapping(value: Any) -> dict[str, Any]:
         try:
-            metadata = json.loads(row.get("metadata_json") or "{}")
+            parsed = json.loads(value or "{}")
         except (TypeError, ValueError, json.JSONDecodeError):
-            metadata = {}
+            parsed = {}
+        return dict(parsed) if isinstance(parsed, dict) else {}
+
+    @staticmethod
+    def _retired_lifecycle_metadata(metadata: dict[str, Any]) -> bool:
         processing_identity = (
             dict(metadata.get("processing_identity") or {})
-            if isinstance(metadata, dict)
+            if isinstance(metadata.get("processing_identity"), dict)
             else {}
         )
         if str(processing_identity.get("rollout_phase") or "") == "structured_shadow":
             return True
-        marker = metadata.get("retirement_marker") if isinstance(metadata, dict) else None
+        marker = metadata.get("retirement_marker")
         return (
             isinstance(marker, dict)
             and bool(str(marker.get("reason") or "").strip())
@@ -856,7 +971,7 @@ class BusinessProfileSemanticRepairService:
                 (instrument_id,),
             ).fetchall()
             artifact_rows = conn.execute(
-                "SELECT artifact_id, source_document_id, field_family, response_json "
+                "SELECT artifact_id, source_document_id, field_family, response_json, authority_json "
                 "FROM business_profile_semantic_artifacts WHERE instrument_id = ?",
                 (instrument_id,),
             ).fetchall()
@@ -949,6 +1064,13 @@ class BusinessProfileSemanticRepairService:
             for row in rows
             if self._legacy_shadow_work({"metadata_json": row["metadata_json"]})
         }
+        retired_artifact_ids.update(
+            str(row["artifact_id"])
+            for row in artifact_rows
+            if self._retired_lifecycle_metadata(
+                self._json_mapping(row["authority_json"])
+            )
+        )
         for row in artifact_rows:
             artifact_id = str(row["artifact_id"])
             try:
@@ -2023,7 +2145,16 @@ class BusinessProfileSemanticRepairService:
         rows = self.repository.list_records(
             "exposures", instrument_id=instrument_id, limit=10000
         )
+        facts = self.repository.list_records(
+            "exposure_facts", instrument_id=instrument_id, limit=10000
+        )
         by_id = {str(item.get("exposure_id") or ""): item for item in rows}
+        actions_by_fact_id = {
+            str(item.get("fact_id") or ""): str(
+                (item.get("metadata") or {}).get("source_activity_action") or ""
+            ).strip()
+            for item in facts
+        }
         issues: list[dict[str, Any]] = []
         for item in rows:
             if item.get("review_status") != "approved":
@@ -2032,11 +2163,24 @@ class BusinessProfileSemanticRepairService:
             predecessor = by_id.get(predecessor_id)
             if predecessor is None:
                 continue
-            action = str((item.get("metadata") or {}).get("source_activity_action") or "").strip()
-            prior_action = str(
-                (predecessor.get("metadata") or {}).get("source_activity_action") or ""
-            ).strip()
-            if not action or not prior_action or action == prior_action:
+            action, action_reason = self._exposure_action(item, actions_by_fact_id)
+            prior_action, prior_action_reason = self._exposure_action(
+                predecessor, actions_by_fact_id
+            )
+            if action_reason or prior_action_reason:
+                issues.append(
+                    self._issue(
+                        "lineage_incomplete",
+                        instrument_id,
+                        {
+                            "exposure_id": item.get("exposure_id"),
+                            "predecessor_exposure_id": predecessor_id,
+                            "reason": action_reason or prior_action_reason,
+                        },
+                    )
+                )
+                continue
+            if action == prior_action:
                 continue
             issues.append(
                 self._issue(
@@ -2050,6 +2194,36 @@ class BusinessProfileSemanticRepairService:
                 )
             )
         return issues
+
+    @staticmethod
+    def _exposure_action(
+        exposure: dict[str, Any], actions_by_fact_id: dict[str, str]
+    ) -> tuple[str, str | None]:
+        metadata = exposure.get("metadata") or {}
+        published_action = str(
+            (metadata.get("source_activity_action") or "")
+            if isinstance(metadata, dict)
+            else ""
+        ).strip()
+        if published_action:
+            return published_action, None
+        fact_ids = exposure.get("fact_ids") or []
+        if not isinstance(fact_ids, (list, tuple)):
+            return "", "invalid_fact_ids"
+        referenced = [str(value).strip() for value in fact_ids if str(value).strip()]
+        if not referenced:
+            return "", "missing_fact_ids"
+        missing = [fact_id for fact_id in referenced if fact_id not in actions_by_fact_id]
+        actions = {
+            actions_by_fact_id[fact_id]
+            for fact_id in referenced
+            if actions_by_fact_id.get(fact_id)
+        }
+        if missing:
+            return "", "referenced_fact_missing"
+        if len(actions) != 1:
+            return "", "source_activity_action_unknown_or_ambiguous"
+        return next(iter(actions)), None
 
     @staticmethod
     def _snapshot_dates(payload: dict[str, Any]) -> list[Any]:

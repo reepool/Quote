@@ -56,6 +56,17 @@ def test_unit_alias_resolution_is_deterministic():
     assert catalog.resolve_unit("吨每年").unit_id == "tonne/year"
 
 
+@pytest.mark.parametrize("source_unit", ("MW", "mw", "mW"))
+def test_governed_power_compatibility_aliases_resolve_as_megawatt(source_unit):
+    resolution = load_unit_conversion_catalog().resolve(source_unit)
+
+    assert resolution.status == "resolved"
+    assert resolution.dimension == "power"
+    assert resolution.canonical_unit == "watt"
+    assert resolution.multiplier == Decimal("1000000")
+    assert resolution.rule_ids == ("power_compatibility:megawatt",)
+
+
 def test_fixed_conversion_preserves_raw_and_basis_lineage():
     catalog = load_unit_conversion_catalog()
 

@@ -50,6 +50,26 @@ def reconcile_gross_margin(
     """Reconcile ``(revenue - cost) / revenue`` without overwriting source data."""
 
     if revenue is None or segment_cost is None:
+        # A missing cost prevents reconciliation, but it does not make a
+        # reported gross margin trustworthy.  Normalize and validate the
+        # disclosed value before allowing the caller to treat this result as
+        # not applicable for reconciliation purposes.
+        if reported_margin is not None:
+            try:
+                reported = normalize_ratio(reported_margin, reported_margin_unit)
+            except ValueError:
+                return _result("failed", "invalid_reported_margin")
+            if not Decimal("-1") <= reported <= Decimal("1"):
+                return _result(
+                    "failed",
+                    "reported_margin_out_of_range",
+                    reported_value=reported,
+                )
+            return _result(
+                "not_applicable",
+                "missing_revenue_or_cost",
+                reported_value=reported,
+            )
         return _result("not_applicable", "missing_revenue_or_cost")
     if not dimensions_compatible:
         return _result("failed", "incompatible_dimensions")

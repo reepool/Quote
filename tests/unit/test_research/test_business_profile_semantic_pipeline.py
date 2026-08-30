@@ -81,6 +81,22 @@ def test_exact_stage_order_resume_and_unchanged_replay(tmp_path):
     assert resumed["completed_stages"] == ["plan", "select"]
 
 
+def test_rollout_phase_is_persisted_in_the_immutable_checkpoint_scope(tmp_path):
+    pipeline = BusinessProfileSemanticPipeline(
+        config=_config(),
+        checkpoint_store=SemanticProductionCheckpointStore(tmp_path / "checkpoint.json"),
+        handlers=_handlers(),
+    )
+    scope = _scope(rollout_phase="semantic_complete_targeted")
+
+    pipeline.run("plan", scope=scope)
+    checkpoint = SemanticProductionCheckpointStore(tmp_path / "checkpoint.json").load()
+
+    assert checkpoint["scope"]["rollout_phase"] == "semantic_complete_targeted"
+    with pytest.raises(ValueError, match="checkpoint scope"):
+        pipeline.run("resume", scope=_scope(rollout_phase="structured_shadow"))
+
+
 def test_stale_scope_and_budget_checkpoint_are_rejected(tmp_path):
     path = tmp_path / "checkpoint.json"
     pipeline = BusinessProfileSemanticPipeline(

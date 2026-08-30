@@ -95,6 +95,29 @@ def test_explicit_non_success_states(kwargs, status, reason):
     assert result.passed is False
 
 
+def test_missing_cost_does_not_validate_invalid_reported_gross_margin():
+    invalid = reconcile_gross_margin(
+        revenue="100",
+        segment_cost=None,
+        reported_margin="35.2",
+        reported_margin_unit="fraction",
+    )
+    valid = reconcile_gross_margin(
+        revenue="100",
+        segment_cost=None,
+        reported_margin="35",
+        reported_margin_unit="%",
+    )
+
+    assert (invalid.status, invalid.reason, invalid.passed) == (
+        "failed",
+        "reported_margin_out_of_range",
+        False,
+    )
+    assert valid.status == "not_applicable"
+    assert valid.reported_value == Decimal("0.35")
+
+
 def test_program_owned_ratio_share_ranking_and_confidence():
     assert normalize_ratio("18.41", "%") == Decimal("0.1841")
     assert normalize_ratio("18.41", "（%）") == Decimal("0.1841")

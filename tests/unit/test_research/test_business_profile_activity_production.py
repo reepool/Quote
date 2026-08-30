@@ -179,6 +179,27 @@ def test_relationship_share_percentage_is_normalized_and_direction_conflicts_fai
         )
 
 
+def test_sub_one_percent_share_is_fail_closed_instead_of_guessing_units():
+    producer = BusinessProfileActivityProducer(_Repository())
+
+    with pytest.raises(ValueError, match="fraction conflicts with percent"):
+        producer.build_relationship_or_concentration_candidate(
+            {
+                "instrument_id": "601088.SH",
+                "report_period": "2025-12-31",
+                "relationship_type": "sells_to",
+                "anonymous": True,
+                "counterparty_name_raw": "前五大客户",
+                "disclosed_share": 0.5,
+                "disclosed_share_unit": "%",
+            },
+            resolution=GovernedCounterpartyResolver(entities=[]).resolve("前五大客户"),
+            evidence_id="evidence-1",
+            run_id="run-1",
+            data_available_date="2026-03-28",
+        )
+
+
 def test_unresolved_relationship_identity_includes_raw_counterparty_name():
     producer = BusinessProfileActivityProducer(_Repository())
     base = {

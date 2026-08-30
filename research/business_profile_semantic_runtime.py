@@ -1905,6 +1905,7 @@ class BusinessProfileSemanticRuntime:
                             authority={
                                 "source_fields": "authoritative",
                                 "model_derived_hints": "diagnostic_only",
+                                "processing_identity": _scope_processing_identity(scope),
                             },
                         )
                         semantic_artifact_id = str(artifact["artifact_id"])
@@ -2305,6 +2306,7 @@ class BusinessProfileSemanticRuntime:
                                 authority={
                                     "source_fields": "authoritative",
                                     "model_derived_hints": "diagnostic_only",
+                                    "processing_identity": _scope_processing_identity(scope),
                                     "consumer_field_families": [
                                         "atomic_activities",
                                         "named_relationships",
@@ -2556,6 +2558,7 @@ class BusinessProfileSemanticRuntime:
                         "metadata": {
                             "runtime_schema_version": RUNTIME_SCHEMA_VERSION,
                             "runtime_identities": dict(scope.identities),
+                            "processing_identity": _scope_processing_identity(scope),
                             "fact_catalog_version": load_business_fact_catalog().catalog_version,
                             "product_catalog_version": load_business_product_catalog().catalog_version,
                             "result_policy": self.result_policy,
@@ -5408,6 +5411,18 @@ def _structured_artifact_identity(
         prompt_version=STRUCTURED_EXTRACTION_PROMPT_VERSION,
         schema_version=STRUCTURED_EXTRACTION_SCHEMA_VERSION,
     )
+
+
+def _scope_processing_identity(scope: Any) -> dict[str, Any]:
+    """Persist the rollout identity that governs replay and retirement."""
+
+    return {
+        "rollout_phase": str(getattr(scope, "rollout_phase", "") or ""),
+        "field_families": sorted(
+            {str(value) for value in getattr(scope, "field_families", ()) if str(value)}
+        ),
+        "runtime_identities": dict(getattr(scope, "identities", {}) or {}),
+    }
 
 
 def _evidence_context_hash(source_document_id: str, selected_artifact_hash: str) -> str:

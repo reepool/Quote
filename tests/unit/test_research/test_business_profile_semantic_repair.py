@@ -104,6 +104,67 @@ def test_repair_deletes_failed_semantic_receipt_and_converges(tmp_path):
     assert repeated["change_counts"]["unchanged"] == 1
 
 
+def test_legacy_exposure_action_collision_recovers_actions_from_facts(tmp_path):
+    service = BusinessProfileSemanticRepairService(_storage(tmp_path))
+    exposures = [
+        {
+            "exposure_id": "exposure-sales",
+            "review_status": "approved",
+            "supersedes_exposure_id": "exposure-production",
+            "fact_ids": ["fact-sales"],
+            "metadata": {},
+        },
+        {
+            "exposure_id": "exposure-production",
+            "review_status": "approved",
+            "fact_ids": ["fact-production"],
+            "metadata": {},
+        },
+    ]
+    facts = [
+        {"fact_id": "fact-sales", "metadata": {"source_activity_action": "sells"}},
+        {"fact_id": "fact-production", "metadata": {"source_activity_action": "produces"}},
+    ]
+    service.repository.list_records = lambda record_type, **_kwargs: (
+        exposures if record_type == "exposures" else facts
+    )
+
+    issues = service._exposure_collision_findings("601088.SH")
+
+    assert [issue["code"] for issue in issues] == ["exposure_action_collision"]
+    assert issues[0]["details"]["actions"] == ["produces", "sells"]
+
+
+def test_legacy_exposure_action_audit_reports_missing_fact_as_incomplete_lineage(tmp_path):
+    service = BusinessProfileSemanticRepairService(_storage(tmp_path))
+    exposures = [
+        {
+            "exposure_id": "exposure-current",
+            "review_status": "approved",
+            "supersedes_exposure_id": "exposure-prior",
+            "fact_ids": ["fact-current"],
+            "metadata": {},
+        },
+        {
+            "exposure_id": "exposure-prior",
+            "review_status": "approved",
+            "fact_ids": ["removed-fact"],
+            "metadata": {},
+        },
+    ]
+    facts = [
+        {"fact_id": "fact-current", "metadata": {"source_activity_action": "sells"}},
+    ]
+    service.repository.list_records = lambda record_type, **_kwargs: (
+        exposures if record_type == "exposures" else facts
+    )
+
+    issues = service._exposure_collision_findings("601088.SH")
+
+    assert [issue["code"] for issue in issues] == ["lineage_incomplete"]
+    assert issues[0]["details"]["reason"] == "referenced_fact_missing"
+
+
 def test_all_scope_includes_instruments_with_only_failed_lifecycle_rows(tmp_path):
     storage = _storage(tmp_path)
     artifacts = BusinessProfileSemanticArtifactRepository(storage)
@@ -453,6 +514,105 @@ def test_repair_deletes_retired_shadow_artifact_and_run(tmp_path):
         assert conn.execute(
             "SELECT COUNT(*) FROM business_profile_semantic_runs"
         ).fetchone()[0] == 0
+
+
+def test_retirement_marker_propagates_to_linked_run_and_receipt_before_cleanup(tmp_path):
+    storage = _storage(tmp_path)
+    artifacts = BusinessProfileSemanticArtifactRepository(storage)
+    identity = SemanticArtifactIdentity(
+        instrument_id="600007.SH",
+        source_document_id="annual-report-2025",
+        document_hash="a" * 64,
+        report_period="2025-12-31",
+        field_family="atomic_activities",
+        evidence_scope_hash="b" * 64,
+        input_hash="c" * 64,
+        prompt_version="prompt.v1",
+        schema_version="schema.v1",
+    )
+    artifact = artifacts.receive(
+        identity,
+        response={"rows": []},
+        response_hash="",
+        evidence_ids=[],
+        authority={"processing_identity": {"rollout_phase": "daily_incremental"}},
+    )
+    artifacts.mark(artifact["artifact_id"], "converted")
+    now = "2026-08-30T12:00:00+08:00"
+    with storage.get_connection() as conn:
+        conn.execute(
+            """
+            INSERT INTO business_profile_semantic_runs (
+                run_id, instrument_id, source_document_id, field_family, status,
+                bundle_hash, metadata_json, started_at, completed_at, created_at, updated_at
+            ) VALUES ('retirable-run', '600007.SH', 'annual-report-2025',
+                      'atomic_activities', 'completed', 'bundle', ?, ?, ?, ?, ?)
+            """,
+            (
+                json.dumps({"semantic_artifact_id": artifact["artifact_id"]}),
+                now,
+                now,
+                now,
+                now,
+            ),
+        )
+        conn.execute(
+            """
+            INSERT INTO business_profile_work_items (
+                work_id, frontier_id, instrument_id, source, announcement_id,
+                report_period, document_type, policy, processing_identity_hash,
+                stage, status, checkpoint_path, metadata_json, created_at, updated_at
+            ) VALUES ('retirable-work', 'frontier-retirable', '600007.SH', 'cninfo',
+                      'annual-report-2025', '2025-12-31', 'annual_report', 'expanded',
+                      'identity-retirable', 'publish', 'completed', '', ?, ?, ?)
+            """,
+            (
+                json.dumps(
+                    {
+                        "source_document_id": "annual-report-2025",
+                        "processing_identity": {
+                            "rollout_phase": "daily_incremental",
+                            "field_families": ["atomic_activities"],
+                        },
+                    }
+                ),
+                now,
+                now,
+            ),
+        )
+        conn.commit()
+
+    service = BusinessProfileSemanticRepairService(storage)
+    marked = service.run(
+        all_scope=True,
+        apply=True,
+        retirement_work_ids=["retirable-work"],
+        retirement_reason="explicit shadow migration retirement",
+    )
+
+    assert marked["change_counts"]["failed"] == 0
+    assert artifacts.find_replay(identity) is None
+    with storage.get_connection() as conn:
+        run_metadata = json.loads(
+            conn.execute(
+                "SELECT metadata_json FROM business_profile_semantic_runs WHERE run_id = 'retirable-run'"
+            ).fetchone()[0]
+        )
+        receipt_authority = json.loads(
+            conn.execute(
+                "SELECT authority_json FROM business_profile_semantic_artifacts WHERE artifact_id = ?",
+                (artifact["artifact_id"],),
+            ).fetchone()[0]
+        )
+    assert run_metadata["retirement_marker"]["reason"] == "explicit shadow migration retirement"
+    assert receipt_authority["retirement_marker"]["reason"] == "explicit shadow migration retirement"
+
+    cleaned = service.run(all_scope=True, apply=True, cleanup_only=True)
+
+    assert cleaned["change_counts"]["failed"] == 0
+    with storage.get_connection() as conn:
+        assert conn.execute("SELECT COUNT(*) FROM business_profile_semantic_runs").fetchone()[0] == 0
+        assert conn.execute("SELECT COUNT(*) FROM business_profile_semantic_artifacts").fetchone()[0] == 0
 
 
 def test_repair_audit_is_read_only_and_apply_requires_explicit_scope(tmp_path):

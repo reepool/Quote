@@ -282,6 +282,73 @@ def test_contract_recovery_preserves_human_held_record(tmp_path):
     assert repository.get_record("segments", "segment-human-held")["review_status"] == "held"
 
 
+def test_contract_recovery_rejects_automation_owned_hold(tmp_path):
+    storage = _storage(tmp_path)
+    repository = BusinessProfileRepository(storage)
+    _add_evidence(repository)
+    _add_segment(repository, record_id="segment-system-held")
+    review = BusinessProfileReviewService(repository)
+    candidate = repository.get_record("segments", "segment-system-held")
+    review.system_hold_candidate(
+        "segments",
+        "segment-system-held",
+        expected_updated_at=candidate["updated_at"],
+        reason="automated integrity hold",
+    )
+
+    result = BusinessProfileContractRecovery(repository).run()
+
+    assert result["human_held"] == 0
+    assert result["rejected"] == 1
+    assert repository.get_record("segments", "segment-system-held")["review_status"] == "rejected"
+
+
+def test_latest_human_hold_audit_blocks_recovery_after_system_hold(tmp_path):
+    storage = _storage(tmp_path)
+    repository = BusinessProfileRepository(storage)
+    _add_evidence(repository)
+    _add_segment(repository, record_id="segment-later-human-hold")
+    review = BusinessProfileReviewService(repository)
+    candidate = repository.get_record("segments", "segment-later-human-hold")
+    review.system_hold_candidate(
+        "segments",
+        "segment-later-human-hold",
+        expected_updated_at=candidate["updated_at"],
+        reason="automated integrity hold",
+    )
+    # A manual re-hold is a separate immutable audit decision.  The record
+    # remains held, so model the later human decision without reopening it.
+    with storage.get_connection() as conn:
+        conn.execute(
+            """
+            INSERT INTO business_profile_review_audit (
+                audit_id, operation_id, record_type, record_id, instrument_id,
+                decision, prior_status, new_status, prior_version, new_version,
+                prior_updated_at, new_updated_at, record_lineage_hash, reviewer,
+                reason, evidence_references_json, replacement_record_id,
+                prior_audit_hash, audit_hash, metadata_json, reviewed_at, created_at
+            )
+            SELECT 'audit-later-human-hold', 'op-later-human-hold', record_type,
+                   record_id, instrument_id, 'held', 'held', 'held', prior_version,
+                   new_version, prior_updated_at, new_updated_at, record_lineage_hash,
+                   'analyst@example', 'manual re-hold', evidence_references_json,
+                   replacement_record_id, audit_hash, 'audit-hash-later-human-hold',
+                   metadata_json, '2099-01-01T00:00:00+08:00',
+                   '2099-01-01T00:00:00+08:00'
+            FROM business_profile_review_audit
+            WHERE record_type = 'segments' AND record_id = 'segment-later-human-hold'
+            ORDER BY reviewed_at DESC, audit_id DESC LIMIT 1
+            """
+        )
+        conn.commit()
+
+    result = BusinessProfileContractRecovery(repository).run()
+
+    assert result["human_held"] == 1
+    assert result["rejected"] == 0
+    assert repository.get_record("segments", "segment-later-human-hold")["review_status"] == "held"
+
+
 def test_structured_operating_fact_still_uses_structured_contract():
     record = {
         "metadata": {

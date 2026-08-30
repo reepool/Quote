@@ -170,6 +170,8 @@ class BusinessProfileSemanticArtifactRepository:
             ).fetchone()
         if row is None:
             return None
+        if _retired_processing_identity(dict(row)):
+            return None
         latest_status = str(row["latest_status"] or "")
         latest_reason = str(row["latest_reason_code"] or "")
         # A failed conversion is not a reusable semantic result.  The only
@@ -279,6 +281,28 @@ def _bounded_json(value: Any, label: str) -> str:
     if len(payload.encode("utf-8")) > MAX_SEMANTIC_RESPONSE_BYTES:
         raise ValueError(f"{label} exceeds persistence bound")
     return payload
+
+
+def _retired_processing_identity(row: Mapping[str, Any]) -> bool:
+    """A receipt is replayable only while its persisted lifecycle is active."""
+
+    try:
+        authority = json.loads(str(row.get("authority_json") or "{}"))
+    except (TypeError, ValueError, json.JSONDecodeError):
+        return False
+    if not isinstance(authority, Mapping):
+        return False
+    identity = authority.get("processing_identity")
+    if not isinstance(identity, Mapping):
+        identity = {}
+    if str(identity.get("rollout_phase") or "") == "structured_shadow":
+        return True
+    marker = authority.get("retirement_marker")
+    return (
+        isinstance(marker, Mapping)
+        and bool(str(marker.get("reason") or "").strip())
+        and bool(str(marker.get("timestamp") or "").strip())
+    )
 
 
 def _stable_hash(value: Any) -> str:

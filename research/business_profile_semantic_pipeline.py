@@ -97,6 +97,7 @@ class SemanticProductionScope:
     identities: Mapping[str, str]
     promotion_manifest_hashes: Mapping[str, str] = field(default_factory=dict)
     source_revision: str = ""
+    rollout_phase: str = ""
 
     def __post_init__(self) -> None:
         if not self.instruments or not all(
@@ -127,6 +128,7 @@ class SemanticProductionScope:
                     sorted(self.promotion_manifest_hashes.items())
                 ),
                 "source_revision": self.source_revision,
+                "rollout_phase": self.rollout_phase,
             }
         )
 
@@ -379,6 +381,7 @@ class BusinessProfileSemanticPipeline:
                 "identities": dict(scope.identities),
                 "promotion_manifest_hashes": dict(scope.promotion_manifest_hashes),
                 "source_revision": scope.source_revision,
+                "rollout_phase": scope.rollout_phase,
             },
             "budgets_hash": budgets_hash,
             "completed_stages": [],
@@ -486,6 +489,7 @@ class BusinessProfileSemanticPipeline:
             identities=scope.identities,
             promotion_manifest_hashes=scope.promotion_manifest_hashes,
             source_revision=str(result["source_revision"] or ""),
+            rollout_phase=scope.rollout_phase,
         )
         checkpoint["scope_hash"] = rebound_scope.scope_hash
         checkpoint["scope"]["source_revision"] = rebound_scope.source_revision
@@ -803,6 +807,7 @@ def _logical_scope_payload(
             "knowledge_cutoff": scope.knowledge_cutoff,
             "identities": scope.identities,
             "promotion_manifest_hashes": scope.promotion_manifest_hashes,
+            "rollout_phase": scope.rollout_phase,
         }
         if isinstance(scope, SemanticProductionScope)
         else scope
@@ -815,6 +820,7 @@ def _logical_scope_payload(
         "promotion_manifest_hashes": dict(
             sorted(dict(value.get("promotion_manifest_hashes") or {}).items())
         ),
+        "rollout_phase": str(value.get("rollout_phase") or ""),
     }
 
 

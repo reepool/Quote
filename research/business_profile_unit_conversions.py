@@ -586,6 +586,10 @@ _EXACT_TABLE_HEADER_UNIT_ALIASES = {
     "元币种:人民币": "元",
     "单位:元币种:人民币": "元",
 }
+# Annual-report PDF extraction can lose the original capitalization of power
+# units.  This is a narrowly governed compatibility rule for megawatt only;
+# general SI prefix parsing below remains case-sensitive.
+_POWER_COMPATIBILITY_ALIASES = frozenset({"MW", "mw", "mW"})
 _PRIMITIVES: Mapping[str, tuple[str, str, Decimal]] = {
     # currency; cross-currency normalization is intentionally not represented.
     "元": ("currency", "CNY", Decimal("1")),
@@ -892,6 +896,14 @@ def _compose_unit(normalized: str, *, catalog_version: str) -> UnitResolution:
 
 def _resolve_primitive(text: str) -> Optional[_PrimitiveResolution]:
     token = text.strip()
+    if token in _POWER_COMPATIBILITY_ALIASES:
+        return _PrimitiveResolution(
+            "power",
+            "watt",
+            Decimal("1000000"),
+            token,
+            ("power_compatibility:megawatt",),
+        )
     if token in _COUNT_ALIASES or token.lower() in _COUNT_ALIASES:
         return _PrimitiveResolution(
             "count", "unit", Decimal("1"), token, (f"classifier:{token.lower()}",)

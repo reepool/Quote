@@ -61,7 +61,9 @@ class BusinessProfileContractRecovery:
                     self._upsert_blocker(record_type, record_id, row, reasons)
                     approved_blockers += 1
                     continue
-                if status == "held" and not self._automation_owned_hold(row):
+                if status == "held" and not self._automation_owned_hold(
+                    record_type, record_id
+                ):
                     # A hold is an explicit review decision.  Contract recovery
                     # may only revisit a hold that carries automation provenance.
                     human_held += 1
@@ -147,19 +149,23 @@ class BusinessProfileContractRecovery:
             "unit_blocked_recovery": unit_recovery,
         }
 
-    @staticmethod
-    def _automation_owned_hold(row: Mapping[str, Any]) -> bool:
-        """Return true only for a hold carrying explicit automation provenance."""
+    def _automation_owned_hold(self, record_type: str, record_id: str) -> bool:
+        """Use the latest immutable hold audit; ambiguous history stays held."""
 
-        metadata = row.get("metadata")
-        if not isinstance(metadata, Mapping):
-            return False
-        provenance = str(
-            metadata.get("hold_provenance")
-            or metadata.get("review_provenance")
-            or ""
-        ).strip()
-        return provenance.startswith("automation:")
+        with self.storage.get_connection() as conn:
+            self.storage._apply_pragmas(conn)
+            row = conn.execute(
+                """
+                SELECT reviewer
+                FROM business_profile_review_audit
+                WHERE record_type = ? AND record_id = ? AND new_status = 'held'
+                ORDER BY reviewed_at DESC, audit_id DESC
+                LIMIT 1
+                """,
+                (record_type, record_id),
+            ).fetchone()
+        reviewer = str(row["reviewer"] or "").strip() if row is not None else ""
+        return reviewer.startswith(("system:", "automation:"))
 
     def _obsolete_rows(
         self,
