@@ -54,6 +54,7 @@ class DataSourceFactory:
         # 交易日历缓存
         self.trading_calendar_cache: Dict[str, Dict[date, bool]] = {}
         self.daily_coverage_date_cache: Dict[tuple[str, date, date], Optional[date]] = {}
+        self.daily_trading_days_cache: Dict[tuple[str, date, date], List[date]] = {}
         self.daily_stale_source_counts: Dict[tuple[str, str, str, date], int] = {}
         self.daily_stale_source_breakers: set[tuple[str, str, str, date]] = set()
         self.daily_transport_error_counts: Dict[tuple[str, str, str, date], int] = {}
@@ -1381,6 +1382,28 @@ class DataSourceFactory:
                     return None
         return None
 
+    async def _get_requested_trading_days(
+        self,
+        exchange: str,
+        start_date: datetime,
+        end_date: datetime,
+    ) -> List[date]:
+        requested_start = start_date.date() if start_date else end_date.date()
+        requested_end = end_date.date()
+        cache_key = (exchange.upper(), requested_start, requested_end)
+        cached = self.daily_trading_days_cache.get(cache_key)
+        if cached is not None:
+            return cached
+
+        trading_days = await self.get_trading_days(exchange, requested_start, requested_end)
+        normalized_days = [
+            self._quote_date(item)
+            for item in trading_days
+        ]
+        normalized_days = [item for item in normalized_days if item is not None]
+        self.daily_trading_days_cache[cache_key] = normalized_days
+        return normalized_days
+
     async def _get_expected_daily_coverage_date(
         self,
         exchange: str,
@@ -1393,15 +1416,49 @@ class DataSourceFactory:
         if cache_key in self.daily_coverage_date_cache:
             return self.daily_coverage_date_cache[cache_key]
 
-        trading_days = await self.get_trading_days(exchange, requested_start, requested_end)
-        normalized_days = [
-            self._quote_date(item)
-            for item in trading_days
-        ]
-        normalized_days = [item for item in normalized_days if item is not None]
+        normalized_days = await self._get_requested_trading_days(
+            exchange, start_date, end_date
+        )
         expected_date = max(normalized_days) if normalized_days else None
         self.daily_coverage_date_cache[cache_key] = expected_date
         return expected_date
+
+    async def _drop_non_trading_day_daily_quotes(
+        self,
+        data: List[Dict[str, Any]],
+        *,
+        exchange: str,
+        start_date: datetime,
+        end_date: datetime,
+        symbol: str,
+    ) -> List[Dict[str, Any]]:
+        """Drop vendor bars dated on non-trading days before persistence."""
+        if not data:
+            return data
+        trading_days = await self._get_requested_trading_days(
+            exchange, start_date, end_date
+        )
+        if not trading_days:
+            return data
+        allowed = set(trading_days)
+        kept: List[Dict[str, Any]] = []
+        dropped_dates: List[date] = []
+        for row in data:
+            quote_date = self._quote_date(row.get('time'))
+            if quote_date is None or quote_date in allowed:
+                kept.append(row)
+                continue
+            dropped_dates.append(quote_date)
+        if dropped_dates:
+            unique_dropped = sorted(set(dropped_dates))
+            ds_logger.info(
+                "[DataSourceFactory] Dropped %s non-trading-day quote(s) for %s %s: %s",
+                len(dropped_dates),
+                exchange,
+                symbol,
+                ",".join(item.isoformat() for item in unique_dropped),
+            )
+        return kept
 
     async def _validate_daily_date_coverage(
         self,
@@ -1630,7 +1687,13 @@ class DataSourceFactory:
                     )
                 ):
                     ds_logger.debug(f"[DataSourceFactory] Got data from {primary_source.name}: {len(data)} quotes")
-                    return data
+                    return await self._drop_non_trading_day_daily_quotes(
+                        data,
+                        exchange=exchange,
+                        start_date=start_date,
+                        end_date=end_date,
+                        symbol=symbol,
+                    )
                 elif not data:
                     self.last_daily_data_diagnostic["empty"] = True
                     ds_logger.warning(f"[DataSourceFactory] Empty data from {primary_source.name} for {symbol}")
@@ -1693,7 +1756,13 @@ class DataSourceFactory:
                         )
                     ):
                         ds_logger.info(f"[DataSourceFactory] Got data from backup {backup_source.name}: {len(data)} quotes")
-                        return data
+                        return await self._drop_non_trading_day_daily_quotes(
+                            data,
+                            exchange=exchange,
+                            start_date=start_date,
+                            end_date=end_date,
+                            symbol=symbol,
+                        )
                     elif not data:
                         self.last_daily_data_diagnostic["empty"] = True
                         ds_logger.warning(f"[DataSourceFactory] Empty data from backup {backup_source.name} for {symbol}")

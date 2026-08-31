@@ -439,7 +439,7 @@
 - **`enabled`**: 是否启用普通日更追补逻辑。
 - **`exchanges`**: 启用追补的市场，默认覆盖 A 股 `SSE/SZSE/BSE`。
 - **`new_instrument_catchup_days`**: 对本地还没有任何行情的标的，从 `max(listed_date, target_date - N days)` 开始追补；避免新股迟到入库后漏掉上市首日行情。
-- **`short_gap_catchup_days`**: 对已有行情但最新日期落后普通日更窗口的标的，从 `max(latest_quote_date, target_date - N days)` 开始追补。
+- **`short_gap_catchup_days`**: 对已有行情但最新日期落后上一交易日的标的，从 `max(latest_quote_date, target_date - N days)` 开始追补。比较锚点是官方交易日历的上一交易日，不是日历昨日，避免周末把全市场当成短缺口。
 - **`sample_limit`**: 日更报告中保留的追补样例数量。追补窗口被截断或缺少 `listed_date` 时会在报告中暴露，超过窗口的大缺口仍交给 `/backfill` 或 `find_gap_and_repair`。
 
 ### data_config.daily_update_unresolved_retry

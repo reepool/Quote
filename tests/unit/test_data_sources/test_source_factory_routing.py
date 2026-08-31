@@ -782,3 +782,27 @@ class TestSourceFactoryRouting:
         assert self.csindex.get_daily_data.await_count == 4
         breaker_key = ('SSE', 'index', 'csindex_a_stock', datetime(2026, 8, 27).date())
         assert breaker_key not in self.factory.daily_transport_error_breakers
+
+    @pytest.mark.asyncio
+    async def test_index_daily_data_drops_non_trading_day_bars(self):
+        monday = datetime(2026, 8, 31)
+        sunday = datetime(2026, 8, 30)
+        self.factory.db_ops.get_trading_days = AsyncMock(return_value=[monday.date()])
+        self.csindex.get_daily_data = AsyncMock(return_value=[
+            self._index_quote('000842.SH', sunday, 1.0),
+            self._index_quote('000842.SH', monday, 1.0),
+        ])
+
+        rows = await self.factory.get_daily_data(
+            'SSE',
+            '000842.SH',
+            '000842',
+            sunday,
+            monday,
+            instrument_type='index',
+        )
+
+        assert [row['time'] for row in rows] == [monday]
+        self.csindex.get_daily_data.assert_awaited_once()
+        self.baostock.get_daily_data.assert_not_awaited()
+        assert self.factory.db_ops.get_trading_days.await_count == 1

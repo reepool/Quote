@@ -19680,6 +19680,33 @@ class DataManager:
         except Exception:
             return None
 
+    async def _resolve_a_share_previous_trading_day(
+        self,
+        exchange: str,
+        target_date: date,
+    ) -> Optional[date]:
+        """Load the official previous trading day for A-share daily catch-up."""
+        getter = getattr(self.db_ops, 'get_previous_trading_day', None)
+        if not inspect.iscoroutinefunction(getter):
+            return None
+        try:
+            previous_trading_day = self._coerce_date(await getter(exchange, target_date))
+        except Exception as exc:
+            dm_logger.warning(
+                "[DataManager] Failed to load previous trading day for %s %s: %s",
+                exchange,
+                target_date,
+                exc,
+            )
+            return None
+        if previous_trading_day is None:
+            dm_logger.warning(
+                "[DataManager] Previous trading day unknown for %s %s; skip short-gap catch-up",
+                exchange,
+                target_date,
+            )
+        return previous_trading_day
+
     def _resolve_daily_update_fetch_window(
         self,
         *,
@@ -19689,14 +19716,20 @@ class DataManager:
         listed_date: Optional[Any],
         instrument_type: str = 'stock',
         catchup_config: Dict[str, Any],
+        previous_trading_day: Optional[date] = None,
     ) -> Dict[str, Any]:
         """Resolve the per-instrument daily quote fetch window and catch-up reason."""
         exchange_code = str(exchange or '').upper()
         is_a_stock = exchange_code in ('SSE', 'SZSE', 'BSE')
         is_stock = str(instrument_type or '').lower() == 'stock'
+        # A-share fetch window stays calendar-day based. Catch-up lag compares
+        # against the official previous trading day so weekends/holidays are
+        # not treated as a market-wide short gap.
         normal_start = target_date - timedelta(days=1)
+        catchup_anchor = self._coerce_date(previous_trading_day)
         if not is_a_stock:
             normal_start = DateUtils.get_previous_trading_day(exchange_code, target_date)
+            catchup_anchor = normal_start
 
         fetch_start = normal_start
         reason = 'normal_daily_window'
@@ -19722,7 +19755,12 @@ class DataManager:
                 skipped_reason = 'listed_after_target_date'
             else:
                 skipped_reason = 'missing_listed_date'
-        elif catchup_enabled and latest is not None and latest < normal_start:
+        elif (
+            catchup_enabled
+            and latest is not None
+            and catchup_anchor is not None
+            and latest < catchup_anchor
+        ):
             lower_bound = target_date - timedelta(
                 days=int(catchup_config.get('short_gap_catchup_days', 5))
             )
@@ -38289,6 +38327,13 @@ class DataManager:
 
                     last_progress_log = datetime.now()
                     stocks_needing_factors: list = []  # 收集需要同步复权因子的股票品种
+                    is_a_stock = exchange in ('SSE', 'SZSE', 'BSE')
+                    previous_trading_day = None
+                    if is_a_stock:
+                        previous_trading_day = await self._resolve_a_share_previous_trading_day(
+                            exchange,
+                            target_date,
+                        )
 
                     for idx, instrument in enumerate(instruments, start=1):
                         try:
@@ -38317,9 +38362,8 @@ class DataManager:
                                         update_results['integrity_stats']['refetched_incomplete'] += 1
 
                             # 从数据源获取数据
-                            # A 股沿用 calendar-day 锚点；
+                            # A 股抓取窗口沿用 calendar-day 锚点；短缺口比较用上一交易日。
                             # 港股/美股改为前一交易日锚点，仅将 target_date 作为因子业务窗口。
-                            is_a_stock = exchange in ('SSE', 'SZSE', 'BSE')
                             window = self._resolve_daily_update_fetch_window(
                                 exchange=exchange,
                                 target_date=target_date,
@@ -38327,6 +38371,7 @@ class DataManager:
                                 listed_date=instrument.get('listed_date'),
                                 instrument_type=instrument.get('type', 'stock'),
                                 catchup_config=catchup_config,
+                                previous_trading_day=previous_trading_day,
                             )
                             fetch_start_date = window['fetch_start_date']
                             factor_start_date = fetch_start_date

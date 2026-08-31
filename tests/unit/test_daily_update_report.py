@@ -518,6 +518,7 @@ def test_daily_update_short_gap_catchup_window_is_capped():
         target_date=date(2026, 6, 15),
         latest_quote_date=datetime(2026, 6, 1),
         listed_date=datetime(2026, 1, 1),
+        previous_trading_day=date(2026, 6, 12),
         catchup_config={
             'enabled': True,
             'exchanges': {'SSE', 'SZSE', 'BSE'},
@@ -529,6 +530,73 @@ def test_daily_update_short_gap_catchup_window_is_capped():
     assert window['reason'] == 'short_gap_catchup'
     assert window['fetch_start_date'] == date(2026, 6, 10)
     assert window['capped']
+
+
+def test_daily_update_weekend_does_not_treat_friday_as_short_gap():
+    with patch('data_manager.config_manager', _build_config_manager()):
+        manager = DataManager()
+
+    window = manager._resolve_daily_update_fetch_window(
+        exchange='SSE',
+        target_date=date(2026, 8, 31),
+        latest_quote_date=datetime(2026, 8, 28),
+        listed_date=datetime(2020, 1, 1),
+        previous_trading_day=date(2026, 8, 28),
+        catchup_config={
+            'enabled': True,
+            'exchanges': {'SSE', 'SZSE', 'BSE'},
+            'new_instrument_catchup_days': 10,
+            'short_gap_catchup_days': 5,
+        },
+    )
+
+    assert window['reason'] == 'normal_daily_window'
+    assert window['fetch_start_date'] == date(2026, 8, 30)
+    assert not window['capped']
+
+
+def test_daily_update_short_gap_still_triggers_when_behind_previous_trading_day():
+    with patch('data_manager.config_manager', _build_config_manager()):
+        manager = DataManager()
+
+    window = manager._resolve_daily_update_fetch_window(
+        exchange='SSE',
+        target_date=date(2026, 8, 31),
+        latest_quote_date=datetime(2026, 8, 27),
+        listed_date=datetime(2020, 1, 1),
+        previous_trading_day=date(2026, 8, 28),
+        catchup_config={
+            'enabled': True,
+            'exchanges': {'SSE', 'SZSE', 'BSE'},
+            'new_instrument_catchup_days': 10,
+            'short_gap_catchup_days': 5,
+        },
+    )
+
+    assert window['reason'] == 'short_gap_catchup'
+    assert window['fetch_start_date'] == date(2026, 8, 27)
+    assert not window['capped']
+
+
+def test_daily_update_skips_short_gap_when_previous_trading_day_unknown():
+    with patch('data_manager.config_manager', _build_config_manager()):
+        manager = DataManager()
+
+    window = manager._resolve_daily_update_fetch_window(
+        exchange='SSE',
+        target_date=date(2026, 8, 31),
+        latest_quote_date=datetime(2026, 8, 28),
+        listed_date=datetime(2020, 1, 1),
+        catchup_config={
+            'enabled': True,
+            'exchanges': {'SSE', 'SZSE', 'BSE'},
+            'new_instrument_catchup_days': 10,
+            'short_gap_catchup_days': 5,
+        },
+    )
+
+    assert window['reason'] == 'normal_daily_window'
+    assert window['fetch_start_date'] == date(2026, 8, 30)
 
 
 def test_daily_update_catchup_skips_non_stock_instruments():
@@ -1123,6 +1191,78 @@ async def test_update_daily_data_fetches_new_instrument_from_listed_date():
     )
     assert result['catchup_stats']['new_instrument_count'] == 1
     assert result['catchup_stats']['catchup_quotes_added'] == 1
+
+
+@pytest.mark.asyncio
+async def test_update_daily_data_does_not_catchup_whole_market_after_weekend():
+    with patch('data_manager.config_manager', _build_config_manager()):
+        manager = DataManager()
+    manager.data_config['daily_update_catchup'] = {
+        'enabled': True,
+        'exchanges': ['SSE', 'SZSE', 'BSE'],
+        'new_instrument_catchup_days': 10,
+        'short_gap_catchup_days': 5,
+        'sample_limit': 10,
+    }
+    manager._maybe_sync_instrument_master_before_daily_update = AsyncMock(
+        return_value={'status': 'success', 'action': 'synced'}
+    )
+    manager._batch_sync_adjustment_factors = AsyncMock(return_value={'synced': 0})
+    manager._generate_daily_update_report = AsyncMock(return_value={})
+    manager.db_ops = Mock()
+    manager.db_ops.get_active_instruments = AsyncMock(return_value=[{
+        'instrument_id': '600000.SH',
+        'symbol': '600000',
+        'exchange': 'SSE',
+        'type': 'stock',
+        'listed_date': datetime(2020, 1, 1),
+        'source_symbol': '600000',
+    }])
+    manager.db_ops.get_latest_quote_date = AsyncMock(
+        return_value=datetime(2026, 8, 28)
+    )
+    manager.db_ops.get_previous_trading_day = AsyncMock(
+        return_value=date(2026, 8, 28)
+    )
+    manager.db_ops.save_daily_quotes = AsyncMock(return_value={
+        'inserted': 1,
+        'changed': 0,
+        'unchanged': 0,
+        'skipped': 0,
+        'failed': 0,
+        'changelog_written': 1,
+    })
+    manager.source_factory = Mock()
+    manager.source_factory.get_daily_data = AsyncMock(return_value=[{
+        'instrument_id': '600000.SH',
+        'time': datetime(2026, 8, 31),
+        'open': 10,
+        'high': 10,
+        'low': 10,
+        'close': 10,
+        'volume': 1,
+        'amount': 1,
+        'tradestatus': 1,
+        'factor': 1,
+    }])
+
+    with patch('builtins.open', mock_open()):
+        result = await manager.update_daily_data(
+            exchanges=['SSE'],
+            target_date=date(2026, 8, 31),
+            instrument_types=['stock'],
+            run_factor_audit=False,
+        )
+
+    args = manager.source_factory.get_daily_data.await_args.args
+    assert args[3].date() == date(2026, 8, 30)
+    manager.db_ops.get_previous_trading_day.assert_any_await(
+        'SSE',
+        date(2026, 8, 31),
+    )
+    assert result['catchup_stats']['short_gap_count'] == 0
+    assert result['catchup_stats']['catchup_quotes_added'] == 0
+    assert result['success_count'] == 1
 
 
 @pytest.mark.asyncio
