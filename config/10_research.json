@@ -241,7 +241,7 @@
           "note": "Legacy selected-section adapter compatibility switch only. Production extraction and verification use the common LLM gateway profile from config/13_llm.json; provider connection settings are not owned here."
         },
         "semantic_production": {
-          "enabled": true,
+          "enabled": false,
           "promotion_enabled": false,
           "scheduler_enabled": false,
           "retry_limit": 3,
@@ -268,7 +268,7 @@
             "promotion": false,
             "scope_widening": false
           },
-          "note": "Semantic runtime is enabled for bounded shadow processing. Promotion and cron remain disabled until frozen field-family manifests, bounded validation, rollback drills, and exception-backlog gates pass."
+          "note": "Frozen on 2026-09-02: the legacy semantic contract no longer accepts new production writes while the authoritative company-profile product and industry contract is redesigned. Raw annual-report/PDF acquisition and local read-only repair remain available."
         },
         "production_operations": {
           "discovery_enabled": true,

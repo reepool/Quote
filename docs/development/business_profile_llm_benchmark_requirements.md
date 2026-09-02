@@ -1,5 +1,9 @@
 # 公司业务画像 LLM 基准与启用要求
 
+> 历史状态（2026-09-02）：本文件基于旧统一语义合同，不能用于启用新画像生产。
+> 新 benchmark 必须按 `company_profile_product_and_industry_semantic_requirements.md`
+> 的通用合同、行业独立文档和报告期业务 regime 重新设计。
+
 ## 1. 目的和当前边界
 
 本文件定义任意公共网关 provider/model 组合的评估合同，不因公共 profile 已可调用而

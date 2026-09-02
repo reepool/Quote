@@ -11,8 +11,10 @@ OUTLINE_SCHEMA_VERSION = "business_profile_report_outline.v1"
 MANAGEMENT_DISCUSSION_TITLES = (
     "管理层讨论与分析",
     "管理层讨论和分析",
+    "管理层讨论及分析",
     "经营情况讨论与分析",
     "经营情况讨论和分析",
+    "经营情况讨论及分析",
     "经营分析",
 )
 _MAJOR_HEADING_RE = re.compile(
@@ -156,6 +158,42 @@ def locate_business_profile_outline(
                 diagnostics=("toc_printed_page_assumed_without_heading",),
             )
 
+    # Some Hong Kong-style annual reports render the first-level TOC as a
+    # title column followed by a separate page-number column.  There is no
+    # "第X章" marker to feed _toc_entries, but the body still repeats the
+    # first-level titles in its page headers.  Use those headers to establish
+    # a physical-page boundary without scanning the whole document for OCR.
+    layout_management = _layout_toc_management_entry(pages)
+    if layout_management is not None:
+        title, toc_page = layout_management
+        body_pages = [
+            page for page in pages
+            if int(page.get("page_number") or 0) > toc_page
+        ]
+        actual_start = _first_body_title_page(body_pages, title)
+        if actual_start is not None:
+            next_page = _next_body_layout_title_page(
+                body_pages,
+                start_page=actual_start,
+                excluded_title=title,
+            )
+            return BusinessProfileReportOutline(
+                start_page=actual_start,
+                end_page=min(
+                    (next_page or (page_count + 1)) - 1,
+                    page_count,
+                ),
+                source="table_of_contents_layout",
+                confidence="medium" if next_page else "low",
+                chapter_title=title,
+                diagnostics=(
+                    "layout_toc_title_column_mapped_to_body_headers",
+                    "layout_toc_boundary_inferred_from_next_body_title"
+                    if next_page
+                    else "layout_toc_end_boundary_unresolved",
+                ),
+            )
+
     heading_entries = _heading_entries(pages)
     management_heading = _find_management_entry(heading_entries)
     if management_heading is not None:
@@ -272,6 +310,70 @@ def _toc_entries(pages: Sequence[Mapping[str, Any]]) -> list[tuple[int, str, int
                     )
                 )
     return _dedupe_entries(entries)
+
+
+def _layout_toc_management_entry(
+    pages: Sequence[Mapping[str, Any]],
+) -> tuple[str, int] | None:
+    """Find a management title in a title-column/table-style TOC."""
+
+    for page in pages[: min(12, len(pages))]:
+        page_number = int(page.get("page_number") or 0)
+        lines = [str(line).strip() for line in str(page.get("text") or "").splitlines()]
+        for index, line in enumerate(lines):
+            normalized = re.sub(r"\s+", "", line)
+            if not line or not any(candidate in normalized for candidate in MANAGEMENT_DISCUSSION_TITLES):
+                continue
+            # A conventional inline TOC entry was already handled above.  A
+            # title-column entry is followed by a numeric page-number column
+            # elsewhere on the same page, so no page suffix is present here.
+            if re.search(r"\d", line):
+                continue
+            if index + 1 < len(lines) and re.fullmatch(r"\d{1,4}", lines[index + 1]):
+                continue
+            return _clean_title(line), page_number
+    return None
+
+
+def _first_body_title_page(
+    pages: Sequence[Mapping[str, Any]],
+    title: str,
+) -> int | None:
+    wanted = re.sub(r"\s+", "", title)
+    for page in pages:
+        page_number = int(page.get("page_number") or 0)
+        for line in str(page.get("text") or "").splitlines():
+            if re.sub(r"\s+", "", line.strip()) == wanted:
+                return page_number
+    return None
+
+
+def _next_body_layout_title_page(
+    pages: Sequence[Mapping[str, Any]],
+    *,
+    start_page: int,
+    excluded_title: str,
+) -> int | None:
+    """Infer the next top-level title from repeated body headers."""
+
+    excluded = re.sub(r"\s+", "", excluded_title)
+    candidates = {
+        "公司管治",
+        "公司治理",
+        "财务报表",
+        "其他信息",
+    }
+    for page in pages:
+        page_number = int(page.get("page_number") or 0)
+        if page_number <= start_page:
+            continue
+        for line in str(page.get("text") or "").splitlines():
+            normalized = re.sub(r"\s+", "", line.strip())
+            if normalized == excluded:
+                continue
+            if normalized in candidates:
+                return page_number
+    return None
 
 
 def _bookmark_management_entry(

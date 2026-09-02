@@ -23,6 +23,7 @@ from research.business_profile_activity_production import (
     EntityResolution,
     GovernedCounterpartyResolver,
     RELATIONSHIP_IDENTITY_RESOLVED,
+    RELATIONSHIP_IDENTITY_DISCLOSED,
     canonical_relationship_identity_status,
     classify_entity_resolution_exception,
 )
@@ -53,7 +54,9 @@ from research.business_profile_numeric_reconciliation import (
 )
 from research.business_profile_occurrence import (
     normalize_occurrence_material,
+    occurrence_material_from_exact_evidence,
     occurrence_identity_key,
+    semantic_content_fingerprint,
 )
 from research.business_profile_pdf_artifacts import (
     BusinessProfilePdfArtifactStore,
@@ -815,6 +818,123 @@ class BusinessProfileSemanticRuntime:
         self.promotion_service = BusinessProfilePromotionService(
             BusinessProfileReviewService(repository)
         )
+        self._active_publication_manifests: dict[str, str] = {}
+
+    def _create_publication_manifest(
+        self, *, instrument_id: str, scope: Any
+    ) -> str:
+        """Create the durable owner used by one instrument's derived publish."""
+        payload = {
+            "instrument_id": instrument_id,
+            "scope_hash": str(getattr(scope, "scope_hash", "")),
+            "source_revision": str(getattr(scope, "source_revision", "")),
+            "identities": dict(getattr(scope, "identities", {}) or {}),
+        }
+        manifest_id = "publication-manifest-" + hashlib.sha256(
+            json.dumps(payload, sort_keys=True, ensure_ascii=True).encode("utf-8")
+        ).hexdigest()[:32]
+        now = get_shanghai_time().isoformat()
+        with self.storage.get_connection() as conn:
+            self.storage._apply_pragmas(conn)
+            conn.execute(
+                "INSERT INTO business_profile_publication_manifests "
+                "(manifest_id, instrument_id, stage, status, processing_identity_json, "
+                "provenance_json, descendant_ids_json, created_at, updated_at) "
+                "VALUES (?, ?, 'derive_publish', 'running', ?, ?, '{}', ?, ?) "
+                "ON CONFLICT(manifest_id) DO UPDATE SET status='running', "
+                "processing_identity_json=excluded.processing_identity_json, "
+                "provenance_json=excluded.provenance_json, updated_at=excluded.updated_at",
+                (
+                    manifest_id,
+                    instrument_id,
+                    json.dumps(dict(getattr(scope, "identities", {}) or {}), sort_keys=True),
+                    json.dumps({"scope_hash": payload["scope_hash"], "source_revision": payload["source_revision"]}, sort_keys=True),
+                    now,
+                    now,
+                ),
+            )
+            conn.commit()
+        self._active_publication_manifests[instrument_id] = manifest_id
+        return manifest_id
+
+    def _register_publication_descendant(
+        self, manifest_id: str, record_type: str, record_id: str
+    ) -> None:
+        with self.storage.get_connection() as conn:
+            self.storage._apply_pragmas(conn)
+            row = conn.execute(
+                "SELECT descendant_ids_json FROM business_profile_publication_manifests WHERE manifest_id = ?",
+                (manifest_id,),
+            ).fetchone()
+            if row is None:
+                return
+            try:
+                descendants = json.loads(row["descendant_ids_json"] or "{}")
+            except (TypeError, ValueError, json.JSONDecodeError):
+                descendants = {}
+            values = list(descendants.get(record_type) or [])
+            if record_id not in values:
+                values.append(record_id)
+            descendants[record_type] = sorted(set(values))
+            conn.execute(
+                "UPDATE business_profile_publication_manifests SET descendant_ids_json = ?, updated_at = ? WHERE manifest_id = ?",
+                (json.dumps(descendants, sort_keys=True), get_shanghai_time().isoformat(), manifest_id),
+            )
+            conn.commit()
+
+    def _finish_publication_manifest(self, manifest_id: str, *, status: str, reason: str | None = None) -> None:
+        with self.storage.get_connection() as conn:
+            self.storage._apply_pragmas(conn)
+            conn.execute(
+                "UPDATE business_profile_publication_manifests SET status = ?, failure_reason = ?, updated_at = ? WHERE manifest_id = ?",
+                (status, reason, get_shanghai_time().isoformat(), manifest_id),
+            )
+            conn.commit()
+        for instrument_id, active_id in tuple(self._active_publication_manifests.items()):
+            if active_id == manifest_id:
+                self._active_publication_manifests.pop(instrument_id, None)
+
+    def _cleanup_publication_manifests(self, *, reason: str) -> dict[str, Any]:
+        deleted: list[str] = []
+        with self.storage.get_connection() as conn:
+            self.storage._apply_pragmas(conn)
+            conn.execute("BEGIN IMMEDIATE")
+            try:
+                rows = conn.execute(
+                    "SELECT manifest_id, descendant_ids_json FROM business_profile_publication_manifests WHERE manifest_id IN (%s)" % ",".join("?" for _ in self._active_publication_manifests.values()),
+                    tuple(self._active_publication_manifests.values()),
+                ).fetchall() if self._active_publication_manifests else []
+                tables = {
+                    "value_chain_roles": ("company_value_chain_roles", "record_id"),
+                    "exposure_facts": ("company_commodity_exposure_facts", "fact_id"),
+                    "exposures": ("company_commodity_exposures", "exposure_id"),
+                }
+                for row in rows:
+                    try:
+                        descendants = json.loads(row["descendant_ids_json"] or "{}")
+                    except (TypeError, ValueError, json.JSONDecodeError):
+                        descendants = {}
+                    for kind, ids in descendants.items():
+                        spec = tables.get(kind)
+                        if not spec:
+                            continue
+                        table, pk = spec
+                        for record_id in ids or []:
+                            cursor = conn.execute(
+                                f"DELETE FROM {table} WHERE {pk} = ? AND review_status = 'candidate'",
+                                (str(record_id),),
+                            )
+                            if cursor.rowcount:
+                                deleted.append(f"{kind}:{record_id}")
+                    conn.execute(
+                        "UPDATE business_profile_publication_manifests SET status='non_reusable', failure_reason=?, updated_at=? WHERE manifest_id=?",
+                        (reason, get_shanghai_time().isoformat(), row["manifest_id"]),
+                    )
+                conn.commit()
+            except Exception:
+                conn.rollback()
+                raise
+        return {"deleted": deleted, "count": len(deleted)}
 
     def handlers(self) -> dict[str, Callable[..., Mapping[str, Any]]]:
         return {
@@ -895,7 +1015,17 @@ class BusinessProfileSemanticRuntime:
             raise ValueError(
                 "rebuild-publications requires commodity_exposure_publication scope"
             )
-        derived = self._derive_and_publish(scope)
+        try:
+            derived = self._derive_and_publish(scope)
+        except Exception as exc:
+            cleanup = self._cleanup_publication_manifests(
+                reason=f"derive_publish_failed:{type(exc).__name__}"
+            )
+            logger.exception(
+                "business-profile derive/publish failed; cleaned publication descendants=%s",
+                cleanup.get("count", 0),
+            )
+            raise
         effective_scope = self._revised_scope(scope, config)
         artifact = self.stage_store.write(
             "rebuild-publications",
@@ -1249,7 +1379,7 @@ class BusinessProfileSemanticRuntime:
                             artifact=pdf_artifact,
                             instrument_id=plan["instrument_id"],
                             source_document_id=document["identity"],
-                            field_family=selection_family,
+                            field_family=plan["field_family"],
                             templates=templates,
                             page_scope=outline.page_numbers,
                             max_pages_override=adaptive_page_limit,
@@ -1263,7 +1393,7 @@ class BusinessProfileSemanticRuntime:
                                 artifact=pdf_artifact,
                                 instrument_id=plan["instrument_id"],
                                 source_document_id=document["identity"],
-                                field_family=selection_family,
+                                field_family=plan["field_family"],
                                 templates=templates,
                                 page_scope=outline.page_numbers,
                                 max_pages_override=adaptive_page_limit,
@@ -1288,7 +1418,7 @@ class BusinessProfileSemanticRuntime:
                                 artifact=pdf_artifact,
                                 instrument_id=plan["instrument_id"],
                                 source_document_id=document["identity"],
-                                field_family=selection_family,
+                                field_family=plan["field_family"],
                                 templates=templates,
                                 page_scope=outline.page_numbers,
                                 max_pages_override=adaptive_page_limit,
@@ -1518,6 +1648,7 @@ class BusinessProfileSemanticRuntime:
             "origin_counts": {},
         }
         joint_semantic_cache: dict[str, tuple[Any, str]] = {}
+        joint_semantic_failures: dict[str, Exception] = {}
         # A catalog release may make an older quarantined proposal provable.
         # Reconcile it before claiming new semantic work so persisted artifacts
         # are replayed without another extraction request.
@@ -1611,6 +1742,7 @@ class BusinessProfileSemanticRuntime:
             semantic_audit: Mapping[str, Any] | None = None
             semantic_records: list[tuple[str, dict[str, Any]]] = []
             semantic_artifact_id: str | None = None
+            cache_key: str | None = None
             structured_fallback_used = False
             origin = "program_derived"
             expected_non_disclosure = False
@@ -2180,6 +2312,14 @@ class BusinessProfileSemanticRuntime:
                         runtime_identities=scope.identities,
                     )
                     cache_key = artifact_identity.input_hash
+                    if cache_key in joint_semantic_failures:
+                        metrics["joint_semantic_sibling_failure_reuses"] = int(
+                            metrics.get("joint_semantic_sibling_failure_reuses") or 0
+                        ) + 1
+                        metrics["joint_semantic_saved_llm_calls"] = int(
+                            metrics.get("joint_semantic_saved_llm_calls") or 0
+                        ) + 1
+                        raise joint_semantic_failures[cache_key]
                     cached = joint_semantic_cache.get(cache_key)
                     if cached is not None:
                         envelope, semantic_artifact_id = cached
@@ -2402,6 +2542,19 @@ class BusinessProfileSemanticRuntime:
                             llm_calls=-1,
                         )
                     reason = _semantic_failure_reason(exc)
+                    if (
+                        cache_key is not None
+                        and reason not in {"gateway_failure", "blocked_configuration"}
+                    ):
+                        joint_semantic_failures[cache_key] = exc
+                    if semantic_artifact_id is not None and reason != "gateway_failure":
+                        self.semantic_artifacts.mark(
+                            semantic_artifact_id,
+                            "conversion_pending",
+                            runtime_version=RUNTIME_SCHEMA_VERSION,
+                            reason_code=reason,
+                            metadata={"stage": "atomic_record_conversion"},
+                        )
                     if reason == "blocked_configuration":
                         blocker = _semantic_configuration_reason(exc)
                         blocked_configuration_reasons[blocker] = (
@@ -2546,8 +2699,9 @@ class BusinessProfileSemanticRuntime:
                 for record_type in ("activities", "relationships"):
                     for record in records_by_type.get(record_type, []):
                         record["run_id"] = run_id
-                self.repository.persist_document_field_family_bundle(
-                    run={
+                try:
+                    persisted = self.repository.persist_document_field_family_bundle(
+                        run={
                         "run_id": run_id,
                         "instrument_id": item["instrument_id"],
                         "source_document_id": item["document"]["identity"],
@@ -2574,15 +2728,6 @@ class BusinessProfileSemanticRuntime:
                                 value.to_dict() for value in diagnostics
                             ],
                             "semantic_audit": semantic_audit,
-                            "record_ids": {
-                                key: [_record_id(key, row) for row in rows]
-                                for key, rows in records_by_type.items()
-                                if key != "evidence"
-                            },
-                            "evidence_ids": [
-                                row["evidence_id"]
-                                for row in records_by_type.get("evidence", [])
-                            ],
                             "expected_non_disclosure": expected_non_disclosure,
                             "semantic_family_complete": semantic_family_complete,
                             "unit_conversion_pending": unit_conversion_pending,
@@ -2590,9 +2735,19 @@ class BusinessProfileSemanticRuntime:
                                 empty_reason if item_record_count == 0 else None
                             ),
                         },
-                    },
-                    records_by_type=records_by_type,
-                )
+                        },
+                        records_by_type=records_by_type,
+                    )
+                except Exception:
+                    if semantic_artifact_id is not None:
+                        self.semantic_artifacts.mark(
+                            semantic_artifact_id,
+                            "conversion_pending",
+                            runtime_version=RUNTIME_SCHEMA_VERSION,
+                            reason_code="persistence_validation_failed",
+                            metadata={"stage": "semantic_bundle_persistence"},
+                        )
+                    raise
                 logger.info(
                     "business-profile semantic family persisted instrument_id=%s "
                     "field_family=%s run_id=%s records=%s evidence=%s semantic=%s",
@@ -2610,17 +2765,40 @@ class BusinessProfileSemanticRuntime:
                     item.get("field_family"),
                     run_id,
                     _runtime_debug_json(semantic_audit or {}),
-                    _runtime_debug_json(
-                        {
-                            key: [_record_id(key, row) for row in rows]
-                            for key, rows in records_by_type.items()
-                            if key != "evidence"
-                        }
-                    ),
+                    _runtime_debug_json(persisted["record_ids"]),
                 )
+                if not persisted.get("semantic_family_complete", semantic_family_complete):
+                    semantic_family_complete = False
+                    for values in persisted.get("record_dispositions", {}).values():
+                        for disposition in values:
+                            if disposition.get("state") != "blocked":
+                                continue
+                            machine_rework.append(
+                                _rework_item(
+                                    item,
+                                    item["document"],
+                                    str(
+                                        disposition.get("reason_code")
+                                        or "temporal_reuse_conflict"
+                                    ),
+                                    str(disposition.get("requested_id") or ""),
+                                )
+                            )
                 reuse = False
             else:
                 reuse = True
+                persisted = {
+                    "record_ids": {
+                        key: [_record_id(key, row) for row in rows]
+                        for key, rows in records_by_type.items()
+                        if key != "evidence"
+                    },
+                    "evidence_ids": [
+                        row["evidence_id"]
+                        for row in records_by_type.get("evidence", [])
+                    ],
+                    "record_dispositions": {},
+                }
             if semantic_family_complete:
                 metrics["machine_rework_recovered"] += self._resolve_runtime_rework(
                     instrument_id=item["instrument_id"],
@@ -2643,15 +2821,9 @@ class BusinessProfileSemanticRuntime:
                     "run_id": run_id,
                     "reused": reuse,
                     "origin": origin,
-                    "record_ids": {
-                        key: [_record_id(key, row) for row in rows]
-                        for key, rows in records_by_type.items()
-                        if key != "evidence"
-                    },
-                    "evidence_ids": [
-                        row["evidence_id"]
-                        for row in records_by_type.get("evidence", [])
-                    ],
+                    "record_ids": dict(persisted["record_ids"]),
+                    "evidence_ids": list(persisted["evidence_ids"]),
+                    "record_dispositions": dict(persisted["record_dispositions"]),
                     "semantic": semantic_audit is not None,
                     "semantic_audit": semantic_audit,
                     "expected_non_disclosure": expected_non_disclosure,
@@ -3036,6 +3208,7 @@ class BusinessProfileSemanticRuntime:
         budget_stop_reason: str | None = None
         pending_by_batch: dict[tuple[str, str, str], list[dict[str, Any]]] = {}
         target_order: dict[str, int] = {}
+        terminal_verify_outputs: dict[str, tuple[Mapping[str, Any], str]] = {}
 
         if resumed_verification_count:
             logger.info(
@@ -3367,6 +3540,17 @@ class BusinessProfileSemanticRuntime:
                     ]
                     machine_rework.append(exception)
                     new_machine_rework.append(exception)
+                    retryable_verification = (
+                        reason == "gateway_failure"
+                        and bool(failure_diagnostics["exception"].get("retryable", True))
+                    ) or reason == "verification_incomplete"
+                    if not retryable_verification:
+                        run_id = str(target["output"].get("run_id") or "")
+                        if run_id:
+                            terminal_verify_outputs[run_id] = (
+                                target["output"],
+                                reason,
+                            )
                     _log_runtime_semantic_failure(
                         target["output"],
                         reason=reason,
@@ -3384,6 +3568,9 @@ class BusinessProfileSemanticRuntime:
                     "budget_exhausted:elapsed_seconds"
                 ):
                     break
+
+        for output, reason in terminal_verify_outputs.values():
+            self._cleanup_terminal_verify_output(output, reason=reason)
 
         for exception in new_machine_rework:
             _increment_family_reason(
@@ -3581,6 +3768,7 @@ class BusinessProfileSemanticRuntime:
                             record.get("metadata") if isinstance(record.get("metadata"), Mapping) else None
                         )
                         != RELATIONSHIP_IDENTITY_RESOLVED
+                        and not _is_masked_ordinary_disclosed_relationship(record)
                     ):
                         exception_reasons.append("catalog_proposal")
                     promotion = self._promote_record(
@@ -4165,19 +4353,27 @@ class BusinessProfileSemanticRuntime:
             groups: dict[
                 tuple[Any, ...], list[tuple[dict[str, Any], dict[str, Any]]]
             ] = {}
-            for raw in envelope.activities:
+            for activity_ordinal, raw in enumerate(envelope.activities, start=1):
                 assertion = dict(raw)
+                assertion["_occurrence_ordinal"] = activity_ordinal
                 evidence = _semantic_evidence(item, selected, assertion)
+                period_basis = _document_period_basis(item["document"])
+                if period_basis is not None:
+                    assertion["period_basis"], assertion["period_basis_source"] = period_basis
                 # Model output does not own durable row identity.  Derive it
                 # from immutable evidence and row content before activity
                 # construction so a replay produces the same occurrence key
                 # even when assertion ordering or model ids change.
                 assertion["source_row_key"] = _source_row_key(
-                    table_id="semantic_activity",
-                    row_label=str(assertion.get("object_raw") or ""),
+                    table_id="",
+                    row_label=str(evidence.get("evidence_text_hash") or ""),
                     cells={
-                        "action": assertion.get("action"),
-                        "contract_reference_raw": assertion.get("contract_reference_raw"),
+                        "_physical_page": evidence.get("page_number"),
+                        "_row_ordinal": (
+                            _semantic_evidence_match_ordinal(assertion)
+                            or activity_ordinal
+                        ),
+                        "_normalized_quote": _semantic_evidence_quote(assertion),
                     },
                     evidence_id=evidence["evidence_id"],
                 )
@@ -4265,6 +4461,8 @@ class BusinessProfileSemanticRuntime:
                     object_raw=record.get("object_raw"),
                     source_row_key=record.get("metadata", {}).get("source_row_key"),
                     contract_reference_raw=record.get("metadata", {}).get("contract_reference_raw"),
+                    occurrence_ordinal=projection_assertion.get("_occurrence_ordinal"),
+                    normalized_quote=_semantic_evidence_quote(projection_assertion),
                 )
                 output.append(("activities", record))
 
@@ -4294,10 +4492,12 @@ class BusinessProfileSemanticRuntime:
                     )
                     output.append(("operating_facts", fact))
 
+            _bind_semantic_transformation_lineage(output)
+
         relationships = (
             envelope.relationships if "relationships" in selected_types else ()
         )
-        for raw in relationships:
+        for relationship_ordinal, raw in enumerate(relationships, start=1):
             assertion = dict(raw)
             evidence = _semantic_evidence(item, selected, assertion)
             counterparty = str(assertion.get("counterparty_name_raw") or "").strip()
@@ -4310,13 +4510,15 @@ class BusinessProfileSemanticRuntime:
                 )
             ).strip().lower()
             assertion["source_row_key"] = _source_row_key(
-                table_id="semantic_relationship",
-                row_label=counterparty,
+                table_id="",
+                row_label=str(evidence.get("evidence_text_hash") or ""),
                 cells={
-                    "relationship_type": assertion.get("relationship_type"),
-                    "object_raw": assertion.get("object_raw"),
-                    "disclosed_share": assertion.get("disclosed_share"),
-                    "relationship_scope": assertion["relationship_scope"],
+                    "_physical_page": evidence.get("page_number"),
+                    "_row_ordinal": (
+                        _semantic_evidence_match_ordinal(assertion)
+                        or relationship_ordinal
+                    ),
+                    "_normalized_quote": _semantic_evidence_quote(assertion),
                 },
                 evidence_id=evidence["evidence_id"],
             )
@@ -4369,6 +4571,7 @@ class BusinessProfileSemanticRuntime:
             record["metadata"].update(
                 {
                     "semantic_assertion_id": assertion["relationship_id"],
+                    "relationship_scope": assertion.get("relationship_scope"),
                     "semantic_synthesis": True,
                     "semantic_contract": (
                         "semantic_synthesis_independent_from_transcription.v1"
@@ -4384,6 +4587,8 @@ class BusinessProfileSemanticRuntime:
                 object_raw=assertion.get("object_raw"),
                 source_row_key=assertion.get("source_row_key"),
                 contract_reference_raw=assertion.get("contract_reference_raw"),
+                occurrence_ordinal=relationship_ordinal,
+                normalized_quote=_semantic_evidence_quote(assertion),
             )
             output.append((record_type, record))
         records["evidence"] = list(evidence_by_id.values())
@@ -4620,7 +4825,12 @@ class BusinessProfileSemanticRuntime:
                 runtime_identities=scope.identities,
                 evidence_references=tuple(value for value in (evidence_id,) if value),
                 exception_reasons=exception_reasons,
-                metadata={"source_document_id": source_document_id},
+                metadata={
+                    "source_document_id": source_document_id,
+                    "confirm_disclosed_name_only": _is_masked_ordinary_disclosed_relationship(
+                        record
+                    ),
+                },
             ),
             manifest,
         )
@@ -4634,6 +4844,9 @@ class BusinessProfileSemanticRuntime:
             "gaps": [],
         }
         for instrument_id in scope.instruments:
+            publication_owner_id = self._create_publication_manifest(
+                instrument_id=instrument_id, scope=scope
+            )
             approved_activities = self.repository.get_approved_as_of(
                 "activities", instrument_id=instrument_id, cutoff=scope.knowledge_cutoff
             )
@@ -4683,6 +4896,7 @@ class BusinessProfileSemanticRuntime:
                     activities,
                     supporting_facts=operating_facts,
                 ):
+                    role.setdefault("metadata", {})["publication_manifest_id"] = publication_owner_id
                     evidence_ids = list(
                         dict.fromkeys(
                             str(value)
@@ -4771,6 +4985,11 @@ class BusinessProfileSemanticRuntime:
                         )
                         continue
                     try:
+                        self._register_publication_descendant(
+                            publication_owner_id,
+                            "value_chain_roles",
+                            str(role["record_id"]),
+                        )
                         self.repository.upsert("value_chain_roles", role)
                     except (ValueError, KeyError) as exc:
                         gap = {
@@ -4825,13 +5044,20 @@ class BusinessProfileSemanticRuntime:
                     }:
                         continue
                     try:
-                        fact = producer.build_from_activity(activity)
+                        fact = producer.build_from_activity(
+                            activity, lifecycle_owner_id=publication_owner_id
+                        )
                         evidence = self.repository.get_record(
                             "evidence", str(fact.get("evidence_id") or "")
                         )
                         if evidence is None:
                             raise ValueError("exposure fact source evidence is missing")
                         _bind_promotion_validation(fact, evidence)
+                        self._register_publication_descendant(
+                            publication_owner_id,
+                            "exposure_facts",
+                            str(fact["fact_id"]),
+                        )
                         self.repository.upsert("exposure_facts", fact)
                         fact = self._find_record("exposure_facts", fact["fact_id"])
                         if manifest is not None:
@@ -4904,6 +5130,10 @@ class BusinessProfileSemanticRuntime:
                             knowledge_cutoff=scope.knowledge_cutoff,
                             promotion_manifest=publication_manifest,
                             promotion_gates=publication_gates,
+                            lifecycle_owner_id=publication_owner_id,
+                            register_descendant=lambda kind, record_id: self._register_publication_descendant(
+                                publication_owner_id, kind, record_id
+                            ),
                         )
                         result["publications"].append(publication)
                         if publication.get("status") in {"published", "unchanged"}:
@@ -4936,6 +5166,15 @@ class BusinessProfileSemanticRuntime:
                                 "exception": persisted,
                             }
                         )
+            if any(item.get("tier") == "machine_rework" for item in result["gaps"]):
+                self._cleanup_publication_manifests(reason="derive_publish_partial_failure")
+                self._finish_publication_manifest(
+                    publication_owner_id,
+                    status="non_reusable",
+                    reason="derive_publish_partial_failure",
+                )
+            else:
+                self._finish_publication_manifest(publication_owner_id, status="completed")
         return result
 
     def _due_rework_reasons(
@@ -5053,6 +5292,72 @@ class BusinessProfileSemanticRuntime:
                 ).fetchone()
                 is not None
             )
+
+    def _cleanup_terminal_verify_output(
+        self, output: Mapping[str, Any], *, reason: str
+    ) -> None:
+        """Invalidate one failed semantic owner and remove only its candidates."""
+
+        run_id = str(output.get("run_id") or "")
+        instrument_id = str(output.get("instrument_id") or "")
+        if not run_id or not instrument_id:
+            return
+        tables = {
+            "activities": ("company_business_activities", "activity_id"),
+            "operating_facts": ("company_operating_facts", "record_id"),
+            "relationships": ("company_supply_chain_relationships", "relationship_id"),
+        }
+        with self.storage.get_connection() as conn:
+            self.storage._apply_pragmas(conn)
+            conn.execute("BEGIN IMMEDIATE")
+            try:
+                for record_type, record_ids in dict(output.get("record_ids") or {}).items():
+                    table_spec = tables.get(str(record_type))
+                    if table_spec is None:
+                        continue
+                    table, primary_key = table_spec
+                    for record_id in record_ids or ():
+                        conn.execute(
+                            f"DELETE FROM {table} WHERE {primary_key} = ? "
+                            "AND instrument_id = ? AND review_status = 'candidate'",
+                            (str(record_id), instrument_id),
+                        )
+                row = conn.execute(
+                    "SELECT metadata_json FROM business_profile_semantic_runs WHERE run_id = ?",
+                    (run_id,),
+                ).fetchone()
+                if row is not None:
+                    try:
+                        metadata = json.loads(row["metadata_json"] or "{}")
+                    except (TypeError, ValueError, json.JSONDecodeError):
+                        metadata = {}
+                    metadata["reusable"] = False
+                    metadata["terminal_verify_failure"] = reason
+                    conn.execute(
+                        "UPDATE business_profile_semantic_runs SET status = 'failed', "
+                        "error_code = ?, metadata_json = ?, updated_at = ? WHERE run_id = ?",
+                        (
+                            reason,
+                            json.dumps(metadata, ensure_ascii=False, sort_keys=True),
+                            get_shanghai_time().isoformat(),
+                            run_id,
+                        ),
+                    )
+                conn.commit()
+            except Exception:
+                conn.rollback()
+                raise
+        semantic_audit = output.get("semantic_audit")
+        if isinstance(semantic_audit, Mapping):
+            artifact_id = str(semantic_audit.get("semantic_artifact_id") or "")
+            if artifact_id:
+                self.semantic_artifacts.mark(
+                    artifact_id,
+                    "rejected",
+                    runtime_version=RUNTIME_SCHEMA_VERSION,
+                    reason_code="terminal_verify_failure",
+                    metadata={"run_id": run_id, "reason": reason},
+                )
 
     def _reusable_semantic_family(
         self,
@@ -5228,6 +5533,7 @@ class BusinessProfileSemanticRuntime:
             if not source_row_key or identity_quality not in {
                 "derived_from_evidence",
                 "parser_supplied",
+                "physical_source_coordinates",
             }:
                 return True
         return False
@@ -6057,6 +6363,109 @@ def _semantic_activity_group_key(assertion: Mapping[str, Any]) -> tuple[Any, ...
     )
 
 
+def _bind_semantic_transformation_lineage(
+    records: Sequence[tuple[str, dict[str, Any]]],
+) -> None:
+    activities = [record for record_type, record in records if record_type == "activities"]
+
+    def matching_ids(
+        labels: Sequence[Any],
+        *,
+        source: Mapping[str, Any],
+    ) -> tuple[list[str], str]:
+        normalized_labels = list(
+            dict.fromkeys(
+                normalize_product_alias(label)
+                for label in labels
+                if normalize_product_alias(label)
+            )
+        )
+        if not normalized_labels:
+            return [], "incomplete"
+        source_bundle_hash = str(
+            (source.get("metadata") or {}).get("selected_artifact_hash") or ""
+        )
+        resolved: list[str] = []
+        for label in normalized_labels:
+            label_matches: list[str] = []
+            for candidate in activities:
+                candidate_metadata = candidate.get("metadata") or {}
+                candidate_bundle_hash = str(
+                    candidate_metadata.get("selected_artifact_hash") or ""
+                )
+                if (
+                    source_bundle_hash
+                    and candidate_bundle_hash
+                    and source_bundle_hash != candidate_bundle_hash
+                ):
+                    continue
+                candidate_key = normalize_product_alias(candidate.get("object_raw"))
+                if not candidate_key:
+                    continue
+                if (
+                    label == candidate_key
+                    or (len(label) >= 2 and label in candidate_key)
+                    or (len(candidate_key) >= 2 and candidate_key in label)
+                ):
+                    label_matches.append(str(candidate["activity_id"]))
+            label_matches = list(dict.fromkeys(label_matches))
+            if not label_matches:
+                return [], "incomplete"
+            if len(label_matches) != 1:
+                return [], "ambiguous"
+            resolved.extend(label_matches)
+        return list(dict.fromkeys(resolved)), "bound"
+
+    for activity in activities:
+        if str(activity.get("action") or "") != "processes":
+            continue
+        metadata = activity.setdefault("metadata", {})
+        inputs = list(metadata.get("transformation_input_objects_raw") or [])
+        outputs = list(metadata.get("transformation_output_objects_raw") or [])
+        input_ids, input_status = matching_ids(inputs, source=activity)
+        output_ids, output_status = matching_ids(outputs, source=activity)
+        status = (
+            "ambiguous"
+            if "ambiguous" in {input_status, output_status}
+            else "incomplete"
+            if "incomplete" in {input_status, output_status}
+            or set(input_ids).intersection(output_ids)
+            else "bound"
+        )
+        # A filing can state a complete conversion in one assertion (for
+        # example recycled material -> lithium salt) without separately
+        # asserting standalone input/output activities.  That is sufficient
+        # lineage only when both labels live in this exact evidence assertion.
+        if (
+            status == "incomplete"
+            and input_status == output_status == "incomplete"
+            and inputs
+            and outputs
+            and isinstance(metadata.get("exact_evidence"), Mapping)
+            and not set(
+                normalize_product_alias(value) for value in inputs
+            ).intersection(
+                normalize_product_alias(value) for value in outputs
+            )
+        ):
+            status = "assertion_bound"
+            metadata["transformation_component_evidence_id"] = str(
+                activity.get("evidence_id") or ""
+            )
+        metadata["transformation_input_activity_ids"] = input_ids
+        metadata["transformation_output_activity_ids"] = output_ids
+        metadata["transformation_lineage_status"] = status
+
+
+def _document_period_basis(document: Mapping[str, Any]) -> tuple[str, str] | None:
+    if str(document.get("document_type") or "") in {
+        "annual_report",
+        "annual_report_correction",
+    }:
+        return "period_total", "annual_document_type"
+    return None
+
+
 def _has_atomic_measurement(assertion: Mapping[str, Any]) -> bool:
     value = assertion.get("source_value")
     if value is None:
@@ -6169,6 +6578,8 @@ def _atomic_activity_operating_fact(
             "value": value_raw,
             "unit": unit_raw,
             "occurrence_ordinal": occurrence_ordinal,
+            "_row_ordinal": occurrence_ordinal,
+            "_metric_slot": source_label or fact_type,
         },
         evidence_id=evidence_id,
     )
@@ -6264,7 +6675,7 @@ def _atomic_activity_operating_fact(
             "object_raw": object_raw,
             "source_label_raw": source_label or fact_scope,
             "source_row_key": source_row_key,
-            "occurrence_identity_quality": "derived_from_evidence",
+            "occurrence_identity_quality": "physical_source_coordinates",
             "contract_reference_raw": assertion.get("contract_reference_raw"),
             "source_value_raw": value_raw,
             "source_unit_raw": unit_raw,
@@ -6390,12 +6801,17 @@ def _source_row_key(
         instrument_id="",
         report_period="",
         source_document_id=table_id,
-        evidence_id=evidence_id,
-        source_row_key=row_label,
-        object_raw=row_label,
-        action_or_relationship=table_id,
+        page_number=cells.get("_physical_page"),
+        source_row_key=(
+            cells.get("_row_ordinal")
+            or cells.get("row_ordinal")
+            or cells.get("occurrence_ordinal")
+            or row_label
+        ),
+        table_id=table_id,
+        metric_slot=cells.get("_metric_slot") or cells.get("metric_slot"),
+        normalized_quote=cells.get("_normalized_quote") or cells.get("quote"),
     )
-    material["cells"] = {str(key): str(value) for key, value in cells.items()}
     return "row-" + occurrence_identity_key(material).split(":", 1)[1][:24]
 
 
@@ -6409,29 +6825,93 @@ def _bind_occurrence_identity(
     source_row_key: Any = None,
     contract_reference_raw: Any = None,
     occurrence_ordinal: Any = None,
+    normalized_quote: Any = None,
 ) -> None:
     """Attach the canonical material used by replay and temporal governance."""
 
     metadata = record.setdefault("metadata", {})
-    material = normalize_occurrence_material(
+    exact_evidence = metadata.get("exact_evidence")
+    if not isinstance(exact_evidence, Mapping):
+        exact_evidence = {}
+    metric_slot = metadata.get("metric_slot") or metadata.get("source_header")
+    if not metric_slot:
+        # A physical row may carry several independent logical facts (for
+        # example produces/sells or customer/supplier concentration shares).
+        # Keep that slot discriminator source-derived and stable across runs.
+        slot_parts = (
+            metadata.get("anonymous_label"),
+            metadata.get("source_label_raw"),
+            action_or_relationship,
+            record.get("fact_type"),
+            object_raw or metadata.get("object_raw"),
+        )
+        metric_slot = ":".join(
+            str(part).strip() for part in slot_parts if str(part or "").strip()
+        ) or None
+    material = occurrence_material_from_exact_evidence(
         instrument_id=record.get("instrument_id"),
         report_period=record.get("report_period"),
         source_document_id=source_document_id,
-        evidence_id=evidence_id,
-        page_number=metadata.get("page_number"),
-        section_id=metadata.get("section_id"),
+        exact_evidence=exact_evidence,
         source_row_key=source_row_key or metadata.get("source_row_key"),
-        contract_reference_raw=contract_reference_raw
-        or metadata.get("contract_reference_raw"),
-        subject_scope=record.get("subject_scope"),
-        object_raw=object_raw or record.get("object_raw") or metadata.get("object_raw"),
-        object_id=record.get("object_id"),
-        action_or_relationship=action_or_relationship,
-        segment_id=record.get("segment_id"),
-        occurrence_ordinal=occurrence_ordinal,
+        metric_slot=metric_slot,
+        normalized_quote=(
+            normalized_quote
+            or metadata.get("normalized_quote")
+            or metadata.get("evidence_quote")
+        ),
+        narrative_match_ordinal=(
+            occurrence_ordinal
+            if occurrence_ordinal is not None
+            else exact_evidence.get("same_page_match_ordinal")
+        ),
     )
+    metadata["source_occurrence_material"] = material
     metadata["occurrence_material"] = material
     metadata["occurrence_identity"] = occurrence_identity_key(material)
+    metadata["semantic_content_fingerprint"] = semantic_content_fingerprint(
+        subject_scope=record.get("subject_scope"),
+        action_or_relationship=action_or_relationship,
+        object_raw=object_raw or record.get("object_raw") or metadata.get("object_raw"),
+        object_id=record.get("object_id"),
+        segment_id=record.get("segment_id"),
+        contract_reference_raw=contract_reference_raw or metadata.get("contract_reference_raw"),
+        value=(
+            record.get("value")
+            if record.get("value") is not None
+            else record.get("value_raw")
+        ),
+        unit=(
+            record.get("unit")
+            if record.get("unit") is not None
+            else record.get("unit_raw")
+        ),
+    )
+
+
+def _semantic_evidence_match_ordinal(assertion: Mapping[str, Any]) -> int | None:
+    """Read a source-span ordinal without using raw text offsets as identity."""
+
+    evidence = assertion.get("evidence")
+    if not isinstance(evidence, Mapping):
+        return None
+    value = evidence.get("same_page_match_ordinal")
+    return int(value) if str(value or "").isdigit() else None
+
+
+def _semantic_evidence_quote(assertion: Mapping[str, Any]) -> str | None:
+    """Return normalized source text for narrative occurrence identity."""
+
+    evidence = assertion.get("evidence")
+    if not isinstance(evidence, Mapping):
+        return None
+    spans = evidence.get("evidence_spans") or []
+    quotes = [
+        str(span.get("quote") or "").strip()
+        for span in spans
+        if isinstance(span, Mapping) and str(span.get("quote") or "").strip()
+    ]
+    return " ".join(quotes) or None
 
 
 def _ambiguous_operating_row_groups(
@@ -6807,6 +7287,28 @@ def _bind_promotion_validation(
         ),
         "no_conflicts": not bool(metadata.get("publication_blocker")),
     }
+
+
+def _is_masked_ordinary_disclosed_relationship(record: Mapping[str, Any]) -> bool:
+    """Return whether an exact-evidence masked contract name is complete.
+
+    ``客户 A(1)`` is intentionally not an entity resolution request.  It is a
+    disclosed filing label, so treating it as a missing catalog entity would
+    manufacture an unnecessary catalog-proposal exception.
+    """
+
+    if not bool(record.get("anonymous")):
+        return False
+    metadata = record.get("metadata")
+    if not isinstance(metadata, Mapping):
+        return False
+    return (
+        str(metadata.get("relationship_scope") or "").strip().lower()
+        == "ordinary"
+        and canonical_relationship_identity_status(metadata)
+        == RELATIONSHIP_IDENTITY_DISCLOSED
+        and isinstance(metadata.get("exact_evidence"), Mapping)
+    )
 
 
 def _select_current_semantic_activities(
@@ -7227,6 +7729,8 @@ def _semantic_failure_reason(exc: Exception) -> str:
         return "evidence_provenance_failed"
     if "schema" in text or "schema_validation_failed" in row_categories:
         return "schema_failure"
+    if "semantic verification batch omitted" in text:
+        return "verification_incomplete"
     if (
         "target ids" in text
         or "target_id" in text

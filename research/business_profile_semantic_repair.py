@@ -31,14 +31,45 @@ from research.shareholder_snapshot_policy import (
 )
 from research.shareholder_sync import ShareholderShadowSyncService
 from research.business_profile_semantic_runtime import RUNTIME_SCHEMA_VERSION
+from research.business_profile_occurrence import (
+    occurrence_identity_key,
+    occurrence_material_from_exact_evidence,
+    semantic_content_fingerprint_from_record,
+)
 from utils.date_utils import get_shanghai_time
 
 
 REPAIR_SCHEMA_VERSION = "business_profile_semantic_repair.v1"
-OBSOLETE_WORK_STATUSES = frozenset(
-    {"machine_rework", "superseded", "terminal_failure"}
-)
+OBSOLETE_WORK_STATUSES = frozenset({"superseded", "terminal_failure"})
 MANIFEST_ID_SAMPLE_LIMIT = 100
+PUBLICATION_MANIFEST_STALE_SECONDS = 3600
+
+
+def _checkpoint_knowledge_cutoff_local(path: Path) -> str | None:
+    if not path.is_file():
+        return None
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, TypeError, ValueError, json.JSONDecodeError):
+        return None
+    scope = payload.get("scope") if isinstance(payload, dict) else None
+    value = scope.get("knowledge_cutoff") if isinstance(scope, dict) else None
+    return str(value or "")[:10] or None
+_INCOMPATIBLE_APPROVED_OCCURRENCES = {
+    "002496.SZ": {
+        "activity_id": "activity:0faef4e854bcd38cc4d66f8e8cfcbebe",
+        "operating_fact_id": "bp-operating-3f653a092261c442c4c9bdaa",
+        "evidence_id": "bp-evidence-7303f5a07c5004b7ce7ab7de",
+        "source_document_id": "shared-asset:asset_4678a73d576881f1f73714ace2cd3151",
+        "report_period": "2025-12-31",
+        "action": "hedges",
+        "object_raw": "套期工具",
+        "value": 734770360.0,
+        "unit": "万元",
+        "fact_type": "other_measurement",
+        "fact_scope": "套期工具:hedges",
+    }
+}
 
 
 class BusinessProfileSemanticRepairService:
@@ -833,11 +864,44 @@ class BusinessProfileSemanticRepairService:
         status = str(row.get("status") or "")
         if status in OBSOLETE_WORK_STATUSES:
             return f"work_status_{status}"
+        if status == "machine_rework":
+            metadata = cls._json_mapping(row.get("metadata_json"))
+            if cls._machine_rework_checkpoint_recoverable(row, metadata):
+                return None
+            return "machine_rework_checkpoint_non_recoverable"
         if not cls._legacy_shadow_work(row):
             return None
         if status == "running" and str(row.get("lease_expires_at") or "") > now:
             return None
         return "retired_structured_shadow"
+
+    @classmethod
+    def _machine_rework_checkpoint_recoverable(
+        cls, row: dict[str, Any], metadata: dict[str, Any]
+    ) -> bool:
+        """Compute checkpoint recoverability from persisted scope, not a flag."""
+        identity = metadata.get("processing_identity")
+        if not isinstance(identity, dict) or not identity:
+            return False
+        if metadata.get("artifact_reusable") is False:
+            return False
+        checkpoint_path = Path(str(row.get("checkpoint_path") or ""))
+        cutoff = str(metadata.get("knowledge_cutoff") or "")[:10]
+        if not cutoff:
+            cutoff = _checkpoint_knowledge_cutoff_local(checkpoint_path)
+        if not cutoff:
+            return False
+        try:
+            from research.business_profile_async_production import _checkpoint_matches_work_scope
+
+            return _checkpoint_matches_work_scope(
+                checkpoint_path,
+                instrument_id=str(row.get("instrument_id") or ""),
+                knowledge_cutoff=cutoff,
+                processing_identity=identity,
+            )
+        except (OSError, TypeError, ValueError, json.JSONDecodeError, ImportError):
+            return False
 
     def _audit_instrument(self, instrument_id: str) -> dict[str, Any]:
         issues: list[dict[str, Any]] = []
@@ -893,9 +957,244 @@ class BusinessProfileSemanticRepairService:
                 }))
         issues.extend(self._activity_and_role_findings(instrument_id))
         issues.extend(self._operating_fact_findings(instrument_id))
+        incompatible_occurrence = self._incompatible_approved_occurrence_finding(
+            instrument_id
+        )
+        if incompatible_occurrence is not None:
+            issues.append(incompatible_occurrence)
         issues.extend(self._incompatible_artifact_findings(instrument_id))
         issues.extend(self._exposure_collision_findings(instrument_id))
+        issues.extend(self._publication_manifest_findings(instrument_id))
+        issues.extend(self._approved_occurrence_migration_findings(instrument_id))
         return {"instrument_id": instrument_id, "inventory": inventory, "issues": issues}
+
+    def _approved_occurrence_migration_findings(
+        self, instrument_id: str
+    ) -> list[dict[str, Any]]:
+        """Find only exact, source-row keyed repeated approved occurrences.
+
+        Legacy rows without a physical row locator remain protected history and
+        are deliberately outside this migration.  A group is actionable only
+        when all members share the reconstructed physical identity and the
+        semantic fingerprint is identical across distinct executions.
+        """
+
+        specs = {
+            "activities": ("company_business_activities", "activity_id"),
+            "operating_facts": ("company_operating_facts", "record_id"),
+        }
+        findings: list[dict[str, Any]] = []
+        with self.storage.get_connection() as conn:
+            self.storage._apply_pragmas(conn)
+            for record_type, (table, primary_key) in specs.items():
+                rows = conn.execute(
+                    f"SELECT * FROM {table} WHERE instrument_id = ? AND review_status = 'approved'",
+                    (instrument_id,),
+                ).fetchall()
+                groups: dict[str, list[dict[str, Any]]] = {}
+                for raw in rows:
+                    row = dict(raw)
+                    try:
+                        metadata = json.loads(row.get("metadata_json") or "{}")
+                    except (TypeError, ValueError, json.JSONDecodeError):
+                        metadata = {}
+                    source_row_key = str(metadata.get("source_row_key") or "").strip()
+                    evidence = metadata.get("exact_evidence")
+                    if not source_row_key or not isinstance(evidence, dict):
+                        continue
+                    spans = evidence.get("evidence_spans") or []
+                    span = spans[0] if isinstance(spans, list) and spans and isinstance(spans[0], dict) else evidence
+                    material = occurrence_material_from_exact_evidence(
+                        instrument_id=instrument_id,
+                        report_period=row.get("report_period"),
+                        source_document_id=span.get("source_document_id") or evidence.get("source_document_id"),
+                        exact_evidence=evidence,
+                        source_row_key=source_row_key,
+                        metric_slot=metadata.get("metric_slot") or metadata.get("source_header"),
+                    )
+                    occurrence = occurrence_identity_key(material)
+                    fingerprint = semantic_content_fingerprint_from_record(row, metadata)
+                    groups.setdefault(occurrence, []).append({
+                        "row": row,
+                        "metadata": metadata,
+                        "material": material,
+                        "fingerprint": fingerprint,
+                    })
+                for occurrence, members in groups.items():
+                    if len(members) < 2:
+                        continue
+                    if record_type == "activities" and len({str(m["row"].get("run_id") or "") for m in members}) < 2:
+                        continue
+                    fingerprints = {m["fingerprint"] for m in members}
+                    code = (
+                        "duplicate_approved_occurrence_semantic_conflict"
+                        if len(fingerprints) != 1
+                        else "duplicate_approved_occurrence"
+                    )
+                    details = {
+                        "record_type": record_type,
+                        "occurrence_identity": occurrence,
+                        "rows": [
+                            {
+                                "record_id": str(m["row"][primary_key]),
+                                "run_id": m["row"].get("run_id"),
+                                "version": m["row"].get("version"),
+                                "updated_at": m["row"].get("updated_at"),
+                                "semantic_content_fingerprint": m["fingerprint"],
+                                "source_occurrence_material": m["material"],
+                            }
+                            for m in members
+                        ],
+                        "proposed_action": "migrate_exact_duplicate" if code == "duplicate_approved_occurrence" else "hold_semantic_conflict",
+                    }
+                    findings.append(self._issue(code, instrument_id, details))
+        return findings
+
+    def _incompatible_approved_occurrence_finding(
+        self, instrument_id: str
+    ) -> dict[str, Any] | None:
+        manifest = _INCOMPATIBLE_APPROVED_OCCURRENCES.get(instrument_id)
+        if manifest is None:
+            return None
+        with self.storage.get_connection() as conn:
+            self.storage._apply_pragmas(conn)
+            activity = conn.execute(
+                "SELECT * FROM company_business_activities WHERE activity_id = ?",
+                (manifest["activity_id"],),
+            ).fetchone()
+            fact = conn.execute(
+                "SELECT * FROM company_operating_facts WHERE record_id = ?",
+                (manifest["operating_fact_id"],),
+            ).fetchone()
+            evidence = conn.execute(
+                "SELECT source_document_id, page_number FROM business_profile_evidence "
+                "WHERE evidence_id = ?",
+                (manifest["evidence_id"],),
+            ).fetchone()
+            artifacts = conn.execute(
+                "SELECT artifact_id FROM business_profile_semantic_artifacts "
+                "WHERE instrument_id = ? AND source_document_id = ? "
+                "AND schema_version = 'business_profile_atomic_extraction.v5'",
+                (instrument_id, manifest["source_document_id"]),
+            ).fetchall()
+            owned_candidates = self._owned_candidate_descendants(
+                conn,
+                instrument_id=instrument_id,
+                activity_id=manifest["activity_id"],
+            )
+        if activity is None and fact is None:
+            return None
+        if activity is None or fact is None or evidence is None:
+            return self._issue(
+                "incompatible_approved_occurrence_manifest_mismatch",
+                instrument_id,
+                {"manifest": dict(manifest), "proposed_action": "manual_review"},
+            )
+        activity_metadata = json.loads(activity["metadata_json"] or "{}")
+        exact_match = str(activity["instrument_id"]) == instrument_id and all(
+            (
+                str(activity[key] or "") == str(manifest[key])
+                for key in ("report_period", "action", "object_raw", "unit")
+            )
+        ) and abs(float(activity["value"]) - float(manifest["value"])) < 0.01
+        exact_match = exact_match and (
+            str(activity["evidence_id"]) == manifest["evidence_id"]
+            and str(fact["evidence_id"]) == manifest["evidence_id"]
+            and str(fact["instrument_id"]) == instrument_id
+            and str(fact["report_period"]) == manifest["report_period"]
+            and str(fact["fact_type"]) == manifest["fact_type"]
+            and str(fact["fact_scope"]) == manifest["fact_scope"]
+            and abs(float(fact["value_raw"]) - float(manifest["value"])) < 0.01
+            and str(fact["unit_raw"]) == manifest["unit"]
+            and str(fact["review_status"]) == "approved"
+            and str(activity["review_status"]) == "approved"
+            and activity_metadata.get("measurement_projection_compatibility") is True
+            and json.loads(fact["metadata_json"] or "{}").get(
+                "source_activity_id"
+            )
+            == manifest["activity_id"]
+            and str(evidence["source_document_id"]) == manifest["source_document_id"]
+            and int(evidence["page_number"] or 0) == 21
+        )
+        if not exact_match:
+            return self._issue(
+                "incompatible_approved_occurrence_manifest_mismatch",
+                instrument_id,
+                {"manifest": dict(manifest), "proposed_action": "manual_review"},
+            )
+        return self._issue(
+            "incompatible_approved_occurrence",
+            instrument_id,
+            {
+                **dict(manifest),
+                "artifact_ids": [str(row["artifact_id"]) for row in artifacts],
+                "owned_candidates": owned_candidates,
+                "proposed_action": "delete_exact_obsolete_projection_and_reextract",
+            },
+        )
+
+    @staticmethod
+    def _owned_candidate_descendants(
+        conn: sqlite3.Connection,
+        *,
+        instrument_id: str,
+        activity_id: str,
+    ) -> dict[str, list[str]]:
+        descendants: dict[str, list[str]] = {
+            "operating_facts": [],
+            "value_chain_roles": [],
+            "exposure_facts": [],
+            "exposures": [],
+        }
+        operating_rows = conn.execute(
+            "SELECT record_id, metadata_json FROM company_operating_facts "
+            "WHERE instrument_id = ? AND review_status = 'candidate'",
+            (instrument_id,),
+        ).fetchall()
+        for row in operating_rows:
+            metadata = json.loads(row["metadata_json"] or "{}")
+            if str(metadata.get("source_activity_id") or "") == activity_id:
+                descendants["operating_facts"].append(str(row["record_id"]))
+        role_rows = conn.execute(
+            "SELECT record_id, metadata_json FROM company_value_chain_roles "
+            "WHERE instrument_id = ? AND review_status = 'candidate'",
+            (instrument_id,),
+        ).fetchall()
+        for row in role_rows:
+            metadata = json.loads(row["metadata_json"] or "{}")
+            supporting_ids = {
+                str(value)
+                for value in metadata.get("supporting_activity_ids") or ()
+                if str(value or "")
+            }
+            if supporting_ids == {activity_id}:
+                descendants["value_chain_roles"].append(str(row["record_id"]))
+        exposure_fact_rows = conn.execute(
+            "SELECT fact_id FROM company_commodity_exposure_facts "
+            "WHERE instrument_id = ? AND activity_id = ? AND review_status = 'candidate'",
+            (instrument_id, activity_id),
+        ).fetchall()
+        descendants["exposure_facts"] = [
+            str(row["fact_id"]) for row in exposure_fact_rows
+        ]
+        owned_fact_ids = set(descendants["exposure_facts"])
+        if owned_fact_ids:
+            exposure_rows = conn.execute(
+                "SELECT exposure_id, fact_ids_json FROM company_commodity_exposures "
+                "WHERE instrument_id = ? AND review_status = 'candidate'",
+                (instrument_id,),
+            ).fetchall()
+            for row in exposure_rows:
+                fact_ids = {
+                    str(value)
+                    for value in json.loads(row["fact_ids_json"] or "[]")
+                    if str(value or "")
+                }
+                if fact_ids and fact_ids.issubset(owned_fact_ids):
+                    descendants["exposures"].append(str(row["exposure_id"]))
+        return {
+            key: sorted(set(values)) for key, values in descendants.items()
+        }
 
     def _audit_cleanup_instrument(self, instrument_id: str) -> dict[str, Any]:
         """Audit only lifecycle rows that are eligible for physical deletion."""
@@ -906,8 +1205,84 @@ class BusinessProfileSemanticRepairService:
             "issues": [
                 *self._incompatible_artifact_findings(instrument_id),
                 *self._orphan_candidate_findings(instrument_id),
+                *self._publication_manifest_findings(instrument_id),
             ],
         }
+
+    def _publication_manifest_findings(self, instrument_id: str) -> list[dict[str, Any]]:
+        """Find failed publication owners and their candidate descendants."""
+        with self.storage.get_connection() as conn:
+            self.storage._apply_pragmas(conn)
+            exists = conn.execute(
+                "SELECT 1 FROM sqlite_master WHERE type='table' AND name='business_profile_publication_manifests'"
+            ).fetchone()
+            if exists is None:
+                return []
+            rows = conn.execute(
+                "SELECT manifest_id, status, descendant_ids_json, failure_reason, updated_at "
+                "FROM business_profile_publication_manifests "
+                "WHERE instrument_id = ? AND status IN ('running','non_reusable','completed')",
+                (instrument_id,),
+            ).fetchall()
+        findings: list[dict[str, Any]] = []
+        for row in rows:
+            try:
+                descendants = json.loads(row["descendant_ids_json"] or "{}")
+            except (TypeError, ValueError, json.JSONDecodeError):
+                descendants = {}
+            candidate_ids: list[str] = []
+            with self.storage.get_connection() as conn:
+                self.storage._apply_pragmas(conn)
+                specs = {
+                    "value_chain_roles": ("company_value_chain_roles", "record_id"),
+                    "exposure_facts": ("company_commodity_exposure_facts", "fact_id"),
+                    "exposures": ("company_commodity_exposures", "exposure_id"),
+                }
+                for kind, ids in descendants.items():
+                    spec = specs.get(kind)
+                    if not spec:
+                        continue
+                    table, pk = spec
+                    for record_id in ids or ():
+                        found = conn.execute(
+                            f"SELECT {pk} FROM {table} WHERE {pk} = ? AND instrument_id = ? AND review_status = 'candidate'",
+                            (str(record_id), instrument_id),
+                        ).fetchone()
+                        if found is not None:
+                            candidate_ids.append(f"{kind}:{record_id}")
+            running_stale = self._publication_manifest_is_stale(row)
+            if (
+                (row["status"] == "running" and running_stale)
+                or (row["status"] in {"non_reusable", "completed"} and candidate_ids)
+            ):
+                findings.append(self._issue(
+                    "non_reusable_publication_manifest",
+                    instrument_id,
+                    {
+                        "manifest_id": str(row["manifest_id"]),
+                        "status": str(row["status"]),
+                        "candidate_ids": sorted(candidate_ids),
+                        "failure_reason": row["failure_reason"],
+                        "stale": running_stale,
+                        "proposed_action": "delete_publication_manifest_descendants",
+                    },
+                ))
+        return findings
+
+    @staticmethod
+    def _publication_manifest_is_stale(row: Any) -> bool:
+        """Treat an in-flight owner as failed only after a bounded lease window."""
+        from datetime import datetime, timedelta
+
+        updated_at = str(row["updated_at"] or "")
+        try:
+            updated = datetime.fromisoformat(updated_at)
+        except (TypeError, ValueError):
+            return False
+        now = get_shanghai_time()
+        if updated.tzinfo is None:
+            updated = updated.replace(tzinfo=now.tzinfo)
+        return now - updated > timedelta(seconds=PUBLICATION_MANIFEST_STALE_SECONDS)
 
     def _orphan_candidate_findings(self, instrument_id: str) -> list[dict[str, Any]]:
         """Find candidate outputs whose semantic run owner no longer exists."""
@@ -934,6 +1309,11 @@ class BusinessProfileSemanticRepairService:
                     "AND NOT EXISTS ("
                     "SELECT 1 FROM business_profile_semantic_runs r "
                     f"WHERE r.run_id = {table}.run_id"
+                    ") "
+                    "AND NOT EXISTS ("
+                    "SELECT 1 FROM business_profile_publication_manifests pm "
+                    f"WHERE pm.manifest_id = {table}.run_id "
+                    "AND pm.status IN ('running', 'completed')"
                     ")",
                     (instrument_id,),
                 ).fetchall()
@@ -1434,6 +1814,17 @@ class BusinessProfileSemanticRepairService:
                         "reason": issue["code"],
                         "stable_id": issue["stable_id"],
                     })
+            elif issue["code"] == "incompatible_approved_occurrence":
+                changes.append(
+                    self._delete_incompatible_approved_occurrence(instrument_id, issue)
+                )
+            elif issue["code"] == "incompatible_approved_occurrence_manifest_mismatch":
+                changes.append({
+                    "instrument_id": instrument_id,
+                    "status": "held",
+                    "reason": issue["code"],
+                    "stable_id": issue["stable_id"],
+                })
             elif issue["code"] in {
                 "incompatible_reusable_artifact",
                 "legacy_semantic_artifact",
@@ -1448,7 +1839,331 @@ class BusinessProfileSemanticRepairService:
                 changes.append(self._delete_obsolete_semantic_run(instrument_id, issue))
             elif issue["code"] == "orphan_candidate_records":
                 changes.append(self._delete_orphan_candidate_records(instrument_id, issue))
+            elif issue["code"] == "non_reusable_publication_manifest":
+                changes.append(self._delete_publication_manifest_descendants(instrument_id, issue))
+            elif issue["code"] == "duplicate_approved_occurrence":
+                changes.append(self._migrate_exact_duplicate_occurrence(instrument_id, issue))
+            elif issue["code"] == "duplicate_approved_occurrence_semantic_conflict":
+                changes.append({
+                    "instrument_id": instrument_id,
+                    "status": "held",
+                    "reason": "duplicate_approved_occurrence_semantic_conflict",
+                    "stable_id": issue["stable_id"],
+                    "affected_ids": [
+                        str(item.get("record_id") or "")
+                        for item in (issue.get("details") or {}).get("rows") or []
+                    ],
+                })
         return changes
+
+    def _migrate_exact_duplicate_occurrence(
+        self, instrument_id: str, issue: dict[str, Any]
+    ) -> dict[str, Any]:
+        """Re-key one proven duplicate group without changing governed content."""
+
+        details = dict(issue.get("details") or {})
+        record_type = str(details.get("record_type") or "")
+        specs = {
+            "activities": ("company_business_activities", "activity_id"),
+            "operating_facts": ("company_operating_facts", "record_id"),
+        }
+        spec = specs.get(record_type)
+        rows = list(details.get("rows") or [])
+        if spec is None or len(rows) < 2:
+            return {"instrument_id": instrument_id, "status": "held", "reason": "exact_duplicate_manifest_invalid", "stable_id": issue["stable_id"]}
+        table, pk = spec
+        # Prefer the highest governed version, then the most recently updated
+        # row.  This keeps the existing successor pointer semantics intact.
+        ordered = sorted(rows, key=lambda item: (int(item.get("version") or 0), str(item.get("updated_at") or ""), str(item.get("record_id") or "")), reverse=True)
+        canonical_id = str(ordered[0].get("record_id") or "")
+        duplicate_ids = [str(item.get("record_id") or "") for item in ordered[1:] if str(item.get("record_id") or "")]
+        new_material = ordered[0].get("source_occurrence_material")
+        if not canonical_id or not duplicate_ids or not isinstance(new_material, dict):
+            return {"instrument_id": instrument_id, "status": "held", "reason": "exact_duplicate_manifest_incomplete", "stable_id": issue["stable_id"]}
+        deleted_dependents: list[str] = []
+        migrated_audit_id: str | None = None
+        now = get_shanghai_time().isoformat()
+        with self.storage.get_connection() as conn:
+            self.storage._apply_pragmas(conn)
+            conn.execute("BEGIN IMMEDIATE")
+            try:
+                canonical = conn.execute(
+                    f"SELECT * FROM {table} WHERE {pk} = ? AND instrument_id = ? AND review_status = 'approved'",
+                    (canonical_id, instrument_id),
+                ).fetchone()
+                if canonical is None:
+                    conn.rollback()
+                    return {"instrument_id": instrument_id, "status": "unchanged", "reason": "canonical_duplicate_already_absent", "stable_id": issue["stable_id"]}
+                # Re-check every member against the dry-run identity and
+                # semantic fingerprint before making any physical change.
+                for member in rows:
+                    current = conn.execute(
+                        f"SELECT * FROM {table} WHERE {pk} = ? AND instrument_id = ? AND review_status = 'approved'",
+                        (str(member.get("record_id") or ""), instrument_id),
+                    ).fetchone()
+                    if current is None:
+                        raise ValueError("exact duplicate member changed after audit")
+                    metadata = json.loads(current["metadata_json"] or "{}")
+                    current_fingerprint = semantic_content_fingerprint_from_record(
+                        dict(current), metadata
+                    )
+                    if current_fingerprint != str(member.get("semantic_content_fingerprint") or ""):
+                        raise ValueError("exact duplicate semantic fingerprint changed after audit")
+                canonical_dict = dict(canonical)
+                metadata = json.loads(canonical_dict.get("metadata_json") or "{}")
+                old_material = metadata.get("source_occurrence_material") or metadata.get("occurrence_material")
+                metadata["source_occurrence_material"] = new_material
+                metadata["occurrence_material"] = new_material
+                metadata["occurrence_identity"] = occurrence_identity_key(new_material)
+                metadata["occurrence_identity_quality"] = "migrated_physical_source_coordinates"
+                canonical_dict["metadata_json"] = json.dumps(metadata, ensure_ascii=False, sort_keys=True)
+                lineage_payload = {
+                    key: value for key, value in canonical_dict.items()
+                    if key not in {"created_at", "updated_at", "lineage_hash", "metadata_json"}
+                }
+                lineage_payload["source_occurrence_material"] = new_material
+                canonical_dict["lineage_hash"] = hashlib.sha256(
+                    json.dumps(lineage_payload, ensure_ascii=False, sort_keys=True, default=str).encode("utf-8")
+                ).hexdigest()
+                conn.execute(
+                    f"UPDATE {table} SET metadata_json = ?, lineage_hash = ?, updated_at = ? WHERE {pk} = ? AND instrument_id = ? AND review_status = 'approved'",
+                    (canonical_dict["metadata_json"], canonical_dict["lineage_hash"], now, canonical_id, instrument_id),
+                )
+                # Remove only derived rows explicitly pointing at a duplicate.
+                dependent_specs = {
+                    "company_operating_facts": "record_id",
+                    "company_value_chain_roles": "record_id",
+                    "company_commodity_exposure_facts": "fact_id",
+                    "company_commodity_exposures": "exposure_id",
+                }
+                for dependent_table, dependent_pk in dependent_specs.items():
+                    if dependent_table == table:
+                        continue
+                    for duplicate_id in duplicate_ids:
+                        rows_dep = conn.execute(
+                            f"SELECT {dependent_pk} AS record_id, review_status FROM {dependent_table} WHERE instrument_id = ? AND metadata_json LIKE ?",
+                            (instrument_id, f"%{duplicate_id}%"),
+                        ).fetchall()
+                        for dep in rows_dep:
+                            if str(dep["review_status"] or "") not in {"candidate", "approved"}:
+                                continue
+                            conn.execute(f"DELETE FROM {dependent_table} WHERE {dependent_pk} = ? AND instrument_id = ?", (str(dep["record_id"]), instrument_id))
+                            deleted_dependents.append(f"{dependent_table}:{dep['record_id']}")
+                for duplicate_id in duplicate_ids:
+                    conn.execute(
+                        f"DELETE FROM {table} WHERE {pk} = ? AND instrument_id = ? AND review_status = 'approved'",
+                        (duplicate_id, instrument_id),
+                    )
+                audit = self.review_service._build_review_audit(
+                    conn,
+                    record_type=record_type,
+                    record_id=canonical_id,
+                    row=canonical_dict,
+                    new_status="approved",
+                    operation_id=f"business-profile-occurrence-migration:{issue['stable_id']}",
+                    reviewer="system:occurrence_migration",
+                    reason="exact repeated replay occurrence re-keyed; duplicate approved rows removed",
+                    evidence_references=[str(canonical_dict.get("evidence_id") or "")],
+                    replacement_record_id=None,
+                    metadata={
+                        "manifest_stable_id": issue["stable_id"],
+                        "old_identity_material": old_material,
+                        "new_identity_material": new_material,
+                        "removed_record_ids": duplicate_ids,
+                    },
+                    now=now,
+                )
+                conn.execute(
+                    "INSERT INTO business_profile_review_audit (audit_id, operation_id, record_type, record_id, instrument_id, decision, prior_status, new_status, prior_version, new_version, prior_updated_at, new_updated_at, record_lineage_hash, reviewer, reason, evidence_references_json, replacement_record_id, prior_audit_hash, audit_hash, metadata_json, reviewed_at, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    (audit["audit_id"], audit["operation_id"], audit["record_type"], audit["record_id"], audit["instrument_id"], audit["decision"], audit["prior_status"], audit["new_status"], audit["prior_version"], audit["new_version"], audit["prior_updated_at"], audit["new_updated_at"], audit["record_lineage_hash"], audit["reviewer"], audit["reason"], json.dumps(audit["evidence_references"], ensure_ascii=False), audit["replacement_record_id"], audit["prior_audit_hash"], audit["audit_hash"], json.dumps(audit["metadata"], ensure_ascii=False, sort_keys=True), audit["reviewed_at"], audit["created_at"]),
+                )
+                migrated_audit_id = audit["audit_id"]
+                conn.commit()
+            except Exception:
+                conn.rollback()
+                raise
+        return {
+            "instrument_id": instrument_id,
+            "status": "changed",
+            "reason": "exact_duplicate_occurrence_migrated",
+            "stable_id": issue["stable_id"],
+            "canonical_record_id": canonical_id,
+            "affected_ids": [canonical_id, *duplicate_ids, *deleted_dependents],
+            "review_audit_id": migrated_audit_id,
+        }
+
+    def _delete_publication_manifest_descendants(
+        self, instrument_id: str, issue: dict[str, Any]
+    ) -> dict[str, Any]:
+        manifest_id = str(issue.get("details", {}).get("manifest_id") or "")
+        if not manifest_id:
+            return {"instrument_id": instrument_id, "status": "held", "reason": "publication_manifest_identity_unavailable"}
+        deleted: list[str] = []
+        with self.storage.get_connection() as conn:
+            self.storage._apply_pragmas(conn)
+            conn.execute("BEGIN IMMEDIATE")
+            try:
+                row = conn.execute(
+                    "SELECT status, updated_at, descendant_ids_json FROM business_profile_publication_manifests WHERE manifest_id = ? AND instrument_id = ?",
+                    (manifest_id, instrument_id),
+                ).fetchone()
+                if row is None:
+                    conn.rollback()
+                    return {"instrument_id": instrument_id, "status": "unchanged", "reason": "publication_manifest_already_absent", "stable_id": issue["stable_id"]}
+                if row["status"] == "running" and not self._publication_manifest_is_stale(row):
+                    conn.rollback()
+                    return {
+                        "instrument_id": instrument_id,
+                        "status": "held",
+                        "reason": "publication_manifest_still_running",
+                        "stable_id": issue["stable_id"],
+                    }
+                try:
+                    descendants = json.loads(row["descendant_ids_json"] or "{}")
+                except (TypeError, ValueError, json.JSONDecodeError):
+                    descendants = {}
+                specs = {
+                    "value_chain_roles": ("company_value_chain_roles", "record_id"),
+                    "exposure_facts": ("company_commodity_exposure_facts", "fact_id"),
+                    "exposures": ("company_commodity_exposures", "exposure_id"),
+                }
+                for kind, ids in descendants.items():
+                    spec = specs.get(kind)
+                    if not spec:
+                        continue
+                    table, pk = spec
+                    for record_id in ids or ():
+                        cursor = conn.execute(
+                            f"DELETE FROM {table} WHERE {pk} = ? AND instrument_id = ? AND review_status = 'candidate'",
+                            (str(record_id), instrument_id),
+                        )
+                        if cursor.rowcount:
+                            deleted.append(f"{kind}:{record_id}")
+                conn.execute(
+                    "UPDATE business_profile_publication_manifests SET status='cleaned', updated_at=? WHERE manifest_id=?",
+                    (get_shanghai_time().isoformat(), manifest_id),
+                )
+                conn.commit()
+            except Exception:
+                conn.rollback()
+                raise
+        return {"instrument_id": instrument_id, "status": "changed", "reason": "publication_manifest_descendants_deleted", "stable_id": issue["stable_id"], "affected_ids": deleted}
+
+    def _delete_incompatible_approved_occurrence(
+        self, instrument_id: str, issue: dict[str, Any]
+    ) -> dict[str, Any]:
+        details = dict(issue.get("details") or {})
+        manifest = _INCOMPATIBLE_APPROVED_OCCURRENCES.get(instrument_id)
+        if manifest is None or any(details.get(key) != value for key, value in manifest.items()):
+            raise ValueError("approved occurrence rebuild manifest changed after audit")
+        artifact_ids = [str(value) for value in details.get("artifact_ids") or ()]
+        audited_candidates = {
+            str(key): [str(value) for value in values]
+            for key, values in dict(details.get("owned_candidates") or {}).items()
+        }
+        deleted: dict[str, list[str]] = {
+            "activities": [],
+            "operating_facts": [],
+            "value_chain_roles": [],
+            "exposure_facts": [],
+            "exposures": [],
+            "semantic_artifacts": [],
+        }
+        with self.storage.get_connection() as conn:
+            self.storage._apply_pragmas(conn)
+            conn.execute("BEGIN IMMEDIATE")
+            activity = conn.execute(
+                "SELECT review_status, evidence_id, value, unit FROM company_business_activities "
+                "WHERE activity_id = ? AND instrument_id = ?",
+                (manifest["activity_id"], instrument_id),
+            ).fetchone()
+            fact = conn.execute(
+                "SELECT * FROM company_operating_facts "
+                "WHERE record_id = ? AND instrument_id = ?",
+                (manifest["operating_fact_id"], instrument_id),
+            ).fetchone()
+            if activity is None and fact is None:
+                conn.rollback()
+                return {
+                    "instrument_id": instrument_id,
+                    "status": "unchanged",
+                    "reason": "incompatible_approved_occurrence_already_absent",
+                    "stable_id": issue["stable_id"],
+                }
+            if (
+                activity is None
+                or fact is None
+                or str(activity["review_status"]) != "approved"
+                or str(fact["review_status"]) != "approved"
+                or str(activity["evidence_id"]) != manifest["evidence_id"]
+                or str(fact["evidence_id"]) != manifest["evidence_id"]
+                or str(fact["report_period"]) != manifest["report_period"]
+                or str(fact["fact_type"]) != manifest["fact_type"]
+                or str(fact["fact_scope"]) != manifest["fact_scope"]
+                or abs(float(fact["value_raw"]) - float(manifest["value"])) >= 0.01
+                or str(fact["unit_raw"]) != manifest["unit"]
+                or json.loads(fact["metadata_json"] or "{}").get(
+                    "source_activity_id"
+                )
+                != manifest["activity_id"]
+                or abs(float(activity["value"]) - float(manifest["value"])) >= 0.01
+                or str(activity["unit"]) != manifest["unit"]
+            ):
+                conn.rollback()
+                raise ValueError("approved occurrence no longer matches rebuild manifest")
+            current_candidates = self._owned_candidate_descendants(
+                conn,
+                instrument_id=instrument_id,
+                activity_id=manifest["activity_id"],
+            )
+            if current_candidates != audited_candidates:
+                conn.rollback()
+                raise ValueError("approved occurrence descendants changed after audit")
+            for table, key, bucket in (
+                ("company_commodity_exposures", "exposure_id", "exposures"),
+                ("company_commodity_exposure_facts", "fact_id", "exposure_facts"),
+                ("company_value_chain_roles", "record_id", "value_chain_roles"),
+                ("company_operating_facts", "record_id", "operating_facts"),
+            ):
+                for record_id in current_candidates[bucket]:
+                    cursor = conn.execute(
+                        f"DELETE FROM {table} WHERE {key} = ? AND review_status = 'candidate'",
+                        (record_id,),
+                    )
+                    if cursor.rowcount:
+                        deleted[bucket].append(record_id)
+            conn.execute(
+                "DELETE FROM company_operating_facts WHERE record_id = ?",
+                (manifest["operating_fact_id"],),
+            )
+            deleted["operating_facts"].append(manifest["operating_fact_id"])
+            conn.execute(
+                "DELETE FROM company_business_activities WHERE activity_id = ?",
+                (manifest["activity_id"],),
+            )
+            deleted["activities"].append(manifest["activity_id"])
+            for artifact_id in artifact_ids:
+                conn.execute(
+                    "DELETE FROM business_profile_semantic_artifact_events WHERE artifact_id = ?",
+                    (artifact_id,),
+                )
+                cursor = conn.execute(
+                    "DELETE FROM business_profile_semantic_artifacts WHERE artifact_id = ? "
+                    "AND instrument_id = ? AND source_document_id = ? "
+                    "AND schema_version = 'business_profile_atomic_extraction.v5'",
+                    (artifact_id, instrument_id, manifest["source_document_id"]),
+                )
+                if cursor.rowcount:
+                    deleted["semantic_artifacts"].append(artifact_id)
+            conn.commit()
+        return {
+            "instrument_id": instrument_id,
+            "status": "changed",
+            "reason": "incompatible_approved_occurrence_deleted_for_reextract",
+            "stable_id": issue["stable_id"],
+            "deleted": deleted,
+            "preserved": ["business_profile_evidence", "business_profile_review_audit"],
+        }
 
     def _delete_orphan_candidate_records(
         self, instrument_id: str, issue: dict[str, Any]
@@ -1503,7 +2218,12 @@ class BusinessProfileSemanticRepairService:
                         "SELECT 1 FROM business_profile_semantic_runs WHERE run_id = ?",
                         (run_id,),
                     ).fetchone()
-                    if not run_id or owner is not None:
+                    manifest_owner = conn.execute(
+                        "SELECT 1 FROM business_profile_publication_manifests "
+                        "WHERE manifest_id = ? AND status IN ('running', 'completed')",
+                        (run_id,),
+                    ).fetchone()
+                    if not run_id or owner is not None or manifest_owner is not None:
                         continue
                     if "business_profile_exceptions" in existing_tables:
                         conn.execute(

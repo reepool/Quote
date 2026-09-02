@@ -246,6 +246,14 @@ class BusinessProfileActivityProducer:
                 "semantic_verification_id": assertion.get("verification_id"),
                 "source_row_key": assertion.get("source_row_key"),
                 "contract_reference_raw": assertion.get("contract_reference_raw"),
+                "period_basis": assertion.get("period_basis"),
+                "period_basis_source": assertion.get("period_basis_source"),
+                "transformation_input_objects_raw": list(
+                    assertion.get("transformation_input_objects_raw") or []
+                ),
+                "transformation_output_objects_raw": list(
+                    assertion.get("transformation_output_objects_raw") or []
+                ),
                 **_storage_metadata(assertion),
             },
         }
@@ -351,8 +359,16 @@ class BusinessProfileActivityProducer:
                     "numeric_reconciliation": {
                         "schema_version": "business_profile_ratio_validation.v1",
                         "status": "passed",
-                        "source_value": str(share),
-                        "source_unit": assertion.get("disclosed_share_unit") or "fraction",
+                        "source_value": str(
+                            assertion.get("disclosed_share_source_value")
+                            if assertion.get("disclosed_share_source_value") is not None
+                            else share
+                        ),
+                        "source_unit": (
+                            assertion.get("disclosed_share_source_unit")
+                            or assertion.get("disclosed_share_unit")
+                            or "fraction"
+                        ),
                         "normalized_value": str(normalized_share),
                         "normalized_unit": "fraction",
                         "rule": share_rule,
@@ -449,8 +465,12 @@ class BusinessProfileActivityProducer:
                 "numeric_reconciliation": {
                     "schema_version": "business_profile_ratio_validation.v1",
                     "status": "passed" if normalized_share is not None else "not_applicable",
-                    "source_value": None if assertion.get("disclosed_share") is None else str(assertion.get("disclosed_share")),
-                    "source_unit": assertion.get("disclosed_share_unit"),
+                    "source_value": None if assertion.get("disclosed_share") is None else str(
+                        assertion.get("disclosed_share_source_value")
+                        if assertion.get("disclosed_share_source_value") is not None
+                        else assertion.get("disclosed_share")
+                    ),
+                    "source_unit": assertion.get("disclosed_share_source_unit") or assertion.get("disclosed_share_unit"),
                     "normalized_value": None if normalized_share is None else str(normalized_share),
                     "normalized_unit": "fraction" if normalized_share is not None else None,
                     "rule": share_rule,
@@ -602,7 +622,17 @@ class BusinessProfileActivityProducer:
                 )
                 is None
             ):
-                gaps[activity_id] = "transformation_lineage_missing"
+                lineage_status = str(
+                    (activity.get("metadata") or {}).get(
+                        "transformation_lineage_status"
+                    )
+                    or "incomplete"
+                )
+                gaps[activity_id] = (
+                    "transformation_lineage_ambiguous"
+                    if lineage_status == "ambiguous"
+                    else "transformation_lineage_missing"
+                )
             if (
                 activity.get("review_status") == "approved"
                 and str(activity.get("action") or "") == "stores"
@@ -825,6 +855,21 @@ def _transformation_support(
     metadata = activity.get("metadata")
     if not isinstance(metadata, Mapping):
         return None
+    lineage_status = str(metadata.get("transformation_lineage_status") or "bound")
+    if lineage_status == "assertion_bound":
+        inputs = _metadata_text_tuple(metadata, "transformation_input_objects_raw")
+        outputs = _metadata_text_tuple(metadata, "transformation_output_objects_raw")
+        if (
+            inputs
+            and outputs
+            and isinstance(metadata.get("exact_evidence"), Mapping)
+            and str(metadata.get("transformation_component_evidence_id") or "")
+            == str(activity.get("evidence_id") or "")
+        ):
+            return (), ()
+        return None
+    if lineage_status != "bound":
+        return None
     input_activity_ids = _metadata_id_tuple(
         metadata, "transformation_input_activity_ids"
     )
@@ -907,6 +952,12 @@ def _metadata_id_tuple(metadata: Mapping[str, Any], *keys: str) -> tuple[str, ..
             continue
         output.extend(str(item).strip() for item in values if str(item).strip())
     return tuple(dict.fromkeys(output))
+
+
+def _metadata_text_tuple(metadata: Mapping[str, Any], *keys: str) -> tuple[str, ...]:
+    """Read non-empty source labels without treating a string as a sequence."""
+
+    return _metadata_id_tuple(metadata, *keys)
 
 
 def _required_text(value: Mapping[str, Any], key: str) -> str:

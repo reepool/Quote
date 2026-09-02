@@ -67,7 +67,12 @@ class BusinessProfileExposureFactProducer:
     def __init__(self, repository: Any):
         self.repository = repository
 
-    def build_from_activity(self, activity: Mapping[str, Any]) -> dict[str, Any]:
+    def build_from_activity(
+        self,
+        activity: Mapping[str, Any],
+        *,
+        lifecycle_owner_id: str | None = None,
+    ) -> dict[str, Any]:
         if activity.get("review_status") != "approved":
             raise ValueError("commodity exposure facts require an approved activity")
         action = str(activity.get("action") or "").strip()
@@ -134,7 +139,10 @@ class BusinessProfileExposureFactProducer:
             "share": activity.get("share"),
             "fact_scope": "segment" if activity.get("segment_id") else "company",
             "evidence_id": evidence_id,
-            "run_id": activity.get("run_id"),
+            # The ancestor semantic run is provenance only.  A derived fact
+            # must be owned by the current publication execution when one is
+            # supplied, otherwise legacy callers retain their prior behavior.
+            "run_id": lifecycle_owner_id or activity.get("run_id"),
             "data_available_date": activity.get("data_available_date"),
             "confidence": activity.get("confidence"),
             "review_status": "candidate",
@@ -147,13 +155,19 @@ class BusinessProfileExposureFactProducer:
             "metadata": {
                 "policy_version": EXPOSURE_FACT_POLICY_VERSION,
                 "source_activity_action": action,
+                "source_semantic_run_id": activity.get("run_id"),
+                "publication_manifest_id": lifecycle_owner_id,
                 "source_activity_lineage_hash": activity.get("lineage_hash"),
                 "unknown_value_preserved": value is None,
                 "unknown_unit_preserved": unit is None or not bool(resolution and resolution.publishable),
                 "unit_resolution": resolution.to_dict() if resolution else None,
                 "period_basis": period_basis,
                 "period_basis_source": (
-                    "activity" if period_basis != "unknown" else "unknown"
+                    str(
+                        activity.get("period_basis_source")
+                        or (activity.get("metadata") or {}).get("period_basis_source")
+                        or ("activity" if period_basis != "unknown" else "unknown")
+                    )
                 ),
                 "numeric_reconciliation_executed": value is None or conversion_completed,
                 "numeric_reconciliation_valid": value is None or conversion_completed,
@@ -183,7 +197,7 @@ class BusinessProfileExposureFactProducer:
 
 
 def _activity_period_basis(activity: Mapping[str, Any]) -> str:
-    """Read the disclosed measurement basis without inventing annual semantics."""
+    """Read the measurement basis assigned by extraction or document policy."""
 
     metadata = activity.get("metadata") or {}
     value = activity.get("period_basis") or metadata.get("period_basis")
@@ -346,6 +360,8 @@ class BusinessProfileExposurePublisher:
         consumer_id: str | None = None,
         promotion_manifest: FieldFamilyPromotionManifest | None = None,
         promotion_gates: Mapping[str, Any] | None = None,
+        lifecycle_owner_id: str | None = None,
+        register_descendant: Any | None = None,
     ) -> dict[str, Any]:
         if promotion_manifest is None:
             raise ValueError("commodity publication promotion manifest is required")
@@ -483,6 +499,8 @@ class BusinessProfileExposurePublisher:
             "knowledge_to": fact.get("knowledge_to"),
         }
         validate_business_profile_artifact("exposure_publication", publication_artifact)
+        if callable(register_descendant):
+            register_descendant("exposures", exposure_id)
         payload = {
             "exposure_id": exposure_id,
             "instrument_id": fact["instrument_id"],
@@ -521,6 +539,7 @@ class BusinessProfileExposurePublisher:
             "metadata": {
                 "mapping_reference_type": mapping.reference_type,
                 "source_activity_action": action,
+                "publication_manifest_id": lifecycle_owner_id,
                 "market_series_status": (
                     "resolved" if mapping.price_series_id else "unresolved"
                 ),

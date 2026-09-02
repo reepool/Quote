@@ -1,5 +1,9 @@
 # LLM 辅助公司画像与供应链语义抽取需求说明
 
+> 历史状态（2026-09-02）：本文件描述的旧 LLM 语义合同已冻结，不再接受生产写入。
+> 当前唯一权威总需求为 `company_profile_product_and_industry_semantic_requirements.md`；
+> 后续 extract/repair/verify、行业 prompt 和 schema 必须从新总需求及对应行业文档派生。
+
 > 状态：A 股自动化语义生产实施需求
 > 更新日期：2026-08-03
 > 关联：`common_llm_gateway_architecture.md`、

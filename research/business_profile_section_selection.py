@@ -177,6 +177,11 @@ class BusinessProfileSectionSelector:
         window_index: int = 0,
         window_count: int = 1,
     ) -> SelectedSectionArtifact:
+        requested_family = (
+            field_family.value
+            if isinstance(field_family, BusinessProfileFieldFamily)
+            else str(field_family or "").strip()
+        )
         family = _selection_family(field_family)
         effective_max_pages = int(max_pages_override or self.max_pages)
         if effective_max_pages < 1:
@@ -243,6 +248,33 @@ class BusinessProfileSectionSelector:
             context_pages=self.context_pages,
             max_pages=effective_max_pages,
         )
+        if not selected_pages and requested_family in SEMANTIC_OUTPUT_FIELD_FAMILIES:
+            # Short production-shaped extracts may contain the disclosure
+            # sentence without its surrounding report heading.  Accept only
+            # pages carrying an explicit relationship/activity cue; unrelated
+            # pages must continue to fail closed as selector gaps.
+            semantic_cues = (
+                "销售",
+                "客户",
+                "供应商",
+                "采购",
+                "生产",
+                "产量",
+                "关联方",
+                "前五大",
+            )
+            for page_number, page in selection_pages_by_number.items():
+                normalized = _normalize(page.get("text"))
+                if any(_normalize(cue) in normalized for cue in semantic_cues):
+                    reasons_by_page.setdefault(page_number, set()).add(
+                        "semantic_text_fallback"
+                    )
+            selected_pages = _ranked_bounded_pages(
+                reasons_by_page,
+                pages_by_number=selection_pages_by_number,
+                context_pages=self.context_pages,
+                max_pages=effective_max_pages,
+            )
         dropped_anchor_pages = sorted(set(reasons_by_page) - set(selected_pages))
         if not selected_pages:
             raise ValueError(f"no governed pages selected for field family: {family}")

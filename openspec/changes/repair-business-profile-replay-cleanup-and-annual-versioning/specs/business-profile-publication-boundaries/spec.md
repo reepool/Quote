@@ -1,7 +1,7 @@
 ## ADDED Requirements
 
 ### Requirement: Candidate isolation after cleanup
-The publication layer MUST publish only records that pass current identity, evidence, and semantic gates. Deleted or non-reusable candidate artifacts MUST not be eligible for publication or replay.
+The publication layer MUST publish only records that pass current identity, evidence, semantic gates, and a current stage-owned publication owner check. Deleted or non-reusable candidate artifacts MUST not be eligible for publication or replay. A source semantic run reference is provenance only and MUST NOT substitute for a current publication owner.
 
 #### Scenario: Failed candidate is removed
 - **WHEN** cleanup deletes a failed semantic receipt and its candidate descendants
@@ -10,6 +10,18 @@ The publication layer MUST publish only records that pass current identity, evid
 #### Scenario: Valid candidate remains reviewable
 - **WHEN** a candidate has complete evidence and a current identity but is not yet approved
 - **THEN** it remains available to the normal review path without being exposed as approved output
+
+#### Scenario: Conversion-failed artifact cannot publish
+- **WHEN** an artifact has been marked non-reusable after downstream business conversion failure
+- **THEN** none of its candidate descendants can be promoted and a reuse run must perform current-schema extraction instead of replaying it
+
+#### Scenario: Verification-failed semantic candidates cannot publish
+- **WHEN** semantic candidates were persisted but their verification work terminated because the committed governed target set was invalid
+- **THEN** the failed owner and artifacts are non-reusable, the owned candidates are removed, and no later derive/publish run may consume them
+
+#### Scenario: Publish-owned descendants cannot outlive their owner
+- **WHEN** a derivation or publication stage creates candidate exposure facts or roles
+- **THEN** each candidate references the current stage-owned manifest, and deleting or invalidating that manifest makes the candidates ineligible for publication and causes them to be removed during terminal cleanup
 
 ### Requirement: Publication failure transparency
 The system MUST expose publication gaps and their deterministic reasons without converting them into successful publication or hiding them as empty data.
@@ -21,6 +33,10 @@ The system MUST expose publication gaps and their deterministic reasons without 
 #### Scenario: Complete publication
 - **WHEN** all required components and identity gates pass
 - **THEN** the system publishes the derived record once and a replay does not duplicate it
+
+#### Scenario: Replay duplicate is not normal review backlog
+- **WHEN** exposure facts fail `no_conflicts` because repeated runs approved multiple activities for the same physical source occurrence
+- **THEN** the operation reports an occurrence-lifecycle defect and blocks publication until exact duplicate migration completes; it MUST NOT treat the duplicate candidates as an acceptable completed manifest
 
 ### Requirement: Action-preserving exposure lineage
 The exposure fact, publication payload, predecessor lookup, and repair audit MUST use the same non-empty `source_activity_action` for action-sensitive lineage. Actions that share a market role, such as `sells` and `produces`, MUST remain distinguishable in lineage and MUST NOT be linked as predecessor/successor solely because their derived role is equal. Collision repair MUST recover the action from referenced exposure facts when publication metadata is absent; if neither side can be resolved, it MUST report `lineage_incomplete` rather than silently skipping the audit.

@@ -189,6 +189,14 @@ ATOMIC_ACTIVITY_SCHEMA = _closed_object(
         "source_label_raw": {"type": ["string", "null"]},
         "source_row_key": {"type": ["string", "null"]},
         "contract_reference_raw": {"type": ["string", "null"]},
+        "transformation_input_objects_raw": {
+            "type": "array",
+            "items": {"type": "string", "minLength": 1},
+        },
+        "transformation_output_objects_raw": {
+            "type": "array",
+            "items": {"type": "string", "minLength": 1},
+        },
         "semantic_summary_zh": {"type": ["string", "null"]},
         "model_derived_hints": {"type": "object"},
         "evidence": EXACT_EVIDENCE_SCHEMA,

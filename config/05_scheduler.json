@@ -1074,9 +1074,9 @@
         }
       },
       "business_profile_backfill": {
-        "enabled": true,
+        "enabled": false,
         "manual_only": true,
-        "description": "A股业务画像全市场 latest-annual 启动及特殊公告手工回补",
+        "description": "已冻结：旧公司画像语义合同不再接受手工或批量回补，等待新产品与行业语义合同实施",
         "report": true,
         "pre_run_notify": true,
         "max_instances": 1,

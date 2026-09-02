@@ -55,3 +55,26 @@ deletion target.
 The cleanup did not broaden into approved-history deletion, evidence deletion,
 or automatic retry of provider-congestion work. The database remains ready for
 the targeted replay gate in OpenSpec task 10.3.
+
+## Follow-up Cleanup Before 10.3
+
+After the first targeted replay, a read-only audit found legacy state that was
+not reusable but was outside the original deletion manifest:
+
+- `002415.SZ`: 17 orphan candidate exposure facts whose semantic run rows no
+  longer existed.
+- `300750.SZ`: 10 orphan candidate exposure facts and one legacy-occurrence
+  semantic artifact (`bp-semantic-artifact-9eeaee85e02ed6a12d6cb185`).
+
+The exact three findings were deleted transactionally with
+`cleanup_only=true, apply=true`. No approved activity, operating fact, role,
+exposure fact, evidence row, or review audit was deleted. `002496.SZ` retained
+its `retry_due` work item because it represents a provider transport failure
+that remains eligible for retry, not an unusable artifact.
+
+Backup and integrity evidence:
+
+- `/tmp/business_profile_before_10_3_cleanup_20260831_full.db`
+- `PRAGMA quick_check=ok`
+- Post-cleanup repair audit for `002415.SZ`, `002496.SZ`, and `300750.SZ`:
+  `issue_counts={}`, with no execution-state deletion candidates.

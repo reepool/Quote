@@ -2729,7 +2729,7 @@ def test_invalid_backfill_scope_fails_before_discovery(tmp_path):
     discover.assert_not_awaited()
 
 
-def test_broad_backfill_pre_batch_gate_blocks_known_lifecycle_findings(
+def test_broad_backfill_pre_batch_gate_scopes_known_lifecycle_findings(
     tmp_path, monkeypatch
 ):
     storage = _storage(tmp_path)
@@ -2778,9 +2778,10 @@ def test_broad_backfill_pre_batch_gate_blocks_known_lifecycle_findings(
         )
     )
 
-    assert report["status"] == "not_ready"
-    assert report["reason_codes"] == ["pre_batch_gate_blocked"]
+    assert report["status"] == "success"
     assert report["pre_batch_gate"]["llm_calls"] == 0
+    assert report["pre_batch_gate"]["blocked_instruments"] == ["600000.SH"]
+    assert report["pre_batch_gate"]["allowed_instruments"] == ["000001.SZ"]
     assert report["pre_batch_gate"]["blocking_instruments"] == [
         {
             "instrument_id": "600000.SH",
@@ -2793,7 +2794,7 @@ def test_broad_backfill_pre_batch_gate_blocks_known_lifecycle_findings(
             ],
         }
     ]
-    discover.assert_not_awaited()
+    discover.assert_awaited()
     stage_runner.assert_not_awaited()
 
 
@@ -3302,7 +3303,7 @@ def test_data_manager_targeted_backfill_scopes_discovery_and_reconciliation_acce
     assert reconciliation.call_args.kwargs["shared_asset_access"] is shared_access
 
 
-def test_targeted_expanded_atomic_backfill_selects_complete_publication_phase(
+def test_targeted_expanded_atomic_backfill_is_blocked_when_rollout_is_frozen(
     tmp_path, monkeypatch
 ):
     import research.business_profile_async_production as async_module
@@ -3380,18 +3381,15 @@ def test_targeted_expanded_atomic_backfill_selects_complete_publication_phase(
         )
     )
 
-    assert result["effective_rollout_phase"] == "semantic_complete_targeted"
-    assert captured["configured_families"] == (
-        "atomic_activities",
-        "named_relationships",
-        "derived_value_chain_roles",
-        "commodity_exposure_facts",
-        "commodity_exposure_publication",
-    )
-    assert captured["semantic"]["promotion_enabled"] is True
-    budgets = service.run_backfill.await_args.kwargs["stage_budgets"]
-    assert budgets["verify"].max_concurrency == 20
-    assert budgets["publish"].max_concurrency == 1
+    assert result == {
+        "status": "not_ready",
+        "reason": (
+            "business-profile rollout phase is disabled: "
+            "semantic_complete_targeted"
+        ),
+    }
+    manager._build_business_profile_async_service.assert_not_called()
+    service.run_backfill.assert_not_awaited()
 
 
 def test_data_manager_stage_runner_uses_work_bound_cutoff(tmp_path):

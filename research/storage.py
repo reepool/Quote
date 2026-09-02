@@ -12616,6 +12616,22 @@ class ResearchStorageManager:
                 instrument_id, report_period, policy, status, updated_at
             );
 
+            CREATE TABLE IF NOT EXISTS business_profile_publication_manifests (
+                manifest_id TEXT PRIMARY KEY,
+                instrument_id TEXT NOT NULL,
+                stage TEXT NOT NULL,
+                status TEXT NOT NULL,
+                processing_identity_json TEXT NOT NULL DEFAULT '{}',
+                provenance_json TEXT NOT NULL DEFAULT '{}',
+                descendant_ids_json TEXT NOT NULL DEFAULT '{}',
+                failure_reason TEXT,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_business_profile_publication_manifests_scope
+            ON business_profile_publication_manifests(instrument_id, stage, status, updated_at);
+
             CREATE TABLE IF NOT EXISTS company_profiles (
                 instrument_id TEXT PRIMARY KEY,
                 symbol TEXT NOT NULL,

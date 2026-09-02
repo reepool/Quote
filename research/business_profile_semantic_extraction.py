@@ -24,8 +24,8 @@ from utils.llm import LlmClientProtocol, LlmMessage, LlmRequest
 
 logger = logging.getLogger(__name__)
 
-SEMANTIC_EXTRACTION_SCHEMA_VERSION = "business_profile_atomic_extraction.v5"
-SEMANTIC_EXTRACTION_PROMPT_VERSION = "business_profile_atomic_extraction.v5"
+SEMANTIC_EXTRACTION_SCHEMA_VERSION = "business_profile_atomic_extraction.v6"
+SEMANTIC_EXTRACTION_PROMPT_VERSION = "business_profile_atomic_extraction.v6"
 SEMANTIC_VERIFIER_PROMPT_VERSION = "business_profile_atomic_verifier.v6"
 SEMANTIC_BATCH_VERIFIER_SCHEMA_VERSION = "business_profile_semantic_batch_verifier.v2"
 SEMANTIC_BATCH_VERIFIER_PROMPT_VERSION = "business_profile_semantic_batch_verifier.v2"
@@ -39,6 +39,7 @@ STRUCTURED_EXTRACTION_PROMPT_VERSION = "business_profile_structured_extraction.v
 _LEGACY_SEMANTIC_SCHEMA_VERSIONS = {
     "business_profile_atomic_extraction.v3",
     "business_profile_atomic_extraction.v4",
+    "business_profile_atomic_extraction.v5",
     "business_profile_structured_extraction.v3",
 }
 MAX_STRUCTURED_ROW_DIAGNOSTICS = 10
@@ -398,7 +399,10 @@ class BusinessProfileSemanticExtractor:
                                 "activities and relationships in one response. Do not infer "
                                 "value-chain roles, direction, materiality, pass-through, hedge "
                                 "effectiveness, valuation values, governed ids, or anonymous entity edges. "
-                                "Anonymous concentration facts require an explicitly disclosed fraction. "
+                                "Anonymous concentration facts require source-native disclosed share value "
+                                "and unit fields; preserve percent values exactly as printed and do not "
+                                "convert them to fractions. For processes activities, return explicit "
+                                "source-native transformation input and output object labels when disclosed. "
                                 "Return concise Chinese semantic conclusions and source-native raw fields; "
                                 "do not translate labels, proper nouns, acronyms, numeric values, or units. "
                                 "Do not convert units or calculate derived values. For every item "
@@ -1953,6 +1957,16 @@ def _extraction_schema(field_family: str, *, max_items: int) -> dict[str, Any]:
             "source_unit_raw": {"type": ["string", "null"]},
             "source_row_key": {"type": ["string", "null"]},
             "contract_reference_raw": {"type": ["string", "null"]},
+            "transformation_input_objects_raw": {
+                "type": "array",
+                "items": {"type": "string", "minLength": 1},
+                "maxItems": 12,
+            },
+            "transformation_output_objects_raw": {
+                "type": "array",
+                "items": {"type": "string", "minLength": 1},
+                "maxItems": 12,
+            },
             "model_derived_hints": {"type": "object"},
             "evidence_span_ids": evidence_span_ids,
         },
@@ -1983,6 +1997,11 @@ def _extraction_schema(field_family: str, *, max_items: int) -> dict[str, Any]:
                 "type": ["number", "null"],
                 "minimum": 0,
                 "maximum": 1,
+            },
+            "disclosed_share_source_unit": {"type": ["string", "null"]},
+            "disclosed_share_source_value": {
+                "type": ["number", "null"],
+                "minimum": 0,
             },
             "object_raw": {"type": ["string", "null"]},
             "evidence_span_ids": evidence_span_ids,
@@ -2759,6 +2778,12 @@ def _normalize_activity(
         "source_label_raw": raw.get("source_label_raw"),
         "source_row_key": raw.get("source_row_key"),
         "contract_reference_raw": raw.get("contract_reference_raw"),
+        "transformation_input_objects_raw": _normalized_raw_labels(
+            raw.get("transformation_input_objects_raw")
+        ),
+        "transformation_output_objects_raw": _normalized_raw_labels(
+            raw.get("transformation_output_objects_raw")
+        ),
         "semantic_summary_zh": raw.get("semantic_summary_zh"),
         "model_derived_hints": dict(raw.get("model_derived_hints") or {}),
         "evidence": evidence,
@@ -2791,12 +2816,14 @@ def _normalize_relationship(
         raw.get("anonymous") is True or normalized_counterparty in anonymous_labels
     )
     disclosed_share = raw.get("disclosed_share")
+    source_share = raw.get("disclosed_share_source_value")
+    source_share_unit = raw.get("disclosed_share_source_unit")
     if not counterparty:
         raise ValueError("counterparty label is required")
     inferred_scope = (
         "concentration"
         if _is_anonymous_concentration_label(counterparty)
-        or (anonymous and disclosed_share is not None)
+        or (anonymous and (source_share is not None or disclosed_share is not None))
         else "ordinary"
     )
     relationship_scope = str(raw.get("relationship_scope") or inferred_scope).strip().lower()
@@ -2805,7 +2832,7 @@ def _normalize_relationship(
     # An unnamed customer/supplier is a valid ordinary relationship.  The
     # disclosed-share requirement applies only to concentration rows (the
     # explicit ``前五大客户/供应商`` labels), not to every anonymous contract.
-    if relationship_scope == "concentration" and disclosed_share is None:
+    if relationship_scope == "concentration" and source_share is None and disclosed_share is None:
         raise ValueError("anonymous concentration requires disclosed_share")
     evidence = _resolve_exact_evidence(
         raw.get("evidence_span_ids"),
@@ -2813,13 +2840,19 @@ def _normalize_relationship(
         catalog,
     )
     object_raw = str(raw.get("object_raw") or "").strip()
-    if disclosed_share is not None:
+    if source_share is not None:
+        disclosed_share = _normalize_source_disclosed_share(source_share, source_share_unit)
+        canonical_share_unit = "fraction"
+    elif disclosed_share is not None:
         _validate_finite_number(disclosed_share, "relationship disclosed_share")
         share_unit = str(raw.get("disclosed_share_unit") or "").strip().lower()
-        if share_unit in {"%", "percent", "percentage", "百分点"} and 0 < float(disclosed_share) < 1:
+        if share_unit in {"%", "percent", "percentage", "百分点"}:
             raise ValueError(
                 "relationship disclosed_share fraction conflicts with percent unit"
             )
+        canonical_share_unit = "fraction"
+    else:
+        canonical_share_unit = None
     core = {
         "instrument_id": instrument_id,
         "report_period": report_period,
@@ -2829,7 +2862,9 @@ def _normalize_relationship(
         "anonymous": anonymous,
         "relationship_scope": relationship_scope,
         "disclosed_share": disclosed_share,
-        "disclosed_share_unit": raw.get("disclosed_share_unit"),
+        "disclosed_share_unit": canonical_share_unit,
+        "disclosed_share_source_value": source_share,
+        "disclosed_share_source_unit": source_share_unit,
         "object_raw": object_raw or None,
         "source_row_key": raw.get("source_row_key"),
         "contract_reference_raw": raw.get("contract_reference_raw"),
@@ -2842,6 +2877,35 @@ def _normalize_relationship(
         "counterparty_entity_id": None,
         "review_status": "candidate",
     }
+
+
+def _normalize_source_disclosed_share(value: Any, unit: Any) -> float:
+    _validate_finite_number(value, "relationship disclosed_share source value")
+    numeric = float(value)
+    normalized_unit = str(unit or "").strip().lower()
+    percent_units = {"%", "percent", "percentage", "百分点"}
+    # Annual-report tables commonly put the semantic unit in the column
+    # heading (for example, "占年度销售总额比例") rather than repeating "%"
+    # in the model field.  These labels are explicit percent semantics, not a
+    # magnitude-based guess; fraction labels remain a separate contract.
+    if normalized_unit in percent_units or (
+        normalized_unit
+        and any(token in normalized_unit for token in ("比例", "占比", "百分比", "百分点"))
+    ):
+        numeric /= 100.0
+    elif normalized_unit not in {"fraction", "ratio", "decimal"}:
+        raise ValueError("relationship disclosed_share source unit is ambiguous")
+    if not 0 <= numeric <= 1:
+        raise ValueError("relationship disclosed_share is outside [0, 1]")
+    return numeric
+
+
+def _normalized_raw_labels(value: Any) -> list[str]:
+    if value in (None, ""):
+        return []
+    if not isinstance(value, Sequence) or isinstance(value, (str, bytes)):
+        raise ValueError("transformation object labels must be an array")
+    return list(dict.fromkeys(str(item).strip() for item in value if str(item).strip()))
 
 
 def _is_anonymous_concentration_label(value: Any) -> bool:

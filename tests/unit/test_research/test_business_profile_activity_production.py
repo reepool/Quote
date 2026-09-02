@@ -483,6 +483,41 @@ def test_standalone_processes_activity_does_not_create_processor_role():
     assert producer.role_derivation_gap(approved) == "transformation_lineage_missing"
 
 
+def test_exact_source_transformation_components_support_processor_without_linked_ids():
+    producer = BusinessProfileActivityProducer(_Repository())
+    candidate = producer.build_activity_candidate(
+        {
+            "instrument_id": "300750.SZ",
+            "report_period": "2025-12-31",
+            "subject_scope": "issuer",
+            "action": "processes",
+            "object_type": "product",
+            "object_raw": "锂盐",
+            "segment_id": "recycling",
+            "confidence": 1.0,
+        },
+        evidence_id="evidence-recycle-line",
+        run_id="run-1",
+        data_available_date="2026-03-28",
+        extraction_method="semantic",
+    )
+    candidate["metadata"].update(
+        {
+            "transformation_lineage_status": "assertion_bound",
+            "transformation_input_objects_raw": ["废旧电池"],
+            "transformation_output_objects_raw": ["锂盐"],
+            "transformation_component_evidence_id": "evidence-recycle-line",
+            "exact_evidence": {"quote_hash": "exact"},
+        }
+    )
+    approved = {**candidate, "review_status": "approved"}
+
+    roles = producer.derive_role_candidates([approved])
+
+    assert [item["role"] for item in roles] == ["processor"]
+    assert producer.role_derivation_gap(approved) is None
+
+
 def test_processor_links_must_resolve_to_approved_same_scope_inputs_and_outputs():
     producer = BusinessProfileActivityProducer(_Repository())
 

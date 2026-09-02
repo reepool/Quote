@@ -1,0 +1,3329 @@
+{
+  "approved_occurrence_groups": [
+    {
+      "approved_record_ids": [
+        "activity:5ef1aaf799933865118619997b7c74e2",
+        "activity:aeba45980618d8f33276d7b33b53cade"
+      ],
+      "canonical_new_identity_material": {
+        "instrument_id": "300750.SZ",
+        "metric_slot": null,
+        "page_number": 25,
+        "report_period": "2025-12-31",
+        "row_locator": "row-3909f9768cb60a33467207cd",
+        "source_document_id": "shared-asset:asset_3b09f6c831975c7177b6bb3287cab781",
+        "source_kind": "table",
+        "table_id": "shared-asset:asset_3b09f6c831975c7177b6bb3287cab781:annual_report_semantic_bundle:25:91a16c2ba017cc19"
+      },
+      "canonical_old_identity_material": {
+        "action_or_relationship": "sells",
+        "contract_reference_raw": null,
+        "evidence_id": "bp-evidence-4cf0da3b8cd4c207ee23e3be",
+        "instrument_id": "300750.SZ",
+        "object_id": null,
+        "object_raw": "动力电池系统",
+        "occurrence_ordinal": null,
+        "page_number": null,
+        "report_period": "2025-12-31",
+        "section_id": null,
+        "segment_id": null,
+        "source_document_id": "shared-asset:asset_3b09f6c831975c7177b6bb3287cab781",
+        "source_row_key": "row-3909f9768cb60a33467207cd",
+        "subject_scope": "issuer"
+      },
+      "canonical_rekey_status": "blocked_semantic_content_conflict",
+      "dependent_exposure_fact_ids": [],
+      "dependent_exposure_ids": [],
+      "inference": "reconstructed",
+      "instrument_id": "300750.SZ",
+      "occurrence_identity": "occurrence:0677b87bff165a3acc0920aaa4940de4",
+      "record_type": "activities",
+      "rows": [
+        {
+          "evidence_id": "bp-evidence-4cf0da3b8cd4c207ee23e3be",
+          "legacy_source_occurrence_material": {
+            "action_or_relationship": "sells",
+            "contract_reference_raw": null,
+            "evidence_id": "bp-evidence-4cf0da3b8cd4c207ee23e3be",
+            "instrument_id": "300750.SZ",
+            "object_id": null,
+            "object_raw": "动力电池系统",
+            "occurrence_ordinal": null,
+            "page_number": null,
+            "report_period": "2025-12-31",
+            "section_id": null,
+            "segment_id": null,
+            "source_document_id": "shared-asset:asset_3b09f6c831975c7177b6bb3287cab781",
+            "source_row_key": "row-3909f9768cb60a33467207cd",
+            "subject_scope": "issuer"
+          },
+          "record_id": "activity:5ef1aaf799933865118619997b7c74e2",
+          "report_period": "2025-12-31",
+          "run_id": "bp-run-4f8b0d8fbadffe42fafb79a2",
+          "semantic_content_fingerprint": "semantic:144f56686fd1ab09dfd362daa581237b",
+          "source_occurrence_material": {
+            "instrument_id": "300750.SZ",
+            "metric_slot": null,
+            "page_number": 25,
+            "report_period": "2025-12-31",
+            "row_locator": "row-3909f9768cb60a33467207cd",
+            "source_document_id": "shared-asset:asset_3b09f6c831975c7177b6bb3287cab781",
+            "source_kind": "table",
+            "table_id": "shared-asset:asset_3b09f6c831975c7177b6bb3287cab781:annual_report_semantic_bundle:25:91a16c2ba017cc19"
+          }
+        },
+        {
+          "evidence_id": "bp-evidence-4cf0da3b8cd4c207ee23e3be",
+          "legacy_source_occurrence_material": {
+            "action_or_relationship": "sells",
+            "contract_reference_raw": null,
+            "evidence_id": "bp-evidence-4cf0da3b8cd4c207ee23e3be",
+            "instrument_id": "300750.SZ",
+            "object_id": null,
+            "object_raw": "动力电池系统",
+            "occurrence_ordinal": null,
+            "page_number": null,
+            "report_period": "2025-12-31",
+            "section_id": null,
+            "segment_id": null,
+            "source_document_id": "shared-asset:asset_3b09f6c831975c7177b6bb3287cab781",
+            "source_row_key": "row-3909f9768cb60a33467207cd",
+            "subject_scope": "consolidated_group"
+          },
+          "record_id": "activity:aeba45980618d8f33276d7b33b53cade",
+          "report_period": "2025-12-31",
+          "run_id": "bp-run-ee8828b58d15a435442c5578",
+          "semantic_content_fingerprint": "semantic:d2be1ac8b5f4be1d9358c66fc3f82c11",
+          "source_occurrence_material": {
+            "instrument_id": "300750.SZ",
+            "metric_slot": null,
+            "page_number": 25,
+            "report_period": "2025-12-31",
+            "row_locator": "row-3909f9768cb60a33467207cd",
+            "source_document_id": "shared-asset:asset_3b09f6c831975c7177b6bb3287cab781",
+            "source_kind": "table",
+            "table_id": "shared-asset:asset_3b09f6c831975c7177b6bb3287cab781:annual_report_semantic_bundle:25:91a16c2ba017cc19"
+          }
+        }
+      ]
+    },
+    {
+      "approved_record_ids": [
+        "activity:0828de2ce296248bc8f532fb11a8b805",
+        "activity:91bc882fe2e805c9328200f4d9aef844"
+      ],
+      "canonical_new_identity_material": {
+        "instrument_id": "300750.SZ",
+        "metric_slot": null,
+        "page_number": 27,
+        "report_period": "2025-12-31",
+        "row_locator": "row-c7bc9f54fa34737f4b6bbb5d",
+        "source_document_id": "shared-asset:asset_3b09f6c831975c7177b6bb3287cab781",
+        "source_kind": "table",
+        "table_id": "shared-asset:asset_3b09f6c831975c7177b6bb3287cab781:annual_report_semantic_bundle:27:cb2d97d8c15dd7b7"
+      },
+      "canonical_old_identity_material": {
+        "action_or_relationship": "stores",
+        "contract_reference_raw": null,
+        "evidence_id": "bp-evidence-1b8433f562029f072dd23431",
+        "instrument_id": "300750.SZ",
+        "object_id": null,
+        "object_raw": "电池系统",
+        "occurrence_ordinal": null,
+        "page_number": null,
+        "report_period": "2025-12-31",
+        "section_id": null,
+        "segment_id": null,
+        "source_document_id": "shared-asset:asset_3b09f6c831975c7177b6bb3287cab781",
+        "source_row_key": "row-c7bc9f54fa34737f4b6bbb5d",
+        "subject_scope": "issuer"
+      },
+      "canonical_rekey_status": "blocked_semantic_content_conflict",
+      "dependent_exposure_fact_ids": [],
+      "dependent_exposure_ids": [],
+      "inference": "reconstructed",
+      "instrument_id": "300750.SZ",
+      "occurrence_identity": "occurrence:268eeb76790b8abe4036eb6b1abdb8cc",
+      "record_type": "activities",
+      "rows": [
+        {
+          "evidence_id": "bp-evidence-1b8433f562029f072dd23431",
+          "legacy_source_occurrence_material": {
+            "action_or_relationship": "stores",
+            "contract_reference_raw": null,
+            "evidence_id": "bp-evidence-1b8433f562029f072dd23431",
+            "instrument_id": "300750.SZ",
+            "object_id": null,
+            "object_raw": "电池系统",
+            "occurrence_ordinal": null,
+            "page_number": null,
+            "report_period": "2025-12-31",
+            "section_id": null,
+            "segment_id": null,
+            "source_document_id": "shared-asset:asset_3b09f6c831975c7177b6bb3287cab781",
+            "source_row_key": "row-c7bc9f54fa34737f4b6bbb5d",
+            "subject_scope": "issuer"
+          },
+          "record_id": "activity:0828de2ce296248bc8f532fb11a8b805",
+          "report_period": "2025-12-31",
+          "run_id": "bp-run-13e7e6aa3d6ca6c9ca9249a2",
+          "semantic_content_fingerprint": "semantic:dc09455a318de470d28492b02cb6b7ca",
+          "source_occurrence_material": {
+            "instrument_id": "300750.SZ",
+            "metric_slot": null,
+            "page_number": 27,
+            "report_period": "2025-12-31",
+            "row_locator": "row-c7bc9f54fa34737f4b6bbb5d",
+            "source_document_id": "shared-asset:asset_3b09f6c831975c7177b6bb3287cab781",
+            "source_kind": "table",
+            "table_id": "shared-asset:asset_3b09f6c831975c7177b6bb3287cab781:annual_report_semantic_bundle:27:cb2d97d8c15dd7b7"
+          }
+        },
+        {
+          "evidence_id": "bp-evidence-1b8433f562029f072dd23431",
+          "legacy_source_occurrence_material": {
+            "action_or_relationship": "stores",
+            "contract_reference_raw": null,
+            "evidence_id": "bp-evidence-1b8433f562029f072dd23431",
+            "instrument_id": "300750.SZ",
+            "object_id": null,
+            "object_raw": "电池系统",
+            "occurrence_ordinal": null,
+            "page_number": null,
+            "report_period": "2025-12-31",
+            "section_id": null,
+            "segment_id": null,
+            "source_document_id": "shared-asset:asset_3b09f6c831975c7177b6bb3287cab781",
+            "source_row_key": "row-c7bc9f54fa34737f4b6bbb5d",
+            "subject_scope": "consolidated_group"
+          },
+          "record_id": "activity:91bc882fe2e805c9328200f4d9aef844",
+          "report_period": "2025-12-31",
+          "run_id": "bp-run-ee8828b58d15a435442c5578",
+          "semantic_content_fingerprint": "semantic:7dde823ce3381eeaf6c4663abe70a689",
+          "source_occurrence_material": {
+            "instrument_id": "300750.SZ",
+            "metric_slot": null,
+            "page_number": 27,
+            "report_period": "2025-12-31",
+            "row_locator": "row-c7bc9f54fa34737f4b6bbb5d",
+            "source_document_id": "shared-asset:asset_3b09f6c831975c7177b6bb3287cab781",
+            "source_kind": "table",
+            "table_id": "shared-asset:asset_3b09f6c831975c7177b6bb3287cab781:annual_report_semantic_bundle:27:cb2d97d8c15dd7b7"
+          }
+        }
+      ]
+    },
+    {
+      "approved_record_ids": [
+        "activity:ba3ab7734ae4c7e355cd709d252a59ed",
+        "activity:d3b2a7a92ee881c40f69aeb1f0394fb5"
+      ],
+      "canonical_new_identity_material": {
+        "instrument_id": "300750.SZ",
+        "metric_slot": null,
+        "page_number": 26,
+        "report_period": "2025-12-31",
+        "row_locator": "row-e00770fc46c8da814762d52f",
+        "source_document_id": "shared-asset:asset_3b09f6c831975c7177b6bb3287cab781",
+        "source_kind": "table",
+        "table_id": "shared-asset:asset_3b09f6c831975c7177b6bb3287cab781:annual_report_semantic_bundle:26:361fef7a8fb84720"
+      },
+      "canonical_old_identity_material": {
+        "action_or_relationship": "sells",
+        "contract_reference_raw": null,
+        "evidence_id": "bp-evidence-25cc851d42829fe5332d5bc7",
+        "instrument_id": "300750.SZ",
+        "object_id": null,
+        "object_raw": "电池系统",
+        "occurrence_ordinal": null,
+        "page_number": null,
+        "report_period": "2025-12-31",
+        "section_id": null,
+        "segment_id": null,
+        "source_document_id": "shared-asset:asset_3b09f6c831975c7177b6bb3287cab781",
+        "source_row_key": "row-e00770fc46c8da814762d52f",
+        "subject_scope": "issuer"
+      },
+      "canonical_rekey_status": "blocked_semantic_content_conflict",
+      "dependent_exposure_fact_ids": [],
+      "dependent_exposure_ids": [],
+      "inference": "reconstructed",
+      "instrument_id": "300750.SZ",
+      "occurrence_identity": "occurrence:5f233d8acc587e3bc1d91c03f9f99157",
+      "record_type": "activities",
+      "rows": [
+        {
+          "evidence_id": "bp-evidence-25cc851d42829fe5332d5bc7",
+          "legacy_source_occurrence_material": {
+            "action_or_relationship": "sells",
+            "contract_reference_raw": null,
+            "evidence_id": "bp-evidence-25cc851d42829fe5332d5bc7",
+            "instrument_id": "300750.SZ",
+            "object_id": null,
+            "object_raw": "电池系统",
+            "occurrence_ordinal": null,
+            "page_number": null,
+            "report_period": "2025-12-31",
+            "section_id": null,
+            "segment_id": null,
+            "source_document_id": "shared-asset:asset_3b09f6c831975c7177b6bb3287cab781",
+            "source_row_key": "row-e00770fc46c8da814762d52f",
+            "subject_scope": "issuer"
+          },
+          "record_id": "activity:ba3ab7734ae4c7e355cd709d252a59ed",
+          "report_period": "2025-12-31",
+          "run_id": "bp-run-13e7e6aa3d6ca6c9ca9249a2",
+          "semantic_content_fingerprint": "semantic:007010330ed527539892f59754cdb830",
+          "source_occurrence_material": {
+            "instrument_id": "300750.SZ",
+            "metric_slot": null,
+            "page_number": 26,
+            "report_period": "2025-12-31",
+            "row_locator": "row-e00770fc46c8da814762d52f",
+            "source_document_id": "shared-asset:asset_3b09f6c831975c7177b6bb3287cab781",
+            "source_kind": "table",
+            "table_id": "shared-asset:asset_3b09f6c831975c7177b6bb3287cab781:annual_report_semantic_bundle:26:361fef7a8fb84720"
+          }
+        },
+        {
+          "evidence_id": "bp-evidence-25cc851d42829fe5332d5bc7",
+          "legacy_source_occurrence_material": {
+            "action_or_relationship": "sells",
+            "contract_reference_raw": null,
+            "evidence_id": "bp-evidence-25cc851d42829fe5332d5bc7",
+            "instrument_id": "300750.SZ",
+            "object_id": null,
+            "object_raw": "电池系统",
+            "occurrence_ordinal": null,
+            "page_number": null,
+            "report_period": "2025-12-31",
+            "section_id": null,
+            "segment_id": null,
+            "source_document_id": "shared-asset:asset_3b09f6c831975c7177b6bb3287cab781",
+            "source_row_key": "row-e00770fc46c8da814762d52f",
+            "subject_scope": "consolidated_group"
+          },
+          "record_id": "activity:d3b2a7a92ee881c40f69aeb1f0394fb5",
+          "report_period": "2025-12-31",
+          "run_id": "bp-run-ee8828b58d15a435442c5578",
+          "semantic_content_fingerprint": "semantic:cd7210948c9849c53d73526b1f147de3",
+          "source_occurrence_material": {
+            "instrument_id": "300750.SZ",
+            "metric_slot": null,
+            "page_number": 26,
+            "report_period": "2025-12-31",
+            "row_locator": "row-e00770fc46c8da814762d52f",
+            "source_document_id": "shared-asset:asset_3b09f6c831975c7177b6bb3287cab781",
+            "source_kind": "table",
+            "table_id": "shared-asset:asset_3b09f6c831975c7177b6bb3287cab781:annual_report_semantic_bundle:26:361fef7a8fb84720"
+          }
+        }
+      ]
+    },
+    {
+      "approved_record_ids": [
+        "activity:4c81d55fa3d51d7ad61529df90d038f3",
+        "activity:d4d3d7762f9e2b90e6e807a7e160bd16"
+      ],
+      "canonical_new_identity_material": {
+        "instrument_id": "300750.SZ",
+        "metric_slot": null,
+        "page_number": 25,
+        "report_period": "2025-12-31",
+        "row_locator": "row-6afdcbdc2ad7c1d0249e99a0",
+        "source_document_id": "shared-asset:asset_3b09f6c831975c7177b6bb3287cab781",
+        "source_kind": "table",
+        "table_id": "shared-asset:asset_3b09f6c831975c7177b6bb3287cab781:annual_report_semantic_bundle:25:91a16c2ba017cc19"
+      },
+      "canonical_old_identity_material": {
+        "action_or_relationship": "sells",
+        "contract_reference_raw": null,
+        "evidence_id": "bp-evidence-4cf0da3b8cd4c207ee23e3be",
+        "instrument_id": "300750.SZ",
+        "object_id": null,
+        "object_raw": "储能电池系统",
+        "occurrence_ordinal": null,
+        "page_number": null,
+        "report_period": "2025-12-31",
+        "section_id": null,
+        "segment_id": null,
+        "source_document_id": "shared-asset:asset_3b09f6c831975c7177b6bb3287cab781",
+        "source_row_key": "row-6afdcbdc2ad7c1d0249e99a0",
+        "subject_scope": "issuer"
+      },
+      "canonical_rekey_status": "blocked_semantic_content_conflict",
+      "dependent_exposure_fact_ids": [],
+      "dependent_exposure_ids": [],
+      "inference": "reconstructed",
+      "instrument_id": "300750.SZ",
+      "occurrence_identity": "occurrence:639df02d51110dffd3fb343f14d1f06e",
+      "record_type": "activities",
+      "rows": [
+        {
+          "evidence_id": "bp-evidence-4cf0da3b8cd4c207ee23e3be",
+          "legacy_source_occurrence_material": {
+            "action_or_relationship": "sells",
+            "contract_reference_raw": null,
+            "evidence_id": "bp-evidence-4cf0da3b8cd4c207ee23e3be",
+            "instrument_id": "300750.SZ",
+            "object_id": null,
+            "object_raw": "储能电池系统",
+            "occurrence_ordinal": null,
+            "page_number": null,
+            "report_period": "2025-12-31",
+            "section_id": null,
+            "segment_id": null,
+            "source_document_id": "shared-asset:asset_3b09f6c831975c7177b6bb3287cab781",
+            "source_row_key": "row-6afdcbdc2ad7c1d0249e99a0",
+            "subject_scope": "issuer"
+          },
+          "record_id": "activity:4c81d55fa3d51d7ad61529df90d038f3",
+          "report_period": "2025-12-31",
+          "run_id": "bp-run-4f8b0d8fbadffe42fafb79a2",
+          "semantic_content_fingerprint": "semantic:d98bb9a3744b76f2c44cfe7d61802318",
+          "source_occurrence_material": {
+            "instrument_id": "300750.SZ",
+            "metric_slot": null,
+            "page_number": 25,
+            "report_period": "2025-12-31",
+            "row_locator": "row-6afdcbdc2ad7c1d0249e99a0",
+            "source_document_id": "shared-asset:asset_3b09f6c831975c7177b6bb3287cab781",
+            "source_kind": "table",
+            "table_id": "shared-asset:asset_3b09f6c831975c7177b6bb3287cab781:annual_report_semantic_bundle:25:91a16c2ba017cc19"
+          }
+        },
+        {
+          "evidence_id": "bp-evidence-4cf0da3b8cd4c207ee23e3be",
+          "legacy_source_occurrence_material": {
+            "action_or_relationship": "sells",
+            "contract_reference_raw": null,
+            "evidence_id": "bp-evidence-4cf0da3b8cd4c207ee23e3be",
+            "instrument_id": "300750.SZ",
+            "object_id": null,
+            "object_raw": "储能电池系统",
+            "occurrence_ordinal": null,
+            "page_number": null,
+            "report_period": "2025-12-31",
+            "section_id": null,
+            "segment_id": null,
+            "source_document_id": "shared-asset:asset_3b09f6c831975c7177b6bb3287cab781",
+            "source_row_key": "row-6afdcbdc2ad7c1d0249e99a0",
+            "subject_scope": "consolidated_group"
+          },
+          "record_id": "activity:d4d3d7762f9e2b90e6e807a7e160bd16",
+          "report_period": "2025-12-31",
+          "run_id": "bp-run-ee8828b58d15a435442c5578",
+          "semantic_content_fingerprint": "semantic:f2759fc0a4a976dfe5c27e8942a0075b",
+          "source_occurrence_material": {
+            "instrument_id": "300750.SZ",
+            "metric_slot": null,
+            "page_number": 25,
+            "report_period": "2025-12-31",
+            "row_locator": "row-6afdcbdc2ad7c1d0249e99a0",
+            "source_document_id": "shared-asset:asset_3b09f6c831975c7177b6bb3287cab781",
+            "source_kind": "table",
+            "table_id": "shared-asset:asset_3b09f6c831975c7177b6bb3287cab781:annual_report_semantic_bundle:25:91a16c2ba017cc19"
+          }
+        }
+      ]
+    },
+    {
+      "approved_record_ids": [
+        "activity:1951cc308129f2b1b3a731f24d80067c",
+        "activity:c4a72dc12662e75ca42ea857db95f442"
+      ],
+      "canonical_new_identity_material": {
+        "instrument_id": "300750.SZ",
+        "metric_slot": null,
+        "page_number": 26,
+        "report_period": "2025-12-31",
+        "row_locator": "row-bd7b9a820cdb060bf9c8fff1",
+        "source_document_id": "shared-asset:asset_3b09f6c831975c7177b6bb3287cab781",
+        "source_kind": "table",
+        "table_id": "shared-asset:asset_3b09f6c831975c7177b6bb3287cab781:annual_report_semantic_bundle:26:361fef7a8fb84720"
+      },
+      "canonical_old_identity_material": {
+        "action_or_relationship": "produces",
+        "contract_reference_raw": null,
+        "evidence_id": "bp-evidence-25cc851d42829fe5332d5bc7",
+        "instrument_id": "300750.SZ",
+        "object_id": null,
+        "object_raw": "电池系统",
+        "occurrence_ordinal": null,
+        "page_number": null,
+        "report_period": "2025-12-31",
+        "section_id": null,
+        "segment_id": null,
+        "source_document_id": "shared-asset:asset_3b09f6c831975c7177b6bb3287cab781",
+        "source_row_key": "row-bd7b9a820cdb060bf9c8fff1",
+        "subject_scope": "issuer"
+      },
+      "canonical_rekey_status": "blocked_semantic_content_conflict",
+      "dependent_exposure_fact_ids": [],
+      "dependent_exposure_ids": [],
+      "inference": "reconstructed",
+      "instrument_id": "300750.SZ",
+      "occurrence_identity": "occurrence:7448497a0da7acafdde87c4b0abb4ca6",
+      "record_type": "activities",
+      "rows": [
+        {
+          "evidence_id": "bp-evidence-25cc851d42829fe5332d5bc7",
+          "legacy_source_occurrence_material": {
+            "action_or_relationship": "produces",
+            "contract_reference_raw": null,
+            "evidence_id": "bp-evidence-25cc851d42829fe5332d5bc7",
+            "instrument_id": "300750.SZ",
+            "object_id": null,
+            "object_raw": "电池系统",
+            "occurrence_ordinal": null,
+            "page_number": null,
+            "report_period": "2025-12-31",
+            "section_id": null,
+            "segment_id": null,
+            "source_document_id": "shared-asset:asset_3b09f6c831975c7177b6bb3287cab781",
+            "source_row_key": "row-bd7b9a820cdb060bf9c8fff1",
+            "subject_scope": "issuer"
+          },
+          "record_id": "activity:1951cc308129f2b1b3a731f24d80067c",
+          "report_period": "2025-12-31",
+          "run_id": "bp-run-13e7e6aa3d6ca6c9ca9249a2",
+          "semantic_content_fingerprint": "semantic:e0185d9a04931091d58b0ab1a27b19b9",
+          "source_occurrence_material": {
+            "instrument_id": "300750.SZ",
+            "metric_slot": null,
+            "page_number": 26,
+            "report_period": "2025-12-31",
+            "row_locator": "row-bd7b9a820cdb060bf9c8fff1",
+            "source_document_id": "shared-asset:asset_3b09f6c831975c7177b6bb3287cab781",
+            "source_kind": "table",
+            "table_id": "shared-asset:asset_3b09f6c831975c7177b6bb3287cab781:annual_report_semantic_bundle:26:361fef7a8fb84720"
+          }
+        },
+        {
+          "evidence_id": "bp-evidence-25cc851d42829fe5332d5bc7",
+          "legacy_source_occurrence_material": {
+            "action_or_relationship": "produces",
+            "contract_reference_raw": null,
+            "evidence_id": "bp-evidence-25cc851d42829fe5332d5bc7",
+            "instrument_id": "300750.SZ",
+            "object_id": null,
+            "object_raw": "电池系统",
+            "occurrence_ordinal": null,
+            "page_number": null,
+            "report_period": "2025-12-31",
+            "section_id": null,
+            "segment_id": null,
+            "source_document_id": "shared-asset:asset_3b09f6c831975c7177b6bb3287cab781",
+            "source_row_key": "row-bd7b9a820cdb060bf9c8fff1",
+            "subject_scope": "consolidated_group"
+          },
+          "record_id": "activity:c4a72dc12662e75ca42ea857db95f442",
+          "report_period": "2025-12-31",
+          "run_id": "bp-run-ee8828b58d15a435442c5578",
+          "semantic_content_fingerprint": "semantic:79fa76647e3748de101d2953d8cf0a28",
+          "source_occurrence_material": {
+            "instrument_id": "300750.SZ",
+            "metric_slot": null,
+            "page_number": 26,
+            "report_period": "2025-12-31",
+            "row_locator": "row-bd7b9a820cdb060bf9c8fff1",
+            "source_document_id": "shared-asset:asset_3b09f6c831975c7177b6bb3287cab781",
+            "source_kind": "table",
+            "table_id": "shared-asset:asset_3b09f6c831975c7177b6bb3287cab781:annual_report_semantic_bundle:26:361fef7a8fb84720"
+          }
+        }
+      ]
+    },
+    {
+      "approved_record_ids": [
+        "activity:39658f1043a2260c57836ceda80d551a",
+        "activity:d1dc3502a437d7c3c7ffafd22445cdc3"
+      ],
+      "canonical_new_identity_material": {
+        "instrument_id": "300750.SZ",
+        "metric_slot": null,
+        "page_number": 25,
+        "report_period": "2025-12-31",
+        "row_locator": "row-168454f5419a4baf1ef77dcf",
+        "source_document_id": "shared-asset:asset_3b09f6c831975c7177b6bb3287cab781",
+        "source_kind": "table",
+        "table_id": "shared-asset:asset_3b09f6c831975c7177b6bb3287cab781:annual_report_semantic_bundle:25:91a16c2ba017cc19"
+      },
+      "canonical_old_identity_material": {
+        "action_or_relationship": "sells",
+        "contract_reference_raw": null,
+        "evidence_id": "bp-evidence-4cf0da3b8cd4c207ee23e3be",
+        "instrument_id": "300750.SZ",
+        "object_id": null,
+        "object_raw": "电池矿产资源",
+        "occurrence_ordinal": null,
+        "page_number": null,
+        "report_period": "2025-12-31",
+        "section_id": null,
+        "segment_id": null,
+        "source_document_id": "shared-asset:asset_3b09f6c831975c7177b6bb3287cab781",
+        "source_row_key": "row-168454f5419a4baf1ef77dcf",
+        "subject_scope": "issuer"
+      },
+      "canonical_rekey_status": "blocked_semantic_content_conflict",
+      "dependent_exposure_fact_ids": [],
+      "dependent_exposure_ids": [],
+      "inference": "reconstructed",
+      "instrument_id": "300750.SZ",
+      "occurrence_identity": "occurrence:bd26c1de8735591e97ff6fb5d781d4f4",
+      "record_type": "activities",
+      "rows": [
+        {
+          "evidence_id": "bp-evidence-4cf0da3b8cd4c207ee23e3be",
+          "legacy_source_occurrence_material": {
+            "action_or_relationship": "sells",
+            "contract_reference_raw": null,
+            "evidence_id": "bp-evidence-4cf0da3b8cd4c207ee23e3be",
+            "instrument_id": "300750.SZ",
+            "object_id": null,
+            "object_raw": "电池矿产资源",
+            "occurrence_ordinal": null,
+            "page_number": null,
+            "report_period": "2025-12-31",
+            "section_id": null,
+            "segment_id": null,
+            "source_document_id": "shared-asset:asset_3b09f6c831975c7177b6bb3287cab781",
+            "source_row_key": "row-168454f5419a4baf1ef77dcf",
+            "subject_scope": "issuer"
+          },
+          "record_id": "activity:39658f1043a2260c57836ceda80d551a",
+          "report_period": "2025-12-31",
+          "run_id": "bp-run-4f8b0d8fbadffe42fafb79a2",
+          "semantic_content_fingerprint": "semantic:28499a13e5694d4e3abdb54de5c759e6",
+          "source_occurrence_material": {
+            "instrument_id": "300750.SZ",
+            "metric_slot": null,
+            "page_number": 25,
+            "report_period": "2025-12-31",
+            "row_locator": "row-168454f5419a4baf1ef77dcf",
+            "source_document_id": "shared-asset:asset_3b09f6c831975c7177b6bb3287cab781",
+            "source_kind": "table",
+            "table_id": "shared-asset:asset_3b09f6c831975c7177b6bb3287cab781:annual_report_semantic_bundle:25:91a16c2ba017cc19"
+          }
+        },
+        {
+          "evidence_id": "bp-evidence-4cf0da3b8cd4c207ee23e3be",
+          "legacy_source_occurrence_material": {
+            "action_or_relationship": "sells",
+            "contract_reference_raw": null,
+            "evidence_id": "bp-evidence-4cf0da3b8cd4c207ee23e3be",
+            "instrument_id": "300750.SZ",
+            "object_id": null,
+            "object_raw": "电池矿产资源",
+            "occurrence_ordinal": null,
+            "page_number": null,
+            "report_period": "2025-12-31",
+            "section_id": null,
+            "segment_id": null,
+            "source_document_id": "shared-asset:asset_3b09f6c831975c7177b6bb3287cab781",
+            "source_row_key": "row-168454f5419a4baf1ef77dcf",
+            "subject_scope": "consolidated_group"
+          },
+          "record_id": "activity:d1dc3502a437d7c3c7ffafd22445cdc3",
+          "report_period": "2025-12-31",
+          "run_id": "bp-run-ee8828b58d15a435442c5578",
+          "semantic_content_fingerprint": "semantic:1a42b6f7d26cfd150c0b380abb9f06de",
+          "source_occurrence_material": {
+            "instrument_id": "300750.SZ",
+            "metric_slot": null,
+            "page_number": 25,
+            "report_period": "2025-12-31",
+            "row_locator": "row-168454f5419a4baf1ef77dcf",
+            "source_document_id": "shared-asset:asset_3b09f6c831975c7177b6bb3287cab781",
+            "source_kind": "table",
+            "table_id": "shared-asset:asset_3b09f6c831975c7177b6bb3287cab781:annual_report_semantic_bundle:25:91a16c2ba017cc19"
+          }
+        }
+      ]
+    },
+    {
+      "approved_record_ids": [
+        "activity:c018e11cdd994b0541254e16c93c99bf",
+        "activity:4299c3b46455fbc139fb584eab244351"
+      ],
+      "canonical_new_identity_material": {
+        "instrument_id": "300750.SZ",
+        "metric_slot": null,
+        "page_number": 25,
+        "report_period": "2025-12-31",
+        "row_locator": "row-e36697784c6607e15ebd2608",
+        "source_document_id": "shared-asset:asset_3b09f6c831975c7177b6bb3287cab781",
+        "source_kind": "table",
+        "table_id": "shared-asset:asset_3b09f6c831975c7177b6bb3287cab781:annual_report_semantic_bundle:25:91a16c2ba017cc19"
+      },
+      "canonical_old_identity_material": {
+        "action_or_relationship": "sells",
+        "contract_reference_raw": null,
+        "evidence_id": "bp-evidence-4cf0da3b8cd4c207ee23e3be",
+        "instrument_id": "300750.SZ",
+        "object_id": null,
+        "object_raw": "电池材料及回收",
+        "occurrence_ordinal": null,
+        "page_number": null,
+        "report_period": "2025-12-31",
+        "section_id": null,
+        "segment_id": null,
+        "source_document_id": "shared-asset:asset_3b09f6c831975c7177b6bb3287cab781",
+        "source_row_key": "row-e36697784c6607e15ebd2608",
+        "subject_scope": "issuer"
+      },
+      "canonical_rekey_status": "blocked_semantic_content_conflict",
+      "dependent_exposure_fact_ids": [],
+      "dependent_exposure_ids": [],
+      "inference": "reconstructed",
+      "instrument_id": "300750.SZ",
+      "occurrence_identity": "occurrence:cad86b98fab22b13b85a8b4c7fcea807",
+      "record_type": "activities",
+      "rows": [
+        {
+          "evidence_id": "bp-evidence-4cf0da3b8cd4c207ee23e3be",
+          "legacy_source_occurrence_material": {
+            "action_or_relationship": "sells",
+            "contract_reference_raw": null,
+            "evidence_id": "bp-evidence-4cf0da3b8cd4c207ee23e3be",
+            "instrument_id": "300750.SZ",
+            "object_id": null,
+            "object_raw": "电池材料及回收",
+            "occurrence_ordinal": null,
+            "page_number": null,
+            "report_period": "2025-12-31",
+            "section_id": null,
+            "segment_id": null,
+            "source_document_id": "shared-asset:asset_3b09f6c831975c7177b6bb3287cab781",
+            "source_row_key": "row-e36697784c6607e15ebd2608",
+            "subject_scope": "issuer"
+          },
+          "record_id": "activity:c018e11cdd994b0541254e16c93c99bf",
+          "report_period": "2025-12-31",
+          "run_id": "bp-run-4f8b0d8fbadffe42fafb79a2",
+          "semantic_content_fingerprint": "semantic:95c99be56c8568b32a88902ed81d0190",
+          "source_occurrence_material": {
+            "instrument_id": "300750.SZ",
+            "metric_slot": null,
+            "page_number": 25,
+            "report_period": "2025-12-31",
+            "row_locator": "row-e36697784c6607e15ebd2608",
+            "source_document_id": "shared-asset:asset_3b09f6c831975c7177b6bb3287cab781",
+            "source_kind": "table",
+            "table_id": "shared-asset:asset_3b09f6c831975c7177b6bb3287cab781:annual_report_semantic_bundle:25:91a16c2ba017cc19"
+          }
+        },
+        {
+          "evidence_id": "bp-evidence-4cf0da3b8cd4c207ee23e3be",
+          "legacy_source_occurrence_material": {
+            "action_or_relationship": "sells",
+            "contract_reference_raw": null,
+            "evidence_id": "bp-evidence-4cf0da3b8cd4c207ee23e3be",
+            "instrument_id": "300750.SZ",
+            "object_id": null,
+            "object_raw": "电池材料及回收",
+            "occurrence_ordinal": null,
+            "page_number": null,
+            "report_period": "2025-12-31",
+            "section_id": null,
+            "segment_id": null,
+            "source_document_id": "shared-asset:asset_3b09f6c831975c7177b6bb3287cab781",
+            "source_row_key": "row-e36697784c6607e15ebd2608",
+            "subject_scope": "consolidated_group"
+          },
+          "record_id": "activity:4299c3b46455fbc139fb584eab244351",
+          "report_period": "2025-12-31",
+          "run_id": "bp-run-ee8828b58d15a435442c5578",
+          "semantic_content_fingerprint": "semantic:41c94614fc13f77baf994a501b70b620",
+          "source_occurrence_material": {
+            "instrument_id": "300750.SZ",
+            "metric_slot": null,
+            "page_number": 25,
+            "report_period": "2025-12-31",
+            "row_locator": "row-e36697784c6607e15ebd2608",
+            "source_document_id": "shared-asset:asset_3b09f6c831975c7177b6bb3287cab781",
+            "source_kind": "table",
+            "table_id": "shared-asset:asset_3b09f6c831975c7177b6bb3287cab781:annual_report_semantic_bundle:25:91a16c2ba017cc19"
+          }
+        }
+      ]
+    }
+  ],
+  "artifact_read_errors": [],
+  "blockers": [
+    "canonical_rekey_material_unavailable"
+  ],
+  "candidate_descendants": [],
+  "control_artifact": "/home/python/Quote/data/checkpoints/business_profile_async/control/backfill_progress.json",
+  "generated_at": "2026-09-01T05:10:19.580140+00:00",
+  "llm_access": false,
+  "manifest_hash": "1646d74686de40299a509bc1076d4060b2e90b379c1078293ab635d9681ef456",
+  "mode": "audit",
+  "network_access": false,
+  "operation_run_id": "business-profile-20260831214638661690",
+  "parameters": {
+    "continuous": false,
+    "document_types": [
+      "annual_report",
+      "annual_report_correction"
+    ],
+    "end_date": null,
+    "field_families": [
+      "atomic_activities",
+      "named_relationships",
+      "derived_value_chain_roles",
+      "commodity_exposure_facts",
+      "commodity_exposure_publication"
+    ],
+    "force": true,
+    "instrument_ids": [
+      "002415.SZ",
+      "002496.SZ",
+      "300750.SZ"
+    ],
+    "knowledge_cutoff": null,
+    "max_attempts": 3,
+    "result_policy": "reuse",
+    "rollout_phase": null,
+    "selection_policy": "expanded",
+    "start_date": "2026-01-01"
+  },
+  "read_only": true,
+  "requested_id_dispositions": [
+    {
+      "actual_id": "activity:225fd5142c7f33a211039ede1d298a87",
+      "disposition": "written",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/extract/0bd03e86412a3a4cf98012a1520d90749a53c5c08a8777779f1c5a469c9d021a.json",
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/6348c3e20207d3d53b35ace1e5718eb18bfd282d2ecc7713af8725cffcf255c8.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": "bp-run-e540ea108f1bb6cfc3c52387",
+      "record_type": "activities",
+      "requested_id": "activity:225fd5142c7f33a211039ede1d298a87",
+      "review_status": "approved"
+    },
+    {
+      "actual_id": "activity:4299c3b46455fbc139fb584eab244351",
+      "disposition": "written",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/extract/0f681be6c2776a403bb2a76c6ede05d84fee0ba0f311b71a8d6893bdbcd77fb2.json",
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/c55ad1ad33dbd507687b3c91fe0ed0963cb14c1c3e63dfbf7a38527d757a8004.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": "bp-run-ee8828b58d15a435442c5578",
+      "record_type": "activities",
+      "requested_id": "activity:4299c3b46455fbc139fb584eab244351",
+      "review_status": "approved"
+    },
+    {
+      "actual_id": "activity:469bb52716815069c96c20cd6e750ffb",
+      "disposition": "written",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/extract/0f681be6c2776a403bb2a76c6ede05d84fee0ba0f311b71a8d6893bdbcd77fb2.json",
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/c55ad1ad33dbd507687b3c91fe0ed0963cb14c1c3e63dfbf7a38527d757a8004.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": "bp-run-13e7e6aa3d6ca6c9ca9249a2",
+      "record_type": "activities",
+      "requested_id": "activity:469bb52716815069c96c20cd6e750ffb",
+      "review_status": "approved"
+    },
+    {
+      "actual_id": "activity:50220a200c9685fcf6666a2dc581614f",
+      "disposition": "written",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/extract/0f681be6c2776a403bb2a76c6ede05d84fee0ba0f311b71a8d6893bdbcd77fb2.json",
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/c55ad1ad33dbd507687b3c91fe0ed0963cb14c1c3e63dfbf7a38527d757a8004.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": "bp-run-13e7e6aa3d6ca6c9ca9249a2",
+      "record_type": "activities",
+      "requested_id": "activity:50220a200c9685fcf6666a2dc581614f",
+      "review_status": "approved"
+    },
+    {
+      "actual_id": "activity:67d4c858ad2830dd577c80a0f4f96c38",
+      "disposition": "written",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/extract/0bd03e86412a3a4cf98012a1520d90749a53c5c08a8777779f1c5a469c9d021a.json",
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/6348c3e20207d3d53b35ace1e5718eb18bfd282d2ecc7713af8725cffcf255c8.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": "bp-run-e540ea108f1bb6cfc3c52387",
+      "record_type": "activities",
+      "requested_id": "activity:67d4c858ad2830dd577c80a0f4f96c38",
+      "review_status": "approved"
+    },
+    {
+      "actual_id": "activity:7fbe11d435f11091f98999ad4a79cecc",
+      "disposition": "written",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/extract/0f681be6c2776a403bb2a76c6ede05d84fee0ba0f311b71a8d6893bdbcd77fb2.json",
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/c55ad1ad33dbd507687b3c91fe0ed0963cb14c1c3e63dfbf7a38527d757a8004.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": "bp-run-13e7e6aa3d6ca6c9ca9249a2",
+      "record_type": "activities",
+      "requested_id": "activity:7fbe11d435f11091f98999ad4a79cecc",
+      "review_status": "approved"
+    },
+    {
+      "actual_id": "activity:812d0fd79394932989389c0a3726bfd6",
+      "disposition": "written",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/extract/0f681be6c2776a403bb2a76c6ede05d84fee0ba0f311b71a8d6893bdbcd77fb2.json",
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/c55ad1ad33dbd507687b3c91fe0ed0963cb14c1c3e63dfbf7a38527d757a8004.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": "bp-run-ee8828b58d15a435442c5578",
+      "record_type": "activities",
+      "requested_id": "activity:812d0fd79394932989389c0a3726bfd6",
+      "review_status": "approved"
+    },
+    {
+      "actual_id": "activity:842d9cf00c3ade94226f0228c34901ec",
+      "disposition": "written",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/extract/0f681be6c2776a403bb2a76c6ede05d84fee0ba0f311b71a8d6893bdbcd77fb2.json",
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/c55ad1ad33dbd507687b3c91fe0ed0963cb14c1c3e63dfbf7a38527d757a8004.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": "bp-run-ee8828b58d15a435442c5578",
+      "record_type": "activities",
+      "requested_id": "activity:842d9cf00c3ade94226f0228c34901ec",
+      "review_status": "approved"
+    },
+    {
+      "actual_id": "activity:91bc882fe2e805c9328200f4d9aef844",
+      "disposition": "written",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/extract/0f681be6c2776a403bb2a76c6ede05d84fee0ba0f311b71a8d6893bdbcd77fb2.json",
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/c55ad1ad33dbd507687b3c91fe0ed0963cb14c1c3e63dfbf7a38527d757a8004.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": "bp-run-ee8828b58d15a435442c5578",
+      "record_type": "activities",
+      "requested_id": "activity:91bc882fe2e805c9328200f4d9aef844",
+      "review_status": "approved"
+    },
+    {
+      "actual_id": "activity:92599cd8e108c787d65ba11d22cdd00f",
+      "disposition": "written",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/extract/0bd03e86412a3a4cf98012a1520d90749a53c5c08a8777779f1c5a469c9d021a.json",
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/6348c3e20207d3d53b35ace1e5718eb18bfd282d2ecc7713af8725cffcf255c8.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": "bp-run-e540ea108f1bb6cfc3c52387",
+      "record_type": "activities",
+      "requested_id": "activity:92599cd8e108c787d65ba11d22cdd00f",
+      "review_status": "approved"
+    },
+    {
+      "actual_id": "activity:9606af388a238ac87262ac87a8809b1d",
+      "disposition": "written",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/extract/0bd03e86412a3a4cf98012a1520d90749a53c5c08a8777779f1c5a469c9d021a.json",
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/6348c3e20207d3d53b35ace1e5718eb18bfd282d2ecc7713af8725cffcf255c8.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": "bp-run-e540ea108f1bb6cfc3c52387",
+      "record_type": "activities",
+      "requested_id": "activity:9606af388a238ac87262ac87a8809b1d",
+      "review_status": "approved"
+    },
+    {
+      "actual_id": "activity:96630ae2d4a2f17cc820f0edc6a29b4e",
+      "disposition": "written",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/extract/0bd03e86412a3a4cf98012a1520d90749a53c5c08a8777779f1c5a469c9d021a.json",
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/6348c3e20207d3d53b35ace1e5718eb18bfd282d2ecc7713af8725cffcf255c8.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": "bp-run-e540ea108f1bb6cfc3c52387",
+      "record_type": "activities",
+      "requested_id": "activity:96630ae2d4a2f17cc820f0edc6a29b4e",
+      "review_status": "approved"
+    },
+    {
+      "actual_id": "activity:a04e2dd9da61aef037a951a93604463c",
+      "disposition": "written",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/extract/0bd03e86412a3a4cf98012a1520d90749a53c5c08a8777779f1c5a469c9d021a.json",
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/6348c3e20207d3d53b35ace1e5718eb18bfd282d2ecc7713af8725cffcf255c8.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": "bp-run-e540ea108f1bb6cfc3c52387",
+      "record_type": "activities",
+      "requested_id": "activity:a04e2dd9da61aef037a951a93604463c",
+      "review_status": "approved"
+    },
+    {
+      "actual_id": "activity:aeba45980618d8f33276d7b33b53cade",
+      "disposition": "written",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/extract/0f681be6c2776a403bb2a76c6ede05d84fee0ba0f311b71a8d6893bdbcd77fb2.json",
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/c55ad1ad33dbd507687b3c91fe0ed0963cb14c1c3e63dfbf7a38527d757a8004.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": "bp-run-ee8828b58d15a435442c5578",
+      "record_type": "activities",
+      "requested_id": "activity:aeba45980618d8f33276d7b33b53cade",
+      "review_status": "approved"
+    },
+    {
+      "actual_id": "activity:b196b33904696f85e4097d7efad20ceb",
+      "disposition": "written",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/extract/0bd03e86412a3a4cf98012a1520d90749a53c5c08a8777779f1c5a469c9d021a.json",
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/6348c3e20207d3d53b35ace1e5718eb18bfd282d2ecc7713af8725cffcf255c8.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": "bp-run-e540ea108f1bb6cfc3c52387",
+      "record_type": "activities",
+      "requested_id": "activity:b196b33904696f85e4097d7efad20ceb",
+      "review_status": "approved"
+    },
+    {
+      "actual_id": "activity:b8b0f69ce7ab26cfab7b5c8db9e5ec28",
+      "disposition": "written",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/extract/0bd03e86412a3a4cf98012a1520d90749a53c5c08a8777779f1c5a469c9d021a.json",
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/6348c3e20207d3d53b35ace1e5718eb18bfd282d2ecc7713af8725cffcf255c8.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": "bp-run-e540ea108f1bb6cfc3c52387",
+      "record_type": "activities",
+      "requested_id": "activity:b8b0f69ce7ab26cfab7b5c8db9e5ec28",
+      "review_status": "approved"
+    },
+    {
+      "actual_id": "activity:c4a72dc12662e75ca42ea857db95f442",
+      "disposition": "written",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/extract/0f681be6c2776a403bb2a76c6ede05d84fee0ba0f311b71a8d6893bdbcd77fb2.json",
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/c55ad1ad33dbd507687b3c91fe0ed0963cb14c1c3e63dfbf7a38527d757a8004.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": "bp-run-ee8828b58d15a435442c5578",
+      "record_type": "activities",
+      "requested_id": "activity:c4a72dc12662e75ca42ea857db95f442",
+      "review_status": "approved"
+    },
+    {
+      "actual_id": "activity:d1dc3502a437d7c3c7ffafd22445cdc3",
+      "disposition": "written",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/extract/0f681be6c2776a403bb2a76c6ede05d84fee0ba0f311b71a8d6893bdbcd77fb2.json",
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/c55ad1ad33dbd507687b3c91fe0ed0963cb14c1c3e63dfbf7a38527d757a8004.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": "bp-run-ee8828b58d15a435442c5578",
+      "record_type": "activities",
+      "requested_id": "activity:d1dc3502a437d7c3c7ffafd22445cdc3",
+      "review_status": "approved"
+    },
+    {
+      "actual_id": "activity:d3b2a7a92ee881c40f69aeb1f0394fb5",
+      "disposition": "written",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/extract/0f681be6c2776a403bb2a76c6ede05d84fee0ba0f311b71a8d6893bdbcd77fb2.json",
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/c55ad1ad33dbd507687b3c91fe0ed0963cb14c1c3e63dfbf7a38527d757a8004.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": "bp-run-ee8828b58d15a435442c5578",
+      "record_type": "activities",
+      "requested_id": "activity:d3b2a7a92ee881c40f69aeb1f0394fb5",
+      "review_status": "approved"
+    },
+    {
+      "actual_id": "activity:d4d3d7762f9e2b90e6e807a7e160bd16",
+      "disposition": "written",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/extract/0f681be6c2776a403bb2a76c6ede05d84fee0ba0f311b71a8d6893bdbcd77fb2.json",
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/c55ad1ad33dbd507687b3c91fe0ed0963cb14c1c3e63dfbf7a38527d757a8004.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": "bp-run-ee8828b58d15a435442c5578",
+      "record_type": "activities",
+      "requested_id": "activity:d4d3d7762f9e2b90e6e807a7e160bd16",
+      "review_status": "approved"
+    },
+    {
+      "actual_id": "activity:fa08d8d990ac048c159612576918bf4f",
+      "disposition": "written",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/extract/0bd03e86412a3a4cf98012a1520d90749a53c5c08a8777779f1c5a469c9d021a.json",
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/6348c3e20207d3d53b35ace1e5718eb18bfd282d2ecc7713af8725cffcf255c8.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": "bp-run-e540ea108f1bb6cfc3c52387",
+      "record_type": "activities",
+      "requested_id": "activity:fa08d8d990ac048c159612576918bf4f",
+      "review_status": "approved"
+    },
+    {
+      "actual_id": null,
+      "disposition": "not_persisted",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/extract/0f681be6c2776a403bb2a76c6ede05d84fee0ba0f311b71a8d6893bdbcd77fb2.json",
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/c55ad1ad33dbd507687b3c91fe0ed0963cb14c1c3e63dfbf7a38527d757a8004.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": null,
+      "record_type": "operating_facts",
+      "requested_id": "anonymous-concentration:19f1a2074e2d5f4a9ffc3e4b97cabaed",
+      "review_status": null
+    },
+    {
+      "actual_id": null,
+      "disposition": "not_persisted",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/extract/0f681be6c2776a403bb2a76c6ede05d84fee0ba0f311b71a8d6893bdbcd77fb2.json",
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/c55ad1ad33dbd507687b3c91fe0ed0963cb14c1c3e63dfbf7a38527d757a8004.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": null,
+      "record_type": "operating_facts",
+      "requested_id": "anonymous-concentration:1caa970bfa4ad43428bb73e0101d0423",
+      "review_status": null
+    },
+    {
+      "actual_id": null,
+      "disposition": "not_persisted",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/extract/0bd03e86412a3a4cf98012a1520d90749a53c5c08a8777779f1c5a469c9d021a.json",
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/6348c3e20207d3d53b35ace1e5718eb18bfd282d2ecc7713af8725cffcf255c8.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": null,
+      "record_type": "operating_facts",
+      "requested_id": "anonymous-concentration:1e46e7a9c87424747e6bba1423fd1af6",
+      "review_status": null
+    },
+    {
+      "actual_id": null,
+      "disposition": "not_persisted",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/extract/0f681be6c2776a403bb2a76c6ede05d84fee0ba0f311b71a8d6893bdbcd77fb2.json",
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/c55ad1ad33dbd507687b3c91fe0ed0963cb14c1c3e63dfbf7a38527d757a8004.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": null,
+      "record_type": "operating_facts",
+      "requested_id": "anonymous-concentration:277775c72c1f444876563bd053240df6",
+      "review_status": null
+    },
+    {
+      "actual_id": null,
+      "disposition": "not_persisted",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/extract/0f681be6c2776a403bb2a76c6ede05d84fee0ba0f311b71a8d6893bdbcd77fb2.json",
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/c55ad1ad33dbd507687b3c91fe0ed0963cb14c1c3e63dfbf7a38527d757a8004.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": null,
+      "record_type": "operating_facts",
+      "requested_id": "anonymous-concentration:37c60e7310ba6f40a2ecfcf0ae804cfa",
+      "review_status": null
+    },
+    {
+      "actual_id": null,
+      "disposition": "not_persisted",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/extract/0f681be6c2776a403bb2a76c6ede05d84fee0ba0f311b71a8d6893bdbcd77fb2.json",
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/c55ad1ad33dbd507687b3c91fe0ed0963cb14c1c3e63dfbf7a38527d757a8004.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": null,
+      "record_type": "operating_facts",
+      "requested_id": "anonymous-concentration:39599573cdc2e7eb1cf415d1a2cc97c0",
+      "review_status": null
+    },
+    {
+      "actual_id": null,
+      "disposition": "not_persisted",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/extract/0bd03e86412a3a4cf98012a1520d90749a53c5c08a8777779f1c5a469c9d021a.json",
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/6348c3e20207d3d53b35ace1e5718eb18bfd282d2ecc7713af8725cffcf255c8.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": null,
+      "record_type": "operating_facts",
+      "requested_id": "anonymous-concentration:3ba718da2d8d9cc222843ca22c8de413",
+      "review_status": null
+    },
+    {
+      "actual_id": null,
+      "disposition": "not_persisted",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/extract/0f681be6c2776a403bb2a76c6ede05d84fee0ba0f311b71a8d6893bdbcd77fb2.json",
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/c55ad1ad33dbd507687b3c91fe0ed0963cb14c1c3e63dfbf7a38527d757a8004.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": null,
+      "record_type": "operating_facts",
+      "requested_id": "anonymous-concentration:40f84959037baf06e5b055a8e565a0aa",
+      "review_status": null
+    },
+    {
+      "actual_id": null,
+      "disposition": "not_persisted",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/extract/0f681be6c2776a403bb2a76c6ede05d84fee0ba0f311b71a8d6893bdbcd77fb2.json",
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/c55ad1ad33dbd507687b3c91fe0ed0963cb14c1c3e63dfbf7a38527d757a8004.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": null,
+      "record_type": "operating_facts",
+      "requested_id": "anonymous-concentration:4a8342ff9fce02fb44b9f3a3f953156b",
+      "review_status": null
+    },
+    {
+      "actual_id": null,
+      "disposition": "not_persisted",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/extract/0bd03e86412a3a4cf98012a1520d90749a53c5c08a8777779f1c5a469c9d021a.json",
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/6348c3e20207d3d53b35ace1e5718eb18bfd282d2ecc7713af8725cffcf255c8.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": null,
+      "record_type": "operating_facts",
+      "requested_id": "anonymous-concentration:4f2d602f0dae678ada138abea5118153",
+      "review_status": null
+    },
+    {
+      "actual_id": null,
+      "disposition": "not_persisted",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/extract/0bd03e86412a3a4cf98012a1520d90749a53c5c08a8777779f1c5a469c9d021a.json",
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/6348c3e20207d3d53b35ace1e5718eb18bfd282d2ecc7713af8725cffcf255c8.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": null,
+      "record_type": "operating_facts",
+      "requested_id": "anonymous-concentration:525bf853157bf8d4b9fdd6b606f7f945",
+      "review_status": null
+    },
+    {
+      "actual_id": null,
+      "disposition": "not_persisted",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/extract/0bd03e86412a3a4cf98012a1520d90749a53c5c08a8777779f1c5a469c9d021a.json",
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/6348c3e20207d3d53b35ace1e5718eb18bfd282d2ecc7713af8725cffcf255c8.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": null,
+      "record_type": "operating_facts",
+      "requested_id": "anonymous-concentration:59a3abe30ff29014ac94d5d155efd4f8",
+      "review_status": null
+    },
+    {
+      "actual_id": null,
+      "disposition": "not_persisted",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/extract/0f681be6c2776a403bb2a76c6ede05d84fee0ba0f311b71a8d6893bdbcd77fb2.json",
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/c55ad1ad33dbd507687b3c91fe0ed0963cb14c1c3e63dfbf7a38527d757a8004.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": null,
+      "record_type": "operating_facts",
+      "requested_id": "anonymous-concentration:7b295eba0a9b09fa8933387f74bf9e25",
+      "review_status": null
+    },
+    {
+      "actual_id": null,
+      "disposition": "not_persisted",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/extract/0bd03e86412a3a4cf98012a1520d90749a53c5c08a8777779f1c5a469c9d021a.json",
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/6348c3e20207d3d53b35ace1e5718eb18bfd282d2ecc7713af8725cffcf255c8.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": null,
+      "record_type": "operating_facts",
+      "requested_id": "anonymous-concentration:8119bfdfc0b53d0b51efb3885e68d324",
+      "review_status": null
+    },
+    {
+      "actual_id": null,
+      "disposition": "not_persisted",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/extract/0bd03e86412a3a4cf98012a1520d90749a53c5c08a8777779f1c5a469c9d021a.json",
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/6348c3e20207d3d53b35ace1e5718eb18bfd282d2ecc7713af8725cffcf255c8.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": null,
+      "record_type": "operating_facts",
+      "requested_id": "anonymous-concentration:85f0f382186dce6b6a71940210213031",
+      "review_status": null
+    },
+    {
+      "actual_id": null,
+      "disposition": "not_persisted",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/extract/0f681be6c2776a403bb2a76c6ede05d84fee0ba0f311b71a8d6893bdbcd77fb2.json",
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/c55ad1ad33dbd507687b3c91fe0ed0963cb14c1c3e63dfbf7a38527d757a8004.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": null,
+      "record_type": "operating_facts",
+      "requested_id": "anonymous-concentration:8adcdd60f97741f433e8861a9b0edc14",
+      "review_status": null
+    },
+    {
+      "actual_id": null,
+      "disposition": "not_persisted",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/extract/0bd03e86412a3a4cf98012a1520d90749a53c5c08a8777779f1c5a469c9d021a.json",
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/6348c3e20207d3d53b35ace1e5718eb18bfd282d2ecc7713af8725cffcf255c8.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": null,
+      "record_type": "operating_facts",
+      "requested_id": "anonymous-concentration:923e99c7218349ac65cad874200a7dce",
+      "review_status": null
+    },
+    {
+      "actual_id": null,
+      "disposition": "not_persisted",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/extract/0f681be6c2776a403bb2a76c6ede05d84fee0ba0f311b71a8d6893bdbcd77fb2.json",
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/c55ad1ad33dbd507687b3c91fe0ed0963cb14c1c3e63dfbf7a38527d757a8004.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": null,
+      "record_type": "operating_facts",
+      "requested_id": "anonymous-concentration:944f2949e184ed3eb706322c0c770e6f",
+      "review_status": null
+    },
+    {
+      "actual_id": null,
+      "disposition": "not_persisted",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/extract/0f681be6c2776a403bb2a76c6ede05d84fee0ba0f311b71a8d6893bdbcd77fb2.json",
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/c55ad1ad33dbd507687b3c91fe0ed0963cb14c1c3e63dfbf7a38527d757a8004.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": null,
+      "record_type": "operating_facts",
+      "requested_id": "anonymous-concentration:a1a52308b36d8e76c1d02b74ad13c462",
+      "review_status": null
+    },
+    {
+      "actual_id": null,
+      "disposition": "not_persisted",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/extract/0bd03e86412a3a4cf98012a1520d90749a53c5c08a8777779f1c5a469c9d021a.json",
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/6348c3e20207d3d53b35ace1e5718eb18bfd282d2ecc7713af8725cffcf255c8.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": null,
+      "record_type": "operating_facts",
+      "requested_id": "anonymous-concentration:a53457d0f5ca9bb56b2e35bdd4bf77ee",
+      "review_status": null
+    },
+    {
+      "actual_id": null,
+      "disposition": "not_persisted",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/extract/0bd03e86412a3a4cf98012a1520d90749a53c5c08a8777779f1c5a469c9d021a.json",
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/6348c3e20207d3d53b35ace1e5718eb18bfd282d2ecc7713af8725cffcf255c8.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": null,
+      "record_type": "operating_facts",
+      "requested_id": "anonymous-concentration:b0fa2a81d3075ae606898944e50c6c54",
+      "review_status": null
+    },
+    {
+      "actual_id": null,
+      "disposition": "not_persisted",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/extract/0bd03e86412a3a4cf98012a1520d90749a53c5c08a8777779f1c5a469c9d021a.json",
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/6348c3e20207d3d53b35ace1e5718eb18bfd282d2ecc7713af8725cffcf255c8.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": null,
+      "record_type": "operating_facts",
+      "requested_id": "anonymous-concentration:c859b2c60f6aa6db6047c5cc79d74eeb",
+      "review_status": null
+    },
+    {
+      "actual_id": null,
+      "disposition": "not_persisted",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/extract/0f681be6c2776a403bb2a76c6ede05d84fee0ba0f311b71a8d6893bdbcd77fb2.json",
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/c55ad1ad33dbd507687b3c91fe0ed0963cb14c1c3e63dfbf7a38527d757a8004.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": null,
+      "record_type": "operating_facts",
+      "requested_id": "anonymous-concentration:eba5d4ade13968f632a178a894101c0e",
+      "review_status": null
+    },
+    {
+      "actual_id": null,
+      "disposition": "not_persisted",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/extract/0bd03e86412a3a4cf98012a1520d90749a53c5c08a8777779f1c5a469c9d021a.json",
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/6348c3e20207d3d53b35ace1e5718eb18bfd282d2ecc7713af8725cffcf255c8.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": null,
+      "record_type": "operating_facts",
+      "requested_id": "anonymous-concentration:fc8070943f235357c69852e60997dc55",
+      "review_status": null
+    },
+    {
+      "actual_id": null,
+      "disposition": "not_persisted",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/extract/0bd03e86412a3a4cf98012a1520d90749a53c5c08a8777779f1c5a469c9d021a.json",
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/6348c3e20207d3d53b35ace1e5718eb18bfd282d2ecc7713af8725cffcf255c8.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": null,
+      "record_type": "operating_facts",
+      "requested_id": "bp-operating-0ba1c8bc460348663c9c83a9",
+      "review_status": null
+    },
+    {
+      "actual_id": null,
+      "disposition": "not_persisted",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/extract/0f681be6c2776a403bb2a76c6ede05d84fee0ba0f311b71a8d6893bdbcd77fb2.json",
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/c55ad1ad33dbd507687b3c91fe0ed0963cb14c1c3e63dfbf7a38527d757a8004.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": null,
+      "record_type": "operating_facts",
+      "requested_id": "bp-operating-185795fec64718770da57527",
+      "review_status": null
+    },
+    {
+      "actual_id": null,
+      "disposition": "not_persisted",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/extract/0bd03e86412a3a4cf98012a1520d90749a53c5c08a8777779f1c5a469c9d021a.json",
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/6348c3e20207d3d53b35ace1e5718eb18bfd282d2ecc7713af8725cffcf255c8.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": null,
+      "record_type": "operating_facts",
+      "requested_id": "bp-operating-29ca40ce52c68f7f23c35031",
+      "review_status": null
+    },
+    {
+      "actual_id": null,
+      "disposition": "not_persisted",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/extract/0f681be6c2776a403bb2a76c6ede05d84fee0ba0f311b71a8d6893bdbcd77fb2.json",
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/c55ad1ad33dbd507687b3c91fe0ed0963cb14c1c3e63dfbf7a38527d757a8004.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": null,
+      "record_type": "operating_facts",
+      "requested_id": "bp-operating-36dc0525d1708cc249fa8eb5",
+      "review_status": null
+    },
+    {
+      "actual_id": null,
+      "disposition": "not_persisted",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/extract/0bd03e86412a3a4cf98012a1520d90749a53c5c08a8777779f1c5a469c9d021a.json",
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/6348c3e20207d3d53b35ace1e5718eb18bfd282d2ecc7713af8725cffcf255c8.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": null,
+      "record_type": "operating_facts",
+      "requested_id": "bp-operating-3bb85317211062f30b1e7329",
+      "review_status": null
+    },
+    {
+      "actual_id": null,
+      "disposition": "not_persisted",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/extract/0bd03e86412a3a4cf98012a1520d90749a53c5c08a8777779f1c5a469c9d021a.json",
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/6348c3e20207d3d53b35ace1e5718eb18bfd282d2ecc7713af8725cffcf255c8.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": null,
+      "record_type": "operating_facts",
+      "requested_id": "bp-operating-415ec97a81cf687348edc97a",
+      "review_status": null
+    },
+    {
+      "actual_id": null,
+      "disposition": "not_persisted",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/extract/0f681be6c2776a403bb2a76c6ede05d84fee0ba0f311b71a8d6893bdbcd77fb2.json",
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/c55ad1ad33dbd507687b3c91fe0ed0963cb14c1c3e63dfbf7a38527d757a8004.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": null,
+      "record_type": "operating_facts",
+      "requested_id": "bp-operating-4b58c1c654480dd0a3b0ab62",
+      "review_status": null
+    },
+    {
+      "actual_id": null,
+      "disposition": "not_persisted",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/extract/0bd03e86412a3a4cf98012a1520d90749a53c5c08a8777779f1c5a469c9d021a.json",
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/6348c3e20207d3d53b35ace1e5718eb18bfd282d2ecc7713af8725cffcf255c8.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": null,
+      "record_type": "operating_facts",
+      "requested_id": "bp-operating-73beb7372e439f42ac44077b",
+      "review_status": null
+    },
+    {
+      "actual_id": null,
+      "disposition": "not_persisted",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/extract/0f681be6c2776a403bb2a76c6ede05d84fee0ba0f311b71a8d6893bdbcd77fb2.json",
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/c55ad1ad33dbd507687b3c91fe0ed0963cb14c1c3e63dfbf7a38527d757a8004.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": null,
+      "record_type": "operating_facts",
+      "requested_id": "bp-operating-82c65423bce5b12401862a90",
+      "review_status": null
+    },
+    {
+      "actual_id": null,
+      "disposition": "not_persisted",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/extract/0f681be6c2776a403bb2a76c6ede05d84fee0ba0f311b71a8d6893bdbcd77fb2.json",
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/c55ad1ad33dbd507687b3c91fe0ed0963cb14c1c3e63dfbf7a38527d757a8004.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": null,
+      "record_type": "operating_facts",
+      "requested_id": "bp-operating-837bf3dca0ccd79090a16dee",
+      "review_status": null
+    },
+    {
+      "actual_id": null,
+      "disposition": "not_persisted",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/extract/0f681be6c2776a403bb2a76c6ede05d84fee0ba0f311b71a8d6893bdbcd77fb2.json",
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/c55ad1ad33dbd507687b3c91fe0ed0963cb14c1c3e63dfbf7a38527d757a8004.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": null,
+      "record_type": "operating_facts",
+      "requested_id": "bp-operating-8f35a827132f67180323a384",
+      "review_status": null
+    },
+    {
+      "actual_id": null,
+      "disposition": "not_persisted",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/extract/0f681be6c2776a403bb2a76c6ede05d84fee0ba0f311b71a8d6893bdbcd77fb2.json",
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/c55ad1ad33dbd507687b3c91fe0ed0963cb14c1c3e63dfbf7a38527d757a8004.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": null,
+      "record_type": "operating_facts",
+      "requested_id": "bp-operating-ad5e21412682e48e9a5ed1c7",
+      "review_status": null
+    },
+    {
+      "actual_id": null,
+      "disposition": "not_persisted",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/extract/0f681be6c2776a403bb2a76c6ede05d84fee0ba0f311b71a8d6893bdbcd77fb2.json",
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/c55ad1ad33dbd507687b3c91fe0ed0963cb14c1c3e63dfbf7a38527d757a8004.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": null,
+      "record_type": "operating_facts",
+      "requested_id": "bp-operating-ba3fc1b69c792ff12329d9db",
+      "review_status": null
+    },
+    {
+      "actual_id": null,
+      "disposition": "not_persisted",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/extract/0bd03e86412a3a4cf98012a1520d90749a53c5c08a8777779f1c5a469c9d021a.json",
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/6348c3e20207d3d53b35ace1e5718eb18bfd282d2ecc7713af8725cffcf255c8.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": null,
+      "record_type": "operating_facts",
+      "requested_id": "bp-operating-be280806ece53454865f3226",
+      "review_status": null
+    },
+    {
+      "actual_id": null,
+      "disposition": "not_persisted",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/extract/0bd03e86412a3a4cf98012a1520d90749a53c5c08a8777779f1c5a469c9d021a.json",
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/6348c3e20207d3d53b35ace1e5718eb18bfd282d2ecc7713af8725cffcf255c8.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": null,
+      "record_type": "operating_facts",
+      "requested_id": "bp-operating-bf29e2042ba561b18f78de3d",
+      "review_status": null
+    },
+    {
+      "actual_id": null,
+      "disposition": "not_persisted",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/extract/0bd03e86412a3a4cf98012a1520d90749a53c5c08a8777779f1c5a469c9d021a.json",
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/6348c3e20207d3d53b35ace1e5718eb18bfd282d2ecc7713af8725cffcf255c8.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": null,
+      "record_type": "operating_facts",
+      "requested_id": "bp-operating-bfc4983bd638a6eebe2df36e",
+      "review_status": null
+    },
+    {
+      "actual_id": null,
+      "disposition": "not_persisted",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/extract/0bd03e86412a3a4cf98012a1520d90749a53c5c08a8777779f1c5a469c9d021a.json",
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/6348c3e20207d3d53b35ace1e5718eb18bfd282d2ecc7713af8725cffcf255c8.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": null,
+      "record_type": "operating_facts",
+      "requested_id": "bp-operating-d81fbc9be44be75c62bee4c8",
+      "review_status": null
+    },
+    {
+      "actual_id": null,
+      "disposition": "not_persisted",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/extract/0f681be6c2776a403bb2a76c6ede05d84fee0ba0f311b71a8d6893bdbcd77fb2.json",
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/c55ad1ad33dbd507687b3c91fe0ed0963cb14c1c3e63dfbf7a38527d757a8004.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": null,
+      "record_type": "operating_facts",
+      "requested_id": "bp-operating-d8bd9d22d92b315546647d16",
+      "review_status": null
+    },
+    {
+      "actual_id": null,
+      "disposition": "not_persisted",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/extract/0f681be6c2776a403bb2a76c6ede05d84fee0ba0f311b71a8d6893bdbcd77fb2.json",
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/c55ad1ad33dbd507687b3c91fe0ed0963cb14c1c3e63dfbf7a38527d757a8004.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": null,
+      "record_type": "operating_facts",
+      "requested_id": "bp-operating-dc3350fea7f389207c768a1c",
+      "review_status": null
+    },
+    {
+      "actual_id": null,
+      "disposition": "not_persisted",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/extract/0bd03e86412a3a4cf98012a1520d90749a53c5c08a8777779f1c5a469c9d021a.json",
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/6348c3e20207d3d53b35ace1e5718eb18bfd282d2ecc7713af8725cffcf255c8.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": null,
+      "record_type": "operating_facts",
+      "requested_id": "bp-operating-f750bf713697cd8d234dd57a",
+      "review_status": null
+    },
+    {
+      "actual_id": "exposure-fact-05d96208811c2bf269c25132",
+      "disposition": "written",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/c55ad1ad33dbd507687b3c91fe0ed0963cb14c1c3e63dfbf7a38527d757a8004.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": "bp-run-4f8b0d8fbadffe42fafb79a2",
+      "record_type": "exposure_facts",
+      "requested_id": "exposure-fact-05d96208811c2bf269c25132",
+      "review_status": "approved"
+    },
+    {
+      "actual_id": "exposure-fact-07dcb9d6a5a66ab823ea4819",
+      "disposition": "written",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/6348c3e20207d3d53b35ace1e5718eb18bfd282d2ecc7713af8725cffcf255c8.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": "publication-manifest-fdd20b64716e94cacf21f27214249f16",
+      "record_type": "exposure_facts",
+      "requested_id": "exposure-fact-07dcb9d6a5a66ab823ea4819",
+      "review_status": "approved"
+    },
+    {
+      "actual_id": "exposure-fact-088f03376c629d2d445f102a",
+      "disposition": "written",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/c55ad1ad33dbd507687b3c91fe0ed0963cb14c1c3e63dfbf7a38527d757a8004.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": "bp-run-13e7e6aa3d6ca6c9ca9249a2",
+      "record_type": "exposure_facts",
+      "requested_id": "exposure-fact-088f03376c629d2d445f102a",
+      "review_status": "approved"
+    },
+    {
+      "actual_id": "exposure-fact-08ea6f8297117c8ba79cdb58",
+      "disposition": "written",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/c55ad1ad33dbd507687b3c91fe0ed0963cb14c1c3e63dfbf7a38527d757a8004.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": "publication-manifest-9e33a4b3db4b991eaf01d6d8e21dabb8",
+      "record_type": "exposure_facts",
+      "requested_id": "exposure-fact-08ea6f8297117c8ba79cdb58",
+      "review_status": "approved"
+    },
+    {
+      "actual_id": null,
+      "disposition": "not_persisted",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/6348c3e20207d3d53b35ace1e5718eb18bfd282d2ecc7713af8725cffcf255c8.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": null,
+      "record_type": "exposure_facts",
+      "requested_id": "exposure-fact-164b2bfb292174aa076398f5",
+      "review_status": null
+    },
+    {
+      "actual_id": null,
+      "disposition": "not_persisted",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/6348c3e20207d3d53b35ace1e5718eb18bfd282d2ecc7713af8725cffcf255c8.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": null,
+      "record_type": "exposure_facts",
+      "requested_id": "exposure-fact-19581a67fe374e30b921ba1e",
+      "review_status": null
+    },
+    {
+      "actual_id": null,
+      "disposition": "not_persisted",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/c55ad1ad33dbd507687b3c91fe0ed0963cb14c1c3e63dfbf7a38527d757a8004.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": null,
+      "record_type": "exposure_facts",
+      "requested_id": "exposure-fact-1d0bed4553d444f21ab86308",
+      "review_status": null
+    },
+    {
+      "actual_id": null,
+      "disposition": "not_persisted",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/c55ad1ad33dbd507687b3c91fe0ed0963cb14c1c3e63dfbf7a38527d757a8004.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": null,
+      "record_type": "exposure_facts",
+      "requested_id": "exposure-fact-1e190e3e4b1ac70c780ce211",
+      "review_status": null
+    },
+    {
+      "actual_id": null,
+      "disposition": "not_persisted",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/6348c3e20207d3d53b35ace1e5718eb18bfd282d2ecc7713af8725cffcf255c8.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": null,
+      "record_type": "exposure_facts",
+      "requested_id": "exposure-fact-215450f3a7cf2a48be4cd84f",
+      "review_status": null
+    },
+    {
+      "actual_id": "exposure-fact-228ffdb31a2fb516f95b5f94",
+      "disposition": "written",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/6348c3e20207d3d53b35ace1e5718eb18bfd282d2ecc7713af8725cffcf255c8.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": "bp-run-9dd8729295dedb93f8a0449a",
+      "record_type": "exposure_facts",
+      "requested_id": "exposure-fact-228ffdb31a2fb516f95b5f94",
+      "review_status": "approved"
+    },
+    {
+      "actual_id": "exposure-fact-22a7fef8e2901cc4112dd898",
+      "disposition": "written",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/c55ad1ad33dbd507687b3c91fe0ed0963cb14c1c3e63dfbf7a38527d757a8004.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": "publication-manifest-9e33a4b3db4b991eaf01d6d8e21dabb8",
+      "record_type": "exposure_facts",
+      "requested_id": "exposure-fact-22a7fef8e2901cc4112dd898",
+      "review_status": "approved"
+    },
+    {
+      "actual_id": "exposure-fact-26b77add1f516b54767ebd16",
+      "disposition": "written",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/c55ad1ad33dbd507687b3c91fe0ed0963cb14c1c3e63dfbf7a38527d757a8004.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": "publication-manifest-9e33a4b3db4b991eaf01d6d8e21dabb8",
+      "record_type": "exposure_facts",
+      "requested_id": "exposure-fact-26b77add1f516b54767ebd16",
+      "review_status": "approved"
+    },
+    {
+      "actual_id": "exposure-fact-29307a3de9a5db71b1048a09",
+      "disposition": "written",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/c55ad1ad33dbd507687b3c91fe0ed0963cb14c1c3e63dfbf7a38527d757a8004.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": "publication-manifest-9e33a4b3db4b991eaf01d6d8e21dabb8",
+      "record_type": "exposure_facts",
+      "requested_id": "exposure-fact-29307a3de9a5db71b1048a09",
+      "review_status": "approved"
+    },
+    {
+      "actual_id": null,
+      "disposition": "not_persisted",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/6348c3e20207d3d53b35ace1e5718eb18bfd282d2ecc7713af8725cffcf255c8.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": null,
+      "record_type": "exposure_facts",
+      "requested_id": "exposure-fact-29ee8b5e616b11678be3830e",
+      "review_status": null
+    },
+    {
+      "actual_id": null,
+      "disposition": "not_persisted",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/6348c3e20207d3d53b35ace1e5718eb18bfd282d2ecc7713af8725cffcf255c8.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": null,
+      "record_type": "exposure_facts",
+      "requested_id": "exposure-fact-30fe6af2ad7f79c21d103491",
+      "review_status": null
+    },
+    {
+      "actual_id": "exposure-fact-34671b04f4d638a6dcd62acb",
+      "disposition": "written",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/c55ad1ad33dbd507687b3c91fe0ed0963cb14c1c3e63dfbf7a38527d757a8004.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": "bp-run-4f8b0d8fbadffe42fafb79a2",
+      "record_type": "exposure_facts",
+      "requested_id": "exposure-fact-34671b04f4d638a6dcd62acb",
+      "review_status": "approved"
+    },
+    {
+      "actual_id": null,
+      "disposition": "not_persisted",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/6348c3e20207d3d53b35ace1e5718eb18bfd282d2ecc7713af8725cffcf255c8.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": null,
+      "record_type": "exposure_facts",
+      "requested_id": "exposure-fact-35e535c0c99d1b7a6ce74528",
+      "review_status": null
+    },
+    {
+      "actual_id": null,
+      "disposition": "not_persisted",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/6348c3e20207d3d53b35ace1e5718eb18bfd282d2ecc7713af8725cffcf255c8.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": null,
+      "record_type": "exposure_facts",
+      "requested_id": "exposure-fact-393edcd962fa5f3c96912bc6",
+      "review_status": null
+    },
+    {
+      "actual_id": "exposure-fact-3959e957584c938e110c9084",
+      "disposition": "written",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/6348c3e20207d3d53b35ace1e5718eb18bfd282d2ecc7713af8725cffcf255c8.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": "publication-manifest-fdd20b64716e94cacf21f27214249f16",
+      "record_type": "exposure_facts",
+      "requested_id": "exposure-fact-3959e957584c938e110c9084",
+      "review_status": "approved"
+    },
+    {
+      "actual_id": "exposure-fact-3c4015848e1e5cc31845f500",
+      "disposition": "written",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/c55ad1ad33dbd507687b3c91fe0ed0963cb14c1c3e63dfbf7a38527d757a8004.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": "bp-run-13e7e6aa3d6ca6c9ca9249a2",
+      "record_type": "exposure_facts",
+      "requested_id": "exposure-fact-3c4015848e1e5cc31845f500",
+      "review_status": "approved"
+    },
+    {
+      "actual_id": null,
+      "disposition": "not_persisted",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/c55ad1ad33dbd507687b3c91fe0ed0963cb14c1c3e63dfbf7a38527d757a8004.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": null,
+      "record_type": "exposure_facts",
+      "requested_id": "exposure-fact-3daceef9a37cbb88d1173f4a",
+      "review_status": null
+    },
+    {
+      "actual_id": null,
+      "disposition": "not_persisted",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/6348c3e20207d3d53b35ace1e5718eb18bfd282d2ecc7713af8725cffcf255c8.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": null,
+      "record_type": "exposure_facts",
+      "requested_id": "exposure-fact-41db9c61cc6f55bdc8b04f8e",
+      "review_status": null
+    },
+    {
+      "actual_id": null,
+      "disposition": "not_persisted",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/6348c3e20207d3d53b35ace1e5718eb18bfd282d2ecc7713af8725cffcf255c8.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": null,
+      "record_type": "exposure_facts",
+      "requested_id": "exposure-fact-4aec5089f797134babac0305",
+      "review_status": null
+    },
+    {
+      "actual_id": null,
+      "disposition": "not_persisted",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/6348c3e20207d3d53b35ace1e5718eb18bfd282d2ecc7713af8725cffcf255c8.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": null,
+      "record_type": "exposure_facts",
+      "requested_id": "exposure-fact-4ea274a6b4589a6649b32b35",
+      "review_status": null
+    },
+    {
+      "actual_id": "exposure-fact-4f2610a3e8b6ca81031343a9",
+      "disposition": "written",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/6348c3e20207d3d53b35ace1e5718eb18bfd282d2ecc7713af8725cffcf255c8.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": "bp-run-24ccb870c7fddece17459382",
+      "record_type": "exposure_facts",
+      "requested_id": "exposure-fact-4f2610a3e8b6ca81031343a9",
+      "review_status": "approved"
+    },
+    {
+      "actual_id": "exposure-fact-4f4d2bd84e637ad1c7daf745",
+      "disposition": "written",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/6348c3e20207d3d53b35ace1e5718eb18bfd282d2ecc7713af8725cffcf255c8.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": "bp-run-9dd8729295dedb93f8a0449a",
+      "record_type": "exposure_facts",
+      "requested_id": "exposure-fact-4f4d2bd84e637ad1c7daf745",
+      "review_status": "approved"
+    },
+    {
+      "actual_id": "exposure-fact-4f61c935baf0b4a17b29ccaa",
+      "disposition": "written",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/6348c3e20207d3d53b35ace1e5718eb18bfd282d2ecc7713af8725cffcf255c8.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": "publication-manifest-fdd20b64716e94cacf21f27214249f16",
+      "record_type": "exposure_facts",
+      "requested_id": "exposure-fact-4f61c935baf0b4a17b29ccaa",
+      "review_status": "approved"
+    },
+    {
+      "actual_id": "exposure-fact-5157f640abb27d0d36a14a4c",
+      "disposition": "written",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/c55ad1ad33dbd507687b3c91fe0ed0963cb14c1c3e63dfbf7a38527d757a8004.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": "bp-run-13e7e6aa3d6ca6c9ca9249a2",
+      "record_type": "exposure_facts",
+      "requested_id": "exposure-fact-5157f640abb27d0d36a14a4c",
+      "review_status": "approved"
+    },
+    {
+      "actual_id": "exposure-fact-51fb1c2335e3efdba25be991",
+      "disposition": "written",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/c55ad1ad33dbd507687b3c91fe0ed0963cb14c1c3e63dfbf7a38527d757a8004.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": "publication-manifest-9e33a4b3db4b991eaf01d6d8e21dabb8",
+      "record_type": "exposure_facts",
+      "requested_id": "exposure-fact-51fb1c2335e3efdba25be991",
+      "review_status": "approved"
+    },
+    {
+      "actual_id": null,
+      "disposition": "not_persisted",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/c55ad1ad33dbd507687b3c91fe0ed0963cb14c1c3e63dfbf7a38527d757a8004.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": null,
+      "record_type": "exposure_facts",
+      "requested_id": "exposure-fact-52d196071bab75158476b316",
+      "review_status": null
+    },
+    {
+      "actual_id": "exposure-fact-57982f2cdaf7cff350d5aca0",
+      "disposition": "written",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/c55ad1ad33dbd507687b3c91fe0ed0963cb14c1c3e63dfbf7a38527d757a8004.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": "bp-run-13e7e6aa3d6ca6c9ca9249a2",
+      "record_type": "exposure_facts",
+      "requested_id": "exposure-fact-57982f2cdaf7cff350d5aca0",
+      "review_status": "approved"
+    },
+    {
+      "actual_id": "exposure-fact-5e88288572083ede059b7d85",
+      "disposition": "written",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/c55ad1ad33dbd507687b3c91fe0ed0963cb14c1c3e63dfbf7a38527d757a8004.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": "bp-run-4f8b0d8fbadffe42fafb79a2",
+      "record_type": "exposure_facts",
+      "requested_id": "exposure-fact-5e88288572083ede059b7d85",
+      "review_status": "approved"
+    },
+    {
+      "actual_id": "exposure-fact-5ed11b05b774e6400364e71d",
+      "disposition": "written",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/6348c3e20207d3d53b35ace1e5718eb18bfd282d2ecc7713af8725cffcf255c8.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": "bp-run-9dd8729295dedb93f8a0449a",
+      "record_type": "exposure_facts",
+      "requested_id": "exposure-fact-5ed11b05b774e6400364e71d",
+      "review_status": "approved"
+    },
+    {
+      "actual_id": null,
+      "disposition": "not_persisted",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/6348c3e20207d3d53b35ace1e5718eb18bfd282d2ecc7713af8725cffcf255c8.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": null,
+      "record_type": "exposure_facts",
+      "requested_id": "exposure-fact-6755b1bb417bc921341e12ed",
+      "review_status": null
+    },
+    {
+      "actual_id": "exposure-fact-68693564dbfdc0ec3a0ef8eb",
+      "disposition": "written",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/c55ad1ad33dbd507687b3c91fe0ed0963cb14c1c3e63dfbf7a38527d757a8004.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": "bp-run-13e7e6aa3d6ca6c9ca9249a2",
+      "record_type": "exposure_facts",
+      "requested_id": "exposure-fact-68693564dbfdc0ec3a0ef8eb",
+      "review_status": "approved"
+    },
+    {
+      "actual_id": "exposure-fact-6978e81ddc91491269348e15",
+      "disposition": "written",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/c55ad1ad33dbd507687b3c91fe0ed0963cb14c1c3e63dfbf7a38527d757a8004.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": "bp-run-482cd8c2929ac8e54cdc4476",
+      "record_type": "exposure_facts",
+      "requested_id": "exposure-fact-6978e81ddc91491269348e15",
+      "review_status": "approved"
+    },
+    {
+      "actual_id": "exposure-fact-6e0ae3282f0da62aad41ef8f",
+      "disposition": "written",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/6348c3e20207d3d53b35ace1e5718eb18bfd282d2ecc7713af8725cffcf255c8.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": "publication-manifest-fdd20b64716e94cacf21f27214249f16",
+      "record_type": "exposure_facts",
+      "requested_id": "exposure-fact-6e0ae3282f0da62aad41ef8f",
+      "review_status": "approved"
+    },
+    {
+      "actual_id": null,
+      "disposition": "not_persisted",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/6348c3e20207d3d53b35ace1e5718eb18bfd282d2ecc7713af8725cffcf255c8.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": null,
+      "record_type": "exposure_facts",
+      "requested_id": "exposure-fact-72fad6663e660009c9b0a381",
+      "review_status": null
+    },
+    {
+      "actual_id": null,
+      "disposition": "not_persisted",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/c55ad1ad33dbd507687b3c91fe0ed0963cb14c1c3e63dfbf7a38527d757a8004.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": null,
+      "record_type": "exposure_facts",
+      "requested_id": "exposure-fact-777e94d5b87a77f551ecc254",
+      "review_status": null
+    },
+    {
+      "actual_id": "exposure-fact-7d324c92692174aeb173884e",
+      "disposition": "written",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/6348c3e20207d3d53b35ace1e5718eb18bfd282d2ecc7713af8725cffcf255c8.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": "bp-run-9dd8729295dedb93f8a0449a",
+      "record_type": "exposure_facts",
+      "requested_id": "exposure-fact-7d324c92692174aeb173884e",
+      "review_status": "approved"
+    },
+    {
+      "actual_id": "exposure-fact-80748d4db7268b453cbfe9ac",
+      "disposition": "written",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/6348c3e20207d3d53b35ace1e5718eb18bfd282d2ecc7713af8725cffcf255c8.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": "bp-run-24ccb870c7fddece17459382",
+      "record_type": "exposure_facts",
+      "requested_id": "exposure-fact-80748d4db7268b453cbfe9ac",
+      "review_status": "approved"
+    },
+    {
+      "actual_id": "exposure-fact-8263c6596ec3dbbf784e7e28",
+      "disposition": "written",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/6348c3e20207d3d53b35ace1e5718eb18bfd282d2ecc7713af8725cffcf255c8.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": "publication-manifest-fdd20b64716e94cacf21f27214249f16",
+      "record_type": "exposure_facts",
+      "requested_id": "exposure-fact-8263c6596ec3dbbf784e7e28",
+      "review_status": "approved"
+    },
+    {
+      "actual_id": null,
+      "disposition": "not_persisted",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/c55ad1ad33dbd507687b3c91fe0ed0963cb14c1c3e63dfbf7a38527d757a8004.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": null,
+      "record_type": "exposure_facts",
+      "requested_id": "exposure-fact-9883cc86c5464367e20f9304",
+      "review_status": null
+    },
+    {
+      "actual_id": null,
+      "disposition": "not_persisted",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/6348c3e20207d3d53b35ace1e5718eb18bfd282d2ecc7713af8725cffcf255c8.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": null,
+      "record_type": "exposure_facts",
+      "requested_id": "exposure-fact-a02b7dafefa8f2c83e4e6bf0",
+      "review_status": null
+    },
+    {
+      "actual_id": "exposure-fact-ab9d1eb7c3873e5e37cc1948",
+      "disposition": "written",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/c55ad1ad33dbd507687b3c91fe0ed0963cb14c1c3e63dfbf7a38527d757a8004.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": "publication-manifest-9e33a4b3db4b991eaf01d6d8e21dabb8",
+      "record_type": "exposure_facts",
+      "requested_id": "exposure-fact-ab9d1eb7c3873e5e37cc1948",
+      "review_status": "approved"
+    },
+    {
+      "actual_id": null,
+      "disposition": "not_persisted",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/c55ad1ad33dbd507687b3c91fe0ed0963cb14c1c3e63dfbf7a38527d757a8004.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": null,
+      "record_type": "exposure_facts",
+      "requested_id": "exposure-fact-b96438d36d29237c1d9198e7",
+      "review_status": null
+    },
+    {
+      "actual_id": "exposure-fact-ba467f7554891a0a6e362a18",
+      "disposition": "written",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/c55ad1ad33dbd507687b3c91fe0ed0963cb14c1c3e63dfbf7a38527d757a8004.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": "publication-manifest-9e33a4b3db4b991eaf01d6d8e21dabb8",
+      "record_type": "exposure_facts",
+      "requested_id": "exposure-fact-ba467f7554891a0a6e362a18",
+      "review_status": "approved"
+    },
+    {
+      "actual_id": null,
+      "disposition": "not_persisted",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/6348c3e20207d3d53b35ace1e5718eb18bfd282d2ecc7713af8725cffcf255c8.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": null,
+      "record_type": "exposure_facts",
+      "requested_id": "exposure-fact-bc038169d1e6e6cdb09ede3e",
+      "review_status": null
+    },
+    {
+      "actual_id": null,
+      "disposition": "not_persisted",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/c55ad1ad33dbd507687b3c91fe0ed0963cb14c1c3e63dfbf7a38527d757a8004.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": null,
+      "record_type": "exposure_facts",
+      "requested_id": "exposure-fact-bca9fa21dfcf4697d73f5e3f",
+      "review_status": null
+    },
+    {
+      "actual_id": "exposure-fact-bde64624c59513bbc8a86f9e",
+      "disposition": "written",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/c55ad1ad33dbd507687b3c91fe0ed0963cb14c1c3e63dfbf7a38527d757a8004.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": "bp-run-4f8b0d8fbadffe42fafb79a2",
+      "record_type": "exposure_facts",
+      "requested_id": "exposure-fact-bde64624c59513bbc8a86f9e",
+      "review_status": "approved"
+    },
+    {
+      "actual_id": "exposure-fact-be1b3e329f0b5509c91da967",
+      "disposition": "written",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/c55ad1ad33dbd507687b3c91fe0ed0963cb14c1c3e63dfbf7a38527d757a8004.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": "bp-run-4f8b0d8fbadffe42fafb79a2",
+      "record_type": "exposure_facts",
+      "requested_id": "exposure-fact-be1b3e329f0b5509c91da967",
+      "review_status": "approved"
+    },
+    {
+      "actual_id": "exposure-fact-c80e8a01aa4e518d0cb7ea14",
+      "disposition": "written",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/c55ad1ad33dbd507687b3c91fe0ed0963cb14c1c3e63dfbf7a38527d757a8004.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": "bp-run-13e7e6aa3d6ca6c9ca9249a2",
+      "record_type": "exposure_facts",
+      "requested_id": "exposure-fact-c80e8a01aa4e518d0cb7ea14",
+      "review_status": "approved"
+    },
+    {
+      "actual_id": "exposure-fact-d17322653df87c7dd6ab6718",
+      "disposition": "written",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/6348c3e20207d3d53b35ace1e5718eb18bfd282d2ecc7713af8725cffcf255c8.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": "bp-run-9dd8729295dedb93f8a0449a",
+      "record_type": "exposure_facts",
+      "requested_id": "exposure-fact-d17322653df87c7dd6ab6718",
+      "review_status": "approved"
+    },
+    {
+      "actual_id": null,
+      "disposition": "not_persisted",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/6348c3e20207d3d53b35ace1e5718eb18bfd282d2ecc7713af8725cffcf255c8.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": null,
+      "record_type": "exposure_facts",
+      "requested_id": "exposure-fact-d1d69444ffd60d13b4d48aa9",
+      "review_status": null
+    },
+    {
+      "actual_id": "exposure-fact-d63723cd3504ec3c8d65ef89",
+      "disposition": "written",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/c55ad1ad33dbd507687b3c91fe0ed0963cb14c1c3e63dfbf7a38527d757a8004.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": "bp-run-482cd8c2929ac8e54cdc4476",
+      "record_type": "exposure_facts",
+      "requested_id": "exposure-fact-d63723cd3504ec3c8d65ef89",
+      "review_status": "approved"
+    },
+    {
+      "actual_id": "exposure-fact-d788e1206d3419fd6e095cca",
+      "disposition": "written",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/6348c3e20207d3d53b35ace1e5718eb18bfd282d2ecc7713af8725cffcf255c8.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": "bp-run-9dd8729295dedb93f8a0449a",
+      "record_type": "exposure_facts",
+      "requested_id": "exposure-fact-d788e1206d3419fd6e095cca",
+      "review_status": "approved"
+    },
+    {
+      "actual_id": "exposure-fact-db7cd2d847dee645107f63c5",
+      "disposition": "written",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/c55ad1ad33dbd507687b3c91fe0ed0963cb14c1c3e63dfbf7a38527d757a8004.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": "bp-run-13e7e6aa3d6ca6c9ca9249a2",
+      "record_type": "exposure_facts",
+      "requested_id": "exposure-fact-db7cd2d847dee645107f63c5",
+      "review_status": "approved"
+    },
+    {
+      "actual_id": null,
+      "disposition": "not_persisted",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/c55ad1ad33dbd507687b3c91fe0ed0963cb14c1c3e63dfbf7a38527d757a8004.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": null,
+      "record_type": "exposure_facts",
+      "requested_id": "exposure-fact-dc843d8999832362650be994",
+      "review_status": null
+    },
+    {
+      "actual_id": "exposure-fact-e1a9588dda1ed4170531482f",
+      "disposition": "written",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/c55ad1ad33dbd507687b3c91fe0ed0963cb14c1c3e63dfbf7a38527d757a8004.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": "publication-manifest-9e33a4b3db4b991eaf01d6d8e21dabb8",
+      "record_type": "exposure_facts",
+      "requested_id": "exposure-fact-e1a9588dda1ed4170531482f",
+      "review_status": "approved"
+    },
+    {
+      "actual_id": "exposure-fact-e1b71acb193b079716258d4a",
+      "disposition": "written",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/6348c3e20207d3d53b35ace1e5718eb18bfd282d2ecc7713af8725cffcf255c8.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": "publication-manifest-fdd20b64716e94cacf21f27214249f16",
+      "record_type": "exposure_facts",
+      "requested_id": "exposure-fact-e1b71acb193b079716258d4a",
+      "review_status": "approved"
+    },
+    {
+      "actual_id": null,
+      "disposition": "not_persisted",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/6348c3e20207d3d53b35ace1e5718eb18bfd282d2ecc7713af8725cffcf255c8.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": null,
+      "record_type": "exposure_facts",
+      "requested_id": "exposure-fact-e3d27fefb0203de96b413f83",
+      "review_status": null
+    },
+    {
+      "actual_id": "exposure-fact-e4f019d22d3ee4a782efe1f0",
+      "disposition": "written",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/c55ad1ad33dbd507687b3c91fe0ed0963cb14c1c3e63dfbf7a38527d757a8004.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": "bp-run-4f8b0d8fbadffe42fafb79a2",
+      "record_type": "exposure_facts",
+      "requested_id": "exposure-fact-e4f019d22d3ee4a782efe1f0",
+      "review_status": "approved"
+    },
+    {
+      "actual_id": "exposure-fact-e58f58fe9f8dba0b6c6b4feb",
+      "disposition": "written",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/6348c3e20207d3d53b35ace1e5718eb18bfd282d2ecc7713af8725cffcf255c8.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": "publication-manifest-fdd20b64716e94cacf21f27214249f16",
+      "record_type": "exposure_facts",
+      "requested_id": "exposure-fact-e58f58fe9f8dba0b6c6b4feb",
+      "review_status": "approved"
+    },
+    {
+      "actual_id": "exposure-fact-eb312fef8fb0bcba97947213",
+      "disposition": "written",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/6348c3e20207d3d53b35ace1e5718eb18bfd282d2ecc7713af8725cffcf255c8.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": "publication-manifest-fdd20b64716e94cacf21f27214249f16",
+      "record_type": "exposure_facts",
+      "requested_id": "exposure-fact-eb312fef8fb0bcba97947213",
+      "review_status": "approved"
+    },
+    {
+      "actual_id": "exposure-fact-ee8b21df38289f44184ac743",
+      "disposition": "written",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/6348c3e20207d3d53b35ace1e5718eb18bfd282d2ecc7713af8725cffcf255c8.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": "publication-manifest-fdd20b64716e94cacf21f27214249f16",
+      "record_type": "exposure_facts",
+      "requested_id": "exposure-fact-ee8b21df38289f44184ac743",
+      "review_status": "approved"
+    },
+    {
+      "actual_id": null,
+      "disposition": "not_persisted",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/c55ad1ad33dbd507687b3c91fe0ed0963cb14c1c3e63dfbf7a38527d757a8004.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": null,
+      "record_type": "exposure_facts",
+      "requested_id": "exposure-fact-f287f712d3578267835fe9e7",
+      "review_status": null
+    },
+    {
+      "actual_id": null,
+      "disposition": "not_persisted",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/6348c3e20207d3d53b35ace1e5718eb18bfd282d2ecc7713af8725cffcf255c8.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": null,
+      "record_type": "exposure_facts",
+      "requested_id": "exposure-fact-f891479ba2a27946ce6d1bb3",
+      "review_status": null
+    },
+    {
+      "actual_id": null,
+      "disposition": "not_persisted",
+      "evidence_artifacts": [
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/extract/0f681be6c2776a403bb2a76c6ede05d84fee0ba0f311b71a8d6893bdbcd77fb2.json",
+        "/home/python/Quote/data/checkpoints/business_profile_semantic/artifacts/stages/promote/c55ad1ad33dbd507687b3c91fe0ed0963cb14c1c3e63dfbf7a38527d757a8004.json"
+      ],
+      "inference": "reconstructed",
+      "owner_run_id": null,
+      "record_type": "relationships",
+      "requested_id": "relationship:a6976953e8bca57b8884b65a110cfd34",
+      "review_status": null
+    }
+  ],
+  "research_db": "/home/python/Quote/data/research.db",
+  "schema_version": "business_profile_replay_migration_audit.v1",
+  "status": "blocked",
+  "unresolved_approved_identity_rows": [
+    {
+      "inference": "reconstructed",
+      "instrument_id": "002415.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "activity:a3a605b81c6cc3cc4962abfafa320fdd",
+      "record_type": "activities"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "002415.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "activity:6bcab7122deb2187326643701f8ac9e7",
+      "record_type": "activities"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "002415.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "activity:897a70ee90114fbcbdca4decd9c8a037",
+      "record_type": "activities"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "002415.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "activity:798d8232ec990d09985d70f0bcec0e02",
+      "record_type": "activities"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "002415.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "activity:7e3084f7353a207418a4d456bedf5dbc",
+      "record_type": "activities"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "002415.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "activity:b10376fafa9ba8d223794d50e16c0f11",
+      "record_type": "activities"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "002415.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "activity:4550959897999bc63584dd4b549c5f52",
+      "record_type": "activities"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "002415.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "activity:c74d9e762f6c287630d72cc155a1b858",
+      "record_type": "activities"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "002415.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "activity:fb67240d7a521edfb75202c580d3542c",
+      "record_type": "activities"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "002415.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "activity:cc5cee39beecfac620462384f40a76fa",
+      "record_type": "activities"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "002415.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "activity:9889d0f05af20347f590b00c40410a09",
+      "record_type": "activities"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "002415.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "activity:2722f2fa6d758a425ba52daae07930c6",
+      "record_type": "activities"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "002415.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "activity:0c1f3a779b548966e9c6d917a6ebf7a1",
+      "record_type": "activities"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "002415.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "activity:ce08d7b9ca2825b12c48694f95e99ae7",
+      "record_type": "activities"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "002415.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "activity:3d7537ac7c297530e81afdca1b468e9f",
+      "record_type": "activities"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "002415.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "activity:006bef502d6fa7521323b81ab65e19b3",
+      "record_type": "activities"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "002415.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "activity:740896eb6dbe201febcc4f5b76de1773",
+      "record_type": "activities"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "002415.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "activity:9e1d46cceb359fc7e9a48af8d3066515",
+      "record_type": "activities"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "002415.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "activity:13e57dd6bad3f21c9c38d75addaea279",
+      "record_type": "activities"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "002496.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "activity:e40407b9949346464206bbccdcbda439",
+      "record_type": "activities"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "002496.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "activity:ecf142a2c5004abbbfc05c6ece8abd20",
+      "record_type": "activities"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "002496.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "activity:328213e7feec245eae58399242677840",
+      "record_type": "activities"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "002496.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "activity:7eced13e969ac79d3a1cfb22dbf9ddab",
+      "record_type": "activities"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "002496.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "activity:362b45791941082a5de2f53774fb52e1",
+      "record_type": "activities"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "002496.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "activity:847418da96cc6ae8842891827ee2adad",
+      "record_type": "activities"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "002496.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "activity:1692e546e9c0b4dd06bb537d5f6541a2",
+      "record_type": "activities"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "002496.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "activity:a55efddc90aff16a49912027e9a44da1",
+      "record_type": "activities"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "002496.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "activity:e91ca792db1411ad91b4e6fc64022833",
+      "record_type": "activities"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "002496.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "activity:2b808fddfb5e8c4a80b9ccb72fdad52f",
+      "record_type": "activities"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "002496.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "activity:63bbeffcc051a23613a0f9f315e1ee88",
+      "record_type": "activities"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "002496.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "activity:ce769a9deca528f3b9ce6eeb9b7f18e2",
+      "record_type": "activities"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "002496.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "activity:dfb55ab7ec2b386149c28bf5d216a5f9",
+      "record_type": "activities"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "002496.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "activity:d8bb50d035a699f379546e6b29e005fa",
+      "record_type": "activities"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "002496.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "activity:226d188057e6c740dca044f1c2ee411f",
+      "record_type": "activities"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "002496.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "activity:c85893d942eb9da5676e1a30139fa5ae",
+      "record_type": "activities"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "002496.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "activity:1ed156b1403f7fc055941dbc79d03f0c",
+      "record_type": "activities"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "002496.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "activity:5899825fead128d4cc418c2261cf9aa5",
+      "record_type": "activities"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "002496.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "activity:b8043f95caa199fa11f674b27afd6ad7",
+      "record_type": "activities"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "002496.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "activity:f223c431633cf4ad312e3b3e3d5939d3",
+      "record_type": "activities"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "002496.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "activity:e9295395202b9e92e2166f3ab39a3a07",
+      "record_type": "activities"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "300750.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "activity:7d7a6b9e13ed0b12d80df2a2997da9e4",
+      "record_type": "activities"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "300750.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "activity:9bce6724f2b37cd9e0cbe21a706d6c63",
+      "record_type": "activities"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "300750.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "activity:af03a8b627bad2578fe6f9e71d30bc75",
+      "record_type": "activities"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "300750.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "activity:9bf33a7dd35a03a054348bdf00095767",
+      "record_type": "activities"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "300750.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "activity:a3d236a4c179e9023cfb139208cf340f",
+      "record_type": "activities"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "300750.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "activity:111bf21e988fe00b25d20032b058f7f3",
+      "record_type": "activities"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "300750.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "activity:3a3701d5192d8541a6f7b867150b741d",
+      "record_type": "activities"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "300750.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "activity:9f0a467af590db16ce4323f3e85a27c5",
+      "record_type": "activities"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "300750.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "activity:9eec031b88d17ba19ce34cb0d1e42d28",
+      "record_type": "activities"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "300750.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "activity:163d368ed8fe05b74c237216d669209a",
+      "record_type": "activities"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "300750.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "activity:e3de17e95d0a601bb25d996ad128317e",
+      "record_type": "activities"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "300750.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "activity:fcfe5d1a89d7cba79be9ee2ad0145bc7",
+      "record_type": "activities"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "002415.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "anonymous-concentration:c859b2c60f6aa6db6047c5cc79d74eeb",
+      "record_type": "operating_facts"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "002415.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "anonymous-concentration:b0fa2a81d3075ae606898944e50c6c54",
+      "record_type": "operating_facts"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "002415.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "anonymous-concentration:85f0f382186dce6b6a71940210213031",
+      "record_type": "operating_facts"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "002415.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "anonymous-concentration:59a3abe30ff29014ac94d5d155efd4f8",
+      "record_type": "operating_facts"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "002415.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "anonymous-concentration:3ba718da2d8d9cc222843ca22c8de413",
+      "record_type": "operating_facts"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "002415.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "anonymous-concentration:923e99c7218349ac65cad874200a7dce",
+      "record_type": "operating_facts"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "002415.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "bp-operating-4374c14f74c7d95a864a3061",
+      "record_type": "operating_facts"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "002415.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "bp-operating-3f5c2f8df1576538bdf3e80d",
+      "record_type": "operating_facts"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "002415.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "bp-operating-c197aff6d4bda67457391ef0",
+      "record_type": "operating_facts"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "002415.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "bp-operating-44ddfd34858548e69809ac35",
+      "record_type": "operating_facts"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "002415.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "bp-operating-73ffdc809a048d0dfe9ee2f8",
+      "record_type": "operating_facts"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "002415.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "bp-operating-cfa67c7a668168764682fa35",
+      "record_type": "operating_facts"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "002415.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "bp-operating-d40d2bc00bd934ff58392236",
+      "record_type": "operating_facts"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "002415.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "bp-operating-d8f910a24ad3331e0f43b4c0",
+      "record_type": "operating_facts"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "002415.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "bp-operating-e376c6844189877b3164877c",
+      "record_type": "operating_facts"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "002415.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "bp-operating-43a3c3045998b8d80308c429",
+      "record_type": "operating_facts"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "002415.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "bp-operating-e9e1ec279a7131da92541cf2",
+      "record_type": "operating_facts"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "002415.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "bp-operating-c4621aed1bb84f8a8bed9742",
+      "record_type": "operating_facts"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "002415.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "anonymous-concentration:fc8070943f235357c69852e60997dc55",
+      "record_type": "operating_facts"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "002415.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "anonymous-concentration:1e46e7a9c87424747e6bba1423fd1af6",
+      "record_type": "operating_facts"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "002415.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "anonymous-concentration:4f2d602f0dae678ada138abea5118153",
+      "record_type": "operating_facts"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "002415.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "anonymous-concentration:a53457d0f5ca9bb56b2e35bdd4bf77ee",
+      "record_type": "operating_facts"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "002415.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "anonymous-concentration:8119bfdfc0b53d0b51efb3885e68d324",
+      "record_type": "operating_facts"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "002415.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "anonymous-concentration:525bf853157bf8d4b9fdd6b606f7f945",
+      "record_type": "operating_facts"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "002496.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "bp-operating-edb08f57884fd7edd3f72339",
+      "record_type": "operating_facts"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "002496.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "bp-operating-dc4044db357e250413d44e6c",
+      "record_type": "operating_facts"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "002496.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "bp-operating-be67daee41be00f64abf5dbb",
+      "record_type": "operating_facts"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "002496.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "bp-operating-618f9783989396d52c9990ae",
+      "record_type": "operating_facts"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "002496.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "bp-operating-b78cf52f349c060cffcd9e06",
+      "record_type": "operating_facts"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "002496.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "bp-operating-f146d4a5b8a7d2f2ef5f232e",
+      "record_type": "operating_facts"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "002496.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "bp-operating-0f1aef6e889aee0dc6c8dfcc",
+      "record_type": "operating_facts"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "002496.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "bp-operating-7268c682025b26640b59865e",
+      "record_type": "operating_facts"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "002496.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "bp-operating-044e71385c78ddf2141b5bd8",
+      "record_type": "operating_facts"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "300750.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "anonymous-concentration:277775c72c1f444876563bd053240df6",
+      "record_type": "operating_facts"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "300750.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "anonymous-concentration:c1989e67fb33788042f8b3ce75a16f89",
+      "record_type": "operating_facts"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "300750.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "anonymous-concentration:eba5d4ade13968f632a178a894101c0e",
+      "record_type": "operating_facts"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "300750.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "anonymous-concentration:54870f82603a351f779b2190d877e04e",
+      "record_type": "operating_facts"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "300750.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "anonymous-concentration:6a5cf2949b1328c8865d384693cb5906",
+      "record_type": "operating_facts"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "300750.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "anonymous-concentration:1849cd732dbd282f4ad25cb7ea6898d8",
+      "record_type": "operating_facts"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "300750.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "anonymous-concentration:1caa970bfa4ad43428bb73e0101d0423",
+      "record_type": "operating_facts"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "300750.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "anonymous-concentration:4a8342ff9fce02fb44b9f3a3f953156b",
+      "record_type": "operating_facts"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "300750.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "anonymous-concentration:39599573cdc2e7eb1cf415d1a2cc97c0",
+      "record_type": "operating_facts"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "300750.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "anonymous-concentration:aa04cb79ffd3b4b1d87710db92804d77",
+      "record_type": "operating_facts"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "300750.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "anonymous-concentration:bec9b29b29ab4acced5c4df2d8acdb1d",
+      "record_type": "operating_facts"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "300750.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "anonymous-concentration:37c60e7310ba6f40a2ecfcf0ae804cfa",
+      "record_type": "operating_facts"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "300750.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "anonymous-concentration:fefed74e3941f1ebe17eb3fa50d9909b",
+      "record_type": "operating_facts"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "300750.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "bp-operating-45440a66487d4cbd94a356c3",
+      "record_type": "operating_facts"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "300750.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "bp-operating-9195782174cb466c582a72dc",
+      "record_type": "operating_facts"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "300750.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "bp-operating-908e7166f7c4f3148e1b6b3e",
+      "record_type": "operating_facts"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "300750.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "bp-operating-39c8c735544a54935762497d",
+      "record_type": "operating_facts"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "300750.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "bp-operating-9909445c1e4056b63c2ec7e6",
+      "record_type": "operating_facts"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "300750.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "bp-operating-1fd6db54678f51f11a29c297",
+      "record_type": "operating_facts"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "300750.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "bp-operating-aa981eeab1be104c79bd1409",
+      "record_type": "operating_facts"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "300750.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "bp-operating-75334f34dca0d7b62886aa4d",
+      "record_type": "operating_facts"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "300750.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "bp-operating-2bdf8349afabd0342706677b",
+      "record_type": "operating_facts"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "300750.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "bp-operating-53167562a678405365ad0d90",
+      "record_type": "operating_facts"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "300750.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "anonymous-concentration:7b295eba0a9b09fa8933387f74bf9e25",
+      "record_type": "operating_facts"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "300750.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "anonymous-concentration:3f762cbffd7eaea6826d92de32ec6561",
+      "record_type": "operating_facts"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "300750.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "anonymous-concentration:40f84959037baf06e5b055a8e565a0aa",
+      "record_type": "operating_facts"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "300750.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "anonymous-concentration:259e875486359781055aac8889af1df7",
+      "record_type": "operating_facts"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "300750.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "anonymous-concentration:bc42669dbfd7cdc110332d34ee34f878",
+      "record_type": "operating_facts"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "300750.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "anonymous-concentration:19f1a2074e2d5f4a9ffc3e4b97cabaed",
+      "record_type": "operating_facts"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "300750.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "anonymous-concentration:eae3ebe4097e2d4cff88a2bb9b77eaad",
+      "record_type": "operating_facts"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "300750.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "anonymous-concentration:7b36680950e554d7944d70f2530b653b",
+      "record_type": "operating_facts"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "300750.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "anonymous-concentration:8adcdd60f97741f433e8861a9b0edc14",
+      "record_type": "operating_facts"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "300750.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "anonymous-concentration:b74780da1840745966149e95aae9670e",
+      "record_type": "operating_facts"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "300750.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "anonymous-concentration:a1a52308b36d8e76c1d02b74ad13c462",
+      "record_type": "operating_facts"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "300750.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "anonymous-concentration:944f2949e184ed3eb706322c0c770e6f",
+      "record_type": "operating_facts"
+    },
+    {
+      "inference": "reconstructed",
+      "instrument_id": "300750.SZ",
+      "reason": "outside_exact_migration_scope",
+      "record_id": "anonymous-concentration:f4cde25d55e26e9b2aa11a154acaa2c0",
+      "record_type": "operating_facts"
+    }
+  ],
+  "work_items": [
+    {
+      "checkpoint_path": "data/checkpoints/business_profile_async/bp-work-52661c9f23e1f6d25890bd17.force-replay-44f7d458c6a0.json",
+      "inference": "reconstructed",
+      "instrument_id": "002415.SZ",
+      "last_error": null,
+      "stage": "publish",
+      "status": "completed",
+      "work_id": "bp-work-52661c9f23e1f6d25890bd17"
+    },
+    {
+      "checkpoint_path": "data/checkpoints/business_profile_async/bp-work-fe514fdb92b27346bfaa215a.force-replay-542f3860fac0.json",
+      "inference": "reconstructed",
+      "instrument_id": "300750.SZ",
+      "last_error": null,
+      "stage": "publish",
+      "status": "completed",
+      "work_id": "bp-work-fe514fdb92b27346bfaa215a"
+    }
+  ]
+}

@@ -1,7 +1,8 @@
 {
   "business_profile_rollout": {
     "schema_version": "business_profile_production_rollout.v1",
-    "enabled": true,
+    "enabled": false,
+    "freeze_reason": "Legacy business-profile semantic contracts are frozen pending the authoritative product and industry contract redesign; do not resume targeted or broad semantic backfill from this rollout.",
     "active_phase": "structured_shadow",
     "runtime_identity_mode": "derived",
     "bootstrap": {
@@ -46,9 +47,9 @@
           "document": "effective_annual_report.v2|business_profile_source_asset.v1",
           "model": "logical_profile=semantic_extraction|route_fingerprint=9f6d789fdb1fb079f20a9ec44c5d6709ab7956e0c91f7973145fd3398d17faf4|structured_output_modes=json_object",
           "parser": "structured_business_profile.v2|business_profile_text_table_parser.v1|business_profile_semantic_runtime.v8",
-          "policy": "business_profile_latest_annual.v2|business_profile_atomic_extraction.v5|business_profile_structured_extraction.v4|business_profile_auto_promotion.2026.1|business_profile_exposure_publication.v1",
+          "policy": "business_profile_latest_annual.v2|business_profile_atomic_extraction.v6|business_profile_structured_extraction.v4|business_profile_auto_promotion.2026.1|business_profile_exposure_publication.v1",
           "rules": "business_profile_activity_role_rules.v1|business_profile_entity_resolution.v2|business_profile_exposure_direction.v1|business_profile_exposure_facts.v1",
-          "schema": "business_profile_semantic_schemas.v2|business_profile_atomic_extraction.v5|business_profile_structured_extraction.v4",
+          "schema": "business_profile_semantic_schemas.v2|business_profile_atomic_extraction.v6|business_profile_structured_extraction.v4",
           "section": "business_profile_pdf_artifact.v2|business_profile_pdfium_recovery.v4|business_profile_selected_sections.v1",
           "selector": "business_profile_field_family_selector.v2|business_profile_action_object_spans.v1",
           "verifier": "business_profile_atomic_verifier.v6"
@@ -63,9 +64,9 @@
           "document": "effective_annual_report.v2|business_profile_source_asset.v1",
           "model": "logical_profile=semantic_extraction|route_fingerprint=9f6d789fdb1fb079f20a9ec44c5d6709ab7956e0c91f7973145fd3398d17faf4|structured_output_modes=json_object",
           "parser": "structured_business_profile.v2|business_profile_text_table_parser.v1|business_profile_semantic_runtime.v8",
-          "policy": "business_profile_latest_annual.v2|business_profile_atomic_extraction.v5|business_profile_structured_extraction.v4|business_profile_auto_promotion.2026.1|business_profile_exposure_publication.v1",
+          "policy": "business_profile_latest_annual.v2|business_profile_atomic_extraction.v6|business_profile_structured_extraction.v4|business_profile_auto_promotion.2026.1|business_profile_exposure_publication.v1",
           "rules": "business_profile_activity_role_rules.v1|business_profile_entity_resolution.v2|business_profile_exposure_direction.v1|business_profile_exposure_facts.v1",
-          "schema": "business_profile_semantic_schemas.v2|business_profile_atomic_extraction.v5|business_profile_structured_extraction.v4",
+          "schema": "business_profile_semantic_schemas.v2|business_profile_atomic_extraction.v6|business_profile_structured_extraction.v4",
           "section": "business_profile_pdf_artifact.v2|business_profile_pdfium_recovery.v4|business_profile_selected_sections.v1",
           "selector": "business_profile_field_family_selector.v2|business_profile_action_object_spans.v1",
           "verifier": "business_profile_atomic_verifier.v6"
@@ -80,9 +81,9 @@
           "document": "effective_annual_report.v2|business_profile_source_asset.v1",
           "model": "logical_profile=semantic_extraction|route_fingerprint=9f6d789fdb1fb079f20a9ec44c5d6709ab7956e0c91f7973145fd3398d17faf4|structured_output_modes=json_object",
           "parser": "structured_business_profile.v2|business_profile_text_table_parser.v1|business_profile_semantic_runtime.v8",
-          "policy": "business_profile_latest_annual.v2|business_profile_atomic_extraction.v5|business_profile_structured_extraction.v4|business_profile_auto_promotion.2026.1|business_profile_exposure_publication.v1",
+          "policy": "business_profile_latest_annual.v2|business_profile_atomic_extraction.v6|business_profile_structured_extraction.v4|business_profile_auto_promotion.2026.1|business_profile_exposure_publication.v1",
           "rules": "business_profile_activity_role_rules.v1|business_profile_entity_resolution.v2|business_profile_exposure_direction.v1|business_profile_exposure_facts.v1",
-          "schema": "business_profile_semantic_schemas.v2|business_profile_atomic_extraction.v5|business_profile_structured_extraction.v4",
+          "schema": "business_profile_semantic_schemas.v2|business_profile_atomic_extraction.v6|business_profile_structured_extraction.v4",
           "section": "business_profile_pdf_artifact.v2|business_profile_pdfium_recovery.v4|business_profile_selected_sections.v1",
           "selector": "business_profile_field_family_selector.v2|business_profile_action_object_spans.v1",
           "verifier": "business_profile_atomic_verifier.v6"
@@ -97,9 +98,9 @@
           "document": "effective_annual_report.v2|business_profile_source_asset.v1",
           "model": "logical_profile=semantic_extraction|route_fingerprint=9f6d789fdb1fb079f20a9ec44c5d6709ab7956e0c91f7973145fd3398d17faf4|structured_output_modes=json_object",
           "parser": "structured_business_profile.v2|business_profile_text_table_parser.v1|business_profile_semantic_runtime.v8",
-          "policy": "business_profile_latest_annual.v2|business_profile_atomic_extraction.v5|business_profile_structured_extraction.v4|business_profile_auto_promotion.2026.1|business_profile_exposure_publication.v1",
+          "policy": "business_profile_latest_annual.v2|business_profile_atomic_extraction.v6|business_profile_structured_extraction.v4|business_profile_auto_promotion.2026.1|business_profile_exposure_publication.v1",
           "rules": "business_profile_activity_role_rules.v1|business_profile_entity_resolution.v2|business_profile_exposure_direction.v1|business_profile_exposure_facts.v1",
-          "schema": "business_profile_semantic_schemas.v2|business_profile_atomic_extraction.v5|business_profile_structured_extraction.v4",
+          "schema": "business_profile_semantic_schemas.v2|business_profile_atomic_extraction.v6|business_profile_structured_extraction.v4",
           "section": "business_profile_pdf_artifact.v2|business_profile_pdfium_recovery.v4|business_profile_selected_sections.v1",
           "selector": "business_profile_field_family_selector.v2|business_profile_action_object_spans.v1",
           "verifier": "business_profile_atomic_verifier.v6"
@@ -114,9 +115,9 @@
           "document": "effective_annual_report.v2|business_profile_source_asset.v1",
           "model": "logical_profile=semantic_extraction|route_fingerprint=9f6d789fdb1fb079f20a9ec44c5d6709ab7956e0c91f7973145fd3398d17faf4|structured_output_modes=json_object",
           "parser": "structured_business_profile.v2|business_profile_text_table_parser.v1|business_profile_semantic_runtime.v8",
-          "policy": "business_profile_latest_annual.v2|business_profile_atomic_extraction.v5|business_profile_structured_extraction.v4|business_profile_auto_promotion.2026.1|business_profile_exposure_publication.v1",
+          "policy": "business_profile_latest_annual.v2|business_profile_atomic_extraction.v6|business_profile_structured_extraction.v4|business_profile_auto_promotion.2026.1|business_profile_exposure_publication.v1",
           "rules": "business_profile_activity_role_rules.v1|business_profile_entity_resolution.v2|business_profile_exposure_direction.v1|business_profile_exposure_facts.v1",
-          "schema": "business_profile_semantic_schemas.v2|business_profile_atomic_extraction.v5|business_profile_structured_extraction.v4",
+          "schema": "business_profile_semantic_schemas.v2|business_profile_atomic_extraction.v6|business_profile_structured_extraction.v4",
           "section": "business_profile_pdf_artifact.v2|business_profile_pdfium_recovery.v4|business_profile_selected_sections.v1",
           "selector": "business_profile_field_family_selector.v2|business_profile_action_object_spans.v1",
           "verifier": "business_profile_atomic_verifier.v6"

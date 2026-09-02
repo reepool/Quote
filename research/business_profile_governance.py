@@ -757,50 +757,10 @@ class BusinessProfileRepository:
                     raise ValueError(
                         f"bundle record evidence_id is required: {record_type}:{item['pk_value']}"
                     )
-        counts = {
-            "evidence_count": sum(
-                1
-                for item in prepared_by_type.get("evidence", [])
-                if not item.get("skip_write")
-            ),
-            "fact_count": sum(
-                sum(
-                    1
-                    for item in prepared_by_type.get(key, [])
-                    if not item.get("skip_write")
-                )
-                for key in ("segments", "operating_facts", "exposure_facts")
-            ),
-            "activity_count": sum(
-                1
-                for item in prepared_by_type.get("activities", [])
-                if not item.get("skip_write")
-            ),
-            "relationship_count": sum(
-                1
-                for item in prepared_by_type.get("relationships", [])
-                if not item.get("skip_write")
-            ),
-        }
-        # Keep the durable run manifest aligned with rows that will actually
-        # be written. Skipped reuse conflicts remain available in the raw
-        # semantic artifact, but must not make a later family replay reject
-        # an otherwise complete run for missing record ids.
-        run_metadata = dict(run_payload.get("metadata") or {})
-        record_ids = dict(run_metadata.get("record_ids") or {})
-        for record_type, prepared in prepared_by_type.items():
-            if record_type == "evidence":
-                continue
-            record_ids[record_type] = [
-                item["pk_value"] for item in prepared if not item.get("skip_write")
-            ]
-        run_metadata["record_ids"] = record_ids
-        run_metadata["evidence_ids"] = [
-            item["pk_value"]
-            for item in prepared_by_type.get("evidence", [])
-            if not item.get("skip_write")
-        ]
-        run_payload["metadata"] = run_metadata
+        counts: Dict[str, int] = {}
+        record_ids: Dict[str, List[str]] = {}
+        evidence_ids: List[str] = []
+        dispositions: Dict[str, List[Dict[str, str]]] = {}
         with self.storage.get_connection() as conn:
             self.storage._apply_pragmas(conn)
             conn.execute("BEGIN IMMEDIATE")
@@ -891,6 +851,7 @@ class BusinessProfileRepository:
                                         f"{record_type}:{item['pk_value']}"
                                     )
                             item["skip_write"] = True
+                            item["reused_governed_id"] = str(existing[spec["pk"]])
                         self._validate_temporal_state(
                             conn,
                             record_type,
@@ -912,36 +873,46 @@ class BusinessProfileRepository:
                                     "bundle evidence instrument mismatch: "
                                     f"{record_type}:{evidence_id}"
                                 )
-                # Temporal reuse validation may mark a replay candidate as
-                # skip_write (for example a zero-valued row shadowed by an
-                # already approved non-zero fact).  Recompute counts after
-                # validation so the run manifest reports rows actually
-                # persisted, not rows merely prepared.
+                # Finalize the disposition only after every temporal/reuse
+                # check.  The runtime must never verify an ID that this
+                # transaction intentionally skipped or failed to create.
+                dispositions = self._bundle_dispositions(prepared_by_type)
+                record_ids = {
+                    record_type: [
+                        item["actual_id"]
+                        for item in values
+                        if item["state"] == "written"
+                    ]
+                    for record_type, values in dispositions.items()
+                    if record_type != "evidence"
+                }
+                evidence_ids = [
+                    item["actual_id"]
+                    for item in dispositions.get("evidence", [])
+                    if item["state"] == "written"
+                ]
                 counts = {
-                    "evidence_count": sum(
-                        1
-                        for item in prepared_by_type.get("evidence", [])
-                        if not item.get("skip_write")
-                    ),
+                    "evidence_count": len(evidence_ids),
                     "fact_count": sum(
-                        sum(
-                            1
-                            for item in prepared_by_type.get(key, [])
-                            if not item.get("skip_write")
-                        )
+                        len(record_ids.get(key, []))
                         for key in ("segments", "operating_facts", "exposure_facts")
                     ),
-                    "activity_count": sum(
-                        1
-                        for item in prepared_by_type.get("activities", [])
-                        if not item.get("skip_write")
-                    ),
-                    "relationship_count": sum(
-                        1
-                        for item in prepared_by_type.get("relationships", [])
-                        if not item.get("skip_write")
-                    ),
+                    "activity_count": len(record_ids.get("activities", [])),
+                    "relationship_count": len(record_ids.get("relationships", [])),
                 }
+                run_metadata = dict(run_payload.get("metadata") or {})
+                run_metadata["record_ids"] = record_ids
+                run_metadata["evidence_ids"] = evidence_ids
+                run_metadata["record_dispositions"] = dispositions
+                blocked_dispositions = [
+                    item
+                    for values in dispositions.values()
+                    for item in values
+                    if item["state"] == "blocked"
+                ]
+                if blocked_dispositions:
+                    run_metadata["semantic_family_complete"] = False
+                run_payload["metadata"] = run_metadata
                 for record_type in (
                     "evidence",
                     "segments",
@@ -993,7 +964,55 @@ class BusinessProfileRepository:
             except Exception:
                 conn.rollback()
                 raise
-        return {"run_id": run_id, "status": "completed", **counts}
+        return {
+            "run_id": run_id,
+            "status": "completed",
+            **counts,
+            "record_ids": record_ids,
+            "evidence_ids": evidence_ids,
+            "record_dispositions": dispositions,
+            "semantic_family_complete": bool(
+                run_metadata.get("semantic_family_complete") is True
+            ),
+        }
+
+    @staticmethod
+    def _bundle_dispositions(
+        prepared_by_type: Mapping[str, Sequence[Mapping[str, Any]]],
+    ) -> Dict[str, List[Dict[str, str]]]:
+        """Return durable outcomes for each requested bundle record."""
+
+        results: Dict[str, List[Dict[str, str]]] = {}
+        for record_type, prepared in prepared_by_type.items():
+            values: List[Dict[str, str]] = []
+            for item in prepared:
+                request_id = str(item["pk_value"])
+                if not item.get("skip_write"):
+                    values.append(
+                        {"requested_id": request_id, "state": "written", "actual_id": request_id}
+                    )
+                    continue
+                governed_id = str(item.get("reused_governed_id") or "").strip()
+                if governed_id:
+                    values.append(
+                        {
+                            "requested_id": request_id,
+                            "state": "reused",
+                            "actual_id": governed_id,
+                        }
+                    )
+                    continue
+                values.append(
+                    {
+                        "requested_id": request_id,
+                        "state": "blocked",
+                        "reason_code": str(
+                            item.get("blocked_reason") or "temporal_reuse_conflict"
+                        ),
+                    }
+                )
+            results[record_type] = values
+        return results
 
     def _attach_replace_successors(
         self,
@@ -1099,6 +1118,7 @@ class BusinessProfileRepository:
                         winner = self._prefer_report_flow_candidate(left, right)
                         loser = right if winner is left else left
                         loser["skip_write"] = True
+                        loser["blocked_reason"] = "temporal_reuse_conflict"
                         continue
                     raise ValueError(
                         "business profile temporal conflict within bulk batch: "
@@ -1119,6 +1139,36 @@ class BusinessProfileRepository:
         policy = get_business_profile_temporal_policy(record_type)
         spec = prepared["spec"]
         payload = prepared["payload"]
+        occurrence_identity = self._lineage_value(payload, "occurrence_identity")
+        semantic_fingerprint = self._lineage_value(
+            payload, "semantic_content_fingerprint"
+        )
+        if occurrence_identity and semantic_fingerprint:
+            rows = conn.execute(
+                f"SELECT * FROM {spec['table']} WHERE instrument_id = ? "
+                "AND review_status IN ('held', 'approved') "
+                f"AND {spec['pk']} <> ?",
+                (payload.get("instrument_id"), prepared["pk_value"]),
+            ).fetchall()
+            for row in rows:
+                existing = self._decode_row(dict(row), spec["json"])
+                if self._lineage_value(existing, "occurrence_identity") != occurrence_identity:
+                    continue
+                existing_fingerprint = self._lineage_value(
+                    existing, "semantic_content_fingerprint"
+                )
+                if existing_fingerprint == semantic_fingerprint:
+                    prepared["skip_write"] = True
+                    prepared["reused_governed_id"] = str(existing[spec["pk"]])
+                    return
+                if allow_reuse_conflict:
+                    prepared["skip_write"] = True
+                    prepared["blocked_reason"] = "occurrence_semantic_drift"
+                    return
+                raise ValueError(
+                    "business profile occurrence semantic drift: "
+                    f"{record_type}:{prepared['pk_value']}:{existing.get(spec['pk'])}"
+                )
         pointer_column = get_business_profile_supersession_column(record_type)
         pointer = (
             str(payload.get(pointer_column) or "").strip()
@@ -1165,6 +1215,7 @@ class BusinessProfileRepository:
                         # replay must complete against that immutable row
                         # instead of inserting a second temporal version.
                         prepared["skip_write"] = True
+                        prepared["reused_governed_id"] = str(existing[spec["pk"]])
                         return
                     # A replay can produce a new record id when evidence spans
                     # are regenerated, while the reported fact is unchanged.
@@ -1197,6 +1248,7 @@ class BusinessProfileRepository:
                     # artifact and is retriable through an explicit replace
                     # run, instead of aborting the whole document bundle.
                     prepared["skip_write"] = True
+                    prepared["reused_governed_id"] = str(existing[spec["pk"]])
                     return
                 raise ValueError(
                     "business profile temporal conflict: "

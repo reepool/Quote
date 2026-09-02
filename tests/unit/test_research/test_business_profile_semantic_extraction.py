@@ -928,6 +928,100 @@ async def test_anonymous_concentration_with_explicit_share_is_normalized():
 
 
 @pytest.mark.asyncio
+@pytest.mark.parametrize(
+    ("source_value", "source_unit", "expected"),
+    (
+        (0.5, "%", 0.005),
+        (2.0, "占年度销售总额比例", 0.02),
+        (14.5, "%", 0.145),
+    ),
+)
+async def test_source_native_percent_share_is_normalized_once(
+    source_value, source_unit, expected
+):
+    selected = _selected(f"前五名客户销售占比为{source_value}%。")
+    response = {
+        "schema_version": SEMANTIC_EXTRACTION_SCHEMA_VERSION,
+        "instrument_id": "601088.SH",
+        "report_period": "2025-12-31",
+        "activities": [],
+        "relationships": [
+            {
+                "subject_scope": "issuer",
+                "relationship_type": "sells_to",
+                "counterparty_name_raw": "前五名客户",
+                "anonymous": True,
+                "relationship_scope": "concentration",
+                "disclosed_share_source_value": source_value,
+                "disclosed_share_source_unit": source_unit,
+                "object_raw": "营业收入",
+                "evidence_span_ids": [
+                    build_semantic_extraction_request(
+                        field_family="named_relationships",
+                        instrument_id="601088.SH",
+                        report_period="2025-12-31",
+                        selected=selected,
+                    ).evidence_spans[0].evidence_span_id
+                ],
+            }
+        ],
+    }
+
+    envelope = await BusinessProfileSemanticExtractor(
+        _FakeGateway([response])
+    ).extract_async(
+        field_family="named_relationships",
+        instrument_id="601088.SH",
+        report_period="2025-12-31",
+        selected=selected,
+    )
+
+    relationship = envelope.relationships[0]
+    assert relationship["disclosed_share"] == pytest.approx(expected)
+    assert relationship["disclosed_share_unit"] == "fraction"
+    assert relationship["disclosed_share_source_value"] == source_value
+    assert relationship["disclosed_share_source_unit"] == source_unit
+
+
+@pytest.mark.asyncio
+async def test_legacy_canonical_share_with_percent_unit_is_rejected():
+    selected = _selected("前五名客户销售占比为0.5%。")
+    context = build_semantic_extraction_request(
+        field_family="named_relationships",
+        instrument_id="601088.SH",
+        report_period="2025-12-31",
+        selected=selected,
+    )
+    response = {
+        "schema_version": SEMANTIC_EXTRACTION_SCHEMA_VERSION,
+        "instrument_id": "601088.SH",
+        "report_period": "2025-12-31",
+        "activities": [],
+        "relationships": [
+            {
+                "subject_scope": "issuer",
+                "relationship_type": "sells_to",
+                "counterparty_name_raw": "前五名客户",
+                "anonymous": True,
+                "relationship_scope": "concentration",
+                "disclosed_share": 0.5,
+                "disclosed_share_unit": "%",
+                "object_raw": "营业收入",
+                "evidence_span_ids": [context.evidence_spans[0].evidence_span_id],
+            }
+        ],
+    }
+
+    with pytest.raises(ValueError, match="fraction conflicts with percent unit"):
+        await BusinessProfileSemanticExtractor(_FakeGateway([response])).extract_async(
+            field_family="named_relationships",
+            instrument_id="601088.SH",
+            report_period="2025-12-31",
+            selected=selected,
+        )
+
+
+@pytest.mark.asyncio
 async def test_mixed_partial_response_is_rejected():
     selected = _selected()
     relationship_selected = _selected("主要业务：公司向客户股份有限公司销售动力煤。")

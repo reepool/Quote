@@ -2550,6 +2550,7 @@ class BusinessProfileAsyncProductionService:
         # still contains known identity collisions or non-reusable receipts.
         # Single-instrument runs remain available for targeted repair/replay.
         pre_batch_gate: dict[str, Any] | None = None
+        effective_instrument_ids = tuple(instrument_ids)
         if len(tuple(instrument_ids)) > 1:
             from research.business_profile_semantic_repair import (
                 BusinessProfileSemanticRepairService,
@@ -2573,6 +2574,8 @@ class BusinessProfileAsyncProductionService:
                 "legacy_shadow_semantic_run",
                 "superseded_semantic_run",
                 "failed_work_item",
+                "orphan_candidate_records",
+                "non_reusable_publication_manifest",
             }
             blockers = [
                 {
@@ -2595,14 +2598,25 @@ class BusinessProfileAsyncProductionService:
                     "unsafe_checkpoint_paths",
                 }
             ]
-            if execution_issues:
-                blockers.append(
-                    {
-                        "instrument_id": "__execution_state__",
-                        "issues": execution_issues,
-                    }
-                )
-            if blockers:
+            for execution_issue in execution_issues:
+                if execution_issue.get("code") in {
+                    "obsolete_work_items", "active_legacy_work_items"
+                }:
+                    execution_instruments = list(
+                        (execution_issue.get("details") or {}).get("instrument_ids") or ()
+                    )
+                    for execution_instrument in execution_instruments:
+                        blockers.append({"instrument_id": execution_instrument, "issues": [execution_issue]})
+                else:
+                    blockers.append({"instrument_id": "__execution_state__", "issues": [execution_issue]})
+            global_blockers = [
+                item for item in blockers
+                if item.get("instrument_id") == "__execution_state__"
+                or any(issue.get("code") in {"unsafe_checkpoint_paths", "shared_catalog_failure", "database_integrity_failure", "runtime_schema_failure", "source_asset_failure"} for issue in item.get("issues", ()))
+            ]
+            scoped_blockers = [item for item in blockers if item not in global_blockers]
+            blocked_ids = {str(item.get("instrument_id")) for item in scoped_blockers if item.get("instrument_id")}
+            if global_blockers:
                 return {
                     "schema_version": ASYNC_REPORT_SCHEMA_VERSION,
                     "status": "not_ready",
@@ -2613,12 +2627,35 @@ class BusinessProfileAsyncProductionService:
                     "pre_batch_gate": {
                         "status": "blocked",
                         "blocking_instruments": blockers,
+                        "blocked_instruments": sorted(blocked_ids),
+                        "allowed_instruments": [],
                         "audit_issue_counts": audit.get("issue_counts", {}),
                         "llm_calls": 0,
                     },
                     "elapsed_seconds": round(time.monotonic() - started, 3),
                 }
-            pre_batch_gate = {"status": "passed", "llm_calls": 0}
+            effective_instrument_ids = tuple(
+                item for item in instrument_ids if str(item) not in blocked_ids
+            )
+            pre_batch_gate = {
+                "status": "blocked_scoped" if blocked_ids else "passed",
+                "blocking_instruments": scoped_blockers,
+                "blocked_instruments": sorted(blocked_ids),
+                "allowed_instruments": list(effective_instrument_ids),
+                "llm_calls": 0,
+            }
+            if not effective_instrument_ids:
+                pre_batch_gate["status"] = "blocked"
+                return {
+                    "schema_version": ASYNC_REPORT_SCHEMA_VERSION,
+                    "status": "not_ready",
+                    "reason_codes": ["pre_batch_gate_blocked"],
+                    "operation": "business_profile_backfill",
+                    "selection_policy": policy,
+                    "result_policy": result_policy,
+                    "pre_batch_gate": pre_batch_gate,
+                    "elapsed_seconds": round(time.monotonic() - started, 3),
+                }
         logger.info(
             "business-profile backfill start cutoff=%s policy=%s instruments=%s "
             "start_date=%s end_date=%s document_types=%s result_policy=%s stages=%s",
@@ -2720,7 +2757,7 @@ class BusinessProfileAsyncProductionService:
                 self.repository.enqueue_latest_annual,
                 knowledge_cutoff=knowledge_cutoff,
                 processing_identity=processing_identity,
-                instrument_ids=instrument_ids,
+                instrument_ids=effective_instrument_ids,
                 start_date=start_date,
                 end_date=end_date,
                 max_attempts=max_attempts,
@@ -2731,7 +2768,7 @@ class BusinessProfileAsyncProductionService:
                 self.repository.enqueue_scoped,
                 knowledge_cutoff=knowledge_cutoff,
                 processing_identity=processing_identity,
-                instrument_ids=instrument_ids,
+                instrument_ids=effective_instrument_ids,
                 start_date=start_date,
                 end_date=end_date,
                 document_types=document_types,

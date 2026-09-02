@@ -42,3 +42,10 @@ Quarterly or half-year report processing MUST supply an explicit `period_basis` 
 #### Scenario: Quarterly report without basis
 - **WHEN** a Q1 or Q3 document reaches structured ingestion without `period_basis`
 - **THEN** processing is blocked with a deterministic configuration/data-shape reason and no monthly observation interval is persisted
+
+### Requirement: Annual document basis is deterministic
+Activities extracted from `annual_report` or `annual_report_correction` MUST carry `period_basis=period_total` and `period_basis_source=annual_document_type` into derived exposure facts and publication. The system MUST NOT mark an annual fact `period_basis_unknown` merely because the model omitted a redundant basis field.
+
+#### Scenario: Annual exposure has no model-supplied basis
+- **WHEN** an annual-report activity with a numeric commodity exposure omits `period_basis`
+- **THEN** conversion assigns `period_total` from the document type, records its source, and the exposure is not blocked by `period_basis_unknown`

@@ -29,7 +29,8 @@
 ## 研究数据域
 
 - `docs/development/research_data_engine_execution.md`：研究数据引擎实施与现状
-- `docs/development/business_profile_semantic_production_runbook.md`：公司业务画像语义生产
+- `docs/development/company_profile_product_and_industry_semantic_requirements.md`：公司画像产品、通用对象、分行业语义、LLM 分工与分阶段实施的唯一权威总需求
+- `docs/development/business_profile_semantic_production_runbook.md`：已冻结的旧公司画像语义生产手册，仅用于本地审计、停止与历史排障，不得继续启动旧回补
 - `docs/development/shared_pdf_processing.md`：共享 PDF 解析、选择性 OCR、CPU/GPU canary 与回滚
 - `docs/development/common_llm_gateway_architecture.md`：公共 LLM 网关
 - `docs/development/fx_market_data_requirements.md`：外汇数据域

@@ -129,6 +129,7 @@ OpenSpec CLI 位于：
 
 - `project_development_governance.md`：长期开发总纲；
 - `framework_refactoring_program.md`：框架改造需求和进度；
+- `company_profile_product_and_industry_semantic_requirements.md`：公司画像产品与分行业语义的唯一权威总需求；
 - `open_issues_backlog.md`：当前数据能力问题；
 - `research_data_engine_execution.md`：研究引擎实施主线；
 - `../architecture.md`：按当前代码和配置维护的系统架构概览；

@@ -7,6 +7,10 @@ The system MUST distinguish ordinary anonymous relationships from anonymous conc
 - **WHEN** a relationship names a masked counterparty such as `客户 A(1)` and is supported by a contract row
 - **THEN** it is accepted as an ordinary relationship without requiring `disclosed_share`
 
+#### Scenario: Masked ordinary relationship reaches promotion
+- **WHEN** an ordinary contract relationship has a masked disclosed label such as `客户 A(1)`, exact contract evidence, and identity status `disclosed_name_only`
+- **THEN** the identity is complete for anonymous publication, no entity-catalog proposal is required, and promotion MUST NOT emit `catalog_proposal` solely because the legal entity is intentionally undisclosed
+
 #### Scenario: Anonymous concentration
 - **WHEN** a relationship is labeled as a top-five customer or supplier concentration fact
 - **THEN** missing or invalid `disclosed_share` produces a deterministic semantic validation failure
@@ -41,15 +45,26 @@ The structured extraction language contract MUST have one reachable behavior. If
 - **THEN** the configured strict-repair or soft-rejection path is actually executed and its audit records the outcome without a `TypeError`
 
 ### Requirement: Share normalization has one owner
-`disclosed_share` MUST have one canonical internal unit of fraction. A value already in fraction form MUST NOT be divided by 100 again merely because a model also supplied `%`; percent-form values MUST be converted exactly once, with the source and normalized values recorded.
+`disclosed_share` MUST have one canonical internal unit of fraction. The semantic response MUST represent source-native disclosure value/unit separately from the canonical value. The program MUST convert a source percent exactly once and persist both source and normalized values/units. A legacy payload that claims `disclosed_share` is already canonical while pairing it with `%` MUST fail closed rather than be guessed or silently divided again.
 
 #### Scenario: Fraction with percent label
 - **WHEN** the model returns `disclosed_share=0.352` and `disclosed_share_unit="%"`
-- **THEN** the system either rejects the contradictory payload deterministically or applies an explicitly documented compatibility rule, but MUST NOT silently persist `0.00352`
+- **THEN** the legacy contradictory payload is rejected deterministically and MUST NOT be silently persisted as `0.00352`
 
-#### Scenario: Sub-one-percent disclosure is fail-closed
-- **WHEN** the model returns a value between `0` and `1` together with a percent unit, such as `disclosed_share=0.5` and `disclosed_share_unit="%"`
-- **THEN** the system records a deterministic ambiguous/contradictory-share diagnostic and sends the row to machine rework; it MUST NOT guess whether the value means `0.5%` or a canonical fraction
+#### Scenario: Source-native percent is converted once
+- **WHEN** the model returns `disclosed_share_source_value=0.5` and `disclosed_share_source_unit="%"`
+- **THEN** the program persists canonical `disclosed_share=0.005`, records both source fields and normalized fraction metadata, and does not reject the legitimate sub-one-percent disclosure
+
+#### Scenario: Ordinary percent disclosures share one rule
+- **WHEN** source-native concentration values are `2%` or `14.5%`
+- **THEN** the program deterministically stores canonical fractions `0.02` and `0.145` through the same conversion owner
+
+### Requirement: Joint extraction failure is not duplicated
+A joint semantic extraction result or failure MUST be shared by all field families covered by the same document, selected sections, schema, prompt, and runtime identity within one run. A deterministic validation failure MUST NOT cause a sibling field family to issue the same LLM request again.
+
+#### Scenario: First family rejects the shared response
+- **WHEN** a joint response fails deterministic relationship validation before an artifact can be published
+- **THEN** later field families receive the same typed failure without another provider call, and token accounting records one request for that joint input
 
 ### Requirement: Null source fallback
 When a semantic activity contains both `source_value` and `value`, an explicit null `source_value` MUST fall back to the non-null `value`; the same rule applies to source unit fields.

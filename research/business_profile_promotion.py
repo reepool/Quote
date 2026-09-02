@@ -43,6 +43,7 @@ _MACHINE_REWORK_REASONS = frozenset(
         "unit_normalization_failed",
         "numeric_validation_failed",
         "partial_row_rejection",
+        "verification_incomplete",
         "blocked_configuration",
         "schema_failure",
         "gateway_failure",
@@ -250,6 +251,7 @@ class BusinessProfilePromotionService:
                     "gate_signature": decision["gate_signature"],
                     "runtime_identities": dict(context.runtime_identities),
                     "gates": dict(context.gates),
+                    **dict(context.metadata or {}),
                 },
             )
             self._resolve_open_exceptions(context)

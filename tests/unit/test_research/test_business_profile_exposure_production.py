@@ -156,6 +156,28 @@ def test_period_basis_is_preserved_and_unknown_does_not_assume_full_year(tmp_pat
     assert fact["metadata"]["numeric_reconciliation_valid"] is True
 
 
+def test_annual_document_period_basis_source_reaches_exposure(tmp_path):
+    repository = BusinessProfileRepository(_storage(tmp_path))
+    _approved_evidence(repository)
+    activity = _approved_sales_activity(repository)
+    activity = {
+        **activity,
+        "period_basis": "period_total",
+        "period_basis_source": "annual_document_type",
+        "metadata": {
+            **dict(activity.get("metadata") or {}),
+            "period_basis": "period_total",
+            "period_basis_source": "annual_document_type",
+        },
+    }
+
+    fact = BusinessProfileExposureFactProducer(repository).build_from_activity(activity)
+
+    assert fact["metadata"]["period_basis"] == "period_total"
+    assert fact["metadata"]["period_basis_source"] == "annual_document_type"
+    assert fact["metadata"]["publication_blocker"] is None
+
+
 def test_publication_requires_external_manifest_and_gate_context(tmp_path):
     repository = BusinessProfileRepository(_storage(tmp_path))
     _approved_evidence(repository)

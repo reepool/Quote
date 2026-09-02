@@ -104,6 +104,47 @@ def test_repair_deletes_failed_semantic_receipt_and_converges(tmp_path):
     assert repeated["change_counts"]["unchanged"] == 1
 
 
+def test_machine_rework_checkpoint_is_retained_only_when_recoverable(tmp_path):
+    service = BusinessProfileSemanticRepairService(_storage(tmp_path))
+    checkpoint = tmp_path / "bp-work-recoverable.json"
+    checkpoint.write_text(json.dumps({
+        "scope": {
+            "instruments": ["600000.SH"],
+            "field_families": ["atomic_activities"],
+            "knowledge_cutoff": "2026-08-30",
+            "identities": {"schema": "v1"},
+            "promotion_manifest_hashes": {},
+        }
+    }), encoding="utf-8")
+    base = {
+        "status": "machine_rework",
+        "lease_expires_at": None,
+        "instrument_id": "600000.SH",
+        "checkpoint_path": str(checkpoint),
+        "metadata_json": json.dumps({
+            "knowledge_cutoff": "2026-08-30",
+            "processing_identity": {
+                "field_families": ["atomic_activities"],
+                "runtime_identities": {"schema": "v1"},
+                "promotion_manifest_hashes": {},
+            },
+        }),
+    }
+    assert service._obsolete_work_reason(base, now="2026-08-30T12:00:00+08:00") is None
+    base["metadata_json"] = json.dumps({
+        "knowledge_cutoff": "2026-08-30",
+        "processing_identity": {
+            "field_families": ["atomic_activities"],
+            "runtime_identities": {"schema": "v1"},
+            "promotion_manifest_hashes": {},
+        },
+        "artifact_reusable": False,
+    })
+    assert service._obsolete_work_reason(base, now="2026-08-30T12:00:00+08:00") == (
+        "machine_rework_checkpoint_non_recoverable"
+    )
+
+
 def test_repair_marks_run_with_missing_governed_record_reference_unreusable(tmp_path):
     storage = _storage(tmp_path)
     artifacts = BusinessProfileSemanticArtifactRepository(storage)
@@ -504,6 +545,66 @@ def test_cleanup_only_deletes_candidate_with_missing_run_owner(tmp_path):
     assert repository.get_record("exposure_facts", "orphan-exposure-fact") is None
 
 
+def test_cleanup_deletes_candidate_left_by_completed_publication_manifest(tmp_path):
+    storage = _storage(tmp_path)
+    repository = BusinessProfileRepository(storage)
+    repository.upsert("evidence", {
+        "evidence_id": "completed-manifest-evidence",
+        "instrument_id": "600011.SH",
+        "source_document_id": "annual-report-2025",
+        "source_tier": "official_filing",
+        "document_hash": "completed-manifest-document",
+        "data_available_date": "2026-03-30",
+        "availability_quality": "actual",
+        "evidence_text_hash": "completed-manifest-text",
+        "extraction_method": "native_text",
+        "confidence": 1.0,
+        "review_status": "candidate",
+    })
+    repository.upsert("exposure_facts", {
+        "fact_id": "completed-manifest-candidate",
+        "instrument_id": "600011.SH",
+        "report_period": "2025-12-31",
+        "exposure_fact_type": "sales_value",
+        "object_raw": "product",
+        "fact_scope": "issuer",
+        "evidence_id": "completed-manifest-evidence",
+        "run_id": "publication-manifest-completed",
+        "data_available_date": "2026-03-30",
+        "confidence": 1.0,
+        "review_status": "candidate",
+        "knowledge_from": "2026-03-30",
+        "metadata": {"publication_manifest_id": "publication-manifest-completed"},
+    })
+    now = "2026-08-30T12:00:00+08:00"
+    with storage.get_connection() as conn:
+        conn.execute(
+            "INSERT INTO business_profile_publication_manifests "
+            "(manifest_id,instrument_id,stage,status,processing_identity_json,"
+            "provenance_json,descendant_ids_json,created_at,updated_at) "
+            "VALUES (?,?,?,?,?,?,?,?,?)",
+            (
+                "publication-manifest-completed", "600011.SH", "publish",
+                "completed", "{}", "{}",
+                json.dumps({"exposure_facts": ["completed-manifest-candidate"]}),
+                now, now,
+            ),
+        )
+        conn.commit()
+
+    service = BusinessProfileSemanticRepairService(storage)
+    audit = service.run(instrument_ids=["600011.SH"], cleanup_only=True)
+    assert audit["issue_counts"]["non_reusable_publication_manifest"] == 1
+
+    applied = service.run(
+        instrument_ids=["600011.SH"], apply=True, cleanup_only=True
+    )
+    assert applied["change_counts"]["changed"] == 1
+    assert repository.get_record(
+        "exposure_facts", "completed-manifest-candidate"
+    ) is None
+
+
 def test_repair_refuses_checkpoint_outside_owned_root(tmp_path):
     storage = _storage(tmp_path)
     checkpoint_root = tmp_path / "checkpoints"
@@ -758,6 +859,86 @@ def test_repair_audit_is_read_only_and_apply_requires_explicit_scope(tmp_path):
         assert "instrument_ids or all_scope" in str(exc)
     else:
         raise AssertionError("apply without an explicit scope must fail")
+
+
+def test_exact_duplicate_migration_reuses_audit_fingerprint_for_legacy_rows(tmp_path):
+    storage = _storage(tmp_path)
+    repository = BusinessProfileRepository(storage)
+    review = BusinessProfileReviewService(repository)
+    evidence_id = "migration-evidence"
+    repository.upsert("evidence", {
+        "evidence_id": evidence_id,
+        "instrument_id": "600010.SH",
+        "source_document_id": "annual-report-2025",
+        "source_tier": "official_filing",
+        "document_hash": "migration-document",
+        "report_period": "2025-12-31",
+        "page_number": 10,
+        "data_available_date": "2026-04-01",
+        "availability_quality": "actual",
+        "evidence_text_hash": "migration-evidence-text",
+        "extraction_method": "native_text",
+        "confidence": 1.0,
+        "review_status": "candidate",
+    })
+    evidence = repository.get_record("evidence", evidence_id)
+    review.system_promote_record(
+        "evidence", evidence_id, field_family="test:evidence",
+        policy_version="test.v1", gate_manifest_hash="migration-evidence",
+        reviewer_version="v1", expected_updated_at=evidence["updated_at"],
+    )
+    exact_evidence = {
+        "source_document_id": "annual-report-2025",
+        "evidence_spans": [{
+            "source_document_id": "annual-report-2025",
+            "page_number": 10,
+            "section_id": "table:10:products",
+            "quote": "产品产量 100 吨",
+        }],
+    }
+    for record_id in ("fact:old", "fact:new"):
+        repository.upsert("operating_facts", {
+            "record_id": record_id,
+            "instrument_id": "600010.SH",
+            "report_period": "2025-12-31",
+            "fact_type": "production_volume",
+            "fact_scope": "产品:produces",
+            "value_raw": 100.0,
+            "unit_raw": "吨",
+            "value_normalized": 100.0,
+            "unit_normalized": "tonne",
+            "evidence_id": evidence_id,
+            "data_available_date": "2026-04-01",
+            "confidence": 1.0,
+            "review_status": "candidate",
+            "knowledge_from": "2026-04-01",
+            "version": 1,
+            "metadata": {
+                "source_row_key": "row:products:1",
+                "exact_evidence": exact_evidence,
+            },
+        })
+        current = repository.get_record("operating_facts", record_id)
+        review.system_promote_record(
+            "operating_facts", record_id, field_family="test:facts",
+            policy_version="test.v1", gate_manifest_hash=record_id,
+            reviewer_version="v1", expected_updated_at=current["updated_at"],
+            evidence_references=[evidence_id],
+        )
+
+    service = BusinessProfileSemanticRepairService(storage)
+    audit = service.run(instrument_ids=["600010.SH"])
+    assert audit["issue_counts"]["duplicate_approved_occurrence"] == 1
+
+    applied = service.run(instrument_ids=["600010.SH"], apply=True)
+    assert applied["change_counts"]["changed"] == 1
+    assert applied["change_counts"]["failed"] == 0
+    assert repository.get_record("operating_facts", "fact:old") is None
+    assert repository.get_record("operating_facts", "fact:new") is not None
+
+    repeated = service.run(instrument_ids=["600010.SH"], apply=True)
+    assert repeated["change_counts"]["failed"] == 0
+    assert repeated["change_counts"]["changed"] == 0
 
 
 def test_repair_keeps_official_controller_without_control_history(tmp_path):
@@ -1192,3 +1373,130 @@ def test_repair_replays_distinct_candidate_contract_occurrences(tmp_path):
     rows = repository.list_records("operating_facts", instrument_id="601012.SH")
     assert {row["review_status"] for row in rows} == {"held", "candidate"}
     assert len([row for row in rows if row["review_status"] == "candidate"]) == 2
+
+
+def test_repair_rebuilds_only_exact_incompatible_approved_occurrence(tmp_path):
+    storage = _storage(tmp_path)
+    repository = BusinessProfileRepository(storage)
+    review = BusinessProfileReviewService(repository)
+    evidence_id = "bp-evidence-7303f5a07c5004b7ce7ab7de"
+    source_document_id = "shared-asset:asset_4678a73d576881f1f73714ace2cd3151"
+    repository.upsert("evidence", {
+        "evidence_id": evidence_id, "instrument_id": "002496.SZ",
+        "source_document_id": source_document_id, "source_tier": "official_filing",
+        "document_hash": "hedge-document-hash", "report_period": "2025-12-31",
+        "page_number": 21, "data_available_date": "2026-04-17",
+        "availability_quality": "actual", "evidence_text_hash": "hedge-evidence-hash",
+        "extraction_method": "native_text", "confidence": 1.0,
+        "review_status": "candidate",
+    })
+    current = repository.get_record("evidence", evidence_id)
+    review.system_promote_record(
+        "evidence", evidence_id, field_family="test:evidence",
+        policy_version="test.v1", gate_manifest_hash="hedge-evidence",
+        reviewer_version="v1", expected_updated_at=current["updated_at"],
+    )
+    activity_id = "activity:0faef4e854bcd38cc4d66f8e8cfcbebe"
+    repository.upsert("activities", {
+        "activity_id": activity_id, "instrument_id": "002496.SZ",
+        "report_period": "2025-12-31", "subject_scope": "issuer",
+        "action": "hedges", "object_type": "product", "object_raw": "套期工具",
+        "value": 734770360.0, "unit": "万元", "evidence_id": evidence_id,
+        "run_id": "legacy-run", "data_available_date": "2026-04-17",
+        "extraction_method": "semantic_verified", "confidence": 1.0,
+        "review_status": "candidate", "knowledge_from": "2026-04-17",
+        "version": 1, "metadata": {"measurement_projection_compatibility": True},
+    })
+    current = repository.get_record("activities", activity_id)
+    review.system_promote_record(
+        "activities", activity_id, field_family="test:activities",
+        policy_version="test.v1", gate_manifest_hash="hedge-activity",
+        reviewer_version="v1", expected_updated_at=current["updated_at"],
+        evidence_references=[evidence_id],
+    )
+    fact_id = "bp-operating-3f653a092261c442c4c9bdaa"
+    repository.upsert("operating_facts", {
+        "record_id": fact_id, "instrument_id": "002496.SZ",
+        "report_period": "2025-12-31", "fact_type": "other_measurement",
+        "fact_scope": "套期工具:hedges", "value_raw": 734770360.0,
+        "unit_raw": "万元", "value_normalized": 7347703600000.0,
+        "unit_normalized": "CNY", "evidence_id": evidence_id,
+        "data_available_date": "2026-04-17", "confidence": 1.0,
+        "review_status": "candidate", "knowledge_from": "2026-04-17", "version": 1,
+        "metadata": {"source_activity_id": activity_id},
+    })
+    current = repository.get_record("operating_facts", fact_id)
+    review.system_promote_record(
+        "operating_facts", fact_id, field_family="test:facts",
+        policy_version="test.v1", gate_manifest_hash="hedge-fact",
+        reviewer_version="v1", expected_updated_at=current["updated_at"],
+        evidence_references=[evidence_id],
+    )
+    repository.upsert("operating_facts", {
+        "record_id": "candidate-dependent-fact", "instrument_id": "002496.SZ",
+        "report_period": "2025-12-31", "fact_type": "inventory_volume",
+        "fact_scope": "candidate-dependent", "value_raw": 1.0,
+        "unit_raw": "吨", "value_normalized": 1.0,
+        "unit_normalized": "tonne", "evidence_id": evidence_id,
+        "data_available_date": "2026-04-17", "confidence": 1.0,
+        "review_status": "candidate", "knowledge_from": "2026-04-17", "version": 1,
+        "metadata": {"source_activity_id": activity_id},
+    })
+    repository.upsert("value_chain_roles", {
+        "record_id": "candidate-dependent-role", "instrument_id": "002496.SZ",
+        "report_period": "2025-12-31", "role": "trader",
+        "mapping_basis": "test", "evidence_id": evidence_id,
+        "data_available_date": "2026-04-17", "confidence": 1.0,
+        "review_status": "candidate", "knowledge_from": "2026-04-17", "version": 1,
+        "metadata": {"supporting_activity_ids": [activity_id]},
+    })
+    unrelated_activity_id = "activity:unrelated-approved-without-source-row"
+    repository.upsert("activities", {
+        "activity_id": unrelated_activity_id, "instrument_id": "002496.SZ",
+        "report_period": "2025-12-31", "subject_scope": "issuer",
+        "action": "produces", "object_type": "product", "object_raw": "农药产品",
+        "evidence_id": evidence_id, "run_id": "legacy-run",
+        "data_available_date": "2026-04-17", "extraction_method": "semantic_verified",
+        "confidence": 1.0, "review_status": "candidate",
+        "knowledge_from": "2026-04-17", "version": 1, "metadata": {},
+    })
+    current = repository.get_record("activities", unrelated_activity_id)
+    review.system_promote_record(
+        "activities", unrelated_activity_id, field_family="test:activities",
+        policy_version="test.v1", gate_manifest_hash="unrelated-activity",
+        reviewer_version="v1", expected_updated_at=current["updated_at"],
+        evidence_references=[evidence_id],
+    )
+    artifacts = BusinessProfileSemanticArtifactRepository(storage)
+    artifact = artifacts.receive(
+        SemanticArtifactIdentity(
+            instrument_id="002496.SZ", source_document_id=source_document_id,
+            document_hash="a" * 64, report_period="2025-12-31",
+            field_family="annual_report_semantic_bundle", evidence_scope_hash="b" * 64,
+            input_hash="c" * 64, prompt_version="business_profile_atomic_extraction.v5",
+            schema_version="business_profile_atomic_extraction.v5",
+        ),
+        response={"activities": []}, response_hash="", evidence_ids=[evidence_id],
+    )
+    service = BusinessProfileSemanticRepairService(storage)
+
+    audit = service.run(instrument_ids=["002496.SZ"])
+    assert audit["issue_counts"]["incompatible_approved_occurrence"] == 1
+    applied = service.run(instrument_ids=["002496.SZ"], apply=True)
+
+    assert applied["change_counts"]["changed"] >= 1
+    assert repository.get_record("activities", activity_id) is None
+    assert repository.get_record("operating_facts", fact_id) is None
+    assert repository.get_record("operating_facts", "candidate-dependent-fact") is None
+    assert repository.get_record("value_chain_roles", "candidate-dependent-role") is None
+    assert repository.get_record("activities", unrelated_activity_id)["review_status"] == "approved"
+    assert repository.get_record("evidence", evidence_id)["review_status"] == "approved"
+    with storage.get_connection() as conn:
+        assert conn.execute(
+            "SELECT COUNT(*) FROM business_profile_review_audit WHERE record_id IN (?, ?)",
+            (activity_id, fact_id),
+        ).fetchone()[0] == 2
+        assert conn.execute(
+            "SELECT COUNT(*) FROM business_profile_semantic_artifacts WHERE artifact_id = ?",
+            (artifact["artifact_id"],),
+        ).fetchone()[0] == 0

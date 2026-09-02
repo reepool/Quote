@@ -4,6 +4,10 @@ import sqlite3
 import pytest
 
 from research.business_profile_governance import BusinessProfileRepository
+from research.business_profile_occurrence import (
+    normalize_occurrence_material,
+    occurrence_identity_key,
+)
 from research.storage import ResearchStorageManager
 from utils.config_manager import (
     ResearchBudgetConfig,
@@ -176,7 +180,9 @@ def test_valid_document_field_family_bundle_commits_once(tmp_path):
         },
     )
 
-    assert result == {
+    assert {key: result[key] for key in (
+        "run_id", "status", "evidence_count", "fact_count", "activity_count", "relationship_count"
+    )} == {
         "run_id": "run-1",
         "status": "completed",
         "evidence_count": 1,
@@ -184,6 +190,13 @@ def test_valid_document_field_family_bundle_commits_once(tmp_path):
         "activity_count": 1,
         "relationship_count": 1,
     }
+    assert result["record_ids"] == {
+        "activities": ["activity-1"],
+        "relationships": ["relationship-1"],
+    }
+    assert result["record_dispositions"]["activities"] == [
+        {"requested_id": "activity-1", "state": "written", "actual_id": "activity-1"}
+    ]
     with storage.get_connection() as conn:
         storage._apply_pragmas(conn)
         run = dict(
@@ -273,6 +286,185 @@ def test_reuse_bundle_skips_conflicting_candidate_against_approved_fact(tmp_path
     assert result["fact_count"] == 0
     assert repository.get_record("operating_facts", "fact-zero") is None
     assert repository.get_record("operating_facts", "fact-1")["review_status"] == "approved"
+    assert result["record_ids"]["operating_facts"] == []
+    assert result["record_dispositions"]["operating_facts"] == [
+        {"requested_id": "fact-zero", "state": "reused", "actual_id": "fact-1"}
+    ]
+
+
+def test_source_occurrence_identity_ignores_regenerated_evidence_and_keeps_metric_slots():
+    common = {
+        "instrument_id": "601088.SH",
+        "report_period": "2025-12-31",
+        "source_document_id": "annual-report-2025",
+        "page_number": 123,
+        "table_id": "segment-revenue",
+        "source_row_key": "row-7",
+    }
+    first = normalize_occurrence_material(
+        **common,
+        metric_slot="revenue",
+        evidence_id="evidence-regenerated-a",
+        object_raw="动力煤",
+        subject_scope="issuer",
+    )
+    regenerated = normalize_occurrence_material(
+        **common,
+        metric_slot="revenue",
+        evidence_id="evidence-regenerated-b",
+        object_raw="焦煤",
+        subject_scope="consolidated_group",
+    )
+    other_metric = normalize_occurrence_material(
+        **common, metric_slot="gross_margin"
+    )
+
+    assert occurrence_identity_key(first) == occurrence_identity_key(regenerated)
+    assert occurrence_identity_key(first) != occurrence_identity_key(other_metric)
+
+
+def test_narrative_occurrence_identity_ignores_offsets_and_tracks_match_ordinal():
+    common = {
+        "instrument_id": "002496.SZ",
+        "report_period": "2025-12-31",
+        "source_document_id": "annual-report-2025",
+        "page_number": 88,
+        "normalized_quote": "公司生产动力煤",
+        "context_before": "主要业务",
+        "context_after": "产销情况",
+    }
+    first = normalize_occurrence_material(
+        **common,
+        evidence_id="span-a",
+        subject_scope="issuer",
+        object_raw="动力煤",
+        narrative_match_ordinal=1,
+    )
+    regenerated = normalize_occurrence_material(
+        **common,
+        evidence_id="span-b",
+        subject_scope="group",
+        object_raw="焦煤",
+        narrative_match_ordinal=1,
+    )
+    second_match = normalize_occurrence_material(
+        **common,
+        evidence_id="span-c",
+        narrative_match_ordinal=2,
+    )
+
+    # Parser character offsets and regenerated evidence IDs are validation
+    # provenance only; the normalized quote/context and same-page ordinal are
+    # the stable narrative occurrence identity.
+    assert occurrence_identity_key(first) == occurrence_identity_key(regenerated)
+    assert occurrence_identity_key(first) != occurrence_identity_key(second_match)
+
+
+def test_reuse_dispositions_expose_only_committed_targets_to_verify(tmp_path):
+    repository, _storage = _repository(tmp_path)
+    evidence = _evidence()
+    approved_rows = []
+    for index in range(6):
+        row = _activity(
+            activity_id=f"approved-{index}",
+            evidence_id=evidence["evidence_id"],
+        )
+        row["object_raw"] = f"已批准产品-{index}"
+        row["object_id"] = f"product-approved-{index}"
+        row["run_id"] = "approved-run"
+        material = normalize_occurrence_material(
+            instrument_id=row["instrument_id"],
+            report_period=row["report_period"],
+            source_document_id="annual-report-2025",
+            page_number=10,
+            table_id="activity-table",
+            source_row_key=f"physical-row-{index}",
+            metric_slot="activity",
+        )
+        row["metadata"] = {
+            "source_occurrence_material": material,
+            "occurrence_identity": occurrence_identity_key(material),
+            "semantic_content_fingerprint": "semantic:approved",
+        }
+        approved_rows.append(row)
+
+    repository.persist_document_field_family_bundle(
+        run=_run("approved-run"),
+        records_by_type={"evidence": [evidence], "activities": approved_rows},
+    )
+    _system_promote(repository, "evidence", evidence["evidence_id"])
+    for row in approved_rows:
+        _system_promote(repository, "activities", row["activity_id"])
+
+    replay_rows = []
+    # Three same-occurrence, unchanged facts are reused.
+    for index, approved in enumerate(approved_rows[:3]):
+        row = dict(approved)
+        row["activity_id"] = f"reused-{index}"
+        row["run_id"] = "replay-run"
+        replay_rows.append(row)
+    # Three different same-occurrence facts with changed semantic content are
+    # blocked. They use disjoint approved occurrences so the batch remains
+    # atomically evaluable rather than containing duplicate requests.
+    for index, approved in enumerate(approved_rows[3:6]):
+        row = dict(approved)
+        row["activity_id"] = f"drift-{index}"
+        row["run_id"] = "replay-run"
+        row["metadata"] = dict(approved["metadata"])
+        row["metadata"]["semantic_content_fingerprint"] = "semantic:changed"
+        replay_rows.append(row)
+    # Three independent source occurrences are newly written candidates.
+    for index in range(3):
+        row = _activity(
+            activity_id=f"written-{index}",
+            evidence_id=evidence["evidence_id"],
+            run_id="replay-run",
+        )
+        row["object_raw"] = f"新产品-{index}"
+        row["object_id"] = f"product-new-{index}"
+        material = normalize_occurrence_material(
+            instrument_id=row["instrument_id"],
+            report_period=row["report_period"],
+            source_document_id="annual-report-2025",
+            page_number=11,
+            table_id="activity-table",
+            source_row_key=f"new-physical-row-{index}",
+            metric_slot="activity",
+        )
+        row["metadata"] = {
+            "source_occurrence_material": material,
+            "occurrence_identity": occurrence_identity_key(material),
+            "semantic_content_fingerprint": f"semantic:new-{index}",
+        }
+        replay_rows.append(row)
+
+    result = repository.persist_document_field_family_bundle(
+        run={**_run("replay-run"), "metadata": {"result_policy": "reuse"}},
+        records_by_type={"activities": replay_rows},
+    )
+
+    dispositions = result["record_dispositions"]["activities"]
+    assert sum(item["state"] == "reused" for item in dispositions) == 3
+    assert sum(item["state"] == "blocked" for item in dispositions) == 3
+    assert sum(item["state"] == "written" for item in dispositions) == 3
+    assert result["record_ids"]["activities"] == [
+        f"written-{index}" for index in range(3)
+    ]
+    assert {
+        item["actual_id"]
+        for item in dispositions
+        if item["state"] == "reused"
+    } == {f"approved-{index}" for index in range(3)}
+    assert {
+        item["reason_code"]
+        for item in dispositions
+        if item["state"] == "blocked"
+    } == {"occurrence_semantic_drift"}
+    # The returned committed ID set is the only set a later verify stage may
+    # consume; reused IDs are represented by dispositions, not new targets.
+    assert set(result["record_ids"]["activities"]) == {
+        f"written-{index}" for index in range(3)
+    }
 
 
 def test_bundle_collapses_identical_primary_keys(tmp_path):

@@ -42,8 +42,10 @@ from research.business_profile_semantic_runtime import (
     _atomic_activity_operating_fact,
     _ambiguous_operating_row_groups,
     _bind_promotion_validation,
+    _bind_semantic_transformation_lineage,
     _catalog_version_scope,
     _catalogs_current,
+    _document_period_basis,
     _expanded_action_verification_target,
     _normalized_value,
     _select_current_semantic_activities,
@@ -94,6 +96,73 @@ def test_runtime_async_bridge_accepts_concurrent_thread_submissions():
     finally:
         for bridge in bridges:
             bridge.close()
+
+
+def test_annual_document_basis_and_transformation_lineage_are_deterministic():
+    assert _document_period_basis({"document_type": "annual_report"}) == (
+        "period_total",
+        "annual_document_type",
+    )
+    assert _document_period_basis({"document_type": "annual_report_correction"}) == (
+        "period_total",
+        "annual_document_type",
+    )
+    assert _document_period_basis({"document_type": "quarterly_report"}) is None
+
+    process = {
+        "activity_id": "process-1",
+        "action": "processes",
+        "object_raw": "废旧电池金属材料",
+        "metadata": {
+            "transformation_input_objects_raw": ["废旧电池金属材料"],
+            "transformation_output_objects_raw": ["锂盐、前驱体及正极材料"],
+        },
+    }
+    output = {
+        "activity_id": "produce-1",
+        "action": "produces",
+        "object_raw": "锂盐、前驱体及正极材料等",
+        "metadata": {},
+    }
+    records = [("activities", process), ("activities", output)]
+
+    _bind_semantic_transformation_lineage(records)
+
+    assert process["metadata"]["transformation_input_activity_ids"] == ["process-1"]
+    assert process["metadata"]["transformation_output_activity_ids"] == ["produce-1"]
+    assert process["metadata"]["transformation_lineage_status"] == "bound"
+
+
+def test_transformation_lineage_rejects_missing_and_ambiguous_bindings():
+    process = {
+        "activity_id": "process-ambiguous",
+        "action": "processes",
+        "object_raw": "废旧电池",
+        "metadata": {
+            "transformation_input_objects_raw": ["不存在的输入"],
+            "transformation_output_objects_raw": ["锂盐"],
+        },
+    }
+    output_a = {
+        "activity_id": "output-a",
+        "action": "produces",
+        "object_raw": "锂盐材料",
+        "metadata": {},
+    }
+    output_b = {
+        "activity_id": "output-b",
+        "action": "sells",
+        "object_raw": "锂盐产品",
+        "metadata": {},
+    }
+
+    _bind_semantic_transformation_lineage(
+        [("activities", process), ("activities", output_a), ("activities", output_b)]
+    )
+
+    assert process["metadata"]["transformation_input_activity_ids"] == []
+    assert process["metadata"]["transformation_output_activity_ids"] == []
+    assert process["metadata"]["transformation_lineage_status"] == "ambiguous"
 
 
 def test_numeric_reconciliation_failure_is_not_classified_as_gateway_failure():
@@ -2491,6 +2560,58 @@ def test_joint_semantic_families_call_llm_once_and_restart_from_artifact(
     assert len(gateway.requests) == 2
 
 
+def test_joint_deterministic_failure_is_shared_without_second_llm_call(
+    tmp_path, monkeypatch
+):
+    class InvalidShareGateway(_FakeGateway):
+        async def complete(self, request):
+            self.requests.append(request)
+            payload = json.loads(request.messages[-1].content)
+            return _response(
+                {
+                    "schema_version": SEMANTIC_EXTRACTION_SCHEMA_VERSION,
+                    "instrument_id": payload["instrument_id"],
+                    "report_period": payload["report_period"],
+                    "activities": [],
+                    "relationships": [
+                        {
+                            "subject_scope": "issuer",
+                            "relationship_type": "sells_to",
+                            "counterparty_name_raw": "前五名客户",
+                            "anonymous": True,
+                            "relationship_scope": "concentration",
+                            "disclosed_share_source_value": 0.02,
+                            "disclosed_share_source_unit": "占年度销售总额比例",
+                            "object_raw": "营业收入",
+                            "semantic_summary_zh": "前五名客户销售占比",
+                            "evidence_span_ids": [payload["evidence_spans"][0]["evidence_span_id"]],
+                        }
+                    ],
+                },
+                request,
+            )
+
+    gateway = InvalidShareGateway()
+    _repository, pipeline, single_scope = _deterministic_runtime(
+        tmp_path,
+        monkeypatch,
+        family="atomic_activities",
+        text="公司从事的主要业务：前五名客户销售占比为0.02%。",
+        gateway=gateway,
+    )
+    scope = replace(
+        single_scope,
+        field_families=("atomic_activities", "named_relationships"),
+        promotion_manifest_hashes={},
+    )
+    for stage in ("plan", "select"):
+        assert pipeline.run(stage, scope=scope)["status"] == "success"
+
+    result = pipeline.run("extract", scope=scope)
+
+    assert len(gateway.requests) == 1
+    assert result["status"] == "stopped"
+
 def test_due_context_rework_expands_lineaged_pages_and_recovers(tmp_path, monkeypatch):
     storage = _storage(tmp_path)
     repository = BusinessProfileRepository(storage)
@@ -4750,6 +4871,143 @@ def test_disclosed_complete_counterparty_is_published_without_master_registratio
     assert relationships[0]["review_status"] == "candidate"
     exceptions = repository.list_exceptions(instrument_id="601088.SH")
     assert any("catalog_proposal" in item["reason_codes"] for item in exceptions)
+
+
+def test_masked_ordinary_counterparty_promotes_without_catalog_proposal(tmp_path, monkeypatch):
+    class MaskedOrdinaryGateway(_FakeGateway):
+        async def complete(self, request):
+            self.requests.append(request)
+            if request.metadata["stage"] == "semantic_verification":
+                return _response(
+                    {
+                        "decision": "confirmed",
+                        "checks": {
+                            "subject": True,
+                            "action": True,
+                            "object": True,
+                            "scope": True,
+                            "period": True,
+                            "evidence": True,
+                        },
+                    },
+                    request,
+                )
+            payload = json.loads(request.messages[-1].content)
+            return _response(
+                {
+                    "schema_version": SEMANTIC_EXTRACTION_SCHEMA_VERSION,
+                    "instrument_id": payload["instrument_id"],
+                    "report_period": payload["report_period"],
+                    "activities": [],
+                    "relationships": [
+                        {
+                            "subject_scope": "issuer",
+                            "relationship_type": "sells_to",
+                            "relationship_scope": "ordinary",
+                            "counterparty_name_raw": "客户 A(1)",
+                            "anonymous": True,
+                            "object_raw": "动力煤",
+                            "semantic_summary_zh": "公司向客户 A(1)销售动力煤",
+                            "evidence_span_ids": _request_span_ids(
+                                payload, "公司向客户 A(1)销售动力煤"
+                            ),
+                        }
+                    ],
+                },
+                request,
+            )
+
+    repository, pipeline, scope, _gateway = _relationship_runtime(
+        tmp_path,
+        monkeypatch,
+        [],
+        promote=True,
+        gateway=MaskedOrdinaryGateway(),
+        text="公司向客户 A(1)销售动力煤。",
+    )
+    assert pipeline.run("verify", scope=scope)["status"] == "success"
+    assert pipeline.run("promote", scope=scope)["status"] == "success"
+
+    relationship = repository.list_records("relationships", instrument_id="601088.SH")[0]
+    assert relationship["review_status"] == "approved"
+    assert not any(
+        "catalog_proposal" in item["reason_codes"]
+        for item in repository.list_exceptions(instrument_id="601088.SH")
+    )
+
+
+def test_terminal_verify_cleanup_removes_only_owned_candidates(tmp_path):
+    repository = BusinessProfileRepository(_storage(tmp_path))
+    runtime = BusinessProfileSemanticRuntime(
+        repository=repository, artifact_root=tmp_path / "artifacts"
+    )
+    evidence = {
+        "evidence_id": "evidence-1",
+        "instrument_id": "601088.SH",
+        "source_document_id": "annual-report-2025",
+        "source_tier": "official_filing",
+        "document_hash": "document-hash",
+        "data_available_date": "2026-03-28",
+        "availability_quality": "actual",
+        "evidence_text_hash": "evidence-hash",
+        "extraction_method": "native_text",
+        "parser_version": "test",
+        "confidence": 1.0,
+        "review_status": "candidate",
+        "metadata": {},
+    }
+    activity = {
+        "activity_id": "activity-1",
+        "instrument_id": "601088.SH",
+        "report_period": "2025-12-31",
+        "subject_scope": "issuer",
+        "action": "produces",
+        "object_type": "product",
+        "object_raw": "动力煤",
+        "object_id": "coal.thermal_coal",
+        "segment_id": "coal",
+        "evidence_id": "evidence-1",
+        "run_id": "terminal-run",
+        "data_available_date": "2026-03-28",
+        "extraction_method": "semantic_verified",
+        "confidence": 1.0,
+        "review_status": "candidate",
+        "valid_from": "2025-12-31",
+        "knowledge_from": "2026-03-28",
+        "version": 1,
+        "metadata": {},
+    }
+    repository.persist_document_field_family_bundle(
+        run={
+            "run_id": "terminal-run",
+            "instrument_id": "601088.SH",
+            "source_document_id": "annual-report-2025",
+            "field_family": "atomic_activities",
+            "bundle_hash": "bundle-hash",
+            "fact_catalog_version": "business_profile_facts.2026.3",
+            "product_catalog_version": "business_profile_products.2026.4",
+            "metadata": {"result_policy": "reuse"},
+        },
+        records_by_type={"evidence": [evidence], "activities": [activity]},
+    )
+    output = {
+        "run_id": "terminal-run",
+        "instrument_id": "601088.SH",
+        "record_ids": {"activities": ["activity-1"]},
+    }
+
+    runtime._cleanup_terminal_verify_output(
+        output, reason="business_rule_validation_failed"
+    )
+
+    assert repository.get_record("activities", "activity-1") is None
+    assert repository.get_record("evidence", "evidence-1") is not None
+    with repository.storage.get_connection() as conn:
+        row = conn.execute(
+            "SELECT status, error_code FROM business_profile_semantic_runs WHERE run_id = ?",
+            ("terminal-run",),
+        ).fetchone()
+    assert tuple(row) == ("failed", "business_rule_validation_failed")
 
 
 def test_resolved_relationship_closes_prior_catalog_proposal_exceptions(

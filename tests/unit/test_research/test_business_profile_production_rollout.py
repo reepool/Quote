@@ -27,9 +27,14 @@ from utils.config_manager import UnifiedConfigManager
 
 
 def _payload():
-    return deepcopy(
+    payload = deepcopy(
         UnifiedConfigManager("config").get_nested("business_profile_rollout", {})
     )
+    # Production is intentionally frozen during the product-contract redesign;
+    # parser/readiness unit tests use an explicit enabled fixture so they continue
+    # to exercise rollout semantics independently of the production kill switch.
+    payload["enabled"] = True
+    return payload
 
 
 def test_production_rollout_starts_in_structured_shadow_with_bounded_budgets():
@@ -105,7 +110,7 @@ def test_runtime_identity_is_derived_and_explicit_values_must_match():
     assert first == second
     assert set(first) == RUNTIME_IDENTITY_KEYS
     assert "business_profile_semantic_schemas.v2" in first["schema"]
-    assert "business_profile_atomic_extraction.v5" in first["schema"]
+    assert "business_profile_atomic_extraction.v6" in first["schema"]
     assert "business_profile_structured_extraction.v4" in first["schema"]
     assert "business_profile_structured_extraction.v4" in first["policy"]
     assert "logical_profile=semantic_extraction" in first["model"]
@@ -550,7 +555,7 @@ def test_daily_and_disabled_backfill_phase_stop_before_storage_initialization():
     )
 
     assert daily["status"] == "not_ready"
-    assert daily["active_phase"] == "structured_shadow"
+    assert "active_phase" not in daily
     assert backfill["status"] == "not_ready"
     storage.initialize.assert_not_called()
 
@@ -581,7 +586,7 @@ def test_backfill_rejects_field_families_outside_active_phase_before_storage_ini
     )
 
     assert result["status"] == "not_ready"
-    assert "outside rollout phase" in result["reason"]
+    assert "rollout phase is disabled" in result["reason"]
     storage.initialize.assert_not_called()
 
 

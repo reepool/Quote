@@ -94,3 +94,21 @@ def test_recovery_assessment_requires_section_recovery_for_bad_pages():
 
     assert decision.state == "section_ocr_required"
     assert decision.section_pages == (4,)
+
+
+def test_layout_toc_titles_use_body_top_level_boundary():
+    outline = locate_business_profile_outline(
+        _artifact(
+            "目录\n关于我们\n经营情况讨论及分析\n公司管治\n财务报表\n1\n2\n3\n4\n5",
+            "关于我们\n公司战略",
+            "经营情况讨论及分析\n公司主要业务",
+            "经营情况讨论及分析\n主营业务分析",
+            "经营情况讨论及分析\n未来发展展望",
+            "公司管治\n公司治理报告",
+            "财务报表\n审计报告",
+        )
+    )
+
+    assert (outline.start_page, outline.end_page) == (3, 5)
+    assert outline.source == "table_of_contents_layout"
+    assert outline.confidence == "medium"
