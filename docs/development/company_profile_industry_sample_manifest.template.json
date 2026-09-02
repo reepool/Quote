@@ -1,0 +1,100 @@
+{
+  "artifact_type": "company_profile_industry_sample_manifest",
+  "schema_version": "company_profile_industry_sample_manifest.v1",
+  "research_contract_only": true,
+  "industry_package": "<package_id>",
+  "industry_boundary_version": "<version>",
+  "master_requirements": "company_profile_product_and_industry_semantic_requirements.md@<version>",
+  "research_method": "company_profile_industry_research_method.v1",
+  "owner": "<research_owner>",
+  "reviewer": "<independent_reviewer>",
+  "review_status": "draft",
+  "selection_protocol": {
+    "minimum_reports": 3,
+    "minimum_companies": 2,
+    "focus_report_limit": 1,
+    "additional_report_rule": "at_least_two_differ_by_company_or_reporting_year",
+    "prohibit_single_company_contract": true,
+    "prohibit_irrelevant_exchange_padding": true
+  },
+  "coverage_dimensions": [
+    "subindustry_and_business_model",
+    "exchange_and_disclosure_template",
+    "subject_scope",
+    "unit_location_and_cross_page_tables",
+    "legal_empty_and_extraction_failure",
+    "stable_transition_restructuring_business_regime"
+  ],
+  "reports": [
+    {
+      "sample_id": "<stable_sample_id>",
+      "focus_sample": false,
+      "report_identity": {
+        "instrument_id": "<instrument_id>",
+        "company_name": "<company_name>",
+        "exchange": "SSE|SZSE|BSE",
+        "report_period": "YYYY-12-31",
+        "document_id": "<official_document_id>",
+        "document_type": "annual_report|annual_report_correction",
+        "document_version": "<version>",
+        "published_at": "<ISO-8601>",
+        "supersedes_document_id": null,
+        "source_uri_or_archive_id": "<official_source>",
+        "content_hash": "<sha256>",
+        "readability_status": "readable|partially_readable|unreadable"
+      },
+      "selection_dimensions": {
+        "subindustry": "<subindustry>",
+        "business_model": ["<model>"],
+        "business_complexity": "small|medium|complex",
+        "disclosure_form": ["<pattern>"],
+        "subject_scope_patterns": ["<master scope>"],
+        "unit_patterns": ["header|row|footnote|cross_page"],
+        "legal_empty_cases": ["<case_or_none>"],
+        "known_failure_cases": ["<case_or_none>"]
+      },
+      "business_regime": {
+        "regime_id": "<research_id>",
+        "regime_type": "stable|transition|restructuring|reverse_listing|unclear",
+        "primary_package_candidate": "<package_or_unclear>",
+        "extension_package_candidates": [],
+        "effective_period": "<period_or_unclear>",
+        "evidence_anchors": ["<document/page/quote>"],
+        "package_assignment_status": "proposed|unclear|reviewed"
+      },
+      "chapter_tasks": [
+        {
+          "chapter_family": "<family>",
+          "section_task": "<task>",
+          "observed_heading": "<heading>",
+          "page_range": [0],
+          "semantic_anchors": ["<anchor>"],
+          "table_signatures": ["<signature>"],
+          "required_context": ["<header_or_footnote>"],
+          "coverage_intent": ["<field_id>"],
+          "selection_reason": "<how this report challenges the contract>"
+        }
+      ]
+    }
+  ],
+  "coverage_gaps": [
+    {
+      "gap_id": "<gap_id>",
+      "dimension": "<exchange|subindustry|template|regime|other>",
+      "reason": "<why no representative sample exists>",
+      "affected_requirements": ["<field_or_task>"],
+      "risk": "<risk>",
+      "temporary_disposition": "hold|defer_non_blocking",
+      "supplementation_trigger": "<observable future condition>",
+      "owner": "<name>"
+    }
+  ],
+  "sample_sufficiency": {
+    "report_count": 0,
+    "company_count": 0,
+    "focus_report_count": 0,
+    "additional_challenging_report_count": 0,
+    "blocking_gap_count": 0,
+    "decision": "hold"
+  }
+}

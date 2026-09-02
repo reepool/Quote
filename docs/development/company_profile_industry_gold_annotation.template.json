@@ -1,0 +1,90 @@
+{
+  "artifact_type": "company_profile_industry_gold_annotation_manifest",
+  "schema_version": "company_profile_industry_gold_annotation.v1",
+  "research_contract_only": true,
+  "industry_package": "<package_id>",
+  "industry_boundary_version": "<version>",
+  "master_requirements": "company_profile_product_and_industry_semantic_requirements.md@<version>",
+  "sample_manifest_version": "company_profile_industry_sample_manifest.v1@<revision>",
+  "owner": "<primary_annotator>",
+  "reviewer": "<independent_reviewer>",
+  "review_status": "draft",
+  "field_checklist": [
+    {
+      "field_id": "<stable_field_id>",
+      "researcher_question": "<question>",
+      "object_type": "<master_object_type>",
+      "business_definition": "<definition>",
+      "metric_type_or_relation": "<catalog_value>",
+      "logical_slot": "<slot_or_null>",
+      "activating_package": "<package_id>",
+      "chapter_task": "<task_id>",
+      "activation_condition": "<condition>",
+      "requirement_level": "required|conditional|optional|not_applicable_by_design",
+      "allowed_subject_scopes": ["consolidated_group", "issuer", "named_subsidiary", "business_segment", "unclear"],
+      "period_semantics": "<duration|instant|event>",
+      "source_unit_rule": "<source-native rule>",
+      "canonical_unit_owner": "program",
+      "evidence_requirement": "<page/table/row-column/quote/footnote>",
+      "extraction_owner": "deterministic|llm_extract|manual",
+      "allowed_coverage_states": ["observed", "not_disclosed", "not_applicable", "extraction_failed", "unclear"],
+      "blocking_conditions": ["<condition>"],
+      "prohibited_inferences": ["<rule>"]
+    }
+  ],
+  "annotations": [
+    {
+      "annotation_id": "<stable_annotation_id>",
+      "sample_id": "<sample_id>",
+      "field_id": "<field_id>",
+      "chapter_family": "<family>",
+      "chapter_task": "<task>",
+      "report_identity": {"document_id": "<id>", "report_period": "YYYY-12-31", "document_version": "<version>"},
+      "evidence": {
+        "page": 0,
+        "section_title": "<source title>",
+        "table_id": "<table_or_null>",
+        "physical_anchor": {
+          "row_label": "<row_or_null>",
+          "column_header": "<column_or_null>",
+          "cell_locator": "<locator_or_null>",
+          "bounded_quote": "<quote_or_null>",
+          "context_before": "<bounded_context_or_null>",
+          "context_after": "<bounded_context_or_null>",
+          "footnote_refs": ["<footnote_or_none>"],
+          "content_hash": "<hash>"
+        }
+      },
+      "source_native": {"name": "<name>", "value": "<value_or_null>", "unit": "<unit_or_null>", "header": "<header_or_null>"},
+      "semantic": {
+        "object_type": "<master_object_type>",
+        "metric_type_or_relation": "<catalog value>",
+        "logical_slot": "<slot_or_null>",
+        "subject_scope": "consolidated_group|issuer|named_subsidiary|business_segment|unclear",
+        "subject_name": "<name_or_null>",
+        "period": "<period>",
+        "assertion_class": "reported_fact|deterministic_derivation|research_assumption"
+      },
+      "requirement_level": "required|conditional|optional|not_applicable_by_design",
+      "coverage_status": "observed|not_disclosed|not_applicable|extraction_failed|unclear",
+      "failure_or_empty_reason": "<reason_or_null>",
+      "example_class": "positive|prohibited_inference|legal_empty|ambiguity|extraction_failure|cross_page|footnote|business_regime_change",
+      "annotator_decision": "<decision>",
+      "review_status": "pending|agreed|disputed|resolved|unresolved"
+    }
+  ],
+  "review_log": [
+    {
+      "review_event_id": "<append_only_id>",
+      "annotation_id": "<annotation_id>",
+      "reviewed_at": "<ISO-8601>",
+      "reviewer": "<name>",
+      "disagreement_topic": "subject_scope|unit|field_meaning|coverage_status|evidence|other",
+      "annotator_position": "<position>",
+      "reviewer_position": "<position>",
+      "evidence_considered": ["<anchor>"],
+      "final_disposition": "agreed|resolved|unclear",
+      "reason": "<reason>"
+    }
+  ]
+}

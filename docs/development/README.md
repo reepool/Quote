@@ -130,6 +130,10 @@ OpenSpec CLI 位于：
 - `project_development_governance.md`：长期开发总纲；
 - `framework_refactoring_program.md`：框架改造需求和进度；
 - `company_profile_product_and_industry_semantic_requirements.md`：公司画像产品与分行业语义的唯一权威总需求；
+- `company_profile_industry_research_method.md`：阶段 2 行业研究方法、角色、样本、标注、benchmark 与阶段 3 进入门；
+- `company_profile_industry_requirements_template.md`：独立行业 requirements 模板；
+- `company_profile_industry_sample_manifest.template.json`、`company_profile_industry_gold_annotation.template.json`：`research_contract_only` 的样本与 gold 标注模板；
+- `company_profile_industry_benchmark_acceptance_template.md`：行业 benchmark 验收模板；
 - `open_issues_backlog.md`：当前数据能力问题；
 - `research_data_engine_execution.md`：研究引擎实施主线；
 - `../architecture.md`：按当前代码和配置维护的系统架构概览；

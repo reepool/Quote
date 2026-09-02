@@ -494,17 +494,26 @@ LLM 不得：
 
 ### 18.3 行业文档登记表
 
+阶段 2 的通用研究方法与模板已由 `define-company-profile-industry-research-method` 建立：
+
+- 研究方法：`company_profile_industry_research_method.md`；
+- 行业需求模板：`company_profile_industry_requirements_template.md`；
+- 样本与 gold 标注模板：`company_profile_industry_sample_manifest.template.json`、`company_profile_industry_gold_annotation.template.json`；
+- benchmark 验收模板：`company_profile_industry_benchmark_acceptance_template.md`。
+
+方法和模板完成不等于任何具体行业已完成研究。登记状态统一使用 `requirements_baseline`、`not_researched`、`researching`、`in_review`、`approved` 或 `held`；阶段 2 结束时所有具体行业仍为 `not_researched`。
+
 | 行业包 | 文档 | 状态 | 代表样本 |
 |---|---|---|---|
-| 通用基础 | 本文件 | requirements baseline | 跨行业待形成 benchmark |
-| 制造/材料 | 待阶段 3 创建 | 未研究 | 宁德时代仅为样本之一 |
-| 资源/矿业 | 待创建 | 未研究 | 待定 |
-| 能源/公用事业 | 待创建 | 未研究 | 待定 |
-| 消费/零售/餐饮 | 待创建 | 未研究 | 待定 |
-| 一般服务 | 待创建 | 未研究 | 待定 |
-| 金融 | 待创建 | 未研究 | 待定 |
-| 医药 | 待创建 | 未研究 | 待定 |
-| TMT/平台 | 待创建 | 未研究 | 待定 |
+| 通用基础 | 本文件 | `requirements_baseline` | 跨行业待形成 benchmark |
+| 制造/材料 | 待阶段 3 创建 | `not_researched` | 宁德时代仅为样本之一 |
+| 资源/矿业 | 待创建 | `not_researched` | 待定 |
+| 能源/公用事业 | 待创建 | `not_researched` | 待定 |
+| 消费/零售/餐饮 | 待创建 | `not_researched` | 待定 |
+| 一般服务 | 待创建 | `not_researched` | 待定 |
+| 金融 | 待创建 | `not_researched` | 待定 |
+| 医药 | 待创建 | `not_researched` | 待定 |
+| TMT/平台 | 待创建 | `not_researched` | 待定 |
 
 ## 19. 多行业包组合
 
