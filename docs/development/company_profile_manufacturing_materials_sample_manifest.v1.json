@@ -1,0 +1,231 @@
+{
+  "artifact_type": "company_profile_industry_sample_manifest",
+  "schema_version": "company_profile_industry_sample_manifest.v1",
+  "manifest_revision": "manufacturing_materials.2026-09-02.1",
+  "research_contract_only": true,
+  "production_authorization": "not_authorized",
+  "industry_package": "manufacturing_materials",
+  "industry_boundary_version": "research.v1",
+  "master_requirements": "company_profile_product_and_industry_semantic_requirements.md@2026-09-02",
+  "research_method": "company_profile_industry_research_method.v1",
+  "owner": "Codex / company-profile research owner",
+  "primary_annotator": "Codex in stage-3 research context",
+  "reviewer": "independent external AI review arranged by user",
+  "acceptance_reviewer": "user",
+  "role_separation_note": "These are logical review responsibilities and do not require a real multi-person team.",
+  "review_status": "pending_independent_review",
+  "selection_protocol": {
+    "minimum_reports": 3,
+    "minimum_companies": 2,
+    "focus_report_limit": 1,
+    "additional_report_rule": "at_least_two_challenge_focus_by_company_business_model_or_disclosure_form",
+    "common_required_support_rule": "at_least_two_different_companies_with_different_business_model_or_disclosure_form",
+    "prohibit_single_company_contract": true,
+    "prohibit_irrelevant_exchange_padding": true
+  },
+  "verification": {
+    "verified_at": "2026-09-02",
+    "database": "data/research.db",
+    "database_view": "effective_annual_reports",
+    "checks": [
+      "effective annual report row is current, local_valid and production-visible",
+      "official announcement title and exchange match",
+      "official_document_blobs integrity_status is valid and signature_status is valid_pdf",
+      "local file SHA-256 equals content_hash",
+      "pypdf page count equals manifest page_count"
+    ],
+    "result": "pass"
+  },
+  "reports": [
+    {
+      "sample_id": "manufacturing-materials-300750-2025",
+      "focus_sample": true,
+      "report_identity": {
+        "instrument_id": "300750.SZ",
+        "company_name": "宁德时代",
+        "exchange": "SZSE",
+        "report_period": "2025-12-31",
+        "document_id": "asset_3b09f6c831975c7177b6bb3287cab781",
+        "announcement_id": "ann_f99ec2a1b59a8e544b9dce3902ae34db",
+        "attachment_id": "att_c99a53df390f23839582d32582814e84",
+        "document_version": "ver_09c0e677ec8192dc4fc12cb620069f29",
+        "document_type": "annual_report",
+        "variant": "original",
+        "title": "2025年年度报告",
+        "published_at": "2026-03-09T16:00:00+00:00",
+        "source": "cninfo",
+        "source_announcement_id": "1225002214",
+        "content_hash": "c15272977147dee7e6935a38ea0e4fd6855370aabb106f54cfe20f7cf6048ec9",
+        "local_path": "data/filings/announcements/blobs/c1/c15272977147dee7e6935a38ea0e4fd6855370aabb106f54cfe20f7cf6048ec9.pdf",
+        "content_length": 2043710,
+        "page_count": 232,
+        "availability": "local_valid",
+        "readability_status": "readable"
+      },
+      "selection_dimensions": {
+        "subindustry": "battery_system_and_battery_materials_manufacturing",
+        "business_model": ["battery_system_manufacturing", "battery_materials_and_recycling"],
+        "business_complexity": "complex",
+        "disclosure_form": ["szse_industry_specific", "product_revenue_cost_margin", "capacity_production_sales_inventory"],
+        "subject_scope_patterns": ["consolidated_group", "issuer_or_group_ambiguity"],
+        "unit_patterns": ["千元", "GWh", "percent", "header_unit"],
+        "legal_empty_cases": ["masked_customer_contract", "anonymous_top_customers"],
+        "known_failure_cases": ["legacy_activity_measurement_conflation", "legacy_subject_scope_collision"]
+      },
+      "business_regime": {
+        "regime_type": "stable",
+        "primary_package_candidate": "manufacturing_materials",
+        "extension_package_candidates": [],
+        "effective_period": "2025",
+        "package_assignment_status": "proposed"
+      },
+      "selection_reason": "复杂制造 focus 样本；覆盖总体业务、分产品收支利、产能产销存、客户供应商和多业务链，但不得单独定义行业合同。"
+    },
+    {
+      "sample_id": "manufacturing-materials-603659-2025",
+      "focus_sample": false,
+      "report_identity": {
+        "instrument_id": "603659.SH",
+        "company_name": "璞泰来",
+        "exchange": "SSE",
+        "report_period": "2025-12-31",
+        "document_id": "asset_50c70429093f66b34fc57ad8f896fcee",
+        "announcement_id": "ann_38f9eed20214f4d15d90043b7ce0da60",
+        "attachment_id": "att_d9e3666bff9a0b21ee3c47385b4125a1",
+        "document_version": "ver_c867a6a692048e88fd9cb80473fbf908",
+        "document_type": "annual_report",
+        "variant": "original",
+        "title": "上海璞泰来新能源科技集团股份有限公司2025年年度报告",
+        "published_at": "2026-03-05T16:00:00+00:00",
+        "source": "cninfo",
+        "source_announcement_id": "1224998510",
+        "content_hash": "4e81f5539046ba1eee733100f38442a4abd5037afe3881115ba7f48678fa35b6",
+        "local_path": "data/filings/announcements/blobs/4e/4e81f5539046ba1eee733100f38442a4abd5037afe3881115ba7f48678fa35b6.pdf",
+        "content_length": 1740667,
+        "page_count": 203,
+        "availability": "local_valid",
+        "readability_status": "readable"
+      },
+      "selection_dimensions": {
+        "subindustry": "battery_materials_processing_and_equipment",
+        "business_model": ["battery_materials", "coating_processing", "automation_equipment"],
+        "business_complexity": "complex",
+        "disclosure_form": ["sse_annual_report", "multi_business_segment", "subsidiary_operating_scope"],
+        "subject_scope_patterns": ["consolidated_group", "named_subsidiary", "business_segment"],
+        "unit_patterns": ["元", "万元", "吨", "平方米", "equipment_count"],
+        "legal_empty_cases": ["no_single_consolidated_standard_volume_table_to_be_verified"],
+        "known_failure_cases": ["capacity_definition_and_subject_differ_by_business_line"]
+      },
+      "business_regime": {
+        "regime_type": "stable",
+        "primary_package_candidate": "manufacturing_materials",
+        "extension_package_candidates": [],
+        "effective_period": "2025",
+        "package_assignment_status": "proposed"
+      },
+      "selection_reason": "挑战电池系统样本的单一产品和单位假设，覆盖材料、加工、装备、多子公司和项目产能披露。"
+    },
+    {
+      "sample_id": "manufacturing-materials-920015-2025",
+      "focus_sample": false,
+      "report_identity": {
+        "instrument_id": "920015.BJ",
+        "company_name": "锦华新材",
+        "exchange": "BSE",
+        "report_period": "2025-12-31",
+        "document_id": "asset_b87f1d1a48e662dae376c540cd021f69",
+        "announcement_id": "ann_14e0013580d34da1a89aeffbc6e993b5",
+        "attachment_id": "att_0afa28d0264bc196569e4660267354fc",
+        "document_version": "ver_cfdbd2d058af825b1fc39f494d7a9bd3",
+        "document_type": "annual_report",
+        "variant": "original",
+        "title": "2025年年度报告",
+        "published_at": "2026-04-22T16:00:00+00:00",
+        "source": "cninfo",
+        "source_announcement_id": "1225167636",
+        "content_hash": "4d2c1612f6f62a9024b8947d7a01b70c40f8f347c2975fa1a05b908d0770695a",
+        "local_path": "data/filings/announcements/blobs/4d/4d2c1612f6f62a9024b8947d7a01b70c40f8f347c2975fa1a05b908d0770695a.pdf",
+        "content_length": 1845726,
+        "page_count": 143,
+        "availability": "local_valid",
+        "readability_status": "readable"
+      },
+      "selection_dimensions": {
+        "subindustry": "fine_chemical_material_manufacturing",
+        "business_model": ["fine_chemical_material_manufacturing"],
+        "business_complexity": "medium",
+        "disclosure_form": ["bse_annual_report", "product_revenue_cost_margin", "customer_supplier_disclosure_exemption"],
+        "subject_scope_patterns": ["issuer_or_group_template_difference"],
+        "unit_patterns": ["元", "kt/a", "percent", "footnote_unit"],
+        "legal_empty_cases": ["customer_supplier_names_exempted", "production_volume_requirement_to_be_decided"],
+        "known_failure_cases": ["masked_counterparty_must_not_become_catalog_failure"]
+      },
+      "business_regime": {
+        "regime_type": "stable",
+        "primary_package_candidate": "manufacturing_materials",
+        "extension_package_candidates": [],
+        "effective_period": "2025",
+        "package_assignment_status": "proposed"
+      },
+      "selection_reason": "覆盖 BSE 模板、精细化工材料、分产品收支利、行业专用产能单位以及客户供应商名称豁免。"
+    },
+    {
+      "sample_id": "manufacturing-materials-302132-2025-regime",
+      "focus_sample": false,
+      "report_identity": {
+        "instrument_id": "302132.SZ",
+        "company_name": "中航成飞",
+        "exchange": "SZSE",
+        "report_period": "2025-12-31",
+        "document_id": "asset_0a488da55636b09107be6d719c9ebf39",
+        "announcement_id": "ann_3b85ae9292cac1ef50886206def6e0fc",
+        "attachment_id": "att_40b2f17164f69a5a421c81d61244260b",
+        "document_version": "ver_2d20ba3aebc5fac6c562cd619695995a",
+        "document_type": "annual_report",
+        "variant": "original",
+        "title": "2025年年度报告",
+        "published_at": "2026-04-28T16:00:00+00:00",
+        "source": "cninfo",
+        "source_announcement_id": "1225250581",
+        "content_hash": "605394bd0879f906a829a9fcd3a2dab037d8aad2554b741a7d95757a3a5e3020",
+        "local_path": "data/filings/announcements/blobs/60/605394bd0879f906a829a9fcd3a2dab037d8aad2554b741a7d95757a3a5e3020.pdf",
+        "content_length": 1721821,
+        "page_count": 186,
+        "availability": "local_valid",
+        "readability_status": "readable"
+      },
+      "selection_dimensions": {
+        "subindustry": "aircraft_and_aerospace_equipment_manufacturing",
+        "business_model": ["aircraft_manufacturing", "aircraft_maintenance_service", "intelligent_measurement_and_control"],
+        "business_complexity": "complex",
+        "disclosure_form": ["szse_annual_report", "same_control_major_asset_restructuring", "post_restructuring_first_full_year"],
+        "subject_scope_patterns": ["listed_company_after_same_control_merger", "acquired_group", "surviving_predecessor_subsidiary"],
+        "unit_patterns": ["元", "classified_physical_volume_not_disclosed"],
+        "legal_empty_cases": ["physical_volume_unclassifiable_due_to_many_products", "customer_supplier_names_not_listed"],
+        "known_failure_cases": ["current_business_must_not_retroactively_overwrite_pre_restructuring_regime", "same_control_comparatives_require_explicit_basis"]
+      },
+      "business_regime": {
+        "regime_type": "restructuring",
+        "primary_package_candidate": "manufacturing_materials",
+        "extension_package_candidates": ["aerospace_manufacturing_future_package"],
+        "effective_period": "2025-01-06 onward",
+        "evidence_anchors": [
+          "PDF page 28: former AVIC Measurement disclosed the quality-return plan; acquisition added aircraft manufacturing and transformed the listed company",
+          "PDF page 59: transfer of 100% Chengdu Aircraft equity completed on 2025-01-06 and entered consolidation scope"
+        ],
+        "package_assignment_status": "reviewed_for_stage_3_research"
+      },
+      "selection_reason": "正式年报同时给出重大资产重组、名称变更、成飞 100% 股权过户、合并生效和新增航空整机主业，是验证历史事实不被当前包追溯覆盖的代表性 regime 样本。"
+    }
+  ],
+  "coverage_gaps": [],
+  "sample_sufficiency": {
+    "report_count": 4,
+    "company_count": 4,
+    "exchange_count": 3,
+    "focus_report_count": 1,
+    "additional_challenging_report_count": 3,
+    "blocking_gap_count": 0,
+    "decision": "sample_portfolio_complete_for_stage_3_synthesis"
+  }
+}
