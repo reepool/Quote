@@ -1,0 +1,160 @@
+{
+  "artifact_type": "company_profile_industry_sample_manifest",
+  "schema_version": "company_profile_industry_sample_manifest.v1",
+  "research_contract_only": true,
+  "industry_package": "manufacturing_materials",
+  "industry_boundary_version": "proposal.v1",
+  "master_requirements": "company_profile_product_and_industry_semantic_requirements.md@2026-09-02",
+  "research_method": "company_profile_industry_research_method.v1",
+  "owner": "Codex / company-profile research owner",
+  "primary_annotator": "Codex in stage-3 research context",
+  "reviewer": "independent external AI review arranged by user",
+  "acceptance_reviewer": "user",
+  "review_status": "proposed",
+  "reports": [
+    {
+      "sample_id": "manufacturing-materials-300750-2025",
+      "focus_sample": true,
+      "report_identity": {
+        "instrument_id": "300750.SZ",
+        "company_name": "宁德时代",
+        "exchange": "SZSE",
+        "report_period": "2025-12-31",
+        "asset_id": "asset_3b09f6c831975c7177b6bb3287cab781",
+        "content_hash": "c15272977147dee7e6935a38ea0e4fd6855370aabb106f54cfe20f7cf6048ec9",
+        "published_at": "2026-03-09T16:00:00+00:00",
+        "availability": "local_valid",
+        "page_count": 232
+      },
+      "selection_dimensions": {
+        "business_model": [
+          "battery_system_manufacturing",
+          "battery_materials_and_recycling"
+        ],
+        "disclosure_form": [
+          "szse_industry_specific",
+          "product_revenue_cost_margin",
+          "capacity_production_sales_inventory"
+        ],
+        "subject_scope_challenge": [
+          "group_vs_issuer"
+        ],
+        "unit_patterns": [
+          "千元",
+          "GWh",
+          "percent"
+        ],
+        "legal_empty_or_masked_cases": [
+          "masked_customer_contract",
+          "anonymous_top_customers"
+        ]
+      },
+      "selection_reason": "复杂制造 focus 样本；完整覆盖总体业务、分产品收支利、产能产销存、客户供应商和多业务链，但不得单独定义行业合同。"
+    },
+    {
+      "sample_id": "manufacturing-materials-603659-2025",
+      "focus_sample": false,
+      "report_identity": {
+        "instrument_id": "603659.SH",
+        "company_name": "璞泰来",
+        "exchange": "SSE",
+        "report_period": "2025-12-31",
+        "asset_id": "asset_50c70429093f66b34fc57ad8f896fcee",
+        "content_hash": "4e81f5539046ba1eee733100f38442a4abd5037afe3881115ba7f48678fa35b6",
+        "published_at": "2026-03-05T16:00:00+00:00",
+        "availability": "local_valid",
+        "page_count": 203
+      },
+      "selection_dimensions": {
+        "business_model": [
+          "battery_materials",
+          "coating_processing",
+          "automation_equipment"
+        ],
+        "disclosure_form": [
+          "sse_annual_report",
+          "multi_business_segment",
+          "subsidiary_operating_scope"
+        ],
+        "subject_scope_challenge": [
+          "consolidated_group",
+          "named_subsidiary",
+          "business_segment"
+        ],
+        "unit_patterns": [
+          "元",
+          "万元",
+          "吨",
+          "平方米"
+        ],
+        "legal_empty_or_masked_cases": [
+          "no_single_consolidated_standard_volume_table_to_be_verified"
+        ]
+      },
+      "selection_reason": "挑战电池系统样本的单一产品/单位假设，覆盖材料、加工、装备、多子公司和项目产能披露。"
+    },
+    {
+      "sample_id": "manufacturing-materials-920015-2025",
+      "focus_sample": false,
+      "report_identity": {
+        "instrument_id": "920015.BJ",
+        "company_name": "锦华新材",
+        "exchange": "BSE",
+        "report_period": "2025-12-31",
+        "asset_id": "asset_b87f1d1a48e662dae376c540cd021f69",
+        "content_hash": "4d2c1612f6f62a9024b8947d7a01b70c40f8f347c2975fa1a05b908d0770695a",
+        "published_at": "2026-04-22T16:00:00+00:00",
+        "availability": "local_valid",
+        "page_count": 143
+      },
+      "selection_dimensions": {
+        "business_model": [
+          "fine_chemical_material_manufacturing"
+        ],
+        "disclosure_form": [
+          "bse_annual_report",
+          "product_revenue_cost_margin",
+          "customer_supplier_disclosure_exemption"
+        ],
+        "subject_scope_challenge": [
+          "issuer_or_group_template_difference"
+        ],
+        "unit_patterns": [
+          "元",
+          "kt/a",
+          "percent"
+        ],
+        "legal_empty_or_masked_cases": [
+          "customer_supplier_names_exempted",
+          "production_volume_requirement_to_be_decided"
+        ]
+      },
+      "selection_reason": "覆盖 BSE 模板、精细化工材料、分产品收支利、行业专用产能单位以及客户供应商名称豁免。"
+    }
+  ],
+  "coverage_gaps": [
+    {
+      "gap_id": "manufacturing-materials-transition-regime-sample",
+      "dimension": "business_regime_transition_or_major_restructuring",
+      "reason": "首轮三份本地正式报告均以稳定主业为主，尚未核实足够代表性的转型、重大重组或借壳制造/材料报告。",
+      "affected_requirements": [
+        "BusinessRegime",
+        "IndustryPackageAssignment",
+        "package transition rules"
+      ],
+      "risk": "无法验证主业切换时行业包和历史 measurement 不被当前业务覆盖。",
+      "temporary_disposition": "blocking_before_industry_contract_approval",
+      "supplementation_trigger": "找到正式年报及重组/主业变更证据，且样本与制造/材料边界高度相关。",
+      "owner": "stage-3 research owner"
+    }
+  ],
+  "sample_sufficiency": {
+    "report_count": 3,
+    "company_count": 3,
+    "exchange_count": 3,
+    "focus_report_count": 1,
+    "additional_challenging_report_count": 2,
+    "blocking_gap_count": 1,
+    "decision": "ready_to_start_research_but_held_for_final_approval"
+  }
+}
