@@ -41,9 +41,9 @@
 |---:|---|---|---|
 | 12 | 酮肟系列精细化学品 | `develops`、`produces`、`sells` | 主营业务明示 |
 | 12 | 原材料 | `purchases` | 按需采购并结合价格波动备货 |
-| 12 | 丁酮肟 | `outsources_processing` | 公司提供主要原料并支付固定加工费 |
+| 12 | 丁酮肟 | `purchases` outsourced-processing service；source candidate `outsources_processing` | v1 只发布有证据的采购服务动作，来源委托加工术语保留待后续枚举审核 |
 | 12 | 精细化工产品 | `sells` | 直销和贸易商买断模式；不得把贸易商等同最终应用客户 |
-| 49 | 副产品和中间物 | `recycles` / `processes` 候选 | 联产循环工艺有明确物料回用证据 |
+| 49 | 副产品和中间物 | `processes`；source candidate `recycles` | v1 使用 `processes`，循环利用原词作为未冻结动作候选 |
 
 ## 5. Segment 与经营 Measurements
 

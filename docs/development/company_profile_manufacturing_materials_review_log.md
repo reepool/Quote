@@ -2,7 +2,7 @@
 
 > 文档类型：append-only review log
 > 版本：`manufacturing_materials_review.v1`
-> 日期：2026-09-02
+> 日期：2026-09-03
 > 当前状态：`pending_independent_review`
 > production authorization：`not_authorized`
 
@@ -21,12 +21,14 @@
 - LLM 合同：`company_profile_manufacturing_materials_llm_contract.md`；
 - Gold 与验收：`company_profile_manufacturing_materials_gold_annotations.v1.json`、`company_profile_manufacturing_materials_benchmark_acceptance.md`。
 
-## 3. 需要独立审核和用户裁决的问题
+## 3. 用户已裁决、仍需独立盲审的口径
 
-1. 璞泰来“涂覆加工量（销量）”应只映射为 `processing_volume`，还是在该指标之外保留可查询的双重来源标签；
-2. “合并抵消项”在未来 common model 中应如何表达，且必须保证它不被当作产品、活动或普通业务分部；
-3. 管理层讨论表使用“公司”但未明确写“合并口径”时，认定 `consolidated_group` 所需的最小证据；
-4. 同一控制合并产生的比较数如何与 predecessor 原历史报告按各自知识时点并列，避免用后来重述覆盖当时可知事实。
+1. “涂覆加工量（销量）”只映射 `processing_volume`，保留 source-native 双重叫法；另一表格锚点可独立为 `sales_volume`；
+2. “合并抵消项”使用 `row_class=consolidation_adjustment` 行和独立 revenue/cost/margin Measurements，不新增对象；
+3. `consolidated_group` 需要明文口径或与合并利润表完成并记录金额核对；只有“公司”时为 `unclear`；
+4. 同一控制比较数使用四时钟和 `comparison_basis` 与 predecessor 原披露并列，不覆盖历史知识状态。
+
+外部独立盲审仍需检查这些规则在原 PDF 上是否存在错标、遗漏或样本偏差；本节不是独立审核通过记录。
 
 ## 4. 审核事件
 
@@ -40,3 +42,14 @@
 - authorization：`not_authorized`；本事件不构成外部审核通过、用户验收或生产授权。
 
 后续外部 AI 审核和用户裁决应在本节末尾继续追加，不修改上述历史事件。
+
+### 2026-09-03 — 外部口径抽检与用户裁决
+
+- actor：外部 AI（口径抽检）+ 用户（最终口径裁决）
+- review class：`semantic_ruling_and_fact_spot_check`
+- status：`accepted_with_required_corrections`
+- accepted：加工量单指标、合并抵消调整行、主体肯定证据、同一控制比较数并列四项规则。
+- corrections：Gold checklist 与行业 checklist 对齐；修正加工量 field identity；锦华新材在建产能改用 PDF 49–50 连续表格锚点；补 Activity 正例；固定一基 PDF 物理页坐标；未冻结 source verbs 不进入 v1 action enum。
+- scope clarification：该事件包含事实抽检和用户语义裁决，`counts_as_independent_blind_review=false`，不得用于关闭 OpenSpec 8.1。
+- remaining：由未参与初标的外部 AI 在不预载行业结论的情况下，从原 PDF 独立检查样本偏差、字段遗漏和标注错误。
+- authorization：`not_authorized`；行业状态继续为 `in_review/hold`，不得启动阶段 4。

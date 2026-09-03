@@ -1,7 +1,7 @@
 {
   "artifact_type": "company_profile_industry_sample_manifest",
   "schema_version": "company_profile_industry_sample_manifest.v1",
-  "manifest_revision": "manufacturing_materials.2026-09-02.1",
+  "manifest_revision": "manufacturing_materials.2026-09-03.2",
   "research_contract_only": true,
   "production_authorization": "not_authorized",
   "industry_package": "manufacturing_materials",
@@ -219,6 +219,12 @@
     }
   ],
   "coverage_gaps": [],
+  "non_blocking_research_boundaries": [
+    "aerospace-specific operating fields are not generalized from the regime sample",
+    "predecessor detailed historical fields require the predecessor original annual report and are not reconstructed from the post-restructuring report",
+    "the four-report portfolio establishes a manufacturing-materials v1 contract but does not claim exhaustive coverage of all Chinese manufacturing subindustries",
+    "future generalization must be tested on holdout issuers that did not participate in contract construction"
+  ],
   "sample_sufficiency": {
     "report_count": 4,
     "company_count": 4,

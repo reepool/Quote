@@ -3,7 +3,7 @@
 > 文档类型：industry LLM contract
 > schema/version：`company_profile_manufacturing_materials_llm_contract.v1`
 > 状态：`in_review`
-> 日期：2026-09-02
+> 日期：2026-09-03
 > production authorization：`not_authorized`
 > 行业需求：`company_profile_manufacturing_materials_requirements.md`
 
@@ -90,6 +90,8 @@ LLM 只做三类请求：
 
 输入必须是目标任务的连续语料。只给一行表格而不提供表头、单位、脚注和续表页，属于无效输入。模型不得自行要求联网，也不得使用训练知识补报告外事实。
 
+v1 `allowed_actions` 只能来自 `develops/produces/processes/sells/purchases/provides_service/operates`。输入原文出现其他动词时，程序可保留 source verb 供复核，但不得把它加入 allowed enum。
+
 ## 4. 所有候选的共同输出
 
 模型只能返回 JSON，不得在 JSON 外输出研究长文。候选至少包含：
@@ -124,7 +126,8 @@ LLM 只做三类请求：
         "assertion_class": "reported_fact"
       },
       "evidence": {
-        "page": 0,
+        "page": 1,
+        "printed_page_label": null,
         "section_title": "...",
         "table_id": null,
         "row_label": null,
@@ -150,6 +153,8 @@ LLM 只做三类请求：
 ```
 
 模型不得返回 canonical value/unit、approved 状态、数据库 ID、package 最终决定、产业链角色、商品方向、价格预测或 DCF 含义。
+
+`evidence.page` 统一使用从 1 开始的 PDF 文件物理页序；正文印刷页码只能放在 `printed_page_label`。模型不得把两者互换。
 
 ## 5. `extract_business_overview`
 
@@ -188,6 +193,7 @@ LLM 只做三类请求：
 - `row_label + column_header + page/table/cell` 进入 physical anchor；
 - reported margin 保留 `%` 与精度；不计算、不补 derived margin；
 - “合并抵消项”标为 adjustment，不生成负销售活动；
+- adjustment 行必须返回 `row_class=consolidation_adjustment`，其 revenue、cost、reported margin 分别形成 Measurement 并继承该标记；“其他”不得无证据标为 adjustment；
 - 同金额出现在 product/industry/region 时保持独立 dimension。
 
 ### 6.3 强制反例
@@ -216,7 +222,8 @@ LLM 只做三类请求：
 ### 7.3 语义边界例
 
 - 宁德时代 661 GWh 是销量，不是销售收入；186 GWh 是库存量，不是存货金额；
-- 璞泰来涂覆加工量优先标 `processing_volume`，不能因为报告括注“销量”就忽略其服务对象，若无法确定返回候选分歧；
+- 璞泰来第 14 页“涂覆加工量（销量）109.42 亿㎡”只返回一条 `processing_volume`，`source_native.name` 原样保留，不从同一锚点再生成 `sales_volume`；
+- 璞泰来第 19 页“涂覆隔膜/销售量/1,094,249.25 万㎡”是另一 physical anchor，可按表头独立返回 `sales_volume`；模型不得因换算后可能等价而自动合并；
 - 锦华新材 40kt/a 是在建 capacity-rate，不是报告期产量；
 - 中航成飞“无法分类统计”是合法 coverage，不是模型缺能力。
 
@@ -270,6 +277,7 @@ LLM 只做三类请求：
 - 明确区分 `business_extension` 与 `restructuring`；
 - 旧 regime 证据不足时返回 `unclear`，不从当前名称倒推；
 - 同一控制比较数标记 comparison-basis clue；
+- 重组后年报的重述比较数标记 `comparison_basis=same_control_restated` 或报告原标签，predecessor 原年报标记 `original_as_published`；两者保留各自 knowledge time，模型不得输出 supersession/overwrite 建议；
 - 模型不得最终启用 package，也不得覆盖旧期间。
 
 ### 10.3 样本约束
@@ -321,6 +329,8 @@ verify 输入包含原始 evidence bundle、冻结 checklist 和待核 candidate
 ```
 
 verify 还要逐 active checklist 检查 coverage。它不得新增 candidate、修正数值、决定 approval 或以平均得分放过 blocker。
+
+主体核验不得因表中只写“公司”而默认通过 `consolidated_group`。只有明文合并/集团口径，或输入中包含表格合计与合并利润表营业收入的完整核对证据时才可通过；仅金额核对时必须要求 `subject_basis`、核对页和 uncertainty。
 
 ## 13. 程序交互顺序
 

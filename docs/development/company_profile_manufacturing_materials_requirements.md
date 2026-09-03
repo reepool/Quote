@@ -3,7 +3,7 @@
 > 文档类型：industry requirements
 > schema/version：`company_profile_manufacturing_materials_requirements.v1`
 > 状态：`in_review`
-> 日期：2026-09-02
+> 日期：2026-09-03
 > production authorization：`not_authorized`
 > 上位需求：`company_profile_product_and_industry_semantic_requirements.md`
 > 研究方法：`company_profile_industry_research_method.md`
@@ -73,7 +73,9 @@
 - package assignment 必须绑定报告期和可核验 event/effective date；
 - 重组样本优先使用股权过户、资产交割或法律生效日，不用新闻发布日期替代；
 - 当前 package 不追溯覆盖旧期间；历史 Measurement 保持原报告主体、期间和当时 package；
-- 同一控制合并的比较数要保存 `comparison_basis`，不得当作 predecessor 当时知识时点事实；
+- 同一控制合并必须分开保存 `reported_period`、`knowledge_time`、`regime_effective_at` 和 `comparison_basis`；
+- 重组后报告中的上年比较列使用 `same_control_restated` 或报告原始比较口径标签，知识时点为该重组后报告的发布日期；
+- predecessor 当年正式报告使用 `original_as_published`，知识时点为当时发布日期；后来重述与原披露可以并列，但不得覆盖、删除或改写 predecessor 当时可知事实；
 - 首个生产竖切仍需人工批准 package manifest；阶段 3 不实现自动 resolver。
 
 中航成飞样本初标：2025-01-06 成飞 100% 股权完成过户后，post-transition primary package 为制造/材料；pre-transition 精细 package 保持 `unclear`，不得因当前航空制造主业反写旧画像。
@@ -99,7 +101,7 @@
 
 ### 5.2 Segment
 
-表达产品、行业、地区、销售模式或业务板块等报告原生维度。相同金额出现在不同 dimension 不代表同一事实；“其他”和“合并抵消项”保留 source-native 标签，并显式标记 aggregate/adjustment。
+表达产品、行业、地区、销售模式或业务板块等报告原生维度。相同金额出现在不同 dimension 不代表同一事实。“其他”保留为 `aggregate` 来源标签；“合并抵消项”保留来源行名并标记 `row_class=consolidation_adjustment`。二者不得混为一类。调整行上的收入、成本和 reported margin 分别形成 Measurement 并继承调整标记，不生成产品、普通经营分部或 Activity。v1 不新增独立 Adjustment 对象。
 
 ### 5.3 Activity
 
@@ -115,9 +117,13 @@ v1 只使用少量、可判定动作：
 | `provides_service` | 原文明示代工、维修、服务保障 | 产品交付不能无证据改成服务 |
 | `operates` | 原文明示运营工厂、资源或设施 | 投资或在建项目不等于已运营 |
 
+该枚举是 v1 闭集。报告出现 `invests_in`、`integrates`、`outsources_processing`、`recycles`、`repairs` 等来源动词时，只能保留为 unresolved source candidate，或在证据直接蕴含现有动作时映射为上述枚举；不得由 dossier 临时扩展阶段 4 的 action contract。
+
 ### 5.4 Measurement
 
 每个数字只表达一个 metric、一个 subject、一个 object/segment、一个期间和一个 source-native unit。表格一行多指标必须按 logical slot 分拆，不能共用单一 occurrence。
+
+同一物理事实只允许一个主 metric。来源名称可保留业务双重叫法，但不得据此双写指标：璞泰来“涂覆加工量（销量）109.42 亿㎡”只标 `processing_volume`，并原样保留 `source_native.name`；第 19 页产销表中的涂覆隔膜销售量属于另一 physical anchor，可独立标 `sales_volume`，不得仅因换算后数值接近就自动合并。
 
 第一版 `metric_type → logical_slot` 对照：
 
@@ -151,19 +157,20 @@ v1 只使用少量、可判定动作：
 
 | field_id | object | task | activation | requirement level | subject | period | source-unit rule | allowed coverage | blocker |
 |---|---|---|---|---|---|---|---|---|---|
-| `business_overview_source` | BusinessOverview | overview | manufacturing package active | required | all governed scopes | duration | n/a, preserve text | observed/failed/unclear | required passage silent omission |
-| `business_regime` | BusinessEvent/Regime | regime | every report | required | listed company/group | event | n/a | observed/unclear/failed | current business applied retroactively |
-| `segment_dimension` | Segment | segment | segment table or narrative exists | required inspection | table subject | duration | n/a | observed/not_disclosed/not_applicable/failed/unclear | table present but task silently empty |
-| `operating_revenue` | Measurement | segment | active row has revenue | conditional | row/table subject | duration | currency source scale | observed/unclear/failed | amount or unit overwritten |
-| `operating_cost` | Measurement | segment | active row has cost | conditional | same | duration | currency source scale | observed/unclear/failed | cost confused with other field |
-| `gross_margin_reported` | Measurement | segment | active row has reported margin | conditional | same | duration | percent source token | observed/unclear/failed | 100x conversion or invented derived margin |
-| `production_capacity` | Measurement | volume | capacity disclosure exists | conditional | object/plant/segment | instant/duration per text | preserve rate token | observed/not_disclosed/not_applicable/failed/unclear | capacity kind lost |
+| `business_overview_source` | BusinessOverview | overview | manufacturing package active | required | all governed scopes | duration | n/a, preserve text | observed/extraction_failed/unclear | required passage silent omission |
+| `explicit_activity` | Activity | overview | explicit governed action is disclosed | conditional | disclosed subject | duration/current | n/a, preserve source verb/object | observed/unclear/extraction_failed | numeric measurement embedded in Activity or action outside reviewed v1 set |
+| `business_regime` | BusinessEvent/Regime | regime | every report | required | listed company/group | event | n/a | observed/unclear/extraction_failed | current business applied retroactively |
+| `segment_dimension` | Segment | segment | segment table or narrative exists | required | table subject | duration | n/a | observed/not_disclosed/not_applicable/extraction_failed/unclear | table present but task silently empty |
+| `operating_revenue` | Measurement | segment | active row has revenue | conditional | row/table subject | duration | currency source scale | observed/unclear/extraction_failed | amount or unit overwritten |
+| `operating_cost` | Measurement | segment | active row has cost | conditional | same | duration | currency source scale | observed/unclear/extraction_failed | cost confused with other field |
+| `gross_margin_reported` | Measurement | segment | active row has reported margin | conditional | same | duration | percent source token | observed/unclear/extraction_failed | 100x conversion or invented derived margin |
+| `production_capacity` | Measurement | volume | capacity disclosure exists | conditional | object/plant/segment | instant/duration per text | preserve rate token | observed/not_disclosed/not_applicable/extraction_failed/unclear | capacity kind lost |
 | `capacity_under_construction` | Measurement | volume | project capacity exists | conditional | project/segment | expected/event | preserve rate token | same | merged into current capacity |
 | `capacity_utilization` | Measurement | volume | reported | conditional | capacity subject | duration | percent | same | used to fabricate reported output |
 | `production_volume` | Measurement | volume | applicable table/text exists | conditional | product/segment | duration | source dimension | same | confused with capacity |
 | `sales_volume` | Measurement | volume | applicable table/text exists | conditional | product/segment | duration | source dimension | same | confused with revenue/order amount |
 | `inventory_volume` | Measurement | volume | applicable table/text exists | conditional | product/segment | instant | source dimension + footnote | same | confused with balance-sheet inventory value |
-| `processing_volume` | Measurement | volume | processing service explicitly disclosed | subtype | service/segment | duration | area/mass/energy per report | same | forced into sales_volume |
+| `processing_volume` | Measurement | volume | processing service explicitly disclosed | conditional (processing subtype) | service/segment | duration | area/mass/energy per report | same | forced into sales_volume |
 | `material_input` | Relationship/fact | materials | explicit material/energy disclosure | conditional | business/segment | duration/current | preserve name/unit if any | same | common-knowledge completion |
 | `counterparty_relationship` | Relationship | counterparties | named or anonymous row/contract exists | conditional | group/issuer | duration/event | identity is source-native | same | anonymous catalog failure or cross-report merge |
 | `customer_concentration` | Measurement | counterparties | concentration disclosed | conditional | report subject | duration | currency/share | same | concentration creates fake relationship |
@@ -171,13 +178,14 @@ v1 只使用少量、可判定动作：
 
 ## 7. 主体决策树
 
-1. 读取明确的“合并”“母公司”“本公司”“子公司/事业部”表头和脚注；
+1. 读取明确的“合并”“本集团”“合并财务报表”“母公司”“本公司”“子公司/事业部”表头、导语和脚注；
 2. 有 named subsidiary 或 business segment 时绑定该主体，不提升为 group；
-3. 管理层讨论使用集团、合并经营数据且与合并财务一致时，可提议 `consolidated_group`；
-4. 只有 issuer 单体证据时使用 `issuer`；
-5. “公司”且无足够上下文时使用 `unclear`，不得按开发者习惯默认；
-6. 同一 physical row 的 Measurements 必须继承相同主体，除非单元格脚注明确改变；
-7. 重组前后主体和 package 分开，不能因法律主体延续而认为业务语义连续。
+3. 表头、导语或脚注明示合并/集团口径时，可以标记 `consolidated_group`；
+4. 未明示合并口径，但表格合计与同一报告的合并利润表营业收入核对一致时，可以提议 `consolidated_group`，同时必须保存 `subject_basis=numeric_reconciliation_to_consolidated_statement`、核对页和 uncertainty；
+5. 只有“公司”二字或行业披露习惯，不足以认定 `consolidated_group`；未完成上述核对时为 `unclear`；
+6. 只有 issuer 单体证据时使用 `issuer`；
+7. 同一 physical row 的 Measurements 必须继承相同主体，除非单元格脚注明确改变；
+8. 重组前后主体和 package 分开，不能因法律主体延续而认为业务语义连续。
 
 ## 8. 期间和单位
 
@@ -201,6 +209,13 @@ v1 只使用少量、可判定动作：
 - comparison qualifier：`>3 万吨` 的 `>` 必须保存。
 
 LLM 只抄 source-native；canonical conversion owner 是程序。不得按数量级猜百分比或单位，不跨维度换算。
+
+### 8.3 页码坐标
+
+- `evidence.page` 统一表示 PDF 文件中从 1 开始的物理页序，即 PDF 阅读器显示的第 1、2、3 页；
+- 年报正文印刷页码可另存 `printed_page_label`，只能用于展示和人工核对；
+- selector、Gold、LLM 输入输出和 verify 必须使用 PDF 物理页作为权威锚点，不得把印刷页码写入 `evidence.page`；
+- 中航成飞样本 PDF 物理第 59 页印刷页码为 58，作为两套坐标不得混用的 Gold/Benchmark 边界。
 
 ## 9. 来源优先级与冲突
 
@@ -262,14 +277,14 @@ Gold 和 Benchmark 必须覆盖四份报告、不同交易所、不同量纲、�
 
 研究视图使用模板组合 approved BusinessOverview 和结构化事实；LLM 若仅做措辞调整，不得新增数字、对象、角色、因果或判断。
 
-## 16. 未解决问题
+## 16. 已裁决口径与剩余审核
 
-| issue | current disposition | blocking for research review |
+| issue | accepted disposition | remaining review |
 |---|---|---|
-| `processing_volume` 是否独立于 `sales_volume` | 初标为独立 metric | yes, needs reviewer decision |
-| 合并抵消项 object/measurement 表达 | 保留 adjustment row，不生成经营活动 | yes, needs reviewer confirmation |
-| 管理层讨论隐含合并口径的最小主体证据 | 使用决策树，证据不足为 unclear | yes |
-| 同一控制合并比较数与历史知识时点并列方式 | 保存 comparison basis，不覆盖 predecessor | yes |
+| `processing_volume` 是否独立于 `sales_volume` | 独立 metric；来源括注“销量”只保留在 source-native，不双写 | 外部独立盲审检查样本偏差 |
+| 合并抵消项 object/measurement 表达 | v1 使用 `consolidation_adjustment` 行及独立 Measurements，不新增对象 | 外部独立盲审检查 Gold 完整性 |
+| 管理层讨论隐含合并口径的最小主体证据 | 明文合并口径，或与合并利润表完成并记录金额核对；否则 unclear | 外部独立盲审复核主体证据 |
+| 同一控制比较数与历史知识时点并列方式 | 四时钟分离；`same_control_restated` 与 `original_as_published` 并列 | 外部独立盲审复核历史边界 |
 
 ## 17. 审核结论
 
@@ -277,4 +292,5 @@ Gold 和 Benchmark 必须覆盖四份报告、不同交易所、不同量纲、�
 - sample sufficiency：`pass`；
 - research status：`in_review`；
 - production authorization：`not_authorized`；
-- 下一步：完成 LLM 合同、Gold、Benchmark 后由外部 AI 审核，再由用户裁决未决项。未验收前不得进入阶段 4 实现。
+- 用户口径裁决：`accepted_on_2026-09-03`；
+- 下一步：由未参与初标的外部 AI 进行独立盲审，检查样本偏差、字段遗漏、主体/单位/证据错标；通过后才能登记 `approved`。未验收前不得进入阶段 4 实现。

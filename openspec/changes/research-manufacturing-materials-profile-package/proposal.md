@@ -7,6 +7,7 @@
 - 使用经本地正式公告库确认的四份 2025 年年度报告开展共性研究：`300750.SZ` 宁德时代（SZSE）、`603659.SH` 璞泰来（SSE）、`920015.BJ` 锦华新材（BSE），以及用于主业转型/regime 边界的 `302132.SZ` 中航成飞（SZSE）。前三者分别挑战电池系统完整产销存/产能、多材料与装备/子公司口径、精细化工产品与匿名客户供应商/BSE 模板；第四份报告以正式重组生效证据验证新旧主业不得追溯混用。
 - 深读每份报告的主要业务、主营构成、产销存/产能、原材料/采购、客户/供应商、重大变化章节，形成制造/材料独立 requirements、chapter-family map、字段 checklist 和正反例。
 - 冻结第一版制造/材料画像义务：总体业务原文、产品/行业/地区收入成本毛利率、适用的产量销量库存、披露的产能、明示原材料/客户/供应商、业务变化与 regime；每个字段明确 required/conditional/optional/not-applicable、主体、期间、source-native 单位和失败语义。
+- 固化阶段 3 口径裁决：加工量只保留一个 `processing_volume` 指标并保留来源别名，合并抵消采用带标记的调整行，管理层讨论主体必须由明文或合并报表金额核对支持，同一控制重述比较数与 predecessor 原披露按知识时点并列。
 - 定义确定性表格优先以及 LLM `extract/repair/verify` 的行业级输入输出合同，但不实现生产 prompt、schema、selector、writer 或 resolver，不运行旧画像生产链。
 - 建立 gold annotations 与 benchmark acceptance，要求所有 required 静默遗漏、销量/销售额或库存量/存货金额混淆、无证据主体归并、单位猜测和清单外产业链推断均为 blocker。
 

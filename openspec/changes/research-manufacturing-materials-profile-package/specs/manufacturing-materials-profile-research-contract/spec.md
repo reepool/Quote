@@ -46,7 +46,7 @@ The package MUST require a `BusinessOverview` sourced from the principal-busines
 - **AND** revenue, volume, customer, and supplier fields are not embedded into the overview object
 
 ### Requirement: Activities and measurements remain distinct
-The industry contract MUST model explicit business actions separately from numeric measurements. Operating revenue, operating cost, gross margin, capacity, production volume, sales volume, and inventory volume MUST be independent `Measurement` fields connected to their segment/object, subject, period, source-native unit, and evidence. A table row containing multiple metrics MUST use distinct logical slots and physical anchors.
+The industry contract MUST model explicit business actions separately from numeric measurements. Operating revenue, operating cost, gross margin, capacity, production volume, sales volume, inventory volume, and processing volume MUST be independent `Measurement` fields connected to their segment/object, subject, period, source-native unit, and evidence. A table row containing multiple metrics MUST use distinct logical slots and physical anchors. The v1 Activity action set MUST remain closed to `develops`, `produces`, `processes`, `sells`, `purchases`, `provides_service`, and `operates`; other observed verbs MUST remain unresolved source candidates until separately reviewed.
 
 #### Scenario: Product row contains revenue cost and margin
 - **WHEN** a product row contains operating revenue, operating cost, and gross margin
@@ -58,13 +58,49 @@ The industry contract MUST model explicit business actions separately from numer
 - **THEN** the values are annotated as `sales_volume` and `inventory_volume`
 - **AND** sales volume is not treated as sales amount and inventory volume is not treated as balance-sheet inventory value
 
+#### Scenario: Processing narrative uses a sales alias
+- **WHEN** a narrative reports `涂覆加工量（销量）` as one physical fact
+- **THEN** exactly one `processing_volume` measurement is produced and the complete source-native label is preserved
+- **AND** no duplicate `sales_volume` is created from the same physical anchor
+
+#### Scenario: Activity Gold uses only the reviewed action set
+- **WHEN** a dossier observes a source verb such as investment, integration, recycling, outsourcing, or repair that is not a v1 action
+- **THEN** it remains an unresolved source candidate or is mapped only when an allowed action is directly entailed
+- **AND** Gold contains at least one positive Activity example from the reviewed v1 action set
+
+### Requirement: Consolidation adjustments remain marked rows
+The v1 research contract MUST preserve a consolidation-elimination row as a source-native Segment/row with `row_class=consolidation_adjustment`. Revenue, cost, and reported margin on that row MUST be separate Measurements inheriting the adjustment marker. The row MUST NOT be modeled as a product, ordinary operating segment, or Activity, and an aggregate label such as `其他` MUST NOT be classified as a consolidation adjustment without evidence.
+
+#### Scenario: Elimination row reports a margin above one hundred percent
+- **WHEN** a report discloses `合并抵消项` with negative revenue, negative cost, and reported margin `118.30%`
+- **THEN** the source row and all three measurements are preserved with the adjustment marker
+- **AND** the reported margin is not reinterpreted as product profitability or a negative sales action
+
 ### Requirement: Source-native units and periods are authoritative research inputs
-Every numeric annotation MUST preserve source value, source unit, header, footnote, period type, subject scope, and physical anchor. The research contract MUST define dimension-specific unit vocabularies and canonical-conversion ownership without guessing from magnitude. Units such as currency scales, `GWh`, tonnes, `kt/a`, square metres, and equipment counts MUST NOT be folded across dimensions.
+Every numeric annotation MUST preserve source value, source unit, header, footnote, period type, subject scope, and physical anchor. The research contract MUST define dimension-specific unit vocabularies and canonical-conversion ownership without guessing from magnitude. Units such as currency scales, `GWh`, tonnes, `kt/a`, square metres, and equipment counts MUST NOT be folded across dimensions. Evidence `page` MUST mean the one-based physical page order in the PDF file; an optional printed page label MUST be stored separately and MUST NOT replace the physical coordinate.
 
 #### Scenario: Annual capacity uses an industry-specific compound unit
 - **WHEN** a report discloses capacity using `kt/a` or another compound unit
 - **THEN** the annotation preserves the token, period meaning, table header, and evidence
 - **AND** an unproved conversion becomes `unclear` or `extraction_failed` rather than a guessed canonical value
+
+#### Scenario: Printed page label differs from PDF position
+- **WHEN** a report page is physical PDF page 59 but prints page label 58
+- **THEN** the evidence anchor records physical page 59 as the authoritative coordinate and may separately retain printed label 58
+- **AND** selectors, Gold, and verification do not silently mix the two coordinate systems
+
+### Requirement: Subject scope requires affirmative evidence
+A management-discussion table MUST NOT be classified as `consolidated_group` solely because it says `公司` or because that scope is customary. Consolidated scope MUST be supported either by explicit group/consolidated wording in the table, introduction, or footnote, or by a documented reconciliation of the table total to the consolidated income statement in the same report. Reconciliation-only support MUST retain its basis and uncertainty; otherwise subject scope MUST be `unclear`.
+
+#### Scenario: Product table reconciles to consolidated revenue
+- **WHEN** the table total reconciles to the same report's consolidated income-statement revenue but has no explicit consolidated wording
+- **THEN** `consolidated_group` may be proposed with `subject_basis=numeric_reconciliation_to_consolidated_statement`
+- **AND** the evidence pages and uncertainty are retained rather than treating the scope as directly reported
+
+#### Scenario: Company wording has no corroboration
+- **WHEN** an operating table only says `公司` and has neither explicit scope text nor a completed consolidated-statement reconciliation
+- **THEN** subject scope is `unclear`
+- **AND** package convention does not supply a subject silently
 
 ### Requirement: Customers suppliers and concentration are separate concepts
 The industry contract MUST distinguish named or intentionally anonymous customer/supplier relationships from concentration measurements. A disclosed anonymous identity such as `客户 A`, `第一名`, or a disclosure-exempt counterparty MUST be retained as report-local disclosed identity and MUST NOT require legal-entity catalog resolution solely because the name is masked. Concentration alone MUST NOT create a relationship, and anonymous identities MUST NOT be merged across reports.
@@ -75,12 +111,17 @@ The industry contract MUST distinguish named or intentionally anonymous customer
 - **AND** it neither fabricates a legal entity nor marks the chapter extraction failed solely because the name is masked
 
 ### Requirement: Business regime changes block approval until evidenced
-The manufacturing-materials contract MUST include a verified transformation, major restructuring, or reverse-listing report before final approval, or MUST remain `held` with a blocking coverage gap. Regime research MUST preserve historical business facts and MUST NOT apply the current package assignment retroactively.
+The manufacturing-materials contract MUST include a verified transformation, major restructuring, or reverse-listing report before final approval, or MUST remain `held` with a blocking coverage gap. Regime research MUST preserve historical business facts and MUST NOT apply the current package assignment retroactively. It MUST keep `reported_period`, `knowledge_time`, `regime_effective_at`, and `comparison_basis` distinct. A later same-control restatement MUST coexist with, and MUST NOT overwrite or delete, the predecessor's `original_as_published` fact.
 
 #### Scenario: Company changes its principal business
 - **WHEN** official report and event evidence show a manufacturing/materials company changed its principal business
 - **THEN** the research records old, transition, and new regime candidates with effective evidence
 - **AND** measurements remain bound to their original report period and business scope
+
+#### Scenario: Same-control comparative is reported later
+- **WHEN** a post-restructuring report presents a prior-year comparative on a same-control-restated basis and the predecessor's original annual report also exists
+- **THEN** both facts remain queryable with separate knowledge times and comparison bases
+- **AND** the later comparative does not rewrite what was known from the predecessor report at its publication time
 
 ### Requirement: LLM contracts are bounded by chapter task
 The industry requirements MUST define separate `extract`, `repair`, and `verify` contracts for each governed chapter task. Inputs MUST include continuous source text/table, headers, source units, footnotes, pages, subject candidates, active checklist, allowed enumerations, positive/negative examples, and prohibited inferences. Outputs MUST remain source-native candidates with evidence and uncertainty. The LLM MUST NOT decide approval, canonical conversion, package assignment, value-chain role, commodity direction, or DCF input.
@@ -91,7 +132,7 @@ The industry requirements MUST define separate `extract`, `repair`, and `verify`
 - **AND** ambiguity is returned as candidate options or `unclear`, not silently forced to a field
 
 ### Requirement: Gold annotations and benchmark expose blockers
-The research MUST produce versioned gold annotations, append-only reviewer disagreements, and an acceptance report that separately measures required coverage, source value/unit, subject/period, evidence anchoring, legal-empty classification, failure honesty, and prohibited inference. Required silent omissions, Activity/Measurement confusion, sales-volume/sales-amount confusion, inventory-volume/inventory-value confusion, unsupported subject/unit changes, or checklist-external supply-chain inference MUST block approval regardless of average accuracy.
+The research MUST produce versioned gold annotations, append-only reviewer disagreements, and an acceptance report that separately measures required coverage, source value/unit, subject/period, evidence anchoring, legal-empty classification, failure honesty, and prohibited inference. The Gold field checklist MUST be a versioned snapshot of the industry checklist rather than an independently narrowed list, and Gold MUST include positive Activity, adjustment-row, processing-volume, capacity-under-construction, concentration, page-coordinate, and historical-restatement examples or blockers. Required silent omissions, Activity/Measurement confusion, sales-volume/sales-amount confusion, inventory-volume/inventory-value confusion, unsupported subject/unit changes, or checklist-external supply-chain inference MUST block approval regardless of average accuracy.
 
 #### Scenario: Average metrics pass but a required product table is omitted
 - **WHEN** aggregate benchmark metrics pass but a required product revenue/cost/margin table is silently absent

@@ -44,14 +44,14 @@
 | 14-15 | 动力电池系统 | `develops`、`produces`、`sells` | 原文明示研发、生产、销售；不得由此推完整上下游角色 |
 | 15 | 储能电池系统 | `develops`、`produces`、`sells` | 产品和解决方案同时存在，数值仍归 Measurement |
 | 15 | 电池材料及回收 | `processes`、`produces` | 回收、加工、提纯、合成有明确工艺叙述 |
-| 15 | 电池矿产资源 | `invests_in`、`operates` 候选 | 原文为投资、建设及运营；产品名不能自动启用资源/矿业包 |
+| 15 | 电池矿产资源 | `operates`；source candidate `invests_in` | 只有 `operates` 属 v1 action；投资/建设原词保留待后续动作合同审核，产品名不能自动启用资源/矿业包 |
 | 16 | 原材料和设备 | `purchases` | 采购模式有明示，但不生成具名供应商关系 |
 
 ## 5. Segment 与经营 Measurements
 
 ### 5.1 分产品收入、成本、毛利率
 
-source：PDF 25；unit：`千元`，毛利率为 `%`；subject candidate：`consolidated_group`；period：2025 annual duration。
+source：PDF 25；unit：`千元`，毛利率为 `%`；subject candidate：`consolidated_group`；period：2025 annual duration。主体依据不是“公司”惯例，而是 PDF 24 营业收入合计 423,701,834 千元与 PDF 116 合并利润表营业收入一致，且明显不同于 PDF 118 母公司营业收入 265,326,794 千元；Gold 必须记录该数值核对依据和 uncertainty。
 
 | physical row | revenue | cost | gross margin | logical slots |
 |---|---:|---:|---:|---|
@@ -113,7 +113,7 @@ source：PDF 25；unit：`千元`，毛利率为 `%`；subject candidate：`cons
 
 ## 8. Review notes 与未决问题
 
-1. 产品表和产销存表的经营主体应按年度报告合并口径认定为 `consolidated_group`，但跨交易所主体决策树尚未定稿。
+1. 产品表主体可依据营业收入合计与合并利润表核对提议为 `consolidated_group`；仅有“公司”表述不足，产销存表仍须使用自身上下文或继承经证明的同节口径。
 2. “电池矿产资源”是产品/业务标签还是独立资源 package 触发证据：本阶段按产品分部处理，不启用未研究的资源包。
 3. 产能 772 GWh 在叙述和表格重复出现，应视为同一 reported fact 的两个证据锚点，而不是两个事实。
 4. `客户 A(1)` 与前五名“第一名”金额相同，但报告未明示二者 identity parity；不得仅凭金额自动合并。

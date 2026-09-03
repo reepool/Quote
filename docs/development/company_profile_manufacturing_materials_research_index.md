@@ -2,7 +2,7 @@
 
 > 文档类型：requirements research index
 > 状态：`in_review`
-> 日期：2026-09-02
+> 日期：2026-09-03
 > 行业包：`manufacturing_materials`
 > production authorization：`not_authorized`
 > 上位需求：`company_profile_product_and_industry_semantic_requirements.md`
@@ -65,8 +65,8 @@
 - LLM 合同：`complete_pending_review`；
 - Gold/Benchmark：`complete_pending_review`；
 - 外部独立审核：`pending`；
-- 用户验收：`pending`；
+- 用户口径验收：`accepted_2026-09-03`；
 - 研究状态：`in_review`；
 - 生产授权：`not_authorized`。
 
-当前未决语义问题与审核交接材料见 `company_profile_manufacturing_materials_review_log.md`。在独立审核和用户验收完成前，本行业包不得登记为 `approved`，也不得据此启动阶段 4 实现。
+四项口径裁决和独立审核交接材料见 `company_profile_manufacturing_materials_review_log.md`。在未参与初标的外部 AI 完成独立盲审、且所有 blocker 关闭前，本行业包不得登记为 `approved`，也不得据此启动阶段 4 实现。

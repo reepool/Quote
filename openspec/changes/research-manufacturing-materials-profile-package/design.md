@@ -75,6 +75,22 @@ SSE/SZSE/BSE 的章节编号只作为 observed evidence，不进入通用 select
 
 Gold set 不只收成功数值，还必须覆盖空披露、匿名关系、跨页/脚注、主体歧义、单位不清、不可读页、转型 regime、销量/销售额混淆和清单外推断。任何 required 静默遗漏、Measurement/Activity 混淆或无证据单位/主体修正均为 blocker。
 
+### Decision 10: 来源中的“销量”别名不产生第二条指标
+
+璞泰来叙述“涂覆加工量（销量）109.42 亿㎡”只形成一条 `processing_volume` Measurement，`source_native.name` 原样保留双重叫法。报告第 19 页产销表的“涂覆隔膜/销售量/1,094,249.25 万㎡”是另一物理锚点，可独立标为 `sales_volume`；两处即使可换算等价，也只能由后续程序在证据充分时对账，不得由 LLM 双写或自动合并。
+
+### Decision 11: 合并抵消使用带标记的调整行
+
+v1 不新增 Adjustment 对象。“合并抵消项”保留 source-native 行名，并以 `row_class=consolidation_adjustment` 的 Segment/行承载；该行的 revenue、cost、reported margin 分别形成 Measurement 并继承调整标记。调整行不是产品、普通业务分部或 Activity；“其他”聚合标签也不得与调整行混为一类。
+
+### Decision 12: 主体口径必须有肯定证据
+
+管理层讨论仅写“公司”时不默认 `consolidated_group`。合并主体至少需要表头、导语或脚注明示“合并/本集团/合并财务报表”，或者表格合计与同报告合并利润表营业收入核对一致。仅依赖金额核对时必须记录该依据及 uncertainty；两类证据均不足则为 `unclear`。
+
+### Decision 13: 同一控制比较数按四个时钟并列
+
+重组研究分开保存 `reported_period`、`knowledge_time`、`regime_effective_at`、`comparison_basis`。重组后报告的上年列使用 `same_control_restated` 或报告原标签；predecessor 当年报告使用 `original_as_published`。两者可并列，后来重述不得覆盖、删除或改写当时可知事实。中航成飞以 2025-01-06 股权过户并表日作为 regime 生效证据，更名日只用于展示。
+
 ## Risks / Trade-offs
 
 - [Risk] 稳定主业样本会低估 regime 复杂度。→ 已以中航成飞正式年报和 2025 年 1 月 6 日生效证据补充重组边界；predecessor 历史并列规则仍提交独立审核。
@@ -82,6 +98,7 @@ Gold set 不只收成功数值，还必须覆盖空披露、匿名关系、跨�
 - [Risk] 至少两样本支持可能遗漏真正重要但少见字段。→ 允许以法规义务或明确子行业规则登记 `conditional`，不强推为全行业 required。
 - [Risk] PDF 文本提取质量影响研究。→ dossier 同时记录页码、表头、引文和可读性；不可读不改写为未披露。
 - [Risk] 研究文档过早被当成生产 schema。→ 全部 manifest 标记 `research_contract_only`，最终结论明确 `production_authorization=not_authorized`。
+- [Risk] 四份样本被误解为覆盖全部中国制造业。→ `coverage_gaps` 只表示阶段 3 阻塞样本缺口归零，另列航空专用字段、predecessor 精细重建和未见制造子类型等非阻塞研究边界；后续以未参与合同制定的 holdout 公司验证泛化。
 
 ## Migration Plan
 
@@ -96,7 +113,6 @@ Gold set 不只收成功数值，还必须覆盖空披露、匿名关系、跨�
 
 ## Open Questions
 
-- 璞泰来“涂覆加工量（销量）”应只归为 `processing_volume`，还是同时保留双重来源标签。
-- “合并抵消项”在未来 common model 中应采用何种 adjustment 表达。
-- 管理层讨论表认定为 `consolidated_group` 的最小证据是什么。
-- 同一控制合并比较数如何与 predecessor 原历史报告在各自知识时点下并列。
+- 外部独立盲审是否发现四份样本之外的字段遗漏、样本偏差或 Gold 错标。
+- 后续 common model 是否需要独立 Adjustment 对象；阶段 3 已决定 v1 不新增。
+- 未参与合同制定的制造/材料 holdout 年报能否满足相同 chapter task、coverage 和 source-native 合同。

@@ -3,12 +3,12 @@
 > artifact type：`company_profile_industry_benchmark_acceptance`
 > version：`manufacturing_materials_benchmark.v1`
 > 状态：`hold_pending_independent_review_and_implementation_evaluation`
-> 日期：2026-09-02
+> 日期：2026-09-03
 > production authorization：`not_authorized`
 
 ## 1. 当前结论
 
-研究样本、四份 dossier、字段账本、行业 requirements、LLM 合同和 Gold 初标已经齐备，足以进入独立审核。阶段 3 没有实现或运行生产抽取器，因此本报告只冻结验收方法和 Gold 基线，不声称模型指标已经通过。当前结论为 `hold`，解除条件是：外部独立审核和用户语义裁决完成，后续实现版本在本 Gold 上通过阻塞项和分项阈值。
+研究样本、四份 dossier、字段账本、行业 requirements、LLM 合同和 Gold 初标已经齐备，用户已于 2026-09-03 接受四项口径裁决，足以进入独立盲审。阶段 3 没有实现或运行生产抽取器，因此本报告只冻结验收方法和 Gold 基线，不声称模型指标已经通过。当前结论为 `hold`，解除条件是：外部独立盲审完成且无未解决 blocker，后续实现版本在本 Gold 上通过阻塞项和分项阈值。
 
 ## 2. 样本覆盖
 
@@ -23,10 +23,10 @@
 
 ## 3. Gold 构成
 
-- 真实报告 annotations：15 条；
-- 覆盖对象：BusinessOverview、Segment、Measurement、Relationship、BusinessEvent；
+- 真实报告 annotations：22 条；
+- 覆盖对象：BusinessOverview、Segment、Activity、Measurement、Relationship、BusinessEvent；
 - 覆盖业务：产品收支利、产能、销量、库存、加工量、匿名关系、集中度、合并抵消、合法空值、重大重组；
-- contract negative cases：10 条；
+- contract negative cases：13 条；
 - review status：全部 `pending`，等待独立审核。
 
 ## 4. 实现版本分项阈值
@@ -72,6 +72,9 @@
 | anonymous identity treated as catalog failure | 0 | anonymous Gold 全通过 |
 | subject/period forced | 0 | unclear 路径可达且无无证据强制 |
 | current package applied to old regime | 0 | 中航成飞时间边界通过 |
+| later same-control restatement overwrites predecessor fact | 0 | comparison basis 与 knowledge time 并列 |
+| printed page label replaces PDF physical page | 0 | page-coordinate negative case 通过 |
+| one processing fact is emitted as two metrics | 0 | processing-volume negative case 通过 |
 | LLM/research prose introduced new fact | 0 | summary negative case 通过 |
 
 ## 7. Legal empty 与失败诚实性
@@ -83,21 +86,21 @@
 - 主体或语义存在多个合法解释：`unclear`；
 - 空数组、部分 candidates 或聚合源数字不得改变上述状态。
 
-## 8. 当前未决审核项
+## 8. 已裁决口径与剩余审核
 
-1. 璞泰来“涂覆加工量（销量）”最终使用 `processing_volume` 还是同时保留 source label 与 processing metric；
-2. 合并抵消项在未来 common model 中的 adjustment 表达；
-3. 管理层讨论表隐含合并口径的最小证据；
-4. 同一控制合并比较数与 predecessor 当时知识时点事实的并列展示。
+1. 涂覆加工量只生成 `processing_volume`，来源双重叫法原样保留；第 19 页表格销售量是独立锚点；
+2. 合并抵消项采用带 `consolidation_adjustment` 标记的行及三个独立 Measurements，不新增对象；
+3. 合并主体必须有明文口径或与合并利润表完成金额核对，仅有“公司”时为 `unclear`；
+4. 同一控制重述与 predecessor 原披露按四时钟和 comparison basis 并列，不相互覆盖。
 
-这些项目进入外部 review log，未解决时行业 research status 维持 `in_review/hold`。
+上述口径已经用户确认并进入 Gold。剩余出口是由未参与初标的外部 AI 从原 PDF 独立检查样本偏差、字段遗漏、主体/单位/证据错标；该盲审未完成时行业状态维持 `in_review/hold`。
 
 ## 9. 阶段 3 验收状态
 
 - sample sufficiency：`pass`；
 - artifact completeness：`pass_for_independent_review`；
 - independent annotation review：`pending`；
-- user acceptance：`pending`；
+- user semantic acceptance：`accepted_2026-09-03`；
 - model implementation benchmark：`not_run_by_design`；
 - final research decision：`hold`；
-- next step：外部审核本组文档，用户裁决未决项；通过后才能将研究状态改为 `approved` 并另开阶段 4 change。
+- next step：完成外部独立盲审并逐项记录 accepted/rejected/deferred；无 blocker 后才能将研究状态改为 `approved` 并另开阶段 4 change。

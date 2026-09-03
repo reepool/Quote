@@ -45,7 +45,7 @@
 | 12 | 自动化装备 | `develops`、`produces`、`sells` | 装备与材料不得共用量纲 |
 | 12、15 | 极片 | `processes` / `provides_service` | 来料加工和“整卷”交付，不应简化为商品销售 |
 | 12 | 原材料、标准件、非标准件 | `purchases` | 采购主体按各子公司业务需求执行 |
-| 12 | 自动化装备 | `integrates` 候选 | 自制和外采零部件配合软件系统进行整机交付 |
+| 12 | 自动化装备 | unresolved source candidate `integrates` | 不属于 v1 action；自制/生产有直接证据时另标 `produces`，不得临时扩枚举 |
 
 ## 5. Segment 与经营 Measurements
 
@@ -68,7 +68,8 @@ source：PDF 18-19；unit：`元`；period：2025 annual duration；subject：`c
 | object | metric | source value | source unit | page / anchor |
 |---|---|---:|---|---|
 | 涂覆隔膜加工 | effective capacity | 140 | 亿㎡ | 14 叙述 |
-| 涂覆隔膜加工 | sales/processing volume | 109.42 | 亿㎡ | 14 叙述；19 表为 1,094,249.25 万㎡ |
+| 涂覆隔膜加工 | processing volume | 109.42 | 亿㎡ | 14 叙述，source label 为“涂覆加工量（销量）” |
+| 涂覆隔膜 | sales volume | 1,094,249.25 | 万㎡ | 19 产销量表独立 physical anchor |
 | 隔膜基膜 | capacity | 21 | 亿㎡/年 | 14 |
 | 隔膜基膜 | sales volume | 14.95 | 亿㎡ | 14 |
 | 负极材料 | capacity | 25 | 万吨/年 | 15 |
@@ -119,7 +120,7 @@ PDF 19 说明库存量为产成品数量，包含已发至客户但尚未确认�
 ## 8. Review notes 与未决问题
 
 1. “新能源电池材料与服务”叙述收入为内部抵消前，正式主营表含合并抵消项；必须定义优先使用合并后表还是同时保留内部口径。
-2. 涂覆加工量既可被称为销量，也可被理解为服务处理量；对象应为 `processing_volume` 还是 `sales_volume`，需行业字段字典明确。
+2. 已裁决：第 14 页叙述只标 `processing_volume` 并保留双重来源叫法；第 19 页表格销售量独立标 `sales_volume`，二者不得由 LLM 自动合并。
 3. `>3 万吨` 必须保留比较符，不能写成精确 30,000 吨。
 4. 子公司与事业部交叉存在，subject 可能是 `named_subsidiary`、`business_segment` 或 `consolidated_group`；不得凭产品名猜主体。
 5. 本 dossier 初标完整，待独立审核；不提前与其他样本合并字段结论。

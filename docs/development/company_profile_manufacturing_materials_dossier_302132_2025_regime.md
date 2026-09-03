@@ -50,7 +50,7 @@ PDF 59 进一步给出确定性生效证据：截至 2025 年 1 月 6 日，成�
 - PDF 11：报告期主营业务为航空产品研发、制造、销售、维修与服务保障；主要产品包括航空防务装备、民用航空产品和智能测控产品；
 - subject：重组后 `consolidated_group`；成飞、贵飞、长飞、电测等是 named subsidiary 候选；
 - period：2025 annual duration，但 regime effective date 为 2025-01-06；
-- Activity 候选：`develops`、`produces`、`sells`、`repairs`、`provides_service`；
+- Activity 候选：`develops`、`produces`、`sells`、`provides_service`；“维修”保留为 source verb，由 `provides_service` 表达，不扩展 v1 action；
 - 不得从“航空产业链”叙述自动推导完整供应链位置、军品型号收入或客户身份。
 
 ## 6. Segment 与 Measurements
