@@ -2,7 +2,7 @@
 
 > 文档类型：industry requirements
 > schema/version：`company_profile_manufacturing_materials_requirements.v1`
-> 状态：`independent_review_complete_pending_user_acceptance`
+> 状态：`approved`
 > 日期：2026-09-03
 > production authorization：`not_authorized`
 > 上位需求：`company_profile_product_and_industry_semantic_requirements.md`
@@ -310,8 +310,9 @@ Gold 和 Benchmark 必须覆盖四份报告、不同交易所、不同量纲、�
 
 - artifact completeness：`independent_review_complete`；
 - sample sufficiency：`pass`；
-- research status：`independent_review_complete_pending_user_acceptance`；
+- research status：`approved`；
 - production authorization：`not_authorized`；
 - 用户口径裁决：`accepted_on_2026-09-03`；
 - 独立盲审：`complete_on_2026-09-03`，详细对账见 `company_profile_manufacturing_materials_blind_review_adjudication_20260903.md`；
-- 下一步：用户确认盲审新增裁决后执行 OpenSpec 8.3 并登记 `approved`。确认前不得进入阶段 4 实现。
+- 用户最终验收：`accepted_on_2026-09-03`；
+- 阶段结论：制造/材料阶段 3 研究合同已批准，可以另开阶段 4 change；本批准不授权生产实现、生产 LLM、数据库写入或恢复旧 backfill。

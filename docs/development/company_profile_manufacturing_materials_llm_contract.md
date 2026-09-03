@@ -2,7 +2,7 @@
 
 > 文档类型：industry LLM contract
 > schema/version：`company_profile_manufacturing_materials_llm_contract.v1`
-> 状态：`independent_review_complete_pending_user_acceptance`
+> 状态：`approved_research_contract`
 > 日期：2026-09-03
 > production authorization：`not_authorized`
 > 行业需求：`company_profile_manufacturing_materials_requirements.md`

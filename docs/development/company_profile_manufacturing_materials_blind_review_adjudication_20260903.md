@@ -3,7 +3,7 @@
 > 文档类型：blind-review adjudication
 > 日期：2026-09-03
 > 行业包：`manufacturing_materials`
-> 当前状态：`independent_review_complete_pending_user_acceptance`
+> 当前状态：`approved`
 > production authorization：`not_authorized`
 
 ## 1. 盲审有效性结论
@@ -61,4 +61,5 @@
 - Gold/Benchmark：继续是研究验收基线，不代表生产模型已通过；
 - 生产授权：`not_authorized`；
 - 阶段 4：未启动；
-- 最终行业登记：待用户接受本文件新增裁决后，才执行 OpenSpec 8.3 并将 `in_review` 改为 `approved`。
+- 用户最终验收：`accepted_2026-09-03`；
+- 最终行业登记：`approved`。该批准仅关闭阶段 3 研究合同，不改变 `production_authorization=not_authorized`。

@@ -1,7 +1,7 @@
 {
   "artifact_type": "company_profile_industry_sample_manifest",
   "schema_version": "company_profile_industry_sample_manifest.v1",
-  "manifest_revision": "manufacturing_materials.2026-09-03.3",
+  "manifest_revision": "manufacturing_materials.2026-09-03.4",
   "research_contract_only": true,
   "production_authorization": "not_authorized",
   "industry_package": "manufacturing_materials",
@@ -13,7 +13,7 @@
   "reviewer": "independent external AI review arranged by user",
   "acceptance_reviewer": "user",
   "role_separation_note": "These are logical review responsibilities and do not require a real multi-person team.",
-  "review_status": "independent_review_complete_pending_user_acceptance",
+  "review_status": "approved",
   "selection_protocol": {
     "minimum_reports": 3,
     "minimum_companies": 2,
@@ -242,6 +242,7 @@
     "report_field_check_positions": 72,
     "submitted_fact_annotations": 74,
     "report_blocking_finding_count": 0,
-    "user_adjudication_acceptance": "pending"
+    "user_adjudication_acceptance": "accepted",
+    "accepted_at": "2026-09-03"
   }
 }

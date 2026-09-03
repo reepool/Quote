@@ -3,7 +3,7 @@
 > 文档类型：append-only review log
 > 版本：`manufacturing_materials_review.v1`
 > 日期：2026-09-03
-> 当前状态：`independent_review_complete_pending_user_acceptance`
+> 当前状态：`approved`
 > production authorization：`not_authorized`
 
 ## 1. 使用规则
@@ -98,3 +98,13 @@
 - rejected as new top-level fields：`related_party_counterparty`、境外收入、副产品客户；现有 Relationship/Segment 语义足够；
 - status：`independent_review_complete_pending_user_acceptance`；OpenSpec 8.1 可关闭，8.3 保持未完成；
 - authorization：`not_authorized`；用户接受本次新增裁决前不得登记 approved 或启动阶段 4。
+
+### 2026-09-03 — 用户最终验收与阶段 3 登记
+
+- actor：用户 / acceptance reviewer；
+- review class：`user_final_acceptance`；
+- status：`accepted`；
+- accepted：盲审对账文件中的加工服务方向、产能 kind、仅合计披露、重述 basis、未披露原因、库存脚注和 Activity actor 七项裁决，以及其中 rejected/deferred 边界；
+- stage decision：制造/材料行业包阶段 3 研究状态登记为 `approved`，OpenSpec 8.3 完成；
+- next authorization：允许另开阶段 4 change 设计和实现通用最小语义模型与严格 `extract/repair/verify` 合同；
+- production authorization：`not_authorized`；本验收不允许生产写入、生产 LLM、恢复旧 backfill、删除旧数据或启动阶段 5/6。

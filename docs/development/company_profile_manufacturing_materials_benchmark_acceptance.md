@@ -2,13 +2,13 @@
 
 > artifact type：`company_profile_industry_benchmark_acceptance`
 > version：`manufacturing_materials_benchmark.v1`
-> 状态：`hold_pending_user_final_acceptance_and_implementation_evaluation`
+> 状态：`approved_research_contract_implementation_evaluation_pending`
 > 日期：2026-09-03
 > production authorization：`not_authorized`
 
 ## 1. 当前结论
 
-研究样本、四份 dossier、字段账本、行业 requirements、LLM 合同和 Gold 初标已经齐备。独立盲审已于 2026-09-03 完成：覆盖 72 个报告字段检查位、提交 74 条事实标注，四份报告均无 blocking finding；盲审发现的 7 个合同边界已逐项对账。阶段 3 没有实现或运行生产抽取器，因此本报告只冻结验收方法和 Gold 基线，不声称模型指标已经通过。当前结论为 `hold`，解除条件是：用户接受盲审新增裁决并完成 8.3 最终登记；后续实现版本仍须在本 Gold 上通过阻塞项和分项阈值。
+研究样本、四份 dossier、字段账本、行业 requirements、LLM 合同和 Gold 初标已经齐备。独立盲审已于 2026-09-03 完成：覆盖 72 个报告字段检查位、提交 74 条事实标注，四份报告均无 blocking finding；盲审发现的 7 个合同边界已逐项对账并获得用户最终接受。阶段 3 研究合同据此为 `approved`。阶段 3 没有实现或运行生产抽取器，因此本报告只批准验收方法和 Gold 研究基线，不声称模型指标已经通过；后续阶段 4/5 实现仍须在本 Gold 上通过阻塞项和分项阈值。
 
 ## 2. 样本覆盖
 
@@ -27,7 +27,7 @@
 - 覆盖对象：BusinessOverview、Segment、Activity、Measurement、Relationship、BusinessEvent；
 - 覆盖业务：产品收支利、产能、销量、库存、加工量、明确原料、匿名关系、集中度、合并抵消、合法空值、重大重组及同一控制重述比较数；
 - contract negative cases：19 条；
-- review status：独立盲审与 Gold 对账完成，等待用户最终 acceptance；24 条原始 Gold 标注不因盲审自动变为生产 approved。
+- review status：独立盲审、Gold 对账和用户最终 acceptance 完成；24 条 Gold 标注批准为研究基线，不等于生产事实 approved。
 
 ## 4. 实现版本分项阈值
 
@@ -92,14 +92,14 @@
 - 主体或语义存在多个合法解释：`unclear`；
 - 空数组、部分 candidates 或聚合源数字不得改变上述状态。
 
-## 8. 已裁决口径与剩余审核
+## 8. 已裁决口径与最终验收
 
 1. 涂覆加工量只生成 `processing_volume`，来源双重叫法原样保留；第 19 页表格销售量是独立锚点；
 2. 合并抵消项采用带 `consolidation_adjustment` 标记的行及三个独立 Measurements，不新增对象；
 3. 合并主体必须有明文口径或与合并利润表完成金额核对，仅有“公司”时为 `unclear`；
 4. 同一控制重述与 predecessor 原披露按四时钟和 comparison basis 并列，不相互覆盖。
 
-上述四项口径已经用户确认并进入 Gold。独立盲审已按两步法完成，详细裁决见 `company_profile_manufacturing_materials_blind_review_adjudication_20260903.md`。新增接受项包括：加工服务方向、产能 kind、重述 basis、仅合计披露的关系/coverage 分离、未披露原因护栏、库存脚注可选性和 Activity actor。用户接受这些新增裁决前，行业状态维持 `in_review/hold`。
+上述四项口径已经用户确认并进入 Gold。独立盲审已按两步法完成，详细裁决见 `company_profile_manufacturing_materials_blind_review_adjudication_20260903.md`。新增接受项包括：加工服务方向、产能 kind、重述 basis、仅合计披露的关系/coverage 分离、未披露原因护栏、库存脚注可选性和 Activity actor；用户于 2026-09-03 最终接受全部新增裁决。
 
 ## 9. 阶段 3 验收状态
 
@@ -107,7 +107,7 @@
 - artifact completeness：`pass_independent_review_complete`；
 - independent annotation review：`complete_2026-09-03`；
 - user semantic acceptance：`accepted_2026-09-03`；
-- user blind-review adjudication acceptance：`pending`；
+- user blind-review adjudication acceptance：`accepted_2026-09-03`；
 - model implementation benchmark：`not_run_by_design`；
-- final research decision：`hold`；
-- next step：用户确认盲审新增裁决后执行 OpenSpec 8.3，将研究状态登记为 `approved`；之后才可另开阶段 4 change。
+- final research decision：`approved`；
+- next step：可另开阶段 4 change，实现通用最小语义模型和严格 extract/repair/verify 合同；生产授权继续为 `not_authorized`。

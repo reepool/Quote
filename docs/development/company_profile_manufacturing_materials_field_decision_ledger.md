@@ -1,9 +1,9 @@
 # 制造/材料公司画像字段决策账本
 
 > artifact type：`company_profile_industry_field_decision_ledger`
-> 状态：`independent_review_complete_pending_user_acceptance`
+> 状态：`approved`
 > 日期：2026-09-03
-> 样本版本：`manufacturing_materials.2026-09-03.3`
+> 样本版本：`manufacturing_materials.2026-09-03.4`
 > production authorization：`not_authorized`
 
 ## 1. 决策原则
@@ -111,7 +111,7 @@
 - 管理层讨论认定合并主体需要明文口径或与合并利润表金额核对；只有“公司”时为 `unclear`。
 - 同一控制合并按四个时钟和 comparison basis 并列，不覆盖 predecessor 原披露。
 
-上述裁决由用户于 2026-09-03 接受。独立盲审随后完成；行业包当前等待用户接受第 10 节的盲审新增裁决。
+上述裁决由用户于 2026-09-03 接受。独立盲审随后完成，盲审新增裁决亦于 2026-09-03 获得用户最终接受。
 
 ## 10. 独立盲审新增裁决
 
@@ -121,4 +121,4 @@
 - 重述比较列强制 `comparison_basis`；缺失为 blocker。
 - `not_disclosed` 的保密/豁免原因必须由原文明示；库存脚注仅在来源存在时强制保留。
 - Activity actor 不得跨第三方改写；军贸公司对最终用户的销售不能归到上市公司。
-- 当前状态为 `independent_review_complete_pending_user_acceptance`；用户确认前不登记 approved、不启动阶段 4。
+- 当前状态为 `approved`；可以另开阶段 4 change，但生产授权仍为 `not_authorized`。

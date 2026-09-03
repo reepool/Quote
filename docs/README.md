@@ -31,6 +31,7 @@
 - `docs/development/research_data_engine_execution.md`：研究数据引擎实施与现状
 - `docs/development/company_profile_product_and_industry_semantic_requirements.md`：公司画像产品、通用对象、分行业语义、LLM 分工与分阶段实施的唯一权威总需求
 - `docs/development/company_profile_industry_research_method.md`：公司画像阶段 2 分行业研究方法、样本选择、标注、benchmark 与阶段 3 进入门
+- `docs/development/company_profile_manufacturing_materials_requirements.md`、`company_profile_manufacturing_materials_research_index.md`：已通过阶段 3 研究验收的制造/材料行业合同与证据索引；不代表生产授权
 - `docs/development/company_profile_industry_requirements_template.md`：独立行业 requirements 标准模板
 - `docs/development/company_profile_industry_sample_manifest.template.json`、`company_profile_industry_gold_annotation.template.json`：仅用于研究合同的样本与 gold 标注清单模板
 - `docs/development/company_profile_industry_benchmark_acceptance_template.md`：行业 benchmark 验收报告模板

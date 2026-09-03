@@ -133,6 +133,5 @@ Activity actor 必须由原文直接语法主体或明确经济关系支持。�
 
 ## Open Questions
 
-- 用户是否接受独立盲审新增的加工方向、产能口径、coverage、重述、脚注和 actor 裁决。
 - 后续 common model 是否需要独立 Adjustment 对象；阶段 3 已决定 v1 不新增。
 - 未参与合同制定的制造/材料 holdout 年报能否满足相同 chapter task、coverage 和 source-native 合同。

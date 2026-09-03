@@ -1,7 +1,7 @@
 # 制造/材料公司画像阶段 3 研究索引
 
 > 文档类型：requirements research index
-> 状态：`independent_review_complete_pending_user_acceptance`
+> 状态：`approved`
 > 日期：2026-09-03
 > 行业包：`manufacturing_materials`
 > production authorization：`not_authorized`
@@ -67,13 +67,13 @@
 - 初始样本复核：`pass`；
 - 四份报告 dossier：`initial_annotation_complete`；
 - 转型/regime 样本：`covered`；
-- 行业 requirements：`independent_review_complete_pending_user_acceptance`；
-- LLM 合同：`independent_review_complete_pending_user_acceptance`；
-- Gold/Benchmark：`independent_review_complete_pending_user_acceptance`；
+- 行业 requirements：`approved`；
+- LLM 合同：`approved_research_contract`；
+- Gold/Benchmark：`approved_research_baseline`；
 - 外部独立审核：`complete_2026-09-03`；
 - 用户口径验收：`accepted_2026-09-03`；
-- 盲审新增裁决用户验收：`pending`；
-- 研究状态：`independent_review_complete_pending_user_acceptance`；
+- 盲审新增裁决用户验收：`accepted_2026-09-03`；
+- 研究状态：`approved`；
 - 生产授权：`not_authorized`。
 
-四项既有口径裁决和本次盲审新增裁决见 `company_profile_manufacturing_materials_review_log.md` 与 `company_profile_manufacturing_materials_blind_review_adjudication_20260903.md`。独立盲审已完成且没有报告级 blocker；盲标中无肯定证据的主体推断等内容未覆盖 Gold。用户接受新增裁决并完成 OpenSpec 8.3 前，本行业包不得登记为 `approved`，也不得据此启动阶段 4 实现。
+四项既有口径裁决和本次盲审新增裁决见 `company_profile_manufacturing_materials_review_log.md` 与 `company_profile_manufacturing_materials_blind_review_adjudication_20260903.md`。独立盲审没有报告级 blocker，盲标中无肯定证据的主体推断等内容未覆盖 Gold；用户已接受最终对账。制造/材料阶段 3 研究合同据此登记为 `approved`，允许另开阶段 4 change，但仍不得启动生产实现、生产 LLM、数据库写入或旧 backfill。
