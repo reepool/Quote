@@ -51,7 +51,7 @@
 
 ## 8. 审核、登记与阶段出口
 
-- [ ] 8.1 建立 append-only review log，提交样本选择、字段决策、正反例、LLM 合同和 Benchmark 给外部 AI 独立审核，并逐项记录 accepted/rejected/deferred 及理由。
+- [ ] 8.1 建立 append-only review log：先仅以四份原 PDF、冻结 checklist、字段定义和中性输出格式进行独立盲标，不提供 Gold/dossier/ledger 结论；盲标提交后再揭示 Gold、LLM 合同和 Benchmark 对账，并逐项记录 accepted/rejected/deferred 及理由。
 - [x] 8.2 将关键语义分歧和 blocker 提交用户验收；未经用户接受不得把行业包登记为 `approved`。（用户于 2026-09-03 接受四项口径裁决；该验收不替代 8.1 独立盲审。）
 - [ ] 8.3 更新总需求行业登记和开发文档索引：通过全部 blocker 时登记 `approved`，否则登记 `held` 并列出解除条件。
 - [x] 8.4 验证阶段 3 仅产生研究文档和证据，未修改生产代码、schema、数据库、调度、Telegram、DCF、生产 prompt 或冻结开关，且 `production_authorization=not_authorized`。
@@ -64,3 +64,4 @@
 - [x] 9.3 使 Gold field checklist 成为行业 checklist 的完整快照，补齐 `explicit_activity`、在建产能、利用率、加工量和客户/供应商集中度，并加入至少一个 v1 Activity 正例。
 - [x] 9.4 固定一基 PDF 物理页坐标、收敛 dossier 中未冻结 action 枚举，并记录航空专用字段、predecessor 精细重建和 holdout 泛化为非阻塞研究边界。
 - [x] 9.5 同步 Benchmark、sample manifest、研究索引和 OpenSpec 严格校验；保持 8.1 独立盲审与 8.3 最终登记未完成，且不得启动阶段 4。
+- [x] 9.6 修正璞泰来无充分证据的主体口径，补充 `same_control_restated` 与 `material_input` Gold 正例，并固定 8.1“盲标—揭示 Gold 对账”协议；保持 8.1/8.3 未完成。

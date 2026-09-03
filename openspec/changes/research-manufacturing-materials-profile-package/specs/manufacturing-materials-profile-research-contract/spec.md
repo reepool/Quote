@@ -132,12 +132,17 @@ The industry requirements MUST define separate `extract`, `repair`, and `verify`
 - **AND** ambiguity is returned as candidate options or `unclear`, not silently forced to a field
 
 ### Requirement: Gold annotations and benchmark expose blockers
-The research MUST produce versioned gold annotations, append-only reviewer disagreements, and an acceptance report that separately measures required coverage, source value/unit, subject/period, evidence anchoring, legal-empty classification, failure honesty, and prohibited inference. The Gold field checklist MUST be a versioned snapshot of the industry checklist rather than an independently narrowed list, and Gold MUST include positive Activity, adjustment-row, processing-volume, capacity-under-construction, concentration, page-coordinate, and historical-restatement examples or blockers. Required silent omissions, Activity/Measurement confusion, sales-volume/sales-amount confusion, inventory-volume/inventory-value confusion, unsupported subject/unit changes, or checklist-external supply-chain inference MUST block approval regardless of average accuracy.
+The research MUST produce versioned gold annotations, append-only reviewer disagreements, and an acceptance report that separately measures required coverage, source value/unit, subject/period, evidence anchoring, legal-empty classification, failure honesty, and prohibited inference. The Gold field checklist MUST be a versioned snapshot of the industry checklist rather than an independently narrowed list, and Gold MUST include positive Activity, adjustment-row, processing-volume, capacity-under-construction, material-input, concentration, page-coordinate, and same-control-restatement examples plus historical-overwrite blockers. Required silent omissions, Activity/Measurement confusion, sales-volume/sales-amount confusion, inventory-volume/inventory-value confusion, unsupported subject/unit changes, or checklist-external supply-chain inference MUST block approval regardless of average accuracy.
 
 #### Scenario: Average metrics pass but a required product table is omitted
 - **WHEN** aggregate benchmark metrics pass but a required product revenue/cost/margin table is silently absent
 - **THEN** acceptance is `hold`
 - **AND** the omitted task and remediation requirement are reported explicitly
+
+#### Scenario: Independent reviewer has not seen Gold expectations
+- **WHEN** the external reviewer begins the independent blind-annotation pass
+- **THEN** the reviewer receives the original PDFs, frozen checklist, field definitions, and a neutral output format without Gold labels or dossier conclusions
+- **AND** Gold is revealed only after the blind submission for item-by-item adjudication
 
 ### Requirement: Stage-three completion does not authorize production
 Completion of this change MUST produce research documents and reviewed evidence only. It MUST NOT modify production code, schema, databases, schedulers, Telegram, DCF, production prompts, or freeze switches; MUST NOT execute the legacy business-profile production chain; and MUST leave production authorization as `not_authorized`.

@@ -23,9 +23,9 @@
 
 ## 3. Gold 构成
 
-- 真实报告 annotations：22 条；
+- 真实报告 annotations：24 条；
 - 覆盖对象：BusinessOverview、Segment、Activity、Measurement、Relationship、BusinessEvent；
-- 覆盖业务：产品收支利、产能、销量、库存、加工量、匿名关系、集中度、合并抵消、合法空值、重大重组；
+- 覆盖业务：产品收支利、产能、销量、库存、加工量、明确原料、匿名关系、集中度、合并抵消、合法空值、重大重组及同一控制重述比较数；
 - contract negative cases：13 条；
 - review status：全部 `pending`，等待独立审核。
 
@@ -93,7 +93,7 @@
 3. 合并主体必须有明文口径或与合并利润表完成金额核对，仅有“公司”时为 `unclear`；
 4. 同一控制重述与 predecessor 原披露按四时钟和 comparison basis 并列，不相互覆盖。
 
-上述口径已经用户确认并进入 Gold。剩余出口是由未参与初标的外部 AI 从原 PDF 独立检查样本偏差、字段遗漏、主体/单位/证据错标；该盲审未完成时行业状态维持 `in_review/hold`。
+上述口径已经用户确认并进入 Gold。盲审采用两步法：第一步只提供四份 PDF、冻结 checklist、字段定义和输出格式，不提供 Gold 预期标签或 dossier 结论；第二步才揭示 Gold，逐条对账并登记 `accepted/rejected/deferred`。该流程未完成时行业状态维持 `in_review/hold`。
 
 ## 9. 阶段 3 验收状态
 
@@ -103,4 +103,4 @@
 - user semantic acceptance：`accepted_2026-09-03`；
 - model implementation benchmark：`not_run_by_design`；
 - final research decision：`hold`；
-- next step：完成外部独立盲审并逐项记录 accepted/rejected/deferred；无 blocker 后才能将研究状态改为 `approved` 并另开阶段 4 change。
+- next step：按“盲标—揭示 Gold 对账”完成外部独立审核并逐项记录 accepted/rejected/deferred；无 blocker 后才能将研究状态改为 `approved` 并另开阶段 4 change。

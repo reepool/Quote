@@ -91,6 +91,10 @@ v1 不新增 Adjustment 对象。“合并抵消项”保留 source-native 行�
 
 重组研究分开保存 `reported_period`、`knowledge_time`、`regime_effective_at`、`comparison_basis`。重组后报告的上年列使用 `same_control_restated` 或报告原标签；predecessor 当年报告使用 `original_as_published`。两者可并列，后来重述不得覆盖、删除或改写当时可知事实。中航成飞以 2025-01-06 股权过户并表日作为 regime 生效证据，更名日只用于展示。
 
+### Decision 14: 独立审核先盲标再揭示 Gold
+
+8.1 第一阶段只向未参与初标的审核方提供四份原 PDF、冻结 checklist、字段定义和中性输出格式，不提供 Gold 预期标签、dossier、ledger 或既有结论。审核方提交独立标注后，第二阶段才揭示 Gold 并逐项对账、记录 `accepted/rejected/deferred`。直接读取 Gold 后进行的检查可以作为独立复核，但不能单独称为盲审或关闭 8.1。
+
 ## Risks / Trade-offs
 
 - [Risk] 稳定主业样本会低估 regime 复杂度。→ 已以中航成飞正式年报和 2025 年 1 月 6 日生效证据补充重组边界；predecessor 历史并列规则仍提交独立审核。

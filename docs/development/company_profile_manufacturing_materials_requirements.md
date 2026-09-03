@@ -260,7 +260,7 @@ LLM 只抄 source-native；canonical conversion owner 是程序。不得按数�
 
 ## 14. Benchmark 与验收
 
-Gold 和 Benchmark 必须覆盖四份报告、不同交易所、不同量纲、匿名披露、合法未披露、复杂抵消项和中航成飞 regime transition。以下任一非零即 hold：
+Gold 和 Benchmark 必须覆盖四份报告、不同交易所、不同量纲、明确原料输入、匿名披露、合法未披露、复杂抵消项、中航成飞 regime transition 和至少一条 `same_control_restated` 正例。以下任一非零即 hold：
 
 - required 章节或表静默遗漏；
 - revenue/cost/margin、capacity/production、sales volume/revenue、inventory volume/inventory value 混淆；
@@ -270,6 +270,8 @@ Gold 和 Benchmark 必须覆盖四份报告、不同交易所、不同量纲、�
 - 当前包追溯覆盖旧 regime；
 - 研究文字或 LLM 引入新事实；
 - 清单外完整产业链、商品价格或 DCF 推断。
+
+独立审核采用两步法。第一步只向未参与初标的审核方提供原 PDF、冻结 checklist、字段定义和中性输出格式，不提供 Gold 预期标签、dossier 结论或既有争议判断；第二步才揭示 Gold，逐条对账并记录 `accepted`、`rejected`、`deferred` 及证据。第一步看到 Gold 后完成的复核只能算非盲独立复核，不能单独关闭 8.1。
 
 ## 15. DCF、商品暴露和研究视图边界
 

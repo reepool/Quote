@@ -21,6 +21,13 @@
 - LLM 合同：`company_profile_manufacturing_materials_llm_contract.md`；
 - Gold 与验收：`company_profile_manufacturing_materials_gold_annotations.v1.json`、`company_profile_manufacturing_materials_benchmark_acceptance.md`。
 
+### 2.1 独立盲审交付顺序
+
+1. 盲标阶段只提供四份原 PDF、冻结 field checklist、字段定义和中性 JSON 输出格式；不提供 Gold 预期标签、逐报告 dossier、field ledger 或已有口径结论；
+2. 盲标结果提交后再揭示 Gold 和其余研究材料，逐条比较样本偏差、字段遗漏、语义、主体、期间、单位和页锚；
+3. 每条差异登记 `accepted/rejected/deferred`、原 PDF 证据和解除条件；存在 blocker 时保持 `held`；
+4. 第一阶段已经读取 Gold 的审核只能登记为独立复核，不能单独关闭 OpenSpec 8.1。
+
 ## 3. 用户已裁决、仍需独立盲审的口径
 
 1. “涂覆加工量（销量）”只映射 `processing_volume`，保留 source-native 双重叫法；另一表格锚点可独立为 `sales_volume`；
@@ -52,4 +59,15 @@
 - corrections：Gold checklist 与行业 checklist 对齐；修正加工量 field identity；锦华新材在建产能改用 PDF 49–50 连续表格锚点；补 Activity 正例；固定一基 PDF 物理页坐标；未冻结 source verbs 不进入 v1 action enum。
 - scope clarification：该事件包含事实抽检和用户语义裁决，`counts_as_independent_blind_review=false`，不得用于关闭 OpenSpec 8.1。
 - remaining：由未参与初标的外部 AI 在不预载行业结论的情况下，从原 PDF 独立检查样本偏差、字段遗漏和标注错误。
+- authorization：`not_authorized`；行业状态继续为 `in_review/hold`，不得启动阶段 4。
+
+### 2026-09-03 — 盲审前 Gold 基线修正
+
+- actor：Codex / primary annotator
+- review class：`pre_blind_review_baseline_correction`
+- status：`accepted`
+- corrections：璞泰来库存、前五名空名及客户/供应商集中度因缺少明文合并口径或金额核对，`subject_scope` 从 `consolidated_group` 降为 `unclear`；新增中航成飞 PDF 第 14 页 2024 年营业收入合计正例，并以 PDF 第 8 页“同一控制下企业合并”作为 `same_control_restated` 比较口径证据；新增锦华新材 PDF 第 51 页“丁酮”原料输入正例。
+- gold result：18 项 checklist、24 条真实标注、13 条阻塞负例；全部标注仍为 `pending`。
+- protocol：8.1 使用本文件 2.1 的“盲标—揭示 Gold 对账”流程。
+- scope clarification：`counts_as_independent_blind_review=false`，本事件不关闭 8.1 或 8.3。
 - authorization：`not_authorized`；行业状态继续为 `in_review/hold`，不得启动阶段 4。
