@@ -506,7 +506,7 @@ LLM 不得：
 | 行业包 | 文档 | 状态 | 代表样本 |
 |---|---|---|---|
 | 通用基础 | 本文件 | `requirements_baseline` | 跨行业待形成 benchmark |
-| 制造/材料 | `company_profile_manufacturing_materials_requirements.md`；研究索引 `company_profile_manufacturing_materials_research_index.md` | `in_review` | 宁德时代、璞泰来、锦华新材；中航成飞用于 regime 边界 |
+| 制造/材料 | `company_profile_manufacturing_materials_requirements.md`；研究索引 `company_profile_manufacturing_materials_research_index.md` | `in_review` | 宁德时代、璞泰来、锦华新材；中航成飞用于 regime 边界；独立盲审已完成，待用户接受对账裁决后执行最终登记 |
 | 资源/矿业 | 待创建 | `not_researched` | 待定 |
 | 能源/公用事业 | 待创建 | `not_researched` | 待定 |
 | 消费/零售/餐饮 | 待创建 | `not_researched` | 待定 |

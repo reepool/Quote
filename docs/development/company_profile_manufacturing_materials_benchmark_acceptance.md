@@ -2,13 +2,13 @@
 
 > artifact type：`company_profile_industry_benchmark_acceptance`
 > version：`manufacturing_materials_benchmark.v1`
-> 状态：`hold_pending_independent_review_and_implementation_evaluation`
+> 状态：`hold_pending_user_final_acceptance_and_implementation_evaluation`
 > 日期：2026-09-03
 > production authorization：`not_authorized`
 
 ## 1. 当前结论
 
-研究样本、四份 dossier、字段账本、行业 requirements、LLM 合同和 Gold 初标已经齐备，用户已于 2026-09-03 接受四项口径裁决，足以进入独立盲审。阶段 3 没有实现或运行生产抽取器，因此本报告只冻结验收方法和 Gold 基线，不声称模型指标已经通过。当前结论为 `hold`，解除条件是：外部独立盲审完成且无未解决 blocker，后续实现版本在本 Gold 上通过阻塞项和分项阈值。
+研究样本、四份 dossier、字段账本、行业 requirements、LLM 合同和 Gold 初标已经齐备。独立盲审已于 2026-09-03 完成：覆盖 72 个报告字段检查位、提交 74 条事实标注，四份报告均无 blocking finding；盲审发现的 7 个合同边界已逐项对账。阶段 3 没有实现或运行生产抽取器，因此本报告只冻结验收方法和 Gold 基线，不声称模型指标已经通过。当前结论为 `hold`，解除条件是：用户接受盲审新增裁决并完成 8.3 最终登记；后续实现版本仍须在本 Gold 上通过阻塞项和分项阈值。
 
 ## 2. 样本覆盖
 
@@ -26,8 +26,8 @@
 - 真实报告 annotations：24 条；
 - 覆盖对象：BusinessOverview、Segment、Activity、Measurement、Relationship、BusinessEvent；
 - 覆盖业务：产品收支利、产能、销量、库存、加工量、明确原料、匿名关系、集中度、合并抵消、合法空值、重大重组及同一控制重述比较数；
-- contract negative cases：13 条；
-- review status：全部 `pending`，等待独立审核。
+- contract negative cases：19 条；
+- review status：独立盲审与 Gold 对账完成，等待用户最终 acceptance；24 条原始 Gold 标注不因盲审自动变为生产 approved。
 
 ## 4. 实现版本分项阈值
 
@@ -75,6 +75,12 @@
 | later same-control restatement overwrites predecessor fact | 0 | comparison basis 与 knowledge time 并列 |
 | printed page label replaces PDF physical page | 0 | page-coordinate negative case 通过 |
 | one processing fact is emitted as two metrics | 0 | processing-volume negative case 通过 |
+| buyer-side/internal/recycling volume is mislabeled as processing service output | 0 | processing-direction negative case 通过 |
+| observed capacity omits capacity kind | 0 | capacity-kind negative case 通过 |
+| restated comparative omits comparison basis | 0 | same-control required-basis negative case 通过 |
+| related-party evidence fabricates top-five name coverage | 0 | counterparty coverage negative case 通过 |
+| confidentiality/exemption is inferred without source text | 0 | disclosure-reason negative case 通过 |
+| third-party sales action is assigned to issuer | 0 | activity-actor negative case 通过 |
 | LLM/research prose introduced new fact | 0 | summary negative case 通过 |
 
 ## 7. Legal empty 与失败诚实性
@@ -93,14 +99,15 @@
 3. 合并主体必须有明文口径或与合并利润表完成金额核对，仅有“公司”时为 `unclear`；
 4. 同一控制重述与 predecessor 原披露按四时钟和 comparison basis 并列，不相互覆盖。
 
-上述口径已经用户确认并进入 Gold。盲审采用两步法：第一步只提供四份 PDF、冻结 checklist、字段定义和输出格式，不提供 Gold 预期标签或 dossier 结论；第二步才揭示 Gold，逐条对账并登记 `accepted/rejected/deferred`。该流程未完成时行业状态维持 `in_review/hold`。
+上述四项口径已经用户确认并进入 Gold。独立盲审已按两步法完成，详细裁决见 `company_profile_manufacturing_materials_blind_review_adjudication_20260903.md`。新增接受项包括：加工服务方向、产能 kind、重述 basis、仅合计披露的关系/coverage 分离、未披露原因护栏、库存脚注可选性和 Activity actor。用户接受这些新增裁决前，行业状态维持 `in_review/hold`。
 
 ## 9. 阶段 3 验收状态
 
 - sample sufficiency：`pass`；
-- artifact completeness：`pass_for_independent_review`；
-- independent annotation review：`pending`；
+- artifact completeness：`pass_independent_review_complete`；
+- independent annotation review：`complete_2026-09-03`；
 - user semantic acceptance：`accepted_2026-09-03`；
+- user blind-review adjudication acceptance：`pending`；
 - model implementation benchmark：`not_run_by_design`；
 - final research decision：`hold`；
-- next step：按“盲标—揭示 Gold 对账”完成外部独立审核并逐项记录 accepted/rejected/deferred；无 blocker 后才能将研究状态改为 `approved` 并另开阶段 4 change。
+- next step：用户确认盲审新增裁决后执行 OpenSpec 8.3，将研究状态登记为 `approved`；之后才可另开阶段 4 change。

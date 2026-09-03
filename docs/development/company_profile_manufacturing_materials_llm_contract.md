@@ -2,7 +2,7 @@
 
 > 文档类型：industry LLM contract
 > schema/version：`company_profile_manufacturing_materials_llm_contract.v1`
-> 状态：`in_review`
+> 状态：`independent_review_complete_pending_user_acceptance`
 > 日期：2026-09-03
 > production authorization：`not_authorized`
 > 行业需求：`company_profile_manufacturing_materials_requirements.md`
@@ -115,12 +115,16 @@ v1 `allowed_actions` 只能来自 `develops/produces/processes/sells/purchases/p
       "semantic": {
         "metric_type": null,
         "logical_slot": null,
+        "capacity_kind": null,
         "action": null,
         "relation_type": null,
+        "identity_class": null,
         "subject_scope": "consolidated_group|issuer|named_subsidiary|business_segment|unclear",
         "subject_name": null,
+        "subject_basis": null,
         "period_semantics": "duration|instant|event|unclear",
         "period": null,
+        "comparison_basis": null,
         "segment_dimension": null,
         "segment_label": null,
         "assertion_class": "reported_fact"
@@ -154,6 +158,8 @@ v1 `allowed_actions` 只能来自 `develops/produces/processes/sells/purchases/p
 
 模型不得返回 canonical value/unit、approved 状态、数据库 ID、package 最终决定、产业链角色、商品方向、价格预测或 DCF 含义。
 
+`production_capacity` observed candidate 必须填写 `capacity_kind=report_period_capacity|effective_capacity|design_capacity|source_native_other|unclear`。比较列被报告明确重述时必须填写 `comparison_basis`。Relationship 的 `identity_class` 可使用 `report_local_anonymous` 或 `report_local_aggregate`，但不能据此改变另一张表的名称 coverage。
+
 `evidence.page` 统一使用从 1 开始的 PDF 文件物理页序；正文印刷页码只能放在 `printed_page_label`。模型不得把两者互换。
 
 ## 5. `extract_business_overview`
@@ -169,6 +175,7 @@ v1 `allowed_actions` 只能来自 `develops/produces/processes/sells/purchases/p
 
 - 一个 BusinessOverview source candidate，保持原始段落范围和证据页；
 - 对每个明示动作分别输出 Activity candidate；
+- 每个 Activity 的 actor 必须由原文直接语法主体或明确经济关系支持；第三方军贸公司向最终用户销售不能改写为上市公司直接向最终用户 `sells`；
 - 产品、材料、装备、加工服务分别命名，不用一个“主营业务”对象兜底；
 - 经营数字不进入 overview；如果源段落出现数字，只作为原文的一部分，不另建 Measurement，除非该 task checklist 明确允许。
 
@@ -208,14 +215,15 @@ v1 `allowed_actions` 只能来自 `develops/produces/processes/sells/purchases/p
 ### 7.1 输入要求
 
 - 产能、产销、库存和加工量的完整表或连续叙述；
-- object、capacity kind、source unit、期间、比较符和 footnote；
+- object、`capacity_kind`、source unit、期间、比较符和来源存在的 footnote；
 - active metrics 由报告触发，不要求每家公司都有全套。
 
 ### 7.2 输出要求
 
 - 分开 `production_capacity`、`capacity_under_construction`、`capacity_utilization`、`production_volume`、`sales_volume`、`inventory_volume`、`processing_volume`；
+- observed `production_capacity` 必须使用受控 `capacity_kind`，不同 kind 不得由模型直接比较或合并；
 - `>3 万吨` 保留 qualifier；`kt/a` 不改写为吨/年；
-- 库存脚注随 candidate 返回；
+- 库存脚注在来源存在时随 candidate 返回；来源没有脚注但对象、值、单位、表头和时点明确时仍可 observed，并返回空 `footnote_refs`，不得补写库存范围；
 - 如果报告明确“产品众多无法分类统计”，输出 `not_applicable` 或 `not_disclosed` coverage 及理由，不发明数量；
 - 不用 utilization 倒算 production，不用订单额替代 sales volume。
 
@@ -224,6 +232,7 @@ v1 `allowed_actions` 只能来自 `develops/produces/processes/sells/purchases/p
 - 宁德时代 661 GWh 是销量，不是销售收入；186 GWh 是库存量，不是存货金额；
 - 璞泰来第 14 页“涂覆加工量（销量）109.42 亿㎡”只返回一条 `processing_volume`，`source_native.name` 原样保留，不从同一锚点再生成 `sales_volume`；
 - 璞泰来第 19 页“涂覆隔膜/销售量/1,094,249.25 万㎡”是另一 physical anchor，可按表头独立返回 `sales_volume`；模型不得因换算后可能等价而自动合并；
+- `processing_volume` 只用于公司或业务分部对外提供加工服务形成的实物处理量；委外采购、内部生产工序和自营回收均不得借用该字段，回收量保留为未冻结候选；
 - 锦华新材 40kt/a 是在建 capacity-rate，不是报告期产量；
 - 中航成飞“无法分类统计”是合法 coverage，不是模型缺能力。
 
@@ -262,6 +271,7 @@ v1 `allowed_actions` 只能来自 `develops/produces/processes/sells/purchases/p
 - amount/share 分别为 Measurements；合计 concentration 不生成 Relationship；
 - 重大合同与排名行仅在原文明示同一性时合并，金额相同不足以证明；
 - 完整章节不列名称时，name coverage 为 `not_disclosed`，不是 `extraction_failed`。
+- 关联交易表中的具名关系或“集团所属单位”等报告内聚合身份可形成独立 Relationship candidate；聚合身份使用 `identity_class=report_local_aggregate`，但不得把前五名 name coverage 从 `not_disclosed` 改为 observed。
 
 ## 10. `extract_business_regime`
 
@@ -278,6 +288,7 @@ v1 `allowed_actions` 只能来自 `develops/produces/processes/sells/purchases/p
 - 旧 regime 证据不足时返回 `unclear`，不从当前名称倒推；
 - 同一控制比较数标记 comparison-basis clue；
 - 重组后年报的重述比较数标记 `comparison_basis=same_control_restated` 或报告原标签，predecessor 原年报标记 `original_as_published`；两者保留各自 knowledge time，模型不得输出 supersession/overwrite 建议；
+- 比较列明确重述但 candidate 缺失 `comparison_basis` 时，task 不得完成，必须返回 blocker；
 - 模型不得最终启用 package，也不得覆盖旧期间。
 
 ### 10.3 样本约束
@@ -300,6 +311,10 @@ repair 请求必须包含原 extract request、原 candidate、程序错误码�
 | `cross_page_incomplete` | 使用已补齐的续表页修复 | 在仍缺页时声明完成 |
 | `anonymous_identity_misclassified` | 改为 report-local anonymous identity | 发明法定名称 |
 | `regime_boundary_unclear` | 重排已提供事件证据并保留 unclear | 决定 package final |
+| `capacity_kind_ambiguous` | 从已提供表头/叙述恢复受控 kind，或保留 `unclear` | 仅凭数值或行业习惯选择 kind |
+| `comparison_basis_missing` | 从已提供重述说明恢复 reported basis | 猜测未提供的重述口径 |
+| `activity_actor_ambiguous` | 绑定原文直接 actor，或返回 `unclear` | 把第三方动作转给上市公司 |
+| `disclosure_reason_unsupported` | 降为 `source_reason_unspecified` | 无原文明示保留保密/豁免标签 |
 | `unsupported_inference` | 删除或 block 越界 candidate | 换一种措辞保留推断 |
 | `coverage_mismatch` | 修正 coverage 与证据原因 | 用 not_disclosed 掩盖 extraction failure |
 
@@ -318,8 +333,13 @@ verify 输入包含原始 evidence bundle、冻结 checklist 和待核 candidate
     "source_value_exact": "pass|block|n-a",
     "source_unit_exact": "pass|block|n-a",
     "logical_slot_correct": "pass|block|n-a",
+    "capacity_kind_supported": "pass|block|unclear|n-a",
     "subject_supported": "pass|block|unclear",
+    "activity_actor_supported": "pass|block|unclear|n-a",
     "period_supported": "pass|block|unclear",
+    "comparison_basis_supported": "pass|block|unclear|n-a",
+    "coverage_reason_supported": "pass|block|unclear|n-a",
+    "source_footnote_exact": "pass|block|n-a",
     "physical_anchor_complete": "pass|block",
     "prohibited_inference_absent": "pass|block"
   },
@@ -356,6 +376,7 @@ official report / correction selection
 - 表头/脚注/续表缺失：`extraction_failed:table_context_incomplete`；
 - 证据有多个合法解释：`unclear:semantic_ambiguity`；
 - 完整检查后确实未披露：`not_disclosed`；
+- `not_disclosed` 的 reason code 只允许 `explicit_confidentiality`、`explicit_disclosure_exemption`、`source_reason_unspecified`；前两者必须由输入原文明示，不得根据军工或披露惯例猜测；
 - 业务形态明确不适用：`not_applicable`；
 - LLM 输出非 JSON、越界枚举、改写 source value/unit：typed contract failure，可 repair 一次，仍失败则进入 machine/human rework。
 
@@ -369,6 +390,11 @@ official report / correction selection
 - 销量/销售额、库存量/存货金额、产能/产量混淆；
 - 匿名身份被判实体解析失败；
 - 合并抵消项被当成产品；
+- observed capacity 缺失 `capacity_kind`；
+- 重述比较列缺失 `comparison_basis`；
+- 委外采购、内部工序或自营回收被写成 `processing_volume`；
+- 第三方销售动作被改写为上市公司对最终用户的销售；
+- 无原文依据推断保密或披露豁免；
 - 重组后主业覆盖旧报告期；
 - `not_disclosed` 用于掩盖未读页或抽取失败；
 - 研究摘要或 verify 新增证据中不存在的事实。

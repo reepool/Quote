@@ -95,6 +95,22 @@ v1 不新增 Adjustment 对象。“合并抵消项”保留 source-native 行�
 
 8.1 第一阶段只向未参与初标的审核方提供四份原 PDF、冻结 checklist、字段定义和中性输出格式，不提供 Gold 预期标签、dossier、ledger 或既有结论。审核方提交独立标注后，第二阶段才揭示 Gold 并逐项对账、记录 `accepted/rejected/deferred`。直接读取 Gold 后进行的检查可以作为独立复核，但不能单独称为盲审或关闭 8.1。
 
+### Decision 15: 加工量只表示对外服务输出
+
+v1 `processing_volume` 只表示公司或业务分部对外提供加工服务形成的实物处理量。委外采购只形成采购/关系或费用事实，内部工序不形成该指标，自营回收量作为未来 `recycling_volume` subtype 候选。该收窄解决了盲审中四种“加工”方向不可比的问题，不扩展 v1 字段集。
+
+### Decision 16: 产能口径和重述基准是条件必填语义
+
+observed `production_capacity` 必须携带 `capacity_kind`，至少区分报告期产能、有效产能、设计产能、来源其他口径和不清；不同 kind 不直接比较。比较列被明确追溯调整或重述时，`comparison_basis` 必填并与 reported period、knowledge time、regime effective time 分开。
+
+### Decision 17: 名称 coverage、未披露原因和来源脚注不相互替代
+
+仅披露前五名合计时，name coverage 保持 `not_disclosed`；关联交易或报告内聚合身份只能形成独立 Relationship。保密或披露豁免 reason code 仅在原文明示时使用，否则为来源未说明。库存脚注只在来源存在时强制保留，无脚注但值、单位、对象和时点明确时仍可 observed。
+
+### Decision 18: Activity actor 不跨第三方传播
+
+Activity actor 必须由原文直接语法主体或明确经济关系支持。第三方军贸公司向最终用户销售不得改写为上市公司直接销售；该规则不新增 action enum，只约束既有动作的主体绑定。
+
 ## Risks / Trade-offs
 
 - [Risk] 稳定主业样本会低估 regime 复杂度。→ 已以中航成飞正式年报和 2025 年 1 月 6 日生效证据补充重组边界；predecessor 历史并列规则仍提交独立审核。
@@ -110,13 +126,13 @@ v1 不新增 Adjustment 对象。“合并抵消项”保留 source-native 行�
 2. 为三份初始年报建立逐报告 dossier 和初标，并以中航成飞正式年报补充转型/重组 regime 样本。
 3. 建立跨样本 field decision ledger，区分 common、subtype-specific、conditional、optional、unresolved。
 4. 编写制造/材料 requirements、chapter map、LLM contract、gold annotations 和 benchmark acceptance。
-5. 外部独立审核与用户验收；存在 blocking gap 或 blocker 时保持 `held`。
+5. 外部独立盲标、揭示 Gold 后对账与用户验收；存在 blocking gap、未解决 blocker 或未接受的实质裁决时保持 `held/in_review`。
 6. 通过后把总需求登记状态更新为 `approved`，并允许阶段 4 另开 change；不修改生产状态。
 
 回滚仅删除阶段 3 研究文档/OpenSpec 产物并把登记状态恢复为 `not_researched`；正式 PDF 和公告资产不受影响。
 
 ## Open Questions
 
-- 外部独立盲审是否发现四份样本之外的字段遗漏、样本偏差或 Gold 错标。
+- 用户是否接受独立盲审新增的加工方向、产能口径、coverage、重述、脚注和 actor 裁决。
 - 后续 common model 是否需要独立 Adjustment 对象；阶段 3 已决定 v1 不新增。
 - 未参与合同制定的制造/材料 holdout 年报能否满足相同 chapter task、coverage 和 source-native 合同。

@@ -3,7 +3,7 @@
 > 文档类型：append-only review log
 > 版本：`manufacturing_materials_review.v1`
 > 日期：2026-09-03
-> 当前状态：`pending_independent_review`
+> 当前状态：`independent_review_complete_pending_user_acceptance`
 > production authorization：`not_authorized`
 
 ## 1. 使用规则
@@ -73,3 +73,28 @@
 - protocol：8.1 使用本文件 2.1 的“盲标—揭示 Gold 对账”流程。
 - scope clarification：`counts_as_independent_blind_review=false`，本事件不关闭 8.1 或 8.3。
 - authorization：`not_authorized`；行业状态继续为 `in_review/hold`，不得启动阶段 4。
+
+### 2026-09-03 — 独立盲标提交完成
+
+- actor：`zcode-independent-blind-reviewer (GLM-5.3)`；
+- review class：`independent_blind_annotation`；
+- artifact：`company_profile_manufacturing_materials_blind_review_submission.zcode.20260903.json`（commit `ccbb4e5`）；
+- independence：`gold_seen_before_submission=false`；审核方只读取盲审交接单、中性模板和四份原 PDF。开始前仅对另一份未跟踪提交做顶层结构、reviewer 和条数探测，未读取标注内容、引文或结论，且已在 artifact 中披露；
+- completeness：4 份报告 × 18 个 checklist 字段全部覆盖，共 72 个检查位、74 条事实标注、68 条 bounded quotes；
+- report blockers：四份报告的 `blocking_findings=[]`；
+- findings：7 条 contract findings、7 条 cross-report findings；
+- status：`accepted_as_independent_blind_submission`；
+- authorization：`not_authorized`；盲标提交本身不等于 Gold 覆盖或行业包 approved。
+
+### 2026-09-03 — 揭示 Gold 后逐项对账
+
+- actor：Codex / research owner；
+- review class：`blind_review_adjudication`；
+- detail：`company_profile_manufacturing_materials_blind_review_adjudication_20260903.md`；
+- accepted：`processing_volume` 方向收窄、`production_capacity.capacity_kind`、重述比较列强制 `comparison_basis`、库存脚注来源存在时保留、Activity actor 直接证据规则；
+- accepted with clarification：仅合计披露时前五名 name coverage 仍为 `not_disclosed`，关联交易或报告内聚合身份只能形成独立 Relationship；未披露原因可细分，但保密/豁免必须有原文明示；
+- rejected as Gold override：盲标中仅凭“公司”或惯例使用 `consolidated_group`、把中航成飞“无法分类统计”从 `not_applicable` 改成普通 `not_disclosed`、把璞泰来第 14 页加工量重新标成 sales volume、以关联交易关系填补前五名名单 coverage；
+- deferred：`recycling_volume`、`order_backlog`、定性自给率和“仅产量无产能” holdout；
+- rejected as new top-level fields：`related_party_counterparty`、境外收入、副产品客户；现有 Relationship/Segment 语义足够；
+- status：`independent_review_complete_pending_user_acceptance`；OpenSpec 8.1 可关闭，8.3 保持未完成；
+- authorization：`not_authorized`；用户接受本次新增裁决前不得登记 approved 或启动阶段 4。

@@ -1,9 +1,9 @@
 # 制造/材料公司画像字段决策账本
 
 > artifact type：`company_profile_industry_field_decision_ledger`
-> 状态：`revised_after_user_semantic_ruling`
+> 状态：`independent_review_complete_pending_user_acceptance`
 > 日期：2026-09-03
-> 样本版本：`manufacturing_materials.2026-09-03.2`
+> 样本版本：`manufacturing_materials.2026-09-03.3`
 > production authorization：`not_authorized`
 
 ## 1. 决策原则
@@ -35,7 +35,7 @@
 | `production_volume` | GWh | 吨/万㎡ | not disclosed | explicitly unclassifiable | `conditional` | 至少两家公司支持；按披露任务触发 |
 | `sales_volume` | GWh | 吨/万㎡/加工量 | not disclosed | explicitly unclassifiable | `conditional` | 绝不等于销售额；加工量需 subtype 语义 |
 | `inventory_volume` | GWh | 吨/万㎡ | not disclosed | unclassifiable | `conditional` | 不等于资产负债表存货金额 |
-| `processing_volume` | recycling/processing narrative | coating/CAAS | outsourced processing | repair/service | `subtype_specific` | 独立于 sales_volume；来源括注可保留，但同一锚点不得双写 metric |
+| `processing_volume` | recycling remains deferred | external coating/CAAS service | buyer-side outsourcing does not trigger | internal processing does not trigger | `subtype_specific` | 仅表示公司对外提供加工服务的实物处理量；独立于 sales_volume；来源括注可保留，但同一锚点不得双写 metric |
 | `materials_and_procurement` task | observed | observed | observed | partial | `common_required_inspection` | 可以合法未披露具体原料，但不能静默空 |
 | explicit material input | named categories | segment-specific categories | named chemicals/energy | sensitive/partial | `conditional` | 只有原文明示才建 material input candidate |
 | customer/supplier task | anonymous rows | concentration only | named + anonymous | concentration only | `common_required_inspection` | 四份均有章节，但名称披露义务不同 |
@@ -54,11 +54,13 @@
 | `extraction_failed` | 目标存在或应检查，但页面不可读、表格断裂、超预算丢页、解析器/LLM 未完成 | 不能改写为空数组成功 |
 | `unclear` | 证据存在但字段、主体、期间、单位、表头或同一性无法唯一判断 | 不能为了 completion 强制选一个候选 |
 
+`not_disclosed` 的原因只在原文明示时细分为 `explicit_confidentiality` 或 `explicit_disclosure_exemption`；否则使用 `source_reason_unspecified`。不得仅凭军工或披露惯例推断保密。
+
 ## 4. 产能、产量、销量、库存决策
 
 1. `operating_volume_capacity` 是制造/材料包的 required inspection task。
 2. `production_capacity`、`production_volume`、`sales_volume`、`inventory_volume` 是 conditional fields：报告披露对应表或叙述时必须抽取；完整检查后未披露可为 `not_disclosed`。
-3. 产能不是同一语义：可为在产设计产能、有效产能、生产线产能、在建产能、加工服务能力，必须由 `capacity_kind` 区分。
+3. 产能不是同一语义：observed `production_capacity` 必须使用 `capacity_kind=report_period_capacity|effective_capacity|design_capacity|source_native_other|unclear`；在建产能使用独立 metric，不同 kind 不直接比较。
 4. 产量、销量和库存仅在对象、单位、期间可对齐时比较；不得把销售额、订单额、出货排名、市场份额或存货金额替代经营量。
 5. 产能利用率是 reported Measurement；除非后续合同明确允许 deterministic derivation，否则不得据此倒算产量并标为 reported。
 
@@ -67,7 +69,7 @@
 第一版不拆成两个独立行业包，而采用一个制造/材料 primary package 加 subtype checklist：
 
 - `material_product_manufacturing`：质量、面积、能量等产品经营量；
-- `processing_service`：涂覆加工、极片代工、委外加工等处理量和服务关系；
+- `processing_service`：公司对外提供的涂覆加工、极片代工等处理量和服务关系；委外采购只进入采购/关系或费用事实；
 - `equipment_manufacturing`：装备产品、订单、交付和台套数量；没有台套披露时不拿订单金额冒充销量；
 - `complex_assembly_manufacturing`：航空等多产品、敏感制造；允许分类实物量 `not_applicable/not_disclosed`。
 
@@ -81,7 +83,7 @@
 - 多事业部/子公司报告允许 `business_segment` 或 `named_subsidiary`，无法唯一化为 `unclear`；
 - 收入、成本、产量、销量为 duration；库存量通常为 report-end instant，必须读取表头/脚注；
 - capacity 必须记录 `capacity_kind` 与适用时点/期间；在建产能不是当期可用产能；
-- regime 变化分开 `reported_period`、`knowledge_time`、`regime_effective_at`、`comparison_basis`；中航成飞成飞股权过户生效日为 2025-01-06；重组后 `same_control_restated` 比较数与 predecessor `original_as_published` 并列，当前包和后来重述均不得追溯覆盖此前知识状态。
+- regime 变化分开 `reported_period`、`knowledge_time`、`regime_effective_at`、`comparison_basis`；比较列被明确重述时 `comparison_basis` 为 required-when-restated；中航成飞成飞股权过户生效日为 2025-01-06；重组后 `same_control_restated` 比较数与 predecessor `original_as_published` 并列，当前包和后来重述均不得追溯覆盖此前知识状态。
 
 ## 7. 单位与 physical anchor 决策
 
@@ -100,6 +102,7 @@
 3. 匿名身份不要求 catalog resolution，不跨报告合并，也不因金额相同自动等同。
 4. 前五名合计金额/比例是 concentration Measurement；只有具体交易对手行才形成 Relationship candidate。
 5. 叙述中的合作客户名单不等同年度前五名，不继承前五名金额。
+6. 仅披露前五名合计时，name coverage 保持 `not_disclosed`；关联交易表或来源聚合身份可以形成独立 Relationship，聚合身份使用 `identity_class=report_local_aggregate`，不得反向改写前五名 coverage。
 
 ## 9. 用户已确认的口径裁决
 
@@ -108,4 +111,14 @@
 - 管理层讨论认定合并主体需要明文口径或与合并利润表金额核对；只有“公司”时为 `unclear`。
 - 同一控制合并按四个时钟和 comparison basis 并列，不覆盖 predecessor 原披露。
 
-上述裁决由用户于 2026-09-03 接受。行业包仍保持 `in_review`，因为尚需未参与初标的外部 AI 独立盲审。
+上述裁决由用户于 2026-09-03 接受。独立盲审随后完成；行业包当前等待用户接受第 10 节的盲审新增裁决。
+
+## 10. 独立盲审新增裁决
+
+- 盲审已于 2026-09-03 完成，覆盖 72 个报告字段检查位和 74 条事实标注；详细对账见 `company_profile_manufacturing_materials_blind_review_adjudication_20260903.md`。
+- `processing_volume` 收窄为公司对外提供加工服务的实物处理量；委外采购、内部工序和自营回收不触发。
+- observed `production_capacity` 强制 `capacity_kind`；不同 kind 不直接比较。
+- 重述比较列强制 `comparison_basis`；缺失为 blocker。
+- `not_disclosed` 的保密/豁免原因必须由原文明示；库存脚注仅在来源存在时强制保留。
+- Activity actor 不得跨第三方改写；军贸公司对最终用户的销售不能归到上市公司。
+- 当前状态为 `independent_review_complete_pending_user_acceptance`；用户确认前不登记 approved、不启动阶段 4。

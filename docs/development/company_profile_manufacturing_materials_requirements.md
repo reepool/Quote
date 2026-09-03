@@ -2,7 +2,7 @@
 
 > 文档类型：industry requirements
 > schema/version：`company_profile_manufacturing_materials_requirements.v1`
-> 状态：`in_review`
+> 状态：`independent_review_complete_pending_user_acceptance`
 > 日期：2026-09-03
 > production authorization：`not_authorized`
 > 上位需求：`company_profile_product_and_industry_semantic_requirements.md`
@@ -17,7 +17,7 @@
 第一版制造/材料包覆盖以实物产品、材料加工或复杂装备制造为主要经营活动的 A 股公司，允许以下 subtype 共存：
 
 - `material_product_manufacturing`：化工、新能源材料、功能材料等；
-- `processing_service`：涂覆、代工、委外加工、循环加工等；
+- `processing_service`：公司或业务分部对外提供的涂覆、代工等加工服务；委外采购、内部工序和自营回收不因此产生 `processing_volume`；
 - `equipment_manufacturing`：自动化装备及其他可辨认设备；
 - `complex_assembly_manufacturing`：电池系统、航空等复杂产品制造。
 
@@ -88,7 +88,7 @@
 |---|---|---|---|---|---|---|---|---|
 | `business_overview` | `extract_business_overview` | 主要业务、业务情况、业务概要、主营业务、主要产品、经营模式 | 通常为叙述 | 连续段落、脚注、主体说明 | BusinessOverview、Activity candidate、regime clue | 标题定位、连续段落保存 | 区分产品/服务/模式和主体 | 章节可读但未写业务为 `unclear`；不可读为 `extraction_failed` |
 | `segment_performance` | `extract_segment_financials` | 收入与成本、主营业务分析、收入构成、分产品/行业/地区 | 行标签 + revenue/cost/margin，单位常在表头 | 多层表头、单位、脚注、合并抵消、续表 | Segment + Measurements | 表格结构稳定时逐 cell 提取 | 复杂表头、跨页、抵消项语义 | 制造公司存在表却静默为空为 blocker |
-| `operating_volume_capacity` | `extract_operating_quantities` | 产销情况、产能情况、供应链及产能、实物销售 | capacity/production/sales/inventory/utilization | 对象、单位、期间、比较符、库存脚注 | Measurements | 标准表直接映射 | 叙述型、多对象、多单位和脚注 | 完整检查后可 `not_disclosed/not_applicable`；丢页为 failure |
+| `operating_volume_capacity` | `extract_operating_quantities` | 产销情况、产能情况、供应链及产能、实物销售 | capacity/production/sales/inventory/utilization | 对象、单位、期间、比较符；来源存在时保留库存脚注 | Measurements | 标准表直接映射 | 叙述型、多对象、多单位和脚注 | 完整检查后可 `not_disclosed/not_applicable`；丢页为 failure |
 | `materials_and_procurement` | `extract_material_inputs` | 采购模式、主要原材料及能源、成本构成、原材料风险 | 原料/能源/采购模式/成本构成 | 业务 segment、是否能源、价格方向是否公司披露 | Relationship candidate、material facts、Measurements | 行业专表和明确清单 | 叙述分类、segment 归属 | 未具名可 `not_disclosed`；不允许从行业常识补原料 |
 | `customers_and_suppliers` | `extract_counterparties_and_concentration` | 主要客户、主要供应商、重大合同、前五名 | identity/amount/share/related-party | 匿名标签、排名、保密说明、合计行 | Relationship candidate + concentration Measurements | 标准排名表 | 跨页、同一控制合并、合同与排名同一性 | 名称未披露可合法空；空数组不能代替 coverage |
 | `business_change_and_regime` | `extract_business_regime` | 业务重大变化、合并范围、重大资产重组、名称变更、收购资产 | 选择项、事件叙述、时间和资产 | 法律生效证据、旧/新业务、同一控制基础 | BusinessEvent、Regime candidate | 明确日期和选择项 | 多事件排序、旧新业务边界 | 证据矛盾为 `unclear`，不能以 current profile 覆盖历史 |
@@ -119,11 +119,15 @@ v1 只使用少量、可判定动作：
 
 该枚举是 v1 闭集。报告出现 `invests_in`、`integrates`、`outsources_processing`、`recycles`、`repairs` 等来源动词时，只能保留为 unresolved source candidate，或在证据直接蕴含现有动作时映射为上述枚举；不得由 dossier 临时扩展阶段 4 的 action contract。
 
+Activity 的 actor 必须由原文中的直接语法主体或明确经济关系支持。第三方军贸公司向最终用户销售，不得改写为上市公司直接向最终用户 `sells`；上市公司自身销售产品的活动仍可在原文明示时记录。
+
 ### 5.4 Measurement
 
 每个数字只表达一个 metric、一个 subject、一个 object/segment、一个期间和一个 source-native unit。表格一行多指标必须按 logical slot 分拆，不能共用单一 occurrence。
 
 同一物理事实只允许一个主 metric。来源名称可保留业务双重叫法，但不得据此双写指标：璞泰来“涂覆加工量（销量）109.42 亿㎡”只标 `processing_volume`，并原样保留 `source_native.name`；第 19 页产销表中的涂覆隔膜销售量属于另一 physical anchor，可独立标 `sales_volume`，不得仅因换算后数值接近就自动合并。
+
+v1 的 `processing_volume` 仅表示公司或业务分部**对外提供加工服务**形成的实物处理量。公司采购委外加工服务只能形成采购/关系或费用事实；内部生产工序不形成该指标；自营回收量保留为未来 `recycling_volume` subtype 候选，不借用本字段。
 
 第一版 `metric_type → logical_slot` 对照：
 
@@ -149,6 +153,8 @@ v1 只使用少量、可判定动作：
 
 只保存年报明示的客户、供应商、合同和采购/销售关系。匿名身份是 report-local disclosed identity，不要求实体目录解析，不跨报告合并。集中度本身不创建 Relationship。
 
+“仅披露前五名合计、未列名称”时，前五名 name coverage 为 `not_disclosed`。同一报告的关联交易表可独立产生具名 Relationship，“集团所属单位”等来源聚合身份可用 `identity_class=report_local_aggregate` 保存，但均不得反向把前五名名单标为 observed。
+
 ### 5.6 BusinessEvent
 
 至少包含 event type、证据、事件日期、生效日期、涉及主体/资产、旧 regime、新 regime、状态和不确定性。新产品发布可为 business extension；重大资产置入和主业改变才是 package regime 候选。
@@ -164,13 +170,13 @@ v1 只使用少量、可判定动作：
 | `operating_revenue` | Measurement | segment | active row has revenue | conditional | row/table subject | duration | currency source scale | observed/unclear/extraction_failed | amount or unit overwritten |
 | `operating_cost` | Measurement | segment | active row has cost | conditional | same | duration | currency source scale | observed/unclear/extraction_failed | cost confused with other field |
 | `gross_margin_reported` | Measurement | segment | active row has reported margin | conditional | same | duration | percent source token | observed/unclear/extraction_failed | 100x conversion or invented derived margin |
-| `production_capacity` | Measurement | volume | capacity disclosure exists | conditional | object/plant/segment | instant/duration per text | preserve rate token | observed/not_disclosed/not_applicable/extraction_failed/unclear | capacity kind lost |
+| `production_capacity` | Measurement | volume | capacity disclosure exists | conditional | object/plant/segment | instant/duration per text | preserve rate token and `capacity_kind` | observed/not_disclosed/not_applicable/extraction_failed/unclear | capacity kind lost |
 | `capacity_under_construction` | Measurement | volume | project capacity exists | conditional | project/segment | expected/event | preserve rate token | same | merged into current capacity |
 | `capacity_utilization` | Measurement | volume | reported | conditional | capacity subject | duration | percent | same | used to fabricate reported output |
 | `production_volume` | Measurement | volume | applicable table/text exists | conditional | product/segment | duration | source dimension | same | confused with capacity |
 | `sales_volume` | Measurement | volume | applicable table/text exists | conditional | product/segment | duration | source dimension | same | confused with revenue/order amount |
-| `inventory_volume` | Measurement | volume | applicable table/text exists | conditional | product/segment | instant | source dimension + footnote | same | confused with balance-sheet inventory value |
-| `processing_volume` | Measurement | volume | processing service explicitly disclosed | conditional (processing subtype) | service/segment | duration | area/mass/energy per report | same | forced into sales_volume |
+| `inventory_volume` | Measurement | volume | applicable table/text exists | conditional | product/segment | instant | source dimension; preserve footnote when present | same | confused with balance-sheet inventory value or invented footnote scope |
+| `processing_volume` | Measurement | volume | company explicitly provides external processing service and discloses physical volume | conditional (processing subtype) | service/segment | duration | area/mass/energy per report | same | buyer-side outsourcing, internal processing or recycling forced into processing volume; forced into sales_volume |
 | `material_input` | Relationship/fact | materials | explicit material/energy disclosure | conditional | business/segment | duration/current | preserve name/unit if any | same | common-knowledge completion |
 | `counterparty_relationship` | Relationship | counterparties | named or anonymous row/contract exists | conditional | group/issuer | duration/event | identity is source-native | same | anonymous catalog failure or cross-report merge |
 | `customer_concentration` | Measurement | counterparties | concentration disclosed | conditional | report subject | duration | currency/share | same | concentration creates fake relationship |
@@ -193,9 +199,11 @@ v1 只使用少量、可判定动作：
 
 - revenue、cost、margin、production、sales、processing：duration；
 - inventory volume：通常为报告期末 instant，按表头/脚注确认；
-- capacity：记录 `capacity_kind` 和适用时点；在建/预计产能有 event/expected 语义；
+- capacity：记录 `capacity_kind` 和适用时点；`production_capacity` 至少区分 `report_period_capacity`、`effective_capacity`、`design_capacity`、`source_native_other`、`unclear`，不同 kind 不直接比较；在建/预计产能使用独立 metric 并具有 event/expected 语义；
 - business event：event/effective date；
 - 知识可得日采用正式报告或更正稿发布日。
+
+比较列被报告明确追溯调整或重述时，`comparison_basis` 为 required-when-restated；缺失即 blocker。它必须与 `reported_period`、`knowledge_time`、`regime_effective_at` 分开保存。
 
 ### 8.2 Source-native 单位
 
@@ -244,6 +252,8 @@ LLM 只抄 source-native；canonical conversion owner 是程序。不得按数�
 - coverage：`observed`、`not_disclosed`、`not_applicable`、`extraction_failed`、`unclear`；
 - assertion：`reported_fact`、`deterministic_derivation`、`research_assumption`。
 
+`not_disclosed` 可附 reason code：`explicit_confidentiality`、`explicit_disclosure_exemption`、`source_reason_unspecified`。前两者只能由报告原文明示，不得根据军工、客户行业或披露惯例推断。没有库存脚注不等于未披露：只要表头、对象、值、单位和时点明确，库存量仍可 observed，`footnote_refs=[]`；来源有脚注时必须逐字保留。
+
 完成门按 active package × chapter task checklist 逐项出状态。空数组不是成功。required chapter/table 静默遗漏、事实/推导混淆、无证据主体/单位修正和清单外产业链推断均为 blocker。
 
 ## 12. 多包组合
@@ -265,6 +275,11 @@ Gold 和 Benchmark 必须覆盖四份报告、不同交易所、不同量纲、�
 - required 章节或表静默遗漏；
 - revenue/cost/margin、capacity/production、sales volume/revenue、inventory volume/inventory value 混淆；
 - source value/unit/header/footnote 被改写；
+- observed capacity 缺失 `capacity_kind`，或不同 capacity kind 被直接比较；
+- 重述比较列缺失 `comparison_basis`；
+- 仅凭行业惯例把 `not_disclosed` 标为保密/豁免；
+- 委外采购、内部工序或自营回收被写成对外 `processing_volume`；
+- 第三方军贸公司的销售被改写为上市公司对最终用户的销售；
 - 主体或期间被无证据强制；
 - 匿名身份被解析失败或跨报告合并；
 - 当前包追溯覆盖旧 regime；
@@ -279,20 +294,24 @@ Gold 和 Benchmark 必须覆盖四份报告、不同交易所、不同量纲、�
 
 研究视图使用模板组合 approved BusinessOverview 和结构化事实；LLM 若仅做措辞调整，不得新增数字、对象、角色、因果或判断。
 
-## 16. 已裁决口径与剩余审核
+## 16. 已裁决口径与独立盲审对账
 
-| issue | accepted disposition | remaining review |
+| issue | accepted disposition | review result |
 |---|---|---|
-| `processing_volume` 是否独立于 `sales_volume` | 独立 metric；来源括注“销量”只保留在 source-native，不双写 | 外部独立盲审检查样本偏差 |
-| 合并抵消项 object/measurement 表达 | v1 使用 `consolidation_adjustment` 行及独立 Measurements，不新增对象 | 外部独立盲审检查 Gold 完整性 |
-| 管理层讨论隐含合并口径的最小主体证据 | 明文合并口径，或与合并利润表完成并记录金额核对；否则 unclear | 外部独立盲审复核主体证据 |
-| 同一控制比较数与历史知识时点并列方式 | 四时钟分离；`same_control_restated` 与 `original_as_published` 并列 | 外部独立盲审复核历史边界 |
+| `processing_volume` 是否独立于 `sales_volume` | 独立 metric；来源括注“销量”只保留在 source-native，不双写 | 盲审确认双写风险；进一步收窄为对外加工服务实物量 |
+| 合并抵消项 object/measurement 表达 | v1 使用 `consolidation_adjustment` 行及独立 Measurements，不新增对象 | 盲审未发现 blocker |
+| 管理层讨论隐含合并口径的最小主体证据 | 明文合并口径，或与合并利润表完成并记录金额核对；否则 unclear | 盲标大量默认 group，揭示 Gold 后拒绝覆盖既有主体规则 |
+| 同一控制比较数与历史知识时点并列方式 | 四时钟分离；`same_control_restated` 与 `original_as_published` 并列 | 盲审确认应将 comparison basis 设为 required-when-restated |
+| 产能口径 | `production_capacity` 强制 `capacity_kind` | 接受盲审建议 |
+| 仅合计披露与独立关系 | name coverage 保持 `not_disclosed`，关联/聚合关系独立记录 | 部分接受并增加 `report_local_aggregate` |
+| 未披露原因、库存脚注、Activity actor | 原文明示 reason code；脚注存在时保留；actor 不跨第三方改写 | 接受并加入防推断护栏 |
 
 ## 17. 审核结论
 
-- artifact completeness：`ready_for_independent_review`；
+- artifact completeness：`independent_review_complete`；
 - sample sufficiency：`pass`；
-- research status：`in_review`；
+- research status：`independent_review_complete_pending_user_acceptance`；
 - production authorization：`not_authorized`；
 - 用户口径裁决：`accepted_on_2026-09-03`；
-- 下一步：由未参与初标的外部 AI 进行独立盲审，检查样本偏差、字段遗漏、主体/单位/证据错标；通过后才能登记 `approved`。未验收前不得进入阶段 4 实现。
+- 独立盲审：`complete_on_2026-09-03`，详细对账见 `company_profile_manufacturing_materials_blind_review_adjudication_20260903.md`；
+- 下一步：用户确认盲审新增裁决后执行 OpenSpec 8.3 并登记 `approved`。确认前不得进入阶段 4 实现。
