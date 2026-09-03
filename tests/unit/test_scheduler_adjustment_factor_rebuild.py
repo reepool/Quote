@@ -732,8 +732,11 @@ def test_cninfo_daily_report_reads_nested_incremental_results():
         },
     })
 
-    assert "A 股公司行动增量日更" in report
+    assert "✅ *A 股公司行动增量日更*" in report
+    assert "结论: ✅ *完成*" in report
     assert "判断:" in report
+    assert "巨潮被限流后已降速跑完" in report
+    assert "巨潮触发限流熔断" not in report
     assert "前序水位未就绪" in report
     assert "巨潮主源: 完成" in report
     assert "候选 12 只" in report
@@ -850,7 +853,8 @@ def test_cninfo_daily_report_explains_bse_only_success_without_false_alarms():
         },
     })
 
-    assert "结论: *完成*" in report
+    assert "✅ *A 股公司行动增量日更*" in report
+    assert "结论: ✅ *完成*" in report
     assert "北交所官方证据已入库" in report
     assert "未改沪深生产复权表" in report
     assert "巨潮主源: 未跑（北交所不走巨潮）" in report
@@ -967,7 +971,8 @@ def test_cninfo_daily_report_highlights_bse_parse_failure():
         "stage_durations": {"total_seconds": 319},
     })
 
-    assert "结论: *部分完成*" in report
+    assert "❗ *A 股公司行动增量日更*" in report
+    assert "结论: ❗ *部分完成*" in report
     assert "北交所 1 条实施公告解析失败" in report
     assert "生产复权表已定向更新" in report
     assert "历史不一致，不是本轮采集失败" in report
@@ -979,6 +984,38 @@ def test_cninfo_daily_report_highlights_bse_parse_failure():
     assert "仅通达信 11" in report
     assert "因子重试: 12 只留待下一日" in report
     assert "exact_matches=" not in report
+
+
+def test_cninfo_daily_report_marks_failure_and_keeps_unrecovered_throttle_as_issue():
+    report = _format_cninfo_primary_factor_report({
+        "status": "failed",
+        "operation": "a_share_cninfo_primary_daily_maintenance",
+        "parameters": {
+            "start_date": "2026-08-27",
+            "end_date": "2026-09-03",
+            "exchanges": ["SSE", "SZSE"],
+            "cninfo_exchanges": ["SSE", "SZSE"],
+        },
+        "candidate_discovery": {"status": "success", "candidate_count": 10},
+        "cninfo_refresh": {
+            "status": "failed",
+            "counters": {"requested_instruments": 10},
+            "adaptive_throttle": {
+                "http_403_count": 8,
+                "http_429_count": 0,
+                "circuit_trip_count": 2,
+                "circuit_wait_seconds": 180,
+            },
+            "errors": [{"instrument_id": "600000.SH", "error": "http_403"}],
+        },
+        "factor_rebuild": {"status": "skipped"},
+        "canonical_maintenance": {"status": "failed", "merge": None},
+    })
+
+    assert "❌ *A 股公司行动增量日更*" in report
+    assert "结论: ❌ *失败*" in report
+    assert "巨潮触发限流熔断" in report
+    assert "巨潮被限流后已降速跑完" not in report
 
 
 @pytest.mark.asyncio

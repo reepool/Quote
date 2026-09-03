@@ -1507,6 +1507,12 @@ _CNINFO_DAILY_STATUS_ZH = {
     "dry_run": "预演完成",
     "unavailable": "不可用",
 }
+_CNINFO_DAILY_STATUS_MARK = {
+    "success": "✅",
+    "partial": "❗",
+    "failed": "❌",
+    "error": "❌",
+}
 _EXCHANGE_ZH = {
     "SSE": "上交所",
     "SZSE": "深交所",
@@ -1525,6 +1531,11 @@ def _daily_status_zh(value: Any, default: str = "未知") -> str:
     if not key:
         return default
     return _CNINFO_DAILY_STATUS_ZH.get(key, str(value))
+
+
+def _daily_status_mark(value: Any) -> str:
+    key = str(value or "").strip().lower()
+    return _CNINFO_DAILY_STATUS_MARK.get(key, "ℹ️")
 
 
 def _daily_count(value: Any) -> int:
@@ -1610,14 +1621,23 @@ def _format_cninfo_primary_daily_report(result: Dict[str, Any]) -> str:
     elif bse_partial > 0 or str(bse.get("status") or "").lower() == "partial":
         issues.append(f"北交所 {max(bse_partial, 1)} 条实施公告解析失败")
     error_count = len(cninfo_refresh.get("errors") or [])
+    cninfo_failed = str(cninfo_refresh.get("status") or "").lower() in {
+        "failed",
+        "error",
+        "partial",
+    }
+    throttled = bool(
+        _daily_count(throttle.get("circuit_trip_count"))
+        or _daily_count(throttle.get("http_403_count"))
+        or _daily_count(throttle.get("http_429_count"))
+    )
     if error_count:
         issues.append(f"巨潮刷新有 {error_count} 个错误")
-    if _daily_count(throttle.get("circuit_trip_count")):
-        issues.append("巨潮触发限流熔断")
-    elif _daily_count(throttle.get("http_403_count")) or _daily_count(
-        throttle.get("http_429_count")
-    ):
-        issues.append("巨潮出现限流")
+    if throttled and (error_count or cninfo_failed):
+        if _daily_count(throttle.get("circuit_trip_count")):
+            issues.append("巨潮触发限流熔断")
+        else:
+            issues.append("巨潮出现限流")
     blocker = str(canonical.get("blocker_reason") or "").strip()
     if canonical.get("merge"):
         notes.append("生产复权表已定向更新")
@@ -1655,9 +1675,12 @@ def _format_cninfo_primary_daily_report(result: Dict[str, Any]) -> str:
         notes.append("对账还有历史不一致，不是本轮采集失败")
     if bse_events > 0 and not canonical.get("merge") and not blocker:
         notes.append("北交所官方证据已入库，未改沪深生产复权表")
+    if throttled and not (error_count or cninfo_failed):
+        notes.append("巨潮被限流后已降速跑完")
 
     status = result.get("status", "unknown")
     label = _daily_status_zh(status, str(status))
+    mark = _daily_status_mark(status)
     if issues:
         judgment = "；".join(issues + notes) + "。"
     elif notes:
@@ -1666,9 +1689,9 @@ def _format_cninfo_primary_daily_report(result: Dict[str, Any]) -> str:
         judgment = "各采集阶段正常完成。"
 
     lines = [
-        "ℹ️ *A 股公司行动增量日更*",
+        f"{mark} *A 股公司行动增量日更*",
         "",
-        f"结论: *{label}*",
+        f"结论: {mark} *{label}*",
         f"判断: {judgment}",
     ]
     scope = (
