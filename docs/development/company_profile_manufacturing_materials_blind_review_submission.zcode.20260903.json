@@ -1,0 +1,2783 @@
+{
+  "artifact_type": "company_profile_industry_blind_review_submission",
+  "schema_version": "manufacturing_materials_blind_review.v1",
+  "industry_package": "manufacturing_materials",
+  "reviewer": "zcode-independent-blind-reviewer (GLM-5.3)",
+  "reviewed_at": "2026-09-03T08:35:26Z",
+  "gold_seen_before_submission": false,
+  "independence_note": "审核方仅接收：盲审交接单、四份PDF原文、中性输出模板。未读取 Gold annotations、四份 dossier、field decision ledger、benchmark acceptance 及任何既往审核意见或预期答案。披露事项：开始标注前，为确定输出路径对仓库中已存在的未跟踪文件 company_profile_manufacturing_materials_blind_review_submission.20260903.json 做过一次纯结构性探测（顶层键名、其 reviewer 字符串、gold_seen_before_submission=True 标记、各报告 field_assessments 条数 18/19/20/18 及 findings 条数），未读取其中任何标注内容、引文或结论；本提交输出至独立新文件，未改动该文件。该元数据未影响任何字段判定（多条目/单条目结构由交接单『跨页证据必须分别锚定』规则独立推导）。据此判定 gold_seen_before_submission=false。页码坐标系：one_based_pdf_physical_page，302132 物理页=印刷页+1，已在各条目以 printed_page_label 标注。",
+  "page_coordinate_system": "one_based_pdf_physical_page",
+  "reports": [
+    {
+      "sample_id": "manufacturing-materials-300750-2025",
+      "report_identity": {
+        "instrument_id": "300750.SZ",
+        "report_period": "2025-12-31",
+        "content_hash": "c15272977147dee7e6935a38ea0e4fd6855370aabb106f54cfe20f7cf6048ec9"
+      },
+      "field_assessments": [
+        {
+          "field_id": "business_overview_source",
+          "chapter_task": "extract_business_overview",
+          "activation_status": "required",
+          "coverage_status": "observed",
+          "evidence": {
+            "page": 14,
+            "printed_page_label": null,
+            "section_title": "第三节 管理层讨论与分析 一、报告期内公司从事的主要业务 1、主要业务",
+            "physical_anchor": {
+              "row_label": null,
+              "column_header": null,
+              "cell_locator": null,
+              "bounded_quote": "公司是全球领先的零碳新能源科技公司，主要从事动力电池、储能电池的研发、生产、销售",
+              "footnote_refs": []
+            }
+          },
+          "source_native": {
+            "name": "主要业务",
+            "value": "动力电池、储能电池的研发、生产、销售（及电池材料、电池回收、钠电池等延展）",
+            "unit": null,
+            "header": null
+          },
+          "semantic": {
+            "object_type": "BusinessOverview",
+            "metric_type_or_relation": "business_overview_text",
+            "logical_slot": null,
+            "subject_scope": "consolidated_group",
+            "subject_name": "宁德时代新能源科技股份有限公司",
+            "period": "FY2025(报告期)",
+            "comparison_basis": null,
+            "assertion_class": "reported_fact"
+          },
+          "failure_or_empty_reason": null,
+          "reviewer_notes": "第14页另列『2、主要产品及其用途』（动力电池系统/储能电池系统等）。p195分部附注重述同一主业口径。原文与研报总结可区分，此处为年报原文。"
+        },
+        {
+          "field_id": "explicit_activity",
+          "chapter_task": "extract_business_overview",
+          "activation_status": "triggered",
+          "coverage_status": "observed",
+          "evidence": {
+            "page": 14,
+            "printed_page_label": null,
+            "section_title": "第三节 一、报告期内公司从事的主要业务 1、主要业务",
+            "physical_anchor": {
+              "row_label": null,
+              "column_header": null,
+              "cell_locator": null,
+              "bounded_quote": "主要从事动力电池、储能电池的研发、生产、销售",
+              "footnote_refs": []
+            }
+          },
+          "source_native": {
+            "name": "明示动作",
+            "value": "研发(develops)、生产(produces)、销售(sells)；另 p14-15 延展『回收』(电池回收)与『提供解决方案和服务』(provides_service)",
+            "unit": null,
+            "header": null
+          },
+          "semantic": {
+            "object_type": "Activity",
+            "metric_type_or_relation": "explicit_activity_verbs",
+            "logical_slot": null,
+            "subject_scope": "consolidated_group",
+            "subject_name": "公司",
+            "period": "FY2025(报告期)",
+            "comparison_basis": null,
+            "assertion_class": "reported_fact"
+          },
+          "failure_or_empty_reason": null,
+          "reviewer_notes": "动词集合属于 v1 允许集合；p24『推动自有及合作矿产资源项目的投资、建设及运营』另含运营(operates)语义但对象为矿产项目，未计入主业动词主集合。无数值混入。"
+        },
+        {
+          "field_id": "business_regime",
+          "chapter_task": "extract_business_regime",
+          "activation_status": "required",
+          "coverage_status": "observed",
+          "evidence": {
+            "page": 14,
+            "printed_page_label": null,
+            "section_title": "第三节 一、报告期内公司从事的主要业务 1、主要业务",
+            "physical_anchor": {
+              "row_label": null,
+              "column_header": null,
+              "cell_locator": null,
+              "bounded_quote": "主要从事动力电池、储能电池的研发、生产、销售",
+              "footnote_refs": []
+            }
+          },
+          "source_native": {
+            "name": "主业边界",
+            "value": "报告期内主业未变；2025-05-20 H股挂牌（p20）；报告期无非同一主业方向重大重组；本期收购洛阳国宏新业100%、Linergy Power、Hong Kong CBC International、CATGAT Vienna AG 等子公司自购买日并表（p64-65）；同一控制下企业合并被合并方合并前净利润0元（p118）",
+            "unit": null,
+            "header": null
+          },
+          "semantic": {
+            "object_type": "BusinessEvent",
+            "metric_type_or_relation": "business_regime_boundary",
+            "logical_slot": null,
+            "subject_scope": "consolidated_group",
+            "subject_name": null,
+            "period": "FY2025；H股上市事件2025-05-20",
+            "comparison_basis": null,
+            "assertion_class": "reported_fact"
+          },
+          "failure_or_empty_reason": null,
+          "reviewer_notes": "regime 无变更：主业连续，重组类事件仅常规并购子公司与H股二次上市（不改并表主业口径）。证据次锚：p20（H股上市）、p27(6)（合并范围变动『是』，详见第八节九）、p64-65（收购整合）、p118（同一控制合并净利0元）。"
+        },
+        {
+          "field_id": "segment_dimension",
+          "chapter_task": "extract_segment_financials",
+          "activation_status": "required",
+          "coverage_status": "observed",
+          "evidence": {
+            "page": 24,
+            "printed_page_label": null,
+            "section_title": "第三节 四、主营业务分析 2、收入与成本 (1)营业收入构成",
+            "physical_anchor": {
+              "row_label": "分行业/分产品/分地区（p24）；分业务/分产品/分地区（p25 占10%以上表）",
+              "column_header": "金额、占营业收入比重、同比增减（p24）；营业收入、营业成本、毛利率及同比（p25）",
+              "cell_locator": null,
+              "bounded_quote": "营业收入构成",
+              "footnote_refs": []
+            }
+          },
+          "source_native": {
+            "name": "分部维度",
+            "value": "行业（电气机械及器材制造业/采选冶炼行业）、产品（动力电池系统/储能电池系统/电池材料及回收/电池矿产资源/其他业务）、地区（境内/境外）；无销售模式维度表",
+            "unit": null,
+            "header": null
+          },
+          "semantic": {
+            "object_type": "Segment",
+            "metric_type_or_relation": "segment_dimension_value",
+            "logical_slot": null,
+            "subject_scope": "consolidated_group",
+            "subject_name": "合并口径分部",
+            "period": "FY2025(报告期)",
+            "comparison_basis": null,
+            "assertion_class": "reported_fact"
+          },
+          "failure_or_empty_reason": null,
+          "reviewer_notes": "p24为收入构成表（千元），p25为10%以上行业/产品/地区的收入-成本-毛利率表（千元）。p25 行业维度表头写作『分业务』。"
+        },
+        {
+          "field_id": "operating_revenue",
+          "chapter_task": "extract_segment_financials",
+          "activation_status": "triggered",
+          "coverage_status": "observed",
+          "evidence": {
+            "page": 25,
+            "printed_page_label": null,
+            "section_title": "第三节 四、主营业务分析 2、收入与成本 (2)占公司营业收入或营业利润10%以上的行业、产品、地区、销售模式的情况",
+            "physical_anchor": {
+              "row_label": "电气机械及器材制造业 417,723,738；采选冶炼行业 5,978,096；动力电池系统 316,506,369；储能电池系统 62,439,820；电池材料及回收 21,860,936；电池矿产资源 5,978,096；境内 294,060,576；境外 129,641,258",
+              "column_header": "营业收入",
+              "cell_locator": null,
+              "bounded_quote": "电气机械及器材制造业 417,723,738 307,077,698 26.49%",
+              "footnote_refs": []
+            }
+          },
+          "source_native": {
+            "name": "营业收入(分部)",
+            "value": "营业收入合计 423,701,834；行业/产品/地区明细见行定位",
+            "unit": "千元（人民币）",
+            "header": "单位：千元"
+          },
+          "semantic": {
+            "object_type": "Measurement",
+            "metric_type_or_relation": null,
+            "logical_slot": "revenue",
+            "subject_scope": "consolidated_group",
+            "subject_name": "合并口径分部",
+            "period": "FY2025(报告期)",
+            "comparison_basis": "2024年同期为上年年报披露值（本报告未重述）",
+            "assertion_class": "reported_fact"
+          },
+          "failure_or_empty_reason": null,
+          "reviewer_notes": "单位为千元，表头未明示币种，按A股年报人民币列报（附注p211主要业务以人民币结算）。分行业收入构成另见p24。"
+        },
+        {
+          "field_id": "operating_cost",
+          "chapter_task": "extract_segment_financials",
+          "activation_status": "triggered",
+          "coverage_status": "observed",
+          "evidence": {
+            "page": 25,
+            "printed_page_label": null,
+            "section_title": "同上 (2)占10%以上的行业、产品、地区、销售模式的情况",
+            "physical_anchor": {
+              "row_label": "电气机械及器材制造业 307,077,698；采选冶炼行业 5,305,599；动力电池系统 241,064,397；储能电池系统 45,763,689；电池材料及回收 15,899,813；电池矿产资源 5,305,599；境内 223,497,885；境外 88,885,412",
+              "column_header": "营业成本",
+              "cell_locator": null,
+              "bounded_quote": "电气机械及器材制造业 417,723,738 307,077,698 26.49%",
+              "footnote_refs": []
+            }
+          },
+          "source_native": {
+            "name": "营业成本(分部)",
+            "value": "见行定位",
+            "unit": "千元（人民币）",
+            "header": "单位：千元"
+          },
+          "semantic": {
+            "object_type": "Measurement",
+            "metric_type_or_relation": null,
+            "logical_slot": "cost",
+            "subject_scope": "consolidated_group",
+            "subject_name": "合并口径分部",
+            "period": "FY2025(报告期)",
+            "comparison_basis": "2024年同期为上年披露值",
+            "assertion_class": "reported_fact"
+          },
+          "failure_or_empty_reason": null,
+          "reviewer_notes": "另 p27 (5)营业成本构成：电池行业直接材料 221,152,510 千元、占71.79%（口径为主营业务）。"
+        },
+        {
+          "field_id": "gross_margin_reported",
+          "chapter_task": "extract_segment_financials",
+          "activation_status": "triggered",
+          "coverage_status": "observed",
+          "evidence": {
+            "page": 25,
+            "printed_page_label": null,
+            "section_title": "同上 (2)占10%以上的行业、产品、地区、销售模式的情况",
+            "physical_anchor": {
+              "row_label": "电气机械及器材制造业 26.49%；采选冶炼行业 11.25%；动力电池系统 23.84%；储能电池系统 26.71%；电池材料及回收 27.27%；电池矿产资源 11.25%；境内 24.00%；境外 31.44%",
+              "column_header": "毛利率",
+              "cell_locator": null,
+              "bounded_quote": "动力电池系统 316,506,369 241,064,397 23.84%",
+              "footnote_refs": []
+            }
+          },
+          "source_native": {
+            "name": "毛利率(分部)",
+            "value": "见行定位",
+            "unit": "%",
+            "header": "毛利率"
+          },
+          "semantic": {
+            "object_type": "Measurement",
+            "metric_type_or_relation": null,
+            "logical_slot": "gross_margin",
+            "subject_scope": "consolidated_group",
+            "subject_name": "合并口径分部",
+            "period": "FY2025(报告期)",
+            "comparison_basis": "附同比增减列",
+            "assertion_class": "reported_fact"
+          },
+          "failure_or_empty_reason": null,
+          "reviewer_notes": "均为报告直接披露值，未自行补造 derived 值。"
+        },
+        {
+          "field_id": "production_capacity",
+          "chapter_task": "extract_operating_quantities",
+          "activation_status": "triggered",
+          "coverage_status": "observed",
+          "evidence": {
+            "page": 26,
+            "printed_page_label": null,
+            "section_title": "第三节 四、主营业务分析 2、收入与成本 5)不同产品或业务的产销情况",
+            "physical_anchor": {
+              "row_label": "电池系统（GWh）",
+              "column_header": "产能",
+              "cell_locator": null,
+              "bounded_quote": "电池系统（GWh） 772 321 96.9% 748",
+              "footnote_refs": []
+            }
+          },
+          "source_native": {
+            "name": "产能",
+            "value": "772",
+            "unit": "GWh",
+            "header": "产能（报告期内口径）"
+          },
+          "semantic": {
+            "object_type": "Measurement",
+            "metric_type_or_relation": "production_capacity",
+            "logical_slot": null,
+            "subject_scope": "consolidated_group",
+            "subject_name": null,
+            "period": "FY2025（报告期内）",
+            "comparison_basis": null,
+            "assertion_class": "reported_fact"
+          },
+          "failure_or_empty_reason": null,
+          "reviewer_notes": "叙述式次锚 p24『报告期内公司锂电池产能 772GWh』。口径为报告期内锂电池产能，非期末设计产能，与锦华新材『设计产能』、璞泰来『有效产能』口径不同。"
+        },
+        {
+          "field_id": "capacity_under_construction",
+          "chapter_task": "extract_operating_quantities",
+          "activation_status": "triggered",
+          "coverage_status": "observed",
+          "evidence": {
+            "page": 26,
+            "printed_page_label": null,
+            "section_title": "同上 5)不同产品或业务的产销情况",
+            "physical_anchor": {
+              "row_label": "电池系统（GWh）",
+              "column_header": "在建产能",
+              "cell_locator": null,
+              "bounded_quote": "电池系统（GWh） 772 321 96.9% 748",
+              "footnote_refs": []
+            }
+          },
+          "source_native": {
+            "name": "在建产能",
+            "value": "321",
+            "unit": "GWh",
+            "header": "在建产能（期末）"
+          },
+          "semantic": {
+            "object_type": "Measurement",
+            "metric_type_or_relation": "capacity_under_construction",
+            "logical_slot": null,
+            "subject_scope": "consolidated_group",
+            "subject_name": null,
+            "period": "2025-12-31（期末）",
+            "comparison_basis": null,
+            "assertion_class": "reported_fact"
+          },
+          "failure_or_empty_reason": null,
+          "reviewer_notes": "次锚 p24『期末在建产能 321GWh』。表格列口径为『期末在建产能』。基地建设叙述（中州、济宁、福鼎、溧阳、宜宾、匈牙利、印尼，p24）无量值。"
+        },
+        {
+          "field_id": "capacity_utilization",
+          "chapter_task": "extract_operating_quantities",
+          "activation_status": "triggered",
+          "coverage_status": "observed",
+          "evidence": {
+            "page": 26,
+            "printed_page_label": null,
+            "section_title": "同上 5)不同产品或业务的产销情况",
+            "physical_anchor": {
+              "row_label": "电池系统（GWh）",
+              "column_header": "产能利用率",
+              "cell_locator": null,
+              "bounded_quote": "电池系统（GWh） 772 321 96.9% 748",
+              "footnote_refs": []
+            }
+          },
+          "source_native": {
+            "name": "产能利用率",
+            "value": "96.9%",
+            "unit": "%",
+            "header": "产能利用率"
+          },
+          "semantic": {
+            "object_type": "Measurement",
+            "metric_type_or_relation": "capacity_utilization",
+            "logical_slot": null,
+            "subject_scope": "consolidated_group",
+            "subject_name": null,
+            "period": "FY2025",
+            "comparison_basis": null,
+            "assertion_class": "reported_fact"
+          },
+          "failure_or_empty_reason": null,
+          "reviewer_notes": null
+        },
+        {
+          "field_id": "production_volume",
+          "chapter_task": "extract_operating_quantities",
+          "activation_status": "triggered",
+          "coverage_status": "observed",
+          "evidence": {
+            "page": 27,
+            "printed_page_label": null,
+            "section_title": "同上 (3)公司实物销售收入是否大于劳务收入 行业分类表",
+            "physical_anchor": {
+              "row_label": "电池系统/生产量",
+              "column_header": "2025年",
+              "cell_locator": null,
+              "bounded_quote": "生产量 GWh 748 516 44.96%",
+              "footnote_refs": []
+            }
+          },
+          "source_native": {
+            "name": "生产量",
+            "value": "748",
+            "unit": "GWh",
+            "header": "生产量（同比+44.96%）"
+          },
+          "semantic": {
+            "object_type": "Measurement",
+            "metric_type_or_relation": "production_volume",
+            "logical_slot": null,
+            "subject_scope": "consolidated_group",
+            "subject_name": null,
+            "period": "FY2025(报告期)",
+            "comparison_basis": null,
+            "assertion_class": "reported_fact"
+          },
+          "failure_or_empty_reason": null,
+          "reviewer_notes": "口径：电池系统合计。"
+        },
+        {
+          "field_id": "sales_volume",
+          "chapter_task": "extract_operating_quantities",
+          "activation_status": "triggered",
+          "coverage_status": "observed",
+          "evidence": {
+            "page": 26,
+            "printed_page_label": null,
+            "section_title": "同上 (3)公司实物销售收入是否大于劳务收入 行业分类表（表起于p26末，生产量/库存量行续p27）",
+            "physical_anchor": {
+              "row_label": "电池系统/销售量",
+              "column_header": "2025年",
+              "cell_locator": null,
+              "bounded_quote": "电池系统 销售量 GWh 661 475 39.16%",
+              "footnote_refs": []
+            }
+          },
+          "source_native": {
+            "name": "销售量",
+            "value": "661",
+            "unit": "GWh",
+            "header": "销售量（同比+39.16%）"
+          },
+          "semantic": {
+            "object_type": "Measurement",
+            "metric_type_or_relation": "sales_volume",
+            "logical_slot": null,
+            "subject_scope": "consolidated_group",
+            "subject_name": null,
+            "period": "FY2025(报告期)",
+            "comparison_basis": null,
+            "assertion_class": "reported_fact"
+          },
+          "failure_or_empty_reason": null,
+          "reviewer_notes": "分产品叙述次锚：p20 锂离子电池销量661GWh；p21 动力电池销量541GWh；p22 储能电池销量121GWh（541+121≈661，尾差为四舍五入）。均为实物销量，非收入/订单额。"
+        },
+        {
+          "field_id": "inventory_volume",
+          "chapter_task": "extract_operating_quantities",
+          "activation_status": "triggered",
+          "coverage_status": "observed",
+          "evidence": {
+            "page": 27,
+            "printed_page_label": null,
+            "section_title": "同上 (3)公司实物销售收入是否大于劳务收入 行业分类表",
+            "physical_anchor": {
+              "row_label": "电池系统/库存量",
+              "column_header": "2025年",
+              "cell_locator": null,
+              "bounded_quote": "库存量 GWh 186 106 75.47%",
+              "footnote_refs": []
+            }
+          },
+          "source_native": {
+            "name": "库存量",
+            "value": "186",
+            "unit": "GWh",
+            "header": "库存量（同比+75.47%）"
+          },
+          "semantic": {
+            "object_type": "Measurement",
+            "metric_type_or_relation": "inventory_volume",
+            "logical_slot": null,
+            "subject_scope": "consolidated_group",
+            "subject_name": null,
+            "period": "FY2025(报告期)",
+            "comparison_basis": null,
+            "assertion_class": "reported_fact"
+          },
+          "failure_or_empty_reason": null,
+          "reviewer_notes": "表下仅说明同比变动30%以上原因（产销两旺），未披露库存量口径脚注（是否含发出商品等未说明）；与璞泰来库存脚注形成口径差异，非金额存货。"
+        },
+        {
+          "field_id": "processing_volume",
+          "chapter_task": "extract_operating_quantities",
+          "activation_status": "triggered",
+          "coverage_status": "observed",
+          "evidence": {
+            "page": 24,
+            "printed_page_label": null,
+            "section_title": "第三节 一、报告期内公司从事的主要业务 (4)供应链及产能 (5)可持续发展",
+            "physical_anchor": {
+              "row_label": null,
+              "column_header": null,
+              "cell_locator": null,
+              "bounded_quote": "废旧电池及材料综合回收量达到 21.0万吨,同比增长 63.2%,再生锂盐 2.4万吨",
+              "footnote_refs": []
+            }
+          },
+          "source_native": {
+            "name": "废旧电池及材料综合回收量",
+            "value": "21.0万吨（另：再生锂盐2.4万吨）",
+            "unit": "万吨",
+            "header": "叙述段（非表格）"
+          },
+          "semantic": {
+            "object_type": "Measurement",
+            "metric_type_or_relation": "processing_volume",
+            "logical_slot": null,
+            "subject_scope": "consolidated_group",
+            "subject_name": null,
+            "period": "FY2025(报告期)",
+            "comparison_basis": null,
+            "assertion_class": "reported_fact"
+          },
+          "failure_or_empty_reason": null,
+          "reviewer_notes": "语义标注为『回收处理量』而非典型受托加工服务量：公司自营回收业务（电池材料及回收分部）的实物加工/回收规模，来源括注『综合回收量』。是否计入 processing_volume 需对账裁决；未与产量/销量双写。"
+        },
+        {
+          "field_id": "material_input",
+          "chapter_task": "extract_material_inputs",
+          "activation_status": "triggered",
+          "coverage_status": "observed",
+          "evidence": {
+            "page": 40,
+            "printed_page_label": null,
+            "section_title": "第三节 十一、风险因素 (4)原材料价格波动及供应风险",
+            "physical_anchor": {
+              "row_label": null,
+              "column_header": null,
+              "cell_locator": null,
+              "bounded_quote": "公司生产经营所需主要原材料包括正极材料、负极材料、隔膜和电解液等，上述原材料受锂、镍、钴等大宗商品或化工原料价格影响较大",
+              "footnote_refs": []
+            }
+          },
+          "source_native": {
+            "name": "主要原材料",
+            "value": "正极材料、负极材料、隔膜、电解液（价格驱动：锂、镍、钴等大宗商品/化工原料）",
+            "unit": "类别列举（无量值）",
+            "header": null
+          },
+          "semantic": {
+            "object_type": "Relationship",
+            "metric_type_or_relation": "material_input_relation",
+            "logical_slot": null,
+            "subject_scope": "consolidated_group",
+            "subject_name": null,
+            "period": "FY2025(报告期)",
+            "comparison_basis": null,
+            "assertion_class": "reported_fact"
+          },
+          "failure_or_empty_reason": null,
+          "reviewer_notes": "另 p24 供应链段：自有及合作矿产资源项目（上游资源）；p27 直接材料成本占比71.79%。锂/镍/钴为价格影响因子，与直接投入材料的层次在引文中已区分。"
+        },
+        {
+          "field_id": "counterparty_relationship",
+          "chapter_task": "extract_counterparties_and_concentration",
+          "activation_status": "triggered",
+          "coverage_status": "observed",
+          "evidence": {
+            "page": 28,
+            "printed_page_label": null,
+            "section_title": "第三节 四、主营业务分析 (8)主要销售客户和主要供应商情况 公司前5大客户资料",
+            "physical_anchor": {
+              "row_label": "第一名…第五名（客户）；第一名…第五名（供应商）",
+              "column_header": "客户名称/供应商名称、销售额（采购额）、占年度销售（采购）总额比例",
+              "cell_locator": null,
+              "bounded_quote": "1 第一名 58,159,202 13.73%",
+              "footnote_refs": []
+            }
+          },
+          "source_native": {
+            "name": "前5大客户/前5大供应商",
+            "value": "均为匿名序号（第一名…第五名），未具名",
+            "unit": "—",
+            "header": null
+          },
+          "semantic": {
+            "object_type": "Relationship",
+            "metric_type_or_relation": "counterparty_relation",
+            "logical_slot": null,
+            "subject_scope": "consolidated_group",
+            "subject_name": null,
+            "period": "FY2025(报告期)",
+            "comparison_basis": null,
+            "assertion_class": "reported_fact"
+          },
+          "failure_or_empty_reason": null,
+          "reviewer_notes": "另 p27 重大销售合同对手方『客户A』，脚注(1)『基于双方保密协议约定，不便披露客户具体名称』；本期确认销售收入58,159,202千元，与第一名客户销售额完全一致，可推断为同一对手方但报告未明示，按匿名身份不合并处理。匿名编码仅在本报告内使用。"
+        },
+        {
+          "field_id": "customer_concentration",
+          "chapter_task": "extract_counterparties_and_concentration",
+          "activation_status": "triggered",
+          "coverage_status": "observed",
+          "evidence": {
+            "page": 28,
+            "printed_page_label": null,
+            "section_title": "第三节 (8)主要销售客户和主要供应商情况",
+            "physical_anchor": {
+              "row_label": "前五名客户合计",
+              "column_header": "销售金额、占年度销售总额比例",
+              "cell_locator": null,
+              "bounded_quote": "前五名客户合计销售金额占年度销售总额比例 38.96%",
+              "footnote_refs": []
+            }
+          },
+          "source_native": {
+            "name": "前五名客户合计销售金额",
+            "value": "165,061,533（占比38.96%；其中关联方0.00%）",
+            "unit": "千元（人民币）",
+            "header": null
+          },
+          "semantic": {
+            "object_type": "Measurement",
+            "metric_type_or_relation": "customer_concentration",
+            "logical_slot": null,
+            "subject_scope": "consolidated_group",
+            "subject_name": "合并口径销售",
+            "period": "FY2025(报告期)",
+            "comparison_basis": null,
+            "assertion_class": "reported_fact"
+          },
+          "failure_or_empty_reason": null,
+          "reviewer_notes": "明细：第一名58,159,202(13.73%)、第二名47,127,609(11.12%)、第三名30,201,701(7.13%)、第四名15,419,319(3.64%)、第五名14,153,702(3.34%)。"
+        },
+        {
+          "field_id": "supplier_concentration",
+          "chapter_task": "extract_counterparties_and_concentration",
+          "activation_status": "triggered",
+          "coverage_status": "observed",
+          "evidence": {
+            "page": 28,
+            "printed_page_label": null,
+            "section_title": "第三节 (8)主要销售客户和主要供应商情况",
+            "physical_anchor": {
+              "row_label": "前五名供应商合计",
+              "column_header": "采购金额、占年度采购总额比例",
+              "cell_locator": null,
+              "bounded_quote": "前五名供应商合计采购金额占年度采购总额比例 10.38%",
+              "footnote_refs": []
+            }
+          },
+          "source_native": {
+            "name": "前五名供应商合计采购金额",
+            "value": "59,938,203（占比10.38%；其中关联方0.00%）",
+            "unit": "千元（人民币）",
+            "header": null
+          },
+          "semantic": {
+            "object_type": "Measurement",
+            "metric_type_or_relation": "supplier_concentration",
+            "logical_slot": null,
+            "subject_scope": "consolidated_group",
+            "subject_name": "合并口径采购",
+            "period": "FY2025(报告期)",
+            "comparison_basis": null,
+            "assertion_class": "reported_fact"
+          },
+          "failure_or_empty_reason": null,
+          "reviewer_notes": "明细：第一名23,318,360(4.04%)、第二名11,601,437(2.01%)、第三名9,241,133(1.60%)、第四名8,258,913(1.43%)、第五名7,518,360(1.30%)。"
+        }
+      ],
+      "sample_bias_findings": [
+        "样本为超大型链主（A+H两地上市，营收4237亿元），分部维度仅2行业/5产品/2地区，量类仅『电池系统』单一口径（GWh），材料、回收等分部无实物量；以其为正例会低估多业务线分散披露形态的复杂度。",
+        "匿名客户A重大合同金额（58,159,202千元）与第一名客户销售额完全一致，报告未明示两者同一；盲标按『匿名身份不得合并』处理，但对账时需裁决该推断。",
+        "非同一控制收购多家子公司（p64-65）但均不构成主业变更；样本未提供『主业本身变化』的正例（regime变更正例在302132），两样本互补。"
+      ],
+      "missing_field_candidates": [
+        "回收/再生处理量：『废旧电池及材料综合回收量21.0万吨、再生锂盐2.4万吨』现只能挤入 processing_volume，建议增设 recycling_volume 或明确 processing_volume 的包含范围。",
+        "境外收入专项披露（创业板行业指引要求：境外收入占比30.60%，p25）在18字段中无落点，建议评估是否纳入 segment_dimension 的证据要求。"
+      ],
+      "blocking_findings": []
+    },
+    {
+      "sample_id": "manufacturing-materials-603659-2025",
+      "report_identity": {
+        "instrument_id": "603659.SH",
+        "report_period": "2025-12-31",
+        "content_hash": "4e81f5539046ba1eee733100f38442a4abd5037afe3881115ba7f48678fa35b6"
+      },
+      "field_assessments": [
+        {
+          "field_id": "business_overview_source",
+          "chapter_task": "extract_business_overview",
+          "activation_status": "required",
+          "coverage_status": "observed",
+          "evidence": {
+            "page": 12,
+            "printed_page_label": null,
+            "section_title": "第三节 管理层讨论与分析 一、报告期内公司从事的业务情况 1、主要业务",
+            "physical_anchor": {
+              "row_label": null,
+              "column_header": null,
+              "cell_locator": null,
+              "bounded_quote": "公司是新能源电池关键材料、自动化装备与工艺技术的综合解决方案提供商与平台型企业，主要从事新能源电池材料、自动化装备的研发、生产和销售，并为客户提供新能源电池极片代工服务",
+              "footnote_refs": []
+            }
+          },
+          "source_native": {
+            "name": "主要业务",
+            "value": "膜材料及涂覆加工、负极材料等主材，PVDF及粘结剂、氧化铝及勃姆石等功能性材料，新能源电池自动化装备与服务，极片代工服务",
+            "unit": null,
+            "header": null
+          },
+          "semantic": {
+            "object_type": "BusinessOverview",
+            "metric_type_or_relation": "business_overview_text",
+            "logical_slot": null,
+            "subject_scope": "consolidated_group",
+            "subject_name": "上海璞泰来新能源科技集团股份有限公司",
+            "period": "FY2025(报告期)",
+            "comparison_basis": null,
+            "assertion_class": "reported_fact"
+          },
+          "failure_or_empty_reason": null,
+          "reviewer_notes": "p12脚注列明主体结构：东阳光氟树脂、嘉拓智能、吉林紫宸为控股子公司；江苏高远为江苏卓立控股子公司；四川茵地乐、浙江利科为联营公司——多主体平台结构影响后续字段主体归属。"
+        },
+        {
+          "field_id": "explicit_activity",
+          "chapter_task": "extract_business_overview",
+          "activation_status": "triggered",
+          "coverage_status": "observed",
+          "evidence": {
+            "page": 12,
+            "printed_page_label": null,
+            "section_title": "第三节 一、报告期内公司从事的业务情况 1、主要业务",
+            "physical_anchor": {
+              "row_label": null,
+              "column_header": null,
+              "cell_locator": null,
+              "bounded_quote": "主要从事新能源电池材料、自动化装备的研发、生产和销售，并为客户提供新能源电池极片代工服务",
+              "footnote_refs": []
+            }
+          },
+          "source_native": {
+            "name": "明示动作",
+            "value": "研发(develops)、生产(produces)、销售(sells)、提供代工服务(provides_service)；涂覆加工(processes)见p14涂覆加工业务",
+            "unit": null,
+            "header": null
+          },
+          "semantic": {
+            "object_type": "Activity",
+            "metric_type_or_relation": "explicit_activity_verbs",
+            "logical_slot": null,
+            "subject_scope": "consolidated_group",
+            "subject_name": "公司",
+            "period": "FY2025(报告期)",
+            "comparison_basis": null,
+            "assertion_class": "reported_fact"
+          },
+          "failure_or_empty_reason": null,
+          "reviewer_notes": "全部属于 v1 允许集合；『代工/来料加工』与『涂覆加工』为该样本特有的加工语义，对 processing_volume 触发有直接影响。"
+        },
+        {
+          "field_id": "business_regime",
+          "chapter_task": "extract_business_regime",
+          "activation_status": "required",
+          "coverage_status": "observed",
+          "evidence": {
+            "page": 28,
+            "printed_page_label": null,
+            "section_title": "第三节 (五)投资状况分析 4、报告期内重大资产重组整合的具体进展情况",
+            "physical_anchor": {
+              "row_label": null,
+              "column_header": null,
+              "cell_locator": null,
+              "bounded_quote": "报告期内重大资产重组整合的具体进展情况 □适用 √不适用",
+              "footnote_refs": []
+            }
+          },
+          "source_native": {
+            "name": "主业边界",
+            "value": "平台型主业未变；报告期无重大资产重组（不适用）；合并范围新增内蒙古璞锦矿业、紫宸马来西亚、江苏常州嘉拓，注销东莞卓越新材料、溧阳嘉拓（原无锡嘉拓）（p21）；同一控制下企业合并被合并方合并前净利润0元（p82）",
+            "unit": null,
+            "header": null
+          },
+          "semantic": {
+            "object_type": "BusinessEvent",
+            "metric_type_or_relation": "business_regime_boundary",
+            "logical_slot": null,
+            "subject_scope": "consolidated_group",
+            "subject_name": null,
+            "period": "FY2025",
+            "comparison_basis": null,
+            "assertion_class": "reported_fact"
+          },
+          "failure_or_empty_reason": null,
+          "reviewer_notes": "次锚：p12（主业定义）、p21(5)（合并范围变化明细）、p82（同一控制合并0元）。"
+        },
+        {
+          "field_id": "segment_dimension",
+          "chapter_task": "extract_segment_financials",
+          "activation_status": "required",
+          "coverage_status": "observed",
+          "evidence": {
+            "page": 18,
+            "printed_page_label": null,
+            "section_title": "第三节 五、(一)主营业务分析 (1)主营业务分行业、分产品、分地区、分销售模式情况",
+            "physical_anchor": {
+              "row_label": "分行业（锂电池材料及设备）；分产品（新能源电池材料与服务/新能源自动化装备与服务/产业投资贸易管理及其他/合并抵消项）；分地区（境内/境外）；分销售模式（直销模式）",
+              "column_header": "营业收入、营业成本、毛利率、营业收入/成本比上年增减、毛利率比上年增减",
+              "cell_locator": null,
+              "bounded_quote": "主营业务分行业、分产品、分地区、分销售模式情况",
+              "footnote_refs": []
+            }
+          },
+          "source_native": {
+            "name": "分部维度",
+            "value": "行业、产品、地区、销售模式（四维齐全）",
+            "unit": null,
+            "header": null
+          },
+          "semantic": {
+            "object_type": "Segment",
+            "metric_type_or_relation": "segment_dimension_value",
+            "logical_slot": null,
+            "subject_scope": "consolidated_group",
+            "subject_name": "主营业务（合并抵消前含抵消行）",
+            "period": "FY2025(报告期)",
+            "comparison_basis": null,
+            "assertion_class": "reported_fact"
+          },
+          "failure_or_empty_reason": null,
+          "reviewer_notes": "四份样本中唯一维度齐全的报告；分产品表含负值『合并抵消项』行（-2,098,859,323.96），证明为合并口径内部抵消前列示。"
+        },
+        {
+          "field_id": "operating_revenue",
+          "chapter_task": "extract_segment_financials",
+          "activation_status": "triggered",
+          "coverage_status": "observed",
+          "evidence": {
+            "page": 19,
+            "printed_page_label": null,
+            "section_title": "同上 (1)主营业务分行业、分产品、分地区、分销售模式情况",
+            "physical_anchor": {
+              "row_label": "新能源电池材料与服务 11,792,842,608.70；新能源自动化装备与服务 4,568,927,099.42；产业投资贸易管理及其他 1,268,902,961.06；合并抵消项 -2,098,859,323.96；合计 15,531,813,345.22；境内 14,595,362,541.32；境外 936,450,803.90；直销模式 15,531,813,345.22",
+              "column_header": "营业收入",
+              "cell_locator": null,
+              "bounded_quote": "新能源电池材料与服务 11,792,842,608.70 7,909,390,929.81 32.93",
+              "footnote_refs": []
+            }
+          },
+          "source_native": {
+            "name": "营业收入(分部)",
+            "value": "见行定位（利润表口径营业收入总额15,711,291,195.73元，p18）",
+            "unit": "元（人民币）",
+            "header": "单位：元 币种：人民币"
+          },
+          "semantic": {
+            "object_type": "Measurement",
+            "metric_type_or_relation": null,
+            "logical_slot": "revenue",
+            "subject_scope": "consolidated_group",
+            "subject_name": "合并口径分部",
+            "period": "FY2025(报告期)",
+            "comparison_basis": "2024年同期为上年披露值",
+            "assertion_class": "reported_fact"
+          },
+          "failure_or_empty_reason": null,
+          "reviewer_notes": "分行业表（p18）：锂电池材料及设备 15,531,813,345.22元。"
+        },
+        {
+          "field_id": "operating_cost",
+          "chapter_task": "extract_segment_financials",
+          "activation_status": "triggered",
+          "coverage_status": "observed",
+          "evidence": {
+            "page": 19,
+            "printed_page_label": null,
+            "section_title": "同上",
+            "physical_anchor": {
+              "row_label": "新能源电池材料与服务 7,909,390,929.81；新能源自动化装备与服务 3,546,104,343.84；产业投资贸易管理及其他 1,229,079,080.22；合并抵消项 -2,070,706,126.81；合计 10,613,868,227.06",
+              "column_header": "营业成本",
+              "cell_locator": null,
+              "bounded_quote": "新能源电池材料与服务 11,792,842,608.70 7,909,390,929.81 32.93",
+              "footnote_refs": []
+            }
+          },
+          "source_native": {
+            "name": "营业成本(分部)",
+            "value": "见行定位（利润表口径营业成本10,726,924,153.28元，p18）",
+            "unit": "元（人民币）",
+            "header": "单位：元 币种：人民币"
+          },
+          "semantic": {
+            "object_type": "Measurement",
+            "metric_type_or_relation": null,
+            "logical_slot": "cost",
+            "subject_scope": "consolidated_group",
+            "subject_name": "合并口径分部",
+            "period": "FY2025(报告期)",
+            "comparison_basis": null,
+            "assertion_class": "reported_fact"
+          },
+          "failure_or_empty_reason": null,
+          "reviewer_notes": "p19-21成本分析表按分行业成本构成项列示（直接材料等），含内部销售口径脚注。"
+        },
+        {
+          "field_id": "gross_margin_reported",
+          "chapter_task": "extract_segment_financials",
+          "activation_status": "triggered",
+          "coverage_status": "observed",
+          "evidence": {
+            "page": 19,
+            "printed_page_label": null,
+            "section_title": "同上",
+            "physical_anchor": {
+              "row_label": "新能源电池材料与服务 32.93%；新能源自动化装备与服务 22.39%；产业投资贸易管理及其他 3.14%；合计 31.66%；境内 32.91%；境外 12.25%",
+              "column_header": "毛利率（%）",
+              "cell_locator": null,
+              "bounded_quote": "新能源电池材料与服务 11,792,842,608.70 7,909,390,929.81 32.93",
+              "footnote_refs": []
+            }
+          },
+          "source_native": {
+            "name": "毛利率(分部)",
+            "value": "见行定位",
+            "unit": "%",
+            "header": "毛利率（%）"
+          },
+          "semantic": {
+            "object_type": "Measurement",
+            "metric_type_or_relation": null,
+            "logical_slot": "gross_margin",
+            "subject_scope": "consolidated_group",
+            "subject_name": "合并口径分部",
+            "period": "FY2025(报告期)",
+            "comparison_basis": null,
+            "assertion_class": "reported_fact"
+          },
+          "failure_or_empty_reason": null,
+          "reviewer_notes": null
+        },
+        {
+          "field_id": "production_capacity",
+          "chapter_task": "extract_operating_quantities",
+          "activation_status": "triggered",
+          "coverage_status": "observed",
+          "evidence": {
+            "page": 14,
+            "printed_page_label": null,
+            "section_title": "第三节 三、经营情况讨论与分析 (一)新能源电池材料与服务 1、膜材料及涂覆加工 (1)涂覆加工/(2)隔膜基膜",
+            "physical_anchor": {
+              "row_label": null,
+              "column_header": null,
+              "cell_locator": null,
+              "bounded_quote": "截至报告期末，已形成 140 亿㎡涂覆隔膜加工的有效产能",
+              "footnote_refs": []
+            }
+          },
+          "source_native": {
+            "name": "涂覆隔膜加工有效产能",
+            "value": "140",
+            "unit": "亿㎡/年（有效产能）",
+            "header": "叙述段"
+          },
+          "semantic": {
+            "object_type": "Measurement",
+            "metric_type_or_relation": "production_capacity",
+            "logical_slot": null,
+            "subject_scope": "business_segment",
+            "subject_name": "膜材料与涂覆事业部",
+            "period": "2025-12-31（截至报告期末）",
+            "comparison_basis": null,
+            "assertion_class": "reported_fact"
+          },
+          "failure_or_empty_reason": null,
+          "reviewer_notes": "『有效产能』口径。次锚同页：基膜『截至2025年末，已形成年产21亿㎡基膜的产能』；p14 极片事业部『8GWh制浆和极片涂布线产能投产』。"
+        },
+        {
+          "field_id": "production_capacity",
+          "chapter_task": "extract_operating_quantities",
+          "activation_status": "triggered",
+          "coverage_status": "observed",
+          "evidence": {
+            "page": 15,
+            "printed_page_label": null,
+            "section_title": "第三节 三、经营情况讨论与分析 (一)新能源电池材料与服务 2、负极材料/3、功能性材料",
+            "physical_anchor": {
+              "row_label": null,
+              "column_header": null,
+              "cell_locator": null,
+              "bounded_quote": "截至 2025 年末，已经形成年产 25 万吨负极材料的产能",
+              "footnote_refs": []
+            }
+          },
+          "source_native": {
+            "name": "负极材料产能",
+            "value": "负极材料25万吨/年；PVDF有效产能超过3万吨；勃姆石和氧化铝有效产能3万吨（均截至2025年末）",
+            "unit": "吨/年",
+            "header": "叙述段"
+          },
+          "semantic": {
+            "object_type": "Measurement",
+            "metric_type_or_relation": "production_capacity",
+            "logical_slot": null,
+            "subject_scope": "business_segment",
+            "subject_name": "负极材料/功能性材料业务线",
+            "period": "2025-12-31",
+            "comparison_basis": null,
+            "assertion_class": "reported_fact"
+          },
+          "failure_or_empty_reason": null,
+          "reviewer_notes": "多业务线产能分散于叙述段落，无统一产能表；『有效产能』与『年产…产能』混用，口径需在对账时统一。"
+        },
+        {
+          "field_id": "capacity_under_construction",
+          "chapter_task": "extract_operating_quantities",
+          "activation_status": "triggered",
+          "coverage_status": "observed",
+          "evidence": {
+            "page": 15,
+            "printed_page_label": null,
+            "section_title": "第三节 三、(一)3、功能性材料 (1)PVDF及其衍生品；同页 1、膜材料及涂覆加工 (2)隔膜基膜",
+            "physical_anchor": {
+              "row_label": null,
+              "column_header": null,
+              "cell_locator": null,
+              "bounded_quote": "年产 1 万吨 PVDF 产能即将投入生产，年产 1.5 万吨 PVDF 项目正在建设中，2026 年总产能有望达到 5 万吨",
+              "footnote_refs": []
+            }
+          },
+          "source_native": {
+            "name": "在建/计划产能(PVDF)",
+            "value": "在建1.5万吨/年+即将投产1万吨/年；2026年总产能有望5万吨（预期）；另四川卓勤基膜涂覆一体化建成后新增基膜年产能20亿㎡",
+            "unit": "吨/年、亿㎡/年",
+            "header": "叙述段"
+          },
+          "semantic": {
+            "object_type": "Measurement",
+            "metric_type_or_relation": "capacity_under_construction",
+            "logical_slot": null,
+            "subject_scope": "business_segment",
+            "subject_name": "PVDF业务线/基膜业务线",
+            "period": "在建中；预计2026年（PVDF）",
+            "comparison_basis": null,
+            "assertion_class": "reported_fact"
+          },
+          "failure_or_empty_reason": null,
+          "reviewer_notes": "跨页证据分别锚定：PVDF在建p15；卓勤二期子项目二（计划总投资25亿元，新增基膜20亿㎡+涂覆30亿㎡，建设中）p27；四川紫宸28万吨一体化分三期（一期10万吨部分投产、二期10万吨2026年择机、三期8万吨逐步推进）p27。"
+        },
+        {
+          "field_id": "capacity_utilization",
+          "chapter_task": "extract_operating_quantities",
+          "activation_status": "triggered",
+          "coverage_status": "not_disclosed",
+          "evidence": {
+            "page": 15,
+            "printed_page_label": null,
+            "section_title": "第三节 三、(一)3、功能性材料 (2)陶瓷涂覆材料",
+            "physical_anchor": {
+              "row_label": null,
+              "column_header": null,
+              "cell_locator": null,
+              "bounded_quote": "在产能利用率提高规模效应提升的情况下",
+              "footnote_refs": []
+            }
+          },
+          "source_native": {
+            "name": "产能利用率",
+            "value": null,
+            "unit": null,
+            "header": null
+          },
+          "semantic": {
+            "object_type": "Measurement",
+            "metric_type_or_relation": "capacity_utilization",
+            "logical_slot": null,
+            "subject_scope": "consolidated_group",
+            "subject_name": null,
+            "period": "FY2025(报告期)",
+            "comparison_basis": null,
+            "assertion_class": "reported_fact"
+          },
+          "failure_or_empty_reason": "全文仅p15一处定性提及『产能利用率提高』（陶瓷涂覆材料业务），未披露任何分业务产能利用率数值；产销量表(p19)亦无利用率列。",
+          "reviewer_notes": "触发依据：公司为多产线制造商且报告提及该概念；但无数值披露，记 not_disclosed 而非 unclear（概念出现但无事实可标）。"
+        },
+        {
+          "field_id": "production_volume",
+          "chapter_task": "extract_operating_quantities",
+          "activation_status": "triggered",
+          "coverage_status": "observed",
+          "evidence": {
+            "page": 19,
+            "printed_page_label": null,
+            "section_title": "第三节 五、(一)主营业务分析 (2)产销量情况分析表",
+            "physical_anchor": {
+              "row_label": "负极材料 151,178.99；涂覆隔膜 1,158,602.82；PVDF及含氟聚合物 44,027.49",
+              "column_header": "生产量",
+              "cell_locator": null,
+              "bounded_quote": "负极材料 吨 151,178.99 143,009.19 39,299.86",
+              "footnote_refs": []
+            }
+          },
+          "source_native": {
+            "name": "生产量",
+            "value": "负极材料151,178.99吨；涂覆隔膜1,158,602.82万㎡；PVDF及含氟聚合物44,027.49吨",
+            "unit": "吨 / 万㎡（按产品行）",
+            "header": "生产量（同比：+10.59%/+56.37%/+101.56%）"
+          },
+          "semantic": {
+            "object_type": "Measurement",
+            "metric_type_or_relation": "production_volume",
+            "logical_slot": null,
+            "subject_scope": "consolidated_group",
+            "subject_name": null,
+            "period": "FY2025(报告期)",
+            "comparison_basis": null,
+            "assertion_class": "reported_fact"
+          },
+          "failure_or_empty_reason": null,
+          "reviewer_notes": null
+        },
+        {
+          "field_id": "sales_volume",
+          "chapter_task": "extract_operating_quantities",
+          "activation_status": "triggered",
+          "coverage_status": "observed",
+          "evidence": {
+            "page": 19,
+            "printed_page_label": null,
+            "section_title": "同上 (2)产销量情况分析表",
+            "physical_anchor": {
+              "row_label": "负极材料 143,009.19；涂覆隔膜 1,094,249.25；PVDF及含氟聚合物 41,315.50",
+              "column_header": "销售量",
+              "cell_locator": null,
+              "bounded_quote": "负极材料 吨 151,178.99 143,009.19 39,299.86",
+              "footnote_refs": []
+            }
+          },
+          "source_native": {
+            "name": "销售量",
+            "value": "负极材料143,009.19吨；涂覆隔膜1,094,249.25万㎡；PVDF及含氟聚合物41,315.50吨",
+            "unit": "吨 / 万㎡（按产品行）",
+            "header": "销售量（同比：+8.09%/+56.26%/+99.14%）"
+          },
+          "semantic": {
+            "object_type": "Measurement",
+            "metric_type_or_relation": "sales_volume",
+            "logical_slot": null,
+            "subject_scope": "consolidated_group",
+            "subject_name": null,
+            "period": "FY2025(报告期)",
+            "comparison_basis": null,
+            "assertion_class": "reported_fact"
+          },
+          "failure_or_empty_reason": null,
+          "reviewer_notes": "叙述次锚：负极出货量14.30万吨(p15)、基膜销量14.95亿㎡(p14)、PVDF及含氟聚合物销量4.13万吨(p15)、涂覆加工量(销量)109.42亿㎡(p14)。注意：涂覆隔膜『销售量』与p14『涂覆加工量（销量）』为同一物理事实（109.42亿㎡=1,094,249.25万㎡），不得在 processing_volume 与 sales_volume 双写，本提交将其锚在 sales_volume（产销量表为权威表源），见 processing_volume 条目说明。"
+        },
+        {
+          "field_id": "inventory_volume",
+          "chapter_task": "extract_operating_quantities",
+          "activation_status": "triggered",
+          "coverage_status": "observed",
+          "evidence": {
+            "page": 19,
+            "printed_page_label": null,
+            "section_title": "同上 (2)产销量情况分析表",
+            "physical_anchor": {
+              "row_label": "负极材料 39,299.86；涂覆隔膜 202,802.13；PVDF及含氟聚合物 5,509.79",
+              "column_header": "库存量",
+              "cell_locator": null,
+              "bounded_quote": "上述表格中库存量为产成品数量，包含已发出至客户但尚未确认收入的发出商品",
+              "footnote_refs": [
+                "产销量情况说明：库存量为产成品数量，包含已发出至客户但尚未确认收入的发出商品"
+              ]
+            }
+          },
+          "source_native": {
+            "name": "库存量",
+            "value": "负极材料39,299.86吨；涂覆隔膜202,802.13万㎡；PVDF及含氟聚合物5,509.79吨",
+            "unit": "吨 / 万㎡（按产品行）",
+            "header": "库存量（产成品口径，含发出商品）"
+          },
+          "semantic": {
+            "object_type": "Measurement",
+            "metric_type_or_relation": "inventory_volume",
+            "logical_slot": null,
+            "subject_scope": "consolidated_group",
+            "subject_name": null,
+            "period": "FY2025(报告期)",
+            "comparison_basis": null,
+            "assertion_class": "reported_fact"
+          },
+          "failure_or_empty_reason": null,
+          "reviewer_notes": "脚注口径明确：实物产成品库存，含发出商品；非资产负债表存货金额。"
+        },
+        {
+          "field_id": "processing_volume",
+          "chapter_task": "extract_operating_quantities",
+          "activation_status": "triggered",
+          "coverage_status": "observed",
+          "evidence": {
+            "page": 14,
+            "printed_page_label": null,
+            "section_title": "第三节 三、经营情况讨论与分析 (一)1、膜材料及涂覆加工 (1)涂覆加工",
+            "physical_anchor": {
+              "row_label": null,
+              "column_header": null,
+              "cell_locator": null,
+              "bounded_quote": "2025 年，公司涂覆加工量（销量）达到 109.42 亿㎡",
+              "footnote_refs": []
+            }
+          },
+          "source_native": {
+            "name": "涂覆加工量（销量）",
+            "value": "109.42",
+            "unit": "亿㎡",
+            "header": "叙述段（来源自带括注别名）"
+          },
+          "semantic": {
+            "object_type": "Measurement",
+            "metric_type_or_relation": "processing_volume",
+            "logical_slot": null,
+            "subject_scope": "consolidated_group",
+            "subject_name": null,
+            "period": "FY2025(报告期)",
+            "comparison_basis": null,
+            "assertion_class": "reported_fact"
+          },
+          "failure_or_empty_reason": null,
+          "reviewer_notes": "来源括注（销量）按交接单要求保留在 source-native.name。该物理量同时构成涂覆隔膜销售量（p19表1,094,249.25万㎡），已锚定在 sales_volume；按『同一物理事实不得双写指标』，本条仅作为加工服务语义的证据记录，对账时应裁决其唯一归属字段。另：极片代工/来料加工服务（p12、p14、p15）已开展但未披露加工量数值。"
+        },
+        {
+          "field_id": "material_input",
+          "chapter_task": "extract_material_inputs",
+          "activation_status": "triggered",
+          "coverage_status": "observed",
+          "evidence": {
+            "page": 33,
+            "printed_page_label": null,
+            "section_title": "第三节 四、(可能面对的风险/风险因素) 3、原材料价格上涨的风险",
+            "physical_anchor": {
+              "row_label": null,
+              "column_header": null,
+              "cell_locator": null,
+              "bounded_quote": "公司负极材料原材料包括焦类、初级石墨、沥青等，涂覆隔膜生产所需原材料包括隔膜基膜、陶瓷材料、氧化铝和氢氧化铝等，锂电设备业务原材料钢材、机加工件等",
+              "footnote_refs": []
+            }
+          },
+          "source_native": {
+            "name": "主要原材料(分业务)",
+            "value": "负极材料：焦类、初级石墨、沥青等；涂覆隔膜：隔膜基膜、陶瓷材料、氧化铝和氢氧化铝等；锂电设备：钢材、机加工件等",
+            "unit": "类别列举（无量值）",
+            "header": null
+          },
+          "semantic": {
+            "object_type": "Relationship",
+            "metric_type_or_relation": "material_input_relation",
+            "logical_slot": null,
+            "subject_scope": "consolidated_group",
+            "subject_name": null,
+            "period": "FY2025(报告期)",
+            "comparison_basis": null,
+            "assertion_class": "reported_fact"
+          },
+          "failure_or_empty_reason": null,
+          "reviewer_notes": "按业务线明示，无能源输入披露（与锦华新材形成差异）。p159收入政策附注提及锂电池原材料销售及加工（贸易类业务）。"
+        },
+        {
+          "field_id": "counterparty_relationship",
+          "chapter_task": "extract_counterparties_and_concentration",
+          "activation_status": "triggered",
+          "coverage_status": "observed",
+          "evidence": {
+            "page": 184,
+            "printed_page_label": null,
+            "section_title": "第八节 财务报告 附注 关联方及关联交易 5、关联交易情况 (1)购销商品、提供和接受劳务的关联交易",
+            "physical_anchor": {
+              "row_label": "采购：枣庄振兴炭材科技有限公司(原材料及其他15,652,369.47元)、四川茵地乐材料科技集团有限公司(原材料47,518,544.39元)、贵州高点科技有限公司(原材料18,008.84元)、广州云趣信息科技有限公司(技术服务148,584.90元)；销售：四川茵地乐(加工服务及其他1,911,471.23元)、南京庐峰新能基金(提供管理服务4,773,584.95元)、枣庄振兴炭材(提供技术服务101,886.79元)、上海锦源晟(设备及配件144,955.75元)",
+              "column_header": "关联方、关联交易内容、本期发生额",
+              "cell_locator": null,
+              "bounded_quote": "四川茵地乐材料科技集团有限公司 原材料 47,518,544.39",
+              "footnote_refs": []
+            }
+          },
+          "source_native": {
+            "name": "关联客户/供应商(具名)",
+            "value": "具名关联对手方见行定位",
+            "unit": "元（人民币）",
+            "header": null
+          },
+          "semantic": {
+            "object_type": "Relationship",
+            "metric_type_or_relation": "counterparty_relation",
+            "logical_slot": null,
+            "subject_scope": "consolidated_group",
+            "subject_name": null,
+            "period": "FY2025(报告期)",
+            "comparison_basis": null,
+            "assertion_class": "reported_fact"
+          },
+          "failure_or_empty_reason": null,
+          "reviewer_notes": "重要披露格式差异：本报告(2025年上交所新格式)主要客户/供应商部分仅披露前五名合计金额与占比（p21），无前五大名单（含匿名序号名单也没有）。报告内唯一具名对手方来自关联交易表(p184-185)。若对账口径要求非关联客户/供应商身份，本样本为 not_disclosed；本提交按『报告内具名对手方存在』记 observed，需对账裁决关联对手是否计入 counterparty_relationship。"
+        },
+        {
+          "field_id": "customer_concentration",
+          "chapter_task": "extract_counterparties_and_concentration",
+          "activation_status": "triggered",
+          "coverage_status": "observed",
+          "evidence": {
+            "page": 21,
+            "printed_page_label": null,
+            "section_title": "第三节 五、(一)主营业务分析 (7)主要销售客户及主要供应商情况",
+            "physical_anchor": {
+              "row_label": null,
+              "column_header": null,
+              "cell_locator": null,
+              "bounded_quote": "前五名客户销售额913,511万元，占年度销售总额58.14%；其中前五名客户销售额中关联方销售额0万元",
+              "footnote_refs": []
+            }
+          },
+          "source_native": {
+            "name": "前五名客户销售额",
+            "value": "913,511（占年度销售总额58.14%；关联方0）",
+            "unit": "万元（人民币）",
+            "header": null
+          },
+          "semantic": {
+            "object_type": "Measurement",
+            "metric_type_or_relation": "customer_concentration",
+            "logical_slot": null,
+            "subject_scope": "consolidated_group",
+            "subject_name": "合并口径销售",
+            "period": "FY2025(报告期)",
+            "comparison_basis": null,
+            "assertion_class": "reported_fact"
+          },
+          "failure_or_empty_reason": null,
+          "reviewer_notes": "单位陷阱：本页集中度单位为万元，而分部表单位为元，跨字段对账不得自动换算。另：向单个客户销售超50%、前5名新增客户、依赖少数客户等小节均为不适用。"
+        },
+        {
+          "field_id": "supplier_concentration",
+          "chapter_task": "extract_counterparties_and_concentration",
+          "activation_status": "triggered",
+          "coverage_status": "observed",
+          "evidence": {
+            "page": 21,
+            "printed_page_label": null,
+            "section_title": "同上 (7)主要销售客户及主要供应商情况",
+            "physical_anchor": {
+              "row_label": null,
+              "column_header": null,
+              "cell_locator": null,
+              "bounded_quote": "前五名供应商采购额115,002万元，占年度采购总额13.98%；其中前五名供应商采购额中关联方采购额0万元",
+              "footnote_refs": []
+            }
+          },
+          "source_native": {
+            "name": "前五名供应商采购额",
+            "value": "115,002（占年度采购总额13.98%；关联方0）",
+            "unit": "万元（人民币）",
+            "header": null
+          },
+          "semantic": {
+            "object_type": "Measurement",
+            "metric_type_or_relation": "supplier_concentration",
+            "logical_slot": null,
+            "subject_scope": "consolidated_group",
+            "subject_name": "合并口径采购",
+            "period": "FY2025(报告期)",
+            "comparison_basis": null,
+            "assertion_class": "reported_fact"
+          },
+          "failure_or_empty_reason": null,
+          "reviewer_notes": null
+        }
+      ],
+      "sample_bias_findings": [
+        "2025年上交所新披露格式：主要客户/供应商仅披露合计金额与占比，无前五大名单，counterparty_relationship 只能靠关联交易表支撑；以本样本为正例可检验清单对『仅合计披露』格式的容忍度。",
+        "多业务线平台型公司：产能披露分散于叙述段落（涂覆/基膜/负极/PVDF/勃姆石/极片），口径混用『有效产能』『年产…产能』，且无统一产能表；与产销量表（吨/万㎡双单位）并存。",
+        "客户集中度58.14%但无名单，关联销售/采购集中度披露为0，与璞泰来以核心电池客户为主的业务常识形成张力——清单要求不得虚构客户关系在此样本尤其关键。",
+        "涂覆隔膜『加工量（销量）』一名双语义（加工服务量+实物销量），是『同一物理事实不得双写指标』规则的直接试金石。"
+      ],
+      "missing_field_candidates": [
+        "关联交易对手方字段：目前具名对手只能挤入 counterparty_relationship，建议明确关联客户/供应商是否属于该字段语义，或增设 related_party_counterparty。",
+        "订单/在手订单：自动化装备新接订单54.27亿元(+130.9%)、极片代工『整卷』交付模式等经营量信息在18字段中无落点（不属于销量），建议评估是否增设 order_backlog。",
+        "基膜自给率（p14『基膜自给率提升』）类相对指标无字段承载，且报告仅有定性表述，建议在规则中明确定性经营指标不标注。"
+      ],
+      "blocking_findings": []
+    },
+    {
+      "sample_id": "manufacturing-materials-920015-2025",
+      "report_identity": {
+        "instrument_id": "920015.BJ",
+        "report_period": "2025-12-31",
+        "content_hash": "4d2c1612f6f62a9024b8947d7a01b70c40f8f347c2975fa1a05b908d0770695a"
+      },
+      "field_assessments": [
+        {
+          "field_id": "business_overview_source",
+          "chapter_task": "extract_business_overview",
+          "activation_status": "required",
+          "coverage_status": "observed",
+          "evidence": {
+            "page": 12,
+            "printed_page_label": null,
+            "section_title": "第四节 管理层讨论与分析 一、业务概要 1、主营业务",
+            "physical_anchor": {
+              "row_label": null,
+              "column_header": null,
+              "cell_locator": null,
+              "bounded_quote": "公司主要从事酮肟系列精细化学品的研发、生产和销售，主要产品包括硅烷交联剂、羟胺盐、甲氧胺盐酸盐、乙醛肟、羟胺水溶液等",
+              "footnote_refs": []
+            }
+          },
+          "source_native": {
+            "name": "主要业务",
+            "value": "酮肟系列精细化学品：硅烷交联剂、羟胺盐、甲氧胺盐酸盐、乙醛肟、羟胺水溶液等；国内硅烷交联剂、羟胺盐细分领域龙头企业",
+            "unit": null,
+            "header": null
+          },
+          "semantic": {
+            "object_type": "BusinessOverview",
+            "metric_type_or_relation": "business_overview_text",
+            "logical_slot": null,
+            "subject_scope": "consolidated_group",
+            "subject_name": "浙江锦华新材料股份有限公司（证券简称锦华新材）",
+            "period": "FY2025(报告期)",
+            "comparison_basis": null,
+            "assertion_class": "reported_fact"
+          },
+          "failure_or_empty_reason": null,
+          "reviewer_notes": "第二处业务表述（p44 第九节行业信息）：『主要从事酮肟硅新材料及其他特种化学品的研发、生产和销售』，行业分类：制造业(C)-石油、化学、生物医药(CE)-化学原料和化学制品制造业(26)。两处措辞略有差异（精细化学品 vs 酮肟硅新材料及特种化学品），以第12页MD&A为准、p44为行业章节口径。"
+        },
+        {
+          "field_id": "explicit_activity",
+          "chapter_task": "extract_business_overview",
+          "activation_status": "triggered",
+          "coverage_status": "observed",
+          "evidence": {
+            "page": 12,
+            "printed_page_label": null,
+            "section_title": "第四节 一、业务概要 1、主营业务/2、经营模式",
+            "physical_anchor": {
+              "row_label": null,
+              "column_header": null,
+              "cell_locator": null,
+              "bounded_quote": "主要从事酮肟系列精细化学品的研发、生产和销售",
+              "footnote_refs": []
+            }
+          },
+          "source_native": {
+            "name": "明示动作",
+            "value": "研发(develops)、生产(produces)、销售(sells)；采购模式段另示按需采购(purchases)；委外加工为公司采购加工服务（p12：公司提供主要原料并支付固定加工费）",
+            "unit": null,
+            "header": null
+          },
+          "semantic": {
+            "object_type": "Activity",
+            "metric_type_or_relation": "explicit_activity_verbs",
+            "logical_slot": null,
+            "subject_scope": "consolidated_group",
+            "subject_name": "公司",
+            "period": "FY2025(报告期)",
+            "comparison_basis": null,
+            "assertion_class": "reported_fact"
+          },
+          "failure_or_empty_reason": null,
+          "reviewer_notes": "以销定产、产销结合（生产模式段）。动词集合属于 v1 允许集合。"
+        },
+        {
+          "field_id": "business_regime",
+          "chapter_task": "extract_business_regime",
+          "activation_status": "required",
+          "coverage_status": "observed",
+          "evidence": {
+            "page": 13,
+            "printed_page_label": null,
+            "section_title": "第四节 一、业务概要 报告期内经营模式变化情况；二、经营情况回顾",
+            "physical_anchor": {
+              "row_label": null,
+              "column_header": null,
+              "cell_locator": null,
+              "bounded_quote": "公司在报告期内，经营模式未发生重大变化",
+              "footnote_refs": []
+            }
+          },
+          "source_native": {
+            "name": "主业边界",
+            "value": "主业与经营模式未变；2025-09-25 北京证券交易所 IPO 上市（p6）；报告期无收购、出售资产、对外投资及企业合并事项（p28：否）",
+            "unit": null,
+            "header": null
+          },
+          "semantic": {
+            "object_type": "BusinessEvent",
+            "metric_type_or_relation": "business_regime_boundary",
+            "logical_slot": null,
+            "subject_scope": "consolidated_group",
+            "subject_name": null,
+            "period": "FY2025；上市事件2025-09-25",
+            "comparison_basis": null,
+            "assertion_class": "reported_fact"
+          },
+          "failure_or_empty_reason": null,
+          "reviewer_notes": "次锚：p6（上市交易所北京证券交易所、上市时间2025年9月25日）、p28（收购/出售/合并事项 否）。控股股东为巨化集团有限公司（p133附注），报告期控制权未变。"
+        },
+        {
+          "field_id": "segment_dimension",
+          "chapter_task": "extract_segment_financials",
+          "activation_status": "required",
+          "coverage_status": "observed",
+          "evidence": {
+            "page": 17,
+            "printed_page_label": null,
+            "section_title": "第四节 二、经营情况回顾 收入分析 按产品分类分析/按区域分类分析",
+            "physical_anchor": {
+              "row_label": "分产品（硅烷交联剂/羟胺盐/其他产品/其他业务收入）；分地区（内销客户/外销客户）",
+              "column_header": "营业收入、营业成本、毛利率%、增减",
+              "cell_locator": null,
+              "bounded_quote": "按产品分类分析",
+              "footnote_refs": []
+            }
+          },
+          "source_native": {
+            "name": "分部维度",
+            "value": "产品、地区（内销/外销）两个维度；无分行业收入表（行业归属仅p44文字），无销售模式收入表",
+            "unit": null,
+            "header": null
+          },
+          "semantic": {
+            "object_type": "Segment",
+            "metric_type_or_relation": "segment_dimension_value",
+            "logical_slot": null,
+            "subject_scope": "consolidated_group",
+            "subject_name": "合并口径分部",
+            "period": "FY2025(报告期)",
+            "comparison_basis": null,
+            "assertion_class": "reported_fact"
+          },
+          "failure_or_empty_reason": null,
+          "reviewer_notes": "北交所格式：维度少于沪深样本，产品维度含『其他业务收入』行。"
+        },
+        {
+          "field_id": "operating_revenue",
+          "chapter_task": "extract_segment_financials",
+          "activation_status": "triggered",
+          "coverage_status": "observed",
+          "evidence": {
+            "page": 17,
+            "printed_page_label": null,
+            "section_title": "同上 按产品分类分析/按区域分类分析",
+            "physical_anchor": {
+              "row_label": "硅烷交联剂 575,652,405.05；羟胺盐 285,241,030.19；其他产品 153,822,114.31；其他业务收入 17,582,027.30；合计 1,032,297,576.85；内销客户 895,512,828.11；外销客户 136,784,748.74",
+              "column_header": "营业收入",
+              "cell_locator": null,
+              "bounded_quote": "硅 烷 交 联 剂 575,652,405.05 456,934,716.38 20.62%",
+              "footnote_refs": []
+            }
+          },
+          "source_native": {
+            "name": "营业收入(分部)",
+            "value": "见行定位",
+            "unit": "元（人民币）",
+            "header": "单位：元"
+          },
+          "semantic": {
+            "object_type": "Measurement",
+            "metric_type_or_relation": null,
+            "logical_slot": "revenue",
+            "subject_scope": "consolidated_group",
+            "subject_name": "合并口径分部",
+            "period": "FY2025(报告期)",
+            "comparison_basis": "2024年同期为上年披露值（收入同比-16.72%）",
+            "assertion_class": "reported_fact"
+          },
+          "failure_or_empty_reason": null,
+          "reviewer_notes": null
+        },
+        {
+          "field_id": "operating_cost",
+          "chapter_task": "extract_segment_financials",
+          "activation_status": "triggered",
+          "coverage_status": "observed",
+          "evidence": {
+            "page": 17,
+            "printed_page_label": null,
+            "section_title": "同上",
+            "physical_anchor": {
+              "row_label": "硅烷交联剂 456,934,716.38；羟胺盐 159,734,692.43；其他产品 91,827,286.17；其他业务收入 14,368,184.03；合计 722,864,879.01；内销 641,113,535.22；外销 81,751,343.79",
+              "column_header": "营业成本",
+              "cell_locator": null,
+              "bounded_quote": "羟胺盐 285,241,030.19 159,734,692.43 44.00%",
+              "footnote_refs": []
+            }
+          },
+          "source_native": {
+            "name": "营业成本(分部)",
+            "value": "见行定位",
+            "unit": "元（人民币）",
+            "header": "单位：元"
+          },
+          "semantic": {
+            "object_type": "Measurement",
+            "metric_type_or_relation": null,
+            "logical_slot": "cost",
+            "subject_scope": "consolidated_group",
+            "subject_name": "合并口径分部",
+            "period": "FY2025(报告期)",
+            "comparison_basis": null,
+            "assertion_class": "reported_fact"
+          },
+          "failure_or_empty_reason": null,
+          "reviewer_notes": null
+        },
+        {
+          "field_id": "gross_margin_reported",
+          "chapter_task": "extract_segment_financials",
+          "activation_status": "triggered",
+          "coverage_status": "observed",
+          "evidence": {
+            "page": 17,
+            "printed_page_label": null,
+            "section_title": "同上",
+            "physical_anchor": {
+              "row_label": "硅烷交联剂 20.62%；羟胺盐 44.00%；其他产品 40.30%；其他业务收入 18.28%；内销 28.41%；外销 40.23%（另整体毛利率29.98%，p16）",
+              "column_header": "毛利率%",
+              "cell_locator": null,
+              "bounded_quote": "羟胺盐 285,241,030.19 159,734,692.43 44.00%",
+              "footnote_refs": []
+            }
+          },
+          "source_native": {
+            "name": "毛利率(分部)",
+            "value": "见行定位",
+            "unit": "%",
+            "header": "毛利率%"
+          },
+          "semantic": {
+            "object_type": "Measurement",
+            "metric_type_or_relation": null,
+            "logical_slot": "gross_margin",
+            "subject_scope": "consolidated_group",
+            "subject_name": "合并口径分部",
+            "period": "FY2025(报告期)",
+            "comparison_basis": null,
+            "assertion_class": "reported_fact"
+          },
+          "failure_or_empty_reason": null,
+          "reviewer_notes": null
+        },
+        {
+          "field_id": "production_capacity",
+          "chapter_task": "extract_operating_quantities",
+          "activation_status": "triggered",
+          "coverage_status": "observed",
+          "evidence": {
+            "page": 49,
+            "printed_page_label": null,
+            "section_title": "第九节 行业信息（化工公司） (三)产能情况 1.产能与开工情况",
+            "physical_anchor": {
+              "row_label": "硅烷交联剂 70,000 吨/年；羟胺盐 35,000 吨/年；其他主营产品 36,000 吨/年（p50）",
+              "column_header": "设计产能",
+              "cell_locator": null,
+              "bounded_quote": "硅烷交联剂 70,000 吨/年 65.12%",
+              "footnote_refs": []
+            }
+          },
+          "source_native": {
+            "name": "设计产能",
+            "value": "硅烷交联剂70,000；羟胺盐35,000；其他主营产品36,000",
+            "unit": "吨/年",
+            "header": "设计产能"
+          },
+          "semantic": {
+            "object_type": "Measurement",
+            "metric_type_or_relation": "production_capacity",
+            "logical_slot": null,
+            "subject_scope": "business_segment",
+            "subject_name": "硅烷交联剂/羟胺盐/其他主营产品（产品线）",
+            "period": "FY2025(报告期)",
+            "comparison_basis": null,
+            "assertion_class": "reported_fact"
+          },
+          "failure_or_empty_reason": null,
+          "reviewer_notes": "口径为『设计产能』（与宁德时代『报告期产能』、璞泰来『有效产能』不同），对账时需按 capacity 口径分类。叙述次锚 p13『新增40kt/a 羟胺盐装置』。"
+        },
+        {
+          "field_id": "capacity_under_construction",
+          "chapter_task": "extract_operating_quantities",
+          "activation_status": "triggered",
+          "coverage_status": "observed",
+          "evidence": {
+            "page": 49,
+            "printed_page_label": null,
+            "section_title": "第九节 (三)产能情况 1.产能与开工情况（表行跨页：投资与完工时间列在p49，产能规模列续p50）",
+            "physical_anchor": {
+              "row_label": "羟胺盐（在建）：总投资计划10,632.17万元，新增羟胺盐产能，在建产能预计完工时间2026年",
+              "column_header": "在建产能及投资情况/在建产能预计完工时间/在建产能主要工艺及环保投入情况",
+              "cell_locator": null,
+              "bounded_quote": "总投资计划 10,632.17 万元，新增羟胺盐",
+              "footnote_refs": []
+            }
+          },
+          "source_native": {
+            "name": "在建产能（投资与工期）",
+            "value": "总投资10,632.17万元；预计完工2026年",
+            "unit": "万元；年",
+            "header": "在建产能及投资情况（表列组）"
+          },
+          "semantic": {
+            "object_type": "Measurement",
+            "metric_type_or_relation": "capacity_under_construction",
+            "logical_slot": null,
+            "subject_scope": "business_segment",
+            "subject_name": "羟胺盐",
+            "period": "在建中；预计完工2026年",
+            "comparison_basis": null,
+            "assertion_class": "reported_fact"
+          },
+          "failure_or_empty_reason": null,
+          "reviewer_notes": "跨页证据分别锚定：本条锚投资额与完工时间（p49）；产能规模见下一条（p50）。"
+        },
+        {
+          "field_id": "capacity_under_construction",
+          "chapter_task": "extract_operating_quantities",
+          "activation_status": "triggered",
+          "coverage_status": "observed",
+          "evidence": {
+            "page": 50,
+            "printed_page_label": null,
+            "section_title": "第九节 (三)产能情况 1.产能与开工情况（表行续页）",
+            "physical_anchor": {
+              "row_label": "羟胺盐（在建）：产能 40,000 吨/年；主要工艺未发生重大变化，环保投入正常",
+              "column_header": "在建产能及投资情况（产能规模）/在建产能主要工艺及环保投入情况",
+              "cell_locator": null,
+              "bounded_quote": "产能 40,000 吨/年",
+              "footnote_refs": []
+            }
+          },
+          "source_native": {
+            "name": "在建产能（规模）",
+            "value": "新增羟胺盐产能 40,000 吨/年",
+            "unit": "吨/年",
+            "header": "在建产能及投资情况（表列组）"
+          },
+          "semantic": {
+            "object_type": "Measurement",
+            "metric_type_or_relation": "capacity_under_construction",
+            "logical_slot": null,
+            "subject_scope": "business_segment",
+            "subject_name": "羟胺盐",
+            "period": "在建中；预计完工2026年（完工时间锚见p49条目）",
+            "comparison_basis": null,
+            "assertion_class": "reported_fact"
+          },
+          "failure_or_empty_reason": null,
+          "reviewer_notes": "与p14-15产能叙述一致口径：p13『新增40kt/a 羟胺盐装置』。硅烷交联剂与其他主营产品行在建产能均为『-』。另 p25 展望提及 60kt/a 高端偶联剂项目与 JH-2 工业化（规划性质，无量值锚定，不计入 observed 证据）。"
+        },
+        {
+          "field_id": "capacity_utilization",
+          "chapter_task": "extract_operating_quantities",
+          "activation_status": "triggered",
+          "coverage_status": "observed",
+          "evidence": {
+            "page": 49,
+            "printed_page_label": null,
+            "section_title": "第九节 (三)产能情况 1.产能与开工情况",
+            "physical_anchor": {
+              "row_label": "硅烷交联剂 65.12%；羟胺盐 99.13%；其他主营产品 30.65%（p50）",
+              "column_header": "产能利用率",
+              "cell_locator": null,
+              "bounded_quote": "硅烷交联剂 70,000 吨/年 65.12%",
+              "footnote_refs": []
+            }
+          },
+          "source_native": {
+            "name": "产能利用率",
+            "value": "硅烷交联剂65.12%；羟胺盐99.13%；其他主营产品30.65%",
+            "unit": "%",
+            "header": "产能利用率"
+          },
+          "semantic": {
+            "object_type": "Measurement",
+            "metric_type_or_relation": "capacity_utilization",
+            "logical_slot": null,
+            "subject_scope": "business_segment",
+            "subject_name": "分产品线",
+            "period": "FY2025(报告期)",
+            "comparison_basis": null,
+            "assertion_class": "reported_fact"
+          },
+          "failure_or_empty_reason": null,
+          "reviewer_notes": "四份样本中唯一以专表披露产能利用率，且可与设计产能同表交叉验证。"
+        },
+        {
+          "field_id": "production_volume",
+          "chapter_task": "extract_operating_quantities",
+          "activation_status": "triggered",
+          "coverage_status": "not_disclosed",
+          "evidence": {
+            "page": 17,
+            "printed_page_label": null,
+            "section_title": "第四节 二、经营情况回顾 收入分析；第九节 (三)产能情况",
+            "physical_anchor": {
+              "row_label": null,
+              "column_header": null,
+              "cell_locator": null,
+              "bounded_quote": null,
+              "footnote_refs": []
+            }
+          },
+          "source_native": {
+            "name": "生产量/产量",
+            "value": null,
+            "unit": null,
+            "header": null
+          },
+          "semantic": {
+            "object_type": "Measurement",
+            "metric_type_or_relation": "production_volume",
+            "logical_slot": null,
+            "subject_scope": "consolidated_group",
+            "subject_name": null,
+            "period": "FY2025(报告期)",
+            "comparison_basis": null,
+            "assertion_class": "reported_fact"
+          },
+          "failure_or_empty_reason": "全文检索『产量/生产量/销量/库存量』：公司自身产销量无数值披露；命中项均为行业统计产量（p14 ACMI/SAGSI 全球/中国功能性硅烷产量）或内部管理口号（p25 提产量），不构成公司产量事实。北交所格式未含产销量情况分析表。",
+          "reviewer_notes": "触发依据：公司为产能披露完整的制造商（有设计产能与利用率），产量字段适用但未披露。行业统计产量严禁误标为公司产量。"
+        },
+        {
+          "field_id": "sales_volume",
+          "chapter_task": "extract_operating_quantities",
+          "activation_status": "triggered",
+          "coverage_status": "not_disclosed",
+          "evidence": {
+            "page": 17,
+            "printed_page_label": null,
+            "section_title": "第四节 收入分析/主要客户情况",
+            "physical_anchor": {
+              "row_label": null,
+              "column_header": null,
+              "cell_locator": null,
+              "bounded_quote": null,
+              "footnote_refs": []
+            }
+          },
+          "source_native": {
+            "name": "销售量",
+            "value": null,
+            "unit": null,
+            "header": null
+          },
+          "semantic": {
+            "object_type": "Measurement",
+            "metric_type_or_relation": "sales_volume",
+            "logical_slot": null,
+            "subject_scope": "consolidated_group",
+            "subject_name": null,
+            "period": "FY2025(报告期)",
+            "comparison_basis": null,
+            "assertion_class": "reported_fact"
+          },
+          "failure_or_empty_reason": "报告无实物销售量披露；p17-18客户表为销售金额（元），p12-13为业务描述，均非实物销量。不得以收入金额充当销量。",
+          "reviewer_notes": "触发依据：实物产品制造商且实物销售收入明显为主要收入构成；但无数值披露。"
+        },
+        {
+          "field_id": "inventory_volume",
+          "chapter_task": "extract_operating_quantities",
+          "activation_status": "triggered",
+          "coverage_status": "not_disclosed",
+          "evidence": {
+            "page": 17,
+            "printed_page_label": null,
+            "section_title": "第四节 收入分析；财务报表附注",
+            "physical_anchor": {
+              "row_label": null,
+              "column_header": null,
+              "cell_locator": null,
+              "bounded_quote": null,
+              "footnote_refs": []
+            }
+          },
+          "source_native": {
+            "name": "库存量",
+            "value": null,
+            "unit": null,
+            "header": null
+          },
+          "semantic": {
+            "object_type": "Measurement",
+            "metric_type_or_relation": "inventory_volume",
+            "logical_slot": null,
+            "subject_scope": "consolidated_group",
+            "subject_name": null,
+            "period": "FY2025(报告期)",
+            "comparison_basis": null,
+            "assertion_class": "reported_fact"
+          },
+          "failure_or_empty_reason": "报告无实物库存量表；附注存货为原材料/在产品/库存商品等金额项目（资产负债表口径），不构成实物库存量。",
+          "reviewer_notes": "触发依据：产销型制造商库存量字段适用；仅金额存货不得充当库存量（交接单明确禁止）。"
+        },
+        {
+          "field_id": "processing_volume",
+          "chapter_task": "extract_operating_quantities",
+          "activation_status": "triggered",
+          "coverage_status": "not_disclosed",
+          "evidence": {
+            "page": 50,
+            "printed_page_label": null,
+            "section_title": "第九节 (三)产能情况 3.委托生产",
+            "physical_anchor": {
+              "row_label": null,
+              "column_header": null,
+              "cell_locator": null,
+              "bounded_quote": "公司向巨化集团控股子公司衢州巨化锦纶有限责任公司采购丁酮肟的代加工服务",
+              "footnote_refs": []
+            }
+          },
+          "source_native": {
+            "name": "委托加工（代加工服务，采购方向）",
+            "value": null,
+            "unit": null,
+            "header": null
+          },
+          "semantic": {
+            "object_type": "Measurement",
+            "metric_type_or_relation": "processing_volume",
+            "logical_slot": null,
+            "subject_scope": "consolidated_group",
+            "subject_name": null,
+            "period": "FY2025(报告期)",
+            "comparison_basis": null,
+            "assertion_class": "reported_fact"
+          },
+          "failure_or_empty_reason": "报告明示存在委托加工安排（p12委外加工丁酮肟、p50代加工服务、p133关联交易金额24,922,322.13元），但未披露任何实物加工量数值，仅披露加工费金额。",
+          "reviewer_notes": "方向语义：锦华为加工服务的采购方（提供原料、支付固定加工费），非服务提供方。若 processing_volume 仅指公司对外提供的加工服务量，则本样本应记 not_triggered；本提交按字段字面（加工服务量，不分方向）记 triggered+not_disclosed，需对账裁决。副产品氯化铵销售（p50）非加工服务。"
+        },
+        {
+          "field_id": "material_input",
+          "chapter_task": "extract_material_inputs",
+          "activation_status": "triggered",
+          "coverage_status": "observed",
+          "evidence": {
+            "page": 51,
+            "printed_page_label": null,
+            "section_title": "第九节 行业信息 三、主要原材料及能源采购 (一)主要原材料及能源情况",
+            "physical_anchor": {
+              "row_label": "乙烯基三氯硅烷；丁酮肟；丁酮；乙醛；一甲基三氯硅烷；蒸汽；电；双氧水；液氨",
+              "column_header": "原材料及能源名称、耗用情况、采购模式、供应稳定性分析、价格走势及变动情况分析、价格波动对营业成本的影响",
+              "cell_locator": null,
+              "bounded_quote": "乙烯基三氯 硅烷 合理范围 分散采购 稳定",
+              "footnote_refs": []
+            }
+          },
+          "source_native": {
+            "name": "主要原材料及能源",
+            "value": "乙烯基三氯硅烷、丁酮肟、丁酮、乙醛、一甲基三氯硅烷、双氧水、液氨（原材料）；蒸汽、电（能源）",
+            "unit": "类别列举（耗用情况仅『合理范围』，无量值）",
+            "header": null
+          },
+          "semantic": {
+            "object_type": "Relationship",
+            "metric_type_or_relation": "material_input_relation",
+            "logical_slot": null,
+            "subject_scope": "consolidated_group",
+            "subject_name": null,
+            "period": "FY2025(报告期)",
+            "comparison_basis": null,
+            "assertion_class": "reported_fact"
+          },
+          "failure_or_empty_reason": null,
+          "reviewer_notes": "唯一同时明示原材料与能源输入的样本。次锚 p26 风险因素（丁酮、双氧水、液氨、一甲基三氯硅烷、乙烯基三氯硅烷、乙醛价格波动）。"
+        },
+        {
+          "field_id": "counterparty_relationship",
+          "chapter_task": "extract_counterparties_and_concentration",
+          "activation_status": "triggered",
+          "coverage_status": "observed",
+          "evidence": {
+            "page": 17,
+            "printed_page_label": null,
+            "section_title": "第四节 二、经营情况回顾 (3)主要客户情况/(4)主要供应商情况",
+            "physical_anchor": {
+              "row_label": "客户：1 浙江衢州硅宝化工有限公司同一控制下企业(关联,17.25%)、2 J公司、3 K公司、4 L公司、5 M公司（匿名）；供应商：1 巨化集团有限公司及其控制的企业(关联,23.42%)、2 A公司、3 B公司、4 C公司、5 D公司（匿名）",
+              "column_header": "客户/供应商、销售金额/采购金额、年度销售占比%/年度采购占比%、是否存在关联关系",
+              "cell_locator": null,
+              "bounded_quote": "1 浙江衢州硅宝化工有限公司同一控制下企业 178,099,027.98 17.25% 是",
+              "footnote_refs": []
+            }
+          },
+          "source_native": {
+            "name": "主要客户/主要供应商",
+            "value": "具名：浙江衢州硅宝化工有限公司同一控制下企业、巨化集团有限公司及其控制的企业；匿名：J/K/L/M公司（客户）、A/B/C/D公司（供应商）",
+            "unit": "元（人民币）",
+            "header": null
+          },
+          "semantic": {
+            "object_type": "Relationship",
+            "metric_type_or_relation": "counterparty_relation",
+            "logical_slot": null,
+            "subject_scope": "consolidated_group",
+            "subject_name": null,
+            "period": "FY2025(报告期)",
+            "comparison_basis": null,
+            "assertion_class": "reported_fact"
+          },
+          "failure_or_empty_reason": null,
+          "reviewer_notes": "匿名编码体系（J/K/L/M、A/B/C/D）与沪深样本（第一名…）不同，不得跨报告合并。p50副产品氯化铵客户：R公司40.53%、S公司21.35%、T公司15.15%（匿名）。委托加工对手方具名：衢州巨化锦纶有限责任公司（p50、p133）。p18脚注：洪根自2021年5月卸任董事后按从严认定，浙江衢州硅宝同一控制下企业仍认定关联方。"
+        },
+        {
+          "field_id": "customer_concentration",
+          "chapter_task": "extract_counterparties_and_concentration",
+          "activation_status": "triggered",
+          "coverage_status": "observed",
+          "evidence": {
+            "page": 18,
+            "printed_page_label": null,
+            "section_title": "第四节 (3)主要客户情况（合计行）",
+            "physical_anchor": {
+              "row_label": "合计",
+              "column_header": "销售金额、年度销售占比%",
+              "cell_locator": null,
+              "bounded_quote": "合计 518,958,619.32 50.27%",
+              "footnote_refs": []
+            }
+          },
+          "source_native": {
+            "name": "前五名客户合计销售金额",
+            "value": "518,958,619.32（占年度销售总额50.27%）",
+            "unit": "元（人民币）",
+            "header": null
+          },
+          "semantic": {
+            "object_type": "Measurement",
+            "metric_type_or_relation": "customer_concentration",
+            "logical_slot": null,
+            "subject_scope": "consolidated_group",
+            "subject_name": "合并口径销售",
+            "period": "FY2025(报告期)",
+            "comparison_basis": null,
+            "assertion_class": "reported_fact"
+          },
+          "failure_or_empty_reason": null,
+          "reviewer_notes": "明细：衢州硅宝同一控制下企业178,099,027.98(17.25%,关联)；J公司102,138,447.77(9.89%)；K公司96,572,440.35(9.36%)；L公司77,381,436.14(7.50%)；M公司64,767,267.08(6.27%)。应收账款口径补充：余额前五名客户占应收账款94.72%（p129），口径不同不得混用。"
+        },
+        {
+          "field_id": "supplier_concentration",
+          "chapter_task": "extract_counterparties_and_concentration",
+          "activation_status": "triggered",
+          "coverage_status": "observed",
+          "evidence": {
+            "page": 18,
+            "printed_page_label": null,
+            "section_title": "第四节 (4)主要供应商情况（合计行）",
+            "physical_anchor": {
+              "row_label": "合计",
+              "column_header": "采购金额、年度采购占比%",
+              "cell_locator": null,
+              "bounded_quote": "合计 387,793,549.7 51.40%",
+              "footnote_refs": []
+            }
+          },
+          "source_native": {
+            "name": "前五名供应商合计采购金额",
+            "value": "387,793,549.7（占年度采购总额51.40%）",
+            "unit": "元（人民币）",
+            "header": null
+          },
+          "semantic": {
+            "object_type": "Measurement",
+            "metric_type_or_relation": "supplier_concentration",
+            "logical_slot": null,
+            "subject_scope": "consolidated_group",
+            "subject_name": "合并口径采购",
+            "period": "FY2025(报告期)",
+            "comparison_basis": null,
+            "assertion_class": "reported_fact"
+          },
+          "failure_or_empty_reason": null,
+          "reviewer_notes": "明细：巨化集团及其控制的企业176,687,834.41(23.42%,关联)；A公司64,084,947.81(8.49%)；B公司53,396,542.16(7.08%)；C公司46,894,579.64(6.22%)；D公司46,729,645.68(6.19%)。第一大供应商即控股股东体系。"
+        }
+      ],
+      "sample_bias_findings": [
+        "第一大客户（浙江衢州硅宝同一控制下企业，17.25%）与第一大供应商（巨化集团有限公司及其控制的企业，23.42%）均为关联方，且巨化集团为控股股东、其控股子公司衢州巨化锦纶同时是独家丁酮肟代加工方（p50、p133）——供应商集中度与关联依赖高度纠缠，画像需防将关联集中度误读为市场化集中度。",
+        "北交所专精特新样本：产能/利用率/在建披露最规范（专表），但完全无公司自身产销量库存表；与其余样本的披露形态互补，检验清单对『有产能无产量』组合的覆盖状态使用。",
+        "IPO当年（2025-09-25上市）年报：筹资现金流因募集资金剧增（+1367%），主业经营数据未受影响，但样本时间序列可比性弱（上市首年审计与披露惯例差异）。",
+        "应收账款前五名客户占94.72%（p129）与前五名客户销售占比50.27%口径不同（余额vs发生额），报告内并存两种集中度口径，易混淆。"
+      ],
+      "missing_field_candidates": [
+        "委托加工量：报告明示委外加工安排但仅披露加工费金额（24,922,322.13元），无实物量；建议清单明确加工费金额能否作为 processing_volume 的金额型替代证据或一律 not_disclosed。",
+        "副产品销售对象集中度（氯化铵对R/S/T公司，p50）在前五客户表之外单独披露，18字段无显式落点，易被遗漏。",
+        "关联关系认定说明（原董事洪根卸任超12个月仍从严认定，p18）属于主体关系语义的重要证据，建议 counterparty_relationship 的 evidence 允许携带关联认定依据。"
+      ],
+      "blocking_findings": []
+    },
+    {
+      "sample_id": "manufacturing-materials-302132-2025-regime",
+      "report_identity": {
+        "instrument_id": "302132.SZ",
+        "report_period": "2025-12-31",
+        "content_hash": "605394bd0879f906a829a9fcd3a2dab037d8aad2554b741a7d95757a3a5e3020"
+      },
+      "field_assessments": [
+        {
+          "field_id": "business_overview_source",
+          "chapter_task": "extract_business_overview",
+          "activation_status": "required",
+          "coverage_status": "observed",
+          "evidence": {
+            "page": 11,
+            "printed_page_label": "10",
+            "section_title": "第三节 管理层讨论与分析 一、报告期内公司从事的主要业务 (一)主要业务、主要产品及其用途",
+            "physical_anchor": {
+              "row_label": null,
+              "column_header": null,
+              "cell_locator": null,
+              "bounded_quote": "报告期内，公司主营业务为航空产品研发、制造、销售、维修与服务保障，主要产品包括航空防务装备、民用航空产品和智能测控产品",
+              "footnote_refs": []
+            }
+          },
+          "source_native": {
+            "name": "主要业务",
+            "value": "航空产品研发、制造、销售、维修与服务保障；产品：航空防务装备、民用航空产品、智能测控产品",
+            "unit": null,
+            "header": null
+          },
+          "semantic": {
+            "object_type": "BusinessOverview",
+            "metric_type_or_relation": "business_overview_text",
+            "logical_slot": null,
+            "subject_scope": "consolidated_group",
+            "subject_name": "中航成飞股份有限公司",
+            "period": "FY2025(报告期)",
+            "comparison_basis": null,
+            "assertion_class": "reported_fact"
+          },
+          "failure_or_empty_reason": null,
+          "reviewer_notes": "注意：物理PDF页11，印刷页码10（本报告物理页=印刷页+1，全程成立）。p12-13行业与核心竞争力章节补充业务全貌（六大产业格局）。"
+        },
+        {
+          "field_id": "explicit_activity",
+          "chapter_task": "extract_business_overview",
+          "activation_status": "triggered",
+          "coverage_status": "observed",
+          "evidence": {
+            "page": 11,
+            "printed_page_label": "10",
+            "section_title": "第三节 一、(一)主要业务…(二)报告期内的经营模式",
+            "physical_anchor": {
+              "row_label": null,
+              "column_header": null,
+              "cell_locator": null,
+              "bounded_quote": "公司主营业务为航空产品研发、制造、销售、维修与服务保障",
+              "footnote_refs": []
+            }
+          },
+          "source_native": {
+            "name": "明示动作",
+            "value": "研发(develops)、制造/生产(produces)、销售(sells)、维修与服务保障(provides_service)；军贸模式下公司负责研发、生产、技术服务，军贸公司对外销售（p11销售模式）",
+            "unit": null,
+            "header": null
+          },
+          "semantic": {
+            "object_type": "Activity",
+            "metric_type_or_relation": "explicit_activity_verbs",
+            "logical_slot": null,
+            "subject_scope": "consolidated_group",
+            "subject_name": "公司",
+            "period": "FY2025(报告期)",
+            "comparison_basis": null,
+            "assertion_class": "reported_fact"
+          },
+          "failure_or_empty_reason": null,
+          "reviewer_notes": "动词集合属于 v1 允许集合；军贸出口销售动作由军贸公司承担（公司仅向军贸公司销售），销售主体的链式语义需注意。"
+        },
+        {
+          "field_id": "business_regime",
+          "chapter_task": "extract_business_regime",
+          "activation_status": "required",
+          "coverage_status": "observed",
+          "evidence": {
+            "page": 28,
+            "printed_page_label": "27",
+            "section_title": "第三节 十四、质量回报双提升行动方案贯彻落实情况",
+            "physical_anchor": {
+              "row_label": null,
+              "column_header": null,
+              "cell_locator": null,
+              "bounded_quote": "2025 年，公司通过发行股份购买中国航空工业集团所持有的成飞100%股权，实施重大资产重组并更名为中航成飞股份有限公司。本次重组实现了成飞核心资产整体上市，上市公司新增航空整机装备及部附件制造，转型升级为航空整机装备核心厂商",
+              "footnote_refs": []
+            }
+          },
+          "source_native": {
+            "name": "重大重组/主业边界",
+            "value": "原中航电测仪器股份有限公司发行股份购买中国航空工业集团所持成飞(成都飞机工业(集团)有限责任公司)100%股权；2024-08-05证监会注册批复；2025-01-06资产交割完成；2025-01-22新增股份2,086,021,877股上市、总股本590,760,499→2,676,782,376股；同一控制下企业合并，比较期间追溯重述（p8：2024营业收入调整前1,779,761,710.30元/调整后65,054,925,106.17元；p154：同一控制合并范围变更影响期初未分配利润2,333,248,217.01元）",
+            "unit": null,
+            "header": null
+          },
+          "semantic": {
+            "object_type": "BusinessEvent",
+            "metric_type_or_relation": "business_regime_boundary",
+            "logical_slot": null,
+            "subject_scope": "consolidated_group",
+            "subject_name": "中航成飞股份有限公司（原中航电测仪器股份有限公司）",
+            "period": "事件期2024-08-05（批复）至2025-01-22（新股上市）；并表自2025-01-06资产交割，同一控制按最终控制方开始控制时点追溯",
+            "comparison_basis": null,
+            "assertion_class": "reported_fact"
+          },
+          "failure_or_empty_reason": null,
+          "reviewer_notes": "母公司/最终控制方：中国航空工业集团有限公司，持股78.66%（p173）。锁定：重组新增股份2028-01-23解禁（p69）。不得用重组后主业（航空整机）追溯改写更早期间上市公司（中航电测，应变测试与控制）的真实主业口径；重述仅使成飞并入口径可比。"
+        },
+        {
+          "field_id": "segment_dimension",
+          "chapter_task": "extract_segment_financials",
+          "activation_status": "required",
+          "coverage_status": "observed",
+          "evidence": {
+            "page": 14,
+            "printed_page_label": "13",
+            "section_title": "第三节 四、主营业务分析 2、收入与成本 (1)营业收入构成；(2)占10%以上…",
+            "physical_anchor": {
+              "row_label": "分行业（航空制造业/其他）；分产品（航空产品/其他）；分地区（国内/国外）；分销售模式（直销）",
+              "column_header": "金额、占营业收入比重、同比增减（构成表）；营业收入、营业成本、毛利率及同比（10%以上表）",
+              "cell_locator": null,
+              "bounded_quote": "分销售模式 直销 75,358,958,001.86 100.00%",
+              "footnote_refs": []
+            }
+          },
+          "source_native": {
+            "name": "分部维度",
+            "value": "行业、产品、地区、销售模式（直销100%）四维",
+            "unit": null,
+            "header": null
+          },
+          "semantic": {
+            "object_type": "Segment",
+            "metric_type_or_relation": "segment_dimension_value",
+            "logical_slot": null,
+            "subject_scope": "consolidated_group",
+            "subject_name": "重述后合并口径分部",
+            "period": "FY2025(报告期)",
+            "comparison_basis": "2024年比较值为同一控制重述后口径",
+            "assertion_class": "reported_fact"
+          },
+          "failure_or_empty_reason": null,
+          "reviewer_notes": "军贸出口通过军贸公司进行，但销售模式表仍归并为直销（公司直销给军贸公司/直接客户），维度标签与业务实质的映射需在对账时说明。"
+        },
+        {
+          "field_id": "operating_revenue",
+          "chapter_task": "extract_segment_financials",
+          "activation_status": "triggered",
+          "coverage_status": "observed",
+          "evidence": {
+            "page": 14,
+            "printed_page_label": "13",
+            "section_title": "第三节 四、主营业务分析 2、收入与成本 (1)营业收入构成",
+            "physical_anchor": {
+              "row_label": "营业收入合计 75,358,958,001.86；航空制造业/航空产品 73,551,376,777.21(97.60%)；其他 1,807,581,224.65(2.40%)；国内 74,034,112,060.93(98.24%)；国外 1,324,845,940.93(1.76%)；直销 75,358,958,001.86(100.00%)",
+              "column_header": "金额/占营业收入比重",
+              "cell_locator": null,
+              "bounded_quote": "航空制造业 73,551,376,777.21 97.60%",
+              "footnote_refs": []
+            }
+          },
+          "source_native": {
+            "name": "营业收入(分部)",
+            "value": "见行定位",
+            "unit": "元（人民币）",
+            "header": "单位：元"
+          },
+          "semantic": {
+            "object_type": "Measurement",
+            "metric_type_or_relation": null,
+            "logical_slot": "revenue",
+            "subject_scope": "consolidated_group",
+            "subject_name": "重述后合并口径分部",
+            "period": "FY2025(报告期)",
+            "comparison_basis": "2024年比较值65,054,925,106.17元为同一控制重述后（调整后）口径，非上年年报原披露值1,779,761,710.30元（调整前，p8）",
+            "assertion_class": "reported_fact"
+          },
+          "failure_or_empty_reason": null,
+          "reviewer_notes": "营业收入锚定本页(物理14/印刷13)分部表；重述依据锚定p8（第二节 五、主要会计数据和财务指标：追溯调整或重述原因=同一控制下企业合并）。两页分工明确，不得混用。"
+        },
+        {
+          "field_id": "operating_cost",
+          "chapter_task": "extract_segment_financials",
+          "activation_status": "triggered",
+          "coverage_status": "observed",
+          "evidence": {
+            "page": 15,
+            "printed_page_label": "14",
+            "section_title": "第三节 四、主营业务分析 2、收入与成本 (2)占公司营业收入或营业利润10%以上的行业、产品、地区、销售模式的情况",
+            "physical_anchor": {
+              "row_label": "航空制造业/航空产品 67,921,791,741.91；国内 67,741,472,762.12；直销 68,984,052,885.87",
+              "column_header": "营业成本",
+              "cell_locator": null,
+              "bounded_quote": "航空制造业 73,551,376,777.21 67,921,791,741.91 7.65%",
+              "footnote_refs": []
+            }
+          },
+          "source_native": {
+            "name": "营业成本(分部)",
+            "value": "见行定位",
+            "unit": "元（人民币）",
+            "header": "单位：元"
+          },
+          "semantic": {
+            "object_type": "Measurement",
+            "metric_type_or_relation": null,
+            "logical_slot": "cost",
+            "subject_scope": "consolidated_group",
+            "subject_name": "重述后合并口径分部",
+            "period": "FY2025(报告期)",
+            "comparison_basis": "2024年为重述后口径；营业成本同比+19.43%（航空制造业）",
+            "assertion_class": "reported_fact"
+          },
+          "failure_or_empty_reason": null,
+          "reviewer_notes": null
+        },
+        {
+          "field_id": "gross_margin_reported",
+          "chapter_task": "extract_segment_financials",
+          "activation_status": "triggered",
+          "coverage_status": "observed",
+          "evidence": {
+            "page": 15,
+            "printed_page_label": "14",
+            "section_title": "同上 (2)占10%以上的行业、产品、地区、销售模式的情况",
+            "physical_anchor": {
+              "row_label": "航空制造业/航空产品 7.65%；国内 8.50%；直销 8.46%（毛利率同比-2.35%~-2.34%）",
+              "column_header": "毛利率",
+              "cell_locator": null,
+              "bounded_quote": "航空制造业 73,551,376,777.21 67,921,791,741.91 7.65%",
+              "footnote_refs": []
+            }
+          },
+          "source_native": {
+            "name": "毛利率(分部)",
+            "value": "见行定位",
+            "unit": "%",
+            "header": "毛利率"
+          },
+          "semantic": {
+            "object_type": "Measurement",
+            "metric_type_or_relation": null,
+            "logical_slot": "gross_margin",
+            "subject_scope": "consolidated_group",
+            "subject_name": "重述后合并口径分部",
+            "period": "FY2025(报告期)",
+            "comparison_basis": "同比变动基于重述后2024年值",
+            "assertion_class": "reported_fact"
+          },
+          "failure_or_empty_reason": null,
+          "reviewer_notes": null
+        },
+        {
+          "field_id": "production_capacity",
+          "chapter_task": "extract_operating_quantities",
+          "activation_status": "triggered",
+          "coverage_status": "not_disclosed",
+          "evidence": {
+            "page": 13,
+            "printed_page_label": "12",
+            "section_title": "第三节 三、核心竞争力分析；全文检索",
+            "physical_anchor": {
+              "row_label": null,
+              "column_header": null,
+              "cell_locator": null,
+              "bounded_quote": "构建以成飞作为航空整机装备核心能力中心，以贵飞、长飞、电测等公司为价值链延伸支撑的科研生产能力布局",
+              "footnote_refs": []
+            }
+          },
+          "source_native": {
+            "name": "产能",
+            "value": null,
+            "unit": null,
+            "header": null
+          },
+          "semantic": {
+            "object_type": "Measurement",
+            "metric_type_or_relation": "production_capacity",
+            "logical_slot": null,
+            "subject_scope": "consolidated_group",
+            "subject_name": null,
+            "period": "FY2025(报告期)",
+            "comparison_basis": null,
+            "assertion_class": "reported_fact"
+          },
+          "failure_or_empty_reason": "全文检索『产能/设计产能/有效产能』：仅科研生产能力等定性表述，无任何生产产能数值披露（军工行业保密惯例）。",
+          "reviewer_notes": "触发依据：航空整机制造商产能字段在业务上适用；报告未披露。非 extraction_failed（文本全部可读）。"
+        },
+        {
+          "field_id": "capacity_under_construction",
+          "chapter_task": "extract_operating_quantities",
+          "activation_status": "triggered",
+          "coverage_status": "not_disclosed",
+          "evidence": {
+            "page": 105,
+            "printed_page_label": "104",
+            "section_title": "第八节 财务报告 报表附注 重要在建工程项目",
+            "physical_anchor": {
+              "row_label": "在建工程期末余额758,207,947.98元（p18/p83）；重要在建工程项目披露门槛",
+              "column_header": null,
+              "cell_locator": null,
+              "bounded_quote": "重要在建工程项目 本期增加额或转入固定资产金额大于 5,000 万元或期初、期末余额大于 1 亿",
+              "footnote_refs": []
+            }
+          },
+          "source_native": {
+            "name": "在建产能",
+            "value": null,
+            "unit": null,
+            "header": null
+          },
+          "semantic": {
+            "object_type": "Measurement",
+            "metric_type_or_relation": "capacity_under_construction",
+            "logical_slot": null,
+            "subject_scope": "consolidated_group",
+            "subject_name": null,
+            "period": "FY2025(报告期)",
+            "comparison_basis": null,
+            "assertion_class": "reported_fact"
+          },
+          "failure_or_empty_reason": "财务口径在建工程金额存在（重要在建工程项目附注见p105），但报告未披露任何以产能单位计的在建/计划产能及预计投产时间；金额型在建工程不等于在建产能。",
+          "reviewer_notes": "对账关注点：不得将在建工程金额误标为产能类 Measurement。附注18在建工程核算政策见p114。"
+        },
+        {
+          "field_id": "capacity_utilization",
+          "chapter_task": "extract_operating_quantities",
+          "activation_status": "triggered",
+          "coverage_status": "not_disclosed",
+          "evidence": {
+            "page": 13,
+            "printed_page_label": "12",
+            "section_title": "第三节 三、核心竞争力分析；全文检索",
+            "physical_anchor": {
+              "row_label": null,
+              "column_header": null,
+              "cell_locator": null,
+              "bounded_quote": null,
+              "footnote_refs": []
+            }
+          },
+          "source_native": {
+            "name": "产能利用率",
+            "value": null,
+            "unit": null,
+            "header": null
+          },
+          "semantic": {
+            "object_type": "Measurement",
+            "metric_type_or_relation": "capacity_utilization",
+            "logical_slot": null,
+            "subject_scope": "consolidated_group",
+            "subject_name": null,
+            "period": "FY2025(报告期)",
+            "comparison_basis": null,
+            "assertion_class": "reported_fact"
+          },
+          "failure_or_empty_reason": "全文无产能利用率披露（定性与数值均无）。",
+          "reviewer_notes": null
+        },
+        {
+          "field_id": "production_volume",
+          "chapter_task": "extract_operating_quantities",
+          "activation_status": "triggered",
+          "coverage_status": "not_disclosed",
+          "evidence": {
+            "page": 15,
+            "printed_page_label": "14",
+            "section_title": "第三节 2、收入与成本 (3)公司实物销售收入是否大于劳务收入",
+            "physical_anchor": {
+              "row_label": null,
+              "column_header": null,
+              "cell_locator": null,
+              "bounded_quote": "公司实物销售收入是否大于劳务收入",
+              "footnote_refs": []
+            }
+          },
+          "source_native": {
+            "name": "生产量/产量",
+            "value": null,
+            "unit": null,
+            "header": null
+          },
+          "semantic": {
+            "object_type": "Measurement",
+            "metric_type_or_relation": "production_volume",
+            "logical_slot": null,
+            "subject_scope": "consolidated_group",
+            "subject_name": null,
+            "period": "FY2025(报告期)",
+            "comparison_basis": null,
+            "assertion_class": "reported_fact"
+          },
+          "failure_or_empty_reason": "报告明示实物销售收入大于劳务收入（勾选『是』，且注：因公司实物销售产品众多，无法进行分类统计），但全文无公司产量数值披露；军品产量属保密信息。",
+          "reviewer_notes": "'实物销售收入大于劳务收入=是'（勾选框）本身可作产量存在的定性证据，但无数值可标。"
+        },
+        {
+          "field_id": "sales_volume",
+          "chapter_task": "extract_operating_quantities",
+          "activation_status": "triggered",
+          "coverage_status": "not_disclosed",
+          "evidence": {
+            "page": 15,
+            "printed_page_label": "14",
+            "section_title": "同上 (3)公司实物销售收入是否大于劳务收入",
+            "physical_anchor": {
+              "row_label": null,
+              "column_header": null,
+              "cell_locator": null,
+              "bounded_quote": null,
+              "footnote_refs": []
+            }
+          },
+          "source_native": {
+            "name": "销售量",
+            "value": null,
+            "unit": null,
+            "header": null
+          },
+          "semantic": {
+            "object_type": "Measurement",
+            "metric_type_or_relation": "sales_volume",
+            "logical_slot": null,
+            "subject_scope": "consolidated_group",
+            "subject_name": null,
+            "period": "FY2025(报告期)",
+            "comparison_basis": null,
+            "assertion_class": "reported_fact"
+          },
+          "failure_or_empty_reason": "无实物销量披露；收入为货币金额，严禁充当销量。军贸出口亦无交付量披露。",
+          "reviewer_notes": null
+        },
+        {
+          "field_id": "inventory_volume",
+          "chapter_task": "extract_operating_quantities",
+          "activation_status": "triggered",
+          "coverage_status": "not_disclosed",
+          "evidence": {
+            "page": 134,
+            "printed_page_label": "133",
+            "section_title": "第八节 财务报告 附注 存货（原材料 7,435,556,45x.xx 元等）",
+            "physical_anchor": {
+              "row_label": null,
+              "column_header": null,
+              "cell_locator": null,
+              "bounded_quote": null,
+              "footnote_refs": []
+            }
+          },
+          "source_native": {
+            "name": "库存量",
+            "value": null,
+            "unit": null,
+            "header": null
+          },
+          "semantic": {
+            "object_type": "Measurement",
+            "metric_type_or_relation": "inventory_volume",
+            "logical_slot": null,
+            "subject_scope": "consolidated_group",
+            "subject_name": null,
+            "period": "FY2025(报告期)",
+            "comparison_basis": null,
+            "assertion_class": "reported_fact"
+          },
+          "failure_or_empty_reason": "存货仅有金额披露（原材料等），无实物库存量及脚注；军品库存量未披露。",
+          "reviewer_notes": null
+        },
+        {
+          "field_id": "processing_volume",
+          "chapter_task": "extract_operating_quantities",
+          "activation_status": "not_triggered",
+          "coverage_status": "not_applicable",
+          "evidence": {
+            "page": 11,
+            "printed_page_label": "10",
+            "section_title": "第三节 一、(二)报告期内的经营模式 2、生产模式/4、盈利和结算模式",
+            "physical_anchor": {
+              "row_label": null,
+              "column_header": null,
+              "cell_locator": null,
+              "bounded_quote": "扣除基础原材料、零部件成本和加工、装配等环节的制造费用后获得一定的毛利",
+              "footnote_refs": []
+            }
+          },
+          "source_native": {
+            "name": "加工服务量",
+            "value": null,
+            "unit": null,
+            "header": null
+          },
+          "semantic": {
+            "object_type": "Measurement",
+            "metric_type_or_relation": "processing_volume",
+            "logical_slot": null,
+            "subject_scope": "consolidated_group",
+            "subject_name": null,
+            "period": "FY2025(报告期)",
+            "comparison_basis": null,
+            "assertion_class": "reported_fact"
+          },
+          "failure_or_empty_reason": "公司的加工、装配为自制产品的内部制造环节（成本构成），不构成对外提供的加工服务量；维修服务保障业务存在（服务收入）但报告未以实物加工量口径披露任何数值。",
+          "reviewer_notes": "若对账口径将维修服务量纳入 processing_volume，则本条应改记 triggered+not_disclosed；本提交按『对外加工服务量』语义记 not_triggered，属合同语义待裁决点（见 contract_findings）。"
+        },
+        {
+          "field_id": "material_input",
+          "chapter_task": "extract_material_inputs",
+          "activation_status": "triggered",
+          "coverage_status": "not_disclosed",
+          "evidence": {
+            "page": 12,
+            "printed_page_label": "11",
+            "section_title": "第三节 一、(二)报告期内的经营模式 4、盈利和结算模式",
+            "physical_anchor": {
+              "row_label": null,
+              "column_header": null,
+              "cell_locator": null,
+              "bounded_quote": "扣除基础原材料、零部件成本和加工、装配等环节的制造费用",
+              "footnote_refs": []
+            }
+          },
+          "source_native": {
+            "name": "原材料/能源输入",
+            "value": null,
+            "unit": null,
+            "header": null
+          },
+          "semantic": {
+            "object_type": "Relationship",
+            "metric_type_or_relation": "material_input_relation",
+            "logical_slot": null,
+            "subject_scope": "consolidated_group",
+            "subject_name": null,
+            "period": "FY2025(报告期)",
+            "comparison_basis": null,
+            "assertion_class": "reported_fact"
+          },
+          "failure_or_empty_reason": "全文仅有『基础原材料、零部件』泛称（盈利模式成本描述），无任何具体原材料或能源名称披露（军工保密）；附注仅存货金额分类。泛称不满足『年报明示的原材料输入』可标注事实标准。",
+          "reviewer_notes": "触发依据：报告提及原材料成本要素（泛称）。若对账认为泛称不构成触发条件，则改记 not_triggered；两可之间按 triggered+not_disclosed 从严处理并留痕。"
+        },
+        {
+          "field_id": "counterparty_relationship",
+          "chapter_task": "extract_counterparties_and_concentration",
+          "activation_status": "triggered",
+          "coverage_status": "observed",
+          "evidence": {
+            "page": 174,
+            "printed_page_label": "173",
+            "section_title": "第八节 财务报告 附注 十四、关联方及关联交易 5、关联交易情况 (1)购销商品、提供和接受劳务的关联交易",
+            "physical_anchor": {
+              "row_label": "采购：中国航空工业集团所属单位 采购商品24,728,257,889.64元、接受劳务3,039,224,919.90元；中国航空工业集团合营联营企业 采购商品4,199,011.51元；销售：中国航空工业集团所属单位 销售商品3,604,178,894.96元、提供劳务56,398,329.26元；合营联营企业 销售商品52,961,867.36元",
+              "column_header": "关联方、关联交易内容、本期发生额、获批的交易额度、上期发生额",
+              "cell_locator": null,
+              "bounded_quote": "中国航空工业集团所属单位 采购商品 24,728,257,889.64",
+              "footnote_refs": []
+            }
+          },
+          "source_native": {
+            "name": "关联客户/供应商（集团聚合匿名口径）",
+            "value": "见行定位；对手方以『中国航空工业集团所属单位/合营联营企业』聚合列示，无个体名称",
+            "unit": "元（人民币）",
+            "header": null
+          },
+          "semantic": {
+            "object_type": "Relationship",
+            "metric_type_or_relation": "counterparty_relation",
+            "logical_slot": null,
+            "subject_scope": "consolidated_group",
+            "subject_name": "consolidated_group",
+            "period": "FY2025(报告期)",
+            "comparison_basis": null,
+            "assertion_class": "reported_fact"
+          },
+          "failure_or_empty_reason": null,
+          "reviewer_notes": "主销客户/供应商段（p16）仅披露合计与关联占比、无任何名单；报告内匿名对手方仅有集团聚合口径（『集团所属单位』），另 p170 定性表述『本公司的主要客户为国家单位等』。具名主体仅中航工业集团财务有限责任公司（资金拆借，非购销对手，p175）。军工保密使个体身份不可得，聚合匿名是报告内最高分辨率。"
+        },
+        {
+          "field_id": "customer_concentration",
+          "chapter_task": "extract_counterparties_and_concentration",
+          "activation_status": "triggered",
+          "coverage_status": "observed",
+          "evidence": {
+            "page": 16,
+            "printed_page_label": "15",
+            "section_title": "第三节 四、主营业务分析 (8)主要销售客户和主要供应商情况",
+            "physical_anchor": {
+              "row_label": null,
+              "column_header": null,
+              "cell_locator": null,
+              "bounded_quote": "前五名客户合计销售金额(元) 72,672,513,444.91",
+              "footnote_refs": []
+            }
+          },
+          "source_native": {
+            "name": "前五名客户合计销售金额",
+            "value": "72,672,513,444.91（占年度销售总额96.44%；其中关联方销售额占4.93%）",
+            "unit": "元（人民币）",
+            "header": null
+          },
+          "semantic": {
+            "object_type": "Measurement",
+            "metric_type_or_relation": "customer_concentration",
+            "logical_slot": null,
+            "subject_scope": "consolidated_group",
+            "subject_name": "重述后合并口径销售",
+            "period": "FY2025(报告期)",
+            "comparison_basis": null,
+            "assertion_class": "reported_fact"
+          },
+          "failure_or_empty_reason": null,
+          "reviewer_notes": "极高客户集中度（军工单一国家客户特征）。无名单：仅有比例与金额，不得反推或虚构具体客户关系（交接单规则）。"
+        },
+        {
+          "field_id": "supplier_concentration",
+          "chapter_task": "extract_counterparties_and_concentration",
+          "activation_status": "triggered",
+          "coverage_status": "observed",
+          "evidence": {
+            "page": 16,
+            "printed_page_label": "15",
+            "section_title": "同上 (8)主要销售客户和主要供应商情况",
+            "physical_anchor": {
+              "row_label": null,
+              "column_header": null,
+              "cell_locator": null,
+              "bounded_quote": "前五名供应商合计采购金额(元) 51,613,058,963.17",
+              "footnote_refs": []
+            }
+          },
+          "source_native": {
+            "name": "前五名供应商合计采购金额",
+            "value": "51,613,058,963.17（占年度采购总额74.16%；其中关联方采购额占42.17%）",
+            "unit": "元（人民币）",
+            "header": null
+          },
+          "semantic": {
+            "object_type": "Measurement",
+            "metric_type_or_relation": "supplier_concentration",
+            "logical_slot": null,
+            "subject_scope": "consolidated_group",
+            "subject_name": "重述后合并口径采购",
+            "period": "FY2025(报告期)",
+            "comparison_basis": null,
+            "assertion_class": "reported_fact"
+          },
+          "failure_or_empty_reason": null,
+          "reviewer_notes": "关联采购占比42.17%与关联交易表（p174：向集团所属单位采购商品247.28亿元）量级吻合，交叉验证一致。"
+        }
+      ],
+      "sample_bias_findings": [
+        "regime 样本的核心偏差：同一控制下企业合并使全部比较期数据重述（2024收入由17.80亿元重述为650.55亿元，p8），若画像不强制携带 comparison_basis，任何跨期比较都会得到数量级错误的增长率。",
+        "军工保密样本：六个量类字段全部 not_disclosed，客户/供应商仅有合计与关联占比（无名单），材料输入仅泛称——检验清单在极端披露缺失下的失败语义使用（not_disclosed vs not_applicable vs extraction_failed）。",
+        "页码系偏差：本报告物理页码=印刷页码+1（全文成立），其余三份物理=印刷；不加 printed_page_label 会造成证据锚定系统性偏移一格。",
+        "上市公司主体连续性与业务主体同一性分离：法律主体（原中航电测）连续，业务主体（成飞资产）靠重述拼接，业务画像的主体语义在2025年前后实质不同（应变测试/智能测控 vs 航空整机），regime 字段必须能承载『不得用当前主业追溯改写历史』。"
+      ],
+      "missing_field_candidates": [
+        "重述/可比口径标记：建议在 Measurement 语义中强制 comparison_basis（本提交已自愿填写），清单18字段未显式要求，容易在自动抽取中被省略。",
+        "披露豁免原因：军工样本大量 not_disclosed 的根因是保密豁免而非疏漏，建议覆盖状态增加可选 reason_code=disclosure_exemption（军事保密/商业秘密），锦华的匿名客户（保密协议）同理。",
+        "军贸链式销售主体：军贸模式下公司→军贸公司→国外最终用户，销售模式表却归为直销；建议 segment/counterparty 语义说明销售链条中的直接对手方认定规则。"
+      ],
+      "blocking_findings": []
+    }
+  ],
+  "cross_report_findings": [
+    "披露模板三分：300750（深交所创业板）、603659（上交所新格式）、920015（北交所行业信息专章）、302132（深交所主板军工）分属不同披露体系，同字段的证据形态从专表（锦华产能表）到叙述段（璞泰来产能）到整体缺失（成飞量类）不等；18字段清单对这些形态均可落位，但 evidence 要求需容忍叙述式锚定。",
+    "页码坐标系：302132 物理页=印刷页+1，其余三份一致；交接单的 printed_page_label 规则在 regime 样本上为必需而非可选。",
+    "量类披露完整度梯度：300750（产能/在建/利用率/产量/销量/库存全有）≈920015（产能/在建/利用率有，产销量库存无）>603659（产能叙述+产销量库存有，利用率无数值）>302132（全无）。样本梯度覆盖良好，但缺『仅披露产量无产能』的形态。",
+    "集中度谱系：客户集中度38.96%(300750)→50.27%(920015)→58.14%(603659)→96.44%(302132)；供应商10.38%→51.40%→13.98%→74.16%。匿名编码体系互不相同（第一名…/无名单/J·K·L·M·A·B·C·D/集团所属单位聚合），『匿名身份不得跨报告合并』规则必要且需匿名ID命名规范。",
+    "金额单位四样态：千元（300750分部）、元（603659/920015/302132分部）、万元（603659集中度）、亿元（叙述）；同一报告内亦可混用（603659分部元vs集中度万元），source-native 单位保留规则必须严格执行且禁止跨字段换算。",
+    "原材料披露形态谱系：专表含能源（920015）>分业务文字列举（603659、300750）>泛称（302132）；『不得用行业常识补齐』在军工样本上直接决定 material_input 的覆盖状态。",
+    "同一物理事实双写风险仅出现在603659（涂覆加工量=涂覆隔膜销量），但规则需推广：300750回收量与销量分属不同物理量无冲突；对账时应将『来源括注』（加工量（销量））视为双写高风险信号。"
+  ],
+  "contract_findings": [
+    "processing_volume 方向语义未定义：璞泰来为加工服务提供方（涂覆加工/极片代工）、锦华为加工服务采购方（委外加工丁酮肟）、宁德为自营回收处理、成飞为内部工序加工；清单应明确该字段仅统计『公司对外提供』还是双向，否则四样本的 activation/coverage 判定不可比（本提交：603659 observed、300750 observed(回收语义待裁决)、920015 triggered+not_disclosed、302132 not_triggered）。",
+    "production_capacity 口径未分类：样本中并存『报告期内产能』（300750）、『有效产能』（603659）、『设计产能』（920015）；三者不可直接比较，建议 semantic 增加 capacity_semantics（period/effective/design）。",
+    "counterparty_relationship 对『仅合计披露』格式的合法状态未定义：603659（新格式）与302132（军工）均无前五大名单，仅能以关联交易表（603659具名、302132集团聚合）支撑 observed；建议清单明确（a）关联交易对手是否计入、（b）聚合匿名（集团所属单位）是否算报告内匿名对手方。",
+    "同一控制重述的比较基准未被清单强制：302132 分部表 2024 列为重述值；模板 semantic.comparison_basis 存在但 checklist 定义未要求填写；建议升级为 required-when-restated。",
+    "not_disclosed 与披露豁免未区分：军工保密（302132量类、对手方名单）与NDA匿名（300750客户A、920015匿名编码）的根因不同，建议 failure_or_empty_reason 增加豁免类型标注，避免画像将保密豁免误判为披露质量问题。",
+    "inventory_volume 要求『实物库存量及脚注』，但300750库存量无脚注（口径未说明是否含发出商品）、603659脚注明确含发出商品；建议明确无脚注时的标注方式（本提交均记 observed 并在 notes 说明脚注缺失）。",
+    "explicit_activity 的动词集合在军工维修样本上需要裁决：『维修与服务保障』映射 provides_service 无争议，但军贸链条中『销售』动作由军贸公司完成，公司对最终用户无销售动词；建议规则说明动词归属以公司直接对手方为准。"
+  ],
+  "submission_status": "complete"
+}
