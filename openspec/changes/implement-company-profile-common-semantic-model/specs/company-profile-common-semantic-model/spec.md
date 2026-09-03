@@ -27,7 +27,7 @@ Every source-backed object MUST reference versioned Evidence containing report i
 - **AND** verification does not substitute the printed label for the physical coordinate
 
 ### Requirement: Subject period and business regime are explicit
-Every governed fact MUST carry a supported subject scope and period semantics. Subject scope MUST be one of `consolidated_group`, `issuer`, `named_subsidiary`, `business_segment`, or `unclear`; unsupported scope MUST remain `unclear`. Regime-sensitive facts MUST preserve report period, knowledge time, regime effective time, and comparison basis without rewriting historical knowledge.
+Every governed fact MUST carry a supported subject scope and period semantics. Subject scope MUST be one of `consolidated_group`, `issuer`, `named_subsidiary`, `business_segment`, or `unclear`; unsupported scope MUST remain `unclear`. Regime-sensitive facts MUST preserve report period, knowledge time, regime effective time, and comparison basis without rewriting historical knowledge. An explicitly restated comparative MUST carry `comparison_basis`; a missing basis is a blocker, not an inferred default.
 
 #### Scenario: Company wording lacks group evidence
 - **WHEN** a management-discussion table only says `公司` and has neither explicit group wording nor documented reconciliation to the consolidated statement
@@ -40,7 +40,7 @@ Every governed fact MUST carry a supported subject scope and period semantics. S
 - **AND** the later record does not overwrite the earlier known fact
 
 ### Requirement: Measurements preserve source-native meaning before canonical conversion
-Each Measurement MUST contain exactly one metric, one logical slot, one subject, one measured object or segment, one period, and the source-native value, unit, header, qualifier, footnote references, and Evidence. Canonical conversion MUST be a separate program-owned result. Reported and derived values MUST have distinct provenance.
+Each Measurement MUST contain exactly one metric, one logical slot, one subject, one measured object or segment, one period, and the source-native value, unit, header, qualifier, footnote references, and Evidence. Canonical conversion MUST be a separate program-owned result. Reported and derived values MUST have distinct provenance. A production-capacity Measurement MUST carry a source-supported `capacity_kind`; a processing-volume Measurement MUST carry `processing_direction=external_service_provided` and MUST NOT represent buyer-side outsourcing, an internal production step, or self-operated recycling. Consolidation rows MUST use `row_class=consolidation_adjustment` and keep revenue, cost, and margin as separate Measurements; they are not products or Activities.
 
 #### Scenario: Capacity is observed
 - **WHEN** a source reports production capacity
@@ -57,8 +57,16 @@ Each Measurement MUST contain exactly one metric, one logical slot, one subject,
 - **THEN** the Measurement may be observed with an empty footnote list
 - **AND** the model does not invent an inventory scope
 
+### Requirement: Activities and disclosed identities use frozen closed sets
+The model MUST restrict v1 Activity actions to `develops`, `produces`, `processes`, `sells`, `purchases`, `provides_service`, and `operates`; an observed verb outside this set MUST remain an unresolved source candidate. Every Activity `activity_actor` MUST be supported by the source's direct grammatical or economic relationship, and a third-party trader's sale MUST NOT be rewritten as the issuer's `sells`. Counterparty identity MUST use only `named`, `report_local_anonymous`, or `report_local_aggregate`; an aggregate total without names remains `not_disclosed` for names and MUST NOT be backfilled from another chapter.
+
+#### Scenario: Unsupported action and aggregate identity stay bounded
+- **WHEN** a source uses an unreviewed action verb and a top-five section reports only an aggregate amount without names
+- **THEN** the action remains unresolved and the aggregate may use `identity_class=report_local_aggregate` only for its own source identity
+- **AND** counterparty-name coverage remains `not_disclosed` rather than being filled from another chapter
+
 ### Requirement: Coverage is a first-class result rather than an empty collection
-For every active package and chapter-task checklist item, the system MUST record its requirement level and one of `observed`, `not_disclosed`, `not_applicable`, `extraction_failed`, or `unclear`, with a reason and evidence pages where applicable. An empty object list MUST NOT imply task completion.
+For every active package and chapter-task checklist item, the system MUST record its requirement level and one of `observed`, `not_disclosed`, `not_applicable`, `extraction_failed`, or `unclear`, with an applicable `reason_code` and evidence pages where applicable. For `not_disclosed`, the `reason_code` set is closed to `explicit_confidentiality`, `explicit_disclosure_exemption`, or `source_reason_unspecified`; the first two require explicit source wording. Coverage is evaluated only against the active package's chapter-task checklist, not an unbounded universe of metrics. An empty object list MUST NOT imply task completion.
 
 #### Scenario: Required product table was not read
 - **WHEN** a required product performance table is known to exist but its page was omitted or unreadable

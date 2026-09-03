@@ -53,7 +53,9 @@
 
 使用仓库已有 Pydantic v2 的 frozen/strict models 和 discriminated unions；JSON Schema 从模型生成，用于 LLM 响应约束和 fixture 校验。业务不变量通过 model validator 和少量纯函数表达，不再同时手写第二份等价 JSON Schema。
 
-关键封闭枚举包括：object type、subject scope、assertion class、requirement level、coverage status、period semantics、v1 action、metric type、capacity kind、comparison basis 和 disposition。未知值必须失败或显式进入 `unclear`，不得被 silently coerced。
+关键封闭枚举与受控值域包括：object type、subject scope、assertion class、requirement level、coverage status、period semantics、v1 action、metric type、capacity kind、comparison basis、processing direction、identity class、row class、coverage reason code 和 disposition。v1 action 仅允许 `develops`、`produces`、`processes`、`sells`、`purchases`、`provides_service`、`operates`；`processing_volume` 的 v1 `processing_direction` 仅允许 `external_service_provided`；identity class 仅允许 `named`、`report_local_anonymous`、`report_local_aggregate`；`row_class=consolidation_adjustment` 只用于有证据的合并抵消行，其他行不填该标记；`not_disclosed` reason code 仅允许 `explicit_confidentiality`、`explicit_disclosure_exemption`、`source_reason_unspecified`。未知值必须失败或显式进入 `unclear`，不得被 silently coerced。
+
+阶段 4 的 chapter task 同样是闭集：`extract_business_overview`、`extract_segment_financials`、`extract_operating_quantities`、`extract_material_inputs`、`extract_counterparties_and_concentration`、`extract_business_regime`。模型和请求合同不得接受未审定任务名。
 
 备选是继续只用字典加 `jsonschema`。放弃，因为对象间条件不变量（例如 capacity kind、重述 basis、Activity 禁止 numeric value）会散落在调用方。
 
@@ -79,7 +81,7 @@ validated task input
   -> research projection input
 ```
 
-Provider 只暴露 `extract/repair/verify` protocol。测试使用 fake provider；阶段 4 不实现网络 client。确定性候选与模型候选经过同一 validator，并按 physical occurrence 去重，避免两个来源各自发布。
+Provider 只暴露 `extract/repair/verify` protocol。测试使用 fake provider；阶段 4 不实现网络 client。确定性候选仅来自已结构化的 Gold/research fixture，不做 PDF 选页、OCR 或表格解析。确定性候选与模型候选经过同一 validator，并按 physical occurrence 去重，避免两个来源各自发布。
 
 ### Decision 5: task 完成由 coverage 与 disposition 决定
 
@@ -110,18 +112,19 @@ Provider 只暴露 `extract/repair/verify` protocol。测试使用 fake provider
 }
 ```
 
-投影按批准/可展示状态过滤，保留 source-native 与证据链接。阶段 4 fixture 中没有正式 approved governance，因此参考样例必须标为 `research_fixture`，不得冒充生产画像。
+投影按阶段 4 合同可展示状态过滤：`accepted_for_review` 且带 `data_status=research_fixture` 的对象可以进入参考视图；不得按生产 `approved` 过滤，因为阶段 4 不存在治理批准。投影保留 source-native 与证据链接。参考样例必须标为 `research_fixture`，不得冒充生产画像。
 
 商品暴露最终可以显示“披露商品事实、公司角色、映射状态、有效期、证据、方向/敏感性是否另有研究假设”，但在阶段 4 只能返回 `not_authorized/not_assessed/insufficient_evidence` 及已披露基础事实，不能生成利润方向。供应链也只展示明示输入、客户、供应商、合同和有证据的加工转换，未知上下游必须显式保留。
 
 ### Decision 7: Gold 测试按业务不变量映射，不建设通用 benchmark 平台
 
-测试直接读取已批准 Gold JSON 和 negative cases，建立少量 adapter 将其转为新模型 fixture。优先验证：
+测试直接读取已批准 Gold JSON 和 negative cases，建立少量 adapter 将其转为新模型 fixture；另增加来自已读年报的最小 `research_fixture` 正例，覆盖 observed production-capacity kind 和无库存脚注仍可 observed，不修改 Gold、不编造数字。优先验证：
 
 - 产品行拆成三个 Measurements；
 - 加工量与销量不同锚点、不双写；
 - 合并抵消行不是产品或 Activity；
 - 产能 kind、重述 comparison basis 必填；
+- `processing_direction`、`identity_class`、`row_class=consolidation_adjustment`、`activity_actor` 和 not-disclosed reason code 与行业冻结合同一致；
 - 无肯定证据的主体保持 unclear；
 - 匿名关系不跨报告解析；
 - coverage 不以空数组完成；
