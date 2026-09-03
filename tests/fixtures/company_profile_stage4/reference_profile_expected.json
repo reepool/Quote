@@ -1,0 +1,902 @@
+{
+  "schema_version": "company_profile_research_view.v1",
+  "production_authorization": "not_authorized",
+  "data_status": "research_fixture",
+  "company": {
+    "instrument_id": "300750.SZ",
+    "name": "宁德时代"
+  },
+  "as_of": {
+    "report_id": "asset_3b09f6c831975c7177b6bb3287cab781",
+    "report_period": "2025-12-31",
+    "published_at": "2026-03-09T16:00:00+00:00",
+    "document_version": "ver_09c0e677ec8192dc4fc12cb620069f29"
+  },
+  "business_overview": {
+    "record_id": "cp-300750-overview",
+    "field_id": "business_overview_source",
+    "object_type": "BusinessOverview",
+    "assertion_class": "reported_fact",
+    "subject_scope": "unclear",
+    "reported_period": "2025",
+    "source_native": {
+      "name": "主要业务",
+      "value": null,
+      "unit": null,
+      "header": "第三节 管理层讨论与分析",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "evidence_ids": [
+      "ev-300750-overview"
+    ],
+    "details": {
+      "subject_name": null,
+      "subject_basis": null,
+      "source_text": "主要从事动力电池、储能电池的研发、生产、销售"
+    }
+  },
+  "business_regime": [
+    {
+      "record_id": "cp-300750-package",
+      "field_id": "business_regime",
+      "object_type": "IndustryPackageAssignment",
+      "assertion_class": "deterministic_derivation",
+      "subject_scope": "issuer",
+      "reported_period": "2025",
+      "source_native": {
+        "name": "制造/材料行业包",
+        "value": null,
+        "unit": null,
+        "header": "阶段3已批准行业研究合同",
+        "qualifier": null,
+        "footnote_refs": [],
+        "source_aliases": []
+      },
+      "evidence_ids": [
+        "ev-300750-overview"
+      ],
+      "details": {
+        "subject_name": null,
+        "subject_basis": "direct_source_wording",
+        "package_name": "manufacturing_materials",
+        "package_version": "research.v1",
+        "effective_from": "2025-01-01",
+        "effective_to": null
+      }
+    }
+  ],
+  "segments": [
+    {
+      "record_id": "cp-300750-segment",
+      "field_id": "segment_dimension",
+      "object_type": "Segment",
+      "assertion_class": "reported_fact",
+      "subject_scope": "consolidated_group",
+      "reported_period": "2025",
+      "source_native": {
+        "name": "动力电池系统",
+        "value": null,
+        "unit": null,
+        "header": "分产品",
+        "qualifier": null,
+        "footnote_refs": [],
+        "source_aliases": []
+      },
+      "evidence_ids": [
+        "ev-300750-segment"
+      ],
+      "details": {
+        "subject_name": null,
+        "subject_basis": "numeric_reconciliation_to_consolidated_statement",
+        "dimension": "product",
+        "label": "动力电池系统",
+        "row_class": null,
+        "uncertainty": [
+          "scope is supported by reconciliation to consolidated revenue"
+        ]
+      }
+    }
+  ],
+  "activities": [
+    {
+      "record_id": "cp-300750-produces",
+      "field_id": "explicit_activity",
+      "object_type": "Activity",
+      "assertion_class": "reported_fact",
+      "subject_scope": "issuer",
+      "reported_period": "2025",
+      "source_native": {
+        "name": "动力电池系统",
+        "value": null,
+        "unit": null,
+        "header": "主要业务",
+        "qualifier": null,
+        "footnote_refs": [],
+        "source_aliases": []
+      },
+      "evidence_ids": [
+        "ev-300750-overview"
+      ],
+      "details": {
+        "subject_name": null,
+        "subject_basis": "direct_source_wording",
+        "action": "produces",
+        "activity_actor": "宁德时代",
+        "source_actor": "宁德时代",
+        "actor_basis": "direct_grammatical_actor",
+        "object_name": "动力电池系统",
+        "source_verb": "生产"
+      }
+    }
+  ],
+  "operating_measurements": [
+    {
+      "record_id": "cp-300750-cost",
+      "field_id": "operating_cost",
+      "object_type": "Measurement",
+      "assertion_class": "reported_fact",
+      "subject_scope": "consolidated_group",
+      "reported_period": "2025",
+      "source_native": {
+        "name": "动力电池系统",
+        "value": "241064397",
+        "unit": "千元",
+        "header": "营业成本",
+        "qualifier": null,
+        "footnote_refs": [],
+        "source_aliases": []
+      },
+      "evidence_ids": [
+        "ev-300750-cost"
+      ],
+      "details": {
+        "subject_name": null,
+        "subject_basis": "numeric_reconciliation_to_consolidated_statement",
+        "metric_type": "operating_cost",
+        "logical_slot": "cost",
+        "measured_object": "动力电池系统",
+        "segment_dimension": "product",
+        "segment_label": "动力电池系统",
+        "capacity_kind": null,
+        "processing_direction": null,
+        "row_class": null,
+        "is_restated_comparative": false,
+        "comparison_basis": null,
+        "relationship_context": null,
+        "uncertainty": [
+          "scope is supported by reconciliation to consolidated revenue"
+        ]
+      }
+    },
+    {
+      "record_id": "cp-300750-margin",
+      "field_id": "gross_margin_reported",
+      "object_type": "Measurement",
+      "assertion_class": "reported_fact",
+      "subject_scope": "consolidated_group",
+      "reported_period": "2025",
+      "source_native": {
+        "name": "动力电池系统",
+        "value": "23.84",
+        "unit": "%",
+        "header": "毛利率",
+        "qualifier": null,
+        "footnote_refs": [],
+        "source_aliases": []
+      },
+      "evidence_ids": [
+        "ev-300750-margin"
+      ],
+      "details": {
+        "subject_name": null,
+        "subject_basis": "numeric_reconciliation_to_consolidated_statement",
+        "metric_type": "gross_margin_reported",
+        "logical_slot": "gross_margin",
+        "measured_object": "动力电池系统",
+        "segment_dimension": "product",
+        "segment_label": "动力电池系统",
+        "capacity_kind": null,
+        "processing_direction": null,
+        "row_class": null,
+        "is_restated_comparative": false,
+        "comparison_basis": null,
+        "relationship_context": null,
+        "uncertainty": [
+          "scope is supported by reconciliation to consolidated revenue"
+        ]
+      }
+    },
+    {
+      "record_id": "cp-300750-revenue",
+      "field_id": "operating_revenue",
+      "object_type": "Measurement",
+      "assertion_class": "reported_fact",
+      "subject_scope": "consolidated_group",
+      "reported_period": "2025",
+      "source_native": {
+        "name": "动力电池系统",
+        "value": "316506369",
+        "unit": "千元",
+        "header": "营业收入",
+        "qualifier": null,
+        "footnote_refs": [],
+        "source_aliases": []
+      },
+      "evidence_ids": [
+        "ev-300750-revenue"
+      ],
+      "details": {
+        "subject_name": null,
+        "subject_basis": "numeric_reconciliation_to_consolidated_statement",
+        "metric_type": "operating_revenue",
+        "logical_slot": "revenue",
+        "measured_object": "动力电池系统",
+        "segment_dimension": "product",
+        "segment_label": "动力电池系统",
+        "capacity_kind": null,
+        "processing_direction": null,
+        "row_class": null,
+        "is_restated_comparative": false,
+        "comparison_basis": null,
+        "relationship_context": null,
+        "uncertainty": [
+          "scope is supported by reconciliation to consolidated revenue"
+        ]
+      }
+    },
+    {
+      "record_id": "cp-300750-capacity",
+      "field_id": "production_capacity",
+      "object_type": "Measurement",
+      "assertion_class": "reported_fact",
+      "subject_scope": "unclear",
+      "reported_period": "2025",
+      "source_native": {
+        "name": "电池系统产能",
+        "value": "772",
+        "unit": "GWh",
+        "header": "2025年",
+        "qualifier": null,
+        "footnote_refs": [],
+        "source_aliases": []
+      },
+      "evidence_ids": [
+        "ev-300750-capacity"
+      ],
+      "details": {
+        "subject_name": null,
+        "subject_basis": null,
+        "metric_type": "production_capacity",
+        "logical_slot": "capacity",
+        "measured_object": "电池系统",
+        "segment_dimension": null,
+        "segment_label": null,
+        "capacity_kind": "report_period_capacity",
+        "processing_direction": null,
+        "row_class": null,
+        "is_restated_comparative": false,
+        "comparison_basis": null,
+        "relationship_context": null,
+        "uncertainty": [
+          "the operating table does not independently establish consolidated scope"
+        ]
+      }
+    },
+    {
+      "record_id": "cp-300750-production",
+      "field_id": "production_volume",
+      "object_type": "Measurement",
+      "assertion_class": "reported_fact",
+      "subject_scope": "unclear",
+      "reported_period": "2025",
+      "source_native": {
+        "name": "电池系统生产量",
+        "value": "748",
+        "unit": "GWh",
+        "header": "2025年",
+        "qualifier": null,
+        "footnote_refs": [],
+        "source_aliases": []
+      },
+      "evidence_ids": [
+        "ev-300750-production"
+      ],
+      "details": {
+        "subject_name": null,
+        "subject_basis": null,
+        "metric_type": "production_volume",
+        "logical_slot": "production_volume",
+        "measured_object": "电池系统",
+        "segment_dimension": null,
+        "segment_label": null,
+        "capacity_kind": null,
+        "processing_direction": null,
+        "row_class": null,
+        "is_restated_comparative": false,
+        "comparison_basis": null,
+        "relationship_context": null,
+        "uncertainty": [
+          "the operating table does not independently establish consolidated scope"
+        ]
+      }
+    },
+    {
+      "record_id": "cp-300750-sales",
+      "field_id": "sales_volume",
+      "object_type": "Measurement",
+      "assertion_class": "reported_fact",
+      "subject_scope": "unclear",
+      "reported_period": "2025",
+      "source_native": {
+        "name": "电池系统销售量",
+        "value": "661",
+        "unit": "GWh",
+        "header": "2025年",
+        "qualifier": null,
+        "footnote_refs": [],
+        "source_aliases": []
+      },
+      "evidence_ids": [
+        "ev-300750-sales"
+      ],
+      "details": {
+        "subject_name": null,
+        "subject_basis": null,
+        "metric_type": "sales_volume",
+        "logical_slot": "sales_volume",
+        "measured_object": "电池系统",
+        "segment_dimension": null,
+        "segment_label": null,
+        "capacity_kind": null,
+        "processing_direction": null,
+        "row_class": null,
+        "is_restated_comparative": false,
+        "comparison_basis": null,
+        "relationship_context": null,
+        "uncertainty": [
+          "the operating table does not independently establish consolidated scope"
+        ]
+      }
+    },
+    {
+      "record_id": "cp-300750-inventory",
+      "field_id": "inventory_volume",
+      "object_type": "Measurement",
+      "assertion_class": "reported_fact",
+      "subject_scope": "unclear",
+      "reported_period": "2025-12-31",
+      "source_native": {
+        "name": "电池系统库存量",
+        "value": "186",
+        "unit": "GWh",
+        "header": "2025年末",
+        "qualifier": null,
+        "footnote_refs": [],
+        "source_aliases": []
+      },
+      "evidence_ids": [
+        "ev-300750-inventory"
+      ],
+      "details": {
+        "subject_name": null,
+        "subject_basis": null,
+        "metric_type": "inventory_volume",
+        "logical_slot": "inventory_volume",
+        "measured_object": "电池系统",
+        "segment_dimension": null,
+        "segment_label": null,
+        "capacity_kind": null,
+        "processing_direction": null,
+        "row_class": null,
+        "is_restated_comparative": false,
+        "comparison_basis": null,
+        "relationship_context": null,
+        "uncertainty": [
+          "the operating table does not independently establish consolidated scope"
+        ]
+      }
+    }
+  ],
+  "disclosed_inputs": [
+    {
+      "record_id": "cp-300750-material-input",
+      "field_id": "material_input",
+      "object_type": "Relationship",
+      "assertion_class": "reported_fact",
+      "subject_scope": "unclear",
+      "reported_period": "2025",
+      "source_native": {
+        "name": "正极材料、负极材料、隔膜和电解液",
+        "value": null,
+        "unit": null,
+        "header": "主要原材料",
+        "qualifier": null,
+        "footnote_refs": [],
+        "source_aliases": []
+      },
+      "evidence_ids": [
+        "ev-300750-materials"
+      ],
+      "details": {
+        "subject_name": null,
+        "subject_basis": null,
+        "relation_type": "material_input",
+        "object_name": "正极材料、负极材料、隔膜和电解液",
+        "identity_class": null,
+        "external_entity_id": null
+      }
+    }
+  ],
+  "counterparties": [
+    {
+      "record_id": "cp-300750-customer-a",
+      "field_id": "counterparty_relationship",
+      "object_type": "Relationship",
+      "assertion_class": "reported_fact",
+      "subject_scope": "unclear",
+      "reported_period": "2025",
+      "source_native": {
+        "name": "客户 A(1)",
+        "value": "58159202",
+        "unit": "千元",
+        "header": "本报告期履行金额",
+        "qualifier": null,
+        "footnote_refs": [],
+        "source_aliases": []
+      },
+      "evidence_ids": [
+        "ev-300750-customer-a"
+      ],
+      "details": {
+        "subject_name": null,
+        "subject_basis": null,
+        "relation_type": "customer",
+        "object_name": "客户 A(1)",
+        "identity_class": "report_local_anonymous",
+        "external_entity_id": null
+      }
+    }
+  ],
+  "business_events": [],
+  "coverage": [
+    {
+      "schema_version": "company_profile_coverage_result.v1",
+      "field_id": "business_overview_source",
+      "chapter_task": "extract_business_overview",
+      "requirement_level": "required",
+      "status": "observed",
+      "reason_code": null,
+      "reason": null,
+      "evidence": [],
+      "reason_evidence_text": null
+    },
+    {
+      "schema_version": "company_profile_coverage_result.v1",
+      "field_id": "explicit_activity",
+      "chapter_task": "extract_business_overview",
+      "requirement_level": "conditional",
+      "status": "observed",
+      "reason_code": null,
+      "reason": null,
+      "evidence": [],
+      "reason_evidence_text": null
+    },
+    {
+      "schema_version": "company_profile_coverage_result.v1",
+      "field_id": "business_regime",
+      "chapter_task": "extract_business_regime",
+      "requirement_level": "required",
+      "status": "observed",
+      "reason_code": null,
+      "reason": null,
+      "evidence": [],
+      "reason_evidence_text": null
+    },
+    {
+      "schema_version": "company_profile_coverage_result.v1",
+      "field_id": "counterparty_relationship",
+      "chapter_task": "extract_counterparties_and_concentration",
+      "requirement_level": "conditional",
+      "status": "observed",
+      "reason_code": null,
+      "reason": null,
+      "evidence": [],
+      "reason_evidence_text": null
+    },
+    {
+      "schema_version": "company_profile_coverage_result.v1",
+      "field_id": "material_input",
+      "chapter_task": "extract_material_inputs",
+      "requirement_level": "conditional",
+      "status": "observed",
+      "reason_code": null,
+      "reason": null,
+      "evidence": [],
+      "reason_evidence_text": null
+    },
+    {
+      "schema_version": "company_profile_coverage_result.v1",
+      "field_id": "inventory_volume",
+      "chapter_task": "extract_operating_quantities",
+      "requirement_level": "conditional",
+      "status": "observed",
+      "reason_code": null,
+      "reason": null,
+      "evidence": [],
+      "reason_evidence_text": null
+    },
+    {
+      "schema_version": "company_profile_coverage_result.v1",
+      "field_id": "production_capacity",
+      "chapter_task": "extract_operating_quantities",
+      "requirement_level": "conditional",
+      "status": "observed",
+      "reason_code": null,
+      "reason": null,
+      "evidence": [],
+      "reason_evidence_text": null
+    },
+    {
+      "schema_version": "company_profile_coverage_result.v1",
+      "field_id": "production_volume",
+      "chapter_task": "extract_operating_quantities",
+      "requirement_level": "conditional",
+      "status": "observed",
+      "reason_code": null,
+      "reason": null,
+      "evidence": [],
+      "reason_evidence_text": null
+    },
+    {
+      "schema_version": "company_profile_coverage_result.v1",
+      "field_id": "sales_volume",
+      "chapter_task": "extract_operating_quantities",
+      "requirement_level": "conditional",
+      "status": "observed",
+      "reason_code": null,
+      "reason": null,
+      "evidence": [],
+      "reason_evidence_text": null
+    },
+    {
+      "schema_version": "company_profile_coverage_result.v1",
+      "field_id": "gross_margin_reported",
+      "chapter_task": "extract_segment_financials",
+      "requirement_level": "conditional",
+      "status": "observed",
+      "reason_code": null,
+      "reason": null,
+      "evidence": [],
+      "reason_evidence_text": null
+    },
+    {
+      "schema_version": "company_profile_coverage_result.v1",
+      "field_id": "operating_cost",
+      "chapter_task": "extract_segment_financials",
+      "requirement_level": "conditional",
+      "status": "observed",
+      "reason_code": null,
+      "reason": null,
+      "evidence": [],
+      "reason_evidence_text": null
+    },
+    {
+      "schema_version": "company_profile_coverage_result.v1",
+      "field_id": "operating_revenue",
+      "chapter_task": "extract_segment_financials",
+      "requirement_level": "conditional",
+      "status": "observed",
+      "reason_code": null,
+      "reason": null,
+      "evidence": [],
+      "reason_evidence_text": null
+    },
+    {
+      "schema_version": "company_profile_coverage_result.v1",
+      "field_id": "segment_dimension",
+      "chapter_task": "extract_segment_financials",
+      "requirement_level": "required",
+      "status": "observed",
+      "reason_code": null,
+      "reason": null,
+      "evidence": [],
+      "reason_evidence_text": null
+    }
+  ],
+  "commodity_exposure": {
+    "status": "not_assessed",
+    "facts": [
+      {
+        "record_id": "cp-300750-material-input",
+        "field_id": "material_input",
+        "object_type": "Relationship",
+        "assertion_class": "reported_fact",
+        "subject_scope": "unclear",
+        "reported_period": "2025",
+        "source_native": {
+          "name": "正极材料、负极材料、隔膜和电解液",
+          "value": null,
+          "unit": null,
+          "header": "主要原材料",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        },
+        "evidence_ids": [
+          "ev-300750-materials"
+        ],
+        "details": {
+          "subject_name": null,
+          "subject_basis": null,
+          "relation_type": "material_input",
+          "object_name": "正极材料、负极材料、隔膜和电解液",
+          "identity_class": null,
+          "external_entity_id": null
+        }
+      }
+    ],
+    "supported_statements": []
+  },
+  "value_chain_position": {
+    "status": "insufficient_evidence",
+    "facts": [],
+    "supported_statements": []
+  },
+  "evidence_index": [
+    {
+      "evidence_id": "ev-300750-capacity",
+      "report": {
+        "instrument_id": "300750.SZ",
+        "report_id": "asset_3b09f6c831975c7177b6bb3287cab781",
+        "document_version": "ver_09c0e677ec8192dc4fc12cb620069f29",
+        "report_period": "2025-12-31",
+        "published_at": "2026-03-09T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "page": 26,
+      "printed_page_label": null,
+      "section_title": "不同产品或业务的产销情况",
+      "continuation_pages": [],
+      "subject_evidence_pages": [],
+      "anchor": {
+        "anchor_type": "table",
+        "table_label": null,
+        "row_label": "电池系统（GWh）/产能",
+        "column_header": "2025年",
+        "cell_locator": "page26/电池系统/capacity"
+      }
+    },
+    {
+      "evidence_id": "ev-300750-cost",
+      "report": {
+        "instrument_id": "300750.SZ",
+        "report_id": "asset_3b09f6c831975c7177b6bb3287cab781",
+        "document_version": "ver_09c0e677ec8192dc4fc12cb620069f29",
+        "report_period": "2025-12-31",
+        "published_at": "2026-03-09T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "page": 25,
+      "printed_page_label": null,
+      "section_title": "占公司营业收入或营业利润10%以上",
+      "continuation_pages": [],
+      "subject_evidence_pages": [],
+      "anchor": {
+        "anchor_type": "table",
+        "table_label": null,
+        "row_label": "动力电池系统",
+        "column_header": "营业成本",
+        "cell_locator": "page25/product/动力电池系统/cost"
+      }
+    },
+    {
+      "evidence_id": "ev-300750-customer-a",
+      "report": {
+        "instrument_id": "300750.SZ",
+        "report_id": "asset_3b09f6c831975c7177b6bb3287cab781",
+        "document_version": "ver_09c0e677ec8192dc4fc12cb620069f29",
+        "report_period": "2025-12-31",
+        "published_at": "2026-03-09T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "page": 27,
+      "printed_page_label": null,
+      "section_title": "重大销售合同",
+      "continuation_pages": [],
+      "subject_evidence_pages": [],
+      "anchor": {
+        "anchor_type": "table",
+        "table_label": null,
+        "row_label": "锂电池供应",
+        "column_header": "对方当事人",
+        "cell_locator": "page27/重大销售合同/客户A1"
+      }
+    },
+    {
+      "evidence_id": "ev-300750-inventory",
+      "report": {
+        "instrument_id": "300750.SZ",
+        "report_id": "asset_3b09f6c831975c7177b6bb3287cab781",
+        "document_version": "ver_09c0e677ec8192dc4fc12cb620069f29",
+        "report_period": "2025-12-31",
+        "published_at": "2026-03-09T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "page": 27,
+      "printed_page_label": null,
+      "section_title": "不同产品或业务的产销情况",
+      "continuation_pages": [],
+      "subject_evidence_pages": [],
+      "anchor": {
+        "anchor_type": "table",
+        "table_label": null,
+        "row_label": "电池系统/库存量",
+        "column_header": "2025年末",
+        "cell_locator": "page27/电池系统/inventory_volume"
+      }
+    },
+    {
+      "evidence_id": "ev-300750-margin",
+      "report": {
+        "instrument_id": "300750.SZ",
+        "report_id": "asset_3b09f6c831975c7177b6bb3287cab781",
+        "document_version": "ver_09c0e677ec8192dc4fc12cb620069f29",
+        "report_period": "2025-12-31",
+        "published_at": "2026-03-09T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "page": 25,
+      "printed_page_label": null,
+      "section_title": "占公司营业收入或营业利润10%以上",
+      "continuation_pages": [],
+      "subject_evidence_pages": [],
+      "anchor": {
+        "anchor_type": "table",
+        "table_label": null,
+        "row_label": "动力电池系统",
+        "column_header": "毛利率",
+        "cell_locator": "page25/product/动力电池系统/gross_margin"
+      }
+    },
+    {
+      "evidence_id": "ev-300750-materials",
+      "report": {
+        "instrument_id": "300750.SZ",
+        "report_id": "asset_3b09f6c831975c7177b6bb3287cab781",
+        "document_version": "ver_09c0e677ec8192dc4fc12cb620069f29",
+        "report_period": "2025-12-31",
+        "published_at": "2026-03-09T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "page": 40,
+      "printed_page_label": null,
+      "section_title": "原材料价格波动风险",
+      "continuation_pages": [],
+      "subject_evidence_pages": [],
+      "anchor": {
+        "anchor_type": "text",
+        "bounded_quote": "主要原材料包括正极材料、负极材料、隔膜和电解液",
+        "context_before": null,
+        "context_after": null,
+        "match_index": 0
+      }
+    },
+    {
+      "evidence_id": "ev-300750-overview",
+      "report": {
+        "instrument_id": "300750.SZ",
+        "report_id": "asset_3b09f6c831975c7177b6bb3287cab781",
+        "document_version": "ver_09c0e677ec8192dc4fc12cb620069f29",
+        "report_period": "2025-12-31",
+        "published_at": "2026-03-09T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "page": 14,
+      "printed_page_label": null,
+      "section_title": "报告期内公司从事的主要业务/主要业务",
+      "continuation_pages": [],
+      "subject_evidence_pages": [],
+      "anchor": {
+        "anchor_type": "text",
+        "bounded_quote": "主要从事动力电池、储能电池的研发、生产、销售",
+        "context_before": null,
+        "context_after": null,
+        "match_index": 0
+      }
+    },
+    {
+      "evidence_id": "ev-300750-production",
+      "report": {
+        "instrument_id": "300750.SZ",
+        "report_id": "asset_3b09f6c831975c7177b6bb3287cab781",
+        "document_version": "ver_09c0e677ec8192dc4fc12cb620069f29",
+        "report_period": "2025-12-31",
+        "published_at": "2026-03-09T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "page": 26,
+      "printed_page_label": null,
+      "section_title": "不同产品或业务的产销情况",
+      "continuation_pages": [],
+      "subject_evidence_pages": [],
+      "anchor": {
+        "anchor_type": "table",
+        "table_label": null,
+        "row_label": "电池系统/生产量",
+        "column_header": "2025年",
+        "cell_locator": "page26-27/电池系统/production_volume"
+      }
+    },
+    {
+      "evidence_id": "ev-300750-revenue",
+      "report": {
+        "instrument_id": "300750.SZ",
+        "report_id": "asset_3b09f6c831975c7177b6bb3287cab781",
+        "document_version": "ver_09c0e677ec8192dc4fc12cb620069f29",
+        "report_period": "2025-12-31",
+        "published_at": "2026-03-09T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "page": 25,
+      "printed_page_label": null,
+      "section_title": "占公司营业收入或营业利润10%以上",
+      "continuation_pages": [],
+      "subject_evidence_pages": [],
+      "anchor": {
+        "anchor_type": "table",
+        "table_label": null,
+        "row_label": "动力电池系统",
+        "column_header": "营业收入",
+        "cell_locator": "page25/product/动力电池系统/revenue"
+      }
+    },
+    {
+      "evidence_id": "ev-300750-sales",
+      "report": {
+        "instrument_id": "300750.SZ",
+        "report_id": "asset_3b09f6c831975c7177b6bb3287cab781",
+        "document_version": "ver_09c0e677ec8192dc4fc12cb620069f29",
+        "report_period": "2025-12-31",
+        "published_at": "2026-03-09T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "page": 26,
+      "printed_page_label": null,
+      "section_title": "不同产品或业务的产销情况",
+      "continuation_pages": [],
+      "subject_evidence_pages": [],
+      "anchor": {
+        "anchor_type": "table",
+        "table_label": null,
+        "row_label": "电池系统/销售量",
+        "column_header": "2025年",
+        "cell_locator": "page26-27/电池系统/sales_volume"
+      }
+    },
+    {
+      "evidence_id": "ev-300750-segment",
+      "report": {
+        "instrument_id": "300750.SZ",
+        "report_id": "asset_3b09f6c831975c7177b6bb3287cab781",
+        "document_version": "ver_09c0e677ec8192dc4fc12cb620069f29",
+        "report_period": "2025-12-31",
+        "published_at": "2026-03-09T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "page": 25,
+      "printed_page_label": null,
+      "section_title": "占公司营业收入或营业利润10%以上",
+      "continuation_pages": [],
+      "subject_evidence_pages": [],
+      "anchor": {
+        "anchor_type": "table",
+        "table_label": null,
+        "row_label": "动力电池系统",
+        "column_header": "项目",
+        "cell_locator": "page25/product/动力电池系统"
+      }
+    }
+  ]
+}

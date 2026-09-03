@@ -134,11 +134,12 @@ OpenSpec CLI 位于：
 - `company_profile_industry_requirements_template.md`：独立行业 requirements 模板；
 - `company_profile_industry_sample_manifest.template.json`、`company_profile_industry_gold_annotation.template.json`：`research_contract_only` 的样本与 gold 标注模板；
 - `company_profile_industry_benchmark_acceptance_template.md`：行业 benchmark 验收模板；
-- `company_profile_manufacturing_materials_research_index.md`：阶段 3 制造/材料行业研究包入口（当前 `in_review`，未授权生产）；
+- `company_profile_manufacturing_materials_research_index.md`：已通过阶段 3 研究验收的制造/材料行业研究包入口，仍未授权生产；
 - `company_profile_manufacturing_materials_requirements.md`：制造/材料行业需求合同；
 - `company_profile_manufacturing_materials_llm_contract.md`：按章节任务拆分的 LLM `extract/repair/verify` 合同；
 - `company_profile_manufacturing_materials_gold_annotations.v1.json`、`company_profile_manufacturing_materials_benchmark_acceptance.md`：制造/材料 Gold 与验收基线；
 - `company_profile_manufacturing_materials_review_log.md`：制造/材料外部审核和用户裁决的 append-only 日志；
+- `company_profile_common_semantic_model.md`：阶段 4 通用语义对象、内存 extract/repair/verify 工作流、研究读取投影和阶段 5 边界；
 - `open_issues_backlog.md`：当前数据能力问题；
 - `research_data_engine_execution.md`：研究引擎实施主线；
 - `../architecture.md`：按当前代码和配置维护的系统架构概览；
