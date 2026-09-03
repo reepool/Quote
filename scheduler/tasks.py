@@ -1494,55 +1494,520 @@ def _format_a_share_factor_rebuild_report(result: Dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
+_CNINFO_DAILY_STATUS_ZH = {
+    "success": "完成",
+    "partial": "部分完成",
+    "failed": "失败",
+    "error": "失败",
+    "skipped": "未跑",
+    "disabled": "未启用",
+    "inactive": "未启用",
+    "not_evaluated": "未评估",
+    "not_run": "未跑",
+    "dry_run": "预演完成",
+    "unavailable": "不可用",
+}
+_EXCHANGE_ZH = {
+    "SSE": "上交所",
+    "SZSE": "深交所",
+    "BSE": "北交所",
+}
+_CANONICAL_BLOCKER_ZH = {
+    "predecessor_watermark_stale": "前序水位未就绪",
+    "factor_cutoff_unavailable": "行情截止日不可用",
+    "canonical_candidate_gate_failed": "候选未通过合并门槛",
+    "canonical_maintenance_failed": "增量合并失败",
+}
+
+
+def _daily_status_zh(value: Any, default: str = "未知") -> str:
+    key = str(value or "").strip().lower()
+    if not key:
+        return default
+    return _CNINFO_DAILY_STATUS_ZH.get(key, str(value))
+
+
+def _daily_count(value: Any) -> int:
+    try:
+        return int(value or 0)
+    except (TypeError, ValueError):
+        return 0
+
+
+def _daily_exchanges_zh(exchanges: Any) -> str:
+    names = []
+    for item in exchanges or []:
+        code = str(item or "").strip().upper()
+        if code:
+            names.append(_EXCHANGE_ZH.get(code, code))
+    return "/".join(names)
+
+
+def _daily_short_date(value: Any) -> str:
+    text = str(value or "").strip()
+    if not text or text in {"N/A", "None"}:
+        return ""
+    return text[:10]
+
+
+def _daily_short_datetime(value: Any) -> str:
+    text = str(value or "").strip()
+    if not text or text in {"N/A", "None"}:
+        return ""
+    if "T" in text:
+        date_part, time_part = text.split("T", 1)
+        return f"{date_part} {time_part[:5]}"
+    return _daily_short_date(text)
+
+
+def _join_zh(parts: List[str]) -> str:
+    return " · ".join(part for part in parts if part)
+
+
+def _format_cninfo_primary_daily_report(result: Dict[str, Any]) -> str:
+    """Build a short Chinese operator report for the XDXR daily job."""
+    parameters = result.get("parameters") or {}
+    discovery = result.get("candidate_discovery") or {}
+    cninfo_refresh = result.get("cninfo_refresh") or {}
+    cninfo_counters = cninfo_refresh.get("counters") or {}
+    endpoint_metrics = cninfo_refresh.get("endpoint_metrics") or {}
+    throttle = cninfo_refresh.get("adaptive_throttle") or {}
+    bse = result.get("bse_official_refresh") or {}
+    tdx = result.get("tdx_refresh") or {}
+    tdx_totals = tdx.get("totals") or {}
+    tdx_scope = tdx.get("target_scope") or {}
+    affected = result.get("affected_instruments") or {}
+    rebuild = result.get("factor_rebuild") or {}
+    readiness = result.get("data_readiness") or {}
+    anomaly = result.get("anomaly_governance") or {}
+    anomaly_llm = anomaly.get("llm") or {}
+    triage = anomaly.get("announcement_only_triage") or {}
+    routing = triage.get("routing_counts") or {}
+    canonical = result.get("canonical_maintenance") or {}
+    predecessor = canonical.get("predecessor") or {}
+    retry_state = result.get("factor_retry_state") or {}
+    durations = result.get("stage_durations") or {}
+    announcement_scan = discovery.get("announcement_scan") or {}
+    carryover = announcement_scan.get("carryover_revalidation") or {}
+    rebuild_skipped = str(rebuild.get("status") or "").lower() == "skipped"
+    cninfo_exchanges = parameters.get("cninfo_exchanges") or []
+    excluded_exchanges = parameters.get("cninfo_excluded_exchanges") or []
+    bse_events = _daily_count(bse.get("parsed_event_count"))
+    bse_announcements = _daily_count(bse.get("matched_announcement_count"))
+    bse_partial = _daily_count(bse.get("parse_partial_count"))
+    recon = (readiness.get("reconciliation") or {})
+    if not recon:
+        recon = (rebuild.get("reconciliation") or {})
+    recon_totals = recon.get("totals") or (
+        (rebuild.get("reconciliation") or {}).get("totals") or {}
+    )
+    recon_incomplete = _daily_count(recon.get("incomplete_instruments"))
+
+    issues: List[str] = []
+    notes: List[str] = []
+    if str(bse.get("status") or "").lower() == "failed":
+        issues.append("北交所官方扫描失败")
+    elif bse_partial > 0 or str(bse.get("status") or "").lower() == "partial":
+        issues.append(f"北交所 {max(bse_partial, 1)} 条实施公告解析失败")
+    error_count = len(cninfo_refresh.get("errors") or [])
+    if error_count:
+        issues.append(f"巨潮刷新有 {error_count} 个错误")
+    if _daily_count(throttle.get("circuit_trip_count")):
+        issues.append("巨潮触发限流熔断")
+    elif _daily_count(throttle.get("http_403_count")) or _daily_count(
+        throttle.get("http_429_count")
+    ):
+        issues.append("巨潮出现限流")
+    blocker = str(canonical.get("blocker_reason") or "").strip()
+    if canonical.get("merge"):
+        notes.append("生产复权表已定向更新")
+    elif blocker:
+        issues.append(
+            "生产复权表未更新："
+            + _CANONICAL_BLOCKER_ZH.get(blocker, blocker)
+        )
+    if str(rebuild.get("status") or "").lower() == "failed":
+        issues.append("因子重建失败")
+    deferred = _daily_count(anomaly.get("deferred_event_count"))
+    unmatched = _daily_count(anomaly.get("unmatched_special_announcement_count"))
+    manual = _daily_count(
+        (anomaly_llm.get("review_workload") or {}).get("remaining_manual_review")
+    )
+    pending_bits = []
+    if deferred:
+        pending_bits.append(f"推迟 {deferred}")
+    if unmatched:
+        pending_bits.append(f"未匹配 {unmatched}")
+    if manual:
+        pending_bits.append(f"人工待审 {manual}")
+    if pending_bits:
+        issues.append("异常治理仍有待办（" + "、".join(pending_bits) + "）")
+    tdx_ready = readiness.get("tdx_reference") or {}
+    if (
+        not rebuild_skipped
+        and (
+            _daily_count(tdx_ready.get("pending_factor_events"))
+            or _daily_count(tdx_ready.get("incomplete_instruments"))
+        )
+    ):
+        issues.append("通达信参考路径仍有缺口")
+    if recon_incomplete > 0 and not rebuild_skipped:
+        notes.append("对账还有历史不一致，不是本轮采集失败")
+    if bse_events > 0 and not canonical.get("merge") and not blocker:
+        notes.append("北交所官方证据已入库，未改沪深生产复权表")
+
+    status = result.get("status", "unknown")
+    label = _daily_status_zh(status, str(status))
+    if issues:
+        judgment = "；".join(issues + notes) + "。"
+    elif notes:
+        judgment = "，".join(notes) + "。"
+    else:
+        judgment = "各采集阶段正常完成。"
+
+    lines = [
+        "ℹ️ *A 股公司行动增量日更*",
+        "",
+        f"结论: *{label}*",
+        f"判断: {judgment}",
+    ]
+    scope = (
+        f"{parameters.get('start_date', 'N/A')} 至 "
+        f"{parameters.get('end_date', 'N/A')}"
+    )
+    markets = _daily_exchanges_zh(parameters.get("exchanges"))
+    if markets:
+        scope = f"{scope} · {markets}"
+    lines.append(f"范围: {scope}")
+    window_parts = []
+    announcement_start = _daily_short_date(
+        parameters.get("announcement_start_date")
+    )
+    announcement_run = _daily_short_datetime(
+        parameters.get("announcement_run_at")
+    )
+    if announcement_start and announcement_run:
+        window_parts.append(f"公告窗 {announcement_start} 至 {announcement_run}")
+    factor_end = _daily_short_date(
+        (result.get("factor_cutoff") or {}).get("resolved_end_date")
+    )
+    if factor_end:
+        window_parts.append(f"因子截止 {factor_end}")
+    if window_parts:
+        lines.append(_join_zh(window_parts))
+
+    discovery_status = str(discovery.get("status") or cninfo_refresh.get("status") or "")
+    if not cninfo_exchanges and excluded_exchanges:
+        lines.append("巨潮主源: 未跑（北交所不走巨潮）")
+    elif discovery_status in {"skipped", "disabled"}:
+        lines.append(f"巨潮主源: {_daily_status_zh(discovery_status)}")
+    else:
+        cninfo_parts = [_daily_status_zh(cninfo_refresh.get("status") or discovery_status)]
+        selected = _daily_count(discovery.get("candidate_count"))
+        if selected:
+            cninfo_parts.append(f"候选 {selected} 只")
+        deferred_count = _daily_count(discovery.get("deferred_count"))
+        if deferred_count:
+            cninfo_parts.append(f"推迟 {deferred_count} 只")
+        requested = _daily_count(cninfo_counters.get("requested_instruments"))
+        if requested:
+            change_bits = []
+            for key, text in (
+                ("observations_inserted", "新增"),
+                ("observations_changed", "变更"),
+                ("observations_unchanged", "不变"),
+                ("observations_retired", "退役"),
+            ):
+                count = _daily_count(cninfo_counters.get(key))
+                if count or key != "observations_retired":
+                    change_bits.append(f"{text} {count}")
+            cninfo_parts.append(
+                f"刷新 {requested} 只（{' / '.join(change_bits)}）"
+            )
+        if error_count:
+            cninfo_parts.append(f"{error_count} 个错误")
+        retry_targets = _daily_count(endpoint_metrics.get("final_retry_targets"))
+        retry_recovered = _daily_count(endpoint_metrics.get("final_retry_recovered"))
+        if retry_targets:
+            if retry_recovered == retry_targets:
+                cninfo_parts.append(f"分红补拉 {retry_targets} 只已恢复")
+            else:
+                cninfo_parts.append(
+                    f"分红补拉 {retry_recovered}/{retry_targets} 只恢复"
+                )
+        throttle_bits = []
+        count_403 = _daily_count(throttle.get("http_403_count"))
+        count_429 = _daily_count(throttle.get("http_429_count"))
+        cooldowns = _daily_count(throttle.get("short_cooldown_count"))
+        circuits = _daily_count(throttle.get("circuit_trip_count"))
+        if count_403:
+            throttle_bits.append(f"403×{count_403}")
+        if count_429:
+            throttle_bits.append(f"429×{count_429}")
+        if cooldowns:
+            throttle_bits.append(f"冷却 {cooldowns} 次")
+        if circuits:
+            wait = float(throttle.get("circuit_wait_seconds") or 0)
+            throttle_bits.append(
+                f"熔断 {circuits} 次（等候 {wait:.0f}s）"
+                if wait
+                else f"熔断 {circuits} 次"
+            )
+        if throttle_bits:
+            cninfo_parts.append("限流 " + "，".join(throttle_bits))
+        lines.append("巨潮主源: " + _join_zh(cninfo_parts))
+
+    if bse:
+        bse_parts = [_daily_status_zh(bse.get("status"))]
+        window_start = _daily_short_date(bse.get("requested_start_date"))
+        window_end = _daily_short_date(bse.get("requested_end_date"))
+        if window_start and window_end:
+            bse_parts.append(f"{window_start}～{window_end}")
+        if bse_announcements and bse_partial and bse_events == 0:
+            bse_parts.append(f"{bse_announcements} 条公告未能解析")
+        elif bse_announcements:
+            bse_parts.append(
+                f"{bse_announcements} 条公告解析为 {bse_events} 条事件"
+            )
+        elif bse_announcements == 0:
+            bse_parts.append("窗口内无实施公告")
+        if bse_partial and bse_events:
+            bse_parts.append(f"{bse_partial} 条解析失败")
+        lines.append("北交所官方: " + _join_zh(bse_parts))
+
+    if tdx:
+        tdx_parts = [_daily_status_zh(tdx.get("status") or "success")]
+        targets = _daily_count(tdx_scope.get("instrument_count"))
+        rotation = _daily_count(tdx_scope.get("rotating_sample_count"))
+        processed = _daily_count(tdx_totals.get("processed_instruments"))
+        events = _daily_count(tdx_totals.get("raw_events"))
+        if targets and rotation and targets == rotation:
+            tdx_parts.append(f"定向抽检 {targets} 只")
+        elif targets:
+            tdx_parts.append(
+                f"定向 {targets} 只（轮询 {rotation}）"
+                if rotation
+                else f"定向 {targets} 只"
+            )
+        if processed and processed != targets:
+            tdx_parts.append(f"处理 {processed} 只")
+        if events:
+            tdx_parts.append(f"{events} 条事件")
+        else:
+            tdx_parts.append("无新事件")
+        tdx_errors = _daily_count(tdx_totals.get("errors"))
+        tdx_timeouts = _daily_count(tdx_totals.get("timeouts"))
+        if tdx_errors or tdx_timeouts:
+            tdx_parts.append(f"错误 {tdx_errors}、超时 {tdx_timeouts}")
+        lines.append("通达信参考: " + _join_zh(tdx_parts))
+
+    if canonical.get("merge"):
+        merged_rows = _daily_count(
+            (canonical.get("merge") or {}).get("canonical_rows")
+        )
+        coverage = _daily_count(canonical.get("missing_coverage_count"))
+        canonical_line = f"生产复权表: 已定向更新 {merged_rows} 行"
+        if coverage:
+            canonical_line += f"（本轮补齐覆盖缺口 {coverage} 只）"
+        lines.append(canonical_line)
+    elif blocker:
+        cutoff_bits = [_CANONICAL_BLOCKER_ZH.get(blocker, blocker)]
+        required = _daily_short_date(predecessor.get("required_through"))
+        if required:
+            cutoff_bits.append(f"要求到 {required}")
+        seen = []
+        for exchange, value in (
+            predecessor.get("successful_through_by_exchange") or {}
+        ).items():
+            label_ex = _EXCHANGE_ZH.get(str(exchange).upper(), str(exchange))
+            seen.append(f"{label_ex}已到 {_daily_short_date(value)}")
+        if seen:
+            cutoff_bits.append("，".join(seen))
+        lines.append("生产复权表: 未更新（" + "，".join(cutoff_bits) + "）")
+    else:
+        lines.append("生产复权表: 未更新（本轮无沪深受影响标的）")
+
+    affected_count = _daily_count(affected.get("count"))
+    if affected_count:
+        lines.append(
+            "受影响标的: "
+            + _join_zh([
+                f"{affected_count} 只",
+                f"巨潮 {_daily_count(affected.get('cninfo_count'))}",
+                f"通达信 {_daily_count(affected.get('tdx_count'))}",
+            ])
+        )
+
+    if not rebuild_skipped:
+        tdx_pending = _daily_count(tdx_ready.get("pending_factor_events"))
+        tdx_incomplete = _daily_count(tdx_ready.get("incomplete_instruments"))
+        cninfo_ready = readiness.get("cninfo") or {}
+        cninfo_pending = _daily_count(cninfo_ready.get("pending_factor_events"))
+        cninfo_incomplete = _daily_count(cninfo_ready.get("incomplete_instruments"))
+        ready_bits = []
+        if cninfo_pending or cninfo_incomplete:
+            ready_bits.append(
+                f"巨潮 {cninfo_pending} 条待建、{cninfo_incomplete} 只不完整"
+            )
+        if tdx_pending or tdx_incomplete:
+            ready_bits.append(
+                f"通达信 {tdx_pending} 条待建、{tdx_incomplete} 只不完整"
+            )
+        if ready_bits:
+            lines.append("因子就绪: " + "；".join(ready_bits))
+        recon_bits = []
+        incomplete_instruments = _daily_count(recon.get("incomplete_instruments"))
+        conflicts = _daily_count(recon_totals.get("conflicts"))
+        tdx_only = _daily_count(recon_totals.get("tdx_only"))
+        cninfo_only = _daily_count(recon_totals.get("cninfo_only"))
+        if incomplete_instruments:
+            if conflicts or tdx_only or cninfo_only:
+                recon_bits.append(f"对账 {incomplete_instruments} 只历史不一致")
+            else:
+                recon_bits.append(f"对账 {incomplete_instruments} 只不一致")
+        if conflicts:
+            recon_bits.append(f"冲突 {conflicts}")
+        if tdx_only:
+            recon_bits.append(f"仅通达信 {tdx_only}")
+        if cninfo_only:
+            recon_bits.append(f"仅巨潮 {cninfo_only}")
+        if recon_bits:
+            lines.append("跨源对账: " + "，".join(recon_bits))
+
+    if any([
+        _daily_count(anomaly.get("candidate_event_count")),
+        deferred, unmatched,
+        str(anomaly.get("execution_status") or "") in {"partial", "failed"},
+    ]):
+        lines.append(
+            "异常治理: "
+            + "，".join([
+                f"候选 {_daily_count(anomaly.get('candidate_event_count'))}",
+                f"入选 {_daily_count(anomaly.get('selected_event_count'))}",
+                f"推迟 {deferred}",
+                f"未匹配 {unmatched}",
+            ])
+        )
+    llm_processed = _daily_count((anomaly_llm.get("counts") or {}).get("processed"))
+    llm_promoted = _daily_count(
+        (anomaly_llm.get("auto_promotion") or {}).get("promoted")
+    )
+    llm_errors = _daily_count((anomaly_llm.get("counts") or {}).get("errors"))
+    if llm_processed or llm_promoted or manual or llm_errors:
+        llm_bits = [f"处理 {llm_processed}", f"晋级 {llm_promoted}"]
+        if manual:
+            llm_bits.append(f"人工待审 {manual}")
+        if llm_errors:
+            llm_bits.append(f"错误 {llm_errors}")
+        lines.append("异常语义: " + "，".join(llm_bits))
+
+    case_count = _daily_count(triage.get("case_count"))
+    if case_count:
+        mode = str(triage.get("mode") or "")
+        mode_zh = {
+            "shadow": "观察模式",
+            "active": "正式分流",
+            "disabled": "未启用",
+        }.get(mode, mode or "分流")
+        triage_bits = [
+            mode_zh,
+            (
+                f"{case_count} 案处理 "
+                f"{_daily_count(triage.get('processed_case_count'))}"
+            ),
+        ]
+        probable = _daily_count(routing.get("active_probable_xdxr"))
+        uncertain = _daily_count(routing.get("active_uncertain"))
+        pending = _daily_count(routing.get("active_pending"))
+        inactive = _daily_count(routing.get("inactive_watch"))
+        if probable:
+            triage_bits.append(f"较可能除权 {probable}")
+        if uncertain:
+            triage_bits.append(f"待确认 {uncertain}")
+        if pending:
+            triage_bits.append(f"待决 {pending}")
+        if inactive:
+            triage_bits.append(f"非除权 {inactive}")
+        reactivated = _daily_count(triage.get("reactivated_case_count"))
+        if reactivated:
+            triage_bits.append(f"复活 {reactivated}")
+        triage_head = " · ".join(triage_bits[:2])
+        triage_tail = "，".join(triage_bits[2:])
+        lines.append(
+            "公告分流: "
+            + (f"{triage_head} · {triage_tail}" if triage_tail else triage_head)
+        )
+
+    retry_count = _daily_count(retry_state.get("actionable_retry_count"))
+    if retry_count:
+        lines.append(f"因子重试: {retry_count} 只留待下一日")
+
+    unmatched_samples = []
+    for instrument_id, items in sorted(
+        (anomaly.get("deferred_special_announcements_by_instrument") or {}).items()
+    ):
+        for item in items or ():
+            title = str(item.get("title") or "").strip()
+            if title:
+                unmatched_samples.append(f"{instrument_id}:{title[:80]}")
+            if len(unmatched_samples) >= 5:
+                break
+        if len(unmatched_samples) >= 5:
+            break
+    if unmatched_samples:
+        lines.append("待处理公告: " + "；".join(unmatched_samples))
+    if _daily_count(carryover.get("evaluated")):
+        lines.append(
+            "公告待办重验: "
+            f"评估 {_daily_count(carryover.get('evaluated'))}，"
+            f"排除 {_daily_count(carryover.get('excluded'))}"
+        )
+
+    duration_bits = []
+    for key, text in (
+        ("candidate_discovery_seconds", "发现"),
+        ("cninfo_refresh_seconds", "巨潮"),
+        ("bse_official_refresh_seconds", "北交所"),
+        ("tdx_refresh_seconds", "通达信"),
+        ("factor_rebuild_seconds", "因子"),
+        ("canonical_maintenance_seconds", "复权表"),
+        ("anomaly_llm_seconds", "语义"),
+    ):
+        seconds = float(durations.get(key) or 0)
+        if seconds:
+            duration_bits.append(f"{text} {seconds:.1f}s")
+    total = float(durations.get("total_seconds") or 0)
+    if total:
+        if total >= 60:
+            duration_text = _format_seconds_for_report(total)
+        elif total == int(total):
+            duration_text = f"{int(total)}s"
+        else:
+            duration_text = f"{total:.1f}s"
+        duration = f"耗时 {duration_text}"
+        if duration_bits:
+            duration += "（" + " · ".join(duration_bits) + "）"
+        lines.append(duration)
+    return "\n".join(lines)
+
+
 def _format_cninfo_primary_factor_report(result: Dict[str, Any]) -> str:
     """Build a bounded report for the isolated multi-source factor workflow."""
+    if result.get("operation") == "a_share_cninfo_primary_daily_maintenance":
+        return _format_cninfo_primary_daily_report(result)
     status = result.get("status", "unknown")
     label = {"success": "完成", "partial": "部分完成", "dry_run": "预演完成"}.get(
         status, status
     )
-    is_daily = result.get("operation") == "a_share_cninfo_primary_daily_maintenance"
     parameters = result.get("parameters") or {}
-    factor_result = (result.get("factor_rebuild") or {}) if is_daily else result
-    reconciliation = factor_result.get("reconciliation") or {}
+    reconciliation = result.get("reconciliation") or {}
     totals = reconciliation.get("totals") or {}
     matching_policy = reconciliation.get("matching_policy") or {}
     rounded_policy = matching_policy.get("rounded_precision_policy") or {}
-    candidate = factor_result.get("candidate") or {}
-    benchmark = factor_result.get("benchmark") or {}
+    candidate = result.get("candidate") or {}
+    benchmark = result.get("benchmark") or {}
     reference_sources = benchmark.get("reference_sources") or {}
-    discovery = result.get("candidate_discovery") or {}
-    cninfo_refresh = result.get("cninfo_refresh") or {}
-    bse_official = result.get("bse_official_refresh") or {}
-    bse_scan = bse_official.get("scan") or {}
-    cninfo_counters = cninfo_refresh.get("counters") or {}
-    endpoint_metrics = cninfo_refresh.get("endpoint_metrics") or {}
-    endpoint_targets = endpoint_metrics.get("target_counts") or {}
-    endpoint_requests = endpoint_metrics.get("request_counts") or {}
-    throttle_metrics = cninfo_refresh.get("adaptive_throttle") or {}
-    tdx_refresh = result.get("tdx_refresh") or {}
-    tdx_totals = tdx_refresh.get("totals") or {}
-    tdx_scope = tdx_refresh.get("target_scope") or {}
-    affected = result.get("affected_instruments") or {}
-    readiness = result.get("data_readiness") or {}
-    execution_status = result.get("execution_status") or {}
-    stage_durations = result.get("stage_durations") or {}
-    anomaly = result.get("anomaly_governance") or {}
-    anomaly_llm = anomaly.get("llm") or {}
-    anomaly_counts = anomaly_llm.get("counts") or {}
-    anomaly_promotion = anomaly_llm.get("auto_promotion") or {}
-    anomaly_review = anomaly_llm.get("review_workload") or {}
-    announcement_scan = discovery.get("announcement_scan") or {}
-    carryover_revalidation = (
-        announcement_scan.get("carryover_revalidation") or {}
-    )
     canonical_maintenance = result.get("canonical_maintenance") or {}
-    canonical_predecessor = canonical_maintenance.get("predecessor") or {}
-    factor_retry_state = result.get("factor_retry_state") or {}
-    anomaly_reason_counts = anomaly.get("reason_counts") or {}
-    anomaly_reason_summary = ",".join(
-        f"{reason}:{count}"
-        for reason, count in sorted(anomaly_reason_counts.items())
-    ) or "none"
     lines = [
         "ℹ️ *A 股公司行动与复权因子多源基准*",
         "",
@@ -1557,10 +2022,10 @@ def _format_cninfo_primary_factor_report(result: Dict[str, Any]) -> str:
         + "`",
         f"范围: `{parameters.get('start_date', 'N/A')}` 至 `{parameters.get('end_date', 'N/A')}`",
         f"市场: `{','.join(parameters.get('exchanges') or [])}`",
-        f"CNInfo事件: `{(factor_result.get('source_events') or {}).get('cninfo_rows', 0)}`",
-        f"TDX事件: `{(factor_result.get('source_events') or {}).get('tdx_rows', 0)}`",
-        f"CNInfo因子: `{(factor_result.get('cninfo_path') or {}).get('derived_events', 0)}`",
-        f"TDX因子: `{(factor_result.get('tdx_path') or {}).get('derived_events', 0)}`",
+        f"CNInfo事件: `{(result.get('source_events') or {}).get('cninfo_rows', 0)}`",
+        f"TDX事件: `{(result.get('source_events') or {}).get('tdx_rows', 0)}`",
+        f"CNInfo因子: `{(result.get('cninfo_path') or {}).get('derived_events', 0)}`",
+        f"TDX因子: `{(result.get('tdx_path') or {}).get('derived_events', 0)}`",
         "事件对账: `"
         + ", ".join(
             f"{key}={totals.get(key, 0)}"
@@ -1591,219 +2056,7 @@ def _format_cninfo_primary_factor_report(result: Dict[str, Any]) -> str:
             f"可晋级生产: `{candidate.get('promotion_eligible', False)}`",
         ])
     else:
-        lines.append(
-            "生产因子候选: `未构造（build_canonical=false）`"
-            if is_daily
-            else "候选构造: `未执行（需 build_canonical=true）`"
-        )
-    if is_daily:
-        lines[0] = "ℹ️ *A 股公司行动增量日更*"
-        lines.insert(1, "模式: `公告/事件候选刷新 + 受影响标的因子重建`")
-        lines.insert(
-            7,
-            "CNInfo市场: `"
-            + ",".join(parameters.get("cninfo_exchanges") or [])
-            + "`；排除: `"
-            + ",".join(parameters.get("cninfo_excluded_exchanges") or [])
-            + "` (`source_not_supported`)",
-        )
-        incremental_lines = [
-            "候选发现: `"
-            f"status={discovery.get('status', 'N/A')}, "
-            f"selected={discovery.get('candidate_count', 0)}, "
-            f"deferred={discovery.get('deferred_count', 0)}, "
-            f"announcements={(discovery.get('announcement_scan') or {}).get('announcements_seen', 0)}, "
-            "relevant="
-            f"{((discovery.get('announcement_scan') or {}).get('title_filter') or {}).get('selected_records', 0)}"
-            "`",
-            "CNInfo刷新: `"
-            f"requested={cninfo_counters.get('requested_instruments', 0)}, "
-            f"inserted={cninfo_counters.get('observations_inserted', 0)}, "
-            f"changed={cninfo_counters.get('observations_changed', 0)}, "
-            f"unchanged={cninfo_counters.get('observations_unchanged', 0)}, "
-            f"retired={cninfo_counters.get('observations_retired', 0)}, "
-            f"errors={len(cninfo_refresh.get('errors') or [])}"
-            "`",
-            "CNInfo端点: `"
-            f"dividend targets={endpoint_targets.get('cninfo_dividend', 0)} "
-            f"requests={endpoint_requests.get('cninfo_dividend', 0)}; "
-            f"allotment targets={endpoint_targets.get('cninfo_allotment', 0)} "
-            f"requests={endpoint_requests.get('cninfo_allotment', 0)}; "
-            f"final_retry={endpoint_metrics.get('final_retry_targets', 0)}/"
-            f"recovered={endpoint_metrics.get('final_retry_recovered', 0)}"
-            "`",
-            "CNInfo限流: `"
-            f"403={throttle_metrics.get('http_403_count', 0)}, "
-            f"429={throttle_metrics.get('http_429_count', 0)}, "
-            f"wait={float(throttle_metrics.get('adaptive_wait_seconds', 0) or 0):.1f}s, "
-            f"cooldowns={throttle_metrics.get('short_cooldown_count', 0)}, "
-            f"circuits={throttle_metrics.get('circuit_trip_count', 0)}, "
-            f"circuit_wait={float(throttle_metrics.get('circuit_wait_seconds', 0) or 0):.1f}s"
-            "`",
-            "BSE官方近期证据: `"
-            f"status={bse_official.get('status', 'N/A')}, "
-            f"scope={bse_official.get('coverage_scope', 'recent_window_only')}, "
-            f"window={bse_official.get('requested_start_date', 'N/A')}.."
-            f"{bse_official.get('requested_end_date', 'N/A')}, "
-            f"pages={bse_scan.get('pages_scanned', 0)}, "
-            f"announcements={bse_official.get('matched_announcement_count', 0)}, "
-            f"events={bse_official.get('parsed_event_count', 0)}, "
-            f"partial={bse_official.get('parse_partial_count', 0)}, "
-            f"full_history={bse_official.get('full_history_complete', False)}"
-            "`",
-            "TDX刷新: `"
-            f"mode={tdx_refresh.get('refresh_mode', 'N/A')}, "
-            f"targets={tdx_scope.get('instrument_count', 0)}, "
-            f"rotation={tdx_scope.get('rotating_sample_count', 0)}, "
-            f"processed={tdx_totals.get('processed_instruments', 0)}, "
-            f"events={tdx_totals.get('raw_events', 0)}, "
-            f"errors={tdx_totals.get('errors', 0)}, "
-            f"timeouts={tdx_totals.get('timeouts', 0)}"
-            "`",
-            "执行状态: `"
-            f"cninfo_primary={execution_status.get('primary', status)}, "
-            f"bse_official={execution_status.get('bse_official', 'N/A')}, "
-            f"tdx_reference={execution_status.get('tdx_reference', 'N/A')}, "
-            f"reconciliation={execution_status.get('reconciliation', 'N/A')}, "
-            f"canonical={execution_status.get('canonical', 'inactive')}"
-            "`",
-            "Canonical日更: `"
-            f"status={canonical_maintenance.get('status', 'inactive')}, "
-            "series="
-            f"{canonical_maintenance.get('active_series_version') or 'N/A'}, "
-            f"scope={canonical_maintenance.get('scope_instrument_count', 0)}, "
-            "missing_coverage="
-            f"{canonical_maintenance.get('missing_coverage_count', 0)}, "
-            "merge_eligible="
-            f"{canonical_maintenance.get('incremental_merge_eligible', False)}, "
-            "merged_rows="
-            f"{(canonical_maintenance.get('merge') or {}).get('canonical_rows', 0)}"
-            "`",
-            "Canonical阻塞: `"
-            f"reason={canonical_maintenance.get('blocker_reason') or 'none'}, "
-            "workflow_deferred="
-            f"{canonical_maintenance.get('workflow_deferred', False)}, "
-            "actionable_retry="
-            f"{canonical_maintenance.get('actionable_retry_count', 0)}"
-            "`",
-            "因子重试队列: `"
-            f"status={factor_retry_state.get('status', 'N/A')}, "
-            "actionable="
-            f"{factor_retry_state.get('actionable_retry_count', 0)}"
-            "`",
-            "Canonical前序: `"
-            f"reason={canonical_predecessor.get('reason', 'N/A')}, "
-            f"required={canonical_predecessor.get('required_through', 'N/A')}, "
-            "cutoffs="
-            f"{canonical_predecessor.get('successful_through_by_exchange', {})}"
-            "`",
-            "受影响标的: `"
-            f"total={affected.get('count', 0)}, "
-            f"cninfo={affected.get('cninfo_count', 0)}, "
-            f"tdx={affected.get('tdx_count', 0)}"
-            "`",
-            "CNInfo就绪度: `"
-            f"status={(readiness.get('cninfo') or {}).get('status', readiness.get('status', 'not_evaluated'))}, "
-            f"pending_factors={(readiness.get('cninfo') or {}).get('pending_factor_events', 0)}, "
-            f"incomplete_instruments={(readiness.get('cninfo') or {}).get('incomplete_instruments', 0)}"
-            "`",
-            "TDX参考路径: `"
-            f"status={(readiness.get('tdx_reference') or {}).get('status', 'not_evaluated')}, "
-            f"pending_factors={(readiness.get('tdx_reference') or {}).get('pending_factor_events', 0)}, "
-            f"incomplete_instruments={(readiness.get('tdx_reference') or {}).get('incomplete_instruments', 0)}"
-            "`",
-            "跨源对账: `"
-            f"status={(readiness.get('reconciliation') or {}).get('status', 'not_evaluated')}, "
-            f"incomplete_instruments={(readiness.get('reconciliation') or {}).get('incomplete_instruments', 0)}"
-            "`",
-            "窗口: `"
-            f"announcements={parameters.get('announcement_start_date', 'N/A')}.."
-            f"{parameters.get('announcement_run_at', 'N/A')}, "
-            f"factor_end={(result.get('factor_cutoff') or {}).get('resolved_end_date', parameters.get('end_date', 'N/A'))}"
-            "`",
-            "异常语义治理: `"
-            f"execution={anomaly.get('execution_status', 'N/A')}, "
-            f"readiness={anomaly.get('readiness_status', 'N/A')}, "
-            f"candidates={anomaly.get('candidate_event_count', 0)}, "
-            f"selected={anomaly.get('selected_event_count', 0)}, "
-            f"deferred={anomaly.get('deferred_event_count', 0)}, "
-            "unmatched="
-            f"{anomaly.get('unmatched_special_announcement_count', 0)}, "
-            f"reasons={anomaly_reason_summary}"
-            "`",
-            "异常 LLM: `"
-            f"processed={anomaly_counts.get('processed', 0)}, "
-            f"analyzed={anomaly_counts.get('analyzed', 0)}, "
-            f"promoted={anomaly_promotion.get('promoted', 0)}, "
-            f"manual={anomaly_review.get('remaining_manual_review', 0)}, "
-            f"errors={anomaly_counts.get('errors', 0)}, "
-            f"document_failures={anomaly_counts.get('document_failures', 0)}"
-            "`",
-            "公告语义分流: `"
-            f"mode={(anomaly.get('announcement_only_triage') or {}).get('mode', 'disabled')}, "
-            f"execution={(anomaly.get('announcement_only_triage') or {}).get('execution_status', 'N/A')}, "
-            f"cases={(anomaly.get('announcement_only_triage') or {}).get('case_count', 0)}, "
-            f"processed={(anomaly.get('announcement_only_triage') or {}).get('processed_case_count', 0)}, "
-            f"announcements={(anomaly.get('announcement_only_triage') or {}).get('announcement_count', 0)}, "
-            f"probable={((anomaly.get('announcement_only_triage') or {}).get('routing_counts') or {}).get('active_probable_xdxr', 0)}, "
-            f"uncertain={((anomaly.get('announcement_only_triage') or {}).get('routing_counts') or {}).get('active_uncertain', 0)}, "
-            f"pending={((anomaly.get('announcement_only_triage') or {}).get('routing_counts') or {}).get('active_pending', 0)}, "
-            f"inactive={((anomaly.get('announcement_only_triage') or {}).get('routing_counts') or {}).get('inactive_watch', 0)}, "
-            f"reactivated={(anomaly.get('announcement_only_triage') or {}).get('reactivated_case_count', 0)}, "
-            f"primary_changes={(anomaly.get('announcement_only_triage') or {}).get('primary_evidence_change_count', 0)}, "
-            f"errors={(anomaly.get('announcement_only_triage') or {}).get('error_count', 0)}"
-            "`",
-            "阶段耗时: `"
-            f"discovery={float(stage_durations.get('candidate_discovery_seconds', 0) or 0):.1f}s, "
-            f"cninfo={float(stage_durations.get('cninfo_refresh_seconds', 0) or 0):.1f}s, "
-            f"bse={float(stage_durations.get('bse_official_refresh_seconds', 0) or 0):.1f}s, "
-            f"tdx={float(stage_durations.get('tdx_refresh_seconds', 0) or 0):.1f}s, "
-            f"factors={float(stage_durations.get('factor_rebuild_seconds', 0) or 0):.1f}s, "
-            "canonical="
-            f"{float(stage_durations.get('canonical_maintenance_seconds', 0) or 0):.1f}s, "
-            f"llm={float(stage_durations.get('anomaly_llm_seconds', 0) or 0):.1f}s, "
-            f"total={float(stage_durations.get('total_seconds', 0) or 0):.1f}s"
-            "`",
-        ]
-        if factor_result.get("status") == "skipped":
-            incremental_lines.append("因子重建: `无需执行（本轮无受影响标的）`")
-        if int(carryover_revalidation.get("evaluated", 0) or 0):
-            incremental_lines.append(
-                "公告待办重验: `"
-                f"policy={carryover_revalidation.get('policy_version', 'N/A')}, "
-                f"evaluated={carryover_revalidation.get('evaluated', 0)}, "
-                f"excluded={carryover_revalidation.get('excluded', 0)}, "
-                "rerouted_structured="
-                f"{carryover_revalidation.get('rerouted_structured', 0)}, "
-                "retained_exceptional="
-                f"{carryover_revalidation.get('retained_exceptional', 0)}, "
-                "retained_missing_title="
-                f"{carryover_revalidation.get('retained_missing_title', 0)}"
-                "`"
-            )
-        unmatched_samples = []
-        for instrument_id, items in sorted(
-            (
-                anomaly.get(
-                    "deferred_special_announcements_by_instrument"
-                ) or {}
-            ).items()
-        ):
-            for item in items or ():
-                title = str(item.get("title") or "").strip()
-                if title:
-                    unmatched_samples.append(
-                        f"{instrument_id}:{title[:80]}"
-                    )
-                if len(unmatched_samples) >= 5:
-                    break
-            if len(unmatched_samples) >= 5:
-                break
-        if unmatched_samples:
-            incremental_lines.append(
-                "待处理公告样本: `" + "；".join(unmatched_samples) + "`"
-            )
-        lines[8:8] = incremental_lines
+        lines.append("候选构造: `未执行（需 build_canonical=true）`")
     return "\n".join(lines)
 
 

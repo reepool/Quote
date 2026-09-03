@@ -733,38 +733,252 @@ def test_cninfo_daily_report_reads_nested_incremental_results():
     })
 
     assert "A 股公司行动增量日更" in report
-    assert "selected=12" in report
-    assert "requested=12" in report
-    assert "processed=5533" in report
-    assert "dividend targets=10 requests=11" in report
-    assert "403=3" in report
-    assert "circuits=1" in report
-    assert "BSE官方近期证据: `status=success" in report
-    assert "events=1, partial=0, full_history=False" in report
-    assert "mode=targeted, targets=149, rotation=100" in report
-    assert "cninfo_primary=success, bse_official=success" in report
-    assert "discovery=2.0s, cninfo=10.0s, bse=1.5s" in report
-    assert "total=5" in report
-    assert "CNInfo事件: `40`" in report
-    assert "TDX因子: `44`" in report
-    assert "CNInfo就绪度: `status=success, pending_factors=0" in report
-    assert "TDX参考路径: `status=partial, pending_factors=2" in report
-    assert "跨源对账: `status=partial, incomplete_instruments=1" in report
-    assert "execution=success, readiness=partial, candidates=3" in report
-    assert (
-        "reasons=exceptional_implementation_title:2,"
-        "incomplete_structured_event:1"
-    ) in report
-    assert "processed=2, analyzed=2, promoted=1, manual=1" in report
-    assert "公告语义分流: `mode=shadow, execution=success, cases=2" in report
-    assert "processed=1, announcements=3, probable=1, uncertain=1" in report
-    assert "pending=0, inactive=0, reactivated=1, primary_changes=1" in report
-    assert "reason=predecessor_watermark_stale" in report
-    assert "workflow_deferred=True, actionable_retry=0" in report
-    assert "因子重试队列: `status=success, actionable=2`" in report
+    assert "判断:" in report
+    assert "前序水位未就绪" in report
+    assert "巨潮主源: 完成" in report
+    assert "候选 12 只" in report
+    assert "新增 2 / 变更 3 / 不变 7 / 退役 1" in report
+    assert "分红补拉 1 只已恢复" in report
+    assert "403×3" in report
+    assert "熔断 1 次" in report
+    assert "北交所官方: 完成" in report
+    assert "2 条公告解析为 1 条事件" in report
+    assert "通达信参考:" in report
+    assert "定向 149 只" in report
+    assert "处理 5533 只" in report
+    assert "生产复权表: 未更新" in report
+    assert "要求到 2026-07-22" in report
+    assert "上交所已到 2026-07-21" in report
+    assert "通达信 2 条待建、1 只不完整" in report
+    assert "对账 1 只不一致" in report
+    assert "推迟 1" in report
+    assert "人工待审 1" in report
+    assert "公告分流: 观察模式" in report
+    assert "较可能除权 1" in report
+    assert "待确认 1" in report
+    assert "复活 1" in report
+    assert "因子重试: 2 只留待下一日" in report
     assert "600000.SH:重整计划资本公积金转增股本实施公告" in report
-    assert "公告待办重验:" in report
-    assert "evaluated=5, excluded=5, rerouted_structured=0" in report
+    assert "公告待办重验: 评估 5，排除 5" in report
+    assert "耗时 20s" in report
+    assert "巨潮 10.0s" in report
+    assert "selected=" not in report
+    assert "cninfo_primary=" not in report
+    assert "full_history=" not in report
+    assert "build_canonical" not in report
+    assert len(report) < 2200
+
+
+def test_cninfo_daily_report_explains_bse_only_success_without_false_alarms():
+    report = _format_cninfo_primary_factor_report({
+        "status": "success",
+        "operation": "a_share_cninfo_primary_daily_maintenance",
+        "parameters": {
+            "start_date": "2026-08-27",
+            "end_date": "2026-09-03",
+            "exchanges": ["BSE"],
+            "cninfo_exchanges": [],
+            "cninfo_excluded_exchanges": ["BSE"],
+            "announcement_start_date": "2026-09-02",
+            "announcement_run_at": "2026-09-03T11:18:56.154494+08:00",
+        },
+        "candidate_discovery": {"status": "skipped", "candidate_count": 0},
+        "cninfo_refresh": {"status": "skipped", "counters": {}, "errors": []},
+        "bse_official_refresh": {
+            "status": "success",
+            "coverage_scope": "recent_window_only",
+            "requested_start_date": "2026-09-02",
+            "requested_end_date": "2026-09-03",
+            "matched_announcement_count": 1,
+            "parsed_event_count": 1,
+            "parse_partial_count": 0,
+            "scan": {"pages_scanned": 3},
+            "affected_instrument_ids": ["920096.BJ"],
+        },
+        "tdx_refresh": {
+            "refresh_mode": "targeted",
+            "target_scope": {
+                "instrument_count": 100,
+                "rotating_sample_count": 100,
+            },
+            "totals": {
+                "processed_instruments": 100,
+                "raw_events": 0,
+                "errors": 0,
+                "timeouts": 0,
+            },
+        },
+        "affected_instruments": {"count": 0, "cninfo_count": 0, "tdx_count": 0},
+        "factor_rebuild": {"status": "skipped"},
+        "data_readiness": {
+            "status": "partial",
+            "cninfo": {
+                "status": "partial",
+                "pending_factor_events": 0,
+                "incomplete_instruments": 0,
+            },
+            "tdx_reference": {
+                "status": "partial",
+                "pending_factor_events": 0,
+                "incomplete_instruments": 0,
+            },
+            "reconciliation": {
+                "status": "success",
+                "incomplete_instruments": 0,
+            },
+        },
+        "canonical_maintenance": {
+            "status": "success",
+            "scope_instrument_count": 0,
+            "missing_coverage_count": 0,
+            "incremental_merge_eligible": False,
+            "merge": None,
+        },
+        "factor_retry_state": {"status": "success", "actionable_retry_count": 0},
+        "factor_cutoff": {"resolved_end_date": "2026-09-02"},
+        "execution_status": {
+            "primary": "success",
+            "bse_official": "success",
+            "tdx_reference": "success",
+            "reconciliation": "success",
+            "canonical": "success",
+        },
+        "stage_durations": {
+            "bse_official_refresh_seconds": 1.9,
+            "tdx_refresh_seconds": 2.0,
+            "total_seconds": 18.1,
+        },
+    })
+
+    assert "结论: *完成*" in report
+    assert "北交所官方证据已入库" in report
+    assert "未改沪深生产复权表" in report
+    assert "巨潮主源: 未跑（北交所不走巨潮）" in report
+    assert "1 条公告解析为 1 条事件" in report
+    assert "生产复权表: 未更新（本轮无沪深受影响标的）" in report
+    assert "就绪度" not in report
+    assert "部分完成" not in report
+    assert "build_canonical" not in report
+    assert len(report) < 900
+
+
+def test_cninfo_daily_report_highlights_bse_parse_failure():
+    report = _format_cninfo_primary_factor_report({
+        "status": "partial",
+        "operation": "a_share_cninfo_primary_daily_maintenance",
+        "parameters": {
+            "start_date": "2026-08-27",
+            "end_date": "2026-09-03",
+            "exchanges": ["SSE", "SZSE", "BSE"],
+            "cninfo_exchanges": ["SSE", "SZSE"],
+            "cninfo_excluded_exchanges": ["BSE"],
+        },
+        "candidate_discovery": {
+            "status": "success",
+            "candidate_count": 207,
+            "deferred_count": 0,
+            "announcement_scan": {
+                "announcements_seen": 1140,
+                "title_filter": {"selected_records": 21},
+            },
+        },
+        "cninfo_refresh": {
+            "status": "success",
+            "counters": {
+                "requested_instruments": 208,
+                "observations_inserted": 19,
+                "observations_changed": 11,
+                "observations_unchanged": 79,
+                "observations_retired": 0,
+            },
+            "errors": [],
+        },
+        "bse_official_refresh": {
+            "status": "partial",
+            "requested_start_date": "2026-09-02",
+            "requested_end_date": "2026-09-03",
+            "matched_announcement_count": 1,
+            "parsed_event_count": 0,
+            "parse_partial_count": 1,
+            "scan": {"pages_scanned": 3},
+        },
+        "tdx_refresh": {
+            "refresh_mode": "targeted",
+            "target_scope": {
+                "instrument_count": 307,
+                "rotating_sample_count": 100,
+            },
+            "totals": {
+                "processed_instruments": 307,
+                "raw_events": 42,
+                "errors": 0,
+                "timeouts": 0,
+            },
+        },
+        "affected_instruments": {
+            "count": 109,
+            "cninfo_count": 109,
+            "tdx_count": 42,
+        },
+        "factor_rebuild": {
+            "status": "success",
+            "reconciliation": {
+                "totals": {
+                    "exact_matches": 1452,
+                    "conflicts": 4,
+                    "tdx_only": 11,
+                    "cninfo_only": 0,
+                    "shifted_matches": 2,
+                },
+            },
+        },
+        "data_readiness": {
+            "cninfo": {
+                "status": "success",
+                "pending_factor_events": 0,
+                "incomplete_instruments": 0,
+            },
+            "tdx_reference": {
+                "status": "success",
+                "pending_factor_events": 0,
+                "incomplete_instruments": 0,
+            },
+            "reconciliation": {
+                "status": "partial",
+                "incomplete_instruments": 14,
+            },
+        },
+        "canonical_maintenance": {
+            "status": "success",
+            "scope_instrument_count": 110,
+            "missing_coverage_count": 1,
+            "incremental_merge_eligible": True,
+            "merge": {"canonical_rows": 1459},
+        },
+        "factor_retry_state": {
+            "status": "success",
+            "actionable_retry_count": 12,
+        },
+        "execution_status": {
+            "primary": "partial",
+            "bse_official": "partial",
+            "canonical": "success",
+        },
+        "stage_durations": {"total_seconds": 319},
+    })
+
+    assert "结论: *部分完成*" in report
+    assert "北交所 1 条实施公告解析失败" in report
+    assert "生产复权表已定向更新" in report
+    assert "历史不一致，不是本轮采集失败" in report
+    assert "北交所官方: 部分完成" in report
+    assert "1 条公告未能解析" in report
+    assert "生产复权表: 已定向更新 1459 行" in report
+    assert "对账 14 只历史不一致" in report
+    assert "冲突 4" in report
+    assert "仅通达信 11" in report
+    assert "因子重试: 12 只留待下一日" in report
+    assert "exact_matches=" not in report
 
 
 @pytest.mark.asyncio
