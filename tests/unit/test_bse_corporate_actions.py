@@ -118,3 +118,24 @@ def test_bse_parser_rejects_non_implementation_title():
 
     assert result.status == "not_applicable"
     assert result.observation is None
+
+
+def test_bse_implementation_parser_accepts_spaced_cjk_dates_and_label_colon():
+    result = parse_bse_dividend_implementation(
+        record=_record("嘉晨智能2026年半年度权益分派实施公告"),
+        instrument_id="920096.BJ",
+        pages=[_page(
+            "以公司现有总股本 69,000,000 股为基数，向全体股东每 10 股派 4.300000 元 "
+            "人民币现金。"
+            "本次权益分派权益登记日为：2026 年 9 月 10 日 "
+            "除权除息日为：2026 年 9 月 11 日。"
+        )],
+        as_of_date=date(2026, 9, 3),
+    )
+
+    assert result.status == "success"
+    observation = result.observation
+    assert observation["cash_dividend_per_share"] == 0.43
+    assert observation["record_date"] == date(2026, 9, 10)
+    assert observation["ex_date"] == date(2026, 9, 11)
+    assert observation["event_status"] == "scheduled"

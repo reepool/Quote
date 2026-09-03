@@ -20,8 +20,8 @@ BSE_DIVIDEND_PROFILE = "bse_dividend_implementation"
 BSE_IMPLEMENTATION_TITLE = "权益分派实施公告"
 _NUMBER = r"([0-9]+(?:\.[0-9]+)?)"
 _DATE_VALUE = (
-    r"((?:19|20)\d{2}(?:年|[-/.])\s*\d{1,2}(?:月|[-/.])\s*"
-    r"\d{1,2}日?)"
+    r"((?:19|20)\d{2}\s*(?:年|[-/.])\s*\d{1,2}\s*(?:月|[-/.])\s*"
+    r"\d{1,2}\s*日?)"
 )
 
 
@@ -67,7 +67,7 @@ def _date_value(value: Any) -> Optional[date]:
 def _labeled_date(text: str, labels: Sequence[str]) -> Optional[date]:
     label_pattern = "|".join(re.escape(value) for value in labels)
     match = re.search(
-        rf"(?:{label_pattern})\s*(?:为|是|：|:)?\s*{_DATE_VALUE}",
+        rf"(?:{label_pattern})\s*(?:为|是)?\s*(?:：|:)?\s*{_DATE_VALUE}",
         text,
     )
     return _date_value(match.group(1)) if match else None
