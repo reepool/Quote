@@ -37,7 +37,8 @@
 5. task-specific LLM contract：定义 `extract/repair/verify`，不生成生产 prompt 代码；
 6. Gold annotations：记录正例、反例、合法空、歧义和失败；
 7. Benchmark acceptance：按 blocker 和分项指标给出 `pass/hold`；
-8. append-only review log：保存外部独立审核和用户最终决策。
+8. blind-review brief/output template：隔离 Gold 预期，提供四份 PDF、冻结 checklist、字段定义和中性提交格式；
+9. append-only review log：保存外部独立审核和用户最终决策。
 
 已形成的权威文件：
 
@@ -46,6 +47,8 @@
 - `company_profile_manufacturing_materials_llm_contract.md`；
 - `company_profile_manufacturing_materials_gold_annotations.v1.json`；
 - `company_profile_manufacturing_materials_benchmark_acceptance.md`；
+- `company_profile_manufacturing_materials_blind_review_brief.md`；
+- `company_profile_manufacturing_materials_blind_review_output.template.json`；
 - `company_profile_manufacturing_materials_review_log.md`。
 
 ## 4. 研究职责
@@ -69,4 +72,4 @@
 - 研究状态：`in_review`；
 - 生产授权：`not_authorized`。
 
-四项口径裁决和独立审核交接材料见 `company_profile_manufacturing_materials_review_log.md`。在未参与初标的外部 AI 完成独立盲审、且所有 blocker 关闭前，本行业包不得登记为 `approved`，也不得据此启动阶段 4 实现。
+四项口径裁决见 `company_profile_manufacturing_materials_review_log.md`；盲标阶段只向审核方提供四份 PDF、`company_profile_manufacturing_materials_blind_review_brief.md` 和 `company_profile_manufacturing_materials_blind_review_output.template.json`。在未参与初标的外部 AI 完成独立盲审、且所有 blocker 关闭前，本行业包不得登记为 `approved`，也不得据此启动阶段 4 实现。

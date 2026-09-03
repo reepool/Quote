@@ -65,3 +65,4 @@
 - [x] 9.4 固定一基 PDF 物理页坐标、收敛 dossier 中未冻结 action 枚举，并记录航空专用字段、predecessor 精细重建和 holdout 泛化为非阻塞研究边界。
 - [x] 9.5 同步 Benchmark、sample manifest、研究索引和 OpenSpec 严格校验；保持 8.1 独立盲审与 8.3 最终登记未完成，且不得启动阶段 4。
 - [x] 9.6 修正璞泰来无充分证据的主体口径，补充 `same_control_restated` 与 `material_input` Gold 正例，并固定 8.1“盲标—揭示 Gold 对账”协议；保持 8.1/8.3 未完成。
+- [x] 9.7 生成不含 Gold/dossier/ledger/Benchmark 结论的独立盲审交接单与中性 JSON 输出模板，使 8.1 可由外部审核方直接启动；交接准备不得冒充盲审完成。

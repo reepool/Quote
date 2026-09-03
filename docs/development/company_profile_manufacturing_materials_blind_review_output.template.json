@@ -1,0 +1,63 @@
+{
+  "artifact_type": "company_profile_industry_blind_review_submission",
+  "schema_version": "manufacturing_materials_blind_review.v1",
+  "industry_package": "manufacturing_materials",
+  "reviewer": "<independent_reviewer>",
+  "reviewed_at": "<ISO-8601>",
+  "gold_seen_before_submission": false,
+  "page_coordinate_system": "one_based_pdf_physical_page",
+  "reports": [
+    {
+      "sample_id": "<sample_id>",
+      "report_identity": {
+        "instrument_id": "<instrument_id>",
+        "report_period": "2025-12-31",
+        "content_hash": "<pdf_sha256>"
+      },
+      "field_assessments": [
+        {
+          "field_id": "<field_id>",
+          "chapter_task": "<chapter_task>",
+          "activation_status": "triggered|not_triggered|required",
+          "coverage_status": "observed|not_disclosed|not_applicable|extraction_failed|unclear",
+          "evidence": {
+            "page": 1,
+            "printed_page_label": "<optional>",
+            "section_title": "<source_section>",
+            "physical_anchor": {
+              "row_label": "<optional>",
+              "column_header": "<optional>",
+              "cell_locator": "<optional>",
+              "bounded_quote": "<optional>",
+              "footnote_refs": []
+            }
+          },
+          "source_native": {
+            "name": "<source_label_or_null>",
+            "value": "<source_value_or_null>",
+            "unit": "<source_unit_or_null>",
+            "header": "<source_header_or_null>"
+          },
+          "semantic": {
+            "object_type": "BusinessOverview|Segment|Activity|Measurement|Relationship|BusinessEvent",
+            "metric_type_or_relation": "<value_or_null>",
+            "logical_slot": "<value_or_null>",
+            "subject_scope": "consolidated_group|issuer|named_subsidiary|business_segment|unclear",
+            "subject_name": "<value_or_null>",
+            "period": "<duration_instant_or_event_period>",
+            "comparison_basis": "<value_or_null>",
+            "assertion_class": "reported_fact"
+          },
+          "failure_or_empty_reason": "<required_unless_observed>",
+          "reviewer_notes": "<ambiguity_or_reasoning>"
+        }
+      ],
+      "sample_bias_findings": [],
+      "missing_field_candidates": [],
+      "blocking_findings": []
+    }
+  ],
+  "cross_report_findings": [],
+  "contract_findings": [],
+  "submission_status": "complete|blocked"
+}

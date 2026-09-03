@@ -28,6 +28,8 @@
 3. 每条差异登记 `accepted/rejected/deferred`、原 PDF 证据和解除条件；存在 blocker 时保持 `held`；
 4. 第一阶段已经读取 Gold 的审核只能登记为独立复核，不能单独关闭 OpenSpec 8.1。
 
+盲标交付文件固定为 `company_profile_manufacturing_materials_blind_review_brief.md` 和 `company_profile_manufacturing_materials_blind_review_output.template.json`；交接方不得额外附带本文件第 3 节、Gold、dossier、ledger 或 Benchmark。
+
 ## 3. 用户已裁决、仍需独立盲审的口径
 
 1. “涂覆加工量（销量）”只映射 `processing_volume`，保留 source-native 双重叫法；另一表格锚点可独立为 `sales_volume`；
