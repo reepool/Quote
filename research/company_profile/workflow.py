@@ -461,6 +461,16 @@ def _candidate_issue(
     }
     if any(item.evidence_id not in request_evidence_ids for item in record.evidence):
         return ContractErrorCode.REQUEST_IDENTITY_MISMATCH
+    evidence_field_bindings = {
+        (item.evidence.evidence_id, item.field_id)
+        for item in request.evidence_bundle
+        if item.field_id is not None
+    }
+    if not any(
+        (evidence.evidence_id, record.field_id) in evidence_field_bindings
+        for evidence in record.evidence
+    ):
+        return ContractErrorCode.EVIDENCE_FIELD_MISMATCH
     if ObjectType(record.object_type) not in request.allowed_object_types:
         return ContractErrorCode.OBJECT_NOT_ALLOWED
     active = {
@@ -561,16 +571,7 @@ def _resolve_coverage(
     for item in request.package_manifest.active_items(request.chapter_task):
         identity = (item.chapter_task, item.field_id)
         coverage = explicit.get(identity)
-        if item.field_id in unresolved_fields:
-            coverage = CoverageResult(
-                field_id=item.field_id,
-                chapter_task=item.chapter_task,
-                requirement_level=item.requirement_level,
-                status=CoverageStatus.UNCLEAR,
-                reason_code=CoverageReasonCode.CANDIDATE_UNRESOLVED,
-                reason="candidate did not pass the stage-four contract",
-            )
-        elif coverage is not None:
+        if coverage is not None:
             check = verify_checks.get(_coverage_target_id(coverage))
             if check is None or check.status != VerifyStatus.PASS:
                 coverage = CoverageResult(
@@ -582,6 +583,15 @@ def _resolve_coverage(
                     reason="explicit coverage did not pass independent verification",
                     evidence=coverage.evidence,
                 )
+        elif item.field_id in unresolved_fields:
+            coverage = CoverageResult(
+                field_id=item.field_id,
+                chapter_task=item.chapter_task,
+                requirement_level=item.requirement_level,
+                status=CoverageStatus.UNCLEAR,
+                reason_code=CoverageReasonCode.CANDIDATE_UNRESOLVED,
+                reason="candidate did not pass the stage-four contract",
+            )
         elif item.field_id in accepted_fields:
             coverage = CoverageResult(
                 field_id=item.field_id,

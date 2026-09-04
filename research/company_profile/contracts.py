@@ -60,6 +60,7 @@ class ContractErrorCode(_StringEnum):
     OBJECT_NOT_ALLOWED = "object_not_allowed"
     METRIC_NOT_ALLOWED = "metric_not_allowed"
     ACTION_NOT_ALLOWED = "action_not_allowed"
+    EVIDENCE_FIELD_MISMATCH = "evidence_field_mismatch"
     SOURCE_VALUE_MUTATION = "source_value_mutation"
     CANDIDATE_SCHEMA_INVALID = "candidate_schema_invalid"
     CAPACITY_KIND_AMBIGUOUS = "capacity_kind_ambiguous"

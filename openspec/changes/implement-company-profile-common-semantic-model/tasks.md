@@ -43,6 +43,7 @@
 - [x] 6.3 覆盖产能缺 kind、重述缺 `comparison_basis`（必须 blocker）、销量/销售额、库存量/存货金额、Activity 数值、第三方 actor、processing_volume 方向误用、非法 action、非法 identity class、非法 not-disclosed reason code、未知 chapter task、商品方向和完整产业链推断等阻塞反例。
 - [x] 6.4 覆盖 deterministic-only、fake extract、一次 repair、verify block、coverage legal-empty 和人工复核包的最小端到端测试。
 - [x] 6.5 增加副作用护栏测试，证明 import 和 fixture 执行不访问网络、不打开生产数据库、不修改配置或旧生产状态。
+- [x] 6.6 修正前五名合计与 `report_local_aggregate` 的交互合同：集中度 Evidence 不得生成 Relationship；独立原文明示的聚合交易主体仍可形成 Relationship，并执行 `mm-neg-counterparty-coverage-backfill` 负例回归。
 
 ## 7. 阶段验收与交接
 
@@ -51,3 +52,4 @@
 - [x] 7.3 审查本 change 的代码和文档，只修复会导致当前合同结果错误、生产边界破坏或验收无法证明的阻塞问题。
 - [x] 7.4 验证没有修改生产数据库 schema、scheduler、Telegram、DCF、旧 prompt/backfill 或 freeze switches，并保持 `production_authorization=not_authorized`。
 - [x] 7.5 阶段 4 全部通过后形成阶段 5 交接条件：四份制造/材料年报、隔离存储、无旧 approved 混写、人工可核验研究视图；不得在本 change 内提前实现阶段 5。
+- [x] 7.6 对 6.6 的阻塞修复重新运行阶段 4 测试、共享回归、Ruff 和 OpenSpec strict validation，确认生产隔离仍成立后再允许归档。

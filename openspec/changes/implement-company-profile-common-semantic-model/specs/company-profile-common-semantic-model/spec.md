@@ -62,8 +62,13 @@ The model MUST restrict v1 Activity actions to `develops`, `produces`, `processe
 
 #### Scenario: Unsupported action and aggregate identity stay bounded
 - **WHEN** a source uses an unreviewed action verb and a top-five section reports only an aggregate amount without names
-- **THEN** the action remains unresolved and the aggregate may use `identity_class=report_local_aggregate` only for its own source identity
-- **AND** counterparty-name coverage remains `not_disclosed` rather than being filled from another chapter
+- **THEN** the action remains unresolved and the top-five aggregate is represented only by its concentration Measurement
+- **AND** counterparty-name coverage remains `not_disclosed` with no Relationship created from that aggregate
+
+#### Scenario: Independently disclosed aggregate identity remains a relationship
+- **WHEN** another section explicitly discloses a transaction counterparty identity such as `集团所属单位`
+- **THEN** that source identity may use `identity_class=report_local_aggregate` in an independent Relationship
+- **AND** it does not change top-five counterparty-name coverage to observed
 
 ### Requirement: Coverage is a first-class result rather than an empty collection
 For every active package and chapter-task checklist item, the system MUST record its requirement level and one of `observed`, `not_disclosed`, `not_applicable`, `extraction_failed`, or `unclear`, with an applicable `reason_code` and evidence pages where applicable. For `not_disclosed`, the `reason_code` set is closed to `explicit_confidentiality`, `explicit_disclosure_exemption`, or `source_reason_unspecified`; the first two require explicit source wording. Coverage is evaluated only against the active package's chapter-task checklist, not an unbounded universe of metrics. An empty object list MUST NOT imply task completion.

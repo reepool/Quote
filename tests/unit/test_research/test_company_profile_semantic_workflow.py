@@ -469,7 +469,13 @@ def test_preparation_failure_happens_before_provider(preparation, expected_reaso
     assert result.coverage[0].reason_code.value == expected_reason
 
 
-def test_legal_empty_name_coverage_survives_aggregate_relationship_candidate():
+def test_top_five_concentration_evidence_cannot_create_aggregate_relationship():
+    gold = json.loads(GOLD_PATH.read_text(encoding="utf-8"))
+    negative_case = next(
+        item
+        for item in gold["contract_negative_cases"]
+        if item["case_id"] == "mm-neg-counterparty-coverage-backfill"
+    )
     original = _record("counterparty_relationship")
     aggregate = original.model_copy(
         update={
@@ -487,12 +493,48 @@ def test_legal_empty_name_coverage_survives_aggregate_relationship_candidate():
         reason="section reports only aggregate totals and no names",
         evidence=aggregate.evidence,
     )
-    request = _request((aggregate,), coverage=(coverage,))
+    request = _request(
+        (aggregate,),
+        coverage=(coverage,),
+        extra_fields=("customer_concentration",),
+    ).model_copy(
+        update={
+            "evidence_bundle": (
+                PreparedEvidence(
+                    evidence=aggregate.evidence[0],
+                    field_id="customer_concentration",
+                ),
+            )
+        }
+    )
 
     result = CompanyProfileSemanticService().run_task(request)
+    coverage_by_field = {item.field_id: item for item in result.coverage}
+
+    assert negative_case["blocking"] is True
+    assert result.task_complete is False
+    assert coverage_by_field["counterparty_relationship"].status.value == (
+        "not_disclosed"
+    )
+    assert result.dispositions[0].status == DispositionStatus.BLOCKED
+    assert result.dispositions[0].reason_codes == (
+        ContractErrorCode.EVIDENCE_FIELD_MISMATCH,
+    )
+
+
+def test_independently_disclosed_aggregate_counterparty_relationship_is_allowed():
+    original = _record("counterparty_relationship")
+    aggregate = original.model_copy(
+        update={
+            "record_id": "aggregate-related-party",
+            "object_name": "集团所属单位",
+            "identity_class": company_profile.IdentityClass.REPORT_LOCAL_AGGREGATE,
+        }
+    )
+
+    result = CompanyProfileSemanticService().run_task(_request((aggregate,)))
 
     assert result.task_complete is True
-    assert result.coverage[0].status.value == "not_disclosed"
     assert result.dispositions[0].status == DispositionStatus.ACCEPTED_FOR_REVIEW
 
 
@@ -529,35 +571,26 @@ def test_coverage_only_legal_empty_is_independently_verified():
 
 
 def test_explicit_coverage_requires_an_independent_verify_check():
-    original = _record("counterparty_relationship")
-    aggregate = original.model_copy(
-        update={
-            "record_id": "aggregate-without-coverage-check",
-            "object_name": "前五名客户合计",
-            "identity_class": company_profile.IdentityClass.REPORT_LOCAL_AGGREGATE,
-        }
-    )
+    relationship = _record("counterparty_relationship")
     coverage = CoverageResult(
-        field_id=aggregate.field_id,
-        chapter_task=aggregate.chapter_task,
+        field_id=relationship.field_id,
+        chapter_task=relationship.chapter_task,
         requirement_level=company_profile.RequirementLevel.CONDITIONAL,
         status=company_profile.CoverageStatus.NOT_DISCLOSED,
         reason_code=company_profile.CoverageReasonCode.SOURCE_REASON_UNSPECIFIED,
         reason="section reports only aggregate totals and no names",
-        evidence=aggregate.evidence,
+        evidence=relationship.evidence,
     )
-    request = _request((aggregate,), coverage=(coverage,))
+    request = _request(
+        chapter_task=relationship.chapter_task,
+        coverage=(coverage,),
+        extra_fields=(relationship.field_id,),
+    )
     provider = FakeSemanticProvider(
         verify_outputs=[
             VerifyResponse(
                 request_id=f"{request.request_id}:verify",
-                checks=(
-                    VerifyCheck(
-                        target_type="candidate",
-                        target_id=aggregate.record_id,
-                        status=VerifyStatus.PASS,
-                    ),
-                ),
+                checks=(),
             )
         ]
     )

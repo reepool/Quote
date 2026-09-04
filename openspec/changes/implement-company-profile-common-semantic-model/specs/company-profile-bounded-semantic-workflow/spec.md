@@ -67,8 +67,13 @@ Verify MUST evaluate each candidate and each active checklist item against the o
 
 #### Scenario: Aggregate counterparty names remain undisclosed
 - **WHEN** a top-five section reports only aggregate amounts without names
-- **THEN** verify returns `identity_class=report_local_aggregate` and name coverage `not_disclosed`
-- **AND** it does not import names from another chapter
+- **THEN** the workflow may pass the source-bound concentration Measurement and independently verified name coverage `not_disclosed`
+- **AND** it blocks any Relationship candidate whose Evidence is bound only to the concentration field before verification
+
+#### Scenario: Separate aggregate counterparty identity is source-bound
+- **WHEN** another section explicitly identifies a transaction counterparty as `集团所属单位` or an equivalent report-local aggregate
+- **THEN** verify may pass an independent `identity_class=report_local_aggregate` Relationship whose Evidence is bound to the relationship field
+- **AND** it does not import that identity into the top-five names checklist
 
 #### Scenario: Candidate subject is unsupported
 - **WHEN** a candidate claims `consolidated_group` from the word `公司` without affirmative evidence

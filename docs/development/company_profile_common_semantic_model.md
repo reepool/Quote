@@ -79,7 +79,7 @@
 - 合并抵消使用 `row_class=consolidation_adjustment`，并保留一行 Segment 和收入、成本、毛利率三个独立 Measurement；不能生成负向销售 Activity。
 - 第三方动作不能改写成上市公司动作。
 - 对手方身份仅允许 `named`、`report_local_anonymous`、`report_local_aggregate`；匿名和聚合身份不得携带全局实体 ID。
-- 仅披露前五名合计时，可以保留聚合 Relationship，但名称 coverage 仍为 `not_disclosed`。
+- 仅披露前五名合计时，只形成 concentration Measurement 和名称 `not_disclosed` coverage，不形成 Relationship；只有其他章节原文明示的“集团所属单位”等聚合交易主体，才可独立形成 `report_local_aggregate` Relationship。
 - `not_disclosed` reason code 只允许 `explicit_confidentiality`、`explicit_disclosure_exemption`、`source_reason_unspecified`；前两者必须有原文明示。
 - 重述比较数必须带 `comparison_basis`，并与 predecessor 的 `original_as_published` 事实并列。
 - occurrence identity 使用证券、报告期、文档版本、PDF 物理页、稳定表格/叙述锚点以及适用的 logical slot；evidence ID、可再生 report ID、模型解释和规范化对象名不参与身份。
@@ -117,7 +117,7 @@ Pydantic 模型是唯一运行时 schema 源；`semantic_record_json_schema()`�
 1. 在 provider 调用前检查报告、active checklist、连续页、表头、单位、脚注和可读性；
 2. 优先消费已结构化 deterministic candidate；
 3. 只有 unresolved field 才调用注入的 fake provider `extract`；
-4. 所有候选经过同一身份、枚举、source-native 和语义不变量验证；
+4. 所有候选经过同一身份、枚举、source-native、字段级 Evidence 绑定和语义不变量验证；集中度 Evidence 不得被改写为 Relationship；
 5. 只允许一次受 writable pointer 限制的 repair；
 6. verify 对每个候选和显式 coverage 独立检查，不修改事实；
 7. 输出每个候选的 `accepted_for_review`、`blocked` 或 `unresolved` disposition；
@@ -159,7 +159,7 @@ Pydantic 模型是唯一运行时 schema 源；`semantic_record_json_schema()`�
 
 ## 9. 阶段 4 验收记录
 
-2026-09-03 完成以下本地、无网络、无生产数据库验收：
+2026-09-04 完成以下本地、无网络、无生产数据库验收：
 
 ```bash
 python -m pytest -q \
@@ -169,7 +169,7 @@ python -m pytest -q \
   tests/unit/test_research/test_business_profile_semantic_runtime.py \
   tests/unit/test_research/test_business_profile_production_rollout.py \
   tests/unit/test_research/test_business_profile_fact_catalog.py
-# 190 passed
+# 191 passed
 
 python -m ruff check research/company_profile \
   tests/unit/test_research/test_company_profile_common_semantic_model.py \
@@ -182,4 +182,4 @@ openspec validate implement-company-profile-common-semantic-model --strict
 
 参考投影与期望 JSON 逐字段相等；旧生产配置、数据库 schema、scheduler、Telegram、DCF、prompt 和 backfill 均未修改。
 
-阻塞性 Review 还验证并修复了以下合同边界：跨报告 Evidence/投影混入、provider 已构造模型绕过二次校验、重复 candidate/coverage/verify target 静默覆盖，以及 occurrence identity 错误包含语义对象类型或受 Evidence 顺序影响。对应回归已包含在上述 190 个测试中。
+阻塞性 Review 还验证并修复了以下合同边界：跨报告 Evidence/投影混入、provider 已构造模型绕过二次校验、重复 candidate/coverage/verify target 静默覆盖、occurrence identity 错误包含语义对象类型或受 Evidence 顺序影响，以及前五名集中度 Evidence 被错误接受为聚合 Relationship。对应回归已包含在上述 191 个测试中。
