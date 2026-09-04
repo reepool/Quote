@@ -19,6 +19,7 @@ from .contracts import (
     RepairRequest,
     RepairResponse,
     SemanticProvider,
+    SemanticProviderError,
     SemanticTaskRequest,
     VerifyCheck,
     VerifyRequest,
@@ -174,6 +175,18 @@ class CompanyProfileSemanticService:
                         )
                     records.extend(response_candidates)
                     explicit_coverage.extend(response_coverage)
+                except SemanticProviderError as exc:
+                    request_review_items.append(
+                        HumanReviewItem(
+                            review_id=f"{request.request_id}:extract-provider",
+                            field_id=request.unresolved_field_ids[0],
+                            evidence=tuple(
+                                item.evidence for item in request.evidence_bundle
+                            ),
+                            reason_codes=(exc.code,),
+                            conflicting_interpretations=(str(exc),),
+                        )
+                    )
                 except (ValidationError, ValueError, TypeError, RuntimeError) as exc:
                     request_review_items.append(
                         HumanReviewItem(
@@ -283,6 +296,28 @@ class CompanyProfileSemanticService:
                         for check in verify_response.checks
                     ):
                         raise ValueError("verify response returned an unknown target")
+                except SemanticProviderError as exc:
+                    verify_response = VerifyResponse(
+                        request_id=verify_request.request_id,
+                        checks=tuple(
+                            VerifyCheck(
+                                target_type="candidate",
+                                target_id=item.record_id,
+                                status=VerifyStatus.BLOCK,
+                                reason_codes=(exc.code,),
+                            )
+                            for item in verify_request.candidates
+                        )
+                        + tuple(
+                            VerifyCheck(
+                                target_type="coverage",
+                                target_id=_coverage_target_id(item),
+                                status=VerifyStatus.BLOCK,
+                                reason_codes=(exc.code,),
+                            )
+                            for item in verify_request.coverage
+                        ),
+                    )
                 except (ValidationError, ValueError, TypeError, RuntimeError):
                     verify_response = VerifyResponse(
                         request_id=verify_request.request_id,

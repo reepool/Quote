@@ -1,7 +1,7 @@
-"""Stage-four company-profile semantic contracts.
+"""Isolated company-profile research contracts for stages four and five.
 
-Production authorization remains ``not_authorized``.  This package is pure in-memory
-code and intentionally exposes no database writer or network provider.
+Production authorization remains ``not_authorized``.  Stage five only adds bounded
+local evidence preparation; it still exposes no production database writer.
 """
 
 from .contracts import (
@@ -15,6 +15,7 @@ from .contracts import (
     PreparedEvidence,
     RepairRequest,
     RepairResponse,
+    SemanticProviderError,
     SemanticTaskRequest,
     VerifyCheck,
     VerifyRequest,
@@ -61,6 +62,42 @@ from .models import (
     semantic_record_json_schema,
 )
 from .projection import CompanyProfileResearchView, project_research_view
+from .stage5 import (
+    APPROVED_STAGE5_SAMPLES,
+    EvidencePreparationError,
+    PreparationFailureCode,
+    PreparedRequestScope,
+    Stage5EvidencePlan,
+    Stage5EvidencePreparer,
+    Stage5SampleManifest,
+    load_stage5_evidence_plan,
+    load_stage5_sample_manifest,
+)
+from .stage5_bundle import (
+    Stage5BenchmarkDimension,
+    Stage5BenchmarkResult,
+    Stage5FailureDiagnostic,
+    Stage5FailureManifest,
+    Stage5GarbageAudit,
+    Stage5OverallStatus,
+    Stage5PreparationBundle,
+    Stage5PreparedScopeSummary,
+    Stage5ProviderCallTrace,
+    Stage5ReportBundle,
+    Stage5ReportStatus,
+    Stage5ReviewAction,
+    Stage5ReviewDecision,
+    Stage5RunBundle,
+    Stage5RunBundleStore,
+    Stage5ScopeResult,
+    stage5_evidence_plan_hash,
+)
+from .stage5_provider import CommonGatewaySemanticProvider
+from .stage5_service import (
+    ManufacturingMaterialsProfileSliceService,
+    Stage5SemanticInput,
+    Stage5SliceExecution,
+)
 from .workflow import (
     CompanyProfileSemanticService,
     FakeSemanticProvider,
@@ -68,6 +105,7 @@ from .workflow import (
 )
 
 __all__ = [
+    "APPROVED_STAGE5_SAMPLES",
     "PRODUCTION_AUTHORIZATION",
     "Activity",
     "ActivityAction",
@@ -78,6 +116,7 @@ __all__ = [
     "CapacityKind",
     "ChapterTask",
     "ChecklistItem",
+    "CommonGatewaySemanticProvider",
     "CompanyProfileResearchView",
     "CompanyProfileSemanticService",
     "CompanyProfileTaskResult",
@@ -89,18 +128,22 @@ __all__ = [
     "Disposition",
     "DispositionStatus",
     "Evidence",
+    "EvidencePreparationError",
     "ExtractResponse",
     "FakeSemanticProvider",
     "HumanReviewItem",
     "IdentityClass",
     "IndustryPackageAssignment",
     "LogicalSlot",
+    "ManufacturingMaterialsProfileSliceService",
     "Measurement",
     "MetricType",
     "ObjectType",
     "PackageManifest",
     "PeriodType",
+    "PreparationFailureCode",
     "PreparedEvidence",
+    "PreparedRequestScope",
     "ProcessingDirection",
     "Relationship",
     "RelationshipType",
@@ -111,8 +154,30 @@ __all__ = [
     "RowClass",
     "Segment",
     "SemanticProvider",
+    "SemanticProviderError",
     "SemanticTaskRequest",
     "SourceNativeValue",
+    "Stage5BenchmarkDimension",
+    "Stage5BenchmarkResult",
+    "Stage5EvidencePlan",
+    "Stage5EvidencePreparer",
+    "Stage5FailureDiagnostic",
+    "Stage5FailureManifest",
+    "Stage5GarbageAudit",
+    "Stage5OverallStatus",
+    "Stage5PreparationBundle",
+    "Stage5PreparedScopeSummary",
+    "Stage5ProviderCallTrace",
+    "Stage5ReportBundle",
+    "Stage5ReportStatus",
+    "Stage5ReviewAction",
+    "Stage5ReviewDecision",
+    "Stage5RunBundle",
+    "Stage5RunBundleStore",
+    "Stage5SampleManifest",
+    "Stage5ScopeResult",
+    "Stage5SemanticInput",
+    "Stage5SliceExecution",
     "SubjectBasis",
     "SubjectScope",
     "TableAnchor",
@@ -123,6 +188,9 @@ __all__ = [
     "VerifyStatus",
     "contract_example_manifest",
     "contract_schema_manifest",
+    "load_stage5_evidence_plan",
+    "load_stage5_sample_manifest",
     "project_research_view",
     "semantic_record_json_schema",
+    "stage5_evidence_plan_hash",
 ]

@@ -79,6 +79,14 @@ class ContractErrorCode(_StringEnum):
     PROVIDER_UNAVAILABLE = "provider_unavailable"
 
 
+class SemanticProviderError(RuntimeError):
+    """Safe typed failure raised by a SemanticProvider boundary adapter."""
+
+    def __init__(self, code: ContractErrorCode, message: str) -> None:
+        super().__init__(message)
+        self.code = code
+
+
 class ChecklistItem(_StrictModel):
     field_id: str = Field(min_length=1)
     object_type: ObjectType

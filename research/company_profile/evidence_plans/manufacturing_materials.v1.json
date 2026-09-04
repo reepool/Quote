@@ -1,0 +1,673 @@
+{
+  "schema_version": "company_profile_stage5_evidence_plan.v1",
+  "plan_version": "manufacturing_materials.2026-09-04.1",
+  "sample_manifest_revision": "manufacturing_materials.2026-09-03.4",
+  "page_coordinate_system": "one_based_pdf_physical_page",
+  "production_authorization": "not_authorized",
+  "reports": [
+    {
+      "sample_id": "manufacturing-materials-300750-2025",
+      "content_hash": "c15272977147dee7e6935a38ea0e4fd6855370aabb106f54cfe20f7cf6048ec9",
+      "plan_version": "manufacturing_materials.2026-09-04.1",
+      "tasks": [
+        {
+          "chapter_task": "extract_business_overview",
+          "request_scopes": [
+            {
+              "scope_id": "business_overview",
+              "field_ids": ["business_overview_source", "explicit_activity"],
+              "pages": [14, 15, 16],
+              "section_titles": ["第三节 管理层讨论与分析", "报告期内公司从事的主要业务"],
+              "anchor_terms": ["报告期内公司从事的主要业务", "主要业务"],
+              "required_headers": [],
+              "required_units": [],
+              "required_footnotes": [],
+              "continuation_required": false,
+              "printed_page_labels": {}
+            }
+          ]
+        },
+        {
+          "chapter_task": "extract_segment_financials",
+          "request_scopes": [
+            {
+              "scope_id": "segment_product_industry_region",
+              "field_ids": ["segment_dimension", "operating_revenue", "operating_cost", "gross_margin_reported"],
+              "pages": [24, 25],
+              "section_titles": ["主营业务分析", "收入与成本"],
+              "anchor_terms": ["营业收入构成", "分产品"],
+              "required_headers": ["营业收入", "营业成本", "毛利率"],
+              "required_units": ["千元"],
+              "required_footnotes": [],
+              "continuation_required": true,
+              "printed_page_labels": {}
+            }
+          ]
+        },
+        {
+          "chapter_task": "extract_operating_quantities",
+          "request_scopes": [
+            {
+              "scope_id": "capacity_narrative",
+              "field_ids": ["production_capacity", "capacity_under_construction"],
+              "pages": [24],
+              "section_titles": ["供应链及产能"],
+              "anchor_terms": ["锂电池产能", "在建产能"],
+              "required_headers": [],
+              "required_units": ["GWh"],
+              "required_footnotes": [],
+              "continuation_required": false,
+              "printed_page_labels": {}
+            },
+            {
+              "scope_id": "battery_system_volume_table",
+              "field_ids": ["capacity_utilization", "production_volume", "sales_volume", "inventory_volume"],
+              "pages": [26, 27],
+              "section_titles": ["实物销售", "产销量情况"],
+              "anchor_terms": ["生产量", "销售量", "库存量"],
+              "required_headers": ["生产量", "销售量", "库存量"],
+              "required_units": ["GWh"],
+              "required_footnotes": [],
+              "continuation_required": true,
+              "printed_page_labels": {}
+            }
+          ]
+        },
+        {
+          "chapter_task": "extract_material_inputs",
+          "request_scopes": [
+            {
+              "scope_id": "material_risk_disclosure",
+              "field_ids": ["material_input"],
+              "pages": [40],
+              "section_titles": ["原材料价格波动及供应风险"],
+              "anchor_terms": ["主要原材料包括", "正极材料", "负极材料"],
+              "required_headers": [],
+              "required_units": [],
+              "required_footnotes": [],
+              "continuation_required": false,
+              "printed_page_labels": {}
+            }
+          ]
+        },
+        {
+          "chapter_task": "extract_counterparties_and_concentration",
+          "request_scopes": [
+            {
+              "scope_id": "major_sales_contract",
+              "field_ids": ["counterparty_relationship", "customer_concentration"],
+              "pages": [27],
+              "section_titles": ["重大销售合同"],
+              "anchor_terms": ["重大销售合同", "对方当事人"],
+              "required_headers": ["本报告期履行金额"],
+              "required_units": ["千元"],
+              "required_footnotes": ["基于双方保密协议约定"],
+              "continuation_required": false,
+              "printed_page_labels": {}
+            },
+            {
+              "scope_id": "top_five_customer_rows",
+              "field_ids": ["counterparty_relationship", "customer_concentration"],
+              "pages": [28],
+              "section_titles": ["主要销售客户"],
+              "anchor_terms": ["前五名客户合计销售金额", "客户名称"],
+              "required_headers": ["销售额", "占年度销售总额比例"],
+              "required_units": ["千元", "%"],
+              "required_footnotes": [],
+              "continuation_required": false,
+              "printed_page_labels": {}
+            },
+            {
+              "scope_id": "top_five_supplier_rows",
+              "field_ids": ["counterparty_relationship", "supplier_concentration"],
+              "pages": [28, 29],
+              "section_titles": ["主要供应商"],
+              "anchor_terms": ["前五名供应商合计采购金额", "供应商名称"],
+              "required_headers": ["采购额", "占年度采购总额比例"],
+              "required_units": ["千元", "%"],
+              "required_footnotes": [],
+              "continuation_required": true,
+              "printed_page_labels": {}
+            }
+          ]
+        },
+        {
+          "chapter_task": "extract_business_regime",
+          "request_scopes": [
+            {
+              "scope_id": "reported_business_change",
+              "field_ids": ["business_regime"],
+              "pages": [27, 28],
+              "section_titles": ["业务、产品或服务重大变化", "合并范围变化"],
+              "anchor_terms": ["业务、产品或服务发生重大变化", "不适用"],
+              "required_headers": [],
+              "required_units": [],
+              "required_footnotes": [],
+              "continuation_required": false,
+              "printed_page_labels": {}
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sample_id": "manufacturing-materials-603659-2025",
+      "content_hash": "4e81f5539046ba1eee733100f38442a4abd5037afe3881115ba7f48678fa35b6",
+      "plan_version": "manufacturing_materials.2026-09-04.1",
+      "tasks": [
+        {
+          "chapter_task": "extract_business_overview",
+          "request_scopes": [
+            {
+              "scope_id": "business_overview",
+              "field_ids": ["business_overview_source", "explicit_activity"],
+              "pages": [12],
+              "section_titles": ["第三节 管理层讨论与分析", "报告期内公司从事的业务情况"],
+              "anchor_terms": ["报告期内公司从事的业务情况", "主要业务"],
+              "required_headers": [],
+              "required_units": [],
+              "required_footnotes": ["东阳光氟树脂"],
+              "continuation_required": false,
+              "printed_page_labels": {}
+            }
+          ]
+        },
+        {
+          "chapter_task": "extract_segment_financials",
+          "request_scopes": [
+            {
+              "scope_id": "segment_product_and_adjustment",
+              "field_ids": ["segment_dimension", "operating_revenue", "operating_cost", "gross_margin_reported"],
+              "pages": [18, 19],
+              "section_titles": ["主营业务分析", "分产品"],
+              "anchor_terms": ["主营业务分产品情况", "合并抵消项"],
+              "required_headers": ["营业收入", "营业成本", "毛利率"],
+              "required_units": ["元"],
+              "required_footnotes": [],
+              "continuation_required": true,
+              "printed_page_labels": {}
+            }
+          ]
+        },
+        {
+          "chapter_task": "extract_operating_quantities",
+          "request_scopes": [
+            {
+              "scope_id": "capacity_and_processing_narrative",
+              "field_ids": ["production_capacity", "processing_volume"],
+              "pages": [14, 15],
+              "section_titles": ["经营情况讨论与分析", "产能与加工量"],
+              "anchor_terms": ["涂覆加工量", "产能"],
+              "required_headers": [],
+              "required_units": ["亿㎡", "万吨"],
+              "required_footnotes": [],
+              "continuation_required": false,
+              "printed_page_labels": {}
+            },
+            {
+              "scope_id": "product_volume_table",
+              "field_ids": ["production_volume", "sales_volume", "inventory_volume"],
+              "pages": [19],
+              "section_titles": ["产销量情况分析表"],
+              "anchor_terms": ["产量", "销售量", "库存量"],
+              "required_headers": ["产量", "销售量", "库存量"],
+              "required_units": ["吨", "万㎡"],
+              "required_footnotes": ["包含已发出至客户但尚未确认收入的发出商品"],
+              "continuation_required": false,
+              "printed_page_labels": {}
+            }
+          ]
+        },
+        {
+          "chapter_task": "extract_material_inputs",
+          "request_scopes": [
+            {
+              "scope_id": "procurement_mode",
+              "field_ids": ["material_input"],
+              "pages": [12],
+              "section_titles": ["采购模式"],
+              "anchor_terms": ["采购模式", "标准原材料"],
+              "required_headers": [],
+              "required_units": [],
+              "required_footnotes": [],
+              "continuation_required": false,
+              "printed_page_labels": {}
+            },
+            {
+              "scope_id": "cost_composition",
+              "field_ids": ["material_input"],
+              "pages": [20],
+              "section_titles": ["营业成本构成"],
+              "anchor_terms": ["直接材料", "加工费"],
+              "required_headers": ["成本构成项目"],
+              "required_units": ["元", "%"],
+              "required_footnotes": [],
+              "continuation_required": false,
+              "printed_page_labels": {}
+            },
+            {
+              "scope_id": "material_risk_disclosure",
+              "field_ids": ["material_input"],
+              "pages": [33],
+              "section_titles": ["原材料价格波动风险"],
+              "anchor_terms": ["原材料价格上涨的风险", "钢材", "机加工件"],
+              "required_headers": [],
+              "required_units": [],
+              "required_footnotes": [],
+              "continuation_required": false,
+              "printed_page_labels": {}
+            }
+          ]
+        },
+        {
+          "chapter_task": "extract_counterparties_and_concentration",
+          "request_scopes": [
+            {
+              "scope_id": "top_five_customer_totals_only",
+              "field_ids": ["counterparty_relationship", "customer_concentration"],
+              "pages": [21],
+              "section_titles": ["主要销售客户"],
+              "anchor_terms": ["前五名客户销售额", "年度销售总额"],
+              "required_headers": [],
+              "required_units": ["万元", "%"],
+              "required_footnotes": [],
+              "continuation_required": false,
+              "printed_page_labels": {}
+            },
+            {
+              "scope_id": "top_five_supplier_totals_only",
+              "field_ids": ["counterparty_relationship", "supplier_concentration"],
+              "pages": [21],
+              "section_titles": ["主要供应商"],
+              "anchor_terms": ["前五名供应商采购额", "年度采购总额"],
+              "required_headers": [],
+              "required_units": ["万元", "%"],
+              "required_footnotes": [],
+              "continuation_required": false,
+              "printed_page_labels": {}
+            }
+          ]
+        },
+        {
+          "chapter_task": "extract_business_regime",
+          "request_scopes": [
+            {
+              "scope_id": "reported_business_change",
+              "field_ids": ["business_regime"],
+              "pages": [21],
+              "section_titles": ["业务、产品或服务重大变化", "合并范围变化"],
+              "anchor_terms": ["业务、产品或服务发生重大变化", "不适用"],
+              "required_headers": [],
+              "required_units": [],
+              "required_footnotes": [],
+              "continuation_required": false,
+              "printed_page_labels": {}
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sample_id": "manufacturing-materials-920015-2025",
+      "content_hash": "4d2c1612f6f62a9024b8947d7a01b70c40f8f347c2975fa1a05b908d0770695a",
+      "plan_version": "manufacturing_materials.2026-09-04.1",
+      "tasks": [
+        {
+          "chapter_task": "extract_business_overview",
+          "request_scopes": [
+            {
+              "scope_id": "business_overview",
+              "field_ids": ["business_overview_source", "explicit_activity"],
+              "pages": [12, 13],
+              "section_titles": ["第四节 管理层讨论与分析", "业务概要"],
+              "anchor_terms": ["业务概要", "主营业务"],
+              "required_headers": [],
+              "required_units": [],
+              "required_footnotes": [],
+              "continuation_required": false,
+              "printed_page_labels": {}
+            }
+          ]
+        },
+        {
+          "chapter_task": "extract_segment_financials",
+          "request_scopes": [
+            {
+              "scope_id": "segment_product_and_region",
+              "field_ids": ["segment_dimension", "operating_revenue", "operating_cost", "gross_margin_reported"],
+              "pages": [16, 17, 18],
+              "section_titles": ["营业情况分析", "按产品分类分析"],
+              "anchor_terms": ["按产品分类分析", "羟胺盐"],
+              "required_headers": ["营业收入", "营业成本", "毛利率"],
+              "required_units": ["元"],
+              "required_footnotes": [],
+              "continuation_required": true,
+              "printed_page_labels": {}
+            }
+          ]
+        },
+        {
+          "chapter_task": "extract_operating_quantities",
+          "request_scopes": [
+            {
+              "scope_id": "capacity_project_narrative",
+              "field_ids": ["capacity_under_construction"],
+              "pages": [13],
+              "section_titles": ["经营回顾", "产能项目"],
+              "anchor_terms": ["40kt/a", "羟胺盐"],
+              "required_headers": [],
+              "required_units": ["kt/a"],
+              "required_footnotes": [],
+              "continuation_required": false,
+              "printed_page_labels": {}
+            },
+            {
+              "scope_id": "quantity_disclosure_check",
+              "field_ids": ["production_volume", "sales_volume", "inventory_volume"],
+              "pages": [19],
+              "section_titles": ["经营情况回顾"],
+              "anchor_terms": ["30kt/a", "盐酸羟胺"],
+              "required_headers": [],
+              "required_units": ["kt/a", "吨"],
+              "required_footnotes": [],
+              "continuation_required": false,
+              "printed_page_labels": {}
+            },
+            {
+              "scope_id": "capacity_table",
+              "field_ids": ["production_capacity", "capacity_under_construction", "capacity_utilization"],
+              "pages": [49, 50],
+              "section_titles": ["产能情况", "产能与开工情况"],
+              "anchor_terms": ["设计产能", "在建产能"],
+              "required_headers": ["设计产能", "产能利用率", "在建产能"],
+              "required_units": ["吨/年", "%"],
+              "required_footnotes": [],
+              "continuation_required": true,
+              "printed_page_labels": {}
+            }
+          ]
+        },
+        {
+          "chapter_task": "extract_material_inputs",
+          "request_scopes": [
+            {
+              "scope_id": "procurement_mode",
+              "field_ids": ["material_input"],
+              "pages": [12],
+              "section_titles": ["采购模式"],
+              "anchor_terms": ["采购模式", "原材料"],
+              "required_headers": [],
+              "required_units": [],
+              "required_footnotes": [],
+              "continuation_required": false,
+              "printed_page_labels": {}
+            },
+            {
+              "scope_id": "material_risk_disclosure",
+              "field_ids": ["material_input"],
+              "pages": [26],
+              "section_titles": ["原材料价格波动风险"],
+              "anchor_terms": ["原材料价格上涨风险", "平均采购价格"],
+              "required_headers": [],
+              "required_units": [],
+              "required_footnotes": [],
+              "continuation_required": false,
+              "printed_page_labels": {}
+            },
+            {
+              "scope_id": "material_and_energy_table",
+              "field_ids": ["material_input"],
+              "pages": [51],
+              "section_titles": ["主要原材料及能源采购"],
+              "anchor_terms": ["原材料及能源名称", "采购模式"],
+              "required_headers": ["供应稳定性分析", "价格走势及变动情况分析"],
+              "required_units": [],
+              "required_footnotes": [],
+              "continuation_required": false,
+              "printed_page_labels": {}
+            }
+          ]
+        },
+        {
+          "chapter_task": "extract_counterparties_and_concentration",
+          "request_scopes": [
+            {
+              "scope_id": "customer_ranking_rows",
+              "field_ids": ["counterparty_relationship", "customer_concentration"],
+              "pages": [17, 18],
+              "section_titles": ["主要客户情况"],
+              "anchor_terms": ["主要客户情况", "销售金额"],
+              "required_headers": ["客户", "销售金额"],
+              "required_units": ["元", "%"],
+              "required_footnotes": [],
+              "continuation_required": true,
+              "printed_page_labels": {}
+            },
+            {
+              "scope_id": "supplier_ranking_rows",
+              "field_ids": ["counterparty_relationship", "supplier_concentration"],
+              "pages": [17, 18],
+              "section_titles": ["主要供应商情况"],
+              "anchor_terms": ["主要供应商情况", "采购金额"],
+              "required_headers": ["供应商", "采购金额"],
+              "required_units": ["元", "%"],
+              "required_footnotes": [],
+              "continuation_required": true,
+              "printed_page_labels": {}
+            }
+          ]
+        },
+        {
+          "chapter_task": "extract_business_regime",
+          "request_scopes": [
+            {
+              "scope_id": "business_mode_and_extension",
+              "field_ids": ["business_regime"],
+              "pages": [12, 13],
+              "section_titles": ["商业模式", "产品扩展"],
+              "anchor_terms": ["商业模式", "羟胺水溶液"],
+              "required_headers": [],
+              "required_units": [],
+              "required_footnotes": [],
+              "continuation_required": false,
+              "printed_page_labels": {}
+            },
+            {
+              "scope_id": "reported_business_change",
+              "field_ids": ["business_regime"],
+              "pages": [24, 25],
+              "section_titles": ["合并报表范围的变化情况"],
+              "anchor_terms": ["合并报表范围的变化情况", "不适用"],
+              "required_headers": [],
+              "required_units": [],
+              "required_footnotes": [],
+              "continuation_required": false,
+              "printed_page_labels": {}
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sample_id": "manufacturing-materials-302132-2025-regime",
+      "content_hash": "605394bd0879f906a829a9fcd3a2dab037d8aad2554b741a7d95757a3a5e3020",
+      "plan_version": "manufacturing_materials.2026-09-04.1",
+      "tasks": [
+        {
+          "chapter_task": "extract_business_overview",
+          "request_scopes": [
+            {
+              "scope_id": "business_overview",
+              "field_ids": ["business_overview_source", "explicit_activity"],
+              "pages": [11, 12],
+              "section_titles": ["第三节 管理层讨论与分析", "报告期内公司从事的主要业务"],
+              "anchor_terms": ["报告期内公司从事的主要业务", "航空产品研发"],
+              "required_headers": [],
+              "required_units": [],
+              "required_footnotes": [],
+              "continuation_required": false,
+              "printed_page_labels": {"11": "10", "12": "11"}
+            }
+          ]
+        },
+        {
+          "chapter_task": "extract_segment_financials",
+          "request_scopes": [
+            {
+              "scope_id": "same_control_comparison_basis",
+              "field_ids": ["operating_revenue"],
+              "pages": [8],
+              "section_titles": ["主要会计数据和财务指标"],
+              "anchor_terms": ["同一控制下企业合并", "调整前", "调整后"],
+              "required_headers": ["营业收入"],
+              "required_units": ["元"],
+              "required_footnotes": [],
+              "continuation_required": false,
+              "printed_page_labels": {"8": "7"}
+            },
+            {
+              "scope_id": "segment_and_restated_revenue",
+              "field_ids": ["segment_dimension", "operating_revenue", "operating_cost", "gross_margin_reported"],
+              "pages": [14, 15],
+              "section_titles": ["主营业务分析", "收入与成本"],
+              "anchor_terms": ["营业收入构成", "分行业", "分产品"],
+              "required_headers": ["营业收入", "营业成本", "毛利率"],
+              "required_units": ["元"],
+              "required_footnotes": [],
+              "continuation_required": true,
+              "printed_page_labels": {"14": "13", "15": "14"}
+            }
+          ]
+        },
+        {
+          "chapter_task": "extract_operating_quantities",
+          "request_scopes": [
+            {
+              "scope_id": "classified_volume_not_available",
+              "field_ids": ["production_capacity", "capacity_under_construction", "capacity_utilization", "production_volume", "sales_volume", "inventory_volume", "processing_volume"],
+              "pages": [15],
+              "section_titles": ["实物销售收入"],
+              "anchor_terms": ["实物销售产品众多", "无法进行分类统计"],
+              "required_headers": [],
+              "required_units": [],
+              "required_footnotes": [],
+              "continuation_required": false,
+              "printed_page_labels": {"15": "14"}
+            }
+          ]
+        },
+        {
+          "chapter_task": "extract_material_inputs",
+          "request_scopes": [
+            {
+              "scope_id": "procurement_mode",
+              "field_ids": ["material_input"],
+              "pages": [11],
+              "section_titles": ["采购模式"],
+              "anchor_terms": ["年度采购计划", "供应商目录"],
+              "required_headers": [],
+              "required_units": [],
+              "required_footnotes": [],
+              "continuation_required": false,
+              "printed_page_labels": {"11": "10"}
+            },
+            {
+              "scope_id": "cost_composition_without_named_materials",
+              "field_ids": ["material_input"],
+              "pages": [15],
+              "section_titles": ["营业成本构成"],
+              "anchor_terms": ["营业成本构成", "航空制造业"],
+              "required_headers": ["行业分类", "项目"],
+              "required_units": ["元", "%"],
+              "required_footnotes": [],
+              "continuation_required": false,
+              "printed_page_labels": {"15": "14"}
+            }
+          ]
+        },
+        {
+          "chapter_task": "extract_counterparties_and_concentration",
+          "request_scopes": [
+            {
+              "scope_id": "top_five_customer_totals_only",
+              "field_ids": ["counterparty_relationship", "customer_concentration"],
+              "pages": [16],
+              "section_titles": ["主要销售客户"],
+              "anchor_terms": ["前五名客户合计销售金额", "年度销售总额"],
+              "required_headers": [],
+              "required_units": ["元", "%"],
+              "required_footnotes": [],
+              "continuation_required": false,
+              "printed_page_labels": {"16": "15"}
+            },
+            {
+              "scope_id": "top_five_supplier_totals_only",
+              "field_ids": ["counterparty_relationship", "supplier_concentration"],
+              "pages": [16],
+              "section_titles": ["主要供应商"],
+              "anchor_terms": ["前五名供应商合计采购金额", "年度采购总额"],
+              "required_headers": [],
+              "required_units": ["元", "%"],
+              "required_footnotes": [],
+              "continuation_required": false,
+              "printed_page_labels": {"16": "15"}
+            }
+          ]
+        },
+        {
+          "chapter_task": "extract_business_regime",
+          "request_scopes": [
+            {
+              "scope_id": "same_control_basis",
+              "field_ids": ["business_regime"],
+              "pages": [8],
+              "section_titles": ["主要会计数据和财务指标"],
+              "anchor_terms": ["同一控制下企业合并", "追溯调整或重述原因"],
+              "required_headers": [],
+              "required_units": [],
+              "required_footnotes": [],
+              "continuation_required": false,
+              "printed_page_labels": {"8": "7"}
+            },
+            {
+              "scope_id": "business_transition_description",
+              "field_ids": ["business_regime"],
+              "pages": [28],
+              "section_titles": ["质量回报双提升", "重大资产重组"],
+              "anchor_terms": ["重大资产重组", "转型升级"],
+              "required_headers": [],
+              "required_units": [],
+              "required_footnotes": [],
+              "continuation_required": false,
+              "printed_page_labels": {"28": "27"}
+            },
+            {
+              "scope_id": "restructuring_commitment",
+              "field_ids": ["business_regime"],
+              "pages": [50],
+              "section_titles": ["承诺事项履行情况", "资产重组"],
+              "anchor_terms": ["重大资产重组项目", "成飞"],
+              "required_headers": [],
+              "required_units": [],
+              "required_footnotes": [],
+              "continuation_required": false,
+              "printed_page_labels": {"50": "49"}
+            },
+            {
+              "scope_id": "equity_transfer_effective",
+              "field_ids": ["business_regime"],
+              "pages": [58, 59],
+              "section_titles": ["重大资产重组", "合并报表范围"],
+              "anchor_terms": ["成飞100.00%的股权", "2025 年 1 月 6 日", "纳入公司合并报表范围"],
+              "required_headers": [],
+              "required_units": [],
+              "required_footnotes": [],
+              "continuation_required": true,
+              "printed_page_labels": {"58": "57", "59": "58"}
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -362,11 +362,12 @@ class BusinessOverview(SourceFact):
             if isinstance(item.anchor, TextAnchor)
         ]
         normalized_source = _normalize_text(self.source_text)
-        normalized_quotes = {_normalize_text(item) for item in quotes}
         normalized_joined = _normalize_text(" ".join(quotes))
-        if not quotes or normalized_source not in normalized_quotes | {
-            normalized_joined
-        }:
+        # A model may quote a contiguous paragraph from a bounded page excerpt
+        # instead of echoing the entire excerpt. Keep the source-native guard
+        # strict: the returned text must remain a contiguous substring of the
+        # supplied Evidence text after whitespace normalization.
+        if not quotes or not normalized_source or normalized_source not in normalized_joined:
             raise ValueError("business overview source_text must match text evidence")
         return self
 

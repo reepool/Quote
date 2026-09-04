@@ -149,13 +149,26 @@ Pydantic 模型是唯一运行时 schema 源；`semantic_record_json_schema()`�
 
 阶段 4 新包位于 `research/company_profile/`，不继承、不反向导入、不双写旧 `research/business_profile_*` 生产链。旧画像开关、数据库 schema、scheduler、Telegram、DCF、prompt 和 backfill 均保持冻结状态。
 
-阶段 5 才允许另开 change，使用四份制造/材料年报做隔离多样本竖切。阶段 5 必须满足：
+阶段 5 change `slice-manufacturing-materials-company-profile` 已于 2026-09-04
+进入实施，只允许使用四份已批准制造/材料 2025 年报做隔离多样本竖切：
+
+- `300750.SZ` 宁德时代；
+- `603659.SH` 璞泰来；
+- `920015.BJ` 锦华新材；
+- `302132.SZ` 中航成飞 regime 样本。
+
+阶段 5 继续满足：
 
 - 使用隔离存储或命名空间；
 - 不向旧 approved 表混写；
 - 只接入已批准制造/材料包；
 - 输出人工可逐证据核验的研究视图；
 - 在独立授权前仍不得恢复旧 backfill 或生产发布。
+
+阶段 5 的证据准备只读取批准的本地 sample manifest、版本化 evidence plan
+和上述 PDF 物理页；不读取 `research.db`、旧 approved 表、旧 Activity
+结果或 PDF 评测库。所有输出继续保持
+`production_authorization=not_authorized`。
 
 ## 9. 阶段 4 验收记录
 
