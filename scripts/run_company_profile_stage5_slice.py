@@ -82,6 +82,12 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--evidence-plan", required=True, type=Path)
     parser.add_argument("--output-root", required=True, type=Path)
     parser.add_argument("--run-id", required=True)
+    parser.add_argument(
+        "--sample-id",
+        action="append",
+        dest="sample_ids",
+        help="limit execution to one or more approved sample IDs; repeat for multiple reports",
+    )
     parser.add_argument("--provider-route", required=True)
     parser.add_argument("--max-output-tokens", required=True, type=int)
     parser.add_argument("--timeout-seconds", required=True, type=float)
@@ -107,6 +113,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             evidence_plan=evidence_plan,
             evidence_plan_path=args.evidence_plan,
             store=store,
+            sample_ids=args.sample_ids,
         )
         _print_result(execution.model_dump(mode="json"), provider_calls=0)
         return 0
@@ -143,6 +150,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                 timeout_seconds=args.timeout_seconds,
                 budget=budget,
             ),
+            sample_ids=args.sample_ids,
         )
     finally:
         runner.run(client.close())
