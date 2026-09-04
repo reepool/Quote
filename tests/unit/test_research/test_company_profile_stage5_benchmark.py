@@ -66,10 +66,33 @@ def test_approved_gold_and_negative_cases_are_evaluated_only_after_commit(
     assert benchmark.decision == "hold"
     assert len(benchmark.annotation_results) == 24
     assert len(benchmark.negative_case_results) == 19
-    assert all(item.passed for item in benchmark.negative_case_results)
+    assert all(item.evaluated and item.passed for item in benchmark.negative_case_results)
     assert benchmark.gold_evaluation_only is True
     assert benchmark.production_authorization == "not_authorized"
 
+
+
+def test_negative_cases_are_not_reported_as_passed_when_not_evaluated(
+    tmp_path: Path,
+) -> None:
+    store = Stage5RunBundleStore(
+        tmp_path / "isolated",
+        repository_root=REPOSITORY_ROOT,
+    )
+    run_path = store.commit(_minimal_run_bundle("post-run-unevaluated"))
+    gold = json.loads(GOLD_PATH.read_text(encoding="utf-8"))
+    negative_results = {
+        item["case_id"]: None for item in gold["contract_negative_cases"]
+    }
+
+    benchmark = evaluate_committed_stage5_run(
+        run_path,
+        gold_path=GOLD_PATH,
+        negative_case_results=negative_results,
+    )
+
+    assert benchmark.decision == "hold"
+    assert all(not item.evaluated and not item.passed for item in benchmark.negative_case_results)
 
 def test_stage5_runtime_modules_do_not_import_gold_adapter_or_legacy_paths() -> None:
     prohibited_modules = (

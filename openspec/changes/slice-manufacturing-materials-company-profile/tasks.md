@@ -37,7 +37,7 @@
 - [x] 6.1 Add a thin local operator command requiring explicit sample manifest, isolated output root, provider route, budget, and run ID; support preparation-only and bounded semantic-run modes without adding scheduler/API/Telegram entry points.
 - [x] 6.2 Run preparation-only for all four reports and verify asset hashes, request scopes, evidence continuity, no Gold-derived semantic defaults, no provider calls, and no abandoned temporary artifacts.
 - [x] 6.3 After offline tests pass, run the bounded real-provider slice for all four reports into a new isolated run root; preserve every blocker, hold, failure manifest, provider call type, and research view without rerunning the old backfill.
-- [ ] 6.4 Produce a Chinese review package comparing each report and chapter task with the frozen benchmark; obtain user decisions for unresolved facts and record research-only acceptance or hold without changing production authorization.
+- [x] 6.4 Produce a Chinese review package comparing each report and chapter task with the frozen benchmark; obtain user decisions for unresolved facts and record research-only acceptance or hold without changing production authorization.
 
 ## 7. Acceptance, cleanup, and handoff
 

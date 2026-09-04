@@ -29,6 +29,7 @@ class Stage5GoldAnnotationResult(_StrictModel):
 
 class Stage5NegativeCaseResult(_StrictModel):
     case_id: str = Field(min_length=1)
+    evaluated: bool
     passed: bool
 
 
@@ -45,9 +46,12 @@ class Stage5PostRunBenchmark(_StrictModel):
 
     @model_validator(mode="after")
     def _failures_force_hold(self) -> Stage5PostRunBenchmark:
-        if self.decision == "pass" and any(
-            not item.passed
-            for item in (*self.annotation_results, *self.negative_case_results)
+        if self.decision == "pass" and (
+            any(
+                not item.passed
+                for item in (*self.annotation_results, *self.negative_case_results)
+            )
+            or any(not item.evaluated for item in self.negative_case_results)
         ):
             raise ValueError("post-run benchmark failures cannot be hidden by pass")
         return self
@@ -57,7 +61,7 @@ def evaluate_committed_stage5_run(
     run_directory: str | Path,
     *,
     gold_path: str | Path,
-    negative_case_results: Mapping[str, bool],
+    negative_case_results: Mapping[str, bool | None],
 ) -> Stage5PostRunBenchmark:
     """Evaluate an immutable run against the approved research baseline."""
 
@@ -94,7 +98,10 @@ def evaluate_committed_stage5_run(
     negative_results = tuple(
         Stage5NegativeCaseResult(
             case_id=case_id,
-            passed=bool(negative_case_results[case_id]),
+            evaluated=negative_case_results[case_id] is not None,
+            passed=bool(negative_case_results[case_id])
+            if negative_case_results[case_id] is not None
+            else False,
         )
         for case_id in sorted(expected_case_ids)
     )
