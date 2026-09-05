@@ -72,7 +72,10 @@ _TASK_INSTRUCTIONS = {
     ),
     "extract_operating_quantities": (
         "Distinguish production, sales, inventory, capacity, and processing_volume by "
-        "the source label; processing_volume is only external service provided."
+        "the source label; processing_volume is only external service provided. "
+        "production_capacity requires capacity_kind, but capacity_under_construction "
+        "must not carry capacity_kind and must not be blocked merely because that field "
+        "is absent."
     ),
     "extract_material_inputs": (
         "Extract only explicitly named material inputs and their stated relationship; "
@@ -80,7 +83,11 @@ _TASK_INSTRUCTIONS = {
     ),
     "extract_counterparties_and_concentration": (
         "Keep named, report-local anonymous, and report-local aggregate identities "
-        "separate; concentration alone must not create a Relationship."
+        "separate; concentration alone must not create a Relationship. Ranking labels "
+        "such as 第一名, 第二名, 客户A, or 供应商A are observed "
+        "report_local_anonymous identities when their rows are disclosed. Do not mark "
+        "those rows not_disclosed merely because the legal name is masked. Use name "
+        "coverage not_disclosed only when the source reports totals without identity rows."
     ),
     "extract_business_regime": (
         "Record only explicitly disclosed business or control changes and effective dates; "
@@ -743,31 +750,55 @@ def _coverage_draft_schema(
     field_ids: list[str],
     statuses: list[str],
 ) -> dict[str, Any]:
+    branches = [
+        _coverage_status_schema(field_ids=field_ids, status=status)
+        for status in statuses
+    ]
+    return branches[0] if len(branches) == 1 else {"oneOf": branches}
+
+
+def _coverage_status_schema(
+    *,
+    field_ids: list[str],
+    status: str,
+) -> dict[str, Any]:
+    properties: dict[str, Any] = {
+        "field_id": {"enum": field_ids},
+        "status": {"const": status},
+        "reason": {"type": "string"},
+        "evidence_ids": {"type": "array", "items": {"type": "string"}},
+        "reason_evidence_text": {"type": "string"},
+    }
+    required = ["field_id", "status"]
+    reason_codes = {
+        "not_disclosed": [
+            "explicit_confidentiality",
+            "explicit_disclosure_exemption",
+            "source_reason_unspecified",
+        ],
+        "extraction_failed": [
+            "table_context_incomplete",
+            "source_unreadable",
+            "coverage_budget_exhausted",
+            "unit_ambiguous",
+        ],
+        "unclear": [
+            "unit_ambiguous",
+            "required_result_missing",
+            "candidate_unresolved",
+            "source_reason_unspecified",
+        ],
+        "not_applicable": ["source_explicitly_not_applicable"],
+    }.get(status)
+    if reason_codes:
+        properties["reason_code"] = {"enum": reason_codes}
+        if status in {"not_disclosed", "extraction_failed", "unclear"}:
+            required.append("reason_code")
     return {
         "type": "object",
         "additionalProperties": False,
-        "required": ["field_id", "status"],
-        "properties": {
-            "field_id": {"enum": field_ids},
-            "status": {"enum": statuses},
-            "reason_code": {
-                "enum": [
-                    "explicit_confidentiality",
-                    "explicit_disclosure_exemption",
-                    "source_reason_unspecified",
-                    "table_context_incomplete",
-                    "source_unreadable",
-                    "coverage_budget_exhausted",
-                    "unit_ambiguous",
-                    "required_result_missing",
-                    "candidate_unresolved",
-                    "source_explicitly_not_applicable",
-                ]
-            },
-            "reason": {"type": "string"},
-            "evidence_ids": {"type": "array", "items": {"type": "string"}},
-            "reason_evidence_text": {"type": "string"},
-        },
+        "required": required,
+        "properties": properties,
     }
 
 

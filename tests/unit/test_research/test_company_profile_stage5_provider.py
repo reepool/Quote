@@ -35,6 +35,7 @@ from research.company_profile.stage5 import PreparedPageContext, PreparedRequest
 from research.company_profile.stage5_provider import (
     _TASK_INSTRUCTIONS,
     CommonGatewaySemanticProvider,
+    _coverage_draft_schema,
     _expand_extract_response,
     _minimal_extract_schema,
 )
@@ -162,6 +163,14 @@ def test_common_gateway_provider_sends_one_bounded_scope_and_stage4_schema() -> 
         in _TASK_INSTRUCTIONS["extract_segment_financials"]
     )
     assert (
+        "capacity_under_construction must not carry capacity_kind"
+        in _TASK_INSTRUCTIONS["extract_operating_quantities"]
+    )
+    assert (
+        "第一名, 第二名, 客户A, or 供应商A"
+        in _TASK_INSTRUCTIONS["extract_counterparties_and_concentration"]
+    )
+    assert (
         "gold" not in LlmMessage.from_value(gateway_request.messages[1]).content.lower()
     )
     assert provider.traces[0].call_type == "extract"
@@ -278,6 +287,32 @@ def test_measurement_schema_scopes_capacity_kind_to_metric_type() -> None:
     }
     assert "capacity_kind" not in under_construction["properties"]
     assert "capacity_kind" not in under_construction["required"]
+
+
+def test_coverage_schema_requires_typed_reason_for_not_disclosed() -> None:
+    schema = _coverage_draft_schema(
+        field_ids=["counterparty_relationship"],
+        statuses=["not_disclosed", "not_applicable"],
+    )
+    branches = schema["oneOf"]
+    not_disclosed = next(
+        item
+        for item in branches
+        if item["properties"]["status"] == {"const": "not_disclosed"}
+    )
+    not_applicable = next(
+        item
+        for item in branches
+        if item["properties"]["status"] == {"const": "not_applicable"}
+    )
+
+    assert "reason_code" in not_disclosed["required"]
+    assert not_disclosed["properties"]["reason_code"]["enum"] == [
+        "explicit_confidentiality",
+        "explicit_disclosure_exemption",
+        "source_reason_unspecified",
+    ]
+    assert "reason_code" not in not_applicable["required"]
 
 
 def test_numeric_reconciliation_requires_non_empty_uncertainty() -> None:
