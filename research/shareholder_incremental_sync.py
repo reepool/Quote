@@ -4,8 +4,6 @@ Daily incremental shareholder sync driven by reusable CNInfo announcements.
 
 from __future__ import annotations
 
-import hashlib
-import json
 import time
 from dataclasses import asdict
 from datetime import datetime, timedelta
@@ -29,12 +27,12 @@ from research.shareholder_announcement_filters import (
     shareholder_announcement_filter,
     shareholder_announcement_stream_specs,
 )
+from research.shareholder_control_sync import persist_shareholder_control_changes
 from research.shareholder_snapshot_policy import (
     actual_shareholder_coverage_scope,
-    normalize_shareholder_report_date,
+    compute_shareholder_content_hashes,
+    incoming_shareholder_snapshot_is_weaker,
 )
-from research.shareholder_control_sync import persist_shareholder_control_changes
-from research.shareholder_snapshot_policy import incoming_shareholder_snapshot_is_weaker
 from research.shareholder_sync import ShareholderExchangeSyncResult, ShareholderShadowSyncService
 from research.source_policy import ResearchSourcePolicyResolver
 from research.storage import ResearchStorageManager
@@ -972,116 +970,3 @@ class ShareholderIncrementalSyncService:
         return "success"
 
 
-def compute_shareholder_content_hashes(snapshot_json: Dict[str, Any]) -> Dict[str, Any]:
-    """Compute normalized shareholder content hashes for incremental change checks."""
-    holder_count = _normalize_holder_count(snapshot_json.get("holder_count") or {})
-    top_holders = _normalize_top_holders(snapshot_json.get("top_holders") or [])
-    ownership = _normalize_ownership(snapshot_json.get("ownership_clues") or {})
-    coverage_scope = sorted(
-        {
-            str(item).strip()
-            for item in snapshot_json.get("coverage_scope", []) or []
-            if str(item).strip()
-        }
-    )
-    latest_report_date = max(
-        [
-            str(value)
-            for value in [
-                holder_count.get("report_date"),
-                *(item.get("report_date") for item in top_holders),
-                ownership.get("report_date"),
-            ]
-            if value
-        ],
-        default=None,
-    )
-    return {
-        "holder_count_hash": _hash_json(holder_count),
-        "top_holders_hash": _hash_json(top_holders),
-        "ownership_hash": _hash_json(ownership),
-        "content_hash": _hash_json(
-            {
-                "coverage_scope": coverage_scope,
-                "holder_count": holder_count,
-                "top_holders": top_holders,
-                "ownership_clues": ownership,
-            }
-        ),
-        "latest_report_date": latest_report_date,
-        "coverage_scope": coverage_scope,
-    }
-
-
-def _normalize_holder_count(value: Dict[str, Any]) -> Dict[str, Any]:
-    return {
-        "value": _to_int(value.get("value")),
-        "report_date": normalize_shareholder_report_date(value.get("report_date")),
-    }
-
-
-def _normalize_top_holders(values: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-    rows = []
-    for row in values:
-        if not isinstance(row, dict):
-            continue
-        rows.append(
-            {
-                "rank": _to_int(row.get("rank")),
-                "holder_name": _clean_text(row.get("holder_name")),
-                "holding_shares": _to_int(row.get("holding_shares")),
-                "holding_ratio": _to_float(row.get("holding_ratio")),
-                "holder_type": _clean_text(row.get("holder_type")),
-                "change": _clean_text(row.get("change")),
-                "report_date": normalize_shareholder_report_date(row.get("report_date")),
-            }
-        )
-    rows.sort(
-        key=lambda item: (
-            item.get("rank") is None,
-            item.get("rank") or 999,
-            item.get("holder_name") or "",
-        )
-    )
-    return rows
-
-
-def _normalize_ownership(value: Dict[str, Any]) -> Dict[str, Any]:
-    return {
-        "control_owner_name": _clean_text(value.get("control_owner_name")),
-        "control_owner_ratio": _to_float(value.get("control_owner_ratio")),
-        "report_date": normalize_shareholder_report_date(value.get("report_date")),
-        "direct_controller_name": _clean_text(value.get("direct_controller_name")),
-        "control_type": _clean_text(value.get("control_type")),
-        "control_holding_shares": _to_float(value.get("control_holding_shares")),
-    }
-
-
-def _hash_json(value: Any) -> str:
-    payload = json.dumps(value, ensure_ascii=False, sort_keys=True, default=str)
-    return hashlib.sha256(payload.encode("utf-8")).hexdigest()
-
-
-def _clean_text(value: Any) -> Optional[str]:
-    if value in (None, ""):
-        return None
-    text = str(value).strip()
-    return text or None
-
-
-def _to_int(value: Any) -> Optional[int]:
-    if value in (None, ""):
-        return None
-    try:
-        return int(round(float(value)))
-    except (TypeError, ValueError):
-        return None
-
-
-def _to_float(value: Any) -> Optional[float]:
-    if value in (None, ""):
-        return None
-    try:
-        return round(float(value), 8)
-    except (TypeError, ValueError):
-        return None

@@ -17,6 +17,7 @@ from research.empty_support import allows_optional_empty_exchange
 from research.shareholder_control_sync import persist_shareholder_control_changes
 from research.shareholder_snapshot_policy import (
     actual_shareholder_coverage_scope,
+    compute_shareholder_content_hashes,
     incoming_shareholder_snapshot_is_weaker,
     normalize_shareholder_report_date,
     top_holders_satisfy_required_scope,
@@ -459,24 +460,28 @@ class ShareholderShadowSyncService:
                         if existing_snapshot
                         else None
                     )
-                    existing_hash = (
-                        self._hash_payload(existing_json)
-                        if isinstance(existing_json, dict)
-                        else None
-                    )
-                    incoming_hash = self._hash_payload(snapshot.snapshot_json)
-                    existing_scope = {
-                        str(scope).strip()
-                        for scope in (
-                            (existing_json or {}).get("coverage_scope", [])
-                            if isinstance(existing_json, dict)
-                            else []
+                    if isinstance(existing_json, dict):
+                        existing_hash = compute_shareholder_content_hashes(
+                            existing_json
+                        )["content_hash"]
+                        incoming_hash = compute_shareholder_content_hashes(
+                            snapshot.snapshot_json
+                        )["content_hash"]
+                        existing_actual = actual_shareholder_coverage_scope(
+                            exchange=snapshot.exchange,
+                            snapshot_json=existing_json,
+                            holder_count=(
+                                existing_snapshot.get("holder_count")
+                                if existing_snapshot
+                                else None
+                            ),
                         )
-                        if str(scope).strip()
-                    }
-                    if existing_hash == incoming_hash and required_scope.issubset(existing_scope):
-                        unchanged_instruments += 1
-                        continue
+                        if (
+                            existing_hash == incoming_hash
+                            and required_scope.issubset(existing_actual)
+                        ):
+                            unchanged_instruments += 1
+                            continue
                     payload_hash = self._hash_payload(snapshot.raw_payload)
                     self.storage.store_raw_payload(
                         domain="shareholders",

@@ -1299,7 +1299,7 @@ technical readiness 接口会聚合：
   - 当前全量刷新策略：`shareholder_shadow_sync` 仅手工触发，`SSE / SZSE / BSE` 全量刷新，`limit_per_exchange = null`，`max_runtime_seconds = 18000`；常驻调度改为每日 `06:30` 的 `shareholder_incremental_sync` 和每周六 `12:30` 的 `shareholder_reconciliation_sync`
   - 三种股东更新任务的边界：
     - `shareholder_incremental_sync`：每日公告驱动增量检查，不逐标的扫描公告；只读取公告候选、缺失 required scope 和 pending recheck 标的；只写变化、缺失或覆盖不完整标的
-    - `shareholder_reconciliation_sync`：每周六周期复核与补足，全量读取目标股票池，但按 `changed_only` 写入；本地 `snapshot_json` hash 和 required scope 相同则跳过
+    - `shareholder_reconciliation_sync`：每周六周期复核与补足，全量读取目标股票池，但按 `changed_only` 写入；与日更相同的归一化内容 hash 和 required scope 相同则跳过
     - `shareholder_shadow_sync`：仅手工 `/run` 的全量刷新，`manual_only=true`，不注册自动 cron；用于初始化、灾后修复或明确需要全量重写的场景
   - 只读 readiness 复核命令：
     - `python scripts/research_shareholder_rollout_validation.py --exchanges SSE,SZSE,BSE --skip-sync --fail-on-not-ready`

@@ -50,6 +50,7 @@ class _ShareholderProvider(BaseShareholderProvider):
         coverage_scope: list[str] | None = None,
         control_owner_name: str = "中国贵州茅台酒厂（集团）有限责任公司",
         control_owner_ratio: float = 54.0,
+        holder_count: int = 123456,
     ):
         self.source_name = source_name
         self.resolved_instrument_ids = (
@@ -63,6 +64,7 @@ class _ShareholderProvider(BaseShareholderProvider):
         ]
         self.control_owner_name = control_owner_name
         self.control_owner_ratio = control_owner_ratio
+        self.holder_count = holder_count
 
     async def fetch_shareholder_snapshots(
         self,
@@ -88,7 +90,7 @@ class _ShareholderProvider(BaseShareholderProvider):
                 symbol=instrument["symbol"],
                 exchange=exchange,
                 coverage_status="reference_only",
-                holder_count=123456 if "holder_count" in self.coverage_scope else None,
+                holder_count=self.holder_count if "holder_count" in self.coverage_scope else None,
                 holder_count_report_date=(
                     "2026-03-31" if "holder_count" in self.coverage_scope else None
                 ),
@@ -114,7 +116,7 @@ class _ShareholderProvider(BaseShareholderProvider):
                 snapshot_json={
                     "coverage_scope": self.coverage_scope,
                     "holder_count": {
-                        "value": 123456 if "holder_count" in self.coverage_scope else None,
+                        "value": self.holder_count if "holder_count" in self.coverage_scope else None,
                         "report_date": "2026-03-31" if "holder_count" in self.coverage_scope else None,
                     },
                     "top_holders": (
@@ -444,6 +446,85 @@ async def test_shareholder_sync_writes_latest_snapshot(tmp_path):
     assert second_result["write_policy"] == "changed_only"
     assert second_result["total_snapshots_written"] == 0
     assert second_result["exchanges"][0]["unchanged_instruments"] == 1
+
+
+def _maotai_instrument():
+    return {
+        "instrument_id": "600519.SH",
+        "symbol": "600519",
+        "name": "贵州茅台",
+        "exchange": "SSE",
+        "type": "stock",
+        "is_active": True,
+    }
+
+
+def _shadow_service(tmp_path, provider):
+    research_config = _build_research_config(tmp_path)
+    storage = ResearchStorageManager(research_config)
+    storage.initialize()
+    service = ShareholderShadowSyncService(
+        db_ops=_MockDbOps(instruments=[_maotai_instrument()]),
+        storage=storage,
+        research_config=research_config,
+        resolver=ResearchSourcePolicyResolver(research_config),
+        registry=ShareholderProviderRegistry({"akshare": provider}),
+    )
+    return service, storage
+
+
+@pytest.mark.asyncio
+async def test_shareholder_sync_changed_only_skips_raw_payload_type_jitter(tmp_path):
+    first_provider = _ShareholderProvider(
+        "akshare",
+        raw_payload={"holder_count": {"本期股东人数": 123456.0, "本期人均持股数量": 10.0}},
+    )
+    service, storage = _shadow_service(tmp_path, first_provider)
+    first = await service.sync(exchanges=["SSE"], limit_per_exchange=1)
+    first_updated_at = storage.get_shareholder_snapshot("600519.SH")["updated_at"]
+
+    service.registry = ShareholderProviderRegistry(
+        {
+            "akshare": _ShareholderProvider(
+                "akshare",
+                raw_payload={"holder_count": {"本期股东人数": 123456, "本期人均持股数量": 10}},
+            )
+        }
+    )
+    second = await service.sync(
+        exchanges=["SSE"],
+        limit_per_exchange=1,
+        write_policy="changed_only",
+    )
+
+    stored = storage.get_shareholder_snapshot("600519.SH")
+    assert first["total_snapshots_written"] == 1
+    assert second["status"] == "success"
+    assert second["total_snapshots_written"] == 0
+    assert second["exchanges"][0]["unchanged_instruments"] == 1
+    assert stored["holder_count"] == 123456
+    assert stored["updated_at"] == first_updated_at
+
+
+@pytest.mark.asyncio
+async def test_shareholder_sync_changed_only_writes_when_holder_count_changes(tmp_path):
+    service, storage = _shadow_service(tmp_path, _ShareholderProvider("akshare"))
+    await service.sync(exchanges=["SSE"], limit_per_exchange=1)
+    first_updated_at = storage.get_shareholder_snapshot("600519.SH")["updated_at"]
+
+    service.registry = ShareholderProviderRegistry(
+        {"akshare": _ShareholderProvider("akshare", holder_count=123457)}
+    )
+    result = await service.sync(
+        exchanges=["SSE"],
+        limit_per_exchange=1,
+        write_policy="changed_only",
+    )
+
+    stored = storage.get_shareholder_snapshot("600519.SH")
+    assert result["total_snapshots_written"] == 1
+    assert stored["holder_count"] == 123457
+    assert stored["updated_at"] != first_updated_at
 
 
 @pytest.mark.asyncio

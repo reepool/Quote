@@ -400,7 +400,7 @@ async def weekly_data_maintenance(self,
 | 任务 | 触发方式 | 是否全量读取 | 是否全量写入 | 主要用途 |
 |---|---|---:|---:|---|
 | `shareholder_incremental_sync` | 每日 `06:30` 自动，也可 `/run` | 否，只读取公告候选、缺失或 pending 标的 | 否，只写变化、缺失或 required scope 不完整标的 | 日常及时更新，覆盖季报/年报/半年报和权益变动类公告 |
-| `shareholder_reconciliation_sync` | 每周六 `12:30` 自动，也可 `/run` | 是，读取 `SSE / SZSE / BSE` 活跃股票 | 否，`changed_only`，本地 hash 和 required scope 相同则跳过 | 周期复核、补足历史缺口、捕捉 CNInfo data20 静默修正或公告漏识别 |
+| `shareholder_reconciliation_sync` | 每周六 `12:30` 自动，也可 `/run` | 是，读取 `SSE / SZSE / BSE` 活跃股票 | 否，`changed_only`，与日更相同的归一化内容 hash 和 required scope 相同则跳过 | 周期复核、补足历史缺口、捕捉 CNInfo data20 静默修正或公告漏识别 |
 | `shareholder_shadow_sync` | 仅手工 `/run` | 是，读取 `SSE / SZSE / BSE` 活跃股票 | 是，`refresh_all` | 初始化、灾后修复、operator 明确要求的全量重写 |
 
 三者共用股东 provider 路由和 required scope 定义。区别在于候选范围和写入策略：每日增量先用公告缩小候选；周期复核全量读取但只写差异；手工全量刷新全量读取并刷新写入。
@@ -408,14 +408,14 @@ async def weekly_data_maintenance(self,
 ### 6.4 研究域股东摘要周期复核与补足 (shareholder_reconciliation_sync)
 
 #### 功能描述
-每周六 `12:30` 对 `SSE / SZSE / BSE` 做全量读取和本地 hash 对比，只写入结构化内容变化、本地缺失或 required scope 覆盖不完整的标的。这个任务用于兜底 CNInfo data20 静默修正、历史快照缺口和增量公告漏识别；它不做无差别全量重写。
+每周六 `12:30` 对 `SSE / SZSE / BSE` 做全量读取和与日更相同的归一化内容 hash 对比，只写入结构化内容变化、本地缺失或 required scope 覆盖不完整的标的。这个任务用于兜底 CNInfo data20 静默修正、历史快照缺口和增量公告漏识别；它不做无差别全量重写。
 
 #### 变更判断
 1. **全量读取目标股票池**：与全量刷新一样读取 `SSE / SZSE / BSE` 活跃股票。
 2. **生成新快照**：按 `cninfo:direct -> akshare:proxy_patch -> akshare:direct -> efinance:direct` 的股东域路由合并快照。
-3. **本地 hash 对比**：将新 `snapshot_json` 与本地 `shareholder_snapshots.snapshot_json` 做规范化 JSON hash 对比。
+3. **本地内容 hash 对比**：用与日更相同的归一化内容 hash 比较户数、前十大股东和实控线索，忽略原始回包里的类型抖动。
 4. **required scope 检查**：本地快照必须覆盖 `holder_count / top10_holders / reference_only_ownership_clues`。
-5. **只写必要变更**：hash 相同且 required scope 完整时跳过；hash 变化、本地缺失或 required scope 不完整时才写入 `shareholder_snapshots` 和 `raw_payload_audit`。
+5. **只写必要变更**：内容 hash 相同且 required scope 完整时跳过；内容变化、本地缺失或 required scope 不完整时才写入 `shareholder_snapshots` 和 `raw_payload_audit`。
 
 #### 当前配置
 ```json
