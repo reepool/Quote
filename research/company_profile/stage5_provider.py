@@ -96,6 +96,14 @@ _TASK_INSTRUCTIONS = {
 }
 
 _SCOPE_INSTRUCTIONS = {
+    "business_overview": (
+        "Return one source-native business overview excerpt from the report's explicit "
+        "主要业务/主营业务 passage. The excerpt must be contiguous within one cited "
+        "Evidence item. Emit Activities only when the same cited wording directly states "
+        "an allowed action, its grammatical or explicitly related actor, the source verb, "
+        "and the acted-on product or service; do not turn product uses, customer industries, "
+        "or management commentary into company Activities."
+    ),
     "capacity_and_processing_narrative": (
         "A source-native label that combines 加工量 and 销量 does not by itself make "
         "processing_volume invalid. When the same bounded Evidence explicitly describes "
@@ -126,6 +134,7 @@ _SCOPE_INSTRUCTIONS = {
 }
 
 _FLAT_EXTRACT_SCOPES = {
+    "business_overview",
     "capacity_and_processing_narrative",
     "procurement_mode",
     "top_five_customer_totals_only",
@@ -528,6 +537,8 @@ def _minimal_extract_schema(
     *,
     prepared_scope: PreparedRequestScope | None = None,
 ) -> dict[str, Any]:
+    if prepared_scope is not None and prepared_scope.scope_id == "business_overview":
+        return _business_overview_extract_schema(request, prepared_scope)
     if prepared_scope is not None and prepared_scope.scope_id == "procurement_mode":
         return _material_input_extract_schema()
     if prepared_scope is not None and prepared_scope.scope_id in {
@@ -597,6 +608,62 @@ def _minimal_extract_schema(
             "schema_version": {"const": "company_profile_extract_response.v1"},
             "request_id": {"type": "string"},
             "items": {"type": "array", "items": {"oneOf": item_schemas}},
+        },
+    }
+
+
+def _business_overview_extract_schema(
+    request: SemanticTaskRequest,
+    prepared_scope: PreparedRequestScope,
+) -> dict[str, Any]:
+    evidence_ids = [
+        item.evidence.evidence_id for item in prepared_scope.evidence_bundle
+    ]
+    return {
+        "type": "object",
+        "additionalProperties": False,
+        "required": ["overview", "activities"],
+        "properties": {
+            "overview": {
+                "type": "object",
+                "additionalProperties": False,
+                "required": ["source_name", "source_text", "evidence_id"],
+                "properties": {
+                    "source_name": {"type": "string"},
+                    "source_text": {"type": "string"},
+                    "evidence_id": {"enum": evidence_ids},
+                },
+            },
+            "activities": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "additionalProperties": False,
+                    "required": [
+                        "action",
+                        "actor",
+                        "actor_basis",
+                        "object_name",
+                        "source_verb",
+                        "evidence_id",
+                    ],
+                    "properties": {
+                        "action": {
+                            "enum": [item.value for item in request.allowed_actions]
+                        },
+                        "actor": {"type": "string"},
+                        "actor_basis": {
+                            "enum": [
+                                "direct_grammatical_actor",
+                                "explicit_economic_relationship",
+                            ]
+                        },
+                        "object_name": {"type": "string"},
+                        "source_verb": {"type": "string"},
+                        "evidence_id": {"enum": evidence_ids},
+                    },
+                },
+            },
         },
     }
 
@@ -1160,7 +1227,54 @@ def _expand_extract_response(
     if not isinstance(data, Mapping):
         return data
     result = deepcopy(dict(data))
-    if isinstance(result.get("segment_rows"), list):
+    if isinstance(result.get("overview"), Mapping) and isinstance(
+        result.get("activities"), list
+    ):
+        overview = dict(result.pop("overview"))
+        activities = result.pop("activities")
+        result["schema_version"] = "company_profile_extract_response.v1"
+        result["request_id"] = request.request_id
+        result["items"] = [
+            {
+                "item_type": "candidate",
+                "candidate": {
+                    "object_type": "BusinessOverview",
+                    "field_id": "business_overview_source",
+                    "subject_scope": "unclear",
+                    "reported_period": _reported_period_label(prepared_scope),
+                    "period_type": "duration",
+                    "source_native": {"name": overview["source_name"]},
+                    "source_text": overview["source_text"],
+                    "evidence_ids": [overview["evidence_id"]],
+                },
+            }
+        ]
+        for item in activities:
+            result["items"].append(
+                {
+                    "item_type": "candidate",
+                    "candidate": {
+                        "object_type": "Activity",
+                        "field_id": "explicit_activity",
+                        "action": item["action"],
+                        "activity_actor": item["actor"],
+                        "source_actor": item["actor"],
+                        "actor_basis": item["actor_basis"],
+                        "object_name": item["object_name"],
+                        "source_verb": item["source_verb"],
+                        "subject_scope": "unclear",
+                        "reported_period": _reported_period_label(prepared_scope),
+                        "period_type": "duration",
+                        "source_native": {
+                            "name": item["object_name"],
+                            "value": item["source_verb"],
+                            "header": overview["source_name"],
+                        },
+                        "evidence_ids": [item["evidence_id"]],
+                    },
+                }
+            )
+    elif isinstance(result.get("segment_rows"), list):
         rows = result.pop("segment_rows")
         result["schema_version"] = "company_profile_extract_response.v1"
         result["request_id"] = request.request_id

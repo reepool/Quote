@@ -17,6 +17,7 @@ from research.company_profile.contracts import (
     VerifyRequest,
 )
 from research.company_profile.models import (
+    ActivityAction,
     AssertionClass,
     BusinessOverview,
     ChapterTask,
@@ -81,7 +82,7 @@ class _FakeGatewayClient:
 
 
 def test_common_gateway_provider_sends_one_bounded_scope_and_stage4_schema() -> None:
-    prepared = _prepared_scope()
+    prepared = _prepared_scope().model_copy(update={"scope_id": "generic_overview"})
     request = _extract_request(prepared)
     client = _FakeGatewayClient(
         outputs=[
@@ -129,7 +130,7 @@ def test_common_gateway_provider_sends_one_bounded_scope_and_stage4_schema() -> 
     assert "evidence" not in overview_schema["properties"]
     assert "evidence_ids" in overview_schema["properties"]
     envelope = json.loads(LlmMessage.from_value(gateway_request.messages[1]).content)
-    assert envelope["request_scope"]["scope_id"] == prepared.scope_id
+    assert envelope["request_scope"]["scope_id"] == "generic_overview"
     assert envelope["request_scope"]["field_ids"] == ["business_overview_source"]
     assert envelope["request_scope"]["scope_instructions"] == ""
     assert "page_contexts" in envelope["request_scope"]
@@ -182,6 +183,7 @@ def test_common_gateway_provider_sends_one_bounded_scope_and_stage4_schema() -> 
 @pytest.mark.parametrize(
     ("scope_id", "required_text"),
     [
+        ("business_overview", "product uses, customer industries"),
         ("capacity_and_processing_narrative", "do not emit a second sales_volume"),
         ("procurement_mode", "to invent named material inputs"),
         ("top_five_customer_totals_only", "This request scope is totals-only"),
@@ -221,6 +223,106 @@ def test_common_gateway_provider_adds_frozen_scope_instructions(
         instructions = user_content
     assert required_text in instructions
     assert required_text in _SCOPE_INSTRUCTIONS[scope_id]
+
+
+def test_business_overview_uses_flat_source_and_activity_drafts() -> None:
+    prepared = (
+        _prepared_scope()
+        .model_copy(update={"scope_id": "business_overview"})
+        .model_copy(
+            update={
+                "field_ids": ("business_overview_source", "explicit_activity"),
+            }
+        )
+    )
+    checklist = (
+        ChecklistItem(
+            field_id="business_overview_source",
+            object_type=ObjectType.BUSINESS_OVERVIEW,
+            chapter_task=ChapterTask.EXTRACT_BUSINESS_OVERVIEW,
+            requirement_level=RequirementLevel.REQUIRED,
+            allowed_coverage_statuses=(
+                CoverageStatus.OBSERVED,
+                CoverageStatus.EXTRACTION_FAILED,
+                CoverageStatus.UNCLEAR,
+            ),
+        ),
+        ChecklistItem(
+            field_id="explicit_activity",
+            object_type=ObjectType.ACTIVITY,
+            chapter_task=ChapterTask.EXTRACT_BUSINESS_OVERVIEW,
+            requirement_level=RequirementLevel.CONDITIONAL,
+            allowed_coverage_statuses=(
+                CoverageStatus.OBSERVED,
+                CoverageStatus.EXTRACTION_FAILED,
+                CoverageStatus.UNCLEAR,
+            ),
+            allowed_actions=tuple(ActivityAction),
+        ),
+    )
+    request = SemanticTaskRequest(
+        request_id="business-overview-request",
+        report=prepared.report,
+        package_manifest=PackageManifest(
+            package_name="manufacturing_materials",
+            package_version="v1",
+            report=prepared.report,
+            checklist=checklist,
+        ),
+        chapter_task=prepared.chapter_task,
+        evidence_bundle=prepared.evidence_bundle,
+        allowed_object_types=(ObjectType.BUSINESS_OVERVIEW, ObjectType.ACTIVITY),
+        allowed_actions=tuple(ActivityAction),
+        unresolved_field_ids=prepared.field_ids,
+    )
+    evidence_id = prepared.evidence_bundle[0].evidence.evidence_id
+    source_text = "公司主要从事动力电池研发、生产和销售。"
+    client = _FakeGatewayClient(
+        outputs=[
+            {
+                "overview": {
+                    "source_name": "主要业务",
+                    "source_text": source_text,
+                    "evidence_id": evidence_id,
+                },
+                "activities": [
+                    {
+                        "action": "produces",
+                        "actor": "公司",
+                        "actor_basis": "direct_grammatical_actor",
+                        "object_name": "动力电池",
+                        "source_verb": "生产",
+                        "evidence_id": evidence_id,
+                    }
+                ],
+            }
+        ]
+    )
+    provider = CommonGatewaySemanticProvider(
+        client=client,
+        profile="semantic_extraction",
+        prepared_scope=prepared,
+        max_output_tokens=1000,
+        timeout_seconds=30,
+    )
+
+    response = provider.extract(request)
+
+    schema = client.requests[0].response_schema
+    assert set(schema["properties"]) == {"overview", "activities"}
+    assert "subject_scope" not in json.dumps(schema)
+    assert not LlmMessage.from_value(client.requests[0].messages[1]).content.startswith(
+        "{"
+    )
+    overview = response["items"][0]["candidate"]
+    activity = response["items"][1]["candidate"]
+    assert overview["source_text"] == source_text
+    assert overview["subject_scope"] == "unclear"
+    assert overview["reported_period"] == "2025年度"
+    assert activity["activity_actor"] == "公司"
+    assert activity["source_actor"] == "公司"
+    assert activity["source_verb"] == "生产"
+    assert activity["source_native"]["header"] == "主要业务"
 
 
 def test_procurement_mode_uses_flat_draft_and_reconstructs_mechanical_fields() -> None:
