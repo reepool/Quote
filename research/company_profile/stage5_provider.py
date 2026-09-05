@@ -150,11 +150,13 @@ _SCOPE_INSTRUCTIONS = {
         "Measurement."
     ),
     "reported_business_change": (
-        "For an explicit annual-report checkbox such as 合并报表范围的变化情况：□适用 "
-        "√不适用, emit coverage for business_regime with status=not_applicable and "
-        "reason_code=source_explicitly_not_applicable; do not fabricate a BusinessEvent. "
-        "Only emit a BusinessEvent when the source explicitly states a change, event date, "
-        "or effective date."
+        "Treat each annual-report disclosure independently. If the source explicitly says "
+        "the consolidation scope changed, emit only that BusinessEvent and describe only "
+        "the disclosed change; a pointer such as 详见财务报告 is not additional event fact. "
+        "Do not merge a separate 业务、产品或服务重大变化：不适用 statement into that "
+        "event. When the supplied scope only states that the applicable change did not "
+        "occur, emit coverage for business_regime with status=not_applicable and "
+        "reason_code=source_explicitly_not_applicable; do not fabricate a BusinessEvent."
     ),
     "same_control_comparison_basis": (
         "Extract the disclosed revenue comparison columns as separate Measurements, not "
@@ -1391,6 +1393,52 @@ def _minimal_repair_schema(request: RepairRequest) -> dict[str, Any]:
     }
 
 
+def _minimal_verify_schema(request: VerifyRequest) -> dict[str, Any]:
+    """Constrain verifier identity and every target while retaining local validation."""
+
+    def target_schema(target_type: str, target_id: str) -> dict[str, Any]:
+        return {
+            "type": "object",
+            "additionalProperties": False,
+            "required": ["target_type", "target_id", "status", "reason_codes"],
+            "properties": {
+                "target_type": {"const": target_type},
+                "target_id": {"const": target_id},
+                "status": {"enum": ["pass", "unclear", "block"]},
+                "reason_codes": {
+                    "type": "array",
+                    "uniqueItems": True,
+                    "items": {"enum": [item.value for item in ContractErrorCode]},
+                },
+                "explanation": {"type": "string"},
+            },
+        }
+
+    target_schemas = [
+        target_schema("candidate", item.record_id) for item in request.candidates
+    ] + [
+        target_schema("coverage", f"{item.chapter_task.value}:{item.field_id}")
+        for item in request.coverage
+    ]
+    target_count = len(target_schemas)
+    return {
+        "type": "object",
+        "additionalProperties": False,
+        "required": ["schema_version", "request_id", "checks"],
+        "properties": {
+            "schema_version": {"const": "company_profile_verify_response.v1"},
+            "request_id": {"const": request.request_id},
+            "checks": {
+                "type": "array",
+                "minItems": target_count,
+                "maxItems": target_count,
+                "prefixItems": target_schemas,
+                "items": False,
+            },
+        },
+    }
+
+
 def _validate_segment_row_source_labels(
     row: Mapping[str, Any],
     *,
@@ -2251,7 +2299,7 @@ class CommonGatewaySemanticProvider:
             response_model=VerifyResponse,
             schema_name="company_profile_verify_response",
             schema_version="company_profile_verify_response.v1",
-            model_schema=VerifyResponse,
+            model_schema=_minimal_verify_schema(request),
             normalize_response=lambda data: data,
             include_page_contexts=False,
         )
@@ -2356,25 +2404,49 @@ class CommonGatewaySemanticProvider:
                     item.model_dump(mode="json")
                     for item in self._prepared_scope.page_contexts
                 ]
-            system_instruction = (
-                "You are a bounded company-profile semantic worker. "
-                "Use only the supplied PDF page context and runtime schema. "
-                "Return JSON only; never infer production approval, package "
-                "assignment, commodity exposure, value-chain position, or DCF input. "
-                "Return only semantic draft fields requested by the schema. Do not "
-                "repeat report, chapter_task, record_id, schema_version, assertion_class, "
-                "data_status, or full Evidence inside a candidate. Return evidence_ids "
-                "only; the adapter binds canonical source evidence locally. When a "
-                "candidate is emitted, do not also emit observed coverage for that field; "
-                "the workflow derives observed coverage after acceptance. The wording 公司 "
-                "alone does not prove consolidated_group: use subject_scope=unclear unless "
-                "the source explicitly says 合并/本集团 or the supplied evidence documents "
-                "numeric reconciliation to the consolidated statement. Every "
-                "consolidated_group candidate must include the matching subject_basis. "
-                "When subject_basis is numeric reconciliation, uncertainty must be "
-                "non-empty and state the source-table total plus its comparison with "
-                "the consolidated and parent-company statement values from Evidence."
-            )
+            if call_type == "verify":
+                system_instruction = (
+                    "You are the independent verifier for one bounded company-profile "
+                    "request. Use only runtime_request candidates, coverage, and Evidence. "
+                    "Return request_id exactly as supplied. Return exactly one check for "
+                    "each target, in the schema order, with no omitted, duplicate, renamed, "
+                    "or extra target. Pass a candidate only when every fact and Evidence "
+                    "binding is supported; the evidence_catalog field_ids list is the "
+                    "authoritative field binding, and one Evidence item may be bound to "
+                    "several field_ids in the same request scope. Do not return "
+                    "evidence_field_mismatch when the candidate field_id appears in that "
+                    "list; use that reason only when the candidate field_id is absent from "
+                    "all cited Evidence bindings. Otherwise return unclear or block with "
+                    "typed reason_codes. For coverage, pass a legal-empty not_disclosed result "
+                    "when the supplied scope is complete and genuinely contains no requested "
+                    "disclosure, explicitly says classification is unavailable, or explicitly "
+                    "states a permitted confidentiality/exemption reason. A legal-empty "
+                    "coverage target must not be marked unclear merely because it has no "
+                    "candidate. Pass not_applicable only when the source explicitly states "
+                    "that the requested disclosure does not apply. Do not infer facts, "
+                    "production approval, package assignment, commodity exposure, value-chain "
+                    "position, or DCF input. Return JSON only."
+                )
+            else:
+                system_instruction = (
+                    "You are a bounded company-profile semantic worker. "
+                    "Use only the supplied PDF page context and runtime schema. "
+                    "Return JSON only; never infer production approval, package "
+                    "assignment, commodity exposure, value-chain position, or DCF input. "
+                    "Return only semantic draft fields requested by the schema. Do not "
+                    "repeat report, chapter_task, record_id, schema_version, assertion_class, "
+                    "data_status, or full Evidence inside a candidate. Return evidence_ids "
+                    "only; the adapter binds canonical source evidence locally. When a "
+                    "candidate is emitted, do not also emit observed coverage for that field; "
+                    "the workflow derives observed coverage after acceptance. The wording 公司 "
+                    "alone does not prove consolidated_group: use subject_scope=unclear unless "
+                    "the source explicitly says 合并/本集团 or the supplied evidence documents "
+                    "numeric reconciliation to the consolidated statement. Every "
+                    "consolidated_group candidate must include the matching subject_basis. "
+                    "When subject_basis is numeric reconciliation, uncertainty must be "
+                    "non-empty and state the source-table total plus its comparison with "
+                    "the consolidated and parent-company statement values from Evidence."
+                )
             user_content = json.dumps(
                 envelope,
                 ensure_ascii=False,

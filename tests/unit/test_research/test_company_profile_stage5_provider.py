@@ -42,6 +42,7 @@ from research.company_profile.stage5_provider import (
     _coverage_draft_schema,
     _expand_extract_response,
     _minimal_extract_schema,
+    _minimal_verify_schema,
 )
 from research.company_profile.workflow import CompanyProfileSemanticService
 from utils.llm import (
@@ -192,7 +193,7 @@ def test_common_gateway_provider_sends_one_bounded_scope_and_stage4_schema() -> 
         ("top_five_supplier_totals_only", "This request scope is totals-only"),
         ("quantity_disclosure_check", "do not infer quantities from"),
         ("classified_volume_not_available", "not a parser or table-context failure"),
-        ("reported_business_change", "emit coverage for business_regime"),
+        ("reported_business_change", "Do not merge a separate"),
         ("same_control_comparison_basis", "not as Segment rows"),
     ],
 )
@@ -1298,6 +1299,25 @@ def test_common_gateway_provider_uses_separate_repair_and_verify_requests() -> N
     )
     assert len(verify_envelope["runtime_request"]["evidence_catalog"]) == 1
     verify_candidate = verify_envelope["runtime_request"]["candidates"][0]
+    verify_schema = _minimal_verify_schema(verify_request)
+    checks_schema = verify_schema["properties"]["checks"]
+    assert verify_schema["properties"]["request_id"] == {
+        "const": verify_request.request_id
+    }
+    assert checks_schema["minItems"] == checks_schema["maxItems"] == 1
+    assert checks_schema["items"] is False
+    assert checks_schema["prefixItems"][0]["properties"]["target_id"] == {
+        "const": candidate.record_id
+    }
+    verify_instruction = LlmMessage.from_value(client.requests[1].messages[0]).content
+    assert "exactly one check for each target" in verify_instruction
+    assert (
+        "legal-empty coverage target must not be marked unclear" in verify_instruction
+    )
+    assert "evidence_catalog field_ids list is the authoritative field binding" in (
+        verify_instruction
+    )
+    assert "one Evidence item may be bound to several field_ids" in verify_instruction
     assert "report" not in verify_candidate and "evidence" not in verify_candidate
 
 
