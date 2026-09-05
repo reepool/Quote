@@ -31,6 +31,7 @@ from research.company_profile.models import (
     ReportIdentity,
     RequirementLevel,
     SourceNativeValue,
+    SubjectBasis,
     SubjectScope,
     TextAnchor,
 )
@@ -815,6 +816,51 @@ def test_segment_financials_use_compact_rows_and_expand_locally() -> None:
     }
     assert candidates[0]["dimension"] == "分产品"
     assert candidates[0]["source_native"]["header"] == "分产品"
+    assert all(
+        candidate["subject_scope"] == "business_segment"
+        for candidate in candidates
+    )
+
+
+def test_segment_adjustment_row_does_not_inherit_business_segment_scope() -> None:
+    prepared = _segment_prepared_scope()
+    evidence = prepared.evidence_bundle[0].evidence.model_copy(
+        update={
+            "anchor": TextAnchor(
+                bounded_quote="分产品 营业收入 营业成本 毛利率 合并抵消项 -1 -2 118.30%"
+            )
+        }
+    )
+    prepared = prepared.model_copy(
+        update={
+            "source_row_dimensions": {"合并抵消项": "分产品"},
+            "evidence_bundle": (PreparedEvidence(evidence=evidence),),
+        }
+    )
+    request = _segment_extract_request(prepared)
+    evidence_id = prepared.evidence_bundle[0].evidence.evidence_id
+    expanded = _expand_extract_response(
+        _segment_row_response(
+            request_id=request.request_id,
+            evidence_id=evidence_id,
+            label="合并抵消项",
+            row_class="consolidation_adjustment",
+        ),
+        request=request,
+        prepared_scope=prepared,
+    )
+    candidates = ExtractResponse.model_validate_json(
+        json.dumps(expanded, ensure_ascii=False)
+    ).candidates()
+    assert candidates
+    assert all(
+        candidate.subject_scope == SubjectScope.CONSOLIDATED_GROUP
+        for candidate in candidates
+    )
+    assert all(
+        candidate.subject_basis == SubjectBasis.DIRECT_SOURCE_WORDING
+        for candidate in candidates
+    )
 
 
 def test_same_page_totals_in_different_dimensions_are_distinct_occurrences() -> None:
@@ -1318,6 +1364,9 @@ def test_common_gateway_provider_uses_separate_repair_and_verify_requests() -> N
         verify_instruction
     )
     assert "one Evidence item may be bound to several field_ids" in verify_instruction
+    assert "source_value_mutation as applicable only when" in verify_instruction
+    assert "does not need comparison_basis merely because" in verify_instruction
+    assert "subject_scope is business_segment is supported" in verify_instruction
     assert "report" not in verify_candidate and "evidence" not in verify_candidate
 
 

@@ -1546,6 +1546,28 @@ def _expand_segment_row_draft(
 ) -> list[dict[str, Any]]:
     _require_numeric_reconciliation_uncertainty(row)
     dimension = _validate_segment_row_source_labels(row, prepared_scope=prepared_scope)
+    # A non-adjustment row is physically scoped by the disclosed table dimension
+    # (for example, 分产品 / 分地区 / 分销售模式). This is an Evidence-backed
+    # reconstruction, not a model default: the source dimension and row label are
+    # already validated against the approved table Evidence above. Keep explicit
+    # affirmative scopes (such as a numeric-reconciled consolidated total) intact,
+    # but resolve the common model ``unclear`` output to business_segment. An
+    # adjustment row is deliberately excluded because its consolidated scope must
+    # still be supported by its own wording/reconciliation evidence.
+    if row.get("subject_scope") in (None, "", "unclear"):
+        row = deepcopy(row)
+        if row.get("row_class") == "consolidation_adjustment":
+            # The validated row label itself is affirmative source wording for the
+            # consolidation adjustment (合并抵消项). It is not a business segment,
+            # but it is also not an inferred company-wide total.
+            row["subject_scope"] = "consolidated_group"
+            row["subject_basis"] = "direct_source_wording"
+        else:
+            # A normal row is physically scoped by the disclosed table dimension
+            # (for example, 分产品 / 分地区 / 分销售模式). This is an
+            # Evidence-backed reconstruction, not a model default: the source
+            # dimension and row label are validated against table Evidence above.
+            row["subject_scope"] = "business_segment"
     common_keys = (
         "subject_scope",
         "subject_name",
@@ -2416,8 +2438,17 @@ class CommonGatewaySemanticProvider:
                     "several field_ids in the same request scope. Do not return "
                     "evidence_field_mismatch when the candidate field_id appears in that "
                     "list; use that reason only when the candidate field_id is absent from "
-                    "all cited Evidence bindings. Otherwise return unclear or block with "
-                    "typed reason_codes. For coverage, pass a legal-empty not_disclosed result "
+                    "all cited Evidence bindings. Treat source_value_mutation as applicable "
+                    "only when an Evidence item has an explicit source_bindings entry for "
+                    "the candidate field and the candidate source_native disagrees with that "
+                    "bound value; do not use it merely because a table Evidence anchor is "
+                    "broader than the candidate cell. A current-period row does not need "
+                    "comparison_basis merely because the table also prints prior-year columns; "
+                    "require comparison_basis only when the candidate explicitly marks itself "
+                    "as a restated comparative. A Segment or Measurement whose subject_scope "
+                    "is business_segment is supported by its disclosed segment dimension; do "
+                    "not require issuer/consolidated wording for that scope. Otherwise return "
+                    "unclear or block with typed reason_codes. For coverage, pass a legal-empty not_disclosed result "
                     "when the supplied scope is complete and genuinely contains no requested "
                     "disclosure, explicitly says classification is unavailable, or explicitly "
                     "states a permitted confidentiality/exemption reason. A legal-empty "
