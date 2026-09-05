@@ -31,6 +31,7 @@ from .models import (
     Relationship,
     RequirementLevel,
     SemanticRecord,
+    SubjectScope,
 )
 from .projection import project_research_view
 from .stage5 import (
@@ -68,7 +69,9 @@ _REVIEW_ACTIONS = (
 )
 _FIELD_CONTRACT: dict[
     str,
-    tuple[ObjectType, RequirementLevel, tuple[MetricType, ...], tuple[ActivityAction, ...]],
+    tuple[
+        ObjectType, RequirementLevel, tuple[MetricType, ...], tuple[ActivityAction, ...]
+    ],
 ] = {
     "business_overview_source": (
         ObjectType.BUSINESS_OVERVIEW,
@@ -231,9 +234,15 @@ class ManufacturingMaterialsProfileSliceService:
         evidence_plan_path: str | Path,
         store: Stage5RunBundleStore,
         sample_ids: Iterable[str] | None = None,
+        scope_ids: Iterable[str] | None = None,
     ) -> Stage5SliceExecution:
         selected = self._selected_sample_ids(sample_ids)
-        prepared = self._prepare_selected(manifest, evidence_plan, selected)
+        prepared = self._prepare_selected(
+            manifest,
+            evidence_plan,
+            selected,
+            scope_ids=scope_ids,
+        )
         scopes = tuple(
             Stage5PreparedScopeSummary(
                 sample_id=scope.sample_id,
@@ -277,11 +286,17 @@ class ManufacturingMaterialsProfileSliceService:
         provider_factory: ProviderFactory,
         semantic_input_factory: SemanticInputFactory | None = None,
         sample_ids: Iterable[str] | None = None,
+        scope_ids: Iterable[str] | None = None,
         review_decisions: Mapping[str, tuple[Stage5ReviewDecision, ...]] | None = None,
     ) -> Stage5SliceExecution:
         selected = self._selected_sample_ids(sample_ids)
         try:
-            prepared = self._prepare_selected(manifest, evidence_plan, selected)
+            prepared = self._prepare_selected(
+                manifest,
+                evidence_plan,
+                selected,
+                scope_ids=scope_ids,
+            )
             reports = tuple(
                 self._run_report(
                     run_id=run_id,
@@ -355,7 +370,9 @@ class ManufacturingMaterialsProfileSliceService:
             task_result = self._semantic_service.run_task(request, provider=provider)
             task_result = _normalize_review_actions(task_result)
             task_result = _suppress_same_scope_legal_empty_relationships(task_result)
-            traces = tuple(getattr(provider, "traces", ())) if provider is not None else ()
+            traces = (
+                tuple(getattr(provider, "traces", ())) if provider is not None else ()
+            )
             scope_result = Stage5ScopeResult(
                 scope_id=scope.scope_id,
                 request_id=request.request_id,
@@ -398,8 +415,10 @@ class ManufacturingMaterialsProfileSliceService:
         manifest: Stage5SampleManifest,
         evidence_plan: Stage5EvidencePlan,
         selected: tuple[str, ...],
+        *,
+        scope_ids: Iterable[str] | None = None,
     ) -> dict[str, tuple[PreparedRequestScope, ...]]:
-        return {
+        prepared = {
             sample_id: self._evidence_preparer.prepare_report(
                 manifest=manifest,
                 evidence_plan=evidence_plan,
@@ -407,6 +426,21 @@ class ManufacturingMaterialsProfileSliceService:
             )
             for sample_id in selected
         }
+        if scope_ids is None:
+            return prepared
+        requested = tuple(scope_ids)
+        if len(selected) != 1:
+            raise ValueError("stage-five scope selection requires exactly one sample")
+        if not requested or len(requested) != len(set(requested)):
+            raise ValueError("stage-five scope selection must be non-empty and unique")
+        sample_id = selected[0]
+        available = {scope.scope_id: scope for scope in prepared[sample_id]}
+        unknown = set(requested) - set(available)
+        if unknown:
+            raise ValueError(
+                f"unknown stage-five scopes for {sample_id}: {sorted(unknown)}"
+            )
+        return {sample_id: tuple(available[scope_id] for scope_id in requested)}
 
     @staticmethod
     def _selected_sample_ids(sample_ids: Iterable[str] | None) -> tuple[str, ...]:
@@ -428,7 +462,9 @@ def _semantic_request(
     if set(semantic_input.unresolved_field_ids) - set(scope.field_ids):
         raise ValueError("semantic input requests a field outside its request scope")
     active_fields = tuple(dict.fromkeys(scope.field_ids))
-    checklist = tuple(_checklist_item(field_id, scope.chapter_task) for field_id in active_fields)
+    checklist = tuple(
+        _checklist_item(field_id, scope.chapter_task) for field_id in active_fields
+    )
     manifest = PackageManifest(
         package_name="manufacturing_materials",
         package_version="v1",
@@ -577,12 +613,29 @@ def _contract_benchmark(
     production_boundary_ok = all(
         item.production_authorization == "not_authorized" for item in task_results
     )
+    unclear_subject_ids = [
+        record.record_id
+        for task_result in task_results
+        for record in task_result.records
+        if record.subject_scope == SubjectScope.UNCLEAR
+        and any(
+            disposition.target_id == record.record_id
+            and disposition.status == DispositionStatus.ACCEPTED_FOR_REVIEW
+            for disposition in task_result.dispositions
+        )
+    ]
     dimensions = (
         Stage5BenchmarkDimension(
             name="task_completion",
             passed=not incomplete,
             blocker_codes=("incomplete_request_scope",) if incomplete else (),
             details={"incomplete_request_ids": incomplete},
+        ),
+        Stage5BenchmarkDimension(
+            name="subject_resolution",
+            passed=not unclear_subject_ids,
+            blocker_codes=("subject_scope_unclear",) if unclear_subject_ids else (),
+            details={"unclear_subject_record_ids": unclear_subject_ids},
         ),
         Stage5BenchmarkDimension(
             name="production_isolation",

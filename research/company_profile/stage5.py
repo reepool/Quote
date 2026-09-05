@@ -27,7 +27,7 @@ from .models import ChapterTask, Evidence, ReportIdentity, TextAnchor
 
 STAGE5_SAMPLE_MANIFEST_SCHEMA = "company_profile_industry_sample_manifest.v1"
 STAGE5_EVIDENCE_PLAN_SCHEMA = "company_profile_stage5_evidence_plan.v1"
-STAGE5_EVIDENCE_PLAN_VERSION = "manufacturing_materials.2026-09-04.1"
+STAGE5_EVIDENCE_PLAN_VERSION = "manufacturing_materials.2026-09-05.3"
 STAGE5_PACKAGE = "manufacturing_materials"
 STAGE5_PRODUCTION_AUTHORIZATION = "not_authorized"
 
@@ -136,13 +136,17 @@ class Stage5SampleManifest(_StrictModel):
         if len(ids) != len(set(ids)):
             raise ValueError("sample manifest contains duplicate sample_id")
         if set(ids) != set(APPROVED_STAGE5_SAMPLES):
-            raise ValueError("sample manifest must contain exactly the approved reports")
+            raise ValueError(
+                "sample manifest must contain exactly the approved reports"
+            )
         for item in self.reports:
             instrument, regime = APPROVED_STAGE5_SAMPLES[item.sample_id]
             if item.report.instrument_id != instrument or item.regime_type != regime:
                 raise ValueError("sample identity or regime does not match approval")
             if item.report.report_period != "2025-12-31":
-                raise ValueError("stage-five slice accepts only the approved 2025 reports")
+                raise ValueError(
+                    "stage-five slice accepts only the approved 2025 reports"
+                )
         return self
 
     def report_by_id(self, sample_id: str) -> Stage5ReportAsset:
@@ -167,6 +171,10 @@ class EvidenceScopePlan(_StrictModel):
     required_footnotes: tuple[str, ...] = ()
     continuation_required: bool = False
     printed_page_labels: dict[str, str] = Field(default_factory=dict)
+    subject_pages: tuple[int, ...] = ()
+    subject_anchor_terms: tuple[str, ...] = ()
+    source_row_dimensions: dict[str, str] = Field(default_factory=dict)
+    candidate_pages: tuple[int, ...] = ()
 
     @model_validator(mode="after")
     def _pages_are_continuous(self) -> EvidenceScopePlan:
@@ -182,6 +190,31 @@ class EvidenceScopePlan(_StrictModel):
             raise ValueError("continuation scope requires at least two pages")
         if any(int(page) not in self.pages for page in self.printed_page_labels):
             raise ValueError("printed page labels must belong to the scope pages")
+        if tuple(sorted(set(self.subject_pages))) != self.subject_pages or any(
+            page < 1 for page in self.subject_pages
+        ):
+            raise ValueError(
+                "subject evidence pages must be sorted unique physical pages"
+            )
+        if set(self.pages) & set(self.subject_pages):
+            raise ValueError(
+                "subject evidence pages must be separate from primary pages"
+            )
+        if bool(self.subject_pages) != bool(self.subject_anchor_terms):
+            raise ValueError(
+                "subject evidence pages and anchor terms must be supplied together"
+            )
+        if any(
+            not label.strip() or not dimension.strip()
+            for label, dimension in self.source_row_dimensions.items()
+        ):
+            raise ValueError(
+                "source row dimension mappings require non-empty labels and dimensions"
+            )
+        if tuple(sorted(set(self.candidate_pages))) != self.candidate_pages or any(
+            page not in self.pages for page in self.candidate_pages
+        ):
+            raise ValueError("candidate pages must be sorted unique primary pages")
         return self
 
 
@@ -207,7 +240,9 @@ class EvidenceReportPlan(_StrictModel):
     def _six_frozen_tasks(self) -> EvidenceReportPlan:
         tasks = [item.chapter_task for item in self.tasks]
         if len(tasks) != len(set(tasks)) or set(tasks) != _FROZEN_TASKS:
-            raise ValueError("each report plan must contain the six frozen chapter tasks")
+            raise ValueError(
+                "each report plan must contain the six frozen chapter tasks"
+            )
         return self
 
     def task(self, chapter_task: ChapterTask) -> EvidenceTaskPlan:
@@ -226,7 +261,7 @@ class Stage5EvidencePlan(_StrictModel):
     schema_version: Literal["company_profile_stage5_evidence_plan.v1"] = (
         STAGE5_EVIDENCE_PLAN_SCHEMA
     )
-    plan_version: Literal["manufacturing_materials.2026-09-04.1"] = (
+    plan_version: Literal["manufacturing_materials.2026-09-05.3"] = (
         STAGE5_EVIDENCE_PLAN_VERSION
     )
     sample_manifest_revision: str = Field(min_length=1)
@@ -275,6 +310,8 @@ class PreparedRequestScope(_StrictModel):
     evidence_bundle: tuple[PreparedEvidence, ...] = Field(min_length=1)
     page_contexts: tuple[PreparedPageContext, ...] = Field(min_length=1)
     plan_version: str = Field(min_length=1)
+    source_row_dimensions: dict[str, str] = Field(default_factory=dict)
+    candidate_pages: tuple[int, ...] = ()
     production_authorization: Literal["not_authorized"] = (
         STAGE5_PRODUCTION_AUTHORIZATION
     )
@@ -375,7 +412,7 @@ class Stage5EvidencePreparer:
                     page
                     for task in plan.tasks
                     for scope in task.request_scopes
-                    for page in scope.pages
+                    for page in (*scope.pages, *scope.subject_pages)
                 }
             )
         )
@@ -414,7 +451,8 @@ class Stage5EvidencePreparer:
         contexts: list[PreparedPageContext] = []
         evidence: list[PreparedEvidence] = []
         combined_parts: list[str] = []
-        for page_number in scope.pages:
+        for page_number in (*scope.pages, *scope.subject_pages):
+            is_subject_evidence = page_number in scope.subject_pages
             page = page_results.get(page_number)
             if page is None or not page.selected_usable_for_semantic:
                 raise EvidencePreparationError(
@@ -433,7 +471,8 @@ class Stage5EvidencePreparer:
                     chapter_task=chapter_task,
                     scope_id=scope.scope_id,
                 )
-            combined_parts.append(text)
+            if not is_subject_evidence:
+                combined_parts.append(text)
             contexts.append(
                 PreparedPageContext(
                     page=page_number,
@@ -444,21 +483,41 @@ class Stage5EvidencePreparer:
                     quality_status=page.quality_status,
                 )
             )
-            quote = _bounded_anchor(text, scope.anchor_terms)
+            quote = _bounded_anchor(
+                text,
+                scope.subject_anchor_terms
+                if is_subject_evidence
+                else scope.anchor_terms,
+            )
             evidence.append(
                 PreparedEvidence(
                     evidence=Evidence(
                         evidence_id=_evidence_id(
-                            asset.sample_id, chapter_task, scope.scope_id, page_number, quote
+                            asset.sample_id,
+                            chapter_task,
+                            scope.scope_id,
+                            page_number,
+                            quote,
                         ),
                         report=asset.report,
                         page=page_number,
                         printed_page_label=scope.printed_page_labels.get(
                             str(page_number)
                         ),
-                        section_title=" / ".join(scope.section_titles),
-                        continuation_pages=tuple(
-                            item for item in scope.pages if item != page_number
+                        section_title=(
+                            "主体口径核对"
+                            if is_subject_evidence
+                            else " / ".join(scope.section_titles)
+                        ),
+                        continuation_pages=(
+                            ()
+                            if is_subject_evidence
+                            else tuple(
+                                item for item in scope.pages if item != page_number
+                            )
+                        ),
+                        subject_evidence_pages=(
+                            () if is_subject_evidence else scope.subject_pages
                         ),
                         anchor=TextAnchor(bounded_quote=quote),
                     ),
@@ -471,11 +530,44 @@ class Stage5EvidencePreparer:
                 )
             )
         combined = "\n".join(combined_parts)
+        if scope.subject_pages:
+            subject_text = "\n".join(
+                context.text
+                for context in contexts
+                if context.page in scope.subject_pages
+            )
+            self._require_terms(
+                subject_text,
+                scope.subject_anchor_terms,
+                PreparationFailureCode.CONTEXT_INCOMPLETE,
+                "subject anchor",
+                asset,
+                chapter_task,
+                scope,
+            )
         self._require_terms(
             combined,
             scope.anchor_terms,
             PreparationFailureCode.CONTEXT_INCOMPLETE,
             "anchor",
+            asset,
+            chapter_task,
+            scope,
+        )
+        self._require_terms(
+            combined,
+            tuple(scope.source_row_dimensions),
+            PreparationFailureCode.CONTEXT_INCOMPLETE,
+            "source row label",
+            asset,
+            chapter_task,
+            scope,
+        )
+        self._require_terms(
+            combined,
+            tuple(dict.fromkeys(scope.source_row_dimensions.values())),
+            PreparationFailureCode.CONTEXT_INCOMPLETE,
+            "source row dimension",
             asset,
             chapter_task,
             scope,
@@ -507,7 +599,9 @@ class Stage5EvidencePreparer:
             chapter_task,
             scope,
         )
-        if scope.continuation_required and len(contexts) != len(scope.pages):
+        if scope.continuation_required and len(
+            [context for context in contexts if context.page in scope.pages]
+        ) != len(scope.pages):
             raise EvidencePreparationError(
                 PreparationFailureCode.CONTINUATION_INCOMPLETE,
                 "continued table context is incomplete",
@@ -524,6 +618,8 @@ class Stage5EvidencePreparer:
             evidence_bundle=tuple(evidence),
             page_contexts=tuple(contexts),
             plan_version=STAGE5_EVIDENCE_PLAN_VERSION,
+            source_row_dimensions=scope.source_row_dimensions,
+            candidate_pages=scope.candidate_pages,
         )
 
     @staticmethod

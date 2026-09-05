@@ -680,7 +680,7 @@ def _reconcile_occurrences(
     records: list[SemanticRecord],
 ) -> tuple[list[SemanticRecord], list[Disposition], set[str]]:
     unique: list[SemanticRecord] = []
-    by_occurrence: dict[str, SemanticRecord] = {}
+    by_occurrence_slot: dict[tuple[str, str], SemanticRecord] = {}
     duplicate_dispositions: list[Disposition] = []
     conflict_ids: set[str] = set()
     processing_sales_by_source: dict[str, SemanticRecord] = {}
@@ -696,9 +696,10 @@ def _reconcile_occurrences(
             elif existing_source.metric_type != record.metric_type:
                 conflict_ids.update({existing_source.record_id, record.record_id})
         occurrence = record.occurrence_id()
-        existing = by_occurrence.get(occurrence)
+        slot = _semantic_reconciliation_slot(record)
+        existing = by_occurrence_slot.get((occurrence, slot))
         if existing is None:
-            by_occurrence[occurrence] = record
+            by_occurrence_slot[(occurrence, slot)] = record
             unique.append(record)
             continue
         if (
@@ -717,6 +718,39 @@ def _reconcile_occurrences(
         conflict_ids.update({existing.record_id, record.record_id})
         unique.append(record)
     return unique, duplicate_dispositions, conflict_ids
+
+
+def _semantic_reconciliation_slot(record: SemanticRecord) -> str:
+    """Separate coexisting facts without changing physical occurrence identity.
+
+    One bounded source passage can legitimately support an overview plus several
+    activities, or several source-native table rows. Drift reconciliation therefore
+    compares semantic fingerprints only within the same logical fact slot.
+    """
+
+    material: dict[str, Any] = {
+        "object_type": record.object_type,
+        "field_id": record.field_id,
+        "source_native": record.source_native.model_dump(mode="json"),
+    }
+    if isinstance(record, Activity):
+        material.update(
+            action=record.action.value,
+            source_verb=record.source_verb,
+        )
+    elif isinstance(record, Measurement):
+        material["logical_slot"] = record.logical_slot.value
+    elif record.object_type == ObjectType.SEGMENT.value:
+        material["dimension"] = getattr(record, "dimension", None)
+    elif record.object_type == ObjectType.RELATIONSHIP.value:
+        relation_type = getattr(record, "relation_type", None)
+        material["relation_type"] = getattr(relation_type, "value", relation_type)
+    elif record.object_type == ObjectType.BUSINESS_EVENT.value:
+        material.update(
+            event_type=getattr(record, "event_type", None),
+            event_date=getattr(record, "event_date", None),
+        )
+    return json.dumps(material, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
 
 
 def _physical_source_key(record: SemanticRecord) -> str:

@@ -77,6 +77,7 @@ class ContractErrorCode(_StringEnum):
     COVERAGE_STATUS_NOT_ALLOWED = "coverage_status_not_allowed"
     COVERAGE_REASON_UNSUPPORTED = "coverage_reason_unsupported"
     PROVIDER_UNAVAILABLE = "provider_unavailable"
+    DEADLINE_EXCEEDED = "deadline_exceeded"
 
 
 class SemanticProviderError(RuntimeError):

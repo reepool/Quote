@@ -50,7 +50,9 @@ class _ProviderCallBudget:
 
 
 class _BudgetedProvider:
-    def __init__(self, provider: CommonGatewaySemanticProvider, budget: _ProviderCallBudget):
+    def __init__(
+        self, provider: CommonGatewaySemanticProvider, budget: _ProviderCallBudget
+    ):
         self._provider = provider
         self._budget = budget
 
@@ -88,6 +90,15 @@ def build_parser() -> argparse.ArgumentParser:
         dest="sample_ids",
         help="limit execution to one or more approved sample IDs; repeat for multiple reports",
     )
+    parser.add_argument(
+        "--scope-id",
+        action="append",
+        dest="scope_ids",
+        help=(
+            "limit execution to one or more request scopes for exactly one sample; "
+            "repeat for multiple held scopes"
+        ),
+    )
     parser.add_argument("--provider-route", required=True)
     parser.add_argument("--max-output-tokens", required=True, type=int)
     parser.add_argument("--timeout-seconds", required=True, type=float)
@@ -114,6 +125,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             evidence_plan_path=args.evidence_plan,
             store=store,
             sample_ids=args.sample_ids,
+            scope_ids=args.scope_ids,
         )
         _print_result(execution.model_dump(mode="json"), provider_calls=0)
         return 0
@@ -151,6 +163,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                 budget=budget,
             ),
             sample_ids=args.sample_ids,
+            scope_ids=args.scope_ids,
         )
     finally:
         runner.run(client.close())

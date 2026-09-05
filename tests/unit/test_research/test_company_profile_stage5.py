@@ -55,9 +55,7 @@ def test_stage5_manifest_is_a_verified_four_report_closed_set() -> None:
         repository_root=REPOSITORY_ROOT,
     )
 
-    assert {item.sample_id for item in manifest.reports} == set(
-        APPROVED_STAGE5_SAMPLES
-    )
+    assert {item.sample_id for item in manifest.reports} == set(APPROVED_STAGE5_SAMPLES)
     assert {item.report.instrument_id for item in manifest.reports} == {
         "300750.SZ",
         "603659.SH",
@@ -66,8 +64,7 @@ def test_stage5_manifest_is_a_verified_four_report_closed_set() -> None:
     }
     assert all(item.local_path.is_file() for item in manifest.reports)
     assert all(
-        item.production_authorization == "not_authorized"
-        for item in manifest.reports
+        item.production_authorization == "not_authorized" for item in manifest.reports
     )
 
 
@@ -99,7 +96,10 @@ def test_stage5_evidence_plan_has_six_tasks_per_report_and_no_gold_answers() -> 
     plan = load_stage5_evidence_plan(EVIDENCE_PLAN)
 
     assert {item.sample_id for item in plan.reports} == set(APPROVED_STAGE5_SAMPLES)
-    assert all({task.chapter_task for task in item.tasks} == set(ChapterTask) for item in plan.reports)
+    assert all(
+        {task.chapter_task for task in item.tasks} == set(ChapterTask)
+        for item in plan.reports
+    )
     assert all(
         all(
             tuple(sorted(set(scope.pages))) == scope.pages
@@ -114,9 +114,9 @@ def test_stage5_evidence_plan_rejects_runtime_semantic_defaults(
     tmp_path: Path,
 ) -> None:
     payload = json.loads(EVIDENCE_PLAN.read_text(encoding="utf-8"))
-    payload["reports"][0]["tasks"][0]["request_scopes"][0][
-        "subject_scope"
-    ] = "consolidated_group"
+    payload["reports"][0]["tasks"][0]["request_scopes"][0]["subject_scope"] = (
+        "consolidated_group"
+    )
     candidate = tmp_path / "plan.json"
     candidate.write_text(json.dumps(payload, ensure_ascii=False), encoding="utf-8")
 
@@ -163,6 +163,40 @@ def test_stage5_preparation_reads_all_planned_pages_without_provider_calls() -> 
         for scope in scopes
         for evidence in scope.evidence_bundle
     )
+    ningde_segment = next(
+        scope
+        for scope in prepared["manufacturing-materials-300750-2025"]
+        if scope.scope_id == "segment_product_industry_region"
+    )
+    assert [context.page for context in ningde_segment.page_contexts] == [
+        24,
+        25,
+        116,
+        118,
+    ]
+    primary_evidence = [
+        item.evidence
+        for item in ningde_segment.evidence_bundle
+        if item.evidence.page in {24, 25}
+    ]
+    subject_evidence = [
+        item.evidence
+        for item in ningde_segment.evidence_bundle
+        if item.evidence.page in {116, 118}
+    ]
+    assert all(item.subject_evidence_pages == (116, 118) for item in primary_evidence)
+    assert all(item.section_title == "主体口径核对" for item in subject_evidence)
+    assert ningde_segment.source_row_dimensions == {
+        "电气机械及器材制造业": "分业务",
+        "采选冶炼行业": "分业务",
+        "动力电池系统": "分产品",
+        "储能电池系统": "分产品",
+        "电池材料及回收": "分产品",
+        "电池矿产资源": "分产品",
+        "境内": "分地区",
+        "境外": "分地区",
+    }
+    assert ningde_segment.candidate_pages == (25,)
 
 
 def test_stage5_evidence_plans_cover_the_frozen_cross_report_contract() -> None:
@@ -182,15 +216,30 @@ def test_stage5_evidence_plans_cover_the_frozen_cross_report_contract() -> None:
     assert "合并抵消项" in adjustment.anchor_terms
     assert set(adjustment.required_headers) == {"营业收入", "营业成本", "毛利率"}
 
+    subject_scope = scopes["manufacturing-materials-300750-2025"][
+        "segment_product_industry_region"
+    ]
+    assert subject_scope.subject_pages == (116, 118)
+    assert subject_scope.subject_anchor_terms == ("合并利润表", "母公司利润表")
+    assert subject_scope.source_row_dimensions == {
+        "电气机械及器材制造业": "分业务",
+        "采选冶炼行业": "分业务",
+        "动力电池系统": "分产品",
+        "储能电池系统": "分产品",
+        "电池材料及回收": "分产品",
+        "电池矿产资源": "分产品",
+        "境内": "分地区",
+        "境外": "分地区",
+    }
+    assert subject_scope.candidate_pages == (25,)
+
     processing = scopes["manufacturing-materials-603659-2025"][
         "capacity_and_processing_narrative"
     ]
     assert "processing_volume" in processing.field_ids
     assert "涂覆加工量" in processing.anchor_terms
     inventory = scopes["manufacturing-materials-603659-2025"]["product_volume_table"]
-    assert inventory.required_footnotes == (
-        "包含已发出至客户但尚未确认收入的发出商品",
-    )
+    assert inventory.required_footnotes == ("包含已发出至客户但尚未确认收入的发出商品",)
 
     capacity = scopes["manufacturing-materials-920015-2025"]["capacity_table"]
     assert capacity.pages == (49, 50)
@@ -207,15 +256,11 @@ def test_stage5_evidence_plans_cover_the_frozen_cross_report_contract() -> None:
     }.issubset(absent_quantities.field_ids)
     assert "无法进行分类统计" in absent_quantities.anchor_terms
 
-    named_rows = scopes["manufacturing-materials-920015-2025"][
-        "customer_ranking_rows"
-    ]
+    named_rows = scopes["manufacturing-materials-920015-2025"]["customer_ranking_rows"]
     totals_only = scopes["manufacturing-materials-603659-2025"][
         "top_five_customer_totals_only"
     ]
-    contract = scopes["manufacturing-materials-300750-2025"][
-        "major_sales_contract"
-    ]
+    contract = scopes["manufacturing-materials-300750-2025"]["major_sales_contract"]
     assert named_rows.scope_id != totals_only.scope_id != contract.scope_id
     assert contract.required_footnotes == ("基于双方保密协议约定",)
 
@@ -225,9 +270,7 @@ def test_stage5_evidence_plans_cover_the_frozen_cross_report_contract() -> None:
     effective = scopes["manufacturing-materials-302132-2025-regime"][
         "equity_transfer_effective"
     ]
-    assert {"同一控制下企业合并", "调整前", "调整后"}.issubset(
-        comparison.anchor_terms
-    )
+    assert {"同一控制下企业合并", "调整前", "调整后"}.issubset(comparison.anchor_terms)
     assert effective.pages == (58, 59)
     assert effective.printed_page_labels == {"58": "57", "59": "58"}
     assert plan.page_coordinate_system == "one_based_pdf_physical_page"
@@ -237,9 +280,9 @@ def test_stage5_preparation_reports_missing_header_before_provider(
     tmp_path: Path,
 ) -> None:
     payload = json.loads(EVIDENCE_PLAN.read_text(encoding="utf-8"))
-    payload["reports"][0]["tasks"][1]["request_scopes"][0][
-        "required_headers"
-    ].append("不存在的表头")
+    payload["reports"][0]["tasks"][1]["request_scopes"][0]["required_headers"].append(
+        "不存在的表头"
+    )
     candidate = tmp_path / "plan.json"
     candidate.write_text(json.dumps(payload, ensure_ascii=False), encoding="utf-8")
     manifest = load_stage5_sample_manifest(

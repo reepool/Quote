@@ -3,6 +3,8 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import pytest
+
 from research.company_profile.contracts import (
     CompanyProfileTaskResult,
     ContractErrorCode,
@@ -72,9 +74,7 @@ def test_stage5_fake_single_report_commits_research_view_and_legal_empty(
         repository_root=REPOSITORY_ROOT,
     )
     service = ManufacturingMaterialsProfileSliceService(
-        evidence_preparer=Stage5EvidencePreparer(
-            PdfRouter(native=PypdfNativeAdapter())
-        )
+        evidence_preparer=Stage5EvidencePreparer(PdfRouter(native=PypdfNativeAdapter()))
     )
 
     execution = service.run_semantic_slice(
@@ -89,13 +89,16 @@ def test_stage5_fake_single_report_commits_research_view_and_legal_empty(
     )
 
     assert execution.overall_status == "hold"
-    assert execution.report_statuses == {
-        "manufacturing-materials-603659-2025": "complete"
-    }
+    assert execution.report_statuses == {"manufacturing-materials-603659-2025": "hold"}
     manifest_payload = json.loads(
         (execution.output_path / "manifest.json").read_text(encoding="utf-8")
     )
     report = manifest_payload["reports"][0]
+    assert any(
+        item["name"] == "subject_resolution"
+        and item["blocker_codes"] == ["subject_scope_unclear"]
+        for item in report["benchmark"]["dimensions"]
+    )
     view = report["research_view"]
     assert view["production_authorization"] == "not_authorized"
     assert view["business_overview"] is not None
@@ -126,9 +129,7 @@ def test_stage5_preparation_only_writes_no_provider_or_semantic_output(
         repository_root=REPOSITORY_ROOT,
     )
     service = ManufacturingMaterialsProfileSliceService(
-        evidence_preparer=Stage5EvidencePreparer(
-            PdfRouter(native=PypdfNativeAdapter())
-        )
+        evidence_preparer=Stage5EvidencePreparer(PdfRouter(native=PypdfNativeAdapter()))
     )
 
     execution = service.run_preparation_only(
@@ -155,7 +156,88 @@ def test_stage5_preparation_only_writes_no_provider_or_semantic_output(
     assert "research_view" not in payload
 
 
-def test_stage5_request_scope_legal_empty_suppresses_only_same_scope_relationship() -> None:
+def test_stage5_preparation_can_select_held_scopes_for_exactly_one_sample(
+    tmp_path: Path,
+) -> None:
+    manifest = load_stage5_sample_manifest(
+        SAMPLE_MANIFEST,
+        repository_root=REPOSITORY_ROOT,
+    )
+    plan = load_stage5_evidence_plan(EVIDENCE_PLAN)
+    store = Stage5RunBundleStore(
+        tmp_path / "isolated",
+        repository_root=REPOSITORY_ROOT,
+    )
+    service = ManufacturingMaterialsProfileSliceService(
+        evidence_preparer=Stage5EvidencePreparer(PdfRouter(native=PypdfNativeAdapter()))
+    )
+
+    execution = service.run_preparation_only(
+        run_id="prepare-held-scopes",
+        manifest=manifest,
+        evidence_plan=plan,
+        evidence_plan_path=EVIDENCE_PLAN,
+        store=store,
+        sample_ids=("manufacturing-materials-300750-2025",),
+        scope_ids=("business_overview", "capacity_narrative"),
+    )
+
+    payload = json.loads(
+        (execution.output_path / "manifest.json").read_text(encoding="utf-8")
+    )
+    assert [item["scope_id"] for item in payload["scopes"]] == [
+        "business_overview",
+        "capacity_narrative",
+    ]
+
+
+def test_stage5_scope_selection_rejects_multiple_samples_and_unknown_scopes(
+    tmp_path: Path,
+) -> None:
+    manifest = load_stage5_sample_manifest(
+        SAMPLE_MANIFEST,
+        repository_root=REPOSITORY_ROOT,
+    )
+    plan = load_stage5_evidence_plan(EVIDENCE_PLAN)
+    service = ManufacturingMaterialsProfileSliceService(
+        evidence_preparer=Stage5EvidencePreparer(PdfRouter(native=PypdfNativeAdapter()))
+    )
+
+    with pytest.raises(ValueError, match="requires exactly one sample"):
+        service.run_preparation_only(
+            run_id="prepare-invalid-multiple",
+            manifest=manifest,
+            evidence_plan=plan,
+            evidence_plan_path=EVIDENCE_PLAN,
+            store=Stage5RunBundleStore(
+                tmp_path / "multiple",
+                repository_root=REPOSITORY_ROOT,
+            ),
+            sample_ids=(
+                "manufacturing-materials-300750-2025",
+                "manufacturing-materials-603659-2025",
+            ),
+            scope_ids=("business_overview",),
+        )
+
+    with pytest.raises(ValueError, match="unknown stage-five scopes"):
+        service.run_preparation_only(
+            run_id="prepare-invalid-scope",
+            manifest=manifest,
+            evidence_plan=plan,
+            evidence_plan_path=EVIDENCE_PLAN,
+            store=Stage5RunBundleStore(
+                tmp_path / "unknown",
+                repository_root=REPOSITORY_ROOT,
+            ),
+            sample_ids=("manufacturing-materials-300750-2025",),
+            scope_ids=("not-a-real-scope",),
+        )
+
+
+def test_stage5_request_scope_legal_empty_suppresses_only_same_scope_relationship() -> (
+    None
+):
     manifest = load_stage5_sample_manifest(
         SAMPLE_MANIFEST,
         repository_root=REPOSITORY_ROOT,
@@ -448,7 +530,8 @@ def _measurement(
 def _legal_empty(scope: PreparedRequestScope, field_id: str) -> CoverageResult:
     requirement = (
         RequirementLevel.REQUIRED
-        if field_id in {"business_overview_source", "segment_dimension", "business_regime"}
+        if field_id
+        in {"business_overview_source", "segment_dimension", "business_regime"}
         else RequirementLevel.CONDITIONAL
     )
     return CoverageResult(

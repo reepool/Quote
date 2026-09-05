@@ -1,7 +1,6 @@
-import importlib
 import json
-import socket
-import sqlite3
+import subprocess
+import sys
 from pathlib import Path
 
 import pytest
@@ -616,6 +615,35 @@ def test_unresolved_without_provider_creates_programmatic_human_review_item():
     )
 
 
+def test_overview_and_activity_can_share_one_physical_occurrence():
+    activity = _record("explicit_activity")
+    payload = activity.model_dump(mode="json")
+    for field in (
+        "action",
+        "activity_actor",
+        "source_actor",
+        "actor_basis",
+        "object_name",
+        "source_verb",
+    ):
+        payload.pop(field)
+    payload.update(
+        record_id="same-source-overview",
+        field_id="business_overview_source",
+        object_type="BusinessOverview",
+        source_text=activity.evidence[0].anchor.bounded_quote,
+    )
+    overview = RECORD_ADAPTER.validate_json(json.dumps(payload, ensure_ascii=False))
+
+    assert overview.occurrence_id() == activity.occurrence_id()
+    result = CompanyProfileSemanticService().run_task(_request((overview, activity)))
+
+    assert result.task_complete is True
+    assert {item.status for item in result.dispositions} == {
+        DispositionStatus.ACCEPTED_FOR_REVIEW
+    }
+
+
 def test_same_occurrence_semantic_conflict_is_unresolved():
     original = _record("sales_volume")
     conflict = _replace_record(
@@ -811,20 +839,33 @@ def test_same_control_restated_and_original_reports_keep_distinct_occurrences():
     assert restated.comparison_basis.value == "same_control_restated"
 
 
-def test_new_package_import_has_no_network_database_or_config_write(monkeypatch):
-    calls = []
-    monkeypatch.setattr(
-        socket.socket, "connect", lambda *args, **kwargs: calls.append("network")
-    )
-    monkeypatch.setattr(
-        sqlite3, "connect", lambda *args, **kwargs: calls.append("database")
+def test_new_package_import_has_no_network_database_or_config_write():
+    probe = """
+import socket
+import sqlite3
+
+def blocked(kind):
+    def fail(*args, **kwargs):
+        raise RuntimeError(f\"unexpected {kind} access during import\")
+    return fail
+
+socket.socket.connect = blocked("network")
+sqlite3.connect = blocked("database")
+
+import research.company_profile.models
+import research.company_profile.contracts
+import research.company_profile.projection
+"""
+
+    result = subprocess.run(
+        [sys.executable, "-c", probe],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        check=False,
     )
 
-    importlib.reload(importlib.import_module("research.company_profile.models"))
-    importlib.reload(importlib.import_module("research.company_profile.contracts"))
-    importlib.reload(importlib.import_module("research.company_profile.projection"))
-
-    assert calls == []
+    assert result.returncode == 0, result.stderr
 
 
 def test_all_approved_negative_cases_are_mapped_to_executable_guards():
