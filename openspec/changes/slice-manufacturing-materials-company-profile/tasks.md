@@ -41,7 +41,7 @@
 
 ## 7. Acceptance, cleanup, and handoff
 
-- [ ] 7.1 Re-run held scopes only with new run IDs after approved evidence/semantic corrections, then perform a final stage-five garbage audit: remove abandoned temporary/uncommitted outputs and list every retained pass/hold/failed diagnostic bundle.
+- [x] 7.1 Re-run held scopes only with new run IDs after approved evidence/semantic corrections, then perform a final stage-five garbage audit: remove abandoned temporary/uncommitted outputs and list every retained pass/hold/failed diagnostic bundle.
 - [x] 7.2 Run stage-five unit/integration tests, stage-four shared regressions, projection comparison, Ruff, and `openspec validate slice-manufacturing-materials-company-profile --strict`; record exact commands and results.
 - [x] 7.3 Review only blockers affecting the four-report contract, isolation, result correctness, or proof of acceptance; record non-blocking parser/platform/generalization ideas without implementing them.
-- [ ] 7.4 Verify all four reports have immutable audit bundles and an explicit pass/hold decision, old production remains frozen, `production_authorization=not_authorized`, and no stage-six reset or stage-eight backfill was started.
+- [x] 7.4 Verify all four reports have immutable audit bundles and an explicit pass/hold decision, old production remains frozen, `production_authorization=not_authorized`, and no stage-six reset or stage-eight backfill was started.
