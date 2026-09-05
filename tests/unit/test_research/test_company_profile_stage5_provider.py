@@ -817,8 +817,7 @@ def test_segment_financials_use_compact_rows_and_expand_locally() -> None:
     assert candidates[0]["dimension"] == "分产品"
     assert candidates[0]["source_native"]["header"] == "分产品"
     assert all(
-        candidate["subject_scope"] == "business_segment"
-        for candidate in candidates
+        candidate["subject_scope"] == "business_segment" for candidate in candidates
     )
 
 
