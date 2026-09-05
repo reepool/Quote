@@ -33,6 +33,7 @@ from research.company_profile.models import (
 )
 from research.company_profile.stage5 import PreparedPageContext, PreparedRequestScope
 from research.company_profile.stage5_provider import (
+    _SCOPE_INSTRUCTIONS,
     _TASK_INSTRUCTIONS,
     CommonGatewaySemanticProvider,
     _coverage_draft_schema,
@@ -130,6 +131,7 @@ def test_common_gateway_provider_sends_one_bounded_scope_and_stage4_schema() -> 
     envelope = json.loads(LlmMessage.from_value(gateway_request.messages[1]).content)
     assert envelope["request_scope"]["scope_id"] == prepared.scope_id
     assert envelope["request_scope"]["field_ids"] == ["business_overview_source"]
+    assert envelope["request_scope"]["scope_instructions"] == ""
     assert "page_contexts" in envelope["request_scope"]
     assert "evidence_bundle" not in envelope["runtime_request"]
     assert len(envelope["runtime_request"]["evidence_catalog"]) == 1
@@ -175,6 +177,226 @@ def test_common_gateway_provider_sends_one_bounded_scope_and_stage4_schema() -> 
     )
     assert provider.traces[0].call_type == "extract"
     assert provider.traces[0].status == "success"
+
+
+@pytest.mark.parametrize(
+    ("scope_id", "required_text"),
+    [
+        ("capacity_and_processing_narrative", "do not emit a second sales_volume"),
+        ("procurement_mode", "to invent named material inputs"),
+        ("top_five_customer_totals_only", "This request scope is totals-only"),
+        ("top_five_supplier_totals_only", "This request scope is totals-only"),
+    ],
+)
+def test_common_gateway_provider_adds_frozen_scope_instructions(
+    scope_id: str,
+    required_text: str,
+) -> None:
+    prepared = _prepared_scope().model_copy(update={"scope_id": scope_id})
+    request = _extract_request(prepared)
+    client = _FakeGatewayClient(
+        outputs=[
+            {
+                "schema_version": "company_profile_extract_response.v1",
+                "request_id": request.request_id,
+                "items": [],
+            }
+        ]
+    )
+    provider = CommonGatewaySemanticProvider(
+        client=client,
+        profile="semantic_extraction",
+        prepared_scope=prepared,
+        max_output_tokens=2000,
+        timeout_seconds=30,
+    )
+
+    provider.extract(request)
+
+    user_content = LlmMessage.from_value(client.requests[0].messages[1]).content
+    if user_content.startswith("{"):
+        envelope = json.loads(user_content)
+        instructions = envelope["request_scope"]["scope_instructions"]
+    else:
+        instructions = user_content
+    assert required_text in instructions
+    assert required_text in _SCOPE_INSTRUCTIONS[scope_id]
+
+
+def test_procurement_mode_uses_flat_draft_and_reconstructs_mechanical_fields() -> None:
+    prepared = _prepared_scope().model_copy(
+        update={
+            "scope_id": "procurement_mode",
+            "chapter_task": ChapterTask.EXTRACT_MATERIAL_INPUTS,
+            "field_ids": ("material_input",),
+        }
+    )
+    request = _material_input_extract_request(prepared)
+    client = _FakeGatewayClient(
+        outputs=[
+            {
+                "material_inputs": [],
+                "coverage": {
+                    "status": "not_disclosed",
+                    "reason_code": "source_reason_unspecified",
+                },
+            }
+        ]
+    )
+    provider = CommonGatewaySemanticProvider(
+        client=client,
+        profile="semantic_extraction",
+        prepared_scope=prepared,
+        max_output_tokens=1000,
+        timeout_seconds=30,
+    )
+
+    response = provider.extract(request)
+    assert not LlmMessage.from_value(client.requests[0].messages[1]).content.startswith(
+        "{"
+    )
+
+    schema = client.requests[0].response_schema
+    assert set(schema["properties"]) == {"material_inputs", "coverage"}
+    assert "subject_scope" not in json.dumps(schema)
+    assert response["items"][0]["coverage"]["field_id"] == "material_input"
+    assert response["items"][0]["coverage"]["status"] == "not_disclosed"
+
+
+def test_totals_only_schema_cannot_emit_relationship_and_expands_measurement() -> None:
+    prepared = _prepared_scope().model_copy(
+        update={
+            "scope_id": "top_five_supplier_totals_only",
+            "chapter_task": ChapterTask.EXTRACT_COUNTERPARTIES_AND_CONCENTRATION,
+            "field_ids": ("counterparty_relationship", "supplier_concentration"),
+        }
+    )
+    request = _supplier_totals_extract_request(prepared)
+    evidence_id = prepared.evidence_bundle[0].evidence.evidence_id
+    client = _FakeGatewayClient(
+        outputs=[
+            {
+                "measurements": [
+                    {
+                        "metric_type": "disclosed_share",
+                        "name": "前五名供应商采购额占年度采购总额",
+                        "value": "13.98",
+                        "unit": "%",
+                        "evidence_id": evidence_id,
+                    }
+                ],
+            }
+        ]
+    )
+    provider = CommonGatewaySemanticProvider(
+        client=client,
+        profile="semantic_extraction",
+        prepared_scope=prepared,
+        max_output_tokens=1000,
+        timeout_seconds=30,
+    )
+
+    response = provider.extract(request)
+    assert not LlmMessage.from_value(client.requests[0].messages[1]).content.startswith(
+        "{"
+    )
+
+    schema_text = json.dumps(client.requests[0].response_schema)
+    assert "Relationship" not in schema_text
+    candidate = response["items"][0]["candidate"]
+    assert candidate["field_id"] == "supplier_concentration"
+    assert candidate["subject_scope"] == "unclear"
+    assert candidate["reported_period"] == "2025年度"
+    assert response["items"][1]["coverage"]["status"] == "not_disclosed"
+
+
+def test_stage5_capacity_processing_scope_uses_flat_measurements() -> None:
+    prepared = _prepared_scope().model_copy(
+        update={
+            "scope_id": "capacity_and_processing_narrative",
+            "chapter_task": ChapterTask.EXTRACT_OPERATING_QUANTITIES,
+            "field_ids": ("production_capacity", "processing_volume"),
+        }
+    )
+    statuses = (
+        CoverageStatus.OBSERVED,
+        CoverageStatus.EXTRACTION_FAILED,
+        CoverageStatus.UNCLEAR,
+    )
+    metrics = (MetricType.PRODUCTION_CAPACITY, MetricType.PROCESSING_VOLUME)
+    checklist = tuple(
+        ChecklistItem(
+            field_id=metric.value,
+            object_type=ObjectType.MEASUREMENT,
+            chapter_task=ChapterTask.EXTRACT_OPERATING_QUANTITIES,
+            requirement_level=RequirementLevel.CONDITIONAL,
+            allowed_coverage_statuses=statuses,
+            allowed_metric_types=(metric,),
+        )
+        for metric in metrics
+    )
+    request = SemanticTaskRequest(
+        request_id="slice-1:capacity-processing",
+        report=prepared.report,
+        package_manifest=PackageManifest(
+            package_name="manufacturing_materials",
+            package_version="v1",
+            report=prepared.report,
+            checklist=checklist,
+        ),
+        chapter_task=prepared.chapter_task,
+        evidence_bundle=prepared.evidence_bundle,
+        allowed_object_types=(ObjectType.MEASUREMENT,),
+        allowed_metric_types=metrics,
+        unresolved_field_ids=prepared.field_ids,
+    )
+    evidence_id = prepared.evidence_bundle[0].evidence.evidence_id
+    client = _FakeGatewayClient(
+        outputs=[
+            {
+                "production_capacity": [
+                    {
+                        "name": "负极材料有效产能",
+                        "value": "21.0",
+                        "unit": "万吨",
+                        "capacity_kind": "effective_capacity",
+                        "evidence_id": evidence_id,
+                    }
+                ],
+                "processing_volume": [
+                    {
+                        "name": "涂覆加工量（销量）",
+                        "value": "109.42",
+                        "unit": "亿㎡",
+                        "evidence_id": evidence_id,
+                    }
+                ],
+            }
+        ]
+    )
+    provider = CommonGatewaySemanticProvider(
+        client=client,
+        profile="semantic_extraction",
+        prepared_scope=prepared,
+        max_output_tokens=2000,
+        timeout_seconds=30,
+    )
+
+    response = provider.extract(request)
+
+    schema = client.requests[0].response_schema
+    assert set(schema["properties"]) == {"production_capacity", "processing_volume"}
+    assert not LlmMessage.from_value(client.requests[0].messages[1]).content.startswith(
+        "{"
+    )
+    candidates = [item["candidate"] for item in response["items"]]
+    assert [item["field_id"] for item in candidates] == [
+        "production_capacity",
+        "processing_volume",
+    ]
+    assert candidates[0]["capacity_kind"] == "effective_capacity"
+    assert candidates[1]["processing_direction"] == "external_service_provided"
+    assert candidates[1]["logical_slot"] == "processing_volume"
 
 
 def test_segment_financials_use_compact_rows_and_expand_locally() -> None:
@@ -391,7 +613,7 @@ def test_segment_financials_report_the_rejected_source_label() -> None:
     assert "其他业务" in (provider.traces[0].error_detail or "")
 
 
-def test_consolidation_adjustment_allows_internal_dimension_only() -> None:
+def test_consolidation_adjustment_normalizes_internal_dimension() -> None:
     prepared = _segment_prepared_scope()
     evidence = prepared.evidence_bundle[0].evidence.model_copy(
         update={
@@ -410,7 +632,7 @@ def test_consolidation_adjustment_allows_internal_dimension_only() -> None:
     compact = _segment_row_response(
         request_id=request.request_id,
         evidence_id=evidence.evidence_id,
-        dimension="adjustment",
+        dimension="分产品",
         label="分部间抵销",
         row_class="consolidation_adjustment",
     )
@@ -423,6 +645,36 @@ def test_consolidation_adjustment_allows_internal_dimension_only() -> None:
 
     assert expanded["items"][0]["candidate"]["dimension"] == "adjustment"
     assert expanded["items"][0]["candidate"]["row_class"] == "consolidation_adjustment"
+
+
+def test_consolidation_adjustment_requires_explicit_adjustment_label() -> None:
+    prepared = _segment_prepared_scope()
+    evidence = prepared.evidence_bundle[0].evidence.model_copy(
+        update={
+            "anchor": TextAnchor(bounded_quote="分产品 新能源电池材料与服务 100 80 20%")
+        }
+    )
+    prepared = prepared.model_copy(
+        update={
+            "evidence_bundle": (PreparedEvidence(evidence=evidence),),
+            "source_row_dimensions": {},
+        }
+    )
+    request = _segment_extract_request(prepared)
+    compact = _segment_row_response(
+        request_id=request.request_id,
+        evidence_id=evidence.evidence_id,
+        dimension="分产品",
+        label="新能源电池材料与服务",
+        row_class="consolidation_adjustment",
+    )
+
+    with pytest.raises(ValueError, match="explicitly identify an adjustment"):
+        _expand_extract_response(
+            compact,
+            request=request,
+            prepared_scope=prepared,
+        )
 
 
 def test_provider_expands_compact_report_and_evidence_references() -> None:
@@ -838,6 +1090,75 @@ def _capacity_extract_request(
             MetricType.CAPACITY_UNDER_CONSTRUCTION,
         ),
         unresolved_field_ids=prepared.field_ids,
+    )
+
+
+def _material_input_extract_request(
+    prepared: PreparedRequestScope,
+) -> SemanticTaskRequest:
+    checklist = ChecklistItem(
+        field_id="material_input",
+        object_type=ObjectType.RELATIONSHIP,
+        chapter_task=ChapterTask.EXTRACT_MATERIAL_INPUTS,
+        requirement_level=RequirementLevel.CONDITIONAL,
+        allowed_coverage_statuses=tuple(CoverageStatus),
+    )
+    return SemanticTaskRequest(
+        request_id="material-input-request",
+        report=prepared.report,
+        package_manifest=PackageManifest(
+            package_name="manufacturing_materials",
+            package_version="v1",
+            report=prepared.report,
+            checklist=(checklist,),
+        ),
+        chapter_task=ChapterTask.EXTRACT_MATERIAL_INPUTS,
+        evidence_bundle=prepared.evidence_bundle,
+        allowed_object_types=(ObjectType.RELATIONSHIP,),
+        unresolved_field_ids=("material_input",),
+    )
+
+
+def _supplier_totals_extract_request(
+    prepared: PreparedRequestScope,
+) -> SemanticTaskRequest:
+    checklist = (
+        ChecklistItem(
+            field_id="counterparty_relationship",
+            object_type=ObjectType.RELATIONSHIP,
+            chapter_task=ChapterTask.EXTRACT_COUNTERPARTIES_AND_CONCENTRATION,
+            requirement_level=RequirementLevel.CONDITIONAL,
+            allowed_coverage_statuses=tuple(CoverageStatus),
+        ),
+        ChecklistItem(
+            field_id="supplier_concentration",
+            object_type=ObjectType.MEASUREMENT,
+            chapter_task=ChapterTask.EXTRACT_COUNTERPARTIES_AND_CONCENTRATION,
+            requirement_level=RequirementLevel.CONDITIONAL,
+            allowed_coverage_statuses=tuple(CoverageStatus),
+            allowed_metric_types=(
+                MetricType.SUPPLIER_PURCHASE_AMOUNT,
+                MetricType.DISCLOSED_SHARE,
+            ),
+        ),
+    )
+    return SemanticTaskRequest(
+        request_id="supplier-totals-request",
+        report=prepared.report,
+        package_manifest=PackageManifest(
+            package_name="manufacturing_materials",
+            package_version="v1",
+            report=prepared.report,
+            checklist=checklist,
+        ),
+        chapter_task=ChapterTask.EXTRACT_COUNTERPARTIES_AND_CONCENTRATION,
+        evidence_bundle=prepared.evidence_bundle,
+        allowed_object_types=(ObjectType.RELATIONSHIP, ObjectType.MEASUREMENT),
+        allowed_metric_types=(
+            MetricType.SUPPLIER_PURCHASE_AMOUNT,
+            MetricType.DISCLOSED_SHARE,
+        ),
+        unresolved_field_ids=("counterparty_relationship", "supplier_concentration"),
     )
 
 
