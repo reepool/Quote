@@ -5,6 +5,7 @@ from dataclasses import dataclass, field
 from typing import Any
 
 import pytest
+from jsonschema import Draft202012Validator
 
 from research.company_profile.contracts import (
     ChecklistItem,
@@ -190,7 +191,9 @@ def test_common_gateway_provider_sends_one_bounded_scope_and_stage4_schema() -> 
         ("top_five_customer_totals_only", "This request scope is totals-only"),
         ("top_five_supplier_totals_only", "This request scope is totals-only"),
         ("quantity_disclosure_check", "do not infer quantities from"),
+        ("classified_volume_not_available", "not a parser or table-context failure"),
         ("reported_business_change", "emit coverage for business_regime"),
+        ("same_control_comparison_basis", "not as Segment rows"),
     ],
 )
 def test_common_gateway_provider_adds_frozen_scope_instructions(
@@ -504,6 +507,226 @@ def test_stage5_capacity_processing_scope_uses_flat_measurements() -> None:
     assert candidates[1]["logical_slot"] == "processing_volume"
 
 
+def test_general_operating_scope_uses_compact_measurements_and_full_local_validation() -> (
+    None
+):
+    prepared = _prepared_scope().model_copy(
+        update={
+            "scope_id": "capacity_narrative",
+            "chapter_task": ChapterTask.EXTRACT_OPERATING_QUANTITIES,
+            "field_ids": ("production_capacity", "capacity_under_construction"),
+        }
+    )
+    request = _capacity_extract_request(prepared)
+    evidence_id = prepared.evidence_bundle[0].evidence.evidence_id
+    client = _FakeGatewayClient(
+        outputs=[
+            {
+                "measurements": [
+                    {
+                        "metric_type": "production_capacity",
+                        "name": "报告期内产能",
+                        "value": "772",
+                        "unit": "GWh",
+                        "capacity_kind": "report_period_capacity",
+                        "evidence_id": evidence_id,
+                    },
+                    {
+                        "metric_type": "capacity_under_construction",
+                        "name": "在建产能",
+                        "value": "321",
+                        "unit": "GWh",
+                        "evidence_id": evidence_id,
+                    },
+                ],
+                "coverage": [],
+            }
+        ]
+    )
+    provider = CommonGatewaySemanticProvider(
+        client=client,
+        profile="semantic_extraction",
+        prepared_scope=prepared,
+        max_output_tokens=1000,
+        timeout_seconds=30,
+    )
+
+    response = provider.extract(request)
+
+    assert set(client.requests[0].response_schema["properties"]) == {
+        "measurements",
+        "coverage",
+    }
+    candidates = [item["candidate"] for item in response["items"]]
+    assert [item["field_id"] for item in candidates] == [
+        "production_capacity",
+        "capacity_under_construction",
+    ]
+    assert candidates[0]["capacity_kind"] == "report_period_capacity"
+    assert candidates[1]["capacity_kind"] is None
+
+
+def test_non_totals_counterparty_scope_uses_compact_relationships_and_measurements() -> (
+    None
+):
+    prepared = _prepared_scope().model_copy(
+        update={
+            "scope_id": "supplier_ranking_rows",
+            "chapter_task": ChapterTask.EXTRACT_COUNTERPARTIES_AND_CONCENTRATION,
+            "field_ids": ("counterparty_relationship", "supplier_concentration"),
+        }
+    )
+    request = _supplier_totals_extract_request(prepared)
+    evidence_id = prepared.evidence_bundle[0].evidence.evidence_id
+    client = _FakeGatewayClient(
+        outputs=[
+            {
+                "relationships": [
+                    {
+                        "relation_type": "supplier",
+                        "name": "供应商A",
+                        "identity_class": "report_local_anonymous",
+                        "evidence_id": evidence_id,
+                    }
+                ],
+                "measurements": [
+                    {
+                        "metric_type": "supplier_purchase_amount",
+                        "name": "供应商A采购额",
+                        "value": "100",
+                        "unit": "万元",
+                        "evidence_id": evidence_id,
+                    }
+                ],
+                "coverage": [],
+            }
+        ]
+    )
+    provider = CommonGatewaySemanticProvider(
+        client=client,
+        profile="semantic_extraction",
+        prepared_scope=prepared,
+        max_output_tokens=1000,
+        timeout_seconds=30,
+    )
+
+    response = provider.extract(request)
+
+    assert set(client.requests[0].response_schema["properties"]) == {
+        "relationships",
+        "measurements",
+        "coverage",
+    }
+    relationship, measurement = [item["candidate"] for item in response["items"]]
+    assert relationship["identity_class"] == "report_local_anonymous"
+    assert relationship["field_id"] == "counterparty_relationship"
+    assert measurement["field_id"] == "supplier_concentration"
+    assert measurement["logical_slot"] == "supplier_purchase_amount"
+
+
+def test_material_input_scope_can_return_observed_items_without_false_coverage() -> (
+    None
+):
+    prepared = _prepared_scope().model_copy(
+        update={
+            "scope_id": "material_risk_disclosure",
+            "chapter_task": ChapterTask.EXTRACT_MATERIAL_INPUTS,
+            "field_ids": ("material_input",),
+        }
+    )
+    request = _material_input_extract_request(prepared)
+    evidence_id = prepared.evidence_bundle[0].evidence.evidence_id
+    client = _FakeGatewayClient(
+        outputs=[
+            {
+                "material_inputs": [{"name": "正极材料", "evidence_id": evidence_id}],
+                "coverage": None,
+            }
+        ]
+    )
+    provider = CommonGatewaySemanticProvider(
+        client=client,
+        profile="semantic_extraction",
+        prepared_scope=prepared,
+        max_output_tokens=1000,
+        timeout_seconds=30,
+    )
+
+    response = provider.extract(request)
+
+    assert response["items"][0]["candidate"]["object_name"] == "正极材料"
+    assert all("coverage" not in item for item in response["items"])
+
+
+def test_business_regime_scope_uses_compact_events_and_restores_full_record() -> None:
+    prepared = _prepared_scope().model_copy(
+        update={
+            "scope_id": "equity_transfer_effective",
+            "chapter_task": ChapterTask.EXTRACT_BUSINESS_REGIME,
+            "field_ids": ("business_regime",),
+        }
+    )
+    checklist = ChecklistItem(
+        field_id="business_regime",
+        object_type=ObjectType.BUSINESS_EVENT,
+        chapter_task=ChapterTask.EXTRACT_BUSINESS_REGIME,
+        requirement_level=RequirementLevel.REQUIRED,
+        allowed_coverage_statuses=tuple(CoverageStatus),
+    )
+    request = SemanticTaskRequest(
+        request_id="business-regime-request",
+        report=prepared.report,
+        package_manifest=PackageManifest(
+            package_name="manufacturing_materials",
+            package_version="v1",
+            report=prepared.report,
+            checklist=(checklist,),
+        ),
+        chapter_task=prepared.chapter_task,
+        evidence_bundle=prepared.evidence_bundle,
+        allowed_object_types=(
+            ObjectType.BUSINESS_EVENT,
+            ObjectType.BUSINESS_REGIME,
+            ObjectType.INDUSTRY_PACKAGE_ASSIGNMENT,
+        ),
+        unresolved_field_ids=prepared.field_ids,
+    )
+    evidence_id = prepared.evidence_bundle[0].evidence.evidence_id
+    client = _FakeGatewayClient(
+        outputs=[
+            {
+                "events": [
+                    {
+                        "event_type": "equity_transfer_effective",
+                        "description": "成飞100.00%的股权完成过户",
+                        "event_date": "2025-01-06",
+                        "regime_effective_at": "2025-01-06",
+                        "evidence_id": evidence_id,
+                    }
+                ],
+                "regimes": [],
+                "package_assignments": [],
+                "coverage": [],
+            }
+        ]
+    )
+    provider = CommonGatewaySemanticProvider(
+        client=client,
+        profile="semantic_extraction",
+        prepared_scope=prepared,
+        max_output_tokens=1000,
+        timeout_seconds=30,
+    )
+
+    response = provider.extract(request)
+
+    candidate = response["items"][0]["candidate"]
+    assert candidate["object_type"] == "BusinessEvent"
+    assert candidate["event_date"] == "2025-01-06"
+    assert candidate["regime_effective_at"] == "2025-01-06"
+    assert candidate["evidence"][0]["evidence_id"] == evidence_id
+
+
 def test_segment_financials_use_compact_rows_and_expand_locally() -> None:
     prepared = _segment_prepared_scope()
     request = _segment_extract_request(prepared)
@@ -644,6 +867,68 @@ def test_same_page_totals_in_different_dimensions_are_distinct_occurrences() -> 
     assert records[0].occurrence_id() != records[1].occurrence_id()
 
 
+def test_same_control_comparison_uses_measurement_contract_not_segment_rows() -> None:
+    prepared = _prepared_scope().model_copy(
+        update={
+            "scope_id": "same_control_comparison_basis",
+            "chapter_task": ChapterTask.EXTRACT_SEGMENT_FINANCIALS,
+            "field_ids": ("operating_revenue",),
+        }
+    )
+    checklist = ChecklistItem(
+        field_id="operating_revenue",
+        object_type=ObjectType.MEASUREMENT,
+        chapter_task=ChapterTask.EXTRACT_SEGMENT_FINANCIALS,
+        requirement_level=RequirementLevel.CONDITIONAL,
+        allowed_coverage_statuses=tuple(CoverageStatus),
+        allowed_metric_types=(MetricType.OPERATING_REVENUE,),
+    )
+    request = SemanticTaskRequest(
+        request_id="same-control-comparison-request",
+        report=prepared.report,
+        package_manifest=PackageManifest(
+            package_name="manufacturing_materials",
+            package_version="v1",
+            report=prepared.report,
+            checklist=(checklist,),
+        ),
+        chapter_task=prepared.chapter_task,
+        evidence_bundle=prepared.evidence_bundle,
+        allowed_object_types=(ObjectType.MEASUREMENT,),
+        allowed_metric_types=(MetricType.OPERATING_REVENUE,),
+        unresolved_field_ids=prepared.field_ids,
+    )
+    evidence_id = prepared.evidence_bundle[0].evidence.evidence_id
+    expanded = _expand_extract_response(
+        {
+            "measurements": [
+                {
+                    "metric_type": "operating_revenue",
+                    "name": "营业收入",
+                    "value": "65047476349.46",
+                    "unit": "元",
+                    "header": "调整后",
+                    "is_restated_comparative": True,
+                    "comparison_basis": "same_control_restated",
+                    "evidence_id": evidence_id,
+                }
+            ],
+            "coverage": [],
+        },
+        request=request,
+        prepared_scope=prepared,
+    )
+
+    schema = _minimal_extract_schema(request, prepared_scope=prepared)
+    assert set(schema["properties"]) == {"measurements", "coverage"}
+    candidate = ExtractResponse.model_validate_json(
+        json.dumps(expanded, ensure_ascii=False)
+    ).candidates()[0]
+    assert candidate.object_type == "Measurement"
+    assert candidate.is_restated_comparative is True
+    assert candidate.comparison_basis.value == "same_control_restated"
+
+
 def test_measurement_schema_scopes_capacity_kind_to_metric_type() -> None:
     prepared = _prepared_scope().model_copy(
         update={
@@ -655,23 +940,32 @@ def test_measurement_schema_scopes_capacity_kind_to_metric_type() -> None:
     request = _capacity_extract_request(prepared)
 
     schema = _minimal_extract_schema(request, prepared_scope=prepared)
-    candidate_schemas = schema["properties"]["items"]["items"]["oneOf"][0][
-        "properties"
-    ]["candidate"]["oneOf"]
-    by_metric = {
-        item["properties"]["metric_type"]["enum"][0]: item for item in candidate_schemas
+    item_schema = schema["properties"]["measurements"]["items"]
+    evidence_id = prepared.evidence_bundle[0].evidence.evidence_id
+    base = {
+        "name": "产能",
+        "value": "10",
+        "unit": "GWh",
+        "evidence_id": evidence_id,
     }
+    validator = Draft202012Validator(item_schema)
 
-    production = by_metric["production_capacity"]
-    under_construction = by_metric["capacity_under_construction"]
-    assert production["properties"]["field_id"] == {"const": "production_capacity"}
-    assert "capacity_kind" in production["properties"]
-    assert "capacity_kind" in production["required"]
-    assert under_construction["properties"]["field_id"] == {
-        "const": "capacity_under_construction"
-    }
-    assert "capacity_kind" not in under_construction["properties"]
-    assert "capacity_kind" not in under_construction["required"]
+    assert validator.is_valid(
+        {
+            **base,
+            "metric_type": "production_capacity",
+            "capacity_kind": "report_period_capacity",
+        }
+    )
+    assert not validator.is_valid({**base, "metric_type": "production_capacity"})
+    assert validator.is_valid({**base, "metric_type": "capacity_under_construction"})
+    assert not validator.is_valid(
+        {
+            **base,
+            "metric_type": "capacity_under_construction",
+            "capacity_kind": "design_capacity",
+        }
+    )
 
 
 def test_coverage_schema_requires_typed_reason_for_not_disclosed() -> None:

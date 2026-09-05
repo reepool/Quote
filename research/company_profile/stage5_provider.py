@@ -79,7 +79,9 @@ _TASK_INSTRUCTIONS = {
     ),
     "extract_material_inputs": (
         "Extract only explicitly named material inputs and their stated relationship; "
-        "do not infer materials from industry knowledge."
+        "do not infer materials from industry knowledge. When at least one material input "
+        "is emitted, return coverage=null. When none is explicitly named, return legal-empty "
+        "coverage with the source-supported non-observed status and reason code."
     ),
     "extract_counterparties_and_concentration": (
         "Keep named, report-local anonymous, and report-local aggregate identities "
@@ -140,12 +142,25 @@ _SCOPE_INSTRUCTIONS = {
         "because the requested quantity is absent, and do not infer quantities from "
         "capacity, project investment, revenue, or inventory accounting tables."
     ),
+    "classified_volume_not_available": (
+        "The source explicitly states that physical sales products are too numerous to "
+        "classify and report. This is a disclosure outcome, not a parser or table-context "
+        "failure. Emit exactly one coverage item for every requested quantity field with "
+        "status=not_disclosed and reason_code=source_reason_unspecified; emit no "
+        "Measurement."
+    ),
     "reported_business_change": (
         "For an explicit annual-report checkbox such as 合并报表范围的变化情况：□适用 "
         "√不适用, emit coverage for business_regime with status=not_applicable and "
         "reason_code=source_explicitly_not_applicable; do not fabricate a BusinessEvent. "
         "Only emit a BusinessEvent when the source explicitly states a change, event date, "
         "or effective date."
+    ),
+    "same_control_comparison_basis": (
+        "Extract the disclosed revenue comparison columns as separate Measurements, not "
+        "as Segment rows. Preserve each source column header and value. Mark a restated "
+        "comparative with is_restated_comparative=true and the source-supported "
+        "comparison_basis; never overwrite the original-as-published value."
     ),
 }
 
@@ -156,6 +171,7 @@ _FLAT_EXTRACT_SCOPES = {
     "top_five_customer_totals_only",
     "top_five_supplier_totals_only",
     "quantity_disclosure_check",
+    "classified_volume_not_available",
     "reported_business_change",
 }
 
@@ -557,23 +573,34 @@ def _minimal_extract_schema(
 ) -> dict[str, Any]:
     if prepared_scope is not None and prepared_scope.scope_id == "business_overview":
         return _business_overview_extract_schema(request, prepared_scope)
-    if prepared_scope is not None and prepared_scope.scope_id == "procurement_mode":
+    if request.chapter_task.value == "extract_material_inputs":
         return _material_input_extract_schema()
     if prepared_scope is not None and prepared_scope.scope_id in {
         "top_five_customer_totals_only",
         "top_five_supplier_totals_only",
     }:
         return _totals_only_extract_schema(request)
-    if (
-        prepared_scope is not None
-        and prepared_scope.scope_id == "quantity_disclosure_check"
-    ):
+    if prepared_scope is not None and prepared_scope.scope_id in {
+        "quantity_disclosure_check",
+        "classified_volume_not_available",
+    }:
         return _coverage_only_extract_schema(request)
     if (
         prepared_scope is not None
         and prepared_scope.scope_id == "capacity_and_processing_narrative"
     ):
         return _compact_operating_measurement_schema(request, prepared_scope)
+    if request.chapter_task.value == "extract_operating_quantities":
+        return _compact_measurements_extract_schema(request, prepared_scope)
+    if request.chapter_task.value == "extract_counterparties_and_concentration":
+        return _counterparty_extract_schema(request, prepared_scope)
+    if request.chapter_task.value == "extract_business_regime":
+        return _business_regime_extract_schema(request, prepared_scope)
+    if (
+        prepared_scope is not None
+        and prepared_scope.scope_id == "same_control_comparison_basis"
+    ):
+        return _compact_measurements_extract_schema(request, prepared_scope)
     if request.chapter_task.value == "extract_segment_financials":
         return _segment_row_extract_schema(request, prepared_scope=prepared_scope)
     field_ids = list(request.unresolved_field_ids)
@@ -761,7 +788,7 @@ def _material_input_extract_schema() -> dict[str, Any]:
                 "type": "array",
                 "items": relationship_schema,
             },
-            "coverage": coverage_schema,
+            "coverage": {"oneOf": [coverage_schema, {"type": "null"}]},
         },
     }
 
@@ -840,6 +867,238 @@ def _compact_operating_measurement_schema(
         "properties": {
             "production_capacity": {"type": "array", "items": capacity_item},
             "processing_volume": {"type": "array", "items": processing_item},
+        },
+    }
+
+
+def _evidence_id_schema(
+    prepared_scope: PreparedRequestScope | None,
+) -> dict[str, Any]:
+    if prepared_scope is None:
+        return {"type": "string"}
+    evidence_ids = list(
+        dict.fromkeys(
+            item.evidence.evidence_id for item in prepared_scope.evidence_bundle
+        )
+    )
+    return {"enum": evidence_ids} if evidence_ids else {"type": "string"}
+
+
+def _compact_measurement_item_schema(
+    request: SemanticTaskRequest,
+    prepared_scope: PreparedRequestScope | None,
+) -> dict[str, Any]:
+    return {
+        "type": "object",
+        "additionalProperties": False,
+        "required": ["metric_type", "name", "value", "unit", "evidence_id"],
+        "properties": {
+            "metric_type": {
+                "enum": [item.value for item in request.allowed_metric_types]
+            },
+            "name": {"type": "string"},
+            "value": {"type": "string"},
+            "unit": {"type": "string"},
+            "header": {"type": "string"},
+            "qualifier": {"type": "string"},
+            "footnote_refs": {"type": "array", "items": {"type": "string"}},
+            "source_aliases": {"type": "array", "items": {"type": "string"}},
+            "measured_object": {"type": "string"},
+            "capacity_kind": {
+                "enum": [
+                    "report_period_capacity",
+                    "effective_capacity",
+                    "design_capacity",
+                    "source_native_other",
+                    "unclear",
+                ]
+            },
+            "processing_direction": {"enum": ["external_service_provided"]},
+            "is_restated_comparative": {"type": "boolean"},
+            "comparison_basis": {
+                "enum": [
+                    "current_period_after_restructuring",
+                    "same_control_restated",
+                    "original_as_published",
+                    "source_native_other",
+                    "unclear",
+                ]
+            },
+            "relationship_context": {"type": "string"},
+            "evidence_id": _evidence_id_schema(prepared_scope),
+        },
+        "allOf": [
+            {
+                "if": {"properties": {"metric_type": {"const": "production_capacity"}}},
+                "then": {"required": ["capacity_kind"]},
+                "else": {"not": {"required": ["capacity_kind"]}},
+            },
+            {
+                "if": {"properties": {"metric_type": {"const": "processing_volume"}}},
+                "then": {"required": ["processing_direction"]},
+                "else": {"not": {"required": ["processing_direction"]}},
+            },
+            {
+                "if": {
+                    "properties": {"is_restated_comparative": {"const": True}},
+                    "required": ["is_restated_comparative"],
+                },
+                "then": {"required": ["comparison_basis"]},
+            },
+        ],
+    }
+
+
+def _compact_coverage_array_schema(
+    request: SemanticTaskRequest,
+) -> dict[str, Any]:
+    statuses = _allowed_non_observed_coverage_statuses(request)
+    if not statuses:
+        return {"type": "array", "maxItems": 0}
+    return {
+        "type": "array",
+        "items": _coverage_draft_schema(
+            field_ids=list(request.unresolved_field_ids),
+            statuses=statuses,
+        ),
+    }
+
+
+def _compact_measurements_extract_schema(
+    request: SemanticTaskRequest,
+    prepared_scope: PreparedRequestScope | None,
+) -> dict[str, Any]:
+    """Use a small model contract while retaining full local Pydantic checks."""
+
+    return {
+        "type": "object",
+        "additionalProperties": False,
+        "required": ["measurements", "coverage"],
+        "properties": {
+            "measurements": {
+                "type": "array",
+                "items": _compact_measurement_item_schema(request, prepared_scope),
+            },
+            "coverage": _compact_coverage_array_schema(request),
+        },
+    }
+
+
+def _counterparty_extract_schema(
+    request: SemanticTaskRequest,
+    prepared_scope: PreparedRequestScope | None,
+) -> dict[str, Any]:
+    evidence_id = _evidence_id_schema(prepared_scope)
+    return {
+        "type": "object",
+        "additionalProperties": False,
+        "required": ["relationships", "measurements", "coverage"],
+        "properties": {
+            "relationships": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "additionalProperties": False,
+                    "required": [
+                        "relation_type",
+                        "name",
+                        "identity_class",
+                        "evidence_id",
+                    ],
+                    "properties": {
+                        "relation_type": {
+                            "enum": [
+                                "customer",
+                                "supplier",
+                                "related_party",
+                                "contract_counterparty",
+                            ]
+                        },
+                        "name": {"type": "string"},
+                        "identity_class": {
+                            "enum": [
+                                "named",
+                                "report_local_anonymous",
+                                "report_local_aggregate",
+                            ]
+                        },
+                        "external_entity_id": {"type": "string"},
+                        "evidence_id": evidence_id,
+                    },
+                },
+            },
+            "measurements": {
+                "type": "array",
+                "items": _compact_measurement_item_schema(request, prepared_scope),
+            },
+            "coverage": _compact_coverage_array_schema(request),
+        },
+    }
+
+
+def _business_regime_extract_schema(
+    request: SemanticTaskRequest,
+    prepared_scope: PreparedRequestScope | None,
+) -> dict[str, Any]:
+    evidence_id = _evidence_id_schema(prepared_scope)
+    event_schema = {
+        "type": "object",
+        "additionalProperties": False,
+        "required": ["event_type", "description", "evidence_id"],
+        "properties": {
+            "event_type": {"type": "string"},
+            "description": {"type": "string"},
+            "event_date": {"type": "string"},
+            "regime_effective_at": {"type": "string"},
+            "comparison_basis": {
+                "enum": [
+                    "current_period_after_restructuring",
+                    "same_control_restated",
+                    "original_as_published",
+                    "source_native_other",
+                    "unclear",
+                ]
+            },
+            "evidence_id": evidence_id,
+        },
+    }
+    regime_schema = {
+        "type": "object",
+        "additionalProperties": False,
+        "required": ["label", "effective_from", "evidence_id"],
+        "properties": {
+            "label": {"type": "string"},
+            "effective_from": {"type": "string"},
+            "effective_to": {"type": "string"},
+            "evidence_id": evidence_id,
+        },
+    }
+    package_schema = {
+        "type": "object",
+        "additionalProperties": False,
+        "required": [
+            "package_name",
+            "package_version",
+            "effective_from",
+            "evidence_id",
+        ],
+        "properties": {
+            "package_name": {"type": "string"},
+            "package_version": {"type": "string"},
+            "effective_from": {"type": "string"},
+            "effective_to": {"type": "string"},
+            "evidence_id": evidence_id,
+        },
+    }
+    return {
+        "type": "object",
+        "additionalProperties": False,
+        "required": ["events", "regimes", "package_assignments", "coverage"],
+        "properties": {
+            "events": {"type": "array", "items": event_schema},
+            "regimes": {"type": "array", "items": regime_schema},
+            "package_assignments": {"type": "array", "items": package_schema},
+            "coverage": _compact_coverage_array_schema(request),
         },
     }
 
@@ -1315,6 +1574,197 @@ def _expand_segment_row_draft(
     return expanded
 
 
+def _compact_source_native(item: Mapping[str, Any]) -> dict[str, Any]:
+    return {
+        key: deepcopy(item[key])
+        for key in (
+            "name",
+            "value",
+            "unit",
+            "header",
+            "qualifier",
+            "footnote_refs",
+            "source_aliases",
+        )
+        if item.get(key) not in (None, "", [], {})
+    }
+
+
+def _expand_compact_measurements(
+    measurements: list[Any],
+    *,
+    field_id_for_metric: Callable[[str], str],
+    prepared_scope: PreparedRequestScope,
+) -> list[dict[str, Any]]:
+    expanded: list[dict[str, Any]] = []
+    for raw in measurements:
+        if not isinstance(raw, Mapping):
+            expanded.append(raw)
+            continue
+        item = dict(raw)
+        metric_type = str(item.get("metric_type") or "")
+        candidate = {
+            "object_type": "Measurement",
+            "field_id": field_id_for_metric(metric_type),
+            "metric_type": metric_type,
+            "measured_object": item.get("measured_object") or item.get("name"),
+            "subject_scope": "unclear",
+            "reported_period": _reported_period_label(prepared_scope),
+            "period_type": "duration",
+            "source_native": _compact_source_native(item),
+            "evidence_ids": [item.get("evidence_id")],
+        }
+        for key in (
+            "capacity_kind",
+            "processing_direction",
+            "is_restated_comparative",
+            "comparison_basis",
+            "relationship_context",
+        ):
+            if item.get(key) is not None:
+                candidate[key] = item[key]
+        expanded.append({"item_type": "candidate", "candidate": candidate})
+    return expanded
+
+
+def _append_compact_coverage(target: list[dict[str, Any]], coverage: Any) -> None:
+    if not isinstance(coverage, list):
+        return
+    target.extend(
+        {"item_type": "coverage", "coverage": deepcopy(item)}
+        for item in coverage
+        if isinstance(item, Mapping)
+    )
+
+
+def _expand_counterparty_draft(
+    result: dict[str, Any],
+    *,
+    request: SemanticTaskRequest,
+    prepared_scope: PreparedRequestScope,
+) -> None:
+    relationships = result.pop("relationships", [])
+    measurements = result.pop("measurements", [])
+    coverage = result.pop("coverage", [])
+    result["schema_version"] = "company_profile_extract_response.v1"
+    result["request_id"] = request.request_id
+    result["items"] = []
+    for raw in relationships:
+        if not isinstance(raw, Mapping):
+            result["items"].append(raw)
+            continue
+        item = dict(raw)
+        candidate = {
+            "object_type": "Relationship",
+            "field_id": "counterparty_relationship",
+            "relation_type": item.get("relation_type"),
+            "object_name": item.get("name"),
+            "identity_class": item.get("identity_class"),
+            "subject_scope": "unclear",
+            "reported_period": _reported_period_label(prepared_scope),
+            "period_type": "duration",
+            "source_native": {"name": item.get("name")},
+            "evidence_ids": [item.get("evidence_id")],
+        }
+        if item.get("external_entity_id") is not None:
+            candidate["external_entity_id"] = item["external_entity_id"]
+        result["items"].append({"item_type": "candidate", "candidate": candidate})
+    concentration_field = next(
+        (
+            field_id
+            for field_id in request.unresolved_field_ids
+            if field_id != "counterparty_relationship"
+        ),
+        "counterparty_relationship",
+    )
+    result["items"].extend(
+        _expand_compact_measurements(
+            measurements,
+            field_id_for_metric=lambda _: concentration_field,
+            prepared_scope=prepared_scope,
+        )
+    )
+    _append_compact_coverage(result["items"], coverage)
+
+
+def _expand_business_regime_draft(
+    result: dict[str, Any],
+    *,
+    request: SemanticTaskRequest,
+    prepared_scope: PreparedRequestScope,
+) -> None:
+    events = result.pop("events", [])
+    regimes = result.pop("regimes", [])
+    package_assignments = result.pop("package_assignments", [])
+    coverage = result.pop("coverage", [])
+    result["schema_version"] = "company_profile_extract_response.v1"
+    result["request_id"] = request.request_id
+    result["items"] = []
+    for raw in events:
+        if not isinstance(raw, Mapping):
+            result["items"].append(raw)
+            continue
+        item = dict(raw)
+        candidate = {
+            "object_type": "BusinessEvent",
+            "field_id": "business_regime",
+            "event_type": item.get("event_type"),
+            "description": item.get("description"),
+            "subject_scope": "unclear",
+            "reported_period": _reported_period_label(prepared_scope),
+            "period_type": "event",
+            "source_native": {
+                "name": item.get("event_type"),
+                "value": item.get("description"),
+            },
+            "evidence_ids": [item.get("evidence_id")],
+        }
+        for key in ("event_date", "regime_effective_at", "comparison_basis"):
+            if item.get(key) is not None:
+                candidate[key] = item[key]
+        result["items"].append({"item_type": "candidate", "candidate": candidate})
+    for raw in regimes:
+        if not isinstance(raw, Mapping):
+            result["items"].append(raw)
+            continue
+        item = dict(raw)
+        candidate = {
+            "object_type": "BusinessRegime",
+            "field_id": "business_regime",
+            "regime_label": item.get("label"),
+            "effective_from": item.get("effective_from"),
+            "subject_scope": "unclear",
+            "reported_period": _reported_period_label(prepared_scope),
+            "period_type": "event",
+            "source_native": {"name": item.get("label")},
+            "evidence_ids": [item.get("evidence_id")],
+        }
+        if item.get("effective_to") is not None:
+            candidate["effective_to"] = item["effective_to"]
+        result["items"].append({"item_type": "candidate", "candidate": candidate})
+    for raw in package_assignments:
+        if not isinstance(raw, Mapping):
+            result["items"].append(raw)
+            continue
+        item = dict(raw)
+        candidate = {
+            "object_type": "IndustryPackageAssignment",
+            "field_id": "business_regime",
+            "package_name": item.get("package_name"),
+            "package_version": item.get("package_version"),
+            "effective_from": item.get("effective_from"),
+            "subject_scope": "unclear",
+            "reported_period": _reported_period_label(prepared_scope),
+            "period_type": "event",
+            "source_native": {"name": item.get("package_name")},
+            "evidence_ids": [item.get("evidence_id")],
+        }
+        if item.get("effective_to") is not None:
+            candidate["effective_to"] = item["effective_to"]
+        result["items"].append({"item_type": "candidate", "candidate": candidate})
+    _append_compact_coverage(result["items"], coverage)
+
+
 def _expand_extract_response(
     data: Any,
     *,
@@ -1454,42 +1904,29 @@ def _expand_extract_response(
                 result["items"].append(
                     {"item_type": "candidate", "candidate": candidate}
                 )
-    elif isinstance(result.get("measurements"), list):
-        concentration_field = next(
-            field_id
-            for field_id in request.unresolved_field_ids
-            if field_id != "counterparty_relationship"
-        )
+    elif (
+        request.chapter_task.value == "extract_operating_quantities"
+        or prepared_scope.scope_id == "same_control_comparison_basis"
+    ) and isinstance(result.get("measurements"), list):
         measurements = result.pop("measurements")
+        coverage = result.pop("coverage", [])
         result["schema_version"] = "company_profile_extract_response.v1"
         result["request_id"] = request.request_id
-        result["items"] = [
-            {
-                "item_type": "candidate",
-                "candidate": {
-                    "object_type": "Measurement",
-                    "field_id": concentration_field,
-                    "metric_type": item["metric_type"],
-                    "measured_object": item.get("measured_object") or item["name"],
-                    "relationship_context": item.get("relationship_context"),
-                    "subject_scope": "unclear",
-                    "reported_period": _reported_period_label(prepared_scope),
-                    "period_type": "duration",
-                    "source_native": {
-                        "name": item["name"],
-                        "value": item["value"],
-                        "unit": item["unit"],
-                        "header": item.get("header"),
-                    },
-                    "evidence_ids": [item["evidence_id"]],
-                },
-            }
-            for item in measurements
-        ]
-        result["items"].append(
-            {
-                "item_type": "coverage",
-                "coverage": {
+        result["items"] = _expand_compact_measurements(
+            measurements,
+            field_id_for_metric=lambda metric_type: metric_type,
+            prepared_scope=prepared_scope,
+        )
+        _append_compact_coverage(result["items"], coverage)
+    elif (
+        request.chapter_task.value == "extract_counterparties_and_concentration"
+        and isinstance(result.get("measurements"), list)
+    ):
+        if "relationships" not in result:
+            result["relationships"] = []
+        if "coverage" not in result:
+            result["coverage"] = [
+                {
                     "field_id": "counterparty_relationship",
                     "status": "not_disclosed",
                     "reason_code": "source_reason_unspecified",
@@ -1497,9 +1934,24 @@ def _expand_extract_response(
                         item.evidence.evidence_id
                         for item in prepared_scope.evidence_bundle
                     ],
-                },
-            }
+                }
+            ]
+        _expand_counterparty_draft(
+            result,
+            request=request,
+            prepared_scope=prepared_scope,
         )
+    elif request.chapter_task.value == "extract_business_regime" and isinstance(
+        result.get("events"), list
+    ):
+        _expand_business_regime_draft(
+            result,
+            request=request,
+            prepared_scope=prepared_scope,
+        )
+    if isinstance(result.get("items"), list):
+        result.setdefault("schema_version", "company_profile_extract_response.v1")
+        result.setdefault("request_id", request.request_id)
     expanded_items: list[Any] = []
     for item in result.get("items", []):
         if not isinstance(item, dict):

@@ -4,7 +4,23 @@
 
 本包用于阶段 5 的研究复核，不代表生产批准、旧画像回填或商品暴露/供应链发布。当前 `production_authorization` 始终为 `not_authorized`。
 
-## 本次运行
+## 2026-09-05 超时优化与重跑更新
+
+阶段 5 的公共网关并非不可用。逐 scope 量化确认，阻塞来自模型侧仍接收通用候选并集：最重的成飞 `classified_volume_not_available` 页面文本仅约 1.7 KB，但 schema 指令约 14.5 KB。现已按 chapter task 收窄为任务专用草稿 schema，并由 adapter 确定性恢复完整 Pydantic 对象后继续执行原有 extract、最多一次 repair、独立 verify、Evidence identity 和生产隔离校验；没有删除字段、降低 validator 或使用 Gold 补值。
+
+本轮没有采用跨请求传输同一事实。原因是现有 request scope 已是批准的最小业务/Evidence 边界，先收窄模型输出合同即可解除超时；只有未来某个单 scope 在紧凑合同下仍超过有界预算时，才允许按独立表格行组或字段组拆分，并必须确定性合并回同一 `SemanticTaskRequest` 结果。
+
+真实验证结果：
+
+- 中航成飞完整 12-scope 新运行 `run-stage5-rerun-302132-luna-20260905-a` 共发起 23 次调用，所有请求在 120 秒预算内返回，`deadline_exceeded=0`、`provider_unavailable=0`；唯一 schema 路由问题是同一控制比较列误走 Segment 行合同。
+- 该比较列已改走 Measurement 草稿，并由 `run-stage5-rerun-302132-same-control-luna-20260905-b` 复验：extract/verify 均成功，五条营业收入记录保留 2024/2023 调整前后列，重述列带 `same_control_restated`。
+- 宁德时代 `top_five_customer_rows` 由 `run-stage5-proof-300750-customer-rows-20260905-a` 复验：extract/verify 均成功，17 条记录进入 `accepted_for_review`，名称关系与集中度 coverage 均为 `observed`。
+- 宁德时代 `capacity_narrative` 由 `run-stage5-proof-300750-quantity-regime-20260905-a` 复验：产能与在建产能均通过；业务变化仍因同一 scope 混有“合并范围变化”和“业务/产品变化不适用”而 hold，这是 Evidence scope/语义问题，不是传输问题。
+- 璞泰来 `segment_product_and_adjustment` 由 `run-stage5-rerun-603659-segment-adjustment-luna-20260905-c` 复验：extract/verify 均成功，20 条记录和四个字段 coverage 全部通过，包括合并抵消调整行。
+
+因此，阶段 5 的 LLM 超时已不再是当前 blocker。四报告仍保持研究 `hold`，剩余工作是对真实输出中的主体、Activity、合法空和业务变更 scope 做语义/Evidence 裁决，并完成 7.1/7.4；生产授权继续为 `not_authorized`。
+
+## 2026-09-04 基线运行
 
 - 运行目录：`var/company_profile_stage5/20260904/run-stage5-semantic-20260904-a`
 - 运行类型：四份批准年报的真实公共 LLM provider 竖切
