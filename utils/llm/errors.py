@@ -52,6 +52,11 @@ class LlmError(RuntimeError):
     request_hash: Optional[str] = None
     attempt_count: int = 0
     lineage: Optional[Mapping[str, Any]] = None
+    # Safe transport diagnostics.  These intentionally contain only a stable
+    # classification and exception type, never the provider exception text.
+    transport_error_type: Optional[str] = None
+    transport_phase: Optional[str] = None
+    transport_exception_type: Optional[str] = None
 
     def __post_init__(self) -> None:
         if self.code not in ERROR_CODES:
@@ -84,6 +89,9 @@ class LlmError(RuntimeError):
             "request_hash": self.request_hash,
             "attempt_count": self.attempt_count,
             "lineage": dict(self.lineage or {}),
+            "transport_error_type": self.transport_error_type,
+            "transport_phase": self.transport_phase,
+            "transport_exception_type": self.transport_exception_type,
         }
 
 

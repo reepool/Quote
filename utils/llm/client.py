@@ -294,7 +294,9 @@ class LlmClient:
                     llm_logger.warning(
                         "event=llm.route.source_failed pool=%s logical_profile=%s "
                         "source_label=%s selected_profile=%s route_request_id=%s "
-                        "error_code=%s attempt_count=%s failover_count=%s",
+                        "error_code=%s attempt_count=%s failover_count=%s "
+                        "transport_error_type=%s transport_phase=%s "
+                        "transport_exception_type=%s",
                         pool_name,
                         logical_profile,
                         selected_source,
@@ -303,6 +305,9 @@ class LlmClient:
                         exc.code,
                         exc.attempt_count,
                         failover_count,
+                        exc.transport_error_type,
+                        exc.transport_phase,
+                        exc.transport_exception_type,
                     )
                     can_failover = self._can_failover(
                         error=exc,
@@ -445,12 +450,17 @@ class LlmClient:
         )
         llm_logger.error(
             "event=llm.route.all_sources_failed pool=%s logical_profile=%s "
-            "route_request_id=%s failover_count=%s error_code=%s",
+            "route_request_id=%s failover_count=%s error_code=%s "
+            "transport_error_type=%s transport_phase=%s "
+            "transport_exception_type=%s",
             pool_name,
             logical_profile,
             route_request_id,
             failover_count,
             last_error.code,
+            last_error.transport_error_type,
+            last_error.transport_phase,
+            last_error.transport_exception_type,
             exc_info=(
                 type(last_error),
                 LlmError(last_error.code, "terminal LLM route failure"),
@@ -1019,7 +1029,9 @@ class LlmClient:
                     llm_logger.warning(
                         "event=llm.attempt.failed profile=%s request_id=%s attempt=%s/%s "
                         "code=%s retryable=%s elapsed_ms=%s "
-                        "phase=%s remaining_seconds=%.1f",
+                        "phase=%s remaining_seconds=%.1f "
+                        "transport_error_type=%s transport_phase=%s "
+                        "transport_exception_type=%s",
                         profile.name,
                         request_id,
                         attempt_count,
@@ -1033,6 +1045,9 @@ class LlmClient:
                             (execution_deadline or admission_deadline)
                             - time.monotonic(),
                         ),
+                        exc.transport_error_type,
+                        exc.transport_phase,
+                        exc.transport_exception_type,
                     )
                     if not exc.retryable:
                         raise
@@ -1089,11 +1104,15 @@ class LlmClient:
             )
             llm_logger.warning(
                 "event=llm.request.failed request_id=%s request_hash=%s "
-                "code=%s attempts=%s",
+                "code=%s attempts=%s transport_error_type=%s "
+                "transport_phase=%s transport_exception_type=%s",
                 request_id,
                 request_hash or "unavailable",
                 contextual.code,
                 attempt_count,
+                contextual.transport_error_type,
+                contextual.transport_phase,
+                contextual.transport_exception_type,
             )
             raise contextual from exc
 
@@ -1111,6 +1130,14 @@ class LlmClient:
             "error_code": error.code,
             "status_code": error.status_code,
         }
+        for key in (
+            "transport_error_type",
+            "transport_phase",
+            "transport_exception_type",
+        ):
+            value = getattr(error, key, None)
+            if value is not None:
+                failure[key] = value
         if target and target[-1] == failure:
             return
         target.append(failure)

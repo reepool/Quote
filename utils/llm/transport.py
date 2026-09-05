@@ -6,14 +6,109 @@ import asyncio
 import inspect
 import json
 import logging
+import socket
+import ssl
 import time
 from dataclasses import dataclass, field
 from typing import Any, AsyncIterator, Callable, Mapping, Protocol
+from urllib.parse import urlsplit
 
 from .errors import LlmError, LlmResponseParseError, LlmTransientTransportError
 
 
 llm_logger = logging.getLogger("LLM")
+
+
+def _root_exception(exc: BaseException) -> BaseException:
+    """Return a bounded root cause without traversing arbitrary exception graphs."""
+
+    current = exc
+    seen: set[int] = set()
+    for _ in range(8):
+        marker = id(current)
+        if marker in seen:
+            break
+        seen.add(marker)
+        cause = current.__cause__ or current.__context__
+        if cause is None:
+            break
+        current = cause
+    return current
+
+
+def _classify_transport_exception(exc: BaseException) -> tuple[str, str]:
+    """Map an httpx/network exception to a safe type and transport phase."""
+
+    import httpx
+
+    root = _root_exception(exc)
+    if isinstance(exc, httpx.PoolTimeout):
+        return "pool_timeout", "pool"
+    if isinstance(exc, httpx.ConnectTimeout):
+        return "connect_timeout", "connect"
+    if isinstance(exc, httpx.ReadTimeout):
+        return "read_timeout", "read"
+    if isinstance(exc, httpx.WriteTimeout):
+        return "write_timeout", "write"
+    if isinstance(exc, httpx.TimeoutException):
+        return "timeout", "request"
+
+    if isinstance(root, socket.gaierror):
+        return "dns_failure", "connect"
+    if isinstance(root, ssl.SSLError):
+        return "tls_error", "tls"
+    if isinstance(root, ConnectionResetError):
+        phase = "read" if isinstance(exc, httpx.ReadError) else "connect"
+        return "connection_reset", phase
+    if isinstance(exc, httpx.ConnectError):
+        return "connect_error", "connect"
+    if isinstance(exc, httpx.ReadError):
+        return "read_error", "read"
+    if isinstance(exc, httpx.WriteError):
+        return "write_error", "write"
+    if isinstance(exc, httpx.TransportError):
+        return "transport_error", "transport"
+    return "transport_error", "unknown"
+
+
+def _transport_failure(
+    exc: BaseException,
+    *,
+    url: str,
+    started: float,
+    stream: bool,
+) -> LlmTransientTransportError:
+    """Create a compatible transient error with safe diagnostics and a log event."""
+
+    import httpx
+
+    error_type, phase = _classify_transport_exception(exc)
+    try:
+        host = urlsplit(url).hostname or "unknown"
+    except ValueError:
+        host = "unknown"
+    elapsed_ms = max(0, round((time.monotonic() - started) * 1000))
+    llm_logger.warning(
+        "event=llm.transport.failed host=%s transport_error_type=%s "
+        "transport_phase=%s transport_exception_type=%s elapsed_ms=%s stream=%s",
+        host,
+        error_type,
+        phase,
+        type(exc).__name__,
+        elapsed_ms,
+        stream,
+    )
+    message = (
+        "LLM provider request timed out"
+        if isinstance(exc, httpx.TimeoutException)
+        else "LLM provider transport failed"
+    )
+    return LlmTransientTransportError(
+        message,
+        transport_error_type=error_type,
+        transport_phase=phase,
+        transport_exception_type=type(exc).__name__,
+    )
 
 
 @dataclass(frozen=True)
@@ -88,6 +183,7 @@ class HttpxOpenAICompatibleTransport:
         if payload.get("stream") is True:
             return await self._send_stream(url, headers, payload, timeout_seconds)
 
+        started = time.monotonic()
         try:
             response = await (await self._get_client()).post(
                 url,
@@ -96,11 +192,17 @@ class HttpxOpenAICompatibleTransport:
                 timeout=timeout_seconds,
             )
         except httpx.TimeoutException as exc:
-            raise LlmTransientTransportError("LLM provider request timed out") from exc
+            raise _transport_failure(
+                exc, url=url, started=started, stream=False
+            ) from exc
         except httpx.TransportError as exc:
-            raise LlmTransientTransportError("LLM provider transport failed") from exc
+            raise _transport_failure(
+                exc, url=url, started=started, stream=False
+            ) from exc
         except Exception as exc:
-            raise LlmTransientTransportError("LLM provider transport failed") from exc
+            raise _transport_failure(
+                exc, url=url, started=started, stream=False
+            ) from exc
 
         provider_request_id = response.headers.get("x-request-id") or response.headers.get(
             "request-id"
@@ -182,13 +284,19 @@ class HttpxOpenAICompatibleTransport:
                     provider_request_id=provider_request_id,
                 )
         except httpx.TimeoutException as exc:
-            raise LlmTransientTransportError("LLM provider request timed out") from exc
+            raise _transport_failure(
+                exc, url=url, started=started, stream=True
+            ) from exc
         except httpx.TransportError as exc:
-            raise LlmTransientTransportError("LLM provider transport failed") from exc
+            raise _transport_failure(
+                exc, url=url, started=started, stream=True
+            ) from exc
         except LlmError:
             raise
         except Exception as exc:
-            raise LlmTransientTransportError("LLM provider transport failed") from exc
+            raise _transport_failure(
+                exc, url=url, started=started, stream=True
+            ) from exc
 
     async def close(self) -> None:
         if self._closed:

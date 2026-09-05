@@ -1,13 +1,16 @@
 import asyncio
 import json
 import os
+import socket
+import ssl
 import time
 
+import httpx
 import pytest
 
 from utils.llm import (
-    DEFAULT_QUEUE_TIMEOUT_SECONDS,
     DEFAULT_PROVIDER_REQUESTS_PER_MINUTE,
+    DEFAULT_QUEUE_TIMEOUT_SECONDS,
     LlmAuthenticationError,
     LlmCancelledError,
     LlmClient,
@@ -18,14 +21,13 @@ from utils.llm import (
     LlmRequest,
     LlmSchemaValidationError,
     LlmTransientTransportError,
+    load_project_environment,
     normalize_openai_url,
 )
 from utils.llm.errors import LlmProviderError
 from utils.llm.rate_limit import ProfileLimiter, ProfileLimiterRegistry
-from utils.llm.transport import HttpxOpenAICompatibleTransport
-from utils.llm import load_project_environment
 from utils.llm.testing import ScriptedTransport
-
+from utils.llm.transport import HttpxOpenAICompatibleTransport
 
 SCHEMA = {
     "type": "object",
@@ -479,6 +481,149 @@ async def test_response_parsing_failure_prefers_execution_deadline(
     with pytest.raises(LlmDeadlineExceededError):
         await client.complete(_request())
     assert len(transport.calls) == 1
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    ("exception_factory", "expected_type", "expected_phase", "expected_message"),
+    [
+        (lambda request: httpx.PoolTimeout("pool", request=request), "pool_timeout", "pool", "LLM provider request timed out"),
+        (lambda request: httpx.ConnectTimeout("connect", request=request), "connect_timeout", "connect", "LLM provider request timed out"),
+        (lambda request: httpx.ReadTimeout("read", request=request), "read_timeout", "read", "LLM provider request timed out"),
+        (lambda request: httpx.WriteTimeout("write", request=request), "write_timeout", "write", "LLM provider request timed out"),
+    ],
+)
+async def test_transport_timeout_classification(
+    exception_factory, expected_type, expected_phase, expected_message
+):
+    request = httpx.Request("POST", "https://provider.example/v1/chat/completions")
+
+    class Client:
+        async def post(self, *args, **kwargs):
+            raise exception_factory(request)
+
+        async def aclose(self):
+            return None
+
+    transport = HttpxOpenAICompatibleTransport(client=Client())
+    with pytest.raises(LlmTransientTransportError) as captured:
+        await transport.send(
+            "https://provider.example/v1/chat/completions", {}, {}, 1
+        )
+    error = captured.value
+    assert str(error) == expected_message
+    assert error.transport_error_type == expected_type
+    assert error.transport_phase == expected_phase
+    assert error.transport_exception_type == type(exception_factory(request)).__name__
+    assert error.to_dict()["transport_error_type"] == expected_type
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    ("cause", "expected_type", "expected_phase"),
+    [
+        (socket.gaierror(-2, "dns detail"), "dns_failure", "connect"),
+        (ssl.SSLError("tls detail"), "tls_error", "tls"),
+        (ConnectionResetError("reset detail"), "connection_reset", "connect"),
+    ],
+)
+async def test_transport_root_cause_classification(cause, expected_type, expected_phase):
+    request = httpx.Request("POST", "https://provider.example/v1/chat/completions")
+
+    class Client:
+        async def post(self, *args, **kwargs):
+            try:
+                raise cause
+            except BaseException as root:
+                raise httpx.ConnectError("raw detail", request=request) from root
+
+        async def aclose(self):
+            return None
+
+    transport = HttpxOpenAICompatibleTransport(client=Client())
+    with pytest.raises(LlmTransientTransportError) as captured:
+        await transport.send(
+            "https://provider.example/v1/chat/completions", {}, {}, 1
+        )
+    assert captured.value.transport_error_type == expected_type
+    assert captured.value.transport_phase == expected_phase
+    assert "raw detail" not in str(captured.value)
+
+
+@pytest.mark.asyncio
+async def test_stream_transport_classifies_read_connection_reset():
+    request = httpx.Request("POST", "https://provider.example/v1/chat/completions")
+
+    class Response:
+        status_code = 200
+        headers = {}
+
+        async def aiter_lines(self):
+            try:
+                raise ConnectionResetError("stream reset detail")
+            except ConnectionResetError as root:
+                raise httpx.ReadError("raw stream detail", request=request) from root
+            yield ""
+
+        async def aread(self):
+            return b""
+
+    class StreamContext:
+        async def __aenter__(self):
+            return Response()
+
+        async def __aexit__(self, exc_type, exc, traceback):
+            return None
+
+    class Client:
+        def stream(self, *args, **kwargs):
+            return StreamContext()
+
+        async def aclose(self):
+            return None
+
+    transport = HttpxOpenAICompatibleTransport(client=Client())
+    with pytest.raises(LlmTransientTransportError) as captured:
+        await transport.send(
+            "https://provider.example/v1/chat/completions", {}, {"stream": True}, 1
+        )
+    assert captured.value.transport_error_type == "connection_reset"
+    assert captured.value.transport_phase == "read"
+    assert captured.value.transport_exception_type == "ReadError"
+
+
+@pytest.mark.asyncio
+async def test_client_attempt_failure_exposes_transport_diagnostics():
+    request = httpx.Request("POST", "https://provider.example/v1/chat/completions")
+
+    class Client:
+        async def post(self, *args, **kwargs):
+            raise httpx.ReadTimeout("read detail", request=request)
+
+        async def aclose(self):
+            return None
+
+    client = LlmClient(
+        _config(max_retries=0),
+        transport=HttpxOpenAICompatibleTransport(client=Client()),
+        environment={"TEST_LLM_KEY": "unit-secret"},
+    )
+    with pytest.raises(LlmTransientTransportError) as captured:
+        await client.complete(_unstructured_request())
+    error = captured.value
+    assert error.transport_error_type == "read_timeout"
+    assert error.transport_phase == "read"
+    assert error.transport_exception_type == "ReadTimeout"
+    failures = []
+    client._record_attempt_failure(failures, attempt_sequence=1, error=error)
+    assert failures == [{
+        "attempt_sequence": 1,
+        "error_code": "transient_transport_error",
+        "status_code": None,
+        "transport_error_type": "read_timeout",
+        "transport_phase": "read",
+        "transport_exception_type": "ReadTimeout",
+    }]
 
 
 @pytest.mark.asyncio
