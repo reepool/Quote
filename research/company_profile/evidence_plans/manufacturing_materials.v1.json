@@ -1,6 +1,6 @@
 {
   "schema_version": "company_profile_stage5_evidence_plan.v1",
-  "plan_version": "manufacturing_materials.2026-09-05.3",
+  "plan_version": "manufacturing_materials.2026-09-05.4",
   "sample_manifest_revision": "manufacturing_materials.2026-09-03.4",
   "page_coordinate_system": "one_based_pdf_physical_page",
   "production_authorization": "not_authorized",
@@ -8,7 +8,7 @@
     {
       "sample_id": "manufacturing-materials-300750-2025",
       "content_hash": "c15272977147dee7e6935a38ea0e4fd6855370aabb106f54cfe20f7cf6048ec9",
-      "plan_version": "manufacturing_materials.2026-09-05.3",
+      "plan_version": "manufacturing_materials.2026-09-05.4",
       "tasks": [
         {
           "chapter_task": "extract_business_overview",
@@ -166,7 +166,7 @@
     {
       "sample_id": "manufacturing-materials-603659-2025",
       "content_hash": "4e81f5539046ba1eee733100f38442a4abd5037afe3881115ba7f48678fa35b6",
-      "plan_version": "manufacturing_materials.2026-09-05.3",
+      "plan_version": "manufacturing_materials.2026-09-05.4",
       "tasks": [
         {
           "chapter_task": "extract_business_overview",
@@ -323,7 +323,7 @@
     {
       "sample_id": "manufacturing-materials-920015-2025",
       "content_hash": "4d2c1612f6f62a9024b8947d7a01b70c40f8f347c2975fa1a05b908d0770695a",
-      "plan_version": "manufacturing_materials.2026-09-05.3",
+      "plan_version": "manufacturing_materials.2026-09-05.4",
       "tasks": [
         {
           "chapter_task": "extract_business_overview",
@@ -377,13 +377,13 @@
             {
               "scope_id": "quantity_disclosure_check",
               "field_ids": ["production_volume", "sales_volume", "inventory_volume"],
-              "pages": [19],
-              "section_titles": ["经营情况回顾"],
-              "anchor_terms": ["30kt/a", "盐酸羟胺"],
-              "required_headers": [],
-              "required_units": ["kt/a", "吨"],
+              "pages": [49, 50],
+              "section_titles": ["产能情况", "产能与开工情况"],
+              "anchor_terms": ["设计产能", "产能利用率", "在建产能"],
+              "required_headers": ["设计产能", "产能利用率", "在建产能"],
+              "required_units": ["吨/年", "%"],
               "required_footnotes": [],
-              "continuation_required": false,
+              "continuation_required": true,
               "printed_page_labels": {}
             },
             {
@@ -488,7 +488,7 @@
             {
               "scope_id": "reported_business_change",
               "field_ids": ["business_regime"],
-              "pages": [24, 25],
+              "pages": [24],
               "section_titles": ["合并报表范围的变化情况"],
               "anchor_terms": ["合并报表范围的变化情况", "不适用"],
               "required_headers": [],
@@ -504,7 +504,7 @@
     {
       "sample_id": "manufacturing-materials-302132-2025-regime",
       "content_hash": "605394bd0879f906a829a9fcd3a2dab037d8aad2554b741a7d95757a3a5e3020",
-      "plan_version": "manufacturing_materials.2026-09-05.3",
+      "plan_version": "manufacturing_materials.2026-09-05.4",
       "tasks": [
         {
           "chapter_task": "extract_business_overview",

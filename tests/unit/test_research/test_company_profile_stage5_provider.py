@@ -189,6 +189,8 @@ def test_common_gateway_provider_sends_one_bounded_scope_and_stage4_schema() -> 
         ("procurement_mode", "to invent named material inputs"),
         ("top_five_customer_totals_only", "This request scope is totals-only"),
         ("top_five_supplier_totals_only", "This request scope is totals-only"),
+        ("quantity_disclosure_check", "do not infer quantities from"),
+        ("reported_business_change", "emit coverage for business_regime"),
     ],
 )
 def test_common_gateway_provider_adds_frozen_scope_instructions(
@@ -696,6 +698,59 @@ def test_coverage_schema_requires_typed_reason_for_not_disclosed() -> None:
         "source_reason_unspecified",
     ]
     assert "reason_code" not in not_applicable["required"]
+
+
+def test_quantity_disclosure_check_uses_coverage_only_schema() -> None:
+    prepared = _prepared_scope().model_copy(
+        update={
+            "scope_id": "quantity_disclosure_check",
+            "chapter_task": ChapterTask.EXTRACT_OPERATING_QUANTITIES,
+            "field_ids": ("production_volume", "sales_volume", "inventory_volume"),
+        }
+    )
+    statuses = tuple(CoverageStatus)
+    checklist = tuple(
+        ChecklistItem(
+            field_id=field_id,
+            object_type=ObjectType.MEASUREMENT,
+            chapter_task=ChapterTask.EXTRACT_OPERATING_QUANTITIES,
+            requirement_level=RequirementLevel.CONDITIONAL,
+            allowed_coverage_statuses=statuses,
+            allowed_metric_types=(metric_type,),
+        )
+        for field_id, metric_type in (
+            ("production_volume", MetricType.PRODUCTION_VOLUME),
+            ("sales_volume", MetricType.SALES_VOLUME),
+            ("inventory_volume", MetricType.INVENTORY_VOLUME),
+        )
+    )
+    request = SemanticTaskRequest(
+        request_id="slice-1:quantity-disclosure",
+        report=prepared.report,
+        package_manifest=PackageManifest(
+            package_name="manufacturing_materials",
+            package_version="v1",
+            report=prepared.report,
+            checklist=checklist,
+        ),
+        chapter_task=ChapterTask.EXTRACT_OPERATING_QUANTITIES,
+        evidence_bundle=prepared.evidence_bundle,
+        allowed_object_types=(ObjectType.MEASUREMENT,),
+        allowed_metric_types=(
+            MetricType.PRODUCTION_VOLUME,
+            MetricType.SALES_VOLUME,
+            MetricType.INVENTORY_VOLUME,
+        ),
+        unresolved_field_ids=prepared.field_ids,
+    )
+    schema = _minimal_extract_schema(request, prepared_scope=prepared)
+    item = schema["properties"]["items"]["items"]
+    assert item["properties"]["item_type"] == {"const": "coverage"}
+    coverage = item["properties"]["coverage"]
+    assert coverage["oneOf"]
+    assert all(
+        "candidate" not in branch.get("properties", {}) for branch in coverage["oneOf"]
+    )
 
 
 def test_numeric_reconciliation_requires_non_empty_uncertainty() -> None:

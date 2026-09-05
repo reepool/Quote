@@ -131,6 +131,22 @@ _SCOPE_INSTRUCTIONS = {
         "Measurements and counterparty_relationship coverage=not_disclosed with "
         "reason_code=source_reason_unspecified; do not emit a Relationship."
     ),
+    "quantity_disclosure_check": (
+        "This scope checks whether the report discloses production_volume, sales_volume, "
+        "or inventory_volume. If the supplied operating-quantity context is complete and "
+        "contains capacity or project tables but no row for a requested quantity, emit "
+        "one coverage item per requested field with status=not_disclosed and "
+        "reason_code=source_reason_unspecified. Do not use extraction_failed merely "
+        "because the requested quantity is absent, and do not infer quantities from "
+        "capacity, project investment, revenue, or inventory accounting tables."
+    ),
+    "reported_business_change": (
+        "For an explicit annual-report checkbox such as 合并报表范围的变化情况：□适用 "
+        "√不适用, emit coverage for business_regime with status=not_applicable and "
+        "reason_code=source_explicitly_not_applicable; do not fabricate a BusinessEvent. "
+        "Only emit a BusinessEvent when the source explicitly states a change, event date, "
+        "or effective date."
+    ),
 }
 
 _FLAT_EXTRACT_SCOPES = {
@@ -139,6 +155,8 @@ _FLAT_EXTRACT_SCOPES = {
     "procurement_mode",
     "top_five_customer_totals_only",
     "top_five_supplier_totals_only",
+    "quantity_disclosure_check",
+    "reported_business_change",
 }
 
 
@@ -548,6 +566,11 @@ def _minimal_extract_schema(
         return _totals_only_extract_schema(request)
     if (
         prepared_scope is not None
+        and prepared_scope.scope_id == "quantity_disclosure_check"
+    ):
+        return _coverage_only_extract_schema(request)
+    if (
+        prepared_scope is not None
         and prepared_scope.scope_id == "capacity_and_processing_narrative"
     ):
         return _compact_operating_measurement_schema(request, prepared_scope)
@@ -608,6 +631,42 @@ def _minimal_extract_schema(
             "schema_version": {"const": "company_profile_extract_response.v1"},
             "request_id": {"type": "string"},
             "items": {"type": "array", "items": {"oneOf": item_schemas}},
+        },
+    }
+
+
+def _coverage_only_extract_schema(request: SemanticTaskRequest) -> dict[str, Any]:
+    """Small model-side contract for a checklist whose answer is legal empty coverage.
+
+    The full ExtractResponse remains the local validation contract.  This schema only
+    prevents the provider from inventing Measurement candidates when the evidence plan
+    is specifically checking for absent operating quantities.
+    """
+
+    field_ids = list(request.unresolved_field_ids)
+    statuses = _allowed_non_observed_coverage_statuses(request)
+    if not statuses:
+        raise ValueError("coverage-only scope requires a non-observed coverage status")
+    return {
+        "type": "object",
+        "additionalProperties": False,
+        "required": ["items"],
+        "properties": {
+            "items": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "additionalProperties": False,
+                    "required": ["item_type", "coverage"],
+                    "properties": {
+                        "item_type": {"const": "coverage"},
+                        "coverage": _coverage_draft_schema(
+                            field_ids=field_ids,
+                            statuses=statuses,
+                        ),
+                    },
+                },
+            }
         },
     }
 

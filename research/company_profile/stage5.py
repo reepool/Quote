@@ -27,7 +27,7 @@ from .models import ChapterTask, Evidence, ReportIdentity, TextAnchor
 
 STAGE5_SAMPLE_MANIFEST_SCHEMA = "company_profile_industry_sample_manifest.v1"
 STAGE5_EVIDENCE_PLAN_SCHEMA = "company_profile_stage5_evidence_plan.v1"
-STAGE5_EVIDENCE_PLAN_VERSION = "manufacturing_materials.2026-09-05.3"
+STAGE5_EVIDENCE_PLAN_VERSION = "manufacturing_materials.2026-09-05.4"
 STAGE5_PACKAGE = "manufacturing_materials"
 STAGE5_PRODUCTION_AUTHORIZATION = "not_authorized"
 
@@ -261,7 +261,7 @@ class Stage5EvidencePlan(_StrictModel):
     schema_version: Literal["company_profile_stage5_evidence_plan.v1"] = (
         STAGE5_EVIDENCE_PLAN_SCHEMA
     )
-    plan_version: Literal["manufacturing_materials.2026-09-05.3"] = (
+    plan_version: Literal["manufacturing_materials.2026-09-05.4"] = (
         STAGE5_EVIDENCE_PLAN_VERSION
     )
     sample_manifest_revision: str = Field(min_length=1)
