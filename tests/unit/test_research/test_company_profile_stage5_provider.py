@@ -9,6 +9,7 @@ import pytest
 from research.company_profile.contracts import (
     ChecklistItem,
     ContractErrorCode,
+    ExtractResponse,
     PackageManifest,
     PreparedEvidence,
     RepairRequest,
@@ -579,8 +580,66 @@ def test_segment_financials_use_compact_rows_and_expand_locally() -> None:
     assert candidates[1]["logical_slot"] == "revenue"
     assert candidates[1]["segment_label"] == "动力电池系统"
     assert candidates[1]["evidence"][0]["evidence_id"] == evidence_id
+    assert candidates[1]["evidence"][0]["anchor"] == {
+        "anchor_type": "table",
+        "table_label": "分产品",
+        "row_label": "动力电池系统",
+        "column_header": "营业收入",
+        "cell_locator": None,
+    }
     assert candidates[0]["dimension"] == "分产品"
     assert candidates[0]["source_native"]["header"] == "分产品"
+
+
+def test_same_page_totals_in_different_dimensions_are_distinct_occurrences() -> None:
+    prepared = _segment_prepared_scope()
+    evidence = prepared.evidence_bundle[0].evidence.model_copy(
+        update={
+            "anchor": TextAnchor(
+                bounded_quote=(
+                    "分产品 营业收入 营业成本 毛利率 合计 100 80 20% "
+                    "分地区 营业收入 营业成本 毛利率 合计 100 80 20%"
+                )
+            )
+        }
+    )
+    prepared = prepared.model_copy(
+        update={
+            "evidence_bundle": (PreparedEvidence(evidence=evidence),),
+            "source_row_dimensions": {},
+        }
+    )
+    request = _segment_extract_request(prepared)
+
+    records = []
+    for dimension in ("分产品", "分地区"):
+        response = _segment_row_response(
+            request_id=request.request_id,
+            evidence_id=evidence.evidence_id,
+            dimension=dimension,
+            label="合计",
+        )
+        expanded = ExtractResponse.model_validate_json(
+            json.dumps(
+                _expand_extract_response(
+                    response,
+                    request=request,
+                    prepared_scope=prepared,
+                ),
+                ensure_ascii=False,
+            )
+        )
+        records.append(
+            next(
+                item
+                for item in expanded.candidates()
+                if item.field_id == "operating_revenue"
+            )
+        )
+
+    assert records[0].evidence[0].anchor.table_label == "分产品"
+    assert records[1].evidence[0].anchor.table_label == "分地区"
+    assert records[0].occurrence_id() != records[1].occurrence_id()
 
 
 def test_measurement_schema_scopes_capacity_kind_to_metric_type() -> None:

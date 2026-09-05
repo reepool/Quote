@@ -1144,6 +1144,34 @@ def _require_numeric_reconciliation_uncertainty(
         )
 
 
+def _segment_table_evidence(
+    evidence: Any,
+    *,
+    dimension: str,
+    label: str,
+    column_header: str | None,
+) -> Any:
+    if not isinstance(evidence, list):
+        return evidence
+    anchored: list[Any] = []
+    for item in evidence:
+        if not isinstance(item, Mapping):
+            anchored.append(item)
+            continue
+        candidate_evidence = deepcopy(dict(item))
+        anchor = candidate_evidence.get("anchor")
+        if isinstance(anchor, Mapping) and anchor.get("anchor_type") == "text":
+            candidate_evidence["anchor"] = {
+                "anchor_type": "table",
+                "table_label": dimension,
+                "row_label": label,
+                "column_header": column_header,
+                "cell_locator": None,
+            }
+        anchored.append(candidate_evidence)
+    return anchored
+
+
 def _expand_segment_row_draft(
     row: dict[str, Any],
     *,
@@ -1205,17 +1233,27 @@ def _expand_segment_row_draft(
             if row_class is not None:
                 measurement["row_class"] = row_class
             candidates.append(measurement)
-    return [
-        {
-            "item_type": "candidate",
-            "candidate": _expand_candidate_draft(
-                candidate,
-                request=request,
-                prepared_scope=prepared_scope,
-            ),
-        }
-        for candidate in candidates
-    ]
+    expanded: list[dict[str, Any]] = []
+    for candidate in candidates:
+        record = _expand_candidate_draft(
+            candidate,
+            request=request,
+            prepared_scope=prepared_scope,
+        )
+        source_native = record.get("source_native")
+        column_header = (
+            str(source_native.get("header"))
+            if isinstance(source_native, Mapping) and source_native.get("header")
+            else None
+        )
+        record["evidence"] = _segment_table_evidence(
+            record.get("evidence"),
+            dimension=dimension,
+            label=str(label),
+            column_header=column_header,
+        )
+        expanded.append({"item_type": "candidate", "candidate": record})
+    return expanded
 
 
 def _expand_extract_response(
