@@ -489,6 +489,42 @@ async def test_failover_reuses_one_absolute_execution_deadline():
 
 
 @pytest.mark.asyncio
+async def test_routed_client_preserves_client_timeout_diagnostics():
+    class BlockingTransport(ScriptedTransport):
+        async def send(self, url, headers, payload, timeout_seconds):
+            self.calls.append({
+                "url": url,
+                "headers": dict(headers),
+                "payload": dict(payload),
+            })
+            await asyncio.sleep(0.05)
+            return _success("unexpected", "grok-4.5")
+
+    config = _config(
+        timeout_seconds=0.2,
+        attempt_timeout_seconds=0.01,
+        max_hops=1,
+    )
+    transport = BlockingTransport([])
+    with pytest.raises(LlmTransientTransportError) as captured:
+        await _client(config, transport).complete(_request())
+
+    error = captured.value
+    assert error.status_code is None
+    assert error.transport_error_type == "client_attempt_timeout"
+    assert error.transport_phase == "request"
+    assert error.transport_exception_type == "TimeoutError"
+    attempts = error.lineage["attempts"]
+    assert len(attempts) == 2
+    assert all(
+        item["attempt_failures"][0]["transport_error_type"]
+        == "client_attempt_timeout"
+        for item in attempts
+    )
+    assert all(item["attempt_failures"][0]["status_code"] is None for item in attempts)
+
+
+@pytest.mark.asyncio
 async def test_configuration_and_exhausted_deadline_do_not_fail_over():
     invalid = ScriptedTransport([_success("unused", "grok-4.5")])
     with pytest.raises(Exception) as captured:
@@ -501,8 +537,16 @@ async def test_configuration_and_exhausted_deadline_do_not_fail_over():
         await _client(
             _config(timeout_seconds=0.02, attempt_timeout_seconds=1), delayed
         ).complete(_request())
-    assert getattr(deadline_error.value, "code", None) == "deadline_exceeded"
+    error = deadline_error.value
+    assert getattr(error, "code", None) == "deadline_exceeded"
+    assert error.status_code is None
+    assert error.transport_error_type == "client_execution_deadline"
+    assert error.transport_phase == "request"
+    assert error.transport_exception_type == "TimeoutError"
     assert len(delayed.calls) == 1
+    attempt_failure = error.lineage["attempts"][0]["attempt_failures"][0]
+    assert attempt_failure["status_code"] is None
+    assert attempt_failure["transport_error_type"] == "client_execution_deadline"
 
 
 @pytest.mark.asyncio

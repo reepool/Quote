@@ -24,6 +24,7 @@ from .errors import (
     LlmError,
     LlmResponseParseError,
     LlmSchemaValidationError,
+    LlmTransientTransportError,
     safe_provider_error,
 )
 from .models import LlmConfig, LlmMessage, LlmProfile, LlmRequest, LlmResponse, LlmUsage
@@ -813,7 +814,7 @@ class LlmClient:
                             if provider_coordinator is not None:
                                 await provider_coordinator.report_retryable_failure(
                                     error_code="transient_transport_error",
-                                    status_code=408,
+                                    status_code=None,
                                 )
                                 provider_failure_reported = True
                             raise
@@ -947,14 +948,30 @@ class LlmClient:
                     raise LlmCancelledError() from exc
                 except asyncio.TimeoutError as exc:
                     active_deadline = execution_deadline or admission_deadline
+                    execution_timeout = (
+                        execution_deadline is not None
+                        and execution_deadline - attempt_started
+                        <= profile.attempt_timeout_seconds
+                    )
                     last_error = (
-                        LlmDeadlineExceededError()
-                        if time.monotonic() >= active_deadline
-                        else safe_provider_error(408)
+                        LlmDeadlineExceededError(
+                            transport_error_type="client_execution_deadline",
+                            transport_phase="request",
+                            transport_exception_type=type(exc).__name__,
+                        )
+                        if execution_timeout
+                        else LlmTransientTransportError(
+                            "LLM provider request timed out",
+                            transport_error_type="client_attempt_timeout",
+                            transport_phase="request",
+                            transport_exception_type=type(exc).__name__,
+                        )
                     )
                     llm_logger.warning(
                         "event=llm.attempt.timeout profile=%s request_id=%s attempt=%s/%s "
-                        "code=%s elapsed_ms=%s remaining_seconds=%.1f",
+                        "code=%s elapsed_ms=%s remaining_seconds=%.1f "
+                        "transport_error_type=%s transport_phase=%s "
+                        "transport_exception_type=%s",
                         profile.name,
                         request_id,
                         attempt_count,
@@ -962,6 +979,9 @@ class LlmClient:
                         last_error.code,
                         max(0, round((time.monotonic() - attempt_started) * 1000)),
                         max(0.0, active_deadline - time.monotonic()),
+                        last_error.transport_error_type,
+                        last_error.transport_phase,
+                        last_error.transport_exception_type,
                     )
                     self._record_attempt_failure(
                         attempt_failures,

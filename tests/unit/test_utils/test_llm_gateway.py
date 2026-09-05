@@ -267,6 +267,52 @@ async def test_attempt_timeout_retries_within_total_deadline(monkeypatch):
 
 
 @pytest.mark.asyncio
+async def test_client_attempt_timeout_is_not_reported_as_http_408():
+    async def slow_transport(url, headers, payload, timeout):
+        await asyncio.sleep(0.05)
+        return _response({"label": "never", "score": 0})
+
+    from utils.llm import CallableTransport
+
+    client = LlmClient(
+        _config(timeout_seconds=0.2, attempt_timeout_seconds=0.01, max_retries=0),
+        transport=CallableTransport(slow_transport),
+        environment={"TEST_LLM_KEY": "unit-secret"},
+    )
+    with pytest.raises(LlmTransientTransportError) as captured:
+        await client.complete(_unstructured_request())
+    error = captured.value
+    assert error.code == "transient_transport_error"
+    assert error.status_code is None
+    assert error.transport_error_type == "client_attempt_timeout"
+    assert error.transport_phase == "request"
+    assert error.transport_exception_type == "TimeoutError"
+
+
+@pytest.mark.asyncio
+async def test_client_execution_deadline_is_classified_separately():
+    async def slow_transport(url, headers, payload, timeout):
+        await asyncio.sleep(0.05)
+        return _response({"label": "never", "score": 0})
+
+    from utils.llm import CallableTransport
+
+    client = LlmClient(
+        _config(timeout_seconds=0.01, attempt_timeout_seconds=0.2, max_retries=0),
+        transport=CallableTransport(slow_transport),
+        environment={"TEST_LLM_KEY": "unit-secret"},
+    )
+    with pytest.raises(LlmDeadlineExceededError) as captured:
+        await client.complete(_unstructured_request())
+    error = captured.value
+    assert error.code == "deadline_exceeded"
+    assert error.status_code is None
+    assert error.transport_error_type == "client_execution_deadline"
+    assert error.transport_phase == "request"
+    assert error.transport_exception_type == "TimeoutError"
+
+
+@pytest.mark.asyncio
 async def test_initial_queue_wait_preserves_full_execution_budget():
     first_started = asyncio.Event()
     release_first = asyncio.Event()
