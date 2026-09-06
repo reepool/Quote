@@ -58,6 +58,10 @@ Gold 与负例均由真实 bundle 的 records、dispositions、coverage、Eviden
   客户销售额 `913,511 万元` 与集中度 `58.14%` 可接受，名称仍为
   `not_disclosed` 且不生成 Relationship；主体是否允许保持 `unclear` 进入研究视图，
   仍需人工裁决。
+- 针对权威运行中该 scope 的一次 `provider_unavailable`，又使用全新 run
+  `stage55-adjudicated-603659-customer-total-luna-20260906-q` 重跑成功；除上述客户销售额与集中度外，
+  还抽出关联方销售额 `0 万元` 及占比 `0%`，仍不生成 Relationship。该结果仅作为定向复核证据，
+  不回写或替换权威完整运行。
 - 该定向 run 只证明该 scope 的复核链已跑通，不回写或替换
   历史完整运行，也不改变四报告总体 `hold`。
 

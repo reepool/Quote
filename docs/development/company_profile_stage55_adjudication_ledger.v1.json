@@ -468,6 +468,25 @@
       "sample_id": "manufacturing-materials-603659-2025",
       "scope_id": "top_five_customer_totals_only",
       "task_complete": true
+    },
+    {
+      "accepted_record_count": 4,
+      "coverage_statuses": [
+        "counterparty_relationship:not_disclosed",
+        "customer_concentration:observed"
+      ],
+      "decision": "scope_pass",
+      "manifest_path": "var/company_profile_stage5/20260906/run-stage55-adjudicated-603659-customer-total-luna-20260906-q/manifest.json",
+      "production_authorization": "not_authorized",
+      "provider_calls": 2,
+      "rationale": "新 run 重跑璞泰来前五名客户合计 scope；客户销售额 913,511 万元、占比 58.14%、关联方销售额 0 万元及关联方占比 0% 均有来源证据并获得 accepted_for_review。名称 coverage 保持 not_disclosed，不生成 Relationship；主体继续 unclear。该定向结果不替换四报告权威 run。",
+      "run_id": "stage55-adjudicated-603659-customer-total-luna-20260906-q",
+      "runtime_target_ids": [
+        "stage55-adjudicated-603659-customer-total-luna-20260906-q:manufacturing-materials-603659-2025:top_five_customer_totals_only"
+      ],
+      "sample_id": "manufacturing-materials-603659-2025",
+      "scope_id": "top_five_customer_totals_only",
+      "task_complete": true
     }
   ],
   "unclear_subject_record_counts": {

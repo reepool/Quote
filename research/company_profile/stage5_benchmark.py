@@ -524,6 +524,20 @@ def _evaluate_negative_case(
         ]
         bad: list[tuple[str, str, dict[str, Any]]] = []
         for sample_id, scope_id, scope in trigger:
+            # A provider failure leaves no runtime decision to inspect.  It is
+            # deliberately unevaluated; the report remains hold rather than
+            # treating transport/provider unavailability as a semantic breach.
+            if any(
+                "provider_unavailable" in item.get("reason_codes", [])
+                for item in scope.get("task_result", {}).get("human_review_items", [])
+            ):
+                return Stage5NegativeCaseResult(
+                    case_id=case_id,
+                    evaluated=False,
+                    passed=False,
+                    reason="runtime trigger was provider-unavailable; semantic guard not evaluated",
+                    inspected_runtime_target_ids=(),
+                )
             accepted_relationships = [
                 item
                 for item in _accepted_records_for_scope(sample_id, scope_id, scope)
@@ -597,9 +611,12 @@ def _evaluate_negative_case(
             disposition = _disposition(
                 scopes, item[0], item[1], str(item[2].get("record_id"))
             )
-            if (
-                item[2].get("activity_actor") == "公司"
-                and disposition.get("status") == "accepted_for_review"
+            actor_text = " ".join(
+                str(item[2].get(key) or "")
+                for key in ("activity_actor", "source_actor", "object_name")
+            )
+            if disposition.get("status") == "accepted_for_review" and re.search(
+                r"军贸公司|国外最终用户", actor_text
             ):
                 bad.append(item)
         return _required_output_result(

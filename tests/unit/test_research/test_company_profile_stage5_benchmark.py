@@ -33,6 +33,7 @@ from research.company_profile.models import (
 from research.company_profile.projection import project_research_view
 from research.company_profile.stage5 import PreparedPageContext, PreparedRequestScope
 from research.company_profile.stage5_benchmark import (
+    _evaluate_negative_case,
     _has_affirmative_subject_basis,
     evaluate_committed_stage5_run,
 )
@@ -131,6 +132,56 @@ def test_consolidation_adjustment_row_name_is_affirmative_subject_evidence() -> 
     }
 
     assert _has_affirmative_subject_basis(record) is True
+
+
+def test_totals_only_provider_failure_is_not_claimed_as_semantic_violation() -> None:
+    scope = {
+        "prepared_scope": {
+            "page_contexts": [{"text": "前五名客户销售额占年度销售总额58.14%"}],
+        },
+        "task_result": {
+            "records": [],
+            "dispositions": [],
+            "coverage": [],
+            "human_review_items": [{"reason_codes": ["provider_unavailable"]}],
+        },
+    }
+    result = _evaluate_negative_case(
+        "mm-neg-counterparty-coverage-backfill",
+        {"reports": [{"sample_id": "manufacturing-materials-603659-2025", "scope_results": [
+            {"scope_id": "top_five_customer_totals_only", **scope}
+        ]}]},
+    )
+    assert result.evaluated is False
+    assert result.passed is False
+
+
+def test_third_party_guard_does_not_reject_company_direct_sale() -> None:
+    activity = {
+        "record_id": "company-sale",
+        "object_type": "Activity",
+        "action": "sells",
+        "activity_actor": "公司",
+        "source_actor": "公司",
+        "object_name": "航空产品",
+    }
+    scope = {
+        "prepared_scope": {
+            "page_contexts": [{"text": "军贸公司向国外最终用户销售；军用航空产品采取直销模式。"}],
+        },
+        "task_result": {
+            "records": [activity],
+            "dispositions": [{"status": "accepted_for_review", "target_id": "company-sale"}],
+        },
+    }
+    result = _evaluate_negative_case(
+        "mm-neg-third-party-action-actor",
+        {"reports": [{"sample_id": "manufacturing-materials-302132-2025-regime", "scope_results": [
+            {"scope_id": "business_overview", **scope}
+        ]}]},
+    )
+    assert result.evaluated is True
+    assert result.passed is True
 
 
 def test_negative_cases_are_not_reported_as_passed_when_not_evaluated(
