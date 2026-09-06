@@ -211,6 +211,66 @@
       "sample_id": "manufacturing-materials-920015-2025",
       "scope_id": "segment_product_and_region",
       "task_complete": true
+    },
+    {
+      "accepted_record_count": 7,
+      "coverage_statuses": [
+        "production_capacity:observed",
+        "capacity_under_construction:observed",
+        "capacity_utilization:observed"
+      ],
+      "decision": "scope_pass",
+      "manifest_path": "var/company_profile_stage5/20260906/run-stage55-targeted-920015-capacity-table-luna-20260906-e/run-stage55-targeted-920015-capacity-table-luna-20260906-e/manifest.json",
+      "production_authorization": "not_authorized",
+      "provider_calls": 2,
+      "rationale": "新 run 完成产能表 extract→verify；表内羟胺盐在建产能 40,000 吨/年、设计产能和产能利用率均获得 accepted_for_review。主体仍按合同保留为 unclear；该定向结果不替换四报告权威 run。",
+      "run_id": "stage55-targeted-920015-capacity-table-luna-20260906-e",
+      "runtime_target_ids": [
+        "stage55-targeted-920015-capacity-table-luna-20260906-e:manufacturing-materials-920015-2025:capacity_table"
+      ],
+      "sample_id": "manufacturing-materials-920015-2025",
+      "scope_id": "capacity_table",
+      "task_complete": true
+    },
+    {
+      "accepted_record_count": 4,
+      "coverage_statuses": [
+        "capacity_utilization:observed",
+        "production_volume:observed",
+        "sales_volume:observed",
+        "inventory_volume:observed"
+      ],
+      "decision": "scope_pass",
+      "manifest_path": "var/company_profile_stage5/20260906/run-stage55-targeted-300750-volume-table-luna-20260906-f/run-stage55-targeted-300750-volume-table-luna-20260906-f/manifest.json",
+      "production_authorization": "not_authorized",
+      "provider_calls": 2,
+      "rationale": "新 run 完成电池系统产销存表 extract→verify；产量 748 GWh、销量 661 GWh、库存 186 GWh 和产能利用率 96.9% 均有来源证据并获得 accepted_for_review。该定向结果不替换四报告权威 run。",
+      "run_id": "stage55-targeted-300750-volume-table-luna-20260906-f",
+      "runtime_target_ids": [
+        "stage55-targeted-300750-volume-table-luna-20260906-f:manufacturing-materials-300750-2025:battery_system_volume_table"
+      ],
+      "sample_id": "manufacturing-materials-300750-2025",
+      "scope_id": "battery_system_volume_table",
+      "task_complete": true
+    },
+    {
+      "accepted_record_count": 2,
+      "coverage_statuses": [
+        "counterparty_relationship:not_disclosed",
+        "customer_concentration:observed"
+      ],
+      "decision": "scope_pass",
+      "manifest_path": "var/company_profile_stage5/20260906/run-stage55-targeted-603659-customer-total-luna-20260906-g/run-stage55-targeted-603659-customer-total-luna-20260906-g/manifest.json",
+      "production_authorization": "not_authorized",
+      "provider_calls": 2,
+      "rationale": "新 run 对璞泰来前五名客户仅合计披露 scope 完成 extract→verify；客户销售额 913,511 万元及集中度 58.14% 被接受，名称 coverage 保持 not_disclosed，未生成 Relationship。主体保持 unclear，待人工决定是否允许该集中度事实进入研究视图。",
+      "run_id": "stage55-targeted-603659-customer-total-luna-20260906-g",
+      "runtime_target_ids": [
+        "stage55-targeted-603659-customer-total-luna-20260906-g:manufacturing-materials-603659-2025:top_five_customer_totals_only"
+      ],
+      "sample_id": "manufacturing-materials-603659-2025",
+      "scope_id": "top_five_customer_totals_only",
+      "task_complete": true
     }
   ],
   "unclear_subject_record_counts": {

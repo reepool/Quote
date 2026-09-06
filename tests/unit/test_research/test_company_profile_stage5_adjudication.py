@@ -27,10 +27,10 @@ def test_stage55_ledger_loads_only_against_immutable_run_f() -> None:
     assert ledger.rerun_policy == "new_run_id_only"
     assert ledger.production_authorization == "not_authorized"
     assert len(ledger.items) == 4
-    assert len(ledger.targeted_runs) == 4
+    assert len(ledger.targeted_runs) >= 4
     assert all(item.task_complete for item in ledger.targeted_runs)
     assert all(item.decision == "scope_pass" for item in ledger.targeted_runs)
-    assert len({item.run_id for item in ledger.targeted_runs}) == 4
+    assert len({item.run_id for item in ledger.targeted_runs}) == len(ledger.targeted_runs)
 
 
 def test_stage55_ledger_rejects_tampered_baseline_manifest(tmp_path: Path) -> None:

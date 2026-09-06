@@ -32,7 +32,10 @@ from research.company_profile.models import (
 )
 from research.company_profile.projection import project_research_view
 from research.company_profile.stage5 import PreparedPageContext, PreparedRequestScope
-from research.company_profile.stage5_benchmark import evaluate_committed_stage5_run
+from research.company_profile.stage5_benchmark import (
+    _has_affirmative_subject_basis,
+    evaluate_committed_stage5_run,
+)
 from research.company_profile.stage5_bundle import (
     Stage5BenchmarkResult,
     Stage5OverallStatus,
@@ -117,6 +120,17 @@ def test_totals_only_aggregate_relationship_fails_from_committed_output(
     assert any(
         target.startswith("record:") for target in result.inspected_runtime_target_ids
     )
+
+
+def test_consolidation_adjustment_row_name_is_affirmative_subject_evidence() -> None:
+    record = {
+        "row_class": "consolidation_adjustment",
+        "subject_basis": "direct_source_wording",
+        "source_native": {"name": "合并抵消项"},
+        "evidence": [{"anchor": {"bounded_quote": ""}}],
+    }
+
+    assert _has_affirmative_subject_basis(record) is True
 
 
 def test_negative_cases_are_not_reported_as_passed_when_not_evaluated(

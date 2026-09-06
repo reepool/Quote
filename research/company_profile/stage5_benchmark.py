@@ -830,6 +830,11 @@ def _has_affirmative_subject_basis(record: dict[str, Any]) -> bool:
             item.get("subject_evidence_pages") for item in record.get("evidence", [])
         )
     if basis == "direct_source_wording":
+        if (
+            record.get("row_class") == "consolidation_adjustment"
+            and "合并抵消项" in _record_text(record)
+        ):
+            return True
         return bool(re.search(r"合并|本集团|集团", _record_evidence_text(record)))
     return False
 
