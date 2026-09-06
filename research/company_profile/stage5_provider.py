@@ -78,10 +78,12 @@ _TASK_INSTRUCTIONS = {
         "is absent."
     ),
     "extract_material_inputs": (
-        "Extract only explicitly named material inputs and their stated relationship; "
-        "do not infer materials from industry knowledge. When at least one material input "
-        "is emitted, return coverage=null. When none is explicitly named, return legal-empty "
-        "coverage with the source-supported non-observed status and reason code."
+        "Extract only explicitly named raw-material or energy inputs and their stated "
+        "relationship; do not infer inputs from industry knowledge. The governed "
+        "material_input Relationship is used for both source classes while preserving the "
+        "source-native item name. When at least one input is emitted, return coverage=null. "
+        "When none is explicitly named, return legal-empty coverage with the "
+        "source-supported non-observed status and reason code."
     ),
     "extract_counterparties_and_concentration": (
         "Keep named, report-local anonymous, and report-local aggregate identities "
@@ -129,6 +131,18 @@ _SCOPE_INSTRUCTIONS = {
         "names no such item, return an empty material_inputs array and "
         "coverage=not_disclosed/source_reason_unspecified."
     ),
+    "customer_ranking_rows": (
+        "Extract only customer identity rows and customer concentration values from this "
+        "request scope. A continuation page may also contain a supplier section; that "
+        "section belongs to supplier_ranking_rows and must not produce supplier "
+        "Relationships or supplier Measurements here."
+    ),
+    "supplier_ranking_rows": (
+        "Extract only supplier identity rows and supplier concentration values from this "
+        "request scope. A preceding page may also contain a customer section; that section "
+        "belongs to customer_ranking_rows and must not produce customer Relationships or "
+        "customer Measurements here."
+    ),
     "top_five_customer_totals_only": (
         "This request scope is totals-only. If the complete supplied section reports customer "
         "amount/share but contains no customer identity rows, emit every explicitly disclosed "
@@ -167,8 +181,11 @@ _SCOPE_INSTRUCTIONS = {
         "event. Whether or not another event is disclosed in the same scope, emit separate "
         "coverage for business_regime with status=not_applicable and "
         "reason_code=source_explicitly_not_applicable whenever the source explicitly marks "
-        "that business/product/service change as 不适用; do not fabricate a BusinessEvent "
-        "for the not-applicable statement."
+        "that business/product/service change as 不适用. If this approved request scope "
+        "instead consists specifically of 合并报表范围的变化情况 and that field is explicitly "
+        "marked 不适用, return the same evidenced not_applicable coverage for this "
+        "consolidation-change scope without claiming that principal business was unchanged. "
+        "Do not fabricate a BusinessEvent for either not-applicable statement."
     ),
     "same_control_comparison_basis": (
         "Extract the disclosed revenue comparison columns as separate Measurements, not "
@@ -1028,6 +1045,16 @@ def _counterparty_extract_schema(
     prepared_scope: PreparedRequestScope | None,
 ) -> dict[str, Any]:
     evidence_id = _evidence_id_schema(prepared_scope)
+    relation_types = [
+        "customer",
+        "supplier",
+        "related_party",
+        "contract_counterparty",
+    ]
+    if prepared_scope is not None and prepared_scope.scope_id == "customer_ranking_rows":
+        relation_types = ["customer"]
+    elif prepared_scope is not None and prepared_scope.scope_id == "supplier_ranking_rows":
+        relation_types = ["supplier"]
     return {
         "type": "object",
         "additionalProperties": False,
@@ -1045,14 +1072,7 @@ def _counterparty_extract_schema(
                         "evidence_id",
                     ],
                     "properties": {
-                        "relation_type": {
-                            "enum": [
-                                "customer",
-                                "supplier",
-                                "related_party",
-                                "contract_counterparty",
-                            ]
-                        },
+                        "relation_type": {"enum": relation_types},
                         "name": {"type": "string"},
                         "identity_class": {
                             "enum": [
@@ -1811,6 +1831,15 @@ def _expand_business_regime_draft(
     regimes = result.pop("regimes", [])
     package_assignments = result.pop("package_assignments", [])
     coverage = result.pop("coverage", [])
+    if prepared_scope.scope_id == "business_mode_and_extension" and any(
+        isinstance(item, Mapping) and item.get("event_type") == "product_extension"
+        for item in events
+    ):
+        # MR-03: an evidenced product extension completes this request scope.  A
+        # simultaneous statement that the operating mode did not materially change
+        # is not a separate business-regime legal-empty result and must not override
+        # the accepted event during coverage resolution.
+        coverage = []
     result["schema_version"] = "company_profile_extract_response.v1"
     result["request_id"] = request.request_id
     result["items"] = []
@@ -2100,6 +2129,7 @@ def _expand_extract_response(
                 prepared_scope=prepared_scope,
             )
         expanded_items.append(item)
+    _ensure_unique_generated_record_ids(expanded_items)
     result["items"] = expanded_items
     return result
 
@@ -2353,6 +2383,56 @@ def _stable_record_id(
     ).encode("utf-8")
     return f"stage5-{hashlib.sha256(encoded).hexdigest()[:24]}"
 
+def _ensure_unique_generated_record_ids(items: list[Any]) -> None:
+    """Disambiguate repeated model drafts before strict response validation.
+
+    Record identity is owned by this adapter, not by the model-side compact
+    contract. A provider can repeat the same source row in a long table response;
+    the stage-four workflow is responsible for reconciling that semantic duplicate,
+    but ``ExtractResponse`` first requires transport-level record IDs to be unique.
+    Keep the first stable ID and deterministically derive a distinct ID for each
+    later occurrence without changing any semantic field.
+    """
+
+    seen: dict[str, int] = {}
+    assigned: set[str] = set()
+    for item in items:
+        if not isinstance(item, Mapping):
+            continue
+        candidate = item.get("candidate")
+        if not isinstance(candidate, dict):
+            continue
+        record_id = candidate.get("record_id")
+        if not isinstance(record_id, str) or not record_id:
+            continue
+        occurrence = seen.get(record_id, 0)
+        seen[record_id] = occurrence + 1
+        if occurrence == 0 and record_id not in assigned:
+            assigned.add(record_id)
+            continue
+        semantic_candidate = {
+            key: value for key, value in candidate.items() if key != "record_id"
+        }
+        salt = occurrence + 1
+        while True:
+            encoded = json.dumps(
+                {
+                    "base_record_id": record_id,
+                    "occurrence": salt,
+                    "candidate": semantic_candidate,
+                },
+                ensure_ascii=False,
+                sort_keys=True,
+                separators=(",", ":"),
+                allow_nan=False,
+            ).encode("utf-8")
+            disambiguated = f"stage5-{hashlib.sha256(encoded).hexdigest()[:24]}"
+            if disambiguated not in assigned:
+                candidate["record_id"] = disambiguated
+                assigned.add(disambiguated)
+                break
+            salt += 1
+
 
 class CommonGatewaySemanticProvider:
     """Adapt one prepared request scope to the existing common LLM gateway.
@@ -2593,6 +2673,27 @@ class CommonGatewaySemanticProvider:
                     "production approval, package assignment, commodity exposure, value-chain "
                     "position, or DCF input. Return JSON only."
                 )
+                if self._prepared_scope.scope_id == "reported_business_change":
+                    system_instruction += (
+                        " In this reported_business_change request, a source section titled "
+                        "合并报表范围的变化情况 that explicitly marks □适用 √不适用 "
+                        "supports business_regime coverage=not_applicable with "
+                        "reason_code=source_explicitly_not_applicable. This legal-empty "
+                        "result answers only whether consolidation scope changed; it must "
+                        "not be interpreted as evidence that principal business, products, "
+                        "or services were unchanged, and it must not create a BusinessEvent."
+                    )
+                if (
+                    self._prepared_scope.chapter_task.value
+                    == "extract_material_inputs"
+                ):
+                    system_instruction += (
+                        " In extract_material_inputs, the governed material_input "
+                        "Relationship covers both explicitly named raw-material inputs and "
+                        "explicitly named energy inputs. Preserve the source-native name and "
+                        "do not return object_not_allowed solely because the report classifies "
+                        "an input as energy rather than raw material."
+                    )
             else:
                 system_instruction = (
                     "You are a bounded company-profile semantic worker. "

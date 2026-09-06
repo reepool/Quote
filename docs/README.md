@@ -33,8 +33,8 @@
 - `docs/development/company_profile_industry_research_method.md`：公司画像阶段 2 分行业研究方法、样本选择、标注、benchmark 与阶段 3 进入门
 - `docs/development/company_profile_manufacturing_materials_requirements.md`、`company_profile_manufacturing_materials_research_index.md`：已通过阶段 3 研究验收的制造/材料行业合同与证据索引；不代表生产授权
 - `docs/development/company_profile_stage5_final_audit_20260905.md`、`company_profile_stage55_adjudication_ledger.v1.json`：阶段 5 四报告权威 hold 基线与阶段 5.5 语义裁决账本；所有重跑必须使用新 run ID，生产授权仍为 `not_authorized`
-- `docs/development/company_profile_stage55_adjudication_summary_20260906.md`：阶段 5.5 最新完整运行 `run-l` 与真实 Benchmark 汇总；四份 `company_profile_stage55_profile_*_2025.md` 仍保留较早 `run-a` 的研究视图，不作为本轮人工审批依据
-- `docs/development/company_profile_stage55_manual_review_package_20260906.md`：阶段 5.5 最新完整运行 `run-l` 的人工审批包；将 30 条底层复核记录合并为 7 个带原文、页码、Evidence 和推荐决定的审批主题
+- `docs/development/company_profile_stage55_adjudication_summary_20260906.md`：阶段 5.5 最新完整权威运行 `stage55-final-four-authoritative-x`、真实 Benchmark、定向修正及 DNS 重跑阻塞汇总；四份 `company_profile_stage55_profile_*_2025.md` 均以 run-x 为权威来源
+- `docs/development/company_profile_stage55_manual_review_package_20260906.md`：MR-01 至 MR-07 用户裁决及 MR-08/MR-09 实现修正的人工复核包；逐项保留 runtime target、原文、页码、Evidence 和决定依据
 - `docs/development/company_profile_common_semantic_model.md`：阶段 4 通用语义模型、受控内存工作流和研究员读取投影；生产授权仍为 `not_authorized`
 - `openspec/changes/archive/2026-09-06-slice-manufacturing-materials-company-profile/`：已归档的阶段 5 隔离竖切合同；不恢复旧生产链
 - `openspec/changes/resolve-manufacturing-materials-profile-semantic-holds/`：当前阶段 5.5 语义裁决 change；只处理四报告 hold、真实 Benchmark 和人工复核，不授权生产发布

@@ -1,6 +1,6 @@
 # 阶段 5.5 人工语义复核包（2026-09-06）
 
-> 复核对象：MR-01 至 MR-07 的原始候选来自前一轮完整运行；裁决后的复验与完整权威运行是 `stage55-final-four-luna-20260906-p`
+> 复核对象：MR-01 至 MR-07 已完成用户裁决；最新完整权威运行是 `stage55-final-four-authoritative-x`，本轮 MR-08/MR-09 修正由定向运行 `stage55-targeted-920015-current-result-fix-y` 复验
 >
 > 状态：`adjudication_recorded`
 >
@@ -10,13 +10,13 @@
 
 ## 1. 本复核包解决什么问题
 
-裁决后的新权威完整运行 `run-p` 完成了 43 个 scope 的执行（82 次 provider call，其中 78 次成功、4 次
-`provider_unavailable`）。当前 `hold` 不是 DNS 或底层传输超时，而是未完成 scope、主体门禁以及 Gold/负例
-结果未达到完成门槛。
+最新完整权威运行 run-x 完成 43 个 scope：43 次 extract 成功，42 次 verify 成功，宁德时代
+`reported_business_change` 的一次 verify 命中 180 秒 `deadline_exceeded`。run-x 中锦华新材另有两个
+当前结果缺口；它们已按冻结合同做最小实现修正，并由 run-y 的 4 次真实调用全部复验通过。
 
-原始复核运行产生 30 条底层 `human_review_items`：璞泰来 2 条、锦华新材 12 条、中航成飞 16 条、
-宁德时代 0 条。本文件按同一原文、同一语义问题合并为 7 个审批主题。一次主题审批同时覆盖其
-列出的候选记录和派生 coverage，避免对同一张表逐行重复审批。
+MR-01 至 MR-07 是已经完成用户裁决的原始审批主题。MR-08/MR-09 记录本轮从 run-x 发现并修正的
+实现误差，仍提供准确 runtime target、PDF 原文、页码和 Evidence，便于复查；它们不把定向运行拼入
+完整权威画像。
 
 可选动作含义：
 
@@ -46,6 +46,8 @@ MR-02 request_repair
 | MR-05 | 中航成飞 | 同一控制调整前后营业收入五列 | `subject_unsupported`，且比较口径不完整 | `request_repair` |
 | MR-06 | 中航成飞 | 前五名客户合计金额和占比 | `subject_unsupported` | `accept_for_research_review`，主体继续 `unclear` |
 | MR-07 | 中航成飞 | 2023 年重大资产重组启动事件 | 事件可见但 coverage 未通过 | `request_repair` |
+| MR-08 | 锦华新材 | 原材料及能源表中的蒸汽、电 | verifier 误报 `object_not_allowed` | `implementation_correction`，按能源输入接受 |
+| MR-09 | 锦华新材 | 产品扩展事件与“经营模式未变化” coverage 冲突 | 失败 coverage 覆盖已接受事件 | `implementation_correction`，由产品扩展事件完成 scope |
 
 ## 3. 逐项复核
 
@@ -265,6 +267,48 @@ Measurement；不得生成“前五名客户合计” Relationship，也不得�
 source-native 中文描述，期间标为 2023 年并保留本年报的 `knowledge_time`；不得用它替代
 2025-01-06 的 `equity_transfer_effective/regime_effective_at`。
 
+### MR-08 锦华新材：蒸汽、电属于明示能源输入
+
+run-x 的准确目标：
+
+- `stage5-668bfa53e0515e34ed044206`：`material_input / 蒸汽`；
+- `stage5-e057985c94a2e49e84898438`：`material_input / 电`；
+- coverage：`stage55-final-four-authoritative-x:manufacturing-materials-920015-2025:material_and_energy_table:coverage:material_input`。
+
+原文（PDF 物理页 51）：
+
+> 三、主要原材料及能源采购；（一）主要原材料及能源情况……蒸汽 合理范围 定向采购 稳定 较上年下降……电 合理范围 定向采购 稳定 较上年下降。
+
+Evidence：`stage5-evidence-6c76e455cca0c914d8298f9f`。
+
+审核依据：制造/材料合同中的 `material_input` 覆盖原文明示的 material/energy input。蒸汽、电必须保留为
+能源输入，不能改写成 raw material；但它们仍使用当前 v1 的受控 `material_input` Relationship，不因此推导
+商品价格方向、利润敏感度或生产 CommodityExposure。
+
+决定：`implementation_correction`。独立 verifier 不得仅因来源将对象归为能源而返回
+`object_not_allowed`。定向 run-y 中同表九项输入全部接受，coverage=`observed`，scope complete。
+
+### MR-09 锦华新材：产品扩展事件完成 scope，不叠加矛盾 coverage
+
+run-x 的准确目标：
+
+- 已接受事件 `stage5-c2b6481e5a08b5c97be5fd18`：`product_extension`；
+- 失败 coverage：`stage55-final-four-authoritative-x:manufacturing-materials-920015-2025:business_mode_and_extension:coverage:business_regime`。
+
+原文（PDF 物理页 12–13）：
+
+> 报告期内，新增电子级羟胺水溶液供应，主要用于集成电路制造过程中蚀刻后的清洗环节。
+>
+> 公司在报告期内，经营模式未发生重大变化。
+
+Evidence：`stage5-evidence-ffb1170192a7c07251ee0e79`、`stage5-evidence-38c90111524687d53d30522b`。
+
+审核依据：第一句是有报告期边界的产品扩展事件；第二句仅说明经营模式稳定，不是 BusinessRegime，
+也不能生成与已接受 `product_extension` 同字段冲突的 legal-empty coverage。这直接执行用户已批准的 MR-03。
+
+决定：`implementation_correction`。保留产品扩展事件，由 accepted event 派生 `business_regime=observed`；
+丢弃“经营模式未变化”产生的多余 coverage。定向 run-y 中 scope complete，无人工复核项。
+
 ## 4. 不应由人工强行批准的报告级主体门禁
 
 四份报告所有 request scope 均已完成调用，但报告级 `subject_resolution` 仍发现以下
@@ -272,10 +316,10 @@ source-native 中文描述，期间标为 2023 年并保留本年报的 `knowled
 
 | 公司 | unclear accepted records | 本轮候选级人工项 |
 |---|---:|---:|
-| 宁德时代 | 51 | 0 |
-| 璞泰来 | 36 | 2 |
-| 锦华新材 | 60 | 12 |
-| 中航成飞 | 10 | 16 |
+| 宁德时代 | 52 | 0 |
+| 璞泰来 | 39 | 0 个新增候选级决定 |
+| 锦华新材 | 60 | MR-08/MR-09 已按合同修正 |
+| 中航成飞 | 24 | 0 个新增候选级决定 |
 
 这类记录的原文通常只写“公司”，例如：
 
@@ -285,31 +329,33 @@ source-native 中文描述，期间标为 2023 年并保留本年报的 `knowled
 只有“公司”二字不能默认推成合并集团；需要表头/导语/脚注明示合并口径，或记录同报告合并利润表
 的数字核对。
 
-因此，本轮建议继续保留报告级 `hold`，不把这 157 条记录批量升级为
-`consolidated_group`。后续如要清除此门禁，应做 Evidence 级主体补强或同报告数字核对；这不是
-本次七项人工事实审批可以代替的工作。
+因此，本轮继续保留报告级 `hold`，不把这 175 条记录批量升级为 `consolidated_group`。后续如要
+清除此门禁，应做 Evidence 级主体补强或同报告数字核对；这不是 MR-01 至 MR-09 可以代替的工作。
 
-## 5. Benchmark 与审批后的完成边界
+## 5. Benchmark、重跑与完成边界
 
-当前真实 Benchmark：
+run-x 的真实 Benchmark：
 
 | 项目 | 结果 |
 |---|---:|
-| Gold | 4 / 24 通过 |
-| 冻结负例 | 15 / 19 已评估 |
-| 已评估负例通过 | 13 |
-| 已评估负例失败 | 2（`mm-neg-counterparty-coverage-backfill`、`mm-neg-third-party-action-actor`） |
-| 未触发、未评估 | 4 |
+| Gold | 3 / 24 通过 |
+| 冻结负例 | 19 条 |
+| 实际已评估 | 15 条 |
+| 已评估且通过 | 15 条 |
+| 已评估且失败 | 0 条 |
+| 未触发、未评估 | 4 条 |
 
-以上数字是 `run-p/post-run-benchmark.json` 生成时的历史结果。后续修正了两个 Benchmark 守卫：provider
-不可用现在记为未评估；共享 Evidence 不再误伤合法的公司直销 Activity。对同一 bundle 的离线重算为 14 条已评估、
-14 条通过、5 条未评估，但不可覆盖历史 Benchmark；必须在新的完整 run 上重新生成正式结果。
+未评估项保持未评估，不能记为通过。Gold 低通过数也不能解释成只抽出三条事实；它包含严格格式、表头和
+source-native 对账，必须在新权威 bundle 上继续核验。
 
-MR-01 至 MR-07 的人工决定已写入裁决账本，并已使用新 run ID `run-p` 复验受影响 scope、完成
-四报告完整切片和真实 post-run Benchmark。当前两条失败负例是 `mm-neg-counterparty-coverage-backfill`
-与 `mm-neg-third-party-action-actor`；4 条负例尚未触发，保持未评估。不得修改历史运行或把人工决定、
-Gold 值补写成 runtime 事实。
+本轮完整替代运行尝试：
 
-即使 MR-01 至 MR-07 全部按推荐决定通过，只要报告级主体门禁、Gold 或冻结负例完成门尚未满足，
-四报告仍保持 `hold`，不得登记 `research_slice_pass`，不得启动阶段 6、旧 backfill 或商品暴露/
-价值链生产发布。
+- run-z：首个 scope 命中 `dns_failure/connect` 后中止；
+- preflight-aa：同一 scope 的 extract/verify 均成功；
+- run-ab：再次在首个 scope 命中 `dns_failure/connect` 后中止。
+
+run-z/run-ab 均未提交 bundle，且无 `.stage5-tmp-*`。因此 run-y 只作为 MR-08/MR-09 的定向复验证据，
+最新完整权威结果仍为 run-x。
+
+只要报告级主体门禁、Gold、全部冻结负例实际评估或任一 required scope 尚未满足，四报告就继续 `hold`，
+不得登记 `research_slice_pass`，不得启动阶段 6、旧 backfill 或商品暴露/价值链生产发布。

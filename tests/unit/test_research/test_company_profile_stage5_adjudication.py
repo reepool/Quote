@@ -26,7 +26,7 @@ def test_stage55_ledger_loads_only_against_immutable_run_f() -> None:
     assert ledger.baseline_run_id == STAGE55_BASELINE_RUN_ID
     assert ledger.rerun_policy == "new_run_id_only"
     assert ledger.production_authorization == "not_authorized"
-    assert len(ledger.items) == 11
+    assert len(ledger.items) == 13
     user_decisions = {
         item.adjudication_id: item for item in ledger.items if item.reviewer == "user-final-adjudication"
     }

@@ -326,6 +326,58 @@
       ],
       "sample_id": "manufacturing-materials-302132-2025-regime",
       "scope_id": "restructuring_commitment"
+    },
+    {
+      "adjudication_id": "stage55-920015-material-energy-inputs",
+      "blocker_codes": [
+        "object_not_allowed",
+        "required_coverage_missing"
+      ],
+      "contract_refs": [
+        "company_profile_manufacturing_materials_llm_contract.md#8",
+        "company_profile_manufacturing_materials_requirements.md#5"
+      ],
+      "decision": "implementation_correction",
+      "evidence_ids": [
+        "stage5-evidence-6c76e455cca0c914d8298f9f"
+      ],
+      "production_authorization": "not_authorized",
+      "rationale": "冻结合同将年报明示的原材料和能源输入都纳入 material_input Relationship。run-x 的独立 verify 仅因蒸汽、电属于能源而返回 object_not_allowed，属于 verifier 误拦；修正后仍保留 source-native 名称，不把能源改写成原材料，也不推导商品价格暴露。",
+      "reviewed_at": "2026-09-06",
+      "reviewer": "codex-stage55",
+      "runtime_target_ids": [
+        "stage5-668bfa53e0515e34ed044206",
+        "stage5-e057985c94a2e49e84898438",
+        "stage55-final-four-authoritative-x:manufacturing-materials-920015-2025:material_and_energy_table:coverage:material_input"
+      ],
+      "sample_id": "manufacturing-materials-920015-2025",
+      "scope_id": "material_and_energy_table"
+    },
+    {
+      "adjudication_id": "stage55-920015-product-extension-coverage-precedence",
+      "blocker_codes": [
+        "required_coverage_missing",
+        "candidate_unresolved"
+      ],
+      "contract_refs": [
+        "company_profile_stage55_manual_review_package_20260906.md#mr-03-锦华新材产品扩展与-businessregime-误分类",
+        "company_profile_manufacturing_materials_requirements.md#8"
+      ],
+      "decision": "implementation_correction",
+      "evidence_ids": [
+        "stage5-evidence-ffb1170192a7c07251ee0e79",
+        "stage5-evidence-38c90111524687d53d30522b"
+      ],
+      "production_authorization": "not_authorized",
+      "rationale": "MR-03 已裁决新增电子级羟胺水溶液供应为 product_extension BusinessEvent，并由该事件完成 scope。‘经营模式未发生重大变化’不能同时生成 business_regime legal-empty coverage，否则失败 coverage 会覆盖已接受事件并制造假缺口。",
+      "reviewed_at": "2026-09-06",
+      "reviewer": "codex-stage55",
+      "runtime_target_ids": [
+        "stage5-c2b6481e5a08b5c97be5fd18",
+        "stage55-final-four-authoritative-x:manufacturing-materials-920015-2025:business_mode_and_extension:coverage:business_regime"
+      ],
+      "sample_id": "manufacturing-materials-920015-2025",
+      "scope_id": "business_mode_and_extension"
     }
   ],
   "production_authorization": "not_authorized",
@@ -486,6 +538,26 @@
       ],
       "sample_id": "manufacturing-materials-603659-2025",
       "scope_id": "top_five_customer_totals_only",
+      "task_complete": true
+    },
+    {
+      "accepted_record_count": 10,
+      "coverage_statuses": [
+        "material_input:observed",
+        "business_regime:observed"
+      ],
+      "decision": "scope_pass",
+      "manifest_path": "var/company_profile_stage5/20260906/run-stage55-targeted-920015-current-result-fix-y/manifest.json",
+      "production_authorization": "not_authorized",
+      "provider_calls": 4,
+      "rationale": "同一新 run 分别完成 material_and_energy_table 与 business_mode_and_extension 的 extract→verify：九项原材料/能源输入全部接受；产品扩展事件接受且不再由经营模式未变化 coverage 覆盖。该定向结果只证明两项修正，不替换完整四报告权威 run。",
+      "run_id": "stage55-targeted-920015-current-result-fix-y",
+      "runtime_target_ids": [
+        "stage55-targeted-920015-current-result-fix-y:manufacturing-materials-920015-2025:material_and_energy_table",
+        "stage55-targeted-920015-current-result-fix-y:manufacturing-materials-920015-2025:business_mode_and_extension"
+      ],
+      "sample_id": "manufacturing-materials-920015-2025",
+      "scope_id": "material_and_energy_table + business_mode_and_extension",
       "task_complete": true
     }
   ],

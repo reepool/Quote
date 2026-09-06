@@ -36,6 +36,8 @@
 - 业务变化：合并范围变化与“业务、产品或服务无重大变化”分成不同结果。后者生成 `business_regime=not_applicable` coverage，不生成虚假 BusinessEvent。
 - 加工量：复合来源名 `涂覆加工量（销量）` 的同一 physical anchor 只产生 `processing_volume`。verify 按 request field、physical anchor 和完整 source-native label 判断，不因括号别名要求第二个 `sales_volume`。
 - 同一控制：重述列必须带 `comparison_basis=same_control_restated`；调整前列保留报告原标签或 `original_as_published` 语义，但任何列仍需独立主体依据。后发重述永不覆盖 predecessor 当时披露。
+- 原材料与能源：`material_input` 作为 v1 受控 Relationship 同时承载原文明示的 material/energy input；独立 verify 不得只因对象是能源而报 `object_not_allowed`，但不得将能源改写成原料或推导商品敏感性。
+- 产品扩展：`business_mode_and_extension` 已有 accepted `product_extension` 时，由该事件完成 observed coverage；“经营模式未发生重大变化”不是 BusinessRegime，也不得用失败 legal-empty coverage 覆盖已接受事件。
 
 ### 3. 负例评估从固定合同规则读取真实 bundle
 

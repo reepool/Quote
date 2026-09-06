@@ -16,6 +16,22 @@ For the business-regime chapter task, the workflow MUST keep consolidation-scope
 - **THEN** the workflow may complete that checklist obligation with `not_applicable` coverage and Evidence
 - **AND** no event is required merely to avoid an empty record array
 
+### Requirement: Material-input verification preserves explicit energy inputs
+For `extract_material_inputs`, the governed `material_input` Relationship MUST accept both explicitly named raw-material inputs and explicitly named energy inputs when the Evidence identifies them as procured or consumed inputs. Verification MUST preserve the source-native item name and MUST NOT return `object_not_allowed` solely because the report classifies an item as energy. This rule MUST NOT relabel energy as raw material or authorize CommodityExposure inference.
+
+#### Scenario: A source table lists steam and electricity as energy inputs
+- **WHEN** a complete “主要原材料及能源” table explicitly lists steam or electricity as an input
+- **THEN** verify may pass the source-supported `material_input` Relationship
+- **AND** the result remains a research fact without inferred price sensitivity or production publication
+
+### Requirement: Product-extension events are not overridden by non-regime no-change wording
+In the `business_mode_and_extension` scope, an evidenced `product_extension` BusinessEvent MUST complete the `business_regime` checklist field through accepted observed coverage. A separate statement that the operating mode did not materially change MUST NOT create a BusinessRegime or a legal-empty coverage result that overrides the accepted event.
+
+#### Scenario: A new product is supplied while the operating mode remains unchanged
+- **WHEN** the Evidence reports a new product or service supply during the period and separately says the operating mode did not materially change
+- **THEN** the workflow retains the product-extension event and derives observed coverage from that accepted event
+- **AND** it does not add a conflicting `not_applicable` result for the same checklist field
+
 ### Requirement: Same-control comparative verification is column and knowledge-time aware
 Verification MUST require `comparison_basis` for each explicitly restated comparative and MUST preserve reported period, knowledge time, and subject evidence per column. It MUST NOT treat a current-period value as restated merely because prior-year columns exist, and MUST NOT reject a valid restated column solely because its value differs from the predecessor's original annual report.
 

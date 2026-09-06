@@ -25,6 +25,7 @@ from research.company_profile.models import (
     ChapterTask,
     ComparisonBasis,
     CoverageReasonCode,
+    CoverageResult,
     CoverageStatus,
     Evidence,
     MetricType,
@@ -196,6 +197,9 @@ def test_common_gateway_provider_sends_one_bounded_scope_and_stage4_schema() -> 
         ("capacity_and_processing_narrative", "do not emit a second sales_volume"),
         ("capacity_project_narrative", "do not convert its value or unit"),
         ("procurement_mode", "to invent named material inputs"),
+        ("customer_ranking_rows", "must not produce supplier Relationships"),
+        ("supplier_ranking_rows", "must not produce customer Relationships"),
+        ("reported_business_change", "consolidation-change scope"),
         ("top_five_customer_totals_only", "This request scope is totals-only"),
         ("top_five_supplier_totals_only", "This request scope is totals-only"),
         ("quantity_disclosure_check", "do not infer quantities from"),
@@ -955,6 +959,245 @@ def test_reported_business_change_keeps_event_and_not_applicable_coverage_separa
     assert result.task_complete is True
 
 
+def test_product_extension_drops_operating_mode_no_change_coverage() -> None:
+    prepared = _prepared_scope().model_copy(
+        update={
+            "scope_id": "business_mode_and_extension",
+            "chapter_task": ChapterTask.EXTRACT_BUSINESS_REGIME,
+            "field_ids": ("business_regime",),
+        }
+    )
+    source_text = (
+        "报告期内，新增电子级羟胺水溶液供应。"
+        "公司在报告期内，经营模式未发生重大变化。"
+    )
+    evidence = prepared.evidence_bundle[0].evidence.model_copy(
+        update={
+            "section_title": "商业模式 / 产品扩展",
+            "anchor": TextAnchor(bounded_quote=source_text),
+        }
+    )
+    prepared = prepared.model_copy(
+        update={
+            "evidence_bundle": (
+                PreparedEvidence(evidence=evidence, field_id="business_regime"),
+            ),
+            "page_contexts": (
+                PreparedPageContext(
+                    page=evidence.page,
+                    text=source_text,
+                    text_hash="e" * 64,
+                    extraction_method="pypdf",
+                    quality_status="usable",
+                ),
+            ),
+        }
+    )
+    request = _business_regime_request(prepared)
+    expanded = _expand_extract_response(
+        {
+            "events": [
+                {
+                    "event_type": "product_extension",
+                    "description": "报告期内，新增电子级羟胺水溶液供应。",
+                    "evidence_id": evidence.evidence_id,
+                }
+            ],
+            "regimes": [],
+            "package_assignments": [],
+            "coverage": [
+                {
+                    "field_id": "business_regime",
+                    "status": "not_applicable",
+                    "reason_code": "source_explicitly_not_applicable",
+                    "evidence_ids": [evidence.evidence_id],
+                }
+            ],
+        },
+        request=request,
+        prepared_scope=prepared,
+    )
+    response = ExtractResponse.model_validate_json(
+        json.dumps(expanded, ensure_ascii=False)
+    )
+
+    assert len(response.candidates()) == 1
+    assert response.candidates()[0].event_type == "product_extension"
+    assert response.coverage_results() == ()
+
+    result = CompanyProfileSemanticService().run_task(
+        request,
+        provider=FakeSemanticProvider(extract_output=response),
+    )
+
+    assert len(result.accepted_records()) == 1
+    assert result.coverage[0].status == CoverageStatus.OBSERVED
+    assert result.task_complete is True
+
+
+def test_consolidation_change_not_applicable_is_explicitly_supported_for_verify() -> None:
+    prepared = _reported_business_change_scope()
+    source_text = "（八）合并报表范围的变化情况 □适用 √不适用"
+    evidence = prepared.evidence_bundle[0].evidence.model_copy(
+        update={
+            "section_title": "合并报表范围的变化情况",
+            "anchor": TextAnchor(bounded_quote=source_text),
+        }
+    )
+    prepared = prepared.model_copy(
+        update={
+            "evidence_bundle": (
+                PreparedEvidence(evidence=evidence, field_id="business_regime"),
+            ),
+            "page_contexts": (
+                PreparedPageContext(
+                    page=evidence.page,
+                    text=source_text,
+                    text_hash="d" * 64,
+                    extraction_method="pypdf",
+                    quality_status="usable",
+                ),
+            ),
+        }
+    )
+    coverage = CoverageResult(
+        field_id="business_regime",
+        chapter_task=ChapterTask.EXTRACT_BUSINESS_REGIME,
+        requirement_level=RequirementLevel.REQUIRED,
+        status=CoverageStatus.NOT_APPLICABLE,
+        reason_code=CoverageReasonCode.SOURCE_EXPLICITLY_NOT_APPLICABLE,
+        evidence=(evidence,),
+    )
+    verify_request = VerifyRequest(
+        request_id="consolidation-change-not-applicable:verify",
+        original_request_id="consolidation-change-not-applicable",
+        report=prepared.report,
+        evidence_bundle=prepared.evidence_bundle,
+        candidates=(),
+        coverage=(coverage,),
+    )
+    client = _FakeGatewayClient(
+        outputs=[
+            {
+                "schema_version": "company_profile_verify_response.v1",
+                "request_id": verify_request.request_id,
+                "checks": [
+                    {
+                        "target_type": "coverage",
+                        "target_id": "extract_business_regime:business_regime",
+                        "status": "pass",
+                        "reason_codes": [],
+                    }
+                ],
+            }
+        ]
+    )
+    provider = CommonGatewaySemanticProvider(
+        client=client,
+        profile="semantic_extraction",
+        prepared_scope=prepared,
+        max_output_tokens=1000,
+        timeout_seconds=30,
+    )
+
+    response = provider.verify(verify_request)
+    instruction = LlmMessage.from_value(client.requests[0].messages[0]).content
+
+    assert response["checks"][0]["status"] == "pass"
+    assert "合并报表范围的变化情况" in instruction
+    assert "answers only whether consolidation scope changed" in instruction
+    assert "must not create a BusinessEvent" in instruction
+
+
+def test_material_input_verifier_accepts_explicit_energy_inputs() -> None:
+    prepared = _prepared_scope().model_copy(
+        update={
+            "scope_id": "material_and_energy_table",
+            "chapter_task": ChapterTask.EXTRACT_MATERIAL_INPUTS,
+            "field_ids": ("material_input",),
+        }
+    )
+    source_text = "原材料及能源名称 蒸汽 合理范围 定向采购 电 合理范围 定向采购"
+    evidence = prepared.evidence_bundle[0].evidence.model_copy(
+        update={
+            "section_title": "主要原材料及能源采购",
+            "anchor": TextAnchor(bounded_quote=source_text),
+        }
+    )
+    prepared = prepared.model_copy(
+        update={
+            "evidence_bundle": (
+                PreparedEvidence(evidence=evidence, field_id="material_input"),
+            ),
+            "page_contexts": (
+                PreparedPageContext(
+                    page=evidence.page,
+                    text=source_text,
+                    text_hash="f" * 64,
+                    extraction_method="pypdf",
+                    quality_status="usable",
+                ),
+            ),
+        }
+    )
+    request = _material_input_extract_request(prepared)
+    extract_response = ExtractResponse.model_validate_json(
+        json.dumps(
+            _expand_extract_response(
+                {
+                    "material_inputs": [
+                        {"name": "蒸汽", "evidence_id": evidence.evidence_id},
+                        {"name": "电", "evidence_id": evidence.evidence_id},
+                    ],
+                    "coverage": None,
+                },
+                request=request,
+                prepared_scope=prepared,
+            ),
+            ensure_ascii=False,
+        )
+    )
+    verify_request = VerifyRequest(
+        request_id=f"{request.request_id}:verify",
+        original_request_id=request.request_id,
+        report=prepared.report,
+        evidence_bundle=prepared.evidence_bundle,
+        candidates=extract_response.candidates(),
+        coverage=(),
+    )
+    client = _FakeGatewayClient(
+        outputs=[
+            {
+                "schema_version": "company_profile_verify_response.v1",
+                "request_id": verify_request.request_id,
+                "checks": [
+                    {
+                        "target_type": "candidate",
+                        "target_id": candidate.record_id,
+                        "status": "pass",
+                        "reason_codes": [],
+                    }
+                    for candidate in extract_response.candidates()
+                ],
+            }
+        ]
+    )
+    provider = CommonGatewaySemanticProvider(
+        client=client,
+        profile="semantic_extraction",
+        prepared_scope=prepared,
+        max_output_tokens=1000,
+        timeout_seconds=30,
+    )
+
+    response = provider.verify(verify_request)
+    instruction = LlmMessage.from_value(client.requests[0].messages[0]).content
+
+    assert len(response["checks"]) == 2
+    assert "covers both explicitly named raw-material inputs" in instruction
+    assert "do not return object_not_allowed" in instruction
+
+
 def test_reported_business_change_rejects_event_only_when_source_says_not_applicable() -> (
     None
 ):
@@ -1101,6 +1344,60 @@ def test_segment_financials_use_compact_rows_and_expand_locally() -> None:
     assert candidates[0]["source_native"]["header"] == "分产品"
     assert all(
         candidate["subject_scope"] == "business_segment" for candidate in candidates
+    )
+
+
+def test_repeated_segment_rows_receive_unique_local_record_ids() -> None:
+    prepared = _segment_prepared_scope()
+    request = _segment_extract_request(prepared)
+    evidence_id = prepared.evidence_bundle[0].evidence.evidence_id
+    repeated_row = {
+        "item_type": "segment_row",
+        "row": {
+            "label": "动力电池系统",
+            "subject_scope": "unclear",
+            "reported_period": "2025",
+            "period_type": "duration",
+            "evidence_ids": [evidence_id],
+            "cells": {
+                "operating_revenue": {
+                    "value": "316,506,369",
+                    "unit": "千元",
+                    "header": "营业收入",
+                },
+                "operating_cost": {
+                    "value": "241,064,397",
+                    "unit": "千元",
+                    "header": "营业成本",
+                },
+                "gross_margin_reported": {
+                    "value": "23.84%",
+                    "unit": "%",
+                    "header": "毛利率",
+                },
+            },
+        },
+    }
+
+    expanded = _expand_extract_response(
+        {
+            "schema_version": "company_profile_extract_response.v1",
+            "request_id": request.request_id,
+            "items": [repeated_row, repeated_row],
+        },
+        request=request,
+        prepared_scope=prepared,
+    )
+    response = ExtractResponse.model_validate_json(
+        json.dumps(expanded, ensure_ascii=False)
+    )
+
+    candidates = response.candidates()
+    assert len(candidates) == 8
+    assert len({candidate.record_id for candidate in candidates}) == 8
+    assert (
+        candidates[0].semantic_content_fingerprint()
+        == candidates[4].semantic_content_fingerprint()
     )
 
 
