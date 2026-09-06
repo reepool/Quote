@@ -1,0 +1,222 @@
+{
+  "baseline_manifest_path": "var/company_profile_stage5/20260905/run-stage5-final-four-luna-20260905-f/manifest.json",
+  "baseline_manifest_sha256": "ca7fe9feabd651c11240a87dfa14401968d4920d91da10c3cc56999ecae84bfc",
+  "baseline_overall_status": "hold",
+  "baseline_run_id": "stage5-final-four-luna-20260905-f",
+  "incomplete_scopes": {
+    "manufacturing-materials-300750-2025": [
+      "business_overview",
+      "segment_product_industry_region",
+      "reported_business_change"
+    ],
+    "manufacturing-materials-302132-2025-regime": [
+      "business_overview",
+      "same_control_comparison_basis",
+      "segment_and_restated_revenue",
+      "cost_composition_without_named_materials"
+    ],
+    "manufacturing-materials-603659-2025": [
+      "segment_product_and_adjustment",
+      "capacity_and_processing_narrative",
+      "cost_composition",
+      "material_risk_disclosure"
+    ],
+    "manufacturing-materials-920015-2025": [
+      "segment_product_and_region",
+      "capacity_project_narrative",
+      "material_risk_disclosure",
+      "material_and_energy_table"
+    ]
+  },
+  "items": [
+    {
+      "adjudication_id": "stage55-subject-evidence-policy",
+      "blocker_codes": [
+        "subject_scope_unclear",
+        "subject_unsupported"
+      ],
+      "contract_refs": [
+        "company_profile_manufacturing_materials_requirements.md#7",
+        "company-profile-bounded-semantic-workflow/Candidate subject is unsupported"
+      ],
+      "decision": "implementation_correction",
+      "evidence_ids": [
+        "stage5-evidence-44639d38dfe5c4863c39c37d"
+      ],
+      "production_authorization": "not_authorized",
+      "rationale": "保持‘公司’不自动等于 consolidated_group；表内非调整行只能按已验证的分产品、分行业或分地区维度落为 business_segment。需要以当前规则重跑受影响表格 scope，不能从 Gold 补 subject_basis。",
+      "reviewed_at": "2026-09-06",
+      "reviewer": "codex-stage55",
+      "runtime_target_ids": [
+        "stage5-final-four-luna-20260905-f:manufacturing-materials-920015-2025:segment_product_and_region"
+      ],
+      "sample_id": "manufacturing-materials-920015-2025",
+      "scope_id": "segment_product_and_region"
+    },
+    {
+      "adjudication_id": "stage55-300750-business-change-split",
+      "blocker_codes": [
+        "required_coverage_missing"
+      ],
+      "contract_refs": [
+        "company_profile_manufacturing_materials_llm_contract.md#extract_business_regime",
+        "company-profile-bounded-semantic-workflow/No-change disclosures use coverage rather than fabricated events"
+      ],
+      "decision": "implementation_correction",
+      "evidence_ids": [
+        "stage5-evidence-6378e220361f69e5437b2e3b",
+        "stage5-evidence-c775de7e78f7b07fd9c120a3"
+      ],
+      "production_authorization": "not_authorized",
+      "rationale": "合并范围变化可单独保留为事件；业务、产品或服务重大变化为不适用时必须另给 business_regime=not_applicable coverage，不能把交叉引用拼入事件，也不能留下 required coverage 缺口。",
+      "reviewed_at": "2026-09-06",
+      "reviewer": "codex-stage55",
+      "runtime_target_ids": [
+        "stage5-6b207c204267edf1586992b8"
+      ],
+      "sample_id": "manufacturing-materials-300750-2025",
+      "scope_id": "reported_business_change"
+    },
+    {
+      "adjudication_id": "stage55-603659-processing-primary-metric",
+      "blocker_codes": [
+        "evidence_field_mismatch",
+        "prohibited_inference"
+      ],
+      "contract_refs": [
+        "company_profile_manufacturing_materials_requirements.md#5.4",
+        "company-profile-bounded-semantic-workflow/Verification preserves one primary metric for a composite source-native label"
+      ],
+      "decision": "implementation_correction",
+      "evidence_ids": [
+        "stage5-evidence-53c26e57fae095b8a41ab6f0",
+        "stage5-evidence-6b0e13de51a1fa68a18deec2"
+      ],
+      "production_authorization": "not_authorized",
+      "rationale": "同一锚点的‘涂覆加工量（销量）109.42亿㎡’只生成 processing_volume，括注销量保留在 source-native name，不生成第二条 sales_volume。run-f 的 verify blocker 属规则误伤，需要新 run 复验。",
+      "reviewed_at": "2026-09-06",
+      "reviewer": "codex-stage55",
+      "runtime_target_ids": [
+        "stage5-f1183e1876ce9fb0837f4453"
+      ],
+      "sample_id": "manufacturing-materials-603659-2025",
+      "scope_id": "capacity_and_processing_narrative"
+    },
+    {
+      "adjudication_id": "stage55-302132-same-control-columns",
+      "blocker_codes": [
+        "evidence_field_mismatch",
+        "required_coverage_missing"
+      ],
+      "contract_refs": [
+        "company_profile_manufacturing_materials_requirements.md#8",
+        "company-profile-bounded-semantic-workflow/Same-control comparative verification is column and knowledge-time aware"
+      ],
+      "decision": "implementation_correction",
+      "evidence_ids": [
+        "stage5-evidence-37e75a11e441ac77954f4235"
+      ],
+      "production_authorization": "not_authorized",
+      "rationale": "五列收入必须按各自表头、报告期和比较基础独立核验；调整后列带 same_control_restated，调整前列不得被覆盖。run-f 只接受当期列，历史列继续通过新 run 复验主体与字段绑定。",
+      "reviewed_at": "2026-09-06",
+      "reviewer": "codex-stage55",
+      "runtime_target_ids": [
+        "stage5-b488df82e599fcf1e909200b",
+        "stage5-ab98002d5614d1c874bd182b",
+        "stage5-5b8670049d81ee838399f5c0",
+        "stage5-e0a75f137d1b767e9a46516d",
+        "stage5-d96cde2b556f012c14347033"
+      ],
+      "sample_id": "manufacturing-materials-302132-2025-regime",
+      "scope_id": "same_control_comparison_basis"
+    }
+  ],
+  "production_authorization": "not_authorized",
+  "rerun_policy": "new_run_id_only",
+  "schema_version": "company_profile_stage55_adjudication_ledger.v1",
+  "status": "in_review",
+  "targeted_runs": [
+    {
+      "accepted_record_count": 1,
+      "coverage_statuses": [
+        "business_regime:not_applicable"
+      ],
+      "decision": "scope_pass",
+      "manifest_path": "var/company_profile_stage5/20260906/run-stage55-targeted-300750-business-change-luna-20260906-c/manifest.json",
+      "production_authorization": "not_authorized",
+      "provider_calls": 2,
+      "rationale": "合并范围变化事件与业务、产品或服务重大变化不适用 coverage 已分别通过 extract 和独立 verify；定向 report_status=hold 仅因未执行该报告其余 scope。",
+      "run_id": "stage55-targeted-300750-business-change-luna-20260906-c",
+      "runtime_target_ids": [
+        "stage55-targeted-300750-business-change-luna-20260906-c:manufacturing-materials-300750-2025:reported_business_change"
+      ],
+      "sample_id": "manufacturing-materials-300750-2025",
+      "scope_id": "reported_business_change",
+      "task_complete": true
+    },
+    {
+      "accepted_record_count": 6,
+      "coverage_statuses": [
+        "production_capacity:observed",
+        "processing_volume:observed"
+      ],
+      "decision": "scope_pass",
+      "manifest_path": "var/company_profile_stage5/20260906/run-stage55-targeted-603659-processing-luna-20260906-c/manifest.json",
+      "production_authorization": "not_authorized",
+      "provider_calls": 2,
+      "rationale": "涂覆加工量（销量）仅形成一条 processing_volume，完整 source-native 标签保留，未从同一锚点双写 sales_volume；其余五条为同 scope 明示产能。",
+      "run_id": "stage55-targeted-603659-processing-luna-20260906-c",
+      "runtime_target_ids": [
+        "stage55-targeted-603659-processing-luna-20260906-c:manufacturing-materials-603659-2025:capacity_and_processing_narrative"
+      ],
+      "sample_id": "manufacturing-materials-603659-2025",
+      "scope_id": "capacity_and_processing_narrative",
+      "task_complete": true
+    },
+    {
+      "accepted_record_count": 5,
+      "coverage_statuses": [
+        "operating_revenue:observed"
+      ],
+      "decision": "scope_pass",
+      "manifest_path": "var/company_profile_stage5/20260906/run-stage55-targeted-302132-same-control-luna-20260906-c/manifest.json",
+      "production_authorization": "not_authorized",
+      "provider_calls": 2,
+      "rationale": "2025、2024 调整前/后、2023 调整前/后五列按独立 reported_period 和 source header 保留；调整后列带 same_control_restated，knowledge_time 为本报告发布日期，未覆盖调整前列。",
+      "run_id": "stage55-targeted-302132-same-control-luna-20260906-c",
+      "runtime_target_ids": [
+        "stage55-targeted-302132-same-control-luna-20260906-c:manufacturing-materials-302132-2025-regime:same_control_comparison_basis"
+      ],
+      "sample_id": "manufacturing-materials-302132-2025-regime",
+      "scope_id": "same_control_comparison_basis",
+      "task_complete": true
+    },
+    {
+      "accepted_record_count": 30,
+      "coverage_statuses": [
+        "segment_dimension:observed",
+        "operating_revenue:observed",
+        "operating_cost:observed",
+        "gross_margin_reported:observed"
+      ],
+      "decision": "scope_pass",
+      "manifest_path": "var/company_profile_stage5/20260906/run-stage55-targeted-920015-segment-subject-luna-20260906-c/manifest.json",
+      "production_authorization": "not_authorized",
+      "provider_calls": 2,
+      "rationale": "分产品和分地区的来源行均按已验证表维度落为 business_segment；没有把单独‘公司’表述或分部 measured object 伪造成 consolidated_group 主体。",
+      "run_id": "stage55-targeted-920015-segment-subject-luna-20260906-c",
+      "runtime_target_ids": [
+        "stage55-targeted-920015-segment-subject-luna-20260906-c:manufacturing-materials-920015-2025:segment_product_and_region"
+      ],
+      "sample_id": "manufacturing-materials-920015-2025",
+      "scope_id": "segment_product_and_region",
+      "task_complete": true
+    }
+  ],
+  "unclear_subject_record_counts": {
+    "manufacturing-materials-300750-2025": 63,
+    "manufacturing-materials-302132-2025-regime": 12,
+    "manufacturing-materials-603659-2025": 25,
+    "manufacturing-materials-920015-2025": 53
+  }
+}

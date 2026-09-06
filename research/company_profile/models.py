@@ -337,6 +337,9 @@ class SourceFact(_StrictModel):
         logical_slot = getattr(self, "logical_slot", None)
         if logical_slot is not None:
             material["logical_slot"] = _enum_value(logical_slot)
+        comparison_basis = getattr(self, "comparison_basis", None)
+        if comparison_basis is not None:
+            material["comparison_basis"] = _enum_value(comparison_basis)
         return material
 
     def occurrence_id(self) -> str:
@@ -367,7 +370,11 @@ class BusinessOverview(SourceFact):
         # instead of echoing the entire excerpt. Keep the source-native guard
         # strict: the returned text must remain a contiguous substring of the
         # supplied Evidence text after whitespace normalization.
-        if not quotes or not normalized_source or normalized_source not in normalized_joined:
+        if (
+            not quotes
+            or not normalized_source
+            or normalized_source not in normalized_joined
+        ):
             raise ValueError("business overview source_text must match text evidence")
         return self
 
@@ -606,16 +613,12 @@ class CoverageResult(_StrictModel):
                 and not self.reason_evidence_text
             ):
                 raise ValueError("explicit disclosure reason requires source wording")
-        if (
-            self.status == CoverageStatus.EXTRACTION_FAILED
-            and self.reason_code
-            not in {
-                CoverageReasonCode.TABLE_CONTEXT_INCOMPLETE,
-                CoverageReasonCode.SOURCE_UNREADABLE,
-                CoverageReasonCode.COVERAGE_BUDGET_EXHAUSTED,
-                CoverageReasonCode.UNIT_AMBIGUOUS,
-            }
-        ):
+        if self.status == CoverageStatus.EXTRACTION_FAILED and self.reason_code not in {
+            CoverageReasonCode.TABLE_CONTEXT_INCOMPLETE,
+            CoverageReasonCode.SOURCE_UNREADABLE,
+            CoverageReasonCode.COVERAGE_BUDGET_EXHAUSTED,
+            CoverageReasonCode.UNIT_AMBIGUOUS,
+        }:
             raise ValueError("extraction_failed requires a typed failure reason")
         if self.status == CoverageStatus.UNCLEAR and self.reason_code is None:
             raise ValueError("unclear coverage requires a reason_code")

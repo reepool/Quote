@@ -32,6 +32,8 @@
 - `docs/development/company_profile_product_and_industry_semantic_requirements.md`：公司画像产品、通用对象、分行业语义、LLM 分工与分阶段实施的唯一权威总需求
 - `docs/development/company_profile_industry_research_method.md`：公司画像阶段 2 分行业研究方法、样本选择、标注、benchmark 与阶段 3 进入门
 - `docs/development/company_profile_manufacturing_materials_requirements.md`、`company_profile_manufacturing_materials_research_index.md`：已通过阶段 3 研究验收的制造/材料行业合同与证据索引；不代表生产授权
+- `docs/development/company_profile_stage5_final_audit_20260905.md`、`company_profile_stage55_adjudication_ledger.v1.json`：阶段 5 四报告权威 hold 基线与阶段 5.5 语义裁决账本；所有重跑必须使用新 run ID，生产授权仍为 `not_authorized`
+- `docs/development/company_profile_stage55_adjudication_summary_20260906.md` 及四份 `company_profile_stage55_profile_*_2025.md`：阶段 5.5 新权威运行、真实 Benchmark 和研究员可读画像；总体仍为 `hold`
 - `docs/development/company_profile_common_semantic_model.md`：阶段 4 通用语义模型、受控内存工作流和研究员读取投影；生产授权仍为 `not_authorized`
 - `openspec/changes/slice-manufacturing-materials-company-profile/`：阶段 5 在途 change；仅对四份已批准制造/材料 2025 年报执行隔离证据准备、bounded semantic workflow、研究视图和 benchmark，不恢复旧生产链
 - `docs/development/company_profile_industry_requirements_template.md`：独立行业 requirements 标准模板

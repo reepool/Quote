@@ -162,15 +162,18 @@ _SCOPE_INSTRUCTIONS = {
         "the consolidation scope changed, emit only that BusinessEvent and describe only "
         "the disclosed change; a pointer such as 详见财务报告 is not additional event fact. "
         "Do not merge a separate 业务、产品或服务重大变化：不适用 statement into that "
-        "event. When the supplied scope only states that the applicable change did not "
-        "occur, emit coverage for business_regime with status=not_applicable and "
-        "reason_code=source_explicitly_not_applicable; do not fabricate a BusinessEvent."
+        "event. Whether or not another event is disclosed in the same scope, emit separate "
+        "coverage for business_regime with status=not_applicable and "
+        "reason_code=source_explicitly_not_applicable whenever the source explicitly marks "
+        "that business/product/service change as 不适用; do not fabricate a BusinessEvent "
+        "for the not-applicable statement."
     ),
     "same_control_comparison_basis": (
         "Extract the disclosed revenue comparison columns as separate Measurements, not "
-        "as Segment rows. Preserve each source column header and value. Mark a restated "
-        "comparative with is_restated_comparative=true and the source-supported "
-        "comparison_basis; never overwrite the original-as-published value."
+        "as Segment rows. Preserve each source column header, value, and the year named "
+        "by that column in reported_period. Mark a restated comparative with "
+        "is_restated_comparative=true and the source-supported comparison_basis; never "
+        "overwrite the original-as-published value."
     ),
 }
 
@@ -898,7 +901,7 @@ def _compact_measurement_item_schema(
     request: SemanticTaskRequest,
     prepared_scope: PreparedRequestScope | None,
 ) -> dict[str, Any]:
-    return {
+    schema = {
         "type": "object",
         "additionalProperties": False,
         "required": ["metric_type", "name", "value", "unit", "evidence_id"],
@@ -935,6 +938,7 @@ def _compact_measurement_item_schema(
                 ]
             },
             "relationship_context": {"type": "string"},
+            "reported_period": {"type": "string"},
             "evidence_id": _evidence_id_schema(prepared_scope),
         },
         "allOf": [
@@ -957,6 +961,12 @@ def _compact_measurement_item_schema(
             },
         ],
     }
+    if (
+        prepared_scope is not None
+        and prepared_scope.scope_id == "same_control_comparison_basis"
+    ):
+        schema["required"].append("reported_period")
+    return schema
 
 
 def _compact_coverage_array_schema(
@@ -1353,7 +1363,12 @@ def _coverage_status_schema(
     }.get(status)
     if reason_codes:
         properties["reason_code"] = {"enum": reason_codes}
-        if status in {"not_disclosed", "extraction_failed", "unclear"}:
+        if status in {
+            "not_disclosed",
+            "not_applicable",
+            "extraction_failed",
+            "unclear",
+        }:
             required.append("reason_code")
     return {
         "type": "object",
@@ -1687,8 +1702,10 @@ def _expand_compact_measurements(
             "metric_type": metric_type,
             "measured_object": item.get("measured_object") or item.get("name"),
             "subject_scope": "unclear",
-            "reported_period": _reported_period_label(prepared_scope),
+            "reported_period": item.get("reported_period")
+            or _reported_period_label(prepared_scope),
             "period_type": "duration",
+            "knowledge_time": prepared_scope.report.published_at,
             "source_native": _compact_source_native(item),
             "evidence_ids": [item.get("evidence_id")],
         }
@@ -2061,6 +2078,76 @@ def _expand_extract_response(
     return result
 
 
+def _normalize_extract_response(
+    data: Any,
+    *,
+    request: SemanticTaskRequest,
+    prepared_scope: PreparedRequestScope,
+) -> Any:
+    result = _expand_extract_response(
+        data,
+        request=request,
+        prepared_scope=prepared_scope,
+    )
+    _require_reported_business_change_coverage(result, prepared_scope=prepared_scope)
+    return result
+
+
+def _require_reported_business_change_coverage(
+    result: Any,
+    *,
+    prepared_scope: PreparedRequestScope,
+) -> None:
+    """Reject a false observed result when explicit no-change wording was omitted.
+
+    The approved ``reported_business_change`` scope can contain two independent facts:
+    a consolidation-scope event and an explicit statement that business, products, or
+    services had no applicable major change.  The common workflow correctly preserves
+    explicit legal-empty coverage, but an accepted event alone would otherwise derive
+    ``observed`` for the shared checklist field.  This guard does not synthesize coverage;
+    it requires the semantic provider to return the source-supported result.
+    """
+
+    if prepared_scope.scope_id != "reported_business_change":
+        return
+    source_text = re.sub(
+        r"\s+",
+        "",
+        "\n".join(
+            item.evidence.anchor.bounded_quote
+            for item in prepared_scope.evidence_bundle
+            if hasattr(item.evidence.anchor, "bounded_quote")
+        ),
+    )
+    marker = "业务、产品或服务发生重大变化"
+    marker_index = source_text.find(marker)
+    if marker_index < 0 or "不适用" not in source_text[marker_index : marker_index + 160]:
+        return
+    if not isinstance(result, Mapping):
+        raise TypeError(
+            "reported_business_change response omitted explicit not_applicable coverage"
+        )
+    items = result.get("items")
+    if not isinstance(items, list):
+        raise TypeError(
+            "reported_business_change response omitted explicit not_applicable coverage"
+        )
+    has_coverage = any(
+        isinstance(item, Mapping)
+        and item.get("item_type") == "coverage"
+        and isinstance(item.get("coverage"), Mapping)
+        and item["coverage"].get("field_id") == "business_regime"
+        and item["coverage"].get("status") == "not_applicable"
+        and item["coverage"].get("reason_code")
+        == "source_explicitly_not_applicable"
+        for item in items
+    )
+    if not has_coverage:
+        raise ValueError(
+            "reported_business_change response omitted explicit not_applicable coverage"
+        )
+
+
 def _reported_period_label(prepared_scope: PreparedRequestScope) -> str:
     year = prepared_scope.report.report_period[:4]
     return f"{year}年度" if year.isdigit() else prepared_scope.report.report_period
@@ -2289,7 +2376,7 @@ class CommonGatewaySemanticProvider:
             model_schema=_minimal_extract_schema(
                 request, prepared_scope=self._prepared_scope
             ),
-            normalize_response=lambda data: _expand_extract_response(
+            normalize_response=lambda data: _normalize_extract_response(
                 data,
                 request=request,
                 prepared_scope=self._prepared_scope,
@@ -2446,7 +2533,10 @@ class CommonGatewaySemanticProvider:
                     "several field_ids in the same request scope. Do not return "
                     "evidence_field_mismatch when the candidate field_id appears in that "
                     "list; use that reason only when the candidate field_id is absent from "
-                    "all cited Evidence bindings. Treat source_value_mutation as applicable "
+                    "all cited Evidence bindings. A composite source-native label such as "
+                    "加工量（销量） does not require a second metric when the requested field, "
+                    "physical anchor, and economic direction support one primary metric. "
+                    "Treat source_value_mutation as applicable "
                     "only when an Evidence item has an explicit source_bindings entry for "
                     "the candidate field and the candidate source_native disagrees with that "
                     "bound value; do not use it merely because a table Evidence anchor is "

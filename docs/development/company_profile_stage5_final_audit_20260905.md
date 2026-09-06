@@ -1,5 +1,11 @@
 # 阶段 5 最终运行与垃圾审计（2026-09-05）
 
+> 当前后续：阶段 5 已归档。2026-09-06 起唯一在途公司画像工作为 OpenSpec
+> `resolve-manufacturing-materials-profile-semantic-holds`，以本文件记录的 run-f
+> 为不可变问题基线，裁决账本为
+> `company_profile_stage55_adjudication_ledger.v1.json`。任何修正必须使用新 run ID，
+> 不得回写本基线；生产授权继续为 `not_authorized`。
+
 ## 结论
 
 阶段 5 四份报告均已生成不可变隔离 bundle，并明确判定为 `hold`；这不是传输失败通过，也不是生产批准。`production_authorization` 始终为 `not_authorized`，未启动阶段 6 reset 或阶段 8 回填。

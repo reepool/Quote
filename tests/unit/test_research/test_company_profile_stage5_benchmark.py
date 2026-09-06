@@ -7,14 +7,27 @@ import socket
 import sqlite3
 from pathlib import Path
 
+import pytest
+
 from research.company_profile.contracts import (
     CompanyProfileTaskResult,
     PreparedEvidence,
 )
 from research.company_profile.models import (
+    AssertionClass,
     ChapterTask,
+    CoverageReasonCode,
+    CoverageResult,
+    CoverageStatus,
     Evidence,
+    IdentityClass,
+    PeriodType,
+    Relationship,
+    RelationshipType,
     ReportIdentity,
+    RequirementLevel,
+    SourceNativeValue,
+    SubjectScope,
     TextAnchor,
 )
 from research.company_profile.projection import project_research_view
@@ -29,6 +42,7 @@ from research.company_profile.stage5_bundle import (
     Stage5RunBundleStore,
     Stage5ScopeResult,
 )
+from scripts import evaluate_company_profile_stage5_run as benchmark_operator
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[3]
 GOLD_PATH = (
@@ -51,25 +65,58 @@ def test_approved_gold_and_negative_cases_are_evaluated_only_after_commit(
         repository_root=REPOSITORY_ROOT,
     )
     run_path = store.commit(_minimal_run_bundle("post-run-evaluation"))
-    gold = json.loads(GOLD_PATH.read_text(encoding="utf-8"))
-    negative_results = {
-        item["case_id"]: True for item in gold["contract_negative_cases"]
-    }
 
     benchmark = evaluate_committed_stage5_run(
         run_path,
         gold_path=GOLD_PATH,
-        negative_case_results=negative_results,
     )
 
     assert benchmark.run_id == "post-run-evaluation"
     assert benchmark.decision == "hold"
     assert len(benchmark.annotation_results) == 24
     assert len(benchmark.negative_case_results) == 19
-    assert all(item.evaluated and item.passed for item in benchmark.negative_case_results)
+    assert all(item.reason for item in benchmark.negative_case_results)
     assert benchmark.gold_evaluation_only is True
     assert benchmark.production_authorization == "not_authorized"
+    expected_case_ids = {
+        item["case_id"]
+        for item in json.loads(GOLD_PATH.read_text(encoding="utf-8"))[
+            "contract_negative_cases"
+        ]
+    }
+    assert {
+        item.case_id for item in benchmark.negative_case_results
+    } == expected_case_ids
 
+
+def test_totals_only_legal_empty_is_evaluated_from_committed_output(
+    tmp_path: Path,
+) -> None:
+    run_path = _commit_totals_only_run(tmp_path, prohibited_relationship=False)
+
+    benchmark = evaluate_committed_stage5_run(run_path, gold_path=GOLD_PATH)
+    result = _negative_results(benchmark)["mm-neg-counterparty-coverage-backfill"]
+
+    assert result.evaluated is True
+    assert result.passed is True
+    assert any(
+        target.startswith("scope:") for target in result.inspected_runtime_target_ids
+    )
+
+
+def test_totals_only_aggregate_relationship_fails_from_committed_output(
+    tmp_path: Path,
+) -> None:
+    run_path = _commit_totals_only_run(tmp_path, prohibited_relationship=True)
+
+    benchmark = evaluate_committed_stage5_run(run_path, gold_path=GOLD_PATH)
+    result = _negative_results(benchmark)["mm-neg-counterparty-coverage-backfill"]
+
+    assert result.evaluated is True
+    assert result.passed is False
+    assert any(
+        target.startswith("record:") for target in result.inspected_runtime_target_ids
+    )
 
 
 def test_negative_cases_are_not_reported_as_passed_when_not_evaluated(
@@ -80,19 +127,57 @@ def test_negative_cases_are_not_reported_as_passed_when_not_evaluated(
         repository_root=REPOSITORY_ROOT,
     )
     run_path = store.commit(_minimal_run_bundle("post-run-unevaluated"))
-    gold = json.loads(GOLD_PATH.read_text(encoding="utf-8"))
-    negative_results = {
-        item["case_id"]: None for item in gold["contract_negative_cases"]
-    }
 
     benchmark = evaluate_committed_stage5_run(
         run_path,
         gold_path=GOLD_PATH,
-        negative_case_results=negative_results,
     )
+    results = {item.case_id: item for item in benchmark.negative_case_results}
 
     assert benchmark.decision == "hold"
-    assert all(not item.evaluated and not item.passed for item in benchmark.negative_case_results)
+    missing_trigger = results["mm-neg-sales-amount-as-volume"]
+    assert missing_trigger.evaluated is False
+    assert missing_trigger.passed is False
+    assert missing_trigger.inspected_runtime_target_ids == ()
+
+
+def test_post_run_benchmark_operator_writes_one_atomic_result(
+    tmp_path: Path,
+) -> None:
+    store = Stage5RunBundleStore(
+        tmp_path / "isolated",
+        repository_root=REPOSITORY_ROOT,
+    )
+    run_path = store.commit(_minimal_run_bundle("post-run-command"))
+
+    assert (
+        benchmark_operator.main(
+            [
+                "--run-directory",
+                str(run_path),
+                "--gold-path",
+                str(GOLD_PATH),
+            ]
+        )
+        == 0
+    )
+
+    destination = run_path / "post-run-benchmark.json"
+    payload = json.loads(destination.read_text(encoding="utf-8"))
+    assert payload["run_id"] == "post-run-command"
+    assert len(payload["annotation_results"]) == 24
+    assert len(payload["negative_case_results"]) == 19
+    assert not tuple(run_path.glob(".post-run-benchmark-*.tmp"))
+    with pytest.raises(FileExistsError):
+        benchmark_operator.main(
+            [
+                "--run-directory",
+                str(run_path),
+                "--gold-path",
+                str(GOLD_PATH),
+            ]
+        )
+
 
 def test_stage5_runtime_modules_do_not_import_gold_adapter_or_legacy_paths() -> None:
     prohibited_modules = (
@@ -244,3 +329,65 @@ def _minimal_run_bundle(run_id: str) -> Stage5RunBundle:
         overall_status=Stage5OverallStatus.HOLD,
         created_at="2026-09-04T00:00:00+00:00",
     )
+
+
+def _negative_results(benchmark):
+    return {item.case_id: item for item in benchmark.negative_case_results}
+
+
+def _commit_totals_only_run(tmp_path: Path, *, prohibited_relationship: bool) -> Path:
+    store = Stage5RunBundleStore(
+        tmp_path / "isolated",
+        repository_root=REPOSITORY_ROOT,
+    )
+    run_path = store.commit(_minimal_run_bundle("post-run-totals-only"))
+    manifest_path = run_path / "manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    scope = manifest["reports"][0]["scope_results"][0]
+    scope["scope_id"] = "top_five_customer_totals_only"
+    scope["prepared_scope"]["scope_id"] = scope["scope_id"]
+    evidence = Evidence.model_validate_json(
+        json.dumps(
+            scope["prepared_scope"]["evidence_bundle"][0]["evidence"],
+            ensure_ascii=False,
+        )
+    )
+    coverage = CoverageResult(
+        field_id="counterparty_relationship",
+        chapter_task=ChapterTask.EXTRACT_COUNTERPARTIES_AND_CONCENTRATION,
+        requirement_level=RequirementLevel.CONDITIONAL,
+        status=CoverageStatus.NOT_DISCLOSED,
+        reason_code=CoverageReasonCode.SOURCE_REASON_UNSPECIFIED,
+        evidence=(evidence,),
+    )
+    scope["task_result"]["coverage"] = [coverage.model_dump(mode="json")]
+    if prohibited_relationship:
+        record = Relationship(
+            record_id="stage55-prohibited-top-five-aggregate",
+            field_id="counterparty_relationship",
+            chapter_task=ChapterTask.EXTRACT_COUNTERPARTIES_AND_CONCENTRATION,
+            report=evidence.report,
+            subject_scope=SubjectScope.UNCLEAR,
+            reported_period="2025年度",
+            period_type=PeriodType.DURATION,
+            assertion_class=AssertionClass.REPORTED_FACT,
+            evidence=(evidence,),
+            source_native=SourceNativeValue(name="前五名客户合计"),
+            relation_type=RelationshipType.CUSTOMER,
+            object_name="前五名客户合计",
+            identity_class=IdentityClass.REPORT_LOCAL_AGGREGATE,
+        )
+        scope["task_result"]["records"] = [record.model_dump(mode="json")]
+        scope["task_result"]["dispositions"] = [
+            {
+                "field_id": "counterparty_relationship",
+                "reason_codes": [],
+                "status": "accepted_for_review",
+                "target_id": record.record_id,
+            }
+        ]
+    manifest_path.write_text(
+        json.dumps(manifest, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    return run_path

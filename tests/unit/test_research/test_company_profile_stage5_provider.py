@@ -23,6 +23,8 @@ from research.company_profile.models import (
     AssertionClass,
     BusinessOverview,
     ChapterTask,
+    ComparisonBasis,
+    CoverageReasonCode,
     CoverageStatus,
     Evidence,
     MetricType,
@@ -45,7 +47,10 @@ from research.company_profile.stage5_provider import (
     _minimal_extract_schema,
     _minimal_verify_schema,
 )
-from research.company_profile.workflow import CompanyProfileSemanticService
+from research.company_profile.workflow import (
+    CompanyProfileSemanticService,
+    FakeSemanticProvider,
+)
 from utils.llm import (
     LlmDeadlineExceededError,
     LlmMessage,
@@ -510,6 +515,97 @@ def test_stage5_capacity_processing_scope_uses_flat_measurements() -> None:
     assert candidates[1]["logical_slot"] == "processing_volume"
 
 
+def test_composite_processing_label_can_pass_one_primary_metric_verification() -> None:
+    prepared = _prepared_scope().model_copy(
+        update={
+            "scope_id": "capacity_and_processing_narrative",
+            "chapter_task": ChapterTask.EXTRACT_OPERATING_QUANTITIES,
+            "field_ids": ("processing_volume",),
+        }
+    )
+    checklist = ChecklistItem(
+        field_id="processing_volume",
+        object_type=ObjectType.MEASUREMENT,
+        chapter_task=ChapterTask.EXTRACT_OPERATING_QUANTITIES,
+        requirement_level=RequirementLevel.CONDITIONAL,
+        allowed_coverage_statuses=tuple(CoverageStatus),
+        allowed_metric_types=(MetricType.PROCESSING_VOLUME,),
+    )
+    request = SemanticTaskRequest(
+        request_id="slice-1:composite-processing",
+        report=prepared.report,
+        package_manifest=PackageManifest(
+            package_name="manufacturing_materials",
+            package_version="v1",
+            report=prepared.report,
+            checklist=(checklist,),
+        ),
+        chapter_task=prepared.chapter_task,
+        evidence_bundle=prepared.evidence_bundle,
+        allowed_object_types=(ObjectType.MEASUREMENT,),
+        allowed_metric_types=(MetricType.PROCESSING_VOLUME,),
+        unresolved_field_ids=prepared.field_ids,
+    )
+    evidence_id = prepared.evidence_bundle[0].evidence.evidence_id
+    client = _FakeGatewayClient(
+        outputs=[
+            {
+                "production_capacity": [],
+                "processing_volume": [
+                    {
+                        "name": "涂覆加工量（销量）",
+                        "value": "109.42",
+                        "unit": "亿㎡",
+                        "evidence_id": evidence_id,
+                    }
+                ],
+            }
+        ]
+    )
+    provider = CommonGatewaySemanticProvider(
+        client=client,
+        profile="semantic_extraction",
+        prepared_scope=prepared,
+        max_output_tokens=1000,
+        timeout_seconds=30,
+    )
+
+    extracted = ExtractResponse.model_validate_json(
+        json.dumps(provider.extract(request), ensure_ascii=False)
+    )
+    candidate = extracted.candidates()[0]
+    assert candidate.source_native.name == "涂覆加工量（销量）"
+    assert candidate.metric_type == MetricType.PROCESSING_VOLUME
+
+    verify_request = VerifyRequest(
+        request_id=f"{request.request_id}:verify",
+        original_request_id=request.request_id,
+        report=request.report,
+        evidence_bundle=request.evidence_bundle,
+        candidates=(candidate,),
+        coverage=(),
+    )
+    client.outputs.append(
+        {
+            "schema_version": "company_profile_verify_response.v1",
+            "request_id": verify_request.request_id,
+            "checks": [
+                {
+                    "target_type": "candidate",
+                    "target_id": candidate.record_id,
+                    "status": "pass",
+                    "reason_codes": [],
+                }
+            ],
+        }
+    )
+    verified = provider.verify(verify_request)
+    verify_instruction = LlmMessage.from_value(client.requests[1].messages[0]).content
+
+    assert verified["checks"][0]["status"] == "pass"
+    assert "加工量（销量） does not require a second metric" in verify_instruction
+
+
 def test_general_operating_scope_uses_compact_measurements_and_full_local_validation() -> (
     None
 ):
@@ -728,6 +824,154 @@ def test_business_regime_scope_uses_compact_events_and_restores_full_record() ->
     assert candidate["event_date"] == "2025-01-06"
     assert candidate["regime_effective_at"] == "2025-01-06"
     assert candidate["evidence"][0]["evidence_id"] == evidence_id
+
+
+def test_reported_business_change_keeps_event_and_not_applicable_coverage_separate() -> (
+    None
+):
+    prepared = _reported_business_change_scope()
+    prepared = prepared.model_copy(
+        update={
+            "scope_id": "reported_business_change",
+            "chapter_task": ChapterTask.EXTRACT_BUSINESS_REGIME,
+            "field_ids": ("business_regime",),
+        }
+    )
+    checklist = ChecklistItem(
+        field_id="business_regime",
+        object_type=ObjectType.BUSINESS_EVENT,
+        chapter_task=ChapterTask.EXTRACT_BUSINESS_REGIME,
+        requirement_level=RequirementLevel.REQUIRED,
+        allowed_coverage_statuses=tuple(CoverageStatus),
+    )
+    request = SemanticTaskRequest(
+        request_id="business-change-separation",
+        report=prepared.report,
+        package_manifest=PackageManifest(
+            package_name="manufacturing_materials",
+            package_version="v1",
+            report=prepared.report,
+            checklist=(checklist,),
+        ),
+        chapter_task=prepared.chapter_task,
+        evidence_bundle=prepared.evidence_bundle,
+        allowed_object_types=(
+            ObjectType.BUSINESS_EVENT,
+            ObjectType.BUSINESS_REGIME,
+            ObjectType.INDUSTRY_PACKAGE_ASSIGNMENT,
+        ),
+        unresolved_field_ids=prepared.field_ids,
+    )
+    evidence_id = prepared.evidence_bundle[0].evidence.evidence_id
+    provider = CommonGatewaySemanticProvider(
+        client=_FakeGatewayClient(
+            outputs=[
+                {
+                    "events": [
+                        {
+                            "event_type": "consolidation_scope_change",
+                            "description": "报告期内合并范围发生变动",
+                            "evidence_id": evidence_id,
+                        }
+                    ],
+                    "regimes": [],
+                    "package_assignments": [],
+                    "coverage": [
+                        {
+                            "field_id": "business_regime",
+                            "status": "not_applicable",
+                            "reason_code": "source_explicitly_not_applicable",
+                            "evidence_ids": [evidence_id],
+                        }
+                    ],
+                }
+            ]
+        ),
+        profile="semantic_extraction",
+        prepared_scope=prepared,
+        max_output_tokens=1000,
+        timeout_seconds=30,
+    )
+
+    response = ExtractResponse.model_validate_json(
+        json.dumps(provider.extract(request), ensure_ascii=False)
+    )
+
+    assert len(response.candidates()) == 1
+    assert response.candidates()[0].event_type == "consolidation_scope_change"
+    assert response.coverage_results()[0].status == CoverageStatus.NOT_APPLICABLE
+    assert response.coverage_results()[0].reason_code == (
+        CoverageReasonCode.SOURCE_EXPLICITLY_NOT_APPLICABLE
+    )
+
+    result = CompanyProfileSemanticService().run_task(
+        request,
+        provider=FakeSemanticProvider(extract_output=response),
+    )
+
+    assert len(result.accepted_records()) == 1
+    assert result.coverage[0].status == CoverageStatus.NOT_APPLICABLE
+    assert result.coverage[0].reason_code == (
+        CoverageReasonCode.SOURCE_EXPLICITLY_NOT_APPLICABLE
+    )
+    assert result.task_complete is True
+
+
+def test_reported_business_change_rejects_event_only_when_source_says_not_applicable() -> (
+    None
+):
+    prepared = _reported_business_change_scope()
+    checklist = ChecklistItem(
+        field_id="business_regime",
+        object_type=ObjectType.BUSINESS_EVENT,
+        chapter_task=ChapterTask.EXTRACT_BUSINESS_REGIME,
+        requirement_level=RequirementLevel.REQUIRED,
+        allowed_coverage_statuses=tuple(CoverageStatus),
+    )
+    request = SemanticTaskRequest(
+        request_id="business-change-missing-coverage",
+        report=prepared.report,
+        package_manifest=PackageManifest(
+            package_name="manufacturing_materials",
+            package_version="v1",
+            report=prepared.report,
+            checklist=(checklist,),
+        ),
+        chapter_task=prepared.chapter_task,
+        evidence_bundle=prepared.evidence_bundle,
+        allowed_object_types=(ObjectType.BUSINESS_EVENT,),
+        unresolved_field_ids=prepared.field_ids,
+    )
+    provider = CommonGatewaySemanticProvider(
+        client=_FakeGatewayClient(
+            outputs=[
+                {
+                    "events": [
+                        {
+                            "event_type": "consolidation_scope_change",
+                            "description": "报告期内合并范围发生变动",
+                            "evidence_id": prepared.evidence_bundle[
+                                0
+                            ].evidence.evidence_id,
+                        }
+                    ],
+                    "regimes": [],
+                    "package_assignments": [],
+                    "coverage": [],
+                }
+            ]
+        ),
+        profile="semantic_extraction",
+        prepared_scope=prepared,
+        max_output_tokens=1000,
+        timeout_seconds=30,
+    )
+
+    with pytest.raises(SemanticProviderError) as exc_info:
+        provider.extract(request)
+
+    assert exc_info.value.code == ContractErrorCode.CANDIDATE_SCHEMA_INVALID
+    assert provider.traces[0].error_code == "candidate_schema_invalid"
 
 
 def test_segment_financials_use_compact_rows_and_expand_locally() -> None:
@@ -955,6 +1199,7 @@ def test_same_control_comparison_uses_measurement_contract_not_segment_rows() ->
                     "value": "65047476349.46",
                     "unit": "元",
                     "header": "调整后",
+                    "reported_period": "2024年度",
                     "is_restated_comparative": True,
                     "comparison_basis": "same_control_restated",
                     "evidence_id": evidence_id,
@@ -974,6 +1219,87 @@ def test_same_control_comparison_uses_measurement_contract_not_segment_rows() ->
     assert candidate.object_type == "Measurement"
     assert candidate.is_restated_comparative is True
     assert candidate.comparison_basis.value == "same_control_restated"
+    assert candidate.reported_period == "2024年度"
+    assert candidate.knowledge_time == prepared.report.published_at
+
+
+def test_same_control_adjusted_and_pre_adjustment_columns_keep_distinct_period_basis() -> (
+    None
+):
+    prepared = _prepared_scope().model_copy(
+        update={
+            "scope_id": "same_control_comparison_basis",
+            "chapter_task": ChapterTask.EXTRACT_SEGMENT_FINANCIALS,
+            "field_ids": ("operating_revenue",),
+        }
+    )
+    checklist = ChecklistItem(
+        field_id="operating_revenue",
+        object_type=ObjectType.MEASUREMENT,
+        chapter_task=ChapterTask.EXTRACT_SEGMENT_FINANCIALS,
+        requirement_level=RequirementLevel.CONDITIONAL,
+        allowed_coverage_statuses=tuple(CoverageStatus),
+        allowed_metric_types=(MetricType.OPERATING_REVENUE,),
+    )
+    request = SemanticTaskRequest(
+        request_id="same-control-distinct-columns-request",
+        report=prepared.report,
+        package_manifest=PackageManifest(
+            package_name="manufacturing_materials",
+            package_version="v1",
+            report=prepared.report,
+            checklist=(checklist,),
+        ),
+        chapter_task=prepared.chapter_task,
+        evidence_bundle=prepared.evidence_bundle,
+        allowed_object_types=(ObjectType.MEASUREMENT,),
+        allowed_metric_types=(MetricType.OPERATING_REVENUE,),
+        unresolved_field_ids=prepared.field_ids,
+    )
+    evidence_id = prepared.evidence_bundle[0].evidence.evidence_id
+    expanded = _expand_extract_response(
+        {
+            "measurements": [
+                {
+                    "metric_type": "operating_revenue",
+                    "name": "营业收入",
+                    "value": "65054925106.17",
+                    "unit": "元",
+                    "header": "2024年 调整后",
+                    "reported_period": "2024年度",
+                    "is_restated_comparative": True,
+                    "comparison_basis": "same_control_restated",
+                    "evidence_id": evidence_id,
+                },
+                {
+                    "metric_type": "operating_revenue",
+                    "name": "营业收入",
+                    "value": "1779761710.30",
+                    "unit": "元",
+                    "header": "2024年 调整前",
+                    "reported_period": "2024年度",
+                    "is_restated_comparative": False,
+                    "comparison_basis": "original_as_published",
+                    "evidence_id": evidence_id,
+                },
+            ],
+            "coverage": [],
+        },
+        request=request,
+        prepared_scope=prepared,
+    )
+    records = ExtractResponse.model_validate_json(
+        json.dumps(expanded, ensure_ascii=False)
+    ).candidates()
+
+    assert len(records) == 2
+    assert {item.reported_period for item in records} == {"2024年度"}
+    assert {item.comparison_basis for item in records} == {
+        ComparisonBasis.SAME_CONTROL_RESTATED,
+        ComparisonBasis.ORIGINAL_AS_PUBLISHED,
+    }
+    assert {item.knowledge_time for item in records} == {prepared.report.published_at}
+    assert records[0].occurrence_id() != records[1].occurrence_id()
 
 
 def test_measurement_schema_scopes_capacity_kind_to_metric_type() -> None:
@@ -1038,7 +1364,7 @@ def test_coverage_schema_requires_typed_reason_for_not_disclosed() -> None:
         "explicit_disclosure_exemption",
         "source_reason_unspecified",
     ]
-    assert "reason_code" not in not_applicable["required"]
+    assert "reason_code" in not_applicable["required"]
 
 
 def test_quantity_disclosure_check_uses_coverage_only_schema() -> None:
@@ -1117,6 +1443,29 @@ def test_numeric_reconciliation_requires_non_empty_uncertainty() -> None:
 
     assert exc_info.value.code == ContractErrorCode.CANDIDATE_SCHEMA_INVALID
     assert "non-empty uncertainty" in (provider.traces[0].error_detail or "")
+
+
+def test_consolidated_segment_subject_requires_affirmative_basis() -> None:
+    prepared = _segment_prepared_scope()
+    request = _segment_extract_request(prepared)
+    compact = _segment_row_response(
+        request_id=request.request_id,
+        evidence_id=prepared.evidence_bundle[0].evidence.evidence_id,
+    )
+    compact["items"][0]["row"]["subject_scope"] = "consolidated_group"
+    provider = CommonGatewaySemanticProvider(
+        client=_FakeGatewayClient(outputs=[compact]),
+        profile="semantic_extraction",
+        prepared_scope=prepared,
+        max_output_tokens=2000,
+        timeout_seconds=30,
+    )
+
+    with pytest.raises(SemanticProviderError) as exc_info:
+        provider.extract(request)
+
+    assert exc_info.value.code == ContractErrorCode.CANDIDATE_SCHEMA_INVALID
+    assert "subject_basis" in (provider.traces[0].error_detail or "")
 
 
 @pytest.mark.parametrize("dimension", ["分业务", "产品"])
@@ -1526,6 +1875,44 @@ def _prepared_scope() -> PreparedRequestScope:
             ),
         ),
         plan_version="manufacturing_materials.2026-09-04.1",
+    )
+
+
+def _reported_business_change_scope() -> PreparedRequestScope:
+    prepared = _prepared_scope()
+    text = (
+        "（6）报告期内合并范围是否发生变动：是。"
+        "（7）公司报告期内业务、产品或服务发生重大变化或调整有关情况："
+        "□适用  ☑不适用。"
+    )
+    evidence = prepared.evidence_bundle[0].evidence.model_copy(
+        update={
+            "page": 27,
+            "section_title": "业务、产品或服务重大变化 / 合并范围变化",
+            "anchor": TextAnchor(bounded_quote=text),
+        }
+    )
+    return prepared.model_copy(
+        update={
+            "scope_id": "reported_business_change",
+            "chapter_task": ChapterTask.EXTRACT_BUSINESS_REGIME,
+            "field_ids": ("business_regime",),
+            "evidence_bundle": (
+                PreparedEvidence(
+                    evidence=evidence,
+                    field_id="business_regime",
+                ),
+            ),
+            "page_contexts": (
+                PreparedPageContext(
+                    page=27,
+                    text=text,
+                    text_hash="c" * 64,
+                    extraction_method="pypdf",
+                    quality_status="usable",
+                ),
+            ),
+        }
     )
 
 

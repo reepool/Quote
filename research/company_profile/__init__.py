@@ -73,6 +73,14 @@ from .stage5 import (
     load_stage5_evidence_plan,
     load_stage5_sample_manifest,
 )
+from .stage5_adjudication import (
+    STAGE55_ADJUDICATION_SCHEMA,
+    STAGE55_BASELINE_RUN_ID,
+    Stage55AdjudicationDecision,
+    Stage55AdjudicationItem,
+    Stage55AdjudicationLedger,
+    load_stage55_adjudication_ledger,
+)
 from .stage5_bundle import (
     Stage5BenchmarkDimension,
     Stage5BenchmarkResult,
@@ -107,6 +115,8 @@ from .workflow import (
 __all__ = [
     "APPROVED_STAGE5_SAMPLES",
     "PRODUCTION_AUTHORIZATION",
+    "STAGE55_ADJUDICATION_SCHEMA",
+    "STAGE55_BASELINE_RUN_ID",
     "Activity",
     "ActivityAction",
     "AssertionClass",
@@ -178,6 +188,9 @@ __all__ = [
     "Stage5ScopeResult",
     "Stage5SemanticInput",
     "Stage5SliceExecution",
+    "Stage55AdjudicationDecision",
+    "Stage55AdjudicationItem",
+    "Stage55AdjudicationLedger",
     "SubjectBasis",
     "SubjectScope",
     "TableAnchor",
@@ -190,6 +203,7 @@ __all__ = [
     "contract_schema_manifest",
     "load_stage5_evidence_plan",
     "load_stage5_sample_manifest",
+    "load_stage55_adjudication_ledger",
     "project_research_view",
     "semantic_record_json_schema",
     "stage5_evidence_plan_hash",
