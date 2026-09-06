@@ -189,7 +189,7 @@ def test_common_gateway_provider_sends_one_bounded_scope_and_stage4_schema() -> 
     [
         ("business_overview", "product uses, customer industries"),
         ("capacity_and_processing_narrative", "do not emit a second sales_volume"),
-        ("capacity_project_narrative", "metric_type=capacity_under_construction"),
+        ("capacity_project_narrative", "do not convert its value or unit"),
         ("procurement_mode", "to invent named material inputs"),
         ("top_five_customer_totals_only", "This request scope is totals-only"),
         ("top_five_supplier_totals_only", "This request scope is totals-only"),

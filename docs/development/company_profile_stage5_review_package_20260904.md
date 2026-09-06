@@ -1,5 +1,7 @@
 # 阶段 5 制造/材料公司画像人工复核包（2026-09-04）
 
+> 历史状态说明：本文记录 2026-09-04 的中间复核状态，其中 7.1/7.4 未完成等表述已由 `company_profile_stage5_final_audit_20260905.md` 取代；最终权威切片为 `run-stage5-final-four-luna-20260905-f`，四报告结论仍为 `hold`。
+
 ## 复核目的
 
 本包用于阶段 5 的研究复核，不代表生产批准、旧画像回填或商品暴露/供应链发布。当前 `production_authorization` 始终为 `not_authorized`。

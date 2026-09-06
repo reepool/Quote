@@ -114,14 +114,12 @@ _SCOPE_INSTRUCTIONS = {
         "a second sales_volume from that same physical anchor."
     ),
     "capacity_project_narrative": (
-        "This scope is specifically checking the disclosed project sentence. If the supplied "
-        "Evidence contains the source wording ‘新增40kt/a 羟胺盐装置’ (or the same wording "
-        "with PDF whitespace differences), emit exactly one Measurement with "
-        "metric_type=capacity_under_construction, measured_object=羟胺盐, value=40kt/a, "
-        "unit=kt/a, and the listed evidence_id. Preserve the source-native value and unit; "
-        "do not convert it, classify it as production_capacity, or add capacity_kind. If "
-        "that exact project disclosure is absent from a complete scope, emit legal-empty "
-        "coverage for capacity_under_construction instead."
+        "Classify an explicitly disclosed newly added, under-construction, or planned "
+        "production line or plant capacity as capacity_under_construction only when the "
+        "source wording itself supports that project status. Preserve the exact source-native "
+        "object name, value, unit, and evidence_id; do not convert its value or unit, classify "
+        "it as production_capacity, or add capacity_kind. If a complete scope contains no "
+        "such disclosure, emit legal-empty coverage for capacity_under_construction."
     ),
     "procurement_mode": (
         "Do not combine product or business nouns from one paragraph with a generic "
