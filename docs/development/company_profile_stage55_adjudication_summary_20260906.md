@@ -26,6 +26,10 @@ Gold 与负例均由真实 bundle 的 records、dispositions、coverage、Eviden
 
 `run-p` 是 MR-01 至 MR-07 裁决后的新权威完整运行。它没有把 Gold 或人工决定写回 runtime；四报告仍因 9 个未完成 scope、报告级 `subject_scope_unclear`、两条真实负例失败及 Gold 未完成而保持 `hold`。人工复核主题、原文和已记录决定见 `company_profile_stage55_manual_review_package_20260906.md`。
 
+说明：`run-p/post-run-benchmark.json` 是在本次 Benchmark 守卫修正前生成的不可变产物，仍保留当时的
+`13/15` 负例通过记录。修正后的评估器对同一 bundle 离线重算为 `14` 条已评估、`14` 条通过、`5` 条未评估；
+该重算尚未覆盖写入历史 bundle，下一次新的完整 run 才会生成正式的修正版 Benchmark。
+
 ## 四份报告状态
 
 | 报告 | 研究状态 | 主要已核验内容 | 主要未决 |

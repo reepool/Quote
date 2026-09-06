@@ -301,6 +301,10 @@ source-native 中文描述，期间标为 2023 年并保留本年报的 `knowled
 | 已评估负例失败 | 2（`mm-neg-counterparty-coverage-backfill`、`mm-neg-third-party-action-actor`） |
 | 未触发、未评估 | 4 |
 
+以上数字是 `run-p/post-run-benchmark.json` 生成时的历史结果。后续修正了两个 Benchmark 守卫：provider
+不可用现在记为未评估；共享 Evidence 不再误伤合法的公司直销 Activity。对同一 bundle 的离线重算为 14 条已评估、
+14 条通过、5 条未评估，但不可覆盖历史 Benchmark；必须在新的完整 run 上重新生成正式结果。
+
 MR-01 至 MR-07 的人工决定已写入裁决账本，并已使用新 run ID `run-p` 复验受影响 scope、完成
 四报告完整切片和真实 post-run Benchmark。当前两条失败负例是 `mm-neg-counterparty-coverage-backfill`
 与 `mm-neg-third-party-action-actor`；4 条负例尚未触发，保持未评估。不得修改历史运行或把人工决定、
