@@ -131,7 +131,9 @@ _SCOPE_INSTRUCTIONS = {
     ),
     "top_five_customer_totals_only": (
         "This request scope is totals-only. If the complete supplied section reports customer "
-        "amount/share but contains no customer identity rows, emit the concentration "
+        "amount/share but contains no customer identity rows, emit every explicitly disclosed "
+        "concentration Measurement, including a separately reported related-party amount or "
+        "share. Return the "
         "Measurements and counterparty_relationship coverage=not_disclosed with "
         "reason_code=source_reason_unspecified; do not emit a Relationship."
     ),
@@ -171,9 +173,24 @@ _SCOPE_INSTRUCTIONS = {
     "same_control_comparison_basis": (
         "Extract the disclosed revenue comparison columns as separate Measurements, not "
         "as Segment rows. Preserve each source column header, value, and the year named "
-        "by that column in reported_period. Mark a restated comparative with "
-        "is_restated_comparative=true and the source-supported comparison_basis; never "
-        "overwrite the original-as-published value."
+        "by that column in reported_period. Every column must carry comparison_basis: use "
+        "current_period_after_restructuring for the current period, original_as_published "
+        "for 调整前, and same_control_restated for 调整后. Mark only the adjusted/restated "
+        "comparatives with is_restated_comparative=true; never overwrite the "
+        "original-as-published value."
+    ),
+    "business_mode_and_extension": (
+        "A stable principal-business description is business overview, not a BusinessRegime "
+        "unless the source states an effective regime boundary. An explicitly disclosed new "
+        "product or service supplied during the reporting period may be a product_extension "
+        "BusinessEvent. Do not create a regime merely to complete coverage."
+    ),
+    "restructuring_commitment": (
+        "Extract only the source-supported restructuring occurrence from the commitment text. "
+        "Keep the event description in source-native Chinese without translation and use the "
+        "occurrence year/date as reported_period and event_date. A commitment or its performance "
+        "status is not the restructuring completion/effective date and must not replace a "
+        "separately evidenced equity-transfer event."
     ),
 }
 
@@ -965,7 +982,9 @@ def _compact_measurement_item_schema(
         prepared_scope is not None
         and prepared_scope.scope_id == "same_control_comparison_basis"
     ):
-        schema["required"].append("reported_period")
+        schema["required"].extend(
+            ["reported_period", "comparison_basis", "is_restated_comparative"]
+        )
     return schema
 
 
@@ -1806,8 +1825,15 @@ def _expand_business_regime_draft(
             "event_type": item.get("event_type"),
             "description": item.get("description"),
             "subject_scope": "unclear",
-            "reported_period": _reported_period_label(prepared_scope),
+            "reported_period": item.get("reported_period")
+            or (
+                item.get("event_date")
+                if prepared_scope.scope_id == "restructuring_commitment"
+                else None
+            )
+            or _reported_period_label(prepared_scope),
             "period_type": "event",
+            "knowledge_time": prepared_scope.report.published_at,
             "source_native": {
                 "name": item.get("event_type"),
                 "value": item.get("description"),
@@ -2536,14 +2562,23 @@ class CommonGatewaySemanticProvider:
                     "all cited Evidence bindings. A composite source-native label such as "
                     "加工量（销量） does not require a second metric when the requested field, "
                     "physical anchor, and economic direction support one primary metric. "
+                    "The activity_actor_unsupported reason applies only to Activity and must "
+                    "not reject a Measurement. For Activity, an exact source-native actor "
+                    "that grammatically governs the cited verb supports actor_basis="
+                    "direct_grammatical_actor, even when the separate report subject_scope "
+                    "remains unclear. A candidate with subject_scope=unclear may pass when "
+                    "its factual content and Evidence binding are supported and it makes no "
+                    "stronger issuer or consolidated-group claim; the report-level subject "
+                    "gate remains separate. "
                     "Treat source_value_mutation as applicable "
                     "only when an Evidence item has an explicit source_bindings entry for "
                     "the candidate field and the candidate source_native disagrees with that "
                     "bound value; do not use it merely because a table Evidence anchor is "
-                    "broader than the candidate cell. A current-period row does not need "
-                    "comparison_basis merely because the table also prints prior-year columns; "
-                    "require comparison_basis only when the candidate explicitly marks itself "
-                    "as a restated comparative. A Segment or Measurement whose subject_scope "
+                    "broader than the candidate cell. A current-period row does not normally "
+                    "need comparison_basis merely because the table also prints prior-year "
+                    "columns. In the same_control_comparison_basis scope, however, every "
+                    "current, 调整前, and 调整后 candidate must carry its source-supported "
+                    "comparison_basis. A Segment or Measurement whose subject_scope "
                     "is business_segment is supported by its disclosed segment dimension; do "
                     "not require issuer/consolidated wording for that scope. Otherwise return "
                     "unclear or block with typed reason_codes. For coverage, pass a legal-empty not_disclosed result "
@@ -2552,7 +2587,9 @@ class CommonGatewaySemanticProvider:
                     "states a permitted confidentiality/exemption reason. A legal-empty "
                     "coverage target must not be marked unclear merely because it has no "
                     "candidate. Pass not_applicable only when the source explicitly states "
-                    "that the requested disclosure does not apply. Do not infer facts, "
+                    "that the requested disclosure does not apply. Source-native narrative "
+                    "descriptions must preserve the cited source language and must not be "
+                    "translated. Do not infer facts, "
                     "production approval, package assignment, commodity exposure, value-chain "
                     "position, or DCF input. Return JSON only."
                 )

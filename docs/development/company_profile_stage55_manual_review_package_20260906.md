@@ -1,8 +1,8 @@
 # 阶段 5.5 人工语义复核包（2026-09-06）
 
-> 复核对象：`stage55-final-four-luna-20260906-l`
+> 复核对象：MR-01 至 MR-07 的原始候选来自前一轮完整运行；裁决后的复验与完整权威运行是 `stage55-final-four-luna-20260906-p`
 >
-> 状态：`awaiting_user_adjudication`
+> 状态：`adjudication_recorded`
 >
 > 研究状态：四报告均为 `hold`
 >
@@ -10,10 +10,11 @@
 
 ## 1. 本复核包解决什么问题
 
-本次权威运行完成了 43 个 scope 的 extract 和 verify，共 86 次 LLM 调用，全部成功。当前 `hold`
-不是 DNS、超时或网关失败，而是部分候选事实仍有主体、动作承担者、期间或对象类型争议。
+裁决后的新权威完整运行 `run-p` 完成了 43 个 scope 的执行（82 次 provider call，其中 78 次成功、4 次
+`provider_unavailable`）。当前 `hold` 不是 DNS 或底层传输超时，而是未完成 scope、主体门禁以及 Gold/负例
+结果未达到完成门槛。
 
-运行产生 30 条底层 `human_review_items`：璞泰来 2 条、锦华新材 12 条、中航成飞 16 条、
+原始复核运行产生 30 条底层 `human_review_items`：璞泰来 2 条、锦华新材 12 条、中航成飞 16 条、
 宁德时代 0 条。本文件按同一原文、同一语义问题合并为 7 个审批主题。一次主题审批同时覆盖其
 列出的候选记录和派生 coverage，避免对同一张表逐行重复审批。
 
@@ -24,7 +25,7 @@
 - `hold`：现有证据不足，保持未决。
 - `request_repair`：原文事实成立，但当前结构化对象、期间、主体或字段需要按指定口径重建。
 
-用户可以按如下格式回复：
+历史审批记录格式如下：
 
 ```text
 MR-01 accept_for_research_review
@@ -32,7 +33,7 @@ MR-02 request_repair
 ...
 ```
 
-如同意本文全部推荐，可回复“同意 MR-01 至 MR-07 的推荐决定”。
+用户已同意“MR-01 至 MR-07 的推荐决定”，决定已写入裁决账本。
 
 ## 2. 审批主题总览
 
@@ -294,14 +295,15 @@ source-native 中文描述，期间标为 2023 年并保留本年报的 `knowled
 
 | 项目 | 结果 |
 |---|---:|
-| Gold | 5 / 24 通过 |
+| Gold | 4 / 24 通过 |
 | 冻结负例 | 15 / 19 已评估 |
 | 已评估负例通过 | 13 |
-| 已评估负例失败 | 2 |
+| 已评估负例失败 | 2（`mm-neg-counterparty-coverage-backfill`、`mm-neg-third-party-action-actor`） |
 | 未触发、未评估 | 4 |
 
-两条失败负例分别由 MR-01 和 MR-05 覆盖。人工决定写入裁决账本后，必须使用新 run ID 复验受
-影响 scope，并重新对真实 bundle 运行 Benchmark；不得直接修改 `run-l`，也不得把人工决定或
+MR-01 至 MR-07 的人工决定已写入裁决账本，并已使用新 run ID `run-p` 复验受影响 scope、完成
+四报告完整切片和真实 post-run Benchmark。当前两条失败负例是 `mm-neg-counterparty-coverage-backfill`
+与 `mm-neg-third-party-action-actor`；4 条负例尚未触发，保持未评估。不得修改历史运行或把人工决定、
 Gold 值补写成 runtime 事实。
 
 即使 MR-01 至 MR-07 全部按推荐决定通过，只要报告级主体门禁、Gold 或冻结负例完成门尚未满足，

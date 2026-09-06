@@ -2,10 +2,10 @@
 
 ## 权威运行
 
-- 最新完整运行 run ID：`stage55-final-four-luna-20260906-l`
+- 最新完整运行 run ID：`stage55-final-four-luna-20260906-p`
 - 范围：批准的四份 2025 年报、43 个 request scope
-- provider calls：86（extract 43 + verify 43）
-- provider 结果：86 次全部成功，无 DNS、timeout、provider error 或 failover
+- provider calls：82（成功 78，失败 4；extract/verify 仍按既定最多一次 repair 约束执行）
+- provider 失败：4 次均记录为 `provider_unavailable`；本次未出现 DNS、底层 transport timeout 或 schema 路由错误
 - 运行状态：`hold`
 - 生产授权：`not_authorized`
 - 本次未读取或写入旧 approved 表、backfill、scheduler、API、Telegram、CommodityExposure、ValueChainRole、DCF 或阶段 6 reset。
@@ -16,15 +16,15 @@
 
 | 项目 | 结果 |
 |---|---:|
-| Gold 标注 | 5 / 24 通过 |
+| Gold 标注 | 4 / 24 通过 |
 | 冻结负例 | 19 条中 15 条已评估：13 条通过、2 条失败；4 条未触发而未评估 |
 | 未触发而未评估的负例 | 4 |
-| 负例失败 | 2：`mm-neg-processing-duplicate`、`mm-neg-same-control-overwrite` |
+| 负例失败 | 2：`mm-neg-counterparty-coverage-backfill`、`mm-neg-third-party-action-actor` |
 | 总体决定 | `hold` |
 
 Gold 与负例均由真实 bundle 的 records、dispositions、coverage、Evidence 和 research projection 计算；没有把 Gold 值补回 runtime，也没有把未触发的负例记为通过。
 
-`run-l` 的所有 scope 均完成公共网关调用；权威运行仍因人工候选、两条实际负例失败和已接受记录的主体未完全明确而保持 `hold`。人工复核主题、原文和推荐决定见 `company_profile_stage55_manual_review_package_20260906.md`。
+`run-p` 是 MR-01 至 MR-07 裁决后的新权威完整运行。它没有把 Gold 或人工决定写回 runtime；四报告仍因 5 个未完成 scope、报告级 `subject_scope_unclear`、两条真实负例失败及 Gold 未完成而保持 `hold`。人工复核主题、原文和已记录决定见 `company_profile_stage55_manual_review_package_20260906.md`。
 
 ## 四份报告状态
 
@@ -63,7 +63,7 @@ Gold 与负例均由真实 bundle 的 records、dispositions、coverage、Eviden
 
 ## 人工复核入口
 
-最新 `run-l` 的 30 条底层人工项已按同一 Evidence 和语义问题合并为 7 个审批主题，详见
+原始运行产生的底层人工项已按同一 Evidence 和语义问题合并为 7 个审批主题；MR-01 至 MR-07 的用户裁决已写入账本，详见
 `company_profile_stage55_manual_review_package_20260906.md`。宁德时代没有候选级人工项；
 其 `hold` 来自报告级主体门禁，不能靠人工把“公司”强行升级为合并集团。
 

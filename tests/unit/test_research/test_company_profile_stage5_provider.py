@@ -202,6 +202,8 @@ def test_common_gateway_provider_sends_one_bounded_scope_and_stage4_schema() -> 
         ("classified_volume_not_available", "not a parser or table-context failure"),
         ("reported_business_change", "Do not merge a separate"),
         ("same_control_comparison_basis", "not as Segment rows"),
+        ("business_mode_and_extension", "not a BusinessRegime"),
+        ("restructuring_commitment", "source-native Chinese"),
     ],
 )
 def test_common_gateway_provider_adds_frozen_scope_instructions(
@@ -823,7 +825,43 @@ def test_business_regime_scope_uses_compact_events_and_restores_full_record() ->
     assert candidate["object_type"] == "BusinessEvent"
     assert candidate["event_date"] == "2025-01-06"
     assert candidate["regime_effective_at"] == "2025-01-06"
+    assert candidate["knowledge_time"] == prepared.report.published_at
     assert candidate["evidence"][0]["evidence_id"] == evidence_id
+
+
+def test_restructuring_commitment_uses_occurrence_period_not_report_year() -> None:
+    prepared = _prepared_scope().model_copy(
+        update={
+            "scope_id": "restructuring_commitment",
+            "chapter_task": ChapterTask.EXTRACT_BUSINESS_REGIME,
+            "field_ids": ("business_regime",),
+        }
+    )
+    request = _business_regime_request(prepared)
+    evidence_id = prepared.evidence_bundle[0].evidence.evidence_id
+
+    expanded = _expand_extract_response(
+        {
+            "events": [
+                {
+                    "event_type": "major_asset_restructuring_project_launched",
+                    "description": "2023年，公司启动收购成飞100%股权重大资产重组项目。",
+                    "event_date": "2023",
+                    "evidence_id": evidence_id,
+                }
+            ],
+            "regimes": [],
+            "package_assignments": [],
+            "coverage": [],
+        },
+        request=request,
+        prepared_scope=prepared,
+    )
+
+    candidate = expanded["items"][0]["candidate"]
+    assert candidate["reported_period"] == "2023"
+    assert candidate["knowledge_time"] == prepared.report.published_at
+    assert candidate["source_native"]["value"].startswith("2023年，公司启动")
 
 
 def test_reported_business_change_keeps_event_and_not_applicable_coverage_separate() -> (
@@ -1302,6 +1340,38 @@ def test_same_control_adjusted_and_pre_adjustment_columns_keep_distinct_period_b
     assert records[0].occurrence_id() != records[1].occurrence_id()
 
 
+def test_same_control_compact_schema_requires_basis_for_every_column() -> None:
+    prepared = _prepared_scope().model_copy(
+        update={
+            "scope_id": "same_control_comparison_basis",
+            "chapter_task": ChapterTask.EXTRACT_SEGMENT_FINANCIALS,
+            "field_ids": ("operating_revenue",),
+        }
+    )
+    request = _same_control_request(prepared)
+    schema = _minimal_extract_schema(request, prepared_scope=prepared)
+    item_schema = schema["properties"]["measurements"]["items"]
+    evidence_id = prepared.evidence_bundle[0].evidence.evidence_id
+    base = {
+        "metric_type": "operating_revenue",
+        "name": "营业收入",
+        "value": "100",
+        "unit": "元",
+        "reported_period": "2025年",
+        "evidence_id": evidence_id,
+    }
+    validator = Draft202012Validator(item_schema)
+
+    assert not validator.is_valid(base)
+    assert validator.is_valid(
+        {
+            **base,
+            "comparison_basis": "current_period_after_restructuring",
+            "is_restated_comparative": False,
+        }
+    )
+
+
 def test_measurement_schema_scopes_capacity_kind_to_metric_type() -> None:
     prepared = _prepared_scope().model_copy(
         update={
@@ -1714,7 +1784,13 @@ def test_common_gateway_provider_uses_separate_repair_and_verify_requests() -> N
     )
     assert "one Evidence item may be bound to several field_ids" in verify_instruction
     assert "source_value_mutation as applicable only when" in verify_instruction
-    assert "does not need comparison_basis merely because" in verify_instruction
+    assert "does not normally need comparison_basis merely because" in verify_instruction
+    assert "same_control_comparison_basis scope" in verify_instruction
+    assert "activity_actor_unsupported reason applies only to Activity" in (
+        verify_instruction
+    )
+    assert "candidate with subject_scope=unclear may pass" in verify_instruction
+    assert "must not be translated" in verify_instruction
     assert "subject_scope is business_segment is supported" in verify_instruction
     assert "report" not in verify_candidate and "evidence" not in verify_candidate
 
@@ -2011,6 +2087,60 @@ def _segment_extract_request(
             MetricType.OPERATING_REVENUE,
             MetricType.OPERATING_COST,
             MetricType.GROSS_MARGIN_REPORTED,
+        ),
+        unresolved_field_ids=prepared.field_ids,
+    )
+
+
+def _same_control_request(prepared: PreparedRequestScope) -> SemanticTaskRequest:
+    checklist = ChecklistItem(
+        field_id="operating_revenue",
+        object_type=ObjectType.MEASUREMENT,
+        chapter_task=ChapterTask.EXTRACT_SEGMENT_FINANCIALS,
+        requirement_level=RequirementLevel.CONDITIONAL,
+        allowed_coverage_statuses=tuple(CoverageStatus),
+        allowed_metric_types=(MetricType.OPERATING_REVENUE,),
+    )
+    return SemanticTaskRequest(
+        request_id="same-control-request",
+        report=prepared.report,
+        package_manifest=PackageManifest(
+            package_name="manufacturing_materials",
+            package_version="v1",
+            report=prepared.report,
+            checklist=(checklist,),
+        ),
+        chapter_task=prepared.chapter_task,
+        evidence_bundle=prepared.evidence_bundle,
+        allowed_object_types=(ObjectType.MEASUREMENT,),
+        allowed_metric_types=(MetricType.OPERATING_REVENUE,),
+        unresolved_field_ids=prepared.field_ids,
+    )
+
+
+def _business_regime_request(prepared: PreparedRequestScope) -> SemanticTaskRequest:
+    checklist = ChecklistItem(
+        field_id="business_regime",
+        object_type=ObjectType.BUSINESS_EVENT,
+        chapter_task=ChapterTask.EXTRACT_BUSINESS_REGIME,
+        requirement_level=RequirementLevel.REQUIRED,
+        allowed_coverage_statuses=tuple(CoverageStatus),
+    )
+    return SemanticTaskRequest(
+        request_id="business-regime-request",
+        report=prepared.report,
+        package_manifest=PackageManifest(
+            package_name="manufacturing_materials",
+            package_version="v1",
+            report=prepared.report,
+            checklist=(checklist,),
+        ),
+        chapter_task=prepared.chapter_task,
+        evidence_bundle=prepared.evidence_bundle,
+        allowed_object_types=(
+            ObjectType.BUSINESS_EVENT,
+            ObjectType.BUSINESS_REGIME,
+            ObjectType.INDUSTRY_PACKAGE_ASSIGNMENT,
         ),
         unresolved_field_ids=prepared.field_ids,
     )

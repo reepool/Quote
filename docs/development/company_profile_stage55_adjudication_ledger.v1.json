@@ -129,6 +129,203 @@
       ],
       "sample_id": "manufacturing-materials-302132-2025-regime",
       "scope_id": "same_control_comparison_basis"
+    },
+    {
+      "adjudication_id": "stage55-user-mr-01-processing-volume",
+      "blocker_codes": [
+        "activity_actor_unsupported",
+        "required_coverage_missing"
+      ],
+      "contract_refs": [
+        "company_profile_stage55_manual_review_package_20260906.md#mr-01-璞泰来涂覆加工量销量",
+        "company-profile-bounded-semantic-workflow/Verification preserves one primary metric for a composite source-native label"
+      ],
+      "decision": "contract_accepted",
+      "evidence_ids": [
+        "stage5-evidence-6b0e13de51a1fa68a18deec2"
+      ],
+      "production_authorization": "not_authorized",
+      "rationale": "用户接受一条 processing_volume=109.42 亿㎡，processing_direction=external_service_provided；括注‘销量’只保留在 source-native，同一锚点不得生成 sales_volume。Measurement 不适用 activity_actor_unsupported，主体保持 unclear。",
+      "reviewed_at": "2026-09-06",
+      "reviewer": "user-final-adjudication",
+      "runtime_target_ids": [
+        "stage5-215a7b101399971f2f84f56b",
+        "stage55-final-four-luna-20260906-l:manufacturing-materials-603659-2025:capacity_and_processing_narrative:coverage:processing_volume"
+      ],
+      "sample_id": "manufacturing-materials-603659-2025",
+      "scope_id": "capacity_and_processing_narrative"
+    },
+    {
+      "adjudication_id": "stage55-user-mr-02-capacity-table",
+      "blocker_codes": [
+        "subject_unsupported",
+        "required_coverage_missing"
+      ],
+      "contract_refs": [
+        "company_profile_stage55_manual_review_package_20260906.md#mr-02-锦华新材产能与开工情况表",
+        "company_profile_manufacturing_materials_requirements.md#5"
+      ],
+      "decision": "contract_accepted",
+      "evidence_ids": [
+        "stage5-evidence-d4f2e3a922b89b95dde4bf27",
+        "stage5-evidence-9f36e3059612afc9fcd7667c"
+      ],
+      "production_authorization": "not_authorized",
+      "rationale": "用户接受产能表七条来源事实及 observed coverage：三条 design_capacity、羟胺盐在建产能 40,000 吨/年和三条利用率。表内没有合并口径，所有记录继续 subject_scope=unclear，不批量升级主体。",
+      "reviewed_at": "2026-09-06",
+      "reviewer": "user-final-adjudication",
+      "runtime_target_ids": [
+        "stage5-f1f448365e2a54a7a043a274",
+        "stage5-216d5c77c722f42dc6d8ffba",
+        "stage5-a0bebaa48b739a6ecec95250",
+        "stage5-7ae18033500d90c303b36b86",
+        "stage5-6d655bbf5ea727b88e830967",
+        "stage5-1cd8e44405e1e3487a1cfb0b",
+        "stage5-f8e8bbc350a6d2fd841aa3b8",
+        "stage55-final-four-luna-20260906-l:manufacturing-materials-920015-2025:capacity_table:coverage:production_capacity",
+        "stage55-final-four-luna-20260906-l:manufacturing-materials-920015-2025:capacity_table:coverage:capacity_under_construction",
+        "stage55-final-four-luna-20260906-l:manufacturing-materials-920015-2025:capacity_table:coverage:capacity_utilization"
+      ],
+      "sample_id": "manufacturing-materials-920015-2025",
+      "scope_id": "capacity_table"
+    },
+    {
+      "adjudication_id": "stage55-user-mr-03-product-extension",
+      "blocker_codes": [
+        "occurrence_semantic_conflict",
+        "prohibited_inference",
+        "required_coverage_missing"
+      ],
+      "contract_refs": [
+        "company_profile_stage55_manual_review_package_20260906.md#mr-03-锦华新材产品扩展与-businessregime-误分类",
+        "company_profile_manufacturing_materials_requirements.md#8"
+      ],
+      "decision": "implementation_correction",
+      "evidence_ids": [
+        "stage5-evidence-ffb1170192a7c07251ee0e79"
+      ],
+      "production_authorization": "not_authorized",
+      "rationale": "用户拒绝把稳定主营描述‘酮肟系列精细化学品的研发、生产和销售’建成 BusinessRegime；保留新增电子级羟胺水溶液供应为 product_extension BusinessEvent，并由该事件完成本 scope coverage，主体保持 unclear。",
+      "reviewed_at": "2026-09-06",
+      "reviewer": "user-final-adjudication",
+      "runtime_target_ids": [
+        "stage5-088cba9bc049f31b08e44fbd",
+        "stage5-49f6b594966034f2f9e5e489",
+        "stage55-final-four-luna-20260906-l:manufacturing-materials-920015-2025:business_mode_and_extension:coverage:business_regime"
+      ],
+      "sample_id": "manufacturing-materials-920015-2025",
+      "scope_id": "business_mode_and_extension"
+    },
+    {
+      "adjudication_id": "stage55-user-mr-04-activity-actor",
+      "blocker_codes": [
+        "activity_actor_unsupported",
+        "required_coverage_missing"
+      ],
+      "contract_refs": [
+        "company_profile_stage55_manual_review_package_20260906.md#mr-04-中航成飞航空产品-activity",
+        "company_profile_manufacturing_materials_requirements.md#6"
+      ],
+      "decision": "contract_accepted",
+      "evidence_ids": [
+        "stage5-evidence-1e1963b92cea83a9ccd5822a"
+      ],
+      "production_authorization": "not_authorized",
+      "rationale": "用户接受公司对航空产品的研发、制造、销售、维修和服务保障五个 Activity；actor 保留原文‘公司’，维修/服务保障映射 provides_service。军贸公司向国外最终用户销售不得改写成上市公司直销，报告主体保持 unclear。",
+      "reviewed_at": "2026-09-06",
+      "reviewer": "user-final-adjudication",
+      "runtime_target_ids": [
+        "stage5-a6916866012ced391a464188",
+        "stage5-301bbc12f6882b53ec59d665",
+        "stage5-27dd342c334d7e992e8b89f2",
+        "stage5-7bd254f92f9e5de2b3979827",
+        "stage5-593b205c64f67b87a9f96dcb",
+        "stage55-final-four-luna-20260906-l:manufacturing-materials-302132-2025-regime:business_overview:coverage:explicit_activity"
+      ],
+      "sample_id": "manufacturing-materials-302132-2025-regime",
+      "scope_id": "business_overview"
+    },
+    {
+      "adjudication_id": "stage55-user-mr-05-same-control-basis",
+      "blocker_codes": [
+        "subject_unsupported",
+        "required_coverage_missing",
+        "comparison_basis_missing"
+      ],
+      "contract_refs": [
+        "company_profile_stage55_manual_review_package_20260906.md#mr-05-中航成飞同一控制调整前后营业收入",
+        "company-profile-bounded-semantic-workflow/Same-control comparative verification is column and knowledge-time aware"
+      ],
+      "decision": "implementation_correction",
+      "evidence_ids": [
+        "stage5-evidence-37e75a11e441ac77954f4235"
+      ],
+      "production_authorization": "not_authorized",
+      "rationale": "用户确认五列数字和列位，但要求 2025=current_period_after_restructuring、调整前=original_as_published、调整后=same_control_restated；共同保留本年报 knowledge_time，不覆盖 predecessor 原披露，主体保持 unclear。",
+      "reviewed_at": "2026-09-06",
+      "reviewer": "user-final-adjudication",
+      "runtime_target_ids": [
+        "stage5-b488df82e599fcf1e909200b",
+        "stage5-ab98002d5614d1c874bd182b",
+        "stage5-5b8670049d81ee838399f5c0",
+        "stage5-e0a75f137d1b767e9a46516d",
+        "stage5-d96cde2b556f012c14347033",
+        "stage55-final-four-luna-20260906-l:manufacturing-materials-302132-2025-regime:same_control_comparison_basis:coverage:operating_revenue"
+      ],
+      "sample_id": "manufacturing-materials-302132-2025-regime",
+      "scope_id": "same_control_comparison_basis"
+    },
+    {
+      "adjudication_id": "stage55-user-mr-06-customer-totals",
+      "blocker_codes": [
+        "subject_unsupported",
+        "required_coverage_missing"
+      ],
+      "contract_refs": [
+        "company_profile_stage55_manual_review_package_20260906.md#mr-06-中航成飞前五名客户合计",
+        "company-profile-common-semantic-model/Totals-only disclosure cannot create a counterparty relationship"
+      ],
+      "decision": "contract_accepted",
+      "evidence_ids": [
+        "stage5-evidence-a31e0ceb31a004b851d22092"
+      ],
+      "production_authorization": "not_authorized",
+      "rationale": "用户接受前五名客户合计销售金额、96.44% 及同表关联方销售额占比 4.93% 为 concentration Measurements；名称保持 not_disclosed，不生成 Relationship，主体保持 unclear。",
+      "reviewed_at": "2026-09-06",
+      "reviewer": "user-final-adjudication",
+      "runtime_target_ids": [
+        "stage5-70534a096e7669cf866b6c7d",
+        "stage5-4a0900d10fe0baae9888073e",
+        "stage55-final-four-luna-20260906-l:manufacturing-materials-302132-2025-regime:top_five_customer_totals_only:coverage:customer_concentration"
+      ],
+      "sample_id": "manufacturing-materials-302132-2025-regime",
+      "scope_id": "top_five_customer_totals_only"
+    },
+    {
+      "adjudication_id": "stage55-user-mr-07-restructuring-start",
+      "blocker_codes": [
+        "required_coverage_missing",
+        "occurrence_semantic_conflict",
+        "source_native_text_mutation"
+      ],
+      "contract_refs": [
+        "company_profile_stage55_manual_review_package_20260906.md#mr-07-中航成飞重大资产重组启动事件",
+        "company_profile_manufacturing_materials_requirements.md#8"
+      ],
+      "decision": "implementation_correction",
+      "evidence_ids": [
+        "stage5-evidence-6f7dbd059f0fcb2571886d89"
+      ],
+      "production_authorization": "not_authorized",
+      "rationale": "用户要求保留 2023 年启动收购成飞 100% 股权重大资产重组项目事件，描述改回 source-native 中文，期间为 2023，并保留本年报 knowledge_time；该事件不得替代 2025-01-06 股权过户生效事件。",
+      "reviewed_at": "2026-09-06",
+      "reviewer": "user-final-adjudication",
+      "runtime_target_ids": [
+        "stage5-11a5b460f59685530ddf51dc",
+        "stage55-final-four-luna-20260906-l:manufacturing-materials-302132-2025-regime:restructuring_commitment:coverage:business_regime"
+      ],
+      "sample_id": "manufacturing-materials-302132-2025-regime",
+      "scope_id": "restructuring_commitment"
     }
   ],
   "production_authorization": "not_authorized",
