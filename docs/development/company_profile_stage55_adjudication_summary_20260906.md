@@ -24,7 +24,7 @@
 
 Gold 与负例均由真实 bundle 的 records、dispositions、coverage、Evidence 和 research projection 计算；没有把 Gold 值补回 runtime，也没有把未触发的负例记为通过。
 
-`run-p` 是 MR-01 至 MR-07 裁决后的新权威完整运行。它没有把 Gold 或人工决定写回 runtime；四报告仍因 5 个未完成 scope、报告级 `subject_scope_unclear`、两条真实负例失败及 Gold 未完成而保持 `hold`。人工复核主题、原文和已记录决定见 `company_profile_stage55_manual_review_package_20260906.md`。
+`run-p` 是 MR-01 至 MR-07 裁决后的新权威完整运行。它没有把 Gold 或人工决定写回 runtime；四报告仍因 9 个未完成 scope、报告级 `subject_scope_unclear`、两条真实负例失败及 Gold 未完成而保持 `hold`。人工复核主题、原文和已记录决定见 `company_profile_stage55_manual_review_package_20260906.md`。
 
 ## 四份报告状态
 
