@@ -2,9 +2,10 @@
 
 ## 权威运行
 
-- run ID：`stage55-final-four-luna-20260906-a`
+- 最新完整运行 run ID：`stage55-final-four-luna-20260906-l`
 - 范围：批准的四份 2025 年报、43 个 request scope
 - provider calls：86（extract 43 + verify 43）
+- provider 结果：86 次全部成功，无 DNS、timeout、provider error 或 failover
 - 运行状态：`hold`
 - 生产授权：`not_authorized`
 - 本次未读取或写入旧 approved 表、backfill、scheduler、API、Telegram、CommodityExposure、ValueChainRole、DCF 或阶段 6 reset。
@@ -15,15 +16,15 @@
 
 | 项目 | 结果 |
 |---|---:|
-| Gold 标注 | 4 / 24 通过 |
-| 冻结负例 | 19 条中 15 条已评估：15 条通过；4 条未触发而未评估 |
+| Gold 标注 | 5 / 24 通过 |
+| 冻结负例 | 19 条中 15 条已评估：13 条通过、2 条失败；4 条未触发而未评估 |
 | 未触发而未评估的负例 | 4 |
-| 负例失败 | 0（调整行的明示合并口径已纳入评估规则） |
+| 负例失败 | 2：`mm-neg-processing-duplicate`、`mm-neg-same-control-overwrite` |
 | 总体决定 | `hold` |
 
 Gold 与负例均由真实 bundle 的 records、dispositions、coverage、Evidence 和 research projection 计算；没有把 Gold 值补回 runtime，也没有把未触发的负例记为通过。
 
-本次仅在只读重评中修正了 `mm-neg-subject-forced` 对 `row_class=consolidation_adjustment` 且来源行名为“合并抵消项”的判断；原始权威 bundle 未被改写。即使负例全部已评估通过，权威运行仍因任务未完成和已接受记录的主体未完全明确而保持 `hold`。
+`run-l` 的所有 scope 均完成公共网关调用；权威运行仍因人工候选、两条实际负例失败和已接受记录的主体未完全明确而保持 `hold`。人工复核主题、原文和推荐决定见 `company_profile_stage55_manual_review_package_20260906.md`。
 
 ## 四份报告状态
 
@@ -58,6 +59,12 @@ Gold 与负例均由真实 bundle 的 records、dispositions、coverage、Eviden
   `not_disclosed` 且不生成 Relationship；主体是否允许保持 `unclear` 进入研究视图，
   仍需人工裁决。
 - 该定向 run 只证明该 scope 的复核链已跑通，不回写或替换
-  `stage55-final-four-luna-20260906-a`，也不改变四报告总体 `hold`。
+  历史完整运行，也不改变四报告总体 `hold`。
+
+## 人工复核入口
+
+最新 `run-l` 的 30 条底层人工项已按同一 Evidence 和语义问题合并为 7 个审批主题，详见
+`company_profile_stage55_manual_review_package_20260906.md`。宁德时代没有候选级人工项；
+其 `hold` 来自报告级主体门禁，不能靠人工把“公司”强行升级为合并集团。
 
 下一步应是研究员逐 Evidence 复核这些 hold 项；在全部冻结 blocker 清除、Gold 与实际负例满足完成门前，不得登记 `research_slice_pass`，也不得启动生产发布或阶段 6。
