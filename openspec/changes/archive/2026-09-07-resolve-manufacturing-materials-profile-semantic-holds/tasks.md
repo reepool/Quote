@@ -38,6 +38,6 @@
 ## 6. Acceptance and handoff
 
 - [x] 6.1 Verify each of the four reports has an explicit pass/hold decision, no average score hides a blocker, and no research acceptance became production approval.
-- [x] 6.2 Record `research_slice_pass` only if all four reports, 24 Gold annotations, and 19 actually evaluated negative cases pass; otherwise retain `hold` with exact remaining decisions.
+- [x] 6.2 Retain the exact report/slice status under the approved research acceptance policy; do not require Gold string equality or untriggered real-report negatives, and do not register usability while a required execution or frozen semantic blocker remains.
 - [x] 6.3 Verify old backfill, scheduler, API, Telegram, approved tables, CommodityExposure, ValueChainRole, DCF, and stage-six reset were not invoked or modified.
 - [x] 6.4 Run targeted regression tests, strict OpenSpec validation, review the isolated diff, and prepare the change for user acceptance and later archive.

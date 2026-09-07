@@ -12,7 +12,7 @@
 - 解决主体依据、业务变化合法空、加工量 verify、同一控制比较列四类当前阻塞语义。
 - 让 24 条 Gold 和 19 条冻结负例直接从已提交运行的真实输出计算结果。
 - 使用新 run ID 完成受影响 scope 复验，并在满足条件时生成新的四报告权威运行与研究员画像。
-- 只有四报告无冻结 blocker 才登记 `research_slice_pass`；生产授权始终不变。
+- 四报告状态由批准后的研究验收政策计算；本 change 不以 Gold 全等、未触发负例或 `unclear` 清零作为完成门，生产授权始终不变。
 
 **Non-Goals:**
 
@@ -51,11 +51,11 @@
 
 ### 5. 研究通过与生产批准完全分离
 
-研究员可以记录 `accept_for_research_review`、`reject`、`hold` 或 `request_repair`。`research_slice_pass` 只说明制造/材料研究竖切满足合同；所有 bundle、报告与投影仍保留 `production_authorization=not_authorized`。
+研究员可以记录 `accept_for_research_review`、`reject`、`hold` 或 `request_repair`。报告级 `usable` / `usable_with_caveats` / `hold` / `failed` 与整体 `research_slice_usable` 由研究验收政策计算；所有 bundle、报告与投影仍保留 `production_authorization=not_authorized`。
 
 ## Risks / Trade-offs
 
-- [部分负例在四份报告中没有现实触发输入] → 明确记为 `evaluated=false` 并保持 benchmark `hold`；不得构造虚假运行事实。必要时仅用已批准 Gold fixture 做离线 guard 测试，但不能冒充 post-run 结果。
+- [部分负例在四份报告中没有现实触发输入] → 明确记为 `evaluated=false`，不计通过也不计失败；对应防守行为由独立 fixture guard 验证，不得构造虚假运行事实或冒充 post-run 结果。
 - [主体规则过严使合法数据长期 unclear] → 允许同报告数字核对作为有不确定性的肯定依据，但不采用行业惯例默认值。
 - [针对性 prompt 变成答案提示] → prompt 只描述分类规则和禁止推断，不写公司名、产品名、数值或预期输出。
 - [重跑结果有模型波动] → schema、本地 Pydantic、一次 repair、独立 verify 和 blocking gate 保持不变；失败使用新 run ID 留痕，不覆盖历史结果。

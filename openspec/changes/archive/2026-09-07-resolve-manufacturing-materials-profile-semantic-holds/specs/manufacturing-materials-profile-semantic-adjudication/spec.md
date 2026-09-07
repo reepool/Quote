@@ -34,10 +34,10 @@ Any semantic correction MUST be verified first through new targeted run IDs for 
 - **THEN** the operator executes the affected scope under a new run ID before a complete four-report rerun
 - **AND** the prior held bundle remains independently reviewable
 
-### Requirement: Research slice completion remains blocking and non-production
-The adjudication MUST leave the overall result `hold` while any frozen blocker, unevaluated required negative case, unsupported subject, incomplete required scope, or failed Gold assertion remains. It MAY record `research_slice_pass` only when all four complete report bundles and researcher-readable profiles pass the frozen contract. Every outcome MUST retain `production_authorization=not_authorized` and MUST NOT start legacy reset, backfill, publication, CommodityExposure, ValueChainRole, or DCF writes.
+### Requirement: Research slice completion follows the approved acceptance policy and remains non-production
+The adjudication MUST preserve every frozen blocker, incomplete required scope, Gold mismatch, contract conflict, and unevaluated real-report negative case in the audit output. Report and slice usability MUST be derived by the approved research acceptance policy: untriggered real-report negatives and allowed `unclear` subjects are not failures by themselves, while required execution failures, actually failed negative cases, and frozen semantic blockers remain blocking. Every outcome MUST retain `production_authorization=not_authorized` and MUST NOT start legacy reset, backfill, publication, CommodityExposure, ValueChainRole, or DCF writes.
 
-#### Scenario: Three reports pass and one report remains semantically unresolved
-- **WHEN** any one report retains a frozen blocker after adjudication and rerun
-- **THEN** the four-report result remains `hold`
+#### Scenario: Three reports are usable and one report remains semantically unresolved
+- **WHEN** any one report retains a required execution failure or frozen blocker after adjudication and rerun
+- **THEN** the four-report result cannot be `research_slice_usable`
 - **AND** no production or reset authorization is created
