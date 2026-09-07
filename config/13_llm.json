@@ -134,9 +134,9 @@
           "direct": 1
         }
       },
-      "scorpio:zai": {
+      "zai": {
         "provider": "openai_compatible",
-        "quota_bucket": "scorpio:zai-key",
+        "quota_bucket": "zai:key",
         "hard_max_concurrency": 20,
         "default_bulk_concurrency": 18,
         "reserved_concurrency": 2,
@@ -195,11 +195,11 @@
             }
           },
           {
-            "source_label": "scorpio:glm-5.3-flash",
+            "source_label": "zai:glm-5.3-flash",
             "weight": 1,
             "profiles": {
-              "semantic_extraction": "semantic_extraction__scorpio_zai",
-              "corporate_action_title_classification": "corporate_action_title_classification__scorpio_zai"
+              "semantic_extraction": "semantic_extraction__zai",
+              "corporate_action_title_classification": "corporate_action_title_classification__zai"
             }
           },
           {
@@ -358,15 +358,15 @@
         "retry_jitter_ratio": 0.2,
         "idempotency_header": "Idempotency-Key"
       },
-      "semantic_extraction__scorpio_zai": {
+      "semantic_extraction__zai": {
         "provider": "openai_compatible",
-        "provider_resource": "scorpio:zai",
-        "source_label": "scorpio:glm-5.3-flash",
+        "provider_resource": "zai",
+        "source_label": "zai:glm-5.3-flash",
         "default_workload": "corporate_action_semantic_extraction",
         "enabled": true,
-        "base_url": "https://scorpio.reepool.com",
-        "endpoint": "/v1/chat/completions",
-        "api_key_env": "QUOTE_LLM_SCORPIO_ZAI_API_KEY",
+        "base_url": "https://open.bigmodel.cn/api/coding/paas/v4",
+        "endpoint": "/chat/completions",
+        "api_key_env": "QUOTE_LLM_ZAI_API_KEY",
         "model": "glm-5.3-flash",
         "structured_output_mode": "auto",
         "supported_structured_output_modes": ["json_object"],
@@ -503,15 +503,15 @@
         "retry_jitter_ratio": 0.5,
         "idempotency_header": "Idempotency-Key"
       },
-      "corporate_action_title_classification__scorpio_zai": {
+      "corporate_action_title_classification__zai": {
         "provider": "openai_compatible",
-        "provider_resource": "scorpio:zai",
-        "source_label": "scorpio:glm-5.3-flash",
+        "provider_resource": "zai",
+        "source_label": "zai:glm-5.3-flash",
         "default_workload": "corporate_action_title_classification",
         "enabled": true,
-        "base_url": "https://scorpio.reepool.com",
-        "endpoint": "/v1/chat/completions",
-        "api_key_env": "QUOTE_LLM_SCORPIO_ZAI_API_KEY",
+        "base_url": "https://open.bigmodel.cn/api/coding/paas/v4",
+        "endpoint": "/chat/completions",
+        "api_key_env": "QUOTE_LLM_ZAI_API_KEY",
         "model": "glm-5.3-flash",
         "structured_output_mode": "auto",
         "supported_structured_output_modes": ["json_object"],

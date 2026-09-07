@@ -411,7 +411,7 @@ def test_repository_llm_config_is_enabled_non_secret_and_has_one_owner():
     members = config.pools["shared_semantic"].members
     assert [member.source_label for member in members] == [
         "scorpio:gemini-3.8-flash-high",
-        "scorpio:glm-5.3-flash",
+        "zai:glm-5.3-flash",
         "scorpio:grok-4.6",
     ]
     assert [member.weight for member in members] == [1, 1, 1]
@@ -457,16 +457,20 @@ def test_repository_llm_config_is_enabled_non_secret_and_has_one_owner():
     assert profiles["semantic_extraction__scorpio_deepseek"].source_label == (
         "scorpio:deepseek-v4-flash-0731"
     )
-    assert profiles["semantic_extraction__scorpio_zai"].enabled is True
-    assert profiles["corporate_action_title_classification__scorpio_zai"].enabled is True
-    assert profiles["semantic_extraction__scorpio_zai"].api_key_env == (
-        "QUOTE_LLM_SCORPIO_ZAI_API_KEY"
+    assert profiles["semantic_extraction__zai"].enabled is True
+    assert profiles["corporate_action_title_classification__zai"].enabled is True
+    assert profiles["semantic_extraction__zai"].api_key_env == (
+        "QUOTE_LLM_ZAI_API_KEY"
     )
-    assert profiles["semantic_extraction__scorpio_zai"].model == "glm-5.3-flash"
-    assert profiles["semantic_extraction__scorpio_zai"].source_label == (
-        "scorpio:glm-5.3-flash"
+    assert profiles["semantic_extraction__zai"].model == "glm-5.3-flash"
+    assert profiles["semantic_extraction__zai"].source_label == (
+        "zai:glm-5.3-flash"
     )
-    assert config.provider_resources["scorpio:zai"].hard_max_concurrency == 20
+    assert profiles["semantic_extraction__zai"].base_url == (
+        "https://open.bigmodel.cn/api/coding/paas/v4"
+    )
+    assert profiles["semantic_extraction__zai"].endpoint == "/chat/completions"
+    assert config.provider_resources["zai"].hard_max_concurrency == 20
     assert profiles["semantic_extraction__scorpio_gemini"].api_key_env == (
         "QUOTE_LLM_SCORPIO_GEMINI_API_KEY"
     )
@@ -498,7 +502,7 @@ def test_repository_llm_config_routes_gemini_grok_and_zai_equal_weight():
         profile.name for profile in config.concrete_profiles_for("semantic_extraction")
     ] == [
         "semantic_extraction__scorpio_gemini",
-        "semantic_extraction__scorpio_zai",
+        "semantic_extraction__zai",
         "semantic_extraction__scorpio_grok",
     ]
     assert [member.weight for member in config.pools["shared_semantic"].members] == [
