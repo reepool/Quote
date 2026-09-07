@@ -29,3 +29,9 @@
 - 影响 `research/company_profile/` 的报告状态、研究投影、Gold/Benchmark 评估和相关测试。
 - 影响阶段 5.5 后续一次完整四报告运行的验收解释，不回写历史 run-x/run-y，也不改变阶段 3 冻结行业字段和语义枚举。
 - 不新增 PDF/OCR 解析器、研究数仓、用途本体或生产写入链；所有结果继续写入隔离 run bundle。
+
+## Archive Outcome (2026-09-07)
+
+- 本 change 交付并验证的是研究验收门禁，不代表四报告切片已经达到 `research_slice_usable`。
+- 权威验证运行 `stage55-policy-four-20260907-a` 的整体状态仍为 `failed`：宁德时代 `failed`、璞泰来 `hold`、锦华新材与中航成飞 `usable_with_caveats`。
+- 阶段 5.5 研究切片尚未收口，阶段 6 继续关闭；所有结果仍为 `accepted_for_review`，且 `production_authorization=not_authorized`。
