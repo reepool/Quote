@@ -89,14 +89,15 @@ def test_stage5_fake_single_report_commits_research_view_and_legal_empty(
     )
 
     assert execution.overall_status == "hold"
-    assert execution.report_statuses == {"manufacturing-materials-603659-2025": "hold"}
+    assert execution.report_statuses == {
+        "manufacturing-materials-603659-2025": "usable_with_caveats"
+    }
     manifest_payload = json.loads(
         (execution.output_path / "manifest.json").read_text(encoding="utf-8")
     )
     report = manifest_payload["reports"][0]
     assert any(
-        item["name"] == "subject_resolution"
-        and item["blocker_codes"] == ["subject_scope_unclear"]
+        item["name"] == "subject_resolution" and item["passed"]
         for item in report["benchmark"]["dimensions"]
     )
     view = report["research_view"]

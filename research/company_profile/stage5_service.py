@@ -9,6 +9,10 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, model_validator
 
+from .acceptance_policy import (
+    CORE_CHAPTERS,
+    accepted_has_illegal_group_promotion,
+)
 from .contracts import (
     ChecklistItem,
     CompanyProfileTaskResult,
@@ -388,11 +392,11 @@ class ManufacturingMaterialsProfileSliceService:
             report=asset.report,
             task_results=task_results,
         )
-        benchmark = _contract_benchmark(task_results)
-        report_status = (
-            Stage5ReportStatus.COMPLETE
-            if benchmark.decision == "pass"
-            else Stage5ReportStatus.HOLD
+        benchmark = _contract_benchmark(task_results, scope_results)
+        report_status = _derive_report_status(
+            task_results=task_results,
+            scope_results=scope_results,
+            benchmark=benchmark,
         )
         return Stage5ReportBundle(
             run_id=run_id,
@@ -608,6 +612,7 @@ def _suppress_same_scope_legal_empty_relationships(
 
 def _contract_benchmark(
     task_results: list[CompanyProfileTaskResult],
+    scope_results: list[Stage5ScopeResult] | None = None,
 ) -> Stage5BenchmarkResult:
     incomplete = [item.request_id for item in task_results if not item.task_complete]
     production_boundary_ok = all(
@@ -624,6 +629,8 @@ def _contract_benchmark(
             for disposition in task_result.dispositions
         )
     ]
+    chapter_dimensions = _core_chapter_dimensions(scope_results or [])
+    illegal_promotion = accepted_has_illegal_group_promotion(task_results)
     dimensions = (
         Stage5BenchmarkDimension(
             name="task_completion",
@@ -633,10 +640,16 @@ def _contract_benchmark(
         ),
         Stage5BenchmarkDimension(
             name="subject_resolution",
-            passed=not unclear_subject_ids,
-            blocker_codes=("subject_scope_unclear",) if unclear_subject_ids else (),
-            details={"unclear_subject_record_ids": unclear_subject_ids},
+            passed=not illegal_promotion,
+            blocker_codes=("subject_scope_unsupported_promotion",)
+            if illegal_promotion
+            else (),
+            details={
+                "unclear_subject_record_ids": unclear_subject_ids,
+                "unclear_is_non_blocking": True,
+            },
         ),
+        *chapter_dimensions,
         Stage5BenchmarkDimension(
             name="production_isolation",
             passed=production_boundary_ok,
@@ -666,21 +679,90 @@ def _overall_status(
 ) -> Stage5OverallStatus:
     if any(item.report_status == Stage5ReportStatus.FAILED for item in reports):
         return Stage5OverallStatus.FAILED
-    accepted = {
-        item.sample_id
-        for item in reports
-        if any(
-            decision.action == Stage5ReviewAction.ACCEPT_FOR_RESEARCH_REVIEW
-            for decision in item.review_decisions
-        )
-    }
-    if (
-        set(selected) == set(APPROVED_STAGE5_SAMPLES)
-        and all(item.report_status == Stage5ReportStatus.COMPLETE for item in reports)
-        and accepted == set(APPROVED_STAGE5_SAMPLES)
-    ):
-        return Stage5OverallStatus.RESEARCH_SLICE_PASS
+    # Final research-slice usability is a post-run decision because the real-report
+    # negative cases are evaluated only after the immutable bundle is committed.
     return Stage5OverallStatus.HOLD
+
+
+def _core_chapter_dimensions(
+    scope_results: list[Stage5ScopeResult],
+) -> tuple[Stage5BenchmarkDimension, ...]:
+    dimensions: list[Stage5BenchmarkDimension] = []
+    required_by_chapter: dict[ChapterTask, set[str]] = {}
+    for scope in scope_results:
+        for field_id in scope.prepared_scope.field_ids:
+            contract = _FIELD_CONTRACT.get(field_id)
+            if contract and contract[1] == RequirementLevel.REQUIRED:
+                required_by_chapter.setdefault(
+                    scope.prepared_scope.chapter_task, set()
+                ).add(field_id)
+    for chapter in CORE_CHAPTERS:
+        chapter_enum = ChapterTask(chapter)
+        scopes = [
+            item
+            for item in scope_results
+            if item.prepared_scope.chapter_task == chapter_enum
+        ]
+        required = required_by_chapter.get(chapter_enum, set())
+        seen: set[str] = set()
+        failures: list[str] = []
+        for scope in scopes:
+            if not scope.task_result.task_complete:
+                failures.append(scope.scope_id)
+            for coverage in scope.task_result.coverage:
+                if coverage.field_id in required and coverage.status in {
+                    CoverageStatus.OBSERVED,
+                    CoverageStatus.NOT_DISCLOSED,
+                    CoverageStatus.NOT_APPLICABLE,
+                }:
+                    seen.add(coverage.field_id)
+                elif coverage.field_id in required:
+                    failures.append(
+                        f"{scope.scope_id}:{coverage.field_id}:{coverage.status.value}"
+                    )
+        missing = sorted(required - seen)
+        if not scopes:
+            failures.append("missing_scope")
+        if missing:
+            failures.extend(f"missing:{item}" for item in missing)
+        dimensions.append(
+            Stage5BenchmarkDimension(
+                name=f"core_chapter:{chapter}",
+                passed=not failures,
+                blocker_codes=("required_core_chapter_incomplete",) if failures else (),
+                details={"failures": failures, "required_fields": sorted(required)},
+            )
+        )
+    return tuple(dimensions)
+
+
+def _derive_report_status(
+    *,
+    task_results: list[CompanyProfileTaskResult],
+    scope_results: list[Stage5ScopeResult],
+    benchmark: Stage5BenchmarkResult,
+) -> Stage5ReportStatus:
+    if any(
+        any(
+            code
+            in {
+                ContractErrorCode.DEADLINE_EXCEEDED,
+                ContractErrorCode.PROVIDER_UNAVAILABLE,
+            }
+            for item in result.human_review_items
+            for code in item.reason_codes
+        )
+        for result in task_results
+    ):
+        return Stage5ReportStatus.FAILED
+    if benchmark.decision != "pass":
+        return Stage5ReportStatus.HOLD
+    accepted = [
+        record for result in task_results for record in result.accepted_records()
+    ]
+    if any(record.subject_scope == SubjectScope.UNCLEAR for record in accepted):
+        return Stage5ReportStatus.USABLE_WITH_CAVEATS
+    return Stage5ReportStatus.USABLE
 
 
 def _utc_now() -> str:

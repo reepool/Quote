@@ -12,11 +12,45 @@ import re
 from pathlib import Path
 from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
+
+from .contracts import (
+    ChecklistItem,
+    PackageManifest,
+    PreparedEvidence,
+    SemanticTaskRequest,
+)
+from .models import (
+    AssertionClass,
+    ChapterTask,
+    CoverageReasonCode,
+    CoverageStatus,
+    Evidence,
+    LogicalSlot,
+    Measurement,
+    MetricType,
+    ObjectType,
+    PeriodType,
+    ReportIdentity,
+    RequirementLevel,
+    SourceNativeValue,
+    SubjectScope,
+    TextAnchor,
+)
+from .stage5 import APPROVED_STAGE5_SAMPLES
+from .workflow import CompanyProfileSemanticService
 
 
 class _StrictModel(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
+
+
+_FIXTURE_GUARD_CASES = {
+    "mm-neg-inventory-value-as-volume",
+    "mm-neg-required-page-omitted",
+    "mm-neg-required-page-unreadable",
+    "mm-neg-unit-ambiguous",
+}
 
 
 class Stage5GoldAnnotationResult(_StrictModel):
@@ -25,6 +59,14 @@ class Stage5GoldAnnotationResult(_StrictModel):
     field_id: str = Field(min_length=1)
     passed: bool
     reason: str | None = None
+    match_status: Literal[
+        "exact_match",
+        "semantic_match",
+        "accepted_with_uncertainty",
+        "failed",
+        "not_applicable",
+        "gold_contract_conflict",
+    ] = "failed"
 
 
 class Stage5NegativeCaseResult(_StrictModel):
@@ -33,6 +75,7 @@ class Stage5NegativeCaseResult(_StrictModel):
     passed: bool
     reason: str = Field(min_length=1)
     inspected_runtime_target_ids: tuple[str, ...] = ()
+    source: Literal["fixture_guard", "real_report"] = "real_report"
 
     @model_validator(mode="after")
     def _unevaluated_cannot_pass(self) -> Stage5NegativeCaseResult:
@@ -49,19 +92,27 @@ class Stage5PostRunBenchmark(_StrictModel):
     decision: Literal["pass", "hold"]
     annotation_results: tuple[Stage5GoldAnnotationResult, ...]
     negative_case_results: tuple[Stage5NegativeCaseResult, ...]
+    fixture_guard_results: tuple[Stage5NegativeCaseResult, ...] = ()
+    research_slice_status: Literal["research_slice_usable", "hold", "failed"] = (
+        "hold"
+    )
     production_authorization: Literal["not_authorized"] = "not_authorized"
     gold_evaluation_only: Literal[True] = True
 
     @model_validator(mode="after")
     def _failures_force_hold(self) -> Stage5PostRunBenchmark:
+        blocking_negative = any(
+            not item.passed for item in self.fixture_guard_results
+        ) or any(
+            not item.passed for item in self.negative_case_results if item.evaluated
+        )
         if self.decision == "pass" and (
-            any(
-                not item.passed
-                for item in (*self.annotation_results, *self.negative_case_results)
-            )
-            or any(not item.evaluated for item in self.negative_case_results)
+            any(not item.passed for item in self.annotation_results)
+            or blocking_negative
         ):
             raise ValueError("post-run benchmark failures cannot be hidden by pass")
+        if self.research_slice_status == "research_slice_usable" and blocking_negative:
+            raise ValueError("research_slice_usable cannot hide negative-case failures")
         return self
 
 
@@ -108,14 +159,62 @@ def evaluate_committed_stage5_run(
         _evaluate_negative_case(case_id, manifest)
         for case_id in sorted(expected_case_ids)
     )
-    passed = all(
-        item.passed for item in (*annotation_results, *negative_results)
-    ) and all(item.evaluated for item in negative_results)
+    fixture_guard_results = evaluate_fixture_guards()
+    passed = (
+        all(item.passed for item in annotation_results)
+        and all(item.passed for item in fixture_guard_results)
+        and all(item.passed for item in negative_results if item.evaluated)
+    )
     return Stage5PostRunBenchmark(
         run_id=str(manifest["run_id"]),
         decision="pass" if passed else "hold",
         annotation_results=annotation_results,
         negative_case_results=negative_results,
+        fixture_guard_results=fixture_guard_results,
+        research_slice_status=_post_run_slice_status(
+            manifest,
+            fixture_guard_results=fixture_guard_results,
+            negative_case_results=negative_results,
+        ),
+    )
+
+
+def _post_run_slice_status(
+    manifest: dict[str, Any],
+    *,
+    fixture_guard_results: tuple[Stage5NegativeCaseResult, ...],
+    negative_case_results: tuple[Stage5NegativeCaseResult, ...],
+) -> Literal["research_slice_usable", "hold", "failed"]:
+    report_statuses = {
+        str(item.get("sample_id")): item.get("report_status")
+        for item in manifest.get("reports", [])
+    }
+    if manifest.get("overall_status") == "failed" or any(
+        status == "failed" for status in report_statuses.values()
+    ):
+        return "failed"
+    all_reports_usable = (
+        set(report_statuses) == set(APPROVED_STAGE5_SAMPLES)
+        and all(
+            status in {"usable", "usable_with_caveats"}
+            for status in report_statuses.values()
+        )
+    )
+    fixture_guards_pass = (
+        {item.case_id for item in fixture_guard_results} == _FIXTURE_GUARD_CASES
+        and all(item.passed for item in fixture_guard_results)
+    )
+    real_results_complete = (
+        len(negative_case_results) == 19
+        and len({item.case_id for item in negative_case_results}) == 19
+    )
+    real_results_pass = real_results_complete and all(
+        item.passed for item in negative_case_results if item.evaluated
+    )
+    return (
+        "research_slice_usable"
+        if all_reports_usable and fixture_guards_pass and real_results_pass
+        else "hold"
     )
 
 
@@ -133,10 +232,18 @@ def _evaluate_annotation(
             **identity,
             passed=False,
             reason="sample missing from committed run",
+            match_status="failed",
         )
     scope_results = report.get("scope_results", [])
     expected_status = annotation.get("coverage_status")
     if expected_status == "observed":
+        best: str | None = None
+        priority = {
+            "exact_match": 3,
+            "semantic_match": 2,
+            "accepted_with_uncertainty": 1,
+            "failed": 0,
+        }
         for scope in scope_results:
             task_result = scope.get("task_result", {})
             accepted_ids = {
@@ -148,11 +255,21 @@ def _evaluate_annotation(
                 if record.get("record_id") not in accepted_ids:
                     continue
                 if _record_matches_annotation(record, annotation):
-                    return Stage5GoldAnnotationResult(**identity, passed=True)
+                    status = _annotation_match_status(record, annotation)
+                    if best is None or priority[status] > priority[best]:
+                        best = status
+        if best is not None:
+            return Stage5GoldAnnotationResult(
+                **identity,
+                passed=best
+                in {"exact_match", "semantic_match", "accepted_with_uncertainty"},
+                match_status=best,
+            )
         return Stage5GoldAnnotationResult(
             **identity,
             passed=False,
             reason="no accepted runtime record matches the Gold annotation",
+            match_status="failed",
         )
 
     expected_page = annotation.get("evidence", {}).get("page")
@@ -163,11 +280,32 @@ def _evaluate_annotation(
                 and coverage.get("status") == expected_status
                 and _evidence_has_page(coverage.get("evidence", []), expected_page)
             ):
-                return Stage5GoldAnnotationResult(**identity, passed=True)
+                return Stage5GoldAnnotationResult(
+                    **identity,
+                    passed=True,
+                    match_status="exact_match",
+                )
+    if expected_status == "not_applicable":
+        for scope in scope_results:
+            for coverage in scope.get("task_result", {}).get("coverage", []):
+                if (
+                    coverage.get("field_id") == annotation.get("field_id")
+                    and coverage.get("status") == "not_disclosed"
+                    and _evidence_has_page(
+                        coverage.get("evidence", []), expected_page
+                    )
+                ):
+                    return Stage5GoldAnnotationResult(
+                        **identity,
+                        passed=False,
+                        reason="Gold expectation conflicts with frozen disclosure contract",
+                        match_status="gold_contract_conflict",
+                    )
     return Stage5GoldAnnotationResult(
         **identity,
         passed=False,
         reason=f"no runtime coverage matches Gold status {expected_status}",
+        match_status="failed",
     )
 
 
@@ -176,10 +314,11 @@ def _record_matches_annotation(
     annotation: dict[str, Any],
 ) -> bool:
     semantic = annotation.get("semantic", {})
-    source = annotation.get("source_native", {})
     if record.get("field_id") != annotation.get("field_id"):
         return False
     if record.get("object_type") != semantic.get("object_type"):
+        return False
+    if _subject_match_status(record, annotation) == "failed":
         return False
     for key in (
         "action",
@@ -193,27 +332,325 @@ def _record_matches_annotation(
         "relation_type",
         "event_type",
         "comparison_basis",
-        "reported_period",
+        "segment_dimension",
+        "segment_label",
         "knowledge_time",
         "regime_effective_at",
     ):
         expected = semantic.get(key)
-        if expected is not None and record.get(key) != expected:
+        if expected is not None and not _semantic_value_matches(
+            key, record.get(key), expected
+        ):
             return False
-    runtime_source = record.get("source_native", {})
-    for key in ("name", "value", "unit", "header"):
-        expected = source.get(key)
-        if expected is not None and runtime_source.get(key) != expected:
-            return False
+    expected_period = semantic.get("period", semantic.get("reported_period"))
+    if expected_period is not None and not _period_matches(
+        record, expected_period
+    ):
+        return False
+    if not _source_fact_matches(record, annotation):
+        return False
     expected_page = annotation.get("evidence", {}).get("page")
-    return _evidence_has_page(record.get("evidence", []), expected_page)
+    return _evidence_has_page(
+        record.get("evidence", []), expected_page
+    ) and _physical_anchor_matches(record, annotation)
+
+
+def _annotation_match_status(record: dict[str, Any], annotation: dict[str, Any]) -> str:
+    if not _record_matches_annotation(record, annotation):
+        return "failed"
+    if _subject_match_status(record, annotation) == "accepted_with_uncertainty":
+        return "accepted_with_uncertainty"
+    return "exact_match" if _record_raw_equal(record, annotation) else "semantic_match"
+
+
+def _subject_match_status(
+    record: dict[str, Any], annotation: dict[str, Any]
+) -> Literal["exact", "accepted_with_uncertainty", "failed"]:
+    semantic = annotation.get("semantic", {})
+    expected_subject = semantic.get("subject_scope")
+    if not expected_subject:
+        return "exact"
+    actual_subject = record.get("subject_scope")
+    if actual_subject == expected_subject:
+        expected_basis = semantic.get("subject_basis")
+        if expected_basis is not None and _normalize_scalar(
+            record.get("subject_basis")
+        ) != _normalize_scalar(expected_basis):
+            return "failed"
+        return "exact"
+    if (
+        annotation.get("subject_strictness") == "allow_unclear_if_not_promoted"
+        and actual_subject == "unclear"
+    ):
+        return "accepted_with_uncertainty"
+    return "failed"
+
+
+def _record_raw_equal(record: dict[str, Any], annotation: dict[str, Any]) -> bool:
+    semantic = annotation.get("semantic", {})
+    source = annotation.get("source_native", {})
+    for key in (
+        "object_type",
+        "action",
+        "object_name",
+        "metric_type",
+        "logical_slot",
+        "capacity_kind",
+        "processing_direction",
+        "row_class",
+        "identity_class",
+        "relation_type",
+        "event_type",
+        "comparison_basis",
+        "segment_dimension",
+        "segment_label",
+        "knowledge_time",
+        "regime_effective_at",
+    ):
+        if semantic.get(key) is not None and record.get(key) != semantic.get(key):
+            return False
+    expected_period = semantic.get("period", semantic.get("reported_period"))
+    if expected_period is not None and record.get("reported_period") != expected_period:
+        return False
+    runtime_source = record.get("source_native", {})
+    return all(
+        source.get(key) is None or runtime_source.get(key) == source.get(key)
+        for key in ("name", "value", "unit", "header")
+    )
+
+
+def _normalize_scalar(value: Any) -> str:
+    return re.sub(r"[\s,，。；：（）()/_-]+", "", str(value or "")).lower()
+
+
+_DIMENSION_ALIASES = {
+    "product": "product",
+    "分产品": "product",
+    "industry": "industry",
+    "分行业": "industry",
+    "region": "region",
+    "分地区": "region",
+    "salesmode": "sales_mode",
+    "分销售模式": "sales_mode",
+    "adjustment": "adjustment",
+}
+
+_IDENTITY_SUFFIXES = (
+    "在建产能",
+    "销售金额",
+    "采购金额",
+    "销售量",
+    "生产量",
+    "库存量",
+    "产能",
+    "合计",
+)
+
+
+def _semantic_value_matches(key: str, actual: Any, expected: Any) -> bool:
+    if key == "segment_dimension":
+        actual_key = _normalize_scalar(actual)
+        expected_key = _normalize_scalar(expected)
+        return _DIMENSION_ALIASES.get(actual_key, actual_key) == _DIMENSION_ALIASES.get(
+            expected_key, expected_key
+        )
+    return _normalize_scalar(actual) == _normalize_scalar(expected)
+
+
+def _period_matches(record: dict[str, Any], expected: Any) -> bool:
+    actual = str(record.get("reported_period") or "").strip()
+    expected_text = str(expected).strip()
+    actual_year = re.fullmatch(r"(\d{4})(?:年|年度)?", actual)
+    expected_year = re.fullmatch(r"(\d{4})(?:年|年度)?", expected_text)
+    if actual_year and expected_year:
+        return actual_year.group(1) == expected_year.group(1)
+    completion = re.fullmatch(r"(\d{4})_expected_completion", expected_text)
+    if completion:
+        qualifier = str(record.get("source_native", {}).get("qualifier") or "")
+        return completion.group(1) in qualifier and bool(
+            re.search(r"预计.{0,4}(?:完工|完成)", qualifier)
+        )
+    if (
+        re.fullmatch(r"\d{4}-\d{2}-\d{2}", expected_text)
+        and record.get("metric_type") == "inventory_volume"
+        and record.get("report", {}).get("report_period") == expected_text
+    ):
+        return True
+    return _normalize_scalar(actual) == _normalize_scalar(expected_text)
+
+
+def _source_fact_matches(
+    record: dict[str, Any], annotation: dict[str, Any]
+) -> bool:
+    source = annotation.get("source_native", {})
+    runtime_source = record.get("source_native", {})
+    object_type = record.get("object_type")
+    expected_name = source.get("name")
+    if object_type in {"Measurement", "Relationship", "Segment"} and expected_name:
+        candidates = [
+            runtime_source.get("name"),
+            record.get("measured_object"),
+            record.get("object_name"),
+            record.get("segment_label"),
+        ]
+        candidates.extend(
+            evidence.get("anchor", {}).get("row_label")
+            for evidence in record.get("evidence", [])
+        )
+        if not any(
+            _identity_matches(candidate, expected_name)
+            for candidate in candidates
+            if candidate
+        ):
+            return False
+    if object_type == "Measurement":
+        expected_value = source.get("value")
+        expected_unit = source.get("unit")
+        if expected_value is not None and not _values_equivalent(
+            runtime_source.get("value"),
+            runtime_source.get("unit"),
+            expected_value,
+            expected_unit,
+        ):
+            return False
+        if expected_unit is not None and not _units_equivalent(
+            runtime_source.get("unit"), expected_unit
+        ):
+            return False
+    return True
+
+
+def _identity_matches(actual: Any, expected: Any) -> bool:
+    def normalized(value: Any) -> str:
+        text = re.sub(r"[（(]\d+[）)]", "", str(value or ""))
+        return _normalize_scalar(text)
+
+    def root(value: Any) -> str:
+        text = normalized(value)
+        for suffix in _IDENTITY_SUFFIXES:
+            normalized_suffix = _normalize_scalar(suffix)
+            if text.endswith(normalized_suffix) and len(text) > len(normalized_suffix):
+                return text[: -len(normalized_suffix)]
+        return text
+
+    return normalized(actual) == normalized(expected) or root(actual) == root(expected)
+
+
+_UNIT_FACTORS = {
+    ("kt/a", "吨/年"): 1000.0,
+    ("吨/年", "kt/a"): 0.001,
+    ("万㎡", "亿㎡"): 0.0001,
+    ("亿㎡", "万㎡"): 10000.0,
+    ("GWh", "MWh"): 1000.0,
+    ("MWh", "GWh"): 0.001,
+}
+
+
+def _units_equivalent(actual: Any, expected: Any) -> bool:
+    return actual == expected or (str(actual), str(expected)) in _UNIT_FACTORS
+
+
+def _values_equivalent(
+    actual: Any, actual_unit: Any, expected: Any, expected_unit: Any
+) -> bool:
+    if not _units_equivalent(actual_unit, expected_unit):
+        return False
+    try:
+        left = _numeric_value(actual, actual_unit)
+        right = _numeric_value(expected, expected_unit)
+    except (TypeError, ValueError):
+        return str(actual).strip() == str(expected).strip()
+    if str(actual_unit) == str(expected_unit):
+        return abs(left - right) <= max(1e-9, abs(right) * 1e-9)
+    factor = _UNIT_FACTORS.get((str(actual_unit), str(expected_unit)))
+    return factor is not None and abs(left * factor - right) <= max(
+        1e-9, abs(right) * 1e-9
+    )
+
+
+def _numeric_value(value: Any, unit: Any) -> float:
+    text = str(value).replace(",", "").replace("，", "").strip()
+    if str(unit) == "%" and text.endswith("%"):
+        text = text[:-1]
+    return float(text)
+
+
+def _physical_anchor_matches(
+    record: dict[str, Any], annotation: dict[str, Any]
+) -> bool:
+    expected_evidence = annotation.get("evidence", {})
+    expected = expected_evidence.get("physical_anchor", {})
+    if not expected:
+        return True
+    expected_page = expected_evidence.get("page")
+    for evidence in record.get("evidence", []):
+        if not _evidence_item_has_page(evidence, expected_page):
+            continue
+        anchor = evidence.get("anchor", {})
+        actual_locator = anchor.get("cell_locator")
+        expected_locator = expected.get("cell_locator")
+        if expected_locator and actual_locator and actual_locator != expected_locator:
+            continue
+        if expected_locator and not actual_locator and not (
+            expected.get("row_label") or expected.get("bounded_quote")
+        ):
+            continue
+
+        actual_column = anchor.get("column_header")
+        expected_column = expected.get("column_header")
+        if (
+            expected_column
+            and actual_column
+            and not _bounded_text_component_matches(actual_column, expected_column)
+        ):
+            continue
+
+        quote = str(anchor.get("bounded_quote", ""))
+        if expected.get("row_label"):
+            identities = {
+                anchor.get("row_label"),
+                record.get("object_name"),
+                record.get("measured_object"),
+                record.get("segment_label"),
+                record.get("source_native", {}).get("name"),
+            }
+            row_matches = any(
+                _identity_matches(identity, expected["row_label"])
+                for identity in identities
+                if identity
+            ) or _bounded_text_component_matches(quote, expected["row_label"])
+            if not row_matches:
+                continue
+        if expected.get("bounded_quote") and not _bounded_text_component_matches(
+            quote, expected["bounded_quote"]
+        ):
+            continue
+        return True
+    return False
+
+
+def _bounded_text_component_matches(actual: Any, expected: Any) -> bool:
+    actual_text = _normalize_scalar(actual)
+    expected_text = _normalize_scalar(expected)
+    return bool(
+        actual_text
+        and expected_text
+        and (actual_text in expected_text or expected_text in actual_text)
+    )
+
+
+def _evidence_item_has_page(evidence: dict[str, Any], expected_page: Any) -> bool:
+    return (
+        expected_page is None
+        or evidence.get("page") == expected_page
+        or expected_page in evidence.get("continuation_pages", [])
+    )
 
 
 def _evidence_has_page(evidence: list[dict[str, Any]], expected_page: Any) -> bool:
     return expected_page is None or any(
-        item.get("page") == expected_page for item in evidence
+        _evidence_item_has_page(item, expected_page) for item in evidence
     )
-
 
 def _evaluate_negative_case(
     case_id: str, manifest: dict[str, Any]
@@ -646,6 +1083,145 @@ def _evaluate_negative_case(
     raise ValueError(f"no fixed evaluator for approved negative case: {case_id}")
 
 
+def evaluate_fixture_guards() -> tuple[Stage5NegativeCaseResult, ...]:
+    """Execute four local guards through the existing model/workflow contracts."""
+
+    results = [_inventory_amount_fixture_guard()]
+    results.extend(
+        _preparation_fixture_guard(case_id, expected_reason=reason, **flags)
+        for case_id, reason, flags in (
+            (
+                "mm-neg-required-page-omitted",
+                CoverageReasonCode.TABLE_CONTEXT_INCOMPLETE,
+                {"continuation_complete": False},
+            ),
+            (
+                "mm-neg-required-page-unreadable",
+                CoverageReasonCode.SOURCE_UNREADABLE,
+                {"source_readable": False},
+            ),
+            (
+                "mm-neg-unit-ambiguous",
+                CoverageReasonCode.UNIT_AMBIGUOUS,
+                {"unit_context_complete": False},
+            ),
+        )
+    )
+    return tuple(results)
+
+
+def _inventory_amount_fixture_guard() -> Stage5NegativeCaseResult:
+    report, evidence = _fixture_identity()
+    try:
+        Measurement(
+            record_id="fixture-inventory-amount",
+            field_id="inventory_volume",
+            chapter_task=ChapterTask.EXTRACT_OPERATING_QUANTITIES,
+            report=report,
+            subject_scope=SubjectScope.UNCLEAR,
+            reported_period="2025-12-31",
+            period_type=PeriodType.INSTANT,
+            assertion_class=AssertionClass.REPORTED_FACT,
+            evidence=(evidence,),
+            source_native=SourceNativeValue(
+                name="存货", value="94,526,239", unit="千元"
+            ),
+            metric_type=MetricType.INVENTORY_VOLUME,
+            logical_slot=LogicalSlot.INVENTORY_VOLUME,
+            measured_object="存货",
+        )
+    except ValidationError:
+        passed = True
+    else:
+        passed = False
+    return Stage5NegativeCaseResult(
+        case_id="mm-neg-inventory-value-as-volume",
+        evaluated=True,
+        passed=passed,
+        reason=(
+            "currency inventory amount was rejected by the physical-volume model guard"
+            if passed
+            else "currency inventory amount bypassed the physical-volume model guard"
+        ),
+        inspected_runtime_target_ids=("fixture:mm-neg-inventory-value-as-volume",),
+        source="fixture_guard",
+    )
+
+
+def _preparation_fixture_guard(
+    case_id: str,
+    *,
+    expected_reason: CoverageReasonCode,
+    **flags: bool,
+) -> Stage5NegativeCaseResult:
+    report, evidence = _fixture_identity()
+    checklist = ChecklistItem(
+        field_id="inventory_volume",
+        object_type=ObjectType.MEASUREMENT,
+        chapter_task=ChapterTask.EXTRACT_OPERATING_QUANTITIES,
+        requirement_level=RequirementLevel.CONDITIONAL,
+        allowed_coverage_statuses=tuple(CoverageStatus),
+        allowed_metric_types=(MetricType.INVENTORY_VOLUME,),
+    )
+    prepared = PreparedEvidence(
+        evidence=evidence,
+        field_id="inventory_volume",
+        **flags,
+    )
+    request = SemanticTaskRequest(
+        request_id=f"fixture:{case_id}",
+        report=report,
+        package_manifest=PackageManifest(
+            package_name="manufacturing_materials",
+            package_version="fixture.v1",
+            report=report,
+            checklist=(checklist,),
+        ),
+        chapter_task=ChapterTask.EXTRACT_OPERATING_QUANTITIES,
+        evidence_bundle=(prepared,),
+        allowed_object_types=(ObjectType.MEASUREMENT,),
+        allowed_metric_types=(MetricType.INVENTORY_VOLUME,),
+        unresolved_field_ids=("inventory_volume",),
+    )
+    result = CompanyProfileSemanticService().run_task(request, provider=None)
+    passed = (
+        result.task_complete is False
+        and result.provider_calls == ()
+        and len(result.coverage) == 1
+        and result.coverage[0].status == CoverageStatus.EXTRACTION_FAILED
+        and result.coverage[0].reason_code == expected_reason
+    )
+    return Stage5NegativeCaseResult(
+        case_id=case_id,
+        evaluated=True,
+        passed=passed,
+        reason=(
+            f"preparation guard returned extraction_failed:{expected_reason.value}"
+            if passed
+            else "preparation guard did not return the required typed failure"
+        ),
+        inspected_runtime_target_ids=(f"fixture:{case_id}",),
+        source="fixture_guard",
+    )
+
+
+def _fixture_identity() -> tuple[ReportIdentity, Evidence]:
+    report = ReportIdentity(
+        instrument_id="fixture",
+        report_id="fixture-report",
+        document_version="fixture-v1",
+        report_period="2025-12-31",
+        published_at="2026-09-07T00:00:00+08:00",
+    )
+    return report, Evidence(
+        evidence_id="fixture-evidence",
+        report=report,
+        page=1,
+        section_title="controlled fixture",
+        anchor=TextAnchor(bounded_quote="存货 94,526,239 千元"),
+    )
+
+
 def _iter_scopes(manifest: dict[str, Any]):
     for report in manifest.get("reports", []):
         sample_id = str(report.get("sample_id"))
@@ -689,6 +1265,7 @@ def _trigger_result(case_id, trigger, bad, success_reason):
             passed=False,
             reason="runtime trigger absent; case was not evaluated",
             inspected_runtime_target_ids=(),
+            source="real_report",
         )
     return Stage5NegativeCaseResult(
         case_id=case_id,
@@ -700,6 +1277,7 @@ def _trigger_result(case_id, trigger, bad, success_reason):
         inspected_runtime_target_ids=tuple(
             sorted({_target_id(item) for item in inspected})
         ),
+        source="real_report",
     )
 
 
@@ -847,10 +1425,9 @@ def _has_affirmative_subject_basis(record: dict[str, Any]) -> bool:
             item.get("subject_evidence_pages") for item in record.get("evidence", [])
         )
     if basis == "direct_source_wording":
-        if (
-            record.get("row_class") == "consolidation_adjustment"
-            and "合并抵消项" in _record_text(record)
-        ):
+        if record.get(
+            "row_class"
+        ) == "consolidation_adjustment" and "合并抵消项" in _record_text(record):
             return True
         return bool(re.search(r"合并|本集团|集团", _record_evidence_text(record)))
     return False

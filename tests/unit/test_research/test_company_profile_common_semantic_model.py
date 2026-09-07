@@ -72,7 +72,9 @@ def _gold_report(sample_id):
     suffix = (
         ".BJ"
         if instrument.startswith("92")
-        else ".SH" if instrument.startswith("6") else ".SZ"
+        else ".SH"
+        if instrument.startswith("6")
+        else ".SZ"
     )
     return {
         "instrument_id": f"{instrument}{suffix}",
@@ -145,7 +147,9 @@ def _adapt_observed_gold(annotation):
         "period_type": (
             "instant"
             if annotation["field_id"] == "inventory_volume"
-            else "event" if semantic["object_type"] == "BusinessEvent" else "duration"
+            else "event"
+            if semantic["object_type"] == "BusinessEvent"
+            else "duration"
         ),
         "knowledge_time": semantic.get("knowledge_time"),
         "assertion_class": semantic["assertion_class"],
@@ -220,9 +224,23 @@ def test_reference_profile_matches_stable_research_projection():
         company_name=payload["company_name"], report=report, task_results=(result,)
     )
 
-    assert view.model_dump(mode="json") == json.loads(
-        REFERENCE_EXPECTED.read_text(encoding="utf-8")
-    )
+    actual = view.model_dump(mode="json")
+    expected = json.loads(REFERENCE_EXPECTED.read_text(encoding="utf-8"))
+
+    # The acceptance-policy projection adds non-destructive confidence and usage
+    # metadata; the frozen stage-four fixture remains a compatibility baseline.
+    def strip_policy(value):
+        if isinstance(value, dict):
+            return {
+                key: strip_policy(item)
+                for key, item in value.items()
+                if key not in {"confidence", "usage", "usage_restriction_reason"}
+            }
+        if isinstance(value, list):
+            return [strip_policy(item) for item in value]
+        return value
+
+    assert strip_policy(actual) == expected
     assert view.production_authorization == PRODUCTION_AUTHORIZATION
     assert len(view.operating_measurements) == 7
     assert view.commodity_exposure.status == "not_assessed"
@@ -294,9 +312,9 @@ def test_text_occurrence_uses_normalized_quote_not_evidence_identifier():
     activity = next(item for item in result.records if isinstance(item, Activity))
     payload = activity.model_dump(mode="json")
     payload["evidence"][0]["evidence_id"] = "regenerated"
-    payload["evidence"][0]["anchor"][
-        "bounded_quote"
-    ] = "主要从事动力电池、  储能电池的研发、生产、销售"
+    payload["evidence"][0]["anchor"]["bounded_quote"] = (
+        "主要从事动力电池、  储能电池的研发、生产、销售"
+    )
 
     assert _record(payload).occurrence_id() == activity.occurrence_id()
 
@@ -333,9 +351,7 @@ def test_occurrence_identity_is_stable_when_evidence_order_changes():
     _, _, result = _reference_bundle()
     activity = next(item for item in result.records if isinstance(item, Activity))
     other_evidence = next(
-        item.evidence[0]
-        for item in result.records
-        if item.field_id == "material_input"
+        item.evidence[0] for item in result.records if item.field_id == "material_input"
     )
     first = activity.model_copy(
         update={"evidence": (activity.evidence[0], other_evidence)}

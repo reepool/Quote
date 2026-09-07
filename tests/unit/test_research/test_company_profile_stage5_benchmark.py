@@ -9,6 +9,7 @@ from pathlib import Path
 
 import pytest
 
+import research.company_profile.stage5_benchmark as stage5_benchmark_module
 from research.company_profile.contracts import (
     CompanyProfileTaskResult,
     PreparedEvidence,
@@ -33,6 +34,8 @@ from research.company_profile.models import (
 from research.company_profile.projection import project_research_view
 from research.company_profile.stage5 import PreparedPageContext, PreparedRequestScope
 from research.company_profile.stage5_benchmark import (
+    Stage5GoldAnnotationResult,
+    Stage5NegativeCaseResult,
     _evaluate_negative_case,
     _has_affirmative_subject_basis,
     evaluate_committed_stage5_run,
@@ -204,6 +207,59 @@ def test_negative_cases_are_not_reported_as_passed_when_not_evaluated(
     assert missing_trigger.evaluated is False
     assert missing_trigger.passed is False
     assert missing_trigger.inspected_runtime_target_ids == ()
+
+
+def test_fixture_guard_failure_forces_post_run_hold(
+    monkeypatch,
+    tmp_path: Path,
+) -> None:
+    store = Stage5RunBundleStore(
+        tmp_path / "isolated",
+        repository_root=REPOSITORY_ROOT,
+    )
+    run_path = store.commit(_minimal_run_bundle("post-run-fixture-failure"))
+    monkeypatch.setattr(
+        stage5_benchmark_module,
+        "_evaluate_annotation",
+        lambda annotation, report: Stage5GoldAnnotationResult(
+            annotation_id=annotation["annotation_id"],
+            sample_id=annotation["sample_id"],
+            field_id=annotation["field_id"],
+            passed=True,
+            match_status="exact_match",
+        ),
+    )
+    monkeypatch.setattr(
+        stage5_benchmark_module,
+        "_evaluate_negative_case",
+        lambda case_id, manifest: Stage5NegativeCaseResult(
+            case_id=case_id,
+            evaluated=True,
+            passed=True,
+            reason="guarded",
+        ),
+    )
+    monkeypatch.setattr(
+        stage5_benchmark_module,
+        "evaluate_fixture_guards",
+        lambda: (
+            Stage5NegativeCaseResult(
+                case_id="fixture-failed",
+                evaluated=True,
+                passed=False,
+                reason="fixture guard did not block the invalid candidate",
+                source="fixture_guard",
+            ),
+        ),
+    )
+
+    benchmark = stage5_benchmark_module.evaluate_committed_stage5_run(
+        run_path,
+        gold_path=GOLD_PATH,
+    )
+
+    assert benchmark.decision == "hold"
+    assert benchmark.fixture_guard_results[0].passed is False
 
 
 def test_post_run_benchmark_operator_writes_one_atomic_result(

@@ -38,12 +38,15 @@ class Stage5ReviewAction(str, Enum):
 
 
 class Stage5ReportStatus(str, Enum):
+    USABLE = "usable"
+    USABLE_WITH_CAVEATS = "usable_with_caveats"
     COMPLETE = "complete"
     HOLD = "hold"
     FAILED = "failed"
 
 
 class Stage5OverallStatus(str, Enum):
+    RESEARCH_SLICE_USABLE = "research_slice_usable"
     RESEARCH_SLICE_PASS = "research_slice_pass"
     HOLD = "hold"
     FAILED = "failed"
@@ -103,11 +106,17 @@ class Stage5ScopeResult(_StrictModel):
         if self.request_id != self.task_result.request_id:
             raise ValueError("scope result request identity must match task result")
         if tuple(self.task_result.provider_calls) != self.provider_call_types:
-            raise ValueError("provider call types must match the bounded workflow result")
-        if self.provider_traces and tuple(
-            item.call_type for item in self.provider_traces
-        ) != self.provider_call_types:
-            raise ValueError("provider traces must match the bounded workflow call order")
+            raise ValueError(
+                "provider call types must match the bounded workflow result"
+            )
+        if (
+            self.provider_traces
+            and tuple(item.call_type for item in self.provider_traces)
+            != self.provider_call_types
+        ):
+            raise ValueError(
+                "provider traces must match the bounded workflow call order"
+            )
         return self
 
 
@@ -166,7 +175,9 @@ class Stage5RunBundle(_StrictModel):
             raise ValueError("run bundle cannot contain duplicate reports")
         if any(item.run_id != self.run_id for item in self.reports):
             raise ValueError("report bundle run_id must match its parent")
-        if any(item.report_status == Stage5ReportStatus.FAILED for item in self.reports):
+        if any(
+            item.report_status == Stage5ReportStatus.FAILED for item in self.reports
+        ):
             if self.overall_status != Stage5OverallStatus.FAILED:
                 raise ValueError("a failed report makes the run failed")
         elif (
@@ -174,11 +185,24 @@ class Stage5RunBundle(_StrictModel):
             and self.overall_status != Stage5OverallStatus.HOLD
         ):
             raise ValueError("a held report makes the run hold")
-        if (
-            self.overall_status == Stage5OverallStatus.RESEARCH_SLICE_PASS
-            and set(sample_ids) != set(APPROVED_STAGE5_SAMPLES)
-        ):
-            raise ValueError("research_slice_pass requires all four approved reports")
+        if self.overall_status in {
+            Stage5OverallStatus.RESEARCH_SLICE_PASS,
+            Stage5OverallStatus.RESEARCH_SLICE_USABLE,
+        }:
+            if set(sample_ids) != set(APPROVED_STAGE5_SAMPLES):
+                raise ValueError(
+                    "a successful slice requires all four approved reports"
+                )
+            if any(
+                item.report_status
+                not in {
+                    Stage5ReportStatus.COMPLETE,
+                    Stage5ReportStatus.USABLE,
+                    Stage5ReportStatus.USABLE_WITH_CAVEATS,
+                }
+                for item in self.reports
+            ):
+                raise ValueError("a successful slice requires usable reports")
         return self
 
 
@@ -221,7 +245,9 @@ class Stage5FailureManifest(_StrictModel):
     run_id: str = Field(min_length=1, pattern=r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
     status: Literal["failed"] = "failed"
     reusable: Literal[False] = False
-    diagnostics: tuple[Stage5FailureDiagnostic, ...] = Field(min_length=1, max_length=20)
+    diagnostics: tuple[Stage5FailureDiagnostic, ...] = Field(
+        min_length=1, max_length=20
+    )
     created_at: str = Field(min_length=1)
     production_authorization: Literal["not_authorized"] = PRODUCTION_AUTHORIZATION
 
@@ -257,7 +283,9 @@ class Stage5RunBundleStore:
         destination = self._run_destination(bundle.run_id)
         if destination.exists() or self.failure_manifest_path(bundle.run_id).exists():
             raise FileExistsError(f"stage-five run already exists: {bundle.run_id}")
-        temporary = self.output_root / f"{_TEMP_PREFIX}{bundle.run_id}-{uuid.uuid4().hex}"
+        temporary = (
+            self.output_root / f"{_TEMP_PREFIX}{bundle.run_id}-{uuid.uuid4().hex}"
+        )
         temporary.mkdir(parents=False, exist_ok=False)
         try:
             reports_dir = temporary / "reports"
@@ -284,7 +312,9 @@ class Stage5RunBundleStore:
         destination = self.output_root / f"preparation-{bundle.run_id}"
         if destination.exists() or self.failure_manifest_path(bundle.run_id).exists():
             raise FileExistsError(f"stage-five run already exists: {bundle.run_id}")
-        temporary = self.output_root / f"{_TEMP_PREFIX}{bundle.run_id}-{uuid.uuid4().hex}"
+        temporary = (
+            self.output_root / f"{_TEMP_PREFIX}{bundle.run_id}-{uuid.uuid4().hex}"
+        )
         temporary.mkdir(parents=False, exist_ok=False)
         try:
             _write_json(
@@ -318,7 +348,9 @@ class Stage5RunBundleStore:
             diagnostics=diagnostics,
             created_at=_utc_now(),
         )
-        temporary = self.output_root / f"{_TEMP_PREFIX}{run_id}-failure-{uuid.uuid4().hex}"
+        temporary = (
+            self.output_root / f"{_TEMP_PREFIX}{run_id}-failure-{uuid.uuid4().hex}"
+        )
         try:
             _write_json(temporary, manifest.model_dump(mode="json"))
             os.replace(temporary, failure_path)
@@ -369,9 +401,14 @@ class Stage5RunBundleStore:
         return self.output_root / f"run-{run_id}"
 
     def _validate_run_id(self, run_id: str) -> None:
-        if not run_id or not run_id[0].isalnum() or any(
-            character not in "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789._-"
-            for character in run_id
+        if (
+            not run_id
+            or not run_id[0].isalnum()
+            or any(
+                character
+                not in "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789._-"
+                for character in run_id
+            )
         ):
             raise ValueError("run_id contains unsafe path characters")
 

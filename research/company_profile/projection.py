@@ -7,6 +7,7 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict
 
+from .acceptance_policy import derive_confidence, usage_policy
 from .contracts import CompanyProfileTaskResult, DispositionStatus
 from .models import (
     PRODUCTION_AUTHORIZATION,
@@ -37,6 +38,7 @@ class ResearchViewItem(_StrictModel):
     reported_period: str
     source_native: dict[str, Any]
     evidence_ids: tuple[str, ...]
+    confidence: Literal["high", "medium", "low", "rejected"]
     details: dict[str, Any]
 
 
@@ -81,7 +83,7 @@ def project_research_view(
     displayable.
     """
 
-    accepted: dict[str, SemanticRecord] = {}
+    accepted: dict[str, tuple[SemanticRecord, DispositionStatus]] = {}
     coverage_by_identity: dict[tuple[str, str], dict[str, Any]] = {}
     for result in task_results:
         statuses = {item.target_id: item.status for item in result.dispositions}
@@ -92,23 +94,31 @@ def project_research_view(
                 statuses.get(record.record_id) == DispositionStatus.ACCEPTED_FOR_REVIEW
                 and record.data_status == "research_fixture"
             ):
-                accepted[record.record_id] = record
+                accepted[record.record_id] = (record, statuses[record.record_id])
         for coverage in result.coverage:
             if any(item.report != report for item in coverage.evidence):
-                raise ValueError("research view cannot mix coverage from another report")
+                raise ValueError(
+                    "research view cannot mix coverage from another report"
+                )
             coverage_by_identity[(coverage.chapter_task.value, coverage.field_id)] = (
                 coverage.model_dump(mode="json")
             )
 
     records = sorted(
-        accepted.values(),
+        (item[0] for item in accepted.values()),
         key=lambda item: (
             min(evidence.page for evidence in item.evidence),
             item.object_type,
             item.record_id,
         ),
     )
-    items = {record.record_id: _project_record(record) for record in records}
+    items = {
+        record.record_id: _project_record(
+            record,
+            disposition=accepted[record.record_id][1],
+        )
+        for record in records
+    }
 
     overviews = [item for item in records if isinstance(item, BusinessOverview)]
     regimes = [
@@ -175,7 +185,11 @@ def project_research_view(
     )
 
 
-def _project_record(record: SemanticRecord) -> ResearchViewItem:
+def _project_record(
+    record: SemanticRecord,
+    *,
+    disposition: DispositionStatus = DispositionStatus.ACCEPTED_FOR_REVIEW,
+) -> ResearchViewItem:
     common = {
         "schema_version",
         "record_id",
@@ -199,6 +213,12 @@ def _project_record(record: SemanticRecord) -> ResearchViewItem:
         details["uncertainty"] = list(record.uncertainty)
     if record.knowledge_time:
         details["knowledge_time"] = record.knowledge_time
+    policy = usage_policy(record)
+    details["usage"] = {
+        key: value for key, value in policy.items() if key != "restriction_reason"
+    }
+    if policy["restriction_reason"]:
+        details["usage_restriction_reason"] = policy["restriction_reason"]
     return ResearchViewItem(
         record_id=record.record_id,
         field_id=record.field_id,
@@ -208,5 +228,6 @@ def _project_record(record: SemanticRecord) -> ResearchViewItem:
         reported_period=record.reported_period,
         source_native=record.source_native.model_dump(mode="json"),
         evidence_ids=tuple(item.evidence_id for item in record.evidence),
+        confidence=derive_confidence(record, disposition=disposition),
         details=details,
     )
