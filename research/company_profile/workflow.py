@@ -377,8 +377,14 @@ class CompanyProfileSemanticService:
             coverage_verify_checks,
         )
         review_items.extend(coverage_review)
+        accepted_fields = {
+            item.field_id
+            for item in dispositions.values()
+            if item.status == DispositionStatus.ACCEPTED_FOR_REVIEW
+        }
         all_candidates_accepted = all(
             item.status == DispositionStatus.ACCEPTED_FOR_REVIEW
+            or _is_resolved_supplemental_rejection(item, accepted_fields)
             for item in dispositions.values()
         )
         task_complete = (
@@ -599,6 +605,7 @@ def _resolve_coverage(
         item.field_id
         for item in dispositions
         if item.status != DispositionStatus.ACCEPTED_FOR_REVIEW
+        and not _is_resolved_supplemental_rejection(item, accepted_fields)
     }
     results: list[CoverageResult] = []
     reviews: list[HumanReviewItem] = []
@@ -670,6 +677,19 @@ def _resolve_coverage(
                 )
             )
     return tuple(results), complete, reviews
+
+
+def _is_resolved_supplemental_rejection(
+    disposition: Disposition,
+    accepted_fields: set[str],
+) -> bool:
+    """Keep a safely rejected extra object from erasing accepted field coverage."""
+
+    return (
+        disposition.field_id in accepted_fields
+        and disposition.status == DispositionStatus.BLOCKED
+        and disposition.reason_codes == (ContractErrorCode.OBJECT_NOT_ALLOWED,)
+    )
 
 
 def _coverage_target_id(coverage: CoverageResult) -> str:

@@ -16,7 +16,10 @@ from research.company_profile.contracts import (
     RepairRequest,
     SemanticProviderError,
     SemanticTaskRequest,
+    VerifyCheck,
     VerifyRequest,
+    VerifyResponse,
+    VerifyStatus,
 )
 from research.company_profile.models import (
     ActivityAction,
@@ -1950,6 +1953,132 @@ def test_consolidation_adjustment_requires_explicit_adjustment_label() -> None:
         )
 
 
+def test_verify_accepts_explicit_consolidation_adjustment_subject() -> None:
+    prepared, request = _consolidation_adjustment_verify_request()
+    client = _FakeGatewayClient(
+        outputs=[
+            VerifyResponse(
+                request_id=request.request_id,
+                checks=tuple(
+                    VerifyCheck(
+                        target_type="candidate",
+                        target_id=candidate.record_id,
+                        status=VerifyStatus.BLOCK,
+                        reason_codes=(ContractErrorCode.SUBJECT_UNSUPPORTED,),
+                    )
+                    for candidate in request.candidates
+                ),
+            ).model_dump(mode="json")
+        ]
+    )
+    provider = CommonGatewaySemanticProvider(
+        client=client,
+        profile="semantic_extraction",
+        prepared_scope=prepared,
+        max_output_tokens=2000,
+        timeout_seconds=30,
+    )
+
+    response = provider.verify(request)
+
+    assert {item["status"] for item in response["checks"]} == {"pass"}
+    assert {tuple(item["reason_codes"]) for item in response["checks"]} == {()}
+    assert {candidate.object_type for candidate in request.candidates} == {
+        "Segment",
+        "Measurement",
+    }
+    system_message = LlmMessage.from_value(client.requests[0].messages[0]).content
+    assert "validated source-native row label explicitly identifies" in system_message
+    assert "do not return subject_unsupported solely" in system_message
+
+
+def test_verify_does_not_normalize_ordinary_segment_subject_block() -> None:
+    prepared = _segment_prepared_scope()
+    extract_request = _segment_extract_request(prepared)
+    compact = _segment_row_response(
+        request_id=extract_request.request_id,
+        evidence_id=prepared.evidence_bundle[0].evidence.evidence_id,
+    )
+    candidates = ExtractResponse.model_validate_json(
+        json.dumps(
+            _expand_extract_response(
+                compact,
+                request=extract_request,
+                prepared_scope=prepared,
+            ),
+            ensure_ascii=False,
+        )
+    ).candidates()
+    request = VerifyRequest(
+        request_id=f"{extract_request.request_id}:verify",
+        original_request_id=extract_request.request_id,
+        report=prepared.report,
+        evidence_bundle=prepared.evidence_bundle,
+        candidates=candidates,
+        coverage=(),
+    )
+    blocked = VerifyResponse(
+        request_id=request.request_id,
+        checks=tuple(
+            VerifyCheck(
+                target_type="candidate",
+                target_id=candidate.record_id,
+                status=VerifyStatus.BLOCK,
+                reason_codes=(ContractErrorCode.SUBJECT_UNSUPPORTED,),
+            )
+            for candidate in request.candidates
+        ),
+    ).model_dump(mode="json")
+    provider = CommonGatewaySemanticProvider(
+        client=_FakeGatewayClient(outputs=[blocked]),
+        profile="semantic_extraction",
+        prepared_scope=prepared,
+        max_output_tokens=2000,
+        timeout_seconds=30,
+    )
+
+    response = provider.verify(request)
+
+    assert {item["status"] for item in response["checks"]} == {"block"}
+    assert {
+        tuple(item["reason_codes"]) for item in response["checks"]
+    } == {(ContractErrorCode.SUBJECT_UNSUPPORTED.value,)}
+
+
+def test_verify_keeps_additional_adjustment_failure_blocking() -> None:
+    prepared, request = _consolidation_adjustment_verify_request()
+    blocked = VerifyResponse(
+        request_id=request.request_id,
+        checks=tuple(
+            VerifyCheck(
+                target_type="candidate",
+                target_id=candidate.record_id,
+                status=VerifyStatus.BLOCK,
+                reason_codes=(
+                    ContractErrorCode.SUBJECT_UNSUPPORTED,
+                    ContractErrorCode.EVIDENCE_FIELD_MISMATCH,
+                ),
+            )
+            for candidate in request.candidates
+        ),
+    ).model_dump(mode="json")
+    provider = CommonGatewaySemanticProvider(
+        client=_FakeGatewayClient(outputs=[blocked]),
+        profile="semantic_extraction",
+        prepared_scope=prepared,
+        max_output_tokens=2000,
+        timeout_seconds=30,
+    )
+
+    response = provider.verify(request)
+
+    assert {item["status"] for item in response["checks"]} == {"block"}
+    assert all(
+        ContractErrorCode.EVIDENCE_FIELD_MISMATCH.value in item["reason_codes"]
+        for item in response["checks"]
+    )
+
+
 def test_provider_expands_compact_report_and_evidence_references() -> None:
     prepared = _prepared_scope()
     request = _extract_request(prepared)
@@ -2586,6 +2715,50 @@ def _segment_row_response(
         "request_id": request_id,
         "items": [{"item_type": "segment_row", "row": row}],
     }
+
+
+def _consolidation_adjustment_verify_request(
+) -> tuple[PreparedRequestScope, VerifyRequest]:
+    prepared = _segment_prepared_scope()
+    evidence = prepared.evidence_bundle[0].evidence.model_copy(
+        update={
+            "anchor": TextAnchor(
+                bounded_quote="分产品 合并抵消项 -2,098,859,323.96 元"
+            )
+        }
+    )
+    prepared = prepared.model_copy(
+        update={
+            "evidence_bundle": (PreparedEvidence(evidence=evidence),),
+            "source_row_dimensions": {},
+        }
+    )
+    extract_request = _segment_extract_request(prepared)
+    compact = _segment_row_response(
+        request_id=extract_request.request_id,
+        evidence_id=evidence.evidence_id,
+        dimension="分产品",
+        label="合并抵消项",
+        row_class="consolidation_adjustment",
+    )
+    candidates = ExtractResponse.model_validate_json(
+        json.dumps(
+            _expand_extract_response(
+                compact,
+                request=extract_request,
+                prepared_scope=prepared,
+            ),
+            ensure_ascii=False,
+        )
+    ).candidates()
+    return prepared, VerifyRequest(
+        request_id=f"{extract_request.request_id}:verify",
+        original_request_id=extract_request.request_id,
+        report=prepared.report,
+        evidence_bundle=prepared.evidence_bundle,
+        candidates=candidates,
+        coverage=(),
+    )
 
 
 def _extract_request(prepared: PreparedRequestScope) -> SemanticTaskRequest:

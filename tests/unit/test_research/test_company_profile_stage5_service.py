@@ -192,7 +192,7 @@ def test_stage5_preparation_can_select_held_scopes_for_exactly_one_sample(
     ]
 
 
-def test_stage5_scope_selection_rejects_multiple_samples_and_unknown_scopes(
+def test_stage5_scope_selection_supports_explicit_multi_report_preflight(
     tmp_path: Path,
 ) -> None:
     manifest = load_stage5_sample_manifest(
@@ -204,22 +204,55 @@ def test_stage5_scope_selection_rejects_multiple_samples_and_unknown_scopes(
         evidence_preparer=Stage5EvidencePreparer(PdfRouter(native=PypdfNativeAdapter()))
     )
 
-    with pytest.raises(ValueError, match="requires exactly one sample"):
-        service.run_preparation_only(
-            run_id="prepare-invalid-multiple",
-            manifest=manifest,
-            evidence_plan=plan,
-            evidence_plan_path=EVIDENCE_PLAN,
-            store=Stage5RunBundleStore(
-                tmp_path / "multiple",
-                repository_root=REPOSITORY_ROOT,
-            ),
-            sample_ids=(
-                "manufacturing-materials-300750-2025",
-                "manufacturing-materials-603659-2025",
-            ),
-            scope_ids=("business_overview",),
-        )
+    execution = service.run_preparation_only(
+        run_id="prepare-closure-preflight",
+        manifest=manifest,
+        evidence_plan=plan,
+        evidence_plan_path=EVIDENCE_PLAN,
+        store=Stage5RunBundleStore(
+            tmp_path / "multiple",
+            repository_root=REPOSITORY_ROOT,
+        ),
+        sample_ids=(
+            "manufacturing-materials-300750-2025",
+            "manufacturing-materials-603659-2025",
+        ),
+        scope_ids=(
+            "segment_product_industry_region",
+            "top_five_customer_rows",
+            "segment_product_and_adjustment",
+        ),
+    )
+
+    payload = json.loads(
+        (execution.output_path / "manifest.json").read_text(encoding="utf-8")
+    )
+    assert [
+        (item["sample_id"], item["scope_id"]) for item in payload["scopes"]
+    ] == [
+        (
+            "manufacturing-materials-300750-2025",
+            "segment_product_industry_region",
+        ),
+        ("manufacturing-materials-300750-2025", "top_five_customer_rows"),
+        (
+            "manufacturing-materials-603659-2025",
+            "segment_product_and_adjustment",
+        ),
+    ]
+
+
+def test_stage5_scope_selection_rejects_unknown_or_unmatched_scopes(
+    tmp_path: Path,
+) -> None:
+    manifest = load_stage5_sample_manifest(
+        SAMPLE_MANIFEST,
+        repository_root=REPOSITORY_ROOT,
+    )
+    plan = load_stage5_evidence_plan(EVIDENCE_PLAN)
+    service = ManufacturingMaterialsProfileSliceService(
+        evidence_preparer=Stage5EvidencePreparer(PdfRouter(native=PypdfNativeAdapter()))
+    )
 
     with pytest.raises(ValueError, match="unknown stage-five scopes"):
         service.run_preparation_only(
@@ -233,6 +266,23 @@ def test_stage5_scope_selection_rejects_multiple_samples_and_unknown_scopes(
             ),
             sample_ids=("manufacturing-materials-300750-2025",),
             scope_ids=("not-a-real-scope",),
+        )
+
+    with pytest.raises(ValueError, match="matched no scope for selected sample"):
+        service.run_preparation_only(
+            run_id="prepare-unmatched-sample",
+            manifest=manifest,
+            evidence_plan=plan,
+            evidence_plan_path=EVIDENCE_PLAN,
+            store=Stage5RunBundleStore(
+                tmp_path / "unmatched",
+                repository_root=REPOSITORY_ROOT,
+            ),
+            sample_ids=(
+                "manufacturing-materials-300750-2025",
+                "manufacturing-materials-603659-2025",
+            ),
+            scope_ids=("top_five_customer_rows",),
         )
 
 

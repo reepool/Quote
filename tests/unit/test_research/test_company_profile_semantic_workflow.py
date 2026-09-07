@@ -521,6 +521,202 @@ def test_top_five_concentration_evidence_cannot_create_aggregate_relationship():
     )
 
 
+def test_safely_blocked_aggregate_candidate_does_not_erase_ranked_coverage():
+    original = _record("counterparty_relationship")
+    ranked = original.model_copy(
+        update={
+            "record_id": "ranked-customer-one",
+            "object_name": "第一名",
+            "identity_class": company_profile.IdentityClass.REPORT_LOCAL_ANONYMOUS,
+            "source_native": original.source_native.model_copy(
+                update={"name": "第一名"}
+            ),
+        }
+    )
+    aggregate = original.model_copy(
+        update={
+            "record_id": "aggregate-top-five-customer",
+            "object_name": "前五名客户",
+            "identity_class": company_profile.IdentityClass.REPORT_LOCAL_AGGREGATE,
+            "source_native": original.source_native.model_copy(
+                update={"name": "前五名客户"}
+            ),
+        }
+    )
+    request = _request((ranked, aggregate)).model_copy(
+        update={
+            "evidence_bundle": (
+                PreparedEvidence(
+                    evidence=original.evidence[0],
+                    field_id=original.field_id,
+                ),
+            )
+        }
+    )
+    provider = FakeSemanticProvider(
+        verify_outputs=[
+            VerifyResponse(
+                request_id=f"{request.request_id}:verify",
+                checks=(
+                    VerifyCheck(
+                        target_type="candidate",
+                        target_id=ranked.record_id,
+                        status=VerifyStatus.PASS,
+                    ),
+                    VerifyCheck(
+                        target_type="candidate",
+                        target_id=aggregate.record_id,
+                        status=VerifyStatus.BLOCK,
+                        reason_codes=(ContractErrorCode.OBJECT_NOT_ALLOWED,),
+                    ),
+                ),
+            )
+        ]
+    )
+
+    result = CompanyProfileSemanticService().run_task(request, provider=provider)
+
+    assert result.task_complete is True
+    assert result.coverage[0].status == company_profile.CoverageStatus.OBSERVED
+    assert result.accepted_records() == (ranked,)
+    assert {item.target_id: item.status for item in result.dispositions} == {
+        ranked.record_id: DispositionStatus.ACCEPTED_FOR_REVIEW,
+        aggregate.record_id: DispositionStatus.BLOCKED,
+    }
+    aggregate_review = next(
+        item for item in result.human_review_items if item.candidate == aggregate
+    )
+    assert aggregate_review.reason_codes == (ContractErrorCode.OBJECT_NOT_ALLOWED,)
+
+
+@pytest.mark.parametrize(
+    "blocking_reason",
+    [
+        ContractErrorCode.SUBJECT_UNSUPPORTED,
+        ContractErrorCode.EVIDENCE_FIELD_MISMATCH,
+        ContractErrorCode.PROVIDER_UNAVAILABLE,
+        ContractErrorCode.PROHIBITED_INFERENCE,
+    ],
+)
+def test_substantive_block_remains_incomplete_when_same_field_has_accepted_record(
+    blocking_reason,
+):
+    original = _record("counterparty_relationship")
+    accepted = original.model_copy(
+        update={
+            "record_id": "accepted-counterparty",
+            "object_name": "第一名",
+            "source_native": original.source_native.model_copy(
+                update={"name": "第一名"}
+            ),
+        }
+    )
+    blocked = original.model_copy(
+        update={
+            "record_id": f"blocked-{blocking_reason.value}",
+            "object_name": "第二名",
+            "source_native": original.source_native.model_copy(
+                update={"name": "第二名"}
+            ),
+        }
+    )
+    request = _request((accepted, blocked)).model_copy(
+        update={
+            "evidence_bundle": (
+                PreparedEvidence(
+                    evidence=original.evidence[0],
+                    field_id=original.field_id,
+                ),
+            )
+        }
+    )
+    provider = FakeSemanticProvider(
+        verify_outputs=[
+            VerifyResponse(
+                request_id=f"{request.request_id}:verify",
+                checks=(
+                    VerifyCheck(
+                        target_type="candidate",
+                        target_id=accepted.record_id,
+                        status=VerifyStatus.PASS,
+                    ),
+                    VerifyCheck(
+                        target_type="candidate",
+                        target_id=blocked.record_id,
+                        status=VerifyStatus.BLOCK,
+                        reason_codes=(blocking_reason,),
+                    ),
+                ),
+            )
+        ]
+    )
+
+    result = CompanyProfileSemanticService().run_task(request, provider=provider)
+
+    assert result.task_complete is False
+    assert result.coverage[0].status == company_profile.CoverageStatus.UNCLEAR
+    blocked_disposition = next(
+        item for item in result.dispositions if item.target_id == blocked.record_id
+    )
+    assert blocked_disposition.reason_codes == (blocking_reason,)
+
+
+def test_missing_verify_target_remains_incomplete_with_same_field_accepted():
+    original = _record("counterparty_relationship")
+    accepted = original.model_copy(
+        update={
+            "record_id": "accepted-counterparty",
+            "object_name": "第一名",
+            "source_native": original.source_native.model_copy(
+                update={"name": "第一名"}
+            ),
+        }
+    )
+    missing = original.model_copy(
+        update={
+            "record_id": "missing-counterparty-check",
+            "object_name": "第二名",
+            "source_native": original.source_native.model_copy(
+                update={"name": "第二名"}
+            ),
+        }
+    )
+    request = _request((accepted, missing)).model_copy(
+        update={
+            "evidence_bundle": (
+                PreparedEvidence(
+                    evidence=original.evidence[0],
+                    field_id=original.field_id,
+                ),
+            )
+        }
+    )
+    provider = FakeSemanticProvider(
+        verify_outputs=[
+            VerifyResponse(
+                request_id=f"{request.request_id}:verify",
+                checks=(
+                    VerifyCheck(
+                        target_type="candidate",
+                        target_id=accepted.record_id,
+                        status=VerifyStatus.PASS,
+                    ),
+                ),
+            )
+        ]
+    )
+
+    result = CompanyProfileSemanticService().run_task(request, provider=provider)
+
+    assert result.task_complete is False
+    missing_disposition = next(
+        item for item in result.dispositions if item.target_id == missing.record_id
+    )
+    assert missing_disposition.reason_codes == (
+        ContractErrorCode.VERIFY_TARGET_MISSING,
+    )
+
+
 def test_independently_disclosed_aggregate_counterparty_relationship_is_allowed():
     original = _record("counterparty_relationship")
     aggregate = original.model_copy(

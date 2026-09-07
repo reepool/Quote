@@ -95,8 +95,8 @@ def build_parser() -> argparse.ArgumentParser:
         action="append",
         dest="scope_ids",
         help=(
-            "limit execution to one or more request scopes for exactly one sample; "
-            "repeat for multiple held scopes"
+            "limit execution to one or more request scopes within the explicitly selected "
+            "approved samples; repeat for multiple held scopes"
         ),
     )
     parser.add_argument("--provider-route", required=True)

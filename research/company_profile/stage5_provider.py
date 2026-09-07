@@ -32,7 +32,14 @@ from .contracts import (
     VerifyRequest,
     VerifyResponse,
 )
-from .models import LogicalSlot, MetricType
+from .models import (
+    LogicalSlot,
+    MetricType,
+    ObjectType,
+    RowClass,
+    SubjectBasis,
+    SubjectScope,
+)
 from .stage5 import PreparedRequestScope
 from .stage5_bundle import Stage5ProviderCallTrace
 
@@ -1555,6 +1562,67 @@ def _validate_segment_row_source_labels(
     return dimension
 
 
+def _is_explicit_consolidation_adjustment(candidate: Any) -> bool:
+    if getattr(candidate, "object_type", None) not in {
+        ObjectType.SEGMENT.value,
+        ObjectType.MEASUREMENT.value,
+    }:
+        return False
+    if getattr(candidate, "row_class", None) != RowClass.CONSOLIDATION_ADJUSTMENT:
+        return False
+    if getattr(candidate, "subject_scope", None) != SubjectScope.CONSOLIDATED_GROUP:
+        return False
+    if (
+        getattr(candidate, "subject_basis", None)
+        != SubjectBasis.DIRECT_SOURCE_WORDING
+    ):
+        return False
+    source_native = getattr(candidate, "source_native", None)
+    label = str(getattr(source_native, "name", None) or "")
+    return bool(re.search(r"(?:抵[消销]|合并.*抵[消销])", label))
+
+
+def _normalize_verify_response(
+    data: Any,
+    *,
+    request: VerifyRequest,
+) -> Any:
+    """Normalize only the known verifier false negative for explicit adjustments."""
+
+    if isinstance(data, BaseModel):
+        normalized: Any = data.model_dump(mode="json")
+    elif isinstance(data, Mapping):
+        normalized = deepcopy(dict(data))
+    else:
+        return data
+    checks = normalized.get("checks")
+    if not isinstance(checks, list):
+        return normalized
+    candidates = {item.record_id: item for item in request.candidates}
+    for check in checks:
+        if not isinstance(check, dict) or check.get("target_type") != "candidate":
+            continue
+        reasons = tuple(
+            item.value if isinstance(item, ContractErrorCode) else str(item)
+            for item in (check.get("reason_codes") or ())
+        )
+        if (
+            check.get("status") != "block"
+            or reasons != (ContractErrorCode.SUBJECT_UNSUPPORTED.value,)
+        ):
+            continue
+        candidate = candidates.get(str(check.get("target_id") or ""))
+        if candidate is None or not _is_explicit_consolidation_adjustment(candidate):
+            continue
+        check["status"] = "pass"
+        check["reason_codes"] = []
+        check["explanation"] = (
+            "source-native consolidation-adjustment row wording supports the "
+            "declared consolidated subject"
+        )
+    return normalized
+
+
 def _require_numeric_reconciliation_uncertainty(
     candidate: Mapping[str, Any],
 ) -> None:
@@ -2523,7 +2591,10 @@ class CommonGatewaySemanticProvider:
             schema_name="company_profile_verify_response",
             schema_version="company_profile_verify_response.v1",
             model_schema=_minimal_verify_schema(request),
-            normalize_response=lambda data: data,
+            normalize_response=lambda data: _normalize_verify_response(
+                data,
+                request=request,
+            ),
             include_page_contexts=False,
         )
 
@@ -2660,7 +2731,13 @@ class CommonGatewaySemanticProvider:
                     "current, 调整前, and 调整后 candidate must carry its source-supported "
                     "comparison_basis. A Segment or Measurement whose subject_scope "
                     "is business_segment is supported by its disclosed segment dimension; do "
-                    "not require issuer/consolidated wording for that scope. Otherwise return "
+                    "not require issuer/consolidated wording for that scope. A Segment or "
+                    "Measurement whose validated source-native row label explicitly identifies "
+                    "a consolidation elimination or adjustment, with row_class="
+                    "consolidation_adjustment, subject_scope=consolidated_group, and "
+                    "subject_basis=direct_source_wording, has affirmative subject Evidence; "
+                    "do not return subject_unsupported solely for that declared subject. "
+                    "Otherwise return "
                     "unclear or block with typed reason_codes. For coverage, pass a legal-empty not_disclosed result "
                     "when the supplied scope is complete and genuinely contains no requested "
                     "disclosure, explicitly says classification is unavailable, or explicitly "

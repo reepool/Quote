@@ -433,18 +433,31 @@ class ManufacturingMaterialsProfileSliceService:
         if scope_ids is None:
             return prepared
         requested = tuple(scope_ids)
-        if len(selected) != 1:
-            raise ValueError("stage-five scope selection requires exactly one sample")
         if not requested or len(requested) != len(set(requested)):
             raise ValueError("stage-five scope selection must be non-empty and unique")
-        sample_id = selected[0]
-        available = {scope.scope_id: scope for scope in prepared[sample_id]}
-        unknown = set(requested) - set(available)
+        available_scope_ids = {
+            scope.scope_id for scopes in prepared.values() for scope in scopes
+        }
+        unknown = set(requested) - available_scope_ids
         if unknown:
             raise ValueError(
-                f"unknown stage-five scopes for {sample_id}: {sorted(unknown)}"
+                f"unknown stage-five scopes for selected samples: {sorted(unknown)}"
             )
-        return {sample_id: tuple(available[scope_id] for scope_id in requested)}
+        selected_scopes: dict[str, tuple[PreparedRequestScope, ...]] = {}
+        for sample_id in selected:
+            available = {scope.scope_id: scope for scope in prepared[sample_id]}
+            matched = tuple(
+                available[scope_id]
+                for scope_id in requested
+                if scope_id in available
+            )
+            if not matched:
+                raise ValueError(
+                    "stage-five scope selection matched no scope for selected sample: "
+                    f"{sample_id}"
+                )
+            selected_scopes[sample_id] = matched
+        return selected_scopes
 
     @staticmethod
     def _selected_sample_ids(sample_ids: Iterable[str] | None) -> tuple[str, ...]:
