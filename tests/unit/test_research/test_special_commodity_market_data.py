@@ -1864,6 +1864,22 @@ def _cctda_bspi_listing_html() -> str:
     """
 
 
+def _cctda_bspi_listing_html_with_homepage_breadcrumb() -> str:
+    """Reproduce CCTDA list-6 pages: nav <li> plus homepage crumb before the news list."""
+    return """
+    <html><body>
+      <ul class="nav"><li><el-link href="http://www.cctda.org.cn">首页</el-link></el-breadcrumb-item>
+        <el-breadcrumb-item><a href="https://www.cctda.org.cn/index.php?m=content&c=index&a=lists&catid=6">行业资讯</a></el-breadcrumb-item>
+      </ul>
+      <div class="news_list"><ul>
+        <li><el-link href="https://www.cctda.org.cn/index.php?m=content&c=index&a=show&catid=6&id=6483" target="_blank">【BSPI】环渤海动力煤价格指数720元/吨</el-link><span class="rt">2026-09-02</span></li>
+        <li><el-link href="https://www.cctda.org.cn/index.php?m=content&c=index&a=show&catid=6&id=6480" target="_blank">暑运期间国家铁路累计发送电煤2.24亿吨</el-link><span class="rt">2026-09-01</span></li>
+        <li><el-link href="https://www.cctda.org.cn/index.php?m=content&c=index&a=show&catid=6&id=6420" target="_blank">【BSPI】环渤海动力煤价格指数717元/吨</el-link><span class="rt">2026-08-26</span></li>
+      </ul></div>
+    </body></html>
+    """
+
+
 def _cctda_bspi_article_html(*, include_body_value: bool = True) -> str:
     value_text = (
         "环渤海动力煤价格指数报收于712元/吨，环比下降。"
@@ -1926,6 +1942,81 @@ def test_cctda_bspi_provider_preserves_weekly_price_semantics(monkeypatch):
     assert observation.metadata["source_field_alignment"] == "article_body"
     assert observation.metadata["not_daily_spot_price"] is True
     assert result.metadata["source_coverage"]["coverage_ratio"] == 1.0
+
+
+def test_cctda_bspi_listing_keeps_article_url_when_homepage_breadcrumb_precedes():
+    matches = list(
+        CctdaBspiPortPriceProvider._LISTING_ROW.finditer(
+            _cctda_bspi_listing_html_with_homepage_breadcrumb()
+        )
+    )
+    rows = [
+        {
+            "url": match.group("url"),
+            "title": CctdaBspiPortPriceProvider._plain_text(match.group("title")),
+            "date": match.group("date"),
+        }
+        for match in matches
+    ]
+
+    assert [row["url"] for row in rows] == [
+        "https://www.cctda.org.cn/index.php?m=content&c=index&a=show&catid=6&id=6483",
+        "https://www.cctda.org.cn/index.php?m=content&c=index&a=show&catid=6&id=6480",
+        "https://www.cctda.org.cn/index.php?m=content&c=index&a=show&catid=6&id=6420",
+    ]
+    assert rows[0]["title"] == "【BSPI】环渤海动力煤价格指数720元/吨"
+    assert rows[0]["date"] == "2026-09-02"
+    assert all("cctda.org.cn" in row["url"] and "id=" in row["url"] for row in rows)
+
+
+def test_cctda_bspi_provider_fetches_latest_article_despite_homepage_breadcrumb(
+    monkeypatch,
+):
+    cfg = config_manager.get_research_config().modules["commodity_market_data"][
+        "special_commodity_market_data"
+    ]
+    item = CommodityUniverseSelector(cfg).resolve(scope_id="cn_coal_bspi")[0]
+    source_cfg = deepcopy(cfg["source_profiles"][item.source_profile])
+    source_cfg["listing_urls"] = ["https://www.cctda.org.cn/list-6-1.html"]
+    source_cfg["listing_max_pages"] = 1
+
+    def fake_get(url, *args, **kwargs):
+        target = str(url)
+        if target.endswith("list-6-1.html"):
+            payload = _cctda_bspi_listing_html_with_homepage_breadcrumb()
+        elif "id=6483" in target:
+            payload = """
+            <html><body>
+              <h1>【BSPI】环渤海动力煤价格指数720元/吨</h1>
+              <p>2026-09-02 15:18:02 来源：秦皇岛煤炭网</p>
+              <p>本报告期（2026年8月26日至2026年9月1日），环渤海动力煤价格指数报收于720元/吨。</p>
+            </body></html>
+            """
+        elif target.rstrip("/") in {"http://www.cctda.org.cn", "https://www.cctda.org.cn"}:
+            raise AssertionError(f"homepage must not be fetched as a BSPI article: {target}")
+        else:
+            raise AssertionError(f"unexpected URL: {url}")
+        return SimpleNamespace(
+            text=payload,
+            apparent_encoding="utf-8",
+            encoding="utf-8",
+            raise_for_status=lambda: None,
+        )
+
+    monkeypatch.setattr(
+        "research.special_commodity_market_data.request_get", fake_get
+    )
+    result = CctdaBspiPortPriceProvider(item.source_profile, source_cfg).fetch(
+        [item], start_date="2026-08-29", end_date="2026-09-07"
+    )
+
+    assert result.blockers == []
+    assert len(result.observations) == 1
+    observation = result.observations[0]
+    assert observation.observation_date == "2026-09-01"
+    assert observation.value == 720.0
+    assert "id=6483" in observation.source_url
+    assert result.metadata["source_coverage"]["reports_without_metric"] == 0
 
 
 def test_cctda_bspi_parser_allows_title_value_only_with_body_period():

@@ -3931,10 +3931,10 @@ class CctdaBspiPortPriceProvider:
     """Weekly Bohai-Rim Steam-Coal Price Index from public CCTDA articles."""
 
     _LISTING_ROW = re.compile(
-        r"<li\b.*?<el-link\b[^>]*href=[\"'](?P<url>[^\"']+)[\"'][^>]*>"
-        r"(?P<title>.*?)</el-link>\s*<span\b[^>]*>(?P<date>20\d{2}-\d{2}-\d{2})"
-        r"</span>.*?</li>",
-        re.IGNORECASE | re.DOTALL,
+        r"<li\b[^>]*>\s*<el-link\b[^>]*href=[\"'](?P<url>[^\"']+)[\"'][^>]*>"
+        r"(?P<title>[^<]*)</el-link>\s*<span\b[^>]*>(?P<date>20\d{2}-\d{2}-\d{2})"
+        r"</span>\s*</li>",
+        re.IGNORECASE,
     )
     _PERIOD = re.compile(
         r"本报告期[（(]\s*(?P<start_year>20\d{2})年(?P<start_month>\d{1,2})月"
@@ -3973,6 +3973,18 @@ class CctdaBspiPortPriceProvider:
         self.tls_config = tls_config_from_source_config(
             "cctda_bspi_weekly_port_price", self.source_cfg
         )
+
+    @staticmethod
+    def _is_article_url(url: str) -> bool:
+        parsed = urlsplit(url)
+        path = (parsed.path or "").strip()
+        if path in {"", "/"}:
+            return False
+        query = dict(parse_qsl(parsed.query))
+        action = str(query.get("a") or "").lower()
+        if action == "lists":
+            return False
+        return True
 
     @staticmethod
     def _plain_text(value: str) -> str:
@@ -4118,6 +4130,8 @@ class CctdaBspiPortPriceProvider:
                     source_url = urljoin(
                         page_url, html_lib.unescape(match.group("url"))
                     )
+                    if not self._is_article_url(source_url):
+                        continue
                     discovered[source_url] = {
                         "title": title,
                         "publication_date": publication_date.isoformat(),
