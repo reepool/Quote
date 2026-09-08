@@ -36,8 +36,13 @@ from research.company_profile.stage5 import PreparedPageContext, PreparedRequest
 from research.company_profile.stage5_benchmark import (
     Stage5GoldAnnotationResult,
     Stage5NegativeCaseResult,
+    _annotation_match_status,
+    _evaluate_annotation,
     _evaluate_negative_case,
     _has_affirmative_subject_basis,
+    _period_matches,
+    _record_matches_annotation,
+    _subject_match_status,
     evaluate_committed_stage5_run,
 )
 from research.company_profile.stage5_bundle import (
@@ -262,6 +267,135 @@ def test_fixture_guard_failure_forces_post_run_hold(
     assert benchmark.fixture_guard_results[0].passed is False
 
 
+def test_same_year_report_end_matches_only_duration_gold_period() -> None:
+    report = {"report_period": "2025-12-31"}
+    duration = {
+        "reported_period": "2025-12-31",
+        "period_type": "duration",
+        "report": report,
+    }
+    instant = {
+        "reported_period": "2025-12-31",
+        "period_type": "instant",
+        "report": report,
+    }
+    narrower = {
+        "reported_period": "2025年1-6月",
+        "period_type": "duration",
+        "report": report,
+    }
+    mid_year = {
+        "reported_period": "2025-06-30",
+        "period_type": "duration",
+        "report": {"report_period": "2025-06-30"},
+    }
+
+    assert _period_matches(duration, "2025") is True
+    assert _period_matches(instant, "2025") is False
+    assert _period_matches(narrower, "2025") is False
+    assert _period_matches(mid_year, "2025") is False
+    assert _period_matches(instant, "2025-12-31") is True
+
+
+def test_supported_non_group_subject_refinement_is_closed() -> None:
+    annotation = {
+        "subject_strictness": "allow_supported_non_group_refinement",
+        "semantic": {"subject_scope": "unclear"},
+    }
+    supported_segment = {
+        "subject_scope": "business_segment",
+        "segment_dimension": "product",
+        "segment_label": "羟胺盐",
+        "evidence": [{"anchor": {"row_label": "羟胺盐"}}],
+    }
+    unsupported_segment = {
+        **supported_segment,
+        "evidence": [{"anchor": {"row_label": "其他产品"}}],
+    }
+    consolidated = {
+        **supported_segment,
+        "subject_scope": "consolidated_group",
+        "subject_basis": "direct_source_wording",
+    }
+    unsupported_issuer = {
+        "subject_scope": "issuer",
+        "subject_name": "锦华新材",
+        "subject_basis": "numeric_reconciliation_to_consolidated_statement",
+        "evidence": [{"anchor": {"bounded_quote": "锦华新材"}}],
+    }
+
+    assert (
+        _subject_match_status(supported_segment, annotation)
+        == "accepted_with_uncertainty"
+    )
+    assert _subject_match_status(unsupported_segment, annotation) == "failed"
+    assert _subject_match_status(consolidated, annotation) == "failed"
+    assert _subject_match_status(unsupported_issuer, annotation) == "failed"
+
+
+def test_chengfei_transfer_effective_equivalence_is_directional_and_audited() -> None:
+    annotation = _chengfei_event_annotation()
+    record = _chengfei_event_record()
+    report = {
+        "scope_results": [
+            {
+                "task_result": {
+                    "records": [record],
+                    "dispositions": [
+                        {
+                            "status": "accepted_for_review",
+                            "target_id": record["record_id"],
+                        }
+                    ],
+                }
+            }
+        ]
+    }
+
+    assert _record_matches_annotation(record, annotation) is True
+    assert _annotation_match_status(record, annotation) == "semantic_match"
+    result = _evaluate_annotation(annotation, report)
+    assert result.passed is True
+    assert result.runtime_target_id == record["record_id"]
+    assert result.match_rule == "chengfei_transfer_effective_directional_equivalence"
+
+
+@pytest.mark.parametrize(
+    "record_update,annotation_update",
+    [
+        ({"event_type": "重大资产重组"}, {}),
+        ({"event_date": "2023-02-01"}, {}),
+        ({"regime_effective_at": "2025-01-17"}, {}),
+        (
+            {
+                "evidence": [
+                    {
+                        "page": 50,
+                        "anchor": {
+                            "bounded_quote": "2023年，公司启动收购成飞100%股权重大资产重组项目"
+                        },
+                    }
+                ]
+            },
+            {},
+        ),
+        (
+            {"event_type": "major_asset_restructuring_effective"},
+            {"semantic": {"event_type": "equity_transfer"}},
+        ),
+    ],
+)
+def test_chengfei_event_equivalence_rejects_unlisted_direction_date_or_anchor(
+    record_update: dict,
+    annotation_update: dict,
+) -> None:
+    record = {**_chengfei_event_record(), **record_update}
+    annotation = _chengfei_event_annotation()
+    annotation.update(annotation_update)
+
+    assert _record_matches_annotation(record, annotation) is False
+
+
 def test_post_run_benchmark_operator_writes_one_atomic_result(
     tmp_path: Path,
 ) -> None:
@@ -298,6 +432,48 @@ def test_post_run_benchmark_operator_writes_one_atomic_result(
                 str(GOLD_PATH),
             ]
         )
+
+
+def test_offline_benchmark_operator_uses_independent_identity_and_output(
+    tmp_path: Path,
+) -> None:
+    store = Stage5RunBundleStore(
+        tmp_path / "isolated",
+        repository_root=REPOSITORY_ROOT,
+    )
+    run_path = store.commit(_minimal_run_bundle("offline-input-run"))
+    manifest_path = run_path / "manifest.json"
+    manifest_before = manifest_path.read_bytes()
+    source_benchmark = run_path / "post-run-benchmark.json"
+    source_benchmark.write_text('{"baseline":true}\n', encoding="utf-8")
+    source_benchmark_before = source_benchmark.read_bytes()
+    destination = tmp_path / "evaluations" / "offline-evaluation.json"
+
+    assert (
+        benchmark_operator.main(
+            [
+                "--run-directory",
+                str(run_path),
+                "--gold-path",
+                str(GOLD_PATH),
+                "--output-path",
+                str(destination),
+                "--evaluation-id",
+                "period-event-semantics-20260908-a",
+            ]
+        )
+        == 0
+    )
+
+    payload = json.loads(destination.read_text(encoding="utf-8"))
+    assert payload["schema_version"] == "company_profile_stage5_offline_evaluation.v1"
+    assert payload["evaluation_id"] == "period-event-semantics-20260908-a"
+    assert payload["runtime_source"]["run_id"] == "offline-input-run"
+    assert len(payload["runtime_source"]["manifest_sha256"]) == 64
+    assert len(payload["runtime_source"]["source_benchmark_sha256"]) == 64
+    assert payload["benchmark"]["production_authorization"] == "not_authorized"
+    assert manifest_path.read_bytes() == manifest_before
+    assert source_benchmark.read_bytes() == source_benchmark_before
 
 
 def test_stage5_runtime_modules_do_not_import_gold_adapter_or_legacy_paths() -> None:
@@ -450,6 +626,55 @@ def _minimal_run_bundle(run_id: str) -> Stage5RunBundle:
         overall_status=Stage5OverallStatus.HOLD,
         created_at="2026-09-04T00:00:00+00:00",
     )
+
+
+def _chengfei_event_annotation() -> dict:
+    return {
+        "annotation_id": "mm-302132-regime-effective",
+        "sample_id": "manufacturing-materials-302132-2025-regime",
+        "field_id": "business_regime",
+        "coverage_status": "observed",
+        "subject_strictness": "must_equal",
+        "source_native": {"value": "2025-01-06"},
+        "semantic": {
+            "object_type": "BusinessEvent",
+            "event_type": "major_asset_restructuring_effective",
+            "subject_scope": "unclear",
+            "period": "2025",
+            "regime_effective_at": "2025-01-06",
+        },
+        "evidence": {
+            "page": 59,
+            "physical_anchor": {
+                "bounded_quote": "截至2025年1月6日，公司已完成股权过户并纳入公司合并报表范围"
+            },
+        },
+    }
+
+
+def _chengfei_event_record() -> dict:
+    return {
+        "record_id": "stage5-chengfei-transfer",
+        "field_id": "business_regime",
+        "object_type": "BusinessEvent",
+        "event_type": "equity_transfer",
+        "subject_scope": "unclear",
+        "reported_period": "2025",
+        "period_type": "event",
+        "event_date": "2025-01-06",
+        "regime_effective_at": "2025-01-06",
+        "source_native": {"name": "equity_transfer"},
+        "evidence": [
+            {
+                "page": 59,
+                "anchor": {
+                    "bounded_quote": (
+                        "截至2025年1月6日，公司已完成股权过户并纳入公司合并报表范围"
+                    )
+                },
+            }
+        ],
+    }
 
 
 def _negative_results(benchmark):

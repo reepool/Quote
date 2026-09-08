@@ -3,6 +3,7 @@
 > 文档类型：current
 > 版本：`company_profile_common_semantic_model.v1`
 > 日期：2026-09-03
+> 最近语义修订：2026-09-08
 > 状态：阶段 4 实现
 > production authorization：`not_authorized`
 
@@ -84,6 +85,14 @@
 - 重述比较数必须带 `comparison_basis`，并与 predecessor 的 `original_as_published` 事实并列。
 - occurrence identity 使用证券、报告期、文档版本、PDF 物理页、稳定表格/叙述锚点以及适用的 logical slot；evidence ID、可再生 report ID、模型解释和规范化对象名不参与身份。
 - source-native value/unit/header/qualifier/footnote 不能被模型换算或改写。
+- `period_type` 是期间语义的唯一判别字段：年度流量/比率等 `duration`
+  事实使用报告年；`inventory_volume` 等期末存量 `instant` 事实保留明确的
+  截止日期；事件的 `reported_period`、`event_date`、
+  `regime_effective_at` 与 `knowledge_time` 互不覆盖。adapter 只规范新构造
+  的记录，不改历史 bundle，也不覆盖原文明示的更窄期间。
+- 预计完工、完成或投产时间只有在当前已批准 Evidence 明示时才逐字保存在
+  `source_native.qualifier`；它不替换产能事实的 `reported_period`，也不得从
+  Gold、行业惯例或范围外页面补出。
 
 ## 5. Extract / Repair / Verify 合同
 

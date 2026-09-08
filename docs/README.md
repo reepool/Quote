@@ -33,11 +33,12 @@
 - `docs/development/company_profile_industry_research_method.md`：公司画像阶段 2 分行业研究方法、样本选择、标注、benchmark 与阶段 3 进入门
 - `docs/development/company_profile_manufacturing_materials_requirements.md`、`company_profile_manufacturing_materials_research_index.md`：已通过阶段 3 研究验收的制造/材料行业合同与证据索引；不代表生产授权
 - `docs/development/company_profile_stage5_final_audit_20260905.md`、`company_profile_stage55_adjudication_ledger.v1.json`：阶段 5 四报告权威 hold 基线与阶段 5.5 语义裁决账本；所有重跑必须使用新 run ID，生产授权仍为 `not_authorized`
-- `docs/development/company_profile_stage55_adjudication_summary_20260906.md`：阶段 5.5 最新完整权威运行 `stage55-final-four-authoritative-x`、真实 Benchmark、定向修正及 DNS 重跑阻塞汇总；四份 `company_profile_stage55_profile_*_2025.md` 均以 run-x 为权威来源
+- `docs/development/company_profile_stage55_adjudication_summary_20260906.md`：阶段 5.5 历史裁决汇总；最终权威运行已由后续闭包 change 更新为 `stage55-closure-four-20260907-a`
 - `docs/development/company_profile_stage55_manual_review_package_20260906.md`：MR-01 至 MR-07 用户裁决及 MR-08/MR-09 实现修正的人工复核包；逐项保留 runtime target、原文、页码、Evidence 和决定依据
 - `docs/development/company_profile_common_semantic_model.md`：阶段 4 通用语义模型、受控内存工作流和研究员读取投影；生产授权仍为 `not_authorized`
 - `openspec/changes/archive/2026-09-06-slice-manufacturing-materials-company-profile/`：已归档的阶段 5 隔离竖切合同；不恢复旧生产链
-- `openspec/changes/resolve-manufacturing-materials-profile-semantic-holds/`：当前阶段 5.5 语义裁决 change；只处理四报告 hold、真实 Benchmark 和人工复核，不授权生产发布
+- `openspec/changes/archive/2026-09-08-close-manufacturing-materials-profile-research-slice/`：阶段 5.5 研究切片闭包合同；权威结果为 `research_slice_usable`、Gold 14/24，生产仍未授权
+- `openspec/changes/refine-company-profile-period-and-event-semantics/`：当前离线期间、qualifier、Gold 主体严格度和成飞事件裁决 change；不运行 LLM、不改 closure bundle、不启动阶段 6
 - `docs/development/company_profile_industry_requirements_template.md`：独立行业 requirements 标准模板
 - `docs/development/company_profile_industry_sample_manifest.template.json`、`company_profile_industry_gold_annotation.template.json`：仅用于研究合同的样本与 gold 标注清单模板
 - `docs/development/company_profile_industry_benchmark_acceptance_template.md`：行业 benchmark 验收报告模板

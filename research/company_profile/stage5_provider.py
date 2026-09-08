@@ -126,7 +126,10 @@ _SCOPE_INSTRUCTIONS = {
         "Classify an explicitly disclosed newly added, under-construction, or planned "
         "production line or plant capacity as capacity_under_construction only when the "
         "source wording itself supports that project status. Preserve the exact source-native "
-        "object name, value, unit, and evidence_id; do not convert its value or unit, classify "
+        "object name, value, unit, and evidence_id. When the supplied Evidence explicitly "
+        "states an expected completion, completion, or commissioning expression, copy that "
+        "exact wording into qualifier; otherwise do not add completion timing. Do not replace "
+        "the report period with that expected timing; do not convert its value or unit, classify "
         "it as production_capacity, or add capacity_kind. If a complete scope contains no "
         "such disclosure, emit legal-empty coverage for capacity_under_construction."
     ),
@@ -1803,6 +1806,7 @@ def _expand_compact_measurements(
             continue
         item = dict(raw)
         metric_type = str(item.get("metric_type") or "")
+        period_type = _measurement_period_type(metric_type)
         candidate = {
             "object_type": "Measurement",
             "field_id": field_id_for_metric(metric_type),
@@ -1810,8 +1814,8 @@ def _expand_compact_measurements(
             "measured_object": item.get("measured_object") or item.get("name"),
             "subject_scope": "unclear",
             "reported_period": item.get("reported_period")
-            or _reported_period_label(prepared_scope),
-            "period_type": "duration",
+            or _reported_period_label(prepared_scope, period_type=period_type),
+            "period_type": period_type,
             "knowledge_time": prepared_scope.report.published_at,
             "source_native": _compact_source_native(item),
             "evidence_ids": [item.get("evidence_id")],
@@ -2272,9 +2276,41 @@ def _require_reported_business_change_coverage(
         )
 
 
-def _reported_period_label(prepared_scope: PreparedRequestScope) -> str:
+def _measurement_period_type(metric_type: str) -> str:
+    return "instant" if metric_type == "inventory_volume" else "duration"
+
+
+def _reported_period_label(
+    prepared_scope: PreparedRequestScope,
+    *,
+    period_type: str = "duration",
+) -> str:
+    if period_type == "instant":
+        return prepared_scope.report.report_period
     year = prepared_scope.report.report_period[:4]
-    return f"{year}年度" if year.isdigit() else prepared_scope.report.report_period
+    return year if year.isdigit() else prepared_scope.report.report_period
+
+
+def _normalize_adapter_reported_period(
+    reported_period: Any,
+    *,
+    period_type: Any,
+    prepared_scope: PreparedRequestScope,
+) -> Any:
+    """Normalize only newly adapted facts, preserving explicit source periods."""
+
+    if not isinstance(reported_period, str):
+        return reported_period
+    value = reported_period.strip()
+    report_period = prepared_scope.report.report_period
+    report_year = report_period[:4]
+    if (
+        period_type == "duration"
+        and value == report_period
+        and report_year.isdigit()
+    ):
+        return report_year
+    return value
 
 
 def _expand_repair_response(
@@ -2317,6 +2353,11 @@ def _expand_candidate_draft(
         return _expand_existing_fact_refs(draft, prepared_scope=prepared_scope)
     candidate = deepcopy(draft)
     _require_numeric_reconciliation_uncertainty(candidate)
+    candidate["reported_period"] = _normalize_adapter_reported_period(
+        candidate.get("reported_period"),
+        period_type=candidate.get("period_type"),
+        prepared_scope=prepared_scope,
+    )
     evidence_ids = candidate.pop("evidence_ids", None)
     candidate["schema_version"] = "company_profile_semantic_object.v1"
     candidate["record_id"] = _stable_record_id(

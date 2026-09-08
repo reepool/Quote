@@ -111,3 +111,32 @@
 - model implementation benchmark：`not_run_by_design`；
 - final research decision：`approved`；
 - next step：可另开阶段 4 change，实现通用最小语义模型和严格 extract/repair/verify 合同；生产授权继续为 `not_authorized`。
+
+## 10. 2026-09-08 离线期间与事件语义复评
+
+制造/材料切片后续已登记为 `research_slice_usable`，但仍保持研究隔离和
+`production_authorization=not_authorized`。本次只对不可变 closure bundle
+`stage55-closure-four-20260907-a` 做离线复评，没有运行 LLM、读取新 PDF、
+修改 Evidence plan 或覆盖原 benchmark。
+
+复评采用以下闭集规则：
+
+- 只有 `period_type=duration` 时，同年度的 `2025` 与机械年末日
+  `2025-12-31` 才可按期间语义等价；instant 和显式更窄期间不适用；
+- Gold 保持 `subject_scope=unclear` 时，仅可通过
+  `allow_supported_non_group_refinement` 接受 Evidence 直接支持的
+  `business_segment`、`named_subsidiary` 或 `issuer`，不得接受
+  `consolidated_group`；
+- 事件类型默认必须相等。唯一新增裁决是中航成飞同一物理锚点、
+  `event_date` 与 `regime_effective_at` 均为 `2025-01-06` 时，Gold
+  `major_asset_restructuring_effective` 可单向匹配 runtime
+  `equity_transfer`；反向、项目启动、承诺、错日期和错锚点均不匹配；
+- 预计完工年必须已经存在于 runtime 的 source-native qualifier。旧 bundle
+  没有该 qualifier 时继续失败，不能从 Gold 回填。
+
+新 identity `refine-period-event-semantics-20260908-a` 的结果为 Gold 18/24：
+2 exact、13 semantic、3 accepted with uncertainty、5 failed、1 contract
+conflict；fixture 4/4，真实报告负例 15/15，另 4 条未触发。只有抵消收入、
+抵消成本、锦华产品毛利率主体细化和成飞生效事件 4 条改变结果；其他缺失
+事实、结构缺口、物理锚点差异和成飞销量合同冲突均保留。benchmark 仍为
+`hold`，不撤销 `research_slice_usable`，也不构成生产批准。

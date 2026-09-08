@@ -47,9 +47,11 @@ from research.company_profile.stage5_provider import (
     _TASK_INSTRUCTIONS,
     CommonGatewaySemanticProvider,
     _coverage_draft_schema,
+    _expand_compact_measurements,
     _expand_extract_response,
     _minimal_extract_schema,
     _minimal_verify_schema,
+    _normalize_adapter_reported_period,
 )
 from research.company_profile.workflow import (
     CompanyProfileSemanticService,
@@ -341,7 +343,7 @@ def test_business_overview_uses_flat_source_and_activity_drafts() -> None:
     activity = response["items"][1]["candidate"]
     assert overview["source_text"] == source_text
     assert overview["subject_scope"] == "unclear"
-    assert overview["reported_period"] == "2025年度"
+    assert overview["reported_period"] == "2025"
     assert activity["activity_actor"] == "公司"
     assert activity["source_actor"] == "公司"
     assert activity["source_verb"] == "生产"
@@ -431,7 +433,7 @@ def test_totals_only_schema_cannot_emit_relationship_and_expands_measurement() -
     candidate = response["items"][0]["candidate"]
     assert candidate["field_id"] == "supplier_concentration"
     assert candidate["subject_scope"] == "unclear"
-    assert candidate["reported_period"] == "2025年度"
+    assert candidate["reported_period"] == "2025"
     assert response["items"][1]["coverage"]["status"] == "not_disclosed"
 
 
@@ -1638,6 +1640,186 @@ def test_same_control_adjusted_and_pre_adjustment_columns_keep_distinct_period_b
     }
     assert {item.knowledge_time for item in records} == {prepared.report.published_at}
     assert records[0].occurrence_id() != records[1].occurrence_id()
+
+
+def test_adapter_period_semantics_distinguish_duration_instant_and_narrower_periods() -> (
+    None
+):
+    prepared = _prepared_scope()
+
+    assert (
+        _normalize_adapter_reported_period(
+            "2025-12-31",
+            period_type="duration",
+            prepared_scope=prepared,
+        )
+        == "2025"
+    )
+    assert (
+        _normalize_adapter_reported_period(
+            "2025-12-31",
+            period_type="instant",
+            prepared_scope=prepared,
+        )
+        == "2025-12-31"
+    )
+    assert (
+        _normalize_adapter_reported_period(
+            "2025年1-6月",
+            period_type="duration",
+            prepared_scope=prepared,
+        )
+        == "2025年1-6月"
+    )
+
+
+def test_business_event_keeps_occurrence_effective_and_knowledge_time_separate() -> None:
+    prepared = _prepared_scope().model_copy(
+        update={
+            "scope_id": "restructuring_commitment",
+            "chapter_task": ChapterTask.EXTRACT_BUSINESS_REGIME,
+            "field_ids": ("business_regime",),
+        }
+    )
+    request = _business_regime_request(prepared)
+    evidence_id = prepared.evidence_bundle[0].evidence.evidence_id
+
+    expanded = _expand_extract_response(
+        {
+            "events": [
+                {
+                    "event_type": "equity_transfer",
+                    "description": "公司已完成股权过户并纳入合并报表范围",
+                    "reported_period": "2025",
+                    "event_date": "2025-01-06",
+                    "regime_effective_at": "2025-01-06",
+                    "comparison_basis": "current_period_after_restructuring",
+                    "evidence_id": evidence_id,
+                }
+            ],
+            "regimes": [],
+            "package_assignments": [],
+            "coverage": [],
+        },
+        request=request,
+        prepared_scope=prepared,
+    )
+    event = ExtractResponse.model_validate_json(
+        json.dumps(expanded, ensure_ascii=False)
+    ).candidates()[0]
+
+    assert event.reported_period == "2025"
+    assert event.event_date == "2025-01-06"
+    assert event.regime_effective_at == "2025-01-06"
+    assert event.knowledge_time == prepared.report.published_at
+
+
+def test_inventory_measurement_uses_report_date_as_instant() -> None:
+    prepared = _prepared_scope()
+    evidence_id = prepared.evidence_bundle[0].evidence.evidence_id
+
+    expanded = _expand_compact_measurements(
+        [
+            {
+                "metric_type": "inventory_volume",
+                "name": "负极材料库存量",
+                "value": "39299.86",
+                "unit": "吨",
+                "header": "库存量",
+                "evidence_id": evidence_id,
+            }
+        ],
+        field_id_for_metric=lambda metric_type: metric_type,
+        prepared_scope=prepared,
+    )
+    candidate = expanded[0]["candidate"]
+
+    assert candidate["period_type"] == "instant"
+    assert candidate["reported_period"] == "2025-12-31"
+
+
+def test_capacity_completion_qualifier_is_source_native_and_does_not_replace_period() -> (
+    None
+):
+    prepared = _prepared_scope().model_copy(
+        update={
+            "scope_id": "capacity_project_narrative",
+            "chapter_task": ChapterTask.EXTRACT_OPERATING_QUANTITIES,
+            "field_ids": ("production_capacity", "capacity_under_construction"),
+            "evidence_bundle": (
+                PreparedEvidence(
+                    evidence=_prepared_scope()
+                    .evidence_bundle[0]
+                    .evidence.model_copy(update={"continuation_pages": (50,)})
+                ),
+            ),
+        }
+    )
+    request = _capacity_extract_request(prepared)
+    evidence_id = prepared.evidence_bundle[0].evidence.evidence_id
+
+    expanded = _expand_extract_response(
+        {
+            "measurements": [
+                {
+                    "metric_type": "capacity_under_construction",
+                    "name": "羟胺盐在建产能",
+                    "value": "40000",
+                    "unit": "吨/年",
+                    "qualifier": "预计2026年完工",
+                    "reported_period": "2025-12-31",
+                    "evidence_id": evidence_id,
+                }
+            ],
+            "coverage": [],
+        },
+        request=request,
+        prepared_scope=prepared,
+    )
+    measurement = ExtractResponse.model_validate_json(
+        json.dumps(expanded, ensure_ascii=False)
+    ).candidates()[0]
+
+    assert measurement.reported_period == "2025"
+    assert measurement.period_type == PeriodType.DURATION
+    assert measurement.source_native.qualifier == "预计2026年完工"
+    assert measurement.evidence[0].page == 14
+    assert measurement.evidence[0].continuation_pages == (50,)
+
+
+def test_capacity_completion_qualifier_remains_absent_when_source_omits_it() -> None:
+    prepared = _prepared_scope().model_copy(
+        update={
+            "scope_id": "capacity_project_narrative",
+            "chapter_task": ChapterTask.EXTRACT_OPERATING_QUANTITIES,
+            "field_ids": ("production_capacity", "capacity_under_construction"),
+        }
+    )
+    request = _capacity_extract_request(prepared)
+    evidence_id = prepared.evidence_bundle[0].evidence.evidence_id
+
+    expanded = _expand_extract_response(
+        {
+            "measurements": [
+                {
+                    "metric_type": "capacity_under_construction",
+                    "name": "羟胺盐在建产能",
+                    "value": "40000",
+                    "unit": "吨/年",
+                    "evidence_id": evidence_id,
+                }
+            ],
+            "coverage": [],
+        },
+        request=request,
+        prepared_scope=prepared,
+    )
+    measurement = ExtractResponse.model_validate_json(
+        json.dumps(expanded, ensure_ascii=False)
+    ).candidates()[0]
+
+    assert measurement.reported_period == "2025"
+    assert measurement.source_native.qualifier is None
 
 
 def test_same_control_compact_schema_requires_basis_for_every_column() -> None:

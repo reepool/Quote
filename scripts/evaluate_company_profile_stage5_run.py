@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import sys
@@ -27,6 +28,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--run-directory", required=True, type=Path)
     parser.add_argument("--gold-path", type=Path, default=DEFAULT_GOLD_PATH)
+    parser.add_argument("--output-path", type=Path)
+    parser.add_argument("--evaluation-id")
     return parser
 
 
@@ -36,12 +39,44 @@ def main(argv: Sequence[str] | None = None) -> int:
         args.run_directory,
         gold_path=args.gold_path,
     )
-    destination = args.run_directory / "post-run-benchmark.json"
+    if args.output_path is not None and not args.evaluation_id:
+        raise ValueError("--evaluation-id is required with --output-path")
+    destination = args.output_path or (
+        args.run_directory / "post-run-benchmark.json"
+    )
+    run_directory = args.run_directory.resolve()
+    if args.output_path is not None and destination.resolve().is_relative_to(
+        run_directory
+    ):
+        raise ValueError("offline evaluation output must be outside the input bundle")
     if destination.exists():
         raise FileExistsError(f"post-run benchmark already exists: {destination}")
-    temporary = args.run_directory / f".post-run-benchmark-{uuid.uuid4().hex}.tmp"
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    payload: dict[str, object]
+    if args.output_path is None:
+        payload = benchmark.model_dump(mode="json")
+    else:
+        source_benchmark = args.run_directory / "post-run-benchmark.json"
+        payload = {
+            "schema_version": "company_profile_stage5_offline_evaluation.v1",
+            "evaluation_id": args.evaluation_id,
+            "runtime_source": {
+                "run_id": benchmark.run_id,
+                "run_directory": str(args.run_directory),
+                "manifest_sha256": _sha256_file(
+                    args.run_directory / "manifest.json"
+                ),
+                "source_benchmark_sha256": (
+                    _sha256_file(source_benchmark)
+                    if source_benchmark.is_file()
+                    else None
+                ),
+            },
+            "benchmark": benchmark.model_dump(mode="json"),
+        }
+    temporary = destination.parent / f".{destination.name}-{uuid.uuid4().hex}.tmp"
     encoded = json.dumps(
-        benchmark.model_dump(mode="json"),
+        payload,
         ensure_ascii=False,
         indent=2,
         sort_keys=True,
@@ -58,6 +93,14 @@ def main(argv: Sequence[str] | None = None) -> int:
             temporary.unlink()
     print(destination)
     return 0
+
+
+def _sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
 
 
 if __name__ == "__main__":
