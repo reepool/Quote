@@ -17,12 +17,17 @@ The system MUST provide a versioned common semantic model for `BusinessOverview`
 - **AND** the summary cannot introduce a new fact, causal claim, role, or judgment
 
 ### Requirement: Evidence and occurrence identity preserve the physical source
-Every source-backed object MUST reference versioned Evidence containing report identity, one-based PDF physical page, section, and a stable table cell or normalized bounded-text anchor. A table Measurement identity MUST include `logical_slot + physical_anchor`; semantic interpretation, normalized names, evidence IDs, run IDs, and model artifacts MUST remain outside the physical occurrence identity.
+Every source-backed object MUST reference versioned Evidence containing report identity, one-based PDF physical page, section, and a stable table cell or normalized bounded-text anchor. A table Measurement identity MUST include `logical_slot + physical_anchor` and, when the Evidence distinguishes source rows or measured objects, that source-row/measured-object identity; semantic interpretation, normalized names, evidence IDs, run IDs, and model artifacts MUST remain outside the physical occurrence identity. Equal numeric values MUST NOT merge distinct source rows or measured objects.
 
 #### Scenario: One table row contains different metric cells
 - **WHEN** revenue and cost appear on the same row but in different columns
 - **THEN** their logical slots and cell anchors produce distinct occurrences
 - **AND** neither candidate overwrites or merges with the other
+
+#### Scenario: Equal values belong to different source rows
+- **WHEN** one utilization table reports `铁 ... 96%` and `坯材 ... 96%` under the same header
+- **THEN** the adapter retains two independently anchored Measurements
+- **AND** it does not emit an occurrence conflict solely because the values are equal
 
 #### Scenario: Printed page differs from physical page
 - **WHEN** the PDF physical page is 59 and the printed label is 58

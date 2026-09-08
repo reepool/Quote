@@ -122,7 +122,7 @@ A management-discussion table MUST NOT be classified as `consolidated_group` sol
 - **AND** package convention does not supply a subject silently
 
 ### Requirement: Customers suppliers and concentration are separate concepts
-The industry contract MUST distinguish named or intentionally anonymous customer/supplier relationships from concentration measurements. A disclosed anonymous identity such as `客户 A`, `第一名`, or a disclosure-exempt counterparty MUST be retained as report-local disclosed identity and MUST NOT require legal-entity catalog resolution solely because the name is masked. Concentration alone MUST NOT create a relationship, and anonymous identities MUST NOT be merged across reports. When a top-five section discloses totals without names, its name coverage MUST remain `not_disclosed`; a named related-party row or report-local aggregate identity from another section MAY form an independent Relationship but MUST NOT fill that top-five name coverage. A confidentiality or disclosure-exemption reason MUST be used only when explicitly stated by the source; otherwise the reason remains source-unspecified.
+The industry contract MUST distinguish named or intentionally anonymous customer/supplier relationships from concentration measurements, and MUST preserve the disclosed counterparty direction. Supplier procurement amounts and supplier concentration shares MUST use supplier field semantics even when adjacent to customer disclosures. A disclosed anonymous identity such as `客户 A`, `第一名`, or a disclosure-exempt counterparty MUST be retained as report-local disclosed identity and MUST NOT require legal-entity catalog resolution solely because the name is masked. Concentration alone MUST NOT create a relationship, and anonymous identities MUST NOT be merged across reports. When a top-five section discloses totals without names, its name coverage MUST remain `not_disclosed`; a named related-party row or report-local aggregate identity from another section MAY form an independent Relationship but MUST NOT fill that top-five name coverage. Related-party transaction amounts or service ratios outside the active concentration checklist MUST remain explicitly deferred or blocked rather than being relabelled as concentration. A confidentiality or disclosure-exemption reason MUST be used only when explicitly stated by the source; otherwise the reason remains source-unspecified.
 
 #### Scenario: BSE report exempts counterparty names
 - **WHEN** an annual report lawfully withholds non-related important customer or supplier names while disclosing amounts or concentration
@@ -133,6 +133,24 @@ The industry contract MUST distinguish named or intentionally anonymous customer
 - **WHEN** a report gives only top-five totals but separately names related parties or a report-local aggregate such as `集团所属单位`
 - **THEN** those separate relationships may be retained with their own evidence and identity class
 - **AND** top-five counterparty-name coverage remains `not_disclosed`
+
+#### Scenario: Supplier totals are adjacent to customer totals
+- **WHEN** Evidence reports customer sales totals followed by supplier purchase totals
+- **THEN** each direction retains its own field family and metric meaning
+- **AND** no supplier value is accepted as a customer fact
+
+#### Scenario: Related-party rows exceed the concentration checklist
+- **WHEN** a related-party table reports sales, purchases, or services not covered by the current concentration task
+- **THEN** the source facts remain traceable as deferred or blocked candidates
+- **AND** the task does not widen its concentration contract implicitly
+
+### Requirement: Consolidation adjustments require independent subject support
+A `consolidation_adjustment` row MUST preserve its source-native values and row class, but MUST NOT be assigned `consolidated_group` solely from the adjustment label. Subject promotion requires affirmative group wording or the existing allowed same-report reconciliation.
+
+#### Scenario: Inter-segment elimination lacks group wording
+- **WHEN** a source labels a row `分部间抵消` without affirmative group wording or reconciliation Evidence
+- **THEN** its subject remains `unclear`
+- **AND** the row is not treated as a consolidated-group fact
 
 ### Requirement: Business regime changes block approval until evidenced
 The manufacturing-materials contract MUST include a verified transformation, major restructuring, or reverse-listing report before final approval, or MUST remain `held` with a blocking coverage gap. Regime research MUST preserve historical business facts and MUST NOT apply the current package assignment retroactively. It MUST keep `reported_period`, `knowledge_time`, `regime_effective_at`, and `comparison_basis` distinct. When a comparative is explicitly restated, `comparison_basis` MUST be present; its absence MUST block completion. A later same-control restatement MUST coexist with, and MUST NOT overwrite or delete, the predecessor's `original_as_published` fact.
