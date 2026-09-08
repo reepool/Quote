@@ -38,7 +38,7 @@
 - `docs/development/company_profile_common_semantic_model.md`：阶段 4 通用语义模型、受控内存工作流和研究员读取投影；生产授权仍为 `not_authorized`
 - `openspec/changes/archive/2026-09-06-slice-manufacturing-materials-company-profile/`：已归档的阶段 5 隔离竖切合同；不恢复旧生产链
 - `openspec/changes/archive/2026-09-08-close-manufacturing-materials-profile-research-slice/`：阶段 5.5 研究切片闭包合同；权威结果为 `research_slice_usable`、Gold 14/24，生产仍未授权
-- `openspec/changes/refine-company-profile-period-and-event-semantics/`：当前离线期间、qualifier、Gold 主体严格度和成飞事件裁决 change；不运行 LLM、不改 closure bundle、不启动阶段 6
+- `openspec/changes/archive/2026-09-08-refine-company-profile-period-and-event-semantics/`：已归档的离线期间、qualifier、Gold 主体严格度和成飞事件裁决 change；权威运行仍为 `stage55-closure-four-20260907-a`，离线 Gold 为 18/24，生产仍未授权且未启动阶段 6
 - `docs/development/company_profile_industry_requirements_template.md`：独立行业 requirements 标准模板
 - `docs/development/company_profile_industry_sample_manifest.template.json`、`company_profile_industry_gold_annotation.template.json`：仅用于研究合同的样本与 gold 标注清单模板
 - `docs/development/company_profile_industry_benchmark_acceptance_template.md`：行业 benchmark 验收报告模板
