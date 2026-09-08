@@ -6,9 +6,9 @@
 
 ## 2. Six-chapter Evidence plan
 
-- [ ] 2.1 Prepare bounded source-native Evidence for overview plus Activity and for segment performance, preserving continuous physical pages, headers, units, footnotes, continuation links, and legal-empty behavior.
-- [ ] 2.2 Prepare the same bounded Evidence for operating quantity/capacity, material/energy input, counterparty/concentration, and business regime event or explicit `not_applicable`.
-- [ ] 2.3 Audit the frozen plan against all six core chapters before any model call; record unreadable, incomplete, or legally empty scopes without adding Gold-shaped answers or new PDF/parser capability.
+- [x] 2.1 Prepare bounded source-native Evidence for overview plus Activity and for segment performance, preserving continuous physical pages, headers, units, footnotes, continuation links, and legal-empty behavior.
+- [x] 2.2 Prepare the same bounded Evidence for operating quantity/capacity, material/energy input, counterparty/concentration, and business regime event or explicit `not_applicable`.
+- [x] 2.3 Audit the frozen plan against all six core chapters before any model call; record unreadable, incomplete, or legally empty scopes without adding Gold-shaped answers or new PDF/parser capability.
 
 ## 3. Validation-manifest execution path
 

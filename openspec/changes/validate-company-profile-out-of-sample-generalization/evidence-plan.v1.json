@@ -1,0 +1,432 @@
+{
+    "schema_version": "company_profile_out_of_sample_evidence_plan.v1",
+    "plan_version": "manufacturing_materials_oos.2026-09-08.1",
+    "sample_manifest_revision": "manufacturing-materials-oos-manifest-20260908-v1",
+    "page_coordinate_system": "one_based_pdf_physical_page",
+    "production_authorization": "not_authorized",
+    "reports": [
+        {
+            "sample_id": "manufacturing-materials-oos-600019-2025",
+            "content_hash": "9d910b7b6a78fe2ccae1345c8651ca2e592d83b04bc2705f51d611ec0e1545a8",
+            "plan_version": "manufacturing_materials_oos.2026-09-08.1",
+            "tasks": [
+                {
+                    "chapter_task": "extract_business_overview",
+                    "request_scopes": [
+                        {
+                            "scope_id": "business_overview",
+                            "field_ids": [
+                                "business_overview_source",
+                                "explicit_activity"
+                            ],
+                            "pages": [
+                                9,
+                                10
+                            ],
+                            "section_titles": [
+                                "\u7b2c\u4e09\u8282 \u7ba1\u7406\u5c42\u8ba8\u8bba\u4e0e\u5206\u6790",
+                                "\u62a5\u544a\u671f\u5185\u516c\u53f8\u4ece\u4e8b\u7684\u4e1a\u52a1\u60c5\u51b5"
+                            ],
+                            "anchor_terms": [
+                                "\u62a5\u544a\u671f\u5185\u516c\u53f8\u6240\u4ece\u4e8b\u7684\u4e3b\u8981\u4e1a\u52a1",
+                                "\u94a2\u94c1\u4e1a",
+                                "\u52a0\u5de5\u914d\u9001",
+                                "\u4e3b\u8981\u4ea7\u54c1"
+                            ],
+                            "required_headers": [],
+                            "required_units": [],
+                            "required_footnotes": [],
+                            "continuation_required": false,
+                            "printed_page_labels": {
+                                "9": "9",
+                                "10": "10"
+                            },
+                            "subject_pages": [],
+                            "subject_anchor_terms": [],
+                            "source_row_dimensions": {},
+                            "candidate_pages": [
+                                9,
+                                10
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "chapter_task": "extract_segment_financials",
+                    "request_scopes": [
+                        {
+                            "scope_id": "segment_industry_product_region_mode",
+                            "field_ids": [
+                                "segment_dimension",
+                                "operating_revenue",
+                                "operating_cost",
+                                "gross_margin_reported"
+                            ],
+                            "pages": [
+                                14,
+                                15
+                            ],
+                            "section_titles": [
+                                "\u4e3b\u8425\u4e1a\u52a1\u5206\u6790",
+                                "\u6536\u5165\u548c\u6210\u672c\u5206\u6790",
+                                "\u4e3b\u8425\u4e1a\u52a1\u5206\u884c\u4e1a\u3001\u5206\u4ea7\u54c1\u3001\u5206\u5730\u533a\u3001\u5206\u9500\u552e\u6a21\u5f0f\u60c5\u51b5"
+                            ],
+                            "anchor_terms": [
+                                "\u4e3b\u8425\u4e1a\u52a1\u5206\u884c\u4e1a\u3001\u5206\u4ea7\u54c1\u3001\u5206\u5730\u533a\u3001\u5206\u9500\u552e\u6a21\u5f0f\u60c5\u51b5",
+                                "\u4e3b\u8425\u4e1a\u52a1\u5206\u884c\u4e1a\u60c5\u51b5",
+                                "\u4e3b\u8425\u4e1a\u52a1\u5206\u4ea7\u54c1\u60c5\u51b5"
+                            ],
+                            "required_headers": [
+                                "\u8425\u4e1a\u6536\u5165",
+                                "\u8425\u4e1a\u6210\u672c",
+                                "\u6bdb\u5229\u7387"
+                            ],
+                            "required_units": [
+                                "\u767e\u4e07\u5143"
+                            ],
+                            "required_footnotes": [
+                                "\u516c\u53f8\u6309\u5185\u90e8\u7ec4\u7ec7\u673a\u6784\u5212\u5206\u4e3a\u94a2\u94c1\u5236\u9020\u3001\u52a0\u5de5\u914d\u9001\u3001\u5176\u4ed6\u4e09\u4e2a\u5206\u90e8"
+                            ],
+                            "continuation_required": true,
+                            "printed_page_labels": {
+                                "14": "14",
+                                "15": "15"
+                            },
+                            "subject_pages": [],
+                            "subject_anchor_terms": [],
+                            "source_row_dimensions": {
+                                "\u94a2\u94c1\u5236\u9020": "\u5206\u884c\u4e1a",
+                                "\u52a0\u5de5\u914d\u9001": "\u5206\u884c\u4e1a",
+                                "\u5176\u4ed6": "\u5206\u884c\u4e1a",
+                                "\u5206\u90e8\u95f4\u62b5\u6d88": "\u5206\u884c\u4e1a",
+                                "\u51b7\u8f67\u78b3\u94a2\u677f\u5377": "\u5206\u4ea7\u54c1",
+                                "\u70ed\u8f67\u78b3\u94a2\u677f\u5377": "\u5206\u4ea7\u54c1",
+                                "\u94a2\u7ba1\u4ea7\u54c1": "\u5206\u4ea7\u54c1",
+                                "\u957f\u6750\u4ea7\u54c1": "\u5206\u4ea7\u54c1",
+                                "\u539a\u677f\u4ea7\u54c1": "\u5206\u4ea7\u54c1",
+                                "\u5176\u4ed6\u94a2\u94c1\u4ea7\u54c1": "\u5206\u4ea7\u54c1",
+                                "\u5883\u5185\u5e02\u573a": "\u5206\u5730\u533a",
+                                "\u5883\u5916\u5e02\u573a": "\u5206\u5730\u533a",
+                                "\u96c6\u4e2d\u9500\u552e": "\u9500\u552e\u6a21\u5f0f",
+                                "\u975e\u96c6\u4e2d\u9500\u552e": "\u9500\u552e\u6a21\u5f0f"
+                            },
+                            "candidate_pages": [
+                                14
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "chapter_task": "extract_operating_quantities",
+                    "request_scopes": [
+                        {
+                            "scope_id": "product_volume_table",
+                            "field_ids": [
+                                "production_volume",
+                                "sales_volume",
+                                "inventory_volume"
+                            ],
+                            "pages": [
+                                15
+                            ],
+                            "section_titles": [
+                                "\u4ea7\u9500\u91cf\u60c5\u51b5\u5206\u6790\u8868"
+                            ],
+                            "anchor_terms": [
+                                "\u4ea7\u9500\u91cf\u60c5\u51b5\u5206\u6790\u8868",
+                                "\u4e3b\u8981\u4ea7\u54c1",
+                                "\u5408\u8ba1"
+                            ],
+                            "required_headers": [
+                                "\u751f\u4ea7\u91cf",
+                                "\u9500\u552e\u91cf",
+                                "\u5e93\u5b58\u91cf"
+                            ],
+                            "required_units": [
+                                "\u4e07\u5428"
+                            ],
+                            "required_footnotes": [],
+                            "continuation_required": false,
+                            "printed_page_labels": {
+                                "15": "15"
+                            },
+                            "subject_pages": [],
+                            "subject_anchor_terms": [],
+                            "source_row_dimensions": {},
+                            "candidate_pages": [
+                                15
+                            ]
+                        },
+                        {
+                            "scope_id": "capacity_and_steel_process_tables",
+                            "field_ids": [
+                                "production_capacity",
+                                "production_volume",
+                                "sales_volume",
+                                "capacity_utilization"
+                            ],
+                            "pages": [
+                                22,
+                                23
+                            ],
+                            "section_titles": [
+                                "\u884c\u4e1a\u7ecf\u8425\u6027\u4fe1\u606f\u5206\u6790",
+                                "\u94a2\u94c1\u884c\u4e1a\u7ecf\u8425\u6027\u4fe1\u606f\u5206\u6790"
+                            ],
+                            "anchor_terms": [
+                                "\u4ea7\u80fd\u53ca\u4ea7\u80fd\u5229\u7528\u7387",
+                                "\u6309\u52a0\u5de5\u5de5\u827a\u5206\u7c7b\u7684\u94a2\u6750\u5236\u9020\u548c\u9500\u552e\u60c5\u51b5",
+                                "\u6309\u6210\u54c1\u5f62\u6001\u5206\u7c7b\u7684\u94a2\u6750\u5236\u9020\u548c\u9500\u552e\u60c5\u51b5"
+                            ],
+                            "required_headers": [
+                                "\u4ea7\u80fd\uff08\u4e07\u5428\uff09",
+                                "\u4ea7\u91cf\uff08\u4e07\u5428\uff09",
+                                "\u4ea7\u80fd\u5229\u7528\u7387",
+                                "\u4ea7\u91cf\uff08\u5428\uff09",
+                                "\u9500\u91cf\uff08\u5428\uff09"
+                            ],
+                            "required_units": [
+                                "\u4e07\u5428",
+                                "\u5428",
+                                "%",
+                                "\u767e\u4e07\u5143"
+                            ],
+                            "required_footnotes": [
+                                "\u5b9d\u6b66\u96c6\u56e2\u4ea7\u91cf\u8c03\u63a7\u5b89\u6392\u7ec4\u7ec7\u751f\u4ea7"
+                            ],
+                            "continuation_required": false,
+                            "printed_page_labels": {
+                                "22": "22",
+                                "23": "23"
+                            },
+                            "subject_pages": [],
+                            "subject_anchor_terms": [],
+                            "source_row_dimensions": {},
+                            "candidate_pages": [
+                                22,
+                                23
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "chapter_task": "extract_material_inputs",
+                    "request_scopes": [
+                        {
+                            "scope_id": "material_energy_narrative",
+                            "field_ids": [
+                                "material_input"
+                            ],
+                            "pages": [
+                                12,
+                                13
+                            ],
+                            "section_titles": [
+                                "\u7ecf\u8425\u60c5\u51b5\u8ba8\u8bba\u4e0e\u5206\u6790",
+                                "\u7eff\u8272\u4f4e\u78b3",
+                                "\u6548\u7387\u63d0\u5347"
+                            ],
+                            "anchor_terms": [
+                                "\u539f\u71c3\u6599\u4ef7\u683c",
+                                "\u539f\u8f85\u6599\u4ef7\u683c",
+                                "\u6280\u672f\u8282\u80fd\u91cf",
+                                "\u5916\u8d2d\u7eff\u7535/\u7eff\u8bc1"
+                            ],
+                            "required_headers": [],
+                            "required_units": [
+                                "\u4e07\u5428",
+                                "\u4ebf\u5343\u74e6\u65f6"
+                            ],
+                            "required_footnotes": [],
+                            "continuation_required": false,
+                            "printed_page_labels": {
+                                "12": "12",
+                                "13": "13"
+                            },
+                            "subject_pages": [],
+                            "subject_anchor_terms": [],
+                            "source_row_dimensions": {},
+                            "candidate_pages": [
+                                12,
+                                13
+                            ]
+                        },
+                        {
+                            "scope_id": "material_supply_table",
+                            "field_ids": [
+                                "material_input"
+                            ],
+                            "pages": [
+                                24
+                            ],
+                            "section_titles": [
+                                "\u94c1\u77ff\u77f3\u4f9b\u5e94\u60c5\u51b5",
+                                "\u5e9f\u94a2\u4f9b\u5e94\u60c5\u51b5"
+                            ],
+                            "anchor_terms": [
+                                "\u94c1\u77ff\u77f3\u4f9b\u5e94\u60c5\u51b5",
+                                "\u5e9f\u94a2\u4f9b\u5e94\u60c5\u51b5",
+                                "\u94c1\u77ff\u77f3\u4f9b\u5e94\u6765\u6e90",
+                                "\u5e9f\u94a2\u4f9b\u5e94\u6765\u6e90"
+                            ],
+                            "required_headers": [
+                                "\u4f9b\u5e94\u91cf\uff08\u5428\uff09",
+                                "\u652f\u51fa\u91d1\u989d"
+                            ],
+                            "required_units": [
+                                "\u5428",
+                                "\u767e\u4e07\u5143"
+                            ],
+                            "required_footnotes": [
+                                "\u81ea\u4f9b\u5e9f\u94a2\u4e3a\u5382\u5185\u56de\u6536\uff0c\u65e0\u5bf9\u5916\u652f\u51fa\u91d1\u989d"
+                            ],
+                            "continuation_required": false,
+                            "printed_page_labels": {
+                                "24": "24"
+                            },
+                            "subject_pages": [],
+                            "subject_anchor_terms": [],
+                            "source_row_dimensions": {},
+                            "candidate_pages": [
+                                24
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "chapter_task": "extract_counterparties_and_concentration",
+                    "request_scopes": [
+                        {
+                            "scope_id": "top_five_totals_and_legal_empty_names",
+                            "field_ids": [
+                                "counterparty_relationship",
+                                "customer_concentration",
+                                "supplier_concentration"
+                            ],
+                            "pages": [
+                                16,
+                                17
+                            ],
+                            "section_titles": [
+                                "\u4e3b\u8981\u9500\u552e\u5ba2\u6237\u53ca\u4e3b\u8981\u4f9b\u5e94\u5546\u60c5\u51b5",
+                                "\u524d\u4e94\u540d\u9500\u552e\u5ba2\u6237\u53ca\u524d\u4e94\u540d\u4f9b\u5e94\u5546"
+                            ],
+                            "anchor_terms": [
+                                "\u524d\u4e94\u540d\u5ba2\u6237\u9500\u552e\u989d",
+                                "\u524d\u4e94\u540d\u4f9b\u5e94\u5546\u91c7\u8d2d\u989d",
+                                "\u524d\u4e94\u540d\u9500\u552e\u5ba2\u6237",
+                                "\u524d\u4e94\u540d\u4f9b\u5e94\u5546",
+                                "\u4e0d\u9002\u7528"
+                            ],
+                            "required_headers": [],
+                            "required_units": [
+                                "\u4ebf\u5143",
+                                "%"
+                            ],
+                            "required_footnotes": [
+                                "\u5c5e\u4e8e\u540c\u4e00\u63a7\u5236\u4eba\u63a7\u5236\u7684\u5ba2\u6237\u6216\u4f9b\u5e94\u5546\u89c6\u4e3a\u540c\u4e00\u5ba2\u6237\u6216\u4f9b\u5e94\u5546\u5408\u5e76\u5217\u793a"
+                            ],
+                            "continuation_required": true,
+                            "printed_page_labels": {
+                                "16": "16",
+                                "17": "17"
+                            },
+                            "subject_pages": [],
+                            "subject_anchor_terms": [],
+                            "source_row_dimensions": {},
+                            "candidate_pages": [
+                                16,
+                                17
+                            ]
+                        },
+                        {
+                            "scope_id": "related_party_sales_purchases_and_services",
+                            "field_ids": [
+                                "counterparty_relationship",
+                                "customer_concentration",
+                                "supplier_concentration"
+                            ],
+                            "pages": [
+                                69,
+                                70
+                            ],
+                            "section_titles": [
+                                "\u91cd\u5927\u5173\u8054\u4ea4\u6613",
+                                "\u4e0e\u65e5\u5e38\u7ecf\u8425\u76f8\u5173\u7684\u5173\u8054\u4ea4\u6613"
+                            ],
+                            "anchor_terms": [
+                                "\u516c\u53f8\u7684\u4e3b\u8981\u5173\u8054\u65b9",
+                                "\u4ea7\u54c1\u9500\u552e\u5c0f\u8ba1",
+                                "\u91c7\u8d2d\u5546\u54c1\u5c0f\u8ba1",
+                                "\u63a5\u53d7\u52b3\u52a1\u5c0f\u8ba1",
+                                "\u4ee5\u4e0a\u516c\u53f8\u5747\u542b\u5176\u5b50\u516c\u53f8"
+                            ],
+                            "required_headers": [
+                                "\u5173\u8054\u65b9",
+                                "\u5173\u8054\u4ea4\u6613\u5185\u5bb9",
+                                "\u5b9a\u4ef7\u539f\u5219",
+                                "\u4ea4\u6613\u989d"
+                            ],
+                            "required_units": [
+                                "\u767e\u4e07\u5143",
+                                "%"
+                            ],
+                            "required_footnotes": [
+                                "\u4ee5\u4e0a\u516c\u53f8\u5747\u542b\u5176\u5b50\u516c\u53f8"
+                            ],
+                            "continuation_required": true,
+                            "printed_page_labels": {
+                                "69": "69",
+                                "70": "70"
+                            },
+                            "subject_pages": [],
+                            "subject_anchor_terms": [],
+                            "source_row_dimensions": {},
+                            "candidate_pages": [
+                                69,
+                                70
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "chapter_task": "extract_business_regime",
+                    "request_scopes": [
+                        {
+                            "scope_id": "business_change_and_consolidation_scope",
+                            "field_ids": [
+                                "business_regime"
+                            ],
+                            "pages": [
+                                16
+                            ],
+                            "section_titles": [
+                                "\u62a5\u544a\u671f\u4e3b\u8981\u5b50\u516c\u53f8\u80a1\u6743\u53d8\u52a8\u5bfc\u81f4\u5408\u5e76\u8303\u56f4\u53d8\u5316",
+                                "\u4e1a\u52a1\u3001\u4ea7\u54c1\u6216\u670d\u52a1\u53d1\u751f\u91cd\u5927\u53d8\u5316\u6216\u8c03\u6574\u6709\u5173\u60c5\u51b5"
+                            ],
+                            "anchor_terms": [
+                                "\u62a5\u544a\u671f\u4e3b\u8981\u5b50\u516c\u53f8\u80a1\u6743\u53d8\u52a8\u5bfc\u81f4\u5408\u5e76\u8303\u56f4\u53d8\u5316",
+                                "\u7eb3\u5165\u5408\u5e76\u8303\u56f4",
+                                "\u516c\u53f8\u62a5\u544a\u671f\u5185\u4e1a\u52a1\u3001\u4ea7\u54c1\u6216\u670d\u52a1\u53d1\u751f\u91cd\u5927\u53d8\u5316\u6216\u8c03\u6574\u6709\u5173\u60c5\u51b5",
+                                "\u4e0d\u9002\u7528"
+                            ],
+                            "required_headers": [],
+                            "required_units": [],
+                            "required_footnotes": [],
+                            "continuation_required": false,
+                            "printed_page_labels": {
+                                "16": "16"
+                            },
+                            "subject_pages": [],
+                            "subject_anchor_terms": [],
+                            "source_row_dimensions": {},
+                            "candidate_pages": [
+                                16
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
