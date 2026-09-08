@@ -481,7 +481,7 @@ def _semantic_request(
 ) -> SemanticTaskRequest:
     if set(semantic_input.unresolved_field_ids) - set(scope.field_ids):
         raise ValueError("semantic input requests a field outside its request scope")
-    active_fields = tuple(dict.fromkeys(scope.field_ids))
+    active_fields = _active_scope_fields(scope)
     checklist = tuple(
         _checklist_item(field_id, scope.chapter_task) for field_id in active_fields
     )
@@ -513,12 +513,17 @@ def _semantic_request(
             for action in _FIELD_CONTRACT[field_id][3]
         )
     )
+    unresolved_fields = tuple(
+        field_id
+        for field_id in semantic_input.unresolved_field_ids
+        if field_id in active_fields
+    )
     return SemanticTaskRequest(
         request_id=f"{run_id}:{scope.sample_id}:{scope.scope_id}",
         report=asset.report,
         package_manifest=manifest,
         chapter_task=scope.chapter_task,
-        evidence_bundle=_field_bound_evidence(scope),
+        evidence_bundle=_field_bound_evidence(scope, active_fields=active_fields),
         allowed_object_types=allowed_objects,
         allowed_metric_types=allowed_metrics,
         allowed_actions=allowed_actions,
@@ -532,14 +537,30 @@ def _semantic_request(
         ),
         deterministic_candidates=semantic_input.deterministic_candidates,
         provided_coverage=semantic_input.provided_coverage,
-        unresolved_field_ids=semantic_input.unresolved_field_ids,
+        unresolved_field_ids=unresolved_fields,
     )
 
 
-def _field_bound_evidence(scope: PreparedRequestScope) -> tuple[PreparedEvidence, ...]:
+def _active_scope_fields(scope: PreparedRequestScope) -> tuple[str, ...]:
+    """Keep disclosure-specific scopes inside their frozen semantic boundary."""
+
+    fields = tuple(dict.fromkeys(scope.field_ids))
+    if scope.scope_id == "related_party_sales_purchases_and_services":
+        return tuple(
+            field_id for field_id in fields if field_id == "counterparty_relationship"
+        )
+    return fields
+
+
+def _field_bound_evidence(
+    scope: PreparedRequestScope,
+    *,
+    active_fields: tuple[str, ...] | None = None,
+) -> tuple[PreparedEvidence, ...]:
+    fields = scope.field_ids if active_fields is None else active_fields
     return tuple(
         item.model_copy(update={"field_id": field_id})
-        for field_id in scope.field_ids
+        for field_id in fields
         for item in scope.evidence_bundle
     )
 

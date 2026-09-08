@@ -46,6 +46,7 @@ from research.company_profile.stage5_service import (
     ManufacturingMaterialsProfileSliceService,
     Stage5SemanticInput,
     _normalize_review_actions,
+    _semantic_request,
     _suppress_same_scope_legal_empty_relationships,
 )
 from research.document_processing.pdf import PdfRouter, PypdfNativeAdapter
@@ -159,14 +160,53 @@ def test_stage5_validation_manifest_uses_existing_semantic_and_bundle_owners(
     )
     assert execution.overall_status == "hold"
     assert execution.report_statuses == {VALIDATION_SAMPLE_ID: "hold"}
-    assert [item["sample_id"] for item in payload["reports"]] == [
-        VALIDATION_SAMPLE_ID
-    ]
+    assert [item["sample_id"] for item in payload["reports"]] == [VALIDATION_SAMPLE_ID]
     assert len(payload["reports"][0]["scope_results"]) == 9
     assert payload["reports"][0]["research_view"]["production_authorization"] == (
         "not_authorized"
     )
     assert not list(store.output_root.glob(".stage5-tmp-*"))
+
+
+def test_related_party_scope_keeps_concentration_outside_runtime_contract() -> None:
+    manifest = load_stage5_sample_manifest(
+        VALIDATION_MANIFEST,
+        repository_root=REPOSITORY_ROOT,
+    )
+    plan = load_stage5_evidence_plan(VALIDATION_EVIDENCE_PLAN)
+    scope = next(
+        item
+        for item in Stage5EvidencePreparer(
+            PdfRouter(native=PypdfNativeAdapter())
+        ).prepare_report(
+            manifest=manifest,
+            evidence_plan=plan,
+            sample_id=VALIDATION_SAMPLE_ID,
+        )
+        if item.scope_id == "related_party_sales_purchases_and_services"
+    )
+    asset = manifest.report_by_id(VALIDATION_SAMPLE_ID)
+
+    request = _semantic_request(
+        "related-party-scope",
+        asset,
+        scope,
+        Stage5SemanticInput(unresolved_field_ids=scope.field_ids),
+    )
+
+    assert scope.field_ids == (
+        "counterparty_relationship",
+        "customer_concentration",
+        "supplier_concentration",
+    )
+    assert request.unresolved_field_ids == ("counterparty_relationship",)
+    assert [item.field_id for item in request.package_manifest.checklist] == [
+        "counterparty_relationship"
+    ]
+    assert {item.field_id for item in request.evidence_bundle} == {
+        "counterparty_relationship"
+    }
+    assert request.allowed_metric_types == ()
 
 
 def test_stage5_preparation_only_writes_no_provider_or_semantic_output(
@@ -279,9 +319,7 @@ def test_stage5_scope_selection_supports_explicit_multi_report_preflight(
     payload = json.loads(
         (execution.output_path / "manifest.json").read_text(encoding="utf-8")
     )
-    assert [
-        (item["sample_id"], item["scope_id"]) for item in payload["scopes"]
-    ] == [
+    assert [(item["sample_id"], item["scope_id"]) for item in payload["scopes"]] == [
         (
             "manufacturing-materials-300750-2025",
             "segment_product_industry_region",

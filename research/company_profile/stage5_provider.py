@@ -153,6 +153,13 @@ _SCOPE_INSTRUCTIONS = {
         "belongs to customer_ranking_rows and must not produce customer Relationships or "
         "customer Measurements here."
     ),
+    "related_party_sales_purchases_and_services": (
+        "This request scope records named related-party Relationships only. Transaction "
+        "amounts and sales, purchase, or service ratios in this table are related-party "
+        "transaction facts, not top-five customer or supplier concentration. Do not emit "
+        "Measurements for them and do not relabel them as customer_concentration or "
+        "supplier_concentration."
+    ),
     "top_five_customer_totals_only": (
         "This request scope is totals-only. If the complete supplied section reports customer "
         "amount/share but contains no customer identity rows, emit every explicitly disclosed "
@@ -1061,10 +1068,24 @@ def _counterparty_extract_schema(
         "related_party",
         "contract_counterparty",
     ]
-    if prepared_scope is not None and prepared_scope.scope_id == "customer_ranking_rows":
+    if (
+        prepared_scope is not None
+        and prepared_scope.scope_id == "customer_ranking_rows"
+    ):
         relation_types = ["customer"]
-    elif prepared_scope is not None and prepared_scope.scope_id == "supplier_ranking_rows":
+    elif (
+        prepared_scope is not None
+        and prepared_scope.scope_id == "supplier_ranking_rows"
+    ):
         relation_types = ["supplier"]
+    measurement_schema: dict[str, Any]
+    if request.allowed_metric_types:
+        measurement_schema = {
+            "type": "array",
+            "items": _compact_measurement_item_schema(request, prepared_scope),
+        }
+    else:
+        measurement_schema = {"type": "array", "maxItems": 0}
     return {
         "type": "object",
         "additionalProperties": False,
@@ -1096,10 +1117,7 @@ def _counterparty_extract_schema(
                     },
                 },
             },
-            "measurements": {
-                "type": "array",
-                "items": _compact_measurement_item_schema(request, prepared_scope),
-            },
+            "measurements": measurement_schema,
             "coverage": _compact_coverage_array_schema(request),
         },
     }
@@ -1576,14 +1594,21 @@ def _is_explicit_consolidation_adjustment(candidate: Any) -> bool:
         return False
     if getattr(candidate, "subject_scope", None) != SubjectScope.CONSOLIDATED_GROUP:
         return False
-    if (
-        getattr(candidate, "subject_basis", None)
-        != SubjectBasis.DIRECT_SOURCE_WORDING
-    ):
+    if getattr(candidate, "subject_basis", None) != SubjectBasis.DIRECT_SOURCE_WORDING:
         return False
     source_native = getattr(candidate, "source_native", None)
     label = str(getattr(source_native, "name", None) or "")
-    return bool(re.search(r"(?:抵[消销]|合并.*抵[消销])", label))
+    return _adjustment_label_has_group_wording(label)
+
+
+def _adjustment_label_has_group_wording(label: str) -> bool:
+    normalized = "".join(str(label).split())
+    return bool(
+        re.search(
+            r"(?:合并|本集团|集团).*抵[消销]|抵[消销].*(?:合并|本集团|集团)",
+            normalized,
+        )
+    )
 
 
 def _normalize_verify_response(
@@ -1610,9 +1635,8 @@ def _normalize_verify_response(
             item.value if isinstance(item, ContractErrorCode) else str(item)
             for item in (check.get("reason_codes") or ())
         )
-        if (
-            check.get("status") != "block"
-            or reasons != (ContractErrorCode.SUBJECT_UNSUPPORTED.value,)
+        if check.get("status") != "block" or reasons != (
+            ContractErrorCode.SUBJECT_UNSUPPORTED.value,
         ):
             continue
         candidate = candidates.get(str(check.get("target_id") or ""))
@@ -1672,6 +1696,53 @@ def _segment_table_evidence(
     return anchored
 
 
+def _measurement_table_evidence(
+    evidence: Any,
+    *,
+    measured_object: str,
+    source_native: Mapping[str, Any],
+) -> Any:
+    """Narrow a wide text excerpt only when it proves one physical table row."""
+
+    if not isinstance(evidence, list):
+        return evidence
+    source_value = str(source_native.get("value") or "").strip()
+    column_header = str(source_native.get("header") or "").strip()
+    normalized_object = "".join(str(measured_object).split())
+    normalized_value = "".join(source_value.split())
+    normalized_header = "".join(column_header.split())
+    if not normalized_object or not normalized_value or not normalized_header:
+        return evidence
+    anchored: list[Any] = []
+    for item in evidence:
+        if not isinstance(item, Mapping):
+            anchored.append(item)
+            continue
+        candidate_evidence = deepcopy(dict(item))
+        anchor = candidate_evidence.get("anchor")
+        if not isinstance(anchor, Mapping) or anchor.get("anchor_type") != "text":
+            anchored.append(candidate_evidence)
+            continue
+        bounded_quote = str(anchor.get("bounded_quote") or "")
+        normalized_quote = "".join(bounded_quote.split())
+        row_supported = any(
+            normalized_object in "".join(line.split())
+            and normalized_value in "".join(line.split())
+            for line in bounded_quote.splitlines()
+            if line.strip()
+        )
+        if row_supported and normalized_header in normalized_quote:
+            candidate_evidence["anchor"] = {
+                "anchor_type": "table",
+                "table_label": candidate_evidence.get("section_title"),
+                "row_label": measured_object,
+                "column_header": column_header,
+                "cell_locator": None,
+            }
+        anchored.append(candidate_evidence)
+    return anchored
+
+
 def _expand_segment_row_draft(
     row: dict[str, Any],
     *,
@@ -1688,20 +1759,28 @@ def _expand_segment_row_draft(
     # but resolve the common model ``unclear`` output to business_segment. An
     # adjustment row is deliberately excluded because its consolidated scope must
     # still be supported by its own wording/reconciliation evidence.
-    if row.get("subject_scope") in (None, "", "unclear"):
-        row = deepcopy(row)
-        if row.get("row_class") == "consolidation_adjustment":
-            # The validated row label itself is affirmative source wording for the
-            # consolidation adjustment (合并抵消项). It is not a business segment,
-            # but it is also not an inferred company-wide total.
+    row = deepcopy(row)
+    if row.get("row_class") == "consolidation_adjustment":
+        has_group_wording = _adjustment_label_has_group_wording(
+            str(row.get("label") or "")
+        )
+        has_reconciliation = (
+            row.get("subject_basis")
+            == "numeric_reconciliation_to_consolidated_statement"
+        )
+        if has_group_wording and row.get("subject_scope") in (None, "", "unclear"):
             row["subject_scope"] = "consolidated_group"
             row["subject_basis"] = "direct_source_wording"
-        else:
-            # A normal row is physically scoped by the disclosed table dimension
-            # (for example, 分产品 / 分地区 / 分销售模式). This is an
-            # Evidence-backed reconstruction, not a model default: the source
-            # dimension and row label are validated against table Evidence above.
-            row["subject_scope"] = "business_segment"
+        elif not has_group_wording and not has_reconciliation:
+            row["subject_scope"] = "unclear"
+            row.pop("subject_basis", None)
+            row.pop("subject_name", None)
+    elif row.get("subject_scope") in (None, "", "unclear"):
+        # A normal row is physically scoped by the disclosed table dimension
+        # (for example, 分产品 / 分地区 / 分销售模式). This is an
+        # Evidence-backed reconstruction, not a model default: the source
+        # dimension and row label are validated against table Evidence above.
+        row["subject_scope"] = "business_segment"
     common_keys = (
         "subject_scope",
         "subject_name",
@@ -1799,6 +1878,7 @@ def _expand_compact_measurements(
     *,
     field_id_for_metric: Callable[[str], str],
     prepared_scope: PreparedRequestScope,
+    field_id_for_measurement: Callable[[str, Mapping[str, Any]], str] | None = None,
 ) -> list[dict[str, Any]]:
     expanded: list[dict[str, Any]] = []
     for raw in measurements:
@@ -1810,7 +1890,11 @@ def _expand_compact_measurements(
         period_type = _measurement_period_type(metric_type)
         candidate = {
             "object_type": "Measurement",
-            "field_id": field_id_for_metric(metric_type),
+            "field_id": (
+                field_id_for_measurement(metric_type, item)
+                if field_id_for_measurement is not None
+                else field_id_for_metric(metric_type)
+            ),
             "metric_type": metric_type,
             "measured_object": item.get("measured_object") or item.get("name"),
             "subject_scope": "unclear",
@@ -1832,6 +1916,51 @@ def _expand_compact_measurements(
                 candidate[key] = item[key]
         expanded.append({"item_type": "candidate", "candidate": candidate})
     return expanded
+
+
+def _counterparty_measurement_field(
+    metric_type: str,
+    item: Mapping[str, Any],
+    *,
+    request: SemanticTaskRequest,
+) -> str:
+    active = set(request.unresolved_field_ids)
+    if metric_type == "customer_sales_amount":
+        if "customer_concentration" in active:
+            return "customer_concentration"
+        raise ValueError("customer amount is outside the active counterparty direction")
+    if metric_type == "supplier_purchase_amount":
+        if "supplier_concentration" in active:
+            return "supplier_concentration"
+        raise ValueError("supplier amount is outside the active counterparty direction")
+    if metric_type == "disclosed_share":
+        source_label = "".join(
+            str(item.get(key) or "")
+            for key in (
+                "name",
+                "measured_object",
+                "header",
+                "qualifier",
+                "relationship_context",
+            )
+        )
+        if (
+            re.search(r"供应商|采购", source_label)
+            and "supplier_concentration" in active
+        ):
+            return "supplier_concentration"
+        if re.search(r"客户|销售", source_label) and "customer_concentration" in active:
+            return "customer_concentration"
+    concentration_fields = [
+        field_id
+        for field_id in request.unresolved_field_ids
+        if field_id in {"customer_concentration", "supplier_concentration"}
+    ]
+    if len(concentration_fields) == 1:
+        return concentration_fields[0]
+    raise ValueError(
+        f"counterparty measurement has ambiguous field direction: {metric_type!r}"
+    )
 
 
 def _append_compact_coverage(target: list[dict[str, Any]], coverage: Any) -> None:
@@ -1876,18 +2005,17 @@ def _expand_counterparty_draft(
         if item.get("external_entity_id") is not None:
             candidate["external_entity_id"] = item["external_entity_id"]
         result["items"].append({"item_type": "candidate", "candidate": candidate})
-    concentration_field = next(
-        (
-            field_id
-            for field_id in request.unresolved_field_ids
-            if field_id != "counterparty_relationship"
-        ),
-        "counterparty_relationship",
-    )
     result["items"].extend(
         _expand_compact_measurements(
             measurements,
-            field_id_for_metric=lambda _: concentration_field,
+            field_id_for_metric=lambda metric_type: metric_type,
+            field_id_for_measurement=lambda metric_type, item: (
+                _counterparty_measurement_field(
+                    metric_type,
+                    item,
+                    request=request,
+                )
+            ),
             prepared_scope=prepared_scope,
         )
     )
@@ -2250,7 +2378,10 @@ def _require_reported_business_change_coverage(
     )
     marker = "业务、产品或服务发生重大变化"
     marker_index = source_text.find(marker)
-    if marker_index < 0 or "不适用" not in source_text[marker_index : marker_index + 160]:
+    if (
+        marker_index < 0
+        or "不适用" not in source_text[marker_index : marker_index + 160]
+    ):
         return
     if not isinstance(result, Mapping):
         raise TypeError(
@@ -2267,8 +2398,7 @@ def _require_reported_business_change_coverage(
         and isinstance(item.get("coverage"), Mapping)
         and item["coverage"].get("field_id") == "business_regime"
         and item["coverage"].get("status") == "not_applicable"
-        and item["coverage"].get("reason_code")
-        == "source_explicitly_not_applicable"
+        and item["coverage"].get("reason_code") == "source_explicitly_not_applicable"
         for item in items
     )
     if not has_coverage:
@@ -2305,11 +2435,7 @@ def _normalize_adapter_reported_period(
     value = reported_period.strip()
     report_period = prepared_scope.report.report_period
     report_year = report_period[:4]
-    if (
-        period_type == "duration"
-        and value == report_period
-        and report_year.isdigit()
-    ):
+    if period_type == "duration" and value == report_period and report_year.isdigit():
         return report_year
     return value
 
@@ -2378,6 +2504,14 @@ def _expand_candidate_draft(
         logical_slot = _METRIC_LOGICAL_SLOTS.get(str(candidate.get("metric_type")))
         if logical_slot is not None:
             candidate["logical_slot"] = logical_slot
+        if request.chapter_task.value == "extract_operating_quantities":
+            source_native = candidate.get("source_native")
+            if isinstance(source_native, Mapping):
+                candidate["evidence"] = _measurement_table_evidence(
+                    candidate.get("evidence"),
+                    measured_object=str(candidate.get("measured_object") or ""),
+                    source_native=source_native,
+                )
     return candidate
 
 
@@ -2493,6 +2627,7 @@ def _stable_record_id(
     ).encode("utf-8")
     return f"stage5-{hashlib.sha256(encoded).hexdigest()[:24]}"
 
+
 def _ensure_unique_generated_record_ids(items: list[Any]) -> None:
     """Disambiguate repeated model drafts before strict response validation.
 
@@ -2575,9 +2710,7 @@ class CommonGatewaySemanticProvider:
         self._profile = profile
         self._prepared_scope = prepared_scope
         self._extract_max_output_tokens = max_output_tokens
-        self._verify_max_output_tokens = (
-            verify_max_output_tokens or max_output_tokens
-        )
+        self._verify_max_output_tokens = verify_max_output_tokens or max_output_tokens
         self._timeout_seconds = timeout_seconds
         self._runner = runner
         self._traces: list[Stage5ProviderCallTrace] = []
@@ -2780,8 +2913,8 @@ class CommonGatewaySemanticProvider:
                     "comparison_basis. A Segment or Measurement whose subject_scope "
                     "is business_segment is supported by its disclosed segment dimension; do "
                     "not require issuer/consolidated wording for that scope. A Segment or "
-                    "Measurement whose validated source-native row label explicitly identifies "
-                    "a consolidation elimination or adjustment, with row_class="
+                    "Measurement whose validated source-native row label explicitly contains "
+                    "affirmative group wording such as 合并抵消项, with row_class="
                     "consolidation_adjustment, subject_scope=consolidated_group, and "
                     "subject_basis=direct_source_wording, has affirmative subject Evidence; "
                     "do not return subject_unsupported solely for that declared subject. "
@@ -2808,10 +2941,7 @@ class CommonGatewaySemanticProvider:
                         "not be interpreted as evidence that principal business, products, "
                         "or services were unchanged, and it must not create a BusinessEvent."
                     )
-                if (
-                    self._prepared_scope.chapter_task.value
-                    == "extract_material_inputs"
-                ):
+                if self._prepared_scope.chapter_task.value == "extract_material_inputs":
                     system_instruction += (
                         " In extract_material_inputs, the governed material_input "
                         "Relationship covers both explicitly named raw-material inputs and "

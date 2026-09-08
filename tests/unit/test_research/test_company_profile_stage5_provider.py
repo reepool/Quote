@@ -39,6 +39,7 @@ from research.company_profile.models import (
     SourceNativeValue,
     SubjectBasis,
     SubjectScope,
+    TableAnchor,
     TextAnchor,
 )
 from research.company_profile.stage5 import PreparedPageContext, PreparedRequestScope
@@ -526,6 +527,112 @@ def test_stage5_capacity_processing_scope_uses_flat_measurements() -> None:
     assert candidates[1]["logical_slot"] == "processing_volume"
 
 
+def test_equal_utilization_rows_receive_distinct_table_occurrences() -> None:
+    prepared = _prepared_scope()
+    source_text = "产能及产能利用率\n类别 产能利用率\n铁 96%\n坯材 96%"
+    evidence = prepared.evidence_bundle[0].evidence.model_copy(
+        update={
+            "page": 22,
+            "section_title": "产能及产能利用率",
+            "anchor": TextAnchor(bounded_quote=source_text),
+        }
+    )
+    prepared = prepared.model_copy(
+        update={
+            "scope_id": "capacity_and_steel_process_tables",
+            "chapter_task": ChapterTask.EXTRACT_OPERATING_QUANTITIES,
+            "field_ids": ("capacity_utilization",),
+            "evidence_bundle": (
+                PreparedEvidence(evidence=evidence, field_id="capacity_utilization"),
+            ),
+            "page_contexts": (
+                PreparedPageContext(
+                    page=22,
+                    text=source_text,
+                    text_hash="d" * 64,
+                    extraction_method="pypdf",
+                    quality_status="usable",
+                ),
+            ),
+        }
+    )
+    checklist = ChecklistItem(
+        field_id="capacity_utilization",
+        object_type=ObjectType.MEASUREMENT,
+        chapter_task=ChapterTask.EXTRACT_OPERATING_QUANTITIES,
+        requirement_level=RequirementLevel.CONDITIONAL,
+        allowed_coverage_statuses=tuple(CoverageStatus),
+        allowed_metric_types=(MetricType.CAPACITY_UTILIZATION,),
+    )
+    request = SemanticTaskRequest(
+        request_id="slice-1:equal-utilization",
+        report=prepared.report,
+        package_manifest=PackageManifest(
+            package_name="manufacturing_materials",
+            package_version="v1",
+            report=prepared.report,
+            checklist=(checklist,),
+        ),
+        chapter_task=prepared.chapter_task,
+        evidence_bundle=prepared.evidence_bundle,
+        allowed_object_types=(ObjectType.MEASUREMENT,),
+        allowed_metric_types=(MetricType.CAPACITY_UTILIZATION,),
+        unresolved_field_ids=("capacity_utilization",),
+    )
+    expanded = _expand_extract_response(
+        {
+            "measurements": [
+                {
+                    "metric_type": "capacity_utilization",
+                    "name": "铁",
+                    "value": "96",
+                    "unit": "%",
+                    "header": "产能利用率",
+                    "evidence_id": evidence.evidence_id,
+                },
+                {
+                    "metric_type": "capacity_utilization",
+                    "name": "坯材",
+                    "value": "96",
+                    "unit": "%",
+                    "header": "产能利用率",
+                    "evidence_id": evidence.evidence_id,
+                },
+            ],
+            "coverage": [],
+        },
+        request=request,
+        prepared_scope=prepared,
+    )
+    candidates = ExtractResponse.model_validate_json(
+        json.dumps(expanded, ensure_ascii=False)
+    ).candidates()
+
+    assert [candidate.measured_object for candidate in candidates] == ["铁", "坯材"]
+    assert all(
+        isinstance(candidate.evidence[0].anchor, TableAnchor)
+        for candidate in candidates
+    )
+    assert [candidate.evidence[0].anchor.row_label for candidate in candidates] == [
+        "铁",
+        "坯材",
+    ]
+    assert len({candidate.occurrence_id() for candidate in candidates}) == 2
+
+    result = CompanyProfileSemanticService().run_task(
+        request.model_copy(
+            update={
+                "deterministic_candidates": candidates,
+                "unresolved_field_ids": (),
+            }
+        )
+    )
+    assert result.task_complete is True
+    assert {item.status.value for item in result.dispositions} == {
+        "accepted_for_review"
+    }
+
+
 def test_composite_processing_label_can_pass_one_primary_metric_verification() -> None:
     prepared = _prepared_scope().model_copy(
         update={
@@ -732,6 +839,187 @@ def test_non_totals_counterparty_scope_uses_compact_relationships_and_measuremen
     assert relationship["field_id"] == "counterparty_relationship"
     assert measurement["field_id"] == "supplier_concentration"
     assert measurement["logical_slot"] == "supplier_purchase_amount"
+
+
+def test_counterparty_measurements_bind_customer_and_supplier_directions() -> None:
+    prepared = _prepared_scope().model_copy(
+        update={
+            "scope_id": "top_five_totals_and_legal_empty_names",
+            "chapter_task": ChapterTask.EXTRACT_COUNTERPARTIES_AND_CONCENTRATION,
+            "field_ids": (
+                "counterparty_relationship",
+                "customer_concentration",
+                "supplier_concentration",
+            ),
+        }
+    )
+    checklist = (
+        ChecklistItem(
+            field_id="counterparty_relationship",
+            object_type=ObjectType.RELATIONSHIP,
+            chapter_task=prepared.chapter_task,
+            requirement_level=RequirementLevel.CONDITIONAL,
+            allowed_coverage_statuses=tuple(CoverageStatus),
+        ),
+        ChecklistItem(
+            field_id="customer_concentration",
+            object_type=ObjectType.MEASUREMENT,
+            chapter_task=prepared.chapter_task,
+            requirement_level=RequirementLevel.CONDITIONAL,
+            allowed_coverage_statuses=tuple(CoverageStatus),
+            allowed_metric_types=(
+                MetricType.CUSTOMER_SALES_AMOUNT,
+                MetricType.DISCLOSED_SHARE,
+            ),
+        ),
+        ChecklistItem(
+            field_id="supplier_concentration",
+            object_type=ObjectType.MEASUREMENT,
+            chapter_task=prepared.chapter_task,
+            requirement_level=RequirementLevel.CONDITIONAL,
+            allowed_coverage_statuses=tuple(CoverageStatus),
+            allowed_metric_types=(
+                MetricType.SUPPLIER_PURCHASE_AMOUNT,
+                MetricType.DISCLOSED_SHARE,
+            ),
+        ),
+    )
+    request = SemanticTaskRequest(
+        request_id="counterparty-both-directions",
+        report=prepared.report,
+        package_manifest=PackageManifest(
+            package_name="manufacturing_materials",
+            package_version="v1",
+            report=prepared.report,
+            checklist=checklist,
+        ),
+        chapter_task=prepared.chapter_task,
+        evidence_bundle=prepared.evidence_bundle,
+        allowed_object_types=(ObjectType.RELATIONSHIP, ObjectType.MEASUREMENT),
+        allowed_metric_types=(
+            MetricType.CUSTOMER_SALES_AMOUNT,
+            MetricType.SUPPLIER_PURCHASE_AMOUNT,
+            MetricType.DISCLOSED_SHARE,
+        ),
+        unresolved_field_ids=(
+            "counterparty_relationship",
+            "customer_concentration",
+            "supplier_concentration",
+        ),
+    )
+    evidence_id = prepared.evidence_bundle[0].evidence.evidence_id
+    client = _FakeGatewayClient(
+        outputs=[
+            {
+                "relationships": [],
+                "measurements": [
+                    {
+                        "metric_type": "customer_sales_amount",
+                        "name": "前五名客户销售额",
+                        "value": "100",
+                        "unit": "亿元",
+                        "evidence_id": evidence_id,
+                    },
+                    {
+                        "metric_type": "supplier_purchase_amount",
+                        "name": "前五名供应商采购额",
+                        "value": "95",
+                        "unit": "亿元",
+                        "evidence_id": evidence_id,
+                    },
+                    {
+                        "metric_type": "disclosed_share",
+                        "name": "前五名客户销售额占比",
+                        "value": "20",
+                        "unit": "%",
+                        "evidence_id": evidence_id,
+                    },
+                    {
+                        "metric_type": "disclosed_share",
+                        "name": "前五名供应商采购额占比",
+                        "value": "30",
+                        "unit": "%",
+                        "evidence_id": evidence_id,
+                    },
+                ],
+                "coverage": [],
+            }
+        ]
+    )
+    provider = CommonGatewaySemanticProvider(
+        client=client,
+        profile="semantic_extraction",
+        prepared_scope=prepared,
+        max_output_tokens=2000,
+        timeout_seconds=30,
+    )
+
+    response = provider.extract(request)
+    candidates = [item["candidate"] for item in response["items"]]
+
+    assert [item["field_id"] for item in candidates] == [
+        "customer_concentration",
+        "supplier_concentration",
+        "customer_concentration",
+        "supplier_concentration",
+    ]
+    assert [item["logical_slot"] for item in candidates] == [
+        "customer_sales_amount",
+        "supplier_purchase_amount",
+        "disclosed_share",
+        "disclosed_share",
+    ]
+
+
+def test_related_party_scope_schema_rejects_transaction_measurements() -> None:
+    prepared = _prepared_scope().model_copy(
+        update={
+            "scope_id": "related_party_sales_purchases_and_services",
+            "chapter_task": ChapterTask.EXTRACT_COUNTERPARTIES_AND_CONCENTRATION,
+            "field_ids": ("counterparty_relationship",),
+        }
+    )
+    checklist = ChecklistItem(
+        field_id="counterparty_relationship",
+        object_type=ObjectType.RELATIONSHIP,
+        chapter_task=prepared.chapter_task,
+        requirement_level=RequirementLevel.CONDITIONAL,
+        allowed_coverage_statuses=tuple(CoverageStatus),
+    )
+    request = SemanticTaskRequest(
+        request_id="related-party-only",
+        report=prepared.report,
+        package_manifest=PackageManifest(
+            package_name="manufacturing_materials",
+            package_version="v1",
+            report=prepared.report,
+            checklist=(checklist,),
+        ),
+        chapter_task=prepared.chapter_task,
+        evidence_bundle=prepared.evidence_bundle,
+        allowed_object_types=(ObjectType.RELATIONSHIP,),
+        unresolved_field_ids=("counterparty_relationship",),
+    )
+    client = _FakeGatewayClient(
+        outputs=[{"relationships": [], "measurements": [], "coverage": []}]
+    )
+    provider = CommonGatewaySemanticProvider(
+        client=client,
+        profile="semantic_extraction",
+        prepared_scope=prepared,
+        max_output_tokens=1000,
+        timeout_seconds=30,
+    )
+
+    provider.extract(request)
+
+    schema = client.requests[0].response_schema
+    assert schema["properties"]["measurements"] == {
+        "type": "array",
+        "maxItems": 0,
+    }
+    user_message = LlmMessage.from_value(client.requests[0].messages[1]).content
+    assert "not top-five customer or supplier concentration" in user_message
 
 
 def test_material_input_scope_can_return_observed_items_without_false_coverage() -> (
@@ -973,8 +1261,7 @@ def test_product_extension_drops_operating_mode_no_change_coverage() -> None:
         }
     )
     source_text = (
-        "报告期内，新增电子级羟胺水溶液供应。"
-        "公司在报告期内，经营模式未发生重大变化。"
+        "报告期内，新增电子级羟胺水溶液供应。公司在报告期内，经营模式未发生重大变化。"
     )
     evidence = prepared.evidence_bundle[0].evidence.model_copy(
         update={
@@ -1040,7 +1327,9 @@ def test_product_extension_drops_operating_mode_no_change_coverage() -> None:
     assert result.task_complete is True
 
 
-def test_consolidation_change_not_applicable_is_explicitly_supported_for_verify() -> None:
+def test_consolidation_change_not_applicable_is_explicitly_supported_for_verify() -> (
+    None
+):
     prepared = _reported_business_change_scope()
     source_text = "（八）合并报表范围的变化情况 □适用 √不适用"
     evidence = prepared.evidence_bundle[0].evidence.model_copy(
@@ -1447,6 +1736,47 @@ def test_segment_adjustment_row_does_not_inherit_business_segment_scope() -> Non
     )
 
 
+def test_inter_segment_elimination_keeps_unclear_subject_scope() -> None:
+    prepared = _segment_prepared_scope()
+    evidence = prepared.evidence_bundle[0].evidence.model_copy(
+        update={
+            "anchor": TextAnchor(
+                bounded_quote="分行业 营业收入 营业成本 分部间抵消 -1 -2"
+            )
+        }
+    )
+    prepared = prepared.model_copy(
+        update={
+            "source_row_dimensions": {"分部间抵消": "分行业"},
+            "evidence_bundle": (PreparedEvidence(evidence=evidence),),
+        }
+    )
+    request = _segment_extract_request(prepared)
+    expanded = _expand_extract_response(
+        _segment_row_response(
+            request_id=request.request_id,
+            evidence_id=evidence.evidence_id,
+            label="分部间抵消",
+            row_class="consolidation_adjustment",
+        ),
+        request=request,
+        prepared_scope=prepared,
+    )
+    candidates = ExtractResponse.model_validate_json(
+        json.dumps(expanded, ensure_ascii=False)
+    ).candidates()
+
+    assert candidates
+    assert all(
+        candidate.row_class.value == "consolidation_adjustment"
+        for candidate in candidates
+    )
+    assert all(
+        candidate.subject_scope == SubjectScope.UNCLEAR for candidate in candidates
+    )
+    assert all(candidate.subject_basis is None for candidate in candidates)
+
+
 def test_plan_bound_sales_mode_dimension_uses_source_native_table_header() -> None:
     prepared = _segment_prepared_scope()
     evidence = prepared.evidence_bundle[0].evidence.model_copy(
@@ -1713,7 +2043,9 @@ def test_adapter_period_semantics_distinguish_duration_instant_and_narrower_peri
     )
 
 
-def test_business_event_keeps_occurrence_effective_and_knowledge_time_separate() -> None:
+def test_business_event_keeps_occurrence_effective_and_knowledge_time_separate() -> (
+    None
+):
     prepared = _prepared_scope().model_copy(
         update={
             "scope_id": "restructuring_commitment",
@@ -2210,7 +2542,7 @@ def test_verify_accepts_explicit_consolidation_adjustment_subject() -> None:
         "Measurement",
     }
     system_message = LlmMessage.from_value(client.requests[0].messages[0]).content
-    assert "validated source-native row label explicitly identifies" in system_message
+    assert "affirmative group wording such as 合并抵消项" in system_message
     assert "do not return subject_unsupported solely" in system_message
 
 
@@ -2262,9 +2594,9 @@ def test_verify_does_not_normalize_ordinary_segment_subject_block() -> None:
     response = provider.verify(request)
 
     assert {item["status"] for item in response["checks"]} == {"block"}
-    assert {
-        tuple(item["reason_codes"]) for item in response["checks"]
-    } == {(ContractErrorCode.SUBJECT_UNSUPPORTED.value,)}
+    assert {tuple(item["reason_codes"]) for item in response["checks"]} == {
+        (ContractErrorCode.SUBJECT_UNSUPPORTED.value,)
+    }
 
 
 def test_verify_keeps_additional_adjustment_failure_blocking() -> None:
@@ -2434,7 +2766,9 @@ def test_common_gateway_provider_uses_separate_repair_and_verify_requests() -> N
     )
     assert "one Evidence item may be bound to several field_ids" in verify_instruction
     assert "source_value_mutation as applicable only when" in verify_instruction
-    assert "does not normally need comparison_basis merely because" in verify_instruction
+    assert (
+        "does not normally need comparison_basis merely because" in verify_instruction
+    )
     assert "same_control_comparison_basis scope" in verify_instruction
     assert "activity_actor_unsupported reason applies only to Activity" in (
         verify_instruction
@@ -2941,14 +3275,13 @@ def _segment_row_response(
     }
 
 
-def _consolidation_adjustment_verify_request(
-) -> tuple[PreparedRequestScope, VerifyRequest]:
+def _consolidation_adjustment_verify_request() -> tuple[
+    PreparedRequestScope, VerifyRequest
+]:
     prepared = _segment_prepared_scope()
     evidence = prepared.evidence_bundle[0].evidence.model_copy(
         update={
-            "anchor": TextAnchor(
-                bounded_quote="分产品 合并抵消项 -2,098,859,323.96 元"
-            )
+            "anchor": TextAnchor(bounded_quote="分产品 合并抵消项 -2,098,859,323.96 元")
         }
     )
     prepared = prepared.model_copy(
