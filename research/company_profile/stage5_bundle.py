@@ -87,6 +87,11 @@ class Stage5ProviderCallTrace(_StrictModel):
     provider: str | None = None
     model: str | None = None
     response_hash: str | None = None
+    latency_ms: int | None = Field(default=None, ge=0)
+    input_tokens: int | None = Field(default=None, ge=0)
+    output_tokens: int | None = Field(default=None, ge=0)
+    total_tokens: int | None = Field(default=None, ge=0)
+    warnings: tuple[str, ...] = ()
     error_code: str | None = None
     error_detail: str | None = Field(default=None, max_length=2000)
 

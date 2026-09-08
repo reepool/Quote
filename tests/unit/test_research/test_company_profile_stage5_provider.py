@@ -1447,6 +1447,46 @@ def test_segment_adjustment_row_does_not_inherit_business_segment_scope() -> Non
     )
 
 
+def test_plan_bound_sales_mode_dimension_uses_source_native_table_header() -> None:
+    prepared = _segment_prepared_scope()
+    evidence = prepared.evidence_bundle[0].evidence.model_copy(
+        update={
+            "anchor": TextAnchor(
+                bounded_quote=(
+                    "主营业务分销售模式情况\n"
+                    "销售模式 营业收入 营业成本 毛利率\n"
+                    "集中销售 100 80 20%"
+                )
+            )
+        }
+    )
+    prepared = prepared.model_copy(
+        update={
+            "source_row_dimensions": {"集中销售": "销售模式"},
+            "evidence_bundle": (PreparedEvidence(evidence=evidence),),
+        }
+    )
+    request = _segment_extract_request(prepared)
+    evidence_id = evidence.evidence_id
+
+    expanded = _expand_extract_response(
+        _segment_row_response(
+            request_id=request.request_id,
+            evidence_id=evidence_id,
+            label="集中销售",
+        ),
+        request=request,
+        prepared_scope=prepared,
+    )
+    candidates = ExtractResponse.model_validate_json(
+        json.dumps(expanded, ensure_ascii=False)
+    ).candidates()
+
+    assert candidates[0].dimension == "销售模式"
+    assert candidates[0].source_native.header == "销售模式"
+    assert candidates[1].segment_dimension == "销售模式"
+
+
 def test_same_page_totals_in_different_dimensions_are_distinct_occurrences() -> None:
     prepared = _segment_prepared_scope()
     evidence = prepared.evidence_bundle[0].evidence.model_copy(
@@ -2346,6 +2386,7 @@ def test_common_gateway_provider_uses_separate_repair_and_verify_requests() -> N
         profile="semantic_extraction",
         prepared_scope=prepared,
         max_output_tokens=2000,
+        verify_max_output_tokens=1200,
         timeout_seconds=30,
     )
 
@@ -2357,6 +2398,7 @@ def test_common_gateway_provider_uses_separate_repair_and_verify_requests() -> N
         "company_profile_repair_response",
         "company_profile_verify_response",
     ]
+    assert [request.max_output_tokens for request in client.requests] == [2000, 1200]
     assert [trace.call_type for trace in provider.traces] == ["repair", "verify"]
     assert client.requests[0].idempotency_key != client.requests[1].idempotency_key
     repair_schema = client.requests[0].response_schema

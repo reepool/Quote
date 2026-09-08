@@ -13,6 +13,11 @@ from pathlib import Path
 from typing import Any
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
+STAGE5_DEFAULT_PROVIDER_ROUTE = "semantic_extraction__scorpio_grok"
+STAGE5_DEFAULT_EXTRACT_MAX_OUTPUT_TOKENS = 20_000
+STAGE5_DEFAULT_VERIFY_MAX_OUTPUT_TOKENS = 18_000
+STAGE5_DEFAULT_TIMEOUT_SECONDS = 300.0
+STAGE5_DEFAULT_MAX_PROVIDER_CALLS = 27
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
@@ -100,16 +105,42 @@ def build_parser() -> argparse.ArgumentParser:
             "approved samples; repeat for multiple held scopes"
         ),
     )
-    parser.add_argument("--provider-route", required=True)
-    parser.add_argument("--max-output-tokens", required=True, type=int)
-    parser.add_argument("--timeout-seconds", required=True, type=float)
-    parser.add_argument("--max-provider-calls", required=True, type=int)
+    parser.add_argument(
+        "--provider-route",
+        default=STAGE5_DEFAULT_PROVIDER_ROUTE,
+        help="concrete LLM profile; defaults to the measured Stage 5 primary",
+    )
+    parser.add_argument(
+        "--max-output-tokens",
+        type=int,
+        help="legacy global override applied to extract, repair, and verify",
+    )
+    parser.add_argument(
+        "--extract-max-output-tokens",
+        type=int,
+        default=STAGE5_DEFAULT_EXTRACT_MAX_OUTPUT_TOKENS,
+    )
+    parser.add_argument(
+        "--verify-max-output-tokens",
+        type=int,
+        default=STAGE5_DEFAULT_VERIFY_MAX_OUTPUT_TOKENS,
+    )
+    parser.add_argument(
+        "--timeout-seconds",
+        type=float,
+        default=STAGE5_DEFAULT_TIMEOUT_SECONDS,
+    )
+    parser.add_argument(
+        "--max-provider-calls",
+        type=int,
+        default=STAGE5_DEFAULT_MAX_PROVIDER_CALLS,
+    )
     return parser
 
 
 def main(argv: Sequence[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
-    _validate_budget(args)
+    extract_max_output_tokens, verify_max_output_tokens = _validate_budget(args)
     manifest = load_stage5_sample_manifest(
         args.sample_manifest,
         repository_root=ROOT_DIR,
@@ -168,7 +199,8 @@ def main(argv: Sequence[str] | None = None) -> int:
                 client=client,
                 runner=runner,
                 route=args.provider_route,
-                max_output_tokens=args.max_output_tokens,
+                max_output_tokens=extract_max_output_tokens,
+                verify_max_output_tokens=verify_max_output_tokens,
                 timeout_seconds=args.timeout_seconds,
                 budget=budget,
             ),
@@ -190,6 +222,7 @@ def _provider_for_scope(
     runner: asyncio.Runner,
     route: str,
     max_output_tokens: int,
+    verify_max_output_tokens: int,
     timeout_seconds: float,
     budget: _ProviderCallBudget,
 ) -> _BudgetedProvider:
@@ -199,6 +232,7 @@ def _provider_for_scope(
             profile=route,
             prepared_scope=scope,
             max_output_tokens=max_output_tokens,
+            verify_max_output_tokens=verify_max_output_tokens,
             timeout_seconds=timeout_seconds,
             runner=runner,
         ),
@@ -206,13 +240,20 @@ def _provider_for_scope(
     )
 
 
-def _validate_budget(args: Any) -> None:
-    if args.max_output_tokens < 1:
+def _validate_budget(args: Any) -> tuple[int, int]:
+    if args.max_output_tokens is not None and args.max_output_tokens < 1:
         raise ValueError("max-output-tokens must be positive")
+    if args.extract_max_output_tokens < 1:
+        raise ValueError("extract-max-output-tokens must be positive")
+    if args.verify_max_output_tokens < 1:
+        raise ValueError("verify-max-output-tokens must be positive")
     if args.timeout_seconds <= 0:
         raise ValueError("timeout-seconds must be positive")
     if args.max_provider_calls < 1:
         raise ValueError("max-provider-calls must be positive")
+    if args.max_output_tokens is not None:
+        return args.max_output_tokens, args.max_output_tokens
+    return args.extract_max_output_tokens, args.verify_max_output_tokens
 
 
 def _print_result(payload: dict[str, Any], *, provider_calls: int) -> None:

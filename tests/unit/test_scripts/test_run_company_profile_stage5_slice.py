@@ -25,6 +25,57 @@ VALIDATION_MANIFEST = VALIDATION_CHANGE / "out-of-sample-manifest.v1.json"
 VALIDATION_EVIDENCE_PLAN = VALIDATION_CHANGE / "evidence-plan.v1.json"
 
 
+def _minimal_operator_args() -> tuple[str, ...]:
+    return (
+        "--mode",
+        "preparation-only",
+        "--sample-manifest",
+        str(SAMPLE_MANIFEST),
+        "--evidence-plan",
+        str(EVIDENCE_PLAN),
+        "--output-root",
+        "/tmp/stage5-operator-default-test",
+        "--run-id",
+        "operator-defaults",
+    )
+
+
+def test_stage5_operator_uses_measured_execution_defaults() -> None:
+    args = operator.build_parser().parse_args(_minimal_operator_args())
+
+    assert args.provider_route == "semantic_extraction__scorpio_grok"
+    assert args.extract_max_output_tokens == 20_000
+    assert args.verify_max_output_tokens == 18_000
+    assert args.timeout_seconds == 300.0
+    assert args.max_provider_calls == 27
+    assert operator._validate_budget(args) == (20_000, 18_000)
+
+
+def test_stage5_operator_legacy_output_override_applies_to_all_calls() -> None:
+    args = operator.build_parser().parse_args(
+        (*_minimal_operator_args(), "--max-output-tokens", "9000")
+    )
+
+    assert operator._validate_budget(args) == (9_000, 9_000)
+
+
+@pytest.mark.parametrize(
+    ("flag", "message"),
+    (
+        ("--extract-max-output-tokens", "extract-max-output-tokens"),
+        ("--verify-max-output-tokens", "verify-max-output-tokens"),
+        ("--max-output-tokens", "max-output-tokens"),
+    ),
+)
+def test_stage5_operator_rejects_invalid_output_overrides(
+    flag: str, message: str
+) -> None:
+    args = operator.build_parser().parse_args((*_minimal_operator_args(), flag, "0"))
+
+    with pytest.raises(ValueError, match=message):
+        operator._validate_budget(args)
+
+
 def test_stage5_operator_can_limit_preparation_to_one_approved_sample(
     tmp_path: Path,
     capsys,

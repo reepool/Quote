@@ -1552,16 +1552,17 @@ def _validate_segment_row_source_labels(
         raise ValueError(
             f"segment dimension must occur in its cited Evidence: {dimension!r}"
         )
-    normalized_lines = {
-        "".join(line.split()) for line in source_text.splitlines() if line.strip()
-    }
-    if (
-        normalized_dimension not in normalized_lines
-        and not normalized_dimension.startswith(("分", "按"))
-    ):
-        raise ValueError(
-            f"segment dimension must preserve the full source heading: {dimension!r}"
-        )
+    if planned_dimension is None:
+        normalized_lines = {
+            "".join(line.split()) for line in source_text.splitlines() if line.strip()
+        }
+        if (
+            normalized_dimension not in normalized_lines
+            and not normalized_dimension.startswith(("分", "按"))
+        ):
+            raise ValueError(
+                f"segment dimension must preserve the full source heading: {dimension!r}"
+            )
     return dimension
 
 
@@ -2559,18 +2560,24 @@ class CommonGatewaySemanticProvider:
         prepared_scope: PreparedRequestScope,
         max_output_tokens: int,
         timeout_seconds: float,
+        verify_max_output_tokens: int | None = None,
         runner: asyncio.Runner | None = None,
     ) -> None:
         if not profile.strip():
             raise ValueError("LLM profile is required")
         if max_output_tokens < 1:
             raise ValueError("max_output_tokens must be positive")
+        if verify_max_output_tokens is not None and verify_max_output_tokens < 1:
+            raise ValueError("verify_max_output_tokens must be positive")
         if timeout_seconds <= 0:
             raise ValueError("timeout_seconds must be positive")
         self._client = client
         self._profile = profile
         self._prepared_scope = prepared_scope
-        self._max_output_tokens = max_output_tokens
+        self._extract_max_output_tokens = max_output_tokens
+        self._verify_max_output_tokens = (
+            verify_max_output_tokens or max_output_tokens
+        )
         self._timeout_seconds = timeout_seconds
         self._runner = runner
         self._traces: list[Stage5ProviderCallTrace] = []
@@ -2859,7 +2866,11 @@ class CommonGatewaySemanticProvider:
             schema_name=schema_name,
             schema_version=schema_version,
             temperature=0,
-            max_output_tokens=self._max_output_tokens,
+            max_output_tokens=(
+                self._verify_max_output_tokens
+                if call_type == "verify"
+                else self._extract_max_output_tokens
+            ),
             timeout_seconds=self._timeout_seconds,
             idempotency_key=f"{semantic_request_id}:{call_type}",
             metadata={
@@ -2923,6 +2934,17 @@ class CommonGatewaySemanticProvider:
                 provider=response.provider,
                 model=response.model,
                 response_hash=response.response_hash,
+                latency_ms=response.latency_ms,
+                input_tokens=(
+                    response.usage.input_tokens if response.usage is not None else None
+                ),
+                output_tokens=(
+                    response.usage.output_tokens if response.usage is not None else None
+                ),
+                total_tokens=(
+                    response.usage.total_tokens if response.usage is not None else None
+                ),
+                warnings=response.warnings,
             )
         )
         return parsed.model_dump(mode="json")
