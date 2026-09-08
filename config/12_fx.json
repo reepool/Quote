@@ -496,7 +496,8 @@
           "policy": "us_business_day_configured_holidays",
           "holiday_dates": []
         },
-        "quality_flag": "official"
+        "quality_flag": "official",
+        "note": "DTWEXBGS usually arrives in weekly batches. Readiness keeps a 10-calendar-day stale budget and extends it by weekday US holidays so Labor Day weekends do not false-block."
       },
       "ecb_reference_rates": {
         "enabled": false,

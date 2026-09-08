@@ -471,6 +471,105 @@ def test_fx_readiness_uses_source_stale_override(tmp_path):
     assert readiness["series"]["FXI.USD_TRADE_WEIGHTED.FRED.DAILY"]["max_stale_observation_days"] == 10
 
 
+def test_fx_readiness_extends_stale_window_for_source_weekday_holidays(tmp_path):
+    config, storage = _seed_storage(tmp_path)
+    module_cfg = config.modules["fx_market_data"]
+    module_cfg["quality"]["required_first_phase_series"] = ["FXI.USD_TRADE_WEIGHTED.FRED.DAILY"]
+    module_cfg["sources"]["fred_trade_weighted_dollar"]["max_stale_observation_days"] = 10
+    module_cfg["sources"]["fred_trade_weighted_dollar"]["calendar"] = {
+        "policy": "us_business_day_configured_holidays",
+        "holiday_dates": [],
+    }
+    storage.upsert_observation(
+        FxObservation(
+            series_id="FXI.USD_TRADE_WEIGHTED.FRED.DAILY",
+            observation_date="2026-08-28",
+            value=118.7479,
+            base_currency="USD",
+            quote_currency="",
+            quote_multiplier=1,
+            source_profile="fred_trade_weighted_dollar",
+            quality_flag="official",
+        )
+    )
+
+    readiness = FxReadService(storage, module_cfg).readiness(as_of_date="2026-09-08")
+    quality = FxQualityService(storage, module_cfg).run(as_of_date="2026-09-08")
+    series_status = readiness["series"]["FXI.USD_TRADE_WEIGHTED.FRED.DAILY"]
+
+    assert readiness["status"] == "ready"
+    assert readiness["blockers"] == []
+    assert quality["status"] != "blocked"
+    assert (quality.get("severity_counts") or {}).get("error", 0) == 0
+    assert series_status["latest_observation_date"] == "2026-08-28"
+    assert series_status["max_stale_observation_days"] == 10
+    assert series_status["effective_max_stale_observation_days"] == 11
+    assert series_status["stale_lag_extension_days"] == 1
+
+
+def test_fx_readiness_still_blocks_beyond_holiday_adjusted_stale_window(tmp_path):
+    config, storage = _seed_storage(tmp_path)
+    module_cfg = config.modules["fx_market_data"]
+    module_cfg["quality"]["required_first_phase_series"] = ["FXI.USD_TRADE_WEIGHTED.FRED.DAILY"]
+    module_cfg["sources"]["fred_trade_weighted_dollar"]["max_stale_observation_days"] = 10
+    module_cfg["sources"]["fred_trade_weighted_dollar"]["calendar"] = {
+        "policy": "us_business_day_configured_holidays",
+        "holiday_dates": [],
+    }
+    storage.upsert_observation(
+        FxObservation(
+            series_id="FXI.USD_TRADE_WEIGHTED.FRED.DAILY",
+            observation_date="2026-08-27",
+            value=118.3583,
+            base_currency="USD",
+            quote_currency="",
+            quote_multiplier=1,
+            source_profile="fred_trade_weighted_dollar",
+            quality_flag="official",
+        )
+    )
+
+    readiness = FxReadService(storage, module_cfg).readiness(as_of_date="2026-09-08")
+    series_status = readiness["series"]["FXI.USD_TRADE_WEIGHTED.FRED.DAILY"]
+
+    assert readiness["status"] == "blocked"
+    assert readiness["blockers"] == ["missing_or_stale_fx_series:FXI.USD_TRADE_WEIGHTED.FRED.DAILY"]
+    assert series_status["status"] == "missing_or_stale"
+    assert series_status["latest_observation_date"] == "2026-08-27"
+    assert series_status["effective_max_stale_observation_days"] == 11
+
+
+def test_fx_readiness_keeps_calendar_day_stale_window_without_holiday_policy(tmp_path):
+    config, storage = _seed_storage(tmp_path)
+    module_cfg = config.modules["fx_market_data"]
+    module_cfg["quality"]["required_first_phase_series"] = ["FXI.USD_TRADE_WEIGHTED.FRED.DAILY"]
+    module_cfg["sources"]["fred_trade_weighted_dollar"]["max_stale_observation_days"] = 10
+    module_cfg["sources"]["fred_trade_weighted_dollar"]["calendar"] = {
+        "policy": "weekday_24x5",
+        "holiday_dates": [],
+    }
+    storage.upsert_observation(
+        FxObservation(
+            series_id="FXI.USD_TRADE_WEIGHTED.FRED.DAILY",
+            observation_date="2026-08-28",
+            value=118.7479,
+            base_currency="USD",
+            quote_currency="",
+            quote_multiplier=1,
+            source_profile="fred_trade_weighted_dollar",
+            quality_flag="official",
+        )
+    )
+
+    readiness = FxReadService(storage, module_cfg).readiness(as_of_date="2026-09-08")
+    series_status = readiness["series"]["FXI.USD_TRADE_WEIGHTED.FRED.DAILY"]
+
+    assert readiness["status"] == "blocked"
+    assert series_status["effective_max_stale_observation_days"] == 10
+    assert series_status["stale_lag_extension_days"] == 0
+    assert series_status["latest_observation_date"] == "2026-08-28"
+
+
 def test_fx_configured_provider_contract_writes_reviewed_payloads(tmp_path):
     config, storage = _seed_storage(tmp_path)
     module_cfg = config.modules["fx_market_data"]

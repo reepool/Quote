@@ -2964,6 +2964,57 @@ class FxCalendarGovernanceService:
             "warnings": [],
         }
 
+    def effective_stale_lag_days(
+        self,
+        *,
+        source_profile: str,
+        as_of_date: date,
+        configured_lag_days: int,
+    ) -> int:
+        """Return calendar-day stale lag, extended by weekday source holidays.
+
+        Weekends stay inside the configured calendar-day budget. Public or
+        configured holidays that fall on weekdays delay official publication and
+        therefore extend the allowed lag by one day each.
+        """
+        configured = max(int(configured_lag_days), 0)
+        if configured <= 0:
+            return configured
+        extra = self.count_weekday_holidays(
+            source_profile=source_profile,
+            start_date=as_of_date - timedelta(days=configured),
+            end_date=as_of_date,
+        )
+        return configured + extra
+
+    def count_weekday_holidays(
+        self,
+        *,
+        source_profile: str,
+        start_date: date,
+        end_date: date,
+    ) -> int:
+        if end_date < start_date:
+            return 0
+        sources = self.module_cfg.get("sources") or {}
+        source_cfg = sources.get(source_profile) or {}
+        if not isinstance(source_cfg, Mapping):
+            source_cfg = {}
+        calendar_cfg = self.module_cfg.get("calendar") or {}
+        if not isinstance(calendar_cfg, Mapping):
+            calendar_cfg = {}
+        policy = self._calendar_policy(source_profile, source_cfg, calendar_cfg).strip().lower()
+        configured = self._configured_holidays(source_profile, source_cfg, calendar_cfg)
+        extra = 0
+        day = start_date
+        while day <= end_date:
+            if day.weekday() < 5:
+                iso = day.isoformat()
+                if iso in configured or self._public_holiday_reason(day, policy):
+                    extra += 1
+            day += timedelta(days=1)
+        return extra
+
     def _calendar_policy(
         self,
         profile: str,
@@ -3546,9 +3597,11 @@ class FxReadService:
 
     def readiness(self, *, as_of_date: Optional[str] = None, save_snapshot: bool = False) -> Dict[str, Any]:
         as_of = as_of_date or get_shanghai_time().date().isoformat()
+        as_of_dt = _as_date(as_of) or get_shanghai_time().date()
         quality_cfg = self.module_cfg.get("quality") or {}
         required = _normalize_values(quality_cfg.get("required_first_phase_series"), upper=True)
         max_stale = int(quality_cfg.get("max_stale_observation_days") or 5)
+        calendar = FxCalendarGovernanceService(self.storage, self.module_cfg)
         blockers: List[str] = []
         warnings: List[str] = []
         series_status: Dict[str, Any] = {}
@@ -3562,24 +3615,38 @@ class FxReadService:
                 or source_cfg.get("max_stale_observation_days")
                 or max_stale
             )
+            effective_max_stale = calendar.effective_stale_lag_days(
+                source_profile=source_profile,
+                as_of_date=as_of_dt,
+                configured_lag_days=series_max_stale,
+            )
             obs = self.storage.get_latest_observation_on_or_before(
                 series_id=sid,
                 observation_date=as_of,
-                max_lag_days=series_max_stale,
+                max_lag_days=effective_max_stale,
             )
+            latest_any = obs or self.storage.get_latest_observation_on_or_before(
+                series_id=sid,
+                observation_date=as_of,
+            )
+            stale_fields = {
+                "max_stale_observation_days": series_max_stale,
+                "effective_max_stale_observation_days": effective_max_stale,
+                "stale_lag_extension_days": effective_max_stale - series_max_stale,
+                "latest_observation_date": (latest_any or {}).get("observation_date"),
+            }
             if obs is None:
                 blockers.append(f"missing_or_stale_fx_series:{sid}")
                 series_status[sid] = {
                     "status": "missing_or_stale",
-                    "max_stale_observation_days": series_max_stale,
+                    **stale_fields,
                 }
             else:
                 series_status[sid] = {
                     "status": "ready",
-                    "latest_observation_date": obs["observation_date"],
                     "quality_flag": obs["quality_flag"],
                     "source_profile": obs["source_profile"],
-                    "max_stale_observation_days": series_max_stale,
+                    **stale_fields,
                 }
         status = "ready" if not blockers else "blocked"
         payload = {

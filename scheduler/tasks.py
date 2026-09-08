@@ -4105,6 +4105,18 @@ def _format_fx_market_data_scheduler_report(result: Dict[str, Any]) -> str:
         lines.extend(["", "来源:", "```text", "\n".join(source_lines), "```"])
     if blockers:
         lines.extend(["", "阻断:", "```text", "\n".join(str(item) for item in blockers[:12]), "```"])
+        stale_lines = []
+        coverage = ((result.get("coverage") or {}).get("series") or result.get("series") or {})
+        if isinstance(coverage, dict):
+            for sid, info in coverage.items():
+                if not isinstance(info, dict) or info.get("status") != "missing_or_stale":
+                    continue
+                latest = info.get("latest_observation_date") or "none"
+                configured = info.get("max_stale_observation_days")
+                effective = info.get("effective_max_stale_observation_days") or configured
+                stale_lines.append(f"{sid}: latest={latest} stale_days={configured}->{effective}")
+        if stale_lines:
+            lines.extend(["", "陈旧序列:", "```text", "\n".join(stale_lines[:12]), "```"])
     if warnings:
         lines.extend(["", "告警:", "```text", "\n".join(str(item) for item in warnings[:12]), "```"])
     return "\n".join(lines)

@@ -299,7 +299,7 @@ EUR/CNH = 1 EUR 兑换多少 CNH
 - `missing_or_stale`、无效报价单位等 error 级问题应返回 `blocked`。
 - 异常跳变、直接市场价与派生价差异、派生缺口等 warning 级问题应写入 `fx_quality_issues`，但不应阻断 readiness。
 - 直接市场价与派生交叉价差异应记录为 `cross_market_basis_monitoring`，不应混入 `source_conflict`；`source_conflict` 只用于同一 instrument 多数据源同口径观测冲突。
-- 时效性阈值默认使用 `quality.max_stale_observation_days`；FRED 等宏观/指数源可在 source profile 上配置 `max_stale_observation_days`，避免把官方发布延迟误判为汇率缺口。
+- 时效性阈值默认使用 `quality.max_stale_observation_days`；FRED 等宏观/指数源可在 source profile 上配置 `max_stale_observation_days`，避免把官方发布延迟误判为汇率缺口。该阈值按自然日计算，但 readiness / `fx_quality_check` 必须按 source calendar 把窗口内的工作日公共假日和手工 `holiday_dates` 加进允许滞后期；周末仍计入原自然日预算，不得把美国三天周末误判为 `missing_or_stale`。真实超出假日调整窗口的缺口仍应阻断。
 
 ### 8.1.1 在岸人民币优先落库顺序
 
