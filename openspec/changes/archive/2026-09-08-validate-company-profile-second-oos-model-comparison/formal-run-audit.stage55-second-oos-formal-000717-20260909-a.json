@@ -1,0 +1,54 @@
+{
+  "comparison_outputs_spliced": false,
+  "completed_formal_bundle": false,
+  "failure_manifest": "var/company_profile_stage5_oos/20260909/run-stage55-second-oos-formal-000717-20260909-a.failed.json",
+  "failure_manifest_sha256": "d2ab20504d7c6007dba48b48942ad044380bfbc0276109f3af182d2af8934062",
+  "parameters": {
+    "extract_max_output_tokens": 16000,
+    "max_provider_calls": 27,
+    "timeout_seconds": 300,
+    "verify_max_output_tokens": 12000
+  },
+  "production_authorization": "not_authorized",
+  "provider_attempts_before_terminal_contract_failure": [
+    {
+      "final_code": "deadline_exceeded",
+      "gateway_request_id": "8276b537231c4946baa0006d8e7a0e1e",
+      "scope_id": "business_overview",
+      "transport_error_type": "dns_failure",
+      "transport_exception_type": "ConnectError",
+      "transport_phase": "connect"
+    },
+    {
+      "final_code": "deadline_exceeded",
+      "gateway_request_id": "8131ab03deaf403a972191c70e83b8e0",
+      "scope_id": "segment_industry_product_region_mode",
+      "transport_error_type": "dns_failure",
+      "transport_exception_type": "ConnectError",
+      "transport_phase": "connect"
+    },
+    {
+      "final_code": "deadline_exceeded",
+      "gateway_request_id": "7b3b475c85f54b0cbacb4fe5903310c6",
+      "scope_id": "production_sales_inventory_table",
+      "transport_error_type": "dns_failure",
+      "transport_exception_type": "ConnectError",
+      "transport_phase": "connect"
+    }
+  ],
+  "report_state": "failed",
+  "run_id": "stage55-second-oos-formal-000717-20260909-a",
+  "run_id_date_basis": "mistaken future-dated identifier retained for log identity; actual execution date is 2026-09-08 UTC",
+  "sample_id": "manufacturing-materials-oos-000717-2025",
+  "schema_version": "company_profile_second_oos_formal_run_audit.v1",
+  "second_formal_run_started": false,
+  "selected_model": "gemini-3.8-flash",
+  "selected_route": "semantic_extraction__scorpio_gemini",
+  "temporary_bundle_paths": [],
+  "terminal_failure": {
+    "code": "ValueError",
+    "interpretation": "the frozen plan introduced energy_input although the existing contract uses material_input for both raw materials and energy",
+    "message": "unknown stage-five checklist field: energy_input",
+    "scope_id": "material_procurement_narrative"
+  }
+}

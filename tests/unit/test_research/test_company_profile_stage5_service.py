@@ -62,11 +62,40 @@ EVIDENCE_PLAN = (
 )
 VALIDATION_CHANGE = (
     REPOSITORY_ROOT
-    / "openspec/changes/validate-company-profile-out-of-sample-generalization"
+    / "openspec/changes/archive/2026-09-08-validate-company-profile-out-of-sample-generalization"
 )
 VALIDATION_MANIFEST = VALIDATION_CHANGE / "out-of-sample-manifest.v1.json"
 VALIDATION_EVIDENCE_PLAN = VALIDATION_CHANGE / "evidence-plan.v1.json"
 VALIDATION_SAMPLE_ID = "manufacturing-materials-oos-600019-2025"
+SECOND_OOS_CHANGE = (
+    REPOSITORY_ROOT
+    / "openspec/changes/archive/2026-09-08-validate-company-profile-second-oos-model-comparison"
+)
+SECOND_OOS_MANIFEST = SECOND_OOS_CHANGE / "second-oos-manifest.v1.json"
+SECOND_OOS_EVIDENCE_PLAN = SECOND_OOS_CHANGE / "evidence-plan.v1.json"
+
+
+def test_stage5_second_oos_rejects_unknown_field_before_provider_execution(
+    tmp_path: Path,
+) -> None:
+    manifest = load_stage5_sample_manifest(
+        SECOND_OOS_MANIFEST,
+        repository_root=REPOSITORY_ROOT,
+    )
+    plan = load_stage5_evidence_plan(SECOND_OOS_EVIDENCE_PLAN)
+    service = ManufacturingMaterialsProfileSliceService()
+
+    with pytest.raises(ValueError, match="energy_input"):
+        service.run_semantic_slice(
+            run_id="second-oos-unknown-field",
+            manifest=manifest,
+            evidence_plan=plan,
+            evidence_plan_path=SECOND_OOS_EVIDENCE_PLAN,
+            store=Stage5RunBundleStore(
+                tmp_path / "second-oos", repository_root=REPOSITORY_ROOT
+            ),
+            provider_factory=lambda _: pytest.fail("provider must not be called"),
+        )
 
 
 def test_stage5_fake_single_report_commits_research_view_and_legal_empty(

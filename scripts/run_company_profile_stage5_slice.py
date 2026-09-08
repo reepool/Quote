@@ -29,7 +29,7 @@ from research.company_profile.contracts import (
     VerifyRequest,
 )
 from research.company_profile.stage5 import (
-    STAGE5_VALIDATION_MANIFEST_KIND,
+    STAGE5_VALIDATION_MANIFEST_KINDS,
     PreparedRequestScope,
     load_stage5_evidence_plan,
     load_stage5_sample_manifest,
@@ -147,7 +147,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     )
     evidence_plan = load_stage5_evidence_plan(args.evidence_plan)
     if (
-        manifest.manifest_kind == STAGE5_VALIDATION_MANIFEST_KIND
+        manifest.manifest_kind in STAGE5_VALIDATION_MANIFEST_KINDS
         and args.mode == "semantic-run"
         and args.scope_ids
     ):

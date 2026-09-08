@@ -300,6 +300,7 @@ class ManufacturingMaterialsProfileSliceService:
                 selected,
                 scope_ids=scope_ids,
             )
+            _validate_prepared_field_contract(prepared)
             reports = tuple(
                 self._run_report(
                     run_id=run_id,
@@ -471,6 +472,21 @@ class ManufacturingMaterialsProfileSliceService:
                 f"samples are outside the loaded stage-five manifest: {sorted(unknown)}"
             )
         return selected
+
+
+def _validate_prepared_field_contract(
+    prepared: Mapping[str, tuple[PreparedRequestScope, ...]],
+) -> None:
+    """Reject unknown checklist fields before constructing any provider request."""
+
+    for sample_id, scopes in prepared.items():
+        for scope in scopes:
+            unknown = sorted(set(scope.field_ids) - set(_FIELD_CONTRACT))
+            if unknown:
+                raise ValueError(
+                    "unknown stage-five checklist fields before provider execution: "
+                    f"{sample_id}:{scope.scope_id}:{unknown}"
+                )
 
 
 def _semantic_request(

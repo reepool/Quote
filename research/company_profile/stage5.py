@@ -31,13 +31,32 @@ STAGE5_EVIDENCE_PLAN_SCHEMA = "company_profile_stage5_evidence_plan.v1"
 STAGE5_EVIDENCE_PLAN_VERSION = "manufacturing_materials.2026-09-05.4"
 STAGE5_VALIDATION_MANIFEST_SCHEMA = "company_profile_out_of_sample_manifest.v1"
 STAGE5_VALIDATION_MANIFEST_KIND = "out_of_sample_validation"
+STAGE5_SECOND_OOS_MANIFEST_KIND = "second_oos_model_comparison"
+STAGE5_VALIDATION_MANIFEST_KINDS = frozenset(
+    {
+        STAGE5_VALIDATION_MANIFEST_KIND,
+        STAGE5_SECOND_OOS_MANIFEST_KIND,
+    }
+)
 STAGE5_VALIDATION_EVIDENCE_PLAN_SCHEMA = (
     "company_profile_out_of_sample_evidence_plan.v1"
 )
 STAGE5_VALIDATION_EVIDENCE_PLAN_VERSION = "manufacturing_materials_oos.2026-09-08.1"
-STAGE5_VALIDATION_MANIFEST_REVISION = (
-    "manufacturing-materials-oos-manifest-20260908-v1"
+STAGE5_SECOND_OOS_EVIDENCE_PLAN_SCHEMA = "company_profile_second_oos_evidence_plan.v1"
+STAGE5_SECOND_OOS_EVIDENCE_PLAN_VERSION = "manufacturing_materials_oos.2026-09-08.2"
+STAGE5_SECOND_OOS_MANIFEST_SCHEMA = "company_profile_second_oos_manifest.v1"
+STAGE5_SECOND_OOS_MANIFEST_REVISION = (
+    "manufacturing-materials-second-oos-manifest-20260908-v1"
 )
+STAGE5_SECOND_OOS_SAMPLE_ID = "manufacturing-materials-oos-000717-2025"
+STAGE5_SECOND_OOS_REPORT_ID = "1225158456"
+STAGE5_SECOND_OOS_DOCUMENT_VERSION = (
+    "94388fcdf94cbd7f53188c95e3a8efd66348a3a0b2d337db904a88690eef5c55"
+)
+STAGE5_SECOND_OOS_CONTENT_HASH = (
+    "94388fcdf94cbd7f53188c95e3a8efd66348a3a0b2d337db904a88690eef5c55"
+)
+STAGE5_VALIDATION_MANIFEST_REVISION = "manufacturing-materials-oos-manifest-20260908-v1"
 STAGE5_VALIDATION_SAMPLE_ID = "manufacturing-materials-oos-600019-2025"
 STAGE5_VALIDATION_REPORT_ID = "ann_b6f4559910072e19246d18f96508e7d8"
 STAGE5_VALIDATION_DOCUMENT_VERSION = "ver_f9c4bf73d6b80d19718adfa4ab88154d"
@@ -59,7 +78,39 @@ VALIDATION_STAGE5_SAMPLES: dict[str, tuple[str, str]] = {
         "validation_unclassified",
     ),
 }
-KNOWN_STAGE5_SAMPLES = APPROVED_STAGE5_SAMPLES | VALIDATION_STAGE5_SAMPLES
+SECOND_OOS_STAGE5_SAMPLES: dict[str, tuple[str, str]] = {
+    STAGE5_SECOND_OOS_SAMPLE_ID: (
+        "000717.SZ",
+        "validation_unclassified",
+    ),
+}
+KNOWN_STAGE5_SAMPLES = (
+    APPROVED_STAGE5_SAMPLES | VALIDATION_STAGE5_SAMPLES | SECOND_OOS_STAGE5_SAMPLES
+)
+_VALIDATION_PROFILES: dict[str, dict[str, Any]] = {
+    STAGE5_VALIDATION_MANIFEST_REVISION: {
+        "manifest_kind": STAGE5_VALIDATION_MANIFEST_KIND,
+        "manifest_schema": STAGE5_VALIDATION_MANIFEST_SCHEMA,
+        "evidence_schema": STAGE5_VALIDATION_EVIDENCE_PLAN_SCHEMA,
+        "evidence_version": STAGE5_VALIDATION_EVIDENCE_PLAN_VERSION,
+        "samples": VALIDATION_STAGE5_SAMPLES,
+        "sample_id": STAGE5_VALIDATION_SAMPLE_ID,
+        "report_id": STAGE5_VALIDATION_REPORT_ID,
+        "document_version": STAGE5_VALIDATION_DOCUMENT_VERSION,
+        "content_hash": STAGE5_VALIDATION_CONTENT_HASH,
+    },
+    STAGE5_SECOND_OOS_MANIFEST_REVISION: {
+        "manifest_kind": STAGE5_SECOND_OOS_MANIFEST_KIND,
+        "manifest_schema": STAGE5_SECOND_OOS_MANIFEST_SCHEMA,
+        "evidence_schema": STAGE5_SECOND_OOS_EVIDENCE_PLAN_SCHEMA,
+        "evidence_version": STAGE5_SECOND_OOS_EVIDENCE_PLAN_VERSION,
+        "samples": SECOND_OOS_STAGE5_SAMPLES,
+        "sample_id": STAGE5_SECOND_OOS_SAMPLE_ID,
+        "report_id": STAGE5_SECOND_OOS_REPORT_ID,
+        "document_version": STAGE5_SECOND_OOS_DOCUMENT_VERSION,
+        "content_hash": STAGE5_SECOND_OOS_CONTENT_HASH,
+    },
+}
 
 _FROZEN_TASKS = frozenset(ChapterTask)
 _PROHIBITED_PLAN_KEYS = frozenset(
@@ -147,10 +198,11 @@ class Stage5SampleManifest(_StrictModel):
     schema_version: Literal[
         "company_profile_industry_sample_manifest.v1",
         "company_profile_out_of_sample_manifest.v1",
+        "company_profile_second_oos_manifest.v1",
     ]
-    manifest_kind: Literal["four_report_slice", "out_of_sample_validation"] = (
-        STAGE5_SAMPLE_MANIFEST_KIND
-    )
+    manifest_kind: Literal[
+        "four_report_slice", "out_of_sample_validation", "second_oos_model_comparison"
+    ] = STAGE5_SAMPLE_MANIFEST_KIND
     manifest_revision: str = Field(min_length=1)
     reports: tuple[Stage5ReportAsset, ...] = Field(min_length=1, max_length=4)
     production_authorization: Literal["not_authorized"] = (
@@ -162,20 +214,22 @@ class Stage5SampleManifest(_StrictModel):
         ids = [item.sample_id for item in self.reports]
         if len(ids) != len(set(ids)):
             raise ValueError("sample manifest contains duplicate sample_id")
-        is_validation = self.manifest_kind == STAGE5_VALIDATION_MANIFEST_KIND
+        is_validation = self.manifest_kind in STAGE5_VALIDATION_MANIFEST_KINDS
+        profile = (
+            _VALIDATION_PROFILES.get(self.manifest_revision) if is_validation else None
+        )
         approved = (
-            VALIDATION_STAGE5_SAMPLES if is_validation else APPROVED_STAGE5_SAMPLES
+            profile["samples"] if profile is not None else APPROVED_STAGE5_SAMPLES
         )
         expected_schema = (
-            STAGE5_VALIDATION_MANIFEST_SCHEMA
-            if is_validation
+            profile["manifest_schema"]
+            if profile is not None
             else STAGE5_SAMPLE_MANIFEST_SCHEMA
         )
         if self.schema_version != expected_schema:
             raise ValueError("sample manifest schema does not match its execution mode")
-        if (
-            is_validation
-            and self.manifest_revision != STAGE5_VALIDATION_MANIFEST_REVISION
+        if is_validation and (
+            profile is None or self.manifest_kind != profile["manifest_kind"]
         ):
             raise ValueError("validation manifest revision does not match its freeze")
         if set(ids) != set(approved):
@@ -302,6 +356,7 @@ class Stage5EvidencePlan(_StrictModel):
     schema_version: Literal[
         "company_profile_stage5_evidence_plan.v1",
         "company_profile_out_of_sample_evidence_plan.v1",
+        "company_profile_second_oos_evidence_plan.v1",
     ]
     plan_version: str = Field(min_length=1)
     sample_manifest_revision: str = Field(min_length=1)
@@ -314,9 +369,19 @@ class Stage5EvidencePlan(_StrictModel):
     @model_validator(mode="after")
     def _approved_closed_set(self) -> Stage5EvidencePlan:
         ids = [item.sample_id for item in self.reports]
-        if self.schema_version == STAGE5_VALIDATION_EVIDENCE_PLAN_SCHEMA:
-            approved = VALIDATION_STAGE5_SAMPLES
-            expected_version = STAGE5_VALIDATION_EVIDENCE_PLAN_VERSION
+        if self.schema_version in {
+            STAGE5_VALIDATION_EVIDENCE_PLAN_SCHEMA,
+            STAGE5_SECOND_OOS_EVIDENCE_PLAN_SCHEMA,
+        }:
+            profile = _VALIDATION_PROFILES.get(self.sample_manifest_revision)
+            if profile is None:
+                raise ValueError("validation evidence plan revision is unknown")
+            approved = profile["samples"]
+            expected_version = profile["evidence_version"]
+            if self.schema_version != profile["evidence_schema"]:
+                raise ValueError(
+                    "validation evidence plan schema does not match its freeze"
+                )
         else:
             approved = APPROVED_STAGE5_SAMPLES
             expected_version = STAGE5_EVIDENCE_PLAN_VERSION
@@ -384,7 +449,7 @@ def load_stage5_sample_manifest(
         ) from exc
     try:
         manifest_kind = raw.get("manifest_kind", STAGE5_SAMPLE_MANIFEST_KIND)
-        if manifest_kind == STAGE5_VALIDATION_MANIFEST_KIND:
+        if manifest_kind in STAGE5_VALIDATION_MANIFEST_KINDS:
             if (
                 raw.get("sample_count") != 1
                 or raw.get("sample_replacement_allowed") is not False
@@ -811,12 +876,13 @@ def _validation_manifest_report(
     )
     content = local_path.read_bytes()
     expected_hash = str(pdf.get("sha256") or "")
-    if (
-        sample_id != STAGE5_VALIDATION_SAMPLE_ID
+    profile = _VALIDATION_PROFILES.get(str(raw_manifest.get("manifest_id") or ""))
+    if profile is None or (
+        sample_id != profile["sample_id"]
         or identity.get("report_id", identity.get("announcement_id"))
-        != STAGE5_VALIDATION_REPORT_ID
-        or identity.get("version_id") != STAGE5_VALIDATION_DOCUMENT_VERSION
-        or expected_hash != STAGE5_VALIDATION_CONTENT_HASH
+        != profile["report_id"]
+        or identity.get("version_id") != profile["document_version"]
+        or expected_hash != profile["content_hash"]
     ):
         raise EvidencePreparationError(
             PreparationFailureCode.MANIFEST_INVALID,

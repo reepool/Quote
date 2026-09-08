@@ -19,7 +19,7 @@ EVIDENCE_PLAN = (
 
 VALIDATION_CHANGE = (
     REPOSITORY_ROOT
-    / "openspec/changes/validate-company-profile-out-of-sample-generalization"
+    / "openspec/changes/archive/2026-09-08-validate-company-profile-out-of-sample-generalization"
 )
 VALIDATION_MANIFEST = VALIDATION_CHANGE / "out-of-sample-manifest.v1.json"
 VALIDATION_EVIDENCE_PLAN = VALIDATION_CHANGE / "evidence-plan.v1.json"

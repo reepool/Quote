@@ -1,0 +1,118 @@
+{
+  "artifact_type": "company_profile_second_oos_manifest",
+  "schema_version": "company_profile_second_oos_manifest.v1",
+  "manifest_id": "manufacturing-materials-second-oos-manifest-20260908-v1",
+  "manifest_kind": "second_oos_model_comparison",
+  "industry_package": "manufacturing_materials",
+  "frozen_on": "2026-09-08",
+  "sample_replacement_allowed": false,
+  "semantic_execution_started": false,
+  "evidence_plan_status": "frozen_before_model_comparison",
+  "production_authorization": "not_authorized",
+  "accepted_record_semantics": "accepted_for_review",
+  "sample_count": 1,
+  "samples": [
+    {
+      "sample_id": "manufacturing-materials-oos-000717-2025",
+      "report_identity": {
+        "instrument_id": "000717.SZ",
+        "symbol": "000717",
+        "company_name": "中南钢铁",
+        "company_name_en": "Guangdong Zhongnan Iron & Steel Co., Ltd.",
+        "exchange": "SZSE",
+        "fiscal_year": 2025,
+        "report_period": "2025-12-31",
+        "report_title": "中南钢铁2025年年度报告全文",
+        "document_family": "annual_report",
+        "variant": "original",
+        "source": "cninfo",
+        "announcement_id": "1225158456",
+        "version_id": "94388fcdf94cbd7f53188c95e3a8efd66348a3a0b2d337db904a88690eef5c55",
+        "published_at": "2026-04-24T16:00:00+00:00",
+        "decision_state": "current",
+        "availability": "local_valid",
+        "visibility_state": "production",
+        "classifier_version": "formal_annual_report.v1",
+        "canonical_projection_policy_version": "canonical_source_filing.v1"
+      },
+      "pdf": {
+        "path": "data/filings/business_profile/2025/SZSE/000717_SZ_2025Q4_1225158456_94388fcdf94cbd7f53188c95e3a8efd66348a3a0b2d337db904a88690eef5c55.pdf",
+        "sha256": "94388fcdf94cbd7f53188c95e3a8efd66348a3a0b2d337db904a88690eef5c55",
+        "content_length_bytes": 1379438,
+        "page_count": 217,
+        "encrypted": false,
+        "signature_status": "valid_pdf",
+        "integrity_status": "valid"
+      },
+      "selection_dimensions": {
+        "business_model": [
+          "integrated_steel_manufacturing",
+          "steel_processing_and_distribution",
+          "chemical_operations"
+        ],
+        "disclosure_form": [
+          "szse_annual_report",
+          "industry_and_product_revenue_cost_tables",
+          "production_sales_inventory_disclosure",
+          "customer_supplier_disclosure",
+          "same_control_group_reference"
+        ],
+        "generalization_pressure": [
+          "steel_and_coking_mix",
+          "large_revenue_table_with_multiple_product_rows",
+          "supplier_and_related_party_overlap",
+          "subsidiary_and_group_boundary"
+        ]
+      },
+      "selection_reason": "The locally valid 000717.SZ report is absent from the four-report company-profile authority, Gold, targeted runs, adjudication ledgers, and BaoSteel OOS records. It adds an integrated steel/coking disclosure form and tests large product, operating-volume, supplier, and group-boundary tables. Prior exposure is limited to PDF-engine evaluation, not company-profile semantic extraction.",
+      "known_limitations": [
+        "The PDF was previously used for parser-only evaluation and is therefore not a clean PDF-unseen sample.",
+        "The report contains group-platform and same-control references that may leave subject_scope unclear.",
+        "One sample and two comparison scopes cannot establish industry-wide model superiority."
+      ]
+    }
+  ],
+  "independence_audit": {
+    "excluded_in_sample_instruments": [
+      "300750.SZ",
+      "603659.SH",
+      "920015.BJ",
+      "302132.SZ",
+      "600019.SH"
+    ],
+    "checked_identifiers": [
+      "000717.SZ",
+      "000717",
+      "中南钢铁",
+      "1225158456",
+      "94388fcdf94cbd7f53188c95e3a8efd66348a3a0b2d337db904a88690eef5c55"
+    ],
+    "checked_artifact_classes": [
+      "approved_four_report_manifest",
+      "company_profile_gold_annotations",
+      "company_profile_negative_annotations",
+      "stage5_targeted_probe_preflight_and_complete_runs",
+      "manufacturing_materials_adjudication_ledgers",
+      "company_profile_oos_runs"
+    ],
+    "company_profile_matches": [],
+    "pdf_only_prior_exposure": [
+      "research/document_processing/pdf/evaluation_manifest_local.json",
+      "docs/development/pdf_engine_evaluation_local_corpus_20260825.json"
+    ],
+    "decision": "independent_for_company_profile_semantics_with_pdf_only_limitation"
+  },
+  "immutable_in_sample_references": {
+    "authority_run_id": "stage55-closure-four-20260907-a",
+    "authority_manifest_sha256": "00fa20045d4df037a8984cff4b56af3f19ac533f4c4b9e311e7f130bf5158687",
+    "authority_benchmark_sha256": "ce417e81039a863d0c9093fd2bd2fa2bb2e12d81cd2df0f440790210e6084188",
+    "offline_gold_result": "18/24",
+    "input_record_source_for_new_run": false
+  },
+  "prohibited_actions_before_sample_confirmation": [
+    "prepare_six_chapter_evidence",
+    "modify_execution_code",
+    "invoke_llm_gateway",
+    "replace_sample"
+  ]
+}

@@ -51,11 +51,18 @@ EVIDENCE_PLAN = (
 
 VALIDATION_CHANGE = (
     REPOSITORY_ROOT
-    / "openspec/changes/validate-company-profile-out-of-sample-generalization"
+    / "openspec/changes/archive/2026-09-08-validate-company-profile-out-of-sample-generalization"
 )
 VALIDATION_MANIFEST = VALIDATION_CHANGE / "out-of-sample-manifest.v1.json"
 VALIDATION_EVIDENCE_PLAN = VALIDATION_CHANGE / "evidence-plan.v1.json"
 VALIDATION_SAMPLE_ID = "manufacturing-materials-oos-600019-2025"
+SECOND_OOS_CHANGE = (
+    REPOSITORY_ROOT
+    / "openspec/changes/archive/2026-09-08-validate-company-profile-second-oos-model-comparison"
+)
+SECOND_OOS_MANIFEST = SECOND_OOS_CHANGE / "second-oos-manifest.v1.json"
+SECOND_OOS_EVIDENCE_PLAN = SECOND_OOS_CHANGE / "evidence-plan.v1.json"
+SECOND_OOS_SAMPLE_ID = "manufacturing-materials-oos-000717-2025"
 
 
 def test_stage5_manifest_is_a_verified_four_report_closed_set() -> None:
@@ -552,6 +559,35 @@ def test_stage5_validation_manifest_rejects_unknown_mixed_and_replaced_samples(
         with pytest.raises(EvidencePreparationError) as exc_info:
             load_stage5_sample_manifest(candidate, repository_root=REPOSITORY_ROOT)
         assert exc_info.value.code == PreparationFailureCode.MANIFEST_INVALID
+
+
+def test_stage5_second_oos_manifest_and_evidence_prepare_seven_scopes() -> None:
+    manifest = load_stage5_sample_manifest(
+        SECOND_OOS_MANIFEST,
+        repository_root=REPOSITORY_ROOT,
+    )
+    plan = load_stage5_evidence_plan(SECOND_OOS_EVIDENCE_PLAN)
+
+    scopes = Stage5EvidencePreparer().prepare_report(
+        manifest=manifest,
+        evidence_plan=plan,
+        sample_id=SECOND_OOS_SAMPLE_ID,
+    )
+
+    assert manifest.manifest_kind == "second_oos_model_comparison"
+    assert (
+        manifest.report_by_id(SECOND_OOS_SAMPLE_ID).report.instrument_id == "000717.SZ"
+    )
+    assert len(scopes) == 7
+    assert {scope.scope_id for scope in scopes} == {
+        "business_overview",
+        "segment_industry_product_region_mode",
+        "production_sales_inventory_table",
+        "material_procurement_narrative",
+        "material_energy_cost_table",
+        "customer_supplier_concentration",
+        "business_regime_change",
+    }
 
 
 def test_stage5_validation_evidence_plan_rejects_mixed_reports(
