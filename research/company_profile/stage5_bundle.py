@@ -17,7 +17,7 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 from .contracts import CompanyProfileTaskResult
 from .models import PRODUCTION_AUTHORIZATION, ReportIdentity
 from .projection import CompanyProfileResearchView
-from .stage5 import APPROVED_STAGE5_SAMPLES, PreparedRequestScope
+from .stage5 import APPROVED_STAGE5_SAMPLES, KNOWN_STAGE5_SAMPLES, PreparedRequestScope
 
 STAGE5_REPORT_BUNDLE_SCHEMA = "company_profile_stage5_report_bundle.v1"
 STAGE5_RUN_BUNDLE_SCHEMA = "company_profile_stage5_run_bundle.v1"
@@ -141,7 +141,7 @@ class Stage5ReportBundle(_StrictModel):
 
     @model_validator(mode="after")
     def _report_identity_is_closed(self) -> Stage5ReportBundle:
-        expected = APPROVED_STAGE5_SAMPLES.get(self.sample_id)
+        expected = KNOWN_STAGE5_SAMPLES.get(self.sample_id)
         if expected is None or self.report.instrument_id != expected[0]:
             raise ValueError("report bundle is outside the approved sample set")
         if any(

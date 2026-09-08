@@ -26,8 +26,24 @@ from .contracts import PreparedEvidence
 from .models import ChapterTask, Evidence, ReportIdentity, TextAnchor
 
 STAGE5_SAMPLE_MANIFEST_SCHEMA = "company_profile_industry_sample_manifest.v1"
+STAGE5_SAMPLE_MANIFEST_KIND = "four_report_slice"
 STAGE5_EVIDENCE_PLAN_SCHEMA = "company_profile_stage5_evidence_plan.v1"
 STAGE5_EVIDENCE_PLAN_VERSION = "manufacturing_materials.2026-09-05.4"
+STAGE5_VALIDATION_MANIFEST_SCHEMA = "company_profile_out_of_sample_manifest.v1"
+STAGE5_VALIDATION_MANIFEST_KIND = "out_of_sample_validation"
+STAGE5_VALIDATION_EVIDENCE_PLAN_SCHEMA = (
+    "company_profile_out_of_sample_evidence_plan.v1"
+)
+STAGE5_VALIDATION_EVIDENCE_PLAN_VERSION = "manufacturing_materials_oos.2026-09-08.1"
+STAGE5_VALIDATION_MANIFEST_REVISION = (
+    "manufacturing-materials-oos-manifest-20260908-v1"
+)
+STAGE5_VALIDATION_SAMPLE_ID = "manufacturing-materials-oos-600019-2025"
+STAGE5_VALIDATION_REPORT_ID = "ann_b6f4559910072e19246d18f96508e7d8"
+STAGE5_VALIDATION_DOCUMENT_VERSION = "ver_f9c4bf73d6b80d19718adfa4ab88154d"
+STAGE5_VALIDATION_CONTENT_HASH = (
+    "9d910b7b6a78fe2ccae1345c8651ca2e592d83b04bc2705f51d611ec0e1545a8"
+)
 STAGE5_PACKAGE = "manufacturing_materials"
 STAGE5_PRODUCTION_AUTHORIZATION = "not_authorized"
 
@@ -37,6 +53,13 @@ APPROVED_STAGE5_SAMPLES: dict[str, tuple[str, str]] = {
     "manufacturing-materials-920015-2025": ("920015.BJ", "stable"),
     "manufacturing-materials-302132-2025-regime": ("302132.SZ", "restructuring"),
 }
+VALIDATION_STAGE5_SAMPLES: dict[str, tuple[str, str]] = {
+    STAGE5_VALIDATION_SAMPLE_ID: (
+        "600019.SH",
+        "validation_unclassified",
+    ),
+}
+KNOWN_STAGE5_SAMPLES = APPROVED_STAGE5_SAMPLES | VALIDATION_STAGE5_SAMPLES
 
 _FROZEN_TASKS = frozenset(ChapterTask)
 _PROHIBITED_PLAN_KEYS = frozenset(
@@ -113,7 +136,7 @@ class Stage5ReportAsset(_StrictModel):
     content_length: int = Field(gt=0)
     page_count: int = Field(gt=0)
     industry_package: Literal["manufacturing_materials"] = STAGE5_PACKAGE
-    regime_type: Literal["stable", "restructuring"]
+    regime_type: Literal["stable", "restructuring", "validation_unclassified"]
     regime_effective_period: str = Field(min_length=1)
     production_authorization: Literal["not_authorized"] = (
         STAGE5_PRODUCTION_AUTHORIZATION
@@ -121,11 +144,15 @@ class Stage5ReportAsset(_StrictModel):
 
 
 class Stage5SampleManifest(_StrictModel):
-    schema_version: Literal["company_profile_industry_sample_manifest.v1"] = (
-        STAGE5_SAMPLE_MANIFEST_SCHEMA
+    schema_version: Literal[
+        "company_profile_industry_sample_manifest.v1",
+        "company_profile_out_of_sample_manifest.v1",
+    ]
+    manifest_kind: Literal["four_report_slice", "out_of_sample_validation"] = (
+        STAGE5_SAMPLE_MANIFEST_KIND
     )
     manifest_revision: str = Field(min_length=1)
-    reports: tuple[Stage5ReportAsset, ...] = Field(min_length=4, max_length=4)
+    reports: tuple[Stage5ReportAsset, ...] = Field(min_length=1, max_length=4)
     production_authorization: Literal["not_authorized"] = (
         STAGE5_PRODUCTION_AUTHORIZATION
     )
@@ -135,12 +162,26 @@ class Stage5SampleManifest(_StrictModel):
         ids = [item.sample_id for item in self.reports]
         if len(ids) != len(set(ids)):
             raise ValueError("sample manifest contains duplicate sample_id")
-        if set(ids) != set(APPROVED_STAGE5_SAMPLES):
-            raise ValueError(
-                "sample manifest must contain exactly the approved reports"
-            )
+        is_validation = self.manifest_kind == STAGE5_VALIDATION_MANIFEST_KIND
+        approved = (
+            VALIDATION_STAGE5_SAMPLES if is_validation else APPROVED_STAGE5_SAMPLES
+        )
+        expected_schema = (
+            STAGE5_VALIDATION_MANIFEST_SCHEMA
+            if is_validation
+            else STAGE5_SAMPLE_MANIFEST_SCHEMA
+        )
+        if self.schema_version != expected_schema:
+            raise ValueError("sample manifest schema does not match its execution mode")
+        if (
+            is_validation
+            and self.manifest_revision != STAGE5_VALIDATION_MANIFEST_REVISION
+        ):
+            raise ValueError("validation manifest revision does not match its freeze")
+        if set(ids) != set(approved):
+            raise ValueError("sample manifest does not match its closed execution mode")
         for item in self.reports:
-            instrument, regime = APPROVED_STAGE5_SAMPLES[item.sample_id]
+            instrument, regime = approved[item.sample_id]
             if item.report.instrument_id != instrument or item.regime_type != regime:
                 raise ValueError("sample identity or regime does not match approval")
             if item.report.report_period != "2025-12-31":
@@ -258,24 +299,31 @@ class EvidenceReportPlan(_StrictModel):
 
 
 class Stage5EvidencePlan(_StrictModel):
-    schema_version: Literal["company_profile_stage5_evidence_plan.v1"] = (
-        STAGE5_EVIDENCE_PLAN_SCHEMA
-    )
-    plan_version: Literal["manufacturing_materials.2026-09-05.4"] = (
-        STAGE5_EVIDENCE_PLAN_VERSION
-    )
+    schema_version: Literal[
+        "company_profile_stage5_evidence_plan.v1",
+        "company_profile_out_of_sample_evidence_plan.v1",
+    ]
+    plan_version: str = Field(min_length=1)
     sample_manifest_revision: str = Field(min_length=1)
     page_coordinate_system: Literal["one_based_pdf_physical_page"]
     production_authorization: Literal["not_authorized"] = (
         STAGE5_PRODUCTION_AUTHORIZATION
     )
-    reports: tuple[EvidenceReportPlan, ...] = Field(min_length=4, max_length=4)
+    reports: tuple[EvidenceReportPlan, ...] = Field(min_length=1, max_length=4)
 
     @model_validator(mode="after")
     def _approved_closed_set(self) -> Stage5EvidencePlan:
         ids = [item.sample_id for item in self.reports]
-        if len(ids) != len(set(ids)) or set(ids) != set(APPROVED_STAGE5_SAMPLES):
-            raise ValueError("evidence plan must contain exactly the approved reports")
+        if self.schema_version == STAGE5_VALIDATION_EVIDENCE_PLAN_SCHEMA:
+            approved = VALIDATION_STAGE5_SAMPLES
+            expected_version = STAGE5_VALIDATION_EVIDENCE_PLAN_VERSION
+        else:
+            approved = APPROVED_STAGE5_SAMPLES
+            expected_version = STAGE5_EVIDENCE_PLAN_VERSION
+        if self.plan_version != expected_version:
+            raise ValueError("evidence plan version does not match its schema")
+        if len(ids) != len(set(ids)) or set(ids) != set(approved):
+            raise ValueError("evidence plan does not match its closed execution mode")
         return self
 
     def report_by_id(self, sample_id: str) -> EvidenceReportPlan:
@@ -335,10 +383,29 @@ def load_stage5_sample_manifest(
             f"sample manifest is unreadable: {exc}",
         ) from exc
     try:
-        reports = tuple(_manifest_report(item, raw, root) for item in raw["reports"])
+        manifest_kind = raw.get("manifest_kind", STAGE5_SAMPLE_MANIFEST_KIND)
+        if manifest_kind == STAGE5_VALIDATION_MANIFEST_KIND:
+            if (
+                raw.get("sample_count") != 1
+                or raw.get("sample_replacement_allowed") is not False
+                or raw.get("semantic_execution_started") is not False
+            ):
+                raise ValueError("validation manifest freeze controls are invalid")
+            reports = tuple(
+                _validation_manifest_report(item, raw, root) for item in raw["samples"]
+            )
+            manifest_revision = raw.get("manifest_id")
+        elif manifest_kind == STAGE5_SAMPLE_MANIFEST_KIND:
+            reports = tuple(
+                _manifest_report(item, raw, root) for item in raw["reports"]
+            )
+            manifest_revision = raw.get("manifest_revision")
+        else:
+            raise ValueError(f"unknown stage-five manifest kind: {manifest_kind}")
         manifest = Stage5SampleManifest(
             schema_version=raw.get("schema_version"),
-            manifest_revision=raw.get("manifest_revision"),
+            manifest_kind=manifest_kind,
+            manifest_revision=manifest_revision,
             reports=reports,
             production_authorization=raw.get("production_authorization"),
         )
@@ -437,7 +504,13 @@ class Stage5EvidencePreparer:
         for task in plan.tasks:
             for scope in task.request_scopes:
                 prepared.append(
-                    self._prepare_scope(asset, task.chapter_task, scope, page_results)
+                    self._prepare_scope(
+                        asset,
+                        task.chapter_task,
+                        scope,
+                        page_results,
+                        plan_version=evidence_plan.plan_version,
+                    )
                 )
         return tuple(prepared)
 
@@ -447,6 +520,8 @@ class Stage5EvidencePreparer:
         chapter_task: ChapterTask,
         scope: EvidenceScopePlan,
         page_results: dict[int, Any],
+        *,
+        plan_version: str,
     ) -> PreparedRequestScope:
         contexts: list[PreparedPageContext] = []
         evidence: list[PreparedEvidence] = []
@@ -617,7 +692,7 @@ class Stage5EvidencePreparer:
             report=asset.report,
             evidence_bundle=tuple(evidence),
             page_contexts=tuple(contexts),
-            plan_version=STAGE5_EVIDENCE_PLAN_VERSION,
+            plan_version=plan_version,
             source_row_dimensions=scope.source_row_dimensions,
             candidate_pages=scope.candidate_pages,
         )
@@ -721,6 +796,100 @@ def _manifest_report(
         regime_effective_period=package["effective_period"],
         production_authorization=raw_manifest.get("production_authorization"),
     )
+
+
+def _validation_manifest_report(
+    raw_report: dict[str, Any],
+    raw_manifest: dict[str, Any],
+    repository_root: Path,
+) -> Stage5ReportAsset:
+    sample_id = str(raw_report.get("sample_id") or "")
+    identity = raw_report["report_identity"]
+    pdf = raw_report["pdf"]
+    local_path = _resolve_validation_asset(
+        repository_root, pdf.get("path"), sample_id=sample_id
+    )
+    content = local_path.read_bytes()
+    expected_hash = str(pdf.get("sha256") or "")
+    if (
+        sample_id != STAGE5_VALIDATION_SAMPLE_ID
+        or identity.get("report_id", identity.get("announcement_id"))
+        != STAGE5_VALIDATION_REPORT_ID
+        or identity.get("version_id") != STAGE5_VALIDATION_DOCUMENT_VERSION
+        or expected_hash != STAGE5_VALIDATION_CONTENT_HASH
+    ):
+        raise EvidencePreparationError(
+            PreparationFailureCode.MANIFEST_INVALID,
+            f"validation report identity does not match its freeze: {sample_id}",
+            sample_id=sample_id,
+        )
+    if hashlib.sha256(content).hexdigest() != expected_hash:
+        raise EvidencePreparationError(
+            PreparationFailureCode.HASH_MISMATCH,
+            f"PDF hash mismatch for {sample_id}",
+            sample_id=sample_id,
+        )
+    if len(content) != int(pdf.get("content_length_bytes") or 0):
+        raise EvidencePreparationError(
+            PreparationFailureCode.CONTENT_LENGTH_MISMATCH,
+            f"PDF content length mismatch for {sample_id}",
+            sample_id=sample_id,
+        )
+    if raw_manifest.get("industry_package") != STAGE5_PACKAGE:
+        raise EvidencePreparationError(
+            PreparationFailureCode.MANIFEST_INVALID,
+            f"validation sample is outside the industry package: {sample_id}",
+            sample_id=sample_id,
+        )
+    return Stage5ReportAsset(
+        sample_id=sample_id,
+        company_name=identity["company_name"],
+        exchange=identity["exchange"],
+        report=ReportIdentity(
+            instrument_id=identity["instrument_id"],
+            report_id=identity["announcement_id"],
+            document_version=identity["version_id"],
+            report_period=identity["report_period"],
+            published_at=identity["published_at"],
+            document_type=identity["document_family"],
+        ),
+        content_hash=expected_hash,
+        local_path=local_path,
+        content_length=pdf["content_length_bytes"],
+        page_count=pdf["page_count"],
+        regime_type="validation_unclassified",
+        regime_effective_period=identity["report_period"],
+        production_authorization=raw_manifest.get("production_authorization"),
+    )
+
+
+def _resolve_validation_asset(
+    repository_root: Path,
+    raw_path: Any,
+    *,
+    sample_id: str,
+) -> Path:
+    requested = Path(str(raw_path or ""))
+    resolved = (
+        requested.resolve()
+        if requested.is_absolute()
+        else (repository_root / requested).resolve()
+    )
+    try:
+        resolved.relative_to(repository_root)
+    except ValueError as exc:
+        raise EvidencePreparationError(
+            PreparationFailureCode.ASSET_PATH_INVALID,
+            f"validation PDF path escapes the repository: {raw_path}",
+            sample_id=sample_id,
+        ) from exc
+    if not resolved.is_file():
+        raise EvidencePreparationError(
+            PreparationFailureCode.ASSET_MISSING,
+            f"validation PDF asset is missing: {raw_path}",
+            sample_id=sample_id,
+        )
+    return resolved
 
 
 def _resolve_local_asset(

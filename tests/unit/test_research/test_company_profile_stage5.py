@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 import json
 from pathlib import Path
 
@@ -47,6 +48,14 @@ EVIDENCE_PLAN = (
     REPOSITORY_ROOT
     / "research/company_profile/evidence_plans/manufacturing_materials.v1.json"
 )
+
+VALIDATION_CHANGE = (
+    REPOSITORY_ROOT
+    / "openspec/changes/validate-company-profile-out-of-sample-generalization"
+)
+VALIDATION_MANIFEST = VALIDATION_CHANGE / "out-of-sample-manifest.v1.json"
+VALIDATION_EVIDENCE_PLAN = VALIDATION_CHANGE / "evidence-plan.v1.json"
+VALIDATION_SAMPLE_ID = "manufacturing-materials-oos-600019-2025"
 
 
 def test_stage5_manifest_is_a_verified_four_report_closed_set() -> None:
@@ -456,3 +465,162 @@ def _minimal_run_bundle(run_id: str) -> Stage5RunBundle:
         retained_bundle_ids=(),
         created_at="2026-09-04T00:00:00+00:00",
     )
+
+
+def test_stage5_validation_manifest_prepares_the_frozen_single_sample() -> None:
+    manifest = load_stage5_sample_manifest(
+        VALIDATION_MANIFEST,
+        repository_root=REPOSITORY_ROOT,
+    )
+    plan = load_stage5_evidence_plan(VALIDATION_EVIDENCE_PLAN)
+
+    prepared = Stage5EvidencePreparer(
+        PdfRouter(native=PypdfNativeAdapter())
+    ).prepare_report(
+        manifest=manifest,
+        evidence_plan=plan,
+        sample_id=VALIDATION_SAMPLE_ID,
+    )
+
+    assert manifest.manifest_kind == "out_of_sample_validation"
+    assert [item.sample_id for item in manifest.reports] == [VALIDATION_SAMPLE_ID]
+    assert manifest.reports[0].report.instrument_id == "600019.SH"
+    assert [item.sample_id for item in plan.reports] == [VALIDATION_SAMPLE_ID]
+    assert len(prepared) == 9
+    assert {scope.chapter_task for scope in prepared} == set(ChapterTask)
+    assert all(
+        scope.plan_version == "manufacturing_materials_oos.2026-09-08.1"
+        and scope.production_authorization == "not_authorized"
+        for scope in prepared
+    )
+
+
+def test_stage5_validation_manifest_rejects_unknown_mixed_and_replaced_samples(
+    tmp_path: Path,
+) -> None:
+    original = json.loads(VALIDATION_MANIFEST.read_text(encoding="utf-8"))
+
+    unknown_kind = copy.deepcopy(original)
+    unknown_kind["manifest_kind"] = "unknown_validation_kind"
+    unknown_path = tmp_path / "unknown-kind.json"
+    unknown_path.write_text(json.dumps(unknown_kind), encoding="utf-8")
+
+    schema_mismatch = copy.deepcopy(original)
+    schema_mismatch["schema_version"] = "company_profile_industry_sample_manifest.v1"
+    schema_mismatch_path = tmp_path / "schema-mismatch.json"
+    schema_mismatch_path.write_text(json.dumps(schema_mismatch), encoding="utf-8")
+
+    mixed = copy.deepcopy(original)
+    second = copy.deepcopy(mixed["samples"][0])
+    second["sample_id"] = "manufacturing-materials-300750-2025"
+    second["report_identity"]["instrument_id"] = "300750.SZ"
+    mixed["samples"].append(second)
+    mixed_path = tmp_path / "mixed.json"
+    mixed_path.write_text(json.dumps(mixed), encoding="utf-8")
+
+    replaced = copy.deepcopy(original)
+    replaced["samples"][0]["sample_id"] = "manufacturing-materials-oos-replacement"
+    replaced_path = tmp_path / "replaced.json"
+    replaced_path.write_text(json.dumps(replaced), encoding="utf-8")
+
+    post_output = copy.deepcopy(original)
+    post_output["semantic_execution_started"] = True
+    post_output_path = tmp_path / "post-output.json"
+    post_output_path.write_text(json.dumps(post_output), encoding="utf-8")
+
+    revised_manifest = copy.deepcopy(original)
+    revised_manifest["manifest_id"] = "replacement-revision"
+    revised_manifest_path = tmp_path / "revised-manifest.json"
+    revised_manifest_path.write_text(json.dumps(revised_manifest), encoding="utf-8")
+
+    revised_report = copy.deepcopy(original)
+    revised_report["samples"][0]["report_identity"]["announcement_id"] = (
+        "replacement-announcement"
+    )
+    revised_report_path = tmp_path / "revised-report.json"
+    revised_report_path.write_text(json.dumps(revised_report), encoding="utf-8")
+
+    for candidate in (
+        unknown_path,
+        schema_mismatch_path,
+        mixed_path,
+        replaced_path,
+        post_output_path,
+        revised_manifest_path,
+        revised_report_path,
+    ):
+        with pytest.raises(EvidencePreparationError) as exc_info:
+            load_stage5_sample_manifest(candidate, repository_root=REPOSITORY_ROOT)
+        assert exc_info.value.code == PreparationFailureCode.MANIFEST_INVALID
+
+
+def test_stage5_validation_evidence_plan_rejects_mixed_reports(
+    tmp_path: Path,
+) -> None:
+    payload = json.loads(VALIDATION_EVIDENCE_PLAN.read_text(encoding="utf-8"))
+    payload["reports"].append(copy.deepcopy(payload["reports"][0]))
+    candidate = tmp_path / "mixed-evidence.json"
+    candidate.write_text(json.dumps(payload), encoding="utf-8")
+
+    with pytest.raises(EvidencePreparationError) as exc_info:
+        load_stage5_evidence_plan(candidate)
+
+    assert exc_info.value.code == PreparationFailureCode.PLAN_INVALID
+
+
+def test_stage5_report_bundle_accepts_only_the_frozen_validation_identity() -> None:
+    manifest = load_stage5_sample_manifest(
+        VALIDATION_MANIFEST,
+        repository_root=REPOSITORY_ROOT,
+    )
+    plan = load_stage5_evidence_plan(VALIDATION_EVIDENCE_PLAN)
+    prepared = Stage5EvidencePreparer().prepare_report(
+        manifest=manifest,
+        evidence_plan=plan,
+        sample_id=VALIDATION_SAMPLE_ID,
+    )[0]
+    task_result = CompanyProfileTaskResult(
+        request_id="validation-bundle:business_overview",
+        records=(),
+        dispositions=(),
+        coverage=(),
+        human_review_items=(),
+        task_complete=True,
+        provider_calls=(),
+    )
+    scope_result = Stage5ScopeResult(
+        scope_id=prepared.scope_id,
+        request_id=task_result.request_id,
+        prepared_scope=prepared,
+        task_result=task_result,
+        provider_call_types=(),
+    )
+    view = project_research_view(
+        company_name="宝钢股份",
+        report=prepared.report,
+        task_results=(task_result,),
+    )
+
+    bundle = Stage5ReportBundle(
+        run_id="validation-bundle",
+        sample_id=VALIDATION_SAMPLE_ID,
+        company_name="宝钢股份",
+        report=prepared.report,
+        sample_manifest_revision=manifest.manifest_revision,
+        evidence_plan_version=plan.plan_version,
+        evidence_plan_hash="b" * 64,
+        scope_results=(scope_result,),
+        research_view=view,
+        report_status=Stage5ReportStatus.HOLD,
+        benchmark=Stage5BenchmarkResult(decision="not_evaluated"),
+        created_at="2026-09-08T00:00:00+00:00",
+    )
+
+    assert bundle.sample_id == VALIDATION_SAMPLE_ID
+    invalid_payload = {
+        field_name: getattr(bundle, field_name)
+        for field_name in Stage5ReportBundle.model_fields
+    }
+    invalid_payload["sample_id"] = "unknown-sample"
+    with pytest.raises(ValueError, match="outside the approved sample set"):
+        Stage5ReportBundle.model_validate(invalid_payload)

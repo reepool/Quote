@@ -59,6 +59,13 @@ EVIDENCE_PLAN = (
     REPOSITORY_ROOT
     / "research/company_profile/evidence_plans/manufacturing_materials.v1.json"
 )
+VALIDATION_CHANGE = (
+    REPOSITORY_ROOT
+    / "openspec/changes/validate-company-profile-out-of-sample-generalization"
+)
+VALIDATION_MANIFEST = VALIDATION_CHANGE / "out-of-sample-manifest.v1.json"
+VALIDATION_EVIDENCE_PLAN = VALIDATION_CHANGE / "evidence-plan.v1.json"
+VALIDATION_SAMPLE_ID = "manufacturing-materials-oos-600019-2025"
 
 
 def test_stage5_fake_single_report_commits_research_view_and_legal_empty(
@@ -113,6 +120,51 @@ def test_stage5_fake_single_report_commits_research_view_and_legal_empty(
         item["field_id"] == "counterparty_relationship"
         and item["status"] == "not_disclosed"
         for item in view["coverage"]
+    )
+    assert not list(store.output_root.glob(".stage5-tmp-*"))
+
+
+def test_stage5_validation_manifest_uses_existing_semantic_and_bundle_owners(
+    tmp_path: Path,
+) -> None:
+    manifest = load_stage5_sample_manifest(
+        VALIDATION_MANIFEST,
+        repository_root=REPOSITORY_ROOT,
+    )
+    plan = load_stage5_evidence_plan(VALIDATION_EVIDENCE_PLAN)
+    store = Stage5RunBundleStore(
+        tmp_path / "isolated",
+        repository_root=REPOSITORY_ROOT,
+    )
+    service = ManufacturingMaterialsProfileSliceService(
+        evidence_preparer=Stage5EvidencePreparer(PdfRouter(native=PypdfNativeAdapter()))
+    )
+
+    execution = service.run_semantic_slice(
+        run_id="fake-oos-600019",
+        manifest=manifest,
+        evidence_plan=plan,
+        evidence_plan_path=VALIDATION_EVIDENCE_PLAN,
+        store=store,
+        provider_factory=lambda _: pytest.fail(
+            "offline validation path must not invoke a provider"
+        ),
+        semantic_input_factory=lambda scope: Stage5SemanticInput(
+            unresolved_field_ids=()
+        ),
+    )
+
+    payload = json.loads(
+        (execution.output_path / "manifest.json").read_text(encoding="utf-8")
+    )
+    assert execution.overall_status == "hold"
+    assert execution.report_statuses == {VALIDATION_SAMPLE_ID: "hold"}
+    assert [item["sample_id"] for item in payload["reports"]] == [
+        VALIDATION_SAMPLE_ID
+    ]
+    assert len(payload["reports"][0]["scope_results"]) == 9
+    assert payload["reports"][0]["research_view"]["production_authorization"] == (
+        "not_authorized"
     )
     assert not list(store.output_root.glob(".stage5-tmp-*"))
 

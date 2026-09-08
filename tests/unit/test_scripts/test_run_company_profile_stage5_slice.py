@@ -3,6 +3,8 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import pytest
+
 from scripts import run_company_profile_stage5_slice as operator
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[3]
@@ -14,6 +16,13 @@ EVIDENCE_PLAN = (
     REPOSITORY_ROOT
     / "research/company_profile/evidence_plans/manufacturing_materials.v1.json"
 )
+
+VALIDATION_CHANGE = (
+    REPOSITORY_ROOT
+    / "openspec/changes/validate-company-profile-out-of-sample-generalization"
+)
+VALIDATION_MANIFEST = VALIDATION_CHANGE / "out-of-sample-manifest.v1.json"
+VALIDATION_EVIDENCE_PLAN = VALIDATION_CHANGE / "evidence-plan.v1.json"
 
 
 def test_stage5_operator_can_limit_preparation_to_one_approved_sample(
@@ -146,3 +155,79 @@ def test_stage5_operator_runs_four_report_preparation_only(
     assert payload["provider_calls"] == 0
     assert len(payload["scopes"]) == 43
     assert not list(output_root.glob(".stage5-tmp-*"))
+
+
+def test_stage5_operator_prepares_the_explicit_validation_manifest(
+    tmp_path: Path,
+    capsys,
+) -> None:
+    output_root = tmp_path / "isolated"
+
+    exit_code = operator.main(
+        (
+            "--mode",
+            "preparation-only",
+            "--sample-manifest",
+            str(VALIDATION_MANIFEST),
+            "--evidence-plan",
+            str(VALIDATION_EVIDENCE_PLAN),
+            "--output-root",
+            str(output_root),
+            "--run-id",
+            "operator-oos-preparation",
+            "--provider-route",
+            "semantic_extraction",
+            "--max-output-tokens",
+            "4000",
+            "--timeout-seconds",
+            "90",
+            "--max-provider-calls",
+            "27",
+        )
+    )
+
+    result = json.loads(capsys.readouterr().out)
+    payload = json.loads(
+        (
+            output_root / "preparation-operator-oos-preparation" / "manifest.json"
+        ).read_text(encoding="utf-8")
+    )
+    assert exit_code == 0
+    assert result["provider_calls"] == 0
+    assert result["report_statuses"] == {
+        "manufacturing-materials-oos-600019-2025": "prepared"
+    }
+    assert len(payload["scopes"]) == 9
+    assert {item["sample_id"] for item in payload["scopes"]} == {
+        "manufacturing-materials-oos-600019-2025"
+    }
+
+
+def test_stage5_operator_rejects_targeted_validation_semantic_runs(
+    tmp_path: Path,
+) -> None:
+    with pytest.raises(ValueError, match="requires one complete report run"):
+        operator.main(
+            (
+                "--mode",
+                "semantic-run",
+                "--sample-manifest",
+                str(VALIDATION_MANIFEST),
+                "--evidence-plan",
+                str(VALIDATION_EVIDENCE_PLAN),
+                "--output-root",
+                str(tmp_path / "isolated"),
+                "--run-id",
+                "operator-oos-targeted",
+                "--scope-id",
+                "business_overview",
+                "--provider-route",
+                "semantic_extraction",
+                "--max-output-tokens",
+                "4000",
+                "--timeout-seconds",
+                "90",
+                "--max-provider-calls",
+                "27",
+            )
+        )

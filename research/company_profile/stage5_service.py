@@ -39,7 +39,6 @@ from .models import (
 )
 from .projection import project_research_view
 from .stage5 import (
-    APPROVED_STAGE5_SAMPLES,
     PreparedRequestScope,
     Stage5EvidencePlan,
     Stage5EvidencePreparer,
@@ -240,7 +239,7 @@ class ManufacturingMaterialsProfileSliceService:
         sample_ids: Iterable[str] | None = None,
         scope_ids: Iterable[str] | None = None,
     ) -> Stage5SliceExecution:
-        selected = self._selected_sample_ids(sample_ids)
+        selected = self._selected_sample_ids(manifest, sample_ids)
         prepared = self._prepare_selected(
             manifest,
             evidence_plan,
@@ -293,7 +292,7 @@ class ManufacturingMaterialsProfileSliceService:
         scope_ids: Iterable[str] | None = None,
         review_decisions: Mapping[str, tuple[Stage5ReviewDecision, ...]] | None = None,
     ) -> Stage5SliceExecution:
-        selected = self._selected_sample_ids(sample_ids)
+        selected = self._selected_sample_ids(manifest, sample_ids)
         try:
             prepared = self._prepare_selected(
                 manifest,
@@ -447,9 +446,7 @@ class ManufacturingMaterialsProfileSliceService:
         for sample_id in selected:
             available = {scope.scope_id: scope for scope in prepared[sample_id]}
             matched = tuple(
-                available[scope_id]
-                for scope_id in requested
-                if scope_id in available
+                available[scope_id] for scope_id in requested if scope_id in available
             )
             if not matched:
                 raise ValueError(
@@ -460,13 +457,19 @@ class ManufacturingMaterialsProfileSliceService:
         return selected_scopes
 
     @staticmethod
-    def _selected_sample_ids(sample_ids: Iterable[str] | None) -> tuple[str, ...]:
-        selected = tuple(sample_ids or APPROVED_STAGE5_SAMPLES)
+    def _selected_sample_ids(
+        manifest: Stage5SampleManifest,
+        sample_ids: Iterable[str] | None,
+    ) -> tuple[str, ...]:
+        allowed = tuple(item.sample_id for item in manifest.reports)
+        selected = tuple(sample_ids or allowed)
         if not selected or len(selected) != len(set(selected)):
             raise ValueError("stage-five sample selection must be non-empty and unique")
-        unknown = set(selected) - set(APPROVED_STAGE5_SAMPLES)
+        unknown = set(selected) - set(allowed)
         if unknown:
-            raise ValueError(f"unapproved stage-five samples: {sorted(unknown)}")
+            raise ValueError(
+                f"samples are outside the loaded stage-five manifest: {sorted(unknown)}"
+            )
         return selected
 
 

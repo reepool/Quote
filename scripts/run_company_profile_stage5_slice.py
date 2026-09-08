@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run the isolated four-report company-profile stage-five slice."""
+"""Run an isolated company-profile stage-five research manifest."""
 
 from __future__ import annotations
 
@@ -24,6 +24,7 @@ from research.company_profile.contracts import (
     VerifyRequest,
 )
 from research.company_profile.stage5 import (
+    STAGE5_VALIDATION_MANIFEST_KIND,
     PreparedRequestScope,
     load_stage5_evidence_plan,
     load_stage5_sample_manifest,
@@ -114,6 +115,15 @@ def main(argv: Sequence[str] | None = None) -> int:
         repository_root=ROOT_DIR,
     )
     evidence_plan = load_stage5_evidence_plan(args.evidence_plan)
+    if (
+        manifest.manifest_kind == STAGE5_VALIDATION_MANIFEST_KIND
+        and args.mode == "semantic-run"
+        and args.scope_ids
+    ):
+        raise ValueError(
+            "out-of-sample validation requires one complete report run; "
+            "scope selection is preparation-only"
+        )
     store = Stage5RunBundleStore(args.output_root, repository_root=ROOT_DIR)
     service = ManufacturingMaterialsProfileSliceService()
 
