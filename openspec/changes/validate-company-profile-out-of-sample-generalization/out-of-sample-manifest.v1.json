@@ -1,0 +1,132 @@
+{
+  "artifact_type": "company_profile_out_of_sample_manifest",
+  "schema_version": "company_profile_out_of_sample_manifest.v1",
+  "manifest_id": "manufacturing-materials-oos-manifest-20260908-v1",
+  "manifest_kind": "out_of_sample_validation",
+  "industry_package": "manufacturing_materials",
+  "frozen_on": "2026-09-08",
+  "sample_replacement_allowed": false,
+  "semantic_execution_started": false,
+  "evidence_plan_status": "not_started_pending_sample_confirmation",
+  "production_authorization": "not_authorized",
+  "accepted_record_semantics": "accepted_for_review",
+  "sample_count": 1,
+  "samples": [
+    {
+      "sample_id": "manufacturing-materials-oos-600019-2025",
+      "report_identity": {
+        "instrument_id": "600019.SH",
+        "symbol": "600019",
+        "company_name": "宝钢股份",
+        "company_name_en": "Baoshan Iron & Steel Co., Ltd.",
+        "exchange": "SSE",
+        "fiscal_year": 2025,
+        "report_period": "2025-12-31",
+        "report_title": "宝钢股份2025年年度报告全文",
+        "document_family": "annual_report",
+        "variant": "original",
+        "source": "cninfo",
+        "source_announcement_id": "1225257227",
+        "announcement_id": "ann_b6f4559910072e19246d18f96508e7d8",
+        "attachment_id": "att_e22e291ad8ba6dad7d30d1db0e4c5d8b",
+        "version_id": "ver_f9c4bf73d6b80d19718adfa4ab88154d",
+        "asset_id": "asset_50bd3ff0072ae0e7f7307798d86fd1a0",
+        "published_at": "2026-04-29T16:00:00+00:00",
+        "decision_state": "current",
+        "availability": "local_valid",
+        "visibility_state": "production",
+        "classifier_version": "formal_annual_report.v1",
+        "canonical_projection_policy_version": "canonical_source_filing.v1"
+      },
+      "pdf": {
+        "path": "/home/python/Quote/data/filings/announcements/blobs/9d/9d910b7b6a78fe2ccae1345c8651ca2e592d83b04bc2705f51d611ec0e1545a8.pdf",
+        "sha256": "9d910b7b6a78fe2ccae1345c8651ca2e592d83b04bc2705f51d611ec0e1545a8",
+        "content_length_bytes": 1905325,
+        "page_count": 245,
+        "encrypted": false,
+        "signature_status": "valid_pdf",
+        "integrity_status": "valid"
+      },
+      "selection_dimensions": {
+        "business_model": [
+          "integrated_steel_manufacturing",
+          "steel_processing_and_distribution",
+          "chemical_operations",
+          "information_technology_services"
+        ],
+        "disclosure_form": [
+          "sse_annual_report",
+          "industry_and_product_revenue_cost_tables",
+          "production_and_sales_disclosure",
+          "customer_and_consolidation_disclosure",
+          "project_and_capacity_narrative"
+        ],
+        "generalization_pressure": [
+          "complex_group_and_business_structure",
+          "manufacturing_vs_processing_distribution_boundary",
+          "multi_activity_subject_scope"
+        ]
+      },
+      "selection_reason": "The official locally valid integrated-steel report is absent from the manufacturing/materials company-profile sample, Gold, targeted runs, and adjudication ledger, and differs materially from the prior battery, fine-chemical, and aviation business forms.",
+      "known_limitations": [
+        "Complex group and operating structure may produce subject-scope caveats.",
+        "Steel manufacturing and processing/distribution disclosures may test the frozen activity boundary.",
+        "Subsidiary and consolidation-scope disclosures must not be promoted to consolidated_group without existing-policy support.",
+        "One sample can demonstrate only bounded contract reuse, not industry-wide readiness."
+      ]
+    }
+  ],
+  "independence_audit": {
+    "excluded_in_sample_instruments": [
+      "300750.SZ",
+      "603659.SH",
+      "920015.BJ",
+      "302132.SZ"
+    ],
+    "checked_identifiers": [
+      "600019.SH",
+      "600019",
+      "宝钢股份",
+      "asset_50bd3ff0072ae0e7f7307798d86fd1a0",
+      "1225257227",
+      "9d910b7b6a78fe2ccae1345c8651ca2e592d83b04bc2705f51d611ec0e1545a8"
+    ],
+    "checked_artifact_classes": [
+      "approved_four_report_manifest",
+      "company_profile_gold_annotations",
+      "company_profile_negative_annotations",
+      "stage5_targeted_probe_preflight_and_complete_runs",
+      "manufacturing_materials_adjudication_ledgers",
+      "company_profile_openspec_changes"
+    ],
+    "company_profile_matches": [],
+    "unrelated_repository_mentions": [
+      {
+        "path": "docs/development/research_data_engine_execution.md",
+        "reason": "financial numeric-fact batch note; not company-profile semantic evidence"
+      },
+      {
+        "path": "tests/unit/test_research/test_business_profile_governance.py",
+        "reason": "generic governance fixture symbol; not manufacturing/materials Gold or adjudication"
+      }
+    ],
+    "decision": "independent_sample_confirmed"
+  },
+  "immutable_in_sample_references": {
+    "authority_run_id": "stage55-closure-four-20260907-a",
+    "authority_run_directory": "var/company_profile_stage5/20260907/run-stage55-closure-four-20260907-a",
+    "authority_manifest_sha256": "00fa20045d4df037a8984cff4b56af3f19ac533f4c4b9e311e7f130bf5158687",
+    "authority_benchmark_sha256": "ce417e81039a863d0c9093fd2bd2fa2bb2e12d81cd2df0f440790210e6084188",
+    "offline_evaluation_id": "refine-period-event-semantics-20260908-a",
+    "offline_gold_result": "18/24",
+    "offline_evaluation_path": "openspec/changes/archive/2026-09-08-refine-company-profile-period-and-event-semantics/offline-evaluation.stage55-closure-four-20260907-a.20260908-a.json",
+    "offline_evaluation_sha256": "4151aed0bc75119c9d4c3338d699e5b2f4c8d30437b8e2796300d24efc1469aa",
+    "input_record_source_for_new_run": false
+  },
+  "prohibited_actions_before_sample_confirmation": [
+    "prepare_six_chapter_evidence",
+    "modify_execution_code",
+    "invoke_llm_gateway",
+    "replace_sample"
+  ]
+}

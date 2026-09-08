@@ -1,8 +1,8 @@
 ## 1. Baseline and sample freeze
 
-- [ ] 1.1 Record `stage55-closure-four-20260907-a` and the offline Gold 18/24 evaluation as immutable in-sample references, and confirm that neither is an input record source for the new run.
-- [ ] 1.2 Select exactly one official local manufacturing/materials annual report absent from the four-report manifest, Gold, targeted runs, and adjudication ledger; record its business-model and disclosure-form selection rationale.
-- [ ] 1.3 Freeze a versioned out-of-sample manifest with sample/report identity, exchange, report period, PDF path and hash, known limitations, and `production_authorization=not_authorized` before semantic execution.
+- [x] 1.1 Record `stage55-closure-four-20260907-a` and the offline Gold 18/24 evaluation as immutable in-sample references, and confirm that neither is an input record source for the new run.
+- [x] 1.2 Select exactly one official local manufacturing/materials annual report absent from the four-report manifest, Gold, targeted runs, and adjudication ledger; record its business-model and disclosure-form selection rationale.
+- [x] 1.3 Freeze a versioned out-of-sample manifest with sample/report identity, exchange, report period, PDF path and hash, known limitations, and `production_authorization=not_authorized` before semantic execution.
 
 ## 2. Six-chapter Evidence plan
 
