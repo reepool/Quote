@@ -34,6 +34,7 @@ from typing import (
     Iterable,
     List,
     Mapping,
+    MutableMapping,
     Optional,
     Sequence,
     Set,
@@ -19610,8 +19611,12 @@ class DataManager:
             update_results['total_quotes_added'] += quotes_added
             exchange_result['success_count'] += 1
             update_results['success_count'] += 1
-            exchange_result['failure_count'] = max(0, exchange_result['failure_count'] - 1)
-            update_results['failure_count'] = max(0, update_results['failure_count'] - 1)
+            self._adjust_daily_instrument_failure_counts(
+                exchange_result,
+                update_results,
+                instrument,
+                -1,
+            )
             exchange_result['integrity_stats']['empty_unresolved'] = max(
                 0, exchange_result['integrity_stats']['empty_unresolved'] - 1
             )
@@ -20366,6 +20371,69 @@ class DataManager:
             result['reason'] = 'factor_download_failures'
         return result
 
+    @staticmethod
+    def _is_index_instrument(instrument: Optional[Mapping[str, Any]]) -> bool:
+        return str((instrument or {}).get('type') or '').lower() == 'index'
+
+    @staticmethod
+    def _adjust_daily_instrument_failure_counts(
+        exchange_result: MutableMapping[str, Any],
+        update_results: MutableMapping[str, Any],
+        instrument: Optional[Mapping[str, Any]],
+        delta: int,
+    ) -> None:
+        """Track mixed and typed daily quote failures for reports vs stock watermarks."""
+
+        typed_key = (
+            'index_failure_count'
+            if DataManager._is_index_instrument(instrument)
+            else 'stock_failure_count'
+        )
+        for bucket in (exchange_result, update_results):
+            bucket['failure_count'] = max(
+                0, int(bucket.get('failure_count') or 0) + delta
+            )
+            bucket[typed_key] = max(0, int(bucket.get(typed_key) or 0) + delta)
+
+    @staticmethod
+    def _quote_exchange_blocks_stock_watermark(
+        quote_state: Mapping[str, Any],
+    ) -> bool:
+        """Return True when this exchange's stock quote path is not ready.
+
+        Index fetch misses stay in mixed ``failure_count`` for the daily
+        report, but they must not freeze the stock operational watermark that
+        XDXR and canonical merge wait on.
+        """
+
+        if quote_state.get('error'):
+            return True
+        write_stats = quote_state.get('changelog_stats')
+        write_failures = int(
+            (
+                write_stats.get('failed')
+                if isinstance(write_stats, Mapping)
+                else 0
+            )
+            or 0
+        )
+        if write_failures:
+            return True
+        return int(quote_state.get('stock_failure_count') or 0) > 0
+
+    @staticmethod
+    def _sum_exchange_stat(
+        exchange_stats: Mapping[str, Any],
+        exchanges: Sequence[str],
+        key: str,
+    ) -> int:
+        total = 0
+        for exchange in exchanges:
+            state = exchange_stats.get(exchange)
+            if isinstance(state, Mapping):
+                total += int(state.get(key) or 0)
+        return total
+
     async def _record_a_share_quote_composite_watermark(
         self,
         *,
@@ -20424,22 +20492,8 @@ class DataManager:
                 failures.append(f'{exchange}:quote_persisted_coverage_stale')
             if not isinstance(quote_state, Mapping):
                 failures.append(f'{exchange}:quote_status_missing')
-            else:
-                quote_write_stats = quote_state.get('changelog_stats')
-                quote_write_failures = int(
-                    (
-                        quote_write_stats.get('failed')
-                        if isinstance(quote_write_stats, Mapping)
-                        else 0
-                    )
-                    or 0
-                )
-                if (
-                    quote_state.get('error')
-                    or int(quote_state.get('failure_count') or 0)
-                    or quote_write_failures
-                ):
-                    failures.append(f'{exchange}:quote_update_failed')
+            elif self._quote_exchange_blocks_stock_watermark(quote_state):
+                failures.append(f'{exchange}:quote_update_failed')
             if not isinstance(factor_state, Mapping):
                 failures.append(f'{exchange}:factor_status_missing')
             elif str(factor_state.get('status') or 'success') != 'success':
@@ -20461,6 +20515,12 @@ class DataManager:
             'failure_reasons': failures[:20],
             'quote_failure_count': int(
                 update_results.get('failure_count') or 0
+            ),
+            'stock_failure_count': self._sum_exchange_stat(
+                exchange_stats, governed_exchanges, 'stock_failure_count'
+            ),
+            'index_failure_count': self._sum_exchange_stat(
+                exchange_stats, governed_exchanges, 'index_failure_count'
             ),
             'factor_stats': {
                 exchange: {
@@ -38219,6 +38279,8 @@ class DataManager:
             update_results = {
                 'success_count': 0,
                 'failure_count': 0,
+                'stock_failure_count': 0,
+                'index_failure_count': 0,
                 'total_quotes_added': 0,
                 'integrity_stats': {
                     'empty_unresolved': 0,
@@ -38296,6 +38358,8 @@ class DataManager:
                     exchange_result = {
                         'success_count': 0,
                         'failure_count': 0,
+                        'stock_failure_count': 0,
+                        'index_failure_count': 0,
                         'quotes_added': 0,
                         'integrity_stats': {
                             'empty_unresolved': 0,
@@ -38434,8 +38498,12 @@ class DataManager:
                                     else:
                                         exchange_result['integrity_stats']['empty_unresolved'] += 1
                                         update_results['integrity_stats']['empty_unresolved'] += 1
-                                        exchange_result['failure_count'] += 1
-                                        update_results['failure_count'] += 1
+                                        self._adjust_daily_instrument_failure_counts(
+                                            exchange_result,
+                                            update_results,
+                                            instrument,
+                                            1,
+                                        )
                                         skipped_sources = []
                                         probed_sources = []
                                         if isinstance(source_diagnostic, dict):
@@ -38567,12 +38635,20 @@ class DataManager:
                                 instrument.get('symbol'),
                                 instrument.get('instrument_id')
                             )
-                            exchange_result['failure_count'] += 1
-                            update_results['failure_count'] += 1
+                            self._adjust_daily_instrument_failure_counts(
+                                exchange_result,
+                                update_results,
+                                instrument,
+                                1,
+                            )
                         except Exception as e:
                             dm_logger.error(f"[DataManager] Failed to update {instrument['symbol']}: {e}")
-                            exchange_result['failure_count'] += 1
-                            update_results['failure_count'] += 1
+                            self._adjust_daily_instrument_failure_counts(
+                                exchange_result,
+                                update_results,
+                                instrument,
+                                1,
+                            )
                             continue
 
                     update_results['exchange_stats'][exchange] = exchange_result

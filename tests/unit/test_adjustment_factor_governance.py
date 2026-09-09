@@ -1049,6 +1049,166 @@ async def test_stale_persisted_quote_coverage_keeps_watermark_partial():
     ]
 
 
+def test_daily_quote_failure_counts_split_stock_and_index():
+    exchange_result = {
+        "failure_count": 0,
+        "stock_failure_count": 0,
+        "index_failure_count": 0,
+    }
+    update_results = {
+        "failure_count": 0,
+        "stock_failure_count": 0,
+        "index_failure_count": 0,
+    }
+
+    DataManager._adjust_daily_instrument_failure_counts(
+        exchange_result, update_results, {"type": "index"}, 1
+    )
+    assert exchange_result["failure_count"] == 1
+    assert exchange_result["index_failure_count"] == 1
+    assert exchange_result["stock_failure_count"] == 0
+
+    DataManager._adjust_daily_instrument_failure_counts(
+        exchange_result, update_results, {"type": "stock"}, 1
+    )
+    assert exchange_result["stock_failure_count"] == 1
+    assert exchange_result["failure_count"] == 2
+
+    DataManager._adjust_daily_instrument_failure_counts(
+        exchange_result, update_results, {"type": "index"}, -1
+    )
+    assert exchange_result["index_failure_count"] == 0
+    assert exchange_result["stock_failure_count"] == 1
+    assert exchange_result["failure_count"] == 1
+
+
+@pytest.mark.asyncio
+async def test_index_quote_failure_does_not_block_stock_watermark():
+    manager = DataManager()
+    manager.db_ops = Mock()
+    manager.db_ops.get_previous_trading_day = AsyncMock(
+        return_value=date(2026, 9, 8)
+    )
+    manager.db_ops.get_latest_stock_quote_dates_by_exchange = AsyncMock(
+        return_value={
+            "SSE": date(2026, 9, 8),
+            "SZSE": date(2026, 9, 8),
+        }
+    )
+    manager.db_ops.upsert_operational_watermark = AsyncMock(
+        side_effect=lambda **kwargs: dict(kwargs)
+    )
+
+    result = await manager._record_a_share_quote_composite_watermark(
+        target_date=date(2026, 9, 8),
+        exchanges=["SSE", "SZSE"],
+        update_results={
+            "failure_count": 1,
+            "exchange_stats": {
+                "SSE": {
+                    "failure_count": 0,
+                    "stock_failure_count": 0,
+                    "index_failure_count": 0,
+                    "changelog_stats": {"failed": 0},
+                },
+                "SZSE": {
+                    "failure_count": 1,
+                    "stock_failure_count": 0,
+                    "index_failure_count": 1,
+                    "changelog_stats": {"failed": 0},
+                },
+            },
+            "factor_stats": {
+                exchange: {"status": "success", "failed": 0}
+                for exchange in ("SSE", "SZSE")
+            },
+        },
+    )
+
+    calls = {
+        call.kwargs["watermark_name"]: call.kwargs
+        for call in manager.db_ops.upsert_operational_watermark.await_args_list
+    }
+    assert calls["a_share_quote_baostock_sina:SSE"]["status"] == "success"
+    assert calls["a_share_quote_baostock_sina:SZSE"]["status"] == "success"
+    assert calls["a_share_quote_baostock_sina"]["status"] == "success"
+    assert result["status"] == "success"
+    assert result["metadata"]["failure_reasons"] == []
+    assert result["metadata"]["index_failure_count"] == 1
+
+
+@pytest.mark.asyncio
+async def test_stock_quote_failure_still_blocks_watermark():
+    manager = DataManager()
+    manager.db_ops = Mock()
+    manager.db_ops.get_previous_trading_day = AsyncMock(
+        return_value=date(2026, 9, 8)
+    )
+    manager.db_ops.get_latest_stock_quote_dates_by_exchange = AsyncMock(
+        return_value={"SZSE": date(2026, 9, 8)}
+    )
+    manager.db_ops.upsert_operational_watermark = AsyncMock(
+        side_effect=lambda **kwargs: dict(kwargs)
+    )
+
+    result = await manager._record_a_share_quote_composite_watermark(
+        target_date=date(2026, 9, 8),
+        exchanges=["SZSE"],
+        update_results={
+            "failure_count": 1,
+            "exchange_stats": {
+                "SZSE": {
+                    "failure_count": 1,
+                    "stock_failure_count": 1,
+                    "index_failure_count": 0,
+                    "changelog_stats": {"failed": 0},
+                },
+            },
+            "factor_stats": {"SZSE": {"status": "success", "failed": 0}},
+        },
+    )
+
+    first_call = manager.db_ops.upsert_operational_watermark.await_args_list[0]
+    assert first_call.kwargs["status"] == "partial"
+    assert result["metadata"]["failure_reasons"] == [
+        "SZSE:quote_update_failed"
+    ]
+
+
+@pytest.mark.asyncio
+async def test_legacy_mixed_failure_count_does_not_block_stock_watermark():
+    manager = DataManager()
+    manager.db_ops = Mock()
+    manager.db_ops.get_previous_trading_day = AsyncMock(
+        return_value=date(2026, 9, 8)
+    )
+    manager.db_ops.get_latest_stock_quote_dates_by_exchange = AsyncMock(
+        return_value={"SZSE": date(2026, 9, 8)}
+    )
+    manager.db_ops.upsert_operational_watermark = AsyncMock(
+        side_effect=lambda **kwargs: dict(kwargs)
+    )
+
+    result = await manager._record_a_share_quote_composite_watermark(
+        target_date=date(2026, 9, 8),
+        exchanges=["SZSE"],
+        update_results={
+            "failure_count": 1,
+            "exchange_stats": {
+                "SZSE": {
+                    "failure_count": 1,
+                    "changelog_stats": {"failed": 0},
+                },
+            },
+            "factor_stats": {"SZSE": {"status": "success", "failed": 0}},
+        },
+    )
+
+    first_call = manager.db_ops.upsert_operational_watermark.await_args_list[0]
+    assert first_call.kwargs["status"] == "success"
+    assert result["metadata"]["failure_reasons"] == []
+
+
 @pytest.mark.asyncio
 async def test_non_trading_day_watermark_stays_on_latest_completed_session():
     manager = DataManager()

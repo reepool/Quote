@@ -80,9 +80,10 @@ CNInfo 公告与原始事件仍正常刷新，但 canonical 合并返回 `predec
 后续任务可重试，不会用旧的第三源路径投票。旧聚合水位只有在 metadata 明确证明覆盖本轮全部
 交易所时才兼容使用。
 
-行情水位取数据库中符合上市、活跃和可交易条件证券的实际完整覆盖日，并与交易日历的预期完成日
-核对；交易日历已推进但任一应覆盖证券仍缺行情时，水位保持 `partial`，不会用日历日期替代实际
-落库覆盖。
+行情水位取数据库中符合上市、活跃和可交易条件**股票**的实际完整覆盖日，并与交易日历的预期完成日
+核对；交易日历已推进但任一应覆盖股票仍缺行情时，水位保持 `partial`，不会用日历日期替代实际
+落库覆盖。指数拉取失败仍计入日更 `failure_count` 和 Telegram 告警，但不单独把股票水位标成失败；
+股票写入失败仍通过 changelog `failed` 或 `stock_failure_count` 拦住水位。
 
 日更参数 `maintain_promoted_canonical=true` 默认开启。未激活 canonical 时，该阶段为
 `inactive`，不会写入 canonical 稳定版本。报告中的 `canonical_maintenance` 应重点关注：
