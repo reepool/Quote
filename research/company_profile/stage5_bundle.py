@@ -58,6 +58,53 @@ class Stage5ReviewDecision(_StrictModel):
     reason: str | None = Field(default=None, max_length=2000)
 
 
+class Stage5ActivityReviewDecision(_StrictModel):
+    review_id: str = Field(min_length=1)
+    target_id: str = Field(min_length=1)
+    evidence_id: str = Field(min_length=1)
+    action: Literal["accept_for_research_review"] = "accept_for_research_review"
+    prior_actor_basis: Literal["explicit_economic_relationship"] = (
+        "explicit_economic_relationship"
+    )
+    actor_basis: Literal["direct_grammatical_actor"] = "direct_grammatical_actor"
+    activity_actor: str = Field(min_length=1)
+    source_actor: str = Field(min_length=1)
+    subject_scope: Literal["unclear"] = "unclear"
+    source_text: str = Field(min_length=1, max_length=4000)
+    reason: str = Field(min_length=1, max_length=2000)
+    reviewer: str = Field(min_length=1)
+    reviewed_at: str = Field(min_length=1)
+
+    @model_validator(mode="after")
+    def _actors_remain_source_native(self) -> Stage5ActivityReviewDecision:
+        if self.activity_actor != self.source_actor:
+            raise ValueError("reviewed Activity actors must remain source-native")
+        return self
+
+
+class Stage5OfflineActivityReviewRequest(_StrictModel):
+    schema_version: Literal["company_profile_stage5_offline_activity_review.v1"] = (
+        "company_profile_stage5_offline_activity_review.v1"
+    )
+    adjudication_id: str = Field(min_length=1)
+    source_run_id: str = Field(min_length=1)
+    sample_id: str = Field(min_length=1)
+    source_manifest_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    source_report_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    decisions: tuple[Stage5ActivityReviewDecision, ...] = Field(min_length=1)
+    production_authorization: Literal["not_authorized"] = PRODUCTION_AUTHORIZATION
+
+    @model_validator(mode="after")
+    def _decision_targets_are_unique(self) -> Stage5OfflineActivityReviewRequest:
+        review_ids = [item.review_id for item in self.decisions]
+        target_ids = [item.target_id for item in self.decisions]
+        if len(review_ids) != len(set(review_ids)):
+            raise ValueError("offline Activity review IDs must be unique")
+        if len(target_ids) != len(set(target_ids)):
+            raise ValueError("offline Activity review targets must be unique")
+        return self
+
+
 class Stage5BenchmarkDimension(_StrictModel):
     name: str = Field(min_length=1)
     passed: bool
@@ -157,6 +204,33 @@ class Stage5ReportBundle(_StrictModel):
             raise ValueError("scope results must belong to the report bundle")
         if self.research_view.production_authorization != "not_authorized":
             raise ValueError("research view cannot authorize production")
+        return self
+
+
+class Stage5OfflineActivityReviewResult(_StrictModel):
+    schema_version: Literal["company_profile_stage5_offline_activity_result.v1"] = (
+        "company_profile_stage5_offline_activity_result.v1"
+    )
+    adjudication_id: str = Field(min_length=1)
+    source_run_id: str = Field(min_length=1)
+    source_manifest_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    source_report_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    decisions: tuple[Stage5ActivityReviewDecision, ...] = Field(min_length=1)
+    original_report_status: Stage5ReportStatus
+    derived_report_status: Stage5ReportStatus
+    accepted_record_count: int = Field(ge=0)
+    remaining_human_review_count: int = Field(ge=0)
+    provider_calls: Literal[0] = 0
+    report: Stage5ReportBundle
+    created_at: str = Field(min_length=1)
+    production_authorization: Literal["not_authorized"] = PRODUCTION_AUTHORIZATION
+
+    @model_validator(mode="after")
+    def _result_remains_research_only(self) -> Stage5OfflineActivityReviewResult:
+        if self.report.production_authorization != "not_authorized":
+            raise ValueError("offline Activity review cannot authorize production")
+        if self.report.report_status != self.derived_report_status:
+            raise ValueError("offline Activity review status must match derived report")
         return self
 
 

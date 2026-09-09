@@ -1,0 +1,56 @@
+{
+  "adjudication_id": "second-oos-000717-activity-review-20260909-a",
+  "decisions": [
+    {
+      "action": "accept_for_research_review",
+      "activity_actor": "公司",
+      "actor_basis": "direct_grammatical_actor",
+      "evidence_id": "stage5-evidence-37a588de249dec04022042e7",
+      "prior_actor_basis": "explicit_economic_relationship",
+      "reason": "OOS-000717-ACTIVITY-PRODUCES: 原文中“公司”直接支配并列动词“制造”，接受为研究事实但主体保持 unclear。",
+      "review_id": "review:stage5-1a520da8e1ed124293c09c05",
+      "reviewed_at": "2026-09-09T00:00:00+08:00",
+      "reviewer": "user-approved-external-review",
+      "source_actor": "公司",
+      "source_text": "公司主营范围包括制造、加工、销售钢铁冶金产品、金属制品、焦炭、煤化工产品（危险化学品除外）、技术开发、转让、引进及咨询服务。",
+      "subject_scope": "unclear",
+      "target_id": "stage5-1a520da8e1ed124293c09c05"
+    },
+    {
+      "action": "accept_for_research_review",
+      "activity_actor": "公司",
+      "actor_basis": "direct_grammatical_actor",
+      "evidence_id": "stage5-evidence-37a588de249dec04022042e7",
+      "prior_actor_basis": "explicit_economic_relationship",
+      "reason": "OOS-000717-ACTIVITY-PROCESSES: 原文中“公司”直接支配并列动词“加工”，接受为研究事实但主体保持 unclear。",
+      "review_id": "review:stage5-aacb6456d075ec3f9b7834ce",
+      "reviewed_at": "2026-09-09T00:00:00+08:00",
+      "reviewer": "user-approved-external-review",
+      "source_actor": "公司",
+      "source_text": "公司主营范围包括制造、加工、销售钢铁冶金产品、金属制品、焦炭、煤化工产品（危险化学品除外）、技术开发、转让、引进及咨询服务。",
+      "subject_scope": "unclear",
+      "target_id": "stage5-aacb6456d075ec3f9b7834ce"
+    },
+    {
+      "action": "accept_for_research_review",
+      "activity_actor": "公司",
+      "actor_basis": "direct_grammatical_actor",
+      "evidence_id": "stage5-evidence-37a588de249dec04022042e7",
+      "prior_actor_basis": "explicit_economic_relationship",
+      "reason": "OOS-000717-ACTIVITY-SELLS: 原文中“公司”直接支配并列动词“销售”，接受为研究事实但主体保持 unclear。",
+      "review_id": "review:stage5-04b80062ff6f7104b26cdb21",
+      "reviewed_at": "2026-09-09T00:00:00+08:00",
+      "reviewer": "user-approved-external-review",
+      "source_actor": "公司",
+      "source_text": "公司主营范围包括制造、加工、销售钢铁冶金产品、金属制品、焦炭、煤化工产品（危险化学品除外）、技术开发、转让、引进及咨询服务。",
+      "subject_scope": "unclear",
+      "target_id": "stage5-04b80062ff6f7104b26cdb21"
+    }
+  ],
+  "production_authorization": "not_authorized",
+  "sample_id": "manufacturing-materials-oos-000717-2025",
+  "schema_version": "company_profile_stage5_offline_activity_review.v1",
+  "source_manifest_sha256": "bdb417e3cff651e47b0c19e5cc8ee3beb61ce64b7eeb1fd7bbf1608e55778de5",
+  "source_report_sha256": "ad101238d795eca0acb29330ba5107d4f5776f5781675c1e78182a6b4e9027dc",
+  "source_run_id": "stage55-second-oos-completion-000717-20260909-c"
+}

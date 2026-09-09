@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import hashlib
+import re
 from collections.abc import Callable, Iterable, Mapping
 from datetime import datetime, timezone
 from pathlib import Path
@@ -26,6 +28,7 @@ from .contracts import (
     SemanticTaskRequest,
 )
 from .models import (
+    Activity,
     ActivityAction,
     ChapterTask,
     CoverageResult,
@@ -35,6 +38,7 @@ from .models import (
     Relationship,
     RequirementLevel,
     SemanticRecord,
+    SubjectBasis,
     SubjectScope,
 )
 from .projection import project_research_view
@@ -45,9 +49,12 @@ from .stage5 import (
     Stage5SampleManifest,
 )
 from .stage5_bundle import (
+    Stage5ActivityReviewDecision,
     Stage5BenchmarkDimension,
     Stage5BenchmarkResult,
     Stage5FailureDiagnostic,
+    Stage5OfflineActivityReviewRequest,
+    Stage5OfflineActivityReviewResult,
     Stage5OverallStatus,
     Stage5PreparationBundle,
     Stage5PreparedScopeSummary,
@@ -415,6 +422,69 @@ class ManufacturingMaterialsProfileSliceService:
             created_at=_utc_now(),
         )
 
+    def apply_committed_activity_reviews(
+        self,
+        *,
+        run_directory: str | Path,
+        review_request: Stage5OfflineActivityReviewRequest,
+    ) -> Stage5OfflineActivityReviewResult:
+        """Apply source-bound Activity decisions without invoking a provider."""
+
+        run_path = Path(run_directory).resolve()
+        if not run_path.is_dir() or not run_path.name.startswith("run-"):
+            raise ValueError("offline Activity review requires a committed run directory")
+        manifest_path = run_path / "manifest.json"
+        report_path = run_path / "reports" / f"{review_request.sample_id}.json"
+        manifest_hash = _sha256_file(manifest_path)
+        report_hash = _sha256_file(report_path)
+        if manifest_hash != review_request.source_manifest_sha256:
+            raise ValueError("offline Activity review manifest hash mismatch")
+        if report_hash != review_request.source_report_sha256:
+            raise ValueError("offline Activity review report hash mismatch")
+        try:
+            bundle = Stage5RunBundle.model_validate_json(
+                manifest_path.read_text(encoding="utf-8")
+            )
+            report_file = Stage5ReportBundle.model_validate_json(
+                report_path.read_text(encoding="utf-8")
+            )
+        except (OSError, ValueError) as exc:
+            raise ValueError("offline Activity review source bundle is unreadable") from exc
+        if bundle.run_id != review_request.source_run_id:
+            raise ValueError("offline Activity review run identity mismatch")
+        matches = [
+            item for item in bundle.reports if item.sample_id == review_request.sample_id
+        ]
+        if len(matches) != 1 or matches[0] != report_file:
+            raise ValueError("offline Activity review report identity mismatch")
+
+        source_report = matches[0]
+        derived_report = _apply_activity_review_decisions(
+            source_report,
+            review_request.decisions,
+        )
+        accepted_count = sum(
+            len(scope.task_result.accepted_records())
+            for scope in derived_report.scope_results
+        )
+        review_count = sum(
+            len(scope.task_result.human_review_items)
+            for scope in derived_report.scope_results
+        )
+        return Stage5OfflineActivityReviewResult(
+            adjudication_id=review_request.adjudication_id,
+            source_run_id=review_request.source_run_id,
+            source_manifest_sha256=manifest_hash,
+            source_report_sha256=report_hash,
+            decisions=review_request.decisions,
+            original_report_status=source_report.report_status,
+            derived_report_status=derived_report.report_status,
+            accepted_record_count=accepted_count,
+            remaining_human_review_count=review_count,
+            report=derived_report,
+            created_at=_utc_now(),
+        )
+
     def _prepare_selected(
         self,
         manifest: Stage5SampleManifest,
@@ -662,6 +732,229 @@ def _suppress_same_scope_legal_empty_relationships(
             "task_complete": False,
         }
     )
+
+
+def _apply_activity_review_decisions(
+    report: Stage5ReportBundle,
+    decisions: tuple[Stage5ActivityReviewDecision, ...],
+) -> Stage5ReportBundle:
+    source_review_counts = {
+        decision.review_id: sum(
+            item.review_id == decision.review_id
+            for scope in report.scope_results
+            for item in scope.task_result.human_review_items
+        )
+        for decision in decisions
+    }
+    missing = sorted(
+        review_id for review_id, count in source_review_counts.items() if count == 0
+    )
+    duplicate = sorted(
+        review_id for review_id, count in source_review_counts.items() if count > 1
+    )
+    if missing:
+        raise ValueError(f"offline Activity review targets are missing: {missing}")
+    if duplicate:
+        raise ValueError(f"offline Activity review targets are not unique: {duplicate}")
+
+    pending = {item.review_id: item for item in decisions}
+    updated_scopes: list[Stage5ScopeResult] = []
+    recorded_decisions = list(report.review_decisions)
+
+    for scope in report.scope_results:
+        result = scope.task_result
+        reviews_by_id = {item.review_id: item for item in result.human_review_items}
+        applicable = [
+            decision for decision in decisions if decision.review_id in reviews_by_id
+        ]
+        if not applicable:
+            updated_scopes.append(scope)
+            continue
+
+        records = {item.record_id: item for item in result.records}
+        dispositions = {item.target_id: item for item in result.dispositions}
+        removed_review_ids: set[str] = set()
+        for decision in applicable:
+            review = reviews_by_id[decision.review_id]
+            candidate = _validated_activity_review_candidate(
+                decision=decision,
+                review=review,
+                records=records,
+                dispositions=dispositions,
+            )
+            records[candidate.record_id] = candidate.model_copy(
+                update={"actor_basis": SubjectBasis.DIRECT_GRAMMATICAL_ACTOR}
+            )
+            dispositions[candidate.record_id] = Disposition(
+                target_id=candidate.record_id,
+                field_id=candidate.field_id,
+                status=DispositionStatus.ACCEPTED_FOR_REVIEW,
+            )
+            removed_review_ids.add(decision.review_id)
+            pending.pop(decision.review_id)
+            recorded_decisions.append(
+                Stage5ReviewDecision(
+                    review_id=decision.review_id,
+                    action=Stage5ReviewAction.ACCEPT_FOR_RESEARCH_REVIEW,
+                    reason=decision.reason,
+                )
+            )
+
+        remaining_reviews = [
+            item
+            for item in result.human_review_items
+            if item.review_id not in removed_review_ids
+        ]
+        unresolved_activity = any(
+            item.field_id == "explicit_activity" and item.candidate is not None
+            for item in remaining_reviews
+        )
+        accepted_activities = [
+            record
+            for record in records.values()
+            if isinstance(record, Activity)
+            and record.field_id == "explicit_activity"
+            and dispositions.get(record.record_id) is not None
+            and dispositions[record.record_id].status
+            == DispositionStatus.ACCEPTED_FOR_REVIEW
+        ]
+        coverage = list(result.coverage)
+        if accepted_activities and not unresolved_activity:
+            evidence_by_id = {
+                evidence.evidence_id: evidence
+                for record in accepted_activities
+                for evidence in record.evidence
+            }
+            coverage = [
+                item.model_copy(
+                    update={
+                        "status": CoverageStatus.OBSERVED,
+                        "reason_code": None,
+                        "reason": None,
+                        "evidence": tuple(evidence_by_id.values()),
+                        "reason_evidence_text": None,
+                    }
+                )
+                if item.field_id == "explicit_activity"
+                else item
+                for item in coverage
+            ]
+            remaining_reviews = [
+                item
+                for item in remaining_reviews
+                if not (
+                    item.field_id == "explicit_activity"
+                    and item.candidate is None
+                    and ContractErrorCode.REQUIRED_COVERAGE_MISSING
+                    in item.reason_codes
+                )
+            ]
+
+        updated_result = result.model_copy(
+            update={
+                "records": tuple(records[item.record_id] for item in result.records),
+                "dispositions": tuple(
+                    dispositions[item.target_id] for item in result.dispositions
+                ),
+                "coverage": tuple(coverage),
+                "human_review_items": tuple(remaining_reviews),
+                "task_complete": (
+                    not remaining_reviews
+                    and all(
+                        item.status == DispositionStatus.ACCEPTED_FOR_REVIEW
+                        for item in dispositions.values()
+                    )
+                    and all(
+                        item.status
+                        not in {
+                            CoverageStatus.EXTRACTION_FAILED,
+                            CoverageStatus.UNCLEAR,
+                        }
+                        for item in coverage
+                    )
+                ),
+            }
+        )
+        updated_scopes.append(scope.model_copy(update={"task_result": updated_result}))
+
+    if pending:
+        raise ValueError(
+            f"offline Activity review targets are missing: {sorted(pending)}"
+        )
+    task_results = [item.task_result for item in updated_scopes]
+    view = project_research_view(
+        company_name=report.company_name,
+        report=report.report,
+        task_results=task_results,
+    )
+    benchmark = _contract_benchmark(task_results, updated_scopes)
+    status = _derive_report_status(
+        task_results=task_results,
+        scope_results=updated_scopes,
+        benchmark=benchmark,
+    )
+    return report.model_copy(
+        update={
+            "scope_results": tuple(updated_scopes),
+            "review_decisions": tuple(recorded_decisions),
+            "research_view": view,
+            "report_status": status,
+            "benchmark": benchmark,
+            "created_at": _utc_now(),
+        }
+    )
+
+
+def _validated_activity_review_candidate(
+    *,
+    decision: Stage5ActivityReviewDecision,
+    review: HumanReviewItem,
+    records: Mapping[str, SemanticRecord],
+    dispositions: Mapping[str, Disposition],
+) -> Activity:
+    candidate = review.candidate
+    if not isinstance(candidate, Activity) or candidate.field_id != "explicit_activity":
+        raise ValueError("offline Activity review accepts only Activity candidates")
+    if candidate.record_id != decision.target_id or records.get(candidate.record_id) != candidate:
+        raise ValueError("offline Activity review target mismatch")
+    disposition = dispositions.get(candidate.record_id)
+    if (
+        disposition is None
+        or disposition.status != DispositionStatus.BLOCKED
+        or ContractErrorCode.ACTIVITY_ACTOR_UNSUPPORTED
+        not in disposition.reason_codes
+        or ContractErrorCode.ACTIVITY_ACTOR_UNSUPPORTED not in review.reason_codes
+    ):
+        raise ValueError("offline Activity review prior blocker mismatch")
+    if candidate.actor_basis != SubjectBasis.EXPLICIT_ECONOMIC_RELATIONSHIP:
+        raise ValueError("offline Activity review prior actor basis mismatch")
+    if (
+        candidate.activity_actor != decision.activity_actor
+        or candidate.source_actor != decision.source_actor
+        or candidate.activity_actor != candidate.source_actor
+    ):
+        raise ValueError("offline Activity review actor mismatch")
+    if candidate.subject_scope != SubjectScope.UNCLEAR:
+        raise ValueError("offline Activity review cannot promote subject scope")
+    evidence = {item.evidence_id: item for item in candidate.evidence}
+    if set(evidence) != {decision.evidence_id}:
+        raise ValueError("offline Activity review Evidence mismatch")
+    bounded_quote = evidence[decision.evidence_id].anchor.bounded_quote
+    if _normalized_text(decision.source_text) not in _normalized_text(bounded_quote):
+        raise ValueError("offline Activity review source text mismatch")
+    return candidate
+
+
+def _normalized_text(value: str) -> str:
+    return re.sub(r"\s+", "", value)
+
+
+def _sha256_file(path: Path) -> str:
+    try:
+        payload = path.read_bytes()
+    except OSError as exc:
+        raise ValueError("offline Activity review source file is missing") from exc
+    return hashlib.sha256(payload).hexdigest()
 
 
 def _contract_benchmark(

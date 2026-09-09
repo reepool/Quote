@@ -1,0 +1,80 @@
+{
+  "boundaries": {
+    "llm_or_pdf_rerun": false,
+    "production_consumers_opened": false,
+    "source_bundle_modified": false,
+    "stage6_opened": false,
+    "subject_scope_promoted": false
+  },
+  "change_id": "resolve-second-oos-activity-review-hold",
+  "created_at": "2026-09-09T17:06:19+08:00",
+  "decisions": [
+    {
+      "action": "accept_for_research_review",
+      "activity_actor": "公司",
+      "actor_basis": "direct_grammatical_actor",
+      "evidence_id": "stage5-evidence-37a588de249dec04022042e7",
+      "prior_actor_basis": "explicit_economic_relationship",
+      "reason": "OOS-000717-ACTIVITY-PRODUCES: 原文中“公司”直接支配并列动词“制造”，接受为研究事实但主体保持 unclear。",
+      "review_id": "review:stage5-1a520da8e1ed124293c09c05",
+      "source_actor": "公司",
+      "subject_scope": "unclear",
+      "target_id": "stage5-1a520da8e1ed124293c09c05"
+    },
+    {
+      "action": "accept_for_research_review",
+      "activity_actor": "公司",
+      "actor_basis": "direct_grammatical_actor",
+      "evidence_id": "stage5-evidence-37a588de249dec04022042e7",
+      "prior_actor_basis": "explicit_economic_relationship",
+      "reason": "OOS-000717-ACTIVITY-PROCESSES: 原文中“公司”直接支配并列动词“加工”，接受为研究事实但主体保持 unclear。",
+      "review_id": "review:stage5-aacb6456d075ec3f9b7834ce",
+      "source_actor": "公司",
+      "subject_scope": "unclear",
+      "target_id": "stage5-aacb6456d075ec3f9b7834ce"
+    },
+    {
+      "action": "accept_for_research_review",
+      "activity_actor": "公司",
+      "actor_basis": "direct_grammatical_actor",
+      "evidence_id": "stage5-evidence-37a588de249dec04022042e7",
+      "prior_actor_basis": "explicit_economic_relationship",
+      "reason": "OOS-000717-ACTIVITY-SELLS: 原文中“公司”直接支配并列动词“销售”，接受为研究事实但主体保持 unclear。",
+      "review_id": "review:stage5-04b80062ff6f7104b26cdb21",
+      "source_actor": "公司",
+      "subject_scope": "unclear",
+      "target_id": "stage5-04b80062ff6f7104b26cdb21"
+    }
+  ],
+  "derived_artifact": {
+    "path": "var/company_profile_stage5_oos/20260909/adjudication-second-oos-000717-activity-review-20260909-a/result.json",
+    "sha256": "df33ff142fc5cddd9f285dae8397224247a99daa677987b6bc567d5479dac69c"
+  },
+  "evidence": {
+    "evidence_id": "stage5-evidence-37a588de249dec04022042e7",
+    "physical_page": 10,
+    "source_text": "公司主营范围包括制造、加工、销售钢铁冶金产品、金属制品、焦炭、煤化工产品（危险化学品除外）、技术开发、转让、引进及咨询服务。"
+  },
+  "outcome": {
+    "accepted_record_count_after": 74,
+    "accepted_record_count_before": 71,
+    "benchmark_decision": "pass",
+    "derived_report_status": "usable_with_caveats",
+    "explicit_activity_coverage": "observed",
+    "original_report_status": "hold",
+    "production_authorization": "not_authorized",
+    "provider_calls": 0,
+    "remaining_human_review_count_after": 0,
+    "remaining_human_review_count_before": 4
+  },
+  "schema_version": "company_profile_second_oos_activity_review_audit.v1",
+  "source": {
+    "manifest_path": "var/company_profile_stage5_oos/20260909/run-stage55-second-oos-completion-000717-20260909-c/manifest.json",
+    "manifest_sha256": "bdb417e3cff651e47b0c19e5cc8ee3beb61ce64b7eeb1fd7bbf1608e55778de5",
+    "report_path": "var/company_profile_stage5_oos/20260909/run-stage55-second-oos-completion-000717-20260909-c/reports/manufacturing-materials-oos-000717-2025.json",
+    "report_sha256": "ad101238d795eca0acb29330ba5107d4f5776f5781675c1e78182a6b4e9027dc",
+    "run_id": "stage55-second-oos-completion-000717-20260909-c",
+    "sample_id": "manufacturing-materials-oos-000717-2025",
+    "source_bundle_unchanged": true
+  }
+}
