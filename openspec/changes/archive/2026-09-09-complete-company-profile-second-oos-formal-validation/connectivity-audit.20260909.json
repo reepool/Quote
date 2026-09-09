@@ -1,0 +1,19 @@
+{
+  "schema_version": "company_profile_second_oos_connectivity_audit.v1",
+  "checked_at": "2026-09-09T00:48:10+00:00",
+  "execution_environment": "outside_restricted_sandbox",
+  "host": "scorpio.reepool.com",
+  "resolved_addresses": [
+    "176.126.114.194"
+  ],
+  "http_probe": {
+    "path": "/v1/models",
+    "status_code": 401,
+    "remote_ip": "176.126.114.194",
+    "connect_seconds": 0.097145,
+    "tls_seconds": 0.209613,
+    "total_seconds": 0.287026
+  },
+  "interpretation": "DNS, TCP, TLS, and HTTP were reachable outside the sandbox; 401 is the expected unauthenticated response.",
+  "production_authorization": "not_authorized"
+}

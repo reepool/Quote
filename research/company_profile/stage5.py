@@ -44,6 +44,15 @@ STAGE5_VALIDATION_EVIDENCE_PLAN_SCHEMA = (
 STAGE5_VALIDATION_EVIDENCE_PLAN_VERSION = "manufacturing_materials_oos.2026-09-08.1"
 STAGE5_SECOND_OOS_EVIDENCE_PLAN_SCHEMA = "company_profile_second_oos_evidence_plan.v1"
 STAGE5_SECOND_OOS_EVIDENCE_PLAN_VERSION = "manufacturing_materials_oos.2026-09-08.2"
+STAGE5_SECOND_OOS_PREFLIGHT_EVIDENCE_PLAN_VERSION = (
+    "manufacturing_materials_oos.2026-09-09.3"
+)
+STAGE5_SECOND_OOS_PREFLIGHT2_EVIDENCE_PLAN_VERSION = (
+    "manufacturing_materials_oos.2026-09-09.4"
+)
+STAGE5_SECOND_OOS_CORRECTED_EVIDENCE_PLAN_VERSION = (
+    "manufacturing_materials_oos.2026-09-09.5"
+)
 STAGE5_SECOND_OOS_MANIFEST_SCHEMA = "company_profile_second_oos_manifest.v1"
 STAGE5_SECOND_OOS_MANIFEST_REVISION = (
     "manufacturing-materials-second-oos-manifest-20260908-v1"
@@ -92,7 +101,7 @@ _VALIDATION_PROFILES: dict[str, dict[str, Any]] = {
         "manifest_kind": STAGE5_VALIDATION_MANIFEST_KIND,
         "manifest_schema": STAGE5_VALIDATION_MANIFEST_SCHEMA,
         "evidence_schema": STAGE5_VALIDATION_EVIDENCE_PLAN_SCHEMA,
-        "evidence_version": STAGE5_VALIDATION_EVIDENCE_PLAN_VERSION,
+        "evidence_versions": (STAGE5_VALIDATION_EVIDENCE_PLAN_VERSION,),
         "samples": VALIDATION_STAGE5_SAMPLES,
         "sample_id": STAGE5_VALIDATION_SAMPLE_ID,
         "report_id": STAGE5_VALIDATION_REPORT_ID,
@@ -103,7 +112,12 @@ _VALIDATION_PROFILES: dict[str, dict[str, Any]] = {
         "manifest_kind": STAGE5_SECOND_OOS_MANIFEST_KIND,
         "manifest_schema": STAGE5_SECOND_OOS_MANIFEST_SCHEMA,
         "evidence_schema": STAGE5_SECOND_OOS_EVIDENCE_PLAN_SCHEMA,
-        "evidence_version": STAGE5_SECOND_OOS_EVIDENCE_PLAN_VERSION,
+        "evidence_versions": (
+            STAGE5_SECOND_OOS_EVIDENCE_PLAN_VERSION,
+            STAGE5_SECOND_OOS_PREFLIGHT_EVIDENCE_PLAN_VERSION,
+            STAGE5_SECOND_OOS_PREFLIGHT2_EVIDENCE_PLAN_VERSION,
+            STAGE5_SECOND_OOS_CORRECTED_EVIDENCE_PLAN_VERSION,
+        ),
         "samples": SECOND_OOS_STAGE5_SAMPLES,
         "sample_id": STAGE5_SECOND_OOS_SAMPLE_ID,
         "report_id": STAGE5_SECOND_OOS_REPORT_ID,
@@ -377,15 +391,15 @@ class Stage5EvidencePlan(_StrictModel):
             if profile is None:
                 raise ValueError("validation evidence plan revision is unknown")
             approved = profile["samples"]
-            expected_version = profile["evidence_version"]
+            expected_versions = profile["evidence_versions"]
             if self.schema_version != profile["evidence_schema"]:
                 raise ValueError(
                     "validation evidence plan schema does not match its freeze"
                 )
         else:
             approved = APPROVED_STAGE5_SAMPLES
-            expected_version = STAGE5_EVIDENCE_PLAN_VERSION
-        if self.plan_version != expected_version:
+            expected_versions = (STAGE5_EVIDENCE_PLAN_VERSION,)
+        if self.plan_version not in expected_versions:
             raise ValueError("evidence plan version does not match its schema")
         if len(ids) != len(set(ids)) or set(ids) != set(approved):
             raise ValueError("evidence plan does not match its closed execution mode")

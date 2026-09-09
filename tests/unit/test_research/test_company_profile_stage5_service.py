@@ -86,6 +86,17 @@ def test_stage5_second_oos_rejects_unknown_field_before_provider_execution(
     service = ManufacturingMaterialsProfileSliceService()
 
     with pytest.raises(ValueError, match="energy_input"):
+        service.run_preparation_only(
+            run_id="second-oos-invalid-preparation",
+            manifest=manifest,
+            evidence_plan=plan,
+            evidence_plan_path=SECOND_OOS_EVIDENCE_PLAN,
+            store=Stage5RunBundleStore(
+                tmp_path / "second-oos-preparation", repository_root=REPOSITORY_ROOT
+            ),
+        )
+
+    with pytest.raises(ValueError, match="energy_input"):
         service.run_semantic_slice(
             run_id="second-oos-unknown-field",
             manifest=manifest,

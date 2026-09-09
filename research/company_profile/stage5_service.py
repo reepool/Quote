@@ -246,6 +246,7 @@ class ManufacturingMaterialsProfileSliceService:
             selected,
             scope_ids=scope_ids,
         )
+        _validate_prepared_field_contract(prepared)
         scopes = tuple(
             Stage5PreparedScopeSummary(
                 sample_id=scope.sample_id,

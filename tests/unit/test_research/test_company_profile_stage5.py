@@ -62,6 +62,19 @@ SECOND_OOS_CHANGE = (
 )
 SECOND_OOS_MANIFEST = SECOND_OOS_CHANGE / "second-oos-manifest.v1.json"
 SECOND_OOS_EVIDENCE_PLAN = SECOND_OOS_CHANGE / "evidence-plan.v1.json"
+SECOND_OOS_COMPLETION_CHANGE = (
+    REPOSITORY_ROOT
+    / "openspec/changes/archive/2026-09-09-complete-company-profile-second-oos-formal-validation"
+)
+SECOND_OOS_PREFLIGHT_EVIDENCE_PLAN = (
+    SECOND_OOS_COMPLETION_CHANGE / "evidence-plan.v2.json"
+)
+SECOND_OOS_PREFLIGHT2_EVIDENCE_PLAN = (
+    SECOND_OOS_COMPLETION_CHANGE / "evidence-plan.v3.json"
+)
+SECOND_OOS_CORRECTED_EVIDENCE_PLAN = (
+    SECOND_OOS_COMPLETION_CHANGE / "evidence-plan.v4.json"
+)
 SECOND_OOS_SAMPLE_ID = "manufacturing-materials-oos-000717-2025"
 
 
@@ -588,6 +601,58 @@ def test_stage5_second_oos_manifest_and_evidence_prepare_seven_scopes() -> None:
         "customer_supplier_concentration",
         "business_regime_change",
     }
+
+
+def test_stage5_second_oos_corrected_plan_changes_only_the_invalid_field() -> None:
+    archived_payload = json.loads(SECOND_OOS_EVIDENCE_PLAN.read_text(encoding="utf-8"))
+    corrected_payload = json.loads(
+        SECOND_OOS_CORRECTED_EVIDENCE_PLAN.read_text(encoding="utf-8")
+    )
+    expected_payload = copy.deepcopy(archived_payload)
+    corrected_version = "manufacturing_materials_oos.2026-09-09.5"
+    expected_payload["plan_version"] = corrected_version
+    expected_payload["reports"][0]["plan_version"] = corrected_version
+    for task in expected_payload["reports"][0]["tasks"]:
+        if task["chapter_task"] != "extract_material_inputs":
+            continue
+        for scope in task["request_scopes"]:
+            scope["field_ids"] = ["material_input"]
+    for task in expected_payload["reports"][0]["tasks"]:
+        if task["chapter_task"] != "extract_counterparties_and_concentration":
+            continue
+        for scope in task["request_scopes"]:
+            scope["field_ids"] = [
+                "customer_concentration",
+                "supplier_concentration",
+                "counterparty_relationship",
+            ]
+    for task in expected_payload["reports"][0]["tasks"]:
+        if task["chapter_task"] != "extract_business_regime":
+            continue
+        for scope in task["request_scopes"]:
+            scope["field_ids"] = ["business_regime"]
+
+    assert corrected_payload == expected_payload
+
+    preflight_plan = load_stage5_evidence_plan(SECOND_OOS_PREFLIGHT_EVIDENCE_PLAN)
+    assert preflight_plan.plan_version == "manufacturing_materials_oos.2026-09-09.3"
+    preflight2_plan = load_stage5_evidence_plan(SECOND_OOS_PREFLIGHT2_EVIDENCE_PLAN)
+    assert preflight2_plan.plan_version == "manufacturing_materials_oos.2026-09-09.4"
+
+    manifest = load_stage5_sample_manifest(
+        SECOND_OOS_MANIFEST, repository_root=REPOSITORY_ROOT
+    )
+    plan = load_stage5_evidence_plan(SECOND_OOS_CORRECTED_EVIDENCE_PLAN)
+    scopes = Stage5EvidencePreparer().prepare_report(
+        manifest=manifest, evidence_plan=plan, sample_id=SECOND_OOS_SAMPLE_ID
+    )
+    material_scopes = [
+        scope for scope in scopes if scope.chapter_task == ChapterTask.EXTRACT_MATERIAL_INPUTS
+    ]
+
+    assert plan.plan_version == corrected_version
+    assert len(material_scopes) == 2
+    assert all(scope.field_ids == ("material_input",) for scope in material_scopes)
 
 
 def test_stage5_validation_evidence_plan_rejects_mixed_reports(

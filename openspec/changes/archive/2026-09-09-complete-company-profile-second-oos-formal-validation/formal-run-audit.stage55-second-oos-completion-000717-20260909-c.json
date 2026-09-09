@@ -1,0 +1,318 @@
+{
+  "accepted_by_field": {
+    "business_overview_source": 1,
+    "counterparty_relationship": 10,
+    "customer_concentration": 13,
+    "gross_margin_reported": 6,
+    "inventory_volume": 2,
+    "material_input": 4,
+    "operating_cost": 6,
+    "operating_revenue": 6,
+    "production_volume": 2,
+    "sales_volume": 2,
+    "segment_dimension": 6,
+    "supplier_concentration": 13
+  },
+  "accepted_non_unclear_subject_count": 24,
+  "accepted_record_count": 71,
+  "accepted_unclear_subject_count": 47,
+  "actual_provider_model": [
+    "gemini-3.8-flash-high"
+  ],
+  "benchmark_decision": "hold",
+  "bundle": {
+    "manifest_sha256": "bdb417e3cff651e47b0c19e5cc8ee3beb61ce64b7eeb1fd7bbf1608e55778de5",
+    "path": "var/company_profile_stage5_oos/20260909/run-stage55-second-oos-completion-000717-20260909-c",
+    "report_sha256": "ad101238d795eca0acb29330ba5107d4f5776f5781675c1e78182a6b4e9027dc",
+    "temporary_paths": []
+  },
+  "caveats": [
+    "material_energy_cost_table completed as material_input not_disclosed even though the Evidence contains cost rows; the current material_input Relationship contract does not structure cost amounts",
+    "47 accepted records retain subject_scope=unclear and are restricted from consolidated aggregation, ranking, and cross-company comparison"
+  ],
+  "comparison_outputs_spliced": false,
+  "connectivity_audit": {
+    "path": "openspec/changes/complete-company-profile-second-oos-formal-validation/connectivity-audit.20260909.json",
+    "sha256": "daa0e6309dcadceb2259efc07a51ba98c7e3f21215a6c9ed38e0f2248933314b"
+  },
+  "created_at": "2026-09-09T01:07:41.299593+00:00",
+  "execution_environment": "outside_restricted_sandbox",
+  "historical_authority_hashes": {
+    "baosteel_optimized_manifest": "05fc6c750c643bd333ae955f58fd09b53e17987b7ac3cd66ec8f408888a70df0",
+    "baosteel_semantic_mappings_manifest": "a396ecd341c6f50c9999c4127137b93811fe799150925bbd42099cffb850a9bb",
+    "four_report_manifest": "00fa20045d4df037a8984cff4b56af3f19ac533f4c4b9e311e7f130bf5158687"
+  },
+  "manual_review_items": [
+    {
+      "candidate_action": "produces",
+      "evidence_id": "stage5-evidence-37a588de249dec04022042e7",
+      "physical_page": 10,
+      "recommended_action": "accept_for_research_review",
+      "review_id": "OOS-000717-ACTIVITY-PRODUCES",
+      "runtime_issue": "actor_basis was explicit_economic_relationship although 公司 is the direct grammatical actor",
+      "source_text": "公司主营范围包括制造、加工、销售钢铁冶金产品、金属制品、焦炭、煤化工产品（危险化学品除外）、技术开发、转让、引进及咨询服务。",
+      "subject_scope": "unclear"
+    },
+    {
+      "candidate_action": "processes",
+      "evidence_id": "stage5-evidence-37a588de249dec04022042e7",
+      "physical_page": 10,
+      "recommended_action": "accept_for_research_review",
+      "review_id": "OOS-000717-ACTIVITY-PROCESSES",
+      "runtime_issue": "actor_basis was explicit_economic_relationship although 公司 is the direct grammatical actor",
+      "source_text": "公司主营范围包括制造、加工、销售钢铁冶金产品、金属制品、焦炭、煤化工产品（危险化学品除外）、技术开发、转让、引进及咨询服务。",
+      "subject_scope": "unclear"
+    },
+    {
+      "candidate_action": "sells",
+      "evidence_id": "stage5-evidence-37a588de249dec04022042e7",
+      "physical_page": 10,
+      "recommended_action": "accept_for_research_review",
+      "review_id": "OOS-000717-ACTIVITY-SELLS",
+      "runtime_issue": "actor_basis was explicit_economic_relationship although 公司 is the direct grammatical actor",
+      "source_text": "公司主营范围包括制造、加工、销售钢铁冶金产品、金属制品、焦炭、煤化工产品（危险化学品除外）、技术开发、转让、引进及咨询服务。",
+      "subject_scope": "unclear"
+    }
+  ],
+  "parameters": {
+    "extract_max_output_tokens": 16000,
+    "max_provider_calls": 27,
+    "timeout_seconds": 300,
+    "verify_max_output_tokens": 12000
+  },
+  "pre_provider_validation_attempts": [
+    {
+      "error": "unknown checklist field relationship",
+      "failure_manifest": "var/company_profile_stage5_oos/20260909/run-stage55-second-oos-completion-000717-20260909-b.failed.json",
+      "failure_manifest_sha256": "3bdf330b86a1da49ebed06c5b10a7178354c91a2288b2c6a05bcdfa0768e3ada",
+      "provider_calls": 0,
+      "result": "failed",
+      "run_id": "stage55-second-oos-completion-000717-20260909-b"
+    },
+    {
+      "error": "unknown checklist field business_event",
+      "failure_manifest": null,
+      "provider_calls": 0,
+      "result": "failed",
+      "run_id": "stage55-second-oos-preparation-000717-20260909-d"
+    }
+  ],
+  "production_authorization": "not_authorized",
+  "provider_bearing_formal_runs": [
+    "stage55-second-oos-completion-000717-20260909-c"
+  ],
+  "provider_summary": {
+    "calls": 14,
+    "extract": 7,
+    "input_tokens": 94488,
+    "output_tokens": 46775,
+    "repair": 0,
+    "success": 14,
+    "summed_latency_ms": 179379,
+    "total_tokens": 141263,
+    "transport_failures": [],
+    "verify": 7
+  },
+  "report_blockers": [
+    {
+      "cause": "three explicit_activity candidates were blocked as activity_actor_unsupported; business_overview_source itself was accepted",
+      "code": "incomplete_request_scope",
+      "scope_id": "business_overview"
+    },
+    {
+      "chapter_task": "extract_business_overview",
+      "code": "required_core_chapter_incomplete"
+    }
+  ],
+  "report_state": "hold",
+  "run_id": "stage55-second-oos-completion-000717-20260909-c",
+  "sample_id": "manufacturing-materials-oos-000717-2025",
+  "schema_version": "company_profile_second_oos_completion_audit.v1",
+  "scope_summary": [
+    {
+      "accepted_records": 1,
+      "coverage": [
+        {
+          "field_id": "business_overview_source",
+          "reason_code": null,
+          "status": "observed"
+        },
+        {
+          "field_id": "explicit_activity",
+          "reason_code": "candidate_unresolved",
+          "status": "unclear"
+        }
+      ],
+      "human_review_items": 4,
+      "provider_calls": [
+        "extract",
+        "verify"
+      ],
+      "provider_statuses": [
+        "success"
+      ],
+      "scope_id": "business_overview",
+      "task_complete": false
+    },
+    {
+      "accepted_records": 24,
+      "coverage": [
+        {
+          "field_id": "segment_dimension",
+          "reason_code": null,
+          "status": "observed"
+        },
+        {
+          "field_id": "operating_revenue",
+          "reason_code": null,
+          "status": "observed"
+        },
+        {
+          "field_id": "operating_cost",
+          "reason_code": null,
+          "status": "observed"
+        },
+        {
+          "field_id": "gross_margin_reported",
+          "reason_code": null,
+          "status": "observed"
+        }
+      ],
+      "human_review_items": 0,
+      "provider_calls": [
+        "extract",
+        "verify"
+      ],
+      "provider_statuses": [
+        "success"
+      ],
+      "scope_id": "segment_industry_product_region_mode",
+      "task_complete": true
+    },
+    {
+      "accepted_records": 6,
+      "coverage": [
+        {
+          "field_id": "production_volume",
+          "reason_code": null,
+          "status": "observed"
+        },
+        {
+          "field_id": "sales_volume",
+          "reason_code": null,
+          "status": "observed"
+        },
+        {
+          "field_id": "inventory_volume",
+          "reason_code": null,
+          "status": "observed"
+        }
+      ],
+      "human_review_items": 0,
+      "provider_calls": [
+        "extract",
+        "verify"
+      ],
+      "provider_statuses": [
+        "success"
+      ],
+      "scope_id": "production_sales_inventory_table",
+      "task_complete": true
+    },
+    {
+      "accepted_records": 4,
+      "coverage": [
+        {
+          "field_id": "material_input",
+          "reason_code": null,
+          "status": "observed"
+        }
+      ],
+      "human_review_items": 0,
+      "provider_calls": [
+        "extract",
+        "verify"
+      ],
+      "provider_statuses": [
+        "success"
+      ],
+      "scope_id": "material_procurement_narrative",
+      "task_complete": true
+    },
+    {
+      "accepted_records": 0,
+      "coverage": [
+        {
+          "field_id": "material_input",
+          "reason_code": "source_reason_unspecified",
+          "status": "not_disclosed"
+        }
+      ],
+      "human_review_items": 0,
+      "provider_calls": [
+        "extract",
+        "verify"
+      ],
+      "provider_statuses": [
+        "success"
+      ],
+      "scope_id": "material_energy_cost_table",
+      "task_complete": true
+    },
+    {
+      "accepted_records": 36,
+      "coverage": [
+        {
+          "field_id": "customer_concentration",
+          "reason_code": null,
+          "status": "observed"
+        },
+        {
+          "field_id": "supplier_concentration",
+          "reason_code": null,
+          "status": "observed"
+        },
+        {
+          "field_id": "counterparty_relationship",
+          "reason_code": null,
+          "status": "observed"
+        }
+      ],
+      "human_review_items": 0,
+      "provider_calls": [
+        "extract",
+        "verify"
+      ],
+      "provider_statuses": [
+        "success"
+      ],
+      "scope_id": "customer_supplier_concentration",
+      "task_complete": true
+    },
+    {
+      "accepted_records": 0,
+      "coverage": [
+        {
+          "field_id": "business_regime",
+          "reason_code": "source_explicitly_not_applicable",
+          "status": "not_applicable"
+        }
+      ],
+      "human_review_items": 0,
+      "provider_calls": [
+        "extract",
+        "verify"
+      ],
+      "provider_statuses": [
+        "success"
+      ],
+      "scope_id": "business_regime_change",
+      "task_complete": true
+    }
+  ],
+  "second_provider_bearing_formal_run_started": false,
+  "selected_logical_model": "gemini-3.8-flash",
+  "selected_route": "semantic_extraction__scorpio_gemini",
+  "stage6_started": false,
+  "targeted_rerun_started": false
+}

@@ -1,0 +1,324 @@
+{
+  "schema_version": "company_profile_second_oos_evidence_plan.v1",
+  "plan_version": "manufacturing_materials_oos.2026-09-09.5",
+  "sample_manifest_revision": "manufacturing-materials-second-oos-manifest-20260908-v1",
+  "page_coordinate_system": "one_based_pdf_physical_page",
+  "production_authorization": "not_authorized",
+  "reports": [
+    {
+      "sample_id": "manufacturing-materials-oos-000717-2025",
+      "content_hash": "94388fcdf94cbd7f53188c95e3a8efd66348a3a0b2d337db904a88690eef5c55",
+      "plan_version": "manufacturing_materials_oos.2026-09-09.5",
+      "tasks": [
+        {
+          "chapter_task": "extract_business_overview",
+          "request_scopes": [
+            {
+              "scope_id": "business_overview",
+              "field_ids": [
+                "business_overview_source",
+                "explicit_activity"
+              ],
+              "pages": [
+                10,
+                11
+              ],
+              "section_titles": [
+                "第三节 管理层讨论与分析",
+                "报告期内公司从事的主要业务"
+              ],
+              "anchor_terms": [
+                "制造",
+                "加工",
+                "销售钢铁冶金产品",
+                "经营模式"
+              ],
+              "required_headers": [],
+              "required_units": [],
+              "required_footnotes": [],
+              "continuation_required": false,
+              "printed_page_labels": {
+                "10": "10",
+                "11": "11"
+              },
+              "subject_pages": [],
+              "subject_anchor_terms": [],
+              "source_row_dimensions": {},
+              "candidate_pages": [
+                10,
+                11
+              ]
+            }
+          ]
+        },
+        {
+          "chapter_task": "extract_segment_financials",
+          "request_scopes": [
+            {
+              "scope_id": "segment_industry_product_region_mode",
+              "field_ids": [
+                "segment_dimension",
+                "operating_revenue",
+                "operating_cost",
+                "gross_margin_reported"
+              ],
+              "pages": [
+                16,
+                17
+              ],
+              "section_titles": [
+                "主营业务分析",
+                "收入和成本分析"
+              ],
+              "anchor_terms": [
+                "钢铁产品",
+                "分产品",
+                "营业收入",
+                "营业成本",
+                "毛利率"
+              ],
+              "required_headers": [
+                "营业收入",
+                "营业成本",
+                "毛利率"
+              ],
+              "required_units": [
+                "元"
+              ],
+              "required_footnotes": [],
+              "continuation_required": true,
+              "printed_page_labels": {
+                "16": "16",
+                "17": "17"
+              },
+              "subject_pages": [],
+              "subject_anchor_terms": [],
+              "source_row_dimensions": {
+                "钢铁产品": "分行业",
+                "板材": "分产品",
+                "螺纹钢": "分产品",
+                "线材": "分产品",
+                "钢坯": "分产品",
+                "焦化产品及其他": "分行业"
+              },
+              "candidate_pages": [
+                16,
+                17
+              ]
+            }
+          ]
+        },
+        {
+          "chapter_task": "extract_operating_quantities",
+          "request_scopes": [
+            {
+              "scope_id": "production_sales_inventory_table",
+              "field_ids": [
+                "production_volume",
+                "sales_volume",
+                "inventory_volume"
+              ],
+              "pages": [
+                16,
+                17
+              ],
+              "section_titles": [
+                "主营业务分析",
+                "产销量情况"
+              ],
+              "anchor_terms": [
+                "生产量",
+                "库存量",
+                "钢铁产品"
+              ],
+              "required_headers": [
+                "生产量",
+                "库存量"
+              ],
+              "required_units": [
+                "吨"
+              ],
+              "required_footnotes": [],
+              "continuation_required": true,
+              "printed_page_labels": {
+                "16": "16",
+                "17": "17"
+              },
+              "subject_pages": [],
+              "subject_anchor_terms": [],
+              "source_row_dimensions": {},
+              "candidate_pages": [
+                16,
+                17
+              ]
+            }
+          ]
+        },
+        {
+          "chapter_task": "extract_material_inputs",
+          "request_scopes": [
+            {
+              "scope_id": "material_procurement_narrative",
+              "field_ids": [
+                "material_input"
+              ],
+              "pages": [
+                10,
+                11
+              ],
+              "section_titles": [
+                "报告期内公司从事的主要业务",
+                "经营模式"
+              ],
+              "anchor_terms": [
+                "铁矿",
+                "煤炭",
+                "原料",
+                "原辅料"
+              ],
+              "required_headers": [],
+              "required_units": [
+                "万吨",
+                "吨"
+              ],
+              "required_footnotes": [],
+              "continuation_required": false,
+              "printed_page_labels": {
+                "10": "10",
+                "11": "11"
+              },
+              "subject_pages": [],
+              "subject_anchor_terms": [],
+              "source_row_dimensions": {},
+              "candidate_pages": [
+                10,
+                11
+              ]
+            },
+            {
+              "scope_id": "material_energy_cost_table",
+              "field_ids": [
+                "material_input"
+              ],
+              "pages": [
+                17
+              ],
+              "section_titles": [
+                "营业成本构成"
+              ],
+              "anchor_terms": [
+                "原燃辅料",
+                "能源动力",
+                "钢铁产品"
+              ],
+              "required_headers": [
+                "原燃辅料",
+                "能源动力"
+              ],
+              "required_units": [
+                "元"
+              ],
+              "required_footnotes": [],
+              "continuation_required": false,
+              "printed_page_labels": {
+                "17": "17"
+              },
+              "subject_pages": [],
+              "subject_anchor_terms": [],
+              "source_row_dimensions": {},
+              "candidate_pages": [
+                17
+              ]
+            }
+          ]
+        },
+        {
+          "chapter_task": "extract_counterparties_and_concentration",
+          "request_scopes": [
+            {
+              "scope_id": "customer_supplier_concentration",
+              "field_ids": [
+                "customer_concentration",
+                "supplier_concentration",
+                "counterparty_relationship"
+              ],
+              "pages": [
+                18,
+                19
+              ],
+              "section_titles": [
+                "主要销售客户和主要供应商情况"
+              ],
+              "anchor_terms": [
+                "前五名客户合计销售金额",
+                "前五名供应商合计采购金额",
+                "关联方销售额",
+                "主要供应商"
+              ],
+              "required_headers": [
+                "销售金额",
+                "采购金额",
+                "占年度销售总额比例"
+              ],
+              "required_units": [
+                "元",
+                "%"
+              ],
+              "required_footnotes": [],
+              "continuation_required": true,
+              "printed_page_labels": {
+                "18": "18",
+                "19": "19"
+              },
+              "subject_pages": [],
+              "subject_anchor_terms": [],
+              "source_row_dimensions": {},
+              "candidate_pages": [
+                18,
+                19
+              ]
+            }
+          ]
+        },
+        {
+          "chapter_task": "extract_business_regime",
+          "request_scopes": [
+            {
+              "scope_id": "business_regime_change",
+              "field_ids": [
+                "business_regime"
+              ],
+              "pages": [
+                10,
+                11
+              ],
+              "section_titles": [
+                "报告期内公司从事的主要业务",
+                "经营模式"
+              ],
+              "anchor_terms": [
+                "主要业务及经营模式未发生重大变化",
+                "未发生重大变化"
+              ],
+              "required_headers": [],
+              "required_units": [],
+              "required_footnotes": [],
+              "continuation_required": false,
+              "printed_page_labels": {
+                "10": "10",
+                "11": "11"
+              },
+              "subject_pages": [],
+              "subject_anchor_terms": [],
+              "source_row_dimensions": {},
+              "candidate_pages": [
+                10,
+                11
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
