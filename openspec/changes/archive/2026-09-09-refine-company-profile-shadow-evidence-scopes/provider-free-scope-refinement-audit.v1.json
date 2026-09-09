@@ -1,0 +1,78 @@
+{
+  "schema_version": "company_profile_shadow_scope_refinement_audit.v1",
+  "audit_id": "manufacturing-materials-shadow-scope-refinement-20260909-a",
+  "sample_manifest_hash": "6f639739ef082e78dcb0c01a5ce40bab1645d8fdc027bece2dbef63652bae9e2",
+  "baseline_plan_version": "manufacturing_materials_shadow.2026-09-09.1",
+  "baseline_plan_hash": "39d415b6d0773a0a244dcb9161b9231629df21bd6b508ab3ccdc0b24884d07b1",
+  "refined_plan_version": "manufacturing_materials_shadow.2026-09-09.2",
+  "refined_plan_hash": "aa408594aa94b0c9096bb1a4889bea7a3da3b27b3efed13049bc8e7eae937d66",
+  "report_count": 20,
+  "baseline_scope_count": 168,
+  "refined_scope_count": 165,
+  "baseline_field_scope_pair_count": 568,
+  "refined_field_scope_pair_count": 374,
+  "baseline_field_bound_evidence_copy_count": 1026,
+  "refined_field_bound_evidence_copy_count": 707,
+  "baseline_field_bound_evidence_character_count": 2024952,
+  "refined_field_bound_evidence_character_count": 1408031,
+  "field_bound_evidence_copy_reduction_rate": 0.310916,
+  "field_bound_evidence_character_reduction_rate": 0.30466,
+  "unsupported_assignment_count": 0,
+  "missing_required_owner_count": 0,
+  "table_context_incomplete_count": 0,
+  "evidence_traceability_rate": 1.0,
+  "provider_calls": 0,
+  "chapter_metrics": {
+    "extract_business_overview": {
+      "baseline_scope_count": 20,
+      "refined_scope_count": 20,
+      "baseline_field_scope_pair_count": 40,
+      "refined_field_scope_pair_count": 40,
+      "baseline_field_bound_evidence_copy_count": 86,
+      "refined_field_bound_evidence_copy_count": 86
+    },
+    "extract_segment_financials": {
+      "baseline_scope_count": 40,
+      "refined_scope_count": 38,
+      "baseline_field_scope_pair_count": 160,
+      "refined_field_scope_pair_count": 137,
+      "baseline_field_bound_evidence_copy_count": 276,
+      "refined_field_bound_evidence_copy_count": 240
+    },
+    "extract_operating_quantities": {
+      "baseline_scope_count": 31,
+      "refined_scope_count": 30,
+      "baseline_field_scope_pair_count": 217,
+      "refined_field_scope_pair_count": 91,
+      "baseline_field_bound_evidence_copy_count": 385,
+      "refined_field_bound_evidence_copy_count": 178
+    },
+    "extract_material_inputs": {
+      "baseline_scope_count": 20,
+      "refined_scope_count": 20,
+      "baseline_field_scope_pair_count": 20,
+      "refined_field_scope_pair_count": 20,
+      "baseline_field_bound_evidence_copy_count": 45,
+      "refined_field_bound_evidence_copy_count": 45
+    },
+    "extract_counterparties_and_concentration": {
+      "baseline_scope_count": 37,
+      "refined_scope_count": 37,
+      "baseline_field_scope_pair_count": 111,
+      "refined_field_scope_pair_count": 66,
+      "baseline_field_bound_evidence_copy_count": 189,
+      "refined_field_bound_evidence_copy_count": 115
+    },
+    "extract_business_regime": {
+      "baseline_scope_count": 20,
+      "refined_scope_count": 20,
+      "baseline_field_scope_pair_count": 20,
+      "refined_field_scope_pair_count": 20,
+      "baseline_field_bound_evidence_copy_count": 45,
+      "refined_field_bound_evidence_copy_count": 43
+    }
+  },
+  "created_at": "2026-09-09T15:30:24.503808+00:00",
+  "audit_hash": "b404b08332f5ad0a53ab5c47be474b198ceb2a1e4f76bd9aaad8e764a971eb3e",
+  "production_authorization": "not_authorized"
+}

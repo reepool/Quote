@@ -5,8 +5,9 @@ from __future__ import annotations
 import json
 import os
 import re
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from enum import Enum
+from itertools import pairwise
 from pathlib import Path
 from types import SimpleNamespace
 from typing import Any, Literal
@@ -48,8 +49,11 @@ from .stage5 import (
 from .stage5_service import stage5_field_ids
 
 SHADOW_EVIDENCE_PLAN_SCHEMA = "company_profile_shadow_evidence_plan.v1"
-SHADOW_EVIDENCE_PLAN_VERSION = "manufacturing_materials_shadow.2026-09-09.1"
+SHADOW_EVIDENCE_PLAN_VERSION = "manufacturing_materials_shadow.2026-09-09.2"
 SHADOW_PREPARATION_AUDIT_SCHEMA = "company_profile_shadow_preparation_audit.v1"
+SHADOW_SCOPE_REFINEMENT_AUDIT_SCHEMA = (
+    "company_profile_shadow_scope_refinement_audit.v1"
+)
 _PROHIBITED_KEYS = frozenset(
     {
         "activity_actor",
@@ -127,6 +131,132 @@ _CHAPTER_MAX_SCOPES = {
     ChapterTask.EXTRACT_MATERIAL_INPUTS: 1,
     ChapterTask.EXTRACT_COUNTERPARTIES_AND_CONCENTRATION: 2,
     ChapterTask.EXTRACT_BUSINESS_REGIME: 1,
+}
+_REQUIRED_CHAPTER_FIELDS: dict[ChapterTask, tuple[str, ...]] = {
+    ChapterTask.EXTRACT_BUSINESS_OVERVIEW: ("business_overview_source",),
+    ChapterTask.EXTRACT_SEGMENT_FINANCIALS: ("segment_dimension",),
+    ChapterTask.EXTRACT_BUSINESS_REGIME: ("business_regime",),
+}
+_FIELD_TEXT_PATTERNS: dict[ChapterTask, dict[str, tuple[str, ...]]] = {
+    ChapterTask.EXTRACT_BUSINESS_OVERVIEW: {
+        "business_overview_source": (
+            r"主营(?:业务|范围)",
+            r"主要(?:业务|产品)",
+            r"经营范围",
+            r"业务概述",
+            r"(?:专业|主要)从事",
+        ),
+        "explicit_activity": (
+            r"(?:生产|制造|加工|销售|研发|开发|采购|开采|冶炼|提供.{0,8}服务)",
+        ),
+    },
+    ChapterTask.EXTRACT_SEGMENT_FINANCIALS: {
+        "segment_dimension": (
+            r"分(?:行业|产品|地区|部|销售模式)",
+            r"(?:业务|报告)分部",
+            r"主营业务分",
+        ),
+        "operating_revenue": (r"(?:营业|主营业务|销售)收入",),
+        "operating_cost": (r"(?:营业|主营业务|销售)成本",),
+        "gross_margin_reported": (r"毛利率",),
+    },
+    ChapterTask.EXTRACT_OPERATING_QUANTITIES: {
+        "production_capacity": (
+            r"(?:设计|现有|核定|实际|总|年)产能",
+            r"产能(?:规模|为|达到)",
+        ),
+        "capacity_under_construction": (
+            r"在建(?:产能|项目|工程)",
+            r"新增.{0,20}产能",
+            r"建设.{0,20}产能",
+        ),
+        "capacity_utilization": (r"产能利用率",),
+        "production_volume": (r"(?:生产量|产量)",),
+        "sales_volume": (r"(?:销售量|销量)",),
+        "inventory_volume": (r"(?:库存量|期末库存)",),
+        "processing_volume": (r"(?:加工量|处理量|吞吐量)",),
+    },
+    ChapterTask.EXTRACT_MATERIAL_INPUTS: {
+        "material_input": (
+            r"(?:原材料|原料|原燃料|燃料|能源|铁矿石|矿石|煤炭|焦炭|采购模式)",
+        ),
+    },
+    ChapterTask.EXTRACT_COUNTERPARTIES_AND_CONCENTRATION: {
+        "counterparty_relationship": (r"(?:客户|供应商|经销商|关联方)",),
+        "customer_concentration": (
+            r"前五名客户",
+            r"客户集中度",
+            r"客户.{0,20}(?:销售额|营业收入).{0,20}(?:比例|占比)",
+        ),
+        "supplier_concentration": (
+            r"前五名供应商",
+            r"供应商集中度",
+            r"供应商.{0,20}(?:采购额|采购总额).{0,20}(?:比例|占比)",
+        ),
+    },
+    ChapterTask.EXTRACT_BUSINESS_REGIME: {
+        "business_regime": (
+            r"经营模式",
+            r"(?:主营业务|业务|经营).{0,20}(?:重大变化|未发生重大变化|发生变化)",
+            r"合并范围.{0,20}(?:变化|变动)",
+            r"(?:重大资产重组|资产重组|收购|股权过户|完成过户)",
+        ),
+    },
+}
+_FIELD_SECTION_KEYS: dict[ChapterTask, dict[str, tuple[str, ...]]] = {
+    ChapterTask.EXTRACT_BUSINESS_OVERVIEW: {
+        "business_overview_source": ("principal_business", "business_model"),
+        "explicit_activity": ("principal_business", "business_model"),
+    },
+    ChapterTask.EXTRACT_SEGMENT_FINANCIALS: {
+        "segment_dimension": ("segment_information",),
+    },
+    ChapterTask.EXTRACT_OPERATING_QUANTITIES: {
+        "production_volume": ("production_sales_inventory", "coal_operations"),
+        "sales_volume": ("production_sales_inventory", "coal_operations"),
+        "inventory_volume": ("production_sales_inventory",),
+        "capacity_under_construction": ("major_projects",),
+    },
+    ChapterTask.EXTRACT_MATERIAL_INPUTS: {
+        "material_input": ("procurement_and_costs", "cost_composition"),
+    },
+    ChapterTask.EXTRACT_COUNTERPARTIES_AND_CONCENTRATION: {
+        "counterparty_relationship": ("major_customers_suppliers", "orders"),
+    },
+    ChapterTask.EXTRACT_BUSINESS_REGIME: {
+        "business_regime": ("principal_business", "business_model", "major_projects"),
+    },
+}
+_FIELD_REASON_TERMS: dict[ChapterTask, dict[str, tuple[str, ...]]] = {
+    ChapterTask.EXTRACT_BUSINESS_OVERVIEW: {
+        "business_overview_source": ("主营业务", "主要业务", "主要产品", "经营模式"),
+        "explicit_activity": ("主营业务", "主要业务", "主要产品"),
+    },
+    ChapterTask.EXTRACT_SEGMENT_FINANCIALS: {
+        "segment_dimension": ("分部信息", "分行业", "分产品"),
+        "operating_revenue": ("营业收入",),
+        "operating_cost": ("营业成本", "成本构成"),
+        "gross_margin_reported": ("毛利率",),
+    },
+    ChapterTask.EXTRACT_OPERATING_QUANTITIES: {
+        "production_capacity": ("产能",),
+        "capacity_under_construction": ("在建",),
+        "production_volume": ("产销量", "生产量"),
+        "sales_volume": ("产销量", "销售量"),
+        "inventory_volume": ("产销量", "库存量"),
+        "processing_volume": ("加工量",),
+    },
+    ChapterTask.EXTRACT_MATERIAL_INPUTS: {
+        "material_input": ("原材料", "能源", "采购", "成本构成", "铁矿石", "煤炭"),
+    },
+    ChapterTask.EXTRACT_COUNTERPARTIES_AND_CONCENTRATION: {
+        "counterparty_relationship": ("客户", "供应商"),
+        "customer_concentration": ("前五名客户", "客户集中度"),
+        "supplier_concentration": ("前五名供应商", "供应商集中度"),
+    },
+    ChapterTask.EXTRACT_BUSINESS_REGIME: {
+        "business_regime": ("经营模式", "重大变化", "业务变化", "合并范围", "重组"),
+    },
 }
 
 
@@ -298,6 +428,56 @@ class ShadowEvidencePreparationAudit(_StrictModel):
         return self
 
 
+class ShadowScopeRefinementAudit(_StrictModel):
+    schema_version: Literal[
+        "company_profile_shadow_scope_refinement_audit.v1"
+    ] = SHADOW_SCOPE_REFINEMENT_AUDIT_SCHEMA
+    audit_id: str = Field(min_length=1)
+    sample_manifest_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    baseline_plan_version: str = Field(min_length=1)
+    baseline_plan_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    refined_plan_version: str = Field(min_length=1)
+    refined_plan_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    report_count: int = Field(ge=SHADOW_REPORT_COUNT, le=SHADOW_REPORT_COUNT)
+    baseline_scope_count: int = Field(ge=SHADOW_REPORT_COUNT * 6)
+    refined_scope_count: int = Field(ge=SHADOW_REPORT_COUNT * 6)
+    baseline_field_scope_pair_count: int = Field(gt=0)
+    refined_field_scope_pair_count: int = Field(gt=0)
+    baseline_field_bound_evidence_copy_count: int = Field(gt=0)
+    refined_field_bound_evidence_copy_count: int = Field(gt=0)
+    baseline_field_bound_evidence_character_count: int = Field(gt=0)
+    refined_field_bound_evidence_character_count: int = Field(gt=0)
+    field_bound_evidence_copy_reduction_rate: float = Field(ge=0.0, le=1.0)
+    field_bound_evidence_character_reduction_rate: float = Field(ge=0.0, le=1.0)
+    unsupported_assignment_count: Literal[0] = 0
+    missing_required_owner_count: Literal[0] = 0
+    table_context_incomplete_count: Literal[0] = 0
+    evidence_traceability_rate: Literal[1.0] = 1.0
+    provider_calls: Literal[0] = 0
+    chapter_metrics: dict[str, dict[str, int]]
+    created_at: str = Field(min_length=1)
+    audit_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    production_authorization: Literal["not_authorized"] = PRODUCTION_AUTHORIZATION
+
+    @model_validator(mode="after")
+    def _audit_is_consistent(self) -> ShadowScopeRefinementAudit:
+        if self.refined_field_scope_pair_count >= self.baseline_field_scope_pair_count:
+            raise ValueError("refined scope plan must reduce field/scope assignments")
+        if (
+            self.refined_field_bound_evidence_copy_count
+            >= self.baseline_field_bound_evidence_copy_count
+        ):
+            raise ValueError("refined scope plan must reduce field-bound Evidence copies")
+        if (
+            self.refined_field_bound_evidence_character_count
+            >= self.baseline_field_bound_evidence_character_count
+        ):
+            raise ValueError("refined scope plan must reduce field-bound Evidence characters")
+        if self.audit_hash != _payload_hash(self, omit={"audit_hash"}):
+            raise ValueError("shadow scope refinement audit hash mismatch")
+        return self
+
+
 class ShadowEvidencePlanner:
     """Translate governed PDF sections into existing Stage 5 plan objects."""
 
@@ -317,7 +497,12 @@ class ShadowEvidencePlanner:
         )
         self._catalog = load_disclosure_template_catalog()
 
-    def build(self, manifest: ShadowSampleManifest) -> ShadowEvidencePlan:
+    def build(
+        self,
+        manifest: ShadowSampleManifest,
+        *,
+        expected_artifact_hashes: Mapping[str, str] | None = None,
+    ) -> ShadowEvidencePlan:
         reports: list[EvidenceReportPlan] = []
         artifact_hashes: dict[str, str] = {}
         section_hashes: dict[str, tuple[str, ...]] = {}
@@ -325,7 +510,12 @@ class ShadowEvidencePlanner:
         recovery_states: dict[str, str] = {}
         recovered_page_numbers: dict[str, tuple[int, ...]] = {}
         for report in manifest.reports:
-            artifact, recovery_state, recovered_pages = self.load_artifact(report)
+            artifact, recovery_state, recovered_pages = self.load_artifact(
+                report,
+                expected_artifact_hash=(expected_artifact_hashes or {}).get(
+                    report.sample_id
+                ),
+            )
             if artifact.status == "parse_failed":
                 failure_class = artifact.diagnostics.get("failure_class")
                 raise ShadowEvidencePlanningError(
@@ -524,11 +714,6 @@ class ShadowEvidencePlanner:
                 sample_id=report.sample_id,
                 chapter_task=chapter_task,
             )
-        _validate_table_context(
-            selected.sections,
-            sample_id=report.sample_id,
-            chapter_task=chapter_task,
-        )
         direct_pages = {
             section.page_number
             for section in selected.sections
@@ -557,15 +742,25 @@ class ShadowEvidencePlanner:
             direct_pages=direct_pages,
             bounded_pages=bounded,
             maximum_scopes=_CHAPTER_MAX_SCOPES[chapter_task],
+            chapter_task=chapter_task,
         )
         for index, pages in enumerate(ranges, start=1):
+            pages = _bind_table_context_range(
+                pages,
+                selected.sections,
+                sample_id=report.sample_id,
+                chapter_task=chapter_task,
+            )
             page_set = set(pages)
             sections = [item for item in selected.sections if item.page_number in page_set]
             combined = "\n".join(item.text for item in sections)
+            scope_field_ids = _scope_field_ids(chapter_task, sections)
+            if not scope_field_ids:
+                continue
             scopes.append(
                 EvidenceScopePlan(
                     scope_id=f"{chapter_name}-{index:02d}",
-                    field_ids=field_ids,
+                    field_ids=scope_field_ids,
                     pages=pages,
                     section_titles=tuple(
                         dict.fromkeys(
@@ -606,6 +801,27 @@ class ShadowEvidencePlanner:
                         else "native"
                     ),
                 )
+            )
+        if not scopes:
+            raise ShadowEvidencePlanningError(
+                ShadowPlanningFailureCode.CHAPTER_EVIDENCE_NOT_FOUND,
+                f"no source-supported fields selected for {chapter_task.value}",
+                sample_id=report.sample_id,
+                chapter_task=chapter_task,
+            )
+        planned_fields = {
+            field_id for scope in scopes for field_id in scope.field_ids
+        }
+        missing_required = sorted(
+            set(_REQUIRED_CHAPTER_FIELDS.get(chapter_task, ())) - planned_fields
+        )
+        if missing_required:
+            raise ShadowEvidencePlanningError(
+                ShadowPlanningFailureCode.CHAPTER_EVIDENCE_NOT_FOUND,
+                "required chapter fields have no source-supported owning scope: "
+                f"{missing_required}",
+                sample_id=report.sample_id,
+                chapter_task=chapter_task,
             )
         return EvidenceTaskPlan(
             chapter_task=chapter_task,
@@ -684,6 +900,18 @@ class ShadowEvidencePreparer:
                     f"unknown Stage 5 checklist fields: {unknown}",
                     sample_id=asset.sample_id,
                 )
+            if plan.plan_version == SHADOW_EVIDENCE_PLAN_VERSION:
+                _validate_refined_report_plan(
+                    report_plan,
+                    artifact_pages=artifact_pages,
+                    sample_id=asset.sample_id,
+                    scope_reasons={
+                        (selection.chapter_task, selection.scope_id): (
+                            selection.selector_reasons
+                        )
+                        for selection in plan.scope_selections[asset.sample_id]
+                    },
+                )
             page_results = {
                 number: _artifact_page_result(page) for number, page in artifact_pages.items()
             }
@@ -694,6 +922,68 @@ class ShadowEvidencePreparer:
                 page_results=page_results,
             )
         return prepared
+
+
+def _validate_refined_report_plan(
+    report_plan: EvidenceReportPlan,
+    *,
+    artifact_pages: dict[int, Any],
+    sample_id: str,
+    scope_reasons: dict[tuple[ChapterTask, str], tuple[str, ...]],
+) -> None:
+    for task in report_plan.tasks:
+        planned_fields: set[str] = set()
+        for scope in task.request_scopes:
+            try:
+                sections = tuple(
+                    SimpleNamespace(
+                        page_number=page,
+                        text=str(artifact_pages[page].text or ""),
+                    )
+                    for page in scope.pages
+                )
+            except KeyError as exc:
+                raise ShadowEvidencePlanningError(
+                    ShadowPlanningFailureCode.PDF_IDENTITY_MISMATCH,
+                    f"refined scope page is missing from the PDF artifact: {exc}",
+                    sample_id=sample_id,
+                    chapter_task=task.chapter_task,
+                ) from exc
+            supported = set(
+                _scope_field_ids(
+                    task.chapter_task,
+                    sections,
+                    selector_reasons=scope_reasons.get(
+                        (task.chapter_task, scope.scope_id), ()
+                    ),
+                    supplemental_terms=(*scope.section_titles, *scope.anchor_terms),
+                )
+            )
+            unsupported = sorted(set(scope.field_ids) - supported)
+            if unsupported:
+                raise ShadowEvidencePlanningError(
+                    ShadowPlanningFailureCode.FIELD_CONTRACT_INVALID,
+                    "refined scope assigns fields without a positive source signal: "
+                    f"{scope.scope_id}:{unsupported}",
+                    sample_id=sample_id,
+                    chapter_task=task.chapter_task,
+                )
+            _validate_table_context(
+                sections,
+                sample_id=sample_id,
+                chapter_task=task.chapter_task,
+            )
+            planned_fields.update(scope.field_ids)
+        missing = sorted(
+            set(_REQUIRED_CHAPTER_FIELDS.get(task.chapter_task, ())) - planned_fields
+        )
+        if missing:
+            raise ShadowEvidencePlanningError(
+                ShadowPlanningFailureCode.FIELD_CONTRACT_INVALID,
+                f"refined chapter has no owner for required fields: {missing}",
+                sample_id=sample_id,
+                chapter_task=task.chapter_task,
+            )
 
 
 def build_shadow_preparation_audit(
@@ -756,6 +1046,225 @@ def build_shadow_preparation_audit(
     )
 
 
+def build_shadow_scope_refinement_audit(
+    *,
+    audit_id: str,
+    baseline_plan: ShadowEvidencePlan,
+    refined_plan: ShadowEvidencePlan,
+    baseline_prepared: dict[str, tuple[PreparedRequestScope, ...]],
+    refined_prepared: dict[str, tuple[PreparedRequestScope, ...]],
+) -> ShadowScopeRefinementAudit:
+    """Compare two hash-bound plans without invoking or emulating a provider."""
+
+    if baseline_plan.sample_manifest_hash != refined_plan.sample_manifest_hash:
+        raise ValueError("scope refinement plans use different sample manifests")
+    if baseline_plan.pdf_artifact_hashes != refined_plan.pdf_artifact_hashes:
+        raise ValueError("scope refinement plans use different PDF artifacts")
+    if baseline_plan.selected_section_hashes != refined_plan.selected_section_hashes:
+        raise ValueError("scope refinement plans use different governed sections")
+    if baseline_plan.recovery_states != refined_plan.recovery_states or (
+        baseline_plan.recovered_page_numbers != refined_plan.recovered_page_numbers
+    ):
+        raise ValueError("scope refinement plans use different PDF recovery states")
+    expected_ids = {report.sample_id for report in baseline_plan.reports}
+    if (
+        expected_ids != {report.sample_id for report in refined_plan.reports}
+        or expected_ids != set(baseline_prepared)
+        or expected_ids != set(refined_prepared)
+    ):
+        raise ValueError("scope refinement report identities mismatch")
+
+    baseline_metrics = _prepared_scope_metrics(baseline_prepared)
+    refined_metrics = _prepared_scope_metrics(refined_prepared)
+    unsupported = _unsupported_prepared_assignments(refined_plan, refined_prepared)
+    missing_required = _missing_required_field_owners(refined_plan)
+    if unsupported:
+        raise ValueError(f"refined plan has unsupported field assignments: {unsupported}")
+    if missing_required:
+        raise ValueError(f"refined plan has missing required field owners: {missing_required}")
+    _validate_prepared_table_contexts(refined_prepared)
+
+    chapter_metrics: dict[str, dict[str, int]] = {}
+    for chapter in ChapterTask:
+        baseline_chapter = _prepared_scope_metrics(
+            _prepared_for_chapter(baseline_prepared, chapter)
+        )
+        refined_chapter = _prepared_scope_metrics(
+            _prepared_for_chapter(refined_prepared, chapter)
+        )
+        chapter_metrics[chapter.value] = {
+            "baseline_scope_count": baseline_chapter["scope_count"],
+            "refined_scope_count": refined_chapter["scope_count"],
+            "baseline_field_scope_pair_count": baseline_chapter[
+                "field_scope_pair_count"
+            ],
+            "refined_field_scope_pair_count": refined_chapter[
+                "field_scope_pair_count"
+            ],
+            "baseline_field_bound_evidence_copy_count": baseline_chapter[
+                "field_bound_evidence_copy_count"
+            ],
+            "refined_field_bound_evidence_copy_count": refined_chapter[
+                "field_bound_evidence_copy_count"
+            ],
+        }
+    payload = {
+        "schema_version": SHADOW_SCOPE_REFINEMENT_AUDIT_SCHEMA,
+        "audit_id": audit_id,
+        "sample_manifest_hash": baseline_plan.sample_manifest_hash,
+        "baseline_plan_version": baseline_plan.plan_version,
+        "baseline_plan_hash": baseline_plan.plan_hash,
+        "refined_plan_version": refined_plan.plan_version,
+        "refined_plan_hash": refined_plan.plan_hash,
+        "report_count": len(expected_ids),
+        "baseline_scope_count": baseline_metrics["scope_count"],
+        "refined_scope_count": refined_metrics["scope_count"],
+        "baseline_field_scope_pair_count": baseline_metrics[
+            "field_scope_pair_count"
+        ],
+        "refined_field_scope_pair_count": refined_metrics["field_scope_pair_count"],
+        "baseline_field_bound_evidence_copy_count": baseline_metrics[
+            "field_bound_evidence_copy_count"
+        ],
+        "refined_field_bound_evidence_copy_count": refined_metrics[
+            "field_bound_evidence_copy_count"
+        ],
+        "baseline_field_bound_evidence_character_count": baseline_metrics[
+            "field_bound_evidence_character_count"
+        ],
+        "refined_field_bound_evidence_character_count": refined_metrics[
+            "field_bound_evidence_character_count"
+        ],
+        "field_bound_evidence_copy_reduction_rate": _reduction_rate(
+            baseline_metrics["field_bound_evidence_copy_count"],
+            refined_metrics["field_bound_evidence_copy_count"],
+        ),
+        "field_bound_evidence_character_reduction_rate": _reduction_rate(
+            baseline_metrics["field_bound_evidence_character_count"],
+            refined_metrics["field_bound_evidence_character_count"],
+        ),
+        "unsupported_assignment_count": 0,
+        "missing_required_owner_count": 0,
+        "table_context_incomplete_count": 0,
+        "evidence_traceability_rate": 1.0,
+        "provider_calls": 0,
+        "chapter_metrics": chapter_metrics,
+        "created_at": _utc_now(),
+        "production_authorization": PRODUCTION_AUTHORIZATION,
+    }
+    return ShadowScopeRefinementAudit(
+        **payload,
+        audit_hash=_payload_hash(payload),
+    )
+
+
+def _prepared_scope_metrics(
+    prepared: dict[str, tuple[PreparedRequestScope, ...]],
+) -> dict[str, int]:
+    scopes = [scope for values in prepared.values() for scope in values]
+    evidence_copies = 0
+    evidence_characters = 0
+    for scope in scopes:
+        for field_id in scope.field_ids:
+            for item in scope.evidence_bundle:
+                bound = item.model_copy(update={"field_id": field_id})
+                evidence_copies += 1
+                evidence_characters += len(bound.model_dump_json())
+    return {
+        "scope_count": len(scopes),
+        "field_scope_pair_count": sum(len(scope.field_ids) for scope in scopes),
+        "field_bound_evidence_copy_count": evidence_copies,
+        "field_bound_evidence_character_count": evidence_characters,
+    }
+
+
+def _prepared_for_chapter(
+    prepared: dict[str, tuple[PreparedRequestScope, ...]],
+    chapter: ChapterTask,
+) -> dict[str, tuple[PreparedRequestScope, ...]]:
+    return {
+        sample_id: tuple(scope for scope in scopes if scope.chapter_task == chapter)
+        for sample_id, scopes in prepared.items()
+    }
+
+
+def _unsupported_prepared_assignments(
+    plan: ShadowEvidencePlan,
+    prepared: dict[str, tuple[PreparedRequestScope, ...]],
+) -> tuple[str, ...]:
+    unsupported: list[str] = []
+    for sample_id, scopes in prepared.items():
+        report_plan = plan.report_by_id(sample_id)
+        scope_plans = {
+            (task.chapter_task, scope.scope_id): scope
+            for task in report_plan.tasks
+            for scope in task.request_scopes
+        }
+        scope_reasons = {
+            (selection.chapter_task, selection.scope_id): selection.selector_reasons
+            for selection in plan.scope_selections[sample_id]
+        }
+        for scope in scopes:
+            scope_plan = scope_plans[(scope.chapter_task, scope.scope_id)]
+            sections = tuple(
+                SimpleNamespace(page_number=page.page, text=page.text)
+                for page in scope.page_contexts
+            )
+            supported = set(
+                _scope_field_ids(
+                    scope.chapter_task,
+                    sections,
+                    selector_reasons=scope_reasons.get(
+                        (scope.chapter_task, scope.scope_id), ()
+                    ),
+                    supplemental_terms=(
+                        *scope_plan.section_titles,
+                        *scope_plan.anchor_terms,
+                    ),
+                )
+            )
+            for field_id in scope.field_ids:
+                if field_id not in supported:
+                    unsupported.append(f"{sample_id}:{scope.scope_id}:{field_id}")
+    return tuple(unsupported)
+
+
+def _missing_required_field_owners(
+    plan: ShadowEvidencePlan,
+) -> tuple[str, ...]:
+    missing: list[str] = []
+    for report in plan.reports:
+        for task in report.tasks:
+            planned = {
+                field_id for scope in task.request_scopes for field_id in scope.field_ids
+            }
+            for field_id in _REQUIRED_CHAPTER_FIELDS.get(task.chapter_task, ()):
+                if field_id not in planned:
+                    missing.append(
+                        f"{report.sample_id}:{task.chapter_task.value}:{field_id}"
+                    )
+    return tuple(missing)
+
+
+def _validate_prepared_table_contexts(
+    prepared: dict[str, tuple[PreparedRequestScope, ...]],
+) -> None:
+    for sample_id, scopes in prepared.items():
+        for scope in scopes:
+            _validate_table_context(
+                tuple(
+                    SimpleNamespace(page_number=page.page, text=page.text)
+                    for page in scope.page_contexts
+                ),
+                sample_id=sample_id,
+                chapter_task=scope.chapter_task,
+            )
+
+
+def _reduction_rate(baseline: int, refined: int) -> float:
+    return round((baseline - refined) / baseline, 6)
+
+
 def _artifact_page_result(page: Any) -> SimpleNamespace:
     text = str(page.text or "")
     method = str(page.extraction_method or "none")
@@ -796,7 +1305,11 @@ def _load_frozen_artifact(
 
 def write_shadow_evidence_artifact(
     path: str | Path,
-    value: ShadowEvidencePlan | ShadowEvidencePreparationAudit,
+    value: (
+        ShadowEvidencePlan
+        | ShadowEvidencePreparationAudit
+        | ShadowScopeRefinementAudit
+    ),
 ) -> None:
     destination = Path(path)
     content = json.dumps(
@@ -846,6 +1359,20 @@ def load_shadow_preparation_audit(
         raise ShadowEvidencePlanningError(
             ShadowPlanningFailureCode.PLAN_INVALID,
             f"shadow preparation audit is invalid: {exc}",
+        ) from exc
+
+
+def load_shadow_scope_refinement_audit(
+    path: str | Path,
+) -> ShadowScopeRefinementAudit:
+    try:
+        return ShadowScopeRefinementAudit.model_validate_json(
+            Path(path).read_text(encoding="utf-8")
+        )
+    except (OSError, ValueError) as exc:
+        raise ShadowEvidencePlanningError(
+            ShadowPlanningFailureCode.PLAN_INVALID,
+            f"shadow scope refinement audit is invalid: {exc}",
         ) from exc
 
 
@@ -909,11 +1436,14 @@ def _select_scope_ranges(
     direct_pages: set[int],
     bounded_pages: Sequence[int],
     maximum_scopes: int,
+    chapter_task: ChapterTask,
 ) -> tuple[tuple[int, ...], ...]:
     ranges = _continuous_ranges(bounded_pages, maximum=3)
     sections_by_page = {item.page_number: item for item in sections}
 
-    def score(pages: tuple[int, ...]) -> tuple[int, int]:
+    def score(pages: tuple[int, ...]) -> tuple[int, int, int]:
+        scoped_sections = [sections_by_page[page] for page in pages]
+        supported_fields = _scope_field_ids(chapter_task, scoped_sections)
         reasons = {
             reason
             for page in pages
@@ -930,10 +1460,120 @@ def _select_scope_ranges(
             for reason in reasons
         )
         value += 10 * sum(page in direct_pages for page in pages)
-        return value, -pages[0]
+        return len(supported_fields), value, -pages[0]
 
-    chosen = sorted(ranges, key=score, reverse=True)[:maximum_scopes]
+    supported = [pages for pages in ranges if score(pages)[0] > 0]
+    chosen = sorted(supported, key=score, reverse=True)[:maximum_scopes]
     return tuple(sorted(chosen, key=lambda pages: pages[0]))
+
+
+def _scope_field_ids(
+    chapter_task: ChapterTask,
+    sections: Sequence[Any],
+    *,
+    selector_reasons: Sequence[str] = (),
+    supplemental_terms: Sequence[str] = (),
+) -> tuple[str, ...]:
+    """Return the stable existing field subset supported by this source scope."""
+
+    chapter_fields = _CHAPTER_CONFIG[chapter_task][0]
+    compact = re.sub(r"\s+", "", "\n".join(str(item.text) for item in sections))
+    section_keys = {
+        str(getattr(item, "section_key", "")) for item in sections
+    } | {str(term) for term in supplemental_terms}
+    reasons = {
+        str(reason)
+        for item in sections
+        for reason in getattr(item, "selector_reasons", ())
+    } | {str(reason) for reason in selector_reasons}
+    matched: set[str] = set()
+    for field_id in chapter_fields:
+        patterns = _FIELD_TEXT_PATTERNS[chapter_task].get(field_id, ())
+        key_signals = _FIELD_SECTION_KEYS.get(chapter_task, {}).get(field_id, ())
+        reason_terms = _FIELD_REASON_TERMS.get(chapter_task, {}).get(field_id, ())
+        if (
+            any(re.search(pattern, compact) for pattern in patterns)
+            or bool(section_keys & set(key_signals))
+            or any(
+                term in reason
+                for reason in reasons
+                for term in reason_terms
+            )
+        ):
+            matched.add(field_id)
+    if chapter_task == ChapterTask.EXTRACT_SEGMENT_FINANCIALS and (
+        "segment_dimension" not in matched
+    ):
+        matched -= {
+            "operating_revenue",
+            "operating_cost",
+            "gross_margin_reported",
+        }
+    return tuple(field_id for field_id in chapter_fields if field_id in matched)
+
+
+def _bind_table_context_range(
+    pages: tuple[int, ...],
+    sections: Sequence[Any],
+    *,
+    sample_id: str,
+    chapter_task: ChapterTask,
+) -> tuple[int, ...]:
+    sections_by_page = {item.page_number: item for item in sections}
+    available = set(sections_by_page)
+    required = set(pages)
+    changed = True
+    while changed:
+        changed = False
+        for page in tuple(sorted(required)):
+            normalized = re.sub(r"\s+", "", sections_by_page[page].text)
+            if "续表" in normalized and page - 1 not in required:
+                if page - 1 not in available:
+                    _raise_table_context_incomplete(
+                        sample_id=sample_id,
+                        chapter_task=chapter_task,
+                        page=page,
+                    )
+                required.add(page - 1)
+                changed = True
+            if any(term in normalized for term in ("续下表", "接下页")) and (
+                page + 1 not in required
+            ):
+                if page + 1 not in available:
+                    _raise_table_context_incomplete(
+                        sample_id=sample_id,
+                        chapter_task=chapter_task,
+                        page=page,
+                    )
+                required.add(page + 1)
+                changed = True
+    bounded = tuple(sorted(required))
+    if len(bounded) > 3 or any(right != left + 1 for left, right in pairwise(bounded)):
+        _raise_table_context_incomplete(
+            sample_id=sample_id,
+            chapter_task=chapter_task,
+            page=min(bounded),
+        )
+    _validate_table_context(
+        [sections_by_page[page] for page in bounded],
+        sample_id=sample_id,
+        chapter_task=chapter_task,
+    )
+    return bounded
+
+
+def _raise_table_context_incomplete(
+    *,
+    sample_id: str,
+    chapter_task: ChapterTask,
+    page: int,
+) -> None:
+    raise ShadowEvidencePlanningError(
+        ShadowPlanningFailureCode.TABLE_CONTEXT_INCOMPLETE,
+        f"selected table continuation context is incomplete at page {page}",
+        sample_id=sample_id,
+        chapter_task=chapter_task,
+    )
 
 
 def _anchor_term(

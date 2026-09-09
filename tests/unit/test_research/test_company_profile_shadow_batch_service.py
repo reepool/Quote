@@ -28,7 +28,7 @@ from research.company_profile.shadow_evidence import (
 REPOSITORY_ROOT = Path(__file__).resolve().parents[3]
 CHANGE_ROOT = (
     REPOSITORY_ROOT
-    / "openspec/changes/validate-manufacturing-materials-company-profile-shadow-batch"
+    / "openspec/changes/archive/2026-09-09-validate-manufacturing-materials-company-profile-shadow-batch"
 )
 SHADOW_MANIFEST = CHANGE_ROOT / "shadow-manifest.v1.json"
 

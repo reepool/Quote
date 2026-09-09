@@ -18,14 +18,17 @@ from research.company_profile.shadow_evidence import (
     ShadowEvidencePlanningError,
     ShadowEvidencePreparer,
     ShadowPlanningFailureCode,
+    _bind_table_context_range,
+    _scope_field_ids,
     build_shadow_preparation_audit,
+    build_shadow_scope_refinement_audit,
     load_shadow_evidence_plan,
 )
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[3]
 CHANGE_ROOT = (
     REPOSITORY_ROOT
-    / "openspec/changes/validate-manufacturing-materials-company-profile-shadow-batch"
+    / "openspec/changes/archive/2026-09-09-validate-manufacturing-materials-company-profile-shadow-batch"
 )
 SHADOW_MANIFEST = CHANGE_ROOT / "shadow-manifest.v1.json"
 
@@ -200,3 +203,68 @@ def test_shadow_plan_loader_rejects_answer_bearing_content(tmp_path: Path) -> No
         load_shadow_evidence_plan(path)
 
     assert caught.value.code == ShadowPlanningFailureCode.PLAN_INVALID
+
+
+def test_shadow_scope_fields_follow_source_specific_signals() -> None:
+    customer = SimpleNamespace(
+        section_key="major_customers_suppliers",
+        selector_reasons=("structured_hint:前五名客户",),
+        text="前五名客户销售额合计占年度销售总额比例 38.5%",
+    )
+    supplier = SimpleNamespace(
+        section_key="major_customers_suppliers",
+        selector_reasons=("structured_hint:前五名供应商",),
+        text="前五名供应商采购额合计占年度采购总额比例 42.1%",
+    )
+
+    assert _scope_field_ids(
+        ChapterTask.EXTRACT_COUNTERPARTIES_AND_CONCENTRATION, (customer,)
+    ) == ("counterparty_relationship", "customer_concentration")
+    assert _scope_field_ids(
+        ChapterTask.EXTRACT_COUNTERPARTIES_AND_CONCENTRATION, (supplier,)
+    ) == ("counterparty_relationship", "supplier_concentration")
+
+
+def test_shadow_scope_fields_do_not_invent_missing_table_columns() -> None:
+    revenue_only = SimpleNamespace(
+        section_key="segment_information",
+        selector_reasons=("structured_hint:营业收入",),
+        text="分产品 营业收入 2025年 2024年",
+    )
+
+    assert _scope_field_ids(
+        ChapterTask.EXTRACT_SEGMENT_FINANCIALS, (revenue_only,)
+    ) == ("segment_dimension", "operating_revenue")
+
+
+def test_shadow_table_context_binds_continuation_to_owner() -> None:
+    sections = (
+        SimpleNamespace(page_number=8, text="产销量表 单位：吨"),
+        SimpleNamespace(page_number=9, text="续表 销售量 库存量"),
+    )
+
+    assert _bind_table_context_range(
+        (9,),
+        sections,
+        sample_id="sample",
+        chapter_task=ChapterTask.EXTRACT_OPERATING_QUANTITIES,
+    ) == (8, 9)
+
+
+def test_scope_refinement_audit_rejects_different_manifest() -> None:
+    manifest = _manifest()
+    planner = ShadowEvidencePlanner(
+        extractor=_ManifestExtractor(manifest),
+        selector=_Selector(),
+    )
+    baseline = planner.build(manifest)
+    refined = baseline.model_copy(update={"sample_manifest_hash": "f" * 64})
+
+    with pytest.raises(ValueError, match="different sample manifests"):
+        build_shadow_scope_refinement_audit(
+            audit_id="test",
+            baseline_plan=baseline,
+            refined_plan=refined,
+            baseline_prepared={},
+            refined_prepared={},
+        )

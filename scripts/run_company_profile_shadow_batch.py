@@ -25,10 +25,13 @@ from research.company_profile.shadow_batch_service import (
     ShadowBatchStore,
 )
 from research.company_profile.shadow_evidence import (
+    ShadowEvidencePlanner,
     ShadowEvidencePreparer,
     build_shadow_preparation_audit,
+    build_shadow_scope_refinement_audit,
     load_shadow_evidence_plan,
     load_shadow_preparation_audit,
+    write_shadow_evidence_artifact,
 )
 from scripts.run_company_profile_stage5_slice import (
     _provider_for_scope,
@@ -44,10 +47,16 @@ SHADOW_MAX_PROVIDER_CALLS = 600
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--mode", choices=("preparation-only", "semantic-run"), required=True)
+    parser.add_argument(
+        "--mode",
+        choices=("preparation-only", "scope-refinement-replay", "semantic-run"),
+        required=True,
+    )
     parser.add_argument("--sample-manifest", required=True, type=Path)
     parser.add_argument("--evidence-plan", required=True, type=Path)
-    parser.add_argument("--preparation-audit", required=True, type=Path)
+    parser.add_argument("--preparation-audit", type=Path)
+    parser.add_argument("--refined-evidence-plan", type=Path)
+    parser.add_argument("--scope-refinement-audit", type=Path)
     parser.add_argument("--output-root", type=Path)
     parser.add_argument("--batch-id")
     parser.add_argument("--provider-route", default=SHADOW_PRIMARY_PROFILE)
@@ -70,6 +79,47 @@ def main(argv: Sequence[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     manifest = load_shadow_sample_manifest(args.sample_manifest, repository_root=ROOT_DIR)
     plan = load_shadow_evidence_plan(args.evidence_plan)
+    if args.mode == "scope-refinement-replay":
+        if not args.refined_evidence_plan or not args.scope_refinement_audit:
+            raise ValueError(
+                "scope-refinement-replay requires --refined-evidence-plan and "
+                "--scope-refinement-audit"
+            )
+        planner = ShadowEvidencePlanner()
+        refined_plan = planner.build(
+            manifest,
+            expected_artifact_hashes=plan.pdf_artifact_hashes,
+        )
+        baseline_prepared = ShadowEvidencePreparer(planner=planner).prepare(
+            manifest=manifest,
+            plan=plan,
+        )
+        refined_prepared = ShadowEvidencePreparer(planner=planner).prepare(
+            manifest=manifest,
+            plan=refined_plan,
+        )
+        refinement_audit = build_shadow_scope_refinement_audit(
+            audit_id="manufacturing-materials-shadow-scope-refinement-20260909-a",
+            baseline_plan=plan,
+            refined_plan=refined_plan,
+            baseline_prepared=baseline_prepared,
+            refined_prepared=refined_prepared,
+        )
+        write_shadow_evidence_artifact(args.refined_evidence_plan, refined_plan)
+        write_shadow_evidence_artifact(
+            args.scope_refinement_audit,
+            refinement_audit,
+        )
+        print(
+            json.dumps(
+                refinement_audit.model_dump(mode="json"),
+                ensure_ascii=False,
+                indent=2,
+            )
+        )
+        return 0
+    if not args.preparation_audit:
+        raise ValueError(f"{args.mode} requires --preparation-audit")
     frozen_audit = load_shadow_preparation_audit(args.preparation_audit)
     if (
         frozen_audit.sample_manifest_hash != manifest.manifest_hash
