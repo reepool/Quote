@@ -33,6 +33,16 @@ PARSEABLE_BAR = {
 }
 
 
+def _no_probe_tcp():
+    from data_sources.tdx_source import TdxIPManager
+
+    return patch.object(
+        TdxIPManager,
+        "_connect_registered_probe",
+        lambda self, api, ip, port, tracker: None,
+    )
+
+
 def _entry(ip, status, latency=1.0, port=7709, name=""):
     from data_sources.tdx_source import IPEntry
     return IPEntry(ip=ip, port=port, name=name, latency_ms=latency, status=status)
@@ -778,7 +788,7 @@ class TestDailyBarProbeClassification:
         api.get_security_bars.side_effect = get_bars
         api.client = None
 
-        with patch("data_sources.tdx_source.TdxHq_API", return_value=api):
+        with patch("data_sources.tdx_source.TdxHq_API", return_value=api), _no_probe_tcp():
             mgr = TdxIPManager(
                 hosts=[{"ip": "8.8.8.8", "port": 7709, "name": "sz"}],
                 probe_workers=1,
@@ -826,7 +836,7 @@ class TestDailyBarProbeClassification:
         api.connect.return_value = api
         api.get_security_bars.side_effect = get_bars
         api.client = None
-        with patch("data_sources.tdx_source.TdxHq_API", return_value=api):
+        with patch("data_sources.tdx_source.TdxHq_API", return_value=api), _no_probe_tcp():
             mgr = TdxIPManager(
                 hosts=[{"ip": "8.8.8.8", "port": 7709}],
                 probe_workers=1,
@@ -843,7 +853,7 @@ class TestDailyBarProbeClassification:
         api.connect.return_value = api
         api.get_security_bars.side_effect = OSError("reset")
         api.client = None
-        with patch("data_sources.tdx_source.TdxHq_API", return_value=api):
+        with patch("data_sources.tdx_source.TdxHq_API", return_value=api), _no_probe_tcp():
             mgr = TdxIPManager(
                 hosts=[{"ip": "8.8.8.8", "port": 7709}],
                 probe_workers=1,
@@ -859,7 +869,7 @@ class TestDailyBarProbeClassification:
         api.connect.return_value = api
         api.get_security_bars.return_value = None
         api.client = None
-        with patch("data_sources.tdx_source.TdxHq_API", return_value=api):
+        with patch("data_sources.tdx_source.TdxHq_API", return_value=api), _no_probe_tcp():
             mgr = TdxIPManager(
                 hosts=[{"ip": "8.8.8.8", "port": 7709}],
                 probe_workers=1,
@@ -970,18 +980,25 @@ class TestRefreshDeadlineAndLocks:
         from data_sources.tdx_source import TdxIPManager
 
         deadline = 0.15
-        client = Mock()
         closed = []
-        client.shutdown = Mock()
-        client.close = Mock(side_effect=lambda: closed.append("close"))
 
-        class SlowConnect:
-            def __init__(self, **_kwargs):
-                self.client = client
+        class SlowSock:
+            def settimeout(self, *_args, **_kwargs):
+                return None
 
             def connect(self, *_args, **_kwargs):
                 time.sleep(0.6)
-                return self
+
+            def shutdown(self, *_args, **_kwargs):
+                return None
+
+            def close(self):
+                closed.append("close")
+
+        class ProbeAPI:
+            def __init__(self, **_kwargs):
+                self.client = None
+                self.need_setup = False
 
             def get_security_bars(self, *_args, **_kwargs):
                 return [PARSEABLE_BAR]
@@ -991,13 +1008,15 @@ class TestRefreshDeadlineAndLocks:
             probe_workers=1,
             refresh_deadline_sec=deadline,
         )
-        with patch("data_sources.tdx_source.TdxHq_API", SlowConnect):
+        with patch("data_sources.tdx_source.TdxHq_API", ProbeAPI), patch.object(
+            TdxIPManager, "_open_probe_socket", lambda self, ip, port: SlowSock()
+        ):
             t0 = time.monotonic()
             mgr.refresh()
             elapsed = time.monotonic() - t0
         assert elapsed <= deadline + 0.2
         assert mgr.ranked_ips[0].status == "unfinished"
-        assert closed == ["close"]
+        assert "close" in closed
 
     def test_shutdown_error_still_closes_and_keeps_completed_result(self):
         from data_sources.tdx_source import TdxIPManager, close_tdx_socket
@@ -1011,25 +1030,30 @@ class TestRefreshDeadlineAndLocks:
         assert api.client is None
 
         deadline = 0.2
-        boom_client = Mock()
-        boom_client.shutdown.side_effect = OSError("disconnect err")
         closed = []
-        boom_client.close.side_effect = lambda: closed.append("close")
+        boom_client = Mock()
+        boom_client.settimeout = Mock()
+        boom_client.shutdown.side_effect = OSError("disconnect err")
+        boom_client.close.side_effect = lambda *_args, **_kwargs: closed.append("close")
+        boom_client.connect.side_effect = lambda *_args, **_kwargs: time.sleep(0.5)
 
-        class MixedAPI:
+        class ProbeAPI:
             def __init__(self, **_kwargs):
-                self.client = Mock()
-                self.ip = None
-
-            def connect(self, ip, port=7709, **_kwargs):
-                self.ip = ip
-                if ip == "2.2.2.2":
-                    self.client = boom_client
-                    time.sleep(0.5)
-                return self
+                self.client = None
+                self.need_setup = False
 
             def get_security_bars(self, *_args, **_kwargs):
                 return [PARSEABLE_BAR]
+
+        def open_sock(self, ip, port):
+            if ip == "2.2.2.2":
+                return boom_client
+            fast = Mock()
+            fast.settimeout = Mock()
+            fast.connect = Mock()
+            fast.shutdown = Mock()
+            fast.close = Mock()
+            return fast
 
         mgr = TdxIPManager(
             hosts=[
@@ -1039,12 +1063,140 @@ class TestRefreshDeadlineAndLocks:
             probe_workers=2,
             refresh_deadline_sec=deadline,
         )
-        with patch("data_sources.tdx_source.TdxHq_API", MixedAPI):
+        with patch("data_sources.tdx_source.TdxHq_API", ProbeAPI), patch.object(
+            TdxIPManager, "_open_probe_socket", open_sock
+        ):
             mgr.refresh()
         statuses = {e.ip: e.status for e in mgr.ranked_ips}
         assert statuses["1.1.1.1"] == "active"
         assert statuses["2.2.2.2"] == "unfinished"
         assert "close" in closed
+
+    def test_cleanup_cost_stays_inside_refresh_budget(self):
+        from data_sources.tdx_source import TdxIPManager
+
+        deadline = 0.1
+        hosts = [{"ip": f"1.1.1.{i}", "port": 7709} for i in range(16)]
+
+        def slow_close(api):
+            time.sleep(0.03)
+            client = getattr(api, "client", None)
+            if client is None:
+                return
+            try:
+                client.shutdown(2)
+            except Exception:
+                pass
+            try:
+                client.close()
+            except Exception:
+                pass
+            try:
+                api.client = None
+            except Exception:
+                pass
+
+        def fake_probe(self, host, deadline_ts, tracker):
+            api = Mock()
+            sock = Mock()
+            sock.shutdown = Mock()
+            sock.close = Mock()
+            if not tracker.register(api):
+                return _entry(host["ip"], "unfinished")
+            try:
+                if not tracker.install_socket(api, sock):
+                    return _entry(host["ip"], "unfinished")
+                time.sleep(1.0)
+                return _entry(host["ip"], "active")
+            finally:
+                tracker.unregister(api)
+
+        mgr = TdxIPManager(
+            hosts=hosts,
+            probe_workers=16,
+            refresh_deadline_sec=deadline,
+        )
+        with patch.object(TdxIPManager, "_probe_host", fake_probe), patch(
+            "data_sources.tdx_source.close_tdx_socket", slow_close
+        ):
+            t0 = time.monotonic()
+            mgr.refresh()
+            elapsed = time.monotonic() - t0
+        assert elapsed <= deadline + 0.2
+        assert mgr.last_refresh_duration_sec <= deadline + 0.2
+        assert all(entry.status == "unfinished" for entry in mgr.ranked_ips)
+
+    def test_deadline_stop_closes_socket_created_after_register(self):
+        from data_sources.tdx_source import TdxIPManager
+
+        deadline = 0.1
+        created = []
+        registered = threading.Event()
+        allow_create = threading.Event()
+
+        class RecSock:
+            def __init__(self):
+                self.closed = False
+                self.connect_called = False
+
+            def settimeout(self, *_args, **_kwargs):
+                return None
+
+            def connect(self, *_args, **_kwargs):
+                self.connect_called = True
+
+            def shutdown(self, *_args, **_kwargs):
+                return None
+
+            def close(self):
+                self.closed = True
+
+        class ProbeAPI:
+            def __init__(self, **_kwargs):
+                self.client = None
+                self.need_setup = False
+
+            def get_security_bars(self, *_args, **_kwargs):
+                return [PARSEABLE_BAR]
+
+        def delayed_open(self, ip, port):
+            registered.set()
+            assert allow_create.wait(timeout=2.0)
+            sock = RecSock()
+            created.append(sock)
+            return sock
+
+        mgr = TdxIPManager(
+            hosts=[{"ip": "1.1.1.1", "port": 7709}],
+            probe_workers=1,
+            refresh_deadline_sec=deadline,
+        )
+        elapsed = {}
+
+        def run_refresh():
+            t0 = time.monotonic()
+            with patch("data_sources.tdx_source.TdxHq_API", ProbeAPI), patch.object(
+                TdxIPManager, "_open_probe_socket", delayed_open
+            ):
+                mgr.refresh()
+            elapsed["sec"] = time.monotonic() - t0
+
+        worker = threading.Thread(target=run_refresh)
+        worker.start()
+        assert registered.wait(2.0)
+        worker.join(2.0)
+        assert not worker.is_alive()
+        assert elapsed["sec"] <= deadline + 0.2
+        allow_create.set()
+        until = time.monotonic() + 1.0
+        while time.monotonic() < until:
+            if created and all(sock.closed for sock in created):
+                break
+            time.sleep(0.01)
+        assert created
+        assert all(sock.closed for sock in created)
+        assert all(not sock.connect_called for sock in created)
+        assert mgr.ranked_ips[0].status == "unfinished"
 
     def test_expired_and_forced_refresh_do_not_deadlock_or_scan_parallel(self):
         from data_sources.tdx_source import TdxConnectionPool, TdxIPManager

@@ -193,11 +193,24 @@ def first_parseable_daily_bars(api: TdxHq_API) -> list | None:
     return None
 
 
+_REFRESH_CLEANUP_RESERVE_SEC = 0.05
+
+
 def close_tdx_socket(api: Any) -> None:
     """Best-effort closer: shutdown then close, each in its own try. Never raises."""
     if api is None:
         return
     client = getattr(api, "client", None)
+    if client is None:
+        return
+    _close_raw_socket(client)
+    try:
+        api.client = None
+    except Exception:
+        pass
+
+
+def _close_raw_socket(client: Any) -> None:
     if client is None:
         return
     try:
@@ -208,24 +221,47 @@ def close_tdx_socket(api: Any) -> None:
         client.close()
     except Exception:
         pass
-    try:
-        api.client = None
-    except Exception:
-        pass
 
 
 def _host_key(ip: str, port: int) -> str:
     return f"{ip}:{int(port)}"
 
 
+class _ProbeStopped(Exception):
+    """Probe hit the refresh stop flag before a usable connection existed."""
+
+
 class _ProbeSocketTracker:
     def __init__(self) -> None:
         self._lock = threading.Lock()
+        self._stopped = False
         self._apis: list[Any] = []
 
-    def register(self, api: Any) -> None:
+    @property
+    def stopped(self) -> bool:
         with self._lock:
+            return self._stopped
+
+    def stop(self) -> None:
+        with self._lock:
+            self._stopped = True
+
+    def register(self, api: Any) -> bool:
+        with self._lock:
+            if self._stopped:
+                return False
             self._apis.append(api)
+            return True
+
+    def install_socket(self, api: Any, client: Any) -> bool:
+        """Attach a live socket. False means the caller must close `client`."""
+        with self._lock:
+            if self._stopped:
+                return False
+            if api not in self._apis:
+                self._apis.append(api)
+            api.client = client
+            return True
 
     def unregister(self, api: Any) -> None:
         with self._lock:
@@ -234,11 +270,27 @@ class _ProbeSocketTracker:
             except ValueError:
                 pass
 
-    def close_all(self) -> None:
+    def close_all(self, until: float | None = None) -> None:
         with self._lock:
+            self._stopped = True
             apis = list(self._apis)
-        for api in apis:
-            close_tdx_socket(api)
+        if not apis:
+            return
+        workers = min(16, len(apis))
+        executor = ThreadPoolExecutor(
+            max_workers=workers,
+            thread_name_prefix="tdx-close",
+        )
+        try:
+            futures = [executor.submit(close_tdx_socket, api) for api in apis]
+            if until is None:
+                wait_futures(futures)
+                return
+            timeout = max(0.0, until - time.monotonic())
+            if timeout > 0:
+                wait_futures(futures, timeout=timeout)
+        finally:
+            executor.shutdown(wait=False, cancel_futures=False)
 
 
 # ---------------------------------------------------------------------------
@@ -390,6 +442,9 @@ class TdxIPManager:
                         entry.status = "active"
                         break
 
+    def _cleanup_reserve_sec(self) -> float:
+        return min(_REFRESH_CLEANUP_RESERVE_SEC, self._refresh_deadline_sec)
+
     def _run_scan(self) -> None:
         hosts = list(self._hosts)
         t0 = time.monotonic()
@@ -406,8 +461,9 @@ class TdxIPManager:
         )
         futures = []
         try:
+            schedule_until = deadline - self._cleanup_reserve_sec()
             for host in hosts:
-                if time.monotonic() >= deadline:
+                if time.monotonic() >= schedule_until:
                     break
                 futures.append(
                     executor.submit(
@@ -419,12 +475,13 @@ class TdxIPManager:
                         accepted_lock,
                     )
                 )
-            remaining = deadline - time.monotonic()
-            if remaining > 0 and futures:
-                wait_futures(futures, timeout=remaining)
+            wait_timeout = max(0.0, schedule_until - time.monotonic())
+            if wait_timeout > 0 and futures:
+                wait_futures(futures, timeout=wait_timeout)
         finally:
+            tracker.stop()
             executor.shutdown(wait=False, cancel_futures=True)
-            tracker.close_all()
+            tracker.close_all(until=deadline)
 
         results: list[IPEntry] = []
         for host in hosts:
@@ -505,6 +562,32 @@ class TdxIPManager:
         with accepted_lock:
             accepted[(entry.ip, entry.port)] = entry
 
+    def _open_probe_socket(self, ip: str, port: int) -> socket.socket:
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.settimeout(self._probe_timeout)
+        return sock
+
+    def _connect_registered_probe(
+        self,
+        api: Any,
+        ip: str,
+        port: int,
+        tracker: _ProbeSocketTracker,
+    ) -> None:
+        client = self._open_probe_socket(ip, port)
+        if not tracker.install_socket(api, client):
+            _close_raw_socket(client)
+            raise _ProbeStopped()
+        client.connect((ip, port))
+        if tracker.stopped:
+            raise _ProbeStopped()
+        api.ip = ip
+        api.port = port
+        if getattr(api, "need_setup", True):
+            api.setup()
+        if tracker.stopped:
+            raise _ProbeStopped()
+
     def _probe_host(
         self,
         host: dict[str, Any],
@@ -514,27 +597,41 @@ class TdxIPManager:
         ip = str(host["ip"])
         port = int(host.get("port", 7709))
         name = str(host.get("name", "") or "")
-        if time.monotonic() >= deadline:
+        if tracker.stopped or time.monotonic() >= deadline:
             return IPEntry(
                 ip=ip, port=port, name=name,
                 latency_ms=UNREACHABLE_LATENCY_MS, status="unfinished",
             )
 
         api = TdxHq_API(heartbeat=False, auto_retry=False, raise_exception=True)
-        tracker.register(api)
+        if not tracker.register(api):
+            return IPEntry(
+                ip=ip, port=port, name=name,
+                latency_ms=UNREACHABLE_LATENCY_MS, status="unfinished",
+            )
         t0 = time.monotonic()
         saw_unparseable = False
         try:
             try:
-                api.connect(ip, port, time_out=self._probe_timeout)
+                self._connect_registered_probe(api, ip, port, tracker)
+            except _ProbeStopped:
+                return IPEntry(
+                    ip=ip, port=port, name=name,
+                    latency_ms=UNREACHABLE_LATENCY_MS, status="unfinished",
+                )
             except Exception:
+                if tracker.stopped or time.monotonic() >= deadline:
+                    return IPEntry(
+                        ip=ip, port=port, name=name,
+                        latency_ms=UNREACHABLE_LATENCY_MS, status="unfinished",
+                    )
                 return IPEntry(
                     ip=ip, port=port, name=name,
                     latency_ms=UNREACHABLE_LATENCY_MS, status="unreachable",
                 )
 
             for market, code in DAILY_PROBE_SYMBOLS:
-                if time.monotonic() >= deadline:
+                if tracker.stopped or time.monotonic() >= deadline:
                     return IPEntry(
                         ip=ip, port=port, name=name,
                         latency_ms=UNREACHABLE_LATENCY_MS, status="unfinished",
