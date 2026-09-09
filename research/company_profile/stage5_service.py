@@ -36,12 +36,13 @@ from .models import (
     MetricType,
     ObjectType,
     Relationship,
+    ReportIdentity,
     RequirementLevel,
     SemanticRecord,
     SubjectBasis,
     SubjectScope,
 )
-from .projection import project_research_view
+from .projection import CompanyProfileResearchView, project_research_view
 from .stage5 import (
     PreparedRequestScope,
     Stage5EvidencePlan,
@@ -194,6 +195,12 @@ _FIELD_CONTRACT: dict[
 }
 
 
+def stage5_field_ids() -> frozenset[str]:
+    """Return the existing bounded semantic checklist field identifiers."""
+
+    return frozenset(_FIELD_CONTRACT)
+
+
 class _StrictModel(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
 
@@ -217,6 +224,30 @@ class Stage5SliceExecution(_StrictModel):
     overall_status: str
     report_statuses: dict[str, str]
     production_authorization: Literal["not_authorized"] = "not_authorized"
+
+
+class Stage5ReportExecutionResult(_StrictModel):
+    """Report-local semantic result before a mode-specific bundle admits it."""
+
+    run_id: str
+    sample_id: str
+    company_name: str
+    report: ReportIdentity
+    scope_results: tuple[Stage5ScopeResult, ...]
+    research_view: CompanyProfileResearchView
+    report_status: Stage5ReportStatus
+    benchmark: Stage5BenchmarkResult
+    created_at: str
+
+    @model_validator(mode="after")
+    def _scope_identity_is_report_local(self) -> Stage5ReportExecutionResult:
+        if any(
+            item.prepared_scope.sample_id != self.sample_id
+            or item.prepared_scope.report != self.report
+            for item in self.scope_results
+        ):
+            raise ValueError("report execution scopes must remain report-local")
+        return self
 
 
 SemanticInputFactory = Callable[[PreparedRequestScope], Stage5SemanticInput]
@@ -369,6 +400,48 @@ class ManufacturingMaterialsProfileSliceService:
         review_decisions: tuple[Stage5ReviewDecision, ...],
     ) -> Stage5ReportBundle:
         asset = manifest.report_by_id(sample_id)
+        result = self.execute_prepared_report(
+            run_id=run_id,
+            asset=asset,
+            prepared_scopes=prepared_scopes,
+            provider_factory=provider_factory,
+            semantic_input_factory=semantic_input_factory,
+        )
+        return Stage5ReportBundle(
+            run_id=result.run_id,
+            sample_id=result.sample_id,
+            company_name=result.company_name,
+            report=result.report,
+            sample_manifest_revision=manifest.manifest_revision,
+            evidence_plan_version=evidence_plan.plan_version,
+            evidence_plan_hash=stage5_evidence_plan_hash(evidence_plan_path),
+            scope_results=result.scope_results,
+            review_decisions=review_decisions,
+            research_view=result.research_view,
+            report_status=result.report_status,
+            benchmark=result.benchmark,
+            created_at=result.created_at,
+        )
+
+    def execute_prepared_report(
+        self,
+        *,
+        run_id: str,
+        asset: Any,
+        prepared_scopes: tuple[PreparedRequestScope, ...],
+        provider_factory: ProviderFactory,
+        semantic_input_factory: SemanticInputFactory | None = None,
+    ) -> Stage5ReportExecutionResult:
+        """Execute one already-admitted report through the existing semantic owner."""
+
+        if not prepared_scopes:
+            raise ValueError("report execution requires prepared scopes")
+        if any(
+            scope.sample_id != asset.sample_id or scope.report != asset.report
+            for scope in prepared_scopes
+        ):
+            raise ValueError("prepared scopes do not belong to the admitted report")
+        _validate_prepared_field_contract({asset.sample_id: prepared_scopes})
         scope_results: list[Stage5ScopeResult] = []
         task_results: list[CompanyProfileTaskResult] = []
         for scope in prepared_scopes:
@@ -406,16 +479,12 @@ class ManufacturingMaterialsProfileSliceService:
             scope_results=scope_results,
             benchmark=benchmark,
         )
-        return Stage5ReportBundle(
+        return Stage5ReportExecutionResult(
             run_id=run_id,
-            sample_id=sample_id,
+            sample_id=asset.sample_id,
             company_name=asset.company_name,
             report=asset.report,
-            sample_manifest_revision=manifest.manifest_revision,
-            evidence_plan_version=evidence_plan.plan_version,
-            evidence_plan_hash=stage5_evidence_plan_hash(evidence_plan_path),
             scope_results=tuple(scope_results),
-            review_decisions=review_decisions,
             research_view=view,
             report_status=report_status,
             benchmark=benchmark,

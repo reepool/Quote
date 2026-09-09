@@ -18,7 +18,14 @@ from research.business_profile_section_selection import (
 )
 
 
-def _page(number, text, *, ocr_required=False, native_status="extracted"):
+def _page(
+    number,
+    text,
+    *,
+    ocr_required=False,
+    native_status="extracted",
+    extraction_method="native_text",
+):
     text_hash = hashlib.sha256(text.encode()).hexdigest()
     return {
         "page_number": number,
@@ -27,6 +34,7 @@ def _page(number, text, *, ocr_required=False, native_status="extracted"):
         "page_artifact_hash": hashlib.sha256(f"page:{number}:{text}".encode()).hexdigest(),
         "native_text_status": native_status,
         "ocr_required": ocr_required,
+        "extraction_method": extraction_method,
     }
 
 
@@ -79,6 +87,32 @@ def test_selector_uses_heading_table_signature_context_and_immutable_replay(tmp_
     assert first_path == second_path
     assert first_status == "written"
     assert second_status == "unchanged"
+
+
+def test_selector_uses_schema_governed_quality_for_ocr_pages():
+    artifact = {
+        "source_content_hash": hashlib.sha256(b"ocr-document").hexdigest(),
+        "pages": [
+            _page(
+                1,
+                "主营业务\n公司生产并销售化纤产品。",
+                native_status="ocr",
+                extraction_method="ocr",
+            )
+        ],
+    }
+
+    selected = BusinessProfileSectionSelector(context_pages=0).select(
+        artifact=artifact,
+        instrument_id="000420.SZ",
+        source_document_id="ocr-report",
+        field_family=ANNUAL_REPORT_SEMANTIC_BUNDLE_FAMILY,
+        templates=_templates(),
+        hint_terms=("主营业务",),
+    )
+
+    assert selected.sections[0].quality == "governed_ocr"
+    assert selected.bundle["quality"] == "governed_ocr"
 
 
 def test_cross_page_table_repeats_header_and_reconciles_rows():

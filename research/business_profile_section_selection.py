@@ -305,7 +305,7 @@ class BusinessProfileSectionSelector:
             )
             extraction_method = str(page.get("extraction_method") or "native_text")
             quality = (
-                "ocr"
+                "governed_ocr"
                 if extraction_method == "ocr" and str(page.get("text") or "").strip()
                 else "low_text"
                 if bool(page.get("ocr_required"))
@@ -332,8 +332,8 @@ class BusinessProfileSectionSelector:
                 )
             )
         bundle_quality = (
-            "ocr"
-            if any(item.quality == "ocr" for item in sections)
+            "governed_ocr"
+            if any(item.quality == "governed_ocr" for item in sections)
             else "low_text"
             if any(item.quality == "low_text" for item in sections)
             else "unsupported"

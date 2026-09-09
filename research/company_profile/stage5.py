@@ -10,6 +10,7 @@ from __future__ import annotations
 import hashlib
 import json
 import re
+from collections.abc import Mapping
 from enum import Enum
 from pathlib import Path
 from typing import Any, Literal
@@ -552,6 +553,28 @@ class Stage5EvidencePreparer:
                 "evidence plan PDF hash does not match the approved manifest",
                 sample_id=sample_id,
             )
+        return self.prepare_asset_plan(
+            asset=asset,
+            plan=plan,
+            plan_version=evidence_plan.plan_version,
+        )
+
+    def prepare_asset_plan(
+        self,
+        *,
+        asset: Any,
+        plan: EvidenceReportPlan,
+        plan_version: str,
+        page_results: Mapping[int, Any] | None = None,
+    ) -> tuple[PreparedRequestScope, ...]:
+        """Prepare one hash-validated report plan through the shared owner."""
+
+        if plan.sample_id != asset.sample_id or plan.content_hash != asset.content_hash:
+            raise EvidencePreparationError(
+                PreparationFailureCode.PLAN_IDENTITY_MISMATCH,
+                "evidence report plan does not match its report asset",
+                sample_id=asset.sample_id,
+            )
         pages = tuple(
             sorted(
                 {
@@ -562,23 +585,28 @@ class Stage5EvidencePreparer:
                 }
             )
         )
-        content = asset.local_path.read_bytes()
-        result = self._router.parse(
-            PdfParseRequest(
-                content=content,
-                expected_content_hash=asset.content_hash,
-                target_pages=pages,
-                ocr_mode="none",
-                recovery_policy="native_first",
+        if page_results is None:
+            content = asset.local_path.read_bytes()
+            result = self._router.parse(
+                PdfParseRequest(
+                    content=content,
+                    expected_content_hash=asset.content_hash,
+                    target_pages=pages,
+                    ocr_mode="none",
+                    recovery_policy="native_first",
+                )
             )
-        )
-        if result.page_count != asset.page_count:
-            raise EvidencePreparationError(
-                PreparationFailureCode.PAGE_COUNT_MISMATCH,
-                f"PDF page count {result.page_count} != manifest {asset.page_count}",
-                sample_id=sample_id,
-            )
-        page_results = {item.page_number: item for item in result.pages}
+            if result.page_count != asset.page_count:
+                raise EvidencePreparationError(
+                    PreparationFailureCode.PAGE_COUNT_MISMATCH,
+                    f"PDF page count {result.page_count} != manifest {asset.page_count}",
+                    sample_id=asset.sample_id,
+                )
+            resolved_pages: Mapping[int, Any] = {
+                item.page_number: item for item in result.pages
+            }
+        else:
+            resolved_pages = page_results
         prepared: list[PreparedRequestScope] = []
         for task in plan.tasks:
             for scope in task.request_scopes:
@@ -587,8 +615,8 @@ class Stage5EvidencePreparer:
                         asset,
                         task.chapter_task,
                         scope,
-                        page_results,
-                        plan_version=evidence_plan.plan_version,
+                        dict(resolved_pages),
+                        plan_version=plan_version,
                     )
                 )
         return tuple(prepared)

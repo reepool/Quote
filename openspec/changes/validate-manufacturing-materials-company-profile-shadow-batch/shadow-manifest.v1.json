@@ -1,0 +1,631 @@
+{
+  "schema_version": "company_profile_shadow_batch_manifest.v1",
+  "manifest_kind": "manufacturing_materials_shadow_batch",
+  "manifest_revision": "manufacturing-materials-shadow-manifest-20260909-v1",
+  "selection_receipt_hash": "2a86341fd4b423b5a4880ff0d63f8438b9dbf5ad48530cf7bb6736703ed43531",
+  "reports": [
+    {
+      "sample_id": "manufacturing-materials-shadow-600121-2025",
+      "asset_id": "shared-asset:asset_b6c0f6aee524997e86a4b035aeedd25c",
+      "company_name": "郑州煤电",
+      "exchange": "SSE",
+      "board": "main",
+      "report": {
+        "instrument_id": "600121.SH",
+        "report_id": "1225048820",
+        "document_version": "a29e38547d59da761748aaf2c4c61b0e07855a86ce3f6843ed4bd4a70da32577",
+        "report_period": "2025-12-31",
+        "published_at": "2026-03-27T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "content_hash": "a29e38547d59da761748aaf2c4c61b0e07855a86ce3f6843ed4bd4a70da32577",
+      "local_path": "/home/python/Quote/data/filings/announcements/blobs/a2/a29e38547d59da761748aaf2c4c61b0e07855a86ce3f6843ed4bd4a70da32577.pdf",
+      "content_length": 1592060,
+      "page_count": 202,
+      "industry_group": "coal",
+      "sw_l1_name": "煤炭",
+      "sw_l2_name": "煤炭开采",
+      "sw_l3_name": "动力煤",
+      "business_shape": "coal:煤炭开采:动力煤",
+      "disclosure_shape": "SSE:main:annual_report",
+      "selection_reason": "deterministic unseen cohort diversity cell SSE/coal",
+      "known_limitations": [
+        "business and disclosure shapes are pre-runtime metadata proxies",
+        "semantic output was not inspected before cohort freeze"
+      ],
+      "production_authorization": "not_authorized"
+    },
+    {
+      "sample_id": "manufacturing-materials-shadow-600022-2025",
+      "asset_id": "shared-asset:asset_fff27215ac077751c12134a740d477c0",
+      "company_name": "山东钢铁",
+      "exchange": "SSE",
+      "board": "main",
+      "report": {
+        "instrument_id": "600022.SH",
+        "report_id": "1225149024",
+        "document_version": "dc615d75bd0f77ee98c9991bf98f7040b4fc6b5bd91cbfffa42c573a05506165",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-22T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "content_hash": "dc615d75bd0f77ee98c9991bf98f7040b4fc6b5bd91cbfffa42c573a05506165",
+      "local_path": "/home/python/Quote/data/filings/announcements/blobs/dc/dc615d75bd0f77ee98c9991bf98f7040b4fc6b5bd91cbfffa42c573a05506165.pdf",
+      "content_length": 1541862,
+      "page_count": 194,
+      "industry_group": "steel",
+      "sw_l1_name": "钢铁",
+      "sw_l2_name": "普钢",
+      "sw_l3_name": "板材",
+      "business_shape": "steel:普钢:板材",
+      "disclosure_shape": "SSE:main:annual_report",
+      "selection_reason": "deterministic unseen cohort diversity cell SSE/steel",
+      "known_limitations": [
+        "business and disclosure shapes are pre-runtime metadata proxies",
+        "semantic output was not inspected before cohort freeze"
+      ],
+      "production_authorization": "not_authorized"
+    },
+    {
+      "sample_id": "manufacturing-materials-shadow-600256-2025",
+      "asset_id": "shared-asset:asset_68d59c9f3e68695654637db841d28d07",
+      "company_name": "广汇能源",
+      "exchange": "SSE",
+      "board": "main",
+      "report": {
+        "instrument_id": "600256.SH",
+        "report_id": "1225170913",
+        "document_version": "1f53ed723477c38ace30c7e23147a3067492f2d9812db6049b5e49fe9a4b0271",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-23T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "content_hash": "1f53ed723477c38ace30c7e23147a3067492f2d9812db6049b5e49fe9a4b0271",
+      "local_path": "/home/python/Quote/data/filings/announcements/blobs/1f/1f53ed723477c38ace30c7e23147a3067492f2d9812db6049b5e49fe9a4b0271.pdf",
+      "content_length": 2225221,
+      "page_count": 310,
+      "industry_group": "petrochemical",
+      "sw_l1_name": "石油石化",
+      "sw_l2_name": "炼化及贸易",
+      "sw_l3_name": "油品石化贸易",
+      "business_shape": "petrochemical:炼化及贸易:油品石化贸易",
+      "disclosure_shape": "SSE:main:annual_report",
+      "selection_reason": "deterministic unseen cohort diversity cell SSE/petrochemical",
+      "known_limitations": [
+        "business and disclosure shapes are pre-runtime metadata proxies",
+        "semantic output was not inspected before cohort freeze"
+      ],
+      "production_authorization": "not_authorized"
+    },
+    {
+      "sample_id": "manufacturing-materials-shadow-600063-2025",
+      "asset_id": "shared-asset:asset_751602c3f5dd52d5068fb9de4a88af1e",
+      "company_name": "皖维高新",
+      "exchange": "SSE",
+      "board": "main",
+      "report": {
+        "instrument_id": "600063.SH",
+        "report_id": "1225017733",
+        "document_version": "ccc948f219767475dc7f27d18f40194400e06a23cffff0f0a54101595d44a938",
+        "report_period": "2025-12-31",
+        "published_at": "2026-03-19T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "content_hash": "ccc948f219767475dc7f27d18f40194400e06a23cffff0f0a54101595d44a938",
+      "local_path": "/home/python/Quote/data/filings/announcements/blobs/cc/ccc948f219767475dc7f27d18f40194400e06a23cffff0f0a54101595d44a938.pdf",
+      "content_length": 2097857,
+      "page_count": 213,
+      "industry_group": "basic_chemical",
+      "sw_l1_name": "基础化工",
+      "sw_l2_name": "化学纤维",
+      "sw_l3_name": "其他化学纤维",
+      "business_shape": "basic_chemical:化学纤维:其他化学纤维",
+      "disclosure_shape": "SSE:main:annual_report",
+      "selection_reason": "deterministic unseen cohort diversity cell SSE/basic_chemical",
+      "known_limitations": [
+        "business and disclosure shapes are pre-runtime metadata proxies",
+        "semantic output was not inspected before cohort freeze"
+      ],
+      "production_authorization": "not_authorized"
+    },
+    {
+      "sample_id": "manufacturing-materials-shadow-600111-2025",
+      "asset_id": "shared-asset:asset_6b1434d990b3b25f8fd615c986cf4109",
+      "company_name": "北方稀土",
+      "exchange": "SSE",
+      "board": "main",
+      "report": {
+        "instrument_id": "600111.SH",
+        "report_id": "1225118607",
+        "document_version": "401eba062f09132ee6a1814dd57a1aff5aa52375f4bfde070d2034c2175b141c",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-17T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "content_hash": "401eba062f09132ee6a1814dd57a1aff5aa52375f4bfde070d2034c2175b141c",
+      "local_path": "/home/python/Quote/data/filings/announcements/blobs/40/401eba062f09132ee6a1814dd57a1aff5aa52375f4bfde070d2034c2175b141c.pdf",
+      "content_length": 1699920,
+      "page_count": 263,
+      "industry_group": "nonferrous_and_solid_mineral",
+      "sw_l1_name": "有色金属",
+      "sw_l2_name": "小金属",
+      "sw_l3_name": "稀土",
+      "business_shape": "nonferrous_and_solid_mineral:小金属:稀土",
+      "disclosure_shape": "SSE:main:annual_report",
+      "selection_reason": "deterministic unseen cohort diversity cell SSE/nonferrous_and_solid_mineral",
+      "known_limitations": [
+        "business and disclosure shapes are pre-runtime metadata proxies",
+        "semantic output was not inspected before cohort freeze"
+      ],
+      "production_authorization": "not_authorized"
+    },
+    {
+      "sample_id": "manufacturing-materials-shadow-600176-2025",
+      "asset_id": "shared-asset:asset_3c86ad61788e9c3a8a36f53c2bbe1ae9",
+      "company_name": "中国巨石",
+      "exchange": "SSE",
+      "board": "main",
+      "report": {
+        "instrument_id": "600176.SH",
+        "report_id": "1225018682",
+        "document_version": "c71b2130cf3d5d9135b884f732d06767c6d2de03c6f7563920a2fc19ef73347f",
+        "report_period": "2025-12-31",
+        "published_at": "2026-03-19T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "content_hash": "c71b2130cf3d5d9135b884f732d06767c6d2de03c6f7563920a2fc19ef73347f",
+      "local_path": "/home/python/Quote/data/filings/announcements/blobs/c7/c71b2130cf3d5d9135b884f732d06767c6d2de03c6f7563920a2fc19ef73347f.pdf",
+      "content_length": 1785295,
+      "page_count": 213,
+      "industry_group": "building_material",
+      "sw_l1_name": "建筑材料",
+      "sw_l2_name": "玻璃玻纤",
+      "sw_l3_name": "玻纤制造",
+      "business_shape": "building_material:玻璃玻纤:玻纤制造",
+      "disclosure_shape": "SSE:main:annual_report",
+      "selection_reason": "deterministic unseen cohort diversity cell SSE/building_material",
+      "known_limitations": [
+        "business and disclosure shapes are pre-runtime metadata proxies",
+        "semantic output was not inspected before cohort freeze"
+      ],
+      "production_authorization": "not_authorized"
+    },
+    {
+      "sample_id": "manufacturing-materials-shadow-600075-2025",
+      "asset_id": "shared-asset:asset_fb16c3ec64749f73c5e0df825cc2b5b6",
+      "company_name": "新疆天业",
+      "exchange": "SSE",
+      "board": "main",
+      "report": {
+        "instrument_id": "600075.SH",
+        "report_id": "1225088343",
+        "document_version": "5afb41b23d2492a859a9157603ac7848c9fdb720f6d5fbca0e9a99f50a5cf7ed",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-09T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "content_hash": "5afb41b23d2492a859a9157603ac7848c9fdb720f6d5fbca0e9a99f50a5cf7ed",
+      "local_path": "/home/python/Quote/data/filings/announcements/blobs/5a/5afb41b23d2492a859a9157603ac7848c9fdb720f6d5fbca0e9a99f50a5cf7ed.pdf",
+      "content_length": 1794614,
+      "page_count": 235,
+      "industry_group": "basic_chemical",
+      "sw_l1_name": "基础化工",
+      "sw_l2_name": "化学原料",
+      "sw_l3_name": "氯碱",
+      "business_shape": "basic_chemical:化学原料:氯碱",
+      "disclosure_shape": "SSE:main:annual_report",
+      "selection_reason": "deterministic unseen cohort diversity cell SSE/basic_chemical",
+      "known_limitations": [
+        "business and disclosure shapes are pre-runtime metadata proxies",
+        "semantic output was not inspected before cohort freeze"
+      ],
+      "production_authorization": "not_authorized"
+    },
+    {
+      "sample_id": "manufacturing-materials-shadow-000552-2025",
+      "asset_id": "shared-asset:asset_f8e37f12f984d7d8bbd3e83913073418",
+      "company_name": "甘肃能化",
+      "exchange": "SZSE",
+      "board": "main",
+      "report": {
+        "instrument_id": "000552.SZ",
+        "report_id": "1225201908",
+        "document_version": "4841587d5a5eca8ad4645c31fd107bf92606204b9c4cdcae8e3b7fdbbe5cad26",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-27T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "content_hash": "4841587d5a5eca8ad4645c31fd107bf92606204b9c4cdcae8e3b7fdbbe5cad26",
+      "local_path": "/home/python/Quote/data/filings/announcements/blobs/48/4841587d5a5eca8ad4645c31fd107bf92606204b9c4cdcae8e3b7fdbbe5cad26.pdf",
+      "content_length": 1700806,
+      "page_count": 259,
+      "industry_group": "coal",
+      "sw_l1_name": "煤炭",
+      "sw_l2_name": "煤炭开采",
+      "sw_l3_name": "动力煤",
+      "business_shape": "coal:煤炭开采:动力煤",
+      "disclosure_shape": "SZSE:main:annual_report",
+      "selection_reason": "deterministic unseen cohort diversity cell SZSE/coal",
+      "known_limitations": [
+        "business and disclosure shapes are pre-runtime metadata proxies",
+        "semantic output was not inspected before cohort freeze"
+      ],
+      "production_authorization": "not_authorized"
+    },
+    {
+      "sample_id": "manufacturing-materials-shadow-000629-2025",
+      "asset_id": "shared-asset:asset_f8f03025c0873708fbd42d69a21d9160",
+      "company_name": "钒钛股份",
+      "exchange": "SZSE",
+      "board": "main",
+      "report": {
+        "instrument_id": "000629.SZ",
+        "report_id": "1225061907",
+        "document_version": "00f27adec4a5b4e8fe4a11f2c68cb6ac710c7f9e76eb8deb34d0a0d1d3bbb7c6",
+        "report_period": "2025-12-31",
+        "published_at": "2026-03-30T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "content_hash": "00f27adec4a5b4e8fe4a11f2c68cb6ac710c7f9e76eb8deb34d0a0d1d3bbb7c6",
+      "local_path": "/home/python/Quote/data/filings/announcements/blobs/00/00f27adec4a5b4e8fe4a11f2c68cb6ac710c7f9e76eb8deb34d0a0d1d3bbb7c6.pdf",
+      "content_length": 3845079,
+      "page_count": 179,
+      "industry_group": "steel",
+      "sw_l1_name": "钢铁",
+      "sw_l2_name": "冶钢原料",
+      "sw_l3_name": "冶钢辅料",
+      "business_shape": "steel:冶钢原料:冶钢辅料",
+      "disclosure_shape": "SZSE:main:annual_report",
+      "selection_reason": "deterministic unseen cohort diversity cell SZSE/steel",
+      "known_limitations": [
+        "business and disclosure shapes are pre-runtime metadata proxies",
+        "semantic output was not inspected before cohort freeze"
+      ],
+      "production_authorization": "not_authorized"
+    },
+    {
+      "sample_id": "manufacturing-materials-shadow-000059-2025",
+      "asset_id": "shared-asset:asset_939f6dd930e4290f963be3dadd8e20ad",
+      "company_name": "华锦股份",
+      "exchange": "SZSE",
+      "board": "main",
+      "report": {
+        "instrument_id": "000059.SZ",
+        "report_id": "1225144735",
+        "document_version": "6148d5c282c7295256fad060a116107d18fbdd0e34e6308fec42222a2a1ccf25",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-22T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "content_hash": "6148d5c282c7295256fad060a116107d18fbdd0e34e6308fec42222a2a1ccf25",
+      "local_path": "/home/python/Quote/data/filings/announcements/blobs/61/6148d5c282c7295256fad060a116107d18fbdd0e34e6308fec42222a2a1ccf25.pdf",
+      "content_length": 2104336,
+      "page_count": 132,
+      "industry_group": "petrochemical",
+      "sw_l1_name": "石油石化",
+      "sw_l2_name": "炼化及贸易",
+      "sw_l3_name": "炼油化工",
+      "business_shape": "petrochemical:炼化及贸易:炼油化工",
+      "disclosure_shape": "SZSE:main:annual_report",
+      "selection_reason": "deterministic unseen cohort diversity cell SZSE/petrochemical",
+      "known_limitations": [
+        "business and disclosure shapes are pre-runtime metadata proxies",
+        "semantic output was not inspected before cohort freeze"
+      ],
+      "production_authorization": "not_authorized"
+    },
+    {
+      "sample_id": "manufacturing-materials-shadow-000408-2025",
+      "asset_id": "shared-asset:asset_1c971704f9015919dcd9c74307565202",
+      "company_name": "藏格矿业",
+      "exchange": "SZSE",
+      "board": "main",
+      "report": {
+        "instrument_id": "000408.SZ",
+        "report_id": "1225009932",
+        "document_version": "10350f651693d09a3ed6f203996751624b41bcc330159df69eb29297cdd2d956",
+        "report_period": "2025-12-31",
+        "published_at": "2026-03-13T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "content_hash": "10350f651693d09a3ed6f203996751624b41bcc330159df69eb29297cdd2d956",
+      "local_path": "/home/python/Quote/data/filings/announcements/blobs/10/10350f651693d09a3ed6f203996751624b41bcc330159df69eb29297cdd2d956.pdf",
+      "content_length": 29310731,
+      "page_count": 205,
+      "industry_group": "basic_chemical",
+      "sw_l1_name": "基础化工",
+      "sw_l2_name": "农化制品",
+      "sw_l3_name": "钾肥",
+      "business_shape": "basic_chemical:农化制品:钾肥",
+      "disclosure_shape": "SZSE:main:annual_report",
+      "selection_reason": "deterministic unseen cohort diversity cell SZSE/basic_chemical",
+      "known_limitations": [
+        "business and disclosure shapes are pre-runtime metadata proxies",
+        "semantic output was not inspected before cohort freeze"
+      ],
+      "production_authorization": "not_authorized"
+    },
+    {
+      "sample_id": "manufacturing-materials-shadow-000060-2025",
+      "asset_id": "shared-asset:asset_a961b4dc60246ee8ce85ea8bf1bb068f",
+      "company_name": "中金岭南",
+      "exchange": "SZSE",
+      "board": "main",
+      "report": {
+        "instrument_id": "000060.SZ",
+        "report_id": "1225140762",
+        "document_version": "4485fbc367492b24fbec9ae444a48e97d6cddef53e16f853d8516bc37608efe3",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-21T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "content_hash": "4485fbc367492b24fbec9ae444a48e97d6cddef53e16f853d8516bc37608efe3",
+      "local_path": "/home/python/Quote/data/filings/announcements/blobs/44/4485fbc367492b24fbec9ae444a48e97d6cddef53e16f853d8516bc37608efe3.pdf",
+      "content_length": 3616027,
+      "page_count": 251,
+      "industry_group": "nonferrous_and_solid_mineral",
+      "sw_l1_name": "有色金属",
+      "sw_l2_name": "工业金属",
+      "sw_l3_name": "铅锌",
+      "business_shape": "nonferrous_and_solid_mineral:工业金属:铅锌",
+      "disclosure_shape": "SZSE:main:annual_report",
+      "selection_reason": "deterministic unseen cohort diversity cell SZSE/nonferrous_and_solid_mineral",
+      "known_limitations": [
+        "business and disclosure shapes are pre-runtime metadata proxies",
+        "semantic output was not inspected before cohort freeze"
+      ],
+      "production_authorization": "not_authorized"
+    },
+    {
+      "sample_id": "manufacturing-materials-shadow-000055-2025",
+      "asset_id": "shared-asset:asset_8c774f536d1a223763774e9fa3540d9d",
+      "company_name": "方大集团",
+      "exchange": "SZSE",
+      "board": "main",
+      "report": {
+        "instrument_id": "000055.SZ",
+        "report_id": "1225081648",
+        "document_version": "5f0c572946a37462cea97e81db69088b46b9757957b58ec80e966957a2a7e534",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-07T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "content_hash": "5f0c572946a37462cea97e81db69088b46b9757957b58ec80e966957a2a7e534",
+      "local_path": "/home/python/Quote/data/filings/announcements/blobs/5f/5f0c572946a37462cea97e81db69088b46b9757957b58ec80e966957a2a7e534.pdf",
+      "content_length": 1265247,
+      "page_count": 193,
+      "industry_group": "building_material",
+      "sw_l1_name": "建筑材料",
+      "sw_l2_name": "装修建材",
+      "sw_l3_name": "其他建材",
+      "business_shape": "building_material:装修建材:其他建材",
+      "disclosure_shape": "SZSE:main:annual_report",
+      "selection_reason": "deterministic unseen cohort diversity cell SZSE/building_material",
+      "known_limitations": [
+        "business and disclosure shapes are pre-runtime metadata proxies",
+        "semantic output was not inspected before cohort freeze"
+      ],
+      "production_authorization": "not_authorized"
+    },
+    {
+      "sample_id": "manufacturing-materials-shadow-000420-2025",
+      "asset_id": "shared-asset:asset_2ad1399a086a0bcf64271a1df415d7ec",
+      "company_name": "吉林化纤",
+      "exchange": "SZSE",
+      "board": "main",
+      "report": {
+        "instrument_id": "000420.SZ",
+        "report_id": "1225230991",
+        "document_version": "fe66da326f2a27794aff3286b4a711af3945f7856681acfa4f614c89a35fb28e",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-28T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "content_hash": "fe66da326f2a27794aff3286b4a711af3945f7856681acfa4f614c89a35fb28e",
+      "local_path": "/home/python/Quote/data/filings/announcements/blobs/fe/fe66da326f2a27794aff3286b4a711af3945f7856681acfa4f614c89a35fb28e.pdf",
+      "content_length": 20320786,
+      "page_count": 195,
+      "industry_group": "basic_chemical",
+      "sw_l1_name": "基础化工",
+      "sw_l2_name": "化学纤维",
+      "sw_l3_name": "粘胶",
+      "business_shape": "basic_chemical:化学纤维:粘胶",
+      "disclosure_shape": "SZSE:main:annual_report",
+      "selection_reason": "deterministic unseen cohort diversity cell SZSE/basic_chemical",
+      "known_limitations": [
+        "business and disclosure shapes are pre-runtime metadata proxies",
+        "semantic output was not inspected before cohort freeze"
+      ],
+      "production_authorization": "not_authorized"
+    },
+    {
+      "sample_id": "manufacturing-materials-shadow-920016-2025",
+      "asset_id": "shared-asset:asset_b5ff35dce0247da436a373c9473b2e1e",
+      "company_name": "中草香料",
+      "exchange": "BSE",
+      "board": "bse",
+      "report": {
+        "instrument_id": "920016.BJ",
+        "report_id": "1225121613",
+        "document_version": "2719862ff99bc55c6753ead34efd58fc02559a59795ecf01068212f666fd0b73",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-16T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "content_hash": "2719862ff99bc55c6753ead34efd58fc02559a59795ecf01068212f666fd0b73",
+      "local_path": "/home/python/Quote/data/filings/announcements/blobs/27/2719862ff99bc55c6753ead34efd58fc02559a59795ecf01068212f666fd0b73.pdf",
+      "content_length": 2574774,
+      "page_count": 195,
+      "industry_group": "basic_chemical",
+      "sw_l1_name": "基础化工",
+      "sw_l2_name": "化学制品",
+      "sw_l3_name": "食品及饲料添加剂",
+      "business_shape": "basic_chemical:化学制品:食品及饲料添加剂",
+      "disclosure_shape": "BSE:bse:annual_report",
+      "selection_reason": "deterministic unseen cohort diversity cell BSE/basic_chemical",
+      "known_limitations": [
+        "business and disclosure shapes are pre-runtime metadata proxies",
+        "semantic output was not inspected before cohort freeze"
+      ],
+      "production_authorization": "not_authorized"
+    },
+    {
+      "sample_id": "manufacturing-materials-shadow-920033-2025",
+      "asset_id": "shared-asset:asset_0656e54e4a4e528e8a90e85f4f3c75e4",
+      "company_name": "康普化学",
+      "exchange": "BSE",
+      "board": "bse",
+      "report": {
+        "instrument_id": "920033.BJ",
+        "report_id": "1225034390",
+        "document_version": "44f3f7b0b8801e4f195ca3f89e1f186ff8dd914ecf37496c7b8d3e0c4ed5adc9",
+        "report_period": "2025-12-31",
+        "published_at": "2026-03-25T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "content_hash": "44f3f7b0b8801e4f195ca3f89e1f186ff8dd914ecf37496c7b8d3e0c4ed5adc9",
+      "local_path": "/home/python/Quote/data/filings/announcements/blobs/44/44f3f7b0b8801e4f195ca3f89e1f186ff8dd914ecf37496c7b8d3e0c4ed5adc9.pdf",
+      "content_length": 3008002,
+      "page_count": 170,
+      "industry_group": "basic_chemical",
+      "sw_l1_name": "基础化工",
+      "sw_l2_name": "化学制品",
+      "sw_l3_name": "其他化学制品",
+      "business_shape": "basic_chemical:化学制品:其他化学制品",
+      "disclosure_shape": "BSE:bse:annual_report",
+      "selection_reason": "deterministic unseen cohort diversity cell BSE/basic_chemical",
+      "known_limitations": [
+        "business and disclosure shapes are pre-runtime metadata proxies",
+        "semantic output was not inspected before cohort freeze"
+      ],
+      "production_authorization": "not_authorized"
+    },
+    {
+      "sample_id": "manufacturing-materials-shadow-920068-2025",
+      "asset_id": "shared-asset:asset_2d6dd5dfdb22362a1aa20ebce8cbb979",
+      "company_name": "天工股份",
+      "exchange": "BSE",
+      "board": "bse",
+      "report": {
+        "instrument_id": "920068.BJ",
+        "report_id": "1225061053",
+        "document_version": "6f0e3f72de4df504aca48fb20eb255765811f4894839c0f33cb0144948efe679",
+        "report_period": "2025-12-31",
+        "published_at": "2026-03-29T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "content_hash": "6f0e3f72de4df504aca48fb20eb255765811f4894839c0f33cb0144948efe679",
+      "local_path": "/home/python/Quote/data/filings/announcements/blobs/6f/6f0e3f72de4df504aca48fb20eb255765811f4894839c0f33cb0144948efe679.pdf",
+      "content_length": 2632729,
+      "page_count": 153,
+      "industry_group": "nonferrous_and_solid_mineral",
+      "sw_l1_name": "有色金属",
+      "sw_l2_name": "小金属",
+      "sw_l3_name": "其他小金属",
+      "business_shape": "nonferrous_and_solid_mineral:小金属:其他小金属",
+      "disclosure_shape": "BSE:bse:annual_report",
+      "selection_reason": "deterministic unseen cohort diversity cell BSE/nonferrous_and_solid_mineral",
+      "known_limitations": [
+        "business and disclosure shapes are pre-runtime metadata proxies",
+        "semantic output was not inspected before cohort freeze"
+      ],
+      "production_authorization": "not_authorized"
+    },
+    {
+      "sample_id": "manufacturing-materials-shadow-920078-2025",
+      "asset_id": "shared-asset:asset_8520358e92a55cfd0c4cee9af3c4f5ca",
+      "company_name": "族兴新材",
+      "exchange": "BSE",
+      "board": "bse",
+      "report": {
+        "instrument_id": "920078.BJ",
+        "report_id": "1225172859",
+        "document_version": "c4862179aa641ea585650feb0ca58fb240f6c0fe30149aeff16e7811c6d2a35d",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-22T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "content_hash": "c4862179aa641ea585650feb0ca58fb240f6c0fe30149aeff16e7811c6d2a35d",
+      "local_path": "/home/python/Quote/data/filings/announcements/blobs/c4/c4862179aa641ea585650feb0ca58fb240f6c0fe30149aeff16e7811c6d2a35d.pdf",
+      "content_length": 2617369,
+      "page_count": 158,
+      "industry_group": "nonferrous_and_solid_mineral",
+      "sw_l1_name": "有色金属",
+      "sw_l2_name": "金属新材料",
+      "sw_l3_name": "其他金属新材料",
+      "business_shape": "nonferrous_and_solid_mineral:金属新材料:其他金属新材料",
+      "disclosure_shape": "BSE:bse:annual_report",
+      "selection_reason": "deterministic unseen cohort diversity cell BSE/nonferrous_and_solid_mineral",
+      "known_limitations": [
+        "business and disclosure shapes are pre-runtime metadata proxies",
+        "semantic output was not inspected before cohort freeze"
+      ],
+      "production_authorization": "not_authorized"
+    },
+    {
+      "sample_id": "manufacturing-materials-shadow-920076-2025",
+      "asset_id": "shared-asset:asset_96c37bf1be4f08cbe4af2761269d41ff",
+      "company_name": "国亮新材",
+      "exchange": "BSE",
+      "board": "bse",
+      "report": {
+        "instrument_id": "920076.BJ",
+        "report_id": "1225252299",
+        "document_version": "cbe63b7aec01f877f127df8b5ecfe96b7808b243564726b759a46953be2d793d",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-27T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "content_hash": "cbe63b7aec01f877f127df8b5ecfe96b7808b243564726b759a46953be2d793d",
+      "local_path": "/home/python/Quote/data/filings/announcements/blobs/cb/cbe63b7aec01f877f127df8b5ecfe96b7808b243564726b759a46953be2d793d.pdf",
+      "content_length": 2562948,
+      "page_count": 173,
+      "industry_group": "building_material",
+      "sw_l1_name": "建筑材料",
+      "sw_l2_name": "装修建材",
+      "sw_l3_name": "耐火材料",
+      "business_shape": "building_material:装修建材:耐火材料",
+      "disclosure_shape": "BSE:bse:annual_report",
+      "selection_reason": "deterministic unseen cohort diversity cell BSE/building_material",
+      "known_limitations": [
+        "business and disclosure shapes are pre-runtime metadata proxies",
+        "semantic output was not inspected before cohort freeze"
+      ],
+      "production_authorization": "not_authorized"
+    },
+    {
+      "sample_id": "manufacturing-materials-shadow-920580-2025",
+      "asset_id": "shared-asset:asset_2b487a69d35f6c63d71f526a8ea7d09e",
+      "company_name": "科创新材",
+      "exchange": "BSE",
+      "board": "bse",
+      "report": {
+        "instrument_id": "920580.BJ",
+        "report_id": "1225022769",
+        "document_version": "380dd32ca29d876cef2efd45724e25f44c5aeb6f9577a8704ae254c182afbf18",
+        "report_period": "2025-12-31",
+        "published_at": "2026-03-19T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "content_hash": "380dd32ca29d876cef2efd45724e25f44c5aeb6f9577a8704ae254c182afbf18",
+      "local_path": "/home/python/Quote/data/filings/announcements/blobs/38/380dd32ca29d876cef2efd45724e25f44c5aeb6f9577a8704ae254c182afbf18.pdf",
+      "content_length": 1938648,
+      "page_count": 135,
+      "industry_group": "building_material",
+      "sw_l1_name": "建筑材料",
+      "sw_l2_name": "装修建材",
+      "sw_l3_name": "耐火材料",
+      "business_shape": "building_material:装修建材:耐火材料",
+      "disclosure_shape": "BSE:bse:annual_report",
+      "selection_reason": "deterministic unseen cohort diversity cell BSE/building_material",
+      "known_limitations": [
+        "business and disclosure shapes are pre-runtime metadata proxies",
+        "semantic output was not inspected before cohort freeze"
+      ],
+      "production_authorization": "not_authorized"
+    }
+  ],
+  "created_at": "2026-09-09T10:25:10.790097+00:00",
+  "manifest_hash": "6f639739ef082e78dcb0c01a5ce40bab1645d8fdc027bece2dbef63652bae9e2",
+  "production_authorization": "not_authorized"
+}
