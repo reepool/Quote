@@ -2,11 +2,13 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 import math
 import os
 import statistics
 import uuid
+from collections import Counter
 from pathlib import Path
 from typing import Literal
 
@@ -18,12 +20,14 @@ from .shadow_batch_service import (
     ShadowBatchResult,
     ShadowReportFailure,
     ShadowReportSuccess,
+    load_shadow_batch_result,
     load_shadow_report_result,
 )
 from .stage5_bundle import Stage5ReportStatus
 
 SHADOW_REVIEW_PACKAGE_SCHEMA = "company_profile_shadow_review_package.v1"
 SHADOW_READINESS_AUDIT_SCHEMA = "company_profile_shadow_readiness_audit.v1"
+SHADOW_REPLAY_COMPARISON_SCHEMA = "company_profile_shadow_replay_comparison.v1"
 SHADOW_REVIEW_RULE_VERSION = "manufacturing_materials_shadow_review.2026-09-09.1"
 _USABLE = {
     Stage5ReportStatus.USABLE,
@@ -138,6 +142,67 @@ class ShadowReadinessAudit(_StrictModel):
             raise ValueError("shadow readiness decision does not match its gates")
         if self.audit_hash != _payload_hash(self, omit={"audit_hash"}):
             raise ValueError("shadow readiness audit hash mismatch")
+        return self
+
+
+class ShadowReplayMetricSnapshot(_StrictModel):
+    batch_id: str = Field(min_length=1)
+    source_batch_result_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    sample_manifest_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    evidence_plan_version: str = Field(min_length=1)
+    evidence_plan_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    batch_manifest_file_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    review_package_file_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    readiness_audit_file_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    persisted_report_count: int = Field(ge=0, le=SHADOW_REPORT_COUNT)
+    report_status_counts: dict[str, int]
+    execution_completion_rate: float = Field(ge=0, le=1)
+    usable_report_rate: float = Field(ge=0, le=1)
+    accepted_record_count: int = Field(ge=0)
+    evidence_traceability_rate: float = Field(ge=0, le=1)
+    unresolved_review_median: float = Field(ge=0)
+    unresolved_review_p90: float = Field(ge=0)
+    provider_call_count: int = Field(ge=0)
+    provider_failed_call_count: int = Field(ge=0)
+    total_latency_ms: int = Field(ge=0)
+    total_input_tokens: int = Field(ge=0)
+    total_output_tokens: int = Field(ge=0)
+    source_review_row_count: int = Field(ge=0)
+    precision_reviewed_count: int = Field(ge=0)
+    sampled_precision: float | None = Field(default=None, ge=0, le=1)
+    critical_semantic_error_count: int = Field(ge=0)
+    reason_code_counts: dict[str, int]
+    readiness_decision: Literal["ready", "hold"]
+
+    @model_validator(mode="after")
+    def _report_counts_are_complete(self) -> ShadowReplayMetricSnapshot:
+        if sum(self.report_status_counts.values()) != self.persisted_report_count:
+            raise ValueError("shadow replay report status counts mismatch")
+        return self
+
+
+class ShadowReplayComparisonAudit(_StrictModel):
+    schema_version: Literal["company_profile_shadow_replay_comparison.v1"] = (
+        SHADOW_REPLAY_COMPARISON_SCHEMA
+    )
+    audit_id: str = Field(min_length=1)
+    baseline: ShadowReplayMetricSnapshot
+    refined: ShadowReplayMetricSnapshot
+    metric_deltas: dict[str, float]
+    report_status_deltas: dict[str, int]
+    reason_code_deltas: dict[str, int]
+    created_at: str = Field(min_length=1)
+    audit_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    production_authorization: Literal["not_authorized"] = PRODUCTION_AUTHORIZATION
+
+    @model_validator(mode="after")
+    def _comparison_is_frozen(self) -> ShadowReplayComparisonAudit:
+        if self.baseline.sample_manifest_hash != self.refined.sample_manifest_hash:
+            raise ValueError("shadow replay comparison requires the same cohort")
+        if self.baseline.evidence_plan_hash == self.refined.evidence_plan_hash:
+            raise ValueError("shadow replay comparison requires different plans")
+        if self.audit_hash != _payload_hash(self, omit={"audit_hash"}):
+            raise ValueError("shadow replay comparison audit hash mismatch")
         return self
 
 
@@ -256,9 +321,98 @@ def build_shadow_readiness_audit(
     return ShadowReadinessAudit(**payload, audit_hash=_payload_hash(payload))
 
 
+def build_shadow_replay_comparison_audit(
+    *,
+    audit_id: str,
+    baseline_batch_directory: str | Path,
+    refined_batch_directory: str | Path,
+    baseline_review_path: str | Path,
+    refined_review_path: str | Path,
+    baseline_readiness_path: str | Path,
+    refined_readiness_path: str | Path,
+) -> ShadowReplayComparisonAudit:
+    """Compare two complete immutable cohort runs without modifying either tree."""
+
+    baseline = _replay_snapshot(
+        batch_directory=Path(baseline_batch_directory),
+        review_path=Path(baseline_review_path),
+        readiness_path=Path(baseline_readiness_path),
+    )
+    refined = _replay_snapshot(
+        batch_directory=Path(refined_batch_directory),
+        review_path=Path(refined_review_path),
+        readiness_path=Path(refined_readiness_path),
+    )
+    numeric_fields = (
+        "persisted_report_count",
+        "execution_completion_rate",
+        "usable_report_rate",
+        "accepted_record_count",
+        "evidence_traceability_rate",
+        "unresolved_review_median",
+        "unresolved_review_p90",
+        "provider_call_count",
+        "provider_failed_call_count",
+        "total_latency_ms",
+        "total_input_tokens",
+        "total_output_tokens",
+        "source_review_row_count",
+        "precision_reviewed_count",
+        "critical_semantic_error_count",
+    )
+    metric_deltas = {
+        field: float(getattr(refined, field) - getattr(baseline, field))
+        for field in numeric_fields
+    }
+    if baseline.sampled_precision is not None and refined.sampled_precision is not None:
+        metric_deltas["sampled_precision"] = (
+            refined.sampled_precision - baseline.sampled_precision
+        )
+    status_keys = sorted(
+        set(baseline.report_status_counts) | set(refined.report_status_counts)
+    )
+    reason_keys = sorted(set(baseline.reason_code_counts) | set(refined.reason_code_counts))
+    payload = {
+        "schema_version": SHADOW_REPLAY_COMPARISON_SCHEMA,
+        "audit_id": audit_id,
+        "baseline": baseline,
+        "refined": refined,
+        "metric_deltas": metric_deltas,
+        "report_status_deltas": {
+            key: refined.report_status_counts.get(key, 0)
+            - baseline.report_status_counts.get(key, 0)
+            for key in status_keys
+        },
+        "reason_code_deltas": {
+            key: refined.reason_code_counts.get(key, 0)
+            - baseline.reason_code_counts.get(key, 0)
+            for key in reason_keys
+        },
+        "created_at": _utc_now(),
+        "production_authorization": PRODUCTION_AUTHORIZATION,
+    }
+    return ShadowReplayComparisonAudit(**payload, audit_hash=_payload_hash(payload))
+
+
+def load_shadow_review_package(path: str | Path) -> ShadowReviewPackage:
+    return ShadowReviewPackage.model_validate_json(Path(path).read_text(encoding="utf-8"))
+
+
+def load_shadow_readiness_audit(path: str | Path) -> ShadowReadinessAudit:
+    return ShadowReadinessAudit.model_validate_json(Path(path).read_text(encoding="utf-8"))
+
+
+def load_shadow_replay_comparison_audit(
+    path: str | Path,
+) -> ShadowReplayComparisonAudit:
+    return ShadowReplayComparisonAudit.model_validate_json(
+        Path(path).read_text(encoding="utf-8")
+    )
+
+
 def write_shadow_batch_audit_artifact(
     path: str | Path,
-    value: ShadowReviewPackage | ShadowReadinessAudit,
+    value: ShadowReviewPackage | ShadowReadinessAudit | ShadowReplayComparisonAudit,
 ) -> None:
     destination = Path(path)
     content = (
@@ -274,6 +428,100 @@ def write_shadow_batch_audit_artifact(
         os.replace(temporary, destination)
     finally:
         temporary.unlink(missing_ok=True)
+
+
+def _replay_snapshot(
+    *,
+    batch_directory: Path,
+    review_path: Path,
+    readiness_path: Path,
+) -> ShadowReplayMetricSnapshot:
+    manifest_path = batch_directory / "manifest.json"
+    batch = load_shadow_batch_result(manifest_path)
+    review = load_shadow_review_package(review_path)
+    readiness = load_shadow_readiness_audit(readiness_path)
+    if review.source_batch_result_hash != batch.result_hash:
+        raise ValueError("shadow replay review package does not belong to its batch")
+    if (
+        readiness.batch_id != batch.batch_id
+        or readiness.source_batch_result_hash != batch.result_hash
+        or readiness.review_package_hash != review.package_hash
+    ):
+        raise ValueError("shadow replay readiness audit does not belong to its batch")
+    results = _load_validated_batch_tree(batch_directory, batch)
+    result_ids = {item.sample_id for item in results}
+    readiness_ids = {item.sample_id for item in readiness.reports}
+    if result_ids != readiness_ids:
+        raise ValueError("shadow replay readiness report identities mismatch")
+    status_counts = Counter(
+        "failed"
+        if isinstance(result, ShadowReportFailure)
+        else result.report_status.value
+        for result in results
+    )
+    reasons: Counter[str] = Counter()
+    for result in results:
+        if isinstance(result, ShadowReportFailure):
+            reasons.update(item.code for item in result.diagnostics)
+            continue
+        for scope in result.scope_results:
+            for item in scope.task_result.human_review_items:
+                reasons.update(item.reason_codes)
+    return ShadowReplayMetricSnapshot(
+        batch_id=batch.batch_id,
+        source_batch_result_hash=batch.result_hash,
+        sample_manifest_hash=batch.sample_manifest_hash,
+        evidence_plan_version=batch.evidence_plan_version,
+        evidence_plan_hash=batch.evidence_plan_hash,
+        batch_manifest_file_sha256=_file_sha256(manifest_path),
+        review_package_file_sha256=_file_sha256(review_path),
+        readiness_audit_file_sha256=_file_sha256(readiness_path),
+        persisted_report_count=len(results),
+        report_status_counts=dict(sorted(status_counts.items())),
+        execution_completion_rate=readiness.execution_completion_rate,
+        usable_report_rate=readiness.usable_report_rate,
+        accepted_record_count=readiness.accepted_record_count,
+        evidence_traceability_rate=readiness.evidence_traceability_rate,
+        unresolved_review_median=readiness.unresolved_review_median,
+        unresolved_review_p90=readiness.unresolved_review_p90,
+        provider_call_count=readiness.provider_call_count,
+        provider_failed_call_count=readiness.provider_failed_call_count,
+        total_latency_ms=readiness.total_latency_ms,
+        total_input_tokens=readiness.total_input_tokens,
+        total_output_tokens=readiness.total_output_tokens,
+        source_review_row_count=len(review.rows),
+        precision_reviewed_count=readiness.precision_reviewed_count,
+        sampled_precision=readiness.sampled_precision,
+        critical_semantic_error_count=readiness.critical_semantic_error_count,
+        reason_code_counts=dict(sorted(reasons.items())),
+        readiness_decision=readiness.readiness_decision,
+    )
+
+
+def _load_validated_batch_tree(
+    batch_directory: Path,
+    batch: ShadowBatchResult,
+) -> tuple[ShadowReportSuccess | ShadowReportFailure, ...]:
+    results: list[ShadowReportSuccess | ShadowReportFailure] = []
+    for reference in batch.reports:
+        path = batch_directory / reference.relative_path
+        if _file_sha256(path) != reference.output_sha256:
+            raise ValueError(f"shadow replay report hash mismatch: {reference.sample_id}")
+        result = load_shadow_report_result(path)
+        if (
+            result.batch_id != batch.batch_id
+            or result.sample_id != reference.sample_id
+            or result.report_run_id != reference.report_run_id
+            or result.sample_manifest_hash != batch.sample_manifest_hash
+            or result.evidence_plan_hash != batch.evidence_plan_hash
+        ):
+            raise ValueError(f"shadow replay report identity mismatch: {reference.sample_id}")
+        results.append(result)
+    return tuple(results)
+
+
+def _file_sha256(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
 def _report_metric(

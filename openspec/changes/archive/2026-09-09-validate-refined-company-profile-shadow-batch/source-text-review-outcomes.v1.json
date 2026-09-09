@@ -1,0 +1,638 @@
+[
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:segment_financials-01:chapter_sample:stage5-86d24526c99d7ea9b8e3cb3d",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "Runtime target is supported by frozen Evidence; source-native identity/value/unit/period semantics and research-only restrictions are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:operating_quantities-01:chapter_sample:coverage:operating_quantities-01:production_capacity",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "Frozen Evidence supports this legal-empty result without inventing a value, identity, event, or group subject."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:material_inputs-01:chapter_sample:stage5-4b4c3a6f705c197375d10137",
+    "outcome": "noncritical_error",
+    "reviewer": "codex-source-review",
+    "notes": "Generic cost category 材料 was over-structured as a named material_input Relationship; no numeric fact was altered."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:counterparties_and_concentration-01:chapter_sample:stage5-b2243cc697170c3fe9673002",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "Runtime target is supported by frozen Evidence; source-native identity/value/unit/period semantics and research-only restrictions are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:business_regime-01:chapter_sample:coverage:business_regime-01:business_regime",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "Frozen Evidence supports this legal-empty result without inventing a value, identity, event, or group subject."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600022-2025:business_overview-01:chapter_sample:stage5-c3652e7bd81f605e1b2130c1",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "Runtime target is supported by frozen Evidence; source-native identity/value/unit/period semantics and research-only restrictions are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600022-2025:segment_financials-01:chapter_sample:stage5-d0a7607c5de137d8c5b361d7",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "Runtime target is supported by frozen Evidence; source-native identity/value/unit/period semantics and research-only restrictions are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600022-2025:operating_quantities-01:chapter_sample:stage5-dda5d3ee01a4a98a985a5937",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "Runtime target is supported by frozen Evidence; source-native identity/value/unit/period semantics and research-only restrictions are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600022-2025:material_inputs-01:chapter_sample:coverage:material_inputs-01:material_input",
+    "outcome": "noncritical_error",
+    "reviewer": "codex-source-review",
+    "notes": "Selected Evidence is green-development/financial commentary, not a governed procurement or material disclosure; the legal empty exposes an Evidence-recall gap."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600022-2025:counterparties_and_concentration-01:chapter_sample:stage5-932e5fe176bf1248c4fa90fe",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "Runtime target is supported by frozen Evidence; source-native identity/value/unit/period semantics and research-only restrictions are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600022-2025:business_regime-01:chapter_sample:stage5-aa9c690bfed5b154a25db412",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "Runtime target is supported by frozen Evidence; source-native identity/value/unit/period semantics and research-only restrictions are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:segment_financials-01:chapter_sample:stage5-a8e2a268ec2337fa573811c8",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "Runtime target is supported by frozen Evidence; source-native identity/value/unit/period semantics and research-only restrictions are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:operating_quantities-01:chapter_sample:stage5-a8047c4698ccda2e51404540",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "Runtime target is supported by frozen Evidence; source-native identity/value/unit/period semantics and research-only restrictions are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:material_inputs-01:chapter_sample:coverage:material_inputs-01:material_input",
+    "outcome": "noncritical_error",
+    "reviewer": "codex-source-review",
+    "notes": "Selected Evidence is a business-results page and does not establish that material-input disclosure was checked; the legal empty exposes an Evidence-recall gap."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:counterparties_and_concentration-02:chapter_sample:coverage:counterparties_and_concentration-02:counterparty_relationship",
+    "outcome": "noncritical_error",
+    "reviewer": "codex-source-review",
+    "notes": "Selected Evidence is a revenue-note page without the governed customer/supplier section; the legal empty is not a reliable chapter-level counterparty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:business_regime-01:chapter_sample:coverage:business_regime-01:business_regime",
+    "outcome": "critical_error",
+    "reviewer": "codex-source-review",
+    "notes": "The same Evidence explicitly marks subsidiary equity changes affecting consolidation scope as applicable. business_regime=not_applicable silently omits a disclosed control-scope change."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600063-2025:segment_financials-01:chapter_sample:stage5-2e534718a460c40c9bcc68eb",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "Runtime target is supported by frozen Evidence; source-native identity/value/unit/period semantics and research-only restrictions are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600063-2025:operating_quantities-01:chapter_sample:stage5-0d4e4b86d0464fe497ff6f5c",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "Runtime target is supported by frozen Evidence; source-native identity/value/unit/period semantics and research-only restrictions are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600063-2025:material_inputs-01:chapter_sample:coverage:material_inputs-01:material_input",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "Frozen Evidence supports this legal-empty result without inventing a value, identity, event, or group subject."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600063-2025:counterparties_and_concentration-01:chapter_sample:stage5-390199486bfe3646ec9f0ba3",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "Runtime target is supported by frozen Evidence; source-native identity/value/unit/period semantics and research-only restrictions are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600063-2025:business_regime-01:chapter_sample:coverage:business_regime-01:business_regime",
+    "outcome": "noncritical_error",
+    "reviewer": "codex-source-review",
+    "notes": "Selected Evidence is a retained-earnings/revenue note rather than the business/control-change disclosure; the legal empty exposes an Evidence-selection gap."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600111-2025:business_overview-01:chapter_sample:stage5-4f145aa6c6ea58bae6b52df1",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "Runtime target is supported by frozen Evidence; source-native identity/value/unit/period semantics and research-only restrictions are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600111-2025:segment_financials-01:chapter_sample:stage5-12a6f9cc313bea4bf35d3986",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "Runtime target is supported by frozen Evidence; source-native identity/value/unit/period semantics and research-only restrictions are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600111-2025:operating_quantities-01:chapter_sample:coverage:operating_quantities-01:production_volume",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "Frozen Evidence supports this legal-empty result without inventing a value, identity, event, or group subject."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600111-2025:counterparties_and_concentration-01:chapter_sample:stage5-71b26797b4ea6a174d90d974",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "Runtime target is supported by frozen Evidence; source-native identity/value/unit/period semantics and research-only restrictions are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600111-2025:business_regime-01:chapter_sample:coverage:business_regime-01:business_regime",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "Frozen Evidence supports this legal-empty result without inventing a value, identity, event, or group subject."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:business_overview-01:chapter_sample:stage5-e7c96093add3438b3ab032d8",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "Runtime target is supported by frozen Evidence; source-native identity/value/unit/period semantics and research-only restrictions are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:segment_financials-01:chapter_sample:stage5-c6d48be0e47acfca1d8f86ae",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "Runtime target is supported by frozen Evidence; source-native identity/value/unit/period semantics and research-only restrictions are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:operating_quantities-01:chapter_sample:coverage:operating_quantities-01:production_capacity",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "Frozen Evidence supports this legal-empty result without inventing a value, identity, event, or group subject."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:material_inputs-01:chapter_sample:coverage:material_inputs-01:material_input",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "Frozen Evidence supports this legal-empty result without inventing a value, identity, event, or group subject."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:counterparties_and_concentration-01:chapter_sample:stage5-a300fd5dcad8b0c4fa6bec8b",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "Runtime target is supported by frozen Evidence; source-native identity/value/unit/period semantics and research-only restrictions are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:business_regime-01:chapter_sample:coverage:business_regime-01:business_regime",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "Frozen Evidence supports this legal-empty result without inventing a value, identity, event, or group subject."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:segment_financials-01:chapter_sample:stage5-6487a8bf9c9d2608eb90c700",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "Runtime target is supported by frozen Evidence; source-native identity/value/unit/period semantics and research-only restrictions are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:operating_quantities-01:chapter_sample:coverage:operating_quantities-01:production_capacity",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "Frozen Evidence supports this legal-empty result without inventing a value, identity, event, or group subject."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:material_inputs-01:chapter_sample:stage5-abc3caa81ba277f8754bf2ef",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "Runtime target is supported by frozen Evidence; source-native identity/value/unit/period semantics and research-only restrictions are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:counterparties_and_concentration-01:chapter_sample:stage5-6beaf69e104edc7d78284466",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "Runtime target is supported by frozen Evidence; source-native identity/value/unit/period semantics and research-only restrictions are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:business_regime-01:chapter_sample:coverage:business_regime-01:business_regime",
+    "outcome": "noncritical_error",
+    "reviewer": "codex-source-review",
+    "notes": "Selected Evidence is a segment table without the governed business/control-change checklist; not_disclosed is only a local Evidence result."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000552-2025:segment_financials-01:chapter_sample:stage5-0fda446bb5436c3d5c610edc",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "Runtime target is supported by frozen Evidence; source-native identity/value/unit/period semantics and research-only restrictions are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000552-2025:operating_quantities-01:chapter_sample:coverage:operating_quantities-01:production_capacity",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "Frozen Evidence supports this legal-empty result without inventing a value, identity, event, or group subject."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000552-2025:material_inputs-01:chapter_sample:coverage:material_inputs-01:material_input",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "Frozen Evidence supports this legal-empty result without inventing a value, identity, event, or group subject."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000552-2025:counterparties_and_concentration-01:chapter_sample:stage5-68d2a89a17ddddd4cf957aa6",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "Runtime target is supported by frozen Evidence; source-native identity/value/unit/period semantics and research-only restrictions are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000552-2025:business_regime-01:chapter_sample:coverage:business_regime-01:business_regime",
+    "outcome": "noncritical_error",
+    "reviewer": "codex-source-review",
+    "notes": "The source marks only principal-business statistical-calibre adjustment as not applicable; that is not equivalent to the broader business/control regime field."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:operating_quantities-01:chapter_sample:stage5-b4edb2215558179039fa41d4",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "Runtime target is supported by frozen Evidence; source-native identity/value/unit/period semantics and research-only restrictions are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:material_inputs-01:chapter_sample:stage5-76056f3576c9777206f62bb0",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "Runtime target is supported by frozen Evidence; source-native identity/value/unit/period semantics and research-only restrictions are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:counterparties_and_concentration-01:chapter_sample:stage5-0d2092fa3925d5550268260f",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "Runtime target is supported by frozen Evidence; source-native identity/value/unit/period semantics and research-only restrictions are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:business_regime-01:chapter_sample:coverage:business_regime-01:business_regime",
+    "outcome": "noncritical_error",
+    "reviewer": "codex-source-review",
+    "notes": "The source marks only principal-business statistical-calibre adjustment as not applicable; it does not close the broader business/control regime field."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000059-2025:business_overview-01:chapter_sample:stage5-1f12a970d82f7316e12e1e4f",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "Runtime target is supported by frozen Evidence; source-native identity/value/unit/period semantics and research-only restrictions are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000059-2025:segment_financials-01:chapter_sample:stage5-46e4df3d3320b767baeaa4d6",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "Runtime target is supported by frozen Evidence; source-native identity/value/unit/period semantics and research-only restrictions are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000059-2025:operating_quantities-01:chapter_sample:coverage:operating_quantities-01:production_capacity",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "Frozen Evidence supports this legal-empty result without inventing a value, identity, event, or group subject."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000059-2025:material_inputs-01:chapter_sample:coverage:material_inputs-01:material_input",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "Frozen Evidence supports this legal-empty result without inventing a value, identity, event, or group subject."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000059-2025:counterparties_and_concentration-01:chapter_sample:stage5-9b2fe0fd5281968b50e8b1c3",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "Runtime target is supported by frozen Evidence; source-native identity/value/unit/period semantics and research-only restrictions are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000059-2025:business_regime-01:chapter_sample:coverage:business_regime-01:business_regime",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "Frozen Evidence supports this legal-empty result without inventing a value, identity, event, or group subject."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:segment_financials-01:chapter_sample:stage5-b89729de6283b9e4b02afa93",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "Runtime target is supported by frozen Evidence; source-native identity/value/unit/period semantics and research-only restrictions are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:operating_quantities-01:chapter_sample:stage5-b1dfa3583f147eb905d9ca16",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "Runtime target is supported by frozen Evidence; source-native identity/value/unit/period semantics and research-only restrictions are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:material_inputs-01:chapter_sample:coverage:material_inputs-01:material_input",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "Frozen Evidence supports this legal-empty result without inventing a value, identity, event, or group subject."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:counterparties_and_concentration-01:chapter_sample:stage5-200286f7496d4c6807648cd6",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "Runtime target is supported by frozen Evidence; source-native identity/value/unit/period semantics and research-only restrictions are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:business_regime-01:chapter_sample:coverage:business_regime-01:business_regime",
+    "outcome": "critical_error",
+    "reviewer": "codex-source-review",
+    "notes": "The same Evidence explicitly states that consolidation scope changed, including a 2025-01-27 inclusion and a newly established subsidiary. business_regime=not_applicable is contradicted by the source."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000060-2025:business_overview-01:chapter_sample:coverage:business_overview-01:business_overview_source",
+    "outcome": "noncritical_error",
+    "reviewer": "codex-source-review",
+    "notes": "Selected Evidence is a financial-statement note, not the report main-business passage; the legal empty exposes an overview-page selection failure."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000060-2025:segment_financials-01:chapter_sample:stage5-8f948a48fef069f387ba5690",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "Runtime target is supported by frozen Evidence; source-native identity/value/unit/period semantics and research-only restrictions are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000060-2025:operating_quantities-01:chapter_sample:stage5-f707368b40659ac57d9c24ca",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "Runtime target is supported by frozen Evidence; source-native identity/value/unit/period semantics and research-only restrictions are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000060-2025:material_inputs-01:chapter_sample:coverage:material_inputs-01:material_input",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "Frozen Evidence supports this legal-empty result without inventing a value, identity, event, or group subject."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000060-2025:counterparties_and_concentration-01:chapter_sample:stage5-f4d7d5aa31caf2bec64eef45",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "Runtime target is supported by frozen Evidence; source-native identity/value/unit/period semantics and research-only restrictions are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000060-2025:business_regime-01:chapter_sample:coverage:business_regime-01:business_regime",
+    "outcome": "noncritical_error",
+    "reviewer": "codex-source-review",
+    "notes": "Selected Evidence is a retained-earnings/revenue note and does not test the governed business/control-change section."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000055-2025:segment_financials-01:chapter_sample:stage5-1c7a213d9389c2807763dfdc",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "Runtime target is supported by frozen Evidence; source-native identity/value/unit/period semantics and research-only restrictions are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000055-2025:operating_quantities-01:chapter_sample:coverage:operating_quantities-01:production_capacity",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "Frozen Evidence supports this legal-empty result without inventing a value, identity, event, or group subject."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000055-2025:material_inputs-01:chapter_sample:coverage:material_inputs-01:material_input",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "Frozen Evidence supports this legal-empty result without inventing a value, identity, event, or group subject."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000055-2025:counterparties_and_concentration-01:chapter_sample:stage5-665f3019401db8dea8486c94",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "Runtime target is supported by frozen Evidence; source-native identity/value/unit/period semantics and research-only restrictions are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000055-2025:business_regime-01:chapter_sample:coverage:business_regime-01:business_regime",
+    "outcome": "noncritical_error",
+    "reviewer": "codex-source-review",
+    "notes": "Selected Evidence is a parent-company investment/revenue note rather than the business/control-change disclosure."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000420-2025:business_overview-01:chapter_sample:stage5-5b285da4ca4b6675c96d8b38",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "Runtime target is supported by frozen Evidence; source-native identity/value/unit/period semantics and research-only restrictions are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000420-2025:segment_financials-01:chapter_sample:stage5-efd2152650130bb6d980fe9c",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "Runtime target is supported by frozen Evidence; source-native identity/value/unit/period semantics and research-only restrictions are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000420-2025:operating_quantities-01:chapter_sample:stage5-8c8658aee099b1d9e39afb91",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "Runtime target is supported by frozen Evidence; source-native identity/value/unit/period semantics and research-only restrictions are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000420-2025:material_inputs-01:chapter_sample:coverage:material_inputs-01:material_input",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "Frozen Evidence supports this legal-empty result without inventing a value, identity, event, or group subject."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000420-2025:counterparties_and_concentration-01:chapter_sample:coverage:counterparties_and_concentration-01:counterparty_relationship",
+    "outcome": "noncritical_error",
+    "reviewer": "codex-source-review",
+    "notes": "Selected Evidence is a business-model page without the governed customer/supplier section; the legal empty is not a reliable chapter-level conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000420-2025:business_regime-01:chapter_sample:coverage:business_regime-01:business_regime",
+    "outcome": "noncritical_error",
+    "reviewer": "codex-source-review",
+    "notes": "The source marks only principal-business statistical-calibre adjustment as not applicable; it does not close the broader business/control regime field."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920016-2025:business_overview-01:chapter_sample:stage5-3e8ada40c8891a8da32c5e3f",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "Runtime target is supported by frozen Evidence; source-native identity/value/unit/period semantics and research-only restrictions are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920016-2025:segment_financials-02:chapter_sample:stage5-857904eec0a66b947d6e65c3",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "Runtime target is supported by frozen Evidence; source-native identity/value/unit/period semantics and research-only restrictions are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920016-2025:operating_quantities-01:chapter_sample:coverage:operating_quantities-01:production_capacity",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "Frozen Evidence supports this legal-empty result without inventing a value, identity, event, or group subject."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920016-2025:material_inputs-01:chapter_sample:coverage:material_inputs-01:material_input",
+    "outcome": "noncritical_error",
+    "reviewer": "codex-source-review",
+    "notes": "Selected Evidence is financial analysis, while the earlier procurement passage explicitly identifies natural and synthetic raw-material classes; this is a material Evidence-recall miss."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920016-2025:counterparties_and_concentration-02:chapter_sample:stage5-d78d69acb30834b50ffe406e",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "Runtime target is supported by frozen Evidence; source-native identity/value/unit/period semantics and research-only restrictions are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920016-2025:business_regime-01:chapter_sample:coverage:business_regime-01:business_regime",
+    "outcome": "noncritical_error",
+    "reviewer": "codex-source-review",
+    "notes": "Selected Evidence is profit analysis and does not contain a governed business/control-change disclosure."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:segment_financials-01:chapter_sample:stage5-61b20939486f47b168f932dc",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "Runtime target is supported by frozen Evidence; source-native identity/value/unit/period semantics and research-only restrictions are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:operating_quantities-01:chapter_sample:coverage:operating_quantities-01:production_capacity",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "Frozen Evidence supports this legal-empty result without inventing a value, identity, event, or group subject."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:material_inputs-01:chapter_sample:coverage:material_inputs-01:material_input",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "Frozen Evidence supports this legal-empty result without inventing a value, identity, event, or group subject."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:counterparties_and_concentration-02:chapter_sample:stage5-43245ec363cb41b1cf9a4ef6",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "Runtime target is supported by frozen Evidence; source-native identity/value/unit/period semantics and research-only restrictions are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:business_regime-01:chapter_sample:coverage:business_regime-01:business_regime",
+    "outcome": "noncritical_error",
+    "reviewer": "codex-source-review",
+    "notes": "Selected Evidence is balance-sheet analysis and does not test the business/control-change section."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920068-2025:segment_financials-01:chapter_sample:stage5-7bf93961bb46a3f9ec47acb5",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "Runtime target is supported by frozen Evidence; source-native identity/value/unit/period semantics and research-only restrictions are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920068-2025:operating_quantities-01:chapter_sample:coverage:operating_quantities-01:production_capacity",
+    "outcome": "noncritical_error",
+    "reviewer": "codex-source-review",
+    "notes": "Selected Evidence is a balance-sheet page with an in-progress asset amount, not a physical production-capacity disclosure; capacity Evidence selection is weak."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920068-2025:material_inputs-01:chapter_sample:coverage:material_inputs-01:material_input",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "Frozen Evidence supports this legal-empty result without inventing a value, identity, event, or group subject."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920068-2025:business_regime-01:chapter_sample:stage5-67a61c62d763171d3eafea2a",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "Runtime target is supported by frozen Evidence; source-native identity/value/unit/period semantics and research-only restrictions are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920078-2025:business_overview-01:chapter_sample:coverage:business_overview-01:explicit_activity",
+    "outcome": "noncritical_error",
+    "reviewer": "codex-source-review",
+    "notes": "Selected Evidence is balance-sheet variance commentary rather than a main business/activity passage; this is an activity Evidence-selection failure."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920078-2025:segment_financials-02:chapter_sample:coverage:segment_financials-02:segment_dimension",
+    "outcome": "noncritical_error",
+    "reviewer": "codex-source-review",
+    "notes": "Selected Evidence is the parent-company income statement, not a segment table; this is a segment Evidence-selection failure."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920078-2025:operating_quantities-01:chapter_sample:coverage:operating_quantities-01:capacity_under_construction",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "Frozen Evidence supports this legal-empty result without inventing a value, identity, event, or group subject."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920078-2025:material_inputs-01:chapter_sample:stage5-69548c763dff5fbd1206068f",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "Runtime target is supported by frozen Evidence; source-native identity/value/unit/period semantics and research-only restrictions are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920078-2025:counterparties_and_concentration-01:chapter_sample:stage5-43dcc02f3bcb90aea9397988",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "Runtime target is supported by frozen Evidence; source-native identity/value/unit/period semantics and research-only restrictions are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920078-2025:business_regime-01:chapter_sample:coverage:business_regime-01:business_regime",
+    "outcome": "noncritical_error",
+    "reviewer": "codex-source-review",
+    "notes": "Selected Evidence is balance-sheet/profit commentary rather than the business/control-change section."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920076-2025:segment_financials-01:chapter_sample:stage5-75027cafb2da5d86c23084df",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "Runtime target is supported by frozen Evidence; source-native identity/value/unit/period semantics and research-only restrictions are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920076-2025:operating_quantities-01:chapter_sample:coverage:operating_quantities-01:capacity_under_construction",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "Frozen Evidence supports this legal-empty result without inventing a value, identity, event, or group subject."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920076-2025:material_inputs-01:chapter_sample:coverage:material_inputs-01:material_input",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "Frozen Evidence supports this legal-empty result without inventing a value, identity, event, or group subject."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920076-2025:counterparties_and_concentration-01:chapter_sample:stage5-21e7db1cae269aaf90889f05",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "Runtime target is supported by frozen Evidence; source-native identity/value/unit/period semantics and research-only restrictions are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920076-2025:business_regime-01:chapter_sample:coverage:business_regime-01:business_regime",
+    "outcome": "noncritical_error",
+    "reviewer": "codex-source-review",
+    "notes": "Selected Evidence is an operating-revenue note and does not test the governed business/control-change disclosure."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:business_overview-01:chapter_sample:stage5-25b4b0c5bc8866f6ffc90f04",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "Runtime target is supported by frozen Evidence; source-native identity/value/unit/period semantics and research-only restrictions are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:segment_financials-01:chapter_sample:stage5-ff2a66c2fadf68ae7fac356f",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "Runtime target is supported by frozen Evidence; source-native identity/value/unit/period semantics and research-only restrictions are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:operating_quantities-01:chapter_sample:stage5-96a6e32a021c1d6e0cf6f2d7",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "Runtime target is supported by frozen Evidence; source-native identity/value/unit/period semantics and research-only restrictions are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:material_inputs-01:chapter_sample:stage5-07401ebe3ea39dbfa1bf6670",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "Runtime target is supported by frozen Evidence; source-native identity/value/unit/period semantics and research-only restrictions are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:counterparties_and_concentration-02:chapter_sample:coverage:counterparties_and_concentration-02:counterparty_relationship",
+    "outcome": "noncritical_error",
+    "reviewer": "codex-source-review",
+    "notes": "Selected Evidence is a risk/materials page rather than the governed customer/supplier section; the legal empty is not a reliable chapter-level conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:business_regime-01:chapter_sample:coverage:business_regime-01:business_regime",
+    "outcome": "noncritical_error",
+    "reviewer": "codex-source-review",
+    "notes": "Selected Evidence is a retained-earnings/revenue note and does not test the governed business/control-change section."
+  }
+]

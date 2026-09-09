@@ -23,6 +23,8 @@ from research.company_profile.shadow_batch_audit import (
 from research.company_profile.shadow_batch_service import (
     ManufacturingMaterialsShadowBatchService,
     ShadowBatchStore,
+    ShadowReplayContract,
+    validate_shadow_replay_admission,
 )
 from research.company_profile.shadow_evidence import (
     ShadowEvidencePlanner,
@@ -31,6 +33,7 @@ from research.company_profile.shadow_evidence import (
     build_shadow_scope_refinement_audit,
     load_shadow_evidence_plan,
     load_shadow_preparation_audit,
+    load_shadow_scope_refinement_audit,
     write_shadow_evidence_artifact,
 )
 from scripts.run_company_profile_stage5_slice import (
@@ -43,13 +46,39 @@ SHADOW_EXTRACT_MAX_OUTPUT_TOKENS = 20_000
 SHADOW_VERIFY_MAX_OUTPUT_TOKENS = 18_000
 SHADOW_TIMEOUT_SECONDS = 300.0
 SHADOW_MAX_PROVIDER_CALLS = 600
+REFINED_SHADOW_REPLAY_CONTRACT = ShadowReplayContract(
+    batch_id="manufacturing-materials-shadow-refined-gemini-20260910-a",
+    sample_manifest_hash=(
+        "6f639739ef082e78dcb0c01a5ce40bab1645d8fdc027bece2dbef63652bae9e2"
+    ),
+    evidence_plan_version="manufacturing_materials_shadow.2026-09-09.2",
+    evidence_plan_hash=(
+        "aa408594aa94b0c9096bb1a4889bea7a3da3b27b3efed13049bc8e7eae937d66"
+    ),
+    preparation_audit_hash=(
+        "2ae0f1a168193b5e92eafbe14e307e942dda7e1406adb43fb0f861eeb6b74428"
+    ),
+    scope_refinement_audit_hash=(
+        "b404b08332f5ad0a53ab5c47be474b198ceb2a1e4f76bd9aaad8e764a971eb3e"
+    ),
+    primary_logical_profile=SHADOW_PRIMARY_PROFILE,
+    extract_max_output_tokens=SHADOW_EXTRACT_MAX_OUTPUT_TOKENS,
+    verify_max_output_tokens=SHADOW_VERIFY_MAX_OUTPUT_TOKENS,
+    timeout_seconds=SHADOW_TIMEOUT_SECONDS,
+    max_provider_calls=SHADOW_MAX_PROVIDER_CALLS,
+)
 
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "--mode",
-        choices=("preparation-only", "scope-refinement-replay", "semantic-run"),
+        choices=(
+            "preparation-only",
+            "scope-refinement-replay",
+            "semantic-run",
+            "refined-semantic-replay",
+        ),
         required=True,
     )
     parser.add_argument("--sample-manifest", required=True, type=Path)
@@ -142,7 +171,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         print(json.dumps(frozen_audit.model_dump(mode="json"), ensure_ascii=False, indent=2))
         return 0
     if not args.output_root or not args.batch_id:
-        raise ValueError("semantic-run requires --output-root and --batch-id")
+        raise ValueError(f"{args.mode} requires --output-root and --batch-id")
     if args.provider_route != SHADOW_PRIMARY_PROFILE:
         raise ValueError("contracted shadow batch requires the frozen Gemini profile")
     if min(
@@ -152,6 +181,29 @@ def main(argv: Sequence[str] | None = None) -> int:
         args.max_provider_calls,
     ) <= 0:
         raise ValueError("shadow provider budgets must be positive")
+    if args.mode == "refined-semantic-replay":
+        if not args.scope_refinement_audit:
+            raise ValueError(
+                "refined-semantic-replay requires --scope-refinement-audit"
+            )
+        refinement_audit = load_shadow_scope_refinement_audit(
+            args.scope_refinement_audit
+        )
+        validate_shadow_replay_admission(
+            contract=REFINED_SHADOW_REPLAY_CONTRACT,
+            batch_id=args.batch_id,
+            primary_logical_profile=args.provider_route,
+            extract_max_output_tokens=args.extract_max_output_tokens,
+            verify_max_output_tokens=args.verify_max_output_tokens,
+            timeout_seconds=args.timeout_seconds,
+            max_provider_calls=args.max_provider_calls,
+            manifest=manifest,
+            evidence_plan=plan,
+            preparation_audit=frozen_audit,
+            scope_refinement_audit=refinement_audit,
+            prepared=prepared,
+            output_root=args.output_root,
+        )
 
     from utils.config_manager import config_manager
     from utils.llm import (

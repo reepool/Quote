@@ -23,7 +23,11 @@ from .shadow_batch import (
     _StrictModel,
     _utc_now,
 )
-from .shadow_evidence import ShadowEvidencePlan
+from .shadow_evidence import (
+    ShadowEvidencePlan,
+    ShadowEvidencePreparationAudit,
+    ShadowScopeRefinementAudit,
+)
 from .stage5 import PreparedRequestScope
 from .stage5_bundle import (
     Stage5BenchmarkResult,
@@ -41,6 +45,94 @@ SHADOW_REPORT_RESULT_SCHEMA = "company_profile_shadow_report_result.v1"
 SHADOW_REPORT_FAILURE_SCHEMA = "company_profile_shadow_report_failure.v1"
 SHADOW_BATCH_RESULT_SCHEMA = "company_profile_shadow_batch_result.v1"
 _RUN_ID_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
+
+
+class ShadowReplayContract(_StrictModel):
+    """Single-run admission contract for a controlled refined-plan replay."""
+
+    batch_id: str = Field(min_length=1)
+    sample_manifest_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    evidence_plan_version: str = Field(min_length=1)
+    evidence_plan_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    preparation_audit_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    scope_refinement_audit_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    primary_logical_profile: str = Field(min_length=1)
+    extract_max_output_tokens: int = Field(gt=0)
+    verify_max_output_tokens: int = Field(gt=0)
+    timeout_seconds: float = Field(gt=0)
+    max_provider_calls: int = Field(gt=0)
+    production_authorization: Literal["not_authorized"] = PRODUCTION_AUTHORIZATION
+
+
+def validate_shadow_replay_admission(
+    *,
+    contract: ShadowReplayContract,
+    batch_id: str,
+    primary_logical_profile: str,
+    extract_max_output_tokens: int,
+    verify_max_output_tokens: int,
+    timeout_seconds: float,
+    max_provider_calls: int,
+    manifest: ShadowSampleManifest,
+    evidence_plan: ShadowEvidencePlan,
+    preparation_audit: ShadowEvidencePreparationAudit,
+    scope_refinement_audit: ShadowScopeRefinementAudit,
+    prepared: Mapping[str, tuple[PreparedRequestScope, ...]],
+    output_root: str | Path,
+) -> None:
+    """Reject any replay drift before a provider client is created."""
+
+    actual = {
+        "batch_id": batch_id,
+        "sample_manifest_hash": manifest.manifest_hash,
+        "evidence_plan_version": evidence_plan.plan_version,
+        "evidence_plan_hash": evidence_plan.plan_hash,
+        "preparation_audit_hash": preparation_audit.audit_hash,
+        "scope_refinement_audit_hash": scope_refinement_audit.audit_hash,
+        "primary_logical_profile": primary_logical_profile,
+        "extract_max_output_tokens": extract_max_output_tokens,
+        "verify_max_output_tokens": verify_max_output_tokens,
+        "timeout_seconds": timeout_seconds,
+        "max_provider_calls": max_provider_calls,
+        "production_authorization": PRODUCTION_AUTHORIZATION,
+    }
+    if actual != contract.model_dump(mode="python"):
+        drift = sorted(
+            key
+            for key, expected in contract.model_dump(mode="python").items()
+            if actual.get(key) != expected
+        )
+        raise ValueError(f"refined shadow replay contract mismatch: {drift}")
+    if (
+        preparation_audit.sample_manifest_hash != manifest.manifest_hash
+        or preparation_audit.evidence_plan_hash != evidence_plan.plan_hash
+        or preparation_audit.report_count != SHADOW_REPORT_COUNT
+        or preparation_audit.planned_report_count != SHADOW_REPORT_COUNT
+        or preparation_audit.evidence_traceability_rate != 1.0
+    ):
+        raise ValueError("refined shadow preparation audit does not admit this replay")
+    if (
+        scope_refinement_audit.sample_manifest_hash != manifest.manifest_hash
+        or scope_refinement_audit.refined_plan_version != evidence_plan.plan_version
+        or scope_refinement_audit.refined_plan_hash != evidence_plan.plan_hash
+        or scope_refinement_audit.report_count != SHADOW_REPORT_COUNT
+        or scope_refinement_audit.unsupported_assignment_count != 0
+        or scope_refinement_audit.missing_required_owner_count != 0
+        or scope_refinement_audit.table_context_incomplete_count != 0
+        or scope_refinement_audit.evidence_traceability_rate != 1.0
+        or scope_refinement_audit.provider_calls != 0
+    ):
+        raise ValueError("scope refinement audit does not admit this replay")
+    ManufacturingMaterialsShadowBatchService._validate_admission(
+        manifest,
+        evidence_plan,
+        prepared,
+    )
+    requested_root = Path(output_root)
+    if requested_root.exists() and requested_root.is_symlink():
+        raise ValueError("shadow output root cannot be a symlink")
+    if (requested_root.resolve() / f"batch-{batch_id}").exists():
+        raise FileExistsError(f"shadow batch already exists: {batch_id}")
 
 
 class ShadowReportSuccess(_StrictModel):
