@@ -1,0 +1,30 @@
+{
+  "schema_version": "company_profile_bounded_llm_repair_probe.v1",
+  "probe_id": "bounded-repair-probe-a",
+  "status": "success",
+  "profile": "semantic_extraction__scorpio_gemini",
+  "provider": "openai_compatible",
+  "model": "gemini-3.8-flash-high",
+  "structured_output_mode": "json_object",
+  "request_hash": "c0473b322007bdecf83accdb60c93e8ea96c70e03670853f06f3d833273a274d",
+  "gateway_request_hash": "63c44674010d5a9608503dfb426fb649de02533a69ba138b5b93e5c60736bbc4",
+  "response_hash": "2235d352015e701d1abf118da24b9c1319af935e17b79629e7f64723bce64dca",
+  "attempt_count": 2,
+  "first_attempt_result": "schema_validation_error",
+  "final_schema_valid": true,
+  "latency_ms": 7674,
+  "requested_output_tokens": 128,
+  "usage": {
+    "input_tokens": 180,
+    "output_tokens": 258,
+    "total_tokens": 438
+  },
+  "warnings": [
+    "provider_output_budget_exceeded",
+    "provider_output_budget_exceeded_valid_response"
+  ],
+  "typed_error": null,
+  "contains_full_prompt_or_response": false,
+  "twenty_report_replay_executed": false,
+  "production_authorization": "not_authorized"
+}

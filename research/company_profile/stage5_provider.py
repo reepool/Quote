@@ -8,9 +8,9 @@ import json
 import re
 from collections.abc import Callable, Mapping
 from copy import deepcopy
-from typing import Any, TypeVar
+from typing import Any, Literal, TypeVar
 
-from pydantic import BaseModel, ValidationError
+from pydantic import BaseModel, ConfigDict, ValidationError
 
 from utils.llm import (
     LlmClientProtocol,
@@ -44,6 +44,23 @@ from .stage5 import PreparedRequestScope
 from .stage5_bundle import Stage5ProviderCallTrace
 
 _ResponseT = TypeVar("_ResponseT", bound=BaseModel)
+
+_SEGMENT_PARTITION_NUMERIC_OCCURRENCE_THRESHOLD = 40
+_SEGMENT_PARTITION_METRIC_FIELDS = (
+    "operating_revenue",
+    "operating_cost",
+    "gross_margin_reported",
+)
+_SEGMENT_PARTITION_REQUIRED_METRIC_FIELD_COUNT = 2
+
+
+class _CompactSegmentPartitionResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    schema_version: Literal["company_profile_extract_response.v1"]
+    request_id: str
+    items: tuple[dict[str, Any], ...]
+
 
 _TASK_INSTRUCTIONS = {
     "extract_business_overview": (
@@ -613,6 +630,206 @@ def _segment_cell_schema() -> dict[str, Any]:
             "footnote_refs": {"type": "array", "items": {"type": "string"}},
             "source_aliases": {"type": "array", "items": {"type": "string"}},
         },
+    }
+
+
+def _segment_partition_fields(
+    request: SemanticTaskRequest,
+    *,
+    prepared_scope: PreparedRequestScope,
+) -> tuple[tuple[str, ...], ...]:
+    """Return stable high-cardinality segment partitions or an empty tuple."""
+
+    unresolved = tuple(request.unresolved_field_ids)
+    unresolved_set = set(unresolved)
+    supported = {"segment_dimension", *_SEGMENT_PARTITION_METRIC_FIELDS}
+    metric_fields = tuple(
+        field_id
+        for field_id in _SEGMENT_PARTITION_METRIC_FIELDS
+        if field_id in unresolved_set
+    )
+    if (
+        request.chapter_task.value != "extract_segment_financials"
+        or prepared_scope.scope_id == "same_control_comparison_basis"
+        or ObjectType.SEGMENT not in request.allowed_object_types
+        or "segment_dimension" not in unresolved_set
+        or not unresolved_set.issubset(supported)
+        or len(metric_fields) < _SEGMENT_PARTITION_REQUIRED_METRIC_FIELD_COUNT
+        or _segment_numeric_occurrence_count(prepared_scope)
+        < _SEGMENT_PARTITION_NUMERIC_OCCURRENCE_THRESHOLD
+    ):
+        return ()
+    return tuple(("segment_dimension", field_id) for field_id in metric_fields)
+
+
+def _segment_numeric_occurrence_count(prepared_scope: PreparedRequestScope) -> int:
+    fragments = [str(item.text or "") for item in prepared_scope.page_contexts]
+    if not fragments:
+        fragments = [
+            str(getattr(item.evidence.anchor, "bounded_quote", "") or "")
+            for item in prepared_scope.evidence_bundle
+        ]
+    source_text = "\n".join(fragments)
+    return len(re.findall(r"(?<!\d)\d[\d,]*(?:\.\d+)?%?", source_text))
+
+
+def _segment_partition_request(
+    request: SemanticTaskRequest,
+    *,
+    fields: tuple[str, ...],
+    partition_index: int,
+    partition_count: int,
+) -> SemanticTaskRequest:
+    metric_fields = tuple(
+        field_id for field_id in fields if field_id != "segment_dimension"
+    )
+    allowed_metric_types = tuple(MetricType(field_id) for field_id in metric_fields)
+    return request.model_copy(
+        update={
+            "request_id": (
+                f"{request.request_id}:partition-{partition_index:02d}-of-"
+                f"{partition_count:02d}"
+            ),
+            "unresolved_field_ids": fields,
+            "allowed_metric_types": allowed_metric_types,
+        }
+    )
+
+
+def _merge_segment_partition_responses(
+    request: SemanticTaskRequest,
+    partitions: tuple[
+        tuple[SemanticTaskRequest, Mapping[str, Any]],
+        ...,
+    ],
+    *,
+    prepared_scope: PreparedRequestScope,
+) -> dict[str, Any]:
+    rows_by_anchor: dict[tuple[str, str], dict[str, Any]] = {}
+    row_identities: dict[tuple[str, str], str] = {}
+    coverage_by_field: dict[str, dict[str, Any]] = {}
+    requested_fields = set(request.unresolved_field_ids)
+    allowed_evidence_ids = {
+        item.evidence.evidence_id for item in prepared_scope.evidence_bundle
+    }
+
+    for partition_request, payload in partitions:
+        if payload.get("schema_version") != "company_profile_extract_response.v1":
+            raise ValueError("segment partition response schema_version mismatch")
+        if payload.get("request_id") != partition_request.request_id:
+            raise ValueError("segment partition response request_id mismatch")
+        items = payload.get("items")
+        if not isinstance(items, (list, tuple)):
+            raise TypeError("segment partition response items must be an array")
+        partition_fields = set(partition_request.unresolved_field_ids)
+        allowed_cells = partition_fields.intersection(_SEGMENT_PARTITION_METRIC_FIELDS)
+        if len(allowed_cells) != 1:
+            raise ValueError("segment partition must contain exactly one metric field")
+        for raw_item in items:
+            if not isinstance(raw_item, Mapping):
+                raise TypeError("segment partition item must be an object")
+            item = dict(raw_item)
+            item_type = item.get("item_type")
+            if item_type == "segment_row":
+                if set(item) != {"item_type", "row"} or not isinstance(
+                    item.get("row"), Mapping
+                ):
+                    raise ValueError("segment partition row item is invalid")
+                row = deepcopy(dict(item["row"]))
+                cells = row.get("cells")
+                if not isinstance(cells, Mapping) or not cells:
+                    raise ValueError("segment partition row requires metric cells")
+                if not set(cells).issubset(allowed_cells):
+                    raise ValueError(
+                        "segment partition returned a metric outside its field"
+                    )
+                label = str(row.get("label") or "").strip()
+                if not label:
+                    raise ValueError("segment partition row requires a label")
+                dimension = str(
+                    row.get("dimension")
+                    or prepared_scope.source_row_dimensions.get(label)
+                    or ""
+                ).strip()
+                if not dimension:
+                    raise ValueError(
+                        "segment partition row requires a source dimension"
+                    )
+                evidence_ids = row.get("evidence_ids")
+                if (
+                    not isinstance(evidence_ids, list)
+                    or not evidence_ids
+                    or len(evidence_ids) != len(set(evidence_ids))
+                    or not set(evidence_ids).issubset(allowed_evidence_ids)
+                ):
+                    raise ValueError("segment partition row Evidence is invalid")
+                row["evidence_ids"] = sorted(evidence_ids)
+                anchor = (dimension, label)
+                identity_payload = {
+                    key: row.get(key)
+                    for key in (
+                        "dimension",
+                        "label",
+                        "row_class",
+                        "subject_scope",
+                        "subject_name",
+                        "subject_basis",
+                        "reported_period",
+                        "period_type",
+                        "knowledge_time",
+                        "uncertainty",
+                        "evidence_ids",
+                    )
+                }
+                identity_payload["dimension"] = dimension
+                identity = json.dumps(
+                    identity_payload,
+                    ensure_ascii=False,
+                    sort_keys=True,
+                    separators=(",", ":"),
+                    allow_nan=False,
+                )
+                if anchor in row_identities and row_identities[anchor] != identity:
+                    raise ValueError("segment partition row identity conflict")
+                if anchor not in rows_by_anchor:
+                    rows_by_anchor[anchor] = row
+                    row_identities[anchor] = identity
+                    continue
+                merged_cells = rows_by_anchor[anchor]["cells"]
+                duplicate_cells = set(merged_cells).intersection(cells)
+                if duplicate_cells:
+                    raise ValueError(
+                        "segment partition returned a duplicate metric cell"
+                    )
+                merged_cells.update(deepcopy(dict(cells)))
+                continue
+            if item_type == "coverage":
+                if set(item) != {"item_type", "coverage"} or not isinstance(
+                    item.get("coverage"), Mapping
+                ):
+                    raise ValueError("segment partition coverage item is invalid")
+                coverage = deepcopy(dict(item["coverage"]))
+                field_id = str(coverage.get("field_id") or "")
+                if field_id not in partition_fields or field_id not in requested_fields:
+                    raise ValueError("segment partition coverage escaped its field")
+                previous = coverage_by_field.get(field_id)
+                if previous is not None and previous != coverage:
+                    raise ValueError("segment partition coverage conflict")
+                coverage_by_field[field_id] = coverage
+                continue
+            raise ValueError("segment partition returned an unsupported item type")
+
+    items: list[dict[str, Any]] = [
+        {"item_type": "segment_row", "row": row} for row in rows_by_anchor.values()
+    ]
+    items.extend(
+        {"item_type": "coverage", "coverage": coverage}
+        for coverage in coverage_by_field.values()
+    )
+    return {
+        "schema_version": "company_profile_extract_response.v1",
+        "request_id": request.request_id,
+        "items": items,
     }
 
 
@@ -2815,6 +3032,7 @@ class CommonGatewaySemanticProvider:
         timeout_seconds: float,
         verify_max_output_tokens: int | None = None,
         runner: asyncio.Runner | None = None,
+        physical_call_admission: Callable[[], None] | None = None,
     ) -> None:
         if not profile.strip():
             raise ValueError("LLM profile is required")
@@ -2831,6 +3049,7 @@ class CommonGatewaySemanticProvider:
         self._verify_max_output_tokens = verify_max_output_tokens or max_output_tokens
         self._timeout_seconds = timeout_seconds
         self._runner = runner
+        self._physical_call_admission = physical_call_admission
         self._traces: list[Stage5ProviderCallTrace] = []
 
     @property
@@ -2839,6 +3058,63 @@ class CommonGatewaySemanticProvider:
 
     def extract(self, request: SemanticTaskRequest) -> Mapping[str, Any]:
         self._validate_extract_scope(request)
+        partition_fields = _segment_partition_fields(
+            request,
+            prepared_scope=self._prepared_scope,
+        )
+        if partition_fields:
+            partition_count = len(partition_fields)
+            results: list[tuple[SemanticTaskRequest, Mapping[str, Any]]] = []
+            for partition_index, fields in enumerate(partition_fields, start=1):
+                partition_request = _segment_partition_request(
+                    request,
+                    fields=fields,
+                    partition_index=partition_index,
+                    partition_count=partition_count,
+                )
+                result = self._execute(
+                    call_type="extract",
+                    semantic_request_id=partition_request.request_id,
+                    runtime_payload=_compact_extract_runtime_payload(partition_request),
+                    response_model=_CompactSegmentPartitionResponse,
+                    schema_name="company_profile_extract_response",
+                    schema_version="company_profile_extract_response.v1",
+                    model_schema=_minimal_extract_schema(
+                        partition_request,
+                        prepared_scope=self._prepared_scope,
+                    ),
+                    normalize_response=lambda data: data,
+                    include_page_contexts=True,
+                    parent_semantic_request_id=request.request_id,
+                    partition_index=partition_index,
+                    partition_count=partition_count,
+                )
+                results.append((partition_request, result))
+            try:
+                merged = _merge_segment_partition_responses(
+                    request,
+                    tuple(results),
+                    prepared_scope=self._prepared_scope,
+                )
+                normalized = _normalize_extract_response(
+                    merged,
+                    request=request,
+                    prepared_scope=self._prepared_scope,
+                )
+                parsed = ExtractResponse.model_validate_json(
+                    json.dumps(normalized, ensure_ascii=False, allow_nan=False)
+                )
+            except (ValidationError, TypeError, ValueError) as exc:
+                raise SemanticProviderError(
+                    ContractErrorCode.CANDIDATE_SCHEMA_INVALID,
+                    "merged segment partitions violate the extract schema",
+                ) from exc
+            if parsed.request_id != request.request_id:
+                raise SemanticProviderError(
+                    ContractErrorCode.REQUEST_IDENTITY_MISMATCH,
+                    "merged segment partition request_id mismatch",
+                )
+            return parsed.model_dump(mode="json")
         return self._execute(
             call_type="extract",
             semantic_request_id=request.request_id,
@@ -2909,6 +3185,9 @@ class CommonGatewaySemanticProvider:
         model_schema: Any,
         normalize_response: Callable[[Any], Any],
         include_page_contexts: bool,
+        parent_semantic_request_id: str | None = None,
+        partition_index: int | None = None,
+        partition_count: int | None = None,
     ) -> dict[str, Any]:
         flat_extract = (
             call_type == "extract"
@@ -3132,6 +3411,8 @@ class CommonGatewaySemanticProvider:
             content_is_untrusted=True,
         )
         response: LlmResponse | None = None
+        if self._physical_call_admission is not None:
+            self._physical_call_admission()
         try:
             response = _run_complete(self._client, llm_request, self._runner)
             normalized_response = normalize_response(response.data)
@@ -3145,7 +3426,13 @@ class CommonGatewaySemanticProvider:
                 )
         except SemanticProviderError as exc:
             self._append_failure_trace(
-                call_type, semantic_request_id, exc.code.value, str(exc)
+                call_type,
+                semantic_request_id,
+                exc.code.value,
+                str(exc),
+                parent_semantic_request_id=parent_semantic_request_id,
+                partition_index=partition_index,
+                partition_count=partition_count,
             )
             raise
         except LlmError as exc:
@@ -3156,6 +3443,9 @@ class CommonGatewaySemanticProvider:
                 code.value,
                 exc.message,
                 gateway_request_id=exc.request_id,
+                parent_semantic_request_id=parent_semantic_request_id,
+                partition_index=partition_index,
+                partition_count=partition_count,
             )
             raise SemanticProviderError(code, exc.message) from exc
         except (ValidationError, TypeError, ValueError) as exc:
@@ -3168,6 +3458,9 @@ class CommonGatewaySemanticProvider:
                 gateway_request_id=(
                     response.request_id if response is not None else None
                 ),
+                parent_semantic_request_id=parent_semantic_request_id,
+                partition_index=partition_index,
+                partition_count=partition_count,
             )
             raise SemanticProviderError(
                 code, "gateway response violates the schema"
@@ -3193,6 +3486,9 @@ class CommonGatewaySemanticProvider:
                     response.usage.total_tokens if response.usage is not None else None
                 ),
                 warnings=response.warnings,
+                parent_semantic_request_id=parent_semantic_request_id,
+                partition_index=partition_index,
+                partition_count=partition_count,
             )
         )
         return parsed.model_dump(mode="json")
@@ -3227,6 +3523,9 @@ class CommonGatewaySemanticProvider:
         error_code: str,
         error_detail: str,
         gateway_request_id: str | None = None,
+        parent_semantic_request_id: str | None = None,
+        partition_index: int | None = None,
+        partition_count: int | None = None,
     ) -> None:
         self._traces.append(
             Stage5ProviderCallTrace(
@@ -3237,6 +3536,9 @@ class CommonGatewaySemanticProvider:
                 profile=self._profile,
                 error_code=error_code,
                 error_detail=error_detail[:2000],
+                parent_semantic_request_id=parent_semantic_request_id,
+                partition_index=partition_index,
+                partition_count=partition_count,
             )
         )
 

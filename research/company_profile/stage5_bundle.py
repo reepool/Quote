@@ -141,6 +141,30 @@ class Stage5ProviderCallTrace(_StrictModel):
     warnings: tuple[str, ...] = ()
     error_code: str | None = None
     error_detail: str | None = Field(default=None, max_length=2000)
+    parent_semantic_request_id: str | None = None
+    partition_index: int | None = Field(default=None, ge=1)
+    partition_count: int | None = Field(default=None, ge=1)
+
+    @model_validator(mode="after")
+    def _partition_lineage_is_complete(self) -> Stage5ProviderCallTrace:
+        values = (
+            self.parent_semantic_request_id,
+            self.partition_index,
+            self.partition_count,
+        )
+        if any(value is not None for value in values) and not all(
+            value is not None for value in values
+        ):
+            raise ValueError("partition trace lineage must be complete")
+        if (
+            self.partition_index is not None
+            and self.partition_count is not None
+            and self.partition_index > self.partition_count
+        ):
+            raise ValueError("partition trace index exceeds partition count")
+        if self.parent_semantic_request_id is not None and self.call_type != "extract":
+            raise ValueError("only extract traces may carry partition lineage")
+        return self
 
 
 class Stage5ScopeResult(_StrictModel):
@@ -163,13 +187,58 @@ class Stage5ScopeResult(_StrictModel):
             )
         if (
             self.provider_traces
-            and tuple(item.call_type for item in self.provider_traces)
+            and _logical_call_types_from_traces(self.provider_traces)
             != self.provider_call_types
         ):
             raise ValueError(
                 "provider traces must match the bounded workflow call order"
             )
         return self
+
+
+def _logical_call_types_from_traces(
+    traces: tuple[Stage5ProviderCallTrace, ...],
+) -> tuple[Literal["extract", "repair", "verify"], ...]:
+    collapsed: list[Literal["extract", "repair", "verify"]] = []
+    active_partition_parent: str | None = None
+    expected_partition_index = 1
+    active_partition_count: int | None = None
+    last_partition_status: Literal["success", "failed"] | None = None
+
+    def close_partition_group() -> None:
+        if (
+            active_partition_parent is not None
+            and last_partition_status == "success"
+            and active_partition_count is not None
+            and expected_partition_index - 1 != active_partition_count
+        ):
+            raise ValueError("successful partition trace group must be complete")
+
+    for trace in traces:
+        if trace.parent_semantic_request_id is None:
+            close_partition_group()
+            active_partition_parent = None
+            expected_partition_index = 1
+            active_partition_count = None
+            last_partition_status = None
+            collapsed.append(trace.call_type)
+            continue
+        if trace.parent_semantic_request_id != active_partition_parent:
+            close_partition_group()
+            if trace.partition_index != 1:
+                raise ValueError("partition trace group must start at index one")
+            active_partition_parent = trace.parent_semantic_request_id
+            expected_partition_index = 1
+            active_partition_count = trace.partition_count
+            collapsed.append("extract")
+        if trace.partition_count != active_partition_count:
+            raise ValueError("partition trace count must remain stable")
+        if trace.partition_index != expected_partition_index:
+            raise ValueError("partition trace indexes must be consecutive")
+        expected_partition_index += 1
+        last_partition_status = trace.status
+    close_partition_group()
+    return tuple(collapsed)
 
 
 class Stage5ReportBundle(_StrictModel):

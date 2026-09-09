@@ -1643,6 +1643,147 @@ def test_segment_financials_use_compact_rows_and_expand_locally() -> None:
     )
 
 
+def test_high_cardinality_segment_financials_partition_and_merge_once() -> None:
+    prepared = _high_cardinality_segment_prepared_scope()
+    request = _segment_extract_request(prepared)
+    evidence_id = prepared.evidence_bundle[0].evidence.evidence_id
+    request_ids = [
+        f"{request.request_id}:partition-{index:02d}-of-03" for index in range(1, 4)
+    ]
+    outputs = [
+        _segment_partition_response(
+            request_id=request_ids[0],
+            evidence_id=evidence_id,
+            metric_field="operating_revenue",
+        ),
+        _segment_partition_response(
+            request_id=request_ids[1],
+            evidence_id=evidence_id,
+            metric_field="operating_cost",
+        ),
+        _segment_partition_response(
+            request_id=request_ids[2],
+            evidence_id=evidence_id,
+            metric_field="gross_margin_reported",
+        ),
+    ]
+    admissions: list[int] = []
+    client = _FakeGatewayClient(outputs=outputs)
+    provider = CommonGatewaySemanticProvider(
+        client=client,
+        profile="semantic_extraction",
+        prepared_scope=prepared,
+        max_output_tokens=2000,
+        timeout_seconds=30,
+        physical_call_admission=lambda: admissions.append(len(admissions) + 1),
+    )
+
+    response = provider.extract(request)
+
+    assert len(client.requests) == 3
+    assert admissions == [1, 2, 3]
+    runtime_fields = []
+    for gateway_request in client.requests:
+        user_message = LlmMessage.from_value(gateway_request.messages[1])
+        envelope = json.loads(user_message.content)
+        runtime_fields.append(envelope["runtime_request"]["unresolved_field_ids"])
+    assert runtime_fields == [
+        ["segment_dimension", "operating_revenue"],
+        ["segment_dimension", "operating_cost"],
+        ["segment_dimension", "gross_margin_reported"],
+    ]
+    candidates = [item["candidate"] for item in response["items"]]
+    assert [candidate["field_id"] for candidate in candidates] == [
+        "segment_dimension",
+        "operating_revenue",
+        "operating_cost",
+        "gross_margin_reported",
+    ]
+    assert len([item for item in candidates if item["object_type"] == "Segment"]) == 1
+    assert [trace.semantic_request_id for trace in provider.traces] == request_ids
+    assert all(
+        trace.parent_semantic_request_id == request.request_id
+        for trace in provider.traces
+    )
+    assert [trace.partition_index for trace in provider.traces] == [1, 2, 3]
+    assert all(trace.partition_count == 3 for trace in provider.traces)
+
+
+def test_segment_partition_provider_failure_returns_no_partial_extract() -> None:
+    prepared = _high_cardinality_segment_prepared_scope()
+    request = _segment_extract_request(prepared)
+    evidence_id = prepared.evidence_bundle[0].evidence.evidence_id
+    client = _FakeGatewayClient(
+        outputs=[
+            _segment_partition_response(
+                request_id=f"{request.request_id}:partition-01-of-03",
+                evidence_id=evidence_id,
+                metric_field="operating_revenue",
+            ),
+            LlmRateLimitError("rate limited"),
+            _segment_partition_response(
+                request_id=f"{request.request_id}:partition-03-of-03",
+                evidence_id=evidence_id,
+                metric_field="gross_margin_reported",
+            ),
+        ]
+    )
+    provider = CommonGatewaySemanticProvider(
+        client=client,
+        profile="semantic_extraction",
+        prepared_scope=prepared,
+        max_output_tokens=2000,
+        timeout_seconds=30,
+    )
+
+    with pytest.raises(SemanticProviderError) as exc_info:
+        provider.extract(request)
+
+    assert exc_info.value.code == ContractErrorCode.PROVIDER_UNAVAILABLE
+    assert len(client.requests) == 2
+    assert [trace.status for trace in provider.traces] == ["success", "failed"]
+    assert all(
+        trace.parent_semantic_request_id == request.request_id
+        for trace in provider.traces
+    )
+
+
+def test_segment_partition_merge_conflict_fails_closed() -> None:
+    prepared = _high_cardinality_segment_prepared_scope()
+    request = _segment_extract_request(prepared)
+    evidence_id = prepared.evidence_bundle[0].evidence.evidence_id
+    outputs = [
+        _segment_partition_response(
+            request_id=f"{request.request_id}:partition-01-of-03",
+            evidence_id=evidence_id,
+            metric_field="operating_revenue",
+        ),
+        _segment_partition_response(
+            request_id=f"{request.request_id}:partition-02-of-03",
+            evidence_id=evidence_id,
+            metric_field="operating_cost",
+            subject_scope="issuer",
+        ),
+        _segment_partition_response(
+            request_id=f"{request.request_id}:partition-03-of-03",
+            evidence_id=evidence_id,
+            metric_field="gross_margin_reported",
+        ),
+    ]
+    provider = CommonGatewaySemanticProvider(
+        client=_FakeGatewayClient(outputs=outputs),
+        profile="semantic_extraction",
+        prepared_scope=prepared,
+        max_output_tokens=2000,
+        timeout_seconds=30,
+    )
+
+    with pytest.raises(SemanticProviderError) as exc_info:
+        provider.extract(request)
+
+    assert exc_info.value.code == ContractErrorCode.CANDIDATE_SCHEMA_INVALID
+
+
 def test_repeated_segment_rows_receive_unique_local_record_ids() -> None:
     prepared = _segment_prepared_scope()
     request = _segment_extract_request(prepared)
@@ -3015,6 +3156,27 @@ def _segment_prepared_scope() -> PreparedRequestScope:
     )
 
 
+def _high_cardinality_segment_prepared_scope() -> PreparedRequestScope:
+    prepared = _segment_prepared_scope()
+    evidence = prepared.evidence_bundle[0].evidence
+    source = f"{evidence.anchor.bounded_quote} " + " ".join(
+        str(index) for index in range(1, 42)
+    )
+    evidence = evidence.model_copy(
+        update={"anchor": TextAnchor(bounded_quote=source)}
+    )
+    return prepared.model_copy(
+        update={
+            "evidence_bundle": (PreparedEvidence(evidence=evidence),),
+            "page_contexts": (
+                prepared.page_contexts[0].model_copy(
+                    update={"text": source, "text_hash": "d" * 64}
+                ),
+            ),
+        }
+    )
+
+
 def _segment_extract_request(
     prepared: PreparedRequestScope,
 ) -> SemanticTaskRequest:
@@ -3274,6 +3436,49 @@ def _segment_row_response(
         "schema_version": "company_profile_extract_response.v1",
         "request_id": request_id,
         "items": [{"item_type": "segment_row", "row": row}],
+    }
+
+
+def _segment_partition_response(
+    *,
+    request_id: str,
+    evidence_id: str,
+    metric_field: str,
+    subject_scope: str = "unclear",
+) -> dict[str, Any]:
+    cells = {
+        "operating_revenue": {
+            "value": "316,506,369",
+            "unit": "千元",
+            "header": "营业收入",
+        },
+        "operating_cost": {
+            "value": "241,064,397",
+            "unit": "千元",
+            "header": "营业成本",
+        },
+        "gross_margin_reported": {
+            "value": "23.84%",
+            "unit": "%",
+            "header": "毛利率",
+        },
+    }
+    return {
+        "schema_version": "company_profile_extract_response.v1",
+        "request_id": request_id,
+        "items": [
+            {
+                "item_type": "segment_row",
+                "row": {
+                    "label": "动力电池系统",
+                    "subject_scope": subject_scope,
+                    "reported_period": "2025",
+                    "period_type": "duration",
+                    "evidence_ids": [evidence_id],
+                    "cells": {metric_field: cells[metric_field]},
+                },
+            }
+        ],
     }
 
 

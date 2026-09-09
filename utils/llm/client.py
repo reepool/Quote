@@ -3,8 +3,6 @@
 from __future__ import annotations
 
 import asyncio
-from contextlib import AsyncExitStack
-from dataclasses import asdict, dataclass, replace
 import hashlib
 import json
 import logging
@@ -13,6 +11,8 @@ import os
 import random
 import time
 import uuid
+from contextlib import AsyncExitStack
+from dataclasses import asdict, dataclass, replace
 from typing import Any, Callable, Mapping, Optional, Protocol
 from urllib.parse import urlsplit, urlunsplit
 
@@ -23,6 +23,7 @@ from .errors import (
     LlmDeadlineExceededError,
     LlmError,
     LlmResponseParseError,
+    LlmResponseTruncatedError,
     LlmSchemaValidationError,
     LlmTransientTransportError,
     safe_provider_error,
@@ -32,7 +33,6 @@ from .orchestration import LlmPoolCoordinatorRegistry, ProviderCoordinatorRegist
 from .rate_limit import ProfileLimiterRegistry
 from .schema import compact_schema_instruction, normalize_schema, validate_data
 from .transport import AsyncTransport, HttpxOpenAICompatibleTransport, TransportResponse
-
 
 llm_logger = logging.getLogger("LLM")
 _GLOBAL_LIMITERS = ProfileLimiterRegistry()
@@ -865,19 +865,35 @@ class LlmClient:
                         provider_error = safe_provider_error(response.status_code)
                         raise provider_error
                     raw_content, finish_reason = extract_message_content(response)
-                    data = self._parse_and_validate(raw_content, schema)
+                    usage = LlmUsage.from_mapping((response.data or {}).get("usage"))
+                    try:
+                        data = self._parse_and_validate(raw_content, schema)
+                    except (LlmResponseParseError, LlmSchemaValidationError) as exc:
+                        if _is_output_limit_finish_reason(finish_reason):
+                            raise LlmResponseTruncatedError(
+                                finish_reason=finish_reason,
+                                requested_output_tokens=request.max_output_tokens,
+                                observed_output_tokens=(
+                                    usage.output_tokens if usage is not None else None
+                                ),
+                            ) from exc
+                        raise
                     warnings = response_warnings(
                         response,
                         finish_reason,
                     )
-                    usage = LlmUsage.from_mapping((response.data or {}).get("usage"))
                     if (
                         request.max_output_tokens is not None
                         and usage is not None
                         and usage.output_tokens is not None
                         and usage.output_tokens > request.max_output_tokens
                     ):
-                        warnings.append("provider_output_budget_exceeded")
+                        warnings.extend(
+                            (
+                                "provider_output_budget_exceeded",
+                                "provider_output_budget_exceeded_valid_response",
+                            )
+                        )
                         llm_logger.warning(
                             "event=llm.response.output_budget_exceeded profile=%s "
                             "request_id=%s request_hash=%s field=%s requested=%s observed=%s",
@@ -999,7 +1015,11 @@ class LlmClient:
                             status_code=last_error.status_code,
                         )
                         provider_failure_reported = True
-                except (LlmResponseParseError, LlmSchemaValidationError) as exc:
+                except (
+                    LlmResponseParseError,
+                    LlmResponseTruncatedError,
+                    LlmSchemaValidationError,
+                ) as exc:
                     assert execution_deadline is not None
                     if time.monotonic() >= execution_deadline:
                         raise LlmDeadlineExceededError() from exc
@@ -1154,6 +1174,9 @@ class LlmClient:
             "transport_error_type",
             "transport_phase",
             "transport_exception_type",
+            "finish_reason",
+            "requested_output_tokens",
+            "observed_output_tokens",
         ):
             value = getattr(error, key, None)
             if value is not None:
@@ -1391,18 +1414,25 @@ class LlmClient:
     ) -> dict[str, Any]:
         repaired = dict(base_payload)
         messages = list(base_payload.get("messages", []))
-        messages.extend(
-            [
-                {"role": "assistant", "content": str(raw_content or "")},
-                {
-                    "role": "system",
-                    "content": (
-                        "The prior response failed local validation: "
-                        f"{error.message}. Return a corrected JSON response only. "
-                        "Preserve supported facts; do not invent, infer, or silently delete values."
-                    ),
-                },
-            ]
+        correction = {
+            "request_kind": "schema_repair",
+            "validation_error": error.message,
+            "prior_response": str(raw_content or ""),
+            "instructions": (
+                "Return a corrected JSON response only. Preserve supported facts; "
+                "do not invent, infer, or silently delete values."
+            ),
+        }
+        messages.append(
+            {
+                "role": "user",
+                "content": json.dumps(
+                    correction,
+                    ensure_ascii=False,
+                    sort_keys=True,
+                    separators=(",", ":"),
+                ),
+            }
         )
         repaired["messages"] = messages
         return repaired
@@ -1547,6 +1577,16 @@ def response_warnings(response: TransportResponse, finish_reason: Optional[str])
     if finish_reason is None:
         warnings.append("finish_reason_missing")
     return warnings
+
+
+def _is_output_limit_finish_reason(value: Optional[str]) -> bool:
+    normalized = str(value or "").strip().lower()
+    return normalized in {
+        "length",
+        "max_tokens",
+        "max_output_tokens",
+        "token_limit",
+    }
 
 
 def stable_hash(value: Any) -> str:

@@ -56,26 +56,20 @@ class _ProviderCallBudget:
 
 
 class _BudgetedProvider:
-    def __init__(
-        self, provider: CommonGatewaySemanticProvider, budget: _ProviderCallBudget
-    ):
+    def __init__(self, provider: CommonGatewaySemanticProvider):
         self._provider = provider
-        self._budget = budget
 
     @property
     def traces(self):
         return self._provider.traces
 
     def extract(self, request: SemanticTaskRequest):
-        self._budget.consume()
         return self._provider.extract(request)
 
     def repair(self, request: RepairRequest):
-        self._budget.consume()
         return self._provider.repair(request)
 
     def verify(self, request: VerifyRequest):
-        self._budget.consume()
         return self._provider.verify(request)
 
 
@@ -235,8 +229,8 @@ def _provider_for_scope(
             verify_max_output_tokens=verify_max_output_tokens,
             timeout_seconds=timeout_seconds,
             runner=runner,
-        ),
-        budget,
+            physical_call_admission=budget.consume,
+        )
     )
 
 

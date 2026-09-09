@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import json
 from pathlib import Path
 
 import pytest
@@ -31,6 +32,7 @@ from research.company_profile.shadow_evidence import (
     load_shadow_preparation_audit,
     load_shadow_scope_refinement_audit,
 )
+from research.company_profile.stage5_provider import _segment_numeric_occurrence_count
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[3]
 BASELINE_CHANGE = (
@@ -46,6 +48,10 @@ BASELINE_BATCH = (
     / "var/company_profile_shadow_batch/20260909/batch-manufacturing-materials-shadow-gemini-20260909-a"
 )
 REFINED_PLAN_HASH = "1" * 64
+EXECUTION_STABILITY_FIXTURE = (
+    REPOSITORY_ROOT
+    / "tests/fixtures/company_profile_shadow_execution_stability.v1.json"
+)
 
 
 def _active_change_root() -> Path:
@@ -108,6 +114,58 @@ def _clone_batch_with_refined_identity(tmp_path: Path) -> Path:
     return directory
 
 
+def test_execution_stability_baseline_freezes_observed_failures_and_partition_contract() -> None:
+    payload = json.loads(EXECUTION_STABILITY_FIXTURE.read_text(encoding="utf-8"))
+
+    assert payload["schema_version"] == (
+        "company_profile_shadow_execution_stability_baseline.v1"
+    )
+    assert payload["batch_id"] == (
+        "manufacturing-materials-shadow-refined-gemini-20260910-a"
+    )
+    manifest_path = REPOSITORY_ROOT / payload["batch_manifest_path"]
+    assert hashlib.sha256(manifest_path.read_bytes()).hexdigest() == payload[
+        "batch_manifest_sha256"
+    ]
+    manifest = load_shadow_batch_result(manifest_path)
+    assert manifest.result_hash == payload["batch_result_hash"]
+
+    over_budget = payload["valid_over_budget"]
+    assert len(over_budget) == 5
+    assert max(item["output_tokens"] for item in over_budget) == 40_673
+    assert payload["maximum_observed_output_tokens"] == 40_673
+    assert len(payload["provider_failures"]) == 5
+    assert len(payload["terminal_schema_failures"]) == 4
+    assert payload["maximum_observed_latency_ms"] == 259_482
+
+    contract = payload["segment_partition_contract"]
+    assert contract["numeric_occurrence_threshold"] == 40
+    assert contract["required_metric_field_count"] == 2
+    assert contract["metric_partitions"] == [
+        ["operating_revenue"],
+        ["operating_cost"],
+        ["gross_margin_reported"],
+    ]
+    observations = contract["observations"]
+    assert all(
+        item["eligible"]
+        == (item["numeric_occurrence_count"] >= contract["numeric_occurrence_threshold"])
+        for item in observations
+    )
+    assert {item["numeric_occurrence_count"] for item in observations if item["eligible"]} == {
+        49,
+        104,
+        191,
+        208,
+    }
+    assert [
+        item["numeric_occurrence_count"]
+        for item in observations
+        if not item["eligible"]
+    ] == [28]
+    assert payload["production_authorization"] == "not_authorized"
+
+
 def test_refined_replay_admission_is_hash_and_budget_bound(tmp_path: Path) -> None:
     manifest = load_shadow_sample_manifest(
         BASELINE_CHANGE / "shadow-manifest.v1.json",
@@ -121,6 +179,17 @@ def test_refined_replay_admission_is_hash_and_budget_bound(tmp_path: Path) -> No
         REFINEMENT_CHANGE / "provider-free-scope-refinement-audit.v1.json"
     )
     prepared = ShadowEvidencePreparer().prepare(manifest=manifest, plan=plan)
+    stability = json.loads(EXECUTION_STABILITY_FIXTURE.read_text(encoding="utf-8"))
+    observations = stability["segment_partition_contract"]["observations"]
+    for observation in observations:
+        scope = next(
+            item
+            for item in prepared[observation["sample_id"]]
+            if item.scope_id == observation["scope_id"]
+        )
+        assert _segment_numeric_occurrence_count(scope) == observation[
+            "numeric_occurrence_count"
+        ]
     current = build_shadow_preparation_audit(
         plan,
         audit_id=preparation.audit_id,

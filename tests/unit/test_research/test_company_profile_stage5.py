@@ -31,6 +31,7 @@ from research.company_profile.stage5_bundle import (
     Stage5BenchmarkResult,
     Stage5FailureDiagnostic,
     Stage5OverallStatus,
+    Stage5ProviderCallTrace,
     Stage5ReportBundle,
     Stage5ReportStatus,
     Stage5RunBundle,
@@ -95,6 +96,95 @@ def test_stage5_manifest_is_a_verified_four_report_closed_set() -> None:
     assert all(
         item.production_authorization == "not_authorized" for item in manifest.reports
     )
+
+
+def test_stage5_scope_result_maps_partition_traces_to_one_logical_extract() -> None:
+    base = _minimal_run_bundle("partition-trace-unit").reports[0].scope_results[0]
+    task_result = base.task_result.model_copy(
+        update={"provider_calls": ("extract", "verify")}
+    )
+    traces = tuple(
+        Stage5ProviderCallTrace(
+            call_type="extract",
+            semantic_request_id=(
+                f"{task_result.request_id}:partition-{index:02d}-of-03"
+            ),
+            status="success",
+            profile="semantic_extraction",
+            parent_semantic_request_id=task_result.request_id,
+            partition_index=index,
+            partition_count=3,
+        )
+        for index in range(1, 4)
+    ) + (
+        Stage5ProviderCallTrace(
+            call_type="verify",
+            semantic_request_id=f"{task_result.request_id}:verify",
+            status="success",
+            profile="semantic_extraction",
+        ),
+    )
+
+    result = Stage5ScopeResult(
+        scope_id=base.scope_id,
+        request_id=task_result.request_id,
+        prepared_scope=base.prepared_scope,
+        task_result=task_result,
+        provider_call_types=("extract", "verify"),
+        provider_traces=traces,
+    )
+
+    assert len(result.provider_traces) == 4
+
+
+def test_stage5_scope_result_allows_only_failed_incomplete_partition_prefix() -> None:
+    base = _minimal_run_bundle("partition-failure-unit").reports[0].scope_results[0]
+    task_result = base.task_result.model_copy(update={"provider_calls": ("extract",)})
+    traces = (
+        Stage5ProviderCallTrace(
+            call_type="extract",
+            semantic_request_id=f"{task_result.request_id}:partition-01-of-03",
+            status="success",
+            profile="semantic_extraction",
+            parent_semantic_request_id=task_result.request_id,
+            partition_index=1,
+            partition_count=3,
+        ),
+        Stage5ProviderCallTrace(
+            call_type="extract",
+            semantic_request_id=f"{task_result.request_id}:partition-02-of-03",
+            status="failed",
+            profile="semantic_extraction",
+            error_code="provider_unavailable",
+            parent_semantic_request_id=task_result.request_id,
+            partition_index=2,
+            partition_count=3,
+        ),
+    )
+
+    result = Stage5ScopeResult(
+        scope_id=base.scope_id,
+        request_id=task_result.request_id,
+        prepared_scope=base.prepared_scope,
+        task_result=task_result,
+        provider_call_types=("extract",),
+        provider_traces=traces,
+    )
+    assert result.provider_traces[-1].status == "failed"
+
+    successful_prefix = tuple(
+        trace.model_copy(update={"status": "success", "error_code": None})
+        for trace in traces
+    )
+    with pytest.raises(ValueError, match="must be complete"):
+        Stage5ScopeResult(
+            scope_id=base.scope_id,
+            request_id=task_result.request_id,
+            prepared_scope=base.prepared_scope,
+            task_result=task_result,
+            provider_call_types=("extract",),
+            provider_traces=successful_prefix,
+        )
 
 
 def test_stage5_manifest_rejects_an_unapproved_sample(tmp_path: Path) -> None:

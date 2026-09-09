@@ -19,6 +19,7 @@ from utils.llm import (
     LlmDeadlineExceededError,
     LlmMessage,
     LlmRequest,
+    LlmResponseTruncatedError,
     LlmSchemaValidationError,
     LlmTransientTransportError,
     load_project_environment,
@@ -225,6 +226,7 @@ async def test_profile_selects_max_completion_tokens_and_warns_on_usage_overrun(
     assert payload["max_completion_tokens"] == 4096
     assert "max_tokens" not in payload
     assert "provider_output_budget_exceeded" in response.warnings
+    assert "provider_output_budget_exceeded_valid_response" in response.warnings
 
 
 @pytest.mark.asyncio
@@ -851,7 +853,54 @@ async def test_json_object_schema_failure_repairs_once():
     result = await client.complete(_request())
     assert result.data["label"] == "fixed"
     assert result.attempt_count == 2
-    assert "prior response failed" in transport.calls[1]["payload"]["messages"][-1]["content"]
+    repair_payload = transport.calls[1]["payload"]
+    assert repair_payload["response_format"] == {"type": "json_object"}
+    assert [item["role"] for item in repair_payload["messages"]][-1] == "user"
+    assert not any(
+        item["role"] == "system"
+        for item in repair_payload["messages"][2:]
+    )
+    correction = json.loads(repair_payload["messages"][-1]["content"])
+    assert correction["request_kind"] == "schema_repair"
+    assert '"score": "not-a-number"' in correction["prior_response"]
+    assert correction["validation_error"] == "schema validation failed at score (type)"
+
+
+@pytest.mark.asyncio
+async def test_output_limit_invalid_json_is_typed_truncation_after_bounded_repair():
+    truncated = {
+        "choices": [
+            {
+                "message": {"content": '{"label":"partial"'},
+                "finish_reason": "length",
+            }
+        ],
+        "usage": {
+            "prompt_tokens": 10,
+            "completion_tokens": 20,
+            "total_tokens": 30,
+        },
+        "id": "provider-truncated",
+    }
+    transport = ScriptedTransport([truncated, truncated])
+    client = LlmClient(
+        _config(
+            structured_output_mode="json_object",
+            supported_structured_output_modes=["json_object"],
+        ),
+        transport=transport,
+        environment={"TEST_LLM_KEY": "unit-secret"},
+    )
+
+    with pytest.raises(LlmResponseTruncatedError) as exc_info:
+        await client.complete(_request(max_output_tokens=20))
+
+    assert len(transport.calls) == 2
+    error = exc_info.value
+    assert error.finish_reason == "length"
+    assert error.requested_output_tokens == 20
+    assert error.observed_output_tokens == 20
+    assert error.attempt_count == 2
 
 
 @pytest.mark.asyncio
@@ -887,6 +936,31 @@ async def test_repair_failure_remains_fail_closed():
     with pytest.raises(LlmSchemaValidationError):
         await client.complete(_request())
     assert len(transport.calls) == 2
+
+
+@pytest.mark.asyncio
+async def test_schema_repair_provider_failure_preserves_terminal_provider_error():
+    transport = ScriptedTransport(
+        [
+            _response({"label": "bad", "score": "wrong-type"}),
+            {"status_code": 400, "data": {"error": {"message": "invalid repair"}}},
+        ]
+    )
+    client = LlmClient(
+        _config(
+            structured_output_mode="json_object",
+            supported_structured_output_modes=["json_object"],
+        ),
+        transport=transport,
+        environment={"TEST_LLM_KEY": "unit-secret"},
+    )
+
+    with pytest.raises(LlmProviderError):
+        await client.complete(_request())
+
+    assert len(transport.calls) == 2
+    repair_messages = transport.calls[1]["payload"]["messages"]
+    assert repair_messages[-1]["role"] == "user"
 
 
 @pytest.mark.asyncio

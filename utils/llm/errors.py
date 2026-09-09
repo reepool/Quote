@@ -5,7 +5,6 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any, Mapping, Optional
 
-
 ERROR_CODES = {
     "configuration_error",
     "authentication_error",
@@ -13,6 +12,7 @@ ERROR_CODES = {
     "transient_transport_error",
     "provider_error",
     "response_parse_error",
+    "response_truncated",
     "schema_validation_error",
     "deadline_exceeded",
     "cancelled",
@@ -57,6 +57,9 @@ class LlmError(RuntimeError):
     transport_error_type: Optional[str] = None
     transport_phase: Optional[str] = None
     transport_exception_type: Optional[str] = None
+    finish_reason: Optional[str] = None
+    requested_output_tokens: Optional[int] = None
+    observed_output_tokens: Optional[int] = None
 
     def __post_init__(self) -> None:
         if self.code not in ERROR_CODES:
@@ -92,6 +95,9 @@ class LlmError(RuntimeError):
             "transport_error_type": self.transport_error_type,
             "transport_phase": self.transport_phase,
             "transport_exception_type": self.transport_exception_type,
+            "finish_reason": self.finish_reason,
+            "requested_output_tokens": self.requested_output_tokens,
+            "observed_output_tokens": self.observed_output_tokens,
         }
 
 
@@ -125,13 +131,22 @@ class LlmResponseParseError(LlmError):
         super().__init__("response_parse_error", message, True, **kwargs)
 
 
+class LlmResponseTruncatedError(LlmError):
+    def __init__(
+        self, message: str = "LLM response was truncated", **kwargs: Any
+    ) -> None:
+        super().__init__("response_truncated", message, True, **kwargs)
+
+
 class LlmSchemaValidationError(LlmError):
     def __init__(self, message: str, **kwargs: Any) -> None:
         super().__init__("schema_validation_error", message, True, **kwargs)
 
 
 class LlmDeadlineExceededError(LlmError):
-    def __init__(self, message: str = "LLM request deadline exceeded", **kwargs: Any) -> None:
+    def __init__(
+        self, message: str = "LLM request deadline exceeded", **kwargs: Any
+    ) -> None:
         super().__init__("deadline_exceeded", message, False, **kwargs)
 
 
@@ -148,7 +163,9 @@ def safe_provider_error(status_code: int) -> LlmError:
             "LLM provider rejected authentication", status_code=status_code
         )
     if status_code == 429:
-        return LlmRateLimitError("LLM provider rate limit exceeded", status_code=status_code)
+        return LlmRateLimitError(
+            "LLM provider rate limit exceeded", status_code=status_code
+        )
     if status_code in RETRYABLE_PROVIDER_STATUS_CODES:
         return LlmTransientTransportError(
             "LLM provider returned a retryable response", status_code=status_code
