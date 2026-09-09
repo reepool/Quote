@@ -33,6 +33,11 @@ from research.company_profile.shadow_evidence import (
     load_shadow_scope_refinement_audit,
 )
 from research.company_profile.stage5_provider import _segment_numeric_occurrence_count
+from scripts.run_company_profile_shadow_batch import (
+    STABILITY_SHADOW_REPLAY_CONTRACT,
+    _validate_replay_mode,
+    build_parser,
+)
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[3]
 BASELINE_CHANGE = (
@@ -42,6 +47,14 @@ BASELINE_CHANGE = (
 REFINEMENT_CHANGE = (
     REPOSITORY_ROOT
     / "openspec/changes/archive/2026-09-09-refine-company-profile-shadow-evidence-scopes"
+)
+CORRECTION_CHANGE = (
+    REPOSITORY_ROOT
+    / "openspec/changes/archive/2026-09-09-correct-company-profile-shadow-evidence-routing-and-regime-coverage"
+)
+STABILITY_CHANGE = (
+    REPOSITORY_ROOT
+    / "openspec/changes/archive/2026-09-09-stabilize-company-profile-shadow-llm-execution"
 )
 BASELINE_BATCH = (
     REPOSITORY_ROOT
@@ -54,8 +67,37 @@ EXECUTION_STABILITY_FIXTURE = (
 )
 
 
+def _file_sha256(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def _stability_replay_inputs():
+    manifest = load_shadow_sample_manifest(
+        BASELINE_CHANGE / "shadow-manifest.v1.json",
+        repository_root=REPOSITORY_ROOT,
+    )
+    plan = load_shadow_evidence_plan(CORRECTION_CHANGE / "shadow-evidence-plan.v3.json")
+    preparation = load_shadow_preparation_audit(
+        CORRECTION_CHANGE / "provider-free-preparation-audit.v1.json"
+    )
+    correction = json.loads(
+        (CORRECTION_CHANGE / "correction-audit.v1.json").read_text(encoding="utf-8")
+    )
+    supporting = {
+        "execution_stability_fixture": _file_sha256(EXECUTION_STABILITY_FIXTURE),
+        "bounded_repair_probe": _file_sha256(
+            STABILITY_CHANGE / "bounded-gemini-repair-probe.v1.json"
+        ),
+    }
+    prepared = ShadowEvidencePreparer().prepare(manifest=manifest, plan=plan)
+    return manifest, plan, preparation, correction, supporting, prepared
+
+
 def _active_change_root() -> Path:
-    active = REPOSITORY_ROOT / "openspec/changes/validate-refined-company-profile-shadow-batch"
+    active = (
+        REPOSITORY_ROOT
+        / "openspec/changes/validate-refined-company-profile-shadow-batch"
+    )
     if active.exists():
         return active
     archived = sorted(
@@ -114,7 +156,9 @@ def _clone_batch_with_refined_identity(tmp_path: Path) -> Path:
     return directory
 
 
-def test_execution_stability_baseline_freezes_observed_failures_and_partition_contract() -> None:
+def test_execution_stability_baseline_freezes_observed_failures_and_partition_contract() -> (
+    None
+):
     payload = json.loads(EXECUTION_STABILITY_FIXTURE.read_text(encoding="utf-8"))
 
     assert payload["schema_version"] == (
@@ -124,9 +168,10 @@ def test_execution_stability_baseline_freezes_observed_failures_and_partition_co
         "manufacturing-materials-shadow-refined-gemini-20260910-a"
     )
     manifest_path = REPOSITORY_ROOT / payload["batch_manifest_path"]
-    assert hashlib.sha256(manifest_path.read_bytes()).hexdigest() == payload[
-        "batch_manifest_sha256"
-    ]
+    assert (
+        hashlib.sha256(manifest_path.read_bytes()).hexdigest()
+        == payload["batch_manifest_sha256"]
+    )
     manifest = load_shadow_batch_result(manifest_path)
     assert manifest.result_hash == payload["batch_result_hash"]
 
@@ -149,10 +194,14 @@ def test_execution_stability_baseline_freezes_observed_failures_and_partition_co
     observations = contract["observations"]
     assert all(
         item["eligible"]
-        == (item["numeric_occurrence_count"] >= contract["numeric_occurrence_threshold"])
+        == (
+            item["numeric_occurrence_count"] >= contract["numeric_occurrence_threshold"]
+        )
         for item in observations
     )
-    assert {item["numeric_occurrence_count"] for item in observations if item["eligible"]} == {
+    assert {
+        item["numeric_occurrence_count"] for item in observations if item["eligible"]
+    } == {
         49,
         104,
         191,
@@ -187,17 +236,18 @@ def test_refined_replay_admission_is_hash_and_budget_bound(tmp_path: Path) -> No
             for item in prepared[observation["sample_id"]]
             if item.scope_id == observation["scope_id"]
         )
-        assert _segment_numeric_occurrence_count(scope) == observation[
-            "numeric_occurrence_count"
-        ]
+        assert (
+            _segment_numeric_occurrence_count(scope)
+            == observation["numeric_occurrence_count"]
+        )
     current = build_shadow_preparation_audit(
         plan,
         audit_id=preparation.audit_id,
         prepared=prepared,
     )
-    assert current.model_dump(exclude={"created_at", "audit_hash"}) == preparation.model_dump(
+    assert current.model_dump(
         exclude={"created_at", "audit_hash"}
-    )
+    ) == preparation.model_dump(exclude={"created_at", "audit_hash"})
     contract = ShadowReplayContract(
         batch_id="refined-admission-unit",
         sample_manifest_hash=manifest.manifest_hash,
@@ -246,11 +296,187 @@ def test_refined_replay_admission_is_hash_and_budget_bound(tmp_path: Path) -> No
         )
 
 
+def test_stability_replay_admission_binds_corrected_plan_and_stability_evidence(
+    tmp_path: Path,
+) -> None:
+    manifest, plan, preparation, correction, supporting, prepared = (
+        _stability_replay_inputs()
+    )
+    contract = STABILITY_SHADOW_REPLAY_CONTRACT
+
+    validate_shadow_replay_admission(
+        contract=contract,
+        batch_id=contract.batch_id,
+        primary_logical_profile=contract.primary_logical_profile,
+        extract_max_output_tokens=contract.extract_max_output_tokens,
+        verify_max_output_tokens=contract.verify_max_output_tokens,
+        timeout_seconds=contract.timeout_seconds,
+        max_provider_calls=contract.max_provider_calls,
+        manifest=manifest,
+        evidence_plan=plan,
+        preparation_audit=preparation,
+        correction_audit=correction,
+        supporting_artifact_hashes=supporting,
+        prepared=prepared,
+        output_root=tmp_path,
+    )
+
+    assert (
+        contract.evidence_plan_version == "manufacturing_materials_shadow.2026-09-09.3"
+    )
+    assert contract.production_authorization == "not_authorized"
+
+
+def test_stability_replay_operator_mode_is_closed_to_the_v3_contract() -> None:
+    contract = STABILITY_SHADOW_REPLAY_CONTRACT
+    args = build_parser().parse_args(
+        [
+            "--mode",
+            "stability-semantic-replay",
+            "--sample-manifest",
+            "manifest.json",
+            "--evidence-plan",
+            "plan.json",
+            "--batch-id",
+            contract.batch_id,
+        ]
+    )
+    assert args.mode == "stability-semantic-replay"
+
+    _validate_replay_mode(
+        mode=args.mode,
+        plan_version=contract.evidence_plan_version,
+        batch_id=args.batch_id,
+    )
+    _validate_replay_mode(
+        mode="preparation-only",
+        plan_version=contract.evidence_plan_version,
+        batch_id=None,
+    )
+    with pytest.raises(ValueError, match="require stability-semantic-replay"):
+        _validate_replay_mode(
+            mode="semantic-run",
+            plan_version=contract.evidence_plan_version,
+            batch_id="bypass-v3",
+        )
+    with pytest.raises(ValueError, match="require stability-semantic-replay"):
+        _validate_replay_mode(
+            mode="semantic-run",
+            plan_version="manufacturing_materials_shadow.2026-09-09.1",
+            batch_id=contract.batch_id,
+        )
+
+
+@pytest.mark.parametrize(
+    ("override", "expected_drift"),
+    [
+        (
+            {"batch_id": "manufacturing-materials-shadow-refined-gemini-20260910-a"},
+            "batch_id",
+        ),
+        (
+            {"primary_logical_profile": "semantic_extraction__scorpio_grok"},
+            "primary_logical_profile",
+        ),
+        ({"extract_max_output_tokens": 19_999}, "extract_max_output_tokens"),
+        ({"supporting_artifact_hashes": {}}, "supporting_artifact_hashes"),
+    ],
+)
+def test_stability_replay_admission_rejects_contract_drift(
+    tmp_path: Path,
+    override: dict[str, object],
+    expected_drift: str,
+) -> None:
+    manifest, plan, preparation, correction, supporting, prepared = (
+        _stability_replay_inputs()
+    )
+    contract = STABILITY_SHADOW_REPLAY_CONTRACT
+    actual = {
+        "batch_id": contract.batch_id,
+        "primary_logical_profile": contract.primary_logical_profile,
+        "extract_max_output_tokens": contract.extract_max_output_tokens,
+        "verify_max_output_tokens": contract.verify_max_output_tokens,
+        "timeout_seconds": contract.timeout_seconds,
+        "max_provider_calls": contract.max_provider_calls,
+        "supporting_artifact_hashes": supporting,
+    }
+    actual.update(override)
+
+    with pytest.raises(ValueError, match=expected_drift):
+        validate_shadow_replay_admission(
+            contract=contract,
+            batch_id=str(actual["batch_id"]),
+            primary_logical_profile=str(actual["primary_logical_profile"]),
+            extract_max_output_tokens=int(actual["extract_max_output_tokens"]),
+            verify_max_output_tokens=int(actual["verify_max_output_tokens"]),
+            timeout_seconds=float(actual["timeout_seconds"]),
+            max_provider_calls=int(actual["max_provider_calls"]),
+            manifest=manifest,
+            evidence_plan=plan,
+            preparation_audit=preparation,
+            correction_audit=correction,
+            supporting_artifact_hashes=actual["supporting_artifact_hashes"],
+            prepared=prepared,
+            output_root=tmp_path,
+        )
+
+
+def test_stability_replay_admission_rejects_tampered_correction_and_existing_output(
+    tmp_path: Path,
+) -> None:
+    manifest, plan, preparation, correction, supporting, prepared = (
+        _stability_replay_inputs()
+    )
+    contract = STABILITY_SHADOW_REPLAY_CONTRACT
+    tampered = dict(correction)
+    tampered["provider_calls"] = 1
+
+    with pytest.raises(ValueError, match="correction audit hash mismatch"):
+        validate_shadow_replay_admission(
+            contract=contract,
+            batch_id=contract.batch_id,
+            primary_logical_profile=contract.primary_logical_profile,
+            extract_max_output_tokens=contract.extract_max_output_tokens,
+            verify_max_output_tokens=contract.verify_max_output_tokens,
+            timeout_seconds=contract.timeout_seconds,
+            max_provider_calls=contract.max_provider_calls,
+            manifest=manifest,
+            evidence_plan=plan,
+            preparation_audit=preparation,
+            correction_audit=tampered,
+            supporting_artifact_hashes=supporting,
+            prepared=prepared,
+            output_root=tmp_path,
+        )
+
+    (tmp_path / f"batch-{contract.batch_id}").mkdir()
+    with pytest.raises(FileExistsError, match="shadow batch already exists"):
+        validate_shadow_replay_admission(
+            contract=contract,
+            batch_id=contract.batch_id,
+            primary_logical_profile=contract.primary_logical_profile,
+            extract_max_output_tokens=contract.extract_max_output_tokens,
+            verify_max_output_tokens=contract.verify_max_output_tokens,
+            timeout_seconds=contract.timeout_seconds,
+            max_provider_calls=contract.max_provider_calls,
+            manifest=manifest,
+            evidence_plan=plan,
+            preparation_audit=preparation,
+            correction_audit=correction,
+            supporting_artifact_hashes=supporting,
+            prepared=prepared,
+            output_root=tmp_path,
+        )
+
+
 def test_replay_comparison_validates_trees_and_is_research_only(tmp_path: Path) -> None:
     refined = _clone_batch_with_refined_identity(tmp_path)
-    baseline_report = BASELINE_BATCH / load_shadow_batch_result(
-        BASELINE_BATCH / "manifest.json"
-    ).reports[0].relative_path
+    baseline_report = (
+        BASELINE_BATCH
+        / load_shadow_batch_result(BASELINE_BATCH / "manifest.json")
+        .reports[0]
+        .relative_path
+    )
     baseline_before = hashlib.sha256(baseline_report.read_bytes()).hexdigest()
 
     comparison = build_shadow_replay_comparison_audit(
@@ -286,7 +512,8 @@ def test_replay_comparison_rejects_tampered_report(tmp_path: Path) -> None:
             refined_batch_directory=refined,
             baseline_review_path=BASELINE_CHANGE / "source-text-review-package.v3.json",
             refined_review_path=refined / "review-package.json",
-            baseline_readiness_path=BASELINE_CHANGE / "empirical-readiness-audit.v3.json",
+            baseline_readiness_path=BASELINE_CHANGE
+            / "empirical-readiness-audit.v3.json",
             refined_readiness_path=refined / "readiness-audit.json",
         )
 
@@ -302,6 +529,7 @@ def test_replay_comparison_rejects_incomplete_input(tmp_path: Path) -> None:
             refined_batch_directory=refined,
             baseline_review_path=BASELINE_CHANGE / "source-text-review-package.v3.json",
             refined_review_path=refined / "review-package.json",
-            baseline_readiness_path=BASELINE_CHANGE / "empirical-readiness-audit.v3.json",
+            baseline_readiness_path=BASELINE_CHANGE
+            / "empirical-readiness-audit.v3.json",
             refined_readiness_path=refined / "readiness-audit.json",
         )

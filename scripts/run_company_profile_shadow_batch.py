@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import asyncio
+import hashlib
 import json
 import sys
 from collections.abc import Sequence
@@ -67,6 +68,35 @@ REFINED_SHADOW_REPLAY_CONTRACT = ShadowReplayContract(
     timeout_seconds=SHADOW_TIMEOUT_SECONDS,
     max_provider_calls=SHADOW_MAX_PROVIDER_CALLS,
 )
+STABILITY_SHADOW_REPLAY_CONTRACT = ShadowReplayContract(
+    batch_id="manufacturing-materials-shadow-stability-gemini-20260909-a",
+    sample_manifest_hash=(
+        "6f639739ef082e78dcb0c01a5ce40bab1645d8fdc027bece2dbef63652bae9e2"
+    ),
+    evidence_plan_version="manufacturing_materials_shadow.2026-09-09.3",
+    evidence_plan_hash=(
+        "4f009c767dd0b75bce267fdba94c069272bf44a33e133dd5ca5dff2928da72ec"
+    ),
+    preparation_audit_hash=(
+        "052155d3c948de7af257937783595a46028d96dfb8922d533354a5a4648f5ad8"
+    ),
+    correction_audit_hash=(
+        "14e0cd52fb2f698d5ef9f5417167c81e6139b25234113d4efcc42463a86b9e91"
+    ),
+    supporting_artifact_hashes={
+        "execution_stability_fixture": (
+            "4176e321ab83d0bd59ff72468d42360c833fd8354915ed52950de1a3894f8934"
+        ),
+        "bounded_repair_probe": (
+            "a4de6b83148f2c86b32957c65b1285b6b21db0c75496452880c4d172048d4b6b"
+        ),
+    },
+    primary_logical_profile=SHADOW_PRIMARY_PROFILE,
+    extract_max_output_tokens=SHADOW_EXTRACT_MAX_OUTPUT_TOKENS,
+    verify_max_output_tokens=SHADOW_VERIFY_MAX_OUTPUT_TOKENS,
+    timeout_seconds=SHADOW_TIMEOUT_SECONDS,
+    max_provider_calls=SHADOW_MAX_PROVIDER_CALLS,
+)
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -78,6 +108,7 @@ def build_parser() -> argparse.ArgumentParser:
             "scope-refinement-replay",
             "semantic-run",
             "refined-semantic-replay",
+            "stability-semantic-replay",
         ),
         required=True,
     )
@@ -86,6 +117,9 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--preparation-audit", type=Path)
     parser.add_argument("--refined-evidence-plan", type=Path)
     parser.add_argument("--scope-refinement-audit", type=Path)
+    parser.add_argument("--correction-audit", type=Path)
+    parser.add_argument("--execution-stability-fixture", type=Path)
+    parser.add_argument("--stability-probe", type=Path)
     parser.add_argument("--output-root", type=Path)
     parser.add_argument("--batch-id")
     parser.add_argument("--provider-route", default=SHADOW_PRIMARY_PROFILE)
@@ -100,14 +134,23 @@ def build_parser() -> argparse.ArgumentParser:
         default=SHADOW_VERIFY_MAX_OUTPUT_TOKENS,
     )
     parser.add_argument("--timeout-seconds", type=float, default=SHADOW_TIMEOUT_SECONDS)
-    parser.add_argument("--max-provider-calls", type=int, default=SHADOW_MAX_PROVIDER_CALLS)
+    parser.add_argument(
+        "--max-provider-calls", type=int, default=SHADOW_MAX_PROVIDER_CALLS
+    )
     return parser
 
 
 def main(argv: Sequence[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
-    manifest = load_shadow_sample_manifest(args.sample_manifest, repository_root=ROOT_DIR)
+    manifest = load_shadow_sample_manifest(
+        args.sample_manifest, repository_root=ROOT_DIR
+    )
     plan = load_shadow_evidence_plan(args.evidence_plan)
+    _validate_replay_mode(
+        mode=args.mode,
+        plan_version=plan.plan_version,
+        batch_id=args.batch_id,
+    )
     if args.mode == "scope-refinement-replay":
         if not args.refined_evidence_plan or not args.scope_refinement_audit:
             raise ValueError(
@@ -156,30 +199,39 @@ def main(argv: Sequence[str] | None = None) -> int:
         or frozen_audit.report_count != 20
         or frozen_audit.evidence_traceability_rate != 1.0
     ):
-        raise ValueError("frozen provider-free preparation audit does not admit this batch")
+        raise ValueError(
+            "frozen provider-free preparation audit does not admit this batch"
+        )
     prepared = ShadowEvidencePreparer().prepare(manifest=manifest, plan=plan)
     current_audit = build_shadow_preparation_audit(
         plan,
         audit_id=frozen_audit.audit_id,
         prepared=prepared,
     )
-    if current_audit.model_dump(exclude={"created_at", "audit_hash"}) != frozen_audit.model_dump(
+    if current_audit.model_dump(
         exclude={"created_at", "audit_hash"}
-    ):
+    ) != frozen_audit.model_dump(exclude={"created_at", "audit_hash"}):
         raise ValueError("provider-free preparation no longer matches the frozen audit")
     if args.mode == "preparation-only":
-        print(json.dumps(frozen_audit.model_dump(mode="json"), ensure_ascii=False, indent=2))
+        print(
+            json.dumps(
+                frozen_audit.model_dump(mode="json"), ensure_ascii=False, indent=2
+            )
+        )
         return 0
     if not args.output_root or not args.batch_id:
         raise ValueError(f"{args.mode} requires --output-root and --batch-id")
     if args.provider_route != SHADOW_PRIMARY_PROFILE:
         raise ValueError("contracted shadow batch requires the frozen Gemini profile")
-    if min(
-        args.extract_max_output_tokens,
-        args.verify_max_output_tokens,
-        args.timeout_seconds,
-        args.max_provider_calls,
-    ) <= 0:
+    if (
+        min(
+            args.extract_max_output_tokens,
+            args.verify_max_output_tokens,
+            args.timeout_seconds,
+            args.max_provider_calls,
+        )
+        <= 0
+    ):
         raise ValueError("shadow provider budgets must be positive")
     if args.mode == "refined-semantic-replay":
         if not args.scope_refinement_audit:
@@ -201,6 +253,38 @@ def main(argv: Sequence[str] | None = None) -> int:
             evidence_plan=plan,
             preparation_audit=frozen_audit,
             scope_refinement_audit=refinement_audit,
+            prepared=prepared,
+            output_root=args.output_root,
+        )
+    elif args.mode == "stability-semantic-replay":
+        required = {
+            "correction audit": args.correction_audit,
+            "execution stability fixture": args.execution_stability_fixture,
+            "stability probe": args.stability_probe,
+        }
+        missing = [name for name, path in required.items() if path is None]
+        if missing:
+            raise ValueError("stability-semantic-replay requires " + ", ".join(missing))
+        correction_audit = json.loads(args.correction_audit.read_text(encoding="utf-8"))
+        supporting_hashes = {
+            "execution_stability_fixture": _file_sha256(
+                args.execution_stability_fixture
+            ),
+            "bounded_repair_probe": _file_sha256(args.stability_probe),
+        }
+        validate_shadow_replay_admission(
+            contract=STABILITY_SHADOW_REPLAY_CONTRACT,
+            batch_id=args.batch_id,
+            primary_logical_profile=args.provider_route,
+            extract_max_output_tokens=args.extract_max_output_tokens,
+            verify_max_output_tokens=args.verify_max_output_tokens,
+            timeout_seconds=args.timeout_seconds,
+            max_provider_calls=args.max_provider_calls,
+            manifest=manifest,
+            evidence_plan=plan,
+            preparation_audit=frozen_audit,
+            correction_audit=correction_audit,
+            supporting_artifact_hashes=supporting_hashes,
             prepared=prepared,
             output_root=args.output_root,
         )
@@ -269,6 +353,28 @@ def main(argv: Sequence[str] | None = None) -> int:
         )
     )
     return 0
+
+
+def _file_sha256(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def _validate_replay_mode(
+    *,
+    mode: str,
+    plan_version: str,
+    batch_id: str | None,
+) -> None:
+    stability_plan = STABILITY_SHADOW_REPLAY_CONTRACT.evidence_plan_version
+    stability_batch = STABILITY_SHADOW_REPLAY_CONTRACT.batch_id
+    provider_bearing_legacy_modes = {"semantic-run", "refined-semantic-replay"}
+    if (
+        plan_version == stability_plan or batch_id == stability_batch
+    ) and mode in provider_bearing_legacy_modes:
+        raise ValueError(
+            "corrected v3 Evidence plan and stability batch identity require "
+            "stability-semantic-replay"
+        )
 
 
 if __name__ == "__main__":

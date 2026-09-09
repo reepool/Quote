@@ -55,13 +55,34 @@ class ShadowReplayContract(_StrictModel):
     evidence_plan_version: str = Field(min_length=1)
     evidence_plan_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
     preparation_audit_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
-    scope_refinement_audit_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    scope_refinement_audit_hash: str | None = Field(
+        default=None,
+        pattern=r"^[0-9a-f]{64}$",
+    )
+    correction_audit_hash: str | None = Field(
+        default=None,
+        pattern=r"^[0-9a-f]{64}$",
+    )
+    supporting_artifact_hashes: dict[str, str] = Field(default_factory=dict)
     primary_logical_profile: str = Field(min_length=1)
     extract_max_output_tokens: int = Field(gt=0)
     verify_max_output_tokens: int = Field(gt=0)
     timeout_seconds: float = Field(gt=0)
     max_provider_calls: int = Field(gt=0)
     production_authorization: Literal["not_authorized"] = PRODUCTION_AUTHORIZATION
+
+    @model_validator(mode="after")
+    def _audit_lineage_is_closed(self) -> ShadowReplayContract:
+        if (self.scope_refinement_audit_hash is None) == (
+            self.correction_audit_hash is None
+        ):
+            raise ValueError(
+                "shadow replay contract requires exactly one plan-lineage audit"
+            )
+        for name, value in self.supporting_artifact_hashes.items():
+            if not name or not re.fullmatch(r"[0-9a-f]{64}", value):
+                raise ValueError("shadow replay supporting artifact hashes are invalid")
+        return self
 
 
 def validate_shadow_replay_admission(
@@ -76,7 +97,9 @@ def validate_shadow_replay_admission(
     manifest: ShadowSampleManifest,
     evidence_plan: ShadowEvidencePlan,
     preparation_audit: ShadowEvidencePreparationAudit,
-    scope_refinement_audit: ShadowScopeRefinementAudit,
+    scope_refinement_audit: ShadowScopeRefinementAudit | None = None,
+    correction_audit: Mapping[str, object] | None = None,
+    supporting_artifact_hashes: Mapping[str, str] | None = None,
     prepared: Mapping[str, tuple[PreparedRequestScope, ...]],
     output_root: str | Path,
 ) -> None:
@@ -88,7 +111,13 @@ def validate_shadow_replay_admission(
         "evidence_plan_version": evidence_plan.plan_version,
         "evidence_plan_hash": evidence_plan.plan_hash,
         "preparation_audit_hash": preparation_audit.audit_hash,
-        "scope_refinement_audit_hash": scope_refinement_audit.audit_hash,
+        "scope_refinement_audit_hash": (
+            scope_refinement_audit.audit_hash if scope_refinement_audit else None
+        ),
+        "correction_audit_hash": (
+            str(correction_audit.get("audit_hash")) if correction_audit else None
+        ),
+        "supporting_artifact_hashes": dict(supporting_artifact_hashes or {}),
         "primary_logical_profile": primary_logical_profile,
         "extract_max_output_tokens": extract_max_output_tokens,
         "verify_max_output_tokens": verify_max_output_tokens,
@@ -111,18 +140,28 @@ def validate_shadow_replay_admission(
         or preparation_audit.evidence_traceability_rate != 1.0
     ):
         raise ValueError("refined shadow preparation audit does not admit this replay")
-    if (
-        scope_refinement_audit.sample_manifest_hash != manifest.manifest_hash
-        or scope_refinement_audit.refined_plan_version != evidence_plan.plan_version
-        or scope_refinement_audit.refined_plan_hash != evidence_plan.plan_hash
-        or scope_refinement_audit.report_count != SHADOW_REPORT_COUNT
-        or scope_refinement_audit.unsupported_assignment_count != 0
-        or scope_refinement_audit.missing_required_owner_count != 0
-        or scope_refinement_audit.table_context_incomplete_count != 0
-        or scope_refinement_audit.evidence_traceability_rate != 1.0
-        or scope_refinement_audit.provider_calls != 0
-    ):
-        raise ValueError("scope refinement audit does not admit this replay")
+    if scope_refinement_audit is not None:
+        if (
+            scope_refinement_audit.sample_manifest_hash != manifest.manifest_hash
+            or scope_refinement_audit.refined_plan_version != evidence_plan.plan_version
+            or scope_refinement_audit.refined_plan_hash != evidence_plan.plan_hash
+            or scope_refinement_audit.report_count != SHADOW_REPORT_COUNT
+            or scope_refinement_audit.unsupported_assignment_count != 0
+            or scope_refinement_audit.missing_required_owner_count != 0
+            or scope_refinement_audit.table_context_incomplete_count != 0
+            or scope_refinement_audit.evidence_traceability_rate != 1.0
+            or scope_refinement_audit.provider_calls != 0
+        ):
+            raise ValueError("scope refinement audit does not admit this replay")
+    elif correction_audit is not None:
+        _validate_shadow_correction_audit(
+            correction_audit,
+            manifest=manifest,
+            evidence_plan=evidence_plan,
+            preparation_audit=preparation_audit,
+        )
+    else:  # pragma: no cover - the contract validator makes this unreachable
+        raise ValueError("shadow replay plan-lineage audit is missing")
     ManufacturingMaterialsShadowBatchService._validate_admission(
         manifest,
         evidence_plan,
@@ -133,6 +172,30 @@ def validate_shadow_replay_admission(
         raise ValueError("shadow output root cannot be a symlink")
     if (requested_root.resolve() / f"batch-{batch_id}").exists():
         raise FileExistsError(f"shadow batch already exists: {batch_id}")
+
+
+def _validate_shadow_correction_audit(
+    audit: Mapping[str, object],
+    *,
+    manifest: ShadowSampleManifest,
+    evidence_plan: ShadowEvidencePlan,
+    preparation_audit: ShadowEvidencePreparationAudit,
+) -> None:
+    payload = dict(audit)
+    audit_hash = payload.pop("audit_hash", None)
+    if audit_hash != _payload_hash(payload):
+        raise ValueError("shadow correction audit hash mismatch")
+    if (
+        audit.get("schema_version")
+        != "company_profile_shadow_evidence_correction_audit.v1"
+        or audit.get("sample_manifest_hash") != manifest.manifest_hash
+        or audit.get("corrected_plan_hash") != evidence_plan.plan_hash
+        or audit.get("preparation_audit_hash") != preparation_audit.audit_hash
+        or audit.get("unresolved_finding_ids") != []
+        or audit.get("provider_calls") != 0
+        or audit.get("production_authorization") != PRODUCTION_AUTHORIZATION
+    ):
+        raise ValueError("shadow correction audit does not admit this replay")
 
 
 class ShadowReportSuccess(_StrictModel):
@@ -182,7 +245,9 @@ class ShadowReportFailure(_StrictModel):
     evidence_plan_version: str = Field(min_length=1)
     evidence_plan_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
     status: Literal["failed"] = "failed"
-    diagnostics: tuple[Stage5FailureDiagnostic, ...] = Field(min_length=1, max_length=20)
+    diagnostics: tuple[Stage5FailureDiagnostic, ...] = Field(
+        min_length=1, max_length=20
+    )
     created_at: str = Field(min_length=1)
     production_authorization: Literal["not_authorized"] = PRODUCTION_AUTHORIZATION
 
@@ -271,7 +336,11 @@ class ShadowBatchStore:
             status="success" if isinstance(result, ShadowReportSuccess) else "failed",
             relative_path=relative.as_posix(),
             output_sha256=hashlib.sha256(content).hexdigest(),
-            report_status=(result.report_status if isinstance(result, ShadowReportSuccess) else None),
+            report_status=(
+                result.report_status
+                if isinstance(result, ShadowReportSuccess)
+                else None
+            ),
         )
 
     def commit_batch(self, batch_directory: Path, result: ShadowBatchResult) -> Path:
@@ -290,7 +359,9 @@ class ManufacturingMaterialsShadowBatchService:
         *,
         stage5_service: ManufacturingMaterialsProfileSliceService | None = None,
     ) -> None:
-        self._stage5_service = stage5_service or ManufacturingMaterialsProfileSliceService()
+        self._stage5_service = (
+            stage5_service or ManufacturingMaterialsProfileSliceService()
+        )
 
     def run(
         self,
@@ -365,7 +436,9 @@ class ManufacturingMaterialsShadowBatchService:
             "evidence_plan_hash": evidence_plan.plan_hash,
             "primary_logical_profile": primary_logical_profile,
             "reports": tuple(references),
-            "completed_report_count": sum(item.status == "success" for item in references),
+            "completed_report_count": sum(
+                item.status == "success" for item in references
+            ),
             "failed_report_count": sum(item.status == "failed" for item in references),
             "created_at": _utc_now(),
             "production_authorization": PRODUCTION_AUTHORIZATION,
@@ -386,11 +459,15 @@ class ManufacturingMaterialsShadowBatchService:
             raise ValueError("shadow Evidence plan does not match the active manifest")
         expected_ids = {item.sample_id for item in manifest.reports}
         if set(prepared) != expected_ids:
-            raise ValueError("shadow prepared report identities do not match the manifest")
+            raise ValueError(
+                "shadow prepared report identities do not match the manifest"
+            )
         for asset in manifest.reports:
             report_plan = plan.report_by_id(asset.sample_id)
             if report_plan.content_hash != asset.content_hash:
-                raise ValueError("shadow report PDF hash does not match the active manifest")
+                raise ValueError(
+                    "shadow report PDF hash does not match the active manifest"
+                )
             scopes = prepared[asset.sample_id]
             expected_scopes = {
                 scope.scope_id
