@@ -53,7 +53,12 @@ class _ManifestExtractor:
                 SimpleNamespace(
                     page_number=page,
                     printed_page_label=str(page),
-                    text="主营业务 分部信息 产销量 原材料 前五名客户 经营模式 单位：吨",
+                    text=(
+                        "公司主要从事钢铁制造，主要业务包括钢材生产和销售。"
+                        "分行业 营业收入 营业成本 毛利率；主要产品产销量 单位：吨；"
+                        "公司生产所需主要原材料为铁矿石；前五名客户销售额占比；"
+                        "公司业务、产品或服务发生重大变化：不适用。"
+                    ),
                     extraction_method="native_text",
                     native_text_status="extracted",
                     page_artifact_hash=_hash(f"page:{page}"),
@@ -66,7 +71,12 @@ class _ManifestExtractor:
 class _Selector:
     def select(self, **kwargs):
         term = next(iter(kwargs["hint_terms"]))
-        text = "主营业务 分部信息 产销量 原材料 前五名客户 经营模式 单位：吨"
+        text = (
+            "公司主要从事钢铁制造，主要业务包括钢材生产和销售。"
+            "分行业 营业收入 营业成本 毛利率；主要产品产销量 单位：吨；"
+            "公司生产所需主要原材料为铁矿石；前五名客户销售额占比；"
+            "公司业务、产品或服务发生重大变化：不适用。"
+        )
         sections = tuple(
             SelectedSection(
                 section_id=f"section-{page}",
@@ -134,11 +144,11 @@ def test_shadow_batch_admits_twenty_without_weakening_legacy_bundle(
     assert json.loads((output_path / "manifest.json").read_text())["result_hash"]
     review = build_shadow_review_package(result, batch_directory=output_path)
     sampled = [
-        item
-        for item in review.rows
-        if item.category in {"chapter_sample", "caveat"}
+        item for item in review.rows if item.category in {"chapter_sample", "caveat"}
     ]
-    assert len({(item.sample_id, item.chapter_task) for item in sampled}) == len(sampled)
+    assert len({(item.sample_id, item.chapter_task) for item in sampled}) == len(
+        sampled
+    )
     assert len(sampled) <= 20 * 6
     audit = build_shadow_readiness_audit(
         result,

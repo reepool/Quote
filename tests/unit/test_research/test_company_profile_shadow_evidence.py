@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+from dataclasses import replace
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -12,17 +13,19 @@ from research.business_profile_section_selection import (
     SelectedSectionArtifact,
 )
 from research.company_profile.models import ChapterTask
-from research.company_profile.shadow_batch import ShadowSampleManifest
+from research.company_profile.shadow_batch import ShadowSampleManifest, _payload_hash
 from research.company_profile.shadow_evidence import (
     ShadowEvidencePlanner,
     ShadowEvidencePlanningError,
     ShadowEvidencePreparer,
     ShadowPlanningFailureCode,
     _bind_table_context_range,
+    _chapter_owner_score,
     _scope_field_ids,
     build_shadow_preparation_audit,
     build_shadow_scope_refinement_audit,
     load_shadow_evidence_plan,
+    load_shadow_preparation_audit,
 )
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[3]
@@ -31,6 +34,10 @@ CHANGE_ROOT = (
     / "openspec/changes/archive/2026-09-09-validate-manufacturing-materials-company-profile-shadow-batch"
 )
 SHADOW_MANIFEST = CHANGE_ROOT / "shadow-manifest.v1.json"
+CORRECTION_CHANGE_ROOT = (
+    REPOSITORY_ROOT
+    / "openspec/changes/archive/2026-09-09-correct-company-profile-shadow-evidence-routing-and-regime-coverage"
+)
 
 
 def _hash(value: str) -> str:
@@ -44,7 +51,9 @@ def _manifest() -> ShadowSampleManifest:
 
 
 class _ManifestExtractor:
-    def __init__(self, manifest: ShadowSampleManifest, *, mismatch: bool = False) -> None:
+    def __init__(
+        self, manifest: ShadowSampleManifest, *, mismatch: bool = False
+    ) -> None:
         self._by_path = {str(item.local_path): item for item in manifest.reports}
         self._mismatch = mismatch
 
@@ -62,8 +71,11 @@ class _ManifestExtractor:
                     page_number=page,
                     printed_page_label=str(page),
                     text=(
-                        "主营业务 分部信息 产销量 原材料 前五名客户 经营模式 "
-                        f"单位：吨 受控原文第{page}页"
+                        "公司主要从事钢铁制造，主要业务包括钢材生产和销售。"
+                        "分行业 营业收入 营业成本 毛利率；产销量 单位：吨；"
+                        "主要原材料采购包括铁矿石；前五名客户销售额占比；"
+                        "公司业务、产品或服务发生重大变化：不适用。"
+                        f"受控原文第{page}页"
                     ),
                     extraction_method="native_text",
                     native_text_status="extracted",
@@ -75,7 +87,9 @@ class _ManifestExtractor:
 
 
 class _Selector:
-    def __init__(self, *, quality: str = "native", continuation_gap: bool = False) -> None:
+    def __init__(
+        self, *, quality: str = "native", continuation_gap: bool = False
+    ) -> None:
         self._quality = quality
         self._continuation_gap = continuation_gap
 
@@ -85,8 +99,11 @@ class _Selector:
         pages = (2,) if self._continuation_gap else (1, 2, 3, 4)
         for page in pages:
             text = (
-                "主营业务 分部信息 产销量 原材料 前五名客户 经营模式 "
-                f"单位：吨 受控原文第{page}页"
+                "公司主要从事钢铁制造，主要业务包括钢材生产和销售。"
+                "分行业 营业收入 营业成本 毛利率；产销量 单位：吨；"
+                "主要原材料采购包括铁矿石；前五名客户销售额占比；"
+                "公司业务、产品或服务发生重大变化：不适用。"
+                f"受控原文第{page}页"
             )
             if self._continuation_gap:
                 text += "\n续表"
@@ -115,6 +132,24 @@ class _Selector:
         )
 
 
+class _SelectorWithBlankAdjacent(_Selector):
+    def select(self, **kwargs):
+        selected = super().select(**kwargs)
+        owner = selected.sections[0]
+        blank = replace(
+            owner,
+            section_id="section-blank-adjacent",
+            page_number=2,
+            text="",
+            normalized_text="",
+            normalized_end=0,
+            page_hash=_hash("page:blank-adjacent"),
+            section_hash=_hash("section:blank-adjacent"),
+            quality="low_text",
+        )
+        return replace(selected, sections=(owner, blank))
+
+
 def test_shadow_planner_generates_six_bounded_hash_bound_chapters() -> None:
     manifest = _manifest()
     planner = ShadowEvidencePlanner(
@@ -129,7 +164,9 @@ def test_shadow_planner_generates_six_bounded_hash_bound_chapters() -> None:
         assert {task.chapter_task for task in report.tasks} == set(ChapterTask)
         assert all(
             len(scope.pages) <= 3
-            and all(right == left + 1 for left, right in zip(scope.pages, scope.pages[1:]))
+            and all(
+                right == left + 1 for left, right in zip(scope.pages, scope.pages[1:])
+            )
             for task in report.tasks
             for scope in task.request_scopes
         )
@@ -172,10 +209,15 @@ def test_shadow_planner_rejects_pdf_identity_mismatch() -> None:
     ("selector", "expected"),
     [
         (_Selector(quality="low_text"), ShadowPlanningFailureCode.PAGE_UNREADABLE),
-        (_Selector(continuation_gap=True), ShadowPlanningFailureCode.TABLE_CONTEXT_INCOMPLETE),
+        (
+            _Selector(continuation_gap=True),
+            ShadowPlanningFailureCode.TABLE_CONTEXT_INCOMPLETE,
+        ),
     ],
 )
-def test_shadow_planner_rejects_unusable_or_incomplete_evidence(selector, expected) -> None:
+def test_shadow_planner_rejects_unusable_or_incomplete_evidence(
+    selector, expected
+) -> None:
     manifest = _manifest()
     planner = ShadowEvidencePlanner(
         extractor=_ManifestExtractor(manifest),
@@ -186,6 +228,24 @@ def test_shadow_planner_rejects_unusable_or_incomplete_evidence(selector, expect
         planner.build(manifest)
 
     assert caught.value.code == expected
+
+
+def test_shadow_planner_keeps_readable_owner_when_adjacent_page_is_blank() -> None:
+    manifest = _manifest()
+    planner = ShadowEvidencePlanner(
+        extractor=_ManifestExtractor(manifest),
+        selector=_SelectorWithBlankAdjacent(),
+    )
+
+    plan = planner.build(manifest)
+
+    assert len(plan.reports) == 20
+    assert all(
+        2 not in scope.pages
+        for report in plan.reports
+        for task in report.tasks
+        for scope in task.request_scopes
+    )
 
 
 def test_shadow_plan_loader_rejects_answer_bearing_content(tmp_path: Path) -> None:
@@ -268,3 +328,208 @@ def test_scope_refinement_audit_rejects_different_manifest() -> None:
             baseline_prepared={},
             refined_prepared={},
         )
+
+
+@pytest.mark.parametrize(
+    ("chapter_task", "text"),
+    [
+        (
+            ChapterTask.EXTRACT_BUSINESS_OVERVIEW,
+            "母公司利润表 项目 2025年 2024年 一、营业收入 减：营业成本",
+        ),
+        (
+            ChapterTask.EXTRACT_SEGMENT_FINANCIALS,
+            "（四）母公司利润表 一、营业收入 289,285,706.26 营业成本 195,121,511.02",
+        ),
+        (
+            ChapterTask.EXTRACT_OPERATING_QUANTITIES,
+            "单位：元 项目 2025年末 在建工程 88,941,300.56 占总资产5.56%",
+        ),
+        (
+            ChapterTask.EXTRACT_COUNTERPARTIES_AND_CONCENTRATION,
+            "公司通过经销和直销模式服务客户并保持供应商体系稳定。",
+        ),
+        (
+            ChapterTask.EXTRACT_MATERIAL_INPUTS,
+            "受供需关系影响，本期原材料采购价格降低，产品盈利能力改善。",
+        ),
+        (
+            ChapterTask.EXTRACT_BUSINESS_REGIME,
+            "调整后期初未分配利润；由于同一控制导致的合并范围变更，影响期初未分配利润0元。",
+        ),
+    ],
+)
+def test_chapter_owner_score_rejects_reviewed_non_owner_shapes(
+    chapter_task: ChapterTask,
+    text: str,
+) -> None:
+    section = SimpleNamespace(
+        section_key="principal_business",
+        selector_reasons=("structured_hint:主营业务",),
+        text=text,
+    )
+
+    assert _chapter_owner_score(chapter_task, (section,)) == 0
+
+
+@pytest.mark.parametrize(
+    ("chapter_task", "section_key", "text"),
+    [
+        (
+            ChapterTask.EXTRACT_BUSINESS_OVERVIEW,
+            "principal_business",
+            "公司主要从事特种钢材制造，主要业务包括研发、生产和销售。",
+        ),
+        (
+            ChapterTask.EXTRACT_SEGMENT_FINANCIALS,
+            "segment_information",
+            "分产品 营业收入 营业成本 毛利率 钢材产品 100 80 20%",
+        ),
+        (
+            ChapterTask.EXTRACT_OPERATING_QUANTITIES,
+            "production_sales_inventory",
+            "主要产品产销量 单位：吨 产品A 生产量100 销售量90 库存量10",
+        ),
+        (
+            ChapterTask.EXTRACT_OPERATING_QUANTITIES,
+            "production_sales_inventory",
+            "公司实物销售收入是否大于劳务收入 □是 √否，不适用产销量披露。",
+        ),
+        (
+            ChapterTask.EXTRACT_MATERIAL_INPUTS,
+            "procurement_and_costs",
+            "公司生产所需主要原材料为铁矿石和焦炭，采用集中采购模式。",
+        ),
+        (
+            ChapterTask.EXTRACT_MATERIAL_INPUTS,
+            "cost_composition",
+            "分行业成本构成项目：原材料、燃料及动力，本期金额及占比。",
+        ),
+        (
+            ChapterTask.EXTRACT_COUNTERPARTIES_AND_CONCENTRATION,
+            "major_customers_suppliers",
+            "前五名客户销售额占年度销售总额比例38.5%。",
+        ),
+        (
+            ChapterTask.EXTRACT_BUSINESS_REGIME,
+            "principal_business",
+            "报告期主要子公司股权变动导致合并范围变化 √适用 □不适用。",
+        ),
+        (
+            ChapterTask.EXTRACT_BUSINESS_REGIME,
+            "principal_business",
+            "合并报表范围的变化情况：本期新设全资子公司并纳入合并报表范围。",
+        ),
+    ],
+)
+def test_chapter_owner_score_accepts_governed_owner_shapes(
+    chapter_task: ChapterTask,
+    section_key: str,
+    text: str,
+) -> None:
+    section = SimpleNamespace(
+        section_key=section_key,
+        selector_reasons=(f"heading_alias:{section_key}:owner",),
+        text=text,
+    )
+
+    assert _chapter_owner_score(chapter_task, (section,)) > 0
+
+
+def test_provider_free_correction_audit_closes_all_reviewed_findings() -> None:
+    audit_path = CORRECTION_CHANGE_ROOT / "correction-audit.v1.json"
+    audit = json.loads(audit_path.read_text(encoding="utf-8"))
+    audit_without_hash = {
+        key: value for key, value in audit.items() if key != "audit_hash"
+    }
+
+    assert audit["audit_hash"] == _payload_hash(audit_without_hash)
+    assert audit["finding_counts"] == {
+        "total": 25,
+        "evidence_routing": 19,
+        "statistical_calibre_scope": 3,
+        "regime_contradiction": 2,
+        "generic_material_input": 1,
+    }
+    assert len(audit["routing_results"]) == 19
+    assert len(audit["semantic_guard_results"]) == 6
+    assert audit["unresolved_finding_ids"] == []
+    assert audit["provider_calls"] == 0
+    assert audit["production_authorization"] == "not_authorized"
+
+    for binding in audit["inputs"].values():
+        source = REPOSITORY_ROOT / binding["path"]
+        assert hashlib.sha256(source.read_bytes()).hexdigest() == binding["sha256"]
+
+    cases = json.loads(
+        (CORRECTION_CHANGE_ROOT / "reviewed-correction-cases.v1.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    case_ids = {item["review_row_id"] for item in cases["cases"]}
+    audited_ids = {item["review_row_id"] for item in audit["routing_results"]} | {
+        item["review_row_id"] for item in audit["semantic_guard_results"]
+    }
+    assert audited_ids == case_ids
+
+    baseline = load_shadow_evidence_plan(
+        REPOSITORY_ROOT
+        / "openspec/changes/archive/2026-09-09-refine-company-profile-shadow-evidence-scopes/shadow-evidence-plan.v2.json"
+    )
+    corrected = load_shadow_evidence_plan(
+        CORRECTION_CHANGE_ROOT / "shadow-evidence-plan.v3.json"
+    )
+    preparation = load_shadow_preparation_audit(
+        CORRECTION_CHANGE_ROOT / "provider-free-preparation-audit.v1.json"
+    )
+    assert audit["sample_manifest_hash"] == _manifest().manifest_hash
+    assert audit["baseline_plan_hash"] == baseline.plan_hash
+    assert audit["corrected_plan_hash"] == corrected.plan_hash
+    assert audit["preparation_audit_hash"] == preparation.audit_hash
+    assert preparation.evidence_plan_hash == corrected.plan_hash
+
+    prepared = ShadowEvidencePreparer().prepare(
+        manifest=_manifest(),
+        plan=corrected,
+    )
+    for result in audit["routing_results"]:
+        baseline_scope = next(
+            scope
+            for task in baseline.report_by_id(result["sample_id"]).tasks
+            if task.chapter_task.value == result["chapter_task"]
+            for scope in task.request_scopes
+            if scope.scope_id == result["baseline_scope_id"]
+        )
+        assert list(baseline_scope.pages) == result["baseline_pages"]
+        assert result["resolution"] == "owner_valid_scope"
+        assert result["owner_valid"] is True
+        for expected in result["corrected_scopes"]:
+            scope = next(
+                item
+                for item in prepared[result["sample_id"]]
+                if item.scope_id == expected["scope_id"]
+                and item.chapter_task.value == result["chapter_task"]
+            )
+            assert [page.page for page in scope.page_contexts] == expected["pages"]
+            assert list(scope.field_ids) == expected["field_ids"]
+            sections = tuple(
+                SimpleNamespace(text=page.text, section_key="", selector_reasons=())
+                for page in scope.page_contexts
+            )
+            assert _chapter_owner_score(scope.chapter_task, sections) > 0
+            owner_pages = [
+                page.page
+                for page in scope.page_contexts
+                if _chapter_owner_score(
+                    scope.chapter_task,
+                    (
+                        SimpleNamespace(
+                            text=page.text,
+                            section_key="",
+                            selector_reasons=(),
+                        ),
+                    ),
+                )
+                > 0
+            ]
+            assert owner_pages == expected["owner_pages"]

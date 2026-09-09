@@ -1,0 +1,250 @@
+{
+  "schema_version": "company_profile_shadow_evidence_correction_cases.v1",
+  "case_set_id": "manufacturing-materials-shadow-reviewed-corrections-20260909-a",
+  "inputs": {
+    "shadow_manifest": {
+      "path": "openspec/changes/archive/2026-09-09-validate-manufacturing-materials-company-profile-shadow-batch/shadow-manifest.v1.json",
+      "sha256": "ca6d301ff7fb3b21b206be5951965059c87a7e485121c98a24475e59bad0f215"
+    },
+    "refined_plan": {
+      "path": "openspec/changes/archive/2026-09-09-refine-company-profile-shadow-evidence-scopes/shadow-evidence-plan.v2.json",
+      "sha256": "98f530f9c57c6392b5bffa8d9ca2700a12a68881c91c499754eaf042169713d3"
+    },
+    "review_package": {
+      "path": "openspec/changes/archive/2026-09-09-validate-refined-company-profile-shadow-batch/source-text-review-package.v2.json",
+      "sha256": "38480b62ac1616d58a9a290e849a841779d03ba4c7f488a5ef3e25c3e823d216"
+    },
+    "review_outcomes": {
+      "path": "openspec/changes/archive/2026-09-09-validate-refined-company-profile-shadow-batch/source-text-review-outcomes.v1.json",
+      "sha256": "a218520e731453548e21d3c6cd58aae53bc0f77e640e2be4b11db2205bd20a71"
+    },
+    "v1_batch_manifest": {
+      "path": "var/company_profile_shadow_batch/20260909/batch-manufacturing-materials-shadow-gemini-20260909-a/manifest.json",
+      "sha256": "965846458fe44f6b976e5ec6d0beed01b12ac0d2ac7ef5a43914c8195253a85c"
+    },
+    "v1_readiness_audit": {
+      "path": "var/company_profile_shadow_batch/20260909/batch-manufacturing-materials-shadow-gemini-20260909-a/readiness-audit.json",
+      "sha256": "90f2930604ea81a239374a8b8c468e37259583cadadd9f1a4b7b3f96d558cc86"
+    },
+    "refined_batch_manifest": {
+      "path": "var/company_profile_shadow_batch/20260910/batch-manufacturing-materials-shadow-refined-gemini-20260910-a/manifest.json",
+      "sha256": "7f98b4d25e1d9fb741d467f11165d977758dafeaaf2e1948c7f04111dfeeaf11"
+    },
+    "refined_readiness_audit": {
+      "path": "var/company_profile_shadow_batch/20260910/batch-manufacturing-materials-shadow-refined-gemini-20260910-a/readiness-audit.json",
+      "sha256": "668c224d3eefb910a14119c18bcefea0b3ae0a87386e9dac898bf813f7cc6bd0"
+    }
+  },
+  "finding_counts": {
+    "total": 25,
+    "evidence_routing": 19,
+    "statistical_calibre_scope": 3,
+    "regime_contradiction": 2,
+    "generic_material_input": 1
+  },
+  "cases": [
+    {
+      "review_row_id": "manufacturing-materials-shadow-600121-2025:material_inputs-01:chapter_sample:stage5-4b4c3a6f705c197375d10137",
+      "outcome": "noncritical_error",
+      "correction_family": "generic_material_input",
+      "notes_hash": "a229e8fa458e6e92110dcdb45b6a13d437a48b18bd298ad5d03f4ab58262147d",
+      "source_quote_hash": "30b2cf744b0b7db00962904ee83023bdf570683013b0c652e68f6c771ec95546",
+      "expected_resolution": "typed_semantic_rejection"
+    },
+    {
+      "review_row_id": "manufacturing-materials-shadow-600022-2025:material_inputs-01:chapter_sample:coverage:material_inputs-01:material_input",
+      "outcome": "noncritical_error",
+      "correction_family": "evidence_routing",
+      "notes_hash": "7bf8a4a0dc65bb51897e007b5b9aac5f830a945b2876e3f6f0027cb7324c93a9",
+      "source_quote_hash": "4ac6f16ddb75376dc4c52bb58e5383b410bf361c0694ab3bc838db6046c341e5",
+      "expected_resolution": "owner_valid_scope_or_typed_failure"
+    },
+    {
+      "review_row_id": "manufacturing-materials-shadow-600256-2025:material_inputs-01:chapter_sample:coverage:material_inputs-01:material_input",
+      "outcome": "noncritical_error",
+      "correction_family": "evidence_routing",
+      "notes_hash": "c3fa6bf56a403101892f8ce0cf430efb18b49d882efa368e0c967412aa1a30c5",
+      "source_quote_hash": "1c16b6fd49498b8f9956de7b0e85067cc2a43524721e5b9a0071c6a74a69cea2",
+      "expected_resolution": "owner_valid_scope_or_typed_failure"
+    },
+    {
+      "review_row_id": "manufacturing-materials-shadow-600256-2025:counterparties_and_concentration-02:chapter_sample:coverage:counterparties_and_concentration-02:counterparty_relationship",
+      "outcome": "noncritical_error",
+      "correction_family": "evidence_routing",
+      "notes_hash": "6b7fd30a8eba990b3a92adcfd7bf92d4ccb742fb4b93ee551b62c2a1f51bafc7",
+      "source_quote_hash": "de15e8620c9a807e995f11312394496263fc5930ab4ef299bfb3c8200af1fc75",
+      "expected_resolution": "owner_valid_scope_or_typed_failure"
+    },
+    {
+      "review_row_id": "manufacturing-materials-shadow-600256-2025:business_regime-01:chapter_sample:coverage:business_regime-01:business_regime",
+      "outcome": "critical_error",
+      "correction_family": "regime_contradiction",
+      "notes_hash": "d2157d1b067c15c8c1bb6cc8a0d5177ee5f20343814f1c4b399e73dd44ceddcc",
+      "source_quote_hash": "73c685f0a7b4a5592aa29dd94f620ef5af6155da52f982c8fc8a3ab40aedf4e3",
+      "expected_resolution": "typed_semantic_rejection"
+    },
+    {
+      "review_row_id": "manufacturing-materials-shadow-600063-2025:business_regime-01:chapter_sample:coverage:business_regime-01:business_regime",
+      "outcome": "noncritical_error",
+      "correction_family": "evidence_routing",
+      "notes_hash": "a688bf82b6998d2c509c135b85b1cb1582ff0c2945dcf9777ab4a8d22153f965",
+      "source_quote_hash": "b66072a3697c6e694e943e9d3d6b9c6594e9fc2ba4fa93b4d0f34c2688c4b2a8",
+      "expected_resolution": "owner_valid_scope_or_typed_failure"
+    },
+    {
+      "review_row_id": "manufacturing-materials-shadow-600075-2025:business_regime-01:chapter_sample:coverage:business_regime-01:business_regime",
+      "outcome": "noncritical_error",
+      "correction_family": "evidence_routing",
+      "notes_hash": "830ef26f54879cf80f6d74dd2c8fe154f21263a6ef05353c1692964292d6aa35",
+      "source_quote_hash": "bc52809b836b137b12c3d41bcb92f0474062eb16774a0cc85cd2a5718b7bda78",
+      "expected_resolution": "owner_valid_scope_or_typed_failure"
+    },
+    {
+      "review_row_id": "manufacturing-materials-shadow-000552-2025:business_regime-01:chapter_sample:coverage:business_regime-01:business_regime",
+      "outcome": "noncritical_error",
+      "correction_family": "statistical_calibre_scope",
+      "notes_hash": "c3191bfcbf1eb4b4964c6c9d430acf63ddaa1808de142258725d0ac06ae88b02",
+      "source_quote_hash": "fdeffb12333ef05d81d6b928fcdc34aa433d193584e22198aca547bc4ffe4ac3",
+      "expected_resolution": "typed_semantic_rejection"
+    },
+    {
+      "review_row_id": "manufacturing-materials-shadow-000629-2025:business_regime-01:chapter_sample:coverage:business_regime-01:business_regime",
+      "outcome": "noncritical_error",
+      "correction_family": "statistical_calibre_scope",
+      "notes_hash": "d4734070db3e6cca603b9bac77e726169630fc0aa13dd08cab14fada689f24f8",
+      "source_quote_hash": "db31d45d14cfa66ed8cb7d15451ec5043ed639cc3fd0eb125ff1aecf30b92864",
+      "expected_resolution": "typed_semantic_rejection"
+    },
+    {
+      "review_row_id": "manufacturing-materials-shadow-000408-2025:business_regime-01:chapter_sample:coverage:business_regime-01:business_regime",
+      "outcome": "critical_error",
+      "correction_family": "regime_contradiction",
+      "notes_hash": "061b715005b02116452ac4c29a9c62ccbbd9086d8b3d5b59e4f4cbbb4387dd3a",
+      "source_quote_hash": "2b09dba52d622a81102d460c1bedd3d83fa7cc41b4cb0d08b08b4e9a6bc0571c",
+      "expected_resolution": "typed_semantic_rejection"
+    },
+    {
+      "review_row_id": "manufacturing-materials-shadow-000060-2025:business_overview-01:chapter_sample:coverage:business_overview-01:business_overview_source",
+      "outcome": "noncritical_error",
+      "correction_family": "evidence_routing",
+      "notes_hash": "fee3f05c56af0c9a13ec85e3f78c85ecbaf9be1c7849c30ea855ba7b0ca809c9",
+      "source_quote_hash": "7bf11c7f5152c2dc4b4c8ed4d3681e00fc85ad7a49d55585616ca28f40cbd387",
+      "expected_resolution": "owner_valid_scope_or_typed_failure"
+    },
+    {
+      "review_row_id": "manufacturing-materials-shadow-000060-2025:business_regime-01:chapter_sample:coverage:business_regime-01:business_regime",
+      "outcome": "noncritical_error",
+      "correction_family": "evidence_routing",
+      "notes_hash": "9c4e3fbad62b19204a19dcdb5f4e902da9aa54129754c961ee6fe7c8c4f619c4",
+      "source_quote_hash": "49b895a25768cef8d618574c12b9837ff656e93315f555191d38df3fd5c4c9e5",
+      "expected_resolution": "owner_valid_scope_or_typed_failure"
+    },
+    {
+      "review_row_id": "manufacturing-materials-shadow-000055-2025:business_regime-01:chapter_sample:coverage:business_regime-01:business_regime",
+      "outcome": "noncritical_error",
+      "correction_family": "evidence_routing",
+      "notes_hash": "94dc16a0ed5a9c751f514a891fa6a5ad0d46c7ae1000877ed61cd186a4e2629a",
+      "source_quote_hash": "a196e7d9a687e4cff1ee885893112b51b92978a01073f78ab04c2546527d9da6",
+      "expected_resolution": "owner_valid_scope_or_typed_failure"
+    },
+    {
+      "review_row_id": "manufacturing-materials-shadow-000420-2025:counterparties_and_concentration-01:chapter_sample:coverage:counterparties_and_concentration-01:counterparty_relationship",
+      "outcome": "noncritical_error",
+      "correction_family": "evidence_routing",
+      "notes_hash": "c5f7755548bce7a53dd7af57482ba3cbe1616d76ca39bfa9c1d0eb01303b9a85",
+      "source_quote_hash": "1f0cc2e7b420c4f6dd8a3ecb949255a7c1b48953fdc73fb86ad0408ce0c84f26",
+      "expected_resolution": "owner_valid_scope_or_typed_failure"
+    },
+    {
+      "review_row_id": "manufacturing-materials-shadow-000420-2025:business_regime-01:chapter_sample:coverage:business_regime-01:business_regime",
+      "outcome": "noncritical_error",
+      "correction_family": "statistical_calibre_scope",
+      "notes_hash": "d4734070db3e6cca603b9bac77e726169630fc0aa13dd08cab14fada689f24f8",
+      "source_quote_hash": "d1acc4e5d4fe5c1158ef0ed734dc069771b58e2fcf080cb95b4b028533cf4819",
+      "expected_resolution": "typed_semantic_rejection"
+    },
+    {
+      "review_row_id": "manufacturing-materials-shadow-920016-2025:material_inputs-01:chapter_sample:coverage:material_inputs-01:material_input",
+      "outcome": "noncritical_error",
+      "correction_family": "evidence_routing",
+      "notes_hash": "aed2580a04bc157fe0d489771824e9345b2e247ef9c1c9902de38ea5c79362ef",
+      "source_quote_hash": "ea82f9cdd2c72f1df81331497738bac9e6a60f0b5cb7a7dabaebdeeb0a5622e9",
+      "expected_resolution": "owner_valid_scope_or_typed_failure"
+    },
+    {
+      "review_row_id": "manufacturing-materials-shadow-920016-2025:business_regime-01:chapter_sample:coverage:business_regime-01:business_regime",
+      "outcome": "noncritical_error",
+      "correction_family": "evidence_routing",
+      "notes_hash": "a4ee4a687dbbcfd1027475cf6c4aae56a03137862e7918e292e03274b13883ec",
+      "source_quote_hash": "3d2d9a7da263885751f1e9207bc75927d04743d399794309a5570d4cb92d7a15",
+      "expected_resolution": "owner_valid_scope_or_typed_failure"
+    },
+    {
+      "review_row_id": "manufacturing-materials-shadow-920033-2025:business_regime-01:chapter_sample:coverage:business_regime-01:business_regime",
+      "outcome": "noncritical_error",
+      "correction_family": "evidence_routing",
+      "notes_hash": "9849f0fe9aea97a6a14dc0d14527c181cd89c4e83b0d171f20e3baf23acc9660",
+      "source_quote_hash": "029c7984578f1d556e54cbba1d43471eeaea6c3fa9709c3e9bfc52e6a9214791",
+      "expected_resolution": "owner_valid_scope_or_typed_failure"
+    },
+    {
+      "review_row_id": "manufacturing-materials-shadow-920068-2025:operating_quantities-01:chapter_sample:coverage:operating_quantities-01:production_capacity",
+      "outcome": "noncritical_error",
+      "correction_family": "evidence_routing",
+      "notes_hash": "cee09cf43cdac82c6b2c9fe250d94841ad03ab0e8cf009be2fb98239572ea0b4",
+      "source_quote_hash": "879776b9c5842805a23cd796cf2b591f949425750c82df54cdbb4c3fcb16f9b3",
+      "expected_resolution": "owner_valid_scope_or_typed_failure"
+    },
+    {
+      "review_row_id": "manufacturing-materials-shadow-920078-2025:business_overview-01:chapter_sample:coverage:business_overview-01:explicit_activity",
+      "outcome": "noncritical_error",
+      "correction_family": "evidence_routing",
+      "notes_hash": "deeec560c60b5219a2e728ff664fff315061910d70dde86d337ca258fcb0107e",
+      "source_quote_hash": "20385d2e683c35558395668e5014fbe5ebd0daa4a5c1ec966d84d0ad04bc57cb",
+      "expected_resolution": "owner_valid_scope_or_typed_failure"
+    },
+    {
+      "review_row_id": "manufacturing-materials-shadow-920078-2025:segment_financials-02:chapter_sample:coverage:segment_financials-02:segment_dimension",
+      "outcome": "noncritical_error",
+      "correction_family": "evidence_routing",
+      "notes_hash": "8732d9e82a5ed1f01c7793903ca324500a1881678782715706b54fb7a1d37388",
+      "source_quote_hash": "dbab460cd330f55c221e417f4cdadb18b3c6ac08424aae6dcc0f60f05f19b8db",
+      "expected_resolution": "owner_valid_scope_or_typed_failure"
+    },
+    {
+      "review_row_id": "manufacturing-materials-shadow-920078-2025:business_regime-01:chapter_sample:coverage:business_regime-01:business_regime",
+      "outcome": "noncritical_error",
+      "correction_family": "evidence_routing",
+      "notes_hash": "e8cb5fd334c391206b040262ce5562e2a497b4b6c7d716ae4dbd3ade0922f848",
+      "source_quote_hash": "20385d2e683c35558395668e5014fbe5ebd0daa4a5c1ec966d84d0ad04bc57cb",
+      "expected_resolution": "owner_valid_scope_or_typed_failure"
+    },
+    {
+      "review_row_id": "manufacturing-materials-shadow-920076-2025:business_regime-01:chapter_sample:coverage:business_regime-01:business_regime",
+      "outcome": "noncritical_error",
+      "correction_family": "evidence_routing",
+      "notes_hash": "bffedcd8781dee051e348d0ab2a811031b905802e76c0111b1344cd7ba6be7f4",
+      "source_quote_hash": "0724dbface721b1ad17b150b1270db156d2319d5619801bb756e5a5c10d6970f",
+      "expected_resolution": "owner_valid_scope_or_typed_failure"
+    },
+    {
+      "review_row_id": "manufacturing-materials-shadow-920580-2025:counterparties_and_concentration-02:chapter_sample:coverage:counterparties_and_concentration-02:counterparty_relationship",
+      "outcome": "noncritical_error",
+      "correction_family": "evidence_routing",
+      "notes_hash": "bf1104ab169d3a873ba05c578545f0728a5ea9da2a3642476786452a13504f61",
+      "source_quote_hash": "57cdf4607f4509864260138e4a5a2f609e0ac39805261de2383c04b21281f7ed",
+      "expected_resolution": "owner_valid_scope_or_typed_failure"
+    },
+    {
+      "review_row_id": "manufacturing-materials-shadow-920580-2025:business_regime-01:chapter_sample:coverage:business_regime-01:business_regime",
+      "outcome": "noncritical_error",
+      "correction_family": "evidence_routing",
+      "notes_hash": "9c4e3fbad62b19204a19dcdb5f4e902da9aa54129754c961ee6fe7c8c4f619c4",
+      "source_quote_hash": "a3368af5881ca22a70c446c7f5c9724244b404e4516eba6095597d1474d59b39",
+      "expected_resolution": "owner_valid_scope_or_typed_failure"
+    }
+  ],
+  "provider_calls": 0,
+  "production_authorization": "not_authorized",
+  "case_set_hash": "7b1a39a4ce26083e6cea51ac1ba4adb0611d8b1d8644baf1b483383ffd72cf19"
+}

@@ -2196,6 +2196,10 @@ def _expand_extract_response(
             result["items"].append({"item_type": "segment_row", "row": row})
     elif isinstance(result.get("material_inputs"), list):
         relationships = result.pop("material_inputs")
+        _reject_generic_material_input_drafts(
+            relationships,
+            prepared_scope=prepared_scope,
+        )
         coverage = result.pop("coverage", None)
         result["schema_version"] = "company_profile_extract_response.v1"
         result["request_id"] = request.request_id
@@ -2346,8 +2350,122 @@ def _normalize_extract_response(
         request=request,
         prepared_scope=prepared_scope,
     )
+    _reject_invalid_business_regime_coverage(result, prepared_scope=prepared_scope)
     _require_reported_business_change_coverage(result, prepared_scope=prepared_scope)
     return result
+
+
+_GENERIC_MATERIAL_INPUT_NAMES = frozenset(
+    {"材料", "原材料", "原料", "原燃料", "燃料", "能源"}
+)
+
+
+def _reject_generic_material_input_drafts(
+    relationships: Any,
+    *,
+    prepared_scope: PreparedRequestScope,
+) -> None:
+    if not isinstance(relationships, list):
+        return
+    source_text = _prepared_scope_source_text(prepared_scope)
+    invalid = sorted(
+        {
+            name
+            for item in relationships
+            if isinstance(item, Mapping)
+            and (name := re.sub(r"\s+", "", str(item.get("name") or "")))
+            in _GENERIC_MATERIAL_INPUT_NAMES
+            and not _source_explicitly_uses_generic_input(name, source_text)
+        }
+    )
+    if invalid:
+        raise ValueError(
+            "material_input requires a specifically named procured or consumed item: "
+            f"{invalid}"
+        )
+
+
+def _source_explicitly_uses_generic_input(name: str, source_text: str) -> bool:
+    escaped = re.escape(name)
+    return any(
+        re.search(pattern, source_text)
+        for pattern in (
+            rf"(?:采购|购入|消耗|投入)(?:了|的)?{escaped}(?:用于生产|作为投入)?[，。；;]",
+            rf"(?:采购|消耗|投入)(?:品种|项目|内容|物料)?[:：]{escaped}(?:[，。；;]|$)",
+        )
+    )
+
+
+def _prepared_scope_source_text(prepared_scope: PreparedRequestScope) -> str:
+    fragments = [str(item.text or "") for item in prepared_scope.page_contexts]
+    fragments.extend(
+        str(getattr(item.evidence.anchor, "bounded_quote", "") or "")
+        for item in prepared_scope.evidence_bundle
+    )
+    return re.sub(r"\s+", "", "\n".join(fragments))
+
+
+def _reject_invalid_business_regime_coverage(
+    result: Any,
+    *,
+    prepared_scope: PreparedRequestScope,
+) -> None:
+    if prepared_scope.chapter_task.value != "extract_business_regime":
+        return
+    if not isinstance(result, Mapping) or not isinstance(result.get("items"), list):
+        return
+    items = result["items"]
+    not_applicable = any(
+        isinstance(item, Mapping)
+        and item.get("item_type") == "coverage"
+        and isinstance(item.get("coverage"), Mapping)
+        and item["coverage"].get("field_id") == "business_regime"
+        and item["coverage"].get("status") == "not_applicable"
+        for item in items
+    )
+    if not not_applicable:
+        return
+    source_text = _prepared_scope_source_text(prepared_scope)
+    statistical_calibre = re.search(
+        r"公司主营业务数据统计口径.{0,120}(?:不适用|[√☑]不适用)",
+        source_text,
+    )
+    broad_no_change = any(
+        re.search(pattern, source_text)
+        for pattern in (
+            r"业务、产品或服务发生重大变化.{0,80}(?:不适用|[√☑]不适用)",
+            r"合并报表范围的变化情况.{0,80}[√☑]不适用",
+            r"主要子公司股权变动导致合并范围变化.{0,80}[√☑]不适用",
+            r"(?:主营业务|主要业务|经营模式).{0,40}未发生重大变化",
+        )
+    )
+    if statistical_calibre and not broad_no_change:
+        raise ValueError(
+            "principal-business statistical-calibre coverage cannot close business_regime"
+        )
+    affirmative_change = any(
+        re.search(pattern, source_text)
+        for pattern in (
+            r"(?:合并报表范围的变化情况|主要子公司股权变动导致合并范围变化).{0,80}[√☑]适用",
+            r"(?:本期|报告期内).{0,30}(?:纳入|新增).{0,30}合并(?:报表)?范围",
+            r"纳入.{0,20}合并报表范围",
+            r"(?:新设|设立).{0,20}(?:全资)?子公司",
+            r"(?:完成)?收购.{0,40}股权",
+            r"完成股权过户",
+        )
+    )
+    has_change_event = any(
+        isinstance(item, Mapping)
+        and item.get("item_type") == "candidate"
+        and isinstance(item.get("candidate"), Mapping)
+        and item["candidate"].get("object_type") == "BusinessEvent"
+        and item["candidate"].get("field_id") == "business_regime"
+        for item in items
+    )
+    if affirmative_change and not has_change_event:
+        raise ValueError(
+            "business_regime not_applicable coverage contradicts an evidenced control-scope change"
+        )
 
 
 def _require_reported_business_change_coverage(

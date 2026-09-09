@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Any
 
 import pytest
@@ -53,6 +54,7 @@ from research.company_profile.stage5_provider import (
     _minimal_extract_schema,
     _minimal_verify_schema,
     _normalize_adapter_reported_period,
+    _normalize_extract_response,
 )
 from research.company_profile.workflow import (
     CompanyProfileSemanticService,
@@ -3362,3 +3364,309 @@ def _overview_candidate(prepared: PreparedRequestScope) -> BusinessOverview:
         source_native=SourceNativeValue(name="主要业务"),
         source_text=quote,
     )
+
+
+def _scope_with_source_text(
+    *,
+    chapter_task: ChapterTask,
+    scope_id: str,
+    field_id: str,
+    source_text: str,
+) -> PreparedRequestScope:
+    prepared = _prepared_scope().model_copy(
+        update={
+            "scope_id": scope_id,
+            "chapter_task": chapter_task,
+            "field_ids": (field_id,),
+        }
+    )
+    evidence = prepared.evidence_bundle[0].evidence.model_copy(
+        update={
+            "section_title": scope_id,
+            "anchor": TextAnchor(bounded_quote=source_text),
+        }
+    )
+    return prepared.model_copy(
+        update={
+            "evidence_bundle": (
+                PreparedEvidence(evidence=evidence, field_id=field_id),
+            ),
+            "page_contexts": (
+                PreparedPageContext(
+                    page=evidence.page,
+                    text=source_text,
+                    text_hash="f" * 64,
+                    extraction_method="pypdf",
+                    quality_status="usable",
+                ),
+            ),
+        }
+    )
+
+
+@pytest.mark.parametrize(
+    "source_text",
+    [
+        "报告期主要子公司股权变动导致合并范围变化 √适用 □不适用。",
+        "合并报表范围发生变化，2025年1月27日将仙人掌科技纳入合并报表范围，并新设全资子公司。",
+    ],
+)
+def test_business_regime_rejects_not_applicable_when_control_change_is_evidenced(
+    source_text: str,
+) -> None:
+    prepared = _scope_with_source_text(
+        chapter_task=ChapterTask.EXTRACT_BUSINESS_REGIME,
+        scope_id="business_regime",
+        field_id="business_regime",
+        source_text=source_text,
+    )
+    request = _business_regime_request(prepared)
+    evidence_id = prepared.evidence_bundle[0].evidence.evidence_id
+
+    with pytest.raises(
+        ValueError, match="contradicts an evidenced control-scope change"
+    ):
+        _normalize_extract_response(
+            {
+                "events": [],
+                "regimes": [],
+                "package_assignments": [],
+                "coverage": [
+                    {
+                        "field_id": "business_regime",
+                        "status": "not_applicable",
+                        "reason_code": "source_explicitly_not_applicable",
+                        "evidence_ids": [evidence_id],
+                    }
+                ],
+            },
+            request=request,
+            prepared_scope=prepared,
+        )
+
+
+@pytest.mark.parametrize(
+    "source_text",
+    [
+        "公司主营业务数据统计口径在报告期发生调整的情况下，公司最近1年按报告期末口径调整后的主营业务数据 □适用 ☑不适用。",
+        "公司主营业务数据统计口径在报告期发生调整的情况下，公司最近1年按报告期末口径调整后的主营业务数据 □适用 不适用。",
+        "公司主营业务数据统计口径在报告期发生调整的情况下，公司最近1年按报告期末口径调整后的主营业务数据 □适用 √不适用。",
+    ],
+)
+def test_business_regime_rejects_statistical_calibre_only_not_applicable(
+    source_text: str,
+) -> None:
+    prepared = _scope_with_source_text(
+        chapter_task=ChapterTask.EXTRACT_BUSINESS_REGIME,
+        scope_id="business_regime",
+        field_id="business_regime",
+        source_text=source_text,
+    )
+    request = _business_regime_request(prepared)
+    evidence_id = prepared.evidence_bundle[0].evidence.evidence_id
+
+    with pytest.raises(ValueError, match="statistical-calibre coverage"):
+        _normalize_extract_response(
+            {
+                "events": [],
+                "regimes": [],
+                "package_assignments": [],
+                "coverage": [
+                    {
+                        "field_id": "business_regime",
+                        "status": "not_applicable",
+                        "reason_code": "source_explicitly_not_applicable",
+                        "evidence_ids": [evidence_id],
+                    }
+                ],
+            },
+            request=request,
+            prepared_scope=prepared,
+        )
+
+
+def test_business_regime_accepts_complete_explicit_no_change_coverage() -> None:
+    source_text = (
+        "公司报告期内业务、产品或服务发生重大变化或调整有关情况 □适用 √不适用。"
+    )
+    prepared = _scope_with_source_text(
+        chapter_task=ChapterTask.EXTRACT_BUSINESS_REGIME,
+        scope_id="business_regime",
+        field_id="business_regime",
+        source_text=source_text,
+    )
+    request = _business_regime_request(prepared)
+    evidence_id = prepared.evidence_bundle[0].evidence.evidence_id
+
+    result = _normalize_extract_response(
+        {
+            "events": [],
+            "regimes": [],
+            "package_assignments": [],
+            "coverage": [
+                {
+                    "field_id": "business_regime",
+                    "status": "not_applicable",
+                    "reason_code": "source_explicitly_not_applicable",
+                    "evidence_ids": [evidence_id],
+                }
+            ],
+        },
+        request=request,
+        prepared_scope=prepared,
+    )
+
+    assert result["items"][0]["coverage"]["status"] == "not_applicable"
+
+
+@pytest.mark.parametrize("name", ["材料", "原材料", "原料", "原燃料", "燃料", "能源"])
+def test_material_input_rejects_generic_cost_categories(name: str) -> None:
+    source_text = f"分产品 成本构成项目 本期金额 煤炭 {name} 21,283.40"
+    prepared = _scope_with_source_text(
+        chapter_task=ChapterTask.EXTRACT_MATERIAL_INPUTS,
+        scope_id="material_inputs",
+        field_id="material_input",
+        source_text=source_text,
+    )
+    request = _material_input_extract_request(prepared)
+    evidence_id = prepared.evidence_bundle[0].evidence.evidence_id
+
+    with pytest.raises(ValueError, match="specifically named"):
+        _normalize_extract_response(
+            {
+                "material_inputs": [{"name": name, "evidence_id": evidence_id}],
+                "coverage": None,
+            },
+            request=request,
+            prepared_scope=prepared,
+        )
+
+
+@pytest.mark.parametrize("name", ["材料", "原材料", "原料", "原燃料", "燃料", "能源"])
+def test_material_input_accepts_generic_word_when_source_explicitly_procures_it(
+    name: str,
+) -> None:
+    source_text = f"公司直接采购{name}用于生产。"
+    prepared = _scope_with_source_text(
+        chapter_task=ChapterTask.EXTRACT_MATERIAL_INPUTS,
+        scope_id="material_inputs",
+        field_id="material_input",
+        source_text=source_text,
+    )
+    request = _material_input_extract_request(prepared)
+    evidence_id = prepared.evidence_bundle[0].evidence.evidence_id
+
+    result = _normalize_extract_response(
+        {
+            "material_inputs": [{"name": name, "evidence_id": evidence_id}],
+            "coverage": None,
+        },
+        request=request,
+        prepared_scope=prepared,
+    )
+
+    assert result["items"][0]["candidate"]["object_name"] == name
+
+
+@pytest.mark.parametrize("name", ["电", "蒸汽", "铁矿石", "天然原材料", "合成原材料"])
+def test_material_input_accepts_explicit_named_inputs(name: str) -> None:
+    source_text = f"公司生产所需主要原材料及能源包括{name}，采用集中采购模式。"
+    prepared = _scope_with_source_text(
+        chapter_task=ChapterTask.EXTRACT_MATERIAL_INPUTS,
+        scope_id="material_inputs",
+        field_id="material_input",
+        source_text=source_text,
+    )
+    request = _material_input_extract_request(prepared)
+    evidence_id = prepared.evidence_bundle[0].evidence.evidence_id
+
+    result = _normalize_extract_response(
+        {
+            "material_inputs": [{"name": name, "evidence_id": evidence_id}],
+            "coverage": None,
+        },
+        request=request,
+        prepared_scope=prepared,
+    )
+
+    assert result["items"][0]["candidate"]["object_name"] == name
+
+
+REPOSITORY_ROOT = Path(__file__).resolve().parents[3]
+CORRECTION_CHANGE_ROOT = (
+    REPOSITORY_ROOT
+    / "openspec/changes/archive/2026-09-09-correct-company-profile-shadow-evidence-routing-and-regime-coverage"
+)
+SOURCE_REVIEW_PACKAGE = (
+    REPOSITORY_ROOT
+    / "openspec/changes/archive/2026-09-09-validate-refined-company-profile-shadow-batch/source-text-review-package.v2.json"
+)
+
+
+def test_reviewed_semantic_corrections_hit_the_typed_guards() -> None:
+    cases = json.loads(
+        (CORRECTION_CHANGE_ROOT / "reviewed-correction-cases.v1.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    review_rows = {
+        row["review_row_id"]: row
+        for row in json.loads(SOURCE_REVIEW_PACKAGE.read_text(encoding="utf-8"))["rows"]
+    }
+    semantic_cases = [
+        item
+        for item in cases["cases"]
+        if item["correction_family"] != "evidence_routing"
+    ]
+
+    assert len(semantic_cases) == 6
+    for case in semantic_cases:
+        row = review_rows[case["review_row_id"]]
+        source_text = row["source_quote"]
+        if case["correction_family"] == "generic_material_input":
+            prepared = _scope_with_source_text(
+                chapter_task=ChapterTask.EXTRACT_MATERIAL_INPUTS,
+                scope_id=row["scope_id"],
+                field_id="material_input",
+                source_text=source_text,
+            )
+            request = _material_input_extract_request(prepared)
+            evidence_id = prepared.evidence_bundle[0].evidence.evidence_id
+            payload = {
+                "material_inputs": [{"name": "材料", "evidence_id": evidence_id}],
+                "coverage": None,
+            }
+            expected_error = "specifically named"
+        else:
+            prepared = _scope_with_source_text(
+                chapter_task=ChapterTask.EXTRACT_BUSINESS_REGIME,
+                scope_id=row["scope_id"],
+                field_id="business_regime",
+                source_text=source_text,
+            )
+            request = _business_regime_request(prepared)
+            evidence_id = prepared.evidence_bundle[0].evidence.evidence_id
+            payload = {
+                "events": [],
+                "regimes": [],
+                "package_assignments": [],
+                "coverage": [
+                    {
+                        "field_id": "business_regime",
+                        "status": "not_applicable",
+                        "reason_code": "source_explicitly_not_applicable",
+                        "evidence_ids": [evidence_id],
+                    }
+                ],
+            }
+            expected_error = (
+                "statistical-calibre coverage"
+                if case["correction_family"] == "statistical_calibre_scope"
+                else "contradicts an evidenced control-scope change"
+            )
+        with pytest.raises(ValueError, match=expected_error):
+            _normalize_extract_response(
+                payload,
+                request=request,
+                prepared_scope=prepared,
+            )
