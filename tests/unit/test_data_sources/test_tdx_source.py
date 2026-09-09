@@ -13,12 +13,29 @@
 """
 
 import pytest
-from datetime import datetime, date, timedelta
-from unittest.mock import Mock, MagicMock, patch, AsyncMock
+from datetime import datetime, timedelta
+from unittest.mock import Mock, patch, AsyncMock
+import threading
+import time
 
 import sys
 import os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..', '..'))
+
+PARSEABLE_BAR = {
+    "datetime": "2026-09-09",
+    "open": 10.0,
+    "high": 10.5,
+    "low": 9.8,
+    "close": 10.2,
+    "vol": 100.0,
+    "amount": 102000.0,
+}
+
+
+def _entry(ip, status, latency=1.0, port=7709, name=""):
+    from data_sources.tdx_source import IPEntry
+    return IPEntry(ip=ip, port=port, name=name, latency_ms=latency, status=status)
 
 
 # ===========================================================
@@ -231,11 +248,11 @@ class TestDailyDataReconnect:
 # 2. TdxIPManager
 # ===========================================================
 class TestTdxIPManager:
-    """IP 管理器测试 (mock socket 探测)"""
+    """IP 管理器测试 (mock 日线探针)"""
 
-    def _make_manager(self):
+    def _make_manager(self, **kwargs):
         from data_sources.tdx_source import TdxIPManager
-        return TdxIPManager(
+        params = dict(
             hosts=[
                 {"ip": "1.1.1.1", "port": 7709, "name": "测试1"},
                 {"ip": "2.2.2.2", "port": 7709, "name": "测试2"},
@@ -243,57 +260,113 @@ class TestTdxIPManager:
             ],
             blacklist_duration_hours=0.01,
             probe_timeout=0.1,
+            probe_workers=2,
+            refresh_deadline_sec=8.0,
         )
+        params.update(kwargs)
+        return TdxIPManager(**params)
 
-    @patch.object(
-        __import__('data_sources.tdx_source', fromlist=['TdxIPManager']).TdxIPManager,
-        '_probe_single'
-    )
-    def test_refresh_sorts_by_latency(self, mock_probe):
+    def _patch_probes(self, status_by_ip):
+        from data_sources.tdx_source import TdxIPManager
+
+        def fake(self, host, deadline, tracker):
+            ip = host["ip"]
+            spec = status_by_ip[ip]
+            if isinstance(spec, tuple):
+                status, latency = spec
+            else:
+                status, latency = spec, float(100 * (ord(ip[0]) or 1))
+            return _entry(ip, status, latency=latency, name=host.get("name", ""))
+
+        return patch.object(TdxIPManager, "_probe_host", fake)
+
+    def test_refresh_sorts_by_latency(self):
         """探测后按延迟排序"""
-        mock_probe.side_effect = [500.0, 100.0, 300.0]
         mgr = self._make_manager()
-        mgr.refresh()
+        with self._patch_probes({
+            "1.1.1.1": ("active", 500.0),
+            "2.2.2.2": ("active", 100.0),
+            "3.3.3.3": ("active", 300.0),
+        }):
+            mgr.refresh()
         assert len(mgr.ranked_ips) == 3
-        assert mgr.ranked_ips[0].ip == "2.2.2.2"  # 最快
+        assert mgr.ranked_ips[0].ip == "2.2.2.2"
         assert mgr.ranked_ips[1].ip == "3.3.3.3"
         assert mgr.ranked_ips[2].ip == "1.1.1.1"
 
-    @patch.object(
-        __import__('data_sources.tdx_source', fromlist=['TdxIPManager']).TdxIPManager,
-        '_probe_single'
-    )
-    def test_blacklist_and_failover(self, mock_probe):
-        """IP 拉黑后自动切换到下一个"""
-        mock_probe.side_effect = [100.0, 200.0, 300.0]
+    def test_faster_empty_bar_loses_to_slower_selectable(self):
         mgr = self._make_manager()
-        mgr.refresh()
+        with self._patch_probes({
+            "1.1.1.1": ("empty_bars", 10.0),
+            "2.2.2.2": ("active", 200.0),
+            "3.3.3.3": ("unfinished", 9999.0),
+        }):
+            mgr.refresh()
+        ip, port = mgr.get_ip()
+        assert ip == "2.2.2.2"
+        assert port == 7709
+        assert any(e.status == "empty_bars" for e in mgr.ranked_ips)
+        assert any(e.status == "unfinished" for e in mgr.ranked_ips)
 
-        # 初始最佳
+    def test_refresh_log_separates_unfinished_from_unreachable(self):
+        mgr = self._make_manager()
+        with patch("data_sources.tdx_source.tdx_logger") as logger:
+            with self._patch_probes({
+                "1.1.1.1": ("active", 100.0),
+                "2.2.2.2": ("empty_bars", 10.0),
+                "3.3.3.3": ("unfinished", 9999.0),
+            }):
+                mgr.refresh()
+        messages = " ".join(
+            str(call.args[0]) for call in logger.info.call_args_list if call.args
+        )
+        assert "empty_bars=1" in messages
+        assert "unfinished=1" in messages
+        assert "unreachable=0" in messages
+        assert "chosen=1.1.1.1:7709" in messages
+        assert "duration_sec=" in messages
+
+    def test_blacklist_and_failover(self):
+        """IP 拉黑后自动切换到下一个"""
+        mgr = self._make_manager()
+        with self._patch_probes({
+            "1.1.1.1": ("active", 100.0),
+            "2.2.2.2": ("active", 200.0),
+            "3.3.3.3": ("active", 300.0),
+        }):
+            mgr.refresh()
+
         ip, port = mgr.get_ip()
         assert ip == "1.1.1.1"
 
-        # 报告故障 → 拉黑 → 切换
         new_ip, new_port = mgr.report_failure("1.1.1.1", 7709)
         assert new_ip == "2.2.2.2"
 
-    @patch.object(
-        __import__('data_sources.tdx_source', fromlist=['TdxIPManager']).TdxIPManager,
-        '_probe_single'
-    )
-    def test_all_blacklisted_reset(self, mock_probe):
-        """全部被拉黑后清空黑名单"""
-        mock_probe.side_effect = [100.0, 200.0, 300.0]
+    def test_all_blacklisted_reset_only_selectable(self):
+        """全部可选节点被拉黑后只解封可选节点，不复活空日线站"""
         mgr = self._make_manager()
-        mgr.refresh()
+        with self._patch_probes({
+            "1.1.1.1": ("active", 100.0),
+            "2.2.2.2": ("active", 200.0),
+            "3.3.3.3": ("empty_bars", 1.0),
+        }):
+            mgr.refresh()
 
         mgr.report_failure("1.1.1.1", 7709)
-        mgr.report_failure("2.2.2.2", 7709)
-        mgr.report_failure("3.3.3.3", 7709)
+        ip, port = mgr.report_failure("2.2.2.2", 7709)
+        assert ip == "1.1.1.1"
+        assert mgr.get_ip()[0] != "3.3.3.3"
 
-        # 全部被封后应清空黑名单
-        ip, port = mgr.get_ip()
-        assert ip == "1.1.1.1"  # 回到最快的
+    def test_zero_selectable_raises_connection_error(self):
+        mgr = self._make_manager()
+        with self._patch_probes({
+            "1.1.1.1": ("empty_bars", 10.0),
+            "2.2.2.2": ("unreachable", 9999.0),
+            "3.3.3.3": ("unfinished", 9999.0),
+        }):
+            mgr.refresh()
+        with pytest.raises(ConnectionError, match="无法连接任何服务器"):
+            mgr.get_ip()
 
     def test_needs_refresh_initially(self):
         mgr = self._make_manager()
@@ -689,3 +762,444 @@ class TestConfigRoutes:
         routing = d["routing"]
         assert "pytdx" not in routing["instrument_list"]["a_stock"]
         assert "pytdx" not in routing["calendar"]["a_stock"]
+
+
+class TestDailyBarProbeClassification:
+    def test_shenzhen_only_success_is_selectable_and_healthy(self):
+        from data_sources.tdx_source import TdxIPManager, TdxSource
+
+        def get_bars(_category, _market, code, _offset, _count):
+            if code == "600000":
+                return []
+            return [PARSEABLE_BAR]
+
+        api = Mock()
+        api.connect.return_value = api
+        api.get_security_bars.side_effect = get_bars
+        api.client = None
+
+        with patch("data_sources.tdx_source.TdxHq_API", return_value=api):
+            mgr = TdxIPManager(
+                hosts=[{"ip": "8.8.8.8", "port": 7709, "name": "sz"}],
+                probe_workers=1,
+                refresh_deadline_sec=2.0,
+            )
+            mgr.refresh()
+        assert mgr.ranked_ips[0].status == "active"
+        assert TdxSource._is_connection_healthy(api)
+
+        source = TdxSource.__new__(TdxSource)
+        source.pool = Mock()
+        source.pool.get_connection.return_value = api
+        assert source._sync_test_connection() == [PARSEABLE_BAR]
+
+    def test_malformed_primary_then_parseable_fallback(self):
+        from data_sources.tdx_source import (
+            TdxIPManager,
+            TdxSource,
+            is_parseable_daily_bar,
+        )
+
+        malformed = {
+            "datetime": "not-a-date",
+            "open": 1,
+            "high": 1,
+            "low": 1,
+            "close": 1,
+        }
+        assert is_parseable_daily_bar(malformed) is False
+        nan_bar = {
+            "datetime": "2026-09-09",
+            "open": float("nan"),
+            "high": 1,
+            "low": 1,
+            "close": 1,
+        }
+        assert is_parseable_daily_bar(nan_bar) is False
+
+        def get_bars(_category, _market, code, _offset, _count):
+            if code == "600000":
+                return [malformed]
+            return [PARSEABLE_BAR]
+
+        api = Mock()
+        api.connect.return_value = api
+        api.get_security_bars.side_effect = get_bars
+        api.client = None
+        with patch("data_sources.tdx_source.TdxHq_API", return_value=api):
+            mgr = TdxIPManager(
+                hosts=[{"ip": "8.8.8.8", "port": 7709}],
+                probe_workers=1,
+                refresh_deadline_sec=2.0,
+            )
+            mgr.refresh()
+        assert mgr.ranked_ips[0].status == "active"
+        assert TdxSource._is_connection_healthy(api)
+
+    def test_transport_exception_is_not_empty_bar(self):
+        from data_sources.tdx_source import TdxIPManager
+
+        api = Mock()
+        api.connect.return_value = api
+        api.get_security_bars.side_effect = OSError("reset")
+        api.client = None
+        with patch("data_sources.tdx_source.TdxHq_API", return_value=api):
+            mgr = TdxIPManager(
+                hosts=[{"ip": "8.8.8.8", "port": 7709}],
+                probe_workers=1,
+                refresh_deadline_sec=2.0,
+            )
+            mgr.refresh()
+        assert mgr.ranked_ips[0].status == "transport_failed"
+
+    def test_swallowed_none_is_not_empty_bar(self):
+        from data_sources.tdx_source import TdxIPManager
+
+        api = Mock()
+        api.connect.return_value = api
+        api.get_security_bars.return_value = None
+        api.client = None
+        with patch("data_sources.tdx_source.TdxHq_API", return_value=api):
+            mgr = TdxIPManager(
+                hosts=[{"ip": "8.8.8.8", "port": 7709}],
+                probe_workers=1,
+                refresh_deadline_sec=2.0,
+            )
+            mgr.refresh()
+        assert mgr.ranked_ips[0].status == "transport_failed"
+
+    def test_duplicate_ip_port_is_probed_once(self):
+        from data_sources.tdx_source import merge_hq_host_lists
+
+        merged = merge_hq_host_lists(
+            [{"ip": "1.1.1.1", "port": 7709, "name": "quote"}],
+            [("pytdx", "1.1.1.1", 7709), ("broker", "2.2.2.2", 7709)],
+        )
+        assert [(h["ip"], h["port"]) for h in merged] == [
+            ("1.1.1.1", 7709),
+            ("2.2.2.2", 7709),
+        ]
+
+    def test_stale_thread_local_is_evicted(self):
+        from data_sources.tdx_source import TdxConnectionPool, TdxIPManager
+
+        mgr = TdxIPManager(
+            hosts=[
+                {"ip": "1.1.1.1", "port": 7709},
+                {"ip": "2.2.2.2", "port": 7709},
+            ],
+            probe_workers=1,
+            refresh_deadline_sec=2.0,
+        )
+        with patch.object(
+            TdxIPManager,
+            "_probe_host",
+            lambda self, host, deadline, tracker: _entry(
+                host["ip"],
+                "active",
+                latency=10 if host["ip"] == "1.1.1.1" else 20,
+            ),
+        ):
+            mgr.refresh()
+
+        first_api = Mock()
+        second_api = Mock()
+        created = {"n": 0}
+
+        def api_factory(*_args, **_kwargs):
+            created["n"] += 1
+            return first_api if created["n"] == 1 else second_api
+
+        with patch("data_sources.tdx_source.TdxHq_API", side_effect=api_factory):
+            first_api.connect.return_value = first_api
+            second_api.connect.return_value = second_api
+            pool = TdxConnectionPool(mgr)
+            assert pool.get_connection() is first_api
+            mgr.ranked_ips = [_entry("2.2.2.2", "active", latency=20)]
+            mgr._selectable_keys = {"2.2.2.2:7709"}
+            mgr._last_refresh = datetime.now()
+            with patch("data_sources.tdx_source.close_tdx_socket") as closer:
+                assert pool.get_connection() is second_api
+                closer.assert_called()
+
+
+class TestRefreshDeadlineAndLocks:
+    def test_slow_protocol_is_unfinished_within_budget(self):
+        from data_sources.tdx_source import TdxIPManager
+
+        deadline = 0.15
+
+        def slow(self, host, deadline_ts, tracker):
+            time.sleep(0.6)
+            return _entry(host["ip"], "active", latency=1.0)
+
+        mgr = TdxIPManager(
+            hosts=[{"ip": "1.1.1.1", "port": 7709}],
+            probe_workers=1,
+            refresh_deadline_sec=deadline,
+        )
+        with patch.object(TdxIPManager, "_probe_host", slow):
+            t0 = time.monotonic()
+            mgr.refresh()
+            elapsed = time.monotonic() - t0
+        assert elapsed <= deadline + 0.2
+        assert mgr.last_refresh_duration_sec <= deadline + 0.2
+        assert mgr.ranked_ips[0].status == "unfinished"
+        assert mgr.ranked_ips[0].status != "unreachable"
+
+    def test_late_results_do_not_mutate_ranking(self):
+        from data_sources.tdx_source import TdxIPManager
+
+        deadline = 0.1
+
+        def late(self, host, deadline_ts, tracker):
+            time.sleep(0.25)
+            return _entry(host["ip"], "active", latency=1.0)
+
+        mgr = TdxIPManager(
+            hosts=[{"ip": "1.1.1.1", "port": 7709}],
+            probe_workers=1,
+            refresh_deadline_sec=deadline,
+        )
+        with patch.object(TdxIPManager, "_probe_host", late):
+            mgr.refresh()
+            time.sleep(0.3)
+        assert mgr.ranked_ips[0].status == "unfinished"
+
+    def test_connect_in_progress_is_unfinished_and_socket_closed(self):
+        from data_sources.tdx_source import TdxIPManager
+
+        deadline = 0.15
+        client = Mock()
+        closed = []
+        client.shutdown = Mock()
+        client.close = Mock(side_effect=lambda: closed.append("close"))
+
+        class SlowConnect:
+            def __init__(self, **_kwargs):
+                self.client = client
+
+            def connect(self, *_args, **_kwargs):
+                time.sleep(0.6)
+                return self
+
+            def get_security_bars(self, *_args, **_kwargs):
+                return [PARSEABLE_BAR]
+
+        mgr = TdxIPManager(
+            hosts=[{"ip": "1.1.1.1", "port": 7709}],
+            probe_workers=1,
+            refresh_deadline_sec=deadline,
+        )
+        with patch("data_sources.tdx_source.TdxHq_API", SlowConnect):
+            t0 = time.monotonic()
+            mgr.refresh()
+            elapsed = time.monotonic() - t0
+        assert elapsed <= deadline + 0.2
+        assert mgr.ranked_ips[0].status == "unfinished"
+        assert closed == ["close"]
+
+    def test_shutdown_error_still_closes_and_keeps_completed_result(self):
+        from data_sources.tdx_source import TdxIPManager, close_tdx_socket
+
+        client = Mock()
+        client.shutdown.side_effect = OSError("disconnect err")
+        api = Mock()
+        api.client = client
+        close_tdx_socket(api)
+        client.close.assert_called_once()
+        assert api.client is None
+
+        deadline = 0.2
+        boom_client = Mock()
+        boom_client.shutdown.side_effect = OSError("disconnect err")
+        closed = []
+        boom_client.close.side_effect = lambda: closed.append("close")
+
+        class MixedAPI:
+            def __init__(self, **_kwargs):
+                self.client = Mock()
+                self.ip = None
+
+            def connect(self, ip, port=7709, **_kwargs):
+                self.ip = ip
+                if ip == "2.2.2.2":
+                    self.client = boom_client
+                    time.sleep(0.5)
+                return self
+
+            def get_security_bars(self, *_args, **_kwargs):
+                return [PARSEABLE_BAR]
+
+        mgr = TdxIPManager(
+            hosts=[
+                {"ip": "1.1.1.1", "port": 7709},
+                {"ip": "2.2.2.2", "port": 7709},
+            ],
+            probe_workers=2,
+            refresh_deadline_sec=deadline,
+        )
+        with patch("data_sources.tdx_source.TdxHq_API", MixedAPI):
+            mgr.refresh()
+        statuses = {e.ip: e.status for e in mgr.ranked_ips}
+        assert statuses["1.1.1.1"] == "active"
+        assert statuses["2.2.2.2"] == "unfinished"
+        assert "close" in closed
+
+    def test_expired_and_forced_refresh_do_not_deadlock_or_scan_parallel(self):
+        from data_sources.tdx_source import TdxConnectionPool, TdxIPManager
+
+        in_scan = 0
+        max_parallel = 0
+        lock = threading.Lock()
+        started = threading.Event()
+
+        def slow(self, host, deadline, tracker):
+            nonlocal in_scan, max_parallel
+            with lock:
+                in_scan += 1
+                max_parallel = max(max_parallel, in_scan)
+            started.set()
+            time.sleep(0.2)
+            with lock:
+                in_scan -= 1
+            return _entry(host["ip"], "active", latency=1.0)
+
+        mgr = TdxIPManager(
+            hosts=[{"ip": "1.1.1.1", "port": 7709}],
+            probe_workers=1,
+            refresh_deadline_sec=8.0,
+            refresh_interval_hours=0.00001,
+        )
+        errors = []
+
+        def run_expired():
+            try:
+                mgr.refresh(force=False)
+            except Exception as exc:
+                errors.append(exc)
+
+        def run_forced():
+            started.wait(2)
+            try:
+                mgr.refresh(force=True)
+            except Exception as exc:
+                errors.append(exc)
+
+        with patch.object(TdxIPManager, "_probe_host", slow):
+            t1 = threading.Thread(target=run_expired)
+            t2 = threading.Thread(target=run_forced)
+            t1.start()
+            t2.start()
+            t1.join(5)
+            t2.join(5)
+
+            pool = TdxConnectionPool(mgr)
+            started.clear()
+            mgr._last_refresh = datetime.now() - timedelta(hours=48)
+
+            def run_get():
+                try:
+                    with patch("data_sources.tdx_source.TdxHq_API") as api_cls:
+                        api_cls.return_value.connect.return_value = api_cls.return_value
+                        pool.get_connection()
+                except Exception as exc:
+                    errors.append(exc)
+
+            t3 = threading.Thread(target=run_get)
+            t4 = threading.Thread(target=run_forced)
+            t3.start()
+            t4.start()
+            t3.join(5)
+            t4.join(5)
+
+        assert not any(t.is_alive() for t in (t1, t2, t3, t4))
+        assert errors == []
+        assert max_parallel == 1
+
+
+class TestPytdxZeroHostFactoryFallback:
+    @pytest.mark.asyncio
+    async def test_zero_selectable_pytdx_lets_baostock_serve_daily(self, monkeypatch):
+        from data_sources.baostock_source import BaostockSource
+        from data_sources.source_factory import DataSourceFactory
+        from data_sources.tdx_source import TdxIPManager
+
+        cfg = {
+            "data_sources": {"a_stock": {"enabled": True}},
+            "data_sources_config": {
+                "pytdx": {
+                    "enabled": True,
+                    "exchanges_supported": ["a_stock"],
+                    "instrument_types_supported": ["stock"],
+                },
+                "baostock": {
+                    "enabled": True,
+                    "exchanges_supported": ["a_stock"],
+                    "instrument_types_supported": ["stock"],
+                },
+            },
+            "routing": {
+                "daily": {"SSE": {"stock": ["pytdx", "baostock"]}},
+                "instrument_list": {"a_stock": ["baostock"]},
+                "calendar": {"a_stock": ["baostock"]},
+                "factor": {"SSE": {"primary": "baostock"}},
+            },
+        }
+
+        class _Cfg:
+            def get(self, key, default=None):
+                return cfg.get(key, default)
+
+        def fake_refresh(self, force=True):
+            with self._lock:
+                self.ranked_ips = []
+                self._selectable_keys = set()
+                self._last_refresh = datetime.now()
+
+        async def skip_baostock_init(self):
+            return None
+
+        monkeypatch.setattr(TdxIPManager, "refresh", fake_refresh)
+        monkeypatch.setattr(BaostockSource, "_initialize_impl", skip_baostock_init)
+
+        factory = DataSourceFactory(Mock())
+        factory.config = _Cfg()
+        await factory.initialize()
+
+        assert "pytdx_a_stock" not in factory.sources
+        assert "baostock_a_stock" in factory.sources
+        baostock = factory.sources["baostock_a_stock"]
+        assert factory.get_primary_source("SSE", "stock") is baostock
+
+        quote = [{
+            "instrument_id": "600000.SH",
+            "symbol": "600000",
+            "time": datetime(2026, 9, 9),
+            "open": 9.0,
+            "high": 9.3,
+            "low": 9.0,
+            "close": 9.23,
+            "volume": 1000,
+            "amount": 9000,
+            "source": "baostock",
+        }]
+        baostock.get_daily_data = AsyncMock(return_value=quote)
+        factory._validate_daily_data = Mock(return_value=True)
+        factory._validate_daily_date_coverage = AsyncMock(return_value=True)
+        factory._validate_yfinance_tradable_volume = AsyncMock(return_value=True)
+        factory._drop_non_trading_day_daily_quotes = AsyncMock(
+            side_effect=lambda data, **_kwargs: data
+        )
+
+        rows = await factory.get_daily_data(
+            "SSE",
+            "600000.SH",
+            "600000",
+            datetime(2026, 9, 9),
+            datetime(2026, 9, 9),
+            ignore_coverage_breaker=True,
+        )
+        assert rows == quote
+        baostock.get_daily_data.assert_awaited()
+

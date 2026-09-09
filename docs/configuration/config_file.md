@@ -972,13 +972,23 @@
     ],
     "instrument_types_supported": [
       "stock"
-    ]
+    ],
+    "connection_pool_size": 3,
+    "connection_timeout_sec": 10,
+    "ip_refresh_interval_hours": 24,
+    "host_probe_workers": 16,
+    "host_probe_timeout_sec": 0.7,
+    "host_refresh_deadline_sec": 8
   }
 }
   ...
 ```
 
 - **`instrument_types_supported`**: 当前建议为 `['stock']`，因为指数日线不走 `pytdx`
+- Host 是否可选由可解析日线探针决定（先 `600000.SH`，空或不可解析再试 `000001.SZ`），候选为项目 `DEFAULT_HQ_HOSTS` 与已安装 `pytdx.config.hosts.hq_hosts` 的 `ip:port` 并集。
+- **`host_refresh_deadline_sec`**: 只约束 `TdxIPManager.refresh()`（扫描 + 截止清理），默认 8 秒；不含随后的连接池正式连接（`connection_timeout_sec`）和初始化健康检查，因此 `TdxSource` 初始化总时长可以大于 8 秒。
+- **`host_probe_workers`** / **`host_probe_timeout_sec`**: 刷新探针线程数（默认 16）和单次 socket 超时（默认 0.7 秒）。socket 超时不是整段 refresh 的证明。
+- 以上三个探针项均可省略，省略时使用上述默认值。零可选节点时 pytdx 初始化失败，日线路由按现有 `pytdx -> baostock -> akshare` 由后续源接管。
 
 ### data_sources_config.baostock
 

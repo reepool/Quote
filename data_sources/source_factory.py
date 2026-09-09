@@ -165,6 +165,9 @@ class DataSourceFactory:
                 connection_timeout=source_config.get('connection_timeout_sec', 10),
                 ip_refresh_hours=source_config.get('ip_refresh_interval_hours', 24),
                 batch_size=source_config.get('batch_size', 800),
+                host_probe_workers=source_config.get('host_probe_workers', 16),
+                host_probe_timeout_sec=source_config.get('host_probe_timeout_sec', 0.7),
+                host_refresh_deadline_sec=source_config.get('host_refresh_deadline_sec', 8),
             )
         elif source_name == 'baostock':
             connection_timeout = source_config.get(

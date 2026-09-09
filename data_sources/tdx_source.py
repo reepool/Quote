@@ -10,13 +10,14 @@
 
 import asyncio
 import logging
+import math
 import socket
 import threading
 import time
-from collections import OrderedDict
-from concurrent.futures import ThreadPoolExecutor
-from dataclasses import dataclass, field
-from datetime import datetime, date, timedelta
+from collections import Counter
+from concurrent.futures import ThreadPoolExecutor, wait as wait_futures
+from dataclasses import dataclass
+from datetime import datetime, timedelta
 from typing import Any, Dict, List, Optional, Tuple
 
 from pytdx.hq import TdxHq_API
@@ -67,6 +68,178 @@ DEFAULT_HQ_HOSTS: list[dict[str, Any]] = [
     {"ip": "60.28.29.69",    "port": 7709, "name": "天津联通"},
 ]
 
+KLINE_TYPE_DAILY = 9
+DAILY_PROBE_SYMBOLS: tuple[tuple[int, str], ...] = ((1, "600000"), (0, "000001"))
+UNREACHABLE_LATENCY_MS = 9999.0
+NO_SELECTABLE_HOST_ERROR = "pytdx 无法连接任何服务器"
+_PROBE_STATUS_ORDER = (
+    "active",
+    "empty_bars",
+    "unparseable",
+    "transport_failed",
+    "unreachable",
+    "unfinished",
+)
+
+
+def load_pytdx_hq_hosts() -> list[tuple[Any, ...]]:
+    """Return installed pytdx built-in HQ rows: (name, ip, port)."""
+    try:
+        from pytdx.config.hosts import hq_hosts
+    except Exception:
+        tdx_logger.warning("[TdxIPManager] 无法导入 pytdx.config.hosts.hq_hosts")
+        return []
+    if not hq_hosts:
+        return []
+    return list(hq_hosts)
+
+
+def merge_hq_host_lists(
+    quote_hosts: list[dict[str, Any]] | None,
+    pytdx_hosts: list[tuple[Any, ...]] | None,
+) -> list[dict[str, Any]]:
+    """Unique ip:port union of Quote dicts and pytdx (name, ip, port) tuples."""
+    merged: list[dict[str, Any]] = []
+    seen: set[tuple[str, int]] = set()
+    for host in quote_hosts or []:
+        ip = str(host.get("ip", "")).strip()
+        if not ip:
+            continue
+        port = int(host.get("port", 7709))
+        key = (ip, port)
+        if key in seen:
+            continue
+        seen.add(key)
+        merged.append({
+            "ip": ip,
+            "port": port,
+            "name": str(host.get("name", "") or ""),
+        })
+    for row in pytdx_hosts or []:
+        if row is None or len(row) < 3:
+            continue
+        name, ip, port = row[0], row[1], row[2]
+        ip = str(ip).strip()
+        if not ip:
+            continue
+        port = int(port)
+        key = (ip, port)
+        if key in seen:
+            continue
+        seen.add(key)
+        merged.append({
+            "ip": ip,
+            "port": port,
+            "name": str(name or ""),
+        })
+    return merged
+
+
+def default_hq_hosts() -> list[dict[str, Any]]:
+    return merge_hq_host_lists(DEFAULT_HQ_HOSTS, load_pytdx_hq_hosts())
+
+
+def parse_tdx_bar_datetime(bar: dict) -> datetime | None:
+    """解析 pytdx bar 的 datetime 字段。"""
+    dt_str = bar.get("datetime", "")
+    if dt_str:
+        try:
+            return datetime.strptime(str(dt_str)[:10], "%Y-%m-%d")
+        except ValueError:
+            pass
+    try:
+        return datetime(
+            int(bar.get("year", 0)),
+            int(bar.get("month", 1)),
+            int(bar.get("day", 1)),
+        )
+    except (ValueError, TypeError):
+        return None
+
+
+def _finite_ohlc_price(value: Any) -> bool:
+    try:
+        number = float(value)
+    except (TypeError, ValueError):
+        return False
+    return math.isfinite(number)
+
+
+def is_parseable_daily_bar(bar: Any) -> bool:
+    if not isinstance(bar, dict):
+        return False
+    if parse_tdx_bar_datetime(bar) is None:
+        return False
+    return all(
+        _finite_ohlc_price(bar.get(key)) for key in ("open", "high", "low", "close")
+    )
+
+
+def first_parseable_daily_bars(api: TdxHq_API) -> list | None:
+    """Shared liquid-symbol probe: SSE 600000 then SZSE 000001.
+
+    Empty or unparseable on the first symbol tries the second. A transport
+    failure does not continue on this socket.
+    """
+    for market, code in DAILY_PROBE_SYMBOLS:
+        try:
+            bars = api.get_security_bars(KLINE_TYPE_DAILY, market, code, 0, 1)
+        except Exception:
+            return None
+        if bars is None:
+            return None
+        if any(is_parseable_daily_bar(bar) for bar in bars):
+            return bars
+    return None
+
+
+def close_tdx_socket(api: Any) -> None:
+    """Best-effort closer: shutdown then close, each in its own try. Never raises."""
+    if api is None:
+        return
+    client = getattr(api, "client", None)
+    if client is None:
+        return
+    try:
+        client.shutdown(socket.SHUT_RDWR)
+    except Exception:
+        pass
+    try:
+        client.close()
+    except Exception:
+        pass
+    try:
+        api.client = None
+    except Exception:
+        pass
+
+
+def _host_key(ip: str, port: int) -> str:
+    return f"{ip}:{int(port)}"
+
+
+class _ProbeSocketTracker:
+    def __init__(self) -> None:
+        self._lock = threading.Lock()
+        self._apis: list[Any] = []
+
+    def register(self, api: Any) -> None:
+        with self._lock:
+            self._apis.append(api)
+
+    def unregister(self, api: Any) -> None:
+        with self._lock:
+            try:
+                self._apis.remove(api)
+            except ValueError:
+                pass
+
+    def close_all(self) -> None:
+        with self._lock:
+            apis = list(self._apis)
+        for api in apis:
+            close_tdx_socket(api)
+
 
 # ---------------------------------------------------------------------------
 # TdxIPManager: IP 探测 + 故障转移 + 黑名单
@@ -76,17 +249,17 @@ class IPEntry:
     ip: str
     port: int
     name: str = ""
-    latency_ms: float = 9999.0
-    status: str = "unknown"  # active / blacklisted / untested
+    latency_ms: float = UNREACHABLE_LATENCY_MS
+    status: str = "unknown"
 
 
 class TdxIPManager:
     """通达信行情服务器 IP 管理器
 
     功能:
-      1. 启动时并发探测所有候选 IP, 按延迟排序
-      2. 请求失败时将 IP 加入黑名单, 自动切换到下一个
-      3. 黑名单 IP 到期后自动解封
+      1. 启动时并发探测候选 IP, 按可解析日线延迟排序
+      2. 请求失败时将可选 IP 加入黑名单, 自动切换到下一个可选节点
+      3. 黑名单 IP 到期后自动解封（仅限最近一轮可选节点）
       4. 支持定期刷新 IP 延迟排名
     """
 
@@ -96,79 +269,64 @@ class TdxIPManager:
         blacklist_duration_hours: float = 1.0,
         refresh_interval_hours: float = 24.0,
         probe_timeout: float = 0.7,
+        probe_workers: int = 16,
+        refresh_deadline_sec: float = 8.0,
     ):
-        self._hosts = hosts or DEFAULT_HQ_HOSTS
+        self._hosts = hosts if hosts is not None else default_hq_hosts()
         self._blacklist_duration = timedelta(hours=blacklist_duration_hours)
         self._refresh_interval = timedelta(hours=refresh_interval_hours)
-        self._probe_timeout = probe_timeout
+        self._probe_timeout = float(probe_timeout)
+        self._probe_workers = max(1, int(probe_workers))
+        self._refresh_deadline_sec = max(0.0, float(refresh_deadline_sec))
 
         self.ranked_ips: list[IPEntry] = []
         self.blacklist: dict[str, datetime] = {}  # "ip:port" → 解封时间
+        self._selectable_keys: set[str] = set()
         self._last_refresh: datetime | None = None
         self._lock = threading.Lock()
+        self._refresh_mutex = threading.Lock()
+        self.last_refresh_duration_sec: float = 0.0
 
     # ---- 公开接口 ----
 
-    def refresh(self) -> None:
-        """同步探测所有候选 IP, 按延迟排序"""
-        tdx_logger.info(f"[TdxIPManager] 开始探测 {len(self._hosts)} 个候选 IP...")
-        results: list[IPEntry] = []
-
-        for host in self._hosts:
-            ip = host["ip"]
-            port = host.get("port", 7709)
-            name = host.get("name", "")
-            latency = self._probe_single(ip, port)
-            entry = IPEntry(ip=ip, port=port, name=name, latency_ms=latency)
-            entry.status = "active" if latency < 9000 else "unreachable"
-            results.append(entry)
-
-        # 按延迟排序, 不可达的排最后
-        results.sort(key=lambda e: e.latency_ms)
-        active_count = sum(1 for e in results if e.status == "active")
-
-        with self._lock:
-            self.ranked_ips = results
-            self._last_refresh = datetime.now()
-
-        tdx_logger.info(
-            f"[TdxIPManager] 探测完成: {active_count}/{len(results)} 可达, "
-            f"最快: {results[0].ip}:{results[0].port} ({results[0].latency_ms:.1f}ms)"
-            if active_count > 0 else
-            f"[TdxIPManager] 探测完成: 无可达 IP!"
-        )
+    def refresh(self, force: bool = True) -> None:
+        """并发探测候选 IP。force=False 时仅在排名到期后扫描。"""
+        with self._refresh_mutex:
+            if not force and not self.needs_refresh():
+                return
+            self._run_scan()
 
     def get_ip(self) -> Tuple[str, int]:
-        """获取当前最佳可用 IP (跳过黑名单中的)"""
+        """获取当前最佳可选 IP (跳过黑名单)。"""
         now = datetime.now()
         with self._lock:
+            self._expire_blacklist_unlocked(now)
             for entry in self.ranked_ips:
-                key = f"{entry.ip}:{entry.port}"
+                key = _host_key(entry.ip, entry.port)
                 if key in self.blacklist:
-                    if now > self.blacklist[key]:
-                        # 到期自动解封
-                        del self.blacklist[key]
-                        entry.status = "active"
-                    else:
-                        continue
-                if entry.status == "active":
+                    continue
+                if entry.status == "active" and key in self._selectable_keys:
                     return (entry.ip, entry.port)
 
-            # 极端: 全部被封 → 清空黑名单重试
-            if self.ranked_ips:
-                tdx_logger.warning("[TdxIPManager] 所有 IP 被封, 清空黑名单重试")
-                self.blacklist.clear()
-                for e in self.ranked_ips:
-                    e.status = "active"
-                return (self.ranked_ips[0].ip, self.ranked_ips[0].port)
+            selectable = [
+                entry for entry in self.ranked_ips
+                if _host_key(entry.ip, entry.port) in self._selectable_keys
+            ]
+            if selectable:
+                tdx_logger.warning("[TdxIPManager] 所有可选 IP 被封, 仅清空可选节点黑名单")
+                for entry in selectable:
+                    key = _host_key(entry.ip, entry.port)
+                    self.blacklist.pop(key, None)
+                    entry.status = "active"
+                selectable.sort(key=lambda e: e.latency_ms)
+                return (selectable[0].ip, selectable[0].port)
 
-        # 兜底
-        tdx_logger.error("[TdxIPManager] 无可用 IP, 使用硬编码兜底")
-        return ("180.153.18.170", 7709)
+        tdx_logger.error("[TdxIPManager] 无日线可用 IP")
+        raise ConnectionError(NO_SELECTABLE_HOST_ERROR)
 
     def report_failure(self, ip: str, port: int) -> Tuple[str, int]:
         """报告连接失败, 拉黑当前 IP, 返回下一个可用 IP"""
-        key = f"{ip}:{port}"
+        key = _host_key(ip, port)
         with self._lock:
             self.blacklist[key] = datetime.now() + self._blacklist_duration
             for entry in self.ranked_ips:
@@ -182,30 +340,236 @@ class TdxIPManager:
 
     def report_success(self, ip: str, port: int) -> None:
         """报告连接成功"""
-        key = f"{ip}:{port}"
+        key = _host_key(ip, port)
         with self._lock:
             self.blacklist.pop(key, None)
+            if key in self._selectable_keys:
+                for entry in self.ranked_ips:
+                    if entry.ip == ip and entry.port == port:
+                        entry.status = "active"
+                        break
 
     def needs_refresh(self) -> bool:
         """是否需要刷新 IP 排名"""
+        with self._lock:
+            return self._needs_refresh_unlocked()
+
+    def has_selectable_host(self) -> bool:
+        with self._lock:
+            return any(
+                entry.status == "active"
+                and _host_key(entry.ip, entry.port) in self._selectable_keys
+                for entry in self.ranked_ips
+            )
+
+    def is_host_selectable(self, ip: str, port: int) -> bool:
+        now = datetime.now()
+        key = _host_key(ip, port)
+        with self._lock:
+            self._expire_blacklist_unlocked(now)
+            if key not in self._selectable_keys:
+                return False
+            if key in self.blacklist:
+                return False
+            return True
+
+    # ---- 内部 ----
+
+    def _needs_refresh_unlocked(self) -> bool:
         if self._last_refresh is None:
             return True
         return datetime.now() - self._last_refresh > self._refresh_interval
 
-    # ---- 内部 ----
+    def _expire_blacklist_unlocked(self, now: datetime) -> None:
+        expired = [key for key, until in self.blacklist.items() if now > until]
+        for key in expired:
+            del self.blacklist[key]
+            if key in self._selectable_keys:
+                for entry in self.ranked_ips:
+                    if _host_key(entry.ip, entry.port) == key:
+                        entry.status = "active"
+                        break
 
-    def _probe_single(self, ip: str, port: int) -> float:
-        """探测单个 IP 的延迟(ms), 失败返回 9999"""
-        api = TdxHq_API()
+    def _run_scan(self) -> None:
+        hosts = list(self._hosts)
+        t0 = time.monotonic()
+        deadline = t0 + self._refresh_deadline_sec
+        tdx_logger.info(f"[TdxIPManager] 开始探测 {len(hosts)} 个候选 IP...")
+
+        accepted: dict[tuple[str, int], IPEntry] = {}
+        accepted_lock = threading.Lock()
+        tracker = _ProbeSocketTracker()
+        workers = min(self._probe_workers, max(1, len(hosts))) if hosts else 1
+        executor = ThreadPoolExecutor(
+            max_workers=workers,
+            thread_name_prefix="tdx-probe",
+        )
+        futures = []
         try:
-            t0 = time.monotonic()
-            with api.connect(ip, port, time_out=self._probe_timeout):
-                res = api.get_security_list(0, 1)
-                if res and len(res) > 0:
-                    return (time.monotonic() - t0) * 1000
-            return 9999.0
+            for host in hosts:
+                if time.monotonic() >= deadline:
+                    break
+                futures.append(
+                    executor.submit(
+                        self._record_probe,
+                        host,
+                        deadline,
+                        tracker,
+                        accepted,
+                        accepted_lock,
+                    )
+                )
+            remaining = deadline - time.monotonic()
+            if remaining > 0 and futures:
+                wait_futures(futures, timeout=remaining)
+        finally:
+            executor.shutdown(wait=False, cancel_futures=True)
+            tracker.close_all()
+
+        results: list[IPEntry] = []
+        for host in hosts:
+            ip = str(host["ip"])
+            port = int(host.get("port", 7709))
+            name = str(host.get("name", "") or "")
+            entry = accepted.get((ip, port))
+            if entry is None:
+                entry = IPEntry(
+                    ip=ip,
+                    port=port,
+                    name=name,
+                    latency_ms=UNREACHABLE_LATENCY_MS,
+                    status="unfinished",
+                )
+            results.append(entry)
+
+        results.sort(
+            key=lambda e: (0 if e.status == "active" else 1, e.latency_ms)
+        )
+        selectable_keys = {
+            _host_key(entry.ip, entry.port)
+            for entry in results
+            if entry.status == "active"
+        }
+        counts = Counter(entry.status for entry in results)
+        duration = time.monotonic() - t0
+        chosen = next((e for e in results if e.status == "active"), None)
+
+        with self._lock:
+            self.ranked_ips = results
+            self._selectable_keys = selectable_keys
+            self._last_refresh = datetime.now()
+            self.last_refresh_duration_sec = duration
+            stale_keys = [key for key in self.blacklist if key not in selectable_keys]
+            for key in stale_keys:
+                self.blacklist.pop(key, None)
+
+        count_text = " ".join(
+            f"{name}={counts.get(name, 0)}" for name in _PROBE_STATUS_ORDER
+        )
+        if chosen is not None:
+            tdx_logger.info(
+                f"[TdxIPManager] 探测完成: {count_text} "
+                f"chosen={chosen.ip}:{chosen.port} "
+                f"latency_ms={chosen.latency_ms:.1f} "
+                f"duration_sec={duration:.3f}"
+            )
+        else:
+            tdx_logger.info(
+                f"[TdxIPManager] 探测完成: {count_text} "
+                f"duration_sec={duration:.3f} 无日线可用 IP"
+            )
+
+    def _record_probe(
+        self,
+        host: dict[str, Any],
+        deadline: float,
+        tracker: _ProbeSocketTracker,
+        accepted: dict[tuple[str, int], IPEntry],
+        accepted_lock: threading.Lock,
+    ) -> None:
+        ip = str(host["ip"])
+        port = int(host.get("port", 7709))
+        try:
+            entry = self._probe_host(host, deadline, tracker)
         except Exception:
-            return 9999.0
+            entry = IPEntry(
+                ip=ip,
+                port=port,
+                name=str(host.get("name", "") or ""),
+                latency_ms=UNREACHABLE_LATENCY_MS,
+                status="unreachable",
+            )
+        finished_at = time.monotonic()
+        if finished_at > deadline:
+            return
+        with accepted_lock:
+            accepted[(entry.ip, entry.port)] = entry
+
+    def _probe_host(
+        self,
+        host: dict[str, Any],
+        deadline: float,
+        tracker: _ProbeSocketTracker,
+    ) -> IPEntry:
+        ip = str(host["ip"])
+        port = int(host.get("port", 7709))
+        name = str(host.get("name", "") or "")
+        if time.monotonic() >= deadline:
+            return IPEntry(
+                ip=ip, port=port, name=name,
+                latency_ms=UNREACHABLE_LATENCY_MS, status="unfinished",
+            )
+
+        api = TdxHq_API(heartbeat=False, auto_retry=False, raise_exception=True)
+        tracker.register(api)
+        t0 = time.monotonic()
+        saw_unparseable = False
+        try:
+            try:
+                api.connect(ip, port, time_out=self._probe_timeout)
+            except Exception:
+                return IPEntry(
+                    ip=ip, port=port, name=name,
+                    latency_ms=UNREACHABLE_LATENCY_MS, status="unreachable",
+                )
+
+            for market, code in DAILY_PROBE_SYMBOLS:
+                if time.monotonic() >= deadline:
+                    return IPEntry(
+                        ip=ip, port=port, name=name,
+                        latency_ms=UNREACHABLE_LATENCY_MS, status="unfinished",
+                    )
+                try:
+                    bars = api.get_security_bars(
+                        KLINE_TYPE_DAILY, market, code, 0, 1
+                    )
+                except Exception:
+                    return IPEntry(
+                        ip=ip, port=port, name=name,
+                        latency_ms=UNREACHABLE_LATENCY_MS, status="transport_failed",
+                    )
+                if bars is None:
+                    return IPEntry(
+                        ip=ip, port=port, name=name,
+                        latency_ms=UNREACHABLE_LATENCY_MS, status="transport_failed",
+                    )
+                if any(is_parseable_daily_bar(bar) for bar in bars):
+                    latency_ms = (time.monotonic() - t0) * 1000.0
+                    return IPEntry(
+                        ip=ip, port=port, name=name,
+                        latency_ms=latency_ms, status="active",
+                    )
+                if bars:
+                    saw_unparseable = True
+
+            status = "unparseable" if saw_unparseable else "empty_bars"
+            return IPEntry(
+                ip=ip, port=port, name=name,
+                latency_ms=UNREACHABLE_LATENCY_MS, status=status,
+            )
+        finally:
+            close_tdx_socket(api)
+            tracker.unregister(api)
 
 
 # ---------------------------------------------------------------------------
@@ -231,44 +595,67 @@ class TdxConnectionPool:
     def get_connection(self) -> TdxHq_API:
         """获取一个可用连接 (线程安全)
 
-        如果当前线程已有连接, 直接返回; 否则从池中分配或创建新连接.
+        如果当前线程已有连接且主机仍可选, 直接返回; 否则从池中分配或创建新连接.
         """
-        # 检查线程本地连接
-        api = getattr(self._local, 'api', None)
-        if api is not None:
-            return api
+        if self._ip_manager.needs_refresh():
+            self._ip_manager.refresh(force=False)
 
-        # 分配或创建
+        api = getattr(self._local, "api", None)
+        if api is not None:
+            ip = getattr(self._local, "ip", None)
+            port = getattr(self._local, "port", None)
+            if (
+                ip is not None
+                and port is not None
+                and self._ip_manager.is_host_selectable(ip, port)
+            ):
+                return api
+            self._discard_local_connection()
+
+        return self._open_connection()
+
+    def _open_connection(self) -> TdxHq_API:
         ip, port = self._ip_manager.get_ip()
         api = TdxHq_API()
         try:
             api.connect(ip, port, time_out=self._timeout)
-            self._local.api = api
-            self._local.ip = ip
-            self._local.port = port
-            with self._lock:
-                self._connections.append((api, ip, port))
+            self._store_local(api, ip, port)
             return api
         except Exception as e:
             tdx_logger.error(f"[TdxConnectionPool] 连接 {ip}:{port} 失败: {e}")
             new_ip, new_port = self._ip_manager.report_failure(ip, port)
-            # 重试一次
             api2 = TdxHq_API()
             try:
                 api2.connect(new_ip, new_port, time_out=self._timeout)
-                self._local.api = api2
-                self._local.ip = new_ip
-                self._local.port = new_port
-                with self._lock:
-                    self._connections.append((api2, new_ip, new_port))
+                self._store_local(api2, new_ip, new_port)
                 return api2
             except Exception as e2:
                 tdx_logger.error(
                     f"[TdxConnectionPool] 重试 {new_ip}:{new_port} 也失败: {e2}"
                 )
                 raise ConnectionError(
-                    f"pytdx 无法连接任何服务器: 首选 {ip}:{port}, 重试 {new_ip}:{new_port}"
+                    f"{NO_SELECTABLE_HOST_ERROR}: 首选 {ip}:{port}, 重试 {new_ip}:{new_port}"
                 ) from e2
+
+    def _store_local(self, api: TdxHq_API, ip: str, port: int) -> None:
+        self._local.api = api
+        self._local.ip = ip
+        self._local.port = port
+        with self._lock:
+            self._connections.append((api, ip, port))
+
+    def _discard_local_connection(self) -> None:
+        old_api = getattr(self._local, "api", None)
+        if old_api is not None:
+            close_tdx_socket(old_api)
+            with self._lock:
+                self._connections = [
+                    (a, i, p) for a, i, p in self._connections
+                    if a is not old_api
+                ]
+        self._local.api = None
+        self._local.ip = None
+        self._local.port = None
 
     def reconnect_current(self, mark_failure: bool = True) -> TdxHq_API:
         """断线重连当前线程的连接
@@ -276,39 +663,23 @@ class TdxConnectionPool:
         Args:
             mark_failure: 是否将当前 IP 标记为故障（拉黑）。因为有时只是为了怀疑断连而主动重刷连接，并不代表服务器一定宕机。
         """
-        old_api = getattr(self._local, 'api', None)
-        old_ip = getattr(self._local, 'ip', None)
-        old_port = getattr(self._local, 'port', None)
-
-        # 清理旧连接
-        if old_api:
-            try:
-                old_api.disconnect()
-            except Exception:
-                pass
-            self._local.api = None
-            with self._lock:
-                self._connections = [
-                    (a, i, p) for a, i, p in self._connections
-                    if a is not old_api
-                ]
-
-        # 如果是因为当前 IP 故障, 切换到新 IP
+        old_ip = getattr(self._local, "ip", None)
+        old_port = getattr(self._local, "port", None)
+        self._discard_local_connection()
         if old_ip and old_port and mark_failure:
             self._ip_manager.report_failure(old_ip, old_port)
-
         return self.get_connection()
 
     def close_all(self) -> None:
         """关闭所有连接"""
         with self._lock:
-            for api, ip, port in self._connections:
-                try:
-                    api.disconnect()
-                except Exception:
-                    pass
+            connections = list(self._connections)
             self._connections.clear()
+        for api, ip, port in connections:
+            close_tdx_socket(api)
         self._local.api = None
+        self._local.ip = None
+        self._local.port = None
         tdx_logger.info("[TdxConnectionPool] 所有连接已关闭")
 
 
@@ -337,8 +708,7 @@ INDEX_CODES: dict[int, tuple[str, ...]] = {
     0: ("399001", "399006", "399300", "399005", "399673"),
 }
 
-# K线类型常量
-KLINE_TYPE_DAILY = 9  # 日线
+# K线类型常量见文件前部 KLINE_TYPE_DAILY
 
 
 def _parse_instrument_id(instrument_id: str) -> Tuple[int, str]:
@@ -377,6 +747,9 @@ class TdxSource(BaseDataSource):
         connection_timeout: float = 10.0,
         ip_refresh_hours: float = 24.0,
         batch_size: int = 800,
+        host_probe_workers: int = 16,
+        host_probe_timeout_sec: float = 0.7,
+        host_refresh_deadline_sec: float = 8.0,
     ):
         super().__init__(name, rate_limit_config)
         self.supported_exchanges = ['SSE', 'SZSE', 'BSE']  # pytdx 支持全部 A 股交易所
@@ -386,6 +759,9 @@ class TdxSource(BaseDataSource):
 
         self.ip_manager = TdxIPManager(
             refresh_interval_hours=ip_refresh_hours,
+            probe_timeout=host_probe_timeout_sec,
+            probe_workers=host_probe_workers,
+            refresh_deadline_sec=host_refresh_deadline_sec,
         )
         self.pool: TdxConnectionPool | None = None
 
@@ -404,6 +780,8 @@ class TdxSource(BaseDataSource):
         # IP 探测 (在线程池中执行, 避免阻塞)
         tdx_logger.info(f"[{self.name}] 开始 IP 探测...")
         await loop.run_in_executor(self._executor, self.ip_manager.refresh)
+        if not self.ip_manager.has_selectable_host():
+            raise ConnectionError(NO_SELECTABLE_HOST_ERROR)
 
         # 创建连接池
         self.pool = TdxConnectionPool(
@@ -412,7 +790,7 @@ class TdxSource(BaseDataSource):
             timeout=self._connection_timeout,
         )
 
-        # 验证连接: 获取一条数据
+        # 验证连接: 获取一条可解析日线
         try:
             test_result = await loop.run_in_executor(
                 self._executor,
@@ -421,10 +799,7 @@ class TdxSource(BaseDataSource):
             if test_result:
                 tdx_logger.info(f"[{self.name}] 连接验证成功")
             else:
-                tdx_logger.warning(
-                    f"[{self.name}] 连接验证无日线: TCP/品种列表可达, "
-                    f"但 get_security_bars 为空"
-                )
+                raise ConnectionError(NO_SELECTABLE_HOST_ERROR)
         except Exception as e:
             tdx_logger.error(f"[{self.name}] 连接验证失败: {e}")
             raise
@@ -438,25 +813,14 @@ class TdxSource(BaseDataSource):
             tdx_logger.warning(f"[{self.name}] 因子引擎模块未找到, 跳过")
 
     def _sync_test_connection(self) -> list | None:
-        """同步连接测试: 品种列表可达不足以证明日线可用。"""
+        """同步连接测试: 使用与刷新相同的可解析日线探针。"""
         api = self.pool.get_connection()
-        if not self._is_connection_healthy(api):
-            return []
-        return api.get_security_bars(KLINE_TYPE_DAILY, 1, "600000", 0, 1)
+        return first_parseable_daily_bars(api)
 
     @staticmethod
     def _is_connection_healthy(api: TdxHq_API) -> bool:
         """Use liquid A-share symbols to distinguish an empty series from a dead socket."""
-        for market, code in ((1, "600000"), (0, "000001")):
-            try:
-                bars = api.get_security_bars(
-                    KLINE_TYPE_DAILY, market, code, 0, 1
-                )
-            except Exception:
-                continue
-            if bars:
-                return True
-        return False
+        return first_parseable_daily_bars(api) is not None
 
     # ================================================================
     # BaseDataSource 抽象方法实现
@@ -866,6 +1230,8 @@ class TdxSource(BaseDataSource):
         try:
             loop = asyncio.get_event_loop()
             await loop.run_in_executor(self._executor, self.ip_manager.refresh)
+            if not self.ip_manager.has_selectable_host():
+                return False
             if self.pool:
                 self.pool.close_all()
             self.pool = TdxConnectionPool(
@@ -893,21 +1259,7 @@ class TdxSource(BaseDataSource):
     @staticmethod
     def _parse_bar_datetime(bar: dict) -> datetime | None:
         """解析 pytdx bar 的 datetime 字段"""
-        dt_str = bar.get("datetime", "")
-        if dt_str:
-            try:
-                return datetime.strptime(dt_str[:10], "%Y-%m-%d")
-            except ValueError:
-                pass
-        # 回退到 year/month/day 字段
-        try:
-            return datetime(
-                int(bar.get("year", 0)),
-                int(bar.get("month", 1)),
-                int(bar.get("day", 1)),
-            )
-        except (ValueError, TypeError):
-            return None
+        return parse_tdx_bar_datetime(bar)
 
     def _convert_bars_to_quotes(
         self,
