@@ -413,8 +413,9 @@ def test_repository_llm_config_is_enabled_non_secret_and_has_one_owner():
         "scorpio:gemini-3.8-flash-high",
         "zai:glm-5.3-flash",
         "scorpio:grok-4.6",
+        "deepseek:deepseek-v4-flash-vision-exp",
     ]
-    assert [member.weight for member in members] == [1, 1, 1]
+    assert [member.weight for member in members] == [1, 1, 1, 1]
     assert config.pools["shared_semantic"].failover.enabled is True
     profiles = config.profiles
     assert profiles["semantic_extraction__scorpio_grok"].enabled is True
@@ -471,6 +472,27 @@ def test_repository_llm_config_is_enabled_non_secret_and_has_one_owner():
     )
     assert profiles["semantic_extraction__zai"].endpoint == "/chat/completions"
     assert config.provider_resources["zai"].hard_max_concurrency == 20
+    assert profiles["semantic_extraction__deepseek"].enabled is True
+    assert (
+        profiles["corporate_action_title_classification__deepseek"].enabled
+        is True
+    )
+    assert profiles["semantic_extraction__deepseek"].api_key_env == (
+        "QUOTE_LLM_DEEPSEEK_API_KEY"
+    )
+    assert profiles["semantic_extraction__deepseek"].model == (
+        "deepseek-v4-flash-vision-exp"
+    )
+    assert profiles["semantic_extraction__deepseek"].source_label == (
+        "deepseek:deepseek-v4-flash-vision-exp"
+    )
+    assert profiles["semantic_extraction__deepseek"].base_url == (
+        "https://api.deepseek.com"
+    )
+    assert profiles["semantic_extraction__deepseek"].endpoint == (
+        "/v1/chat/completions"
+    )
+    assert config.provider_resources["deepseek"].hard_max_concurrency == 20
     assert profiles["semantic_extraction__scorpio_gemini"].api_key_env == (
         "QUOTE_LLM_SCORPIO_GEMINI_API_KEY"
     )
@@ -490,7 +512,7 @@ def test_repository_llm_config_is_enabled_non_secret_and_has_one_owner():
     assert "unit-test-key" not in serialized
 
 
-def test_repository_llm_config_routes_gemini_grok_and_zai_equal_weight():
+def test_repository_llm_config_routes_four_equal_weight_members():
     raw = json.loads(Path("config/13_llm.json").read_text(encoding="utf-8"))["llm"]
     pool = raw["pools"]["shared_semantic"]
 
@@ -504,8 +526,10 @@ def test_repository_llm_config_routes_gemini_grok_and_zai_equal_weight():
         "semantic_extraction__scorpio_gemini",
         "semantic_extraction__zai",
         "semantic_extraction__scorpio_grok",
+        "semantic_extraction__deepseek",
     ]
     assert [member.weight for member in config.pools["shared_semantic"].members] == [
+        1,
         1,
         1,
         1,
