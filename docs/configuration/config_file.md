@@ -1118,7 +1118,11 @@
     "daily_behavior": {
       "default": {
         "stock": {
-          "skip_backup_on_empty_short_range": true
+          "skip_backup_on_empty_short_range": false,
+          "require_end_date_coverage": true,
+          "stale_source_circuit_breaker_threshold": 3,
+          "transport_error_circuit_breaker_threshold": 3,
+          "transport_error_circuit_breaker_probe_every": 20
         },
         "index": {
           "skip_backup_on_empty_short_range": false,
@@ -1163,9 +1167,9 @@
 - **`routing.daily_behavior.<default|exchange>.<instrument_type>.stale_source_circuit_breaker_probe_every`**: `int`
   控制 stale 熔断打开后每隔多少个被跳过的品种做一次半开探测。`0` 表示本轮不再探测。探测成功覆盖目标交易日后关闭熔断。日更循环不会因此 sleep。
 - **`routing.daily_behavior.<default|exchange>.<instrument_type>.transport_error_circuit_breaker_threshold`**: `int`
-  控制同一进程、同一交易所、同一品种类型、同一行情源、同一目标交易日累计 HTTP 403/429 后的临时熔断阈值。指数默认 `3`；达到阈值后后续请求跳过该源并走 fallback，不在日更主循环插入 cooldown sleep。空结果和 stale 不计入该阈值。
+  控制同一进程、同一交易所、同一品种类型、同一行情源、同一目标交易日连续“源不可用”后的临时熔断阈值。计入 HTTP 403/429、连接失败，以及源主动标记的 `connection_unhealthy` 空结果；健康连接上的空结果和 stale 不计入。指数默认 `3`，A 股股票当前配置为 `3`。达到阈值后后续请求跳过该源并走 fallback，不在日更主循环插入 cooldown sleep。
 - **`routing.daily_behavior.<default|exchange>.<instrument_type>.transport_error_circuit_breaker_probe_every`**: `int`
-  控制 403/429 熔断打开后每隔多少个被跳过的品种做一次半开探测。`0` 表示本轮不再探测。
+  控制源不可用熔断打开后每隔多少个被跳过的品种做一次半开探测。`0` 表示本轮不再探测。
 - **`routing.instrument_list.<region>`**: `List[str]`
   指定品种列表抓取链，按 region 配置。A 股股票当前为 `exchange_official -> baostock -> akshare`；官方源成功时备源不得并集补入官方 current list 缺失代码，只能补非生命周期字段和写差异诊断。
 - **`routing.calendar.<region>`**: `List[str]`

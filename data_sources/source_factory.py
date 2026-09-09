@@ -592,7 +592,7 @@ class DataSourceFactory:
         exchange: str,
         instrument_type: str,
     ) -> int:
-        """Return per-run HTTP 403/429 breaker threshold; 0 disables the breaker."""
+        """Return per-run source-unavailable breaker threshold; 0 disables it."""
         default = 3 if (instrument_type or 'stock').lower() == 'index' else 0
         return self._daily_route_int(
             exchange,
@@ -635,6 +635,19 @@ class DataSourceFactory:
             or 'too many requests' in text
             or 'status code: 403' in text
             or 'status_code=403' in text
+        )
+
+    @staticmethod
+    def _is_daily_source_unavailable_error(exc: BaseException) -> bool:
+        """Return True when a source cannot serve quotes at all."""
+        if isinstance(exc, ConnectionError):
+            return True
+        text = str(exc)
+        lowered = text.lower()
+        return (
+            '无法连接任何服务器' in text
+            or 'connection refused' in lowered
+            or 'connection reset' in lowered
         )
 
     def _daily_stale_breaker_key(
@@ -721,8 +734,8 @@ class DataSourceFactory:
         if count >= threshold and key not in self.daily_transport_error_breakers:
             self.daily_transport_error_breakers.add(key)
             ds_logger.warning(
-                "[DataSourceFactory] Circuit breaker opened for HTTP throttle %s daily source %s "
-                "on %s/%s expected_trading_day=%s after %s throttle errors; "
+                "[DataSourceFactory] Circuit breaker opened for unavailable %s daily source %s "
+                "on %s/%s expected_trading_day=%s after %s consecutive source failures; "
                 "last_error=%s last_symbol=%s",
                 instrument_type,
                 source_name,
@@ -745,7 +758,10 @@ class DataSourceFactory:
         symbol: str,
         error: BaseException,
     ) -> None:
-        if not self._is_daily_http_throttle_error(error):
+        if not (
+            self._is_daily_http_throttle_error(error)
+            or self._is_daily_source_unavailable_error(error)
+        ):
             return
         expected_date = await self._get_expected_daily_coverage_date(
             exchange, start_date, end_date
@@ -754,6 +770,8 @@ class DataSourceFactory:
             return
         if isinstance(self.last_daily_data_diagnostic, dict):
             self.last_daily_data_diagnostic["transport_error"] = True
+            if self._is_daily_source_unavailable_error(error):
+                self.last_daily_data_diagnostic["source_unavailable"] = True
         self._record_daily_source_transport_error(
             exchange=exchange,
             instrument_type=instrument_type,
@@ -761,6 +779,36 @@ class DataSourceFactory:
             expected_date=expected_date,
             symbol=symbol,
             error=error,
+        )
+
+    async def _maybe_record_daily_source_unavailable_from_fetch(
+        self,
+        *,
+        source: Any,
+        exchange: str,
+        instrument_type: str,
+        start_date: datetime,
+        end_date: datetime,
+        symbol: str,
+    ) -> None:
+        diagnostic = getattr(source, 'last_fetch_diagnostic', None)
+        if not isinstance(diagnostic, dict) or not diagnostic.get('connection_unhealthy'):
+            return
+        expected_date = await self._get_expected_daily_coverage_date(
+            exchange, start_date, end_date
+        )
+        if expected_date is None:
+            return
+        if isinstance(self.last_daily_data_diagnostic, dict):
+            self.last_daily_data_diagnostic["source_unavailable"] = True
+        reason = str(diagnostic.get('reason') or 'connection_unhealthy')
+        self._record_daily_source_transport_error(
+            exchange=exchange,
+            instrument_type=instrument_type,
+            source_name=getattr(source, 'name', type(source).__name__),
+            expected_date=expected_date,
+            symbol=symbol,
+            error=RuntimeError(reason),
         )
 
     def _breaker_probe_is_due(self, skip_count: int, probe_every: int) -> bool:
@@ -1697,6 +1745,14 @@ class DataSourceFactory:
                 elif not data:
                     self.last_daily_data_diagnostic["empty"] = True
                     ds_logger.warning(f"[DataSourceFactory] Empty data from {primary_source.name} for {symbol}")
+                    await self._maybe_record_daily_source_unavailable_from_fetch(
+                        source=primary_source,
+                        exchange=exchange,
+                        instrument_type=instrument_type,
+                        start_date=start_date,
+                        end_date=end_date,
+                        symbol=symbol,
+                    )
                 else:
                     ds_logger.warning(f"[DataSourceFactory] Validation failed from {primary_source.name} for {symbol}")
         except Exception as e:
@@ -1766,6 +1822,14 @@ class DataSourceFactory:
                     elif not data:
                         self.last_daily_data_diagnostic["empty"] = True
                         ds_logger.warning(f"[DataSourceFactory] Empty data from backup {backup_source.name} for {symbol}")
+                        await self._maybe_record_daily_source_unavailable_from_fetch(
+                            source=backup_source,
+                            exchange=exchange,
+                            instrument_type=instrument_type,
+                            start_date=start_date,
+                            end_date=end_date,
+                            symbol=symbol,
+                        )
                     else:
                         ds_logger.warning(f"[DataSourceFactory] Invalid data from backup {backup_source.name}")
             except Exception as backup_e:

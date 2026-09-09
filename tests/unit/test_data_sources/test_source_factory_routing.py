@@ -476,6 +476,20 @@ class TestSourceFactoryRouting:
             'transport_error_circuit_breaker_probe_every': transport_probe_every,
         }
 
+    def _set_stock_breaker_behavior(
+        self,
+        *,
+        transport_threshold: int = 3,
+        transport_probe_every: int = 0,
+    ) -> None:
+        self.factory.routing['daily_behavior']['default']['stock'] = {
+            'skip_backup_on_empty_short_range': False,
+            'require_end_date_coverage': True,
+            'stale_source_circuit_breaker_threshold': 3,
+            'transport_error_circuit_breaker_threshold': transport_threshold,
+            'transport_error_circuit_breaker_probe_every': transport_probe_every,
+        }
+
     @staticmethod
     def _index_quote(instrument_id: str, quote_date: datetime, close: float) -> dict:
         return {
@@ -529,6 +543,95 @@ class TestSourceFactoryRouting:
         assert self.factory.last_daily_data_diagnostic['skipped_sources'] == [
             'csindex_a_stock'
         ]
+
+    @pytest.mark.asyncio
+    async def test_stock_source_skips_after_unhealthy_empty_threshold(self):
+        self._set_stock_breaker_behavior(transport_threshold=3, transport_probe_every=0)
+        self.factory.db_ops.get_trading_days = AsyncMock(
+            return_value=[datetime(2026, 9, 9).date()]
+        )
+
+        async def unhealthy_empty(*_args, **_kwargs):
+            self.pytdx.last_fetch_diagnostic = {'connection_unhealthy': True}
+            return []
+
+        self.pytdx.get_daily_data = AsyncMock(side_effect=unhealthy_empty)
+        self.baostock.get_daily_data = AsyncMock(
+            side_effect=lambda instrument_id, *_args, **_kwargs: [
+                {
+                    'instrument_id': instrument_id,
+                    'time': datetime(2026, 9, 9),
+                    'open': 10.0,
+                    'high': 10.0,
+                    'low': 10.0,
+                    'close': 10.0,
+                    'volume': 100,
+                }
+            ]
+        )
+
+        for symbol in ['600000', '600004', '600006', '600007']:
+            rows = await self.factory.get_daily_data(
+                'SSE',
+                f'{symbol}.SH',
+                symbol,
+                datetime(2026, 9, 9),
+                datetime(2026, 9, 9),
+                instrument_type='stock',
+            )
+            assert rows[0]['close'] == 10.0
+
+        assert self.pytdx.get_daily_data.await_count == 3
+        assert self.baostock.get_daily_data.await_count == 4
+        breaker_key = ('SSE', 'stock', 'pytdx_a_stock', datetime(2026, 9, 9).date())
+        assert breaker_key in self.factory.daily_transport_error_breakers
+        assert self.factory.last_daily_data_diagnostic['skipped_sources'] == [
+            'pytdx_a_stock'
+        ]
+
+    @pytest.mark.asyncio
+    async def test_healthy_empty_stock_source_does_not_open_unavailable_breaker(self):
+        self._set_stock_breaker_behavior(transport_threshold=3, transport_probe_every=0)
+        self.factory.db_ops.get_trading_days = AsyncMock(
+            return_value=[datetime(2026, 9, 9).date()]
+        )
+
+        async def healthy_empty(*_args, **_kwargs):
+            self.pytdx.last_fetch_diagnostic = {
+                'connection_unhealthy': False,
+                'reason': 'empty_on_healthy_connection',
+            }
+            return []
+
+        self.pytdx.get_daily_data = AsyncMock(side_effect=healthy_empty)
+        self.baostock.get_daily_data = AsyncMock(
+            side_effect=lambda instrument_id, *_args, **_kwargs: [
+                {
+                    'instrument_id': instrument_id,
+                    'time': datetime(2026, 9, 9),
+                    'open': 10.0,
+                    'high': 10.0,
+                    'low': 10.0,
+                    'close': 10.0,
+                    'volume': 100,
+                }
+            ]
+        )
+
+        for symbol in ['600000', '600004', '600006', '600007']:
+            await self.factory.get_daily_data(
+                'SSE',
+                f'{symbol}.SH',
+                symbol,
+                datetime(2026, 9, 9),
+                datetime(2026, 9, 9),
+                instrument_type='stock',
+            )
+
+        assert self.pytdx.get_daily_data.await_count == 4
+        assert ('SSE', 'stock', 'pytdx_a_stock', datetime(2026, 9, 9).date()) not in (
+            self.factory.daily_transport_error_breakers
+        )
 
     @pytest.mark.asyncio
     async def test_official_only_retry_ignores_open_http_403_breaker(self):

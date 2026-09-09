@@ -165,7 +165,8 @@ class TestDailyDataReconnect:
         pool = Mock()
         pool.get_connection.return_value = api
 
-        quotes = self._source(pool)._sync_get_daily_data(
+        source = self._source(pool)
+        quotes = source._sync_get_daily_data(
             "300208.SZ",
             "300208",
             datetime(1990, 12, 19),
@@ -174,6 +175,7 @@ class TestDailyDataReconnect:
 
         assert quotes == []
         pool.reconnect_current.assert_not_called()
+        assert source.last_fetch_diagnostic.get("connection_unhealthy") is not True
 
     def test_dead_connection_rotates_endpoint_and_retries_target(self):
         stale_api = Mock()
@@ -190,7 +192,8 @@ class TestDailyDataReconnect:
         pool.get_connection.return_value = stale_api
         pool.reconnect_current.return_value = refreshed_api
 
-        quotes = self._source(pool)._sync_get_daily_data(
+        source = self._source(pool)
+        quotes = source._sync_get_daily_data(
             "300208.SZ",
             "300208",
             datetime(2026, 7, 15),
@@ -199,6 +202,28 @@ class TestDailyDataReconnect:
 
         assert len(quotes) == 1
         assert quotes[0]["instrument_id"] == "300208.SZ"
+        pool.reconnect_current.assert_called_once_with(mark_failure=True)
+        assert source.last_fetch_diagnostic.get("connection_unhealthy") is not True
+
+    def test_dead_connection_after_rotate_marks_source_unhealthy(self):
+        stale_api = Mock()
+        stale_api.get_security_bars.return_value = []
+        refreshed_api = Mock()
+        refreshed_api.get_security_bars.return_value = []
+        pool = Mock()
+        pool.get_connection.return_value = stale_api
+        pool.reconnect_current.return_value = refreshed_api
+
+        source = self._source(pool)
+        quotes = source._sync_get_daily_data(
+            "600000.SH",
+            "600000",
+            datetime(2026, 9, 9),
+            datetime(2026, 9, 9),
+        )
+
+        assert quotes == []
+        assert source.last_fetch_diagnostic["connection_unhealthy"] is True
         pool.reconnect_current.assert_called_once_with(mark_failure=True)
 
 

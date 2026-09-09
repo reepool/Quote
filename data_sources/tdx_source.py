@@ -421,7 +421,10 @@ class TdxSource(BaseDataSource):
             if test_result:
                 tdx_logger.info(f"[{self.name}] 连接验证成功")
             else:
-                tdx_logger.warning(f"[{self.name}] 连接验证无数据 (可能非交易时间)")
+                tdx_logger.warning(
+                    f"[{self.name}] 连接验证无日线: TCP/品种列表可达, "
+                    f"但 get_security_bars 为空"
+                )
         except Exception as e:
             tdx_logger.error(f"[{self.name}] 连接验证失败: {e}")
             raise
@@ -435,9 +438,11 @@ class TdxSource(BaseDataSource):
             tdx_logger.warning(f"[{self.name}] 因子引擎模块未找到, 跳过")
 
     def _sync_test_connection(self) -> list | None:
-        """同步连接测试"""
+        """同步连接测试: 品种列表可达不足以证明日线可用。"""
         api = self.pool.get_connection()
-        return api.get_security_bars(KLINE_TYPE_DAILY, 1, "000001", 0, 1)
+        if not self._is_connection_healthy(api):
+            return []
+        return api.get_security_bars(KLINE_TYPE_DAILY, 1, "600000", 0, 1)
 
     @staticmethod
     def _is_connection_healthy(api: TdxHq_API) -> bool:
@@ -538,6 +543,7 @@ class TdxSource(BaseDataSource):
             tdx_logger.warning(f"[{self.name}] 跳过无法解析的 ID: {instrument_id}: {e}")
             return []
 
+        self.last_fetch_diagnostic: Dict[str, Any] = {}
         api = self.pool.get_connection()
         all_bars: list[dict] = []
 
@@ -568,6 +574,10 @@ class TdxSource(BaseDataSource):
                     tdx_logger.error(
                         f"[{self.name}] 重连后仍失败 {instrument_id}: {e2}"
                     )
+                    self.last_fetch_diagnostic = {
+                        'connection_unhealthy': True,
+                        'reason': 'reconnect_failed',
+                    }
                     break
 
             if not bars:
@@ -579,6 +589,10 @@ class TdxSource(BaseDataSource):
                             f"可能不提供退市/历史行情, 交由备源处理 "
                             f"({instrument_id})"
                         )
+                        self.last_fetch_diagnostic = {
+                            'connection_unhealthy': False,
+                            'reason': 'empty_on_healthy_connection',
+                        }
                         break
 
                     tdx_logger.warning(
@@ -607,11 +621,23 @@ class TdxSource(BaseDataSource):
                                 f"连接健康={probe_healthy}, 交由备源处理 "
                                 f"({instrument_id})"
                             )
+                            self.last_fetch_diagnostic = {
+                                'connection_unhealthy': not probe_healthy,
+                                'reason': (
+                                    'empty_on_healthy_connection'
+                                    if probe_healthy
+                                    else 'empty_after_reconnect'
+                                ),
+                            }
                             break
                     except Exception as e:
                         tdx_logger.error(
                             f"[{self.name}] 切换 TDX 节点失败 {instrument_id}: {e}"
                         )
+                        self.last_fetch_diagnostic = {
+                            'connection_unhealthy': True,
+                            'reason': 'reconnect_failed',
+                        }
                         break
                 else:
                     break
