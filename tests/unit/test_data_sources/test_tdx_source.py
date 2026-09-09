@@ -878,6 +878,68 @@ class TestDailyBarProbeClassification:
             mgr.refresh()
         assert mgr.ranked_ips[0].status == "transport_failed"
 
+    def test_plain_socket_cannot_run_real_pytdx_setup(self):
+        from pytdx.hq import TdxHq_API
+
+        class PlainSocket:
+            def send(self, data, flags=0):
+                return len(data)
+
+            def recv(self, n, flags=0):
+                return b"\x00" * n
+
+        api = TdxHq_API(heartbeat=False, auto_retry=False, raise_exception=True)
+        api.client = PlainSocket()
+        with pytest.raises(AttributeError, match="send_pkg_num"):
+            api.setup()
+
+    def test_real_setup_and_bar_parser_use_probe_traffic_stat_socket(self):
+        import struct
+        from pytdx.base_socket_client import TrafficStatSocket
+        from data_sources.tdx_source import TdxIPManager
+
+        def reply(body: bytes) -> bytes:
+            header = struct.pack("<IIIHH", 0, 0, 0, len(body), len(body))
+            return header + body
+
+        empty_bars = struct.pack("<H", 0)
+        inbox = bytearray()
+        for _ in range(5):
+            inbox.extend(reply(empty_bars))
+
+        created = []
+        real_open = TdxIPManager._open_probe_socket
+
+        def scripted_open(self, ip, port):
+            sock = real_open(self, ip, port)
+            created.append(sock)
+
+            def send(data, flags=0):
+                return len(data)
+
+            def recv(bufsize, flags=0):
+                n = min(bufsize, len(inbox))
+                chunk = bytes(inbox[:n])
+                del inbox[:n]
+                return chunk
+
+            sock.connect = lambda addr: None
+            sock.send = send
+            sock.recv = recv
+            return sock
+
+        mgr = TdxIPManager(
+            hosts=[{"ip": "1.1.1.1", "port": 7709}],
+            probe_workers=1,
+            refresh_deadline_sec=2.0,
+        )
+        with patch.object(TdxIPManager, "_open_probe_socket", scripted_open):
+            mgr.refresh()
+        assert created
+        assert all(isinstance(sock, TrafficStatSocket) for sock in created)
+        assert mgr.ranked_ips[0].status == "empty_bars"
+        assert mgr.ranked_ips[0].status != "unreachable"
+
     def test_duplicate_ip_port_is_probed_once(self):
         from data_sources.tdx_source import merge_hq_host_lists
 

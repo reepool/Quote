@@ -20,6 +20,7 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta
 from typing import Any, Dict, List, Optional, Tuple
 
+from pytdx.base_socket_client import TrafficStatSocket
 from pytdx.hq import TdxHq_API
 
 from .base_source import BaseDataSource, RateLimitConfig
@@ -562,8 +563,8 @@ class TdxIPManager:
         with accepted_lock:
             accepted[(entry.ip, entry.port)] = entry
 
-    def _open_probe_socket(self, ip: str, port: int) -> socket.socket:
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    def _open_probe_socket(self, ip: str, port: int) -> TrafficStatSocket:
+        sock = TrafficStatSocket(socket.AF_INET, socket.SOCK_STREAM)
         sock.settimeout(self._probe_timeout)
         return sock
 
