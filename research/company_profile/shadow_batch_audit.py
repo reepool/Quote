@@ -199,8 +199,8 @@ class ShadowReplayComparisonAudit(_StrictModel):
     def _comparison_is_frozen(self) -> ShadowReplayComparisonAudit:
         if self.baseline.sample_manifest_hash != self.refined.sample_manifest_hash:
             raise ValueError("shadow replay comparison requires the same cohort")
-        if self.baseline.evidence_plan_hash == self.refined.evidence_plan_hash:
-            raise ValueError("shadow replay comparison requires different plans")
+        if self.baseline.batch_id == self.refined.batch_id:
+            raise ValueError("shadow replay comparison requires distinct batch identities")
         if self.audit_hash != _payload_hash(self, omit={"audit_hash"}):
             raise ValueError("shadow replay comparison audit hash mismatch")
         return self

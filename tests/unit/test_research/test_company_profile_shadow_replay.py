@@ -129,10 +129,14 @@ def _active_change_root() -> Path:
     return archived[-1]
 
 
-def _clone_batch_with_refined_identity(tmp_path: Path) -> Path:
+def _clone_batch_with_refined_identity(
+    tmp_path: Path, *, preserve_evidence_plan: bool = False
+) -> Path:
     baseline = load_shadow_batch_result(BASELINE_BATCH / "manifest.json")
     store = ShadowBatchStore(tmp_path / "shadow")
     batch_id = "shadow-refined-unit"
+    plan_version = baseline.evidence_plan_version if preserve_evidence_plan else "refined-unit.v2"
+    plan_hash = baseline.evidence_plan_hash if preserve_evidence_plan else REFINED_PLAN_HASH
     directory = store.start(batch_id)
     references = []
     for reference in baseline.reports:
@@ -141,8 +145,8 @@ def _clone_batch_with_refined_identity(tmp_path: Path) -> Path:
             update={
                 "batch_id": batch_id,
                 "report_run_id": f"{batch_id}-{result.sample_id}",
-                "evidence_plan_version": "refined-unit.v2",
-                "evidence_plan_hash": REFINED_PLAN_HASH,
+                "evidence_plan_version": plan_version,
+                "evidence_plan_hash": plan_hash,
             }
         )
         references.append(store.commit_report(directory, cloned))
@@ -151,8 +155,8 @@ def _clone_batch_with_refined_identity(tmp_path: Path) -> Path:
         "batch_id": batch_id,
         "sample_manifest_revision": baseline.sample_manifest_revision,
         "sample_manifest_hash": baseline.sample_manifest_hash,
-        "evidence_plan_version": "refined-unit.v2",
-        "evidence_plan_hash": REFINED_PLAN_HASH,
+        "evidence_plan_version": plan_version,
+        "evidence_plan_hash": plan_hash,
         "primary_logical_profile": baseline.primary_logical_profile,
         "reports": tuple(references),
         "completed_report_count": baseline.completed_report_count,
@@ -516,6 +520,30 @@ def test_replay_comparison_validates_trees_and_is_research_only(tmp_path: Path) 
     assert comparison.refined.evidence_plan_hash == REFINED_PLAN_HASH
     assert comparison.production_authorization == "not_authorized"
     assert hashlib.sha256(baseline_report.read_bytes()).hexdigest() == baseline_before
+
+
+def test_replay_comparison_allows_distinct_batches_with_same_evidence_plan(
+    tmp_path: Path,
+) -> None:
+    replay = _clone_batch_with_refined_identity(
+        tmp_path, preserve_evidence_plan=True
+    )
+
+    comparison = build_shadow_replay_comparison_audit(
+        audit_id="shadow-replay-same-plan-comparison-unit",
+        baseline_batch_directory=BASELINE_BATCH,
+        refined_batch_directory=replay,
+        baseline_review_path=BASELINE_CHANGE / "source-text-review-package.v3.json",
+        refined_review_path=replay / "review-package.json",
+        baseline_readiness_path=BASELINE_CHANGE / "empirical-readiness-audit.v3.json",
+        refined_readiness_path=replay / "readiness-audit.json",
+    )
+
+    assert comparison.baseline.batch_id != comparison.refined.batch_id
+    assert (
+        comparison.baseline.evidence_plan_hash
+        == comparison.refined.evidence_plan_hash
+    )
 
 
 def test_replay_comparison_rejects_tampered_report(tmp_path: Path) -> None:
