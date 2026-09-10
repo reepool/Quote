@@ -116,6 +116,10 @@ PRECISION_CLOSURE_SHADOW_REPLAY_CONTRACT = ShadowReplayContract(
     timeout_seconds=STABILITY_SHADOW_REPLAY_CONTRACT.timeout_seconds,
     max_provider_calls=STABILITY_SHADOW_REPLAY_CONTRACT.max_provider_calls,
 )
+EXTERNAL_PRECISION_SHADOW_REPLAY_CONTRACT = ShadowReplayContract(
+    batch_id="manufacturing-materials-shadow-precision-external-gemini-20260910-a",
+    **PRECISION_CLOSURE_SHADOW_REPLAY_CONTRACT.model_dump(exclude={"batch_id"}),
+)
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -129,6 +133,7 @@ def build_parser() -> argparse.ArgumentParser:
             "refined-semantic-replay",
             "stability-semantic-replay",
             "precision-closure-semantic-replay",
+            "external-precision-semantic-replay",
         ),
         required=True,
     )
@@ -280,8 +285,10 @@ def main(argv: Sequence[str] | None = None) -> int:
     elif args.mode in {
         "stability-semantic-replay",
         "precision-closure-semantic-replay",
+        "external-precision-semantic-replay",
     }:
-        precision_closure = args.mode == "precision-closure-semantic-replay"
+        precision_closure = args.mode != "stability-semantic-replay"
+        external_precision = args.mode == "external-precision-semantic-replay"
         required = {
             "correction audit": args.correction_audit,
             "execution stability fixture": args.execution_stability_fixture,
@@ -305,9 +312,13 @@ def main(argv: Sequence[str] | None = None) -> int:
             )
         validate_shadow_replay_admission(
             contract=(
-                PRECISION_CLOSURE_SHADOW_REPLAY_CONTRACT
-                if precision_closure
-                else STABILITY_SHADOW_REPLAY_CONTRACT
+                EXTERNAL_PRECISION_SHADOW_REPLAY_CONTRACT
+                if external_precision
+                else (
+                    PRECISION_CLOSURE_SHADOW_REPLAY_CONTRACT
+                    if precision_closure
+                    else STABILITY_SHADOW_REPLAY_CONTRACT
+                )
             ),
             batch_id=args.batch_id,
             primary_logical_profile=args.provider_route,
@@ -403,6 +414,7 @@ def _validate_replay_mode(
     stability_plan = STABILITY_SHADOW_REPLAY_CONTRACT.evidence_plan_version
     stability_batch = STABILITY_SHADOW_REPLAY_CONTRACT.batch_id
     precision_batch = PRECISION_CLOSURE_SHADOW_REPLAY_CONTRACT.batch_id
+    external_batch = EXTERNAL_PRECISION_SHADOW_REPLAY_CONTRACT.batch_id
     provider_bearing_legacy_modes = {"semantic-run", "refined-semantic-replay"}
     if (
         plan_version == stability_plan or batch_id == stability_batch
@@ -415,6 +427,11 @@ def _validate_replay_mode(
         raise ValueError(
             "precision-closure batch identity requires "
             "precision-closure-semantic-replay"
+        )
+    if batch_id == external_batch and mode != "external-precision-semantic-replay":
+        raise ValueError(
+            "external precision batch identity requires "
+            "external-precision-semantic-replay"
         )
 
 
