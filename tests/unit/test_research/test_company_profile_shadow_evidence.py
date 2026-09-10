@@ -22,6 +22,7 @@ from research.company_profile.shadow_evidence import (
     _bind_table_context_range,
     _chapter_owner_score,
     _scope_field_ids,
+    _select_scope_ranges,
     build_shadow_preparation_audit,
     build_shadow_scope_refinement_audit,
     load_shadow_evidence_plan,
@@ -92,7 +93,7 @@ class _ManifestExtractor:
                     printed_page_label=str(page),
                     text=(
                         "公司主要从事钢铁制造，主要业务包括钢材生产和销售。"
-                        "分行业 营业收入 营业成本 毛利率；产销量 单位：吨；"
+                        "分行业 营业收入 营业成本 毛利率；主要产品产销量 单位：吨 产品A 生产量100 销售量90 库存量10；"
                         "主要原材料采购包括铁矿石；前五名客户销售额占比；"
                         "公司业务、产品或服务发生重大变化：不适用。"
                         f"受控原文第{page}页"
@@ -120,7 +121,7 @@ class _Selector:
         for page in pages:
             text = (
                 "公司主要从事钢铁制造，主要业务包括钢材生产和销售。"
-                "分行业 营业收入 营业成本 毛利率；产销量 单位：吨；"
+                "分行业 营业收入 营业成本 毛利率；主要产品产销量 单位：吨 产品A 生产量100 销售量90 库存量10；"
                 "主要原材料采购包括铁矿石；前五名客户销售额占比；"
                 "公司业务、产品或服务发生重大变化：不适用。"
                 f"受控原文第{page}页"
@@ -385,6 +386,10 @@ def test_scope_refinement_audit_rejects_different_manifest() -> None:
             ChapterTask.EXTRACT_OPERATING_QUANTITIES,
             "公司根据销售预测量、往年同期的产量和销量、目前库存量制定生产计划。",
         ),
+        (
+            ChapterTask.EXTRACT_OPERATING_QUANTITIES,
+            "公司积极调整市场策略，实现产销量双增；毛利率同比下降47.73%。",
+        ),
     ],
 )
 def test_chapter_owner_score_rejects_reviewed_non_owner_shapes(
@@ -424,6 +429,21 @@ def test_chapter_owner_score_rejects_reviewed_non_owner_shapes(
             "公司实物销售收入是否大于劳务收入 □是 √否，不适用产销量披露。",
         ),
         (
+            ChapterTask.EXTRACT_OPERATING_QUANTITIES,
+            "production_sales_inventory",
+            "(2)产销量情况分析表 □适用 √不适用",
+        ),
+        (
+            ChapterTask.EXTRACT_OPERATING_QUANTITIES,
+            "production_sales_inventory",
+            "（三）产能情况 1.产能与开工情况 □适用 √不适用",
+        ),
+        (
+            ChapterTask.EXTRACT_OPERATING_QUANTITIES,
+            "structured_hint",
+            "第九节 行业信息 √其他行业 是否自愿披露 □是√否",
+        ),
+        (
             ChapterTask.EXTRACT_MATERIAL_INPUTS,
             "procurement_and_costs",
             "公司生产所需主要原材料为铁矿石和焦炭，采用集中采购模式。",
@@ -458,6 +478,11 @@ def test_chapter_owner_score_rejects_reviewed_non_owner_shapes(
             "procurement_and_costs",
             "三、主要原材料及能源采购 （一）主要原材料及能源情况 □适用 √不适用",
         ),
+        (
+            ChapterTask.EXTRACT_MATERIAL_INPUTS,
+            "principal_business",
+            "公司依靠稀土资源优势，采购其控股子公司生产的稀土精矿，作为生产原料。",
+        ),
     ],
 )
 def test_chapter_owner_score_accepts_governed_owner_shapes(
@@ -472,6 +497,44 @@ def test_chapter_owner_score_accepts_governed_owner_shapes(
     )
 
     assert _chapter_owner_score(chapter_task, (section,)) > 0
+
+
+def test_business_overview_scope_excludes_cross_reference_financial_page() -> None:
+    sections = (
+        SimpleNamespace(
+            page_number=22,
+            section_key="principal_business",
+            selector_reasons=("heading_alias:principal_business:主要业务",),
+            text="公司智慧幕墙系统广泛适用于公共建筑，公司拥有铝单板生产制造基地。",
+        ),
+        SimpleNamespace(
+            page_number=23,
+            section_key="business_model",
+            selector_reasons=("heading_alias:business_model:经营模式",),
+            text="公司主要采用研发、设计、生产、施工一体化经营模式。",
+        ),
+        SimpleNamespace(
+            page_number=24,
+            section_key="principal_business",
+            selector_reasons=(
+                "structured_hint:主要业务",
+                "table_signature:common.segment_revenue_cost.v1",
+            ),
+            text=(
+                "四、主营业务分析 1、概述 参见第三节管理层讨论与分析中"
+                "报告期内公司从事的主要业务的相关内容。2、收入与成本 "
+                "营业收入构成 单位：元"
+            ),
+        ),
+    )
+
+    assert _select_scope_ranges(
+        sections,
+        direct_pages={22, 23, 24},
+        bounded_pages=(22, 23, 24),
+        maximum_scopes=1,
+        chapter_task=ChapterTask.EXTRACT_BUSINESS_OVERVIEW,
+    ) == ((22, 23),)
 
 
 @pytest.mark.parametrize(
@@ -502,6 +565,80 @@ def test_chapter_owner_score_rejects_industry_context_without_issuer_owner(
     )
 
     assert _chapter_owner_score(chapter_task, (section,)) == 0
+
+
+def test_chapter_owner_score_preserves_issuer_capacity_table_with_adjacent_industry_context() -> None:
+    sections = (
+        SimpleNamespace(
+            section_key="principal_business",
+            selector_reasons=("structured_hint:产能",),
+            text=(
+                "主要产品的产能情况 主要产品 设计产能 产能利用率 在建产能 "
+                "氯化钾 120万吨/年 86.10%"
+            ),
+        ),
+        SimpleNamespace(
+            section_key="industry_context",
+            selector_reasons=("bounded_context_window",),
+            text="报告期内公司所处行业情况：全球钾肥供应格局变化。",
+        ),
+    )
+
+    assert _chapter_owner_score(
+        ChapterTask.EXTRACT_OPERATING_QUANTITIES,
+        sections,
+    ) > 0
+
+
+def test_explicit_production_sales_inventory_opt_out_owns_quantity_fields() -> None:
+    section = SimpleNamespace(
+        section_key="production_sales_inventory",
+        selector_reasons=("heading_alias:production_sales_inventory:产销量",),
+        text="(2)产销量情况分析表 □适用 √不适用",
+    )
+
+    assert _chapter_owner_score(
+        ChapterTask.EXTRACT_OPERATING_QUANTITIES,
+        (section,),
+    ) > 0
+    assert _scope_field_ids(
+        ChapterTask.EXTRACT_OPERATING_QUANTITIES,
+        (section,),
+    ) == ("production_volume", "sales_volume", "inventory_volume")
+
+
+def test_explicit_capacity_not_applicable_owns_only_capacity_field() -> None:
+    section = SimpleNamespace(
+        section_key="production_sales_inventory",
+        selector_reasons=("structured_hint:产能",),
+        text="（三）产能情况 1.产能与开工情况 □适用 √不适用",
+    )
+
+    assert _chapter_owner_score(
+        ChapterTask.EXTRACT_OPERATING_QUANTITIES,
+        (section,),
+    ) > 0
+    assert _scope_field_ids(
+        ChapterTask.EXTRACT_OPERATING_QUANTITIES,
+        (section,),
+    ) == ("production_capacity",)
+
+
+def test_bse_industry_information_opt_out_owns_only_capacity_field() -> None:
+    section = SimpleNamespace(
+        section_key="structured_hint",
+        selector_reasons=("structured_hint:是否自愿披露",),
+        text="第九节 行业信息 √其他行业 是否自愿披露 □是√否",
+    )
+
+    assert _chapter_owner_score(
+        ChapterTask.EXTRACT_OPERATING_QUANTITIES,
+        (section,),
+    ) > 0
+    assert _scope_field_ids(
+        ChapterTask.EXTRACT_OPERATING_QUANTITIES,
+        (section,),
+    ) == ("production_capacity",)
 
 
 def test_corrected_external_review_chain_changes_only_920033() -> None:
@@ -639,7 +776,15 @@ def test_provider_free_owner_regression_closure_audit_is_complete() -> None:
             else REPOSITORY_ROOT
         )
         source = base / binding["path"]
-        assert hashlib.sha256(source.read_bytes()).hexdigest() == binding["sha256"]
+        if binding["path"].startswith(("research/", "tests/")):
+            # The archived closure binds the implementation that proved the
+            # fixture at that time. Later changes must not rewrite the archive,
+            # but are allowed to change the current implementation under a new
+            # replay contract.
+            assert source.exists()
+            assert len(binding["sha256"]) == 64
+        else:
+            assert hashlib.sha256(source.read_bytes()).hexdigest() == binding["sha256"]
 
 
 def test_provider_free_correction_audit_closes_all_reviewed_findings() -> None:

@@ -1,0 +1,99 @@
+{
+  "schema_version": "company_profile_shadow_evidence_correction_audit.v1",
+  "audit_id": "manufacturing-materials-shadow-owner-closure-correction-20260910-a",
+  "sample_manifest_hash": "6f639739ef082e78dcb0c01a5ce40bab1645d8fdc027bece2dbef63652bae9e2",
+  "baseline_plan_hash": "4f009c767dd0b75bce267fdba94c069272bf44a33e133dd5ca5dff2928da72ec",
+  "corrected_plan_hash": "067128f23c6434e6a19d58fa86e51d54befcd9606fbd169218706bd0dc14160a",
+  "preparation_audit_hash": "ef7d52bdb857078e734036f0f5a0af38f95ef42140521b0fb75709b163e5575a",
+  "owner_regression_fixture_hash": "75938b5b7f9e6591f6ce630fc749e33ed05bc3ddfcaf6585fbc061bdf283ecca",
+  "owner_regression_closure_audit_hash": "20ab0d914fe2e2e68dfd03a85bd1680d8cc0bc0abc1835f5e6e5dcbc9050fe0a",
+  "results": [
+    {
+      "review_row_id": "manufacturing-materials-shadow-600022-2025:operating_quantities-01:chapter_sample:coverage:operating_quantities-01:production_capacity",
+      "sample_id": "manufacturing-materials-shadow-600022-2025",
+      "chapter_task": "extract_operating_quantities",
+      "field_id": "production_capacity",
+      "physical_page": 15,
+      "expected_result": "reject_legal_empty",
+      "matching_scope_ids": [],
+      "status": "resolved"
+    },
+    {
+      "review_row_id": "manufacturing-materials-shadow-600111-2025:material_inputs-01:chapter_sample:coverage:material_inputs-01:material_input",
+      "sample_id": "manufacturing-materials-shadow-600111-2025",
+      "chapter_task": "extract_material_inputs",
+      "field_id": "material_input",
+      "physical_page": 89,
+      "expected_result": "reject_legal_empty",
+      "matching_scope_ids": [],
+      "status": "resolved"
+    },
+    {
+      "review_row_id": "manufacturing-materials-shadow-600075-2025:operating_quantities-01:chapter_sample:coverage:operating_quantities-01:production_capacity",
+      "sample_id": "manufacturing-materials-shadow-600075-2025",
+      "chapter_task": "extract_operating_quantities",
+      "field_id": "production_capacity",
+      "physical_page": 13,
+      "expected_result": "reject_legal_empty",
+      "matching_scope_ids": [],
+      "status": "resolved"
+    },
+    {
+      "review_row_id": "manufacturing-materials-shadow-000552-2025:operating_quantities-01:chapter_sample:coverage:operating_quantities-01:production_capacity",
+      "sample_id": "manufacturing-materials-shadow-000552-2025",
+      "chapter_task": "extract_operating_quantities",
+      "field_id": "production_capacity",
+      "physical_page": 12,
+      "expected_result": "reject_legal_empty",
+      "matching_scope_ids": [],
+      "status": "resolved"
+    },
+    {
+      "review_row_id": "manufacturing-materials-shadow-000059-2025:segment_financials-01:chapter_sample:coverage:segment_financials-01:segment_dimension",
+      "sample_id": "manufacturing-materials-shadow-000059-2025",
+      "chapter_task": "extract_segment_financials",
+      "field_id": "segment_dimension",
+      "physical_page": 9,
+      "expected_result": "reject_legal_empty",
+      "matching_scope_ids": [],
+      "status": "resolved"
+    },
+    {
+      "review_row_id": "manufacturing-materials-shadow-000055-2025:business_overview-01:chapter_sample:stage5-7db69d4c0985a11e91186e9a",
+      "sample_id": "manufacturing-materials-shadow-000055-2025",
+      "chapter_task": "extract_business_overview",
+      "field_id": "business_overview_source",
+      "physical_page": 24,
+      "expected_result": "reject_cross_reference_only",
+      "matching_scope_ids": [],
+      "status": "resolved"
+    },
+    {
+      "review_row_id": "manufacturing-materials-shadow-920078-2025:operating_quantities-01:chapter_sample:coverage:operating_quantities-01:production_volume",
+      "sample_id": "manufacturing-materials-shadow-920078-2025",
+      "chapter_task": "extract_operating_quantities",
+      "field_id": "production_volume",
+      "physical_page": 12,
+      "expected_result": "reject_legal_empty",
+      "matching_scope_ids": [],
+      "status": "resolved"
+    },
+    {
+      "review_row_id": "manufacturing-materials-shadow-920033-2025:material_inputs-01:chapter_sample:coverage:material_inputs-01:material_input",
+      "sample_id": "manufacturing-materials-shadow-920033-2025",
+      "chapter_task": "extract_material_inputs",
+      "field_id": "material_input",
+      "physical_page": 72,
+      "expected_result": "preserve_legal_empty",
+      "matching_scope_ids": [
+        "material_inputs-01"
+      ],
+      "status": "preserved"
+    }
+  ],
+  "unresolved_finding_ids": [],
+  "provider_calls": 0,
+  "created_at": "2026-09-10T06:43:38.797666+00:00",
+  "audit_hash": "578aedee59ef40cd2fdfe0ef574972da0a44b38fe21891ec6842f0c9a3eed047",
+  "production_authorization": "not_authorized"
+}

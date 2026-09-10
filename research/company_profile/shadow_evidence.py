@@ -49,10 +49,22 @@ from .stage5 import (
 from .stage5_service import stage5_field_ids
 
 SHADOW_EVIDENCE_PLAN_SCHEMA = "company_profile_shadow_evidence_plan.v1"
-SHADOW_EVIDENCE_PLAN_VERSION = "manufacturing_materials_shadow.2026-09-09.3"
+SHADOW_EVIDENCE_PLAN_VERSION = "manufacturing_materials_shadow.2026-09-10.4"
 SHADOW_PREPARATION_AUDIT_SCHEMA = "company_profile_shadow_preparation_audit.v1"
 SHADOW_SCOPE_REFINEMENT_AUDIT_SCHEMA = (
     "company_profile_shadow_scope_refinement_audit.v1"
+)
+_BSE_INDUSTRY_DISCLOSURE_OPT_OUT_PATTERN = (
+    r"第九节行业信息.{0,240}是否自愿披露.{0,20}[√☑]否"
+)
+_OPERATING_QUANTITY_LEGAL_EMPTY_PATTERN = (
+    r"(?:公司实物销售收入是否大于劳务收入|产销量情况分析表)"
+    r".{0,80}(?:[√☑](?:否|不适用)|不适用)"
+)
+_BUSINESS_OVERVIEW_CROSS_REFERENCE_PAGE_PATTERN = re.compile(
+    r"(?:主营业务分析.{0,30}概述|概述)"
+    r"(?:具体(?:内容|情况))?(?:参见|详见|见)(?:本报告|报告)?"
+    r".{0,120}(?:主要业务|主营业务).{0,30}(?:相关)?(?:内容|情况)?"
 )
 _PROHIBITED_KEYS = frozenset(
     {
@@ -118,11 +130,17 @@ _CHAPTER_CONFIG: dict[
             "产能",
             "产能情况",
             "在建产能",
+            "是否自愿披露",
         ),
     ),
     ChapterTask.EXTRACT_MATERIAL_INPUTS: (
         ("material_input",),
-        ("procurement_and_costs", "cost_composition", "principal_business"),
+        (
+            "procurement_and_costs",
+            "cost_composition",
+            "principal_business",
+            "business_model",
+        ),
         (
             "主要原材料",
             "原材料及能源",
@@ -204,6 +222,8 @@ _FIELD_TEXT_PATTERNS: dict[ChapterTask, dict[str, tuple[str, ...]]] = {
         "production_capacity": (
             r"(?:设计|现有|核定|实际|总|年)产能",
             r"产能(?:规模|为|达到)",
+            r"产能(?:与开工)?情况.{0,60}(?:[√☑]不适用|不适用)",
+            _BSE_INDUSTRY_DISCLOSURE_OPT_OUT_PATTERN,
         ),
         "capacity_under_construction": (
             r"在建产能",
@@ -260,7 +280,12 @@ _FIELD_SECTION_KEYS: dict[ChapterTask, dict[str, tuple[str, ...]]] = {
         "capacity_under_construction": ("major_projects",),
     },
     ChapterTask.EXTRACT_MATERIAL_INPUTS: {
-        "material_input": ("procurement_and_costs", "cost_composition"),
+        "material_input": (
+            "procurement_and_costs",
+            "cost_composition",
+            "principal_business",
+            "business_model",
+        ),
     },
     ChapterTask.EXTRACT_COUNTERPARTIES_AND_CONCENTRATION: {
         "counterparty_relationship": ("major_customers_suppliers", "orders"),
@@ -337,9 +362,12 @@ _CHAPTER_OWNER_PATTERNS: dict[ChapterTask, tuple[str, ...]] = {
     ChapterTask.EXTRACT_OPERATING_QUANTITIES: (
         r"(?:产销量|生产量|销售量|库存量|加工量|处理量|吞吐量)",
         r"公司实物销售收入是否大于劳务收入",
+        _OPERATING_QUANTITY_LEGAL_EMPTY_PATTERN,
         r"实际产量",
         r"(?:设计|现有|核定|实际|总|年)产能",
         r"产能(?:规模|为|达到|利用率)",
+        r"产能(?:与开工)?情况.{0,60}(?:[√☑]不适用|不适用)",
+        _BSE_INDUSTRY_DISCLOSURE_OPT_OUT_PATTERN,
         r"在建(?:产能|项目|工程).{0,40}(?:产能|生产线|装置|吨|台|套|GWh|MWh|㎡)",
     ),
     ChapterTask.EXTRACT_MATERIAL_INPUTS: (
@@ -350,6 +378,7 @@ _CHAPTER_OWNER_PATTERNS: dict[ChapterTask, tuple[str, ...]] = {
         r"(?:采购模式|采购情况)",
         r"(?:成本分析|营业成本构成|成本构成).{0,300}(?:原材料|原燃料|燃料及动力)",
         r"生产所需.{0,30}(?:原料|原材料|能源)",
+        r"(?:公司|本公司).{0,100}(?:采购|购入).{0,80}(?:原料|原材料|精矿|矿石|煤炭|焦炭)",
         r"原材料价格波动风险",
         r"(?:原料|原材料)主要(?:为|包括)",
         r"以.{1,80}为原料",
@@ -383,6 +412,7 @@ _EXPLICIT_ISSUER_CAPACITY_PATTERN = re.compile(
     r"(?:(?:公司|本公司).{0,80}|(?:现有|拥有|下辖).{0,50})"
     r"(?:核定年产能|设计产能|现有产能|总产能|年产能|产能规模)"
     r".{0,30}\d[\d,]*(?:\.\d+)?(?:万吨|吨|GWh|MWh|万㎡|亿㎡|㎡|台|套)"
+    r"|主要产品的产能情况.{0,300}(?:设计产能|产能利用率|在建产能)"
 )
 _SEGMENT_OWNER_PATTERN = re.compile(
     r"分(?:行业|产品|地区|销售模式)|(?:业务|报告)分部|"
@@ -411,6 +441,34 @@ def _chapter_owner_score(
     keys = {str(getattr(item, "section_key", "")) for item in sections} | {
         str(term) for term in supplemental_terms
     }
+    if chapter_task == ChapterTask.EXTRACT_OPERATING_QUANTITIES:
+        explicit_legal_empty = bool(
+            re.search(_OPERATING_QUANTITY_LEGAL_EMPTY_PATTERN, compact)
+            or re.search(
+                r"产能(?:与开工)?情况"
+                r".{0,80}(?:[√☑](?:否|不适用)|不适用)",
+                compact,
+            )
+            or re.search(_BSE_INDUSTRY_DISCLOSURE_OPT_OUT_PATTERN, compact)
+        )
+        physical_unit = r"(?:万吨|吨|GWh|MWh|万㎡|亿㎡|㎡|台|套)"
+        quantity_term = (
+            r"(?:生产量|销售量|库存量|实际产量|加工量|处理量|吞吐量|"
+            r"设计产能|现有产能|核定年产能|总产能|年产能|产能规模)"
+        )
+        has_quantity_substance = any(
+            re.search(pattern, compact)
+            for pattern in (
+                rf"{quantity_term}.{{0,160}}\d[\d,]*(?:\.\d+)?{physical_unit}",
+                rf"{quantity_term}.{{0,160}}{physical_unit}.{{0,80}}\d",
+                rf"{physical_unit}.{{0,800}}{quantity_term}.{{0,160}}\d",
+                rf"\d[\d,]*(?:\.\d+)?{physical_unit}.{{0,160}}{quantity_term}",
+                r"产能利用率.{0,120}\d[\d,]*(?:\.\d+)?(?:%|％)",
+                rf"年产\d[\d,]*(?:\.\d+)?{physical_unit}",
+            )
+        )
+        if not explicit_legal_empty and not has_quantity_substance:
+            return 0
     if (
         chapter_task == ChapterTask.EXTRACT_OPERATING_QUANTITIES
         and "industry_context" in keys
@@ -695,6 +753,50 @@ class ShadowEvidencePreparationAudit(_StrictModel):
             raise ValueError("shadow preparation audit recovery count mismatch")
         if self.audit_hash != _payload_hash(self, omit={"audit_hash"}):
             raise ValueError("shadow preparation audit hash mismatch")
+        return self
+
+
+class ShadowOwnerClosureResult(_StrictModel):
+    review_row_id: str = Field(min_length=1)
+    sample_id: str = Field(min_length=1)
+    chapter_task: ChapterTask
+    field_id: str = Field(min_length=1)
+    physical_page: int = Field(ge=1)
+    expected_result: Literal[
+        "reject_legal_empty",
+        "reject_cross_reference_only",
+        "preserve_legal_empty",
+    ]
+    matching_scope_ids: tuple[str, ...]
+    status: Literal["resolved", "preserved"]
+
+
+class ShadowOwnerClosureCorrectionAudit(_StrictModel):
+    schema_version: Literal["company_profile_shadow_evidence_correction_audit.v1"] = (
+        "company_profile_shadow_evidence_correction_audit.v1"
+    )
+    audit_id: str = Field(min_length=1)
+    sample_manifest_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    baseline_plan_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    corrected_plan_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    preparation_audit_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    owner_regression_fixture_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    owner_regression_closure_audit_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    results: tuple[ShadowOwnerClosureResult, ...] = Field(min_length=8, max_length=8)
+    unresolved_finding_ids: tuple[str, ...] = ()
+    provider_calls: Literal[0] = 0
+    created_at: str = Field(min_length=1)
+    audit_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    production_authorization: Literal["not_authorized"] = PRODUCTION_AUTHORIZATION
+
+    @model_validator(mode="after")
+    def _audit_is_closed(self) -> ShadowOwnerClosureCorrectionAudit:
+        if len({item.review_row_id for item in self.results}) != len(self.results):
+            raise ValueError("shadow owner-closure results must be unique")
+        if self.unresolved_finding_ids:
+            raise ValueError("shadow owner-closure correction audit is unresolved")
+        if self.audit_hash != _payload_hash(self, omit={"audit_hash"}):
+            raise ValueError("shadow owner-closure correction audit hash mismatch")
         return self
 
 
@@ -1355,6 +1457,99 @@ def build_shadow_preparation_audit(
     )
 
 
+def build_shadow_owner_closure_correction_audit(
+    *,
+    audit_id: str,
+    baseline_plan: ShadowEvidencePlan,
+    corrected_plan: ShadowEvidencePlan,
+    preparation_audit: ShadowEvidencePreparationAudit,
+    regression_cases: Mapping[str, Any],
+    owner_regression_closure_audit_hash: str,
+) -> ShadowOwnerClosureCorrectionAudit:
+    """Bind the current plan to the reviewed owner regressions without a provider."""
+
+    fixture_payload = dict(regression_cases)
+    fixture_hash = fixture_payload.pop("fixture_hash", None)
+    if fixture_hash != _payload_hash(fixture_payload):
+        raise ValueError("shadow owner-regression fixture hash mismatch")
+    if baseline_plan.sample_manifest_hash != corrected_plan.sample_manifest_hash:
+        raise ValueError("shadow owner-closure plans use different cohorts")
+    if baseline_plan.pdf_artifact_hashes != corrected_plan.pdf_artifact_hashes:
+        raise ValueError("shadow owner-closure plans use different PDF artifacts")
+    if preparation_audit.evidence_plan_hash != corrected_plan.plan_hash:
+        raise ValueError("shadow owner-closure preparation audit does not match the plan")
+    if not re.fullmatch(r"[0-9a-f]{64}", owner_regression_closure_audit_hash):
+        raise ValueError("shadow owner-regression closure audit hash is invalid")
+
+    cases = regression_cases.get("cases")
+    if not isinstance(cases, list) or len(cases) != 8:
+        raise ValueError("shadow owner-closure audit requires eight reviewed cases")
+    results: list[ShadowOwnerClosureResult] = []
+    unresolved: list[str] = []
+    for raw_case in cases:
+        if not isinstance(raw_case, Mapping):
+            raise TypeError("shadow owner-closure case must be an object")
+        review_row_id = str(raw_case.get("review_row_id") or "")
+        sample_id = str(raw_case.get("sample_id") or "")
+        chapter_task = ChapterTask(str(raw_case.get("chapter_task") or ""))
+        field_id = str(raw_case.get("field_id") or "")
+        physical_page = int(raw_case.get("physical_page") or 0)
+        expected_result = str(raw_case.get("expected_result") or "")
+        report_plan = corrected_plan.report_by_id(sample_id)
+        matching_scope_ids = tuple(
+            scope.scope_id
+            for task in report_plan.tasks
+            if task.chapter_task == chapter_task
+            for scope in task.request_scopes
+            if field_id in scope.field_ids and physical_page in scope.pages
+        )
+        if expected_result in {"reject_legal_empty", "reject_cross_reference_only"}:
+            passed = not matching_scope_ids
+            status = "resolved"
+        elif expected_result == "preserve_legal_empty":
+            passed = bool(matching_scope_ids)
+            status = "preserved"
+        else:
+            raise ValueError(
+                f"unsupported shadow owner-closure expectation: {expected_result}"
+            )
+        if not passed:
+            unresolved.append(review_row_id)
+        results.append(
+            ShadowOwnerClosureResult(
+                review_row_id=review_row_id,
+                sample_id=sample_id,
+                chapter_task=chapter_task,
+                field_id=field_id,
+                physical_page=physical_page,
+                expected_result=expected_result,
+                matching_scope_ids=matching_scope_ids,
+                status=status,
+            )
+        )
+    if unresolved:
+        raise ValueError(f"shadow owner-closure cases remain unresolved: {unresolved}")
+    payload = {
+        "schema_version": "company_profile_shadow_evidence_correction_audit.v1",
+        "audit_id": audit_id,
+        "sample_manifest_hash": corrected_plan.sample_manifest_hash,
+        "baseline_plan_hash": baseline_plan.plan_hash,
+        "corrected_plan_hash": corrected_plan.plan_hash,
+        "preparation_audit_hash": preparation_audit.audit_hash,
+        "owner_regression_fixture_hash": str(fixture_hash),
+        "owner_regression_closure_audit_hash": owner_regression_closure_audit_hash,
+        "results": tuple(results),
+        "unresolved_finding_ids": (),
+        "provider_calls": 0,
+        "created_at": _utc_now(),
+        "production_authorization": PRODUCTION_AUTHORIZATION,
+    }
+    return ShadowOwnerClosureCorrectionAudit(
+        **payload,
+        audit_hash=_payload_hash(payload),
+    )
+
+
 def build_shadow_scope_refinement_audit(
     *,
     audit_id: str,
@@ -1617,7 +1812,10 @@ def _load_frozen_artifact(
 def write_shadow_evidence_artifact(
     path: str | Path,
     value: (
-        ShadowEvidencePlan | ShadowEvidencePreparationAudit | ShadowScopeRefinementAudit
+        ShadowEvidencePlan
+        | ShadowEvidencePreparationAudit
+        | ShadowScopeRefinementAudit
+        | ShadowOwnerClosureCorrectionAudit
     ),
 ) -> None:
     destination = Path(path)
@@ -1752,8 +1950,18 @@ def _select_scope_ranges(
     maximum_scopes: int,
     chapter_task: ChapterTask,
 ) -> tuple[tuple[int, ...], ...]:
-    ranges = _continuous_ranges(bounded_pages, maximum=3)
     sections_by_page = {item.page_number: item for item in sections}
+    governed_pages = tuple(
+        page
+        for page in bounded_pages
+        if not (
+            chapter_task == ChapterTask.EXTRACT_BUSINESS_OVERVIEW
+            and _BUSINESS_OVERVIEW_CROSS_REFERENCE_PAGE_PATTERN.search(
+                re.sub(r"\s+", "", str(sections_by_page[page].text))
+            )
+        )
+    )
+    ranges = _continuous_ranges(governed_pages, maximum=3)
 
     def score(pages: tuple[int, ...]) -> tuple[int, int, int]:
         scoped_sections = [sections_by_page[page] for page in pages]
@@ -1812,6 +2020,22 @@ def _scope_field_ids(
             or any(term in reason for reason in reasons for term in reason_terms)
         ):
             matched.add(field_id)
+    if (
+        chapter_task == ChapterTask.EXTRACT_OPERATING_QUANTITIES
+        and (
+            re.search(
+                r"产能(?:与开工)?情况.{0,60}(?:[√☑]不适用|不适用)",
+                compact,
+            )
+            or re.search(_BSE_INDUSTRY_DISCLOSURE_OPT_OUT_PATTERN, compact)
+        )
+        and not re.search(
+            r"(?:生产量|销售量|库存量|实际产量|加工量|处理量|吞吐量)"
+            r".{0,100}\d[\d,]*(?:\.\d+)?",
+            compact,
+        )
+    ):
+        matched &= {"production_capacity"}
     if chapter_task == ChapterTask.EXTRACT_SEGMENT_FINANCIALS and (
         "segment_dimension" not in matched
     ):

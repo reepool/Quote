@@ -343,6 +343,33 @@ def build_shadow_replay_comparison_audit(
         review_path=Path(refined_review_path),
         readiness_path=Path(refined_readiness_path),
     )
+    return _build_replay_comparison(audit_id=audit_id, baseline=baseline, refined=refined)
+
+
+def build_shadow_replay_comparison_from_snapshot(
+    *,
+    audit_id: str,
+    baseline: ShadowReplayMetricSnapshot,
+    refined_batch_directory: str | Path,
+    refined_review_path: str | Path,
+    refined_readiness_path: str | Path,
+) -> ShadowReplayComparisonAudit:
+    """Compare a current immutable run with an already validated archive snapshot."""
+
+    refined = _replay_snapshot(
+        batch_directory=Path(refined_batch_directory),
+        review_path=Path(refined_review_path),
+        readiness_path=Path(refined_readiness_path),
+    )
+    return _build_replay_comparison(audit_id=audit_id, baseline=baseline, refined=refined)
+
+
+def _build_replay_comparison(
+    *,
+    audit_id: str,
+    baseline: ShadowReplayMetricSnapshot,
+    refined: ShadowReplayMetricSnapshot,
+) -> ShadowReplayComparisonAudit:
     numeric_fields = (
         "persisted_report_count",
         "execution_completion_rate",

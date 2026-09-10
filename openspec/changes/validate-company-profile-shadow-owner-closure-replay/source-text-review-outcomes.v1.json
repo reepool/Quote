@@ -1,0 +1,2426 @@
+[
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:business_overview-01:blocker:task_completion:business_overview-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this report-local blocker; it is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:business_overview-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600121-SH:manufacturing-materials-shadow-600121-2025:business_overview-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:business_overview-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600121-SH:manufacturing-materials-shadow-600121-2025:business_overview-01:coverage:business_overview_source",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:business_overview-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600121-SH:manufacturing-materials-shadow-600121-2025:business_overview-01:coverage:explicit_activity",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:segment_financials-01:blocker:task_completion:segment_financials-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this report-local blocker; it is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600121-SH:manufacturing-materials-shadow-600121-2025:segment_financials-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600121-SH:manufacturing-materials-shadow-600121-2025:segment_financials-01:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600121-SH:manufacturing-materials-shadow-600121-2025:segment_financials-01:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600121-SH:manufacturing-materials-shadow-600121-2025:segment_financials-01:coverage:operating_cost",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600121-SH:manufacturing-materials-shadow-600121-2025:segment_financials-01:coverage:gross_margin_reported",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:segment_financials-02:blocker:task_completion:segment_financials-02",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this report-local blocker; it is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600121-SH:manufacturing-materials-shadow-600121-2025:segment_financials-02:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600121-SH:manufacturing-materials-shadow-600121-2025:segment_financials-02:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600121-SH:manufacturing-materials-shadow-600121-2025:segment_financials-02:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600121-SH:manufacturing-materials-shadow-600121-2025:segment_financials-02:coverage:operating_cost",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:operating_quantities-01:chapter_sample:stage5-4dfe5512dfb14925fb5cad58",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:material_inputs-01:chapter_sample:stage5-890c5cbf9573b0b6d4812e8d",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:counterparties_and_concentration-01:blocker:task_completion:counterparties_and_concentration-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this report-local blocker; it is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:counterparties_and_concentration-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600121-SH:manufacturing-materials-shadow-600121-2025:counterparties_and_concentration-01:coverage:counterparty_relationship",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:counterparties_and_concentration-01:chapter_sample:stage5-b2243cc697170c3fe9673002",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:counterparties_and_concentration-02:blocker:task_completion:counterparties_and_concentration-02",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this report-local blocker; it is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:counterparties_and_concentration-02:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600121-SH:manufacturing-materials-shadow-600121-2025:counterparties_and_concentration-02:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:counterparties_and_concentration-02:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600121-SH:manufacturing-materials-shadow-600121-2025:counterparties_and_concentration-02:coverage:counterparty_relationship",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:counterparties_and_concentration-02:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600121-SH:manufacturing-materials-shadow-600121-2025:counterparties_and_concentration-02:coverage:customer_concentration",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:counterparties_and_concentration-02:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600121-SH:manufacturing-materials-shadow-600121-2025:counterparties_and_concentration-02:coverage:supplier_concentration",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:business_regime-01:chapter_sample:coverage:business_regime-01:business_regime",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600022-2025:business_overview-01:blocker:task_completion:business_overview-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this report-local blocker; it is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600022-2025:business_overview-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600022-SH:manufacturing-materials-shadow-600022-2025:business_overview-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600022-2025:business_overview-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600022-SH:manufacturing-materials-shadow-600022-2025:business_overview-01:coverage:business_overview_source",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600022-2025:business_overview-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600022-SH:manufacturing-materials-shadow-600022-2025:business_overview-01:coverage:explicit_activity",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600022-2025:segment_financials-01:blocker:task_completion:segment_financials-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this report-local blocker; it is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600022-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600022-SH:manufacturing-materials-shadow-600022-2025:segment_financials-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600022-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600022-SH:manufacturing-materials-shadow-600022-2025:segment_financials-01:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600022-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600022-SH:manufacturing-materials-shadow-600022-2025:segment_financials-01:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600022-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600022-SH:manufacturing-materials-shadow-600022-2025:segment_financials-01:coverage:operating_cost",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600022-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600022-SH:manufacturing-materials-shadow-600022-2025:segment_financials-01:coverage:gross_margin_reported",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600022-2025:segment_financials-02:chapter_sample:stage5-511907200d555a93e269e2a4",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600022-2025:operating_quantities-01:chapter_sample:stage5-821a7c98a1e72a9b4942fb2e",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600022-2025:material_inputs-01:chapter_sample:coverage:material_inputs-01:material_input",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600022-2025:counterparties_and_concentration-01:blocker:task_completion:counterparties_and_concentration-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this report-local blocker; it is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600022-2025:counterparties_and_concentration-01:unresolved:stage5-932e5fe176bf1248c4fa90fe",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600022-2025:counterparties_and_concentration-01:unresolved:stage5-57b2e23f0adc274c831921ec",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600022-2025:counterparties_and_concentration-01:unresolved:stage5-a198a9e74cd6f0ef96b85ddc",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600022-2025:counterparties_and_concentration-01:unresolved:stage5-f299e7e0cf38952f7ef6e2c1",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600022-2025:counterparties_and_concentration-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600022-SH:manufacturing-materials-shadow-600022-2025:counterparties_and_concentration-01:coverage:counterparty_relationship",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600022-2025:counterparties_and_concentration-01:chapter_sample:stage5-f861c664f68f954cf3933929",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600022-2025:business_regime-01:chapter_sample:stage5-f953b226227b433124753e0d",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:business_overview-01:blocker:task_completion:business_overview-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this report-local blocker; it is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:business_overview-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600256-SH:manufacturing-materials-shadow-600256-2025:business_overview-01:coverage:business_overview_source",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:business_overview-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600256-SH:manufacturing-materials-shadow-600256-2025:business_overview-01:coverage:explicit_activity",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:segment_financials-01:blocker:task_completion:segment_financials-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this report-local blocker; it is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600256-SH:manufacturing-materials-shadow-600256-2025:segment_financials-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600256-SH:manufacturing-materials-shadow-600256-2025:segment_financials-01:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600256-SH:manufacturing-materials-shadow-600256-2025:segment_financials-01:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600256-SH:manufacturing-materials-shadow-600256-2025:segment_financials-01:coverage:operating_cost",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600256-SH:manufacturing-materials-shadow-600256-2025:segment_financials-01:coverage:gross_margin_reported",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:segment_financials-02:chapter_sample:stage5-a64d981df1da330244f24dbc",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:operating_quantities-01:blocker:task_completion:operating_quantities-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this report-local blocker; it is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600256-SH:manufacturing-materials-shadow-600256-2025:operating_quantities-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600256-SH:manufacturing-materials-shadow-600256-2025:operating_quantities-01:coverage:production_capacity",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600256-SH:manufacturing-materials-shadow-600256-2025:operating_quantities-01:coverage:production_volume",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600256-SH:manufacturing-materials-shadow-600256-2025:operating_quantities-01:coverage:sales_volume",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600256-SH:manufacturing-materials-shadow-600256-2025:operating_quantities-01:coverage:inventory_volume",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:operating_quantities-02:blocker:task_completion:operating_quantities-02",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this report-local blocker; it is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:operating_quantities-02:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600256-SH:manufacturing-materials-shadow-600256-2025:operating_quantities-02:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:operating_quantities-02:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600256-SH:manufacturing-materials-shadow-600256-2025:operating_quantities-02:coverage:production_capacity",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:operating_quantities-02:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600256-SH:manufacturing-materials-shadow-600256-2025:operating_quantities-02:coverage:production_volume",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:operating_quantities-02:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600256-SH:manufacturing-materials-shadow-600256-2025:operating_quantities-02:coverage:sales_volume",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:operating_quantities-02:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600256-SH:manufacturing-materials-shadow-600256-2025:operating_quantities-02:coverage:inventory_volume",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:material_inputs-01:chapter_sample:stage5-58d6d53ae7668ce7b80c3e5c",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:counterparties_and_concentration-01:chapter_sample:stage5-4cc5fd8f12d54081602cb448",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:counterparties_and_concentration-02:blocker:task_completion:counterparties_and_concentration-02",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this report-local blocker; it is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:counterparties_and_concentration-02:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600256-SH:manufacturing-materials-shadow-600256-2025:counterparties_and_concentration-02:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:counterparties_and_concentration-02:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600256-SH:manufacturing-materials-shadow-600256-2025:counterparties_and_concentration-02:coverage:counterparty_relationship",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:counterparties_and_concentration-02:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600256-SH:manufacturing-materials-shadow-600256-2025:counterparties_and_concentration-02:coverage:customer_concentration",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:business_regime-01:blocker:task_completion:business_regime-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this report-local blocker; it is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:business_regime-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600256-SH:manufacturing-materials-shadow-600256-2025:business_regime-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:business_regime-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600256-SH:manufacturing-materials-shadow-600256-2025:business_regime-01:coverage:business_regime",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600063-2025:business_overview-01:chapter_sample:stage5-5f91704e4601505c56ee6f1a",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600063-2025:segment_financials-01:blocker:task_completion:segment_financials-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this report-local blocker; it is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600063-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600063-SH:manufacturing-materials-shadow-600063-2025:segment_financials-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600063-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600063-SH:manufacturing-materials-shadow-600063-2025:segment_financials-01:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600063-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600063-SH:manufacturing-materials-shadow-600063-2025:segment_financials-01:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600063-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600063-SH:manufacturing-materials-shadow-600063-2025:segment_financials-01:coverage:operating_cost",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600063-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600063-SH:manufacturing-materials-shadow-600063-2025:segment_financials-01:coverage:gross_margin_reported",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600063-2025:segment_financials-02:chapter_sample:stage5-7697e7c3e7237fa37d89fa66",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600063-2025:operating_quantities-01:chapter_sample:stage5-3e6085664152a1491ae5fb46",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600063-2025:operating_quantities-02:blocker:task_completion:operating_quantities-02",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this report-local blocker; it is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600063-2025:operating_quantities-02:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600063-SH:manufacturing-materials-shadow-600063-2025:operating_quantities-02:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600063-2025:operating_quantities-02:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600063-SH:manufacturing-materials-shadow-600063-2025:operating_quantities-02:coverage:production_capacity",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600063-2025:operating_quantities-02:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600063-SH:manufacturing-materials-shadow-600063-2025:operating_quantities-02:coverage:capacity_under_construction",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600063-2025:operating_quantities-02:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600063-SH:manufacturing-materials-shadow-600063-2025:operating_quantities-02:coverage:production_volume",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600063-2025:operating_quantities-02:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600063-SH:manufacturing-materials-shadow-600063-2025:operating_quantities-02:coverage:sales_volume",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600063-2025:operating_quantities-02:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600063-SH:manufacturing-materials-shadow-600063-2025:operating_quantities-02:coverage:inventory_volume",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600063-2025:material_inputs-01:chapter_sample:stage5-957de624ab3d84751e83d7e6",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600063-2025:counterparties_and_concentration-01:chapter_sample:stage5-390199486bfe3646ec9f0ba3",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600063-2025:business_regime-01:chapter_sample:coverage:business_regime-01:business_regime",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600111-2025:business_overview-01:chapter_sample:stage5-4f145aa6c6ea58bae6b52df1",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600111-2025:segment_financials-01:chapter_sample:stage5-12a6f9cc313bea4bf35d3986",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600111-2025:operating_quantities-01:blocker:task_completion:operating_quantities-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this report-local blocker; it is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600111-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600111-SH:manufacturing-materials-shadow-600111-2025:operating_quantities-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600111-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600111-SH:manufacturing-materials-shadow-600111-2025:operating_quantities-01:coverage:production_volume",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600111-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600111-SH:manufacturing-materials-shadow-600111-2025:operating_quantities-01:coverage:sales_volume",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600111-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600111-SH:manufacturing-materials-shadow-600111-2025:operating_quantities-01:coverage:inventory_volume",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600111-2025:material_inputs-01:chapter_sample:stage5-dfcb7768c2cf25ab30479ddd",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600111-2025:counterparties_and_concentration-01:chapter_sample:stage5-073f40a44850c06b32dc89ed",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600111-2025:business_regime-01:blocker:task_completion:business_regime-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this report-local blocker; it is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600111-2025:business_regime-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600111-SH:manufacturing-materials-shadow-600111-2025:business_regime-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600111-2025:business_regime-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600111-SH:manufacturing-materials-shadow-600111-2025:business_regime-01:coverage:business_regime",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:business_overview-01:chapter_sample:stage5-d2c61bcf0e3a7235abf9994a",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:segment_financials-01:blocker:task_completion:segment_financials-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this report-local blocker; it is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600176-SH:manufacturing-materials-shadow-600176-2025:segment_financials-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600176-SH:manufacturing-materials-shadow-600176-2025:segment_financials-01:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600176-SH:manufacturing-materials-shadow-600176-2025:segment_financials-01:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600176-SH:manufacturing-materials-shadow-600176-2025:segment_financials-01:coverage:operating_cost",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600176-SH:manufacturing-materials-shadow-600176-2025:segment_financials-01:coverage:gross_margin_reported",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:segment_financials-02:blocker:task_completion:segment_financials-02",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this report-local blocker; it is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600176-SH:manufacturing-materials-shadow-600176-2025:segment_financials-02:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600176-SH:manufacturing-materials-shadow-600176-2025:segment_financials-02:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:operating_quantities-01:blocker:task_completion:operating_quantities-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this report-local blocker; it is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600176-SH:manufacturing-materials-shadow-600176-2025:operating_quantities-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600176-SH:manufacturing-materials-shadow-600176-2025:operating_quantities-01:coverage:production_capacity",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600176-SH:manufacturing-materials-shadow-600176-2025:operating_quantities-01:coverage:production_volume",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600176-SH:manufacturing-materials-shadow-600176-2025:operating_quantities-01:coverage:sales_volume",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:operating_quantities-02:blocker:task_completion:operating_quantities-02",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this report-local blocker; it is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:operating_quantities-02:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600176-SH:manufacturing-materials-shadow-600176-2025:operating_quantities-02:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:operating_quantities-02:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600176-SH:manufacturing-materials-shadow-600176-2025:operating_quantities-02:coverage:production_capacity",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:operating_quantities-02:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600176-SH:manufacturing-materials-shadow-600176-2025:operating_quantities-02:coverage:production_volume",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:operating_quantities-02:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600176-SH:manufacturing-materials-shadow-600176-2025:operating_quantities-02:coverage:sales_volume",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:operating_quantities-02:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600176-SH:manufacturing-materials-shadow-600176-2025:operating_quantities-02:coverage:inventory_volume",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:material_inputs-01:chapter_sample:stage5-8006cd1b659af4bead2079dc",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:counterparties_and_concentration-01:chapter_sample:stage5-a300fd5dcad8b0c4fa6bec8b",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:business_regime-01:blocker:task_completion:business_regime-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this report-local blocker; it is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:business_regime-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600176-SH:manufacturing-materials-shadow-600176-2025:business_regime-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:business_regime-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600176-SH:manufacturing-materials-shadow-600176-2025:business_regime-01:coverage:business_regime",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:business_overview-01:blocker:task_completion:business_overview-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this report-local blocker; it is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:business_overview-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600075-SH:manufacturing-materials-shadow-600075-2025:business_overview-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:business_overview-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600075-SH:manufacturing-materials-shadow-600075-2025:business_overview-01:coverage:business_overview_source",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:business_overview-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600075-SH:manufacturing-materials-shadow-600075-2025:business_overview-01:coverage:explicit_activity",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:segment_financials-01:blocker:task_completion:segment_financials-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this report-local blocker; it is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600075-SH:manufacturing-materials-shadow-600075-2025:segment_financials-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600075-SH:manufacturing-materials-shadow-600075-2025:segment_financials-01:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600075-SH:manufacturing-materials-shadow-600075-2025:segment_financials-01:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600075-SH:manufacturing-materials-shadow-600075-2025:segment_financials-01:coverage:operating_cost",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600075-SH:manufacturing-materials-shadow-600075-2025:segment_financials-01:coverage:gross_margin_reported",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:segment_financials-02:blocker:task_completion:segment_financials-02",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this report-local blocker; it is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600075-SH:manufacturing-materials-shadow-600075-2025:segment_financials-02:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600075-SH:manufacturing-materials-shadow-600075-2025:segment_financials-02:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600075-SH:manufacturing-materials-shadow-600075-2025:segment_financials-02:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600075-SH:manufacturing-materials-shadow-600075-2025:segment_financials-02:coverage:operating_cost",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600075-SH:manufacturing-materials-shadow-600075-2025:segment_financials-02:coverage:gross_margin_reported",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:operating_quantities-01:blocker:task_completion:operating_quantities-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this report-local blocker; it is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600075-SH:manufacturing-materials-shadow-600075-2025:operating_quantities-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600075-SH:manufacturing-materials-shadow-600075-2025:operating_quantities-01:coverage:production_capacity",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600075-SH:manufacturing-materials-shadow-600075-2025:operating_quantities-01:coverage:capacity_under_construction",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600075-SH:manufacturing-materials-shadow-600075-2025:operating_quantities-01:coverage:production_volume",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600075-SH:manufacturing-materials-shadow-600075-2025:operating_quantities-01:coverage:sales_volume",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600075-SH:manufacturing-materials-shadow-600075-2025:operating_quantities-01:coverage:inventory_volume",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:operating_quantities-02:chapter_sample:stage5-e10bf312257e48e6b63f2795",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:material_inputs-01:chapter_sample:stage5-0cd3b9982124092ebeaa2a66",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:counterparties_and_concentration-01:chapter_sample:stage5-6beaf69e104edc7d78284466",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:counterparties_and_concentration-02:blocker:task_completion:counterparties_and_concentration-02",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this report-local blocker; it is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:counterparties_and_concentration-02:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600075-SH:manufacturing-materials-shadow-600075-2025:counterparties_and_concentration-02:coverage:customer_concentration",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:business_regime-01:blocker:task_completion:business_regime-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this report-local blocker; it is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:business_regime-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600075-SH:manufacturing-materials-shadow-600075-2025:business_regime-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:business_regime-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-600075-SH:manufacturing-materials-shadow-600075-2025:business_regime-01:coverage:business_regime",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000552-2025:business_overview-01:chapter_sample:stage5-68bc9aa6dcc7573d7976fbfd",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000552-2025:segment_financials-01:blocker:task_completion:segment_financials-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this report-local blocker; it is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000552-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-000552-SZ:manufacturing-materials-shadow-000552-2025:segment_financials-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000552-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-000552-SZ:manufacturing-materials-shadow-000552-2025:segment_financials-01:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000552-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-000552-SZ:manufacturing-materials-shadow-000552-2025:segment_financials-01:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000552-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-000552-SZ:manufacturing-materials-shadow-000552-2025:segment_financials-01:coverage:operating_cost",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000552-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-000552-SZ:manufacturing-materials-shadow-000552-2025:segment_financials-01:coverage:gross_margin_reported",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000552-2025:segment_financials-02:chapter_sample:stage5-6965bd21b7b1a7d25ee6260a",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000552-2025:operating_quantities-01:blocker:task_completion:operating_quantities-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this report-local blocker; it is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000552-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-000552-SZ:manufacturing-materials-shadow-000552-2025:operating_quantities-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000552-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-000552-SZ:manufacturing-materials-shadow-000552-2025:operating_quantities-01:coverage:production_capacity",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000552-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-000552-SZ:manufacturing-materials-shadow-000552-2025:operating_quantities-01:coverage:production_volume",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000552-2025:operating_quantities-02:chapter_sample:stage5-22fe8298a0890a8d09646e3b",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000552-2025:material_inputs-01:chapter_sample:stage5-ee8033990706c06c737eb431",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000552-2025:counterparties_and_concentration-01:chapter_sample:stage5-68d2a89a17ddddd4cf957aa6",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000552-2025:business_regime-01:blocker:task_completion:business_regime-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this report-local blocker; it is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000552-2025:business_regime-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-000552-SZ:manufacturing-materials-shadow-000552-2025:business_regime-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000552-2025:business_regime-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-000552-SZ:manufacturing-materials-shadow-000552-2025:business_regime-01:coverage:business_regime",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:business_overview-01:blocker:task_completion:business_overview-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this report-local blocker; it is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:business_overview-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-000629-SZ:manufacturing-materials-shadow-000629-2025:business_overview-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:business_overview-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-000629-SZ:manufacturing-materials-shadow-000629-2025:business_overview-01:coverage:business_overview_source",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:business_overview-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-000629-SZ:manufacturing-materials-shadow-000629-2025:business_overview-01:coverage:explicit_activity",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:segment_financials-01:blocker:task_completion:segment_financials-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this report-local blocker; it is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-000629-SZ:manufacturing-materials-shadow-000629-2025:segment_financials-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-000629-SZ:manufacturing-materials-shadow-000629-2025:segment_financials-01:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-000629-SZ:manufacturing-materials-shadow-000629-2025:segment_financials-01:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-000629-SZ:manufacturing-materials-shadow-000629-2025:segment_financials-01:coverage:operating_cost",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-000629-SZ:manufacturing-materials-shadow-000629-2025:segment_financials-01:coverage:gross_margin_reported",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:segment_financials-02:blocker:task_completion:segment_financials-02",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this report-local blocker; it is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-000629-SZ:manufacturing-materials-shadow-000629-2025:segment_financials-02:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-000629-SZ:manufacturing-materials-shadow-000629-2025:segment_financials-02:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-000629-SZ:manufacturing-materials-shadow-000629-2025:segment_financials-02:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-000629-SZ:manufacturing-materials-shadow-000629-2025:segment_financials-02:coverage:operating_cost",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-000629-SZ:manufacturing-materials-shadow-000629-2025:segment_financials-02:coverage:gross_margin_reported",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:operating_quantities-01:chapter_sample:stage5-b4edb2215558179039fa41d4",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:material_inputs-01:chapter_sample:stage5-223cc4ebebbc3067ef7ba12b",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:counterparties_and_concentration-01:chapter_sample:stage5-258a790c8e7ecca2df6ad673",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:business_regime-01:chapter_sample:coverage:business_regime-01:business_regime",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000059-2025:business_overview-01:chapter_sample:stage5-c946309b14c311263ab9ead8",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000059-2025:segment_financials-01:blocker:task_completion:segment_financials-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this report-local blocker; it is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000059-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-000059-SZ:manufacturing-materials-shadow-000059-2025:segment_financials-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000059-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-000059-SZ:manufacturing-materials-shadow-000059-2025:segment_financials-01:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000059-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-000059-SZ:manufacturing-materials-shadow-000059-2025:segment_financials-01:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000059-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-000059-SZ:manufacturing-materials-shadow-000059-2025:segment_financials-01:coverage:operating_cost",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000059-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-000059-SZ:manufacturing-materials-shadow-000059-2025:segment_financials-01:coverage:gross_margin_reported",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000059-2025:segment_financials-02:blocker:task_completion:segment_financials-02",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this report-local blocker; it is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000059-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-000059-SZ:manufacturing-materials-shadow-000059-2025:segment_financials-02:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000059-2025:operating_quantities-01:chapter_sample:stage5-1b158c1795593c85da520d3b",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000059-2025:material_inputs-01:chapter_sample:stage5-8c1a33022e2e3b82c3136ff0",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000059-2025:counterparties_and_concentration-01:chapter_sample:stage5-9b2fe0fd5281968b50e8b1c3",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000059-2025:business_regime-01:chapter_sample:coverage:business_regime-01:business_regime",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:business_overview-01:chapter_sample:stage5-1a3e34274506ff1cc2ff8981",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:segment_financials-01:blocker:task_completion:segment_financials-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this report-local blocker; it is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-000408-SZ:manufacturing-materials-shadow-000408-2025:segment_financials-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-000408-SZ:manufacturing-materials-shadow-000408-2025:segment_financials-01:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-000408-SZ:manufacturing-materials-shadow-000408-2025:segment_financials-01:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-000408-SZ:manufacturing-materials-shadow-000408-2025:segment_financials-01:coverage:operating_cost",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-000408-SZ:manufacturing-materials-shadow-000408-2025:segment_financials-01:coverage:gross_margin_reported",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:segment_financials-02:chapter_sample:stage5-ee85c75a39fa4ac2b3747b7c",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:operating_quantities-01:blocker:task_completion:operating_quantities-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this report-local blocker; it is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-000408-SZ:manufacturing-materials-shadow-000408-2025:operating_quantities-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-000408-SZ:manufacturing-materials-shadow-000408-2025:operating_quantities-01:coverage:production_capacity",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-000408-SZ:manufacturing-materials-shadow-000408-2025:operating_quantities-01:coverage:capacity_under_construction",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-000408-SZ:manufacturing-materials-shadow-000408-2025:operating_quantities-01:coverage:capacity_utilization",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-000408-SZ:manufacturing-materials-shadow-000408-2025:operating_quantities-01:coverage:production_volume",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:operating_quantities-02:blocker:task_completion:operating_quantities-02",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this report-local blocker; it is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:operating_quantities-02:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-000408-SZ:manufacturing-materials-shadow-000408-2025:operating_quantities-02:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:operating_quantities-02:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-000408-SZ:manufacturing-materials-shadow-000408-2025:operating_quantities-02:coverage:production_capacity",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:operating_quantities-02:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-000408-SZ:manufacturing-materials-shadow-000408-2025:operating_quantities-02:coverage:capacity_under_construction",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:operating_quantities-02:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-000408-SZ:manufacturing-materials-shadow-000408-2025:operating_quantities-02:coverage:capacity_utilization",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:operating_quantities-02:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-000408-SZ:manufacturing-materials-shadow-000408-2025:operating_quantities-02:coverage:production_volume",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:operating_quantities-02:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-000408-SZ:manufacturing-materials-shadow-000408-2025:operating_quantities-02:coverage:sales_volume",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:material_inputs-01:chapter_sample:stage5-8a1b30bd8805f527b3893e6b",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:counterparties_and_concentration-01:chapter_sample:stage5-200286f7496d4c6807648cd6",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:business_regime-01:chapter_sample:stage5-355cc8b8611a211b2b78050b",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000060-2025:business_overview-01:chapter_sample:stage5-0213bba5df0f2dc0ddba8039",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000060-2025:segment_financials-01:blocker:task_completion:segment_financials-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this report-local blocker; it is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000060-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-000060-SZ:manufacturing-materials-shadow-000060-2025:segment_financials-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000060-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-000060-SZ:manufacturing-materials-shadow-000060-2025:segment_financials-01:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000060-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-000060-SZ:manufacturing-materials-shadow-000060-2025:segment_financials-01:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000060-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-000060-SZ:manufacturing-materials-shadow-000060-2025:segment_financials-01:coverage:operating_cost",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000060-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-000060-SZ:manufacturing-materials-shadow-000060-2025:segment_financials-01:coverage:gross_margin_reported",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000060-2025:segment_financials-02:blocker:task_completion:segment_financials-02",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this report-local blocker; it is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000060-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-000060-SZ:manufacturing-materials-shadow-000060-2025:segment_financials-02:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000060-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-000060-SZ:manufacturing-materials-shadow-000060-2025:segment_financials-02:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000060-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-000060-SZ:manufacturing-materials-shadow-000060-2025:segment_financials-02:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000060-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-000060-SZ:manufacturing-materials-shadow-000060-2025:segment_financials-02:coverage:operating_cost",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000060-2025:operating_quantities-01:chapter_sample:stage5-f707368b40659ac57d9c24ca",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000060-2025:material_inputs-01:chapter_sample:coverage:material_inputs-01:material_input",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000060-2025:counterparties_and_concentration-01:chapter_sample:stage5-f4d7d5aa31caf2bec64eef45",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000060-2025:business_regime-01:blocker:task_completion:business_regime-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this report-local blocker; it is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000060-2025:business_regime-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-000060-SZ:manufacturing-materials-shadow-000060-2025:business_regime-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000060-2025:business_regime-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-000060-SZ:manufacturing-materials-shadow-000060-2025:business_regime-01:coverage:business_regime",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000055-2025:business_overview-01:blocker:task_completion:business_overview-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this report-local blocker; it is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000055-2025:business_overview-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-000055-SZ:manufacturing-materials-shadow-000055-2025:business_overview-01:coverage:business_overview_source",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000055-2025:business_overview-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-000055-SZ:manufacturing-materials-shadow-000055-2025:business_overview-01:coverage:explicit_activity",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000055-2025:segment_financials-01:blocker:task_completion:segment_financials-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this report-local blocker; it is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000055-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-000055-SZ:manufacturing-materials-shadow-000055-2025:segment_financials-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000055-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-000055-SZ:manufacturing-materials-shadow-000055-2025:segment_financials-01:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000055-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-000055-SZ:manufacturing-materials-shadow-000055-2025:segment_financials-01:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000055-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-000055-SZ:manufacturing-materials-shadow-000055-2025:segment_financials-01:coverage:operating_cost",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000055-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-000055-SZ:manufacturing-materials-shadow-000055-2025:segment_financials-01:coverage:gross_margin_reported",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000055-2025:segment_financials-02:blocker:task_completion:segment_financials-02",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this report-local blocker; it is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000055-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-000055-SZ:manufacturing-materials-shadow-000055-2025:segment_financials-02:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000055-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-000055-SZ:manufacturing-materials-shadow-000055-2025:segment_financials-02:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000055-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-000055-SZ:manufacturing-materials-shadow-000055-2025:segment_financials-02:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000055-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-000055-SZ:manufacturing-materials-shadow-000055-2025:segment_financials-02:coverage:operating_cost",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000055-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-000055-SZ:manufacturing-materials-shadow-000055-2025:segment_financials-02:coverage:gross_margin_reported",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000055-2025:operating_quantities-01:chapter_sample:coverage:operating_quantities-01:production_volume",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000055-2025:material_inputs-01:chapter_sample:coverage:material_inputs-01:material_input",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000055-2025:counterparties_and_concentration-01:chapter_sample:stage5-665f3019401db8dea8486c94",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000055-2025:business_regime-01:blocker:task_completion:business_regime-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this report-local blocker; it is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000055-2025:business_regime-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-000055-SZ:manufacturing-materials-shadow-000055-2025:business_regime-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000055-2025:business_regime-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-000055-SZ:manufacturing-materials-shadow-000055-2025:business_regime-01:coverage:business_regime",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000420-2025:business_overview-01:blocker:task_completion:business_overview-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this report-local blocker; it is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000420-2025:business_overview-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-000420-SZ:manufacturing-materials-shadow-000420-2025:business_overview-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000420-2025:business_overview-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-000420-SZ:manufacturing-materials-shadow-000420-2025:business_overview-01:coverage:business_overview_source",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000420-2025:business_overview-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-000420-SZ:manufacturing-materials-shadow-000420-2025:business_overview-01:coverage:explicit_activity",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000420-2025:segment_financials-01:chapter_sample:stage5-efd2152650130bb6d980fe9c",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000420-2025:segment_financials-02:blocker:task_completion:segment_financials-02",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this report-local blocker; it is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000420-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-000420-SZ:manufacturing-materials-shadow-000420-2025:segment_financials-02:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000420-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-000420-SZ:manufacturing-materials-shadow-000420-2025:segment_financials-02:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000420-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-000420-SZ:manufacturing-materials-shadow-000420-2025:segment_financials-02:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000420-2025:operating_quantities-01:chapter_sample:stage5-bc5072046daad6bccd9d4618",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000420-2025:material_inputs-01:chapter_sample:stage5-2ecd8a0e83f11b7f83b45cee",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000420-2025:counterparties_and_concentration-01:chapter_sample:stage5-84e9a32584a48fb97c8c18d7",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000420-2025:business_regime-01:chapter_sample:coverage:business_regime-01:business_regime",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920016-2025:business_overview-01:blocker:task_completion:business_overview-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this report-local blocker; it is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920016-2025:business_overview-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-920016-BJ:manufacturing-materials-shadow-920016-2025:business_overview-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920016-2025:business_overview-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-920016-BJ:manufacturing-materials-shadow-920016-2025:business_overview-01:coverage:business_overview_source",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920016-2025:business_overview-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-920016-BJ:manufacturing-materials-shadow-920016-2025:business_overview-01:coverage:explicit_activity",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920016-2025:segment_financials-01:chapter_sample:coverage:segment_financials-01:segment_dimension",
+    "outcome": "noncritical_error",
+    "reviewer": "codex-source-review",
+    "notes": "Noncritical Evidence-owner error: segment_dimension=not_disclosed is bound to a management-plan/production page rather than a governed segment or revenue/cost owner."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920016-2025:operating_quantities-01:chapter_sample:coverage:operating_quantities-01:production_capacity",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920016-2025:material_inputs-01:chapter_sample:stage5-e91320c0dfbd57f23f1c3ff5",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920016-2025:counterparties_and_concentration-01:chapter_sample:stage5-fd97e5def20e1ce80eecfddb",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920016-2025:business_regime-01:chapter_sample:coverage:business_regime-01:business_regime",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:business_overview-01:chapter_sample:stage5-5dc4a703afc38b5badaa90c1",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:segment_financials-01:blocker:task_completion:segment_financials-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this report-local blocker; it is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-920033-BJ:manufacturing-materials-shadow-920033-2025:segment_financials-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-920033-BJ:manufacturing-materials-shadow-920033-2025:segment_financials-01:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-920033-BJ:manufacturing-materials-shadow-920033-2025:segment_financials-01:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-920033-BJ:manufacturing-materials-shadow-920033-2025:segment_financials-01:coverage:operating_cost",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-920033-BJ:manufacturing-materials-shadow-920033-2025:segment_financials-01:coverage:gross_margin_reported",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:segment_financials-02:blocker:task_completion:segment_financials-02",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this report-local blocker; it is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-920033-BJ:manufacturing-materials-shadow-920033-2025:segment_financials-02:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-920033-BJ:manufacturing-materials-shadow-920033-2025:segment_financials-02:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:operating_quantities-01:blocker:task_completion:operating_quantities-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this report-local blocker; it is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-920033-BJ:manufacturing-materials-shadow-920033-2025:operating_quantities-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-920033-BJ:manufacturing-materials-shadow-920033-2025:operating_quantities-01:coverage:production_capacity",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-920033-BJ:manufacturing-materials-shadow-920033-2025:operating_quantities-01:coverage:capacity_under_construction",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-920033-BJ:manufacturing-materials-shadow-920033-2025:operating_quantities-01:coverage:production_volume",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-920033-BJ:manufacturing-materials-shadow-920033-2025:operating_quantities-01:coverage:sales_volume",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-920033-BJ:manufacturing-materials-shadow-920033-2025:operating_quantities-01:coverage:inventory_volume",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:operating_quantities-02:blocker:task_completion:operating_quantities-02",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this report-local blocker; it is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:operating_quantities-02:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-920033-BJ:manufacturing-materials-shadow-920033-2025:operating_quantities-02:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:operating_quantities-02:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-920033-BJ:manufacturing-materials-shadow-920033-2025:operating_quantities-02:coverage:production_capacity",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:operating_quantities-02:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-920033-BJ:manufacturing-materials-shadow-920033-2025:operating_quantities-02:coverage:capacity_under_construction",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:operating_quantities-02:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-920033-BJ:manufacturing-materials-shadow-920033-2025:operating_quantities-02:coverage:production_volume",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:material_inputs-01:chapter_sample:coverage:material_inputs-01:material_input",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:counterparties_and_concentration-01:chapter_sample:stage5-ec2e4a568319498bd0ca2b3d",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:counterparties_and_concentration-02:blocker:task_completion:counterparties_and_concentration-02",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this report-local blocker; it is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:counterparties_and_concentration-02:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-920033-BJ:manufacturing-materials-shadow-920033-2025:counterparties_and_concentration-02:coverage:customer_concentration",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:business_regime-01:blocker:task_completion:business_regime-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this report-local blocker; it is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:business_regime-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-920033-BJ:manufacturing-materials-shadow-920033-2025:business_regime-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:business_regime-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-920033-BJ:manufacturing-materials-shadow-920033-2025:business_regime-01:coverage:business_regime",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920068-2025:business_overview-01:chapter_sample:stage5-dd793e68ab93878ca79cfb3c",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920068-2025:segment_financials-01:chapter_sample:stage5-7bf93961bb46a3f9ec47acb5",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920068-2025:operating_quantities-01:blocker:task_completion:operating_quantities-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this report-local blocker; it is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920068-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-920068-BJ:manufacturing-materials-shadow-920068-2025:operating_quantities-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920068-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-920068-BJ:manufacturing-materials-shadow-920068-2025:operating_quantities-01:coverage:production_capacity",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920068-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-920068-BJ:manufacturing-materials-shadow-920068-2025:operating_quantities-01:coverage:capacity_under_construction",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920068-2025:material_inputs-01:chapter_sample:stage5-19a2dfa2a98ac04c998494d1",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920068-2025:counterparties_and_concentration-01:chapter_sample:stage5-b0d8a3d5942055ddc6a2958b",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920068-2025:business_regime-01:blocker:task_completion:business_regime-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this report-local blocker; it is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920068-2025:business_regime-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-920068-BJ:manufacturing-materials-shadow-920068-2025:business_regime-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920068-2025:business_regime-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-920068-BJ:manufacturing-materials-shadow-920068-2025:business_regime-01:coverage:business_regime",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920078-2025:business_overview-01:chapter_sample:stage5-5f2e40b6968ef0f3d21b7228",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920078-2025:segment_financials-01:blocker:task_completion:segment_financials-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this report-local blocker; it is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920078-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-920078-BJ:manufacturing-materials-shadow-920078-2025:segment_financials-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920078-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-920078-BJ:manufacturing-materials-shadow-920078-2025:segment_financials-01:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920078-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-920078-BJ:manufacturing-materials-shadow-920078-2025:segment_financials-01:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920078-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-920078-BJ:manufacturing-materials-shadow-920078-2025:segment_financials-01:coverage:operating_cost",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920078-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-920078-BJ:manufacturing-materials-shadow-920078-2025:segment_financials-01:coverage:gross_margin_reported",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920078-2025:operating_quantities-01:blocker:task_completion:operating_quantities-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this report-local blocker; it is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920078-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-920078-BJ:manufacturing-materials-shadow-920078-2025:operating_quantities-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920078-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-920078-BJ:manufacturing-materials-shadow-920078-2025:operating_quantities-01:coverage:production_capacity",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920078-2025:material_inputs-01:blocker:task_completion:material_inputs-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this report-local blocker; it is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920078-2025:material_inputs-01:unresolved:stage5-c09aa9a73d7d10b00bb2111a",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920078-2025:material_inputs-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-920078-BJ:manufacturing-materials-shadow-920078-2025:material_inputs-01:coverage:material_input",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920078-2025:material_inputs-01:chapter_sample:stage5-69548c763dff5fbd1206068f",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920078-2025:counterparties_and_concentration-01:chapter_sample:stage5-43dcc02f3bcb90aea9397988",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920078-2025:business_regime-01:blocker:task_completion:business_regime-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this report-local blocker; it is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920078-2025:business_regime-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-920078-BJ:manufacturing-materials-shadow-920078-2025:business_regime-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920078-2025:business_regime-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-920078-BJ:manufacturing-materials-shadow-920078-2025:business_regime-01:coverage:business_regime",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920076-2025:business_overview-01:chapter_sample:stage5-d821007312cc5aa0e69fa8f4",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920076-2025:segment_financials-01:blocker:task_completion:segment_financials-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this report-local blocker; it is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920076-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-920076-BJ:manufacturing-materials-shadow-920076-2025:segment_financials-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920076-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-920076-BJ:manufacturing-materials-shadow-920076-2025:segment_financials-01:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920076-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-920076-BJ:manufacturing-materials-shadow-920076-2025:segment_financials-01:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920076-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-920076-BJ:manufacturing-materials-shadow-920076-2025:segment_financials-01:coverage:operating_cost",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920076-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-920076-BJ:manufacturing-materials-shadow-920076-2025:segment_financials-01:coverage:gross_margin_reported",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920076-2025:segment_financials-02:blocker:task_completion:segment_financials-02",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this report-local blocker; it is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920076-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-920076-BJ:manufacturing-materials-shadow-920076-2025:segment_financials-02:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920076-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-920076-BJ:manufacturing-materials-shadow-920076-2025:segment_financials-02:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920076-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-920076-BJ:manufacturing-materials-shadow-920076-2025:segment_financials-02:coverage:operating_cost",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920076-2025:operating_quantities-01:blocker:task_completion:operating_quantities-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this report-local blocker; it is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920076-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-920076-BJ:manufacturing-materials-shadow-920076-2025:operating_quantities-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920076-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-920076-BJ:manufacturing-materials-shadow-920076-2025:operating_quantities-01:coverage:production_capacity",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920076-2025:material_inputs-01:chapter_sample:coverage:material_inputs-01:material_input",
+    "outcome": "noncritical_error",
+    "reviewer": "codex-source-review",
+    "notes": "Noncritical owner/continuation error: material_input=not_disclosed omits the adjacent continuation disclosure of consumed refractory materials, including spent refractory material."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920076-2025:counterparties_and_concentration-01:chapter_sample:stage5-89875347ba9f2ab641bf2cb6",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920076-2025:business_regime-01:blocker:task_completion:business_regime-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this report-local blocker; it is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920076-2025:business_regime-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-920076-BJ:manufacturing-materials-shadow-920076-2025:business_regime-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920076-2025:business_regime-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-920076-BJ:manufacturing-materials-shadow-920076-2025:business_regime-01:coverage:business_regime",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:business_overview-01:chapter_sample:stage5-25b4b0c5bc8866f6ffc90f04",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:segment_financials-01:blocker:task_completion:segment_financials-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this report-local blocker; it is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-920580-BJ:manufacturing-materials-shadow-920580-2025:segment_financials-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-920580-BJ:manufacturing-materials-shadow-920580-2025:segment_financials-01:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-920580-BJ:manufacturing-materials-shadow-920580-2025:segment_financials-01:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-920580-BJ:manufacturing-materials-shadow-920580-2025:segment_financials-01:coverage:operating_cost",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-920580-BJ:manufacturing-materials-shadow-920580-2025:segment_financials-01:coverage:gross_margin_reported",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:segment_financials-02:blocker:task_completion:segment_financials-02",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this report-local blocker; it is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-920580-BJ:manufacturing-materials-shadow-920580-2025:segment_financials-02:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-920580-BJ:manufacturing-materials-shadow-920580-2025:segment_financials-02:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-920580-BJ:manufacturing-materials-shadow-920580-2025:segment_financials-02:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-920580-BJ:manufacturing-materials-shadow-920580-2025:segment_financials-02:coverage:operating_cost",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-920580-BJ:manufacturing-materials-shadow-920580-2025:segment_financials-02:coverage:gross_margin_reported",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:operating_quantities-01:blocker:task_completion:operating_quantities-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this report-local blocker; it is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-920580-BJ:manufacturing-materials-shadow-920580-2025:operating_quantities-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-920580-BJ:manufacturing-materials-shadow-920580-2025:operating_quantities-01:coverage:production_capacity",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-920580-BJ:manufacturing-materials-shadow-920580-2025:operating_quantities-01:coverage:capacity_under_construction",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:operating_quantities-02:blocker:task_completion:operating_quantities-02",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this report-local blocker; it is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:operating_quantities-02:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-920580-BJ:manufacturing-materials-shadow-920580-2025:operating_quantities-02:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:operating_quantities-02:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-920580-BJ:manufacturing-materials-shadow-920580-2025:operating_quantities-02:coverage:production_capacity",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:material_inputs-01:chapter_sample:stage5-5291bf4ce7fa63a15efc80b3",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:counterparties_and_concentration-01:chapter_sample:stage5-b599bdf0c7f3f21bf668662c",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:business_regime-01:blocker:task_completion:business_regime-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this report-local blocker; it is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:business_regime-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-920580-BJ:manufacturing-materials-shadow-920580-2025:business_regime-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:business_regime-01:unresolved:manufacturing-materials-shadow-owner-closure-gemini-20260910-a-920580-BJ:manufacturing-materials-shadow-920580-2025:business_regime-01:coverage:business_regime",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The source-bound package correctly retains this unresolved item for human adjudication without inventing a fact, identity, value, unit, or legal-empty conclusion."
+  }
+]

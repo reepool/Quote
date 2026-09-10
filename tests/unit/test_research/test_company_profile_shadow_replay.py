@@ -13,6 +13,7 @@ from research.company_profile.shadow_batch import (
 from research.company_profile.shadow_batch_audit import (
     build_shadow_readiness_audit,
     build_shadow_replay_comparison_audit,
+    build_shadow_replay_comparison_from_snapshot,
     build_shadow_review_package,
     load_shadow_replay_comparison_audit,
     write_shadow_batch_audit_artifact,
@@ -35,6 +36,7 @@ from research.company_profile.shadow_evidence import (
 from research.company_profile.stage5_provider import _segment_numeric_occurrence_count
 from scripts.run_company_profile_shadow_batch import (
     EXTERNAL_PRECISION_SHADOW_REPLAY_CONTRACT,
+    OWNER_CLOSURE_SHADOW_REPLAY_CONTRACT,
     PRECISION_CLOSURE_SHADOW_REPLAY_CONTRACT,
     STABILITY_SHADOW_REPLAY_CONTRACT,
     _validate_replay_mode,
@@ -61,6 +63,14 @@ STABILITY_CHANGE = (
 PRECISION_CLOSURE_CHANGE = (
     REPOSITORY_ROOT
     / "openspec/changes/archive/2026-09-10-close-company-profile-shadow-reviewed-precision-errors"
+)
+OWNER_CLOSURE_CHANGE = (
+    REPOSITORY_ROOT
+    / "openspec/changes/validate-company-profile-shadow-owner-closure-replay"
+)
+OWNER_REGRESSION_CHANGE = (
+    REPOSITORY_ROOT
+    / "openspec/changes/archive/2026-09-10-close-company-profile-shadow-evidence-owner-regressions"
 )
 BASELINE_BATCH = (
     REPOSITORY_ROOT
@@ -113,6 +123,34 @@ def _stability_replay_inputs():
         )
         for reference in frozen_batch.reports
     }
+    return manifest, plan, preparation, correction, supporting, prepared
+
+
+@pytest.fixture(scope="module")
+def owner_closure_replay_inputs():
+    manifest = load_shadow_sample_manifest(
+        BASELINE_CHANGE / "shadow-manifest.v1.json",
+        repository_root=REPOSITORY_ROOT,
+    )
+    plan = load_shadow_evidence_plan(OWNER_CLOSURE_CHANGE / "shadow-evidence-plan.v4.json")
+    preparation = load_shadow_preparation_audit(
+        OWNER_CLOSURE_CHANGE / "provider-free-preparation-audit.v1.json"
+    )
+    correction = json.loads(
+        (OWNER_CLOSURE_CHANGE / "owner-closure-correction-audit.v1.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    supporting = {
+        "owner_regression_cases": _file_sha256(
+            OWNER_REGRESSION_CHANGE / "evidence-owner-regression-cases.v1.json"
+        ),
+        "owner_regression_closure_audit": _file_sha256(
+            OWNER_REGRESSION_CHANGE
+            / "provider-free-owner-regression-closure-audit.v1.json"
+        ),
+    }
+    prepared = ShadowEvidencePreparer().prepare(manifest=manifest, plan=plan)
     return manifest, plan, preparation, correction, supporting, prepared
 
 
@@ -539,6 +577,32 @@ def test_replay_comparison_validates_trees_and_is_research_only(tmp_path: Path) 
     assert hashlib.sha256(baseline_report.read_bytes()).hexdigest() == baseline_before
 
 
+def test_replay_comparison_accepts_validated_archive_snapshot(tmp_path: Path) -> None:
+    refined = _clone_batch_with_refined_identity(tmp_path)
+    tree_comparison = build_shadow_replay_comparison_audit(
+        audit_id="shadow-replay-tree-comparison-unit",
+        baseline_batch_directory=BASELINE_BATCH,
+        refined_batch_directory=refined,
+        baseline_review_path=BASELINE_CHANGE / "source-text-review-package.v3.json",
+        refined_review_path=refined / "review-package.json",
+        baseline_readiness_path=BASELINE_CHANGE / "empirical-readiness-audit.v3.json",
+        refined_readiness_path=refined / "readiness-audit.json",
+    )
+
+    snapshot_comparison = build_shadow_replay_comparison_from_snapshot(
+        audit_id="shadow-replay-snapshot-comparison-unit",
+        baseline=tree_comparison.baseline,
+        refined_batch_directory=refined,
+        refined_review_path=refined / "review-package.json",
+        refined_readiness_path=refined / "readiness-audit.json",
+    )
+
+    assert snapshot_comparison.baseline == tree_comparison.baseline
+    assert snapshot_comparison.refined == tree_comparison.refined
+    assert snapshot_comparison.metric_deltas == tree_comparison.metric_deltas
+    assert snapshot_comparison.production_authorization == "not_authorized"
+
+
 def test_replay_comparison_allows_distinct_batches_with_same_evidence_plan(
     tmp_path: Path,
 ) -> None:
@@ -806,6 +870,143 @@ def test_external_precision_replay_mode_and_existing_output_are_closed(
 
     manifest, plan, preparation, correction, supporting, prepared = (
         _precision_closure_replay_inputs()
+    )
+    (tmp_path / f"batch-{contract.batch_id}").mkdir()
+    with pytest.raises(FileExistsError, match="shadow batch already exists"):
+        validate_shadow_replay_admission(
+            contract=contract,
+            batch_id=contract.batch_id,
+            primary_logical_profile=contract.primary_logical_profile,
+            extract_max_output_tokens=contract.extract_max_output_tokens,
+            verify_max_output_tokens=contract.verify_max_output_tokens,
+            timeout_seconds=contract.timeout_seconds,
+            max_provider_calls=contract.max_provider_calls,
+            manifest=manifest,
+            evidence_plan=plan,
+            preparation_audit=preparation,
+            correction_audit=correction,
+            supporting_artifact_hashes=supporting,
+            prepared=prepared,
+            output_root=tmp_path,
+        )
+
+def test_owner_closure_replay_admission_is_exact_and_research_only(
+    tmp_path: Path,
+    owner_closure_replay_inputs,
+) -> None:
+    manifest, plan, preparation, correction, supporting, prepared = (
+        owner_closure_replay_inputs
+    )
+    contract = OWNER_CLOSURE_SHADOW_REPLAY_CONTRACT
+
+    validate_shadow_replay_admission(
+        contract=contract,
+        batch_id=contract.batch_id,
+        primary_logical_profile=contract.primary_logical_profile,
+        extract_max_output_tokens=contract.extract_max_output_tokens,
+        verify_max_output_tokens=contract.verify_max_output_tokens,
+        timeout_seconds=contract.timeout_seconds,
+        max_provider_calls=contract.max_provider_calls,
+        manifest=manifest,
+        evidence_plan=plan,
+        preparation_audit=preparation,
+        correction_audit=correction,
+        supporting_artifact_hashes=supporting,
+        prepared=prepared,
+        output_root=tmp_path,
+    )
+
+    assert contract.evidence_plan_version == "manufacturing_materials_shadow.2026-09-10.4"
+    assert contract.production_authorization == "not_authorized"
+    assert preparation.production_authorization == "not_authorized"
+    assert correction["production_authorization"] == "not_authorized"
+
+
+def test_owner_closure_replay_rejects_case_and_audit_drift(
+    tmp_path: Path,
+    owner_closure_replay_inputs,
+) -> None:
+    manifest, plan, preparation, correction, supporting, prepared = (
+        owner_closure_replay_inputs
+    )
+    contract = OWNER_CLOSURE_SHADOW_REPLAY_CONTRACT
+    changed_supporting = {**supporting, "owner_regression_cases": "f" * 64}
+    with pytest.raises(ValueError, match="supporting_artifact_hashes"):
+        validate_shadow_replay_admission(
+            contract=contract,
+            batch_id=contract.batch_id,
+            primary_logical_profile=contract.primary_logical_profile,
+            extract_max_output_tokens=contract.extract_max_output_tokens,
+            verify_max_output_tokens=contract.verify_max_output_tokens,
+            timeout_seconds=contract.timeout_seconds,
+            max_provider_calls=contract.max_provider_calls,
+            manifest=manifest,
+            evidence_plan=plan,
+            preparation_audit=preparation,
+            correction_audit=correction,
+            supporting_artifact_hashes=changed_supporting,
+            prepared=prepared,
+            output_root=tmp_path,
+        )
+
+    changed_correction = {**correction, "unresolved_finding_ids": ["regression"]}
+    with pytest.raises(ValueError, match="correction audit hash mismatch"):
+        validate_shadow_replay_admission(
+            contract=contract,
+            batch_id=contract.batch_id,
+            primary_logical_profile=contract.primary_logical_profile,
+            extract_max_output_tokens=contract.extract_max_output_tokens,
+            verify_max_output_tokens=contract.verify_max_output_tokens,
+            timeout_seconds=contract.timeout_seconds,
+            max_provider_calls=contract.max_provider_calls,
+            manifest=manifest,
+            evidence_plan=plan,
+            preparation_audit=preparation,
+            correction_audit=changed_correction,
+            supporting_artifact_hashes=supporting,
+            prepared=prepared,
+            output_root=tmp_path,
+        )
+
+
+def test_owner_closure_replay_mode_and_output_identity_are_single_use(
+    tmp_path: Path,
+    owner_closure_replay_inputs,
+) -> None:
+    contract = OWNER_CLOSURE_SHADOW_REPLAY_CONTRACT
+    args = build_parser().parse_args(
+        [
+            "--mode",
+            "owner-closure-semantic-replay",
+            "--sample-manifest",
+            "manifest.json",
+            "--evidence-plan",
+            "plan.json",
+            "--batch-id",
+            contract.batch_id,
+        ]
+    )
+    assert args.mode == "owner-closure-semantic-replay"
+    _validate_replay_mode(
+        mode=args.mode,
+        plan_version=contract.evidence_plan_version,
+        batch_id=contract.batch_id,
+    )
+    with pytest.raises(ValueError, match="owner-closure batch identity requires"):
+        _validate_replay_mode(
+            mode="stability-semantic-replay",
+            plan_version=contract.evidence_plan_version,
+            batch_id=contract.batch_id,
+        )
+    with pytest.raises(ValueError, match="v4 Evidence plan requires"):
+        _validate_replay_mode(
+            mode="semantic-run",
+            plan_version=contract.evidence_plan_version,
+            batch_id="owner-closure-bypass",
+        )
+
+    manifest, plan, preparation, correction, supporting, prepared = (
+        owner_closure_replay_inputs
     )
     (tmp_path / f"batch-{contract.batch_id}").mkdir()
     with pytest.raises(FileExistsError, match="shadow batch already exists"):

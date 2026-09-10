@@ -30,6 +30,7 @@ from research.company_profile.shadow_batch_service import (
 from research.company_profile.shadow_evidence import (
     ShadowEvidencePlanner,
     ShadowEvidencePreparer,
+    build_shadow_owner_closure_correction_audit,
     build_shadow_preparation_audit,
     build_shadow_scope_refinement_audit,
     load_shadow_evidence_plan,
@@ -120,6 +121,35 @@ EXTERNAL_PRECISION_SHADOW_REPLAY_CONTRACT = ShadowReplayContract(
     batch_id="manufacturing-materials-shadow-precision-external-gemini-20260910-a",
     **PRECISION_CLOSURE_SHADOW_REPLAY_CONTRACT.model_dump(exclude={"batch_id"}),
 )
+OWNER_CLOSURE_SHADOW_REPLAY_CONTRACT = ShadowReplayContract(
+    batch_id="manufacturing-materials-shadow-owner-closure-gemini-20260910-a",
+    sample_manifest_hash=(
+        "6f639739ef082e78dcb0c01a5ce40bab1645d8fdc027bece2dbef63652bae9e2"
+    ),
+    evidence_plan_version="manufacturing_materials_shadow.2026-09-10.4",
+    evidence_plan_hash=(
+        "067128f23c6434e6a19d58fa86e51d54befcd9606fbd169218706bd0dc14160a"
+    ),
+    preparation_audit_hash=(
+        "ef7d52bdb857078e734036f0f5a0af38f95ef42140521b0fb75709b163e5575a"
+    ),
+    correction_audit_hash=(
+        "578aedee59ef40cd2fdfe0ef574972da0a44b38fe21891ec6842f0c9a3eed047"
+    ),
+    supporting_artifact_hashes={
+        "owner_regression_cases": (
+            "f681bedc1c4c4415cbd1f8e88149d0a7f179b8e85343a7c0d873244af237573e"
+        ),
+        "owner_regression_closure_audit": (
+            "20ab0d914fe2e2e68dfd03a85bd1680d8cc0bc0abc1835f5e6e5dcbc9050fe0a"
+        ),
+    },
+    primary_logical_profile=SHADOW_PRIMARY_PROFILE,
+    extract_max_output_tokens=SHADOW_EXTRACT_MAX_OUTPUT_TOKENS,
+    verify_max_output_tokens=SHADOW_VERIFY_MAX_OUTPUT_TOKENS,
+    timeout_seconds=SHADOW_TIMEOUT_SECONDS,
+    max_provider_calls=SHADOW_MAX_PROVIDER_CALLS,
+)
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -128,12 +158,14 @@ def build_parser() -> argparse.ArgumentParser:
         "--mode",
         choices=(
             "preparation-only",
+            "owner-closure-preparation",
             "scope-refinement-replay",
             "semantic-run",
             "refined-semantic-replay",
             "stability-semantic-replay",
             "precision-closure-semantic-replay",
             "external-precision-semantic-replay",
+            "owner-closure-semantic-replay",
         ),
         required=True,
     )
@@ -146,6 +178,10 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--execution-stability-fixture", type=Path)
     parser.add_argument("--stability-probe", type=Path)
     parser.add_argument("--precision-closure-audit", type=Path)
+    parser.add_argument("--owner-regression-cases", type=Path)
+    parser.add_argument("--owner-regression-closure-audit", type=Path)
+    parser.add_argument("--generated-preparation-audit", type=Path)
+    parser.add_argument("--generated-correction-audit", type=Path)
     parser.add_argument("--output-root", type=Path)
     parser.add_argument("--batch-id")
     parser.add_argument("--provider-route", default=SHADOW_PRIMARY_PROFILE)
@@ -177,6 +213,72 @@ def main(argv: Sequence[str] | None = None) -> int:
         plan_version=plan.plan_version,
         batch_id=args.batch_id,
     )
+    if args.mode == "owner-closure-preparation":
+        required = {
+            "generated Evidence plan": args.refined_evidence_plan,
+            "generated preparation audit": args.generated_preparation_audit,
+            "generated correction audit": args.generated_correction_audit,
+            "owner regression cases": args.owner_regression_cases,
+            "owner regression closure audit": args.owner_regression_closure_audit,
+        }
+        missing = [name for name, path in required.items() if path is None]
+        if missing:
+            raise ValueError(
+                "owner-closure-preparation requires " + ", ".join(missing)
+            )
+        planner = ShadowEvidencePlanner()
+        corrected_plan = planner.build(
+            manifest,
+            expected_artifact_hashes=plan.pdf_artifact_hashes,
+        )
+        corrected_prepared = ShadowEvidencePreparer(planner=planner).prepare(
+            manifest=manifest,
+            plan=corrected_plan,
+        )
+        preparation_audit = build_shadow_preparation_audit(
+            corrected_plan,
+            audit_id="manufacturing-materials-shadow-owner-closure-preparation-20260910-a",
+            prepared=corrected_prepared,
+        )
+        regression_cases = json.loads(
+            args.owner_regression_cases.read_text(encoding="utf-8")
+        )
+        correction_audit = build_shadow_owner_closure_correction_audit(
+            audit_id="manufacturing-materials-shadow-owner-closure-correction-20260910-a",
+            baseline_plan=plan,
+            corrected_plan=corrected_plan,
+            preparation_audit=preparation_audit,
+            regression_cases=regression_cases,
+            owner_regression_closure_audit_hash=_file_sha256(
+                args.owner_regression_closure_audit
+            ),
+        )
+        write_shadow_evidence_artifact(args.refined_evidence_plan, corrected_plan)
+        write_shadow_evidence_artifact(
+            args.generated_preparation_audit,
+            preparation_audit,
+        )
+        write_shadow_evidence_artifact(
+            args.generated_correction_audit,
+            correction_audit,
+        )
+        print(
+            json.dumps(
+                {
+                    "plan_version": corrected_plan.plan_version,
+                    "plan_hash": corrected_plan.plan_hash,
+                    "preparation_audit_hash": preparation_audit.audit_hash,
+                    "correction_audit_hash": correction_audit.audit_hash,
+                    "prepared_report_count": preparation_audit.report_count,
+                    "owner_closure_case_count": len(correction_audit.results),
+                    "provider_calls": 0,
+                    "production_authorization": "not_authorized",
+                },
+                ensure_ascii=False,
+                indent=2,
+            )
+        )
+        return 0
     if args.mode == "scope-refinement-replay":
         if not args.refined_evidence_plan or not args.scope_refinement_audit:
             raise ValueError(
@@ -279,6 +381,40 @@ def main(argv: Sequence[str] | None = None) -> int:
             evidence_plan=plan,
             preparation_audit=frozen_audit,
             scope_refinement_audit=refinement_audit,
+            prepared=prepared,
+            output_root=args.output_root,
+        )
+    elif args.mode == "owner-closure-semantic-replay":
+        required = {
+            "correction audit": args.correction_audit,
+            "owner regression cases": args.owner_regression_cases,
+            "owner regression closure audit": args.owner_regression_closure_audit,
+        }
+        missing = [name for name, path in required.items() if path is None]
+        if missing:
+            raise ValueError(f"{args.mode} requires " + ", ".join(missing))
+        correction_audit = json.loads(
+            args.correction_audit.read_text(encoding="utf-8")
+        )
+        supporting_hashes = {
+            "owner_regression_cases": _file_sha256(args.owner_regression_cases),
+            "owner_regression_closure_audit": _file_sha256(
+                args.owner_regression_closure_audit
+            ),
+        }
+        validate_shadow_replay_admission(
+            contract=OWNER_CLOSURE_SHADOW_REPLAY_CONTRACT,
+            batch_id=args.batch_id,
+            primary_logical_profile=args.provider_route,
+            extract_max_output_tokens=args.extract_max_output_tokens,
+            verify_max_output_tokens=args.verify_max_output_tokens,
+            timeout_seconds=args.timeout_seconds,
+            max_provider_calls=args.max_provider_calls,
+            manifest=manifest,
+            evidence_plan=plan,
+            preparation_audit=frozen_audit,
+            correction_audit=correction_audit,
+            supporting_artifact_hashes=supporting_hashes,
             prepared=prepared,
             output_root=args.output_root,
         )
@@ -415,6 +551,8 @@ def _validate_replay_mode(
     stability_batch = STABILITY_SHADOW_REPLAY_CONTRACT.batch_id
     precision_batch = PRECISION_CLOSURE_SHADOW_REPLAY_CONTRACT.batch_id
     external_batch = EXTERNAL_PRECISION_SHADOW_REPLAY_CONTRACT.batch_id
+    owner_plan = OWNER_CLOSURE_SHADOW_REPLAY_CONTRACT.evidence_plan_version
+    owner_batch = OWNER_CLOSURE_SHADOW_REPLAY_CONTRACT.batch_id
     provider_bearing_legacy_modes = {"semantic-run", "refined-semantic-replay"}
     if (
         plan_version == stability_plan or batch_id == stability_batch
@@ -432,6 +570,17 @@ def _validate_replay_mode(
         raise ValueError(
             "external precision batch identity requires "
             "external-precision-semantic-replay"
+        )
+    if batch_id == owner_batch and mode != "owner-closure-semantic-replay":
+        raise ValueError(
+            "owner-closure batch identity requires owner-closure-semantic-replay"
+        )
+    if plan_version == owner_plan and mode not in {
+        "preparation-only",
+        "owner-closure-semantic-replay",
+    }:
+        raise ValueError(
+            "owner-closure v4 Evidence plan requires owner-closure-semantic-replay"
         )
 
 
