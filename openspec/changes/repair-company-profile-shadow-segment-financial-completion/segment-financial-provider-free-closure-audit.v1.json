@@ -22,7 +22,7 @@
     {"id": "bounded-local-merge-failure-detail", "status": "passed"}
   ],
   "verification": {
-    "focused_pytest": "173 passed",
+    "focused_pytest": "174 passed",
     "ruff": "passed",
     "git_diff_check": "passed",
     "openspec_strict_validation": "passed",
@@ -35,5 +35,5 @@
     "tests/unit/test_research/test_company_profile_shadow_evidence.py": "7f8284f5a67195b51da0197240706e2266a3fea162c1bc6ca979c88542f0520d"
   },
   "remaining_blocker": "A separate reviewed empirical replay is required to measure report usability and review workload after this provider-free repair; this change does not authorize it.",
-  "audit_hash": "a90093c25969096ade254a575bb68fd48f643f7960e83c16a75a73d12156f563"
+  "audit_hash": "9a08c9203eee674aa3015f05bfd36dafe44cc143c03f657569c367c20edc2c38"
 }
