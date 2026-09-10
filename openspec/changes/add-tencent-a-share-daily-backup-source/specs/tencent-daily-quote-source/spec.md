@@ -19,7 +19,8 @@ The source SHALL fetch daily klines from exactly `https://proxy.finance.qq.com/i
 #### Scenario: Lots-based markets are converted by ×100
 
 - **WHEN** a raw day row reports volume `898172.00` for `600000.SH` on 2026-09-03
-- **THEN** the returned bar volume SHALL be `89817100` shares, matching the pytdx-written row for the same trading day
+- **THEN** the returned bar volume SHALL be `89817200` shares
+- **AND** it MAY differ from the pytdx/baostock-written row by lot-level rounding of at most 100 shares (Tencent rounds to lots, pytdx truncates)
 - **AND** volume `11810.00` for `920000.BJ` on 2026-09-03 SHALL become `1181000` shares
 
 #### Scenario: STAR board and CDR codes are already in shares
