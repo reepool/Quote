@@ -1,10 +1,11 @@
 """TencentSource 单元测试 (mock 共享传输层, 不打真实网络)。
 
 覆盖 openspec change `add-tencent-a-share-daily-backup-source` 的 spec 场景:
-11 列字段序、前缀量纲、万元 amount、有界翻页与 count+1 去重、pre_close
-春节回看、健康空诊断、403/429 契约、快照字段位。
+11 列字段序、前缀量纲、万元 amount、有界翻页 (升序夹具, 空页终止)、
+pre_close 春节回看、健康空诊断、403/429 与 5xx 契约、快照字段位。
 """
 
+import asyncio
 import json
 from datetime import datetime
 from pathlib import Path
@@ -14,9 +15,24 @@ import requests
 
 from data_sources.base_source import RateLimitConfig
 from data_sources.source_factory import DataSourceFactory
-from data_sources.tencent_source import TencentSource, TencentHTTPStatusError
+from data_sources.tencent_source import (
+    TencentHTTPStatusError,
+    TencentHTTPTransportStatusError,
+    TencentSource,
+)
 
 _REPO_ROOT = Path(__file__).resolve().parents[3]
+
+import functools
+
+
+def _at(test):
+    """异步测试运行器: 在 pytest-asyncio 钩子不可用的环境里以 asyncio.run 执行。"""
+    @functools.wraps(test)
+    def wrapper(*args, **kwargs):
+        return asyncio.run(test(*args, **kwargs))
+    return wrapper
+
 
 
 def _row(day, open_, close, high, low, volume_raw, amount_wan="100.00"):
@@ -69,18 +85,20 @@ def _build_source(batch_size=800, queue=None) -> TencentSource:
     return src
 
 
-def _day(pages):
-    """把多页行拼成 endpoint 响应队列 (每日一响应)。"""
-    return [_kline_response(page) for page in pages]
+def _day(pages, code="sh600000"):
+    # 自动追加终止空页: 新终止逻辑下最早日 > 回看起点时会再翻一页取空
+    return [_kline_response(page, code=code) for page in pages] + [
+        _kline_response([], code=code)
+    ]
 
 
 # ---------- 字段映射与量纲 ----------
 
-def test_close_sits_at_index2_not_ohlc():
+@_at
+async def test_close_sits_at_index2_not_ohlc():
     src = _build_source(queue=_day([[_row("2026-09-10", 9.22, 9.30, 9.33, 9.19, 356060)]]))
-    bars = src._sync_get_daily_data(
-        "sh600000", "600000.SH", "600000",
-        datetime(2026, 9, 10), datetime(2026, 9, 10),
+    bars = await src.get_daily_data(
+        "600000.SH", "600000", datetime(2026, 9, 10), datetime(2026, 9, 10)
     )
     assert len(bars) == 1
     bar = bars[0]
@@ -88,10 +106,11 @@ def test_close_sits_at_index2_not_ohlc():
     assert bar["low"] <= bar["close"] <= bar["high"]
 
 
-def test_lot_market_volume_converted_by_100():
+@_at
+async def test_lot_market_volume_converted_by_100():
     src = _build_source(queue=_day([[_row("2026-09-03", 9.24, 9.27, 9.47, 9.22, 898172, "84197.29")]]))
-    bars = src._sync_get_daily_data(
-        "sh600000", "600000.SH", "600000", datetime(2026, 9, 3), datetime(2026, 9, 3)
+    bars = await src.get_daily_data(
+        "600000.SH", "600000", datetime(2026, 9, 3), datetime(2026, 9, 3)
     )
     assert bars[0]["volume"] == 89817200
     # amount 万元 -> 元, 且消除二进制尘埃
@@ -99,20 +118,29 @@ def test_lot_market_volume_converted_by_100():
     assert bars[0]["turnover"] == 0.0
 
 
-def test_star_and_cdr_volume_kept_as_shares():
-    src = _build_source(queue=[
-        _kline_response([
-            _row("2026-09-07", 122.5, 124.12, 125.0, 122.0, 31314788),
-        ], code="sh688981"),
-        _kline_response([
-            _row("2026-09-07", 40.1, 40.58, 40.9, 40.0, 11650323),
-        ], code="sh689009"),
-    ])
-    star = src._sync_get_daily_data(
-        "sh688981", "688981.SH", "688981", datetime(2026, 9, 7), datetime(2026, 9, 7)
+@_at
+async def test_bse_volume_converted_by_100():
+    src = _build_source(queue=_day([[_row("2026-09-03", 14.66, 14.28, 14.96, 14.28, 11810, "1707.67")]],
+                                   code="bj920000"))
+    bars = await src.get_daily_data(
+        "920000.BJ", "920000", datetime(2026, 9, 3), datetime(2026, 9, 3)
     )
-    cdr = src._sync_get_daily_data(
-        "sh689009", "689009.SH", "689009", datetime(2026, 9, 7), datetime(2026, 9, 7)
+    assert bars[0]["volume"] == 1181000
+    assert bars[0]["amount"] == 17076700.0
+
+
+@_at
+async def test_star_and_cdr_volume_kept_as_shares():
+    src = _build_source(queue=_day([
+        [_row("2026-09-07", 122.5, 124.12, 125.0, 122.0, 31314788)],
+    ], code="sh688981") + _day([
+        [_row("2026-09-07", 40.1, 40.58, 40.9, 40.0, 11650323)],
+    ], code="sh689009"))
+    star = await src.get_daily_data(
+        "688981.SH", "688981", datetime(2026, 9, 7), datetime(2026, 9, 7)
+    )
+    cdr = await src.get_daily_data(
+        "689009.SH", "689009", datetime(2026, 9, 7), datetime(2026, 9, 7)
     )
     assert star[0]["volume"] == 31314788  # 原始已是股, 不取整到手
     assert cdr[0]["volume"] == 11650323
@@ -124,44 +152,58 @@ def test_unsupported_code_raises_value_error():
         src._to_tencent_code("AAPL.US")
 
 
-# ---------- 翻页与去重 ----------
+# ---------- 翻页、终止与去重 (升序夹具, 与生产一致) ----------
 
-def test_paging_covers_window_with_count_plus_one_dedupe():
-    # batch_size=2 -> 每页实返 ≤3 根; 两页含重叠日 2026-09-03
+@_at
+async def test_paging_covers_window_with_real_cursor_and_empty_fq():
+    # batch_size=2 -> 每页实返 ≤3 根 (count+1); 升序, 首页最早日推进 cursor
     pages = [
-        [_row("2026-09-07", 9.2, 9.3, 9.4, 9.1, 100),
+        [_row("2026-09-03", 9.0, 9.1, 9.2, 8.9, 300),
          _row("2026-09-04", 9.1, 9.2, 9.3, 9.0, 200),
-         _row("2026-09-03", 9.0, 9.1, 9.2, 8.9, 300)],
-        [_row("2026-09-03", 9.0, 9.1, 9.2, 8.9, 300)],
+         _row("2026-09-07", 9.2, 9.3, 9.4, 9.1, 100)],
+        [_row("2026-08-19", 8.8, 8.9, 9.0, 8.7, 400),
+         _row("2026-08-25", 8.9, 9.0, 9.1, 8.8, 500),
+         _row("2026-09-02", 9.0, 9.05, 9.15, 8.95, 600)],
     ]
     src = _build_source(batch_size=2, queue=_day(pages))
-    bars = src._sync_get_daily_data(
-        "sh600000", "600000.SH", "600000",
-        datetime(2026, 9, 3), datetime(2026, 9, 7),
+    bars = await src.get_daily_data(
+        "600000.SH", "600000", datetime(2026, 9, 3), datetime(2026, 9, 7)
     )
     days = [bar["time"].strftime("%Y-%m-%d") for bar in bars]
+    # 回看行 (08-19/08-25/09-02) 只用于 pre_close 推算, 输出必须滤回窗口
     assert days == ["2026-09-03", "2026-09-04", "2026-09-07"]
+    # 跨页 pre_close: 首根 09-03 的昨收来自第二页的 09-02
+    assert bars[0]["pre_close"] == 9.05
+    # 空复权参数: URL 以空 fq 的逗号结尾, 绝不带 qfq/hfq
+    for url in src.session.calls:
+        assert url.endswith(",day,2026-08-19,2026-09-07,2,") or \
+            url.endswith(",day,2026-08-19,2026-09-02,2,")
+        assert "qfq" not in url and "hfq" not in url
 
 
-def test_paging_stops_on_empty_page_and_marks_healthy():
+@_at
+async def test_paging_terminates_on_empty_page():
+    # 第二页为真正的空 day 节点: 空页 (而非根数) 终止翻页
     pages = [
-        [_row("2026-09-07", 9.2, 9.3, 9.4, 9.1, 100)],
-        [],  # 已翻到上市日之前 -> 健康空终止
+        [_row("2026-09-06", 9.0, 9.1, 9.2, 8.9, 300),
+         _row("2026-09-07", 9.1, 9.2, 9.3, 9.0, 200),
+         _row("2026-09-08", 9.2, 9.3, 9.4, 9.1, 100)],
+        [],
     ]
     src = _build_source(batch_size=2, queue=_day(pages))
-    bars = src._sync_get_daily_data(
-        "sh600000", "600000.SH", "600000",
-        datetime(2026, 9, 6), datetime(2026, 9, 7),
+    bars = await src.get_daily_data(
+        "600000.SH", "600000", datetime(2026, 9, 6), datetime(2026, 9, 8)
     )
-    assert len(bars) == 1
+    assert [bar["time"].strftime("%Y-%m-%d") for bar in bars] == \
+        ["2026-09-06", "2026-09-07", "2026-09-08"]
     assert src.last_fetch_diagnostic == {}  # 健康非空无需诊断
 
 
-def test_empty_day_node_returns_empty_with_diagnostic():
+@_at
+async def test_empty_day_node_returns_empty_with_diagnostic():
     src = _build_source(queue=_day([[]]))
-    bars = src._sync_get_daily_data(
-        "sh600033", "600033.SH", "600033",
-        datetime(2026, 9, 1), datetime(2026, 9, 10),
+    bars = await src.get_daily_data(
+        "600033.SH", "600033", datetime(2026, 9, 1), datetime(2026, 9, 10)
     )
     assert bars == []
     assert src.last_fetch_diagnostic == {
@@ -169,40 +211,58 @@ def test_empty_day_node_returns_empty_with_diagnostic():
     }
 
 
-def test_rows_outside_window_yield_no_rows_in_window():
+@_at
+async def test_rows_outside_window_yield_no_rows_in_window():
     src = _build_source(queue=[_kline_response(
         [_row("2002-04-26", 2.71, 2.71, 2.71, 2.71, 43972)], code="sz000003",
     )])
-    bars = src._sync_get_daily_data(
-        "sz000003", "000003.SZ", "000003",
-        datetime(2026, 8, 1), datetime(2026, 9, 10),
+    bars = await src.get_daily_data(
+        "000003.SZ", "000003", datetime(2026, 8, 1), datetime(2026, 9, 10)
     )
     assert bars == []
     assert src.last_fetch_diagnostic["reason"] == "no_rows_in_window"
     assert src.last_fetch_diagnostic["connection_unhealthy"] is False
 
 
-def test_malformed_rows_skipped_with_diagnostic():
+@_at
+async def test_duplicate_days_within_page_deduplicated():
+    # 端点异常导致同日重复行时, 以先到者为准, 不产生重复 bar
     pages = [[
-        ["2026-09-07", "9.2", "9.3", "9.4"],  # 列数不足
-        ["bad-day", "9.2", "9.3", "9.4", "9.1", "100", {}, "1", "1", "0", "0"],  # 日期非法
-        _row("2026-09-08", 9.2, 9.3, 9.4, 9.1, 100),
-    ], []]  # 翻页终止页
+        _row("2026-09-07", 9.2, 9.3, 9.4, 9.1, 100),
+        _row("2026-09-07", 9.2, 9.9, 9.9, 9.9, 999),
+    ]]
     src = _build_source(queue=_day(pages))
-    bars = src._sync_get_daily_data(
-        "sh600000", "600000.SH", "600000",
-        datetime(2026, 9, 8), datetime(2026, 9, 8),
+    bars = await src.get_daily_data(
+        "600000.SH", "600000", datetime(2026, 9, 7), datetime(2026, 9, 7)
+    )
+    assert len(bars) == 1
+    assert bars[0]["close"] == 9.3  # 先到者为准
+
+
+@_at
+async def test_malformed_rows_skipped_with_diagnostic():
+    pages = [
+        [
+            ["2026-09-07", "9.2", "9.3", "9.4"],  # 列数不足
+            ["bad-day", "9.2", "9.3", "9.4", "9.1", "100", {}, "1", "1", "0", "0"],  # 日期非法
+            _row("2026-09-08", 9.2, 9.3, 9.4, 9.1, 100),
+        ],
+        [],  # 翻页终止页
+    ]
+    src = _build_source(queue=_day(pages))
+    bars = await src.get_daily_data(
+        "600000.SH", "600000", datetime(2026, 9, 8), datetime(2026, 9, 8)
     )
     assert len(bars) == 1
     assert src.last_fetch_diagnostic["reason"] == "malformed_rows"
     assert src.last_fetch_diagnostic["skipped"] == 2
 
 
-def test_intraday_partial_bar_passthrough():
+@_at
+async def test_intraday_partial_bar_passthrough():
     src = _build_source(queue=_day([[_row("2026-09-10", 9.22, 9.30, 9.33, 9.19, 356060)]]))
-    bars = src._sync_get_daily_data(
-        "sh600000", "600000.SH", "600000",
-        datetime(2026, 9, 10), datetime(2026, 9, 10),
+    bars = await src.get_daily_data(
+        "600000.SH", "600000", datetime(2026, 9, 10), datetime(2026, 9, 10)
     )
     assert bars[0]["time"] == datetime(2026, 9, 10)
     assert bars[0]["tradestatus"] == 1
@@ -210,18 +270,18 @@ def test_intraday_partial_bar_passthrough():
 
 # ---------- pre_close 回看 ----------
 
-def test_pre_close_bridges_spring_festival_gap():
+@_at
+async def test_pre_close_bridges_spring_festival_gap():
     # 窗口 [2026-02-24, 2026-02-24]; 春节空档 02-13 -> 02-24 (11 个日历日)
     # 回看 15 天 (lookback_start=02-09) 必须覆盖 02-13
     pages = [
-        [_row("2026-02-24", 10.0, 10.5, 10.6, 9.9, 100, "5000.00"),
-         _row("2026-02-13", 10.2, 10.1, 10.3, 10.0, 100, "4900.00")],
+        [_row("2026-02-13", 10.2, 10.1, 10.3, 10.0, 100, "4900.00"),
+         _row("2026-02-24", 10.0, 10.5, 10.6, 9.9, 100, "5000.00")],
         [],  # 02-12 之前无数据
     ]
     src = _build_source(batch_size=2, queue=_day(pages))
-    bars = src._sync_get_daily_data(
-        "sh600000", "600000.SH", "600000",
-        datetime(2026, 2, 24), datetime(2026, 2, 24),
+    bars = await src.get_daily_data(
+        "600000.SH", "600000", datetime(2026, 2, 24), datetime(2026, 2, 24)
     )
     assert len(bars) == 1
     bar = bars[0]
@@ -231,13 +291,13 @@ def test_pre_close_bridges_spring_festival_gap():
     assert bar["pct_change"] == round((10.5 / 10.1 - 1) * 100, 4)
 
 
-def test_pre_close_none_on_first_ever_bar():
-    src = _build_source(queue=[_kline_response(
-        [_row("2023-05-26", 12.0, 11.71, 12.11, 11.63, 10041)], code="bj920992",
-    )])
-    bars = src._sync_get_daily_data(
-        "bj920992", "920992.BJ", "920992",
-        datetime(2023, 5, 26), datetime(2023, 5, 26),
+@_at
+async def test_pre_close_none_on_first_ever_bar():
+    src = _build_source(queue=_day([
+        [_row("2023-05-26", 12.0, 11.71, 12.11, 11.63, 10041)],
+    ], code="bj920992"))
+    bars = await src.get_daily_data(
+        "920992.BJ", "920992", datetime(2023, 5, 26), datetime(2023, 5, 26)
     )
     assert bars[0]["pre_close"] is None
     assert bars[0]["change"] is None and bars[0]["pct_change"] is None
@@ -245,12 +305,12 @@ def test_pre_close_none_on_first_ever_bar():
 
 # ---------- 失败语义 ----------
 
-def test_http_403_raises_recognizable_status_error():
+@_at
+async def test_http_403_raises_recognizable_status_error():
     src = _build_source(queue=[_FakeResponse(status_code=403)])
     with pytest.raises(TencentHTTPStatusError) as exc_info:
-        src._sync_get_daily_data(
-            "sh600000", "600000.SH", "600000",
-            datetime(2026, 9, 7), datetime(2026, 9, 7),
+        await src.get_daily_data(
+            "600000.SH", "600000", datetime(2026, 9, 7), datetime(2026, 9, 7)
         )
     assert exc_info.value.code == 403 and exc_info.value.status == 403
     # 工厂 throttle 熔断必须能识别, 且不误标为源不可用
@@ -258,7 +318,8 @@ def test_http_403_raises_recognizable_status_error():
     assert DataSourceFactory._is_daily_source_unavailable_error(exc_info.value) is False
 
 
-def test_http_403_not_retried():
+@_at
+async def test_http_403_not_retried():
     src = _build_source(queue=[
         _FakeResponse(status_code=403),
         _kline_response([_row("2026-09-07", 9.2, 9.3, 9.4, 9.1, 100)]),
@@ -266,39 +327,36 @@ def test_http_403_not_retried():
     src.rate_limiter.config.retry_times = 3
     src.rate_limiter.config.retry_interval = 0.0
     with pytest.raises(TencentHTTPStatusError):
-        src._sync_get_daily_data(
-            "sh600000", "600000.SH", "600000",
-            datetime(2026, 9, 7), datetime(2026, 9, 7),
+        await src.get_daily_data(
+            "600000.SH", "600000", datetime(2026, 9, 7), datetime(2026, 9, 7)
         )
     assert len(src.session.calls) == 1  # 限流不重试
 
 
-def test_http_5xx_retried_then_success():
+@_at
+async def test_http_5xx_retried_then_success():
     src = _build_source(queue=[
         _FakeResponse(status_code=502),
         _FakeResponse(status_code=502),
-        _kline_response([_row("2026-09-08", 9.2, 9.3, 9.4, 9.1, 100)]),
-    ])
+    ] + _day([[_row("2026-09-08", 9.2, 9.3, 9.4, 9.1, 100)]]))
     src.rate_limiter.config.retry_times = 3
     src.rate_limiter.config.retry_interval = 0.0
-    bars = src._sync_get_daily_data(
-        "sh600000", "600000.SH", "600000",
-        datetime(2026, 9, 8), datetime(2026, 9, 8),
+    bars = await src.get_daily_data(
+        "600000.SH", "600000", datetime(2026, 9, 8), datetime(2026, 9, 8)
     )
     assert len(bars) == 1
-    assert len(src.session.calls) == 3
+    # 2 次 5xx + 1 次成功页 + 1 次翻页终止空页
+    assert len(src.session.calls) == 4
 
 
-def test_http_5xx_exhaustion_counts_as_transport_unavailable():
-    from data_sources.tencent_source import TencentHTTPTransportStatusError
-
+@_at
+async def test_http_5xx_exhaustion_counts_as_transport_unavailable():
     src = _build_source(queue=[_FakeResponse(status_code=503)] * 3)
     src.rate_limiter.config.retry_times = 3
     src.rate_limiter.config.retry_interval = 0.0
     with pytest.raises(TencentHTTPTransportStatusError) as exc_info:
-        src._sync_get_daily_data(
-            "sh600000", "600000.SH", "600000",
-            datetime(2026, 9, 8), datetime(2026, 9, 8),
+        await src.get_daily_data(
+            "600000.SH", "600000", datetime(2026, 9, 8), datetime(2026, 9, 8)
         )
     assert len(src.session.calls) == 3
     assert isinstance(exc_info.value, ConnectionError)
@@ -307,41 +365,27 @@ def test_http_5xx_exhaustion_counts_as_transport_unavailable():
     assert DataSourceFactory._is_daily_http_throttle_error(exc_info.value) is False
 
 
-def test_network_error_retried_then_success():
+@_at
+async def test_network_error_retried_then_success():
     src = _build_source(queue=[
         requests.exceptions.ConnectionError("connection reset"),
-        _kline_response([_row("2026-09-08", 9.2, 9.3, 9.4, 9.1, 100)]),
-    ])
+    ] + _day([[_row("2026-09-08", 9.2, 9.3, 9.4, 9.1, 100)]]))
     src.rate_limiter.config.retry_times = 2
     src.rate_limiter.config.retry_interval = 0.0
-    bars = src._sync_get_daily_data(
-        "sh600000", "600000.SH", "600000",
-        datetime(2026, 9, 8), datetime(2026, 9, 8),
+    bars = await src.get_daily_data(
+        "600000.SH", "600000", datetime(2026, 9, 8), datetime(2026, 9, 8)
     )
     assert len(bars) == 1
-    assert len(src.session.calls) == 2
+    # 1 次网络失败 + 1 次成功页 + 1 次翻页终止空页
+    assert len(src.session.calls) == 3
 
 
-def test_http_429_message_also_matches_factory_literals():
-    exc = TencentHTTPStatusError("[tencent] http error 429 for sh600000", 429)
-    assert DataSourceFactory._is_daily_http_throttle_error(exc) is True
-
-
-def test_connection_error_wrapped_for_transport_breaker():
-    src = _build_source(queue=[requests.exceptions.ConnectionError("connection reset")])
-    src.rate_limiter.config.retry_times = 1
-    with pytest.raises(ConnectionError):
-        src._sync_get_daily_data(
-            "sh600000", "600000.SH", "600000",
-            datetime(2026, 9, 7), datetime(2026, 9, 7),
-        )
-
-
-def test_timeout_wrapped_as_connection_error():
+@_at
+async def test_timeout_wrapped_as_connection_error():
     src = _build_source(queue=[requests.exceptions.Timeout("timed out")])
     src.rate_limiter.config.retry_times = 1
     with pytest.raises(ConnectionError):
-        src._sync_get_latest_daily_data("sh600000", "600000.SH", "600000")
+        await src.get_latest_daily_data("600000.SH", "600000")
 
 
 # ---------- 批量快照 ----------
@@ -361,9 +405,10 @@ def _snapshot_fields(last="9.30", prev="9.23", open_="9.22", vol="356060", amoun
     return fields
 
 
-def test_snapshot_field_mapping_main_board_scale():
+@_at
+async def test_snapshot_field_mapping_main_board_scale():
     src = _build_source(queue=[_FakeResponse(text=_snapshot_text(_snapshot_fields()))])
-    snap = src._sync_get_latest_daily_data("sh600000", "600000.SH", "600000")
+    snap = await src.get_latest_daily_data("600000.SH", "600000")
     assert snap["close"] == 9.30 and snap["pre_close"] == 9.23 and snap["open"] == 9.22
     assert snap["high"] == 9.33 and snap["low"] == 9.19
     assert snap["volume"] == 35606000  # 手 -> 股
@@ -371,33 +416,34 @@ def test_snapshot_field_mapping_main_board_scale():
     assert snap["time"] == datetime(2026, 9, 10, 15, 0, 3)
 
 
-def test_snapshot_star_volume_keeps_share_unit():
+@_at
+async def test_snapshot_star_volume_keeps_share_unit():
     fields = _snapshot_fields(last="119.35", vol="14307846")
     src = _build_source(queue=[_FakeResponse(text=_snapshot_text(fields))])
-    snap = src._sync_get_latest_daily_data("sh688981", "688981.SH", "688981")
+    snap = await src.get_latest_daily_data("688981.SH", "688981")
     assert snap["volume"] == 14307846  # sh688* 原始已是股
 
 
-def test_snapshot_dead_code_returns_empty_dict():
+@_at
+async def test_snapshot_dead_code_returns_empty_dict():
     src = _build_source(queue=[_FakeResponse(text='pv_none="";\n')])
-    snap = src._sync_get_latest_daily_data("sz000003", "000003.SZ", "000003")
+    snap = await src.get_latest_daily_data("000003.SZ", "000003")
     assert snap == {}
 
 
 # ---------- 接线 ----------
 
-def test_get_instrument_list_returns_empty_instead_of_raising():
+@_at
+async def test_get_instrument_list_returns_empty_instead_of_raising():
     src = _build_source()
-    assert src.get_instrument_list.__doc__  # 显式契约注释
-    assert asyncio_run(src.get_instrument_list("SSE")) == []
+    assert await src.get_instrument_list("SSE") == []
 
 
-def test_close_releases_session():
-    import asyncio
-
+@_at
+async def test_close_releases_session():
     src = _build_source()
     src.session = _FakeSession([])
-    asyncio.run(src.close())
+    await src.close()
     assert src.session is None
 
 
@@ -420,8 +466,3 @@ def test_factory_creates_tencent_source_and_route_order():
         assert "tencent" not in json.dumps(config["routing"].get(section, {}))
     assert "tencent" not in json.dumps(daily["SSE"]["index"])
     assert "tencent" not in json.dumps(daily["HKEX"])
-
-
-def asyncio_run(coro):
-    import asyncio
-    return asyncio.run(coro)

@@ -34,3 +34,10 @@
 - [x] 5.1 `openspec validate add-tencent-a-share-daily-backup-source --strict` 通过
 - [x] 5.2 Review 本 change 范围内改动（scoped），发现按 Blocking / Non-blocking / Unrelated 分类处理
 - [x] 5.3 `git diff --check` 干净；仅提交本 change 相关文件并推送
+
+## 6. 审核收尾加固（归档前第二轮）
+
+- [x] 6.1 翻页终止健壮化：最早 bar 取页内日期最小值（不依赖返回顺序），空页/安全阀终止，移除「少于 2 根」启发式
+- [x] 6.2 限流按 HTTP 页计数：`acquire` 移入异步翻页循环，跨年回补多页时每页各占一个 token
+- [x] 6.3 补合同字面单测：920000 ×100、URL 空 fq（禁误用 qfq/hfq）、升序夹具重写翻页用例（真空页终止 + 跨页 pre_close）
+- [x] 6.4 `docs/configuration/config_file.md` 补 5xx → transport 熔断说明

@@ -117,77 +117,48 @@ class TencentSource(BaseDataSource):
                              instrument_type: str = 'stock',
                              source_symbol: str = '') -> List[Dict[str, Any]]:
         code = self._to_tencent_code(instrument_id)
-        await self.rate_limiter.acquire()
-        return await asyncio.to_thread(
-            self._sync_get_daily_data, code, instrument_id, symbol, start_date, end_date
-        )
-
-    def _fetch_kline_page(self, code: str, beg: str, end: str) -> List[list]:
-        """拉取一页日线 (实返 ≤batch_size+1 根); 传输级失败按配置重试后抛异常。"""
-        param = f"{code},day,{beg},{end},{self.batch_size},"
-        response = self._request_with_retry(
-            f"日线 {code}", f"{self.kline_url}?param={param}"
-        )
-        try:
-            payload = response.json()
-        except ValueError as exc:
-            raise ConnectionError(f"[tencent] 日线响应非 JSON {code}: {exc}") from exc
-        return ((payload.get("data") or {}).get(code) or {}).get("day") or []
-
-    def _request_with_retry(self, description: str, url: str):
-        """带配置化重试的 GET: 网络/5xx 重试 retry_times 次, 403/429 立即上抛。"""
-        attempts = max(1, int(getattr(self.rate_limiter.config, "retry_times", 1) or 1))
-        interval = float(getattr(self.rate_limiter.config, "retry_interval", 0.0) or 0.0)
-        last_exc: Optional[BaseException] = None
-        for attempt in range(attempts):
-            try:
-                response = self.session.get(url, timeout=self.request_timeout)
-            except (requests.exceptions.ConnectionError, requests.exceptions.Timeout) as exc:
-                last_exc = ConnectionError(f"[tencent] {description} 连接失败: {exc}")
-                last_exc.__cause__ = exc
-            else:
-                status = response.status_code
-                if status == 200:
-                    return response
-                message = f"[tencent] http error {status} for {description}"
-                if status in (403, 429):
-                    raise TencentHTTPStatusError(message, status)
-                last_exc = TencentHTTPTransportStatusError(message, status)
-            if attempt < attempts - 1:
-                time.sleep(interval)
-        raise last_exc
-
-    def _sync_get_daily_data(self, code: str, instrument_id: str, symbol: str,
-                             start_date: datetime, end_date: datetime) -> List[Dict[str, Any]]:
         self.last_fetch_diagnostic = {}
-        start_str = start_date.strftime("%Y-%m-%d")
-        end_str = end_date.strftime("%Y-%m-%d")
         # pre_close 回看: 自 start_date 再往前 15 个日历日 (春节/国庆最大间隔 11 天)
         lookback_start = (start_date - timedelta(days=_PRE_CLOSE_LOOKBACK_DAYS)).strftime("%Y-%m-%d")
-        scale = self._volume_scale(code)
-        start_day = start_date.date()
-        end_day = end_date.date()
-
         rows_by_day: Dict[str, list] = {}
         skipped = 0
-        cursor_end = end_str
+        cursor_end = end_date.strftime("%Y-%m-%d")
         for _ in range(_MAX_PAGING_ITERATIONS):
-            node = self._fetch_kline_page(code, lookback_start, cursor_end)
+            # 限流按 HTTP 页计数 (跨年回补一只票多页时每页各占一个 token)
+            await self.rate_limiter.acquire()
+            node = await asyncio.to_thread(
+                self._fetch_kline_page, code, lookback_start, cursor_end
+            )
             if not node:
                 # 页空: 覆盖完成、或已翻到上市日之前 (健康空), 终止翻页
                 break
+            page_days = []
             for row in node:
                 if not isinstance(row, (list, tuple)) or len(row) < 6:
                     skipped += 1
                     continue
                 day = str(row[0])[:10]
+                page_days.append(day)
                 if day not in rows_by_day:
                     rows_by_day[day] = row
-            earliest = str(node[0][0])[:10]
-            if earliest <= lookback_start or len(node) < 2:
+            if not page_days:
+                break
+            earliest = min(page_days)
+            if earliest <= lookback_start:
                 break
             cursor_end = (datetime.strptime(earliest, "%Y-%m-%d") - timedelta(days=1)).strftime("%Y-%m-%d")
+        start_day = start_date.date()
+        return await asyncio.to_thread(
+            self._build_daily_quotes,
+            code, instrument_id, symbol, rows_by_day, skipped,
+            start_day, end_date.date(),
+        )
 
+    def _build_daily_quotes(self, code: str, instrument_id: str, symbol: str,
+                            rows_by_day: Dict[str, list], skipped: int,
+                            start_day, end_day) -> List[Dict[str, Any]]:
+        """把去重后的原始行构建为标准 quote 列表 (pre_close 链式推算, 滤回窗口)。"""
+        scale = self._volume_scale(code)
         quotes: List[Dict[str, Any]] = []
         pre_close: Optional[float] = None
         for day in sorted(rows_by_day):
@@ -245,6 +216,41 @@ class TencentSource(BaseDataSource):
         ds_logger.info("[%s] %s: 获取 %s 根日线 [%s .. %s]",
                        self.name, code, len(quotes), start_day, end_day)
         return quotes
+
+    def _fetch_kline_page(self, code: str, beg: str, end: str) -> List[list]:
+        """拉取一页日线 (实返 ≤batch_size+1 根); 传输级失败按配置重试后抛异常。"""
+        param = f"{code},day,{beg},{end},{self.batch_size},"
+        response = self._request_with_retry(
+            f"日线 {code}", f"{self.kline_url}?param={param}"
+        )
+        try:
+            payload = response.json()
+        except ValueError as exc:
+            raise ConnectionError(f"[tencent] 日线响应非 JSON {code}: {exc}") from exc
+        return ((payload.get("data") or {}).get(code) or {}).get("day") or []
+
+    def _request_with_retry(self, description: str, url: str):
+        """带配置化重试的 GET: 网络/5xx 重试 retry_times 次, 403/429 立即上抛。"""
+        attempts = max(1, int(getattr(self.rate_limiter.config, "retry_times", 1) or 1))
+        interval = float(getattr(self.rate_limiter.config, "retry_interval", 0.0) or 0.0)
+        last_exc: Optional[BaseException] = None
+        for attempt in range(attempts):
+            try:
+                response = self.session.get(url, timeout=self.request_timeout)
+            except (requests.exceptions.ConnectionError, requests.exceptions.Timeout) as exc:
+                last_exc = ConnectionError(f"[tencent] {description} 连接失败: {exc}")
+                last_exc.__cause__ = exc
+            else:
+                status = response.status_code
+                if status == 200:
+                    return response
+                message = f"[tencent] http error {status} for {description}"
+                if status in (403, 429):
+                    raise TencentHTTPStatusError(message, status)
+                last_exc = TencentHTTPTransportStatusError(message, status)
+            if attempt < attempts - 1:
+                time.sleep(interval)
+        raise last_exc
 
     async def get_latest_daily_data(self, instrument_id: str, symbol: str) -> Dict[str, Any]:
         code = self._to_tencent_code(instrument_id)

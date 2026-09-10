@@ -1033,7 +1033,7 @@
 - 腾讯财经日线备源，A 股股票日线路由中紧随 `pytdx`（`routing.daily` 各 stock 链第二位）；不提供股票池/交易日历/复权因子
 - **`batch_size`**: 日线单请求根数上限（端点实返 800+1 根，按日期去重）
 - **`max_requests_per_minute`**: 3600 约为串行日更实测速率（≈11 请求/秒）的 5 倍余量；限流等待由 `RateLimiter` 执行，与日更主循环的"禁止失败退避 sleep"无关
-- HTTP 403/429 会抛出带状态码的异常并由既有 throttle 熔断计数；数据级空结果按健康空降级到下一源
+- HTTP 403/429 抛出带状态码的异常并由既有 throttle 熔断计数；5xx 等传输级状态码计入 transport 熔断；数据级空结果按健康空降级到下一源。网络错误与 5xx 按 `retry_times`/`retry_interval` 重试，403/429 不重试
 
 ### data_sources_config.exchange_official
 
