@@ -71,6 +71,10 @@ OWNER_REGRESSION_CHANGE_ROOT = next(
     )
     if path.exists()
 )
+SEGMENT_FINANCIAL_CHANGE_ROOT = (
+    REPOSITORY_ROOT
+    / "openspec/changes/repair-company-profile-shadow-segment-financial-completion"
+)
 
 
 def _hash(value: str) -> str:
@@ -576,6 +580,67 @@ def test_segment_owner_rejects_partial_product_management_prose() -> None:
     ) == ()
 
 
+@pytest.mark.parametrize(
+    ("section_key", "text"),
+    [
+        (
+            "audit_matters",
+            "关键审计事项：营业收入确认。审计中按报告分部抽取收入样本执行检查。",
+        ),
+        (
+            "industry_context",
+            "行业政策持续调整，不同业务分部面临的政策环境存在差异。",
+        ),
+        (
+            "financial_statements",
+            "合并利润表 营业收入构成 营业收入 100 营业成本 80。",
+        ),
+    ],
+)
+def test_segment_owner_rejects_incidental_audit_policy_and_income_statement(
+    section_key: str,
+    text: str,
+) -> None:
+    section = SimpleNamespace(
+        page_number=81,
+        section_key=section_key,
+        selector_reasons=(f"structured_hint:{section_key}",),
+        text=text,
+    )
+
+    assert _chapter_owner_score(
+        ChapterTask.EXTRACT_SEGMENT_FINANCIALS, (section,)
+    ) == 0
+    assert _scope_field_ids(
+        ChapterTask.EXTRACT_SEGMENT_FINANCIALS, (section,)
+    ) == ()
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "报告分部的财务信息：本集团只有一个报告分部。",
+        "细分行业披露是否适用 □适用 √不适用。",
+    ],
+)
+def test_segment_owner_preserves_explicit_single_segment_and_legal_empty(
+    text: str,
+) -> None:
+    section = SimpleNamespace(
+        page_number=143,
+        section_key="segment_information",
+        selector_reasons=("heading_alias:segment_information:分部信息",),
+        text=text,
+    )
+
+    assert _chapter_owner_score(
+        ChapterTask.EXTRACT_SEGMENT_FINANCIALS, (section,)
+    ) > 0
+    assert _scope_field_ids(
+        ChapterTask.EXTRACT_SEGMENT_FINANCIALS, (section,)
+    ) == ("segment_dimension",)
+
+
 def test_material_owner_keeps_page_spanning_reuse_disclosure() -> None:
     sections = (
         SimpleNamespace(
@@ -885,7 +950,6 @@ def test_provider_free_owner_regression_closure_audit_is_complete() -> None:
             "separate hash-bound empirical replay proposal after this change is archived"
         ),
     }
-
     for binding in audit["inputs"]:
         base = (
             OWNER_REGRESSION_CHANGE_ROOT
@@ -902,6 +966,32 @@ def test_provider_free_owner_regression_closure_audit_is_complete() -> None:
             assert len(binding["sha256"]) == 64
         else:
             assert hashlib.sha256(source.read_bytes()).hexdigest() == binding["sha256"]
+
+
+def test_segment_financial_provider_free_closure_audit_is_hash_bound() -> None:
+    path = (
+        SEGMENT_FINANCIAL_CHANGE_ROOT
+        / "segment-financial-provider-free-closure-audit.v1.json"
+    )
+    audit = json.loads(path.read_text(encoding="utf-8"))
+    audit_without_hash = {
+        key: value for key, value in audit.items() if key != "audit_hash"
+    }
+
+    assert audit["audit_hash"] == _payload_hash(audit_without_hash)
+    assert audit["closure_status"] == "passed"
+    assert audit["provider_calls"] == 0
+    assert audit["cohort_replay_performed"] is False
+    assert audit["external_replay_mutated"] is False
+    assert audit["authoritative_replay_status"] == "hold"
+    assert audit["production_authorization"] == "not_authorized"
+    assert audit["production_paths_opened"] == []
+    assert all(item["status"] == "passed" for item in audit["fixture_results"])
+    for relative_path, expected_hash in audit["implementation_hashes"].items():
+        actual_hash = hashlib.sha256(
+            (REPOSITORY_ROOT / relative_path).read_bytes()
+        ).hexdigest()
+        assert actual_hash == expected_hash
 
 
 def test_provider_free_correction_audit_closes_all_reviewed_findings() -> None:

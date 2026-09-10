@@ -480,6 +480,27 @@ _SEGMENT_OWNER_PATTERN = re.compile(
     r"分部(?:收入|利润|资产|信息)|"
     r"主营业务分(?:行业|地区|部)|主营业务(?<!部)分产品|营业收入构成"
 )
+_STRONG_SEGMENT_OWNER_PATTERN = re.compile(
+    r"报告分部的财务信息|(?:本集团|公司|本公司).{0,40}只有一个报告分部|"
+    r"细分行业.{0,40}(?:不适用|[√☑]不适用)|"
+    r"分(?:行业|产品|地区|销售模式).{0,800}"
+    r"(?:营业收入|营业成本|毛利率|成本构成)|"
+    r"主营业务分(?:行业|产品|地区|部)"
+)
+_INCIDENTAL_SEGMENT_CONTEXT_PATTERN = re.compile(
+    r"关键审计事项|审计应对|行业政策|产业政策|行业发展情况"
+)
+
+
+def _has_governed_segment_owner(compact: str, keys: set[str]) -> bool:
+    if not _SEGMENT_OWNER_PATTERN.search(compact):
+        return False
+    strong_owner = bool(_STRONG_SEGMENT_OWNER_PATTERN.search(compact))
+    if "industry_context" in keys and not strong_owner:
+        return False
+    return not (
+        _INCIDENTAL_SEGMENT_CONTEXT_PATTERN.search(compact) and not strong_owner
+    )
 
 
 def _has_independent_issuer_overview_sentence(text: str) -> bool:
@@ -560,9 +581,8 @@ def _chapter_owner_score(
         and not _EXPLICIT_ISSUER_CAPACITY_PATTERN.search(compact)
     ):
         return 0
-    if (
-        chapter_task == ChapterTask.EXTRACT_SEGMENT_FINANCIALS
-        and not _SEGMENT_OWNER_PATTERN.search(compact)
+    if chapter_task == ChapterTask.EXTRACT_SEGMENT_FINANCIALS and not (
+        _has_governed_segment_owner(compact, keys)
     ):
         return 0
     if (
@@ -2434,7 +2454,7 @@ def _scope_field_ids(
     ):
         matched &= {"production_capacity"}
     if chapter_task == ChapterTask.EXTRACT_SEGMENT_FINANCIALS:
-        if not _SEGMENT_OWNER_PATTERN.search(compact):
+        if not _has_governed_segment_owner(compact, section_keys):
             matched.clear()
         elif "segment_dimension" not in matched:
             matched -= {

@@ -51,10 +51,12 @@ from research.company_profile.stage5_provider import (
     _coverage_draft_schema,
     _expand_compact_measurements,
     _expand_extract_response,
+    _merge_segment_partition_responses,
     _minimal_extract_schema,
     _minimal_verify_schema,
     _normalize_adapter_reported_period,
     _normalize_extract_response,
+    _segment_partition_request,
 )
 from research.company_profile.workflow import (
     CompanyProfileSemanticService,
@@ -1712,6 +1714,178 @@ def test_high_cardinality_segment_financials_partition_and_merge_once() -> None:
     assert all(trace.partition_count == 3 for trace in provider.traces)
 
 
+def test_segment_partition_merge_reconciles_owned_metadata_and_evidence() -> None:
+    prepared = _multi_evidence_high_cardinality_segment_prepared_scope()
+    request = _segment_extract_request(prepared)
+    metrics = (
+        "operating_revenue",
+        "operating_cost",
+        "gross_margin_reported",
+    )
+    periods = ("2025-12-31", "2025", "2025")
+    scopes = ("unclear", "business_segment", "unclear")
+    partitions = []
+    for index, (metric, period, subject_scope, prepared_evidence) in enumerate(
+        zip(metrics, periods, scopes, prepared.evidence_bundle, strict=True),
+        start=1,
+    ):
+        partition_request = _segment_partition_request(
+            request,
+            fields=("segment_dimension", metric),
+            partition_index=index,
+            partition_count=3,
+        )
+        partitions.append(
+            (
+                partition_request,
+                _segment_partition_response(
+                    request_id=partition_request.request_id,
+                    evidence_id=prepared_evidence.evidence.evidence_id,
+                    metric_field=metric,
+                    subject_scope=subject_scope,
+                    reported_period=period,
+                    uncertainty=("source-native row",) if index == 2 else (),
+                ),
+            )
+        )
+
+    merged = _merge_segment_partition_responses(
+        request,
+        tuple(partitions),
+        prepared_scope=prepared,
+    )
+
+    row = merged["items"][0]["row"]
+    assert set(row["evidence_ids"]) == {
+        item.evidence.evidence_id for item in prepared.evidence_bundle
+    }
+    assert row["subject_scope"] == "unclear"
+    assert row["reported_period"] == "2025"
+    assert row["knowledge_time"] == prepared.report.published_at
+    assert row["uncertainty"] == ["source-native row"]
+    assert set(row["cells"]) == set(metrics)
+
+
+def test_segment_partition_multi_evidence_expands_through_existing_provider_path() -> None:
+    prepared = _multi_evidence_high_cardinality_segment_prepared_scope()
+    request = _segment_extract_request(prepared)
+    metrics = (
+        "operating_revenue",
+        "operating_cost",
+        "gross_margin_reported",
+    )
+    outputs = []
+    for index, (metric, prepared_evidence) in enumerate(
+        zip(metrics, prepared.evidence_bundle, strict=True),
+        start=1,
+    ):
+        outputs.append(
+            _segment_partition_response(
+                request_id=f"{request.request_id}:partition-{index:02d}-of-03",
+                evidence_id=prepared_evidence.evidence.evidence_id,
+                metric_field=metric,
+                subject_scope="business_segment" if index == 2 else "unclear",
+                reported_period=("2025-12-31", "2025", "2025")[index - 1],
+            )
+        )
+    client = _FakeGatewayClient(outputs=outputs)
+    provider = CommonGatewaySemanticProvider(
+        client=client,
+        profile="semantic_extraction",
+        prepared_scope=prepared,
+        max_output_tokens=2000,
+        timeout_seconds=30,
+    )
+
+    response = provider.extract(request)
+
+    assert len(client.requests) == 3
+    candidates = [item["candidate"] for item in response["items"]]
+    assert [item["field_id"] for item in candidates] == [
+        "segment_dimension",
+        *metrics,
+    ]
+    expected_evidence_ids = {
+        item.evidence.evidence_id for item in prepared.evidence_bundle
+    }
+    assert all(
+        {item["evidence_id"] for item in candidate["evidence"]}
+        == expected_evidence_ids
+        for candidate in candidates
+    )
+    measurement_by_field = {
+        item["field_id"]: item for item in candidates if item["object_type"] == "Measurement"
+    }
+    for field_id, evidence_id in zip(
+        metrics,
+        ("segment-revenue-evidence", "segment-cost-evidence", "segment-margin-evidence"),
+        strict=True,
+    ):
+        anchors = {
+            item["evidence_id"]: item["anchor"]
+            for item in measurement_by_field[field_id]["evidence"]
+        }
+        assert anchors[evidence_id]["anchor_type"] == "table"
+        assert all(
+            anchor["anchor_type"] == ("table" if item_id == evidence_id else "text")
+            for item_id, anchor in anchors.items()
+        )
+
+
+def test_segment_partition_merge_rejects_period_and_duplicate_cell_conflicts() -> None:
+    prepared = _high_cardinality_segment_prepared_scope()
+    request = _segment_extract_request(prepared)
+    evidence_id = prepared.evidence_bundle[0].evidence.evidence_id
+    revenue_request = _segment_partition_request(
+        request,
+        fields=("segment_dimension", "operating_revenue"),
+        partition_index=1,
+        partition_count=2,
+    )
+    cost_request = _segment_partition_request(
+        request,
+        fields=("segment_dimension", "operating_cost"),
+        partition_index=2,
+        partition_count=2,
+    )
+    revenue = _segment_partition_response(
+        request_id=revenue_request.request_id,
+        evidence_id=evidence_id,
+        metric_field="operating_revenue",
+    )
+    cost = _segment_partition_response(
+        request_id=cost_request.request_id,
+        evidence_id=evidence_id,
+        metric_field="operating_cost",
+        reported_period="2024",
+    )
+
+    with pytest.raises(ValueError, match="identity conflict: reported_period"):
+        _merge_segment_partition_responses(
+            request,
+            ((revenue_request, revenue), (cost_request, cost)),
+            prepared_scope=prepared,
+        )
+
+    duplicate_request = _segment_partition_request(
+        request,
+        fields=("segment_dimension", "operating_revenue"),
+        partition_index=2,
+        partition_count=2,
+    )
+    duplicate = _segment_partition_response(
+        request_id=duplicate_request.request_id,
+        evidence_id=evidence_id,
+        metric_field="operating_revenue",
+    )
+    with pytest.raises(ValueError, match="duplicate metric cell"):
+        _merge_segment_partition_responses(
+            request,
+            ((revenue_request, revenue), (duplicate_request, duplicate)),
+            prepared_scope=prepared,
+        )
+
+
 def test_segment_partition_provider_failure_returns_no_partial_extract() -> None:
     prepared = _high_cardinality_segment_prepared_scope()
     request = _segment_extract_request(prepared)
@@ -1785,6 +1959,8 @@ def test_segment_partition_merge_conflict_fails_closed() -> None:
         provider.extract(request)
 
     assert exc_info.value.code == ContractErrorCode.CANDIDATE_SCHEMA_INVALID
+    assert "identity conflict: subject_scope" in str(exc_info.value)
+    assert "merged segment partitions violate" not in str(exc_info.value)
 
 
 def test_repeated_segment_rows_receive_unique_local_record_ids() -> None:
@@ -2589,6 +2765,84 @@ def test_segment_financials_report_the_rejected_source_label() -> None:
     assert "其他业务" in (provider.traces[0].error_detail or "")
 
 
+def test_segment_dimension_heading_can_precede_cited_continuation_row() -> None:
+    prepared = _segment_prepared_scope()
+    base = prepared.evidence_bundle[0].evidence
+    heading = base.model_copy(
+        update={
+            "evidence_id": "segment-heading-evidence",
+            "page": 25,
+            "anchor": TextAnchor(
+                bounded_quote="分产品 营业收入 营业成本 毛利率 单位：千元"
+            ),
+        }
+    )
+    row_evidence = base.model_copy(
+        update={
+            "evidence_id": "segment-continuation-row-evidence",
+            "page": 26,
+            "anchor": TextAnchor(
+                bounded_quote="续表 动力电池系统 316,506,369 241,064,397 23.84%"
+            ),
+        }
+    )
+    prepared = prepared.model_copy(
+        update={
+            "evidence_bundle": (
+                PreparedEvidence(evidence=heading),
+                PreparedEvidence(evidence=row_evidence),
+            ),
+            "source_row_dimensions": {},
+            "candidate_pages": (25, 26),
+            "page_contexts": (
+                PreparedPageContext(
+                    page=25,
+                    text=heading.anchor.bounded_quote,
+                    text_hash="1" * 64,
+                    extraction_method="pypdf",
+                    quality_status="usable",
+                ),
+                PreparedPageContext(
+                    page=26,
+                    text=row_evidence.anchor.bounded_quote,
+                    text_hash="2" * 64,
+                    extraction_method="pypdf",
+                    quality_status="usable",
+                ),
+            ),
+        }
+    )
+    request = _segment_extract_request(prepared)
+    compact = _segment_row_response(
+        request_id=request.request_id,
+        evidence_id=row_evidence.evidence_id,
+        dimension="分产品",
+    )
+
+    expanded = _normalize_extract_response(
+        compact,
+        request=request,
+        prepared_scope=prepared,
+    )
+
+    candidates = [item["candidate"] for item in expanded["items"]]
+    assert {item["evidence_id"] for item in candidates[0]["evidence"]} == {
+        heading.evidence_id,
+        row_evidence.evidence_id,
+    }
+    evidence_by_id = {
+        item["evidence_id"]: item["anchor"] for item in candidates[1]["evidence"]
+    }
+    assert evidence_by_id[heading.evidence_id]["anchor_type"] == "text"
+    assert evidence_by_id[row_evidence.evidence_id] == {
+        "anchor_type": "table",
+        "table_label": "分产品",
+        "row_label": "动力电池系统",
+        "column_header": "营业收入",
+        "cell_locator": None,
+    }
+
+
 def test_consolidation_adjustment_normalizes_internal_dimension() -> None:
     prepared = _segment_prepared_scope()
     evidence = prepared.evidence_bundle[0].evidence.model_copy(
@@ -3220,6 +3474,58 @@ def _high_cardinality_segment_prepared_scope() -> PreparedRequestScope:
     )
 
 
+def _multi_evidence_high_cardinality_segment_prepared_scope() -> PreparedRequestScope:
+    prepared = _high_cardinality_segment_prepared_scope()
+    base = prepared.evidence_bundle[0].evidence
+    evidence = (
+        base.model_copy(
+            update={
+                "evidence_id": "segment-revenue-evidence",
+                "page": 25,
+                "anchor": TextAnchor(
+                    bounded_quote="分产品 动力电池系统 营业收入 316,506,369 千元"
+                ),
+            }
+        ),
+        base.model_copy(
+            update={
+                "evidence_id": "segment-cost-evidence",
+                "page": 26,
+                "anchor": TextAnchor(
+                    bounded_quote="分产品 动力电池系统 营业成本 241,064,397 千元"
+                ),
+            }
+        ),
+        base.model_copy(
+            update={
+                "evidence_id": "segment-margin-evidence",
+                "page": 27,
+                "anchor": TextAnchor(
+                    bounded_quote="分产品 动力电池系统 毛利率 23.84%"
+                ),
+            }
+        ),
+    )
+    source = " ".join(item.anchor.bounded_quote for item in evidence)
+    source = f"{source} " + " ".join(str(index) for index in range(1, 42))
+    return prepared.model_copy(
+        update={
+            "evidence_bundle": tuple(PreparedEvidence(evidence=item) for item in evidence),
+            "candidate_pages": (25, 26, 27),
+            "page_contexts": tuple(
+                PreparedPageContext(
+                    page=item.page,
+                    text=(source if item.page == 25 else item.anchor.bounded_quote),
+                    text_hash={25: "e", 26: "f", 27: "0"}[item.page] * 64,
+                    extraction_method="pypdf",
+                    quality_status="usable",
+                )
+                for item in evidence
+            ),
+        }
+    )
+
+
 def _segment_extract_request(
     prepared: PreparedRequestScope,
 ) -> SemanticTaskRequest:
@@ -3488,6 +3794,8 @@ def _segment_partition_response(
     evidence_id: str,
     metric_field: str,
     subject_scope: str = "unclear",
+    reported_period: str = "2025",
+    uncertainty: tuple[str, ...] = (),
 ) -> dict[str, Any]:
     cells = {
         "operating_revenue": {
@@ -3515,10 +3823,13 @@ def _segment_partition_response(
                 "row": {
                     "label": "动力电池系统",
                     "subject_scope": subject_scope,
-                    "reported_period": "2025",
+                    "reported_period": reported_period,
                     "period_type": "duration",
                     "evidence_ids": [evidence_id],
                     "cells": {metric_field: cells[metric_field]},
+                    **(
+                        {"uncertainty": list(uncertainty)} if uncertainty else {}
+                    ),
                 },
             }
         ],

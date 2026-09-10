@@ -706,7 +706,6 @@ def _merge_segment_partition_responses(
     prepared_scope: PreparedRequestScope,
 ) -> dict[str, Any]:
     rows_by_anchor: dict[tuple[str, str], dict[str, Any]] = {}
-    row_identities: dict[tuple[str, str], str] = {}
     coverage_by_field: dict[str, dict[str, Any]] = {}
     requested_fields = set(request.unresolved_field_ids)
     allowed_evidence_ids = {
@@ -765,37 +764,31 @@ def _merge_segment_partition_responses(
                     raise ValueError("segment partition row Evidence is invalid")
                 row["evidence_ids"] = sorted(evidence_ids)
                 anchor = (dimension, label)
-                identity_payload = {
-                    key: row.get(key)
-                    for key in (
-                        "dimension",
-                        "label",
-                        "row_class",
-                        "subject_scope",
-                        "subject_name",
-                        "subject_basis",
-                        "reported_period",
-                        "period_type",
-                        "knowledge_time",
-                        "uncertainty",
-                        "evidence_ids",
-                    )
-                }
-                identity_payload["dimension"] = dimension
-                identity = json.dumps(
-                    identity_payload,
-                    ensure_ascii=False,
-                    sort_keys=True,
-                    separators=(",", ":"),
-                    allow_nan=False,
+                row = _normalize_segment_partition_metadata(
+                    row,
+                    prepared_scope=prepared_scope,
                 )
-                if anchor in row_identities and row_identities[anchor] != identity:
-                    raise ValueError("segment partition row identity conflict")
                 if anchor not in rows_by_anchor:
                     rows_by_anchor[anchor] = row
-                    row_identities[anchor] = identity
                     continue
-                merged_cells = rows_by_anchor[anchor]["cells"]
+                existing = rows_by_anchor[anchor]
+                _merge_segment_partition_metadata(existing, row)
+                existing["evidence_ids"] = sorted(
+                    set(existing["evidence_ids"]) | set(row["evidence_ids"])
+                )
+                existing["uncertainty"] = sorted(
+                    {
+                        str(item)
+                        for item in (
+                            *(existing.get("uncertainty") or ()),
+                            *(row.get("uncertainty") or ()),
+                        )
+                        if str(item).strip()
+                    }
+                )
+                if not existing["uncertainty"]:
+                    existing.pop("uncertainty", None)
+                merged_cells = existing["cells"]
                 duplicate_cells = set(merged_cells).intersection(cells)
                 if duplicate_cells:
                     raise ValueError(
@@ -831,6 +824,55 @@ def _merge_segment_partition_responses(
         "request_id": request.request_id,
         "items": items,
     }
+
+
+def _normalize_segment_partition_metadata(
+    row: dict[str, Any],
+    *,
+    prepared_scope: PreparedRequestScope,
+) -> dict[str, Any]:
+    """Normalize only metadata owned by the prepared annual-report table scope."""
+
+    normalized = deepcopy(row)
+    if normalized.get("row_class") != "consolidation_adjustment" and normalized.get(
+        "subject_scope"
+    ) in {"unclear", "business_segment"}:
+        normalized["subject_scope"] = "unclear"
+        normalized.pop("subject_name", None)
+        normalized.pop("subject_basis", None)
+    normalized["reported_period"] = _normalize_adapter_reported_period(
+        normalized.get("reported_period"),
+        period_type=normalized.get("period_type"),
+        prepared_scope=prepared_scope,
+    )
+    normalized["knowledge_time"] = prepared_scope.report.published_at
+    uncertainty = normalized.get("uncertainty")
+    if isinstance(uncertainty, list):
+        normalized["uncertainty"] = sorted(
+            {str(item) for item in uncertainty if str(item).strip()}
+        )
+        if not normalized["uncertainty"]:
+            normalized.pop("uncertainty", None)
+    return normalized
+
+
+def _merge_segment_partition_metadata(
+    existing: dict[str, Any],
+    incoming: Mapping[str, Any],
+) -> None:
+    """Merge partition metadata while keeping substantive conflicts blocking."""
+
+    for key in ("row_class", "subject_scope", "reported_period", "period_type"):
+        if existing.get(key) != incoming.get(key):
+            raise ValueError(f"segment partition row identity conflict: {key}")
+    for key in ("subject_name", "subject_basis"):
+        current = existing.get(key)
+        candidate = incoming.get(key)
+        if current not in (None, "") and candidate not in (None, ""):
+            if current != candidate:
+                raise ValueError(f"segment partition row identity conflict: {key}")
+        elif current in (None, "") and candidate not in (None, ""):
+            existing[key] = deepcopy(candidate)
 
 
 def _allowed_non_observed_coverage_statuses(
@@ -1772,7 +1814,12 @@ def _validate_segment_row_source_labels(
         for item in prepared_scope.evidence_bundle
         if item.evidence.evidence_id in selected
     )
+    scope_source_text = " ".join(
+        str(getattr(item.evidence.anchor, "bounded_quote", ""))
+        for item in prepared_scope.evidence_bundle
+    )
     normalized_source = "".join(source_text.split())
+    normalized_scope_source = "".join(scope_source_text.split())
     label = str(row.get("label") or "")
     if not label or "".join(label.split()) not in normalized_source:
         raise ValueError(
@@ -1799,13 +1846,16 @@ def _validate_segment_row_source_labels(
             )
         return "adjustment"
     normalized_dimension = "".join(dimension.split())
-    if not dimension or normalized_dimension not in normalized_source:
+    if not dimension or normalized_dimension not in normalized_scope_source:
         raise ValueError(
-            f"segment dimension must occur in its cited Evidence: {dimension!r}"
+            "segment dimension must occur in the controlled table Evidence scope: "
+            f"{dimension!r}"
         )
     if planned_dimension is None:
         normalized_lines = {
-            "".join(line.split()) for line in source_text.splitlines() if line.strip()
+            "".join(line.split())
+            for line in scope_source_text.splitlines()
+            if line.strip()
         }
         if (
             normalized_dimension not in normalized_lines
@@ -1907,9 +1957,12 @@ def _segment_table_evidence(
     dimension: str,
     label: str,
     column_header: str | None,
+    source_value: str | None,
 ) -> Any:
     if not isinstance(evidence, list):
         return evidence
+    normalized_header = "".join(str(column_header or "").split())
+    normalized_value = "".join(str(source_value or "").split())
     anchored: list[Any] = []
     for item in evidence:
         if not isinstance(item, Mapping):
@@ -1918,13 +1971,20 @@ def _segment_table_evidence(
         candidate_evidence = deepcopy(dict(item))
         anchor = candidate_evidence.get("anchor")
         if isinstance(anchor, Mapping) and anchor.get("anchor_type") == "text":
-            candidate_evidence["anchor"] = {
-                "anchor_type": "table",
-                "table_label": dimension,
-                "row_label": label,
-                "column_header": column_header,
-                "cell_locator": None,
-            }
+            bounded_quote = str(anchor.get("bounded_quote") or "")
+            normalized_quote = "".join(bounded_quote.split())
+            if "".join(label.split()) in normalized_quote and (
+                (not normalized_header and not normalized_value)
+                or (normalized_header and normalized_header in normalized_quote)
+                or (normalized_value and normalized_value in normalized_quote)
+            ):
+                candidate_evidence["anchor"] = {
+                    "anchor_type": "table",
+                    "table_label": dimension,
+                    "row_label": label,
+                    "column_header": column_header,
+                    "cell_locator": None,
+                }
         anchored.append(candidate_evidence)
     return anchored
 
@@ -1993,6 +2053,17 @@ def _expand_segment_row_draft(
     # adjustment row is deliberately excluded because its consolidated scope must
     # still be supported by its own wording/reconciliation evidence.
     row = deepcopy(row)
+    dimension_evidence_ids = {
+        item.evidence.evidence_id
+        for item in prepared_scope.evidence_bundle
+        if "".join(dimension.split())
+        in "".join(
+            str(getattr(item.evidence.anchor, "bounded_quote", "")).split()
+        )
+    }
+    row["evidence_ids"] = sorted(
+        set(row.get("evidence_ids") or ()) | dimension_evidence_ids
+    )
     if row.get("row_class") == "consolidation_adjustment":
         has_group_wording = _adjustment_label_has_group_wording(
             str(row.get("label") or "")
@@ -2080,11 +2151,17 @@ def _expand_segment_row_draft(
             if isinstance(source_native, Mapping) and source_native.get("header")
             else None
         )
+        source_value = (
+            str(source_native.get("value"))
+            if isinstance(source_native, Mapping) and source_native.get("value")
+            else None
+        )
         record["evidence"] = _segment_table_evidence(
             record.get("evidence"),
             dimension=dimension,
             label=str(label),
             column_header=column_header,
+            source_value=source_value,
         )
         expanded.append({"item_type": "candidate", "candidate": record})
     return expanded
@@ -3158,6 +3235,18 @@ def _ensure_unique_generated_record_ids(items: list[Any]) -> None:
             salt += 1
 
 
+def _segment_partition_failure_detail(
+    exc: ValidationError | TypeError | ValueError,
+) -> str:
+    if isinstance(exc, ValidationError):
+        first = exc.errors(include_url=False)[0]
+        location = ".".join(str(item) for item in first.get("loc", ())) or "response"
+        detail = f"final schema validation failed at {location}: {first.get('msg')}"
+    else:
+        detail = str(exc).strip() or type(exc).__name__
+    return f"segment partition reconciliation failed: {detail}"[:1800]
+
+
 class CommonGatewaySemanticProvider:
     """Adapt one prepared request scope to the existing common LLM gateway.
 
@@ -3251,7 +3340,7 @@ class CommonGatewaySemanticProvider:
             except (ValidationError, TypeError, ValueError) as exc:
                 raise SemanticProviderError(
                     ContractErrorCode.CANDIDATE_SCHEMA_INVALID,
-                    "merged segment partitions violate the extract schema",
+                    _segment_partition_failure_detail(exc),
                 ) from exc
             if parsed.request_id != request.request_id:
                 raise SemanticProviderError(

@@ -1,0 +1,39 @@
+{
+  "schema": "company_profile_segment_financial_provider_free_closure_audit.v1",
+  "audit_id": "segment-financial-provider-free-closure-20260910-a",
+  "change": "repair-company-profile-shadow-segment-financial-completion",
+  "closure_status": "passed",
+  "provider_calls": 0,
+  "cohort_replay_performed": false,
+  "external_replay_mutated": false,
+  "authoritative_replay": "manufacturing-materials-shadow-routing-continuation-gemini-20260910-a",
+  "authoritative_replay_status": "hold",
+  "production_authorization": "not_authorized",
+  "production_paths_opened": [],
+  "fixture_results": [
+    {"id": "partition-evidence-union", "status": "passed"},
+    {"id": "partition-metadata-normalization", "status": "passed"},
+    {"id": "partition-subject-period-conflict", "status": "passed"},
+    {"id": "partition-duplicate-cell-conflict", "status": "passed"},
+    {"id": "cross-page-dimension-and-row-evidence", "status": "passed"},
+    {"id": "cost-component-rejection", "status": "passed"},
+    {"id": "industry-audit-income-statement-owner-rejection", "status": "passed"},
+    {"id": "explicit-single-segment-and-legal-empty-owner", "status": "passed"},
+    {"id": "bounded-local-merge-failure-detail", "status": "passed"}
+  ],
+  "verification": {
+    "focused_pytest": "173 passed",
+    "ruff": "passed",
+    "git_diff_check": "passed",
+    "openspec_strict_validation": "passed",
+    "test_command": "/home/python/miniconda3/envs/Quote/bin/python -m pytest -q tests/unit/test_research/test_company_profile_stage5_provider.py tests/unit/test_research/test_company_profile_shadow_evidence.py"
+  },
+  "implementation_hashes": {
+    "research/company_profile/stage5_provider.py": "b12af04bc154da8bad7e53021fb75ab2753166373e9902cbef1e3866873eb577",
+    "research/company_profile/shadow_evidence.py": "a0a98b4c43f590834755de97d358d863181d58d244ce22cd644e74155811b28b",
+    "tests/unit/test_research/test_company_profile_stage5_provider.py": "84331f388ef193a24fb21910ef9e72bb77baab672dea9538454cd2e172c039c6",
+    "tests/unit/test_research/test_company_profile_shadow_evidence.py": "7f8284f5a67195b51da0197240706e2266a3fea162c1bc6ca979c88542f0520d"
+  },
+  "remaining_blocker": "A separate reviewed empirical replay is required to measure report usability and review workload after this provider-free repair; this change does not authorize it.",
+  "audit_hash": "a90093c25969096ade254a575bb68fd48f643f7960e83c16a75a73d12156f563"
+}
