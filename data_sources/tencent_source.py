@@ -8,6 +8,9 @@ openspec change `add-tencent-a-share-daily-backup-source`:
   收盘价在 idx2, idx6/idx7/idx9/idx10 不使用;
 - 成交量量纲按代码前缀: sh688*/sh689* 原始值已是股 (×1), 其余为手 (×100);
 - amount = idx8 (万元) × 10000; turnover 不猜 idx7, 恒 0.0;
+- 窗口覆盖: 按批有界翻页 (每请求实返 ≤count+1 根, 按日期去重), 安全阀 100 次;
+- pre_close: 自 start_date 回看 15 个日历日推算, 输出滤回 [start_date, end_date],
+  回看内无更早 bar (IPO 首日) 时 pre_close=None;
 - 盘中当日未收盘 bar 原样返回, 完整性由调度端收盘等待与 DataManager 处理;
 - 数据级失败 (空节点/死代码/畸形行) 返回 [] + last_fetch_diagnostic;
   传输级故障抛 ConnectionError; HTTP 403/429 抛 TencentHTTPStatusError
@@ -36,6 +39,8 @@ _SUFFIX_TO_PREFIX = {"SH": "sh", "SZ": "sz", "BJ": "bj"}
 # 原始成交量已经是股的代码前缀 (科创板/CDR), 其余为手
 _SHARE_UNIT_PREFIXES = ("sh688", "sh689")
 _SNAPSHOT_FIELD_COUNT = 38
+_MAX_PAGING_ITERATIONS = 100
+_PRE_CLOSE_LOOKBACK_DAYS = 15
 
 
 class TencentHTTPStatusError(Exception):
@@ -83,9 +88,8 @@ class TencentSource(BaseDataSource):
         ds_logger.info("[%s] tencent source closed", self.name)
 
     async def get_instrument_list(self, exchange: str = None) -> List[Dict[str, Any]]:
-        raise NotImplementedError(
-            "[tencent] 不提供股票池; routing.instrument_list 不引用本源"
-        )
+        """本源不提供股票池; routing.instrument_list 不引用, 返回空保持遍历安全。"""
+        return []
 
     @staticmethod
     def _to_tencent_code(instrument_id: str) -> str:
@@ -109,13 +113,9 @@ class TencentSource(BaseDataSource):
             self._sync_get_daily_data, code, instrument_id, symbol, start_date, end_date
         )
 
-    def _sync_get_daily_data(self, code: str, instrument_id: str, symbol: str,
-                             start_date: datetime, end_date: datetime) -> List[Dict[str, Any]]:
-        self.last_fetch_diagnostic = {}
-        param = (
-            f"{code},day,{start_date.strftime('%Y-%m-%d')},"
-            f"{end_date.strftime('%Y-%m-%d')},{self.batch_size},"
-        )
+    def _fetch_kline_page(self, code: str, beg: str, end: str) -> List[list]:
+        """拉取一页日线 (实返 ≤batch_size+1 根); 传输级失败抛异常。"""
+        param = f"{code},day,{beg},{end},{self.batch_size},"
         try:
             response = self.session.get(
                 f"{self.kline_url}?param={param}", timeout=self.request_timeout
@@ -129,34 +129,45 @@ class TencentSource(BaseDataSource):
             )
         try:
             payload = response.json()
-        except ValueError:
-            self.last_fetch_diagnostic = {
-                "connection_unhealthy": False, "reason": "invalid_json",
-            }
-            return []
+        except ValueError as exc:
+            raise ConnectionError(f"[tencent] 日线响应非 JSON {code}: {exc}") from exc
+        return ((payload.get("data") or {}).get(code) or {}).get("day") or []
 
-        node = ((payload.get("data") or {}).get(code) or {}).get("day") or []
-        if not node:
-            self.last_fetch_diagnostic = {
-                "connection_unhealthy": False, "reason": "empty_day_node",
-            }
-            ds_logger.info("[%s] %s: 空日线节点 [%s .. %s]",
-                           self.name, code, start_date.date(), end_date.date())
-            return []
-
+    def _sync_get_daily_data(self, code: str, instrument_id: str, symbol: str,
+                             start_date: datetime, end_date: datetime) -> List[Dict[str, Any]]:
+        self.last_fetch_diagnostic = {}
+        start_str = start_date.strftime("%Y-%m-%d")
+        end_str = end_date.strftime("%Y-%m-%d")
+        # pre_close 回看: 自 start_date 再往前 15 个日历日 (春节/国庆最大间隔 11 天)
+        lookback_start = (start_date - timedelta(days=_PRE_CLOSE_LOOKBACK_DAYS)).strftime("%Y-%m-%d")
         scale = self._volume_scale(code)
         start_day = start_date.date()
         end_day = end_date.date()
-        quotes: List[Dict[str, Any]] = []
-        seen_days = set()
+
+        rows_by_day: Dict[str, list] = {}
         skipped = 0
-        for row in node:
-            if not isinstance(row, (list, tuple)) or len(row) < 6:
-                skipped += 1
-                continue
-            day = str(row[0])[:10]
-            if day in seen_days:
-                continue
+        cursor_end = end_str
+        for _ in range(_MAX_PAGING_ITERATIONS):
+            node = self._fetch_kline_page(code, lookback_start, cursor_end)
+            if not node:
+                # 页空: 覆盖完成、或已翻到上市日之前 (健康空), 终止翻页
+                break
+            for row in node:
+                if not isinstance(row, (list, tuple)) or len(row) < 6:
+                    skipped += 1
+                    continue
+                day = str(row[0])[:10]
+                if day not in rows_by_day:
+                    rows_by_day[day] = row
+            earliest = str(node[0][0])[:10]
+            if earliest <= lookback_start or len(node) < 2:
+                break
+            cursor_end = (datetime.strptime(earliest, "%Y-%m-%d") - timedelta(days=1)).strftime("%Y-%m-%d")
+
+        quotes: List[Dict[str, Any]] = []
+        pre_close: Optional[float] = None
+        for day in sorted(rows_by_day):
+            row = rows_by_day[day]
             try:
                 bar_time = datetime.strptime(day, "%Y-%m-%d")
                 open_price = float(row[1])
@@ -164,14 +175,11 @@ class TencentSource(BaseDataSource):
                 high_price = float(row[3])
                 low_price = float(row[4])
                 volume = int(round(float(row[5]) * scale))
-                amount = float(row[8]) * 10000.0 if len(row) > 8 else 0.0
+                amount = round(float(row[8]) * 10000.0, 2) if len(row) > 8 else 0.0
             except (TypeError, ValueError):
                 skipped += 1
                 continue
-            if not (start_day <= bar_time.date() <= end_day):
-                continue
-            seen_days.add(day)
-            quotes.append({
+            quote = {
                 "time": bar_time,
                 "instrument_id": instrument_id,
                 "symbol": symbol,
@@ -182,25 +190,33 @@ class TencentSource(BaseDataSource):
                 "volume": volume,
                 "amount": amount,
                 "turnover": 0.0,
-                "pre_close": None,
-                "change": None,
-                "pct_change": None,
+                "pre_close": pre_close,
+                "change": round(close_price - pre_close, 4) if pre_close is not None else None,
+                "pct_change": (
+                    round((close_price / pre_close - 1.0) * 100.0, 4)
+                    if pre_close is not None else None
+                ),
                 "tradestatus": 1 if volume > 0 else 0,
                 "factor": 1.0,
                 "adjustment_type": "none",
                 "source": self.name,
-            })
-        quotes.sort(key=lambda quote: quote["time"])
+            }
+            if start_day <= bar_time.date() <= end_day:
+                quotes.append(quote)
+            pre_close = close_price
         if skipped:
             self.last_fetch_diagnostic = {
                 "connection_unhealthy": False,
                 "reason": "malformed_rows",
                 "skipped": skipped,
             }
+        elif not rows_by_day:
+            self.last_fetch_diagnostic = {
+                "connection_unhealthy": False, "reason": "empty_day_node",
+            }
         elif not quotes:
             self.last_fetch_diagnostic = {
-                "connection_unhealthy": False,
-                "reason": "no_rows_in_window",
+                "connection_unhealthy": False, "reason": "no_rows_in_window",
             }
         ds_logger.info("[%s] %s: 获取 %s 根日线 [%s .. %s]",
                        self.name, code, len(quotes), start_day, end_day)
@@ -238,10 +254,9 @@ class TencentSource(BaseDataSource):
             }
             return {}
         try:
-            quote_time = datetime.strptime(fields[30], "%Y%m%d%H%M%S")
             volume = int(round(float(fields[6]) * self._volume_scale(code)))
             snapshot = {
-                "time": quote_time,
+                "time": datetime.strptime(fields[30], "%Y%m%d%H%M%S"),
                 "instrument_id": instrument_id,
                 "symbol": symbol,
                 "open": float(fields[5]),
@@ -249,7 +264,7 @@ class TencentSource(BaseDataSource):
                 "low": float(fields[34]),
                 "close": float(fields[3]),
                 "volume": volume,
-                "amount": float(fields[37]) * 10000.0,
+                "amount": round(float(fields[37]) * 10000.0, 2),
                 "turnover": 0.0,
                 "pre_close": float(fields[4]),
                 "tradestatus": 1,
