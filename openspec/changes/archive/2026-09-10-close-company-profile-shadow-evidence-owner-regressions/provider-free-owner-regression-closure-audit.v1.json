@@ -1,0 +1,158 @@
+{
+  "schema_version": "company_profile_shadow_evidence_owner_closure_audit.v1",
+  "audit_id": "close-shadow-evidence-owner-regressions-20260910-a",
+  "created_at": "2026-09-10T05:26:11.275248+00:00",
+  "authoritative_batch_id": "manufacturing-materials-shadow-precision-external-gemini-20260910-a",
+  "inputs": [
+    {
+      "base": "change_root",
+      "path": "evidence-owner-regression-cases.v1.json",
+      "sha256": "f681bedc1c4c4415cbd1f8e88149d0a7f179b8e85343a7c0d873244af237573e"
+    },
+    {
+      "base": "change_root",
+      "path": "source-review-correction-audit.v2.json",
+      "sha256": "50cc313fa65bf2348ba411530d543bcf0d4332fad5e070a80f678b09b35a3f63"
+    },
+    {
+      "base": "change_root",
+      "path": "source-text-review-outcomes.v2.json",
+      "sha256": "29b4c8998e84753a2f477f461e5a6b37bf59cb79f8fd122879b1d206f3dc7ce0"
+    },
+    {
+      "base": "change_root",
+      "path": "empirical-readiness-audit.v2.json",
+      "sha256": "74ffaa2c8d1a9e860bf8f1fb85f3d47dfe83047ef61e4dc293c2a919adb1587b"
+    },
+    {
+      "base": "change_root",
+      "path": "shadow-replay-comparison-audit.v2.json",
+      "sha256": "be70c66701cab3a313bd07bd90512d3f02a3463ea1e083378d6db92fdbb3aa98"
+    },
+    {
+      "base": "repository_root",
+      "path": "research/company_profile/models.py",
+      "sha256": "775a77aae55cc4dfd41cd2d9aff368eea8dcffc34ff9a4489a9a85154a994c04"
+    },
+    {
+      "base": "repository_root",
+      "path": "research/company_profile/shadow_evidence.py",
+      "sha256": "d9241233c19615646400f16a302807b601f916c1cda550490bbcfa5c49ff4298"
+    },
+    {
+      "base": "repository_root",
+      "path": "research/company_profile/stage5_provider.py",
+      "sha256": "c3e5de3e82a10b65679f98fd077c4714cd70026ba96ba0554e583008c580950d"
+    },
+    {
+      "base": "repository_root",
+      "path": "tests/unit/test_research/test_company_profile_shadow_evidence.py",
+      "sha256": "3f07655c99a358ce976a2e9eb7d4f1e237ae1e06b181e07192437ba0fe65982c"
+    },
+    {
+      "base": "repository_root",
+      "path": "tests/unit/test_research/test_company_profile_stage5_provider.py",
+      "sha256": "6ccf2d87709fcde163f262685cbecb38af826020e7147acb73ae6c55857d12c4"
+    }
+  ],
+  "corrected_baseline": {
+    "precision_correct_count": 76,
+    "precision_reviewed_count": 83,
+    "sampled_precision": 0.9156626506024096,
+    "critical_semantic_error_count": 0,
+    "readiness_decision": "hold"
+  },
+  "finding_counts": {
+    "confirmed_errors": 7,
+    "resolved_errors": 7,
+    "corrected_controls": 1,
+    "preserved_controls": 1
+  },
+  "results": [
+    {
+      "review_row_id": "manufacturing-materials-shadow-600022-2025:operating_quantities-01:chapter_sample:coverage:operating_quantities-01:production_capacity",
+      "closure_family": "operating_capacity_owner",
+      "expected_result": "reject_legal_empty",
+      "enforcement_test": "test_legal_empty_coverage_rejects_frozen_non_owner_shapes + test_chapter_owner_score_rejects_industry_context_without_issuer_owner",
+      "status": "resolved"
+    },
+    {
+      "review_row_id": "manufacturing-materials-shadow-600111-2025:material_inputs-01:chapter_sample:coverage:material_inputs-01:material_input",
+      "closure_family": "material_owner",
+      "expected_result": "reject_legal_empty",
+      "enforcement_test": "test_legal_empty_coverage_rejects_frozen_non_owner_shapes",
+      "status": "resolved"
+    },
+    {
+      "review_row_id": "manufacturing-materials-shadow-600075-2025:operating_quantities-01:chapter_sample:coverage:operating_quantities-01:production_capacity",
+      "closure_family": "operating_capacity_owner",
+      "expected_result": "reject_legal_empty",
+      "enforcement_test": "test_legal_empty_coverage_rejects_frozen_non_owner_shapes + test_chapter_owner_score_rejects_industry_context_without_issuer_owner",
+      "status": "resolved"
+    },
+    {
+      "review_row_id": "manufacturing-materials-shadow-000552-2025:operating_quantities-01:chapter_sample:coverage:operating_quantities-01:production_capacity",
+      "closure_family": "operating_capacity_owner",
+      "expected_result": "reject_legal_empty",
+      "enforcement_test": "test_legal_empty_coverage_rejects_frozen_non_owner_shapes + test_chapter_owner_score_rejects_industry_context_without_issuer_owner",
+      "status": "resolved"
+    },
+    {
+      "review_row_id": "manufacturing-materials-shadow-000059-2025:segment_financials-01:chapter_sample:coverage:segment_financials-01:segment_dimension",
+      "closure_family": "segment_owner",
+      "expected_result": "reject_legal_empty",
+      "enforcement_test": "test_legal_empty_coverage_rejects_frozen_non_owner_shapes + test_chapter_owner_score_rejects_industry_context_without_issuer_owner",
+      "status": "resolved"
+    },
+    {
+      "review_row_id": "manufacturing-materials-shadow-000055-2025:business_overview-01:chapter_sample:stage5-7db69d4c0985a11e91186e9a",
+      "closure_family": "business_overview_substance",
+      "expected_result": "reject_cross_reference_only",
+      "enforcement_test": "test_business_overview_rejects_cross_reference_only_target",
+      "status": "resolved"
+    },
+    {
+      "review_row_id": "manufacturing-materials-shadow-920078-2025:operating_quantities-01:chapter_sample:coverage:operating_quantities-01:production_volume",
+      "closure_family": "operating_quantity_owner",
+      "expected_result": "reject_legal_empty",
+      "enforcement_test": "test_legal_empty_coverage_rejects_frozen_non_owner_shapes + test_chapter_owner_score_rejects_reviewed_non_owner_shapes",
+      "status": "resolved"
+    },
+    {
+      "review_row_id": "manufacturing-materials-shadow-920033-2025:material_inputs-01:chapter_sample:coverage:material_inputs-01:material_input",
+      "closure_family": "material_owner_control",
+      "expected_result": "preserve_legal_empty",
+      "enforcement_test": "test_material_legal_empty_preserves_explicit_owner_applicability",
+      "status": "preserved"
+    }
+  ],
+  "positive_controls": [
+    {
+      "control_id": "000552-explicit-issuer-capacity",
+      "enforcement_test": "test_chapter_owner_score_accepts_governed_owner_shapes",
+      "status": "preserved"
+    },
+    {
+      "control_id": "substantive-overview-same-evidence",
+      "enforcement_test": "test_business_overview_rejects_cross_reference_only_target",
+      "status": "preserved"
+    }
+  ],
+  "unresolved_review_row_ids": [],
+  "provider_calls": 0,
+  "cohort_replay_performed": false,
+  "external_replay_mutated": false,
+  "external_replay_readiness_decision": "hold",
+  "remaining_blocker": {
+    "execution_completion_rate": 0.95,
+    "usable_report_rate": 0.0,
+    "sampled_precision": 0.9156626506024096,
+    "unresolved_review_median": 11.0,
+    "unresolved_review_p90": 17.0,
+    "required_next_step": "separate hash-bound empirical replay proposal after this change is archived"
+  },
+  "production_paths_opened": [],
+  "production_authorization": "not_authorized",
+  "closure_status": "passed",
+  "audit_hash": "b5d92ed8f2e3d1fba2f6fbb6c9f03398399c5f1be4c7115e086306e4a544851f"
+}

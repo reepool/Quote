@@ -379,6 +379,15 @@ _CHAPTER_OWNER_PATTERNS: dict[ChapterTask, tuple[str, ...]] = {
 _NARROW_STATISTICAL_CALIBRE_PATTERN = re.compile(
     r"公司主营业务数据统计口径.{0,80}(?:适用|不适用)"
 )
+_EXPLICIT_ISSUER_CAPACITY_PATTERN = re.compile(
+    r"(?:(?:公司|本公司).{0,80}|(?:现有|拥有|下辖).{0,50})"
+    r"(?:核定年产能|设计产能|现有产能|总产能|年产能|产能规模)"
+    r".{0,30}\d[\d,]*(?:\.\d+)?(?:万吨|吨|GWh|MWh|万㎡|亿㎡|㎡|台|套)"
+)
+_SEGMENT_OWNER_PATTERN = re.compile(
+    r"分(?:行业|产品|地区|销售模式)|(?:业务|报告)分部|"
+    r"分部(?:收入|利润|资产|信息)|主营业务分(?:行业|产品|地区|部)|营业收入构成"
+)
 
 
 def _chapter_owner_score(
@@ -393,6 +402,26 @@ def _chapter_owner_score(
     patterns = _CHAPTER_OWNER_PATTERNS[chapter_task]
     matches = sum(bool(re.search(pattern, compact)) for pattern in patterns)
     if not matches:
+        return 0
+    reasons = {
+        str(reason)
+        for item in sections
+        for reason in getattr(item, "selector_reasons", ())
+    } | {str(reason) for reason in selector_reasons}
+    keys = {str(getattr(item, "section_key", "")) for item in sections} | {
+        str(term) for term in supplemental_terms
+    }
+    if (
+        chapter_task == ChapterTask.EXTRACT_OPERATING_QUANTITIES
+        and "industry_context" in keys
+        and not _EXPLICIT_ISSUER_CAPACITY_PATTERN.search(compact)
+    ):
+        return 0
+    if (
+        chapter_task == ChapterTask.EXTRACT_SEGMENT_FINANCIALS
+        and "industry_context" in keys
+        and not _SEGMENT_OWNER_PATTERN.search(compact)
+    ):
         return 0
     if (
         chapter_task == ChapterTask.EXTRACT_SEGMENT_FINANCIALS
@@ -453,14 +482,6 @@ def _chapter_owner_score(
         without_statistical = _NARROW_STATISTICAL_CALIBRE_PATTERN.sub("", compact)
         if not any(re.search(pattern, without_statistical) for pattern in patterns):
             return 0
-    reasons = {
-        str(reason)
-        for item in sections
-        for reason in getattr(item, "selector_reasons", ())
-    } | {str(reason) for reason in selector_reasons}
-    keys = {str(getattr(item, "section_key", "")) for item in sections} | {
-        str(term) for term in supplemental_terms
-    }
     key_bonus = sum(
         reason.startswith(("heading_alias:", "table_signature:")) for reason in reasons
     ) + len(keys & set(_CHAPTER_CONFIG[chapter_task][1]))

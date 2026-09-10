@@ -376,6 +376,21 @@ class BusinessOverview(SourceFact):
             or normalized_source not in normalized_joined
         ):
             raise ValueError("business overview source_text must match text evidence")
+        compact = re.sub(r"\s+", "", self.source_text)
+        if re.match(r"^(?:具体(?:内容|情况))?(?:参见|详见|见)(?:本报告|报告)?", compact):
+            substantive_tail = ""
+            for separator in ("。", "；", ";", "，", ","):
+                pointer_end = compact.find(separator)
+                if 0 <= pointer_end < len(compact) - 1:
+                    substantive_tail = compact[pointer_end + 1 :]
+                    break
+            if not re.search(
+                r"(?:公司|本公司).{0,40}(?:主营|主要从事|经营|生产|制造|加工|销售|研发|开发|提供)",
+                substantive_tail,
+            ):
+                raise ValueError(
+                    "business overview source_text must contain substantive business text"
+                )
         return self
 
 

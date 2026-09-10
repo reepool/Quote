@@ -1,0 +1,61 @@
+{
+  "schema_version": "company_profile_shadow_source_review_correction.v2",
+  "correction_id": "manufacturing-materials-shadow-precision-external-920033-correction-20260910-a",
+  "created_at": "2026-09-10T05:12:26.593435+00:00",
+  "authoritative_batch_id": "manufacturing-materials-shadow-precision-external-gemini-20260910-a",
+  "inputs": {
+    "review_package_v1": {
+      "path": "openspec/changes/archive/2026-09-10-execute-company-profile-shadow-precision-replay-external/source-text-review-package.v1.json",
+      "sha256": "5eb5c78ffe8a2da23e59db0e3163e54a87d73e64f0430758a9ad4e990b6a3fa3"
+    },
+    "review_outcomes_v1": {
+      "path": "openspec/changes/archive/2026-09-10-execute-company-profile-shadow-precision-replay-external/source-text-review-outcomes.v1.json",
+      "sha256": "112647a997ccac80733c8613dad1706d83236cefb395635723e46f19c25e282b"
+    },
+    "readiness_v1": {
+      "path": "openspec/changes/archive/2026-09-10-execute-company-profile-shadow-precision-replay-external/empirical-readiness-audit.v1.json",
+      "sha256": "846a07ca9a575874083cf1eab3885ce64e9650731165106b65ddc7ab3d5e7619"
+    },
+    "comparison_v1": {
+      "path": "openspec/changes/archive/2026-09-10-execute-company-profile-shadow-precision-replay-external/shadow-replay-comparison-audit.v1.json",
+      "sha256": "4a5f4a3bad74b232725cc0a0b62ff50a961a75627e4bff573ad4202155838b78"
+    },
+    "batch_manifest": {
+      "path": "var/company_profile_shadow_batch/20260910/batch-manufacturing-materials-shadow-precision-external-gemini-20260910-a/manifest.json",
+      "sha256": "7d53ea10109ffc07d80363d93750b06e4fbb57eacad89765f6beeb86e74c6f1e"
+    }
+  },
+  "outputs": {
+    "review_outcomes_v2": {
+      "path": "source-text-review-outcomes.v2.json",
+      "sha256": "29b4c8998e84753a2f477f461e5a6b37bf59cb79f8fd122879b1d206f3dc7ce0"
+    },
+    "readiness_v2": {
+      "path": "empirical-readiness-audit.v2.json",
+      "sha256": "74ffaa2c8d1a9e860bf8f1fb85f3d47dfe83047ef61e4dc293c2a919adb1587b"
+    },
+    "comparison_v2": {
+      "path": "shadow-replay-comparison-audit.v2.json",
+      "sha256": "be70c66701cab3a313bd07bd90512d3f02a3463ea1e083378d6db92fdbb3aa98"
+    }
+  },
+  "correction": {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:material_inputs-01:chapter_sample:coverage:material_inputs-01:material_input",
+    "source_quote_sha256": "2cd2ae75d83d32374cfeb2106d67bb54ec7e6fadfd7c853181650913e115ac20",
+    "before_outcome": "noncritical_error",
+    "after_outcome": "correct",
+    "reason": "The governed main-material/energy owner row explicitly states □适用 √不适用; adjacent R&D/EHS text does not invalidate that owner-bound legal empty."
+  },
+  "unchanged_outcome_count": 390,
+  "corrected_precision": {
+    "correct": 76,
+    "reviewed": 83,
+    "sampled_precision": 0.9156626506024096,
+    "critical_semantic_errors": 0,
+    "readiness_decision": "hold"
+  },
+  "provider_calls_added": 0,
+  "cohort_replay_performed": false,
+  "production_authorization": "not_authorized",
+  "correction_hash": "596e47d37f7c6b3c25d75da88c5b01ad249593acb632f7ed66ad01c24f7e95e4"
+}

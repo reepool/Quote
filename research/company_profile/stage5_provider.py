@@ -2456,7 +2456,6 @@ def _expand_extract_response(
         if isinstance(coverage, Mapping) and coverage.get("status"):
             coverage = dict(coverage)
             coverage["field_id"] = "material_input"
-            coverage["evidence_ids"] = _coverage_owner_evidence_ids(prepared_scope)
             result["items"].append({"item_type": "coverage", "coverage": coverage})
     elif isinstance(result.get("production_capacity"), list) and isinstance(
         result.get("processing_volume"), list
@@ -2902,8 +2901,14 @@ def _expand_coverage_draft(
     if checklist is None:
         return coverage
     evidence_ids = coverage.pop("evidence_ids", [])
-    owner_evidence_ids = _coverage_owner_evidence_ids(prepared_scope)
-    if evidence_ids and prepared_scope.candidate_pages:
+    legal_empty = coverage.get("status") in {"not_disclosed", "not_applicable"}
+    owner_evidence_ids = _coverage_owner_evidence_ids(
+        prepared_scope,
+        chapter_task=request.chapter_task.value,
+        field_id=field_id,
+        require_field_owner=legal_empty,
+    )
+    if evidence_ids:
         context_only = sorted(set(evidence_ids) - set(owner_evidence_ids))
         if context_only:
             raise ValueError(
@@ -2912,6 +2917,11 @@ def _expand_coverage_draft(
             )
     elif not evidence_ids:
         evidence_ids = owner_evidence_ids
+    if legal_empty and not evidence_ids:
+        raise ValueError(
+            "legal-empty coverage requires field-owning Evidence for "
+            f"{request.chapter_task.value}:{field_id}"
+        )
     coverage["schema_version"] = "company_profile_coverage_result.v1"
     coverage["chapter_task"] = request.chapter_task.value
     coverage["requirement_level"] = checklist.requirement_level.value
@@ -2924,17 +2934,96 @@ def _expand_coverage_draft(
 
 def _coverage_owner_evidence_ids(
     prepared_scope: PreparedRequestScope,
+    *,
+    chapter_task: str,
+    field_id: str,
+    require_field_owner: bool,
 ) -> list[str]:
     """Return owner Evidence, excluding adjacent pages kept only for context."""
 
     owner_pages = set(prepared_scope.candidate_pages)
-    if not owner_pages:
-        return [item.evidence.evidence_id for item in prepared_scope.evidence_bundle]
     return [
         item.evidence.evidence_id
         for item in prepared_scope.evidence_bundle
-        if item.evidence.page in owner_pages
+        if (not owner_pages or item.evidence.page in owner_pages)
+        and (
+            not require_field_owner
+            or _coverage_evidence_owns_field(
+                item.evidence,
+                chapter_task=chapter_task,
+                field_id=field_id,
+            )
+        )
     ]
+
+
+def _coverage_evidence_owns_field(
+    evidence: Any,
+    *,
+    chapter_task: str,
+    field_id: str,
+) -> bool:
+    """Apply narrow field-owner checks before accepting a legal-empty result."""
+
+    text = re.sub(
+        r"\s+",
+        "",
+        str(getattr(getattr(evidence, "anchor", None), "bounded_quote", "")),
+    )
+    section_title = re.sub(r"\s+", "", str(getattr(evidence, "section_title", "")))
+    if chapter_task == "extract_material_inputs" and field_id == "material_input":
+        governed_material = re.search(
+            r"主要原材料及能源(?:采购|情况)|原材料(?:采购模式|采购情况)|"
+            r"(?:营业|主营业务)?成本构成.{0,120}(?:原材料|原燃料|燃料及动力)|"
+            r"(?:公司|本公司).{0,50}(?:生产所需|采购|购入|消耗).{0,40}(?:原料|原材料|能源)",
+            text,
+        )
+        if re.search(r"(?:控股股东|实际控制人)情况", text) and not governed_material:
+            return False
+        return bool(governed_material)
+    if chapter_task == "extract_segment_financials" and field_id == "segment_dimension":
+        segment_owner = re.search(
+            r"分(?:行业|产品|地区|销售模式)|(?:业务|报告)分部|"
+            r"分部(?:收入|利润|资产|信息)|主营业务分|营业收入构成",
+            text,
+        )
+        if "industry_context" in section_title and not segment_owner:
+            return False
+        return bool(segment_owner)
+    if chapter_task == "extract_operating_quantities":
+        legal_empty_owner = re.search(
+            r"公司实物销售收入是否大于劳务收入.{0,100}(?:[□√☑]是|[□√☑]否|适用|不适用)",
+            text,
+        )
+        if field_id == "production_capacity":
+            return bool(
+                legal_empty_owner
+                or re.search(
+                    r"(?:(?:公司|本公司).{0,80}|(?:现有|拥有|下辖).{0,50})"
+                    r"(?:核定年产能|设计产能|现有产能|总产能|年产能|产能规模)"
+                    r".{0,30}\d[\d,]*(?:\.\d+)?(?:万吨|吨|GWh|MWh|万㎡|亿㎡|㎡|台|套)",
+                    text,
+                )
+                or re.search(r"(?:主要产品)?产能(?:情况|状况).{0,100}(?:适用|不适用)", text)
+            )
+        if field_id == "capacity_under_construction":
+            return bool(
+                legal_empty_owner
+                or re.search(
+                    r"(?:公司|本公司).{0,80}(?:在建产能|在建.{0,20}(?:生产线|装置)|新增.{0,20}产能)",
+                    text,
+                )
+            )
+        quantity_patterns = {
+            "production_volume": r"(?:主要产品产销量|生产量|实际产量).{0,100}\d[\d,]*(?:\.\d+)?",
+            "sales_volume": r"(?:主要产品产销量|销售量|销量).{0,100}\d[\d,]*(?:\.\d+)?",
+            "inventory_volume": r"(?:主要产品产销量|库存量|期末库存).{0,100}\d[\d,]*(?:\.\d+)?",
+            "processing_volume": r"(?:加工量|处理量|吞吐量).{0,100}\d[\d,]*(?:\.\d+)?",
+        }
+        pattern = quantity_patterns.get(field_id)
+        if pattern is not None:
+            return bool(legal_empty_owner or re.search(pattern, text))
+    return True
 
 
 def _expand_existing_fact_refs(

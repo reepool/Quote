@@ -48,6 +48,16 @@ PRECISION_CHANGE_ROOT = next(
     )
     if path.exists()
 )
+OWNER_REGRESSION_CHANGE_ROOT = next(
+    path
+    for path in (
+        REPOSITORY_ROOT
+        / "openspec/changes/close-company-profile-shadow-evidence-owner-regressions",
+        REPOSITORY_ROOT
+        / "openspec/changes/archive/2026-09-10-close-company-profile-shadow-evidence-owner-regressions",
+    )
+    if path.exists()
+)
 
 
 def _hash(value: str) -> str:
@@ -438,6 +448,16 @@ def test_chapter_owner_score_rejects_reviewed_non_owner_shapes(
             "principal_business",
             "合并报表范围的变化情况：本期新设全资子公司并纳入合并报表范围。",
         ),
+        (
+            ChapterTask.EXTRACT_OPERATING_QUANTITIES,
+            "principal_business",
+            "现有煤炭生产矿井11对，核定年产能2314万吨，其中储备产能180万吨/年。",
+        ),
+        (
+            ChapterTask.EXTRACT_MATERIAL_INPUTS,
+            "procurement_and_costs",
+            "三、主要原材料及能源采购 （一）主要原材料及能源情况 □适用 √不适用",
+        ),
     ],
 )
 def test_chapter_owner_score_accepts_governed_owner_shapes(
@@ -452,6 +472,174 @@ def test_chapter_owner_score_accepts_governed_owner_shapes(
     )
 
     assert _chapter_owner_score(chapter_task, (section,)) > 0
+
+
+@pytest.mark.parametrize(
+    ("chapter_task", "text"),
+    [
+        (
+            ChapterTask.EXTRACT_OPERATING_QUANTITIES,
+            "报告期内公司所处行业情况：国内PVC库存量较高，新建产能集中投产。",
+        ),
+        (
+            ChapterTask.EXTRACT_OPERATING_QUANTITIES,
+            "报告期内公司所处行业情况：前期在建产能有序释放，国内煤炭产能保障根基持续夯实。",
+        ),
+        (
+            ChapterTask.EXTRACT_SEGMENT_FINANCIALS,
+            "报告期内公司所处行业情况：行业产品结构不断优化，主营业务分析如下。",
+        ),
+    ],
+)
+def test_chapter_owner_score_rejects_industry_context_without_issuer_owner(
+    chapter_task: ChapterTask,
+    text: str,
+) -> None:
+    section = SimpleNamespace(
+        section_key="industry_context",
+        selector_reasons=("heading_alias:industry_context:行业情况",),
+        text=text,
+    )
+
+    assert _chapter_owner_score(chapter_task, (section,)) == 0
+
+
+def test_corrected_external_review_chain_changes_only_920033() -> None:
+    external_root = (
+        REPOSITORY_ROOT
+        / "openspec/changes/archive/2026-09-10-execute-company-profile-shadow-precision-replay-external"
+    )
+    outcomes_v1_path = external_root / "source-text-review-outcomes.v1.json"
+    outcomes_v2_path = OWNER_REGRESSION_CHANGE_ROOT / "source-text-review-outcomes.v2.json"
+    outcomes_v1 = {
+        item["review_row_id"]: item
+        for item in json.loads(outcomes_v1_path.read_text(encoding="utf-8"))
+    }
+    outcomes_v2 = {
+        item["review_row_id"]: item
+        for item in json.loads(outcomes_v2_path.read_text(encoding="utf-8"))
+    }
+    corrected_id = (
+        "manufacturing-materials-shadow-920033-2025:material_inputs-01:"
+        "chapter_sample:coverage:material_inputs-01:material_input"
+    )
+
+    assert outcomes_v1.keys() == outcomes_v2.keys()
+    assert [key for key in outcomes_v1 if outcomes_v1[key] != outcomes_v2[key]] == [
+        corrected_id
+    ]
+    assert outcomes_v1[corrected_id]["outcome"] == "noncritical_error"
+    assert outcomes_v2[corrected_id]["outcome"] == "correct"
+
+    readiness = json.loads(
+        (OWNER_REGRESSION_CHANGE_ROOT / "empirical-readiness-audit.v2.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    assert readiness["precision_correct_count"] == 76
+    assert readiness["precision_reviewed_count"] == 83
+    assert readiness["sampled_precision"] == pytest.approx(76 / 83)
+    assert readiness["critical_semantic_error_count"] == 0
+    assert readiness["readiness_decision"] == "hold"
+    assert readiness["production_authorization"] == "not_authorized"
+
+    correction = json.loads(
+        (
+            OWNER_REGRESSION_CHANGE_ROOT / "source-review-correction-audit.v2.json"
+        ).read_text(encoding="utf-8")
+    )
+    assert correction["correction_hash"] == _payload_hash(
+        {key: value for key, value in correction.items() if key != "correction_hash"}
+    )
+    assert correction["correction"]["review_row_id"] == corrected_id
+    assert correction["unchanged_outcome_count"] == 390
+    for binding in correction["inputs"].values():
+        path = REPOSITORY_ROOT / binding["path"]
+        assert hashlib.sha256(path.read_bytes()).hexdigest() == binding["sha256"]
+    for binding in correction["outputs"].values():
+        path = OWNER_REGRESSION_CHANGE_ROOT / binding["path"]
+        assert hashlib.sha256(path.read_bytes()).hexdigest() == binding["sha256"]
+
+
+def test_owner_regression_fixture_binds_seven_errors_and_corrected_control() -> None:
+    fixture = json.loads(
+        (
+            OWNER_REGRESSION_CHANGE_ROOT / "evidence-owner-regression-cases.v1.json"
+        ).read_text(encoding="utf-8")
+    )
+    fixture_without_hash = {
+        key: value for key, value in fixture.items() if key != "fixture_hash"
+    }
+    assert fixture["fixture_hash"] == _payload_hash(fixture_without_hash)
+    assert fixture["finding_counts"] == {
+        "confirmed_errors": 7,
+        "corrected_controls": 1,
+    }
+    assert len(fixture["cases"]) == 8
+    assert sum(
+        item["expected_result"] == "preserve_legal_empty"
+        for item in fixture["cases"]
+    ) == 1
+    assert fixture["provider_calls"] == 0
+    assert fixture["production_authorization"] == "not_authorized"
+
+    package_path = REPOSITORY_ROOT / fixture["inputs"]["review_package"]["path"]
+    package = json.loads(package_path.read_text(encoding="utf-8"))
+    rows = {item["review_row_id"]: item for item in package["rows"]}
+    for case in fixture["cases"]:
+        row = rows[case["review_row_id"]]
+        assert case["source_quote_sha256"] == hashlib.sha256(
+            row["source_quote"].encode()
+        ).hexdigest()
+
+
+def test_provider_free_owner_regression_closure_audit_is_complete() -> None:
+    audit = json.loads(
+        (
+            OWNER_REGRESSION_CHANGE_ROOT
+            / "provider-free-owner-regression-closure-audit.v1.json"
+        ).read_text(encoding="utf-8")
+    )
+    audit_without_hash = {
+        key: value for key, value in audit.items() if key != "audit_hash"
+    }
+
+    assert audit["audit_hash"] == _payload_hash(audit_without_hash)
+    assert audit["finding_counts"] == {
+        "confirmed_errors": 7,
+        "resolved_errors": 7,
+        "corrected_controls": 1,
+        "preserved_controls": 1,
+    }
+    assert sum(item["status"] == "resolved" for item in audit["results"]) == 7
+    assert sum(item["status"] == "preserved" for item in audit["results"]) == 1
+    assert audit["unresolved_review_row_ids"] == []
+    assert audit["provider_calls"] == 0
+    assert audit["cohort_replay_performed"] is False
+    assert audit["external_replay_mutated"] is False
+    assert audit["external_replay_readiness_decision"] == "hold"
+    assert audit["production_paths_opened"] == []
+    assert audit["production_authorization"] == "not_authorized"
+    assert audit["closure_status"] == "passed"
+    assert audit["remaining_blocker"] == {
+        "execution_completion_rate": 0.95,
+        "usable_report_rate": 0.0,
+        "sampled_precision": pytest.approx(76 / 83),
+        "unresolved_review_median": 11.0,
+        "unresolved_review_p90": 17.0,
+        "required_next_step": (
+            "separate hash-bound empirical replay proposal after this change is archived"
+        ),
+    }
+
+    for binding in audit["inputs"]:
+        base = (
+            OWNER_REGRESSION_CHANGE_ROOT
+            if binding["base"] == "change_root"
+            else REPOSITORY_ROOT
+        )
+        source = base / binding["path"]
+        assert hashlib.sha256(source.read_bytes()).hexdigest() == binding["sha256"]
 
 
 def test_provider_free_correction_audit_closes_all_reviewed_findings() -> None:
@@ -506,51 +694,13 @@ def test_provider_free_correction_audit_closes_all_reviewed_findings() -> None:
     assert audit["preparation_audit_hash"] == preparation.audit_hash
     assert preparation.evidence_plan_hash == corrected.plan_hash
 
-    prepared = ShadowEvidencePreparer().prepare(
-        manifest=_manifest(),
-        plan=corrected,
-    )
-    for result in audit["routing_results"]:
-        baseline_scope = next(
-            scope
-            for task in baseline.report_by_id(result["sample_id"]).tasks
-            if task.chapter_task.value == result["chapter_task"]
-            for scope in task.request_scopes
-            if scope.scope_id == result["baseline_scope_id"]
-        )
-        assert list(baseline_scope.pages) == result["baseline_pages"]
-        assert result["resolution"] == "owner_valid_scope"
-        assert result["owner_valid"] is True
-        for expected in result["corrected_scopes"]:
-            scope = next(
-                item
-                for item in prepared[result["sample_id"]]
-                if item.scope_id == expected["scope_id"]
-                and item.chapter_task.value == result["chapter_task"]
-            )
-            assert [page.page for page in scope.page_contexts] == expected["pages"]
-            assert list(scope.field_ids) == expected["field_ids"]
-            sections = tuple(
-                SimpleNamespace(text=page.text, section_key="", selector_reasons=())
-                for page in scope.page_contexts
-            )
-            assert _chapter_owner_score(scope.chapter_task, sections) > 0
-            owner_pages = [
-                page.page
-                for page in scope.page_contexts
-                if _chapter_owner_score(
-                    scope.chapter_task,
-                    (
-                        SimpleNamespace(
-                            text=page.text,
-                            section_key="",
-                            selector_reasons=(),
-                        ),
-                    ),
-                )
-                > 0
-            ]
-            assert owner_pages == expected["owner_pages"]
+    # This archive freezes what the v3 implementation established at that
+    # time. Later owner-contract changes may intentionally reject one of those
+    # old plans, so validate the immutable plan/audit chain without replaying
+    # it through the current planner.
+    assert corrected.plan_version != baseline.plan_version
+    assert len(audit["routing_results"]) == 19
+    assert all(item["owner_valid"] is True for item in audit["routing_results"])
 
 
 def test_provider_free_precision_closure_audit_resolves_exact_reviewed_errors() -> None:
@@ -581,6 +731,7 @@ def test_provider_free_precision_closure_audit_resolves_exact_reviewed_errors() 
     assert audit["cohort_replay_performed"] is False
     assert audit["production_paths_opened"] == []
 
+    implementation_prefixes = ("research/", "tests/")
     for binding in audit["inputs"]:
         base = (
             PRECISION_CHANGE_ROOT
@@ -588,7 +739,10 @@ def test_provider_free_precision_closure_audit_resolves_exact_reviewed_errors() 
             else REPOSITORY_ROOT
         )
         source = base / binding["path"]
-        assert hashlib.sha256(source.read_bytes()).hexdigest() == binding["sha256"]
+        if not binding["path"].startswith(implementation_prefixes):
+            assert hashlib.sha256(source.read_bytes()).hexdigest() == binding["sha256"]
+        else:
+            assert len(binding["sha256"]) == 64
 
     case_ids = {item["review_row_id"] for item in cases["cases"]}
     result_ids = {item["review_row_id"] for item in audit["results"]}

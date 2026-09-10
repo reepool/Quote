@@ -66,6 +66,10 @@ BASELINE_BATCH = (
     REPOSITORY_ROOT
     / "var/company_profile_shadow_batch/20260909/batch-manufacturing-materials-shadow-gemini-20260909-a"
 )
+STABILITY_BATCH = (
+    REPOSITORY_ROOT
+    / "var/company_profile_shadow_batch/20260909/batch-manufacturing-materials-shadow-stability-gemini-20260909-a"
+)
 REFINED_PLAN_HASH = "1" * 64
 EXECUTION_STABILITY_FIXTURE = (
     REPOSITORY_ROOT
@@ -95,7 +99,20 @@ def _stability_replay_inputs():
             STABILITY_CHANGE / "bounded-gemini-repair-probe.v1.json"
         ),
     }
-    prepared = ShadowEvidencePreparer().prepare(manifest=manifest, plan=plan)
+    # Replay admission freezes the scopes that the historical stability batch
+    # actually executed. Re-running its old v3 plan through today's stricter
+    # owner rules would incorrectly make a closed replay contract depend on
+    # later planner behavior.
+    frozen_batch = load_shadow_batch_result(STABILITY_BATCH / "manifest.json")
+    prepared = {
+        reference.sample_id: tuple(
+            item.prepared_scope
+            for item in load_shadow_report_result(
+                STABILITY_BATCH / reference.relative_path
+            ).scope_results
+        )
+        for reference in frozen_batch.reports
+    }
     return manifest, plan, preparation, correction, supporting, prepared
 
 

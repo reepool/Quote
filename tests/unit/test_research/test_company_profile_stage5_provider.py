@@ -354,11 +354,14 @@ def test_business_overview_uses_flat_source_and_activity_drafts() -> None:
 
 
 def test_procurement_mode_uses_flat_draft_and_reconstructs_mechanical_fields() -> None:
-    prepared = _prepared_scope().model_copy(
+    prepared = _scope_with_source_text(
+        chapter_task=ChapterTask.EXTRACT_MATERIAL_INPUTS,
+        scope_id="procurement_mode",
+        field_id="material_input",
+        source_text="公司生产所需主要原材料为铁矿石，采用集中采购模式。",
+    ).model_copy(
         update={
-            "scope_id": "procurement_mode",
-            "chapter_task": ChapterTask.EXTRACT_MATERIAL_INPUTS,
-            "field_ids": ("material_input",),
+            "candidate_pages": (14,),
         }
     )
     request = _material_input_extract_request(prepared)
@@ -3046,6 +3049,48 @@ def test_business_overview_rejects_text_not_present_in_evidence() -> None:
         )
 
 
+def test_business_overview_rejects_cross_reference_only_target() -> None:
+    prepared = _prepared_scope()
+    pointer = (
+        "参见第三节“管理层讨论与分析”中“一、报告期内公司从事的主要业务”"
+        "的相关内容。"
+    )
+    substantive = "公司的商业开发项目主要采用自行开发，部分销售、部分自持的经营模式。"
+    evidence = prepared.evidence_bundle[0].evidence.model_copy(
+        update={"anchor": TextAnchor(bounded_quote=f"{substantive}\n{pointer}")}
+    )
+
+    with pytest.raises(ValueError, match="substantive business text"):
+        BusinessOverview(
+            record_id="overview-pointer-only",
+            field_id="business_overview_source",
+            chapter_task=ChapterTask.EXTRACT_BUSINESS_OVERVIEW,
+            report=prepared.report,
+            subject_scope=SubjectScope.UNCLEAR,
+            reported_period="2025",
+            period_type=PeriodType.DURATION,
+            assertion_class=AssertionClass.REPORTED_FACT,
+            evidence=(evidence,),
+            source_native=SourceNativeValue(name="主营业务概述"),
+            source_text=pointer,
+        )
+
+    accepted = BusinessOverview(
+        record_id="overview-substantive-same-evidence",
+        field_id="business_overview_source",
+        chapter_task=ChapterTask.EXTRACT_BUSINESS_OVERVIEW,
+        report=prepared.report,
+        subject_scope=SubjectScope.UNCLEAR,
+        reported_period="2025",
+        period_type=PeriodType.DURATION,
+        assertion_class=AssertionClass.REPORTED_FACT,
+        evidence=(evidence,),
+        source_native=SourceNativeValue(name="主要经营模式"),
+        source_text=substantive,
+    )
+    assert accepted.source_text == substantive
+
+
 def _prepared_scope() -> PreparedRequestScope:
     report = ReportIdentity(
         instrument_id="300750.SZ",
@@ -4077,6 +4122,215 @@ def test_coverage_rejects_explicit_context_only_evidence() -> None:
             request=request,
             prepared_scope=prepared,
         )
+
+
+def _owner_coverage_request(prepared: PreparedRequestScope) -> SemanticTaskRequest:
+    field_id = prepared.field_ids[0]
+    object_types = {
+        "production_capacity": ObjectType.MEASUREMENT,
+        "production_volume": ObjectType.MEASUREMENT,
+        "material_input": ObjectType.RELATIONSHIP,
+        "segment_dimension": ObjectType.SEGMENT,
+    }
+    metric_types = {
+        "production_capacity": (MetricType.PRODUCTION_CAPACITY,),
+        "production_volume": (MetricType.PRODUCTION_VOLUME,),
+    }.get(field_id, ())
+    checklist = ChecklistItem(
+        field_id=field_id,
+        object_type=object_types[field_id],
+        chapter_task=prepared.chapter_task,
+        requirement_level=RequirementLevel.CONDITIONAL,
+        allowed_coverage_statuses=tuple(CoverageStatus),
+        allowed_metric_types=metric_types,
+    )
+    return SemanticTaskRequest(
+        request_id=f"owner-coverage:{field_id}",
+        report=prepared.report,
+        package_manifest=PackageManifest(
+            package_name="manufacturing_materials",
+            package_version="v1",
+            report=prepared.report,
+            checklist=(checklist,),
+        ),
+        chapter_task=prepared.chapter_task,
+        evidence_bundle=prepared.evidence_bundle,
+        allowed_object_types=(object_types[field_id],),
+        allowed_metric_types=metric_types,
+        unresolved_field_ids=(field_id,),
+    )
+
+
+@pytest.mark.parametrize(
+    ("chapter_task", "field_id", "section_title", "source_text"),
+    [
+        (
+            ChapterTask.EXTRACT_OPERATING_QUANTITIES,
+            "production_capacity",
+            "business_overview",
+            "营业收入下降主要是受钢材销售量及销售价格降低影响。",
+        ),
+        (
+            ChapterTask.EXTRACT_OPERATING_QUANTITIES,
+            "production_capacity",
+            "industry_context",
+            "国内PVC库存量仍处于较高水平，沿海地区新建产能集中投产。",
+        ),
+        (
+            ChapterTask.EXTRACT_OPERATING_QUANTITIES,
+            "production_capacity",
+            "industry_context",
+            "前期在建产能有序释放，国内煤炭产能保障根基持续夯实。",
+        ),
+        (
+            ChapterTask.EXTRACT_MATERIAL_INPUTS,
+            "material_input",
+            "controlling_shareholder",
+            "四、控股股东及实际控制人情况：控股股东主要经营业务包括稀土原料生产与供应。",
+        ),
+        (
+            ChapterTask.EXTRACT_SEGMENT_FINANCIALS,
+            "segment_dimension",
+            "industry_context",
+            "报告期内公司所处行业情况：炼化一体化产业链布局持续完善。",
+        ),
+        (
+            ChapterTask.EXTRACT_OPERATING_QUANTITIES,
+            "production_volume",
+            "business_model",
+            "公司根据销售预测量、往年同期产量、销量和目前库存量制定生产计划。",
+        ),
+    ],
+)
+def test_legal_empty_coverage_rejects_frozen_non_owner_shapes(
+    chapter_task: ChapterTask,
+    field_id: str,
+    section_title: str,
+    source_text: str,
+) -> None:
+    prepared = _scope_with_source_text(
+        chapter_task=chapter_task,
+        scope_id=f"{field_id}-owner-regression",
+        field_id=field_id,
+        source_text=source_text,
+    )
+    evidence = prepared.evidence_bundle[0].evidence.model_copy(
+        update={"section_title": section_title}
+    )
+    prepared = prepared.model_copy(
+        update={
+            "evidence_bundle": (PreparedEvidence(evidence=evidence, field_id=field_id),),
+            "candidate_pages": (evidence.page,),
+        }
+    )
+    request = _owner_coverage_request(prepared)
+
+    with pytest.raises(ValueError, match="chapter-owning Evidence"):
+        _normalize_extract_response(
+            {
+                "schema_version": "company_profile_extract_response.v1",
+                "request_id": request.request_id,
+                "items": [
+                    {
+                        "item_type": "coverage",
+                        "coverage": {
+                            "field_id": field_id,
+                            "status": "not_disclosed",
+                            "reason_code": "source_explicitly_not_disclosed",
+                            "evidence_ids": [evidence.evidence_id],
+                        },
+                    }
+                ],
+            },
+            request=request,
+            prepared_scope=prepared,
+        )
+
+
+def test_material_legal_empty_preserves_explicit_owner_applicability() -> None:
+    source_text = (
+        "三、主要原材料及能源采购 （一）主要原材料及能源情况 "
+        "□适用 √不适用 四、安全生产与环保"
+    )
+    prepared = _scope_with_source_text(
+        chapter_task=ChapterTask.EXTRACT_MATERIAL_INPUTS,
+        scope_id="material_inputs-01",
+        field_id="material_input",
+        source_text=source_text,
+    )
+    evidence = prepared.evidence_bundle[0].evidence.model_copy(
+        update={"section_title": "procurement_and_costs"}
+    )
+    prepared = prepared.model_copy(
+        update={
+            "evidence_bundle": (
+                PreparedEvidence(evidence=evidence, field_id="material_input"),
+            ),
+            "candidate_pages": (evidence.page,),
+        }
+    )
+    request = _owner_coverage_request(prepared)
+
+    result = _normalize_extract_response(
+        {
+            "schema_version": "company_profile_extract_response.v1",
+            "request_id": request.request_id,
+            "items": [
+                {
+                    "item_type": "coverage",
+                    "coverage": {
+                        "field_id": "material_input",
+                        "status": "not_applicable",
+                        "reason_code": "source_explicitly_not_applicable",
+                        "evidence_ids": [evidence.evidence_id],
+                    },
+                }
+            ],
+        },
+        request=request,
+        prepared_scope=prepared,
+    )
+
+    assert result["items"][0]["coverage"]["status"] == "not_applicable"
+    assert result["items"][0]["coverage"]["evidence"][0]["evidence_id"] == (
+        evidence.evidence_id
+    )
+
+
+def test_unclear_coverage_does_not_require_legal_empty_field_owner() -> None:
+    prepared = _scope_with_source_text(
+        chapter_task=ChapterTask.EXTRACT_OPERATING_QUANTITIES,
+        scope_id="production_volume-owner-regression",
+        field_id="production_volume",
+        source_text="公司根据销售预测量和目前库存量制定生产计划。",
+    )
+    evidence = prepared.evidence_bundle[0].evidence
+    prepared = prepared.model_copy(
+        update={"candidate_pages": (evidence.page,)}
+    )
+    request = _owner_coverage_request(prepared)
+
+    result = _normalize_extract_response(
+        {
+            "schema_version": "company_profile_extract_response.v1",
+            "request_id": request.request_id,
+            "items": [
+                {
+                    "item_type": "coverage",
+                    "coverage": {
+                        "field_id": "production_volume",
+                        "status": "unclear",
+                        "reason_code": "candidate_unresolved",
+                        "evidence_ids": [evidence.evidence_id],
+                    },
+                }
+            ],
+        },
+        request=request,
+        prepared_scope=prepared,
+    )
+
+    assert result["items"][0]["coverage"]["status"] == "unclear"
 
 
 def test_cost_component_cannot_become_segment_identity() -> None:
