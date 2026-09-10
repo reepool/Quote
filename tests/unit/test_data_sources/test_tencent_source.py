@@ -253,8 +253,73 @@ def test_http_403_raises_recognizable_status_error():
             datetime(2026, 9, 7), datetime(2026, 9, 7),
         )
     assert exc_info.value.code == 403 and exc_info.value.status == 403
-    # 工厂 throttle 熔断必须能识别
+    # 工厂 throttle 熔断必须能识别, 且不误标为源不可用
     assert DataSourceFactory._is_daily_http_throttle_error(exc_info.value) is True
+    assert DataSourceFactory._is_daily_source_unavailable_error(exc_info.value) is False
+
+
+def test_http_403_not_retried():
+    src = _build_source(queue=[
+        _FakeResponse(status_code=403),
+        _kline_response([_row("2026-09-07", 9.2, 9.3, 9.4, 9.1, 100)]),
+    ])
+    src.rate_limiter.config.retry_times = 3
+    src.rate_limiter.config.retry_interval = 0.0
+    with pytest.raises(TencentHTTPStatusError):
+        src._sync_get_daily_data(
+            "sh600000", "600000.SH", "600000",
+            datetime(2026, 9, 7), datetime(2026, 9, 7),
+        )
+    assert len(src.session.calls) == 1  # 限流不重试
+
+
+def test_http_5xx_retried_then_success():
+    src = _build_source(queue=[
+        _FakeResponse(status_code=502),
+        _FakeResponse(status_code=502),
+        _kline_response([_row("2026-09-08", 9.2, 9.3, 9.4, 9.1, 100)]),
+    ])
+    src.rate_limiter.config.retry_times = 3
+    src.rate_limiter.config.retry_interval = 0.0
+    bars = src._sync_get_daily_data(
+        "sh600000", "600000.SH", "600000",
+        datetime(2026, 9, 8), datetime(2026, 9, 8),
+    )
+    assert len(bars) == 1
+    assert len(src.session.calls) == 3
+
+
+def test_http_5xx_exhaustion_counts_as_transport_unavailable():
+    from data_sources.tencent_source import TencentHTTPTransportStatusError
+
+    src = _build_source(queue=[_FakeResponse(status_code=503)] * 3)
+    src.rate_limiter.config.retry_times = 3
+    src.rate_limiter.config.retry_interval = 0.0
+    with pytest.raises(TencentHTTPTransportStatusError) as exc_info:
+        src._sync_get_daily_data(
+            "sh600000", "600000.SH", "600000",
+            datetime(2026, 9, 8), datetime(2026, 9, 8),
+        )
+    assert len(src.session.calls) == 3
+    assert isinstance(exc_info.value, ConnectionError)
+    # 5xx 归 transport/unavailable, 不归 throttle
+    assert DataSourceFactory._is_daily_source_unavailable_error(exc_info.value) is True
+    assert DataSourceFactory._is_daily_http_throttle_error(exc_info.value) is False
+
+
+def test_network_error_retried_then_success():
+    src = _build_source(queue=[
+        requests.exceptions.ConnectionError("connection reset"),
+        _kline_response([_row("2026-09-08", 9.2, 9.3, 9.4, 9.1, 100)]),
+    ])
+    src.rate_limiter.config.retry_times = 2
+    src.rate_limiter.config.retry_interval = 0.0
+    bars = src._sync_get_daily_data(
+        "sh600000", "600000.SH", "600000",
+        datetime(2026, 9, 8), datetime(2026, 9, 8),
+    )
+    assert len(bars) == 1
+    assert len(src.session.calls) == 2
 
 
 def test_http_429_message_also_matches_factory_literals():
@@ -264,6 +329,7 @@ def test_http_429_message_also_matches_factory_literals():
 
 def test_connection_error_wrapped_for_transport_breaker():
     src = _build_source(queue=[requests.exceptions.ConnectionError("connection reset")])
+    src.rate_limiter.config.retry_times = 1
     with pytest.raises(ConnectionError):
         src._sync_get_daily_data(
             "sh600000", "600000.SH", "600000",
@@ -273,6 +339,7 @@ def test_connection_error_wrapped_for_transport_breaker():
 
 def test_timeout_wrapped_as_connection_error():
     src = _build_source(queue=[requests.exceptions.Timeout("timed out")])
+    src.rate_limiter.config.retry_times = 1
     with pytest.raises(ConnectionError):
         src._sync_get_latest_daily_data("sh600000", "600000.SH", "600000")
 

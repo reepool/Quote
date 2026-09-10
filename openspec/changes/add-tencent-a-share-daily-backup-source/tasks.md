@@ -19,7 +19,7 @@
 
 - [x] 3.1 失败语义二分并对接工厂匹配器：传输级故障（连接拒绝/重置/超时）抛 `ConnectionError`（`_is_daily_source_unavailable_error` 的 isinstance 分支命中，计入 transport 熔断）；HTTP 403/429 抛出**带 `code`/`status` 属性 ∈ {403, 429} 或消息（小写）含 `http error 403` / `http error 429` / `403`+`forbidden` / `too many requests` / `status code: 403` / `status_code=403` 之一**的异常（`_is_daily_http_throttle_error` 命中，计入 throttle 熔断）；**不得把 403/429 吞成空结果**；数据级失败返回 `[]` + `last_fetch_diagnostic`，健康空结果不置 `connection_unhealthy`
 - [x] 3.2 畸形行跳过并在 diagnostic 中记录原因与条数；GBK 解码容错
-- [ ] 3.3 `RateLimiter` 接入（`rate_limiter.acquire()`），超时/重试按配置生效；日更主循环内无失败退避 sleep（限流器 pacing 等待除外）
+- [x] 3.3 `RateLimiter` 接入（`rate_limiter.acquire()`），超时/重试按配置生效；日更主循环内无失败退避 sleep（限流器 pacing 等待除外）
 - [x] 3.4 所有 HTTP 请求经 `utils/http_transport.py` 共享传输层、单一钉定 URL（运行时不做双端点切换）、TLS 校验开启
 
 ## 4. Milestone 4：测试与回归验证

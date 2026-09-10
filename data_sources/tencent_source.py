@@ -18,6 +18,7 @@ openspec change `add-tencent-a-share-daily-backup-source`:
 """
 
 import asyncio
+import time
 from datetime import datetime, timedelta
 from typing import Any, Dict, List, Optional
 
@@ -44,16 +45,24 @@ _PRE_CLOSE_LOOKBACK_DAYS = 15
 
 
 class TencentHTTPStatusError(Exception):
-    """腾讯接口返回非 200 状态码 (如 403/429)。
+    """腾讯接口返回 HTTP 403/429 (反爬限流)。
 
     携带 code/status 属性, 供工厂 _is_daily_http_throttle_error 识别并计入
-    throttle 熔断, 避免把限流吞成空结果逐只空转。
+    throttle 熔断; 立即上抛, 不做重试, 避免把限流吞成空结果逐只空转。
     """
 
     def __init__(self, message: str, status_code: int):
         super().__init__(message)
         self.code = status_code
         self.status = status_code
+
+
+class TencentHTTPTransportStatusError(TencentHTTPStatusError, ConnectionError):
+    """腾讯接口返回传输级异常状态码 (5xx 等)。
+
+    继承内置 ConnectionError, 使工厂 _is_daily_source_unavailable_error 命中
+    并计入 transport 熔断; 403/429 永远走基类 (throttle 在前, 不混淆)。
+    """
 
 
 class TencentSource(BaseDataSource):
@@ -114,24 +123,39 @@ class TencentSource(BaseDataSource):
         )
 
     def _fetch_kline_page(self, code: str, beg: str, end: str) -> List[list]:
-        """拉取一页日线 (实返 ≤batch_size+1 根); 传输级失败抛异常。"""
+        """拉取一页日线 (实返 ≤batch_size+1 根); 传输级失败按配置重试后抛异常。"""
         param = f"{code},day,{beg},{end},{self.batch_size},"
-        try:
-            response = self.session.get(
-                f"{self.kline_url}?param={param}", timeout=self.request_timeout
-            )
-        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout) as exc:
-            raise ConnectionError(f"[tencent] 日线连接失败 {code}: {exc}") from exc
-        if response.status_code != 200:
-            raise TencentHTTPStatusError(
-                f"[tencent] http error {response.status_code} for {code}",
-                response.status_code,
-            )
+        response = self._request_with_retry(
+            f"日线 {code}", f"{self.kline_url}?param={param}"
+        )
         try:
             payload = response.json()
         except ValueError as exc:
             raise ConnectionError(f"[tencent] 日线响应非 JSON {code}: {exc}") from exc
         return ((payload.get("data") or {}).get(code) or {}).get("day") or []
+
+    def _request_with_retry(self, description: str, url: str):
+        """带配置化重试的 GET: 网络/5xx 重试 retry_times 次, 403/429 立即上抛。"""
+        attempts = max(1, int(getattr(self.rate_limiter.config, "retry_times", 1) or 1))
+        interval = float(getattr(self.rate_limiter.config, "retry_interval", 0.0) or 0.0)
+        last_exc: Optional[BaseException] = None
+        for attempt in range(attempts):
+            try:
+                response = self.session.get(url, timeout=self.request_timeout)
+            except (requests.exceptions.ConnectionError, requests.exceptions.Timeout) as exc:
+                last_exc = ConnectionError(f"[tencent] {description} 连接失败: {exc}")
+                last_exc.__cause__ = exc
+            else:
+                status = response.status_code
+                if status == 200:
+                    return response
+                message = f"[tencent] http error {status} for {description}"
+                if status in (403, 429):
+                    raise TencentHTTPStatusError(message, status)
+                last_exc = TencentHTTPTransportStatusError(message, status)
+            if attempt < attempts - 1:
+                time.sleep(interval)
+        raise last_exc
 
     def _sync_get_daily_data(self, code: str, instrument_id: str, symbol: str,
                              start_date: datetime, end_date: datetime) -> List[Dict[str, Any]]:
@@ -229,17 +253,7 @@ class TencentSource(BaseDataSource):
 
     def _sync_get_latest_daily_data(self, code: str, instrument_id: str, symbol: str) -> Dict[str, Any]:
         self.last_fetch_diagnostic = {}
-        try:
-            response = self.session.get(
-                self.snapshot_url + code, timeout=self.request_timeout
-            )
-        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout) as exc:
-            raise ConnectionError(f"[tencent] 快照连接失败 {code}: {exc}") from exc
-        if response.status_code != 200:
-            raise TencentHTTPStatusError(
-                f"[tencent] http error {response.status_code} for {code}",
-                response.status_code,
-            )
+        response = self._request_with_retry(f"快照 {code}", self.snapshot_url + code)
         response.encoding = "gbk"
         text = response.text
         if '="' not in text or '"' not in text[text.index('="') + 2:]:
