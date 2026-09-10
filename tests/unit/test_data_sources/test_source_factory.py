@@ -20,7 +20,7 @@ class TestDataSourceFactory:
         self.factory = DataSourceFactory(Mock())
 
         self.pytdx = _build_source('pytdx_a_stock', ['SSE', 'SZSE', 'BSE'], ['stock'])
-        self.baostock = _build_source('baostock_a_stock', ['SSE', 'SZSE'], ['stock', 'index'])
+        self.baostock = _build_source('baostock_a_stock', ['SSE', 'SZSE', 'BSE'], ['stock', 'index'])
         self.akshare = _build_source('akshare_a_stock', ['SSE', 'SZSE', 'BSE'], ['stock', 'index'])
 
         self.factory.sources = {
