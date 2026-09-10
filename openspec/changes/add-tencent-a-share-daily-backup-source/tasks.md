@@ -5,8 +5,8 @@
 - [ ] 1.1 新建 `data_sources/tencent_source.py`：`TencentSource(BaseDataSource)` 骨架；实现单请求日线路径（日更常规窗口 `[T-1, T]`）：单一 URL `https://proxy.finance.qq.com/ifzqgtimg/appstock/app/newfqkline/get`（空复权、`day` 节点）、代码前缀映射（`*.SH/sz/bj`）、11 列映射锁定 `idx0..idx5=[日期,开,收,高,低,量]`、`idx6` 跳过、`idx7` 不用、量纲前缀规则（`sh688*`/`sh689*` ×1，其余 ×100）、`amount = idx8 × 10000`、`turnover=0.0`
 - [ ] 1.2 `data_sources/__init__.py` 导出 `TencentSource`
 - [ ] 1.3 `data_sources/source_factory.py` `_create_source_instance` 增加 `tencent` 分支
-- [ ] 1.4 `config/03_data.json`：新增 `data_sources_config.tencent`（enabled、`exchanges_supported: ["a_stock"]`、`connection_timeout_sec: 10`、`retry_times: 3`、`retry_interval: 1.0`、`batch_size: 800`、`max_requests_per_minute: 3600`、`max_requests_per_hour: 60000`、`max_requests_per_day: 1000000`）；`routing.daily` 在 SSE/SZSE/BSE stock 链的 `pytdx` 之后插入 `tencent`
-- [ ] 1.5 最小业务对账（允许一次性真实网络）：`600000.SH`（主板 ×100）、`688981.SH`（科创板 ×1）、`689009.SH`（CDR ×1）、`920000.BJ`（北交所 ×100）各取一个**已收盘**目标交易日，经 `source_factory.get_daily_data` 以 tencent 路由与 `quotes.db` 主源行对账 `close`/`volume`/`amount`（volume 按前缀规则换算后须精确一致，amount 允许万元舍入微差）
+- [ ] 1.4 `config/03_data.json`：新增 `data_sources_config.tencent`（enabled、`exchanges_supported: ["a_stock"]`、`connection_timeout_sec: 10`、`retry_times: 3`、`retry_interval: 1.0`、`batch_size: 800`、`max_requests_per_minute: 3600`、`max_requests_per_hour: 60000`、`max_requests_per_day: 1000000`）；`routing.daily` 在 SSE/SZSE/BSE stock 链的 `pytdx` 之后插入 `tencent`；同步在 `docs/configuration/config_file.md` 增加 `tencent` 数据源小节
+- [ ] 1.5 最小业务对账（允许一次性真实网络，**须直接调用 `TencentSource` 或临时将测试路由设为仅含 tencent——完整路由下 pytdx 先成功不会走到备源**）：`600000.SH`（主板 ×100）、`688981.SH`（科创板 ×1）、`689009.SH`（CDR ×1）、`920000.BJ`（北交所 ×100）各取一个**已收盘**目标交易日，与 `quotes.db` 主源行对账 `close`/`volume`/`amount`；×100 的票 volume 换算后须与 pytdx **精确一致**；`sh688*`/`sh689*` 保留腾讯原始股数（×1），允许与 pytdx 相差按手取整的零股，**不得为对账取整**；amount 允许万元舍入微差
 
 ## 2. Milestone 2：完整核心业务规则
 

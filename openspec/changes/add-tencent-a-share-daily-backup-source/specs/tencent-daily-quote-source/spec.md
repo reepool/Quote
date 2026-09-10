@@ -25,7 +25,8 @@ The source SHALL fetch daily klines from exactly `https://proxy.finance.qq.com/i
 #### Scenario: STAR board and CDR codes are already in shares
 
 - **WHEN** a raw day row reports volume `22153826.00` for `688981.SH` or `7250217.00` for `689009.SH`
-- **THEN** the returned bar volume SHALL remain as-is (×1), matching the pytdx-written rows for the same trading days
+- **THEN** the returned bar volume SHALL remain as-is (×1) and SHALL NOT be rounded to lots
+- **AND** it MAY differ from the pytdx-written row by an odd-lot remainder (e.g. 22,153,826 vs 22,153,800) because pytdx rounds to lots, and such cross-source differences SHALL go through the existing row-hash changelog semantics
 
 #### Scenario: Amount is converted from 万元 to yuan
 
