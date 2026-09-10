@@ -1,0 +1,2006 @@
+[
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:business_overview-01:blocker:task_completion:business_overview-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly retains this report-local blocker; the row is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:business_overview-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-600121-SH:manufacturing-materials-shadow-600121-2025:business_overview-01:coverage:business_overview_source",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:business_overview-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-600121-SH:manufacturing-materials-shadow-600121-2025:business_overview-01:coverage:explicit_activity",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:segment_financials-01:blocker:task_completion:segment_financials-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly retains this report-local blocker; the row is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-600121-SH:manufacturing-materials-shadow-600121-2025:segment_financials-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-600121-SH:manufacturing-materials-shadow-600121-2025:segment_financials-01:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-600121-SH:manufacturing-materials-shadow-600121-2025:segment_financials-01:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-600121-SH:manufacturing-materials-shadow-600121-2025:segment_financials-01:coverage:operating_cost",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-600121-SH:manufacturing-materials-shadow-600121-2025:segment_financials-01:coverage:gross_margin_reported",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:segment_financials-02:blocker:task_completion:segment_financials-02",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly retains this report-local blocker; the row is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-600121-SH:manufacturing-materials-shadow-600121-2025:segment_financials-02:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-600121-SH:manufacturing-materials-shadow-600121-2025:segment_financials-02:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-600121-SH:manufacturing-materials-shadow-600121-2025:segment_financials-02:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-600121-SH:manufacturing-materials-shadow-600121-2025:segment_financials-02:coverage:operating_cost",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:operating_quantities-01:chapter_sample:stage5-6a47165c46f9dcb2d3eaa5f9",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:material_inputs-01:chapter_sample:stage5-1f1c42e6dc6b8c6387fb23d2",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:counterparties_and_concentration-01:blocker:task_completion:counterparties_and_concentration-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly retains this report-local blocker; the row is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:counterparties_and_concentration-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-600121-SH:manufacturing-materials-shadow-600121-2025:counterparties_and_concentration-01:coverage:counterparty_relationship",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:counterparties_and_concentration-01:chapter_sample:stage5-b2243cc697170c3fe9673002",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:business_regime-01:chapter_sample:coverage:business_regime-01:business_regime",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source quote supports this legal-empty result without inventing a value, identity, event, or group subject."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600022-2025:business_overview-01:blocker:task_completion:business_overview-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly retains this report-local blocker; the row is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600022-2025:business_overview-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-600022-SH:manufacturing-materials-shadow-600022-2025:business_overview-01:coverage:explicit_activity",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600022-2025:business_overview-01:chapter_sample:stage5-2469ae35ddc2a7f16d0c95b8",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600022-2025:segment_financials-01:blocker:task_completion:segment_financials-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly retains this report-local blocker; the row is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600022-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-600022-SH:manufacturing-materials-shadow-600022-2025:segment_financials-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600022-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-600022-SH:manufacturing-materials-shadow-600022-2025:segment_financials-01:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600022-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-600022-SH:manufacturing-materials-shadow-600022-2025:segment_financials-01:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600022-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-600022-SH:manufacturing-materials-shadow-600022-2025:segment_financials-01:coverage:operating_cost",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600022-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-600022-SH:manufacturing-materials-shadow-600022-2025:segment_financials-01:coverage:gross_margin_reported",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600022-2025:segment_financials-02:chapter_sample:stage5-109b0cd85f7aa3aa82b80ae8",
+    "outcome": "noncritical_error",
+    "reviewer": "codex-source-review",
+    "notes": "The cost-component label 原材料及燃动费 was emitted as a business Segment; the source row belongs to 钢铁业 and the error does not alter a numeric fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600022-2025:operating_quantities-01:chapter_sample:coverage:operating_quantities-01:production_capacity",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source quote supports this legal-empty result without inventing a value, identity, event, or group subject."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600022-2025:material_inputs-01:chapter_sample:coverage:material_inputs-01:material_input",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source quote supports this legal-empty result without inventing a value, identity, event, or group subject."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600022-2025:counterparties_and_concentration-01:chapter_sample:stage5-932e5fe176bf1248c4fa90fe",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600022-2025:business_regime-01:chapter_sample:stage5-f953b226227b433124753e0d",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:business_overview-01:blocker:task_completion:business_overview-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly retains this report-local blocker; the row is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:business_overview-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-600256-SH:manufacturing-materials-shadow-600256-2025:business_overview-01:coverage:business_overview_source",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:business_overview-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-600256-SH:manufacturing-materials-shadow-600256-2025:business_overview-01:coverage:explicit_activity",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:segment_financials-01:blocker:task_completion:segment_financials-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly retains this report-local blocker; the row is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-600256-SH:manufacturing-materials-shadow-600256-2025:segment_financials-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-600256-SH:manufacturing-materials-shadow-600256-2025:segment_financials-01:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-600256-SH:manufacturing-materials-shadow-600256-2025:segment_financials-01:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-600256-SH:manufacturing-materials-shadow-600256-2025:segment_financials-01:coverage:operating_cost",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-600256-SH:manufacturing-materials-shadow-600256-2025:segment_financials-01:coverage:gross_margin_reported",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:segment_financials-02:chapter_sample:stage5-a64d981df1da330244f24dbc",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:operating_quantities-01:chapter_sample:stage5-ce26c3ecbccad61f79594579",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:material_inputs-01:chapter_sample:stage5-1ff3c89e39f8e9300335a6f9",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:counterparties_and_concentration-01:chapter_sample:stage5-af8c8d545acdb3ea692de5ec",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:business_regime-01:blocker:task_completion:business_regime-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly retains this report-local blocker; the row is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:business_regime-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-600256-SH:manufacturing-materials-shadow-600256-2025:business_regime-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:business_regime-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-600256-SH:manufacturing-materials-shadow-600256-2025:business_regime-01:coverage:business_regime",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600063-2025:business_overview-01:chapter_sample:stage5-5f91704e4601505c56ee6f1a",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600063-2025:segment_financials-01:blocker:task_completion:segment_financials-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly retains this report-local blocker; the row is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600063-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-600063-SH:manufacturing-materials-shadow-600063-2025:segment_financials-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600063-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-600063-SH:manufacturing-materials-shadow-600063-2025:segment_financials-01:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600063-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-600063-SH:manufacturing-materials-shadow-600063-2025:segment_financials-01:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600063-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-600063-SH:manufacturing-materials-shadow-600063-2025:segment_financials-01:coverage:operating_cost",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600063-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-600063-SH:manufacturing-materials-shadow-600063-2025:segment_financials-01:coverage:gross_margin_reported",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600063-2025:segment_financials-02:chapter_sample:stage5-7697e7c3e7237fa37d89fa66",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600063-2025:operating_quantities-01:chapter_sample:stage5-3e6085664152a1491ae5fb46",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600063-2025:material_inputs-01:chapter_sample:stage5-957de624ab3d84751e83d7e6",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600063-2025:counterparties_and_concentration-01:chapter_sample:stage5-7c148d0de727ab8b13374a51",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600063-2025:business_regime-01:chapter_sample:coverage:business_regime-01:business_regime",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source quote supports this legal-empty result without inventing a value, identity, event, or group subject."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600111-2025:business_overview-01:chapter_sample:stage5-62cae4d160543bcf8be01001",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600111-2025:segment_financials-01:blocker:task_completion:segment_financials-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly retains this report-local blocker; the row is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600111-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-600111-SH:manufacturing-materials-shadow-600111-2025:segment_financials-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600111-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-600111-SH:manufacturing-materials-shadow-600111-2025:segment_financials-01:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600111-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-600111-SH:manufacturing-materials-shadow-600111-2025:segment_financials-01:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600111-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-600111-SH:manufacturing-materials-shadow-600111-2025:segment_financials-01:coverage:operating_cost",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600111-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-600111-SH:manufacturing-materials-shadow-600111-2025:segment_financials-01:coverage:gross_margin_reported",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600111-2025:segment_financials-02:chapter_sample:stage5-17027c3e8832dbe39f92b7d8",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600111-2025:operating_quantities-01:chapter_sample:coverage:operating_quantities-01:production_volume",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source quote supports this legal-empty result without inventing a value, identity, event, or group subject."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600111-2025:material_inputs-01:chapter_sample:coverage:material_inputs-01:material_input",
+    "outcome": "noncritical_error",
+    "reviewer": "codex-source-review",
+    "notes": "The legal-empty material conclusion is bound to a shareholder page, not a governed material or procurement disclosure."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600111-2025:counterparties_and_concentration-01:blocker:task_completion:counterparties_and_concentration-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly retains this report-local blocker; the row is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600111-2025:counterparties_and_concentration-01:unresolved:stage5-d88369aaf74f089d798d8030",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600111-2025:counterparties_and_concentration-01:unresolved:stage5-bf8768e6a22a8c049afe38e6",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600111-2025:counterparties_and_concentration-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-600111-SH:manufacturing-materials-shadow-600111-2025:counterparties_and_concentration-01:coverage:supplier_concentration",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600111-2025:counterparties_and_concentration-01:chapter_sample:stage5-073f40a44850c06b32dc89ed",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600111-2025:business_regime-01:blocker:task_completion:business_regime-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly retains this report-local blocker; the row is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600111-2025:business_regime-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-600111-SH:manufacturing-materials-shadow-600111-2025:business_regime-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600111-2025:business_regime-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-600111-SH:manufacturing-materials-shadow-600111-2025:business_regime-01:coverage:business_regime",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:business_overview-01:chapter_sample:stage5-77e2aff28301d8b96409f9d1",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:segment_financials-01:chapter_sample:stage5-c6d48be0e47acfca1d8f86ae",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:segment_financials-02:blocker:task_completion:segment_financials-02",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly retains this report-local blocker; the row is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-600176-SH:manufacturing-materials-shadow-600176-2025:segment_financials-02:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-600176-SH:manufacturing-materials-shadow-600176-2025:segment_financials-02:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:operating_quantities-01:chapter_sample:coverage:operating_quantities-01:production_capacity",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source quote supports this legal-empty result without inventing a value, identity, event, or group subject."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:material_inputs-01:chapter_sample:stage5-8006cd1b659af4bead2079dc",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:counterparties_and_concentration-01:chapter_sample:stage5-a300fd5dcad8b0c4fa6bec8b",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:counterparties_and_concentration-02:blocker:task_completion:counterparties_and_concentration-02",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly retains this report-local blocker; the row is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:counterparties_and_concentration-02:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-600176-SH:manufacturing-materials-shadow-600176-2025:counterparties_and_concentration-02:coverage:counterparty_relationship",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:counterparties_and_concentration-02:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-600176-SH:manufacturing-materials-shadow-600176-2025:counterparties_and_concentration-02:coverage:customer_concentration",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:business_regime-01:chapter_sample:coverage:business_regime-01:business_regime",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source quote supports this legal-empty result without inventing a value, identity, event, or group subject."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:business_overview-01:blocker:task_completion:business_overview-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly retains this report-local blocker; the row is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:business_overview-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-600075-SH:manufacturing-materials-shadow-600075-2025:business_overview-01:coverage:business_overview_source",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:business_overview-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-600075-SH:manufacturing-materials-shadow-600075-2025:business_overview-01:coverage:explicit_activity",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:segment_financials-01:blocker:task_completion:segment_financials-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly retains this report-local blocker; the row is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-600075-SH:manufacturing-materials-shadow-600075-2025:segment_financials-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-600075-SH:manufacturing-materials-shadow-600075-2025:segment_financials-01:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-600075-SH:manufacturing-materials-shadow-600075-2025:segment_financials-01:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-600075-SH:manufacturing-materials-shadow-600075-2025:segment_financials-01:coverage:operating_cost",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-600075-SH:manufacturing-materials-shadow-600075-2025:segment_financials-01:coverage:gross_margin_reported",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:segment_financials-02:blocker:task_completion:segment_financials-02",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly retains this report-local blocker; the row is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-600075-SH:manufacturing-materials-shadow-600075-2025:segment_financials-02:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-600075-SH:manufacturing-materials-shadow-600075-2025:segment_financials-02:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-600075-SH:manufacturing-materials-shadow-600075-2025:segment_financials-02:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-600075-SH:manufacturing-materials-shadow-600075-2025:segment_financials-02:coverage:operating_cost",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-600075-SH:manufacturing-materials-shadow-600075-2025:segment_financials-02:coverage:gross_margin_reported",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:operating_quantities-01:chapter_sample:coverage:operating_quantities-01:production_capacity",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source quote supports this legal-empty result without inventing a value, identity, event, or group subject."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:operating_quantities-02:blocker:task_completion:operating_quantities-02",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly retains this report-local blocker; the row is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:operating_quantities-02:unresolved:stage5-426ea207421635a37cb81307",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:operating_quantities-02:unresolved:stage5-0e3aa545768a56677f1ef572",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:operating_quantities-02:unresolved:stage5-34ef76eca0cee48fbebc46d4",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:operating_quantities-02:unresolved:stage5-7c58c272e0e67a90e7a869f2",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:operating_quantities-02:unresolved:stage5-5e453d0ac9141c459d192393",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:operating_quantities-02:unresolved:stage5-670e747cd7a5820a40bb9b85",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:operating_quantities-02:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-600075-SH:manufacturing-materials-shadow-600075-2025:operating_quantities-02:coverage:production_volume",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:operating_quantities-02:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-600075-SH:manufacturing-materials-shadow-600075-2025:operating_quantities-02:coverage:sales_volume",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:operating_quantities-02:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-600075-SH:manufacturing-materials-shadow-600075-2025:operating_quantities-02:coverage:inventory_volume",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:material_inputs-01:chapter_sample:stage5-0cd3b9982124092ebeaa2a66",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:counterparties_and_concentration-01:chapter_sample:stage5-6beaf69e104edc7d78284466",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:business_regime-01:blocker:task_completion:business_regime-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly retains this report-local blocker; the row is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:business_regime-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-600075-SH:manufacturing-materials-shadow-600075-2025:business_regime-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:business_regime-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-600075-SH:manufacturing-materials-shadow-600075-2025:business_regime-01:coverage:business_regime",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000552-2025:business_overview-01:chapter_sample:stage5-da16ff1a8cb7a0aae27ec94e",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000552-2025:segment_financials-01:blocker:task_completion:segment_financials-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly retains this report-local blocker; the row is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000552-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-000552-SZ:manufacturing-materials-shadow-000552-2025:segment_financials-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000552-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-000552-SZ:manufacturing-materials-shadow-000552-2025:segment_financials-01:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000552-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-000552-SZ:manufacturing-materials-shadow-000552-2025:segment_financials-01:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000552-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-000552-SZ:manufacturing-materials-shadow-000552-2025:segment_financials-01:coverage:operating_cost",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000552-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-000552-SZ:manufacturing-materials-shadow-000552-2025:segment_financials-01:coverage:gross_margin_reported",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000552-2025:segment_financials-02:chapter_sample:stage5-6965bd21b7b1a7d25ee6260a",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000552-2025:operating_quantities-01:chapter_sample:coverage:operating_quantities-01:production_capacity",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source quote supports this legal-empty result without inventing a value, identity, event, or group subject."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000552-2025:material_inputs-01:chapter_sample:stage5-8fd99069d72a603a300814e1",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000552-2025:counterparties_and_concentration-01:blocker:task_completion:counterparties_and_concentration-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly retains this report-local blocker; the row is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000552-2025:counterparties_and_concentration-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-000552-SZ:manufacturing-materials-shadow-000552-2025:counterparties_and_concentration-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000552-2025:counterparties_and_concentration-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-000552-SZ:manufacturing-materials-shadow-000552-2025:counterparties_and_concentration-01:coverage:counterparty_relationship",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000552-2025:counterparties_and_concentration-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-000552-SZ:manufacturing-materials-shadow-000552-2025:counterparties_and_concentration-01:coverage:customer_concentration",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000552-2025:counterparties_and_concentration-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-000552-SZ:manufacturing-materials-shadow-000552-2025:counterparties_and_concentration-01:coverage:supplier_concentration",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000552-2025:business_regime-01:blocker:task_completion:business_regime-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly retains this report-local blocker; the row is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000552-2025:business_regime-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-000552-SZ:manufacturing-materials-shadow-000552-2025:business_regime-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000552-2025:business_regime-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-000552-SZ:manufacturing-materials-shadow-000552-2025:business_regime-01:coverage:business_regime",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:business_overview-01:blocker:task_completion:business_overview-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly retains this report-local blocker; the row is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:business_overview-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-000629-SZ:manufacturing-materials-shadow-000629-2025:business_overview-01:coverage:business_overview_source",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:business_overview-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-000629-SZ:manufacturing-materials-shadow-000629-2025:business_overview-01:coverage:explicit_activity",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:segment_financials-01:blocker:task_completion:segment_financials-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly retains this report-local blocker; the row is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-000629-SZ:manufacturing-materials-shadow-000629-2025:segment_financials-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-000629-SZ:manufacturing-materials-shadow-000629-2025:segment_financials-01:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-000629-SZ:manufacturing-materials-shadow-000629-2025:segment_financials-01:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-000629-SZ:manufacturing-materials-shadow-000629-2025:segment_financials-01:coverage:operating_cost",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-000629-SZ:manufacturing-materials-shadow-000629-2025:segment_financials-01:coverage:gross_margin_reported",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:segment_financials-02:blocker:task_completion:segment_financials-02",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly retains this report-local blocker; the row is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-000629-SZ:manufacturing-materials-shadow-000629-2025:segment_financials-02:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-000629-SZ:manufacturing-materials-shadow-000629-2025:segment_financials-02:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-000629-SZ:manufacturing-materials-shadow-000629-2025:segment_financials-02:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-000629-SZ:manufacturing-materials-shadow-000629-2025:segment_financials-02:coverage:operating_cost",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-000629-SZ:manufacturing-materials-shadow-000629-2025:segment_financials-02:coverage:gross_margin_reported",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:operating_quantities-01:chapter_sample:stage5-d1f1d27eb49bdf5763b46aa3",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:material_inputs-01:chapter_sample:stage5-223cc4ebebbc3067ef7ba12b",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:counterparties_and_concentration-01:chapter_sample:stage5-258a790c8e7ecca2df6ad673",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:business_regime-01:chapter_sample:coverage:business_regime-01:business_regime",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source quote supports this legal-empty result without inventing a value, identity, event, or group subject."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000059-2025:business_overview-01:chapter_sample:stage5-f955bc3b3560eeb8fa4e246a",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000059-2025:segment_financials-01:blocker:task_completion:segment_financials-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly retains this report-local blocker; the row is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000059-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-000059-SZ:manufacturing-materials-shadow-000059-2025:segment_financials-01:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000059-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-000059-SZ:manufacturing-materials-shadow-000059-2025:segment_financials-01:coverage:gross_margin_reported",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000059-2025:segment_financials-02:blocker:task_completion:segment_financials-02",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly retains this report-local blocker; the row is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000059-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-000059-SZ:manufacturing-materials-shadow-000059-2025:segment_financials-02:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000059-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-000059-SZ:manufacturing-materials-shadow-000059-2025:segment_financials-02:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000059-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-000059-SZ:manufacturing-materials-shadow-000059-2025:segment_financials-02:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000059-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-000059-SZ:manufacturing-materials-shadow-000059-2025:segment_financials-02:coverage:operating_cost",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000059-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-000059-SZ:manufacturing-materials-shadow-000059-2025:segment_financials-02:coverage:gross_margin_reported",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000059-2025:operating_quantities-01:chapter_sample:stage5-1b158c1795593c85da520d3b",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000059-2025:material_inputs-01:chapter_sample:stage5-8c1a33022e2e3b82c3136ff0",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000059-2025:counterparties_and_concentration-01:chapter_sample:stage5-9b2fe0fd5281968b50e8b1c3",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000059-2025:business_regime-01:chapter_sample:coverage:business_regime-01:business_regime",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source quote supports this legal-empty result without inventing a value, identity, event, or group subject."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:business_overview-01:blocker:task_completion:business_overview-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly retains this report-local blocker; the row is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:business_overview-01:unresolved:stage5-d1f86ddad1b2c60cd6ac5403",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:business_overview-01:unresolved:stage5-e94edd2444b84c3b262caca6",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:business_overview-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-000408-SZ:manufacturing-materials-shadow-000408-2025:business_overview-01:coverage:explicit_activity",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:business_overview-01:chapter_sample:stage5-5324f3f062874dc515a3563a",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:segment_financials-01:blocker:task_completion:segment_financials-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly retains this report-local blocker; the row is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-000408-SZ:manufacturing-materials-shadow-000408-2025:segment_financials-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-000408-SZ:manufacturing-materials-shadow-000408-2025:segment_financials-01:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-000408-SZ:manufacturing-materials-shadow-000408-2025:segment_financials-01:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-000408-SZ:manufacturing-materials-shadow-000408-2025:segment_financials-01:coverage:operating_cost",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-000408-SZ:manufacturing-materials-shadow-000408-2025:segment_financials-01:coverage:gross_margin_reported",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:segment_financials-02:blocker:task_completion:segment_financials-02",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly retains this report-local blocker; the row is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-000408-SZ:manufacturing-materials-shadow-000408-2025:segment_financials-02:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-000408-SZ:manufacturing-materials-shadow-000408-2025:segment_financials-02:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-000408-SZ:manufacturing-materials-shadow-000408-2025:segment_financials-02:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-000408-SZ:manufacturing-materials-shadow-000408-2025:segment_financials-02:coverage:operating_cost",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:operating_quantities-01:chapter_sample:stage5-1f57996973c20ca7a7383bdb",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:material_inputs-01:chapter_sample:stage5-8a1b30bd8805f527b3893e6b",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:counterparties_and_concentration-01:chapter_sample:stage5-200286f7496d4c6807648cd6",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:business_regime-01:blocker:task_completion:business_regime-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly retains this report-local blocker; the row is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:business_regime-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-000408-SZ:manufacturing-materials-shadow-000408-2025:business_regime-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:business_regime-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-000408-SZ:manufacturing-materials-shadow-000408-2025:business_regime-01:coverage:business_regime",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000060-2025:business_overview-01:chapter_sample:stage5-2d69e1ef1577b88cf1ad3326",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000060-2025:segment_financials-01:blocker:task_completion:segment_financials-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly retains this report-local blocker; the row is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000060-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-000060-SZ:manufacturing-materials-shadow-000060-2025:segment_financials-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000060-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-000060-SZ:manufacturing-materials-shadow-000060-2025:segment_financials-01:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000060-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-000060-SZ:manufacturing-materials-shadow-000060-2025:segment_financials-01:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000060-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-000060-SZ:manufacturing-materials-shadow-000060-2025:segment_financials-01:coverage:operating_cost",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000060-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-000060-SZ:manufacturing-materials-shadow-000060-2025:segment_financials-01:coverage:gross_margin_reported",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000060-2025:segment_financials-02:blocker:task_completion:segment_financials-02",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly retains this report-local blocker; the row is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000060-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-000060-SZ:manufacturing-materials-shadow-000060-2025:segment_financials-02:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000060-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-000060-SZ:manufacturing-materials-shadow-000060-2025:segment_financials-02:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000060-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-000060-SZ:manufacturing-materials-shadow-000060-2025:segment_financials-02:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000060-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-000060-SZ:manufacturing-materials-shadow-000060-2025:segment_financials-02:coverage:operating_cost",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000060-2025:operating_quantities-01:chapter_sample:stage5-f707368b40659ac57d9c24ca",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000060-2025:material_inputs-01:chapter_sample:coverage:material_inputs-01:material_input",
+    "outcome": "noncritical_error",
+    "reviewer": "codex-source-review",
+    "notes": "The legal-empty material conclusion is bound only to the production-sales-inventory table and does not establish that material-input disclosure was checked."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000060-2025:counterparties_and_concentration-01:chapter_sample:stage5-f4d7d5aa31caf2bec64eef45",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000060-2025:business_regime-01:chapter_sample:coverage:business_regime-01:business_regime",
+    "outcome": "critical_error",
+    "reviewer": "codex-source-review",
+    "notes": "The same Evidence explicitly states that the consolidation scope changed, yet runtime closes business_regime as not_applicable and omits the disclosed control-scope event."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000055-2025:business_overview-01:chapter_sample:stage5-5bba6ad2e859c565f9cb2744",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000055-2025:segment_financials-01:blocker:task_completion:segment_financials-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly retains this report-local blocker; the row is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000055-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-000055-SZ:manufacturing-materials-shadow-000055-2025:segment_financials-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000055-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-000055-SZ:manufacturing-materials-shadow-000055-2025:segment_financials-01:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000055-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-000055-SZ:manufacturing-materials-shadow-000055-2025:segment_financials-01:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000055-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-000055-SZ:manufacturing-materials-shadow-000055-2025:segment_financials-01:coverage:operating_cost",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000055-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-000055-SZ:manufacturing-materials-shadow-000055-2025:segment_financials-01:coverage:gross_margin_reported",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000055-2025:segment_financials-02:chapter_sample:stage5-7ea1656823e2f135229f49be",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000055-2025:operating_quantities-01:chapter_sample:coverage:operating_quantities-01:production_volume",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source quote supports this legal-empty result without inventing a value, identity, event, or group subject."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000055-2025:material_inputs-01:chapter_sample:coverage:material_inputs-01:material_input",
+    "outcome": "noncritical_error",
+    "reviewer": "codex-source-review",
+    "notes": "The legal-empty material conclusion is bound to revenue and sales-mode pages rather than a governed material or procurement disclosure."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000055-2025:counterparties_and_concentration-01:chapter_sample:stage5-665f3019401db8dea8486c94",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000055-2025:business_regime-01:blocker:task_completion:business_regime-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly retains this report-local blocker; the row is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000055-2025:business_regime-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-000055-SZ:manufacturing-materials-shadow-000055-2025:business_regime-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000055-2025:business_regime-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-000055-SZ:manufacturing-materials-shadow-000055-2025:business_regime-01:coverage:business_regime",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000420-2025:business_overview-01:blocker:task_completion:business_overview-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly retains this report-local blocker; the row is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000420-2025:business_overview-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-000420-SZ:manufacturing-materials-shadow-000420-2025:business_overview-01:coverage:explicit_activity",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000420-2025:business_overview-01:chapter_sample:stage5-5b285da4ca4b6675c96d8b38",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000420-2025:segment_financials-01:chapter_sample:stage5-efd2152650130bb6d980fe9c",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000420-2025:segment_financials-02:blocker:task_completion:segment_financials-02",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly retains this report-local blocker; the row is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000420-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-000420-SZ:manufacturing-materials-shadow-000420-2025:segment_financials-02:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000420-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-000420-SZ:manufacturing-materials-shadow-000420-2025:segment_financials-02:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000420-2025:operating_quantities-01:chapter_sample:stage5-d9c86177a3d90679d01493d8",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000420-2025:operating_quantities-02:blocker:task_completion:operating_quantities-02",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly retains this report-local blocker; the row is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000420-2025:operating_quantities-02:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-000420-SZ:manufacturing-materials-shadow-000420-2025:operating_quantities-02:coverage:production_capacity",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000420-2025:operating_quantities-02:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-000420-SZ:manufacturing-materials-shadow-000420-2025:operating_quantities-02:coverage:production_volume",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000420-2025:operating_quantities-02:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-000420-SZ:manufacturing-materials-shadow-000420-2025:operating_quantities-02:coverage:sales_volume",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000420-2025:operating_quantities-02:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-000420-SZ:manufacturing-materials-shadow-000420-2025:operating_quantities-02:coverage:inventory_volume",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000420-2025:material_inputs-01:chapter_sample:coverage:material_inputs-01:material_input",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source quote supports this legal-empty result without inventing a value, identity, event, or group subject."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000420-2025:counterparties_and_concentration-01:chapter_sample:stage5-9acfd617c3f05313a4fe4248",
+    "outcome": "critical_error",
+    "reviewer": "codex-source-review",
+    "notes": "Runtime turns 前五名客户合计 into a Relationship identity. A totals-only aggregate must remain a Measurement and must not create a counterparty Relationship."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000420-2025:business_regime-01:chapter_sample:coverage:business_regime-01:business_regime",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source quote supports this legal-empty result without inventing a value, identity, event, or group subject."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920016-2025:business_overview-01:chapter_sample:stage5-6def5958b9d0174ff541ac4c",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920016-2025:segment_financials-01:blocker:task_completion:segment_financials-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly retains this report-local blocker; the row is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920016-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-920016-BJ:manufacturing-materials-shadow-920016-2025:segment_financials-01:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920016-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-920016-BJ:manufacturing-materials-shadow-920016-2025:segment_financials-01:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920016-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-920016-BJ:manufacturing-materials-shadow-920016-2025:segment_financials-01:coverage:gross_margin_reported",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920016-2025:segment_financials-02:blocker:task_completion:segment_financials-02",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly retains this report-local blocker; the row is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920016-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-920016-BJ:manufacturing-materials-shadow-920016-2025:segment_financials-02:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920016-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-920016-BJ:manufacturing-materials-shadow-920016-2025:segment_financials-02:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920016-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-920016-BJ:manufacturing-materials-shadow-920016-2025:segment_financials-02:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920016-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-920016-BJ:manufacturing-materials-shadow-920016-2025:segment_financials-02:coverage:operating_cost",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920016-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-920016-BJ:manufacturing-materials-shadow-920016-2025:segment_financials-02:coverage:gross_margin_reported",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920016-2025:operating_quantities-01:chapter_sample:coverage:operating_quantities-01:production_capacity",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source quote supports this legal-empty result without inventing a value, identity, event, or group subject."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920016-2025:material_inputs-01:chapter_sample:stage5-e91320c0dfbd57f23f1c3ff5",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920016-2025:counterparties_and_concentration-01:chapter_sample:stage5-fd97e5def20e1ce80eecfddb",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920016-2025:business_regime-01:chapter_sample:coverage:business_regime-01:business_regime",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source quote supports this legal-empty result without inventing a value, identity, event, or group subject."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:business_overview-01:chapter_sample:stage5-5dc4a703afc38b5badaa90c1",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:segment_financials-01:blocker:task_completion:segment_financials-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly retains this report-local blocker; the row is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-920033-BJ:manufacturing-materials-shadow-920033-2025:segment_financials-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-920033-BJ:manufacturing-materials-shadow-920033-2025:segment_financials-01:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-920033-BJ:manufacturing-materials-shadow-920033-2025:segment_financials-01:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-920033-BJ:manufacturing-materials-shadow-920033-2025:segment_financials-01:coverage:operating_cost",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-920033-BJ:manufacturing-materials-shadow-920033-2025:segment_financials-01:coverage:gross_margin_reported",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:segment_financials-02:blocker:task_completion:segment_financials-02",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly retains this report-local blocker; the row is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-920033-BJ:manufacturing-materials-shadow-920033-2025:segment_financials-02:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-920033-BJ:manufacturing-materials-shadow-920033-2025:segment_financials-02:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:operating_quantities-01:chapter_sample:coverage:operating_quantities-01:production_capacity",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source quote supports this legal-empty result without inventing a value, identity, event, or group subject."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:operating_quantities-02:blocker:task_completion:operating_quantities-02",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly retains this report-local blocker; the row is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:operating_quantities-02:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-920033-BJ:manufacturing-materials-shadow-920033-2025:operating_quantities-02:coverage:production_capacity",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:material_inputs-01:chapter_sample:coverage:material_inputs-01:material_input",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source quote supports this legal-empty result without inventing a value, identity, event, or group subject."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:counterparties_and_concentration-01:chapter_sample:stage5-ec2e4a568319498bd0ca2b3d",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:business_regime-01:chapter_sample:coverage:business_regime-01:business_regime",
+    "outcome": "noncritical_error",
+    "reviewer": "codex-source-review",
+    "notes": "The business-regime legal empty is bound to a key-audit-matter page and does not test the governed business/control-change section."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920068-2025:business_overview-01:chapter_sample:stage5-dd793e68ab93878ca79cfb3c",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920068-2025:segment_financials-01:blocker:task_completion:segment_financials-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly retains this report-local blocker; the row is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920068-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-920068-BJ:manufacturing-materials-shadow-920068-2025:segment_financials-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920068-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-920068-BJ:manufacturing-materials-shadow-920068-2025:segment_financials-01:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920068-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-920068-BJ:manufacturing-materials-shadow-920068-2025:segment_financials-01:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920068-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-920068-BJ:manufacturing-materials-shadow-920068-2025:segment_financials-01:coverage:operating_cost",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920068-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-920068-BJ:manufacturing-materials-shadow-920068-2025:segment_financials-01:coverage:gross_margin_reported",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920068-2025:segment_financials-02:chapter_sample:coverage:segment_financials-02:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source quote supports this legal-empty result without inventing a value, identity, event, or group subject."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920068-2025:operating_quantities-01:chapter_sample:stage5-73ecb36f66dc5b7e175c40b7",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920068-2025:material_inputs-01:chapter_sample:stage5-19a2dfa2a98ac04c998494d1",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920068-2025:counterparties_and_concentration-01:chapter_sample:stage5-b0d8a3d5942055ddc6a2958b",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920068-2025:business_regime-01:blocker:task_completion:business_regime-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly retains this report-local blocker; the row is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920068-2025:business_regime-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-920068-BJ:manufacturing-materials-shadow-920068-2025:business_regime-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920068-2025:business_regime-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-920068-BJ:manufacturing-materials-shadow-920068-2025:business_regime-01:coverage:business_regime",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920078-2025:business_overview-01:chapter_sample:stage5-5f2e40b6968ef0f3d21b7228",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920078-2025:segment_financials-01:blocker:task_completion:segment_financials-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly retains this report-local blocker; the row is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920078-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-920078-BJ:manufacturing-materials-shadow-920078-2025:segment_financials-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920078-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-920078-BJ:manufacturing-materials-shadow-920078-2025:segment_financials-01:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920078-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-920078-BJ:manufacturing-materials-shadow-920078-2025:segment_financials-01:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920078-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-920078-BJ:manufacturing-materials-shadow-920078-2025:segment_financials-01:coverage:operating_cost",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920078-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-920078-BJ:manufacturing-materials-shadow-920078-2025:segment_financials-01:coverage:gross_margin_reported",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920078-2025:operating_quantities-01:chapter_sample:coverage:operating_quantities-01:production_volume",
+    "outcome": "noncritical_error",
+    "reviewer": "codex-source-review",
+    "notes": "The production-volume legal empty is bound to the business-model and procurement narrative, which does not establish that the operating-quantity disclosure was checked."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920078-2025:material_inputs-01:chapter_sample:stage5-69548c763dff5fbd1206068f",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920078-2025:counterparties_and_concentration-01:chapter_sample:stage5-43dcc02f3bcb90aea9397988",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920078-2025:business_regime-01:blocker:task_completion:business_regime-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly retains this report-local blocker; the row is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920078-2025:business_regime-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-920078-BJ:manufacturing-materials-shadow-920078-2025:business_regime-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920078-2025:business_regime-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-920078-BJ:manufacturing-materials-shadow-920078-2025:business_regime-01:coverage:business_regime",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920076-2025:business_overview-01:chapter_sample:stage5-ac1cab757f7edf75271dbc4e",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920076-2025:segment_financials-01:blocker:task_completion:segment_financials-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly retains this report-local blocker; the row is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920076-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-920076-BJ:manufacturing-materials-shadow-920076-2025:segment_financials-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920076-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-920076-BJ:manufacturing-materials-shadow-920076-2025:segment_financials-01:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920076-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-920076-BJ:manufacturing-materials-shadow-920076-2025:segment_financials-01:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920076-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-920076-BJ:manufacturing-materials-shadow-920076-2025:segment_financials-01:coverage:operating_cost",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920076-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-920076-BJ:manufacturing-materials-shadow-920076-2025:segment_financials-01:coverage:gross_margin_reported",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920076-2025:segment_financials-02:blocker:task_completion:segment_financials-02",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly retains this report-local blocker; the row is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920076-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-920076-BJ:manufacturing-materials-shadow-920076-2025:segment_financials-02:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920076-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-920076-BJ:manufacturing-materials-shadow-920076-2025:segment_financials-02:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920076-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-920076-BJ:manufacturing-materials-shadow-920076-2025:segment_financials-02:coverage:operating_cost",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920076-2025:operating_quantities-01:chapter_sample:coverage:operating_quantities-01:production_volume",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source quote supports this legal-empty result without inventing a value, identity, event, or group subject."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920076-2025:material_inputs-01:chapter_sample:coverage:material_inputs-01:material_input",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source quote supports this legal-empty result without inventing a value, identity, event, or group subject."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920076-2025:counterparties_and_concentration-01:chapter_sample:stage5-89875347ba9f2ab641bf2cb6",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920076-2025:business_regime-01:blocker:task_completion:business_regime-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly retains this report-local blocker; the row is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920076-2025:business_regime-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-920076-BJ:manufacturing-materials-shadow-920076-2025:business_regime-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920076-2025:business_regime-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-920076-BJ:manufacturing-materials-shadow-920076-2025:business_regime-01:coverage:business_regime",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:business_overview-01:chapter_sample:stage5-25b4b0c5bc8866f6ffc90f04",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:segment_financials-01:blocker:task_completion:segment_financials-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly retains this report-local blocker; the row is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-920580-BJ:manufacturing-materials-shadow-920580-2025:segment_financials-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-920580-BJ:manufacturing-materials-shadow-920580-2025:segment_financials-01:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-920580-BJ:manufacturing-materials-shadow-920580-2025:segment_financials-01:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-920580-BJ:manufacturing-materials-shadow-920580-2025:segment_financials-01:coverage:operating_cost",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-920580-BJ:manufacturing-materials-shadow-920580-2025:segment_financials-01:coverage:gross_margin_reported",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:segment_financials-02:blocker:task_completion:segment_financials-02",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly retains this report-local blocker; the row is not treated as an accepted fact or production-authorized output."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-920580-BJ:manufacturing-materials-shadow-920580-2025:segment_financials-02:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-920580-BJ:manufacturing-materials-shadow-920580-2025:segment_financials-02:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-920580-BJ:manufacturing-materials-shadow-920580-2025:segment_financials-02:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-920580-BJ:manufacturing-materials-shadow-920580-2025:segment_financials-02:coverage:operating_cost",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-stability-gemini-20260909-a-920580-BJ:manufacturing-materials-shadow-920580-2025:segment_financials-02:coverage:gross_margin_reported",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The frozen source-bound review correctly leaves this item for human adjudication; no fact, subject, value, or legal-empty conclusion is inferred from it."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:operating_quantities-01:chapter_sample:stage5-f6ddde2a7b6153af0f9ff972",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:material_inputs-01:chapter_sample:stage5-5291bf4ce7fa63a15efc80b3",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:counterparties_and_concentration-01:chapter_sample:stage5-b599bdf0c7f3f21bf668662c",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The runtime target is supported by the frozen source quote; source-native identity, value/unit/period semantics, subject limits, and research-only use are preserved."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:business_regime-01:chapter_sample:coverage:business_regime-01:business_regime",
+    "outcome": "noncritical_error",
+    "reviewer": "codex-source-review",
+    "notes": "The business-regime legal empty is bound primarily to audit-procedure text; the page only closes consolidation scope and does not establish the broader regime conclusion."
+  }
+]
