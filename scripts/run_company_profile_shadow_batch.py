@@ -152,6 +152,46 @@ OWNER_CLOSURE_SHADOW_REPLAY_CONTRACT = ShadowReplayContract(
     timeout_seconds=SHADOW_TIMEOUT_SECONDS,
     max_provider_calls=SHADOW_MAX_PROVIDER_CALLS,
 )
+ROUTING_CONTINUATION_SHADOW_REPLAY_CONTRACT = ShadowReplayContract(
+    batch_id=(
+        "manufacturing-materials-shadow-routing-continuation-gemini-20260910-a"
+    ),
+    sample_manifest_hash=(
+        "6f639739ef082e78dcb0c01a5ce40bab1645d8fdc027bece2dbef63652bae9e2"
+    ),
+    evidence_plan_version="manufacturing_materials_shadow.2026-09-10.5",
+    evidence_plan_hash=(
+        "d091262f4350ff88779293900f0deb21d7c48da85a3102d7a947fa861ec4eafe"
+    ),
+    preparation_audit_hash=(
+        "a6a6d1880c5ae58b5f602329ff3c4280e78c60c5a00abb7edf61384dc6c60511"
+    ),
+    correction_audit_hash=(
+        "a16ebfc4bf836bbc002ead7a9d1fed5d5d1c1c12212993ad608a920916f76e22"
+    ),
+    supporting_artifact_hashes={
+        "routing_continuation_cases": (
+            "d66274a38e7223c97f883823c2b1ffb5450ebdd85203949646e6ca263b9342f9"
+        ),
+        "source_review_package": (
+            "124cb6d9750d93dc676a9316c0411d4e222f5348e5b55ad18cbc307b687c19b1"
+        ),
+        "source_review_outcomes": (
+            "d2e7e39c40ee5b1853373cd1ff0a3dafab9ec688cccb8c250720c15418a5d524"
+        ),
+        "owner_closure_batch_manifest": (
+            "e1a7e343733c1965528460672ec25ab34d8ab9baa56b790596c95d2bf527bbfa"
+        ),
+        "owner_closure_readiness_audit": (
+            "75e3b2fa785bba1a3247bba41b2a583a18049161e77718ba3413bbfe18b31336"
+        ),
+    },
+    primary_logical_profile=SHADOW_PRIMARY_PROFILE,
+    extract_max_output_tokens=SHADOW_EXTRACT_MAX_OUTPUT_TOKENS,
+    verify_max_output_tokens=SHADOW_VERIFY_MAX_OUTPUT_TOKENS,
+    timeout_seconds=SHADOW_TIMEOUT_SECONDS,
+    max_provider_calls=SHADOW_MAX_PROVIDER_CALLS,
+)
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -169,6 +209,7 @@ def build_parser() -> argparse.ArgumentParser:
             "precision-closure-semantic-replay",
             "external-precision-semantic-replay",
             "owner-closure-semantic-replay",
+            "routing-continuation-semantic-replay",
         ),
         required=True,
     )
@@ -186,6 +227,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--routing-continuation-cases", type=Path)
     parser.add_argument("--source-review-package", type=Path)
     parser.add_argument("--source-review-outcomes", type=Path)
+    parser.add_argument("--owner-closure-batch-manifest", type=Path)
+    parser.add_argument("--owner-closure-readiness-audit", type=Path)
     parser.add_argument("--generated-preparation-audit", type=Path)
     parser.add_argument("--generated-correction-audit", type=Path)
     parser.add_argument("--output-root", type=Path)
@@ -465,6 +508,50 @@ def main(argv: Sequence[str] | None = None) -> int:
             prepared=prepared,
             output_root=args.output_root,
         )
+    elif args.mode == "routing-continuation-semantic-replay":
+        required = {
+            "correction audit": args.correction_audit,
+            "routing/continuation cases": args.routing_continuation_cases,
+            "source review package": args.source_review_package,
+            "source review outcomes": args.source_review_outcomes,
+            "owner-closure batch manifest": args.owner_closure_batch_manifest,
+            "owner-closure readiness audit": args.owner_closure_readiness_audit,
+        }
+        missing = [name for name, path in required.items() if path is None]
+        if missing:
+            raise ValueError(f"{args.mode} requires " + ", ".join(missing))
+        correction_audit = json.loads(
+            args.correction_audit.read_text(encoding="utf-8")
+        )
+        supporting_hashes = {
+            "routing_continuation_cases": _file_sha256(
+                args.routing_continuation_cases
+            ),
+            "source_review_package": _file_sha256(args.source_review_package),
+            "source_review_outcomes": _file_sha256(args.source_review_outcomes),
+            "owner_closure_batch_manifest": _file_sha256(
+                args.owner_closure_batch_manifest
+            ),
+            "owner_closure_readiness_audit": _file_sha256(
+                args.owner_closure_readiness_audit
+            ),
+        }
+        validate_shadow_replay_admission(
+            contract=ROUTING_CONTINUATION_SHADOW_REPLAY_CONTRACT,
+            batch_id=args.batch_id,
+            primary_logical_profile=args.provider_route,
+            extract_max_output_tokens=args.extract_max_output_tokens,
+            verify_max_output_tokens=args.verify_max_output_tokens,
+            timeout_seconds=args.timeout_seconds,
+            max_provider_calls=args.max_provider_calls,
+            manifest=manifest,
+            evidence_plan=plan,
+            preparation_audit=frozen_audit,
+            correction_audit=correction_audit,
+            supporting_artifact_hashes=supporting_hashes,
+            prepared=prepared,
+            output_root=args.output_root,
+        )
     elif args.mode == "owner-closure-semantic-replay":
         required = {
             "correction audit": args.correction_audit,
@@ -635,6 +722,7 @@ def _validate_replay_mode(
     owner_plan = OWNER_CLOSURE_SHADOW_REPLAY_CONTRACT.evidence_plan_version
     owner_batch = OWNER_CLOSURE_SHADOW_REPLAY_CONTRACT.batch_id
     routing_continuation_plan = SHADOW_EVIDENCE_PLAN_VERSION
+    routing_continuation_batch = ROUTING_CONTINUATION_SHADOW_REPLAY_CONTRACT.batch_id
     provider_bearing_legacy_modes = {"semantic-run", "refined-semantic-replay"}
     if (
         plan_version == stability_plan or batch_id == stability_batch
@@ -658,8 +746,19 @@ def _validate_replay_mode(
             "owner-closure batch identity requires owner-closure-semantic-replay"
         )
     if (
+        batch_id == routing_continuation_batch
+        and mode != "routing-continuation-semantic-replay"
+    ):
+        raise ValueError(
+            "routing/continuation batch identity requires "
+            "routing-continuation-semantic-replay"
+        )
+    if (
         plan_version == routing_continuation_plan
-        and mode != "preparation-only"
+        and mode not in {
+            "preparation-only",
+            "routing-continuation-semantic-replay",
+        }
     ):
         raise ValueError(
             "routing/continuation v5 Evidence plan is provider-free only; "

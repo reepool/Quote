@@ -186,9 +186,7 @@ def _validate_shadow_correction_audit(
     if audit_hash != _payload_hash(payload):
         raise ValueError("shadow correction audit hash mismatch")
     if (
-        audit.get("schema_version")
-        != "company_profile_shadow_evidence_correction_audit.v1"
-        or audit.get("sample_manifest_hash") != manifest.manifest_hash
+        audit.get("sample_manifest_hash") != manifest.manifest_hash
         or audit.get("corrected_plan_hash") != evidence_plan.plan_hash
         or audit.get("preparation_audit_hash") != preparation_audit.audit_hash
         or audit.get("unresolved_finding_ids") != []
@@ -196,6 +194,22 @@ def _validate_shadow_correction_audit(
         or audit.get("production_authorization") != PRODUCTION_AUTHORIZATION
     ):
         raise ValueError("shadow correction audit does not admit this replay")
+    schema_version = audit.get("schema_version")
+    if schema_version == "company_profile_shadow_evidence_correction_audit.v1":
+        return
+    if schema_version == "company_profile_shadow_routing_continuation_audit.v1":
+        results = audit.get("results")
+        if (
+            audit.get("report_count") != SHADOW_REPORT_COUNT
+            or audit.get("cohort_replay_performed") is not False
+            or audit.get("historical_artifacts_mutated") is not False
+            or audit.get("production_paths_opened") != []
+            or not isinstance(results, list)
+            or len(results) != 6
+        ):
+            raise ValueError("shadow correction audit does not admit this replay")
+        return
+    raise ValueError("shadow correction audit schema is unsupported")
 
 
 class ShadowReportSuccess(_StrictModel):
