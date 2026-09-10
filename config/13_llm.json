@@ -244,7 +244,7 @@
             }
           },
           {
-            "source_label": "deepseek:deepseek-v4-flash-vision-exp",
+            "source_label": "deepseek:deepseek-flash",
             "weight": 1,
             "profiles": {
               "semantic_extraction": "semantic_extraction__deepseek",
@@ -576,13 +576,13 @@
       "semantic_extraction__deepseek": {
         "provider": "openai_compatible",
         "provider_resource": "deepseek",
-        "source_label": "deepseek:deepseek-v4-flash-vision-exp",
+        "source_label": "deepseek:deepseek-flash",
         "default_workload": "corporate_action_semantic_extraction",
         "enabled": true,
         "base_url": "https://api.deepseek.com",
         "endpoint": "/v1/chat/completions",
         "api_key_env": "QUOTE_LLM_DEEPSEEK_API_KEY",
-        "model": "deepseek-v4-flash-vision-exp",
+        "model": "deepseek-flash",
         "structured_output_mode": "auto",
         "supported_structured_output_modes": ["json_object"],
         "allow_prompt_only": false,
@@ -605,13 +605,13 @@
       "corporate_action_title_classification__deepseek": {
         "provider": "openai_compatible",
         "provider_resource": "deepseek",
-        "source_label": "deepseek:deepseek-v4-flash-vision-exp",
+        "source_label": "deepseek:deepseek-flash",
         "default_workload": "corporate_action_title_classification",
         "enabled": true,
         "base_url": "https://api.deepseek.com",
         "endpoint": "/v1/chat/completions",
         "api_key_env": "QUOTE_LLM_DEEPSEEK_API_KEY",
-        "model": "deepseek-v4-flash-vision-exp",
+        "model": "deepseek-flash",
         "structured_output_mode": "auto",
         "supported_structured_output_modes": ["json_object"],
         "allow_prompt_only": false,

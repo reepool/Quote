@@ -413,7 +413,7 @@ def test_repository_llm_config_is_enabled_non_secret_and_has_one_owner():
         "scorpio:gemini-3.8-flash-high",
         "zai:glm-5.3-flash",
         "scorpio:grok-4.6",
-        "deepseek:deepseek-v4-flash-vision-exp",
+        "deepseek:deepseek-flash",
     ]
     assert [member.weight for member in members] == [1, 1, 1, 1]
     assert config.pools["shared_semantic"].failover.enabled is True
@@ -481,10 +481,10 @@ def test_repository_llm_config_is_enabled_non_secret_and_has_one_owner():
         "QUOTE_LLM_DEEPSEEK_API_KEY"
     )
     assert profiles["semantic_extraction__deepseek"].model == (
-        "deepseek-v4-flash-vision-exp"
+        "deepseek-flash"
     )
     assert profiles["semantic_extraction__deepseek"].source_label == (
-        "deepseek:deepseek-v4-flash-vision-exp"
+        "deepseek:deepseek-flash"
     )
     assert profiles["semantic_extraction__deepseek"].base_url == (
         "https://api.deepseek.com"
