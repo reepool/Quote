@@ -985,7 +985,7 @@
 ```
 
 - **`instrument_types_supported`**: 当前建议为 `['stock']`，因为指数日线不走 `pytdx`
-- Host 是否可选由可解析日线探针决定（先 `600000.SH`，空或不可解析再试 `000001.SZ`），候选为项目 `DEFAULT_HQ_HOSTS` 与已安装 `pytdx.config.hosts.hq_hosts` 的 `ip:port` 并集。
+- Host 是否可选由可解析日线探针决定（先 `600000.SH`，空或不可解析再试 `000001.SZ`）。候选为项目 `DEFAULT_HQ_HOSTS`、已安装 `pytdx.config.hosts.hq_hosts`、`pytdx.util.best_ip.stock_ip` 以及 `data_sources/tdx_hq_extra_hosts.py` 中从 mootdx / xmtdx / eltdx 等 7709 客户端摘录的 `ip:port` 并集；不安装、不调用这些第三方行情库。探测顺序保留 Quote 短名单和 pytdx `hq_hosts` 在前，补充名单在后，避免 8 秒刷新预算扫不到已验证可用的券商节点。
 - **`host_refresh_deadline_sec`**: 只约束 `TdxIPManager.refresh()`（扫描 + 截止清理），默认 8 秒；不含随后的连接池正式连接（`connection_timeout_sec`）和初始化健康检查，因此 `TdxSource` 初始化总时长可以大于 8 秒。
 - **`host_probe_workers`** / **`host_probe_timeout_sec`**: 刷新探针线程数（默认 16）和单次 socket 超时（默认 0.7 秒）。socket 超时不是整段 refresh 的证明。
 - 以上三个探针项均可省略，省略时使用上述默认值。零可选节点时 pytdx 初始化失败，日线路由按现有 `pytdx -> baostock -> akshare` 由后续源接管。

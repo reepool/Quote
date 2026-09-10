@@ -24,11 +24,12 @@ from pytdx.base_socket_client import TrafficStatSocket
 from pytdx.hq import TdxHq_API
 
 from .base_source import BaseDataSource, RateLimitConfig
+from .tdx_hq_extra_hosts import SUPPLEMENTAL_HQ_HOSTS
 
 tdx_logger = logging.getLogger("tdx_source")
 
 # ---------------------------------------------------------------------------
-# 内置 IP 候选列表（合并 pytdx 内置 stock_ip + config.hosts）
+# 内置 IP 候选列表（Quote 短名单 ∪ pytdx hq_hosts / stock_ip ∪ 第三方 7709 名单）
 # ---------------------------------------------------------------------------
 DEFAULT_HQ_HOSTS: list[dict[str, Any]] = [
     {"ip": "180.153.18.170", "port": 7709, "name": "上海电信主站Z1"},
@@ -83,6 +84,33 @@ _PROBE_STATUS_ORDER = (
 )
 
 
+def _looks_like_hostname(ip: str) -> bool:
+    return any(ch.isalpha() for ch in ip)
+
+
+def _append_hq_host(
+    merged: list[dict[str, Any]],
+    seen: set[tuple[str, int]],
+    ip: Any,
+    port: Any,
+    name: Any,
+) -> None:
+    ip = str(ip or "").strip()
+    if not ip:
+        return
+    try:
+        port_i = int(port if port not in (None, "") else 7709)
+    except (TypeError, ValueError):
+        return
+    if not 1 <= port_i <= 65535:
+        return
+    key = (ip, port_i)
+    if key in seen:
+        return
+    seen.add(key)
+    merged.append({"ip": ip, "port": port_i, "name": str(name or "")})
+
+
 def load_pytdx_hq_hosts() -> list[tuple[Any, ...]]:
     """Return installed pytdx built-in HQ rows: (name, ip, port)."""
     try:
@@ -95,49 +123,68 @@ def load_pytdx_hq_hosts() -> list[tuple[Any, ...]]:
     return list(hq_hosts)
 
 
+def load_pytdx_stock_ip_hosts() -> list[dict[str, Any]]:
+    """Return pytdx.util.best_ip.stock_ip rows (alternate HQ ports and hostnames)."""
+    try:
+        from pytdx.util.best_ip import stock_ip
+    except Exception:
+        tdx_logger.warning("[TdxIPManager] 无法导入 pytdx.util.best_ip.stock_ip")
+        return []
+    hosts: list[dict[str, Any]] = []
+    for row in stock_ip or []:
+        if not isinstance(row, dict):
+            continue
+        hosts.append({
+            "ip": row.get("ip", ""),
+            "port": row.get("port", 7709),
+            "name": row.get("name", ""),
+        })
+    return hosts
+
+
 def merge_hq_host_lists(
     quote_hosts: list[dict[str, Any]] | None,
     pytdx_hosts: list[tuple[Any, ...]] | None,
+    extra_hosts: list[dict[str, Any]] | None = None,
 ) -> list[dict[str, Any]]:
-    """Unique ip:port union of Quote dicts and pytdx (name, ip, port) tuples."""
+    """Unique ip:port union of Quote dicts, pytdx tuples, and extra dicts.
+
+    Order is preserved: Quote short list, then pytdx hq_hosts, then extras.
+    Hostname extras are appended after numeric IPs so DNS does not occupy
+    the first probe slots inside the 8s refresh deadline.
+    """
     merged: list[dict[str, Any]] = []
     seen: set[tuple[str, int]] = set()
     for host in quote_hosts or []:
-        ip = str(host.get("ip", "")).strip()
-        if not ip:
-            continue
-        port = int(host.get("port", 7709))
-        key = (ip, port)
-        if key in seen:
-            continue
-        seen.add(key)
-        merged.append({
-            "ip": ip,
-            "port": port,
-            "name": str(host.get("name", "") or ""),
-        })
+        _append_hq_host(
+            merged, seen, host.get("ip"), host.get("port", 7709), host.get("name", ""),
+        )
     for row in pytdx_hosts or []:
         if row is None or len(row) < 3:
             continue
-        name, ip, port = row[0], row[1], row[2]
-        ip = str(ip).strip()
-        if not ip:
-            continue
-        port = int(port)
-        key = (ip, port)
-        if key in seen:
-            continue
-        seen.add(key)
-        merged.append({
-            "ip": ip,
-            "port": port,
-            "name": str(name or ""),
-        })
+        _append_hq_host(merged, seen, row[1], row[2], row[0])
+    numeric_extras: list[dict[str, Any]] = []
+    hostname_extras: list[dict[str, Any]] = []
+    for host in extra_hosts or []:
+        ip = str(host.get("ip", "") or "").strip()
+        if _looks_like_hostname(ip):
+            hostname_extras.append(host)
+        else:
+            numeric_extras.append(host)
+    for host in numeric_extras + hostname_extras:
+        _append_hq_host(
+            merged, seen, host.get("ip"), host.get("port", 7709), host.get("name", ""),
+        )
     return merged
 
 
 def default_hq_hosts() -> list[dict[str, Any]]:
-    return merge_hq_host_lists(DEFAULT_HQ_HOSTS, load_pytdx_hq_hosts())
+    extras = list(load_pytdx_stock_ip_hosts()) + list(SUPPLEMENTAL_HQ_HOSTS)
+    return merge_hq_host_lists(
+        DEFAULT_HQ_HOSTS,
+        load_pytdx_hq_hosts(),
+        extras,
+    )
 
 
 def parse_tdx_bar_datetime(bar: dict) -> datetime | None:

@@ -952,6 +952,43 @@ class TestDailyBarProbeClassification:
             ("2.2.2.2", 7709),
         ]
 
+    def test_extra_hosts_are_appended_after_quote_and_pytdx(self):
+        from data_sources.tdx_source import merge_hq_host_lists
+
+        merged = merge_hq_host_lists(
+            [{"ip": "1.1.1.1", "port": 7709, "name": "quote"}],
+            [("pytdx", "2.2.2.2", 7709)],
+            extra_hosts=[
+                {"ip": "3.3.3.3", "port": 7709, "name": "cloud"},
+                {"ip": "1.1.1.1", "port": 7709, "name": "dup"},
+                {"ip": "hq.example.com", "port": 7709, "name": "dns"},
+                {"ip": "4.4.4.4", "port": 7711, "name": "alt-port"},
+            ],
+        )
+        assert [(h["ip"], h["port"]) for h in merged] == [
+            ("1.1.1.1", 7709),
+            ("2.2.2.2", 7709),
+            ("3.3.3.3", 7709),
+            ("4.4.4.4", 7711),
+            ("hq.example.com", 7709),
+        ]
+
+    def test_default_hq_hosts_include_vendored_third_party_ips(self):
+        from data_sources.tdx_hq_extra_hosts import SUPPLEMENTAL_HQ_HOSTS
+        from data_sources.tdx_source import default_hq_hosts
+
+        merged = default_hq_hosts()
+        keys = {(h["ip"], h["port"]) for h in merged}
+        extra_keys = {
+            (str(h["ip"]), int(h["port"])) for h in SUPPLEMENTAL_HQ_HOSTS
+        }
+        assert extra_keys
+        assert extra_keys <= keys
+        assert ("110.41.147.114", 7709) in keys
+        assert ("116.205.183.150", 7709) in keys
+        assert len(merged) == len(keys)
+        assert len(merged) >= 194
+
     def test_stale_thread_local_is_evicted(self):
         from data_sources.tdx_source import TdxConnectionPool, TdxIPManager
 
