@@ -1746,6 +1746,18 @@ def _minimal_verify_schema(request: VerifyRequest) -> dict[str, Any]:
     }
 
 
+_COST_COMPONENT_SEGMENT_LABEL = re.compile(
+    r"^(?:原材料(?:及(?:燃料|燃动|能源|动力))?费?|原燃料(?:及动力)?|"
+    r"燃料及动力|能源(?:及动力)?|人工(?:费用|成本)?|制造费用|折旧费?|"
+    r"其他成本费用|采购成本)$"
+)
+
+
+def _is_cost_component_segment_label(label: str) -> bool:
+    normalized_label = "".join(label.split())
+    return bool(_COST_COMPONENT_SEGMENT_LABEL.fullmatch(normalized_label))
+
+
 def _validate_segment_row_source_labels(
     row: Mapping[str, Any],
     *,
@@ -1765,6 +1777,10 @@ def _validate_segment_row_source_labels(
     if not label or "".join(label.split()) not in normalized_source:
         raise ValueError(
             f"segment row label must occur in its cited Evidence: {label!r}"
+        )
+    if _is_cost_component_segment_label(label):
+        raise ValueError(
+            f"cost-component row cannot become a business Segment: {label!r}"
         )
     planned_dimension = prepared_scope.source_row_dimensions.get(label)
     if prepared_scope.source_row_dimensions and planned_dimension is None:
@@ -2440,9 +2456,7 @@ def _expand_extract_response(
         if isinstance(coverage, Mapping) and coverage.get("status"):
             coverage = dict(coverage)
             coverage["field_id"] = "material_input"
-            coverage["evidence_ids"] = [
-                item.evidence.evidence_id for item in prepared_scope.evidence_bundle
-            ]
+            coverage["evidence_ids"] = _coverage_owner_evidence_ids(prepared_scope)
             result["items"].append({"item_type": "coverage", "coverage": coverage})
     elif isinstance(result.get("production_capacity"), list) and isinstance(
         result.get("processing_volume"), list
@@ -2632,37 +2646,53 @@ def _reject_invalid_business_regime_coverage(
     if not isinstance(result, Mapping) or not isinstance(result.get("items"), list):
         return
     items = result["items"]
-    not_applicable = any(
-        isinstance(item, Mapping)
+    coverage_statuses = {
+        str(item["coverage"].get("status"))
+        for item in items
+        if isinstance(item, Mapping)
         and item.get("item_type") == "coverage"
         and isinstance(item.get("coverage"), Mapping)
         and item["coverage"].get("field_id") == "business_regime"
-        and item["coverage"].get("status") == "not_applicable"
-        for item in items
-    )
-    if not not_applicable:
+    }
+    legal_empty = coverage_statuses & {
+        "not_applicable",
+        "not_disclosed",
+    }
+    if not legal_empty:
         return
     source_text = _prepared_scope_source_text(prepared_scope)
     statistical_calibre = re.search(
         r"公司主营业务数据统计口径.{0,120}(?:不适用|[√☑]不适用)",
         source_text,
     )
-    broad_no_change = any(
+    business_no_change = any(
         re.search(pattern, source_text)
         for pattern in (
             r"业务、产品或服务发生重大变化.{0,80}(?:不适用|[√☑]不适用)",
-            r"合并报表范围的变化情况.{0,80}[√☑]不适用",
-            r"主要子公司股权变动导致合并范围变化.{0,80}[√☑]不适用",
             r"(?:主营业务|主要业务|经营模式).{0,40}未发生重大变化",
         )
     )
-    if statistical_calibre and not broad_no_change:
+    if statistical_calibre and not business_no_change:
         raise ValueError(
             "principal-business statistical-calibre coverage cannot close business_regime"
+        )
+    control_no_change = any(
+        re.search(pattern, source_text)
+        for pattern in (
+            r"合并报表范围的变化情况.{0,80}(?:不适用|[√☑]不适用)",
+            r"报告期内合并范围是否发生变动.{0,30}(?:[√☑]否|□是[√☑]否)",
+            r"合并(?:报表)?范围.{0,30}(?:未发生|没有|无)(?:变化|变动)",
+        )
+    )
+    if control_no_change and not business_no_change:
+        raise ValueError(
+            "control-scope no-change coverage cannot close broader business_regime"
         )
     affirmative_change = any(
         re.search(pattern, source_text)
         for pattern in (
+            r"报告期内合并范围是否发生变动.{0,30}[√☑]是",
+            r"本集团本期合并范围比上年.{0,40}(?:增加|减少|新增|净减少)",
             r"(?:合并报表范围的变化情况|主要子公司股权变动导致合并范围变化).{0,80}[√☑]适用",
             r"(?:本期|报告期内).{0,30}(?:纳入|新增).{0,30}合并(?:报表)?范围",
             r"纳入.{0,20}合并报表范围",
@@ -2681,7 +2711,7 @@ def _reject_invalid_business_regime_coverage(
     )
     if affirmative_change and not has_change_event:
         raise ValueError(
-            "business_regime not_applicable coverage contradicts an evidenced control-scope change"
+            "business_regime legal-empty coverage contradicts an evidenced control-scope change"
         )
 
 
@@ -2872,6 +2902,16 @@ def _expand_coverage_draft(
     if checklist is None:
         return coverage
     evidence_ids = coverage.pop("evidence_ids", [])
+    owner_evidence_ids = _coverage_owner_evidence_ids(prepared_scope)
+    if evidence_ids and prepared_scope.candidate_pages:
+        context_only = sorted(set(evidence_ids) - set(owner_evidence_ids))
+        if context_only:
+            raise ValueError(
+                "legal-empty coverage requires chapter-owning Evidence; "
+                f"context-only ids: {context_only}"
+            )
+    elif not evidence_ids:
+        evidence_ids = owner_evidence_ids
     coverage["schema_version"] = "company_profile_coverage_result.v1"
     coverage["chapter_task"] = request.chapter_task.value
     coverage["requirement_level"] = checklist.requirement_level.value
@@ -2880,6 +2920,21 @@ def _expand_coverage_draft(
         prepared_scope=prepared_scope,
     )
     return coverage
+
+
+def _coverage_owner_evidence_ids(
+    prepared_scope: PreparedRequestScope,
+) -> list[str]:
+    """Return owner Evidence, excluding adjacent pages kept only for context."""
+
+    owner_pages = set(prepared_scope.candidate_pages)
+    if not owner_pages:
+        return [item.evidence.evidence_id for item in prepared_scope.evidence_bundle]
+    return [
+        item.evidence.evidence_id
+        for item in prepared_scope.evidence_bundle
+        if item.evidence.page in owner_pages
+    ]
 
 
 def _expand_existing_fact_refs(

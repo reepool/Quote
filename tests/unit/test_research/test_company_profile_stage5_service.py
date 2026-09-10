@@ -445,10 +445,10 @@ def test_stage5_request_scope_legal_empty_suppresses_only_same_scope_relationshi
         period_type=PeriodType.DURATION,
         assertion_class=AssertionClass.REPORTED_FACT,
         evidence=(evidence,),
-        source_native=SourceNativeValue(name="前五名客户合计"),
+        source_native=SourceNativeValue(name="客户一"),
         relation_type=RelationshipType.CUSTOMER,
-        object_name="前五名客户合计",
-        identity_class=IdentityClass.REPORT_LOCAL_AGGREGATE,
+        object_name="客户一",
+        identity_class=IdentityClass.REPORT_LOCAL_ANONYMOUS,
     )
     accepted = CompanyProfileTaskResult(
         request_id="same-scope",
@@ -504,6 +504,103 @@ def test_stage5_request_scope_legal_empty_suppresses_only_same_scope_relationshi
         "hold",
         "request_repair",
     )
+
+
+def test_stage5_blocks_top_five_aggregate_relationship_without_legal_empty() -> None:
+    manifest = load_stage5_sample_manifest(
+        SAMPLE_MANIFEST,
+        repository_root=REPOSITORY_ROOT,
+    )
+    plan = load_stage5_evidence_plan(EVIDENCE_PLAN)
+    scope = next(
+        item
+        for item in Stage5EvidencePreparer(
+            PdfRouter(native=PypdfNativeAdapter())
+        ).prepare_report(
+            manifest=manifest,
+            evidence_plan=plan,
+            sample_id="manufacturing-materials-603659-2025",
+        )
+        if item.scope_id == "top_five_customer_totals_only"
+    )
+    evidence = scope.evidence_bundle[0].evidence
+
+    aggregate = Relationship(
+        record_id="aggregate",
+        field_id="counterparty_relationship",
+        chapter_task=scope.chapter_task,
+        report=scope.report,
+        subject_scope=SubjectScope.UNCLEAR,
+        reported_period="2025",
+        period_type=PeriodType.DURATION,
+        assertion_class=AssertionClass.REPORTED_FACT,
+        evidence=(evidence,),
+        source_native=SourceNativeValue(name="前五名客户合计"),
+        relation_type=RelationshipType.CUSTOMER,
+        object_name="前五名客户合计",
+        identity_class=IdentityClass.REPORT_LOCAL_AGGREGATE,
+    )
+    ranked = aggregate.model_copy(
+        update={
+            "record_id": "ranked",
+            "source_native": SourceNativeValue(name="客户一"),
+            "object_name": "客户一",
+            "identity_class": IdentityClass.REPORT_LOCAL_ANONYMOUS,
+        }
+    )
+    independent = aggregate.model_copy(
+        update={
+            "record_id": "independent",
+            "source_native": SourceNativeValue(name="集团所属单位"),
+            "object_name": "集团所属单位",
+            "relation_type": RelationshipType.RELATED_PARTY,
+        }
+    )
+    result = CompanyProfileTaskResult(
+        request_id="aggregate-with-ranked",
+        records=(aggregate, ranked, independent),
+        dispositions=tuple(
+            Disposition(
+                target_id=record.record_id,
+                field_id=record.field_id,
+                status=DispositionStatus.ACCEPTED_FOR_REVIEW,
+            )
+            for record in (aggregate, ranked, independent)
+        ),
+        coverage=(),
+        human_review_items=(),
+        task_complete=True,
+    )
+
+    suppressed = _suppress_same_scope_legal_empty_relationships(result)
+    statuses = {item.target_id: item.status for item in suppressed.dispositions}
+
+    assert statuses == {
+        "aggregate": DispositionStatus.BLOCKED,
+        "independent": DispositionStatus.ACCEPTED_FOR_REVIEW,
+        "ranked": DispositionStatus.ACCEPTED_FOR_REVIEW,
+    }
+    assert suppressed.human_review_items[0].reason_codes == (
+        ContractErrorCode.PROHIBITED_INFERENCE,
+    )
+
+    independent_with_customer_legal_empty = result.model_copy(
+        update={
+            "records": (independent,),
+            "dispositions": (
+                Disposition(
+                    target_id=independent.record_id,
+                    field_id=independent.field_id,
+                    status=DispositionStatus.ACCEPTED_FOR_REVIEW,
+                ),
+            ),
+            "coverage": (_not_disclosed_counterparty(scope),),
+        }
+    )
+    preserved = _suppress_same_scope_legal_empty_relationships(
+        independent_with_customer_legal_empty
+    )
+    assert preserved.dispositions[0].status == DispositionStatus.ACCEPTED_FOR_REVIEW
 
 
 def _fake_603659_semantic_input(scope: PreparedRequestScope) -> Stage5SemanticInput:

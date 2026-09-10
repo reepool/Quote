@@ -750,6 +750,23 @@ def _normalize_review_actions(
     )
 
 
+def _is_top_five_aggregate_relationship(record: Relationship) -> bool:
+    if record.relation_type.value not in {
+        "customer",
+        "supplier",
+        "contract_counterparty",
+    }:
+        return False
+    labels = (record.object_name, record.source_native.name)
+    return any(
+        re.fullmatch(
+            r"前(?:五|5)(?:名|大)?(?:客户|供应商)(?:合计|总计)",
+            "".join(str(label or "").split()),
+        )
+        for label in labels
+    )
+
+
 def _suppress_same_scope_legal_empty_relationships(
     result: CompanyProfileTaskResult,
 ) -> CompanyProfileTaskResult:
@@ -758,18 +775,26 @@ def _suppress_same_scope_legal_empty_relationships(
         and item.status == CoverageStatus.NOT_DISCLOSED
         for item in result.coverage
     )
-    if not legal_empty:
-        return result
     dispositions = {item.target_id: item for item in result.dispositions}
     reviews = list(result.human_review_items)
     changed = False
     for record in result.records:
         disposition = dispositions.get(record.record_id)
+        aggregate_identity = isinstance(
+            record, Relationship
+        ) and _is_top_five_aggregate_relationship(record)
+        legal_empty_conflict = (
+            legal_empty
+            and isinstance(record, Relationship)
+            and record.relation_type.value
+            in {"customer", "supplier", "contract_counterparty"}
+        )
         if (
             isinstance(record, Relationship)
             and record.field_id == "counterparty_relationship"
             and disposition is not None
             and disposition.status == DispositionStatus.ACCEPTED_FOR_REVIEW
+            and (legal_empty_conflict or aggregate_identity)
         ):
             blocked = Disposition(
                 target_id=record.record_id,
@@ -778,16 +803,20 @@ def _suppress_same_scope_legal_empty_relationships(
                 reason_codes=(ContractErrorCode.PROHIBITED_INFERENCE,),
             )
             dispositions[record.record_id] = blocked
+            reason = (
+                "top-five customer/supplier aggregate is a Measurement, not a Relationship identity"
+                if aggregate_identity
+                else "same request scope declares counterparty names not_disclosed"
+            )
+            review_kind = "top-five-aggregate" if aggregate_identity else "legal-empty"
             reviews.append(
                 HumanReviewItem(
-                    review_id=f"{result.request_id}:legal-empty:{record.record_id}",
+                    review_id=f"{result.request_id}:{review_kind}:{record.record_id}",
                     field_id=record.field_id,
                     candidate=record,
                     evidence=record.evidence,
                     reason_codes=(ContractErrorCode.PROHIBITED_INFERENCE,),
-                    conflicting_interpretations=(
-                        "same request scope declares counterparty names not_disclosed",
-                    ),
+                    conflicting_interpretations=(reason,),
                     allowed_actions=_REVIEW_ACTIONS,
                 )
             )

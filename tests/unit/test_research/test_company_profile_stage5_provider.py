@@ -3162,9 +3162,7 @@ def _high_cardinality_segment_prepared_scope() -> PreparedRequestScope:
     source = f"{evidence.anchor.bounded_quote} " + " ".join(
         str(index) for index in range(1, 42)
     )
-    evidence = evidence.model_copy(
-        update={"anchor": TextAnchor(bounded_quote=source)}
-    )
+    evidence = evidence.model_copy(update={"anchor": TextAnchor(bounded_quote=source)})
     return prepared.model_copy(
         update={
             "evidence_bundle": (PreparedEvidence(evidence=evidence),),
@@ -3875,3 +3873,252 @@ def test_reviewed_semantic_corrections_hit_the_typed_guards() -> None:
                 request=request,
                 prepared_scope=prepared,
             )
+
+
+_EXACT_CONTROL_CHANGE_AND_BUSINESS_NO_CHANGE = (
+    "（6）报告期内合并范围是否发生变动 ☑是 □否 "
+    "截至2025年12月31日，本集团纳入合并范围的子公司共43户。"
+    "本集团本期合并范围比上年增加1户，减少4户，净减少3户。"
+    "（7）公司报告期内业务、产品或服务发生重大变化或调整有关情况 "
+    "□适用 ☑不适用"
+)
+
+
+def test_business_regime_exact_control_change_requires_event() -> None:
+    prepared = _scope_with_source_text(
+        chapter_task=ChapterTask.EXTRACT_BUSINESS_REGIME,
+        scope_id="business_regime",
+        field_id="business_regime",
+        source_text=_EXACT_CONTROL_CHANGE_AND_BUSINESS_NO_CHANGE,
+    )
+    request = _business_regime_request(prepared)
+    evidence_id = prepared.evidence_bundle[0].evidence.evidence_id
+
+    with pytest.raises(
+        ValueError, match="contradicts an evidenced control-scope change"
+    ):
+        _normalize_extract_response(
+            {
+                "events": [],
+                "regimes": [],
+                "package_assignments": [],
+                "coverage": [
+                    {
+                        "field_id": "business_regime",
+                        "status": "not_applicable",
+                        "reason_code": "source_explicitly_not_applicable",
+                        "evidence_ids": [evidence_id],
+                    }
+                ],
+            },
+            request=request,
+            prepared_scope=prepared,
+        )
+
+
+def test_business_regime_preserves_event_and_separate_business_no_change() -> None:
+    prepared = _scope_with_source_text(
+        chapter_task=ChapterTask.EXTRACT_BUSINESS_REGIME,
+        scope_id="business_regime",
+        field_id="business_regime",
+        source_text=_EXACT_CONTROL_CHANGE_AND_BUSINESS_NO_CHANGE,
+    )
+    request = _business_regime_request(prepared)
+    evidence_id = prepared.evidence_bundle[0].evidence.evidence_id
+
+    result = _normalize_extract_response(
+        {
+            "events": [
+                {
+                    "event_type": "consolidation_scope_change",
+                    "description": "本集团本期合并范围比上年增加1户，减少4户，净减少3户。",
+                    "evidence_id": evidence_id,
+                }
+            ],
+            "regimes": [],
+            "package_assignments": [],
+            "coverage": [
+                {
+                    "field_id": "business_regime",
+                    "status": "not_applicable",
+                    "reason_code": "source_explicitly_not_applicable",
+                    "evidence_ids": [evidence_id],
+                }
+            ],
+        },
+        request=request,
+        prepared_scope=prepared,
+    )
+
+    assert [item["item_type"] for item in result["items"]] == [
+        "candidate",
+        "coverage",
+    ]
+
+
+def test_business_regime_control_no_change_alone_cannot_close_broad_field() -> None:
+    source_text = "（八）合并报表范围的变化情况 □适用 √不适用"
+    prepared = _scope_with_source_text(
+        chapter_task=ChapterTask.EXTRACT_BUSINESS_REGIME,
+        scope_id="business_regime",
+        field_id="business_regime",
+        source_text=source_text,
+    )
+    request = _business_regime_request(prepared)
+
+    with pytest.raises(ValueError, match="cannot close broader business_regime"):
+        _normalize_extract_response(
+            {
+                "events": [],
+                "regimes": [],
+                "package_assignments": [],
+                "coverage": [
+                    {
+                        "field_id": "business_regime",
+                        "status": "not_disclosed",
+                        "reason_code": "source_explicitly_not_disclosed",
+                        "evidence_ids": [
+                            prepared.evidence_bundle[0].evidence.evidence_id
+                        ],
+                    }
+                ],
+            },
+            request=request,
+            prepared_scope=prepared,
+        )
+
+
+def _owner_and_context_material_scope() -> PreparedRequestScope:
+    prepared = _scope_with_source_text(
+        chapter_task=ChapterTask.EXTRACT_MATERIAL_INPUTS,
+        scope_id="material_inputs",
+        field_id="material_input",
+        source_text="公司生产所需主要原材料为铁矿石，采用集中采购模式。",
+    )
+    owner = prepared.evidence_bundle[0].evidence
+    context = owner.model_copy(
+        update={
+            "evidence_id": "stage5-provider-context-evidence",
+            "page": owner.page + 1,
+            "section_title": "相邻上下文",
+            "anchor": TextAnchor(bounded_quote="相邻页仅讨论销售模式。"),
+        }
+    )
+    return prepared.model_copy(
+        update={
+            "evidence_bundle": (
+                PreparedEvidence(evidence=owner, field_id="material_input"),
+                PreparedEvidence(evidence=context, field_id="material_input"),
+            ),
+            "candidate_pages": (owner.page,),
+            "page_contexts": prepared.page_contexts
+            + (
+                PreparedPageContext(
+                    page=context.page,
+                    text=context.anchor.bounded_quote,
+                    text_hash="9" * 64,
+                    extraction_method="pypdf",
+                    quality_status="usable",
+                ),
+            ),
+        }
+    )
+
+
+def test_coverage_without_ids_binds_only_candidate_page_evidence() -> None:
+    prepared = _owner_and_context_material_scope()
+    request = _material_input_extract_request(prepared)
+
+    result = _normalize_extract_response(
+        {
+            "schema_version": "company_profile_extract_response.v1",
+            "request_id": request.request_id,
+            "items": [
+                {
+                    "item_type": "coverage",
+                    "coverage": {
+                        "field_id": "material_input",
+                        "status": "not_disclosed",
+                        "reason_code": "source_explicitly_not_disclosed",
+                    },
+                }
+            ],
+        },
+        request=request,
+        prepared_scope=prepared,
+    )
+
+    assert result["items"][0]["coverage"]["evidence"][0]["page"] == 14
+    assert len(result["items"][0]["coverage"]["evidence"]) == 1
+
+
+def test_coverage_rejects_explicit_context_only_evidence() -> None:
+    prepared = _owner_and_context_material_scope()
+    request = _material_input_extract_request(prepared)
+    context_id = prepared.evidence_bundle[1].evidence.evidence_id
+
+    with pytest.raises(ValueError, match="context-only ids"):
+        _normalize_extract_response(
+            {
+                "schema_version": "company_profile_extract_response.v1",
+                "request_id": request.request_id,
+                "items": [
+                    {
+                        "item_type": "coverage",
+                        "coverage": {
+                            "field_id": "material_input",
+                            "status": "not_disclosed",
+                            "reason_code": "source_explicitly_not_disclosed",
+                            "evidence_ids": [context_id],
+                        },
+                    }
+                ],
+            },
+            request=request,
+            prepared_scope=prepared,
+        )
+
+
+def test_cost_component_cannot_become_segment_identity() -> None:
+    prepared = _segment_prepared_scope()
+    source_text = "分行业 | 钢铁业 | 原材料及燃动费 | 分行业 营业收入 316,506,369"
+    evidence = prepared.evidence_bundle[0].evidence.model_copy(
+        update={"anchor": TextAnchor(bounded_quote=source_text)}
+    )
+    prepared = prepared.model_copy(
+        update={
+            "evidence_bundle": (PreparedEvidence(evidence=evidence),),
+            "source_row_dimensions": {
+                "钢铁业": "分行业",
+                "原材料及燃动费": "分行业",
+            },
+            "page_contexts": (
+                prepared.page_contexts[0].model_copy(update={"text": source_text}),
+            ),
+        }
+    )
+    request = _segment_extract_request(prepared)
+
+    with pytest.raises(ValueError, match="cost-component row"):
+        _normalize_extract_response(
+            _segment_row_response(
+                request_id=request.request_id,
+                evidence_id=evidence.evidence_id,
+                dimension="分行业",
+                label="原材料及燃动费",
+            ),
+            request=request,
+            prepared_scope=prepared,
+        )
+
+    valid = _normalize_extract_response(
+        _segment_row_response(
+            request_id=request.request_id,
+            evidence_id=evidence.evidence_id,
+            dimension=None,
+            label="钢铁业",
+        ),
+        request=request,
+        prepared_scope=prepared,
+    )
+    assert valid["items"][0]["candidate"]["label"] == "钢铁业"

@@ -38,6 +38,16 @@ CORRECTION_CHANGE_ROOT = (
     REPOSITORY_ROOT
     / "openspec/changes/archive/2026-09-09-correct-company-profile-shadow-evidence-routing-and-regime-coverage"
 )
+PRECISION_CHANGE_ROOT = next(
+    path
+    for path in (
+        REPOSITORY_ROOT
+        / "openspec/changes/close-company-profile-shadow-reviewed-precision-errors",
+        REPOSITORY_ROOT
+        / "openspec/changes/archive/2026-09-10-close-company-profile-shadow-reviewed-precision-errors",
+    )
+    if path.exists()
+)
 
 
 def _hash(value: str) -> str:
@@ -357,6 +367,14 @@ def test_scope_refinement_audit_rejects_different_manifest() -> None:
             ChapterTask.EXTRACT_BUSINESS_REGIME,
             "调整后期初未分配利润；由于同一控制导致的合并范围变更，影响期初未分配利润0元。",
         ),
+        (
+            ChapterTask.EXTRACT_MATERIAL_INPUTS,
+            "公司控股股东为包钢集团，其主要经营业务包括稀土原料生产与供应。",
+        ),
+        (
+            ChapterTask.EXTRACT_OPERATING_QUANTITIES,
+            "公司根据销售预测量、往年同期的产量和销量、目前库存量制定生产计划。",
+        ),
     ],
 )
 def test_chapter_owner_score_rejects_reviewed_non_owner_shapes(
@@ -533,3 +551,62 @@ def test_provider_free_correction_audit_closes_all_reviewed_findings() -> None:
                 > 0
             ]
             assert owner_pages == expected["owner_pages"]
+
+
+def test_provider_free_precision_closure_audit_resolves_exact_reviewed_errors() -> None:
+    cases = json.loads(
+        (PRECISION_CHANGE_ROOT / "reviewed-precision-cases.v1.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    audit = json.loads(
+        (
+            PRECISION_CHANGE_ROOT / "provider-free-precision-closure-audit.v1.json"
+        ).read_text(encoding="utf-8")
+    )
+    audit_without_hash = {
+        key: value for key, value in audit.items() if key != "audit_hash"
+    }
+
+    assert audit["audit_hash"] == _payload_hash(audit_without_hash)
+    assert audit["finding_counts"] == {
+        "total": 9,
+        "critical": 2,
+        "noncritical": 7,
+    }
+    assert audit["provider_calls"] == 0
+    assert audit["unresolved_review_row_ids"] == []
+    assert audit["closure_status"] == "passed"
+    assert audit["production_authorization"] == "not_authorized"
+    assert audit["cohort_replay_performed"] is False
+    assert audit["production_paths_opened"] == []
+
+    for binding in audit["inputs"]:
+        base = (
+            PRECISION_CHANGE_ROOT
+            if binding["base"] == "change_root"
+            else REPOSITORY_ROOT
+        )
+        source = base / binding["path"]
+        assert hashlib.sha256(source.read_bytes()).hexdigest() == binding["sha256"]
+
+    case_ids = {item["review_row_id"] for item in cases["cases"]}
+    result_ids = {item["review_row_id"] for item in audit["results"]}
+    assert len(case_ids) == 9
+    assert result_ids == case_ids
+    assert all(item["status"] == "resolved" for item in audit["results"])
+
+    review_package = json.loads(
+        (REPOSITORY_ROOT / cases["inputs"]["review_package"]["path"]).read_text(
+            encoding="utf-8"
+        )
+    )
+    review_rows = {row["review_row_id"]: row for row in review_package["rows"]}
+    for case in cases["cases"]:
+        assert case["review_row_id"] in review_rows
+        assert (
+            case["source_quote_sha256"]
+            == hashlib.sha256(
+                review_rows[case["review_row_id"]]["source_quote"].encode()
+            ).hexdigest()
+        )

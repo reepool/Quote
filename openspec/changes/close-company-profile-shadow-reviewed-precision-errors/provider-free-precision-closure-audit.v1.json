@@ -1,0 +1,140 @@
+{
+  "schema_version": "company_profile_provider_free_precision_closure_audit.v1",
+  "audit_id": "close-shadow-reviewed-precision-errors-20260910-a",
+  "created_at": "2026-09-10T01:28:52.489423+00:00",
+  "authoritative_batch_id": "manufacturing-materials-shadow-stability-gemini-20260909-a",
+  "inputs": [
+    {
+      "base": "repository_root",
+      "path": "openspec/changes/archive/2026-09-10-execute-company-profile-shadow-stability-replay/source-text-review-package.v1.json",
+      "sha256": "c393bcb34d3417d1a15da59f21e3b2a063457715a79e63fc9d5b143f61057ea8"
+    },
+    {
+      "base": "repository_root",
+      "path": "openspec/changes/archive/2026-09-10-execute-company-profile-shadow-stability-replay/source-text-review-outcomes.v1.json",
+      "sha256": "7367551d9f95149ca25936cbb4643782735bc978ffae07c129812f80ac9038a6"
+    },
+    {
+      "base": "change_root",
+      "path": "reviewed-precision-cases.v1.json",
+      "sha256": "9c0ae2715c727d8278e4affab537a4e616f625e4b4bf02e93273a7430dcc27de"
+    },
+    {
+      "base": "repository_root",
+      "path": "research/company_profile/stage5_provider.py",
+      "sha256": "91db38f8e33f1609fa3c0e16c5e59f6ac7f0fe59e2b05e2c7adc8400a3713509"
+    },
+    {
+      "base": "repository_root",
+      "path": "research/company_profile/stage5_service.py",
+      "sha256": "ffffbbc2e1a5788e60563e2ce10f521f3a44418f5d8a55b55318560adb2d5fa5"
+    },
+    {
+      "base": "repository_root",
+      "path": "research/company_profile/shadow_evidence.py",
+      "sha256": "00ad548a0cf2a4659b45421f14ae3ab3da388a191ad423bd12306f51c772cf71"
+    },
+    {
+      "base": "repository_root",
+      "path": "tests/unit/test_research/test_company_profile_stage5_provider.py",
+      "sha256": "6f638fa20b57c2f6c206e3543cae35e60e0b0712df4f8b82c33d13c8f6d88725"
+    },
+    {
+      "base": "repository_root",
+      "path": "tests/unit/test_research/test_company_profile_stage5_service.py",
+      "sha256": "dc26dead82fd57aafa616b1d656466219fdcc22a08347d1c4a50dd6cfccdb9c2"
+    },
+    {
+      "base": "repository_root",
+      "path": "tests/unit/test_research/test_company_profile_shadow_evidence.py",
+      "sha256": "9c4431e6f8601fc06b293b401639b9594c3840cc435faf551b8ad0ef456d31a4"
+    }
+  ],
+  "implementation_hash": "4cbe51cfdc056875869b7fc0f6b34305c437b62f61032abd88c2046500b06727",
+  "finding_counts": {
+    "total": 9,
+    "critical": 2,
+    "noncritical": 7
+  },
+  "results": [
+    {
+      "review_row_id": "manufacturing-materials-shadow-600022-2025:segment_financials-02:chapter_sample:stage5-109b0cd85f7aa3aa82b80ae8",
+      "severity": "noncritical_error",
+      "closure_family": "cost_component_segment",
+      "expected_rule": "reject_cost_component_segment_identity",
+      "enforcement_test": "test_cost_component_cannot_become_segment_identity",
+      "status": "resolved"
+    },
+    {
+      "review_row_id": "manufacturing-materials-shadow-600111-2025:material_inputs-01:chapter_sample:coverage:material_inputs-01:material_input",
+      "severity": "noncritical_error",
+      "closure_family": "material_owner",
+      "expected_rule": "reject_controlling_shareholder_as_material_owner",
+      "enforcement_test": "test_chapter_owner_score_rejects_reviewed_non_owner_shapes",
+      "status": "resolved"
+    },
+    {
+      "review_row_id": "manufacturing-materials-shadow-000060-2025:material_inputs-01:chapter_sample:coverage:material_inputs-01:material_input",
+      "severity": "noncritical_error",
+      "closure_family": "coverage_owner_binding",
+      "expected_rule": "bind_legal_empty_to_candidate_pages",
+      "enforcement_test": "test_coverage_rejects_explicit_context_only_evidence",
+      "status": "resolved"
+    },
+    {
+      "review_row_id": "manufacturing-materials-shadow-000060-2025:business_regime-01:chapter_sample:coverage:business_regime-01:business_regime",
+      "severity": "critical_error",
+      "closure_family": "regime_control_change",
+      "expected_rule": "require_control_scope_change_event",
+      "enforcement_test": "test_business_regime_exact_control_change_requires_event",
+      "status": "resolved"
+    },
+    {
+      "review_row_id": "manufacturing-materials-shadow-000055-2025:material_inputs-01:chapter_sample:coverage:material_inputs-01:material_input",
+      "severity": "noncritical_error",
+      "closure_family": "coverage_owner_binding",
+      "expected_rule": "bind_legal_empty_to_candidate_pages",
+      "enforcement_test": "test_coverage_rejects_explicit_context_only_evidence",
+      "status": "resolved"
+    },
+    {
+      "review_row_id": "manufacturing-materials-shadow-000420-2025:counterparties_and_concentration-01:chapter_sample:stage5-9acfd617c3f05313a4fe4248",
+      "severity": "critical_error",
+      "closure_family": "top_five_aggregate_relationship",
+      "expected_rule": "block_aggregate_relationship_keep_measurements",
+      "enforcement_test": "test_stage5_blocks_top_five_aggregate_relationship_without_legal_empty",
+      "status": "resolved"
+    },
+    {
+      "review_row_id": "manufacturing-materials-shadow-920033-2025:business_regime-01:chapter_sample:coverage:business_regime-01:business_regime",
+      "severity": "noncritical_error",
+      "closure_family": "coverage_owner_binding",
+      "expected_rule": "bind_legal_empty_to_candidate_pages",
+      "enforcement_test": "test_coverage_rejects_explicit_context_only_evidence",
+      "status": "resolved"
+    },
+    {
+      "review_row_id": "manufacturing-materials-shadow-920078-2025:operating_quantities-01:chapter_sample:coverage:operating_quantities-01:production_volume",
+      "severity": "noncritical_error",
+      "closure_family": "operating_quantity_owner",
+      "expected_rule": "reject_planning_narrative_as_quantity_owner",
+      "enforcement_test": "test_chapter_owner_score_rejects_reviewed_non_owner_shapes",
+      "status": "resolved"
+    },
+    {
+      "review_row_id": "manufacturing-materials-shadow-920580-2025:business_regime-01:chapter_sample:coverage:business_regime-01:business_regime",
+      "severity": "noncritical_error",
+      "closure_family": "control_no_change_regime",
+      "expected_rule": "reject_control_only_broad_regime_closure",
+      "enforcement_test": "test_business_regime_control_no_change_alone_cannot_close_broad_field",
+      "status": "resolved"
+    }
+  ],
+  "unresolved_review_row_ids": [],
+  "provider_calls": 0,
+  "cohort_replay_performed": false,
+  "closure_status": "passed",
+  "production_paths_opened": [],
+  "production_authorization": "not_authorized",
+  "audit_hash": "de3edd4f72aa049b141117dfaaf524511e8ed01be7ab85d0680c775b16c24b67"
+}

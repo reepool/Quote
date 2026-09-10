@@ -421,6 +421,34 @@ def _chapter_owner_score(
         )
     ):
         return 0
+    if chapter_task == ChapterTask.EXTRACT_OPERATING_QUANTITIES and len(sections) == 1:
+        planning_only = "生产计划" in compact and any(
+            marker in compact for marker in ("销售预测量", "往年同期", "目前库存量")
+        )
+        disclosed_quantity = any(
+            re.search(pattern, compact)
+            for pattern in (
+                r"公司实物销售收入是否大于劳务收入.{0,60}(?:[√☑]否|不适用)",
+                r"(?:生产量|销售量|库存量|实际产量).{0,100}\d[\d,]*(?:\.\d+)?",
+                r"\d[\d,]*(?:\.\d+)?(?:万吨|吨|台|套|GWh|MWh|万㎡|亿㎡|㎡)",
+            )
+        )
+        if planning_only and not disclosed_quantity:
+            return 0
+    if (
+        chapter_task == ChapterTask.EXTRACT_MATERIAL_INPUTS
+        and len(sections) == 1
+        and re.search(
+            r"(?:控股股东|实际控制人).{0,120}(?:主要经营业务|主营业务|经营范围)",
+            compact,
+        )
+        and not re.search(
+            r"(?:公司|本公司).{0,50}(?:采购|购入|消耗|生产所需|主要原材料|原材料供应)|"
+            r"(?:营业成本构成|主营业务成本构成|成本构成项目)",
+            compact,
+        )
+    ):
+        return 0
     if chapter_task == ChapterTask.EXTRACT_BUSINESS_REGIME:
         without_statistical = _NARROW_STATISTICAL_CALIBRE_PATTERN.sub("", compact)
         if not any(re.search(pattern, without_statistical) for pattern in patterns):
