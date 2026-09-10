@@ -1,0 +1,26 @@
+{
+  "schema_version": "company_profile_shadow_replay_preflight_receipt.v1",
+  "logical_profile": "semantic_extraction__scorpio_gemini",
+  "sandbox_result": {
+    "status": "failed",
+    "transport_error_type": "dns_failure",
+    "transport_phase": "connect",
+    "follow_up_code": "deadline_exceeded",
+    "semantic_replay_started": false
+  },
+  "external_result": {
+    "status": "success",
+    "http_status": 200,
+    "provider": "openai_compatible",
+    "model": "gemini-3.8-flash-high",
+    "provider_request_id": "fb19e3f6-a0e0-46df-9085-c55ffeba62f4",
+    "latency_ms": 5334,
+    "semantic_replay_started": false,
+    "warnings": [
+      "provider_output_budget_exceeded",
+      "provider_output_budget_exceeded_valid_response"
+    ]
+  },
+  "production_authorization": "not_authorized",
+  "audit_hash": "b01eb9f90ac73141c2a7af8eef0ed0b110046985446d1ad2039daec094eee4fa"
+}

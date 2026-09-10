@@ -11,7 +11,7 @@
 
 ## 3. Execute the sole provider-bearing replay
 
-- [ ] 3.1 Run one read-only Scorpio/Gemini connectivity and profile preflight; if the sandbox reports likely DNS or network-permission failure, repeat only that read-only check through the authorized external path.
+- [x] 3.1 Run one read-only Scorpio/Gemini connectivity and profile preflight; if the sandbox reports likely DNS or network-permission failure, repeat only that read-only check through the authorized external path.
 - [ ] 3.2 Run the frozen twenty-report cohort exactly once with the new batch ID and existing Gemini/output/deadline/call budgets, preserving every typed report-local success or failure without tuning, targeted reruns, model substitution, or result splicing.
 
 ## 4. Produce source-bound evaluation artifacts
