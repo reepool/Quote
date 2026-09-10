@@ -320,6 +320,19 @@
       "max_requests_per_hour": 300000,
       "max_requests_per_day": 5000000
     },
+    "tencent": {
+      "enabled": true,
+      "exchanges_supported": [
+        "a_stock"
+      ],
+      "connection_timeout_sec": 10,
+      "retry_times": 3,
+      "retry_interval": 1.0,
+      "batch_size": 800,
+      "max_requests_per_minute": 3600,
+      "max_requests_per_hour": 60000,
+      "max_requests_per_day": 1000000
+    },
     "baostock": {
       "enabled": true,
       "exchanges_supported": [
@@ -510,6 +523,7 @@
       "SSE": {
         "stock": [
           "pytdx",
+          "tencent",
           "baostock",
           "akshare"
         ],
@@ -522,6 +536,7 @@
       "SZSE": {
         "stock": [
           "pytdx",
+          "tencent",
           "baostock",
           "akshare"
         ],
@@ -534,6 +549,7 @@
       "BSE": {
         "stock": [
           "pytdx",
+          "tencent",
           "akshare"
         ],
         "index": [

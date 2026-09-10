@@ -25,6 +25,7 @@ from .akshare_source import AkShareSource
 from .tushare_source import TushareSource
 from .baostock_source import BaostockSource
 from .tdx_source import TdxSource
+from .tencent_source import TencentSource
 from .official_index_source import CNIndexSource, CSIndexSource
 from .a_share_official_stock_master import AShareOfficialStockMasterSource
 from utils.exchange_utils import exchange_mapper
@@ -199,6 +200,8 @@ class DataSourceFactory:
             return YFinanceSource(instance_name, rate_limit_config)
         elif source_name == 'tushare':
             return TushareSource(instance_name, rate_limit_config)
+        elif source_name == 'tencent':
+            return TencentSource(instance_name, rate_limit_config, config=source_config)
         elif source_name == 'cnindex':
             return CNIndexSource(instance_name, rate_limit_config, config=source_config)
         elif source_name == 'csindex':

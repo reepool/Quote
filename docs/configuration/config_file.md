@@ -1010,6 +1010,31 @@
 
 - **`instrument_types_supported`**: 当前建议包含 `stock` 和 `index`，以支持 A 股指数日线
 
+### data_sources_config.tencent
+
+```json
+{
+  "tencent": {
+    "enabled": true,
+    "exchanges_supported": [
+      "a_stock"
+    ],
+    "connection_timeout_sec": 10,
+    "retry_times": 3,
+    "retry_interval": 1.0,
+    "batch_size": 800,
+    "max_requests_per_minute": 3600,
+    "max_requests_per_hour": 60000,
+    "max_requests_per_day": 1000000
+  }
+}
+```
+
+- 腾讯财经日线备源，A 股股票日线路由中紧随 `pytdx`（`routing.daily` 各 stock 链第二位）；不提供股票池/交易日历/复权因子
+- **`batch_size`**: 日线单请求根数上限（端点实返 800+1 根，按日期去重）
+- **`max_requests_per_minute`**: 3600 约为串行日更实测速率（≈11 请求/秒）的 5 倍余量；限流等待由 `RateLimiter` 执行，与日更主循环的"禁止失败退避 sleep"无关
+- HTTP 403/429 会抛出带状态码的异常并由既有 throttle 熔断计数；数据级空结果按健康空降级到下一源
+
 ### data_sources_config.exchange_official
 
 ```json
