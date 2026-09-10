@@ -1,0 +1,49 @@
+{
+  "schema_version": "company_profile_shadow_precision_closure_execution_failure.v1",
+  "batch_id": "manufacturing-materials-shadow-precision-closure-gemini-20260910-a",
+  "started_at": "2026-09-10T10:00:27+08:00",
+  "stopped_at": "2026-09-10T10:12:06+08:00",
+  "execution_status": "failed",
+  "failure_scope": "execution_environment",
+  "provider_profile": "semantic_extraction__scorpio_gemini",
+  "semantic_requests_started": 3,
+  "semantic_requests_completed": 0,
+  "typed_failures": [
+    {
+      "request_id": "caa6385e8f334a7eb813b8652325c2a2",
+      "request_hash": "c6de60405960f9b5b18b7c17a386ac38190e650c44b106dd987f494e5d130974",
+      "elapsed_ms": 300105,
+      "code": "deadline_exceeded",
+      "attempt_error_code": "transient_transport_error",
+      "transport_error_type": "dns_failure",
+      "transport_phase": "connect",
+      "transport_exception_type": "ConnectError"
+    },
+    {
+      "request_id": "f9ca846e7d5f440f9a61b6b0b0a4aec3",
+      "request_hash": "87f1da0b1415d51230bbdb9a138b2afe37cdb296ef526de9da31c52242d98b63",
+      "elapsed_ms": 300065,
+      "code": "deadline_exceeded",
+      "attempt_error_code": "transient_transport_error",
+      "transport_error_type": "dns_failure",
+      "transport_phase": "connect",
+      "transport_exception_type": "ConnectError"
+    }
+  ],
+  "interrupted_request_id": "44a5675d34d947bfa9db9b693a1ef95a",
+  "interruption_reason": "Two consecutive sandbox-network DNS failures proved the environment invariant; continuing would repeat 300-second failures without producing report evidence.",
+  "persisted_report_count": 0,
+  "manifest_written": false,
+  "review_package_written": false,
+  "readiness_audit_written": false,
+  "comparison_audit_written": false,
+  "output_directory": "var/company_profile_shadow_batch/20260910/batch-manufacturing-materials-shadow-precision-closure-gemini-20260910-a",
+  "output_directory_contents": ["reports/"],
+  "historical_batches_modified": false,
+  "targeted_rerun_performed": false,
+  "model_substitution_performed": false,
+  "evidence_or_parameter_relaxation_performed": false,
+  "production_paths_opened": [],
+  "next_required_action": "Run a separately authorized new-ID full replay directly through the user-authorized external-sandbox network path; do not reuse this failed identity.",
+  "production_authorization": "not_authorized"
+}
