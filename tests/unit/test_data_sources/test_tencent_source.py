@@ -23,17 +23,6 @@ from data_sources.tencent_source import (
 
 _REPO_ROOT = Path(__file__).resolve().parents[3]
 
-import functools
-
-
-def _at(test):
-    """异步测试运行器: 在 pytest-asyncio 钩子不可用的环境里以 asyncio.run 执行。"""
-    @functools.wraps(test)
-    def wrapper(*args, **kwargs):
-        return asyncio.run(test(*args, **kwargs))
-    return wrapper
-
-
 
 def _row(day, open_, close, high, low, volume_raw, amount_wan="100.00"):
     """构造 11 列日线行: [日期, 开, 收, 高, 低, 量, {}, 比率, 额(万元), 0, 0]"""
@@ -94,7 +83,7 @@ def _day(pages, code="sh600000"):
 
 # ---------- 字段映射与量纲 ----------
 
-@_at
+@pytest.mark.asyncio
 async def test_close_sits_at_index2_not_ohlc():
     src = _build_source(queue=_day([[_row("2026-09-10", 9.22, 9.30, 9.33, 9.19, 356060)]]))
     bars = await src.get_daily_data(
@@ -106,7 +95,7 @@ async def test_close_sits_at_index2_not_ohlc():
     assert bar["low"] <= bar["close"] <= bar["high"]
 
 
-@_at
+@pytest.mark.asyncio
 async def test_lot_market_volume_converted_by_100():
     src = _build_source(queue=_day([[_row("2026-09-03", 9.24, 9.27, 9.47, 9.22, 898172, "84197.29")]]))
     bars = await src.get_daily_data(
@@ -118,7 +107,7 @@ async def test_lot_market_volume_converted_by_100():
     assert bars[0]["turnover"] == 0.0
 
 
-@_at
+@pytest.mark.asyncio
 async def test_bse_volume_converted_by_100():
     src = _build_source(queue=_day([[_row("2026-09-03", 14.66, 14.28, 14.96, 14.28, 11810, "1707.67")]],
                                    code="bj920000"))
@@ -129,7 +118,7 @@ async def test_bse_volume_converted_by_100():
     assert bars[0]["amount"] == 17076700.0
 
 
-@_at
+@pytest.mark.asyncio
 async def test_star_and_cdr_volume_kept_as_shares():
     src = _build_source(queue=_day([
         [_row("2026-09-07", 122.5, 124.12, 125.0, 122.0, 31314788)],
@@ -154,7 +143,7 @@ def test_unsupported_code_raises_value_error():
 
 # ---------- 翻页、终止与去重 (升序夹具, 与生产一致) ----------
 
-@_at
+@pytest.mark.asyncio
 async def test_paging_covers_window_with_real_cursor_and_empty_fq():
     # batch_size=2 -> 每页实返 ≤3 根 (count+1); 升序, 首页最早日推进 cursor
     pages = [
@@ -181,7 +170,7 @@ async def test_paging_covers_window_with_real_cursor_and_empty_fq():
         assert "qfq" not in url and "hfq" not in url
 
 
-@_at
+@pytest.mark.asyncio
 async def test_paging_terminates_on_empty_page():
     # 第二页为真正的空 day 节点: 空页 (而非根数) 终止翻页
     pages = [
@@ -199,7 +188,7 @@ async def test_paging_terminates_on_empty_page():
     assert src.last_fetch_diagnostic == {}  # 健康非空无需诊断
 
 
-@_at
+@pytest.mark.asyncio
 async def test_empty_day_node_returns_empty_with_diagnostic():
     src = _build_source(queue=_day([[]]))
     bars = await src.get_daily_data(
@@ -211,7 +200,7 @@ async def test_empty_day_node_returns_empty_with_diagnostic():
     }
 
 
-@_at
+@pytest.mark.asyncio
 async def test_rows_outside_window_yield_no_rows_in_window():
     src = _build_source(queue=[_kline_response(
         [_row("2002-04-26", 2.71, 2.71, 2.71, 2.71, 43972)], code="sz000003",
@@ -224,7 +213,7 @@ async def test_rows_outside_window_yield_no_rows_in_window():
     assert src.last_fetch_diagnostic["connection_unhealthy"] is False
 
 
-@_at
+@pytest.mark.asyncio
 async def test_duplicate_days_within_page_deduplicated():
     # 端点异常导致同日重复行时, 以先到者为准, 不产生重复 bar
     pages = [[
@@ -239,7 +228,7 @@ async def test_duplicate_days_within_page_deduplicated():
     assert bars[0]["close"] == 9.3  # 先到者为准
 
 
-@_at
+@pytest.mark.asyncio
 async def test_malformed_rows_skipped_with_diagnostic():
     pages = [
         [
@@ -258,7 +247,7 @@ async def test_malformed_rows_skipped_with_diagnostic():
     assert src.last_fetch_diagnostic["skipped"] == 2
 
 
-@_at
+@pytest.mark.asyncio
 async def test_intraday_partial_bar_passthrough():
     src = _build_source(queue=_day([[_row("2026-09-10", 9.22, 9.30, 9.33, 9.19, 356060)]]))
     bars = await src.get_daily_data(
@@ -270,7 +259,7 @@ async def test_intraday_partial_bar_passthrough():
 
 # ---------- pre_close 回看 ----------
 
-@_at
+@pytest.mark.asyncio
 async def test_pre_close_bridges_spring_festival_gap():
     # 窗口 [2026-02-24, 2026-02-24]; 春节空档 02-13 -> 02-24 (11 个日历日)
     # 回看 15 天 (lookback_start=02-09) 必须覆盖 02-13
@@ -291,7 +280,7 @@ async def test_pre_close_bridges_spring_festival_gap():
     assert bar["pct_change"] == round((10.5 / 10.1 - 1) * 100, 4)
 
 
-@_at
+@pytest.mark.asyncio
 async def test_pre_close_none_on_first_ever_bar():
     src = _build_source(queue=_day([
         [_row("2023-05-26", 12.0, 11.71, 12.11, 11.63, 10041)],
@@ -305,7 +294,7 @@ async def test_pre_close_none_on_first_ever_bar():
 
 # ---------- 失败语义 ----------
 
-@_at
+@pytest.mark.asyncio
 async def test_http_403_raises_recognizable_status_error():
     src = _build_source(queue=[_FakeResponse(status_code=403)])
     with pytest.raises(TencentHTTPStatusError) as exc_info:
@@ -318,7 +307,7 @@ async def test_http_403_raises_recognizable_status_error():
     assert DataSourceFactory._is_daily_source_unavailable_error(exc_info.value) is False
 
 
-@_at
+@pytest.mark.asyncio
 async def test_http_403_not_retried():
     src = _build_source(queue=[
         _FakeResponse(status_code=403),
@@ -333,7 +322,7 @@ async def test_http_403_not_retried():
     assert len(src.session.calls) == 1  # 限流不重试
 
 
-@_at
+@pytest.mark.asyncio
 async def test_http_5xx_retried_then_success():
     src = _build_source(queue=[
         _FakeResponse(status_code=502),
@@ -349,7 +338,7 @@ async def test_http_5xx_retried_then_success():
     assert len(src.session.calls) == 4
 
 
-@_at
+@pytest.mark.asyncio
 async def test_http_5xx_exhaustion_counts_as_transport_unavailable():
     src = _build_source(queue=[_FakeResponse(status_code=503)] * 3)
     src.rate_limiter.config.retry_times = 3
@@ -365,7 +354,7 @@ async def test_http_5xx_exhaustion_counts_as_transport_unavailable():
     assert DataSourceFactory._is_daily_http_throttle_error(exc_info.value) is False
 
 
-@_at
+@pytest.mark.asyncio
 async def test_network_error_retried_then_success():
     src = _build_source(queue=[
         requests.exceptions.ConnectionError("connection reset"),
@@ -380,7 +369,7 @@ async def test_network_error_retried_then_success():
     assert len(src.session.calls) == 3
 
 
-@_at
+@pytest.mark.asyncio
 async def test_timeout_wrapped_as_connection_error():
     src = _build_source(queue=[requests.exceptions.Timeout("timed out")])
     src.rate_limiter.config.retry_times = 1
@@ -405,7 +394,7 @@ def _snapshot_fields(last="9.30", prev="9.23", open_="9.22", vol="356060", amoun
     return fields
 
 
-@_at
+@pytest.mark.asyncio
 async def test_snapshot_field_mapping_main_board_scale():
     src = _build_source(queue=[_FakeResponse(text=_snapshot_text(_snapshot_fields()))])
     snap = await src.get_latest_daily_data("600000.SH", "600000")
@@ -416,7 +405,7 @@ async def test_snapshot_field_mapping_main_board_scale():
     assert snap["time"] == datetime(2026, 9, 10, 15, 0, 3)
 
 
-@_at
+@pytest.mark.asyncio
 async def test_snapshot_star_volume_keeps_share_unit():
     fields = _snapshot_fields(last="119.35", vol="14307846")
     src = _build_source(queue=[_FakeResponse(text=_snapshot_text(fields))])
@@ -424,7 +413,7 @@ async def test_snapshot_star_volume_keeps_share_unit():
     assert snap["volume"] == 14307846  # sh688* 原始已是股
 
 
-@_at
+@pytest.mark.asyncio
 async def test_snapshot_dead_code_returns_empty_dict():
     src = _build_source(queue=[_FakeResponse(text='pv_none="";\n')])
     snap = await src.get_latest_daily_data("000003.SZ", "000003")
@@ -433,13 +422,13 @@ async def test_snapshot_dead_code_returns_empty_dict():
 
 # ---------- 接线 ----------
 
-@_at
+@pytest.mark.asyncio
 async def test_get_instrument_list_returns_empty_instead_of_raising():
     src = _build_source()
     assert await src.get_instrument_list("SSE") == []
 
 
-@_at
+@pytest.mark.asyncio
 async def test_close_releases_session():
     src = _build_source()
     src.session = _FakeSession([])
