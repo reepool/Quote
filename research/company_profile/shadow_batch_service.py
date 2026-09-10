@@ -212,6 +212,71 @@ def _validate_shadow_correction_audit(
     raise ValueError("shadow correction audit schema is unsupported")
 
 
+def build_shadow_replay_admission_receipt(
+    *,
+    contract: ShadowReplayContract,
+    output_root: str | Path,
+) -> dict[str, object]:
+    """Build a hash-bound receipt proving replay admission before provider creation."""
+
+    payload: dict[str, object] = {
+        "schema_version": "company_profile_shadow_replay_admission_receipt.v1",
+        "batch_id": contract.batch_id,
+        "contract": contract.model_dump(mode="json"),
+        "output_root": str(Path(output_root).resolve()),
+        "output_batch_path": str(
+            Path(output_root).resolve() / f"batch-{contract.batch_id}"
+        ),
+        "output_absent_before_provider": True,
+        "provider_calls": 0,
+        "cohort_replay_performed": False,
+        "production_authorization": PRODUCTION_AUTHORIZATION,
+    }
+    return {**payload, "audit_hash": _payload_hash(payload)}
+
+
+def validate_segment_financial_closure_audit(
+    audit: Mapping[str, object],
+    *,
+    implementation_hashes: Mapping[str, str],
+) -> None:
+    """Validate the provider-free segment repair closure before replay admission."""
+
+    payload = dict(audit)
+    audit_hash = payload.pop("audit_hash", None)
+    if audit_hash != _payload_hash(payload):
+        raise ValueError("segment financial closure audit hash mismatch")
+    if (
+        audit.get("schema")
+        != "company_profile_segment_financial_provider_free_closure_audit.v1"
+        or audit.get("closure_status") != "passed"
+        or audit.get("provider_calls") != 0
+        or audit.get("cohort_replay_performed") is not False
+        or audit.get("external_replay_mutated") is not False
+        or audit.get("authoritative_replay_status") != "hold"
+        or audit.get("production_authorization") != PRODUCTION_AUTHORIZATION
+        or audit.get("production_paths_opened") != []
+    ):
+        raise ValueError("segment financial closure audit does not admit this replay")
+    fixture_results = audit.get("fixture_results")
+    if not isinstance(fixture_results, list) or not fixture_results:
+        raise ValueError("segment financial closure fixtures are incomplete")
+    if any(
+        not isinstance(item, Mapping) or item.get("status") != "passed"
+        for item in fixture_results
+    ):
+        raise ValueError("segment financial closure fixtures are incomplete")
+    expected_hashes = audit.get("implementation_hashes")
+    if not isinstance(expected_hashes, Mapping):
+        raise TypeError("segment financial closure implementation hashes are missing")
+    for relative_path, expected_hash in expected_hashes.items():
+        if implementation_hashes.get(str(relative_path)) != expected_hash:
+            raise ValueError(
+                "segment financial closure implementation hash mismatch: "
+                f"{relative_path}"
+            )
+
+
 class ShadowReportSuccess(_StrictModel):
     schema_version: Literal["company_profile_shadow_report_result.v1"] = (
         SHADOW_REPORT_RESULT_SCHEMA

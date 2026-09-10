@@ -22,8 +22,10 @@ from research.company_profile.shadow_batch_service import (
     ShadowBatchResult,
     ShadowBatchStore,
     ShadowReplayContract,
+    build_shadow_replay_admission_receipt,
     load_shadow_batch_result,
     load_shadow_report_result,
+    validate_segment_financial_closure_audit,
     validate_shadow_replay_admission,
 )
 from research.company_profile.shadow_evidence import (
@@ -40,6 +42,7 @@ from scripts.run_company_profile_shadow_batch import (
     OWNER_CLOSURE_SHADOW_REPLAY_CONTRACT,
     PRECISION_CLOSURE_SHADOW_REPLAY_CONTRACT,
     ROUTING_CONTINUATION_SHADOW_REPLAY_CONTRACT,
+    SEGMENT_FINANCIAL_REPAIR_SHADOW_REPLAY_CONTRACT,
     STABILITY_SHADOW_REPLAY_CONTRACT,
     _validate_replay_mode,
     build_parser,
@@ -78,6 +81,10 @@ ROUTING_CONTINUATION_CHANGE = (
     REPOSITORY_ROOT
     / "openspec/changes/repair-company-profile-shadow-evidence-routing-and-continuation"
 )
+SEGMENT_FINANCIAL_CHANGE = (
+    REPOSITORY_ROOT
+    / "openspec/changes/archive/2026-09-10-repair-company-profile-shadow-segment-financial-completion"
+)
 BASELINE_BATCH = (
     REPOSITORY_ROOT
     / "var/company_profile_shadow_batch/20260909/batch-manufacturing-materials-shadow-gemini-20260909-a"
@@ -89,6 +96,10 @@ STABILITY_BATCH = (
 OWNER_CLOSURE_BATCH = (
     REPOSITORY_ROOT
     / "var/company_profile_shadow_batch/20260910/batch-manufacturing-materials-shadow-owner-closure-gemini-20260910-a"
+)
+ROUTING_CONTINUATION_BATCH = (
+    REPOSITORY_ROOT
+    / "var/company_profile_shadow_batch/20260910/batch-manufacturing-materials-shadow-routing-continuation-gemini-20260910-a"
 )
 REFINED_PLAN_HASH = "1" * 64
 EXECUTION_STABILITY_FIXTURE = (
@@ -200,8 +211,48 @@ def routing_continuation_replay_inputs():
             OWNER_CLOSURE_BATCH / "readiness-audit.json"
         ),
     }
-    prepared = ShadowEvidencePreparer().prepare(manifest=manifest, plan=plan)
+    frozen_batch = load_shadow_batch_result(ROUTING_CONTINUATION_BATCH / "manifest.json")
+    prepared = {
+        reference.sample_id: tuple(
+            item.prepared_scope
+            for item in load_shadow_report_result(
+                ROUTING_CONTINUATION_BATCH / reference.relative_path
+            ).scope_results
+        )
+        for reference in frozen_batch.reports
+    }
     return manifest, plan, preparation, correction, supporting, prepared
+
+
+@pytest.fixture(scope="module")
+def segment_repair_replay_inputs(routing_continuation_replay_inputs):
+    manifest, plan, preparation, correction, supporting, prepared = (
+        routing_continuation_replay_inputs
+    )
+    closure_path = (
+        SEGMENT_FINANCIAL_CHANGE
+        / "segment-financial-provider-free-closure-audit.v1.json"
+    )
+    closure = json.loads(closure_path.read_text(encoding="utf-8"))
+    supporting = {
+        **supporting,
+        "segment_financial_closure_audit": _file_sha256(closure_path),
+        "segment_financial_closure_audit_internal": closure["audit_hash"],
+    }
+    implementation_hashes = {
+        relative_path: _file_sha256(REPOSITORY_ROOT / relative_path)
+        for relative_path in closure["implementation_hashes"]
+    }
+    return (
+        manifest,
+        plan,
+        preparation,
+        correction,
+        supporting,
+        prepared,
+        closure,
+        implementation_hashes,
+    )
 
 
 def _precision_closure_replay_inputs():
@@ -1085,6 +1136,172 @@ def test_owner_closure_replay_mode_and_output_identity_are_single_use(
     manifest, plan, preparation, correction, supporting, prepared = (
         owner_closure_replay_inputs
     )
+    (tmp_path / f"batch-{contract.batch_id}").mkdir()
+    with pytest.raises(FileExistsError, match="shadow batch already exists"):
+        validate_shadow_replay_admission(
+            contract=contract,
+            batch_id=contract.batch_id,
+            primary_logical_profile=contract.primary_logical_profile,
+            extract_max_output_tokens=contract.extract_max_output_tokens,
+            verify_max_output_tokens=contract.verify_max_output_tokens,
+            timeout_seconds=contract.timeout_seconds,
+            max_provider_calls=contract.max_provider_calls,
+            manifest=manifest,
+            evidence_plan=plan,
+            preparation_audit=preparation,
+            correction_audit=correction,
+            supporting_artifact_hashes=supporting,
+            prepared=prepared,
+            output_root=tmp_path,
+        )
+
+
+def test_segment_repair_replay_admission_binds_provider_free_closure(
+    tmp_path: Path,
+    segment_repair_replay_inputs,
+) -> None:
+    (
+        manifest,
+        plan,
+        preparation,
+        correction,
+        supporting,
+        prepared,
+        closure,
+        implementation_hashes,
+    ) = segment_repair_replay_inputs
+    contract = SEGMENT_FINANCIAL_REPAIR_SHADOW_REPLAY_CONTRACT
+
+    validate_segment_financial_closure_audit(
+        closure,
+        implementation_hashes=implementation_hashes,
+    )
+    validate_shadow_replay_admission(
+        contract=contract,
+        batch_id=contract.batch_id,
+        primary_logical_profile=contract.primary_logical_profile,
+        extract_max_output_tokens=contract.extract_max_output_tokens,
+        verify_max_output_tokens=contract.verify_max_output_tokens,
+        timeout_seconds=contract.timeout_seconds,
+        max_provider_calls=contract.max_provider_calls,
+        manifest=manifest,
+        evidence_plan=plan,
+        preparation_audit=preparation,
+        correction_audit=correction,
+        supporting_artifact_hashes=supporting,
+        prepared=prepared,
+        output_root=tmp_path,
+    )
+    receipt = build_shadow_replay_admission_receipt(
+        contract=contract,
+        output_root=tmp_path,
+    )
+    assert receipt["output_absent_before_provider"] is True
+    assert receipt["provider_calls"] == 0
+    assert receipt["production_authorization"] == "not_authorized"
+    assert receipt["audit_hash"] == _payload_hash(
+        {key: value for key, value in receipt.items() if key != "audit_hash"}
+    )
+
+    assert contract.evidence_plan_version == SHADOW_EVIDENCE_PLAN_VERSION
+    assert contract.supporting_artifact_hashes[
+        "segment_financial_closure_audit_internal"
+    ] == closure["audit_hash"]
+    assert contract.production_authorization == "not_authorized"
+
+
+def test_segment_repair_replay_rejects_closure_or_lineage_drift(
+    tmp_path: Path,
+    segment_repair_replay_inputs,
+) -> None:
+    (
+        manifest,
+        plan,
+        preparation,
+        correction,
+        supporting,
+        prepared,
+        closure,
+        implementation_hashes,
+    ) = segment_repair_replay_inputs
+    contract = SEGMENT_FINANCIAL_REPAIR_SHADOW_REPLAY_CONTRACT
+
+    tampered_closure = {**closure, "provider_calls": 1}
+    with pytest.raises(ValueError, match="closure audit hash mismatch"):
+        validate_segment_financial_closure_audit(
+            tampered_closure,
+            implementation_hashes=implementation_hashes,
+        )
+
+    changed_supporting = {
+        **supporting,
+        "segment_financial_closure_audit_internal": "f" * 64,
+    }
+    with pytest.raises(ValueError, match="supporting_artifact_hashes"):
+        validate_shadow_replay_admission(
+            contract=contract,
+            batch_id=contract.batch_id,
+            primary_logical_profile=contract.primary_logical_profile,
+            extract_max_output_tokens=contract.extract_max_output_tokens,
+            verify_max_output_tokens=contract.verify_max_output_tokens,
+            timeout_seconds=contract.timeout_seconds,
+            max_provider_calls=contract.max_provider_calls,
+            manifest=manifest,
+            evidence_plan=plan,
+            preparation_audit=preparation,
+            correction_audit=correction,
+            supporting_artifact_hashes=changed_supporting,
+            prepared=prepared,
+            output_root=tmp_path,
+        )
+
+
+def test_segment_repair_replay_mode_is_single_use_and_research_only(
+    tmp_path: Path,
+    segment_repair_replay_inputs,
+) -> None:
+    contract = SEGMENT_FINANCIAL_REPAIR_SHADOW_REPLAY_CONTRACT
+    args = build_parser().parse_args(
+        [
+            "--mode",
+            "segment-repair-semantic-replay",
+            "--sample-manifest",
+            "manifest.json",
+            "--evidence-plan",
+            "plan.json",
+            "--batch-id",
+            contract.batch_id,
+        ]
+    )
+    assert args.mode == "segment-repair-semantic-replay"
+    _validate_replay_mode(
+        mode=args.mode,
+        plan_version=contract.evidence_plan_version,
+        batch_id=contract.batch_id,
+    )
+    with pytest.raises(ValueError, match="segment-repair batch identity requires"):
+        _validate_replay_mode(
+            mode="routing-continuation-semantic-replay",
+            plan_version=contract.evidence_plan_version,
+            batch_id=contract.batch_id,
+        )
+    with pytest.raises(ValueError, match="provider-free only"):
+        _validate_replay_mode(
+            mode="semantic-run",
+            plan_version=contract.evidence_plan_version,
+            batch_id="segment-repair-bypass",
+        )
+
+    (
+        manifest,
+        plan,
+        preparation,
+        correction,
+        supporting,
+        prepared,
+        _,
+        _,
+    ) = segment_repair_replay_inputs
     (tmp_path / f"batch-{contract.batch_id}").mkdir()
     with pytest.raises(FileExistsError, match="shadow batch already exists"):
         validate_shadow_replay_admission(

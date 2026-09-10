@@ -25,6 +25,8 @@ from research.company_profile.shadow_batch_service import (
     ManufacturingMaterialsShadowBatchService,
     ShadowBatchStore,
     ShadowReplayContract,
+    build_shadow_replay_admission_receipt,
+    validate_segment_financial_closure_audit,
     validate_shadow_replay_admission,
 )
 from research.company_profile.shadow_evidence import (
@@ -194,6 +196,32 @@ ROUTING_CONTINUATION_SHADOW_REPLAY_CONTRACT = ShadowReplayContract(
 )
 
 
+SEGMENT_FINANCIAL_REPAIR_SHADOW_REPLAY_CONTRACT = ShadowReplayContract(
+    batch_id=(
+        "manufacturing-materials-shadow-segment-repair-gemini-20260910-a"
+    ),
+    sample_manifest_hash=ROUTING_CONTINUATION_SHADOW_REPLAY_CONTRACT.sample_manifest_hash,
+    evidence_plan_version=ROUTING_CONTINUATION_SHADOW_REPLAY_CONTRACT.evidence_plan_version,
+    evidence_plan_hash=ROUTING_CONTINUATION_SHADOW_REPLAY_CONTRACT.evidence_plan_hash,
+    preparation_audit_hash=ROUTING_CONTINUATION_SHADOW_REPLAY_CONTRACT.preparation_audit_hash,
+    correction_audit_hash=ROUTING_CONTINUATION_SHADOW_REPLAY_CONTRACT.correction_audit_hash,
+    supporting_artifact_hashes={
+        **ROUTING_CONTINUATION_SHADOW_REPLAY_CONTRACT.supporting_artifact_hashes,
+        "segment_financial_closure_audit": (
+            "fedefd4eae5eed10beb6062c587bc9aadc6bc30bf6e3844549416deed6a18626"
+        ),
+        "segment_financial_closure_audit_internal": (
+            "9a08c9203eee674aa3015f05bfd36dafe44cc143c03f657569c367c20edc2c38"
+        ),
+    },
+    primary_logical_profile=ROUTING_CONTINUATION_SHADOW_REPLAY_CONTRACT.primary_logical_profile,
+    extract_max_output_tokens=ROUTING_CONTINUATION_SHADOW_REPLAY_CONTRACT.extract_max_output_tokens,
+    verify_max_output_tokens=ROUTING_CONTINUATION_SHADOW_REPLAY_CONTRACT.verify_max_output_tokens,
+    timeout_seconds=ROUTING_CONTINUATION_SHADOW_REPLAY_CONTRACT.timeout_seconds,
+    max_provider_calls=ROUTING_CONTINUATION_SHADOW_REPLAY_CONTRACT.max_provider_calls,
+)
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -210,6 +238,7 @@ def build_parser() -> argparse.ArgumentParser:
             "external-precision-semantic-replay",
             "owner-closure-semantic-replay",
             "routing-continuation-semantic-replay",
+            "segment-repair-semantic-replay",
         ),
         required=True,
     )
@@ -225,6 +254,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--owner-regression-cases", type=Path)
     parser.add_argument("--owner-regression-closure-audit", type=Path)
     parser.add_argument("--routing-continuation-cases", type=Path)
+    parser.add_argument("--segment-financial-closure-audit", type=Path)
+    parser.add_argument("--admission-receipt", type=Path)
     parser.add_argument("--source-review-package", type=Path)
     parser.add_argument("--source-review-outcomes", type=Path)
     parser.add_argument("--owner-closure-batch-manifest", type=Path)
@@ -552,6 +583,84 @@ def main(argv: Sequence[str] | None = None) -> int:
             prepared=prepared,
             output_root=args.output_root,
         )
+    elif args.mode == "segment-repair-semantic-replay":
+        required = {
+            "correction audit": args.correction_audit,
+            "routing/continuation cases": args.routing_continuation_cases,
+            "source review package": args.source_review_package,
+            "source review outcomes": args.source_review_outcomes,
+            "owner-closure batch manifest": args.owner_closure_batch_manifest,
+            "owner-closure readiness audit": args.owner_closure_readiness_audit,
+            "segment financial closure audit": args.segment_financial_closure_audit,
+            "admission receipt": args.admission_receipt,
+        }
+        missing = [name for name, path in required.items() if path is None]
+        if missing:
+            raise ValueError(f"{args.mode} requires " + ", ".join(missing))
+        correction_audit = json.loads(
+            args.correction_audit.read_text(encoding="utf-8")
+        )
+        segment_closure_audit = json.loads(
+            args.segment_financial_closure_audit.read_text(encoding="utf-8")
+        )
+        implementation_hashes = {
+            relative_path: _file_sha256(ROOT_DIR / relative_path)
+            for relative_path in segment_closure_audit.get(
+                "implementation_hashes", {}
+            )
+        }
+        validate_segment_financial_closure_audit(
+            segment_closure_audit,
+            implementation_hashes=implementation_hashes,
+        )
+        supporting_hashes = {
+            "routing_continuation_cases": _file_sha256(
+                args.routing_continuation_cases
+            ),
+            "source_review_package": _file_sha256(args.source_review_package),
+            "source_review_outcomes": _file_sha256(args.source_review_outcomes),
+            "owner_closure_batch_manifest": _file_sha256(
+                args.owner_closure_batch_manifest
+            ),
+            "owner_closure_readiness_audit": _file_sha256(
+                args.owner_closure_readiness_audit
+            ),
+            "segment_financial_closure_audit": _file_sha256(
+                args.segment_financial_closure_audit
+            ),
+            "segment_financial_closure_audit_internal": str(
+                segment_closure_audit.get("audit_hash")
+            ),
+        }
+        validate_shadow_replay_admission(
+            contract=SEGMENT_FINANCIAL_REPAIR_SHADOW_REPLAY_CONTRACT,
+            batch_id=args.batch_id,
+            primary_logical_profile=args.provider_route,
+            extract_max_output_tokens=args.extract_max_output_tokens,
+            verify_max_output_tokens=args.verify_max_output_tokens,
+            timeout_seconds=args.timeout_seconds,
+            max_provider_calls=args.max_provider_calls,
+            manifest=manifest,
+            evidence_plan=plan,
+            preparation_audit=frozen_audit,
+            correction_audit=correction_audit,
+            supporting_artifact_hashes=supporting_hashes,
+            prepared=prepared,
+            output_root=args.output_root,
+        )
+        if args.admission_receipt.exists():
+            raise FileExistsError(
+                f"shadow admission receipt already exists: {args.admission_receipt}"
+            )
+        receipt = build_shadow_replay_admission_receipt(
+            contract=SEGMENT_FINANCIAL_REPAIR_SHADOW_REPLAY_CONTRACT,
+            output_root=args.output_root,
+        )
+        args.admission_receipt.parent.mkdir(parents=True, exist_ok=True)
+        args.admission_receipt.write_text(
+            json.dumps(receipt, ensure_ascii=False, indent=2) + "\n",
+            encoding="utf-8",
+        )
     elif args.mode == "owner-closure-semantic-replay":
         required = {
             "correction audit": args.correction_audit,
@@ -723,6 +832,7 @@ def _validate_replay_mode(
     owner_batch = OWNER_CLOSURE_SHADOW_REPLAY_CONTRACT.batch_id
     routing_continuation_plan = SHADOW_EVIDENCE_PLAN_VERSION
     routing_continuation_batch = ROUTING_CONTINUATION_SHADOW_REPLAY_CONTRACT.batch_id
+    segment_repair_batch = SEGMENT_FINANCIAL_REPAIR_SHADOW_REPLAY_CONTRACT.batch_id
     provider_bearing_legacy_modes = {"semantic-run", "refined-semantic-replay"}
     if (
         plan_version == stability_plan or batch_id == stability_batch
@@ -754,10 +864,19 @@ def _validate_replay_mode(
             "routing-continuation-semantic-replay"
         )
     if (
+        batch_id == segment_repair_batch
+        and mode != "segment-repair-semantic-replay"
+    ):
+        raise ValueError(
+            "segment-repair batch identity requires "
+            "segment-repair-semantic-replay"
+        )
+    if (
         plan_version == routing_continuation_plan
         and mode not in {
             "preparation-only",
             "routing-continuation-semantic-replay",
+            "segment-repair-semantic-replay",
         }
     ):
         raise ValueError(
