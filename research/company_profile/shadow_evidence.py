@@ -49,10 +49,13 @@ from .stage5 import (
 from .stage5_service import stage5_field_ids
 
 SHADOW_EVIDENCE_PLAN_SCHEMA = "company_profile_shadow_evidence_plan.v1"
-SHADOW_EVIDENCE_PLAN_VERSION = "manufacturing_materials_shadow.2026-09-10.4"
+SHADOW_EVIDENCE_PLAN_VERSION = "manufacturing_materials_shadow.2026-09-10.5"
 SHADOW_PREPARATION_AUDIT_SCHEMA = "company_profile_shadow_preparation_audit.v1"
 SHADOW_SCOPE_REFINEMENT_AUDIT_SCHEMA = (
     "company_profile_shadow_scope_refinement_audit.v1"
+)
+SHADOW_ROUTING_CONTINUATION_AUDIT_SCHEMA = (
+    "company_profile_shadow_routing_continuation_audit.v1"
 )
 _BSE_INDUSTRY_DISCLOSURE_OPT_OUT_PATTERN = (
     r"第九节行业信息.{0,240}是否自愿披露.{0,20}[√☑]否"
@@ -65,6 +68,59 @@ _BUSINESS_OVERVIEW_CROSS_REFERENCE_PAGE_PATTERN = re.compile(
     r"(?:主营业务分析.{0,30}概述|概述)"
     r"(?:具体(?:内容|情况))?(?:参见|详见|见)(?:本报告|报告)?"
     r".{0,120}(?:主要业务|主营业务).{0,30}(?:相关)?(?:内容|情况)?"
+)
+_SUBSIDIARY_FINANCIAL_TABLE_PATTERN = re.compile(
+    r"(?:主要控股参股公司分析|主要子公司及.{0,30}参股公司情况)"
+    r".{0,500}公司名称.{0,80}公司类型.{0,80}主要业务"
+    r".{0,160}(?:注册资本|总资产).{0,240}营业收入.{0,240}净利润"
+)
+_ISSUER_OVERVIEW_SUBSTANCE_PATTERN = re.compile(
+    r"(?:公司|本公司).{0,40}(?:主营业务|主要业务)(?:主要)?"
+    r"(?:包括|为|是).{1,120}(?:。|；|$)"
+    r"|(?:公司|本公司).{0,40}(?:主要|专业|重点)?"
+    r"(?:从事|经营|开展|提供|采用).{0,120}"
+    r"(?:业务|产品|服务|生产|制造|加工|销售|研发|开发|经营模式)"
+    r"|(?:主要业务|主营业务|经营模式)(?:主要)?(?:包括|为|是|采用)"
+    r".{0,120}(?:业务|产品|服务|生产|制造|加工|销售|研发|开发)"
+)
+_BUSINESS_OVERVIEW_CHECKLIST_PATTERN = re.compile(
+    r"公司是否需(?:通过互联网渠道)?开展业务.{0,80}(?:是|否|适用|不适用)"
+)
+
+
+def _business_overview_statistical_table_only(text: str) -> bool:
+    compact = re.sub(r"\s+", "", text)
+    without_checklist = _BUSINESS_OVERVIEW_CHECKLIST_PATTERN.sub("", compact)
+    has_segment_table = (
+        any(term in compact for term in ("分行业", "分产品", "分地区"))
+        and "营业收入" in compact
+        and any(term in compact for term in ("营业成本", "毛利率"))
+    )
+    return bool(
+        has_segment_table
+        and not _ISSUER_OVERVIEW_SUBSTANCE_PATTERN.search(without_checklist)
+    )
+
+
+def _business_overview_cross_reference_only(text: str) -> bool:
+    compact = re.sub(r"\s+", "", text)
+    without_checklist = _BUSINESS_OVERVIEW_CHECKLIST_PATTERN.sub("", compact)
+    without_reference = _BUSINESS_OVERVIEW_CROSS_REFERENCE_PAGE_PATTERN.sub(
+        "", without_checklist
+    )
+    return bool(
+        _BUSINESS_OVERVIEW_CROSS_REFERENCE_PAGE_PATTERN.search(compact)
+        and not _ISSUER_OVERVIEW_SUBSTANCE_PATTERN.search(without_reference)
+    )
+
+
+_MATERIAL_CONTINUATION_OWNER_PATTERN = re.compile(
+    r"(?:公司|本公司).{0,120}(?:原料|原材料|耐火材料)"
+    r".{0,40}(?:替代|再生|循环利用|回收|消耗|储备)"
+    r"|(?:原料|原材料|耐火材料).{0,40}(?:替代|再生|循环利用|回收|消耗|储备)"
+)
+_MATERIAL_PAGE_BREAK_TAIL_PATTERN = re.compile(
+    r"(?:原料|原材料|耐火材料).{0,60}(?:再生|循环|回收|替代|消耗|储备)[^。；！？]{0,30}$"
 )
 _PROHIBITED_KEYS = frozenset(
     {
@@ -240,7 +296,7 @@ _FIELD_TEXT_PATTERNS: dict[ChapterTask, dict[str, tuple[str, ...]]] = {
     },
     ChapterTask.EXTRACT_MATERIAL_INPUTS: {
         "material_input": (
-            r"(?:原材料|原料|原燃料|燃料|能源|铁矿石|矿石|煤炭|焦炭|采购模式)",
+            r"(?:原材料|原料|原燃料|燃料|能源|铁矿石|矿石|煤炭|焦炭|耐火材料|采购模式)",
         ),
     },
     ChapterTask.EXTRACT_COUNTERPARTIES_AND_CONCENTRATION: {
@@ -352,6 +408,10 @@ _CHAPTER_OWNER_PATTERNS: dict[ChapterTask, tuple[str, ...]] = {
         r"(?:公司|本公司).{0,30}(?:主要从事|主营业务|主要业务|经营范围)",
         r"(?:主要业务|主营业务|经营模式).{0,30}(?:包括|为|是|主要采用)",
         r"(?:专业|主要)从事.{0,60}(?:生产|制造|加工|销售|研发|开发|服务)",
+        (
+            r"(?:公司|本公司).{0,80}(?:系统|产品|业务|服务|产业)"
+            r".{0,80}(?:适用于|覆盖|包括|主要采用|提供|生产|制造|销售|研发)"
+        ),
     ),
     ChapterTask.EXTRACT_SEGMENT_FINANCIALS: (
         r"分(?:行业|产品|地区|销售模式)",
@@ -384,6 +444,7 @@ _CHAPTER_OWNER_PATTERNS: dict[ChapterTask, tuple[str, ...]] = {
         r"以.{1,80}为原料",
         r"(?:原油|天然气).{0,35}(?:供应|采购|原料)",
         r"(?:铁矿石|煤炭|焦炭).{0,20}(?:采购|原料|燃料|供应)",
+        r"(?:原料|原材料|耐火材料).{0,30}(?:替代|再生|循环利用|回收|消耗|储备)",
     ),
     ChapterTask.EXTRACT_COUNTERPARTIES_AND_CONCENTRATION: (
         r"前五名(?:客户|供应商)",
@@ -415,9 +476,29 @@ _EXPLICIT_ISSUER_CAPACITY_PATTERN = re.compile(
     r"|主要产品的产能情况.{0,300}(?:设计产能|产能利用率|在建产能)"
 )
 _SEGMENT_OWNER_PATTERN = re.compile(
-    r"分(?:行业|产品|地区|销售模式)|(?:业务|报告)分部|"
-    r"分部(?:收入|利润|资产|信息)|主营业务分(?:行业|产品|地区|部)|营业收入构成"
+    r"分(?:行业|地区|销售模式)|(?<!部)分产品|(?:业务|报告)分部|"
+    r"分部(?:收入|利润|资产|信息)|"
+    r"主营业务分(?:行业|地区|部)|主营业务(?<!部)分产品|营业收入构成"
 )
+
+
+def _has_independent_issuer_overview_sentence(text: str) -> bool:
+    for sentence in re.split(r"[\n。；！？]+", text):
+        compact = re.sub(r"\s+", "", sentence)
+        if (
+            re.match(r"^(?:公司|本公司)", compact)
+            and _ISSUER_OVERVIEW_SUBSTANCE_PATTERN.search(compact)
+        ):
+            return True
+    return False
+
+
+def _subsidiary_financial_table_without_issuer_overview(text: str) -> bool:
+    compact = re.sub(r"\s+", "", text)
+    return bool(
+        _SUBSIDIARY_FINANCIAL_TABLE_PATTERN.search(compact)
+        and not _has_independent_issuer_overview_sentence(text)
+    )
 
 
 def _chapter_owner_score(
@@ -469,6 +550,10 @@ def _chapter_owner_score(
         )
         if not explicit_legal_empty and not has_quantity_substance:
             return 0
+    if chapter_task == ChapterTask.EXTRACT_BUSINESS_OVERVIEW:
+        overview_compact = _BUSINESS_OVERVIEW_CHECKLIST_PATTERN.sub("", compact)
+        if not _ISSUER_OVERVIEW_SUBSTANCE_PATTERN.search(overview_compact):
+            return 0
     if (
         chapter_task == ChapterTask.EXTRACT_OPERATING_QUANTITIES
         and "industry_context" in keys
@@ -477,7 +562,6 @@ def _chapter_owner_score(
         return 0
     if (
         chapter_task == ChapterTask.EXTRACT_SEGMENT_FINANCIALS
-        and "industry_context" in keys
         and not _SEGMENT_OWNER_PATTERN.search(compact)
     ):
         return 0
@@ -488,6 +572,11 @@ def _chapter_owner_score(
             r"分(?:行业|产品|地区|销售模式)|(?:业务|报告)分部|主营业务分",
             compact,
         )
+    ):
+        return 0
+    if (
+        chapter_task == ChapterTask.EXTRACT_BUSINESS_OVERVIEW
+        and _subsidiary_financial_table_without_issuer_overview(compact)
     ):
         return 0
     if (
@@ -544,6 +633,83 @@ def _chapter_owner_score(
         reason.startswith(("heading_alias:", "table_signature:")) for reason in reasons
     ) + len(keys & set(_CHAPTER_CONFIG[chapter_task][1]))
     return matches * 100 + key_bonus
+
+
+def _with_material_continuation_sections(
+    sections: Sequence[Any],
+    artifact: Any,
+) -> tuple[Any, ...]:
+    """Add only source-bound adjacent material continuation pages."""
+
+    by_page = {int(item.page_number): item for item in sections}
+    artifact_pages = {
+        int(page.page_number): page for page in getattr(artifact, "pages", ())
+    }
+    required = set(by_page)
+    for section in tuple(sections):
+        page_number = int(section.page_number)
+        if not (
+            _chapter_owner_score(ChapterTask.EXTRACT_MATERIAL_INPUTS, (section,)) > 0
+            or _section_matches(
+                section,
+                _CHAPTER_CONFIG[ChapterTask.EXTRACT_MATERIAL_INPUTS][1],
+                _CHAPTER_CONFIG[ChapterTask.EXTRACT_MATERIAL_INPUTS][2],
+            )
+        ):
+            continue
+        next_page = artifact_pages.get(page_number + 1)
+        if next_page is None:
+            continue
+        next_compact = re.sub(r"\s+", "", str(next_page.text or ""))
+        if not _MATERIAL_CONTINUATION_OWNER_PATTERN.search(next_compact):
+            continue
+        required.add(page_number + 1)
+        following = artifact_pages.get(page_number + 2)
+        if (
+            following is not None
+            and _MATERIAL_PAGE_BREAK_TAIL_PATTERN.search(next_compact)
+            and str(following.text or "").strip()
+        ):
+            required.add(page_number + 2)
+
+    for page_number in sorted(required - set(by_page)):
+        page = artifact_pages[page_number]
+        text = str(page.text or "")
+        method = str(getattr(page, "extraction_method", "native_text") or "")
+        quality = (
+            "governed_ocr"
+            if method == "ocr" and text.strip()
+            else "native"
+            if text.strip() and method in {"native_text", "alternate_native"}
+            else "unsupported"
+        )
+        page_hash = str(
+            getattr(page, "page_artifact_hash", "")
+            or getattr(page, "text_hash", "")
+            or _payload_hash(text)
+        )
+        section_hash = _payload_hash(
+            {
+                "page_number": page_number,
+                "page_hash": page_hash,
+                "text": re.sub(r"\s+", " ", text).strip(),
+                "reason": "material_page_continuation",
+            }
+        )
+        by_page[page_number] = SimpleNamespace(
+            section_id=f"material-continuation:{page_number}:{section_hash[:16]}",
+            page_number=page_number,
+            section_key="context",
+            text=text,
+            normalized_text=re.sub(r"\s+", " ", text).strip(),
+            normalized_start=0,
+            normalized_end=len(text),
+            page_hash=page_hash,
+            section_hash=section_hash,
+            selector_reasons=("material_page_continuation",),
+            quality=quality,
+        )
+    return tuple(by_page[page] for page in sorted(by_page))
 
 
 def _chapter_owner_page_scope(
@@ -797,6 +963,61 @@ class ShadowOwnerClosureCorrectionAudit(_StrictModel):
             raise ValueError("shadow owner-closure correction audit is unresolved")
         if self.audit_hash != _payload_hash(self, omit={"audit_hash"}):
             raise ValueError("shadow owner-closure correction audit hash mismatch")
+        return self
+
+
+class ShadowRoutingContinuationResult(_StrictModel):
+    review_row_id: str = Field(min_length=1)
+    sample_id: str = Field(min_length=1)
+    chapter_task: ChapterTask
+    field_id: str = Field(min_length=1)
+    expected_result: Literal[
+        "reject_assignment",
+        "require_pages",
+        "preserve_assignment",
+    ]
+    physical_pages: tuple[int, ...] = Field(min_length=1, max_length=3)
+    baseline_scope_ids: tuple[str, ...]
+    corrected_scope_ids: tuple[str, ...]
+    corrected_scope_pages: tuple[tuple[int, ...], ...]
+    status: Literal["resolved", "preserved"]
+
+
+class ShadowRoutingContinuationCorrectionAudit(_StrictModel):
+    schema_version: Literal[
+        "company_profile_shadow_routing_continuation_audit.v1"
+    ] = SHADOW_ROUTING_CONTINUATION_AUDIT_SCHEMA
+    audit_id: str = Field(min_length=1)
+    sample_manifest_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    baseline_plan_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    corrected_plan_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    preparation_audit_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    fixture_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    source_review_package_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    source_review_outcomes_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    report_count: Literal[20] = SHADOW_REPORT_COUNT
+    results: tuple[ShadowRoutingContinuationResult, ...] = Field(
+        min_length=6, max_length=6
+    )
+    unresolved_finding_ids: tuple[str, ...] = ()
+    provider_calls: Literal[0] = 0
+    cohort_replay_performed: Literal[False] = False
+    historical_artifacts_mutated: Literal[False] = False
+    production_paths_opened: tuple[str, ...] = ()
+    created_at: str = Field(min_length=1)
+    audit_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    production_authorization: Literal["not_authorized"] = PRODUCTION_AUTHORIZATION
+
+    @model_validator(mode="after")
+    def _audit_is_closed(self) -> ShadowRoutingContinuationCorrectionAudit:
+        if len({item.review_row_id for item in self.results}) != len(self.results):
+            raise ValueError("routing/continuation audit results must be unique")
+        if self.unresolved_finding_ids:
+            raise ValueError("routing/continuation correction audit is unresolved")
+        if self.production_paths_opened:
+            raise ValueError("routing/continuation audit cannot open production paths")
+        if self.audit_hash != _payload_hash(self, omit={"audit_hash"}):
+            raise ValueError("routing/continuation audit hash mismatch")
         return self
 
 
@@ -1082,21 +1303,34 @@ class ShadowEvidencePlanner:
                 sample_id=report.sample_id,
                 chapter_task=chapter_task,
             ) from exc
+        selected_sections = (
+            _with_material_continuation_sections(selected.sections, artifact)
+            if chapter_task == ChapterTask.EXTRACT_MATERIAL_INPUTS
+            else selected.sections
+        )
         unreadable = [
             item.page_number
-            for item in selected.sections
+            for item in selected_sections
             if not item.text.strip() or item.quality not in {"native", "governed_ocr"}
         ]
         unreadable_pages = set(unreadable)
         readable_sections = tuple(
             item
-            for item in selected.sections
+            for item in selected_sections
             if item.page_number not in unreadable_pages
         )
         direct_pages = {
             section.page_number
             for section in readable_sections
-            if _section_matches(section, allowed_keys, hint_terms)
+            if (
+                _section_matches(section, allowed_keys, hint_terms)
+                or (
+                    chapter_task == ChapterTask.EXTRACT_MATERIAL_INPUTS
+                    and _MATERIAL_CONTINUATION_OWNER_PATTERN.search(
+                        re.sub(r"\s+", "", str(section.text or ""))
+                    )
+                )
+            )
             and _chapter_owner_score(chapter_task, (section,)) > 0
         }
         if not direct_pages:
@@ -1127,7 +1361,7 @@ class ShadowEvidencePlanner:
         scope_selections: list[ShadowEvidenceScopeSelection] = []
         chapter_name = chapter_task.value.removeprefix("extract_")
         ranges = _select_scope_ranges(
-            selected.sections,
+            readable_sections,
             direct_pages=direct_pages,
             bounded_pages=bounded,
             maximum_scopes=_CHAPTER_MAX_SCOPES[chapter_task],
@@ -1136,13 +1370,13 @@ class ShadowEvidencePlanner:
         for index, pages in enumerate(ranges, start=1):
             pages = _bind_table_context_range(
                 pages,
-                selected.sections,
+                readable_sections,
                 sample_id=report.sample_id,
                 chapter_task=chapter_task,
             )
             page_set = set(pages)
             sections = [
-                item for item in selected.sections if item.page_number in page_set
+                item for item in readable_sections if item.page_number in page_set
             ]
             combined = "\n".join(item.text for item in sections)
             scope_field_ids = _scope_field_ids(chapter_task, sections)
@@ -1550,6 +1784,160 @@ def build_shadow_owner_closure_correction_audit(
     )
 
 
+def build_shadow_routing_continuation_correction_audit(
+    *,
+    audit_id: str,
+    baseline_plan: ShadowEvidencePlan,
+    corrected_plan: ShadowEvidencePlan,
+    preparation_audit: ShadowEvidencePreparationAudit,
+    regression_cases: Mapping[str, Any],
+    source_review_package_hash: str,
+    source_review_outcomes_hash: str,
+) -> ShadowRoutingContinuationCorrectionAudit:
+    """Prove the three reviewed routing defects closed without a provider."""
+
+    fixture_payload = dict(regression_cases)
+    fixture_hash = fixture_payload.pop("fixture_hash", None)
+    if fixture_hash != _payload_hash(fixture_payload):
+        raise ValueError("routing/continuation fixture hash mismatch")
+    if baseline_plan.sample_manifest_hash != corrected_plan.sample_manifest_hash:
+        raise ValueError("routing/continuation plans use different cohorts")
+    if baseline_plan.pdf_artifact_hashes != corrected_plan.pdf_artifact_hashes:
+        raise ValueError("routing/continuation plans use different PDF artifacts")
+    if preparation_audit.evidence_plan_hash != corrected_plan.plan_hash:
+        raise ValueError("routing/continuation preparation audit plan mismatch")
+    for value in (source_review_package_hash, source_review_outcomes_hash):
+        if not re.fullmatch(r"[0-9a-f]{64}", value):
+            raise ValueError("routing/continuation source review hash is invalid")
+    inputs = regression_cases.get("inputs")
+    if not isinstance(inputs, Mapping):
+        raise TypeError("routing/continuation fixture inputs must be an object")
+    expected_bindings = {
+        "sample_manifest": corrected_plan.sample_manifest_hash,
+        "baseline_plan": baseline_plan.plan_hash,
+        "source_review_package": source_review_package_hash,
+        "source_review_outcomes": source_review_outcomes_hash,
+    }
+    for name, expected_hash in expected_bindings.items():
+        binding = inputs.get(name)
+        if not isinstance(binding, Mapping):
+            raise TypeError(f"routing/continuation fixture binding is invalid: {name}")
+        key = "identity_hash" if name in {"sample_manifest", "baseline_plan"} else "sha256"
+        if binding.get(key) != expected_hash:
+            raise ValueError(f"routing/continuation fixture binding drift: {name}")
+
+    cases = regression_cases.get("cases")
+    if not isinstance(cases, list) or len(cases) != 6:
+        raise ValueError("routing/continuation audit requires six closed cases")
+    results: list[ShadowRoutingContinuationResult] = []
+    unresolved: list[str] = []
+    for raw_case in cases:
+        if not isinstance(raw_case, Mapping):
+            raise TypeError("routing/continuation case must be an object")
+        review_row_id = str(raw_case.get("review_row_id") or "")
+        sample_id = str(raw_case.get("sample_id") or "")
+        chapter_task = ChapterTask(str(raw_case.get("chapter_task") or ""))
+        field_id = str(raw_case.get("field_id") or "")
+        expected_result = str(raw_case.get("expected_result") or "")
+        physical_pages = tuple(int(page) for page in raw_case.get("physical_pages", ()))
+        expected_page_hashes = {
+            int(page): str(value)
+            for page, value in dict(raw_case.get("page_hashes") or {}).items()
+        }
+        if set(expected_page_hashes) != set(physical_pages):
+            raise ValueError(f"routing/continuation page hashes mismatch: {review_row_id}")
+
+        def matching(
+            plan: ShadowEvidencePlan,
+            *,
+            bound_sample_id: str = sample_id,
+            bound_chapter_task: ChapterTask = chapter_task,
+            bound_field_id: str = field_id,
+            bound_physical_pages: tuple[int, ...] = physical_pages,
+            bound_expected_result: str = expected_result,
+        ) -> tuple[Any, ...]:
+            report = plan.report_by_id(bound_sample_id)
+            return tuple(
+                scope
+                for task in report.tasks
+                if task.chapter_task == bound_chapter_task
+                for scope in task.request_scopes
+                if bound_field_id in scope.field_ids
+                and (
+                    any(page in scope.pages for page in bound_physical_pages)
+                    if bound_expected_result == "reject_assignment"
+                    else set(bound_physical_pages).issubset(scope.pages)
+                )
+            )
+
+        baseline_matches = matching(baseline_plan)
+        corrected_matches = matching(corrected_plan)
+        observed_hashes = {
+            int(page): page_hash
+            for plan in (baseline_plan, corrected_plan)
+            for selection in plan.scope_selections.get(sample_id, ())
+            for page, page_hash in selection.page_hashes.items()
+            if int(page) in physical_pages
+        }
+        if observed_hashes != expected_page_hashes:
+            raise ValueError(f"routing/continuation source page drift: {review_row_id}")
+        if expected_result == "reject_assignment":
+            passed = bool(baseline_matches) and not corrected_matches
+            status = "resolved"
+        elif expected_result == "require_pages":
+            passed = bool(corrected_matches)
+            status = "resolved"
+        elif expected_result == "preserve_assignment":
+            passed = bool(baseline_matches) and bool(corrected_matches)
+            status = "preserved"
+        else:
+            raise ValueError(
+                f"unsupported routing/continuation expectation: {expected_result}"
+            )
+        if not passed:
+            unresolved.append(review_row_id)
+        results.append(
+            ShadowRoutingContinuationResult(
+                review_row_id=review_row_id,
+                sample_id=sample_id,
+                chapter_task=chapter_task,
+                field_id=field_id,
+                expected_result=expected_result,
+                physical_pages=physical_pages,
+                baseline_scope_ids=tuple(scope.scope_id for scope in baseline_matches),
+                corrected_scope_ids=tuple(scope.scope_id for scope in corrected_matches),
+                corrected_scope_pages=tuple(scope.pages for scope in corrected_matches),
+                status=status,
+            )
+        )
+    if unresolved:
+        raise ValueError(f"routing/continuation cases remain unresolved: {unresolved}")
+    payload = {
+        "schema_version": SHADOW_ROUTING_CONTINUATION_AUDIT_SCHEMA,
+        "audit_id": audit_id,
+        "sample_manifest_hash": corrected_plan.sample_manifest_hash,
+        "baseline_plan_hash": baseline_plan.plan_hash,
+        "corrected_plan_hash": corrected_plan.plan_hash,
+        "preparation_audit_hash": preparation_audit.audit_hash,
+        "fixture_hash": str(fixture_hash),
+        "source_review_package_hash": source_review_package_hash,
+        "source_review_outcomes_hash": source_review_outcomes_hash,
+        "report_count": preparation_audit.report_count,
+        "results": tuple(results),
+        "unresolved_finding_ids": (),
+        "provider_calls": 0,
+        "cohort_replay_performed": False,
+        "historical_artifacts_mutated": False,
+        "production_paths_opened": (),
+        "created_at": _utc_now(),
+        "production_authorization": PRODUCTION_AUTHORIZATION,
+    }
+    return ShadowRoutingContinuationCorrectionAudit(
+        **payload,
+        audit_hash=_payload_hash(payload),
+    )
+
+
 def build_shadow_scope_refinement_audit(
     *,
     audit_id: str,
@@ -1816,6 +2204,7 @@ def write_shadow_evidence_artifact(
         | ShadowEvidencePreparationAudit
         | ShadowScopeRefinementAudit
         | ShadowOwnerClosureCorrectionAudit
+        | ShadowRoutingContinuationCorrectionAudit
     ),
 ) -> None:
     destination = Path(path)
@@ -1956,8 +2345,16 @@ def _select_scope_ranges(
         for page in bounded_pages
         if not (
             chapter_task == ChapterTask.EXTRACT_BUSINESS_OVERVIEW
-            and _BUSINESS_OVERVIEW_CROSS_REFERENCE_PAGE_PATTERN.search(
-                re.sub(r"\s+", "", str(sections_by_page[page].text))
+            and (
+                _business_overview_cross_reference_only(
+                    str(sections_by_page[page].text)
+                )
+                or _subsidiary_financial_table_without_issuer_overview(
+                    str(sections_by_page[page].text)
+                )
+                or _business_overview_statistical_table_only(
+                    str(sections_by_page[page].text)
+                )
             )
         )
     )
@@ -2036,14 +2433,15 @@ def _scope_field_ids(
         )
     ):
         matched &= {"production_capacity"}
-    if chapter_task == ChapterTask.EXTRACT_SEGMENT_FINANCIALS and (
-        "segment_dimension" not in matched
-    ):
-        matched -= {
-            "operating_revenue",
-            "operating_cost",
-            "gross_margin_reported",
-        }
+    if chapter_task == ChapterTask.EXTRACT_SEGMENT_FINANCIALS:
+        if not _SEGMENT_OWNER_PATTERN.search(compact):
+            matched.clear()
+        elif "segment_dimension" not in matched:
+            matched -= {
+                "operating_revenue",
+                "operating_cost",
+                "gross_margin_reported",
+            }
     return tuple(field_id for field_id in chapter_fields if field_id in matched)
 
 

@@ -27,6 +27,7 @@ from research.company_profile.shadow_batch_service import (
     validate_shadow_replay_admission,
 )
 from research.company_profile.shadow_evidence import (
+    SHADOW_EVIDENCE_PLAN_VERSION,
     ShadowEvidencePreparer,
     build_shadow_preparation_audit,
     load_shadow_evidence_plan,
@@ -992,6 +993,33 @@ def test_owner_closure_replay_mode_and_output_identity_are_single_use(
         plan_version=contract.evidence_plan_version,
         batch_id=contract.batch_id,
     )
+    preparation_args = build_parser().parse_args(
+        [
+            "--mode",
+            "routing-continuation-preparation",
+            "--sample-manifest",
+            "manifest.json",
+            "--evidence-plan",
+            "plan.json",
+        ]
+    )
+    assert preparation_args.mode == "routing-continuation-preparation"
+    _validate_replay_mode(
+        mode=preparation_args.mode,
+        plan_version=contract.evidence_plan_version,
+        batch_id=None,
+    )
+    _validate_replay_mode(
+        mode="preparation-only",
+        plan_version=SHADOW_EVIDENCE_PLAN_VERSION,
+        batch_id=None,
+    )
+    with pytest.raises(ValueError, match="provider-free only"):
+        _validate_replay_mode(
+            mode="semantic-run",
+            plan_version=SHADOW_EVIDENCE_PLAN_VERSION,
+            batch_id="routing-continuation-bypass",
+        )
     with pytest.raises(ValueError, match="owner-closure batch identity requires"):
         _validate_replay_mode(
             mode="stability-semantic-replay",

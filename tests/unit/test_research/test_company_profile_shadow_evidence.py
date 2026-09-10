@@ -19,11 +19,13 @@ from research.company_profile.shadow_evidence import (
     ShadowEvidencePlanningError,
     ShadowEvidencePreparer,
     ShadowPlanningFailureCode,
+    ShadowRoutingContinuationCorrectionAudit,
     _bind_table_context_range,
     _chapter_owner_score,
     _scope_field_ids,
     _select_scope_ranges,
     build_shadow_preparation_audit,
+    build_shadow_routing_continuation_correction_audit,
     build_shadow_scope_refinement_audit,
     load_shadow_evidence_plan,
     load_shadow_preparation_audit,
@@ -49,6 +51,16 @@ PRECISION_CHANGE_ROOT = next(
     )
     if path.exists()
 )
+ROUTING_CONTINUATION_CHANGE_ROOT = (
+    REPOSITORY_ROOT
+    / "openspec/changes/repair-company-profile-shadow-evidence-routing-and-continuation"
+)
+OWNER_CLOSURE_REPLAY_ROOT = (
+    REPOSITORY_ROOT
+    / "openspec/changes/validate-company-profile-shadow-owner-closure-replay"
+)
+
+
 OWNER_REGRESSION_CHANGE_ROOT = next(
     path
     for path in (
@@ -414,6 +426,11 @@ def test_chapter_owner_score_rejects_reviewed_non_owner_shapes(
             "公司主要从事特种钢材制造，主要业务包括研发、生产和销售。",
         ),
         (
+            ChapterTask.EXTRACT_BUSINESS_OVERVIEW,
+            "principal_business",
+            "公司主营业务为高端耐火材料。",
+        ),
+        (
             ChapterTask.EXTRACT_SEGMENT_FINANCIALS,
             "segment_information",
             "分产品 营业收入 营业成本 毛利率 钢材产品 100 80 20%",
@@ -497,6 +514,106 @@ def test_chapter_owner_score_accepts_governed_owner_shapes(
     )
 
     assert _chapter_owner_score(chapter_task, (section,)) > 0
+
+
+def test_business_overview_rejects_subsidiary_financial_table_without_issuer_substance() -> None:
+    section = SimpleNamespace(
+        page_number=36,
+        section_key="principal_business",
+        selector_reasons=("structured_hint:主要业务",),
+        text=(
+            "九、主要控股参股公司分析 主要子公司及对公司净利润影响达10%以上\n"
+            "公司名称 公司类型 主要业务 注册资本 总资产 净资产 营业收入\n"
+            "营业利润 净利润 方大建科公司 子公司 主要业务为幕墙系统及材料"
+        ),
+    )
+
+    assert _chapter_owner_score(
+        ChapterTask.EXTRACT_BUSINESS_OVERVIEW, (section,)
+    ) == 0
+    assert _select_scope_ranges(
+        (section,),
+        direct_pages={36},
+        bounded_pages=(36,),
+        maximum_scopes=1,
+        chapter_task=ChapterTask.EXTRACT_BUSINESS_OVERVIEW,
+    ) == ()
+
+
+def test_business_overview_preserves_issuer_substance_on_page_with_subsidiary_table() -> None:
+    section = SimpleNamespace(
+        page_number=36,
+        section_key="principal_business",
+        selector_reasons=("heading_alias:principal_business:主要业务",),
+        text=(
+            "九、主要控股参股公司分析 公司名称 公司类型 主要业务 注册资本 "
+            "总资产 净资产 营业收入 营业利润 净利润。"
+            "本公司主要从事高端幕墙材料制造和轨道交通设备服务。"
+        ),
+    )
+
+    assert _chapter_owner_score(
+        ChapterTask.EXTRACT_BUSINESS_OVERVIEW, (section,)
+    ) > 0
+
+
+def test_segment_owner_rejects_partial_product_management_prose() -> None:
+    section = SimpleNamespace(
+        page_number=14,
+        section_key="production_sales_inventory",
+        selector_reasons=("structured_hint:分产品",),
+        text=(
+            "经营计划：部分产品市场价格同比下降。公司积极调整营销策略，"
+            "实现产销量双增、营业收入稳健增长，毛利率同比下降。"
+        ),
+    )
+
+    assert _chapter_owner_score(
+        ChapterTask.EXTRACT_SEGMENT_FINANCIALS, (section,)
+    ) == 0
+    assert _scope_field_ids(
+        ChapterTask.EXTRACT_SEGMENT_FINANCIALS, (section,)
+    ) == ()
+
+
+def test_material_owner_keeps_page_spanning_reuse_disclosure() -> None:
+    sections = (
+        SimpleNamespace(
+            page_number=15,
+            section_key="procurement_and_costs",
+            selector_reasons=("heading_alias:procurement_and_costs:采购模式",),
+            text="公司主要采取以产定采的采购模式，根据订单和库存确定采购量。",
+        ),
+        SimpleNamespace(
+            page_number=16,
+            section_key="principal_business",
+            selector_reasons=("bounded_context_window",),
+            text=(
+                "公司积极优化原料采购策略，推进原料替代，在保证产品质量的前提下，"
+                "优化提升役后耐火材料的再生"
+            ),
+        ),
+        SimpleNamespace(
+            page_number=17,
+            section_key="context",
+            selector_reasons=("bounded_context_window",),
+            text="循环利用，有效降低单位生产成本并提升资源利用效率。",
+        ),
+    )
+
+    assert _chapter_owner_score(
+        ChapterTask.EXTRACT_MATERIAL_INPUTS, (sections[1],)
+    ) > 0
+    assert _select_scope_ranges(
+        sections,
+        direct_pages={15, 16},
+        bounded_pages=(15, 16, 17),
+        maximum_scopes=1,
+        chapter_task=ChapterTask.EXTRACT_MATERIAL_INPUTS,
+    ) == ((15, 16, 17),)
+    assert _scope_field_ids(
+        ChapterTask.EXTRACT_MATERIAL_INPUTS, sections
+    ) == ("material_input",)
 
 
 def test_business_overview_scope_excludes_cross_reference_financial_page() -> None:
@@ -908,4 +1025,134 @@ def test_provider_free_precision_closure_audit_resolves_exact_reviewed_errors() 
             == hashlib.sha256(
                 review_rows[case["review_row_id"]]["source_quote"].encode()
             ).hexdigest()
+        )
+
+
+def test_routing_continuation_fixture_is_hash_bound_to_frozen_inputs() -> None:
+    fixture_path = (
+        ROUTING_CONTINUATION_CHANGE_ROOT
+        / "reviewed-routing-continuation-cases.v1.json"
+    )
+    fixture = json.loads(fixture_path.read_text(encoding="utf-8"))
+    fixture_without_hash = {
+        key: value for key, value in fixture.items() if key != "fixture_hash"
+    }
+
+    assert fixture["fixture_hash"] == _payload_hash(fixture_without_hash)
+    assert fixture["finding_counts"] == {
+        "confirmed_errors": 3,
+        "positive_controls": 3,
+    }
+    assert len(fixture["cases"]) == 6
+    assert fixture["provider_calls"] == 0
+    assert fixture["cohort_replay_performed"] is False
+    assert fixture["production_authorization"] == "not_authorized"
+
+    for binding in fixture["inputs"].values():
+        source = REPOSITORY_ROOT / binding["path"]
+        assert hashlib.sha256(source.read_bytes()).hexdigest() == binding["sha256"]
+
+    manifest = _manifest()
+    baseline = load_shadow_evidence_plan(
+        OWNER_CLOSURE_REPLAY_ROOT / "shadow-evidence-plan.v4.json"
+    )
+    assert (
+        fixture["inputs"]["sample_manifest"]["identity_hash"]
+        == manifest.manifest_hash
+    )
+    assert fixture["inputs"]["baseline_plan"]["identity_hash"] == baseline.plan_hash
+
+
+def test_routing_continuation_provider_free_artifacts_close_six_cases() -> None:
+    fixture = json.loads(
+        (
+            ROUTING_CONTINUATION_CHANGE_ROOT
+            / "reviewed-routing-continuation-cases.v1.json"
+        ).read_text(encoding="utf-8")
+    )
+    baseline = load_shadow_evidence_plan(
+        OWNER_CLOSURE_REPLAY_ROOT / "shadow-evidence-plan.v4.json"
+    )
+    corrected = load_shadow_evidence_plan(
+        ROUTING_CONTINUATION_CHANGE_ROOT / "shadow-evidence-plan.v5.json"
+    )
+    preparation = load_shadow_preparation_audit(
+        ROUTING_CONTINUATION_CHANGE_ROOT
+        / "provider-free-preparation-audit.v1.json"
+    )
+    audit_path = (
+        ROUTING_CONTINUATION_CHANGE_ROOT
+        / "routing-continuation-correction-audit.v1.json"
+    )
+    audit = ShadowRoutingContinuationCorrectionAudit.model_validate_json(
+        audit_path.read_text(encoding="utf-8")
+    )
+
+    assert corrected.plan_version == "manufacturing_materials_shadow.2026-09-10.5"
+    assert preparation.report_count == 20
+    assert preparation.planned_report_count == 20
+    assert preparation.evidence_traceability_rate == 1.0
+    assert audit.corrected_plan_hash == corrected.plan_hash
+    assert audit.preparation_audit_hash == preparation.audit_hash
+    assert audit.fixture_hash == fixture["fixture_hash"]
+    assert len(audit.results) == 6
+    assert sum(item.status == "resolved" for item in audit.results) == 4
+    assert sum(item.status == "preserved" for item in audit.results) == 2
+    assert audit.unresolved_finding_ids == ()
+    assert audit.provider_calls == 0
+    assert audit.cohort_replay_performed is False
+    assert audit.historical_artifacts_mutated is False
+    assert audit.production_paths_opened == ()
+    assert audit.production_authorization == "not_authorized"
+
+    def matching_pages(
+        sample_id: str,
+        chapter_task: ChapterTask,
+        field_id: str,
+    ) -> tuple[tuple[int, ...], ...]:
+        return tuple(
+            scope.pages
+            for task in corrected.report_by_id(sample_id).tasks
+            if task.chapter_task == chapter_task
+            for scope in task.request_scopes
+            if field_id in scope.field_ids
+        )
+
+    overview_pages = matching_pages(
+        "manufacturing-materials-shadow-000055-2025",
+        ChapterTask.EXTRACT_BUSINESS_OVERVIEW,
+        "business_overview_source",
+    )
+    assert overview_pages == ((24,),)
+    assert all(36 not in pages for pages in overview_pages)
+
+    segment_pages = matching_pages(
+        "manufacturing-materials-shadow-920016-2025",
+        ChapterTask.EXTRACT_SEGMENT_FINANCIALS,
+        "segment_dimension",
+    )
+    assert (19, 20, 21) in segment_pages
+    assert all(14 not in pages for pages in segment_pages)
+
+    material_pages = matching_pages(
+        "manufacturing-materials-shadow-920076-2025",
+        ChapterTask.EXTRACT_MATERIAL_INPUTS,
+        "material_input",
+    )
+    assert material_pages == ((15, 16, 17),)
+    assert matching_pages(
+        "manufacturing-materials-shadow-920033-2025",
+        ChapterTask.EXTRACT_MATERIAL_INPUTS,
+        "material_input",
+    ) == ((72,),)
+
+    with pytest.raises(ValueError, match="fixture binding drift"):
+        build_shadow_routing_continuation_correction_audit(
+            audit_id="routing-continuation-source-drift-test",
+            baseline_plan=baseline,
+            corrected_plan=corrected,
+            preparation_audit=preparation,
+            regression_cases=fixture,
+            source_review_package_hash="f" * 64,
+            source_review_outcomes_hash=audit.source_review_outcomes_hash,
         )

@@ -1,0 +1,126 @@
+{
+  "schema_version": "company_profile_shadow_routing_continuation_cases.v1",
+  "authoritative_batch_id": "manufacturing-materials-shadow-owner-closure-gemini-20260910-a",
+  "inputs": {
+    "sample_manifest": {
+      "path": "openspec/changes/archive/2026-09-09-validate-manufacturing-materials-company-profile-shadow-batch/shadow-manifest.v1.json",
+      "sha256": "ca6d301ff7fb3b21b206be5951965059c87a7e485121c98a24475e59bad0f215",
+      "identity_hash": "6f639739ef082e78dcb0c01a5ce40bab1645d8fdc027bece2dbef63652bae9e2"
+    },
+    "baseline_plan": {
+      "path": "openspec/changes/validate-company-profile-shadow-owner-closure-replay/shadow-evidence-plan.v4.json",
+      "sha256": "67cf61661400ede0b119109cfcf06a72788f123356e6b0550578eafeff0f2102",
+      "identity_hash": "067128f23c6434e6a19d58fa86e51d54befcd9606fbd169218706bd0dc14160a"
+    },
+    "source_review_package": {
+      "path": "openspec/changes/validate-company-profile-shadow-owner-closure-replay/source-text-review-package.v1.json",
+      "sha256": "124cb6d9750d93dc676a9316c0411d4e222f5348e5b55ad18cbc307b687c19b1"
+    },
+    "source_review_outcomes": {
+      "path": "openspec/changes/validate-company-profile-shadow-owner-closure-replay/source-text-review-outcomes.v1.json",
+      "sha256": "d2e7e39c40ee5b1853373cd1ff0a3dafab9ec688cccb8c250720c15418a5d524"
+    }
+  },
+  "finding_counts": {
+    "confirmed_errors": 3,
+    "positive_controls": 3
+  },
+  "cases": [
+    {
+      "review_row_id": "manufacturing-materials-shadow-000055-2025:business_overview-01:blocker:task_completion:business_overview-01",
+      "sample_id": "manufacturing-materials-shadow-000055-2025",
+      "chapter_task": "extract_business_overview",
+      "field_id": "business_overview_source",
+      "physical_pages": [
+        36
+      ],
+      "page_hashes": {
+        "36": "27729a83ac6eb4a9c59699509dfab51c716bd8a0e83b9ca2e1e54d2af0aae95c"
+      },
+      "source_shape_excerpt": "主要控股参股公司分析 / 公司名称 公司类型 主要业务 注册资本 总资产 净资产 营业收入 营业利润 净利润",
+      "expected_result": "reject_assignment"
+    },
+    {
+      "review_row_id": "manufacturing-materials-shadow-920016-2025:segment_financials-01:chapter_sample:coverage:segment_financials-01:segment_dimension",
+      "sample_id": "manufacturing-materials-shadow-920016-2025",
+      "chapter_task": "extract_segment_financials",
+      "field_id": "segment_dimension",
+      "physical_pages": [
+        14
+      ],
+      "page_hashes": {
+        "14": "433a508bb187238ba58f20b7f5fc87239a1d0fb619d3818017c77abc2aebf8fa"
+      },
+      "source_shape_excerpt": "经营计划 / 部分产品市场价格同比下降",
+      "expected_result": "reject_assignment"
+    },
+    {
+      "review_row_id": "manufacturing-materials-shadow-920076-2025:material_inputs-01:chapter_sample:coverage:material_inputs-01:material_input",
+      "sample_id": "manufacturing-materials-shadow-920076-2025",
+      "chapter_task": "extract_material_inputs",
+      "field_id": "material_input",
+      "physical_pages": [
+        15,
+        16,
+        17
+      ],
+      "page_hashes": {
+        "15": "7dbdb60d207f79de1e27eb9229128cab60efdfc4ae6c57a018dc724a8be7dcc5",
+        "16": "1b4260c47c1bbd746d491987ee8b92803418f19dc7ca8c5f91779560fe823cb4",
+        "17": "e7b42093ac173ea2e2b36cbb13fc1b7db9aa468aed5d401d41d762bedd3a4d1d"
+      },
+      "source_shape_excerpt": "优化提升役后耐火材料的再生 / 循环利用",
+      "expected_result": "require_pages"
+    },
+    {
+      "review_row_id": "control:000055-issuer-business-overview-page-24",
+      "sample_id": "manufacturing-materials-shadow-000055-2025",
+      "chapter_task": "extract_business_overview",
+      "field_id": "business_overview_source",
+      "physical_pages": [
+        24
+      ],
+      "page_hashes": {
+        "24": "3278581614664cc6f305c72d1a3b14b3bed31da244b3fc0476ddff9cc71fc128"
+      },
+      "source_shape_excerpt": "公司的商业开发项目主要采用自行开发，部分销售、部分自持的经营模式",
+      "expected_result": "require_pages"
+    },
+    {
+      "review_row_id": "control:920016-valid-segment-owner-pages-19-21",
+      "sample_id": "manufacturing-materials-shadow-920016-2025",
+      "chapter_task": "extract_segment_financials",
+      "field_id": "segment_dimension",
+      "physical_pages": [
+        19,
+        20,
+        21
+      ],
+      "page_hashes": {
+        "19": "94bfe8b6eda4c03ec410afc167088cd7ab4b9f19a84b2d05883e92ea04b900e2",
+        "20": "e7bea7aa4dd41c762522e6b425a5e3dd783b1a5e8c83e7cb6aaa412ceeaf854c",
+        "21": "17ea56be258a4794a1e57a40a0a227115324c0f70a643c0a0a20683c01da6e68"
+      },
+      "source_shape_excerpt": "按产品分类分析 / 分产品 营业收入 营业成本 毛利率",
+      "expected_result": "preserve_assignment"
+    },
+    {
+      "review_row_id": "control:920033-material-legal-empty-page-72",
+      "sample_id": "manufacturing-materials-shadow-920033-2025",
+      "chapter_task": "extract_material_inputs",
+      "field_id": "material_input",
+      "physical_pages": [
+        72
+      ],
+      "page_hashes": {
+        "72": "2416a9a79f55c361dc90f367651c3f7d658f198692ce463bfcfdd49ab328edf7"
+      },
+      "source_shape_excerpt": "主要原材料及能源情况 / 不适用",
+      "expected_result": "preserve_assignment"
+    }
+  ],
+  "provider_calls": 0,
+  "cohort_replay_performed": false,
+  "production_authorization": "not_authorized",
+  "fixture_hash": "ebf37767a998e3efa8b19ea618bd35aa08ecd3f3a428c56cb04e6289de5cf535"
+}

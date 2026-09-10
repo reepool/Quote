@@ -1,0 +1,146 @@
+{
+  "schema_version": "company_profile_shadow_routing_continuation_audit.v1",
+  "audit_id": "manufacturing-materials-shadow-routing-continuation-correction-20260910-a",
+  "sample_manifest_hash": "6f639739ef082e78dcb0c01a5ce40bab1645d8fdc027bece2dbef63652bae9e2",
+  "baseline_plan_hash": "067128f23c6434e6a19d58fa86e51d54befcd9606fbd169218706bd0dc14160a",
+  "corrected_plan_hash": "d091262f4350ff88779293900f0deb21d7c48da85a3102d7a947fa861ec4eafe",
+  "preparation_audit_hash": "a6a6d1880c5ae58b5f602329ff3c4280e78c60c5a00abb7edf61384dc6c60511",
+  "fixture_hash": "ebf37767a998e3efa8b19ea618bd35aa08ecd3f3a428c56cb04e6289de5cf535",
+  "source_review_package_hash": "124cb6d9750d93dc676a9316c0411d4e222f5348e5b55ad18cbc307b687c19b1",
+  "source_review_outcomes_hash": "d2e7e39c40ee5b1853373cd1ff0a3dafab9ec688cccb8c250720c15418a5d524",
+  "report_count": 20,
+  "results": [
+    {
+      "review_row_id": "manufacturing-materials-shadow-000055-2025:business_overview-01:blocker:task_completion:business_overview-01",
+      "sample_id": "manufacturing-materials-shadow-000055-2025",
+      "chapter_task": "extract_business_overview",
+      "field_id": "business_overview_source",
+      "expected_result": "reject_assignment",
+      "physical_pages": [
+        36
+      ],
+      "baseline_scope_ids": [
+        "business_overview-01"
+      ],
+      "corrected_scope_ids": [],
+      "corrected_scope_pages": [],
+      "status": "resolved"
+    },
+    {
+      "review_row_id": "manufacturing-materials-shadow-920016-2025:segment_financials-01:chapter_sample:coverage:segment_financials-01:segment_dimension",
+      "sample_id": "manufacturing-materials-shadow-920016-2025",
+      "chapter_task": "extract_segment_financials",
+      "field_id": "segment_dimension",
+      "expected_result": "reject_assignment",
+      "physical_pages": [
+        14
+      ],
+      "baseline_scope_ids": [
+        "segment_financials-01"
+      ],
+      "corrected_scope_ids": [],
+      "corrected_scope_pages": [],
+      "status": "resolved"
+    },
+    {
+      "review_row_id": "manufacturing-materials-shadow-920076-2025:material_inputs-01:chapter_sample:coverage:material_inputs-01:material_input",
+      "sample_id": "manufacturing-materials-shadow-920076-2025",
+      "chapter_task": "extract_material_inputs",
+      "field_id": "material_input",
+      "expected_result": "require_pages",
+      "physical_pages": [
+        15,
+        16,
+        17
+      ],
+      "baseline_scope_ids": [],
+      "corrected_scope_ids": [
+        "material_inputs-01"
+      ],
+      "corrected_scope_pages": [
+        [
+          15,
+          16,
+          17
+        ]
+      ],
+      "status": "resolved"
+    },
+    {
+      "review_row_id": "control:000055-issuer-business-overview-page-24",
+      "sample_id": "manufacturing-materials-shadow-000055-2025",
+      "chapter_task": "extract_business_overview",
+      "field_id": "business_overview_source",
+      "expected_result": "require_pages",
+      "physical_pages": [
+        24
+      ],
+      "baseline_scope_ids": [],
+      "corrected_scope_ids": [
+        "business_overview-01"
+      ],
+      "corrected_scope_pages": [
+        [
+          24
+        ]
+      ],
+      "status": "resolved"
+    },
+    {
+      "review_row_id": "control:920016-valid-segment-owner-pages-19-21",
+      "sample_id": "manufacturing-materials-shadow-920016-2025",
+      "chapter_task": "extract_segment_financials",
+      "field_id": "segment_dimension",
+      "expected_result": "preserve_assignment",
+      "physical_pages": [
+        19,
+        20,
+        21
+      ],
+      "baseline_scope_ids": [
+        "segment_financials-02"
+      ],
+      "corrected_scope_ids": [
+        "segment_financials-01"
+      ],
+      "corrected_scope_pages": [
+        [
+          19,
+          20,
+          21
+        ]
+      ],
+      "status": "preserved"
+    },
+    {
+      "review_row_id": "control:920033-material-legal-empty-page-72",
+      "sample_id": "manufacturing-materials-shadow-920033-2025",
+      "chapter_task": "extract_material_inputs",
+      "field_id": "material_input",
+      "expected_result": "preserve_assignment",
+      "physical_pages": [
+        72
+      ],
+      "baseline_scope_ids": [
+        "material_inputs-01"
+      ],
+      "corrected_scope_ids": [
+        "material_inputs-01"
+      ],
+      "corrected_scope_pages": [
+        [
+          72
+        ]
+      ],
+      "status": "preserved"
+    }
+  ],
+  "unresolved_finding_ids": [],
+  "provider_calls": 0,
+  "cohort_replay_performed": false,
+  "historical_artifacts_mutated": false,
+  "production_paths_opened": [],
+  "created_at": "2026-09-10T13:26:45.794398+00:00",
+  "audit_hash": "a16ebfc4bf836bbc002ead7a9d1fed5d5d1c1c12212993ad608a920916f76e22",
+  "production_authorization": "not_authorized"
+}

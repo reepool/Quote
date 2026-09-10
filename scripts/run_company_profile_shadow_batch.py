@@ -28,10 +28,12 @@ from research.company_profile.shadow_batch_service import (
     validate_shadow_replay_admission,
 )
 from research.company_profile.shadow_evidence import (
+    SHADOW_EVIDENCE_PLAN_VERSION,
     ShadowEvidencePlanner,
     ShadowEvidencePreparer,
     build_shadow_owner_closure_correction_audit,
     build_shadow_preparation_audit,
+    build_shadow_routing_continuation_correction_audit,
     build_shadow_scope_refinement_audit,
     load_shadow_evidence_plan,
     load_shadow_preparation_audit,
@@ -159,6 +161,7 @@ def build_parser() -> argparse.ArgumentParser:
         choices=(
             "preparation-only",
             "owner-closure-preparation",
+            "routing-continuation-preparation",
             "scope-refinement-replay",
             "semantic-run",
             "refined-semantic-replay",
@@ -180,6 +183,9 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--precision-closure-audit", type=Path)
     parser.add_argument("--owner-regression-cases", type=Path)
     parser.add_argument("--owner-regression-closure-audit", type=Path)
+    parser.add_argument("--routing-continuation-cases", type=Path)
+    parser.add_argument("--source-review-package", type=Path)
+    parser.add_argument("--source-review-outcomes", type=Path)
     parser.add_argument("--generated-preparation-audit", type=Path)
     parser.add_argument("--generated-correction-audit", type=Path)
     parser.add_argument("--output-root", type=Path)
@@ -213,6 +219,81 @@ def main(argv: Sequence[str] | None = None) -> int:
         plan_version=plan.plan_version,
         batch_id=args.batch_id,
     )
+    if args.mode == "routing-continuation-preparation":
+        required = {
+            "generated Evidence plan": args.refined_evidence_plan,
+            "generated preparation audit": args.generated_preparation_audit,
+            "generated correction audit": args.generated_correction_audit,
+            "routing/continuation cases": args.routing_continuation_cases,
+            "source review package": args.source_review_package,
+            "source review outcomes": args.source_review_outcomes,
+        }
+        missing = [name for name, path in required.items() if path is None]
+        if missing:
+            raise ValueError(
+                "routing-continuation-preparation requires " + ", ".join(missing)
+            )
+        planner = ShadowEvidencePlanner()
+        corrected_plan = planner.build(
+            manifest,
+            expected_artifact_hashes=plan.pdf_artifact_hashes,
+        )
+        corrected_prepared = ShadowEvidencePreparer(planner=planner).prepare(
+            manifest=manifest,
+            plan=corrected_plan,
+        )
+        preparation_audit = build_shadow_preparation_audit(
+            corrected_plan,
+            audit_id=(
+                "manufacturing-materials-shadow-routing-continuation-"
+                "preparation-20260910-a"
+            ),
+            prepared=corrected_prepared,
+        )
+        regression_cases = json.loads(
+            args.routing_continuation_cases.read_text(encoding="utf-8")
+        )
+        correction_audit = build_shadow_routing_continuation_correction_audit(
+            audit_id=(
+                "manufacturing-materials-shadow-routing-continuation-"
+                "correction-20260910-a"
+            ),
+            baseline_plan=plan,
+            corrected_plan=corrected_plan,
+            preparation_audit=preparation_audit,
+            regression_cases=regression_cases,
+            source_review_package_hash=_file_sha256(args.source_review_package),
+            source_review_outcomes_hash=_file_sha256(args.source_review_outcomes),
+        )
+        write_shadow_evidence_artifact(args.refined_evidence_plan, corrected_plan)
+        write_shadow_evidence_artifact(
+            args.generated_preparation_audit,
+            preparation_audit,
+        )
+        write_shadow_evidence_artifact(
+            args.generated_correction_audit,
+            correction_audit,
+        )
+        print(
+            json.dumps(
+                {
+                    "plan_version": corrected_plan.plan_version,
+                    "plan_hash": corrected_plan.plan_hash,
+                    "preparation_audit_hash": preparation_audit.audit_hash,
+                    "correction_audit_hash": correction_audit.audit_hash,
+                    "prepared_report_count": preparation_audit.report_count,
+                    "routing_continuation_case_count": len(
+                        correction_audit.results
+                    ),
+                    "provider_calls": 0,
+                    "cohort_replay_performed": False,
+                    "production_authorization": "not_authorized",
+                },
+                ensure_ascii=False,
+                indent=2,
+            )
+        )
+        return 0
     if args.mode == "owner-closure-preparation":
         required = {
             "generated Evidence plan": args.refined_evidence_plan,
@@ -553,6 +634,7 @@ def _validate_replay_mode(
     external_batch = EXTERNAL_PRECISION_SHADOW_REPLAY_CONTRACT.batch_id
     owner_plan = OWNER_CLOSURE_SHADOW_REPLAY_CONTRACT.evidence_plan_version
     owner_batch = OWNER_CLOSURE_SHADOW_REPLAY_CONTRACT.batch_id
+    routing_continuation_plan = SHADOW_EVIDENCE_PLAN_VERSION
     provider_bearing_legacy_modes = {"semantic-run", "refined-semantic-replay"}
     if (
         plan_version == stability_plan or batch_id == stability_batch
@@ -575,12 +657,22 @@ def _validate_replay_mode(
         raise ValueError(
             "owner-closure batch identity requires owner-closure-semantic-replay"
         )
+    if (
+        plan_version == routing_continuation_plan
+        and mode != "preparation-only"
+    ):
+        raise ValueError(
+            "routing/continuation v5 Evidence plan is provider-free only; "
+            "a later provider replay requires a separate contract"
+        )
     if plan_version == owner_plan and mode not in {
         "preparation-only",
         "owner-closure-semantic-replay",
+        "routing-continuation-preparation",
     }:
         raise ValueError(
-            "owner-closure v4 Evidence plan requires owner-closure-semantic-replay"
+            "owner-closure v4 Evidence plan requires its frozen replay or "
+            "routing-continuation preparation mode"
         )
 
 
