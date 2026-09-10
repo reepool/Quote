@@ -32,5 +32,5 @@
 ## 5. Validate and close
 
 - [x] 5.1 `openspec validate add-tencent-a-share-daily-backup-source --strict` 通过
-- [ ] 5.2 Review 本 change 范围内改动（scoped），发现按 Blocking / Non-blocking / Unrelated 分类处理
-- [ ] 5.3 `git diff --check` 干净；仅提交本 change 相关文件并推送
+- [x] 5.2 Review 本 change 范围内改动（scoped），发现按 Blocking / Non-blocking / Unrelated 分类处理
+- [x] 5.3 `git diff --check` 干净；仅提交本 change 相关文件并推送
