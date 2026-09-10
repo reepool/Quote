@@ -97,6 +97,25 @@ STABILITY_SHADOW_REPLAY_CONTRACT = ShadowReplayContract(
     timeout_seconds=SHADOW_TIMEOUT_SECONDS,
     max_provider_calls=SHADOW_MAX_PROVIDER_CALLS,
 )
+PRECISION_CLOSURE_SHADOW_REPLAY_CONTRACT = ShadowReplayContract(
+    batch_id="manufacturing-materials-shadow-precision-closure-gemini-20260910-a",
+    sample_manifest_hash=STABILITY_SHADOW_REPLAY_CONTRACT.sample_manifest_hash,
+    evidence_plan_version=STABILITY_SHADOW_REPLAY_CONTRACT.evidence_plan_version,
+    evidence_plan_hash=STABILITY_SHADOW_REPLAY_CONTRACT.evidence_plan_hash,
+    preparation_audit_hash=STABILITY_SHADOW_REPLAY_CONTRACT.preparation_audit_hash,
+    correction_audit_hash=STABILITY_SHADOW_REPLAY_CONTRACT.correction_audit_hash,
+    supporting_artifact_hashes={
+        **STABILITY_SHADOW_REPLAY_CONTRACT.supporting_artifact_hashes,
+        "precision_closure_audit": (
+            "a7dcdcc1b7d59cb2093b3043d92b20b0a0f673364c1016bfa364ac8960689f87"
+        ),
+    },
+    primary_logical_profile=STABILITY_SHADOW_REPLAY_CONTRACT.primary_logical_profile,
+    extract_max_output_tokens=STABILITY_SHADOW_REPLAY_CONTRACT.extract_max_output_tokens,
+    verify_max_output_tokens=STABILITY_SHADOW_REPLAY_CONTRACT.verify_max_output_tokens,
+    timeout_seconds=STABILITY_SHADOW_REPLAY_CONTRACT.timeout_seconds,
+    max_provider_calls=STABILITY_SHADOW_REPLAY_CONTRACT.max_provider_calls,
+)
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -109,6 +128,7 @@ def build_parser() -> argparse.ArgumentParser:
             "semantic-run",
             "refined-semantic-replay",
             "stability-semantic-replay",
+            "precision-closure-semantic-replay",
         ),
         required=True,
     )
@@ -120,6 +140,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--correction-audit", type=Path)
     parser.add_argument("--execution-stability-fixture", type=Path)
     parser.add_argument("--stability-probe", type=Path)
+    parser.add_argument("--precision-closure-audit", type=Path)
     parser.add_argument("--output-root", type=Path)
     parser.add_argument("--batch-id")
     parser.add_argument("--provider-route", default=SHADOW_PRIMARY_PROFILE)
@@ -256,15 +277,21 @@ def main(argv: Sequence[str] | None = None) -> int:
             prepared=prepared,
             output_root=args.output_root,
         )
-    elif args.mode == "stability-semantic-replay":
+    elif args.mode in {
+        "stability-semantic-replay",
+        "precision-closure-semantic-replay",
+    }:
+        precision_closure = args.mode == "precision-closure-semantic-replay"
         required = {
             "correction audit": args.correction_audit,
             "execution stability fixture": args.execution_stability_fixture,
             "stability probe": args.stability_probe,
         }
+        if precision_closure:
+            required["precision closure audit"] = args.precision_closure_audit
         missing = [name for name, path in required.items() if path is None]
         if missing:
-            raise ValueError("stability-semantic-replay requires " + ", ".join(missing))
+            raise ValueError(f"{args.mode} requires " + ", ".join(missing))
         correction_audit = json.loads(args.correction_audit.read_text(encoding="utf-8"))
         supporting_hashes = {
             "execution_stability_fixture": _file_sha256(
@@ -272,8 +299,16 @@ def main(argv: Sequence[str] | None = None) -> int:
             ),
             "bounded_repair_probe": _file_sha256(args.stability_probe),
         }
+        if precision_closure:
+            supporting_hashes["precision_closure_audit"] = _file_sha256(
+                args.precision_closure_audit
+            )
         validate_shadow_replay_admission(
-            contract=STABILITY_SHADOW_REPLAY_CONTRACT,
+            contract=(
+                PRECISION_CLOSURE_SHADOW_REPLAY_CONTRACT
+                if precision_closure
+                else STABILITY_SHADOW_REPLAY_CONTRACT
+            ),
             batch_id=args.batch_id,
             primary_logical_profile=args.provider_route,
             extract_max_output_tokens=args.extract_max_output_tokens,
@@ -367,6 +402,7 @@ def _validate_replay_mode(
 ) -> None:
     stability_plan = STABILITY_SHADOW_REPLAY_CONTRACT.evidence_plan_version
     stability_batch = STABILITY_SHADOW_REPLAY_CONTRACT.batch_id
+    precision_batch = PRECISION_CLOSURE_SHADOW_REPLAY_CONTRACT.batch_id
     provider_bearing_legacy_modes = {"semantic-run", "refined-semantic-replay"}
     if (
         plan_version == stability_plan or batch_id == stability_batch
@@ -374,6 +410,11 @@ def _validate_replay_mode(
         raise ValueError(
             "corrected v3 Evidence plan and stability batch identity require "
             "stability-semantic-replay"
+        )
+    if batch_id == precision_batch and mode != "precision-closure-semantic-replay":
+        raise ValueError(
+            "precision-closure batch identity requires "
+            "precision-closure-semantic-replay"
         )
 
 

@@ -34,6 +34,7 @@ from research.company_profile.shadow_evidence import (
 )
 from research.company_profile.stage5_provider import _segment_numeric_occurrence_count
 from scripts.run_company_profile_shadow_batch import (
+    PRECISION_CLOSURE_SHADOW_REPLAY_CONTRACT,
     STABILITY_SHADOW_REPLAY_CONTRACT,
     _validate_replay_mode,
     build_parser,
@@ -55,6 +56,10 @@ CORRECTION_CHANGE = (
 STABILITY_CHANGE = (
     REPOSITORY_ROOT
     / "openspec/changes/archive/2026-09-09-stabilize-company-profile-shadow-llm-execution"
+)
+PRECISION_CLOSURE_CHANGE = (
+    REPOSITORY_ROOT
+    / "openspec/changes/archive/2026-09-10-close-company-profile-shadow-reviewed-precision-errors"
 )
 BASELINE_BATCH = (
     REPOSITORY_ROOT
@@ -90,6 +95,19 @@ def _stability_replay_inputs():
         ),
     }
     prepared = ShadowEvidencePreparer().prepare(manifest=manifest, plan=plan)
+    return manifest, plan, preparation, correction, supporting, prepared
+
+
+def _precision_closure_replay_inputs():
+    manifest, plan, preparation, correction, supporting, prepared = (
+        _stability_replay_inputs()
+    )
+    supporting = {
+        **supporting,
+        "precision_closure_audit": _file_sha256(
+            PRECISION_CLOSURE_CHANGE / "provider-free-precision-closure-audit.v1.json"
+        ),
+    }
     return manifest, plan, preparation, correction, supporting, prepared
 
 
@@ -532,4 +550,150 @@ def test_replay_comparison_rejects_incomplete_input(tmp_path: Path) -> None:
             baseline_readiness_path=BASELINE_CHANGE
             / "empirical-readiness-audit.v3.json",
             refined_readiness_path=refined / "readiness-audit.json",
+        )
+
+
+def test_precision_closure_replay_admission_binds_closure_evidence(
+    tmp_path: Path,
+) -> None:
+    manifest, plan, preparation, correction, supporting, prepared = (
+        _precision_closure_replay_inputs()
+    )
+    contract = PRECISION_CLOSURE_SHADOW_REPLAY_CONTRACT
+
+    validate_shadow_replay_admission(
+        contract=contract,
+        batch_id=contract.batch_id,
+        primary_logical_profile=contract.primary_logical_profile,
+        extract_max_output_tokens=contract.extract_max_output_tokens,
+        verify_max_output_tokens=contract.verify_max_output_tokens,
+        timeout_seconds=contract.timeout_seconds,
+        max_provider_calls=contract.max_provider_calls,
+        manifest=manifest,
+        evidence_plan=plan,
+        preparation_audit=preparation,
+        correction_audit=correction,
+        supporting_artifact_hashes=supporting,
+        prepared=prepared,
+        output_root=tmp_path,
+    )
+
+    assert contract.supporting_artifact_hashes["precision_closure_audit"] == (
+        _file_sha256(
+            PRECISION_CLOSURE_CHANGE / "provider-free-precision-closure-audit.v1.json"
+        )
+    )
+    assert contract.production_authorization == "not_authorized"
+
+
+def test_precision_closure_replay_operator_mode_is_single_use() -> None:
+    contract = PRECISION_CLOSURE_SHADOW_REPLAY_CONTRACT
+    args = build_parser().parse_args(
+        [
+            "--mode",
+            "precision-closure-semantic-replay",
+            "--sample-manifest",
+            "manifest.json",
+            "--evidence-plan",
+            "plan.json",
+            "--batch-id",
+            contract.batch_id,
+        ]
+    )
+    assert args.mode == "precision-closure-semantic-replay"
+
+    _validate_replay_mode(
+        mode=args.mode,
+        plan_version=contract.evidence_plan_version,
+        batch_id=contract.batch_id,
+    )
+    with pytest.raises(ValueError, match="requires precision-closure-semantic-replay"):
+        _validate_replay_mode(
+            mode="stability-semantic-replay",
+            plan_version=contract.evidence_plan_version,
+            batch_id=contract.batch_id,
+        )
+
+
+@pytest.mark.parametrize(
+    ("override", "expected_drift"),
+    [
+        ({"batch_id": STABILITY_SHADOW_REPLAY_CONTRACT.batch_id}, "batch_id"),
+        (
+            {"primary_logical_profile": "semantic_extraction__scorpio_grok"},
+            "primary_logical_profile",
+        ),
+        ({"extract_max_output_tokens": 19_999}, "extract_max_output_tokens"),
+        (
+            {
+                "supporting_artifact_hashes": {
+                    **STABILITY_SHADOW_REPLAY_CONTRACT.supporting_artifact_hashes
+                }
+            },
+            "supporting_artifact_hashes",
+        ),
+    ],
+)
+def test_precision_closure_replay_admission_rejects_contract_drift(
+    tmp_path: Path,
+    override: dict[str, object],
+    expected_drift: str,
+) -> None:
+    manifest, plan, preparation, correction, supporting, prepared = (
+        _precision_closure_replay_inputs()
+    )
+    contract = PRECISION_CLOSURE_SHADOW_REPLAY_CONTRACT
+    actual = {
+        "batch_id": contract.batch_id,
+        "primary_logical_profile": contract.primary_logical_profile,
+        "extract_max_output_tokens": contract.extract_max_output_tokens,
+        "verify_max_output_tokens": contract.verify_max_output_tokens,
+        "timeout_seconds": contract.timeout_seconds,
+        "max_provider_calls": contract.max_provider_calls,
+        "supporting_artifact_hashes": supporting,
+    }
+    actual.update(override)
+
+    with pytest.raises(ValueError, match=expected_drift):
+        validate_shadow_replay_admission(
+            contract=contract,
+            batch_id=str(actual["batch_id"]),
+            primary_logical_profile=str(actual["primary_logical_profile"]),
+            extract_max_output_tokens=int(actual["extract_max_output_tokens"]),
+            verify_max_output_tokens=int(actual["verify_max_output_tokens"]),
+            timeout_seconds=float(actual["timeout_seconds"]),
+            max_provider_calls=int(actual["max_provider_calls"]),
+            manifest=manifest,
+            evidence_plan=plan,
+            preparation_audit=preparation,
+            correction_audit=correction,
+            supporting_artifact_hashes=actual["supporting_artifact_hashes"],
+            prepared=prepared,
+            output_root=tmp_path,
+        )
+
+
+def test_precision_closure_replay_rejects_existing_output(tmp_path: Path) -> None:
+    manifest, plan, preparation, correction, supporting, prepared = (
+        _precision_closure_replay_inputs()
+    )
+    contract = PRECISION_CLOSURE_SHADOW_REPLAY_CONTRACT
+    (tmp_path / f"batch-{contract.batch_id}").mkdir()
+
+    with pytest.raises(FileExistsError, match="shadow batch already exists"):
+        validate_shadow_replay_admission(
+            contract=contract,
+            batch_id=contract.batch_id,
+            primary_logical_profile=contract.primary_logical_profile,
+            extract_max_output_tokens=contract.extract_max_output_tokens,
+            verify_max_output_tokens=contract.verify_max_output_tokens,
+            timeout_seconds=contract.timeout_seconds,
+            max_provider_calls=contract.max_provider_calls,
+            manifest=manifest,
+            evidence_plan=plan,
+            preparation_audit=preparation,
+            correction_audit=correction,
+            supporting_artifact_hashes=supporting,
+            prepared=prepared,
+            output_root=tmp_path,
         )
