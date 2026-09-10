@@ -1,0 +1,2558 @@
+[
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:business_overview-01:blocker:task_completion:business_overview-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The incomplete report-local scope is conservatively retained as a blocker and is not treated as an accepted or production-authorized fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:business_overview-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600121-SH:manufacturing-materials-shadow-600121-2025:business_overview-01:coverage:explicit_activity",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:business_overview-01:chapter_sample:stage5-217e7f4be87774d1d854b496",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The current source quote, physical page, Evidence identity, and runtime target support the sampled accepted fact or legal-empty disposition."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:segment_financials-01:blocker:task_completion:segment_financials-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The incomplete report-local scope is conservatively retained as a blocker and is not treated as an accepted or production-authorized fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600121-SH:manufacturing-materials-shadow-600121-2025:segment_financials-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600121-SH:manufacturing-materials-shadow-600121-2025:segment_financials-01:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600121-SH:manufacturing-materials-shadow-600121-2025:segment_financials-01:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600121-SH:manufacturing-materials-shadow-600121-2025:segment_financials-01:coverage:operating_cost",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600121-SH:manufacturing-materials-shadow-600121-2025:segment_financials-01:coverage:gross_margin_reported",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:segment_financials-02:blocker:task_completion:segment_financials-02",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The incomplete report-local scope is conservatively retained as a blocker and is not treated as an accepted or production-authorized fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600121-SH:manufacturing-materials-shadow-600121-2025:segment_financials-02:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600121-SH:manufacturing-materials-shadow-600121-2025:segment_financials-02:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600121-SH:manufacturing-materials-shadow-600121-2025:segment_financials-02:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600121-SH:manufacturing-materials-shadow-600121-2025:segment_financials-02:coverage:operating_cost",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:operating_quantities-01:chapter_sample:stage5-4dfe5512dfb14925fb5cad58",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The current source quote, physical page, Evidence identity, and runtime target support the sampled accepted fact or legal-empty disposition."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:material_inputs-01:chapter_sample:stage5-890c5cbf9573b0b6d4812e8d",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The current source quote, physical page, Evidence identity, and runtime target support the sampled accepted fact or legal-empty disposition."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:counterparties_and_concentration-01:blocker:task_completion:counterparties_and_concentration-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The incomplete report-local scope is conservatively retained as a blocker and is not treated as an accepted or production-authorized fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:counterparties_and_concentration-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600121-SH:manufacturing-materials-shadow-600121-2025:counterparties_and_concentration-01:coverage:counterparty_relationship",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:counterparties_and_concentration-01:chapter_sample:stage5-b2243cc697170c3fe9673002",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The current source quote, physical page, Evidence identity, and runtime target support the sampled accepted fact or legal-empty disposition."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:counterparties_and_concentration-02:blocker:task_completion:counterparties_and_concentration-02",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The incomplete report-local scope is conservatively retained as a blocker and is not treated as an accepted or production-authorized fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:counterparties_and_concentration-02:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600121-SH:manufacturing-materials-shadow-600121-2025:counterparties_and_concentration-02:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:counterparties_and_concentration-02:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600121-SH:manufacturing-materials-shadow-600121-2025:counterparties_and_concentration-02:coverage:counterparty_relationship",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:counterparties_and_concentration-02:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600121-SH:manufacturing-materials-shadow-600121-2025:counterparties_and_concentration-02:coverage:customer_concentration",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:counterparties_and_concentration-02:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600121-SH:manufacturing-materials-shadow-600121-2025:counterparties_and_concentration-02:coverage:supplier_concentration",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:business_regime-01:chapter_sample:coverage:business_regime-01:business_regime",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The current source quote, physical page, Evidence identity, and runtime target support the sampled accepted fact or legal-empty disposition."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600022-2025:business_overview-01:chapter_sample:stage5-2469ae35ddc2a7f16d0c95b8",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The current source quote, physical page, Evidence identity, and runtime target support the sampled accepted fact or legal-empty disposition."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600022-2025:segment_financials-01:blocker:task_completion:segment_financials-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The incomplete report-local scope is conservatively retained as a blocker and is not treated as an accepted or production-authorized fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600022-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600022-SH:manufacturing-materials-shadow-600022-2025:segment_financials-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600022-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600022-SH:manufacturing-materials-shadow-600022-2025:segment_financials-01:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600022-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600022-SH:manufacturing-materials-shadow-600022-2025:segment_financials-01:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600022-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600022-SH:manufacturing-materials-shadow-600022-2025:segment_financials-01:coverage:operating_cost",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600022-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600022-SH:manufacturing-materials-shadow-600022-2025:segment_financials-01:coverage:gross_margin_reported",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600022-2025:segment_financials-02:blocker:task_completion:segment_financials-02",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The incomplete report-local scope is conservatively retained as a blocker and is not treated as an accepted or production-authorized fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600022-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600022-SH:manufacturing-materials-shadow-600022-2025:segment_financials-02:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600022-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600022-SH:manufacturing-materials-shadow-600022-2025:segment_financials-02:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600022-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600022-SH:manufacturing-materials-shadow-600022-2025:segment_financials-02:coverage:operating_cost",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600022-2025:operating_quantities-01:chapter_sample:stage5-921dfc2585442898ef21ed03",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The current source quote, physical page, Evidence identity, and runtime target support the sampled accepted fact or legal-empty disposition."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600022-2025:material_inputs-01:chapter_sample:coverage:material_inputs-01:material_input",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The current source quote, physical page, Evidence identity, and runtime target support the sampled accepted fact or legal-empty disposition."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600022-2025:counterparties_and_concentration-01:chapter_sample:stage5-932e5fe176bf1248c4fa90fe",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The current source quote, physical page, Evidence identity, and runtime target support the sampled accepted fact or legal-empty disposition."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600022-2025:business_regime-01:chapter_sample:stage5-f953b226227b433124753e0d",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The current source quote, physical page, Evidence identity, and runtime target support the sampled accepted fact or legal-empty disposition."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:business_overview-01:blocker:task_completion:business_overview-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The incomplete report-local scope is conservatively retained as a blocker and is not treated as an accepted or production-authorized fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:business_overview-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600256-SH:manufacturing-materials-shadow-600256-2025:business_overview-01:coverage:business_overview_source",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:business_overview-01:chapter_sample:stage5-941489e44e413ab4e42558a3",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The current source quote, physical page, Evidence identity, and runtime target support the sampled accepted fact or legal-empty disposition."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:segment_financials-01:chapter_sample:stage5-a8e2a268ec2337fa573811c8",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The current source quote, physical page, Evidence identity, and runtime target support the sampled accepted fact or legal-empty disposition."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:operating_quantities-01:blocker:task_completion:operating_quantities-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The incomplete report-local scope is conservatively retained as a blocker and is not treated as an accepted or production-authorized fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600256-SH:manufacturing-materials-shadow-600256-2025:operating_quantities-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600256-SH:manufacturing-materials-shadow-600256-2025:operating_quantities-01:coverage:production_capacity",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600256-SH:manufacturing-materials-shadow-600256-2025:operating_quantities-01:coverage:production_volume",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600256-SH:manufacturing-materials-shadow-600256-2025:operating_quantities-01:coverage:sales_volume",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600256-SH:manufacturing-materials-shadow-600256-2025:operating_quantities-01:coverage:inventory_volume",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:operating_quantities-02:blocker:task_completion:operating_quantities-02",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The incomplete report-local scope is conservatively retained as a blocker and is not treated as an accepted or production-authorized fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:operating_quantities-02:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600256-SH:manufacturing-materials-shadow-600256-2025:operating_quantities-02:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:operating_quantities-02:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600256-SH:manufacturing-materials-shadow-600256-2025:operating_quantities-02:coverage:production_capacity",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:operating_quantities-02:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600256-SH:manufacturing-materials-shadow-600256-2025:operating_quantities-02:coverage:production_volume",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:operating_quantities-02:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600256-SH:manufacturing-materials-shadow-600256-2025:operating_quantities-02:coverage:sales_volume",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:operating_quantities-02:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600256-SH:manufacturing-materials-shadow-600256-2025:operating_quantities-02:coverage:inventory_volume",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:material_inputs-01:chapter_sample:stage5-58d6d53ae7668ce7b80c3e5c",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The current source quote, physical page, Evidence identity, and runtime target support the sampled accepted fact or legal-empty disposition."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:counterparties_and_concentration-01:chapter_sample:stage5-af8c8d545acdb3ea692de5ec",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The current source quote, physical page, Evidence identity, and runtime target support the sampled accepted fact or legal-empty disposition."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:business_regime-01:blocker:task_completion:business_regime-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The incomplete report-local scope is conservatively retained as a blocker and is not treated as an accepted or production-authorized fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:business_regime-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600256-SH:manufacturing-materials-shadow-600256-2025:business_regime-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:business_regime-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600256-SH:manufacturing-materials-shadow-600256-2025:business_regime-01:coverage:business_regime",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600063-2025:business_overview-01:chapter_sample:stage5-87dec6392081670f94710311",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The current source quote, physical page, Evidence identity, and runtime target support the sampled accepted fact or legal-empty disposition."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600063-2025:segment_financials-01:blocker:task_completion:segment_financials-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The incomplete report-local scope is conservatively retained as a blocker and is not treated as an accepted or production-authorized fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600063-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600063-SH:manufacturing-materials-shadow-600063-2025:segment_financials-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600063-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600063-SH:manufacturing-materials-shadow-600063-2025:segment_financials-01:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600063-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600063-SH:manufacturing-materials-shadow-600063-2025:segment_financials-01:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600063-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600063-SH:manufacturing-materials-shadow-600063-2025:segment_financials-01:coverage:operating_cost",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600063-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600063-SH:manufacturing-materials-shadow-600063-2025:segment_financials-01:coverage:gross_margin_reported",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600063-2025:segment_financials-02:chapter_sample:stage5-7697e7c3e7237fa37d89fa66",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The current source quote, physical page, Evidence identity, and runtime target support the sampled accepted fact or legal-empty disposition."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600063-2025:operating_quantities-01:chapter_sample:stage5-5cf0614fd5f5f73a7f871794",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The current source quote, physical page, Evidence identity, and runtime target support the sampled accepted fact or legal-empty disposition."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600063-2025:operating_quantities-02:blocker:task_completion:operating_quantities-02",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The incomplete report-local scope is conservatively retained as a blocker and is not treated as an accepted or production-authorized fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600063-2025:operating_quantities-02:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600063-SH:manufacturing-materials-shadow-600063-2025:operating_quantities-02:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600063-2025:operating_quantities-02:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600063-SH:manufacturing-materials-shadow-600063-2025:operating_quantities-02:coverage:production_capacity",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600063-2025:operating_quantities-02:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600063-SH:manufacturing-materials-shadow-600063-2025:operating_quantities-02:coverage:capacity_under_construction",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600063-2025:operating_quantities-02:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600063-SH:manufacturing-materials-shadow-600063-2025:operating_quantities-02:coverage:production_volume",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600063-2025:operating_quantities-02:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600063-SH:manufacturing-materials-shadow-600063-2025:operating_quantities-02:coverage:sales_volume",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600063-2025:operating_quantities-02:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600063-SH:manufacturing-materials-shadow-600063-2025:operating_quantities-02:coverage:inventory_volume",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600063-2025:material_inputs-01:chapter_sample:stage5-957de624ab3d84751e83d7e6",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The current source quote, physical page, Evidence identity, and runtime target support the sampled accepted fact or legal-empty disposition."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600063-2025:counterparties_and_concentration-01:chapter_sample:stage5-7c148d0de727ab8b13374a51",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The current source quote, physical page, Evidence identity, and runtime target support the sampled accepted fact or legal-empty disposition."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600063-2025:business_regime-01:chapter_sample:coverage:business_regime-01:business_regime",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The current source quote, physical page, Evidence identity, and runtime target support the sampled accepted fact or legal-empty disposition."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600111-2025:business_overview-01:blocker:task_completion:business_overview-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The incomplete report-local scope is conservatively retained as a blocker and is not treated as an accepted or production-authorized fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600111-2025:business_overview-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600111-SH:manufacturing-materials-shadow-600111-2025:business_overview-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600111-2025:business_overview-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600111-SH:manufacturing-materials-shadow-600111-2025:business_overview-01:coverage:business_overview_source",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600111-2025:business_overview-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600111-SH:manufacturing-materials-shadow-600111-2025:business_overview-01:coverage:explicit_activity",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600111-2025:segment_financials-01:blocker:task_completion:segment_financials-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The incomplete report-local scope is conservatively retained as a blocker and is not treated as an accepted or production-authorized fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600111-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600111-SH:manufacturing-materials-shadow-600111-2025:segment_financials-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600111-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600111-SH:manufacturing-materials-shadow-600111-2025:segment_financials-01:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600111-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600111-SH:manufacturing-materials-shadow-600111-2025:segment_financials-01:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600111-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600111-SH:manufacturing-materials-shadow-600111-2025:segment_financials-01:coverage:operating_cost",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600111-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600111-SH:manufacturing-materials-shadow-600111-2025:segment_financials-01:coverage:gross_margin_reported",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600111-2025:segment_financials-02:chapter_sample:stage5-17027c3e8832dbe39f92b7d8",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The current source quote, physical page, Evidence identity, and runtime target support the sampled accepted fact or legal-empty disposition."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600111-2025:operating_quantities-01:blocker:task_completion:operating_quantities-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The incomplete report-local scope is conservatively retained as a blocker and is not treated as an accepted or production-authorized fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600111-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600111-SH:manufacturing-materials-shadow-600111-2025:operating_quantities-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600111-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600111-SH:manufacturing-materials-shadow-600111-2025:operating_quantities-01:coverage:production_volume",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600111-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600111-SH:manufacturing-materials-shadow-600111-2025:operating_quantities-01:coverage:sales_volume",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600111-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600111-SH:manufacturing-materials-shadow-600111-2025:operating_quantities-01:coverage:inventory_volume",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600111-2025:material_inputs-01:chapter_sample:stage5-dfcb7768c2cf25ab30479ddd",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The current source quote, physical page, Evidence identity, and runtime target support the sampled accepted fact or legal-empty disposition."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600111-2025:counterparties_and_concentration-01:blocker:task_completion:counterparties_and_concentration-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The incomplete report-local scope is conservatively retained as a blocker and is not treated as an accepted or production-authorized fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600111-2025:counterparties_and_concentration-01:unresolved:stage5-d88369aaf74f089d798d8030",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600111-2025:counterparties_and_concentration-01:unresolved:stage5-bf8768e6a22a8c049afe38e6",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600111-2025:counterparties_and_concentration-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600111-SH:manufacturing-materials-shadow-600111-2025:counterparties_and_concentration-01:coverage:supplier_concentration",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600111-2025:counterparties_and_concentration-01:chapter_sample:stage5-073f40a44850c06b32dc89ed",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The current source quote, physical page, Evidence identity, and runtime target support the sampled accepted fact or legal-empty disposition."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600111-2025:business_regime-01:blocker:task_completion:business_regime-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The incomplete report-local scope is conservatively retained as a blocker and is not treated as an accepted or production-authorized fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600111-2025:business_regime-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600111-SH:manufacturing-materials-shadow-600111-2025:business_regime-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600111-2025:business_regime-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600111-SH:manufacturing-materials-shadow-600111-2025:business_regime-01:coverage:business_regime",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:business_overview-01:chapter_sample:stage5-9e180ad1fc86927c86836fb7",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The current source quote, physical page, Evidence identity, and runtime target support the sampled accepted fact or legal-empty disposition."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:segment_financials-01:blocker:task_completion:segment_financials-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The incomplete report-local scope is conservatively retained as a blocker and is not treated as an accepted or production-authorized fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600176-SH:manufacturing-materials-shadow-600176-2025:segment_financials-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600176-SH:manufacturing-materials-shadow-600176-2025:segment_financials-01:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600176-SH:manufacturing-materials-shadow-600176-2025:segment_financials-01:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600176-SH:manufacturing-materials-shadow-600176-2025:segment_financials-01:coverage:operating_cost",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600176-SH:manufacturing-materials-shadow-600176-2025:segment_financials-01:coverage:gross_margin_reported",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:segment_financials-02:blocker:task_completion:segment_financials-02",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The incomplete report-local scope is conservatively retained as a blocker and is not treated as an accepted or production-authorized fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600176-SH:manufacturing-materials-shadow-600176-2025:segment_financials-02:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600176-SH:manufacturing-materials-shadow-600176-2025:segment_financials-02:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:operating_quantities-01:blocker:task_completion:operating_quantities-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The incomplete report-local scope is conservatively retained as a blocker and is not treated as an accepted or production-authorized fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600176-SH:manufacturing-materials-shadow-600176-2025:operating_quantities-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600176-SH:manufacturing-materials-shadow-600176-2025:operating_quantities-01:coverage:production_capacity",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600176-SH:manufacturing-materials-shadow-600176-2025:operating_quantities-01:coverage:production_volume",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600176-SH:manufacturing-materials-shadow-600176-2025:operating_quantities-01:coverage:sales_volume",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:operating_quantities-02:blocker:task_completion:operating_quantities-02",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The incomplete report-local scope is conservatively retained as a blocker and is not treated as an accepted or production-authorized fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:operating_quantities-02:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600176-SH:manufacturing-materials-shadow-600176-2025:operating_quantities-02:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:operating_quantities-02:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600176-SH:manufacturing-materials-shadow-600176-2025:operating_quantities-02:coverage:production_capacity",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:operating_quantities-02:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600176-SH:manufacturing-materials-shadow-600176-2025:operating_quantities-02:coverage:production_volume",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:operating_quantities-02:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600176-SH:manufacturing-materials-shadow-600176-2025:operating_quantities-02:coverage:sales_volume",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:operating_quantities-02:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600176-SH:manufacturing-materials-shadow-600176-2025:operating_quantities-02:coverage:inventory_volume",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:material_inputs-01:chapter_sample:stage5-8006cd1b659af4bead2079dc",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The current source quote, physical page, Evidence identity, and runtime target support the sampled accepted fact or legal-empty disposition."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:counterparties_and_concentration-01:unresolved:stage5-d0134b747fa393579a432323",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:counterparties_and_concentration-01:unresolved:stage5-29d978027927702945e534a0",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:counterparties_and_concentration-01:chapter_sample:stage5-70389f6cfd11747019600335",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The current source quote, physical page, Evidence identity, and runtime target support the sampled accepted fact or legal-empty disposition."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:business_regime-01:chapter_sample:coverage:business_regime-01:business_regime",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The current source quote, physical page, Evidence identity, and runtime target support the sampled accepted fact or legal-empty disposition."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:business_overview-01:blocker:task_completion:business_overview-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The incomplete report-local scope is conservatively retained as a blocker and is not treated as an accepted or production-authorized fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:business_overview-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600075-SH:manufacturing-materials-shadow-600075-2025:business_overview-01:coverage:explicit_activity",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:business_overview-01:chapter_sample:stage5-5973387c301686c71b71f08c",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The current source quote, physical page, Evidence identity, and runtime target support the sampled accepted fact or legal-empty disposition."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:segment_financials-01:blocker:task_completion:segment_financials-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The incomplete report-local scope is conservatively retained as a blocker and is not treated as an accepted or production-authorized fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600075-SH:manufacturing-materials-shadow-600075-2025:segment_financials-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600075-SH:manufacturing-materials-shadow-600075-2025:segment_financials-01:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600075-SH:manufacturing-materials-shadow-600075-2025:segment_financials-01:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600075-SH:manufacturing-materials-shadow-600075-2025:segment_financials-01:coverage:operating_cost",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600075-SH:manufacturing-materials-shadow-600075-2025:segment_financials-01:coverage:gross_margin_reported",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:segment_financials-02:blocker:task_completion:segment_financials-02",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The incomplete report-local scope is conservatively retained as a blocker and is not treated as an accepted or production-authorized fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600075-SH:manufacturing-materials-shadow-600075-2025:segment_financials-02:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600075-SH:manufacturing-materials-shadow-600075-2025:segment_financials-02:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600075-SH:manufacturing-materials-shadow-600075-2025:segment_financials-02:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600075-SH:manufacturing-materials-shadow-600075-2025:segment_financials-02:coverage:operating_cost",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600075-SH:manufacturing-materials-shadow-600075-2025:segment_financials-02:coverage:gross_margin_reported",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:operating_quantities-01:blocker:task_completion:operating_quantities-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The incomplete report-local scope is conservatively retained as a blocker and is not treated as an accepted or production-authorized fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600075-SH:manufacturing-materials-shadow-600075-2025:operating_quantities-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600075-SH:manufacturing-materials-shadow-600075-2025:operating_quantities-01:coverage:production_capacity",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600075-SH:manufacturing-materials-shadow-600075-2025:operating_quantities-01:coverage:capacity_under_construction",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600075-SH:manufacturing-materials-shadow-600075-2025:operating_quantities-01:coverage:production_volume",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600075-SH:manufacturing-materials-shadow-600075-2025:operating_quantities-01:coverage:sales_volume",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600075-SH:manufacturing-materials-shadow-600075-2025:operating_quantities-01:coverage:inventory_volume",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:operating_quantities-02:chapter_sample:stage5-e10bf312257e48e6b63f2795",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The current source quote, physical page, Evidence identity, and runtime target support the sampled accepted fact or legal-empty disposition."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:material_inputs-01:chapter_sample:stage5-0cd3b9982124092ebeaa2a66",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The current source quote, physical page, Evidence identity, and runtime target support the sampled accepted fact or legal-empty disposition."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:counterparties_and_concentration-01:chapter_sample:stage5-6beaf69e104edc7d78284466",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The current source quote, physical page, Evidence identity, and runtime target support the sampled accepted fact or legal-empty disposition."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:business_regime-01:blocker:task_completion:business_regime-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The incomplete report-local scope is conservatively retained as a blocker and is not treated as an accepted or production-authorized fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:business_regime-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600075-SH:manufacturing-materials-shadow-600075-2025:business_regime-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:business_regime-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-600075-SH:manufacturing-materials-shadow-600075-2025:business_regime-01:coverage:business_regime",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000552-2025:business_overview-01:chapter_sample:stage5-78b587a9b83b1820802a1713",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The current source quote, physical page, Evidence identity, and runtime target support the sampled accepted fact or legal-empty disposition."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000552-2025:segment_financials-01:blocker:task_completion:segment_financials-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The incomplete report-local scope is conservatively retained as a blocker and is not treated as an accepted or production-authorized fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000552-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-000552-SZ:manufacturing-materials-shadow-000552-2025:segment_financials-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000552-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-000552-SZ:manufacturing-materials-shadow-000552-2025:segment_financials-01:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000552-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-000552-SZ:manufacturing-materials-shadow-000552-2025:segment_financials-01:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000552-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-000552-SZ:manufacturing-materials-shadow-000552-2025:segment_financials-01:coverage:operating_cost",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000552-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-000552-SZ:manufacturing-materials-shadow-000552-2025:segment_financials-01:coverage:gross_margin_reported",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000552-2025:segment_financials-02:chapter_sample:stage5-6965bd21b7b1a7d25ee6260a",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The current source quote, physical page, Evidence identity, and runtime target support the sampled accepted fact or legal-empty disposition."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000552-2025:operating_quantities-01:blocker:task_completion:operating_quantities-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The incomplete report-local scope is conservatively retained as a blocker and is not treated as an accepted or production-authorized fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000552-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-000552-SZ:manufacturing-materials-shadow-000552-2025:operating_quantities-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000552-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-000552-SZ:manufacturing-materials-shadow-000552-2025:operating_quantities-01:coverage:production_capacity",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000552-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-000552-SZ:manufacturing-materials-shadow-000552-2025:operating_quantities-01:coverage:production_volume",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000552-2025:operating_quantities-02:chapter_sample:stage5-22fe8298a0890a8d09646e3b",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The current source quote, physical page, Evidence identity, and runtime target support the sampled accepted fact or legal-empty disposition."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000552-2025:material_inputs-01:chapter_sample:stage5-8fd99069d72a603a300814e1",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The current source quote, physical page, Evidence identity, and runtime target support the sampled accepted fact or legal-empty disposition."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000552-2025:counterparties_and_concentration-01:chapter_sample:stage5-68d2a89a17ddddd4cf957aa6",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The current source quote, physical page, Evidence identity, and runtime target support the sampled accepted fact or legal-empty disposition."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000552-2025:business_regime-01:blocker:task_completion:business_regime-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The incomplete report-local scope is conservatively retained as a blocker and is not treated as an accepted or production-authorized fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000552-2025:business_regime-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-000552-SZ:manufacturing-materials-shadow-000552-2025:business_regime-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000552-2025:business_regime-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-000552-SZ:manufacturing-materials-shadow-000552-2025:business_regime-01:coverage:business_regime",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:business_overview-01:chapter_sample:stage5-b1a936a4d5cc29f51e577603",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The current source quote, physical page, Evidence identity, and runtime target support the sampled accepted fact or legal-empty disposition."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:segment_financials-01:blocker:task_completion:segment_financials-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The incomplete report-local scope is conservatively retained as a blocker and is not treated as an accepted or production-authorized fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-000629-SZ:manufacturing-materials-shadow-000629-2025:segment_financials-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-000629-SZ:manufacturing-materials-shadow-000629-2025:segment_financials-01:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-000629-SZ:manufacturing-materials-shadow-000629-2025:segment_financials-01:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-000629-SZ:manufacturing-materials-shadow-000629-2025:segment_financials-01:coverage:operating_cost",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-000629-SZ:manufacturing-materials-shadow-000629-2025:segment_financials-01:coverage:gross_margin_reported",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:segment_financials-02:blocker:task_completion:segment_financials-02",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The incomplete report-local scope is conservatively retained as a blocker and is not treated as an accepted or production-authorized fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-000629-SZ:manufacturing-materials-shadow-000629-2025:segment_financials-02:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-000629-SZ:manufacturing-materials-shadow-000629-2025:segment_financials-02:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-000629-SZ:manufacturing-materials-shadow-000629-2025:segment_financials-02:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-000629-SZ:manufacturing-materials-shadow-000629-2025:segment_financials-02:coverage:operating_cost",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:operating_quantities-01:chapter_sample:stage5-b4edb2215558179039fa41d4",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The current source quote, physical page, Evidence identity, and runtime target support the sampled accepted fact or legal-empty disposition."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:material_inputs-01:chapter_sample:stage5-223cc4ebebbc3067ef7ba12b",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The current source quote, physical page, Evidence identity, and runtime target support the sampled accepted fact or legal-empty disposition."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:counterparties_and_concentration-01:blocker:task_completion:counterparties_and_concentration-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The incomplete report-local scope is conservatively retained as a blocker and is not treated as an accepted or production-authorized fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:counterparties_and_concentration-01:unresolved:stage5-258a790c8e7ecca2df6ad673",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:counterparties_and_concentration-01:unresolved:stage5-4f61abe4223e8115b1ff23a0",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:counterparties_and_concentration-01:unresolved:stage5-abd18c3f77799feda966cc85",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:counterparties_and_concentration-01:unresolved:stage5-4dd1ca755d4e2e6587e0440b",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:counterparties_and_concentration-01:unresolved:stage5-72aaf75cfd641dc8247d0291",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:counterparties_and_concentration-01:unresolved:stage5-6db1657a217c03e1e2fe4368",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:counterparties_and_concentration-01:unresolved:stage5-1c06bbf6efe594857fbcc37b",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:counterparties_and_concentration-01:unresolved:stage5-2d5df6d9bfeb39e1e40e6dff",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:counterparties_and_concentration-01:unresolved:stage5-675ce54425bcb006089852fb",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:counterparties_and_concentration-01:unresolved:stage5-d4f07b38335b00351ab00859",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:counterparties_and_concentration-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-000629-SZ:manufacturing-materials-shadow-000629-2025:counterparties_and_concentration-01:coverage:counterparty_relationship",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:counterparties_and_concentration-01:chapter_sample:stage5-8dbb3fc5429e468eb9eab5bd",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The current source quote, physical page, Evidence identity, and runtime target support the sampled accepted fact or legal-empty disposition."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:business_regime-01:chapter_sample:coverage:business_regime-01:business_regime",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The current source quote, physical page, Evidence identity, and runtime target support the sampled accepted fact or legal-empty disposition."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000059-2025:business_overview-01:chapter_sample:stage5-1f12a970d82f7316e12e1e4f",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The current source quote, physical page, Evidence identity, and runtime target support the sampled accepted fact or legal-empty disposition."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000059-2025:segment_financials-01:blocker:task_completion:segment_financials-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The incomplete report-local scope is conservatively retained as a blocker and is not treated as an accepted or production-authorized fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000059-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-000059-SZ:manufacturing-materials-shadow-000059-2025:segment_financials-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000059-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-000059-SZ:manufacturing-materials-shadow-000059-2025:segment_financials-01:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000059-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-000059-SZ:manufacturing-materials-shadow-000059-2025:segment_financials-01:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000059-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-000059-SZ:manufacturing-materials-shadow-000059-2025:segment_financials-01:coverage:operating_cost",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000059-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-000059-SZ:manufacturing-materials-shadow-000059-2025:segment_financials-01:coverage:gross_margin_reported",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000059-2025:segment_financials-02:blocker:task_completion:segment_financials-02",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The incomplete report-local scope is conservatively retained as a blocker and is not treated as an accepted or production-authorized fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000059-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-000059-SZ:manufacturing-materials-shadow-000059-2025:segment_financials-02:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000059-2025:operating_quantities-01:chapter_sample:stage5-3f231f1c1ff1b104fa3445c7",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The current source quote, physical page, Evidence identity, and runtime target support the sampled accepted fact or legal-empty disposition."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000059-2025:material_inputs-01:chapter_sample:stage5-8c1a33022e2e3b82c3136ff0",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The current source quote, physical page, Evidence identity, and runtime target support the sampled accepted fact or legal-empty disposition."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000059-2025:counterparties_and_concentration-01:chapter_sample:stage5-9b2fe0fd5281968b50e8b1c3",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The current source quote, physical page, Evidence identity, and runtime target support the sampled accepted fact or legal-empty disposition."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000059-2025:business_regime-01:chapter_sample:coverage:business_regime-01:business_regime",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The current source quote, physical page, Evidence identity, and runtime target support the sampled accepted fact or legal-empty disposition."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:business_overview-01:blocker:task_completion:business_overview-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The incomplete report-local scope is conservatively retained as a blocker and is not treated as an accepted or production-authorized fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:business_overview-01:unresolved:stage5-3c42ca36f7387cab49def558",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:business_overview-01:unresolved:stage5-97e0a33272667b55066cdb07",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:business_overview-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-000408-SZ:manufacturing-materials-shadow-000408-2025:business_overview-01:coverage:explicit_activity",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:business_overview-01:chapter_sample:stage5-1a3e34274506ff1cc2ff8981",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The current source quote, physical page, Evidence identity, and runtime target support the sampled accepted fact or legal-empty disposition."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:segment_financials-01:blocker:task_completion:segment_financials-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The incomplete report-local scope is conservatively retained as a blocker and is not treated as an accepted or production-authorized fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-000408-SZ:manufacturing-materials-shadow-000408-2025:segment_financials-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-000408-SZ:manufacturing-materials-shadow-000408-2025:segment_financials-01:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-000408-SZ:manufacturing-materials-shadow-000408-2025:segment_financials-01:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-000408-SZ:manufacturing-materials-shadow-000408-2025:segment_financials-01:coverage:operating_cost",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-000408-SZ:manufacturing-materials-shadow-000408-2025:segment_financials-01:coverage:gross_margin_reported",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:segment_financials-02:blocker:task_completion:segment_financials-02",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The incomplete report-local scope is conservatively retained as a blocker and is not treated as an accepted or production-authorized fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-000408-SZ:manufacturing-materials-shadow-000408-2025:segment_financials-02:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-000408-SZ:manufacturing-materials-shadow-000408-2025:segment_financials-02:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-000408-SZ:manufacturing-materials-shadow-000408-2025:segment_financials-02:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-000408-SZ:manufacturing-materials-shadow-000408-2025:segment_financials-02:coverage:operating_cost",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:operating_quantities-01:blocker:task_completion:operating_quantities-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The incomplete report-local scope is conservatively retained as a blocker and is not treated as an accepted or production-authorized fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-000408-SZ:manufacturing-materials-shadow-000408-2025:operating_quantities-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-000408-SZ:manufacturing-materials-shadow-000408-2025:operating_quantities-01:coverage:production_capacity",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-000408-SZ:manufacturing-materials-shadow-000408-2025:operating_quantities-01:coverage:capacity_under_construction",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-000408-SZ:manufacturing-materials-shadow-000408-2025:operating_quantities-01:coverage:capacity_utilization",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-000408-SZ:manufacturing-materials-shadow-000408-2025:operating_quantities-01:coverage:production_volume",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:operating_quantities-02:blocker:task_completion:operating_quantities-02",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The incomplete report-local scope is conservatively retained as a blocker and is not treated as an accepted or production-authorized fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:operating_quantities-02:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-000408-SZ:manufacturing-materials-shadow-000408-2025:operating_quantities-02:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:operating_quantities-02:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-000408-SZ:manufacturing-materials-shadow-000408-2025:operating_quantities-02:coverage:production_capacity",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:operating_quantities-02:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-000408-SZ:manufacturing-materials-shadow-000408-2025:operating_quantities-02:coverage:capacity_under_construction",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:operating_quantities-02:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-000408-SZ:manufacturing-materials-shadow-000408-2025:operating_quantities-02:coverage:capacity_utilization",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:operating_quantities-02:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-000408-SZ:manufacturing-materials-shadow-000408-2025:operating_quantities-02:coverage:production_volume",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:operating_quantities-02:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-000408-SZ:manufacturing-materials-shadow-000408-2025:operating_quantities-02:coverage:sales_volume",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:material_inputs-01:chapter_sample:stage5-8a1b30bd8805f527b3893e6b",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The current source quote, physical page, Evidence identity, and runtime target support the sampled accepted fact or legal-empty disposition."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:counterparties_and_concentration-01:chapter_sample:stage5-200286f7496d4c6807648cd6",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The current source quote, physical page, Evidence identity, and runtime target support the sampled accepted fact or legal-empty disposition."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:business_regime-01:chapter_sample:stage5-5ba755b74f370349f3798860",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The current source quote, physical page, Evidence identity, and runtime target support the sampled accepted fact or legal-empty disposition."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000060-2025:business_overview-01:blocker:task_completion:business_overview-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The incomplete report-local scope is conservatively retained as a blocker and is not treated as an accepted or production-authorized fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000060-2025:business_overview-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-000060-SZ:manufacturing-materials-shadow-000060-2025:business_overview-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000060-2025:business_overview-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-000060-SZ:manufacturing-materials-shadow-000060-2025:business_overview-01:coverage:business_overview_source",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000060-2025:business_overview-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-000060-SZ:manufacturing-materials-shadow-000060-2025:business_overview-01:coverage:explicit_activity",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000060-2025:segment_financials-01:blocker:task_completion:segment_financials-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The incomplete report-local scope is conservatively retained as a blocker and is not treated as an accepted or production-authorized fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000060-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-000060-SZ:manufacturing-materials-shadow-000060-2025:segment_financials-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000060-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-000060-SZ:manufacturing-materials-shadow-000060-2025:segment_financials-01:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000060-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-000060-SZ:manufacturing-materials-shadow-000060-2025:segment_financials-01:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000060-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-000060-SZ:manufacturing-materials-shadow-000060-2025:segment_financials-01:coverage:operating_cost",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000060-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-000060-SZ:manufacturing-materials-shadow-000060-2025:segment_financials-01:coverage:gross_margin_reported",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000060-2025:segment_financials-02:blocker:task_completion:segment_financials-02",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The incomplete report-local scope is conservatively retained as a blocker and is not treated as an accepted or production-authorized fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000060-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-000060-SZ:manufacturing-materials-shadow-000060-2025:segment_financials-02:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000060-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-000060-SZ:manufacturing-materials-shadow-000060-2025:segment_financials-02:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000060-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-000060-SZ:manufacturing-materials-shadow-000060-2025:segment_financials-02:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000060-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-000060-SZ:manufacturing-materials-shadow-000060-2025:segment_financials-02:coverage:operating_cost",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000060-2025:operating_quantities-01:chapter_sample:stage5-4012ad1b5212b3af52faed56",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The current source quote, physical page, Evidence identity, and runtime target support the sampled accepted fact or legal-empty disposition."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000060-2025:material_inputs-01:chapter_sample:coverage:material_inputs-01:material_input",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The current source quote, physical page, Evidence identity, and runtime target support the sampled accepted fact or legal-empty disposition."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000060-2025:counterparties_and_concentration-01:blocker:task_completion:counterparties_and_concentration-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The incomplete report-local scope is conservatively retained as a blocker and is not treated as an accepted or production-authorized fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000060-2025:counterparties_and_concentration-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-000060-SZ:manufacturing-materials-shadow-000060-2025:counterparties_and_concentration-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000060-2025:counterparties_and_concentration-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-000060-SZ:manufacturing-materials-shadow-000060-2025:counterparties_and_concentration-01:coverage:counterparty_relationship",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000060-2025:counterparties_and_concentration-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-000060-SZ:manufacturing-materials-shadow-000060-2025:counterparties_and_concentration-01:coverage:customer_concentration",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000060-2025:counterparties_and_concentration-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-000060-SZ:manufacturing-materials-shadow-000060-2025:counterparties_and_concentration-01:coverage:supplier_concentration",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000060-2025:business_regime-01:blocker:task_completion:business_regime-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The incomplete report-local scope is conservatively retained as a blocker and is not treated as an accepted or production-authorized fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000060-2025:business_regime-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-000060-SZ:manufacturing-materials-shadow-000060-2025:business_regime-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000060-2025:business_regime-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-000060-SZ:manufacturing-materials-shadow-000060-2025:business_regime-01:coverage:business_regime",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000055-2025:business_overview-01:chapter_sample:stage5-6646bb6b9981976ae403509f",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "Current page 24 contains substantive issuer business-model wording; the rejected subsidiary-table page 36 is absent."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000055-2025:segment_financials-01:blocker:task_completion:segment_financials-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The incomplete report-local scope is conservatively retained as a blocker and is not treated as an accepted or production-authorized fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000055-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-000055-SZ:manufacturing-materials-shadow-000055-2025:segment_financials-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000055-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-000055-SZ:manufacturing-materials-shadow-000055-2025:segment_financials-01:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000055-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-000055-SZ:manufacturing-materials-shadow-000055-2025:segment_financials-01:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000055-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-000055-SZ:manufacturing-materials-shadow-000055-2025:segment_financials-01:coverage:operating_cost",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000055-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-000055-SZ:manufacturing-materials-shadow-000055-2025:segment_financials-01:coverage:gross_margin_reported",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000055-2025:segment_financials-02:blocker:task_completion:segment_financials-02",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The incomplete report-local scope is conservatively retained as a blocker and is not treated as an accepted or production-authorized fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000055-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-000055-SZ:manufacturing-materials-shadow-000055-2025:segment_financials-02:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000055-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-000055-SZ:manufacturing-materials-shadow-000055-2025:segment_financials-02:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000055-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-000055-SZ:manufacturing-materials-shadow-000055-2025:segment_financials-02:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000055-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-000055-SZ:manufacturing-materials-shadow-000055-2025:segment_financials-02:coverage:operating_cost",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000055-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-000055-SZ:manufacturing-materials-shadow-000055-2025:segment_financials-02:coverage:gross_margin_reported",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000055-2025:operating_quantities-01:blocker:task_completion:operating_quantities-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The incomplete report-local scope is conservatively retained as a blocker and is not treated as an accepted or production-authorized fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000055-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-000055-SZ:manufacturing-materials-shadow-000055-2025:operating_quantities-01:coverage:production_volume",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000055-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-000055-SZ:manufacturing-materials-shadow-000055-2025:operating_quantities-01:coverage:sales_volume",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000055-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-000055-SZ:manufacturing-materials-shadow-000055-2025:operating_quantities-01:coverage:inventory_volume",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000055-2025:material_inputs-01:chapter_sample:coverage:material_inputs-01:material_input",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The current source quote, physical page, Evidence identity, and runtime target support the sampled accepted fact or legal-empty disposition."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000055-2025:counterparties_and_concentration-01:chapter_sample:stage5-665f3019401db8dea8486c94",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The current source quote, physical page, Evidence identity, and runtime target support the sampled accepted fact or legal-empty disposition."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000055-2025:business_regime-01:blocker:task_completion:business_regime-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The incomplete report-local scope is conservatively retained as a blocker and is not treated as an accepted or production-authorized fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000055-2025:business_regime-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-000055-SZ:manufacturing-materials-shadow-000055-2025:business_regime-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000055-2025:business_regime-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-000055-SZ:manufacturing-materials-shadow-000055-2025:business_regime-01:coverage:business_regime",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000420-2025:business_overview-01:blocker:task_completion:business_overview-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The incomplete report-local scope is conservatively retained as a blocker and is not treated as an accepted or production-authorized fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000420-2025:business_overview-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-000420-SZ:manufacturing-materials-shadow-000420-2025:business_overview-01:coverage:business_overview_source",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000420-2025:business_overview-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-000420-SZ:manufacturing-materials-shadow-000420-2025:business_overview-01:coverage:explicit_activity",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000420-2025:segment_financials-01:blocker:task_completion:segment_financials-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The incomplete report-local scope is conservatively retained as a blocker and is not treated as an accepted or production-authorized fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000420-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-000420-SZ:manufacturing-materials-shadow-000420-2025:segment_financials-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000420-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-000420-SZ:manufacturing-materials-shadow-000420-2025:segment_financials-01:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000420-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-000420-SZ:manufacturing-materials-shadow-000420-2025:segment_financials-01:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000420-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-000420-SZ:manufacturing-materials-shadow-000420-2025:segment_financials-01:coverage:operating_cost",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000420-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-000420-SZ:manufacturing-materials-shadow-000420-2025:segment_financials-01:coverage:gross_margin_reported",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000420-2025:operating_quantities-01:chapter_sample:stage5-8a52604eccc4eab19649f803",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The current source quote, physical page, Evidence identity, and runtime target support the sampled accepted fact or legal-empty disposition."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000420-2025:material_inputs-01:chapter_sample:stage5-2ecd8a0e83f11b7f83b45cee",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The current source quote, physical page, Evidence identity, and runtime target support the sampled accepted fact or legal-empty disposition."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000420-2025:counterparties_and_concentration-01:chapter_sample:stage5-84e9a32584a48fb97c8c18d7",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The current source quote, physical page, Evidence identity, and runtime target support the sampled accepted fact or legal-empty disposition."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000420-2025:business_regime-01:chapter_sample:coverage:business_regime-01:business_regime",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The current source quote, physical page, Evidence identity, and runtime target support the sampled accepted fact or legal-empty disposition."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920016-2025:business_overview-01:blocker:task_completion:business_overview-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The incomplete report-local scope is conservatively retained as a blocker and is not treated as an accepted or production-authorized fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920016-2025:business_overview-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-920016-BJ:manufacturing-materials-shadow-920016-2025:business_overview-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920016-2025:business_overview-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-920016-BJ:manufacturing-materials-shadow-920016-2025:business_overview-01:coverage:business_overview_source",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920016-2025:business_overview-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-920016-BJ:manufacturing-materials-shadow-920016-2025:business_overview-01:coverage:explicit_activity",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920016-2025:segment_financials-01:blocker:task_completion:segment_financials-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The governed segment owner pages 19-21 were routed correctly, but the provider result did not complete; retaining the report-local blocker is correct."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920016-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-920016-BJ:manufacturing-materials-shadow-920016-2025:segment_financials-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920016-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-920016-BJ:manufacturing-materials-shadow-920016-2025:segment_financials-01:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920016-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-920016-BJ:manufacturing-materials-shadow-920016-2025:segment_financials-01:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920016-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-920016-BJ:manufacturing-materials-shadow-920016-2025:segment_financials-01:coverage:operating_cost",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920016-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-920016-BJ:manufacturing-materials-shadow-920016-2025:segment_financials-01:coverage:gross_margin_reported",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920016-2025:segment_financials-02:chapter_sample:coverage:segment_financials-02:segment_dimension",
+    "outcome": "noncritical_error",
+    "reviewer": "codex-source-review",
+    "notes": "The source is an industry-policy discussion on physical page 56, not a segment or revenue/cost owner; it cannot support segment_dimension=not_disclosed."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920016-2025:operating_quantities-01:chapter_sample:coverage:operating_quantities-01:production_capacity",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The current source quote, physical page, Evidence identity, and runtime target support the sampled accepted fact or legal-empty disposition."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920016-2025:material_inputs-01:chapter_sample:stage5-00bc9a68b318a87ae6e3384f",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The current source quote, physical page, Evidence identity, and runtime target support the sampled accepted fact or legal-empty disposition."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920016-2025:counterparties_and_concentration-01:chapter_sample:stage5-fd97e5def20e1ce80eecfddb",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The current source quote, physical page, Evidence identity, and runtime target support the sampled accepted fact or legal-empty disposition."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920016-2025:business_regime-01:chapter_sample:coverage:business_regime-01:business_regime",
+    "outcome": "noncritical_error",
+    "reviewer": "codex-source-review",
+    "notes": "Physical page 15 explicitly states that the company principal business did not change; retaining business_regime as not_disclosed understates source-supported legal-empty coverage."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:business_overview-01:chapter_sample:stage5-2967253170d875990d9940a2",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The current source quote, physical page, Evidence identity, and runtime target support the sampled accepted fact or legal-empty disposition."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:segment_financials-01:blocker:task_completion:segment_financials-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The incomplete report-local scope is conservatively retained as a blocker and is not treated as an accepted or production-authorized fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-920033-BJ:manufacturing-materials-shadow-920033-2025:segment_financials-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-920033-BJ:manufacturing-materials-shadow-920033-2025:segment_financials-01:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-920033-BJ:manufacturing-materials-shadow-920033-2025:segment_financials-01:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-920033-BJ:manufacturing-materials-shadow-920033-2025:segment_financials-01:coverage:operating_cost",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-920033-BJ:manufacturing-materials-shadow-920033-2025:segment_financials-01:coverage:gross_margin_reported",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:segment_financials-02:chapter_sample:coverage:segment_financials-02:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The current source quote, physical page, Evidence identity, and runtime target support the sampled accepted fact or legal-empty disposition."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:operating_quantities-01:blocker:task_completion:operating_quantities-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The incomplete report-local scope is conservatively retained as a blocker and is not treated as an accepted or production-authorized fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-920033-BJ:manufacturing-materials-shadow-920033-2025:operating_quantities-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-920033-BJ:manufacturing-materials-shadow-920033-2025:operating_quantities-01:coverage:production_capacity",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-920033-BJ:manufacturing-materials-shadow-920033-2025:operating_quantities-01:coverage:capacity_under_construction",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-920033-BJ:manufacturing-materials-shadow-920033-2025:operating_quantities-01:coverage:production_volume",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-920033-BJ:manufacturing-materials-shadow-920033-2025:operating_quantities-01:coverage:sales_volume",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-920033-BJ:manufacturing-materials-shadow-920033-2025:operating_quantities-01:coverage:inventory_volume",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:operating_quantities-02:blocker:task_completion:operating_quantities-02",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The incomplete report-local scope is conservatively retained as a blocker and is not treated as an accepted or production-authorized fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:operating_quantities-02:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-920033-BJ:manufacturing-materials-shadow-920033-2025:operating_quantities-02:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:operating_quantities-02:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-920033-BJ:manufacturing-materials-shadow-920033-2025:operating_quantities-02:coverage:production_capacity",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:operating_quantities-02:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-920033-BJ:manufacturing-materials-shadow-920033-2025:operating_quantities-02:coverage:capacity_under_construction",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:operating_quantities-02:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-920033-BJ:manufacturing-materials-shadow-920033-2025:operating_quantities-02:coverage:production_volume",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:material_inputs-01:chapter_sample:coverage:material_inputs-01:material_input",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "Physical page 72 explicitly marks the governed raw-material and energy section not applicable; the positive control is retained."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:counterparties_and_concentration-01:chapter_sample:stage5-ec2e4a568319498bd0ca2b3d",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The current source quote, physical page, Evidence identity, and runtime target support the sampled accepted fact or legal-empty disposition."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:business_regime-01:blocker:task_completion:business_regime-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The incomplete report-local scope is conservatively retained as a blocker and is not treated as an accepted or production-authorized fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:business_regime-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-920033-BJ:manufacturing-materials-shadow-920033-2025:business_regime-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:business_regime-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-920033-BJ:manufacturing-materials-shadow-920033-2025:business_regime-01:coverage:business_regime",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920068-2025:business_overview-01:chapter_sample:stage5-2c500e0c708e44fe00cb1a9b",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The current source quote, physical page, Evidence identity, and runtime target support the sampled accepted fact or legal-empty disposition."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920068-2025:segment_financials-01:blocker:task_completion:segment_financials-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The incomplete report-local scope is conservatively retained as a blocker and is not treated as an accepted or production-authorized fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920068-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-920068-BJ:manufacturing-materials-shadow-920068-2025:segment_financials-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920068-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-920068-BJ:manufacturing-materials-shadow-920068-2025:segment_financials-01:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920068-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-920068-BJ:manufacturing-materials-shadow-920068-2025:segment_financials-01:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920068-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-920068-BJ:manufacturing-materials-shadow-920068-2025:segment_financials-01:coverage:operating_cost",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920068-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-920068-BJ:manufacturing-materials-shadow-920068-2025:segment_financials-01:coverage:gross_margin_reported",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920068-2025:segment_financials-02:chapter_sample:coverage:segment_financials-02:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The current source quote, physical page, Evidence identity, and runtime target support the sampled accepted fact or legal-empty disposition."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920068-2025:operating_quantities-01:blocker:task_completion:operating_quantities-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The incomplete report-local scope is conservatively retained as a blocker and is not treated as an accepted or production-authorized fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920068-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-920068-BJ:manufacturing-materials-shadow-920068-2025:operating_quantities-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920068-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-920068-BJ:manufacturing-materials-shadow-920068-2025:operating_quantities-01:coverage:production_capacity",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920068-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-920068-BJ:manufacturing-materials-shadow-920068-2025:operating_quantities-01:coverage:capacity_under_construction",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920068-2025:material_inputs-01:chapter_sample:stage5-19a2dfa2a98ac04c998494d1",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The current source quote, physical page, Evidence identity, and runtime target support the sampled accepted fact or legal-empty disposition."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920068-2025:counterparties_and_concentration-01:chapter_sample:stage5-b0d8a3d5942055ddc6a2958b",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The current source quote, physical page, Evidence identity, and runtime target support the sampled accepted fact or legal-empty disposition."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920068-2025:business_regime-01:blocker:task_completion:business_regime-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The incomplete report-local scope is conservatively retained as a blocker and is not treated as an accepted or production-authorized fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920068-2025:business_regime-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-920068-BJ:manufacturing-materials-shadow-920068-2025:business_regime-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920068-2025:business_regime-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-920068-BJ:manufacturing-materials-shadow-920068-2025:business_regime-01:coverage:business_regime",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920078-2025:business_overview-01:chapter_sample:stage5-d08cfadfda748a4a3eb152e7",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The current source quote, physical page, Evidence identity, and runtime target support the sampled accepted fact or legal-empty disposition."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920078-2025:segment_financials-01:blocker:task_completion:segment_financials-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The incomplete report-local scope is conservatively retained as a blocker and is not treated as an accepted or production-authorized fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920078-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-920078-BJ:manufacturing-materials-shadow-920078-2025:segment_financials-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920078-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-920078-BJ:manufacturing-materials-shadow-920078-2025:segment_financials-01:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920078-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-920078-BJ:manufacturing-materials-shadow-920078-2025:segment_financials-01:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920078-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-920078-BJ:manufacturing-materials-shadow-920078-2025:segment_financials-01:coverage:operating_cost",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920078-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-920078-BJ:manufacturing-materials-shadow-920078-2025:segment_financials-01:coverage:gross_margin_reported",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920078-2025:operating_quantities-01:blocker:task_completion:operating_quantities-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The incomplete report-local scope is conservatively retained as a blocker and is not treated as an accepted or production-authorized fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920078-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-920078-BJ:manufacturing-materials-shadow-920078-2025:operating_quantities-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920078-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-920078-BJ:manufacturing-materials-shadow-920078-2025:operating_quantities-01:coverage:production_capacity",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920078-2025:material_inputs-01:chapter_sample:stage5-69548c763dff5fbd1206068f",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The current source quote, physical page, Evidence identity, and runtime target support the sampled accepted fact or legal-empty disposition."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920078-2025:counterparties_and_concentration-01:chapter_sample:stage5-43dcc02f3bcb90aea9397988",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The current source quote, physical page, Evidence identity, and runtime target support the sampled accepted fact or legal-empty disposition."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920078-2025:business_regime-01:blocker:task_completion:business_regime-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The incomplete report-local scope is conservatively retained as a blocker and is not treated as an accepted or production-authorized fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920078-2025:business_regime-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-920078-BJ:manufacturing-materials-shadow-920078-2025:business_regime-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920078-2025:business_regime-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-920078-BJ:manufacturing-materials-shadow-920078-2025:business_regime-01:coverage:business_regime",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920076-2025:business_overview-01:chapter_sample:stage5-75391c26fcc121730c026fc5",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The current source quote, physical page, Evidence identity, and runtime target support the sampled accepted fact or legal-empty disposition."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920076-2025:segment_financials-01:blocker:task_completion:segment_financials-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The incomplete report-local scope is conservatively retained as a blocker and is not treated as an accepted or production-authorized fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920076-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-920076-BJ:manufacturing-materials-shadow-920076-2025:segment_financials-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920076-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-920076-BJ:manufacturing-materials-shadow-920076-2025:segment_financials-01:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920076-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-920076-BJ:manufacturing-materials-shadow-920076-2025:segment_financials-01:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920076-2025:segment_financials-02:blocker:task_completion:segment_financials-02",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The incomplete report-local scope is conservatively retained as a blocker and is not treated as an accepted or production-authorized fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920076-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-920076-BJ:manufacturing-materials-shadow-920076-2025:segment_financials-02:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920076-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-920076-BJ:manufacturing-materials-shadow-920076-2025:segment_financials-02:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920076-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-920076-BJ:manufacturing-materials-shadow-920076-2025:segment_financials-02:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920076-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-920076-BJ:manufacturing-materials-shadow-920076-2025:segment_financials-02:coverage:operating_cost",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920076-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-920076-BJ:manufacturing-materials-shadow-920076-2025:segment_financials-02:coverage:gross_margin_reported",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920076-2025:operating_quantities-01:blocker:task_completion:operating_quantities-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The incomplete report-local scope is conservatively retained as a blocker and is not treated as an accepted or production-authorized fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920076-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-920076-BJ:manufacturing-materials-shadow-920076-2025:operating_quantities-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920076-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-920076-BJ:manufacturing-materials-shadow-920076-2025:operating_quantities-01:coverage:production_capacity",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920076-2025:material_inputs-01:chapter_sample:stage5-eea95a2a96e13c2e426e8370",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The continued pages preserve the explicit source wording 役后耐火材料 and support the accepted material-input relationship."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920076-2025:counterparties_and_concentration-01:chapter_sample:stage5-89875347ba9f2ab641bf2cb6",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The current source quote, physical page, Evidence identity, and runtime target support the sampled accepted fact or legal-empty disposition."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920076-2025:business_regime-01:blocker:task_completion:business_regime-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The incomplete report-local scope is conservatively retained as a blocker and is not treated as an accepted or production-authorized fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920076-2025:business_regime-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-920076-BJ:manufacturing-materials-shadow-920076-2025:business_regime-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920076-2025:business_regime-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-920076-BJ:manufacturing-materials-shadow-920076-2025:business_regime-01:coverage:business_regime",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:business_overview-01:chapter_sample:stage5-25b4b0c5bc8866f6ffc90f04",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The current source quote, physical page, Evidence identity, and runtime target support the sampled accepted fact or legal-empty disposition."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:segment_financials-01:blocker:task_completion:segment_financials-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The incomplete report-local scope is conservatively retained as a blocker and is not treated as an accepted or production-authorized fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-920580-BJ:manufacturing-materials-shadow-920580-2025:segment_financials-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-920580-BJ:manufacturing-materials-shadow-920580-2025:segment_financials-01:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-920580-BJ:manufacturing-materials-shadow-920580-2025:segment_financials-01:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-920580-BJ:manufacturing-materials-shadow-920580-2025:segment_financials-01:coverage:operating_cost",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-920580-BJ:manufacturing-materials-shadow-920580-2025:segment_financials-01:coverage:gross_margin_reported",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:segment_financials-02:blocker:task_completion:segment_financials-02",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The incomplete report-local scope is conservatively retained as a blocker and is not treated as an accepted or production-authorized fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-920580-BJ:manufacturing-materials-shadow-920580-2025:segment_financials-02:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-920580-BJ:manufacturing-materials-shadow-920580-2025:segment_financials-02:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-920580-BJ:manufacturing-materials-shadow-920580-2025:segment_financials-02:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-920580-BJ:manufacturing-materials-shadow-920580-2025:segment_financials-02:coverage:operating_cost",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-920580-BJ:manufacturing-materials-shadow-920580-2025:segment_financials-02:coverage:gross_margin_reported",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:operating_quantities-01:blocker:task_completion:operating_quantities-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The incomplete report-local scope is conservatively retained as a blocker and is not treated as an accepted or production-authorized fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-920580-BJ:manufacturing-materials-shadow-920580-2025:operating_quantities-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-920580-BJ:manufacturing-materials-shadow-920580-2025:operating_quantities-01:coverage:production_capacity",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-920580-BJ:manufacturing-materials-shadow-920580-2025:operating_quantities-01:coverage:capacity_under_construction",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:operating_quantities-02:blocker:task_completion:operating_quantities-02",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The incomplete report-local scope is conservatively retained as a blocker and is not treated as an accepted or production-authorized fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:operating_quantities-02:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-920580-BJ:manufacturing-materials-shadow-920580-2025:operating_quantities-02:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:operating_quantities-02:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-920580-BJ:manufacturing-materials-shadow-920580-2025:operating_quantities-02:coverage:production_capacity",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:material_inputs-01:chapter_sample:stage5-5291bf4ce7fa63a15efc80b3",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The current source quote, physical page, Evidence identity, and runtime target support the sampled accepted fact or legal-empty disposition."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:counterparties_and_concentration-01:chapter_sample:stage5-b599bdf0c7f3f21bf668662c",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The current source quote, physical page, Evidence identity, and runtime target support the sampled accepted fact or legal-empty disposition."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:business_regime-01:blocker:task_completion:business_regime-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The incomplete report-local scope is conservatively retained as a blocker and is not treated as an accepted or production-authorized fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:business_regime-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-920580-BJ:manufacturing-materials-shadow-920580-2025:business_regime-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:business_regime-01:unresolved:manufacturing-materials-shadow-routing-continuation-gemini-20260910-a-920580-BJ:manufacturing-materials-shadow-920580-2025:business_regime-01:coverage:business_regime",
+    "outcome": "correct",
+    "reviewer": "codex-source-review",
+    "notes": "The unresolved report-local item is conservatively retained for human review and is not promoted into accepted or production-authorized data."
+  }
+]

@@ -1,0 +1,91 @@
+{
+  "schema_version": "company_profile_shadow_routing_continuation_recurrence_audit.v1",
+  "audit_id": "manufacturing-materials-shadow-routing-continuation-recurrence-20260910-a",
+  "batch_id": "manufacturing-materials-shadow-routing-continuation-gemini-20260910-a",
+  "inputs": {
+    "batch_manifest_sha256": "8ce096841eeb44e5d4e975ee7d72a5a6df50b21cdefc731bcbce8058bb187266",
+    "review_package_sha256": "7ecb0934e6f44022a5d36c3c28f246ee5c8abbc1f1f522236091a0cb0838ee23",
+    "review_outcomes_sha256": "8eb0b49165942e66131d78b87339cae705e04996bef29f8c30eb5ff544d9e40a",
+    "reviewed_readiness_sha256": "166474cd34c2f3713efc5b230f0a83aedce98744ca6318fec7fb15bcca9ea89c",
+    "routing_continuation_cases_sha256": "d66274a38e7223c97f883823c2b1ffb5450ebdd85203949646e6ca263b9342f9",
+    "provider_free_correction_audit_sha256": "044252298c47513a10332ff5ba7e5d80ef70175acf038866053440003d08d80f"
+  },
+  "source_review": {
+    "row_count": 426,
+    "precision_sample_count": 81,
+    "correct_precision_sample_count": 79,
+    "noncritical_error_count": 2,
+    "critical_error_count": 0,
+    "sampled_precision": 0.9753086419753086
+  },
+  "routing_continuation_cases": [
+    {
+      "case_id": "000055-reject-subsidiary-table-page-36",
+      "status": "resolved",
+      "evidence": "The current overview scope uses issuer page 24; page 36 is absent and the accepted BusinessOverview is source-bound to issuer business-model wording."
+    },
+    {
+      "case_id": "920016-reject-partial-products-page-14",
+      "status": "exact_case_resolved_but_owner_family_recurred",
+      "evidence": "Page 14 is absent and governed pages 19-21 are preserved, but their extract remained incomplete; a separate page 56-57 industry-policy scope was incorrectly accepted as segment_dimension=not_disclosed."
+    },
+    {
+      "case_id": "920076-require-material-continuation-pages-15-17",
+      "status": "resolved",
+      "evidence": "The scope retains pages 15-17 and accepts the source-native material input 役后耐火材料 from the continuation disclosure."
+    },
+    {
+      "case_id": "000055-issuer-overview-positive-control-page-24",
+      "status": "preserved",
+      "evidence": "Page 24 produces three accepted issuer BusinessOverview records and the scope is complete."
+    },
+    {
+      "case_id": "920016-valid-segment-owner-positive-control-pages-19-21",
+      "status": "routed_but_not_semantically_completed",
+      "evidence": "Pages 19-21 remain the governed owner scope, but candidate_schema_invalid leaves the scope incomplete with no accepted segment record."
+    },
+    {
+      "case_id": "920033-material-legal-empty-positive-control-page-72",
+      "status": "preserved",
+      "evidence": "The explicit 主要原材料及能源情况 not-applicable disclosure remains legal-empty and complete."
+    }
+  ],
+  "new_source_review_errors": [
+    {
+      "review_row_id": "manufacturing-materials-shadow-920016-2025:segment_financials-02:chapter_sample:coverage:segment_financials-02:segment_dimension",
+      "severity": "noncritical_error",
+      "defect_family": "segment_owner_misroute",
+      "finding": "Industry-policy pages 56-57 do not support segment_dimension=not_disclosed."
+    },
+    {
+      "review_row_id": "manufacturing-materials-shadow-920016-2025:business_regime-01:chapter_sample:coverage:business_regime-01:business_regime",
+      "severity": "noncritical_error",
+      "defect_family": "legal_empty_underclassification",
+      "finding": "The source explicitly says the principal business did not change, so not_disclosed should be not_applicable."
+    }
+  ],
+  "previously_closed_high_risk_semantic_errors": {
+    "contradicted_business_regime_not_applicable": 0,
+    "top_five_aggregate_relationship": 0,
+    "cost_component_segment": 0,
+    "unsupported_consolidated_group_promotion": 0,
+    "generic_material_relationship": 0
+  },
+  "provider_observations": {
+    "provider_call_count": 296,
+    "failed_trace_count": 36,
+    "failed_trace_reason_counts": {
+      "candidate_schema_invalid": 36
+    },
+    "output_budget_exceeded_success_count": 7,
+    "maximum_output_tokens": 27111,
+    "maximum_latency_ms": 176348,
+    "dns_failure_count": 0,
+    "deadline_exceeded_count": 0,
+    "provider_unavailable_count": 0
+  },
+  "historical_batch_mutated": false,
+  "second_replay_performed": false,
+  "production_authorization": "not_authorized",
+  "audit_hash": "16765c569e76e95aae1a91cc3e310dd4d73454055550cd1d2640acae612afb26"
+}
