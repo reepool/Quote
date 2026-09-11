@@ -1,0 +1,72 @@
+{
+  "schema_version": "company_profile_segment_partition_offline_audit.v1",
+  "audit_id": "manufacturing-materials-shadow-segment-partition-normalization-20260911-a",
+  "created_at": "2026-09-11",
+  "provider_calls": 0,
+  "historical_batch_mutated": false,
+  "production_authorization": "not_authorized",
+  "source_batch": {
+    "batch_id": "manufacturing-materials-shadow-segment-retry-gemini-20260911-a",
+    "manifest_sha256": "7274b13f69bbd2dce0c093f0ae62139f61b70908b13cac537181e7e4f7fe50fb",
+    "readiness_audit_sha256": "e532bdf4789ed4ac97a7428489fbeec7214c44c997f60a97ee3acbb763e0970c",
+    "review_package_sha256": "c2e079f47a7f4d02f0508bf42da4a6cf19d0551f83e55317be1ba0ae31f40964"
+  },
+  "segment_partition_failures": {
+    "total_scope_count": 15,
+    "annual_period_conflict_candidate_class": {
+      "count": 11,
+      "scope_ids": [
+        "manufacturing-materials-shadow-000055-2025:segment_financials-01",
+        "manufacturing-materials-shadow-000055-2025:segment_financials-02",
+        "manufacturing-materials-shadow-000059-2025:segment_financials-01",
+        "manufacturing-materials-shadow-000060-2025:segment_financials-01",
+        "manufacturing-materials-shadow-000629-2025:segment_financials-01",
+        "manufacturing-materials-shadow-600111-2025:segment_financials-01",
+        "manufacturing-materials-shadow-600121-2025:segment_financials-01",
+        "manufacturing-materials-shadow-920016-2025:segment_financials-01",
+        "manufacturing-materials-shadow-920068-2025:segment_financials-01",
+        "manufacturing-materials-shadow-920076-2025:segment_financials-02",
+        "manufacturing-materials-shadow-920580-2025:segment_financials-02"
+      ],
+      "observed_failure": "segment partition row identity conflict: reported_period",
+      "offline_conclusion": "Closed YYYY/年/年度 fixtures pass, but historical raw partition periods were not persisted; empirical recurrence remains unproven."
+    },
+    "complete_heading_schema_candidate_class": {
+      "count": 3,
+      "scope_ids": [
+        "manufacturing-materials-shadow-000408-2025:segment_financials-02",
+        "manufacturing-materials-shadow-000629-2025:segment_financials-02",
+        "manufacturing-materials-shadow-600121-2025:segment_financials-02"
+      ],
+      "observed_failure": "segment dimension must preserve the full source heading: 报告分部",
+      "offline_conclusion": "The exact table-owning heading is present in controlled Evidence and is now the schema option; empirical recurrence remains unproven."
+    },
+    "retained_blocking_coverage_conflict_class": {
+      "count": 1,
+      "scope_ids": [
+        "manufacturing-materials-shadow-920580-2025:segment_financials-01"
+      ],
+      "observed_failure": "segment partition coverage conflict",
+      "decision": "not changed by this offline proof"
+    }
+  },
+  "offline_decision": "implementation_fixtures_passed_historical_result_unchanged",
+  "readiness_decision": "not_recomputed",
+  "implementation_hashes": {
+    "research/company_profile/stage5_provider.py": "8b642a5861428bd231b5c39f6d3ffbde73771bee213cc3319d4cd0f1c5eadfdb",
+    "tests/unit/test_research/test_company_profile_stage5_provider.py": "11b8f57b8557140dcf757e5cfff2fa053f9fbba558aaff286817acb3b6a3f079",
+    "tests/unit/test_research/test_company_profile_shadow_replay.py": "cd2b07f38576201e24657abd74234d5e63bc8575a3d71069bc90ca4865b1d910"
+  },
+  "verification": {
+    "focused_pytest": "149 passed, 6 warnings",
+    "ruff": "passed",
+    "immutable_batch_hashes": "passed",
+    "git_diff_check": "passed",
+    "openspec_strict_validation": "passed"
+  },
+  "notes": [
+    "The source batch remains the authoritative September 11 result.",
+    "This audit does not claim semantic precision, report usability, or a new shadow replay.",
+    "A future provider-bearing validation, if separately admitted, must use a new batch identity."
+  ]
+}

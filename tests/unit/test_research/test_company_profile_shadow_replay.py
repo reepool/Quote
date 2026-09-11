@@ -240,10 +240,11 @@ def segment_repair_replay_inputs(routing_continuation_replay_inputs):
         "segment_financial_closure_audit": _file_sha256(closure_path),
         "segment_financial_closure_audit_internal": closure["audit_hash"],
     }
-    implementation_hashes = {
-        relative_path: _file_sha256(REPOSITORY_ROOT / relative_path)
-        for relative_path in closure["implementation_hashes"]
-    }
+    # The historical replay contract validates the immutable implementation
+    # snapshot recorded by its closure audit. Do not couple this fixture to the
+    # current worktree: later provider changes must not rewrite historical audit
+    # evidence, while the operator path still compares current files at runtime.
+    implementation_hashes = dict(closure["implementation_hashes"])
     return (
         manifest,
         plan,
@@ -1232,6 +1233,16 @@ def test_segment_repair_replay_rejects_closure_or_lineage_drift(
         validate_segment_financial_closure_audit(
             tampered_closure,
             implementation_hashes=implementation_hashes,
+        )
+
+    changed_implementation_hashes = {
+        **implementation_hashes,
+        "research/company_profile/stage5_provider.py": "f" * 64,
+    }
+    with pytest.raises(ValueError, match="implementation hash mismatch"):
+        validate_segment_financial_closure_audit(
+            closure,
+            implementation_hashes=changed_implementation_hashes,
         )
 
     changed_supporting = {

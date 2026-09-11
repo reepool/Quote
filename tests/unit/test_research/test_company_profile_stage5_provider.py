@@ -56,6 +56,8 @@ from research.company_profile.stage5_provider import (
     _minimal_verify_schema,
     _normalize_adapter_reported_period,
     _normalize_extract_response,
+    _normalize_segment_partition_reported_period,
+    _segment_dimension_options,
     _segment_partition_request,
 )
 from research.company_profile.workflow import (
@@ -1722,7 +1724,7 @@ def test_segment_partition_merge_reconciles_owned_metadata_and_evidence() -> Non
         "operating_cost",
         "gross_margin_reported",
     )
-    periods = ("2025-12-31", "2025", "2025")
+    periods = ("2025-12-31", "2025年", "2025年度")
     scopes = ("unclear", "business_segment", "unclear")
     partitions = []
     for index, (metric, period, subject_scope, prepared_evidence) in enumerate(
@@ -1860,7 +1862,10 @@ def test_segment_partition_merge_rejects_period_and_duplicate_cell_conflicts() -
         reported_period="2024",
     )
 
-    with pytest.raises(ValueError, match="identity conflict: reported_period"):
+    with pytest.raises(
+        ValueError,
+        match="identity conflict: reported_period: '2025' != '2024'",
+    ):
         _merge_segment_partition_responses(
             request,
             ((revenue_request, revenue), (cost_request, cost)),
@@ -2363,6 +2368,76 @@ def test_adapter_period_semantics_distinguish_duration_instant_and_narrower_peri
         )
         == "2025年1-6月"
     )
+
+
+def test_segment_partition_period_semantics_accepts_only_closed_annual_aliases() -> (
+    None
+):
+    prepared = _prepared_scope()
+
+    assert _normalize_adapter_reported_period(
+        "2025年", period_type="duration", prepared_scope=prepared
+    ) == "2025年"
+    assert _normalize_segment_partition_reported_period(
+        "2025年", period_type="duration", prepared_scope=prepared
+    ) == "2025"
+    assert _normalize_segment_partition_reported_period(
+        "2025年度", period_type="duration", prepared_scope=prepared
+    ) == "2025"
+    assert _normalize_segment_partition_reported_period(
+        "2025年度", period_type="instant", prepared_scope=prepared
+    ) == "2025年度"
+    assert _normalize_segment_partition_reported_period(
+        "2024年度", period_type="duration", prepared_scope=prepared
+    ) == "2024年度"
+
+
+def test_segment_dimension_options_preserve_complete_report_segment_headings() -> None:
+    prepared = _prepared_scope().model_copy(
+        update={
+            "scope_id": "segment_financials-01",
+            "chapter_task": ChapterTask.EXTRACT_SEGMENT_FINANCIALS,
+            "field_ids": (
+                "segment_dimension",
+                "operating_revenue",
+                "operating_cost",
+                "gross_margin_reported",
+            ),
+            "evidence_bundle": (
+                _prepared_scope().evidence_bundle[0].model_copy(
+                    update={
+                        "evidence": _prepared_scope()
+                        .evidence_bundle[0]
+                        .evidence.model_copy(
+                            update={
+                                "anchor": TextAnchor(
+                                    bounded_quote=(
+                                        "6、分部信息\n"
+                                        "(1).报告分部的确定依据与会计政策\n"
+                                        "(2).报告分部的财务信息"
+                                    )
+                                )
+                            }
+                        )
+                    }
+                ),
+            )
+        }
+    )
+
+    options = _segment_dimension_options(prepared)
+    schema_text = json.dumps(
+        _minimal_extract_schema(
+            _segment_extract_request(prepared), prepared_scope=prepared
+        ),
+        ensure_ascii=False,
+    )
+
+    assert "报告分部的财务信息" in options
+    assert "报告分部的确定依据与会计政策" not in options
+    assert "报告分部" not in options
+    assert '"报告分部的财务信息"' in schema_text
+    assert '"报告分部的确定依据与会计政策"' not in schema_text
 
 
 def test_business_event_keeps_occurrence_effective_and_knowledge_time_separate() -> (

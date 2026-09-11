@@ -473,6 +473,13 @@ def _segment_dimension_options(
         if evidence.section_title == "主体口径核对":
             continue
         source = str(getattr(evidence.anchor, "bounded_quote", ""))
+        compact_source = "".join(source.split())
+        report_segment_financial_heading = "报告分部的财务信息"
+        if (
+            report_segment_financial_heading in compact_source
+            and report_segment_financial_heading not in options
+        ):
+            options.append(report_segment_financial_heading)
         for match in pattern.finditer("".join(source.split())):
             option = match.group(0)
             if option not in options:
@@ -840,7 +847,7 @@ def _normalize_segment_partition_metadata(
         normalized["subject_scope"] = "unclear"
         normalized.pop("subject_name", None)
         normalized.pop("subject_basis", None)
-    normalized["reported_period"] = _normalize_adapter_reported_period(
+    normalized["reported_period"] = _normalize_segment_partition_reported_period(
         normalized.get("reported_period"),
         period_type=normalized.get("period_type"),
         prepared_scope=prepared_scope,
@@ -864,13 +871,19 @@ def _merge_segment_partition_metadata(
 
     for key in ("row_class", "subject_scope", "reported_period", "period_type"):
         if existing.get(key) != incoming.get(key):
-            raise ValueError(f"segment partition row identity conflict: {key}")
+            raise ValueError(
+                "segment partition row identity conflict: "
+                f"{key}: {existing.get(key)!r} != {incoming.get(key)!r}"
+            )
     for key in ("subject_name", "subject_basis"):
         current = existing.get(key)
         candidate = incoming.get(key)
         if current not in (None, "") and candidate not in (None, ""):
             if current != candidate:
-                raise ValueError(f"segment partition row identity conflict: {key}")
+                raise ValueError(
+                    "segment partition row identity conflict: "
+                    f"{key}: {current!r} != {candidate!r}"
+                )
         elif current in (None, "") and candidate not in (None, ""):
             existing[key] = deepcopy(candidate)
 
@@ -2878,6 +2891,31 @@ def _normalize_adapter_reported_period(
     report_year = report_period[:4]
     if period_type == "duration" and value == report_period and report_year.isdigit():
         return report_year
+    return value
+
+
+def _normalize_segment_partition_reported_period(
+    reported_period: Any,
+    *,
+    period_type: Any,
+    prepared_scope: PreparedRequestScope,
+) -> Any:
+    """Normalize only closed annual aliases used to reconcile segment partitions."""
+
+    value = _normalize_adapter_reported_period(
+        reported_period,
+        period_type=period_type,
+        prepared_scope=prepared_scope,
+    )
+    report_year = prepared_scope.report.report_period[:4]
+    if isinstance(value, str) and period_type == "duration" and report_year.isdigit():
+        annual_aliases = {
+            report_year,
+            f"{report_year}年",
+            f"{report_year}年度",
+        }
+        if value in annual_aliases:
+            return report_year
     return value
 
 
