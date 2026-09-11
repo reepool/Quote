@@ -125,6 +125,14 @@ class Stage5BenchmarkResult(_StrictModel):
         return self
 
 
+class Stage5RejectedExtractItem(_StrictModel):
+    item_path: str = Field(min_length=1, max_length=240)
+    item_kind: Literal["candidate", "coverage", "segment_row", "measurement", "unknown"]
+    field_id: str | None = Field(default=None, min_length=1)
+    error_code: Literal["candidate_schema_invalid"] = "candidate_schema_invalid"
+    error_detail: str = Field(min_length=1, max_length=1800)
+
+
 class Stage5ProviderCallTrace(_StrictModel):
     call_type: Literal["extract", "repair", "verify"]
     semantic_request_id: str = Field(min_length=1)
@@ -139,6 +147,7 @@ class Stage5ProviderCallTrace(_StrictModel):
     output_tokens: int | None = Field(default=None, ge=0)
     total_tokens: int | None = Field(default=None, ge=0)
     warnings: tuple[str, ...] = ()
+    rejected_extract_items: tuple[Stage5RejectedExtractItem, ...] = ()
     error_code: str | None = None
     error_detail: str | None = Field(default=None, max_length=2000)
     parent_semantic_request_id: str | None = None
@@ -147,6 +156,12 @@ class Stage5ProviderCallTrace(_StrictModel):
 
     @model_validator(mode="after")
     def _partition_lineage_is_complete(self) -> Stage5ProviderCallTrace:
+        if self.rejected_extract_items and (
+            self.call_type != "extract" or self.status != "success"
+        ):
+            raise ValueError(
+                "only successful extract traces may carry rejected-item diagnostics"
+            )
         values = (
             self.parent_semantic_request_id,
             self.partition_index,

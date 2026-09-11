@@ -8,6 +8,7 @@ import json
 import re
 from collections.abc import Callable, Mapping
 from copy import deepcopy
+from dataclasses import dataclass
 from typing import Any, Literal, TypeVar
 
 from pydantic import BaseModel, ConfigDict, ValidationError
@@ -41,9 +42,16 @@ from .models import (
     SubjectScope,
 )
 from .stage5 import PreparedRequestScope
-from .stage5_bundle import Stage5ProviderCallTrace
+from .stage5_bundle import Stage5ProviderCallTrace, Stage5RejectedExtractItem
 
 _ResponseT = TypeVar("_ResponseT", bound=BaseModel)
+
+
+@dataclass(frozen=True)
+class _NormalizedExtractPayload:
+    data: Any
+    rejected_items: tuple[Stage5RejectedExtractItem, ...] = ()
+
 
 _SEGMENT_PARTITION_NUMERIC_OCCURRENCE_THRESHOLD = 40
 _SEGMENT_PARTITION_METRIC_FIELDS = (
@@ -2265,28 +2273,79 @@ def _compact_source_native(item: Mapping[str, Any]) -> dict[str, Any]:
     }
 
 
+def _rejected_extract_item(
+    *,
+    item_path: str,
+    item_kind: Literal[
+        "candidate", "coverage", "segment_row", "measurement", "unknown"
+    ],
+    field_id: str | None,
+    error: ValidationError | TypeError | ValueError,
+) -> Stage5RejectedExtractItem:
+    if isinstance(error, ValidationError):
+        first = error.errors(include_url=False)[0]
+        location = ".".join(str(item) for item in first.get("loc", ())) or item_path
+        detail = f"validation failed at {location}: {first.get('msg')}"
+    else:
+        detail = str(error).strip() or type(error).__name__
+    return Stage5RejectedExtractItem(
+        item_path=item_path,
+        item_kind=item_kind,
+        field_id=field_id,
+        error_detail=detail[:1800],
+    )
+
+
+def _extract_item_field_id(item: Any) -> str | None:
+    if not isinstance(item, Mapping):
+        return None
+    for key in ("candidate", "coverage", "row"):
+        value = item.get(key)
+        if isinstance(value, Mapping) and value.get("field_id"):
+            return str(value["field_id"])
+    if item.get("field_id"):
+        return str(item["field_id"])
+    return None
+
+
 def _expand_compact_measurements(
     measurements: list[Any],
     *,
     field_id_for_metric: Callable[[str], str],
     prepared_scope: PreparedRequestScope,
     field_id_for_measurement: Callable[[str, Mapping[str, Any]], str] | None = None,
+    rejected_items: list[Stage5RejectedExtractItem] | None = None,
+    item_path_prefix: str = "measurements",
 ) -> list[dict[str, Any]]:
     expanded: list[dict[str, Any]] = []
-    for raw in measurements:
+    for index, raw in enumerate(measurements):
         if not isinstance(raw, Mapping):
             expanded.append(raw)
             continue
         item = dict(raw)
         metric_type = str(item.get("metric_type") or "")
         period_type = _measurement_period_type(metric_type)
-        candidate = {
-            "object_type": "Measurement",
-            "field_id": (
+        try:
+            field_id = (
                 field_id_for_measurement(metric_type, item)
                 if field_id_for_measurement is not None
                 else field_id_for_metric(metric_type)
-            ),
+            )
+        except (ValidationError, TypeError, ValueError) as exc:
+            if rejected_items is None:
+                raise
+            rejected_items.append(
+                _rejected_extract_item(
+                    item_path=f"{item_path_prefix}[{index}]",
+                    item_kind="measurement",
+                    field_id=None,
+                    error=exc,
+                )
+            )
+            continue
+        candidate = {
+            "object_type": "Measurement",
+            "field_id": field_id,
             "metric_type": metric_type,
             "measured_object": item.get("measured_object") or item.get("name"),
             "subject_scope": "unclear",
@@ -2370,6 +2429,7 @@ def _expand_counterparty_draft(
     *,
     request: SemanticTaskRequest,
     prepared_scope: PreparedRequestScope,
+    rejected_items: list[Stage5RejectedExtractItem] | None = None,
 ) -> None:
     relationships = result.pop("relationships", [])
     measurements = result.pop("measurements", [])
@@ -2409,6 +2469,8 @@ def _expand_counterparty_draft(
                 )
             ),
             prepared_scope=prepared_scope,
+            rejected_items=rejected_items,
+            item_path_prefix="measurements",
         )
     )
     _append_compact_coverage(result["items"], coverage)
@@ -2513,6 +2575,7 @@ def _expand_extract_response(
     *,
     request: SemanticTaskRequest,
     prepared_scope: PreparedRequestScope,
+    rejected_items: list[Stage5RejectedExtractItem] | None = None,
 ) -> Any:
     if not isinstance(data, Mapping):
         return data
@@ -2588,10 +2651,31 @@ def _expand_extract_response(
             result["items"].append({"item_type": "segment_row", "row": row})
     elif isinstance(result.get("material_inputs"), list):
         relationships = result.pop("material_inputs")
-        _reject_generic_material_input_drafts(
-            relationships,
-            prepared_scope=prepared_scope,
-        )
+        if rejected_items is None:
+            _reject_generic_material_input_drafts(
+                relationships,
+                prepared_scope=prepared_scope,
+            )
+        else:
+            retained_relationships = []
+            for index, item in enumerate(relationships):
+                try:
+                    _reject_generic_material_input_drafts(
+                        [item],
+                        prepared_scope=prepared_scope,
+                    )
+                except (ValidationError, TypeError, ValueError) as exc:
+                    rejected_items.append(
+                        _rejected_extract_item(
+                            item_path=f"material_inputs[{index}]",
+                            item_kind="candidate",
+                            field_id="material_input",
+                            error=exc,
+                        )
+                    )
+                    continue
+                retained_relationships.append(item)
+            relationships = retained_relationships
         coverage = result.pop("coverage", None)
         result["schema_version"] = "company_profile_extract_response.v1"
         result["request_id"] = request.request_id
@@ -2660,6 +2744,8 @@ def _expand_extract_response(
             measurements,
             field_id_for_metric=lambda metric_type: metric_type,
             prepared_scope=prepared_scope,
+            rejected_items=rejected_items,
+            item_path_prefix="measurements",
         )
         _append_compact_coverage(result["items"], coverage)
     elif (
@@ -2684,6 +2770,7 @@ def _expand_extract_response(
             result,
             request=request,
             prepared_scope=prepared_scope,
+            rejected_items=rejected_items,
         )
     elif request.chapter_task.value == "extract_business_regime" and isinstance(
         result.get("events"), list
@@ -2696,34 +2783,102 @@ def _expand_extract_response(
     if isinstance(result.get("items"), list):
         result.setdefault("schema_version", "company_profile_extract_response.v1")
         result.setdefault("request_id", request.request_id)
-    expanded_items: list[Any] = []
-    for item in result.get("items", []):
-        if not isinstance(item, dict):
-            expanded_items.append(item)
-            continue
-        if item.get("item_type") == "segment_row" and isinstance(item.get("row"), dict):
-            expanded_items.extend(
-                _expand_segment_row_draft(
-                    item["row"],
+    expanded_entries: list[tuple[str, Any]] = []
+    for index, item in enumerate(result.get("items", [])):
+        item_path = f"items[{index}]"
+        try:
+            if not isinstance(item, dict):
+                expanded_entries.append((item_path, item))
+                continue
+            if item.get("item_type") == "segment_row" and isinstance(
+                item.get("row"), dict
+            ):
+                expanded_entries.extend(
+                    (f"{item_path}.expanded[{child_index}]", child)
+                    for child_index, child in enumerate(
+                        _expand_segment_row_draft(
+                            item["row"],
+                            request=request,
+                            prepared_scope=prepared_scope,
+                        )
+                    )
+                )
+                continue
+            if isinstance(item.get("candidate"), dict):
+                item["candidate"] = _expand_candidate_draft(
+                    item["candidate"],
                     request=request,
                     prepared_scope=prepared_scope,
                 )
+            if isinstance(item.get("coverage"), dict):
+                item["coverage"] = _expand_coverage_draft(
+                    item["coverage"],
+                    request=request,
+                    prepared_scope=prepared_scope,
+                )
+            expanded_entries.append((item_path, item))
+        except (ValidationError, TypeError, ValueError) as exc:
+            if rejected_items is None:
+                raise
+            item_kind = (
+                "segment_row"
+                if isinstance(item, Mapping) and item.get("item_type") == "segment_row"
+                else "coverage"
+                if isinstance(item, Mapping) and item.get("item_type") == "coverage"
+                else "candidate"
+                if isinstance(item, Mapping) and item.get("item_type") == "candidate"
+                else "unknown"
             )
-            continue
-        if isinstance(item.get("candidate"), dict):
-            item["candidate"] = _expand_candidate_draft(
-                item["candidate"],
-                request=request,
-                prepared_scope=prepared_scope,
+            rejected_items.append(
+                _rejected_extract_item(
+                    item_path=item_path,
+                    item_kind=item_kind,
+                    field_id=_extract_item_field_id(item),
+                    error=exc,
+                )
             )
-        if isinstance(item.get("coverage"), dict):
-            item["coverage"] = _expand_coverage_draft(
-                item["coverage"],
-                request=request,
-                prepared_scope=prepared_scope,
-            )
-        expanded_items.append(item)
+    expanded_items = [item for _, item in expanded_entries]
     _ensure_unique_generated_record_ids(expanded_items)
+    if rejected_items is not None:
+        validated_items: list[Any] = []
+        seen_coverage: set[tuple[str, str]] = set()
+        for item_path, item in expanded_entries:
+            try:
+                parsed_item = ExtractResponse.model_validate_json(
+                    json.dumps(
+                        {"request_id": request.request_id, "items": [item]},
+                        ensure_ascii=False,
+                        allow_nan=False,
+                    )
+                ).items[0]
+                if hasattr(parsed_item, "coverage"):
+                    coverage = parsed_item.coverage
+                    identity = (coverage.chapter_task.value, coverage.field_id)
+                    if identity in seen_coverage:
+                        raise ValueError(
+                            f"duplicate extract coverage identity: {identity}"
+                        )
+                    seen_coverage.add(identity)
+            except (ValidationError, TypeError, ValueError) as exc:
+                rejected_items.append(
+                    _rejected_extract_item(
+                        item_path=item_path,
+                        item_kind=(
+                            "coverage"
+                            if isinstance(item, Mapping)
+                            and item.get("item_type") == "coverage"
+                            else "candidate"
+                            if isinstance(item, Mapping)
+                            and item.get("item_type") == "candidate"
+                            else "unknown"
+                        ),
+                        field_id=_extract_item_field_id(item),
+                        error=exc,
+                    )
+                )
+                continue
+            validated_items.append(item)
+        expanded_items = validated_items
     result["items"] = expanded_items
     return result
 
@@ -2742,6 +2897,72 @@ def _normalize_extract_response(
     _reject_invalid_business_regime_coverage(result, prepared_scope=prepared_scope)
     _require_reported_business_change_coverage(result, prepared_scope=prepared_scope)
     return result
+
+
+_ISOLATABLE_BUSINESS_REGIME_ERRORS = (
+    "principal-business statistical-calibre coverage cannot close business_regime",
+    "control-scope no-change coverage cannot close broader business_regime",
+    "business_regime legal-empty coverage contradicts an evidenced control-scope change",
+)
+
+
+def _normalize_extract_response_isolated(
+    data: Any,
+    *,
+    request: SemanticTaskRequest,
+    prepared_scope: PreparedRequestScope,
+) -> _NormalizedExtractPayload:
+    rejected_items: list[Stage5RejectedExtractItem] = []
+    result = _expand_extract_response(
+        data,
+        request=request,
+        prepared_scope=prepared_scope,
+        rejected_items=rejected_items,
+    )
+    try:
+        _reject_invalid_business_regime_coverage(
+            result,
+            prepared_scope=prepared_scope,
+        )
+    except ValueError as exc:
+        detail = str(exc).strip()
+        if detail not in _ISOLATABLE_BUSINESS_REGIME_ERRORS:
+            raise
+        if not isinstance(result, Mapping) or not isinstance(
+            result.get("items"), list
+        ):
+            raise
+        retained: list[Any] = []
+        removed = 0
+        for index, item in enumerate(result["items"]):
+            coverage = item.get("coverage") if isinstance(item, Mapping) else None
+            if (
+                isinstance(coverage, Mapping)
+                and coverage.get("field_id") == "business_regime"
+                and coverage.get("status") in {"not_applicable", "not_disclosed"}
+            ):
+                rejected_items.append(
+                    _rejected_extract_item(
+                        item_path=f"items[{index}]",
+                        item_kind="coverage",
+                        field_id="business_regime",
+                        error=exc,
+                    )
+                )
+                removed += 1
+                continue
+            retained.append(item)
+        if removed == 0:
+            raise
+        result["items"] = retained
+    _require_reported_business_change_coverage(
+        result,
+        prepared_scope=prepared_scope,
+    )
+    return _NormalizedExtractPayload(
+        data=result,
+        rejected_items=tuple(rejected_items),
+    )
 
 
 _GENERIC_MATERIAL_INPUT_NAMES = frozenset(
@@ -3436,13 +3657,15 @@ class CommonGatewaySemanticProvider:
                     tuple(results),
                     prepared_scope=self._prepared_scope,
                 )
-                normalized = _normalize_extract_response(
+                normalization = _normalize_extract_response_isolated(
                     merged,
                     request=request,
                     prepared_scope=self._prepared_scope,
                 )
                 parsed = ExtractResponse.model_validate_json(
-                    json.dumps(normalized, ensure_ascii=False, allow_nan=False)
+                    json.dumps(
+                        normalization.data, ensure_ascii=False, allow_nan=False
+                    )
                 )
             except (ValidationError, TypeError, ValueError) as exc:
                 raise SemanticProviderError(
@@ -3453,6 +3676,10 @@ class CommonGatewaySemanticProvider:
                 raise SemanticProviderError(
                     ContractErrorCode.REQUEST_IDENTITY_MISMATCH,
                     "merged segment partition request_id mismatch",
+                )
+            if normalization.rejected_items:
+                self._attach_rejected_items_to_latest_extract_trace(
+                    normalization.rejected_items
                 )
             return parsed.model_dump(mode="json")
         return self._execute(
@@ -3465,7 +3692,7 @@ class CommonGatewaySemanticProvider:
             model_schema=_minimal_extract_schema(
                 request, prepared_scope=self._prepared_scope
             ),
-            normalize_response=lambda data: _normalize_extract_response(
+            normalize_response=lambda data: _normalize_extract_response_isolated(
                 data,
                 request=request,
                 prepared_scope=self._prepared_scope,
@@ -3772,11 +3999,15 @@ class CommonGatewaySemanticProvider:
             content_is_untrusted=True,
         )
         response: LlmResponse | None = None
+        rejected_items: tuple[Stage5RejectedExtractItem, ...] = ()
         if self._physical_call_admission is not None:
             self._physical_call_admission()
         try:
             response = _run_complete(self._client, llm_request, self._runner)
             normalized_response = normalize_response(response.data)
+            if isinstance(normalized_response, _NormalizedExtractPayload):
+                rejected_items = normalized_response.rejected_items
+                normalized_response = normalized_response.data
             parsed = response_model.model_validate_json(
                 json.dumps(normalized_response, ensure_ascii=False, allow_nan=False)
             )
@@ -3846,13 +4077,40 @@ class CommonGatewaySemanticProvider:
                 total_tokens=(
                     response.usage.total_tokens if response.usage is not None else None
                 ),
-                warnings=response.warnings,
+                warnings=(
+                    response.warnings
+                    if not rejected_items
+                    or "extract_items_rejected" in response.warnings
+                    else (*response.warnings, "extract_items_rejected")
+                ),
+                rejected_extract_items=rejected_items,
                 parent_semantic_request_id=parent_semantic_request_id,
                 partition_index=partition_index,
                 partition_count=partition_count,
             )
         )
         return parsed.model_dump(mode="json")
+
+    def _attach_rejected_items_to_latest_extract_trace(
+        self,
+        rejected_items: tuple[Stage5RejectedExtractItem, ...],
+    ) -> None:
+        if not rejected_items or not self._traces:
+            return
+        trace = self._traces[-1]
+        if trace.call_type != "extract" or trace.status != "success":
+            raise RuntimeError(
+                "rejected extract items require a successful extract trace"
+            )
+        warnings = trace.warnings
+        if "extract_items_rejected" not in warnings:
+            warnings = (*warnings, "extract_items_rejected")
+        self._traces[-1] = trace.model_copy(
+            update={
+                "warnings": warnings,
+                "rejected_extract_items": rejected_items,
+            }
+        )
 
     def _validate_extract_scope(self, request: SemanticTaskRequest) -> None:
         if (

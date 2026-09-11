@@ -2921,11 +2921,15 @@ def test_numeric_reconciliation_requires_non_empty_uncertainty() -> None:
         timeout_seconds=30,
     )
 
-    with pytest.raises(SemanticProviderError) as exc_info:
-        provider.extract(request)
+    response = provider.extract(request)
 
-    assert exc_info.value.code == ContractErrorCode.CANDIDATE_SCHEMA_INVALID
-    assert "non-empty uncertainty" in (provider.traces[0].error_detail or "")
+    assert response["items"] == []
+    assert provider.traces[0].status == "success"
+    assert "extract_items_rejected" in provider.traces[0].warnings
+    rejected = provider.traces[0].rejected_extract_items
+    assert len(rejected) == 1
+    assert rejected[0].item_kind == "segment_row"
+    assert "non-empty uncertainty" in rejected[0].error_detail
 
 
 def test_consolidated_segment_subject_requires_affirmative_basis() -> None:
@@ -2944,11 +2948,19 @@ def test_consolidated_segment_subject_requires_affirmative_basis() -> None:
         timeout_seconds=30,
     )
 
-    with pytest.raises(SemanticProviderError) as exc_info:
-        provider.extract(request)
+    response = provider.extract(request)
 
-    assert exc_info.value.code == ContractErrorCode.CANDIDATE_SCHEMA_INVALID
-    assert "subject_basis" in (provider.traces[0].error_detail or "")
+    assert response["items"] == []
+    assert provider.traces[0].status == "success"
+    assert "extract_items_rejected" in provider.traces[0].warnings
+    rejected = provider.traces[0].rejected_extract_items
+    assert len(rejected) == 2
+    assert {item.item_kind for item in rejected} == {"candidate"}
+    assert {item.item_path for item in rejected} == {
+        "items[0].expanded[0]",
+        "items[0].expanded[1]",
+    }
+    assert all("subject_basis" in item.error_detail for item in rejected)
 
 
 @pytest.mark.parametrize("dimension", ["分业务", "产品"])
@@ -2971,13 +2983,17 @@ def test_segment_financials_reject_semantic_dimension_rewrite(
         timeout_seconds=30,
     )
 
-    with pytest.raises(SemanticProviderError) as exc_info:
-        provider.extract(request)
+    response = provider.extract(request)
 
-    assert exc_info.value.code == ContractErrorCode.CANDIDATE_SCHEMA_INVALID
-    assert provider.traces[0].error_code == "candidate_schema_invalid"
+    assert response["items"] == []
+    assert provider.traces[0].status == "success"
+    assert provider.traces[0].error_code is None
     assert provider.traces[0].gateway_request_id == "gateway-1"
-    assert "dimension" in (provider.traces[0].error_detail or "")
+    assert "extract_items_rejected" in provider.traces[0].warnings
+    rejected = provider.traces[0].rejected_extract_items
+    assert len(rejected) == 1
+    assert rejected[0].item_kind == "segment_row"
+    assert "dimension" in rejected[0].error_detail
 
 
 def test_segment_financials_report_the_rejected_source_label() -> None:
@@ -2996,10 +3012,12 @@ def test_segment_financials_report_the_rejected_source_label() -> None:
         timeout_seconds=30,
     )
 
-    with pytest.raises(SemanticProviderError):
-        provider.extract(request)
+    response = provider.extract(request)
 
-    assert "其他业务" in (provider.traces[0].error_detail or "")
+    assert response["items"] == []
+    rejected = provider.traces[0].rejected_extract_items
+    assert len(rejected) == 1
+    assert "其他业务" in rejected[0].error_detail
 
 
 def test_segment_dimension_heading_can_precede_cited_continuation_row() -> None:
@@ -3583,6 +3601,27 @@ def test_common_gateway_provider_rejects_response_identity_mismatch() -> None:
 
     assert exc_info.value.code == ContractErrorCode.REQUEST_IDENTITY_MISMATCH
     assert provider.traces[0].error_code == "request_identity_mismatch"
+
+
+def test_common_gateway_provider_keeps_invalid_envelope_call_fatal() -> None:
+    prepared = _prepared_scope()
+    request = _extract_request(prepared)
+    provider = CommonGatewaySemanticProvider(
+        client=_FakeGatewayClient(outputs=[[]]),
+        profile="semantic_extraction",
+        prepared_scope=prepared,
+        max_output_tokens=2000,
+        timeout_seconds=30,
+    )
+
+    with pytest.raises(SemanticProviderError) as exc_info:
+        provider.extract(request)
+
+    assert exc_info.value.code == ContractErrorCode.CANDIDATE_SCHEMA_INVALID
+    trace = provider.traces[0]
+    assert trace.status == "failed"
+    assert trace.error_code == "candidate_schema_invalid"
+    assert trace.rejected_extract_items == ()
 
 
 def test_business_overview_accepts_source_native_contiguous_excerpt() -> None:
@@ -4762,6 +4801,386 @@ def test_coverage_rejects_explicit_context_only_evidence() -> None:
             request=request,
             prepared_scope=prepared,
         )
+
+
+def test_isolated_context_only_coverage_preserves_valid_material_sibling() -> None:
+    prepared = _owner_and_context_material_scope()
+    request = _material_input_extract_request(prepared)
+    owner_id = prepared.evidence_bundle[0].evidence.evidence_id
+    context_id = prepared.evidence_bundle[1].evidence.evidence_id
+    provider = CommonGatewaySemanticProvider(
+        client=_FakeGatewayClient(
+            outputs=[
+                {
+                    "material_inputs": [
+                        {"name": "铁矿石", "evidence_id": owner_id}
+                    ],
+                    "coverage": {
+                        "status": "not_disclosed",
+                        "reason_code": "source_reason_unspecified",
+                        "evidence_ids": [context_id],
+                    },
+                }
+            ]
+        ),
+        profile="semantic_extraction",
+        prepared_scope=prepared,
+        max_output_tokens=1000,
+        timeout_seconds=30,
+    )
+
+    response = provider.extract(request)
+
+    assert len(response["items"]) == 1
+    candidate = response["items"][0]["candidate"]
+    assert candidate["object_name"] == "铁矿石"
+    assert candidate["evidence"][0]["evidence_id"] == owner_id
+    rejected = provider.traces[0].rejected_extract_items
+    assert len(rejected) == 1
+    assert rejected[0].item_kind == "coverage"
+    assert rejected[0].field_id == "material_input"
+    assert "context-only ids" in rejected[0].error_detail
+
+
+def test_isolated_contradictory_regime_coverage_preserves_valid_regime() -> None:
+    source_text = (
+        "公司主要经营模式为直销。"
+        "报告期内合并范围是否发生变动 ☑是 □否。"
+    )
+    prepared = _scope_with_source_text(
+        chapter_task=ChapterTask.EXTRACT_BUSINESS_REGIME,
+        scope_id="business_regime",
+        field_id="business_regime",
+        source_text=source_text,
+    )
+    request = _business_regime_request(prepared)
+    evidence_id = prepared.evidence_bundle[0].evidence.evidence_id
+    provider = CommonGatewaySemanticProvider(
+        client=_FakeGatewayClient(
+            outputs=[
+                {
+                    "events": [],
+                    "regimes": [
+                        {
+                            "label": "直销",
+                            "effective_from": "2025-01-01",
+                            "evidence_id": evidence_id,
+                        }
+                    ],
+                    "package_assignments": [],
+                    "coverage": [
+                        {
+                            "field_id": "business_regime",
+                            "status": "not_applicable",
+                            "reason_code": "source_explicitly_not_applicable",
+                            "evidence_ids": [evidence_id],
+                        }
+                    ],
+                }
+            ]
+        ),
+        profile="semantic_extraction",
+        prepared_scope=prepared,
+        max_output_tokens=1000,
+        timeout_seconds=30,
+    )
+
+    response = provider.extract(request)
+
+    assert len(response["items"]) == 1
+    candidate = response["items"][0]["candidate"]
+    assert candidate["object_type"] == "BusinessRegime"
+    assert candidate["regime_label"] == "直销"
+    rejected = provider.traces[0].rejected_extract_items
+    assert len(rejected) == 1
+    assert "contradicts an evidenced control-scope change" in (
+        rejected[0].error_detail
+    )
+
+
+def test_isolated_control_no_change_coverage_preserves_valid_regime() -> None:
+    source_text = (
+        "公司主要经营模式为直销。"
+        "（八）合并报表范围的变化情况 □适用 √不适用。"
+    )
+    prepared = _scope_with_source_text(
+        chapter_task=ChapterTask.EXTRACT_BUSINESS_REGIME,
+        scope_id="business_regime",
+        field_id="business_regime",
+        source_text=source_text,
+    )
+    request = _business_regime_request(prepared)
+    evidence_id = prepared.evidence_bundle[0].evidence.evidence_id
+    provider = CommonGatewaySemanticProvider(
+        client=_FakeGatewayClient(
+            outputs=[
+                {
+                    "events": [],
+                    "regimes": [
+                        {
+                            "label": "直销",
+                            "effective_from": "2025-01-01",
+                            "evidence_id": evidence_id,
+                        }
+                    ],
+                    "package_assignments": [],
+                    "coverage": [
+                        {
+                            "field_id": "business_regime",
+                            "status": "not_applicable",
+                            "reason_code": "source_explicitly_not_applicable",
+                            "evidence_ids": [evidence_id],
+                        }
+                    ],
+                }
+            ]
+        ),
+        profile="semantic_extraction",
+        prepared_scope=prepared,
+        max_output_tokens=1000,
+        timeout_seconds=30,
+    )
+
+    response = provider.extract(request)
+
+    assert len(response["items"]) == 1
+    assert response["items"][0]["candidate"]["regime_label"] == "直销"
+    rejected = provider.traces[0].rejected_extract_items
+    assert len(rejected) == 1
+    assert "cannot close broader business_regime" in rejected[0].error_detail
+
+
+def test_isolated_overview_source_mismatch_preserves_valid_activity() -> None:
+    prepared = _prepared_scope().model_copy(
+        update={
+            "scope_id": "business_overview",
+            "field_ids": ("business_overview_source", "explicit_activity"),
+        }
+    )
+    checklist = (
+        ChecklistItem(
+            field_id="business_overview_source",
+            object_type=ObjectType.BUSINESS_OVERVIEW,
+            chapter_task=ChapterTask.EXTRACT_BUSINESS_OVERVIEW,
+            requirement_level=RequirementLevel.REQUIRED,
+            allowed_coverage_statuses=tuple(CoverageStatus),
+        ),
+        ChecklistItem(
+            field_id="explicit_activity",
+            object_type=ObjectType.ACTIVITY,
+            chapter_task=ChapterTask.EXTRACT_BUSINESS_OVERVIEW,
+            requirement_level=RequirementLevel.CONDITIONAL,
+            allowed_coverage_statuses=tuple(CoverageStatus),
+            allowed_actions=tuple(ActivityAction),
+        ),
+    )
+    request = SemanticTaskRequest(
+        request_id="isolated-business-overview",
+        report=prepared.report,
+        package_manifest=PackageManifest(
+            package_name="manufacturing_materials",
+            package_version="v1",
+            report=prepared.report,
+            checklist=checklist,
+        ),
+        chapter_task=prepared.chapter_task,
+        evidence_bundle=prepared.evidence_bundle,
+        allowed_object_types=(ObjectType.BUSINESS_OVERVIEW, ObjectType.ACTIVITY),
+        allowed_actions=tuple(ActivityAction),
+        unresolved_field_ids=prepared.field_ids,
+    )
+    evidence_id = prepared.evidence_bundle[0].evidence.evidence_id
+    provider = CommonGatewaySemanticProvider(
+        client=_FakeGatewayClient(
+            outputs=[
+                {
+                    "overview": {
+                        "source_name": "主要业务",
+                        "source_text": "公司主要从事光伏产品。",
+                        "evidence_id": evidence_id,
+                    },
+                    "activities": [
+                        {
+                            "action": "produces",
+                            "actor": "公司",
+                            "actor_basis": "direct_grammatical_actor",
+                            "object_name": "动力电池",
+                            "source_verb": "生产",
+                            "evidence_id": evidence_id,
+                        }
+                    ],
+                }
+            ]
+        ),
+        profile="semantic_extraction",
+        prepared_scope=prepared,
+        max_output_tokens=1000,
+        timeout_seconds=30,
+    )
+
+    response = provider.extract(request)
+
+    assert len(response["items"]) == 1
+    candidate = response["items"][0]["candidate"]
+    assert candidate["object_type"] == "Activity"
+    assert candidate["activity_actor"] == "公司"
+    assert candidate["source_verb"] == "生产"
+    rejected = provider.traces[0].rejected_extract_items
+    assert len(rejected) == 1
+    assert rejected[0].field_id == "business_overview_source"
+    assert "source_text" in rejected[0].error_detail
+
+
+def test_isolated_ambiguous_share_preserves_directional_measurement() -> None:
+    prepared = _prepared_scope().model_copy(
+        update={
+            "scope_id": "top_five_totals_and_legal_empty_names",
+            "chapter_task": ChapterTask.EXTRACT_COUNTERPARTIES_AND_CONCENTRATION,
+            "field_ids": (
+                "counterparty_relationship",
+                "customer_concentration",
+                "supplier_concentration",
+            ),
+        }
+    )
+    checklist = (
+        ChecklistItem(
+            field_id="counterparty_relationship",
+            object_type=ObjectType.RELATIONSHIP,
+            chapter_task=prepared.chapter_task,
+            requirement_level=RequirementLevel.CONDITIONAL,
+            allowed_coverage_statuses=tuple(CoverageStatus),
+        ),
+        ChecklistItem(
+            field_id="customer_concentration",
+            object_type=ObjectType.MEASUREMENT,
+            chapter_task=prepared.chapter_task,
+            requirement_level=RequirementLevel.CONDITIONAL,
+            allowed_coverage_statuses=tuple(CoverageStatus),
+            allowed_metric_types=(MetricType.DISCLOSED_SHARE,),
+        ),
+        ChecklistItem(
+            field_id="supplier_concentration",
+            object_type=ObjectType.MEASUREMENT,
+            chapter_task=prepared.chapter_task,
+            requirement_level=RequirementLevel.CONDITIONAL,
+            allowed_coverage_statuses=tuple(CoverageStatus),
+            allowed_metric_types=(
+                MetricType.SUPPLIER_PURCHASE_AMOUNT,
+                MetricType.DISCLOSED_SHARE,
+            ),
+        ),
+    )
+    request = SemanticTaskRequest(
+        request_id="isolated-counterparty-share",
+        report=prepared.report,
+        package_manifest=PackageManifest(
+            package_name="manufacturing_materials",
+            package_version="v1",
+            report=prepared.report,
+            checklist=checklist,
+        ),
+        chapter_task=prepared.chapter_task,
+        evidence_bundle=prepared.evidence_bundle,
+        allowed_object_types=(ObjectType.RELATIONSHIP, ObjectType.MEASUREMENT),
+        allowed_metric_types=(
+            MetricType.SUPPLIER_PURCHASE_AMOUNT,
+            MetricType.DISCLOSED_SHARE,
+        ),
+        unresolved_field_ids=prepared.field_ids,
+    )
+    evidence_id = prepared.evidence_bundle[0].evidence.evidence_id
+    provider = CommonGatewaySemanticProvider(
+        client=_FakeGatewayClient(
+            outputs=[
+                {
+                    "relationships": [],
+                    "measurements": [
+                        {
+                            "metric_type": "disclosed_share",
+                            "name": "前五名占比",
+                            "value": "20",
+                            "unit": "%",
+                            "evidence_id": evidence_id,
+                        },
+                        {
+                            "metric_type": "supplier_purchase_amount",
+                            "name": "前五名供应商采购额",
+                            "value": "95",
+                            "unit": "亿元",
+                            "evidence_id": evidence_id,
+                        },
+                    ],
+                    "coverage": [],
+                }
+            ]
+        ),
+        profile="semantic_extraction",
+        prepared_scope=prepared,
+        max_output_tokens=1000,
+        timeout_seconds=30,
+    )
+
+    response = provider.extract(request)
+
+    assert len(response["items"]) == 1
+    candidate = response["items"][0]["candidate"]
+    assert candidate["field_id"] == "supplier_concentration"
+    assert candidate["metric_type"] == "supplier_purchase_amount"
+    assert candidate["source_native"]["value"] == "95"
+    rejected = provider.traces[0].rejected_extract_items
+    assert len(rejected) == 1
+    assert rejected[0].item_kind == "measurement"
+    assert rejected[0].field_id is None
+    assert "ambiguous field direction" in rejected[0].error_detail
+
+
+def test_all_invalid_required_field_remains_unresolved() -> None:
+    prepared = _owner_and_context_material_scope()
+    request = _material_input_extract_request(prepared)
+    request = request.model_copy(
+        update={
+            "package_manifest": request.package_manifest.model_copy(
+                update={
+                    "checklist": tuple(
+                        item.model_copy(
+                            update={"requirement_level": RequirementLevel.REQUIRED}
+                        )
+                        for item in request.package_manifest.checklist
+                    )
+                }
+            )
+        }
+    )
+    context_id = prepared.evidence_bundle[1].evidence.evidence_id
+    provider = CommonGatewaySemanticProvider(
+        client=_FakeGatewayClient(
+            outputs=[
+                {
+                    "material_inputs": [],
+                    "coverage": {
+                        "status": "not_disclosed",
+                        "reason_code": "source_reason_unspecified",
+                        "evidence_ids": [context_id],
+                    },
+                }
+            ]
+        ),
+        profile="semantic_extraction",
+        prepared_scope=prepared,
+        max_output_tokens=1000,
+        timeout_seconds=30,
+    )
+
+    result = CompanyProfileSemanticService().run_task(request, provider=provider)
+
+    assert result.task_complete is False
+    assert result.provider_calls == ("extract",)
+    assert result.coverage[0].status == CoverageStatus.UNCLEAR
+    assert result.coverage[0].reason_code == CoverageReasonCode.REQUIRED_RESULT_MISSING
+    assert result.records == ()
+    assert provider.traces[0].status == "success"
+    assert len(provider.traces[0].rejected_extract_items) == 1
 
 
 def _owner_coverage_request(prepared: PreparedRequestScope) -> SemanticTaskRequest:

@@ -137,6 +137,24 @@ def test_stage5_scope_result_maps_partition_traces_to_one_logical_extract() -> N
     assert len(result.provider_traces) == 4
 
 
+def test_historical_provider_trace_without_rejected_items_still_validates() -> None:
+    trace = Stage5ProviderCallTrace.model_validate_json(
+        json.dumps(
+            {
+            "call_type": "extract",
+            "semantic_request_id": "historical-extract",
+            "gateway_request_id": "historical-gateway",
+            "status": "success",
+            "profile": "semantic_extraction",
+            "warnings": [],
+            }
+        )
+    )
+
+    assert trace.rejected_extract_items == ()
+    assert "rejected_extract_items" in trace.model_dump(mode="json")
+
+
 def test_stage5_scope_result_allows_only_failed_incomplete_partition_prefix() -> None:
     base = _minimal_run_bundle("partition-failure-unit").reports[0].scope_results[0]
     task_result = base.task_result.model_copy(update={"provider_calls": ("extract",)})
