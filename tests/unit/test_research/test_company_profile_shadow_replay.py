@@ -16,7 +16,9 @@ from research.company_profile.shadow_batch_audit import (
     build_shadow_replay_comparison_audit,
     build_shadow_replay_comparison_from_snapshot,
     build_shadow_review_package,
+    load_shadow_readiness_audit,
     load_shadow_replay_comparison_audit,
+    load_shadow_review_package,
     write_shadow_batch_audit_artifact,
 )
 from research.company_profile.shadow_batch_service import (
@@ -27,6 +29,7 @@ from research.company_profile.shadow_batch_service import (
     load_shadow_batch_result,
     load_shadow_report_result,
     validate_evidence_role_replay_proof,
+    validate_external_operating_ownership_replay_proof,
     validate_operating_ownership_replay_proof,
     validate_segment_financial_closure_audit,
     validate_segment_heading_replay_proof,
@@ -43,6 +46,7 @@ from research.company_profile.shadow_evidence import (
 from research.company_profile.stage5_provider import _segment_numeric_occurrence_count
 from scripts.run_company_profile_shadow_batch import (
     EVIDENCE_ROLE_SHADOW_REPLAY_CONTRACT,
+    EXTERNAL_OPERATING_OWNERSHIP_SHADOW_REPLAY_CONTRACT,
     EXTERNAL_PRECISION_SHADOW_REPLAY_CONTRACT,
     OPERATING_OWNERSHIP_SHADOW_REPLAY_CONTRACT,
     OWNER_CLOSURE_SHADOW_REPLAY_CONTRACT,
@@ -117,6 +121,10 @@ if not OPERATING_OWNERSHIP_REPLAY_CHANGE.exists():
     )
     if archived_operating_ownership_replays:
         OPERATING_OWNERSHIP_REPLAY_CHANGE = archived_operating_ownership_replays[-1]
+EXTERNAL_OPERATING_OWNERSHIP_CHANGE = (
+    REPOSITORY_ROOT
+    / "openspec/changes/replay-company-profile-operating-ownership-external-path"
+)
 SEGMENT_HEADING_REPLAY_ARCHIVE = (
     SEGMENT_HEADING_REPLAY_CHANGE
 )
@@ -374,6 +382,57 @@ def operating_ownership_replay_inputs():
         (
             OPERATING_OWNERSHIP_REPLAY_CHANGE
             / "provider-free-admission-proof.v1.json"
+        ).read_text(encoding="utf-8")
+    )
+    for name in (
+        "ownership-evidence-plan.v1.json",
+        "provider-free-preparation-audit.v1.json",
+        "ownership-rebuild-audit.v1.json",
+    ):
+        active_path = (
+            "openspec/changes/validate-company-profile-operating-evidence-"
+            f"ownership-replay/{name}"
+        )
+        archived_path = (
+            "openspec/changes/archive/2026-09-11-validate-company-profile-"
+            f"operating-evidence-ownership-replay/{name}"
+        )
+        proof["artifact_hashes"][archived_path] = proof["artifact_hashes"].pop(
+            active_path
+        )
+    current_validator_hash = _file_sha256(
+        REPOSITORY_ROOT / "research/company_profile/shadow_batch_service.py"
+    )
+    proof["implementation_hashes"][
+        "research/company_profile/shadow_batch_service.py"
+    ] = current_validator_hash
+    proof["supporting_artifact_hashes"][
+        "ownership_replay_proof_validator"
+    ] = current_validator_hash
+    proof["audit_hash"] = _payload_hash(
+        {key: value for key, value in proof.items() if key != "audit_hash"}
+    )
+    prepared = ShadowEvidencePreparer().prepare(manifest=manifest, plan=plan)
+    return manifest, plan, preparation, proof, prepared
+
+
+@pytest.fixture(scope="module")
+def external_operating_ownership_replay_inputs():
+    manifest = load_shadow_sample_manifest(
+        BASELINE_CHANGE / "shadow-manifest.v1.json",
+        repository_root=REPOSITORY_ROOT,
+    )
+    plan = load_shadow_evidence_plan(
+        OPERATING_OWNERSHIP_REPLAY_CHANGE / "ownership-evidence-plan.v1.json"
+    )
+    preparation = load_shadow_preparation_audit(
+        OPERATING_OWNERSHIP_REPLAY_CHANGE
+        / "provider-free-preparation-audit.v1.json"
+    )
+    proof = json.loads(
+        (
+            EXTERNAL_OPERATING_OWNERSHIP_CHANGE
+            / "provider-free-recovery-proof.v1.json"
         ).read_text(encoding="utf-8")
     )
     prepared = ShadowEvidencePreparer().prepare(manifest=manifest, plan=plan)
@@ -1902,7 +1961,10 @@ def test_operating_ownership_replay_admission_is_exact_and_research_only(
     proof.pop("audit_hash", None)
     proof["audit_hash"] = _payload_hash(proof)
     contract = OPERATING_OWNERSHIP_SHADOW_REPLAY_CONTRACT.model_copy(
-        update={"correction_audit_hash": proof["audit_hash"]}
+        update={
+            "correction_audit_hash": proof["audit_hash"],
+            "supporting_artifact_hashes": proof["supporting_artifact_hashes"],
+        }
     )
 
     supporting = validate_operating_ownership_replay_proof(
@@ -1970,7 +2032,12 @@ def test_operating_ownership_replay_mode_output_and_budget_are_closed(
     operating_ownership_replay_inputs,
 ) -> None:
     manifest, plan, preparation, proof, prepared = operating_ownership_replay_inputs
-    contract = OPERATING_OWNERSHIP_SHADOW_REPLAY_CONTRACT
+    contract = OPERATING_OWNERSHIP_SHADOW_REPLAY_CONTRACT.model_copy(
+        update={
+            "correction_audit_hash": proof["audit_hash"],
+            "supporting_artifact_hashes": proof["supporting_artifact_hashes"],
+        }
+    )
     args = build_parser().parse_args(
         [
             "--mode",
@@ -2139,6 +2206,299 @@ def test_operating_ownership_interrupted_attempt_is_failed_closed() -> None:
     assert all(
         artifact["production_authorization"] == "not_authorized"
         for artifact in (attempt, readiness, recurrence, comparison, review)
+    )
+
+
+def test_external_operating_ownership_recovery_is_exact_and_research_only(
+    tmp_path: Path,
+    external_operating_ownership_replay_inputs,
+) -> None:
+    manifest, plan, preparation, proof, prepared = (
+        external_operating_ownership_replay_inputs
+    )
+    output_root = tmp_path / "external-output"
+    proof = json.loads(json.dumps(proof))
+    proof["output_root"] = str(output_root)
+    proof["audit_hash"] = _payload_hash(
+        {key: value for key, value in proof.items() if key != "audit_hash"}
+    )
+    contract = EXTERNAL_OPERATING_OWNERSHIP_SHADOW_REPLAY_CONTRACT.model_copy(
+        update={"correction_audit_hash": proof["audit_hash"]}
+    )
+
+    supporting = validate_external_operating_ownership_replay_proof(
+        proof,
+        contract=contract,
+        repository_root=REPOSITORY_ROOT,
+        output_root=output_root,
+    )
+    validate_shadow_replay_admission(
+        contract=contract,
+        batch_id=contract.batch_id,
+        primary_logical_profile=contract.primary_logical_profile,
+        extract_max_output_tokens=contract.extract_max_output_tokens,
+        verify_max_output_tokens=contract.verify_max_output_tokens,
+        timeout_seconds=contract.timeout_seconds,
+        max_provider_calls=contract.max_provider_calls,
+        manifest=manifest,
+        evidence_plan=plan,
+        preparation_audit=preparation,
+        correction_audit=proof,
+        supporting_artifact_hashes=supporting,
+        prepared=prepared,
+        output_root=output_root,
+    )
+
+    assert len(prepared) == 20
+    assert sum(len(scopes) for scopes in prepared.values()) == 154
+    assert proof["changed_experimental_variables"] == [
+        "batch_id",
+        "execution_network_path",
+        "output_root",
+    ]
+    assert contract.extract_max_output_tokens == 20_000
+    assert contract.verify_max_output_tokens == 18_000
+    assert contract.production_authorization == "not_authorized"
+
+
+def test_external_operating_ownership_frozen_proof_matches_consumed_contract(
+    external_operating_ownership_replay_inputs,
+) -> None:
+    manifest, plan, preparation, proof, prepared = (
+        external_operating_ownership_replay_inputs
+    )
+    contract = EXTERNAL_OPERATING_OWNERSHIP_SHADOW_REPLAY_CONTRACT
+    output_root = Path(proof["output_root"])
+
+    supporting = validate_external_operating_ownership_replay_proof(
+        proof,
+        contract=contract,
+        repository_root=REPOSITORY_ROOT,
+        output_root=output_root,
+    )
+    with pytest.raises(FileExistsError, match="shadow batch already exists"):
+        validate_shadow_replay_admission(
+            contract=contract,
+            batch_id=contract.batch_id,
+            primary_logical_profile=contract.primary_logical_profile,
+            extract_max_output_tokens=contract.extract_max_output_tokens,
+            verify_max_output_tokens=contract.verify_max_output_tokens,
+            timeout_seconds=contract.timeout_seconds,
+            max_provider_calls=contract.max_provider_calls,
+            manifest=manifest,
+            evidence_plan=plan,
+            preparation_audit=preparation,
+            correction_audit=proof,
+            supporting_artifact_hashes=supporting,
+            prepared=prepared,
+            output_root=output_root,
+        )
+
+    assert (output_root / f"batch-{contract.batch_id}").is_dir()
+
+
+def test_external_operating_ownership_recovery_rejects_path_drift(
+    external_operating_ownership_replay_inputs,
+) -> None:
+    _, _, _, proof, _ = external_operating_ownership_replay_inputs
+    changed = json.loads(json.dumps(proof))
+    changed["execution_path"] = "sandbox_restricted_network"
+    changed["audit_hash"] = _payload_hash(
+        {key: value for key, value in changed.items() if key != "audit_hash"}
+    )
+    contract = EXTERNAL_OPERATING_OWNERSHIP_SHADOW_REPLAY_CONTRACT.model_copy(
+        update={"correction_audit_hash": changed["audit_hash"]}
+    )
+
+    with pytest.raises(ValueError, match="does not admit"):
+        validate_external_operating_ownership_replay_proof(
+            changed,
+            contract=contract,
+            repository_root=REPOSITORY_ROOT,
+            output_root=Path(changed["output_root"]),
+        )
+
+
+def test_external_operating_ownership_mode_and_budget_are_closed(
+    tmp_path: Path,
+    external_operating_ownership_replay_inputs,
+) -> None:
+    manifest, plan, preparation, proof, prepared = (
+        external_operating_ownership_replay_inputs
+    )
+    contract = EXTERNAL_OPERATING_OWNERSHIP_SHADOW_REPLAY_CONTRACT
+    args = build_parser().parse_args(
+        [
+            "--mode",
+            "external-operating-ownership-semantic-replay",
+            "--sample-manifest",
+            "manifest.json",
+            "--evidence-plan",
+            "plan.json",
+            "--batch-id",
+            contract.batch_id,
+        ]
+    )
+    _validate_replay_mode(
+        mode=args.mode,
+        plan_version=contract.evidence_plan_version,
+        batch_id=contract.batch_id,
+    )
+    with pytest.raises(
+        ValueError, match="external operating ownership batch identity requires"
+    ):
+        _validate_replay_mode(
+            mode="operating-ownership-semantic-replay",
+            plan_version=contract.evidence_plan_version,
+            batch_id=contract.batch_id,
+        )
+    with pytest.raises(ValueError, match="verify_max_output_tokens"):
+        validate_shadow_replay_admission(
+            contract=contract,
+            batch_id=contract.batch_id,
+            primary_logical_profile=contract.primary_logical_profile,
+            extract_max_output_tokens=contract.extract_max_output_tokens,
+            verify_max_output_tokens=contract.verify_max_output_tokens + 1,
+            timeout_seconds=contract.timeout_seconds,
+            max_provider_calls=contract.max_provider_calls,
+            manifest=manifest,
+            evidence_plan=plan,
+            preparation_audit=preparation,
+            correction_audit=proof,
+            supporting_artifact_hashes=contract.supporting_artifact_hashes,
+            prepared=prepared,
+            output_root=tmp_path,
+        )
+
+
+def test_external_operating_ownership_operator_stops_before_provider_creation(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    def reject_before_provider(*args, **kwargs):
+        raise ValueError("provider-free external ownership admission rejected")
+
+    monkeypatch.setattr(
+        shadow_batch_operator,
+        "validate_external_operating_ownership_replay_proof",
+        reject_before_provider,
+    )
+    with pytest.raises(
+        ValueError, match="provider-free external ownership admission rejected"
+    ):
+        shadow_batch_operator.main(
+            [
+                "--mode",
+                "external-operating-ownership-semantic-replay",
+                "--sample-manifest",
+                str(BASELINE_CHANGE / "shadow-manifest.v1.json"),
+                "--evidence-plan",
+                str(
+                    OPERATING_OWNERSHIP_REPLAY_CHANGE
+                    / "ownership-evidence-plan.v1.json"
+                ),
+                "--preparation-audit",
+                str(
+                    OPERATING_OWNERSHIP_REPLAY_CHANGE
+                    / "provider-free-preparation-audit.v1.json"
+                ),
+                "--external-operating-ownership-replay-proof",
+                str(
+                    EXTERNAL_OPERATING_OWNERSHIP_CHANGE
+                    / "provider-free-recovery-proof.v1.json"
+                ),
+                "--admission-receipt",
+                str(tmp_path / "admission.json"),
+                "--output-root",
+                str(tmp_path / "output"),
+                "--batch-id",
+                EXTERNAL_OPERATING_OWNERSHIP_SHADOW_REPLAY_CONTRACT.batch_id,
+            ]
+        )
+
+
+def test_external_operating_ownership_closeout_is_hash_bound_and_research_only() -> None:
+    change = EXTERNAL_OPERATING_OWNERSHIP_CHANGE
+    batch_directory = (
+        REPOSITORY_ROOT
+        / "var/company_profile_shadow_batch/20260911"
+        / "external-operating-ownership-replay-a"
+        / (
+            "batch-manufacturing-materials-shadow-operating-ownership-external-"
+            "gemini-20260911-a"
+        )
+    )
+    review_package = load_shadow_review_package(
+        change / "source-review-package.v1.json"
+    )
+    review_outcomes = json.loads(
+        (change / "source-review-outcomes.v1.json").read_text(encoding="utf-8")
+    )
+    readiness = load_shadow_readiness_audit(
+        change / "empirical-readiness-audit.v1.json"
+    )
+    recurrence = json.loads(
+        (change / "operating-ownership-recurrence-audit.v1.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    comparison = load_shadow_replay_comparison_audit(
+        change / "shadow-replay-comparison-audit.v1.json"
+    )
+
+    recurrence_hash = recurrence.pop("audit_hash")
+    assert recurrence_hash == _payload_hash(recurrence)
+    recurrence["audit_hash"] = recurrence_hash
+
+    assert _file_sha256(batch_directory / "manifest.json") == (
+        comparison.refined.batch_manifest_file_sha256
+    )
+    assert _file_sha256(batch_directory / "review-package.json") == (
+        comparison.refined.review_package_file_sha256
+    )
+    assert _file_sha256(change / "source-review-package.v1.json") == (
+        comparison.refined.review_package_file_sha256
+    )
+    assert _file_sha256(change / "empirical-readiness-audit.v1.json") == (
+        comparison.refined.readiness_audit_file_sha256
+    )
+
+    assert len(review_package.rows) == 266
+    assert len(review_outcomes) == 266
+    assert {item["review_row_id"] for item in review_outcomes} == {
+        item.review_row_id for item in review_package.rows
+    }
+    assert sum(item["outcome"] == "correct" for item in review_outcomes) == 262
+    assert sum(
+        item["outcome"] == "noncritical_error" for item in review_outcomes
+    ) == 4
+    assert sum(item["outcome"] == "critical_error" for item in review_outcomes) == 0
+
+    assert readiness.readiness_decision == "hold"
+    assert readiness.execution_completion_rate == 1.0
+    assert readiness.accepted_record_count == 1_443
+    assert readiness.evidence_traceability_rate == 1.0
+    assert readiness.precision_reviewed_count == 97
+    assert readiness.precision_correct_count == 93
+    assert readiness.critical_semantic_error_count == 0
+    assert recurrence["affected_scope_count"] == 17
+    assert recurrence["affected_scope_count_evaluated"] == 17
+    assert recurrence["ownership_schema_failure_recovery_count"] == 5
+    assert recurrence["ownership_schema_failure_recurrence_count"] == 12
+    assert recurrence["favorable_conclusion_made"] is False
+    assert comparison.refined.report_status_counts == {
+        "hold": 19,
+        "usable_with_caveats": 1,
+    }
+    assert comparison.refined.provider_failed_call_count == 29
+    assert all(
+        authorization == "not_authorized"
+        for authorization in (
+            review_package.production_authorization,
+            readiness.production_authorization,
+            recurrence["production_authorization"],
+            comparison.production_authorization,
+        )
     )
 
 

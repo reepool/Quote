@@ -1,0 +1,113 @@
+{
+  "schema_version": "company_profile_shadow_replay_comparison.v1",
+  "audit_id": "manufacturing-materials-shadow-operating-ownership-external-vs-evidence-role-20260911-a",
+  "baseline": {
+    "batch_id": "manufacturing-materials-shadow-evidence-role-gemini-20260911-a",
+    "source_batch_result_hash": "fe438c0121c88d2fea486ad50f50c2d62f059bb12dbe51c5845edf850e37f710",
+    "sample_manifest_hash": "6f639739ef082e78dcb0c01a5ce40bab1645d8fdc027bece2dbef63652bae9e2",
+    "evidence_plan_version": "manufacturing_materials_shadow.2026-09-10.5",
+    "evidence_plan_hash": "e2205ec932589a0d50457e9f0112b44588ed164cf4c39560f27dfb0f6f996686",
+    "batch_manifest_file_sha256": "982ab6ed61c08569683958b263529b66b7161b83fa161519570cf98a5b11eaf5",
+    "review_package_file_sha256": "9ee8780572449054dd8f1a87484050e6e78a34aab71ae278f531bee21c7cb777",
+    "readiness_audit_file_sha256": "4f18106c02b04a364d90a686d7ccb984e8dcc1fd7ce914338d7c6f98df9a541e",
+    "persisted_report_count": 20,
+    "report_status_counts": {
+      "hold": 20
+    },
+    "execution_completion_rate": 1.0,
+    "usable_report_rate": 0.0,
+    "accepted_record_count": 1511,
+    "evidence_traceability_rate": 1.0,
+    "unresolved_review_median": 6.5,
+    "unresolved_review_p90": 18.0,
+    "provider_call_count": 315,
+    "provider_failed_call_count": 35,
+    "total_latency_ms": 5703325,
+    "total_input_tokens": 1999221,
+    "total_output_tokens": 1349157,
+    "source_review_row_count": 303,
+    "precision_reviewed_count": 93,
+    "sampled_precision": 1.0,
+    "critical_semantic_error_count": 0,
+    "reason_code_counts": {
+      "activity_actor_unsupported": 4,
+      "candidate_schema_invalid": 37,
+      "duplicate_occurrence": 1,
+      "prohibited_inference": 1,
+      "required_coverage_missing": 106,
+      "subject_unsupported": 12
+    },
+    "readiness_decision": "hold"
+  },
+  "refined": {
+    "batch_id": "manufacturing-materials-shadow-operating-ownership-external-gemini-20260911-a",
+    "source_batch_result_hash": "5a07070f88391d28aefbff468501365df42ae9d46e3aebf5a1f4e65927a0ef4a",
+    "sample_manifest_hash": "6f639739ef082e78dcb0c01a5ce40bab1645d8fdc027bece2dbef63652bae9e2",
+    "evidence_plan_version": "manufacturing_materials_shadow.2026-09-11.6",
+    "evidence_plan_hash": "cd445c2642f3509fabb92020968eb8e884aff6d2bc99caeda818ed8b3b094770",
+    "batch_manifest_file_sha256": "99d7121b37e9284ca28471cc256cca9cbf672fd8bb22fe2eedf4a187f6bc9ee0",
+    "review_package_file_sha256": "a6a16b11fb72134162a020ab0346e777e375a3223a1eed643b0e68f97a9bde5f",
+    "readiness_audit_file_sha256": "f0bac8d80ff13c7f7e30e7e3158e842caddfa5f937606332c22d72b3695641e0",
+    "persisted_report_count": 20,
+    "report_status_counts": {
+      "hold": 19,
+      "usable_with_caveats": 1
+    },
+    "execution_completion_rate": 1.0,
+    "usable_report_rate": 0.05,
+    "accepted_record_count": 1443,
+    "evidence_traceability_rate": 1.0,
+    "unresolved_review_median": 6.0,
+    "unresolved_review_p90": 10.0,
+    "provider_call_count": 318,
+    "provider_failed_call_count": 29,
+    "total_latency_ms": 4324483,
+    "total_input_tokens": 1992457,
+    "total_output_tokens": 1312590,
+    "source_review_row_count": 266,
+    "precision_reviewed_count": 97,
+    "sampled_precision": 0.9587628865979382,
+    "critical_semantic_error_count": 0,
+    "reason_code_counts": {
+      "candidate_schema_invalid": 34,
+      "duplicate_occurrence": 3,
+      "occurrence_semantic_conflict": 4,
+      "required_coverage_missing": 86
+    },
+    "readiness_decision": "hold"
+  },
+  "metric_deltas": {
+    "persisted_report_count": 0.0,
+    "execution_completion_rate": 0.0,
+    "usable_report_rate": 0.05,
+    "accepted_record_count": -68.0,
+    "evidence_traceability_rate": 0.0,
+    "unresolved_review_median": -0.5,
+    "unresolved_review_p90": -8.0,
+    "provider_call_count": 3.0,
+    "provider_failed_call_count": -6.0,
+    "total_latency_ms": -1378842.0,
+    "total_input_tokens": -6764.0,
+    "total_output_tokens": -36567.0,
+    "source_review_row_count": -37.0,
+    "precision_reviewed_count": 4.0,
+    "critical_semantic_error_count": 0.0,
+    "sampled_precision": -0.04123711340206182
+  },
+  "report_status_deltas": {
+    "hold": -1,
+    "usable_with_caveats": 1
+  },
+  "reason_code_deltas": {
+    "activity_actor_unsupported": -4,
+    "candidate_schema_invalid": -3,
+    "duplicate_occurrence": 2,
+    "occurrence_semantic_conflict": 4,
+    "prohibited_inference": -1,
+    "required_coverage_missing": -20,
+    "subject_unsupported": -12
+  },
+  "created_at": "2026-09-11T20:11:57.722996+00:00",
+  "audit_hash": "46a2b7cccf2738b6eac9bc7ed12c35728dfc80025137b68c735bf3f3a9c705c7",
+  "production_authorization": "not_authorized"
+}

@@ -1,0 +1,883 @@
+{
+  "schema_version": "company_profile_shadow_operating_ownership_external_recurrence.v1",
+  "audit_id": "manufacturing-materials-shadow-operating-ownership-external-recurrence-20260911-a",
+  "baseline_batch_id": "manufacturing-materials-shadow-evidence-role-gemini-20260911-a",
+  "replay_batch_id": "manufacturing-materials-shadow-operating-ownership-external-gemini-20260911-a",
+  "input_hashes": {
+    "ownership_rebuild_audit": "7ee461ad10a45139a770159a6385041d00800a698d2a21e210a560afdaeb24e6",
+    "baseline_manifest": "982ab6ed61c08569683958b263529b66b7161b83fa161519570cf98a5b11eaf5",
+    "baseline_readiness": "4f18106c02b04a364d90a686d7ccb984e8dcc1fd7ce914338d7c6f98df9a541e",
+    "replay_manifest": "99d7121b37e9284ca28471cc256cca9cbf672fd8bb22fe2eedf4a187f6bc9ee0",
+    "replay_source_review_package": "a6a16b11fb72134162a020ab0346e777e375a3223a1eed643b0e68f97a9bde5f",
+    "replay_source_review_outcomes": "8c4a83ddc0a5cec0f6915ffa9f9552f46fc2822195764c607de27e97cc64d599",
+    "replay_readiness": "f0bac8d80ff13c7f7e30e7e3158e842caddfa5f937606332c22d72b3695641e0"
+  },
+  "affected_scope_count": 17,
+  "affected_scope_count_evaluated": 17,
+  "affected_scope_count_completed": 5,
+  "ownership_schema_failure_recovery_count": 5,
+  "ownership_schema_failure_recurrence_count": 12,
+  "accepted_record_delta": 30,
+  "unresolved_review_delta": -31,
+  "baseline_provider_summary": {
+    "call_type_counts": {
+      "extract": 198,
+      "verify": 117
+    },
+    "typed_failure_counts": {
+      "candidate_schema_invalid": 35
+    },
+    "warning_counts": {
+      "provider_output_budget_exceeded": 14,
+      "provider_output_budget_exceeded_valid_response": 14
+    }
+  },
+  "replay_provider_summary": {
+    "call_type_counts": {
+      "extract": 198,
+      "verify": 120
+    },
+    "typed_failure_counts": {
+      "candidate_schema_invalid": 29
+    },
+    "warning_counts": {
+      "provider_output_budget_exceeded": 6,
+      "provider_output_budget_exceeded_valid_response": 6
+    }
+  },
+  "affected_scopes": [
+    {
+      "sample_id": "manufacturing-materials-shadow-000408-2025",
+      "scope_id": "operating_quantities-01",
+      "baseline": {
+        "task_complete": false,
+        "accepted_record_count": 0,
+        "unresolved_review_count": 5,
+        "reason_code_counts": {
+          "candidate_schema_invalid": 1,
+          "required_coverage_missing": 4
+        },
+        "coverage": [
+          {
+            "field_id": "production_capacity",
+            "status": "unclear"
+          },
+          {
+            "field_id": "capacity_under_construction",
+            "status": "unclear"
+          },
+          {
+            "field_id": "capacity_utilization",
+            "status": "unclear"
+          },
+          {
+            "field_id": "production_volume",
+            "status": "unclear"
+          }
+        ]
+      },
+      "replay": {
+        "task_complete": true,
+        "accepted_record_count": 5,
+        "unresolved_review_count": 0,
+        "reason_code_counts": {},
+        "coverage": [
+          {
+            "field_id": "production_capacity",
+            "status": "observed"
+          },
+          {
+            "field_id": "capacity_under_construction",
+            "status": "observed"
+          },
+          {
+            "field_id": "capacity_utilization",
+            "status": "observed"
+          }
+        ]
+      },
+      "ownership_schema_failure_recovered": true,
+      "ownership_schema_failure_recurred": false
+    },
+    {
+      "sample_id": "manufacturing-materials-shadow-000408-2025",
+      "scope_id": "operating_quantities-02",
+      "baseline": {
+        "task_complete": false,
+        "accepted_record_count": 0,
+        "unresolved_review_count": 6,
+        "reason_code_counts": {
+          "candidate_schema_invalid": 1,
+          "required_coverage_missing": 5
+        },
+        "coverage": [
+          {
+            "field_id": "production_capacity",
+            "status": "unclear"
+          },
+          {
+            "field_id": "capacity_under_construction",
+            "status": "unclear"
+          },
+          {
+            "field_id": "capacity_utilization",
+            "status": "unclear"
+          },
+          {
+            "field_id": "production_volume",
+            "status": "unclear"
+          },
+          {
+            "field_id": "sales_volume",
+            "status": "unclear"
+          }
+        ]
+      },
+      "replay": {
+        "task_complete": false,
+        "accepted_record_count": 0,
+        "unresolved_review_count": 4,
+        "reason_code_counts": {
+          "candidate_schema_invalid": 1,
+          "required_coverage_missing": 3
+        },
+        "coverage": [
+          {
+            "field_id": "capacity_utilization",
+            "status": "unclear"
+          },
+          {
+            "field_id": "production_volume",
+            "status": "unclear"
+          },
+          {
+            "field_id": "sales_volume",
+            "status": "unclear"
+          }
+        ]
+      },
+      "ownership_schema_failure_recovered": false,
+      "ownership_schema_failure_recurred": true
+    },
+    {
+      "sample_id": "manufacturing-materials-shadow-000552-2025",
+      "scope_id": "operating_quantities-01",
+      "baseline": {
+        "task_complete": false,
+        "accepted_record_count": 0,
+        "unresolved_review_count": 3,
+        "reason_code_counts": {
+          "candidate_schema_invalid": 1,
+          "required_coverage_missing": 2
+        },
+        "coverage": [
+          {
+            "field_id": "production_capacity",
+            "status": "unclear"
+          },
+          {
+            "field_id": "production_volume",
+            "status": "unclear"
+          }
+        ]
+      },
+      "replay": {
+        "task_complete": true,
+        "accepted_record_count": 2,
+        "unresolved_review_count": 0,
+        "reason_code_counts": {},
+        "coverage": [
+          {
+            "field_id": "production_capacity",
+            "status": "observed"
+          }
+        ]
+      },
+      "ownership_schema_failure_recovered": true,
+      "ownership_schema_failure_recurred": false
+    },
+    {
+      "sample_id": "manufacturing-materials-shadow-600063-2025",
+      "scope_id": "operating_quantities-02",
+      "baseline": {
+        "task_complete": false,
+        "accepted_record_count": 0,
+        "unresolved_review_count": 6,
+        "reason_code_counts": {
+          "candidate_schema_invalid": 1,
+          "required_coverage_missing": 5
+        },
+        "coverage": [
+          {
+            "field_id": "production_capacity",
+            "status": "unclear"
+          },
+          {
+            "field_id": "capacity_under_construction",
+            "status": "unclear"
+          },
+          {
+            "field_id": "production_volume",
+            "status": "unclear"
+          },
+          {
+            "field_id": "sales_volume",
+            "status": "unclear"
+          },
+          {
+            "field_id": "inventory_volume",
+            "status": "unclear"
+          }
+        ]
+      },
+      "replay": {
+        "task_complete": false,
+        "accepted_record_count": 0,
+        "unresolved_review_count": 4,
+        "reason_code_counts": {
+          "candidate_schema_invalid": 1,
+          "required_coverage_missing": 3
+        },
+        "coverage": [
+          {
+            "field_id": "capacity_under_construction",
+            "status": "unclear"
+          },
+          {
+            "field_id": "sales_volume",
+            "status": "unclear"
+          },
+          {
+            "field_id": "inventory_volume",
+            "status": "unclear"
+          }
+        ]
+      },
+      "ownership_schema_failure_recovered": false,
+      "ownership_schema_failure_recurred": true
+    },
+    {
+      "sample_id": "manufacturing-materials-shadow-600075-2025",
+      "scope_id": "operating_quantities-01",
+      "baseline": {
+        "task_complete": false,
+        "accepted_record_count": 0,
+        "unresolved_review_count": 6,
+        "reason_code_counts": {
+          "candidate_schema_invalid": 1,
+          "required_coverage_missing": 5
+        },
+        "coverage": [
+          {
+            "field_id": "production_capacity",
+            "status": "unclear"
+          },
+          {
+            "field_id": "capacity_under_construction",
+            "status": "unclear"
+          },
+          {
+            "field_id": "production_volume",
+            "status": "unclear"
+          },
+          {
+            "field_id": "sales_volume",
+            "status": "unclear"
+          },
+          {
+            "field_id": "inventory_volume",
+            "status": "unclear"
+          }
+        ]
+      },
+      "replay": {
+        "task_complete": false,
+        "accepted_record_count": 0,
+        "unresolved_review_count": 5,
+        "reason_code_counts": {
+          "candidate_schema_invalid": 1,
+          "required_coverage_missing": 4
+        },
+        "coverage": [
+          {
+            "field_id": "capacity_under_construction",
+            "status": "unclear"
+          },
+          {
+            "field_id": "production_volume",
+            "status": "unclear"
+          },
+          {
+            "field_id": "sales_volume",
+            "status": "unclear"
+          },
+          {
+            "field_id": "inventory_volume",
+            "status": "unclear"
+          }
+        ]
+      },
+      "ownership_schema_failure_recovered": false,
+      "ownership_schema_failure_recurred": true
+    },
+    {
+      "sample_id": "manufacturing-materials-shadow-600111-2025",
+      "scope_id": "operating_quantities-01",
+      "baseline": {
+        "task_complete": false,
+        "accepted_record_count": 0,
+        "unresolved_review_count": 4,
+        "reason_code_counts": {
+          "candidate_schema_invalid": 1,
+          "required_coverage_missing": 3
+        },
+        "coverage": [
+          {
+            "field_id": "production_volume",
+            "status": "unclear"
+          },
+          {
+            "field_id": "sales_volume",
+            "status": "unclear"
+          },
+          {
+            "field_id": "inventory_volume",
+            "status": "unclear"
+          }
+        ]
+      },
+      "replay": {
+        "task_complete": false,
+        "accepted_record_count": 0,
+        "unresolved_review_count": 4,
+        "reason_code_counts": {
+          "candidate_schema_invalid": 1,
+          "required_coverage_missing": 3
+        },
+        "coverage": [
+          {
+            "field_id": "production_volume",
+            "status": "unclear"
+          },
+          {
+            "field_id": "sales_volume",
+            "status": "unclear"
+          },
+          {
+            "field_id": "inventory_volume",
+            "status": "unclear"
+          }
+        ]
+      },
+      "ownership_schema_failure_recovered": false,
+      "ownership_schema_failure_recurred": true
+    },
+    {
+      "sample_id": "manufacturing-materials-shadow-600176-2025",
+      "scope_id": "operating_quantities-01",
+      "baseline": {
+        "task_complete": false,
+        "accepted_record_count": 0,
+        "unresolved_review_count": 4,
+        "reason_code_counts": {
+          "candidate_schema_invalid": 1,
+          "required_coverage_missing": 3
+        },
+        "coverage": [
+          {
+            "field_id": "production_capacity",
+            "status": "unclear"
+          },
+          {
+            "field_id": "production_volume",
+            "status": "unclear"
+          },
+          {
+            "field_id": "sales_volume",
+            "status": "unclear"
+          }
+        ]
+      },
+      "replay": {
+        "task_complete": false,
+        "accepted_record_count": 0,
+        "unresolved_review_count": 2,
+        "reason_code_counts": {
+          "candidate_schema_invalid": 1,
+          "required_coverage_missing": 1
+        },
+        "coverage": [
+          {
+            "field_id": "production_capacity",
+            "status": "unclear"
+          }
+        ]
+      },
+      "ownership_schema_failure_recovered": false,
+      "ownership_schema_failure_recurred": true
+    },
+    {
+      "sample_id": "manufacturing-materials-shadow-600176-2025",
+      "scope_id": "operating_quantities-02",
+      "baseline": {
+        "task_complete": false,
+        "accepted_record_count": 0,
+        "unresolved_review_count": 5,
+        "reason_code_counts": {
+          "candidate_schema_invalid": 1,
+          "required_coverage_missing": 4
+        },
+        "coverage": [
+          {
+            "field_id": "production_capacity",
+            "status": "unclear"
+          },
+          {
+            "field_id": "production_volume",
+            "status": "unclear"
+          },
+          {
+            "field_id": "sales_volume",
+            "status": "unclear"
+          },
+          {
+            "field_id": "inventory_volume",
+            "status": "unclear"
+          }
+        ]
+      },
+      "replay": {
+        "task_complete": false,
+        "accepted_record_count": 0,
+        "unresolved_review_count": 4,
+        "reason_code_counts": {
+          "candidate_schema_invalid": 1,
+          "required_coverage_missing": 3
+        },
+        "coverage": [
+          {
+            "field_id": "production_volume",
+            "status": "unclear"
+          },
+          {
+            "field_id": "sales_volume",
+            "status": "unclear"
+          },
+          {
+            "field_id": "inventory_volume",
+            "status": "unclear"
+          }
+        ]
+      },
+      "ownership_schema_failure_recovered": false,
+      "ownership_schema_failure_recurred": true
+    },
+    {
+      "sample_id": "manufacturing-materials-shadow-600256-2025",
+      "scope_id": "operating_quantities-01",
+      "baseline": {
+        "task_complete": false,
+        "accepted_record_count": 0,
+        "unresolved_review_count": 5,
+        "reason_code_counts": {
+          "candidate_schema_invalid": 1,
+          "required_coverage_missing": 4
+        },
+        "coverage": [
+          {
+            "field_id": "production_capacity",
+            "status": "unclear"
+          },
+          {
+            "field_id": "production_volume",
+            "status": "unclear"
+          },
+          {
+            "field_id": "sales_volume",
+            "status": "unclear"
+          },
+          {
+            "field_id": "inventory_volume",
+            "status": "unclear"
+          }
+        ]
+      },
+      "replay": {
+        "task_complete": true,
+        "accepted_record_count": 10,
+        "unresolved_review_count": 0,
+        "reason_code_counts": {},
+        "coverage": [
+          {
+            "field_id": "production_volume",
+            "status": "observed"
+          },
+          {
+            "field_id": "sales_volume",
+            "status": "observed"
+          }
+        ]
+      },
+      "ownership_schema_failure_recovered": true,
+      "ownership_schema_failure_recurred": false
+    },
+    {
+      "sample_id": "manufacturing-materials-shadow-600256-2025",
+      "scope_id": "operating_quantities-02",
+      "baseline": {
+        "task_complete": false,
+        "accepted_record_count": 0,
+        "unresolved_review_count": 5,
+        "reason_code_counts": {
+          "candidate_schema_invalid": 1,
+          "required_coverage_missing": 4
+        },
+        "coverage": [
+          {
+            "field_id": "production_capacity",
+            "status": "unclear"
+          },
+          {
+            "field_id": "production_volume",
+            "status": "unclear"
+          },
+          {
+            "field_id": "sales_volume",
+            "status": "unclear"
+          },
+          {
+            "field_id": "inventory_volume",
+            "status": "unclear"
+          }
+        ]
+      },
+      "replay": {
+        "task_complete": true,
+        "accepted_record_count": 12,
+        "unresolved_review_count": 0,
+        "reason_code_counts": {},
+        "coverage": [
+          {
+            "field_id": "production_volume",
+            "status": "observed"
+          },
+          {
+            "field_id": "sales_volume",
+            "status": "observed"
+          },
+          {
+            "field_id": "inventory_volume",
+            "status": "observed"
+          }
+        ]
+      },
+      "ownership_schema_failure_recovered": true,
+      "ownership_schema_failure_recurred": false
+    },
+    {
+      "sample_id": "manufacturing-materials-shadow-920033-2025",
+      "scope_id": "operating_quantities-01",
+      "baseline": {
+        "task_complete": false,
+        "accepted_record_count": 0,
+        "unresolved_review_count": 6,
+        "reason_code_counts": {
+          "candidate_schema_invalid": 1,
+          "required_coverage_missing": 5
+        },
+        "coverage": [
+          {
+            "field_id": "production_capacity",
+            "status": "unclear"
+          },
+          {
+            "field_id": "capacity_under_construction",
+            "status": "unclear"
+          },
+          {
+            "field_id": "production_volume",
+            "status": "unclear"
+          },
+          {
+            "field_id": "sales_volume",
+            "status": "unclear"
+          },
+          {
+            "field_id": "inventory_volume",
+            "status": "unclear"
+          }
+        ]
+      },
+      "replay": {
+        "task_complete": false,
+        "accepted_record_count": 0,
+        "unresolved_review_count": 4,
+        "reason_code_counts": {
+          "candidate_schema_invalid": 1,
+          "required_coverage_missing": 3
+        },
+        "coverage": [
+          {
+            "field_id": "production_capacity",
+            "status": "unclear"
+          },
+          {
+            "field_id": "capacity_under_construction",
+            "status": "unclear"
+          },
+          {
+            "field_id": "sales_volume",
+            "status": "unclear"
+          }
+        ]
+      },
+      "ownership_schema_failure_recovered": false,
+      "ownership_schema_failure_recurred": true
+    },
+    {
+      "sample_id": "manufacturing-materials-shadow-920033-2025",
+      "scope_id": "operating_quantities-02",
+      "baseline": {
+        "task_complete": false,
+        "accepted_record_count": 0,
+        "unresolved_review_count": 4,
+        "reason_code_counts": {
+          "candidate_schema_invalid": 1,
+          "required_coverage_missing": 3
+        },
+        "coverage": [
+          {
+            "field_id": "production_capacity",
+            "status": "unclear"
+          },
+          {
+            "field_id": "capacity_under_construction",
+            "status": "unclear"
+          },
+          {
+            "field_id": "production_volume",
+            "status": "unclear"
+          }
+        ]
+      },
+      "replay": {
+        "task_complete": false,
+        "accepted_record_count": 0,
+        "unresolved_review_count": 4,
+        "reason_code_counts": {
+          "candidate_schema_invalid": 1,
+          "required_coverage_missing": 3
+        },
+        "coverage": [
+          {
+            "field_id": "production_capacity",
+            "status": "unclear"
+          },
+          {
+            "field_id": "capacity_under_construction",
+            "status": "unclear"
+          },
+          {
+            "field_id": "production_volume",
+            "status": "unclear"
+          }
+        ]
+      },
+      "ownership_schema_failure_recovered": false,
+      "ownership_schema_failure_recurred": true
+    },
+    {
+      "sample_id": "manufacturing-materials-shadow-920068-2025",
+      "scope_id": "operating_quantities-01",
+      "baseline": {
+        "task_complete": false,
+        "accepted_record_count": 0,
+        "unresolved_review_count": 3,
+        "reason_code_counts": {
+          "candidate_schema_invalid": 1,
+          "required_coverage_missing": 2
+        },
+        "coverage": [
+          {
+            "field_id": "production_capacity",
+            "status": "unclear"
+          },
+          {
+            "field_id": "capacity_under_construction",
+            "status": "unclear"
+          }
+        ]
+      },
+      "replay": {
+        "task_complete": false,
+        "accepted_record_count": 0,
+        "unresolved_review_count": 3,
+        "reason_code_counts": {
+          "candidate_schema_invalid": 1,
+          "required_coverage_missing": 2
+        },
+        "coverage": [
+          {
+            "field_id": "production_capacity",
+            "status": "unclear"
+          },
+          {
+            "field_id": "capacity_under_construction",
+            "status": "unclear"
+          }
+        ]
+      },
+      "ownership_schema_failure_recovered": false,
+      "ownership_schema_failure_recurred": true
+    },
+    {
+      "sample_id": "manufacturing-materials-shadow-920076-2025",
+      "scope_id": "operating_quantities-01",
+      "baseline": {
+        "task_complete": false,
+        "accepted_record_count": 0,
+        "unresolved_review_count": 2,
+        "reason_code_counts": {
+          "candidate_schema_invalid": 1,
+          "required_coverage_missing": 1
+        },
+        "coverage": [
+          {
+            "field_id": "production_capacity",
+            "status": "unclear"
+          }
+        ]
+      },
+      "replay": {
+        "task_complete": false,
+        "accepted_record_count": 0,
+        "unresolved_review_count": 2,
+        "reason_code_counts": {
+          "candidate_schema_invalid": 1,
+          "required_coverage_missing": 1
+        },
+        "coverage": [
+          {
+            "field_id": "production_capacity",
+            "status": "unclear"
+          }
+        ]
+      },
+      "ownership_schema_failure_recovered": false,
+      "ownership_schema_failure_recurred": true
+    },
+    {
+      "sample_id": "manufacturing-materials-shadow-920078-2025",
+      "scope_id": "operating_quantities-01",
+      "baseline": {
+        "task_complete": false,
+        "accepted_record_count": 0,
+        "unresolved_review_count": 2,
+        "reason_code_counts": {
+          "candidate_schema_invalid": 1,
+          "required_coverage_missing": 1
+        },
+        "coverage": [
+          {
+            "field_id": "production_capacity",
+            "status": "unclear"
+          }
+        ]
+      },
+      "replay": {
+        "task_complete": false,
+        "accepted_record_count": 0,
+        "unresolved_review_count": 2,
+        "reason_code_counts": {
+          "candidate_schema_invalid": 1,
+          "required_coverage_missing": 1
+        },
+        "coverage": [
+          {
+            "field_id": "production_capacity",
+            "status": "unclear"
+          }
+        ]
+      },
+      "ownership_schema_failure_recovered": false,
+      "ownership_schema_failure_recurred": true
+    },
+    {
+      "sample_id": "manufacturing-materials-shadow-920580-2025",
+      "scope_id": "operating_quantities-01",
+      "baseline": {
+        "task_complete": false,
+        "accepted_record_count": 0,
+        "unresolved_review_count": 3,
+        "reason_code_counts": {
+          "candidate_schema_invalid": 1,
+          "required_coverage_missing": 2
+        },
+        "coverage": [
+          {
+            "field_id": "production_capacity",
+            "status": "unclear"
+          },
+          {
+            "field_id": "capacity_under_construction",
+            "status": "unclear"
+          }
+        ]
+      },
+      "replay": {
+        "task_complete": true,
+        "accepted_record_count": 1,
+        "unresolved_review_count": 0,
+        "reason_code_counts": {},
+        "coverage": [
+          {
+            "field_id": "capacity_under_construction",
+            "status": "observed"
+          }
+        ]
+      },
+      "ownership_schema_failure_recovered": true,
+      "ownership_schema_failure_recurred": false
+    },
+    {
+      "sample_id": "manufacturing-materials-shadow-920580-2025",
+      "scope_id": "operating_quantities-02",
+      "baseline": {
+        "task_complete": false,
+        "accepted_record_count": 0,
+        "unresolved_review_count": 2,
+        "reason_code_counts": {
+          "candidate_schema_invalid": 1,
+          "required_coverage_missing": 1
+        },
+        "coverage": [
+          {
+            "field_id": "production_capacity",
+            "status": "unclear"
+          }
+        ]
+      },
+      "replay": {
+        "task_complete": false,
+        "accepted_record_count": 0,
+        "unresolved_review_count": 2,
+        "reason_code_counts": {
+          "candidate_schema_invalid": 1,
+          "required_coverage_missing": 1
+        },
+        "coverage": [
+          {
+            "field_id": "production_capacity",
+            "status": "unclear"
+          }
+        ]
+      },
+      "ownership_schema_failure_recovered": false,
+      "ownership_schema_failure_recurred": true
+    }
+  ],
+  "causal_ownership_conclusion": "partial_recovery_with_persistent_candidate_schema_failures",
+  "favorable_conclusion_made": false,
+  "production_authorization": "not_authorized",
+  "audit_hash": "9990bd545a70d9b12b5d45b120846e68b1b636b814ceaa30db82db776593b950"
+}

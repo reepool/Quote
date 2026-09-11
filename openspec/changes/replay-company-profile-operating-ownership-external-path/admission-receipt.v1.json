@@ -1,0 +1,38 @@
+{
+  "schema_version": "company_profile_shadow_replay_admission_receipt.v1",
+  "batch_id": "manufacturing-materials-shadow-operating-ownership-external-gemini-20260911-a",
+  "contract": {
+    "batch_id": "manufacturing-materials-shadow-operating-ownership-external-gemini-20260911-a",
+    "sample_manifest_hash": "6f639739ef082e78dcb0c01a5ce40bab1645d8fdc027bece2dbef63652bae9e2",
+    "evidence_plan_version": "manufacturing_materials_shadow.2026-09-11.6",
+    "evidence_plan_hash": "cd445c2642f3509fabb92020968eb8e884aff6d2bc99caeda818ed8b3b094770",
+    "preparation_audit_hash": "c37280d844b6cb44c9a9d558d39f8de45f48b3173963fa04daaab1eb8617aa65",
+    "scope_refinement_audit_hash": null,
+    "correction_audit_hash": "529fbc39e9af21a5881d9b85d09da40aba278ca3c286252e08557fc93ae2f776",
+    "supporting_artifact_hashes": {
+      "baseline_batch_manifest": "982ab6ed61c08569683958b263529b66b7161b83fa161519570cf98a5b11eaf5",
+      "baseline_readiness_audit": "4f18106c02b04a364d90a686d7ccb984e8dcc1fd7ce914338d7c6f98df9a541e",
+      "ownership_correction_audit": "12746192b585a4270e9f21a32685470fa2f27ddb60f01a75824e1a7a9294e211",
+      "ownership_rebuild_audit": "7ee461ad10a45139a770159a6385041d00800a698d2a21e210a560afdaeb24e6",
+      "failed_readiness_audit": "c2d50fc98aeaf33c16f9b019d53b87d6abc3179c204dcb8eb7ad40835dee571d",
+      "interrupted_attempt": "02a47bbdb9e2b9f1d4bd5bc5163bd2131ea4836ce78d0c6be712ef80cf333ea3",
+      "failed_recurrence_audit": "cffd3fa9ac71bc76b3c055aa37e686a6bbdd4556d4625381c5b43d7e75bab334",
+      "shadow_evidence_implementation": "604048b92487f34dab8bca134a1e3b7a354a374ec12daea02c5ef4c8b8e854fa",
+      "stage5_evidence_binding_implementation": "0d375d94256f4fe245c59175d1419d2b69d050e14abbcff624a03872a02ea37a",
+      "external_ownership_replay_proof_validator": "e7825dcb19ef6dd7a433a29dad78969904a5f4c1253c003ff1371c0da087015b"
+    },
+    "primary_logical_profile": "semantic_extraction__scorpio_gemini",
+    "extract_max_output_tokens": 20000,
+    "verify_max_output_tokens": 18000,
+    "timeout_seconds": 300.0,
+    "max_provider_calls": 600,
+    "production_authorization": "not_authorized"
+  },
+  "output_root": "/home/python/Quote/var/company_profile_shadow_batch/20260911/external-operating-ownership-replay-a",
+  "output_batch_path": "/home/python/Quote/var/company_profile_shadow_batch/20260911/external-operating-ownership-replay-a/batch-manufacturing-materials-shadow-operating-ownership-external-gemini-20260911-a",
+  "output_absent_before_provider": true,
+  "provider_calls": 0,
+  "cohort_replay_performed": false,
+  "production_authorization": "not_authorized",
+  "audit_hash": "143e18bba28d0c1bd99806f32dddfd6ef7cf99c96cd2ab6541bbe24b1b0f817f"
+}

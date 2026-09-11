@@ -213,6 +213,7 @@ def _validate_shadow_correction_audit(
         "company_profile_shadow_segment_heading_replay_proof.v1",
         "company_profile_shadow_evidence_role_replay_proof.v1",
         "company_profile_shadow_operating_ownership_replay_proof.v1",
+        "company_profile_shadow_external_operating_ownership_replay_proof.v1",
     }:
         if (
             audit.get("report_count") != SHADOW_REPORT_COUNT
@@ -594,6 +595,72 @@ def validate_operating_ownership_replay_proof(
     if Path(str(audit.get("output_root"))).resolve() != Path(output_root).resolve():
         raise ValueError("operating ownership replay output root mismatch")
     return actual_supporting
+
+
+def validate_external_operating_ownership_replay_proof(
+    audit: Mapping[str, object],
+    *,
+    contract: ShadowReplayContract,
+    repository_root: str | Path,
+    output_root: str | Path,
+) -> dict[str, str]:
+    """Validate the single external-path recovery of the v6 ownership replay."""
+
+    payload = dict(audit)
+    audit_hash = payload.pop("audit_hash", None)
+    if audit_hash != _payload_hash(payload):
+        raise ValueError("external ownership recovery proof hash mismatch")
+    if audit_hash != contract.correction_audit_hash:
+        raise ValueError("external ownership recovery proof contract hash mismatch")
+    recovery_artifact_hashes = audit.get("recovery_artifact_hashes")
+    if (
+        audit.get("schema_version")
+        != "company_profile_shadow_external_operating_ownership_replay_proof.v1"
+        or audit.get("recovery_from_batch_id")
+        != "manufacturing-materials-shadow-operating-ownership-gemini-20260911-a"
+        or audit.get("execution_path") != "external_authorized"
+        or audit.get("sandbox_fallback_allowed") is not False
+        or audit.get("changed_experimental_variables")
+        != ["batch_id", "execution_network_path", "output_root"]
+        or audit.get("failed_replay_reason_codes")
+        != [
+            "authoritative_batch_manifest_missing",
+            "cohort_execution_interrupted",
+            "sandbox_dns_failure",
+            "semantic_responses_zero",
+            "source_review_incomplete",
+        ]
+        or not isinstance(recovery_artifact_hashes, Mapping)
+        or set(recovery_artifact_hashes)
+        != {
+            "failed_readiness_audit",
+            "interrupted_attempt",
+            "failed_recurrence_audit",
+        }
+    ):
+        raise ValueError("external ownership recovery proof does not admit this replay")
+    supporting_hashes = audit.get("supporting_artifact_hashes")
+    if not isinstance(supporting_hashes, Mapping) or any(
+        supporting_hashes.get(name) != value
+        for name, value in recovery_artifact_hashes.items()
+    ):
+        raise ValueError("external ownership recovery artifact hashes mismatch")
+
+    base_audit = dict(audit)
+    base_audit["schema_version"] = (
+        "company_profile_shadow_operating_ownership_replay_proof.v1"
+    )
+    base_audit.pop("audit_hash", None)
+    base_audit["audit_hash"] = _payload_hash(base_audit)
+    base_contract = contract.model_copy(
+        update={"correction_audit_hash": base_audit["audit_hash"]}
+    )
+    return validate_operating_ownership_replay_proof(
+        base_audit,
+        contract=base_contract,
+        repository_root=repository_root,
+        output_root=output_root,
+    )
 
 
 class ShadowReportSuccess(_StrictModel):
