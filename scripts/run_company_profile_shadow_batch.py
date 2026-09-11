@@ -28,6 +28,7 @@ from research.company_profile.shadow_batch_service import (
     build_shadow_replay_admission_receipt,
     load_shadow_batch_result,
     load_shadow_report_result,
+    validate_evidence_role_replay_proof,
     validate_segment_financial_closure_audit,
     validate_segment_heading_replay_proof,
     validate_shadow_replay_admission,
@@ -295,6 +296,45 @@ SEGMENT_HEADING_SHADOW_REPLAY_CONTRACT = ShadowReplayContract(
     max_provider_calls=SHADOW_MAX_PROVIDER_CALLS,
 )
 
+EVIDENCE_ROLE_SHADOW_REPLAY_CONTRACT = ShadowReplayContract(
+    batch_id="manufacturing-materials-shadow-evidence-role-gemini-20260911-a",
+    sample_manifest_hash=(
+        "6f639739ef082e78dcb0c01a5ce40bab1645d8fdc027bece2dbef63652bae9e2"
+    ),
+    evidence_plan_version="manufacturing_materials_shadow.2026-09-10.5",
+    evidence_plan_hash=(
+        "e2205ec932589a0d50457e9f0112b44588ed164cf4c39560f27dfb0f6f996686"
+    ),
+    preparation_audit_hash=(
+        "24996a5620b12805786a3fd941215220f84f25ac618dfeba2e06a9a50325a9ca"
+    ),
+    correction_audit_hash=(
+        "6377ae573305284daccf31f786a36beb4327775dd10e7667758f10b092a43a5d"
+    ),
+    supporting_artifact_hashes={
+        "baseline_batch_manifest": (
+            "6c94017099c5f98ec960502753e9b05c7eff3baace760dbb2ec511b03055e8fa"
+        ),
+        "baseline_readiness_audit": (
+            "2a9383c87ed9a7f06fdccedf17c81895a6057b887a006de1a08bdae39e9ca62b"
+        ),
+        "evidence_role_implementation": (
+            "61546375d009cf9ac876adc9044bd2bd3a46aa3033a526c984a087753d6ec615"
+        ),
+        "evidence_role_provider_tests": (
+            "f01cb1e7d680e680f8c1b7b99b3902ac6bf1adfeb57318030822046100cf0e66"
+        ),
+        "evidence_role_implementation_audit": (
+            "6fdac8533e0a066775c823c48c0d769b5a96eee5d31302804c65903ba7123c29"
+        ),
+    },
+    primary_logical_profile=SHADOW_PRIMARY_PROFILE,
+    extract_max_output_tokens=SHADOW_EXTRACT_MAX_OUTPUT_TOKENS,
+    verify_max_output_tokens=SHADOW_VERIFY_MAX_OUTPUT_TOKENS,
+    timeout_seconds=SHADOW_TIMEOUT_SECONDS,
+    max_provider_calls=SHADOW_MAX_PROVIDER_CALLS,
+)
+
 # The v5 routing/continuation batch is the frozen source of prepared scopes for
 # this replay.  Re-running the historical plan through today's planner would
 # make the replay depend on later planner rules and can reject a scope that was
@@ -325,6 +365,7 @@ def build_parser() -> argparse.ArgumentParser:
             "segment-repair-semantic-replay",
             "segment-retry-semantic-replay",
             "segment-heading-semantic-replay",
+            "evidence-role-semantic-replay",
         ),
         required=True,
     )
@@ -344,6 +385,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--admission-receipt", type=Path)
     parser.add_argument("--interrupted-attempt", type=Path)
     parser.add_argument("--segment-heading-replay-proof", type=Path)
+    parser.add_argument("--evidence-role-replay-proof", type=Path)
     parser.add_argument("--source-review-package", type=Path)
     parser.add_argument("--source-review-outcomes", type=Path)
     parser.add_argument("--owner-closure-batch-manifest", type=Path)
@@ -841,6 +883,52 @@ def main(argv: Sequence[str] | None = None) -> int:
             json.dumps(receipt, ensure_ascii=False, indent=2) + "\n",
             encoding="utf-8",
         )
+    elif args.mode == "evidence-role-semantic-replay":
+        required = {
+            "Evidence-role replay proof": args.evidence_role_replay_proof,
+            "admission receipt": args.admission_receipt,
+        }
+        missing = [name for name, path in required.items() if path is None]
+        if missing:
+            raise ValueError(f"{args.mode} requires " + ", ".join(missing))
+        replay_proof = json.loads(
+            args.evidence_role_replay_proof.read_text(encoding="utf-8")
+        )
+        supporting_hashes = validate_evidence_role_replay_proof(
+            replay_proof,
+            contract=EVIDENCE_ROLE_SHADOW_REPLAY_CONTRACT,
+            repository_root=ROOT_DIR,
+            output_root=args.output_root,
+        )
+        validate_shadow_replay_admission(
+            contract=EVIDENCE_ROLE_SHADOW_REPLAY_CONTRACT,
+            batch_id=args.batch_id,
+            primary_logical_profile=args.provider_route,
+            extract_max_output_tokens=args.extract_max_output_tokens,
+            verify_max_output_tokens=args.verify_max_output_tokens,
+            timeout_seconds=args.timeout_seconds,
+            max_provider_calls=args.max_provider_calls,
+            manifest=manifest,
+            evidence_plan=plan,
+            preparation_audit=frozen_audit,
+            correction_audit=replay_proof,
+            supporting_artifact_hashes=supporting_hashes,
+            prepared=prepared,
+            output_root=args.output_root,
+        )
+        if args.admission_receipt.exists():
+            raise FileExistsError(
+                f"shadow admission receipt already exists: {args.admission_receipt}"
+            )
+        receipt = build_shadow_replay_admission_receipt(
+            contract=EVIDENCE_ROLE_SHADOW_REPLAY_CONTRACT,
+            output_root=args.output_root,
+        )
+        args.admission_receipt.parent.mkdir(parents=True, exist_ok=True)
+        args.admission_receipt.write_text(
+            json.dumps(receipt, ensure_ascii=False, indent=2) + "\n",
+            encoding="utf-8",
+        )
     elif args.mode == "owner-closure-semantic-replay":
         required = {
             "correction audit": args.correction_audit,
@@ -1015,6 +1103,7 @@ def _validate_replay_mode(
     segment_repair_batch = SEGMENT_FINANCIAL_REPAIR_SHADOW_REPLAY_CONTRACT.batch_id
     segment_retry_batch = RETRY_SEGMENT_FINANCIAL_SHADOW_REPLAY_CONTRACT.batch_id
     segment_heading_batch = SEGMENT_HEADING_SHADOW_REPLAY_CONTRACT.batch_id
+    evidence_role_batch = EVIDENCE_ROLE_SHADOW_REPLAY_CONTRACT.batch_id
     provider_bearing_legacy_modes = {"semantic-run", "refined-semantic-replay"}
     if (
         plan_version == stability_plan or batch_id == stability_batch
@@ -1070,6 +1159,13 @@ def _validate_replay_mode(
             "segment-heading-semantic-replay"
         )
     if (
+        batch_id == evidence_role_batch
+        and mode != "evidence-role-semantic-replay"
+    ):
+        raise ValueError(
+            "Evidence-role batch identity requires evidence-role-semantic-replay"
+        )
+    if (
         plan_version == routing_continuation_plan
         and mode not in {
             "preparation-only",
@@ -1077,6 +1173,7 @@ def _validate_replay_mode(
             "segment-repair-semantic-replay",
             "segment-retry-semantic-replay",
             "segment-heading-semantic-replay",
+            "evidence-role-semantic-replay",
         }
     ):
         raise ValueError(

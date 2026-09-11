@@ -1,0 +1,74 @@
+{
+  "schema_version": "company_profile_shadow_evidence_role_replay_proof.v1",
+  "proof_id": "manufacturing-materials-shadow-evidence-role-replay-admission-20260911-a",
+  "batch_id": "manufacturing-materials-shadow-evidence-role-gemini-20260911-a",
+  "sample_manifest_hash": "6f639739ef082e78dcb0c01a5ce40bab1645d8fdc027bece2dbef63652bae9e2",
+  "corrected_plan_hash": "e2205ec932589a0d50457e9f0112b44588ed164cf4c39560f27dfb0f6f996686",
+  "evidence_plan_version": "manufacturing_materials_shadow.2026-09-10.5",
+  "preparation_audit_hash": "24996a5620b12805786a3fd941215220f84f25ac618dfeba2e06a9a50325a9ca",
+  "report_count": 20,
+  "scope_count": 154,
+  "evidence_count": 332,
+  "artifact_hashes": {
+    "openspec/changes/archive/2026-09-09-validate-manufacturing-materials-company-profile-shadow-batch/shadow-manifest.v1.json": "ca6d301ff7fb3b21b206be5951965059c87a7e485121c98a24475e59bad0f215",
+    "openspec/changes/repair-company-profile-segment-evidence-context-and-output-budget/corrected-evidence-plan.v1.json": "4d90b1f051d9c8b98efe470a9f5e6f382afab23dabf8e6e357f58465f3a517c5",
+    "openspec/changes/archive/2026-09-11-replay-company-profile-shadow-after-segment-heading-binding/provider-free-preparation-audit.v1.json": "19460545854457b675216e6b5494b04c46a75297c67eb24142cff8150057010f",
+    "var/company_profile_shadow_batch/20260911/batch-manufacturing-materials-shadow-segment-heading-replay-gemini-20260911-a/batch-manufacturing-materials-shadow-segment-heading-replay-gemini-20260911-a/manifest.json": "6c94017099c5f98ec960502753e9b05c7eff3baace760dbb2ec511b03055e8fa",
+    "openspec/changes/archive/2026-09-11-replay-company-profile-shadow-after-segment-heading-binding/empirical-readiness-audit.v1.json": "2a9383c87ed9a7f06fdccedf17c81895a6057b887a006de1a08bdae39e9ca62b",
+    "openspec/changes/archive/2026-09-11-make-company-profile-evidence-roles-explicit/implementation-audit.v1.json": "6fdac8533e0a066775c823c48c0d769b5a96eee5d31302804c65903ba7123c29"
+  },
+  "implementation_hashes": {
+    "research/company_profile/stage5_provider.py": "61546375d009cf9ac876adc9044bd2bd3a46aa3033a526c984a087753d6ec615",
+    "tests/unit/test_research/test_company_profile_stage5_provider.py": "f01cb1e7d680e680f8c1b7b99b3902ac6bf1adfeb57318030822046100cf0e66"
+  },
+  "supporting_artifact_hashes": {
+    "baseline_batch_manifest": "6c94017099c5f98ec960502753e9b05c7eff3baace760dbb2ec511b03055e8fa",
+    "baseline_readiness_audit": "2a9383c87ed9a7f06fdccedf17c81895a6057b887a006de1a08bdae39e9ca62b",
+    "evidence_role_implementation": "61546375d009cf9ac876adc9044bd2bd3a46aa3033a526c984a087753d6ec615",
+    "evidence_role_provider_tests": "f01cb1e7d680e680f8c1b7b99b3902ac6bf1adfeb57318030822046100cf0e66",
+    "evidence_role_implementation_audit": "6fdac8533e0a066775c823c48c0d769b5a96eee5d31302804c65903ba7123c29"
+  },
+  "source_review_rule": {
+    "include_all_dispositions": [
+      "blocker",
+      "caveat",
+      "unresolved"
+    ],
+    "stable_sample_per_core_chapter": 1,
+    "stable_sample_kinds": [
+      "accepted_for_review",
+      "legal_empty"
+    ],
+    "core_chapter_count": 6
+  },
+  "readiness_gates": {
+    "execution_completion_min": 0.95,
+    "usable_report_rate_min": 0.9,
+    "evidence_traceability_min": 1.0,
+    "source_review_complete": true,
+    "sampled_precision_min": 0.99,
+    "critical_semantic_error_max": 0,
+    "unresolved_review_median_max": 2,
+    "unresolved_review_p90_max": 5
+  },
+  "provider": {
+    "logical_profile": "semantic_extraction__scorpio_gemini",
+    "extract_max_output_tokens": 20000,
+    "verify_max_output_tokens": 18000,
+    "timeout_seconds": 300.0,
+    "max_provider_calls": 600,
+    "outer_deadline_seconds": null
+  },
+  "authorized_transfer_hosts": [
+    "scorpio.reepool.com"
+  ],
+  "output_root": "/home/python/Quote/var/company_profile_shadow_batch/20260911/batch-manufacturing-materials-shadow-evidence-role-gemini-20260911-a",
+  "output_absent_before_provider": true,
+  "unresolved_finding_ids": [],
+  "provider_calls": 0,
+  "cohort_replay_performed": false,
+  "historical_artifacts_mutated": false,
+  "production_authorization": "not_authorized",
+  "production_paths_opened": [],
+  "audit_hash": "6377ae573305284daccf31f786a36beb4327775dd10e7667758f10b092a43a5d"
+}

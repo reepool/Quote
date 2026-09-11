@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pytest
 
+import scripts.run_company_profile_shadow_batch as shadow_batch_operator
 from research.company_profile.shadow_batch import (
     _payload_hash,
     load_shadow_sample_manifest,
@@ -25,6 +26,7 @@ from research.company_profile.shadow_batch_service import (
     build_shadow_replay_admission_receipt,
     load_shadow_batch_result,
     load_shadow_report_result,
+    validate_evidence_role_replay_proof,
     validate_segment_financial_closure_audit,
     validate_segment_heading_replay_proof,
     validate_shadow_replay_admission,
@@ -39,6 +41,7 @@ from research.company_profile.shadow_evidence import (
 )
 from research.company_profile.stage5_provider import _segment_numeric_occurrence_count
 from scripts.run_company_profile_shadow_batch import (
+    EVIDENCE_ROLE_SHADOW_REPLAY_CONTRACT,
     EXTERNAL_PRECISION_SHADOW_REPLAY_CONTRACT,
     OWNER_CLOSURE_SHADOW_REPLAY_CONTRACT,
     PRECISION_CLOSURE_SHADOW_REPLAY_CONTRACT,
@@ -95,6 +98,14 @@ SEGMENT_HEADING_REPLAY_CHANGE = (
 SEGMENT_CONTEXT_CHANGE = (
     REPOSITORY_ROOT
     / "openspec/changes/repair-company-profile-segment-evidence-context-and-output-budget"
+)
+EVIDENCE_ROLE_CHANGE = (
+    REPOSITORY_ROOT
+    / "openspec/changes/validate-company-profile-evidence-role-shadow-replay"
+)
+SEGMENT_HEADING_REPLAY_ARCHIVE = (
+    REPOSITORY_ROOT
+    / "openspec/changes/archive/2026-09-11-replay-company-profile-shadow-after-segment-heading-binding"
 )
 BASELINE_BATCH = (
     REPOSITORY_ROOT
@@ -284,6 +295,27 @@ def segment_heading_replay_inputs():
             SEGMENT_HEADING_REPLAY_CHANGE
             / "provider-free-admission-proof.v1.json"
         ).read_text(encoding="utf-8")
+    )
+    prepared = ShadowEvidencePreparer().prepare(manifest=manifest, plan=plan)
+    return manifest, plan, preparation, proof, prepared
+
+
+@pytest.fixture(scope="module")
+def evidence_role_replay_inputs():
+    manifest = load_shadow_sample_manifest(
+        BASELINE_CHANGE / "shadow-manifest.v1.json",
+        repository_root=REPOSITORY_ROOT,
+    )
+    plan = load_shadow_evidence_plan(
+        SEGMENT_CONTEXT_CHANGE / "corrected-evidence-plan.v1.json"
+    )
+    preparation = load_shadow_preparation_audit(
+        SEGMENT_HEADING_REPLAY_ARCHIVE / "provider-free-preparation-audit.v1.json"
+    )
+    proof = json.loads(
+        (EVIDENCE_ROLE_CHANGE / "provider-free-admission-proof.v1.json").read_text(
+            encoding="utf-8"
+        )
     )
     prepared = ShadowEvidencePreparer().prepare(manifest=manifest, plan=plan)
     return manifest, plan, preparation, proof, prepared
@@ -1602,6 +1634,193 @@ def test_segment_heading_replay_mode_output_and_budget_are_closed(
             supporting_artifact_hashes=contract.supporting_artifact_hashes,
             prepared=prepared,
             output_root=tmp_path / "fresh",
+        )
+
+
+def test_evidence_role_replay_admission_is_exact_and_research_only(
+    tmp_path: Path,
+    evidence_role_replay_inputs,
+) -> None:
+    manifest, plan, preparation, proof, prepared = evidence_role_replay_inputs
+    output_root = tmp_path / "fresh-shadow-output"
+    proof = dict(proof)
+    proof["output_root"] = str(output_root)
+    proof.pop("audit_hash", None)
+    proof["audit_hash"] = _payload_hash(proof)
+    contract = EVIDENCE_ROLE_SHADOW_REPLAY_CONTRACT.model_copy(
+        update={"correction_audit_hash": proof["audit_hash"]}
+    )
+
+    supporting = validate_evidence_role_replay_proof(
+        proof,
+        contract=contract,
+        repository_root=REPOSITORY_ROOT,
+        output_root=output_root,
+    )
+    validate_shadow_replay_admission(
+        contract=contract,
+        batch_id=contract.batch_id,
+        primary_logical_profile=contract.primary_logical_profile,
+        extract_max_output_tokens=contract.extract_max_output_tokens,
+        verify_max_output_tokens=contract.verify_max_output_tokens,
+        timeout_seconds=contract.timeout_seconds,
+        max_provider_calls=contract.max_provider_calls,
+        manifest=manifest,
+        evidence_plan=plan,
+        preparation_audit=preparation,
+        correction_audit=proof,
+        supporting_artifact_hashes=supporting,
+        prepared=prepared,
+        output_root=output_root,
+    )
+
+    assert len(prepared) == 20
+    assert sum(len(scopes) for scopes in prepared.values()) == 154
+    assert contract.production_authorization == "not_authorized"
+
+
+def test_evidence_role_replay_proof_rejects_implementation_drift(
+    evidence_role_replay_inputs,
+) -> None:
+    _, _, _, proof, _ = evidence_role_replay_inputs
+    changed = json.loads(json.dumps(proof))
+    changed_hash = "f" * 64
+    changed["implementation_hashes"][
+        "research/company_profile/stage5_provider.py"
+    ] = changed_hash
+    changed["supporting_artifact_hashes"][
+        "evidence_role_implementation"
+    ] = changed_hash
+    changed["audit_hash"] = _payload_hash(
+        {key: value for key, value in changed.items() if key != "audit_hash"}
+    )
+    changed_contract = EVIDENCE_ROLE_SHADOW_REPLAY_CONTRACT.model_copy(
+        update={
+            "correction_audit_hash": changed["audit_hash"],
+            "supporting_artifact_hashes": changed["supporting_artifact_hashes"],
+        }
+    )
+
+    with pytest.raises(ValueError, match="artifact hash mismatch"):
+        validate_evidence_role_replay_proof(
+            changed,
+            contract=changed_contract,
+            repository_root=REPOSITORY_ROOT,
+            output_root=Path(changed["output_root"]),
+        )
+
+
+def test_evidence_role_replay_mode_output_and_budget_are_closed(
+    tmp_path: Path,
+    evidence_role_replay_inputs,
+) -> None:
+    manifest, plan, preparation, proof, prepared = evidence_role_replay_inputs
+    contract = EVIDENCE_ROLE_SHADOW_REPLAY_CONTRACT
+    args = build_parser().parse_args(
+        [
+            "--mode",
+            "evidence-role-semantic-replay",
+            "--sample-manifest",
+            "manifest.json",
+            "--evidence-plan",
+            "plan.json",
+            "--batch-id",
+            contract.batch_id,
+        ]
+    )
+    assert args.mode == "evidence-role-semantic-replay"
+    _validate_replay_mode(
+        mode=args.mode,
+        plan_version=contract.evidence_plan_version,
+        batch_id=contract.batch_id,
+    )
+    with pytest.raises(ValueError, match="Evidence-role batch identity requires"):
+        _validate_replay_mode(
+            mode="segment-heading-semantic-replay",
+            plan_version=contract.evidence_plan_version,
+            batch_id=contract.batch_id,
+        )
+    with pytest.raises(ValueError, match="output root mismatch"):
+        validate_evidence_role_replay_proof(
+            proof,
+            contract=contract,
+            repository_root=REPOSITORY_ROOT,
+            output_root=tmp_path,
+        )
+
+    (tmp_path / f"batch-{contract.batch_id}").mkdir()
+    with pytest.raises(FileExistsError, match="shadow batch already exists"):
+        validate_shadow_replay_admission(
+            contract=contract,
+            batch_id=contract.batch_id,
+            primary_logical_profile=contract.primary_logical_profile,
+            extract_max_output_tokens=contract.extract_max_output_tokens,
+            verify_max_output_tokens=contract.verify_max_output_tokens,
+            timeout_seconds=contract.timeout_seconds,
+            max_provider_calls=contract.max_provider_calls,
+            manifest=manifest,
+            evidence_plan=plan,
+            preparation_audit=preparation,
+            correction_audit=proof,
+            supporting_artifact_hashes=contract.supporting_artifact_hashes,
+            prepared=prepared,
+            output_root=tmp_path,
+        )
+
+    with pytest.raises(ValueError, match="max_provider_calls"):
+        validate_shadow_replay_admission(
+            contract=contract,
+            batch_id=contract.batch_id,
+            primary_logical_profile=contract.primary_logical_profile,
+            extract_max_output_tokens=contract.extract_max_output_tokens,
+            verify_max_output_tokens=contract.verify_max_output_tokens,
+            timeout_seconds=contract.timeout_seconds,
+            max_provider_calls=contract.max_provider_calls - 1,
+            manifest=manifest,
+            evidence_plan=plan,
+            preparation_audit=preparation,
+            correction_audit=proof,
+            supporting_artifact_hashes=contract.supporting_artifact_hashes,
+            prepared=prepared,
+            output_root=tmp_path / "fresh",
+        )
+
+
+def test_evidence_role_operator_stops_before_provider_creation(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    def reject_before_provider(*args, **kwargs):
+        raise ValueError("provider-free admission rejected")
+
+    monkeypatch.setattr(
+        shadow_batch_operator,
+        "validate_evidence_role_replay_proof",
+        reject_before_provider,
+    )
+    with pytest.raises(ValueError, match="provider-free admission rejected"):
+        shadow_batch_operator.main(
+            [
+                "--mode",
+                "evidence-role-semantic-replay",
+                "--sample-manifest",
+                str(BASELINE_CHANGE / "shadow-manifest.v1.json"),
+                "--evidence-plan",
+                str(SEGMENT_CONTEXT_CHANGE / "corrected-evidence-plan.v1.json"),
+                "--preparation-audit",
+                str(
+                    SEGMENT_HEADING_REPLAY_ARCHIVE
+                    / "provider-free-preparation-audit.v1.json"
+                ),
+                "--evidence-role-replay-proof",
+                str(EVIDENCE_ROLE_CHANGE / "provider-free-admission-proof.v1.json"),
+                "--admission-receipt",
+                str(tmp_path / "admission.json"),
+                "--output-root",
+                str(tmp_path / "output"),
+                "--batch-id",
+                EVIDENCE_ROLE_SHADOW_REPLAY_CONTRACT.batch_id,
+            ]
         )
 
 
