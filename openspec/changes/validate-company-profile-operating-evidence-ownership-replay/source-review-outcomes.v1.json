@@ -1,0 +1,25 @@
+{
+  "schema_version": "company_profile_shadow_operating_ownership_source_review.v1",
+  "batch_id": "manufacturing-materials-shadow-operating-ownership-gemini-20260911-a",
+  "source_review_complete": false,
+  "source_review_row_count": 0,
+  "precision_reviewed_count": 0,
+  "sampled_precision": null,
+  "critical_semantic_error_count": null,
+  "reason_codes": [
+    "authoritative_batch_manifest_missing",
+    "semantic_responses_zero",
+    "cohort_execution_interrupted"
+  ],
+  "persisted_failure_review": {
+    "sample_id": "manufacturing-materials-shadow-600121-2025",
+    "scope_count": 8,
+    "all_scope_results_inspected": true,
+    "all_provider_traces_failed_before_http_response": true,
+    "accepted_or_legal_empty_rows_available": false,
+    "review_rule_satisfied": false
+  },
+  "favorable_precision_claim_made": false,
+  "production_authorization": "not_authorized",
+  "audit_hash": "7c7f76b0387ba9c53b949dded065d112d532e3ea1640076bef054a9469a788e2"
+}

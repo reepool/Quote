@@ -1,0 +1,34 @@
+{
+  "schema_version": "company_profile_shadow_operating_ownership_comparison_failure.v1",
+  "audit_id": "manufacturing-materials-shadow-operating-ownership-vs-evidence-role-20260911-a",
+  "baseline": {
+    "batch_id": "manufacturing-materials-shadow-evidence-role-gemini-20260911-a",
+    "batch_manifest_file_sha256": "982ab6ed61c08569683958b263529b66b7161b83fa161519570cf98a5b11eaf5",
+    "readiness_audit_file_sha256": "4f18106c02b04a364d90a686d7ccb984e8dcc1fd7ce914338d7c6f98df9a541e",
+    "persisted_report_count": 20,
+    "accepted_record_count": 1511,
+    "provider_call_count": 315,
+    "provider_failed_call_count": 35,
+    "readiness_decision": "hold"
+  },
+  "replay": {
+    "batch_id": "manufacturing-materials-shadow-operating-ownership-gemini-20260911-a",
+    "batch_manifest_file_sha256": null,
+    "persisted_report_count": 1,
+    "accepted_record_count": 0,
+    "provider_call_count": 9,
+    "provider_failed_call_count": 8,
+    "provider_interrupted_call_count": 1,
+    "readiness_decision": "failed"
+  },
+  "comparison_complete": false,
+  "metric_deltas": null,
+  "reason_codes": [
+    "replay_batch_manifest_missing",
+    "cohort_execution_interrupted",
+    "affected_scopes_not_evaluated"
+  ],
+  "historical_batch_mutated": false,
+  "production_authorization": "not_authorized",
+  "audit_hash": "a1c187042349cd55d63c8906ef8de87a8574b145e7d1379b8bc3fbd703d8eda9"
+}

@@ -1,0 +1,19 @@
+{
+  "schema_version": "company_profile_shadow_operating_ownership_recurrence_failure.v1",
+  "audit_id": "manufacturing-materials-shadow-operating-ownership-recurrence-20260911-a",
+  "baseline_batch_id": "manufacturing-materials-shadow-evidence-role-gemini-20260911-a",
+  "replay_batch_id": "manufacturing-materials-shadow-operating-ownership-gemini-20260911-a",
+  "baseline_affected_scope_count": 17,
+  "replay_affected_scope_count_evaluated": 0,
+  "replay_affected_scope_count_completed": 0,
+  "ownership_schema_failure_recurrence_count": null,
+  "comparison_complete": false,
+  "reason_codes": [
+    "transport_failed_before_first_affected_scope",
+    "authoritative_batch_manifest_missing"
+  ],
+  "causal_ownership_conclusion": "not_evaluable",
+  "favorable_conclusion_made": false,
+  "production_authorization": "not_authorized",
+  "audit_hash": "e3ad4f6de00b8e92fd7afce8e32e937b030fa90e8c56a39c3866dd8ba1e62b6f"
+}

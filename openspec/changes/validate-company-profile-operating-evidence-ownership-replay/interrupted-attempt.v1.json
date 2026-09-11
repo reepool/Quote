@@ -1,0 +1,49 @@
+{
+  "schema_version": "company_profile_shadow_operating_ownership_interrupted_attempt.v1",
+  "attempt_id": "manufacturing-materials-shadow-operating-ownership-gemini-20260911-a-sandbox-attempt",
+  "batch_id": "manufacturing-materials-shadow-operating-ownership-gemini-20260911-a",
+  "authority_boundary_crossed": true,
+  "execution_path": "sandbox_restricted_network",
+  "expected_report_count": 20,
+  "persisted_report_count": 1,
+  "persisted_scope_count": 8,
+  "started_provider_call_count": 9,
+  "persisted_provider_call_count": 8,
+  "persisted_provider_failed_call_count": 8,
+  "interrupted_in_flight_provider_call_count": 1,
+  "interrupted_gateway_request_id": "d7aa5e562438448abf3b0706b299f7cc",
+  "provider_http_response_count": 0,
+  "provider_input_tokens": 0,
+  "provider_output_tokens": 0,
+  "persisted_report": {
+    "sample_id": "manufacturing-materials-shadow-600121-2025",
+    "report_status": "failed",
+    "scope_count": 8,
+    "failed_scope_count": 8,
+    "error_codes": {
+      "deadline_exceeded": 8
+    },
+    "file": "var/company_profile_shadow_batch/20260911/batch-manufacturing-materials-shadow-operating-ownership-gemini-20260911-a/batch-manufacturing-materials-shadow-operating-ownership-gemini-20260911-a/reports/manufacturing-materials-shadow-600121-2025.json",
+    "file_sha256": "25c4f143b9c9926d0110f4948fb16e254f11185b13485e982c246b21538f9567"
+  },
+  "transport_diagnosis": {
+    "preflight_status": "success",
+    "preflight_file_sha256": "1f05ead9e7dc705aa913c2ce0230ccb37ad10c248ab0372eecc55c2375bc71c2",
+    "persisted_trace_error_code": "deadline_exceeded",
+    "terminal_transport_error_type": "dns_failure",
+    "terminal_transport_phase": "connect",
+    "completed_same_type_failures_before_stop": 8,
+    "external_head_check": {
+      "host": "scorpio.reepool.com",
+      "resolved_ipv4": "176.126.114.194",
+      "http_status": 404,
+      "provider_request_id": "58228061-8fa5-4b46-b5ac-c3726acd2fc2",
+      "meaning": "host and HTTPS endpoint were reachable outside the restricted sandbox"
+    }
+  },
+  "stop_reason": "A complete report produced eight consecutive 300-second pre-HTTP DNS failures with zero semantic response. Continuing the remaining cohort would repeat the same infrastructure failure without evaluating Evidence ownership.",
+  "replacement_or_rerun_started": false,
+  "historical_artifacts_mutated": false,
+  "production_authorization": "not_authorized",
+  "audit_hash": "559e9ade14b2179e523bc4b64b79e68a36eba5deb3217784e96992b913082323"
+}

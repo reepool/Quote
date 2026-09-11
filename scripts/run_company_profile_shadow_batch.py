@@ -29,12 +29,14 @@ from research.company_profile.shadow_batch_service import (
     load_shadow_batch_result,
     load_shadow_report_result,
     validate_evidence_role_replay_proof,
+    validate_operating_ownership_replay_proof,
     validate_segment_financial_closure_audit,
     validate_segment_heading_replay_proof,
     validate_shadow_replay_admission,
 )
 from research.company_profile.shadow_evidence import (
     SHADOW_EVIDENCE_PLAN_VERSION,
+    SHADOW_OPERATING_OWNERSHIP_PLAN_VERSION,
     ShadowEvidencePlanner,
     ShadowEvidencePreparer,
     build_shadow_owner_closure_correction_audit,
@@ -335,6 +337,51 @@ EVIDENCE_ROLE_SHADOW_REPLAY_CONTRACT = ShadowReplayContract(
     max_provider_calls=SHADOW_MAX_PROVIDER_CALLS,
 )
 
+OPERATING_OWNERSHIP_SHADOW_REPLAY_CONTRACT = ShadowReplayContract(
+    batch_id="manufacturing-materials-shadow-operating-ownership-gemini-20260911-a",
+    sample_manifest_hash=(
+        "6f639739ef082e78dcb0c01a5ce40bab1645d8fdc027bece2dbef63652bae9e2"
+    ),
+    evidence_plan_version=SHADOW_OPERATING_OWNERSHIP_PLAN_VERSION,
+    evidence_plan_hash=(
+        "cd445c2642f3509fabb92020968eb8e884aff6d2bc99caeda818ed8b3b094770"
+    ),
+    preparation_audit_hash=(
+        "c37280d844b6cb44c9a9d558d39f8de45f48b3173963fa04daaab1eb8617aa65"
+    ),
+    correction_audit_hash=(
+        "4496c711b44c0765ab0c9004c8def3f71420a7cf3610b4f8d5088f8cdd2fb337"
+    ),
+    supporting_artifact_hashes={
+        "baseline_batch_manifest": (
+            "982ab6ed61c08569683958b263529b66b7161b83fa161519570cf98a5b11eaf5"
+        ),
+        "baseline_readiness_audit": (
+            "4f18106c02b04a364d90a686d7ccb984e8dcc1fd7ce914338d7c6f98df9a541e"
+        ),
+        "ownership_correction_audit": (
+            "12746192b585a4270e9f21a32685470fa2f27ddb60f01a75824e1a7a9294e211"
+        ),
+        "ownership_rebuild_audit": (
+            "7ee461ad10a45139a770159a6385041d00800a698d2a21e210a560afdaeb24e6"
+        ),
+        "shadow_evidence_implementation": (
+            "604048b92487f34dab8bca134a1e3b7a354a374ec12daea02c5ef4c8b8e854fa"
+        ),
+        "stage5_evidence_binding_implementation": (
+            "0d375d94256f4fe245c59175d1419d2b69d050e14abbcff624a03872a02ea37a"
+        ),
+        "ownership_replay_proof_validator": (
+            "a5422b5efe66609c8503dbe711909a55178533d9d96744e54e84c53be98c0d92"
+        ),
+    },
+    primary_logical_profile=SHADOW_PRIMARY_PROFILE,
+    extract_max_output_tokens=SHADOW_EXTRACT_MAX_OUTPUT_TOKENS,
+    verify_max_output_tokens=SHADOW_VERIFY_MAX_OUTPUT_TOKENS,
+    timeout_seconds=SHADOW_TIMEOUT_SECONDS,
+    max_provider_calls=SHADOW_MAX_PROVIDER_CALLS,
+)
+
 # The v5 routing/continuation batch is the frozen source of prepared scopes for
 # this replay.  Re-running the historical plan through today's planner would
 # make the replay depend on later planner rules and can reject a scope that was
@@ -366,6 +413,7 @@ def build_parser() -> argparse.ArgumentParser:
             "segment-retry-semantic-replay",
             "segment-heading-semantic-replay",
             "evidence-role-semantic-replay",
+            "operating-ownership-semantic-replay",
         ),
         required=True,
     )
@@ -386,6 +434,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--interrupted-attempt", type=Path)
     parser.add_argument("--segment-heading-replay-proof", type=Path)
     parser.add_argument("--evidence-role-replay-proof", type=Path)
+    parser.add_argument("--operating-ownership-replay-proof", type=Path)
     parser.add_argument("--source-review-package", type=Path)
     parser.add_argument("--source-review-outcomes", type=Path)
     parser.add_argument("--owner-closure-batch-manifest", type=Path)
@@ -929,6 +978,54 @@ def main(argv: Sequence[str] | None = None) -> int:
             json.dumps(receipt, ensure_ascii=False, indent=2) + "\n",
             encoding="utf-8",
         )
+    elif args.mode == "operating-ownership-semantic-replay":
+        required = {
+            "operating ownership replay proof": (
+                args.operating_ownership_replay_proof
+            ),
+            "admission receipt": args.admission_receipt,
+        }
+        missing = [name for name, path in required.items() if path is None]
+        if missing:
+            raise ValueError(f"{args.mode} requires " + ", ".join(missing))
+        replay_proof = json.loads(
+            args.operating_ownership_replay_proof.read_text(encoding="utf-8")
+        )
+        supporting_hashes = validate_operating_ownership_replay_proof(
+            replay_proof,
+            contract=OPERATING_OWNERSHIP_SHADOW_REPLAY_CONTRACT,
+            repository_root=ROOT_DIR,
+            output_root=args.output_root,
+        )
+        validate_shadow_replay_admission(
+            contract=OPERATING_OWNERSHIP_SHADOW_REPLAY_CONTRACT,
+            batch_id=args.batch_id,
+            primary_logical_profile=args.provider_route,
+            extract_max_output_tokens=args.extract_max_output_tokens,
+            verify_max_output_tokens=args.verify_max_output_tokens,
+            timeout_seconds=args.timeout_seconds,
+            max_provider_calls=args.max_provider_calls,
+            manifest=manifest,
+            evidence_plan=plan,
+            preparation_audit=frozen_audit,
+            correction_audit=replay_proof,
+            supporting_artifact_hashes=supporting_hashes,
+            prepared=prepared,
+            output_root=args.output_root,
+        )
+        if args.admission_receipt.exists():
+            raise FileExistsError(
+                f"shadow admission receipt already exists: {args.admission_receipt}"
+            )
+        receipt = build_shadow_replay_admission_receipt(
+            contract=OPERATING_OWNERSHIP_SHADOW_REPLAY_CONTRACT,
+            output_root=args.output_root,
+        )
+        args.admission_receipt.parent.mkdir(parents=True, exist_ok=True)
+        args.admission_receipt.write_text(
+            json.dumps(receipt, ensure_ascii=False, indent=2) + "\n",
+            encoding="utf-8",
+        )
     elif args.mode == "owner-closure-semantic-replay":
         required = {
             "correction audit": args.correction_audit,
@@ -1104,6 +1201,7 @@ def _validate_replay_mode(
     segment_retry_batch = RETRY_SEGMENT_FINANCIAL_SHADOW_REPLAY_CONTRACT.batch_id
     segment_heading_batch = SEGMENT_HEADING_SHADOW_REPLAY_CONTRACT.batch_id
     evidence_role_batch = EVIDENCE_ROLE_SHADOW_REPLAY_CONTRACT.batch_id
+    operating_ownership_batch = OPERATING_OWNERSHIP_SHADOW_REPLAY_CONTRACT.batch_id
     provider_bearing_legacy_modes = {"semantic-run", "refined-semantic-replay"}
     if (
         plan_version == stability_plan or batch_id == stability_batch
@@ -1164,6 +1262,22 @@ def _validate_replay_mode(
     ):
         raise ValueError(
             "Evidence-role batch identity requires evidence-role-semantic-replay"
+        )
+    if (
+        batch_id == operating_ownership_batch
+        and mode != "operating-ownership-semantic-replay"
+    ):
+        raise ValueError(
+            "operating ownership batch identity requires "
+            "operating-ownership-semantic-replay"
+        )
+    if (
+        plan_version == SHADOW_OPERATING_OWNERSHIP_PLAN_VERSION
+        and mode
+        not in {"preparation-only", "operating-ownership-semantic-replay"}
+    ):
+        raise ValueError(
+            "operating ownership v6 Evidence plan requires its frozen replay mode"
         )
     if (
         plan_version == routing_continuation_plan

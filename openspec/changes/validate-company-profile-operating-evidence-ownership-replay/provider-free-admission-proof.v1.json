@@ -1,0 +1,82 @@
+{
+  "schema_version": "company_profile_shadow_operating_ownership_replay_proof.v1",
+  "proof_id": "manufacturing-materials-shadow-operating-ownership-replay-admission-20260911-a",
+  "batch_id": "manufacturing-materials-shadow-operating-ownership-gemini-20260911-a",
+  "report_count": 20,
+  "affected_scope_count": 17,
+  "semantic_rows_match_archived_audit": true,
+  "sample_manifest_hash": "6f639739ef082e78dcb0c01a5ce40bab1645d8fdc027bece2dbef63652bae9e2",
+  "corrected_plan_hash": "cd445c2642f3509fabb92020968eb8e884aff6d2bc99caeda818ed8b3b094770",
+  "evidence_plan_version": "manufacturing_materials_shadow.2026-09-11.6",
+  "preparation_audit_hash": "c37280d844b6cb44c9a9d558d39f8de45f48b3173963fa04daaab1eb8617aa65",
+  "archived_ownership_audit_hash": "468207559e4db147986b39deb6a31c38e7b229f4ef86dc1a4cb77e9afb286775",
+  "ownership_rebuild_audit_hash": "4ae9bbb92a27957cfd2c1b1e67147841ed65868f3d54251cd93b946374cf0a43",
+  "artifact_hashes": {
+    "openspec/changes/archive/2026-09-09-validate-manufacturing-materials-company-profile-shadow-batch/shadow-manifest.v1.json": "ca6d301ff7fb3b21b206be5951965059c87a7e485121c98a24475e59bad0f215",
+    "openspec/changes/validate-company-profile-operating-evidence-ownership-replay/ownership-evidence-plan.v1.json": "f2e87d53bac61dd0da4b5e8265de13172716bc9ce7845fce67a6e2cf774954ff",
+    "openspec/changes/validate-company-profile-operating-evidence-ownership-replay/provider-free-preparation-audit.v1.json": "a5958a7ecdd71a76985f02cef0385945fd9207098519a865e30acc7da95bb53f",
+    "openspec/changes/archive/2026-09-11-repair-company-profile-operating-evidence-ownership/operating-evidence-ownership-audit.v1.json": "12746192b585a4270e9f21a32685470fa2f27ddb60f01a75824e1a7a9294e211",
+    "openspec/changes/validate-company-profile-operating-evidence-ownership-replay/ownership-rebuild-audit.v1.json": "7ee461ad10a45139a770159a6385041d00800a698d2a21e210a560afdaeb24e6",
+    "var/company_profile_shadow_batch/20260911/batch-manufacturing-materials-shadow-evidence-role-gemini-20260911-a/batch-manufacturing-materials-shadow-evidence-role-gemini-20260911-a/manifest.json": "982ab6ed61c08569683958b263529b66b7161b83fa161519570cf98a5b11eaf5",
+    "openspec/changes/archive/2026-09-11-validate-company-profile-evidence-role-shadow-replay/empirical-readiness-audit.v1.json": "4f18106c02b04a364d90a686d7ccb984e8dcc1fd7ce914338d7c6f98df9a541e",
+    "openspec/changes/archive/2026-09-11-validate-company-profile-evidence-role-shadow-replay/source-review-outcomes.v1.json": "7375c30a6b2e720153c2379f84102c54556e4538e4034149ffea2d155215cb8a"
+  },
+  "implementation_hashes": {
+    "research/company_profile/shadow_evidence.py": "604048b92487f34dab8bca134a1e3b7a354a374ec12daea02c5ef4c8b8e854fa",
+    "research/company_profile/stage5_service.py": "0d375d94256f4fe245c59175d1419d2b69d050e14abbcff624a03872a02ea37a",
+    "research/company_profile/shadow_batch_service.py": "a5422b5efe66609c8503dbe711909a55178533d9d96744e54e84c53be98c0d92"
+  },
+  "supporting_artifact_hashes": {
+    "baseline_batch_manifest": "982ab6ed61c08569683958b263529b66b7161b83fa161519570cf98a5b11eaf5",
+    "baseline_readiness_audit": "4f18106c02b04a364d90a686d7ccb984e8dcc1fd7ce914338d7c6f98df9a541e",
+    "ownership_correction_audit": "12746192b585a4270e9f21a32685470fa2f27ddb60f01a75824e1a7a9294e211",
+    "ownership_rebuild_audit": "7ee461ad10a45139a770159a6385041d00800a698d2a21e210a560afdaeb24e6",
+    "shadow_evidence_implementation": "604048b92487f34dab8bca134a1e3b7a354a374ec12daea02c5ef4c8b8e854fa",
+    "stage5_evidence_binding_implementation": "0d375d94256f4fe245c59175d1419d2b69d050e14abbcff624a03872a02ea37a",
+    "ownership_replay_proof_validator": "a5422b5efe66609c8503dbe711909a55178533d9d96744e54e84c53be98c0d92"
+  },
+  "source_review_rule": {
+    "include_all_dispositions": [
+      "blocker",
+      "caveat",
+      "unresolved"
+    ],
+    "stable_sample_per_core_chapter": 1,
+    "stable_sample_kinds": [
+      "accepted_for_review",
+      "legal_empty"
+    ],
+    "core_chapter_count": 6
+  },
+  "readiness_gates": {
+    "execution_completion_min": 0.95,
+    "usable_report_rate_min": 0.9,
+    "evidence_traceability_min": 1.0,
+    "source_review_complete": true,
+    "sampled_precision_min": 0.99,
+    "critical_semantic_error_max": 0,
+    "unresolved_review_median_max": 2,
+    "unresolved_review_p90_max": 5
+  },
+  "provider": {
+    "logical_profile": "semantic_extraction__scorpio_gemini",
+    "extract_max_output_tokens": 20000,
+    "verify_max_output_tokens": 18000,
+    "timeout_seconds": 300.0,
+    "max_provider_calls": 600,
+    "outer_deadline_seconds": null
+  },
+  "authorized_transfer_hosts": [
+    "scorpio.reepool.com"
+  ],
+  "output_root": "/home/python/Quote/var/company_profile_shadow_batch/20260911/batch-manufacturing-materials-shadow-operating-ownership-gemini-20260911-a",
+  "output_absent_before_provider": true,
+  "provider_calls": 0,
+  "cohort_replay_performed": false,
+  "historical_artifacts_mutated": false,
+  "production_paths_opened": [],
+  "unresolved_finding_ids": [],
+  "created_at": "2026-09-11T15:50:00+00:00",
+  "production_authorization": "not_authorized",
+  "audit_hash": "4496c711b44c0765ab0c9004c8def3f71420a7cf3610b4f8d5088f8cdd2fb337"
+}

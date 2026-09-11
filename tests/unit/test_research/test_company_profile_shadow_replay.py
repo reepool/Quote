@@ -27,6 +27,7 @@ from research.company_profile.shadow_batch_service import (
     load_shadow_batch_result,
     load_shadow_report_result,
     validate_evidence_role_replay_proof,
+    validate_operating_ownership_replay_proof,
     validate_segment_financial_closure_audit,
     validate_segment_heading_replay_proof,
     validate_shadow_replay_admission,
@@ -43,6 +44,7 @@ from research.company_profile.stage5_provider import _segment_numeric_occurrence
 from scripts.run_company_profile_shadow_batch import (
     EVIDENCE_ROLE_SHADOW_REPLAY_CONTRACT,
     EXTERNAL_PRECISION_SHADOW_REPLAY_CONTRACT,
+    OPERATING_OWNERSHIP_SHADOW_REPLAY_CONTRACT,
     OWNER_CLOSURE_SHADOW_REPLAY_CONTRACT,
     PRECISION_CLOSURE_SHADOW_REPLAY_CONTRACT,
     RETRY_SEGMENT_FINANCIAL_SHADOW_REPLAY_CONTRACT,
@@ -93,7 +95,7 @@ SEGMENT_FINANCIAL_CHANGE = (
 )
 SEGMENT_HEADING_REPLAY_CHANGE = (
     REPOSITORY_ROOT
-    / "openspec/changes/replay-company-profile-shadow-after-segment-heading-binding"
+    / "openspec/changes/archive/2026-09-11-replay-company-profile-shadow-after-segment-heading-binding"
 )
 SEGMENT_CONTEXT_CHANGE = (
     REPOSITORY_ROOT
@@ -103,9 +105,20 @@ EVIDENCE_ROLE_CHANGE = (
     REPOSITORY_ROOT
     / "openspec/changes/archive/2026-09-11-validate-company-profile-evidence-role-shadow-replay"
 )
-SEGMENT_HEADING_REPLAY_ARCHIVE = (
+OPERATING_OWNERSHIP_REPLAY_CHANGE = (
     REPOSITORY_ROOT
-    / "openspec/changes/archive/2026-09-11-replay-company-profile-shadow-after-segment-heading-binding"
+    / "openspec/changes/validate-company-profile-operating-evidence-ownership-replay"
+)
+if not OPERATING_OWNERSHIP_REPLAY_CHANGE.exists():
+    archived_operating_ownership_replays = sorted(
+        (REPOSITORY_ROOT / "openspec/changes/archive").glob(
+            "*-validate-company-profile-operating-evidence-ownership-replay"
+        )
+    )
+    if archived_operating_ownership_replays:
+        OPERATING_OWNERSHIP_REPLAY_CHANGE = archived_operating_ownership_replays[-1]
+SEGMENT_HEADING_REPLAY_ARCHIVE = (
+    SEGMENT_HEADING_REPLAY_CHANGE
 )
 BASELINE_BATCH = (
     REPOSITORY_ROOT
@@ -296,6 +309,29 @@ def segment_heading_replay_inputs():
             / "provider-free-admission-proof.v1.json"
         ).read_text(encoding="utf-8")
     )
+    archived_preparation = (
+        "openspec/changes/archive/2026-09-11-"
+        "replay-company-profile-shadow-after-segment-heading-binding/"
+        "provider-free-preparation-audit.v1.json"
+    )
+    active_preparation = archived_preparation.replace("archive/2026-09-11-", "")
+    proof["artifact_hashes"][archived_preparation] = proof["artifact_hashes"].pop(
+        active_preparation
+    )
+    for implementation_path, supporting_name in {
+        "research/company_profile/shadow_evidence.py": (
+            "shadow_evidence_implementation"
+        ),
+        "research/company_profile/stage5_provider.py": (
+            "stage5_provider_implementation"
+        ),
+    }.items():
+        current_hash = _file_sha256(REPOSITORY_ROOT / implementation_path)
+        proof["implementation_hashes"][implementation_path] = current_hash
+        proof["supporting_artifact_hashes"][supporting_name] = current_hash
+    proof["audit_hash"] = _payload_hash(
+        {key: value for key, value in proof.items() if key != "audit_hash"}
+    )
     prepared = ShadowEvidencePreparer().prepare(manifest=manifest, plan=plan)
     return manifest, plan, preparation, proof, prepared
 
@@ -316,6 +352,29 @@ def evidence_role_replay_inputs():
         (EVIDENCE_ROLE_CHANGE / "provider-free-admission-proof.v1.json").read_text(
             encoding="utf-8"
         )
+    )
+    prepared = ShadowEvidencePreparer().prepare(manifest=manifest, plan=plan)
+    return manifest, plan, preparation, proof, prepared
+
+
+@pytest.fixture(scope="module")
+def operating_ownership_replay_inputs():
+    manifest = load_shadow_sample_manifest(
+        BASELINE_CHANGE / "shadow-manifest.v1.json",
+        repository_root=REPOSITORY_ROOT,
+    )
+    plan = load_shadow_evidence_plan(
+        OPERATING_OWNERSHIP_REPLAY_CHANGE / "ownership-evidence-plan.v1.json"
+    )
+    preparation = load_shadow_preparation_audit(
+        OPERATING_OWNERSHIP_REPLAY_CHANGE
+        / "provider-free-preparation-audit.v1.json"
+    )
+    proof = json.loads(
+        (
+            OPERATING_OWNERSHIP_REPLAY_CHANGE
+            / "provider-free-admission-proof.v1.json"
+        ).read_text(encoding="utf-8")
     )
     prepared = ShadowEvidencePreparer().prepare(manifest=manifest, plan=plan)
     return manifest, plan, preparation, proof, prepared
@@ -1490,7 +1549,10 @@ def test_segment_heading_replay_admission_is_exact_and_research_only(
     proof.pop("audit_hash", None)
     proof["audit_hash"] = _payload_hash(proof)
     contract = SEGMENT_HEADING_SHADOW_REPLAY_CONTRACT.model_copy(
-        update={"correction_audit_hash": proof["audit_hash"]}
+        update={
+            "correction_audit_hash": proof["audit_hash"],
+            "supporting_artifact_hashes": proof["supporting_artifact_hashes"],
+        }
     )
 
     supporting = validate_segment_heading_replay_proof(
@@ -1560,7 +1622,12 @@ def test_segment_heading_replay_mode_output_and_budget_are_closed(
     segment_heading_replay_inputs,
 ) -> None:
     manifest, plan, preparation, proof, prepared = segment_heading_replay_inputs
-    contract = SEGMENT_HEADING_SHADOW_REPLAY_CONTRACT
+    contract = SEGMENT_HEADING_SHADOW_REPLAY_CONTRACT.model_copy(
+        update={
+            "correction_audit_hash": proof["audit_hash"],
+            "supporting_artifact_hashes": proof["supporting_artifact_hashes"],
+        }
+    )
     args = build_parser().parse_args(
         [
             "--mode",
@@ -1822,6 +1889,257 @@ def test_evidence_role_operator_stops_before_provider_creation(
                 EVIDENCE_ROLE_SHADOW_REPLAY_CONTRACT.batch_id,
             ]
         )
+
+
+def test_operating_ownership_replay_admission_is_exact_and_research_only(
+    tmp_path: Path,
+    operating_ownership_replay_inputs,
+) -> None:
+    manifest, plan, preparation, proof, prepared = operating_ownership_replay_inputs
+    output_root = tmp_path / "fresh-shadow-output"
+    proof = dict(proof)
+    proof["output_root"] = str(output_root)
+    proof.pop("audit_hash", None)
+    proof["audit_hash"] = _payload_hash(proof)
+    contract = OPERATING_OWNERSHIP_SHADOW_REPLAY_CONTRACT.model_copy(
+        update={"correction_audit_hash": proof["audit_hash"]}
+    )
+
+    supporting = validate_operating_ownership_replay_proof(
+        proof,
+        contract=contract,
+        repository_root=REPOSITORY_ROOT,
+        output_root=output_root,
+    )
+    validate_shadow_replay_admission(
+        contract=contract,
+        batch_id=contract.batch_id,
+        primary_logical_profile=contract.primary_logical_profile,
+        extract_max_output_tokens=contract.extract_max_output_tokens,
+        verify_max_output_tokens=contract.verify_max_output_tokens,
+        timeout_seconds=contract.timeout_seconds,
+        max_provider_calls=contract.max_provider_calls,
+        manifest=manifest,
+        evidence_plan=plan,
+        preparation_audit=preparation,
+        correction_audit=proof,
+        supporting_artifact_hashes=supporting,
+        prepared=prepared,
+        output_root=output_root,
+    )
+
+    assert len(prepared) == 20
+    assert sum(len(scopes) for scopes in prepared.values()) == 154
+    assert proof["affected_scope_count"] == 17
+    assert contract.production_authorization == "not_authorized"
+
+
+def test_operating_ownership_replay_proof_rejects_implementation_drift(
+    operating_ownership_replay_inputs,
+) -> None:
+    _, _, _, proof, _ = operating_ownership_replay_inputs
+    changed = json.loads(json.dumps(proof))
+    changed_hash = "f" * 64
+    changed["implementation_hashes"][
+        "research/company_profile/shadow_batch_service.py"
+    ] = changed_hash
+    changed["supporting_artifact_hashes"][
+        "ownership_replay_proof_validator"
+    ] = changed_hash
+    changed["audit_hash"] = _payload_hash(
+        {key: value for key, value in changed.items() if key != "audit_hash"}
+    )
+    changed_contract = OPERATING_OWNERSHIP_SHADOW_REPLAY_CONTRACT.model_copy(
+        update={
+            "correction_audit_hash": changed["audit_hash"],
+            "supporting_artifact_hashes": changed["supporting_artifact_hashes"],
+        }
+    )
+
+    with pytest.raises(ValueError, match="artifact hash mismatch"):
+        validate_operating_ownership_replay_proof(
+            changed,
+            contract=changed_contract,
+            repository_root=REPOSITORY_ROOT,
+            output_root=Path(changed["output_root"]),
+        )
+
+
+def test_operating_ownership_replay_mode_output_and_budget_are_closed(
+    tmp_path: Path,
+    operating_ownership_replay_inputs,
+) -> None:
+    manifest, plan, preparation, proof, prepared = operating_ownership_replay_inputs
+    contract = OPERATING_OWNERSHIP_SHADOW_REPLAY_CONTRACT
+    args = build_parser().parse_args(
+        [
+            "--mode",
+            "operating-ownership-semantic-replay",
+            "--sample-manifest",
+            "manifest.json",
+            "--evidence-plan",
+            "plan.json",
+            "--batch-id",
+            contract.batch_id,
+        ]
+    )
+    assert args.mode == "operating-ownership-semantic-replay"
+    _validate_replay_mode(
+        mode=args.mode,
+        plan_version=contract.evidence_plan_version,
+        batch_id=contract.batch_id,
+    )
+    with pytest.raises(ValueError, match="operating ownership batch identity requires"):
+        _validate_replay_mode(
+            mode="evidence-role-semantic-replay",
+            plan_version=contract.evidence_plan_version,
+            batch_id=contract.batch_id,
+        )
+    with pytest.raises(ValueError, match="output root mismatch"):
+        validate_operating_ownership_replay_proof(
+            proof,
+            contract=contract,
+            repository_root=REPOSITORY_ROOT,
+            output_root=tmp_path,
+        )
+
+    (tmp_path / f"batch-{contract.batch_id}").mkdir()
+    with pytest.raises(FileExistsError, match="shadow batch already exists"):
+        validate_shadow_replay_admission(
+            contract=contract,
+            batch_id=contract.batch_id,
+            primary_logical_profile=contract.primary_logical_profile,
+            extract_max_output_tokens=contract.extract_max_output_tokens,
+            verify_max_output_tokens=contract.verify_max_output_tokens,
+            timeout_seconds=contract.timeout_seconds,
+            max_provider_calls=contract.max_provider_calls,
+            manifest=manifest,
+            evidence_plan=plan,
+            preparation_audit=preparation,
+            correction_audit=proof,
+            supporting_artifact_hashes=contract.supporting_artifact_hashes,
+            prepared=prepared,
+            output_root=tmp_path,
+        )
+
+    with pytest.raises(ValueError, match="extract_max_output_tokens"):
+        validate_shadow_replay_admission(
+            contract=contract,
+            batch_id=contract.batch_id,
+            primary_logical_profile=contract.primary_logical_profile,
+            extract_max_output_tokens=contract.extract_max_output_tokens + 1,
+            verify_max_output_tokens=contract.verify_max_output_tokens,
+            timeout_seconds=contract.timeout_seconds,
+            max_provider_calls=contract.max_provider_calls,
+            manifest=manifest,
+            evidence_plan=plan,
+            preparation_audit=preparation,
+            correction_audit=proof,
+            supporting_artifact_hashes=contract.supporting_artifact_hashes,
+            prepared=prepared,
+            output_root=tmp_path / "fresh",
+        )
+
+
+def test_operating_ownership_operator_stops_before_provider_creation(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    def reject_before_provider(*args, **kwargs):
+        raise ValueError("provider-free ownership admission rejected")
+
+    monkeypatch.setattr(
+        shadow_batch_operator,
+        "validate_operating_ownership_replay_proof",
+        reject_before_provider,
+    )
+    with pytest.raises(
+        ValueError, match="provider-free ownership admission rejected"
+    ):
+        shadow_batch_operator.main(
+            [
+                "--mode",
+                "operating-ownership-semantic-replay",
+                "--sample-manifest",
+                str(BASELINE_CHANGE / "shadow-manifest.v1.json"),
+                "--evidence-plan",
+                str(
+                    OPERATING_OWNERSHIP_REPLAY_CHANGE
+                    / "ownership-evidence-plan.v1.json"
+                ),
+                "--preparation-audit",
+                str(
+                    OPERATING_OWNERSHIP_REPLAY_CHANGE
+                    / "provider-free-preparation-audit.v1.json"
+                ),
+                "--operating-ownership-replay-proof",
+                str(
+                    OPERATING_OWNERSHIP_REPLAY_CHANGE
+                    / "provider-free-admission-proof.v1.json"
+                ),
+                "--admission-receipt",
+                str(tmp_path / "admission.json"),
+                "--output-root",
+                str(tmp_path / "output"),
+                "--batch-id",
+                OPERATING_OWNERSHIP_SHADOW_REPLAY_CONTRACT.batch_id,
+            ]
+        )
+
+
+def test_operating_ownership_interrupted_attempt_is_failed_closed() -> None:
+    change = OPERATING_OWNERSHIP_REPLAY_CHANGE
+    output = Path(OPERATING_OWNERSHIP_SHADOW_REPLAY_CONTRACT.batch_id)
+    batch_directory = (
+        REPOSITORY_ROOT
+        / "var/company_profile_shadow_batch/20260911"
+        / f"batch-{output.name}"
+        / f"batch-{output.name}"
+    )
+    report_path = (
+        batch_directory / "reports/manufacturing-materials-shadow-600121-2025.json"
+    )
+    attempt = json.loads(
+        (change / "interrupted-attempt.v1.json").read_text(encoding="utf-8")
+    )
+    readiness = json.loads(
+        (change / "empirical-readiness-audit.v1.json").read_text(encoding="utf-8")
+    )
+    recurrence = json.loads(
+        (change / "operating-ownership-recurrence-audit.v1.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    comparison = json.loads(
+        (change / "shadow-replay-comparison-audit.v1.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    review = json.loads(
+        (change / "source-review-outcomes.v1.json").read_text(encoding="utf-8")
+    )
+
+    for artifact in (attempt, readiness, recurrence, comparison, review):
+        actual_hash = artifact.pop("audit_hash")
+        assert actual_hash == _payload_hash(artifact)
+        artifact["audit_hash"] = actual_hash
+
+    if report_path.is_file():
+        assert _file_sha256(report_path) == attempt["persisted_report"]["file_sha256"]
+    assert not (batch_directory / "manifest.json").exists()
+    assert attempt["persisted_provider_failed_call_count"] == 8
+    assert attempt["provider_http_response_count"] == 0
+    assert attempt["replacement_or_rerun_started"] is False
+    assert readiness["readiness_decision"] == "failed"
+    assert readiness["execution_completion_rate"] == 0.05
+    assert recurrence["causal_ownership_conclusion"] == "not_evaluable"
+    assert recurrence["replay_affected_scope_count_evaluated"] == 0
+    assert comparison["comparison_complete"] is False
+    assert review["source_review_complete"] is False
+    assert all(
+        artifact["production_authorization"] == "not_authorized"
+        for artifact in (attempt, readiness, recurrence, comparison, review)
+    )
 
 
 def test_routing_continuation_replay_admission_is_exact_and_research_only(
