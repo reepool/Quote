@@ -101,7 +101,7 @@ SEGMENT_CONTEXT_CHANGE = (
 )
 EVIDENCE_ROLE_CHANGE = (
     REPOSITORY_ROOT
-    / "openspec/changes/validate-company-profile-evidence-role-shadow-replay"
+    / "openspec/changes/archive/2026-09-11-validate-company-profile-evidence-role-shadow-replay"
 )
 SEGMENT_HEADING_REPLAY_ARCHIVE = (
     REPOSITORY_ROOT
