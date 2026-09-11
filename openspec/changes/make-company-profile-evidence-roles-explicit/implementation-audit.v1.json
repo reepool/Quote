@@ -1,0 +1,29 @@
+{
+  "schema_version": "company_profile_evidence_roles_implementation_audit.v1",
+  "change": "make-company-profile-evidence-roles-explicit",
+  "created_at": "2026-09-11",
+  "provider_calls": 0,
+  "production_authorization": "not_authorized",
+  "historical_outputs_modified": false,
+  "external_replay_performed": false,
+  "implementation": {
+    "research/company_profile/stage5_provider.py": "61546375d009cf9ac876adc9044bd2bd3a46aa3033a526c984a087753d6ec615",
+    "tests/unit/test_research/test_company_profile_stage5_provider.py": "f01cb1e7d680e680f8c1b7b99b3902ac6bf1adfeb57318030822046100cf0e66"
+  },
+  "artifacts": {
+    "proposal.md": "ca4f02138437d8088f225ff353dd85899ae4df2cbcd70aea6c336bffe3d65c01",
+    "design.md": "2eae70729fb0a2ba44548077ce5c123c75456175d3e80efe64259748336182a0",
+    "tasks.md": "8aca0ce79ececf63e15fe60f3fbca9ab0d3f4ce8581025b12f9f06c1b996fc5e",
+    "specs/company-profile-bounded-semantic-workflow/spec.md": "04b70b7229c877d1c375800f88d91eec8597657c2fd68eb0ea210ad6adba1f8f",
+    "specs/company-profile-manufacturing-materials-shadow-batch/spec.md": "1c18d41a68c74b7cddeca82c177867efb5f5e49f61a362432127fa96065b6446",
+    "next-validation-plan.v1.md": "9b852d6ad3e10f9cf07f9e31e54f7b3ce38ead4ec11c4f8dce2fbe756f209f25"
+  },
+  "verification": {
+    "provider_tests": "123 passed",
+    "benchmark_tests": "20 passed",
+    "ruff": "passed",
+    "openspec_strict": "passed",
+    "combined_legacy_replay_tests": "176 passed, 3 setup errors from archived fixture paths outside this change"
+  },
+  "next_step": "Prepare a separate new-identity validation plan; do not replay in this change."
+}

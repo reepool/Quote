@@ -49,6 +49,7 @@ from research.company_profile.stage5_provider import (
     _TASK_INSTRUCTIONS,
     CommonGatewaySemanticProvider,
     _coverage_draft_schema,
+    _evidence_catalog,
     _expand_compact_measurements,
     _expand_extract_response,
     _merge_segment_partition_responses,
@@ -159,6 +160,11 @@ def test_common_gateway_provider_sends_one_bounded_scope_and_stage4_schema() -> 
     assert "page_contexts" in envelope["request_scope"]
     assert "evidence_bundle" not in envelope["runtime_request"]
     assert len(envelope["runtime_request"]["evidence_catalog"]) == 1
+    catalog_item = envelope["runtime_request"]["evidence_catalog"][0]
+    assert catalog_item["evidence_role"] == "context_only"
+    assert catalog_item["context_only"] is True
+    assert catalog_item["field_ids"] == []
+    assert catalog_item["field_owner_ids"] == []
     assert "package_manifest" not in envelope["runtime_request"]
     assert (
         "activity_actor and source_actor must be the same"
@@ -209,6 +215,35 @@ def test_common_gateway_provider_sends_one_bounded_scope_and_stage4_schema() -> 
     )
     assert provider.traces[0].call_type == "extract"
     assert provider.traces[0].status == "success"
+
+
+def test_evidence_catalog_distinguishes_owner_context_and_mixed_bindings() -> None:
+    prepared = _prepared_scope()
+    evidence = prepared.evidence_bundle[0].evidence
+    catalog = _evidence_catalog(
+        (
+            PreparedEvidence(evidence=evidence),
+            PreparedEvidence(evidence=evidence, field_id="business_overview_source"),
+            PreparedEvidence(evidence=evidence, field_id="explicit_activity"),
+        ),
+        include_bounded_quotes=False,
+    )
+
+    assert len(catalog) == 1
+    assert catalog[0]["evidence_role"] == "mixed"
+    assert catalog[0]["context_only"] is True
+    assert catalog[0]["field_ids"] == [
+        "business_overview_source",
+        "explicit_activity",
+    ]
+    assert catalog[0]["field_owner_ids"] == catalog[0]["field_ids"]
+
+    owner_only = _evidence_catalog(
+        (PreparedEvidence(evidence=evidence, field_id="business_overview_source"),),
+        include_bounded_quotes=False,
+    )
+    assert owner_only[0]["evidence_role"] == "field_owner"
+    assert owner_only[0]["context_only"] is False
 
 
 @pytest.mark.parametrize(
@@ -3449,6 +3484,14 @@ def test_common_gateway_provider_uses_separate_repair_and_verify_requests() -> N
         "legal-empty coverage target must not be marked unclear" in verify_instruction
     )
     assert "evidence_catalog field_ids list is the authoritative field binding" in (
+        verify_instruction
+    )
+    assert "field_owner, context_only, or mixed" in verify_instruction
+    assert "Legal-empty coverage may cite only Evidence" in verify_instruction
+    assert "consolidation-scope or control change does not establish broader" in (
+        verify_instruction
+    )
+    assert "cost-component or generic operating-cost row is not a business Segment" in (
         verify_instruction
     )
     assert "one Evidence item may be bound to several field_ids" in verify_instruction
