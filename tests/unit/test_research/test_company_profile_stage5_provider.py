@@ -184,6 +184,14 @@ def test_common_gateway_provider_sends_one_bounded_scope_and_stage4_schema() -> 
         in _TASK_INSTRUCTIONS["extract_segment_financials"]
     )
     assert (
+        "exact heading 报告分部的财务信息"
+        in _TASK_INSTRUCTIONS["extract_segment_financials"]
+    )
+    assert (
+        "Return compact JSON only"
+        in _TASK_INSTRUCTIONS["extract_segment_financials"]
+    )
+    assert (
         "listing all three source values"
         in _TASK_INSTRUCTIONS["extract_segment_financials"]
     )

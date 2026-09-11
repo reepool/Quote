@@ -1,0 +1,70 @@
+{
+  "schema_version": "company_profile_stage5_prepared_scope.v1",
+  "sample_id": "manufacturing-materials-shadow-000408-2025",
+  "scope_id": "segment_financials-02",
+  "chapter_task": "extract_segment_financials",
+  "field_ids": [
+    "segment_dimension",
+    "operating_revenue",
+    "operating_cost"
+  ],
+  "report": {
+    "instrument_id": "000408.SZ",
+    "report_id": "1225009932",
+    "document_version": "10350f651693d09a3ed6f203996751624b41bcc330159df69eb29297cdd2d956",
+    "report_period": "2025-12-31",
+    "published_at": "2026-03-13T16:00:00+00:00",
+    "document_type": "annual_report"
+  },
+  "evidence_bundle": [
+    {
+      "evidence": {
+        "evidence_id": "stage5-evidence-75d08a3065e3df91a3462ad7",
+        "report": {
+          "instrument_id": "000408.SZ",
+          "report_id": "1225009932",
+          "document_version": "10350f651693d09a3ed6f203996751624b41bcc330159df69eb29297cdd2d956",
+          "report_period": "2025-12-31",
+          "published_at": "2026-03-13T16:00:00+00:00",
+          "document_type": "annual_report"
+        },
+        "page": 194,
+        "printed_page_label": null,
+        "section_title": "principal_business",
+        "continuation_pages": [],
+        "subject_evidence_pages": [],
+        "anchor": {
+          "anchor_type": "text",
+          "bounded_quote": "193\n2025\n十八、其他重要事项\n1、前期会计差错更正\n（1）  追溯重述法\n单 位 ：元\n会计差错更正的内容 处理程序 受影响的各个比较期间报表项目名称 累积影响数\n（2）  未来适用法\n会计差错更正的内容 批准程序 采用未来适用法的原因\n2、债务重组\n3、资产置换\n（1）  非货币性资产交换\n（2）  其他资产置换\n4、年金计划\n5、终止经营\n6、分部信息\n（1）  报告分部的确定依据与会计政策\n根据公司的内部组织结构、管理要求及内部报告制度，公司的经营业务划分为 4 个经营分部，公司的管理层能够定期\n评价这些分部的经营成果，以决定向其分配资源、评价其业绩。在经营分部的基础上公司确定了 4 个报告分部，分别为公\n司本部、氯化钾生产及销售业务、碳酸锂生产及销售业务、投资业务。这些报告分部是以对外提供不同产品为基础确定的。\n分部报告信息根据各分部向管理层报告时采用的会计政策及计量标准披露，这些计量基础与编制财务报表时的会计与\n计量基础保持一致。\n（2）  报告分部的财务信息\n单 位 ：元\n项目\n期末余额 / 本期发生额\n公司本部 氯化钾生产\n及销售业务\n碳酸锂生产\n及销售业务 投资业务 分部间抵销 合计\n一 . 主营业务收入 2,948,852,813.24 592,742,029.58 - 3,541,594,842.82\n二 . 主营业务成本 - 1,042,992,661.57 398,893,659.47 - -12,819,444.13 1,429,066,876.91\n三 . 资产总额 21,472,762,830.60 4,944,843,351.96 1,830,375,716.94 4,817,328,837.53 -15,373,156,533.78 17,692,154,203.25\n四 . 负债总额 25,288,750.63 1,504,697,907.84 146,352,256.46 1,251,829,771.87 -1,451,356,394.55 1,476,812,292.25\n（3）  公司无报告分部的，或者不能披露各报告分部的资产总额和负债总额的，应说明原因\n（4）  其他说明",
+          "context_before": null,
+          "context_after": null,
+          "match_index": 0
+        }
+      },
+      "field_id": null,
+      "source_native": null,
+      "context_complete": true,
+      "headers_complete": true,
+      "unit_context_complete": true,
+      "footnotes_complete": true,
+      "continuation_complete": true,
+      "source_readable": true
+    }
+  ],
+  "page_contexts": [
+    {
+      "page": 194,
+      "printed_page_label": null,
+      "text": "193\n2025\n十八、其他重要事项\n1、前期会计差错更正\n（1）  追溯重述法\n单 位 ：元\n会计差错更正的内容 处理程序 受影响的各个比较期间报表项目名称 累积影响数\n（2）  未来适用法\n会计差错更正的内容 批准程序 采用未来适用法的原因\n2、债务重组\n3、资产置换\n（1）  非货币性资产交换\n（2）  其他资产置换\n4、年金计划\n5、终止经营\n6、分部信息\n（1）  报告分部的确定依据与会计政策\n根据公司的内部组织结构、管理要求及内部报告制度，公司的经营业务划分为 4 个经营分部，公司的管理层能够定期\n评价这些分部的经营成果，以决定向其分配资源、评价其业绩。在经营分部的基础上公司确定了 4 个报告分部，分别为公\n司本部、氯化钾生产及销售业务、碳酸锂生产及销售业务、投资业务。这些报告分部是以对外提供不同产品为基础确定的。\n分部报告信息根据各分部向管理层报告时采用的会计政策及计量标准披露，这些计量基础与编制财务报表时的会计与\n计量基础保持一致。\n（2）  报告分部的财务信息\n单 位 ：元\n项目\n期末余额 / 本期发生额\n公司本部 氯化钾生产\n及销售业务\n碳酸锂生产\n及销售业务 投资业务 分部间抵销 合计\n一 . 主营业务收入 2,948,852,813.24 592,742,029.58 - 3,541,594,842.82\n二 . 主营业务成本 - 1,042,992,661.57 398,893,659.47 - -12,819,444.13 1,429,066,876.91\n三 . 资产总额 21,472,762,830.60 4,944,843,351.96 1,830,375,716.94 4,817,328,837.53 -15,373,156,533.78 17,692,154,203.25\n四 . 负债总额 25,288,750.63 1,504,697,907.84 146,352,256.46 1,251,829,771.87 -1,451,356,394.55 1,476,812,292.25\n（3）  公司无报告分部的，或者不能披露各报告分部的资产总额和负债总额的，应说明原因\n（4）  其他说明",
+      "text_hash": "1a992661e9ad5ce255b56036e896adfec9eb0778de7b7e523b0167e98514d98d",
+      "extraction_method": "native_text",
+      "quality_status": "native"
+    }
+  ],
+  "plan_version": "manufacturing_materials_shadow.2026-09-10.5",
+  "source_row_dimensions": {},
+  "candidate_pages": [
+    194
+  ],
+  "production_authorization": "not_authorized"
+}

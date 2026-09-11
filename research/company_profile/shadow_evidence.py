@@ -2360,24 +2360,33 @@ def _select_scope_ranges(
     chapter_task: ChapterTask,
 ) -> tuple[tuple[int, ...], ...]:
     sections_by_page = {item.page_number: item for item in sections}
-    governed_pages = tuple(
-        page
-        for page in bounded_pages
-        if not (
-            chapter_task == ChapterTask.EXTRACT_BUSINESS_OVERVIEW
-            and (
-                _business_overview_cross_reference_only(
-                    str(sections_by_page[page].text)
-                )
-                or _subsidiary_financial_table_without_issuer_overview(
-                    str(sections_by_page[page].text)
-                )
-                or _business_overview_statistical_table_only(
-                    str(sections_by_page[page].text)
+    if chapter_task == ChapterTask.EXTRACT_SEGMENT_FINANCIALS:
+        # Segment tables are row-owned by the selector's direct pages. Do not
+        # inherit the generic bounded ±1-page context: the following page is
+        # often a different table and can materially confuse a high-cardinality
+        # partition request. Explicit continuation markers are bound below by
+        # _bind_table_context_range.
+        governed_pages = tuple(sorted(direct_pages))
+    else:
+        governed_pages = tuple(
+            page
+            for page in bounded_pages
+            if not (
+                chapter_task == ChapterTask.EXTRACT_BUSINESS_OVERVIEW
+                and (
+                    _business_overview_cross_reference_only(
+                        str(sections_by_page[page].text)
+                    )
+                    or _subsidiary_financial_table_without_issuer_overview(
+                        str(sections_by_page[page].text)
+                    )
+                    or _business_overview_statistical_table_only(
+                        str(sections_by_page[page].text)
+                    )
                 )
             )
         )
-    )
+
     ranges = _continuous_ranges(governed_pages, maximum=3)
 
     def score(pages: tuple[int, ...]) -> tuple[int, int, int]:

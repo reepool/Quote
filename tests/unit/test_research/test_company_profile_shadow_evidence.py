@@ -641,6 +641,49 @@ def test_segment_owner_preserves_explicit_single_segment_and_legal_empty(
     ) == ("segment_dimension",)
 
 
+def test_segment_scope_excludes_unrelated_adjacent_page() -> None:
+    owner = SimpleNamespace(
+        page_number=193,
+        section_key="segment_information",
+        selector_reasons=("heading_alias:segment_information:分部信息",),
+        text="报告分部的财务信息 分部名称 营业收入 营业成本 毛利率 产品A 100 80 20%",
+    )
+    unrelated = SimpleNamespace(
+        page_number=194,
+        section_key="context",
+        selector_reasons=("bounded_context_window",),
+        text="其他事项 母公司应收账款 999999",
+    )
+
+    assert _select_scope_ranges(
+        (owner, unrelated),
+        direct_pages={193},
+        bounded_pages=(193, 194),
+        maximum_scopes=1,
+        chapter_task=ChapterTask.EXTRACT_SEGMENT_FINANCIALS,
+    ) == ((193,),)
+
+
+def test_segment_scope_binds_explicit_following_continuation() -> None:
+    sections = (
+        SimpleNamespace(
+            page_number=193,
+            text="报告分部的财务信息 分部名称 营业收入 续下表",
+        ),
+        SimpleNamespace(
+            page_number=194,
+            text="续表 分部名称 营业成本 毛利率",
+        ),
+    )
+
+    assert _bind_table_context_range(
+        (193,),
+        sections,
+        sample_id="sample",
+        chapter_task=ChapterTask.EXTRACT_SEGMENT_FINANCIALS,
+    ) == (193, 194)
+
+
 def test_material_owner_keeps_page_spanning_reuse_disclosure() -> None:
     sections = (
         SimpleNamespace(

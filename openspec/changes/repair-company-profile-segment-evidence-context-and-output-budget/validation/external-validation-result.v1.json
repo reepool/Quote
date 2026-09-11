@@ -1,0 +1,564 @@
+{
+  "schema_version": "company_profile_segment_evidence_context_output_budget_external_validation_result.v1",
+  "validation_id": "manufacturing-materials-shadow-segment-evidence-context-output-budget-20260911-a",
+  "execution_path": "sandbox_external_authorized",
+  "transfer_authorization": {
+    "target": "scorpio.reepool.com",
+    "scope": "only frozen Evidence and request content for 000408.SZ:segment_financials-02"
+  },
+  "provider": {
+    "profile": "semantic_extraction__scorpio_gemini",
+    "extract_max_output_tokens": 20000,
+    "verify_max_output_tokens": 18000,
+    "timeout_seconds": 300.0,
+    "max_provider_calls": 6,
+    "expected_partition_count": 2
+  },
+  "provider_calls": 1,
+  "sample_id": "manufacturing-materials-shadow-000408-2025",
+  "scope_id": "segment_financials-02",
+  "prepared_pages": [
+    194
+  ],
+  "task_complete": false,
+  "accepted_record_count": 0,
+  "accepted_records": [],
+  "execution": {
+    "run_id": "manufacturing-materials-shadow-segment-evidence-context-output-budget-20260911-a:segment_financials-02",
+    "sample_id": "manufacturing-materials-shadow-000408-2025",
+    "company_name": "藏格矿业",
+    "report": {
+      "instrument_id": "000408.SZ",
+      "report_id": "1225009932",
+      "document_version": "10350f651693d09a3ed6f203996751624b41bcc330159df69eb29297cdd2d956",
+      "report_period": "2025-12-31",
+      "published_at": "2026-03-13T16:00:00+00:00",
+      "document_type": "annual_report"
+    },
+    "scope_results": [
+      {
+        "scope_id": "segment_financials-02",
+        "request_id": "manufacturing-materials-shadow-segment-evidence-context-output-budget-20260911-a:segment_financials-02:manufacturing-materials-shadow-000408-2025:segment_financials-02",
+        "prepared_scope": {
+          "schema_version": "company_profile_stage5_prepared_scope.v1",
+          "sample_id": "manufacturing-materials-shadow-000408-2025",
+          "scope_id": "segment_financials-02",
+          "chapter_task": "extract_segment_financials",
+          "field_ids": [
+            "segment_dimension",
+            "operating_revenue",
+            "operating_cost"
+          ],
+          "report": {
+            "instrument_id": "000408.SZ",
+            "report_id": "1225009932",
+            "document_version": "10350f651693d09a3ed6f203996751624b41bcc330159df69eb29297cdd2d956",
+            "report_period": "2025-12-31",
+            "published_at": "2026-03-13T16:00:00+00:00",
+            "document_type": "annual_report"
+          },
+          "evidence_bundle": [
+            {
+              "evidence": {
+                "evidence_id": "stage5-evidence-75d08a3065e3df91a3462ad7",
+                "report": {
+                  "instrument_id": "000408.SZ",
+                  "report_id": "1225009932",
+                  "document_version": "10350f651693d09a3ed6f203996751624b41bcc330159df69eb29297cdd2d956",
+                  "report_period": "2025-12-31",
+                  "published_at": "2026-03-13T16:00:00+00:00",
+                  "document_type": "annual_report"
+                },
+                "page": 194,
+                "printed_page_label": null,
+                "section_title": "principal_business",
+                "continuation_pages": [],
+                "subject_evidence_pages": [],
+                "anchor": {
+                  "anchor_type": "text",
+                  "bounded_quote": "193\n2025\n十八、其他重要事项\n1、前期会计差错更正\n（1）  追溯重述法\n单 位 ：元\n会计差错更正的内容 处理程序 受影响的各个比较期间报表项目名称 累积影响数\n（2）  未来适用法\n会计差错更正的内容 批准程序 采用未来适用法的原因\n2、债务重组\n3、资产置换\n（1）  非货币性资产交换\n（2）  其他资产置换\n4、年金计划\n5、终止经营\n6、分部信息\n（1）  报告分部的确定依据与会计政策\n根据公司的内部组织结构、管理要求及内部报告制度，公司的经营业务划分为 4 个经营分部，公司的管理层能够定期\n评价这些分部的经营成果，以决定向其分配资源、评价其业绩。在经营分部的基础上公司确定了 4 个报告分部，分别为公\n司本部、氯化钾生产及销售业务、碳酸锂生产及销售业务、投资业务。这些报告分部是以对外提供不同产品为基础确定的。\n分部报告信息根据各分部向管理层报告时采用的会计政策及计量标准披露，这些计量基础与编制财务报表时的会计与\n计量基础保持一致。\n（2）  报告分部的财务信息\n单 位 ：元\n项目\n期末余额 / 本期发生额\n公司本部 氯化钾生产\n及销售业务\n碳酸锂生产\n及销售业务 投资业务 分部间抵销 合计\n一 . 主营业务收入 2,948,852,813.24 592,742,029.58 - 3,541,594,842.82\n二 . 主营业务成本 - 1,042,992,661.57 398,893,659.47 - -12,819,444.13 1,429,066,876.91\n三 . 资产总额 21,472,762,830.60 4,944,843,351.96 1,830,375,716.94 4,817,328,837.53 -15,373,156,533.78 17,692,154,203.25\n四 . 负债总额 25,288,750.63 1,504,697,907.84 146,352,256.46 1,251,829,771.87 -1,451,356,394.55 1,476,812,292.25\n（3）  公司无报告分部的，或者不能披露各报告分部的资产总额和负债总额的，应说明原因\n（4）  其他说明",
+                  "context_before": null,
+                  "context_after": null,
+                  "match_index": 0
+                }
+              },
+              "field_id": null,
+              "source_native": null,
+              "context_complete": true,
+              "headers_complete": true,
+              "unit_context_complete": true,
+              "footnotes_complete": true,
+              "continuation_complete": true,
+              "source_readable": true
+            }
+          ],
+          "page_contexts": [
+            {
+              "page": 194,
+              "printed_page_label": null,
+              "text": "193\n2025\n十八、其他重要事项\n1、前期会计差错更正\n（1）  追溯重述法\n单 位 ：元\n会计差错更正的内容 处理程序 受影响的各个比较期间报表项目名称 累积影响数\n（2）  未来适用法\n会计差错更正的内容 批准程序 采用未来适用法的原因\n2、债务重组\n3、资产置换\n（1）  非货币性资产交换\n（2）  其他资产置换\n4、年金计划\n5、终止经营\n6、分部信息\n（1）  报告分部的确定依据与会计政策\n根据公司的内部组织结构、管理要求及内部报告制度，公司的经营业务划分为 4 个经营分部，公司的管理层能够定期\n评价这些分部的经营成果，以决定向其分配资源、评价其业绩。在经营分部的基础上公司确定了 4 个报告分部，分别为公\n司本部、氯化钾生产及销售业务、碳酸锂生产及销售业务、投资业务。这些报告分部是以对外提供不同产品为基础确定的。\n分部报告信息根据各分部向管理层报告时采用的会计政策及计量标准披露，这些计量基础与编制财务报表时的会计与\n计量基础保持一致。\n（2）  报告分部的财务信息\n单 位 ：元\n项目\n期末余额 / 本期发生额\n公司本部 氯化钾生产\n及销售业务\n碳酸锂生产\n及销售业务 投资业务 分部间抵销 合计\n一 . 主营业务收入 2,948,852,813.24 592,742,029.58 - 3,541,594,842.82\n二 . 主营业务成本 - 1,042,992,661.57 398,893,659.47 - -12,819,444.13 1,429,066,876.91\n三 . 资产总额 21,472,762,830.60 4,944,843,351.96 1,830,375,716.94 4,817,328,837.53 -15,373,156,533.78 17,692,154,203.25\n四 . 负债总额 25,288,750.63 1,504,697,907.84 146,352,256.46 1,251,829,771.87 -1,451,356,394.55 1,476,812,292.25\n（3）  公司无报告分部的，或者不能披露各报告分部的资产总额和负债总额的，应说明原因\n（4）  其他说明",
+              "text_hash": "1a992661e9ad5ce255b56036e896adfec9eb0778de7b7e523b0167e98514d98d",
+              "extraction_method": "native_text",
+              "quality_status": "native"
+            }
+          ],
+          "plan_version": "manufacturing_materials_shadow.2026-09-10.5",
+          "source_row_dimensions": {},
+          "candidate_pages": [
+            194
+          ],
+          "production_authorization": "not_authorized"
+        },
+        "task_result": {
+          "schema_version": "company_profile_task_result.v1",
+          "request_id": "manufacturing-materials-shadow-segment-evidence-context-output-budget-20260911-a:segment_financials-02:manufacturing-materials-shadow-000408-2025:segment_financials-02",
+          "records": [],
+          "dispositions": [],
+          "coverage": [
+            {
+              "schema_version": "company_profile_coverage_result.v1",
+              "field_id": "segment_dimension",
+              "chapter_task": "extract_segment_financials",
+              "requirement_level": "required",
+              "status": "unclear",
+              "reason_code": "required_result_missing",
+              "reason": "active checklist item has no candidate or legal-empty result",
+              "evidence": [],
+              "reason_evidence_text": null
+            },
+            {
+              "schema_version": "company_profile_coverage_result.v1",
+              "field_id": "operating_revenue",
+              "chapter_task": "extract_segment_financials",
+              "requirement_level": "conditional",
+              "status": "unclear",
+              "reason_code": "required_result_missing",
+              "reason": "active checklist item has no candidate or legal-empty result",
+              "evidence": [],
+              "reason_evidence_text": null
+            },
+            {
+              "schema_version": "company_profile_coverage_result.v1",
+              "field_id": "operating_cost",
+              "chapter_task": "extract_segment_financials",
+              "requirement_level": "conditional",
+              "status": "unclear",
+              "reason_code": "required_result_missing",
+              "reason": "active checklist item has no candidate or legal-empty result",
+              "evidence": [],
+              "reason_evidence_text": null
+            }
+          ],
+          "human_review_items": [
+            {
+              "review_id": "manufacturing-materials-shadow-segment-evidence-context-output-budget-20260911-a:segment_financials-02:manufacturing-materials-shadow-000408-2025:segment_financials-02:extract-provider",
+              "field_id": "segment_dimension",
+              "candidate": null,
+              "evidence": [
+                {
+                  "evidence_id": "stage5-evidence-75d08a3065e3df91a3462ad7",
+                  "report": {
+                    "instrument_id": "000408.SZ",
+                    "report_id": "1225009932",
+                    "document_version": "10350f651693d09a3ed6f203996751624b41bcc330159df69eb29297cdd2d956",
+                    "report_period": "2025-12-31",
+                    "published_at": "2026-03-13T16:00:00+00:00",
+                    "document_type": "annual_report"
+                  },
+                  "page": 194,
+                  "printed_page_label": null,
+                  "section_title": "principal_business",
+                  "continuation_pages": [],
+                  "subject_evidence_pages": [],
+                  "anchor": {
+                    "anchor_type": "text",
+                    "bounded_quote": "193\n2025\n十八、其他重要事项\n1、前期会计差错更正\n（1）  追溯重述法\n单 位 ：元\n会计差错更正的内容 处理程序 受影响的各个比较期间报表项目名称 累积影响数\n（2）  未来适用法\n会计差错更正的内容 批准程序 采用未来适用法的原因\n2、债务重组\n3、资产置换\n（1）  非货币性资产交换\n（2）  其他资产置换\n4、年金计划\n5、终止经营\n6、分部信息\n（1）  报告分部的确定依据与会计政策\n根据公司的内部组织结构、管理要求及内部报告制度，公司的经营业务划分为 4 个经营分部，公司的管理层能够定期\n评价这些分部的经营成果，以决定向其分配资源、评价其业绩。在经营分部的基础上公司确定了 4 个报告分部，分别为公\n司本部、氯化钾生产及销售业务、碳酸锂生产及销售业务、投资业务。这些报告分部是以对外提供不同产品为基础确定的。\n分部报告信息根据各分部向管理层报告时采用的会计政策及计量标准披露，这些计量基础与编制财务报表时的会计与\n计量基础保持一致。\n（2）  报告分部的财务信息\n单 位 ：元\n项目\n期末余额 / 本期发生额\n公司本部 氯化钾生产\n及销售业务\n碳酸锂生产\n及销售业务 投资业务 分部间抵销 合计\n一 . 主营业务收入 2,948,852,813.24 592,742,029.58 - 3,541,594,842.82\n二 . 主营业务成本 - 1,042,992,661.57 398,893,659.47 - -12,819,444.13 1,429,066,876.91\n三 . 资产总额 21,472,762,830.60 4,944,843,351.96 1,830,375,716.94 4,817,328,837.53 -15,373,156,533.78 17,692,154,203.25\n四 . 负债总额 25,288,750.63 1,504,697,907.84 146,352,256.46 1,251,829,771.87 -1,451,356,394.55 1,476,812,292.25\n（3）  公司无报告分部的，或者不能披露各报告分部的资产总额和负债总额的，应说明原因\n（4）  其他说明",
+                    "context_before": null,
+                    "context_after": null,
+                    "match_index": 0
+                  }
+                },
+                {
+                  "evidence_id": "stage5-evidence-75d08a3065e3df91a3462ad7",
+                  "report": {
+                    "instrument_id": "000408.SZ",
+                    "report_id": "1225009932",
+                    "document_version": "10350f651693d09a3ed6f203996751624b41bcc330159df69eb29297cdd2d956",
+                    "report_period": "2025-12-31",
+                    "published_at": "2026-03-13T16:00:00+00:00",
+                    "document_type": "annual_report"
+                  },
+                  "page": 194,
+                  "printed_page_label": null,
+                  "section_title": "principal_business",
+                  "continuation_pages": [],
+                  "subject_evidence_pages": [],
+                  "anchor": {
+                    "anchor_type": "text",
+                    "bounded_quote": "193\n2025\n十八、其他重要事项\n1、前期会计差错更正\n（1）  追溯重述法\n单 位 ：元\n会计差错更正的内容 处理程序 受影响的各个比较期间报表项目名称 累积影响数\n（2）  未来适用法\n会计差错更正的内容 批准程序 采用未来适用法的原因\n2、债务重组\n3、资产置换\n（1）  非货币性资产交换\n（2）  其他资产置换\n4、年金计划\n5、终止经营\n6、分部信息\n（1）  报告分部的确定依据与会计政策\n根据公司的内部组织结构、管理要求及内部报告制度，公司的经营业务划分为 4 个经营分部，公司的管理层能够定期\n评价这些分部的经营成果，以决定向其分配资源、评价其业绩。在经营分部的基础上公司确定了 4 个报告分部，分别为公\n司本部、氯化钾生产及销售业务、碳酸锂生产及销售业务、投资业务。这些报告分部是以对外提供不同产品为基础确定的。\n分部报告信息根据各分部向管理层报告时采用的会计政策及计量标准披露，这些计量基础与编制财务报表时的会计与\n计量基础保持一致。\n（2）  报告分部的财务信息\n单 位 ：元\n项目\n期末余额 / 本期发生额\n公司本部 氯化钾生产\n及销售业务\n碳酸锂生产\n及销售业务 投资业务 分部间抵销 合计\n一 . 主营业务收入 2,948,852,813.24 592,742,029.58 - 3,541,594,842.82\n二 . 主营业务成本 - 1,042,992,661.57 398,893,659.47 - -12,819,444.13 1,429,066,876.91\n三 . 资产总额 21,472,762,830.60 4,944,843,351.96 1,830,375,716.94 4,817,328,837.53 -15,373,156,533.78 17,692,154,203.25\n四 . 负债总额 25,288,750.63 1,504,697,907.84 146,352,256.46 1,251,829,771.87 -1,451,356,394.55 1,476,812,292.25\n（3）  公司无报告分部的，或者不能披露各报告分部的资产总额和负债总额的，应说明原因\n（4）  其他说明",
+                    "context_before": null,
+                    "context_after": null,
+                    "match_index": 0
+                  }
+                },
+                {
+                  "evidence_id": "stage5-evidence-75d08a3065e3df91a3462ad7",
+                  "report": {
+                    "instrument_id": "000408.SZ",
+                    "report_id": "1225009932",
+                    "document_version": "10350f651693d09a3ed6f203996751624b41bcc330159df69eb29297cdd2d956",
+                    "report_period": "2025-12-31",
+                    "published_at": "2026-03-13T16:00:00+00:00",
+                    "document_type": "annual_report"
+                  },
+                  "page": 194,
+                  "printed_page_label": null,
+                  "section_title": "principal_business",
+                  "continuation_pages": [],
+                  "subject_evidence_pages": [],
+                  "anchor": {
+                    "anchor_type": "text",
+                    "bounded_quote": "193\n2025\n十八、其他重要事项\n1、前期会计差错更正\n（1）  追溯重述法\n单 位 ：元\n会计差错更正的内容 处理程序 受影响的各个比较期间报表项目名称 累积影响数\n（2）  未来适用法\n会计差错更正的内容 批准程序 采用未来适用法的原因\n2、债务重组\n3、资产置换\n（1）  非货币性资产交换\n（2）  其他资产置换\n4、年金计划\n5、终止经营\n6、分部信息\n（1）  报告分部的确定依据与会计政策\n根据公司的内部组织结构、管理要求及内部报告制度，公司的经营业务划分为 4 个经营分部，公司的管理层能够定期\n评价这些分部的经营成果，以决定向其分配资源、评价其业绩。在经营分部的基础上公司确定了 4 个报告分部，分别为公\n司本部、氯化钾生产及销售业务、碳酸锂生产及销售业务、投资业务。这些报告分部是以对外提供不同产品为基础确定的。\n分部报告信息根据各分部向管理层报告时采用的会计政策及计量标准披露，这些计量基础与编制财务报表时的会计与\n计量基础保持一致。\n（2）  报告分部的财务信息\n单 位 ：元\n项目\n期末余额 / 本期发生额\n公司本部 氯化钾生产\n及销售业务\n碳酸锂生产\n及销售业务 投资业务 分部间抵销 合计\n一 . 主营业务收入 2,948,852,813.24 592,742,029.58 - 3,541,594,842.82\n二 . 主营业务成本 - 1,042,992,661.57 398,893,659.47 - -12,819,444.13 1,429,066,876.91\n三 . 资产总额 21,472,762,830.60 4,944,843,351.96 1,830,375,716.94 4,817,328,837.53 -15,373,156,533.78 17,692,154,203.25\n四 . 负债总额 25,288,750.63 1,504,697,907.84 146,352,256.46 1,251,829,771.87 -1,451,356,394.55 1,476,812,292.25\n（3）  公司无报告分部的，或者不能披露各报告分部的资产总额和负债总额的，应说明原因\n（4）  其他说明",
+                    "context_before": null,
+                    "context_after": null,
+                    "match_index": 0
+                  }
+                }
+              ],
+              "reason_codes": [
+                "candidate_schema_invalid"
+              ],
+              "conflicting_interpretations": [
+                "gateway response violates the schema"
+              ],
+              "allowed_actions": [
+                "accept_for_research_review",
+                "reject",
+                "hold",
+                "request_repair"
+              ]
+            },
+            {
+              "review_id": "manufacturing-materials-shadow-segment-evidence-context-output-budget-20260911-a:segment_financials-02:manufacturing-materials-shadow-000408-2025:segment_financials-02:coverage:segment_dimension",
+              "field_id": "segment_dimension",
+              "candidate": null,
+              "evidence": [],
+              "reason_codes": [
+                "required_coverage_missing"
+              ],
+              "conflicting_interpretations": [
+                "active checklist item has no candidate or legal-empty result"
+              ],
+              "allowed_actions": [
+                "accept_for_research_review",
+                "reject",
+                "hold",
+                "request_repair"
+              ]
+            },
+            {
+              "review_id": "manufacturing-materials-shadow-segment-evidence-context-output-budget-20260911-a:segment_financials-02:manufacturing-materials-shadow-000408-2025:segment_financials-02:coverage:operating_revenue",
+              "field_id": "operating_revenue",
+              "candidate": null,
+              "evidence": [],
+              "reason_codes": [
+                "required_coverage_missing"
+              ],
+              "conflicting_interpretations": [
+                "active checklist item has no candidate or legal-empty result"
+              ],
+              "allowed_actions": [
+                "accept_for_research_review",
+                "reject",
+                "hold",
+                "request_repair"
+              ]
+            },
+            {
+              "review_id": "manufacturing-materials-shadow-segment-evidence-context-output-budget-20260911-a:segment_financials-02:manufacturing-materials-shadow-000408-2025:segment_financials-02:coverage:operating_cost",
+              "field_id": "operating_cost",
+              "candidate": null,
+              "evidence": [],
+              "reason_codes": [
+                "required_coverage_missing"
+              ],
+              "conflicting_interpretations": [
+                "active checklist item has no candidate or legal-empty result"
+              ],
+              "allowed_actions": [
+                "accept_for_research_review",
+                "reject",
+                "hold",
+                "request_repair"
+              ]
+            }
+          ],
+          "task_complete": false,
+          "provider_calls": [
+            "extract"
+          ],
+          "production_authorization": "not_authorized"
+        },
+        "provider_call_types": [
+          "extract"
+        ],
+        "provider_traces": [
+          {
+            "call_type": "extract",
+            "semantic_request_id": "manufacturing-materials-shadow-segment-evidence-context-output-budget-20260911-a:segment_financials-02:manufacturing-materials-shadow-000408-2025:segment_financials-02",
+            "gateway_request_id": "e15291f1eb5840049cdb1fb79704fede",
+            "status": "failed",
+            "profile": "semantic_extraction__scorpio_gemini",
+            "provider": null,
+            "model": null,
+            "response_hash": null,
+            "latency_ms": null,
+            "input_tokens": null,
+            "output_tokens": null,
+            "total_tokens": null,
+            "warnings": [],
+            "error_code": "candidate_schema_invalid",
+            "error_detail": "segment dimension must preserve the full source heading: '报告分部的财务信息'",
+            "parent_semantic_request_id": null,
+            "partition_index": null,
+            "partition_count": null
+          }
+        ]
+      }
+    ],
+    "research_view": {
+      "schema_version": "company_profile_research_view.v1",
+      "production_authorization": "not_authorized",
+      "data_status": "research_fixture",
+      "company": {
+        "instrument_id": "000408.SZ",
+        "name": "藏格矿业"
+      },
+      "as_of": {
+        "report_id": "1225009932",
+        "report_period": "2025-12-31",
+        "published_at": "2026-03-13T16:00:00+00:00",
+        "document_version": "10350f651693d09a3ed6f203996751624b41bcc330159df69eb29297cdd2d956"
+      },
+      "business_overview": null,
+      "business_regime": [],
+      "segments": [],
+      "activities": [],
+      "operating_measurements": [],
+      "disclosed_inputs": [],
+      "counterparties": [],
+      "business_events": [],
+      "coverage": [
+        {
+          "schema_version": "company_profile_coverage_result.v1",
+          "field_id": "operating_cost",
+          "chapter_task": "extract_segment_financials",
+          "requirement_level": "conditional",
+          "status": "unclear",
+          "reason_code": "required_result_missing",
+          "reason": "active checklist item has no candidate or legal-empty result",
+          "evidence": [],
+          "reason_evidence_text": null
+        },
+        {
+          "schema_version": "company_profile_coverage_result.v1",
+          "field_id": "operating_revenue",
+          "chapter_task": "extract_segment_financials",
+          "requirement_level": "conditional",
+          "status": "unclear",
+          "reason_code": "required_result_missing",
+          "reason": "active checklist item has no candidate or legal-empty result",
+          "evidence": [],
+          "reason_evidence_text": null
+        },
+        {
+          "schema_version": "company_profile_coverage_result.v1",
+          "field_id": "segment_dimension",
+          "chapter_task": "extract_segment_financials",
+          "requirement_level": "required",
+          "status": "unclear",
+          "reason_code": "required_result_missing",
+          "reason": "active checklist item has no candidate or legal-empty result",
+          "evidence": [],
+          "reason_evidence_text": null
+        }
+      ],
+      "commodity_exposure": {
+        "status": "not_assessed",
+        "facts": [],
+        "supported_statements": []
+      },
+      "value_chain_position": {
+        "status": "insufficient_evidence",
+        "facts": [],
+        "supported_statements": []
+      },
+      "evidence_index": []
+    },
+    "report_status": "hold",
+    "benchmark": {
+      "decision": "hold",
+      "dimensions": [
+        {
+          "name": "task_completion",
+          "passed": false,
+          "blocker_codes": [
+            "incomplete_request_scope"
+          ],
+          "details": {
+            "incomplete_request_ids": [
+              "manufacturing-materials-shadow-segment-evidence-context-output-budget-20260911-a:segment_financials-02:manufacturing-materials-shadow-000408-2025:segment_financials-02"
+            ]
+          }
+        },
+        {
+          "name": "subject_resolution",
+          "passed": true,
+          "blocker_codes": [],
+          "details": {
+            "unclear_subject_record_ids": [],
+            "unclear_is_non_blocking": true
+          }
+        },
+        {
+          "name": "core_chapter:extract_business_overview",
+          "passed": false,
+          "blocker_codes": [
+            "required_core_chapter_incomplete"
+          ],
+          "details": {
+            "failures": [
+              "missing_scope"
+            ],
+            "required_fields": []
+          }
+        },
+        {
+          "name": "core_chapter:extract_segment_financials",
+          "passed": false,
+          "blocker_codes": [
+            "required_core_chapter_incomplete"
+          ],
+          "details": {
+            "failures": [
+              "segment_financials-02",
+              "segment_financials-02:segment_dimension:unclear",
+              "missing:segment_dimension"
+            ],
+            "required_fields": [
+              "segment_dimension"
+            ]
+          }
+        },
+        {
+          "name": "core_chapter:extract_operating_quantities",
+          "passed": false,
+          "blocker_codes": [
+            "required_core_chapter_incomplete"
+          ],
+          "details": {
+            "failures": [
+              "missing_scope"
+            ],
+            "required_fields": []
+          }
+        },
+        {
+          "name": "core_chapter:extract_material_inputs",
+          "passed": false,
+          "blocker_codes": [
+            "required_core_chapter_incomplete"
+          ],
+          "details": {
+            "failures": [
+              "missing_scope"
+            ],
+            "required_fields": []
+          }
+        },
+        {
+          "name": "core_chapter:extract_counterparties_and_concentration",
+          "passed": false,
+          "blocker_codes": [
+            "required_core_chapter_incomplete"
+          ],
+          "details": {
+            "failures": [
+              "missing_scope"
+            ],
+            "required_fields": []
+          }
+        },
+        {
+          "name": "core_chapter:extract_business_regime",
+          "passed": false,
+          "blocker_codes": [
+            "required_core_chapter_incomplete"
+          ],
+          "details": {
+            "failures": [
+              "missing_scope"
+            ],
+            "required_fields": []
+          }
+        },
+        {
+          "name": "production_isolation",
+          "passed": true,
+          "blocker_codes": [],
+          "details": {}
+        },
+        {
+          "name": "bounded_provider_calls",
+          "passed": true,
+          "blocker_codes": [],
+          "details": {}
+        }
+      ],
+      "gold_evaluation_only": true
+    },
+    "created_at": "2026-09-11T07:33:57.787552+00:00"
+  },
+  "traces": [
+    {
+      "call_type": "extract",
+      "semantic_request_id": "manufacturing-materials-shadow-segment-evidence-context-output-budget-20260911-a:segment_financials-02:manufacturing-materials-shadow-000408-2025:segment_financials-02",
+      "gateway_request_id": "e15291f1eb5840049cdb1fb79704fede",
+      "status": "failed",
+      "profile": "semantic_extraction__scorpio_gemini",
+      "provider": null,
+      "model": null,
+      "response_hash": null,
+      "latency_ms": null,
+      "input_tokens": null,
+      "output_tokens": null,
+      "total_tokens": null,
+      "warnings": [],
+      "error_code": "candidate_schema_invalid",
+      "error_detail": "segment dimension must preserve the full source heading: '报告分部的财务信息'",
+      "parent_semantic_request_id": null,
+      "partition_index": null,
+      "partition_count": null
+    }
+  ],
+  "historical_batch_mutated": false,
+  "batch_readiness_recomputed": false,
+  "production_authorization": "not_authorized",
+  "failure_class": "incomplete_report_segment_heading",
+  "classification": "retained_substantive_failure",
+  "transport_status": "success",
+  "http_status": 200,
+  "output_budget_exceeded": false,
+  "output_budget_diagnostic": {
+    "extract_max_output_tokens": 20000,
+    "provider_warning": null,
+    "adapter_rejection_before_persisted_usage": true
+  },
+  "decision": {
+    "fix_resolved_failure_class": false,
+    "resolved_context_issue": true,
+    "remaining_issue": "Gemini emitted ambiguous segment dimension prefix 报告分部 instead of exact source heading 报告分部的财务信息",
+    "full_cohort_replay_justified": false,
+    "next_step": "separate change for structured heading selection or bounded non-LLM heading binding; do not relax validator"
+  }
+}

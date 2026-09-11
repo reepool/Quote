@@ -1,0 +1,52 @@
+{
+  "schema_version": "company_profile_segment_evidence_context_output_budget_external_validation_contract.v1",
+  "validation_id": "manufacturing-materials-shadow-segment-evidence-context-output-budget-20260911-a",
+  "created_at": "2026-09-11",
+  "sample_manifest": {
+    "path": "openspec/changes/archive/2026-09-09-validate-manufacturing-materials-company-profile-shadow-batch/shadow-manifest.v1.json",
+    "sha256": "ca6d301ff7fb3b21b206be5951965059c87a7e485121c98a24475e59bad0f215",
+    "manifest_hash": "6f639739ef082e78dcb0c01a5ce40bab1645d8fdc027bece2dbef63652bae9e2"
+  },
+  "corrected_evidence_plan": {
+    "path": "openspec/changes/repair-company-profile-segment-evidence-context-and-output-budget/corrected-evidence-plan.v1.json",
+    "sha256": "4d90b1f051d9c8b98efe470a9f5e6f382afab23dabf8e6e357f58465f3a517c5",
+    "plan_hash": "e2205ec932589a0d50457e9f0112b44588ed164cf4c39560f27dfb0f6f996686"
+  },
+  "frozen_scope": {
+    "path": "openspec/changes/repair-company-profile-segment-evidence-context-and-output-budget/validation/frozen-prepared-scope.v1.json",
+    "sha256": "75ffe34bc4d8b11bc5e073fa2f69c989cb95407942928ffab129ef73adf84b9e",
+    "sample_id": "manufacturing-materials-shadow-000408-2025",
+    "scope_id": "segment_financials-02",
+    "pages": [
+      194
+    ],
+    "field_ids": [
+      "segment_dimension",
+      "operating_revenue",
+      "operating_cost"
+    ],
+    "report_content_hash": "10350f651693d09a3ed6f203996751624b41bcc330159df69eb29297cdd2d956"
+  },
+  "predecessor_validation": {
+    "path": "openspec/changes/validate-company-profile-segment-partition-normalization-live/live-validation-result.v1.json",
+    "sha256": "a486e45f08b58111713b484d1ec8552851b2b414b5e061504e0fd7f52f1cfdaf",
+    "validation_id": "manufacturing-materials-shadow-segment-normalization-live-20260911-a"
+  },
+  "provider": {
+    "profile": "semantic_extraction__scorpio_gemini",
+    "extract_max_output_tokens": 20000,
+    "verify_max_output_tokens": 18000,
+    "timeout_seconds": 300.0,
+    "max_provider_calls": 6,
+    "expected_partition_count": 2
+  },
+  "execution_path": "sandbox_external_authorized",
+  "transfer_authorization": {
+    "target": "scorpio.reepool.com",
+    "scope": "only frozen Evidence and request content for 000408.SZ:segment_financials-02"
+  },
+  "output_path": "openspec/changes/repair-company-profile-segment-evidence-context-and-output-budget/validation/external-validation-result.v1.json",
+  "historical_batch_mutated": false,
+  "batch_readiness_recomputed": false,
+  "production_authorization": "not_authorized"
+}
