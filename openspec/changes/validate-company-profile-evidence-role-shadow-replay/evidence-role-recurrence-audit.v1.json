@@ -1,0 +1,291 @@
+{
+  "schema_version": "company_profile_evidence_role_recurrence_audit.v1",
+  "audit_id": "manufacturing-materials-shadow-evidence-role-recurrence-20260911-a",
+  "baseline": {
+    "batch_id": "manufacturing-materials-shadow-segment-heading-replay-gemini-20260911-a",
+    "source_batch_result_hash": "517d7bb0c0c4900383f025ce1f39e763f5cc3cc5f936f7fd7d930b2d91bc10d7",
+    "batch_manifest_file_sha256": "6c94017099c5f98ec960502753e9b05c7eff3baace760dbb2ec511b03055e8fa",
+    "review_package_file_sha256": "d7cf89e25148f2f3ade1f4856ded9311505b9c7b090fd34eae2347faf20cd81f",
+    "metrics": {
+      "accepted_record_count": 1388,
+      "completed_scope_count": 100,
+      "coverage_extraction_failed": 1,
+      "coverage_not_applicable": 9,
+      "coverage_not_disclosed": 28,
+      "coverage_observed": 200,
+      "coverage_unclear": 115,
+      "legal_empty_context_only_or_unsupported_count": 0,
+      "legal_empty_count": 37,
+      "legal_empty_field_owner_supported_count": 37,
+      "regime_conclusion_count": 10,
+      "regime_source_supported_count": 10,
+      "regime_source_unsupported_count": 0,
+      "scope_count": 154,
+      "segment_conclusion_count": 218,
+      "segment_source_supported_count": 216,
+      "segment_source_unsupported_count": 2,
+      "unresolved_review_count": 185
+    },
+    "reason_code_counts": {
+      "candidate_schema_invalid": 37,
+      "duplicate_occurrence": 10,
+      "object_not_allowed": 4,
+      "occurrence_semantic_conflict": 13,
+      "prohibited_inference": 1,
+      "required_coverage_missing": 116,
+      "subject_unsupported": 12
+    },
+    "chapter_reason_code_counts": {
+      "extract_business_overview": {
+        "candidate_schema_invalid": 2,
+        "required_coverage_missing": 10
+      },
+      "extract_business_regime": {
+        "candidate_schema_invalid": 12,
+        "required_coverage_missing": 13
+      },
+      "extract_counterparties_and_concentration": {
+        "candidate_schema_invalid": 1,
+        "object_not_allowed": 4,
+        "required_coverage_missing": 4
+      },
+      "extract_material_inputs": {},
+      "extract_operating_quantities": {
+        "candidate_schema_invalid": 17,
+        "required_coverage_missing": 54
+      },
+      "extract_segment_financials": {
+        "candidate_schema_invalid": 5,
+        "duplicate_occurrence": 10,
+        "occurrence_semantic_conflict": 13,
+        "prohibited_inference": 1,
+        "required_coverage_missing": 35,
+        "subject_unsupported": 12
+      }
+    },
+    "chapter_metrics": {
+      "extract_business_overview": {
+        "accepted_record_count": 44,
+        "completed_scope_count": 14,
+        "coverage_not_disclosed": 2,
+        "coverage_observed": 28,
+        "coverage_unclear": 10,
+        "scope_count": 20,
+        "unresolved_review_count": 12
+      },
+      "extract_business_regime": {
+        "accepted_record_count": 4,
+        "completed_scope_count": 7,
+        "coverage_not_applicable": 6,
+        "coverage_observed": 1,
+        "coverage_unclear": 13,
+        "scope_count": 20,
+        "unresolved_review_count": 25
+      },
+      "extract_counterparties_and_concentration": {
+        "accepted_record_count": 388,
+        "completed_scope_count": 25,
+        "coverage_extraction_failed": 1,
+        "coverage_not_disclosed": 16,
+        "coverage_observed": 42,
+        "coverage_unclear": 3,
+        "scope_count": 27,
+        "unresolved_review_count": 9
+      },
+      "extract_material_inputs": {
+        "accepted_record_count": 47,
+        "completed_scope_count": 20,
+        "coverage_not_applicable": 1,
+        "coverage_not_disclosed": 3,
+        "coverage_observed": 16,
+        "scope_count": 20,
+        "unresolved_review_count": 0
+      },
+      "extract_operating_quantities": {
+        "accepted_record_count": 152,
+        "completed_scope_count": 12,
+        "coverage_not_applicable": 1,
+        "coverage_not_disclosed": 6,
+        "coverage_observed": 28,
+        "coverage_unclear": 54,
+        "scope_count": 29,
+        "unresolved_review_count": 71
+      },
+      "extract_segment_financials": {
+        "accepted_record_count": 753,
+        "completed_scope_count": 22,
+        "coverage_not_applicable": 1,
+        "coverage_not_disclosed": 1,
+        "coverage_observed": 85,
+        "coverage_unclear": 35,
+        "scope_count": 38,
+        "unresolved_review_count": 68
+      }
+    }
+  },
+  "refined": {
+    "batch_id": "manufacturing-materials-shadow-evidence-role-gemini-20260911-a",
+    "source_batch_result_hash": "fe438c0121c88d2fea486ad50f50c2d62f059bb12dbe51c5845edf850e37f710",
+    "batch_manifest_file_sha256": "982ab6ed61c08569683958b263529b66b7161b83fa161519570cf98a5b11eaf5",
+    "review_package_file_sha256": "9ee8780572449054dd8f1a87484050e6e78a34aab71ae278f531bee21c7cb777",
+    "metrics": {
+      "accepted_record_count": 1511,
+      "completed_scope_count": 105,
+      "coverage_not_applicable": 12,
+      "coverage_not_disclosed": 28,
+      "coverage_observed": 207,
+      "coverage_unclear": 106,
+      "legal_empty_context_only_or_unsupported_count": 0,
+      "legal_empty_count": 40,
+      "legal_empty_field_owner_supported_count": 40,
+      "regime_conclusion_count": 10,
+      "regime_source_supported_count": 10,
+      "regime_source_unsupported_count": 0,
+      "scope_count": 154,
+      "segment_conclusion_count": 255,
+      "segment_source_supported_count": 255,
+      "segment_source_unsupported_count": 0,
+      "unresolved_review_count": 161
+    },
+    "reason_code_counts": {
+      "activity_actor_unsupported": 4,
+      "candidate_schema_invalid": 37,
+      "duplicate_occurrence": 1,
+      "prohibited_inference": 1,
+      "required_coverage_missing": 106,
+      "subject_unsupported": 12
+    },
+    "chapter_reason_code_counts": {
+      "extract_business_overview": {
+        "activity_actor_unsupported": 4,
+        "candidate_schema_invalid": 3,
+        "required_coverage_missing": 12
+      },
+      "extract_business_regime": {
+        "candidate_schema_invalid": 12,
+        "prohibited_inference": 1,
+        "required_coverage_missing": 13
+      },
+      "extract_counterparties_and_concentration": {
+        "candidate_schema_invalid": 3,
+        "required_coverage_missing": 8
+      },
+      "extract_material_inputs": {},
+      "extract_operating_quantities": {
+        "candidate_schema_invalid": 17,
+        "required_coverage_missing": 57
+      },
+      "extract_segment_financials": {
+        "candidate_schema_invalid": 2,
+        "duplicate_occurrence": 1,
+        "required_coverage_missing": 16,
+        "subject_unsupported": 12
+      }
+    },
+    "chapter_metrics": {
+      "extract_business_overview": {
+        "accepted_record_count": 37,
+        "completed_scope_count": 12,
+        "coverage_not_disclosed": 1,
+        "coverage_observed": 27,
+        "coverage_unclear": 12,
+        "scope_count": 20,
+        "unresolved_review_count": 19
+      },
+      "extract_business_regime": {
+        "accepted_record_count": 3,
+        "completed_scope_count": 7,
+        "coverage_not_applicable": 7,
+        "coverage_unclear": 13,
+        "scope_count": 20,
+        "unresolved_review_count": 26
+      },
+      "extract_counterparties_and_concentration": {
+        "accepted_record_count": 358,
+        "completed_scope_count": 24,
+        "coverage_not_disclosed": 15,
+        "coverage_observed": 39,
+        "coverage_unclear": 8,
+        "scope_count": 27,
+        "unresolved_review_count": 11
+      },
+      "extract_material_inputs": {
+        "accepted_record_count": 51,
+        "completed_scope_count": 20,
+        "coverage_not_applicable": 1,
+        "coverage_not_disclosed": 3,
+        "coverage_observed": 16,
+        "scope_count": 20,
+        "unresolved_review_count": 0
+      },
+      "extract_operating_quantities": {
+        "accepted_record_count": 171,
+        "completed_scope_count": 11,
+        "coverage_not_applicable": 1,
+        "coverage_not_disclosed": 3,
+        "coverage_observed": 28,
+        "coverage_unclear": 57,
+        "scope_count": 29,
+        "unresolved_review_count": 74
+      },
+      "extract_segment_financials": {
+        "accepted_record_count": 891,
+        "completed_scope_count": 31,
+        "coverage_not_applicable": 3,
+        "coverage_not_disclosed": 6,
+        "coverage_observed": 97,
+        "coverage_unclear": 16,
+        "scope_count": 38,
+        "unresolved_review_count": 31
+      }
+    }
+  },
+  "metric_deltas": {
+    "accepted_record_count": 123,
+    "completed_scope_count": 5,
+    "coverage_extraction_failed": -1,
+    "coverage_not_applicable": 3,
+    "coverage_not_disclosed": 0,
+    "coverage_observed": 7,
+    "coverage_unclear": -9,
+    "legal_empty_context_only_or_unsupported_count": 0,
+    "legal_empty_count": 3,
+    "legal_empty_field_owner_supported_count": 3,
+    "regime_conclusion_count": 0,
+    "regime_source_supported_count": 0,
+    "regime_source_unsupported_count": 0,
+    "scope_count": 0,
+    "segment_conclusion_count": 37,
+    "segment_source_supported_count": 39,
+    "segment_source_unsupported_count": -2,
+    "unresolved_review_count": -24
+  },
+  "reason_code_deltas": {
+    "activity_actor_unsupported": 4,
+    "candidate_schema_invalid": 0,
+    "duplicate_occurrence": -9,
+    "object_not_allowed": -4,
+    "occurrence_semantic_conflict": -13,
+    "prohibited_inference": 0,
+    "required_coverage_missing": -10,
+    "subject_unsupported": 0
+  },
+  "source_review": {
+    "review_package_hash": "e82da340ec919f82307571717831914e69a4110129be489bf9f498c75703e5d4",
+    "source_review_outcomes_file_sha256": "7375c30a6b2e720153c2379f84102c54556e4538e4034149ffea2d155215cb8a",
+    "precision_reviewed_count": 93,
+    "precision_correct_count": 93,
+    "sampled_precision": 1.0,
+    "critical_semantic_error_count": 0
+  },
+  "findings": [
+    "Persisted legal-empty results had zero field-owner violations in both batches under the current deterministic owner check.",
+    "Segment conclusions with unsupported source binding decreased from 2 to 0 in the refined replay.",
+    "Business-regime sampled conclusions had zero unsupported source binding in both batches; the refined replay did not broaden regime claims.",
+    "Required-coverage-missing reason codes decreased by 10, but activity_actor_unsupported increased by 4 and the workload tail remains above the frozen gate.",
+    "The Evidence-role request contract improved accepted yield and median review workload but did not make any report usable under the frozen report-status contract."
+  ],
+  "readiness_decision": "hold",
+  "production_authorization": "not_authorized",
+  "audit_hash": "2c1c76145b7b1b91c028fccc391806d6b6c63ee16545fe3569d4ae1f1d6fe48c"
+}

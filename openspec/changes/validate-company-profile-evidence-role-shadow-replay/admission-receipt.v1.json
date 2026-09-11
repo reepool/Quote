@@ -1,0 +1,33 @@
+{
+  "schema_version": "company_profile_shadow_replay_admission_receipt.v1",
+  "batch_id": "manufacturing-materials-shadow-evidence-role-gemini-20260911-a",
+  "contract": {
+    "batch_id": "manufacturing-materials-shadow-evidence-role-gemini-20260911-a",
+    "sample_manifest_hash": "6f639739ef082e78dcb0c01a5ce40bab1645d8fdc027bece2dbef63652bae9e2",
+    "evidence_plan_version": "manufacturing_materials_shadow.2026-09-10.5",
+    "evidence_plan_hash": "e2205ec932589a0d50457e9f0112b44588ed164cf4c39560f27dfb0f6f996686",
+    "preparation_audit_hash": "24996a5620b12805786a3fd941215220f84f25ac618dfeba2e06a9a50325a9ca",
+    "scope_refinement_audit_hash": null,
+    "correction_audit_hash": "6377ae573305284daccf31f786a36beb4327775dd10e7667758f10b092a43a5d",
+    "supporting_artifact_hashes": {
+      "baseline_batch_manifest": "6c94017099c5f98ec960502753e9b05c7eff3baace760dbb2ec511b03055e8fa",
+      "baseline_readiness_audit": "2a9383c87ed9a7f06fdccedf17c81895a6057b887a006de1a08bdae39e9ca62b",
+      "evidence_role_implementation": "61546375d009cf9ac876adc9044bd2bd3a46aa3033a526c984a087753d6ec615",
+      "evidence_role_provider_tests": "f01cb1e7d680e680f8c1b7b99b3902ac6bf1adfeb57318030822046100cf0e66",
+      "evidence_role_implementation_audit": "6fdac8533e0a066775c823c48c0d769b5a96eee5d31302804c65903ba7123c29"
+    },
+    "primary_logical_profile": "semantic_extraction__scorpio_gemini",
+    "extract_max_output_tokens": 20000,
+    "verify_max_output_tokens": 18000,
+    "timeout_seconds": 300.0,
+    "max_provider_calls": 600,
+    "production_authorization": "not_authorized"
+  },
+  "output_root": "/home/python/Quote/var/company_profile_shadow_batch/20260911/batch-manufacturing-materials-shadow-evidence-role-gemini-20260911-a",
+  "output_batch_path": "/home/python/Quote/var/company_profile_shadow_batch/20260911/batch-manufacturing-materials-shadow-evidence-role-gemini-20260911-a/batch-manufacturing-materials-shadow-evidence-role-gemini-20260911-a",
+  "output_absent_before_provider": true,
+  "provider_calls": 0,
+  "cohort_replay_performed": false,
+  "production_authorization": "not_authorized",
+  "audit_hash": "5713e43ac928edd33d7892d3f8c86428f2d99ae21287f25741fa34f0eb08985e"
+}

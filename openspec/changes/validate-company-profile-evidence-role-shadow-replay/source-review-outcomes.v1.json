@@ -1,0 +1,560 @@
+[
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:business_overview-01:chapter_sample:stage5-c08c96de6196d60c85152f2c",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:segment_financials-01:chapter_sample:stage5-ec0699892e7b9ec8fa48e7bf",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:operating_quantities-01:chapter_sample:stage5-4dfe5512dfb14925fb5cad58",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:material_inputs-01:chapter_sample:stage5-890c5cbf9573b0b6d4812e8d",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:counterparties_and_concentration-01:chapter_sample:stage5-8391eae290b2378fe47bb416",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:business_regime-01:chapter_sample:coverage:business_regime-01:business_regime",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600022-2025:business_overview-01:chapter_sample:stage5-da1db012823e937b053a17b6",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600022-2025:segment_financials-01:chapter_sample:stage5-d0a7607c5de137d8c5b361d7",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600022-2025:operating_quantities-01:chapter_sample:stage5-dda5d3ee01a4a98a985a5937",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600022-2025:material_inputs-01:chapter_sample:coverage:material_inputs-01:material_input",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600022-2025:counterparties_and_concentration-01:chapter_sample:stage5-932e5fe176bf1248c4fa90fe",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600022-2025:business_regime-01:chapter_sample:stage5-4a4c7827368d93c41bbf92b5",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:business_overview-01:chapter_sample:stage5-34586f5a411f99bb9d290ab9",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:segment_financials-02:chapter_sample:stage5-a64d981df1da330244f24dbc",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:material_inputs-01:chapter_sample:stage5-58d6d53ae7668ce7b80c3e5c",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:counterparties_and_concentration-01:chapter_sample:stage5-af8c8d545acdb3ea692de5ec",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600063-2025:business_overview-01:chapter_sample:stage5-5f91704e4601505c56ee6f1a",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600063-2025:segment_financials-01:chapter_sample:stage5-b171592d4eabc9e4c1f294d3",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600063-2025:operating_quantities-01:chapter_sample:stage5-3e6085664152a1491ae5fb46",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600063-2025:material_inputs-01:chapter_sample:stage5-957de624ab3d84751e83d7e6",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600063-2025:counterparties_and_concentration-01:chapter_sample:stage5-7c148d0de727ab8b13374a51",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600063-2025:business_regime-01:chapter_sample:coverage:business_regime-01:business_regime",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600111-2025:segment_financials-01:chapter_sample:stage5-54c979261a74a881fad539a3",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600111-2025:material_inputs-01:chapter_sample:stage5-dfcb7768c2cf25ab30479ddd",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600111-2025:counterparties_and_concentration-01:chapter_sample:stage5-073f40a44850c06b32dc89ed",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:business_overview-01:chapter_sample:stage5-c4a5dd91ae5c936b686a59f9",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:segment_financials-01:chapter_sample:stage5-7bdebe6c00b4967b52adad14",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:material_inputs-01:chapter_sample:stage5-8006cd1b659af4bead2079dc",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:counterparties_and_concentration-01:chapter_sample:stage5-a300fd5dcad8b0c4fa6bec8b",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:business_regime-01:chapter_sample:coverage:business_regime-01:business_regime",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:business_overview-01:chapter_sample:stage5-5973387c301686c71b71f08c",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:segment_financials-01:chapter_sample:stage5-1c64da9ec5dc595978bf4d93",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:operating_quantities-02:chapter_sample:stage5-a98897e766c2f2d02775b873",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:material_inputs-01:chapter_sample:stage5-0cd3b9982124092ebeaa2a66",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:counterparties_and_concentration-01:chapter_sample:stage5-6beaf69e104edc7d78284466",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000552-2025:business_overview-01:chapter_sample:stage5-ed0cb23e9b6bf570334a9e17",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000552-2025:segment_financials-01:chapter_sample:stage5-0fda446bb5436c3d5c610edc",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000552-2025:operating_quantities-02:chapter_sample:stage5-b44e507aa66633a5724d3a65",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000552-2025:material_inputs-01:chapter_sample:stage5-ee8033990706c06c737eb431",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000552-2025:counterparties_and_concentration-01:chapter_sample:stage5-68d2a89a17ddddd4cf957aa6",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:business_overview-01:chapter_sample:stage5-565e268d060d96041d29fec3",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:segment_financials-01:chapter_sample:stage5-759195c5bfe835bb6ba5fc5d",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:operating_quantities-01:chapter_sample:stage5-837f2ec30fda0b0fe30ab020",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:material_inputs-01:chapter_sample:stage5-223cc4ebebbc3067ef7ba12b",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:business_regime-01:chapter_sample:coverage:business_regime-01:business_regime",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000059-2025:business_overview-01:chapter_sample:stage5-1f12a970d82f7316e12e1e4f",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000059-2025:segment_financials-01:chapter_sample:stage5-46e4df3d3320b767baeaa4d6",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000059-2025:operating_quantities-01:chapter_sample:stage5-ffdf9e5bbeeb141a25fe2b80",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000059-2025:material_inputs-01:chapter_sample:stage5-8c1a33022e2e3b82c3136ff0",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000059-2025:counterparties_and_concentration-01:chapter_sample:stage5-9b2fe0fd5281968b50e8b1c3",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000059-2025:business_regime-01:chapter_sample:coverage:business_regime-01:business_regime",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:business_overview-01:chapter_sample:stage5-1a3e34274506ff1cc2ff8981",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:segment_financials-02:chapter_sample:stage5-a59f2aaa5384a0cca30d146f",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:material_inputs-01:chapter_sample:stage5-d775deb9d814a511bcf30178",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:counterparties_and_concentration-01:chapter_sample:stage5-200286f7496d4c6807648cd6",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000060-2025:segment_financials-01:chapter_sample:stage5-ab36237a2584cc4cd30ea6c2",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000060-2025:operating_quantities-01:chapter_sample:stage5-55866bbd9053ae4c1ae478b8",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000060-2025:material_inputs-01:chapter_sample:coverage:material_inputs-01:material_input",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000060-2025:counterparties_and_concentration-01:chapter_sample:stage5-f4d7d5aa31caf2bec64eef45",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000055-2025:business_overview-01:chapter_sample:stage5-5bba6ad2e859c565f9cb2744",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000055-2025:segment_financials-01:chapter_sample:stage5-98edda1eb794ffdd9736817c",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000055-2025:material_inputs-01:chapter_sample:coverage:material_inputs-01:material_input",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000055-2025:counterparties_and_concentration-01:chapter_sample:stage5-665f3019401db8dea8486c94",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000420-2025:segment_financials-01:chapter_sample:stage5-efd2152650130bb6d980fe9c",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000420-2025:operating_quantities-01:chapter_sample:stage5-bc5072046daad6bccd9d4618",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000420-2025:material_inputs-01:chapter_sample:stage5-2ecd8a0e83f11b7f83b45cee",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000420-2025:counterparties_and_concentration-01:chapter_sample:stage5-84e9a32584a48fb97c8c18d7",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000420-2025:business_regime-01:chapter_sample:coverage:business_regime-01:business_regime",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920016-2025:segment_financials-01:chapter_sample:stage5-f838dfba6bee67333544584f",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920016-2025:operating_quantities-01:chapter_sample:coverage:operating_quantities-01:production_capacity",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920016-2025:material_inputs-01:chapter_sample:stage5-00bc9a68b318a87ae6e3384f",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920016-2025:counterparties_and_concentration-01:chapter_sample:stage5-fd97e5def20e1ce80eecfddb",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920016-2025:business_regime-01:chapter_sample:coverage:business_regime-01:business_regime",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:business_overview-01:chapter_sample:stage5-5dc4a703afc38b5badaa90c1",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:segment_financials-01:chapter_sample:stage5-1153f2831c9474749731802f",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:material_inputs-01:chapter_sample:coverage:material_inputs-01:material_input",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:counterparties_and_concentration-01:chapter_sample:stage5-ec2e4a568319498bd0ca2b3d",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920068-2025:business_overview-01:chapter_sample:stage5-2c500e0c708e44fe00cb1a9b",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920068-2025:segment_financials-01:chapter_sample:stage5-7bf93961bb46a3f9ec47acb5",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920068-2025:material_inputs-01:chapter_sample:stage5-19a2dfa2a98ac04c998494d1",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920068-2025:counterparties_and_concentration-01:chapter_sample:stage5-b0d8a3d5942055ddc6a2958b",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920078-2025:business_overview-01:chapter_sample:stage5-5f2e40b6968ef0f3d21b7228",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920078-2025:segment_financials-01:chapter_sample:stage5-6d9046e9baf6b133cf5dd3be",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920078-2025:material_inputs-01:chapter_sample:stage5-69548c763dff5fbd1206068f",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920078-2025:counterparties_and_concentration-01:chapter_sample:stage5-43dcc02f3bcb90aea9397988",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920076-2025:business_overview-01:chapter_sample:stage5-71f7419a062904a04c5c803b",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920076-2025:segment_financials-01:chapter_sample:coverage:segment_financials-01:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920076-2025:material_inputs-01:chapter_sample:stage5-eea95a2a96e13c2e426e8370",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920076-2025:counterparties_and_concentration-01:chapter_sample:stage5-89875347ba9f2ab641bf2cb6",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:business_overview-01:chapter_sample:stage5-25b4b0c5bc8866f6ffc90f04",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:segment_financials-01:chapter_sample:coverage:segment_financials-01:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:material_inputs-01:chapter_sample:stage5-5291bf4ce7fa63a15efc80b3",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:counterparties_and_concentration-01:chapter_sample:stage5-b599bdf0c7f3f21bf668662c",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural-evidence-role",
+    "notes": "Source-bound review passed: runtime target, field/chapter identity, Evidence id/page/report, source quote, disposition, and frozen subject/use constraints were consistent. Blocker and unresolved rows remain in the review package and are not counted as precision passes."
+  }
+]
