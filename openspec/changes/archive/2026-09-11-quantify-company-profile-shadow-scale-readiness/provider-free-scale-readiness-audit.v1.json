@@ -1,0 +1,383 @@
+{
+  "schema_version": "company_profile_shadow_post_isolation_scale_audit.v1",
+  "audit_id": "quantify-company-profile-shadow-scale-readiness-20260911-a",
+  "created_at": "2026-09-11",
+  "input_hashes": {
+    "batch_manifest": "99d7121b37e9284ca28471cc256cca9cbf672fd8bb22fe2eedf4a187f6bc9ee0",
+    "batch_review_package": "a6a16b11fb72134162a020ab0346e777e375a3223a1eed643b0e68f97a9bde5f",
+    "empirical_readiness": "f0bac8d80ff13c7f7e30e7e3158e842caddfa5f937606332c22d72b3695641e0",
+    "invalid_item_audit": "4b17caf092771e41b124557d8147662ddbd5535ec09b6b12b3bbc1f085bc84d1",
+    "source_review_outcomes": "8c4a83ddc0a5cec0f6915ffa9f9552f46fc2822195764c607de27e97cc64d599",
+    "source_review_package": "a6a16b11fb72134162a020ab0346e777e375a3223a1eed643b0e68f97a9bde5f"
+  },
+  "authoritative_identity": {
+    "batch_id": "manufacturing-materials-shadow-operating-ownership-external-gemini-20260911-a",
+    "batch_result_hash": "5a07070f88391d28aefbff468501365df42ae9d46e3aebf5a1f4e65927a0ef4a",
+    "review_package_hash": "256298866f591c9e46149266b366e44bbdf741b80b608819dfc2316e2424fd4b",
+    "report_count": 20,
+    "review_row_count": 266,
+    "review_outcome_count": 266
+  },
+  "observed": {
+    "execution_completion_rate": 1.0,
+    "usable_report_count": 1,
+    "usable_report_rate": 0.05,
+    "accepted_record_count": 1443,
+    "evidence_traceability_rate": 1.0,
+    "candidate_schema_invalid_extract_trace_count": 29,
+    "reports_with_candidate_schema_invalid": 16,
+    "unresolved_review_total": 127,
+    "unresolved_review_median": 6.0,
+    "unresolved_review_p90": 10.0,
+    "precision_reviewed_count": 97,
+    "precision_correct_count": 93,
+    "sampled_precision": 0.9587628865979382,
+    "critical_semantic_error_count": 0,
+    "noncritical_semantic_error_count": 4,
+    "readiness_decision": "hold",
+    "failed_gates": [
+      "human_review_median_at_most_2",
+      "human_review_p90_at_most_5",
+      "sampled_precision_at_least_99pct",
+      "usable_reports_at_least_90pct"
+    ]
+  },
+  "deterministic_bounds": {
+    "evidence_level": "optimistic_provider_free_upper_or_lower_bound",
+    "hold_reports_without_applicable_failed_call": [
+      "manufacturing-materials-shadow-000059-2025",
+      "manufacturing-materials-shadow-000420-2025",
+      "manufacturing-materials-shadow-000629-2025"
+    ],
+    "absolute_usable_report_upper_count": 17,
+    "absolute_usable_report_upper_rate": 0.85,
+    "usable_gate_threshold": 0.9,
+    "usable_gate_reachable_by_item_isolation_alone": false,
+    "unresolved_rows_in_failed_scopes_maximum_removable": 82,
+    "optimistic_remaining_unresolved_total": 45,
+    "optimistic_unresolved_median_floor": 0.0,
+    "optimistic_unresolved_p90_floor": 6.0,
+    "optimistic_gate_results_without_changing_precision": {
+      "usable_reports_at_least_90pct": false,
+      "sampled_precision_at_least_99pct": false,
+      "human_review_median_at_most_2": true,
+      "human_review_p90_at_most_5": false
+    },
+    "optimistic_still_failed_gates": [
+      "human_review_p90_at_most_5",
+      "sampled_precision_at_least_99pct",
+      "usable_reports_at_least_90pct"
+    ],
+    "interpretation": "Even if every failure-affected hold report became usable and every unresolved row in a failed scope disappeared, item isolation alone would still miss the usable-rate, sampled-precision, and p90 workload gates."
+  },
+  "source_review_findings": {
+    "noncritical_errors": [
+      {
+        "review_row_id": "manufacturing-materials-shadow-000055-2025:material_inputs-01:chapter_sample:coverage:material_inputs-01:material_input",
+        "outcome": "noncritical_error",
+        "reviewer": "codex-source-review-external-operating-ownership",
+        "notes": "Noncritical Evidence-owner error: material_input=not_disclosed is bound to a general risk page that mentions raw-material price exposure, rather than a governed procurement/material disclosure owner."
+      },
+      {
+        "review_row_id": "manufacturing-materials-shadow-920076-2025:business_overview-01:chapter_sample:stage5-ff2a7c29b2370009dd0e1fc1",
+        "outcome": "noncritical_error",
+        "reviewer": "codex-source-review-external-operating-ownership",
+        "notes": "Noncritical semantic completeness error: the accepted BusinessOverview target is an uncertainty/risk statement and does not provide a substantive description of the company business."
+      },
+      {
+        "review_row_id": "manufacturing-materials-shadow-920076-2025:segment_financials-01:chapter_sample:coverage:segment_financials-01:segment_dimension",
+        "outcome": "noncritical_error",
+        "reviewer": "codex-source-review-external-operating-ownership",
+        "notes": "Noncritical Evidence-owner error: segment_dimension=not_disclosed is bound to company totals and industry narrative rather than a segment or disaggregated revenue/cost disclosure owner."
+      },
+      {
+        "review_row_id": "manufacturing-materials-shadow-920580-2025:segment_financials-01:chapter_sample:coverage:segment_financials-01:segment_dimension",
+        "outcome": "noncritical_error",
+        "reviewer": "codex-source-review-external-operating-ownership",
+        "notes": "Noncritical Evidence-owner error: segment_dimension=not_disclosed is bound to industry and balance-sheet narrative rather than a segment or disaggregated revenue/cost disclosure owner."
+      }
+    ],
+    "critical_errors": [],
+    "independent_of_historical_salvage": true
+  },
+  "report_exposure": [
+    {
+      "sample_id": "manufacturing-materials-shadow-600121-2025",
+      "observed_report_status": "hold",
+      "candidate_schema_invalid_extract_calls": 1,
+      "affected_scope_count": 1,
+      "failure_family_counts": {
+        "ambiguous_counterparty_direction": 1
+      },
+      "observed_unresolved_review_count": 4,
+      "unresolved_rows_in_failed_scopes": 4,
+      "optimistic_remaining_unresolved_count": 0,
+      "hold_without_applicable_failed_call": false
+    },
+    {
+      "sample_id": "manufacturing-materials-shadow-600022-2025",
+      "observed_report_status": "usable_with_caveats",
+      "candidate_schema_invalid_extract_calls": 0,
+      "affected_scope_count": 0,
+      "failure_family_counts": {},
+      "observed_unresolved_review_count": 0,
+      "unresolved_rows_in_failed_scopes": 0,
+      "optimistic_remaining_unresolved_count": 0,
+      "hold_without_applicable_failed_call": false
+    },
+    {
+      "sample_id": "manufacturing-materials-shadow-600256-2025",
+      "observed_report_status": "hold",
+      "candidate_schema_invalid_extract_calls": 3,
+      "affected_scope_count": 3,
+      "failure_family_counts": {
+        "business_overview_source_mismatch": 1,
+        "context_only_legal_empty": 1,
+        "contradictory_business_regime_legal_empty": 1
+      },
+      "observed_unresolved_review_count": 8,
+      "unresolved_rows_in_failed_scopes": 8,
+      "optimistic_remaining_unresolved_count": 0,
+      "hold_without_applicable_failed_call": false
+    },
+    {
+      "sample_id": "manufacturing-materials-shadow-600063-2025",
+      "observed_report_status": "hold",
+      "candidate_schema_invalid_extract_calls": 2,
+      "affected_scope_count": 2,
+      "failure_family_counts": {
+        "context_only_legal_empty": 2
+      },
+      "observed_unresolved_review_count": 11,
+      "unresolved_rows_in_failed_scopes": 7,
+      "optimistic_remaining_unresolved_count": 4,
+      "hold_without_applicable_failed_call": false
+    },
+    {
+      "sample_id": "manufacturing-materials-shadow-600111-2025",
+      "observed_report_status": "hold",
+      "candidate_schema_invalid_extract_calls": 3,
+      "affected_scope_count": 3,
+      "failure_family_counts": {
+        "context_only_legal_empty": 2,
+        "contradictory_business_regime_legal_empty": 1
+      },
+      "observed_unresolved_review_count": 9,
+      "unresolved_rows_in_failed_scopes": 9,
+      "optimistic_remaining_unresolved_count": 0,
+      "hold_without_applicable_failed_call": false
+    },
+    {
+      "sample_id": "manufacturing-materials-shadow-600176-2025",
+      "observed_report_status": "hold",
+      "candidate_schema_invalid_extract_calls": 2,
+      "affected_scope_count": 2,
+      "failure_family_counts": {
+        "context_only_legal_empty": 2
+      },
+      "observed_unresolved_review_count": 6,
+      "unresolved_rows_in_failed_scopes": 6,
+      "optimistic_remaining_unresolved_count": 0,
+      "hold_without_applicable_failed_call": false
+    },
+    {
+      "sample_id": "manufacturing-materials-shadow-600075-2025",
+      "observed_report_status": "hold",
+      "candidate_schema_invalid_extract_calls": 1,
+      "affected_scope_count": 1,
+      "failure_family_counts": {
+        "context_only_legal_empty": 1
+      },
+      "observed_unresolved_review_count": 8,
+      "unresolved_rows_in_failed_scopes": 5,
+      "optimistic_remaining_unresolved_count": 3,
+      "hold_without_applicable_failed_call": false
+    },
+    {
+      "sample_id": "manufacturing-materials-shadow-000552-2025",
+      "observed_report_status": "hold",
+      "candidate_schema_invalid_extract_calls": 1,
+      "affected_scope_count": 1,
+      "failure_family_counts": {
+        "contradictory_business_regime_legal_empty": 1
+      },
+      "observed_unresolved_review_count": 7,
+      "unresolved_rows_in_failed_scopes": 2,
+      "optimistic_remaining_unresolved_count": 5,
+      "hold_without_applicable_failed_call": false
+    },
+    {
+      "sample_id": "manufacturing-materials-shadow-000629-2025",
+      "observed_report_status": "hold",
+      "candidate_schema_invalid_extract_calls": 0,
+      "affected_scope_count": 0,
+      "failure_family_counts": {},
+      "observed_unresolved_review_count": 5,
+      "unresolved_rows_in_failed_scopes": 0,
+      "optimistic_remaining_unresolved_count": 5,
+      "hold_without_applicable_failed_call": true
+    },
+    {
+      "sample_id": "manufacturing-materials-shadow-000059-2025",
+      "observed_report_status": "hold",
+      "candidate_schema_invalid_extract_calls": 0,
+      "affected_scope_count": 0,
+      "failure_family_counts": {},
+      "observed_unresolved_review_count": 6,
+      "unresolved_rows_in_failed_scopes": 0,
+      "optimistic_remaining_unresolved_count": 6,
+      "hold_without_applicable_failed_call": true
+    },
+    {
+      "sample_id": "manufacturing-materials-shadow-000408-2025",
+      "observed_report_status": "hold",
+      "candidate_schema_invalid_extract_calls": 1,
+      "affected_scope_count": 1,
+      "failure_family_counts": {
+        "context_only_legal_empty": 1
+      },
+      "observed_unresolved_review_count": 9,
+      "unresolved_rows_in_failed_scopes": 4,
+      "optimistic_remaining_unresolved_count": 5,
+      "hold_without_applicable_failed_call": false
+    },
+    {
+      "sample_id": "manufacturing-materials-shadow-000060-2025",
+      "observed_report_status": "hold",
+      "candidate_schema_invalid_extract_calls": 2,
+      "affected_scope_count": 2,
+      "failure_family_counts": {
+        "context_only_legal_empty": 1,
+        "contradictory_business_regime_legal_empty": 1
+      },
+      "observed_unresolved_review_count": 5,
+      "unresolved_rows_in_failed_scopes": 5,
+      "optimistic_remaining_unresolved_count": 0,
+      "hold_without_applicable_failed_call": false
+    },
+    {
+      "sample_id": "manufacturing-materials-shadow-000055-2025",
+      "observed_report_status": "hold",
+      "candidate_schema_invalid_extract_calls": 1,
+      "affected_scope_count": 1,
+      "failure_family_counts": {
+        "contradictory_business_regime_legal_empty": 1
+      },
+      "observed_unresolved_review_count": 10,
+      "unresolved_rows_in_failed_scopes": 2,
+      "optimistic_remaining_unresolved_count": 8,
+      "hold_without_applicable_failed_call": false
+    },
+    {
+      "sample_id": "manufacturing-materials-shadow-000420-2025",
+      "observed_report_status": "hold",
+      "candidate_schema_invalid_extract_calls": 0,
+      "affected_scope_count": 0,
+      "failure_family_counts": {},
+      "observed_unresolved_review_count": 7,
+      "unresolved_rows_in_failed_scopes": 0,
+      "optimistic_remaining_unresolved_count": 7,
+      "hold_without_applicable_failed_call": true
+    },
+    {
+      "sample_id": "manufacturing-materials-shadow-920016-2025",
+      "observed_report_status": "hold",
+      "candidate_schema_invalid_extract_calls": 1,
+      "affected_scope_count": 1,
+      "failure_family_counts": {
+        "business_overview_source_mismatch": 1
+      },
+      "observed_unresolved_review_count": 3,
+      "unresolved_rows_in_failed_scopes": 3,
+      "optimistic_remaining_unresolved_count": 0,
+      "hold_without_applicable_failed_call": false
+    },
+    {
+      "sample_id": "manufacturing-materials-shadow-920033-2025",
+      "observed_report_status": "hold",
+      "candidate_schema_invalid_extract_calls": 3,
+      "affected_scope_count": 3,
+      "failure_family_counts": {
+        "context_only_legal_empty": 3
+      },
+      "observed_unresolved_review_count": 12,
+      "unresolved_rows_in_failed_scopes": 10,
+      "optimistic_remaining_unresolved_count": 2,
+      "hold_without_applicable_failed_call": false
+    },
+    {
+      "sample_id": "manufacturing-materials-shadow-920068-2025",
+      "observed_report_status": "hold",
+      "candidate_schema_invalid_extract_calls": 2,
+      "affected_scope_count": 2,
+      "failure_family_counts": {
+        "context_only_legal_empty": 1,
+        "control_only_no_change": 1
+      },
+      "observed_unresolved_review_count": 5,
+      "unresolved_rows_in_failed_scopes": 5,
+      "optimistic_remaining_unresolved_count": 0,
+      "hold_without_applicable_failed_call": false
+    },
+    {
+      "sample_id": "manufacturing-materials-shadow-920078-2025",
+      "observed_report_status": "hold",
+      "candidate_schema_invalid_extract_calls": 2,
+      "affected_scope_count": 2,
+      "failure_family_counts": {
+        "context_only_legal_empty": 1,
+        "control_only_no_change": 1
+      },
+      "observed_unresolved_review_count": 4,
+      "unresolved_rows_in_failed_scopes": 4,
+      "optimistic_remaining_unresolved_count": 0,
+      "hold_without_applicable_failed_call": false
+    },
+    {
+      "sample_id": "manufacturing-materials-shadow-920076-2025",
+      "observed_report_status": "hold",
+      "candidate_schema_invalid_extract_calls": 2,
+      "affected_scope_count": 2,
+      "failure_family_counts": {
+        "context_only_legal_empty": 2
+      },
+      "observed_unresolved_review_count": 4,
+      "unresolved_rows_in_failed_scopes": 4,
+      "optimistic_remaining_unresolved_count": 0,
+      "hold_without_applicable_failed_call": false
+    },
+    {
+      "sample_id": "manufacturing-materials-shadow-920580-2025",
+      "observed_report_status": "hold",
+      "candidate_schema_invalid_extract_calls": 2,
+      "affected_scope_count": 2,
+      "failure_family_counts": {
+        "context_only_legal_empty": 1,
+        "control_only_no_change": 1
+      },
+      "observed_unresolved_review_count": 4,
+      "unresolved_rows_in_failed_scopes": 4,
+      "optimistic_remaining_unresolved_count": 0,
+      "hold_without_applicable_failed_call": false
+    }
+  ],
+  "unavailable": {
+    "raw_provider_payloads": "not_persisted",
+    "historical_valid_sibling_count": "unavailable",
+    "historical_recovered_accepted_record_count": "unavailable",
+    "post_isolation_report_statuses": "unavailable_without_new_empirical_replay",
+    "post_isolation_sampled_precision": "unavailable_without_new_source_review"
+  },
+  "boundaries": {
+    "provider_calls": 0,
+    "historical_bundle_mutated": false,
+    "report_statuses_rewritten": false,
+    "adaptive_token_budget_changed": false,
+    "new_replay_authorized": false,
+    "production_paths_opened": [],
+    "production_authorization": "not_authorized"
+  },
+  "decision": "hold",
+  "next_business_priority": "Reduce report holds and reviewed precision errors on a future separately authorized empirical validation; token-budget dry-run remains a separate change.",
+  "audit_hash": "40578a2f6b62783ee3a2ce2d1a2d410a7da4010d85f82afcfcf4170d99af7678"
+}
