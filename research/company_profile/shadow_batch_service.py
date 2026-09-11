@@ -209,6 +209,16 @@ def _validate_shadow_correction_audit(
         ):
             raise ValueError("shadow correction audit does not admit this replay")
         return
+    if schema_version == "company_profile_shadow_segment_heading_replay_proof.v1":
+        if (
+            audit.get("report_count") != SHADOW_REPORT_COUNT
+            or audit.get("cohort_replay_performed") is not False
+            or audit.get("historical_artifacts_mutated") is not False
+            or audit.get("output_absent_before_provider") is not True
+            or audit.get("production_paths_opened") != []
+        ):
+            raise ValueError("shadow correction audit does not admit this replay")
+        return
     raise ValueError("shadow correction audit schema is unsupported")
 
 
@@ -278,6 +288,94 @@ def validate_segment_financial_closure_audit(
                 "segment financial closure implementation hash mismatch: "
                 f"{relative_path}"
             )
+
+
+def validate_segment_heading_replay_proof(
+    audit: Mapping[str, object],
+    *,
+    contract: ShadowReplayContract,
+    repository_root: str | Path,
+    output_root: str | Path,
+) -> dict[str, str]:
+    """Validate the current segment replay inputs without creating a provider."""
+
+    payload = dict(audit)
+    audit_hash = payload.pop("audit_hash", None)
+    if audit_hash != _payload_hash(payload):
+        raise ValueError("segment heading replay proof hash mismatch")
+    if (
+        audit.get("schema_version")
+        != "company_profile_shadow_segment_heading_replay_proof.v1"
+        or audit.get("report_count") != SHADOW_REPORT_COUNT
+        or audit.get("provider_calls") != 0
+        or audit.get("cohort_replay_performed") is not False
+        or audit.get("historical_artifacts_mutated") is not False
+        or audit.get("output_absent_before_provider") is not True
+        or audit.get("production_authorization") != PRODUCTION_AUTHORIZATION
+        or audit.get("production_paths_opened") != []
+        or audit.get("unresolved_finding_ids") != []
+        or audit.get("batch_id") != contract.batch_id
+        or audit.get("sample_manifest_hash") != contract.sample_manifest_hash
+        or audit.get("corrected_plan_hash") != contract.evidence_plan_hash
+        or audit.get("evidence_plan_version") != contract.evidence_plan_version
+        or audit.get("preparation_audit_hash")
+        != contract.preparation_audit_hash
+        or audit_hash != contract.correction_audit_hash
+    ):
+        raise ValueError("segment heading replay proof does not admit this replay")
+
+    root = Path(repository_root).resolve()
+    artifact_hashes = audit.get("artifact_hashes")
+    implementation_hashes = audit.get("implementation_hashes")
+    supporting_hashes = audit.get("supporting_artifact_hashes")
+    if not isinstance(artifact_hashes, Mapping) or not artifact_hashes:
+        raise TypeError("segment heading replay artifact hashes are missing")
+    if not isinstance(implementation_hashes, Mapping) or not implementation_hashes:
+        raise TypeError("segment heading replay implementation hashes are missing")
+    if not isinstance(supporting_hashes, Mapping) or not supporting_hashes:
+        raise TypeError("segment heading replay supporting hashes are missing")
+
+    for relative_path, expected_hash in {
+        **artifact_hashes,
+        **implementation_hashes,
+    }.items():
+        path = (root / str(relative_path)).resolve()
+        if not path.is_relative_to(root) or not path.is_file():
+            raise ValueError(
+                "segment heading replay proof path is invalid: "
+                f"{relative_path}"
+            )
+        actual_hash = hashlib.sha256(path.read_bytes()).hexdigest()
+        if actual_hash != expected_hash:
+            raise ValueError(
+                "segment heading replay proof artifact hash mismatch: "
+                f"{relative_path}"
+            )
+    if any(
+        not isinstance(name, str)
+        or not name
+        or not isinstance(value, str)
+        or not re.fullmatch(r"[0-9a-f]{64}", value)
+        for name, value in supporting_hashes.items()
+    ):
+        raise ValueError("segment heading replay supporting hashes are invalid")
+    actual_supporting = {
+        str(name): str(value) for name, value in supporting_hashes.items()
+    }
+    if actual_supporting != contract.supporting_artifact_hashes:
+        raise ValueError("segment heading replay supporting hashes mismatch")
+    provider = audit.get("provider")
+    if not isinstance(provider, Mapping) or dict(provider) != {
+        "logical_profile": contract.primary_logical_profile,
+        "extract_max_output_tokens": contract.extract_max_output_tokens,
+        "verify_max_output_tokens": contract.verify_max_output_tokens,
+        "timeout_seconds": contract.timeout_seconds,
+        "max_provider_calls": contract.max_provider_calls,
+    }:
+        raise ValueError("segment heading replay provider contract mismatch")
+    if Path(str(audit.get("output_root"))).resolve() != Path(output_root).resolve():
+        raise ValueError("segment heading replay output root mismatch")
+    return actual_supporting
 
 
 class ShadowReportSuccess(_StrictModel):

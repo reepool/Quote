@@ -1,0 +1,838 @@
+{
+  "schema_version": "company_profile_segment_financial_recurrence_audit.v1",
+  "audit_id": "manufacturing-materials-shadow-segment-heading-replay-recurrence-20260911-a",
+  "baseline": {
+    "batch_id": "manufacturing-materials-shadow-segment-retry-gemini-20260911-a",
+    "source_batch_result_hash": "d017e85cb54357807189940cb5ba35580e333003739828d7f065e1124e38408f",
+    "scopes": {
+      "manufacturing-materials-shadow-000055-2025": [
+        {
+          "scope_id": "segment_financials-01",
+          "task_complete": false,
+          "accepted_record_count": 0,
+          "unresolved_review_count": 5,
+          "coverage_counts": {
+            "unclear": 4
+          }
+        },
+        {
+          "scope_id": "segment_financials-02",
+          "task_complete": false,
+          "accepted_record_count": 0,
+          "unresolved_review_count": 5,
+          "coverage_counts": {
+            "unclear": 4
+          }
+        }
+      ],
+      "manufacturing-materials-shadow-000059-2025": [
+        {
+          "scope_id": "segment_financials-01",
+          "task_complete": false,
+          "accepted_record_count": 0,
+          "unresolved_review_count": 5,
+          "coverage_counts": {
+            "unclear": 4
+          }
+        },
+        {
+          "scope_id": "segment_financials-02",
+          "task_complete": false,
+          "accepted_record_count": 0,
+          "unresolved_review_count": 1,
+          "coverage_counts": {
+            "unclear": 1
+          }
+        }
+      ],
+      "manufacturing-materials-shadow-000060-2025": [
+        {
+          "scope_id": "segment_financials-01",
+          "task_complete": false,
+          "accepted_record_count": 0,
+          "unresolved_review_count": 5,
+          "coverage_counts": {
+            "unclear": 4
+          }
+        },
+        {
+          "scope_id": "segment_financials-02",
+          "task_complete": false,
+          "accepted_record_count": 0,
+          "unresolved_review_count": 4,
+          "coverage_counts": {
+            "unclear": 3
+          }
+        }
+      ],
+      "manufacturing-materials-shadow-000408-2025": [
+        {
+          "scope_id": "segment_financials-01",
+          "task_complete": true,
+          "accepted_record_count": 32,
+          "unresolved_review_count": 0,
+          "coverage_counts": {
+            "observed": 4
+          }
+        },
+        {
+          "scope_id": "segment_financials-02",
+          "task_complete": false,
+          "accepted_record_count": 0,
+          "unresolved_review_count": 4,
+          "coverage_counts": {
+            "unclear": 3
+          }
+        }
+      ],
+      "manufacturing-materials-shadow-000420-2025": [
+        {
+          "scope_id": "segment_financials-01",
+          "task_complete": true,
+          "accepted_record_count": 36,
+          "unresolved_review_count": 0,
+          "coverage_counts": {
+            "observed": 4
+          }
+        }
+      ],
+      "manufacturing-materials-shadow-000552-2025": [
+        {
+          "scope_id": "segment_financials-01",
+          "task_complete": true,
+          "accepted_record_count": 44,
+          "unresolved_review_count": 0,
+          "coverage_counts": {
+            "observed": 4
+          }
+        },
+        {
+          "scope_id": "segment_financials-02",
+          "task_complete": true,
+          "accepted_record_count": 10,
+          "unresolved_review_count": 0,
+          "coverage_counts": {
+            "observed": 2
+          }
+        }
+      ],
+      "manufacturing-materials-shadow-000629-2025": [
+        {
+          "scope_id": "segment_financials-01",
+          "task_complete": false,
+          "accepted_record_count": 0,
+          "unresolved_review_count": 5,
+          "coverage_counts": {
+            "unclear": 4
+          }
+        },
+        {
+          "scope_id": "segment_financials-02",
+          "task_complete": false,
+          "accepted_record_count": 0,
+          "unresolved_review_count": 4,
+          "coverage_counts": {
+            "unclear": 3
+          }
+        }
+      ],
+      "manufacturing-materials-shadow-600022-2025": [
+        {
+          "scope_id": "segment_financials-01",
+          "task_complete": true,
+          "accepted_record_count": 28,
+          "unresolved_review_count": 0,
+          "coverage_counts": {
+            "observed": 4
+          }
+        },
+        {
+          "scope_id": "segment_financials-02",
+          "task_complete": false,
+          "accepted_record_count": 0,
+          "unresolved_review_count": 3,
+          "coverage_counts": {
+            "unclear": 2
+          }
+        }
+      ],
+      "manufacturing-materials-shadow-600063-2025": [
+        {
+          "scope_id": "segment_financials-01",
+          "task_complete": false,
+          "accepted_record_count": 76,
+          "unresolved_review_count": 2,
+          "coverage_counts": {
+            "unclear": 1,
+            "observed": 3
+          }
+        },
+        {
+          "scope_id": "segment_financials-02",
+          "task_complete": true,
+          "accepted_record_count": 16,
+          "unresolved_review_count": 0,
+          "coverage_counts": {
+            "observed": 4
+          }
+        }
+      ],
+      "manufacturing-materials-shadow-600075-2025": [
+        {
+          "scope_id": "segment_financials-01",
+          "task_complete": true,
+          "accepted_record_count": 88,
+          "unresolved_review_count": 0,
+          "coverage_counts": {
+            "observed": 4
+          }
+        },
+        {
+          "scope_id": "segment_financials-02",
+          "task_complete": true,
+          "accepted_record_count": 15,
+          "unresolved_review_count": 0,
+          "coverage_counts": {
+            "observed": 4
+          }
+        }
+      ],
+      "manufacturing-materials-shadow-600111-2025": [
+        {
+          "scope_id": "segment_financials-01",
+          "task_complete": false,
+          "accepted_record_count": 0,
+          "unresolved_review_count": 5,
+          "coverage_counts": {
+            "unclear": 4
+          }
+        },
+        {
+          "scope_id": "segment_financials-02",
+          "task_complete": true,
+          "accepted_record_count": 24,
+          "unresolved_review_count": 0,
+          "coverage_counts": {
+            "observed": 2
+          }
+        }
+      ],
+      "manufacturing-materials-shadow-600121-2025": [
+        {
+          "scope_id": "segment_financials-01",
+          "task_complete": false,
+          "accepted_record_count": 0,
+          "unresolved_review_count": 5,
+          "coverage_counts": {
+            "unclear": 4
+          }
+        },
+        {
+          "scope_id": "segment_financials-02",
+          "task_complete": false,
+          "accepted_record_count": 0,
+          "unresolved_review_count": 4,
+          "coverage_counts": {
+            "unclear": 3
+          }
+        }
+      ],
+      "manufacturing-materials-shadow-600176-2025": [
+        {
+          "scope_id": "segment_financials-01",
+          "task_complete": true,
+          "accepted_record_count": 24,
+          "unresolved_review_count": 0,
+          "coverage_counts": {
+            "observed": 4
+          }
+        },
+        {
+          "scope_id": "segment_financials-02",
+          "task_complete": false,
+          "accepted_record_count": 0,
+          "unresolved_review_count": 2,
+          "coverage_counts": {
+            "unclear": 2
+          }
+        }
+      ],
+      "manufacturing-materials-shadow-600256-2025": [
+        {
+          "scope_id": "segment_financials-01",
+          "task_complete": true,
+          "accepted_record_count": 38,
+          "unresolved_review_count": 0,
+          "coverage_counts": {
+            "observed": 4
+          }
+        },
+        {
+          "scope_id": "segment_financials-02",
+          "task_complete": true,
+          "accepted_record_count": 8,
+          "unresolved_review_count": 0,
+          "coverage_counts": {
+            "observed": 4
+          }
+        }
+      ],
+      "manufacturing-materials-shadow-920016-2025": [
+        {
+          "scope_id": "segment_financials-01",
+          "task_complete": false,
+          "accepted_record_count": 0,
+          "unresolved_review_count": 5,
+          "coverage_counts": {
+            "unclear": 4
+          }
+        },
+        {
+          "scope_id": "segment_financials-02",
+          "task_complete": false,
+          "accepted_record_count": 0,
+          "unresolved_review_count": 2,
+          "coverage_counts": {
+            "unclear": 2
+          }
+        }
+      ],
+      "manufacturing-materials-shadow-920033-2025": [
+        {
+          "scope_id": "segment_financials-01",
+          "task_complete": true,
+          "accepted_record_count": 30,
+          "unresolved_review_count": 0,
+          "coverage_counts": {
+            "observed": 4
+          }
+        },
+        {
+          "scope_id": "segment_financials-02",
+          "task_complete": true,
+          "accepted_record_count": 0,
+          "unresolved_review_count": 0,
+          "coverage_counts": {
+            "not_applicable": 2
+          }
+        }
+      ],
+      "manufacturing-materials-shadow-920068-2025": [
+        {
+          "scope_id": "segment_financials-01",
+          "task_complete": false,
+          "accepted_record_count": 0,
+          "unresolved_review_count": 5,
+          "coverage_counts": {
+            "unclear": 4
+          }
+        },
+        {
+          "scope_id": "segment_financials-02",
+          "task_complete": true,
+          "accepted_record_count": 0,
+          "unresolved_review_count": 0,
+          "coverage_counts": {
+            "not_applicable": 1
+          }
+        }
+      ],
+      "manufacturing-materials-shadow-920076-2025": [
+        {
+          "scope_id": "segment_financials-01",
+          "task_complete": false,
+          "accepted_record_count": 0,
+          "unresolved_review_count": 2,
+          "coverage_counts": {
+            "unclear": 2
+          }
+        },
+        {
+          "scope_id": "segment_financials-02",
+          "task_complete": false,
+          "accepted_record_count": 0,
+          "unresolved_review_count": 5,
+          "coverage_counts": {
+            "unclear": 4
+          }
+        }
+      ],
+      "manufacturing-materials-shadow-920078-2025": [
+        {
+          "scope_id": "segment_financials-01",
+          "task_complete": true,
+          "accepted_record_count": 20,
+          "unresolved_review_count": 0,
+          "coverage_counts": {
+            "observed": 4
+          }
+        }
+      ],
+      "manufacturing-materials-shadow-920580-2025": [
+        {
+          "scope_id": "segment_financials-01",
+          "task_complete": false,
+          "accepted_record_count": 0,
+          "unresolved_review_count": 5,
+          "coverage_counts": {
+            "unclear": 4
+          }
+        },
+        {
+          "scope_id": "segment_financials-02",
+          "task_complete": false,
+          "accepted_record_count": 0,
+          "unresolved_review_count": 5,
+          "coverage_counts": {
+            "unclear": 4
+          }
+        }
+      ]
+    },
+    "aggregate": {
+      "scopes": 38,
+      "accepted_records": 489,
+      "unresolved_reviews": 88,
+      "incomplete_scopes": 22
+    },
+    "reason_code_counts": {
+      "candidate_schema_invalid": 17,
+      "candidate_unresolved": 8,
+      "duplicate_occurrence": 1,
+      "required_coverage_missing": 70,
+      "required_result_missing": 62,
+      "source_explicitly_not_applicable": 3
+    }
+  },
+  "refined": {
+    "batch_id": "manufacturing-materials-shadow-segment-heading-replay-gemini-20260911-a",
+    "source_batch_result_hash": "517d7bb0c0c4900383f025ce1f39e763f5cc3cc5f936f7fd7d930b2d91bc10d7",
+    "scopes": {
+      "manufacturing-materials-shadow-000055-2025": [
+        {
+          "scope_id": "segment_financials-01",
+          "task_complete": false,
+          "accepted_record_count": 0,
+          "unresolved_review_count": 5,
+          "coverage_counts": {
+            "unclear": 4
+          }
+        },
+        {
+          "scope_id": "segment_financials-02",
+          "task_complete": true,
+          "accepted_record_count": 18,
+          "unresolved_review_count": 0,
+          "coverage_counts": {
+            "observed": 3
+          }
+        }
+      ],
+      "manufacturing-materials-shadow-000059-2025": [
+        {
+          "scope_id": "segment_financials-01",
+          "task_complete": true,
+          "accepted_record_count": 62,
+          "unresolved_review_count": 0,
+          "coverage_counts": {
+            "observed": 4
+          }
+        },
+        {
+          "scope_id": "segment_financials-02",
+          "task_complete": false,
+          "accepted_record_count": 0,
+          "unresolved_review_count": 1,
+          "coverage_counts": {
+            "unclear": 1
+          }
+        }
+      ],
+      "manufacturing-materials-shadow-000060-2025": [
+        {
+          "scope_id": "segment_financials-01",
+          "task_complete": false,
+          "accepted_record_count": 0,
+          "unresolved_review_count": 5,
+          "coverage_counts": {
+            "unclear": 4
+          }
+        },
+        {
+          "scope_id": "segment_financials-02",
+          "task_complete": false,
+          "accepted_record_count": 3,
+          "unresolved_review_count": 15,
+          "coverage_counts": {
+            "unclear": 3
+          }
+        }
+      ],
+      "manufacturing-materials-shadow-000408-2025": [
+        {
+          "scope_id": "segment_financials-01",
+          "task_complete": true,
+          "accepted_record_count": 32,
+          "unresolved_review_count": 0,
+          "coverage_counts": {
+            "observed": 4
+          }
+        },
+        {
+          "scope_id": "segment_financials-02",
+          "task_complete": true,
+          "accepted_record_count": 8,
+          "unresolved_review_count": 0,
+          "coverage_counts": {
+            "observed": 3
+          }
+        }
+      ],
+      "manufacturing-materials-shadow-000420-2025": [
+        {
+          "scope_id": "segment_financials-01",
+          "task_complete": true,
+          "accepted_record_count": 36,
+          "unresolved_review_count": 0,
+          "coverage_counts": {
+            "observed": 4
+          }
+        }
+      ],
+      "manufacturing-materials-shadow-000552-2025": [
+        {
+          "scope_id": "segment_financials-01",
+          "task_complete": false,
+          "accepted_record_count": 0,
+          "unresolved_review_count": 5,
+          "coverage_counts": {
+            "unclear": 4
+          }
+        },
+        {
+          "scope_id": "segment_financials-02",
+          "task_complete": true,
+          "accepted_record_count": 12,
+          "unresolved_review_count": 0,
+          "coverage_counts": {
+            "observed": 2
+          }
+        }
+      ],
+      "manufacturing-materials-shadow-000629-2025": [
+        {
+          "scope_id": "segment_financials-01",
+          "task_complete": false,
+          "accepted_record_count": 0,
+          "unresolved_review_count": 5,
+          "coverage_counts": {
+            "unclear": 4
+          }
+        },
+        {
+          "scope_id": "segment_financials-02",
+          "task_complete": true,
+          "accepted_record_count": 15,
+          "unresolved_review_count": 0,
+          "coverage_counts": {
+            "observed": 3
+          }
+        }
+      ],
+      "manufacturing-materials-shadow-600022-2025": [
+        {
+          "scope_id": "segment_financials-01",
+          "task_complete": true,
+          "accepted_record_count": 28,
+          "unresolved_review_count": 0,
+          "coverage_counts": {
+            "observed": 4
+          }
+        },
+        {
+          "scope_id": "segment_financials-02",
+          "task_complete": false,
+          "accepted_record_count": 0,
+          "unresolved_review_count": 3,
+          "coverage_counts": {
+            "unclear": 2
+          }
+        }
+      ],
+      "manufacturing-materials-shadow-600063-2025": [
+        {
+          "scope_id": "segment_financials-01",
+          "task_complete": false,
+          "accepted_record_count": 76,
+          "unresolved_review_count": 3,
+          "coverage_counts": {
+            "unclear": 1,
+            "observed": 3
+          }
+        },
+        {
+          "scope_id": "segment_financials-02",
+          "task_complete": false,
+          "accepted_record_count": 15,
+          "unresolved_review_count": 2,
+          "coverage_counts": {
+            "observed": 3,
+            "unclear": 1
+          }
+        }
+      ],
+      "manufacturing-materials-shadow-600075-2025": [
+        {
+          "scope_id": "segment_financials-01",
+          "task_complete": true,
+          "accepted_record_count": 88,
+          "unresolved_review_count": 0,
+          "coverage_counts": {
+            "observed": 4
+          }
+        },
+        {
+          "scope_id": "segment_financials-02",
+          "task_complete": false,
+          "accepted_record_count": 12,
+          "unresolved_review_count": 2,
+          "coverage_counts": {
+            "unclear": 2,
+            "observed": 2
+          }
+        }
+      ],
+      "manufacturing-materials-shadow-600111-2025": [
+        {
+          "scope_id": "segment_financials-01",
+          "task_complete": true,
+          "accepted_record_count": 36,
+          "unresolved_review_count": 0,
+          "coverage_counts": {
+            "observed": 4
+          }
+        },
+        {
+          "scope_id": "segment_financials-02",
+          "task_complete": true,
+          "accepted_record_count": 12,
+          "unresolved_review_count": 0,
+          "coverage_counts": {
+            "observed": 2
+          }
+        }
+      ],
+      "manufacturing-materials-shadow-600121-2025": [
+        {
+          "scope_id": "segment_financials-01",
+          "task_complete": true,
+          "accepted_record_count": 40,
+          "unresolved_review_count": 0,
+          "coverage_counts": {
+            "observed": 4
+          }
+        },
+        {
+          "scope_id": "segment_financials-02",
+          "task_complete": true,
+          "accepted_record_count": 20,
+          "unresolved_review_count": 0,
+          "coverage_counts": {
+            "observed": 3
+          }
+        }
+      ],
+      "manufacturing-materials-shadow-600176-2025": [
+        {
+          "scope_id": "segment_financials-01",
+          "task_complete": true,
+          "accepted_record_count": 24,
+          "unresolved_review_count": 0,
+          "coverage_counts": {
+            "observed": 4
+          }
+        },
+        {
+          "scope_id": "segment_financials-02",
+          "task_complete": true,
+          "accepted_record_count": 0,
+          "unresolved_review_count": 0,
+          "coverage_counts": {
+            "not_applicable": 1
+          }
+        }
+      ],
+      "manufacturing-materials-shadow-600256-2025": [
+        {
+          "scope_id": "segment_financials-01",
+          "task_complete": true,
+          "accepted_record_count": 44,
+          "unresolved_review_count": 0,
+          "coverage_counts": {
+            "observed": 4
+          }
+        },
+        {
+          "scope_id": "segment_financials-02",
+          "task_complete": true,
+          "accepted_record_count": 8,
+          "unresolved_review_count": 0,
+          "coverage_counts": {
+            "observed": 4
+          }
+        }
+      ],
+      "manufacturing-materials-shadow-920016-2025": [
+        {
+          "scope_id": "segment_financials-01",
+          "task_complete": true,
+          "accepted_record_count": 27,
+          "unresolved_review_count": 0,
+          "coverage_counts": {
+            "observed": 4
+          }
+        },
+        {
+          "scope_id": "segment_financials-02",
+          "task_complete": false,
+          "accepted_record_count": 0,
+          "unresolved_review_count": 1,
+          "coverage_counts": {
+            "unclear": 1
+          }
+        }
+      ],
+      "manufacturing-materials-shadow-920033-2025": [
+        {
+          "scope_id": "segment_financials-01",
+          "task_complete": true,
+          "accepted_record_count": 30,
+          "unresolved_review_count": 0,
+          "coverage_counts": {
+            "observed": 4
+          }
+        },
+        {
+          "scope_id": "segment_financials-02",
+          "task_complete": false,
+          "accepted_record_count": 0,
+          "unresolved_review_count": 2,
+          "coverage_counts": {
+            "unclear": 2
+          }
+        }
+      ],
+      "manufacturing-materials-shadow-920068-2025": [
+        {
+          "scope_id": "segment_financials-01",
+          "task_complete": true,
+          "accepted_record_count": 24,
+          "unresolved_review_count": 0,
+          "coverage_counts": {
+            "observed": 4
+          }
+        },
+        {
+          "scope_id": "segment_financials-02",
+          "task_complete": true,
+          "accepted_record_count": 0,
+          "unresolved_review_count": 0,
+          "coverage_counts": {
+            "not_disclosed": 1
+          }
+        }
+      ],
+      "manufacturing-materials-shadow-920076-2025": [
+        {
+          "scope_id": "segment_financials-01",
+          "task_complete": false,
+          "accepted_record_count": 0,
+          "unresolved_review_count": 2,
+          "coverage_counts": {
+            "unclear": 2
+          }
+        },
+        {
+          "scope_id": "segment_financials-02",
+          "task_complete": false,
+          "accepted_record_count": 14,
+          "unresolved_review_count": 12,
+          "coverage_counts": {
+            "unclear": 2,
+            "observed": 2
+          }
+        }
+      ],
+      "manufacturing-materials-shadow-920078-2025": [
+        {
+          "scope_id": "segment_financials-01",
+          "task_complete": false,
+          "accepted_record_count": 24,
+          "unresolved_review_count": 4,
+          "coverage_counts": {
+            "unclear": 1,
+            "observed": 3
+          }
+        }
+      ],
+      "manufacturing-materials-shadow-920580-2025": [
+        {
+          "scope_id": "segment_financials-01",
+          "task_complete": false,
+          "accepted_record_count": 0,
+          "unresolved_review_count": 1,
+          "coverage_counts": {
+            "unclear": 1
+          }
+        },
+        {
+          "scope_id": "segment_financials-02",
+          "task_complete": true,
+          "accepted_record_count": 45,
+          "unresolved_review_count": 0,
+          "coverage_counts": {
+            "observed": 4
+          }
+        }
+      ]
+    },
+    "aggregate": {
+      "scopes": 38,
+      "accepted_records": 753,
+      "unresolved_reviews": 68,
+      "incomplete_scopes": 16
+    },
+    "reason_code_counts": {
+      "candidate_schema_invalid": 5,
+      "candidate_unresolved": 17,
+      "duplicate_occurrence": 10,
+      "occurrence_semantic_conflict": 13,
+      "prohibited_inference": 1,
+      "required_coverage_missing": 35,
+      "required_result_missing": 18,
+      "source_explicitly_not_applicable": 1,
+      "source_reason_unspecified": 1,
+      "subject_unsupported": 12
+    }
+  },
+  "delta": {
+    "segment_scope_count": 0,
+    "accepted_record_count": 264,
+    "unresolved_review_count": -20,
+    "incomplete_scope_count": -6
+  },
+  "reason_code_deltas": {
+    "candidate_schema_invalid": -12,
+    "candidate_unresolved": 9,
+    "duplicate_occurrence": 9,
+    "occurrence_semantic_conflict": 13,
+    "prohibited_inference": 1,
+    "required_coverage_missing": -35,
+    "required_result_missing": -44,
+    "source_explicitly_not_applicable": -2,
+    "source_reason_unspecified": 1,
+    "subject_unsupported": 12
+  },
+  "production_authorization": "not_authorized",
+  "audit_hash": "d42dffef9412f90258ca923657ac7c39172f41ccb63109f6e339238324189d5b"
+}

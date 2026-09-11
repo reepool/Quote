@@ -1,0 +1,55 @@
+{
+  "schema_version": "company_profile_shadow_segment_heading_replay_proof.v1",
+  "proof_id": "manufacturing-materials-shadow-segment-heading-replay-admission-20260911-a",
+  "batch_id": "manufacturing-materials-shadow-segment-heading-replay-gemini-20260911-a",
+  "sample_manifest_hash": "6f639739ef082e78dcb0c01a5ce40bab1645d8fdc027bece2dbef63652bae9e2",
+  "corrected_plan_hash": "e2205ec932589a0d50457e9f0112b44588ed164cf4c39560f27dfb0f6f996686",
+  "evidence_plan_version": "manufacturing_materials_shadow.2026-09-10.5",
+  "preparation_audit_hash": "24996a5620b12805786a3fd941215220f84f25ac618dfeba2e06a9a50325a9ca",
+  "report_count": 20,
+  "scope_count": 154,
+  "evidence_count": 332,
+  "artifact_hashes": {
+    "openspec/changes/archive/2026-09-09-validate-manufacturing-materials-company-profile-shadow-batch/shadow-manifest.v1.json": "ca6d301ff7fb3b21b206be5951965059c87a7e485121c98a24475e59bad0f215",
+    "openspec/changes/repair-company-profile-segment-evidence-context-and-output-budget/corrected-evidence-plan.v1.json": "4d90b1f051d9c8b98efe470a9f5e6f382afab23dabf8e6e357f58465f3a517c5",
+    "openspec/changes/replay-company-profile-shadow-after-segment-heading-binding/provider-free-preparation-audit.v1.json": "19460545854457b675216e6b5494b04c46a75297c67eb24142cff8150057010f",
+    "var/company_profile_shadow_batch/20260911/batch-manufacturing-materials-shadow-segment-retry-gemini-20260911-a/batch-manufacturing-materials-shadow-segment-retry-gemini-20260911-a/manifest.json": "7274b13f69bbd2dce0c093f0ae62139f61b70908b13cac537181e7e4f7fe50fb",
+    "openspec/changes/retry-company-profile-shadow-segment-replay-after-operator-timeout/empirical-readiness-audit.v1.json": "35a9d827e5ac01898caae1975a0e923ba06e8e5f2a943079f76e67978d9fc3e2",
+    "openspec/changes/retry-company-profile-shadow-segment-replay-after-operator-timeout/source-review-outcomes.v1.json": "e5f09b8694c12382859d09c248a1306ae6f5e0944102a3c02952739e3b2bb6a6",
+    "openspec/changes/retry-company-profile-shadow-segment-replay-after-operator-timeout/segment-recurrence-audit.v1.json": "cf58f6490e27bc3012affa235e95e7420f916c4985451c6ed30136f0328e7df0",
+    "openspec/changes/archive/2026-09-11-validate-company-profile-segment-partition-normalization-external-live/external-validation-result.v1.json": "dad5dc72493528e99a42289d756eebee5075e6804cd0d777a773ff81fcdb3ac2",
+    "openspec/changes/repair-company-profile-segment-evidence-context-and-output-budget/validation/external-validation-result.v1.json": "63fec587d840ae2134fa03abf2b5ab6d93591faab4eb793d143cf5f83fe67487",
+    "openspec/changes/archive/2026-09-11-bind-company-profile-segment-headings-from-evidence/validation/external-validation-result.v1.json": "162e16139b6418f632d02dbfe3a42ee33c2540fd274377c516c10927825f8863"
+  },
+  "implementation_hashes": {
+    "research/company_profile/shadow_evidence.py": "e1707c3c692fa2248b6b22d7203d5033d0096df8ee8a8602aa54ba8ee3b12a03",
+    "research/company_profile/stage5_provider.py": "97e9ddacd705705a0c242368feb959fde4094353c515f27e977e75ab64f04290"
+  },
+  "supporting_artifact_hashes": {
+    "baseline_batch_manifest": "7274b13f69bbd2dce0c093f0ae62139f61b70908b13cac537181e7e4f7fe50fb",
+    "baseline_readiness_audit": "35a9d827e5ac01898caae1975a0e923ba06e8e5f2a943079f76e67978d9fc3e2",
+    "baseline_source_review_outcomes": "e5f09b8694c12382859d09c248a1306ae6f5e0944102a3c02952739e3b2bb6a6",
+    "baseline_segment_recurrence_audit": "cf58f6490e27bc3012affa235e95e7420f916c4985451c6ed30136f0328e7df0",
+    "annual_period_validation_result": "dad5dc72493528e99a42289d756eebee5075e6804cd0d777a773ff81fcdb3ac2",
+    "segment_evidence_context_result": "63fec587d840ae2134fa03abf2b5ab6d93591faab4eb793d143cf5f83fe67487",
+    "unique_segment_heading_binding_result": "162e16139b6418f632d02dbfe3a42ee33c2540fd274377c516c10927825f8863",
+    "stage5_provider_implementation": "97e9ddacd705705a0c242368feb959fde4094353c515f27e977e75ab64f04290",
+    "shadow_evidence_implementation": "e1707c3c692fa2248b6b22d7203d5033d0096df8ee8a8602aa54ba8ee3b12a03"
+  },
+  "provider": {
+    "logical_profile": "semantic_extraction__scorpio_gemini",
+    "extract_max_output_tokens": 20000,
+    "verify_max_output_tokens": 18000,
+    "timeout_seconds": 300.0,
+    "max_provider_calls": 600
+  },
+  "output_root": "/home/python/Quote/var/company_profile_shadow_batch/20260911/batch-manufacturing-materials-shadow-segment-heading-replay-gemini-20260911-a",
+  "output_absent_before_provider": true,
+  "unresolved_finding_ids": [],
+  "provider_calls": 0,
+  "cohort_replay_performed": false,
+  "historical_artifacts_mutated": false,
+  "production_authorization": "not_authorized",
+  "production_paths_opened": [],
+  "audit_hash": "49b813f24b09d0de86eed0c1df3136eb276a950084c76cb283660b2c11339a3b"
+}

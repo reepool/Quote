@@ -1,0 +1,40 @@
+{
+  "schema_version": "company_profile_shadow_replay_preflight_receipt.v1",
+  "batch_id": "manufacturing-materials-shadow-segment-heading-replay-gemini-20260911-a",
+  "logical_profile": "semantic_extraction__scorpio_gemini",
+  "execution_path": "sandbox_external_authorized",
+  "transfer_authorization": {
+    "target": "scorpio.reepool.com",
+    "scope": "synthetic preflight and contracted annual-report Evidence/request content"
+  },
+  "request": {
+    "kind": "read_only_connectivity_profile_smoke",
+    "synthetic_text_only": true,
+    "annual_report_content_transmitted": false,
+    "semantic_replay_started": false,
+    "timeout_seconds": 120.0,
+    "max_output_tokens": 500
+  },
+  "result": {
+    "status": "success",
+    "provider": "openai_compatible",
+    "model": "gemini-3.8-flash-high",
+    "provider_request_id": "05e13ace-1b9b-4e4c-b49c-e828531ba395",
+    "request_hash": "394216723fb036566bbbe3d0eb0da856602548b89dee021bb1789b796be5f6a8",
+    "response_hash": "82366dfac67a3ec872e65c99478f8a89192499d7e3764dd2c9e915d206513410",
+    "route_fingerprint": "3d41de19dd7b7657a15683111ffb0d75877a91c2f7df4984e9486ac4f6bda52c",
+    "attempt_count": 1,
+    "latency_ms": 6340,
+    "input_tokens": 191,
+    "output_tokens": 750,
+    "finish_reason": "stop",
+    "warnings": [
+      "provider_output_budget_exceeded",
+      "provider_output_budget_exceeded_valid_response"
+    ]
+  },
+  "provider_calls": 1,
+  "cohort_replay_performed": false,
+  "production_authorization": "not_authorized",
+  "audit_hash": "6069e71cbfc4f271ad1d897e3664c3e1a4a05067362a73c9b0cb5a4a79bd35db"
+}

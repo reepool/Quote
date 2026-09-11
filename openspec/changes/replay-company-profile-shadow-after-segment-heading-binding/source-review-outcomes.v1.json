@@ -1,0 +1,560 @@
+[
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:business_overview-01:chapter_sample:stage5-c08c96de6196d60c85152f2c",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:segment_financials-01:chapter_sample:stage5-ec0699892e7b9ec8fa48e7bf",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:operating_quantities-01:chapter_sample:stage5-671683d26854089f777259e9",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:material_inputs-01:chapter_sample:stage5-890c5cbf9573b0b6d4812e8d",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:counterparties_and_concentration-01:chapter_sample:stage5-b2243cc697170c3fe9673002",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:business_regime-01:chapter_sample:coverage:business_regime-01:business_regime",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600022-2025:business_overview-01:chapter_sample:stage5-7e54795ee96f1b08f76bfa57",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600022-2025:segment_financials-01:chapter_sample:stage5-d0a7607c5de137d8c5b361d7",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600022-2025:operating_quantities-01:chapter_sample:stage5-821a7c98a1e72a9b4942fb2e",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600022-2025:material_inputs-01:chapter_sample:coverage:material_inputs-01:material_input",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600022-2025:counterparties_and_concentration-01:chapter_sample:stage5-932e5fe176bf1248c4fa90fe",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600022-2025:business_regime-01:chapter_sample:stage5-f953b226227b433124753e0d",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:business_overview-01:chapter_sample:stage5-310ed49434dd8e9f93839e71",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:segment_financials-01:chapter_sample:stage5-a8e2a268ec2337fa573811c8",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:material_inputs-01:chapter_sample:stage5-58d6d53ae7668ce7b80c3e5c",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:counterparties_and_concentration-01:chapter_sample:stage5-29fb60dd6b0a383dcc3a78c3",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600063-2025:business_overview-01:chapter_sample:stage5-87dec6392081670f94710311",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600063-2025:segment_financials-01:chapter_sample:stage5-b171592d4eabc9e4c1f294d3",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600063-2025:operating_quantities-01:chapter_sample:stage5-3e6085664152a1491ae5fb46",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600063-2025:material_inputs-01:chapter_sample:stage5-957de624ab3d84751e83d7e6",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600063-2025:counterparties_and_concentration-01:chapter_sample:stage5-7c148d0de727ab8b13374a51",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600063-2025:business_regime-01:chapter_sample:coverage:business_regime-01:business_regime",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600111-2025:business_overview-01:chapter_sample:stage5-ab174de5c79e2f51618db7a6",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600111-2025:segment_financials-01:chapter_sample:stage5-54c979261a74a881fad539a3",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600111-2025:material_inputs-01:chapter_sample:stage5-dfcb7768c2cf25ab30479ddd",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600111-2025:counterparties_and_concentration-01:chapter_sample:stage5-073f40a44850c06b32dc89ed",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:business_overview-01:chapter_sample:stage5-02a15a8f6d88c701dc93fc43",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:segment_financials-01:chapter_sample:stage5-7bdebe6c00b4967b52adad14",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:material_inputs-01:chapter_sample:stage5-8006cd1b659af4bead2079dc",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:counterparties_and_concentration-01:chapter_sample:stage5-c910f14688fb5e849f932874",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:business_regime-01:chapter_sample:coverage:business_regime-01:business_regime",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:business_overview-01:chapter_sample:stage5-da8a52c0b9a382907d7f4218",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:segment_financials-01:chapter_sample:stage5-1c64da9ec5dc595978bf4d93",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:operating_quantities-02:chapter_sample:stage5-e10bf312257e48e6b63f2795",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:material_inputs-01:chapter_sample:stage5-0cd3b9982124092ebeaa2a66",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:counterparties_and_concentration-01:chapter_sample:stage5-6beaf69e104edc7d78284466",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000552-2025:business_overview-01:chapter_sample:stage5-bbcf526c25dbe5a8f69af453",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000552-2025:segment_financials-02:chapter_sample:stage5-dfd76dfafe0b7ece9e58121d",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000552-2025:operating_quantities-02:chapter_sample:stage5-22fe8298a0890a8d09646e3b",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000552-2025:material_inputs-01:chapter_sample:stage5-ee8033990706c06c737eb431",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000552-2025:counterparties_and_concentration-01:chapter_sample:stage5-68d2a89a17ddddd4cf957aa6",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:business_overview-01:chapter_sample:stage5-af07eaff395f7e67969af258",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:segment_financials-02:chapter_sample:stage5-1b1f8cda773394593b5db414",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:operating_quantities-01:chapter_sample:stage5-bc995d209b7d1ca07db6566f",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:material_inputs-01:chapter_sample:stage5-223cc4ebebbc3067ef7ba12b",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:counterparties_and_concentration-01:chapter_sample:stage5-258a790c8e7ecca2df6ad673",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:business_regime-01:chapter_sample:coverage:business_regime-01:business_regime",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000059-2025:business_overview-01:chapter_sample:stage5-b8073048c476c3a9188901be",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000059-2025:segment_financials-01:chapter_sample:stage5-46e4df3d3320b767baeaa4d6",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000059-2025:operating_quantities-01:chapter_sample:stage5-1b158c1795593c85da520d3b",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000059-2025:material_inputs-01:chapter_sample:stage5-8c1a33022e2e3b82c3136ff0",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000059-2025:counterparties_and_concentration-01:chapter_sample:stage5-9b2fe0fd5281968b50e8b1c3",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000059-2025:business_regime-01:chapter_sample:coverage:business_regime-01:business_regime",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:business_overview-01:chapter_sample:stage5-e7082d8081f5ce646ca1ef2d",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:segment_financials-01:chapter_sample:stage5-d1d59a44551a711c2e995962",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:material_inputs-01:chapter_sample:stage5-8a1b30bd8805f527b3893e6b",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:counterparties_and_concentration-01:chapter_sample:stage5-200286f7496d4c6807648cd6",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000060-2025:segment_financials-02:chapter_sample:stage5-b088d97f8092ad80f48b9547",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000060-2025:operating_quantities-01:chapter_sample:stage5-f707368b40659ac57d9c24ca",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000060-2025:material_inputs-01:chapter_sample:coverage:material_inputs-01:material_input",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000060-2025:counterparties_and_concentration-01:chapter_sample:stage5-f4d7d5aa31caf2bec64eef45",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000055-2025:business_overview-01:chapter_sample:stage5-83641bdf0a4add66fc58bf1d",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000055-2025:segment_financials-02:chapter_sample:stage5-2f96cb6b4008a05d4ebe29e6",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000055-2025:operating_quantities-01:chapter_sample:coverage:operating_quantities-01:production_volume",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000055-2025:material_inputs-01:chapter_sample:coverage:material_inputs-01:material_input",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000420-2025:segment_financials-01:chapter_sample:stage5-efd2152650130bb6d980fe9c",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000420-2025:operating_quantities-01:chapter_sample:stage5-9fbe3efeb2a018dda6310114",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000420-2025:material_inputs-01:chapter_sample:stage5-2ecd8a0e83f11b7f83b45cee",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000420-2025:counterparties_and_concentration-01:chapter_sample:stage5-84e9a32584a48fb97c8c18d7",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000420-2025:business_regime-01:chapter_sample:coverage:business_regime-01:business_regime",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920016-2025:segment_financials-01:chapter_sample:stage5-f838dfba6bee67333544584f",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920016-2025:operating_quantities-01:chapter_sample:coverage:operating_quantities-01:production_capacity",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920016-2025:material_inputs-01:chapter_sample:stage5-00bc9a68b318a87ae6e3384f",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920016-2025:counterparties_and_concentration-01:chapter_sample:stage5-fd97e5def20e1ce80eecfddb",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:business_overview-01:chapter_sample:stage5-5dc4a703afc38b5badaa90c1",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:segment_financials-01:chapter_sample:stage5-1153f2831c9474749731802f",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:material_inputs-01:chapter_sample:coverage:material_inputs-01:material_input",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:counterparties_and_concentration-01:chapter_sample:stage5-ec2e4a568319498bd0ca2b3d",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920068-2025:business_overview-01:chapter_sample:stage5-d91bec4b322e1438e33583c4",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920068-2025:segment_financials-01:chapter_sample:stage5-7bf93961bb46a3f9ec47acb5",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920068-2025:material_inputs-01:chapter_sample:stage5-19a2dfa2a98ac04c998494d1",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920068-2025:counterparties_and_concentration-01:chapter_sample:stage5-b0d8a3d5942055ddc6a2958b",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920078-2025:business_overview-01:chapter_sample:stage5-56c5afc58cd2408fc3b93c85",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920078-2025:segment_financials-01:chapter_sample:stage5-189e42975eb9fb26f1d220c3",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920078-2025:material_inputs-01:chapter_sample:stage5-69548c763dff5fbd1206068f",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920078-2025:counterparties_and_concentration-01:chapter_sample:stage5-43dcc02f3bcb90aea9397988",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920076-2025:segment_financials-02:chapter_sample:stage5-db66aef7cd4f66352365ffd0",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920076-2025:material_inputs-01:chapter_sample:stage5-eea95a2a96e13c2e426e8370",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920076-2025:counterparties_and_concentration-01:chapter_sample:stage5-89875347ba9f2ab641bf2cb6",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:business_overview-01:chapter_sample:stage5-25b4b0c5bc8866f6ffc90f04",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:segment_financials-02:chapter_sample:stage5-55db156a16fe80c28d90fe0d",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:material_inputs-01:chapter_sample:stage5-5291bf4ce7fa63a15efc80b3",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:counterparties_and_concentration-01:chapter_sample:stage5-b599bdf0c7f3f21bf668662c",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-structural",
+    "notes": "Source-bound structural review passed: persisted runtime target, field identity, Evidence id/page/report binding, and frozen subject-basis constraints were consistent. This is not a substitute for a broader semantic benchmark."
+  }
+]
