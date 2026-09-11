@@ -23,4 +23,4 @@
 ## 5. Close and verify
 
 - [x] 5.1 Record `ready`, `hold`, or `failed` from the frozen gates and retain `production_authorization=not_authorized` with Stage 6 and every production consumer closed.
-- [ ] 5.2 Run targeted regression tests, Ruff, artifact/hash checks, `git diff --check`, and strict OpenSpec validation; review only blocking defects, then commit and push isolated task changes without touching pre-existing workspace files.
+- [x] 5.2 Run targeted regression tests, Ruff, artifact/hash checks, `git diff --check`, and strict OpenSpec validation; review only blocking defects, then commit and push isolated task changes without touching pre-existing workspace files.
