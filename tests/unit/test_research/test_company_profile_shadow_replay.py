@@ -125,6 +125,16 @@ EXTERNAL_OPERATING_OWNERSHIP_CHANGE = (
     REPOSITORY_ROOT
     / "openspec/changes/replay-company-profile-operating-ownership-external-path"
 )
+if not EXTERNAL_OPERATING_OWNERSHIP_CHANGE.exists():
+    archived_external_operating_ownership_replays = sorted(
+        (REPOSITORY_ROOT / "openspec/changes/archive").glob(
+            "*-replay-company-profile-operating-ownership-external-path"
+        )
+    )
+    if archived_external_operating_ownership_replays:
+        EXTERNAL_OPERATING_OWNERSHIP_CHANGE = (
+            archived_external_operating_ownership_replays[-1]
+        )
 SEGMENT_HEADING_REPLAY_ARCHIVE = (
     SEGMENT_HEADING_REPLAY_CHANGE
 )
