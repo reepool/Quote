@@ -1,0 +1,1319 @@
+{
+  "schema_version": "company_profile_segment_heading_external_validation_result.v1",
+  "validation_id": "manufacturing-materials-shadow-segment-heading-binding-20260911-a",
+  "execution_path": "sandbox_external_authorized",
+  "transfer_authorization": {
+    "target": "scorpio.reepool.com",
+    "scope": "frozen Evidence and request content for 000408.SZ:segment_financials-02"
+  },
+  "provider": {
+    "profile": "semantic_extraction__scorpio_gemini",
+    "extract_max_output_tokens": 20000,
+    "verify_max_output_tokens": 18000,
+    "timeout_seconds": 300.0,
+    "max_provider_calls": 6,
+    "expected_partition_count": 2
+  },
+  "provider_calls": 2,
+  "classification": "resolved",
+  "accepted_record_count": 8,
+  "task_complete": true,
+  "execution": {
+    "run_id": "manufacturing-materials-shadow-segment-heading-binding-20260911-a:segment_financials-02",
+    "sample_id": "manufacturing-materials-shadow-000408-2025",
+    "company_name": "藏格矿业",
+    "report": {
+      "instrument_id": "000408.SZ",
+      "report_id": "1225009932",
+      "document_version": "10350f651693d09a3ed6f203996751624b41bcc330159df69eb29297cdd2d956",
+      "report_period": "2025-12-31",
+      "published_at": "2026-03-13T16:00:00+00:00",
+      "document_type": "annual_report"
+    },
+    "scope_results": [
+      {
+        "scope_id": "segment_financials-02",
+        "request_id": "manufacturing-materials-shadow-segment-heading-binding-20260911-a:segment_financials-02:manufacturing-materials-shadow-000408-2025:segment_financials-02",
+        "prepared_scope": {
+          "schema_version": "company_profile_stage5_prepared_scope.v1",
+          "sample_id": "manufacturing-materials-shadow-000408-2025",
+          "scope_id": "segment_financials-02",
+          "chapter_task": "extract_segment_financials",
+          "field_ids": [
+            "segment_dimension",
+            "operating_revenue",
+            "operating_cost"
+          ],
+          "report": {
+            "instrument_id": "000408.SZ",
+            "report_id": "1225009932",
+            "document_version": "10350f651693d09a3ed6f203996751624b41bcc330159df69eb29297cdd2d956",
+            "report_period": "2025-12-31",
+            "published_at": "2026-03-13T16:00:00+00:00",
+            "document_type": "annual_report"
+          },
+          "evidence_bundle": [
+            {
+              "evidence": {
+                "evidence_id": "stage5-evidence-75d08a3065e3df91a3462ad7",
+                "report": {
+                  "instrument_id": "000408.SZ",
+                  "report_id": "1225009932",
+                  "document_version": "10350f651693d09a3ed6f203996751624b41bcc330159df69eb29297cdd2d956",
+                  "report_period": "2025-12-31",
+                  "published_at": "2026-03-13T16:00:00+00:00",
+                  "document_type": "annual_report"
+                },
+                "page": 194,
+                "printed_page_label": null,
+                "section_title": "principal_business",
+                "continuation_pages": [],
+                "subject_evidence_pages": [],
+                "anchor": {
+                  "anchor_type": "text",
+                  "bounded_quote": "193\n2025\n十八、其他重要事项\n1、前期会计差错更正\n（1）  追溯重述法\n单 位 ：元\n会计差错更正的内容 处理程序 受影响的各个比较期间报表项目名称 累积影响数\n（2）  未来适用法\n会计差错更正的内容 批准程序 采用未来适用法的原因\n2、债务重组\n3、资产置换\n（1）  非货币性资产交换\n（2）  其他资产置换\n4、年金计划\n5、终止经营\n6、分部信息\n（1）  报告分部的确定依据与会计政策\n根据公司的内部组织结构、管理要求及内部报告制度，公司的经营业务划分为 4 个经营分部，公司的管理层能够定期\n评价这些分部的经营成果，以决定向其分配资源、评价其业绩。在经营分部的基础上公司确定了 4 个报告分部，分别为公\n司本部、氯化钾生产及销售业务、碳酸锂生产及销售业务、投资业务。这些报告分部是以对外提供不同产品为基础确定的。\n分部报告信息根据各分部向管理层报告时采用的会计政策及计量标准披露，这些计量基础与编制财务报表时的会计与\n计量基础保持一致。\n（2）  报告分部的财务信息\n单 位 ：元\n项目\n期末余额 / 本期发生额\n公司本部 氯化钾生产\n及销售业务\n碳酸锂生产\n及销售业务 投资业务 分部间抵销 合计\n一 . 主营业务收入 2,948,852,813.24 592,742,029.58 - 3,541,594,842.82\n二 . 主营业务成本 - 1,042,992,661.57 398,893,659.47 - -12,819,444.13 1,429,066,876.91\n三 . 资产总额 21,472,762,830.60 4,944,843,351.96 1,830,375,716.94 4,817,328,837.53 -15,373,156,533.78 17,692,154,203.25\n四 . 负债总额 25,288,750.63 1,504,697,907.84 146,352,256.46 1,251,829,771.87 -1,451,356,394.55 1,476,812,292.25\n（3）  公司无报告分部的，或者不能披露各报告分部的资产总额和负债总额的，应说明原因\n（4）  其他说明",
+                  "context_before": null,
+                  "context_after": null,
+                  "match_index": 0
+                }
+              },
+              "field_id": null,
+              "source_native": null,
+              "context_complete": true,
+              "headers_complete": true,
+              "unit_context_complete": true,
+              "footnotes_complete": true,
+              "continuation_complete": true,
+              "source_readable": true
+            }
+          ],
+          "page_contexts": [
+            {
+              "page": 194,
+              "printed_page_label": null,
+              "text": "193\n2025\n十八、其他重要事项\n1、前期会计差错更正\n（1）  追溯重述法\n单 位 ：元\n会计差错更正的内容 处理程序 受影响的各个比较期间报表项目名称 累积影响数\n（2）  未来适用法\n会计差错更正的内容 批准程序 采用未来适用法的原因\n2、债务重组\n3、资产置换\n（1）  非货币性资产交换\n（2）  其他资产置换\n4、年金计划\n5、终止经营\n6、分部信息\n（1）  报告分部的确定依据与会计政策\n根据公司的内部组织结构、管理要求及内部报告制度，公司的经营业务划分为 4 个经营分部，公司的管理层能够定期\n评价这些分部的经营成果，以决定向其分配资源、评价其业绩。在经营分部的基础上公司确定了 4 个报告分部，分别为公\n司本部、氯化钾生产及销售业务、碳酸锂生产及销售业务、投资业务。这些报告分部是以对外提供不同产品为基础确定的。\n分部报告信息根据各分部向管理层报告时采用的会计政策及计量标准披露，这些计量基础与编制财务报表时的会计与\n计量基础保持一致。\n（2）  报告分部的财务信息\n单 位 ：元\n项目\n期末余额 / 本期发生额\n公司本部 氯化钾生产\n及销售业务\n碳酸锂生产\n及销售业务 投资业务 分部间抵销 合计\n一 . 主营业务收入 2,948,852,813.24 592,742,029.58 - 3,541,594,842.82\n二 . 主营业务成本 - 1,042,992,661.57 398,893,659.47 - -12,819,444.13 1,429,066,876.91\n三 . 资产总额 21,472,762,830.60 4,944,843,351.96 1,830,375,716.94 4,817,328,837.53 -15,373,156,533.78 17,692,154,203.25\n四 . 负债总额 25,288,750.63 1,504,697,907.84 146,352,256.46 1,251,829,771.87 -1,451,356,394.55 1,476,812,292.25\n（3）  公司无报告分部的，或者不能披露各报告分部的资产总额和负债总额的，应说明原因\n（4）  其他说明",
+              "text_hash": "1a992661e9ad5ce255b56036e896adfec9eb0778de7b7e523b0167e98514d98d",
+              "extraction_method": "native_text",
+              "quality_status": "native"
+            }
+          ],
+          "plan_version": "manufacturing_materials_shadow.2026-09-10.5",
+          "source_row_dimensions": {},
+          "candidate_pages": [
+            194
+          ],
+          "production_authorization": "not_authorized"
+        },
+        "task_result": {
+          "schema_version": "company_profile_task_result.v1",
+          "request_id": "manufacturing-materials-shadow-segment-heading-binding-20260911-a:segment_financials-02:manufacturing-materials-shadow-000408-2025:segment_financials-02",
+          "records": [
+            {
+              "schema_version": "company_profile_semantic_object.v1",
+              "record_id": "stage5-a59f2aaa5384a0cca30d146f",
+              "field_id": "segment_dimension",
+              "chapter_task": "extract_segment_financials",
+              "report": {
+                "instrument_id": "000408.SZ",
+                "report_id": "1225009932",
+                "document_version": "10350f651693d09a3ed6f203996751624b41bcc330159df69eb29297cdd2d956",
+                "report_period": "2025-12-31",
+                "published_at": "2026-03-13T16:00:00+00:00",
+                "document_type": "annual_report"
+              },
+              "subject_scope": "business_segment",
+              "subject_name": null,
+              "subject_basis": "unclear",
+              "reported_period": "2025",
+              "period_type": "duration",
+              "knowledge_time": null,
+              "assertion_class": "reported_fact",
+              "evidence": [
+                {
+                  "evidence_id": "stage5-evidence-75d08a3065e3df91a3462ad7",
+                  "report": {
+                    "instrument_id": "000408.SZ",
+                    "report_id": "1225009932",
+                    "document_version": "10350f651693d09a3ed6f203996751624b41bcc330159df69eb29297cdd2d956",
+                    "report_period": "2025-12-31",
+                    "published_at": "2026-03-13T16:00:00+00:00",
+                    "document_type": "annual_report"
+                  },
+                  "page": 194,
+                  "printed_page_label": null,
+                  "section_title": "principal_business",
+                  "continuation_pages": [],
+                  "subject_evidence_pages": [],
+                  "anchor": {
+                    "anchor_type": "table",
+                    "table_label": "报告分部的财务信息",
+                    "row_label": "氯化钾生产及销售业务",
+                    "column_header": "报告分部的财务信息",
+                    "cell_locator": null
+                  }
+                }
+              ],
+              "source_native": {
+                "name": "氯化钾生产及销售业务",
+                "value": null,
+                "unit": null,
+                "header": "报告分部的财务信息",
+                "qualifier": null,
+                "footnote_refs": [],
+                "source_aliases": []
+              },
+              "uncertainty": [],
+              "data_status": "research_fixture",
+              "object_type": "Segment",
+              "dimension": "报告分部的财务信息",
+              "label": "氯化钾生产及销售业务",
+              "row_class": null
+            },
+            {
+              "schema_version": "company_profile_semantic_object.v1",
+              "record_id": "stage5-d717f49da656be71f274434b",
+              "field_id": "operating_revenue",
+              "chapter_task": "extract_segment_financials",
+              "report": {
+                "instrument_id": "000408.SZ",
+                "report_id": "1225009932",
+                "document_version": "10350f651693d09a3ed6f203996751624b41bcc330159df69eb29297cdd2d956",
+                "report_period": "2025-12-31",
+                "published_at": "2026-03-13T16:00:00+00:00",
+                "document_type": "annual_report"
+              },
+              "subject_scope": "business_segment",
+              "subject_name": null,
+              "subject_basis": "unclear",
+              "reported_period": "2025",
+              "period_type": "duration",
+              "knowledge_time": null,
+              "assertion_class": "reported_fact",
+              "evidence": [
+                {
+                  "evidence_id": "stage5-evidence-75d08a3065e3df91a3462ad7",
+                  "report": {
+                    "instrument_id": "000408.SZ",
+                    "report_id": "1225009932",
+                    "document_version": "10350f651693d09a3ed6f203996751624b41bcc330159df69eb29297cdd2d956",
+                    "report_period": "2025-12-31",
+                    "published_at": "2026-03-13T16:00:00+00:00",
+                    "document_type": "annual_report"
+                  },
+                  "page": 194,
+                  "printed_page_label": null,
+                  "section_title": "principal_business",
+                  "continuation_pages": [],
+                  "subject_evidence_pages": [],
+                  "anchor": {
+                    "anchor_type": "table",
+                    "table_label": "报告分部的财务信息",
+                    "row_label": "氯化钾生产及销售业务",
+                    "column_header": "一 . 主营业务收入",
+                    "cell_locator": null
+                  }
+                }
+              ],
+              "source_native": {
+                "name": "氯化钾生产及销售业务",
+                "value": "2,948,852,813.24",
+                "unit": "元",
+                "header": "一 . 主营业务收入",
+                "qualifier": null,
+                "footnote_refs": [],
+                "source_aliases": []
+              },
+              "uncertainty": [],
+              "data_status": "research_fixture",
+              "object_type": "Measurement",
+              "metric_type": "operating_revenue",
+              "logical_slot": "revenue",
+              "measured_object": "氯化钾生产及销售业务",
+              "segment_dimension": "报告分部的财务信息",
+              "segment_label": "氯化钾生产及销售业务",
+              "capacity_kind": null,
+              "processing_direction": null,
+              "row_class": null,
+              "is_restated_comparative": false,
+              "comparison_basis": null,
+              "relationship_context": null
+            },
+            {
+              "schema_version": "company_profile_semantic_object.v1",
+              "record_id": "stage5-13de6172564e1c657183bb6d",
+              "field_id": "operating_cost",
+              "chapter_task": "extract_segment_financials",
+              "report": {
+                "instrument_id": "000408.SZ",
+                "report_id": "1225009932",
+                "document_version": "10350f651693d09a3ed6f203996751624b41bcc330159df69eb29297cdd2d956",
+                "report_period": "2025-12-31",
+                "published_at": "2026-03-13T16:00:00+00:00",
+                "document_type": "annual_report"
+              },
+              "subject_scope": "business_segment",
+              "subject_name": null,
+              "subject_basis": "unclear",
+              "reported_period": "2025",
+              "period_type": "duration",
+              "knowledge_time": null,
+              "assertion_class": "reported_fact",
+              "evidence": [
+                {
+                  "evidence_id": "stage5-evidence-75d08a3065e3df91a3462ad7",
+                  "report": {
+                    "instrument_id": "000408.SZ",
+                    "report_id": "1225009932",
+                    "document_version": "10350f651693d09a3ed6f203996751624b41bcc330159df69eb29297cdd2d956",
+                    "report_period": "2025-12-31",
+                    "published_at": "2026-03-13T16:00:00+00:00",
+                    "document_type": "annual_report"
+                  },
+                  "page": 194,
+                  "printed_page_label": null,
+                  "section_title": "principal_business",
+                  "continuation_pages": [],
+                  "subject_evidence_pages": [],
+                  "anchor": {
+                    "anchor_type": "table",
+                    "table_label": "报告分部的财务信息",
+                    "row_label": "氯化钾生产及销售业务",
+                    "column_header": "二 . 主营业务成本",
+                    "cell_locator": null
+                  }
+                }
+              ],
+              "source_native": {
+                "name": "氯化钾生产及销售业务",
+                "value": "1,042,992,661.57",
+                "unit": "元",
+                "header": "二 . 主营业务成本",
+                "qualifier": null,
+                "footnote_refs": [],
+                "source_aliases": []
+              },
+              "uncertainty": [],
+              "data_status": "research_fixture",
+              "object_type": "Measurement",
+              "metric_type": "operating_cost",
+              "logical_slot": "cost",
+              "measured_object": "氯化钾生产及销售业务",
+              "segment_dimension": "报告分部的财务信息",
+              "segment_label": "氯化钾生产及销售业务",
+              "capacity_kind": null,
+              "processing_direction": null,
+              "row_class": null,
+              "is_restated_comparative": false,
+              "comparison_basis": null,
+              "relationship_context": null
+            },
+            {
+              "schema_version": "company_profile_semantic_object.v1",
+              "record_id": "stage5-ff862808130621549af8808a",
+              "field_id": "segment_dimension",
+              "chapter_task": "extract_segment_financials",
+              "report": {
+                "instrument_id": "000408.SZ",
+                "report_id": "1225009932",
+                "document_version": "10350f651693d09a3ed6f203996751624b41bcc330159df69eb29297cdd2d956",
+                "report_period": "2025-12-31",
+                "published_at": "2026-03-13T16:00:00+00:00",
+                "document_type": "annual_report"
+              },
+              "subject_scope": "business_segment",
+              "subject_name": null,
+              "subject_basis": "unclear",
+              "reported_period": "2025",
+              "period_type": "duration",
+              "knowledge_time": null,
+              "assertion_class": "reported_fact",
+              "evidence": [
+                {
+                  "evidence_id": "stage5-evidence-75d08a3065e3df91a3462ad7",
+                  "report": {
+                    "instrument_id": "000408.SZ",
+                    "report_id": "1225009932",
+                    "document_version": "10350f651693d09a3ed6f203996751624b41bcc330159df69eb29297cdd2d956",
+                    "report_period": "2025-12-31",
+                    "published_at": "2026-03-13T16:00:00+00:00",
+                    "document_type": "annual_report"
+                  },
+                  "page": 194,
+                  "printed_page_label": null,
+                  "section_title": "principal_business",
+                  "continuation_pages": [],
+                  "subject_evidence_pages": [],
+                  "anchor": {
+                    "anchor_type": "table",
+                    "table_label": "报告分部的财务信息",
+                    "row_label": "碳酸锂生产及销售业务",
+                    "column_header": "报告分部的财务信息",
+                    "cell_locator": null
+                  }
+                }
+              ],
+              "source_native": {
+                "name": "碳酸锂生产及销售业务",
+                "value": null,
+                "unit": null,
+                "header": "报告分部的财务信息",
+                "qualifier": null,
+                "footnote_refs": [],
+                "source_aliases": []
+              },
+              "uncertainty": [],
+              "data_status": "research_fixture",
+              "object_type": "Segment",
+              "dimension": "报告分部的财务信息",
+              "label": "碳酸锂生产及销售业务",
+              "row_class": null
+            },
+            {
+              "schema_version": "company_profile_semantic_object.v1",
+              "record_id": "stage5-203b159642743eadfb553212",
+              "field_id": "operating_revenue",
+              "chapter_task": "extract_segment_financials",
+              "report": {
+                "instrument_id": "000408.SZ",
+                "report_id": "1225009932",
+                "document_version": "10350f651693d09a3ed6f203996751624b41bcc330159df69eb29297cdd2d956",
+                "report_period": "2025-12-31",
+                "published_at": "2026-03-13T16:00:00+00:00",
+                "document_type": "annual_report"
+              },
+              "subject_scope": "business_segment",
+              "subject_name": null,
+              "subject_basis": "unclear",
+              "reported_period": "2025",
+              "period_type": "duration",
+              "knowledge_time": null,
+              "assertion_class": "reported_fact",
+              "evidence": [
+                {
+                  "evidence_id": "stage5-evidence-75d08a3065e3df91a3462ad7",
+                  "report": {
+                    "instrument_id": "000408.SZ",
+                    "report_id": "1225009932",
+                    "document_version": "10350f651693d09a3ed6f203996751624b41bcc330159df69eb29297cdd2d956",
+                    "report_period": "2025-12-31",
+                    "published_at": "2026-03-13T16:00:00+00:00",
+                    "document_type": "annual_report"
+                  },
+                  "page": 194,
+                  "printed_page_label": null,
+                  "section_title": "principal_business",
+                  "continuation_pages": [],
+                  "subject_evidence_pages": [],
+                  "anchor": {
+                    "anchor_type": "table",
+                    "table_label": "报告分部的财务信息",
+                    "row_label": "碳酸锂生产及销售业务",
+                    "column_header": "一 . 主营业务收入",
+                    "cell_locator": null
+                  }
+                }
+              ],
+              "source_native": {
+                "name": "碳酸锂生产及销售业务",
+                "value": "592,742,029.58",
+                "unit": "元",
+                "header": "一 . 主营业务收入",
+                "qualifier": null,
+                "footnote_refs": [],
+                "source_aliases": []
+              },
+              "uncertainty": [],
+              "data_status": "research_fixture",
+              "object_type": "Measurement",
+              "metric_type": "operating_revenue",
+              "logical_slot": "revenue",
+              "measured_object": "碳酸锂生产及销售业务",
+              "segment_dimension": "报告分部的财务信息",
+              "segment_label": "碳酸锂生产及销售业务",
+              "capacity_kind": null,
+              "processing_direction": null,
+              "row_class": null,
+              "is_restated_comparative": false,
+              "comparison_basis": null,
+              "relationship_context": null
+            },
+            {
+              "schema_version": "company_profile_semantic_object.v1",
+              "record_id": "stage5-7d872ba9d5d481b52d287bb8",
+              "field_id": "operating_cost",
+              "chapter_task": "extract_segment_financials",
+              "report": {
+                "instrument_id": "000408.SZ",
+                "report_id": "1225009932",
+                "document_version": "10350f651693d09a3ed6f203996751624b41bcc330159df69eb29297cdd2d956",
+                "report_period": "2025-12-31",
+                "published_at": "2026-03-13T16:00:00+00:00",
+                "document_type": "annual_report"
+              },
+              "subject_scope": "business_segment",
+              "subject_name": null,
+              "subject_basis": "unclear",
+              "reported_period": "2025",
+              "period_type": "duration",
+              "knowledge_time": null,
+              "assertion_class": "reported_fact",
+              "evidence": [
+                {
+                  "evidence_id": "stage5-evidence-75d08a3065e3df91a3462ad7",
+                  "report": {
+                    "instrument_id": "000408.SZ",
+                    "report_id": "1225009932",
+                    "document_version": "10350f651693d09a3ed6f203996751624b41bcc330159df69eb29297cdd2d956",
+                    "report_period": "2025-12-31",
+                    "published_at": "2026-03-13T16:00:00+00:00",
+                    "document_type": "annual_report"
+                  },
+                  "page": 194,
+                  "printed_page_label": null,
+                  "section_title": "principal_business",
+                  "continuation_pages": [],
+                  "subject_evidence_pages": [],
+                  "anchor": {
+                    "anchor_type": "table",
+                    "table_label": "报告分部的财务信息",
+                    "row_label": "碳酸锂生产及销售业务",
+                    "column_header": "二 . 主营业务成本",
+                    "cell_locator": null
+                  }
+                }
+              ],
+              "source_native": {
+                "name": "碳酸锂生产及销售业务",
+                "value": "398,893,659.47",
+                "unit": "元",
+                "header": "二 . 主营业务成本",
+                "qualifier": null,
+                "footnote_refs": [],
+                "source_aliases": []
+              },
+              "uncertainty": [],
+              "data_status": "research_fixture",
+              "object_type": "Measurement",
+              "metric_type": "operating_cost",
+              "logical_slot": "cost",
+              "measured_object": "碳酸锂生产及销售业务",
+              "segment_dimension": "报告分部的财务信息",
+              "segment_label": "碳酸锂生产及销售业务",
+              "capacity_kind": null,
+              "processing_direction": null,
+              "row_class": null,
+              "is_restated_comparative": false,
+              "comparison_basis": null,
+              "relationship_context": null
+            },
+            {
+              "schema_version": "company_profile_semantic_object.v1",
+              "record_id": "stage5-c22e6212138675c202a78c87",
+              "field_id": "segment_dimension",
+              "chapter_task": "extract_segment_financials",
+              "report": {
+                "instrument_id": "000408.SZ",
+                "report_id": "1225009932",
+                "document_version": "10350f651693d09a3ed6f203996751624b41bcc330159df69eb29297cdd2d956",
+                "report_period": "2025-12-31",
+                "published_at": "2026-03-13T16:00:00+00:00",
+                "document_type": "annual_report"
+              },
+              "subject_scope": "unclear",
+              "subject_name": null,
+              "subject_basis": null,
+              "reported_period": "2025",
+              "period_type": "duration",
+              "knowledge_time": null,
+              "assertion_class": "reported_fact",
+              "evidence": [
+                {
+                  "evidence_id": "stage5-evidence-75d08a3065e3df91a3462ad7",
+                  "report": {
+                    "instrument_id": "000408.SZ",
+                    "report_id": "1225009932",
+                    "document_version": "10350f651693d09a3ed6f203996751624b41bcc330159df69eb29297cdd2d956",
+                    "report_period": "2025-12-31",
+                    "published_at": "2026-03-13T16:00:00+00:00",
+                    "document_type": "annual_report"
+                  },
+                  "page": 194,
+                  "printed_page_label": null,
+                  "section_title": "principal_business",
+                  "continuation_pages": [],
+                  "subject_evidence_pages": [],
+                  "anchor": {
+                    "anchor_type": "text",
+                    "bounded_quote": "193\n2025\n十八、其他重要事项\n1、前期会计差错更正\n（1）  追溯重述法\n单 位 ：元\n会计差错更正的内容 处理程序 受影响的各个比较期间报表项目名称 累积影响数\n（2）  未来适用法\n会计差错更正的内容 批准程序 采用未来适用法的原因\n2、债务重组\n3、资产置换\n（1）  非货币性资产交换\n（2）  其他资产置换\n4、年金计划\n5、终止经营\n6、分部信息\n（1）  报告分部的确定依据与会计政策\n根据公司的内部组织结构、管理要求及内部报告制度，公司的经营业务划分为 4 个经营分部，公司的管理层能够定期\n评价这些分部的经营成果，以决定向其分配资源、评价其业绩。在经营分部的基础上公司确定了 4 个报告分部，分别为公\n司本部、氯化钾生产及销售业务、碳酸锂生产及销售业务、投资业务。这些报告分部是以对外提供不同产品为基础确定的。\n分部报告信息根据各分部向管理层报告时采用的会计政策及计量标准披露，这些计量基础与编制财务报表时的会计与\n计量基础保持一致。\n（2）  报告分部的财务信息\n单 位 ：元\n项目\n期末余额 / 本期发生额\n公司本部 氯化钾生产\n及销售业务\n碳酸锂生产\n及销售业务 投资业务 分部间抵销 合计\n一 . 主营业务收入 2,948,852,813.24 592,742,029.58 - 3,541,594,842.82\n二 . 主营业务成本 - 1,042,992,661.57 398,893,659.47 - -12,819,444.13 1,429,066,876.91\n三 . 资产总额 21,472,762,830.60 4,944,843,351.96 1,830,375,716.94 4,817,328,837.53 -15,373,156,533.78 17,692,154,203.25\n四 . 负债总额 25,288,750.63 1,504,697,907.84 146,352,256.46 1,251,829,771.87 -1,451,356,394.55 1,476,812,292.25\n（3）  公司无报告分部的，或者不能披露各报告分部的资产总额和负债总额的，应说明原因\n（4）  其他说明",
+                    "context_before": null,
+                    "context_after": null,
+                    "match_index": 0
+                  }
+                }
+              ],
+              "source_native": {
+                "name": "分部间抵销",
+                "value": null,
+                "unit": null,
+                "header": "adjustment",
+                "qualifier": null,
+                "footnote_refs": [],
+                "source_aliases": []
+              },
+              "uncertainty": [],
+              "data_status": "research_fixture",
+              "object_type": "Segment",
+              "dimension": "adjustment",
+              "label": "分部间抵销",
+              "row_class": "consolidation_adjustment"
+            },
+            {
+              "schema_version": "company_profile_semantic_object.v1",
+              "record_id": "stage5-7984b64f55aec5213178d67b",
+              "field_id": "operating_cost",
+              "chapter_task": "extract_segment_financials",
+              "report": {
+                "instrument_id": "000408.SZ",
+                "report_id": "1225009932",
+                "document_version": "10350f651693d09a3ed6f203996751624b41bcc330159df69eb29297cdd2d956",
+                "report_period": "2025-12-31",
+                "published_at": "2026-03-13T16:00:00+00:00",
+                "document_type": "annual_report"
+              },
+              "subject_scope": "unclear",
+              "subject_name": null,
+              "subject_basis": null,
+              "reported_period": "2025",
+              "period_type": "duration",
+              "knowledge_time": null,
+              "assertion_class": "reported_fact",
+              "evidence": [
+                {
+                  "evidence_id": "stage5-evidence-75d08a3065e3df91a3462ad7",
+                  "report": {
+                    "instrument_id": "000408.SZ",
+                    "report_id": "1225009932",
+                    "document_version": "10350f651693d09a3ed6f203996751624b41bcc330159df69eb29297cdd2d956",
+                    "report_period": "2025-12-31",
+                    "published_at": "2026-03-13T16:00:00+00:00",
+                    "document_type": "annual_report"
+                  },
+                  "page": 194,
+                  "printed_page_label": null,
+                  "section_title": "principal_business",
+                  "continuation_pages": [],
+                  "subject_evidence_pages": [],
+                  "anchor": {
+                    "anchor_type": "table",
+                    "table_label": "adjustment",
+                    "row_label": "分部间抵销",
+                    "column_header": "二 . 主营业务成本",
+                    "cell_locator": null
+                  }
+                }
+              ],
+              "source_native": {
+                "name": "分部间抵销",
+                "value": "-12,819,444.13",
+                "unit": "元",
+                "header": "二 . 主营业务成本",
+                "qualifier": null,
+                "footnote_refs": [],
+                "source_aliases": []
+              },
+              "uncertainty": [],
+              "data_status": "research_fixture",
+              "object_type": "Measurement",
+              "metric_type": "operating_cost",
+              "logical_slot": "cost",
+              "measured_object": "分部间抵销",
+              "segment_dimension": "adjustment",
+              "segment_label": "分部间抵销",
+              "capacity_kind": null,
+              "processing_direction": null,
+              "row_class": "consolidation_adjustment",
+              "is_restated_comparative": false,
+              "comparison_basis": null,
+              "relationship_context": null
+            }
+          ],
+          "dispositions": [
+            {
+              "target_id": "stage5-13de6172564e1c657183bb6d",
+              "field_id": "operating_cost",
+              "status": "accepted_for_review",
+              "reason_codes": []
+            },
+            {
+              "target_id": "stage5-203b159642743eadfb553212",
+              "field_id": "operating_revenue",
+              "status": "accepted_for_review",
+              "reason_codes": []
+            },
+            {
+              "target_id": "stage5-7984b64f55aec5213178d67b",
+              "field_id": "operating_cost",
+              "status": "accepted_for_review",
+              "reason_codes": []
+            },
+            {
+              "target_id": "stage5-7d872ba9d5d481b52d287bb8",
+              "field_id": "operating_cost",
+              "status": "accepted_for_review",
+              "reason_codes": []
+            },
+            {
+              "target_id": "stage5-a59f2aaa5384a0cca30d146f",
+              "field_id": "segment_dimension",
+              "status": "accepted_for_review",
+              "reason_codes": []
+            },
+            {
+              "target_id": "stage5-c22e6212138675c202a78c87",
+              "field_id": "segment_dimension",
+              "status": "accepted_for_review",
+              "reason_codes": []
+            },
+            {
+              "target_id": "stage5-d717f49da656be71f274434b",
+              "field_id": "operating_revenue",
+              "status": "accepted_for_review",
+              "reason_codes": []
+            },
+            {
+              "target_id": "stage5-ff862808130621549af8808a",
+              "field_id": "segment_dimension",
+              "status": "accepted_for_review",
+              "reason_codes": []
+            }
+          ],
+          "coverage": [
+            {
+              "schema_version": "company_profile_coverage_result.v1",
+              "field_id": "segment_dimension",
+              "chapter_task": "extract_segment_financials",
+              "requirement_level": "required",
+              "status": "observed",
+              "reason_code": null,
+              "reason": null,
+              "evidence": [],
+              "reason_evidence_text": null
+            },
+            {
+              "schema_version": "company_profile_coverage_result.v1",
+              "field_id": "operating_revenue",
+              "chapter_task": "extract_segment_financials",
+              "requirement_level": "conditional",
+              "status": "observed",
+              "reason_code": null,
+              "reason": null,
+              "evidence": [],
+              "reason_evidence_text": null
+            },
+            {
+              "schema_version": "company_profile_coverage_result.v1",
+              "field_id": "operating_cost",
+              "chapter_task": "extract_segment_financials",
+              "requirement_level": "conditional",
+              "status": "observed",
+              "reason_code": null,
+              "reason": null,
+              "evidence": [],
+              "reason_evidence_text": null
+            }
+          ],
+          "human_review_items": [],
+          "task_complete": true,
+          "provider_calls": [
+            "extract",
+            "verify"
+          ],
+          "production_authorization": "not_authorized"
+        },
+        "provider_call_types": [
+          "extract",
+          "verify"
+        ],
+        "provider_traces": [
+          {
+            "call_type": "extract",
+            "semantic_request_id": "manufacturing-materials-shadow-segment-heading-binding-20260911-a:segment_financials-02:manufacturing-materials-shadow-000408-2025:segment_financials-02",
+            "gateway_request_id": "33c9838c02fa46deb8398fc308d68160",
+            "status": "success",
+            "profile": "semantic_extraction__scorpio_gemini",
+            "provider": "openai_compatible",
+            "model": "gemini-3.8-flash-high",
+            "response_hash": "e3dbba2eef29bc73d6223536fb3264746d795d9c85959ac285837a08949a1f77",
+            "latency_ms": 80815,
+            "input_tokens": 3118,
+            "output_tokens": 25224,
+            "total_tokens": 28342,
+            "warnings": [
+              "provider_output_budget_exceeded",
+              "provider_output_budget_exceeded_valid_response"
+            ],
+            "error_code": null,
+            "error_detail": null,
+            "parent_semantic_request_id": null,
+            "partition_index": null,
+            "partition_count": null
+          },
+          {
+            "call_type": "verify",
+            "semantic_request_id": "manufacturing-materials-shadow-segment-heading-binding-20260911-a:segment_financials-02:manufacturing-materials-shadow-000408-2025:segment_financials-02:verify",
+            "gateway_request_id": "0dd713a0d4594b87b4305b382fefb33c",
+            "status": "success",
+            "profile": "semantic_extraction__scorpio_gemini",
+            "provider": "openai_compatible",
+            "model": "gemini-3.8-flash-high",
+            "response_hash": "5bdc0d6de85107a10b729ab46c3784bc658cab957c9edf95705ffa41d6851cb0",
+            "latency_ms": 16137,
+            "input_tokens": 6578,
+            "output_tokens": 4790,
+            "total_tokens": 11368,
+            "warnings": [],
+            "error_code": null,
+            "error_detail": null,
+            "parent_semantic_request_id": null,
+            "partition_index": null,
+            "partition_count": null
+          }
+        ]
+      }
+    ],
+    "research_view": {
+      "schema_version": "company_profile_research_view.v1",
+      "production_authorization": "not_authorized",
+      "data_status": "research_fixture",
+      "company": {
+        "instrument_id": "000408.SZ",
+        "name": "藏格矿业"
+      },
+      "as_of": {
+        "report_id": "1225009932",
+        "report_period": "2025-12-31",
+        "published_at": "2026-03-13T16:00:00+00:00",
+        "document_version": "10350f651693d09a3ed6f203996751624b41bcc330159df69eb29297cdd2d956"
+      },
+      "business_overview": null,
+      "business_regime": [],
+      "segments": [
+        {
+          "record_id": "stage5-a59f2aaa5384a0cca30d146f",
+          "field_id": "segment_dimension",
+          "object_type": "Segment",
+          "assertion_class": "reported_fact",
+          "subject_scope": "business_segment",
+          "reported_period": "2025",
+          "source_native": {
+            "name": "氯化钾生产及销售业务",
+            "value": null,
+            "unit": null,
+            "header": "报告分部的财务信息",
+            "qualifier": null,
+            "footnote_refs": [],
+            "source_aliases": []
+          },
+          "evidence_ids": [
+            "stage5-evidence-75d08a3065e3df91a3462ad7"
+          ],
+          "confidence": "medium",
+          "details": {
+            "subject_name": null,
+            "subject_basis": "unclear",
+            "dimension": "报告分部的财务信息",
+            "label": "氯化钾生产及销售业务",
+            "row_class": null,
+            "usage": {
+              "display": true,
+              "consolidated_aggregation": false,
+              "ranking": false,
+              "cross_company_comparison": false
+            },
+            "usage_restriction_reason": "segment_identity_is_not_group_total"
+          }
+        },
+        {
+          "record_id": "stage5-c22e6212138675c202a78c87",
+          "field_id": "segment_dimension",
+          "object_type": "Segment",
+          "assertion_class": "reported_fact",
+          "subject_scope": "unclear",
+          "reported_period": "2025",
+          "source_native": {
+            "name": "分部间抵销",
+            "value": null,
+            "unit": null,
+            "header": "adjustment",
+            "qualifier": null,
+            "footnote_refs": [],
+            "source_aliases": []
+          },
+          "evidence_ids": [
+            "stage5-evidence-75d08a3065e3df91a3462ad7"
+          ],
+          "confidence": "medium",
+          "details": {
+            "subject_name": null,
+            "subject_basis": null,
+            "dimension": "adjustment",
+            "label": "分部间抵销",
+            "row_class": "consolidation_adjustment",
+            "usage": {
+              "display": true,
+              "consolidated_aggregation": false,
+              "ranking": false,
+              "cross_company_comparison": false
+            },
+            "usage_restriction_reason": "segment_identity_is_not_group_total"
+          }
+        },
+        {
+          "record_id": "stage5-ff862808130621549af8808a",
+          "field_id": "segment_dimension",
+          "object_type": "Segment",
+          "assertion_class": "reported_fact",
+          "subject_scope": "business_segment",
+          "reported_period": "2025",
+          "source_native": {
+            "name": "碳酸锂生产及销售业务",
+            "value": null,
+            "unit": null,
+            "header": "报告分部的财务信息",
+            "qualifier": null,
+            "footnote_refs": [],
+            "source_aliases": []
+          },
+          "evidence_ids": [
+            "stage5-evidence-75d08a3065e3df91a3462ad7"
+          ],
+          "confidence": "medium",
+          "details": {
+            "subject_name": null,
+            "subject_basis": "unclear",
+            "dimension": "报告分部的财务信息",
+            "label": "碳酸锂生产及销售业务",
+            "row_class": null,
+            "usage": {
+              "display": true,
+              "consolidated_aggregation": false,
+              "ranking": false,
+              "cross_company_comparison": false
+            },
+            "usage_restriction_reason": "segment_identity_is_not_group_total"
+          }
+        }
+      ],
+      "activities": [],
+      "operating_measurements": [
+        {
+          "record_id": "stage5-13de6172564e1c657183bb6d",
+          "field_id": "operating_cost",
+          "object_type": "Measurement",
+          "assertion_class": "reported_fact",
+          "subject_scope": "business_segment",
+          "reported_period": "2025",
+          "source_native": {
+            "name": "氯化钾生产及销售业务",
+            "value": "1,042,992,661.57",
+            "unit": "元",
+            "header": "二 . 主营业务成本",
+            "qualifier": null,
+            "footnote_refs": [],
+            "source_aliases": []
+          },
+          "evidence_ids": [
+            "stage5-evidence-75d08a3065e3df91a3462ad7"
+          ],
+          "confidence": "medium",
+          "details": {
+            "subject_name": null,
+            "subject_basis": "unclear",
+            "metric_type": "operating_cost",
+            "logical_slot": "cost",
+            "measured_object": "氯化钾生产及销售业务",
+            "segment_dimension": "报告分部的财务信息",
+            "segment_label": "氯化钾生产及销售业务",
+            "capacity_kind": null,
+            "processing_direction": null,
+            "row_class": null,
+            "is_restated_comparative": false,
+            "comparison_basis": null,
+            "relationship_context": null,
+            "usage": {
+              "display": true,
+              "consolidated_aggregation": false,
+              "ranking": false,
+              "cross_company_comparison": false
+            },
+            "usage_restriction_reason": "subject_scope_not_group_comparable"
+          }
+        },
+        {
+          "record_id": "stage5-203b159642743eadfb553212",
+          "field_id": "operating_revenue",
+          "object_type": "Measurement",
+          "assertion_class": "reported_fact",
+          "subject_scope": "business_segment",
+          "reported_period": "2025",
+          "source_native": {
+            "name": "碳酸锂生产及销售业务",
+            "value": "592,742,029.58",
+            "unit": "元",
+            "header": "一 . 主营业务收入",
+            "qualifier": null,
+            "footnote_refs": [],
+            "source_aliases": []
+          },
+          "evidence_ids": [
+            "stage5-evidence-75d08a3065e3df91a3462ad7"
+          ],
+          "confidence": "medium",
+          "details": {
+            "subject_name": null,
+            "subject_basis": "unclear",
+            "metric_type": "operating_revenue",
+            "logical_slot": "revenue",
+            "measured_object": "碳酸锂生产及销售业务",
+            "segment_dimension": "报告分部的财务信息",
+            "segment_label": "碳酸锂生产及销售业务",
+            "capacity_kind": null,
+            "processing_direction": null,
+            "row_class": null,
+            "is_restated_comparative": false,
+            "comparison_basis": null,
+            "relationship_context": null,
+            "usage": {
+              "display": true,
+              "consolidated_aggregation": false,
+              "ranking": false,
+              "cross_company_comparison": false
+            },
+            "usage_restriction_reason": "subject_scope_not_group_comparable"
+          }
+        },
+        {
+          "record_id": "stage5-7984b64f55aec5213178d67b",
+          "field_id": "operating_cost",
+          "object_type": "Measurement",
+          "assertion_class": "reported_fact",
+          "subject_scope": "unclear",
+          "reported_period": "2025",
+          "source_native": {
+            "name": "分部间抵销",
+            "value": "-12,819,444.13",
+            "unit": "元",
+            "header": "二 . 主营业务成本",
+            "qualifier": null,
+            "footnote_refs": [],
+            "source_aliases": []
+          },
+          "evidence_ids": [
+            "stage5-evidence-75d08a3065e3df91a3462ad7"
+          ],
+          "confidence": "medium",
+          "details": {
+            "subject_name": null,
+            "subject_basis": null,
+            "metric_type": "operating_cost",
+            "logical_slot": "cost",
+            "measured_object": "分部间抵销",
+            "segment_dimension": "adjustment",
+            "segment_label": "分部间抵销",
+            "capacity_kind": null,
+            "processing_direction": null,
+            "row_class": "consolidation_adjustment",
+            "is_restated_comparative": false,
+            "comparison_basis": null,
+            "relationship_context": null,
+            "usage": {
+              "display": true,
+              "consolidated_aggregation": false,
+              "ranking": false,
+              "cross_company_comparison": false
+            },
+            "usage_restriction_reason": "unclear_subject_scope_restricted_from_consolidated_use"
+          }
+        },
+        {
+          "record_id": "stage5-7d872ba9d5d481b52d287bb8",
+          "field_id": "operating_cost",
+          "object_type": "Measurement",
+          "assertion_class": "reported_fact",
+          "subject_scope": "business_segment",
+          "reported_period": "2025",
+          "source_native": {
+            "name": "碳酸锂生产及销售业务",
+            "value": "398,893,659.47",
+            "unit": "元",
+            "header": "二 . 主营业务成本",
+            "qualifier": null,
+            "footnote_refs": [],
+            "source_aliases": []
+          },
+          "evidence_ids": [
+            "stage5-evidence-75d08a3065e3df91a3462ad7"
+          ],
+          "confidence": "medium",
+          "details": {
+            "subject_name": null,
+            "subject_basis": "unclear",
+            "metric_type": "operating_cost",
+            "logical_slot": "cost",
+            "measured_object": "碳酸锂生产及销售业务",
+            "segment_dimension": "报告分部的财务信息",
+            "segment_label": "碳酸锂生产及销售业务",
+            "capacity_kind": null,
+            "processing_direction": null,
+            "row_class": null,
+            "is_restated_comparative": false,
+            "comparison_basis": null,
+            "relationship_context": null,
+            "usage": {
+              "display": true,
+              "consolidated_aggregation": false,
+              "ranking": false,
+              "cross_company_comparison": false
+            },
+            "usage_restriction_reason": "subject_scope_not_group_comparable"
+          }
+        },
+        {
+          "record_id": "stage5-d717f49da656be71f274434b",
+          "field_id": "operating_revenue",
+          "object_type": "Measurement",
+          "assertion_class": "reported_fact",
+          "subject_scope": "business_segment",
+          "reported_period": "2025",
+          "source_native": {
+            "name": "氯化钾生产及销售业务",
+            "value": "2,948,852,813.24",
+            "unit": "元",
+            "header": "一 . 主营业务收入",
+            "qualifier": null,
+            "footnote_refs": [],
+            "source_aliases": []
+          },
+          "evidence_ids": [
+            "stage5-evidence-75d08a3065e3df91a3462ad7"
+          ],
+          "confidence": "medium",
+          "details": {
+            "subject_name": null,
+            "subject_basis": "unclear",
+            "metric_type": "operating_revenue",
+            "logical_slot": "revenue",
+            "measured_object": "氯化钾生产及销售业务",
+            "segment_dimension": "报告分部的财务信息",
+            "segment_label": "氯化钾生产及销售业务",
+            "capacity_kind": null,
+            "processing_direction": null,
+            "row_class": null,
+            "is_restated_comparative": false,
+            "comparison_basis": null,
+            "relationship_context": null,
+            "usage": {
+              "display": true,
+              "consolidated_aggregation": false,
+              "ranking": false,
+              "cross_company_comparison": false
+            },
+            "usage_restriction_reason": "subject_scope_not_group_comparable"
+          }
+        }
+      ],
+      "disclosed_inputs": [],
+      "counterparties": [],
+      "business_events": [],
+      "coverage": [
+        {
+          "schema_version": "company_profile_coverage_result.v1",
+          "field_id": "operating_cost",
+          "chapter_task": "extract_segment_financials",
+          "requirement_level": "conditional",
+          "status": "observed",
+          "reason_code": null,
+          "reason": null,
+          "evidence": [],
+          "reason_evidence_text": null
+        },
+        {
+          "schema_version": "company_profile_coverage_result.v1",
+          "field_id": "operating_revenue",
+          "chapter_task": "extract_segment_financials",
+          "requirement_level": "conditional",
+          "status": "observed",
+          "reason_code": null,
+          "reason": null,
+          "evidence": [],
+          "reason_evidence_text": null
+        },
+        {
+          "schema_version": "company_profile_coverage_result.v1",
+          "field_id": "segment_dimension",
+          "chapter_task": "extract_segment_financials",
+          "requirement_level": "required",
+          "status": "observed",
+          "reason_code": null,
+          "reason": null,
+          "evidence": [],
+          "reason_evidence_text": null
+        }
+      ],
+      "commodity_exposure": {
+        "status": "not_assessed",
+        "facts": [],
+        "supported_statements": []
+      },
+      "value_chain_position": {
+        "status": "insufficient_evidence",
+        "facts": [],
+        "supported_statements": []
+      },
+      "evidence_index": [
+        {
+          "evidence_id": "stage5-evidence-75d08a3065e3df91a3462ad7",
+          "report": {
+            "instrument_id": "000408.SZ",
+            "report_id": "1225009932",
+            "document_version": "10350f651693d09a3ed6f203996751624b41bcc330159df69eb29297cdd2d956",
+            "report_period": "2025-12-31",
+            "published_at": "2026-03-13T16:00:00+00:00",
+            "document_type": "annual_report"
+          },
+          "page": 194,
+          "printed_page_label": null,
+          "section_title": "principal_business",
+          "continuation_pages": [],
+          "subject_evidence_pages": [],
+          "anchor": {
+            "anchor_type": "table",
+            "table_label": "报告分部的财务信息",
+            "row_label": "碳酸锂生产及销售业务",
+            "column_header": "报告分部的财务信息",
+            "cell_locator": null
+          }
+        }
+      ]
+    },
+    "report_status": "hold",
+    "benchmark": {
+      "decision": "hold",
+      "dimensions": [
+        {
+          "name": "task_completion",
+          "passed": true,
+          "blocker_codes": [],
+          "details": {
+            "incomplete_request_ids": []
+          }
+        },
+        {
+          "name": "subject_resolution",
+          "passed": true,
+          "blocker_codes": [],
+          "details": {
+            "unclear_subject_record_ids": [
+              "stage5-c22e6212138675c202a78c87",
+              "stage5-7984b64f55aec5213178d67b"
+            ],
+            "unclear_is_non_blocking": true
+          }
+        },
+        {
+          "name": "core_chapter:extract_business_overview",
+          "passed": false,
+          "blocker_codes": [
+            "required_core_chapter_incomplete"
+          ],
+          "details": {
+            "failures": [
+              "missing_scope"
+            ],
+            "required_fields": []
+          }
+        },
+        {
+          "name": "core_chapter:extract_segment_financials",
+          "passed": true,
+          "blocker_codes": [],
+          "details": {
+            "failures": [],
+            "required_fields": [
+              "segment_dimension"
+            ]
+          }
+        },
+        {
+          "name": "core_chapter:extract_operating_quantities",
+          "passed": false,
+          "blocker_codes": [
+            "required_core_chapter_incomplete"
+          ],
+          "details": {
+            "failures": [
+              "missing_scope"
+            ],
+            "required_fields": []
+          }
+        },
+        {
+          "name": "core_chapter:extract_material_inputs",
+          "passed": false,
+          "blocker_codes": [
+            "required_core_chapter_incomplete"
+          ],
+          "details": {
+            "failures": [
+              "missing_scope"
+            ],
+            "required_fields": []
+          }
+        },
+        {
+          "name": "core_chapter:extract_counterparties_and_concentration",
+          "passed": false,
+          "blocker_codes": [
+            "required_core_chapter_incomplete"
+          ],
+          "details": {
+            "failures": [
+              "missing_scope"
+            ],
+            "required_fields": []
+          }
+        },
+        {
+          "name": "core_chapter:extract_business_regime",
+          "passed": false,
+          "blocker_codes": [
+            "required_core_chapter_incomplete"
+          ],
+          "details": {
+            "failures": [
+              "missing_scope"
+            ],
+            "required_fields": []
+          }
+        },
+        {
+          "name": "production_isolation",
+          "passed": true,
+          "blocker_codes": [],
+          "details": {}
+        },
+        {
+          "name": "bounded_provider_calls",
+          "passed": true,
+          "blocker_codes": [],
+          "details": {}
+        }
+      ],
+      "gold_evaluation_only": true
+    },
+    "created_at": "2026-09-11T08:17:27.991102+00:00"
+  },
+  "historical_bundle_mutated": false,
+  "batch_readiness_recomputed": false,
+  "production_authorization": "not_authorized"
+}

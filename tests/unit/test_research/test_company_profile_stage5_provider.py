@@ -59,6 +59,7 @@ from research.company_profile.stage5_provider import (
     _normalize_segment_partition_reported_period,
     _segment_dimension_options,
     _segment_partition_request,
+    _unique_segment_scope_heading,
 )
 from research.company_profile.workflow import (
     CompanyProfileSemanticService,
@@ -2434,18 +2435,136 @@ def test_segment_dimension_options_preserve_complete_report_segment_headings() -
     )
 
     options = _segment_dimension_options(prepared)
-    schema_text = json.dumps(
-        _minimal_extract_schema(
-            _segment_extract_request(prepared), prepared_scope=prepared
-        ),
-        ensure_ascii=False,
+    schema = _minimal_extract_schema(
+        _segment_extract_request(prepared), prepared_scope=prepared
     )
+    row_schema = schema["properties"]["items"]["items"]["oneOf"][0][
+        "properties"
+    ]["row"]
 
     assert "报告分部的财务信息" in options
     assert "报告分部的确定依据与会计政策" not in options
     assert "报告分部" not in options
-    assert '"报告分部的财务信息"' in schema_text
-    assert '"报告分部的确定依据与会计政策"' not in schema_text
+    assert _unique_segment_scope_heading(prepared) == "报告分部的财务信息"
+    assert "dimension" not in row_schema["properties"]
+    assert "dimension" not in row_schema["required"]
+
+
+@pytest.mark.parametrize(
+    ("source_text", "expected_options"),
+    [
+        (
+            "分产品 动力电池系统 100 80 分地区 境内 90 70",
+            {"分产品", "分地区"},
+        ),
+        ("业务板块 动力电池系统 100 80", set()),
+    ],
+)
+def test_ambiguous_or_missing_segment_heading_remains_provider_owned(
+    source_text: str,
+    expected_options: set[str],
+) -> None:
+    prepared = _segment_prepared_scope()
+    evidence = prepared.evidence_bundle[0].evidence.model_copy(
+        update={"anchor": TextAnchor(bounded_quote=source_text)}
+    )
+    prepared = prepared.model_copy(
+        update={
+            "evidence_bundle": (PreparedEvidence(evidence=evidence),),
+            "source_row_dimensions": {},
+            "page_contexts": (
+                prepared.page_contexts[0].model_copy(update={"text": source_text}),
+            ),
+        }
+    )
+
+    schema = _minimal_extract_schema(
+        _segment_extract_request(prepared), prepared_scope=prepared
+    )
+    row_schema = schema["properties"]["items"]["items"]["oneOf"][0][
+        "properties"
+    ]["row"]
+
+    assert _unique_segment_scope_heading(prepared) is None
+    assert set(_segment_dimension_options(prepared)) == expected_options
+    assert "dimension" in row_schema["properties"]
+    assert "dimension" in row_schema["required"]
+
+
+def test_unique_segment_heading_expands_dimension_free_failure_shape() -> None:
+    prepared = _segment_prepared_scope()
+    source_text = (
+        "6、分部信息\n"
+        "（1）报告分部的确定依据与会计政策\n"
+        "（2）报告分部的财务信息\n"
+        "项目 动力电池系统\n"
+        "营业收入 316,506,369\n"
+        "营业成本 241,064,397\n"
+        "毛利率 23.84%"
+    )
+    evidence = prepared.evidence_bundle[0].evidence.model_copy(
+        update={"anchor": TextAnchor(bounded_quote=source_text)}
+    )
+    prepared = prepared.model_copy(
+        update={
+            "evidence_bundle": (PreparedEvidence(evidence=evidence),),
+            "source_row_dimensions": {},
+            "page_contexts": (
+                prepared.page_contexts[0].model_copy(update={"text": source_text}),
+            ),
+        }
+    )
+    request = _segment_extract_request(prepared)
+
+    expanded = _normalize_extract_response(
+        _segment_row_response(
+            request_id=request.request_id,
+            evidence_id=evidence.evidence_id,
+        ),
+        request=request,
+        prepared_scope=prepared,
+    )
+
+    candidates = [item["candidate"] for item in expanded["items"]]
+    assert [item["field_id"] for item in candidates] == [
+        "segment_dimension",
+        "operating_revenue",
+    ]
+    assert all(
+        item.get("dimension", item.get("segment_dimension"))
+        == "报告分部的财务信息"
+        for item in candidates
+    )
+    assert candidates[0]["source_native"]["header"] == "报告分部的财务信息"
+    assert candidates[1]["evidence"][0]["anchor"]["table_label"] == (
+        "报告分部的财务信息"
+    )
+
+
+def test_unique_segment_heading_rejects_provider_dimension_prefix() -> None:
+    prepared = _segment_prepared_scope()
+    source_text = "报告分部的财务信息 动力电池系统 316,506,369"
+    evidence = prepared.evidence_bundle[0].evidence.model_copy(
+        update={"anchor": TextAnchor(bounded_quote=source_text)}
+    )
+    prepared = prepared.model_copy(
+        update={
+            "evidence_bundle": (PreparedEvidence(evidence=evidence),),
+            "source_row_dimensions": {},
+        }
+    )
+    request = _segment_extract_request(prepared)
+
+    with pytest.raises(ValueError, match="controlled Evidence binds it locally"):
+        _normalize_extract_response(
+            _segment_row_response(
+                request_id=request.request_id,
+                evidence_id=evidence.evidence_id,
+                dimension="报告分部",
+            ),
+            request=request,
+            prepared_scope=prepared,
+        )
 
 
 def test_business_event_keeps_occurrence_effective_and_knowledge_time_separate() -> (
@@ -2899,7 +3018,6 @@ def test_segment_dimension_heading_can_precede_cited_continuation_row() -> None:
     compact = _segment_row_response(
         request_id=request.request_id,
         evidence_id=row_evidence.evidence_id,
-        dimension="分产品",
     )
 
     expanded = _normalize_extract_response(
@@ -2931,7 +3049,10 @@ def test_consolidation_adjustment_normalizes_internal_dimension() -> None:
     evidence = prepared.evidence_bundle[0].evidence.model_copy(
         update={
             "anchor": TextAnchor(
-                bounded_quote="分行业 分部间抵销 -61,069,781 -60,974,432 0.16%"
+                bounded_quote=(
+                    "报告分部的财务信息 "
+                    "分部间抵销 -61,069,781 -60,974,432 0.16%"
+                )
             )
         }
     )
@@ -2945,7 +3066,6 @@ def test_consolidation_adjustment_normalizes_internal_dimension() -> None:
     compact = _segment_row_response(
         request_id=request.request_id,
         evidence_id=evidence.evidence_id,
-        dimension="分产品",
         label="分部间抵销",
         row_class="consolidation_adjustment",
     )
@@ -2958,6 +3078,91 @@ def test_consolidation_adjustment_normalizes_internal_dimension() -> None:
 
     assert expanded["items"][0]["candidate"]["dimension"] == "adjustment"
     assert expanded["items"][0]["candidate"]["row_class"] == "consolidation_adjustment"
+
+
+def test_unique_segment_heading_merges_dimension_free_partitions() -> None:
+    prepared = _high_cardinality_segment_prepared_scope()
+    source_text = prepared.page_contexts[0].text.replace(
+        "分产品", "报告分部的财务信息"
+    )
+    evidence = prepared.evidence_bundle[0].evidence.model_copy(
+        update={"anchor": TextAnchor(bounded_quote=source_text)}
+    )
+    prepared = prepared.model_copy(
+        update={
+            "evidence_bundle": (PreparedEvidence(evidence=evidence),),
+            "source_row_dimensions": {},
+            "page_contexts": (
+                prepared.page_contexts[0].model_copy(update={"text": source_text}),
+            ),
+        }
+    )
+    request = _segment_extract_request(prepared)
+    partitions = tuple(
+        (
+            partition_request,
+            _segment_partition_response(
+                request_id=partition_request.request_id,
+                evidence_id=evidence.evidence_id,
+                metric_field=metric,
+            ),
+        )
+        for index, metric in enumerate(
+            ("operating_revenue", "operating_cost"),
+            start=1,
+        )
+        for partition_request in (
+            _segment_partition_request(
+                request,
+                fields=("segment_dimension", metric),
+                partition_index=index,
+                partition_count=2,
+            ),
+        )
+    )
+
+    merged = _merge_segment_partition_responses(
+        request,
+        partitions,
+        prepared_scope=prepared,
+    )
+    expanded = _normalize_extract_response(
+        merged,
+        request=request,
+        prepared_scope=prepared,
+    )
+
+    assert "dimension" not in merged["items"][0]["row"]
+    candidates = [item["candidate"] for item in expanded["items"]]
+    assert [item["field_id"] for item in candidates] == [
+        "segment_dimension",
+        "operating_revenue",
+        "operating_cost",
+    ]
+    assert candidates[0]["dimension"] == "报告分部的财务信息"
+
+
+def test_explicit_source_row_dimensions_remain_authoritative() -> None:
+    prepared = _segment_prepared_scope()
+    request = _segment_extract_request(prepared)
+    schema = _minimal_extract_schema(request, prepared_scope=prepared)
+    row_schema = schema["properties"]["items"]["items"]["oneOf"][0][
+        "properties"
+    ]["row"]
+
+    assert _unique_segment_scope_heading(prepared) is None
+    assert "dimension" not in row_schema["properties"]
+    assert row_schema["properties"]["label"] == {"enum": ["动力电池系统"]}
+
+    expanded = _normalize_extract_response(
+        _segment_row_response(
+            request_id=request.request_id,
+            evidence_id=prepared.evidence_bundle[0].evidence.evidence_id,
+        ),
+        request=request,
+        prepared_scope=prepared,
+    )
+    assert expanded["items"][0]["candidate"]["dimension"] == "分产品"
 
 
 def test_consolidation_adjustment_requires_explicit_adjustment_label() -> None:
@@ -2977,7 +3182,6 @@ def test_consolidation_adjustment_requires_explicit_adjustment_label() -> None:
     compact = _segment_row_response(
         request_id=request.request_id,
         evidence_id=evidence.evidence_id,
-        dimension="分产品",
         label="新能源电池材料与服务",
         row_class="consolidation_adjustment",
     )
@@ -3938,7 +4142,6 @@ def _consolidation_adjustment_verify_request() -> tuple[
     compact = _segment_row_response(
         request_id=extract_request.request_id,
         evidence_id=evidence.evidence_id,
-        dimension="分产品",
         label="合并抵消项",
         row_class="consolidation_adjustment",
     )

@@ -496,6 +496,31 @@ def _segment_dimension_options(
     return options
 
 
+def _unique_segment_scope_heading(
+    prepared_scope: PreparedRequestScope | None,
+) -> str | None:
+    """Return the sole complete Evidence heading owned by a segment scope."""
+
+    if prepared_scope is None or prepared_scope.source_row_dimensions:
+        return None
+    headings = [
+        option
+        for option in _segment_dimension_options(prepared_scope)
+        if option != "adjustment"
+    ]
+    return headings[0] if len(headings) == 1 else None
+
+
+def _locally_bound_segment_dimension(
+    prepared_scope: PreparedRequestScope,
+    *,
+    label: str,
+) -> str | None:
+    if prepared_scope.source_row_dimensions:
+        return prepared_scope.source_row_dimensions.get(label)
+    return _unique_segment_scope_heading(prepared_scope)
+
+
 def _segment_row_extract_schema(
     request: SemanticTaskRequest,
     *,
@@ -515,8 +540,14 @@ def _segment_row_extract_schema(
     source_row_dimensions = (
         prepared_scope.source_row_dimensions if prepared_scope is not None else {}
     )
+    unique_scope_heading = _unique_segment_scope_heading(prepared_scope)
+    dimension_is_locally_bound = bool(source_row_dimensions) or bool(
+        unique_scope_heading
+    )
     dimension_options = (
-        [] if source_row_dimensions else _segment_dimension_options(prepared_scope)
+        []
+        if dimension_is_locally_bound
+        else _segment_dimension_options(prepared_scope)
     )
     candidate_evidence_ids = (
         [
@@ -535,7 +566,7 @@ def _segment_row_extract_schema(
         "evidence_ids",
         "cells",
     ]
-    if not source_row_dimensions:
+    if not dimension_is_locally_bound:
         required.insert(0, "dimension")
     row_schema = {
         "type": "object",
@@ -586,7 +617,7 @@ def _segment_row_extract_schema(
             },
         },
     }
-    if not source_row_dimensions:
+    if not dimension_is_locally_bound:
         row_schema["properties"]["dimension"] = (
             {"enum": dimension_options} if dimension_options else {"type": "string"}
         )
@@ -757,9 +788,21 @@ def _merge_segment_partition_responses(
                 label = str(row.get("label") or "").strip()
                 if not label:
                     raise ValueError("segment partition row requires a label")
+                locally_bound_dimension = _locally_bound_segment_dimension(
+                    prepared_scope,
+                    label=label,
+                )
+                if locally_bound_dimension is not None and row.get("dimension") not in (
+                    None,
+                    "",
+                ):
+                    raise ValueError(
+                        "provider must not return dimension when controlled Evidence "
+                        "binds it locally"
+                    )
                 dimension = str(
-                    row.get("dimension")
-                    or prepared_scope.source_row_dimensions.get(label)
+                    locally_bound_dimension
+                    or row.get("dimension")
                     or ""
                 ).strip()
                 if not dimension:
@@ -1852,11 +1895,13 @@ def _validate_segment_row_source_labels(
         raise ValueError(
             f"segment row label has no approved physical dimension mapping: {label!r}"
         )
-    if planned_dimension is not None and row.get("dimension") not in (None, ""):
+    unique_scope_heading = _unique_segment_scope_heading(prepared_scope)
+    locally_bound_dimension = planned_dimension or unique_scope_heading
+    if locally_bound_dimension is not None and row.get("dimension") not in (None, ""):
         raise ValueError(
-            "provider must not return dimension when the evidence plan binds it locally"
+            "provider must not return dimension when controlled Evidence binds it locally"
         )
-    dimension = planned_dimension or str(row.get("dimension") or "")
+    dimension = locally_bound_dimension or str(row.get("dimension") or "")
     if row.get("row_class") == "consolidation_adjustment":
         if not re.search(r"(?:抵[消销]|合并.*抵[消销])", label):
             raise ValueError(
@@ -1869,7 +1914,7 @@ def _validate_segment_row_source_labels(
             "segment dimension must occur in the controlled table Evidence scope: "
             f"{dimension!r}"
         )
-    if planned_dimension is None:
+    if locally_bound_dimension is None:
         normalized_lines = {
             "".join(line.split())
             for line in scope_source_text.splitlines()

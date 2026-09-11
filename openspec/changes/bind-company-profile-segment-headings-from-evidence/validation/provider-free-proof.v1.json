@@ -1,0 +1,30 @@
+{
+  "schema_version": "company_profile_segment_heading_provider_free_proof.v1",
+  "proof_id": "segment-heading-binding-provider-free-20260911-a",
+  "frozen_scope": {
+    "path": "openspec/changes/repair-company-profile-segment-evidence-context-and-output-budget/validation/frozen-prepared-scope.v1.json",
+    "sha256": "75ffe34bc4d8b11bc5e073fa2f69c989cb95407942928ffab129ef73adf84b9e",
+    "sample_id": "manufacturing-materials-shadow-000408-2025",
+    "scope_id": "segment_financials-02",
+    "physical_pages": [
+      194
+    ]
+  },
+  "response_schema_sha256": "cf6c30623e0e5c04a9c38414b53ea09a67417ebcfceb5239a9f1b94050ef9fe8",
+  "compact_response_omits_dimension": true,
+  "bound_dimension": "报告分部的财务信息",
+  "candidate_fields": [
+    "segment_dimension",
+    "operating_revenue",
+    "operating_cost"
+  ],
+  "candidate_record_ids": [
+    "stage5-a59f2aaa5384a0cca30d146f",
+    "stage5-c60248b49fab9450331daea7",
+    "stage5-2f96c7bf3e26781943dcedf7"
+  ],
+  "provider_calls": 0,
+  "historical_bundle_mutated": false,
+  "gold_mutated": false,
+  "production_authorization": "not_authorized"
+}
