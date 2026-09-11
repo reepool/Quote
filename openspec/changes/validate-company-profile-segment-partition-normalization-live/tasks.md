@@ -16,4 +16,4 @@
 ## 4. Closeout
 
 - [x] 4.1 Persist the source-bound result and classify each case as resolved, retained substantive failure, or execution failure without recomputing batch readiness.
-- [ ] 4.2 Record whether a later full-cohort replay is justified, retain `production_authorization=not_authorized`, verify isolated artifacts, and commit/push only this change.
+- [x] 4.2 Record whether a later full-cohort replay is justified, retain `production_authorization=not_authorized`, verify isolated artifacts, and commit/push only this change.
