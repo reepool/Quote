@@ -4210,6 +4210,11 @@ class CctdaBspiPortPriceProvider:
         )
         title_value_recoveries = 0
         out_of_range_articles = 0
+        late_published_retained = 0
+        period_lag_exceeded = 0
+        max_period_lag_days = max(
+            1, int(self.source_cfg.get("max_period_lag_days") or 60)
+        )
         for index, article in enumerate(articles, start=1):
             try:
                 parsed = self.parse_article(
@@ -4242,9 +4247,17 @@ class CctdaBspiPortPriceProvider:
             else:
                 parsed_article_count += 1
                 observed = date.fromisoformat(parsed["observation_date"])
-                if (start and observed < start) or (end and observed > end):
+                published = _parse_date(parsed.get("publication_date"))
+                if end and observed > end:
                     out_of_range_articles += 1
                     continue
+                if published is not None and observed < published - timedelta(
+                    days=max_period_lag_days
+                ):
+                    period_lag_exceeded += 1
+                    continue
+                if start and observed < start:
+                    late_published_retained += 1
                 if parsed["source_field_alignment"] == "title_value_with_body_period":
                     title_value_recoveries += 1
                 for item in series:
@@ -4301,7 +4314,8 @@ class CctdaBspiPortPriceProvider:
         logger.info(
             "[CctdaBspiPortPrice] fetch done range=%s..%s articles=%s "
             "observations=%s metric_absent=%s title_value_recoveries=%s "
-            "out_of_range=%s warnings=%s blockers=%s",
+            "out_of_range=%s late_published=%s period_lag_exceeded=%s "
+            "warnings=%s blockers=%s",
             start_date,
             end_date,
             len(articles),
@@ -4309,6 +4323,8 @@ class CctdaBspiPortPriceProvider:
             len(reports_without_metric),
             title_value_recoveries,
             out_of_range_articles,
+            late_published_retained,
+            period_lag_exceeded,
             len(warnings),
             len(blockers),
         )
@@ -4326,6 +4342,8 @@ class CctdaBspiPortPriceProvider:
                     "reports_without_metric": len(reports_without_metric),
                     "parse_failures": len(parse_failures),
                     "out_of_range_after_period_parse": out_of_range_articles,
+                    "late_published_retained": late_published_retained,
+                    "period_lag_exceeded": period_lag_exceeded,
                     "title_value_recoveries": title_value_recoveries,
                     "coverage_ratio": (
                         len(observations)
@@ -6709,6 +6727,58 @@ def _is_governed_empty_provider_window(result: CommodityProviderResult) -> bool:
     )
 
 
+def _source_freshness_warnings(
+    series: Sequence[CommoditySeries],
+    observations: Sequence[CommodityObservation],
+    *,
+    latest_stored: Mapping[str, str],
+    source_cfg: Mapping[str, Any],
+    end_date: Optional[str],
+) -> List[Dict[str, Any]]:
+    """Warn from local latest observation age; do not invent missing source dates."""
+    raw_days = source_cfg.get("freshness_warning_days")
+    if raw_days in (None, ""):
+        return []
+    try:
+        freshness_days = int(raw_days)
+    except (TypeError, ValueError):
+        return []
+    if freshness_days <= 0:
+        return []
+    end = _parse_date(end_date)
+    if end is None:
+        return []
+    latest_by_series = {
+        series_id: value
+        for series_id, value in latest_stored.items()
+        if _parse_date(value) is not None
+    }
+    for observation in observations:
+        previous = latest_by_series.get(observation.series_id)
+        if previous is None or observation.observation_date > previous:
+            latest_by_series[observation.series_id] = observation.observation_date
+    warnings: List[Dict[str, Any]] = []
+    for item in series:
+        latest = latest_by_series.get(item.series_id)
+        latest_date = _parse_date(latest)
+        if latest_date is None:
+            continue
+        age_days = (end - latest_date).days
+        if age_days <= freshness_days:
+            continue
+        warnings.append(
+            {
+                "reason": "source_observation_stale",
+                "series_id": item.series_id,
+                "latest_observation_date": latest,
+                "end_date": end_date,
+                "age_days": age_days,
+                "freshness_warning_days": freshness_days,
+            }
+        )
+    return warnings
+
+
 class SourceObservedDateGovernanceAdapter:
     """Build date governance only from source-observed rows."""
 
@@ -8277,6 +8347,11 @@ class SpecialCommodityGovernancePipeline:
         warnings: List[Dict[str, Any]] = []
         blockers: List[Dict[str, Any]] = []
         per_source: Dict[str, Dict[str, Any]] = {}
+        latest_stored = {
+            str(row["series_id"]): str(row["observation_date"])
+            for row in self.storage.latest_observations()
+            if row.get("series_id")
+        }
         for source_profile in sorted({item.source_profile for item in target_series}):
             source_series = [item for item in target_series if item.source_profile == source_profile]
             provider, governance, resolution_blockers = registry.resolve(source_profile)
@@ -8418,6 +8493,21 @@ class SpecialCommodityGovernancePipeline:
             blockers.extend(
                 [{**item, "governance_stage": "date"} for item in date_result.blockers]
             )
+            source_cfg = getattr(governance, "source_cfg", None)
+            if not isinstance(source_cfg, Mapping):
+                source_cfg = (registry.module_cfg.get("source_profiles") or {}).get(
+                    source_profile, {}
+                )
+            freshness_warnings = _source_freshness_warnings(
+                date_series,
+                source_observations,
+                latest_stored=latest_stored,
+                source_cfg=source_cfg,
+                end_date=end_date,
+            )
+            warnings.extend(
+                [{**item, "governance_stage": "date"} for item in freshness_warnings]
+            )
             allowed_keys = {
                 (str(row["series_id"]), str(row["observation_date"]))
                 for row in date_result.calendar_rows
@@ -8462,6 +8552,7 @@ class SpecialCommodityGovernancePipeline:
                 len(master_result.warnings)
                 + len(provider_result.warnings)
                 + len(date_result.warnings)
+                + len(freshness_warnings)
             )
             per_source[source_profile] = {
                 "series": len(source_series),
@@ -8503,7 +8594,11 @@ class SpecialCommodityGovernancePipeline:
             "warning"
             if any(
                 item.get("reason")
-                in {"no_source_observed_dates", "nbs_unresolved_observation_periods"}
+                in {
+                    "no_source_observed_dates",
+                    "nbs_unresolved_observation_periods",
+                    "source_observation_stale",
+                }
                 for item in warnings
             )
             else "success"

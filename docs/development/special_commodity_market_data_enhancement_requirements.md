@@ -99,7 +99,7 @@
 
 CBCFI、CCTDA 环渤海港口库存和 NBS 原煤累计产量的治理前置均走统一主数据、来源观测日/周期、持久化和报告流水线，来源页面解析只存在于各自 provider adapter 内。由于它们不是商品价格，不得加入 `special_commodity_overseas_daily_price_sync`、`special_commodity_domestic_spot_price_sync` 或月度价格任务。工程只保留一个 `special_commodity_industrial_indicator_sync` 产业指标域聚合任务：各 scope 独立声明启用状态、到期日和观测窗口；CBCFI 使用 `provider_latest`，NBS 原煤累计产量使用月度四个月回看窗口，CCTDA 港口库存使用21日滚动窗口，三者均已启用。未来新增产业指标时扩展 scope 和 adapter，不为单个产品或来源新增调度任务。
 
-BSPI 复用同一个主数据、来源周期、持久化和报告流水线，但其语义是周频市场价格，因此使用独立的公开协会价格治理 adapter，不能标成 `industrial_indicator`。`cn_coal_bspi` 已加入既有 `special_commodity_domestic_spot_price_sync` 聚合任务，不新增 BSPI 专项任务；10日滚动窗口覆盖周报发布日期相对报告期末的延迟，应用重启后的首次聚合任务已通过。
+BSPI 复用同一个主数据、来源周期、持久化和报告流水线，但其语义是周频市场价格，因此使用独立的公开协会价格治理 adapter，不能标成 `industrial_indicator`。`cn_coal_bspi` 已加入既有 `special_commodity_domestic_spot_price_sync` 聚合任务，不新增 BSPI 专项任务；10日滚动窗口只约束目录发布日发现范围，新发布且解析成功的周报即使报告期末早于窗口也落库，缺口只按本地最新期末新鲜度告警，不按每个周二对源站扫缺。应用重启后的首次聚合任务已通过。
 
 CCTDA 港口库存 rollout 使用当前唯一的历史观测回补入口，旧任务 `special_commodity_price_backfill` 已删除且不保留别名：
 

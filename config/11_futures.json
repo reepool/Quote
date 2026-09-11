@@ -913,6 +913,8 @@
           "calendar_quality_flag": "association_source_observed",
           "quality_flag": "industry_association_public_web",
           "parser_version": "cctda_bspi_weekly_port_price.v1",
+          "max_period_lag_days": 60,
+          "freshness_warning_days": 14,
           "listing_urls": [
             "https://www.cctda.org.cn/list-6-1.html"
           ],
@@ -927,7 +929,7 @@
           "price_value_max": 3000.0,
           "user_agent": "QuoteSystem/SpecialCommodityMarketData",
           "reuse_policy": "internal_research_factual_observations_only",
-          "note": "Collect only factual weekly BSPI values, explicit report periods, publication dates, and source URLs from public articles. Do not call the robots-disallowed CCTDA structured API, store or redistribute article text, or substitute daily CCTD port spot prices or long-term contract prices."
+          "note": "Collect only factual weekly BSPI values, explicit report periods, publication dates, and source URLs from public articles. Daily discovery stays on the publication-date lookback; keep a newly published article whose report period ended before the window. Warn from local latest observation age only. Do not call the robots-disallowed CCTDA structured API, store or redistribute article text, invent skipped Tuesdays, or substitute daily CCTD port spot prices or long-term contract prices."
         },
         "100ppi_public_web": {
           "venue": "100PPI",
