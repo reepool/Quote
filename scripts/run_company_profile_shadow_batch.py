@@ -223,6 +223,24 @@ SEGMENT_FINANCIAL_REPAIR_SHADOW_REPLAY_CONTRACT = ShadowReplayContract(
     max_provider_calls=ROUTING_CONTINUATION_SHADOW_REPLAY_CONTRACT.max_provider_calls,
 )
 
+RETRY_SEGMENT_FINANCIAL_SHADOW_REPLAY_CONTRACT = ShadowReplayContract(
+    batch_id="manufacturing-materials-shadow-segment-retry-gemini-20260911-a",
+    sample_manifest_hash=SEGMENT_FINANCIAL_REPAIR_SHADOW_REPLAY_CONTRACT.sample_manifest_hash,
+    evidence_plan_version=SEGMENT_FINANCIAL_REPAIR_SHADOW_REPLAY_CONTRACT.evidence_plan_version,
+    evidence_plan_hash=SEGMENT_FINANCIAL_REPAIR_SHADOW_REPLAY_CONTRACT.evidence_plan_hash,
+    preparation_audit_hash=SEGMENT_FINANCIAL_REPAIR_SHADOW_REPLAY_CONTRACT.preparation_audit_hash,
+    correction_audit_hash=SEGMENT_FINANCIAL_REPAIR_SHADOW_REPLAY_CONTRACT.correction_audit_hash,
+    supporting_artifact_hashes={
+        **SEGMENT_FINANCIAL_REPAIR_SHADOW_REPLAY_CONTRACT.supporting_artifact_hashes,
+        "interrupted_attempt": "db406b2bbcec2a1b2029edcfc039817f0c5f60c4b25d7d692cb9a2da8b91f527",
+    },
+    primary_logical_profile=SEGMENT_FINANCIAL_REPAIR_SHADOW_REPLAY_CONTRACT.primary_logical_profile,
+    extract_max_output_tokens=SEGMENT_FINANCIAL_REPAIR_SHADOW_REPLAY_CONTRACT.extract_max_output_tokens,
+    verify_max_output_tokens=SEGMENT_FINANCIAL_REPAIR_SHADOW_REPLAY_CONTRACT.verify_max_output_tokens,
+    timeout_seconds=SEGMENT_FINANCIAL_REPAIR_SHADOW_REPLAY_CONTRACT.timeout_seconds,
+    max_provider_calls=SEGMENT_FINANCIAL_REPAIR_SHADOW_REPLAY_CONTRACT.max_provider_calls,
+)
+
 # The v5 routing/continuation batch is the frozen source of prepared scopes for
 # this replay.  Re-running the historical plan through today's planner would
 # make the replay depend on later planner rules and can reject a scope that was
@@ -251,6 +269,7 @@ def build_parser() -> argparse.ArgumentParser:
             "owner-closure-semantic-replay",
             "routing-continuation-semantic-replay",
             "segment-repair-semantic-replay",
+            "segment-retry-semantic-replay",
         ),
         required=True,
     )
@@ -268,6 +287,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--routing-continuation-cases", type=Path)
     parser.add_argument("--segment-financial-closure-audit", type=Path)
     parser.add_argument("--admission-receipt", type=Path)
+    parser.add_argument("--interrupted-attempt", type=Path)
     parser.add_argument("--source-review-package", type=Path)
     parser.add_argument("--source-review-outcomes", type=Path)
     parser.add_argument("--owner-closure-batch-manifest", type=Path)
@@ -497,7 +517,10 @@ def main(argv: Sequence[str] | None = None) -> int:
         raise ValueError(
             "frozen provider-free preparation audit does not admit this batch"
         )
-    if args.mode == "segment-repair-semantic-replay":
+    if args.mode in {
+        "segment-repair-semantic-replay",
+        "segment-retry-semantic-replay",
+    }:
         frozen_batch = load_shadow_batch_result(ROUTING_CONTINUATION_BATCH / "manifest.json")
         prepared = {
             reference.sample_id: tuple(
@@ -607,7 +630,10 @@ def main(argv: Sequence[str] | None = None) -> int:
             prepared=prepared,
             output_root=args.output_root,
         )
-    elif args.mode == "segment-repair-semantic-replay":
+    elif args.mode in {
+        "segment-repair-semantic-replay",
+        "segment-retry-semantic-replay",
+    }:
         required = {
             "correction audit": args.correction_audit,
             "routing/continuation cases": args.routing_continuation_cases,
@@ -618,6 +644,8 @@ def main(argv: Sequence[str] | None = None) -> int:
             "segment financial closure audit": args.segment_financial_closure_audit,
             "admission receipt": args.admission_receipt,
         }
+        if args.mode == "segment-retry-semantic-replay":
+            required["interrupted attempt"] = args.interrupted_attempt
         missing = [name for name, path in required.items() if path is None]
         if missing:
             raise ValueError(f"{args.mode} requires " + ", ".join(missing))
@@ -656,8 +684,21 @@ def main(argv: Sequence[str] | None = None) -> int:
                 segment_closure_audit.get("audit_hash")
             ),
         }
+        if args.mode == "segment-retry-semantic-replay":
+            if not args.interrupted_attempt.is_file():
+                raise FileNotFoundError(
+                    "interrupted attempt is not a file: "
+                    f"{args.interrupted_attempt}"
+                )
+            supporting_hashes["interrupted_attempt"] = _file_sha256(
+                args.interrupted_attempt
+            )
         validate_shadow_replay_admission(
-            contract=SEGMENT_FINANCIAL_REPAIR_SHADOW_REPLAY_CONTRACT,
+            contract=(
+                RETRY_SEGMENT_FINANCIAL_SHADOW_REPLAY_CONTRACT
+                if args.mode == "segment-retry-semantic-replay"
+                else SEGMENT_FINANCIAL_REPAIR_SHADOW_REPLAY_CONTRACT
+            ),
             batch_id=args.batch_id,
             primary_logical_profile=args.provider_route,
             extract_max_output_tokens=args.extract_max_output_tokens,
@@ -677,8 +718,21 @@ def main(argv: Sequence[str] | None = None) -> int:
                 f"shadow admission receipt already exists: {args.admission_receipt}"
             )
         receipt = build_shadow_replay_admission_receipt(
-            contract=SEGMENT_FINANCIAL_REPAIR_SHADOW_REPLAY_CONTRACT,
+            contract=(
+                RETRY_SEGMENT_FINANCIAL_SHADOW_REPLAY_CONTRACT
+                if args.mode == "segment-retry-semantic-replay"
+                else SEGMENT_FINANCIAL_REPAIR_SHADOW_REPLAY_CONTRACT
+            ),
             output_root=args.output_root,
+            excluded_predecessor=(
+                {
+                    "path": str(args.interrupted_attempt.resolve()),
+                    "sha256": supporting_hashes["interrupted_attempt"],
+                    "excluded_from_retry": True,
+                }
+                if args.mode == "segment-retry-semantic-replay"
+                else None
+            ),
         )
         args.admission_receipt.parent.mkdir(parents=True, exist_ok=True)
         args.admission_receipt.write_text(
@@ -857,6 +911,7 @@ def _validate_replay_mode(
     routing_continuation_plan = SHADOW_EVIDENCE_PLAN_VERSION
     routing_continuation_batch = ROUTING_CONTINUATION_SHADOW_REPLAY_CONTRACT.batch_id
     segment_repair_batch = SEGMENT_FINANCIAL_REPAIR_SHADOW_REPLAY_CONTRACT.batch_id
+    segment_retry_batch = RETRY_SEGMENT_FINANCIAL_SHADOW_REPLAY_CONTRACT.batch_id
     provider_bearing_legacy_modes = {"semantic-run", "refined-semantic-replay"}
     if (
         plan_version == stability_plan or batch_id == stability_batch
@@ -896,11 +951,20 @@ def _validate_replay_mode(
             "segment-repair-semantic-replay"
         )
     if (
+        batch_id == segment_retry_batch
+        and mode != "segment-retry-semantic-replay"
+    ):
+        raise ValueError(
+            "segment retry batch identity requires "
+            "segment-retry-semantic-replay"
+        )
+    if (
         plan_version == routing_continuation_plan
         and mode not in {
             "preparation-only",
             "routing-continuation-semantic-replay",
             "segment-repair-semantic-replay",
+            "segment-retry-semantic-replay",
         }
     ):
         raise ValueError(

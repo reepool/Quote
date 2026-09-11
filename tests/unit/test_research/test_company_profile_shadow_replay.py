@@ -41,6 +41,7 @@ from scripts.run_company_profile_shadow_batch import (
     EXTERNAL_PRECISION_SHADOW_REPLAY_CONTRACT,
     OWNER_CLOSURE_SHADOW_REPLAY_CONTRACT,
     PRECISION_CLOSURE_SHADOW_REPLAY_CONTRACT,
+    RETRY_SEGMENT_FINANCIAL_SHADOW_REPLAY_CONTRACT,
     ROUTING_CONTINUATION_SHADOW_REPLAY_CONTRACT,
     SEGMENT_FINANCIAL_REPAIR_SHADOW_REPLAY_CONTRACT,
     STABILITY_SHADOW_REPLAY_CONTRACT,
@@ -1304,6 +1305,70 @@ def test_segment_repair_replay_mode_is_single_use_and_research_only(
     ) = segment_repair_replay_inputs
     (tmp_path / f"batch-{contract.batch_id}").mkdir()
     with pytest.raises(FileExistsError, match="shadow batch already exists"):
+        validate_shadow_replay_admission(
+            contract=contract,
+            batch_id=contract.batch_id,
+            primary_logical_profile=contract.primary_logical_profile,
+            extract_max_output_tokens=contract.extract_max_output_tokens,
+            verify_max_output_tokens=contract.verify_max_output_tokens,
+            timeout_seconds=contract.timeout_seconds,
+            max_provider_calls=contract.max_provider_calls,
+            manifest=manifest,
+            evidence_plan=plan,
+            preparation_audit=preparation,
+            correction_audit=correction,
+            supporting_artifact_hashes=supporting,
+            prepared=prepared,
+            output_root=tmp_path,
+        )
+
+
+def test_segment_retry_replay_is_distinct_and_binds_interrupted_attempt(
+    tmp_path: Path,
+    segment_repair_replay_inputs,
+) -> None:
+    (
+        manifest,
+        plan,
+        preparation,
+        correction,
+        supporting,
+        prepared,
+        _,
+        _,
+    ) = segment_repair_replay_inputs
+    contract = RETRY_SEGMENT_FINANCIAL_SHADOW_REPLAY_CONTRACT
+    retry_supporting = dict(contract.supporting_artifact_hashes)
+
+    assert contract.batch_id != SEGMENT_FINANCIAL_REPAIR_SHADOW_REPLAY_CONTRACT.batch_id
+    _validate_replay_mode(
+        mode="segment-retry-semantic-replay",
+        plan_version=contract.evidence_plan_version,
+        batch_id=contract.batch_id,
+    )
+    validate_shadow_replay_admission(
+        contract=contract,
+        batch_id=contract.batch_id,
+        primary_logical_profile=contract.primary_logical_profile,
+        extract_max_output_tokens=contract.extract_max_output_tokens,
+        verify_max_output_tokens=contract.verify_max_output_tokens,
+        timeout_seconds=contract.timeout_seconds,
+        max_provider_calls=contract.max_provider_calls,
+        manifest=manifest,
+        evidence_plan=plan,
+        preparation_audit=preparation,
+        correction_audit=correction,
+        supporting_artifact_hashes=retry_supporting,
+        prepared=prepared,
+        output_root=tmp_path,
+    )
+    with pytest.raises(ValueError, match="segment retry batch identity requires"):
+        _validate_replay_mode(
+            mode="segment-repair-semantic-replay",
+            plan_version=contract.evidence_plan_version,
+            batch_id=contract.batch_id,
+        )
+    with pytest.raises(ValueError, match="supporting_artifact_hashes"):
         validate_shadow_replay_admission(
             contract=contract,
             batch_id=contract.batch_id,
