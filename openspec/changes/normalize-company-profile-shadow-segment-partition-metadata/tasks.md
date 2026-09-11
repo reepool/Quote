@@ -11,4 +11,4 @@
 ## 3. Offline validation and closeout
 
 - [x] 3.1 Run focused provider tests, Ruff, immutable batch/hash checks, and an offline failure-class audit; do not call the provider or write the historical batch.
-- [ ] 3.2 Record the repairable versus retained failure classes, keep `not_authorized`, and commit/push only this change's isolated artifacts.
+- [x] 3.2 Record the repairable versus retained failure classes, keep `not_authorized`, and commit/push only this change's isolated artifacts.
