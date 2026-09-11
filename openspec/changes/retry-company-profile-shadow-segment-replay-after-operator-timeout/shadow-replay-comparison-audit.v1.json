@@ -1,0 +1,109 @@
+{
+  "schema_version": "company_profile_shadow_replay_comparison.v1",
+  "audit_id": "manufacturing-materials-shadow-segment-retry-vs-routing-20260911-a",
+  "baseline": {
+    "batch_id": "manufacturing-materials-shadow-routing-continuation-gemini-20260910-a",
+    "source_batch_result_hash": "3cf412c7f5fd980f79970ae7d0560aaafcdffd635a239162731a0a97e637f489",
+    "sample_manifest_hash": "6f639739ef082e78dcb0c01a5ce40bab1645d8fdc027bece2dbef63652bae9e2",
+    "evidence_plan_version": "manufacturing_materials_shadow.2026-09-10.5",
+    "evidence_plan_hash": "d091262f4350ff88779293900f0deb21d7c48da85a3102d7a947fa861ec4eafe",
+    "batch_manifest_file_sha256": "8ce096841eeb44e5d4e975ee7d72a5a6df50b21cdefc731bcbce8058bb187266",
+    "review_package_file_sha256": "7ecb0934e6f44022a5d36c3c28f246ee5c8abbc1f1f522236091a0cb0838ee23",
+    "readiness_audit_file_sha256": "edc0aa63bc93de658978ee871297df19e5691ba82b18fa4ec09722dbbe30c6d6",
+    "persisted_report_count": 20,
+    "report_status_counts": {
+      "hold": 20
+    },
+    "execution_completion_rate": 1.0,
+    "usable_report_rate": 0.0,
+    "accepted_record_count": 672,
+    "evidence_traceability_rate": 1.0,
+    "unresolved_review_median": 14.0,
+    "unresolved_review_p90": 19.0,
+    "provider_call_count": 296,
+    "provider_failed_call_count": 36,
+    "total_latency_ms": 4374969,
+    "total_input_tokens": 1533172,
+    "total_output_tokens": 1083570,
+    "source_review_row_count": 426,
+    "precision_reviewed_count": 0,
+    "sampled_precision": null,
+    "critical_semantic_error_count": 0,
+    "reason_code_counts": {
+      "candidate_schema_invalid": 61,
+      "object_not_allowed": 2,
+      "occurrence_semantic_conflict": 4,
+      "prohibited_inference": 10,
+      "required_coverage_missing": 196
+    },
+    "readiness_decision": "hold"
+  },
+  "refined": {
+    "batch_id": "manufacturing-materials-shadow-segment-retry-gemini-20260911-a",
+    "source_batch_result_hash": "d017e85cb54357807189940cb5ba35580e333003739828d7f065e1124e38408f",
+    "sample_manifest_hash": "6f639739ef082e78dcb0c01a5ce40bab1645d8fdc027bece2dbef63652bae9e2",
+    "evidence_plan_version": "manufacturing_materials_shadow.2026-09-10.5",
+    "evidence_plan_hash": "d091262f4350ff88779293900f0deb21d7c48da85a3102d7a947fa861ec4eafe",
+    "batch_manifest_file_sha256": "7274b13f69bbd2dce0c093f0ae62139f61b70908b13cac537181e7e4f7fe50fb",
+    "review_package_file_sha256": "c2e079f47a7f4d02f0508bf42da4a6cf19d0551f83e55317be1ba0ae31f40964",
+    "readiness_audit_file_sha256": "e532bdf4789ed4ac97a7428489fbeec7214c44c997f60a97ee3acbb763e0970c",
+    "persisted_report_count": 20,
+    "report_status_counts": {
+      "hold": 20
+    },
+    "execution_completion_rate": 1.0,
+    "usable_report_rate": 0.0,
+    "accepted_record_count": 1154,
+    "evidence_traceability_rate": 1.0,
+    "unresolved_review_median": 10.5,
+    "unresolved_review_p90": 17.0,
+    "provider_call_count": 306,
+    "provider_failed_call_count": 36,
+    "total_latency_ms": 4733572,
+    "total_input_tokens": 1835959,
+    "total_output_tokens": 1219338,
+    "source_review_row_count": 357,
+    "precision_reviewed_count": 0,
+    "sampled_precision": null,
+    "critical_semantic_error_count": 0,
+    "reason_code_counts": {
+      "candidate_schema_invalid": 51,
+      "duplicate_occurrence": 1,
+      "occurrence_semantic_conflict": 2,
+      "prohibited_inference": 1,
+      "required_coverage_missing": 154
+    },
+    "readiness_decision": "hold"
+  },
+  "metric_deltas": {
+    "persisted_report_count": 0.0,
+    "execution_completion_rate": 0.0,
+    "usable_report_rate": 0.0,
+    "accepted_record_count": 482.0,
+    "evidence_traceability_rate": 0.0,
+    "unresolved_review_median": -3.5,
+    "unresolved_review_p90": -2.0,
+    "provider_call_count": 10.0,
+    "provider_failed_call_count": 0.0,
+    "total_latency_ms": 358603.0,
+    "total_input_tokens": 302787.0,
+    "total_output_tokens": 135768.0,
+    "source_review_row_count": -69.0,
+    "precision_reviewed_count": 0.0,
+    "critical_semantic_error_count": 0.0
+  },
+  "report_status_deltas": {
+    "hold": 0
+  },
+  "reason_code_deltas": {
+    "candidate_schema_invalid": -10,
+    "duplicate_occurrence": 1,
+    "object_not_allowed": -2,
+    "occurrence_semantic_conflict": -2,
+    "prohibited_inference": -9,
+    "required_coverage_missing": -42
+  },
+  "created_at": "2026-09-11T04:19:21.280250+00:00",
+  "audit_hash": "8aed15e05b083e345be4a1f8bab6fada24d4dc2c24eb0f1181af35b01c17b366",
+  "production_authorization": "not_authorized"
+}

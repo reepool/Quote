@@ -1,0 +1,41 @@
+{
+  "schema_version": "company_profile_shadow_replay_admission_receipt.v1",
+  "batch_id": "manufacturing-materials-shadow-segment-retry-gemini-20260911-a",
+  "contract": {
+    "batch_id": "manufacturing-materials-shadow-segment-retry-gemini-20260911-a",
+    "sample_manifest_hash": "6f639739ef082e78dcb0c01a5ce40bab1645d8fdc027bece2dbef63652bae9e2",
+    "evidence_plan_version": "manufacturing_materials_shadow.2026-09-10.5",
+    "evidence_plan_hash": "d091262f4350ff88779293900f0deb21d7c48da85a3102d7a947fa861ec4eafe",
+    "preparation_audit_hash": "a6a6d1880c5ae58b5f602329ff3c4280e78c60c5a00abb7edf61384dc6c60511",
+    "scope_refinement_audit_hash": null,
+    "correction_audit_hash": "a16ebfc4bf836bbc002ead7a9d1fed5d5d1c1c12212993ad608a920916f76e22",
+    "supporting_artifact_hashes": {
+      "routing_continuation_cases": "d66274a38e7223c97f883823c2b1ffb5450ebdd85203949646e6ca263b9342f9",
+      "source_review_package": "124cb6d9750d93dc676a9316c0411d4e222f5348e5b55ad18cbc307b687c19b1",
+      "source_review_outcomes": "d2e7e39c40ee5b1853373cd1ff0a3dafab9ec688cccb8c250720c15418a5d524",
+      "owner_closure_batch_manifest": "e1a7e343733c1965528460672ec25ab34d8ab9baa56b790596c95d2bf527bbfa",
+      "owner_closure_readiness_audit": "75e3b2fa785bba1a3247bba41b2a583a18049161e77718ba3413bbfe18b31336",
+      "segment_financial_closure_audit": "fedefd4eae5eed10beb6062c587bc9aadc6bc30bf6e3844549416deed6a18626",
+      "segment_financial_closure_audit_internal": "9a08c9203eee674aa3015f05bfd36dafe44cc143c03f657569c367c20edc2c38",
+      "interrupted_attempt": "db406b2bbcec2a1b2029edcfc039817f0c5f60c4b25d7d692cb9a2da8b91f527"
+    },
+    "primary_logical_profile": "semantic_extraction__scorpio_gemini",
+    "extract_max_output_tokens": 20000,
+    "verify_max_output_tokens": 18000,
+    "timeout_seconds": 300.0,
+    "max_provider_calls": 600,
+    "production_authorization": "not_authorized"
+  },
+  "output_root": "/home/python/Quote/var/company_profile_shadow_batch/20260911/batch-manufacturing-materials-shadow-segment-retry-gemini-20260911-a",
+  "output_batch_path": "/home/python/Quote/var/company_profile_shadow_batch/20260911/batch-manufacturing-materials-shadow-segment-retry-gemini-20260911-a/batch-manufacturing-materials-shadow-segment-retry-gemini-20260911-a",
+  "output_absent_before_provider": true,
+  "provider_calls": 0,
+  "cohort_replay_performed": false,
+  "production_authorization": "not_authorized",
+  "excluded_predecessor": {
+    "path": "/home/python/Quote/var/company_profile_shadow_batch/20260910/batch-manufacturing-materials-shadow-segment-repair-gemini-20260910-a/batch-manufacturing-materials-shadow-segment-repair-gemini-20260910-a/reports/manufacturing-materials-shadow-600121-2025.json",
+    "sha256": "db406b2bbcec2a1b2029edcfc039817f0c5f60c4b25d7d692cb9a2da8b91f527",
+    "excluded_from_retry": true
+  },
+  "audit_hash": "7be6c9ab9dded06d509b08fa63f7bdaa1b719067ae805b91aafadd361b841260"
+}

@@ -216,6 +216,7 @@ def build_shadow_replay_admission_receipt(
     *,
     contract: ShadowReplayContract,
     output_root: str | Path,
+    excluded_predecessor: Mapping[str, object] | None = None,
 ) -> dict[str, object]:
     """Build a hash-bound receipt proving replay admission before provider creation."""
 
@@ -232,6 +233,8 @@ def build_shadow_replay_admission_receipt(
         "cohort_replay_performed": False,
         "production_authorization": PRODUCTION_AUTHORIZATION,
     }
+    if excluded_predecessor is not None:
+        payload["excluded_predecessor"] = dict(excluded_predecessor)
     return {**payload, "audit_hash": _payload_hash(payload)}
 
 

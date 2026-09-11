@@ -1386,6 +1386,20 @@ def test_segment_retry_replay_is_distinct_and_binds_interrupted_attempt(
             output_root=tmp_path,
         )
 
+    receipt = build_shadow_replay_admission_receipt(
+        contract=contract,
+        output_root=tmp_path / "fresh-output",
+        excluded_predecessor={
+            "path": "/tmp/interrupted-report.json",
+            "sha256": "a" * 64,
+            "excluded_from_retry": True,
+        },
+    )
+    assert receipt["excluded_predecessor"]["excluded_from_retry"] is True
+    assert receipt["audit_hash"] == _payload_hash(
+        {key: value for key, value in receipt.items() if key != "audit_hash"}
+    )
+
 
 def test_routing_continuation_replay_admission_is_exact_and_research_only(
     tmp_path: Path,

@@ -1,0 +1,23 @@
+{
+  "schema_version": "company_profile_shadow_replay_preflight_receipt.v1",
+  "batch_id": "manufacturing-materials-shadow-segment-retry-gemini-20260911-a",
+  "logical_profile": "semantic_extraction__scorpio_gemini",
+  "path": "authorized_external_sandbox",
+  "request": {
+    "kind": "read_only_connectivity_profile_smoke",
+    "synthetic_text_only": true,
+    "annual_report_content_transmitted": false,
+    "semantic_replay_started": false
+  },
+  "result": {
+    "status": "failed",
+    "code": "deadline_exceeded",
+    "transport_error_type": "client_execution_deadline",
+    "transport_phase": "request",
+    "timeout_seconds": 90.0,
+    "provider_request_id": null,
+    "warning": "authorized external smoke reached the Scorpio request path but did not return before the client deadline"
+  },
+  "production_authorization": "not_authorized",
+  "audit_hash": "f8ca8d469a2179db224c3a7c258ddf287fb6fd510765719ca42056175104c727"
+}
