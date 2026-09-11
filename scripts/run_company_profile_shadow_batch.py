@@ -26,6 +26,8 @@ from research.company_profile.shadow_batch_service import (
     ShadowBatchStore,
     ShadowReplayContract,
     build_shadow_replay_admission_receipt,
+    load_shadow_batch_result,
+    load_shadow_report_result,
     validate_segment_financial_closure_audit,
     validate_shadow_replay_admission,
 )
@@ -219,6 +221,16 @@ SEGMENT_FINANCIAL_REPAIR_SHADOW_REPLAY_CONTRACT = ShadowReplayContract(
     verify_max_output_tokens=ROUTING_CONTINUATION_SHADOW_REPLAY_CONTRACT.verify_max_output_tokens,
     timeout_seconds=ROUTING_CONTINUATION_SHADOW_REPLAY_CONTRACT.timeout_seconds,
     max_provider_calls=ROUTING_CONTINUATION_SHADOW_REPLAY_CONTRACT.max_provider_calls,
+)
+
+# The v5 routing/continuation batch is the frozen source of prepared scopes for
+# this replay.  Re-running the historical plan through today's planner would
+# make the replay depend on later planner rules and can reject a scope that was
+# already admitted by the frozen contract.
+ROUTING_CONTINUATION_BATCH = (
+    ROOT_DIR
+    / "var/company_profile_shadow_batch/20260910/"
+    "batch-manufacturing-materials-shadow-routing-continuation-gemini-20260910-a"
 )
 
 
@@ -485,7 +497,19 @@ def main(argv: Sequence[str] | None = None) -> int:
         raise ValueError(
             "frozen provider-free preparation audit does not admit this batch"
         )
-    prepared = ShadowEvidencePreparer().prepare(manifest=manifest, plan=plan)
+    if args.mode == "segment-repair-semantic-replay":
+        frozen_batch = load_shadow_batch_result(ROUTING_CONTINUATION_BATCH / "manifest.json")
+        prepared = {
+            reference.sample_id: tuple(
+                item.prepared_scope
+                for item in load_shadow_report_result(
+                    ROUTING_CONTINUATION_BATCH / reference.relative_path
+                ).scope_results
+            )
+            for reference in frozen_batch.reports
+        }
+    else:
+        prepared = ShadowEvidencePreparer().prepare(manifest=manifest, plan=plan)
     current_audit = build_shadow_preparation_audit(
         plan,
         audit_id=frozen_audit.audit_id,
