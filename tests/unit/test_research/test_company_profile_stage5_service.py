@@ -11,6 +11,7 @@ from research.company_profile.contracts import (
     Disposition,
     DispositionStatus,
     HumanReviewItem,
+    PreparedEvidence,
 )
 from research.company_profile.models import (
     AssertionClass,
@@ -21,6 +22,7 @@ from research.company_profile.models import (
     CoverageReasonCode,
     CoverageResult,
     CoverageStatus,
+    Evidence,
     IdentityClass,
     LogicalSlot,
     Measurement,
@@ -29,13 +31,16 @@ from research.company_profile.models import (
     ProcessingDirection,
     Relationship,
     RelationshipType,
+    ReportIdentity,
     RequirementLevel,
     Segment,
     SourceNativeValue,
     SubjectScope,
+    TextAnchor,
 )
 from research.company_profile.projection import project_research_view
 from research.company_profile.stage5 import (
+    PreparedPageContext,
     PreparedRequestScope,
     Stage5EvidencePreparer,
     load_stage5_evidence_plan,
@@ -45,6 +50,7 @@ from research.company_profile.stage5_bundle import Stage5RunBundleStore
 from research.company_profile.stage5_service import (
     ManufacturingMaterialsProfileSliceService,
     Stage5SemanticInput,
+    _field_bound_evidence,
     _normalize_review_actions,
     _semantic_request,
     _suppress_same_scope_legal_empty_relationships,
@@ -163,6 +169,56 @@ def test_stage5_fake_single_report_commits_research_view_and_legal_empty(
         for item in view["coverage"]
     )
     assert not list(store.output_root.glob(".stage5-tmp-*"))
+
+
+def test_field_bound_evidence_keeps_context_and_filters_inactive_bindings() -> None:
+    report = ReportIdentity(
+        instrument_id="000001.SZ",
+        report_id="r1",
+        document_version="v1",
+        report_period="2025-12-31",
+        published_at="2026-03-01",
+    )
+
+    def make_evidence(evidence_id: str, page: int) -> Evidence:
+        return Evidence(
+            evidence_id=evidence_id,
+            report=report,
+            page=page,
+            section_title="产销量",
+            anchor=TextAnchor(bounded_quote="产量 100 吨"),
+        )
+
+    scope = PreparedRequestScope(
+        sample_id="sample",
+        scope_id="operating-01",
+        chapter_task=ChapterTask.EXTRACT_OPERATING_QUANTITIES,
+        field_ids=("production_volume", "sales_volume"),
+        report=report,
+        evidence_bundle=(
+            PreparedEvidence(
+                evidence=make_evidence("owner-production", 10),
+                field_id="production_volume",
+            ),
+            PreparedEvidence(evidence=make_evidence("context", 11)),
+        ),
+        page_contexts=(
+            PreparedPageContext(
+                page=10,
+                text="产量 100 吨",
+                text_hash="0" * 64,
+                extraction_method="test",
+                quality_status="native",
+            ),
+        ),
+        plan_version="test",
+    )
+
+    filtered = _field_bound_evidence(scope, active_fields=("sales_volume",))
+
+    assert [(item.evidence.evidence_id, item.field_id) for item in filtered] == [
+        ("context", None)
+    ]
 
 
 def test_stage5_validation_manifest_uses_existing_semantic_and_bundle_owners(

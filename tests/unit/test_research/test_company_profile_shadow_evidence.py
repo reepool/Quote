@@ -12,14 +12,22 @@ from research.business_profile_section_selection import (
     SelectedSection,
     SelectedSectionArtifact,
 )
-from research.company_profile.models import ChapterTask
+from research.company_profile.contracts import PreparedEvidence
+from research.company_profile.models import (
+    ChapterTask,
+    Evidence,
+    ReportIdentity,
+    TextAnchor,
+)
 from research.company_profile.shadow_batch import ShadowSampleManifest, _payload_hash
 from research.company_profile.shadow_evidence import (
     ShadowEvidencePlanner,
     ShadowEvidencePlanningError,
     ShadowEvidencePreparer,
+    ShadowOperatingEvidenceOwnershipAudit,
     ShadowPlanningFailureCode,
     ShadowRoutingContinuationCorrectionAudit,
+    _bind_shadow_operating_evidence,
     _bind_table_context_range,
     _chapter_owner_score,
     _scope_field_ids,
@@ -30,6 +38,7 @@ from research.company_profile.shadow_evidence import (
     load_shadow_evidence_plan,
     load_shadow_preparation_audit,
 )
+from research.company_profile.stage5 import PreparedPageContext, PreparedRequestScope
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[3]
 CHANGE_ROOT = (
@@ -320,6 +329,103 @@ def test_shadow_scope_fields_follow_source_specific_signals() -> None:
     assert _scope_field_ids(
         ChapterTask.EXTRACT_COUNTERPARTIES_AND_CONCENTRATION, (supplier,)
     ) == ("counterparty_relationship", "supplier_concentration")
+
+
+def test_operating_scope_fields_ignore_selector_metadata_without_source_signal() -> None:
+    section = SimpleNamespace(
+        section_key="major_projects",
+        selector_reasons=("structured_hint:产能",),
+        text="项目情况尚未披露公司数量。",
+    )
+
+    assert _scope_field_ids(
+        ChapterTask.EXTRACT_OPERATING_QUANTITIES, (section,), ownership_aware=True
+    ) == ()
+
+
+def test_shadow_operating_preparer_binds_direct_pages_and_keeps_context_unbound() -> None:
+    report = ReportIdentity(
+        instrument_id="000001.SZ",
+        report_id="r1",
+        document_version="v1",
+        report_period="2025-12-31",
+        published_at="2026-03-01",
+    )
+    direct = Evidence(
+        evidence_id="direct",
+        report=report,
+        page=10,
+        section_title="产销量",
+        anchor=TextAnchor(bounded_quote="生产量 100 吨 销售量 90 吨"),
+    )
+    context = Evidence(
+        evidence_id="context",
+        report=report,
+        page=11,
+        section_title="上下文",
+        anchor=TextAnchor(bounded_quote="行业新增产能较多"),
+    )
+    scope = PreparedRequestScope(
+        sample_id="sample",
+        scope_id="operating-01",
+        chapter_task=ChapterTask.EXTRACT_OPERATING_QUANTITIES,
+        field_ids=("production_volume", "sales_volume"),
+        report=report,
+        evidence_bundle=(
+            PreparedEvidence(evidence=direct),
+            PreparedEvidence(evidence=context),
+        ),
+        page_contexts=(
+            PreparedPageContext(
+                page=10,
+                text="生产量 100 吨 销售量 90 吨",
+                text_hash="0" * 64,
+                extraction_method="test",
+                quality_status="native",
+            ),
+            PreparedPageContext(
+                page=11,
+                text="行业新增产能较多",
+                text_hash="1" * 64,
+                extraction_method="test",
+                quality_status="native",
+            ),
+        ),
+        plan_version="test",
+        candidate_pages=(10,),
+    )
+
+    prepared = _bind_shadow_operating_evidence(scope)
+
+    assert [(item.evidence.evidence_id, item.field_id) for item in prepared.evidence_bundle] == [
+        ("direct", "production_volume"),
+        ("direct", "sales_volume"),
+        ("context", None),
+    ]
+
+
+def test_operating_ownership_audit_is_hash_bound_and_provider_free() -> None:
+    path = (
+        REPOSITORY_ROOT
+        / "openspec/changes/repair-company-profile-operating-evidence-ownership/"
+        "operating-evidence-ownership-audit.v1.json"
+    )
+    audit = ShadowOperatingEvidenceOwnershipAudit.model_validate_json(
+        path.read_text(encoding="utf-8")
+    )
+
+    assert audit.affected_scope_count == 17
+    assert audit.provider_calls == 0
+    assert audit.historical_artifacts_mutated is False
+    assert audit.production_paths_opened == ()
+    assert audit.production_authorization == "not_authorized"
+    assert sum(
+        row["baseline_legacy_binding_count"]
+        for row in audit.affected_scopes
+    ) > sum(
+        row["corrected_explicit_binding_count"]
+        for row in audit.affected_scopes
+    )
 
 
 def test_shadow_scope_fields_do_not_invent_missing_table_columns() -> None:

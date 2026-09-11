@@ -714,6 +714,12 @@ def _field_bound_evidence(
     active_fields: tuple[str, ...] | None = None,
 ) -> tuple[PreparedEvidence, ...]:
     fields = scope.field_ids if active_fields is None else active_fields
+    if any(item.field_id is not None for item in scope.evidence_bundle):
+        return tuple(
+            item
+            for item in scope.evidence_bundle
+            if item.field_id is None or item.field_id in fields
+        )
     return tuple(
         item.model_copy(update={"field_id": field_id})
         for field_id in fields

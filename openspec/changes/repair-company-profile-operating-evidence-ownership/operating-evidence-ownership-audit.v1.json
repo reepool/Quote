@@ -1,0 +1,875 @@
+{
+  "schema_version": "company_profile_shadow_operating_evidence_ownership_audit.v1",
+  "audit_id": "manufacturing-materials-shadow-operating-evidence-ownership-20260911-a",
+  "sample_manifest_hash": "6f639739ef082e78dcb0c01a5ce40bab1645d8fdc027bece2dbef63652bae9e2",
+  "baseline_plan_hash": "e2205ec932589a0d50457e9f0112b44588ed164cf4c39560f27dfb0f6f996686",
+  "corrected_plan_hash": "19e7e5153419c01962cee83432dda43e21e86a0cde8951ee2a33cea7c0b7cab7",
+  "affected_scope_count": 17,
+  "affected_scopes": [
+    {
+      "sample_id": "manufacturing-materials-shadow-000408-2025",
+      "scope_id": "operating_quantities-01",
+      "baseline_field_ids": [
+        "production_capacity",
+        "capacity_under_construction",
+        "capacity_utilization",
+        "production_volume"
+      ],
+      "corrected_field_ids": [
+        "production_capacity",
+        "capacity_under_construction",
+        "capacity_utilization"
+      ],
+      "baseline_pages": [
+        16,
+        17
+      ],
+      "corrected_candidate_pages": [
+        16
+      ],
+      "evidence_ids": [
+        "stage5-evidence-1910ff7ce0eacd4ad162ef13",
+        "stage5-evidence-1910ff7ce0eacd4ad162ef13",
+        "stage5-evidence-1910ff7ce0eacd4ad162ef13",
+        "stage5-evidence-acfc5c519f7d4742eaa1af3b"
+      ],
+      "baseline_legacy_binding_count": 16,
+      "corrected_explicit_binding_count": 3,
+      "corrected_bindings": [
+        {
+          "evidence_id": "stage5-evidence-1910ff7ce0eacd4ad162ef13",
+          "page": 16,
+          "field_id": "production_capacity"
+        },
+        {
+          "evidence_id": "stage5-evidence-1910ff7ce0eacd4ad162ef13",
+          "page": 16,
+          "field_id": "capacity_under_construction"
+        },
+        {
+          "evidence_id": "stage5-evidence-1910ff7ce0eacd4ad162ef13",
+          "page": 16,
+          "field_id": "capacity_utilization"
+        },
+        {
+          "evidence_id": "stage5-evidence-acfc5c519f7d4742eaa1af3b",
+          "page": 17,
+          "field_id": null
+        }
+      ],
+      "field_set_changed": true
+    },
+    {
+      "sample_id": "manufacturing-materials-shadow-000408-2025",
+      "scope_id": "operating_quantities-02",
+      "baseline_field_ids": [
+        "production_capacity",
+        "capacity_under_construction",
+        "capacity_utilization",
+        "production_volume",
+        "sales_volume"
+      ],
+      "corrected_field_ids": [
+        "capacity_utilization",
+        "production_volume",
+        "sales_volume"
+      ],
+      "baseline_pages": [
+        24,
+        25,
+        26
+      ],
+      "corrected_candidate_pages": [
+        25
+      ],
+      "evidence_ids": [
+        "stage5-evidence-9ead1b03311246bbfba25136",
+        "stage5-evidence-1946127fb57f56d3801a7707",
+        "stage5-evidence-1946127fb57f56d3801a7707",
+        "stage5-evidence-1946127fb57f56d3801a7707",
+        "stage5-evidence-aba77b50ea1b9c1153ffb2e0"
+      ],
+      "baseline_legacy_binding_count": 25,
+      "corrected_explicit_binding_count": 3,
+      "corrected_bindings": [
+        {
+          "evidence_id": "stage5-evidence-9ead1b03311246bbfba25136",
+          "page": 24,
+          "field_id": null
+        },
+        {
+          "evidence_id": "stage5-evidence-1946127fb57f56d3801a7707",
+          "page": 25,
+          "field_id": "capacity_utilization"
+        },
+        {
+          "evidence_id": "stage5-evidence-1946127fb57f56d3801a7707",
+          "page": 25,
+          "field_id": "production_volume"
+        },
+        {
+          "evidence_id": "stage5-evidence-1946127fb57f56d3801a7707",
+          "page": 25,
+          "field_id": "sales_volume"
+        },
+        {
+          "evidence_id": "stage5-evidence-aba77b50ea1b9c1153ffb2e0",
+          "page": 26,
+          "field_id": null
+        }
+      ],
+      "field_set_changed": true
+    },
+    {
+      "sample_id": "manufacturing-materials-shadow-000552-2025",
+      "scope_id": "operating_quantities-01",
+      "baseline_field_ids": [
+        "production_capacity",
+        "production_volume"
+      ],
+      "corrected_field_ids": [
+        "production_capacity"
+      ],
+      "baseline_pages": [
+        10,
+        11
+      ],
+      "corrected_candidate_pages": [
+        10
+      ],
+      "evidence_ids": [
+        "stage5-evidence-7d3d95fe48b243b659663055",
+        "stage5-evidence-2e6b0abfe3c51382beeeb9c0"
+      ],
+      "baseline_legacy_binding_count": 4,
+      "corrected_explicit_binding_count": 1,
+      "corrected_bindings": [
+        {
+          "evidence_id": "stage5-evidence-7d3d95fe48b243b659663055",
+          "page": 10,
+          "field_id": "production_capacity"
+        },
+        {
+          "evidence_id": "stage5-evidence-2e6b0abfe3c51382beeeb9c0",
+          "page": 11,
+          "field_id": null
+        }
+      ],
+      "field_set_changed": true
+    },
+    {
+      "sample_id": "manufacturing-materials-shadow-600063-2025",
+      "scope_id": "operating_quantities-02",
+      "baseline_field_ids": [
+        "production_capacity",
+        "capacity_under_construction",
+        "production_volume",
+        "sales_volume",
+        "inventory_volume"
+      ],
+      "corrected_field_ids": [
+        "capacity_under_construction",
+        "sales_volume",
+        "inventory_volume"
+      ],
+      "baseline_pages": [
+        26
+      ],
+      "corrected_candidate_pages": [
+        26
+      ],
+      "evidence_ids": [
+        "stage5-evidence-3aef859068f3b4d4c92b088e",
+        "stage5-evidence-3aef859068f3b4d4c92b088e",
+        "stage5-evidence-3aef859068f3b4d4c92b088e"
+      ],
+      "baseline_legacy_binding_count": 15,
+      "corrected_explicit_binding_count": 3,
+      "corrected_bindings": [
+        {
+          "evidence_id": "stage5-evidence-3aef859068f3b4d4c92b088e",
+          "page": 26,
+          "field_id": "capacity_under_construction"
+        },
+        {
+          "evidence_id": "stage5-evidence-3aef859068f3b4d4c92b088e",
+          "page": 26,
+          "field_id": "sales_volume"
+        },
+        {
+          "evidence_id": "stage5-evidence-3aef859068f3b4d4c92b088e",
+          "page": 26,
+          "field_id": "inventory_volume"
+        }
+      ],
+      "field_set_changed": true
+    },
+    {
+      "sample_id": "manufacturing-materials-shadow-600075-2025",
+      "scope_id": "operating_quantities-01",
+      "baseline_field_ids": [
+        "production_capacity",
+        "capacity_under_construction",
+        "production_volume",
+        "sales_volume",
+        "inventory_volume"
+      ],
+      "corrected_field_ids": [
+        "capacity_under_construction",
+        "production_volume",
+        "sales_volume",
+        "inventory_volume"
+      ],
+      "baseline_pages": [
+        21,
+        22,
+        23
+      ],
+      "corrected_candidate_pages": [
+        22,
+        23
+      ],
+      "evidence_ids": [
+        "stage5-evidence-711aba61fb7e39a3ec912519",
+        "stage5-evidence-d401d333465ecb79a65ffe65",
+        "stage5-evidence-d401d333465ecb79a65ffe65",
+        "stage5-evidence-d401d333465ecb79a65ffe65",
+        "stage5-evidence-d5b0f971435133467c2819a2",
+        "stage5-evidence-d5b0f971435133467c2819a2",
+        "stage5-evidence-d5b0f971435133467c2819a2"
+      ],
+      "baseline_legacy_binding_count": 35,
+      "corrected_explicit_binding_count": 6,
+      "corrected_bindings": [
+        {
+          "evidence_id": "stage5-evidence-711aba61fb7e39a3ec912519",
+          "page": 21,
+          "field_id": null
+        },
+        {
+          "evidence_id": "stage5-evidence-d401d333465ecb79a65ffe65",
+          "page": 22,
+          "field_id": "production_volume"
+        },
+        {
+          "evidence_id": "stage5-evidence-d401d333465ecb79a65ffe65",
+          "page": 22,
+          "field_id": "sales_volume"
+        },
+        {
+          "evidence_id": "stage5-evidence-d401d333465ecb79a65ffe65",
+          "page": 22,
+          "field_id": "inventory_volume"
+        },
+        {
+          "evidence_id": "stage5-evidence-d5b0f971435133467c2819a2",
+          "page": 23,
+          "field_id": "capacity_under_construction"
+        },
+        {
+          "evidence_id": "stage5-evidence-d5b0f971435133467c2819a2",
+          "page": 23,
+          "field_id": "sales_volume"
+        },
+        {
+          "evidence_id": "stage5-evidence-d5b0f971435133467c2819a2",
+          "page": 23,
+          "field_id": "inventory_volume"
+        }
+      ],
+      "field_set_changed": true
+    },
+    {
+      "sample_id": "manufacturing-materials-shadow-600111-2025",
+      "scope_id": "operating_quantities-01",
+      "baseline_field_ids": [
+        "production_volume",
+        "sales_volume",
+        "inventory_volume"
+      ],
+      "corrected_field_ids": [
+        "production_volume",
+        "sales_volume",
+        "inventory_volume"
+      ],
+      "baseline_pages": [
+        23,
+        24,
+        25
+      ],
+      "corrected_candidate_pages": [
+        24
+      ],
+      "evidence_ids": [
+        "stage5-evidence-de3597375cfb8d88ef4c9da9",
+        "stage5-evidence-1d0d2941c8fea9f978068db1",
+        "stage5-evidence-1d0d2941c8fea9f978068db1",
+        "stage5-evidence-1d0d2941c8fea9f978068db1",
+        "stage5-evidence-659b6bcb423ea122ce50435c"
+      ],
+      "baseline_legacy_binding_count": 15,
+      "corrected_explicit_binding_count": 3,
+      "corrected_bindings": [
+        {
+          "evidence_id": "stage5-evidence-de3597375cfb8d88ef4c9da9",
+          "page": 23,
+          "field_id": null
+        },
+        {
+          "evidence_id": "stage5-evidence-1d0d2941c8fea9f978068db1",
+          "page": 24,
+          "field_id": "production_volume"
+        },
+        {
+          "evidence_id": "stage5-evidence-1d0d2941c8fea9f978068db1",
+          "page": 24,
+          "field_id": "sales_volume"
+        },
+        {
+          "evidence_id": "stage5-evidence-1d0d2941c8fea9f978068db1",
+          "page": 24,
+          "field_id": "inventory_volume"
+        },
+        {
+          "evidence_id": "stage5-evidence-659b6bcb423ea122ce50435c",
+          "page": 25,
+          "field_id": null
+        }
+      ],
+      "field_set_changed": false
+    },
+    {
+      "sample_id": "manufacturing-materials-shadow-600176-2025",
+      "scope_id": "operating_quantities-01",
+      "baseline_field_ids": [
+        "production_capacity",
+        "production_volume",
+        "sales_volume"
+      ],
+      "corrected_field_ids": [
+        "production_capacity"
+      ],
+      "baseline_pages": [
+        13,
+        14
+      ],
+      "corrected_candidate_pages": [
+        14
+      ],
+      "evidence_ids": [
+        "stage5-evidence-3d0a1603ee163e0acc126a26",
+        "stage5-evidence-13e540a430f5e329a8daae73"
+      ],
+      "baseline_legacy_binding_count": 6,
+      "corrected_explicit_binding_count": 1,
+      "corrected_bindings": [
+        {
+          "evidence_id": "stage5-evidence-3d0a1603ee163e0acc126a26",
+          "page": 13,
+          "field_id": null
+        },
+        {
+          "evidence_id": "stage5-evidence-13e540a430f5e329a8daae73",
+          "page": 14,
+          "field_id": "production_capacity"
+        }
+      ],
+      "field_set_changed": true
+    },
+    {
+      "sample_id": "manufacturing-materials-shadow-600176-2025",
+      "scope_id": "operating_quantities-02",
+      "baseline_field_ids": [
+        "production_capacity",
+        "production_volume",
+        "sales_volume",
+        "inventory_volume"
+      ],
+      "corrected_field_ids": [
+        "production_volume",
+        "sales_volume",
+        "inventory_volume"
+      ],
+      "baseline_pages": [
+        16,
+        17,
+        18
+      ],
+      "corrected_candidate_pages": [
+        17
+      ],
+      "evidence_ids": [
+        "stage5-evidence-a7bc1f5e94dde928d6835943",
+        "stage5-evidence-f5bea4e8605cb4000e5e85b0",
+        "stage5-evidence-f5bea4e8605cb4000e5e85b0",
+        "stage5-evidence-f5bea4e8605cb4000e5e85b0",
+        "stage5-evidence-725fe80b10a51ce806422cf9"
+      ],
+      "baseline_legacy_binding_count": 20,
+      "corrected_explicit_binding_count": 3,
+      "corrected_bindings": [
+        {
+          "evidence_id": "stage5-evidence-a7bc1f5e94dde928d6835943",
+          "page": 16,
+          "field_id": null
+        },
+        {
+          "evidence_id": "stage5-evidence-f5bea4e8605cb4000e5e85b0",
+          "page": 17,
+          "field_id": "production_volume"
+        },
+        {
+          "evidence_id": "stage5-evidence-f5bea4e8605cb4000e5e85b0",
+          "page": 17,
+          "field_id": "sales_volume"
+        },
+        {
+          "evidence_id": "stage5-evidence-f5bea4e8605cb4000e5e85b0",
+          "page": 17,
+          "field_id": "inventory_volume"
+        },
+        {
+          "evidence_id": "stage5-evidence-725fe80b10a51ce806422cf9",
+          "page": 18,
+          "field_id": null
+        }
+      ],
+      "field_set_changed": true
+    },
+    {
+      "sample_id": "manufacturing-materials-shadow-600256-2025",
+      "scope_id": "operating_quantities-01",
+      "baseline_field_ids": [
+        "production_capacity",
+        "production_volume",
+        "sales_volume",
+        "inventory_volume"
+      ],
+      "corrected_field_ids": [
+        "production_volume",
+        "sales_volume"
+      ],
+      "baseline_pages": [
+        22
+      ],
+      "corrected_candidate_pages": [
+        22
+      ],
+      "evidence_ids": [
+        "stage5-evidence-ab0b01b8c2d416359320c73d",
+        "stage5-evidence-ab0b01b8c2d416359320c73d"
+      ],
+      "baseline_legacy_binding_count": 8,
+      "corrected_explicit_binding_count": 2,
+      "corrected_bindings": [
+        {
+          "evidence_id": "stage5-evidence-ab0b01b8c2d416359320c73d",
+          "page": 22,
+          "field_id": "production_volume"
+        },
+        {
+          "evidence_id": "stage5-evidence-ab0b01b8c2d416359320c73d",
+          "page": 22,
+          "field_id": "sales_volume"
+        }
+      ],
+      "field_set_changed": true
+    },
+    {
+      "sample_id": "manufacturing-materials-shadow-600256-2025",
+      "scope_id": "operating_quantities-02",
+      "baseline_field_ids": [
+        "production_capacity",
+        "production_volume",
+        "sales_volume",
+        "inventory_volume"
+      ],
+      "corrected_field_ids": [
+        "production_volume",
+        "sales_volume",
+        "inventory_volume"
+      ],
+      "baseline_pages": [
+        26,
+        27,
+        28
+      ],
+      "corrected_candidate_pages": [
+        27
+      ],
+      "evidence_ids": [
+        "stage5-evidence-1a7dfe4c76c82e1cd774b64b",
+        "stage5-evidence-c5cd12d68974d718de840127",
+        "stage5-evidence-c5cd12d68974d718de840127",
+        "stage5-evidence-c5cd12d68974d718de840127",
+        "stage5-evidence-14a22747ecafaa469ea8db47"
+      ],
+      "baseline_legacy_binding_count": 20,
+      "corrected_explicit_binding_count": 3,
+      "corrected_bindings": [
+        {
+          "evidence_id": "stage5-evidence-1a7dfe4c76c82e1cd774b64b",
+          "page": 26,
+          "field_id": null
+        },
+        {
+          "evidence_id": "stage5-evidence-c5cd12d68974d718de840127",
+          "page": 27,
+          "field_id": "production_volume"
+        },
+        {
+          "evidence_id": "stage5-evidence-c5cd12d68974d718de840127",
+          "page": 27,
+          "field_id": "sales_volume"
+        },
+        {
+          "evidence_id": "stage5-evidence-c5cd12d68974d718de840127",
+          "page": 27,
+          "field_id": "inventory_volume"
+        },
+        {
+          "evidence_id": "stage5-evidence-14a22747ecafaa469ea8db47",
+          "page": 28,
+          "field_id": null
+        }
+      ],
+      "field_set_changed": true
+    },
+    {
+      "sample_id": "manufacturing-materials-shadow-920033-2025",
+      "scope_id": "operating_quantities-01",
+      "baseline_field_ids": [
+        "production_capacity",
+        "capacity_under_construction",
+        "production_volume",
+        "sales_volume",
+        "inventory_volume"
+      ],
+      "corrected_field_ids": [
+        "production_capacity",
+        "capacity_under_construction",
+        "sales_volume"
+      ],
+      "baseline_pages": [
+        24,
+        25,
+        26
+      ],
+      "corrected_candidate_pages": [
+        25
+      ],
+      "evidence_ids": [
+        "stage5-evidence-8e98212f051fbdd1ea424953",
+        "stage5-evidence-db7f829738600f200bcc9adb",
+        "stage5-evidence-db7f829738600f200bcc9adb",
+        "stage5-evidence-db7f829738600f200bcc9adb",
+        "stage5-evidence-982a6b8bf1012f6123f55ab9"
+      ],
+      "baseline_legacy_binding_count": 25,
+      "corrected_explicit_binding_count": 3,
+      "corrected_bindings": [
+        {
+          "evidence_id": "stage5-evidence-8e98212f051fbdd1ea424953",
+          "page": 24,
+          "field_id": null
+        },
+        {
+          "evidence_id": "stage5-evidence-db7f829738600f200bcc9adb",
+          "page": 25,
+          "field_id": "production_capacity"
+        },
+        {
+          "evidence_id": "stage5-evidence-db7f829738600f200bcc9adb",
+          "page": 25,
+          "field_id": "capacity_under_construction"
+        },
+        {
+          "evidence_id": "stage5-evidence-db7f829738600f200bcc9adb",
+          "page": 25,
+          "field_id": "sales_volume"
+        },
+        {
+          "evidence_id": "stage5-evidence-982a6b8bf1012f6123f55ab9",
+          "page": 26,
+          "field_id": null
+        }
+      ],
+      "field_set_changed": true
+    },
+    {
+      "sample_id": "manufacturing-materials-shadow-920033-2025",
+      "scope_id": "operating_quantities-02",
+      "baseline_field_ids": [
+        "production_capacity",
+        "capacity_under_construction",
+        "production_volume"
+      ],
+      "corrected_field_ids": [
+        "production_capacity",
+        "capacity_under_construction",
+        "production_volume"
+      ],
+      "baseline_pages": [
+        51
+      ],
+      "corrected_candidate_pages": [
+        51
+      ],
+      "evidence_ids": [
+        "stage5-evidence-4162cf0648b8d7f059a2ec10",
+        "stage5-evidence-4162cf0648b8d7f059a2ec10",
+        "stage5-evidence-4162cf0648b8d7f059a2ec10"
+      ],
+      "baseline_legacy_binding_count": 9,
+      "corrected_explicit_binding_count": 3,
+      "corrected_bindings": [
+        {
+          "evidence_id": "stage5-evidence-4162cf0648b8d7f059a2ec10",
+          "page": 51,
+          "field_id": "production_capacity"
+        },
+        {
+          "evidence_id": "stage5-evidence-4162cf0648b8d7f059a2ec10",
+          "page": 51,
+          "field_id": "capacity_under_construction"
+        },
+        {
+          "evidence_id": "stage5-evidence-4162cf0648b8d7f059a2ec10",
+          "page": 51,
+          "field_id": "production_volume"
+        }
+      ],
+      "field_set_changed": false
+    },
+    {
+      "sample_id": "manufacturing-materials-shadow-920068-2025",
+      "scope_id": "operating_quantities-01",
+      "baseline_field_ids": [
+        "production_capacity",
+        "capacity_under_construction"
+      ],
+      "corrected_field_ids": [
+        "production_capacity",
+        "capacity_under_construction"
+      ],
+      "baseline_pages": [
+        13,
+        14,
+        15
+      ],
+      "corrected_candidate_pages": [
+        14
+      ],
+      "evidence_ids": [
+        "stage5-evidence-c7b01ec3824a19687af3e16f",
+        "stage5-evidence-43ab45b2e1219ae78a7e8b9f",
+        "stage5-evidence-43ab45b2e1219ae78a7e8b9f",
+        "stage5-evidence-7c7a0b68560bf0eae95613b2"
+      ],
+      "baseline_legacy_binding_count": 8,
+      "corrected_explicit_binding_count": 2,
+      "corrected_bindings": [
+        {
+          "evidence_id": "stage5-evidence-c7b01ec3824a19687af3e16f",
+          "page": 13,
+          "field_id": null
+        },
+        {
+          "evidence_id": "stage5-evidence-43ab45b2e1219ae78a7e8b9f",
+          "page": 14,
+          "field_id": "production_capacity"
+        },
+        {
+          "evidence_id": "stage5-evidence-43ab45b2e1219ae78a7e8b9f",
+          "page": 14,
+          "field_id": "capacity_under_construction"
+        },
+        {
+          "evidence_id": "stage5-evidence-7c7a0b68560bf0eae95613b2",
+          "page": 15,
+          "field_id": null
+        }
+      ],
+      "field_set_changed": false
+    },
+    {
+      "sample_id": "manufacturing-materials-shadow-920076-2025",
+      "scope_id": "operating_quantities-01",
+      "baseline_field_ids": [
+        "production_capacity"
+      ],
+      "corrected_field_ids": [
+        "production_capacity"
+      ],
+      "baseline_pages": [
+        56,
+        57,
+        58
+      ],
+      "corrected_candidate_pages": [
+        57
+      ],
+      "evidence_ids": [
+        "stage5-evidence-2aadd4d76d0520b4eacbeb0e",
+        "stage5-evidence-d54d8ddb7f918818c11dc426",
+        "stage5-evidence-473e27c0a01e195dd68707eb"
+      ],
+      "baseline_legacy_binding_count": 3,
+      "corrected_explicit_binding_count": 1,
+      "corrected_bindings": [
+        {
+          "evidence_id": "stage5-evidence-2aadd4d76d0520b4eacbeb0e",
+          "page": 56,
+          "field_id": null
+        },
+        {
+          "evidence_id": "stage5-evidence-d54d8ddb7f918818c11dc426",
+          "page": 57,
+          "field_id": "production_capacity"
+        },
+        {
+          "evidence_id": "stage5-evidence-473e27c0a01e195dd68707eb",
+          "page": 58,
+          "field_id": null
+        }
+      ],
+      "field_set_changed": false
+    },
+    {
+      "sample_id": "manufacturing-materials-shadow-920078-2025",
+      "scope_id": "operating_quantities-01",
+      "baseline_field_ids": [
+        "production_capacity"
+      ],
+      "corrected_field_ids": [
+        "production_capacity"
+      ],
+      "baseline_pages": [
+        55,
+        56,
+        57
+      ],
+      "corrected_candidate_pages": [
+        56
+      ],
+      "evidence_ids": [
+        "stage5-evidence-efd6a337e763348a332530e7",
+        "stage5-evidence-1e207635077ba670b89840b9",
+        "stage5-evidence-5e8e975873d432e65374df9c"
+      ],
+      "baseline_legacy_binding_count": 3,
+      "corrected_explicit_binding_count": 1,
+      "corrected_bindings": [
+        {
+          "evidence_id": "stage5-evidence-efd6a337e763348a332530e7",
+          "page": 55,
+          "field_id": null
+        },
+        {
+          "evidence_id": "stage5-evidence-1e207635077ba670b89840b9",
+          "page": 56,
+          "field_id": "production_capacity"
+        },
+        {
+          "evidence_id": "stage5-evidence-5e8e975873d432e65374df9c",
+          "page": 57,
+          "field_id": null
+        }
+      ],
+      "field_set_changed": false
+    },
+    {
+      "sample_id": "manufacturing-materials-shadow-920580-2025",
+      "scope_id": "operating_quantities-01",
+      "baseline_field_ids": [
+        "production_capacity",
+        "capacity_under_construction"
+      ],
+      "corrected_field_ids": [
+        "capacity_under_construction"
+      ],
+      "baseline_pages": [
+        14,
+        15,
+        16
+      ],
+      "corrected_candidate_pages": [
+        15
+      ],
+      "evidence_ids": [
+        "stage5-evidence-6fa5637b98a42e7d113debb8",
+        "stage5-evidence-f94651547cf4b61190d0b0ea",
+        "stage5-evidence-dd747575a765fac2bd2b89c3"
+      ],
+      "baseline_legacy_binding_count": 6,
+      "corrected_explicit_binding_count": 1,
+      "corrected_bindings": [
+        {
+          "evidence_id": "stage5-evidence-6fa5637b98a42e7d113debb8",
+          "page": 14,
+          "field_id": null
+        },
+        {
+          "evidence_id": "stage5-evidence-f94651547cf4b61190d0b0ea",
+          "page": 15,
+          "field_id": "capacity_under_construction"
+        },
+        {
+          "evidence_id": "stage5-evidence-dd747575a765fac2bd2b89c3",
+          "page": 16,
+          "field_id": null
+        }
+      ],
+      "field_set_changed": true
+    },
+    {
+      "sample_id": "manufacturing-materials-shadow-920580-2025",
+      "scope_id": "operating_quantities-02",
+      "baseline_field_ids": [
+        "production_capacity"
+      ],
+      "corrected_field_ids": [
+        "production_capacity"
+      ],
+      "baseline_pages": [
+        53,
+        54,
+        55
+      ],
+      "corrected_candidate_pages": [
+        54
+      ],
+      "evidence_ids": [
+        "stage5-evidence-4257a94d048ee9c3bfa2c0f7",
+        "stage5-evidence-3b18754266bc27704cb88b34",
+        "stage5-evidence-3de3269bd02b67481ebefc17"
+      ],
+      "baseline_legacy_binding_count": 3,
+      "corrected_explicit_binding_count": 1,
+      "corrected_bindings": [
+        {
+          "evidence_id": "stage5-evidence-4257a94d048ee9c3bfa2c0f7",
+          "page": 53,
+          "field_id": null
+        },
+        {
+          "evidence_id": "stage5-evidence-3b18754266bc27704cb88b34",
+          "page": 54,
+          "field_id": "production_capacity"
+        },
+        {
+          "evidence_id": "stage5-evidence-3de3269bd02b67481ebefc17",
+          "page": 55,
+          "field_id": null
+        }
+      ],
+      "field_set_changed": false
+    }
+  ],
+  "provider_calls": 0,
+  "historical_artifacts_mutated": false,
+  "production_paths_opened": [],
+  "production_authorization": "not_authorized",
+  "created_at": "2026-09-11T16:11:46.990789+00:00",
+  "audit_hash": "468207559e4db147986b39deb6a31c38e7b229f4ef86dc1a4cb77e9afb286775"
+}

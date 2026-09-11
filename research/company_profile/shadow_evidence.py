@@ -50,6 +50,9 @@ from .stage5_service import stage5_field_ids
 
 SHADOW_EVIDENCE_PLAN_SCHEMA = "company_profile_shadow_evidence_plan.v1"
 SHADOW_EVIDENCE_PLAN_VERSION = "manufacturing_materials_shadow.2026-09-10.5"
+SHADOW_OPERATING_OWNERSHIP_PLAN_VERSION = (
+    "manufacturing_materials_shadow.2026-09-11.6"
+)
 SHADOW_PREPARATION_AUDIT_SCHEMA = "company_profile_shadow_preparation_audit.v1"
 SHADOW_SCOPE_REFINEMENT_AUDIT_SCHEMA = (
     "company_profile_shadow_scope_refinement_audit.v1"
@@ -942,6 +945,32 @@ class ShadowEvidencePreparationAudit(_StrictModel):
         return self
 
 
+class ShadowOperatingEvidenceOwnershipAudit(_StrictModel):
+    schema_version: Literal[
+        "company_profile_shadow_operating_evidence_ownership_audit.v1"
+    ] = "company_profile_shadow_operating_evidence_ownership_audit.v1"
+    audit_id: str = Field(min_length=1)
+    sample_manifest_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    baseline_plan_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    corrected_plan_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    affected_scope_count: int = Field(ge=1)
+    affected_scopes: tuple[dict[str, Any], ...] = Field(min_length=1)
+    provider_calls: Literal[0] = 0
+    historical_artifacts_mutated: Literal[False] = False
+    production_paths_opened: tuple[str, ...] = ()
+    production_authorization: Literal["not_authorized"] = PRODUCTION_AUTHORIZATION
+    created_at: str = Field(min_length=1)
+    audit_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    @model_validator(mode="after")
+    def _audit_is_closed(self) -> ShadowOperatingEvidenceOwnershipAudit:
+        if self.affected_scope_count != len(self.affected_scopes):
+            raise ValueError("ownership audit affected scope count mismatch")
+        if self.audit_hash != _payload_hash(self, omit={"audit_hash"}):
+            raise ValueError("ownership audit hash mismatch")
+        return self
+
+
 class ShadowOwnerClosureResult(_StrictModel):
     review_row_id: str = Field(min_length=1)
     sample_id: str = Field(min_length=1)
@@ -1103,6 +1132,7 @@ class ShadowEvidencePlanner:
         *,
         extractor: BusinessProfilePdfArtifactExtractor | None = None,
         selector: BusinessProfileSectionSelector | None = None,
+        plan_version: str = SHADOW_EVIDENCE_PLAN_VERSION,
     ) -> None:
         self._uses_custom_extractor = extractor is not None
         self._extractor = extractor or BusinessProfilePdfArtifactExtractor(
@@ -1112,6 +1142,7 @@ class ShadowEvidencePlanner:
             context_pages=1,
             max_pages=6,
         )
+        self._plan_version = plan_version
         self._catalog = load_disclosure_template_catalog()
 
     def build(
@@ -1173,7 +1204,7 @@ class ShadowEvidencePlanner:
                 EvidenceReportPlan(
                     sample_id=report.sample_id,
                     content_hash=report.content_hash,
-                    plan_version=SHADOW_EVIDENCE_PLAN_VERSION,
+                    plan_version=self._plan_version,
                     tasks=tuple(tasks),
                 )
             )
@@ -1184,7 +1215,7 @@ class ShadowEvidencePlanner:
             recovered_page_numbers[report.sample_id] = recovered_pages
         payload = {
             "schema_version": SHADOW_EVIDENCE_PLAN_SCHEMA,
-            "plan_version": SHADOW_EVIDENCE_PLAN_VERSION,
+            "plan_version": self._plan_version,
             "sample_manifest_revision": manifest.manifest_revision,
             "sample_manifest_hash": manifest.manifest_hash,
             "page_coordinate_system": "one_based_pdf_physical_page",
@@ -1285,6 +1316,7 @@ class ShadowEvidencePlanner:
         tuple[str, ...],
         tuple[ShadowEvidenceScopeSelection, ...],
     ]:
+        ownership_aware = self._plan_version == SHADOW_OPERATING_OWNERSHIP_PLAN_VERSION
         field_ids, allowed_keys, hint_terms = _CHAPTER_CONFIG[chapter_task]
         unknown_fields = sorted(set(field_ids) - stage5_field_ids())
         if unknown_fields:
@@ -1386,6 +1418,7 @@ class ShadowEvidencePlanner:
             bounded_pages=bounded,
             maximum_scopes=_CHAPTER_MAX_SCOPES[chapter_task],
             chapter_task=chapter_task,
+            ownership_aware=ownership_aware,
         )
         for index, pages in enumerate(ranges, start=1):
             pages = _bind_table_context_range(
@@ -1399,7 +1432,17 @@ class ShadowEvidencePlanner:
                 item for item in readable_sections if item.page_number in page_set
             ]
             combined = "\n".join(item.text for item in sections)
-            scope_field_ids = _scope_field_ids(chapter_task, sections)
+            support_sections = (
+                [item for item in sections if item.page_number in direct_pages]
+                if ownership_aware
+                and chapter_task == ChapterTask.EXTRACT_OPERATING_QUANTITIES
+                else sections
+            )
+            scope_field_ids = _scope_field_ids(
+                chapter_task,
+                support_sections,
+                ownership_aware=ownership_aware,
+            )
             if not scope_field_ids:
                 continue
             scopes.append(
@@ -1551,7 +1594,10 @@ class ShadowEvidencePreparer:
                     f"unknown Stage 5 checklist fields: {unknown}",
                     sample_id=asset.sample_id,
                 )
-            if plan.plan_version == SHADOW_EVIDENCE_PLAN_VERSION:
+            if plan.plan_version in {
+                SHADOW_EVIDENCE_PLAN_VERSION,
+                SHADOW_OPERATING_OWNERSHIP_PLAN_VERSION,
+            }:
                 _validate_refined_report_plan(
                     report_plan,
                     artifact_pages=artifact_pages,
@@ -1562,16 +1608,25 @@ class ShadowEvidencePreparer:
                         )
                         for selection in plan.scope_selections[asset.sample_id]
                     },
+                    ownership_aware=(
+                        plan.plan_version == SHADOW_OPERATING_OWNERSHIP_PLAN_VERSION
+                    ),
                 )
             page_results = {
                 number: _artifact_page_result(page)
                 for number, page in artifact_pages.items()
             }
-            prepared[asset.sample_id] = self._stage5_preparer.prepare_asset_plan(
+            prepared_scopes = self._stage5_preparer.prepare_asset_plan(
                 asset=asset,
                 plan=report_plan,
                 plan_version=plan.plan_version,
                 page_results=page_results,
+            )
+            prepared[asset.sample_id] = tuple(
+                _bind_shadow_operating_evidence(scope)
+                if plan.plan_version == SHADOW_OPERATING_OWNERSHIP_PLAN_VERSION
+                else scope
+                for scope in prepared_scopes
             )
         return prepared
 
@@ -1582,6 +1637,7 @@ def _validate_refined_report_plan(
     artifact_pages: dict[int, Any],
     sample_id: str,
     scope_reasons: dict[tuple[ChapterTask, str], tuple[str, ...]],
+    ownership_aware: bool = False,
 ) -> None:
     for task in report_plan.tasks:
         planned_fields: set[str] = set()
@@ -1601,10 +1657,21 @@ def _validate_refined_report_plan(
                     sample_id=sample_id,
                     chapter_task=task.chapter_task,
                 ) from exc
+            support_sections = (
+                tuple(
+                    section
+                    for section in sections
+                    if section.page_number in scope.candidate_pages
+                )
+                if ownership_aware
+                and task.chapter_task == ChapterTask.EXTRACT_OPERATING_QUANTITIES
+                else sections
+            )
             supported = set(
                 _scope_field_ids(
                     task.chapter_task,
-                    sections,
+                    support_sections,
+                    ownership_aware=ownership_aware,
                     selector_reasons=scope_reasons.get(
                         (task.chapter_task, scope.scope_id), ()
                     ),
@@ -1706,6 +1773,90 @@ def build_shadow_preparation_audit(
         "production_authorization": PRODUCTION_AUTHORIZATION,
     }
     return ShadowEvidencePreparationAudit(
+        **payload,
+        audit_hash=_payload_hash(payload),
+    )
+
+
+def build_shadow_operating_evidence_ownership_audit(
+    *,
+    audit_id: str,
+    baseline_plan: ShadowEvidencePlan,
+    corrected_plan: ShadowEvidencePlan,
+    corrected_prepared: Mapping[str, tuple[PreparedRequestScope, ...]],
+    affected_scope_ids: set[tuple[str, str]],
+) -> ShadowOperatingEvidenceOwnershipAudit:
+    """Build a provider-free, hash-bound comparison of operating ownership."""
+
+    if baseline_plan.sample_manifest_hash != corrected_plan.sample_manifest_hash:
+        raise ValueError("ownership audit plans use different sample manifests")
+    baseline_by_key = {
+        (report.sample_id, scope.scope_id): scope
+        for report in baseline_plan.reports
+        for task in report.tasks
+        if task.chapter_task == ChapterTask.EXTRACT_OPERATING_QUANTITIES
+        for scope in task.request_scopes
+    }
+    corrected_by_key = {
+        (scope.sample_id, scope.scope_id): scope
+        for scopes in corrected_prepared.values()
+        for scope in scopes
+        if scope.chapter_task == ChapterTask.EXTRACT_OPERATING_QUANTITIES
+    }
+    missing = sorted(set(affected_scope_ids) - set(baseline_by_key))
+    if missing:
+        raise ValueError(f"ownership audit scope is missing from baseline: {missing}")
+    rows: list[dict[str, Any]] = []
+    for key in sorted(affected_scope_ids):
+        baseline = baseline_by_key[key]
+        corrected = corrected_by_key.get(key)
+        if corrected is None:
+            raise ValueError(
+                f"ownership audit scope is missing from corrected preparation: {key}"
+            )
+        corrected_bindings = [
+            {
+                "evidence_id": item.evidence.evidence_id,
+                "page": item.evidence.page,
+                "field_id": item.field_id,
+            }
+            for item in corrected.evidence_bundle
+        ]
+        rows.append(
+            {
+                "sample_id": key[0],
+                "scope_id": key[1],
+                "baseline_field_ids": list(baseline.field_ids),
+                "corrected_field_ids": list(corrected.field_ids),
+                "baseline_pages": list(baseline.pages),
+                "corrected_candidate_pages": list(corrected.candidate_pages),
+                "evidence_ids": [
+                    item.evidence.evidence_id for item in corrected.evidence_bundle
+                ],
+                "baseline_legacy_binding_count": len(baseline.field_ids)
+                * len(corrected.evidence_bundle),
+                "corrected_explicit_binding_count": sum(
+                    item.field_id is not None for item in corrected.evidence_bundle
+                ),
+                "corrected_bindings": corrected_bindings,
+                "field_set_changed": baseline.field_ids != corrected.field_ids,
+            }
+        )
+    payload = {
+        "schema_version": "company_profile_shadow_operating_evidence_ownership_audit.v1",
+        "audit_id": audit_id,
+        "sample_manifest_hash": baseline_plan.sample_manifest_hash,
+        "baseline_plan_hash": baseline_plan.plan_hash,
+        "corrected_plan_hash": corrected_plan.plan_hash,
+        "affected_scope_count": len(rows),
+        "affected_scopes": tuple(rows),
+        "provider_calls": 0,
+        "historical_artifacts_mutated": False,
+        "production_paths_opened": (),
+        "production_authorization": PRODUCTION_AUTHORIZATION,
+        "created_at": _utc_now(),
+    }
+    return ShadowOperatingEvidenceOwnershipAudit(
         **payload,
         audit_hash=_payload_hash(payload),
     )
@@ -2222,6 +2373,7 @@ def write_shadow_evidence_artifact(
     value: (
         ShadowEvidencePlan
         | ShadowEvidencePreparationAudit
+        | ShadowOperatingEvidenceOwnershipAudit
         | ShadowScopeRefinementAudit
         | ShadowOwnerClosureCorrectionAudit
         | ShadowRoutingContinuationCorrectionAudit
@@ -2358,6 +2510,7 @@ def _select_scope_ranges(
     bounded_pages: Sequence[int],
     maximum_scopes: int,
     chapter_task: ChapterTask,
+    ownership_aware: bool = False,
 ) -> tuple[tuple[int, ...], ...]:
     sections_by_page = {item.page_number: item for item in sections}
     if chapter_task == ChapterTask.EXTRACT_SEGMENT_FINANCIALS:
@@ -2391,7 +2544,15 @@ def _select_scope_ranges(
 
     def score(pages: tuple[int, ...]) -> tuple[int, int, int]:
         scoped_sections = [sections_by_page[page] for page in pages]
-        supported_fields = _scope_field_ids(chapter_task, scoped_sections)
+        support_sections = (
+            [item for item in scoped_sections if item.page_number in direct_pages]
+            if ownership_aware
+            and chapter_task == ChapterTask.EXTRACT_OPERATING_QUANTITIES
+            else scoped_sections
+        )
+        supported_fields = _scope_field_ids(
+            chapter_task, support_sections, ownership_aware=ownership_aware
+        )
         reasons = {
             reason
             for page in pages
@@ -2422,11 +2583,15 @@ def _scope_field_ids(
     *,
     selector_reasons: Sequence[str] = (),
     supplemental_terms: Sequence[str] = (),
+    ownership_aware: bool = False,
 ) -> tuple[str, ...]:
     """Return the stable existing field subset supported by this source scope."""
 
     chapter_fields = _CHAPTER_CONFIG[chapter_task][0]
     compact = re.sub(r"\s+", "", "\n".join(str(item.text) for item in sections))
+    if ownership_aware and chapter_task == ChapterTask.EXTRACT_OPERATING_QUANTITIES:
+        return _operating_field_ids_from_text(compact)
+
     section_keys = {str(getattr(item, "section_key", "")) for item in sections} | {
         str(term) for term in supplemental_terms
     }
@@ -2446,6 +2611,15 @@ def _scope_field_ids(
             or any(term in reason for reason in reasons for term in reason_terms)
         ):
             matched.add(field_id)
+    if chapter_task == ChapterTask.EXTRACT_SEGMENT_FINANCIALS:
+        if not _has_governed_segment_owner(compact, section_keys):
+            matched.clear()
+        elif "segment_dimension" not in matched:
+            matched -= {
+                "operating_revenue",
+                "operating_cost",
+                "gross_margin_reported",
+            }
     if (
         chapter_task == ChapterTask.EXTRACT_OPERATING_QUANTITIES
         and (
@@ -2462,16 +2636,71 @@ def _scope_field_ids(
         )
     ):
         matched &= {"production_capacity"}
-    if chapter_task == ChapterTask.EXTRACT_SEGMENT_FINANCIALS:
-        if not _has_governed_segment_owner(compact, section_keys):
-            matched.clear()
-        elif "segment_dimension" not in matched:
-            matched -= {
-                "operating_revenue",
-                "operating_cost",
-                "gross_margin_reported",
-            }
     return tuple(field_id for field_id in chapter_fields if field_id in matched)
+
+
+def _operating_field_ids_from_text(compact: str) -> tuple[str, ...]:
+    """Return operating fields supported by source text, without selector metadata."""
+
+    chapter_task = ChapterTask.EXTRACT_OPERATING_QUANTITIES
+    chapter_fields = _CHAPTER_CONFIG[chapter_task][0]
+    matched = {
+        field_id
+        for field_id in chapter_fields
+        if any(
+            re.search(pattern, compact)
+            for pattern in _FIELD_TEXT_PATTERNS[chapter_task].get(field_id, ())
+        )
+    }
+    if re.search(_OPERATING_QUANTITY_LEGAL_EMPTY_PATTERN, compact):
+        matched.update({"production_volume", "sales_volume", "inventory_volume"})
+    capacity_legal_empty = bool(
+        re.search(
+            r"产能(?:与开工)?情况.{0,80}(?:[√☑](?:否|不适用)|不适用)",
+            compact,
+        )
+        or re.search(_BSE_INDUSTRY_DISCLOSURE_OPT_OUT_PATTERN, compact)
+    )
+    if capacity_legal_empty:
+        matched.add("production_capacity")
+    if capacity_legal_empty and not re.search(
+        r"(?:生产量|销售量|库存量|实际产量|加工量|处理量|吞吐量)"
+        r".{0,100}\d[\d,]*(?:\.\d+)?",
+        compact,
+    ):
+        matched &= {"production_capacity"}
+    return tuple(field_id for field_id in chapter_fields if field_id in matched)
+
+
+def _bind_shadow_operating_evidence(
+    scope: PreparedRequestScope,
+) -> PreparedRequestScope:
+    """Bind direct operating pages while retaining adjacent pages as context only."""
+
+    if scope.chapter_task != ChapterTask.EXTRACT_OPERATING_QUANTITIES:
+        return scope
+    contexts = {item.page: item for item in scope.page_contexts}
+    bound: list[Any] = []
+    for item in scope.evidence_bundle:
+        page = item.evidence.page
+        if page not in scope.candidate_pages:
+            bound.append(item.model_copy(update={"field_id": None}))
+            continue
+        context = contexts.get(page)
+        supported = (
+            set(_operating_field_ids_from_text(re.sub(r"\s+", "", context.text)))
+            if context is not None
+            else set()
+        ) & set(scope.field_ids)
+        if not supported:
+            bound.append(item.model_copy(update={"field_id": None}))
+            continue
+        bound.extend(
+            item.model_copy(update={"field_id": field_id})
+            for field_id in scope.field_ids
+            if field_id in supported
+        )
+    return scope.model_copy(update={"evidence_bundle": tuple(bound)})
 
 
 def _bind_table_context_range(
