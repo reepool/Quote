@@ -1,0 +1,20 @@
+{
+  "schema_version": "company_profile_segment_partition_live_preflight.v1",
+  "validation_id": "manufacturing-materials-shadow-segment-normalization-live-20260911-a",
+  "executed_at": "2026-09-11T13:52:17+08:00",
+  "execution_path": "sandbox",
+  "status": "success",
+  "logical_profile": "semantic_extraction__scorpio_gemini",
+  "provider": "openai_compatible",
+  "model": "gemini-3.8-flash-high",
+  "provider_request_id": "ec6c839f-4948-4869-8dbc-394f75e9b92c",
+  "request_hash": "394216723fb036566bbbe3d0eb0da856602548b89dee021bb1789b796be5f6a8",
+  "response_hash": "313b3d7f68f279631982f0e9c4bbd7af09caa502a875df7327cb2f68c72b3f34",
+  "latency_ms": 5178,
+  "warnings": [
+    "provider_output_budget_exceeded",
+    "provider_output_budget_exceeded_valid_response"
+  ],
+  "semantic_validation_started": false,
+  "production_authorization": "not_authorized"
+}

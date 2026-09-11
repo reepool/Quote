@@ -1,0 +1,61 @@
+{
+  "schema_version": "company_profile_segment_partition_live_validation_result.v1",
+  "validation_id": "manufacturing-materials-shadow-segment-normalization-live-20260911-a",
+  "source_batch_manifest_sha256": "7274b13f69bbd2dce0c093f0ae62139f61b70908b13cac537181e7e4f7fe50fb",
+  "execution_path": "sandbox",
+  "provider": {
+    "profile": "semantic_extraction__scorpio_gemini",
+    "extract_max_output_tokens": 20000,
+    "verify_max_output_tokens": 18000,
+    "timeout_seconds": 300.0,
+    "max_provider_calls": 12
+  },
+  "provider_calls": 2,
+  "upstream_responses": 0,
+  "cases": [
+    {
+      "case_id": "annual-period-conflict",
+      "failure_class": "reported_period_identity_conflict",
+      "classification": "execution_failure",
+      "request_id": "6294a075a343400797cd1f9f430a089b",
+      "request_hash": "0415f478a9e39dfb55aaa50defdc22f4387dc675bfab89e822322ef30d9eba42",
+      "diagnostic": {
+        "code": "deadline_exceeded",
+        "attempts": 1,
+        "transport_error_type": "dns_failure",
+        "transport_phase": "connect",
+        "transport_exception_type": "ConnectError",
+        "elapsed_ms": 300009
+      }
+    },
+    {
+      "case_id": "complete-report-segment-heading",
+      "failure_class": "incomplete_report_segment_heading",
+      "classification": "execution_failure",
+      "request_id": "fb61b728cb0a4e049cda3ca984113f33",
+      "request_hash": "7c33cc85a324111938cc174cc9f2fbff58840e59fe1d078db0cf2c29a9f25292",
+      "diagnostic": {
+        "code": "deadline_exceeded",
+        "attempts": 1,
+        "transport_error_type": "dns_failure",
+        "transport_phase": "connect",
+        "transport_exception_type": "ConnectError",
+        "elapsed_ms": 300059
+      }
+    }
+  ],
+  "result_persistence": {
+    "mode": "reconstructed_from_complete_runtime_logs",
+    "operator_shutdown_interrupted": true,
+    "semantic_output_available": false
+  },
+  "decision": {
+    "normalization_empirically_validated": false,
+    "full_cohort_replay_justified": false,
+    "external_permission_new_identity_validation_justified": true,
+    "reason": "Short sandbox preflight succeeded, but both full semantic requests failed in sandbox DNS/connect before an upstream response."
+  },
+  "historical_batch_mutated": false,
+  "batch_readiness_recomputed": false,
+  "production_authorization": "not_authorized"
+}

@@ -1,0 +1,48 @@
+{
+  "schema_version": "company_profile_segment_partition_live_validation_contract.v1",
+  "validation_id": "manufacturing-materials-shadow-segment-normalization-live-20260911-a",
+  "created_at": "2026-09-11",
+  "sample_manifest": {
+    "path": "openspec/changes/archive/2026-09-09-validate-manufacturing-materials-company-profile-shadow-batch/shadow-manifest.v1.json",
+    "sha256": "ca6d301ff7fb3b21b206be5951965059c87a7e485121c98a24475e59bad0f215",
+    "manifest_hash": "6f639739ef082e78dcb0c01a5ce40bab1645d8fdc027bece2dbef63652bae9e2"
+  },
+  "source_batch": {
+    "root": "var/company_profile_shadow_batch/20260911/batch-manufacturing-materials-shadow-segment-retry-gemini-20260911-a/batch-manufacturing-materials-shadow-segment-retry-gemini-20260911-a",
+    "manifest_sha256": "7274b13f69bbd2dce0c093f0ae62139f61b70908b13cac537181e7e4f7fe50fb"
+  },
+  "cases": [
+    {
+      "case_id": "annual-period-conflict",
+      "failure_class": "reported_period_identity_conflict",
+      "sample_id": "manufacturing-materials-shadow-000055-2025",
+      "scope_id": "segment_financials-01",
+      "report_sha256": "b594184e454370ba960bf0aba8610d2e5b85419376591dfafa68444b0c87687e",
+      "expected_partition_count": 3
+    },
+    {
+      "case_id": "complete-report-segment-heading",
+      "failure_class": "incomplete_report_segment_heading",
+      "sample_id": "manufacturing-materials-shadow-000408-2025",
+      "scope_id": "segment_financials-02",
+      "report_sha256": "2158c61d66ca94abd1395ac91bf0cc6bcf63bb8b9e4fc5f5aa8600ff711894ea",
+      "expected_partition_count": 2
+    }
+  ],
+  "implementation_hashes": {
+    "research/company_profile/stage5_provider.py": "8b642a5861428bd231b5c39f6d3ffbde73771bee213cc3319d4cd0f1c5eadfdb",
+    "research/company_profile/stage5_service.py": "ffffbbc2e1a5788e60563e2ce10f521f3a44418f5d8a55b55318560adb2d5fa5",
+    "scripts/run_company_profile_stage5_slice.py": "5e9bca706a4665d9f40e91480b753854e284c15dd4c33dffb1a00fc05911b3be"
+  },
+  "provider": {
+    "profile": "semantic_extraction__scorpio_gemini",
+    "extract_max_output_tokens": 20000,
+    "verify_max_output_tokens": 18000,
+    "timeout_seconds": 300.0,
+    "max_provider_calls": 12
+  },
+  "output_path": "openspec/changes/validate-company-profile-segment-partition-normalization-live/live-validation-result.v1.json",
+  "historical_batch_mutated": false,
+  "batch_readiness_recomputed": false,
+  "production_authorization": "not_authorized"
+}
