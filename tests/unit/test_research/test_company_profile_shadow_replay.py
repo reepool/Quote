@@ -1526,6 +1526,33 @@ def test_segment_repair_replay_mode_is_single_use_and_research_only(
         )
 
 
+def test_superseded_segment_repair_replay_is_rejected_before_input_loading(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    def fail_if_loaded(*_args, **_kwargs):
+        pytest.fail("superseded replay must stop before loading provider inputs")
+
+    monkeypatch.setattr(
+        shadow_batch_operator,
+        "load_shadow_sample_manifest",
+        fail_if_loaded,
+    )
+
+    with pytest.raises(ValueError, match="superseded"):
+        shadow_batch_operator.main(
+            [
+                "--mode",
+                "segment-repair-semantic-replay",
+                "--sample-manifest",
+                "manifest.json",
+                "--evidence-plan",
+                "plan.json",
+                "--batch-id",
+                SEGMENT_FINANCIAL_REPAIR_SHADOW_REPLAY_CONTRACT.batch_id,
+            ]
+        )
+
+
 def test_segment_retry_replay_is_distinct_and_binds_interrupted_attempt(
     tmp_path: Path,
     segment_repair_replay_inputs,

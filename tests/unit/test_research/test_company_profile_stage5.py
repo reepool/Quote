@@ -77,6 +77,17 @@ SECOND_OOS_CORRECTED_EVIDENCE_PLAN = (
     SECOND_OOS_COMPLETION_CHANGE / "evidence-plan.v4.json"
 )
 SECOND_OOS_SAMPLE_ID = "manufacturing-materials-oos-000717-2025"
+COMPLETENESS_CANARY_CHANGE = (
+    REPOSITORY_ROOT
+    / "openspec/changes/failover-incomplete-company-profile-scope-output"
+)
+COMPLETENESS_CANARY_MANIFEST = COMPLETENESS_CANARY_CHANGE / "canary-manifest.v1.json"
+COMPLETENESS_CANARY_EVIDENCE_PLAN = (
+    COMPLETENESS_CANARY_CHANGE / "canary-evidence-plan.v1.json"
+)
+COMPLETENESS_CANARY_SAMPLE_ID = (
+    "manufacturing-materials-completeness-canary-600426-2025"
+)
 
 
 def test_stage5_manifest_is_a_verified_four_report_closed_set() -> None:
@@ -709,6 +720,47 @@ def test_stage5_second_oos_manifest_and_evidence_prepare_seven_scopes() -> None:
         "customer_supplier_concentration",
         "business_regime_change",
     }
+
+
+def test_stage5_completeness_canary_freeze_prepares_nine_closed_scopes() -> None:
+    manifest = load_stage5_sample_manifest(
+        COMPLETENESS_CANARY_MANIFEST,
+        repository_root=REPOSITORY_ROOT,
+    )
+    plan = load_stage5_evidence_plan(COMPLETENESS_CANARY_EVIDENCE_PLAN)
+
+    scopes = Stage5EvidencePreparer().prepare_report(
+        manifest=manifest,
+        evidence_plan=plan,
+        sample_id=COMPLETENESS_CANARY_SAMPLE_ID,
+    )
+
+    asset = manifest.report_by_id(COMPLETENESS_CANARY_SAMPLE_ID)
+    assert manifest.manifest_kind == "out_of_sample_validation"
+    assert asset.report.instrument_id == "600426.SH"
+    assert asset.content_hash == (
+        "22e75dc409e246b252871345de029e8aebadb74875d9e445025b7ea20ad469ad"
+    )
+    assert len(scopes) == 9
+    assert {scope.chapter_task for scope in scopes} == set(ChapterTask)
+    assert {scope.scope_id for scope in scopes} == {
+        "business_overview",
+        "segment_industry_product_region_mode",
+        "production_sales_inventory_table",
+        "capacity_table_and_changes",
+        "product_upstream_materials",
+        "raw_material_procurement_and_consumption",
+        "customer_supplier_concentration",
+        "reported_business_change",
+        "operating_model_change",
+    }
+    assert all(
+        scope.plan_version
+        == "manufacturing_materials_completeness_canary.2026-09-12.1"
+        and scope.production_authorization == "not_authorized"
+        and "energy_input" not in scope.field_ids
+        for scope in scopes
+    )
 
 
 def test_stage5_second_oos_corrected_plan_changes_only_the_invalid_field() -> None:

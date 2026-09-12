@@ -5567,3 +5567,173 @@ def test_default_group_subject_is_applied_to_unqualified_provider_drafts():
     candidate = expanded["items"][0]["candidate"]
     assert candidate["subject_scope"] == "consolidated_group"
     assert candidate["subject_basis"] == "report_default_group_scope"
+
+
+def test_required_material_input_rejects_empty_provider_payload() -> None:
+    prepared = _owner_and_context_material_scope()
+    request = _material_input_extract_request(prepared)
+    validator = Draft202012Validator(
+        _minimal_extract_schema(request, prepared_scope=prepared)
+    )
+
+    assert not validator.is_valid({"material_inputs": [], "coverage": None})
+    assert validator.is_valid(
+        {
+            "material_inputs": [],
+            "coverage": {
+                "status": "not_disclosed",
+                "reason_code": "source_reason_unspecified",
+            },
+        }
+    )
+
+
+def test_required_quantity_fields_reject_partial_coverage_payload() -> None:
+    prepared = _prepared_scope().model_copy(
+        update={
+            "scope_id": "quantity_disclosure_check",
+            "chapter_task": ChapterTask.EXTRACT_OPERATING_QUANTITIES,
+            "field_ids": ("production_volume", "sales_volume", "inventory_volume"),
+        }
+    )
+    checklist = tuple(
+        ChecklistItem(
+            field_id=field_id,
+            object_type=ObjectType.MEASUREMENT,
+            chapter_task=prepared.chapter_task,
+            requirement_level=RequirementLevel.CONDITIONAL,
+            allowed_coverage_statuses=tuple(CoverageStatus),
+            allowed_metric_types=(metric_type,),
+        )
+        for field_id, metric_type in (
+            ("production_volume", MetricType.PRODUCTION_VOLUME),
+            ("sales_volume", MetricType.SALES_VOLUME),
+            ("inventory_volume", MetricType.INVENTORY_VOLUME),
+        )
+    )
+    request = SemanticTaskRequest(
+        request_id="required-quantity-completeness",
+        report=prepared.report,
+        package_manifest=PackageManifest(
+            package_name="manufacturing_materials",
+            package_version="v1",
+            report=prepared.report,
+            checklist=checklist,
+        ),
+        chapter_task=prepared.chapter_task,
+        evidence_bundle=prepared.evidence_bundle,
+        allowed_object_types=(ObjectType.MEASUREMENT,),
+        allowed_metric_types=tuple(
+            item.allowed_metric_types[0] for item in checklist
+        ),
+        unresolved_field_ids=prepared.field_ids,
+    )
+    validator = Draft202012Validator(
+        _minimal_extract_schema(request, prepared_scope=prepared)
+    )
+
+    coverage = lambda field_id: {
+        "item_type": "coverage",
+        "coverage": {
+            "field_id": field_id,
+            "status": "not_disclosed",
+            "reason_code": "source_reason_unspecified",
+        },
+    }
+    assert not validator.is_valid({"items": []})
+    assert not validator.is_valid({"items": [coverage("production_volume")]})
+    assert validator.is_valid(
+        {"items": [coverage(field_id) for field_id in prepared.field_ids]}
+    )
+
+
+def test_required_segment_field_accepts_legal_empty_for_missing_metric() -> None:
+    prepared = _segment_prepared_scope()
+    request = _segment_extract_request(prepared)
+    response = _segment_row_response(
+        request_id=request.request_id,
+        evidence_id=prepared.evidence_bundle[0].evidence.evidence_id,
+    )
+    response["items"][0]["row"]["cells"]["operating_cost"] = {
+        "value": "241,064,397",
+        "unit": "千元",
+        "header": "营业成本",
+    }
+    validator = Draft202012Validator(
+        _minimal_extract_schema(request, prepared_scope=prepared)
+    )
+
+    assert not validator.is_valid(response)
+    response["items"].append(
+        {
+            "item_type": "coverage",
+            "coverage": {
+                "field_id": "gross_margin_reported",
+                "status": "unclear",
+                "reason_code": "candidate_unresolved",
+            },
+        }
+    )
+    assert validator.is_valid(response)
+
+
+def test_required_business_regime_rejects_empty_provider_payload() -> None:
+    prepared = _reported_business_change_scope()
+    request = _business_regime_request(prepared)
+    validator = Draft202012Validator(
+        _minimal_extract_schema(request, prepared_scope=prepared)
+    )
+
+    assert not validator.is_valid(
+        {"events": [], "regimes": [], "package_assignments": [], "coverage": []}
+    )
+    assert validator.is_valid(
+        {
+            "events": [],
+            "regimes": [],
+            "package_assignments": [],
+            "coverage": [
+                {
+                    "field_id": "business_regime",
+                    "status": "not_applicable",
+                    "reason_code": "source_explicitly_not_applicable",
+                }
+            ],
+        }
+    )
+
+
+def test_optional_generic_field_may_be_omitted() -> None:
+    prepared = _prepared_scope().model_copy(update={"scope_id": "optional-overview"})
+    checklist = ChecklistItem(
+        field_id="business_overview_source",
+        object_type=ObjectType.BUSINESS_OVERVIEW,
+        chapter_task=prepared.chapter_task,
+        requirement_level=RequirementLevel.OPTIONAL,
+        allowed_coverage_statuses=tuple(CoverageStatus),
+    )
+    request = SemanticTaskRequest(
+        request_id="optional-overview",
+        report=prepared.report,
+        package_manifest=PackageManifest(
+            package_name="manufacturing_materials",
+            package_version="v1",
+            report=prepared.report,
+            checklist=(checklist,),
+        ),
+        chapter_task=prepared.chapter_task,
+        evidence_bundle=prepared.evidence_bundle,
+        allowed_object_types=(ObjectType.BUSINESS_OVERVIEW,),
+        unresolved_field_ids=(checklist.field_id,),
+    )
+    validator = Draft202012Validator(
+        _minimal_extract_schema(request, prepared_scope=prepared)
+    )
+
+    assert validator.is_valid(
+        {
+            "schema_version": "company_profile_extract_response.v1",
+            "request_id": request.request_id,
+            "items": [],
+        }
+    )

@@ -4,17 +4,27 @@
 TBD - created by archiving change relax-company-profile-research-acceptance-policy. Update Purpose after archive.
 ## Requirements
 ### Requirement: Research acceptance preserves evidence while allowing bounded uncertainty
-The research acceptance policy MUST allow a source-backed fact with `subject_scope=unclear` to remain available for research projection when Evidence, value, unit, period, metric meaning, and independent verification are complete. It MUST NOT promote that fact to `consolidated_group` without the existing affirmative source wording or documented numeric reconciliation.
+The research acceptance policy MUST accept a source-backed fact with complete Evidence, value, unit, period, metric meaning, and independent verification under `subject_scope=consolidated_group` with `subject_basis=report_default_group_scope` when the source does not explicitly prove a narrower issuer, subsidiary, or segment scope. Explicit narrower source wording MUST remain narrow. The policy MUST NOT permit unsupported promotion beyond the report-default group convention, and it MUST retain the original source wording, Evidence, and any uncertainty.
 
 #### Scenario: Company wording supports a qualitative activity
 - **WHEN** Evidence says `公司主要从事动力电池研发、生产、销售` and the Activity is independently verified
-- **THEN** the Activity may be accepted for research with `subject_scope=unclear`
-- **AND** no report-level failure is created solely because the subject is unclear
+- **THEN** the Activity may be accepted for research with `subject_scope=consolidated_group` and `subject_basis=report_default_group_scope`
+- **AND** the source actor remains `公司`
 
-#### Scenario: Unsupported group promotion is attempted
-- **WHEN** a candidate changes source wording `公司` to `consolidated_group` without affirmative evidence
+#### Scenario: Ordinary numeric report fact uses group convention
+- **WHEN** an annual-report revenue, margin, operating quantity, or concentration fact has no explicit standalone or segment subject
+- **THEN** the fact may be accepted with the default group scope after Evidence and verification pass
+- **AND** the projection exposes the default basis for audit
+
+#### Scenario: Explicit standalone fact remains issuer-scoped
+- **WHEN** the source identifies `母公司`, `本公司`, or a parent-company statement
+- **THEN** the fact retains `subject_scope=issuer`
+- **AND** the default group convention does not override it
+
+#### Scenario: Unsupported subject rewrite is attempted
+- **WHEN** a candidate rewrites explicit issuer, named-subsidiary, or business-segment Evidence as a consolidated-group fact, or claims a narrower subject that the Evidence does not identify
 - **THEN** verification blocks the candidate
-- **AND** the report retains a subject blocker regardless of other accepted facts
+- **AND** the report-default group convention does not override explicit narrower wording or authorize an unsupported narrow subject
 
 ### Requirement: Downstream usage is governed by a closed subject policy
 The policy MUST provide a program-owned closed table mapping object or metric family and `subject_scope` to permitted research uses. The LLM MUST NOT provide free-form `allowed_use` or `blocked_use` values. `unclear` revenue, cost, margin, operating quantities, processing volume, material/energy input, and counterparty concentration MAY remain source facts, but MUST NOT enter consolidated aggregation, ranking, or cross-company comparison templates unless the existing subject basis supports that use. `business_segment`, `named_subsidiary`, and explicit `issuer` remain distinct scopes.

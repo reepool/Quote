@@ -1,0 +1,202 @@
+{
+  "schema_version": "company_profile_out_of_sample_evidence_plan.v1",
+  "plan_version": "manufacturing_materials_completeness_canary.2026-09-12.1",
+  "sample_manifest_revision": "manufacturing-materials-completeness-canary-manifest-20260912-v1",
+  "page_coordinate_system": "one_based_pdf_physical_page",
+  "production_authorization": "not_authorized",
+  "reports": [
+    {
+      "sample_id": "manufacturing-materials-completeness-canary-600426-2025",
+      "content_hash": "22e75dc409e246b252871345de029e8aebadb74875d9e445025b7ea20ad469ad",
+      "plan_version": "manufacturing_materials_completeness_canary.2026-09-12.1",
+      "tasks": [
+        {
+          "chapter_task": "extract_business_overview",
+          "request_scopes": [
+            {
+              "scope_id": "business_overview",
+              "field_ids": ["business_overview_source", "explicit_activity"],
+              "pages": [8, 9],
+              "section_titles": ["第三节 管理层讨论与分析", "报告期内公司从事的业务情况"],
+              "anchor_terms": ["多业联产", "新能源新材料相关产品", "化学肥料", "有机胺", "醋酸及衍生品", "生产稳定高效", "积极拓展市场空间"],
+              "required_headers": [],
+              "required_units": [],
+              "required_footnotes": [],
+              "continuation_required": false,
+              "printed_page_labels": {"8": "8", "9": "9"},
+              "subject_pages": [],
+              "subject_anchor_terms": [],
+              "source_row_dimensions": {},
+              "candidate_pages": [8, 9]
+            }
+          ]
+        },
+        {
+          "chapter_task": "extract_segment_financials",
+          "request_scopes": [
+            {
+              "scope_id": "segment_industry_product_region_mode",
+              "field_ids": ["segment_dimension", "operating_revenue", "operating_cost", "gross_margin_reported"],
+              "pages": [10, 11],
+              "section_titles": ["主营业务分析", "收入和成本分析", "主营业务分行业、分产品、分地区、分销售模式情况"],
+              "anchor_terms": ["主营业务分行业情况", "主营业务分产品情况", "主营业务分地区情况", "主营业务分销售模式情况"],
+              "required_headers": ["营业收入", "营业成本", "毛利率"],
+              "required_units": ["元"],
+              "required_footnotes": [],
+              "continuation_required": true,
+              "printed_page_labels": {"10": "10", "11": "11"},
+              "subject_pages": [],
+              "subject_anchor_terms": [],
+              "source_row_dimensions": {
+                "化工": "分行业",
+                "化肥": "分行业",
+                "热电": "分行业",
+                "新能源新材料相关产品": "分产品",
+                "有机胺": "分产品",
+                "化学肥料": "分产品",
+                "醋酸及衍生品": "分产品",
+                "其他产品": "分产品",
+                "境内": "分地区",
+                "境外": "分地区",
+                "销售合同": "销售模式"
+              },
+              "candidate_pages": [11]
+            }
+          ]
+        },
+        {
+          "chapter_task": "extract_operating_quantities",
+          "request_scopes": [
+            {
+              "scope_id": "production_sales_inventory_table",
+              "field_ids": ["production_volume", "sales_volume", "inventory_volume"],
+              "pages": [11],
+              "section_titles": ["产销量情况分析表"],
+              "anchor_terms": ["主要产品", "生产量", "销售量", "库存量", "新能源新材料相关产品", "有机胺", "化学肥料", "醋酸及衍生品"],
+              "required_headers": ["生产量", "销售量", "库存量"],
+              "required_units": ["万吨"],
+              "required_footnotes": ["部分中间产品自用"],
+              "continuation_required": false,
+              "printed_page_labels": {"11": "11"},
+              "subject_pages": [],
+              "subject_anchor_terms": [],
+              "source_row_dimensions": {},
+              "candidate_pages": [11]
+            },
+            {
+              "scope_id": "capacity_table_and_changes",
+              "field_ids": ["production_capacity", "capacity_utilization"],
+              "pages": [26, 27],
+              "section_titles": ["化工行业经营性信息分析", "产能与开工情况", "生产能力的增减情况"],
+              "anchor_terms": ["产能与开工情况", "设计产能", "产能利用率", "生产能力的增减情况", "新增 20 万吨/年 BDO"],
+              "required_headers": ["设计产能", "产能利用率"],
+              "required_units": ["万吨", "%"],
+              "required_footnotes": [],
+              "continuation_required": false,
+              "printed_page_labels": {"26": "26", "27": "27"},
+              "subject_pages": [],
+              "subject_anchor_terms": [],
+              "source_row_dimensions": {},
+              "candidate_pages": [26, 27]
+            }
+          ]
+        },
+        {
+          "chapter_task": "extract_material_inputs",
+          "request_scopes": [
+            {
+              "scope_id": "product_upstream_materials",
+              "field_ids": ["material_input"],
+              "pages": [25],
+              "section_titles": ["化工行业经营性信息分析", "主要产品情况"],
+              "anchor_terms": ["主要上游", "原材料", "煤炭", "丙烯", "苯", "己内酰胺"],
+              "required_headers": ["主要上游", "原材料"],
+              "required_units": [],
+              "required_footnotes": [],
+              "continuation_required": false,
+              "printed_page_labels": {"25": "25"},
+              "subject_pages": [],
+              "subject_anchor_terms": [],
+              "source_row_dimensions": {},
+              "candidate_pages": [25]
+            },
+            {
+              "scope_id": "raw_material_procurement_and_consumption",
+              "field_ids": ["material_input"],
+              "pages": [27],
+              "section_titles": ["原材料采购", "主要原材料的基本情况"],
+              "anchor_terms": ["主要原材料", "采购量", "耗用量", "原料煤", "苯", "丙烯"],
+              "required_headers": ["采购量", "耗用量"],
+              "required_units": ["万吨"],
+              "required_footnotes": [],
+              "continuation_required": false,
+              "printed_page_labels": {"27": "27"},
+              "subject_pages": [],
+              "subject_anchor_terms": [],
+              "source_row_dimensions": {},
+              "candidate_pages": [27]
+            }
+          ]
+        },
+        {
+          "chapter_task": "extract_counterparties_and_concentration",
+          "request_scopes": [
+            {
+              "scope_id": "customer_supplier_concentration",
+              "field_ids": ["customer_concentration", "supplier_concentration", "counterparty_relationship"],
+              "pages": [12, 13],
+              "section_titles": ["主要销售客户及主要供应商情况", "公司主要销售客户及主要供应商情况"],
+              "anchor_terms": ["前五名客户销售额", "占年度销售总额", "前五名供应商采购额", "占年度采购总额", "前五名销售客户", "前五名供应商"],
+              "required_headers": [],
+              "required_units": ["万元", "%"],
+              "required_footnotes": ["属于同一控制人控制的客户或供应商视为同一客户或供应商合并列示"],
+              "continuation_required": true,
+              "printed_page_labels": {"12": "12", "13": "13"},
+              "subject_pages": [],
+              "subject_anchor_terms": [],
+              "source_row_dimensions": {},
+              "candidate_pages": [13]
+            }
+          ]
+        },
+        {
+          "chapter_task": "extract_business_regime",
+          "request_scopes": [
+            {
+              "scope_id": "reported_business_change",
+              "field_ids": ["business_regime"],
+              "pages": [12],
+              "section_titles": ["公司报告期内业务、产品或服务发生重大变化或调整有关情况"],
+              "anchor_terms": ["公司报告期内业务、产品或服务发生重大变化或调整有关情况", "□适用 √不适用"],
+              "required_headers": [],
+              "required_units": [],
+              "required_footnotes": [],
+              "continuation_required": false,
+              "printed_page_labels": {"12": "12"},
+              "subject_pages": [],
+              "subject_anchor_terms": [],
+              "source_row_dimensions": {},
+              "candidate_pages": [12]
+            },
+            {
+              "scope_id": "operating_model_change",
+              "field_ids": ["business_regime"],
+              "pages": [25],
+              "section_titles": ["主要经营模式", "报告期内调整经营模式的主要情况"],
+              "anchor_terms": ["报告期内调整经营模式的主要情况", "□适用 √不适用"],
+              "required_headers": [],
+              "required_units": [],
+              "required_footnotes": [],
+              "continuation_required": false,
+              "printed_page_labels": {"25": "25"},
+              "subject_pages": [],
+              "subject_anchor_terms": [],
+              "source_row_dimensions": {},
+              "candidate_pages": [25]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

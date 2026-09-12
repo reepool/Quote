@@ -523,6 +523,7 @@ def build_parser() -> argparse.ArgumentParser:
 
 def main(argv: Sequence[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
+    _reject_superseded_replay_request(mode=args.mode, batch_id=args.batch_id)
     manifest = load_shadow_sample_manifest(
         args.sample_manifest, repository_root=ROOT_DIR
     )
@@ -1291,6 +1292,21 @@ def main(argv: Sequence[str] | None = None) -> int:
 
 def _file_sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def _reject_superseded_replay_request(
+    *,
+    mode: str,
+    batch_id: str | None,
+) -> None:
+    if (
+        mode == "segment-repair-semantic-replay"
+        or batch_id == SEGMENT_FINANCIAL_REPAIR_SHADOW_REPLAY_CONTRACT.batch_id
+    ):
+        raise ValueError(
+            "segment-repair Gemini-only replay is superseded by the current "
+            "four-member company-profile MVP baseline"
+        )
 
 
 def _validate_replay_mode(

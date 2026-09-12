@@ -1,7 +1,6 @@
 import asyncio
 import json
 import logging
-import time
 from dataclasses import replace
 
 import pytest
@@ -13,14 +12,12 @@ from utils.llm import (
     LlmMessage,
     LlmPoolCoordinatorRegistry,
     LlmRequest,
-    LlmResponseParseError,
     LlmTransientTransportError,
 )
 from utils.llm.orchestration import ProviderCoordinatorRegistry
 from utils.llm.rate_limit import ProfileLimiterRegistry
 from utils.llm.testing import ScriptedTransport
 from utils.llm.transport import TransportResponse
-
 
 SCHEMA = {
     "type": "object",
@@ -262,6 +259,52 @@ async def test_rate_limit_fails_over_from_grok_to_luna_with_safe_lineage():
     }
     assert snapshot.failover_succeeded == 1
     assert snapshot.latency_ms["failover"] >= 0
+
+
+@pytest.mark.asyncio
+async def test_schema_incomplete_response_uses_bounded_failover_without_splicing():
+    response_schema = {
+        "type": "object",
+        "required": ["items"],
+        "properties": {
+            "items": {
+                "type": "array",
+                "minItems": 1,
+                "items": {"type": "string"},
+            }
+        },
+        "additionalProperties": False,
+    }
+    transport = ScriptedTransport([
+        {
+            "choices": [{
+                "message": {"content": json.dumps({"items": []})},
+                "finish_reason": "stop",
+            }],
+            "id": "provider-grok-4.5",
+            "model": "grok-4.5",
+        },
+        {
+            "choices": [{
+                "message": {"content": json.dumps({"items": ["complete"]})},
+                "finish_reason": "stop",
+            }],
+            "id": "provider-gpt-5.6-luna",
+            "model": "gpt-5.6-luna",
+        },
+    ])
+
+    response = await _client(_config(max_hops=1), transport).complete(
+        _request(response_schema=response_schema)
+    )
+
+    assert response.source_label == "pipio:gpt-5.6-luna"
+    assert response.failover_count == 1
+    assert response.data == {"items": ["complete"]}
+    assert [
+        attempt.get("error_code", attempt.get("status"))
+        for attempt in response.attempts
+    ] == ["schema_validation_error", "success"]
 
 
 @pytest.mark.asyncio

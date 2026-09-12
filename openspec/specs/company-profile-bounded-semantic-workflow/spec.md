@@ -361,3 +361,26 @@ A cost-component or generic operating-cost row MUST NOT be emitted as a business
 - **WHEN** a model cites a cost-component table as the basis for a business Segment without a field-owning segment dimension
 - **THEN** the response is rejected or remains unresolved through the existing schema/semantic path
 - **AND** the cost fact is not relabeled as a business segment
+
+### Requirement: Company-profile provider failures use bounded pool failover
+New company-profile semantic requests MUST use the existing logical `semantic_extraction` route so the configured LLM pool can select among its eligible candidates. A single logical request MAY fail over to another pool member for configured rate-limit, transient transport, provider, response-parse, or schema-validation failures, subject to the pool's finite hop limit and one execution deadline. Semantic uncertainty, unsupported inference, Evidence mismatch, and verifier rejection MUST NOT trigger blind model cycling. Every physical attempt and typed error MUST remain in existing gateway lineage; the stage-five trace MUST retain the selected provider/model and final disposition without merging failed-attempt candidates.
+
+#### Scenario: Primary provider is unavailable
+- **WHEN** the selected model returns a configured transient/provider failure and execution time remains
+- **THEN** the logical request selects the next eligible pool member within the finite hop limit
+- **AND** the trace records both the failed attempt and the selected fallback model
+
+#### Scenario: Fallback model succeeds
+- **WHEN** a fallback model returns a schema-valid response that passes local validation
+- **THEN** the logical request returns that response with its selected model and failover count
+- **AND** no candidate from the failed attempt is merged into the result
+
+#### Scenario: Semantic rejection is not provider failure
+- **WHEN** local validation or independent verification rejects a candidate for subject, Evidence, metric, or prohibited-inference reasons
+- **THEN** the request records the typed semantic disposition
+- **AND** it does not automatically cycle through all remaining models
+
+#### Scenario: All eligible providers fail
+- **WHEN** the finite failover hop limit or execution deadline is exhausted
+- **THEN** the request returns the final typed provider failure
+- **AND** the report remains failed/hold according to the existing report-isolation policy

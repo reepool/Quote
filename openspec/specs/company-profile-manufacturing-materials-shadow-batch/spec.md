@@ -53,12 +53,22 @@ The system MUST execute each admitted report through the existing manufacturing/
 - **AND** the batch cannot use that response
 
 ### Requirement: The batch uses one primary model policy without output splicing
-The contracted shadow batch MUST use one frozen primary logical model profile and the existing bounded gateway attempt/deadline behavior. Exhausted typed transport or schema failures MUST remain typed report failures. The system MUST NOT start a different-model replacement run, merge model-comparison candidates, or relax timeout, Evidence, schema, subject, unit, or verifier requirements to improve batch metrics.
+The contracted research MVP MUST use the logical `semantic_extraction` route backed by the existing four-member LLM pool. Each logical request MAY use a bounded number of fallback members for typed provider/transport/protocol failures while retaining one request identity and execution deadline. The common gateway MUST record every physical attempt in its lineage, and the batch MUST retain the selected route and final disposition without splicing candidates from failed attempts, historical runs, or independent model-comparison outputs. Semantic rejection, Evidence mismatch, unsupported subject, and verifier disagreement remain terminal for that candidate and MUST NOT be hidden by fallback.
 
-#### Scenario: Primary model attempts are exhausted
-- **WHEN** the existing bounded request behavior exhausts its attempts for a scope
-- **THEN** the report records the typed failure and the batch continues according to its frozen execution policy
-- **AND** no candidate from another model or historical run is inserted
+#### Scenario: Primary model attempts fail transiently
+- **WHEN** a scope receives a configured transient/provider/parse/schema failure
+- **THEN** the route may select another eligible pool member within the finite hop limit
+- **AND** the scope keeps one logical request identity and records the attempt lineage
+
+#### Scenario: Fallback produces valid research output
+- **WHEN** a fallback response passes local schema validation and independent verification
+- **THEN** only that accepted response enters the scope result
+- **AND** failed-attempt candidates are not merged or published
+
+#### Scenario: Semantic disagreement remains unresolved
+- **WHEN** a model response is source-supported but remains semantically unclear or verifier-blocked
+- **THEN** the scope preserves the typed unresolved/blocked disposition
+- **AND** it does not invoke an unbounded second-model semantic contest
 
 ### Requirement: Scale readiness is measured from source-bound review material
 The system MUST produce deterministic batch metrics for cohort count, plan/preparation completion, report execution and usability, accepted-record Evidence traceability, frozen critical-error counts, human-review workload, provider latency, token usage, and sampled source-level precision. Before semantic execution, the review rule MUST be frozen to include every blocker, caveat, unresolved item, and proposed adjudication plus the first accepted or legal-empty result in stable scope order for each core chapter of every report. Every review row MUST include the original source quote, physical page, Evidence identity, runtime target, disposition, usage restriction, and recommended decision.
@@ -965,3 +975,16 @@ After an item-isolation implementation changes future extract behavior, the syst
 - **WHEN** observed usable rate, sampled precision, or human-review workload misses a frozen gate
 - **THEN** the post-isolation audit remains `hold` and identifies every unmet gate
 - **AND** no replay, token-budget change, production write, Stage 6 activation, or downstream publication is authorized
+
+### Requirement: Known false-hold defects are corrected before the next MVP replay
+The MVP implementation MUST correct the four source-review defects already identified in the authoritative shadow audit: material-input legal-empty Evidence ownership, risk-only BusinessOverview acceptance, and both segment legal-empty Evidence ownership cases. A legal-empty result MUST cite a field-owning Evidence item, BusinessOverview MUST prefer a substantive business description when present, and a non-owning risk or generic narrative MUST NOT satisfy a chapter owner. These corrections MUST be covered by provider-free regression tests and MUST NOT mutate the archived batch.
+
+#### Scenario: Legal-empty material input uses the owner Evidence
+- **WHEN** a report has no disclosed material input and the plan includes a governed material-input owner
+- **THEN** `not_disclosed` coverage cites that owner Evidence
+- **AND** generic raw-material risk commentary is context-only
+
+#### Scenario: Overview includes substantive business wording
+- **WHEN** the overview Evidence contains both a substantive business description and a risk/uncertainty sentence
+- **THEN** the accepted BusinessOverview uses the substantive description
+- **AND** the risk sentence is not accepted as the sole overview fact

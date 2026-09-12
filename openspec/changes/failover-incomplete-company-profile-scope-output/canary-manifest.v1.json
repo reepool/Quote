@@ -1,0 +1,121 @@
+{
+  "artifact_type": "company_profile_out_of_sample_manifest",
+  "schema_version": "company_profile_out_of_sample_manifest.v1",
+  "manifest_id": "manufacturing-materials-completeness-canary-manifest-20260912-v1",
+  "manifest_kind": "out_of_sample_validation",
+  "industry_package": "manufacturing_materials",
+  "frozen_on": "2026-09-12",
+  "sample_replacement_allowed": false,
+  "semantic_execution_started": false,
+  "evidence_plan_status": "frozen_before_provider_io",
+  "production_authorization": "not_authorized",
+  "accepted_record_semantics": "accepted_for_review",
+  "sample_count": 1,
+  "samples": [
+    {
+      "sample_id": "manufacturing-materials-completeness-canary-600426-2025",
+      "report_identity": {
+        "instrument_id": "600426.SH",
+        "symbol": "600426",
+        "company_name": "山东华鲁恒升化工股份有限公司",
+        "company_name_en": "Shandong Hualu-Hengsheng Chemical Co., Ltd.",
+        "exchange": "SSE",
+        "fiscal_year": 2025,
+        "report_period": "2025-12-31",
+        "report_title": "华鲁恒升2025年年度报告",
+        "document_family": "annual_report",
+        "variant": "original",
+        "source": "cninfo",
+        "source_announcement_id": "1225051474",
+        "announcement_id": "ann_9683e50b9c41f7c3eb67d72f548e2ea4",
+        "attachment_id": "att_03b510900b82c86c3e02dca35330bf25",
+        "version_id": "ver_245aadf8bb6533d8f26ece7b1c0727c9",
+        "asset_id": "asset_c433ba9aa0a710a545dfe33ca21ed6b2",
+        "published_at": "2026-03-30T16:00:00+00:00",
+        "decision_state": "current",
+        "availability": "local_valid",
+        "visibility_state": "production",
+        "classifier_version": "formal_annual_report.v1",
+        "canonical_projection_policy_version": "canonical_source_filing.v1"
+      },
+      "pdf": {
+        "path": "data/filings/announcements/blobs/22/22e75dc409e246b252871345de029e8aebadb74875d9e445025b7ea20ad469ad.pdf",
+        "sha256": "22e75dc409e246b252871345de029e8aebadb74875d9e445025b7ea20ad469ad",
+        "content_length_bytes": 1399477,
+        "page_count": 184,
+        "encrypted": false,
+        "signature_status": "valid_pdf",
+        "integrity_status": "valid"
+      },
+      "selection_dimensions": {
+        "business_model": [
+          "integrated_multi_product_chemical_manufacturing",
+          "flexible_co_production",
+          "fertilizer_and_new_materials"
+        ],
+        "disclosure_form": [
+          "sse_annual_report",
+          "industry_product_region_mode_financial_table",
+          "production_sales_inventory_table",
+          "capacity_and_raw_material_tables",
+          "totals_only_counterparty_concentration"
+        ],
+        "generalization_pressure": [
+          "multi_product_internal_use_boundary",
+          "table_and_narrative_capacity_separation",
+          "raw_material_vs_energy_field_boundary",
+          "default_group_subject_convention"
+        ]
+      },
+      "selection_reason": "This locally valid multi-product chemical-materials annual report is absent from the four-report authority, Gold, targeted runs, the twenty-report shadow cohort, BaoSteel OOS, and Zhongnan Steel OOS. It tests a materially different flexible co-production disclosure form while reusing the existing six-chapter contract.",
+      "known_limitations": [
+        "One canary cannot establish manufacturing/materials industry-wide readiness.",
+        "Flexible co-production creates a real internal-use versus external-sales boundary.",
+        "Page 27 discloses both raw materials and steam, but the current contract admits only material_input; energy_input is not added by this change.",
+        "Ordinary company wording uses the current report-default group convention, while named subsidiaries and product segments remain narrow subjects."
+      ]
+    }
+  ],
+  "independence_audit": {
+    "excluded_company_profile_instruments": [
+      "300750.SZ",
+      "603659.SH",
+      "920015.BJ",
+      "302132.SZ",
+      "600019.SH",
+      "000717.SZ"
+    ],
+    "checked_identifiers": [
+      "600426.SH",
+      "600426",
+      "华鲁恒升",
+      "山东华鲁恒升化工股份有限公司",
+      "1225051474",
+      "ann_9683e50b9c41f7c3eb67d72f548e2ea4",
+      "22e75dc409e246b252871345de029e8aebadb74875d9e445025b7ea20ad469ad"
+    ],
+    "checked_artifact_classes": [
+      "approved_four_report_manifest",
+      "company_profile_gold_and_negative_annotations",
+      "stage5_targeted_and_authoritative_runs",
+      "manufacturing_materials_adjudication_ledgers",
+      "twenty_report_shadow_cohort",
+      "prior_company_profile_oos_runs"
+    ],
+    "company_profile_matches": [],
+    "decision": "independent_company_profile_canary_confirmed"
+  },
+  "immutable_authority_references": {
+    "four_report_authority_run_id": "stage55-closure-four-20260907-a",
+    "four_report_authority_manifest_sha256": "00fa20045d4df037a8984cff4b56af3f19ac533f4c4b9e311e7f130bf5158687",
+    "offline_gold_result": "18/24",
+    "input_record_source_for_canary": false
+  },
+  "provider_policy": {
+    "logical_route": "semantic_extraction",
+    "eligible_member_count": 4,
+    "dynamic_output_tokens": true,
+    "targeted_rerun_allowed": false,
+    "historical_output_splicing_allowed": false
+  }
+}

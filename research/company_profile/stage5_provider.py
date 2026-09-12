@@ -37,6 +37,7 @@ from .models import (
     LogicalSlot,
     MetricType,
     ObjectType,
+    RequirementLevel,
     RowClass,
     SubjectBasis,
     SubjectScope,
@@ -674,6 +675,19 @@ def _segment_row_extract_schema(
                 },
             }
         )
+    def segment_candidate(item: Any) -> dict[str, Any]:
+        row_schema: dict[str, Any] = {}
+        if item.field_id != "segment_dimension":
+            row_schema["properties"] = {
+                "cells": {"required": [item.field_id]}
+            }
+        return {
+            "properties": {
+                "item_type": {"const": "segment_row"},
+                "row": row_schema,
+            }
+        }
+
     return {
         "type": "object",
         "additionalProperties": False,
@@ -681,7 +695,14 @@ def _segment_row_extract_schema(
         "properties": {
             "schema_version": {"const": "company_profile_extract_response.v1"},
             "request_id": {"type": "string"},
-            "items": {"type": "array", "items": {"oneOf": item_schemas}},
+            "items": {
+                "type": "array",
+                "items": {"oneOf": item_schemas},
+                "allOf": _item_array_requires_fields(
+                    request,
+                    candidate_for_field=segment_candidate,
+                ),
+            },
         },
     }
 
@@ -985,6 +1006,58 @@ def _allowed_non_observed_coverage_statuses(
     )
 
 
+def _active_non_optional_items(request: SemanticTaskRequest) -> tuple[Any, ...]:
+    """Return unresolved checklist items that must produce a field result."""
+
+    active = {
+        item.field_id: item
+        for item in request.package_manifest.active_items(request.chapter_task)
+    }
+    return tuple(
+        active[field_id]
+        for field_id in request.unresolved_field_ids
+        if active[field_id].requirement_level != RequirementLevel.OPTIONAL
+    )
+
+
+def _coverage_contains_field(field_id: str) -> dict[str, Any]:
+    return {
+        "type": "array",
+        "contains": {
+            "type": "object",
+            "required": ["field_id"],
+            "properties": {"field_id": {"const": field_id}},
+        },
+    }
+
+
+def _item_array_requires_fields(
+    request: SemanticTaskRequest,
+    *,
+    candidate_for_field: Callable[[Any], dict[str, Any]],
+) -> list[dict[str, Any]]:
+    requirements: list[dict[str, Any]] = []
+    for item in _active_non_optional_items(request):
+        requirements.append({
+            "contains": {
+                "anyOf": [
+                    candidate_for_field(item),
+                    {
+                        "properties": {
+                            "item_type": {"const": "coverage"},
+                            "coverage": {
+                                "properties": {
+                                    "field_id": {"const": item.field_id}
+                                },
+                            },
+                        },
+                    },
+                ]
+            }
+        })
+    return requirements
+
+
 def _minimal_extract_schema(
     request: SemanticTaskRequest,
     *,
@@ -993,7 +1066,7 @@ def _minimal_extract_schema(
     if prepared_scope is not None and prepared_scope.scope_id == "business_overview":
         return _business_overview_extract_schema(request, prepared_scope)
     if request.chapter_task.value == "extract_material_inputs":
-        return _material_input_extract_schema()
+        return _material_input_extract_schema(request)
     if prepared_scope is not None and prepared_scope.scope_id in {
         "top_five_customer_totals_only",
         "top_five_supplier_totals_only",
@@ -1069,6 +1142,16 @@ def _minimal_extract_schema(
                 },
             }
         )
+    def generic_candidate(item: Any) -> dict[str, Any]:
+        return {
+            "properties": {
+                "item_type": {"const": "candidate"},
+                "candidate": {
+                    "properties": {"field_id": {"const": item.field_id}},
+                },
+            },
+        }
+
     return {
         "type": "object",
         "additionalProperties": False,
@@ -1076,7 +1159,14 @@ def _minimal_extract_schema(
         "properties": {
             "schema_version": {"const": "company_profile_extract_response.v1"},
             "request_id": {"type": "string"},
-            "items": {"type": "array", "items": {"oneOf": item_schemas}},
+            "items": {
+                "type": "array",
+                "items": {"oneOf": item_schemas},
+                "allOf": _item_array_requires_fields(
+                    request,
+                    candidate_for_field=generic_candidate,
+                ),
+            },
         },
     }
 
@@ -1112,6 +1202,25 @@ def _coverage_only_extract_schema(request: SemanticTaskRequest) -> dict[str, Any
                         ),
                     },
                 },
+                "allOf": [
+                    {
+                        "contains": {
+                            "type": "object",
+                            "required": ["item_type", "coverage"],
+                            "properties": {
+                                "item_type": {"const": "coverage"},
+                                "coverage": {
+                                    "type": "object",
+                                    "required": ["field_id"],
+                                    "properties": {
+                                        "field_id": {"const": item.field_id}
+                                    },
+                                },
+                            },
+                        }
+                    }
+                    for item in _active_non_optional_items(request)
+                ],
             }
         },
     }
@@ -1124,7 +1233,7 @@ def _business_overview_extract_schema(
     evidence_ids = [
         item.evidence.evidence_id for item in prepared_scope.evidence_bundle
     ]
-    return {
+    schema = {
         "type": "object",
         "additionalProperties": False,
         "required": ["overview", "activities"],
@@ -1171,9 +1280,15 @@ def _business_overview_extract_schema(
             },
         },
     }
+    if any(
+        item.field_id == "explicit_activity"
+        for item in _active_non_optional_items(request)
+    ):
+        schema["properties"]["activities"]["minItems"] = 1
+    return schema
 
 
-def _material_input_extract_schema() -> dict[str, Any]:
+def _material_input_extract_schema(request: SemanticTaskRequest) -> dict[str, Any]:
     relationship_schema = {
         "type": "object",
         "additionalProperties": False,
@@ -1198,7 +1313,7 @@ def _material_input_extract_schema() -> dict[str, Any]:
             },
         },
     }
-    return {
+    schema = {
         "type": "object",
         "additionalProperties": False,
         "required": ["material_inputs", "coverage"],
@@ -1210,6 +1325,16 @@ def _material_input_extract_schema() -> dict[str, Any]:
             "coverage": {"oneOf": [coverage_schema, {"type": "null"}]},
         },
     }
+    if _active_non_optional_items(request):
+        schema["allOf"] = [
+            {
+                "anyOf": [
+                    {"properties": {"material_inputs": {"minItems": 1}}},
+                    {"properties": {"coverage": {"type": "object"}}},
+                ]
+            }
+        ]
+    return schema
 
 
 def _totals_only_extract_schema(request: SemanticTaskRequest) -> dict[str, Any]:
@@ -1230,7 +1355,7 @@ def _totals_only_extract_schema(request: SemanticTaskRequest) -> dict[str, Any]:
             "evidence_id": {"type": "string"},
         },
     }
-    return {
+    schema = {
         "type": "object",
         "additionalProperties": False,
         "required": ["measurements"],
@@ -1238,6 +1363,9 @@ def _totals_only_extract_schema(request: SemanticTaskRequest) -> dict[str, Any]:
             "measurements": {"type": "array", "items": measurement_schema},
         },
     }
+    if _active_non_optional_items(request):
+        schema["properties"]["measurements"]["minItems"] = 1
+    return schema
 
 
 def _compact_operating_measurement_schema(
@@ -1279,7 +1407,7 @@ def _compact_operating_measurement_schema(
         "required": ["name", "value", "unit", "evidence_id"],
         "properties": common_properties,
     }
-    return {
+    schema = {
         "type": "object",
         "additionalProperties": False,
         "required": ["production_capacity", "processing_volume"],
@@ -1288,6 +1416,13 @@ def _compact_operating_measurement_schema(
             "processing_volume": {"type": "array", "items": processing_item},
         },
     }
+    required_fields = {
+        item.field_id for item in _active_non_optional_items(request)
+    }
+    for field_id in ("production_capacity", "processing_volume"):
+        if field_id in required_fields:
+            schema["properties"][field_id]["minItems"] = 1
+    return schema
 
 
 def _evidence_id_schema(
@@ -1398,7 +1533,7 @@ def _compact_measurements_extract_schema(
 ) -> dict[str, Any]:
     """Use a small model contract while retaining full local Pydantic checks."""
 
-    return {
+    schema = {
         "type": "object",
         "additionalProperties": False,
         "required": ["measurements", "coverage"],
@@ -1410,6 +1545,31 @@ def _compact_measurements_extract_schema(
             "coverage": _compact_coverage_array_schema(request),
         },
     }
+    requirements: list[dict[str, Any]] = []
+    for item in _active_non_optional_items(request):
+        metric_types = [metric.value for metric in item.allowed_metric_types]
+        measurement_rule: dict[str, Any] = {"minItems": 1}
+        if metric_types:
+            measurement_rule = {
+                "contains": {
+                    "type": "object",
+                    "required": ["metric_type"],
+                    "properties": {"metric_type": {"enum": metric_types}},
+                }
+            }
+        requirements.append({
+            "anyOf": [
+                {"properties": {"measurements": measurement_rule}},
+                {
+                    "properties": {
+                        "coverage": _coverage_contains_field(item.field_id)
+                    }
+                },
+            ]
+        })
+    if requirements:
+        schema["allOf"] = requirements
+    return schema
 
 
 def _counterparty_extract_schema(
@@ -1441,7 +1601,7 @@ def _counterparty_extract_schema(
         }
     else:
         measurement_schema = {"type": "array", "maxItems": 0}
-    return {
+    schema = {
         "type": "object",
         "additionalProperties": False,
         "required": ["relationships", "measurements", "coverage"],
@@ -1476,6 +1636,35 @@ def _counterparty_extract_schema(
             "coverage": _compact_coverage_array_schema(request),
         },
     }
+    requirements: list[dict[str, Any]] = []
+    for item in _active_non_optional_items(request):
+        if item.object_type == ObjectType.RELATIONSHIP:
+            candidate = {"properties": {"relationships": {"minItems": 1}}}
+        else:
+            metric_types = [metric.value for metric in item.allowed_metric_types]
+            measurement_rule: dict[str, Any] = {"minItems": 1}
+            if metric_types:
+                measurement_rule = {
+                    "contains": {
+                        "type": "object",
+                        "required": ["metric_type"],
+                        "properties": {"metric_type": {"enum": metric_types}},
+                    }
+                }
+            candidate = {"properties": {"measurements": measurement_rule}}
+        requirements.append({
+            "anyOf": [
+                candidate,
+                {
+                    "properties": {
+                        "coverage": _coverage_contains_field(item.field_id)
+                    }
+                },
+            ]
+        })
+    if requirements:
+        schema["allOf"] = requirements
+    return schema
 
 
 def _business_regime_extract_schema(
@@ -1532,7 +1721,7 @@ def _business_regime_extract_schema(
             "evidence_id": evidence_id,
         },
     }
-    return {
+    schema = {
         "type": "object",
         "additionalProperties": False,
         "required": ["events", "regimes", "package_assignments", "coverage"],
@@ -1543,6 +1732,24 @@ def _business_regime_extract_schema(
             "coverage": _compact_coverage_array_schema(request),
         },
     }
+    if _active_non_optional_items(request):
+        schema["allOf"] = [
+            {
+                "anyOf": [
+                    {"properties": {"events": {"minItems": 1}}},
+                    {"properties": {"regimes": {"minItems": 1}}},
+                    {"properties": {"package_assignments": {"minItems": 1}}},
+                    {
+                        "properties": {
+                            "coverage": _coverage_contains_field(
+                                request.unresolved_field_ids[0]
+                            )
+                        }
+                    },
+                ]
+            }
+        ]
+    return schema
 
 
 def _candidate_draft_schema(
