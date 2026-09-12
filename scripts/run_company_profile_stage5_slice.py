@@ -13,7 +13,7 @@ from pathlib import Path
 from typing import Any
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
-STAGE5_DEFAULT_PROVIDER_ROUTE = "semantic_extraction__scorpio_grok"
+STAGE5_DEFAULT_PROVIDER_ROUTE = "semantic_extraction"
 STAGE5_DEFAULT_EXTRACT_MAX_OUTPUT_TOKENS = 20_000
 STAGE5_DEFAULT_VERIFY_MAX_OUTPUT_TOKENS = 18_000
 STAGE5_DEFAULT_TIMEOUT_SECONDS = 300.0
@@ -174,10 +174,7 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     load_project_environment(ROOT_DIR, override=False)
     llm_config = config_manager.get_llm_config()
-    if not llm_config.is_logical_profile_enabled(args.provider_route):
-        raise ValueError(
-            f"logical LLM profile is disabled or unavailable: {args.provider_route}"
-        )
+    _validate_provider_route(llm_config, args.provider_route)
     runner = asyncio.Runner()
     client = LlmClient(llm_config)
     budget = _ProviderCallBudget(maximum=args.max_provider_calls)
@@ -207,6 +204,28 @@ def main(argv: Sequence[str] | None = None) -> int:
         runner.close()
     _print_result(execution.model_dump(mode="json"), provider_calls=budget.used)
     return 0
+
+
+def _validate_provider_route(llm_config: Any, route: str) -> None:
+    """Fail before provider I/O when the logical pool is not fully eligible."""
+    logical_route = str(route or "").strip()
+    if not llm_config.is_logical_profile_enabled(logical_route):
+        raise ValueError(
+            f"logical LLM profile is disabled or unavailable: {logical_route}"
+        )
+    pool = llm_config.pool_for_profile(logical_route)
+    if pool is None:
+        return
+    members = tuple(pool.members)
+    if len(members) < 4:
+        raise ValueError(
+            f"company-profile logical route requires four eligible pool members; got {len(members)}"
+        )
+    description = llm_config.describe_logical_profile(logical_route)
+    if "json_object" not in description.supported_structured_output_modes:
+        raise ValueError(
+            f"company-profile logical route lacks common json_object output mode: {logical_route}"
+        )
 
 
 def _provider_for_scope(

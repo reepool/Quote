@@ -1537,6 +1537,8 @@ def _is_report_local_counterparty(record: dict[str, Any]) -> bool:
 
 def _has_affirmative_subject_basis(record: dict[str, Any]) -> bool:
     basis = record.get("subject_basis")
+    if basis == "report_default_group_scope":
+        return record.get("subject_scope") == "consolidated_group"
     if basis == "numeric_reconciliation_to_consolidated_statement":
         return bool(record.get("uncertainty")) and any(
             item.get("subject_evidence_pages") for item in record.get("evidence", [])

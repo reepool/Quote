@@ -132,7 +132,7 @@ def test_common_gateway_provider_sends_one_bounded_scope_and_stage4_schema() -> 
     gateway_request = client.requests[0]
     safety_message = LlmMessage.from_value(gateway_request.messages[0])
     assert safety_message.is_safety_instruction is True
-    assert "公司 alone does not prove consolidated_group" in safety_message.content
+    assert "When the source does not identify" in safety_message.content
     assert "Every consolidated_group candidate must include" in safety_message.content
     assert gateway_request.schema_name == "company_profile_extract_response"
     assert isinstance(gateway_request.response_schema, dict)
@@ -195,8 +195,7 @@ def test_common_gateway_provider_sends_one_bounded_scope_and_stage4_schema() -> 
         in _TASK_INSTRUCTIONS["extract_segment_financials"]
     )
     assert (
-        "Return compact JSON only"
-        in _TASK_INSTRUCTIONS["extract_segment_financials"]
+        "Return compact JSON only" in _TASK_INSTRUCTIONS["extract_segment_financials"]
     )
     assert (
         "listing all three source values"
@@ -393,7 +392,7 @@ def test_business_overview_uses_flat_source_and_activity_drafts() -> None:
     overview = response["items"][0]["candidate"]
     activity = response["items"][1]["candidate"]
     assert overview["source_text"] == source_text
-    assert overview["subject_scope"] == "unclear"
+    assert overview["subject_scope"] == "consolidated_group"
     assert overview["reported_period"] == "2025"
     assert activity["activity_actor"] == "公司"
     assert activity["source_actor"] == "公司"
@@ -486,7 +485,7 @@ def test_totals_only_schema_cannot_emit_relationship_and_expands_measurement() -
     assert "Relationship" not in schema_text
     candidate = response["items"][0]["candidate"]
     assert candidate["field_id"] == "supplier_concentration"
-    assert candidate["subject_scope"] == "unclear"
+    assert candidate["subject_scope"] == "consolidated_group"
     assert candidate["reported_period"] == "2025"
     assert response["items"][1]["coverage"]["status"] == "not_disclosed"
 
@@ -1812,7 +1811,9 @@ def test_segment_partition_merge_reconciles_owned_metadata_and_evidence() -> Non
     assert set(row["cells"]) == set(metrics)
 
 
-def test_segment_partition_multi_evidence_expands_through_existing_provider_path() -> None:
+def test_segment_partition_multi_evidence_expands_through_existing_provider_path() -> (
+    None
+):
     prepared = _multi_evidence_high_cardinality_segment_prepared_scope()
     request = _segment_extract_request(prepared)
     metrics = (
@@ -1855,16 +1856,21 @@ def test_segment_partition_multi_evidence_expands_through_existing_provider_path
         item.evidence.evidence_id for item in prepared.evidence_bundle
     }
     assert all(
-        {item["evidence_id"] for item in candidate["evidence"]}
-        == expected_evidence_ids
+        {item["evidence_id"] for item in candidate["evidence"]} == expected_evidence_ids
         for candidate in candidates
     )
     measurement_by_field = {
-        item["field_id"]: item for item in candidates if item["object_type"] == "Measurement"
+        item["field_id"]: item
+        for item in candidates
+        if item["object_type"] == "Measurement"
     }
     for field_id, evidence_id in zip(
         metrics,
-        ("segment-revenue-evidence", "segment-cost-evidence", "segment-margin-evidence"),
+        (
+            "segment-revenue-evidence",
+            "segment-cost-evidence",
+            "segment-margin-evidence",
+        ),
         strict=True,
     ):
         anchors = {
@@ -2419,21 +2425,36 @@ def test_segment_partition_period_semantics_accepts_only_closed_annual_aliases()
 ):
     prepared = _prepared_scope()
 
-    assert _normalize_adapter_reported_period(
-        "2025年", period_type="duration", prepared_scope=prepared
-    ) == "2025年"
-    assert _normalize_segment_partition_reported_period(
-        "2025年", period_type="duration", prepared_scope=prepared
-    ) == "2025"
-    assert _normalize_segment_partition_reported_period(
-        "2025年度", period_type="duration", prepared_scope=prepared
-    ) == "2025"
-    assert _normalize_segment_partition_reported_period(
-        "2025年度", period_type="instant", prepared_scope=prepared
-    ) == "2025年度"
-    assert _normalize_segment_partition_reported_period(
-        "2024年度", period_type="duration", prepared_scope=prepared
-    ) == "2024年度"
+    assert (
+        _normalize_adapter_reported_period(
+            "2025年", period_type="duration", prepared_scope=prepared
+        )
+        == "2025年"
+    )
+    assert (
+        _normalize_segment_partition_reported_period(
+            "2025年", period_type="duration", prepared_scope=prepared
+        )
+        == "2025"
+    )
+    assert (
+        _normalize_segment_partition_reported_period(
+            "2025年度", period_type="duration", prepared_scope=prepared
+        )
+        == "2025"
+    )
+    assert (
+        _normalize_segment_partition_reported_period(
+            "2025年度", period_type="instant", prepared_scope=prepared
+        )
+        == "2025年度"
+    )
+    assert (
+        _normalize_segment_partition_reported_period(
+            "2024年度", period_type="duration", prepared_scope=prepared
+        )
+        == "2024年度"
+    )
 
 
 def test_segment_dimension_options_preserve_complete_report_segment_headings() -> None:
@@ -2448,7 +2469,9 @@ def test_segment_dimension_options_preserve_complete_report_segment_headings() -
                 "gross_margin_reported",
             ),
             "evidence_bundle": (
-                _prepared_scope().evidence_bundle[0].model_copy(
+                _prepared_scope()
+                .evidence_bundle[0]
+                .model_copy(
                     update={
                         "evidence": _prepared_scope()
                         .evidence_bundle[0]
@@ -2465,7 +2488,7 @@ def test_segment_dimension_options_preserve_complete_report_segment_headings() -
                         )
                     }
                 ),
-            )
+            ),
         }
     )
 
@@ -2473,9 +2496,7 @@ def test_segment_dimension_options_preserve_complete_report_segment_headings() -
     schema = _minimal_extract_schema(
         _segment_extract_request(prepared), prepared_scope=prepared
     )
-    row_schema = schema["properties"]["items"]["items"]["oneOf"][0][
-        "properties"
-    ]["row"]
+    row_schema = schema["properties"]["items"]["items"]["oneOf"][0]["properties"]["row"]
 
     assert "报告分部的财务信息" in options
     assert "报告分部的确定依据与会计政策" not in options
@@ -2516,9 +2537,7 @@ def test_ambiguous_or_missing_segment_heading_remains_provider_owned(
     schema = _minimal_extract_schema(
         _segment_extract_request(prepared), prepared_scope=prepared
     )
-    row_schema = schema["properties"]["items"]["items"]["oneOf"][0][
-        "properties"
-    ]["row"]
+    row_schema = schema["properties"]["items"]["items"]["oneOf"][0]["properties"]["row"]
 
     assert _unique_segment_scope_heading(prepared) is None
     assert set(_segment_dimension_options(prepared)) == expected_options
@@ -2566,8 +2585,7 @@ def test_unique_segment_heading_expands_dimension_free_failure_shape() -> None:
         "operating_revenue",
     ]
     assert all(
-        item.get("dimension", item.get("segment_dimension"))
-        == "报告分部的财务信息"
+        item.get("dimension", item.get("segment_dimension")) == "报告分部的财务信息"
         for item in candidates
     )
     assert candidates[0]["source_native"]["header"] == "报告分部的财务信息"
@@ -3103,8 +3121,7 @@ def test_consolidation_adjustment_normalizes_internal_dimension() -> None:
         update={
             "anchor": TextAnchor(
                 bounded_quote=(
-                    "报告分部的财务信息 "
-                    "分部间抵销 -61,069,781 -60,974,432 0.16%"
+                    "报告分部的财务信息 分部间抵销 -61,069,781 -60,974,432 0.16%"
                 )
             )
         }
@@ -3135,9 +3152,7 @@ def test_consolidation_adjustment_normalizes_internal_dimension() -> None:
 
 def test_unique_segment_heading_merges_dimension_free_partitions() -> None:
     prepared = _high_cardinality_segment_prepared_scope()
-    source_text = prepared.page_contexts[0].text.replace(
-        "分产品", "报告分部的财务信息"
-    )
+    source_text = prepared.page_contexts[0].text.replace("分产品", "报告分部的财务信息")
     evidence = prepared.evidence_bundle[0].evidence.model_copy(
         update={"anchor": TextAnchor(bounded_quote=source_text)}
     )
@@ -3199,9 +3214,7 @@ def test_explicit_source_row_dimensions_remain_authoritative() -> None:
     prepared = _segment_prepared_scope()
     request = _segment_extract_request(prepared)
     schema = _minimal_extract_schema(request, prepared_scope=prepared)
-    row_schema = schema["properties"]["items"]["items"]["oneOf"][0][
-        "properties"
-    ]["row"]
+    row_schema = schema["properties"]["items"]["items"]["oneOf"][0]["properties"]["row"]
 
     assert _unique_segment_scope_heading(prepared) is None
     assert "dimension" not in row_schema["properties"]
@@ -3675,8 +3688,7 @@ def test_business_overview_rejects_text_not_present_in_evidence() -> None:
 def test_business_overview_rejects_cross_reference_only_target() -> None:
     prepared = _prepared_scope()
     pointer = (
-        "参见第三节“管理层讨论与分析”中“一、报告期内公司从事的主要业务”"
-        "的相关内容。"
+        "参见第三节“管理层讨论与分析”中“一、报告期内公司从事的主要业务”的相关内容。"
     )
     substantive = "公司的商业开发项目主要采用自行开发，部分销售、部分自持的经营模式。"
     evidence = prepared.evidence_bundle[0].evidence.model_copy(
@@ -3869,9 +3881,7 @@ def _multi_evidence_high_cardinality_segment_prepared_scope() -> PreparedRequest
             update={
                 "evidence_id": "segment-margin-evidence",
                 "page": 27,
-                "anchor": TextAnchor(
-                    bounded_quote="分产品 动力电池系统 毛利率 23.84%"
-                ),
+                "anchor": TextAnchor(bounded_quote="分产品 动力电池系统 毛利率 23.84%"),
             }
         ),
     )
@@ -3879,7 +3889,9 @@ def _multi_evidence_high_cardinality_segment_prepared_scope() -> PreparedRequest
     source = f"{source} " + " ".join(str(index) for index in range(1, 42))
     return prepared.model_copy(
         update={
-            "evidence_bundle": tuple(PreparedEvidence(evidence=item) for item in evidence),
+            "evidence_bundle": tuple(
+                PreparedEvidence(evidence=item) for item in evidence
+            ),
             "candidate_pages": (25, 26, 27),
             "page_contexts": tuple(
                 PreparedPageContext(
@@ -4196,9 +4208,7 @@ def _segment_partition_response(
                     "period_type": "duration",
                     "evidence_ids": [evidence_id],
                     "cells": {metric_field: cells[metric_field]},
-                    **(
-                        {"uncertainty": list(uncertainty)} if uncertainty else {}
-                    ),
+                    **({"uncertainty": list(uncertainty)} if uncertainty else {}),
                 },
             }
         ],
@@ -4812,9 +4822,7 @@ def test_isolated_context_only_coverage_preserves_valid_material_sibling() -> No
         client=_FakeGatewayClient(
             outputs=[
                 {
-                    "material_inputs": [
-                        {"name": "铁矿石", "evidence_id": owner_id}
-                    ],
+                    "material_inputs": [{"name": "铁矿石", "evidence_id": owner_id}],
                     "coverage": {
                         "status": "not_disclosed",
                         "reason_code": "source_reason_unspecified",
@@ -4843,10 +4851,7 @@ def test_isolated_context_only_coverage_preserves_valid_material_sibling() -> No
 
 
 def test_isolated_contradictory_regime_coverage_preserves_valid_regime() -> None:
-    source_text = (
-        "公司主要经营模式为直销。"
-        "报告期内合并范围是否发生变动 ☑是 □否。"
-    )
+    source_text = "公司主要经营模式为直销。报告期内合并范围是否发生变动 ☑是 □否。"
     prepared = _scope_with_source_text(
         chapter_task=ChapterTask.EXTRACT_BUSINESS_REGIME,
         scope_id="business_regime",
@@ -4893,16 +4898,11 @@ def test_isolated_contradictory_regime_coverage_preserves_valid_regime() -> None
     assert candidate["regime_label"] == "直销"
     rejected = provider.traces[0].rejected_extract_items
     assert len(rejected) == 1
-    assert "contradicts an evidenced control-scope change" in (
-        rejected[0].error_detail
-    )
+    assert "contradicts an evidenced control-scope change" in (rejected[0].error_detail)
 
 
 def test_isolated_control_no_change_coverage_preserves_valid_regime() -> None:
-    source_text = (
-        "公司主要经营模式为直销。"
-        "（八）合并报表范围的变化情况 □适用 √不适用。"
-    )
+    source_text = "公司主要经营模式为直销。（八）合并报表范围的变化情况 □适用 √不适用。"
     prepared = _scope_with_source_text(
         chapter_task=ChapterTask.EXTRACT_BUSINESS_REGIME,
         scope_id="business_regime",
@@ -5278,7 +5278,9 @@ def test_legal_empty_coverage_rejects_frozen_non_owner_shapes(
     )
     prepared = prepared.model_copy(
         update={
-            "evidence_bundle": (PreparedEvidence(evidence=evidence, field_id=field_id),),
+            "evidence_bundle": (
+                PreparedEvidence(evidence=evidence, field_id=field_id),
+            ),
             "candidate_pages": (evidence.page,),
         }
     )
@@ -5364,9 +5366,7 @@ def test_unclear_coverage_does_not_require_legal_empty_field_owner() -> None:
         source_text="公司根据销售预测量和目前库存量制定生产计划。",
     )
     evidence = prepared.evidence_bundle[0].evidence
-    prepared = prepared.model_copy(
-        update={"candidate_pages": (evidence.page,)}
-    )
+    prepared = prepared.model_copy(update={"candidate_pages": (evidence.page,)})
     request = _owner_coverage_request(prepared)
 
     result = _normalize_extract_response(
@@ -5435,3 +5435,37 @@ def test_cost_component_cannot_become_segment_identity() -> None:
         prepared_scope=prepared,
     )
     assert valid["items"][0]["candidate"]["label"] == "钢铁业"
+
+
+def test_default_group_subject_is_applied_to_unqualified_provider_drafts():
+    prepared = _prepared_scope().model_copy(update={"scope_id": "generic_overview"})
+    request = _extract_request(prepared)
+    expanded = _normalize_extract_response(
+        {
+            "schema_version": "company_profile_extract_response.v1",
+            "request_id": request.request_id,
+            "items": [
+                {
+                    "item_type": "candidate",
+                    "candidate": {
+                        "object_type": "Measurement",
+                        "field_id": "operating_revenue",
+                        "metric_type": "operating_revenue",
+                        "measured_object": "产品",
+                        "subject_scope": "unclear",
+                        "reported_period": "2025",
+                        "period_type": "duration",
+                        "source_native": {"name": "产品", "value": "100", "unit": "元"},
+                        "evidence_ids": [
+                            prepared.evidence_bundle[0].evidence.evidence_id
+                        ],
+                    },
+                }
+            ],
+        },
+        request=request,
+        prepared_scope=prepared,
+    )
+    candidate = expanded["items"][0]["candidate"]
+    assert candidate["subject_scope"] == "consolidated_group"
+    assert candidate["subject_basis"] == "report_default_group_scope"

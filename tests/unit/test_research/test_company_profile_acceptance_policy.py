@@ -307,9 +307,7 @@ def test_gold_matcher_uses_continuation_page_and_expected_completion_qualifier()
 
 
 def test_gold_matcher_accepts_compound_row_label_and_normalized_quote():
-    record, annotation = _record_and_annotation(
-        runtime_value="661", runtime_unit="GWh"
-    )
+    record, annotation = _record_and_annotation(runtime_value="661", runtime_unit="GWh")
     record.update(
         {
             "field_id": "sales_volume",
@@ -318,9 +316,7 @@ def test_gold_matcher_accepts_compound_row_label_and_normalized_quote():
             "measured_object": "电池系统",
         }
     )
-    record["source_native"].update(
-        {"name": "销售量", "value": "661", "unit": "GWh"}
-    )
+    record["source_native"].update({"name": "销售量", "value": "661", "unit": "GWh"})
     record["evidence"][0]["anchor"] = {
         "anchor_type": "text",
         "bounded_quote": "电池系统 销售量 GWh 661",
@@ -533,16 +529,12 @@ def test_gold_contract_conflict_is_not_hidden_by_matcher():
             }
         ]
     }
-    report["scope_results"][0]["task_result"]["coverage"][0]["evidence"][0][
-        "page"
-    ] = 16
+    report["scope_results"][0]["task_result"]["coverage"][0]["evidence"][0]["page"] = 16
     result = _evaluate_annotation(annotation, report)
     assert result.passed is False
     assert result.match_status == "failed"
 
-    report["scope_results"][0]["task_result"]["coverage"][0]["evidence"][0][
-        "page"
-    ] = 15
+    report["scope_results"][0]["task_result"]["coverage"][0]["evidence"][0]["page"] = 15
     result = _evaluate_annotation(annotation, report)
     assert result.passed is False
     assert result.match_status == "gold_contract_conflict"
@@ -641,20 +633,50 @@ def test_post_run_negative_evaluation_can_form_research_slice_usable():
     )
     fixtures = evaluate_fixture_guards()
 
-    assert _post_run_slice_status(
-        manifest,
-        fixture_guard_results=fixtures,
-        negative_case_results=real_results,
-    ) == "research_slice_usable"
+    assert (
+        _post_run_slice_status(
+            manifest,
+            fixture_guard_results=fixtures,
+            negative_case_results=real_results,
+        )
+        == "research_slice_usable"
+    )
 
     failed = real_results[0].model_copy(update={"passed": False})
-    assert _post_run_slice_status(
-        manifest,
-        fixture_guard_results=fixtures,
-        negative_case_results=(failed, *real_results[1:]),
-    ) == "hold"
-    assert _post_run_slice_status(
-        manifest,
-        fixture_guard_results=fixtures[:-1],
-        negative_case_results=real_results,
-    ) == "hold"
+    assert (
+        _post_run_slice_status(
+            manifest,
+            fixture_guard_results=fixtures,
+            negative_case_results=(failed, *real_results[1:]),
+        )
+        == "hold"
+    )
+    assert (
+        _post_run_slice_status(
+            manifest,
+            fixture_guard_results=fixtures[:-1],
+            negative_case_results=real_results,
+        )
+        == "hold"
+    )
+
+
+def test_report_default_group_scope_is_group_comparable_without_rewriting_source_wording(
+    reference_measurement,
+):
+    record = reference_measurement.model_copy(
+        update={
+            "subject_scope": SubjectScope.CONSOLIDATED_GROUP,
+            "subject_basis": SubjectBasis.REPORT_DEFAULT_GROUP_SCOPE,
+        }
+    )
+    assert record.source_native.name == "产品"
+    assert usage_policy(record)["consolidated_aggregation"] is True
+    assert derive_confidence(record) == "high"
+    issuer_record = record.model_copy(
+        update={
+            "subject_scope": SubjectScope.ISSUER,
+            "subject_basis": SubjectBasis.DIRECT_SOURCE_WORDING,
+        }
+    )
+    assert usage_policy(issuer_record)["consolidated_aggregation"] is False

@@ -54,6 +54,7 @@ class SubjectBasis(_StringEnum):
     )
     DIRECT_GRAMMATICAL_ACTOR = "direct_grammatical_actor"
     EXPLICIT_ECONOMIC_RELATIONSHIP = "explicit_economic_relationship"
+    REPORT_DEFAULT_GROUP_SCOPE = "report_default_group_scope"
     UNCLEAR = "unclear"
 
 
@@ -288,6 +289,7 @@ class SourceFact(_StrictModel):
             and self.subject_basis
             not in {
                 SubjectBasis.DIRECT_SOURCE_WORDING,
+                SubjectBasis.REPORT_DEFAULT_GROUP_SCOPE,
                 SubjectBasis.NUMERIC_RECONCILIATION_TO_CONSOLIDATED_STATEMENT,
             }
         ):

@@ -254,7 +254,7 @@
         ],
         "failover": {
           "enabled": true,
-          "max_hops": 1,
+          "max_hops": 2,
           "failure_threshold": 3,
           "open_seconds": 60,
           "half_open_max_probes": 1,

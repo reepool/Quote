@@ -36,6 +36,7 @@ CORE_CHAPTERS = (
 
 _GROUP_BASES = {
     SubjectBasis.DIRECT_SOURCE_WORDING,
+    SubjectBasis.REPORT_DEFAULT_GROUP_SCOPE,
     SubjectBasis.NUMERIC_RECONCILIATION_TO_CONSOLIDATED_STATEMENT,
 }
 
@@ -151,6 +152,9 @@ def accepted_has_illegal_group_promotion(task_results: list[Any]) -> bool:
 
 
 def _has_affirmative_group_evidence(record: SemanticRecord) -> bool:
+    if record.subject_basis == SubjectBasis.REPORT_DEFAULT_GROUP_SCOPE:
+        # Explicit research convention after narrower source scopes were ruled out.
+        return True
     if (
         record.subject_basis
         == SubjectBasis.NUMERIC_RECONCILIATION_TO_CONSOLIDATED_STATEMENT

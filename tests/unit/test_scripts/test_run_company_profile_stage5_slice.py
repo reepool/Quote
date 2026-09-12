@@ -43,7 +43,7 @@ def _minimal_operator_args() -> tuple[str, ...]:
 def test_stage5_operator_uses_measured_execution_defaults() -> None:
     args = operator.build_parser().parse_args(_minimal_operator_args())
 
-    assert args.provider_route == "semantic_extraction__scorpio_grok"
+    assert args.provider_route == "semantic_extraction"
     assert args.extract_max_output_tokens == 20_000
     assert args.verify_max_output_tokens == 18_000
     assert args.timeout_seconds == 300.0
@@ -282,3 +282,22 @@ def test_stage5_operator_rejects_targeted_validation_semantic_runs(
                 "27",
             )
         )
+
+
+def test_provider_route_validation_requires_four_pool_members():
+    class Config:
+        def is_logical_profile_enabled(self, name):
+            return True
+
+        def pool_for_profile(self, name):
+            return type("Pool", (), {"members": (1, 2, 3)})()
+
+        def describe_logical_profile(self, name):
+            return type(
+                "Description",
+                (),
+                {"supported_structured_output_modes": ("json_object",)},
+            )()
+
+    with pytest.raises(ValueError, match="four eligible pool members"):
+        operator._validate_provider_route(Config(), "semantic_extraction")

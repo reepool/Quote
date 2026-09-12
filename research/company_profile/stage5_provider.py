@@ -572,9 +572,7 @@ def _segment_row_extract_schema(
         unique_scope_heading
     )
     dimension_options = (
-        []
-        if dimension_is_locally_bound
-        else _segment_dimension_options(prepared_scope)
+        [] if dimension_is_locally_bound else _segment_dimension_options(prepared_scope)
     )
     candidate_evidence_ids = (
         [
@@ -620,6 +618,7 @@ def _segment_row_extract_schema(
                 "enum": [
                     "direct_source_wording",
                     "numeric_reconciliation_to_consolidated_statement",
+                    "report_default_group_scope",
                     "unclear",
                 ]
             },
@@ -828,9 +827,7 @@ def _merge_segment_partition_responses(
                         "binds it locally"
                     )
                 dimension = str(
-                    locally_bound_dimension
-                    or row.get("dimension")
-                    or ""
+                    locally_bound_dimension or row.get("dimension") or ""
                 ).strip()
                 if not dimension:
                     raise ValueError(
@@ -1563,6 +1560,7 @@ def _candidate_draft_schema(
                 "numeric_reconciliation_to_consolidated_statement",
                 "direct_grammatical_actor",
                 "explicit_economic_relationship",
+                "report_default_group_scope",
                 "unclear",
             ]
         },
@@ -2147,9 +2145,7 @@ def _expand_segment_row_draft(
         item.evidence.evidence_id
         for item in prepared_scope.evidence_bundle
         if "".join(dimension.split())
-        in "".join(
-            str(getattr(item.evidence.anchor, "bounded_quote", "")).split()
-        )
+        in "".join(str(getattr(item.evidence.anchor, "bounded_quote", "")).split())
     }
     row["evidence_ids"] = sorted(
         set(row.get("evidence_ids") or ()) | dimension_evidence_ids
@@ -2928,9 +2924,7 @@ def _normalize_extract_response_isolated(
         detail = str(exc).strip()
         if detail not in _ISOLATABLE_BUSINESS_REGIME_ERRORS:
             raise
-        if not isinstance(result, Mapping) or not isinstance(
-            result.get("items"), list
-        ):
+        if not isinstance(result, Mapping) or not isinstance(result.get("items"), list):
             raise
         retained: list[Any] = []
         removed = 0
@@ -3239,6 +3233,23 @@ def _expand_repair_response(
     return result
 
 
+def _default_group_subject_draft(
+    candidate: dict[str, Any], *, prepared_scope: PreparedRequestScope
+) -> None:
+    """Apply the report-level group convention to otherwise unqualified facts."""
+    if candidate.get("subject_scope") not in (None, "", "unclear"):
+        return
+    # Segment rows are reconstructed from a disclosed table dimension, and
+    # consolidation-adjustment rows have their own narrow evidence rule.
+    if (
+        candidate.get("object_type") == "Segment"
+        or candidate.get("row_class") == "consolidation_adjustment"
+    ):
+        return
+    candidate["subject_scope"] = "consolidated_group"
+    candidate["subject_basis"] = "report_default_group_scope"
+
+
 def _expand_candidate_draft(
     draft: dict[str, Any],
     *,
@@ -3248,6 +3259,7 @@ def _expand_candidate_draft(
     if {"schema_version", "record_id", "report", "evidence"}.issubset(draft):
         return _expand_existing_fact_refs(draft, prepared_scope=prepared_scope)
     candidate = deepcopy(draft)
+    _default_group_subject_draft(candidate, prepared_scope=prepared_scope)
     _require_numeric_reconciliation_uncertainty(candidate)
     candidate["reported_period"] = _normalize_adapter_reported_period(
         candidate.get("reported_period"),
@@ -3409,7 +3421,9 @@ def _coverage_evidence_owns_field(
                     r".{0,30}\d[\d,]*(?:\.\d+)?(?:万吨|吨|GWh|MWh|万㎡|亿㎡|㎡|台|套)",
                     text,
                 )
-                or re.search(r"(?:主要产品)?产能(?:情况|状况).{0,100}(?:适用|不适用)", text)
+                or re.search(
+                    r"(?:主要产品)?产能(?:情况|状况).{0,100}(?:适用|不适用)", text
+                )
             )
         if field_id == "capacity_under_construction":
             return bool(
@@ -3663,9 +3677,7 @@ class CommonGatewaySemanticProvider:
                     prepared_scope=self._prepared_scope,
                 )
                 parsed = ExtractResponse.model_validate_json(
-                    json.dumps(
-                        normalization.data, ensure_ascii=False, allow_nan=False
-                    )
+                    json.dumps(normalization.data, ensure_ascii=False, allow_nan=False)
                 )
             except (ValidationError, TypeError, ValueError) as exc:
                 raise SemanticProviderError(
@@ -3936,11 +3948,7 @@ class CommonGatewaySemanticProvider:
                     "data_status, or full Evidence inside a candidate. Return evidence_ids "
                     "only; the adapter binds canonical source evidence locally. When a "
                     "candidate is emitted, do not also emit observed coverage for that field; "
-                    "the workflow derives observed coverage after acceptance. The wording 公司 "
-                    "alone does not prove consolidated_group: use subject_scope=unclear unless "
-                    "the source explicitly says 合并/本集团 or the supplied evidence documents "
-                    "numeric reconciliation to the consolidated statement. Every "
-                    "consolidated_group candidate must include the matching subject_basis. "
+                    "the workflow derives observed coverage after acceptance. When the source does not identify 母公司、本公司、 a named subsidiary, or a disclosed segment, use subject_scope=consolidated_group and subject_basis=report_default_group_scope. Preserve source-native wording 公司 and Evidence; do not claim issuer-specific wording. Keep explicit issuer, named subsidiary, business segment, and numeric-reconciled subjects unchanged. Every consolidated_group candidate must include the matching subject_basis. "
                     "When subject_basis is numeric reconciliation, uncertainty must be "
                     "non-empty and state the source-table total plus its comparison with "
                     "the consolidated and parent-company statement values from Evidence. "
