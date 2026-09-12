@@ -211,6 +211,7 @@ class CompanyProfileSemanticService:
         record_positions = {
             record.record_id: index for index, record in enumerate(unique_records)
         }
+        capacity_repair_attempted = False
 
         for record in tuple(unique_records):
             if record.record_id in conflict_ids:
@@ -228,7 +229,9 @@ class CompanyProfileSemanticService:
             if (
                 issue == ContractErrorCode.CAPACITY_KIND_AMBIGUOUS
                 and provider is not None
+                and not capacity_repair_attempted
             ):
+                capacity_repair_attempted = True
                 repaired = self._repair_capacity_kind(
                     request,
                     record,

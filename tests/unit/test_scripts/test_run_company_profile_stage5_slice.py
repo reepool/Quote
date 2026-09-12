@@ -44,11 +44,13 @@ def test_stage5_operator_uses_measured_execution_defaults() -> None:
     args = operator.build_parser().parse_args(_minimal_operator_args())
 
     assert args.provider_route == "semantic_extraction"
-    assert args.extract_max_output_tokens == 20_000
-    assert args.verify_max_output_tokens == 18_000
+    assert args.extract_max_output_tokens is None
+    assert args.verify_max_output_tokens is None
     assert args.timeout_seconds == 300.0
-    assert args.max_provider_calls == 27
+    assert args.max_provider_calls == 129
+    assert args.dynamic_output_tokens is True
     assert operator._validate_budget(args) == (20_000, 18_000)
+    assert operator._dynamic_output_tokens_enabled(args) is True
 
 
 def test_stage5_operator_legacy_output_override_applies_to_all_calls() -> None:
@@ -57,6 +59,73 @@ def test_stage5_operator_legacy_output_override_applies_to_all_calls() -> None:
     )
 
     assert operator._validate_budget(args) == (9_000, 9_000)
+    assert operator._dynamic_output_tokens_enabled(args) is False
+
+
+def test_scope_output_budget_keeps_small_scope_at_base() -> None:
+    scope = type(
+        "Scope",
+        (),
+        {
+            "page_contexts": (type("Page", (), {"text": "short"})(),),
+            "evidence_bundle": (object(),),
+            "field_ids": ("business_description",),
+        },
+    )()
+
+    budget = operator._scope_output_token_budget(scope)
+
+    assert budget == operator._OutputTokenBudget(20_000, 18_000, "base")
+
+
+def test_scope_output_budget_escalates_only_for_large_context() -> None:
+    scope = type(
+        "Scope",
+        (),
+        {
+            "page_contexts": tuple(
+                type("Page", (), {"text": "x" * 12_000})() for _ in range(3)
+            ),
+            "evidence_bundle": tuple(object() for _ in range(8)),
+            "field_ids": tuple(f"field-{index}" for index in range(8)),
+        },
+    )()
+
+    budget = operator._scope_output_token_budget(scope)
+
+    assert budget.tier == "very_large"
+    assert budget.extract == 32_000
+    assert budget.verify == 24_000
+
+
+def test_explicit_output_override_disables_dynamic_budget() -> None:
+    args = operator.build_parser().parse_args(
+        (*_minimal_operator_args(), "--max-output-tokens", "9000")
+    )
+
+    assert args.dynamic_output_tokens is True
+    assert args.max_output_tokens == 9000
+    assert operator._dynamic_output_tokens_enabled(args) is False
+
+
+@pytest.mark.parametrize(
+    ("flag", "value", "expected"),
+    (
+        ("--extract-max-output-tokens", "12000", (12_000, 18_000)),
+        ("--verify-max-output-tokens", "11000", (20_000, 11_000)),
+    ),
+)
+def test_per_call_output_override_is_explicit(
+    flag: str,
+    value: str,
+    expected: tuple[int, int],
+) -> None:
+    args = operator.build_parser().parse_args(
+        (*_minimal_operator_args(), flag, value)
+    )
+
+    assert operator._validate_budget(args) == expected
+    assert operator._dynamic_output_tokens_enabled(args) is False
 
 
 @pytest.mark.parametrize(

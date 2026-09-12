@@ -952,6 +952,17 @@ def _merge_segment_partition_metadata(
         candidate = incoming.get(key)
         if current not in (None, "") and candidate not in (None, ""):
             if current != candidate:
+                if (
+                    key == "subject_basis"
+                    and existing.get("subject_scope") == "consolidated_group"
+                    and incoming.get("subject_scope") == "consolidated_group"
+                ):
+                    default_basis = "report_default_group_scope"
+                    if current == default_basis:
+                        existing[key] = deepcopy(candidate)
+                        continue
+                    if candidate == default_basis:
+                        continue
                 raise ValueError(
                     "segment partition row identity conflict: "
                     f"{key}: {current!r} != {candidate!r}"
@@ -2165,12 +2176,17 @@ def _expand_segment_row_draft(
             row["subject_scope"] = "unclear"
             row.pop("subject_basis", None)
             row.pop("subject_name", None)
-    elif row.get("subject_scope") in (None, "", "unclear"):
+    elif (
+        row.get("subject_scope") in (None, "", "unclear")
+        or row.get("subject_basis") == "report_default_group_scope"
+    ):
         # A normal row is physically scoped by the disclosed table dimension
         # (for example, 分产品 / 分地区 / 分销售模式). This is an
         # Evidence-backed reconstruction, not a model default: the source
         # dimension and row label are validated against table Evidence above.
         row["subject_scope"] = "business_segment"
+        row.pop("subject_basis", None)
+        row.pop("subject_name", None)
     common_keys = (
         "subject_scope",
         "subject_name",

@@ -337,6 +337,43 @@ def test_capacity_kind_can_be_repaired_once_from_supplied_evidence():
     assert result.records[0].capacity_kind.value == "report_period_capacity"
 
 
+def test_capacity_kind_repair_is_limited_to_once_per_scope():
+    first = _replace_record(_record("production_capacity"), capacity_kind="unclear")
+    second_payload = first.model_dump(mode="json")
+    second_payload["record_id"] = "stage4-capacity-second"
+    second_payload["measured_object"] = "储能产品"
+    second_payload["source_native"]["name"] = "储能产品"
+    second_payload["evidence"][0]["page"] += 1
+    second_payload["evidence"][0]["evidence_id"] = "stage4-evidence-capacity-second"
+    second = RECORD_ADAPTER.validate_json(
+        json.dumps(second_payload, ensure_ascii=False)
+    )
+    repaired = _replace_record(first, capacity_kind="report_period_capacity")
+    request = _request((first, second))
+    provider = FakeSemanticProvider(
+        repair_outputs=[
+            RepairResponse(
+                request_id=f"{request.request_id}:repair:{first.record_id}",
+                candidate=repaired,
+                changed_fields=("/capacity_kind",),
+            )
+        ]
+    )
+
+    result = CompanyProfileSemanticService().run_task(request, provider=provider)
+
+    assert result.provider_calls == ("repair", "verify")
+    assert provider.calls == ["repair", "verify"]
+    assert result.task_complete is False
+    assert any(
+        disposition.target_id == second.record_id
+        and disposition.status == DispositionStatus.UNRESOLVED
+        and ContractErrorCode.CAPACITY_KIND_AMBIGUOUS
+        in disposition.reason_codes
+        for disposition in result.dispositions
+    )
+
+
 def test_repair_outside_allowlist_leaves_candidate_unresolved():
     capacity = _replace_record(_record("production_capacity"), capacity_kind="unclear")
     mutated = _replace_record(

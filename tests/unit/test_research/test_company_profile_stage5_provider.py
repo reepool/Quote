@@ -1811,6 +1811,71 @@ def test_segment_partition_merge_reconciles_owned_metadata_and_evidence() -> Non
     assert set(row["cells"]) == set(metrics)
 
 
+@pytest.mark.parametrize(
+    ("bases", "expected_basis"),
+    (
+        (
+            (
+                "report_default_group_scope",
+                "numeric_reconciliation_to_consolidated_statement",
+            ),
+            "numeric_reconciliation_to_consolidated_statement",
+        ),
+        (
+            (
+                "numeric_reconciliation_to_consolidated_statement",
+                "report_default_group_scope",
+            ),
+            "numeric_reconciliation_to_consolidated_statement",
+        ),
+    ),
+)
+def test_segment_partition_merge_prefers_supported_group_basis_over_default(
+    bases: tuple[str, str],
+    expected_basis: str,
+) -> None:
+    prepared = _multi_evidence_high_cardinality_segment_prepared_scope()
+    request = _segment_extract_request(prepared)
+    metrics = ("operating_revenue", "operating_cost")
+    partitions = []
+    for index, (metric, basis, prepared_evidence) in enumerate(
+        zip(metrics, bases, prepared.evidence_bundle, strict=False),
+        start=1,
+    ):
+        partition_request = _segment_partition_request(
+            request,
+            fields=("segment_dimension", metric),
+            partition_index=index,
+            partition_count=2,
+        )
+        partitions.append(
+            (
+                partition_request,
+                _segment_partition_response(
+                    request_id=partition_request.request_id,
+                    evidence_id=prepared_evidence.evidence.evidence_id,
+                    metric_field=metric,
+                    subject_scope="consolidated_group",
+                    subject_basis=basis,
+                    uncertainty=("same-report consolidated reconciliation",)
+                    if basis
+                    == "numeric_reconciliation_to_consolidated_statement"
+                    else (),
+                ),
+            )
+        )
+
+    merged = _merge_segment_partition_responses(
+        request,
+        tuple(partitions),
+        prepared_scope=prepared,
+    )
+
+    row = merged["items"][0]["row"]
+    assert row["subject_scope"] == "consolidated_group"
+    assert row["subject_basis"] == expected_basis
+
+
 def test_segment_partition_multi_evidence_expands_through_existing_provider_path() -> (
     None
 ):
@@ -2979,6 +3044,33 @@ def test_consolidated_segment_subject_requires_affirmative_basis() -> None:
         "items[0].expanded[1]",
     }
     assert all("subject_basis" in item.error_detail for item in rejected)
+
+
+def test_segment_row_replaces_default_group_with_physical_segment_scope() -> None:
+    prepared = _segment_prepared_scope()
+    request = _segment_extract_request(prepared)
+    compact = _segment_row_response(
+        request_id=request.request_id,
+        evidence_id=prepared.evidence_bundle[0].evidence.evidence_id,
+    )
+    compact["items"][0]["row"]["subject_scope"] = "consolidated_group"
+    compact["items"][0]["row"]["subject_basis"] = "report_default_group_scope"
+    provider = CommonGatewaySemanticProvider(
+        client=_FakeGatewayClient(outputs=[compact]),
+        profile="semantic_extraction",
+        prepared_scope=prepared,
+        max_output_tokens=2000,
+        timeout_seconds=30,
+    )
+
+    response = provider.extract(request)
+
+    candidates = ExtractResponse.model_validate_json(
+        json.dumps(response, ensure_ascii=False)
+    ).candidates()
+    assert candidates
+    assert all(candidate.subject_scope == SubjectScope.BUSINESS_SEGMENT for candidate in candidates)
+    assert all(candidate.subject_basis is None for candidate in candidates)
 
 
 @pytest.mark.parametrize("dimension", ["分业务", "产品"])
@@ -4175,6 +4267,7 @@ def _segment_partition_response(
     evidence_id: str,
     metric_field: str,
     subject_scope: str = "unclear",
+    subject_basis: str | None = None,
     reported_period: str = "2025",
     uncertainty: tuple[str, ...] = (),
 ) -> dict[str, Any]:
@@ -4204,6 +4297,11 @@ def _segment_partition_response(
                 "row": {
                     "label": "动力电池系统",
                     "subject_scope": subject_scope,
+                    **(
+                        {"subject_basis": subject_basis}
+                        if subject_basis is not None
+                        else {}
+                    ),
                     "reported_period": reported_period,
                     "period_type": "duration",
                     "evidence_ids": [evidence_id],

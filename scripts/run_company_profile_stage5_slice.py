@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import asyncio
 import json
+import math
 import sys
 from collections.abc import Sequence
 from dataclasses import dataclass
@@ -17,7 +18,7 @@ STAGE5_DEFAULT_PROVIDER_ROUTE = "semantic_extraction"
 STAGE5_DEFAULT_EXTRACT_MAX_OUTPUT_TOKENS = 20_000
 STAGE5_DEFAULT_VERIFY_MAX_OUTPUT_TOKENS = 18_000
 STAGE5_DEFAULT_TIMEOUT_SECONDS = 300.0
-STAGE5_DEFAULT_MAX_PROVIDER_CALLS = 27
+STAGE5_DEFAULT_MAX_PROVIDER_CALLS = 129
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
@@ -53,6 +54,51 @@ class _ProviderCallBudget:
                 "stage-five provider-call budget exhausted",
             )
         self.used += 1
+
+
+@dataclass(frozen=True)
+class _OutputTokenBudget:
+    extract: int
+    verify: int
+    tier: str
+
+
+def _scope_output_token_budget(
+    scope: PreparedRequestScope,
+    *,
+    extract_base: int = STAGE5_DEFAULT_EXTRACT_MAX_OUTPUT_TOKENS,
+    verify_base: int = STAGE5_DEFAULT_VERIFY_MAX_OUTPUT_TOKENS,
+) -> _OutputTokenBudget:
+    """Choose a bounded output budget from request size, not semantic guesses.
+
+    The base budget remains unchanged for ordinary scopes. Larger requests get
+    one of two finite increases, capped below provider-specific runaway values.
+    This is deliberately provider-free so it can be tested before any network I/O.
+    """
+
+    text_chars = sum(len(item.text) for item in scope.page_contexts)
+    evidence_count = len(scope.evidence_bundle)
+    field_count = len(scope.field_ids)
+    page_count = len(scope.page_contexts)
+    complexity = (
+        math.ceil(text_chars / 4000)
+        + field_count * 2
+        + evidence_count
+        + page_count
+    )
+    if complexity <= 18:
+        return _OutputTokenBudget(extract=extract_base, verify=verify_base, tier="base")
+    if complexity <= 32:
+        return _OutputTokenBudget(
+            extract=max(extract_base, 28_000),
+            verify=max(verify_base, 22_000),
+            tier="large",
+        )
+    return _OutputTokenBudget(
+        extract=max(extract_base, 32_000),
+        verify=max(verify_base, 24_000),
+        tier="very_large",
+    )
 
 
 class _BudgetedProvider:
@@ -112,12 +158,10 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--extract-max-output-tokens",
         type=int,
-        default=STAGE5_DEFAULT_EXTRACT_MAX_OUTPUT_TOKENS,
     )
     parser.add_argument(
         "--verify-max-output-tokens",
         type=int,
-        default=STAGE5_DEFAULT_VERIFY_MAX_OUTPUT_TOKENS,
     )
     parser.add_argument(
         "--timeout-seconds",
@@ -129,6 +173,13 @@ def build_parser() -> argparse.ArgumentParser:
         type=int,
         default=STAGE5_DEFAULT_MAX_PROVIDER_CALLS,
     )
+    parser.add_argument(
+        "--no-dynamic-output-tokens",
+        dest="dynamic_output_tokens",
+        action="store_false",
+        help="keep the explicit extract/verify token budgets for every scope",
+    )
+    parser.set_defaults(dynamic_output_tokens=True)
     return parser
 
 
@@ -192,6 +243,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                 route=args.provider_route,
                 max_output_tokens=extract_max_output_tokens,
                 verify_max_output_tokens=verify_max_output_tokens,
+                dynamic_output_tokens=_dynamic_output_tokens_enabled(args),
                 timeout_seconds=args.timeout_seconds,
                 budget=budget,
             ),
@@ -236,9 +288,18 @@ def _provider_for_scope(
     route: str,
     max_output_tokens: int,
     verify_max_output_tokens: int,
+    dynamic_output_tokens: bool,
     timeout_seconds: float,
     budget: _ProviderCallBudget,
 ) -> _BudgetedProvider:
+    if dynamic_output_tokens:
+        selected = _scope_output_token_budget(
+            scope,
+            extract_base=max_output_tokens,
+            verify_base=verify_max_output_tokens,
+        )
+        max_output_tokens = selected.extract
+        verify_max_output_tokens = selected.verify
     return _BudgetedProvider(
         CommonGatewaySemanticProvider(
             client=client,
@@ -256,9 +317,15 @@ def _provider_for_scope(
 def _validate_budget(args: Any) -> tuple[int, int]:
     if args.max_output_tokens is not None and args.max_output_tokens < 1:
         raise ValueError("max-output-tokens must be positive")
-    if args.extract_max_output_tokens < 1:
+    if (
+        args.extract_max_output_tokens is not None
+        and args.extract_max_output_tokens < 1
+    ):
         raise ValueError("extract-max-output-tokens must be positive")
-    if args.verify_max_output_tokens < 1:
+    if (
+        args.verify_max_output_tokens is not None
+        and args.verify_max_output_tokens < 1
+    ):
         raise ValueError("verify-max-output-tokens must be positive")
     if args.timeout_seconds <= 0:
         raise ValueError("timeout-seconds must be positive")
@@ -266,7 +333,21 @@ def _validate_budget(args: Any) -> tuple[int, int]:
         raise ValueError("max-provider-calls must be positive")
     if args.max_output_tokens is not None:
         return args.max_output_tokens, args.max_output_tokens
-    return args.extract_max_output_tokens, args.verify_max_output_tokens
+    return (
+        args.extract_max_output_tokens
+        or STAGE5_DEFAULT_EXTRACT_MAX_OUTPUT_TOKENS,
+        args.verify_max_output_tokens
+        or STAGE5_DEFAULT_VERIFY_MAX_OUTPUT_TOKENS,
+    )
+
+
+def _dynamic_output_tokens_enabled(args: Any) -> bool:
+    return bool(
+        args.dynamic_output_tokens
+        and args.max_output_tokens is None
+        and args.extract_max_output_tokens is None
+        and args.verify_max_output_tokens is None
+    )
 
 
 def _print_result(payload: dict[str, Any], *, provider_calls: int) -> None:
