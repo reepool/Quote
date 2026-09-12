@@ -1,0 +1,116 @@
+{
+  "schema_version": "company_profile_shadow_current_mvp_replay_proof.v1",
+  "proof_id": "manufacturing-materials-shadow-current-mvp-admission-20260912-a",
+  "batch_id": "manufacturing-materials-shadow-current-mvp-four-pool-20260912-a",
+  "report_count": 20,
+  "sample_manifest_hash": "6f639739ef082e78dcb0c01a5ce40bab1645d8fdc027bece2dbef63652bae9e2",
+  "corrected_plan_hash": "cd445c2642f3509fabb92020968eb8e884aff6d2bc99caeda818ed8b3b094770",
+  "evidence_plan_version": "manufacturing_materials_shadow.2026-09-11.6",
+  "preparation_audit_hash": "c37280d844b6cb44c9a9d558d39f8de45f48b3173963fa04daaab1eb8617aa65",
+  "artifact_hashes": {
+    "openspec/changes/archive/2026-09-09-validate-manufacturing-materials-company-profile-shadow-batch/shadow-manifest.v1.json": "ca6d301ff7fb3b21b206be5951965059c87a7e485121c98a24475e59bad0f215",
+    "openspec/changes/archive/2026-09-11-validate-company-profile-operating-evidence-ownership-replay/ownership-evidence-plan.v1.json": "f2e87d53bac61dd0da4b5e8265de13172716bc9ce7845fce67a6e2cf774954ff",
+    "openspec/changes/archive/2026-09-11-validate-company-profile-operating-evidence-ownership-replay/provider-free-preparation-audit.v1.json": "a5958a7ecdd71a76985f02cef0385945fd9207098519a865e30acc7da95bb53f",
+    "var/company_profile_shadow_batch/20260911/external-operating-ownership-replay-a/batch-manufacturing-materials-shadow-operating-ownership-external-gemini-20260911-a/manifest.json": "99d7121b37e9284ca28471cc256cca9cbf672fd8bb22fe2eedf4a187f6bc9ee0",
+    "openspec/changes/archive/2026-09-11-replay-company-profile-operating-ownership-external-path/empirical-readiness-audit.v1.json": "f0bac8d80ff13c7f7e30e7e3158e842caddfa5f937606332c22d72b3695641e0",
+    "openspec/changes/archive/2026-09-11-replay-company-profile-operating-ownership-external-path/source-review-outcomes.v1.json": "8c4a83ddc0a5cec0f6915ffa9f9552f46fc2822195764c607de27e97cc64d599"
+  },
+  "implementation_hashes": {
+    "research/company_profile/shadow_evidence.py": "604048b92487f34dab8bca134a1e3b7a354a374ec12daea02c5ef4c8b8e854fa",
+    "research/company_profile/stage5_provider.py": "aa8dff7560de386cd487db75848b2ca91176bf4498dfe7c0c16a7e49d2e7270e",
+    "research/company_profile/stage5_service.py": "0d375d94256f4fe245c59175d1419d2b69d050e14abbcff624a03872a02ea37a",
+    "research/company_profile/shadow_batch_service.py": "e801d77f9aa67201e5fde6c9ec142b91aa52bf6e2f8601a1c8adca0b2ffa2ff0"
+  },
+  "supporting_artifact_hashes": {
+    "baseline_batch_manifest": "99d7121b37e9284ca28471cc256cca9cbf672fd8bb22fe2eedf4a187f6bc9ee0",
+    "baseline_readiness_audit": "f0bac8d80ff13c7f7e30e7e3158e842caddfa5f937606332c22d72b3695641e0",
+    "baseline_source_review_outcomes": "8c4a83ddc0a5cec0f6915ffa9f9552f46fc2822195764c607de27e97cc64d599",
+    "shadow_evidence_implementation": "604048b92487f34dab8bca134a1e3b7a354a374ec12daea02c5ef4c8b8e854fa",
+    "stage5_provider_implementation": "aa8dff7560de386cd487db75848b2ca91176bf4498dfe7c0c16a7e49d2e7270e",
+    "stage5_service_implementation": "0d375d94256f4fe245c59175d1419d2b69d050e14abbcff624a03872a02ea37a",
+    "current_mvp_replay_proof_validator": "e801d77f9aa67201e5fde6c9ec142b91aa52bf6e2f8601a1c8adca0b2ffa2ff0"
+  },
+  "source_review_rule": {
+    "include_all_dispositions": [
+      "blocker",
+      "caveat",
+      "unresolved"
+    ],
+    "stable_sample_per_core_chapter": 1,
+    "stable_sample_kinds": [
+      "accepted_for_review",
+      "legal_empty"
+    ],
+    "core_chapter_count": 6
+  },
+  "readiness_gates": {
+    "execution_completion_min": 0.95,
+    "usable_report_rate_min": 0.9,
+    "evidence_traceability_min": 1.0,
+    "source_review_complete": true,
+    "sampled_precision_min": 0.99,
+    "critical_semantic_error_max": 0,
+    "unresolved_review_median_max": 2,
+    "unresolved_review_p90_max": 5
+  },
+  "provider": {
+    "logical_profile": "semantic_extraction",
+    "extract_max_output_tokens": 20000,
+    "verify_max_output_tokens": 18000,
+    "timeout_seconds": 300.0,
+    "max_provider_calls": 600,
+    "outer_deadline_seconds": null
+  },
+  "provider_route_contract": {
+    "logical_profile": "semantic_extraction",
+    "pool": "shared_semantic",
+    "eligible_member_count": 4,
+    "source_labels": [
+      "scorpio:gemini-3.8-flash-high",
+      "zai:glm-5.3-flash",
+      "scorpio:grok-4.6",
+      "deepseek:deepseek-flash"
+    ],
+    "common_structured_output_modes": [
+      "json_object"
+    ],
+    "failover": {
+      "enabled": true,
+      "max_hops": 3
+    },
+    "route_fingerprint": "1b439d39e29b4686d977e92e648eb0e6e44a77915aa8ce706575383c1c516be5"
+  },
+  "dynamic_output_tokens": true,
+  "dynamic_token_tiers": {
+    "base": {
+      "complexity_max": 18,
+      "extract": 20000,
+      "verify": 18000
+    },
+    "large": {
+      "complexity_max": 32,
+      "extract": 28000,
+      "verify": 22000
+    },
+    "very_large": {
+      "complexity_min": 33,
+      "extract": 32000,
+      "verify": 24000
+    }
+  },
+  "authorized_transfer_hosts": [
+    "api.deepseek.com",
+    "open.bigmodel.cn",
+    "scorpio.reepool.com"
+  ],
+  "output_root": "/home/python/Quote/var/company_profile_shadow_batch/20260912/current-mvp-four-pool-a",
+  "output_absent_before_provider": true,
+  "provider_calls": 0,
+  "cohort_replay_performed": false,
+  "historical_artifacts_mutated": false,
+  "production_paths_opened": [],
+  "created_at": "2026-09-12T11:34:02.320932+00:00",
+  "production_authorization": "not_authorized",
+  "unresolved_finding_ids": [],
+  "audit_hash": "27e668c7a94f1ddc00a34fb4a40b4e86c6a63441c37f65dce197722e949c166a"
+}

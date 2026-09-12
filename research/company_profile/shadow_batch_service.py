@@ -214,6 +214,7 @@ def _validate_shadow_correction_audit(
         "company_profile_shadow_evidence_role_replay_proof.v1",
         "company_profile_shadow_operating_ownership_replay_proof.v1",
         "company_profile_shadow_external_operating_ownership_replay_proof.v1",
+        "company_profile_shadow_current_mvp_replay_proof.v1",
     }:
         if (
             audit.get("report_count") != SHADOW_REPORT_COUNT
@@ -232,6 +233,7 @@ def build_shadow_replay_admission_receipt(
     contract: ShadowReplayContract,
     output_root: str | Path,
     excluded_predecessor: Mapping[str, object] | None = None,
+    provider_route_contract: Mapping[str, object] | None = None,
 ) -> dict[str, object]:
     """Build a hash-bound receipt proving replay admission before provider creation."""
 
@@ -250,6 +252,8 @@ def build_shadow_replay_admission_receipt(
     }
     if excluded_predecessor is not None:
         payload["excluded_predecessor"] = dict(excluded_predecessor)
+    if provider_route_contract is not None:
+        payload["provider_route_contract"] = dict(provider_route_contract)
     return {**payload, "audit_hash": _payload_hash(payload)}
 
 
@@ -323,8 +327,7 @@ def validate_segment_heading_replay_proof(
         or audit.get("sample_manifest_hash") != contract.sample_manifest_hash
         or audit.get("corrected_plan_hash") != contract.evidence_plan_hash
         or audit.get("evidence_plan_version") != contract.evidence_plan_version
-        or audit.get("preparation_audit_hash")
-        != contract.preparation_audit_hash
+        or audit.get("preparation_audit_hash") != contract.preparation_audit_hash
         or audit_hash != contract.correction_audit_hash
     ):
         raise ValueError("segment heading replay proof does not admit this replay")
@@ -347,14 +350,12 @@ def validate_segment_heading_replay_proof(
         path = (root / str(relative_path)).resolve()
         if not path.is_relative_to(root) or not path.is_file():
             raise ValueError(
-                "segment heading replay proof path is invalid: "
-                f"{relative_path}"
+                f"segment heading replay proof path is invalid: {relative_path}"
             )
         actual_hash = hashlib.sha256(path.read_bytes()).hexdigest()
         if actual_hash != expected_hash:
             raise ValueError(
-                "segment heading replay proof artifact hash mismatch: "
-                f"{relative_path}"
+                f"segment heading replay proof artifact hash mismatch: {relative_path}"
             )
     if any(
         not isinstance(name, str)
@@ -453,13 +454,12 @@ def validate_evidence_role_replay_proof(
         path = (root / str(relative_path)).resolve()
         if not path.is_relative_to(root) or not path.is_file():
             raise ValueError(
-                "Evidence-role replay proof path is invalid: " f"{relative_path}"
+                f"Evidence-role replay proof path is invalid: {relative_path}"
             )
         actual_hash = hashlib.sha256(path.read_bytes()).hexdigest()
         if actual_hash != expected_hash:
             raise ValueError(
-                "Evidence-role replay proof artifact hash mismatch: "
-                f"{relative_path}"
+                f"Evidence-role replay proof artifact hash mismatch: {relative_path}"
             )
     if any(
         not isinstance(name, str)
@@ -561,8 +561,7 @@ def validate_operating_ownership_replay_proof(
         path = (root / str(relative_path)).resolve()
         if not path.is_relative_to(root) or not path.is_file():
             raise ValueError(
-                "operating ownership replay proof path is invalid: "
-                f"{relative_path}"
+                f"operating ownership replay proof path is invalid: {relative_path}"
             )
         if hashlib.sha256(path.read_bytes()).hexdigest() != expected_hash:
             raise ValueError(
@@ -661,6 +660,123 @@ def validate_external_operating_ownership_replay_proof(
         repository_root=repository_root,
         output_root=output_root,
     )
+
+
+def validate_current_mvp_replay_proof(
+    audit: Mapping[str, object],
+    *,
+    contract: ShadowReplayContract,
+    repository_root: str | Path,
+    output_root: str | Path,
+    provider_route_contract: Mapping[str, object],
+) -> dict[str, str]:
+    """Validate the one-shot current-MVP batch before provider construction."""
+
+    payload = dict(audit)
+    audit_hash = payload.pop("audit_hash", None)
+    expected_review_rule = {
+        "include_all_dispositions": ["blocker", "caveat", "unresolved"],
+        "stable_sample_per_core_chapter": 1,
+        "stable_sample_kinds": ["accepted_for_review", "legal_empty"],
+        "core_chapter_count": 6,
+    }
+    expected_readiness_gates = {
+        "execution_completion_min": 0.95,
+        "usable_report_rate_min": 0.9,
+        "evidence_traceability_min": 1.0,
+        "source_review_complete": True,
+        "sampled_precision_min": 0.99,
+        "critical_semantic_error_max": 0,
+        "unresolved_review_median_max": 2,
+        "unresolved_review_p90_max": 5,
+    }
+    if audit_hash != _payload_hash(payload):
+        raise ValueError("current MVP replay proof hash mismatch")
+    if (
+        audit.get("schema_version")
+        != "company_profile_shadow_current_mvp_replay_proof.v1"
+        or audit.get("report_count") != SHADOW_REPORT_COUNT
+        or audit.get("provider_calls") != 0
+        or audit.get("cohort_replay_performed") is not False
+        or audit.get("historical_artifacts_mutated") is not False
+        or audit.get("output_absent_before_provider") is not True
+        or audit.get("production_authorization") != PRODUCTION_AUTHORIZATION
+        or audit.get("production_paths_opened") != []
+        or audit.get("batch_id") != contract.batch_id
+        or audit.get("sample_manifest_hash") != contract.sample_manifest_hash
+        or audit.get("corrected_plan_hash") != contract.evidence_plan_hash
+        or audit.get("evidence_plan_version") != contract.evidence_plan_version
+        or audit.get("preparation_audit_hash") != contract.preparation_audit_hash
+        or audit_hash != contract.correction_audit_hash
+        or audit.get("source_review_rule") != expected_review_rule
+        or audit.get("readiness_gates") != expected_readiness_gates
+        or audit.get("authorized_transfer_hosts")
+        != ["api.deepseek.com", "open.bigmodel.cn", "scorpio.reepool.com"]
+        or audit.get("dynamic_output_tokens") is not True
+        or audit.get("dynamic_token_tiers")
+        != {
+            "base": {"complexity_max": 18, "extract": 20000, "verify": 18000},
+            "large": {"complexity_max": 32, "extract": 28000, "verify": 22000},
+            "very_large": {
+                "complexity_min": 33,
+                "extract": 32000,
+                "verify": 24000,
+            },
+        }
+        or audit.get("provider_route_contract") != dict(provider_route_contract)
+    ):
+        raise ValueError("current MVP replay proof does not admit this batch")
+
+    provider = audit.get("provider")
+    if not isinstance(provider, Mapping) or dict(provider) != {
+        "logical_profile": contract.primary_logical_profile,
+        "extract_max_output_tokens": contract.extract_max_output_tokens,
+        "verify_max_output_tokens": contract.verify_max_output_tokens,
+        "timeout_seconds": contract.timeout_seconds,
+        "max_provider_calls": contract.max_provider_calls,
+        "outer_deadline_seconds": None,
+    }:
+        raise ValueError("current MVP replay provider contract mismatch")
+    if Path(str(audit.get("output_root"))).resolve() != Path(output_root).resolve():
+        raise ValueError("current MVP replay output root mismatch")
+
+    root = Path(repository_root).resolve()
+    artifact_hashes = audit.get("artifact_hashes")
+    implementation_hashes = audit.get("implementation_hashes")
+    supporting_hashes = audit.get("supporting_artifact_hashes")
+    if not isinstance(artifact_hashes, Mapping) or not artifact_hashes:
+        raise TypeError("current MVP replay artifact hashes are missing")
+    if not isinstance(implementation_hashes, Mapping) or not implementation_hashes:
+        raise TypeError("current MVP replay implementation hashes are missing")
+    if not isinstance(supporting_hashes, Mapping) or not supporting_hashes:
+        raise TypeError("current MVP replay supporting hashes are missing")
+    for relative_path, expected_hash in {
+        **artifact_hashes,
+        **implementation_hashes,
+    }.items():
+        path = (root / str(relative_path)).resolve()
+        if not path.is_relative_to(root) or not path.is_file():
+            raise ValueError(
+                f"current MVP replay proof path is invalid: {relative_path}"
+            )
+        if hashlib.sha256(path.read_bytes()).hexdigest() != expected_hash:
+            raise ValueError(
+                f"current MVP replay proof artifact hash mismatch: {relative_path}"
+            )
+    if any(
+        not isinstance(name, str)
+        or not name
+        or not isinstance(value, str)
+        or not re.fullmatch(r"[0-9a-f]{64}", value)
+        for name, value in supporting_hashes.items()
+    ):
+        raise ValueError("current MVP replay supporting hashes are invalid")
+    actual_supporting = {
+        str(name): str(value) for name, value in supporting_hashes.items()
+    }
+    if actual_supporting != contract.supporting_artifact_hashes:
+        raise ValueError("current MVP replay supporting hashes mismatch")
+    return actual_supporting
 
 
 class ShadowReportSuccess(_StrictModel):

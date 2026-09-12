@@ -1,0 +1,54 @@
+{
+  "schema_version": "company_profile_shadow_replay_admission_receipt.v1",
+  "batch_id": "manufacturing-materials-shadow-current-mvp-four-pool-20260912-a",
+  "contract": {
+    "batch_id": "manufacturing-materials-shadow-current-mvp-four-pool-20260912-a",
+    "sample_manifest_hash": "6f639739ef082e78dcb0c01a5ce40bab1645d8fdc027bece2dbef63652bae9e2",
+    "evidence_plan_version": "manufacturing_materials_shadow.2026-09-11.6",
+    "evidence_plan_hash": "cd445c2642f3509fabb92020968eb8e884aff6d2bc99caeda818ed8b3b094770",
+    "preparation_audit_hash": "c37280d844b6cb44c9a9d558d39f8de45f48b3173963fa04daaab1eb8617aa65",
+    "scope_refinement_audit_hash": null,
+    "correction_audit_hash": "27e668c7a94f1ddc00a34fb4a40b4e86c6a63441c37f65dce197722e949c166a",
+    "supporting_artifact_hashes": {
+      "baseline_batch_manifest": "99d7121b37e9284ca28471cc256cca9cbf672fd8bb22fe2eedf4a187f6bc9ee0",
+      "baseline_readiness_audit": "f0bac8d80ff13c7f7e30e7e3158e842caddfa5f937606332c22d72b3695641e0",
+      "baseline_source_review_outcomes": "8c4a83ddc0a5cec0f6915ffa9f9552f46fc2822195764c607de27e97cc64d599",
+      "shadow_evidence_implementation": "604048b92487f34dab8bca134a1e3b7a354a374ec12daea02c5ef4c8b8e854fa",
+      "stage5_provider_implementation": "aa8dff7560de386cd487db75848b2ca91176bf4498dfe7c0c16a7e49d2e7270e",
+      "stage5_service_implementation": "0d375d94256f4fe245c59175d1419d2b69d050e14abbcff624a03872a02ea37a",
+      "current_mvp_replay_proof_validator": "e801d77f9aa67201e5fde6c9ec142b91aa52bf6e2f8601a1c8adca0b2ffa2ff0"
+    },
+    "primary_logical_profile": "semantic_extraction",
+    "extract_max_output_tokens": 20000,
+    "verify_max_output_tokens": 18000,
+    "timeout_seconds": 300.0,
+    "max_provider_calls": 600,
+    "production_authorization": "not_authorized"
+  },
+  "output_root": "/home/python/Quote/var/company_profile_shadow_batch/20260912/current-mvp-four-pool-a",
+  "output_batch_path": "/home/python/Quote/var/company_profile_shadow_batch/20260912/current-mvp-four-pool-a/batch-manufacturing-materials-shadow-current-mvp-four-pool-20260912-a",
+  "output_absent_before_provider": true,
+  "provider_calls": 0,
+  "cohort_replay_performed": false,
+  "production_authorization": "not_authorized",
+  "provider_route_contract": {
+    "logical_profile": "semantic_extraction",
+    "pool": "shared_semantic",
+    "eligible_member_count": 4,
+    "source_labels": [
+      "scorpio:gemini-3.8-flash-high",
+      "zai:glm-5.3-flash",
+      "scorpio:grok-4.6",
+      "deepseek:deepseek-flash"
+    ],
+    "common_structured_output_modes": [
+      "json_object"
+    ],
+    "failover": {
+      "enabled": true,
+      "max_hops": 3
+    },
+    "route_fingerprint": "1b439d39e29b4686d977e92e648eb0e6e44a77915aa8ce706575383c1c516be5"
+  },
+  "audit_hash": "9fc150659a0d9556a8ab526aefb29e5f10a3e87c69487713169c32cd7014cfc1"
+}

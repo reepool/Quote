@@ -1,0 +1,299 @@
+{
+  "schema_version": "company_profile_current_mvp_provider_token_failure_audit.v1",
+  "reviewed_on": "2026-09-12",
+  "batch_id": "manufacturing-materials-shadow-current-mvp-four-pool-20260912-a",
+  "source_batch_result_hash": "f11efedbc4c25f2dfcf6d3e4fdb6738b8d0e70a3f38aa00566d3048f65127788",
+  "route_contract": {
+    "logical_profile": "semantic_extraction",
+    "pool": "shared_semantic",
+    "eligible_member_count": 4,
+    "source_labels": [
+      "scorpio:gemini-3.8-flash-high",
+      "zai:glm-5.3-flash",
+      "scorpio:grok-4.6",
+      "deepseek:deepseek-flash"
+    ],
+    "common_structured_output_modes": [
+      "json_object"
+    ],
+    "failover": {
+      "enabled": true,
+      "max_hops": 3
+    },
+    "route_fingerprint": "1b439d39e29b4686d977e92e648eb0e6e44a77915aa8ce706575383c1c516be5"
+  },
+  "dynamic_output_tokens": true,
+  "dynamic_token_tiers": {
+    "base": {
+      "complexity_max": 18,
+      "extract": 20000,
+      "verify": 18000
+    },
+    "large": {
+      "complexity_max": 32,
+      "extract": 28000,
+      "verify": 22000
+    },
+    "very_large": {
+      "complexity_min": 33,
+      "extract": 32000,
+      "verify": 24000
+    }
+  },
+  "provider_call_count": 320,
+  "successful_call_count": 308,
+  "failed_call_count": 12,
+  "call_type_counts": {
+    "extract": 193,
+    "verify": 127
+  },
+  "failure_code_counts": {
+    "deadline_exceeded": 12
+  },
+  "model_summaries": [
+    {
+      "model": "deepseek-flash",
+      "call_count": 80,
+      "extract_call_count": 51,
+      "verify_call_count": 29,
+      "latency_ms_total": 2212873,
+      "latency_ms_max": 102985,
+      "output_tokens_total": 547859,
+      "output_tokens_max": 27580
+    },
+    {
+      "model": "gemini-3.8-flash-high",
+      "call_count": 80,
+      "extract_call_count": 47,
+      "verify_call_count": 33,
+      "latency_ms_total": 1388063,
+      "latency_ms_max": 75171,
+      "output_tokens_total": 358699,
+      "output_tokens_max": 24500
+    },
+    {
+      "model": "glm-5.3-flash",
+      "call_count": 69,
+      "extract_call_count": 39,
+      "verify_call_count": 30,
+      "latency_ms_total": 8468387,
+      "latency_ms_max": 295606,
+      "output_tokens_total": 417252,
+      "output_tokens_max": 14939
+    },
+    {
+      "model": "grok-4.6",
+      "call_count": 79,
+      "extract_call_count": 47,
+      "verify_call_count": 32,
+      "latency_ms_total": 9409632,
+      "latency_ms_max": 297534,
+      "output_tokens_total": 629835,
+      "output_tokens_max": 19587
+    }
+  ],
+  "token_observations": {
+    "extract_output_tokens_max": 24500,
+    "verify_output_tokens_max": 27580,
+    "extract_calls_above_base_output_budget": 3,
+    "verify_calls_above_base_output_budget": 6,
+    "successful_calls_at_or_above_270_seconds": 4
+  },
+  "slow_successes": [
+    {
+      "sample_id": "manufacturing-materials-shadow-600121-2025",
+      "scope_id": "business_overview-01",
+      "semantic_request_id": "manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-600121-SH:manufacturing-materials-shadow-600121-2025:business_overview-01:verify",
+      "call_type": "verify",
+      "model": "glm-5.3-flash",
+      "latency_ms": 295606,
+      "input_tokens": 2866,
+      "output_tokens": 10894
+    },
+    {
+      "sample_id": "manufacturing-materials-shadow-920033-2025",
+      "scope_id": "operating_quantities-01",
+      "semantic_request_id": "manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-920033-BJ:manufacturing-materials-shadow-920033-2025:operating_quantities-01",
+      "call_type": "extract",
+      "model": "glm-5.3-flash",
+      "latency_ms": 275318,
+      "input_tokens": 4373,
+      "output_tokens": 14638
+    },
+    {
+      "sample_id": "manufacturing-materials-shadow-920033-2025",
+      "scope_id": "operating_quantities-01",
+      "semantic_request_id": "manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-920033-BJ:manufacturing-materials-shadow-920033-2025:operating_quantities-01:verify",
+      "call_type": "verify",
+      "model": "grok-4.6",
+      "latency_ms": 275133,
+      "input_tokens": 8131,
+      "output_tokens": 17347
+    },
+    {
+      "sample_id": "manufacturing-materials-shadow-920068-2025",
+      "scope_id": "segment_financials-01",
+      "semantic_request_id": "manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-920068-BJ:manufacturing-materials-shadow-920068-2025:segment_financials-01:verify",
+      "call_type": "verify",
+      "model": "grok-4.6",
+      "latency_ms": 297534,
+      "input_tokens": 19442,
+      "output_tokens": 19587
+    }
+  ],
+  "failed_traces": [
+    {
+      "sample_id": "manufacturing-materials-shadow-600121-2025",
+      "scope_id": "segment_financials-02",
+      "semantic_request_id": "manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-600121-SH:manufacturing-materials-shadow-600121-2025:segment_financials-02:partition-01-of-02",
+      "call_type": "extract",
+      "status": "failed",
+      "provider": null,
+      "model": null,
+      "error_code": "deadline_exceeded",
+      "error_detail": "LLM request deadline exceeded",
+      "parent_semantic_request_id": "manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-600121-SH:manufacturing-materials-shadow-600121-2025:segment_financials-02"
+    },
+    {
+      "sample_id": "manufacturing-materials-shadow-600256-2025",
+      "scope_id": "segment_financials-01",
+      "semantic_request_id": "manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-600256-SH:manufacturing-materials-shadow-600256-2025:segment_financials-01:verify",
+      "call_type": "verify",
+      "status": "failed",
+      "provider": null,
+      "model": null,
+      "error_code": "deadline_exceeded",
+      "error_detail": "LLM request deadline exceeded",
+      "parent_semantic_request_id": null
+    },
+    {
+      "sample_id": "manufacturing-materials-shadow-600111-2025",
+      "scope_id": "segment_financials-02",
+      "semantic_request_id": "manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-600111-SH:manufacturing-materials-shadow-600111-2025:segment_financials-02",
+      "call_type": "extract",
+      "status": "failed",
+      "provider": null,
+      "model": null,
+      "error_code": "deadline_exceeded",
+      "error_detail": "LLM request deadline exceeded",
+      "parent_semantic_request_id": null
+    },
+    {
+      "sample_id": "manufacturing-materials-shadow-600176-2025",
+      "scope_id": "counterparties_and_concentration-02",
+      "semantic_request_id": "manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-600176-SH:manufacturing-materials-shadow-600176-2025:counterparties_and_concentration-02:verify",
+      "call_type": "verify",
+      "status": "failed",
+      "provider": null,
+      "model": null,
+      "error_code": "deadline_exceeded",
+      "error_detail": "LLM request deadline exceeded",
+      "parent_semantic_request_id": null
+    },
+    {
+      "sample_id": "manufacturing-materials-shadow-600075-2025",
+      "scope_id": "segment_financials-01",
+      "semantic_request_id": "manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-600075-SH:manufacturing-materials-shadow-600075-2025:segment_financials-01:partition-01-of-03",
+      "call_type": "extract",
+      "status": "failed",
+      "provider": null,
+      "model": null,
+      "error_code": "deadline_exceeded",
+      "error_detail": "LLM request deadline exceeded",
+      "parent_semantic_request_id": "manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-600075-SH:manufacturing-materials-shadow-600075-2025:segment_financials-01"
+    },
+    {
+      "sample_id": "manufacturing-materials-shadow-000552-2025",
+      "scope_id": "business_overview-01",
+      "semantic_request_id": "manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-000552-SZ:manufacturing-materials-shadow-000552-2025:business_overview-01",
+      "call_type": "extract",
+      "status": "failed",
+      "provider": null,
+      "model": null,
+      "error_code": "deadline_exceeded",
+      "error_detail": "LLM request deadline exceeded",
+      "parent_semantic_request_id": null
+    },
+    {
+      "sample_id": "manufacturing-materials-shadow-000552-2025",
+      "scope_id": "segment_financials-02",
+      "semantic_request_id": "manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-000552-SZ:manufacturing-materials-shadow-000552-2025:segment_financials-02",
+      "call_type": "extract",
+      "status": "failed",
+      "provider": null,
+      "model": null,
+      "error_code": "deadline_exceeded",
+      "error_detail": "LLM request deadline exceeded",
+      "parent_semantic_request_id": null
+    },
+    {
+      "sample_id": "manufacturing-materials-shadow-000629-2025",
+      "scope_id": "segment_financials-01",
+      "semantic_request_id": "manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-000629-SZ:manufacturing-materials-shadow-000629-2025:segment_financials-01:verify",
+      "call_type": "verify",
+      "status": "failed",
+      "provider": null,
+      "model": null,
+      "error_code": "deadline_exceeded",
+      "error_detail": "LLM request deadline exceeded",
+      "parent_semantic_request_id": null
+    },
+    {
+      "sample_id": "manufacturing-materials-shadow-000059-2025",
+      "scope_id": "segment_financials-01",
+      "semantic_request_id": "manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-000059-SZ:manufacturing-materials-shadow-000059-2025:segment_financials-01:partition-01-of-03",
+      "call_type": "extract",
+      "status": "failed",
+      "provider": null,
+      "model": null,
+      "error_code": "deadline_exceeded",
+      "error_detail": "LLM request deadline exceeded",
+      "parent_semantic_request_id": "manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-000059-SZ:manufacturing-materials-shadow-000059-2025:segment_financials-01"
+    },
+    {
+      "sample_id": "manufacturing-materials-shadow-000059-2025",
+      "scope_id": "segment_financials-02",
+      "semantic_request_id": "manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-000059-SZ:manufacturing-materials-shadow-000059-2025:segment_financials-02",
+      "call_type": "extract",
+      "status": "failed",
+      "provider": null,
+      "model": null,
+      "error_code": "deadline_exceeded",
+      "error_detail": "LLM request deadline exceeded",
+      "parent_semantic_request_id": null
+    },
+    {
+      "sample_id": "manufacturing-materials-shadow-000408-2025",
+      "scope_id": "segment_financials-02",
+      "semantic_request_id": "manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-000408-SZ:manufacturing-materials-shadow-000408-2025:segment_financials-02",
+      "call_type": "extract",
+      "status": "failed",
+      "provider": null,
+      "model": null,
+      "error_code": "deadline_exceeded",
+      "error_detail": "LLM request deadline exceeded",
+      "parent_semantic_request_id": null
+    },
+    {
+      "sample_id": "manufacturing-materials-shadow-000060-2025",
+      "scope_id": "segment_financials-02",
+      "semantic_request_id": "manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-000060-SZ:manufacturing-materials-shadow-000060-2025:segment_financials-02",
+      "call_type": "extract",
+      "status": "failed",
+      "provider": null,
+      "model": null,
+      "error_code": "deadline_exceeded",
+      "error_detail": "LLM request deadline exceeded",
+      "parent_semantic_request_id": null
+    }
+  ],
+  "findings": [
+    "Dynamic output budgets are active and should not be globally raised: most calls completed within the base limits, while nine successful calls legitimately exceeded a base limit under the bounded tiers.",
+    "The observed verify maximum was 27,580 output tokens, above the configured very-large 24,000-token request cap; the response remained usable, but provider cap compliance needs a controlled gateway check.",
+    "All twelve provider failures are deadline_exceeded and lack concrete provider/model attribution in the persisted trace.",
+    "Four successful Grok/GLM calls consumed 275-298 seconds, so globally shortening the 300-second request deadline is unsafe.",
+    "The next common P1 should admit eligible deadline exhaustion into bounded cross-model failover and reserve route time so repair cannot consume the full request budget; this validation must use controlled fixtures rather than another cohort run."
+  ],
+  "production_authorization": "not_authorized",
+  "audit_hash": "391afea57ca65b33984d91788048829966b82cf3aa4d4a1c5e0c2b2b10fd2afd"
+}

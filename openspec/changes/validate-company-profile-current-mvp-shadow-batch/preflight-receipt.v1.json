@@ -1,0 +1,40 @@
+{
+  "schema_version": "company_profile_shadow_current_mvp_preflight_receipt.v1",
+  "batch_id": "manufacturing-materials-shadow-current-mvp-four-pool-20260912-a",
+  "checked_at": "2026-09-12T11:44:17.735350+00:00",
+  "request_body_sent": false,
+  "semantic_provider_calls": 0,
+  "route_fingerprint": "1b439d39e29b4686d977e92e648eb0e6e44a77915aa8ce706575383c1c516be5",
+  "results": [
+    {
+      "host": "scorpio.reepool.com",
+      "path": "/v1/chat/completions",
+      "method": "HEAD",
+      "http_status": 404,
+      "dns_resolved": true,
+      "tls_connected": true,
+      "reachable": true
+    },
+    {
+      "host": "open.bigmodel.cn",
+      "path": "/api/coding/paas/v4/chat/completions",
+      "method": "HEAD",
+      "http_status": 401,
+      "dns_resolved": true,
+      "tls_connected": true,
+      "reachable": true
+    },
+    {
+      "host": "api.deepseek.com",
+      "path": "/v1/chat/completions",
+      "method": "HEAD",
+      "http_status": 401,
+      "dns_resolved": true,
+      "tls_connected": true,
+      "reachable": true
+    }
+  ],
+  "preflight_status": "passed",
+  "production_authorization": "not_authorized",
+  "audit_hash": "3bba9007a7aa2d9b6dba10bae67b5a384bee536e32d37580d9f67ce9fccfa153"
+}

@@ -1,0 +1,2492 @@
+[
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:business_overview-01:blocker:task_completion:business_overview-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms this item must remain a blocker under the frozen contract. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:business_overview-01:unresolved:stage5-d5c40cf9bb02821459c72c86",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:business_overview-01:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-600121-SH:manufacturing-materials-shadow-600121-2025:business_overview-01:coverage:explicit_activity",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:business_overview-01:chapter_sample:stage5-edf30e3496fb9b2bf982375f",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:segment_financials-01:blocker:task_completion:segment_financials-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms this item must remain a blocker under the frozen contract. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-600121-SH:manufacturing-materials-shadow-600121-2025:segment_financials-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-600121-SH:manufacturing-materials-shadow-600121-2025:segment_financials-01:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-600121-SH:manufacturing-materials-shadow-600121-2025:segment_financials-01:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-600121-SH:manufacturing-materials-shadow-600121-2025:segment_financials-01:coverage:operating_cost",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-600121-SH:manufacturing-materials-shadow-600121-2025:segment_financials-01:coverage:gross_margin_reported",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:segment_financials-02:blocker:task_completion:segment_financials-02",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms this item must remain a blocker under the frozen contract. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-600121-SH:manufacturing-materials-shadow-600121-2025:segment_financials-02:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-600121-SH:manufacturing-materials-shadow-600121-2025:segment_financials-02:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-600121-SH:manufacturing-materials-shadow-600121-2025:segment_financials-02:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-600121-SH:manufacturing-materials-shadow-600121-2025:segment_financials-02:coverage:operating_cost",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:operating_quantities-01:chapter_sample:stage5-2ef55a77af52f4840cc72288",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:material_inputs-01:chapter_sample:stage5-890c5cbf9573b0b6d4812e8d",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:counterparties_and_concentration-01:chapter_sample:stage5-fe85deae6c04c655ec0b1184",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600121-2025:business_regime-01:chapter_sample:coverage:business_regime-01:business_regime",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600022-2025:business_overview-01:chapter_sample:stage5-8095e687ef44ee7cc39b34a2",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600022-2025:segment_financials-01:chapter_sample:stage5-d0a7607c5de137d8c5b361d7",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600022-2025:segment_financials-02:blocker:task_completion:segment_financials-02",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms this item must remain a blocker under the frozen contract. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600022-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-600022-SH:manufacturing-materials-shadow-600022-2025:segment_financials-02:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600022-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-600022-SH:manufacturing-materials-shadow-600022-2025:segment_financials-02:coverage:operating_cost",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600022-2025:operating_quantities-01:chapter_sample:stage5-821a7c98a1e72a9b4942fb2e",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600022-2025:material_inputs-01:blocker:task_completion:material_inputs-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms this item must remain a blocker under the frozen contract. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600022-2025:material_inputs-01:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-600022-SH:manufacturing-materials-shadow-600022-2025:material_inputs-01:coverage:material_input",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600022-2025:counterparties_and_concentration-01:chapter_sample:stage5-932e5fe176bf1248c4fa90fe",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600022-2025:business_regime-01:chapter_sample:stage5-01091b57e3c97a5ceac483c7",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:business_overview-01:chapter_sample:stage5-b17c148defc96b69f126fb2e",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:segment_financials-01:blocker:task_completion:segment_financials-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms this item must remain a blocker under the frozen contract. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:segment_financials-01:unresolved:stage5-a8e2a268ec2337fa573811c8",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:segment_financials-01:unresolved:stage5-924af9b6eeadb2a2f43ca788",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:segment_financials-01:unresolved:stage5-722615f1f58f806b191318e4",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:segment_financials-01:unresolved:stage5-bda43958f958ced4b4e10b6d",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:segment_financials-01:unresolved:stage5-3a790254421d9179ac088033",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:segment_financials-01:unresolved:stage5-61da69f265d34630697692fb",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:segment_financials-01:unresolved:stage5-7f498cfb90044f9dc4eb7f69",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:segment_financials-01:unresolved:stage5-296e20324a442107ba425894",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:segment_financials-01:unresolved:stage5-3dafad7ee6d22b3c2d3329c3",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:segment_financials-01:unresolved:stage5-f879731502e936abefa44d13",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:segment_financials-01:unresolved:stage5-6572af5e588b6826f1776d0e",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:segment_financials-01:unresolved:stage5-07dd411f316d04c5560c865b",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:segment_financials-01:unresolved:stage5-ba17954f88f175f4da71ea3b",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:segment_financials-01:unresolved:stage5-d242c58931d4138e0e7ec01f",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:segment_financials-01:unresolved:stage5-5234d83afa82efee9122406f",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:segment_financials-01:unresolved:stage5-e7a9dca4459d125385a31930",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:segment_financials-01:unresolved:stage5-031952f65e2f326281dbac27",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:segment_financials-01:unresolved:stage5-f2f927c8a2c2fc574b062a85",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:segment_financials-01:unresolved:stage5-957c208b796a05173029c43b",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:segment_financials-01:unresolved:stage5-503fac93c8076c88eaf453fd",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:segment_financials-01:unresolved:stage5-840ac3c40f0e507ffd20e2a6",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:segment_financials-01:unresolved:stage5-c5460417b8339fe2684d594c",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:segment_financials-01:unresolved:stage5-9a1a9897c100fae843abee47",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:segment_financials-01:unresolved:stage5-8768f32b0d9e4ee336ffe454",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:segment_financials-01:unresolved:stage5-5d89863213c282be33fb4a22",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:segment_financials-01:unresolved:stage5-8346ea04c353776633254d13",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:segment_financials-01:unresolved:stage5-2d559024ac5eb80a4c2a1fc1",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:segment_financials-01:unresolved:stage5-b1a4e0791639a939b408e8ce",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:segment_financials-01:unresolved:stage5-bdf8440fca70ba540cdbb281",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:segment_financials-01:unresolved:stage5-faac2873a6e138335993a6a4",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:segment_financials-01:unresolved:stage5-4f781753e203e408f0cd14f3",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:segment_financials-01:unresolved:stage5-78223098f940fbb523ed82c8",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:segment_financials-01:unresolved:stage5-ef810c57f65e5bfcec2352a0",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:segment_financials-01:unresolved:stage5-2270c6adb83263695d66064d",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:segment_financials-01:unresolved:stage5-7d8f3729ba569a46ba6da1a2",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:segment_financials-01:unresolved:stage5-2b70b22cd1ca4659c59416a8",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:segment_financials-01:unresolved:stage5-0d165562bf66f17bd5ea6a5c",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:segment_financials-01:unresolved:stage5-5a6b7d9a5a4f5cc3a8cd0430",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-600256-SH:manufacturing-materials-shadow-600256-2025:segment_financials-01:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-600256-SH:manufacturing-materials-shadow-600256-2025:segment_financials-01:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-600256-SH:manufacturing-materials-shadow-600256-2025:segment_financials-01:coverage:operating_cost",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-600256-SH:manufacturing-materials-shadow-600256-2025:segment_financials-01:coverage:gross_margin_reported",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:segment_financials-02:chapter_sample:stage5-a64d981df1da330244f24dbc",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:operating_quantities-01:chapter_sample:stage5-ce26c3ecbccad61f79594579",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:material_inputs-01:chapter_sample:stage5-58d6d53ae7668ce7b80c3e5c",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:counterparties_and_concentration-01:blocker:task_completion:counterparties_and_concentration-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms this item must remain a blocker under the frozen contract. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:counterparties_and_concentration-01:unresolved:stage5-2527ed6e5353d16955847d05",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:counterparties_and_concentration-01:unresolved:stage5-30a27651089de3df8dc573b0",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:counterparties_and_concentration-01:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-600256-SH:manufacturing-materials-shadow-600256-2025:counterparties_and_concentration-01:coverage:supplier_concentration",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:counterparties_and_concentration-01:chapter_sample:stage5-b1c1b3312d1efbdea43953a3",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:business_regime-01:blocker:task_completion:business_regime-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms this item must remain a blocker under the frozen contract. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600256-2025:business_regime-01:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-600256-SH:manufacturing-materials-shadow-600256-2025:business_regime-01:coverage:business_regime",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600063-2025:business_overview-01:chapter_sample:stage5-5f91704e4601505c56ee6f1a",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600063-2025:segment_financials-01:chapter_sample:stage5-b171592d4eabc9e4c1f294d3",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600063-2025:operating_quantities-01:chapter_sample:stage5-3e6085664152a1491ae5fb46",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600063-2025:operating_quantities-02:blocker:task_completion:operating_quantities-02",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms this item must remain a blocker under the frozen contract. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600063-2025:operating_quantities-02:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-600063-SH:manufacturing-materials-shadow-600063-2025:operating_quantities-02:coverage:sales_volume",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600063-2025:operating_quantities-02:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-600063-SH:manufacturing-materials-shadow-600063-2025:operating_quantities-02:coverage:inventory_volume",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600063-2025:material_inputs-01:chapter_sample:stage5-957de624ab3d84751e83d7e6",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600063-2025:counterparties_and_concentration-01:chapter_sample:stage5-cf43155e1b90d3d0ea2fbce2",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600063-2025:business_regime-01:chapter_sample:coverage:business_regime-01:business_regime",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600111-2025:business_overview-01:blocker:task_completion:business_overview-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms this item must remain a blocker under the frozen contract. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600111-2025:business_overview-01:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-600111-SH:manufacturing-materials-shadow-600111-2025:business_overview-01:coverage:explicit_activity",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600111-2025:business_overview-01:chapter_sample:stage5-2b3f8db2ca537fb90f7cf3c8",
+    "outcome": "noncritical_error",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "The accepted value is main-business revenue (423.51亿元), not a substantive description of the business. This is a noncritical BusinessOverview owner error."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600111-2025:segment_financials-01:chapter_sample:stage5-54c979261a74a881fad539a3",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600111-2025:segment_financials-02:blocker:task_completion:segment_financials-02",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms this item must remain a blocker under the frozen contract. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600111-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-600111-SH:manufacturing-materials-shadow-600111-2025:segment_financials-02:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600111-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-600111-SH:manufacturing-materials-shadow-600111-2025:segment_financials-02:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600111-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-600111-SH:manufacturing-materials-shadow-600111-2025:segment_financials-02:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600111-2025:operating_quantities-01:blocker:task_completion:operating_quantities-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms this item must remain a blocker under the frozen contract. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600111-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-600111-SH:manufacturing-materials-shadow-600111-2025:operating_quantities-01:coverage:production_volume",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600111-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-600111-SH:manufacturing-materials-shadow-600111-2025:operating_quantities-01:coverage:inventory_volume",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600111-2025:operating_quantities-01:chapter_sample:coverage:operating_quantities-01:sales_volume",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600111-2025:material_inputs-01:chapter_sample:stage5-dfcb7768c2cf25ab30479ddd",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600111-2025:counterparties_and_concentration-01:unresolved:stage5-c0d8aecd96e8efa177d37fcd",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600111-2025:counterparties_and_concentration-01:unresolved:stage5-1a121ad8e5ab33d7e49956e4",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600111-2025:counterparties_and_concentration-01:chapter_sample:stage5-073f40a44850c06b32dc89ed",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600111-2025:business_regime-01:blocker:task_completion:business_regime-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms this item must remain a blocker under the frozen contract. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600111-2025:business_regime-01:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-600111-SH:manufacturing-materials-shadow-600111-2025:business_regime-01:coverage:business_regime",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:business_overview-01:chapter_sample:stage5-02ba572f4978ff6bc4663d7f",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:segment_financials-01:chapter_sample:stage5-7bdebe6c00b4967b52adad14",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:operating_quantities-01:blocker:task_completion:operating_quantities-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms this item must remain a blocker under the frozen contract. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-600176-SH:manufacturing-materials-shadow-600176-2025:operating_quantities-01:coverage:production_capacity",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:operating_quantities-02:blocker:task_completion:operating_quantities-02",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms this item must remain a blocker under the frozen contract. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:operating_quantities-02:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-600176-SH:manufacturing-materials-shadow-600176-2025:operating_quantities-02:coverage:production_volume",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:operating_quantities-02:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-600176-SH:manufacturing-materials-shadow-600176-2025:operating_quantities-02:coverage:sales_volume",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:operating_quantities-02:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-600176-SH:manufacturing-materials-shadow-600176-2025:operating_quantities-02:coverage:inventory_volume",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:material_inputs-01:chapter_sample:stage5-8006cd1b659af4bead2079dc",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:counterparties_and_concentration-01:chapter_sample:stage5-69f2ea465a06eee18b854149",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:counterparties_and_concentration-02:blocker:task_completion:counterparties_and_concentration-02",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms this item must remain a blocker under the frozen contract. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:counterparties_and_concentration-02:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-600176-SH:manufacturing-materials-shadow-600176-2025:counterparties_and_concentration-02:coverage:counterparty_relationship",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:counterparties_and_concentration-02:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-600176-SH:manufacturing-materials-shadow-600176-2025:counterparties_and_concentration-02:coverage:customer_concentration",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:business_regime-01:blocker:task_completion:business_regime-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms this item must remain a blocker under the frozen contract. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600176-2025:business_regime-01:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-600176-SH:manufacturing-materials-shadow-600176-2025:business_regime-01:coverage:business_regime",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:business_overview-01:blocker:task_completion:business_overview-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms this item must remain a blocker under the frozen contract. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:business_overview-01:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-600075-SH:manufacturing-materials-shadow-600075-2025:business_overview-01:coverage:explicit_activity",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:business_overview-01:chapter_sample:stage5-e9d9a4184a11c8091c009a7a",
+    "outcome": "noncritical_error",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "The accepted overview comes from the risk section and does not provide a stable principal-business description. This is a noncritical Evidence-owner error."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:segment_financials-01:blocker:task_completion:segment_financials-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms this item must remain a blocker under the frozen contract. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-600075-SH:manufacturing-materials-shadow-600075-2025:segment_financials-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-600075-SH:manufacturing-materials-shadow-600075-2025:segment_financials-01:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-600075-SH:manufacturing-materials-shadow-600075-2025:segment_financials-01:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-600075-SH:manufacturing-materials-shadow-600075-2025:segment_financials-01:coverage:operating_cost",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-600075-SH:manufacturing-materials-shadow-600075-2025:segment_financials-01:coverage:gross_margin_reported",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:segment_financials-02:chapter_sample:stage5-94cc9efe899f33a8f3d42262",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:operating_quantities-01:blocker:task_completion:operating_quantities-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms this item must remain a blocker under the frozen contract. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:operating_quantities-01:unresolved:stage5-ee79dfe5ce8b519088def140",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:operating_quantities-01:unresolved:stage5-c3aa2c28aee593ec971ffce3",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:operating_quantities-01:unresolved:stage5-e99c76e0c8811e93d654bc24",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:operating_quantities-01:unresolved:stage5-423b8c611fd3dde3dd7d92df",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:operating_quantities-01:unresolved:stage5-45e117385bdfc952c8f4a3ed",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:operating_quantities-01:unresolved:stage5-95078f96685597ff9b465116",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:operating_quantities-01:unresolved:stage5-728202f43505af181868a084",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:operating_quantities-01:unresolved:stage5-b5914b9ba4b3a78c2a8ec4b9",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:operating_quantities-01:unresolved:stage5-17199342b9f094d5938f58a7",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:operating_quantities-01:unresolved:stage5-611213148e4b6dcd64751f38",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:operating_quantities-01:unresolved:stage5-60a44a6cd4dde4a249de09c0",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:operating_quantities-01:unresolved:stage5-1b3aaf16344de810d473392d",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:operating_quantities-01:unresolved:stage5-830dcfdae50e95f7b292d262",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:operating_quantities-01:unresolved:stage5-72b319149159b5d9f8a51d6f",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-600075-SH:manufacturing-materials-shadow-600075-2025:operating_quantities-01:coverage:capacity_under_construction",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-600075-SH:manufacturing-materials-shadow-600075-2025:operating_quantities-01:coverage:production_volume",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-600075-SH:manufacturing-materials-shadow-600075-2025:operating_quantities-01:coverage:sales_volume",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-600075-SH:manufacturing-materials-shadow-600075-2025:operating_quantities-01:coverage:inventory_volume",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:operating_quantities-01:chapter_sample:stage5-2aaf8c77ffc09376272b32c5",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:material_inputs-01:chapter_sample:stage5-0cd3b9982124092ebeaa2a66",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:counterparties_and_concentration-01:chapter_sample:stage5-6beaf69e104edc7d78284466",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:business_regime-01:blocker:task_completion:business_regime-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms this item must remain a blocker under the frozen contract. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-600075-2025:business_regime-01:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-600075-SH:manufacturing-materials-shadow-600075-2025:business_regime-01:coverage:business_regime",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000552-2025:business_overview-01:blocker:task_completion:business_overview-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms this item must remain a blocker under the frozen contract. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000552-2025:business_overview-01:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-000552-SZ:manufacturing-materials-shadow-000552-2025:business_overview-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000552-2025:business_overview-01:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-000552-SZ:manufacturing-materials-shadow-000552-2025:business_overview-01:coverage:business_overview_source",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000552-2025:business_overview-01:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-000552-SZ:manufacturing-materials-shadow-000552-2025:business_overview-01:coverage:explicit_activity",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000552-2025:segment_financials-01:blocker:task_completion:segment_financials-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms this item must remain a blocker under the frozen contract. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000552-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-000552-SZ:manufacturing-materials-shadow-000552-2025:segment_financials-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000552-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-000552-SZ:manufacturing-materials-shadow-000552-2025:segment_financials-01:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000552-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-000552-SZ:manufacturing-materials-shadow-000552-2025:segment_financials-01:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000552-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-000552-SZ:manufacturing-materials-shadow-000552-2025:segment_financials-01:coverage:operating_cost",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000552-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-000552-SZ:manufacturing-materials-shadow-000552-2025:segment_financials-01:coverage:gross_margin_reported",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000552-2025:segment_financials-02:blocker:task_completion:segment_financials-02",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms this item must remain a blocker under the frozen contract. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000552-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-000552-SZ:manufacturing-materials-shadow-000552-2025:segment_financials-02:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000552-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-000552-SZ:manufacturing-materials-shadow-000552-2025:segment_financials-02:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000552-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-000552-SZ:manufacturing-materials-shadow-000552-2025:segment_financials-02:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000552-2025:operating_quantities-01:chapter_sample:stage5-ac37aa5a63c03188250a8105",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000552-2025:material_inputs-01:chapter_sample:stage5-ee8033990706c06c737eb431",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000552-2025:counterparties_and_concentration-01:chapter_sample:stage5-68d2a89a17ddddd4cf957aa6",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000552-2025:business_regime-01:chapter_sample:stage5-67ca9515b5c32a98abae2c4a",
+    "outcome": "noncritical_error",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "The event is source-supported, but source_native.name contains the canonical English label 'consolidation_scope_increase' rather than source-native wording. This is a noncritical label-preservation error."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:business_overview-01:chapter_sample:stage5-54650c884518a52d749e9169",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:segment_financials-01:blocker:task_completion:segment_financials-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms this item must remain a blocker under the frozen contract. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:segment_financials-01:unresolved:stage5-759195c5bfe835bb6ba5fc5d",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:segment_financials-01:unresolved:stage5-4525f5bf8d2d665c07cd2bf0",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:segment_financials-01:unresolved:stage5-e4dcda71b4abfa2b630ac894",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:segment_financials-01:unresolved:stage5-651817e89555ba5856924471",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:segment_financials-01:unresolved:stage5-fe720675f46a589453c084c4",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:segment_financials-01:unresolved:stage5-43949d76e3e3248c4172b3e8",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:segment_financials-01:unresolved:stage5-9425e10563756899f330c1e2",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:segment_financials-01:unresolved:stage5-06844df6f77fe4640fc31db9",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:segment_financials-01:unresolved:stage5-e65bcd515c7b66d3d4d1f89c",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:segment_financials-01:unresolved:stage5-91dd0210a6f6f196a74e58c6",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:segment_financials-01:unresolved:stage5-e341129c7afa1e4a3b57eadc",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:segment_financials-01:unresolved:stage5-dc8aea044c6d64b5eff85263",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:segment_financials-01:unresolved:stage5-4424de9f67ad2f81d511a870",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:segment_financials-01:unresolved:stage5-3a4660d1253161f3b4750bde",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:segment_financials-01:unresolved:stage5-5432a5df875d8524341f5069",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:segment_financials-01:unresolved:stage5-2220dcd959a8754e523e8913",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:segment_financials-01:unresolved:stage5-1951cd2682df59d716753e4a",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:segment_financials-01:unresolved:stage5-3eba12ba7b59cd2d117ebb49",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:segment_financials-01:unresolved:stage5-25928bef46ea8b42dbd32be8",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:segment_financials-01:unresolved:stage5-ae5bbd13bcf97c34ce479610",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:segment_financials-01:unresolved:stage5-fd0993c7c73cf86695ae4794",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:segment_financials-01:unresolved:stage5-38826d5c3251a0ac9d852f77",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:segment_financials-01:unresolved:stage5-bd99457bdd85c064731adee4",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:segment_financials-01:unresolved:stage5-cb5ebf8945ab058b06b4ef15",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:segment_financials-01:unresolved:stage5-0ae65cd160834efea0e56347",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:segment_financials-01:unresolved:stage5-fc329a08bb787538402eabe8",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:segment_financials-01:unresolved:stage5-fa27da8a94465169da11030b",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:segment_financials-01:unresolved:stage5-c43b7ca07a3d5953011c0126",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:segment_financials-01:unresolved:stage5-497faba5c6ff296122c924bd",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:segment_financials-01:unresolved:stage5-a91c081b1b3e45f305c13363",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:segment_financials-01:unresolved:stage5-7e628adc51a971d19f1698dc",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:segment_financials-01:unresolved:stage5-e42b5ee0cacaaca514e54222",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:segment_financials-01:unresolved:stage5-03295fdd6ce0766f5864ce80",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:segment_financials-01:unresolved:stage5-03f0510724a0c0ad7977c76d",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:segment_financials-01:unresolved:stage5-741c7b6ef6bcb96658331e46",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:segment_financials-01:unresolved:stage5-fc199eeea59b88e0f9dc2d14",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:segment_financials-01:unresolved:stage5-139a011e99b3bfca6942497d",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:segment_financials-01:unresolved:stage5-4b4f21149a61671480d4e67a",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:segment_financials-01:unresolved:stage5-ee3cfd1c1bf6110c826771e4",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:segment_financials-01:unresolved:stage5-1123dcac5e863846c323c61a",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:segment_financials-01:unresolved:stage5-eec50926aaccaee2d5703eb6",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:segment_financials-01:unresolved:stage5-afa39e8574de1180e0bc2407",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:segment_financials-01:unresolved:stage5-bc03bc6e0e1ab7816c407d2b",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:segment_financials-01:unresolved:stage5-3d20dc22cd02da0f1af26d7f",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:segment_financials-01:unresolved:stage5-33a52f2c1c136ec472a5421a",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:segment_financials-01:unresolved:stage5-4a244b5e8d0a8d6551197970",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:segment_financials-01:unresolved:stage5-9caabcba5ed582d49397640a",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:segment_financials-01:unresolved:stage5-c361fb17f21874c1bfea4451",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-000629-SZ:manufacturing-materials-shadow-000629-2025:segment_financials-01:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-000629-SZ:manufacturing-materials-shadow-000629-2025:segment_financials-01:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-000629-SZ:manufacturing-materials-shadow-000629-2025:segment_financials-01:coverage:operating_cost",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-000629-SZ:manufacturing-materials-shadow-000629-2025:segment_financials-01:coverage:gross_margin_reported",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:segment_financials-02:chapter_sample:stage5-1b1f8cda773394593b5db414",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:operating_quantities-01:chapter_sample:stage5-d6f9c2f77748d810b9d4a588",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:material_inputs-01:chapter_sample:stage5-7c40b9fe05d6dd39cd0969b5",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:counterparties_and_concentration-01:chapter_sample:stage5-258a790c8e7ecca2df6ad673",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:business_regime-01:blocker:task_completion:business_regime-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms this item must remain a blocker under the frozen contract. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000629-2025:business_regime-01:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-000629-SZ:manufacturing-materials-shadow-000629-2025:business_regime-01:coverage:business_regime",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000059-2025:business_overview-01:blocker:task_completion:business_overview-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms this item must remain a blocker under the frozen contract. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000059-2025:business_overview-01:unresolved:stage5-83128bae497d3cb0914036e6",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000059-2025:business_overview-01:unresolved:stage5-e8a472a02fab3d0d8c414c16",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000059-2025:business_overview-01:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-000059-SZ:manufacturing-materials-shadow-000059-2025:business_overview-01:coverage:explicit_activity",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000059-2025:business_overview-01:chapter_sample:stage5-a088716b3f61834f7f1c05dc",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000059-2025:segment_financials-01:blocker:task_completion:segment_financials-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms this item must remain a blocker under the frozen contract. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000059-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-000059-SZ:manufacturing-materials-shadow-000059-2025:segment_financials-01:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000059-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-000059-SZ:manufacturing-materials-shadow-000059-2025:segment_financials-01:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000059-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-000059-SZ:manufacturing-materials-shadow-000059-2025:segment_financials-01:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000059-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-000059-SZ:manufacturing-materials-shadow-000059-2025:segment_financials-01:coverage:operating_cost",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000059-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-000059-SZ:manufacturing-materials-shadow-000059-2025:segment_financials-01:coverage:gross_margin_reported",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000059-2025:segment_financials-02:blocker:task_completion:segment_financials-02",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms this item must remain a blocker under the frozen contract. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000059-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-000059-SZ:manufacturing-materials-shadow-000059-2025:segment_financials-02:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000059-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-000059-SZ:manufacturing-materials-shadow-000059-2025:segment_financials-02:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000059-2025:operating_quantities-01:chapter_sample:stage5-6183679b3da31b4b0534109d",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000059-2025:material_inputs-01:chapter_sample:stage5-8c1a33022e2e3b82c3136ff0",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000059-2025:counterparties_and_concentration-01:chapter_sample:stage5-9b2fe0fd5281968b50e8b1c3",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000059-2025:business_regime-01:blocker:task_completion:business_regime-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms this item must remain a blocker under the frozen contract. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000059-2025:business_regime-01:unresolved:stage5-12c09b11e1583e3474b39486",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000059-2025:business_regime-01:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-000059-SZ:manufacturing-materials-shadow-000059-2025:business_regime-01:coverage:business_regime",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:business_overview-01:chapter_sample:stage5-ec9ea7a94c389e0883a6b5bf",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:segment_financials-01:chapter_sample:stage5-d1d59a44551a711c2e995962",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:segment_financials-02:blocker:task_completion:segment_financials-02",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms this item must remain a blocker under the frozen contract. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-000408-SZ:manufacturing-materials-shadow-000408-2025:segment_financials-02:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-000408-SZ:manufacturing-materials-shadow-000408-2025:segment_financials-02:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-000408-SZ:manufacturing-materials-shadow-000408-2025:segment_financials-02:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-000408-SZ:manufacturing-materials-shadow-000408-2025:segment_financials-02:coverage:operating_cost",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:operating_quantities-01:chapter_sample:stage5-c61d0aa33a69309146bf1652",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:operating_quantities-02:blocker:task_completion:operating_quantities-02",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms this item must remain a blocker under the frozen contract. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:operating_quantities-02:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-000408-SZ:manufacturing-materials-shadow-000408-2025:operating_quantities-02:coverage:production_volume",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:operating_quantities-02:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-000408-SZ:manufacturing-materials-shadow-000408-2025:operating_quantities-02:coverage:sales_volume",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:material_inputs-01:chapter_sample:stage5-d775deb9d814a511bcf30178",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:counterparties_and_concentration-01:chapter_sample:stage5-200286f7496d4c6807648cd6",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000408-2025:business_regime-01:chapter_sample:stage5-ea557ac9473c23e4ff52eaa7",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000060-2025:business_overview-01:blocker:task_completion:business_overview-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms this item must remain a blocker under the frozen contract. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000060-2025:business_overview-01:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-000060-SZ:manufacturing-materials-shadow-000060-2025:business_overview-01:coverage:business_overview_source",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000060-2025:business_overview-01:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-000060-SZ:manufacturing-materials-shadow-000060-2025:business_overview-01:coverage:explicit_activity",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000060-2025:segment_financials-01:chapter_sample:stage5-ab36237a2584cc4cd30ea6c2",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000060-2025:segment_financials-02:blocker:task_completion:segment_financials-02",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms this item must remain a blocker under the frozen contract. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000060-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-000060-SZ:manufacturing-materials-shadow-000060-2025:segment_financials-02:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000060-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-000060-SZ:manufacturing-materials-shadow-000060-2025:segment_financials-02:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000060-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-000060-SZ:manufacturing-materials-shadow-000060-2025:segment_financials-02:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000060-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-000060-SZ:manufacturing-materials-shadow-000060-2025:segment_financials-02:coverage:operating_cost",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000060-2025:operating_quantities-01:chapter_sample:stage5-27b681a573e35ff06f4d0d88",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000060-2025:material_inputs-01:chapter_sample:coverage:material_inputs-01:material_input",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000060-2025:counterparties_and_concentration-01:chapter_sample:stage5-f4d7d5aa31caf2bec64eef45",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000060-2025:business_regime-01:blocker:task_completion:business_regime-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms this item must remain a blocker under the frozen contract. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000060-2025:business_regime-01:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-000060-SZ:manufacturing-materials-shadow-000060-2025:business_regime-01:coverage:business_regime",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000055-2025:business_overview-01:chapter_sample:stage5-5c3e8d780aec10c0c443f7f9",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000055-2025:segment_financials-01:blocker:task_completion:segment_financials-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms this item must remain a blocker under the frozen contract. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000055-2025:segment_financials-01:unresolved:stage5-998ba3bc4ce2e00157e33aa4",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000055-2025:segment_financials-01:unresolved:stage5-737f70a49eb183e34cb40c9e",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000055-2025:segment_financials-01:unresolved:stage5-26e6755cd52cb1dc9af21dd7",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000055-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-000055-SZ:manufacturing-materials-shadow-000055-2025:segment_financials-01:coverage:gross_margin_reported",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000055-2025:segment_financials-01:chapter_sample:stage5-98edda1eb794ffdd9736817c",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000055-2025:segment_financials-02:blocker:task_completion:segment_financials-02",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms this item must remain a blocker under the frozen contract. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000055-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-000055-SZ:manufacturing-materials-shadow-000055-2025:segment_financials-02:extract-provider",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000055-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-000055-SZ:manufacturing-materials-shadow-000055-2025:segment_financials-02:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000055-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-000055-SZ:manufacturing-materials-shadow-000055-2025:segment_financials-02:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000055-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-000055-SZ:manufacturing-materials-shadow-000055-2025:segment_financials-02:coverage:operating_cost",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000055-2025:operating_quantities-01:chapter_sample:coverage:operating_quantities-01:production_volume",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000055-2025:material_inputs-01:chapter_sample:coverage:material_inputs-01:material_input",
+    "outcome": "noncritical_error",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Legal-empty material_input is not supported by a procurement/material owner; the selected Evidence is a general risk/management page. The empty result is retained as a noncritical Evidence-owner error and must not be promoted."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000055-2025:counterparties_and_concentration-01:chapter_sample:stage5-665f3019401db8dea8486c94",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000055-2025:business_regime-01:chapter_sample:stage5-046e25fbca0d76c8e69955f7",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000420-2025:business_overview-01:blocker:task_completion:business_overview-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms this item must remain a blocker under the frozen contract. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000420-2025:business_overview-01:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-000420-SZ:manufacturing-materials-shadow-000420-2025:business_overview-01:coverage:explicit_activity",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000420-2025:business_overview-01:chapter_sample:stage5-c1e20f37eb1760f72b17efc1",
+    "outcome": "noncritical_error",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "A regulatory compliance statement was accepted as BusinessOverview. It does not describe the issuer's principal business and is a noncritical owner error."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000420-2025:segment_financials-01:chapter_sample:stage5-efd2152650130bb6d980fe9c",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000420-2025:operating_quantities-01:chapter_sample:stage5-bc5072046daad6bccd9d4618",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000420-2025:material_inputs-01:chapter_sample:stage5-2ecd8a0e83f11b7f83b45cee",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000420-2025:counterparties_and_concentration-01:chapter_sample:stage5-84e9a32584a48fb97c8c18d7",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-000420-2025:business_regime-01:chapter_sample:coverage:business_regime-01:business_regime",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920016-2025:business_overview-01:blocker:task_completion:business_overview-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms this item must remain a blocker under the frozen contract. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920016-2025:business_overview-01:unresolved:stage5-3b6811521f9dd20a2ec17710",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920016-2025:business_overview-01:unresolved:stage5-167a8125c25542e0b0970b5b",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920016-2025:business_overview-01:unresolved:stage5-057921a7ffc489c79528db41",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920016-2025:business_overview-01:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-920016-BJ:manufacturing-materials-shadow-920016-2025:business_overview-01:coverage:business_overview_source",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920016-2025:business_overview-01:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-920016-BJ:manufacturing-materials-shadow-920016-2025:business_overview-01:coverage:explicit_activity",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920016-2025:segment_financials-01:blocker:task_completion:segment_financials-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms this item must remain a blocker under the frozen contract. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920016-2025:segment_financials-01:unresolved:stage5-72320acd5cac40541c88c75e",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920016-2025:segment_financials-01:unresolved:stage5-11cc7a23395ac9da92b64316",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920016-2025:segment_financials-01:unresolved:stage5-1532c3e1324c3a4b6f3f18bb",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920016-2025:segment_financials-01:unresolved:stage5-a4183bf484bd69382ba420d3",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920016-2025:segment_financials-01:unresolved:stage5-9309359b17aea2636f777408",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920016-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-920016-BJ:manufacturing-materials-shadow-920016-2025:segment_financials-01:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920016-2025:segment_financials-01:chapter_sample:stage5-f838dfba6bee67333544584f",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920016-2025:operating_quantities-01:chapter_sample:coverage:operating_quantities-01:production_capacity",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920016-2025:material_inputs-01:chapter_sample:stage5-00bc9a68b318a87ae6e3384f",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920016-2025:counterparties_and_concentration-01:chapter_sample:stage5-4548b804a3c4e7b2e7460ffe",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920016-2025:business_regime-01:chapter_sample:coverage:business_regime-01:business_regime",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:business_overview-01:chapter_sample:stage5-588f44df3fbcac2e3dced8c8",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:segment_financials-01:blocker:task_completion:segment_financials-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms this item must remain a blocker under the frozen contract. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:segment_financials-01:unresolved:stage5-f26af3f2034c576c8d6ecd20",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:segment_financials-01:unresolved:stage5-d0f99c380c24f82db2440a5f",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:segment_financials-01:unresolved:stage5-9344c326f9c5e0e33c3a18cd",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:segment_financials-01:unresolved:stage5-493fb06559ba9fd3cbfe75c6",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:segment_financials-01:unresolved:stage5-86b0a03706320a9f10ca6fdb",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-920033-BJ:manufacturing-materials-shadow-920033-2025:segment_financials-01:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:segment_financials-01:chapter_sample:stage5-1153f2831c9474749731802f",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:segment_financials-02:blocker:task_completion:segment_financials-02",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms this item must remain a blocker under the frozen contract. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-920033-BJ:manufacturing-materials-shadow-920033-2025:segment_financials-02:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-920033-BJ:manufacturing-materials-shadow-920033-2025:segment_financials-02:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:operating_quantities-01:blocker:task_completion:operating_quantities-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms this item must remain a blocker under the frozen contract. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:operating_quantities-01:unresolved:stage5-4a47d5459af48d96e5bfd100",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-920033-BJ:manufacturing-materials-shadow-920033-2025:operating_quantities-01:coverage:production_capacity",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-920033-BJ:manufacturing-materials-shadow-920033-2025:operating_quantities-01:coverage:capacity_under_construction",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:operating_quantities-01:chapter_sample:stage5-3846d6bd65e7cfa54956c724",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:operating_quantities-02:blocker:task_completion:operating_quantities-02",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms this item must remain a blocker under the frozen contract. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:operating_quantities-02:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-920033-BJ:manufacturing-materials-shadow-920033-2025:operating_quantities-02:coverage:capacity_under_construction",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:operating_quantities-02:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-920033-BJ:manufacturing-materials-shadow-920033-2025:operating_quantities-02:coverage:production_volume",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:material_inputs-01:chapter_sample:coverage:material_inputs-01:material_input",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:counterparties_and_concentration-01:chapter_sample:stage5-ec2e4a568319498bd0ca2b3d",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920033-2025:business_regime-01:chapter_sample:stage5-a5ab6585c7948ec527d80b8e",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920068-2025:business_overview-01:chapter_sample:stage5-57020e59276f98df72e18f4a",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920068-2025:segment_financials-01:blocker:task_completion:segment_financials-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms this item must remain a blocker under the frozen contract. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920068-2025:segment_financials-01:unresolved:stage5-7bf93961bb46a3f9ec47acb5",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920068-2025:segment_financials-01:unresolved:stage5-0c9d22589cb1156a316532c3",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920068-2025:segment_financials-01:unresolved:stage5-c01f04250b7e2fc4e8a78ab2",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920068-2025:segment_financials-01:unresolved:stage5-13df99ea66498bce7c5e3bf0",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920068-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-920068-BJ:manufacturing-materials-shadow-920068-2025:segment_financials-01:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920068-2025:segment_financials-01:chapter_sample:stage5-effef109f13455f2fdf10499",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920068-2025:operating_quantities-01:blocker:task_completion:operating_quantities-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms this item must remain a blocker under the frozen contract. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920068-2025:operating_quantities-01:unresolved:stage5-aaa39affa0ac5929d7390f29",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920068-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-920068-BJ:manufacturing-materials-shadow-920068-2025:operating_quantities-01:coverage:production_capacity",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920068-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-920068-BJ:manufacturing-materials-shadow-920068-2025:operating_quantities-01:coverage:capacity_under_construction",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920068-2025:operating_quantities-01:chapter_sample:stage5-d4174cc7fed79484cb092de0",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920068-2025:material_inputs-01:chapter_sample:stage5-19a2dfa2a98ac04c998494d1",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920068-2025:counterparties_and_concentration-01:blocker:task_completion:counterparties_and_concentration-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms this item must remain a blocker under the frozen contract. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920068-2025:counterparties_and_concentration-01:unresolved:stage5-5a8c6dfeeab4513878588d90",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920068-2025:counterparties_and_concentration-01:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-920068-BJ:manufacturing-materials-shadow-920068-2025:counterparties_and_concentration-01:coverage:counterparty_relationship",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920068-2025:counterparties_and_concentration-01:chapter_sample:stage5-b0d8a3d5942055ddc6a2958b",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920068-2025:business_regime-01:blocker:task_completion:business_regime-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms this item must remain a blocker under the frozen contract. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920068-2025:business_regime-01:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-920068-BJ:manufacturing-materials-shadow-920068-2025:business_regime-01:coverage:business_regime",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920078-2025:business_overview-01:chapter_sample:stage5-5f2e40b6968ef0f3d21b7228",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920078-2025:segment_financials-01:chapter_sample:stage5-6d9046e9baf6b133cf5dd3be",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920078-2025:operating_quantities-01:blocker:task_completion:operating_quantities-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms this item must remain a blocker under the frozen contract. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920078-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-920078-BJ:manufacturing-materials-shadow-920078-2025:operating_quantities-01:coverage:production_capacity",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920078-2025:material_inputs-01:chapter_sample:stage5-69548c763dff5fbd1206068f",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920078-2025:counterparties_and_concentration-01:chapter_sample:stage5-43dcc02f3bcb90aea9397988",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920078-2025:business_regime-01:blocker:task_completion:business_regime-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms this item must remain a blocker under the frozen contract. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920078-2025:business_regime-01:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-920078-BJ:manufacturing-materials-shadow-920078-2025:business_regime-01:coverage:business_regime",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920076-2025:business_overview-01:chapter_sample:stage5-005cc411a6c7c1d64e0c090e",
+    "outcome": "noncritical_error",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "The fragment '公司深耕耐火材料行业多年' is drawn from the risk section rather than a substantive business overview. It is retained as a noncritical error."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920076-2025:segment_financials-01:chapter_sample:coverage:segment_financials-01:segment_dimension",
+    "outcome": "noncritical_error",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "The legal-empty segment result cites company totals and industry narrative rather than a segment/revenue-cost owner. It is a noncritical Evidence-owner error."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920076-2025:operating_quantities-01:blocker:task_completion:operating_quantities-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms this item must remain a blocker under the frozen contract. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920076-2025:operating_quantities-01:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-920076-BJ:manufacturing-materials-shadow-920076-2025:operating_quantities-01:coverage:production_capacity",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920076-2025:material_inputs-01:chapter_sample:coverage:material_inputs-01:material_input",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920076-2025:counterparties_and_concentration-01:chapter_sample:stage5-89875347ba9f2ab641bf2cb6",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920076-2025:business_regime-01:blocker:task_completion:business_regime-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms this item must remain a blocker under the frozen contract. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920076-2025:business_regime-01:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-920076-BJ:manufacturing-materials-shadow-920076-2025:business_regime-01:coverage:business_regime",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:business_overview-01:chapter_sample:stage5-87fa3889674d6b17c827dc9f",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:segment_financials-01:blocker:task_completion:segment_financials-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms this item must remain a blocker under the frozen contract. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:segment_financials-01:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-920580-BJ:manufacturing-materials-shadow-920580-2025:segment_financials-01:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:segment_financials-02:blocker:task_completion:segment_financials-02",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms this item must remain a blocker under the frozen contract. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:segment_financials-02:unresolved:stage5-1e29e21f1e55ca7c51522a29",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:segment_financials-02:unresolved:stage5-fc191ea309a08bdbee929017",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:segment_financials-02:unresolved:stage5-0ee1c933df72849e98200266",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:segment_financials-02:unresolved:stage5-3bdd2ba8c1f4e92fb67524f7",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:segment_financials-02:unresolved:stage5-189f0c0b339d31a4536befe1",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:segment_financials-02:unresolved:stage5-cdbf33ff6fc073dde78a976a",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:segment_financials-02:unresolved:stage5-26261ae04a48d8809378d038",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:segment_financials-02:unresolved:stage5-0ad87868489b75cec8fb52a2",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:segment_financials-02:unresolved:stage5-906f988465989d4aef3f344b",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:segment_financials-02:unresolved:stage5-2ac6574fba869dd2e3dfaf79",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:segment_financials-02:unresolved:stage5-75490c425f6beb596be5623e",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:segment_financials-02:unresolved:stage5-f659e0bff1960f0be8ff3cba",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:segment_financials-02:unresolved:stage5-98398c5fa4e706b04cff7236",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:segment_financials-02:unresolved:stage5-9f7d456a8f570b2d84db93dc",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-920580-BJ:manufacturing-materials-shadow-920580-2025:segment_financials-02:coverage:segment_dimension",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-920580-BJ:manufacturing-materials-shadow-920580-2025:segment_financials-02:coverage:operating_revenue",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:segment_financials-02:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-920580-BJ:manufacturing-materials-shadow-920580-2025:segment_financials-02:coverage:operating_cost",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:segment_financials-02:chapter_sample:stage5-55db156a16fe80c28d90fe0d",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:operating_quantities-01:chapter_sample:stage5-36d4001bf53a7e36a4506ece",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:operating_quantities-02:blocker:task_completion:operating_quantities-02",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms this item must remain a blocker under the frozen contract. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:operating_quantities-02:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-920580-BJ:manufacturing-materials-shadow-920580-2025:operating_quantities-02:coverage:production_capacity",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:material_inputs-01:chapter_sample:stage5-5291bf4ce7fa63a15efc80b3",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:counterparties_and_concentration-01:chapter_sample:stage5-b599bdf0c7f3f21bf668662c",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review found the chapter sample consistent with its physical page, Evidence, runtime target, source wording, and research-only use."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:business_regime-01:blocker:task_completion:business_regime-01",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms this item must remain a blocker under the frozen contract. It was not converted into an accepted runtime fact."
+  },
+  {
+    "review_row_id": "manufacturing-materials-shadow-920580-2025:business_regime-01:unresolved:manufacturing-materials-shadow-current-mvp-four-pool-20260912-a-920580-BJ:manufacturing-materials-shadow-920580-2025:business_regime-01:coverage:business_regime",
+    "outcome": "correct",
+    "reviewer": "codex-source-review-current-mvp-20260912",
+    "notes": "Source-bound review confirms that retaining this item for human adjudication is correct. It was not converted into an accepted runtime fact."
+  }
+]
