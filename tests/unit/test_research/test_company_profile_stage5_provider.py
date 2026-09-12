@@ -57,6 +57,7 @@ from research.company_profile.stage5_provider import (
     _minimal_verify_schema,
     _normalize_adapter_reported_period,
     _normalize_extract_response,
+    _normalize_segment_partition_metadata,
     _normalize_segment_partition_reported_period,
     _segment_dimension_options,
     _segment_partition_request,
@@ -1768,10 +1769,11 @@ def test_segment_partition_merge_reconciles_owned_metadata_and_evidence() -> Non
         "gross_margin_reported",
     )
     periods = ("2025-12-31", "2025年", "2025年度")
-    scopes = ("unclear", "business_segment", "unclear")
+    scopes = ("consolidated_group", "unclear", "business_segment")
+    bases = ("report_default_group_scope", None, None)
     partitions = []
-    for index, (metric, period, subject_scope, prepared_evidence) in enumerate(
-        zip(metrics, periods, scopes, prepared.evidence_bundle, strict=True),
+    for index, (metric, period, subject_scope, subject_basis, prepared_evidence) in enumerate(
+        zip(metrics, periods, scopes, bases, prepared.evidence_bundle, strict=True),
         start=1,
     ):
         partition_request = _segment_partition_request(
@@ -1788,6 +1790,7 @@ def test_segment_partition_merge_reconciles_owned_metadata_and_evidence() -> Non
                     evidence_id=prepared_evidence.evidence.evidence_id,
                     metric_field=metric,
                     subject_scope=subject_scope,
+                    subject_basis=subject_basis,
                     reported_period=period,
                     uncertainty=("source-native row",) if index == 2 else (),
                 ),
@@ -1804,11 +1807,99 @@ def test_segment_partition_merge_reconciles_owned_metadata_and_evidence() -> Non
     assert set(row["evidence_ids"]) == {
         item.evidence.evidence_id for item in prepared.evidence_bundle
     }
-    assert row["subject_scope"] == "unclear"
+    assert row["subject_scope"] == "business_segment"
+    assert "subject_basis" not in row
     assert row["reported_period"] == "2025"
     assert row["knowledge_time"] == prepared.report.published_at
     assert row["uncertainty"] == ["source-native row"]
     assert set(row["cells"]) == set(metrics)
+
+
+def test_segment_partition_merge_preserves_affirmative_group_conflict() -> None:
+    prepared = _multi_evidence_high_cardinality_segment_prepared_scope()
+    request = _segment_extract_request(prepared)
+    revenue_request = _segment_partition_request(
+        request,
+        fields=("segment_dimension", "operating_revenue"),
+        partition_index=1,
+        partition_count=2,
+    )
+    cost_request = _segment_partition_request(
+        request,
+        fields=("segment_dimension", "operating_cost"),
+        partition_index=2,
+        partition_count=2,
+    )
+    revenue = _segment_partition_response(
+        request_id=revenue_request.request_id,
+        evidence_id=prepared.evidence_bundle[0].evidence.evidence_id,
+        metric_field="operating_revenue",
+        subject_scope="consolidated_group",
+        subject_basis="direct_source_wording",
+    )
+    cost = _segment_partition_response(
+        request_id=cost_request.request_id,
+        evidence_id=prepared.evidence_bundle[1].evidence.evidence_id,
+        metric_field="operating_cost",
+        subject_scope="unclear",
+    )
+
+    with pytest.raises(
+        ValueError,
+        match=(
+            "identity conflict: subject_scope: 'consolidated_group' "
+            "!= 'business_segment'"
+        ),
+    ):
+        _merge_segment_partition_responses(
+            request,
+            ((revenue_request, revenue), (cost_request, cost)),
+            prepared_scope=prepared,
+        )
+
+
+@pytest.mark.parametrize(
+    ("row", "expected_scope", "expected_basis"),
+    (
+        (
+            {
+                "row_class": "consolidation_adjustment",
+                "subject_scope": "unclear",
+            },
+            "unclear",
+            None,
+        ),
+        (
+            {
+                "subject_scope": "issuer",
+                "subject_basis": "direct_source_wording",
+            },
+            "issuer",
+            "direct_source_wording",
+        ),
+        (
+            {
+                "subject_scope": "named_subsidiary",
+                "subject_basis": "direct_source_wording",
+            },
+            "named_subsidiary",
+            "direct_source_wording",
+        ),
+    ),
+)
+def test_segment_partition_normalization_preserves_special_subjects(
+    row: dict[str, Any],
+    expected_scope: str,
+    expected_basis: str | None,
+) -> None:
+    prepared = _multi_evidence_high_cardinality_segment_prepared_scope()
+    normalized = _normalize_segment_partition_metadata(
+        {"reported_period": "2025", "period_type": "duration", **row},
+        prepared_scope=prepared,
+    )
+
+    assert normalized["subject_scope"] == expected_scope
+    assert normalized.get("subject_basis") == expected_basis
 
 
 @pytest.mark.parametrize(

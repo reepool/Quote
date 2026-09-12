@@ -934,10 +934,11 @@ def _normalize_segment_partition_metadata(
     """Normalize only metadata owned by the prepared annual-report table scope."""
 
     normalized = deepcopy(row)
-    if normalized.get("row_class") != "consolidation_adjustment" and normalized.get(
-        "subject_scope"
-    ) in {"unclear", "business_segment"}:
-        normalized["subject_scope"] = "unclear"
+    subject_scope = normalized.get("subject_scope")
+    if normalized.get("row_class") != "consolidation_adjustment" and (
+        subject_scope in {None, "", "unclear", "business_segment"}
+    ):
+        normalized["subject_scope"] = "business_segment"
         normalized.pop("subject_name", None)
         normalized.pop("subject_basis", None)
     normalized["reported_period"] = _normalize_segment_partition_reported_period(
@@ -962,21 +963,40 @@ def _merge_segment_partition_metadata(
 ) -> None:
     """Merge partition metadata while keeping substantive conflicts blocking."""
 
+    incoming_metadata = deepcopy(dict(incoming))
+    if (
+        existing.get("subject_scope") == "consolidated_group"
+        and existing.get("subject_basis") == "report_default_group_scope"
+        and incoming_metadata.get("subject_scope") == "business_segment"
+    ):
+        existing["subject_scope"] = "business_segment"
+        existing.pop("subject_name", None)
+        existing.pop("subject_basis", None)
+    elif (
+        existing.get("subject_scope") == "business_segment"
+        and incoming_metadata.get("subject_scope") == "consolidated_group"
+        and incoming_metadata.get("subject_basis") == "report_default_group_scope"
+    ):
+        incoming_metadata["subject_scope"] = "business_segment"
+        incoming_metadata.pop("subject_name", None)
+        incoming_metadata.pop("subject_basis", None)
+
     for key in ("row_class", "subject_scope", "reported_period", "period_type"):
-        if existing.get(key) != incoming.get(key):
+        if existing.get(key) != incoming_metadata.get(key):
             raise ValueError(
                 "segment partition row identity conflict: "
-                f"{key}: {existing.get(key)!r} != {incoming.get(key)!r}"
+                f"{key}: {existing.get(key)!r} != {incoming_metadata.get(key)!r}"
             )
     for key in ("subject_name", "subject_basis"):
         current = existing.get(key)
-        candidate = incoming.get(key)
+        candidate = incoming_metadata.get(key)
         if current not in (None, "") and candidate not in (None, ""):
             if current != candidate:
                 if (
                     key == "subject_basis"
                     and existing.get("subject_scope") == "consolidated_group"
-                    and incoming.get("subject_scope") == "consolidated_group"
+                    and incoming_metadata.get("subject_scope")
+                    == "consolidated_group"
                 ):
                     default_basis = "report_default_group_scope"
                     if current == default_basis:
