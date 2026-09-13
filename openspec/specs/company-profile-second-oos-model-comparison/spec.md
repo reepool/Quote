@@ -3,6 +3,9 @@
 ## Purpose
 Define a bounded second out-of-sample annual-report validation with an independent three-model comparison, one selected-model formal run, and research-only failure/caveat handling.
 
+## Contract scope
+The fixed sample, provider comparison and exact committed Activity review patches below describe historical second-OOS work. Their old unclear-only writeback constraints preserve historical identities; they MUST NOT override report_default_group_scope for new extraction. Routine all-A-share production follows company-profile-a-share-delivery and does not rerun this comparison.
+
 ## Requirements
 
 ### Requirement: The second OOS sample is frozen before model comparison

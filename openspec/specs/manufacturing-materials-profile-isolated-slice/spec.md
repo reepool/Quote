@@ -2,6 +2,9 @@
 
 ## Purpose
 Defines the isolated, research-only four-report manufacturing/materials company-profile slice, including evidence authority, bounded LLM execution, immutable audit bundles, blocking acceptance semantics, and continued production non-authorization.
+## Contract scope
+The fixed four-report manifest, full-rerun and six-chapter acceptance requirements below describe historical Stage 5 validation only. They MUST NOT govern current all-A-share task admission or fact-level delivery. Current subject policy applies to new requests; frozen historical Evidence and Gold remain unchanged.
+
 ## Requirements
 ### Requirement: The isolated slice is limited to four approved annual reports
 The system MUST execute the manufacturing/materials stage-five slice only for `manufacturing-materials-300750-2025`, `manufacturing-materials-603659-2025`, `manufacturing-materials-920015-2025`, and `manufacturing-materials-302132-2025-regime` from the approved sample manifest. Each report MUST run the applicable frozen chapter-task checklist and retain its report identity, PDF hash, physical-page coordinate system, package assignment, and business-regime boundary. A sample, year, document version, or industry package outside this manifest MUST be rejected rather than silently added.
@@ -20,9 +23,9 @@ The system MUST execute the manufacturing/materials stage-five slice only for `m
 Every stage-five candidate, CoverageResult, subject basis, Activity actor, source actor, source verb, period, unit, and physical anchor MUST be reconstructed from the report Evidence supplied to that request. Gold annotations and the stage-four Gold adapter MUST NOT populate or default runtime semantic fields. Gold and negative cases MAY be read only after a run to calculate benchmark results. Missing or ambiguous Evidence MUST produce the existing `unclear` or `extraction_failed` result rather than a Gold-derived or industry-custom default.
 
 #### Scenario: Source says company without affirmative group evidence
-- **WHEN** the report Evidence does not directly support consolidated scope and no documented reconciliation is supplied
-- **THEN** the runtime candidate keeps subject scope `unclear`
-- **AND** the Gold expectation or adapter cannot fill `subject_basis=direct_source_wording`
+- **WHEN** company-owned report Evidence has no explicit narrower scope and no unresolved conflict
+- **THEN** new runtime candidates use consolidated_group with report_default_group_scope
+- **AND** Gold cannot replace that basis with direct_source_wording or force an old unclear expectation
 
 #### Scenario: Activity actor is not explicit
 - **WHEN** the source grammar or economic relationship does not identify the issuer as the action actor

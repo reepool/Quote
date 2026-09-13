@@ -2,6 +2,9 @@
 
 ## Purpose
 TBD - created by archiving change validate-manufacturing-materials-company-profile-shadow-batch. Update Purpose after archive.
+## Contract scope
+Fixed sample counts, OOS exclusions, full-replay budgets and numeric readiness thresholds below govern their historical shadow validations only. They MUST NOT govern ordinary all-A-share task admission or accepted-fact delivery. Current product delivery follows company-profile-a-share-delivery; new subject checks follow report_default_group_scope. Historical results remain under their original versions.
+
 ## Requirements
 ### Requirement: The shadow cohort is frozen and genuinely unseen
 The system MUST admit exactly twenty unique, locally valid 2025 manufacturing/materials annual reports through a versioned shadow manifest. The manifest MUST include SSE, SZSE, and BSE reports, bind each local PDF and report identity by hash, record business and disclosure shapes, selection reason, and known limitations, and exclude every identity used by the four-report authority, BaoSteel, Zhongnan Steel, Gold fixtures, targeted runs, adjudication ledgers, or earlier OOS manifests. Cohort selection MUST use existing local assets and MUST finish before Evidence generation or provider execution.

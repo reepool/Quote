@@ -98,16 +98,16 @@ review log 追加保留双方判断、证据、主题、最终 disposition 和�
 
 每个 gap 记录 dimension、原因、受影响 requirement、风险、临时结论、补样条件和 owner。不得通过降低样本相关性、猜事实或把 required 降级为 optional 隐藏缺口。影响 required、关键章节或 regime 组合规则时必须 `hold`。
 
-## 11. 阶段 3 进入门
+## 11. 行业增强研究进入条件
 
 - [ ] 本方法及 industry requirements、sample/gold manifest、acceptance report 模板已审核；
 - [ ] 已提出真实报告 sample manifest，满足数量下限或诚实记录阻塞 gap；
 - [ ] 已命名 research owner、primary annotator、independent reviewer、acceptance reviewer；
 - [ ] 已声明行业边界、拟研究问题和不适用范围；
-- [ ] 所有具体行业仍为 `not_researched`，阶段 3 才开始形成制造/材料结论；
+- [ ] 按该增强包当前状态研究，不要求所有行业退回 not_researched；制造/材料已有基线可复用；
 - [ ] 已确认 production authorization 固定为 `not_authorized`，不授权生产代码、生产 prompt/schema、LLM 执行、数据库迁移或生产启用。
 
-任一项未满足，阶段 3 为 `hold`。
+条件未满足时只暂停该增强的准入，不能阻塞全 A 股通用骨架。该清单用于行业研究，不要求每个生产公司再走一次人工选样/Gold 标注。主体执行总需求 §13 的 report_default_group_scope，历史 Gold 冲突单列。
 
 ## 12. 场景复核
 

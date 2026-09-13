@@ -1,6 +1,6 @@
 # 公司画像阶段 4 通用语义模型与内存工作流
 
-> 文档类型：current
+> 文档类型：implementation-reference（阶段 4 历史实现及模型参考，不是当前产品路线）
 > 版本：`company_profile_common_semantic_model.v1`
 > 日期：2026-09-03
 > 最近语义修订：2026-09-08
@@ -8,6 +8,8 @@
 > production authorization：`not_authorized`
 
 ## 1. 当前能力
+
+现行产品和主体政策以 `company_profile_product_and_industry_semantic_requirements.md` 为准：全 A 股基础骨架＋按需行业增强；明确更窄主体优先，否则采用 `report_default_group_scope`，冲突保持 unclear。下文 fake provider、人工 manifest 和不接生产是阶段 4 实现时的边界，不是新任务的永久限制。
 
 阶段 4 已建立一个不接触生产状态的最小业务闭环：
 

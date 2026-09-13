@@ -1,10 +1,10 @@
 # company-profile-bounded-semantic-workflow Specification
 
 ## Purpose
-TBD - created by archiving change implement-company-profile-common-semantic-model. Update Purpose after archive.
+One bounded semantic workflow for common company facts and evidence-triggered industry enhancements. Policy revised 2026-09-13; historical trial budgets are not production obligations.
 ## Requirements
 ### Requirement: Each semantic request is bounded to one chapter task
-The workflow MUST define separate versioned `extract`, `repair`, and `verify` request and response models. Every request MUST identify one report, one active package manifest, one chapter task, its checklist, allowed object and enum values, prohibited inferences, and a continuous Evidence bundle containing required headers, units, footnotes, and continuation pages. The v1 chapter-task set is closed to `extract_business_overview`, `extract_segment_financials`, `extract_operating_quantities`, `extract_material_inputs`, `extract_counterparties_and_concentration`, and `extract_business_regime`; an unknown task is rejected before provider invocation. Missing required preparation inputs MUST fail before an LLM provider is called.
+The workflow MUST define separate versioned `extract`, `repair`, and `verify` request and response models. Every request MUST identify one report, one active package manifest, one chapter task, its checklist, allowed object and enum values, prohibited inferences, and a continuous Evidence bundle containing required headers, units, footnotes, and continuation pages. Only applicable tasks are activated: the all-industry common core is not required to execute manufacturing quantity/material tasks. The existing chapter-task vocabulary includes `extract_business_overview`, `extract_segment_financials`, `extract_operating_quantities`, `extract_material_inputs`, `extract_counterparties_and_concentration`, and `extract_business_regime`; a task outside the implemented versioned vocabulary is rejected before provider invocation. Missing required preparation inputs MUST fail before an LLM provider is called.
 
 #### Scenario: Table row is supplied without its unit header
 - **WHEN** a numeric table extract request omits the header or footnote that owns the unit
@@ -79,9 +79,9 @@ Verify MUST evaluate each candidate and each active checklist item against the o
 - **AND** it does not import that identity into the top-five names checklist
 
 #### Scenario: Candidate subject is unsupported
-- **WHEN** a candidate claims `consolidated_group` from the word `公司` without affirmative evidence
-- **THEN** verify returns `block` or `unclear` for subject support
-- **AND** it does not rewrite the candidate to force completion
+- **WHEN** a company-owned fact has no explicit narrower scope and no subject conflict
+- **THEN** verify accepts the program-owned consolidated_group / report_default_group_scope convention
+- **AND** explicit narrower scopes and third-party actors remain unchanged
 
 #### Scenario: Most candidates pass but a required table is omitted
 - **WHEN** candidate-level scores are high but an active required checklist item has no result
@@ -110,17 +110,19 @@ The stage-four test suite MUST load the approved manufacturing/materials Gold an
 - **AND** no production state is read or written
 
 ### Requirement: Report usability requires complete core chapters and no frozen blocker
-The bounded workflow MUST derive report status from the six core chapter tasks: business overview and Activity, segment facts or legal empty, operating quantities or legal empty, material/energy inputs or legal empty, counterparties/concentration or legal empty, and business regime event or legal empty. A required core chapter with `extraction_failed`, `deadline_exceeded`, missing coverage, or unresolved frozen §14 blocker MUST keep the report at `hold` or `failed`; an `unclear` subject alone MUST NOT fail the entire report when the field-level usage policy is satisfied.
+For current delivery, core chapters MUST mean substantive principal business, major products/services and revenue model, not all six manufacturing tasks. Record validation errors MUST isolate affected records and dependent derivations. Missing enhanced operating, input, counterparty or event details MUST remain explicit but MUST NOT block unrelated core facts. Task execution failure MUST remain a failure for that task, while record delivery and core completeness are evaluated separately. Historical frozen six-chapter runs retain their versioned statuses.
 
-#### Scenario: Required chapter is incomplete
-- **WHEN** `extract_business_regime` ends with `deadline_exceeded` or another required-result failure
-- **THEN** the report remains `hold` or `failed`
-- **AND** it cannot be labeled `usable_with_caveats` until the chapter is rerun successfully
+#### Scenario: Enhanced operating quantities fail
+- **WHEN** a quantity scope fails and the common business core is evidenced
+- **THEN** the core remains available with the quantity gap and exact failure.
 
-#### Scenario: Unclear subject does not block a qualitative result
-- **WHEN** an Activity is accepted with complete Evidence and `subject_scope=unclear`
-- **THEN** the workflow keeps the Activity available for research projection
-- **AND** it does not create a report-level blocker solely for that subject scope
+#### Scenario: Source value is wrong
+- **WHEN** a candidate value conflicts with its Evidence
+- **THEN** it and dependent results are isolated while independent accepted records remain available.
+
+#### Scenario: Supplementary scope repeats a field
+- **WHEN** the same field appears in several scopes
+- **THEN** chapter reconciliation checks object, period, metric and disclosure obligation before treating coverage as satisfied.
 
 ### Requirement: Confidence and usage restrictions are deterministic workflow outputs
 The workflow MUST preserve the existing candidate, CoverageResult, disposition, and Evidence models as the authority for acceptance. It MUST derive confidence and usage restrictions programmatically after verification, without LLM-supplied probabilities, free-form usage lists, weighted scores, or automatic subject promotion.
@@ -131,9 +133,9 @@ The workflow MUST preserve the existing candidate, CoverageResult, disposition, 
 - **AND** its permitted projection uses come from the closed policy table
 
 #### Scenario: Unsupported promotion remains blocked
-- **WHEN** a model response promotes source wording `公司` to `consolidated_group` without affirmative evidence
-- **THEN** the existing independent verification blocks the candidate
-- **AND** the new usability policy does not waive that blocker
+- **WHEN** a model overwrites explicit parent/subsidiary/segment evidence as group or mislabels the default as direct_source_wording
+- **THEN** independent verification blocks the unsupported rewrite
+- **AND** report_default_group_scope alone is not such an unsupported rewrite
 
 ### Requirement: Verification preserves one primary metric for a composite source-native label
 Verification MUST evaluate a candidate against its requested checklist field, physical Evidence anchor, source meaning, and complete source-native label. A parenthetical or secondary source word MUST NOT require a second metric or cause `evidence_field_mismatch` when the same physical fact has one governed primary metric. This rule MUST NOT permit a candidate whose metric conflicts with the economic direction or a different table header.

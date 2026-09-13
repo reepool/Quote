@@ -5,7 +5,9 @@
 > OpenSpec：`build-a-share-business-profile-evidence-pipeline`、
 > `integrate-llm-business-profile-supply-chain`
 
-## 1. 当前工程目标
+## 1. 历史工程目标
+
+本文保留旧 business_profile 采集实现背景，不是当前执行计划。全 A 股任务、Stage 5 接入、主体政策与基础商品暴露统一由 `company_profile_product_and_industry_semantic_requirements.md` 及 `deliver-a-share-core-profiles-and-commodity-exposure` 定义。下文旧开关、候选链与“当前状态”不授权恢复旧生产。
 
 工程主线已经从“程序解析年报叙述并推断价值链”调整为：
 

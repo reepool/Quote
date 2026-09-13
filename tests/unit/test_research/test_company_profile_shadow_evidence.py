@@ -62,11 +62,11 @@ PRECISION_CHANGE_ROOT = next(
 )
 ROUTING_CONTINUATION_CHANGE_ROOT = (
     REPOSITORY_ROOT
-    / "openspec/changes/repair-company-profile-shadow-evidence-routing-and-continuation"
+    / "openspec/changes/archive/2026-09-13-repair-company-profile-shadow-evidence-routing-and-continuation"
 )
 OWNER_CLOSURE_REPLAY_ROOT = (
     REPOSITORY_ROOT
-    / "openspec/changes/validate-company-profile-shadow-owner-closure-replay"
+    / "openspec/changes/archive/2026-09-13-validate-company-profile-shadow-owner-closure-replay"
 )
 
 
@@ -1289,7 +1289,13 @@ def test_routing_continuation_fixture_is_hash_bound_to_frozen_inputs() -> None:
     assert fixture["production_authorization"] == "not_authorized"
 
     for binding in fixture["inputs"].values():
-        source = REPOSITORY_ROOT / binding["path"]
+        relative = str(binding["path"])
+        old_owner_root = "openspec/changes/validate-company-profile-shadow-owner-closure-replay/"
+        source = (
+            OWNER_CLOSURE_REPLAY_ROOT / relative.removeprefix(old_owner_root)
+            if relative.startswith(old_owner_root)
+            else REPOSITORY_ROOT / relative
+        )
         assert hashlib.sha256(source.read_bytes()).hexdigest() == binding["sha256"]
 
     manifest = _manifest()

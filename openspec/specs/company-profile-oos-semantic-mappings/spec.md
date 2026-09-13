@@ -36,14 +36,12 @@ The Stage 5 scope contract MUST distinguish named related-party transaction amou
 - **AND** it does not map those amounts into customer or supplier concentration fields
 
 ### Requirement: Adjustment rows do not imply consolidated subject scope
-
-An adjustment row MAY retain `row_class=consolidation_adjustment` and its source-native revenue/cost/margin Measurements, but the adapter MUST keep `subject_scope=unclear` unless the cited Evidence contains affirmative group wording or an allowed same-report reconciliation. The row class alone MUST NOT promote the subject.
+An adjustment marker alone MUST NOT overwrite explicit narrower scope. Subject assignment MUST follow the current default-group policy: the narrow source label 分部间抵销/分部间抵消 with consolidation_adjustment is an explicit adjustment basis; other company-owned rows without narrower scope or conflict use report_default_group_scope. Adjustment values MUST remain separate from ordinary products and MUST NOT be double-counted as group totals.
 
 #### Scenario: Evidence labels a row as inter-segment elimination
-
-- **WHEN** the source row is `分部间抵消` without `合并`, `本集团`, `集团`, or reconciliation Evidence
-- **THEN** the row and values remain available with `subject_scope=unclear`
-- **AND** unsupported `consolidated_group` promotion is blocked.
+- **WHEN** a source preserves 分部间抵消 and consolidation_adjustment without conflicting narrower scope
+- **THEN** the existing explicit adjustment rule can use consolidated_group with direct_source_wording
+- **AND** other semantic errors remain isolated.
 
 ### Requirement: Semantic corrections are verified before a new run
 

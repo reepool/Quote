@@ -1,10 +1,10 @@
 # company-profile-research-acceptance-policy Specification
 
 ## Purpose
-TBD - created by archiving change relax-company-profile-research-acceptance-policy. Update Purpose after archive.
+Current fact-level acceptance policy, revised 2026-09-13. Target policy is distinct from implementation readiness; remaining delivery work is tracked in deliver-a-share-core-profiles-and-commodity-exposure.
 ## Requirements
 ### Requirement: Research acceptance preserves evidence while allowing bounded uncertainty
-The research acceptance policy MUST accept a source-backed fact with complete Evidence, value, unit, period, metric meaning, and independent verification under `subject_scope=consolidated_group` with `subject_basis=report_default_group_scope` when the source does not explicitly prove a narrower issuer, subsidiary, or segment scope. Explicit narrower source wording MUST remain narrow. The policy MUST NOT permit unsupported promotion beyond the report-default group convention, and it MUST retain the original source wording, Evidence, and any uncertainty.
+The research acceptance policy MUST accept a source-backed fact with complete Evidence, value, unit, period, metric meaning, and independent verification under `subject_scope=consolidated_group` with `subject_basis=report_default_group_scope` when the source does not explicitly prove a narrower issuer, subsidiary, or segment scope and contains no unresolved subject conflict. Explicit narrower source wording MUST remain narrow. The policy MUST NOT permit unsupported promotion beyond the report-default group convention, and it MUST retain the original source wording, Evidence, and any uncertainty.
 
 #### Scenario: Company wording supports a qualitative activity
 - **WHEN** Evidence says `公司主要从事动力电池研发、生产、销售` and the Activity is independently verified
@@ -17,7 +17,7 @@ The research acceptance policy MUST accept a source-backed fact with complete Ev
 - **AND** the projection exposes the default basis for audit
 
 #### Scenario: Explicit standalone fact remains issuer-scoped
-- **WHEN** the source identifies `母公司`, `本公司`, or a parent-company statement
+- **WHEN** the local Evidence explicitly identifies a parent-only statement, 母公司 scope or 本公司单体 scope rather than ordinary company wording
 - **THEN** the fact retains `subject_scope=issuer`
 - **AND** the default group convention does not override it
 
@@ -81,17 +81,21 @@ The benchmark MUST maintain separate results for local fixture guards and real a
 - **AND** that item does not block research slice usability
 
 ### Requirement: Research usability is separate from production authorization
-The policy MUST define report states `usable`, `usable_with_caveats`, `hold`, and `failed`, plus an overall `research_slice_usable` state. A report MUST NOT be `usable` or `usable_with_caveats` when a required core chapter is incomplete, an execution failure remains, or a frozen §14 blocker exists. Research usability MUST retain `accepted_for_review` and `production_authorization=not_authorized`.
+The policy MUST separate accepted-record delivery, three-dimension core completeness, execution status and consumer authorization. A failed supplementary scope or review workload MUST NOT withhold unrelated accepted facts. Missing principal business, major products/services or revenue-model evidence MUST keep core completeness false even when many numeric facts exist. Historical report states and research_slice_usable MUST retain their original run meaning; current fact-level delivery MUST NOT rewrite historical bundles. Current research fixtures remain accepted_for_review and not_authorized until the explicit new-contract research release is implemented.
 
-#### Scenario: Core regime chapter times out
-- **WHEN** a required `extract_business_regime` scope ends with `deadline_exceeded`
-- **THEN** the report remains `hold` or `failed` according to the execution contract
-- **AND** it cannot be downgraded to a permanent caveat
+#### Scenario: Supplementary regime scope times out
+- **WHEN** an event scope fails but accepted core facts exist
+- **THEN** the failed scope remains retryable or failed and its gap is displayed
+- **AND** unrelated accepted facts remain deliverable without pretending the scope succeeded.
 
-#### Scenario: Core chapters complete with subject caveats
-- **WHEN** all six core chapters are complete and only allowed `unclear` subject restrictions remain
-- **THEN** the report may be `usable_with_caveats`
-- **AND** the overall slice may be `research_slice_usable` if all other blocking dimensions pass
+#### Scenario: Core business is missing
+- **WHEN** measurements exist but principal-business evidence is absent
+- **THEN** partial data is delivered with core completeness false.
+
+#### Scenario: New research release is implemented
+- **WHEN** the declared writer and consumer scope passes its integration acceptance
+- **THEN** program-owned acceptance can publish permitted new-contract research records
+- **AND** no historical fixture or DCF consumer is automatically authorized.
 
 ### Requirement: Confidence is a deterministic four-level projection attribute
 Confidence MUST be derived programmatically from existing Evidence completeness, verification/disposition, subject basis, and contradiction state as `high`, `medium`, `low`, or `rejected`. The LLM MUST NOT self-report a probability or confidence value, and the policy MUST NOT introduce weighted scoring.
@@ -119,9 +123,9 @@ Gold subject evaluation MUST use a closed `subject_strictness` policy. In additi
 - **AND** it does not rewrite either Gold or runtime subject scope
 
 #### Scenario: Company wording is promoted to group scope
-- **WHEN** runtime claims `consolidated_group` from wording that only says `公司`
-- **THEN** subject evaluation returns `failed`
-- **AND** no subject-strictness mode waives the missing affirmative group basis
+- **WHEN** runtime uses consolidated_group with report_default_group_scope under the current policy but historical Gold requires unclear
+- **THEN** evaluation reports gold_contract_conflict unless a separately versioned Gold policy resolves it
+- **AND** runtime is not forced to change to the historical subject; explicit narrower-scope promotion still fails
 
 ### Requirement: Gold event equivalence requires an explicit directional decision
 Gold event evaluation MUST require exact event types unless a program-owned directional equivalence is explicitly listed with its Evidence and date conditions. An allowed pair MUST still match the same sample, physical anchor, occurrence or effective date, and governed regime boundary. Unlisted event pairs, different physical anchors, commitments, project launches, and nearby events MUST remain distinct. The evaluator MUST report the applied equivalence reason and MUST NOT modify runtime or Gold event labels.

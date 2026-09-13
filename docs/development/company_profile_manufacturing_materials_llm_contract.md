@@ -350,7 +350,7 @@ verify 输入包含原始 evidence bundle、冻结 checklist 和待核 candidate
 
 verify 还要逐 active checklist 检查 coverage。它不得新增 candidate、修正数值、决定 approval 或以平均得分放过 blocker。
 
-主体核验不得因表中只写“公司”而默认通过 `consolidated_group`。只有明文合并/集团口径，或输入中包含表格合计与合并利润表营业收入的完整核对证据时才可通过；仅金额核对时必须要求 `subject_basis`、核对页和 uncertainty。
+主体核验遵循总需求 §13：明确母公司/子公司/分部优先；仅称“公司”或无明确更窄口径且无冲突时接受 `consolidated_group` + `report_default_group_scope`。明文合并与金额核对分别保留 direct_source_wording / numeric_reconciliation_to_consolidated_statement 及对应证据，不能将默认约定冒充明文。主体冲突仍 unclear，第三方行动者不能转移给上市公司。
 
 ## 13. 程序交互顺序
 

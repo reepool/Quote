@@ -29,17 +29,16 @@
 ## 研究数据域
 
 - `docs/development/research_data_engine_execution.md`：研究数据引擎实施与现状
-- `docs/development/company_profile_product_and_industry_semantic_requirements.md`：公司画像产品、通用对象、分行业语义、LLM 分工与分阶段实施的唯一权威总需求
-- `docs/development/company_profile_industry_research_method.md`：公司画像阶段 2 分行业研究方法、样本选择、标注、benchmark 与阶段 3 进入门
+- `docs/development/company_profile_product_and_industry_semantic_requirements.md`：全 A 股通用骨架、事实级交付、report_default_group_scope、基础商品暴露与 M1—M4 路线的唯一产品总需求
+- `openspec/changes/deliver-a-share-core-profiles-and-commodity-exposure/`：当前实施主线；规划已批准，实现/任务接入/研究发布仍待完成
+- `openspec/specs/company-profile-a-share-delivery/spec.md`：全市场目标合同；规范存在不等于能力上线
+- `docs/development/company_profile_industry_research_method.md`：行业增强的研究方法；不阻塞通用基础画像
 - `docs/development/company_profile_manufacturing_materials_requirements.md`、`company_profile_manufacturing_materials_research_index.md`：已通过阶段 3 研究验收的制造/材料行业合同与证据索引；不代表生产授权
-- `docs/development/company_profile_stage5_final_audit_20260905.md`、`company_profile_stage55_adjudication_ledger.v1.json`：阶段 5 四报告权威 hold 基线与阶段 5.5 语义裁决账本；所有重跑必须使用新 run ID，生产授权仍为 `not_authorized`
-- `docs/development/company_profile_stage55_adjudication_summary_20260906.md`：阶段 5.5 历史裁决汇总；最终权威运行已由后续闭包 change 更新为 `stage55-closure-four-20260907-a`
-- `docs/development/company_profile_stage55_manual_review_package_20260906.md`：MR-01 至 MR-07 用户裁决及 MR-08/MR-09 实现修正的人工复核包；逐项保留 runtime target、原文、页码、Evidence 和决定依据
-- `docs/development/company_profile_common_semantic_model.md`：阶段 4 通用语义模型、受控内存工作流和研究员读取投影；生产授权仍为 `not_authorized`
+- `docs/development/company_profile_common_semantic_model.md`：阶段 4 历史实现与可复用模型参考；当前政策以总需求为准
+- `openspec/changes/deliver-a-share-core-profiles-and-commodity-exposure/replan-record.md`：旧执行change退役、失效审计删除和恢复位置；历史记录不作为当前生产入口
 - `openspec/changes/archive/2026-09-06-slice-manufacturing-materials-company-profile/`：已归档的阶段 5 隔离竖切合同；不恢复旧生产链
 - `openspec/changes/archive/2026-09-08-close-manufacturing-materials-profile-research-slice/`：阶段 5.5 研究切片闭包合同；权威结果为 `research_slice_usable`、Gold 14/24，生产仍未授权
 - `openspec/changes/archive/2026-09-08-refine-company-profile-period-and-event-semantics/`：已归档的离线期间、qualifier、Gold 主体严格度和成飞事件裁决 change；权威运行仍为 `stage55-closure-four-20260907-a`，离线 Gold 为 18/24，生产仍未授权且未启动阶段 6
-- `openspec/changes/validate-company-profile-out-of-sample-generalization/`：待 apply 的单报告样本外泛化验证合同；冻结新样本和六章 Evidence 后只运行一次，结果保持研究隔离且不启动阶段 6
 - `docs/development/company_profile_industry_requirements_template.md`：独立行业 requirements 标准模板
 - `docs/development/company_profile_industry_sample_manifest.template.json`、`company_profile_industry_gold_annotation.template.json`：仅用于研究合同的样本与 gold 标注清单模板
 - `docs/development/company_profile_industry_benchmark_acceptance_template.md`：行业 benchmark 验收报告模板

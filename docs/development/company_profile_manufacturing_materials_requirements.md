@@ -188,10 +188,10 @@ v1 的 `processing_volume` 仅表示公司或业务分部**对外提供加工服
 2. 有 named subsidiary 或 business segment 时绑定该主体，不提升为 group；
 3. 表头、导语或脚注明示合并/集团口径时，可以标记 `consolidated_group`；
 4. 未明示合并口径，但表格合计与同一报告的合并利润表营业收入核对一致时，可以提议 `consolidated_group`，同时必须保存 `subject_basis=numeric_reconciliation_to_consolidated_statement`、核对页和 uncertainty；
-5. 只有“公司”二字或行业披露习惯，不足以认定 `consolidated_group`；未完成上述核对时为 `unclear`；
+5. 仅称“公司”或没有明确更窄主体且无冲突时，使用 `consolidated_group` + `subject_basis=report_default_group_scope`；同报告金额核对不是接受前提，不伪装为 direct_source_wording；
 6. 只有 issuer 单体证据时使用 `issuer`；
 7. 同一 physical row 的 Measurements 必须继承相同主体，除非单元格脚注明确改变；
-8. 重组前后主体和 package 分开，不能因法律主体延续而认为业务语义连续。
+8. 明确主体冲突仍为 `unclear`，不能以默认规则消除矛盾；重组前后主体和 package 分开，不能因法律主体延续而认为业务语义连续。
 
 ## 8. 期间和单位
 
@@ -270,7 +270,7 @@ LLM 只抄 source-native；canonical conversion owner 是程序。不得按数�
 
 ## 14. Benchmark 与验收
 
-Gold 和 Benchmark 必须覆盖四份报告、不同交易所、不同量纲、明确原料输入、匿名披露、合法未披露、复杂抵消项、中航成飞 regime transition 和至少一条 `same_control_restated` 正例。以下任一非零即 hold：
+本节四报告 Gold 和 Benchmark 是历史制造/材料研究基线，不是全 A 股日常任务门。现行接受遵循总需求的三维骨架与记录级隔离；以下错误阻断受影响记录及其依赖结果，不封锁无关 accepted 事实。增强缺项单列，人工量不作为整体停用门槛：
 
 - required 章节或表静默遗漏；
 - revenue/cost/margin、capacity/production、sales volume/revenue、inventory volume/inventory value 混淆；
@@ -300,7 +300,7 @@ Gold 和 Benchmark 必须覆盖四份报告、不同交易所、不同量纲、�
 |---|---|---|
 | `processing_volume` 是否独立于 `sales_volume` | 独立 metric；来源括注“销量”只保留在 source-native，不双写 | 盲审确认双写风险；进一步收窄为对外加工服务实物量 |
 | 合并抵消项 object/measurement 表达 | v1 使用 `consolidation_adjustment` 行及独立 Measurements，不新增对象 | 盲审未发现 blocker |
-| 管理层讨论隐含合并口径的最小主体证据 | 明文合并口径，或与合并利润表完成并记录金额核对；否则 unclear | 盲标大量默认 group，揭示 Gold 后拒绝覆盖既有主体规则 |
+| 管理层讨论主体（现行政策已更新） | 明确更窄口径优先，否则 report_default_group_scope；冲突 unclear | 历史盲审按旧政策裁决，保留在台账，不再用于否决新政策 |
 | 同一控制比较数与历史知识时点并列方式 | 四时钟分离；`same_control_restated` 与 `original_as_published` 并列 | 盲审确认应将 comparison basis 设为 required-when-restated |
 | 产能口径 | `production_capacity` 强制 `capacity_kind` | 接受盲审建议 |
 | 仅合计披露与独立关系 | name coverage 保持 `not_disclosed`，关联/聚合关系独立记录 | 部分接受并增加 `report_local_aggregate` |

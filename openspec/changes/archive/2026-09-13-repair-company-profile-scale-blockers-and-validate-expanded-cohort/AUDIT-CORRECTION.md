@@ -1,9 +1,9 @@
 # Audit correction and fact-level delivery
 
-The preceding closure claim from commit a3dc726 is withdrawn in part.
+The preceding closure claim from commit a3dc726 is withdrawn in part. During the all-A-share replan the three invalid derived v1 audit files were deleted; their prior bytes can be recovered from Git a3dc726 or 2813b9f. This archive preserves the original inputs and retraction, not a new validation pass.
 The batch execution metrics (8 reports, 133 calls, 742 accepted records) remain
 recorded by the original batch. The derived source-review, reviewed-readiness,
-and empirical-audit v1 files are historical, invalid acceptance evidence.
+and empirical-audit v1 files were invalid acceptance evidence and are no longer current files.
 They MUST NOT be used for semantic precision, defect recurrence, or promotion.
 
 The deleted generator only checked identifiers and pages. It mislabeled those

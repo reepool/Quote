@@ -109,17 +109,19 @@ Every numeric annotation MUST preserve source value, source unit, header, any so
 - **AND** the benchmark blocks direct comparison or merging across unlike kinds
 
 ### Requirement: Subject scope requires affirmative evidence
-A management-discussion table MUST NOT be classified as `consolidated_group` solely because it says `公司` or because that scope is customary. Consolidated scope MUST be supported either by explicit group/consolidated wording in the table, introduction, or footnote, or by a documented reconciliation of the table total to the consolidated income statement in the same report. Reconciliation-only support MUST retain its basis and uncertainty; otherwise subject scope MUST be `unclear`.
+Subject assignment MUST follow the current report-default policy. Explicit parent-only, named-subsidiary or business-segment Evidence MUST retain the narrower scope. Explicit group wording uses direct_source_wording; a completed same-report numeric reconciliation retains its own basis and Evidence. Otherwise a company-owned fact without contradictory scope MUST use consolidated_group with report_default_group_scope. Affirmative Evidence remains required for a narrower scope or a claim of direct wording, not for the declared default convention.
 
 #### Scenario: Product table reconciles to consolidated revenue
-- **WHEN** the table total reconciles to the same report's consolidated income-statement revenue but has no explicit consolidated wording
-- **THEN** `consolidated_group` may be proposed with `subject_basis=numeric_reconciliation_to_consolidated_statement`
-- **AND** the evidence pages and uncertainty are retained rather than treating the scope as directly reported
+- **WHEN** same-report reconciliation is performed
+- **THEN** the result retains numeric_reconciliation_to_consolidated_statement and its cited pages.
 
 #### Scenario: Company wording has no corroboration
-- **WHEN** an operating table only says `公司` and has neither explicit scope text nor a completed consolidated-statement reconciliation
-- **THEN** subject scope is `unclear`
-- **AND** package convention does not supply a subject silently
+- **WHEN** a company-owned fact only says 公司 without a narrower scope or conflict
+- **THEN** it uses consolidated_group with report_default_group_scope.
+
+#### Scenario: Scope conflict remains
+- **WHEN** explicit local scope statements contradict one another
+- **THEN** the candidate remains unclear rather than using the default to hide the conflict.
 
 ### Requirement: Customers suppliers and concentration are separate concepts
 The industry contract MUST distinguish named or intentionally anonymous customer/supplier relationships from concentration measurements, and MUST preserve the disclosed counterparty direction. Supplier procurement amounts and supplier concentration shares MUST use supplier field semantics even when adjacent to customer disclosures. A disclosed anonymous identity such as `客户 A`, `第一名`, or a disclosure-exempt counterparty MUST be retained as report-local disclosed identity and MUST NOT require legal-entity catalog resolution solely because the name is masked. Concentration alone MUST NOT create a relationship, and anonymous identities MUST NOT be merged across reports. When a top-five section discloses totals without names, its name coverage MUST remain `not_disclosed`; a named related-party row or report-local aggregate identity from another section MAY form an independent Relationship but MUST NOT fill that top-five name coverage. Related-party transaction amounts or service ratios outside the active concentration checklist MUST remain explicitly deferred or blocked rather than being relabelled as concentration. A confidentiality or disclosure-exemption reason MUST be used only when explicitly stated by the source; otherwise the reason remains source-unspecified.
@@ -145,12 +147,12 @@ The industry contract MUST distinguish named or intentionally anonymous customer
 - **AND** the task does not widen its concentration contract implicitly
 
 ### Requirement: Consolidation adjustments require independent subject support
-A `consolidation_adjustment` row MUST preserve its source-native values and row class, but MUST NOT be assigned `consolidated_group` solely from the adjustment label. Subject promotion requires affirmative group wording or the existing allowed same-report reconciliation.
+A `consolidation_adjustment` row MUST preserve source-native values and row class. New subject assignment MUST follow the report-default policy with explicit narrower scopes taking precedence. The narrow source label 分部间抵销/分部间抵消 qualifies for the explicit adjustment rule; other company-owned rows without narrower Evidence or conflict use report_default_group_scope. The marker MUST NOT cause duplicate group totals or overwrite explicit subsidiary scope.
 
 #### Scenario: Inter-segment elimination lacks group wording
 - **WHEN** a source labels a row `分部间抵消` without affirmative group wording or reconciliation Evidence
-- **THEN** its subject remains `unclear`
-- **AND** the row is not treated as a consolidated-group fact
+- **THEN** the explicit adjustment rule may preserve consolidated_group with direct_source_wording if no contradictory narrower scope exists
+- **AND** the adjustment remains distinct from ordinary group-total facts
 
 ### Requirement: Business regime changes block approval until evidenced
 The manufacturing-materials contract MUST include a verified transformation, major restructuring, or reverse-listing report before final approval, or MUST remain `held` with a blocking coverage gap. Regime research MUST preserve historical business facts and MUST NOT apply the current package assignment retroactively. It MUST keep `reported_period`, `knowledge_time`, `regime_effective_at`, and `comparison_basis` distinct. When a comparative is explicitly restated, `comparison_basis` MUST be present; its absence MUST block completion. A later same-control restatement MUST coexist with, and MUST NOT overwrite or delete, the predecessor's `original_as_published` fact.

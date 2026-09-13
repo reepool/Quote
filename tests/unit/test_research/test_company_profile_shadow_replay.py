@@ -81,7 +81,7 @@ PRECISION_CLOSURE_CHANGE = (
 )
 OWNER_CLOSURE_CHANGE = (
     REPOSITORY_ROOT
-    / "openspec/changes/validate-company-profile-shadow-owner-closure-replay"
+    / "openspec/changes/archive/2026-09-13-validate-company-profile-shadow-owner-closure-replay"
 )
 OWNER_REGRESSION_CHANGE = (
     REPOSITORY_ROOT
@@ -89,7 +89,7 @@ OWNER_REGRESSION_CHANGE = (
 )
 ROUTING_CONTINUATION_CHANGE = (
     REPOSITORY_ROOT
-    / "openspec/changes/repair-company-profile-shadow-evidence-routing-and-continuation"
+    / "openspec/changes/archive/2026-09-13-repair-company-profile-shadow-evidence-routing-and-continuation"
 )
 SEGMENT_FINANCIAL_CHANGE = (
     REPOSITORY_ROOT
@@ -101,7 +101,7 @@ SEGMENT_HEADING_REPLAY_CHANGE = (
 )
 SEGMENT_CONTEXT_CHANGE = (
     REPOSITORY_ROOT
-    / "openspec/changes/repair-company-profile-segment-evidence-context-and-output-budget"
+    / "openspec/changes/archive/2026-09-13-repair-company-profile-segment-evidence-context-and-output-budget"
 )
 OPERATING_OWNERSHIP_REPLAY_CHANGE = (
     REPOSITORY_ROOT
@@ -330,6 +330,25 @@ def segment_heading_replay_inputs():
     proof["artifact_hashes"][archived_preparation] = proof["artifact_hashes"].pop(
         active_preparation
     )
+    # Rebase only the retired document location in this in-memory test proof;
+    # the archived proof bytes and all expected artifact hashes stay unchanged.
+    retired_locations = {
+        "openspec/changes/repair-company-profile-segment-evidence-context-and-output-budget/": SEGMENT_CONTEXT_CHANGE,
+        "openspec/changes/retry-company-profile-shadow-segment-replay-after-operator-timeout/": (
+            REPOSITORY_ROOT
+            / "openspec/changes/archive/2026-09-13-retry-company-profile-shadow-segment-replay-after-operator-timeout"
+        ),
+    }
+    for artifact_path in tuple(proof["artifact_hashes"]):
+        for active_context, archived_context in retired_locations.items():
+            if artifact_path.startswith(active_context):
+                relocated = (
+                    archived_context / artifact_path.removeprefix(active_context)
+                ).relative_to(REPOSITORY_ROOT).as_posix()
+                proof["artifact_hashes"][relocated] = proof["artifact_hashes"].pop(
+                    artifact_path
+                )
+                break
     for implementation_path, supporting_name in {
         "research/company_profile/shadow_evidence.py": (
             "shadow_evidence_implementation"

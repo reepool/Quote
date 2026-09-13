@@ -8,6 +8,8 @@
 
 ## 1. 当前结论
 
+本节是2026-09-03研究合同快照。新生产不以四报告全部通过或全部六章完整为门；现行主体和事实级交付以总需求及新实施 change 为准。旧 Gold 原值保留为历史评测，不能冒充当前政策实测。
+
 研究样本、四份 dossier、字段账本、行业 requirements、LLM 合同和 Gold 初标已经齐备。独立盲审已于 2026-09-03 完成：覆盖 72 个报告字段检查位、提交 74 条事实标注，四份报告均无 blocking finding；盲审发现的 7 个合同边界已逐项对账并获得用户最终接受。阶段 3 研究合同据此为 `approved`。阶段 3 没有实现或运行生产抽取器，因此本报告只批准验收方法和 Gold 研究基线，不声称模型指标已经通过；后续阶段 4/5 实现仍须在本 Gold 上通过阻塞项和分项阈值。
 
 ## 2. 样本覆盖
@@ -96,7 +98,7 @@
 
 1. 涂覆加工量只生成 `processing_volume`，来源双重叫法原样保留；第 19 页表格销售量是独立锚点；
 2. 合并抵消项采用带 `consolidation_adjustment` 标记的行及三个独立 Measurements，不新增对象；
-3. 合并主体必须有明文口径或与合并利润表完成金额核对，仅有“公司”时为 `unclear`；
+3. 现行主体按总需求 §13：明确更窄证据优先，否则无冲突时采用 `report_default_group_scope`；历史 Gold 的旧 unclear 预期保留为版本冲突，不强制 runtime 迁就；
 4. 同一控制重述与 predecessor 原披露按四时钟和 comparison basis 并列，不相互覆盖。
 
 上述四项口径已经用户确认并进入 Gold。独立盲审已按两步法完成，详细裁决见 `company_profile_manufacturing_materials_blind_review_adjudication_20260903.md`。新增接受项包括：加工服务方向、产能 kind、重述 basis、仅合计披露的关系/coverage 分离、未披露原因护栏、库存脚注可选性和 Activity actor；用户于 2026-09-03 最终接受全部新增裁决。

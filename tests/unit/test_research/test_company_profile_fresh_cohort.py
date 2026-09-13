@@ -45,7 +45,7 @@ BATCH_DIRECTORY = (
 )
 EXPANDED_CHANGE = (
     REPOSITORY_ROOT
-    / "openspec/changes/repair-company-profile-scale-blockers-and-validate-expanded-cohort"
+    / "openspec/changes/archive/2026-09-13-repair-company-profile-scale-blockers-and-validate-expanded-cohort"
 )
 EXPANDED_MANIFEST = EXPANDED_CHANGE / "expanded-cohort-manifest.v1.json"
 EXPANDED_PLAN = EXPANDED_CHANGE / "expanded-cohort-evidence-plan.v1.json"

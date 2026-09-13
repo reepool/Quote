@@ -2,6 +2,9 @@
 
 ## Purpose
 TBD - created by archiving change resolve-manufacturing-materials-profile-semantic-holds. Update Purpose after archive.
+## Contract scope
+Named run identities, targeted/full-run budgets and unresolved historical Gold decisions below are historical validation records, not required future runs. New delivery follows the all-A-share product contract; historical bundles are not rewritten.
+
 ## Requirements
 ### Requirement: Stage-five holds are adjudicated from immutable runtime evidence
 The adjudication MUST use `run-stage5-final-four-luna-20260905-f` as the immutable problem baseline and MUST record each decision against the original sample, request scope, candidate or coverage result, Evidence anchor, blocker, and frozen contract rule. It MUST NOT edit the baseline bundle, copy Gold values into runtime results, or promote targeted diagnostic runs into the authoritative four-report result.
@@ -12,7 +15,7 @@ The adjudication MUST use `run-stage5-final-four-luna-20260905-f` as the immutab
 - **AND** the baseline run remains byte-for-byte unchanged
 
 ### Requirement: The four blocking semantic families have explicit outcomes
-The adjudication MUST separately resolve subject scope, reported business change, external-service processing volume, and same-control comparative semantics. Subject scope MUST require affirmative source wording or documented same-report reconciliation; a no-major-business-change disclosure MUST produce supported `not_applicable` coverage rather than an invented event; a combined processing/sales source label at one physical anchor MUST produce only the source-supported primary metric; and a restated comparative MUST retain `comparison_basis` without overwriting earlier knowledge-time facts.
+The adjudication MUST separately resolve subject scope, reported business change, external-service processing volume, and same-control comparative semantics. Subject scope for new requests MUST follow report_default_group_scope unless explicit narrower Evidence or a conflict exists; direct wording and reconciliation retain their own basis; a no-major-business-change disclosure MUST produce supported `not_applicable` coverage rather than an invented event; a combined processing/sales source label at one physical anchor MUST produce only the source-supported primary metric; and a restated comparative MUST retain `comparison_basis` without overwriting earlier knowledge-time facts.
 
 #### Scenario: No major business change is disclosed beside a consolidation change
 - **WHEN** one Evidence scope states that consolidation scope changed and separately states that products, services, or principal business had no applicable major change
