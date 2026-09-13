@@ -1,0 +1,2587 @@
+{
+  "schema_version": "company_profile_fresh_cohort_source_review_resolution.v1",
+  "review_id": "manufacturing-materials-fresh-cohort-source-review-20260913-a",
+  "batch_id": "manufacturing-materials-fresh-cohort-four-pool-20260913-a",
+  "source_batch_result_hash": "3f5afc25a161661011d37798d9ede43ad30cf41c4258c1706bb3c6de8e552c63",
+  "bindings": {
+    "batch_manifest": {
+      "path": "var/company_profile_fresh_cohort/20260913/batch-manufacturing-materials-fresh-cohort-four-pool-20260913-a/manifest.json",
+      "sha256": "2c47eccdba83986df7894d45d15167b96743e258f7bb7d46fa971ea97339ab78"
+    },
+    "review_package": {
+      "path": "var/company_profile_fresh_cohort/20260913/batch-manufacturing-materials-fresh-cohort-four-pool-20260913-a/review-package.json",
+      "sha256": "02a213eb268fe1dc9c8c9d2cd0aff3b99fe357a9fdbcd44d4e97c61569f6709e",
+      "package_hash": "42d2716612f6b50d83acd232658fe69eefffc552cb8d6ddf4b35444cfec79e88"
+    },
+    "readiness_audit": {
+      "path": "var/company_profile_fresh_cohort/20260913/batch-manufacturing-materials-fresh-cohort-four-pool-20260913-a/readiness-audit.json",
+      "sha256": "2edb9a5779a0f6882e3059d32c8117d25e2cef3b03a0d034f690c92e0805203c",
+      "audit_hash": "4706642f8593b062e4229d93d5c1655e8c10ab4a3ce5414588f1a3961e8feb8e"
+    },
+    "admission_receipt": {
+      "path": "openspec/changes/validate-company-profile-common-fixes-on-fresh-cohort/fresh-cohort-admission-receipt.v1.json",
+      "sha256": "f2a51bc259589627eeede4463b491e0fade02deb111a0c99e0ce9bd4af1526d2"
+    }
+  },
+  "reviewer": "codex-source-review-fresh-cohort-20260913",
+  "reviewed_on": "2026-09-13",
+  "row_count": 73,
+  "outcome_counts": {
+    "correct": 73
+  },
+  "chapter_sample_count": 19,
+  "chapter_sample_correct_count": 19,
+  "critical_semantic_error_count": 0,
+  "writeback_performed": false,
+  "provider_calls": 0,
+  "rows": [
+    {
+      "review_row_id": "manufacturing-materials-fresh-000422-2025:business_overview-01:chapter_sample:stage5-bd34ee59fd0b5853f36473ea",
+      "sample_id": "manufacturing-materials-fresh-000422-2025",
+      "category": "chapter_sample",
+      "chapter_task": "extract_business_overview",
+      "scope_id": "business_overview-01",
+      "field_id": "business_overview_source",
+      "runtime_target_id": "stage5-bd34ee59fd0b5853f36473ea",
+      "physical_page": 11,
+      "evidence_id": "stage5-evidence-b6583610f1c3734dde3ff70b",
+      "source_quote_sha256": "99fca917d60efda9c0f3fc3d581987c41325411632f17f528233a8bedecccd91",
+      "runtime_target": {
+        "record_id": "stage5-bd34ee59fd0b5853f36473ea",
+        "object_type": "BusinessOverview",
+        "field_id": "business_overview_source",
+        "subject_scope": "consolidated_group",
+        "subject_basis": "report_default_group_scope",
+        "source_native_name": "主营业务",
+        "source_native_value_preview": "公司主营业务为化肥、化工、煤炭等产品的生产和销售，已形成完整的化工上下游产业链，主要产品产能包括尿素 216 万吨/年、磷铵 165 万吨/年、复合肥 70 万吨/年，烧碱 94 万吨/年、PVC 90 万吨/年、季戊四醇 7 万吨/年、煤炭 3,000 万吨/年，主要产品的产能均位于行业前列。",
+        "source_native_value_sha256": "a3eb795f681dc83ea04fd762c4c3c07b44175fa58c5d9858c656b23db7034952"
+      },
+      "outcome": "correct",
+      "resolution_action": "confirm_accept_for_research_review",
+      "finding_code": "source_supported_research_sample",
+      "recurrence_candidates": [
+        {
+          "family": "risk_only_business_overview_acceptance",
+          "evaluated": true,
+          "recurred": false,
+          "basis": "No accepted BusinessOverview is risk-only; the 中复神鹰 miss is a false negative."
+        }
+      ],
+      "source_quote_location": "bindings.review_package.rows[review_row_id]",
+      "attempt_lineage_key": "manufacturing-materials-fresh-000422-2025:business_overview-01"
+    },
+    {
+      "review_row_id": "manufacturing-materials-fresh-000422-2025:segment_financials-01:blocker:task_completion:segment_financials-01",
+      "sample_id": "manufacturing-materials-fresh-000422-2025",
+      "category": "blocker",
+      "chapter_task": "extract_segment_financials",
+      "scope_id": "segment_financials-01",
+      "field_id": "segment_dimension",
+      "runtime_target_id": "task_completion:segment_financials-01",
+      "physical_page": 26,
+      "evidence_id": "stage5-evidence-a37453d58921f2bcb050e079",
+      "source_quote_sha256": "46f659a5b7dc06eec3eceb4a7a88bb08dc36d23e33132646911bbedef5b28ef7",
+      "runtime_target": null,
+      "outcome": "correct",
+      "resolution_action": "retain_blocker",
+      "finding_code": "required_scope_incomplete_retained",
+      "recurrence_candidates": [],
+      "source_quote_location": "bindings.review_package.rows[review_row_id]",
+      "attempt_lineage_key": "manufacturing-materials-fresh-000422-2025:segment_financials-01"
+    },
+    {
+      "review_row_id": "manufacturing-materials-fresh-000422-2025:segment_financials-01:unresolved:manufacturing-materials-fresh-cohort-four-pool-20260913-a-000422-SZ:manufacturing-materials-fresh-000422-2025:segment_financials-01:extract-provider",
+      "sample_id": "manufacturing-materials-fresh-000422-2025",
+      "category": "unresolved",
+      "chapter_task": "extract_segment_financials",
+      "scope_id": "segment_financials-01",
+      "field_id": "segment_dimension",
+      "runtime_target_id": "manufacturing-materials-fresh-cohort-four-pool-20260913-a-000422-SZ:manufacturing-materials-fresh-000422-2025:segment_financials-01:extract-provider",
+      "physical_page": 26,
+      "evidence_id": "stage5-evidence-a37453d58921f2bcb050e079",
+      "source_quote_sha256": "46f659a5b7dc06eec3eceb4a7a88bb08dc36d23e33132646911bbedef5b28ef7",
+      "runtime_target": null,
+      "outcome": "correct",
+      "resolution_action": "retain_unresolved",
+      "finding_code": "candidate_schema_invalid",
+      "recurrence_candidates": [],
+      "source_quote_location": "bindings.review_package.rows[review_row_id]",
+      "attempt_lineage_key": "manufacturing-materials-fresh-000422-2025:segment_financials-01"
+    },
+    {
+      "review_row_id": "manufacturing-materials-fresh-000422-2025:segment_financials-01:unresolved:manufacturing-materials-fresh-cohort-four-pool-20260913-a-000422-SZ:manufacturing-materials-fresh-000422-2025:segment_financials-01:coverage:segment_dimension",
+      "sample_id": "manufacturing-materials-fresh-000422-2025",
+      "category": "unresolved",
+      "chapter_task": "extract_segment_financials",
+      "scope_id": "segment_financials-01",
+      "field_id": "segment_dimension",
+      "runtime_target_id": "manufacturing-materials-fresh-cohort-four-pool-20260913-a-000422-SZ:manufacturing-materials-fresh-000422-2025:segment_financials-01:coverage:segment_dimension",
+      "physical_page": 26,
+      "evidence_id": "stage5-evidence-a37453d58921f2bcb050e079",
+      "source_quote_sha256": "46f659a5b7dc06eec3eceb4a7a88bb08dc36d23e33132646911bbedef5b28ef7",
+      "runtime_target": null,
+      "outcome": "correct",
+      "resolution_action": "retain_unresolved",
+      "finding_code": "required_coverage_unresolved",
+      "recurrence_candidates": [],
+      "source_quote_location": "bindings.review_package.rows[review_row_id]",
+      "attempt_lineage_key": "manufacturing-materials-fresh-000422-2025:segment_financials-01"
+    },
+    {
+      "review_row_id": "manufacturing-materials-fresh-000422-2025:segment_financials-01:unresolved:manufacturing-materials-fresh-cohort-four-pool-20260913-a-000422-SZ:manufacturing-materials-fresh-000422-2025:segment_financials-01:coverage:operating_revenue",
+      "sample_id": "manufacturing-materials-fresh-000422-2025",
+      "category": "unresolved",
+      "chapter_task": "extract_segment_financials",
+      "scope_id": "segment_financials-01",
+      "field_id": "operating_revenue",
+      "runtime_target_id": "manufacturing-materials-fresh-cohort-four-pool-20260913-a-000422-SZ:manufacturing-materials-fresh-000422-2025:segment_financials-01:coverage:operating_revenue",
+      "physical_page": 26,
+      "evidence_id": "stage5-evidence-a37453d58921f2bcb050e079",
+      "source_quote_sha256": "46f659a5b7dc06eec3eceb4a7a88bb08dc36d23e33132646911bbedef5b28ef7",
+      "runtime_target": null,
+      "outcome": "correct",
+      "resolution_action": "retain_unresolved",
+      "finding_code": "required_coverage_unresolved",
+      "recurrence_candidates": [],
+      "source_quote_location": "bindings.review_package.rows[review_row_id]",
+      "attempt_lineage_key": "manufacturing-materials-fresh-000422-2025:segment_financials-01"
+    },
+    {
+      "review_row_id": "manufacturing-materials-fresh-000422-2025:segment_financials-01:unresolved:manufacturing-materials-fresh-cohort-four-pool-20260913-a-000422-SZ:manufacturing-materials-fresh-000422-2025:segment_financials-01:coverage:operating_cost",
+      "sample_id": "manufacturing-materials-fresh-000422-2025",
+      "category": "unresolved",
+      "chapter_task": "extract_segment_financials",
+      "scope_id": "segment_financials-01",
+      "field_id": "operating_cost",
+      "runtime_target_id": "manufacturing-materials-fresh-cohort-four-pool-20260913-a-000422-SZ:manufacturing-materials-fresh-000422-2025:segment_financials-01:coverage:operating_cost",
+      "physical_page": 26,
+      "evidence_id": "stage5-evidence-a37453d58921f2bcb050e079",
+      "source_quote_sha256": "46f659a5b7dc06eec3eceb4a7a88bb08dc36d23e33132646911bbedef5b28ef7",
+      "runtime_target": null,
+      "outcome": "correct",
+      "resolution_action": "retain_unresolved",
+      "finding_code": "required_coverage_unresolved",
+      "recurrence_candidates": [],
+      "source_quote_location": "bindings.review_package.rows[review_row_id]",
+      "attempt_lineage_key": "manufacturing-materials-fresh-000422-2025:segment_financials-01"
+    },
+    {
+      "review_row_id": "manufacturing-materials-fresh-000422-2025:segment_financials-01:unresolved:manufacturing-materials-fresh-cohort-four-pool-20260913-a-000422-SZ:manufacturing-materials-fresh-000422-2025:segment_financials-01:coverage:gross_margin_reported",
+      "sample_id": "manufacturing-materials-fresh-000422-2025",
+      "category": "unresolved",
+      "chapter_task": "extract_segment_financials",
+      "scope_id": "segment_financials-01",
+      "field_id": "gross_margin_reported",
+      "runtime_target_id": "manufacturing-materials-fresh-cohort-four-pool-20260913-a-000422-SZ:manufacturing-materials-fresh-000422-2025:segment_financials-01:coverage:gross_margin_reported",
+      "physical_page": 26,
+      "evidence_id": "stage5-evidence-a37453d58921f2bcb050e079",
+      "source_quote_sha256": "46f659a5b7dc06eec3eceb4a7a88bb08dc36d23e33132646911bbedef5b28ef7",
+      "runtime_target": null,
+      "outcome": "correct",
+      "resolution_action": "retain_unresolved",
+      "finding_code": "required_coverage_unresolved",
+      "recurrence_candidates": [],
+      "source_quote_location": "bindings.review_package.rows[review_row_id]",
+      "attempt_lineage_key": "manufacturing-materials-fresh-000422-2025:segment_financials-01"
+    },
+    {
+      "review_row_id": "manufacturing-materials-fresh-000422-2025:segment_financials-02:blocker:task_completion:segment_financials-02",
+      "sample_id": "manufacturing-materials-fresh-000422-2025",
+      "category": "blocker",
+      "chapter_task": "extract_segment_financials",
+      "scope_id": "segment_financials-02",
+      "field_id": "segment_dimension",
+      "runtime_target_id": "task_completion:segment_financials-02",
+      "physical_page": 247,
+      "evidence_id": "stage5-evidence-1032e6fc83a6c823963c73a1",
+      "source_quote_sha256": "f771e3a624b38486ddc488d16b6416ed7fe0c9e60abef54b9f3e2d05ba553ccd",
+      "runtime_target": null,
+      "outcome": "correct",
+      "resolution_action": "retain_blocker",
+      "finding_code": "typed_provider_failure_retained",
+      "recurrence_candidates": [],
+      "source_quote_location": "bindings.review_package.rows[review_row_id]",
+      "attempt_lineage_key": "manufacturing-materials-fresh-000422-2025:segment_financials-02"
+    },
+    {
+      "review_row_id": "manufacturing-materials-fresh-000422-2025:segment_financials-02:unresolved:manufacturing-materials-fresh-cohort-four-pool-20260913-a-000422-SZ:manufacturing-materials-fresh-000422-2025:segment_financials-02:extract-provider",
+      "sample_id": "manufacturing-materials-fresh-000422-2025",
+      "category": "unresolved",
+      "chapter_task": "extract_segment_financials",
+      "scope_id": "segment_financials-02",
+      "field_id": "segment_dimension",
+      "runtime_target_id": "manufacturing-materials-fresh-cohort-four-pool-20260913-a-000422-SZ:manufacturing-materials-fresh-000422-2025:segment_financials-02:extract-provider",
+      "physical_page": 247,
+      "evidence_id": "stage5-evidence-1032e6fc83a6c823963c73a1",
+      "source_quote_sha256": "f771e3a624b38486ddc488d16b6416ed7fe0c9e60abef54b9f3e2d05ba553ccd",
+      "runtime_target": null,
+      "outcome": "correct",
+      "resolution_action": "retain_unresolved",
+      "finding_code": "typed_provider_failure_retained",
+      "recurrence_candidates": [],
+      "source_quote_location": "bindings.review_package.rows[review_row_id]",
+      "attempt_lineage_key": "manufacturing-materials-fresh-000422-2025:segment_financials-02"
+    },
+    {
+      "review_row_id": "manufacturing-materials-fresh-000422-2025:segment_financials-02:unresolved:manufacturing-materials-fresh-cohort-four-pool-20260913-a-000422-SZ:manufacturing-materials-fresh-000422-2025:segment_financials-02:coverage:segment_dimension",
+      "sample_id": "manufacturing-materials-fresh-000422-2025",
+      "category": "unresolved",
+      "chapter_task": "extract_segment_financials",
+      "scope_id": "segment_financials-02",
+      "field_id": "segment_dimension",
+      "runtime_target_id": "manufacturing-materials-fresh-cohort-four-pool-20260913-a-000422-SZ:manufacturing-materials-fresh-000422-2025:segment_financials-02:coverage:segment_dimension",
+      "physical_page": 247,
+      "evidence_id": "stage5-evidence-1032e6fc83a6c823963c73a1",
+      "source_quote_sha256": "f771e3a624b38486ddc488d16b6416ed7fe0c9e60abef54b9f3e2d05ba553ccd",
+      "runtime_target": null,
+      "outcome": "correct",
+      "resolution_action": "retain_unresolved",
+      "finding_code": "typed_provider_failure_retained",
+      "recurrence_candidates": [],
+      "source_quote_location": "bindings.review_package.rows[review_row_id]",
+      "attempt_lineage_key": "manufacturing-materials-fresh-000422-2025:segment_financials-02"
+    },
+    {
+      "review_row_id": "manufacturing-materials-fresh-000422-2025:operating_quantities-01:blocker:task_completion:operating_quantities-01",
+      "sample_id": "manufacturing-materials-fresh-000422-2025",
+      "category": "blocker",
+      "chapter_task": "extract_operating_quantities",
+      "scope_id": "operating_quantities-01",
+      "field_id": "production_volume",
+      "runtime_target_id": "task_completion:operating_quantities-01",
+      "physical_page": 14,
+      "evidence_id": "stage5-evidence-0ebd6c8336bf889ff9bce637",
+      "source_quote_sha256": "dc456c12667bb2be4cdcc49f0e186bcce5b2cfc1c90599452249f13363ba28ca",
+      "runtime_target": null,
+      "outcome": "correct",
+      "resolution_action": "retain_blocker",
+      "finding_code": "required_scope_incomplete_retained",
+      "recurrence_candidates": [],
+      "source_quote_location": "bindings.review_package.rows[review_row_id]",
+      "attempt_lineage_key": "manufacturing-materials-fresh-000422-2025:operating_quantities-01"
+    },
+    {
+      "review_row_id": "manufacturing-materials-fresh-000422-2025:operating_quantities-01:unresolved:manufacturing-materials-fresh-cohort-four-pool-20260913-a-000422-SZ:manufacturing-materials-fresh-000422-2025:operating_quantities-01:coverage:production_volume",
+      "sample_id": "manufacturing-materials-fresh-000422-2025",
+      "category": "unresolved",
+      "chapter_task": "extract_operating_quantities",
+      "scope_id": "operating_quantities-01",
+      "field_id": "production_volume",
+      "runtime_target_id": "manufacturing-materials-fresh-cohort-four-pool-20260913-a-000422-SZ:manufacturing-materials-fresh-000422-2025:operating_quantities-01:coverage:production_volume",
+      "physical_page": 14,
+      "evidence_id": "stage5-evidence-0ebd6c8336bf889ff9bce637",
+      "source_quote_sha256": "dc456c12667bb2be4cdcc49f0e186bcce5b2cfc1c90599452249f13363ba28ca",
+      "runtime_target": null,
+      "outcome": "correct",
+      "resolution_action": "retain_unresolved",
+      "finding_code": "required_coverage_unresolved",
+      "recurrence_candidates": [],
+      "source_quote_location": "bindings.review_package.rows[review_row_id]",
+      "attempt_lineage_key": "manufacturing-materials-fresh-000422-2025:operating_quantities-01"
+    },
+    {
+      "review_row_id": "manufacturing-materials-fresh-000422-2025:operating_quantities-01:chapter_sample:stage5-0c5c6e16f601f5e3f9566c31",
+      "sample_id": "manufacturing-materials-fresh-000422-2025",
+      "category": "chapter_sample",
+      "chapter_task": "extract_operating_quantities",
+      "scope_id": "operating_quantities-01",
+      "field_id": "production_capacity",
+      "runtime_target_id": "stage5-0c5c6e16f601f5e3f9566c31",
+      "physical_page": 14,
+      "evidence_id": "stage5-evidence-0ebd6c8336bf889ff9bce637",
+      "source_quote_sha256": "dc456c12667bb2be4cdcc49f0e186bcce5b2cfc1c90599452249f13363ba28ca",
+      "runtime_target": {
+        "record_id": "stage5-0c5c6e16f601f5e3f9566c31",
+        "object_type": "Measurement",
+        "field_id": "production_capacity",
+        "subject_scope": "consolidated_group",
+        "subject_basis": "report_default_group_scope",
+        "metric_type": "production_capacity",
+        "source_native_name": "尿素",
+        "source_native_unit": "万吨",
+        "source_native_value_preview": "216",
+        "source_native_value_sha256": "0f4121d0ef1df4c86854c7ebb47ae1c93de8aec8f944035eeaa6495dd71a0678"
+      },
+      "outcome": "correct",
+      "resolution_action": "confirm_accept_for_research_review",
+      "finding_code": "source_supported_research_sample",
+      "recurrence_candidates": [],
+      "source_quote_location": "bindings.review_package.rows[review_row_id]",
+      "attempt_lineage_key": "manufacturing-materials-fresh-000422-2025:operating_quantities-01"
+    },
+    {
+      "review_row_id": "manufacturing-materials-fresh-000422-2025:operating_quantities-02:blocker:task_completion:operating_quantities-02",
+      "sample_id": "manufacturing-materials-fresh-000422-2025",
+      "category": "blocker",
+      "chapter_task": "extract_operating_quantities",
+      "scope_id": "operating_quantities-02",
+      "field_id": "production_capacity",
+      "runtime_target_id": "task_completion:operating_quantities-02",
+      "physical_page": 28,
+      "evidence_id": "stage5-evidence-7b55a89fdfb82020df1cce59",
+      "source_quote_sha256": "e2cc9338cf278f947b5961d8d674b5dfd0171d3803eceb10d9ee41acc9678b3a",
+      "runtime_target": null,
+      "outcome": "correct",
+      "resolution_action": "retain_blocker",
+      "finding_code": "required_scope_incomplete_retained",
+      "recurrence_candidates": [],
+      "source_quote_location": "bindings.review_package.rows[review_row_id]",
+      "attempt_lineage_key": "manufacturing-materials-fresh-000422-2025:operating_quantities-02"
+    },
+    {
+      "review_row_id": "manufacturing-materials-fresh-000422-2025:operating_quantities-02:unresolved:manufacturing-materials-fresh-cohort-four-pool-20260913-a-000422-SZ:manufacturing-materials-fresh-000422-2025:operating_quantities-02:coverage:production_capacity",
+      "sample_id": "manufacturing-materials-fresh-000422-2025",
+      "category": "unresolved",
+      "chapter_task": "extract_operating_quantities",
+      "scope_id": "operating_quantities-02",
+      "field_id": "production_capacity",
+      "runtime_target_id": "manufacturing-materials-fresh-cohort-four-pool-20260913-a-000422-SZ:manufacturing-materials-fresh-000422-2025:operating_quantities-02:coverage:production_capacity",
+      "physical_page": 28,
+      "evidence_id": "stage5-evidence-7b55a89fdfb82020df1cce59",
+      "source_quote_sha256": "e2cc9338cf278f947b5961d8d674b5dfd0171d3803eceb10d9ee41acc9678b3a",
+      "runtime_target": null,
+      "outcome": "correct",
+      "resolution_action": "retain_unresolved",
+      "finding_code": "required_coverage_unresolved",
+      "recurrence_candidates": [],
+      "source_quote_location": "bindings.review_package.rows[review_row_id]",
+      "attempt_lineage_key": "manufacturing-materials-fresh-000422-2025:operating_quantities-02"
+    },
+    {
+      "review_row_id": "manufacturing-materials-fresh-000422-2025:operating_quantities-02:unresolved:manufacturing-materials-fresh-cohort-four-pool-20260913-a-000422-SZ:manufacturing-materials-fresh-000422-2025:operating_quantities-02:coverage:capacity_under_construction",
+      "sample_id": "manufacturing-materials-fresh-000422-2025",
+      "category": "unresolved",
+      "chapter_task": "extract_operating_quantities",
+      "scope_id": "operating_quantities-02",
+      "field_id": "capacity_under_construction",
+      "runtime_target_id": "manufacturing-materials-fresh-cohort-four-pool-20260913-a-000422-SZ:manufacturing-materials-fresh-000422-2025:operating_quantities-02:coverage:capacity_under_construction",
+      "physical_page": 28,
+      "evidence_id": "stage5-evidence-7b55a89fdfb82020df1cce59",
+      "source_quote_sha256": "e2cc9338cf278f947b5961d8d674b5dfd0171d3803eceb10d9ee41acc9678b3a",
+      "runtime_target": null,
+      "outcome": "correct",
+      "resolution_action": "retain_unresolved",
+      "finding_code": "required_coverage_unresolved",
+      "recurrence_candidates": [],
+      "source_quote_location": "bindings.review_package.rows[review_row_id]",
+      "attempt_lineage_key": "manufacturing-materials-fresh-000422-2025:operating_quantities-02"
+    },
+    {
+      "review_row_id": "manufacturing-materials-fresh-000422-2025:material_inputs-01:chapter_sample:stage5-4108fe2d02a925f04ac69974",
+      "sample_id": "manufacturing-materials-fresh-000422-2025",
+      "category": "chapter_sample",
+      "chapter_task": "extract_material_inputs",
+      "scope_id": "material_inputs-01",
+      "field_id": "material_input",
+      "runtime_target_id": "stage5-4108fe2d02a925f04ac69974",
+      "physical_page": 12,
+      "evidence_id": "stage5-evidence-5db4fdb9536f8c6b1b028466",
+      "source_quote_sha256": "068cea6b141dc40b6a2f5bee693db091a92c20d31c8d9f03e6920a0aae0e3482",
+      "runtime_target": {
+        "record_id": "stage5-4108fe2d02a925f04ac69974",
+        "object_type": "Relationship",
+        "field_id": "material_input",
+        "subject_scope": "consolidated_group",
+        "subject_basis": "report_default_group_scope",
+        "source_native_name": "电石"
+      },
+      "outcome": "correct",
+      "resolution_action": "confirm_accept_for_research_review",
+      "finding_code": "source_supported_research_sample",
+      "recurrence_candidates": [
+        {
+          "family": "non_owner_legal_empty_evidence",
+          "evaluated": false,
+          "recurred": false,
+          "basis": "This row is an accepted fact, not a legal-empty conclusion."
+        }
+      ],
+      "source_quote_location": "bindings.review_package.rows[review_row_id]",
+      "attempt_lineage_key": "manufacturing-materials-fresh-000422-2025:material_inputs-01"
+    },
+    {
+      "review_row_id": "manufacturing-materials-fresh-000422-2025:counterparties_and_concentration-01:chapter_sample:stage5-24757b48a1c9b1e6bebdda4f",
+      "sample_id": "manufacturing-materials-fresh-000422-2025",
+      "category": "chapter_sample",
+      "chapter_task": "extract_counterparties_and_concentration",
+      "scope_id": "counterparties_and_concentration-01",
+      "field_id": "counterparty_relationship",
+      "runtime_target_id": "stage5-24757b48a1c9b1e6bebdda4f",
+      "physical_page": 31,
+      "evidence_id": "stage5-evidence-5241c2040ac2050d62cf5c20",
+      "source_quote_sha256": "e094e43988a65ecbcd30b25a9aae825115a467ee1f6f999286b8e41eaf87c963",
+      "runtime_target": {
+        "record_id": "stage5-24757b48a1c9b1e6bebdda4f",
+        "object_type": "Relationship",
+        "field_id": "counterparty_relationship",
+        "subject_scope": "consolidated_group",
+        "subject_basis": "report_default_group_scope",
+        "source_native_name": "客户一"
+      },
+      "outcome": "correct",
+      "resolution_action": "confirm_accept_for_research_review",
+      "finding_code": "source_supported_research_sample",
+      "recurrence_candidates": [],
+      "source_quote_location": "bindings.review_package.rows[review_row_id]",
+      "attempt_lineage_key": "manufacturing-materials-fresh-000422-2025:counterparties_and_concentration-01"
+    },
+    {
+      "review_row_id": "manufacturing-materials-fresh-000422-2025:business_regime-01:blocker:task_completion:business_regime-01",
+      "sample_id": "manufacturing-materials-fresh-000422-2025",
+      "category": "blocker",
+      "chapter_task": "extract_business_regime",
+      "scope_id": "business_regime-01",
+      "field_id": "business_regime",
+      "runtime_target_id": "task_completion:business_regime-01",
+      "physical_page": 29,
+      "evidence_id": "stage5-evidence-4b831c113a7f187136a3135b",
+      "source_quote_sha256": "46480ea103a280a0c0fb6dc73d7d648384472e5c5992e37b7450f9c1a59ec11b",
+      "runtime_target": null,
+      "outcome": "correct",
+      "resolution_action": "retain_blocker",
+      "finding_code": "required_scope_incomplete_retained",
+      "recurrence_candidates": [
+        {
+          "family": "unsupported_english_business_event_name",
+          "evaluated": true,
+          "recurred": false,
+          "basis": "Canonical event_type values are separate from source-native naming; accepted source-native names are null or source-supported Chinese."
+        }
+      ],
+      "source_quote_location": "bindings.review_package.rows[review_row_id]",
+      "attempt_lineage_key": "manufacturing-materials-fresh-000422-2025:business_regime-01"
+    },
+    {
+      "review_row_id": "manufacturing-materials-fresh-000422-2025:business_regime-01:unresolved:stage5-c831d5c6f0bbcb5bf98e9040",
+      "sample_id": "manufacturing-materials-fresh-000422-2025",
+      "category": "unresolved",
+      "chapter_task": "extract_business_regime",
+      "scope_id": "business_regime-01",
+      "field_id": "business_regime",
+      "runtime_target_id": "stage5-c831d5c6f0bbcb5bf98e9040",
+      "physical_page": 30,
+      "evidence_id": "stage5-evidence-b4772a1e83bcc73ab29dce35",
+      "source_quote_sha256": "d81a3e1527d30fed4ebd80d36c894f885a2cc4f47aa441c2e9fabe59524910dd",
+      "runtime_target": {
+        "record_id": "stage5-c831d5c6f0bbcb5bf98e9040",
+        "object_type": "BusinessEvent",
+        "field_id": "business_regime",
+        "subject_scope": "consolidated_group",
+        "subject_basis": "report_default_group_scope",
+        "event_type": "same_control_restatement",
+        "source_native_value_preview": "2024年数据为同控调整后数据。",
+        "source_native_value_sha256": "4b16697dec00934c65bc14f148b5984c400b3cbc618c79dd99265d4a2ecd47ae"
+      },
+      "outcome": "correct",
+      "resolution_action": "retain_unresolved",
+      "finding_code": "required_coverage_unresolved",
+      "recurrence_candidates": [
+        {
+          "family": "unsupported_english_business_event_name",
+          "evaluated": true,
+          "recurred": false,
+          "basis": "Canonical event_type values are separate from source-native naming; accepted source-native names are null or source-supported Chinese."
+        }
+      ],
+      "source_quote_location": "bindings.review_package.rows[review_row_id]",
+      "attempt_lineage_key": "manufacturing-materials-fresh-000422-2025:business_regime-01"
+    },
+    {
+      "review_row_id": "manufacturing-materials-fresh-000422-2025:business_regime-01:unresolved:stage5-d9a31208bce97e13c0e49ce1",
+      "sample_id": "manufacturing-materials-fresh-000422-2025",
+      "category": "unresolved",
+      "chapter_task": "extract_business_regime",
+      "scope_id": "business_regime-01",
+      "field_id": "business_regime",
+      "runtime_target_id": "stage5-d9a31208bce97e13c0e49ce1",
+      "physical_page": 30,
+      "evidence_id": "stage5-evidence-b4772a1e83bcc73ab29dce35",
+      "source_quote_sha256": "d81a3e1527d30fed4ebd80d36c894f885a2cc4f47aa441c2e9fabe59524910dd",
+      "runtime_target": {
+        "record_id": "stage5-d9a31208bce97e13c0e49ce1",
+        "object_type": "BusinessEvent",
+        "field_id": "business_regime",
+        "subject_scope": "consolidated_group",
+        "subject_basis": "report_default_group_scope",
+        "event_type": "consolidation_scope_change",
+        "source_native_value_preview": "报告期内合并范围发生变动：本期公司购买宜昌新发产业投资有限公司100%股权；本期公司子公司购买湖北一夫金楚新材料有限公司股权，穿透持股比例40.80%；本期公司转让景县晟科环保科技有限公司51%股权。",
+        "source_native_value_sha256": "5c2511a2f41eaa0ed47dbd70fa9c02e1eba41a0fe2e9dd5e038df85c97a3fd93"
+      },
+      "outcome": "correct",
+      "resolution_action": "retain_unresolved",
+      "finding_code": "required_coverage_unresolved",
+      "recurrence_candidates": [
+        {
+          "family": "unsupported_english_business_event_name",
+          "evaluated": true,
+          "recurred": false,
+          "basis": "Canonical event_type values are separate from source-native naming; accepted source-native names are null or source-supported Chinese."
+        }
+      ],
+      "source_quote_location": "bindings.review_package.rows[review_row_id]",
+      "attempt_lineage_key": "manufacturing-materials-fresh-000422-2025:business_regime-01"
+    },
+    {
+      "review_row_id": "manufacturing-materials-fresh-000422-2025:business_regime-01:unresolved:stage5-402a477774221163e4e1773b",
+      "sample_id": "manufacturing-materials-fresh-000422-2025",
+      "category": "unresolved",
+      "chapter_task": "extract_business_regime",
+      "scope_id": "business_regime-01",
+      "field_id": "business_regime",
+      "runtime_target_id": "stage5-402a477774221163e4e1773b",
+      "physical_page": 31,
+      "evidence_id": "stage5-evidence-ce9349d5c0e1254dd02d2982",
+      "source_quote_sha256": "1c83a37afb2daa2864599e015c04e7c712107761e8eed062d55462606e58bf2f",
+      "runtime_target": {
+        "record_id": "stage5-402a477774221163e4e1773b",
+        "object_type": "BusinessEvent",
+        "field_id": "business_regime",
+        "subject_scope": "consolidated_group",
+        "subject_basis": "report_default_group_scope",
+        "event_type": "consolidation_scope_change",
+        "source_native_value_preview": "报告期内合并范围发生变动：本期公司子公司设立湖北宜化楚星工贸有限公司、湖北宜化精磷科技有限公司、湖北宜化新宜科技有限公司、湖北宜化高新贸易有限公司、宜都宜化商贸有限公司、宜化（新疆）新材料有限公司，均持有100%股权；本期公司子公司注销宜昌宜化物流有限责任公司，原持有其68%股权。",
+        "source_native_value_sha256": "3d77546356d745737db981384c33c83cd4bd672cfb8b0fbc62a9196912f98199"
+      },
+      "outcome": "correct",
+      "resolution_action": "retain_unresolved",
+      "finding_code": "required_coverage_unresolved",
+      "recurrence_candidates": [
+        {
+          "family": "unsupported_english_business_event_name",
+          "evaluated": true,
+          "recurred": false,
+          "basis": "Canonical event_type values are separate from source-native naming; accepted source-native names are null or source-supported Chinese."
+        }
+      ],
+      "source_quote_location": "bindings.review_package.rows[review_row_id]",
+      "attempt_lineage_key": "manufacturing-materials-fresh-000422-2025:business_regime-01"
+    },
+    {
+      "review_row_id": "manufacturing-materials-fresh-000422-2025:business_regime-01:unresolved:manufacturing-materials-fresh-cohort-four-pool-20260913-a-000422-SZ:manufacturing-materials-fresh-000422-2025:business_regime-01:coverage:business_regime",
+      "sample_id": "manufacturing-materials-fresh-000422-2025",
+      "category": "unresolved",
+      "chapter_task": "extract_business_regime",
+      "scope_id": "business_regime-01",
+      "field_id": "business_regime",
+      "runtime_target_id": "manufacturing-materials-fresh-cohort-four-pool-20260913-a-000422-SZ:manufacturing-materials-fresh-000422-2025:business_regime-01:coverage:business_regime",
+      "physical_page": 29,
+      "evidence_id": "stage5-evidence-4b831c113a7f187136a3135b",
+      "source_quote_sha256": "46480ea103a280a0c0fb6dc73d7d648384472e5c5992e37b7450f9c1a59ec11b",
+      "runtime_target": null,
+      "outcome": "correct",
+      "resolution_action": "retain_unresolved",
+      "finding_code": "required_coverage_unresolved",
+      "recurrence_candidates": [
+        {
+          "family": "unsupported_english_business_event_name",
+          "evaluated": true,
+          "recurred": false,
+          "basis": "Canonical event_type values are separate from source-native naming; accepted source-native names are null or source-supported Chinese."
+        }
+      ],
+      "source_quote_location": "bindings.review_package.rows[review_row_id]",
+      "attempt_lineage_key": "manufacturing-materials-fresh-000422-2025:business_regime-01"
+    },
+    {
+      "review_row_id": "manufacturing-materials-fresh-000422-2025:business_regime-01:chapter_sample:stage5-f72746943d4df16a00f082f3",
+      "sample_id": "manufacturing-materials-fresh-000422-2025",
+      "category": "chapter_sample",
+      "chapter_task": "extract_business_regime",
+      "scope_id": "business_regime-01",
+      "field_id": "business_regime",
+      "runtime_target_id": "stage5-f72746943d4df16a00f082f3",
+      "physical_page": 30,
+      "evidence_id": "stage5-evidence-b4772a1e83bcc73ab29dce35",
+      "source_quote_sha256": "d81a3e1527d30fed4ebd80d36c894f885a2cc4f47aa441c2e9fabe59524910dd",
+      "runtime_target": {
+        "record_id": "stage5-f72746943d4df16a00f082f3",
+        "object_type": "BusinessEvent",
+        "field_id": "business_regime",
+        "subject_scope": "consolidated_group",
+        "subject_basis": "report_default_group_scope",
+        "event_type": "share_acquisition",
+        "source_native_value_preview": "本期公司购买宜昌新发产业投资有限公司100%股权。",
+        "source_native_value_sha256": "5357e6a0d397ba2750c73322fe4e3734a6d7d89ce0308cfabef8575455ea0d1f"
+      },
+      "outcome": "correct",
+      "resolution_action": "confirm_accept_for_research_review",
+      "finding_code": "source_supported_research_sample",
+      "recurrence_candidates": [
+        {
+          "family": "unsupported_english_business_event_name",
+          "evaluated": true,
+          "recurred": false,
+          "basis": "Canonical event_type values are separate from source-native naming; accepted source-native names are null or source-supported Chinese."
+        }
+      ],
+      "source_quote_location": "bindings.review_package.rows[review_row_id]",
+      "attempt_lineage_key": "manufacturing-materials-fresh-000422-2025:business_regime-01"
+    },
+    {
+      "review_row_id": "manufacturing-materials-fresh-001296-2025:business_overview-01:chapter_sample:stage5-7f7f5b8e72097f7c6924ecc4",
+      "sample_id": "manufacturing-materials-fresh-001296-2025",
+      "category": "chapter_sample",
+      "chapter_task": "extract_business_overview",
+      "scope_id": "business_overview-01",
+      "field_id": "business_overview_source",
+      "runtime_target_id": "stage5-7f7f5b8e72097f7c6924ecc4",
+      "physical_page": 11,
+      "evidence_id": "stage5-evidence-87fcdd8c687b6dfad2f432d2",
+      "source_quote_sha256": "d2c26cf11be9873ae87d42ac3a6b66ed594c1137e5514f2a484b543d5071e175",
+      "runtime_target": {
+        "record_id": "stage5-7f7f5b8e72097f7c6924ecc4",
+        "object_type": "BusinessOverview",
+        "field_id": "business_overview_source",
+        "subject_scope": "consolidated_group",
+        "subject_basis": "report_default_group_scope",
+        "source_native_value_preview": "公司主营业务为铸造用硅砂、覆膜砂和砂芯的研发、生产和销售；铸造废（旧）砂再生设备的研发、再生砂生产；压裂支撑剂的研发、生产和销售。",
+        "source_native_value_sha256": "94011f5084aad892c7e9fd6dfb140c79d9aeac8081df95cdf7aab95837b73ad9"
+      },
+      "outcome": "correct",
+      "resolution_action": "confirm_accept_for_research_review",
+      "finding_code": "source_supported_research_sample",
+      "recurrence_candidates": [
+        {
+          "family": "risk_only_business_overview_acceptance",
+          "evaluated": true,
+          "recurred": false,
+          "basis": "No accepted BusinessOverview is risk-only; the 中复神鹰 miss is a false negative."
+        }
+      ],
+      "source_quote_location": "bindings.review_package.rows[review_row_id]",
+      "attempt_lineage_key": "manufacturing-materials-fresh-001296-2025:business_overview-01"
+    },
+    {
+      "review_row_id": "manufacturing-materials-fresh-001296-2025:segment_financials-01:chapter_sample:stage5-c335b5756c27da3d296d6171",
+      "sample_id": "manufacturing-materials-fresh-001296-2025",
+      "category": "chapter_sample",
+      "chapter_task": "extract_segment_financials",
+      "scope_id": "segment_financials-01",
+      "field_id": "segment_dimension",
+      "runtime_target_id": "stage5-c335b5756c27da3d296d6171",
+      "physical_page": 13,
+      "evidence_id": "stage5-evidence-246a69213df02570cbad0968",
+      "source_quote_sha256": "566df61b339a8cc863bec363e8aa901286303ee2fdd6d38e63412ada7be808bb",
+      "runtime_target": {
+        "record_id": "stage5-c335b5756c27da3d296d6171",
+        "object_type": "Segment",
+        "field_id": "segment_dimension",
+        "subject_scope": "business_segment",
+        "source_native_name": "铸造行业"
+      },
+      "outcome": "correct",
+      "resolution_action": "confirm_accept_for_research_review",
+      "finding_code": "source_supported_research_sample",
+      "recurrence_candidates": [
+        {
+          "family": "non_owner_legal_empty_evidence",
+          "evaluated": false,
+          "recurred": false,
+          "basis": "This row is an accepted fact, not a legal-empty conclusion."
+        }
+      ],
+      "source_quote_location": "bindings.review_package.rows[review_row_id]",
+      "attempt_lineage_key": "manufacturing-materials-fresh-001296-2025:segment_financials-01"
+    },
+    {
+      "review_row_id": "manufacturing-materials-fresh-001296-2025:segment_financials-02:blocker:task_completion:segment_financials-02",
+      "sample_id": "manufacturing-materials-fresh-001296-2025",
+      "category": "blocker",
+      "chapter_task": "extract_segment_financials",
+      "scope_id": "segment_financials-02",
+      "field_id": "segment_dimension",
+      "runtime_target_id": "task_completion:segment_financials-02",
+      "physical_page": 202,
+      "evidence_id": "stage5-evidence-1bf0a40f3d8be496ae395160",
+      "source_quote_sha256": "7ea5d248de78f3cc4a97612b0524bf1299176f7f966a93c624c71a6a41cc5e81",
+      "runtime_target": null,
+      "outcome": "correct",
+      "resolution_action": "retain_blocker",
+      "finding_code": "required_scope_incomplete_retained",
+      "recurrence_candidates": [],
+      "source_quote_location": "bindings.review_package.rows[review_row_id]",
+      "attempt_lineage_key": "manufacturing-materials-fresh-001296-2025:segment_financials-02"
+    },
+    {
+      "review_row_id": "manufacturing-materials-fresh-001296-2025:segment_financials-02:unresolved:stage5-3e57646ce501962e85f14042",
+      "sample_id": "manufacturing-materials-fresh-001296-2025",
+      "category": "unresolved",
+      "chapter_task": "extract_segment_financials",
+      "scope_id": "segment_financials-02",
+      "field_id": "segment_dimension",
+      "runtime_target_id": "stage5-3e57646ce501962e85f14042",
+      "physical_page": 202,
+      "evidence_id": "stage5-evidence-1bf0a40f3d8be496ae395160",
+      "source_quote_sha256": "7ea5d248de78f3cc4a97612b0524bf1299176f7f966a93c624c71a6a41cc5e81",
+      "runtime_target": {
+        "record_id": "stage5-3e57646ce501962e85f14042",
+        "object_type": "Segment",
+        "field_id": "segment_dimension",
+        "subject_scope": "unclear",
+        "row_class": "consolidation_adjustment",
+        "source_native_name": "分部间抵销"
+      },
+      "outcome": "correct",
+      "resolution_action": "retain_unresolved",
+      "finding_code": "consolidation_adjustment_false_negative",
+      "recurrence_candidates": [],
+      "source_quote_location": "bindings.review_package.rows[review_row_id]",
+      "attempt_lineage_key": "manufacturing-materials-fresh-001296-2025:segment_financials-02"
+    },
+    {
+      "review_row_id": "manufacturing-materials-fresh-001296-2025:segment_financials-02:unresolved:manufacturing-materials-fresh-cohort-four-pool-20260913-a-001296-SZ:manufacturing-materials-fresh-001296-2025:segment_financials-02:coverage:segment_dimension",
+      "sample_id": "manufacturing-materials-fresh-001296-2025",
+      "category": "unresolved",
+      "chapter_task": "extract_segment_financials",
+      "scope_id": "segment_financials-02",
+      "field_id": "segment_dimension",
+      "runtime_target_id": "manufacturing-materials-fresh-cohort-four-pool-20260913-a-001296-SZ:manufacturing-materials-fresh-001296-2025:segment_financials-02:coverage:segment_dimension",
+      "physical_page": 202,
+      "evidence_id": "stage5-evidence-1bf0a40f3d8be496ae395160",
+      "source_quote_sha256": "7ea5d248de78f3cc4a97612b0524bf1299176f7f966a93c624c71a6a41cc5e81",
+      "runtime_target": null,
+      "outcome": "correct",
+      "resolution_action": "retain_unresolved",
+      "finding_code": "required_coverage_unresolved",
+      "recurrence_candidates": [],
+      "source_quote_location": "bindings.review_package.rows[review_row_id]",
+      "attempt_lineage_key": "manufacturing-materials-fresh-001296-2025:segment_financials-02"
+    },
+    {
+      "review_row_id": "manufacturing-materials-fresh-001296-2025:operating_quantities-01:chapter_sample:stage5-979e3b76f84235bf496fe38c",
+      "sample_id": "manufacturing-materials-fresh-001296-2025",
+      "category": "chapter_sample",
+      "chapter_task": "extract_operating_quantities",
+      "scope_id": "operating_quantities-01",
+      "field_id": "production_capacity",
+      "runtime_target_id": "stage5-979e3b76f84235bf496fe38c",
+      "physical_page": 14,
+      "evidence_id": "stage5-evidence-b3ba2138c413c131123401e4",
+      "source_quote_sha256": "2004292790f54d3b34f180c7f13dbf9ab318b0f421c35bf3892203b0812da77d",
+      "runtime_target": {
+        "record_id": "stage5-979e3b76f84235bf496fe38c",
+        "object_type": "Measurement",
+        "field_id": "production_capacity",
+        "subject_scope": "consolidated_group",
+        "subject_basis": "report_default_group_scope",
+        "metric_type": "production_capacity",
+        "source_native_name": "擦洗砂生产能力",
+        "source_native_unit": "万吨/年",
+        "source_native_value_preview": "200",
+        "source_native_value_sha256": "27badc983df1780b60c2b3fa9d3a19a00e46aac798451f0febdca52920faaddf"
+      },
+      "outcome": "correct",
+      "resolution_action": "confirm_accept_for_research_review",
+      "finding_code": "source_supported_research_sample",
+      "recurrence_candidates": [],
+      "source_quote_location": "bindings.review_package.rows[review_row_id]",
+      "attempt_lineage_key": "manufacturing-materials-fresh-001296-2025:operating_quantities-01"
+    },
+    {
+      "review_row_id": "manufacturing-materials-fresh-001296-2025:operating_quantities-02:blocker:task_completion:operating_quantities-02",
+      "sample_id": "manufacturing-materials-fresh-001296-2025",
+      "category": "blocker",
+      "chapter_task": "extract_operating_quantities",
+      "scope_id": "operating_quantities-02",
+      "field_id": "production_capacity",
+      "runtime_target_id": "task_completion:operating_quantities-02",
+      "physical_page": 28,
+      "evidence_id": "stage5-evidence-f50d8a6d8ac6c507648cb883",
+      "source_quote_sha256": "61b992b8c4a19a7d0b78d3850f17e17e7d5008e74e6475a0b2fd422acb1e6224",
+      "runtime_target": null,
+      "outcome": "correct",
+      "resolution_action": "retain_blocker",
+      "finding_code": "frozen_evidence_plan_miss",
+      "recurrence_candidates": [],
+      "source_quote_location": "bindings.review_package.rows[review_row_id]",
+      "attempt_lineage_key": "manufacturing-materials-fresh-001296-2025:operating_quantities-02"
+    },
+    {
+      "review_row_id": "manufacturing-materials-fresh-001296-2025:operating_quantities-02:unresolved:manufacturing-materials-fresh-cohort-four-pool-20260913-a-001296-SZ:manufacturing-materials-fresh-001296-2025:operating_quantities-02:coverage:production_capacity",
+      "sample_id": "manufacturing-materials-fresh-001296-2025",
+      "category": "unresolved",
+      "chapter_task": "extract_operating_quantities",
+      "scope_id": "operating_quantities-02",
+      "field_id": "production_capacity",
+      "runtime_target_id": "manufacturing-materials-fresh-cohort-four-pool-20260913-a-001296-SZ:manufacturing-materials-fresh-001296-2025:operating_quantities-02:coverage:production_capacity",
+      "physical_page": 28,
+      "evidence_id": "stage5-evidence-f50d8a6d8ac6c507648cb883",
+      "source_quote_sha256": "61b992b8c4a19a7d0b78d3850f17e17e7d5008e74e6475a0b2fd422acb1e6224",
+      "runtime_target": null,
+      "outcome": "correct",
+      "resolution_action": "retain_unresolved",
+      "finding_code": "frozen_evidence_plan_miss",
+      "recurrence_candidates": [],
+      "source_quote_location": "bindings.review_package.rows[review_row_id]",
+      "attempt_lineage_key": "manufacturing-materials-fresh-001296-2025:operating_quantities-02"
+    },
+    {
+      "review_row_id": "manufacturing-materials-fresh-001296-2025:operating_quantities-02:unresolved:manufacturing-materials-fresh-cohort-four-pool-20260913-a-001296-SZ:manufacturing-materials-fresh-001296-2025:operating_quantities-02:coverage:capacity_utilization",
+      "sample_id": "manufacturing-materials-fresh-001296-2025",
+      "category": "unresolved",
+      "chapter_task": "extract_operating_quantities",
+      "scope_id": "operating_quantities-02",
+      "field_id": "capacity_utilization",
+      "runtime_target_id": "manufacturing-materials-fresh-cohort-four-pool-20260913-a-001296-SZ:manufacturing-materials-fresh-001296-2025:operating_quantities-02:coverage:capacity_utilization",
+      "physical_page": 28,
+      "evidence_id": "stage5-evidence-f50d8a6d8ac6c507648cb883",
+      "source_quote_sha256": "61b992b8c4a19a7d0b78d3850f17e17e7d5008e74e6475a0b2fd422acb1e6224",
+      "runtime_target": null,
+      "outcome": "correct",
+      "resolution_action": "retain_unresolved",
+      "finding_code": "frozen_evidence_plan_miss",
+      "recurrence_candidates": [],
+      "source_quote_location": "bindings.review_package.rows[review_row_id]",
+      "attempt_lineage_key": "manufacturing-materials-fresh-001296-2025:operating_quantities-02"
+    },
+    {
+      "review_row_id": "manufacturing-materials-fresh-001296-2025:operating_quantities-02:unresolved:manufacturing-materials-fresh-cohort-four-pool-20260913-a-001296-SZ:manufacturing-materials-fresh-001296-2025:operating_quantities-02:coverage:production_volume",
+      "sample_id": "manufacturing-materials-fresh-001296-2025",
+      "category": "unresolved",
+      "chapter_task": "extract_operating_quantities",
+      "scope_id": "operating_quantities-02",
+      "field_id": "production_volume",
+      "runtime_target_id": "manufacturing-materials-fresh-cohort-four-pool-20260913-a-001296-SZ:manufacturing-materials-fresh-001296-2025:operating_quantities-02:coverage:production_volume",
+      "physical_page": 28,
+      "evidence_id": "stage5-evidence-f50d8a6d8ac6c507648cb883",
+      "source_quote_sha256": "61b992b8c4a19a7d0b78d3850f17e17e7d5008e74e6475a0b2fd422acb1e6224",
+      "runtime_target": null,
+      "outcome": "correct",
+      "resolution_action": "retain_unresolved",
+      "finding_code": "frozen_evidence_plan_miss",
+      "recurrence_candidates": [],
+      "source_quote_location": "bindings.review_package.rows[review_row_id]",
+      "attempt_lineage_key": "manufacturing-materials-fresh-001296-2025:operating_quantities-02"
+    },
+    {
+      "review_row_id": "manufacturing-materials-fresh-001296-2025:material_inputs-01:blocker:task_completion:material_inputs-01",
+      "sample_id": "manufacturing-materials-fresh-001296-2025",
+      "category": "blocker",
+      "chapter_task": "extract_material_inputs",
+      "scope_id": "material_inputs-01",
+      "field_id": "material_input",
+      "runtime_target_id": "task_completion:material_inputs-01",
+      "physical_page": 14,
+      "evidence_id": "stage5-evidence-c2581212cd0cd6e25985e293",
+      "source_quote_sha256": "00dbf35b00432ac9210307060a01f441b6189c31b7e8b13b3728a905ea4235f9",
+      "runtime_target": null,
+      "outcome": "correct",
+      "resolution_action": "retain_blocker",
+      "finding_code": "typed_provider_failure_retained",
+      "recurrence_candidates": [],
+      "source_quote_location": "bindings.review_package.rows[review_row_id]",
+      "attempt_lineage_key": "manufacturing-materials-fresh-001296-2025:material_inputs-01"
+    },
+    {
+      "review_row_id": "manufacturing-materials-fresh-001296-2025:material_inputs-01:unresolved:stage5-787a4fb8908b478dfe22a201",
+      "sample_id": "manufacturing-materials-fresh-001296-2025",
+      "category": "unresolved",
+      "chapter_task": "extract_material_inputs",
+      "scope_id": "material_inputs-01",
+      "field_id": "material_input",
+      "runtime_target_id": "stage5-787a4fb8908b478dfe22a201",
+      "physical_page": 14,
+      "evidence_id": "stage5-evidence-c2581212cd0cd6e25985e293",
+      "source_quote_sha256": "00dbf35b00432ac9210307060a01f441b6189c31b7e8b13b3728a905ea4235f9",
+      "runtime_target": {
+        "record_id": "stage5-787a4fb8908b478dfe22a201",
+        "object_type": "Relationship",
+        "field_id": "material_input",
+        "subject_scope": "consolidated_group",
+        "subject_basis": "report_default_group_scope",
+        "source_native_name": "废（旧）砂"
+      },
+      "outcome": "correct",
+      "resolution_action": "retain_unresolved",
+      "finding_code": "typed_provider_failure_retained",
+      "recurrence_candidates": [],
+      "source_quote_location": "bindings.review_package.rows[review_row_id]",
+      "attempt_lineage_key": "manufacturing-materials-fresh-001296-2025:material_inputs-01"
+    },
+    {
+      "review_row_id": "manufacturing-materials-fresh-001296-2025:material_inputs-01:unresolved:stage5-4c298c6f87eb2b20f97c9e32",
+      "sample_id": "manufacturing-materials-fresh-001296-2025",
+      "category": "unresolved",
+      "chapter_task": "extract_material_inputs",
+      "scope_id": "material_inputs-01",
+      "field_id": "material_input",
+      "runtime_target_id": "stage5-4c298c6f87eb2b20f97c9e32",
+      "physical_page": 14,
+      "evidence_id": "stage5-evidence-c2581212cd0cd6e25985e293",
+      "source_quote_sha256": "00dbf35b00432ac9210307060a01f441b6189c31b7e8b13b3728a905ea4235f9",
+      "runtime_target": {
+        "record_id": "stage5-4c298c6f87eb2b20f97c9e32",
+        "object_type": "Relationship",
+        "field_id": "material_input",
+        "subject_scope": "consolidated_group",
+        "subject_basis": "report_default_group_scope",
+        "source_native_name": "原砂"
+      },
+      "outcome": "correct",
+      "resolution_action": "retain_unresolved",
+      "finding_code": "typed_provider_failure_retained",
+      "recurrence_candidates": [],
+      "source_quote_location": "bindings.review_package.rows[review_row_id]",
+      "attempt_lineage_key": "manufacturing-materials-fresh-001296-2025:material_inputs-01"
+    },
+    {
+      "review_row_id": "manufacturing-materials-fresh-001296-2025:material_inputs-01:unresolved:stage5-dcb84aa1511802d92b9a322b",
+      "sample_id": "manufacturing-materials-fresh-001296-2025",
+      "category": "unresolved",
+      "chapter_task": "extract_material_inputs",
+      "scope_id": "material_inputs-01",
+      "field_id": "material_input",
+      "runtime_target_id": "stage5-dcb84aa1511802d92b9a322b",
+      "physical_page": 14,
+      "evidence_id": "stage5-evidence-c2581212cd0cd6e25985e293",
+      "source_quote_sha256": "00dbf35b00432ac9210307060a01f441b6189c31b7e8b13b3728a905ea4235f9",
+      "runtime_target": {
+        "record_id": "stage5-dcb84aa1511802d92b9a322b",
+        "object_type": "Relationship",
+        "field_id": "material_input",
+        "subject_scope": "consolidated_group",
+        "subject_basis": "report_default_group_scope",
+        "source_native_name": "擦洗砂"
+      },
+      "outcome": "correct",
+      "resolution_action": "retain_unresolved",
+      "finding_code": "typed_provider_failure_retained",
+      "recurrence_candidates": [],
+      "source_quote_location": "bindings.review_package.rows[review_row_id]",
+      "attempt_lineage_key": "manufacturing-materials-fresh-001296-2025:material_inputs-01"
+    },
+    {
+      "review_row_id": "manufacturing-materials-fresh-001296-2025:material_inputs-01:unresolved:stage5-6a8601f35ffd1871b97209f2",
+      "sample_id": "manufacturing-materials-fresh-001296-2025",
+      "category": "unresolved",
+      "chapter_task": "extract_material_inputs",
+      "scope_id": "material_inputs-01",
+      "field_id": "material_input",
+      "runtime_target_id": "stage5-6a8601f35ffd1871b97209f2",
+      "physical_page": 14,
+      "evidence_id": "stage5-evidence-c2581212cd0cd6e25985e293",
+      "source_quote_sha256": "00dbf35b00432ac9210307060a01f441b6189c31b7e8b13b3728a905ea4235f9",
+      "runtime_target": {
+        "record_id": "stage5-6a8601f35ffd1871b97209f2",
+        "object_type": "Relationship",
+        "field_id": "material_input",
+        "subject_scope": "consolidated_group",
+        "subject_basis": "report_default_group_scope",
+        "source_native_name": "焙烧砂"
+      },
+      "outcome": "correct",
+      "resolution_action": "retain_unresolved",
+      "finding_code": "typed_provider_failure_retained",
+      "recurrence_candidates": [],
+      "source_quote_location": "bindings.review_package.rows[review_row_id]",
+      "attempt_lineage_key": "manufacturing-materials-fresh-001296-2025:material_inputs-01"
+    },
+    {
+      "review_row_id": "manufacturing-materials-fresh-001296-2025:material_inputs-01:unresolved:stage5-002d28d1874a9ac90eebed6f",
+      "sample_id": "manufacturing-materials-fresh-001296-2025",
+      "category": "unresolved",
+      "chapter_task": "extract_material_inputs",
+      "scope_id": "material_inputs-01",
+      "field_id": "material_input",
+      "runtime_target_id": "stage5-002d28d1874a9ac90eebed6f",
+      "physical_page": 14,
+      "evidence_id": "stage5-evidence-c2581212cd0cd6e25985e293",
+      "source_quote_sha256": "00dbf35b00432ac9210307060a01f441b6189c31b7e8b13b3728a905ea4235f9",
+      "runtime_target": {
+        "record_id": "stage5-002d28d1874a9ac90eebed6f",
+        "object_type": "Relationship",
+        "field_id": "material_input",
+        "subject_scope": "consolidated_group",
+        "subject_basis": "report_default_group_scope",
+        "source_native_name": "天然石英砂"
+      },
+      "outcome": "correct",
+      "resolution_action": "retain_unresolved",
+      "finding_code": "typed_provider_failure_retained",
+      "recurrence_candidates": [],
+      "source_quote_location": "bindings.review_package.rows[review_row_id]",
+      "attempt_lineage_key": "manufacturing-materials-fresh-001296-2025:material_inputs-01"
+    },
+    {
+      "review_row_id": "manufacturing-materials-fresh-001296-2025:material_inputs-01:unresolved:stage5-21e459ce823d0efbcaeb75fc",
+      "sample_id": "manufacturing-materials-fresh-001296-2025",
+      "category": "unresolved",
+      "chapter_task": "extract_material_inputs",
+      "scope_id": "material_inputs-01",
+      "field_id": "material_input",
+      "runtime_target_id": "stage5-21e459ce823d0efbcaeb75fc",
+      "physical_page": 16,
+      "evidence_id": "stage5-evidence-e54c27f7092030d7b7050d7d",
+      "source_quote_sha256": "e82d20c5cfba2821b47e3a79bd549fb6bf9d84bf43a784c07ac127d554ecf30a",
+      "runtime_target": {
+        "record_id": "stage5-21e459ce823d0efbcaeb75fc",
+        "object_type": "Relationship",
+        "field_id": "material_input",
+        "subject_scope": "consolidated_group",
+        "subject_basis": "report_default_group_scope",
+        "source_native_name": "再生砂"
+      },
+      "outcome": "correct",
+      "resolution_action": "retain_unresolved",
+      "finding_code": "typed_provider_failure_retained",
+      "recurrence_candidates": [],
+      "source_quote_location": "bindings.review_package.rows[review_row_id]",
+      "attempt_lineage_key": "manufacturing-materials-fresh-001296-2025:material_inputs-01"
+    },
+    {
+      "review_row_id": "manufacturing-materials-fresh-001296-2025:material_inputs-01:unresolved:stage5-36987732fadf4f5dc2bbc33c",
+      "sample_id": "manufacturing-materials-fresh-001296-2025",
+      "category": "unresolved",
+      "chapter_task": "extract_material_inputs",
+      "scope_id": "material_inputs-01",
+      "field_id": "material_input",
+      "runtime_target_id": "stage5-36987732fadf4f5dc2bbc33c",
+      "physical_page": 16,
+      "evidence_id": "stage5-evidence-e54c27f7092030d7b7050d7d",
+      "source_quote_sha256": "e82d20c5cfba2821b47e3a79bd549fb6bf9d84bf43a784c07ac127d554ecf30a",
+      "runtime_target": {
+        "record_id": "stage5-36987732fadf4f5dc2bbc33c",
+        "object_type": "Relationship",
+        "field_id": "material_input",
+        "subject_scope": "consolidated_group",
+        "subject_basis": "report_default_group_scope",
+        "source_native_name": "覆膜砂"
+      },
+      "outcome": "correct",
+      "resolution_action": "retain_unresolved",
+      "finding_code": "typed_provider_failure_retained",
+      "recurrence_candidates": [],
+      "source_quote_location": "bindings.review_package.rows[review_row_id]",
+      "attempt_lineage_key": "manufacturing-materials-fresh-001296-2025:material_inputs-01"
+    },
+    {
+      "review_row_id": "manufacturing-materials-fresh-001296-2025:material_inputs-01:unresolved:manufacturing-materials-fresh-cohort-four-pool-20260913-a-001296-SZ:manufacturing-materials-fresh-001296-2025:material_inputs-01:coverage:material_input",
+      "sample_id": "manufacturing-materials-fresh-001296-2025",
+      "category": "unresolved",
+      "chapter_task": "extract_material_inputs",
+      "scope_id": "material_inputs-01",
+      "field_id": "material_input",
+      "runtime_target_id": "manufacturing-materials-fresh-cohort-four-pool-20260913-a-001296-SZ:manufacturing-materials-fresh-001296-2025:material_inputs-01:coverage:material_input",
+      "physical_page": 14,
+      "evidence_id": "stage5-evidence-c2581212cd0cd6e25985e293",
+      "source_quote_sha256": "00dbf35b00432ac9210307060a01f441b6189c31b7e8b13b3728a905ea4235f9",
+      "runtime_target": null,
+      "outcome": "correct",
+      "resolution_action": "retain_unresolved",
+      "finding_code": "typed_provider_failure_retained",
+      "recurrence_candidates": [],
+      "source_quote_location": "bindings.review_package.rows[review_row_id]",
+      "attempt_lineage_key": "manufacturing-materials-fresh-001296-2025:material_inputs-01"
+    },
+    {
+      "review_row_id": "manufacturing-materials-fresh-001296-2025:counterparties_and_concentration-01:blocker:task_completion:counterparties_and_concentration-01",
+      "sample_id": "manufacturing-materials-fresh-001296-2025",
+      "category": "blocker",
+      "chapter_task": "extract_counterparties_and_concentration",
+      "scope_id": "counterparties_and_concentration-01",
+      "field_id": "supplier_concentration",
+      "runtime_target_id": "task_completion:counterparties_and_concentration-01",
+      "physical_page": 16,
+      "evidence_id": "stage5-evidence-86110044318686bea51aaddd",
+      "source_quote_sha256": "e82d20c5cfba2821b47e3a79bd549fb6bf9d84bf43a784c07ac127d554ecf30a",
+      "runtime_target": null,
+      "outcome": "correct",
+      "resolution_action": "retain_blocker",
+      "finding_code": "required_scope_incomplete_retained",
+      "recurrence_candidates": [],
+      "source_quote_location": "bindings.review_package.rows[review_row_id]",
+      "attempt_lineage_key": "manufacturing-materials-fresh-001296-2025:counterparties_and_concentration-01"
+    },
+    {
+      "review_row_id": "manufacturing-materials-fresh-001296-2025:counterparties_and_concentration-01:unresolved:stage5-0a59db3545b1b0879977de4f",
+      "sample_id": "manufacturing-materials-fresh-001296-2025",
+      "category": "unresolved",
+      "chapter_task": "extract_counterparties_and_concentration",
+      "scope_id": "counterparties_and_concentration-01",
+      "field_id": "supplier_concentration",
+      "runtime_target_id": "stage5-0a59db3545b1b0879977de4f",
+      "physical_page": 18,
+      "evidence_id": "stage5-evidence-fb7c36458e173011d4737b44",
+      "source_quote_sha256": "2ae14249df8259524e49fb8c89782e541ef3f1e066e54bac6a2a8b21c78919a4",
+      "runtime_target": {
+        "record_id": "stage5-0a59db3545b1b0879977de4f",
+        "object_type": "Measurement",
+        "field_id": "supplier_concentration",
+        "subject_scope": "consolidated_group",
+        "subject_basis": "report_default_group_scope",
+        "metric_type": "disclosed_share",
+        "source_native_name": "占年度销售总额比例",
+        "source_native_unit": "%",
+        "source_native_value_preview": "18.90",
+        "source_native_value_sha256": "d1efc12baa404597d6cf894307719b0b3a7411ce6acf495c2c68bb8fe8fe6e75"
+      },
+      "outcome": "correct",
+      "resolution_action": "retain_unresolved",
+      "finding_code": "wrong_field_candidate_blocked",
+      "recurrence_candidates": [],
+      "source_quote_location": "bindings.review_package.rows[review_row_id]",
+      "attempt_lineage_key": "manufacturing-materials-fresh-001296-2025:counterparties_and_concentration-01"
+    },
+    {
+      "review_row_id": "manufacturing-materials-fresh-001296-2025:counterparties_and_concentration-01:unresolved:manufacturing-materials-fresh-cohort-four-pool-20260913-a-001296-SZ:manufacturing-materials-fresh-001296-2025:counterparties_and_concentration-01:coverage:supplier_concentration",
+      "sample_id": "manufacturing-materials-fresh-001296-2025",
+      "category": "unresolved",
+      "chapter_task": "extract_counterparties_and_concentration",
+      "scope_id": "counterparties_and_concentration-01",
+      "field_id": "supplier_concentration",
+      "runtime_target_id": "manufacturing-materials-fresh-cohort-four-pool-20260913-a-001296-SZ:manufacturing-materials-fresh-001296-2025:counterparties_and_concentration-01:coverage:supplier_concentration",
+      "physical_page": 16,
+      "evidence_id": "stage5-evidence-86110044318686bea51aaddd",
+      "source_quote_sha256": "e82d20c5cfba2821b47e3a79bd549fb6bf9d84bf43a784c07ac127d554ecf30a",
+      "runtime_target": null,
+      "outcome": "correct",
+      "resolution_action": "retain_unresolved",
+      "finding_code": "required_coverage_unresolved",
+      "recurrence_candidates": [],
+      "source_quote_location": "bindings.review_package.rows[review_row_id]",
+      "attempt_lineage_key": "manufacturing-materials-fresh-001296-2025:counterparties_and_concentration-01"
+    },
+    {
+      "review_row_id": "manufacturing-materials-fresh-001296-2025:counterparties_and_concentration-01:chapter_sample:stage5-e0e75b62285e3d4274e93376",
+      "sample_id": "manufacturing-materials-fresh-001296-2025",
+      "category": "chapter_sample",
+      "chapter_task": "extract_counterparties_and_concentration",
+      "scope_id": "counterparties_and_concentration-01",
+      "field_id": "counterparty_relationship",
+      "runtime_target_id": "stage5-e0e75b62285e3d4274e93376",
+      "physical_page": 16,
+      "evidence_id": "stage5-evidence-86110044318686bea51aaddd",
+      "source_quote_sha256": "e82d20c5cfba2821b47e3a79bd549fb6bf9d84bf43a784c07ac127d554ecf30a",
+      "runtime_target": {
+        "record_id": "stage5-e0e75b62285e3d4274e93376",
+        "object_type": "Relationship",
+        "field_id": "counterparty_relationship",
+        "subject_scope": "consolidated_group",
+        "subject_basis": "report_default_group_scope",
+        "source_native_name": "中国海洋石油集团有限公司"
+      },
+      "outcome": "correct",
+      "resolution_action": "confirm_accept_for_research_review",
+      "finding_code": "source_supported_research_sample",
+      "recurrence_candidates": [],
+      "source_quote_location": "bindings.review_package.rows[review_row_id]",
+      "attempt_lineage_key": "manufacturing-materials-fresh-001296-2025:counterparties_and_concentration-01"
+    },
+    {
+      "review_row_id": "manufacturing-materials-fresh-001296-2025:business_regime-01:blocker:task_completion:business_regime-01",
+      "sample_id": "manufacturing-materials-fresh-001296-2025",
+      "category": "blocker",
+      "chapter_task": "extract_business_regime",
+      "scope_id": "business_regime-01",
+      "field_id": "business_regime",
+      "runtime_target_id": "task_completion:business_regime-01",
+      "physical_page": 16,
+      "evidence_id": "stage5-evidence-a4f1ad82641cf2ee5c9949de",
+      "source_quote_sha256": "e82d20c5cfba2821b47e3a79bd549fb6bf9d84bf43a784c07ac127d554ecf30a",
+      "runtime_target": null,
+      "outcome": "correct",
+      "resolution_action": "retain_blocker",
+      "finding_code": "required_scope_incomplete_retained",
+      "recurrence_candidates": [
+        {
+          "family": "unsupported_english_business_event_name",
+          "evaluated": true,
+          "recurred": false,
+          "basis": "Canonical event_type values are separate from source-native naming; accepted source-native names are null or source-supported Chinese."
+        }
+      ],
+      "source_quote_location": "bindings.review_package.rows[review_row_id]",
+      "attempt_lineage_key": "manufacturing-materials-fresh-001296-2025:business_regime-01"
+    },
+    {
+      "review_row_id": "manufacturing-materials-fresh-001296-2025:business_regime-01:unresolved:stage5-c9284715174d00ab9db19734",
+      "sample_id": "manufacturing-materials-fresh-001296-2025",
+      "category": "unresolved",
+      "chapter_task": "extract_business_regime",
+      "scope_id": "business_regime-01",
+      "field_id": "business_regime",
+      "runtime_target_id": "stage5-c9284715174d00ab9db19734",
+      "physical_page": 17,
+      "evidence_id": "stage5-evidence-18b268d0a38e6295ced6bedb",
+      "source_quote_sha256": "c7a1c1c7411257d217289c47db0d78f88ea748c5ec6808bd04eb6b5449adc4b5",
+      "runtime_target": {
+        "record_id": "stage5-c9284715174d00ab9db19734",
+        "object_type": "BusinessEvent",
+        "field_id": "business_regime",
+        "subject_scope": "consolidated_group",
+        "subject_basis": "report_default_group_scope",
+        "event_type": "处置子公司",
+        "source_native_value_preview": "处置子公司，单次处置对子公司投资即丧失控制权，合并范围减少。子公司名称：四川华盛公司；股权处置价款（元）：18,438,306.00；股权处置比例（%）：58；股权处置方式：出售；丧失控制权的时点：2025/9/30；丧失控制权时点的确定依据：股权完成交割且收到第一期股权转让款；处置价款与处置投资对应的合并财务报表层面享有该子公司净资产份额的差额（元）：-1",
+        "source_native_value_sha256": "6f570ad9e4be353ec1e923334227466c8bca43a9d7cd3ad357953077fdc6a686"
+      },
+      "outcome": "correct",
+      "resolution_action": "retain_unresolved",
+      "finding_code": "table_context_incomplete",
+      "recurrence_candidates": [
+        {
+          "family": "unsupported_english_business_event_name",
+          "evaluated": true,
+          "recurred": false,
+          "basis": "Canonical event_type values are separate from source-native naming; accepted source-native names are null or source-supported Chinese."
+        }
+      ],
+      "source_quote_location": "bindings.review_package.rows[review_row_id]",
+      "attempt_lineage_key": "manufacturing-materials-fresh-001296-2025:business_regime-01"
+    },
+    {
+      "review_row_id": "manufacturing-materials-fresh-001296-2025:business_regime-01:unresolved:manufacturing-materials-fresh-cohort-four-pool-20260913-a-001296-SZ:manufacturing-materials-fresh-001296-2025:business_regime-01:coverage:business_regime",
+      "sample_id": "manufacturing-materials-fresh-001296-2025",
+      "category": "unresolved",
+      "chapter_task": "extract_business_regime",
+      "scope_id": "business_regime-01",
+      "field_id": "business_regime",
+      "runtime_target_id": "manufacturing-materials-fresh-cohort-four-pool-20260913-a-001296-SZ:manufacturing-materials-fresh-001296-2025:business_regime-01:coverage:business_regime",
+      "physical_page": 16,
+      "evidence_id": "stage5-evidence-a4f1ad82641cf2ee5c9949de",
+      "source_quote_sha256": "e82d20c5cfba2821b47e3a79bd549fb6bf9d84bf43a784c07ac127d554ecf30a",
+      "runtime_target": null,
+      "outcome": "correct",
+      "resolution_action": "retain_unresolved",
+      "finding_code": "required_coverage_unresolved",
+      "recurrence_candidates": [
+        {
+          "family": "unsupported_english_business_event_name",
+          "evaluated": true,
+          "recurred": false,
+          "basis": "Canonical event_type values are separate from source-native naming; accepted source-native names are null or source-supported Chinese."
+        }
+      ],
+      "source_quote_location": "bindings.review_package.rows[review_row_id]",
+      "attempt_lineage_key": "manufacturing-materials-fresh-001296-2025:business_regime-01"
+    },
+    {
+      "review_row_id": "manufacturing-materials-fresh-001296-2025:business_regime-01:chapter_sample:stage5-51e9ab240c62363f28604aa0",
+      "sample_id": "manufacturing-materials-fresh-001296-2025",
+      "category": "chapter_sample",
+      "chapter_task": "extract_business_regime",
+      "scope_id": "business_regime-01",
+      "field_id": "business_regime",
+      "runtime_target_id": "stage5-51e9ab240c62363f28604aa0",
+      "physical_page": 16,
+      "evidence_id": "stage5-evidence-a4f1ad82641cf2ee5c9949de",
+      "source_quote_sha256": "e82d20c5cfba2821b47e3a79bd549fb6bf9d84bf43a784c07ac127d554ecf30a",
+      "runtime_target": {
+        "record_id": "stage5-51e9ab240c62363f28604aa0",
+        "object_type": "BusinessEvent",
+        "field_id": "business_regime",
+        "subject_scope": "consolidated_group",
+        "subject_basis": "report_default_group_scope",
+        "event_type": "合并范围变动",
+        "source_native_value_preview": "报告期内合并范围是否发生变动：是",
+        "source_native_value_sha256": "583c2a47b76461d071fd6c5c4ea8cbf49963881aa837878909c89df8243aeb60"
+      },
+      "outcome": "correct",
+      "resolution_action": "confirm_accept_for_research_review",
+      "finding_code": "source_supported_research_sample",
+      "recurrence_candidates": [
+        {
+          "family": "unsupported_english_business_event_name",
+          "evaluated": true,
+          "recurred": false,
+          "basis": "Canonical event_type values are separate from source-native naming; accepted source-native names are null or source-supported Chinese."
+        }
+      ],
+      "source_quote_location": "bindings.review_package.rows[review_row_id]",
+      "attempt_lineage_key": "manufacturing-materials-fresh-001296-2025:business_regime-01"
+    },
+    {
+      "review_row_id": "manufacturing-materials-fresh-688295-2025:business_overview-01:blocker:task_completion:business_overview-01",
+      "sample_id": "manufacturing-materials-fresh-688295-2025",
+      "category": "blocker",
+      "chapter_task": "extract_business_overview",
+      "scope_id": "business_overview-01",
+      "field_id": "business_overview_source",
+      "runtime_target_id": "task_completion:business_overview-01",
+      "physical_page": 12,
+      "evidence_id": "stage5-evidence-3fb705c50093cba8bd7a7324",
+      "source_quote_sha256": "29aec66f999daf13d679fe4436fa9eaf894b5456ad7b3d1504b57fffa1aad29a",
+      "runtime_target": null,
+      "outcome": "correct",
+      "resolution_action": "retain_blocker",
+      "finding_code": "overview_coverage_false_negative",
+      "recurrence_candidates": [
+        {
+          "family": "risk_only_business_overview_acceptance",
+          "evaluated": true,
+          "recurred": false,
+          "basis": "No accepted BusinessOverview is risk-only; the 中复神鹰 miss is a false negative."
+        }
+      ],
+      "source_quote_location": "bindings.review_package.rows[review_row_id]",
+      "attempt_lineage_key": "manufacturing-materials-fresh-688295-2025:business_overview-01"
+    },
+    {
+      "review_row_id": "manufacturing-materials-fresh-688295-2025:business_overview-01:unresolved:manufacturing-materials-fresh-cohort-four-pool-20260913-a-688295-SH:manufacturing-materials-fresh-688295-2025:business_overview-01:coverage:business_overview_source",
+      "sample_id": "manufacturing-materials-fresh-688295-2025",
+      "category": "unresolved",
+      "chapter_task": "extract_business_overview",
+      "scope_id": "business_overview-01",
+      "field_id": "business_overview_source",
+      "runtime_target_id": "manufacturing-materials-fresh-cohort-four-pool-20260913-a-688295-SH:manufacturing-materials-fresh-688295-2025:business_overview-01:coverage:business_overview_source",
+      "physical_page": 12,
+      "evidence_id": "stage5-evidence-3fb705c50093cba8bd7a7324",
+      "source_quote_sha256": "29aec66f999daf13d679fe4436fa9eaf894b5456ad7b3d1504b57fffa1aad29a",
+      "runtime_target": null,
+      "outcome": "correct",
+      "resolution_action": "retain_unresolved",
+      "finding_code": "overview_coverage_false_negative",
+      "recurrence_candidates": [
+        {
+          "family": "risk_only_business_overview_acceptance",
+          "evaluated": true,
+          "recurred": false,
+          "basis": "No accepted BusinessOverview is risk-only; the 中复神鹰 miss is a false negative."
+        }
+      ],
+      "source_quote_location": "bindings.review_package.rows[review_row_id]",
+      "attempt_lineage_key": "manufacturing-materials-fresh-688295-2025:business_overview-01"
+    },
+    {
+      "review_row_id": "manufacturing-materials-fresh-688295-2025:business_overview-01:chapter_sample:stage5-e0fc8aae4d4bf1c6927b4b07",
+      "sample_id": "manufacturing-materials-fresh-688295-2025",
+      "category": "chapter_sample",
+      "chapter_task": "extract_business_overview",
+      "scope_id": "business_overview-01",
+      "field_id": "explicit_activity",
+      "runtime_target_id": "stage5-e0fc8aae4d4bf1c6927b4b07",
+      "physical_page": 12,
+      "evidence_id": "stage5-evidence-3fb705c50093cba8bd7a7324",
+      "source_quote_sha256": "29aec66f999daf13d679fe4436fa9eaf894b5456ad7b3d1504b57fffa1aad29a",
+      "runtime_target": {
+        "record_id": "stage5-e0fc8aae4d4bf1c6927b4b07",
+        "object_type": "Activity",
+        "field_id": "explicit_activity",
+        "subject_scope": "issuer",
+        "subject_basis": "direct_source_wording",
+        "action": "develops"
+      },
+      "outcome": "correct",
+      "resolution_action": "confirm_accept_for_research_review",
+      "finding_code": "source_supported_research_sample",
+      "recurrence_candidates": [
+        {
+          "family": "risk_only_business_overview_acceptance",
+          "evaluated": true,
+          "recurred": false,
+          "basis": "No accepted BusinessOverview is risk-only; the 中复神鹰 miss is a false negative."
+        }
+      ],
+      "source_quote_location": "bindings.review_package.rows[review_row_id]",
+      "attempt_lineage_key": "manufacturing-materials-fresh-688295-2025:business_overview-01"
+    },
+    {
+      "review_row_id": "manufacturing-materials-fresh-688295-2025:segment_financials-01:chapter_sample:stage5-2e5924fbec2dc0bc54ce9173",
+      "sample_id": "manufacturing-materials-fresh-688295-2025",
+      "category": "chapter_sample",
+      "chapter_task": "extract_segment_financials",
+      "scope_id": "segment_financials-01",
+      "field_id": "segment_dimension",
+      "runtime_target_id": "stage5-2e5924fbec2dc0bc54ce9173",
+      "physical_page": 28,
+      "evidence_id": "stage5-evidence-cbc2bfdd33f824075cc6dbd6",
+      "source_quote_sha256": "438e3ebfb25f39388101718211d5839440e79777bb6055eae585d50c5530ffa7",
+      "runtime_target": {
+        "record_id": "stage5-2e5924fbec2dc0bc54ce9173",
+        "object_type": "Segment",
+        "field_id": "segment_dimension",
+        "subject_scope": "business_segment",
+        "source_native_name": "新材料"
+      },
+      "outcome": "correct",
+      "resolution_action": "confirm_accept_for_research_review",
+      "finding_code": "source_supported_research_sample",
+      "recurrence_candidates": [
+        {
+          "family": "non_owner_legal_empty_evidence",
+          "evaluated": false,
+          "recurred": false,
+          "basis": "This row is an accepted fact, not a legal-empty conclusion."
+        }
+      ],
+      "source_quote_location": "bindings.review_package.rows[review_row_id]",
+      "attempt_lineage_key": "manufacturing-materials-fresh-688295-2025:segment_financials-01"
+    },
+    {
+      "review_row_id": "manufacturing-materials-fresh-688295-2025:operating_quantities-01:blocker:task_completion:operating_quantities-01",
+      "sample_id": "manufacturing-materials-fresh-688295-2025",
+      "category": "blocker",
+      "chapter_task": "extract_operating_quantities",
+      "scope_id": "operating_quantities-01",
+      "field_id": "sales_volume",
+      "runtime_target_id": "task_completion:operating_quantities-01",
+      "physical_page": 14,
+      "evidence_id": "stage5-evidence-a77b049b24075a438f791095",
+      "source_quote_sha256": "4ce6b970c51746b8db1d1e8051ce41badc604eaaf8803ca7c21fc0d1d9ac87d4",
+      "runtime_target": null,
+      "outcome": "correct",
+      "resolution_action": "retain_blocker",
+      "finding_code": "operating_coverage_false_negative",
+      "recurrence_candidates": [],
+      "source_quote_location": "bindings.review_package.rows[review_row_id]",
+      "attempt_lineage_key": "manufacturing-materials-fresh-688295-2025:operating_quantities-01"
+    },
+    {
+      "review_row_id": "manufacturing-materials-fresh-688295-2025:operating_quantities-01:unresolved:manufacturing-materials-fresh-cohort-four-pool-20260913-a-688295-SH:manufacturing-materials-fresh-688295-2025:operating_quantities-01:coverage:sales_volume",
+      "sample_id": "manufacturing-materials-fresh-688295-2025",
+      "category": "unresolved",
+      "chapter_task": "extract_operating_quantities",
+      "scope_id": "operating_quantities-01",
+      "field_id": "sales_volume",
+      "runtime_target_id": "manufacturing-materials-fresh-cohort-four-pool-20260913-a-688295-SH:manufacturing-materials-fresh-688295-2025:operating_quantities-01:coverage:sales_volume",
+      "physical_page": 14,
+      "evidence_id": "stage5-evidence-a77b049b24075a438f791095",
+      "source_quote_sha256": "4ce6b970c51746b8db1d1e8051ce41badc604eaaf8803ca7c21fc0d1d9ac87d4",
+      "runtime_target": null,
+      "outcome": "correct",
+      "resolution_action": "retain_unresolved",
+      "finding_code": "operating_coverage_false_negative",
+      "recurrence_candidates": [],
+      "source_quote_location": "bindings.review_package.rows[review_row_id]",
+      "attempt_lineage_key": "manufacturing-materials-fresh-688295-2025:operating_quantities-01"
+    },
+    {
+      "review_row_id": "manufacturing-materials-fresh-688295-2025:operating_quantities-01:chapter_sample:stage5-e2ecc98f435cf5adae57d06e",
+      "sample_id": "manufacturing-materials-fresh-688295-2025",
+      "category": "chapter_sample",
+      "chapter_task": "extract_operating_quantities",
+      "scope_id": "operating_quantities-01",
+      "field_id": "production_capacity",
+      "runtime_target_id": "stage5-e2ecc98f435cf5adae57d06e",
+      "physical_page": 15,
+      "evidence_id": "stage5-evidence-63b34900521c116855fc0aac",
+      "source_quote_sha256": "6832c642dd331995850c99b77ae87b90859ab5cdc06a29d7f2ec1c40173c341e",
+      "runtime_target": {
+        "record_id": "stage5-e2ecc98f435cf5adae57d06e",
+        "object_type": "Measurement",
+        "field_id": "production_capacity",
+        "subject_scope": "consolidated_group",
+        "subject_basis": "report_default_group_scope",
+        "metric_type": "production_capacity",
+        "source_native_name": "现有产能",
+        "source_native_unit": "万吨",
+        "source_native_value_preview": "2.9",
+        "source_native_value_sha256": "f491e65f8d4b8dbec7621fcedaf1b7a4b21bf6cfe8070f407548a6334dc55ccd"
+      },
+      "outcome": "correct",
+      "resolution_action": "confirm_accept_for_research_review",
+      "finding_code": "source_supported_research_sample",
+      "recurrence_candidates": [],
+      "source_quote_location": "bindings.review_package.rows[review_row_id]",
+      "attempt_lineage_key": "manufacturing-materials-fresh-688295-2025:operating_quantities-01"
+    },
+    {
+      "review_row_id": "manufacturing-materials-fresh-688295-2025:material_inputs-01:chapter_sample:stage5-a788d3df3918f2bf0f1537be",
+      "sample_id": "manufacturing-materials-fresh-688295-2025",
+      "category": "chapter_sample",
+      "chapter_task": "extract_material_inputs",
+      "scope_id": "material_inputs-01",
+      "field_id": "material_input",
+      "runtime_target_id": "stage5-a788d3df3918f2bf0f1537be",
+      "physical_page": 25,
+      "evidence_id": "stage5-evidence-308caa7af06ec1894e54c91c",
+      "source_quote_sha256": "f5ab6d23517050a89a87f8a33b9d6236c91766910476f743242b065d13d08b86",
+      "runtime_target": {
+        "record_id": "stage5-a788d3df3918f2bf0f1537be",
+        "object_type": "Relationship",
+        "field_id": "material_input",
+        "subject_scope": "consolidated_group",
+        "subject_basis": "report_default_group_scope",
+        "source_native_name": "丙烯腈"
+      },
+      "outcome": "correct",
+      "resolution_action": "confirm_accept_for_research_review",
+      "finding_code": "source_supported_research_sample",
+      "recurrence_candidates": [
+        {
+          "family": "non_owner_legal_empty_evidence",
+          "evaluated": false,
+          "recurred": false,
+          "basis": "This row is an accepted fact, not a legal-empty conclusion."
+        }
+      ],
+      "source_quote_location": "bindings.review_package.rows[review_row_id]",
+      "attempt_lineage_key": "manufacturing-materials-fresh-688295-2025:material_inputs-01"
+    },
+    {
+      "review_row_id": "manufacturing-materials-fresh-688295-2025:counterparties_and_concentration-01:chapter_sample:stage5-9c02727f83cae37671278d48",
+      "sample_id": "manufacturing-materials-fresh-688295-2025",
+      "category": "chapter_sample",
+      "chapter_task": "extract_counterparties_and_concentration",
+      "scope_id": "counterparties_and_concentration-01",
+      "field_id": "counterparty_relationship",
+      "runtime_target_id": "stage5-9c02727f83cae37671278d48",
+      "physical_page": 30,
+      "evidence_id": "stage5-evidence-d9a40ac83ddd9e0e40453c4e",
+      "source_quote_sha256": "4380e7545745f22033ff27dbd5c14bb6b000aa11aa9b6eea280833b13f006bd4",
+      "runtime_target": {
+        "record_id": "stage5-9c02727f83cae37671278d48",
+        "object_type": "Relationship",
+        "field_id": "counterparty_relationship",
+        "subject_scope": "consolidated_group",
+        "subject_basis": "report_default_group_scope",
+        "source_native_name": "客户一"
+      },
+      "outcome": "correct",
+      "resolution_action": "confirm_accept_for_research_review",
+      "finding_code": "source_supported_research_sample",
+      "recurrence_candidates": [],
+      "source_quote_location": "bindings.review_package.rows[review_row_id]",
+      "attempt_lineage_key": "manufacturing-materials-fresh-688295-2025:counterparties_and_concentration-01"
+    },
+    {
+      "review_row_id": "manufacturing-materials-fresh-688295-2025:counterparties_and_concentration-02:blocker:task_completion:counterparties_and_concentration-02",
+      "sample_id": "manufacturing-materials-fresh-688295-2025",
+      "category": "blocker",
+      "chapter_task": "extract_counterparties_and_concentration",
+      "scope_id": "counterparties_and_concentration-02",
+      "field_id": "counterparty_relationship",
+      "runtime_target_id": "task_completion:counterparties_and_concentration-02",
+      "physical_page": 31,
+      "evidence_id": "stage5-evidence-bfe86836910ffe402501cfb5",
+      "source_quote_sha256": "943b851849b84417586fce6ed063a5af3f5f875d65d5af77cbd649d362cb11dd",
+      "runtime_target": null,
+      "outcome": "correct",
+      "resolution_action": "retain_blocker",
+      "finding_code": "explicit_legal_empty_coverage_false_negative",
+      "recurrence_candidates": [],
+      "source_quote_location": "bindings.review_package.rows[review_row_id]",
+      "attempt_lineage_key": "manufacturing-materials-fresh-688295-2025:counterparties_and_concentration-02"
+    },
+    {
+      "review_row_id": "manufacturing-materials-fresh-688295-2025:counterparties_and_concentration-02:unresolved:manufacturing-materials-fresh-cohort-four-pool-20260913-a-688295-SH:manufacturing-materials-fresh-688295-2025:counterparties_and_concentration-02:coverage:counterparty_relationship",
+      "sample_id": "manufacturing-materials-fresh-688295-2025",
+      "category": "unresolved",
+      "chapter_task": "extract_counterparties_and_concentration",
+      "scope_id": "counterparties_and_concentration-02",
+      "field_id": "counterparty_relationship",
+      "runtime_target_id": "manufacturing-materials-fresh-cohort-four-pool-20260913-a-688295-SH:manufacturing-materials-fresh-688295-2025:counterparties_and_concentration-02:coverage:counterparty_relationship",
+      "physical_page": 31,
+      "evidence_id": "stage5-evidence-bfe86836910ffe402501cfb5",
+      "source_quote_sha256": "943b851849b84417586fce6ed063a5af3f5f875d65d5af77cbd649d362cb11dd",
+      "runtime_target": null,
+      "outcome": "correct",
+      "resolution_action": "retain_unresolved",
+      "finding_code": "explicit_legal_empty_coverage_false_negative",
+      "recurrence_candidates": [],
+      "source_quote_location": "bindings.review_package.rows[review_row_id]",
+      "attempt_lineage_key": "manufacturing-materials-fresh-688295-2025:counterparties_and_concentration-02"
+    },
+    {
+      "review_row_id": "manufacturing-materials-fresh-688295-2025:counterparties_and_concentration-02:unresolved:manufacturing-materials-fresh-cohort-four-pool-20260913-a-688295-SH:manufacturing-materials-fresh-688295-2025:counterparties_and_concentration-02:coverage:supplier_concentration",
+      "sample_id": "manufacturing-materials-fresh-688295-2025",
+      "category": "unresolved",
+      "chapter_task": "extract_counterparties_and_concentration",
+      "scope_id": "counterparties_and_concentration-02",
+      "field_id": "supplier_concentration",
+      "runtime_target_id": "manufacturing-materials-fresh-cohort-four-pool-20260913-a-688295-SH:manufacturing-materials-fresh-688295-2025:counterparties_and_concentration-02:coverage:supplier_concentration",
+      "physical_page": 31,
+      "evidence_id": "stage5-evidence-bfe86836910ffe402501cfb5",
+      "source_quote_sha256": "943b851849b84417586fce6ed063a5af3f5f875d65d5af77cbd649d362cb11dd",
+      "runtime_target": null,
+      "outcome": "correct",
+      "resolution_action": "retain_unresolved",
+      "finding_code": "explicit_legal_empty_coverage_false_negative",
+      "recurrence_candidates": [],
+      "source_quote_location": "bindings.review_package.rows[review_row_id]",
+      "attempt_lineage_key": "manufacturing-materials-fresh-688295-2025:counterparties_and_concentration-02"
+    },
+    {
+      "review_row_id": "manufacturing-materials-fresh-688295-2025:business_regime-01:blocker:task_completion:business_regime-01",
+      "sample_id": "manufacturing-materials-fresh-688295-2025",
+      "category": "blocker",
+      "chapter_task": "extract_business_regime",
+      "scope_id": "business_regime-01",
+      "field_id": "business_regime",
+      "runtime_target_id": "task_completion:business_regime-01",
+      "physical_page": 28,
+      "evidence_id": "stage5-evidence-71baa393c7c8dbf199693aaa",
+      "source_quote_sha256": "3892f91cb4b0d55595369151ba248d4a40eb5953f3d552499d8e7b5152719a9a",
+      "runtime_target": null,
+      "outcome": "correct",
+      "resolution_action": "retain_blocker",
+      "finding_code": "explicit_legal_empty_coverage_false_negative",
+      "recurrence_candidates": [
+        {
+          "family": "unsupported_english_business_event_name",
+          "evaluated": true,
+          "recurred": false,
+          "basis": "Canonical event_type values are separate from source-native naming; accepted source-native names are null or source-supported Chinese."
+        }
+      ],
+      "source_quote_location": "bindings.review_package.rows[review_row_id]",
+      "attempt_lineage_key": "manufacturing-materials-fresh-688295-2025:business_regime-01"
+    },
+    {
+      "review_row_id": "manufacturing-materials-fresh-688295-2025:business_regime-01:unresolved:manufacturing-materials-fresh-cohort-four-pool-20260913-a-688295-SH:manufacturing-materials-fresh-688295-2025:business_regime-01:coverage:business_regime",
+      "sample_id": "manufacturing-materials-fresh-688295-2025",
+      "category": "unresolved",
+      "chapter_task": "extract_business_regime",
+      "scope_id": "business_regime-01",
+      "field_id": "business_regime",
+      "runtime_target_id": "manufacturing-materials-fresh-cohort-four-pool-20260913-a-688295-SH:manufacturing-materials-fresh-688295-2025:business_regime-01:coverage:business_regime",
+      "physical_page": 28,
+      "evidence_id": "stage5-evidence-71baa393c7c8dbf199693aaa",
+      "source_quote_sha256": "3892f91cb4b0d55595369151ba248d4a40eb5953f3d552499d8e7b5152719a9a",
+      "runtime_target": null,
+      "outcome": "correct",
+      "resolution_action": "retain_unresolved",
+      "finding_code": "explicit_legal_empty_coverage_false_negative",
+      "recurrence_candidates": [
+        {
+          "family": "unsupported_english_business_event_name",
+          "evaluated": true,
+          "recurred": false,
+          "basis": "Canonical event_type values are separate from source-native naming; accepted source-native names are null or source-supported Chinese."
+        }
+      ],
+      "source_quote_location": "bindings.review_package.rows[review_row_id]",
+      "attempt_lineage_key": "manufacturing-materials-fresh-688295-2025:business_regime-01"
+    },
+    {
+      "review_row_id": "manufacturing-materials-fresh-920576-2025:business_overview-01:chapter_sample:stage5-98b2793534f2855ac3322809",
+      "sample_id": "manufacturing-materials-fresh-920576-2025",
+      "category": "chapter_sample",
+      "chapter_task": "extract_business_overview",
+      "scope_id": "business_overview-01",
+      "field_id": "business_overview_source",
+      "runtime_target_id": "stage5-98b2793534f2855ac3322809",
+      "physical_page": 86,
+      "evidence_id": "stage5-evidence-fd94a0ec4887d2cdf0ff8bd2",
+      "source_quote_sha256": "bbff69c1b72d1215198aa3d2ab2726364588ec59610ebad2336cab23f67a78db",
+      "runtime_target": {
+        "record_id": "stage5-98b2793534f2855ac3322809",
+        "object_type": "BusinessOverview",
+        "field_id": "business_overview_source",
+        "subject_scope": "consolidated_group",
+        "subject_basis": "direct_source_wording",
+        "source_native_value_preview": "本公司及子公司主要业务板块为层状金属复合材料加工制造等，主要产品包括：钛-钢复合板、不锈钢-钢复合板、锆-钢复合板、其他金属复合材料，公司产品主要应用于核电、化工、冶金、电力等行业和众多国家大型项目等。",
+        "source_native_value_sha256": "29ed99bfe213b27129a0cd8b57aa269a0fccc5393fa4b76f2cca056e5a3b42d3"
+      },
+      "outcome": "correct",
+      "resolution_action": "confirm_accept_for_research_review",
+      "finding_code": "source_supported_research_sample",
+      "recurrence_candidates": [
+        {
+          "family": "risk_only_business_overview_acceptance",
+          "evaluated": true,
+          "recurred": false,
+          "basis": "No accepted BusinessOverview is risk-only; the 中复神鹰 miss is a false negative."
+        }
+      ],
+      "source_quote_location": "bindings.review_package.rows[review_row_id]",
+      "attempt_lineage_key": "manufacturing-materials-fresh-920576-2025:business_overview-01"
+    },
+    {
+      "review_row_id": "manufacturing-materials-fresh-920576-2025:segment_financials-01:chapter_sample:stage5-af3c4afda1f91299a5921692",
+      "sample_id": "manufacturing-materials-fresh-920576-2025",
+      "category": "chapter_sample",
+      "chapter_task": "extract_segment_financials",
+      "scope_id": "segment_financials-01",
+      "field_id": "segment_dimension",
+      "runtime_target_id": "stage5-af3c4afda1f91299a5921692",
+      "physical_page": 19,
+      "evidence_id": "stage5-evidence-9004161440aec2723e497ffe",
+      "source_quote_sha256": "42dccb914389ec0930c89242d94089c1dfd63b7ec8824cd5b477c6efbca49c29",
+      "runtime_target": {
+        "record_id": "stage5-af3c4afda1f91299a5921692",
+        "object_type": "Segment",
+        "field_id": "segment_dimension",
+        "subject_scope": "business_segment",
+        "source_native_name": "钛金属复合材料"
+      },
+      "outcome": "correct",
+      "resolution_action": "confirm_accept_for_research_review",
+      "finding_code": "source_supported_research_sample",
+      "recurrence_candidates": [
+        {
+          "family": "non_owner_legal_empty_evidence",
+          "evaluated": false,
+          "recurred": false,
+          "basis": "This row is an accepted fact, not a legal-empty conclusion."
+        }
+      ],
+      "source_quote_location": "bindings.review_package.rows[review_row_id]",
+      "attempt_lineage_key": "manufacturing-materials-fresh-920576-2025:segment_financials-01"
+    },
+    {
+      "review_row_id": "manufacturing-materials-fresh-920576-2025:operating_quantities-01:blocker:task_completion:operating_quantities-01",
+      "sample_id": "manufacturing-materials-fresh-920576-2025",
+      "category": "blocker",
+      "chapter_task": "extract_operating_quantities",
+      "scope_id": "operating_quantities-01",
+      "field_id": "production_capacity",
+      "runtime_target_id": "task_completion:operating_quantities-01",
+      "physical_page": 47,
+      "evidence_id": "stage5-evidence-d302720c1f3bea8c410d5c33",
+      "source_quote_sha256": "f47dca64fc58fa8062877e211cdef02bcf126dbc7638d9d28c26beb6870fe1fd",
+      "runtime_target": null,
+      "outcome": "correct",
+      "resolution_action": "retain_blocker",
+      "finding_code": "frozen_evidence_plan_miss",
+      "recurrence_candidates": [],
+      "source_quote_location": "bindings.review_package.rows[review_row_id]",
+      "attempt_lineage_key": "manufacturing-materials-fresh-920576-2025:operating_quantities-01"
+    },
+    {
+      "review_row_id": "manufacturing-materials-fresh-920576-2025:operating_quantities-01:unresolved:manufacturing-materials-fresh-cohort-four-pool-20260913-a-920576-BJ:manufacturing-materials-fresh-920576-2025:operating_quantities-01:coverage:production_capacity",
+      "sample_id": "manufacturing-materials-fresh-920576-2025",
+      "category": "unresolved",
+      "chapter_task": "extract_operating_quantities",
+      "scope_id": "operating_quantities-01",
+      "field_id": "production_capacity",
+      "runtime_target_id": "manufacturing-materials-fresh-cohort-four-pool-20260913-a-920576-BJ:manufacturing-materials-fresh-920576-2025:operating_quantities-01:coverage:production_capacity",
+      "physical_page": 47,
+      "evidence_id": "stage5-evidence-d302720c1f3bea8c410d5c33",
+      "source_quote_sha256": "f47dca64fc58fa8062877e211cdef02bcf126dbc7638d9d28c26beb6870fe1fd",
+      "runtime_target": null,
+      "outcome": "correct",
+      "resolution_action": "retain_unresolved",
+      "finding_code": "frozen_evidence_plan_miss",
+      "recurrence_candidates": [],
+      "source_quote_location": "bindings.review_package.rows[review_row_id]",
+      "attempt_lineage_key": "manufacturing-materials-fresh-920576-2025:operating_quantities-01"
+    },
+    {
+      "review_row_id": "manufacturing-materials-fresh-920576-2025:material_inputs-01:chapter_sample:stage5-0afba6620ec866e5df99d358",
+      "sample_id": "manufacturing-materials-fresh-920576-2025",
+      "category": "chapter_sample",
+      "chapter_task": "extract_material_inputs",
+      "scope_id": "material_inputs-01",
+      "field_id": "material_input",
+      "runtime_target_id": "stage5-0afba6620ec866e5df99d358",
+      "physical_page": 30,
+      "evidence_id": "stage5-evidence-f45a719c271c402d736e241a",
+      "source_quote_sha256": "88bbfa16b8826f35fe6b1bcc79cd5ee146fc76de7d69ae1f2e049c4f36bea64d",
+      "runtime_target": {
+        "record_id": "stage5-0afba6620ec866e5df99d358",
+        "object_type": "Relationship",
+        "field_id": "material_input",
+        "subject_scope": "consolidated_group",
+        "subject_basis": "report_default_group_scope",
+        "source_native_name": "钛材"
+      },
+      "outcome": "correct",
+      "resolution_action": "confirm_accept_for_research_review",
+      "finding_code": "source_supported_research_sample",
+      "recurrence_candidates": [
+        {
+          "family": "non_owner_legal_empty_evidence",
+          "evaluated": false,
+          "recurred": false,
+          "basis": "This row is an accepted fact, not a legal-empty conclusion."
+        }
+      ],
+      "source_quote_location": "bindings.review_package.rows[review_row_id]",
+      "attempt_lineage_key": "manufacturing-materials-fresh-920576-2025:material_inputs-01"
+    },
+    {
+      "review_row_id": "manufacturing-materials-fresh-920576-2025:counterparties_and_concentration-01:chapter_sample:stage5-7dd3ac2530e0ee084e28c4cb",
+      "sample_id": "manufacturing-materials-fresh-920576-2025",
+      "category": "chapter_sample",
+      "chapter_task": "extract_counterparties_and_concentration",
+      "scope_id": "counterparties_and_concentration-01",
+      "field_id": "counterparty_relationship",
+      "runtime_target_id": "stage5-7dd3ac2530e0ee084e28c4cb",
+      "physical_page": 20,
+      "evidence_id": "stage5-evidence-3fab9933dd9c006b46f6c941",
+      "source_quote_sha256": "e72c3c4a7f552fa04b0bca148c3a1ef7d2b4c5a5ffb77431651ffe0668c86f94",
+      "runtime_target": {
+        "record_id": "stage5-7dd3ac2530e0ee084e28c4cb",
+        "object_type": "Relationship",
+        "field_id": "counterparty_relationship",
+        "subject_scope": "consolidated_group",
+        "subject_basis": "report_default_group_scope",
+        "source_native_name": "山东豪迈集团股份有限公司及其关联公司"
+      },
+      "outcome": "correct",
+      "resolution_action": "confirm_accept_for_research_review",
+      "finding_code": "source_supported_research_sample",
+      "recurrence_candidates": [],
+      "source_quote_location": "bindings.review_package.rows[review_row_id]",
+      "attempt_lineage_key": "manufacturing-materials-fresh-920576-2025:counterparties_and_concentration-01"
+    },
+    {
+      "review_row_id": "manufacturing-materials-fresh-920576-2025:business_regime-01:blocker:task_completion:business_regime-01",
+      "sample_id": "manufacturing-materials-fresh-920576-2025",
+      "category": "blocker",
+      "chapter_task": "extract_business_regime",
+      "scope_id": "business_regime-01",
+      "field_id": "business_regime",
+      "runtime_target_id": "task_completion:business_regime-01",
+      "physical_page": 25,
+      "evidence_id": "stage5-evidence-6e44503eb93aeb658edeb57f",
+      "source_quote_sha256": "23f564ff81d7344d0eeaca1989a911e225d232d59ac79e9bcb2fbba33831b841",
+      "runtime_target": null,
+      "outcome": "correct",
+      "resolution_action": "retain_blocker",
+      "finding_code": "frozen_evidence_plan_miss",
+      "recurrence_candidates": [
+        {
+          "family": "unsupported_english_business_event_name",
+          "evaluated": true,
+          "recurred": false,
+          "basis": "Canonical event_type values are separate from source-native naming; accepted source-native names are null or source-supported Chinese."
+        }
+      ],
+      "source_quote_location": "bindings.review_package.rows[review_row_id]",
+      "attempt_lineage_key": "manufacturing-materials-fresh-920576-2025:business_regime-01"
+    },
+    {
+      "review_row_id": "manufacturing-materials-fresh-920576-2025:business_regime-01:unresolved:manufacturing-materials-fresh-cohort-four-pool-20260913-a-920576-BJ:manufacturing-materials-fresh-920576-2025:business_regime-01:coverage:business_regime",
+      "sample_id": "manufacturing-materials-fresh-920576-2025",
+      "category": "unresolved",
+      "chapter_task": "extract_business_regime",
+      "scope_id": "business_regime-01",
+      "field_id": "business_regime",
+      "runtime_target_id": "manufacturing-materials-fresh-cohort-four-pool-20260913-a-920576-BJ:manufacturing-materials-fresh-920576-2025:business_regime-01:coverage:business_regime",
+      "physical_page": 25,
+      "evidence_id": "stage5-evidence-6e44503eb93aeb658edeb57f",
+      "source_quote_sha256": "23f564ff81d7344d0eeaca1989a911e225d232d59ac79e9bcb2fbba33831b841",
+      "runtime_target": null,
+      "outcome": "correct",
+      "resolution_action": "retain_unresolved",
+      "finding_code": "frozen_evidence_plan_miss",
+      "recurrence_candidates": [
+        {
+          "family": "unsupported_english_business_event_name",
+          "evaluated": true,
+          "recurred": false,
+          "basis": "Canonical event_type values are separate from source-native naming; accepted source-native names are null or source-supported Chinese."
+        }
+      ],
+      "source_quote_location": "bindings.review_package.rows[review_row_id]",
+      "attempt_lineage_key": "manufacturing-materials-fresh-920576-2025:business_regime-01"
+    }
+  ],
+  "production_authorization": "not_authorized",
+  "scope_attempt_lineage": {
+    "manufacturing-materials-fresh-000422-2025:business_overview-01": [
+      {
+        "call_type": "extract",
+        "attempt_sequence": 1,
+        "source_label": "scorpio:gemini-3.8-flash-high",
+        "selected_profile": "semantic_extraction__scorpio_gemini",
+        "model": "gemini-3.8-flash-high",
+        "status": "success",
+        "error_code": null,
+        "latency_ms": 7610
+      },
+      {
+        "call_type": "verify",
+        "attempt_sequence": 1,
+        "source_label": "zai:glm-5.3-flash",
+        "selected_profile": "semantic_extraction__zai",
+        "model": "glm-5.3-flash",
+        "status": "success",
+        "error_code": null,
+        "latency_ms": 44947
+      }
+    ],
+    "manufacturing-materials-fresh-000422-2025:business_regime-01": [
+      {
+        "call_type": "extract",
+        "attempt_sequence": 1,
+        "source_label": "deepseek:deepseek-flash",
+        "selected_profile": "semantic_extraction__deepseek",
+        "model": "deepseek-flash",
+        "status": "success",
+        "error_code": null,
+        "latency_ms": 26557
+      },
+      {
+        "call_type": "verify",
+        "attempt_sequence": 1,
+        "source_label": "scorpio:gemini-3.8-flash-high",
+        "selected_profile": "semantic_extraction__scorpio_gemini",
+        "model": "gemini-3.8-flash-high",
+        "status": "success",
+        "error_code": null,
+        "latency_ms": 26949
+      }
+    ],
+    "manufacturing-materials-fresh-000422-2025:counterparties_and_concentration-01": [
+      {
+        "call_type": "extract",
+        "attempt_sequence": 1,
+        "source_label": "scorpio:grok-4.6",
+        "selected_profile": "semantic_extraction__scorpio_grok",
+        "model": "grok-4.6",
+        "status": "success",
+        "error_code": null,
+        "latency_ms": 205657
+      },
+      {
+        "call_type": "verify",
+        "attempt_sequence": 1,
+        "source_label": "zai:glm-5.3-flash",
+        "selected_profile": "semantic_extraction__zai",
+        "model": "glm-5.3-flash",
+        "status": "success",
+        "error_code": null,
+        "latency_ms": 66147
+      }
+    ],
+    "manufacturing-materials-fresh-000422-2025:material_inputs-01": [
+      {
+        "call_type": "extract",
+        "attempt_sequence": 1,
+        "source_label": "deepseek:deepseek-flash",
+        "selected_profile": "semantic_extraction__deepseek",
+        "model": "deepseek-flash",
+        "status": "success",
+        "error_code": null,
+        "latency_ms": 11977
+      },
+      {
+        "call_type": "verify",
+        "attempt_sequence": 1,
+        "source_label": "scorpio:gemini-3.8-flash-high",
+        "selected_profile": "semantic_extraction__scorpio_gemini",
+        "model": "gemini-3.8-flash-high",
+        "status": "success",
+        "error_code": null,
+        "latency_ms": 7007
+      }
+    ],
+    "manufacturing-materials-fresh-000422-2025:operating_quantities-01": [
+      {
+        "call_type": "extract",
+        "attempt_sequence": 1,
+        "source_label": "deepseek:deepseek-flash",
+        "selected_profile": "semantic_extraction__deepseek",
+        "model": "deepseek-flash",
+        "status": "success",
+        "error_code": null,
+        "latency_ms": 28349
+      },
+      {
+        "call_type": "verify",
+        "attempt_sequence": 1,
+        "source_label": "scorpio:gemini-3.8-flash-high",
+        "selected_profile": "semantic_extraction__scorpio_gemini",
+        "model": "gemini-3.8-flash-high",
+        "status": "success",
+        "error_code": null,
+        "latency_ms": 10868
+      }
+    ],
+    "manufacturing-materials-fresh-000422-2025:operating_quantities-02": [
+      {
+        "call_type": "extract",
+        "attempt_sequence": 1,
+        "source_label": "scorpio:grok-4.6",
+        "selected_profile": "semantic_extraction__scorpio_grok",
+        "model": "grok-4.6",
+        "status": "success",
+        "error_code": null,
+        "latency_ms": 172567
+      },
+      {
+        "call_type": "verify",
+        "attempt_sequence": 1,
+        "source_label": "zai:glm-5.3-flash",
+        "selected_profile": "semantic_extraction__zai",
+        "model": "glm-5.3-flash",
+        "status": "success",
+        "error_code": null,
+        "latency_ms": 199390
+      }
+    ],
+    "manufacturing-materials-fresh-000422-2025:segment_financials-01": [
+      {
+        "call_type": "extract",
+        "attempt_sequence": 1,
+        "source_label": "scorpio:grok-4.6",
+        "selected_profile": "semantic_extraction__scorpio_grok",
+        "model": "grok-4.6",
+        "status": "success",
+        "error_code": null,
+        "latency_ms": 139657
+      },
+      {
+        "call_type": "extract",
+        "attempt_sequence": 1,
+        "source_label": "deepseek:deepseek-flash",
+        "selected_profile": "semantic_extraction__deepseek",
+        "model": "deepseek-flash",
+        "status": "success",
+        "error_code": null,
+        "latency_ms": 71012
+      },
+      {
+        "call_type": "extract",
+        "attempt_sequence": 1,
+        "source_label": "scorpio:gemini-3.8-flash-high",
+        "selected_profile": "semantic_extraction__scorpio_gemini",
+        "model": "gemini-3.8-flash-high",
+        "status": "success",
+        "error_code": null,
+        "latency_ms": 17577
+      }
+    ],
+    "manufacturing-materials-fresh-000422-2025:segment_financials-02": [
+      {
+        "call_type": "extract",
+        "attempt_sequence": 1,
+        "source_label": "zai:glm-5.3-flash",
+        "selected_profile": "semantic_extraction__zai",
+        "model": "glm-5.3-flash",
+        "status": "failed",
+        "error_code": "transient_transport_error",
+        "latency_ms": 240068
+      },
+      {
+        "call_type": "extract",
+        "attempt_sequence": 2,
+        "source_label": "scorpio:grok-4.6",
+        "selected_profile": "semantic_extraction__scorpio_grok",
+        "model": "grok-4.6",
+        "status": "failed",
+        "error_code": "transient_transport_error",
+        "latency_ms": 48077
+      },
+      {
+        "call_type": "extract",
+        "attempt_sequence": 3,
+        "source_label": "deepseek:deepseek-flash",
+        "selected_profile": "semantic_extraction__deepseek",
+        "model": "deepseek-flash",
+        "status": "failed",
+        "error_code": "transient_transport_error",
+        "latency_ms": 6983
+      }
+    ],
+    "manufacturing-materials-fresh-001296-2025:business_overview-01": [
+      {
+        "call_type": "extract",
+        "attempt_sequence": 1,
+        "source_label": "scorpio:grok-4.6",
+        "selected_profile": "semantic_extraction__scorpio_grok",
+        "model": "grok-4.6",
+        "status": "success",
+        "error_code": null,
+        "latency_ms": 165833
+      },
+      {
+        "call_type": "verify",
+        "attempt_sequence": 1,
+        "source_label": "zai:glm-5.3-flash",
+        "selected_profile": "semantic_extraction__zai",
+        "model": "glm-5.3-flash",
+        "status": "success",
+        "error_code": null,
+        "latency_ms": 132912
+      }
+    ],
+    "manufacturing-materials-fresh-001296-2025:business_regime-01": [
+      {
+        "call_type": "extract",
+        "attempt_sequence": 1,
+        "source_label": "scorpio:grok-4.6",
+        "selected_profile": "semantic_extraction__scorpio_grok",
+        "model": "grok-4.6",
+        "status": "success",
+        "error_code": null,
+        "latency_ms": 94698
+      },
+      {
+        "call_type": "verify",
+        "attempt_sequence": 1,
+        "source_label": "scorpio:gemini-3.8-flash-high",
+        "selected_profile": "semantic_extraction__scorpio_gemini",
+        "model": "gemini-3.8-flash-high",
+        "status": "success",
+        "error_code": null,
+        "latency_ms": 20073
+      }
+    ],
+    "manufacturing-materials-fresh-001296-2025:counterparties_and_concentration-01": [
+      {
+        "call_type": "extract",
+        "attempt_sequence": 1,
+        "source_label": "scorpio:grok-4.6",
+        "selected_profile": "semantic_extraction__scorpio_grok",
+        "model": "grok-4.6",
+        "status": "success",
+        "error_code": null,
+        "latency_ms": 217882
+      },
+      {
+        "call_type": "verify",
+        "attempt_sequence": 1,
+        "source_label": "scorpio:gemini-3.8-flash-high",
+        "selected_profile": "semantic_extraction__scorpio_gemini",
+        "model": "gemini-3.8-flash-high",
+        "status": "success",
+        "error_code": null,
+        "latency_ms": 58295
+      }
+    ],
+    "manufacturing-materials-fresh-001296-2025:material_inputs-01": [
+      {
+        "call_type": "extract",
+        "attempt_sequence": 1,
+        "source_label": "scorpio:grok-4.6",
+        "selected_profile": "semantic_extraction__scorpio_grok",
+        "model": "grok-4.6",
+        "status": "success",
+        "error_code": null,
+        "latency_ms": 79840
+      },
+      {
+        "call_type": "verify",
+        "attempt_sequence": 1,
+        "source_label": "zai:glm-5.3-flash",
+        "selected_profile": "semantic_extraction__zai",
+        "model": "glm-5.3-flash",
+        "status": "failed",
+        "error_code": "transient_transport_error",
+        "latency_ms": 240073
+      },
+      {
+        "call_type": "verify",
+        "attempt_sequence": 2,
+        "source_label": "deepseek:deepseek-flash",
+        "selected_profile": "semantic_extraction__deepseek",
+        "model": "deepseek-flash",
+        "status": "failed",
+        "error_code": "transient_transport_error",
+        "latency_ms": 48055
+      },
+      {
+        "call_type": "verify",
+        "attempt_sequence": 3,
+        "source_label": "scorpio:gemini-3.8-flash-high",
+        "selected_profile": "semantic_extraction__scorpio_gemini",
+        "model": "gemini-3.8-flash-high",
+        "status": "failed",
+        "error_code": "transient_transport_error",
+        "latency_ms": 6994
+      }
+    ],
+    "manufacturing-materials-fresh-001296-2025:operating_quantities-01": [
+      {
+        "call_type": "extract",
+        "attempt_sequence": 1,
+        "source_label": "zai:glm-5.3-flash",
+        "selected_profile": "semantic_extraction__zai",
+        "model": "glm-5.3-flash",
+        "status": "success",
+        "error_code": null,
+        "latency_ms": 124337
+      },
+      {
+        "call_type": "verify",
+        "attempt_sequence": 1,
+        "source_label": "deepseek:deepseek-flash",
+        "selected_profile": "semantic_extraction__deepseek",
+        "model": "deepseek-flash",
+        "status": "success",
+        "error_code": null,
+        "latency_ms": 15289
+      }
+    ],
+    "manufacturing-materials-fresh-001296-2025:operating_quantities-02": [
+      {
+        "call_type": "extract",
+        "attempt_sequence": 1,
+        "source_label": "scorpio:gemini-3.8-flash-high",
+        "selected_profile": "semantic_extraction__scorpio_gemini",
+        "model": "gemini-3.8-flash-high",
+        "status": "success",
+        "error_code": null,
+        "latency_ms": 5022
+      }
+    ],
+    "manufacturing-materials-fresh-001296-2025:segment_financials-01": [
+      {
+        "call_type": "extract",
+        "attempt_sequence": 1,
+        "source_label": "deepseek:deepseek-flash",
+        "selected_profile": "semantic_extraction__deepseek",
+        "model": "deepseek-flash",
+        "status": "success",
+        "error_code": null,
+        "latency_ms": 29121
+      },
+      {
+        "call_type": "extract",
+        "attempt_sequence": 1,
+        "source_label": "scorpio:gemini-3.8-flash-high",
+        "selected_profile": "semantic_extraction__scorpio_gemini",
+        "model": "gemini-3.8-flash-high",
+        "status": "success",
+        "error_code": null,
+        "latency_ms": 11762
+      },
+      {
+        "call_type": "extract",
+        "attempt_sequence": 1,
+        "source_label": "scorpio:grok-4.6",
+        "selected_profile": "semantic_extraction__scorpio_grok",
+        "model": "grok-4.6",
+        "status": "success",
+        "error_code": null,
+        "latency_ms": 103971
+      },
+      {
+        "call_type": "verify",
+        "attempt_sequence": 1,
+        "source_label": "zai:glm-5.3-flash",
+        "selected_profile": "semantic_extraction__zai",
+        "model": "glm-5.3-flash",
+        "status": "success",
+        "error_code": null,
+        "latency_ms": 213145
+      }
+    ],
+    "manufacturing-materials-fresh-001296-2025:segment_financials-02": [
+      {
+        "call_type": "extract",
+        "attempt_sequence": 1,
+        "source_label": "deepseek:deepseek-flash",
+        "selected_profile": "semantic_extraction__deepseek",
+        "model": "deepseek-flash",
+        "status": "success",
+        "error_code": null,
+        "latency_ms": 49260
+      },
+      {
+        "call_type": "extract",
+        "attempt_sequence": 1,
+        "source_label": "scorpio:gemini-3.8-flash-high",
+        "selected_profile": "semantic_extraction__scorpio_gemini",
+        "model": "gemini-3.8-flash-high",
+        "status": "success",
+        "error_code": null,
+        "latency_ms": 106646
+      },
+      {
+        "call_type": "verify",
+        "attempt_sequence": 1,
+        "source_label": "scorpio:grok-4.6",
+        "selected_profile": "semantic_extraction__scorpio_grok",
+        "model": "grok-4.6",
+        "status": "success",
+        "error_code": null,
+        "latency_ms": 208882
+      }
+    ],
+    "manufacturing-materials-fresh-688295-2025:business_overview-01": [
+      {
+        "call_type": "extract",
+        "attempt_sequence": 1,
+        "source_label": "deepseek:deepseek-flash",
+        "selected_profile": "semantic_extraction__deepseek",
+        "model": "deepseek-flash",
+        "status": "success",
+        "error_code": null,
+        "latency_ms": 39587
+      },
+      {
+        "call_type": "verify",
+        "attempt_sequence": 1,
+        "source_label": "zai:glm-5.3-flash",
+        "selected_profile": "semantic_extraction__zai",
+        "model": "glm-5.3-flash",
+        "status": "success",
+        "error_code": null,
+        "latency_ms": 24054
+      }
+    ],
+    "manufacturing-materials-fresh-688295-2025:business_regime-01": [
+      {
+        "call_type": "extract",
+        "attempt_sequence": 1,
+        "source_label": "scorpio:grok-4.6",
+        "selected_profile": "semantic_extraction__scorpio_grok",
+        "model": "grok-4.6",
+        "status": "success",
+        "error_code": null,
+        "latency_ms": 56849
+      }
+    ],
+    "manufacturing-materials-fresh-688295-2025:counterparties_and_concentration-01": [
+      {
+        "call_type": "extract",
+        "attempt_sequence": 1,
+        "source_label": "scorpio:grok-4.6",
+        "selected_profile": "semantic_extraction__scorpio_grok",
+        "model": "grok-4.6",
+        "status": "success",
+        "error_code": null,
+        "latency_ms": 147616
+      },
+      {
+        "call_type": "verify",
+        "attempt_sequence": 1,
+        "source_label": "scorpio:gemini-3.8-flash-high",
+        "selected_profile": "semantic_extraction__scorpio_gemini",
+        "model": "gemini-3.8-flash-high",
+        "status": "success",
+        "error_code": null,
+        "latency_ms": 13012
+      }
+    ],
+    "manufacturing-materials-fresh-688295-2025:counterparties_and_concentration-02": [
+      {
+        "call_type": "extract",
+        "attempt_sequence": 1,
+        "source_label": "deepseek:deepseek-flash",
+        "selected_profile": "semantic_extraction__deepseek",
+        "model": "deepseek-flash",
+        "status": "success",
+        "error_code": null,
+        "latency_ms": 47306
+      },
+      {
+        "call_type": "verify",
+        "attempt_sequence": 1,
+        "source_label": "zai:glm-5.3-flash",
+        "selected_profile": "semantic_extraction__zai",
+        "model": "glm-5.3-flash",
+        "status": "success",
+        "error_code": null,
+        "latency_ms": 112486
+      }
+    ],
+    "manufacturing-materials-fresh-688295-2025:material_inputs-01": [
+      {
+        "call_type": "extract",
+        "attempt_sequence": 1,
+        "source_label": "deepseek:deepseek-flash",
+        "selected_profile": "semantic_extraction__deepseek",
+        "model": "deepseek-flash",
+        "status": "success",
+        "error_code": null,
+        "latency_ms": 2640
+      },
+      {
+        "call_type": "verify",
+        "attempt_sequence": 1,
+        "source_label": "zai:glm-5.3-flash",
+        "selected_profile": "semantic_extraction__zai",
+        "model": "glm-5.3-flash",
+        "status": "success",
+        "error_code": null,
+        "latency_ms": 22130
+      }
+    ],
+    "manufacturing-materials-fresh-688295-2025:operating_quantities-01": [
+      {
+        "call_type": "extract",
+        "attempt_sequence": 1,
+        "source_label": "deepseek:deepseek-flash",
+        "selected_profile": "semantic_extraction__deepseek",
+        "model": "deepseek-flash",
+        "status": "success",
+        "error_code": null,
+        "latency_ms": 10936
+      },
+      {
+        "call_type": "verify",
+        "attempt_sequence": 1,
+        "source_label": "zai:glm-5.3-flash",
+        "selected_profile": "semantic_extraction__zai",
+        "model": "glm-5.3-flash",
+        "status": "success",
+        "error_code": null,
+        "latency_ms": 27346
+      }
+    ],
+    "manufacturing-materials-fresh-688295-2025:segment_financials-01": [
+      {
+        "call_type": "extract",
+        "attempt_sequence": 1,
+        "source_label": "scorpio:grok-4.6",
+        "selected_profile": "semantic_extraction__scorpio_grok",
+        "model": "grok-4.6",
+        "status": "success",
+        "error_code": null,
+        "latency_ms": 91248
+      },
+      {
+        "call_type": "extract",
+        "attempt_sequence": 1,
+        "source_label": "scorpio:gemini-3.8-flash-high",
+        "selected_profile": "semantic_extraction__scorpio_gemini",
+        "model": "gemini-3.8-flash-high",
+        "status": "success",
+        "error_code": null,
+        "latency_ms": 10320
+      },
+      {
+        "call_type": "extract",
+        "attempt_sequence": 1,
+        "source_label": "deepseek:deepseek-flash",
+        "selected_profile": "semantic_extraction__deepseek",
+        "model": "deepseek-flash",
+        "status": "success",
+        "error_code": null,
+        "latency_ms": 42692
+      },
+      {
+        "call_type": "verify",
+        "attempt_sequence": 1,
+        "source_label": "zai:glm-5.3-flash",
+        "selected_profile": "semantic_extraction__zai",
+        "model": "glm-5.3-flash",
+        "status": "success",
+        "error_code": null,
+        "latency_ms": 116525
+      }
+    ],
+    "manufacturing-materials-fresh-920576-2025:business_overview-01": [
+      {
+        "call_type": "extract",
+        "attempt_sequence": 1,
+        "source_label": "scorpio:gemini-3.8-flash-high",
+        "selected_profile": "semantic_extraction__scorpio_gemini",
+        "model": "gemini-3.8-flash-high",
+        "status": "success",
+        "error_code": null,
+        "latency_ms": 24061
+      },
+      {
+        "call_type": "verify",
+        "attempt_sequence": 1,
+        "source_label": "deepseek:deepseek-flash",
+        "selected_profile": "semantic_extraction__deepseek",
+        "model": "deepseek-flash",
+        "status": "success",
+        "error_code": null,
+        "latency_ms": 23989
+      }
+    ],
+    "manufacturing-materials-fresh-920576-2025:business_regime-01": [
+      {
+        "call_type": "extract",
+        "attempt_sequence": 1,
+        "source_label": "scorpio:grok-4.6",
+        "selected_profile": "semantic_extraction__scorpio_grok",
+        "model": "grok-4.6",
+        "status": "success",
+        "error_code": null,
+        "latency_ms": 47107
+      }
+    ],
+    "manufacturing-materials-fresh-920576-2025:counterparties_and_concentration-01": [
+      {
+        "call_type": "extract",
+        "attempt_sequence": 1,
+        "source_label": "scorpio:grok-4.6",
+        "selected_profile": "semantic_extraction__scorpio_grok",
+        "model": "grok-4.6",
+        "status": "success",
+        "error_code": null,
+        "latency_ms": 59890
+      },
+      {
+        "call_type": "verify",
+        "attempt_sequence": 1,
+        "source_label": "scorpio:gemini-3.8-flash-high",
+        "selected_profile": "semantic_extraction__scorpio_gemini",
+        "model": "gemini-3.8-flash-high",
+        "status": "success",
+        "error_code": null,
+        "latency_ms": 7266
+      }
+    ],
+    "manufacturing-materials-fresh-920576-2025:material_inputs-01": [
+      {
+        "call_type": "extract",
+        "attempt_sequence": 1,
+        "source_label": "deepseek:deepseek-flash",
+        "selected_profile": "semantic_extraction__deepseek",
+        "model": "deepseek-flash",
+        "status": "success",
+        "error_code": null,
+        "latency_ms": 4963
+      },
+      {
+        "call_type": "verify",
+        "attempt_sequence": 1,
+        "source_label": "zai:glm-5.3-flash",
+        "selected_profile": "semantic_extraction__zai",
+        "model": "glm-5.3-flash",
+        "status": "success",
+        "error_code": null,
+        "latency_ms": 46522
+      }
+    ],
+    "manufacturing-materials-fresh-920576-2025:operating_quantities-01": [
+      {
+        "call_type": "extract",
+        "attempt_sequence": 1,
+        "source_label": "scorpio:gemini-3.8-flash-high",
+        "selected_profile": "semantic_extraction__scorpio_gemini",
+        "model": "gemini-3.8-flash-high",
+        "status": "success",
+        "error_code": null,
+        "latency_ms": 5053
+      }
+    ],
+    "manufacturing-materials-fresh-920576-2025:segment_financials-01": [
+      {
+        "call_type": "extract",
+        "attempt_sequence": 1,
+        "source_label": "zai:glm-5.3-flash",
+        "selected_profile": "semantic_extraction__zai",
+        "model": "glm-5.3-flash",
+        "status": "success",
+        "error_code": null,
+        "latency_ms": 112602
+      },
+      {
+        "call_type": "extract",
+        "attempt_sequence": 1,
+        "source_label": "scorpio:grok-4.6",
+        "selected_profile": "semantic_extraction__scorpio_grok",
+        "model": "grok-4.6",
+        "status": "success",
+        "error_code": null,
+        "latency_ms": 112538
+      },
+      {
+        "call_type": "extract",
+        "attempt_sequence": 1,
+        "source_label": "scorpio:gemini-3.8-flash-high",
+        "selected_profile": "semantic_extraction__scorpio_gemini",
+        "model": "gemini-3.8-flash-high",
+        "status": "success",
+        "error_code": null,
+        "latency_ms": 18587
+      },
+      {
+        "call_type": "verify",
+        "attempt_sequence": 1,
+        "source_label": "deepseek:deepseek-flash",
+        "selected_profile": "semantic_extraction__deepseek",
+        "model": "deepseek-flash",
+        "status": "success",
+        "error_code": null,
+        "latency_ms": 80932
+      }
+    ]
+  },
+  "finding_definitions": {
+    "candidate_schema_invalid": "Provider responses were retained, but partition reconciliation rejected incompatible period identities. The scope remains incomplete without post-call repair.",
+    "consolidation_adjustment_false_negative": "The source explicitly labels 分部间抵销 and the candidate carries row_class=consolidation_adjustment, but the verifier retained prohibited_inference. Keep unresolved here and treat it as a shared verifier false-negative finding for a later change.",
+    "explicit_legal_empty_coverage_false_negative": "The source explicitly marks the scoped disclosure not applicable, but coverage remained unclear. This is a legal-empty closure false negative; the Evidence still belongs to the current scope.",
+    "frozen_evidence_plan_miss": "The frozen Evidence pages do not contain the required company disclosure. The resulting hold is honest and is attributable to preparation, not provider transport.",
+    "operating_coverage_false_negative": "The frozen source contains company operating disclosure, but the required sales-volume coverage did not close. Retain the hold and record the omission for a later shared fix.",
+    "overview_coverage_false_negative": "The source contains a substantive principal-business description and accepted direct activities, yet business_overview_source remained missing. This is a coverage false negative, not a risk-only overview recurrence.",
+    "required_coverage_unresolved": "The frozen run did not produce an accepted or legal-empty result for this checklist field. Retain unresolved; do not synthesize a result after the run.",
+    "required_scope_incomplete_retained": "At least one required field in the scope is unresolved. The report-level blocker correctly preserves this incomplete result.",
+    "source_supported_research_sample": "Physical-page text supports the selected runtime target and its research-only disposition; no production promotion is implied.",
+    "table_context_incomplete": "The subsidiary-disposal candidate is substantively plausible, but the frozen Evidence does not include enough of the table to validate every column. Retain unresolved without reconstructing missing cells.",
+    "typed_provider_failure_retained": "The routed request exhausted its bounded deadline after recorded model attempts. The typed failure and dependent missing coverage remain visible; no rerun or splice is authorized.",
+    "wrong_field_candidate_blocked": "The value is a customer sales share but was proposed under supplier_concentration. The object/metric guards correctly blocked it; do not accept or relabel it in this validation."
+  },
+  "resolution_hash": "73de4f5bebf6b4f74a181f3f5a2e0aedc68bad03733fa909a791806bfd130be9"
+}

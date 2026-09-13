@@ -28,7 +28,12 @@ from .shadow_evidence import (
     ShadowEvidencePreparationAudit,
     ShadowScopeRefinementAudit,
 )
-from .stage5 import PreparedRequestScope
+from .stage5 import (
+    PreparedRequestScope,
+    Stage5EvidencePlan,
+    Stage5ReportAsset,
+    Stage5SampleManifest,
+)
 from .stage5_bundle import (
     Stage5BenchmarkResult,
     Stage5FailureDiagnostic,
@@ -39,12 +44,131 @@ from .stage5_service import (
     ManufacturingMaterialsProfileSliceService,
     ProviderFactory,
     SemanticInputFactory,
+    stage5_field_ids,
 )
 
 SHADOW_REPORT_RESULT_SCHEMA = "company_profile_shadow_report_result.v1"
 SHADOW_REPORT_FAILURE_SCHEMA = "company_profile_shadow_report_failure.v1"
 SHADOW_BATCH_RESULT_SCHEMA = "company_profile_shadow_batch_result.v1"
 _RUN_ID_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
+
+
+class FreshCohortAdmissionContract(_StrictModel):
+    """Immutable admission inputs for one fresh four-report validation batch."""
+
+    batch_id: str = Field(min_length=1)
+    sample_manifest_revision: str = Field(min_length=1)
+    sample_manifest_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    evidence_plan_version: str = Field(min_length=1)
+    evidence_plan_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    preparation_audit_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    preparation_audit_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    sample_ids: tuple[str, ...] = Field(min_length=4, max_length=4)
+    primary_logical_profile: str = Field(min_length=1)
+    dynamic_output_tokens: Literal[True] = True
+    extract_base_tokens: int = Field(gt=0)
+    verify_base_tokens: int = Field(gt=0)
+    timeout_seconds: float = Field(gt=0)
+    max_provider_calls: int = Field(gt=0)
+    production_authorization: Literal["not_authorized"] = PRODUCTION_AUTHORIZATION
+
+    @model_validator(mode="after")
+    def _closed_sample_set(self) -> FreshCohortAdmissionContract:
+        if len(set(self.sample_ids)) != 4:
+            raise ValueError("fresh cohort requires four unique samples")
+        return self
+
+
+def validate_fresh_cohort_admission(
+    *,
+    contract: FreshCohortAdmissionContract,
+    batch_id: str,
+    primary_logical_profile: str,
+    dynamic_output_tokens: bool,
+    extract_base_tokens: int,
+    verify_base_tokens: int,
+    timeout_seconds: float,
+    max_provider_calls: int,
+    manifest: Stage5SampleManifest,
+    manifest_sha256: str,
+    evidence_plan: Stage5EvidencePlan,
+    evidence_plan_sha256: str,
+    preparation_audit: Mapping[str, object],
+    preparation_audit_sha256: str,
+    prepared: Mapping[str, tuple[PreparedRequestScope, ...]],
+    output_root: str | Path,
+) -> None:
+    """Reject any frozen-input or execution-policy drift before provider creation."""
+
+    actual = {
+        "batch_id": batch_id,
+        "sample_manifest_revision": manifest.manifest_revision,
+        "sample_manifest_sha256": manifest_sha256,
+        "evidence_plan_version": evidence_plan.plan_version,
+        "evidence_plan_sha256": evidence_plan_sha256,
+        "preparation_audit_sha256": preparation_audit_sha256,
+        "preparation_audit_hash": preparation_audit.get("audit_hash"),
+        "sample_ids": tuple(item.sample_id for item in manifest.reports),
+        "primary_logical_profile": primary_logical_profile,
+        "dynamic_output_tokens": dynamic_output_tokens,
+        "extract_base_tokens": extract_base_tokens,
+        "verify_base_tokens": verify_base_tokens,
+        "timeout_seconds": timeout_seconds,
+        "max_provider_calls": max_provider_calls,
+        "production_authorization": manifest.production_authorization,
+    }
+    expected = contract.model_dump(mode="python")
+    if actual != expected:
+        drift = sorted(
+            key for key in expected if actual.get(key) != expected.get(key)
+        )
+        raise ValueError(f"fresh cohort contract mismatch: {drift}")
+
+    audit_payload = dict(preparation_audit)
+    audit_hash = audit_payload.pop("audit_hash", None)
+    if audit_hash != _payload_hash(audit_payload):
+        raise ValueError("fresh cohort preparation audit hash mismatch")
+    expected_ids = set(contract.sample_ids)
+    if (
+        preparation_audit.get("semantic_provider_calls") != 0
+        or preparation_audit.get("semantic_execution_started") is not False
+        or preparation_audit.get("report_count") != 4
+        or preparation_audit.get("chapter_count_per_report") != 6
+        or preparation_audit.get("unsupported_field_ids") != []
+        or preparation_audit.get("expected_answers_embedded") is not False
+        or preparation_audit.get("sample_manifest_sha256") != manifest_sha256
+        or preparation_audit.get("evidence_plan_sha256") != evidence_plan_sha256
+        or preparation_audit.get("production_authorization")
+        != PRODUCTION_AUTHORIZATION
+    ):
+        raise ValueError("fresh cohort preparation audit does not admit this batch")
+    if set(prepared) != expected_ids:
+        raise ValueError("fresh cohort prepared identities do not match the freeze")
+    if evidence_plan.sample_manifest_revision != manifest.manifest_revision:
+        raise ValueError("fresh cohort Evidence plan manifest mismatch")
+    for asset in manifest.reports:
+        report_plan = evidence_plan.report_by_id(asset.sample_id)
+        scopes = prepared[asset.sample_id]
+        expected_scopes = {
+            scope.scope_id
+            for task in report_plan.tasks
+            for scope in task.request_scopes
+        }
+        if report_plan.content_hash != asset.content_hash:
+            raise ValueError("fresh cohort PDF hash does not match the Evidence plan")
+        if {scope.scope_id for scope in scopes} != expected_scopes:
+            raise ValueError("fresh cohort prepared scopes do not match the plan")
+        if any(
+            scope.sample_id != asset.sample_id
+            or scope.report != asset.report
+            or scope.plan_version != evidence_plan.plan_version
+            or not set(scope.field_ids) <= stage5_field_ids()
+            for scope in scopes
+        ):
+            raise ValueError("fresh cohort prepared scope contract mismatch")
+    destination = Path(output_root).resolve() / f"batch-{batch_id}"
+    if destination.exists():
+        raise FileExistsError(f"shadow batch already exists: {batch_id}")
 
 
 class ShadowReplayContract(_StrictModel):
@@ -635,7 +759,7 @@ class ShadowBatchResult(_StrictModel):
     evidence_plan_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
     primary_logical_profile: str = Field(min_length=1)
     reports: tuple[ShadowReportReference, ...] = Field(
-        min_length=SHADOW_REPORT_COUNT,
+        min_length=1,
         max_length=SHADOW_REPORT_COUNT,
     )
     completed_report_count: int = Field(ge=0, le=SHADOW_REPORT_COUNT)
@@ -646,12 +770,21 @@ class ShadowBatchResult(_StrictModel):
 
     @model_validator(mode="after")
     def _batch_counts_are_consistent(self) -> ShadowBatchResult:
-        if len({item.sample_id for item in self.reports}) != SHADOW_REPORT_COUNT:
-            raise ValueError("shadow batch result requires twenty unique reports")
+        report_count = len(self.reports)
+        expected_count = (
+            4
+            if self.sample_manifest_revision
+            == "manufacturing-materials-fresh-cohort-manifest-20260913-v1"
+            else SHADOW_REPORT_COUNT
+        )
+        if report_count != expected_count:
+            raise ValueError("shadow batch result report count does not match its mode")
+        if len({item.sample_id for item in self.reports}) != report_count:
+            raise ValueError("shadow batch result requires unique reports")
         completed = sum(item.status == "success" for item in self.reports)
         if self.completed_report_count != completed:
             raise ValueError("shadow batch completed count mismatch")
-        if self.failed_report_count != SHADOW_REPORT_COUNT - completed:
+        if self.failed_report_count != report_count - completed:
             raise ValueError("shadow batch failed count mismatch")
         if self.result_hash != _payload_hash(self, omit={"result_hash"}):
             raise ValueError("shadow batch result hash mismatch")
@@ -733,9 +866,68 @@ class ManufacturingMaterialsShadowBatchService:
         semantic_input_factory: SemanticInputFactory | None = None,
     ) -> tuple[ShadowBatchResult, Path]:
         self._validate_admission(manifest, evidence_plan, prepared)
+        return self._run_reports(
+            batch_id=batch_id,
+            primary_logical_profile=primary_logical_profile,
+            reports=manifest.reports,
+            sample_manifest_revision=manifest.manifest_revision,
+            sample_manifest_hash=manifest.manifest_hash,
+            evidence_plan_version=evidence_plan.plan_version,
+            evidence_plan_hash=evidence_plan.plan_hash,
+            prepared=prepared,
+            store=store,
+            provider_factory=provider_factory,
+            semantic_input_factory=semantic_input_factory,
+        )
+
+    def run_fresh_cohort(
+        self,
+        *,
+        batch_id: str,
+        primary_logical_profile: str,
+        manifest: Stage5SampleManifest,
+        sample_manifest_hash: str,
+        evidence_plan: Stage5EvidencePlan,
+        evidence_plan_hash: str,
+        prepared: Mapping[str, tuple[PreparedRequestScope, ...]],
+        store: ShadowBatchStore,
+        provider_factory: ProviderFactory,
+        semantic_input_factory: SemanticInputFactory | None = None,
+    ) -> tuple[ShadowBatchResult, Path]:
+        """Execute an admitted fresh cohort through the same report-local loop."""
+
+        return self._run_reports(
+            batch_id=batch_id,
+            primary_logical_profile=primary_logical_profile,
+            reports=manifest.reports,
+            sample_manifest_revision=manifest.manifest_revision,
+            sample_manifest_hash=sample_manifest_hash,
+            evidence_plan_version=evidence_plan.plan_version,
+            evidence_plan_hash=evidence_plan_hash,
+            prepared=prepared,
+            store=store,
+            provider_factory=provider_factory,
+            semantic_input_factory=semantic_input_factory,
+        )
+
+    def _run_reports(
+        self,
+        *,
+        batch_id: str,
+        primary_logical_profile: str,
+        reports: tuple[ShadowCohortReport | Stage5ReportAsset, ...],
+        sample_manifest_revision: str,
+        sample_manifest_hash: str,
+        evidence_plan_version: str,
+        evidence_plan_hash: str,
+        prepared: Mapping[str, tuple[PreparedRequestScope, ...]],
+        store: ShadowBatchStore,
+        provider_factory: ProviderFactory,
+        semantic_input_factory: SemanticInputFactory | None,
+    ) -> tuple[ShadowBatchResult, Path]:
         batch_directory = store.start(batch_id)
         references: list[ShadowReportReference] = []
-        for asset in manifest.reports:
+        for asset in reports:
             report_run_id = _report_run_id(batch_id, asset)
             try:
                 execution = self._stage5_service.execute_prepared_report(
@@ -752,10 +944,10 @@ class ManufacturingMaterialsShadowBatchService:
                         sample_id=asset.sample_id,
                         company_name=asset.company_name,
                         report=asset.report,
-                        sample_manifest_revision=manifest.manifest_revision,
-                        sample_manifest_hash=manifest.manifest_hash,
-                        evidence_plan_version=evidence_plan.plan_version,
-                        evidence_plan_hash=evidence_plan.plan_hash,
+                        sample_manifest_revision=sample_manifest_revision,
+                        sample_manifest_hash=sample_manifest_hash,
+                        evidence_plan_version=evidence_plan_version,
+                        evidence_plan_hash=evidence_plan_hash,
                         scope_results=execution.scope_results,
                         research_view=execution.research_view,
                         report_status=execution.report_status,
@@ -770,10 +962,10 @@ class ManufacturingMaterialsShadowBatchService:
                     sample_id=asset.sample_id,
                     company_name=asset.company_name,
                     report=asset.report,
-                    sample_manifest_revision=manifest.manifest_revision,
-                    sample_manifest_hash=manifest.manifest_hash,
-                    evidence_plan_version=evidence_plan.plan_version,
-                    evidence_plan_hash=evidence_plan.plan_hash,
+                    sample_manifest_revision=sample_manifest_revision,
+                    sample_manifest_hash=sample_manifest_hash,
+                    evidence_plan_version=evidence_plan_version,
+                    evidence_plan_hash=evidence_plan_hash,
                     diagnostics=(
                         Stage5FailureDiagnostic(
                             code=type(exc).__name__,
@@ -787,10 +979,10 @@ class ManufacturingMaterialsShadowBatchService:
         payload = {
             "schema_version": SHADOW_BATCH_RESULT_SCHEMA,
             "batch_id": batch_id,
-            "sample_manifest_revision": manifest.manifest_revision,
-            "sample_manifest_hash": manifest.manifest_hash,
-            "evidence_plan_version": evidence_plan.plan_version,
-            "evidence_plan_hash": evidence_plan.plan_hash,
+            "sample_manifest_revision": sample_manifest_revision,
+            "sample_manifest_hash": sample_manifest_hash,
+            "evidence_plan_version": evidence_plan_version,
+            "evidence_plan_hash": evidence_plan_hash,
             "primary_logical_profile": primary_logical_profile,
             "reports": tuple(references),
             "completed_report_count": sum(

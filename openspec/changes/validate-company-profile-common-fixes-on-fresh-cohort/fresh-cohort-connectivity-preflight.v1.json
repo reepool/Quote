@@ -1,0 +1,37 @@
+{
+  "schema_version": "company_profile_fresh_cohort_connectivity_preflight.v1",
+  "preflight_id": "manufacturing-materials-fresh-cohort-connectivity-20260913-a",
+  "checked_on": "2026-09-13",
+  "batch_id": "manufacturing-materials-fresh-cohort-four-pool-20260913-a",
+  "semantic_candidates_generated": false,
+  "provider_calls": 0,
+  "sandbox_external_path_used": true,
+  "endpoints": [
+    {
+      "provider": "scorpio",
+      "host": "scorpio.reepool.com",
+      "http_status": 200,
+      "dns_resolved": true,
+      "tls_connected": true
+    },
+    {
+      "provider": "zai",
+      "host": "open.bigmodel.cn",
+      "http_status": 401,
+      "dns_resolved": true,
+      "tls_connected": true,
+      "interpretation": "unauthenticated HEAD reached provider"
+    },
+    {
+      "provider": "deepseek",
+      "host": "api.deepseek.com",
+      "http_status": 401,
+      "dns_resolved": true,
+      "tls_connected": true,
+      "interpretation": "unauthenticated HEAD reached provider"
+    }
+  ],
+  "decision": "all_configured_provider_hosts_reachable",
+  "production_authorization": "not_authorized",
+  "audit_hash": "e5b41ad32cc7797727e6957bb719e4c500f539d61830a76f312602b61153d5ef"
+}

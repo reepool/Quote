@@ -79,7 +79,7 @@ SECOND_OOS_CORRECTED_EVIDENCE_PLAN = (
 SECOND_OOS_SAMPLE_ID = "manufacturing-materials-oos-000717-2025"
 COMPLETENESS_CANARY_CHANGE = (
     REPOSITORY_ROOT
-    / "openspec/changes/failover-incomplete-company-profile-scope-output"
+    / "openspec/changes/archive/2026-09-12-failover-incomplete-company-profile-scope-output"
 )
 COMPLETENESS_CANARY_MANIFEST = COMPLETENESS_CANARY_CHANGE / "canary-manifest.v1.json"
 COMPLETENESS_CANARY_EVIDENCE_PLAN = (

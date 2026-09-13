@@ -1,0 +1,1380 @@
+{
+  "schema_version": "company_profile_fresh_cohort_preparation_freeze_audit.v1",
+  "audit_id": "manufacturing-materials-fresh-cohort-preparation-20260913-a",
+  "frozen_on": "2026-09-13",
+  "semantic_provider_calls": 0,
+  "semantic_execution_started": false,
+  "sample_replacement_allowed": false,
+  "sample_manifest_path": "openspec/changes/validate-company-profile-common-fixes-on-fresh-cohort/fresh-cohort-manifest.v1.json",
+  "sample_manifest_sha256": "ed6774ae359357e755edfc62952908d35659719158c8f231ab0c64295ebe3abe",
+  "evidence_plan_path": "openspec/changes/validate-company-profile-common-fixes-on-fresh-cohort/fresh-cohort-evidence-plan.v1.json",
+  "evidence_plan_sha256": "04e0ca7491942218837cdfcf6d250e45f2348302b4382dad5a2a1e311d977a65",
+  "report_count": 4,
+  "chapter_count_per_report": 6,
+  "scope_count": 34,
+  "reports": [
+    {
+      "sample_id": "manufacturing-materials-fresh-000422-2025",
+      "instrument_id": "000422.SZ",
+      "pdf_artifact_hash": "c2d8b91966079e6460a4ba404ebc26085135a5814f63ec265b7e36610877064c",
+      "pdf_page_count": 260,
+      "recovery_state": "native_ready",
+      "recovered_page_numbers": [],
+      "chapters": [
+        {
+          "chapter_task": "extract_business_overview",
+          "scope_count": 1,
+          "field_ids": [
+            "business_overview_source",
+            "explicit_activity"
+          ],
+          "selected_section_hashes": [
+            "cbb94f4fdd36cd4d465b5cefd090f39dac61e93c01e5dcba5108fe0856d83570",
+            "50712e812558a3deeca20f7bf591c780675950b64ae79e7d158cb085998a4c34",
+            "00a6184c8d88f51ea4ea0629df0cde8b314fe90f162d7d76bd527b8d5a3ebbce",
+            "b41cfb72e813c40baf1d863ae9db2a910462073ede1cfc09932198b501e4b564",
+            "6e95d989cc1b592d0c67ce529bb07d31503e1428574a46262d4b0b5311da149e",
+            "838ee32ec31bdff191e5819b275bb7003fa2cf18be402e9a964e4352b63f0e7a"
+          ],
+          "scope_selections": [
+            {
+              "chapter_task": "extract_business_overview",
+              "scope_id": "business_overview-01",
+              "pages": [
+                11,
+                12
+              ],
+              "page_hashes": {
+                "11": "d0c98eb09f1d972d093e489736c6a3a8ff2f5ed5d9abc09d079383cf8c0c5913",
+                "12": "fc1ce1e9c23079a0491f46dbc6c120437bbdc14a2d47c206cc1bc00903b5a4e0"
+              },
+              "section_hashes": [
+                "cbb94f4fdd36cd4d465b5cefd090f39dac61e93c01e5dcba5108fe0856d83570",
+                "50712e812558a3deeca20f7bf591c780675950b64ae79e7d158cb085998a4c34"
+              ],
+              "selector_reasons": [
+                "heading_alias:business_model:经营模式",
+                "heading_alias:principal_business:主营业务",
+                "heading_alias:principal_business:主要业务",
+                "heading_alias:procurement_and_costs:采购模式",
+                "heading_alias:products_and_applications:主要产品及用途",
+                "structured_hint:主要业务",
+                "structured_hint:主要产品",
+                "structured_hint:公司从事的主要业务",
+                "structured_hint:报告期内公司从事的主要业务",
+                "structured_hint:经营模式"
+              ],
+              "quality": "native"
+            }
+          ]
+        },
+        {
+          "chapter_task": "extract_segment_financials",
+          "scope_count": 2,
+          "field_ids": [
+            "gross_margin_reported",
+            "operating_cost",
+            "operating_revenue",
+            "segment_dimension"
+          ],
+          "selected_section_hashes": [
+            "00a6184c8d88f51ea4ea0629df0cde8b314fe90f162d7d76bd527b8d5a3ebbce",
+            "b41cfb72e813c40baf1d863ae9db2a910462073ede1cfc09932198b501e4b564",
+            "6e95d989cc1b592d0c67ce529bb07d31503e1428574a46262d4b0b5311da149e",
+            "838ee32ec31bdff191e5819b275bb7003fa2cf18be402e9a964e4352b63f0e7a",
+            "a27cfab23a5e71f01b46196b6284c9fdb1135d7dfcd37e6b9cd521a5edba7b68",
+            "9ec2fa8dfe44169db320f8e44155af07d3c9c8df2551a86115fc3a3b0f827bde"
+          ],
+          "scope_selections": [
+            {
+              "chapter_task": "extract_segment_financials",
+              "scope_id": "segment_financials-01",
+              "pages": [
+                26,
+                27,
+                28
+              ],
+              "page_hashes": {
+                "26": "632aae6dfbafe5f6e0296de5b2a0c67f8c9b57897146a32186ce6ed99c4d76a9",
+                "27": "a8592e10992a3a1baddfd7ff029db3d0d154392cc848dbf5719f6962fd3cac1b",
+                "28": "d3a1926304d301ba56776d092fe725beea0d2ce14470f035cc1eb0204a554271"
+              },
+              "section_hashes": [
+                "00a6184c8d88f51ea4ea0629df0cde8b314fe90f162d7d76bd527b8d5a3ebbce",
+                "b41cfb72e813c40baf1d863ae9db2a910462073ede1cfc09932198b501e4b564",
+                "6e95d989cc1b592d0c67ce529bb07d31503e1428574a46262d4b0b5311da149e"
+              ],
+              "selector_reasons": [
+                "heading_alias:business_model:经营模式",
+                "heading_alias:principal_business:主营业务",
+                "heading_alias:procurement_and_costs:采购模式",
+                "heading_alias:procurement_and_costs:销售模式",
+                "heading_alias:revenue_cost_analysis:主营业务分析",
+                "structured_hint:主营业务分",
+                "structured_hint:分产品",
+                "structured_hint:分地区",
+                "structured_hint:分行业",
+                "table_signature:common.segment_revenue_cost.v1"
+              ],
+              "quality": "native"
+            },
+            {
+              "chapter_task": "extract_segment_financials",
+              "scope_id": "segment_financials-02",
+              "pages": [
+                247
+              ],
+              "page_hashes": {
+                "247": "b31f822094fbe63fa870b7673f95b1f7e2c80759d9207d9ff3e699b42a7dad2f"
+              },
+              "section_hashes": [
+                "9ec2fa8dfe44169db320f8e44155af07d3c9c8df2551a86115fc3a3b0f827bde"
+              ],
+              "selector_reasons": [
+                "heading_alias:major_projects:主要项目",
+                "structured_hint:分部信息",
+                "structured_hint:分部报告"
+              ],
+              "quality": "native"
+            }
+          ]
+        },
+        {
+          "chapter_task": "extract_operating_quantities",
+          "scope_count": 2,
+          "field_ids": [
+            "capacity_under_construction",
+            "capacity_utilization",
+            "inventory_volume",
+            "production_capacity",
+            "production_volume",
+            "sales_volume"
+          ],
+          "selected_section_hashes": [
+            "50712e812558a3deeca20f7bf591c780675950b64ae79e7d158cb085998a4c34",
+            "1883b8fc1574128caba3812a642a5dcff95a0403396f6cc25c5e07ca619b537b",
+            "6e95d989cc1b592d0c67ce529bb07d31503e1428574a46262d4b0b5311da149e",
+            "838ee32ec31bdff191e5819b275bb7003fa2cf18be402e9a964e4352b63f0e7a",
+            "56568d9e77e842efd6b51c75f98386fa81033aa56a78931fe90be90bd63e655d",
+            "e761fc7654ca5b8ea69e02282591ea34dba7f511cad2a14e4211c509b19eb176"
+          ],
+          "scope_selections": [
+            {
+              "chapter_task": "extract_operating_quantities",
+              "scope_id": "operating_quantities-01",
+              "pages": [
+                14
+              ],
+              "page_hashes": {
+                "14": "88a16076365daf679b32a62369082dfc3fa6abcd6b75b227025ee7aa82d933ab"
+              },
+              "section_hashes": [
+                "1883b8fc1574128caba3812a642a5dcff95a0403396f6cc25c5e07ca619b537b"
+              ],
+              "selector_reasons": [
+                "structured_hint:产能",
+                "structured_hint:产能情况",
+                "structured_hint:在建产能"
+              ],
+              "quality": "native"
+            },
+            {
+              "chapter_task": "extract_operating_quantities",
+              "scope_id": "operating_quantities-02",
+              "pages": [
+                28,
+                29,
+                30
+              ],
+              "page_hashes": {
+                "28": "d3a1926304d301ba56776d092fe725beea0d2ce14470f035cc1eb0204a554271",
+                "29": "bfb53cad5eff84403dd7258f89da471e36d66efa90fce3ae44ac50a88a43b8a1",
+                "30": "fbf979e14a94b1d969e640c4f1fb7389269e17d998bd38b6bf01f441810cc56a"
+              },
+              "section_hashes": [
+                "6e95d989cc1b592d0c67ce529bb07d31503e1428574a46262d4b0b5311da149e",
+                "838ee32ec31bdff191e5819b275bb7003fa2cf18be402e9a964e4352b63f0e7a",
+                "56568d9e77e842efd6b51c75f98386fa81033aa56a78931fe90be90bd63e655d"
+              ],
+              "selector_reasons": [
+                "heading_alias:business_model:经营模式",
+                "heading_alias:cost_composition:成本构成",
+                "heading_alias:principal_business:主营业务",
+                "heading_alias:procurement_and_costs:采购模式",
+                "heading_alias:procurement_and_costs:销售模式",
+                "heading_alias:production_sales_inventory:生产量",
+                "structured_hint:产能",
+                "structured_hint:公司实物销售收入是否大于劳务收入",
+                "structured_hint:库存量",
+                "structured_hint:生产量",
+                "structured_hint:销售量",
+                "table_signature:common.production_sales_inventory.v1",
+                "table_signature:common.segment_revenue_cost.v1"
+              ],
+              "quality": "native"
+            }
+          ]
+        },
+        {
+          "chapter_task": "extract_material_inputs",
+          "scope_count": 1,
+          "field_ids": [
+            "material_input"
+          ],
+          "selected_section_hashes": [
+            "50712e812558a3deeca20f7bf591c780675950b64ae79e7d158cb085998a4c34",
+            "5e086b1e3620f44424c06495149c7c8d1e7e521d9c3aff3828dc01d091735c9d",
+            "b8f28f2bee1481f5f377631830d2863fa3986ddf1f0c54ac843d773938baabd7",
+            "b41cfb72e813c40baf1d863ae9db2a910462073ede1cfc09932198b501e4b564",
+            "6e95d989cc1b592d0c67ce529bb07d31503e1428574a46262d4b0b5311da149e",
+            "838ee32ec31bdff191e5819b275bb7003fa2cf18be402e9a964e4352b63f0e7a"
+          ],
+          "scope_selections": [
+            {
+              "chapter_task": "extract_material_inputs",
+              "scope_id": "material_inputs-01",
+              "pages": [
+                12,
+                13
+              ],
+              "page_hashes": {
+                "12": "fc1ce1e9c23079a0491f46dbc6c120437bbdc14a2d47c206cc1bc00903b5a4e0",
+                "13": "0cb9f58db3b6cdea20fc2bd3cdf772edaab78d657455b6567af13056329f0680"
+              },
+              "section_hashes": [
+                "50712e812558a3deeca20f7bf591c780675950b64ae79e7d158cb085998a4c34",
+                "5e086b1e3620f44424c06495149c7c8d1e7e521d9c3aff3828dc01d091735c9d"
+              ],
+              "selector_reasons": [
+                "heading_alias:business_model:经营模式",
+                "heading_alias:principal_business:主营业务",
+                "heading_alias:procurement_and_costs:采购模式",
+                "structured_hint:为原料",
+                "structured_hint:主要原材料",
+                "structured_hint:原材料采购",
+                "structured_hint:煤炭",
+                "structured_hint:采购模式"
+              ],
+              "quality": "native"
+            }
+          ]
+        },
+        {
+          "chapter_task": "extract_counterparties_and_concentration",
+          "scope_count": 1,
+          "field_ids": [
+            "counterparty_relationship",
+            "customer_concentration",
+            "supplier_concentration"
+          ],
+          "selected_section_hashes": [
+            "56568d9e77e842efd6b51c75f98386fa81033aa56a78931fe90be90bd63e655d",
+            "e761fc7654ca5b8ea69e02282591ea34dba7f511cad2a14e4211c509b19eb176",
+            "cb3cd032ad6b57d7de9d95a16249d663a19ddf6a165c84199f6d40e6b5416289",
+            "7d36c2abff4262449032740f025b2d62454c72c12f7acb46a08d70f7c0022c65"
+          ],
+          "scope_selections": [
+            {
+              "chapter_task": "extract_counterparties_and_concentration",
+              "scope_id": "counterparties_and_concentration-01",
+              "pages": [
+                30,
+                31,
+                32
+              ],
+              "page_hashes": {
+                "30": "fbf979e14a94b1d969e640c4f1fb7389269e17d998bd38b6bf01f441810cc56a",
+                "31": "9f68cc5f9b1ffd24ed7f61c9cce70fc7cf060f05c4f5341c45e3567b2da28100",
+                "32": "4711bcd501a15c3805f55d1692a46ee5265ef8dc6ad4ea1166ccbe640216f98b"
+              },
+              "section_hashes": [
+                "56568d9e77e842efd6b51c75f98386fa81033aa56a78931fe90be90bd63e655d",
+                "e761fc7654ca5b8ea69e02282591ea34dba7f511cad2a14e4211c509b19eb176",
+                "cb3cd032ad6b57d7de9d95a16249d663a19ddf6a165c84199f6d40e6b5416289"
+              ],
+              "selector_reasons": [
+                "heading_alias:cost_composition:成本构成",
+                "heading_alias:major_customers_suppliers:主要销售客户",
+                "heading_alias:principal_business:主营业务",
+                "heading_alias:production_sales_inventory:生产量",
+                "structured_hint:主要供应商",
+                "structured_hint:主要销售客户",
+                "structured_hint:前五名供应商",
+                "structured_hint:前五名客户",
+                "table_signature:common.production_sales_inventory.v1"
+              ],
+              "quality": "native"
+            }
+          ]
+        },
+        {
+          "chapter_task": "extract_business_regime",
+          "scope_count": 1,
+          "field_ids": [
+            "business_regime"
+          ],
+          "selected_section_hashes": [
+            "00a6184c8d88f51ea4ea0629df0cde8b314fe90f162d7d76bd527b8d5a3ebbce",
+            "b41cfb72e813c40baf1d863ae9db2a910462073ede1cfc09932198b501e4b564",
+            "6e95d989cc1b592d0c67ce529bb07d31503e1428574a46262d4b0b5311da149e",
+            "838ee32ec31bdff191e5819b275bb7003fa2cf18be402e9a964e4352b63f0e7a",
+            "56568d9e77e842efd6b51c75f98386fa81033aa56a78931fe90be90bd63e655d",
+            "e761fc7654ca5b8ea69e02282591ea34dba7f511cad2a14e4211c509b19eb176"
+          ],
+          "scope_selections": [
+            {
+              "chapter_task": "extract_business_regime",
+              "scope_id": "business_regime-01",
+              "pages": [
+                29,
+                30,
+                31
+              ],
+              "page_hashes": {
+                "29": "bfb53cad5eff84403dd7258f89da471e36d66efa90fce3ae44ac50a88a43b8a1",
+                "30": "fbf979e14a94b1d969e640c4f1fb7389269e17d998bd38b6bf01f441810cc56a",
+                "31": "9f68cc5f9b1ffd24ed7f61c9cce70fc7cf060f05c4f5341c45e3567b2da28100"
+              },
+              "section_hashes": [
+                "838ee32ec31bdff191e5819b275bb7003fa2cf18be402e9a964e4352b63f0e7a",
+                "56568d9e77e842efd6b51c75f98386fa81033aa56a78931fe90be90bd63e655d",
+                "e761fc7654ca5b8ea69e02282591ea34dba7f511cad2a14e4211c509b19eb176"
+              ],
+              "selector_reasons": [
+                "heading_alias:cost_composition:成本构成",
+                "heading_alias:major_customers_suppliers:主要销售客户",
+                "heading_alias:principal_business:主营业务",
+                "heading_alias:procurement_and_costs:销售模式",
+                "heading_alias:production_sales_inventory:生产量",
+                "structured_hint:业务、产品或服务发生重大变化",
+                "table_signature:common.production_sales_inventory.v1"
+              ],
+              "quality": "native"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sample_id": "manufacturing-materials-fresh-001296-2025",
+      "instrument_id": "001296.SZ",
+      "pdf_artifact_hash": "f3a037a3afcc59983753e51c9564e08444ec1dceb0ae92ffec5f90276771ee61",
+      "pdf_page_count": 216,
+      "recovery_state": "native_ready",
+      "recovered_page_numbers": [],
+      "chapters": [
+        {
+          "chapter_task": "extract_business_overview",
+          "scope_count": 1,
+          "field_ids": [
+            "business_overview_source",
+            "explicit_activity"
+          ],
+          "selected_section_hashes": [
+            "fb70d3a5e765106f9500daa625af115c4d942632e609963eea118d5ac9df455f",
+            "d3e68d60a5ee832534e1f7eebca85861cab1ccd3e4f61922afac2f11d9793fb1",
+            "6652339f54c3dfd0abe5723c650677b4614d1f4669b651cb71875958c0183445",
+            "dbbc8de141efde53d1b5f1dbfe9fad958b40c4951763e69d4ac32efc68c25e76",
+            "0ae0c30b8a28976d07c88198e08267c5f7bea68e9015dd592b272faa73040b05",
+            "86484ec6b6b8fbe07b154250c888196a01de5cfb143246a37a0d8fd039efe7a0"
+          ],
+          "scope_selections": [
+            {
+              "chapter_task": "extract_business_overview",
+              "scope_id": "business_overview-01",
+              "pages": [
+                11,
+                12
+              ],
+              "page_hashes": {
+                "11": "dd048563c363329b1e6cc5cee1064588384cdc4abf8f13f9fc078222afba48b8",
+                "12": "83fc1cf079de43b0bae37c681571bad6d008d0f56d7686ee7ab87f449fc00f64"
+              },
+              "section_hashes": [
+                "fb70d3a5e765106f9500daa625af115c4d942632e609963eea118d5ac9df455f",
+                "d3e68d60a5ee832534e1f7eebca85861cab1ccd3e4f61922afac2f11d9793fb1"
+              ],
+              "selector_reasons": [
+                "heading_alias:business_model:经营模式",
+                "heading_alias:industry_context:报告期内公司所处行业情况",
+                "heading_alias:principal_business:主要业务",
+                "heading_alias:procurement_and_costs:原材料采购",
+                "heading_alias:production_sales_inventory:产销量",
+                "structured_hint:主要业务",
+                "structured_hint:主要产品",
+                "structured_hint:公司从事的主要业务",
+                "structured_hint:报告期内公司从事的主要业务",
+                "structured_hint:经营模式"
+              ],
+              "quality": "native"
+            }
+          ]
+        },
+        {
+          "chapter_task": "extract_segment_financials",
+          "scope_count": 2,
+          "field_ids": [
+            "gross_margin_reported",
+            "operating_cost",
+            "operating_revenue",
+            "segment_dimension"
+          ],
+          "selected_section_hashes": [
+            "d3e68d60a5ee832534e1f7eebca85861cab1ccd3e4f61922afac2f11d9793fb1",
+            "09690b2155874c1ee869e40d6a9ca13fa5ff65fec0b29e634fe9fd9381125683",
+            "6652339f54c3dfd0abe5723c650677b4614d1f4669b651cb71875958c0183445",
+            "d4015935046ea4df94e0a891c86893d56f98c4557fcc09c72e61c67be1197142",
+            "367ea8b4a4909e6710e82e0ad876d2e3446602ec1cb491d96157d895d92deb2e",
+            "07529481821feef17c16a85de233312d1dd4dde0328ccbe311144b00bc8012ff"
+          ],
+          "scope_selections": [
+            {
+              "chapter_task": "extract_segment_financials",
+              "scope_id": "segment_financials-01",
+              "pages": [
+                13,
+                14,
+                15
+              ],
+              "page_hashes": {
+                "13": "d3a3bf87ab6dc16fa70e37971a01f749d7433298ba55692ce414d56cb074d4b2",
+                "14": "c1318e294e8b72500b1d0f2efbe14f0b5c1588061d594df71b1a4d5b7d5ae3de",
+                "15": "a6a098451dcf005a2c45f3a416325f56d8b7b820400494139003c30d72a1a5f6"
+              },
+              "section_hashes": [
+                "09690b2155874c1ee869e40d6a9ca13fa5ff65fec0b29e634fe9fd9381125683",
+                "6652339f54c3dfd0abe5723c650677b4614d1f4669b651cb71875958c0183445",
+                "d4015935046ea4df94e0a891c86893d56f98c4557fcc09c72e61c67be1197142"
+              ],
+              "selector_reasons": [
+                "heading_alias:principal_business:主营业务",
+                "heading_alias:procurement_and_costs:销售模式",
+                "heading_alias:production_sales_inventory:生产量",
+                "heading_alias:revenue_cost_analysis:主营业务分析",
+                "structured_hint:主营业务分",
+                "structured_hint:分产品",
+                "structured_hint:分地区",
+                "structured_hint:分行业",
+                "table_signature:common.production_sales_inventory.v1",
+                "table_signature:common.segment_revenue_cost.v1"
+              ],
+              "quality": "native"
+            },
+            {
+              "chapter_task": "extract_segment_financials",
+              "scope_id": "segment_financials-02",
+              "pages": [
+                202
+              ],
+              "page_hashes": {
+                "202": "b37da3802f62fbd557a7fe65b25ba40e510d547afc7e353a1f3531a3a383be9a"
+              },
+              "section_hashes": [
+                "07529481821feef17c16a85de233312d1dd4dde0328ccbe311144b00bc8012ff"
+              ],
+              "selector_reasons": [
+                "structured_hint:分部信息",
+                "table_signature:common.segment_revenue_cost.v1"
+              ],
+              "quality": "native"
+            }
+          ]
+        },
+        {
+          "chapter_task": "extract_operating_quantities",
+          "scope_count": 2,
+          "field_ids": [
+            "capacity_utilization",
+            "inventory_volume",
+            "production_capacity",
+            "production_volume",
+            "sales_volume"
+          ],
+          "selected_section_hashes": [
+            "6652339f54c3dfd0abe5723c650677b4614d1f4669b651cb71875958c0183445",
+            "d4015935046ea4df94e0a891c86893d56f98c4557fcc09c72e61c67be1197142",
+            "367ea8b4a4909e6710e82e0ad876d2e3446602ec1cb491d96157d895d92deb2e",
+            "432107433d6c678dc768cccef159be6f9e6396dd03644ce641a429e73051afd0",
+            "f921067ef95e71359b1675beed4da7a4f3e310f6bdc3c5b5f97675ba09ba7bea",
+            "b2d7046d7ece13980302fdf5fc2bb930becc39602c5b7f0f59374c7f05c0ad5c"
+          ],
+          "scope_selections": [
+            {
+              "chapter_task": "extract_operating_quantities",
+              "scope_id": "operating_quantities-01",
+              "pages": [
+                14,
+                15,
+                16
+              ],
+              "page_hashes": {
+                "14": "c1318e294e8b72500b1d0f2efbe14f0b5c1588061d594df71b1a4d5b7d5ae3de",
+                "15": "a6a098451dcf005a2c45f3a416325f56d8b7b820400494139003c30d72a1a5f6",
+                "16": "9b99ac00f4308ca47c8c48a2747c38888d5be3651da5c9f4a057b13da3e25eab"
+              },
+              "section_hashes": [
+                "6652339f54c3dfd0abe5723c650677b4614d1f4669b651cb71875958c0183445",
+                "d4015935046ea4df94e0a891c86893d56f98c4557fcc09c72e61c67be1197142",
+                "367ea8b4a4909e6710e82e0ad876d2e3446602ec1cb491d96157d895d92deb2e"
+              ],
+              "selector_reasons": [
+                "heading_alias:cost_composition:成本构成",
+                "heading_alias:principal_business:主营业务",
+                "heading_alias:procurement_and_costs:销售模式",
+                "heading_alias:production_sales_inventory:生产量",
+                "heading_alias:revenue_cost_analysis:主营业务分析",
+                "structured_hint:产能",
+                "structured_hint:公司实物销售收入是否大于劳务收入",
+                "structured_hint:库存量",
+                "structured_hint:生产量",
+                "structured_hint:销售量",
+                "table_signature:common.production_sales_inventory.v1",
+                "table_signature:common.segment_revenue_cost.v1"
+              ],
+              "quality": "native"
+            },
+            {
+              "chapter_task": "extract_operating_quantities",
+              "scope_id": "operating_quantities-02",
+              "pages": [
+                28,
+                29
+              ],
+              "page_hashes": {
+                "28": "e0ea4b58f3711ef501612e9b7cc3555a266e267b43994fcd6318d873fa603875",
+                "29": "4b9f98ec4d384bf8fbf6eea503add926ac0ad5be1c7c52cd200a24232411ee62"
+              },
+              "section_hashes": [
+                "f921067ef95e71359b1675beed4da7a4f3e310f6bdc3c5b5f97675ba09ba7bea",
+                "b2d7046d7ece13980302fdf5fc2bb930becc39602c5b7f0f59374c7f05c0ad5c"
+              ],
+              "selector_reasons": [
+                "heading_alias:principal_business:主营业务",
+                "structured_hint:产能"
+              ],
+              "quality": "native"
+            }
+          ]
+        },
+        {
+          "chapter_task": "extract_material_inputs",
+          "scope_count": 1,
+          "field_ids": [
+            "material_input"
+          ],
+          "selected_section_hashes": [
+            "d3e68d60a5ee832534e1f7eebca85861cab1ccd3e4f61922afac2f11d9793fb1",
+            "6652339f54c3dfd0abe5723c650677b4614d1f4669b651cb71875958c0183445",
+            "d4015935046ea4df94e0a891c86893d56f98c4557fcc09c72e61c67be1197142",
+            "367ea8b4a4909e6710e82e0ad876d2e3446602ec1cb491d96157d895d92deb2e",
+            "b2d7046d7ece13980302fdf5fc2bb930becc39602c5b7f0f59374c7f05c0ad5c",
+            "3a8abb89dba4c785a6d07ee003ee2079218ef97e9ac56be5148086b79ddc7d12"
+          ],
+          "scope_selections": [
+            {
+              "chapter_task": "extract_material_inputs",
+              "scope_id": "material_inputs-01",
+              "pages": [
+                14,
+                15,
+                16
+              ],
+              "page_hashes": {
+                "14": "c1318e294e8b72500b1d0f2efbe14f0b5c1588061d594df71b1a4d5b7d5ae3de",
+                "15": "a6a098451dcf005a2c45f3a416325f56d8b7b820400494139003c30d72a1a5f6",
+                "16": "9b99ac00f4308ca47c8c48a2747c38888d5be3651da5c9f4a057b13da3e25eab"
+              },
+              "section_hashes": [
+                "6652339f54c3dfd0abe5723c650677b4614d1f4669b651cb71875958c0183445",
+                "d4015935046ea4df94e0a891c86893d56f98c4557fcc09c72e61c67be1197142",
+                "367ea8b4a4909e6710e82e0ad876d2e3446602ec1cb491d96157d895d92deb2e"
+              ],
+              "selector_reasons": [
+                "heading_alias:cost_composition:成本构成",
+                "heading_alias:principal_business:主营业务",
+                "heading_alias:procurement_and_costs:销售模式",
+                "heading_alias:production_sales_inventory:生产量",
+                "heading_alias:revenue_cost_analysis:主营业务分析",
+                "structured_hint:成本构成",
+                "table_signature:common.production_sales_inventory.v1",
+                "table_signature:common.segment_revenue_cost.v1"
+              ],
+              "quality": "native"
+            }
+          ]
+        },
+        {
+          "chapter_task": "extract_counterparties_and_concentration",
+          "scope_count": 2,
+          "field_ids": [
+            "counterparty_relationship",
+            "customer_concentration",
+            "supplier_concentration"
+          ],
+          "selected_section_hashes": [
+            "367ea8b4a4909e6710e82e0ad876d2e3446602ec1cb491d96157d895d92deb2e",
+            "432107433d6c678dc768cccef159be6f9e6396dd03644ce641a429e73051afd0",
+            "d79811eb8402b8d18c627746e8fda115764cbd8803895ff59719a4ef6842fbc1",
+            "fa47d8c0b38975c0851dee6bf3e619ad7a8812ea43d672ea5efbc6ca29fbc973",
+            "b2d7046d7ece13980302fdf5fc2bb930becc39602c5b7f0f59374c7f05c0ad5c",
+            "13b49e3f59d5d87c5d7d662cee0c1657fb53cb7517e79972de6ebc36ebc30c91"
+          ],
+          "scope_selections": [
+            {
+              "chapter_task": "extract_counterparties_and_concentration",
+              "scope_id": "counterparties_and_concentration-01",
+              "pages": [
+                16,
+                17,
+                18
+              ],
+              "page_hashes": {
+                "16": "9b99ac00f4308ca47c8c48a2747c38888d5be3651da5c9f4a057b13da3e25eab",
+                "17": "8b1dc592d3fb8abd120166098ce658a0498e58e7c4cc3b4967e76029c53dcca5",
+                "18": "d4e6dac39413e0ce10335b3b693f0169c6f2a232450d5d2b2990a2739da10e9a"
+              },
+              "section_hashes": [
+                "367ea8b4a4909e6710e82e0ad876d2e3446602ec1cb491d96157d895d92deb2e",
+                "432107433d6c678dc768cccef159be6f9e6396dd03644ce641a429e73051afd0",
+                "d79811eb8402b8d18c627746e8fda115764cbd8803895ff59719a4ef6842fbc1"
+              ],
+              "selector_reasons": [
+                "heading_alias:cost_composition:成本构成",
+                "heading_alias:major_customers_suppliers:主要供应商情况",
+                "heading_alias:major_customers_suppliers:主要销售客户",
+                "heading_alias:production_sales_inventory:生产量",
+                "structured_hint:主要供应商",
+                "structured_hint:主要销售客户",
+                "structured_hint:前五名供应商",
+                "structured_hint:前五名客户",
+                "table_signature:common.production_sales_inventory.v1"
+              ],
+              "quality": "native"
+            },
+            {
+              "chapter_task": "extract_counterparties_and_concentration",
+              "scope_id": "counterparties_and_concentration-02",
+              "pages": [
+                189
+              ],
+              "page_hashes": {
+                "189": "65f3c6d63df738d313b53bf00ad068619e3f6333795facb2e0fba4eb104e55f5"
+              },
+              "section_hashes": [
+                "13b49e3f59d5d87c5d7d662cee0c1657fb53cb7517e79972de6ebc36ebc30c91"
+              ],
+              "selector_reasons": [
+                "heading_alias:major_customers_suppliers:前五名客户",
+                "structured_hint:前五名客户"
+              ],
+              "quality": "native"
+            }
+          ]
+        },
+        {
+          "chapter_task": "extract_business_regime",
+          "scope_count": 1,
+          "field_ids": [
+            "business_regime"
+          ],
+          "selected_section_hashes": [
+            "d4015935046ea4df94e0a891c86893d56f98c4557fcc09c72e61c67be1197142",
+            "367ea8b4a4909e6710e82e0ad876d2e3446602ec1cb491d96157d895d92deb2e",
+            "432107433d6c678dc768cccef159be6f9e6396dd03644ce641a429e73051afd0",
+            "d79811eb8402b8d18c627746e8fda115764cbd8803895ff59719a4ef6842fbc1",
+            "f921067ef95e71359b1675beed4da7a4f3e310f6bdc3c5b5f97675ba09ba7bea",
+            "b2d7046d7ece13980302fdf5fc2bb930becc39602c5b7f0f59374c7f05c0ad5c"
+          ],
+          "scope_selections": [
+            {
+              "chapter_task": "extract_business_regime",
+              "scope_id": "business_regime-01",
+              "pages": [
+                16,
+                17,
+                18
+              ],
+              "page_hashes": {
+                "16": "9b99ac00f4308ca47c8c48a2747c38888d5be3651da5c9f4a057b13da3e25eab",
+                "17": "8b1dc592d3fb8abd120166098ce658a0498e58e7c4cc3b4967e76029c53dcca5",
+                "18": "d4e6dac39413e0ce10335b3b693f0169c6f2a232450d5d2b2990a2739da10e9a"
+              },
+              "section_hashes": [
+                "367ea8b4a4909e6710e82e0ad876d2e3446602ec1cb491d96157d895d92deb2e",
+                "432107433d6c678dc768cccef159be6f9e6396dd03644ce641a429e73051afd0",
+                "d79811eb8402b8d18c627746e8fda115764cbd8803895ff59719a4ef6842fbc1"
+              ],
+              "selector_reasons": [
+                "heading_alias:cost_composition:成本构成",
+                "heading_alias:major_customers_suppliers:主要供应商情况",
+                "heading_alias:major_customers_suppliers:主要销售客户",
+                "heading_alias:production_sales_inventory:生产量",
+                "structured_hint:业务、产品或服务发生重大变化",
+                "table_signature:common.production_sales_inventory.v1"
+              ],
+              "quality": "native"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sample_id": "manufacturing-materials-fresh-688295-2025",
+      "instrument_id": "688295.SH",
+      "pdf_artifact_hash": "bcc489732ba73a212e0adcbedd8c90d0aa7041d437d2ebe87e0e0ea51ae53f2e",
+      "pdf_page_count": 269,
+      "recovery_state": "native_ready",
+      "recovered_page_numbers": [],
+      "chapters": [
+        {
+          "chapter_task": "extract_business_overview",
+          "scope_count": 1,
+          "field_ids": [
+            "business_overview_source",
+            "explicit_activity"
+          ],
+          "selected_section_hashes": [
+            "7e14b7cb2c51997520b3471b7572c9249b9d5265b3c34d8ea4f4c52cd7d566cf",
+            "e1f11feb2341187b481be98bb6c66f182ccdbae67ead609dd720d49ea453a7b7",
+            "fa21094a920c1941e79b4a263ad30085975a199c942decca282b7aaf1a8c60e0",
+            "4c01a049c8cb2e256d747e5681ef89ab8c88e0090e93ea41f7ae1a251bd230db",
+            "cd6582e0262fe42b9de743eff51a351937913af5fe35270912af905f45387f91",
+            "e784c331f5932987e0393ca43bdde0ad3ad6459edcedd68c7584cb562c7b436c"
+          ],
+          "scope_selections": [
+            {
+              "chapter_task": "extract_business_overview",
+              "scope_id": "business_overview-01",
+              "pages": [
+                12
+              ],
+              "page_hashes": {
+                "12": "4e08ae9a1c02c7564ab68659b23108322dcf5149a96facf70b955e9098eabd52"
+              },
+              "section_hashes": [
+                "7e14b7cb2c51997520b3471b7572c9249b9d5265b3c34d8ea4f4c52cd7d566cf"
+              ],
+              "selector_reasons": [
+                "heading_alias:business_model:经营模式",
+                "heading_alias:principal_business:主要业务",
+                "heading_alias:procurement_and_costs:采购模式",
+                "structured_hint:主要业务",
+                "structured_hint:主要产品",
+                "structured_hint:经营模式"
+              ],
+              "quality": "native"
+            }
+          ]
+        },
+        {
+          "chapter_task": "extract_segment_financials",
+          "scope_count": 2,
+          "field_ids": [
+            "gross_margin_reported",
+            "operating_cost",
+            "operating_revenue",
+            "segment_dimension"
+          ],
+          "selected_section_hashes": [
+            "37b549a38e72ce460120ef6d30175a05b8e51d67c0c98c05862a4e9c3e66fce6",
+            "3cd0350eb277330de2f26e6579c9ca502e1b376c4337ebf6405ab8fe81c1ed9f",
+            "a530d162fd5b357db7b0676be25c0c46101ab2aeab487f20ed3009995e75fceb",
+            "8fa3ed62049bafdc15216d602b33715f5d52596b54d97a73aa25c622b91be55f",
+            "0ad4390ad793e0fe6ebacc03fdc4c8e58caf69ff81b99b7dd7c8634e3a4a694c",
+            "beff93e230d36b4128bd37abd61065704e324c7119ae10bf3dd9193f523532fd"
+          ],
+          "scope_selections": [
+            {
+              "chapter_task": "extract_segment_financials",
+              "scope_id": "segment_financials-01",
+              "pages": [
+                28,
+                29
+              ],
+              "page_hashes": {
+                "28": "291b9895d074f3235d809ddb91b184588375151ead4f312b0c299dd372b3fa13",
+                "29": "bd3ca09ebcdb0153e83f8b8cf1a779392796a8f1f84b8fb5c3a87a3c4ad860a2"
+              },
+              "section_hashes": [
+                "3cd0350eb277330de2f26e6579c9ca502e1b376c4337ebf6405ab8fe81c1ed9f",
+                "a530d162fd5b357db7b0676be25c0c46101ab2aeab487f20ed3009995e75fceb"
+              ],
+              "selector_reasons": [
+                "heading_alias:cost_composition:成本分析",
+                "heading_alias:cost_composition:成本构成",
+                "heading_alias:major_customers_suppliers:主要销售客户",
+                "heading_alias:principal_business:主营业务",
+                "heading_alias:procurement_and_costs:销售模式",
+                "heading_alias:production_sales_inventory:产销量",
+                "heading_alias:revenue_cost_analysis:收入和成本分析",
+                "structured_hint:主营业务分",
+                "structured_hint:分产品",
+                "structured_hint:分地区",
+                "structured_hint:分行业",
+                "table_signature:common.cost_composition.v1",
+                "table_signature:common.production_sales_inventory.v1",
+                "table_signature:common.segment_revenue_cost.v1"
+              ],
+              "quality": "native"
+            },
+            {
+              "chapter_task": "extract_segment_financials",
+              "scope_id": "segment_financials-02",
+              "pages": [
+                257
+              ],
+              "page_hashes": {
+                "257": "76dfa8c9ee7e7b6d0ede927ef3027f871b90f0fc225552429bec3d2a4214e707"
+              },
+              "section_hashes": [
+                "beff93e230d36b4128bd37abd61065704e324c7119ae10bf3dd9193f523532fd"
+              ],
+              "selector_reasons": [
+                "heading_alias:major_projects:主要项目",
+                "heading_alias:principal_business:主营业务",
+                "structured_hint:分部信息",
+                "structured_hint:分部报告"
+              ],
+              "quality": "native"
+            }
+          ]
+        },
+        {
+          "chapter_task": "extract_operating_quantities",
+          "scope_count": 2,
+          "field_ids": [
+            "capacity_under_construction",
+            "inventory_volume",
+            "production_capacity",
+            "production_volume",
+            "sales_volume"
+          ],
+          "selected_section_hashes": [
+            "1284c71d34166994f3aba86cf6b07fa1ca1d2dd4d9c6e1cc9dd90aec83139745",
+            "87f058a573d1da5488b7aa612bb2b97b78e4c4c3b5df1da40868e94fdf3c0ba3",
+            "e1f11feb2341187b481be98bb6c66f182ccdbae67ead609dd720d49ea453a7b7",
+            "0c22fd8b63b4380cb3ad88c5e370aec71dbba9dcbc30615f9290db96d33700c9",
+            "3cd0350eb277330de2f26e6579c9ca502e1b376c4337ebf6405ab8fe81c1ed9f",
+            "a530d162fd5b357db7b0676be25c0c46101ab2aeab487f20ed3009995e75fceb"
+          ],
+          "scope_selections": [
+            {
+              "chapter_task": "extract_operating_quantities",
+              "scope_id": "operating_quantities-01",
+              "pages": [
+                14,
+                15,
+                16
+              ],
+              "page_hashes": {
+                "14": "b3ed1e0a54087007b8428f45ccf1fa04e1cadc0793918de967eabbdb2c9fbc7b",
+                "15": "08cfac8b64357acb331f187176867b16b1ec0ae9a3d270f8957f442582f401c3",
+                "16": "b3b744e51b26e3f31ab7e0608d6806c4393aba43f23a50a111e235bf33a7cdc3"
+              },
+              "section_hashes": [
+                "1284c71d34166994f3aba86cf6b07fa1ca1d2dd4d9c6e1cc9dd90aec83139745",
+                "87f058a573d1da5488b7aa612bb2b97b78e4c4c3b5df1da40868e94fdf3c0ba3",
+                "e1f11feb2341187b481be98bb6c66f182ccdbae67ead609dd720d49ea453a7b7"
+              ],
+              "selector_reasons": [
+                "heading_alias:business_model:经营模式",
+                "heading_alias:principal_business:主要业务",
+                "heading_alias:procurement_and_costs:销售模式",
+                "structured_hint:产能",
+                "structured_hint:在建产能"
+              ],
+              "quality": "native"
+            },
+            {
+              "chapter_task": "extract_operating_quantities",
+              "scope_id": "operating_quantities-02",
+              "pages": [
+                28,
+                29
+              ],
+              "page_hashes": {
+                "28": "291b9895d074f3235d809ddb91b184588375151ead4f312b0c299dd372b3fa13",
+                "29": "bd3ca09ebcdb0153e83f8b8cf1a779392796a8f1f84b8fb5c3a87a3c4ad860a2"
+              },
+              "section_hashes": [
+                "3cd0350eb277330de2f26e6579c9ca502e1b376c4337ebf6405ab8fe81c1ed9f",
+                "a530d162fd5b357db7b0676be25c0c46101ab2aeab487f20ed3009995e75fceb"
+              ],
+              "selector_reasons": [
+                "heading_alias:cost_composition:成本分析",
+                "heading_alias:cost_composition:成本构成",
+                "heading_alias:major_customers_suppliers:主要销售客户",
+                "heading_alias:principal_business:主营业务",
+                "heading_alias:procurement_and_costs:销售模式",
+                "heading_alias:production_sales_inventory:产销量",
+                "heading_alias:revenue_cost_analysis:收入和成本分析",
+                "structured_hint:产销量",
+                "structured_hint:库存量",
+                "structured_hint:生产量",
+                "structured_hint:销售量",
+                "table_signature:common.cost_composition.v1",
+                "table_signature:common.production_sales_inventory.v1",
+                "table_signature:common.segment_revenue_cost.v1"
+              ],
+              "quality": "native"
+            }
+          ]
+        },
+        {
+          "chapter_task": "extract_material_inputs",
+          "scope_count": 1,
+          "field_ids": [
+            "material_input"
+          ],
+          "selected_section_hashes": [
+            "d19918ac4a7d62a61cf512fe02c7e61d4b7e4cc7c97242db04f2435a9c79b6ef",
+            "7e14b7cb2c51997520b3471b7572c9249b9d5265b3c34d8ea4f4c52cd7d566cf",
+            "1977749125c441d289dba55a01f8a9917a7ee015161e61f0f8d2481a0a4d2792",
+            "1284c71d34166994f3aba86cf6b07fa1ca1d2dd4d9c6e1cc9dd90aec83139745",
+            "741e9abab5b894bc9d055dd0b6f2273e5b524e5c804ea968d7edf70d9e5ab09b",
+            "b1ab4208ceee6fa9a2173d74dc9d13a5897e5eb560997ee3e4ca05daf3f7c3cc"
+          ],
+          "scope_selections": [
+            {
+              "chapter_task": "extract_material_inputs",
+              "scope_id": "material_inputs-01",
+              "pages": [
+                25,
+                26
+              ],
+              "page_hashes": {
+                "25": "ed483f8607da20825549bf439bf8a61d0595c99ca09fed5f4d06fe359ef0ce74",
+                "26": "4b15e31446b55870119353386fd00497ef17cf1f29367429f69a8bcc12e230d5"
+              },
+              "section_hashes": [
+                "741e9abab5b894bc9d055dd0b6f2273e5b524e5c804ea968d7edf70d9e5ab09b",
+                "b1ab4208ceee6fa9a2173d74dc9d13a5897e5eb560997ee3e4ca05daf3f7c3cc"
+              ],
+              "selector_reasons": [
+                "heading_alias:principal_business:主营业务",
+                "heading_alias:revenue_cost_analysis:主营业务分析",
+                "structured_hint:主要原材料",
+                "table_signature:common.segment_revenue_cost.v1"
+              ],
+              "quality": "native"
+            }
+          ]
+        },
+        {
+          "chapter_task": "extract_counterparties_and_concentration",
+          "scope_count": 2,
+          "field_ids": [
+            "counterparty_relationship",
+            "customer_concentration",
+            "supplier_concentration"
+          ],
+          "selected_section_hashes": [
+            "3cd0350eb277330de2f26e6579c9ca502e1b376c4337ebf6405ab8fe81c1ed9f",
+            "a530d162fd5b357db7b0676be25c0c46101ab2aeab487f20ed3009995e75fceb",
+            "8fa3ed62049bafdc15216d602b33715f5d52596b54d97a73aa25c622b91be55f",
+            "c0904b77d6380622db34ac81442f14927b4a154308df3c0417e6ad178733d977",
+            "cd6582e0262fe42b9de743eff51a351937913af5fe35270912af905f45387f91",
+            "fc6103a5cef1aace16e7e447a6c19381185375ebbb0d142c35f95affcecd141c"
+          ],
+          "scope_selections": [
+            {
+              "chapter_task": "extract_counterparties_and_concentration",
+              "scope_id": "counterparties_and_concentration-01",
+              "pages": [
+                28,
+                29,
+                30
+              ],
+              "page_hashes": {
+                "28": "291b9895d074f3235d809ddb91b184588375151ead4f312b0c299dd372b3fa13",
+                "29": "bd3ca09ebcdb0153e83f8b8cf1a779392796a8f1f84b8fb5c3a87a3c4ad860a2",
+                "30": "d0bd0b2e9a27f3cc56b139cdc34c544058f0b3bdd66793060dd7d4539f6d22ff"
+              },
+              "section_hashes": [
+                "3cd0350eb277330de2f26e6579c9ca502e1b376c4337ebf6405ab8fe81c1ed9f",
+                "a530d162fd5b357db7b0676be25c0c46101ab2aeab487f20ed3009995e75fceb",
+                "8fa3ed62049bafdc15216d602b33715f5d52596b54d97a73aa25c622b91be55f"
+              ],
+              "selector_reasons": [
+                "heading_alias:cost_composition:成本分析",
+                "heading_alias:cost_composition:成本构成",
+                "heading_alias:major_customers_suppliers:主要销售客户",
+                "heading_alias:principal_business:主营业务",
+                "heading_alias:procurement_and_costs:销售模式",
+                "heading_alias:production_sales_inventory:产销量",
+                "heading_alias:revenue_cost_analysis:收入和成本分析",
+                "structured_hint:主要供应商",
+                "structured_hint:主要销售客户",
+                "structured_hint:前五名供应商",
+                "structured_hint:前五名客户",
+                "table_signature:common.cost_composition.v1",
+                "table_signature:common.production_sales_inventory.v1",
+                "table_signature:common.segment_revenue_cost.v1"
+              ],
+              "quality": "native"
+            },
+            {
+              "chapter_task": "extract_counterparties_and_concentration",
+              "scope_id": "counterparties_and_concentration-02",
+              "pages": [
+                31
+              ],
+              "page_hashes": {
+                "31": "867d79005a4eb61e58f3d4c8630f227413cf3c65c2ef97b7fb717404d1cdf17b"
+              },
+              "section_hashes": [
+                "c0904b77d6380622db34ac81442f14927b4a154308df3c0417e6ad178733d977"
+              ],
+              "selector_reasons": [
+                "heading_alias:major_customers_suppliers:前五名供应商",
+                "heading_alias:principal_business:主营业务",
+                "heading_alias:revenue_cost_analysis:主营业务分析",
+                "structured_hint:前五名供应商"
+              ],
+              "quality": "native"
+            }
+          ]
+        },
+        {
+          "chapter_task": "extract_business_regime",
+          "scope_count": 1,
+          "field_ids": [
+            "business_regime"
+          ],
+          "selected_section_hashes": [
+            "3cd0350eb277330de2f26e6579c9ca502e1b376c4337ebf6405ab8fe81c1ed9f",
+            "a530d162fd5b357db7b0676be25c0c46101ab2aeab487f20ed3009995e75fceb",
+            "c0904b77d6380622db34ac81442f14927b4a154308df3c0417e6ad178733d977",
+            "fa21094a920c1941e79b4a263ad30085975a199c942decca282b7aaf1a8c60e0",
+            "4c01a049c8cb2e256d747e5681ef89ab8c88e0090e93ea41f7ae1a251bd230db",
+            "3faaf88dbf60c571719a17c31b09cbd792c82acb46e4a0da0ec4867ee443043b"
+          ],
+          "scope_selections": [
+            {
+              "chapter_task": "extract_business_regime",
+              "scope_id": "business_regime-01",
+              "pages": [
+                28,
+                29
+              ],
+              "page_hashes": {
+                "28": "291b9895d074f3235d809ddb91b184588375151ead4f312b0c299dd372b3fa13",
+                "29": "bd3ca09ebcdb0153e83f8b8cf1a779392796a8f1f84b8fb5c3a87a3c4ad860a2"
+              },
+              "section_hashes": [
+                "3cd0350eb277330de2f26e6579c9ca502e1b376c4337ebf6405ab8fe81c1ed9f",
+                "a530d162fd5b357db7b0676be25c0c46101ab2aeab487f20ed3009995e75fceb"
+              ],
+              "selector_reasons": [
+                "heading_alias:cost_composition:成本分析",
+                "heading_alias:cost_composition:成本构成",
+                "heading_alias:major_customers_suppliers:主要销售客户",
+                "heading_alias:principal_business:主营业务",
+                "heading_alias:procurement_and_costs:销售模式",
+                "heading_alias:production_sales_inventory:产销量",
+                "heading_alias:revenue_cost_analysis:收入和成本分析",
+                "structured_hint:业务、产品或服务发生重大变化",
+                "structured_hint:报告期主要子公司股权变动",
+                "table_signature:common.cost_composition.v1",
+                "table_signature:common.production_sales_inventory.v1",
+                "table_signature:common.segment_revenue_cost.v1"
+              ],
+              "quality": "native"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sample_id": "manufacturing-materials-fresh-920576-2025",
+      "instrument_id": "920576.BJ",
+      "pdf_artifact_hash": "0104b8e4b0241f3cf1da64ffaa0023a5ae88e0654ea33200acb3aceea10a90e4",
+      "pdf_page_count": 157,
+      "recovery_state": "native_ready",
+      "recovered_page_numbers": [],
+      "chapters": [
+        {
+          "chapter_task": "extract_business_overview",
+          "scope_count": 1,
+          "field_ids": [
+            "business_overview_source",
+            "explicit_activity"
+          ],
+          "selected_section_hashes": [
+            "a7d94e02224c8f14880bef4acf2729725d4ce9b05dee10ff1ca6d69a7e834a24",
+            "ee5db4775694c2efa2db8bc687a773e466df8ebd240dd0c99f56463cfd643cec",
+            "b2fc036d7ce4cab7185392d1ea9225979545fa4e88215a114d7407b7c0d5eb3d",
+            "ec44d238242c1f6e9bb58aaa066015523c2210502f68111fe85d7c86e1b2a9e6",
+            "ebd31cf3bcf437422b7fedd985d42fa26ea7795c53a565d053bacf579a4b8aca",
+            "814e9d9c2f226d0ae3510d13752947d33ec78cc5a980a7207cae2db1e191987e"
+          ],
+          "scope_selections": [
+            {
+              "chapter_task": "extract_business_overview",
+              "scope_id": "business_overview-01",
+              "pages": [
+                86
+              ],
+              "page_hashes": {
+                "86": "c4a128fcf392b2f76b742ba69630338a58a3641577324c842081a655d339a2ce"
+              },
+              "section_hashes": [
+                "814e9d9c2f226d0ae3510d13752947d33ec78cc5a980a7207cae2db1e191987e"
+              ],
+              "selector_reasons": [
+                "heading_alias:principal_business:主要业务",
+                "structured_hint:主要业务",
+                "structured_hint:主要产品"
+              ],
+              "quality": "native"
+            }
+          ]
+        },
+        {
+          "chapter_task": "extract_segment_financials",
+          "scope_count": 2,
+          "field_ids": [
+            "gross_margin_reported",
+            "operating_cost",
+            "operating_revenue",
+            "segment_dimension"
+          ],
+          "selected_section_hashes": [
+            "ca64701ed3b2c23f2955319ff9b0d89378ec159fa95904b31202b13bc15538dd",
+            "4c708d508520d70ddfab8cbcdcda76bbc9ecb55b8aa57e4ccb972096f3898e9c",
+            "27a7082e0165e08daa65af61f7b17b842ddf5a68db91d9f874c0e9e5750fe1e6",
+            "73c5d6f2209b0b34273ba846939224807253db3d5f052642b985137dd2f6fb09",
+            "29ccd776e7221eb8bdf8fb641948905e665e1d2d92e2177131081dfcf9d0fb69",
+            "1e12660f24058700fcc040deaee143cc840fac28e362395523b1cb1534cc14ce"
+          ],
+          "scope_selections": [
+            {
+              "chapter_task": "extract_segment_financials",
+              "scope_id": "segment_financials-01",
+              "pages": [
+                19
+              ],
+              "page_hashes": {
+                "19": "f776e8459260ce9e136ac1f4e86c8b4c41441eb66c301abb3de3d808433a8a80"
+              },
+              "section_hashes": [
+                "4c708d508520d70ddfab8cbcdcda76bbc9ecb55b8aa57e4ccb972096f3898e9c"
+              ],
+              "selector_reasons": [
+                "heading_alias:principal_business:主营业务",
+                "structured_hint:分产品",
+                "structured_hint:分地区",
+                "table_signature:common.segment_revenue_cost.v1"
+              ],
+              "quality": "native"
+            },
+            {
+              "chapter_task": "extract_segment_financials",
+              "scope_id": "segment_financials-02",
+              "pages": [
+                151
+              ],
+              "page_hashes": {
+                "151": "756297b52a73493518495c0f3eaec96148bdc89ca714017c39f82be0f96728f5"
+              },
+              "section_hashes": [
+                "29ccd776e7221eb8bdf8fb641948905e665e1d2d92e2177131081dfcf9d0fb69"
+              ],
+              "selector_reasons": [
+                "heading_alias:major_projects:主要项目",
+                "structured_hint:分部信息"
+              ],
+              "quality": "native"
+            }
+          ]
+        },
+        {
+          "chapter_task": "extract_operating_quantities",
+          "scope_count": 1,
+          "field_ids": [
+            "production_capacity"
+          ],
+          "selected_section_hashes": [
+            "77ef1200c407cb966238ad4bebc534efaaf182ffd0e2ed02fe826660f4247458",
+            "724a4fe3a635e821d946e7677f24c0ec452151ae002e4dee207d497a8873c4f2",
+            "047720dce58bbdcd90ca7c661e3d86c14ac02be1a741f02a3abbe67fb91096fc"
+          ],
+          "scope_selections": [
+            {
+              "chapter_task": "extract_operating_quantities",
+              "scope_id": "operating_quantities-01",
+              "pages": [
+                47,
+                48,
+                49
+              ],
+              "page_hashes": {
+                "47": "8687d8535193d567d0869ad100e8756d65c315dad666324a838f1a19cf5cdc56",
+                "48": "f08a91be1364c19b5b662b403f8fdf75608b7a35cda4079aaff464e0654d4a42",
+                "49": "92c665949e841768c39e9f075af6380b215cf3177ba2917b105535a83ffdd742"
+              },
+              "section_hashes": [
+                "77ef1200c407cb966238ad4bebc534efaaf182ffd0e2ed02fe826660f4247458",
+                "724a4fe3a635e821d946e7677f24c0ec452151ae002e4dee207d497a8873c4f2",
+                "047720dce58bbdcd90ca7c661e3d86c14ac02be1a741f02a3abbe67fb91096fc"
+              ],
+              "selector_reasons": [
+                "bounded_context_window",
+                "structured_hint:是否自愿披露"
+              ],
+              "quality": "native"
+            }
+          ]
+        },
+        {
+          "chapter_task": "extract_material_inputs",
+          "scope_count": 1,
+          "field_ids": [
+            "material_input"
+          ],
+          "selected_section_hashes": [
+            "a7d94e02224c8f14880bef4acf2729725d4ce9b05dee10ff1ca6d69a7e834a24",
+            "ee5db4775694c2efa2db8bc687a773e466df8ebd240dd0c99f56463cfd643cec",
+            "d35c7cd8843e4536e330fd1bf849e2658b1707e14ee05ca6b3c3815c92f6cdaa",
+            "5816430b5983274575aebe5c346abc6c6c87c7b5d7a180f3a943a86d22d78208",
+            "ebd31cf3bcf437422b7fedd985d42fa26ea7795c53a565d053bacf579a4b8aca",
+            "9c4041332556fd66d983e7abecbf72617363adfd2da039a402af3469deb85c4f"
+          ],
+          "scope_selections": [
+            {
+              "chapter_task": "extract_material_inputs",
+              "scope_id": "material_inputs-01",
+              "pages": [
+                29,
+                30
+              ],
+              "page_hashes": {
+                "29": "3c364cb1d2058af656a0cdbe2b9e4362a88f0d7882d8ec31905cf8b155a7c3a7",
+                "30": "ba7f675db0a9faea388b390223da6ce027f26fcbfe1219b6aca2314eaeae73de"
+              },
+              "section_hashes": [
+                "5816430b5983274575aebe5c346abc6c6c87c7b5d7a180f3a943a86d22d78208",
+                "ebd31cf3bcf437422b7fedd985d42fa26ea7795c53a565d053bacf579a4b8aca"
+              ],
+              "selector_reasons": [
+                "bounded_context_window",
+                "heading_alias:major_projects:重大项目",
+                "heading_alias:procurement_and_costs:原材料采购",
+                "structured_hint:原材料采购"
+              ],
+              "quality": "native"
+            }
+          ]
+        },
+        {
+          "chapter_task": "extract_counterparties_and_concentration",
+          "scope_count": 2,
+          "field_ids": [
+            "counterparty_relationship",
+            "customer_concentration",
+            "supplier_concentration"
+          ],
+          "selected_section_hashes": [
+            "4c708d508520d70ddfab8cbcdcda76bbc9ecb55b8aa57e4ccb972096f3898e9c",
+            "27a7082e0165e08daa65af61f7b17b842ddf5a68db91d9f874c0e9e5750fe1e6",
+            "c0dd114cdf500ed556c6e19693b462454efdd0933d8a80663100ae8d3665be8c",
+            "ebd31cf3bcf437422b7fedd985d42fa26ea7795c53a565d053bacf579a4b8aca",
+            "0aaeb413b4a381c65e546fd2a1a008ec9eae3afc494613d202d60263af594f35",
+            "d2630dc813c857a371999bf39cb5415577ced9c85eae00694bd791479d319b55"
+          ],
+          "scope_selections": [
+            {
+              "chapter_task": "extract_counterparties_and_concentration",
+              "scope_id": "counterparties_and_concentration-01",
+              "pages": [
+                19,
+                20
+              ],
+              "page_hashes": {
+                "19": "f776e8459260ce9e136ac1f4e86c8b4c41441eb66c301abb3de3d808433a8a80",
+                "20": "06ca7615f41c58423c10b0fd5c524965fcf98f39555e8a6ab0e75c397f94931a"
+              },
+              "section_hashes": [
+                "4c708d508520d70ddfab8cbcdcda76bbc9ecb55b8aa57e4ccb972096f3898e9c",
+                "27a7082e0165e08daa65af61f7b17b842ddf5a68db91d9f874c0e9e5750fe1e6"
+              ],
+              "selector_reasons": [
+                "heading_alias:major_customers_suppliers:主要客户情况",
+                "heading_alias:principal_business:主营业务",
+                "structured_hint:主要供应商",
+                "table_signature:common.segment_revenue_cost.v1"
+              ],
+              "quality": "native"
+            },
+            {
+              "chapter_task": "extract_counterparties_and_concentration",
+              "scope_id": "counterparties_and_concentration-02",
+              "pages": [
+                30,
+                31
+              ],
+              "page_hashes": {
+                "30": "ba7f675db0a9faea388b390223da6ce027f26fcbfe1219b6aca2314eaeae73de",
+                "31": "9152fe4f5ee7acdd21bfd13766bf794167aa445cfef2bbc06813b2f7aa9415a2"
+              },
+              "section_hashes": [
+                "ebd31cf3bcf437422b7fedd985d42fa26ea7795c53a565d053bacf579a4b8aca",
+                "0aaeb413b4a381c65e546fd2a1a008ec9eae3afc494613d202d60263af594f35"
+              ],
+              "selector_reasons": [
+                "heading_alias:major_projects:重大项目",
+                "heading_alias:procurement_and_costs:原材料采购",
+                "structured_hint:供应商集中度",
+                "structured_hint:客户集中度"
+              ],
+              "quality": "native"
+            }
+          ]
+        },
+        {
+          "chapter_task": "extract_business_regime",
+          "scope_count": 1,
+          "field_ids": [
+            "business_regime"
+          ],
+          "selected_section_hashes": [
+            "d39a5763ec4c57361e6833b6e15be431ee7e5864bbe50322123f1202c6c28bbb",
+            "c0dd114cdf500ed556c6e19693b462454efdd0933d8a80663100ae8d3665be8c",
+            "d0123a82a521c098b10de6c559600e65452384af1a8f186da6c5c89233dd1d67"
+          ],
+          "scope_selections": [
+            {
+              "chapter_task": "extract_business_regime",
+              "scope_id": "business_regime-01",
+              "pages": [
+                25,
+                26,
+                27
+              ],
+              "page_hashes": {
+                "25": "4cbfffd5cec7b449e2bb7fc7d032c22bb6670acc3fd2e6e80b0056bd46204396",
+                "26": "a0fbfd06b1cc6865b54f2ea37fe1b36e5beb5954382d55a3541952755f395e28",
+                "27": "9338e22dbeefeb81f779b1df0e25a56180e82813a6bc991387b4e04522af1fcc"
+              },
+              "section_hashes": [
+                "d39a5763ec4c57361e6833b6e15be431ee7e5864bbe50322123f1202c6c28bbb",
+                "c0dd114cdf500ed556c6e19693b462454efdd0933d8a80663100ae8d3665be8c",
+                "d0123a82a521c098b10de6c559600e65452384af1a8f186da6c5c89233dd1d67"
+              ],
+              "selector_reasons": [
+                "bounded_context_window",
+                "structured_hint:合并报表范围的变化情况",
+                "table_signature:common.segment_revenue_cost.v1"
+              ],
+              "quality": "native"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "unsupported_field_ids": [],
+  "expected_answers_embedded": false,
+  "production_authorization": "not_authorized",
+  "audit_hash": "3fcba64c30ac29f93d48fe5caa46bd751078e7c97be6fbb16c9d57aa5550849a"
+}

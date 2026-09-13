@@ -89,6 +89,12 @@ STAGE5_COMPLETENESS_CANARY_DOCUMENT_VERSION = (
 STAGE5_COMPLETENESS_CANARY_CONTENT_HASH = (
     "22e75dc409e246b252871345de029e8aebadb74875d9e445025b7ea20ad469ad"
 )
+STAGE5_FRESH_COHORT_MANIFEST_REVISION = (
+    "manufacturing-materials-fresh-cohort-manifest-20260913-v1"
+)
+STAGE5_FRESH_COHORT_EVIDENCE_PLAN_VERSION = (
+    "manufacturing_materials_fresh_cohort.2026-09-13.1"
+)
 STAGE5_PACKAGE = "manufacturing_materials"
 STAGE5_PRODUCTION_AUTHORIZATION = "not_authorized"
 
@@ -116,11 +122,26 @@ COMPLETENESS_CANARY_STAGE5_SAMPLES: dict[str, tuple[str, str]] = {
         "validation_unclassified",
     ),
 }
+FRESH_COHORT_STAGE5_SAMPLES: dict[str, tuple[str, str]] = {
+    "manufacturing-materials-fresh-000422-2025": (
+        "000422.SZ", "validation_unclassified"
+    ),
+    "manufacturing-materials-fresh-001296-2025": (
+        "001296.SZ", "validation_unclassified"
+    ),
+    "manufacturing-materials-fresh-688295-2025": (
+        "688295.SH", "validation_unclassified"
+    ),
+    "manufacturing-materials-fresh-920576-2025": (
+        "920576.BJ", "validation_unclassified"
+    ),
+}
 KNOWN_STAGE5_SAMPLES = (
     APPROVED_STAGE5_SAMPLES
     | VALIDATION_STAGE5_SAMPLES
     | SECOND_OOS_STAGE5_SAMPLES
     | COMPLETENESS_CANARY_STAGE5_SAMPLES
+    | FRESH_COHORT_STAGE5_SAMPLES
 )
 _VALIDATION_PROFILES: dict[str, dict[str, Any]] = {
     STAGE5_VALIDATION_MANIFEST_REVISION: {
@@ -162,6 +183,35 @@ _VALIDATION_PROFILES: dict[str, dict[str, Any]] = {
         "report_id": STAGE5_COMPLETENESS_CANARY_REPORT_ID,
         "document_version": STAGE5_COMPLETENESS_CANARY_DOCUMENT_VERSION,
         "content_hash": STAGE5_COMPLETENESS_CANARY_CONTENT_HASH,
+    },
+    STAGE5_FRESH_COHORT_MANIFEST_REVISION: {
+        "manifest_kind": STAGE5_VALIDATION_MANIFEST_KIND,
+        "manifest_schema": STAGE5_VALIDATION_MANIFEST_SCHEMA,
+        "evidence_schema": STAGE5_VALIDATION_EVIDENCE_PLAN_SCHEMA,
+        "evidence_versions": (STAGE5_FRESH_COHORT_EVIDENCE_PLAN_VERSION,),
+        "samples": FRESH_COHORT_STAGE5_SAMPLES,
+        "identities": {
+            "manufacturing-materials-fresh-000422-2025": (
+                "ann_54ead40f0e989141590336fb8583b527",
+                "ver_8d686df9044352e557e6dd22d31b3629",
+                "13067dd7ca378659a5d01a6600c911dda9335afc970ac10f554dfd79a945987f",
+            ),
+            "manufacturing-materials-fresh-001296-2025": (
+                "ann_e64624b4679dee0264f76d41bbef2007",
+                "ver_b09a039f809f6edbeda453564b9c6177",
+                "2470fa942fb741facc56fecd9c282f02df4a757e7a4e5d52441b08025763ea57",
+            ),
+            "manufacturing-materials-fresh-688295-2025": (
+                "ann_4394c71d6b3b3b823710d56965cd8c2c",
+                "ver_28e78d4fb21f467c5fe03293d11d1458",
+                "10476f0cf2fdc0727c0a2ea9ae6641a1f5170f23a5b408d3154c50b9ef66c1b4",
+            ),
+            "manufacturing-materials-fresh-920576-2025": (
+                "ann_fb646442ad0db1d3f76936a8c7844931",
+                "ver_457dc114e6085eed8228542b4f38cafa",
+                "af9ca3edfd551b6c2ba0be2812e1027a64edd248a5a18d29a413850aa354cea7",
+            ),
+        },
     },
 }
 
@@ -503,8 +553,10 @@ def load_stage5_sample_manifest(
     try:
         manifest_kind = raw.get("manifest_kind", STAGE5_SAMPLE_MANIFEST_KIND)
         if manifest_kind in STAGE5_VALIDATION_MANIFEST_KINDS:
+            profile = _VALIDATION_PROFILES.get(str(raw.get("manifest_id") or ""))
+            expected_count = len(profile["samples"]) if profile is not None else 1
             if (
-                raw.get("sample_count") != 1
+                raw.get("sample_count") != expected_count
                 or raw.get("sample_replacement_allowed") is not False
                 or raw.get("semantic_execution_started") is not False
             ):
@@ -957,12 +1009,25 @@ def _validation_manifest_report(
     content = local_path.read_bytes()
     expected_hash = str(pdf.get("sha256") or "")
     profile = _VALIDATION_PROFILES.get(str(raw_manifest.get("manifest_id") or ""))
+    identity_contract = None
+    if profile is not None:
+        identities = profile.get("identities")
+        identity_contract = (
+            identities.get(sample_id)
+            if isinstance(identities, Mapping)
+            else (
+                profile["report_id"],
+                profile["document_version"],
+                profile["content_hash"],
+            )
+        )
     if profile is None or (
-        sample_id != profile["sample_id"]
+        sample_id not in profile["samples"]
+        or identity_contract is None
         or identity.get("report_id", identity.get("announcement_id"))
-        != profile["report_id"]
-        or identity.get("version_id") != profile["document_version"]
-        or expected_hash != profile["content_hash"]
+        != identity_contract[0]
+        or identity.get("version_id") != identity_contract[1]
+        or expected_hash != identity_contract[2]
     ):
         raise EvidencePreparationError(
             PreparationFailureCode.MANIFEST_INVALID,

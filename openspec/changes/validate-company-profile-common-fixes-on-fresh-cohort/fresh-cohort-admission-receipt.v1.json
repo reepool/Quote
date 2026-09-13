@@ -1,0 +1,496 @@
+{
+  "schema_version": "company_profile_fresh_cohort_admission_receipt.v1",
+  "batch_id": "manufacturing-materials-fresh-cohort-four-pool-20260913-a",
+  "sample_manifest_sha256": "ed6774ae359357e755edfc62952908d35659719158c8f231ab0c64295ebe3abe",
+  "evidence_plan_sha256": "04e0ca7491942218837cdfcf6d250e45f2348302b4382dad5a2a1e311d977a65",
+  "preparation_audit_sha256": "57272236f137ae753cb5a5102973af4c18894670fae869c0967ffd74a74b6978",
+  "output_absent_before_provider": true,
+  "provider_calls": 0,
+  "logical_route": {
+    "name": "semantic_extraction",
+    "enabled": true,
+    "routed": true,
+    "pool": "shared_semantic",
+    "route_fingerprint": "1b439d39e29b4686d977e92e648eb0e6e44a77915aa8ce706575383c1c516be5",
+    "source_labels": [
+      "scorpio:gemini-3.8-flash-high",
+      "zai:glm-5.3-flash",
+      "scorpio:grok-4.6",
+      "deepseek:deepseek-flash"
+    ],
+    "effective_max_concurrency": 20,
+    "effective_requests_per_minute": 40,
+    "supported_structured_output_modes": [
+      "json_object"
+    ],
+    "source_resources": [
+      {
+        "source_label": "scorpio:gemini-3.8-flash-high",
+        "provider_resource": "scorpio:gemini"
+      },
+      {
+        "source_label": "zai:glm-5.3-flash",
+        "provider_resource": "zai"
+      },
+      {
+        "source_label": "scorpio:grok-4.6",
+        "provider_resource": "scorpio:grok"
+      },
+      {
+        "source_label": "deepseek:deepseek-flash",
+        "provider_resource": "deepseek"
+      }
+    ],
+    "source_weights": [
+      {
+        "source_label": "scorpio:gemini-3.8-flash-high",
+        "weight": 1
+      },
+      {
+        "source_label": "zai:glm-5.3-flash",
+        "weight": 1
+      },
+      {
+        "source_label": "scorpio:grok-4.6",
+        "weight": 1
+      },
+      {
+        "source_label": "deepseek:deepseek-flash",
+        "weight": 1
+      }
+    ],
+    "transport_max_connections": 22,
+    "transport_max_keepalive_connections": 20,
+    "provider_resource_limits": {
+      "scorpio:gemini": {
+        "hard_max_concurrency": 20,
+        "requests_per_minute": 10
+      },
+      "zai": {
+        "hard_max_concurrency": 20,
+        "requests_per_minute": 10
+      },
+      "scorpio:grok": {
+        "hard_max_concurrency": 10,
+        "requests_per_minute": 10
+      },
+      "deepseek": {
+        "hard_max_concurrency": 20,
+        "requests_per_minute": 10
+      }
+    }
+  },
+  "dynamic_output_tokens": true,
+  "scope_budgets": [
+    {
+      "sample_id": "manufacturing-materials-fresh-000422-2025",
+      "scope_id": "business_overview-01",
+      "chapter_task": "extract_business_overview",
+      "tier": "base",
+      "extract_max_output_tokens": 20000,
+      "verify_max_output_tokens": 18000,
+      "page_count": 2,
+      "evidence_count": 2,
+      "field_count": 2,
+      "text_chars": 2606
+    },
+    {
+      "sample_id": "manufacturing-materials-fresh-000422-2025",
+      "scope_id": "segment_financials-01",
+      "chapter_task": "extract_segment_financials",
+      "tier": "base",
+      "extract_max_output_tokens": 20000,
+      "verify_max_output_tokens": 18000,
+      "page_count": 3,
+      "evidence_count": 3,
+      "field_count": 4,
+      "text_chars": 4474
+    },
+    {
+      "sample_id": "manufacturing-materials-fresh-000422-2025",
+      "scope_id": "segment_financials-02",
+      "chapter_task": "extract_segment_financials",
+      "tier": "base",
+      "extract_max_output_tokens": 20000,
+      "verify_max_output_tokens": 18000,
+      "page_count": 1,
+      "evidence_count": 1,
+      "field_count": 1,
+      "text_chars": 1106
+    },
+    {
+      "sample_id": "manufacturing-materials-fresh-000422-2025",
+      "scope_id": "operating_quantities-01",
+      "chapter_task": "extract_operating_quantities",
+      "tier": "base",
+      "extract_max_output_tokens": 20000,
+      "verify_max_output_tokens": 18000,
+      "page_count": 1,
+      "evidence_count": 1,
+      "field_count": 4,
+      "text_chars": 1154
+    },
+    {
+      "sample_id": "manufacturing-materials-fresh-000422-2025",
+      "scope_id": "operating_quantities-02",
+      "chapter_task": "extract_operating_quantities",
+      "tier": "base",
+      "extract_max_output_tokens": 20000,
+      "verify_max_output_tokens": 18000,
+      "page_count": 3,
+      "evidence_count": 3,
+      "field_count": 5,
+      "text_chars": 4063
+    },
+    {
+      "sample_id": "manufacturing-materials-fresh-000422-2025",
+      "scope_id": "material_inputs-01",
+      "chapter_task": "extract_material_inputs",
+      "tier": "base",
+      "extract_max_output_tokens": 20000,
+      "verify_max_output_tokens": 18000,
+      "page_count": 2,
+      "evidence_count": 2,
+      "field_count": 1,
+      "text_chars": 2911
+    },
+    {
+      "sample_id": "manufacturing-materials-fresh-000422-2025",
+      "scope_id": "counterparties_and_concentration-01",
+      "chapter_task": "extract_counterparties_and_concentration",
+      "tier": "base",
+      "extract_max_output_tokens": 20000,
+      "verify_max_output_tokens": 18000,
+      "page_count": 3,
+      "evidence_count": 3,
+      "field_count": 3,
+      "text_chars": 3695
+    },
+    {
+      "sample_id": "manufacturing-materials-fresh-000422-2025",
+      "scope_id": "business_regime-01",
+      "chapter_task": "extract_business_regime",
+      "tier": "base",
+      "extract_max_output_tokens": 20000,
+      "verify_max_output_tokens": 18000,
+      "page_count": 3,
+      "evidence_count": 3,
+      "field_count": 1,
+      "text_chars": 3722
+    },
+    {
+      "sample_id": "manufacturing-materials-fresh-001296-2025",
+      "scope_id": "business_overview-01",
+      "chapter_task": "extract_business_overview",
+      "tier": "base",
+      "extract_max_output_tokens": 20000,
+      "verify_max_output_tokens": 18000,
+      "page_count": 2,
+      "evidence_count": 2,
+      "field_count": 2,
+      "text_chars": 2807
+    },
+    {
+      "sample_id": "manufacturing-materials-fresh-001296-2025",
+      "scope_id": "segment_financials-01",
+      "chapter_task": "extract_segment_financials",
+      "tier": "base",
+      "extract_max_output_tokens": 20000,
+      "verify_max_output_tokens": 18000,
+      "page_count": 3,
+      "evidence_count": 3,
+      "field_count": 4,
+      "text_chars": 5204
+    },
+    {
+      "sample_id": "manufacturing-materials-fresh-001296-2025",
+      "scope_id": "segment_financials-02",
+      "chapter_task": "extract_segment_financials",
+      "tier": "base",
+      "extract_max_output_tokens": 20000,
+      "verify_max_output_tokens": 18000,
+      "page_count": 1,
+      "evidence_count": 1,
+      "field_count": 3,
+      "text_chars": 1163
+    },
+    {
+      "sample_id": "manufacturing-materials-fresh-001296-2025",
+      "scope_id": "operating_quantities-01",
+      "chapter_task": "extract_operating_quantities",
+      "tier": "base",
+      "extract_max_output_tokens": 20000,
+      "verify_max_output_tokens": 18000,
+      "page_count": 3,
+      "evidence_count": 3,
+      "field_count": 4,
+      "text_chars": 4647
+    },
+    {
+      "sample_id": "manufacturing-materials-fresh-001296-2025",
+      "scope_id": "operating_quantities-02",
+      "chapter_task": "extract_operating_quantities",
+      "tier": "base",
+      "extract_max_output_tokens": 20000,
+      "verify_max_output_tokens": 18000,
+      "page_count": 2,
+      "evidence_count": 2,
+      "field_count": 3,
+      "text_chars": 3014
+    },
+    {
+      "sample_id": "manufacturing-materials-fresh-001296-2025",
+      "scope_id": "material_inputs-01",
+      "chapter_task": "extract_material_inputs",
+      "tier": "base",
+      "extract_max_output_tokens": 20000,
+      "verify_max_output_tokens": 18000,
+      "page_count": 3,
+      "evidence_count": 3,
+      "field_count": 1,
+      "text_chars": 4647
+    },
+    {
+      "sample_id": "manufacturing-materials-fresh-001296-2025",
+      "scope_id": "counterparties_and_concentration-01",
+      "chapter_task": "extract_counterparties_and_concentration",
+      "tier": "base",
+      "extract_max_output_tokens": 20000,
+      "verify_max_output_tokens": 18000,
+      "page_count": 3,
+      "evidence_count": 3,
+      "field_count": 3,
+      "text_chars": 3949
+    },
+    {
+      "sample_id": "manufacturing-materials-fresh-001296-2025",
+      "scope_id": "counterparties_and_concentration-02",
+      "chapter_task": "extract_counterparties_and_concentration",
+      "tier": "base",
+      "extract_max_output_tokens": 20000,
+      "verify_max_output_tokens": 18000,
+      "page_count": 1,
+      "evidence_count": 1,
+      "field_count": 2,
+      "text_chars": 1091
+    },
+    {
+      "sample_id": "manufacturing-materials-fresh-001296-2025",
+      "scope_id": "business_regime-01",
+      "chapter_task": "extract_business_regime",
+      "tier": "base",
+      "extract_max_output_tokens": 20000,
+      "verify_max_output_tokens": 18000,
+      "page_count": 3,
+      "evidence_count": 3,
+      "field_count": 1,
+      "text_chars": 3949
+    },
+    {
+      "sample_id": "manufacturing-materials-fresh-688295-2025",
+      "scope_id": "business_overview-01",
+      "chapter_task": "extract_business_overview",
+      "tier": "base",
+      "extract_max_output_tokens": 20000,
+      "verify_max_output_tokens": 18000,
+      "page_count": 1,
+      "evidence_count": 1,
+      "field_count": 2,
+      "text_chars": 1056
+    },
+    {
+      "sample_id": "manufacturing-materials-fresh-688295-2025",
+      "scope_id": "segment_financials-01",
+      "chapter_task": "extract_segment_financials",
+      "tier": "base",
+      "extract_max_output_tokens": 20000,
+      "verify_max_output_tokens": 18000,
+      "page_count": 2,
+      "evidence_count": 2,
+      "field_count": 4,
+      "text_chars": 1824
+    },
+    {
+      "sample_id": "manufacturing-materials-fresh-688295-2025",
+      "scope_id": "segment_financials-02",
+      "chapter_task": "extract_segment_financials",
+      "tier": "base",
+      "extract_max_output_tokens": 20000,
+      "verify_max_output_tokens": 18000,
+      "page_count": 1,
+      "evidence_count": 1,
+      "field_count": 1,
+      "text_chars": 524
+    },
+    {
+      "sample_id": "manufacturing-materials-fresh-688295-2025",
+      "scope_id": "operating_quantities-01",
+      "chapter_task": "extract_operating_quantities",
+      "tier": "base",
+      "extract_max_output_tokens": 20000,
+      "verify_max_output_tokens": 18000,
+      "page_count": 3,
+      "evidence_count": 3,
+      "field_count": 3,
+      "text_chars": 3613
+    },
+    {
+      "sample_id": "manufacturing-materials-fresh-688295-2025",
+      "scope_id": "operating_quantities-02",
+      "chapter_task": "extract_operating_quantities",
+      "tier": "base",
+      "extract_max_output_tokens": 20000,
+      "verify_max_output_tokens": 18000,
+      "page_count": 2,
+      "evidence_count": 2,
+      "field_count": 3,
+      "text_chars": 1824
+    },
+    {
+      "sample_id": "manufacturing-materials-fresh-688295-2025",
+      "scope_id": "material_inputs-01",
+      "chapter_task": "extract_material_inputs",
+      "tier": "base",
+      "extract_max_output_tokens": 20000,
+      "verify_max_output_tokens": 18000,
+      "page_count": 2,
+      "evidence_count": 2,
+      "field_count": 1,
+      "text_chars": 1370
+    },
+    {
+      "sample_id": "manufacturing-materials-fresh-688295-2025",
+      "scope_id": "counterparties_and_concentration-01",
+      "chapter_task": "extract_counterparties_and_concentration",
+      "tier": "base",
+      "extract_max_output_tokens": 20000,
+      "verify_max_output_tokens": 18000,
+      "page_count": 3,
+      "evidence_count": 3,
+      "field_count": 3,
+      "text_chars": 2707
+    },
+    {
+      "sample_id": "manufacturing-materials-fresh-688295-2025",
+      "scope_id": "counterparties_and_concentration-02",
+      "chapter_task": "extract_counterparties_and_concentration",
+      "tier": "base",
+      "extract_max_output_tokens": 20000,
+      "verify_max_output_tokens": 18000,
+      "page_count": 1,
+      "evidence_count": 1,
+      "field_count": 2,
+      "text_chars": 948
+    },
+    {
+      "sample_id": "manufacturing-materials-fresh-688295-2025",
+      "scope_id": "business_regime-01",
+      "chapter_task": "extract_business_regime",
+      "tier": "base",
+      "extract_max_output_tokens": 20000,
+      "verify_max_output_tokens": 18000,
+      "page_count": 2,
+      "evidence_count": 2,
+      "field_count": 1,
+      "text_chars": 1824
+    },
+    {
+      "sample_id": "manufacturing-materials-fresh-920576-2025",
+      "scope_id": "business_overview-01",
+      "chapter_task": "extract_business_overview",
+      "tier": "base",
+      "extract_max_output_tokens": 20000,
+      "verify_max_output_tokens": 18000,
+      "page_count": 1,
+      "evidence_count": 1,
+      "field_count": 2,
+      "text_chars": 831
+    },
+    {
+      "sample_id": "manufacturing-materials-fresh-920576-2025",
+      "scope_id": "segment_financials-01",
+      "chapter_task": "extract_segment_financials",
+      "tier": "base",
+      "extract_max_output_tokens": 20000,
+      "verify_max_output_tokens": 18000,
+      "page_count": 1,
+      "evidence_count": 1,
+      "field_count": 4,
+      "text_chars": 1066
+    },
+    {
+      "sample_id": "manufacturing-materials-fresh-920576-2025",
+      "scope_id": "segment_financials-02",
+      "chapter_task": "extract_segment_financials",
+      "tier": "base",
+      "extract_max_output_tokens": 20000,
+      "verify_max_output_tokens": 18000,
+      "page_count": 1,
+      "evidence_count": 1,
+      "field_count": 1,
+      "text_chars": 603
+    },
+    {
+      "sample_id": "manufacturing-materials-fresh-920576-2025",
+      "scope_id": "operating_quantities-01",
+      "chapter_task": "extract_operating_quantities",
+      "tier": "base",
+      "extract_max_output_tokens": 20000,
+      "verify_max_output_tokens": 18000,
+      "page_count": 3,
+      "evidence_count": 3,
+      "field_count": 1,
+      "text_chars": 1616
+    },
+    {
+      "sample_id": "manufacturing-materials-fresh-920576-2025",
+      "scope_id": "material_inputs-01",
+      "chapter_task": "extract_material_inputs",
+      "tier": "base",
+      "extract_max_output_tokens": 20000,
+      "verify_max_output_tokens": 18000,
+      "page_count": 2,
+      "evidence_count": 2,
+      "field_count": 1,
+      "text_chars": 2533
+    },
+    {
+      "sample_id": "manufacturing-materials-fresh-920576-2025",
+      "scope_id": "counterparties_and_concentration-01",
+      "chapter_task": "extract_counterparties_and_concentration",
+      "tier": "base",
+      "extract_max_output_tokens": 20000,
+      "verify_max_output_tokens": 18000,
+      "page_count": 2,
+      "evidence_count": 2,
+      "field_count": 1,
+      "text_chars": 2127
+    },
+    {
+      "sample_id": "manufacturing-materials-fresh-920576-2025",
+      "scope_id": "counterparties_and_concentration-02",
+      "chapter_task": "extract_counterparties_and_concentration",
+      "tier": "base",
+      "extract_max_output_tokens": 20000,
+      "verify_max_output_tokens": 18000,
+      "page_count": 2,
+      "evidence_count": 2,
+      "field_count": 3,
+      "text_chars": 2307
+    },
+    {
+      "sample_id": "manufacturing-materials-fresh-920576-2025",
+      "scope_id": "business_regime-01",
+      "chapter_task": "extract_business_regime",
+      "tier": "base",
+      "extract_max_output_tokens": 20000,
+      "verify_max_output_tokens": 18000,
+      "page_count": 3,
+      "evidence_count": 3,
+      "field_count": 1,
+      "text_chars": 3484
+    }
+  ],
+  "production_authorization": "not_authorized",
+  "receipt_hash": "25e938501b7b9e8fb92910964f34fd293b8c61fd3d073eaa8af5cebf16536222"
+}

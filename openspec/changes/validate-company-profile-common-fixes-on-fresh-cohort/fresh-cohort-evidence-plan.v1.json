@@ -1,0 +1,1321 @@
+{
+  "schema_version": "company_profile_out_of_sample_evidence_plan.v1",
+  "plan_version": "manufacturing_materials_fresh_cohort.2026-09-13.1",
+  "sample_manifest_revision": "manufacturing-materials-fresh-cohort-manifest-20260913-v1",
+  "page_coordinate_system": "one_based_pdf_physical_page",
+  "production_authorization": "not_authorized",
+  "reports": [
+    {
+      "sample_id": "manufacturing-materials-fresh-000422-2025",
+      "content_hash": "13067dd7ca378659a5d01a6600c911dda9335afc970ac10f554dfd79a945987f",
+      "plan_version": "manufacturing_materials_fresh_cohort.2026-09-13.1",
+      "tasks": [
+        {
+          "chapter_task": "extract_business_overview",
+          "request_scopes": [
+            {
+              "scope_id": "business_overview-01",
+              "field_ids": [
+                "business_overview_source",
+                "explicit_activity"
+              ],
+              "pages": [
+                11,
+                12
+              ],
+              "section_titles": [
+                "principal_business",
+                "business_model"
+              ],
+              "anchor_terms": [
+                "主要业务"
+              ],
+              "required_headers": [],
+              "required_units": [],
+              "required_footnotes": [],
+              "continuation_required": true,
+              "printed_page_labels": {},
+              "subject_pages": [],
+              "subject_anchor_terms": [],
+              "source_row_dimensions": {},
+              "candidate_pages": [
+                11,
+                12
+              ]
+            }
+          ]
+        },
+        {
+          "chapter_task": "extract_segment_financials",
+          "request_scopes": [
+            {
+              "scope_id": "segment_financials-01",
+              "field_ids": [
+                "segment_dimension",
+                "operating_revenue",
+                "operating_cost",
+                "gross_margin_reported"
+              ],
+              "pages": [
+                26,
+                27,
+                28
+              ],
+              "section_titles": [
+                "principal_business",
+                "business_model"
+              ],
+              "anchor_terms": [
+                "主营业务分析"
+              ],
+              "required_headers": [
+                "营业收入",
+                "营业成本",
+                "毛利率"
+              ],
+              "required_units": [
+                "元"
+              ],
+              "required_footnotes": [],
+              "continuation_required": true,
+              "printed_page_labels": {},
+              "subject_pages": [],
+              "subject_anchor_terms": [],
+              "source_row_dimensions": {},
+              "candidate_pages": [
+                26,
+                27,
+                28
+              ]
+            },
+            {
+              "scope_id": "segment_financials-02",
+              "field_ids": [
+                "segment_dimension"
+              ],
+              "pages": [
+                247
+              ],
+              "section_titles": [
+                "major_projects"
+              ],
+              "anchor_terms": [
+                "分部信息"
+              ],
+              "required_headers": [],
+              "required_units": [
+                "元"
+              ],
+              "required_footnotes": [],
+              "continuation_required": false,
+              "printed_page_labels": {},
+              "subject_pages": [],
+              "subject_anchor_terms": [],
+              "source_row_dimensions": {},
+              "candidate_pages": [
+                247
+              ]
+            }
+          ]
+        },
+        {
+          "chapter_task": "extract_operating_quantities",
+          "request_scopes": [
+            {
+              "scope_id": "operating_quantities-01",
+              "field_ids": [
+                "production_capacity",
+                "capacity_under_construction",
+                "capacity_utilization",
+                "production_volume"
+              ],
+              "pages": [
+                14
+              ],
+              "section_titles": [
+                "structured_hint"
+              ],
+              "anchor_terms": [
+                "产能"
+              ],
+              "required_headers": [],
+              "required_units": [],
+              "required_footnotes": [
+                "注：1 本年度因磷铵存在新旧产能置换衔接过渡，产量含新旧装置叠加产出，故显示产能利用率较高。"
+              ],
+              "continuation_required": false,
+              "printed_page_labels": {},
+              "subject_pages": [],
+              "subject_anchor_terms": [],
+              "source_row_dimensions": {},
+              "candidate_pages": [
+                14
+              ]
+            },
+            {
+              "scope_id": "operating_quantities-02",
+              "field_ids": [
+                "production_capacity",
+                "capacity_under_construction",
+                "production_volume",
+                "sales_volume",
+                "inventory_volume"
+              ],
+              "pages": [
+                28,
+                29,
+                30
+              ],
+              "section_titles": [
+                "business_model",
+                "procurement_and_costs",
+                "cost_composition"
+              ],
+              "anchor_terms": [
+                "产能"
+              ],
+              "required_headers": [
+                "营业收入",
+                "营业成本",
+                "毛利率",
+                "生产量",
+                "销售量",
+                "库存量"
+              ],
+              "required_units": [
+                "元"
+              ],
+              "required_footnotes": [
+                "注：1 化肥产品中磷复肥库存存在少量外采库存。"
+              ],
+              "continuation_required": true,
+              "printed_page_labels": {},
+              "subject_pages": [],
+              "subject_anchor_terms": [],
+              "source_row_dimensions": {},
+              "candidate_pages": [
+                29,
+                30
+              ]
+            }
+          ]
+        },
+        {
+          "chapter_task": "extract_material_inputs",
+          "request_scopes": [
+            {
+              "scope_id": "material_inputs-01",
+              "field_ids": [
+                "material_input"
+              ],
+              "pages": [
+                12,
+                13
+              ],
+              "section_titles": [
+                "business_model",
+                "procurement_and_costs"
+              ],
+              "anchor_terms": [
+                "经营模式"
+              ],
+              "required_headers": [],
+              "required_units": [
+                "元"
+              ],
+              "required_footnotes": [],
+              "continuation_required": true,
+              "printed_page_labels": {},
+              "subject_pages": [],
+              "subject_anchor_terms": [],
+              "source_row_dimensions": {},
+              "candidate_pages": [
+                12,
+                13
+              ]
+            }
+          ]
+        },
+        {
+          "chapter_task": "extract_counterparties_and_concentration",
+          "request_scopes": [
+            {
+              "scope_id": "counterparties_and_concentration-01",
+              "field_ids": [
+                "counterparty_relationship",
+                "customer_concentration",
+                "supplier_concentration"
+              ],
+              "pages": [
+                30,
+                31,
+                32
+              ],
+              "section_titles": [
+                "cost_composition",
+                "major_customers_suppliers",
+                "structured_hint"
+              ],
+              "anchor_terms": [
+                "主要销售客户"
+              ],
+              "required_headers": [
+                "生产量",
+                "销售量",
+                "库存量"
+              ],
+              "required_units": [
+                "元"
+              ],
+              "required_footnotes": [
+                "注：1 化肥产品中磷复肥库存存在少量外采库存。"
+              ],
+              "continuation_required": true,
+              "printed_page_labels": {},
+              "subject_pages": [],
+              "subject_anchor_terms": [],
+              "source_row_dimensions": {},
+              "candidate_pages": [
+                31,
+                32
+              ]
+            }
+          ]
+        },
+        {
+          "chapter_task": "extract_business_regime",
+          "request_scopes": [
+            {
+              "scope_id": "business_regime-01",
+              "field_ids": [
+                "business_regime"
+              ],
+              "pages": [
+                29,
+                30,
+                31
+              ],
+              "section_titles": [
+                "procurement_and_costs",
+                "cost_composition",
+                "major_customers_suppliers"
+              ],
+              "anchor_terms": [
+                "业务、产品或服务发生重大变化"
+              ],
+              "required_headers": [
+                "生产量",
+                "销售量",
+                "库存量"
+              ],
+              "required_units": [
+                "元"
+              ],
+              "required_footnotes": [
+                "注：1 化肥产品中磷复肥库存存在少量外采库存。"
+              ],
+              "continuation_required": true,
+              "printed_page_labels": {},
+              "subject_pages": [],
+              "subject_anchor_terms": [],
+              "source_row_dimensions": {},
+              "candidate_pages": [
+                31
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sample_id": "manufacturing-materials-fresh-001296-2025",
+      "content_hash": "2470fa942fb741facc56fecd9c282f02df4a757e7a4e5d52441b08025763ea57",
+      "plan_version": "manufacturing_materials_fresh_cohort.2026-09-13.1",
+      "tasks": [
+        {
+          "chapter_task": "extract_business_overview",
+          "request_scopes": [
+            {
+              "scope_id": "business_overview-01",
+              "field_ids": [
+                "business_overview_source",
+                "explicit_activity"
+              ],
+              "pages": [
+                11,
+                12
+              ],
+              "section_titles": [
+                "principal_business",
+                "business_model"
+              ],
+              "anchor_terms": [
+                "主要业务"
+              ],
+              "required_headers": [],
+              "required_units": [],
+              "required_footnotes": [],
+              "continuation_required": true,
+              "printed_page_labels": {},
+              "subject_pages": [],
+              "subject_anchor_terms": [],
+              "source_row_dimensions": {},
+              "candidate_pages": [
+                11,
+                12
+              ]
+            }
+          ]
+        },
+        {
+          "chapter_task": "extract_segment_financials",
+          "request_scopes": [
+            {
+              "scope_id": "segment_financials-01",
+              "field_ids": [
+                "segment_dimension",
+                "operating_revenue",
+                "operating_cost",
+                "gross_margin_reported"
+              ],
+              "pages": [
+                13,
+                14,
+                15
+              ],
+              "section_titles": [
+                "structured_hint",
+                "principal_business"
+              ],
+              "anchor_terms": [
+                "分行业"
+              ],
+              "required_headers": [
+                "营业收入",
+                "营业成本",
+                "毛利率",
+                "生产量",
+                "销售量",
+                "库存量"
+              ],
+              "required_units": [
+                "元"
+              ],
+              "required_footnotes": [
+                "注：1 1）后旗长江、彰武科技、彰武矿产是集团各公司产品原材料的生产基地，与主要子公司均有业务往来；2）"
+              ],
+              "continuation_required": true,
+              "printed_page_labels": {},
+              "subject_pages": [],
+              "subject_anchor_terms": [],
+              "source_row_dimensions": {},
+              "candidate_pages": [
+                13,
+                14,
+                15
+              ]
+            },
+            {
+              "scope_id": "segment_financials-02",
+              "field_ids": [
+                "segment_dimension",
+                "operating_revenue",
+                "operating_cost"
+              ],
+              "pages": [
+                202
+              ],
+              "section_titles": [
+                "segment_information"
+              ],
+              "anchor_terms": [
+                "分部信息"
+              ],
+              "required_headers": [
+                "营业收入",
+                "营业成本"
+              ],
+              "required_units": [
+                "元"
+              ],
+              "required_footnotes": [],
+              "continuation_required": false,
+              "printed_page_labels": {},
+              "subject_pages": [],
+              "subject_anchor_terms": [],
+              "source_row_dimensions": {},
+              "candidate_pages": [
+                202
+              ]
+            }
+          ]
+        },
+        {
+          "chapter_task": "extract_operating_quantities",
+          "request_scopes": [
+            {
+              "scope_id": "operating_quantities-01",
+              "field_ids": [
+                "production_capacity",
+                "production_volume",
+                "sales_volume",
+                "inventory_volume"
+              ],
+              "pages": [
+                14,
+                15,
+                16
+              ],
+              "section_titles": [
+                "principal_business",
+                "cost_composition"
+              ],
+              "anchor_terms": [
+                "产能"
+              ],
+              "required_headers": [
+                "营业收入",
+                "营业成本",
+                "毛利率",
+                "生产量",
+                "销售量",
+                "库存量"
+              ],
+              "required_units": [
+                "元",
+                "万元"
+              ],
+              "required_footnotes": [
+                "注：1 1）后旗长江、彰武科技、彰武矿产是集团各公司产品原材料的生产基地，与主要子公司均有业务往来；2）",
+                "注：2  铸造材料主营产品包括再生砂、覆膜砂和砂芯，其中再生砂产品既可以直接销售，也作为原材料继续加工成"
+              ],
+              "continuation_required": true,
+              "printed_page_labels": {},
+              "subject_pages": [],
+              "subject_anchor_terms": [],
+              "source_row_dimensions": {},
+              "candidate_pages": [
+                15,
+                16
+              ]
+            },
+            {
+              "scope_id": "operating_quantities-02",
+              "field_ids": [
+                "production_capacity",
+                "capacity_utilization",
+                "production_volume"
+              ],
+              "pages": [
+                28,
+                29
+              ],
+              "section_titles": [
+                "principal_business"
+              ],
+              "anchor_terms": [
+                "产能"
+              ],
+              "required_headers": [],
+              "required_units": [],
+              "required_footnotes": [],
+              "continuation_required": true,
+              "printed_page_labels": {},
+              "subject_pages": [],
+              "subject_anchor_terms": [],
+              "source_row_dimensions": {},
+              "candidate_pages": [
+                28
+              ]
+            }
+          ]
+        },
+        {
+          "chapter_task": "extract_material_inputs",
+          "request_scopes": [
+            {
+              "scope_id": "material_inputs-01",
+              "field_ids": [
+                "material_input"
+              ],
+              "pages": [
+                14,
+                15,
+                16
+              ],
+              "section_titles": [
+                "principal_business",
+                "cost_composition"
+              ],
+              "anchor_terms": [
+                "主营业务"
+              ],
+              "required_headers": [
+                "营业收入",
+                "营业成本",
+                "毛利率",
+                "生产量",
+                "销售量",
+                "库存量"
+              ],
+              "required_units": [
+                "元",
+                "万元"
+              ],
+              "required_footnotes": [
+                "注：1 1）后旗长江、彰武科技、彰武矿产是集团各公司产品原材料的生产基地，与主要子公司均有业务往来；2）",
+                "注：2  铸造材料主营产品包括再生砂、覆膜砂和砂芯，其中再生砂产品既可以直接销售，也作为原材料继续加工成"
+              ],
+              "continuation_required": true,
+              "printed_page_labels": {},
+              "subject_pages": [],
+              "subject_anchor_terms": [],
+              "source_row_dimensions": {},
+              "candidate_pages": [
+                14,
+                16
+              ]
+            }
+          ]
+        },
+        {
+          "chapter_task": "extract_counterparties_and_concentration",
+          "request_scopes": [
+            {
+              "scope_id": "counterparties_and_concentration-01",
+              "field_ids": [
+                "counterparty_relationship",
+                "customer_concentration",
+                "supplier_concentration"
+              ],
+              "pages": [
+                16,
+                17,
+                18
+              ],
+              "section_titles": [
+                "cost_composition",
+                "major_customers_suppliers"
+              ],
+              "anchor_terms": [
+                "主要销售客户"
+              ],
+              "required_headers": [
+                "生产量",
+                "销售量",
+                "库存量"
+              ],
+              "required_units": [
+                "万元",
+                "元"
+              ],
+              "required_footnotes": [
+                "注：2  铸造材料主营产品包括再生砂、覆膜砂和砂芯，其中再生砂产品既可以直接销售，也作为原材料继续加工成"
+              ],
+              "continuation_required": true,
+              "printed_page_labels": {},
+              "subject_pages": [],
+              "subject_anchor_terms": [],
+              "source_row_dimensions": {},
+              "candidate_pages": [
+                17,
+                18
+              ]
+            },
+            {
+              "scope_id": "counterparties_and_concentration-02",
+              "field_ids": [
+                "counterparty_relationship",
+                "customer_concentration"
+              ],
+              "pages": [
+                189
+              ],
+              "section_titles": [
+                "major_customers_suppliers"
+              ],
+              "anchor_terms": [
+                "前五名客户"
+              ],
+              "required_headers": [],
+              "required_units": [],
+              "required_footnotes": [],
+              "continuation_required": false,
+              "printed_page_labels": {},
+              "subject_pages": [],
+              "subject_anchor_terms": [],
+              "source_row_dimensions": {},
+              "candidate_pages": [
+                189
+              ]
+            }
+          ]
+        },
+        {
+          "chapter_task": "extract_business_regime",
+          "request_scopes": [
+            {
+              "scope_id": "business_regime-01",
+              "field_ids": [
+                "business_regime"
+              ],
+              "pages": [
+                16,
+                17,
+                18
+              ],
+              "section_titles": [
+                "cost_composition",
+                "major_customers_suppliers"
+              ],
+              "anchor_terms": [
+                "业务、产品或服务发生重大变化"
+              ],
+              "required_headers": [
+                "生产量",
+                "销售量",
+                "库存量"
+              ],
+              "required_units": [
+                "万元",
+                "元"
+              ],
+              "required_footnotes": [
+                "注：2  铸造材料主营产品包括再生砂、覆膜砂和砂芯，其中再生砂产品既可以直接销售，也作为原材料继续加工成"
+              ],
+              "continuation_required": true,
+              "printed_page_labels": {},
+              "subject_pages": [],
+              "subject_anchor_terms": [],
+              "source_row_dimensions": {},
+              "candidate_pages": [
+                17
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sample_id": "manufacturing-materials-fresh-688295-2025",
+      "content_hash": "10476f0cf2fdc0727c0a2ea9ae6641a1f5170f23a5b408d3154c50b9ef66c1b4",
+      "plan_version": "manufacturing_materials_fresh_cohort.2026-09-13.1",
+      "tasks": [
+        {
+          "chapter_task": "extract_business_overview",
+          "request_scopes": [
+            {
+              "scope_id": "business_overview-01",
+              "field_ids": [
+                "business_overview_source",
+                "explicit_activity"
+              ],
+              "pages": [
+                12
+              ],
+              "section_titles": [
+                "business_model"
+              ],
+              "anchor_terms": [
+                "经营模式"
+              ],
+              "required_headers": [],
+              "required_units": [],
+              "required_footnotes": [],
+              "continuation_required": false,
+              "printed_page_labels": {},
+              "subject_pages": [],
+              "subject_anchor_terms": [],
+              "source_row_dimensions": {},
+              "candidate_pages": [
+                12
+              ]
+            }
+          ]
+        },
+        {
+          "chapter_task": "extract_segment_financials",
+          "request_scopes": [
+            {
+              "scope_id": "segment_financials-01",
+              "field_ids": [
+                "segment_dimension",
+                "operating_revenue",
+                "operating_cost",
+                "gross_margin_reported"
+              ],
+              "pages": [
+                28,
+                29
+              ],
+              "section_titles": [
+                "cost_composition"
+              ],
+              "anchor_terms": [
+                "收入和成本分析"
+              ],
+              "required_headers": [
+                "营业收入",
+                "营业成本",
+                "毛利率",
+                "生产量",
+                "销售量",
+                "库存量",
+                "本期金额"
+              ],
+              "required_units": [
+                "万元"
+              ],
+              "required_footnotes": [],
+              "continuation_required": true,
+              "printed_page_labels": {},
+              "subject_pages": [],
+              "subject_anchor_terms": [],
+              "source_row_dimensions": {},
+              "candidate_pages": [
+                28,
+                29
+              ]
+            },
+            {
+              "scope_id": "segment_financials-02",
+              "field_ids": [
+                "segment_dimension"
+              ],
+              "pages": [
+                257
+              ],
+              "section_titles": [
+                "major_projects"
+              ],
+              "anchor_terms": [
+                "分部信息"
+              ],
+              "required_headers": [],
+              "required_units": [
+                "元"
+              ],
+              "required_footnotes": [],
+              "continuation_required": false,
+              "printed_page_labels": {},
+              "subject_pages": [],
+              "subject_anchor_terms": [],
+              "source_row_dimensions": {},
+              "candidate_pages": [
+                257
+              ]
+            }
+          ]
+        },
+        {
+          "chapter_task": "extract_operating_quantities",
+          "request_scopes": [
+            {
+              "scope_id": "operating_quantities-01",
+              "field_ids": [
+                "production_capacity",
+                "capacity_under_construction",
+                "sales_volume"
+              ],
+              "pages": [
+                14,
+                15,
+                16
+              ],
+              "section_titles": [
+                "structured_hint",
+                "business_model"
+              ],
+              "anchor_terms": [
+                "产能"
+              ],
+              "required_headers": [],
+              "required_units": [],
+              "required_footnotes": [],
+              "continuation_required": true,
+              "printed_page_labels": {},
+              "subject_pages": [],
+              "subject_anchor_terms": [],
+              "source_row_dimensions": {},
+              "candidate_pages": [
+                15
+              ]
+            },
+            {
+              "scope_id": "operating_quantities-02",
+              "field_ids": [
+                "production_volume",
+                "sales_volume",
+                "inventory_volume"
+              ],
+              "pages": [
+                28,
+                29
+              ],
+              "section_titles": [
+                "cost_composition"
+              ],
+              "anchor_terms": [
+                "产销量"
+              ],
+              "required_headers": [
+                "营业收入",
+                "营业成本",
+                "毛利率",
+                "生产量",
+                "销售量",
+                "库存量",
+                "本期金额"
+              ],
+              "required_units": [
+                "万元"
+              ],
+              "required_footnotes": [],
+              "continuation_required": true,
+              "printed_page_labels": {},
+              "subject_pages": [],
+              "subject_anchor_terms": [],
+              "source_row_dimensions": {},
+              "candidate_pages": [
+                29
+              ]
+            }
+          ]
+        },
+        {
+          "chapter_task": "extract_material_inputs",
+          "request_scopes": [
+            {
+              "scope_id": "material_inputs-01",
+              "field_ids": [
+                "material_input"
+              ],
+              "pages": [
+                25,
+                26
+              ],
+              "section_titles": [
+                "structured_hint",
+                "principal_business"
+              ],
+              "anchor_terms": [
+                "主要原材料"
+              ],
+              "required_headers": [
+                "营业收入",
+                "毛利率"
+              ],
+              "required_units": [
+                "万元"
+              ],
+              "required_footnotes": [],
+              "continuation_required": true,
+              "printed_page_labels": {},
+              "subject_pages": [],
+              "subject_anchor_terms": [],
+              "source_row_dimensions": {},
+              "candidate_pages": [
+                25
+              ]
+            }
+          ]
+        },
+        {
+          "chapter_task": "extract_counterparties_and_concentration",
+          "request_scopes": [
+            {
+              "scope_id": "counterparties_and_concentration-01",
+              "field_ids": [
+                "counterparty_relationship",
+                "customer_concentration",
+                "supplier_concentration"
+              ],
+              "pages": [
+                28,
+                29,
+                30
+              ],
+              "section_titles": [
+                "cost_composition",
+                "major_customers_suppliers"
+              ],
+              "anchor_terms": [
+                "主要销售客户"
+              ],
+              "required_headers": [
+                "营业收入",
+                "营业成本",
+                "毛利率",
+                "生产量",
+                "销售量",
+                "库存量",
+                "本期金额"
+              ],
+              "required_units": [
+                "万元"
+              ],
+              "required_footnotes": [],
+              "continuation_required": true,
+              "printed_page_labels": {},
+              "subject_pages": [],
+              "subject_anchor_terms": [],
+              "source_row_dimensions": {},
+              "candidate_pages": [
+                29,
+                30
+              ]
+            },
+            {
+              "scope_id": "counterparties_and_concentration-02",
+              "field_ids": [
+                "counterparty_relationship",
+                "supplier_concentration"
+              ],
+              "pages": [
+                31
+              ],
+              "section_titles": [
+                "major_customers_suppliers"
+              ],
+              "anchor_terms": [
+                "前五名供应商"
+              ],
+              "required_headers": [],
+              "required_units": [
+                "万元"
+              ],
+              "required_footnotes": [],
+              "continuation_required": false,
+              "printed_page_labels": {},
+              "subject_pages": [],
+              "subject_anchor_terms": [],
+              "source_row_dimensions": {},
+              "candidate_pages": [
+                31
+              ]
+            }
+          ]
+        },
+        {
+          "chapter_task": "extract_business_regime",
+          "request_scopes": [
+            {
+              "scope_id": "business_regime-01",
+              "field_ids": [
+                "business_regime"
+              ],
+              "pages": [
+                28,
+                29
+              ],
+              "section_titles": [
+                "cost_composition"
+              ],
+              "anchor_terms": [
+                "主营业务"
+              ],
+              "required_headers": [
+                "营业收入",
+                "营业成本",
+                "毛利率",
+                "生产量",
+                "销售量",
+                "库存量",
+                "本期金额"
+              ],
+              "required_units": [
+                "万元"
+              ],
+              "required_footnotes": [],
+              "continuation_required": true,
+              "printed_page_labels": {},
+              "subject_pages": [],
+              "subject_anchor_terms": [],
+              "source_row_dimensions": {},
+              "candidate_pages": [
+                29
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sample_id": "manufacturing-materials-fresh-920576-2025",
+      "content_hash": "af9ca3edfd551b6c2ba0be2812e1027a64edd248a5a18d29a413850aa354cea7",
+      "plan_version": "manufacturing_materials_fresh_cohort.2026-09-13.1",
+      "tasks": [
+        {
+          "chapter_task": "extract_business_overview",
+          "request_scopes": [
+            {
+              "scope_id": "business_overview-01",
+              "field_ids": [
+                "business_overview_source",
+                "explicit_activity"
+              ],
+              "pages": [
+                86
+              ],
+              "section_titles": [
+                "principal_business"
+              ],
+              "anchor_terms": [
+                "主要业务"
+              ],
+              "required_headers": [],
+              "required_units": [],
+              "required_footnotes": [],
+              "continuation_required": false,
+              "printed_page_labels": {},
+              "subject_pages": [],
+              "subject_anchor_terms": [],
+              "source_row_dimensions": {},
+              "candidate_pages": [
+                86
+              ]
+            }
+          ]
+        },
+        {
+          "chapter_task": "extract_segment_financials",
+          "request_scopes": [
+            {
+              "scope_id": "segment_financials-01",
+              "field_ids": [
+                "segment_dimension",
+                "operating_revenue",
+                "operating_cost",
+                "gross_margin_reported"
+              ],
+              "pages": [
+                19
+              ],
+              "section_titles": [
+                "principal_business"
+              ],
+              "anchor_terms": [
+                "分产品"
+              ],
+              "required_headers": [
+                "营业收入",
+                "营业成本",
+                "毛利率"
+              ],
+              "required_units": [
+                "元"
+              ],
+              "required_footnotes": [],
+              "continuation_required": false,
+              "printed_page_labels": {},
+              "subject_pages": [],
+              "subject_anchor_terms": [],
+              "source_row_dimensions": {},
+              "candidate_pages": [
+                19
+              ]
+            },
+            {
+              "scope_id": "segment_financials-02",
+              "field_ids": [
+                "segment_dimension"
+              ],
+              "pages": [
+                151
+              ],
+              "section_titles": [
+                "major_projects"
+              ],
+              "anchor_terms": [
+                "分部信息"
+              ],
+              "required_headers": [],
+              "required_units": [],
+              "required_footnotes": [],
+              "continuation_required": false,
+              "printed_page_labels": {},
+              "subject_pages": [],
+              "subject_anchor_terms": [],
+              "source_row_dimensions": {},
+              "candidate_pages": [
+                151
+              ]
+            }
+          ]
+        },
+        {
+          "chapter_task": "extract_operating_quantities",
+          "request_scopes": [
+            {
+              "scope_id": "operating_quantities-01",
+              "field_ids": [
+                "production_capacity"
+              ],
+              "pages": [
+                47,
+                48,
+                49
+              ],
+              "section_titles": [
+                "structured_hint"
+              ],
+              "anchor_terms": [
+                "是否自愿披露"
+              ],
+              "required_headers": [],
+              "required_units": [
+                "股"
+              ],
+              "required_footnotes": [],
+              "continuation_required": true,
+              "printed_page_labels": {},
+              "subject_pages": [],
+              "subject_anchor_terms": [],
+              "source_row_dimensions": {},
+              "candidate_pages": [
+                48
+              ]
+            }
+          ]
+        },
+        {
+          "chapter_task": "extract_material_inputs",
+          "request_scopes": [
+            {
+              "scope_id": "material_inputs-01",
+              "field_ids": [
+                "material_input"
+              ],
+              "pages": [
+                29,
+                30
+              ],
+              "section_titles": [
+                "major_projects"
+              ],
+              "anchor_terms": [
+                "原材料采购"
+              ],
+              "required_headers": [],
+              "required_units": [],
+              "required_footnotes": [],
+              "continuation_required": true,
+              "printed_page_labels": {},
+              "subject_pages": [],
+              "subject_anchor_terms": [],
+              "source_row_dimensions": {},
+              "candidate_pages": [
+                30
+              ]
+            }
+          ]
+        },
+        {
+          "chapter_task": "extract_counterparties_and_concentration",
+          "request_scopes": [
+            {
+              "scope_id": "counterparties_and_concentration-01",
+              "field_ids": [
+                "counterparty_relationship"
+              ],
+              "pages": [
+                19,
+                20
+              ],
+              "section_titles": [
+                "principal_business",
+                "major_customers_suppliers"
+              ],
+              "anchor_terms": [
+                "主要客户情况"
+              ],
+              "required_headers": [
+                "营业收入",
+                "营业成本",
+                "毛利率"
+              ],
+              "required_units": [
+                "元"
+              ],
+              "required_footnotes": [],
+              "continuation_required": true,
+              "printed_page_labels": {},
+              "subject_pages": [],
+              "subject_anchor_terms": [],
+              "source_row_dimensions": {},
+              "candidate_pages": [
+                20
+              ]
+            },
+            {
+              "scope_id": "counterparties_and_concentration-02",
+              "field_ids": [
+                "counterparty_relationship",
+                "customer_concentration",
+                "supplier_concentration"
+              ],
+              "pages": [
+                30,
+                31
+              ],
+              "section_titles": [
+                "major_projects",
+                "structured_hint"
+              ],
+              "anchor_terms": [
+                "供应商集中度"
+              ],
+              "required_headers": [],
+              "required_units": [],
+              "required_footnotes": [],
+              "continuation_required": true,
+              "printed_page_labels": {},
+              "subject_pages": [],
+              "subject_anchor_terms": [],
+              "source_row_dimensions": {},
+              "candidate_pages": [
+                31
+              ]
+            }
+          ]
+        },
+        {
+          "chapter_task": "extract_business_regime",
+          "request_scopes": [
+            {
+              "scope_id": "business_regime-01",
+              "field_ids": [
+                "business_regime"
+              ],
+              "pages": [
+                25,
+                26,
+                27
+              ],
+              "section_titles": [
+                "segment_information"
+              ],
+              "anchor_terms": [
+                "合并报表范围的变化情况"
+              ],
+              "required_headers": [
+                "营业收入",
+                "毛利率"
+              ],
+              "required_units": [],
+              "required_footnotes": [],
+              "continuation_required": true,
+              "printed_page_labels": {},
+              "subject_pages": [],
+              "subject_anchor_terms": [],
+              "source_row_dimensions": {},
+              "candidate_pages": [
+                26
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

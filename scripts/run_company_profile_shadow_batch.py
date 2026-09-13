@@ -22,6 +22,7 @@ from research.company_profile.shadow_batch_audit import (
     write_shadow_batch_audit_artifact,
 )
 from research.company_profile.shadow_batch_service import (
+    FreshCohortAdmissionContract,
     ManufacturingMaterialsShadowBatchService,
     ShadowBatchStore,
     ShadowReplayContract,
@@ -29,6 +30,7 @@ from research.company_profile.shadow_batch_service import (
     load_shadow_batch_result,
     load_shadow_report_result,
     validate_external_operating_ownership_replay_proof,
+    validate_fresh_cohort_admission,
     validate_operating_ownership_replay_proof,
     validate_segment_financial_closure_audit,
     validate_segment_heading_replay_proof,
@@ -48,9 +50,18 @@ from research.company_profile.shadow_evidence import (
     load_shadow_scope_refinement_audit,
     write_shadow_evidence_artifact,
 )
+from research.company_profile.stage5 import (
+    Stage5EvidencePreparer,
+    load_stage5_evidence_plan,
+    load_stage5_sample_manifest,
+)
 from scripts.run_company_profile_stage5_slice import (
+    STAGE5_DEFAULT_EXTRACT_MAX_OUTPUT_TOKENS,
+    STAGE5_DEFAULT_VERIFY_MAX_OUTPUT_TOKENS,
     _provider_for_scope,
     _ProviderCallBudget,
+    _scope_output_token_budget,
+    _validate_provider_route,
 )
 
 SHADOW_PRIMARY_PROFILE = "semantic_extraction__scorpio_gemini"
@@ -58,6 +69,41 @@ SHADOW_EXTRACT_MAX_OUTPUT_TOKENS = 20_000
 SHADOW_VERIFY_MAX_OUTPUT_TOKENS = 18_000
 SHADOW_TIMEOUT_SECONDS = 300.0
 SHADOW_MAX_PROVIDER_CALLS = 600
+FRESH_COHORT_BATCH_ID = "manufacturing-materials-fresh-cohort-four-pool-20260913-a"
+FRESH_COHORT_ROUTE = "semantic_extraction"
+FRESH_COHORT_MAX_PROVIDER_CALLS = 408
+FRESH_COHORT_CONTRACT = FreshCohortAdmissionContract(
+    batch_id=FRESH_COHORT_BATCH_ID,
+    sample_manifest_revision=(
+        "manufacturing-materials-fresh-cohort-manifest-20260913-v1"
+    ),
+    sample_manifest_sha256=(
+        "ed6774ae359357e755edfc62952908d35659719158c8f231ab0c64295ebe3abe"
+    ),
+    evidence_plan_version=(
+        "manufacturing_materials_fresh_cohort.2026-09-13.1"
+    ),
+    evidence_plan_sha256=(
+        "04e0ca7491942218837cdfcf6d250e45f2348302b4382dad5a2a1e311d977a65"
+    ),
+    preparation_audit_sha256=(
+        "57272236f137ae753cb5a5102973af4c18894670fae869c0967ffd74a74b6978"
+    ),
+    preparation_audit_hash=(
+        "3fcba64c30ac29f93d48fe5caa46bd751078e7c97be6fbb16c9d57aa5550849a"
+    ),
+    sample_ids=(
+        "manufacturing-materials-fresh-000422-2025",
+        "manufacturing-materials-fresh-001296-2025",
+        "manufacturing-materials-fresh-688295-2025",
+        "manufacturing-materials-fresh-920576-2025",
+    ),
+    primary_logical_profile=FRESH_COHORT_ROUTE,
+    extract_base_tokens=STAGE5_DEFAULT_EXTRACT_MAX_OUTPUT_TOKENS,
+    verify_base_tokens=STAGE5_DEFAULT_VERIFY_MAX_OUTPUT_TOKENS,
+    timeout_seconds=SHADOW_TIMEOUT_SECONDS,
+    max_provider_calls=FRESH_COHORT_MAX_PROVIDER_CALLS,
+)
 REFINED_SHADOW_REPLAY_CONTRACT = ShadowReplayContract(
     batch_id="manufacturing-materials-shadow-refined-gemini-20260910-a",
     sample_manifest_hash=(
@@ -427,6 +473,8 @@ def build_parser() -> argparse.ArgumentParser:
             "segment-heading-semantic-replay",
             "operating-ownership-semantic-replay",
             "external-operating-ownership-semantic-replay",
+            "fresh-cohort-admission",
+            "fresh-cohort-semantic-run",
         ),
         required=True,
     )
@@ -476,6 +524,8 @@ def build_parser() -> argparse.ArgumentParser:
 
 def main(argv: Sequence[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
+    if args.mode in {"fresh-cohort-admission", "fresh-cohort-semantic-run"}:
+        return _run_fresh_cohort(args)
     _reject_superseded_replay_request(mode=args.mode, batch_id=args.batch_id)
     manifest = load_shadow_sample_manifest(
         args.sample_manifest, repository_root=ROOT_DIR
@@ -1180,6 +1230,197 @@ def main(argv: Sequence[str] | None = None) -> int:
         )
     )
     return 0
+
+
+def _run_fresh_cohort(args: argparse.Namespace) -> int:
+    required = {
+        "preparation audit": args.preparation_audit,
+        "admission receipt": args.admission_receipt,
+        "output root": args.output_root,
+        "batch id": args.batch_id,
+    }
+    missing = [name for name, value in required.items() if value is None]
+    if missing:
+        raise ValueError("fresh-cohort-semantic-run requires " + ", ".join(missing))
+
+    manifest = load_stage5_sample_manifest(
+        args.sample_manifest, repository_root=ROOT_DIR
+    )
+    plan = load_stage5_evidence_plan(args.evidence_plan)
+    prepared = {
+        asset.sample_id: Stage5EvidencePreparer().prepare_report(
+            manifest=manifest, evidence_plan=plan, sample_id=asset.sample_id
+        )
+        for asset in manifest.reports
+    }
+    preparation_audit = json.loads(
+        args.preparation_audit.read_text(encoding="utf-8")
+    )
+    manifest_sha256 = _file_sha256(args.sample_manifest)
+    evidence_plan_sha256 = _file_sha256(args.evidence_plan)
+    preparation_audit_sha256 = _file_sha256(args.preparation_audit)
+    validate_fresh_cohort_admission(
+        contract=FRESH_COHORT_CONTRACT,
+        batch_id=args.batch_id,
+        primary_logical_profile=args.provider_route,
+        dynamic_output_tokens=True,
+        extract_base_tokens=args.extract_max_output_tokens,
+        verify_base_tokens=args.verify_max_output_tokens,
+        timeout_seconds=args.timeout_seconds,
+        max_provider_calls=args.max_provider_calls,
+        manifest=manifest,
+        manifest_sha256=manifest_sha256,
+        evidence_plan=plan,
+        evidence_plan_sha256=evidence_plan_sha256,
+        preparation_audit=preparation_audit,
+        preparation_audit_sha256=preparation_audit_sha256,
+        prepared=prepared,
+        output_root=args.output_root,
+    )
+    from utils.config_manager import config_manager
+    from utils.llm import (
+        LlmClient,
+        load_project_environment,
+        shutdown_shared_llm_resources,
+    )
+
+    load_project_environment(ROOT_DIR, override=False)
+    llm_config = config_manager.get_llm_config()
+    route_receipt = _validate_fresh_cohort_route(llm_config, args.provider_route)
+    scope_budgets = []
+    for sample_id in FRESH_COHORT_CONTRACT.sample_ids:
+        for scope in prepared[sample_id]:
+            selected = _scope_output_token_budget(
+                scope,
+                extract_base=args.extract_max_output_tokens,
+                verify_base=args.verify_max_output_tokens,
+            )
+            scope_budgets.append(
+                {
+                    "sample_id": sample_id,
+                    "scope_id": scope.scope_id,
+                    "chapter_task": scope.chapter_task.value,
+                    "tier": selected.tier,
+                    "extract_max_output_tokens": selected.extract,
+                    "verify_max_output_tokens": selected.verify,
+                    "page_count": len(scope.page_contexts),
+                    "evidence_count": len(scope.evidence_bundle),
+                    "field_count": len(scope.field_ids),
+                    "text_chars": sum(len(page.text) for page in scope.page_contexts),
+                }
+            )
+    receipt_payload = {
+        "schema_version": "company_profile_fresh_cohort_admission_receipt.v1",
+        "batch_id": args.batch_id,
+        "sample_manifest_sha256": manifest_sha256,
+        "evidence_plan_sha256": evidence_plan_sha256,
+        "preparation_audit_sha256": preparation_audit_sha256,
+        "output_absent_before_provider": True,
+        "provider_calls": 0,
+        "logical_route": route_receipt,
+        "dynamic_output_tokens": True,
+        "scope_budgets": scope_budgets,
+        "production_authorization": "not_authorized",
+    }
+    receipt_payload["receipt_hash"] = _json_payload_hash(receipt_payload)
+    _write_json_immutable(args.admission_receipt, receipt_payload)
+    if args.mode == "fresh-cohort-admission":
+        print(
+            json.dumps(
+                {
+                    "batch_id": args.batch_id,
+                    "admission_receipt": str(args.admission_receipt.resolve()),
+                    "scope_count": len(scope_budgets),
+                    "provider_calls": 0,
+                    "production_authorization": "not_authorized",
+                },
+                ensure_ascii=False,
+                indent=2,
+            )
+        )
+        return 0
+
+    runner = asyncio.Runner()
+    client = LlmClient(llm_config)
+    budget = _ProviderCallBudget(maximum=args.max_provider_calls)
+    try:
+        result, output_path = ManufacturingMaterialsShadowBatchService().run_fresh_cohort(
+            batch_id=args.batch_id,
+            primary_logical_profile=args.provider_route,
+            manifest=manifest,
+            sample_manifest_hash=manifest_sha256,
+            evidence_plan=plan,
+            evidence_plan_hash=evidence_plan_sha256,
+            prepared=prepared,
+            store=ShadowBatchStore(args.output_root),
+            provider_factory=lambda scope: _provider_for_scope(
+                scope,
+                client=client,
+                runner=runner,
+                route=args.provider_route,
+                max_output_tokens=args.extract_max_output_tokens,
+                verify_max_output_tokens=args.verify_max_output_tokens,
+                dynamic_output_tokens=True,
+                timeout_seconds=args.timeout_seconds,
+                budget=budget,
+            ),
+        )
+    finally:
+        runner.run(client.close())
+        runner.run(shutdown_shared_llm_resources())
+        runner.close()
+
+    review = build_shadow_review_package(result, batch_directory=output_path)
+    readiness = build_shadow_readiness_audit(
+        result,
+        review,
+        batch_directory=output_path,
+        prepared_report_count=len(prepared),
+        audit_id=f"{args.batch_id}-readiness-v1",
+    )
+    write_shadow_batch_audit_artifact(output_path / "review-package.json", review)
+    write_shadow_batch_audit_artifact(output_path / "readiness-audit.json", readiness)
+    print(
+        json.dumps(
+            {
+                "batch_id": result.batch_id,
+                "output_path": str(output_path),
+                "completed_report_count": result.completed_report_count,
+                "failed_report_count": result.failed_report_count,
+                "provider_calls": budget.used,
+                "readiness_decision": readiness.readiness_decision,
+                "production_authorization": "not_authorized",
+            },
+            ensure_ascii=False,
+            indent=2,
+        )
+    )
+    return 0
+
+
+def _validate_fresh_cohort_route(llm_config: object, route: str) -> dict[str, object]:
+    _validate_provider_route(llm_config, route)
+    description = llm_config.describe_logical_profile(route)
+    if len(description.source_labels) != 4:
+        raise ValueError("fresh cohort route must resolve to exactly four model sources")
+    return description.safe_dict()
+
+
+def _json_payload_hash(payload: dict[str, object]) -> str:
+    encoded = json.dumps(
+        payload, ensure_ascii=False, sort_keys=True, separators=(",", ":")
+    ).encode("utf-8")
+    return hashlib.sha256(encoded).hexdigest()
+
+
+def _write_json_immutable(path: Path, payload: dict[str, object]) -> None:
+    content = json.dumps(payload, ensure_ascii=False, indent=2) + "\n"
+    if path.exists():
+        if path.read_text(encoding="utf-8") != content:
+            raise RuntimeError(f"immutable fresh cohort artifact mismatch: {path}")
+        return
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(content, encoding="utf-8")
 
 
 def _file_sha256(path: Path) -> str:

@@ -1,0 +1,487 @@
+{
+  "schema_version": "company_profile_fresh_cohort_empirical_audit.v1",
+  "audit_id": "manufacturing-materials-fresh-cohort-empirical-20260913-a",
+  "batch_id": "manufacturing-materials-fresh-cohort-four-pool-20260913-a",
+  "source_batch_result_hash": "3f5afc25a161661011d37798d9ede43ad30cf41c4258c1706bb3c6de8e552c63",
+  "bindings": {
+    "sample_manifest_sha256": "ed6774ae359357e755edfc62952908d35659719158c8f231ab0c64295ebe3abe",
+    "evidence_plan_sha256": "04e0ca7491942218837cdfcf6d250e45f2348302b4382dad5a2a1e311d977a65",
+    "batch_manifest_sha256": "2c47eccdba83986df7894d45d15167b96743e258f7bb7d46fa971ea97339ab78",
+    "review_package_sha256": "02a213eb268fe1dc9c8c9d2cd0aff3b99fe357a9fdbcd44d4e97c61569f6709e",
+    "readiness_audit_sha256": "2edb9a5779a0f6882e3059d32c8117d25e2cef3b03a0d034f690c92e0805203c",
+    "source_review_resolution_sha256": "3d7967ce149c2ebc9a6bf544923e6fd48184b8b60d5c7bb7d4362d9ac9e93dfc",
+    "source_review_resolution_hash": "73de4f5bebf6b4f74a181f3f5a2e0aedc68bad03733fa909a791806bfd130be9",
+    "connectivity_preflight_sha256": "3a1710496a0bcdf68948c934557f5bc8d5322ade1293833d9918d7cfdbd233d6",
+    "prior_authoritative_manifest": {
+      "path": "var/company_profile_stage5/20260907/run-stage55-closure-four-20260907-a/manifest.json",
+      "sha256": "00fa20045d4df037a8984cff4b56af3f19ac533f4c4b9e311e7f130bf5158687"
+    }
+  },
+  "execution": {
+    "frozen_report_count": 4,
+    "persisted_report_count": 4,
+    "scope_count": 34,
+    "completed_scope_count": 18,
+    "provider_call_count": 71,
+    "provider_successful_call_count": 69,
+    "provider_failed_call_count": 2,
+    "physical_attempt_count": 75,
+    "total_latency_ms": 4374612,
+    "total_input_tokens": 501437,
+    "total_output_tokens": 475374,
+    "accepted_record_count": 362,
+    "evidence_traceability_rate": 1.0,
+    "single_provider_bearing_batch": true,
+    "targeted_reruns": 0,
+    "spliced_reports": 0
+  },
+  "reports": [
+    {
+      "sample_id": "manufacturing-materials-fresh-000422-2025",
+      "company_name": "湖北宜化化工股份有限公司",
+      "report_status": "failed",
+      "benchmark_decision": "hold",
+      "scope_count": 8,
+      "completed_scope_count": 3,
+      "accepted_record_count": 92,
+      "accepted_unclear_subject_count": 0,
+      "human_review_item_count": 14,
+      "review_package_row_count": 24,
+      "provider_call_count": 16,
+      "provider_failed_call_count": 1,
+      "output_sha256": "430a62340bb55de8a9cbacc9c119a88a5012747c54c37ac1d93c81d63b19424a"
+    },
+    {
+      "sample_id": "manufacturing-materials-fresh-001296-2025",
+      "company_name": "重庆长江造型材料（集团）股份有限公司",
+      "report_status": "failed",
+      "benchmark_decision": "hold",
+      "scope_count": 9,
+      "completed_scope_count": 4,
+      "accepted_record_count": 134,
+      "accepted_unclear_subject_count": 1,
+      "human_review_item_count": 17,
+      "review_package_row_count": 27,
+      "provider_call_count": 20,
+      "provider_failed_call_count": 1,
+      "output_sha256": "9e0fff3d200255217954d8179ec2ebc3f0f188e08017d2209072dc6eb1f7794d"
+    },
+    {
+      "sample_id": "manufacturing-materials-fresh-688295-2025",
+      "company_name": "中复神鹰碳纤维股份有限公司",
+      "report_status": "hold",
+      "benchmark_decision": "hold",
+      "scope_count": 9,
+      "completed_scope_count": 5,
+      "accepted_record_count": 85,
+      "accepted_unclear_subject_count": 0,
+      "human_review_item_count": 5,
+      "review_package_row_count": 14,
+      "provider_call_count": 19,
+      "provider_failed_call_count": 0,
+      "output_sha256": "aad9a0f4ccfbe07f80292e64606c5b897b74d64106f8a5556b71e4de4d3fbd3b"
+    },
+    {
+      "sample_id": "manufacturing-materials-fresh-920576-2025",
+      "company_name": "西安天力金属复合材料股份有限公司",
+      "report_status": "hold",
+      "benchmark_decision": "hold",
+      "scope_count": 8,
+      "completed_scope_count": 6,
+      "accepted_record_count": 51,
+      "accepted_unclear_subject_count": 0,
+      "human_review_item_count": 2,
+      "review_package_row_count": 8,
+      "provider_call_count": 16,
+      "provider_failed_call_count": 0,
+      "output_sha256": "141f3012eaf34ebe148eeaf92d55b88df2ca666bc5441e633027190e592d84fa"
+    }
+  ],
+  "model_attempts": [
+    {
+      "source_label": "deepseek:deepseek-flash",
+      "attempt_count": 19,
+      "success_count": 17,
+      "failure_count": 2,
+      "latency_ms": 584590
+    },
+    {
+      "source_label": "scorpio:gemini-3.8-flash-high",
+      "attempt_count": 19,
+      "success_count": 18,
+      "failure_count": 1,
+      "latency_ms": 365785
+    },
+    {
+      "source_label": "scorpio:grok-4.6",
+      "attempt_count": 19,
+      "success_count": 18,
+      "failure_count": 1,
+      "latency_ms": 2107902
+    },
+    {
+      "source_label": "zai:glm-5.3-flash",
+      "attempt_count": 18,
+      "success_count": 16,
+      "failure_count": 2,
+      "latency_ms": 1906671
+    }
+  ],
+  "trace_usage": [
+    {
+      "source_label": "deepseek:deepseek-flash",
+      "trace_count": 18,
+      "success_count": 17,
+      "failure_count": 1,
+      "input_tokens": 81086,
+      "output_tokens": 131285,
+      "latency_ms": 529533
+    },
+    {
+      "source_label": "scorpio:gemini-3.8-flash-high",
+      "trace_count": 19,
+      "success_count": 18,
+      "failure_count": 1,
+      "input_tokens": 148021,
+      "output_tokens": 113543,
+      "latency_ms": 358777
+    },
+    {
+      "source_label": "scorpio:grok-4.6",
+      "trace_count": 18,
+      "success_count": 18,
+      "failure_count": 0,
+      "input_tokens": 140231,
+      "output_tokens": 139237,
+      "latency_ms": 2059792
+    },
+    {
+      "source_label": "zai:glm-5.3-flash",
+      "trace_count": 16,
+      "success_count": 16,
+      "failure_count": 0,
+      "input_tokens": 132099,
+      "output_tokens": 91309,
+      "latency_ms": 1426510
+    }
+  ],
+  "dynamic_token_policy": {
+    "enabled": true,
+    "scope_count": 34,
+    "tier_counts": {
+      "base": 34
+    },
+    "extract_base_tokens": 20000,
+    "verify_base_tokens": 18000,
+    "provider_reported_over_budget_valid_response_count": 3,
+    "over_budget_valid_responses": [
+      {
+        "sample_id": "manufacturing-materials-fresh-001296-2025",
+        "scope_id": "segment_financials-02",
+        "call_type": "extract",
+        "source_label": "scorpio:gemini-3.8-flash-high",
+        "requested_output_tokens": 20000,
+        "reported_output_tokens": 36236,
+        "warning_codes": [
+          "provider_output_budget_exceeded",
+          "provider_output_budget_exceeded_valid_response"
+        ]
+      },
+      {
+        "sample_id": "manufacturing-materials-fresh-001296-2025",
+        "scope_id": "counterparties_and_concentration-01",
+        "call_type": "verify",
+        "source_label": "scorpio:gemini-3.8-flash-high",
+        "requested_output_tokens": 18000,
+        "reported_output_tokens": 20751,
+        "warning_codes": [
+          "provider_output_budget_exceeded",
+          "provider_output_budget_exceeded_valid_response"
+        ]
+      },
+      {
+        "sample_id": "manufacturing-materials-fresh-920576-2025",
+        "scope_id": "segment_financials-01",
+        "call_type": "verify",
+        "source_label": "deepseek:deepseek-flash",
+        "requested_output_tokens": 18000,
+        "reported_output_tokens": 20646,
+        "warning_codes": [
+          "provider_output_budget_exceeded",
+          "provider_output_budget_exceeded_valid_response"
+        ]
+      }
+    ],
+    "conclusion": "Dynamic selection executed, but all 34 frozen scopes were below escalation thresholds and stayed on the base tier. Three providers reported valid responses above the requested output budget; the gateway preserved them with explicit warnings."
+  },
+  "typed_route_failures": [
+    {
+      "sample_id": "manufacturing-materials-fresh-000422-2025",
+      "scope_id": "segment_financials-02",
+      "call_type": "extract",
+      "error_code": "provider_unavailable",
+      "error_detail": "LLM provider request timed out",
+      "attempts": [
+        {
+          "source_label": "zai:glm-5.3-flash",
+          "selected_profile": "semantic_extraction__zai",
+          "model": "glm-5.3-flash",
+          "attempt_sequence": 1,
+          "request_id": "b3b26e1b1a1d4038908f3250959b1414",
+          "error_code": "transient_transport_error",
+          "attempt_count": 2,
+          "latency_ms": 240068,
+          "attempt_failures": [
+            {
+              "attempt_sequence": 1,
+              "error_code": "schema_validation_error"
+            },
+            {
+              "attempt_sequence": 2,
+              "error_code": "transient_transport_error",
+              "transport_error_type": "client_attempt_timeout",
+              "transport_phase": "request",
+              "transport_exception_type": "TimeoutError"
+            }
+          ]
+        },
+        {
+          "source_label": "scorpio:grok-4.6",
+          "selected_profile": "semantic_extraction__scorpio_grok",
+          "model": "grok-4.6",
+          "attempt_sequence": 2,
+          "request_id": "0aa2ea702a694b3498d47224eb5c1a64",
+          "error_code": "transient_transport_error",
+          "attempt_count": 1,
+          "latency_ms": 48077,
+          "attempt_failures": [
+            {
+              "attempt_sequence": 1,
+              "error_code": "transient_transport_error",
+              "transport_error_type": "client_attempt_timeout",
+              "transport_phase": "request",
+              "transport_exception_type": "TimeoutError"
+            }
+          ]
+        },
+        {
+          "source_label": "deepseek:deepseek-flash",
+          "selected_profile": "semantic_extraction__deepseek",
+          "model": "deepseek-flash",
+          "attempt_sequence": 3,
+          "request_id": "c9b29e8d40c945ecb09d5d5216236dff",
+          "error_code": "transient_transport_error",
+          "attempt_count": 1,
+          "latency_ms": 6983,
+          "attempt_failures": [
+            {
+              "attempt_sequence": 1,
+              "error_code": "transient_transport_error",
+              "transport_error_type": "client_attempt_timeout",
+              "transport_phase": "request",
+              "transport_exception_type": "TimeoutError"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sample_id": "manufacturing-materials-fresh-001296-2025",
+      "scope_id": "material_inputs-01",
+      "call_type": "verify",
+      "error_code": "provider_unavailable",
+      "error_detail": "LLM provider request timed out",
+      "attempts": [
+        {
+          "source_label": "zai:glm-5.3-flash",
+          "selected_profile": "semantic_extraction__zai",
+          "model": "glm-5.3-flash",
+          "attempt_sequence": 1,
+          "request_id": "dad376a21da544a095c0865e3e917482",
+          "error_code": "transient_transport_error",
+          "attempt_count": 1,
+          "latency_ms": 240073,
+          "attempt_failures": [
+            {
+              "attempt_sequence": 1,
+              "error_code": "transient_transport_error",
+              "transport_error_type": "client_attempt_timeout",
+              "transport_phase": "request",
+              "transport_exception_type": "TimeoutError"
+            }
+          ]
+        },
+        {
+          "source_label": "deepseek:deepseek-flash",
+          "selected_profile": "semantic_extraction__deepseek",
+          "model": "deepseek-flash",
+          "attempt_sequence": 2,
+          "request_id": "96ad705b1b94498784a64cdeaceb83f6",
+          "error_code": "transient_transport_error",
+          "attempt_count": 1,
+          "latency_ms": 48055,
+          "attempt_failures": [
+            {
+              "attempt_sequence": 1,
+              "error_code": "transient_transport_error",
+              "transport_error_type": "client_attempt_timeout",
+              "transport_phase": "request",
+              "transport_exception_type": "TimeoutError"
+            }
+          ]
+        },
+        {
+          "source_label": "scorpio:gemini-3.8-flash-high",
+          "selected_profile": "semantic_extraction__scorpio_gemini",
+          "model": "gemini-3.8-flash-high",
+          "attempt_sequence": 3,
+          "request_id": "8c97d5227bf44c59bd5737c87cb1f3ea",
+          "error_code": "transient_transport_error",
+          "attempt_count": 1,
+          "latency_ms": 6994,
+          "attempt_failures": [
+            {
+              "attempt_sequence": 1,
+              "error_code": "transient_transport_error",
+              "transport_error_type": "client_attempt_timeout",
+              "transport_phase": "request",
+              "transport_exception_type": "TimeoutError"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "route_failure_conclusion": "Both failures are bounded logical-route deadline exhaustion: the first model consumed about 240 seconds and later models inherited only about 60 and 7 seconds. DNS/TLS preflight succeeded for Scorpio, ZAI, and DeepSeek.",
+  "source_review": {
+    "review_row_count": 73,
+    "category_counts": {
+      "chapter_sample": 19,
+      "blocker": 16,
+      "unresolved": 38
+    },
+    "resolved_row_count": 73,
+    "outcome_counts": {
+      "correct": 73
+    },
+    "chapter_sample_count": 19,
+    "chapter_sample_correct_count": 19,
+    "sampled_precision": 1.0,
+    "critical_semantic_error_count": 0,
+    "unresolved_human_review_counts": [
+      14,
+      17,
+      5,
+      2
+    ],
+    "unresolved_review_median": 9.5,
+    "unresolved_review_p90": 17.0
+  },
+  "fixed_defect_recurrence": {
+    "risk_only_business_overview_acceptance": {
+      "accepted_overview_count_evaluated": 3,
+      "recurrence_count": 0,
+      "result": "not_observed",
+      "notes": "湖北宜化、长江材料、天力复合的 accepted overview all contain substantive principal-business text. 中复神鹰 has a substantive source but no accepted overview, which is a false negative rather than recurrence."
+    },
+    "non_owner_legal_empty_material_or_segment_coverage": {
+      "legal_empty_count_evaluated": 2,
+      "recurrence_count": 0,
+      "result": "not_observed",
+      "notes": "The two segment legal-empty conclusions (中复神鹰 page 257; 天力复合 page 151) are bound to field-owning segment Evidence. No material legal-empty conclusion was accepted."
+    },
+    "unsupported_english_business_event_name": {
+      "accepted_business_event_count_evaluated": 13,
+      "recurrence_count": 0,
+      "result": "not_observed",
+      "notes": "English values occur only in the canonical event_type field. Accepted source_native.name values are null or source-supported Chinese; no unsupported English source-native name was accepted."
+    },
+    "scope_limit": "Zero recurrence is an observation for these four frozen reports only, not an industry-wide correctness claim."
+  },
+  "observed_issue_families": [
+    {
+      "priority": "P1",
+      "code": "bounded_failover_deadline_allocation",
+      "affected_scopes": [
+        "manufacturing-materials-fresh-000422-2025:segment_financials-02",
+        "manufacturing-materials-fresh-001296-2025:material_inputs-01"
+      ],
+      "impact": "Two required scopes failed after the leading attempt consumed most of the 300-second route deadline; later models had too little time to provide meaningful failover."
+    },
+    {
+      "priority": "P1",
+      "code": "segment_partition_period_reconciliation",
+      "affected_scopes": [
+        "manufacturing-materials-fresh-000422-2025:segment_financials-01"
+      ],
+      "impact": "Valid provider output could not reconcile 2025 and 2024 row identities, leaving an evidence-rich segment scope with zero accepted records."
+    },
+    {
+      "priority": "P1",
+      "code": "coverage_closure_false_negatives",
+      "affected_scopes": [
+        "manufacturing-materials-fresh-688295-2025:business_overview-01",
+        "manufacturing-materials-fresh-688295-2025:operating_quantities-01",
+        "manufacturing-materials-fresh-688295-2025:counterparties_and_concentration-02",
+        "manufacturing-materials-fresh-688295-2025:business_regime-01"
+      ],
+      "impact": "Substantive or explicitly not-applicable source text was present, but required coverage remained unclear."
+    },
+    {
+      "priority": "P1",
+      "code": "consolidation_adjustment_guard_false_negative",
+      "affected_scopes": [
+        "manufacturing-materials-fresh-001296-2025:segment_financials-02"
+      ],
+      "impact": "The source explicitly labels 分部间抵销 and the candidate row class is consolidation_adjustment, yet prohibited_inference blocked the segment identity."
+    },
+    {
+      "priority": "P2",
+      "code": "frozen_evidence_plan_misses",
+      "affected_scopes": [
+        "manufacturing-materials-fresh-001296-2025:operating_quantities-02",
+        "manufacturing-materials-fresh-920576-2025:operating_quantities-01",
+        "manufacturing-materials-fresh-920576-2025:business_regime-01"
+      ],
+      "impact": "Frozen pages did not contain the required company disclosure; these holds are preparation findings, not provider failures."
+    },
+    {
+      "priority": "P2",
+      "code": "wrong_field_candidate_caught",
+      "affected_scopes": [
+        "manufacturing-materials-fresh-001296-2025:counterparties_and_concentration-01"
+      ],
+      "impact": "A customer share was proposed under supplier_concentration and correctly blocked before research acceptance."
+    }
+  ],
+  "readiness": {
+    "original_readiness_decision": "hold",
+    "reviewed_gate_results": {
+      "cohort_and_preparation_complete": true,
+      "execution_completion_at_least_95pct": false,
+      "usable_reports_at_least_90pct": false,
+      "accepted_evidence_traceability_100pct": true,
+      "source_review_complete": true,
+      "sampled_precision_at_least_99pct": true,
+      "critical_semantic_errors_zero": true,
+      "human_review_median_at_most_2": false,
+      "human_review_p90_at_most_5": false
+    },
+    "final_validation_decision": "hold",
+    "supports_later_restricted_promotion_proposal": false,
+    "reason": "Only 2 of 4 reports completed execution semantics, no report reached usable/usable_with_caveats, and human-review median/p90 remain 9.5/17 despite 100% Evidence traceability and 19/19 correct chapter samples."
+  },
+  "closure": {
+    "validation_complete": true,
+    "result_interpretation": "The shared fixes did not recur in this cohort, but the current end-to-end contract is not yet scale-ready. The batch remains a research-only measured failure/hold, not a production candidate.",
+    "semantic_tuning_performed_after_first_call": false,
+    "llm_rerun_performed": false,
+    "gold_authored_or_changed": false,
+    "production_paths_opened": [],
+    "stage6_started": false,
+    "production_authorization": "not_authorized"
+  },
+  "created_on": "2026-09-13",
+  "production_authorization": "not_authorized",
+  "audit_hash": "806c0a62c3b99ae1b1647ddea212a713e0b88486f0fa66ea603f67c2dd203291"
+}

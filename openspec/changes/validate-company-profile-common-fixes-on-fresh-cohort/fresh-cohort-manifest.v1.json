@@ -1,0 +1,210 @@
+{
+  "artifact_type": "company_profile_fresh_cohort_manifest",
+  "schema_version": "company_profile_out_of_sample_manifest.v1",
+  "manifest_id": "manufacturing-materials-fresh-cohort-manifest-20260913-v1",
+  "manifest_kind": "out_of_sample_validation",
+  "industry_package": "manufacturing_materials",
+  "frozen_on": "2026-09-13",
+  "sample_replacement_allowed": false,
+  "semantic_execution_started": false,
+  "evidence_plan_status": "frozen_before_provider_io",
+  "production_authorization": "not_authorized",
+  "accepted_record_semantics": "accepted_for_review",
+  "sample_count": 4,
+  "batch_id": "manufacturing-materials-fresh-cohort-four-pool-20260913-a",
+  "samples": [
+    {
+      "sample_id": "manufacturing-materials-fresh-000422-2025",
+      "report_identity": {
+        "instrument_id": "000422.SZ",
+        "symbol": "000422",
+        "company_name": "湖北宜化化工股份有限公司",
+        "exchange": "SZSE",
+        "fiscal_year": 2025,
+        "report_period": "2025-12-31",
+        "report_title": "2025年年度报告",
+        "document_family": "annual_report",
+        "variant": "original",
+        "source": "cninfo",
+        "source_announcement_id": "1225183616",
+        "announcement_id": "ann_54ead40f0e989141590336fb8583b527",
+        "attachment_id": "att_33f6b0ec532ea06ba0a75b44dc6e410f",
+        "version_id": "ver_8d686df9044352e557e6dd22d31b3629",
+        "asset_id": "asset_848b1afb1d315ea94882663d6f24f751",
+        "published_at": "2026-04-24T16:00:00+00:00",
+        "decision_state": "current",
+        "availability": "local_valid",
+        "visibility_state": "production",
+        "classifier_version": "formal_annual_report.v1",
+        "canonical_projection_policy_version": "canonical_source_filing.v1"
+      },
+      "pdf": {
+        "path": "data/filings/announcements/blobs/13/13067dd7ca378659a5d01a6600c911dda9335afc970ac10f554dfd79a945987f.pdf",
+        "sha256": "13067dd7ca378659a5d01a6600c911dda9335afc970ac10f554dfd79a945987f",
+        "content_length_bytes": 1932240,
+        "page_count": 260,
+        "encrypted": false,
+        "signature_status": "valid_pdf",
+        "integrity_status": "valid"
+      },
+      "selection_dimensions": {
+        "business_model": ["integrated_fertilizer_and_basic_chemical_manufacturing", "commodity_and_specialty_products"],
+        "disclosure_form": ["szse_main_board_annual_report", "multi_product_operating_tables", "capacity_and_procurement_disclosure"],
+        "generalization_pressure": ["large_multi_product_scope", "material_and_energy_boundary", "default_group_subject_convention"]
+      },
+      "selection_reason": "Tests a large integrated fertilizer/basic-chemical issuer with dense product, quantity, capacity, and procurement disclosures outside all prior company-profile cohorts.",
+      "known_limitations": ["Selection metadata was frozen before semantic output.", "Ordinary company wording follows the current report-default group convention unless a narrower subject is explicit."]
+    },
+    {
+      "sample_id": "manufacturing-materials-fresh-001296-2025",
+      "report_identity": {
+        "instrument_id": "001296.SZ",
+        "symbol": "001296",
+        "company_name": "重庆长江造型材料（集团）股份有限公司",
+        "exchange": "SZSE",
+        "fiscal_year": 2025,
+        "report_period": "2025-12-31",
+        "report_title": "2025年年度报告",
+        "document_family": "annual_report",
+        "variant": "original",
+        "source": "cninfo",
+        "source_announcement_id": "1225226034",
+        "announcement_id": "ann_e64624b4679dee0264f76d41bbef2007",
+        "attachment_id": "att_855d67b1a3c4e0ae848cd8fc468fd1b8",
+        "version_id": "ver_b09a039f809f6edbeda453564b9c6177",
+        "asset_id": "asset_349c995d5568513ae9a8a2def7e8a9bf",
+        "published_at": "2026-04-28T16:00:00+00:00",
+        "decision_state": "current",
+        "availability": "local_valid",
+        "visibility_state": "production",
+        "classifier_version": "formal_annual_report.v1",
+        "canonical_projection_policy_version": "canonical_source_filing.v1"
+      },
+      "pdf": {
+        "path": "data/filings/announcements/blobs/24/2470fa942fb741facc56fecd9c282f02df4a757e7a4e5d52441b08025763ea57.pdf",
+        "sha256": "2470fa942fb741facc56fecd9c282f02df4a757e7a4e5d52441b08025763ea57",
+        "content_length_bytes": 3681310,
+        "page_count": 216,
+        "encrypted": false,
+        "signature_status": "valid_pdf",
+        "integrity_status": "valid"
+      },
+      "selection_dimensions": {
+        "business_model": ["foundry_materials_manufacturing", "consumables_and_reclaimed_sand_services"],
+        "disclosure_form": ["szse_main_board_annual_report", "product_and_region_tables", "manufacturing_service_mix"],
+        "generalization_pressure": ["processing_vs_product_activity", "recycling_and_internal_process_boundary", "named_group_wording"]
+      },
+      "selection_reason": "Tests a mid-sized foundry-materials group combining consumable products, reclaimed-sand activity, and manufacturing services without prior company-profile use.",
+      "known_limitations": ["Selection metadata was frozen before semantic output.", "Recycling or internal processing must not be converted into external processing volume without source support."]
+    },
+    {
+      "sample_id": "manufacturing-materials-fresh-688295-2025",
+      "report_identity": {
+        "instrument_id": "688295.SH",
+        "symbol": "688295",
+        "company_name": "中复神鹰碳纤维股份有限公司",
+        "exchange": "SSE",
+        "fiscal_year": 2025,
+        "report_period": "2025-12-31",
+        "report_title": "2025年年度报告",
+        "document_family": "annual_report",
+        "variant": "original",
+        "source": "cninfo",
+        "source_announcement_id": "1225032175",
+        "announcement_id": "ann_4394c71d6b3b3b823710d56965cd8c2c",
+        "attachment_id": "att_da3b0f91dc4caf37e1048acea99f8a3f",
+        "version_id": "ver_28e78d4fb21f467c5fe03293d11d1458",
+        "asset_id": "asset_9fa59609b3ecc6e41667a0199dff7f48",
+        "published_at": "2026-03-25T16:00:00+00:00",
+        "decision_state": "current",
+        "availability": "local_valid",
+        "visibility_state": "production",
+        "classifier_version": "formal_annual_report.v1",
+        "canonical_projection_policy_version": "canonical_source_filing.v1"
+      },
+      "pdf": {
+        "path": "data/filings/announcements/blobs/10/10476f0cf2fdc0727c0a2ea9ae6641a1f5170f23a5b408d3154c50b9ef66c1b4.pdf",
+        "sha256": "10476f0cf2fdc0727c0a2ea9ae6641a1f5170f23a5b408d3154c50b9ef66c1b4",
+        "content_length_bytes": 1529024,
+        "page_count": 269,
+        "encrypted": false,
+        "signature_status": "valid_pdf",
+        "integrity_status": "valid"
+      },
+      "selection_dimensions": {
+        "business_model": ["carbon_fiber_manufacturing", "advanced_material_capacity_expansion"],
+        "disclosure_form": ["sse_star_market_annual_report", "technology_and_application_narrative", "capacity_project_disclosure"],
+        "generalization_pressure": ["technology_narrative_vs_business_overview", "capacity_project_period", "product_application_activity"]
+      },
+      "selection_reason": "Tests a STAR Market advanced-material manufacturer whose narrative, capacity projects, and product applications differ from commodity-material reports.",
+      "known_limitations": ["Selection metadata was frozen before semantic output.", "Technology and market commentary must not replace a source-supported issuer business description."]
+    },
+    {
+      "sample_id": "manufacturing-materials-fresh-920576-2025",
+      "report_identity": {
+        "instrument_id": "920576.BJ",
+        "symbol": "920576",
+        "company_name": "西安天力金属复合材料股份有限公司",
+        "exchange": "BSE",
+        "fiscal_year": 2025,
+        "report_period": "2025-12-31",
+        "report_title": "2025年年度报告",
+        "document_family": "annual_report",
+        "variant": "original",
+        "source": "cninfo",
+        "source_announcement_id": "1225220762",
+        "announcement_id": "ann_fb646442ad0db1d3f76936a8c7844931",
+        "attachment_id": "att_a084bd98979da1adf49f1322a71f0cb9",
+        "version_id": "ver_457dc114e6085eed8228542b4f38cafa",
+        "asset_id": "asset_e88893bc5624235608c54a7cfb38b85d",
+        "published_at": "2026-04-26T16:00:00+00:00",
+        "decision_state": "current",
+        "availability": "local_valid",
+        "visibility_state": "production",
+        "classifier_version": "formal_annual_report.v1",
+        "canonical_projection_policy_version": "canonical_source_filing.v1"
+      },
+      "pdf": {
+        "path": "data/filings/announcements/blobs/af/af9ca3edfd551b6c2ba0be2812e1027a64edd248a5a18d29a413850aa354cea7.pdf",
+        "sha256": "af9ca3edfd551b6c2ba0be2812e1027a64edd248a5a18d29a413850aa354cea7",
+        "content_length_bytes": 2784064,
+        "page_count": 157,
+        "encrypted": false,
+        "signature_status": "valid_pdf",
+        "integrity_status": "valid"
+      },
+      "selection_dimensions": {
+        "business_model": ["explosive_welded_metal_composite_manufacturing", "project_and_product_delivery"],
+        "disclosure_form": ["bse_annual_report", "voluntary_industry_disclosure", "customer_project_concentration"],
+        "generalization_pressure": ["bse_section_shape", "project_delivery_vs_sales", "metal_layer_material_inputs"]
+      },
+      "selection_reason": "Tests a BSE specialized metal-composite manufacturer with project-shaped delivery and a different voluntary-disclosure layout.",
+      "known_limitations": ["Selection metadata was frozen before semantic output.", "Project delivery language does not by itself establish a separate customer relationship or external processing service."]
+    }
+  ],
+  "independence_audit": {
+    "excluded_company_profile_instruments": [
+      "300750.SZ", "603659.SH", "920015.BJ", "302132.SZ", "600019.SH", "000717.SZ", "600426.SH",
+      "600121.SH", "600022.SH", "600256.SH", "600063.SH", "600111.SH", "600176.SH", "600075.SH",
+      "000552.SZ", "000629.SZ", "000059.SZ", "000408.SZ", "000060.SZ", "000055.SZ", "000420.SZ",
+      "920016.BJ", "920033.BJ", "920068.BJ", "920078.BJ", "920076.BJ", "920580.BJ"
+    ],
+    "checked_identifiers": ["000422.SZ", "001296.SZ", "688295.SH", "920576.BJ"],
+    "checked_artifact_classes": [
+      "four_report_authority_and_gold",
+      "prior_oos_and_model_comparison",
+      "completeness_canary",
+      "twenty_report_shadow_cohort",
+      "targeted_runs_and_adjudication_ledgers"
+    ],
+    "company_profile_matches": [],
+    "decision": "four_fresh_company_profile_samples_confirmed"
+  },
+  "provider_policy": {
+    "logical_route": "semantic_extraction",
+    "eligible_member_count": 4,
+    "dynamic_output_tokens": true,
+    "targeted_rerun_allowed": false,
+    "historical_output_splicing_allowed": false
+  }
+}

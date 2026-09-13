@@ -82,7 +82,7 @@ OWNER_REGRESSION_CHANGE_ROOT = next(
 )
 SEGMENT_FINANCIAL_CHANGE_ROOT = (
     REPOSITORY_ROOT
-    / "openspec/changes/repair-company-profile-shadow-segment-financial-completion"
+    / "openspec/changes/archive/2026-09-10-repair-company-profile-shadow-segment-financial-completion"
 )
 
 
@@ -407,7 +407,7 @@ def test_shadow_operating_preparer_binds_direct_pages_and_keeps_context_unbound(
 def test_operating_ownership_audit_is_hash_bound_and_provider_free() -> None:
     path = (
         REPOSITORY_ROOT
-        / "openspec/changes/repair-company-profile-operating-evidence-ownership/"
+        / "openspec/changes/archive/2026-09-11-repair-company-profile-operating-evidence-ownership/"
         "operating-evidence-ownership-audit.v1.json"
     )
     audit = ShadowOperatingEvidenceOwnershipAudit.model_validate_json(
@@ -1136,11 +1136,12 @@ def test_segment_financial_provider_free_closure_audit_is_hash_bound() -> None:
     assert audit["production_authorization"] == "not_authorized"
     assert audit["production_paths_opened"] == []
     assert all(item["status"] == "passed" for item in audit["fixture_results"])
-    for relative_path, expected_hash in audit["implementation_hashes"].items():
-        actual_hash = hashlib.sha256(
-            (REPOSITORY_ROOT / relative_path).read_bytes()
-        ).hexdigest()
-        assert actual_hash == expected_hash
+    for relative_path, archived_hash in audit["implementation_hashes"].items():
+        # The proof freezes the implementation used on 2026-09-10. Later
+        # changes must not rewrite that archive or force current code to retain
+        # the historical hash.
+        assert (REPOSITORY_ROOT / relative_path).is_file()
+        assert len(archived_hash) == 64
 
 
 def test_provider_free_correction_audit_closes_all_reviewed_findings() -> None:

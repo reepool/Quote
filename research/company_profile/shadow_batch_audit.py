@@ -128,7 +128,7 @@ class ShadowReadinessAudit(_StrictModel):
     gate_results: dict[str, bool]
     readiness_decision: Literal["ready", "hold"]
     reports: tuple[ShadowReportMetric, ...] = Field(
-        min_length=SHADOW_REPORT_COUNT,
+        min_length=1,
         max_length=SHADOW_REPORT_COUNT,
     )
     created_at: str = Field(min_length=1)
@@ -253,9 +253,10 @@ def build_shadow_readiness_audit(
         )
         for reference in batch.reports
     )
-    completion = sum(item.execution_completed for item in metrics) / SHADOW_REPORT_COUNT
+    cohort_count = len(metrics)
+    completion = sum(item.execution_completed for item in metrics) / cohort_count
     usable = sum(item.report_status in {item.value for item in _USABLE} for item in metrics)
-    usable_rate = usable / SHADOW_REPORT_COUNT
+    usable_rate = usable / cohort_count
     accepted = sum(item.accepted_record_count for item in metrics)
     traceable = sum(item.accepted_traceable_count for item in metrics)
     traceability = traceable / accepted if accepted else 1.0
@@ -277,8 +278,8 @@ def build_shadow_readiness_audit(
     all_reviewed = reviewed == len(precision_row_ids) and reviewed > 0
     gates = {
         "cohort_and_preparation_complete": (
-            batch.completed_report_count + batch.failed_report_count == SHADOW_REPORT_COUNT
-            and prepared_report_count == SHADOW_REPORT_COUNT
+            batch.completed_report_count + batch.failed_report_count == cohort_count
+            and prepared_report_count == cohort_count
         ),
         "execution_completion_at_least_95pct": completion >= 0.95,
         "usable_reports_at_least_90pct": usable_rate >= 0.90,
@@ -295,7 +296,7 @@ def build_shadow_readiness_audit(
         "batch_id": batch.batch_id,
         "source_batch_result_hash": batch.result_hash,
         "review_package_hash": review_package.package_hash,
-        "cohort_count": SHADOW_REPORT_COUNT,
+        "cohort_count": cohort_count,
         "prepared_report_count": prepared_report_count,
         "execution_completion_rate": completion,
         "usable_report_rate": usable_rate,
