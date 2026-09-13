@@ -1396,3 +1396,51 @@ def test_routing_continuation_provider_free_artifacts_close_six_cases() -> None:
             source_review_package_hash="f" * 64,
             source_review_outcomes_hash=audit.source_review_outcomes_hash,
         )
+
+
+def test_reviewed_001296_industry_statistics_do_not_own_operating_scope() -> None:
+    section = SimpleNamespace(
+        page_number=28,
+        section_key="industry_context",
+        selector_reasons=("heading_alias:industry_context:行业情况",),
+        text="中汽协统计，2025年我国汽车产销分别完成3453.1万辆和3440.0万辆。",
+    )
+
+    assert _chapter_owner_score(
+        ChapterTask.EXTRACT_OPERATING_QUANTITIES,
+        (section,),
+    ) == 0
+    assert _select_scope_ranges(
+        (section,),
+        direct_pages={28},
+        bounded_pages=(28,),
+        maximum_scopes=1,
+        chapter_task=ChapterTask.EXTRACT_OPERATING_QUANTITIES,
+    ) == ()
+
+
+def test_reviewed_920576_commercial_mode_no_change_owns_regime_scope() -> None:
+    commercial_mode = SimpleNamespace(
+        page_number=13,
+        section_key="business_model",
+        selector_reasons=("heading_alias:business_model:商业模式",),
+        text="报告期内公司商业模式未发生明显变化。",
+    )
+    control_scope_only = SimpleNamespace(
+        page_number=26,
+        section_key="principal_business",
+        selector_reasons=("structured_hint:合并报表范围的变化情况",),
+        text="合并报表范围的变化情况 □适用 √不适用",
+    )
+
+    assert _chapter_owner_score(
+        ChapterTask.EXTRACT_BUSINESS_REGIME,
+        (commercial_mode,),
+    ) > 0
+    assert _select_scope_ranges(
+        (commercial_mode, control_scope_only),
+        direct_pages={13, 26},
+        bounded_pages=(13, 26),
+        maximum_scopes=2,
+        chapter_task=ChapterTask.EXTRACT_BUSINESS_REGIME,
+    ) == ((13,), (26,))

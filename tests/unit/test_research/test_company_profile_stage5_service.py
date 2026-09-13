@@ -46,10 +46,14 @@ from research.company_profile.stage5 import (
     load_stage5_evidence_plan,
     load_stage5_sample_manifest,
 )
-from research.company_profile.stage5_bundle import Stage5RunBundleStore
+from research.company_profile.stage5_bundle import (
+    Stage5RunBundleStore,
+    Stage5ScopeResult,
+)
 from research.company_profile.stage5_service import (
     ManufacturingMaterialsProfileSliceService,
     Stage5SemanticInput,
+    _core_chapter_dimensions,
     _field_bound_evidence,
     _normalize_review_actions,
     _semantic_request,
@@ -887,3 +891,144 @@ def _not_disclosed_counterparty(scope: PreparedRequestScope) -> CoverageResult:
         reason="complete top-five section reports totals but no names",
         evidence=(scope.evidence_bundle[0].evidence,),
     )
+
+
+def _operating_scope_result(
+    *,
+    scope_id: str,
+    status: CoverageStatus,
+    task_complete: bool,
+    review_reason: ContractErrorCode | None = None,
+) -> Stage5ScopeResult:
+    report = ReportIdentity(
+        instrument_id="688295.SH",
+        report_id="coverage-report",
+        document_version="coverage-version",
+        report_period="2025-12-31",
+        published_at="2026-04-01",
+    )
+    evidence = Evidence(
+        evidence_id=f"{scope_id}-evidence",
+        report=report,
+        page=10,
+        section_title="产销量",
+        anchor=TextAnchor(bounded_quote="产品 生产量 销售量 库存量"),
+    )
+    scope = PreparedRequestScope(
+        sample_id="coverage-sample",
+        scope_id=scope_id,
+        chapter_task=ChapterTask.EXTRACT_OPERATING_QUANTITIES,
+        field_ids=("sales_volume",),
+        report=report,
+        evidence_bundle=(PreparedEvidence(evidence=evidence, field_id="sales_volume"),),
+        page_contexts=(
+            PreparedPageContext(
+                page=10,
+                text=evidence.anchor.bounded_quote,
+                text_hash="a" * 64,
+                extraction_method="test",
+                quality_status="native",
+            ),
+        ),
+        plan_version="coverage-test",
+    )
+    coverage = CoverageResult(
+        field_id="sales_volume",
+        chapter_task=ChapterTask.EXTRACT_OPERATING_QUANTITIES,
+        requirement_level=RequirementLevel.CONDITIONAL,
+        status=status,
+        reason_code=(
+            CoverageReasonCode.SOURCE_REASON_UNSPECIFIED
+            if status == CoverageStatus.UNCLEAR
+            else None
+        ),
+        evidence=(evidence,),
+    )
+    reviews = (
+        HumanReviewItem(
+            review_id=f"{scope_id}-review",
+            field_id="sales_volume",
+            evidence=(evidence,),
+            reason_codes=(review_reason,),
+        ),
+    ) if review_reason is not None else ()
+    result = CompanyProfileTaskResult(
+        request_id=f"{scope_id}-request",
+        records=(),
+        dispositions=(),
+        coverage=(coverage,),
+        human_review_items=reviews,
+        task_complete=task_complete,
+    )
+    return Stage5ScopeResult(
+        scope_id=scope_id,
+        request_id=result.request_id,
+        prepared_scope=scope,
+        task_result=result,
+    )
+
+
+def test_core_chapter_coverage_closes_from_another_scope() -> None:
+    missing_here = _operating_scope_result(
+        scope_id="operating-01",
+        status=CoverageStatus.UNCLEAR,
+        task_complete=False,
+        review_reason=ContractErrorCode.REQUIRED_COVERAGE_MISSING,
+    )
+    observed_elsewhere = _operating_scope_result(
+        scope_id="operating-02",
+        status=CoverageStatus.OBSERVED,
+        task_complete=True,
+    )
+
+    dimensions = _core_chapter_dimensions([missing_here, observed_elsewhere])
+    dimension = next(
+        item
+        for item in dimensions
+        if item.name == "core_chapter:extract_operating_quantities"
+    )
+
+    assert dimension.passed is True
+    assert dimension.details["failures"] == []
+
+
+def test_core_chapter_keeps_independent_substantive_failure_blocking() -> None:
+    invalid_evidence = _operating_scope_result(
+        scope_id="operating-01",
+        status=CoverageStatus.UNCLEAR,
+        task_complete=False,
+        review_reason=ContractErrorCode.EVIDENCE_FIELD_MISMATCH,
+    )
+    observed_elsewhere = _operating_scope_result(
+        scope_id="operating-02",
+        status=CoverageStatus.OBSERVED,
+        task_complete=True,
+    )
+
+    dimensions = _core_chapter_dimensions([invalid_evidence, observed_elsewhere])
+    dimension = next(
+        item
+        for item in dimensions
+        if item.name == "core_chapter:extract_operating_quantities"
+    )
+
+    assert dimension.passed is False
+    assert dimension.details["failures"] == ["operating-01"]
+
+
+def test_core_chapter_keeps_unexplained_incomplete_scope_blocking() -> None:
+    incomplete = _operating_scope_result(
+        scope_id="operating-01",
+        status=CoverageStatus.UNCLEAR,
+        task_complete=False,
+    )
+
+    dimensions = _core_chapter_dimensions([incomplete])
+    dimension = next(
+        item
+        for item in dimensions
+        if item.name == "core_chapter:extract_operating_quantities"
+    )
+
+    assert dimension.passed is False
+    assert dimension.details["failures"] == ["operating-01"]

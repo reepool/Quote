@@ -1,6 +1,7 @@
 import asyncio
 import json
 import logging
+import time
 from dataclasses import replace
 
 import pytest
@@ -14,6 +15,7 @@ from utils.llm import (
     LlmRequest,
     LlmTransientTransportError,
 )
+from utils.llm.client import _ExecutionBudget
 from utils.llm.orchestration import ProviderCoordinatorRegistry
 from utils.llm.rate_limit import ProfileLimiterRegistry
 from utils.llm.testing import ScriptedTransport
@@ -179,6 +181,7 @@ def _client(config, transport):
             "TEST_GROK_KEY": "grok-secret",
             "TEST_LUNA_KEY": "luna-secret",
             "TEST_THIRD_KEY": "third-secret",
+            "TEST_FOURTH_KEY": "fourth-secret",
         },
         limiter_registry=ProfileLimiterRegistry(),
         provider_coordinator_registry=ProviderCoordinatorRegistry(),
@@ -219,6 +222,74 @@ def _three_source_config():
             )
         },
     )
+
+
+def _four_source_config():
+    config = _three_source_config()
+    third_resource = config.provider_resources["third-resource"]
+    fourth_resource = replace(third_resource, name="fourth-resource")
+    third_profile = config.profiles["semantic__third"]
+    fourth_profile = replace(
+        third_profile,
+        name="semantic__fourth",
+        provider_resource="fourth-resource",
+        source_label="pipio:fourth",
+        api_key_env="TEST_FOURTH_KEY",
+        model="fourth-model",
+    )
+    pool = config.pools["semantic-pool"]
+    fourth_member = replace(
+        pool.members[-1],
+        source_label="pipio:fourth",
+        profiles={"semantic": "semantic__fourth"},
+    )
+    return replace(
+        config,
+        provider_resources={
+            **config.provider_resources,
+            "fourth-resource": fourth_resource,
+        },
+        profiles={**config.profiles, "semantic__fourth": fourth_profile},
+        pools={
+            "semantic-pool": replace(
+                pool,
+                members=(*pool.members, fourth_member),
+                failover=replace(pool.failover, max_hops=3),
+            )
+        },
+    )
+
+
+def test_four_model_route_shares_remaining_deadline_fairly() -> None:
+    config = _four_source_config()
+    client = _client(config, ScriptedTransport([]))
+    pool = config.pools["semantic-pool"]
+    profile = config.profiles["semantic__grok"]
+    budget = _ExecutionBudget(execution_deadline=time.monotonic() + 300.0)
+
+    first = client._routed_attempt_timeout_seconds(
+        request=_request(timeout_seconds=300),
+        profile=profile,
+        logical_profile="semantic",
+        pool=pool,
+        selected_source="pipio:grok-4.5",
+        excluded_sources=set(),
+        failover_count=0,
+        budget=budget,
+    )
+    second = client._routed_attempt_timeout_seconds(
+        request=_request(timeout_seconds=300),
+        profile=config.profiles["semantic__luna"],
+        logical_profile="semantic",
+        pool=pool,
+        selected_source="pipio:gpt-5.6-luna",
+        excluded_sources={"pipio:grok-4.5"},
+        failover_count=1,
+        budget=budget,
+    )
+
+    assert first == pytest.approx(75.0, abs=0.1)
+    assert second == pytest.approx(100.0, abs=0.1)
 
 
 @pytest.mark.asyncio
@@ -560,8 +631,8 @@ async def test_stalled_first_source_reserves_time_for_second_member():
     assert response.source_label == "pipio:gpt-5.6-luna"
     assert response.failover_count == 1
     assert len(transport.calls) == 2
-    assert transport.calls[0]["timeout_seconds"] <= 0.165
-    assert transport.calls[1]["timeout_seconds"] < 0.06
+    assert transport.calls[0]["timeout_seconds"] == pytest.approx(0.1, abs=0.01)
+    assert transport.calls[1]["timeout_seconds"] == pytest.approx(0.1, abs=0.02)
     assert response.attempts[0]["error_code"] == "transient_transport_error"
     assert (
         response.attempts[0]["attempt_failures"][0]["transport_error_type"]

@@ -29,6 +29,8 @@ from .shadow_evidence import (
     ShadowScopeRefinementAudit,
 )
 from .stage5 import (
+    STAGE5_EXPANDED_COHORT_MANIFEST_REVISION,
+    STAGE5_FRESH_COHORT_MANIFEST_REVISION,
     PreparedRequestScope,
     Stage5EvidencePlan,
     Stage5ReportAsset,
@@ -54,7 +56,7 @@ _RUN_ID_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
 
 
 class FreshCohortAdmissionContract(_StrictModel):
-    """Immutable admission inputs for one fresh four-report validation batch."""
+    """Immutable admission inputs for one frozen validation cohort."""
 
     batch_id: str = Field(min_length=1)
     sample_manifest_revision: str = Field(min_length=1)
@@ -63,7 +65,7 @@ class FreshCohortAdmissionContract(_StrictModel):
     evidence_plan_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     preparation_audit_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     preparation_audit_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
-    sample_ids: tuple[str, ...] = Field(min_length=4, max_length=4)
+    sample_ids: tuple[str, ...] = Field(min_length=4, max_length=8)
     primary_logical_profile: str = Field(min_length=1)
     dynamic_output_tokens: Literal[True] = True
     extract_base_tokens: int = Field(gt=0)
@@ -74,8 +76,10 @@ class FreshCohortAdmissionContract(_StrictModel):
 
     @model_validator(mode="after")
     def _closed_sample_set(self) -> FreshCohortAdmissionContract:
-        if len(set(self.sample_ids)) != 4:
-            raise ValueError("fresh cohort requires four unique samples")
+        if len(self.sample_ids) not in {4, 8} or len(set(self.sample_ids)) != len(
+            self.sample_ids
+        ):
+            raise ValueError("fresh cohort requires four or eight unique samples")
         return self
 
 
@@ -132,7 +136,7 @@ def validate_fresh_cohort_admission(
     if (
         preparation_audit.get("semantic_provider_calls") != 0
         or preparation_audit.get("semantic_execution_started") is not False
-        or preparation_audit.get("report_count") != 4
+        or preparation_audit.get("report_count") != len(contract.sample_ids)
         or preparation_audit.get("chapter_count_per_report") != 6
         or preparation_audit.get("unsupported_field_ids") != []
         or preparation_audit.get("expected_answers_embedded") is not False
@@ -771,11 +775,12 @@ class ShadowBatchResult(_StrictModel):
     @model_validator(mode="after")
     def _batch_counts_are_consistent(self) -> ShadowBatchResult:
         report_count = len(self.reports)
-        expected_count = (
-            4
-            if self.sample_manifest_revision
-            == "manufacturing-materials-fresh-cohort-manifest-20260913-v1"
-            else SHADOW_REPORT_COUNT
+        expected_counts = {
+            STAGE5_FRESH_COHORT_MANIFEST_REVISION: 4,
+            STAGE5_EXPANDED_COHORT_MANIFEST_REVISION: 8,
+        }
+        expected_count = expected_counts.get(
+            self.sample_manifest_revision, SHADOW_REPORT_COUNT
         )
         if report_count != expected_count:
             raise ValueError("shadow batch result report count does not match its mode")

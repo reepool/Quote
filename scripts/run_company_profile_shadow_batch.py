@@ -51,6 +51,8 @@ from research.company_profile.shadow_evidence import (
     write_shadow_evidence_artifact,
 )
 from research.company_profile.stage5 import (
+    STAGE5_EXPANDED_COHORT_MANIFEST_REVISION,
+    STAGE5_FRESH_COHORT_MANIFEST_REVISION,
     Stage5EvidencePreparer,
     load_stage5_evidence_plan,
     load_stage5_sample_manifest,
@@ -104,6 +106,49 @@ FRESH_COHORT_CONTRACT = FreshCohortAdmissionContract(
     timeout_seconds=SHADOW_TIMEOUT_SECONDS,
     max_provider_calls=FRESH_COHORT_MAX_PROVIDER_CALLS,
 )
+EXPANDED_COHORT_BATCH_ID = (
+    "manufacturing-materials-expanded-cohort-eight-pool-20260913-a"
+)
+EXPANDED_COHORT_MAX_PROVIDER_CALLS = 816
+EXPANDED_COHORT_CONTRACT = FreshCohortAdmissionContract(
+    batch_id=EXPANDED_COHORT_BATCH_ID,
+    sample_manifest_revision=STAGE5_EXPANDED_COHORT_MANIFEST_REVISION,
+    sample_manifest_sha256=(
+        "9c06180b852c2e7c72f9960ce6d7f0fe000d40e2bd2fdefc6c9af7b49f8a3a0c"
+    ),
+    evidence_plan_version=(
+        "manufacturing_materials_expanded_cohort.2026-09-13.1"
+    ),
+    evidence_plan_sha256=(
+        "3082c5d875a46e289193b320e4ea56f54726aef411989fa46c488c8e738385e3"
+    ),
+    preparation_audit_sha256=(
+        "0a051bca09da5b3d360a3f55b9579c10928b6be2cf55469aacadbfb5c359c968"
+    ),
+    preparation_audit_hash=(
+        "df89388c92d9746f68d78b12528a53f1f4ec52a7da390162130fd19125a0f303"
+    ),
+    sample_ids=(
+        "manufacturing-materials-expanded-000510-2025",
+        "manufacturing-materials-expanded-002149-2025",
+        "manufacturing-materials-expanded-002340-2025",
+        "manufacturing-materials-expanded-600010-2025",
+        "manufacturing-materials-expanded-600549-2025",
+        "manufacturing-materials-expanded-688388-2025",
+        "manufacturing-materials-expanded-920018-2025",
+        "manufacturing-materials-expanded-920247-2025",
+    ),
+    primary_logical_profile=FRESH_COHORT_ROUTE,
+    extract_base_tokens=STAGE5_DEFAULT_EXTRACT_MAX_OUTPUT_TOKENS,
+    verify_base_tokens=STAGE5_DEFAULT_VERIFY_MAX_OUTPUT_TOKENS,
+    timeout_seconds=SHADOW_TIMEOUT_SECONDS,
+    max_provider_calls=EXPANDED_COHORT_MAX_PROVIDER_CALLS,
+)
+FRESH_COHORT_CONTRACTS = {
+    STAGE5_FRESH_COHORT_MANIFEST_REVISION: FRESH_COHORT_CONTRACT,
+    STAGE5_EXPANDED_COHORT_MANIFEST_REVISION: EXPANDED_COHORT_CONTRACT,
+}
+
 REFINED_SHADOW_REPLAY_CONTRACT = ShadowReplayContract(
     batch_id="manufacturing-materials-shadow-refined-gemini-20260910-a",
     sample_manifest_hash=(
@@ -1246,6 +1291,7 @@ def _run_fresh_cohort(args: argparse.Namespace) -> int:
     manifest = load_stage5_sample_manifest(
         args.sample_manifest, repository_root=ROOT_DIR
     )
+    contract = _fresh_cohort_contract_for(manifest.manifest_revision)
     plan = load_stage5_evidence_plan(args.evidence_plan)
     prepared = {
         asset.sample_id: Stage5EvidencePreparer().prepare_report(
@@ -1260,7 +1306,7 @@ def _run_fresh_cohort(args: argparse.Namespace) -> int:
     evidence_plan_sha256 = _file_sha256(args.evidence_plan)
     preparation_audit_sha256 = _file_sha256(args.preparation_audit)
     validate_fresh_cohort_admission(
-        contract=FRESH_COHORT_CONTRACT,
+        contract=contract,
         batch_id=args.batch_id,
         primary_logical_profile=args.provider_route,
         dynamic_output_tokens=True,
@@ -1288,7 +1334,7 @@ def _run_fresh_cohort(args: argparse.Namespace) -> int:
     llm_config = config_manager.get_llm_config()
     route_receipt = _validate_fresh_cohort_route(llm_config, args.provider_route)
     scope_budgets = []
-    for sample_id in FRESH_COHORT_CONTRACT.sample_ids:
+    for sample_id in contract.sample_ids:
         for scope in prepared[sample_id]:
             selected = _scope_output_token_budget(
                 scope,
@@ -1396,6 +1442,17 @@ def _run_fresh_cohort(args: argparse.Namespace) -> int:
         )
     )
     return 0
+
+
+def _fresh_cohort_contract_for(
+    manifest_revision: str,
+) -> FreshCohortAdmissionContract:
+    try:
+        return FRESH_COHORT_CONTRACTS[manifest_revision]
+    except KeyError as exc:
+        raise ValueError(
+            f"unsupported fresh cohort manifest revision: {manifest_revision}"
+        ) from exc
 
 
 def _validate_fresh_cohort_route(llm_config: object, route: str) -> dict[str, object]:

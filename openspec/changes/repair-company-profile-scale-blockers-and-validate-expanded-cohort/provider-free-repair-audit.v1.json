@@ -1,0 +1,77 @@
+{
+  "schema_version": "company_profile_scale_blocker_provider_free_repair_audit.v1",
+  "audit_id": "manufacturing-materials-scale-blocker-repair-20260913-a",
+  "reviewed_on": "2026-09-13",
+  "baseline": {
+    "path": "openspec/changes/archive/2026-09-13-validate-company-profile-common-fixes-on-fresh-cohort/fresh-cohort-empirical-audit.v1.json",
+    "sha256": "f2287e6ca1c41aa9630b2fe7ad9fc2c01c62fbe06324883dc3ff8b5821efcde9",
+    "accepted_record_count": 362,
+    "provider_call_count": 71,
+    "provider_failed_call_count": 2,
+    "overall_status": "hold"
+  },
+  "repair_families": [
+    {
+      "id": "fair_routed_deadline_share",
+      "implementation": "utils/llm/client.py",
+      "implementation_sha256": "5b24c52c8b852b23fce1a08242c82ec4792c06318c11f963e5215513036e4862",
+      "test": "tests/unit/test_utils/test_llm_routed_client.py",
+      "test_sha256": "14a2fdd90f22ecf4b16f8de945370f83ea83fca9c3f4a557c2b982138c0d444b",
+      "result": "passed"
+    },
+    {
+      "id": "period_aware_segment_partition_identity",
+      "implementation": "research/company_profile/stage5_provider.py",
+      "implementation_sha256": "b4c83ebaa97143954cd5bbb56dd80c00b829102826f1a3750a330b0f05a072d6",
+      "test": "tests/unit/test_research/test_company_profile_stage5_provider.py",
+      "test_sha256": "ab674aae5e48dd44b3c8c5f2ce6b0e73e5316b9af0a3c25ce1962c635bed00ae",
+      "result": "passed"
+    },
+    {
+      "id": "accepted_and_owner_legal_empty_coverage_closure",
+      "implementations": {
+        "research/company_profile/stage5_provider.py": "b4c83ebaa97143954cd5bbb56dd80c00b829102826f1a3750a330b0f05a072d6",
+        "research/company_profile/stage5_service.py": "813352a73de4b9fcb48ac8b98aa57542f7c23aaed575c910410bd0471d8f6e1f"
+      },
+      "tests": {
+        "tests/unit/test_research/test_company_profile_stage5_provider.py": "ab674aae5e48dd44b3c8c5f2ce6b0e73e5316b9af0a3c25ce1962c635bed00ae",
+        "tests/unit/test_research/test_company_profile_stage5_service.py": "1bebd25a1c24c1daa2a7cfd6f139a5890519da2f2b7dfc924c375d98944831be"
+      },
+      "result": "passed"
+    },
+    {
+      "id": "explicit_intersegment_elimination_subject",
+      "implementation": "research/company_profile/stage5_provider.py",
+      "implementation_sha256": "b4c83ebaa97143954cd5bbb56dd80c00b829102826f1a3750a330b0f05a072d6",
+      "test": "tests/unit/test_research/test_company_profile_stage5_provider.py",
+      "test_sha256": "ab674aae5e48dd44b3c8c5f2ce6b0e73e5316b9af0a3c25ce1962c635bed00ae",
+      "result": "passed"
+    },
+    {
+      "id": "reviewed_evidence_owner_shapes",
+      "implementation": "research/company_profile/shadow_evidence.py",
+      "implementation_sha256": "dc580e45feb9eb55b63e0bea608fe63c4f50bef0e8553eb0ba879da88602970b",
+      "test": "tests/unit/test_research/test_company_profile_shadow_evidence.py",
+      "test_sha256": "147aa1198cdf00f8b129459db32c0ed270332691e8414fa043020a82c303d1a1",
+      "result": "passed"
+    }
+  ],
+  "historical_compatibility_cleanup": {
+    "archived_artifacts_mutated": false,
+    "fresh_cohort_tests_use_archive_path": true,
+    "archived_replay_proofs_rebind_current_implementation_hashes_in_memory_only": true,
+    "obsolete_active_change_path_fallbacks_added": false
+  },
+  "verification": {
+    "focused_repair_tests_passed": 263,
+    "all_llm_gateway_tests_passed": 153,
+    "all_company_profile_tests_passed": 449,
+    "company_profile_test_failures": 0,
+    "ruff_changed_files": "passed",
+    "openspec_strict_validation": "passed",
+    "provider_calls": 0
+  },
+  "historical_bundles_mutated": false,
+  "production_authorization": "not_authorized",
+  "stage6_opened": false
+}

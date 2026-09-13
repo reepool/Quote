@@ -46,9 +46,6 @@ _LINEAGE_METADATA_KEYS = {
     "business_item_key",
     "input_hash",
 }
-_ROUTED_ATTEMPT_MAX_REMAINING_RATIO = 0.8
-
-
 @dataclass
 class _ExecutionBudget:
     execution_deadline: Optional[float] = None
@@ -524,8 +521,8 @@ class LlmClient:
         remaining = budget.remaining(time.monotonic())
         return remaining is None or remaining >= config.min_attempt_seconds
 
-    @staticmethod
     def _routed_attempt_timeout_seconds(
+        self,
         *,
         request: LlmRequest,
         profile: LlmProfile,
@@ -536,29 +533,39 @@ class LlmClient:
         failover_count: int,
         budget: _ExecutionBudget,
     ) -> float | None:
-        """Reserve a useful window for one configured alternate route member."""
+        """Share one absolute deadline fairly across the remaining route hops."""
 
         config = pool.failover
         if not config.enabled or failover_count >= config.max_hops:
             return None
-        has_alternate = any(
-            member.source_label != selected_source
-            and member.source_label not in excluded_sources
-            and logical_profile in member.profiles
+        configured_sources = [
+            member.source_label
             for member in pool.members
+            if member.source_label not in excluded_sources
+            and logical_profile in member.profiles
+            and (
+                profile_name := member.profiles.get(logical_profile)
+            ) is not None
+            and (candidate_profile := self.config.profiles.get(profile_name))
+            is not None
+            and candidate_profile.enabled
+        ]
+        if selected_source not in configured_sources:
+            configured_sources.insert(0, selected_source)
+        remaining_attempt_limit = config.max_hops - failover_count + 1
+        eligible_attempt_count = min(
+            len(set(configured_sources)),
+            remaining_attempt_limit,
         )
-        if not has_alternate:
+        if eligible_attempt_count <= 1:
             return None
         remaining = budget.remaining(time.monotonic())
         if remaining is None:
             remaining = float(request.timeout_seconds or profile.timeout_seconds)
         minimum = config.min_attempt_seconds
-        if remaining <= 2 * minimum:
+        if remaining <= eligible_attempt_count * minimum:
             return None
-        attempt_window = min(
-            remaining * _ROUTED_ATTEMPT_MAX_REMAINING_RATIO,
-            remaining - minimum,
-        )
+        attempt_window = remaining / eligible_attempt_count
         return attempt_window if attempt_window >= minimum else None
 
     async def _complete_concrete(

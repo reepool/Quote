@@ -51,14 +51,17 @@ from research.company_profile.stage5_provider import (
     _coverage_draft_schema,
     _evidence_catalog,
     _expand_compact_measurements,
+    _expand_coverage_draft,
     _expand_extract_response,
     _merge_segment_partition_responses,
     _minimal_extract_schema,
     _minimal_verify_schema,
     _normalize_adapter_reported_period,
+    _normalize_business_overview_draft,
     _normalize_extract_response,
     _normalize_segment_partition_metadata,
     _normalize_segment_partition_reported_period,
+    _normalize_verify_response,
     _segment_dimension_options,
     _segment_partition_request,
     _unique_segment_scope_heading,
@@ -452,6 +455,23 @@ def test_totals_only_schema_cannot_emit_relationship_and_expands_measurement() -
             "scope_id": "top_five_supplier_totals_only",
             "chapter_task": ChapterTask.EXTRACT_COUNTERPARTIES_AND_CONCENTRATION,
             "field_ids": ("counterparty_relationship", "supplier_concentration"),
+        }
+    )
+    supplier_text = "前五名供应商采购额合计占年度采购总额13.98%，未披露名称。"
+    supplier_evidence = prepared.evidence_bundle[0].evidence.model_copy(
+        update={"anchor": TextAnchor(bounded_quote=supplier_text)}
+    )
+    prepared = prepared.model_copy(
+        update={
+            "evidence_bundle": (
+                PreparedEvidence(
+                    evidence=supplier_evidence,
+                    field_id="counterparty_relationship",
+                ),
+            ),
+            "page_contexts": (
+                prepared.page_contexts[0].model_copy(update={"text": supplier_text}),
+            ),
         }
     )
     request = _supplier_totals_extract_request(prepared)
@@ -2070,15 +2090,16 @@ def test_segment_partition_merge_rejects_period_and_duplicate_cell_conflicts() -
         reported_period="2024",
     )
 
-    with pytest.raises(
-        ValueError,
-        match="identity conflict: reported_period: '2025' != '2024'",
-    ):
-        _merge_segment_partition_responses(
-            request,
-            ((revenue_request, revenue), (cost_request, cost)),
-            prepared_scope=prepared,
-        )
+    distinct_periods = _merge_segment_partition_responses(
+        request,
+        ((revenue_request, revenue), (cost_request, cost)),
+        prepared_scope=prepared,
+    )
+    rows = [item["row"] for item in distinct_periods["items"]]
+    assert {(row["reported_period"], tuple(row["cells"])) for row in rows} == {
+        ("2025", ("operating_revenue",)),
+        ("2024", ("operating_cost",)),
+    }
 
     duplicate_request = _segment_partition_request(
         request,
@@ -2271,7 +2292,7 @@ def test_segment_adjustment_row_does_not_inherit_business_segment_scope() -> Non
     )
 
 
-def test_inter_segment_elimination_keeps_unclear_subject_scope() -> None:
+def test_inter_segment_elimination_uses_explicit_adjustment_subject_scope() -> None:
     prepared = _segment_prepared_scope()
     evidence = prepared.evidence_bundle[0].evidence.model_copy(
         update={
@@ -2307,9 +2328,13 @@ def test_inter_segment_elimination_keeps_unclear_subject_scope() -> None:
         for candidate in candidates
     )
     assert all(
-        candidate.subject_scope == SubjectScope.UNCLEAR for candidate in candidates
+        candidate.subject_scope == SubjectScope.CONSOLIDATED_GROUP
+        for candidate in candidates
     )
-    assert all(candidate.subject_basis is None for candidate in candidates)
+    assert all(
+        candidate.subject_basis == SubjectBasis.DIRECT_SOURCE_WORDING
+        for candidate in candidates
+    )
 
 
 def test_plan_bound_sales_mode_dimension_uses_source_native_table_header() -> None:
@@ -2611,10 +2636,22 @@ def test_segment_partition_period_semantics_accepts_only_closed_annual_aliases()
         _normalize_segment_partition_reported_period(
             "2024年度", period_type="duration", prepared_scope=prepared
         )
-        == "2024年度"
+        == "2024"
     )
 
 
+    assert (
+        _normalize_segment_partition_reported_period(
+            "2025年1-6月", period_type="duration", prepared_scope=prepared
+        )
+        == "2025年1-6月"
+    )
+    assert (
+        _normalize_segment_partition_reported_period(
+            "2025-06-30", period_type="instant", prepared_scope=prepared
+        )
+        == "2025-06-30"
+    )
 def test_segment_dimension_options_preserve_complete_report_segment_headings() -> None:
     prepared = _prepared_scope().model_copy(
         update={
@@ -3445,8 +3482,9 @@ def test_consolidation_adjustment_requires_explicit_adjustment_label() -> None:
         )
 
 
-def test_verify_accepts_explicit_consolidation_adjustment_subject() -> None:
-    prepared, request = _consolidation_adjustment_verify_request()
+@pytest.mark.parametrize("label", ["合并抵消项", "分部间抵消", "分部间抵销"])
+def test_verify_accepts_explicit_consolidation_adjustment_subject(label: str) -> None:
+    prepared, request = _consolidation_adjustment_verify_request(label=label)
     client = _FakeGatewayClient(
         outputs=[
             VerifyResponse(
@@ -4602,13 +4640,15 @@ def _segment_partition_response(
     }
 
 
-def _consolidation_adjustment_verify_request() -> tuple[
-    PreparedRequestScope, VerifyRequest
-]:
+def _consolidation_adjustment_verify_request(
+    *, label: str = "合并抵消项"
+) -> tuple[PreparedRequestScope, VerifyRequest]:
     prepared = _segment_prepared_scope()
     evidence = prepared.evidence_bundle[0].evidence.model_copy(
         update={
-            "anchor": TextAnchor(bounded_quote="分产品 合并抵消项 -2,098,859,323.96 元")
+            "anchor": TextAnchor(
+                bounded_quote=f"分产品 {label} -2,098,859,323.96 元"
+            )
         }
     )
     prepared = prepared.model_copy(
@@ -4621,7 +4661,7 @@ def _consolidation_adjustment_verify_request() -> tuple[
     compact = _segment_row_response(
         request_id=extract_request.request_id,
         evidence_id=evidence.evidence_id,
-        label="合并抵消项",
+        label=label,
         row_class="consolidation_adjustment",
     )
     candidates = ExtractResponse.model_validate_json(
@@ -6145,3 +6185,231 @@ def test_optional_generic_field_may_be_omitted() -> None:
             "items": [],
         }
     )
+
+
+def test_named_issuer_business_overview_wording_is_substantive() -> None:
+    source_text = "中复神鹰作为专业从事碳纤维及其复合材料研发、生产和销售的国家高新技术企业。"
+    candidate = {
+        "source_text": source_text,
+        "source_native": {"value": source_text},
+    }
+
+    _normalize_business_overview_draft(candidate)
+
+    assert candidate["source_text"] == source_text
+
+
+@pytest.mark.parametrize("label", ["分部间抵消", "分部间抵销"])
+def test_inter_segment_label_variants_use_narrow_adjustment_subject(label: str) -> None:
+    prepared = _segment_prepared_scope()
+    normalized = _normalize_segment_partition_metadata(
+        {
+            "label": label,
+            "row_class": "consolidation_adjustment",
+            "subject_scope": "unclear",
+            "reported_period": "2025",
+            "period_type": "duration",
+        },
+        prepared_scope=prepared,
+    )
+
+    assert normalized["subject_scope"] == "consolidated_group"
+    assert normalized["subject_basis"] == "direct_source_wording"
+
+
+def test_segment_partition_keeps_interim_and_instant_rows_separate() -> None:
+    prepared = _high_cardinality_segment_prepared_scope()
+    request = _segment_extract_request(prepared)
+    evidence_id = prepared.evidence_bundle[0].evidence.evidence_id
+    rows = []
+    for index, (metric, period, period_type) in enumerate(
+        (
+            ("operating_revenue", "2025", "duration"),
+            ("operating_cost", "2025年1-6月", "duration"),
+            ("gross_margin_reported", "2025-12-31", "instant"),
+        ),
+        start=1,
+    ):
+        partition_request = _segment_partition_request(
+            request,
+            fields=("segment_dimension", metric),
+            partition_index=index,
+            partition_count=3,
+        )
+        response = _segment_partition_response(
+            request_id=partition_request.request_id,
+            evidence_id=evidence_id,
+            metric_field=metric,
+            reported_period=period,
+        )
+        response["items"][0]["row"]["period_type"] = period_type
+        rows.append((partition_request, response))
+
+    merged = _merge_segment_partition_responses(
+        request,
+        tuple(rows),
+        prepared_scope=prepared,
+    )
+
+    identities = {
+        (item["row"]["reported_period"], item["row"]["period_type"])
+        for item in merged["items"]
+    }
+    assert identities == {
+        ("2025", "duration"),
+        ("2025年1-6月", "duration"),
+        ("2025-12-31", "instant"),
+    }
+
+
+def test_legal_empty_owner_can_come_from_bounded_continuation_page() -> None:
+    prepared = _prepared_scope().model_copy(
+        update={
+            "scope_id": "capacity-continuation",
+            "chapter_task": ChapterTask.EXTRACT_OPERATING_QUANTITIES,
+            "field_ids": ("production_capacity",),
+            "candidate_pages": (10,),
+        }
+    )
+    context = prepared.evidence_bundle[0].evidence.model_copy(
+        update={
+            "page": 10,
+            "section_title": "行业信息",
+            "anchor": TextAnchor(bounded_quote="第九节 行业信息（续下页）"),
+        }
+    )
+    owner_text = "第九节 行业信息 √其他行业 是否自愿披露 □是√否"
+    owner = context.model_copy(
+        update={
+            "evidence_id": "stage5-capacity-owner-continuation",
+            "page": 11,
+            "anchor": TextAnchor(bounded_quote=owner_text),
+        }
+    )
+    prepared = prepared.model_copy(
+        update={
+            "evidence_bundle": (
+                PreparedEvidence(evidence=context),
+                PreparedEvidence(evidence=owner, field_id="production_capacity"),
+            ),
+        }
+    )
+    request = _capacity_extract_request(prepared)
+
+    expanded = _expand_coverage_draft(
+        {
+            "field_id": "production_capacity",
+            "status": "not_applicable",
+            "reason_code": "source_explicitly_not_applicable",
+        },
+        request=request,
+        prepared_scope=prepared,
+    )
+
+    assert [item["evidence_id"] for item in expanded["evidence"]] == [
+        owner.evidence_id
+    ]
+
+
+def test_owner_bound_trade_supplier_legal_empty_normalizes_verifier_false_negative() -> None:
+    prepared = _prepared_scope()
+    text = (
+        "报告期内公司贸易业务收入占营业收入比例超过10%的贸易业务前五名供应商 "
+        "□适用 √不适用"
+    )
+    evidence = prepared.evidence_bundle[0].evidence.model_copy(
+        update={
+            "section_title": "前五名供应商",
+            "anchor": TextAnchor(bounded_quote=text),
+        }
+    )
+    coverage = CoverageResult(
+        field_id="counterparty_relationship",
+        chapter_task=ChapterTask.EXTRACT_COUNTERPARTIES_AND_CONCENTRATION,
+        requirement_level=RequirementLevel.CONDITIONAL,
+        status=CoverageStatus.NOT_APPLICABLE,
+        reason_code=CoverageReasonCode.SOURCE_EXPLICITLY_NOT_APPLICABLE,
+        evidence=(evidence,),
+    )
+    request = VerifyRequest(
+        request_id="trade-supplier-legal-empty:verify",
+        original_request_id="trade-supplier-legal-empty",
+        report=prepared.report,
+        evidence_bundle=(PreparedEvidence(evidence=evidence),),
+        candidates=(),
+        coverage=(coverage,),
+    )
+
+    normalized = _normalize_verify_response(
+        {
+            "schema_version": "company_profile_verify_response.v1",
+            "request_id": request.request_id,
+            "checks": [
+                {
+                    "target_type": "coverage",
+                    "target_id": (
+                        "extract_counterparties_and_concentration:"
+                        "counterparty_relationship"
+                    ),
+                    "status": "block",
+                    "reason_codes": ["evidence_field_mismatch"],
+                }
+            ],
+        },
+        request=request,
+    )
+
+    assert normalized["checks"][0]["status"] == "pass"
+    assert normalized["checks"][0]["reason_codes"] == []
+
+
+def test_non_owner_legal_empty_verifier_failure_remains_blocking() -> None:
+    prepared = _prepared_scope()
+    evidence = prepared.evidence_bundle[0].evidence.model_copy(
+        update={
+            "section_title": "行业情况",
+            "anchor": TextAnchor(
+                bounded_quote="行业前五名供应商格局稳定，未披露公司采购情况。"
+            ),
+        }
+    )
+    coverage = CoverageResult(
+        field_id="counterparty_relationship",
+        chapter_task=ChapterTask.EXTRACT_COUNTERPARTIES_AND_CONCENTRATION,
+        requirement_level=RequirementLevel.CONDITIONAL,
+        status=CoverageStatus.NOT_APPLICABLE,
+        reason_code=CoverageReasonCode.SOURCE_EXPLICITLY_NOT_APPLICABLE,
+        evidence=(evidence,),
+    )
+    request = VerifyRequest(
+        request_id="non-owner-legal-empty:verify",
+        original_request_id="non-owner-legal-empty",
+        report=prepared.report,
+        evidence_bundle=(PreparedEvidence(evidence=evidence),),
+        candidates=(),
+        coverage=(coverage,),
+    )
+
+    normalized = _normalize_verify_response(
+        {
+            "schema_version": "company_profile_verify_response.v1",
+            "request_id": request.request_id,
+            "checks": [
+                {
+                    "target_type": "coverage",
+                    "target_id": (
+                        "extract_counterparties_and_concentration:"
+                        "counterparty_relationship"
+                    ),
+                    "status": "block",
+                    "reason_codes": ["evidence_field_mismatch"],
+                }
+            ],
+        },
+        request=request,
+    )
+
+    assert normalized["checks"][0]["status"] == "block"
+    assert normalized["checks"][0]["reason_codes"] == [
+        "evidence_field_mismatch"
+    ]

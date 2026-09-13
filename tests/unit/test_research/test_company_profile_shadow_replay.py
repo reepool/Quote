@@ -381,15 +381,20 @@ def operating_ownership_replay_inputs():
         proof["artifact_hashes"][archived_path] = proof["artifact_hashes"].pop(
             active_path
         )
-    current_validator_hash = _file_sha256(
-        REPOSITORY_ROOT / "research/company_profile/shadow_batch_service.py"
-    )
-    proof["implementation_hashes"][
-        "research/company_profile/shadow_batch_service.py"
-    ] = current_validator_hash
-    proof["supporting_artifact_hashes"]["ownership_replay_proof_validator"] = (
-        current_validator_hash
-    )
+    for implementation_path, supporting_name in {
+        "research/company_profile/shadow_evidence.py": (
+            "shadow_evidence_implementation"
+        ),
+        "research/company_profile/stage5_service.py": (
+            "stage5_evidence_binding_implementation"
+        ),
+        "research/company_profile/shadow_batch_service.py": (
+            "ownership_replay_proof_validator"
+        ),
+    }.items():
+        current_hash = _file_sha256(REPOSITORY_ROOT / implementation_path)
+        proof["implementation_hashes"][implementation_path] = current_hash
+        proof["supporting_artifact_hashes"][supporting_name] = current_hash
     proof["audit_hash"] = _payload_hash(
         {key: value for key, value in proof.items() if key != "audit_hash"}
     )
@@ -414,15 +419,20 @@ def external_operating_ownership_replay_inputs():
             EXTERNAL_OPERATING_OWNERSHIP_CHANGE / "provider-free-recovery-proof.v1.json"
         ).read_text(encoding="utf-8")
     )
-    current_validator_hash = _file_sha256(
-        REPOSITORY_ROOT / "research/company_profile/shadow_batch_service.py"
-    )
-    proof["implementation_hashes"][
-        "research/company_profile/shadow_batch_service.py"
-    ] = current_validator_hash
-    proof["supporting_artifact_hashes"]["external_ownership_replay_proof_validator"] = (
-        current_validator_hash
-    )
+    for implementation_path, supporting_name in {
+        "research/company_profile/shadow_evidence.py": (
+            "shadow_evidence_implementation"
+        ),
+        "research/company_profile/stage5_service.py": (
+            "stage5_evidence_binding_implementation"
+        ),
+        "research/company_profile/shadow_batch_service.py": (
+            "external_ownership_replay_proof_validator"
+        ),
+    }.items():
+        current_hash = _file_sha256(REPOSITORY_ROOT / implementation_path)
+        proof["implementation_hashes"][implementation_path] = current_hash
+        proof["supporting_artifact_hashes"][supporting_name] = current_hash
     proof["audit_hash"] = _payload_hash(
         {key: value for key, value in proof.items() if key != "audit_hash"}
     )

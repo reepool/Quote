@@ -1,0 +1,81 @@
+{
+  "schema_version": "company_profile_expanded_cohort_connectivity_preflight.v1",
+  "preflight_id": "manufacturing-materials-expanded-cohort-connectivity-20260913-a",
+  "checked_at": "2026-09-13T21:14:45+08:00",
+  "batch_id": "manufacturing-materials-expanded-cohort-eight-pool-20260913-a",
+  "admission_receipt_sha256": "7d623defd125b5592e7c85fa72b8f7a83718383ea8a28bd9ac608dc45a3f319c",
+  "logical_route": "semantic_extraction",
+  "checks": [
+    {
+      "provider": "scorpio",
+      "host": "scorpio.reepool.com",
+      "method": "HEAD",
+      "path": "/v1/chat/completions",
+      "http_status": 404,
+      "dns_reachable": true,
+      "tls_reachable": true,
+      "network_path": "sandbox",
+      "result": "reachable"
+    },
+    {
+      "provider": "zai",
+      "host": "open.bigmodel.cn",
+      "method": "HEAD",
+      "path": "/api/coding/paas/v4/chat/completions",
+      "http_status": 401,
+      "dns_reachable": true,
+      "tls_reachable": true,
+      "network_path": "sandbox",
+      "result": "reachable_auth_required"
+    },
+    {
+      "provider": "deepseek",
+      "host": "api.deepseek.com",
+      "method": "HEAD",
+      "path": "/v1/chat/completions",
+      "http_status": 401,
+      "dns_reachable": true,
+      "tls_reachable": true,
+      "network_path": "sandbox",
+      "result": "reachable_auth_required"
+    }
+  ],
+  "profiles": [
+    {
+      "profile": "semantic_extraction__scorpio_gemini",
+      "source_label": "scorpio:gemini-3.8-flash-high",
+      "model": "gemini-3.8-flash-high",
+      "enabled": true,
+      "api_key_present": true,
+      "json_object_supported": true
+    },
+    {
+      "profile": "semantic_extraction__zai",
+      "source_label": "zai:glm-5.3-flash",
+      "model": "glm-5.3-flash",
+      "enabled": true,
+      "api_key_present": true,
+      "json_object_supported": true
+    },
+    {
+      "profile": "semantic_extraction__scorpio_grok",
+      "source_label": "scorpio:grok-4.6",
+      "model": "grok-4.6",
+      "enabled": true,
+      "api_key_present": true,
+      "json_object_supported": true
+    },
+    {
+      "profile": "semantic_extraction__deepseek",
+      "source_label": "deepseek:deepseek-flash",
+      "model": "deepseek-flash",
+      "enabled": true,
+      "api_key_present": true,
+      "json_object_supported": true
+    }
+  ],
+  "provider_calls": 0,
+  "semantic_content_transferred": false,
+  "production_authorization": "not_authorized",
+  "preflight_hash": "0fbaebd2f625e5b61496138bd0301f0657d24226fa48cb24fdfad1e5edf3db0b"
+}

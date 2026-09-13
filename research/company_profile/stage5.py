@@ -95,6 +95,12 @@ STAGE5_FRESH_COHORT_MANIFEST_REVISION = (
 STAGE5_FRESH_COHORT_EVIDENCE_PLAN_VERSION = (
     "manufacturing_materials_fresh_cohort.2026-09-13.1"
 )
+STAGE5_EXPANDED_COHORT_MANIFEST_REVISION = (
+    "manufacturing-materials-expanded-cohort-manifest-20260913-v1"
+)
+STAGE5_EXPANDED_COHORT_EVIDENCE_PLAN_VERSION = (
+    "manufacturing_materials_expanded_cohort.2026-09-13.1"
+)
 STAGE5_PACKAGE = "manufacturing_materials"
 STAGE5_PRODUCTION_AUTHORIZATION = "not_authorized"
 
@@ -136,12 +142,39 @@ FRESH_COHORT_STAGE5_SAMPLES: dict[str, tuple[str, str]] = {
         "920576.BJ", "validation_unclassified"
     ),
 }
+EXPANDED_COHORT_STAGE5_SAMPLES: dict[str, tuple[str, str]] = {
+    "manufacturing-materials-expanded-000510-2025": (
+        "000510.SZ", "validation_unclassified"
+    ),
+    "manufacturing-materials-expanded-002149-2025": (
+        "002149.SZ", "validation_unclassified"
+    ),
+    "manufacturing-materials-expanded-002340-2025": (
+        "002340.SZ", "validation_unclassified"
+    ),
+    "manufacturing-materials-expanded-600010-2025": (
+        "600010.SH", "validation_unclassified"
+    ),
+    "manufacturing-materials-expanded-600549-2025": (
+        "600549.SH", "validation_unclassified"
+    ),
+    "manufacturing-materials-expanded-688388-2025": (
+        "688388.SH", "validation_unclassified"
+    ),
+    "manufacturing-materials-expanded-920018-2025": (
+        "920018.BJ", "validation_unclassified"
+    ),
+    "manufacturing-materials-expanded-920247-2025": (
+        "920247.BJ", "validation_unclassified"
+    ),
+}
 KNOWN_STAGE5_SAMPLES = (
     APPROVED_STAGE5_SAMPLES
     | VALIDATION_STAGE5_SAMPLES
     | SECOND_OOS_STAGE5_SAMPLES
     | COMPLETENESS_CANARY_STAGE5_SAMPLES
     | FRESH_COHORT_STAGE5_SAMPLES
+    | EXPANDED_COHORT_STAGE5_SAMPLES
 )
 _VALIDATION_PROFILES: dict[str, dict[str, Any]] = {
     STAGE5_VALIDATION_MANIFEST_REVISION: {
@@ -210,6 +243,55 @@ _VALIDATION_PROFILES: dict[str, dict[str, Any]] = {
                 "ann_fb646442ad0db1d3f76936a8c7844931",
                 "ver_457dc114e6085eed8228542b4f38cafa",
                 "af9ca3edfd551b6c2ba0be2812e1027a64edd248a5a18d29a413850aa354cea7",
+            ),
+        },
+    },
+    STAGE5_EXPANDED_COHORT_MANIFEST_REVISION: {
+        "manifest_kind": STAGE5_VALIDATION_MANIFEST_KIND,
+        "manifest_schema": STAGE5_VALIDATION_MANIFEST_SCHEMA,
+        "evidence_schema": STAGE5_VALIDATION_EVIDENCE_PLAN_SCHEMA,
+        "evidence_versions": (STAGE5_EXPANDED_COHORT_EVIDENCE_PLAN_VERSION,),
+        "samples": EXPANDED_COHORT_STAGE5_SAMPLES,
+        "identities": {
+            "manufacturing-materials-expanded-000510-2025": (
+                "ann_f514681f468cdce325a63aaafa8e3140",
+                "ver_fcaf85a4325c9dc7689a58a04d17c1d3",
+                "15c629a00045a4eb1cbc037eac9b38e67a18851dbd97c27eac3219d5d47dcaa8",
+            ),
+            "manufacturing-materials-expanded-002149-2025": (
+                "ann_76e26925994bc47af2c618009692940f",
+                "ver_dde797f8ca7cd430585755e292930d01",
+                "988965892b28325858a7d9c50cf5312a9e14d49a62bdeeba41459653b8b798ca",
+            ),
+            "manufacturing-materials-expanded-002340-2025": (
+                "ann_f0fbc33477f99f7770bc38e5b98d75fe",
+                "ver_e4e061ed5c676a08c953a8f52293a911",
+                "fdb3060c97bc4273571f75b85e39dd399c7e8c580f8d874892463fa5efd4b15f",
+            ),
+            "manufacturing-materials-expanded-600010-2025": (
+                "ann_fcffcf024edaecf62bd99eef15220904",
+                "ver_e177ce2a738015f8dd636d06022a5f3e",
+                "2667da8e6d5f57335fd530388a71f8bf1f4bcff5760b6bf75584ca0e724220e0",
+            ),
+            "manufacturing-materials-expanded-600549-2025": (
+                "ann_8196ea852ead313170f0c92058dfe7db",
+                "ver_25d63de61c79e2dedb1c2950bd0c28c6",
+                "a4da1a158da5958d24264526fa32cc012c0734b17ed1a98356fe619cc6cc1c8d",
+            ),
+            "manufacturing-materials-expanded-688388-2025": (
+                "ann_a02ed0da88b9760e524a99ae96220fd9",
+                "ver_b06a460e00eeb2cce053d1bd02c103dc",
+                "fdd0348b73f41da3d8ee7adae7fdbaba2f71130c44169df33041595977372cea",
+            ),
+            "manufacturing-materials-expanded-920018-2025": (
+                "ann_5aa6ac2fd37c0e57efe89b1713421a66",
+                "ver_d3662c4672949c7269a374d8a34ef895",
+                "4a4e4971092b637b9a89ef92e4e8e1f2b378856049bbd3001c8aedb2c6d028d8",
+            ),
+            "manufacturing-materials-expanded-920247-2025": (
+                "ann_7796e0a680cb61f16df2c222a3a1fef6",
+                "ver_16e3cb34e1f652810ab762770fcdf3ee",
+                "e3725d825a7204c66969de8d816d8dd2aa679ea113bb761c08b8505658f5df67",
             ),
         },
     },
@@ -307,7 +389,7 @@ class Stage5SampleManifest(_StrictModel):
         "four_report_slice", "out_of_sample_validation", "second_oos_model_comparison"
     ] = STAGE5_SAMPLE_MANIFEST_KIND
     manifest_revision: str = Field(min_length=1)
-    reports: tuple[Stage5ReportAsset, ...] = Field(min_length=1, max_length=4)
+    reports: tuple[Stage5ReportAsset, ...] = Field(min_length=1, max_length=8)
     production_authorization: Literal["not_authorized"] = (
         STAGE5_PRODUCTION_AUTHORIZATION
     )
@@ -467,7 +549,7 @@ class Stage5EvidencePlan(_StrictModel):
     production_authorization: Literal["not_authorized"] = (
         STAGE5_PRODUCTION_AUTHORIZATION
     )
-    reports: tuple[EvidenceReportPlan, ...] = Field(min_length=1, max_length=4)
+    reports: tuple[EvidenceReportPlan, ...] = Field(min_length=1, max_length=8)
 
     @model_validator(mode="after")
     def _approved_closed_set(self) -> Stage5EvidencePlan:

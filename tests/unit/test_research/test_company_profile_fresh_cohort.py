@@ -19,7 +19,9 @@ from research.company_profile.stage5 import (
     load_stage5_sample_manifest,
 )
 from scripts.run_company_profile_shadow_batch import (
+    EXPANDED_COHORT_CONTRACT,
     FRESH_COHORT_CONTRACT,
+    _fresh_cohort_contract_for,
     _validate_fresh_cohort_route,
     build_parser,
 )
@@ -27,7 +29,7 @@ from scripts.run_company_profile_shadow_batch import (
 REPOSITORY_ROOT = Path(__file__).resolve().parents[3]
 CHANGE = (
     REPOSITORY_ROOT
-    / "openspec/changes/validate-company-profile-common-fixes-on-fresh-cohort"
+    / "openspec/changes/archive/2026-09-13-validate-company-profile-common-fixes-on-fresh-cohort"
 )
 MANIFEST = CHANGE / "fresh-cohort-manifest.v1.json"
 PLAN = CHANGE / "fresh-cohort-evidence-plan.v1.json"
@@ -40,6 +42,15 @@ BATCH_DIRECTORY = (
     REPOSITORY_ROOT
     / "var/company_profile_fresh_cohort/20260913/"
     "batch-manufacturing-materials-fresh-cohort-four-pool-20260913-a"
+)
+EXPANDED_CHANGE = (
+    REPOSITORY_ROOT
+    / "openspec/changes/repair-company-profile-scale-blockers-and-validate-expanded-cohort"
+)
+EXPANDED_MANIFEST = EXPANDED_CHANGE / "expanded-cohort-manifest.v1.json"
+EXPANDED_PLAN = EXPANDED_CHANGE / "expanded-cohort-evidence-plan.v1.json"
+EXPANDED_PREPARATION = (
+    EXPANDED_CHANGE / "expanded-cohort-preparation-freeze-audit.v1.json"
 )
 
 
@@ -74,6 +85,21 @@ def _inputs():
     return manifest, plan, prepared, audit
 
 
+def _expanded_inputs():
+    manifest = load_stage5_sample_manifest(
+        EXPANDED_MANIFEST, repository_root=REPOSITORY_ROOT
+    )
+    plan = load_stage5_evidence_plan(EXPANDED_PLAN)
+    prepared = {
+        asset.sample_id: Stage5EvidencePreparer().prepare_report(
+            manifest=manifest, evidence_plan=plan, sample_id=asset.sample_id
+        )
+        for asset in manifest.reports
+    }
+    audit = json.loads(EXPANDED_PREPARATION.read_text(encoding="utf-8"))
+    return manifest, plan, prepared, audit
+
+
 def _admit(tmp_path: Path, **overrides) -> None:
     manifest, plan, prepared, audit = _inputs()
     values = {
@@ -91,6 +117,32 @@ def _admit(tmp_path: Path, **overrides) -> None:
         "evidence_plan_sha256": _sha256(PLAN),
         "preparation_audit": audit,
         "preparation_audit_sha256": _sha256(PREPARATION),
+        "prepared": prepared,
+        "output_root": tmp_path,
+    }
+    values.update(overrides)
+    validate_fresh_cohort_admission(**values)
+
+
+def _admit_expanded(tmp_path: Path, **overrides) -> None:
+    manifest, plan, prepared, audit = _expanded_inputs()
+    values = {
+        "contract": EXPANDED_COHORT_CONTRACT,
+        "batch_id": EXPANDED_COHORT_CONTRACT.batch_id,
+        "primary_logical_profile": (
+            EXPANDED_COHORT_CONTRACT.primary_logical_profile
+        ),
+        "dynamic_output_tokens": True,
+        "extract_base_tokens": EXPANDED_COHORT_CONTRACT.extract_base_tokens,
+        "verify_base_tokens": EXPANDED_COHORT_CONTRACT.verify_base_tokens,
+        "timeout_seconds": EXPANDED_COHORT_CONTRACT.timeout_seconds,
+        "max_provider_calls": EXPANDED_COHORT_CONTRACT.max_provider_calls,
+        "manifest": manifest,
+        "manifest_sha256": _sha256(EXPANDED_MANIFEST),
+        "evidence_plan": plan,
+        "evidence_plan_sha256": _sha256(EXPANDED_PLAN),
+        "preparation_audit": audit,
+        "preparation_audit_sha256": _sha256(EXPANDED_PREPARATION),
         "prepared": prepared,
         "output_root": tmp_path,
     }
@@ -271,6 +323,58 @@ def test_fresh_cohort_reuses_shadow_report_loop_and_persists_four_failures(
     assert result.completed_report_count == 0
     assert result.failed_report_count == 4
     assert len(result.reports) == 4
+    assert (output / "manifest.json").is_file()
+
+
+def test_expanded_cohort_freeze_admission_and_report_loop_support_eight_reports(
+    tmp_path: Path,
+) -> None:
+    manifest, plan, prepared, audit = _expanded_inputs()
+
+    assert _fresh_cohort_contract_for(manifest.manifest_revision) == (
+        EXPANDED_COHORT_CONTRACT
+    )
+    assert tuple(item.sample_id for item in manifest.reports) == (
+        EXPANDED_COHORT_CONTRACT.sample_ids
+    )
+    assert len(plan.reports) == 8
+    assert sum(len(scopes) for scopes in prepared.values()) == 60
+    assert all(
+        {scope.chapter_task for scope in scopes}
+        == {task.chapter_task for task in plan.report_by_id(sample_id).tasks}
+        for sample_id, scopes in prepared.items()
+    )
+    assert audit["report_count"] == 8
+    assert audit["chapter_count_per_report"] == 6
+    assert audit["scope_count"] == 60
+    assert audit["semantic_provider_calls"] == 0
+    assert audit["unsupported_field_ids"] == []
+    assert audit["expected_answers_embedded"] is False
+    assert audit["production_authorization"] == "not_authorized"
+
+    _admit_expanded(tmp_path)
+    with pytest.raises(ValueError, match="contract mismatch"):
+        _admit_expanded(tmp_path, evidence_plan_sha256="0" * 64)
+
+    owner = _FailingReportOwner()
+    result, output = ManufacturingMaterialsShadowBatchService(
+        stage5_service=owner
+    ).run_fresh_cohort(
+        batch_id="expanded-cohort-service-unit",
+        primary_logical_profile="semantic_extraction",
+        manifest=manifest,
+        sample_manifest_hash=_sha256(EXPANDED_MANIFEST),
+        evidence_plan=plan,
+        evidence_plan_hash=_sha256(EXPANDED_PLAN),
+        prepared=prepared,
+        store=ShadowBatchStore(tmp_path),
+        provider_factory=lambda scope: None,
+    )
+
+    assert tuple(owner.sample_ids) == EXPANDED_COHORT_CONTRACT.sample_ids
+    assert result.completed_report_count == 0
+    assert result.failed_report_count == 8
+    assert len(result.reports) == 8
     assert (output / "manifest.json").is_file()
 
 

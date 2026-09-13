@@ -34,6 +34,7 @@ from .contracts import (
     VerifyResponse,
 )
 from .models import (
+    CoverageStatus,
     LogicalSlot,
     MetricType,
     ObjectType,
@@ -795,7 +796,7 @@ def _merge_segment_partition_responses(
     *,
     prepared_scope: PreparedRequestScope,
 ) -> dict[str, Any]:
-    rows_by_anchor: dict[tuple[str, str], dict[str, Any]] = {}
+    rows_by_anchor: dict[tuple[str, str, str, str], dict[str, Any]] = {}
     coverage_by_field: dict[str, dict[str, Any]] = {}
     requested_fields = set(request.unresolved_field_ids)
     allowed_evidence_ids = {
@@ -862,11 +863,16 @@ def _merge_segment_partition_responses(
                     or not set(evidence_ids).issubset(allowed_evidence_ids)
                 ):
                     raise ValueError("segment partition row Evidence is invalid")
-                row["evidence_ids"] = sorted(evidence_ids)
-                anchor = (dimension, label)
                 row = _normalize_segment_partition_metadata(
                     row,
                     prepared_scope=prepared_scope,
+                )
+                row["evidence_ids"] = sorted(evidence_ids)
+                anchor = (
+                    dimension,
+                    label,
+                    str(row.get("reported_period") or ""),
+                    str(row.get("period_type") or ""),
                 )
                 if anchor not in rows_by_anchor:
                     rows_by_anchor[anchor] = row
@@ -935,7 +941,15 @@ def _normalize_segment_partition_metadata(
 
     normalized = deepcopy(row)
     subject_scope = normalized.get("subject_scope")
-    if normalized.get("row_class") != "consolidation_adjustment" and (
+    if (
+        normalized.get("row_class") == "consolidation_adjustment"
+        and _adjustment_label_is_explicit(str(normalized.get("label") or ""))
+        and subject_scope in {None, "", "unclear"}
+    ):
+        normalized["subject_scope"] = "consolidated_group"
+        normalized["subject_basis"] = "direct_source_wording"
+        normalized.pop("subject_name", None)
+    elif normalized.get("row_class") != "consolidation_adjustment" and (
         subject_scope in {None, "", "unclear", "business_segment"}
     ):
         normalized["subject_scope"] = "business_segment"
@@ -2207,7 +2221,7 @@ def _is_explicit_consolidation_adjustment(candidate: Any) -> bool:
         return False
     source_native = getattr(candidate, "source_native", None)
     label = str(getattr(source_native, "name", None) or "")
-    return _adjustment_label_has_group_wording(label)
+    return _adjustment_label_is_explicit(label)
 
 
 def _adjustment_label_has_group_wording(label: str) -> bool:
@@ -2217,6 +2231,13 @@ def _adjustment_label_has_group_wording(label: str) -> bool:
             r"(?:合并|本集团|集团).*抵[消销]|抵[消销].*(?:合并|本集团|集团)",
             normalized,
         )
+    )
+
+
+def _adjustment_label_is_explicit(label: str) -> bool:
+    normalized = "".join(str(label).split())
+    return _adjustment_label_has_group_wording(normalized) or bool(
+        re.fullmatch(r"分部间抵[消销]", normalized)
     )
 
 
@@ -2237,8 +2258,51 @@ def _normalize_verify_response(
     if not isinstance(checks, list):
         return normalized
     candidates = {item.record_id: item for item in request.candidates}
+    coverage = {
+        f"{item.chapter_task.value}:{item.field_id}": item
+        for item in request.coverage
+    }
     for check in checks:
-        if not isinstance(check, dict) or check.get("target_type") != "candidate":
+        if not isinstance(check, dict):
+            continue
+        if check.get("target_type") == "coverage":
+            item = coverage.get(str(check.get("target_id") or ""))
+            reasons = {
+                value.value if isinstance(value, ContractErrorCode) else str(value)
+                for value in (check.get("reason_codes") or ())
+            }
+            allowed_false_negative_reasons = {
+                ContractErrorCode.EVIDENCE_FIELD_MISMATCH.value,
+                ContractErrorCode.COVERAGE_REASON_UNSUPPORTED.value,
+                ContractErrorCode.PROHIBITED_INFERENCE.value,
+            }
+            if (
+                item is not None
+                and check.get("status") in {"block", "unclear"}
+                and reasons
+                and reasons.issubset(allowed_false_negative_reasons)
+                and item.status in {
+                    CoverageStatus.NOT_DISCLOSED,
+                    CoverageStatus.NOT_APPLICABLE,
+                }
+                and item.evidence
+                and all(
+                    _coverage_evidence_owns_field(
+                        evidence,
+                        chapter_task=item.chapter_task.value,
+                        field_id=item.field_id,
+                    )
+                    for evidence in item.evidence
+                )
+            ):
+                check["status"] = "pass"
+                check["reason_codes"] = []
+                check["explanation"] = (
+                    "source-bound field-owning legal-empty disclosure satisfies the "
+                    "existing coverage contract"
+                )
+            continue
+        if check.get("target_type") != "candidate":
             continue
         reasons = tuple(
             item.value if isinstance(item, ContractErrorCode) else str(item)
@@ -2389,17 +2453,21 @@ def _expand_segment_row_draft(
         set(row.get("evidence_ids") or ()) | dimension_evidence_ids
     )
     if row.get("row_class") == "consolidation_adjustment":
-        has_group_wording = _adjustment_label_has_group_wording(
+        has_explicit_adjustment_label = _adjustment_label_is_explicit(
             str(row.get("label") or "")
         )
         has_reconciliation = (
             row.get("subject_basis")
             == "numeric_reconciliation_to_consolidated_statement"
         )
-        if has_group_wording and row.get("subject_scope") in (None, "", "unclear"):
+        if has_explicit_adjustment_label and row.get("subject_scope") in (
+            None,
+            "",
+            "unclear",
+        ):
             row["subject_scope"] = "consolidated_group"
             row["subject_basis"] = "direct_source_wording"
-        elif not has_group_wording and not has_reconciliation:
+        elif not has_explicit_adjustment_label and not has_reconciliation:
             row["subject_scope"] = "unclear"
             row.pop("subject_basis", None)
             row.pop("subject_name", None)
@@ -3434,15 +3502,10 @@ def _normalize_segment_partition_reported_period(
         period_type=period_type,
         prepared_scope=prepared_scope,
     )
-    report_year = prepared_scope.report.report_period[:4]
-    if isinstance(value, str) and period_type == "duration" and report_year.isdigit():
-        annual_aliases = {
-            report_year,
-            f"{report_year}年",
-            f"{report_year}年度",
-        }
-        if value in annual_aliases:
-            return report_year
+    if isinstance(value, str) and period_type == "duration":
+        annual_alias = re.fullmatch(r"(\d{4})(?:年|年度|-12-31)?", value)
+        if annual_alias:
+            return annual_alias.group(1)
     return value
 
 
@@ -3550,6 +3613,7 @@ _BUSINESS_OVERVIEW_SUBSTANTIVE = re.compile(
     r"(?:公司|本公司|集团)?(?:主营业务|主营范围|经营范围)(?!收入|成本|利润)"
     r"|(?:公司|本公司|集团).{0,24}(?:主要|专业)(?:从事|生产|制造|加工|销售|"
     r"研发|开发|提供)"
+    r"|[\u4e00-\u9fffA-Za-z0-9（）()·]{2,30}作为专业从事"
     r"|(?:主要|核心)(?:产品|服务)(?:包括|涵盖|为|是|有|[:：])"
 )
 _BUSINESS_OVERVIEW_RISK_TAIL = re.compile(
@@ -3670,12 +3734,10 @@ def _coverage_owner_evidence_ids(
 ) -> list[str]:
     """Return owner Evidence, excluding adjacent pages kept only for context."""
 
-    owner_pages = set(prepared_scope.candidate_pages)
     return [
         item.evidence.evidence_id
         for item in prepared_scope.evidence_bundle
-        if (not owner_pages or item.evidence.page in owner_pages)
-        and (
+        if (
             not require_field_owner
             or _coverage_evidence_owns_field(
                 item.evidence,
@@ -3755,6 +3817,11 @@ def _coverage_evidence_owns_field(
             return bool(
                 legal_empty_owner
                 or re.search(
+                    r"第九节行业信息.{0,120}√其他行业.{0,80}"
+                    r"是否自愿披露.{0,30}□是√否",
+                    text,
+                )
+                or re.search(
                     r"(?:(?:公司|本公司).{0,80}|(?:现有|拥有|下辖).{0,50})"
                     r"(?:核定年产能|设计产能|现有产能|总产能|年产能|产能规模)"
                     r".{0,30}\d[\d,]*(?:\.\d+)?(?:万吨|吨|GWh|MWh|万㎡|亿㎡|㎡|台|套)",
@@ -3781,7 +3848,71 @@ def _coverage_evidence_owns_field(
         pattern = quantity_patterns.get(field_id)
         if pattern is not None:
             return bool(legal_empty_owner or re.search(pattern, text))
-    return True
+    if chapter_task == "extract_counterparties_and_concentration":
+        if field_id == "counterparty_relationship":
+            return bool(
+                re.search(
+                    r"贸易业务收入占营业收入比例超过10%的贸易业务前五名供应商"
+                    r".{0,40}□适用√不适用",
+                    text,
+                )
+                or re.search(
+                    r"前五名(?:客户|供应商).{0,120}"
+                    r"(?:销售额|采购额|销售金额|采购金额|"
+                    r"占年度(?:销售|采购)总额|合计|不适用)",
+                    text,
+                )
+            )
+        if field_id == "supplier_concentration":
+            return bool(
+                re.search(
+                    r"前五名供应商.{0,120}(?:采购额|采购金额|"
+                    r"占年度采购总额|比例|不适用)",
+                    text,
+                )
+            )
+        if field_id == "customer_concentration":
+            return bool(
+                re.search(
+                    r"前五名客户.{0,120}(?:销售额|销售金额|"
+                    r"占年度销售总额|占比|比例|不适用)",
+                    text,
+                )
+            )
+    if chapter_task == "extract_business_regime" and field_id == "business_regime":
+        return bool(
+            re.search(
+                r"本期公司业务类型、利润构成或利润来源发生重大变动的详细说明"
+                r".{0,30}□适用√不适用",
+                text,
+            )
+            or re.search(
+                r"报告期内公司商业模式未发生(?:明显|重大)?变化",
+                text,
+            )
+            or re.search(
+                r"业务、产品或服务发生重大变化.{0,100}"
+                r"(?:不适用|[√☑]不适用)",
+                text,
+            )
+            or re.search(
+                r"(?:主营业务|主要业务|经营模式|商业模式).{0,50}"
+                r"未发生(?:明显|重大)?变化",
+                text,
+            )
+            or re.search(
+                r"公司主营业务数据统计口径.{0,160}"
+                r"(?:不适用|[√☑]不适用)",
+                text,
+            )
+            or re.search(
+                r"(?:合并报表范围的变化情况|报告期内合并范围是否发生变动|"
+                r"主要子公司股权变动导致合并范围变化|合并报表范围发生变化|"
+                r"本集团本期合并范围比上年)",
+                text,
+            )
+        )
+    return False
 
 
 def _expand_existing_fact_refs(

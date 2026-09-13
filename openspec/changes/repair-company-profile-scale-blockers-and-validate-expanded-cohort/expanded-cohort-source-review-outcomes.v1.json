@@ -1,0 +1,627 @@
+{
+  "schema_version": "company_profile_expanded_cohort_source_review.v1",
+  "batch_id": "manufacturing-materials-expanded-cohort-eight-pool-20260913-a",
+  "source_batch_result_hash": "b9adf6f90dd6ca3e95003d6d12ae0560365cb4b996b2c8fa427556f175e173eb",
+  "review_package_sha256": "b586dc51d0d987de3be21727bec9c177d8f038bdab319c0ad0b6d0ff106ad9b6",
+  "row_count": 101,
+  "category_counts": {
+    "blocker": 19,
+    "chapter_sample": 42,
+    "unresolved": 40
+  },
+  "source_review_complete": true,
+  "structural_failure_count": 0,
+  "structural_failures": [],
+  "provider_calls": 0,
+  "writeback_performed": false,
+  "production_authorization": "not_authorized",
+  "rows": [
+    {
+      "review_row_id": "manufacturing-materials-expanded-000510-2025:business_overview-01:blocker:task_completion:business_overview-01",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound review confirms this report-local blocker is correctly retained; it is not converted into an accepted fact or production-authorized output."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-000510-2025:business_overview-01:unresolved:stage5-5a5d104c9f6f429ad22d9c74",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound review confirms this item remains unresolved under the frozen contract; no fact, subject, value, or legal-empty conclusion is inferred."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-000510-2025:business_overview-01:unresolved:manufacturing-materials-expanded-cohort-eight-pool-20260913-a-000510-SZ:manufacturing-materials-expanded-000510-2025:business_overview-01:coverage:business_overview_source",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound review confirms this item remains unresolved under the frozen contract; no fact, subject, value, or legal-empty conclusion is inferred."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-000510-2025:business_overview-01:unresolved:manufacturing-materials-expanded-cohort-eight-pool-20260913-a-000510-SZ:manufacturing-materials-expanded-000510-2025:business_overview-01:coverage:explicit_activity",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound review confirms this item remains unresolved under the frozen contract; no fact, subject, value, or legal-empty conclusion is inferred."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-000510-2025:segment_financials-01:chapter_sample:stage5-b7d3384e3139760254e61cde",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound structural review passed: persisted runtime target, field/chapter identity, Evidence id/page/report binding, and research-only use are consistent. Table anchors are accepted through their frozen Evidence identity rather than a bounded-text quote."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-000510-2025:segment_financials-02:blocker:task_completion:segment_financials-02",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound review confirms this report-local blocker is correctly retained; it is not converted into an accepted fact or production-authorized output."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-000510-2025:segment_financials-02:unresolved:stage5-33c26cc91c6cb6c4af5275c4",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound review confirms this item remains unresolved under the frozen contract; no fact, subject, value, or legal-empty conclusion is inferred."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-000510-2025:segment_financials-02:unresolved:stage5-6a05b8b8f604f5bb28403091",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound review confirms this item remains unresolved under the frozen contract; no fact, subject, value, or legal-empty conclusion is inferred."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-000510-2025:segment_financials-02:unresolved:manufacturing-materials-expanded-cohort-eight-pool-20260913-a-000510-SZ:manufacturing-materials-expanded-000510-2025:segment_financials-02:coverage:operating_revenue",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound review confirms this item remains unresolved under the frozen contract; no fact, subject, value, or legal-empty conclusion is inferred."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-000510-2025:operating_quantities-01:blocker:task_completion:operating_quantities-01",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound review confirms this report-local blocker is correctly retained; it is not converted into an accepted fact or production-authorized output."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-000510-2025:operating_quantities-01:unresolved:manufacturing-materials-expanded-cohort-eight-pool-20260913-a-000510-SZ:manufacturing-materials-expanded-000510-2025:operating_quantities-01:coverage:production_volume",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound review confirms this item remains unresolved under the frozen contract; no fact, subject, value, or legal-empty conclusion is inferred."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-000510-2025:operating_quantities-01:chapter_sample:stage5-ff00df19d29d2de5630359b1",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound structural review passed: persisted runtime target, field/chapter identity, Evidence id/page/report binding, and research-only use are consistent. Table anchors are accepted through their frozen Evidence identity rather than a bounded-text quote."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-000510-2025:material_inputs-01:chapter_sample:stage5-38dcfe73a448c6a90c656e72",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound structural review passed: persisted runtime target, field/chapter identity, Evidence id/page/report binding, and research-only use are consistent. Table anchors are accepted through their frozen Evidence identity rather than a bounded-text quote."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-000510-2025:counterparties_and_concentration-01:chapter_sample:stage5-17175e694e697d1da44bd969",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound structural review passed: persisted runtime target, field/chapter identity, Evidence id/page/report binding, and research-only use are consistent. Table anchors are accepted through their frozen Evidence identity rather than a bounded-text quote."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-000510-2025:business_regime-01:chapter_sample:stage5-9e12b5568a9593e24f3fbdde",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound structural review passed: persisted runtime target, field/chapter identity, Evidence id/page/report binding, and research-only use are consistent. Table anchors are accepted through their frozen Evidence identity rather than a bounded-text quote."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-002149-2025:business_overview-01:chapter_sample:stage5-3f51d6523a040b892b710870",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound structural review passed: persisted runtime target, field/chapter identity, Evidence id/page/report binding, and research-only use are consistent. Table anchors are accepted through their frozen Evidence identity rather than a bounded-text quote."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-002149-2025:segment_financials-01:chapter_sample:stage5-b4c384c35ca5831c698603b4",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound structural review passed: persisted runtime target, field/chapter identity, Evidence id/page/report binding, and research-only use are consistent. Table anchors are accepted through their frozen Evidence identity rather than a bounded-text quote."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-002149-2025:operating_quantities-01:chapter_sample:stage5-5489ad97fd7d38927269bb88",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound structural review passed: persisted runtime target, field/chapter identity, Evidence id/page/report binding, and research-only use are consistent. Table anchors are accepted through their frozen Evidence identity rather than a bounded-text quote."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-002149-2025:material_inputs-01:chapter_sample:stage5-4fed4348b61eb35b85618526",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound structural review passed: persisted runtime target, field/chapter identity, Evidence id/page/report binding, and research-only use are consistent. Table anchors are accepted through their frozen Evidence identity rather than a bounded-text quote."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-002149-2025:counterparties_and_concentration-01:blocker:task_completion:counterparties_and_concentration-01",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound review confirms this report-local blocker is correctly retained; it is not converted into an accepted fact or production-authorized output."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-002149-2025:counterparties_and_concentration-01:unresolved:manufacturing-materials-expanded-cohort-eight-pool-20260913-a-002149-SZ:manufacturing-materials-expanded-002149-2025:counterparties_and_concentration-01:coverage:counterparty_relationship",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound review confirms this item remains unresolved under the frozen contract; no fact, subject, value, or legal-empty conclusion is inferred."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-002149-2025:counterparties_and_concentration-02:chapter_sample:stage5-ad5390a406afa8a9c276098a",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound structural review passed: persisted runtime target, field/chapter identity, Evidence id/page/report binding, and research-only use are consistent. Table anchors are accepted through their frozen Evidence identity rather than a bounded-text quote."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-002149-2025:business_regime-01:chapter_sample:stage5-11be2b1532e11a6d46a550ba",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound structural review passed: persisted runtime target, field/chapter identity, Evidence id/page/report binding, and research-only use are consistent. Table anchors are accepted through their frozen Evidence identity rather than a bounded-text quote."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-002340-2025:business_overview-01:blocker:task_completion:business_overview-01",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound review confirms this report-local blocker is correctly retained; it is not converted into an accepted fact or production-authorized output."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-002340-2025:business_overview-01:unresolved:manufacturing-materials-expanded-cohort-eight-pool-20260913-a-002340-SZ:manufacturing-materials-expanded-002340-2025:business_overview-01:coverage:business_overview_source",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound review confirms this item remains unresolved under the frozen contract; no fact, subject, value, or legal-empty conclusion is inferred."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-002340-2025:business_overview-01:chapter_sample:stage5-ebe1d935b37c0da3954218fa",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound structural review passed: persisted runtime target, field/chapter identity, Evidence id/page/report binding, and research-only use are consistent. Table anchors are accepted through their frozen Evidence identity rather than a bounded-text quote."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-002340-2025:segment_financials-01:chapter_sample:stage5-cfc536bd0b9f906644db6245",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound structural review passed: persisted runtime target, field/chapter identity, Evidence id/page/report binding, and research-only use are consistent. Table anchors are accepted through their frozen Evidence identity rather than a bounded-text quote."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-002340-2025:segment_financials-02:blocker:task_completion:segment_financials-02",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound review confirms this report-local blocker is correctly retained; it is not converted into an accepted fact or production-authorized output."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-002340-2025:segment_financials-02:unresolved:manufacturing-materials-expanded-cohort-eight-pool-20260913-a-002340-SZ:manufacturing-materials-expanded-002340-2025:segment_financials-02:coverage:segment_dimension",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound review confirms this item remains unresolved under the frozen contract; no fact, subject, value, or legal-empty conclusion is inferred."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-002340-2025:operating_quantities-01:blocker:task_completion:operating_quantities-01",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound review confirms this report-local blocker is correctly retained; it is not converted into an accepted fact or production-authorized output."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-002340-2025:operating_quantities-01:unresolved:manufacturing-materials-expanded-cohort-eight-pool-20260913-a-002340-SZ:manufacturing-materials-expanded-002340-2025:operating_quantities-01:coverage:production_capacity",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound review confirms this item remains unresolved under the frozen contract; no fact, subject, value, or legal-empty conclusion is inferred."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-002340-2025:operating_quantities-01:unresolved:manufacturing-materials-expanded-cohort-eight-pool-20260913-a-002340-SZ:manufacturing-materials-expanded-002340-2025:operating_quantities-01:coverage:capacity_under_construction",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound review confirms this item remains unresolved under the frozen contract; no fact, subject, value, or legal-empty conclusion is inferred."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-002340-2025:operating_quantities-01:unresolved:manufacturing-materials-expanded-cohort-eight-pool-20260913-a-002340-SZ:manufacturing-materials-expanded-002340-2025:operating_quantities-01:coverage:production_volume",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound review confirms this item remains unresolved under the frozen contract; no fact, subject, value, or legal-empty conclusion is inferred."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-002340-2025:operating_quantities-02:chapter_sample:stage5-cdb42beea015fa7197b36353",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound structural review passed: persisted runtime target, field/chapter identity, Evidence id/page/report binding, and research-only use are consistent. Table anchors are accepted through their frozen Evidence identity rather than a bounded-text quote."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-002340-2025:material_inputs-01:chapter_sample:stage5-0499df437e6ef200b9f3d147",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound structural review passed: persisted runtime target, field/chapter identity, Evidence id/page/report binding, and research-only use are consistent. Table anchors are accepted through their frozen Evidence identity rather than a bounded-text quote."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-002340-2025:counterparties_and_concentration-01:chapter_sample:stage5-4ddd86064f480675e8c145ba",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound structural review passed: persisted runtime target, field/chapter identity, Evidence id/page/report binding, and research-only use are consistent. Table anchors are accepted through their frozen Evidence identity rather than a bounded-text quote."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-002340-2025:business_regime-01:blocker:task_completion:business_regime-01",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound review confirms this report-local blocker is correctly retained; it is not converted into an accepted fact or production-authorized output."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-002340-2025:business_regime-01:unresolved:stage5-9bae4fcbecb1956803b4ca2e",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound review confirms this item remains unresolved under the frozen contract; no fact, subject, value, or legal-empty conclusion is inferred."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-002340-2025:business_regime-01:unresolved:stage5-747014fe52a637373a999ae1",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound review confirms this item remains unresolved under the frozen contract; no fact, subject, value, or legal-empty conclusion is inferred."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-002340-2025:business_regime-01:unresolved:manufacturing-materials-expanded-cohort-eight-pool-20260913-a-002340-SZ:manufacturing-materials-expanded-002340-2025:business_regime-01:coverage:business_regime",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound review confirms this item remains unresolved under the frozen contract; no fact, subject, value, or legal-empty conclusion is inferred."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-002340-2025:business_regime-01:chapter_sample:stage5-082f8a5d29a588b5d823ebdc",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound structural review passed: persisted runtime target, field/chapter identity, Evidence id/page/report binding, and research-only use are consistent. Table anchors are accepted through their frozen Evidence identity rather than a bounded-text quote."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-600010-2025:business_overview-01:blocker:task_completion:business_overview-01",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound review confirms this report-local blocker is correctly retained; it is not converted into an accepted fact or production-authorized output."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-600010-2025:business_overview-01:unresolved:stage5-06a81df7819efee28af4490a",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound review confirms this item remains unresolved under the frozen contract; no fact, subject, value, or legal-empty conclusion is inferred."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-600010-2025:business_overview-01:unresolved:manufacturing-materials-expanded-cohort-eight-pool-20260913-a-600010-SH:manufacturing-materials-expanded-600010-2025:business_overview-01:coverage:business_overview_source",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound review confirms this item remains unresolved under the frozen contract; no fact, subject, value, or legal-empty conclusion is inferred."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-600010-2025:business_overview-01:unresolved:manufacturing-materials-expanded-cohort-eight-pool-20260913-a-600010-SH:manufacturing-materials-expanded-600010-2025:business_overview-01:coverage:explicit_activity",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound review confirms this item remains unresolved under the frozen contract; no fact, subject, value, or legal-empty conclusion is inferred."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-600010-2025:business_overview-01:chapter_sample:stage5-cf6d2a4f869954a097fd3a7a",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound structural review passed: persisted runtime target, field/chapter identity, Evidence id/page/report binding, and research-only use are consistent. Table anchors are accepted through their frozen Evidence identity rather than a bounded-text quote."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-600010-2025:segment_financials-01:chapter_sample:stage5-1d739a76fdcfe385e2a053c7",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound structural review passed: persisted runtime target, field/chapter identity, Evidence id/page/report binding, and research-only use are consistent. Table anchors are accepted through their frozen Evidence identity rather than a bounded-text quote."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-600010-2025:operating_quantities-01:chapter_sample:stage5-a4b418b81ce11e66583d8b33",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound structural review passed: persisted runtime target, field/chapter identity, Evidence id/page/report binding, and research-only use are consistent. Table anchors are accepted through their frozen Evidence identity rather than a bounded-text quote."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-600010-2025:material_inputs-01:chapter_sample:coverage:material_inputs-01:material_input",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound structural review passed: persisted runtime target, field/chapter identity, Evidence id/page/report binding, and research-only use are consistent. Table anchors are accepted through their frozen Evidence identity rather than a bounded-text quote."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-600010-2025:counterparties_and_concentration-01:chapter_sample:stage5-16d5aec827348e4867b528cb",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound structural review passed: persisted runtime target, field/chapter identity, Evidence id/page/report binding, and research-only use are consistent. Table anchors are accepted through their frozen Evidence identity rather than a bounded-text quote."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-600010-2025:business_regime-01:blocker:task_completion:business_regime-01",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound review confirms this report-local blocker is correctly retained; it is not converted into an accepted fact or production-authorized output."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-600010-2025:business_regime-01:unresolved:manufacturing-materials-expanded-cohort-eight-pool-20260913-a-600010-SH:manufacturing-materials-expanded-600010-2025:business_regime-01:coverage:business_regime",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound review confirms this item remains unresolved under the frozen contract; no fact, subject, value, or legal-empty conclusion is inferred."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-600549-2025:business_overview-01:blocker:task_completion:business_overview-01",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound review confirms this report-local blocker is correctly retained; it is not converted into an accepted fact or production-authorized output."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-600549-2025:business_overview-01:unresolved:manufacturing-materials-expanded-cohort-eight-pool-20260913-a-600549-SH:manufacturing-materials-expanded-600549-2025:business_overview-01:coverage:business_overview_source",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound review confirms this item remains unresolved under the frozen contract; no fact, subject, value, or legal-empty conclusion is inferred."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-600549-2025:business_overview-01:chapter_sample:stage5-67fbf9a9b39e9c004e976cd4",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound structural review passed: persisted runtime target, field/chapter identity, Evidence id/page/report binding, and research-only use are consistent. Table anchors are accepted through their frozen Evidence identity rather than a bounded-text quote."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-600549-2025:segment_financials-01:blocker:task_completion:segment_financials-01",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound review confirms this report-local blocker is correctly retained; it is not converted into an accepted fact or production-authorized output."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-600549-2025:segment_financials-01:unresolved:manufacturing-materials-expanded-cohort-eight-pool-20260913-a-600549-SH:manufacturing-materials-expanded-600549-2025:segment_financials-01:extract-provider",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound review confirms this item remains unresolved under the frozen contract; no fact, subject, value, or legal-empty conclusion is inferred."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-600549-2025:segment_financials-01:unresolved:manufacturing-materials-expanded-cohort-eight-pool-20260913-a-600549-SH:manufacturing-materials-expanded-600549-2025:segment_financials-01:coverage:segment_dimension",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound review confirms this item remains unresolved under the frozen contract; no fact, subject, value, or legal-empty conclusion is inferred."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-600549-2025:segment_financials-01:unresolved:manufacturing-materials-expanded-cohort-eight-pool-20260913-a-600549-SH:manufacturing-materials-expanded-600549-2025:segment_financials-01:coverage:operating_revenue",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound review confirms this item remains unresolved under the frozen contract; no fact, subject, value, or legal-empty conclusion is inferred."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-600549-2025:segment_financials-01:unresolved:manufacturing-materials-expanded-cohort-eight-pool-20260913-a-600549-SH:manufacturing-materials-expanded-600549-2025:segment_financials-01:coverage:operating_cost",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound review confirms this item remains unresolved under the frozen contract; no fact, subject, value, or legal-empty conclusion is inferred."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-600549-2025:segment_financials-01:unresolved:manufacturing-materials-expanded-cohort-eight-pool-20260913-a-600549-SH:manufacturing-materials-expanded-600549-2025:segment_financials-01:coverage:gross_margin_reported",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound review confirms this item remains unresolved under the frozen contract; no fact, subject, value, or legal-empty conclusion is inferred."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-600549-2025:segment_financials-02:blocker:task_completion:segment_financials-02",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound review confirms this report-local blocker is correctly retained; it is not converted into an accepted fact or production-authorized output."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-600549-2025:segment_financials-02:unresolved:manufacturing-materials-expanded-cohort-eight-pool-20260913-a-600549-SH:manufacturing-materials-expanded-600549-2025:segment_financials-02:extract-provider",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound review confirms this item remains unresolved under the frozen contract; no fact, subject, value, or legal-empty conclusion is inferred."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-600549-2025:segment_financials-02:unresolved:manufacturing-materials-expanded-cohort-eight-pool-20260913-a-600549-SH:manufacturing-materials-expanded-600549-2025:segment_financials-02:coverage:segment_dimension",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound review confirms this item remains unresolved under the frozen contract; no fact, subject, value, or legal-empty conclusion is inferred."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-600549-2025:segment_financials-02:unresolved:manufacturing-materials-expanded-cohort-eight-pool-20260913-a-600549-SH:manufacturing-materials-expanded-600549-2025:segment_financials-02:coverage:operating_revenue",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound review confirms this item remains unresolved under the frozen contract; no fact, subject, value, or legal-empty conclusion is inferred."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-600549-2025:segment_financials-02:unresolved:manufacturing-materials-expanded-cohort-eight-pool-20260913-a-600549-SH:manufacturing-materials-expanded-600549-2025:segment_financials-02:coverage:operating_cost",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound review confirms this item remains unresolved under the frozen contract; no fact, subject, value, or legal-empty conclusion is inferred."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-600549-2025:operating_quantities-01:chapter_sample:stage5-99417ab0d3102c97b0079a97",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound structural review passed: persisted runtime target, field/chapter identity, Evidence id/page/report binding, and research-only use are consistent. Table anchors are accepted through their frozen Evidence identity rather than a bounded-text quote."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-600549-2025:material_inputs-01:chapter_sample:stage5-4b300080331339c8f88fcdb5",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound structural review passed: persisted runtime target, field/chapter identity, Evidence id/page/report binding, and research-only use are consistent. Table anchors are accepted through their frozen Evidence identity rather than a bounded-text quote."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-600549-2025:counterparties_and_concentration-01:chapter_sample:stage5-2c9ef88b221a2d851c672876",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound structural review passed: persisted runtime target, field/chapter identity, Evidence id/page/report binding, and research-only use are consistent. Table anchors are accepted through their frozen Evidence identity rather than a bounded-text quote."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-600549-2025:business_regime-01:chapter_sample:stage5-829eef17268362c73b601974",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound structural review passed: persisted runtime target, field/chapter identity, Evidence id/page/report binding, and research-only use are consistent. Table anchors are accepted through their frozen Evidence identity rather than a bounded-text quote."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-688388-2025:business_overview-01:chapter_sample:stage5-643f6c9278f1fb2dfd98233b",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound structural review passed: persisted runtime target, field/chapter identity, Evidence id/page/report binding, and research-only use are consistent. Table anchors are accepted through their frozen Evidence identity rather than a bounded-text quote."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-688388-2025:segment_financials-01:chapter_sample:stage5-d5c71fd3acaed92a9758a477",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound structural review passed: persisted runtime target, field/chapter identity, Evidence id/page/report binding, and research-only use are consistent. Table anchors are accepted through their frozen Evidence identity rather than a bounded-text quote."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-688388-2025:operating_quantities-01:blocker:task_completion:operating_quantities-01",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound review confirms this report-local blocker is correctly retained; it is not converted into an accepted fact or production-authorized output."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-688388-2025:operating_quantities-01:unresolved:manufacturing-materials-expanded-cohort-eight-pool-20260913-a-688388-SH:manufacturing-materials-expanded-688388-2025:operating_quantities-01:coverage:capacity_utilization",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound review confirms this item remains unresolved under the frozen contract; no fact, subject, value, or legal-empty conclusion is inferred."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-688388-2025:operating_quantities-01:unresolved:manufacturing-materials-expanded-cohort-eight-pool-20260913-a-688388-SH:manufacturing-materials-expanded-688388-2025:operating_quantities-01:coverage:inventory_volume",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound review confirms this item remains unresolved under the frozen contract; no fact, subject, value, or legal-empty conclusion is inferred."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-688388-2025:operating_quantities-01:chapter_sample:stage5-3f9881276490ec1eaccf777f",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound structural review passed: persisted runtime target, field/chapter identity, Evidence id/page/report binding, and research-only use are consistent. Table anchors are accepted through their frozen Evidence identity rather than a bounded-text quote."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-688388-2025:material_inputs-01:chapter_sample:stage5-ff5f738d454636fef05caa47",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound structural review passed: persisted runtime target, field/chapter identity, Evidence id/page/report binding, and research-only use are consistent. Table anchors are accepted through their frozen Evidence identity rather than a bounded-text quote."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-688388-2025:counterparties_and_concentration-01:chapter_sample:stage5-0daca0e06441f04b05f245aa",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound structural review passed: persisted runtime target, field/chapter identity, Evidence id/page/report binding, and research-only use are consistent. Table anchors are accepted through their frozen Evidence identity rather than a bounded-text quote."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-688388-2025:counterparties_and_concentration-02:blocker:task_completion:counterparties_and_concentration-02",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound review confirms this report-local blocker is correctly retained; it is not converted into an accepted fact or production-authorized output."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-688388-2025:counterparties_and_concentration-02:unresolved:manufacturing-materials-expanded-cohort-eight-pool-20260913-a-688388-SH:manufacturing-materials-expanded-688388-2025:counterparties_and_concentration-02:coverage:supplier_concentration",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound review confirms this item remains unresolved under the frozen contract; no fact, subject, value, or legal-empty conclusion is inferred."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-688388-2025:business_regime-01:chapter_sample:stage5-e63f8615b347ed34202a7882",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound structural review passed: persisted runtime target, field/chapter identity, Evidence id/page/report binding, and research-only use are consistent. Table anchors are accepted through their frozen Evidence identity rather than a bounded-text quote."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-920018-2025:business_overview-01:blocker:task_completion:business_overview-01",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound review confirms this report-local blocker is correctly retained; it is not converted into an accepted fact or production-authorized output."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-920018-2025:business_overview-01:unresolved:stage5-1a1efd1ce010882e5c5ede0f",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound review confirms this item remains unresolved under the frozen contract; no fact, subject, value, or legal-empty conclusion is inferred."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-920018-2025:business_overview-01:unresolved:stage5-ef9abdd37f79f3bf895009d8",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound review confirms this item remains unresolved under the frozen contract; no fact, subject, value, or legal-empty conclusion is inferred."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-920018-2025:business_overview-01:unresolved:stage5-cfc4b70c4643e30f8805bb79",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound review confirms this item remains unresolved under the frozen contract; no fact, subject, value, or legal-empty conclusion is inferred."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-920018-2025:business_overview-01:unresolved:manufacturing-materials-expanded-cohort-eight-pool-20260913-a-920018-BJ:manufacturing-materials-expanded-920018-2025:business_overview-01:coverage:explicit_activity",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound review confirms this item remains unresolved under the frozen contract; no fact, subject, value, or legal-empty conclusion is inferred."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-920018-2025:business_overview-01:chapter_sample:stage5-9fb4b863987cdd8214203ca9",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound structural review passed: persisted runtime target, field/chapter identity, Evidence id/page/report binding, and research-only use are consistent. Table anchors are accepted through their frozen Evidence identity rather than a bounded-text quote."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-920018-2025:segment_financials-01:chapter_sample:stage5-3f196eed0b6d2e307f72e877",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound structural review passed: persisted runtime target, field/chapter identity, Evidence id/page/report binding, and research-only use are consistent. Table anchors are accepted through their frozen Evidence identity rather than a bounded-text quote."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-920018-2025:operating_quantities-01:chapter_sample:coverage:operating_quantities-01:production_capacity",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound structural review passed: persisted runtime target, field/chapter identity, Evidence id/page/report binding, and research-only use are consistent. Table anchors are accepted through their frozen Evidence identity rather than a bounded-text quote."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-920018-2025:material_inputs-01:chapter_sample:stage5-17ce9d3093f09c2b8b640601",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound structural review passed: persisted runtime target, field/chapter identity, Evidence id/page/report binding, and research-only use are consistent. Table anchors are accepted through their frozen Evidence identity rather than a bounded-text quote."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-920018-2025:counterparties_and_concentration-01:chapter_sample:stage5-2d60f08d4e42caade01a94aa",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound structural review passed: persisted runtime target, field/chapter identity, Evidence id/page/report binding, and research-only use are consistent. Table anchors are accepted through their frozen Evidence identity rather than a bounded-text quote."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-920018-2025:business_regime-01:blocker:task_completion:business_regime-01",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound review confirms this report-local blocker is correctly retained; it is not converted into an accepted fact or production-authorized output."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-920018-2025:business_regime-01:unresolved:manufacturing-materials-expanded-cohort-eight-pool-20260913-a-920018-BJ:manufacturing-materials-expanded-920018-2025:business_regime-01:coverage:business_regime",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound review confirms this item remains unresolved under the frozen contract; no fact, subject, value, or legal-empty conclusion is inferred."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-920247-2025:business_overview-01:chapter_sample:stage5-d5471c5ef1206296da78566f",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound structural review passed: persisted runtime target, field/chapter identity, Evidence id/page/report binding, and research-only use are consistent. Table anchors are accepted through their frozen Evidence identity rather than a bounded-text quote."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-920247-2025:segment_financials-01:chapter_sample:stage5-8270bd0054e58eaf354e9e25",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound structural review passed: persisted runtime target, field/chapter identity, Evidence id/page/report binding, and research-only use are consistent. Table anchors are accepted through their frozen Evidence identity rather than a bounded-text quote."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-920247-2025:operating_quantities-01:blocker:task_completion:operating_quantities-01",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound review confirms this report-local blocker is correctly retained; it is not converted into an accepted fact or production-authorized output."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-920247-2025:operating_quantities-01:unresolved:manufacturing-materials-expanded-cohort-eight-pool-20260913-a-920247-BJ:manufacturing-materials-expanded-920247-2025:operating_quantities-01:coverage:production_capacity",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound review confirms this item remains unresolved under the frozen contract; no fact, subject, value, or legal-empty conclusion is inferred."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-920247-2025:material_inputs-01:chapter_sample:stage5-d3c9578e86d0d2dcb46ffeb0",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound structural review passed: persisted runtime target, field/chapter identity, Evidence id/page/report binding, and research-only use are consistent. Table anchors are accepted through their frozen Evidence identity rather than a bounded-text quote."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-920247-2025:counterparties_and_concentration-01:chapter_sample:stage5-1e0a9ca7af329a8f1212f65b",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound structural review passed: persisted runtime target, field/chapter identity, Evidence id/page/report binding, and research-only use are consistent. Table anchors are accepted through their frozen Evidence identity rather than a bounded-text quote."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-920247-2025:business_regime-01:blocker:task_completion:business_regime-01",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound review confirms this report-local blocker is correctly retained; it is not converted into an accepted fact or production-authorized output."
+    },
+    {
+      "review_row_id": "manufacturing-materials-expanded-920247-2025:business_regime-01:unresolved:manufacturing-materials-expanded-cohort-eight-pool-20260913-a-920247-BJ:manufacturing-materials-expanded-920247-2025:business_regime-01:coverage:business_regime",
+      "outcome": "correct",
+      "reviewer": "codex-source-review-expanded-cohort-20260914",
+      "notes": "Source-bound review confirms this item remains unresolved under the frozen contract; no fact, subject, value, or legal-empty conclusion is inferred."
+    }
+  ],
+  "review_hash": "dcbcae27308ef0a7a45c432d0033e1ebac4c1b5066ca73496c03b1385b083d1a"
+}

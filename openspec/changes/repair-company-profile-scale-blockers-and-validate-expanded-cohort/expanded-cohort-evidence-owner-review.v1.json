@@ -1,0 +1,1216 @@
+{
+  "schema_version": "company_profile_expanded_cohort_evidence_owner_review.v1",
+  "review_id": "manufacturing-materials-expanded-cohort-owner-review-20260913-a",
+  "reviewed_on": "2026-09-13",
+  "sample_manifest_sha256": "9c06180b852c2e7c72f9960ce6d7f0fe000d40e2bd2fdefc6c9af7b49f8a3a0c",
+  "evidence_plan_sha256": "3082c5d875a46e289193b320e4ea56f54726aef411989fa46c488c8e738385e3",
+  "row_count": 60,
+  "rows": [
+    {
+      "sample_id": "manufacturing-materials-expanded-000510-2025",
+      "chapter_task": "extract_business_overview",
+      "scope_id": "business_overview-01",
+      "field_ids": [
+        "business_overview_source",
+        "explicit_activity"
+      ],
+      "physical_pages": [
+        10,
+        11
+      ],
+      "page_text_hashes": {
+        "10": "794bc9a12f233771b54f83df1f61ea27394c9acf9caf818dd33454377913dd62",
+        "11": "ebd2b3caf61b9a4b86d499de446ecaf8e1d8ebe30557e684d4e6d46b5864c978"
+      },
+      "evidence_count": 2,
+      "decision": "owner_supported"
+    },
+    {
+      "sample_id": "manufacturing-materials-expanded-000510-2025",
+      "chapter_task": "extract_segment_financials",
+      "scope_id": "segment_financials-01",
+      "field_ids": [
+        "segment_dimension",
+        "operating_revenue",
+        "operating_cost",
+        "gross_margin_reported"
+      ],
+      "physical_pages": [
+        18
+      ],
+      "page_text_hashes": {
+        "18": "38a4cd5a7c0ac39506169c31e8fe728df3534eda345c42e078c0356f66f3879e"
+      },
+      "evidence_count": 1,
+      "decision": "owner_supported"
+    },
+    {
+      "sample_id": "manufacturing-materials-expanded-000510-2025",
+      "chapter_task": "extract_segment_financials",
+      "scope_id": "segment_financials-02",
+      "field_ids": [
+        "segment_dimension",
+        "operating_revenue",
+        "operating_cost"
+      ],
+      "physical_pages": [
+        189
+      ],
+      "page_text_hashes": {
+        "189": "a7a067717f7cd5dc4e27cb12bd22b3f41f5f7ab2a804a18f033142f90a3fb623"
+      },
+      "evidence_count": 1,
+      "decision": "owner_supported"
+    },
+    {
+      "sample_id": "manufacturing-materials-expanded-000510-2025",
+      "chapter_task": "extract_operating_quantities",
+      "scope_id": "operating_quantities-01",
+      "field_ids": [
+        "production_capacity",
+        "capacity_under_construction",
+        "capacity_utilization",
+        "production_volume"
+      ],
+      "physical_pages": [
+        10,
+        11
+      ],
+      "page_text_hashes": {
+        "10": "794bc9a12f233771b54f83df1f61ea27394c9acf9caf818dd33454377913dd62",
+        "11": "ebd2b3caf61b9a4b86d499de446ecaf8e1d8ebe30557e684d4e6d46b5864c978"
+      },
+      "evidence_count": 2,
+      "decision": "owner_supported"
+    },
+    {
+      "sample_id": "manufacturing-materials-expanded-000510-2025",
+      "chapter_task": "extract_operating_quantities",
+      "scope_id": "operating_quantities-02",
+      "field_ids": [
+        "production_volume",
+        "sales_volume",
+        "inventory_volume"
+      ],
+      "physical_pages": [
+        18,
+        19
+      ],
+      "page_text_hashes": {
+        "18": "38a4cd5a7c0ac39506169c31e8fe728df3534eda345c42e078c0356f66f3879e",
+        "19": "0eea24978e885a3fae6565492b338559c25f7e84268228619ccd03795c552e49"
+      },
+      "evidence_count": 2,
+      "decision": "owner_supported"
+    },
+    {
+      "sample_id": "manufacturing-materials-expanded-000510-2025",
+      "chapter_task": "extract_material_inputs",
+      "scope_id": "material_inputs-01",
+      "field_ids": [
+        "material_input"
+      ],
+      "physical_pages": [
+        10,
+        11,
+        12
+      ],
+      "page_text_hashes": {
+        "10": "794bc9a12f233771b54f83df1f61ea27394c9acf9caf818dd33454377913dd62",
+        "11": "ebd2b3caf61b9a4b86d499de446ecaf8e1d8ebe30557e684d4e6d46b5864c978",
+        "12": "8d4baf5773f8766c8731d53b52431c6bafa42a96320ca1c50dacf6fdb455f02b"
+      },
+      "evidence_count": 3,
+      "decision": "owner_supported"
+    },
+    {
+      "sample_id": "manufacturing-materials-expanded-000510-2025",
+      "chapter_task": "extract_counterparties_and_concentration",
+      "scope_id": "counterparties_and_concentration-01",
+      "field_ids": [
+        "counterparty_relationship",
+        "customer_concentration",
+        "supplier_concentration"
+      ],
+      "physical_pages": [
+        19,
+        20,
+        21
+      ],
+      "page_text_hashes": {
+        "19": "0eea24978e885a3fae6565492b338559c25f7e84268228619ccd03795c552e49",
+        "20": "eb3e99ae520955f71a463a0b843c3afdef29c52578e38fab6e8dfa4b1c009eb3",
+        "21": "7a69ce2cad4d62263790bc6fe887433471193b950e9a8388bb9b9f6dfe23cc68"
+      },
+      "evidence_count": 3,
+      "decision": "owner_supported"
+    },
+    {
+      "sample_id": "manufacturing-materials-expanded-000510-2025",
+      "chapter_task": "extract_business_regime",
+      "scope_id": "business_regime-01",
+      "field_ids": [
+        "business_regime"
+      ],
+      "physical_pages": [
+        19,
+        20
+      ],
+      "page_text_hashes": {
+        "19": "0eea24978e885a3fae6565492b338559c25f7e84268228619ccd03795c552e49",
+        "20": "eb3e99ae520955f71a463a0b843c3afdef29c52578e38fab6e8dfa4b1c009eb3"
+      },
+      "evidence_count": 2,
+      "decision": "owner_supported"
+    },
+    {
+      "sample_id": "manufacturing-materials-expanded-002149-2025",
+      "chapter_task": "extract_business_overview",
+      "scope_id": "business_overview-01",
+      "field_ids": [
+        "business_overview_source",
+        "explicit_activity"
+      ],
+      "physical_pages": [
+        17
+      ],
+      "page_text_hashes": {
+        "17": "ac0d601da21bc911fecd93f571898344cca620870e35b957dab1e0bcd6f80a26"
+      },
+      "evidence_count": 1,
+      "decision": "owner_supported"
+    },
+    {
+      "sample_id": "manufacturing-materials-expanded-002149-2025",
+      "chapter_task": "extract_segment_financials",
+      "scope_id": "segment_financials-01",
+      "field_ids": [
+        "segment_dimension",
+        "operating_revenue",
+        "operating_cost",
+        "gross_margin_reported"
+      ],
+      "physical_pages": [
+        23,
+        24
+      ],
+      "page_text_hashes": {
+        "23": "b4fed35a2cbf6a6304cbdc451ea4790db0b2dfae3e36f7b17f398ea10a6960a1",
+        "24": "4c89c1559b2de87b0d4c3fd805ffbe266c4aef06ddd6d8d3d82aca64ffc1349c"
+      },
+      "evidence_count": 2,
+      "decision": "owner_supported"
+    },
+    {
+      "sample_id": "manufacturing-materials-expanded-002149-2025",
+      "chapter_task": "extract_segment_financials",
+      "scope_id": "segment_financials-02",
+      "field_ids": [
+        "segment_dimension",
+        "operating_revenue",
+        "operating_cost"
+      ],
+      "physical_pages": [
+        215
+      ],
+      "page_text_hashes": {
+        "215": "e292f588e42a9e9c64b42ff43eeb22f63bb82789f7508357133ec279b418f939"
+      },
+      "evidence_count": 1,
+      "decision": "owner_supported"
+    },
+    {
+      "sample_id": "manufacturing-materials-expanded-002149-2025",
+      "chapter_task": "extract_operating_quantities",
+      "scope_id": "operating_quantities-01",
+      "field_ids": [
+        "production_volume",
+        "sales_volume",
+        "inventory_volume"
+      ],
+      "physical_pages": [
+        23,
+        24,
+        25
+      ],
+      "page_text_hashes": {
+        "23": "b4fed35a2cbf6a6304cbdc451ea4790db0b2dfae3e36f7b17f398ea10a6960a1",
+        "24": "4c89c1559b2de87b0d4c3fd805ffbe266c4aef06ddd6d8d3d82aca64ffc1349c",
+        "25": "e87c41e09af8839dc76ad404850f5caff2d0dcf90bc9326a65ea3ac732f471be"
+      },
+      "evidence_count": 3,
+      "decision": "owner_supported"
+    },
+    {
+      "sample_id": "manufacturing-materials-expanded-002149-2025",
+      "chapter_task": "extract_material_inputs",
+      "scope_id": "material_inputs-01",
+      "field_ids": [
+        "material_input"
+      ],
+      "physical_pages": [
+        17,
+        18
+      ],
+      "page_text_hashes": {
+        "17": "ac0d601da21bc911fecd93f571898344cca620870e35b957dab1e0bcd6f80a26",
+        "18": "7d4506cd3dd2b8eaf9b1bc84f298514ab9de986493f5f780b0875f3cd0f26eb2"
+      },
+      "evidence_count": 2,
+      "decision": "owner_supported"
+    },
+    {
+      "sample_id": "manufacturing-materials-expanded-002149-2025",
+      "chapter_task": "extract_counterparties_and_concentration",
+      "scope_id": "counterparties_and_concentration-01",
+      "field_ids": [
+        "counterparty_relationship"
+      ],
+      "physical_pages": [
+        11
+      ],
+      "page_text_hashes": {
+        "11": "e7d59b8ca08e6d2a7d2099203ba143f738bd9498be9ce5cf10ae880027e89323"
+      },
+      "evidence_count": 1,
+      "decision": "owner_supported"
+    },
+    {
+      "sample_id": "manufacturing-materials-expanded-002149-2025",
+      "chapter_task": "extract_counterparties_and_concentration",
+      "scope_id": "counterparties_and_concentration-02",
+      "field_ids": [
+        "counterparty_relationship",
+        "customer_concentration",
+        "supplier_concentration"
+      ],
+      "physical_pages": [
+        25,
+        26,
+        27
+      ],
+      "page_text_hashes": {
+        "25": "e87c41e09af8839dc76ad404850f5caff2d0dcf90bc9326a65ea3ac732f471be",
+        "26": "a59162190cb301d07fa1bb3a68764d75c86cfc744f9c0e6ba55b4b196855b69b",
+        "27": "307b7c73e3deb7ea27ef18a4459b29d7add6ba2d1f8419dd623c71e1039f0771"
+      },
+      "evidence_count": 3,
+      "decision": "owner_supported"
+    },
+    {
+      "sample_id": "manufacturing-materials-expanded-002149-2025",
+      "chapter_task": "extract_business_regime",
+      "scope_id": "business_regime-01",
+      "field_ids": [
+        "business_regime"
+      ],
+      "physical_pages": [
+        25,
+        26
+      ],
+      "page_text_hashes": {
+        "25": "e87c41e09af8839dc76ad404850f5caff2d0dcf90bc9326a65ea3ac732f471be",
+        "26": "a59162190cb301d07fa1bb3a68764d75c86cfc744f9c0e6ba55b4b196855b69b"
+      },
+      "evidence_count": 2,
+      "decision": "owner_supported"
+    },
+    {
+      "sample_id": "manufacturing-materials-expanded-002340-2025",
+      "chapter_task": "extract_business_overview",
+      "scope_id": "business_overview-01",
+      "field_ids": [
+        "business_overview_source",
+        "explicit_activity"
+      ],
+      "physical_pages": [
+        10
+      ],
+      "page_text_hashes": {
+        "10": "b5381e01975db57a0373c2737f6f4b94297688598ad8d5fadb3369cdff1d9a8e"
+      },
+      "evidence_count": 1,
+      "decision": "owner_supported"
+    },
+    {
+      "sample_id": "manufacturing-materials-expanded-002340-2025",
+      "chapter_task": "extract_segment_financials",
+      "scope_id": "segment_financials-01",
+      "field_ids": [
+        "segment_dimension",
+        "operating_revenue",
+        "operating_cost",
+        "gross_margin_reported"
+      ],
+      "physical_pages": [
+        43,
+        44,
+        45
+      ],
+      "page_text_hashes": {
+        "43": "50a36edfb60c82593d7d577a0955c59b95e86873fe7f81a570a44c0c9e62fb17",
+        "44": "1fc7657b9f35c5ed20c77e39c75573d03f190140b4cfa8bc7051f96bf71917e1",
+        "45": "667fbceace0abd3aa671d2a44f649230baed639716e3c69a81980a8e1df007fc"
+      },
+      "evidence_count": 3,
+      "decision": "owner_supported"
+    },
+    {
+      "sample_id": "manufacturing-materials-expanded-002340-2025",
+      "chapter_task": "extract_segment_financials",
+      "scope_id": "segment_financials-02",
+      "field_ids": [
+        "segment_dimension"
+      ],
+      "physical_pages": [
+        309
+      ],
+      "page_text_hashes": {
+        "309": "654cfbc9620ce533853f83964ae41a0107b16ef7f355b3ecc6a73ad0951a20f4"
+      },
+      "evidence_count": 1,
+      "decision": "owner_supported"
+    },
+    {
+      "sample_id": "manufacturing-materials-expanded-002340-2025",
+      "chapter_task": "extract_operating_quantities",
+      "scope_id": "operating_quantities-01",
+      "field_ids": [
+        "production_capacity",
+        "capacity_under_construction",
+        "production_volume"
+      ],
+      "physical_pages": [
+        35
+      ],
+      "page_text_hashes": {
+        "35": "7cc911fa273ae82dea231d32c45f0a036190f5ef756b8171f431e0db8dea088a"
+      },
+      "evidence_count": 1,
+      "decision": "owner_supported"
+    },
+    {
+      "sample_id": "manufacturing-materials-expanded-002340-2025",
+      "chapter_task": "extract_operating_quantities",
+      "scope_id": "operating_quantities-02",
+      "field_ids": [
+        "production_volume",
+        "sales_volume",
+        "inventory_volume"
+      ],
+      "physical_pages": [
+        44,
+        45
+      ],
+      "page_text_hashes": {
+        "44": "1fc7657b9f35c5ed20c77e39c75573d03f190140b4cfa8bc7051f96bf71917e1",
+        "45": "667fbceace0abd3aa671d2a44f649230baed639716e3c69a81980a8e1df007fc"
+      },
+      "evidence_count": 2,
+      "decision": "owner_supported"
+    },
+    {
+      "sample_id": "manufacturing-materials-expanded-002340-2025",
+      "chapter_task": "extract_material_inputs",
+      "scope_id": "material_inputs-01",
+      "field_ids": [
+        "material_input"
+      ],
+      "physical_pages": [
+        45,
+        46
+      ],
+      "page_text_hashes": {
+        "45": "667fbceace0abd3aa671d2a44f649230baed639716e3c69a81980a8e1df007fc",
+        "46": "72e68eb7f89ebd3b1742278365de198832514bd8b8c80367b27480cbe3033c2f"
+      },
+      "evidence_count": 2,
+      "decision": "owner_supported"
+    },
+    {
+      "sample_id": "manufacturing-materials-expanded-002340-2025",
+      "chapter_task": "extract_counterparties_and_concentration",
+      "scope_id": "counterparties_and_concentration-01",
+      "field_ids": [
+        "counterparty_relationship",
+        "customer_concentration",
+        "supplier_concentration"
+      ],
+      "physical_pages": [
+        48,
+        49,
+        50
+      ],
+      "page_text_hashes": {
+        "48": "64c7c2404460af4c6902562f3d4b53f797e3fbe1c2699faebae32f87e521eef3",
+        "49": "7094150258a890737678e990a557d4f07c16f841c5f6e9eb3d58321ebc040bac",
+        "50": "5c08a497a11591731eee4b6f33b2aba98f36f879fea7378cbea81d78d5a624a8"
+      },
+      "evidence_count": 3,
+      "decision": "owner_supported"
+    },
+    {
+      "sample_id": "manufacturing-materials-expanded-002340-2025",
+      "chapter_task": "extract_business_regime",
+      "scope_id": "business_regime-01",
+      "field_ids": [
+        "business_regime"
+      ],
+      "physical_pages": [
+        48,
+        49,
+        50
+      ],
+      "page_text_hashes": {
+        "48": "64c7c2404460af4c6902562f3d4b53f797e3fbe1c2699faebae32f87e521eef3",
+        "49": "7094150258a890737678e990a557d4f07c16f841c5f6e9eb3d58321ebc040bac",
+        "50": "5c08a497a11591731eee4b6f33b2aba98f36f879fea7378cbea81d78d5a624a8"
+      },
+      "evidence_count": 3,
+      "decision": "owner_supported"
+    },
+    {
+      "sample_id": "manufacturing-materials-expanded-600010-2025",
+      "chapter_task": "extract_business_overview",
+      "scope_id": "business_overview-01",
+      "field_ids": [
+        "business_overview_source",
+        "explicit_activity"
+      ],
+      "physical_pages": [
+        8,
+        9
+      ],
+      "page_text_hashes": {
+        "8": "45cfcc337a6c66051a39db099f5548b60cba26c864a56b925dea6f33c227a27b",
+        "9": "285275a5b926974226104fb4ac3f313a87a6baca2e2a25542bb5e09ae6127a80"
+      },
+      "evidence_count": 2,
+      "decision": "owner_supported"
+    },
+    {
+      "sample_id": "manufacturing-materials-expanded-600010-2025",
+      "chapter_task": "extract_segment_financials",
+      "scope_id": "segment_financials-01",
+      "field_ids": [
+        "segment_dimension",
+        "operating_revenue",
+        "operating_cost",
+        "gross_margin_reported"
+      ],
+      "physical_pages": [
+        14,
+        15,
+        16
+      ],
+      "page_text_hashes": {
+        "14": "bb9ec9349edaeda865c3d1670ce908c7c464990d37ec21afac4bb1d75988051b",
+        "15": "bebae77f70729a7a819ceda9d2da74fc3f0a673c66afde20626f70b6bdce4b93",
+        "16": "e70d1127c91e23f2278119459105e31aba5f59c1d91b75fadca68cd3f304d6b9"
+      },
+      "evidence_count": 3,
+      "decision": "owner_supported"
+    },
+    {
+      "sample_id": "manufacturing-materials-expanded-600010-2025",
+      "chapter_task": "extract_segment_financials",
+      "scope_id": "segment_financials-02",
+      "field_ids": [
+        "segment_dimension"
+      ],
+      "physical_pages": [
+        226
+      ],
+      "page_text_hashes": {
+        "226": "636445f70d37d12507eec4d5537ae1c3aa169db9fcd322cb90b5313b7f768ff3"
+      },
+      "evidence_count": 1,
+      "decision": "owner_supported"
+    },
+    {
+      "sample_id": "manufacturing-materials-expanded-600010-2025",
+      "chapter_task": "extract_operating_quantities",
+      "scope_id": "operating_quantities-01",
+      "field_ids": [
+        "production_volume",
+        "sales_volume",
+        "inventory_volume"
+      ],
+      "physical_pages": [
+        14,
+        15,
+        16
+      ],
+      "page_text_hashes": {
+        "14": "bb9ec9349edaeda865c3d1670ce908c7c464990d37ec21afac4bb1d75988051b",
+        "15": "bebae77f70729a7a819ceda9d2da74fc3f0a673c66afde20626f70b6bdce4b93",
+        "16": "e70d1127c91e23f2278119459105e31aba5f59c1d91b75fadca68cd3f304d6b9"
+      },
+      "evidence_count": 3,
+      "decision": "owner_supported"
+    },
+    {
+      "sample_id": "manufacturing-materials-expanded-600010-2025",
+      "chapter_task": "extract_material_inputs",
+      "scope_id": "material_inputs-01",
+      "field_ids": [
+        "material_input"
+      ],
+      "physical_pages": [
+        15,
+        16
+      ],
+      "page_text_hashes": {
+        "15": "bebae77f70729a7a819ceda9d2da74fc3f0a673c66afde20626f70b6bdce4b93",
+        "16": "e70d1127c91e23f2278119459105e31aba5f59c1d91b75fadca68cd3f304d6b9"
+      },
+      "evidence_count": 2,
+      "decision": "owner_supported"
+    },
+    {
+      "sample_id": "manufacturing-materials-expanded-600010-2025",
+      "chapter_task": "extract_counterparties_and_concentration",
+      "scope_id": "counterparties_and_concentration-01",
+      "field_ids": [
+        "counterparty_relationship",
+        "customer_concentration",
+        "supplier_concentration"
+      ],
+      "physical_pages": [
+        15,
+        16,
+        17
+      ],
+      "page_text_hashes": {
+        "15": "bebae77f70729a7a819ceda9d2da74fc3f0a673c66afde20626f70b6bdce4b93",
+        "16": "e70d1127c91e23f2278119459105e31aba5f59c1d91b75fadca68cd3f304d6b9",
+        "17": "19dc4eb5d23a4b924e42c222618dc14804d20e36b2825f5159e406659efd8e45"
+      },
+      "evidence_count": 3,
+      "decision": "owner_supported"
+    },
+    {
+      "sample_id": "manufacturing-materials-expanded-600010-2025",
+      "chapter_task": "extract_business_regime",
+      "scope_id": "business_regime-01",
+      "field_ids": [
+        "business_regime"
+      ],
+      "physical_pages": [
+        15,
+        16
+      ],
+      "page_text_hashes": {
+        "15": "bebae77f70729a7a819ceda9d2da74fc3f0a673c66afde20626f70b6bdce4b93",
+        "16": "e70d1127c91e23f2278119459105e31aba5f59c1d91b75fadca68cd3f304d6b9"
+      },
+      "evidence_count": 2,
+      "decision": "owner_supported"
+    },
+    {
+      "sample_id": "manufacturing-materials-expanded-600549-2025",
+      "chapter_task": "extract_business_overview",
+      "scope_id": "business_overview-01",
+      "field_ids": [
+        "business_overview_source",
+        "explicit_activity"
+      ],
+      "physical_pages": [
+        11,
+        12,
+        13,
+        14,
+        15,
+        16
+      ],
+      "page_text_hashes": {
+        "11": "c0b8ae00693f68fb921b30f29c453a8df9aa2a7166752766bb2cbbb01c5ae608",
+        "12": "2f049e36a6e555619e324ba3ce0f4e6d641656e77c41ada7ca45fb7f91e6127b",
+        "13": "510ee0ae9112d7911f6dbc1a2035e7b3610b132ab0c8cd747c31f32f54f7ea43",
+        "14": "8829d2ccc1b18b1aa28fcd841664f4377933433c8a87cfca3c471525ac08baee",
+        "15": "85c3a94417edf1d7449dd530e30a7e22e6fd7b2bc47e5e93d6cf80dbbc5029ac",
+        "16": "5f066412b8089d9d070dcad4e9d4891744f7ef9e54819bfc5791f60873638e7f"
+      },
+      "evidence_count": 6,
+      "decision": "owner_supported"
+    },
+    {
+      "sample_id": "manufacturing-materials-expanded-600549-2025",
+      "chapter_task": "extract_segment_financials",
+      "scope_id": "segment_financials-01",
+      "field_ids": [
+        "segment_dimension",
+        "operating_revenue",
+        "operating_cost",
+        "gross_margin_reported"
+      ],
+      "physical_pages": [
+        41,
+        42
+      ],
+      "page_text_hashes": {
+        "41": "fb641e934d3697c325a11411a36b86c5e804a5753423de119a55b87d9f0e630a",
+        "42": "1cc1769a1e9cb3b29e89d86a44db291b084460fde4c9164c3077ce026180b5da"
+      },
+      "evidence_count": 2,
+      "decision": "owner_supported"
+    },
+    {
+      "sample_id": "manufacturing-materials-expanded-600549-2025",
+      "chapter_task": "extract_segment_financials",
+      "scope_id": "segment_financials-02",
+      "field_ids": [
+        "segment_dimension",
+        "operating_revenue",
+        "operating_cost"
+      ],
+      "physical_pages": [
+        333
+      ],
+      "page_text_hashes": {
+        "333": "2a66765e7ee2098a187ee592020728a27ef39d08e44923367e88cba704c27ede"
+      },
+      "evidence_count": 1,
+      "decision": "owner_supported"
+    },
+    {
+      "sample_id": "manufacturing-materials-expanded-600549-2025",
+      "chapter_task": "extract_operating_quantities",
+      "scope_id": "operating_quantities-01",
+      "field_ids": [
+        "production_volume",
+        "sales_volume",
+        "inventory_volume"
+      ],
+      "physical_pages": [
+        42,
+        43,
+        44
+      ],
+      "page_text_hashes": {
+        "42": "1cc1769a1e9cb3b29e89d86a44db291b084460fde4c9164c3077ce026180b5da",
+        "43": "cb93b48d51514a2716975420e3e0b5d4d936411284f128fff618a9e0250e073c",
+        "44": "40c6ccd61aa65fe7ae227152d2ce0028253cb507e773bac95a0de1169c507702"
+      },
+      "evidence_count": 3,
+      "decision": "owner_supported"
+    },
+    {
+      "sample_id": "manufacturing-materials-expanded-600549-2025",
+      "chapter_task": "extract_material_inputs",
+      "scope_id": "material_inputs-01",
+      "field_ids": [
+        "material_input"
+      ],
+      "physical_pages": [
+        17
+      ],
+      "page_text_hashes": {
+        "17": "a3ae127c3ce4737c5607774f0cc17582c02af47ea03b9e2de35df3fce8832850"
+      },
+      "evidence_count": 1,
+      "decision": "owner_supported"
+    },
+    {
+      "sample_id": "manufacturing-materials-expanded-600549-2025",
+      "chapter_task": "extract_counterparties_and_concentration",
+      "scope_id": "counterparties_and_concentration-01",
+      "field_ids": [
+        "counterparty_relationship"
+      ],
+      "physical_pages": [
+        16,
+        17,
+        18
+      ],
+      "page_text_hashes": {
+        "16": "5f066412b8089d9d070dcad4e9d4891744f7ef9e54819bfc5791f60873638e7f",
+        "17": "a3ae127c3ce4737c5607774f0cc17582c02af47ea03b9e2de35df3fce8832850",
+        "18": "20d52cc0bf8328f083cd4a80d79eda261577c856e580ede132fa5145a108d5f3"
+      },
+      "evidence_count": 3,
+      "decision": "owner_supported"
+    },
+    {
+      "sample_id": "manufacturing-materials-expanded-600549-2025",
+      "chapter_task": "extract_counterparties_and_concentration",
+      "scope_id": "counterparties_and_concentration-02",
+      "field_ids": [
+        "counterparty_relationship",
+        "customer_concentration",
+        "supplier_concentration"
+      ],
+      "physical_pages": [
+        45,
+        46,
+        47
+      ],
+      "page_text_hashes": {
+        "45": "f17e270fe62f004a0478d9e271a7b69da2e7511e51a39f54459e2be8c1d6b4d5",
+        "46": "63ab140fca793b08bcbc35be74450058d647a9cfa420d6c19aa9f560ec5eb0ee",
+        "47": "0d069ca9f5ea4a971c178c241b1624db9939b19b15b5bae8212eaef985ca571d"
+      },
+      "evidence_count": 3,
+      "decision": "owner_supported"
+    },
+    {
+      "sample_id": "manufacturing-materials-expanded-600549-2025",
+      "chapter_task": "extract_business_regime",
+      "scope_id": "business_regime-01",
+      "field_ids": [
+        "business_regime"
+      ],
+      "physical_pages": [
+        45,
+        46
+      ],
+      "page_text_hashes": {
+        "45": "f17e270fe62f004a0478d9e271a7b69da2e7511e51a39f54459e2be8c1d6b4d5",
+        "46": "63ab140fca793b08bcbc35be74450058d647a9cfa420d6c19aa9f560ec5eb0ee"
+      },
+      "evidence_count": 2,
+      "decision": "owner_supported"
+    },
+    {
+      "sample_id": "manufacturing-materials-expanded-688388-2025",
+      "chapter_task": "extract_business_overview",
+      "scope_id": "business_overview-01",
+      "field_ids": [
+        "business_overview_source",
+        "explicit_activity"
+      ],
+      "physical_pages": [
+        12
+      ],
+      "page_text_hashes": {
+        "12": "2de64371ed8c060d421d217d0fbc81e2804f31d311a10dd7c4e7dd2cb24fa685"
+      },
+      "evidence_count": 1,
+      "decision": "owner_supported"
+    },
+    {
+      "sample_id": "manufacturing-materials-expanded-688388-2025",
+      "chapter_task": "extract_segment_financials",
+      "scope_id": "segment_financials-01",
+      "field_ids": [
+        "segment_dimension",
+        "operating_revenue",
+        "operating_cost",
+        "gross_margin_reported"
+      ],
+      "physical_pages": [
+        45,
+        46
+      ],
+      "page_text_hashes": {
+        "45": "57d32a609cb24c6375cbf896ae192cb10090443a9e6e914ef92a927190b80dfe",
+        "46": "30be592203b3e2e00a2a5cb97fb54a54f2477ad2b37d1538f91699ca5d1b433d"
+      },
+      "evidence_count": 2,
+      "decision": "owner_supported"
+    },
+    {
+      "sample_id": "manufacturing-materials-expanded-688388-2025",
+      "chapter_task": "extract_segment_financials",
+      "scope_id": "segment_financials-02",
+      "field_ids": [
+        "segment_dimension",
+        "operating_cost"
+      ],
+      "physical_pages": [
+        48
+      ],
+      "page_text_hashes": {
+        "48": "d56b103434b60c3b90eab8564067a1654253d8808cf1bca58655aa8f78cc77da"
+      },
+      "evidence_count": 1,
+      "decision": "owner_supported"
+    },
+    {
+      "sample_id": "manufacturing-materials-expanded-688388-2025",
+      "chapter_task": "extract_operating_quantities",
+      "scope_id": "operating_quantities-01",
+      "field_ids": [
+        "production_capacity",
+        "capacity_utilization",
+        "production_volume",
+        "sales_volume",
+        "inventory_volume"
+      ],
+      "physical_pages": [
+        21,
+        22,
+        23
+      ],
+      "page_text_hashes": {
+        "21": "5cb60201edacb74a167e52e7aa450379193a5ed8e851ba131c1bf6a61d5a66f4",
+        "22": "58ba83588aff50a70bd70c03b30726136e3c4ccd35aaa131723562bf0cfc7407",
+        "23": "e8dfa7dc2e826794c5e1094c283e0b8388b4cb2259f347379b8303b1d2618191"
+      },
+      "evidence_count": 3,
+      "decision": "owner_supported"
+    },
+    {
+      "sample_id": "manufacturing-materials-expanded-688388-2025",
+      "chapter_task": "extract_operating_quantities",
+      "scope_id": "operating_quantities-02",
+      "field_ids": [
+        "production_volume",
+        "sales_volume",
+        "inventory_volume"
+      ],
+      "physical_pages": [
+        46,
+        47,
+        48
+      ],
+      "page_text_hashes": {
+        "46": "30be592203b3e2e00a2a5cb97fb54a54f2477ad2b37d1538f91699ca5d1b433d",
+        "47": "e99c0229d294e08ed34dbf255ea9b357d0e9c58f91342e28b7ffc779a1cadbe3",
+        "48": "d56b103434b60c3b90eab8564067a1654253d8808cf1bca58655aa8f78cc77da"
+      },
+      "evidence_count": 3,
+      "decision": "owner_supported"
+    },
+    {
+      "sample_id": "manufacturing-materials-expanded-688388-2025",
+      "chapter_task": "extract_material_inputs",
+      "scope_id": "material_inputs-01",
+      "field_ids": [
+        "material_input"
+      ],
+      "physical_pages": [
+        15
+      ],
+      "page_text_hashes": {
+        "15": "460b7771838f884820fc37d00e34bdf1a82f16b6e575e61a0eb77d3c38861c5a"
+      },
+      "evidence_count": 1,
+      "decision": "owner_supported"
+    },
+    {
+      "sample_id": "manufacturing-materials-expanded-688388-2025",
+      "chapter_task": "extract_counterparties_and_concentration",
+      "scope_id": "counterparties_and_concentration-01",
+      "field_ids": [
+        "counterparty_relationship",
+        "customer_concentration",
+        "supplier_concentration"
+      ],
+      "physical_pages": [
+        48,
+        49,
+        50
+      ],
+      "page_text_hashes": {
+        "48": "d56b103434b60c3b90eab8564067a1654253d8808cf1bca58655aa8f78cc77da",
+        "49": "a9773f1d460b9a03f35bf236106f392d381f01240376d9a3bf6686d3de80386e",
+        "50": "f38e31b5fcfbb043125d5b5249dda684273a763a48f013fee35a26f4d8e0662b"
+      },
+      "evidence_count": 3,
+      "decision": "owner_supported"
+    },
+    {
+      "sample_id": "manufacturing-materials-expanded-688388-2025",
+      "chapter_task": "extract_counterparties_and_concentration",
+      "scope_id": "counterparties_and_concentration-02",
+      "field_ids": [
+        "counterparty_relationship",
+        "supplier_concentration"
+      ],
+      "physical_pages": [
+        51
+      ],
+      "page_text_hashes": {
+        "51": "eab1eb9f0e0b4e5948283467d6336d0ff7dd58e048d60565760a2d117d8eb4c9"
+      },
+      "evidence_count": 1,
+      "decision": "owner_supported"
+    },
+    {
+      "sample_id": "manufacturing-materials-expanded-688388-2025",
+      "chapter_task": "extract_business_regime",
+      "scope_id": "business_regime-01",
+      "field_ids": [
+        "business_regime"
+      ],
+      "physical_pages": [
+        48,
+        49
+      ],
+      "page_text_hashes": {
+        "48": "d56b103434b60c3b90eab8564067a1654253d8808cf1bca58655aa8f78cc77da",
+        "49": "a9773f1d460b9a03f35bf236106f392d381f01240376d9a3bf6686d3de80386e"
+      },
+      "evidence_count": 2,
+      "decision": "owner_supported"
+    },
+    {
+      "sample_id": "manufacturing-materials-expanded-920018-2025",
+      "chapter_task": "extract_business_overview",
+      "scope_id": "business_overview-01",
+      "field_ids": [
+        "business_overview_source",
+        "explicit_activity"
+      ],
+      "physical_pages": [
+        14,
+        15
+      ],
+      "page_text_hashes": {
+        "14": "34f5ae86c4a6167908f1b16f23a63a949b9effd2c66883d066196ca1540baadc",
+        "15": "f637854b8c0714de19b50d5514f7f7a250f8c44140ea4beea643b6fb5236d05b"
+      },
+      "evidence_count": 2,
+      "decision": "owner_supported"
+    },
+    {
+      "sample_id": "manufacturing-materials-expanded-920018-2025",
+      "chapter_task": "extract_segment_financials",
+      "scope_id": "segment_financials-01",
+      "field_ids": [
+        "segment_dimension",
+        "operating_revenue",
+        "operating_cost",
+        "gross_margin_reported"
+      ],
+      "physical_pages": [
+        23
+      ],
+      "page_text_hashes": {
+        "23": "1d9cff470b4fc49f57374118e0035002749bda00277223be296b7904a805d8f7"
+      },
+      "evidence_count": 1,
+      "decision": "owner_supported"
+    },
+    {
+      "sample_id": "manufacturing-materials-expanded-920018-2025",
+      "chapter_task": "extract_operating_quantities",
+      "scope_id": "operating_quantities-01",
+      "field_ids": [
+        "production_capacity"
+      ],
+      "physical_pages": [
+        64
+      ],
+      "page_text_hashes": {
+        "64": "fe9cd62f860a56e0e0cc4292e81a4cccdfb6516ea12f7da6005db669abb46f5c"
+      },
+      "evidence_count": 1,
+      "decision": "owner_supported"
+    },
+    {
+      "sample_id": "manufacturing-materials-expanded-920018-2025",
+      "chapter_task": "extract_material_inputs",
+      "scope_id": "material_inputs-01",
+      "field_ids": [
+        "material_input"
+      ],
+      "physical_pages": [
+        41,
+        42
+      ],
+      "page_text_hashes": {
+        "41": "80543dfafc79c63fc3910f221b7b0c55d38c07c921c069d3ece87b987f8a15db",
+        "42": "a205cb094fe5383a0392240cbb07ffca27116d7bc987a98ab100f69c93cc983b"
+      },
+      "evidence_count": 2,
+      "decision": "owner_supported"
+    },
+    {
+      "sample_id": "manufacturing-materials-expanded-920018-2025",
+      "chapter_task": "extract_counterparties_and_concentration",
+      "scope_id": "counterparties_and_concentration-01",
+      "field_ids": [
+        "counterparty_relationship",
+        "customer_concentration",
+        "supplier_concentration"
+      ],
+      "physical_pages": [
+        23,
+        24
+      ],
+      "page_text_hashes": {
+        "23": "1d9cff470b4fc49f57374118e0035002749bda00277223be296b7904a805d8f7",
+        "24": "1d7a7c04b95c57bc730bfa37b16cdf2f4fe5b4357daf9914f1b7741c13c26a98"
+      },
+      "evidence_count": 2,
+      "decision": "owner_supported"
+    },
+    {
+      "sample_id": "manufacturing-materials-expanded-920018-2025",
+      "chapter_task": "extract_business_regime",
+      "scope_id": "business_regime-01",
+      "field_ids": [
+        "business_regime"
+      ],
+      "physical_pages": [
+        15
+      ],
+      "page_text_hashes": {
+        "15": "f637854b8c0714de19b50d5514f7f7a250f8c44140ea4beea643b6fb5236d05b"
+      },
+      "evidence_count": 1,
+      "decision": "owner_supported"
+    },
+    {
+      "sample_id": "manufacturing-materials-expanded-920247-2025",
+      "chapter_task": "extract_business_overview",
+      "scope_id": "business_overview-01",
+      "field_ids": [
+        "business_overview_source",
+        "explicit_activity"
+      ],
+      "physical_pages": [
+        16
+      ],
+      "page_text_hashes": {
+        "16": "c0c6f963c925d6d73e68cdeaa4e66cbdf95c30bc12105cbeafae1bfeede4b126"
+      },
+      "evidence_count": 1,
+      "decision": "owner_supported"
+    },
+    {
+      "sample_id": "manufacturing-materials-expanded-920247-2025",
+      "chapter_task": "extract_segment_financials",
+      "scope_id": "segment_financials-01",
+      "field_ids": [
+        "segment_dimension",
+        "operating_revenue",
+        "operating_cost",
+        "gross_margin_reported"
+      ],
+      "physical_pages": [
+        26
+      ],
+      "page_text_hashes": {
+        "26": "528d7245a4b4b6f49687628a717adee5b812d5a8653a73099130bf99afcd0ddd"
+      },
+      "evidence_count": 1,
+      "decision": "owner_supported"
+    },
+    {
+      "sample_id": "manufacturing-materials-expanded-920247-2025",
+      "chapter_task": "extract_operating_quantities",
+      "scope_id": "operating_quantities-01",
+      "field_ids": [
+        "production_capacity"
+      ],
+      "physical_pages": [
+        58
+      ],
+      "page_text_hashes": {
+        "58": "f76c7ca4eeacf75fc1f43a7bdcfd72702d7872b8200314ebe87b06e41fc658cd"
+      },
+      "evidence_count": 1,
+      "decision": "owner_supported"
+    },
+    {
+      "sample_id": "manufacturing-materials-expanded-920247-2025",
+      "chapter_task": "extract_material_inputs",
+      "scope_id": "material_inputs-01",
+      "field_ids": [
+        "material_input"
+      ],
+      "physical_pages": [
+        13,
+        14
+      ],
+      "page_text_hashes": {
+        "13": "f770d8309fb43908f3ac8b509ca751da2fad5ab96089c8ddf4a08b286793b914",
+        "14": "018ef7602b71547c6684052255286c3752d07efe1b9ab2c2a8776c74f5ccdd29"
+      },
+      "evidence_count": 2,
+      "decision": "owner_supported"
+    },
+    {
+      "sample_id": "manufacturing-materials-expanded-920247-2025",
+      "chapter_task": "extract_counterparties_and_concentration",
+      "scope_id": "counterparties_and_concentration-01",
+      "field_ids": [
+        "counterparty_relationship",
+        "customer_concentration",
+        "supplier_concentration"
+      ],
+      "physical_pages": [
+        25,
+        26,
+        27
+      ],
+      "page_text_hashes": {
+        "25": "edc026adabe6149e38bcae6e3ec1d352a55163b4520029e5d77d96e2b16aa73b",
+        "26": "528d7245a4b4b6f49687628a717adee5b812d5a8653a73099130bf99afcd0ddd",
+        "27": "e1ce1437dcbe54754e906c3c1349e2b2100eb47b3e1c1d8fab61da6d3a0a9a7c"
+      },
+      "evidence_count": 3,
+      "decision": "owner_supported"
+    },
+    {
+      "sample_id": "manufacturing-materials-expanded-920247-2025",
+      "chapter_task": "extract_business_regime",
+      "scope_id": "business_regime-01",
+      "field_ids": [
+        "business_regime"
+      ],
+      "physical_pages": [
+        37
+      ],
+      "page_text_hashes": {
+        "37": "5cf16278ff98bd1d4452d4302a9f6849b4caf0872e6e69ddb42553274742ba2f"
+      },
+      "evidence_count": 1,
+      "decision": "owner_supported"
+    }
+  ],
+  "manual_corrections": [
+    {
+      "sample_id": "manufacturing-materials-expanded-600549-2025",
+      "chapter_task": "extract_business_overview",
+      "decision": "replace_auditor_page_with_management_discussion_pages_11_16"
+    },
+    {
+      "sample_id": "manufacturing-materials-expanded-002340-2025",
+      "chapter_task": "extract_counterparties_and_concentration",
+      "decision": "remove_research_project_page_51"
+    },
+    {
+      "sample_id": "manufacturing-materials-expanded-920247-2025",
+      "chapter_task": "extract_segment_financials",
+      "decision": "remove_research_project_page_33"
+    },
+    {
+      "sample_id": "manufacturing-materials-expanded-920247-2025",
+      "chapter_task": "extract_counterparties_and_concentration",
+      "decision": "bind_concentration_to_customer_supplier_table_pages_25_27_and_remove_impairment_pages_150_151"
+    },
+    {
+      "sample_id": "manufacturing-materials-expanded-920018-2025",
+      "chapter_task": "extract_counterparties_and_concentration",
+      "decision": "include_table_continuation_page_24"
+    },
+    {
+      "sample_id": "manufacturing-materials-expanded-920018-2025",
+      "chapter_task": "extract_business_regime",
+      "decision": "use_explicit_business_model_no_change_page_15"
+    },
+    {
+      "sample_id": "manufacturing-materials-expanded-920018-2025",
+      "chapter_task": "extract_operating_quantities",
+      "decision": "narrow_legal_empty_owner_to_industry_page_64"
+    },
+    {
+      "sample_id": "manufacturing-materials-expanded-920247-2025",
+      "chapter_task": "extract_operating_quantities",
+      "decision": "narrow_legal_empty_owner_to_industry_page_58"
+    },
+    {
+      "sample_id": "manufacturing-materials-expanded-920247-2025",
+      "chapter_task": "extract_business_regime",
+      "decision": "narrow_consolidation_scope_legal_empty_owner_to_page_37"
+    }
+  ],
+  "gold_or_expected_runtime_facts_present": false,
+  "provider_calls": 0,
+  "production_authorization": "not_authorized",
+  "review_hash": "f12833f183762e84af0b4ab05bad4311518c867c69fff41fe779a2ed579bdd13"
+}

@@ -459,7 +459,10 @@ _CHAPTER_OWNER_PATTERNS: dict[ChapterTask, tuple[str, ...]] = {
     ),
     ChapterTask.EXTRACT_BUSINESS_REGIME: (
         r"业务、产品或服务发生重大变化",
-        r"(?:主营业务|主要业务|经营模式).{0,25}(?:重大变化|未发生重大变化|发生变化)",
+        (
+            r"(?:主营业务|主要业务|经营模式|商业模式).{0,25}"
+            r"(?:重大变化|未发生(?:明显|重大)?变化|发生变化)"
+        ),
         r"(?:报告期)?主要子公司股权变动导致合并范围变化",
         r"合并报表范围的变化情况",
         r"合并范围.{0,25}(?:变化|变动)",
@@ -582,6 +585,17 @@ def _chapter_owner_score(
         chapter_task == ChapterTask.EXTRACT_OPERATING_QUANTITIES
         and "industry_context" in keys
         and not _EXPLICIT_ISSUER_CAPACITY_PATTERN.search(compact)
+    ):
+        return 0
+    if (
+        chapter_task == ChapterTask.EXTRACT_OPERATING_QUANTITIES
+        and re.search(r"(?:中汽协|国家统计局|行业协会)统计|我国.{0,30}产销", compact)
+        and not _EXPLICIT_ISSUER_CAPACITY_PATTERN.search(compact)
+        and not re.search(
+            r"(?:公司|本公司).{0,80}(?:生产量|销售量|库存量|实际产量|"
+            r"设计产能|现有产能|核定年产能|总产能|年产能|产能规模)",
+            compact,
+        )
     ):
         return 0
     if chapter_task == ChapterTask.EXTRACT_SEGMENT_FINANCIALS and not (

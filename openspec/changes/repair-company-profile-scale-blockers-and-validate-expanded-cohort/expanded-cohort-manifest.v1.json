@@ -1,0 +1,499 @@
+{
+  "artifact_type": "company_profile_expanded_cohort_manifest",
+  "schema_version": "company_profile_out_of_sample_manifest.v1",
+  "manifest_id": "manufacturing-materials-expanded-cohort-manifest-20260913-v1",
+  "manifest_kind": "out_of_sample_validation",
+  "industry_package": "manufacturing_materials",
+  "frozen_on": "2026-09-13",
+  "sample_replacement_allowed": false,
+  "semantic_execution_started": false,
+  "evidence_plan_status": "frozen_before_provider_io",
+  "production_authorization": "not_authorized",
+  "accepted_record_semantics": "accepted_for_review",
+  "sample_count": 8,
+  "batch_id": "manufacturing-materials-expanded-cohort-eight-pool-20260913-a",
+  "samples": [
+    {
+      "sample_id": "manufacturing-materials-expanded-000510-2025",
+      "report_identity": {
+        "instrument_id": "000510.SZ",
+        "symbol": "000510",
+        "company_name": "四川新金路集团股份有限公司",
+        "exchange": "SZSE",
+        "fiscal_year": 2025,
+        "report_period": "2025-12-31",
+        "report_title": "2025年年度报告",
+        "document_family": "annual_report",
+        "variant": "original",
+        "source": "cninfo",
+        "source_announcement_id": "1225190142",
+        "announcement_id": "ann_f514681f468cdce325a63aaafa8e3140",
+        "attachment_id": "att_7cb3b825f4102079293d10b9f89fb740",
+        "version_id": "ver_fcaf85a4325c9dc7689a58a04d17c1d3",
+        "asset_id": "asset_b3fa6e343a23b81ace8fdc615b9968f9",
+        "published_at": "2026-04-24T16:00:00+00:00",
+        "decision_state": "current",
+        "availability": "local_valid",
+        "visibility_state": "production",
+        "classifier_version": "formal_annual_report.v1",
+        "canonical_projection_policy_version": "canonical_source_filing.v1"
+      },
+      "pdf": {
+        "path": "data/filings/announcements/blobs/15/15c629a00045a4eb1cbc037eac9b38e67a18851dbd97c27eac3219d5d47dcaa8.pdf",
+        "sha256": "15c629a00045a4eb1cbc037eac9b38e67a18851dbd97c27eac3219d5d47dcaa8",
+        "content_length_bytes": 1446540,
+        "page_count": 199,
+        "encrypted": false,
+        "signature_status": "valid_pdf",
+        "integrity_status": "valid"
+      },
+      "selection_dimensions": {
+        "business_model": [
+          "chlor_alkali_and_pvc_manufacturing",
+          "integrated_basic_chemical_products"
+        ],
+        "disclosure_form": [
+          "szse_main_board_annual_report",
+          "multi_product_operating_tables",
+          "capacity_and_cost_disclosure"
+        ],
+        "generalization_pressure": [
+          "basic_chemical_product_mix",
+          "capacity_and_quantity_owner_selection",
+          "company_group_wording"
+        ]
+      },
+      "selection_reason": "Tests an integrated chlor-alkali/PVC issuer with product, capacity, quantity, and cost disclosures not used by prior company-profile semantic cohorts.",
+      "known_limitations": [
+        "The PDF appeared only in the separate PDF-engine corpus, not in company-profile semantic authority.",
+        "Selection metadata was frozen before semantic output."
+      ]
+    },
+    {
+      "sample_id": "manufacturing-materials-expanded-002149-2025",
+      "report_identity": {
+        "instrument_id": "002149.SZ",
+        "symbol": "002149",
+        "company_name": "西部金属材料股份有限公司",
+        "exchange": "SZSE",
+        "fiscal_year": 2025,
+        "report_period": "2025-12-31",
+        "report_title": "2025年年度报告",
+        "document_family": "annual_report",
+        "variant": "original",
+        "source": "cninfo",
+        "source_announcement_id": "1225216013",
+        "announcement_id": "ann_76e26925994bc47af2c618009692940f",
+        "attachment_id": "att_90cd81ea4bd092b6b779afbec5ab408e",
+        "version_id": "ver_dde797f8ca7cd430585755e292930d01",
+        "asset_id": "asset_ba66c9e1a750475df0d1d926518656ae",
+        "published_at": "2026-04-27T16:00:00+00:00",
+        "decision_state": "current",
+        "availability": "local_valid",
+        "visibility_state": "production",
+        "classifier_version": "formal_annual_report.v1",
+        "canonical_projection_policy_version": "canonical_source_filing.v1"
+      },
+      "pdf": {
+        "path": "data/filings/announcements/blobs/98/988965892b28325858a7d9c50cf5312a9e14d49a62bdeeba41459653b8b798ca.pdf",
+        "sha256": "988965892b28325858a7d9c50cf5312a9e14d49a62bdeeba41459653b8b798ca",
+        "content_length_bytes": 1372693,
+        "page_count": 226,
+        "encrypted": false,
+        "signature_status": "valid_pdf",
+        "integrity_status": "valid"
+      },
+      "selection_dimensions": {
+        "business_model": [
+          "rare_metal_materials_manufacturing",
+          "multi_subsidiary_specialty_materials"
+        ],
+        "disclosure_form": [
+          "szse_main_board_annual_report",
+          "product_and_industry_tables",
+          "subsidiary_business_narrative"
+        ],
+        "generalization_pressure": [
+          "named_subsidiary_subjects",
+          "multi_material_segment_rows",
+          "operating_quantity_legal_empty"
+        ]
+      },
+      "selection_reason": "Tests rare-metal specialty materials and named-subsidiary disclosures outside prior company-profile semantic cohorts.",
+      "known_limitations": [
+        "The PDF appeared only in the separate PDF-engine corpus, not in company-profile semantic authority.",
+        "Selection metadata was frozen before semantic output."
+      ]
+    },
+    {
+      "sample_id": "manufacturing-materials-expanded-002340-2025",
+      "report_identity": {
+        "instrument_id": "002340.SZ",
+        "symbol": "002340",
+        "company_name": "格林美股份有限公司",
+        "exchange": "SZSE",
+        "fiscal_year": 2025,
+        "report_period": "2025-12-31",
+        "report_title": "2025年年度报告",
+        "document_family": "annual_report",
+        "variant": "original",
+        "source": "cninfo",
+        "source_announcement_id": "1225142250",
+        "announcement_id": "ann_f0fbc33477f99f7770bc38e5b98d75fe",
+        "attachment_id": "att_a9cd7118cf54d6b005ce62e2d4069ed3",
+        "version_id": "ver_e4e061ed5c676a08c953a8f52293a911",
+        "asset_id": "asset_ceaafa5f4cf9ef8c2d2c593e668865d7",
+        "published_at": "2026-04-21T16:00:00+00:00",
+        "decision_state": "current",
+        "availability": "local_valid",
+        "visibility_state": "production",
+        "classifier_version": "formal_annual_report.v1",
+        "canonical_projection_policy_version": "canonical_source_filing.v1"
+      },
+      "pdf": {
+        "path": "data/filings/announcements/blobs/fd/fdb3060c97bc4273571f75b85e39dd399c7e8c580f8d874892463fa5efd4b15f.pdf",
+        "sha256": "fdb3060c97bc4273571f75b85e39dd399c7e8c580f8d874892463fa5efd4b15f",
+        "content_length_bytes": 10160104,
+        "page_count": 323,
+        "encrypted": false,
+        "signature_status": "valid_pdf",
+        "integrity_status": "valid"
+      },
+      "selection_dimensions": {
+        "business_model": [
+          "recycled_materials_and_battery_materials",
+          "urban_mining_and_precursor_products"
+        ],
+        "disclosure_form": [
+          "szse_main_board_annual_report",
+          "dense_product_and_capacity_narrative",
+          "global_customer_and_supply_chain_disclosure"
+        ],
+        "generalization_pressure": [
+          "recycling_vs_external_processing",
+          "large_scope_token_budget",
+          "multi_product_capacity_and_quantity"
+        ]
+      },
+      "selection_reason": "Tests a large recycled/battery-material issuer with dense narrative and operating tables not used by prior company-profile semantic cohorts.",
+      "known_limitations": [
+        "Large narrative density may require the existing dynamic output-token policy.",
+        "Selection metadata was frozen before semantic output."
+      ]
+    },
+    {
+      "sample_id": "manufacturing-materials-expanded-600010-2025",
+      "report_identity": {
+        "instrument_id": "600010.SH",
+        "symbol": "600010",
+        "company_name": "内蒙古包钢钢联股份有限公司",
+        "exchange": "SSE",
+        "fiscal_year": 2025,
+        "report_period": "2025-12-31",
+        "report_title": "2025年年度报告",
+        "document_family": "annual_report",
+        "variant": "original",
+        "source": "cninfo",
+        "source_announcement_id": "1225121984",
+        "announcement_id": "ann_fcffcf024edaecf62bd99eef15220904",
+        "attachment_id": "att_a40e29c4b78ad1583281e89ed05635cb",
+        "version_id": "ver_e177ce2a738015f8dd636d06022a5f3e",
+        "asset_id": "asset_18b23f6d72a1e4df80ba18248a1283fb",
+        "published_at": "2026-04-17T16:00:00+00:00",
+        "decision_state": "current",
+        "availability": "local_valid",
+        "visibility_state": "production",
+        "classifier_version": "formal_annual_report.v1",
+        "canonical_projection_policy_version": "canonical_source_filing.v1"
+      },
+      "pdf": {
+        "path": "data/filings/announcements/blobs/26/2667da8e6d5f57335fd530388a71f8bf1f4bcff5760b6bf75584ca0e724220e0.pdf",
+        "sha256": "2667da8e6d5f57335fd530388a71f8bf1f4bcff5760b6bf75584ca0e724220e0",
+        "content_length_bytes": 2104288,
+        "page_count": 240,
+        "encrypted": false,
+        "signature_status": "valid_pdf",
+        "integrity_status": "valid"
+      },
+      "selection_dimensions": {
+        "business_model": [
+          "integrated_steel_manufacturing",
+          "steel_and_rare_earth_resource_linkage"
+        ],
+        "disclosure_form": [
+          "sse_main_board_annual_report",
+          "segment_and_product_tables",
+          "steel_production_sales_inventory"
+        ],
+        "generalization_pressure": [
+          "cross_period_segment_rows",
+          "inter_segment_elimination",
+          "commodity_quantity_tables"
+        ]
+      },
+      "selection_reason": "Tests an integrated steel issuer with comparative segment and operating rows; prior appearances were candidate/exclusion or other research metadata, not company-profile semantic input.",
+      "known_limitations": [
+        "The instrument appears in unrelated financial/business-profile tests and a prior shadow exclusion list, but not as a prior company-profile semantic sample.",
+        "Selection metadata was frozen before semantic output."
+      ]
+    },
+    {
+      "sample_id": "manufacturing-materials-expanded-600549-2025",
+      "report_identity": {
+        "instrument_id": "600549.SH",
+        "symbol": "600549",
+        "company_name": "厦门钨业股份有限公司",
+        "exchange": "SSE",
+        "fiscal_year": 2025,
+        "report_period": "2025-12-31",
+        "report_title": "2025年年度报告",
+        "document_family": "annual_report",
+        "variant": "original",
+        "source": "cninfo",
+        "source_announcement_id": "1225166560",
+        "announcement_id": "ann_8196ea852ead313170f0c92058dfe7db",
+        "attachment_id": "att_fde8860ec68710a9313d17ea9eb14083",
+        "version_id": "ver_25d63de61c79e2dedb1c2950bd0c28c6",
+        "asset_id": "asset_418016571a89d99ee12b265bfdf56bbb",
+        "published_at": "2026-04-23T16:00:00+00:00",
+        "decision_state": "current",
+        "availability": "local_valid",
+        "visibility_state": "production",
+        "classifier_version": "formal_annual_report.v1",
+        "canonical_projection_policy_version": "canonical_source_filing.v1"
+      },
+      "pdf": {
+        "path": "data/filings/announcements/blobs/a4/a4da1a158da5958d24264526fa32cc012c0734b17ed1a98356fe619cc6cc1c8d.pdf",
+        "sha256": "a4da1a158da5958d24264526fa32cc012c0734b17ed1a98356fe619cc6cc1c8d",
+        "content_length_bytes": 3330599,
+        "page_count": 350,
+        "encrypted": false,
+        "signature_status": "valid_pdf",
+        "integrity_status": "valid"
+      },
+      "selection_dimensions": {
+        "business_model": [
+          "tungsten_molybdenum_and_battery_materials",
+          "multi_segment_materials_manufacturing"
+        ],
+        "disclosure_form": [
+          "sse_main_board_annual_report",
+          "multi_segment_tables",
+          "resource_and_battery_material_narrative"
+        ],
+        "generalization_pressure": [
+          "multi_segment_identity",
+          "named_subsidiary_and_segment_scope",
+          "large_report_evidence_selection"
+        ]
+      },
+      "selection_reason": "Tests a diversified tungsten, rare-earth, and battery-material issuer with multiple segments and a long annual report.",
+      "known_limitations": [
+        "Large report length increases Evidence-owner selection pressure.",
+        "Selection metadata was frozen before semantic output."
+      ]
+    },
+    {
+      "sample_id": "manufacturing-materials-expanded-688388-2025",
+      "report_identity": {
+        "instrument_id": "688388.SH",
+        "symbol": "688388",
+        "company_name": "广东嘉元科技股份有限公司",
+        "exchange": "SSE",
+        "fiscal_year": 2025,
+        "report_period": "2025-12-31",
+        "report_title": "2025年年度报告",
+        "document_family": "annual_report",
+        "variant": "original",
+        "source": "cninfo",
+        "source_announcement_id": "1225126560",
+        "announcement_id": "ann_a02ed0da88b9760e524a99ae96220fd9",
+        "attachment_id": "att_89128506794ac2fe9f4d8ede4dbf053c",
+        "version_id": "ver_b06a460e00eeb2cce053d1bd02c103dc",
+        "asset_id": "asset_8b0009a12cfc0306c9a3090cb721405c",
+        "published_at": "2026-04-20T16:00:00+00:00",
+        "decision_state": "current",
+        "availability": "local_valid",
+        "visibility_state": "production",
+        "classifier_version": "formal_annual_report.v1",
+        "canonical_projection_policy_version": "canonical_source_filing.v1"
+      },
+      "pdf": {
+        "path": "data/filings/announcements/blobs/fd/fdd0348b73f41da3d8ee7adae7fdbaba2f71130c44169df33041595977372cea.pdf",
+        "sha256": "fdd0348b73f41da3d8ee7adae7fdbaba2f71130c44169df33041595977372cea",
+        "content_length_bytes": 2040820,
+        "page_count": 343,
+        "encrypted": false,
+        "signature_status": "valid_pdf",
+        "integrity_status": "valid"
+      },
+      "selection_dimensions": {
+        "business_model": [
+          "electrolytic_copper_foil_manufacturing",
+          "capacity_expansion_and_product_grades"
+        ],
+        "disclosure_form": [
+          "sse_star_market_annual_report",
+          "technology_and_capacity_narrative",
+          "product_quantity_tables"
+        ],
+        "generalization_pressure": [
+          "technology_vs_business_activity",
+          "capacity_project_periods",
+          "star_market_layout"
+        ]
+      },
+      "selection_reason": "Tests a STAR Market copper-foil producer with technology, capacity expansion, and operating quantity disclosures.",
+      "known_limitations": [
+        "Technology commentary must not replace issuer-owned business facts.",
+        "Selection metadata was frozen before semantic output."
+      ]
+    },
+    {
+      "sample_id": "manufacturing-materials-expanded-920018-2025",
+      "report_identity": {
+        "instrument_id": "920018.BJ",
+        "symbol": "920018",
+        "company_name": "沈阳宏远电磁线股份有限公司",
+        "exchange": "BSE",
+        "fiscal_year": 2025,
+        "report_period": "2025-12-31",
+        "report_title": "2025年年度报告",
+        "document_family": "annual_report",
+        "variant": "original",
+        "source": "cninfo",
+        "source_announcement_id": "1225114255",
+        "announcement_id": "ann_5aa6ac2fd37c0e57efe89b1713421a66",
+        "attachment_id": "att_b013d24c68baf61de3ead47bbdcbff8c",
+        "version_id": "ver_d3662c4672949c7269a374d8a34ef895",
+        "asset_id": "asset_8c91664c6c863a1f18cd6dcb8f888e15",
+        "published_at": "2026-04-15T16:00:00+00:00",
+        "decision_state": "current",
+        "availability": "local_valid",
+        "visibility_state": "production",
+        "classifier_version": "formal_annual_report.v1",
+        "canonical_projection_policy_version": "canonical_source_filing.v1"
+      },
+      "pdf": {
+        "path": "data/filings/announcements/blobs/4a/4a4e4971092b637b9a89ef92e4e8e1f2b378856049bbd3001c8aedb2c6d028d8.pdf",
+        "sha256": "4a4e4971092b637b9a89ef92e4e8e1f2b378856049bbd3001c8aedb2c6d028d8",
+        "content_length_bytes": 2347321,
+        "page_count": 200,
+        "encrypted": false,
+        "signature_status": "valid_pdf",
+        "integrity_status": "valid"
+      },
+      "selection_dimensions": {
+        "business_model": [
+          "electromagnetic_wire_manufacturing",
+          "electrical_copper_material_products"
+        ],
+        "disclosure_form": [
+          "bse_annual_report",
+          "product_and_customer_tables",
+          "newly_listed_issuer_layout"
+        ],
+        "generalization_pressure": [
+          "bse_layout",
+          "customer_concentration",
+          "material_input_and_quantity_disclosure"
+        ]
+      },
+      "selection_reason": "Tests a newly listed BSE electromagnetic-wire manufacturer with product, material, and customer disclosures.",
+      "known_limitations": [
+        "First post-listing annual-report layout may differ from mature BSE issuers.",
+        "Selection metadata was frozen before semantic output."
+      ]
+    },
+    {
+      "sample_id": "manufacturing-materials-expanded-920247-2025",
+      "report_identity": {
+        "instrument_id": "920247.BJ",
+        "symbol": "920247",
+        "company_name": "河北华密新材科技股份有限公司",
+        "exchange": "BSE",
+        "fiscal_year": 2025,
+        "report_period": "2025-12-31",
+        "report_title": "2025年年度报告",
+        "document_family": "annual_report",
+        "variant": "original",
+        "source": "cninfo",
+        "source_announcement_id": "1225043008",
+        "announcement_id": "ann_7796e0a680cb61f16df2c222a3a1fef6",
+        "attachment_id": "att_8e2de2a0f07ef9d6289ec964762e5901",
+        "version_id": "ver_16e3cb34e1f652810ab762770fcdf3ee",
+        "asset_id": "asset_de79da4582990a586b1c5384d50d82a0",
+        "published_at": "2026-03-26T16:00:00+00:00",
+        "decision_state": "current",
+        "availability": "local_valid",
+        "visibility_state": "production",
+        "classifier_version": "formal_annual_report.v1",
+        "canonical_projection_policy_version": "canonical_source_filing.v1"
+      },
+      "pdf": {
+        "path": "data/filings/announcements/blobs/e3/e3725d825a7204c66969de8d816d8dd2aa679ea113bb761c08b8505658f5df67.pdf",
+        "sha256": "e3725d825a7204c66969de8d816d8dd2aa679ea113bb761c08b8505658f5df67",
+        "content_length_bytes": 2898100,
+        "page_count": 195,
+        "encrypted": false,
+        "signature_status": "valid_pdf",
+        "integrity_status": "valid"
+      },
+      "selection_dimensions": {
+        "business_model": [
+          "rubber_and_polymer_material_products",
+          "seals_and_engineering_components"
+        ],
+        "disclosure_form": [
+          "bse_annual_report",
+          "product_and_application_narrative",
+          "customer_and_material_tables"
+        ],
+        "generalization_pressure": [
+          "polymer_material_taxonomy",
+          "product_vs_component_activity",
+          "bse_legal_empty_shapes"
+        ]
+      },
+      "selection_reason": "Tests a BSE rubber/polymer-material manufacturer with component products and application-shaped disclosure.",
+      "known_limitations": [
+        "Application descriptions do not alone establish counterparties or relationships.",
+        "Selection metadata was frozen before semantic output."
+      ]
+    }
+  ],
+  "independence_audit": {
+    "checked_identifiers": [
+      "000510.SZ",
+      "002149.SZ",
+      "002340.SZ",
+      "600010.SH",
+      "600549.SH",
+      "688388.SH",
+      "920018.BJ",
+      "920247.BJ"
+    ],
+    "checked_artifact_classes": [
+      "four_report_authority_and_gold",
+      "prior_oos_and_model_comparison",
+      "completeness_canary",
+      "twenty_report_shadow_cohort",
+      "fresh_cohort_inputs",
+      "targeted_runs_and_adjudication_ledgers"
+    ],
+    "semantic_input_matches": [],
+    "non_semantic_metadata_matches": [
+      "000510.SZ:pdf_engine_corpus",
+      "002149.SZ:pdf_engine_corpus",
+      "600010.SH:unrelated_research_tests_and_shadow_exclusion_metadata"
+    ],
+    "decision": "eight_unseen_company_profile_semantic_samples_confirmed"
+  },
+  "provider_policy": {
+    "logical_route": "semantic_extraction",
+    "eligible_member_count": 4,
+    "dynamic_output_tokens": true,
+    "targeted_rerun_allowed": false,
+    "historical_output_splicing_allowed": false
+  }
+}

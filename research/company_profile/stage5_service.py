@@ -1155,19 +1155,55 @@ def _core_chapter_dimensions(
             if item.prepared_scope.chapter_task == chapter_enum
         ]
         required = required_by_chapter.get(chapter_enum, set())
-        seen: set[str] = set()
+        satisfied_fields = {
+            coverage.field_id
+            for scope in scopes
+            for coverage in scope.task_result.coverage
+            if coverage.status
+            in {
+                CoverageStatus.OBSERVED,
+                CoverageStatus.NOT_DISCLOSED,
+                CoverageStatus.NOT_APPLICABLE,
+            }
+        }
+        seen = {
+            coverage.field_id
+            for scope in scopes
+            for coverage in scope.task_result.coverage
+            if coverage.field_id in required
+            and coverage.status
+            in {
+                CoverageStatus.OBSERVED,
+                CoverageStatus.NOT_DISCLOSED,
+                CoverageStatus.NOT_APPLICABLE,
+            }
+        }
         failures: list[str] = []
         for scope in scopes:
-            if not scope.task_result.task_complete:
+            unresolved_reviews = [
+                review
+                for review in scope.task_result.human_review_items
+                if not (
+                    review.reason_codes
+                    == (ContractErrorCode.REQUIRED_COVERAGE_MISSING,)
+                    and review.field_id in satisfied_fields
+                )
+            ]
+            if not scope.task_result.task_complete and (
+                not scope.task_result.human_review_items or unresolved_reviews
+            ):
                 failures.append(scope.scope_id)
             for coverage in scope.task_result.coverage:
-                if coverage.field_id in required and coverage.status in {
-                    CoverageStatus.OBSERVED,
-                    CoverageStatus.NOT_DISCLOSED,
-                    CoverageStatus.NOT_APPLICABLE,
-                }:
-                    seen.add(coverage.field_id)
-                elif coverage.field_id in required:
+                if (
+                    coverage.field_id in required
+                    and coverage.status
+                    not in {
+                        CoverageStatus.OBSERVED,
+                        CoverageStatus.NOT_DISCLOSED,
+                        CoverageStatus.NOT_APPLICABLE,
+                    }
+                    and coverage.field_id not in seen
+                ):
                     failures.append(
                         f"{scope.scope_id}:{coverage.field_id}:{coverage.status.value}"
                     )
