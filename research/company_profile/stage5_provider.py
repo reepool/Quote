@@ -3502,6 +3502,8 @@ def _expand_candidate_draft(
     if {"schema_version", "record_id", "report", "evidence"}.issubset(draft):
         return _expand_existing_fact_refs(draft, prepared_scope=prepared_scope)
     candidate = deepcopy(draft)
+    if candidate.get("object_type") == "BusinessOverview":
+        _normalize_business_overview_draft(candidate)
     _default_group_subject_draft(candidate, prepared_scope=prepared_scope)
     _require_numeric_reconciliation_uncertainty(candidate)
     candidate["reported_period"] = _normalize_adapter_reported_period(
@@ -3523,6 +3525,8 @@ def _expand_candidate_draft(
         evidence_ids,
         prepared_scope=prepared_scope,
     )
+    if candidate.get("object_type") == "BusinessEvent":
+        _clear_unsupported_source_native_name(candidate)
     candidate["data_status"] = "research_fixture"
     if candidate.get("object_type") == "Measurement":
         logical_slot = _METRIC_LOGICAL_SLOTS.get(str(candidate.get("metric_type")))
@@ -3537,6 +3541,71 @@ def _expand_candidate_draft(
                     source_native=source_native,
                 )
     return candidate
+
+
+_BUSINESS_OVERVIEW_REGULATORY_BOILERPLATE = re.compile(
+    r"(?:需|应当?)遵守.{0,80}(?:信息披露|披露要求|自律监管指引)"
+)
+_BUSINESS_OVERVIEW_SUBSTANTIVE = re.compile(
+    r"(?:公司|本公司|集团)?(?:主营业务|主营范围|经营范围)(?!收入|成本|利润)"
+    r"|(?:公司|本公司|集团).{0,24}(?:主要|专业)(?:从事|生产|制造|加工|销售|"
+    r"研发|开发|提供)"
+    r"|(?:主要|核心)(?:产品|服务)(?:包括|涵盖|为|是|有|[:：])"
+)
+_BUSINESS_OVERVIEW_RISK_TAIL = re.compile(
+    r"(?:周期性|宏观经济|市场波动|需求下降|竞争加剧|盈利能力|经营业绩|风险)"
+)
+
+
+def _normalize_business_overview_draft(candidate: dict[str, Any]) -> None:
+    """Keep only substantive, exact source-native overview wording."""
+
+    source_text = str(candidate.get("source_text") or "").strip()
+    compact = re.sub(r"\s+", "", source_text)
+    if not compact or _BUSINESS_OVERVIEW_REGULATORY_BOILERPLATE.search(compact):
+        raise ValueError("BusinessOverview requires substantive source-native business text")
+
+    first_clause = re.split(r"[，,；;。]", source_text, maxsplit=1)[0].strip()
+    compact_first = re.sub(r"\s+", "", first_clause)
+    if (
+        first_clause
+        and first_clause != source_text
+        and _BUSINESS_OVERVIEW_SUBSTANTIVE.search(compact_first)
+        and _BUSINESS_OVERVIEW_RISK_TAIL.search(compact[len(compact_first) :])
+    ):
+        candidate["source_text"] = first_clause
+        source_native = candidate.get("source_native")
+        if isinstance(source_native, dict):
+            native_value = str(source_native.get("value") or "").strip()
+            if native_value == source_text:
+                source_native["value"] = first_clause
+        compact = compact_first
+
+    if not _BUSINESS_OVERVIEW_SUBSTANTIVE.search(compact):
+        raise ValueError("BusinessOverview requires substantive source-native business text")
+
+
+def _clear_unsupported_source_native_name(candidate: dict[str, Any]) -> None:
+    """Drop canonical labels that are not literal source-native Evidence text."""
+
+    source_native = candidate.get("source_native")
+    if not isinstance(source_native, dict):
+        return
+    name = str(source_native.get("name") or "").strip()
+    if not name:
+        return
+    compact_name = re.sub(r"\s+", "", name)
+    evidence_texts = (
+        re.sub(
+            r"\s+",
+            "",
+            str(evidence.get("anchor", {}).get("bounded_quote", "")),
+        )
+        for evidence in candidate.get("evidence", [])
+        if isinstance(evidence, Mapping)
+    )
+    if not any(compact_name in evidence_text for evidence_text in evidence_texts):
+        source_native["name"] = None
 
 
 def _expand_coverage_draft(
@@ -3632,6 +3701,23 @@ def _coverage_evidence_owns_field(
     )
     section_title = re.sub(r"\s+", "", str(getattr(evidence, "section_title", "")))
     if chapter_task == "extract_material_inputs" and field_id == "material_input":
+        owner_section = any(
+            key in section_title
+            for key in (
+                "procurement_and_costs",
+                "cost_composition",
+                "principal_business",
+                "business_model",
+            )
+        ) or bool(
+            re.search(
+                r"主要原材料及能源(?:采购|情况)|原材料(?:采购模式|采购情况)|"
+                r"(?:营业|主营业务)?成本构成|"
+                r"(?:公司|本公司).{0,50}(?:生产所需|采购|购入|消耗).{0,40}"
+                r"(?:原料|原材料|能源)",
+                text,
+            )
+        )
         governed_material = re.search(
             r"主要原材料及能源(?:采购|情况)|原材料(?:采购模式|采购情况)|"
             r"(?:营业|主营业务)?成本构成.{0,120}(?:原材料|原燃料|燃料及动力)|"
@@ -3640,16 +3726,26 @@ def _coverage_evidence_owns_field(
         )
         if re.search(r"(?:控股股东|实际控制人)情况", text) and not governed_material:
             return False
-        return bool(governed_material)
+        return owner_section and bool(governed_material)
     if chapter_task == "extract_segment_financials" and field_id == "segment_dimension":
+        owner_section = any(
+            key in section_title
+            for key in ("segment_information", "revenue_cost_analysis")
+        ) or bool(
+            re.search(
+                r"主营业务分(?:行业|产品|地区|销售模式)|"
+                r"报告分部的财务信息|分部(?:信息|报告)",
+                text,
+            )
+        )
         segment_owner = re.search(
-            r"分(?:行业|产品|地区|销售模式)|(?:业务|报告)分部|"
+            r"(?<!细)分(?:行业|产品|地区|销售模式)|(?:业务|报告)分部|"
             r"分部(?:收入|利润|资产|信息)|主营业务分|营业收入构成",
             text,
         )
         if "industry_context" in section_title and not segment_owner:
             return False
-        return bool(segment_owner)
+        return owner_section and bool(segment_owner)
     if chapter_task == "extract_operating_quantities":
         legal_empty_owner = re.search(
             r"公司实物销售收入是否大于劳务收入.{0,100}(?:[□√☑]是|[□√☑]否|适用|不适用)",
@@ -4280,12 +4376,18 @@ class CommonGatewaySemanticProvider:
             raise
         except LlmError as exc:
             code = _contract_error_for_llm(exc)
+            gateway_lineage = _safe_gateway_lineage(exc.lineage)
             self._append_failure_trace(
                 call_type,
                 semantic_request_id,
                 code.value,
                 exc.message,
                 gateway_request_id=exc.request_id,
+                selected_profile=gateway_lineage["selected_profile"],
+                source_label=gateway_lineage["source_label"],
+                model=gateway_lineage["model"],
+                failover_count=gateway_lineage["failover_count"],
+                attempts=gateway_lineage["attempts"],
                 parent_semantic_request_id=parent_semantic_request_id,
                 partition_index=partition_index,
                 partition_count=partition_count,
@@ -4317,6 +4419,10 @@ class CommonGatewaySemanticProvider:
                 profile=self._profile,
                 provider=response.provider,
                 model=response.model,
+                selected_profile=response.selected_profile,
+                source_label=response.source_label,
+                failover_count=response.failover_count,
+                attempts=_safe_gateway_attempts(response.attempts),
                 response_hash=response.response_hash,
                 latency_ms=response.latency_ms,
                 input_tokens=(
@@ -4393,6 +4499,11 @@ class CommonGatewaySemanticProvider:
         error_code: str,
         error_detail: str,
         gateway_request_id: str | None = None,
+        selected_profile: str | None = None,
+        source_label: str | None = None,
+        model: str | None = None,
+        failover_count: int = 0,
+        attempts: tuple[dict[str, Any], ...] = (),
         parent_semantic_request_id: str | None = None,
         partition_index: int | None = None,
         partition_count: int | None = None,
@@ -4404,6 +4515,11 @@ class CommonGatewaySemanticProvider:
                 gateway_request_id=gateway_request_id,
                 status="failed",
                 profile=self._profile,
+                selected_profile=selected_profile,
+                source_label=source_label,
+                model=model,
+                failover_count=failover_count,
+                attempts=attempts,
                 error_code=error_code,
                 error_detail=error_detail[:2000],
                 parent_semantic_request_id=parent_semantic_request_id,
@@ -4411,6 +4527,93 @@ class CommonGatewaySemanticProvider:
                 partition_count=partition_count,
             )
         )
+
+
+_SAFE_GATEWAY_ATTEMPT_KEYS = (
+    "source_label",
+    "selected_profile",
+    "model",
+    "attempt_sequence",
+    "request_id",
+    "provider_request_id",
+    "status",
+    "error_code",
+    "status_code",
+    "attempt_count",
+    "latency_ms",
+)
+_SAFE_GATEWAY_FAILURE_KEYS = (
+    "attempt_sequence",
+    "error_code",
+    "status_code",
+    "transport_error_type",
+    "transport_phase",
+    "transport_exception_type",
+    "finish_reason",
+    "requested_output_tokens",
+    "observed_output_tokens",
+)
+
+
+def _safe_gateway_attempts(value: Any) -> tuple[dict[str, Any], ...]:
+    """Whitelist credential-free routed-attempt diagnostics for persistence."""
+
+    if not isinstance(value, (list, tuple)):
+        return ()
+    safe_attempts: list[dict[str, Any]] = []
+    for raw_attempt in value:
+        if not isinstance(raw_attempt, Mapping):
+            continue
+        attempt = {
+            key: raw_attempt[key]
+            for key in _SAFE_GATEWAY_ATTEMPT_KEYS
+            if raw_attempt.get(key) is not None
+        }
+        raw_failures = raw_attempt.get("attempt_failures")
+        if isinstance(raw_failures, (list, tuple)):
+            failures = [
+                {
+                    key: raw_failure[key]
+                    for key in _SAFE_GATEWAY_FAILURE_KEYS
+                    if raw_failure.get(key) is not None
+                }
+                for raw_failure in raw_failures
+                if isinstance(raw_failure, Mapping)
+            ]
+            if failures:
+                attempt["attempt_failures"] = failures
+        safe_attempts.append(attempt)
+    return tuple(safe_attempts)
+
+
+def _safe_gateway_lineage(lineage: Mapping[str, Any] | None) -> dict[str, Any]:
+    """Project only safe route identity and attempt diagnostics into Stage 5."""
+
+    payload = dict(lineage or {})
+    raw_attempts = payload.get("attempts")
+    attempts = _safe_gateway_attempts(raw_attempts)
+    final_attempt = attempts[-1] if attempts else {}
+    raw_failover_count = payload.get("failover_count", 0)
+    try:
+        failover_count = max(0, int(raw_failover_count))
+    except (TypeError, ValueError):
+        failover_count = 0
+    return {
+        "selected_profile": _optional_lineage_text(
+            payload.get("selected_profile") or final_attempt.get("selected_profile")
+        ),
+        "source_label": _optional_lineage_text(
+            payload.get("llm_source") or final_attempt.get("source_label")
+        ),
+        "model": _optional_lineage_text(final_attempt.get("model")),
+        "failover_count": failover_count,
+        "attempts": attempts,
+    }
+
+
+def _optional_lineage_text(value: Any) -> str | None:
+    text = str(value or "").strip()
+    return text or None
 
 
 def _run_complete(

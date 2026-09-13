@@ -141,6 +141,10 @@ class Stage5ProviderCallTrace(_StrictModel):
     profile: str = Field(min_length=1)
     provider: str | None = None
     model: str | None = None
+    selected_profile: str | None = None
+    source_label: str | None = None
+    failover_count: int = Field(default=0, ge=0)
+    attempts: tuple[dict[str, Any], ...] = ()
     response_hash: str | None = None
     latency_ms: int | None = Field(default=None, ge=0)
     input_tokens: int | None = Field(default=None, ge=0)

@@ -509,12 +509,14 @@ async def test_single_source_failure_keeps_original_error_and_zero_failover_coun
 class _DelayedFailureTransport(ScriptedTransport):
     async def send(self, url, headers, payload, timeout_seconds):
         if not self.calls:
-            self.calls.append({
-                "url": url,
-                "headers": dict(headers),
-                "payload": dict(payload),
-                "timeout_seconds": timeout_seconds,
-            })
+            self.calls.append(
+                {
+                    "url": url,
+                    "headers": dict(headers),
+                    "payload": dict(payload),
+                    "timeout_seconds": timeout_seconds,
+                }
+            )
             await asyncio.sleep(0.05)
             raise LlmTransientTransportError("synthetic delayed timeout")
         return await super().send(url, headers, payload, timeout_seconds)
@@ -528,7 +530,43 @@ async def test_failover_reuses_one_absolute_execution_deadline():
     ).complete(_request())
     assert response.source_label == "pipio:gpt-5.6-luna"
     assert len(transport.calls) == 2
-    assert transport.calls[1]["timeout_seconds"] < transport.calls[0]["timeout_seconds"] - 0.02
+    assert transport.calls[0]["timeout_seconds"] <= 0.245
+    assert transport.calls[1]["timeout_seconds"] < 0.26
+
+
+class _FirstSourceStallTransport(ScriptedTransport):
+    async def send(self, url, headers, payload, timeout_seconds):
+        if not self.calls:
+            self.calls.append({
+                "url": url,
+                "headers": dict(headers),
+                "payload": dict(payload),
+                "timeout_seconds": timeout_seconds,
+            })
+            await asyncio.sleep(1)
+            raise AssertionError(
+                "routed attempt timeout did not bound the stalled source"
+            )
+        return await super().send(url, headers, payload, timeout_seconds)
+
+
+@pytest.mark.asyncio
+async def test_stalled_first_source_reserves_time_for_second_member():
+    transport = _FirstSourceStallTransport([_success("ok", "gpt-5.6-luna")])
+    response = await _client(
+        _config(timeout_seconds=0.2, attempt_timeout_seconds=1), transport
+    ).complete(_request())
+
+    assert response.source_label == "pipio:gpt-5.6-luna"
+    assert response.failover_count == 1
+    assert len(transport.calls) == 2
+    assert transport.calls[0]["timeout_seconds"] <= 0.165
+    assert transport.calls[1]["timeout_seconds"] < 0.06
+    assert response.attempts[0]["error_code"] == "transient_transport_error"
+    assert (
+        response.attempts[0]["attempt_failures"][0]["transport_error_type"]
+        == "client_attempt_timeout"
+    )
 
 
 @pytest.mark.asyncio

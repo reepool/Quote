@@ -10,7 +10,6 @@ import json
 import sys
 from collections.abc import Sequence
 from pathlib import Path
-from typing import Any
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
 if str(ROOT_DIR) not in sys.path:
@@ -29,8 +28,6 @@ from research.company_profile.shadow_batch_service import (
     build_shadow_replay_admission_receipt,
     load_shadow_batch_result,
     load_shadow_report_result,
-    validate_current_mvp_replay_proof,
-    validate_evidence_role_replay_proof,
     validate_external_operating_ownership_replay_proof,
     validate_operating_ownership_replay_proof,
     validate_segment_financial_closure_audit,
@@ -61,9 +58,6 @@ SHADOW_EXTRACT_MAX_OUTPUT_TOKENS = 20_000
 SHADOW_VERIFY_MAX_OUTPUT_TOKENS = 18_000
 SHADOW_TIMEOUT_SECONDS = 300.0
 SHADOW_MAX_PROVIDER_CALLS = 600
-CURRENT_MVP_MODE = "current-mvp-semantic-replay"
-CURRENT_MVP_LOGICAL_PROFILE = "semantic_extraction"
-CURRENT_MVP_BATCH_ID = "manufacturing-materials-shadow-current-mvp-four-pool-20260912-a"
 REFINED_SHADOW_REPLAY_CONTRACT = ShadowReplayContract(
     batch_id="manufacturing-materials-shadow-refined-gemini-20260910-a",
     sample_manifest_hash=(
@@ -300,45 +294,6 @@ SEGMENT_HEADING_SHADOW_REPLAY_CONTRACT = ShadowReplayContract(
     max_provider_calls=SHADOW_MAX_PROVIDER_CALLS,
 )
 
-EVIDENCE_ROLE_SHADOW_REPLAY_CONTRACT = ShadowReplayContract(
-    batch_id="manufacturing-materials-shadow-evidence-role-gemini-20260911-a",
-    sample_manifest_hash=(
-        "6f639739ef082e78dcb0c01a5ce40bab1645d8fdc027bece2dbef63652bae9e2"
-    ),
-    evidence_plan_version="manufacturing_materials_shadow.2026-09-10.5",
-    evidence_plan_hash=(
-        "e2205ec932589a0d50457e9f0112b44588ed164cf4c39560f27dfb0f6f996686"
-    ),
-    preparation_audit_hash=(
-        "24996a5620b12805786a3fd941215220f84f25ac618dfeba2e06a9a50325a9ca"
-    ),
-    correction_audit_hash=(
-        "6377ae573305284daccf31f786a36beb4327775dd10e7667758f10b092a43a5d"
-    ),
-    supporting_artifact_hashes={
-        "baseline_batch_manifest": (
-            "6c94017099c5f98ec960502753e9b05c7eff3baace760dbb2ec511b03055e8fa"
-        ),
-        "baseline_readiness_audit": (
-            "2a9383c87ed9a7f06fdccedf17c81895a6057b887a006de1a08bdae39e9ca62b"
-        ),
-        "evidence_role_implementation": (
-            "61546375d009cf9ac876adc9044bd2bd3a46aa3033a526c984a087753d6ec615"
-        ),
-        "evidence_role_provider_tests": (
-            "f01cb1e7d680e680f8c1b7b99b3902ac6bf1adfeb57318030822046100cf0e66"
-        ),
-        "evidence_role_implementation_audit": (
-            "6fdac8533e0a066775c823c48c0d769b5a96eee5d31302804c65903ba7123c29"
-        ),
-    },
-    primary_logical_profile=SHADOW_PRIMARY_PROFILE,
-    extract_max_output_tokens=SHADOW_EXTRACT_MAX_OUTPUT_TOKENS,
-    verify_max_output_tokens=SHADOW_VERIFY_MAX_OUTPUT_TOKENS,
-    timeout_seconds=SHADOW_TIMEOUT_SECONDS,
-    max_provider_calls=SHADOW_MAX_PROVIDER_CALLS,
-)
-
 OPERATING_OWNERSHIP_SHADOW_REPLAY_CONTRACT = ShadowReplayContract(
     batch_id="manufacturing-materials-shadow-operating-ownership-gemini-20260911-a",
     sample_manifest_hash=(
@@ -441,51 +396,6 @@ EXTERNAL_OPERATING_OWNERSHIP_SHADOW_REPLAY_CONTRACT = ShadowReplayContract(
 )
 
 
-CURRENT_MVP_SHADOW_REPLAY_CONTRACT = ShadowReplayContract(
-    batch_id=CURRENT_MVP_BATCH_ID,
-    sample_manifest_hash=(
-        "6f639739ef082e78dcb0c01a5ce40bab1645d8fdc027bece2dbef63652bae9e2"
-    ),
-    evidence_plan_version=SHADOW_OPERATING_OWNERSHIP_PLAN_VERSION,
-    evidence_plan_hash=(
-        "cd445c2642f3509fabb92020968eb8e884aff6d2bc99caeda818ed8b3b094770"
-    ),
-    preparation_audit_hash=(
-        "c37280d844b6cb44c9a9d558d39f8de45f48b3173963fa04daaab1eb8617aa65"
-    ),
-    correction_audit_hash=(
-        "27e668c7a94f1ddc00a34fb4a40b4e86c6a63441c37f65dce197722e949c166a"
-    ),
-    supporting_artifact_hashes={
-        "baseline_batch_manifest": (
-            "99d7121b37e9284ca28471cc256cca9cbf672fd8bb22fe2eedf4a187f6bc9ee0"
-        ),
-        "baseline_readiness_audit": (
-            "f0bac8d80ff13c7f7e30e7e3158e842caddfa5f937606332c22d72b3695641e0"
-        ),
-        "baseline_source_review_outcomes": (
-            "8c4a83ddc0a5cec0f6915ffa9f9552f46fc2822195764c607de27e97cc64d599"
-        ),
-        "shadow_evidence_implementation": (
-            "604048b92487f34dab8bca134a1e3b7a354a374ec12daea02c5ef4c8b8e854fa"
-        ),
-        "stage5_provider_implementation": (
-            "aa8dff7560de386cd487db75848b2ca91176bf4498dfe7c0c16a7e49d2e7270e"
-        ),
-        "stage5_service_implementation": (
-            "0d375d94256f4fe245c59175d1419d2b69d050e14abbcff624a03872a02ea37a"
-        ),
-        "current_mvp_replay_proof_validator": (
-            "e801d77f9aa67201e5fde6c9ec142b91aa52bf6e2f8601a1c8adca0b2ffa2ff0"
-        ),
-    },
-    primary_logical_profile=CURRENT_MVP_LOGICAL_PROFILE,
-    extract_max_output_tokens=SHADOW_EXTRACT_MAX_OUTPUT_TOKENS,
-    verify_max_output_tokens=SHADOW_VERIFY_MAX_OUTPUT_TOKENS,
-    timeout_seconds=SHADOW_TIMEOUT_SECONDS,
-    max_provider_calls=SHADOW_MAX_PROVIDER_CALLS,
-)
-
 # The v5 routing/continuation batch is the frozen source of prepared scopes for
 # this replay.  Re-running the historical plan through today's planner would
 # make the replay depend on later planner rules and can reject a scope that was
@@ -515,10 +425,8 @@ def build_parser() -> argparse.ArgumentParser:
             "segment-repair-semantic-replay",
             "segment-retry-semantic-replay",
             "segment-heading-semantic-replay",
-            "evidence-role-semantic-replay",
             "operating-ownership-semantic-replay",
             "external-operating-ownership-semantic-replay",
-            CURRENT_MVP_MODE,
         ),
         required=True,
     )
@@ -538,10 +446,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--admission-receipt", type=Path)
     parser.add_argument("--interrupted-attempt", type=Path)
     parser.add_argument("--segment-heading-replay-proof", type=Path)
-    parser.add_argument("--evidence-role-replay-proof", type=Path)
     parser.add_argument("--operating-ownership-replay-proof", type=Path)
     parser.add_argument("--external-operating-ownership-replay-proof", type=Path)
-    parser.add_argument("--current-mvp-replay-proof", type=Path)
     parser.add_argument("--source-review-package", type=Path)
     parser.add_argument("--source-review-outcomes", type=Path)
     parser.add_argument("--owner-closure-batch-manifest", type=Path)
@@ -804,11 +710,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         return 0
     if not args.output_root or not args.batch_id:
         raise ValueError(f"{args.mode} requires --output-root and --batch-id")
-    expected_route = (
-        CURRENT_MVP_LOGICAL_PROFILE
-        if args.mode == CURRENT_MVP_MODE
-        else SHADOW_PRIMARY_PROFILE
-    )
+    expected_route = SHADOW_PRIMARY_PROFILE
     if args.provider_route != expected_route:
         raise ValueError(
             f"contracted shadow batch requires provider route {expected_route}"
@@ -1034,52 +936,6 @@ def main(argv: Sequence[str] | None = None) -> int:
             json.dumps(receipt, ensure_ascii=False, indent=2) + "\n",
             encoding="utf-8",
         )
-    elif args.mode == "evidence-role-semantic-replay":
-        required = {
-            "Evidence-role replay proof": args.evidence_role_replay_proof,
-            "admission receipt": args.admission_receipt,
-        }
-        missing = [name for name, path in required.items() if path is None]
-        if missing:
-            raise ValueError(f"{args.mode} requires " + ", ".join(missing))
-        replay_proof = json.loads(
-            args.evidence_role_replay_proof.read_text(encoding="utf-8")
-        )
-        supporting_hashes = validate_evidence_role_replay_proof(
-            replay_proof,
-            contract=EVIDENCE_ROLE_SHADOW_REPLAY_CONTRACT,
-            repository_root=ROOT_DIR,
-            output_root=args.output_root,
-        )
-        validate_shadow_replay_admission(
-            contract=EVIDENCE_ROLE_SHADOW_REPLAY_CONTRACT,
-            batch_id=args.batch_id,
-            primary_logical_profile=args.provider_route,
-            extract_max_output_tokens=args.extract_max_output_tokens,
-            verify_max_output_tokens=args.verify_max_output_tokens,
-            timeout_seconds=args.timeout_seconds,
-            max_provider_calls=args.max_provider_calls,
-            manifest=manifest,
-            evidence_plan=plan,
-            preparation_audit=frozen_audit,
-            correction_audit=replay_proof,
-            supporting_artifact_hashes=supporting_hashes,
-            prepared=prepared,
-            output_root=args.output_root,
-        )
-        if args.admission_receipt.exists():
-            raise FileExistsError(
-                f"shadow admission receipt already exists: {args.admission_receipt}"
-            )
-        receipt = build_shadow_replay_admission_receipt(
-            contract=EVIDENCE_ROLE_SHADOW_REPLAY_CONTRACT,
-            output_root=args.output_root,
-        )
-        args.admission_receipt.parent.mkdir(parents=True, exist_ok=True)
-        args.admission_receipt.write_text(
-            json.dumps(receipt, ensure_ascii=False, indent=2) + "\n",
-            encoding="utf-8",
-        )
     elif args.mode == "operating-ownership-semantic-replay":
         required = {
             "operating ownership replay proof": (args.operating_ownership_replay_proof),
@@ -1168,62 +1024,6 @@ def main(argv: Sequence[str] | None = None) -> int:
         receipt = build_shadow_replay_admission_receipt(
             contract=EXTERNAL_OPERATING_OWNERSHIP_SHADOW_REPLAY_CONTRACT,
             output_root=args.output_root,
-        )
-        args.admission_receipt.parent.mkdir(parents=True, exist_ok=True)
-        args.admission_receipt.write_text(
-            json.dumps(receipt, ensure_ascii=False, indent=2) + "\n",
-            encoding="utf-8",
-        )
-    elif args.mode == CURRENT_MVP_MODE:
-        required = {
-            "current MVP replay proof": args.current_mvp_replay_proof,
-            "admission receipt": args.admission_receipt,
-        }
-        missing = [name for name, path in required.items() if path is None]
-        if missing:
-            raise ValueError(f"{args.mode} requires " + ", ".join(missing))
-        from utils.config_manager import config_manager
-        from utils.llm import load_project_environment
-
-        load_project_environment(ROOT_DIR, override=False)
-        llm_config = config_manager.get_llm_config()
-        provider_route_contract = _current_mvp_route_contract(
-            llm_config, args.provider_route
-        )
-        replay_proof = json.loads(
-            args.current_mvp_replay_proof.read_text(encoding="utf-8")
-        )
-        supporting_hashes = validate_current_mvp_replay_proof(
-            replay_proof,
-            contract=CURRENT_MVP_SHADOW_REPLAY_CONTRACT,
-            repository_root=ROOT_DIR,
-            output_root=args.output_root,
-            provider_route_contract=provider_route_contract,
-        )
-        validate_shadow_replay_admission(
-            contract=CURRENT_MVP_SHADOW_REPLAY_CONTRACT,
-            batch_id=args.batch_id,
-            primary_logical_profile=args.provider_route,
-            extract_max_output_tokens=args.extract_max_output_tokens,
-            verify_max_output_tokens=args.verify_max_output_tokens,
-            timeout_seconds=args.timeout_seconds,
-            max_provider_calls=args.max_provider_calls,
-            manifest=manifest,
-            evidence_plan=plan,
-            preparation_audit=frozen_audit,
-            correction_audit=replay_proof,
-            supporting_artifact_hashes=supporting_hashes,
-            prepared=prepared,
-            output_root=args.output_root,
-        )
-        if args.admission_receipt.exists():
-            raise FileExistsError(
-                f"shadow admission receipt already exists: {args.admission_receipt}"
-            )
-        receipt = build_shadow_replay_admission_receipt(
-            contract=CURRENT_MVP_SHADOW_REPLAY_CONTRACT,
-            output_root=args.output_root,
-            provider_route_contract=provider_route_contract,
         )
         args.admission_receipt.parent.mkdir(parents=True, exist_ok=True)
         args.admission_receipt.write_text(
@@ -1322,9 +1122,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         shutdown_shared_llm_resources,
     )
 
-    if args.mode != CURRENT_MVP_MODE:
-        load_project_environment(ROOT_DIR, override=False)
-        llm_config = config_manager.get_llm_config()
+    load_project_environment(ROOT_DIR, override=False)
+    llm_config = config_manager.get_llm_config()
     if not llm_config.is_logical_profile_enabled(args.provider_route):
         raise ValueError(f"logical LLM profile is unavailable: {args.provider_route}")
     runner = asyncio.Runner()
@@ -1345,7 +1144,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                 route=args.provider_route,
                 max_output_tokens=args.extract_max_output_tokens,
                 verify_max_output_tokens=args.verify_max_output_tokens,
-                dynamic_output_tokens=_dynamic_output_tokens_for_mode(args.mode),
+                dynamic_output_tokens=False,
                 timeout_seconds=args.timeout_seconds,
                 budget=budget,
             ),
@@ -1419,21 +1218,11 @@ def _validate_replay_mode(
     segment_repair_batch = SEGMENT_FINANCIAL_REPAIR_SHADOW_REPLAY_CONTRACT.batch_id
     segment_retry_batch = RETRY_SEGMENT_FINANCIAL_SHADOW_REPLAY_CONTRACT.batch_id
     segment_heading_batch = SEGMENT_HEADING_SHADOW_REPLAY_CONTRACT.batch_id
-    evidence_role_batch = EVIDENCE_ROLE_SHADOW_REPLAY_CONTRACT.batch_id
     operating_ownership_batch = OPERATING_OWNERSHIP_SHADOW_REPLAY_CONTRACT.batch_id
     external_operating_ownership_batch = (
         EXTERNAL_OPERATING_OWNERSHIP_SHADOW_REPLAY_CONTRACT.batch_id
     )
-    current_mvp_batch = CURRENT_MVP_SHADOW_REPLAY_CONTRACT.batch_id
     provider_bearing_legacy_modes = {"semantic-run", "refined-semantic-replay"}
-    if batch_id == current_mvp_batch and mode != CURRENT_MVP_MODE:
-        raise ValueError(
-            "current MVP batch identity requires current-mvp-semantic-replay"
-        )
-    if mode == CURRENT_MVP_MODE and batch_id != current_mvp_batch:
-        raise ValueError(
-            "current-mvp-semantic-replay requires the frozen current MVP batch identity"
-        )
     if (
         plan_version == stability_plan or batch_id == stability_batch
     ) and mode in provider_bearing_legacy_modes:
@@ -1475,10 +1264,6 @@ def _validate_replay_mode(
         raise ValueError(
             "segment heading batch identity requires segment-heading-semantic-replay"
         )
-    if batch_id == evidence_role_batch and mode != "evidence-role-semantic-replay":
-        raise ValueError(
-            "Evidence-role batch identity requires evidence-role-semantic-replay"
-        )
     if (
         batch_id == operating_ownership_batch
         and mode != "operating-ownership-semantic-replay"
@@ -1499,7 +1284,6 @@ def _validate_replay_mode(
         "preparation-only",
         "operating-ownership-semantic-replay",
         "external-operating-ownership-semantic-replay",
-        CURRENT_MVP_MODE,
     }:
         raise ValueError(
             "operating ownership v6 Evidence plan requires its frozen replay mode"
@@ -1510,7 +1294,6 @@ def _validate_replay_mode(
         "segment-repair-semantic-replay",
         "segment-retry-semantic-replay",
         "segment-heading-semantic-replay",
-        "evidence-role-semantic-replay",
     }:
         raise ValueError(
             "routing/continuation v5 Evidence plan is provider-free only; "
@@ -1525,48 +1308,5 @@ def _validate_replay_mode(
             "owner-closure v4 Evidence plan requires its frozen replay or "
             "routing-continuation preparation mode"
         )
-
-
-def _dynamic_output_tokens_for_mode(mode: str) -> bool:
-    return mode == CURRENT_MVP_MODE
-
-
-def _current_mvp_route_contract(llm_config: Any, route: str) -> dict[str, object]:
-    """Return the credential-free four-member route contract for this batch."""
-
-    if route != CURRENT_MVP_LOGICAL_PROFILE:
-        raise ValueError(
-            f"current MVP replay requires logical profile {CURRENT_MVP_LOGICAL_PROFILE}"
-        )
-    if not llm_config.is_logical_profile_enabled(route):
-        raise ValueError(f"logical LLM profile is unavailable: {route}")
-    pool = llm_config.pool_for_profile(route)
-    if pool is None or len(pool.members) != 4:
-        count = 0 if pool is None else len(pool.members)
-        raise ValueError(
-            "current MVP logical route requires exactly four eligible pool members; "
-            f"got {count}"
-        )
-    if not pool.failover.enabled or pool.failover.max_hops != 3:
-        raise ValueError(
-            "current MVP logical route requires enabled failover with max_hops=3"
-        )
-    description = llm_config.describe_logical_profile(route)
-    modes = tuple(description.supported_structured_output_modes)
-    if "json_object" not in modes:
-        raise ValueError(
-            f"current MVP logical route lacks common json_object output mode: {route}"
-        )
-    return {
-        "logical_profile": route,
-        "pool": pool.name,
-        "eligible_member_count": len(pool.members),
-        "source_labels": list(description.source_labels),
-        "common_structured_output_modes": list(modes),
-        "failover": {"enabled": pool.failover.enabled, "max_hops": 3},
-        "route_fingerprint": description.route_fingerprint,
-    }
-
-
 if __name__ == "__main__":
     raise SystemExit(main())

@@ -1,0 +1,65 @@
+{
+  "schema_version": "company_profile_common_mvp_error_attribution.v1",
+  "source_batch_id": "manufacturing-materials-shadow-current-mvp-four-pool-20260912-a",
+  "reviewed_error_count": 7,
+  "errors": [
+    {
+      "review_id": "manufacturing-materials-shadow-000055-2025:material_inputs-01:chapter_sample:coverage:material_inputs-01:material_input",
+      "defect_family": "legal_empty_evidence_owner",
+      "extract_model": "deepseek-flash",
+      "verify_model": "gemini-3.8-flash-high"
+    },
+    {
+      "review_id": "manufacturing-materials-shadow-600111-2025:business_overview-01:chapter_sample:stage5-2b3f8db2ca537fb90f7cf3c8",
+      "defect_family": "business_overview_substance",
+      "extract_model": "deepseek-flash",
+      "verify_model": "gemini-3.8-flash-high"
+    },
+    {
+      "review_id": "manufacturing-materials-shadow-000420-2025:business_overview-01:chapter_sample:stage5-c1e20f37eb1760f72b17efc1",
+      "defect_family": "business_overview_substance",
+      "extract_model": "glm-5.3-flash",
+      "verify_model": "grok-4.6"
+    },
+    {
+      "review_id": "manufacturing-materials-shadow-600075-2025:business_overview-01:chapter_sample:stage5-e9d9a4184a11c8091c009a7a",
+      "defect_family": "business_overview_substance",
+      "extract_model": "deepseek-flash",
+      "verify_model": "gemini-3.8-flash-high"
+    },
+    {
+      "review_id": "manufacturing-materials-shadow-920076-2025:business_overview-01:chapter_sample:stage5-005cc411a6c7c1d64e0c090e",
+      "defect_family": "business_overview_substance",
+      "extract_model": "grok-4.6",
+      "verify_model": "deepseek-flash"
+    },
+    {
+      "review_id": "manufacturing-materials-shadow-920076-2025:segment_financials-01:chapter_sample:coverage:segment_financials-01:segment_dimension",
+      "defect_family": "legal_empty_evidence_owner",
+      "extract_model": "gemini-3.8-flash-high",
+      "verify_model": "glm-5.3-flash"
+    },
+    {
+      "review_id": "manufacturing-materials-shadow-000552-2025:business_regime-01:chapter_sample:stage5-67ca9515b5c32a98abae2c4a",
+      "defect_family": "source_native_label_normalization",
+      "extract_model": "grok-4.6",
+      "verify_model": "deepseek-flash"
+    }
+  ],
+  "extract_model_error_counts": {
+    "deepseek-flash": 3,
+    "grok-4.6": 2,
+    "glm-5.3-flash": 1,
+    "gemini-3.8-flash-high": 1
+  },
+  "verify_model_error_counts": {
+    "gemini-3.8-flash-high": 3,
+    "deepseek-flash": 2,
+    "grok-4.6": 1,
+    "glm-5.3-flash": 1
+  },
+  "conclusion": "Errors span all four extract and verify models; shared adapter, Evidence-owner, and verifier contracts are the common cause rather than one model-specific failure.",
+  "provider_calls": 0,
+  "historical_artifacts_mutated": false,
+  "production_authorization": "not_authorized"
+}

@@ -86,6 +86,8 @@ class _FakeGatewayClient:
         output = self.outputs.pop(0)
         if isinstance(output, Exception):
             raise output
+        if isinstance(output, LlmResponse):
+            return output
         return LlmResponse(
             status="success",
             data=output,
@@ -3773,6 +3775,112 @@ def test_common_gateway_provider_preserves_deadline_failure_identity() -> None:
     assert provider.traces[0].gateway_request_id == "gateway-deadline-1"
 
 
+def test_common_gateway_provider_preserves_safe_failed_route_lineage() -> None:
+    prepared = _prepared_scope()
+    request = _extract_request(prepared)
+    attempts = [
+        {
+            "source_label": "zai:glm-5.3-flash",
+            "selected_profile": "semantic__glm",
+            "model": "glm-5.3-flash",
+            "attempt_sequence": 1,
+            "error_code": "transient_transport_error",
+            "prompt": "secret prompt",
+        },
+        {
+            "source_label": "deepseek:deepseek-flash",
+            "selected_profile": "semantic__deepseek",
+            "model": "deepseek-flash",
+            "attempt_sequence": 2,
+            "error_code": "transient_transport_error",
+        },
+    ]
+    error = LlmDeadlineExceededError().with_context(
+        request_id="gateway-route-1",
+        attempt_count=2,
+        lineage={
+            "selected_profile": "semantic__deepseek",
+            "llm_source": "deepseek:deepseek-flash",
+            "failover_count": 1,
+            "attempts": attempts,
+        },
+    )
+    provider = CommonGatewaySemanticProvider(
+        client=_FakeGatewayClient(outputs=[error]),
+        profile="semantic_extraction",
+        prepared_scope=prepared,
+        max_output_tokens=2000,
+        timeout_seconds=30,
+    )
+
+    CompanyProfileSemanticService().run_task(request, provider=provider)
+
+    trace = provider.traces[0]
+    assert trace.selected_profile == "semantic__deepseek"
+    assert trace.source_label == "deepseek:deepseek-flash"
+    assert trace.model == "deepseek-flash"
+    assert trace.failover_count == 1
+    assert "prompt" not in trace.attempts[0]
+    assert trace.attempts[1] == attempts[1]
+    assert "secret" not in json.dumps(trace.model_dump(mode="json"))
+
+
+def test_common_gateway_provider_preserves_successful_route_lineage() -> None:
+    prepared = _prepared_scope()
+    request = _extract_request(prepared)
+    payload = {
+        "schema_version": "company_profile_extract_response.v1",
+        "request_id": request.request_id,
+        "items": [],
+    }
+    attempts = ({
+        "source_label": "scorpio:gemini-3.8-flash-high",
+        "selected_profile": "semantic__gemini",
+        "model": "gemini-3.8-flash-high",
+        "attempt_sequence": 1,
+        "status": "success",
+        "response_content": "secret output",
+    },)
+    response = LlmResponse(
+        status="success",
+        data=payload,
+        raw_content=json.dumps(payload),
+        provider="openai_compatible",
+        model="gemini-3.8-flash-high",
+        finish_reason="stop",
+        usage=None,
+        request_id="gateway-route-success",
+        provider_request_id="provider-route-success",
+        request_hash="a" * 64,
+        response_hash="b" * 64,
+        schema_name="company_profile_extract_response",
+        schema_version="v1",
+        structured_output_mode="json_object",
+        latency_ms=12,
+        attempt_count=1,
+        source_label="scorpio:gemini-3.8-flash-high",
+        selected_profile="semantic__gemini",
+        failover_count=0,
+        attempts=attempts,
+    )
+    provider = CommonGatewaySemanticProvider(
+        client=_FakeGatewayClient(outputs=[response]),
+        profile="semantic_extraction",
+        prepared_scope=prepared,
+        max_output_tokens=2000,
+        timeout_seconds=30,
+    )
+
+    provider.extract(request)
+
+    trace = provider.traces[0]
+    assert trace.selected_profile == "semantic__gemini"
+    assert trace.source_label == "scorpio:gemini-3.8-flash-high"
+    assert trace.failover_count == 0
+    assert "response_content" not in trace.attempts[0]
+    assert "secret" not in json.dumps(trace.model_dump(mode="json"))
+
+
 def test_common_gateway_provider_rejects_response_identity_mismatch() -> None:
     prepared = _prepared_scope()
     request = _extract_request(prepared)
@@ -3907,6 +4015,96 @@ def test_business_overview_rejects_cross_reference_only_target() -> None:
         source_text=substantive,
     )
     assert accepted.source_text == substantive
+
+
+@pytest.mark.parametrize(
+    "source_text",
+    [
+        "报告期，公司实现主营业务收入423.51亿元，同比增加29.10%。",
+        "公司需遵守《深圳证券交易所上市公司自律监管指引第3号——行业信息披露》中化工行业的披露要求。",
+        "公司深耕耐火材料行业多年。",
+    ],
+)
+def test_business_overview_adapter_rejects_non_substantive_reviewed_shapes(
+    source_text: str,
+) -> None:
+    prepared = _scope_with_source_text(
+        chapter_task=ChapterTask.EXTRACT_BUSINESS_OVERVIEW,
+        scope_id="business_overview-01",
+        field_id="business_overview_source",
+        source_text=source_text,
+    )
+    request = _extract_request(prepared)
+    evidence_id = prepared.evidence_bundle[0].evidence.evidence_id
+
+    with pytest.raises(ValueError, match="substantive source-native business text"):
+        _normalize_extract_response(
+            {
+                "schema_version": "company_profile_extract_response.v1",
+                "request_id": request.request_id,
+                "items": [
+                    {
+                        "item_type": "candidate",
+                        "candidate": {
+                            "object_type": "BusinessOverview",
+                            "field_id": "business_overview_source",
+                            "subject_scope": "unclear",
+                            "reported_period": "2025",
+                            "period_type": "duration",
+                            "source_native": {"value": source_text},
+                            "source_text": source_text,
+                            "evidence_ids": [evidence_id],
+                        },
+                    }
+                ],
+            },
+            request=request,
+            prepared_scope=prepared,
+        )
+
+
+def test_business_overview_adapter_keeps_exact_business_clause_before_risk() -> None:
+    source_text = (
+        "公司主营业务为钢铁产品制造和销售，"
+        "行业具有周期性，市场波动可能影响经营业绩。"
+    )
+    expected = "公司主营业务为钢铁产品制造和销售"
+    prepared = _scope_with_source_text(
+        chapter_task=ChapterTask.EXTRACT_BUSINESS_OVERVIEW,
+        scope_id="business_overview-01",
+        field_id="business_overview_source",
+        source_text=source_text,
+    )
+    request = _extract_request(prepared)
+    evidence_id = prepared.evidence_bundle[0].evidence.evidence_id
+
+    result = _normalize_extract_response(
+        {
+            "schema_version": "company_profile_extract_response.v1",
+            "request_id": request.request_id,
+            "items": [
+                {
+                    "item_type": "candidate",
+                    "candidate": {
+                        "object_type": "BusinessOverview",
+                        "field_id": "business_overview_source",
+                        "subject_scope": "unclear",
+                        "reported_period": "2025",
+                        "period_type": "duration",
+                        "source_native": {"value": source_text},
+                        "source_text": source_text,
+                        "evidence_ids": [evidence_id],
+                    },
+                }
+            ],
+        },
+        request=request,
+        prepared_scope=prepared,
+    )
+
+    candidate = result["items"][0]["candidate"]
+    assert candidate["source_text"] == expected
+    assert candidate["source_native"]["value"] == expected
 
 
 def _prepared_scope() -> PreparedRequestScope:
@@ -5545,6 +5743,125 @@ def test_material_legal_empty_preserves_explicit_owner_applicability() -> None:
     assert result["items"][0]["coverage"]["evidence"][0]["evidence_id"] == (
         evidence.evidence_id
     )
+
+
+def test_material_legal_empty_rejects_incidental_risk_page_words() -> None:
+    prepared = _scope_with_source_text(
+        chapter_task=ChapterTask.EXTRACT_MATERIAL_INPUTS,
+        scope_id="material_inputs-01",
+        field_id="material_input",
+        source_text="原材料价格波动可能增加公司成本并对经营业绩造成风险。",
+    )
+    evidence = prepared.evidence_bundle[0].evidence.model_copy(
+        update={"section_title": "risk_management"}
+    )
+    prepared = prepared.model_copy(
+        update={
+            "evidence_bundle": (
+                PreparedEvidence(evidence=evidence, field_id="material_input"),
+            ),
+            "candidate_pages": (evidence.page,),
+        }
+    )
+    request = _owner_coverage_request(prepared)
+
+    with pytest.raises(ValueError, match="chapter-owning Evidence"):
+        _normalize_extract_response(
+            {
+                "schema_version": "company_profile_extract_response.v1",
+                "request_id": request.request_id,
+                "items": [
+                    {
+                        "item_type": "coverage",
+                        "coverage": {
+                            "field_id": "material_input",
+                            "status": "not_disclosed",
+                            "reason_code": "source_reason_unspecified",
+                            "evidence_ids": [evidence.evidence_id],
+                        },
+                    }
+                ],
+            },
+            request=request,
+            prepared_scope=prepared,
+        )
+
+
+def test_segment_legal_empty_rejects_industry_narrative_company_total() -> None:
+    source_text = "公司属于耐火材料细分行业，报告期营业收入合计为20亿元。"
+    prepared = _scope_with_source_text(
+        chapter_task=ChapterTask.EXTRACT_SEGMENT_FINANCIALS,
+        scope_id="segment_financials-01",
+        field_id="segment_dimension",
+        source_text=source_text,
+    )
+    evidence = prepared.evidence_bundle[0].evidence.model_copy(
+        update={"section_title": "industry_context"}
+    )
+    prepared = prepared.model_copy(
+        update={
+            "evidence_bundle": (
+                PreparedEvidence(evidence=evidence, field_id="segment_dimension"),
+            ),
+            "candidate_pages": (evidence.page,),
+        }
+    )
+    request = _owner_coverage_request(prepared)
+
+    with pytest.raises(ValueError, match="chapter-owning Evidence"):
+        _normalize_extract_response(
+            {
+                "schema_version": "company_profile_extract_response.v1",
+                "request_id": request.request_id,
+                "items": [
+                    {
+                        "item_type": "coverage",
+                        "coverage": {
+                            "field_id": "segment_dimension",
+                            "status": "not_disclosed",
+                            "reason_code": "source_reason_unspecified",
+                            "evidence_ids": [evidence.evidence_id],
+                        },
+                    }
+                ],
+            },
+            request=request,
+            prepared_scope=prepared,
+        )
+
+
+def test_business_event_clears_unsupported_english_source_native_name() -> None:
+    source_text = "本期新设子公司并纳入合并报表范围。"
+    prepared = _scope_with_source_text(
+        chapter_task=ChapterTask.EXTRACT_BUSINESS_REGIME,
+        scope_id="business_regime-01",
+        field_id="business_regime",
+        source_text=source_text,
+    )
+    request = _business_regime_request(prepared)
+    evidence_id = prepared.evidence_bundle[0].evidence.evidence_id
+
+    result = _normalize_extract_response(
+        {
+            "events": [
+                {
+                    "event_type": "consolidation_scope_increase",
+                    "description": source_text,
+                    "evidence_id": evidence_id,
+                }
+            ],
+            "regimes": [],
+            "package_assignments": [],
+            "coverage": [],
+        },
+        request=request,
+        prepared_scope=prepared,
+    )
+
+    candidate = result["items"][0]["candidate"]
+    assert candidate["event_type"] == "consolidation_scope_increase"
+    assert candidate["source_native"]["name"] is None
+    assert candidate["source_native"]["value"] == source_text
 
 
 def test_unclear_coverage_does_not_require_legal_empty_field_owner() -> None:

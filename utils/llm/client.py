@@ -46,6 +46,7 @@ _LINEAGE_METADATA_KEYS = {
     "business_item_key",
     "input_hash",
 }
+_ROUTED_ATTEMPT_MAX_REMAINING_RATIO = 0.8
 
 
 @dataclass
@@ -261,6 +262,16 @@ class LlmClient:
                 selected_profile = selection.selected_profile
                 selected_source = selection.source_label
                 profile = self.config.profiles[selected_profile]
+                routed_attempt_timeout = self._routed_attempt_timeout_seconds(
+                    request=request,
+                    profile=profile,
+                    logical_profile=logical_profile,
+                    pool=pool,
+                    selected_source=selected_source,
+                    excluded_sources=excluded_sources,
+                    failover_count=failover_count,
+                    budget=budget,
+                )
                 source_attempt_started = time.monotonic()
                 source_attempt_failures: list[dict[str, Any]] = []
                 try:
@@ -269,6 +280,7 @@ class LlmClient:
                         profile_override=profile,
                         budget=budget,
                         attempt_failures=source_attempt_failures,
+                        routed_attempt_timeout_seconds=routed_attempt_timeout,
                     )
                 except LlmError as exc:
                     last_error = exc
@@ -512,6 +524,43 @@ class LlmClient:
         remaining = budget.remaining(time.monotonic())
         return remaining is None or remaining >= config.min_attempt_seconds
 
+    @staticmethod
+    def _routed_attempt_timeout_seconds(
+        *,
+        request: LlmRequest,
+        profile: LlmProfile,
+        logical_profile: str,
+        pool: Any,
+        selected_source: str,
+        excluded_sources: set[str],
+        failover_count: int,
+        budget: _ExecutionBudget,
+    ) -> float | None:
+        """Reserve a useful window for one configured alternate route member."""
+
+        config = pool.failover
+        if not config.enabled or failover_count >= config.max_hops:
+            return None
+        has_alternate = any(
+            member.source_label != selected_source
+            and member.source_label not in excluded_sources
+            and logical_profile in member.profiles
+            for member in pool.members
+        )
+        if not has_alternate:
+            return None
+        remaining = budget.remaining(time.monotonic())
+        if remaining is None:
+            remaining = float(request.timeout_seconds or profile.timeout_seconds)
+        minimum = config.min_attempt_seconds
+        if remaining <= 2 * minimum:
+            return None
+        attempt_window = min(
+            remaining * _ROUTED_ATTEMPT_MAX_REMAINING_RATIO,
+            remaining - minimum,
+        )
+        return attempt_window if attempt_window >= minimum else None
+
     async def _complete_concrete(
         self,
         request: LlmRequest,
@@ -519,6 +568,7 @@ class LlmClient:
         profile_override: Optional[LlmProfile] = None,
         budget: Optional[_ExecutionBudget] = None,
         attempt_failures: Optional[list[dict[str, Any]]] = None,
+        routed_attempt_timeout_seconds: Optional[float] = None,
     ) -> LlmResponse:
         if self._closed:
             raise LlmConfigurationError("LLM client is closed")
@@ -529,6 +579,7 @@ class LlmClient:
         shared_budget = budget or _ExecutionBudget()
         execution_started: Optional[float] = shared_budget.execution_started
         execution_deadline: Optional[float] = shared_budget.execution_deadline
+        routed_attempt_deadline: Optional[float] = None
         total_admission_wait_ms = 0
         lineage = self._lineage_metadata(request.metadata)
         try:
@@ -689,9 +740,23 @@ class LlmClient:
                 admission_deadline = (
                     admission_started + queue_timeout_seconds
                     if execution_deadline is None
-                    else execution_deadline
+                    else min(
+                        execution_deadline,
+                        routed_attempt_deadline or execution_deadline,
+                    )
                 )
                 if admission_deadline - time.monotonic() <= 0:
+                    if (
+                        routed_attempt_deadline is not None
+                        and execution_deadline is not None
+                        and routed_attempt_deadline < execution_deadline
+                    ):
+                        raise LlmTransientTransportError(
+                            "LLM routed source attempt timed out",
+                            transport_error_type="client_attempt_timeout",
+                            transport_phase="admission",
+                            transport_exception_type="TimeoutError",
+                        )
                     raise LlmDeadlineExceededError()
                 try:
                     llm_logger.debug(
@@ -741,6 +806,14 @@ class LlmClient:
                                 now=admitted_at,
                                 timeout_seconds=timeout_seconds,
                             )
+                            if (
+                                routed_attempt_timeout_seconds is not None
+                                and routed_attempt_deadline is None
+                            ):
+                                routed_attempt_deadline = min(
+                                    execution_deadline,
+                                    admitted_at + routed_attempt_timeout_seconds,
+                                )
                             execution_started = shared_budget.execution_started
                             if first_execution_admission:
                                 llm_logger.info(
@@ -770,13 +843,17 @@ class LlmClient:
                                 )
                             assert execution_deadline is not None
                             attempt_started = admitted_at
+                            active_attempt_deadline = min(
+                                execution_deadline,
+                                routed_attempt_deadline or execution_deadline,
+                            )
                             response = await self._send_attempt(
                                 url=url,
                                 headers=headers,
                                 profile=profile,
                                 idempotency_key=request.idempotency_key,
                                 payload=current_payload,
-                                deadline=execution_deadline,
+                                deadline=active_attempt_deadline,
                                 request_id=request_id,
                                 attempt_count=attempt_count,
                                 max_attempts=max_attempts,
@@ -963,9 +1040,15 @@ class LlmClient:
                 except asyncio.CancelledError as exc:
                     raise LlmCancelledError() from exc
                 except asyncio.TimeoutError as exc:
-                    active_deadline = execution_deadline or admission_deadline
+                    active_deadline = min(
+                        execution_deadline or admission_deadline,
+                        routed_attempt_deadline
+                        or execution_deadline
+                        or admission_deadline,
+                    )
                     execution_timeout = (
                         execution_deadline is not None
+                        and active_deadline == execution_deadline
                         and execution_deadline - attempt_started
                         <= profile.attempt_timeout_seconds
                     )
@@ -1005,6 +1088,11 @@ class LlmClient:
                         error=last_error,
                     )
                     if isinstance(last_error, LlmDeadlineExceededError):
+                        raise last_error from exc
+                    if (
+                        routed_attempt_deadline is not None
+                        and time.monotonic() >= routed_attempt_deadline
+                    ):
                         raise last_error from exc
                     if (
                         provider_coordinator is not None
@@ -1113,13 +1201,36 @@ class LlmClient:
                 )
                 if execution_deadline is None:
                     raise LlmDeadlineExceededError()
-                await self._backoff(
-                    profile,
-                    attempt_count,
-                    response=locals().get("response"),
-                    deadline=execution_deadline,
-                    random_source=self._random_source,
-                )
+                try:
+                    await self._backoff(
+                        profile,
+                        attempt_count,
+                        response=locals().get("response"),
+                        deadline=min(
+                            execution_deadline,
+                            routed_attempt_deadline or execution_deadline,
+                        ),
+                        random_source=self._random_source,
+                    )
+                except LlmDeadlineExceededError as exc:
+                    if (
+                        routed_attempt_deadline is not None
+                        and routed_attempt_deadline < execution_deadline
+                        and time.monotonic() < execution_deadline
+                    ):
+                        routed_timeout = LlmTransientTransportError(
+                            "LLM routed source attempt timed out",
+                            transport_error_type="client_attempt_timeout",
+                            transport_phase="backoff",
+                            transport_exception_type=type(exc).__name__,
+                        )
+                        self._record_attempt_failure(
+                            attempt_failures,
+                            attempt_sequence=attempt_count,
+                            error=routed_timeout,
+                        )
+                        raise routed_timeout from exc
+                    raise
 
             raise last_error or LlmError("provider_error", "LLM request failed")
         except asyncio.CancelledError as exc:
