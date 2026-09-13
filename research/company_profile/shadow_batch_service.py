@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import csv
 import hashlib
 import json
 import os
@@ -123,9 +124,7 @@ def validate_fresh_cohort_admission(
     }
     expected = contract.model_dump(mode="python")
     if actual != expected:
-        drift = sorted(
-            key for key in expected if actual.get(key) != expected.get(key)
-        )
+        drift = sorted(key for key in expected if actual.get(key) != expected.get(key))
         raise ValueError(f"fresh cohort contract mismatch: {drift}")
 
     audit_payload = dict(preparation_audit)
@@ -142,8 +141,7 @@ def validate_fresh_cohort_admission(
         or preparation_audit.get("expected_answers_embedded") is not False
         or preparation_audit.get("sample_manifest_sha256") != manifest_sha256
         or preparation_audit.get("evidence_plan_sha256") != evidence_plan_sha256
-        or preparation_audit.get("production_authorization")
-        != PRODUCTION_AUTHORIZATION
+        or preparation_audit.get("production_authorization") != PRODUCTION_AUTHORIZATION
     ):
         raise ValueError("fresh cohort preparation audit does not admit this batch")
     if set(prepared) != expected_ids:
@@ -914,6 +912,162 @@ class ManufacturingMaterialsShadowBatchService:
             provider_factory=provider_factory,
             semantic_input_factory=semantic_input_factory,
         )
+
+    def export_accepted_research_data(
+        self, *, batch_directory: str | Path, output_directory: str | Path
+    ) -> dict[str, object]:
+        """Deliver accepted facts even when report completeness remains hold.
+
+        This is a read projection, not a new acceptance decision. Rejected and
+        unresolved candidates never enter facts. Missing fields stay missing.
+        """
+        from .acceptance_policy import usage_policy
+
+        source = Path(batch_directory).resolve()
+        destination = Path(output_directory).resolve()
+        if destination == source or source in destination.parents:
+            raise ValueError("research export must be outside the source batch")
+        if destination.exists():
+            raise FileExistsError("research export identity already exists")
+        batch = load_shadow_batch_result(source / "manifest.json")
+        facts: list[dict[str, object]] = []
+        gaps: list[dict[str, object]] = []
+        reports: list[dict[str, object]] = []
+        for reference in batch.reports:
+            path = (source / reference.relative_path).resolve()
+            if source not in path.parents:
+                raise ValueError("report path escapes its batch")
+            if hashlib.sha256(path.read_bytes()).hexdigest() != reference.output_sha256:
+                raise ValueError("source report hash mismatch")
+            report = load_shadow_report_result(path)
+            if (
+                report.batch_id != batch.batch_id
+                or report.sample_id != reference.sample_id
+                or report.report_run_id != reference.report_run_id
+                or report.sample_manifest_hash != batch.sample_manifest_hash
+                or report.evidence_plan_hash != batch.evidence_plan_hash
+            ):
+                raise ValueError("source report identity mismatch")
+            start = len(facts)
+            if isinstance(report, ShadowReportSuccess):
+                for scope in report.scope_results:
+                    for record in scope.task_result.accepted_records():
+                        facts.append(
+                            {
+                                "sample_id": report.sample_id,
+                                "scope_id": scope.scope_id,
+                                "source_report_status": report.report_status.value,
+                                "acceptance": "accepted_for_review",
+                                "usage": usage_policy(record),
+                                "record": record.model_dump(mode="json"),
+                            }
+                        )
+                    for coverage in scope.task_result.coverage:
+                        gaps.append(
+                            {
+                                "sample_id": report.sample_id,
+                                "scope_id": scope.scope_id,
+                                "coverage": coverage.model_dump(mode="json"),
+                            }
+                        )
+                    for item in scope.task_result.human_review_items:
+                        gaps.append(
+                            {
+                                "sample_id": report.sample_id,
+                                "scope_id": scope.scope_id,
+                                "review": item.model_dump(mode="json"),
+                            }
+                        )
+            else:
+                gaps.append(
+                    {
+                        "sample_id": report.sample_id,
+                        "failure": report.model_dump(mode="json"),
+                    }
+                )
+            count = len(facts) - start
+            reports.append(
+                {
+                    "sample_id": report.sample_id,
+                    "accepted_fact_count": count,
+                    "delivery_status": "available_partial"
+                    if count
+                    else "no_accepted_facts",
+                    "source_report_sha256": reference.output_sha256,
+                }
+            )
+        payload: dict[str, object] = {
+            "schema_version": "company_profile_accepted_research_export.v1",
+            "source_batch_id": batch.batch_id,
+            "source_batch_result_hash": batch.result_hash,
+            "source_manifest_sha256": hashlib.sha256(
+                (source / "manifest.json").read_bytes()
+            ).hexdigest(),
+            "production_authorization": PRODUCTION_AUTHORIZATION,
+            "provider_calls": 0,
+            "semantic_accuracy": "not_estimated_by_export",
+            "accepted_fact_count": len(facts),
+            "reports": reports,
+            "facts": facts,
+            "coverage_and_review": gaps,
+        }
+        # Validate all inputs before creating the new, exclusively owned output.
+        destination.mkdir(parents=True, exist_ok=False)
+        (destination / "accepted-research-data.json").write_bytes(_json_bytes(payload))
+        columns = (
+            "instrument_id",
+            "report_period",
+            "published_at",
+            "scope_id",
+            "record_id",
+            "field_id",
+            "object_type",
+            "reported_period",
+            "period_type",
+            "subject_scope",
+            "subject_basis",
+            "name",
+            "value",
+            "unit",
+            "header",
+            "qualifier",
+            "source_report_status",
+            "usage_json",
+            "evidence_json",
+        )
+        with (destination / "accepted-facts.csv").open(
+            "w", encoding="utf-8-sig", newline=""
+        ) as output:
+            writer = csv.DictWriter(output, fieldnames=columns)
+            writer.writeheader()
+            for fact in facts:
+                record = fact["record"]
+                native = record["source_native"]
+                row = {key: record.get(key) for key in columns}
+                row.update(
+                    {
+                        key: record["report"][key]
+                        for key in ("instrument_id", "report_period", "published_at")
+                    }
+                )
+                row.update(
+                    {
+                        key: native.get(key)
+                        for key in ("name", "value", "unit", "header", "qualifier")
+                    }
+                )
+                row.update(
+                    {
+                        "scope_id": fact["scope_id"],
+                        "source_report_status": fact["source_report_status"],
+                        "usage_json": json.dumps(fact["usage"], ensure_ascii=False),
+                        "evidence_json": json.dumps(
+                            record["evidence"], ensure_ascii=False
+                        ),
+                    }
+                )
+                writer.writerow(row)
+        return payload
 
     def _run_reports(
         self,

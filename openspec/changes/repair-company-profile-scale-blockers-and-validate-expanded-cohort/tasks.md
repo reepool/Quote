@@ -30,10 +30,10 @@
 
 - [x] 5.1 Run read-only Scorpio, ZAI, and DeepSeek connectivity/profile preflight, using the authorized external-sandbox path for likely sandbox DNS/network failures.
 - [x] 5.2 Execute exactly one immutable eight-report batch through the existing four-model route without targeted reruns, splicing, or in-run tuning.
-- [x] 5.3 Produce the source-bound review package and empirical audit covering all blockers/caveats, one stable result per chapter/report, and recurrence of all five repaired families.
-- [x] 5.4 Confirm historical bundles remain hash-identical and production, Stage 6, approved, scheduler/backfill, CommodityExposure, ValueChainRole, and DCF paths remain closed.
+- [ ] 5.3 Produce the source-bound review package and empirical audit covering all blockers/caveats, one stable result per chapter/report, and recurrence of all five repaired families. Previous structural-only result withdrawn; see AUDIT-CORRECTION.md.
+- [ ] 5.4 Confirm historical bundles remain hash-identical and production, Stage 6, approved, scheduler/backfill, CommodityExposure, ValueChainRole, and DCF paths remain closed. Tracked Git diff alone was insufficient proof of all bundle hashes.
 
 ## 6. Delivery
 
-- [x] 6.1 Review only task-owned changes, fix blocking findings, and document non-blocking or pre-existing findings without scope expansion.
-- [x] 6.2 Mark the OpenSpec tasks complete, run final strict validation, commit only isolated task-owned files, and push normally to the configured upstream.
+- [ ] 6.1 Review only task-owned changes, fix blocking findings, and document non-blocking or pre-existing findings without scope expansion.
+- [ ] 6.2 Mark the OpenSpec tasks complete, run final strict validation, commit only isolated task-owned files, and push normally to the configured upstream.

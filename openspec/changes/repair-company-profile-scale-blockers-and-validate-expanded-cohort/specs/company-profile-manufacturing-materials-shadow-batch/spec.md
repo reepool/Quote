@@ -1,5 +1,22 @@
 ## ADDED Requirements
 
+### Requirement: Accepted facts can be delivered independently of report completeness
+The existing shadow application service MUST provide a file-only research export
+from a validated batch. Already accepted records MUST retain their full values,
+evidence, period and usage restrictions. Report hold and human-review counts MUST
+NOT prevent those records from being exported. Unresolved candidates and coverage
+MUST remain separately visible and MUST NOT become accepted facts. Export MUST
+NOT infer semantic accuracy from structural bindings or overwrite source bundles.
+
+#### Scenario: Held report has accepted facts and missing fields
+- **WHEN** a validated held report contains accepted records and unresolved fields
+- **THEN** its accepted records are delivered as available partial research data
+- **AND** unresolved fields remain explicit without changing their dispositions.
+
+#### Scenario: A source report is changed
+- **WHEN** a report no longer matches its batch manifest hash
+- **THEN** export fails before writing any output.
+
 ### Requirement: Observed Evidence-owner misses are corrected in the existing selector
 The manufacturing/materials Evidence selector MUST recognize the report-local operating
 capacity/quantity and business-regime disclosure shapes documented in the September 13 fresh
