@@ -60,7 +60,7 @@ Gold evaluation MUST distinguish `exact_match`, `semantic_match`, `accepted_with
 #### Scenario: Subject uncertainty is explicitly allowed
 - **WHEN** a Gold annotation has `subject_strictness=allow_unclear_if_not_promoted` and runtime preserves `subject_scope=unclear`
 - **THEN** the matcher returns `accepted_with_uncertainty`
-- **AND** a runtime promotion to unsupported `consolidated_group` returns `failed`
+- **AND** unsupported promotion means violating current Evidence rules, not a valid consolidated_group / report_default_group_scope convention; a valid default conflicting only with historical Gold is gold_contract_conflict after non-subject fact checks pass
 
 #### Scenario: Frozen contract conflicts with Gold
 - **WHEN** Gold expects `not_applicable` but the frozen industry contract requires a source-supported `not_disclosed` result for the same field
@@ -126,6 +126,21 @@ Gold subject evaluation MUST use a closed `subject_strictness` policy. In additi
 - **WHEN** runtime uses consolidated_group with report_default_group_scope under the current policy but historical Gold requires unclear
 - **THEN** evaluation reports gold_contract_conflict unless a separately versioned Gold policy resolves it
 - **AND** runtime is not forced to change to the historical subject; explicit narrower-scope promotion still fails
+
+### Requirement: Gold validation distinguishes factual errors from policy conflicts in order
+The evaluator MUST first validate Evidence, object, metric, value/unit, period, physical anchor and actual subject-policy legality. A factual error, contradictory subject Evidence, unsupported narrower scope or override of explicit parent/subsidiary/segment scope MUST remain failed. Only when those checks pass and a valid report_default_group_scope differs from the historical Gold subject policy MUST it return gold_contract_conflict. This result MUST NOT count as a match or trigger rewriting runtime or historical Gold. The remaining subject_strictness rules MUST apply only after this distinction. A valid report default is not an unsupported promotion, including under allow_unclear_if_not_promoted. The narrow explicit consolidation-adjustment rule MUST NOT be borrowed by ordinary company wording to claim direct_source_wording.
+
+#### Scenario: Valid default differs from old unclear Gold
+- **WHEN** all fact checks pass and runtime has consolidated_group with a legal report_default_group_scope while historical Gold expects unclear
+- **THEN** the result is gold_contract_conflict rather than failed or a matching pass.
+
+#### Scenario: Wrong value also has a different Gold subject
+- **WHEN** runtime uses a legal default scope but its value does not match the source fact
+- **THEN** the result remains failed and the policy conflict cannot hide the error.
+
+#### Scenario: Default overrides an explicit subsidiary
+- **WHEN** runtime widens an explicitly subsidiary-scoped fact to consolidated_group
+- **THEN** the result is failed even if its basis is labelled report_default_group_scope.
 
 ### Requirement: Gold event equivalence requires an explicit directional decision
 Gold event evaluation MUST require exact event types unless a program-owned directional equivalence is explicitly listed with its Evidence and date conditions. An allowed pair MUST still match the same sample, physical anchor, occurrence or effective date, and governed regime boundary. Unlisted event pairs, different physical anchors, commitments, project launches, and nearby events MUST remain distinct. The evaluator MUST report the applied equivalence reason and MUST NOT modify runtime or Gold event labels.

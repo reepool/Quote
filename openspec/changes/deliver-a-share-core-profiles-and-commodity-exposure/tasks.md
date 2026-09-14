@@ -3,9 +3,9 @@
 ## 1. M1 全 A 股通用骨架
 
 - [ ] 1.1 接入既有全 A 股证券池和有效正式年报，输出全量候选、缺资产/缺分类状态与排除原因；不复用制造六行业、固定年份或 OOS 排除名单作为生产范围。
-- [ ] 1.2 在既有模型/应用 owner 中实现通用主营、产品服务、收入来源三维任务和按证据触发的行业增强；无增强包仍可执行基础任务。
+- [ ] 1.2 按 company_profile_common_core_mapping.v1 将三维评价映射到现有 overview/segment 任务，复用 business_overview_source、explicit_activity、segment_dimension、operating_revenue；实现逐维证据投影，保留六个 ChapterTask 闭集，不偷偷增加第七个任务或新 field_id；无增强包仍可执行基础任务。
 - [ ] 1.3 自动生成通用 Evidence，复用已有完整财务/表格事实，只对未解决语义调用 LLM；不要求逐家公司人工冻结页计划。
-- [ ] 1.4 核验 extract、verify、projection 和新评估均执行 report_default_group_scope；添加明确母公司/分部优先、冲突 unclear、第三方 actor 不转移的回归。
+- [ ] 1.4 核验 extract、verify、projection 和新评估均执行 report_default_group_scope；明确合法默认集团不是 unsupported promotion。先判实际事实/更窄主体错误 failed，再判仅历史Gold主体政策不一致为 gold_contract_conflict，最后应用 strictness；加入数值错误不能被冲突掩盖、母公司/分部优先、冲突 unclear、第三方 actor 不转移的回归，历史Gold和bundle不改写。
 - [ ] 1.5 实现三维骨架评价与记录级隔离，修复当前跨 scope 重复缺项/同页不同对象冲突；对象、期间、指标和义务不相同不能互补，业务总述不随一条 Activity 失败丢失。
 - [ ] 1.6 用跨制造、服务、金融等不同披露形态的实际来源/可控 fixture 证明通用任务能形成骨架；不将银行套制造业产销存，不以数百条表格值充当完整主营。
 
@@ -20,7 +20,7 @@
 
 ## 3. M3 基础商品暴露
 
-- [ ] 3.1 适配现有商品目录/映射到新 Activity、Measurement、Relationship；保留标准ID或待映射原名及来源引用，不从旧 Activity 数值字段复制语义。
+- [ ] 3.1 先按总需求 §20.1 和通用模型主规范注册 company_profile_commodity_exposure.v1 投影字段、映射/检查状态及读写 schema，再适配商品目录到新 Activity、Measurement、Relationship；数量引用 Measurement，不从旧 Activity 数值字段复制；新投影不得混进 Stage 5 抽取枚举。
 - [ ] 3.2 实现有证据的产品销售、原料投入、能源消耗等业务角色，标记程序推导及版本；数量/强度未知可空，不将角色直接变成净利润方向。
 - [ ] 3.3 支持多角色并存、歧义映射单列、行情未绑定仍展示；明确“未发现明示关联”“未检查”“失败”均不等于零暴露。
 - [ ] 3.4 将基础商品关联加入同一查询/画像读取，保留期间和知识时间；未授权 DCF、交易和价格敏感性消费者不获得数据授权。

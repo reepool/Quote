@@ -19,7 +19,7 @@
 ### Modified Capabilities
 - `company-profile-research-acceptance-policy`: 主体默认口径和事实级可用性；不以复核数量或六章全满扣住合格事实。
 - `company-profile-bounded-semantic-workflow`: 通用/增强任务激活、主体核验、局部失败与跨 scope 合并。
-- `company-profile-common-semantic-model`: 明确更窄主体优先、默认不覆盖冲突；沿用通用模型。
+- `company-profile-common-semantic-model`: 明确更窄主体优先、默认不覆盖冲突；补齐三维评价投影与 M3 CommodityExposure 字段合同，抽取任务词表不变。
 - `manufacturing-materials-profile-research-contract`: 制造/材料主体及抵消行合同与新政策对齐。
 - `company-profile-oos-semantic-mappings`: 抵消行不再受旧 unclear-only 规则限制。
 - `manufacturing-materials-profile-isolated-slice`: 历史四报告边界与新请求主体政策分开。

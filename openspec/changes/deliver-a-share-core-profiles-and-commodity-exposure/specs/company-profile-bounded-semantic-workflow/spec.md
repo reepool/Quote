@@ -73,3 +73,22 @@ The workflow MUST preserve the existing candidate, CoverageResult, disposition, 
 - **WHEN** a model overwrites explicit parent/subsidiary/segment evidence as group or mislabels the default as direct_source_wording
 - **THEN** independent verification blocks the unsupported rewrite
 - **AND** report_default_group_scope alone is not such an unsupported rewrite
+
+## ADDED Requirements
+
+### Requirement: Common core dimensions map to the existing task vocabulary
+The mapping version MUST be company_profile_common_core_mapping.v1. Principal business, products/services and revenue model MUST be projection/evaluation dimensions, not new ChapterTask values or request field IDs. The six implemented ChapterTask values MUST remain unchanged; unknown values MUST still be rejected before provider invocation. extract_business_overview with business_overview_source and explicit_activity owns the common narrative. extract_segment_financials with segment_dimension and operating_revenue supplements disclosed business/revenue composition. Other existing tasks activate only for supported enhancements. A single accepted passage MAY support multiple dimensions only when each dimension has substantive source support; its existence alone MUST NOT mark all three answered.
+
+#### Scenario: Three core dimensions share an overview passage
+- **WHEN** a passage explicitly names the main business, its services and its fee model
+- **THEN** one overview request can supply the accepted source for all three independently evidenced dimension results
+- **AND** no seventh task or three duplicate model requests are introduced.
+
+#### Scenario: Revenue table supplements the core
+- **WHEN** the report discloses operating revenue by business line
+- **THEN** the existing segment task binds Segment and Measurement records to revenue-model evidence
+- **AND** a company-wide revenue total alone does not establish the revenue model.
+
+#### Scenario: Proposed unknown task name
+- **WHEN** a request invents extract_revenue_model instead of using the declared mapping
+- **THEN** the vocabulary validator rejects it before LLM access.

@@ -23,11 +23,15 @@ Stage 5 已有新对象、真实 provider、研究投影和文件 bundle，2026-
 
 ### 1. 通用三维优先，增强包不阻塞基础
 
+执行映射固定为 company_profile_common_core_mapping.v1：主营/产品服务/收入模式的叙述由现有 extract_business_overview 的 business_overview_source / explicit_activity 承载；披露分部及收入时由 extract_segment_financials 的 segment_dimension / operating_revenue 补充。三维是程序评价，不新增 ChapterTask 或请求 field_id。每维保留同报告已接受记录、摘录/锚点及答复状态；同一段落存在不等于三维自动成立。
+
 三维骨架为主营说明、主要产品/服务或业务线、收入产生方式。正式财务规模复用已有事实域。没有细分收入金额但有明确单一主营的公司可以形成定性骨架；只有合法空值不算骨架成立。保留原文名称，后续按证据映射标准对象。行业专有指标无法映射时保留候选，不用制造业 metric 承载。
 
 备选“逐行业包全部做完再生产”会阻塞全市场目标，故只对增强字段使用行业研究门。通用基线须以跨行业真实样本验证，不从制造业通过率外推。
 
 ### 2. 单一主体和记录级接受
+
+Gold 先检查事实、锚点及主体是否合法，再区分仅旧主体政策不一致的 gold_contract_conflict，最后应用 strictness。合法默认集团不属于 unsupported promotion；数值错误、第三方行为或明确更窄范围被覆盖仍 failed。现有 matcher 还未实现该顺序，必须由任务1.4补齐，不能把当前代码宣称已满足新规范。
 
 局部明确 issuer/subsidiary/segment 优先；明文集团、同报告数值核对分别保留现有 basis；无更窄依据且无冲突采用 report_default_group_scope。冲突不默认。独立 verify 必须接受这一程序约定而非要求再补明文 group。不得把该 basis 换成 direct_source_wording。
 
@@ -40,6 +44,8 @@ Stage 5 已有新对象、真实 provider、研究投影和文件 bundle，2026-
 程序生成 Evidence，完整上下文冻结在各任务输入；无需人审每份计划。新增通用准入路径不得扩大历史固定测试 manifest。scope 完成即持久化；租约恢复继续未完成 scope。复用 identity 含报告版本、输入 hash 和实际影响语义的策略版本。金融旧的“存续状态/announcement-only”逻辑不能直接当新完成语义。
 
 ### 4. 商品关联先交付，经济敏感性后置
+
+任务3.1先注册 company_profile_commodity_exposure.v1 的派生投影/读写字段，再接writer。字段权威见总需求§20.1及通用模型主规范：来源引用、时态/主体、商品/映射状态、业务角色、可空Measurement引用与行情绑定、版本和不确定性；报告检查状态与空关联分开。当前 ObjectType 没有 CommodityExposure，ResearchBoundary 是占位，不可将新字段直接塞入已有LLM响应。商品角色词表与 Stage 5 field_id 隔离。
 
 原始来源字段不变；程序使用现有商品目录与规则关联 CommodityExposure/有限角色，保存来源 record ID、商品 ID、角色和时效。角色有收入端/原料端/能源端等，不能净额化或直接表述利润方向。未绑定行情不影响已识别商品关联。仅行业常识推导的商品不会成为 reported fact。
 

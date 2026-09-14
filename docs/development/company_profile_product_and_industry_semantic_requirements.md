@@ -1,7 +1,8 @@
 # 全 A 股业务画像与基础商品暴露总需求
 
 > 文档类型：requirements（唯一权威产品总需求）
-> 版本：`company_profile_product_contract.2026-09-13`
+> 版本：`company_profile_product_contract.2026-09-14`
+> 实施前澄清：2026-09-14，补齐三维任务映射、Gold 判定顺序和商品投影字段；实现任务仍未完成
 > 状态：用户批准重新规划；新增生产能力待实现，不能把文档批准视为上线
 > 当前实施 change：`deliver-a-share-core-profiles-and-commodity-exposure`
 > 历史阶段 0—5 为研究/实现基线，历史合同与运行只用于回归和复核
@@ -10,7 +11,7 @@
 
 本文件统一全市场目标、核心信息、主体、验收、行业增强、商品暴露和迁移路线。OpenSpec 主规范描述目标合同，不保证功能已上线；当前 change 的未勾选 tasks 是实施缺口的权威清单。行业文档只能细化增强字段，不得重新引入全市场整报否决或不同主体政策。
 
-2026-09-13 以前的固定四/八/二十报告、全部六章完成、Gold 全通过、研究样本必须未见过、每家公司人工冻结 Evidence 等规则仅适用于对应历史试验。不能作为日常生产规则。历史 Gold/原始 bundle 不改写；旧标签冲突在新评测单列，不能用旧 Gold 否决现行主体政策。
+旧固定四/八/二十报告、全部六章完成、Gold 全通过、研究样本必须未见过、每家公司人工冻结 Evidence 等规则仅适用于对应已退役的历史试验。不能作为日常生产规则。历史 Gold/原始 bundle 不改写；旧标签冲突在新评测单列，不能用旧 Gold 否决现行主体政策。
 
 旧 requirements/runbook、阶段汇总与裁决台账均为历史资料。当前产品目标只有本文件一个入口；已有 LLM/PDF/框架通用规范继续约束各自领域。结构关联检查不等于原文语义复核；被撤回的审计不能作为晋升依据。
 
@@ -87,6 +88,18 @@ Activity 描述行动，Measurement 描述单一指标。Measurement 同时绑�
 
 程序自动选取页段与续表并记录证据，不要求每家公司人工冻结选页。只将完整必要上下文传给相应任务；读不到的章节显式报缺，不以搜索词命中替代 owner 判定。
 
+### 9.1 三维到现有任务的唯一映射
+
+映射版本为 `company_profile_common_core_mapping.v1`。三个维度是程序评价/投影维度，**不是新增 ChapterTask、field_id 或第四种 LLM 请求**。六个现有 ChapterTask 值保留，未知任务继续在调用前拒绝。
+
+| 维度 ID | 执行任务与既有来源字段 | 实质回答要求 |
+| --- | --- | --- |
+| `principal_business` | `extract_business_overview`：`business_overview_source` / BusinessOverview.source_text | 原文明确主营/经营模式 |
+| `products_services` | overview 的 `business_overview_source`、`explicit_activity`；如披露分部则用 `extract_segment_financials` 的 `segment_dimension` 补充 | 主要产品/服务/业务线在原文中可定位，Activity.object_name 或 Segment.label 可支持 |
+| `revenue_model` | overview 的主营/销售/服务收费等原文；如披露构成则用 segment 的 `operating_revenue` 和对应 Segment | 原文说明如何形成收入，或经营收入记录明确归属；不能用总收入数值或“公司制造X”自动补出变现方式 |
+
+有界 overview scope 可以一次抽取支持多个维度的原文，不为三维重复调用三次。每个维度分别保存 `answered`、`supporting_record_ids`、`evidence_ids`、原文摘录/表格锚点和 `missing_reason`。这些属于 M1 待实现的版本化研究投影；不要求现有 LLM 响应偷偷增加字段。程序必须检验关联证据确实回答该维度，不能因一个 BusinessOverview 存在而自动把三维全标 answered。无标准 action 映射时，已接受的业务原文仍可支持产品/服务维度。
+
 ## 10. 确定性解析与 LLM 分工
 
 优先复用已有合格事实和完整结构化表格；可靠数值无需重复让模型抄写。既有解析不能正确处理的上下文直接用有界 LLM，不为启用通用骨架先建设新解析平台。校验只能确认实际输入，不能用 Gold 补答案。
@@ -114,6 +127,12 @@ processing_volume 仅表示对外加工服务量，委外采购、内部工序�
 5. 明确冲突、多主体不可区分或非本公司行动者无法归属时保持 unclear。默认规则不能把第三方行为改成上市公司行为。
 
 同表局部证据可共享，不跨无关表传播。Gold、verify、行业合同和 projection 均采用本条；历史 Gold 冲突单列，不为当前接受强制把已支持的 group 降回 unclear。
+
+### 13.1 Gold 主体判定顺序
+
+先核对来源、物理锚点、对象、指标、数值/单位、期间和实际主体依据。存在这些错误或把明确更窄口径改为集团时，结果为 failed，不能被政策冲突覆盖。
+
+仅当上述事实检查通过、默认集团 basis 合法且与历史 Gold 的主体预期不一致时，记 `gold_contract_conflict`，不计匹配通过，也不要求改 runtime 或历史 Gold。`allow_unclear_if_not_promoted` 中的 unsupported group 指违反现行主体规则的晋升，**不包括合法的 report_default_group_scope**。严格度规则只能在真实错误/政策冲突已区分后应用。
 
 ## 14. 数值、单位和比较
 
@@ -160,6 +179,24 @@ A 股通用基础包自动适用于全部行业。制造/材料、资源、能�
 商品存在但行情未绑定时仍交付关联；价格序列是独立市场数据域。投入成本端不等于净利润负相关，产品销售端不等于净利润正相关。净利润弹性、传导/滞后、套保有效性、价格预测独立研究，不阻塞基础商品关联。
 
 不是所有公司都有重大商品暴露。完整检查后无证据则显示“未发现明示关联”；未检查或失败显示对应状态，二者都不能表示零暴露。有限价值链角色以实际输入/输出/服务证据为限，不承诺完整产业链。
+
+### 20.1 M3 商品对象字段合同
+
+目标投影版本为 `company_profile_commodity_exposure.v1`，归现有 CommodityExposure 职责；它是程序派生的读取/发布对象，不加入 Stage 5 抽取对象闭集。M3 的 3.1 须先完成模型、投影及读写 schema 注册，再接 writer；当前代码中的 ResearchBoundary 仍为占位，不代表以下字段已经存在。
+
+| 字段 | 合同 |
+| --- | --- |
+| `exposure_id`、`schema_version` | 程序生成，身份绑定来源记录、角色、商品/原名、期间及政策版本 |
+| `report`、`reported_period`、`period_type`、`knowledge_time` | 继承来源身份和时态，不推测缺失日期 |
+| `subject_scope`、`subject_basis`、`business_object` | 继承来源范围及业务对象，不合并不同分部/子公司 |
+| `source_record_ids`、`evidence_ids`、`measurement_record_ids` | 引用新模型已接受事实；数量/金额通过 Measurement 引用，后者可空 |
+| `source_native_name`、`commodity_id`、`mapping_status` | 原名必有；状态为 mapped/pending/ambiguous；仅 mapped 可有唯一 commodity_id |
+| `role` | product_sales/raw_material_input/energy_consumption/hedge_underlying/unknown；套保角色须有可表示且已接受的套保事实，否则留未知或待处理 |
+| `assertion_class`、`mapping_version`、`policy_version` | 程序映射为 deterministic_derivation，保留规则版本；不冒充直接披露 |
+| `market_series_id`、`market_link_status` | 可空；状态为 not_linked/linked/ambiguous；linked 必须有序列ID，未绑定不阻止商品关联 |
+| `uncertainty` | 复用明确不确定性，不引入 LLM 自报概率或新打分体系 |
+
+报告层另外保存 `assessment_status=not_assessed/assessed/extraction_failed`、`checked_evidence_ids` 和关联列表。assessed 且无关联必须有已检查来源范围；空列表不能单独证明零暴露。角色枚举只属于商品投影，尤其不得把 energy_consumption/hedge_underlying 当新增 Stage 5 field_id。数值源与 canonical 单位仍由原 Measurement 和程序转换控制；没有净利润方向、净敞口和弹性默认值。
 
 ## 21. 使用与发布边界
 

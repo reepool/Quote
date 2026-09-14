@@ -43,3 +43,57 @@ Master requirements → company-profile-a-share-delivery and shared semantic/acc
 - Ten historical proof artifacts retain their expected content hashes after path relocation. Test proof paths are rebased in memory; archived proof bytes are unchanged.
 - Ruff on the three affected test files and git diff whitespace checks passed.
 - Review blocking findings: stale archived-file lookup in tests, corrected without changing expected source hashes. Existing LLM configuration/docs, PDF evaluation and unrelated untracked files remain outside this task.
+
+## Review follow-up — 2026-09-14
+
+The review findings are accepted: core dimensions lacked an explicit mapping to the six ChapterTask values; Gold default-group conflict precedence was ambiguous; M3 needed a concrete derived-object contract; 29 completed legacy business-profile plans remained active. These are clarified in the existing change, with all 23 implementation tasks still unchecked. No runtime schema, matcher, production configuration or source bundle is changed in this follow-up.
+
+The 2026-09-13 directory count is 19 profile archives, not 16 archives total: 16 were retired by the replan; the other three already existed from earlier work: fix-company-profile-common-mvp-blockers, validate-company-profile-common-fixes-on-fresh-cohort, validate-company-profile-current-mvp-shadow-batch. The original list of 16 is retained as the transaction scope, not a claim about every archive on that date.
+
+### Remaining completed legacy plans retired
+
+- `add-continuous-business-profile-backfill` → `openspec/changes/archive/2026-09-14-add-continuous-business-profile-backfill` (completed historical tasks; old deltas not reapplied).
+- `automate-business-profile-semantic-production` → `openspec/changes/archive/2026-09-14-automate-business-profile-semantic-production` (completed historical tasks; old deltas not reapplied).
+- `bind-business-profile-semantic-reuse-to-source-sections` → `openspec/changes/archive/2026-09-14-bind-business-profile-semantic-reuse-to-source-sections` (completed historical tasks; old deltas not reapplied).
+- `complete-business-profile-production-automation` → `openspec/changes/archive/2026-09-14-complete-business-profile-production-automation` (completed historical tasks; old deltas not reapplied).
+- `complete-business-profile-publication-and-reporting` → `openspec/changes/archive/2026-09-14-complete-business-profile-publication-and-reporting` (completed historical tasks; old deltas not reapplied).
+- `complete-business-profile-structured-semantic-fallback` → `openspec/changes/archive/2026-09-14-complete-business-profile-structured-semantic-fallback` (completed historical tasks; old deltas not reapplied).
+- `configure-business-profile-production-rollout` → `openspec/changes/archive/2026-09-14-configure-business-profile-production-rollout` (completed historical tasks; old deltas not reapplied).
+- `establish-a-share-business-profile-governance` → `openspec/changes/archive/2026-09-14-establish-a-share-business-profile-governance` (completed historical tasks; old deltas not reapplied).
+- `expose-business-profile-measurement-contract-and-replay-legacy-profile` → `openspec/changes/archive/2026-09-14-expose-business-profile-measurement-contract-and-replay-legacy-profile` (completed historical tasks; old deltas not reapplied).
+- `fix-business-profile-backfill-recovery-observability` → `openspec/changes/archive/2026-09-14-fix-business-profile-backfill-recovery-observability` (completed historical tasks; old deltas not reapplied).
+- `harden-business-profile-backfill-production-readiness` → `openspec/changes/archive/2026-09-14-harden-business-profile-backfill-production-readiness` (completed historical tasks; old deltas not reapplied).
+- `harden-business-profile-end-to-end-integrity` → `openspec/changes/archive/2026-09-14-harden-business-profile-end-to-end-integrity` (completed historical tasks; old deltas not reapplied).
+- `harden-business-profile-fact-identity-and-publication` → `openspec/changes/archive/2026-09-14-harden-business-profile-fact-identity-and-publication` (completed historical tasks; old deltas not reapplied).
+- `harden-business-profile-llm-acceptance` → `openspec/changes/archive/2026-09-14-harden-business-profile-llm-acceptance` (completed historical tasks; old deltas not reapplied).
+- `optimize-business-profile-annual-report-discovery` → `openspec/changes/archive/2026-09-14-optimize-business-profile-annual-report-discovery` (completed historical tasks; old deltas not reapplied).
+- `optimize-business-profile-discovery-pagination` → `openspec/changes/archive/2026-09-14-optimize-business-profile-discovery-pagination` (completed historical tasks; old deltas not reapplied).
+- `redesign-business-profile-llm-scheduling-and-verification` → `openspec/changes/archive/2026-09-14-redesign-business-profile-llm-scheduling-and-verification` (completed historical tasks; old deltas not reapplied).
+- `repair-business-profile-automatic-publication-gaps` → `openspec/changes/archive/2026-09-14-repair-business-profile-automatic-publication-gaps` (completed historical tasks; old deltas not reapplied).
+- `repair-business-profile-chapter-aware-extraction` → `openspec/changes/archive/2026-09-14-repair-business-profile-chapter-aware-extraction` (completed historical tasks; old deltas not reapplied).
+- `repair-business-profile-frontier-bound-acquisition` → `openspec/changes/archive/2026-09-14-repair-business-profile-frontier-bound-acquisition` (completed historical tasks; old deltas not reapplied).
+- `repair-business-profile-publication-gap-closure` → `openspec/changes/archive/2026-09-14-repair-business-profile-publication-gap-closure` (completed historical tasks; old deltas not reapplied).
+- `repair-business-profile-recovery-and-stage-health` → `openspec/changes/archive/2026-09-14-repair-business-profile-recovery-and-stage-health` (completed historical tasks; old deltas not reapplied).
+- `repair-business-profile-terminal-replay-identity` → `openspec/changes/archive/2026-09-14-repair-business-profile-terminal-replay-identity` (completed historical tasks; old deltas not reapplied).
+- `replace-business-profile-llm-offsets-with-evidence-spans` → `openspec/changes/archive/2026-09-14-replace-business-profile-llm-offsets-with-evidence-spans` (completed historical tasks; old deltas not reapplied).
+- `separate-business-profile-readiness-from-market-linking` → `openspec/changes/archive/2026-09-14-separate-business-profile-readiness-from-market-linking` (completed historical tasks; old deltas not reapplied).
+- `separate-business-profile-semantic-synthesis-from-evidence` → `openspec/changes/archive/2026-09-14-separate-business-profile-semantic-synthesis-from-evidence` (completed historical tasks; old deltas not reapplied).
+- `simplify-business-profile-async-production` → `openspec/changes/archive/2026-09-14-simplify-business-profile-async-production` (completed historical tasks; old deltas not reapplied).
+- `stabilize-business-profile-unit-replay-and-pdf-benchmark` → `openspec/changes/archive/2026-09-14-stabilize-business-profile-unit-replay-and-pdf-benchmark` (completed historical tasks; old deltas not reapplied).
+- `unify-business-profile-annual-report-semantic-bundle` → `openspec/changes/archive/2026-09-14-unify-business-profile-annual-report-semantic-bundle` (completed historical tasks; old deltas not reapplied).
+
+### Implementation boundary
+
+- M1 1.2: implement company_profile_common_core_mapping.v1 using existing overview/segment task and field IDs; new projected assessments are explicitly registered, not extra LLM fields.
+- M1 1.4: implement fact-error-first / valid-default-policy-conflict-second Gold evaluation; current _subject_match_status still falls through to failed for different group/unclear subjects.
+- M3 3.1: register company_profile_commodity_exposure.v1 derived/read schema before writer integration; current ObjectType has no commodity extraction object and ResearchBoundary remains a placeholder.
+- No claim that old 742-record output or Gold scores prove these future behaviors. No legacy command is re-enabled by the retirement.
+
+### Follow-up verification
+
+- Full OpenSpec strict validation: 137 passed, 0 failed (166 minus 29 retired active plans).
+- All 25 requirement blocks in the eight change specs match their main-spec counterparts; all 23 implementation tasks remain unchecked.
+- Source inspection confirms exactly six ChapterTask values, no CommodityExposure extraction object, and the matcher implementation gap described above. These are implementation-status checks, not proof of new runtime behavior.
+- No research/scripts/tests or production configuration were changed by this follow-up; existing unrelated config/LLM/PDF edits are excluded.
+- No direct references to the 29 former active paths were found in research, scripts, tests, config or documentation. All retirement record links resolve. Historical artifacts are preserved and no old delta was reapplied.
+- Document-only changes were validated with OpenSpec, requirement equality and reference checks; no new LLM run or duplicate semantic benchmark was performed.
