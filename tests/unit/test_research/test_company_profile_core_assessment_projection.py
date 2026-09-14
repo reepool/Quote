@@ -16,6 +16,7 @@ from research.company_profile.contracts import (
 from research.company_profile.core_assessment_projection import (
     COMMON_CORE_MAPPING_VERSION,
     core_assessment_schema_manifest,
+    coverage_reconciliation_identity,
     project_core_assessment,
 )
 from research.company_profile.models import (
@@ -415,6 +416,88 @@ def test_numeric_rows_without_principal_business_are_not_a_complete_core():
     assert assessment.core_complete is False
 
 
+def test_research_view_keeps_other_object_gap_regardless_of_scope_order():
+    _payload, report, _result = _reference_bundle()
+    battery_record, battery_coverage = _revenue_scope(
+        report,
+        record_id="battery-revenue",
+        measured_object="动力电池",
+        status=CoverageStatus.OBSERVED,
+    )
+    _storage_record, storage_coverage = _revenue_scope(
+        report,
+        record_id="storage-revenue",
+        measured_object="储能电池",
+        status=CoverageStatus.UNCLEAR,
+        reason_code=CoverageReasonCode.REQUIRED_RESULT_MISSING,
+        include_record=False,
+    )
+    battery_result = CompanyProfileTaskResult(
+        request_id="battery-scope",
+        records=(battery_record,),
+        dispositions=(
+            Disposition(
+                target_id=battery_record.record_id,
+                field_id=battery_record.field_id,
+                status=DispositionStatus.ACCEPTED_FOR_REVIEW,
+            ),
+        ),
+        coverage=(battery_coverage,),
+        human_review_items=(),
+        task_complete=True,
+    )
+    storage_result = CompanyProfileTaskResult(
+        request_id="storage-scope",
+        records=(),
+        dispositions=(),
+        coverage=(storage_coverage,),
+        human_review_items=(),
+        task_complete=False,
+    )
+
+    def _coverage_pairs(results):
+        view = project_research_view(
+            company_name="宁德时代",
+            report=report,
+            task_results=results,
+        )
+        return {
+            (
+                item["status"],
+                item["evidence"][0]["anchor"]["row_label"],
+            )
+            for item in view.coverage
+            if item["field_id"] == "operating_revenue"
+        }
+
+    expected = {("observed", "动力电池"), ("unclear", "储能电池")}
+    assert _coverage_pairs((battery_result, storage_result)) == expected
+    assert _coverage_pairs((storage_result, battery_result)) == expected
+
+
+def test_same_report_comparison_columns_are_not_the_same_identity():
+    _payload, report, _result = _reference_bundle()
+    prior = _coverage_row(
+        report,
+        evidence_id="rev-2024",
+        row_label="动力电池",
+        column_header="2024年营业收入",
+        field_id="operating_revenue",
+        chapter_task=ChapterTask.EXTRACT_SEGMENT_FINANCIALS,
+    )
+    current = _coverage_row(
+        report,
+        evidence_id="rev-2025",
+        row_label="动力电池",
+        column_header="2025年营业收入",
+        field_id="operating_revenue",
+        chapter_task=ChapterTask.EXTRACT_SEGMENT_FINANCIALS,
+    )
+    assert coverage_reconciliation_identity(prior) != coverage_reconciliation_identity(
+        current
+    )
+
+
 def test_research_view_keeps_distinct_coverage_gaps():
     _payload, report, _result = _reference_bundle()
     battery = _coverage_row(report, evidence_id="battery-sales", row_label="动力电池")
@@ -480,22 +563,63 @@ def _coverage_row(
     row_label: str,
     status=CoverageStatus.OBSERVED,
     reason_code=None,
+    column_header: str = "销售量",
+    field_id: str = "sales_volume",
+    chapter_task=ChapterTask.EXTRACT_OPERATING_QUANTITIES,
 ):
     evidence = _revenue_record().evidence[0].model_copy(
         update={
             "evidence_id": evidence_id,
             "anchor": TableAnchor(
                 row_label=row_label,
-                column_header="销售量",
-                cell_locator=f"page49/{row_label}/销售量",
+                column_header=column_header,
+                cell_locator=f"page49/{row_label}/{column_header}",
             ),
         }
     )
     return CoverageResult(
-        field_id="sales_volume",
-        chapter_task=ChapterTask.EXTRACT_OPERATING_QUANTITIES,
+        field_id=field_id,
+        chapter_task=chapter_task,
         requirement_level=RequirementLevel.CONDITIONAL,
         status=status,
         reason_code=reason_code,
         evidence=(evidence,),
     )
+
+
+def _revenue_scope(
+    report,
+    *,
+    record_id: str,
+    measured_object: str,
+    status,
+    reason_code=None,
+    include_record: bool = True,
+):
+    evidence = _revenue_record().evidence[0].model_copy(
+        update={
+            "evidence_id": f"{record_id}-evidence",
+            "anchor": TableAnchor(
+                row_label=measured_object,
+                column_header="营业收入",
+                cell_locator=f"page14/{measured_object}/营业收入",
+            ),
+        }
+    )
+    coverage = CoverageResult(
+        field_id="operating_revenue",
+        chapter_task=ChapterTask.EXTRACT_SEGMENT_FINANCIALS,
+        requirement_level=RequirementLevel.CONDITIONAL,
+        status=status,
+        reason_code=reason_code,
+        evidence=(evidence,),
+    )
+    if not include_record:
+        return None, coverage
+    record = _revenue_record(
+        record_id=record_id,
+        measured_object=measured_object,
+        segment_dimension="产品",
+        segment_label=measured_object,
+    ).model_copy(update={"evidence": (evidence,)})
+    return record, coverage

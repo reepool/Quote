@@ -29,6 +29,7 @@ from .contracts import (
 )
 from .core_assessment_projection import (
     CompanyProfileCoreAssessment,
+    coverage_identity_can_close,
     coverage_reconciliation_identity,
     project_core_assessment,
 )
@@ -1205,7 +1206,10 @@ def _core_chapter_dimensions(
                         CoverageStatus.NOT_DISCLOSED,
                         CoverageStatus.NOT_APPLICABLE,
                     }
-                    and identity not in satisfied
+                    and not (
+                        coverage_identity_can_close(identity)
+                        and identity in satisfied
+                    )
                 ):
                     failures.append(
                         f"{scope.scope_id}:{coverage.field_id}:{coverage.status.value}"
@@ -1232,7 +1236,6 @@ def _scope_coverage_identity(
 ) -> tuple[str, str, str, str, str]:
     return coverage_reconciliation_identity(
         coverage,
-        report_period=scope.prepared_scope.report.report_period,
         accepted_records=scope.task_result.accepted_records(),
     )
 
@@ -1247,7 +1250,8 @@ def _coverage_missing_is_satisfied(
     for coverage in scope.task_result.coverage:
         if coverage.field_id != review.field_id:
             continue
-        if _scope_coverage_identity(scope, coverage) in satisfied:
+        identity = _scope_coverage_identity(scope, coverage)
+        if coverage_identity_can_close(identity) and identity in satisfied:
             return True
     return False
 

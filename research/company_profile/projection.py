@@ -96,7 +96,13 @@ def project_research_view(
                 and record.data_status == "research_fixture"
             ):
                 accepted[record.record_id] = (record, statuses[record.record_id])
-        accepted_for_coverage = tuple(item[0] for item in accepted.values())
+        local_accepted = tuple(
+            record
+            for record in result.records
+            if statuses.get(record.record_id)
+            == DispositionStatus.ACCEPTED_FOR_REVIEW
+            and record.data_status == "research_fixture"
+        )
         for coverage in result.coverage:
             if any(item.report != report for item in coverage.evidence):
                 raise ValueError(
@@ -104,8 +110,7 @@ def project_research_view(
                 )
             identity = coverage_reconciliation_identity(
                 coverage,
-                report_period=report.report_period,
-                accepted_records=accepted_for_coverage,
+                accepted_records=local_accepted,
             )
             payload = coverage.model_dump(mode="json")
             existing = coverage_by_identity.get(identity)

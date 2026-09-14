@@ -902,6 +902,7 @@ def _operating_scope_result(
     review_reason: ContractErrorCode | None = None,
     quote: str = "产品 生产量 销售量 库存量",
     row_label: str | None = None,
+    column_header: str | None = None,
     report_period: str = "2025-12-31",
     requirement_level: RequirementLevel = RequirementLevel.CONDITIONAL,
 ) -> Stage5ScopeResult:
@@ -915,10 +916,11 @@ def _operating_scope_result(
     if row_label is None:
         anchor = TextAnchor(bounded_quote=quote)
     else:
+        header = column_header or "销售量"
         anchor = TableAnchor(
             row_label=row_label,
-            column_header="销售量",
-            cell_locator=f"page10/{row_label}/销售量",
+            column_header=header,
+            cell_locator=f"page10/{row_label}/{header}",
         )
     evidence = Evidence(
         evidence_id=f"{scope_id}-evidence",
@@ -987,11 +989,15 @@ def test_core_chapter_coverage_closes_from_another_scope() -> None:
         status=CoverageStatus.UNCLEAR,
         task_complete=False,
         review_reason=ContractErrorCode.REQUIRED_COVERAGE_MISSING,
+        row_label="动力电池",
+        column_header="2025年销售量",
     )
     observed_elsewhere = _operating_scope_result(
         scope_id="operating-02",
         status=CoverageStatus.OBSERVED,
         task_complete=True,
+        row_label="动力电池",
+        column_header="2025年销售量",
     )
 
     dimensions = _core_chapter_dimensions([missing_here, observed_elsewhere])
@@ -1109,6 +1115,28 @@ def test_core_chapter_does_not_close_different_period_or_obligation() -> None:
     obligation = _operating_chapter([missing_required, observed_conditional])
     assert obligation.passed is False
     assert any("operating-required" in item for item in obligation.details["failures"])
+
+
+def test_core_chapter_does_not_close_same_report_comparison_columns() -> None:
+    missing_prior = _operating_scope_result(
+        scope_id="operating-2024-col",
+        status=CoverageStatus.UNCLEAR,
+        task_complete=False,
+        review_reason=ContractErrorCode.REQUIRED_COVERAGE_MISSING,
+        row_label="动力电池",
+        column_header="2024年营业收入",
+    )
+    observed_current = _operating_scope_result(
+        scope_id="operating-2025-col",
+        status=CoverageStatus.OBSERVED,
+        task_complete=True,
+        row_label="动力电池",
+        column_header="2025年营业收入",
+    )
+
+    dimension = _operating_chapter([missing_prior, observed_current])
+    assert dimension.passed is False
+    assert any("operating-2024-col" in item for item in dimension.details["failures"])
 
 
 def test_core_chapter_still_closes_same_object_period_metric_and_obligation() -> None:

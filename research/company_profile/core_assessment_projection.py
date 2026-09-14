@@ -207,26 +207,30 @@ def resolved_core_field_ids(records: Sequence[SemanticRecord]) -> frozenset[str]
     )
 
 
+_PERIOD_UNKNOWN = ""
+
+
 def coverage_reconciliation_identity(
     coverage: CoverageResult,
     *,
-    report_period: str,
     accepted_records: Sequence[SemanticRecord] = (),
+    report_period: str | None = None,
 ) -> tuple[str, str, str, str, str]:
-    """Return field/metric/period/object/obligation identity for one coverage row."""
+    """Return field/metric/period/object/obligation identity for one coverage row.
 
-    matched = [
-        record
-        for record in accepted_records
-        if record.field_id == coverage.field_id
-    ]
-    if matched:
-        metrics = tuple(sorted({_record_metric_key(record) for record in matched}))
-        periods = tuple(sorted({record.reported_period for record in matched}))
-        objects = tuple(sorted({_record_object_key(record) for record in matched}))
+    ``report_period`` is accepted for compatibility and is not used. Period comes
+    from bound records or this coverage's own column/cell identity.
+    """
+
+    del report_period
+    bound = _records_bound_to_coverage(coverage, accepted_records)
+    if bound:
+        metrics = tuple(sorted({_record_metric_key(record) for record in bound}))
+        periods = tuple(sorted({record.reported_period for record in bound}))
+        objects = tuple(sorted({_record_object_key(record) for record in bound}))
     else:
         metrics = (coverage.field_id,)
-        periods = (report_period,)
+        periods = (_evidence_period_key(coverage.evidence),)
         objects = (_evidence_object_key(coverage.evidence),)
     return (
         coverage.field_id,
@@ -235,6 +239,12 @@ def coverage_reconciliation_identity(
         "|".join(objects),
         coverage.requirement_level.value,
     )
+
+
+def coverage_identity_can_close(identity: tuple[str, str, str, str, str]) -> bool:
+    """Unknown period/column identity must not satisfy another scope's gap."""
+
+    return bool(identity[2])
 
 
 def project_core_assessment(
@@ -475,6 +485,44 @@ def _record_metric_key(record: SemanticRecord) -> str:
     if isinstance(record, Measurement):
         return record.metric_type.value
     return record.field_id
+
+
+def _records_bound_to_coverage(
+    coverage: CoverageResult,
+    accepted_records: Sequence[SemanticRecord],
+) -> list[SemanticRecord]:
+    evidence_ids = {item.evidence_id for item in coverage.evidence}
+    object_key = _evidence_object_key(coverage.evidence)
+    period_key = _evidence_period_key(coverage.evidence)
+    bound: list[SemanticRecord] = []
+    for record in accepted_records:
+        if record.field_id != coverage.field_id:
+            continue
+        record_evidence_ids = {item.evidence_id for item in record.evidence}
+        if evidence_ids and record_evidence_ids & evidence_ids:
+            bound.append(record)
+            continue
+        if not object_key or _record_object_key(record) != object_key:
+            continue
+        record_period = _evidence_period_key(record.evidence)
+        if period_key and record_period == period_key:
+            bound.append(record)
+            continue
+        if period_key and record.reported_period == period_key:
+            bound.append(record)
+    return bound
+
+
+def _evidence_period_key(evidence: Sequence[Evidence]) -> str:
+    parts: list[str] = []
+    for item in evidence:
+        header = getattr(item.anchor, "column_header", None)
+        locator = getattr(item.anchor, "cell_locator", None)
+        if header and str(header).strip():
+            parts.append(str(header).strip())
+        if locator and str(locator).strip():
+            parts.append(str(locator).strip())
+    return "|".join(parts) if parts else _PERIOD_UNKNOWN
 
 
 def _evidence_object_key(evidence: Sequence[Evidence]) -> str:
