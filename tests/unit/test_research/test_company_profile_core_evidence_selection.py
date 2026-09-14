@@ -82,7 +82,8 @@ def test_selects_owned_overview_and_keeps_necessary_context():
                 "text": (
                     "报告期内公司从事的主要业务\n"
                     "公司主要从事动力电池、储能电池的研发、生产和销售，"
-                    "并通过向客户销售电池系统取得货款。"
+                    "并通过向客户销售电池系统取得货款。\n"
+                    "二、风险因素\n公司主要业务面临原材料价格波动风险。"
                 ),
             },
         ),
@@ -90,11 +91,21 @@ def test_selects_owned_overview_and_keeps_necessary_context():
     assert selected.production_authorization == "not_authorized"
     assert selected.spans[0].page == 14
     assert selected.spans[0].section_title == "报告期内公司从事的主要业务"
+    assert selected.spans[0].context_complete is True
     assert "取得货款" in selected.spans[0].excerpt
     assert "主要从事" in selected.spans[0].excerpt
+    assert "风险因素" not in selected.spans[0].excerpt
     assert "principal_business" in selected.spans[0].dimension_ids
     assert "revenue_model" in selected.spans[0].dimension_ids
     assert "business_overview_source" in selected.unresolved_field_ids
+    assert {item.field_id for item in selected.prepared_evidence} == {
+        "business_overview_source",
+        "explicit_activity",
+    }
+    assert all(
+        "取得货款" in item.evidence.anchor.bounded_quote
+        for item in selected.prepared_evidence
+    )
     assert selected.prepared_evidence[0].evidence.page == 14
     assert selected.gaps == ()
 
@@ -128,12 +139,13 @@ def test_reuses_accepted_structured_facts_and_skips_those_fields():
                 "page": 14,
                 "text": (
                     "报告期内公司从事的主要业务\n"
-                    "公司主要从事动力电池系统的研发、生产和销售。"
+                    "公司主要从事动力电池系统的研发、生产和销售。\n"
+                    "二、风险因素"
                 ),
             },
             {
                 "page": 25,
-                "text": "分产品\n动力电池系统 营业收入 316506369 千元",
+                "text": "分产品\n动力电池系统 营业收入 316506369 千元\n三、主要销售客户",
             },
         ),
         accepted_records=records,
@@ -144,6 +156,12 @@ def test_reuses_accepted_structured_facts_and_skips_those_fields():
         "explicit_activity",
         "segment_dimension",
         "operating_revenue",
+    }
+    assert {item.record_id for item in selected.reused_facts} >= {
+        "cp-300750-overview",
+        "cp-300750-produces",
+        "cp-300750-segment",
+        "cp-300750-revenue",
     }
     assert all(item.requires_llm is False for item in selected.reused_facts)
     assert selected.unresolved_field_ids == ()
@@ -202,6 +220,136 @@ def test_missing_continuation_page_is_an_explicit_gap():
     assert any(
         gap.code == "page_unreadable" and gap.page == 15 for gap in selected.gaps
     )
+
+
+def test_toc_and_inline_mentions_are_not_owned_headings():
+    selected = select_core_evidence(
+        report=_report(),
+        pages=(
+            {
+                "page": 3,
+                "text": "目录\n第五节 重要事项 分部信息 120",
+            },
+            {
+                "page": 40,
+                "text": "公司主要业务面临宏观经济波动及原材料价格上涨的风险。",
+            },
+        ),
+    )
+    assert selected.spans == ()
+    assert any(gap.code == "chapter_missing" for gap in selected.gaps)
+
+
+def test_reads_through_section_and_stops_at_next_heading():
+    selected = select_core_evidence(
+        report=_report(),
+        pages=(
+            {
+                "page": 14,
+                "text": (
+                    "报告期内公司从事的主要业务\n"
+                    "公司主要从事动力电池、储能电池的研发、生产和销售。"
+                    "相关产品已形成完整业务体系，并持续向下游客户交付。"
+                ),
+            },
+            {
+                "page": 15,
+                "text": (
+                    "公司通过向客户销售电池系统取得货款。\n"
+                    "二、风险因素\n公司主要业务面临原材料价格波动风险。"
+                ),
+            },
+        ),
+    )
+    assert selected.spans[0].continuation_pages == (15,)
+    assert selected.spans[0].context_complete is True
+    assert "取得货款" in selected.spans[0].excerpt
+    assert "风险因素" not in selected.spans[0].excerpt
+    assert selected.gaps == ()
+
+
+def test_reuse_requires_matching_period():
+    revenue = _reference_records("cp-300750-revenue")[0]
+    stale = _record(
+        {
+            **json.loads(revenue.model_dump_json()),
+            "record_id": "cp-300750-revenue-2024",
+            "reported_period": "2024",
+        }
+    )
+    selected = select_core_evidence(
+        report=_reference_report(),
+        pages=(
+            {
+                "page": 25,
+                "text": "分产品\n动力电池系统 营业收入 316506369 千元\n三、主要销售客户",
+            },
+        ),
+        accepted_records=(stale,),
+    )
+    assert selected.reused_facts == ()
+    assert "operating_revenue" in selected.unresolved_field_ids
+
+
+def test_one_revenue_fact_does_not_close_other_objects():
+    revenue = _reference_records("cp-300750-revenue")[0]
+    total = _record(
+        {
+            **json.loads(revenue.model_dump_json()),
+            "record_id": "cp-300750-revenue-total",
+            "segment_label": "合计",
+            "measured_object": "合计",
+            "source_native": {
+                **json.loads(revenue.model_dump_json())["source_native"],
+                "name": "合计",
+            },
+        }
+    )
+    selected = select_core_evidence(
+        report=_reference_report(),
+        pages=(
+            {
+                "page": 25,
+                "text": (
+                    "分产品\n"
+                    "动力电池系统 营业收入 316506369 千元\n"
+                    "储能电池系统 营业收入 57350891 千元\n"
+                    "三、主要销售客户"
+                ),
+            },
+        ),
+        accepted_records=(revenue, total),
+    )
+    reused_ids = {item.record_id for item in selected.reused_facts}
+    assert "cp-300750-revenue" in reused_ids
+    assert "cp-300750-revenue-total" not in reused_ids
+    assert "operating_revenue" in selected.unresolved_field_ids
+    assert "segment_dimension" in selected.unresolved_field_ids
+
+
+def test_prepared_evidence_keeps_full_context_and_binds_each_field():
+    filler = "该等产品广泛应用于新能源汽车及储能电站等领域。"
+    overview = (
+        "报告期内公司从事的主要业务\n"
+        "公司主要从事动力电池、储能电池的研发、生产和销售。"
+        f"{filler * 8}"
+        "公司通过向客户销售电池系统取得货款。\n"
+        "二、风险因素"
+    )
+    assert len(overview) > 180
+    selected = select_core_evidence(
+        report=_report(),
+        pages=({"page": 14, "text": overview},),
+    )
+    assert "取得货款" in selected.spans[0].excerpt
+    assert "取得货款" not in selected.spans[0].bounded_quote
+    prepared = selected.prepared_evidence
+    assert {item.field_id for item in prepared} == {
+        "business_overview_source",
+        "explicit_activity",
+    }
+    assert all("取得货款" in item.evidence.anchor.bounded_quote for item in prepared)
+    assert all(item.context_complete is True for item in prepared)
 
 
 def test_heading_without_usable_context_is_extraction_failed():

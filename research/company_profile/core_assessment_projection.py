@@ -156,48 +156,54 @@ def overview_dimension_hits(text: str) -> tuple[str, ...]:
     return tuple(hits)
 
 
-def resolved_core_field_ids(records: Sequence[SemanticRecord]) -> frozenset[str]:
-    """Return core field IDs already answered by accepted structured facts."""
+def core_record_is_reusable(record: SemanticRecord) -> bool:
+    """Return whether one accepted record can stand in for its own core field."""
 
-    fields: set[str] = set()
-    for record in records:
-        if (
-            isinstance(record, BusinessOverview)
-            and record.field_id == "business_overview_source"
-            and overview_dimension_hits(record.source_text)
-        ):
-            fields.add("business_overview_source")
-        if (
-            isinstance(record, Activity)
-            and record.field_id == "explicit_activity"
-            and record.action in _PRODUCT_ACTIONS
-            and record.object_name.strip()
-        ):
-            fields.add("explicit_activity")
-        if (
-            isinstance(record, Segment)
-            and record.field_id == "segment_dimension"
-            and not _is_skeleton_noise_segment(
-                dimension=record.dimension,
-                label=record.label,
-                row_class=record.row_class,
-            )
-        ):
-            fields.add("segment_dimension")
-        if (
-            isinstance(record, Measurement)
-            and record.field_id == "operating_revenue"
-            and record.metric_type == MetricType.OPERATING_REVENUE
-            and record.segment_dimension
-            and record.segment_label
-            and not _is_skeleton_noise_segment(
-                dimension=record.segment_dimension,
-                label=record.segment_label,
-                row_class=record.row_class,
-            )
-        ):
-            fields.add("operating_revenue")
-    return frozenset(fields)
+    if (
+        isinstance(record, BusinessOverview)
+        and record.field_id == "business_overview_source"
+        and overview_dimension_hits(record.source_text)
+    ):
+        return True
+    if (
+        isinstance(record, Activity)
+        and record.field_id == "explicit_activity"
+        and record.action in _PRODUCT_ACTIONS
+        and record.object_name.strip()
+    ):
+        return True
+    if (
+        isinstance(record, Segment)
+        and record.field_id == "segment_dimension"
+        and not _is_skeleton_noise_segment(
+            dimension=record.dimension,
+            label=record.label,
+            row_class=record.row_class,
+        )
+    ):
+        return True
+    return (
+        isinstance(record, Measurement)
+        and record.field_id == "operating_revenue"
+        and record.metric_type == MetricType.OPERATING_REVENUE
+        and bool(record.segment_dimension)
+        and bool(record.segment_label)
+        and not _is_skeleton_noise_segment(
+            dimension=record.segment_dimension,
+            label=record.segment_label,
+            row_class=record.row_class,
+        )
+    )
+
+
+def resolved_core_field_ids(records: Sequence[SemanticRecord]) -> frozenset[str]:
+    """Return core field IDs that have at least one reusable accepted record."""
+
+    return frozenset(
+        record.field_id
+        for record in records
+        if core_record_is_reusable(record)
+    )
 
 
 def project_core_assessment(
