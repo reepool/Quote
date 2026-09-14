@@ -31,6 +31,7 @@ from utils.adaptive_throttle import (
     get_adaptive_source_throttle,
 )
 from utils.http_transport import HttpTlsConfig, create_requests_session
+from utils.proxy_patch_runtime import request_with_akshare_proxy
 
 LOGGER = logging.getLogger(__name__)
 
@@ -136,9 +137,36 @@ class _CninfoTransport:
         self.adaptive_throttle = (
             adaptive_throttle or get_adaptive_source_throttle("cninfo")
         )
+        self._prefer_proxy = False
+
+    @staticmethod
+    def _accept_proxy_response(response: Any) -> bool:
+        try:
+            payload = response.json()
+        except (TypeError, ValueError, requests.JSONDecodeError):
+            return False
+        return isinstance(payload, (dict, list))
+
+    def _post_via_proxy(self, url: str, **kwargs: Any) -> requests.Response:
+        timeout = kwargs.get("timeout", self.request_timeout_seconds)
+        return request_with_akshare_proxy(
+            "POST",
+            url,
+            attempts=3,
+            timeout=float(timeout) if timeout is not None else self.request_timeout_seconds,
+            headers=kwargs.get("headers"),
+            data=kwargs.get("data"),
+            accept_response=self._accept_proxy_response,
+            warning_logger=LOGGER,
+        )
 
     def _post(self, url: str, **kwargs: Any) -> requests.Response:
         """POST through the shared CNInfo admission and feedback state."""
+        if self._prefer_proxy:
+            response = self._post_via_proxy(url, **kwargs)
+            self.adaptive_throttle.record_success()
+            return response
+
         self.adaptive_throttle.wait_before_request()
         try:
             response = self.session.post(url, **kwargs)
@@ -146,6 +174,22 @@ class _CninfoTransport:
             self.adaptive_throttle.record_failure()
             raise
         status_code = getattr(response, "status_code", 200)
+        if status_code == 403:
+            try:
+                proxy_response = self._post_via_proxy(url, **kwargs)
+            except Exception as exc:
+                LOGGER.warning(
+                    "[CninfoAnnouncements] akshare proxy fallback failed after HTTP 403: %s",
+                    type(exc).__name__,
+                )
+            else:
+                self._prefer_proxy = True
+                self.adaptive_throttle.record_success()
+                LOGGER.info(
+                    "[CninfoAnnouncements] direct CNInfo blocked with HTTP 403; "
+                    "using akshare_proxy_patch"
+                )
+                return proxy_response
         if status_code in {403, 429}:
             headers = getattr(response, "headers", None)
             retry_after = (

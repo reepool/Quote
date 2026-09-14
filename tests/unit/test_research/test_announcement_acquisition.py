@@ -459,6 +459,135 @@ def test_cninfo_transport_reports_retry_after_to_shared_throttle():
     assert throttle.successes == 0
 
 
+def test_cninfo_transport_falls_back_to_akshare_proxy_on_http_403(monkeypatch):
+    throttle = _TrackingThrottle()
+    session = _Session(
+        payloads=[
+            _Response({"error": "blocked"}, status_code=403),
+        ]
+    )
+    proxy_calls = []
+    proxy_response = _Response(
+        {
+            "announcements": [
+                {
+                    "announcementId": "proxy-1",
+                    "announcementTitle": "浦发银行2025年年度报告",
+                    "announcementTime": "2026-03-31 09:00:00",
+                    "secCode": "600000",
+                }
+            ]
+        }
+    )
+
+    def fake_proxy(method, url, **kwargs):
+        proxy_calls.append({"method": method, "url": url, "data": dict(kwargs.get("data") or {})})
+        return proxy_response
+
+    monkeypatch.setattr(
+        "research.providers.cninfo_announcements.request_with_akshare_proxy",
+        fake_proxy,
+    )
+    provider = CninfoAnnouncementProvider(
+        source_config={
+            "retry_attempts": 0,
+            "request_interval_seconds": 0,
+            "retry_backoff_seconds": 0,
+        },
+        session=session,
+        adaptive_throttle=throttle,
+    )
+
+    result = provider.discover(_query())
+
+    assert result.status == "success"
+    assert result.records[0].source_announcement_id == "proxy-1"
+    assert len(session.calls) == 1
+    assert proxy_calls[0]["method"] == "POST"
+    assert throttle.throttles == []
+    assert throttle.successes == 1
+
+
+def test_cninfo_transport_stays_on_proxy_after_direct_403(monkeypatch):
+    session = _Session(
+        payloads=[
+            _Response({"error": "blocked"}, status_code=403),
+            AssertionError("direct CNInfo must not be retried after proxy recovery"),
+        ]
+    )
+    proxy_responses = [
+        _Response(
+            {
+                "announcements": [
+                    {
+                        "announcementId": f"proxy-{index}",
+                        "announcementTitle": f"公告{index}",
+                        "announcementTime": 1777392000000 - index,
+                    }
+                    for index in range(30)
+                ],
+                "totalpages": 2,
+            }
+        ),
+        _Response(
+            {
+                "announcements": [
+                    {
+                        "announcementId": "proxy-last",
+                        "announcementTitle": "最后一页",
+                        "announcementTime": "2026-03-30 09:00:00",
+                    }
+                ],
+                "totalpages": 2,
+            }
+        ),
+    ]
+
+    def fake_proxy(method, url, **kwargs):
+        return proxy_responses.pop(0)
+
+    monkeypatch.setattr(
+        "research.providers.cninfo_announcements.request_with_akshare_proxy",
+        fake_proxy,
+    )
+    result = _cninfo_provider(session).discover(_query(page_size=30, max_pages=0))
+
+    assert result.status == "success"
+    assert result.pages_scanned == 2
+    assert result.records[-1].source_announcement_id == "proxy-last"
+    assert len(session.calls) == 1
+
+
+def test_cninfo_transport_keeps_403_when_proxy_unavailable(monkeypatch):
+    throttle = _TrackingThrottle()
+    blocked = _Response({"error": "blocked"}, status_code=403)
+
+    def fake_proxy(*_args, **_kwargs):
+        raise RuntimeError("akshare proxy fallback is not fully configured")
+
+    monkeypatch.setattr(
+        "research.providers.cninfo_announcements.request_with_akshare_proxy",
+        fake_proxy,
+    )
+    provider = CninfoAnnouncementProvider(
+        source_config={"retry_attempts": 0},
+        session=_Session(payloads=[blocked]),
+        adaptive_throttle=throttle,
+    )
+
+    assert (
+        provider.transport._post(
+            "https://example.invalid",
+            data={},
+            headers={},
+            timeout=1,
+        )
+        is blocked
+    )
+    assert throttle.throttles == [(403, None)]
+    assert throttle.successes == 0
+
+
 def test_cninfo_business_paths_reuse_process_shared_source_throttle(monkeypatch):
     class FakeRequests:
         @staticmethod
