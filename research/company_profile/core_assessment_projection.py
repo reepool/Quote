@@ -143,6 +143,63 @@ def core_assessment_schema_manifest() -> dict[str, Any]:
     }
 
 
+def overview_dimension_hits(text: str) -> tuple[str, ...]:
+    """Return core dimensions supported by one overview narrative."""
+
+    hits: list[str] = []
+    if _PRINCIPAL_PATTERN.search(text):
+        hits.append("principal_business")
+    if _PRODUCT_PATTERN.search(text):
+        hits.append("products_services")
+    if _overview_states_revenue(text):
+        hits.append("revenue_model")
+    return tuple(hits)
+
+
+def resolved_core_field_ids(records: Sequence[SemanticRecord]) -> frozenset[str]:
+    """Return core field IDs already answered by accepted structured facts."""
+
+    fields: set[str] = set()
+    for record in records:
+        if (
+            isinstance(record, BusinessOverview)
+            and record.field_id == "business_overview_source"
+            and overview_dimension_hits(record.source_text)
+        ):
+            fields.add("business_overview_source")
+        if (
+            isinstance(record, Activity)
+            and record.field_id == "explicit_activity"
+            and record.action in _PRODUCT_ACTIONS
+            and record.object_name.strip()
+        ):
+            fields.add("explicit_activity")
+        if (
+            isinstance(record, Segment)
+            and record.field_id == "segment_dimension"
+            and not _is_skeleton_noise_segment(
+                dimension=record.dimension,
+                label=record.label,
+                row_class=record.row_class,
+            )
+        ):
+            fields.add("segment_dimension")
+        if (
+            isinstance(record, Measurement)
+            and record.field_id == "operating_revenue"
+            and record.metric_type == MetricType.OPERATING_REVENUE
+            and record.segment_dimension
+            and record.segment_label
+            and not _is_skeleton_noise_segment(
+                dimension=record.segment_dimension,
+                label=record.segment_label,
+                row_class=record.row_class,
+            )
+        ):
+            fields.add("operating_revenue")
+    return frozenset(fields)
+
+
 def project_core_assessment(
     *,
     report: ReportIdentity,

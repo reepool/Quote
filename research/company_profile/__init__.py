@@ -36,7 +36,15 @@ from .core_assessment_projection import (
     COMMON_CORE_MAPPING_VERSION,
     CompanyProfileCoreAssessment,
     core_assessment_schema_manifest,
+    overview_dimension_hits,
     project_core_assessment,
+    resolved_core_field_ids,
+)
+from .core_evidence_selection import (
+    CORE_EVIDENCE_SCHEMA_VERSION,
+    CoreEvidenceSelection,
+    core_evidence_schema_manifest,
+    select_core_evidence,
 )
 from .models import (
     PRODUCTION_AUTHORIZATION,
@@ -132,6 +140,7 @@ from .workflow import (
 __all__ = [
     "APPROVED_STAGE5_SAMPLES",
     "COMMON_CORE_MAPPING_VERSION",
+    "CORE_EVIDENCE_SCHEMA_VERSION",
     "PRODUCTION_AUTHORIZATION",
     "STAGE55_ADJUDICATION_SCHEMA",
     "STAGE55_BASELINE_RUN_ID",
@@ -152,6 +161,7 @@ __all__ = [
     "CompanyProfileSemanticService",
     "CompanyProfileTaskResult",
     "ComparisonBasis",
+    "CoreEvidenceSelection",
     "CoverageReasonCode",
     "CoverageResult",
     "CoverageStatus",
@@ -229,12 +239,16 @@ __all__ = [
     "contract_example_manifest",
     "contract_schema_manifest",
     "core_assessment_schema_manifest",
+    "core_evidence_schema_manifest",
     "load_a_share_candidate_registry",
     "load_stage5_evidence_plan",
     "load_stage5_sample_manifest",
     "load_stage55_adjudication_ledger",
+    "overview_dimension_hits",
     "project_core_assessment",
     "project_research_view",
+    "resolved_core_field_ids",
+    "select_core_evidence",
     "semantic_record_json_schema",
     "stage5_evidence_plan_hash",
 ]
