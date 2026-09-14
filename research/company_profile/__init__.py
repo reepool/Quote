@@ -7,6 +7,7 @@ local evidence preparation; it still exposes no production database writer.
 from .candidate_registry import (
     AShareCandidateRegistry,
     AShareProfileCandidate,
+    announcement_access_report_lookup,
     build_a_share_candidate_registry,
     candidate_registry_schema_manifest,
     load_a_share_candidate_registry,
@@ -222,6 +223,7 @@ __all__ = [
     "VerifyRequest",
     "VerifyResponse",
     "VerifyStatus",
+    "announcement_access_report_lookup",
     "build_a_share_candidate_registry",
     "candidate_registry_schema_manifest",
     "contract_example_manifest",

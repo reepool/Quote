@@ -470,6 +470,16 @@ def test_independent_census_pair_is_required_for_full_market_completion(tmp_path
         repository.get_latest_full_market_universe_snapshot()["snapshot_id"]
         == paired.snapshot_id
     )
+    assert repository.get_full_market_universe_snapshot_as_of("2026-08-09") is None
+    assert (
+        repository.get_full_market_universe_snapshot_as_of("2026-08-10")["snapshot_id"]
+        == paired.snapshot_id
+    )
+    assert repository.get_complete_universe_snapshot_as_of("2026-08-09") is None
+    assert (
+        repository.get_complete_universe_snapshot_as_of("2026-08-10")["snapshot_id"]
+        == newer_unpaired.snapshot_id
+    )
 
 
 def test_census_set_field_or_freshness_mismatch_blocks_full_market_completion():

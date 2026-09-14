@@ -4426,16 +4426,32 @@ class AnnouncementAssetRepository:
         )
 
     def get_latest_complete_universe_snapshot(self) -> dict[str, Any] | None:
+        return self._select_complete_universe_snapshot(as_of=None)
+
+    def get_complete_universe_snapshot_as_of(self, as_of: str) -> dict[str, Any] | None:
+        return self._select_complete_universe_snapshot(as_of=str(as_of).strip())
+
+    def get_latest_full_market_universe_snapshot(self) -> dict[str, Any] | None:
+        """Return the newest denominator with an independently paired census."""
+
+        return self._select_full_market_universe_snapshot(as_of=None)
+
+    def get_full_market_universe_snapshot_as_of(
+        self, as_of: str
+    ) -> dict[str, Any] | None:
+        return self._select_full_market_universe_snapshot(as_of=str(as_of).strip())
+
+    def _select_complete_universe_snapshot(
+        self, *, as_of: str | None
+    ) -> dict[str, Any] | None:
         with self.connection() as conn:
-            row = conn.execute(
+            rows = conn.execute(
                 """SELECT * FROM official_asset_universe_snapshots
                    WHERE status='complete' AND source_complete=1
-                   ORDER BY snapshot_at DESC LIMIT 1"""
-            ).fetchone()
-        return (
-            None
-            if row is None
-            else _decode_row(
+                   ORDER BY snapshot_at DESC"""
+            ).fetchall()
+        for row in rows:
+            item = _decode_row(
                 row,
                 json_fields=(
                     "instrument_rows_json",
@@ -4443,11 +4459,13 @@ class AnnouncementAssetRepository:
                     "metadata_json",
                 ),
             )
-        )
+            if as_of is None or _snapshot_at_not_after(item.get("snapshot_at"), as_of):
+                return item
+        return None
 
-    def get_latest_full_market_universe_snapshot(self) -> dict[str, Any] | None:
-        """Return the newest denominator with an independently paired census."""
-
+    def _select_full_market_universe_snapshot(
+        self, *, as_of: str | None
+    ) -> dict[str, Any] | None:
         with self.connection() as conn:
             rows = conn.execute(
                 """SELECT * FROM official_asset_universe_snapshots
@@ -4464,6 +4482,10 @@ class AnnouncementAssetRepository:
                     "metadata_json",
                 ),
             )
+            if as_of is not None and not _snapshot_at_not_after(
+                item.get("snapshot_at"), as_of
+            ):
+                continue
             metadata = item.get("metadata") or item.get("metadata_json") or {}
             reconciliation = (
                 metadata.get("census_reconciliation")
@@ -5262,3 +5284,16 @@ def _parse_iso_datetime(value: str) -> datetime:
 
 def _iso_after(left: str, right: str) -> bool:
     return _parse_iso_datetime(left) > _parse_iso_datetime(right)
+
+
+def _snapshot_at_not_after(snapshot_at: object, as_of: str) -> bool:
+    text = str(snapshot_at or "").strip()
+    bound = str(as_of or "").strip()
+    if not text or not bound:
+        return False
+    if len(bound) == 10:
+        return text.replace("Z", "+00:00")[:10] <= bound
+    try:
+        return not _iso_after(text, bound)
+    except ValueError:
+        return text[:10] <= bound[:10]

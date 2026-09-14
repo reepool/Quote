@@ -16,6 +16,7 @@ from .contracts import CompanyProfileTaskResult, DispositionStatus
 from .models import (
     PRODUCTION_AUTHORIZATION,
     Activity,
+    ActivityAction,
     BusinessOverview,
     Evidence,
     Measurement,
@@ -39,10 +40,42 @@ _PRODUCT_PATTERN = re.compile(
     r"(主要产品|主要服务|业务线|产品包括|服务包括|"
     r"从事.{1,40}(?:的研发|的生产|的制造|的加工|的销售|服务))"
 )
-_REVENUE_NARRATIVE_PATTERN = re.compile(
-    r"(收入来[源于自]|营业收入构成|主营业务收入|服务费|手续费|佣金|"
-    r"经纪业务|利息净收入|保费|分成收入)"
+_CLAUSE_SPLIT = re.compile(r"[。；;\n]+")
+_REVENUE_INFLOW_PATTERN = re.compile(
+    r"(收入来[源于自]|营业收入构成|主营业务收入|"
+    r"通过.{0,30}(?:销售|提供).{0,30}(?:取得|获得|收取)|"
+    r"取得货款|向客户销售|向客户提供|"
+    r"(?:收取|取得|获得).{0,16}(?:货款|价款|服务费|手续费|佣金|保费)|"
+    r"利息净收入|分成收入|经纪业务收入|保费收入|"
+    r"手续费及佣金(?:净)?收入|(?:服务费|手续费|佣金)收入)"
 )
+_REVENUE_OUTFLOW_PATTERN = re.compile(
+    r"(?:支付|缴纳).{0,20}(?:手续费|佣金|服务费|保费|费用)|"
+    r"(?:手续费|佣金|服务费|保费).{0,8}(?:支出|费用)|"
+    r"银行手续费"
+)
+_PRODUCT_ACTIONS = frozenset(
+    {
+        ActivityAction.DEVELOPS,
+        ActivityAction.PRODUCES,
+        ActivityAction.PROCESSES,
+        ActivityAction.SELLS,
+        ActivityAction.PROVIDES_SERVICE,
+        ActivityAction.OPERATES,
+    }
+)
+_REGION_DIMENSION = re.compile(
+    r"(分地区|地区|区域|地域|geographic|region)", re.IGNORECASE
+)
+_REGION_LABEL = re.compile(
+    r"^(?:境内|境外|国内|国外|中国境内|中国境外|"
+    r"华东|华北|华南|华中|东北|西北|西南|海外|"
+    r"国外地区|国内地区)(?:地区|区域)?$"
+)
+_TOTAL_LABEL = re.compile(
+    r"^(?:合计|总计|小计|汇总|总额|公司合计|total)$", re.IGNORECASE
+)
+_ELIMINATION_LABEL = re.compile(r"(抵销|抵消|elimination)", re.IGNORECASE)
 
 
 class _StrictModel(BaseModel):
@@ -63,6 +96,7 @@ class CoreDimensionAssessment(_StrictModel):
             "no_accepted_evidence",
             "overview_lacks_dimension",
             "numeric_total_only",
+            "no_qualifying_source",
         ]
         | None
     ) = None
@@ -167,13 +201,21 @@ def _assess_products_services(
     records: Sequence[SemanticRecord],
 ) -> CoreDimensionAssessment:
     supports: list[SemanticRecord] = []
+    rejected = False
     for record in records:
         if isinstance(record, Activity) and record.field_id == "explicit_activity":
-            if record.object_name.strip():
+            if record.action in _PRODUCT_ACTIONS and record.object_name.strip():
                 supports.append(record)
+            elif record.object_name.strip():
+                rejected = True
             continue
         if isinstance(record, Segment) and record.field_id == "segment_dimension":
-            if record.row_class == RowClass.CONSOLIDATION_ADJUSTMENT:
+            if _is_skeleton_noise_segment(
+                dimension=record.dimension,
+                label=record.label,
+                row_class=record.row_class,
+            ):
+                rejected = True
                 continue
             if record.label.strip():
                 supports.append(record)
@@ -192,6 +234,8 @@ def _assess_products_services(
         for record in records
     ):
         return _unanswered("products_services", "overview_lacks_dimension")
+    if rejected:
+        return _unanswered("products_services", "no_qualifying_source")
     return _unanswered("products_services", "no_accepted_evidence")
 
 
@@ -200,11 +244,12 @@ def _assess_revenue_model(
 ) -> CoreDimensionAssessment:
     supports: list[SemanticRecord] = []
     totals: list[SemanticRecord] = []
+    rejected = False
     for record in records:
         if (
             isinstance(record, BusinessOverview)
             and record.field_id == "business_overview_source"
-            and _REVENUE_NARRATIVE_PATTERN.search(record.source_text)
+            and _overview_states_revenue(record.source_text)
         ):
             supports.append(record)
             continue
@@ -213,10 +258,17 @@ def _assess_revenue_model(
             and record.field_id == "operating_revenue"
             and record.metric_type == MetricType.OPERATING_REVENUE
         ):
-            if record.segment_dimension and record.segment_label:
-                supports.append(record)
-            else:
+            if not record.segment_dimension or not record.segment_label:
                 totals.append(record)
+                continue
+            if _is_skeleton_noise_segment(
+                dimension=record.segment_dimension,
+                label=record.segment_label,
+                row_class=record.row_class,
+            ):
+                rejected = True
+                continue
+            supports.append(record)
     if supports:
         return _answered("revenue_model", supports)
     if totals:
@@ -227,7 +279,42 @@ def _assess_revenue_model(
         for record in records
     ):
         return _unanswered("revenue_model", "overview_lacks_dimension")
+    if rejected:
+        return _unanswered("revenue_model", "no_qualifying_source")
     return _unanswered("revenue_model", "no_accepted_evidence")
+
+
+def _overview_states_revenue(text: str) -> bool:
+    for clause in _CLAUSE_SPLIT.split(text):
+        clause = clause.strip()
+        if not clause:
+            continue
+        if _REVENUE_OUTFLOW_PATTERN.search(clause) and not _REVENUE_INFLOW_PATTERN.search(
+            clause
+        ):
+            continue
+        if _REVENUE_INFLOW_PATTERN.search(clause):
+            return True
+    return False
+
+
+def _is_skeleton_noise_segment(
+    *,
+    dimension: str | None,
+    label: str | None,
+    row_class: RowClass | None,
+) -> bool:
+    if row_class == RowClass.CONSOLIDATION_ADJUSTMENT:
+        return True
+    dim = (dimension or "").strip()
+    lab = (label or "").strip()
+    if dim == "adjustment":
+        return True
+    if _REGION_DIMENSION.search(dim) or _REGION_LABEL.fullmatch(lab):
+        return True
+    if _TOTAL_LABEL.fullmatch(dim) or _TOTAL_LABEL.fullmatch(lab):
+        return True
+    return bool(_ELIMINATION_LABEL.search(dim) or _ELIMINATION_LABEL.search(lab))
 
 
 def _answered(
@@ -264,6 +351,7 @@ def _unanswered(
         "no_accepted_evidence",
         "overview_lacks_dimension",
         "numeric_total_only",
+        "no_qualifying_source",
     ],
 ) -> CoreDimensionAssessment:
     return CoreDimensionAssessment(

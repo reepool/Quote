@@ -155,6 +155,154 @@ def test_segment_operating_revenue_answers_revenue_model_independently():
     assert assessment.core_complete is True
 
 
+def _accepted_records(report, records):
+    return CompanyProfileTaskResult(
+        request_id="review-counterexample",
+        records=tuple(records),
+        dispositions=tuple(
+            Disposition(
+                target_id=record.record_id,
+                field_id=record.field_id,
+                status=DispositionStatus.ACCEPTED_FOR_REVIEW,
+            )
+            for record in records
+        ),
+        coverage=(),
+        human_review_items=(),
+        task_complete=True,
+    )
+
+
+def _overview_record(source_text: str, record_id: str = "cp-review-overview"):
+    payload, report, _result = _reference_bundle()
+    item = deepcopy(
+        next(row for row in payload["records"] if row["record_id"] == "cp-300750-overview")
+    )
+    item["record_id"] = record_id
+    item["source_text"] = source_text
+    item["evidence"][0]["anchor"]["bounded_quote"] = source_text
+    return report, _record(item)
+
+
+def _segment_record(**overrides):
+    payload, _report, _result = _reference_bundle()
+    item = deepcopy(
+        next(row for row in payload["records"] if row["record_id"] == "cp-300750-segment")
+    )
+    item.update(overrides)
+    return _record(item)
+
+
+def _activity_record(**overrides):
+    payload, _report, _result = _reference_bundle()
+    item = deepcopy(
+        next(row for row in payload["records"] if row["record_id"] == "cp-300750-produces")
+    )
+    item.update(overrides)
+    return _record(item)
+
+
+def _revenue_record(**overrides):
+    payload, _report, _result = _reference_bundle()
+    item = deepcopy(
+        next(row for row in payload["records"] if row["record_id"] == "cp-300750-revenue")
+    )
+    item.update(overrides)
+    return _record(item)
+
+
+def test_bank_fee_expense_does_not_answer_revenue_model():
+    report, overview = _overview_record(
+        "公司主要从事电池研发、生产和销售。报告期内支付银行手续费100万元。"
+    )
+    assessment = project_core_assessment(
+        report=report,
+        task_results=(_accepted_records(report, [overview]),),
+    )
+    assert assessment.principal_business.answered is True
+    assert assessment.revenue_model.answered is False
+    assert assessment.revenue_model.missing_reason == "overview_lacks_dimension"
+
+
+def test_sales_proceeds_narrative_answers_revenue_model():
+    report, overview = _overview_record(
+        "主要产品为工业设备，通过向客户销售设备取得货款"
+    )
+    assessment = project_core_assessment(
+        report=report,
+        task_results=(_accepted_records(report, [overview]),),
+    )
+    assert assessment.products_services.answered is True
+    assert assessment.revenue_model.answered is True
+    assert assessment.revenue_model.supporting_record_ids == (overview.record_id,)
+
+
+def test_fee_income_clause_still_answers_revenue_model():
+    report, overview = _overview_record(
+        "公司营业收入主要来源于向客户收取的技术服务费。"
+    )
+    assessment = project_core_assessment(
+        report=report,
+        task_results=(_accepted_records(report, [overview]),),
+    )
+    assert assessment.revenue_model.answered is True
+
+
+def test_region_segment_does_not_answer_products_services():
+    report, _overview = _overview_record("公司主要从事电池研发、生产和销售。")
+    region = _segment_record(
+        record_id="cp-review-region",
+        dimension="分地区",
+        label="境内",
+    )
+    assessment = project_core_assessment(
+        report=report,
+        task_results=(_accepted_records(report, [region]),),
+    )
+    assert assessment.products_services.answered is False
+    assert assessment.products_services.missing_reason == "no_qualifying_source"
+
+
+def test_purchase_activity_does_not_answer_products_services():
+    _payload, report, _result = _reference_bundle()
+    purchase = _activity_record(
+        record_id="cp-review-purchase",
+        action="purchases",
+        object_name="碳酸锂",
+        source_verb="采购",
+        source_native={"name": "碳酸锂", "header": "主要业务"},
+    )
+    assessment = project_core_assessment(
+        report=report,
+        task_results=(_accepted_records(report, [purchase]),),
+    )
+    assert assessment.products_services.answered is False
+    assert assessment.products_services.missing_reason == "no_qualifying_source"
+
+
+def test_elimination_revenue_does_not_answer_revenue_model():
+    _payload, report, _result = _reference_bundle()
+    elimination = _revenue_record(
+        record_id="cp-review-elimination",
+        measured_object="分部间抵销",
+        segment_dimension="adjustment",
+        segment_label="抵销",
+        row_class="consolidation_adjustment",
+        source_native={
+            "name": "分部间抵销",
+            "value": "-100",
+            "unit": "千元",
+            "header": "营业收入",
+        },
+    )
+    assessment = project_core_assessment(
+        report=report,
+        task_results=(_accepted_records(report, [elimination]),),
+    )
+    assert assessment.revenue_model.answered is False
+    assert assessment.revenue_model.missing_reason == "no_qualifying_source"
+
+
 def test_blocked_overview_does_not_support_any_dimension():
     report, result = _overview_only_result()
     blocked = CompanyProfileTaskResult(

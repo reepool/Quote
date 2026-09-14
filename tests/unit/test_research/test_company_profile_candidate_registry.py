@@ -1,8 +1,15 @@
 from __future__ import annotations
 
+from research.announcement_assets.models import (
+    AnnualReportVariant,
+    AssetAvailability,
+    EffectiveAnnualReport,
+    EffectiveDecisionState,
+)
 from research.company_profile.candidate_registry import (
     CANDIDATE_REGISTRY_SCHEMA_VERSION,
     PRODUCTION_SCOPE_POLICY,
+    announcement_access_report_lookup,
     build_a_share_candidate_registry,
     candidate_registry_schema_manifest,
     load_a_share_candidate_registry,
@@ -129,6 +136,8 @@ def test_loader_uses_existing_snapshot_and_does_not_call_shadow_filters():
             return {
                 "snapshot_id": "snap-db",
                 "policy_version": "a_share_active.v1",
+                "snapshot_at": "2026-09-14T00:00:00+00:00",
+                "paired_census_snapshot_id": "census-db",
                 "instrument_rows": {
                     "items": [
                         {
@@ -172,6 +181,7 @@ def test_loader_uses_existing_snapshot_and_does_not_call_shadow_filters():
         shadow_exclusions=shadow_exclusion_forbidden,
     )
     assert registry.universe_snapshot_id == "snap-db"
+    assert registry.universe_coverage_guarantee == "full_market"
     assert universe.coverage_calls == ["snap-db"]
     assert [item.instrument_id for item in registry.candidates] == ["600000.SH"]
     assert registry.candidate("600000.SH").classification_status == "present"
@@ -204,3 +214,270 @@ def test_schema_manifest_is_registered_before_use():
     assert manifest["schema_version"] == CANDIDATE_REGISTRY_SCHEMA_VERSION
     assert "AShareCandidateRegistry" in manifest["title"]
     assert "candidates" in manifest["properties"]
+
+
+def _access_projection(*, published_at: str) -> dict[str, object]:
+    return {
+        "asset_id": "asset-icbc-2025",
+        "instrument_id": "601398.SH",
+        "fiscal_year": 2025,
+        "report_period": "2025-12-31",
+        "content_hash": "abc",
+        "availability": "local_valid",
+        "asset_availability": "local_valid",
+        "effective_state": "current",
+        "effective_decision_state": "current",
+        "published_at": published_at,
+        "version_available_at": published_at,
+        "activated_at": published_at,
+    }
+
+
+def test_access_projection_shape_binds_effective_report():
+    registry = build_a_share_candidate_registry(
+        as_of="2026-09-14",
+        universe_snapshot_id="snap-full-a",
+        universe_policy_version="a_share_active.v1",
+        eligible_instruments=(
+            {
+                "instrument_id": "601398.SH",
+                "exchange": "SSE",
+                "name": "工商银行",
+            },
+        ),
+        asset_coverage={"601398.SH": {"status": "available"}},
+        effective_reports={
+            "601398.SH": _access_projection(published_at="2026-03-31T00:00:00+00:00")
+        },
+    )
+    report = registry.candidate("601398.SH").latest_effective_annual_report
+    assert report is not None
+    assert report.decision_state == "current"
+    assert report.availability == "local_valid"
+    assert report.fiscal_year == 2025
+
+
+def test_future_published_report_is_rejected_at_historical_as_of():
+    registry = build_a_share_candidate_registry(
+        as_of="2025-01-01",
+        universe_snapshot_id="snap-full-a",
+        universe_policy_version="a_share_active.v1",
+        eligible_instruments=(
+            {
+                "instrument_id": "601398.SH",
+                "exchange": "SSE",
+                "name": "工商银行",
+            },
+        ),
+        asset_coverage={"601398.SH": {"status": "available"}},
+        effective_reports={
+            "601398.SH": _access_projection(published_at="2026-04-01T00:00:00+00:00")
+        },
+    )
+    candidate = registry.candidate("601398.SH")
+    assert candidate.asset_status == "available"
+    assert candidate.latest_effective_annual_report is None
+
+
+def test_loader_rejects_current_snapshot_labeled_as_historical_as_of():
+    class _Universe:
+        def get_latest_full_market_universe_snapshot(self):
+            return {
+                "snapshot_id": "snap-2026",
+                "policy_version": "a_share_active.v1",
+                "snapshot_at": "2026-04-01T00:00:00+00:00",
+                "paired_census_snapshot_id": "census-2026",
+                "instrument_rows": {
+                    "items": [
+                        {
+                            "instrument_id": "601398.SH",
+                            "exchange": "SSE",
+                            "name": "工商银行",
+                        }
+                    ]
+                },
+            }
+
+        def get_latest_complete_universe_snapshot(self):
+            raise AssertionError("must not silently fall back after a future snapshot")
+
+        def list_asset_coverage(self, universe_snapshot_id: str):
+            return []
+
+    try:
+        load_a_share_candidate_registry(
+            universe_repository=_Universe(),
+            industry_lookup=lambda *_args, **_kwargs: None,
+            effective_report_lookup=lambda *_args, **_kwargs: None,
+            as_of="2025-01-01",
+        )
+    except ValueError as exc:
+        assert "as of 2025-01-01" in str(exc)
+    else:
+        raise AssertionError("expected historical as_of without a dated snapshot to fail")
+
+
+def test_loader_uses_as_of_snapshot_and_filters_later_reports():
+    class _Universe:
+        def get_latest_full_market_universe_snapshot(self):
+            raise AssertionError("must not use the undated latest snapshot")
+
+        def get_latest_complete_universe_snapshot(self):
+            raise AssertionError("full-market as_of snapshot already present")
+
+        def get_full_market_universe_snapshot_as_of(self, as_of: str):
+            assert as_of == "2025-01-01"
+            return {
+                "snapshot_id": "snap-2024",
+                "policy_version": "a_share_active.v1",
+                "snapshot_at": "2024-12-31T00:00:00+00:00",
+                "paired_census_snapshot_id": "census-2024",
+                "instrument_rows": {
+                    "items": [
+                        {
+                            "instrument_id": "601398.SH",
+                            "exchange": "SSE",
+                            "name": "工商银行",
+                        }
+                    ]
+                },
+            }
+
+        def list_asset_coverage(self, universe_snapshot_id: str):
+            assert universe_snapshot_id == "snap-2024"
+            return [{"instrument_id": "601398.SH", "status": "available"}]
+
+    lookup_calls: list[tuple[str, str]] = []
+
+    def report_lookup(instrument_id: str, as_of: str):
+        lookup_calls.append((instrument_id, as_of))
+        return _access_projection(published_at="2026-04-01T00:00:00+00:00")
+
+    registry = load_a_share_candidate_registry(
+        universe_repository=_Universe(),
+        industry_lookup=lambda *_args, **_kwargs: None,
+        effective_report_lookup=report_lookup,
+        as_of="2025-01-01",
+    )
+    assert registry.universe_snapshot_id == "snap-2024"
+    assert registry.as_of == "2025-01-01"
+    assert registry.universe_coverage_guarantee == "full_market"
+    assert lookup_calls == [("601398.SH", "2025-01-01")]
+    assert registry.candidate("601398.SH").latest_effective_annual_report is None
+
+
+def test_complete_fallback_records_missing_full_market_guarantee():
+    class _Universe:
+        def get_latest_full_market_universe_snapshot(self):
+            return None
+
+        def get_latest_complete_universe_snapshot(self):
+            return {
+                "snapshot_id": "snap-complete",
+                "policy_version": "a_share_active.v1",
+                "snapshot_at": "2026-09-01T00:00:00+00:00",
+                "instrument_rows": {
+                    "items": [
+                        {
+                            "instrument_id": "600000.SH",
+                            "exchange": "SSE",
+                            "name": "浦发银行",
+                        }
+                    ]
+                },
+            }
+
+        def list_asset_coverage(self, universe_snapshot_id: str):
+            return []
+
+    registry = load_a_share_candidate_registry(
+        universe_repository=_Universe(),
+        industry_lookup=lambda *_args, **_kwargs: None,
+        effective_report_lookup=lambda *_args, **_kwargs: None,
+        as_of="2026-09-14",
+    )
+    assert registry.universe_snapshot_id == "snap-complete"
+    assert registry.universe_coverage_guarantee == "complete_unpaired"
+
+
+def test_repository_effective_report_object_and_access_lookup_bind():
+    report = EffectiveAnnualReport(
+        asset_id="asset-icbc-2025",
+        instrument_id="601398.SH",
+        fiscal_year=2025,
+        report_period="2025-12-31",
+        announcement_id="ann-1",
+        attachment_id="att-1",
+        version_id="ver-1",
+        content_hash="abc",
+        source="cninfo",
+        source_announcement_id="ann-1",
+        published_at="2026-03-31T00:00:00+00:00",
+        variant=AnnualReportVariant.ORIGINAL,
+        classifier_version="v1",
+        decision_state=EffectiveDecisionState.CURRENT,
+        availability=AssetAvailability.LOCAL_VALID,
+        predecessor_asset_id=None,
+        pending_candidate_id=None,
+        activated_at="2026-03-31T00:00:00+00:00",
+        last_checked_at="2026-03-31T00:00:00+00:00",
+    )
+
+    class _Access:
+        def get_effective_asset(self, instrument_id: str, **kwargs):
+            assert instrument_id == "601398.SH"
+            assert kwargs["knowledge_cutoff"].startswith("2026-09-14")
+            return _access_projection(published_at="2026-03-31T00:00:00+00:00")
+
+    built = build_a_share_candidate_registry(
+        as_of="2026-09-14",
+        eligible_instruments=(
+            {
+                "instrument_id": "601398.SH",
+                "exchange": "SSE",
+                "name": "工商银行",
+            },
+        ),
+        effective_reports={"601398.SH": report},
+    )
+    assert built.candidate("601398.SH").latest_effective_annual_report is not None
+    assert (
+        built.candidate("601398.SH").latest_effective_annual_report.decision_state
+        == "current"
+    )
+
+    class _Universe:
+        def get_latest_full_market_universe_snapshot(self):
+            return {
+                "snapshot_id": "snap-db",
+                "policy_version": "a_share_active.v1",
+                "snapshot_at": "2026-09-14T00:00:00+00:00",
+                "paired_census_snapshot_id": "census-db",
+                "instrument_rows": {
+                    "items": [
+                        {
+                            "instrument_id": "601398.SH",
+                            "exchange": "SSE",
+                            "name": "工商银行",
+                        }
+                    ]
+                },
+            }
+
+        def get_latest_complete_universe_snapshot(self):
+            raise AssertionError("full-market snapshot already present")
+
+        def list_asset_coverage(self, universe_snapshot_id: str):
+            return [{"instrument_id": "601398.SH", "status": "available"}]
+
+    loaded = load_a_share_candidate_registry(
+        universe_repository=_Universe(),
+        industry_lookup=lambda *_args, **_kwargs: None,
+        effective_report_lookup=announcement_access_report_lookup(_Access()),
+        as_of="2026-09-14",
+    )
+    assert loaded.candidate("601398.SH").latest_effective_annual_report is not None
+    assert (
+        loaded.candidate("601398.SH").latest_effective_annual_report.decision_state
+        == "current"
+    )

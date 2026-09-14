@@ -7,7 +7,9 @@ fixed report years, or shadow/OOS exclusion lists.
 
 from __future__ import annotations
 
+import inspect
 from collections.abc import Callable, Mapping, Sequence
+from datetime import datetime, timezone
 from typing import Any, Literal, Protocol
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
@@ -97,6 +99,9 @@ class AShareCandidateRegistry(_StrictModel):
     as_of: str = Field(min_length=1)
     universe_snapshot_id: str | None = None
     universe_policy_version: str | None = None
+    universe_coverage_guarantee: Literal[
+        "full_market", "complete_unpaired", "unknown"
+    ] = "unknown"
     candidates: tuple[AShareProfileCandidate, ...]
     counts: dict[str, int]
 
@@ -118,7 +123,7 @@ class UniverseSnapshotRepository(Protocol):
 
 
 IndustryLookup = Callable[[str, str], Mapping[str, Any] | None]
-ReportLookup = Callable[[str], Mapping[str, Any] | None]
+ReportLookup = Callable[..., Any]
 
 
 def candidate_registry_schema_manifest() -> dict[str, Any]:
@@ -138,11 +143,14 @@ def build_a_share_candidate_registry(
     indeterminate: Sequence[Mapping[str, Any]] = (),
     asset_coverage: Mapping[str, Mapping[str, Any]] | None = None,
     industry_memberships: Mapping[str, Mapping[str, Any] | None] | None = None,
-    effective_reports: Mapping[str, Mapping[str, Any] | None] | None = None,
+    effective_reports: Mapping[str, Any] | None = None,
     universe_snapshot_id: str | None = None,
     universe_policy_version: str | None = None,
     excluded_instrument_ids: frozenset[str] | None = None,
     allowed_industry_groups: frozenset[str] | None = None,
+    universe_coverage_guarantee: Literal[
+        "full_market", "complete_unpaired", "unknown"
+    ] = "unknown",
 ) -> AShareCandidateRegistry:
     """Assemble the production denominator from already-loaded source rows.
 
@@ -161,6 +169,7 @@ def build_a_share_candidate_registry(
             coverage=coverage,
             memberships=memberships,
             reports=reports,
+            as_of=as_of,
         ),
         *_candidates_from_rows(
             indeterminate,
@@ -168,6 +177,7 @@ def build_a_share_candidate_registry(
             coverage=coverage,
             memberships=memberships,
             reports=reports,
+            as_of=as_of,
         ),
     ]
     candidates.sort(key=lambda item: item.instrument_id)
@@ -175,6 +185,7 @@ def build_a_share_candidate_registry(
         as_of=as_of,
         universe_snapshot_id=universe_snapshot_id,
         universe_policy_version=universe_policy_version,
+        universe_coverage_guarantee=universe_coverage_guarantee,
         candidates=tuple(candidates),
         counts=_counts(candidates),
     )
@@ -193,11 +204,11 @@ def load_a_share_candidate_registry(
     """Load a registry from existing universe/coverage/industry stores."""
 
     del first_wave_universe, shadow_exclusions
-    loaded = snapshot or universe_repository.get_latest_full_market_universe_snapshot()
-    if loaded is None:
-        loaded = universe_repository.get_latest_complete_universe_snapshot()
-    if loaded is None:
-        raise ValueError("universe snapshot is required for the A-share candidate registry")
+    loaded, coverage_guarantee = _resolve_universe_snapshot(
+        universe_repository,
+        as_of=as_of,
+        snapshot=snapshot,
+    )
 
     snapshot_id = str(loaded.get("snapshot_id") or "").strip() or None
     coverage_rows = (
@@ -220,7 +231,9 @@ def load_a_share_candidate_registry(
         for instrument_id in instrument_ids
     }
     reports = {
-        instrument_id: effective_report_lookup(instrument_id)
+        instrument_id: _invoke_report_lookup(
+            effective_report_lookup, instrument_id, as_of
+        )
         for instrument_id in instrument_ids
     }
     return build_a_share_candidate_registry(
@@ -232,7 +245,20 @@ def load_a_share_candidate_registry(
         effective_reports=reports,
         universe_snapshot_id=snapshot_id,
         universe_policy_version=str(loaded.get("policy_version") or "") or None,
+        universe_coverage_guarantee=coverage_guarantee,
     )
+
+
+def announcement_access_report_lookup(access: Any) -> ReportLookup:
+    """Adapt AnnouncementAssetAccess.get_effective_asset to the registry lookup."""
+
+    def lookup(instrument_id: str, as_of: str) -> Any:
+        return access.get_effective_asset(
+            instrument_id,
+            knowledge_cutoff=_knowledge_cutoff(as_of),
+        )
+
+    return lookup
 
 
 def _candidates_from_rows(
@@ -241,7 +267,8 @@ def _candidates_from_rows(
     universe_status: Literal["eligible", "indeterminate"],
     coverage: Mapping[str, Mapping[str, Any]],
     memberships: Mapping[str, Mapping[str, Any] | None],
-    reports: Mapping[str, Mapping[str, Any] | None],
+    reports: Mapping[str, Any],
+    as_of: str,
 ) -> list[AShareProfileCandidate]:
     candidates: list[AShareProfileCandidate] = []
     seen: set[str] = set()
@@ -252,7 +279,7 @@ def _candidates_from_rows(
         seen.add(instrument_id)
         classification = _classification(memberships.get(instrument_id))
         coverage_row = coverage.get(instrument_id)
-        report = _latest_report(reports.get(instrument_id))
+        report = _latest_report(reports.get(instrument_id), as_of=as_of)
         candidates.append(
             AShareProfileCandidate(
                 instrument_id=instrument_id,
@@ -341,27 +368,189 @@ def _classification(row: Mapping[str, Any] | None) -> ClassificationInfo | None:
     return info
 
 
-def _latest_report(row: Mapping[str, Any] | None) -> LatestAnnualReport | None:
-    if not row:
+def _latest_report(row: Any, *, as_of: str) -> LatestAnnualReport | None:
+    data = _report_mapping(row)
+    if data is None:
         return None
-    asset_id = _optional_text(row.get("asset_id"))
-    report_period = _optional_text(row.get("report_period"))
-    availability = _optional_text(row.get("availability"))
-    decision_state = _optional_text(row.get("decision_state"))
-    fiscal_year = row.get("fiscal_year")
+    if _report_visible_after(data, as_of):
+        return None
+    asset_id = _optional_text(data.get("asset_id"))
+    report_period = _optional_text(data.get("report_period"))
+    availability = _optional_text(
+        data.get("availability") or data.get("asset_availability")
+    )
+    decision_state = _optional_text(
+        data.get("decision_state")
+        or data.get("effective_decision_state")
+        or data.get("effective_state")
+    )
+    fiscal_year = data.get("fiscal_year")
     if not asset_id or not report_period or not availability or not decision_state:
         return None
-    if not isinstance(fiscal_year, int):
+    if isinstance(fiscal_year, bool) or not isinstance(fiscal_year, int):
         return None
     return LatestAnnualReport(
         asset_id=asset_id,
         fiscal_year=fiscal_year,
         report_period=report_period,
-        content_hash=_optional_text(row.get("content_hash")),
+        content_hash=_optional_text(data.get("content_hash")),
         availability=availability,
         decision_state=decision_state,
-        published_at=_optional_text(row.get("published_at")),
+        published_at=_optional_text(data.get("published_at")),
     )
+
+
+def _report_mapping(row: Any) -> dict[str, Any] | None:
+    if row is None:
+        return None
+    if isinstance(row, Mapping):
+        return dict(row)
+    return {
+        "asset_id": getattr(row, "asset_id", None),
+        "fiscal_year": getattr(row, "fiscal_year", None),
+        "report_period": getattr(row, "report_period", None),
+        "content_hash": getattr(row, "content_hash", None),
+        "availability": _enum_value(getattr(row, "availability", None)),
+        "asset_availability": _enum_value(getattr(row, "asset_availability", None)),
+        "decision_state": _enum_value(getattr(row, "decision_state", None)),
+        "effective_state": getattr(row, "effective_state", None),
+        "effective_decision_state": getattr(row, "effective_decision_state", None),
+        "published_at": getattr(row, "published_at", None),
+        "version_available_at": getattr(row, "version_available_at", None),
+        "activated_at": getattr(row, "activated_at", None),
+    }
+
+
+def _report_visible_after(row: Mapping[str, Any], as_of: str) -> bool:
+    for key in ("published_at", "version_available_at", "activated_at"):
+        value = row.get(key)
+        if value and not _timestamp_not_after(str(value), as_of, missing_ok=True):
+            return True
+    return False
+
+
+def _resolve_universe_snapshot(
+    universe_repository: UniverseSnapshotRepository,
+    *,
+    as_of: str,
+    snapshot: Mapping[str, Any] | None,
+) -> tuple[Mapping[str, Any], Literal["full_market", "complete_unpaired", "unknown"]]:
+    if snapshot is not None:
+        _ensure_snapshot_as_of(snapshot, as_of)
+        return snapshot, _caller_coverage_guarantee(snapshot)
+
+    as_of_full = getattr(
+        universe_repository, "get_full_market_universe_snapshot_as_of", None
+    )
+    if callable(as_of_full):
+        loaded = as_of_full(as_of)
+        if loaded is not None:
+            _ensure_snapshot_as_of(loaded, as_of)
+            return loaded, "full_market"
+
+    latest_full = universe_repository.get_latest_full_market_universe_snapshot()
+    if latest_full is not None and _snapshot_usable_as_of(latest_full, as_of):
+        return latest_full, "full_market"
+
+    as_of_complete = getattr(
+        universe_repository, "get_complete_universe_snapshot_as_of", None
+    )
+    if callable(as_of_complete):
+        loaded = as_of_complete(as_of)
+        if loaded is not None:
+            _ensure_snapshot_as_of(loaded, as_of)
+            return loaded, "complete_unpaired"
+
+    if latest_full is not None:
+        raise ValueError(
+            f"no universe snapshot is available as of {as_of}; "
+            "refusing to label current data with a historical as_of"
+        )
+
+    latest_complete = universe_repository.get_latest_complete_universe_snapshot()
+    if latest_complete is not None and _snapshot_usable_as_of(latest_complete, as_of):
+        return latest_complete, "complete_unpaired"
+    if latest_complete is not None:
+        raise ValueError(
+            f"no universe snapshot is available as of {as_of}; "
+            "refusing to label current data with a historical as_of"
+        )
+    raise ValueError("universe snapshot is required for the A-share candidate registry")
+
+
+def _caller_coverage_guarantee(
+    snapshot: Mapping[str, Any],
+) -> Literal["full_market", "complete_unpaired", "unknown"]:
+    if snapshot.get("paired_census_snapshot_id"):
+        return "full_market"
+    return "unknown"
+
+
+def _ensure_snapshot_as_of(snapshot: Mapping[str, Any], as_of: str) -> None:
+    if not _snapshot_usable_as_of(snapshot, as_of):
+        raise ValueError(
+            f"no universe snapshot is available as of {as_of}; "
+            "refusing to label current data with a historical as_of"
+        )
+
+
+def _snapshot_usable_as_of(snapshot: Mapping[str, Any], as_of: str) -> bool:
+    snapshot_at = _optional_text(snapshot.get("snapshot_at"))
+    if snapshot_at is None:
+        return False
+    return _timestamp_not_after(snapshot_at, as_of, missing_ok=False)
+
+
+def _invoke_report_lookup(lookup: ReportLookup, instrument_id: str, as_of: str) -> Any:
+    try:
+        parameters = inspect.signature(lookup).parameters
+    except (TypeError, ValueError):
+        parameters = {}
+    if "as_of" in parameters:
+        return lookup(instrument_id, as_of=as_of)
+    if any(
+        item.kind in (inspect.Parameter.VAR_POSITIONAL, inspect.Parameter.VAR_KEYWORD)
+        for item in parameters.values()
+    ):
+        return lookup(instrument_id, as_of)
+    if len(parameters) >= 2:
+        return lookup(instrument_id, as_of)
+    return lookup(instrument_id)
+
+
+def _knowledge_cutoff(as_of: str) -> str:
+    text = str(as_of or "").strip()
+    if len(text) == 10:
+        return f"{text}T23:59:59.999999+08:00"
+    return text
+
+
+def _timestamp_not_after(value: str, as_of: str, *, missing_ok: bool) -> bool:
+    text = str(value or "").strip()
+    bound = str(as_of or "").strip()
+    if not text:
+        return missing_ok
+    if not bound:
+        return False
+    if len(bound) == 10:
+        return text.replace("Z", "+00:00")[:10] <= bound
+    try:
+        return _parse_timestamp(text) <= _parse_timestamp(bound)
+    except ValueError:
+        return text[:10] <= bound[:10]
+
+
+def _parse_timestamp(value: str) -> datetime:
+    parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=timezone.utc)
+    return parsed.astimezone(timezone.utc)
+
+
+def _enum_value(value: Any) -> Any:
+    if value is None:
+        return None
+    return getattr(value, "value", value)
 
 
 def _asset_status(row: Mapping[str, Any] | None) -> str:
