@@ -7,6 +7,7 @@ fields.  It is not a confidence service or a persisted authorization layer.
 from __future__ import annotations
 
 import re
+from collections.abc import Mapping
 from enum import Enum
 from typing import Any
 
@@ -24,6 +25,12 @@ from .models import (
     SubjectBasis,
     SubjectScope,
 )
+
+_SELF_ACTORS = frozenset({"公司", "本公司", "本集团", "集团", "上市公司"})
+_NARROWER_SCOPES = frozenset(
+    {"issuer", "named_subsidiary", "business_segment"}
+)
+_SUBJECT_CONFLICT = re.compile(r"冲突|不可区分|无法归属|conflict", re.IGNORECASE)
 
 CORE_CHAPTERS = (
     "extract_business_overview",
@@ -149,6 +156,75 @@ def accepted_has_illegal_group_promotion(task_results: list[Any]) -> bool:
             ):
                 return True
     return False
+
+
+def apply_report_default_group_scope(candidate: dict[str, Any]) -> dict[str, Any]:
+    """Apply the report-level group convention to an otherwise unqualified draft."""
+
+    scope = _scope_value(candidate.get("subject_scope"))
+    if scope in _NARROWER_SCOPES:
+        return candidate
+    if (
+        _object_type_value(candidate.get("object_type")) == "Segment"
+        or candidate.get("row_class") == "consolidation_adjustment"
+    ):
+        return candidate
+    if scope not in (None, "", "unclear"):
+        return candidate
+    if _draft_has_subject_conflict(candidate) or _draft_is_third_party_activity(
+        candidate
+    ):
+        candidate["subject_scope"] = "unclear"
+        return candidate
+    candidate["subject_scope"] = "consolidated_group"
+    candidate["subject_basis"] = "report_default_group_scope"
+    return candidate
+
+
+def activity_promotes_third_party_to_group(record: SemanticRecord) -> bool:
+    """Return True when a non-issuer actor is treated as the listed-company group."""
+
+    if not isinstance(record, Activity):
+        return False
+    if record.subject_scope != SubjectScope.CONSOLIDATED_GROUP:
+        return False
+    if record.subject_basis != SubjectBasis.REPORT_DEFAULT_GROUP_SCOPE:
+        return False
+    return any(
+        actor not in _SELF_ACTORS
+        for actor in (record.activity_actor.strip(), record.source_actor.strip())
+        if actor
+    )
+
+
+def _scope_value(value: Any) -> str | None:
+    if value is None:
+        return None
+    if isinstance(value, Enum):
+        return value.value
+    text = str(value).strip()
+    return text or None
+
+
+def _object_type_value(value: Any) -> str | None:
+    return _scope_value(value)
+
+
+def _draft_has_subject_conflict(candidate: Mapping[str, Any]) -> bool:
+    return any(
+        _SUBJECT_CONFLICT.search(str(item))
+        for item in candidate.get("uncertainty") or ()
+    )
+
+
+def _draft_is_third_party_activity(candidate: Mapping[str, Any]) -> bool:
+    if _object_type_value(candidate.get("object_type")) != "Activity":
+        return False
+    actors = [
+        str(candidate.get(key) or "").strip()
+        for key in ("activity_actor", "source_actor")
+    ]
+    return any(actor and actor not in _SELF_ACTORS for actor in actors)
 
 
 def _has_affirmative_group_evidence(record: SemanticRecord) -> bool:

@@ -6017,6 +6017,74 @@ def test_default_group_subject_is_applied_to_unqualified_provider_drafts():
     assert candidate["subject_basis"] == "report_default_group_scope"
 
 
+def test_extract_keeps_subject_conflict_and_third_party_actor_unclear():
+    prepared = _prepared_scope().model_copy(update={"scope_id": "generic_overview"})
+    request = _extract_request(prepared)
+    conflict = _normalize_extract_response(
+        {
+            "schema_version": "company_profile_extract_response.v1",
+            "request_id": request.request_id,
+            "items": [
+                {
+                    "item_type": "candidate",
+                    "candidate": {
+                        "object_type": "Measurement",
+                        "field_id": "operating_revenue",
+                        "metric_type": "operating_revenue",
+                        "measured_object": "产品",
+                        "subject_scope": "unclear",
+                        "uncertainty": ["母公司口径与合并口径冲突，无法归属"],
+                        "reported_period": "2025",
+                        "period_type": "duration",
+                        "source_native": {"name": "产品", "value": "100", "unit": "元"},
+                        "evidence_ids": [
+                            prepared.evidence_bundle[0].evidence.evidence_id
+                        ],
+                    },
+                }
+            ],
+        },
+        request=request,
+        prepared_scope=prepared,
+    )["items"][0]["candidate"]
+    assert conflict["subject_scope"] == "unclear"
+    assert conflict.get("subject_basis") != "report_default_group_scope"
+
+    third_party = _normalize_extract_response(
+        {
+            "schema_version": "company_profile_extract_response.v1",
+            "request_id": request.request_id,
+            "items": [
+                {
+                    "item_type": "candidate",
+                    "candidate": {
+                        "object_type": "Activity",
+                        "field_id": "explicit_activity",
+                        "action": "sells",
+                        "activity_actor": "军贸公司",
+                        "source_actor": "军贸公司",
+                        "actor_basis": "direct_grammatical_actor",
+                        "object_name": "产品",
+                        "source_verb": "销售",
+                        "subject_scope": "unclear",
+                        "reported_period": "2025",
+                        "period_type": "duration",
+                        "source_native": {"name": "产品"},
+                        "evidence_ids": [
+                            prepared.evidence_bundle[0].evidence.evidence_id
+                        ],
+                    },
+                }
+            ],
+        },
+        request=request,
+        prepared_scope=prepared,
+    )["items"][0]["candidate"]
+    assert third_party["activity_actor"] == "军贸公司"
+    assert third_party["subject_scope"] == "unclear"
+    assert third_party.get("subject_basis") != "report_default_group_scope"
+
+
 def test_required_material_input_rejects_empty_provider_payload() -> None:
     prepared = _owner_and_context_material_scope()
     request = _material_input_extract_request(prepared)

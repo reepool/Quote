@@ -241,9 +241,10 @@ def _evaluate_annotation(
     if expected_status == "observed":
         best: tuple[str, dict[str, Any]] | None = None
         priority = {
-            "exact_match": 3,
-            "semantic_match": 2,
-            "accepted_with_uncertainty": 1,
+            "exact_match": 4,
+            "semantic_match": 3,
+            "accepted_with_uncertainty": 2,
+            "gold_contract_conflict": 1,
             "failed": 0,
         }
         for scope in scope_results:
@@ -266,6 +267,11 @@ def _evaluate_annotation(
                 **identity,
                 passed=status
                 in {"exact_match", "semantic_match", "accepted_with_uncertainty"},
+                reason=(
+                    "runtime subject policy conflicts with historical Gold expectation"
+                    if status == "gold_contract_conflict"
+                    else None
+                ),
                 match_status=status,
                 runtime_target_id=str(record.get("record_id") or "") or None,
                 match_rule=_annotation_match_rule(record, annotation, status=status),
@@ -323,8 +329,6 @@ def _record_matches_annotation(
         return False
     if record.get("object_type") != semantic.get("object_type"):
         return False
-    if _subject_match_status(record, annotation) == "failed":
-        return False
     if not _event_type_matches(record, annotation):
         return False
     for key in (
@@ -364,26 +368,49 @@ def _record_matches_annotation(
 def _annotation_match_status(record: dict[str, Any], annotation: dict[str, Any]) -> str:
     if not _record_matches_annotation(record, annotation):
         return "failed"
-    if _subject_match_status(record, annotation) == "accepted_with_uncertainty":
+    subject_status = _subject_match_status(record, annotation)
+    if subject_status == "failed":
+        return "failed"
+    if subject_status == "gold_contract_conflict":
+        return "gold_contract_conflict"
+    if subject_status == "accepted_with_uncertainty":
         return "accepted_with_uncertainty"
     return "exact_match" if _record_raw_equal(record, annotation) else "semantic_match"
 
 
 def _subject_match_status(
     record: dict[str, Any], annotation: dict[str, Any]
-) -> Literal["exact", "accepted_with_uncertainty", "failed"]:
+) -> Literal["exact", "accepted_with_uncertainty", "gold_contract_conflict", "failed"]:
     semantic = annotation.get("semantic", {})
     expected_subject = semantic.get("subject_scope")
     if not expected_subject:
         return "exact"
     actual_subject = record.get("subject_scope")
+    expected_basis = semantic.get("subject_basis")
+    actual_basis = record.get("subject_basis")
+    legal_default = (
+        actual_subject == "consolidated_group"
+        and actual_basis == "report_default_group_scope"
+    )
+    if (
+        expected_subject in {"issuer", "named_subsidiary", "business_segment"}
+        and actual_subject == "consolidated_group"
+    ):
+        return "failed"
     if actual_subject == expected_subject:
-        expected_basis = semantic.get("subject_basis")
-        if expected_basis is not None and _normalize_scalar(
-            record.get("subject_basis")
-        ) != _normalize_scalar(expected_basis):
-            return "failed"
-        return "exact"
+        if expected_basis is None or _normalize_scalar(
+            actual_basis
+        ) == _normalize_scalar(expected_basis):
+            return "exact"
+        if legal_default:
+            return "gold_contract_conflict"
+        return "failed"
+    if legal_default:
+        return "gold_contract_conflict"
+    if actual_subject == "consolidated_group" and not _has_affirmative_subject_basis(
+        record
+    ):
+        return "failed"
     if (
         annotation.get("subject_strictness") == "allow_unclear_if_not_promoted"
         and actual_subject == "unclear"

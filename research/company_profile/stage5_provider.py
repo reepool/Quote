@@ -23,6 +23,7 @@ from utils.llm import (
     LlmSchemaValidationError,
 )
 
+from .acceptance_policy import apply_report_default_group_scope
 from .contracts import (
     ContractErrorCode,
     ExtractResponse,
@@ -3543,17 +3544,8 @@ def _default_group_subject_draft(
     candidate: dict[str, Any], *, prepared_scope: PreparedRequestScope
 ) -> None:
     """Apply the report-level group convention to otherwise unqualified facts."""
-    if candidate.get("subject_scope") not in (None, "", "unclear"):
-        return
-    # Segment rows are reconstructed from a disclosed table dimension, and
-    # consolidation-adjustment rows have their own narrow evidence rule.
-    if (
-        candidate.get("object_type") == "Segment"
-        or candidate.get("row_class") == "consolidation_adjustment"
-    ):
-        return
-    candidate["subject_scope"] = "consolidated_group"
-    candidate["subject_basis"] = "report_default_group_scope"
+
+    apply_report_default_group_scope(candidate)
 
 
 def _expand_candidate_draft(

@@ -9,6 +9,7 @@ from typing import Any, TypeVar
 
 from pydantic import BaseModel, ValidationError
 
+from .acceptance_policy import activity_promotes_third_party_to_group
 from .contracts import (
     CompanyProfileTaskResult,
     ContractErrorCode,
@@ -544,6 +545,8 @@ def _candidate_issue(
             return ContractErrorCode.ACTION_NOT_ALLOWED
         if record.activity_actor != record.source_actor:
             return ContractErrorCode.ACTIVITY_ACTOR_UNSUPPORTED
+        if activity_promotes_third_party_to_group(record):
+            return ContractErrorCode.SUBJECT_UNSUPPORTED
     source_by_identity = {
         (item.evidence.evidence_id, item.field_id): item.source_native
         for item in request.evidence_bundle
@@ -571,6 +574,15 @@ def _deterministic_verify(request: VerifyRequest) -> VerifyResponse:
                     target_id=record.record_id,
                     status=VerifyStatus.BLOCK,
                     reason_codes=(ContractErrorCode.ACTIVITY_ACTOR_UNSUPPORTED,),
+                )
+            )
+        elif activity_promotes_third_party_to_group(record):
+            checks.append(
+                VerifyCheck(
+                    target_type="candidate",
+                    target_id=record.record_id,
+                    status=VerifyStatus.BLOCK,
+                    reason_codes=(ContractErrorCode.SUBJECT_UNSUPPORTED,),
                 )
             )
         else:
