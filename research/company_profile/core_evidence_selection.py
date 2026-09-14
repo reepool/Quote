@@ -27,6 +27,7 @@ from .models import (
     ChapterTask,
     Evidence,
     Measurement,
+    PeriodType,
     ReportIdentity,
     Segment,
     SemanticRecord,
@@ -493,7 +494,7 @@ def _record_matches_span(
 ) -> bool:
     if record.field_id not in span.field_ids:
         return False
-    if not _period_matches(record.reported_period, report.report_period):
+    if not _period_matches(record, report):
         return False
     if not _source_range_matches(record, span):
         return False
@@ -518,9 +519,11 @@ def _field_covered_for_span(
     ]
     if not covering:
         return False
+    if field_id == "business_overview_source":
+        return True
     demanded = _demanded_objects(field_id, span.excerpt)
     if not demanded:
-        return True
+        return False
     covered: set[str] = set()
     for record in covering:
         covered.update(_record_objects(record))
@@ -531,14 +534,27 @@ def _field_covered_for_span(
     )
 
 
-def _period_matches(reported_period: str, report_period: str) -> bool:
-    reported = re.sub(r"\s+", "", reported_period)
-    expected = re.sub(r"\s+", "", report_period)
+def _period_matches(record: SemanticRecord, report: ReportIdentity) -> bool:
+    """Reuse the annual-duration alias already used by Stage 5 adapters."""
+
+    reported = record.reported_period.strip()
+    expected = report.report_period.strip()
     if not reported or not expected:
         return False
-    return reported in expected or expected.startswith(reported) or reported.startswith(
-        expected[:4]
-    )
+    if reported == expected:
+        return True
+    if record.period_type is not PeriodType.DURATION:
+        return False
+    left = _annual_duration_year(reported)
+    right = _annual_duration_year(expected)
+    return bool(left and right and left == right)
+
+
+def _annual_duration_year(value: str) -> str | None:
+    # Same closed annual aliases as
+    # stage5_provider._normalize_segment_partition_reported_period.
+    match = re.fullmatch(r"(\d{4})(?:年|年度|-12-31)?", re.sub(r"\s+", "", value))
+    return match.group(1) if match else None
 
 
 def _source_range_matches(record: SemanticRecord, span: CoreEvidenceSpan) -> bool:
@@ -547,10 +563,8 @@ def _source_range_matches(record: SemanticRecord, span: CoreEvidenceSpan) -> boo
     for item in record.evidence:
         record_pages.add(item.page)
         record_pages.update(item.continuation_pages)
-    if record_pages & span_pages:
-        return True
-    compact = re.sub(r"\s+", "", span.excerpt)
-    return any(_object_mentioned(item, compact) for item in _record_objects(record))
+        record_pages.update(item.subject_evidence_pages)
+    return bool(record_pages & span_pages)
 
 
 def _record_objects(record: SemanticRecord) -> set[str]:

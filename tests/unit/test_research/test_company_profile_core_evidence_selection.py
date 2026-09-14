@@ -291,6 +291,77 @@ def test_reuse_requires_matching_period():
     assert "operating_revenue" in selected.unresolved_field_ids
 
 
+def test_header_only_revenue_table_stays_unresolved():
+    revenue = _reference_records("cp-300750-revenue")[0]
+    selected = select_core_evidence(
+        report=_reference_report(),
+        pages=(
+            {
+                "page": 25,
+                "text": (
+                    "分产品\n"
+                    "项目          营业收入\n"
+                    "动力电池系统  316506369\n"
+                    "储能电池系统  100000\n"
+                    "三、主要销售客户"
+                ),
+            },
+        ),
+        accepted_records=(revenue,),
+    )
+    assert any(item.record_id == "cp-300750-revenue" for item in selected.reused_facts)
+    assert "operating_revenue" in selected.unresolved_field_ids
+
+
+def test_same_object_on_other_page_is_not_reused():
+    revenue = _reference_records("cp-300750-revenue")[0]
+    selected = select_core_evidence(
+        report=_reference_report(),
+        pages=(
+            {
+                "page": 70,
+                "text": (
+                    "分产品\n动力电池系统 营业收入 316506369 千元\n"
+                    "三、主要销售客户"
+                ),
+            },
+        ),
+        accepted_records=(revenue,),
+    )
+    assert selected.reused_facts == ()
+    assert "operating_revenue" in selected.unresolved_field_ids
+
+
+def test_interim_and_midyear_periods_do_not_match_annual_report():
+    revenue = _reference_records("cp-300750-revenue")[0]
+    interim = _record(
+        {
+            **json.loads(revenue.model_dump_json()),
+            "record_id": "cp-300750-revenue-h1",
+            "reported_period": "2025年1-6月",
+        }
+    )
+    midyear = _record(
+        {
+            **json.loads(revenue.model_dump_json()),
+            "record_id": "cp-300750-revenue-midyear",
+            "reported_period": "2025-06-30",
+        }
+    )
+    selected = select_core_evidence(
+        report=_reference_report(),
+        pages=(
+            {
+                "page": 25,
+                "text": "分产品\n动力电池系统 营业收入 316506369 千元\n三、主要销售客户",
+            },
+        ),
+        accepted_records=(interim, midyear),
+    )
+    assert selected.reused_facts == ()
+    assert "operating_revenue" in selected.unresolved_field_ids
+
+
 def test_one_revenue_fact_does_not_close_other_objects():
     revenue = _reference_records("cp-300750-revenue")[0]
     total = _record(
