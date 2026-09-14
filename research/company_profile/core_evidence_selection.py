@@ -576,15 +576,8 @@ def _overview_covers_excerpt(
     for record in records:
         if not isinstance(record, BusinessOverview):
             continue
-        accepted = [_compact_source_text(record.source_text)]
-        for item in record.evidence:
-            if isinstance(item.anchor, TextAnchor):
-                accepted.append(_compact_source_text(item.anchor.bounded_quote))
-        if any(
-            body == item or body in item
-            for item in (_strip_company_prefix(text) for text in accepted)
-            if item
-        ):
+        accepted = _strip_company_prefix(_compact_source_text(record.source_text))
+        if accepted and (body == accepted or body in accepted):
             return True
     return False
 

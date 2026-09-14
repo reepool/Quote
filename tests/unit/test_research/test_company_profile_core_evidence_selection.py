@@ -335,6 +335,53 @@ def test_subject_evidence_page_is_not_a_fact_source():
     assert "operating_revenue" in selected.unresolved_field_ids
 
 
+def test_wider_evidence_quote_does_not_close_partial_overview():
+    overview = _reference_records("cp-300750-overview")[0]
+    payload = json.loads(overview.model_dump_json())
+    payload["evidence"][0]["anchor"]["bounded_quote"] = (
+        "主要从事动力电池、储能电池的研发、生产、销售，"
+        "并通过向客户收取技术服务费取得收入"
+    )
+    wider = _record(payload)
+    selected = select_core_evidence(
+        report=_reference_report(),
+        pages=(
+            {
+                "page": 14,
+                "text": (
+                    "报告期内公司从事的主要业务\n"
+                    "公司主要从事动力电池、储能电池的研发、生产、销售，"
+                    "并通过向客户收取技术服务费取得收入。\n"
+                    "二、风险因素"
+                ),
+            },
+        ),
+        accepted_records=(wider,),
+    )
+    assert any(item.record_id == "cp-300750-overview" for item in selected.reused_facts)
+    assert "business_overview_source" in selected.unresolved_field_ids
+
+
+def test_accepted_overview_source_text_covers_matching_span():
+    overview = _reference_records("cp-300750-overview")[0]
+    selected = select_core_evidence(
+        report=_reference_report(),
+        pages=(
+            {
+                "page": 14,
+                "text": (
+                    "报告期内公司从事的主要业务\n"
+                    "公司主要从事动力电池、储能电池的研发、生产、销售。\n"
+                    "二、风险因素"
+                ),
+            },
+        ),
+        accepted_records=(overview,),
+    )
+    assert any(item.record_id == "cp-300750-overview" for item in selected.reused_facts)
+    assert "business_overview_source" not in selected.unresolved_field_ids
+
+
 def test_partial_overview_does_not_close_added_revenue_sentence():
     overview = _reference_records("cp-300750-overview")[0]
     selected = select_core_evidence(
