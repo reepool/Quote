@@ -97,3 +97,16 @@ The 2026-09-13 directory count is 19 profile archives, not 16 archives total: 16
 - No research/scripts/tests or production configuration were changed by this follow-up; existing unrelated config/LLM/PDF edits are excluded.
 - No direct references to the 29 former active paths were found in research, scripts, tests, config or documentation. All retirement record links resolve. Historical artifacts are preserved and no old delta was reapplied.
 - Document-only changes were validated with OpenSpec, requirement equality and reference checks; no new LLM run or duplicate semantic benchmark was performed.
+
+## Content-based retirement follow-up — 2026-09-14
+
+The further review identified legacy profile plans whose directory names did not contain business-profile. Accepted and resolved:
+
+- add-contract-row-identity-and-adaptive-section-budgets → openspec/changes/archive/2026-09-14-add-contract-row-identity-and-adaptive-section-budgets (completed historical work, old deltas not synchronized).
+- separate-business-activities-from-operating-facts → openspec/changes/archive/2026-09-14-separate-business-activities-from-operating-facts (completed historical work; Activity numeric compatibility is not part of the new contract).
+- Removed harden-a-share-dcf-input-governance/specs/company-business-profile-governance/spec.md from the active DCF delta tree. Its industry-default company exposure and scoring rules are superseded; proposal/design/tasks now point to SUPERSEDED-PROFILE-SCOPE.md. The DCF financial-input delta is unchanged. Deleted policy text is recoverable from Git 9995519.
+- business-profile-selective-pdf-recovery main spec is explicitly historical implementation reference. New profile task semantics use the current delivery/workflow contracts; shared PDF APIs retain their own authority.
+
+The previous 29-plan count is the prior retirement transaction, not all legacy content in the repository. This follow-up adds two archives (31 relevant Sep14 retirements in total). No claim is made that unrelated completed DCF or infrastructure plans are retired.
+
+The three named missing features (core projection, Gold precedence, commodity schema) are specific contract implementation gaps, not the full implementation backlog. All 23 tasks, including discovery, persistence/resume, query, source review and publication, remain unchecked. This documentation cleanup does not implement M1 or authorize a new provider run.
