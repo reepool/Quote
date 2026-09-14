@@ -16,6 +16,7 @@ from research.company_profile.contracts import (
 from research.company_profile.core_assessment_projection import (
     COMMON_CORE_MAPPING_VERSION,
     core_assessment_schema_manifest,
+    coverage_identity_can_close,
     coverage_reconciliation_identity,
     project_core_assessment,
 )
@@ -625,6 +626,80 @@ def test_different_page_same_table_name_is_not_the_same_identity():
     )
 
 
+def test_research_view_keeps_incomplete_table_identity_across_scopes():
+    _payload, report, _result = _reference_bundle()
+    group = _sales_table_coverage(
+        report,
+        evidence_id="group-sales",
+        page=25,
+        table_label=None,
+        section_title="集团销量",
+        status=CoverageStatus.OBSERVED,
+    )
+    parent = _sales_table_coverage(
+        report,
+        evidence_id="parent-sales",
+        page=25,
+        table_label=None,
+        section_title="母公司销量",
+        status=CoverageStatus.UNCLEAR,
+        reason_code=CoverageReasonCode.REQUIRED_RESULT_MISSING,
+    )
+    group_identity = coverage_reconciliation_identity(group)
+    parent_identity = coverage_reconciliation_identity(parent)
+    assert group_identity == parent_identity
+    assert coverage_identity_can_close(group_identity) is False
+
+    view = project_research_view(
+        company_name="宁德时代",
+        report=report,
+        task_results=(
+            _coverage_only_result("group-scope", group),
+            _coverage_only_result("parent-scope", parent),
+        ),
+    )
+    pairs = {
+        (item["status"], item["evidence"][0]["section_title"])
+        for item in view.coverage
+        if item["field_id"] == "sales_volume"
+    }
+    assert pairs == {("observed", "集团销量"), ("unclear", "母公司销量")}
+
+
+def test_research_view_merges_same_complete_source_across_scopes():
+    _payload, report, _result = _reference_bundle()
+    observed = _sales_table_coverage(
+        report,
+        evidence_id="group-observed",
+        page=25,
+        table_label="集团产品销量",
+        status=CoverageStatus.OBSERVED,
+    )
+    missing = _sales_table_coverage(
+        report,
+        evidence_id="group-missing",
+        page=25,
+        table_label="集团产品销量",
+        status=CoverageStatus.UNCLEAR,
+        reason_code=CoverageReasonCode.REQUIRED_RESULT_MISSING,
+    )
+    assert coverage_identity_can_close(coverage_reconciliation_identity(observed))
+    view = project_research_view(
+        company_name="宁德时代",
+        report=report,
+        task_results=(
+            _coverage_only_result("observed-scope", observed),
+            _coverage_only_result("missing-scope", missing),
+        ),
+    )
+    pairs = {
+        (item["status"], item["evidence"][0]["anchor"]["table_label"])
+        for item in view.coverage
+        if item["field_id"] == "sales_volume"
+    }
+    assert pairs == {("observed", "集团产品销量")}
+
+
 def test_same_page_different_tables_are_not_the_same_identity():
     _payload, report, _result = _reference_bundle()
     group = _sales_table_coverage(
@@ -727,22 +802,34 @@ def test_blocked_overview_does_not_support_any_dimension():
     assert assessment.core_complete is False
 
 
+def _coverage_only_result(request_id: str, coverage: CoverageResult):
+    return CompanyProfileTaskResult(
+        request_id=request_id,
+        records=(),
+        dispositions=(),
+        coverage=(coverage,),
+        human_review_items=(),
+        task_complete=coverage.status == CoverageStatus.OBSERVED,
+    )
+
+
 def _sales_table_coverage(
     report,
     *,
     evidence_id: str,
     page: int,
-    table_label: str,
+    table_label: str | None,
     status=CoverageStatus.OBSERVED,
     reason_code=None,
     row_label: str = "动力电池",
     column_header: str = "2025年销售量",
+    section_title: str | None = None,
 ):
     evidence = Evidence(
         evidence_id=evidence_id,
         report=report,
         page=page,
-        section_title=table_label,
+        section_title=section_title or table_label or "产销量",
         anchor=TableAnchor(
             table_label=table_label,
             row_label=row_label,

@@ -9,7 +9,10 @@ from pydantic import BaseModel, ConfigDict
 
 from .acceptance_policy import derive_confidence, usage_policy
 from .contracts import CompanyProfileTaskResult, DispositionStatus
-from .core_assessment_projection import coverage_reconciliation_identity
+from .core_assessment_projection import (
+    coverage_identity_can_close,
+    coverage_reconciliation_identity,
+)
 from .models import (
     PRODUCTION_AUTHORIZATION,
     RESEARCH_VIEW_SCHEMA_VERSION,
@@ -86,6 +89,7 @@ def project_research_view(
 
     accepted: dict[str, tuple[SemanticRecord, DispositionStatus]] = {}
     coverage_by_identity: dict[tuple[str, ...], dict[str, Any]] = {}
+    incomplete_slots = 0
     for result in task_results:
         statuses = {item.target_id: item.status for item in result.dispositions}
         for record in result.records:
@@ -113,6 +117,12 @@ def project_research_view(
                 accepted_records=local_accepted,
             )
             payload = coverage.model_dump(mode="json")
+            if not coverage_identity_can_close(identity):
+                incomplete_slots += 1
+                coverage_by_identity[
+                    (*identity, result.request_id, str(incomplete_slots))
+                ] = payload
+                continue
             existing = coverage_by_identity.get(identity)
             if existing is None or _coverage_status_rank(
                 payload["status"]
