@@ -413,9 +413,10 @@ def test_repository_llm_config_is_enabled_non_secret_and_has_one_owner():
         "scorpio:gemini-3.8-flash-high",
         "zai:glm-5.3-flash",
         "scorpio:grok-4.6",
+        "scorpio:gpt-5.6-luna",
         "deepseek:deepseek-flash",
     ]
-    assert [member.weight for member in members] == [1, 1, 1, 1]
+    assert [member.weight for member in members] == [1, 1, 1, 1, 1]
     assert config.pools["shared_semantic"].failover.enabled is True
     profiles = config.profiles
     assert profiles["semantic_extraction__scorpio_grok"].enabled is True
@@ -423,9 +424,9 @@ def test_repository_llm_config_is_enabled_non_secret_and_has_one_owner():
         profiles["corporate_action_title_classification__scorpio_grok"].enabled
         is True
     )
-    assert profiles["semantic_extraction__scorpio_luna"].enabled is False
+    assert profiles["semantic_extraction__scorpio_luna"].enabled is True
     assert (
-        profiles["corporate_action_title_classification__scorpio_luna"].enabled is False
+        profiles["corporate_action_title_classification__scorpio_luna"].enabled is True
     )
     assert profiles["semantic_extraction__scorpio_deepseek"].enabled is False
     assert profiles["semantic_extraction__scorpio_deepseek"].max_concurrency == 20
@@ -512,7 +513,7 @@ def test_repository_llm_config_is_enabled_non_secret_and_has_one_owner():
     assert "unit-test-key" not in serialized
 
 
-def test_repository_llm_config_routes_four_equal_weight_members():
+def test_repository_llm_config_routes_five_equal_weight_members():
     raw = json.loads(Path("config/13_llm.json").read_text(encoding="utf-8"))["llm"]
     pool = raw["pools"]["shared_semantic"]
 
@@ -526,9 +527,11 @@ def test_repository_llm_config_routes_four_equal_weight_members():
         "semantic_extraction__scorpio_gemini",
         "semantic_extraction__zai",
         "semantic_extraction__scorpio_grok",
+        "semantic_extraction__scorpio_luna",
         "semantic_extraction__deepseek",
     ]
     assert [member.weight for member in config.pools["shared_semantic"].members] == [
+        1,
         1,
         1,
         1,
