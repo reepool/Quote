@@ -3580,6 +3580,7 @@ def _expand_candidate_draft(
         evidence_ids,
         prepared_scope=prepared_scope,
     )
+    apply_report_default_group_scope(candidate)
     if candidate.get("object_type") == "BusinessEvent":
         _clear_unsupported_source_native_name(candidate)
     candidate["data_status"] = "research_fixture"
@@ -3595,6 +3596,7 @@ def _expand_candidate_draft(
                     measured_object=str(candidate.get("measured_object") or ""),
                     source_native=source_native,
                 )
+        apply_report_default_group_scope(candidate)
     return candidate
 
 
@@ -3931,6 +3933,7 @@ def _expand_existing_fact_refs(
             prepared_scope=prepared_scope,
             preserve_full=evidence,
         )
+    apply_report_default_group_scope(result)
     return result
 
 

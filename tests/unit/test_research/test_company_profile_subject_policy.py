@@ -195,6 +195,57 @@ def test_subject_conflict_stays_unclear_instead_of_default_group():
     assert draft.get("subject_basis") != "report_default_group_scope"
 
 
+def test_prelabeled_default_group_with_conflict_is_reverted_to_unclear():
+    draft = apply_report_default_group_scope(
+        _measurement_draft(
+            subject_scope="consolidated_group",
+            subject_basis="report_default_group_scope",
+            uncertainty=["母公司与合并主体冲突，无法归属"],
+        )
+    )
+    assert draft["subject_scope"] == "unclear"
+    assert draft.get("subject_basis") != "report_default_group_scope"
+
+
+def test_parent_local_evidence_blocks_default_group_without_uncertainty():
+    draft = apply_report_default_group_scope(
+        _measurement_draft(
+            subject_scope="consolidated_group",
+            subject_basis="report_default_group_scope",
+            source_native={"name": "母公司在建产能", "value": "40000", "unit": "吨/年"},
+            evidence=[
+                {
+                    "page": 49,
+                    "anchor": {
+                        "bounded_quote": "母公司财务报表／母公司在建产能 40,000 吨/年",
+                        "row_label": "母公司在建产能",
+                    },
+                }
+            ],
+        )
+    )
+    assert draft["subject_scope"] == "unclear"
+    assert draft.get("subject_basis") != "report_default_group_scope"
+
+
+def test_same_page_parent_data_does_not_taint_company_only_local_quote():
+    draft = apply_report_default_group_scope(
+        _measurement_draft(
+            evidence=[
+                {
+                    "page": 14,
+                    "section_title": "主要业务",
+                    "anchor": {
+                        "bounded_quote": "公司主要从事动力电池研发、生产和销售。",
+                    },
+                }
+            ],
+        )
+    )
+    assert draft["subject_scope"] == "consolidated_group"
+    assert draft["subject_basis"] == "report_default_group_scope"
+
+
 def test_third_party_actor_is_not_transferred_to_listed_company_group():
     draft = apply_report_default_group_scope(
         _activity_draft(activity_actor="军贸公司", source_actor="军贸公司")
@@ -241,6 +292,42 @@ def test_verify_accepts_legal_default_group_without_group_wording():
     )
 
 
+def test_verify_blocks_prelabeled_default_group_with_subject_conflict():
+    record = _replace_record(
+        _record("sales_volume"),
+        subject_scope=SubjectScope.CONSOLIDATED_GROUP.value,
+        subject_basis=SubjectBasis.REPORT_DEFAULT_GROUP_SCOPE.value,
+        uncertainty=("母公司与合并主体冲突，无法归属",),
+    )
+    result = CompanyProfileSemanticService().run_task(_request((record,)))
+    assert result.dispositions[0].status == DispositionStatus.BLOCKED
+    assert result.dispositions[0].reason_codes == (
+        ContractErrorCode.SUBJECT_UNSUPPORTED,
+    )
+
+
+def test_verify_blocks_default_group_when_local_evidence_is_parent_only():
+    base = _record("sales_volume")
+    evidence = base.evidence[0].model_dump(mode="json")
+    evidence["section_title"] = "母公司财务报表"
+    evidence["anchor"]["row_label"] = "母公司在建产能"
+    record = _replace_record(
+        base,
+        subject_scope=SubjectScope.CONSOLIDATED_GROUP.value,
+        subject_basis=SubjectBasis.REPORT_DEFAULT_GROUP_SCOPE.value,
+        uncertainty=(),
+        source_native=base.source_native.model_copy(
+            update={"name": "母公司在建产能"}
+        ).model_dump(mode="json"),
+        evidence=(evidence,),
+    )
+    result = CompanyProfileSemanticService().run_task(_request((record,)))
+    assert result.dispositions[0].status == DispositionStatus.BLOCKED
+    assert result.dispositions[0].reason_codes == (
+        ContractErrorCode.SUBJECT_UNSUPPORTED,
+    )
+
+
 def test_verify_does_not_transfer_third_party_actor_via_default_group():
     activity = _replace_record(
         _record("explicit_activity"),
@@ -281,6 +368,33 @@ def test_default_group_cannot_overwrite_gold_issuer_or_segment():
     annotation["semantic"]["subject_scope"] = "business_segment"
     assert _subject_match_status(record, annotation) == "failed"
     assert _annotation_match_status(record, annotation) == "failed"
+
+
+def test_illegal_default_group_with_parent_evidence_is_gold_failed():
+    record, annotation = _capacity_pair()
+    record["subject_scope"] = "consolidated_group"
+    record["subject_basis"] = "report_default_group_scope"
+    record["evidence"][0]["anchor"]["bounded_quote"] = (
+        "母公司财务报表／母公司在建产能 40,000 吨/年"
+    )
+    assert _record_matches_annotation(record, annotation) is True
+    assert _subject_match_status(record, annotation) == "failed"
+    assert _annotation_match_status(record, annotation) == "failed"
+    result = _evaluate_annotation(annotation, _observed_report(record))
+    assert result.passed is False
+    assert result.match_status == "failed"
+
+
+def test_illegal_default_group_with_subject_conflict_is_gold_failed():
+    record, annotation = _capacity_pair()
+    record["subject_scope"] = "consolidated_group"
+    record["subject_basis"] = "report_default_group_scope"
+    record["uncertainty"] = ["母公司与合并主体冲突，无法归属"]
+    assert _subject_match_status(record, annotation) == "failed"
+    assert _annotation_match_status(record, annotation) == "failed"
+    result = _evaluate_annotation(annotation, _observed_report(record))
+    assert result.passed is False
+    assert result.match_status == "failed"
 
 
 def test_legal_default_group_vs_historical_gold_subject_is_contract_conflict():

@@ -30,7 +30,9 @@ _SELF_ACTORS = frozenset({"公司", "本公司", "本集团", "集团", "上市�
 _NARROWER_SCOPES = frozenset(
     {"issuer", "named_subsidiary", "business_segment"}
 )
+_DEFAULT_GROUP_BASES = frozenset({None, "", "unclear", "report_default_group_scope"})
 _SUBJECT_CONFLICT = re.compile(r"冲突|不可区分|无法归属|conflict", re.IGNORECASE)
+_NARROWER_IN_LOCAL = re.compile(r"母公司|本公司单体|业务分部")
 
 CORE_CHAPTERS = (
     "extract_business_overview",
@@ -162,6 +164,7 @@ def apply_report_default_group_scope(candidate: dict[str, Any]) -> dict[str, Any
     """Apply the report-level group convention to an otherwise unqualified draft."""
 
     scope = _scope_value(candidate.get("subject_scope"))
+    basis = _scope_value(candidate.get("subject_basis"))
     if scope in _NARROWER_SCOPES:
         return candidate
     if (
@@ -169,16 +172,38 @@ def apply_report_default_group_scope(candidate: dict[str, Any]) -> dict[str, Any
         or candidate.get("row_class") == "consolidation_adjustment"
     ):
         return candidate
-    if scope not in (None, "", "unclear"):
+    if scope == "consolidated_group" and basis not in _DEFAULT_GROUP_BASES:
         return candidate
-    if _draft_has_subject_conflict(candidate) or _draft_is_third_party_activity(
-        candidate
-    ):
-        candidate["subject_scope"] = "unclear"
-        return candidate
-    candidate["subject_scope"] = "consolidated_group"
-    candidate["subject_basis"] = "report_default_group_scope"
+    if not report_default_group_is_legal(candidate):
+        return _clear_default_group_subject(candidate)
+    if scope in (None, "", "unclear"):
+        candidate["subject_scope"] = "consolidated_group"
+        candidate["subject_basis"] = "report_default_group_scope"
     return candidate
+
+
+def report_default_group_is_legal(
+    payload: SemanticRecord | Mapping[str, Any],
+) -> bool:
+    """Return whether default-group tags are allowed for this candidate's local evidence."""
+
+    data = _as_subject_payload(payload)
+    if _draft_is_third_party_activity(data):
+        return False
+    text = _local_subject_evidence_text(payload)
+    if _SUBJECT_CONFLICT.search(text):
+        return False
+    return _NARROWER_IN_LOCAL.search(text) is None
+
+
+def default_group_subject_is_unsupported(record: SemanticRecord) -> bool:
+    """Return True when a default-group tag is not supported by local evidence."""
+
+    if record.subject_scope != SubjectScope.CONSOLIDATED_GROUP:
+        return False
+    if record.subject_basis != SubjectBasis.REPORT_DEFAULT_GROUP_SCOPE:
+        return False
+    return not report_default_group_is_legal(record)
 
 
 def activity_promotes_third_party_to_group(record: SemanticRecord) -> bool:
@@ -210,11 +235,71 @@ def _object_type_value(value: Any) -> str | None:
     return _scope_value(value)
 
 
-def _draft_has_subject_conflict(candidate: Mapping[str, Any]) -> bool:
-    return any(
-        _SUBJECT_CONFLICT.search(str(item))
-        for item in candidate.get("uncertainty") or ()
-    )
+def _as_subject_payload(
+    payload: SemanticRecord | Mapping[str, Any],
+) -> Mapping[str, Any]:
+    if isinstance(payload, Mapping):
+        return payload
+    return {
+        "object_type": payload.object_type,
+        "activity_actor": getattr(payload, "activity_actor", None),
+        "source_actor": getattr(payload, "source_actor", None),
+    }
+
+
+def _local_subject_evidence_text(
+    payload: SemanticRecord | Mapping[str, Any],
+) -> str:
+    parts: list[str] = []
+    if not isinstance(payload, Mapping):
+        parts.extend(payload.uncertainty)
+        parts.append(str(payload.source_native.name or ""))
+        parts.append(str(payload.source_native.header or ""))
+        parts.append(str(payload.subject_name or ""))
+        if isinstance(payload, BusinessOverview):
+            parts.append(payload.source_text)
+        for evidence in payload.evidence:
+            parts.append(evidence.section_title)
+            anchor = evidence.anchor
+            for key in (
+                "bounded_quote",
+                "row_label",
+                "table_label",
+                "column_header",
+                "cell_locator",
+            ):
+                parts.append(str(getattr(anchor, key, "") or ""))
+        return " ".join(part for part in parts if part)
+
+    parts.extend(str(item) for item in payload.get("uncertainty") or () if item)
+    source = payload.get("source_native") or {}
+    if isinstance(source, Mapping):
+        parts.append(str(source.get("name") or ""))
+        parts.append(str(source.get("header") or ""))
+    parts.append(str(payload.get("source_text") or ""))
+    parts.append(str(payload.get("subject_name") or ""))
+    for evidence in payload.get("evidence") or ():
+        if not isinstance(evidence, Mapping):
+            continue
+        parts.append(str(evidence.get("section_title") or ""))
+        anchor = evidence.get("anchor") or {}
+        if isinstance(anchor, Mapping):
+            for key in (
+                "bounded_quote",
+                "row_label",
+                "table_label",
+                "column_header",
+                "cell_locator",
+            ):
+                parts.append(str(anchor.get(key) or ""))
+    return " ".join(part for part in parts if part)
+
+
+def _clear_default_group_subject(candidate: dict[str, Any]) -> dict[str, Any]:
+    candidate["subject_scope"] = "unclear"
+    if _scope_value(candidate.get("subject_basis")) == "report_default_group_scope":
+        candidate.pop("subject_basis", None)
+    return candidate
 
 
 def _draft_is_third_party_activity(candidate: Mapping[str, Any]) -> bool:
@@ -229,8 +314,7 @@ def _draft_is_third_party_activity(candidate: Mapping[str, Any]) -> bool:
 
 def _has_affirmative_group_evidence(record: SemanticRecord) -> bool:
     if record.subject_basis == SubjectBasis.REPORT_DEFAULT_GROUP_SCOPE:
-        # Explicit research convention after narrower source scopes were ruled out.
-        return True
+        return report_default_group_is_legal(record)
     if (
         record.subject_basis
         == SubjectBasis.NUMERIC_RECONCILIATION_TO_CONSOLIDATED_STATEMENT

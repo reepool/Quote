@@ -14,6 +14,7 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
 
+from .acceptance_policy import report_default_group_is_legal
 from .contracts import (
     ChecklistItem,
     PackageManifest,
@@ -391,6 +392,7 @@ def _subject_match_status(
     legal_default = (
         actual_subject == "consolidated_group"
         and actual_basis == "report_default_group_scope"
+        and report_default_group_is_legal(record)
     )
     if (
         expected_subject in {"issuer", "named_subsidiary", "business_segment"}
@@ -1565,7 +1567,10 @@ def _is_report_local_counterparty(record: dict[str, Any]) -> bool:
 def _has_affirmative_subject_basis(record: dict[str, Any]) -> bool:
     basis = record.get("subject_basis")
     if basis == "report_default_group_scope":
-        return record.get("subject_scope") == "consolidated_group"
+        return (
+            record.get("subject_scope") == "consolidated_group"
+            and report_default_group_is_legal(record)
+        )
     if basis == "numeric_reconciliation_to_consolidated_statement":
         return bool(record.get("uncertainty")) and any(
             item.get("subject_evidence_pages") for item in record.get("evidence", [])

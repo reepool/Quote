@@ -6085,6 +6085,57 @@ def test_extract_keeps_subject_conflict_and_third_party_actor_unclear():
     assert third_party.get("subject_basis") != "report_default_group_scope"
 
 
+def test_extract_rechecks_prelabeled_default_group_after_binding_parent_evidence():
+    prepared = _prepared_scope()
+    quote = "母公司财务报表／母公司在建产能 40,000 吨/年"
+    evidence = prepared.evidence_bundle[0].evidence.model_copy(
+        update={"anchor": TextAnchor(bounded_quote=quote)}
+    )
+    prepared = prepared.model_copy(
+        update={
+            "scope_id": "generic_overview",
+            "evidence_bundle": (PreparedEvidence(evidence=evidence),),
+            "page_contexts": (
+                PreparedPageContext(
+                    page=evidence.page,
+                    text=quote + " 同页另有合并营业收入。",
+                    text_hash="b" * 64,
+                    extraction_method="pypdf",
+                    quality_status="usable",
+                ),
+            ),
+        }
+    )
+    request = _extract_request(prepared)
+    candidate = _normalize_extract_response(
+        {
+            "schema_version": "company_profile_extract_response.v1",
+            "request_id": request.request_id,
+            "items": [
+                {
+                    "item_type": "candidate",
+                    "candidate": {
+                        "object_type": "Measurement",
+                        "field_id": "operating_revenue",
+                        "metric_type": "operating_revenue",
+                        "measured_object": "产品",
+                        "subject_scope": "consolidated_group",
+                        "subject_basis": "report_default_group_scope",
+                        "reported_period": "2025",
+                        "period_type": "duration",
+                        "source_native": {"name": "产品", "value": "100", "unit": "元"},
+                        "evidence_ids": [evidence.evidence_id],
+                    },
+                }
+            ],
+        },
+        request=request,
+        prepared_scope=prepared,
+    )["items"][0]["candidate"]
+    assert candidate["subject_scope"] == "unclear"
+    assert candidate.get("subject_basis") != "report_default_group_scope"
+
+
 def test_required_material_input_rejects_empty_provider_payload() -> None:
     prepared = _owner_and_context_material_scope()
     request = _material_input_extract_request(prepared)
