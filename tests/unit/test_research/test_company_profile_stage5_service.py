@@ -894,6 +894,9 @@ def _not_disclosed_counterparty(scope: PreparedRequestScope) -> CoverageResult:
     )
 
 
+_AUTO_CELL_LOCATOR = object()
+
+
 def _operating_scope_result(
     *,
     scope_id: str,
@@ -906,6 +909,9 @@ def _operating_scope_result(
     report_period: str = "2025-12-31",
     requirement_level: RequirementLevel = RequirementLevel.CONDITIONAL,
     accepted_reported_period: str | None = None,
+    page: int = 10,
+    table_label: str | None = None,
+    cell_locator: str | None | object = _AUTO_CELL_LOCATOR,
 ) -> Stage5ScopeResult:
     report = ReportIdentity(
         instrument_id="688295.SH",
@@ -918,16 +924,20 @@ def _operating_scope_result(
         anchor = TextAnchor(bounded_quote=quote)
     else:
         header = column_header or "销售量"
+        locator = cell_locator
+        if locator is _AUTO_CELL_LOCATOR:
+            locator = f"page{page}/{row_label}/{header}"
         anchor = TableAnchor(
+            table_label=table_label,
             row_label=row_label,
             column_header=header,
-            cell_locator=f"page10/{row_label}/{header}",
+            cell_locator=locator if locator else None,
         )
     evidence = Evidence(
         evidence_id=f"{scope_id}-evidence",
         report=report,
-        page=10,
-        section_title="产销量",
+        page=page,
+        section_title=table_label or "产销量",
         anchor=anchor,
     )
     scope = PreparedRequestScope(
@@ -939,7 +949,7 @@ def _operating_scope_result(
         evidence_bundle=(PreparedEvidence(evidence=evidence, field_id="sales_volume"),),
         page_contexts=(
             PreparedPageContext(
-                page=10,
+                page=page,
                 text=quote if row_label is None else f"{row_label} 销售量",
                 text_hash="a" * 64,
                 extraction_method="test",
@@ -1027,6 +1037,7 @@ def test_core_chapter_coverage_closes_from_another_scope() -> None:
         review_reason=ContractErrorCode.REQUIRED_COVERAGE_MISSING,
         row_label="动力电池",
         column_header="2025年销售量",
+        table_label="产品销量",
     )
     observed_elsewhere = _operating_scope_result(
         scope_id="operating-02",
@@ -1034,6 +1045,7 @@ def test_core_chapter_coverage_closes_from_another_scope() -> None:
         task_complete=True,
         row_label="动力电池",
         column_header="2025年销售量",
+        table_label="产品销量",
     )
 
     dimensions = _core_chapter_dimensions([missing_here, observed_elsewhere])
@@ -1153,6 +1165,90 @@ def test_core_chapter_does_not_close_different_period_or_obligation() -> None:
     assert any("operating-required" in item for item in obligation.details["failures"])
 
 
+def test_core_chapter_does_not_close_different_page_same_table_name() -> None:
+    missing_parent = _operating_scope_result(
+        scope_id="operating-p70",
+        status=CoverageStatus.UNCLEAR,
+        task_complete=False,
+        review_reason=ContractErrorCode.REQUIRED_COVERAGE_MISSING,
+        row_label="动力电池",
+        column_header="2025年销售量",
+        page=70,
+        table_label="产品销量",
+        cell_locator=None,
+    )
+    observed_group = _operating_scope_result(
+        scope_id="operating-p25",
+        status=CoverageStatus.OBSERVED,
+        task_complete=True,
+        row_label="动力电池",
+        column_header="2025年销售量",
+        page=25,
+        table_label="产品销量",
+        cell_locator=None,
+    )
+
+    dimension = _operating_chapter([missing_parent, observed_group])
+    assert dimension.passed is False
+    assert any("operating-p70" in item for item in dimension.details["failures"])
+
+
+def test_core_chapter_does_not_close_same_page_different_tables() -> None:
+    missing_parent = _operating_scope_result(
+        scope_id="operating-parent",
+        status=CoverageStatus.UNCLEAR,
+        task_complete=False,
+        review_reason=ContractErrorCode.REQUIRED_COVERAGE_MISSING,
+        row_label="动力电池",
+        column_header="2025年销售量",
+        page=25,
+        table_label="母公司产品销量",
+        cell_locator=None,
+    )
+    observed_group = _operating_scope_result(
+        scope_id="operating-group",
+        status=CoverageStatus.OBSERVED,
+        task_complete=True,
+        row_label="动力电池",
+        column_header="2025年销售量",
+        page=25,
+        table_label="集团产品销量",
+        cell_locator=None,
+    )
+
+    dimension = _operating_chapter([missing_parent, observed_group])
+    assert dimension.passed is False
+    assert any("operating-parent" in item for item in dimension.details["failures"])
+
+
+def test_core_chapter_closes_same_source_without_cell_locator() -> None:
+    missing_here = _operating_scope_result(
+        scope_id="operating-01",
+        status=CoverageStatus.UNCLEAR,
+        task_complete=False,
+        review_reason=ContractErrorCode.REQUIRED_COVERAGE_MISSING,
+        row_label="动力电池",
+        column_header="2025年销售量",
+        page=25,
+        table_label="集团产品销量",
+        cell_locator=None,
+    )
+    observed_elsewhere = _operating_scope_result(
+        scope_id="operating-02",
+        status=CoverageStatus.OBSERVED,
+        task_complete=True,
+        row_label="动力电池",
+        column_header="2025年销售量",
+        page=25,
+        table_label="集团产品销量",
+        cell_locator=None,
+    )
+
+    dimension = _operating_chapter([missing_here, observed_elsewhere])
+    assert dimension.passed is True
+    assert dimension.details["failures"] == []
+
+
 def test_core_chapter_does_not_close_same_report_comparison_columns() -> None:
     missing_prior = _operating_scope_result(
         scope_id="operating-2024-col",
@@ -1183,6 +1279,7 @@ def test_core_chapter_closes_same_source_with_or_without_accepted_record() -> No
         review_reason=ContractErrorCode.REQUIRED_COVERAGE_MISSING,
         row_label="动力电池",
         column_header="营业收入",
+        table_label="产品销量",
     )
     observed_elsewhere = _operating_scope_result(
         scope_id="operating-02",
@@ -1190,6 +1287,7 @@ def test_core_chapter_closes_same_source_with_or_without_accepted_record() -> No
         task_complete=True,
         row_label="动力电池",
         column_header="营业收入",
+        table_label="产品销量",
         accepted_reported_period="2025",
     )
 
@@ -1205,12 +1303,14 @@ def test_core_chapter_still_closes_same_object_period_metric_and_obligation() ->
         task_complete=False,
         review_reason=ContractErrorCode.REQUIRED_COVERAGE_MISSING,
         row_label="动力电池",
+        table_label="产品销量",
     )
     observed_elsewhere = _operating_scope_result(
         scope_id="operating-02",
         status=CoverageStatus.OBSERVED,
         task_complete=True,
         row_label="动力电池",
+        table_label="产品销量",
     )
 
     dimension = _operating_chapter([missing_here, observed_elsewhere])

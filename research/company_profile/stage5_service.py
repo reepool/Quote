@@ -1233,7 +1233,7 @@ def _core_chapter_dimensions(
 def _scope_coverage_identity(
     scope: Stage5ScopeResult,
     coverage: CoverageResult,
-) -> tuple[str, str, str, str, str]:
+) -> tuple[str, ...]:
     return coverage_reconciliation_identity(
         coverage,
         accepted_records=scope.task_result.accepted_records(),
@@ -1243,7 +1243,7 @@ def _scope_coverage_identity(
 def _coverage_missing_is_satisfied(
     scope: Stage5ScopeResult,
     review: HumanReviewItem,
-    satisfied: set[tuple[str, str, str, str, str]],
+    satisfied: set[tuple[str, ...]],
 ) -> bool:
     if review.reason_codes != (ContractErrorCode.REQUIRED_COVERAGE_MISSING,):
         return False

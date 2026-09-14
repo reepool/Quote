@@ -23,6 +23,7 @@ from research.company_profile.models import (
     CoverageReasonCode,
     CoverageResult,
     CoverageStatus,
+    Evidence,
     ReportIdentity,
     RequirementLevel,
     SemanticRecord,
@@ -555,6 +556,96 @@ def test_same_source_identity_does_not_depend_on_accepted_records():
     assert "动力电池系统" in with_record[3]
 
 
+def test_research_view_keeps_same_row_on_different_page_and_table():
+    _payload, report, _result = _reference_bundle()
+    group = _sales_table_coverage(
+        report,
+        evidence_id="group-sales",
+        page=25,
+        table_label="集团产品销量",
+        status=CoverageStatus.OBSERVED,
+    )
+    parent = _sales_table_coverage(
+        report,
+        evidence_id="parent-sales",
+        page=70,
+        table_label="母公司产品销量",
+        status=CoverageStatus.UNCLEAR,
+        reason_code=CoverageReasonCode.REQUIRED_RESULT_MISSING,
+    )
+    result = CompanyProfileTaskResult(
+        request_id="page-table-gaps",
+        records=(),
+        dispositions=(),
+        coverage=(group, parent),
+        human_review_items=(),
+        task_complete=False,
+    )
+    view = project_research_view(
+        company_name="宁德时代",
+        report=report,
+        task_results=(result,),
+    )
+    pairs = {
+        (
+            item["status"],
+            item["evidence"][0]["page"],
+            item["evidence"][0]["anchor"]["table_label"],
+        )
+        for item in view.coverage
+        if item["field_id"] == "sales_volume"
+    }
+    assert pairs == {
+        ("observed", 25, "集团产品销量"),
+        ("unclear", 70, "母公司产品销量"),
+    }
+    assert coverage_reconciliation_identity(group) != coverage_reconciliation_identity(
+        parent
+    )
+
+
+def test_different_page_same_table_name_is_not_the_same_identity():
+    _payload, report, _result = _reference_bundle()
+    page_25 = _sales_table_coverage(
+        report,
+        evidence_id="sales-p25",
+        page=25,
+        table_label="产品销量",
+    )
+    page_70 = _sales_table_coverage(
+        report,
+        evidence_id="sales-p70",
+        page=70,
+        table_label="产品销量",
+        status=CoverageStatus.UNCLEAR,
+        reason_code=CoverageReasonCode.REQUIRED_RESULT_MISSING,
+    )
+    assert coverage_reconciliation_identity(page_25) != coverage_reconciliation_identity(
+        page_70
+    )
+
+
+def test_same_page_different_tables_are_not_the_same_identity():
+    _payload, report, _result = _reference_bundle()
+    group = _sales_table_coverage(
+        report,
+        evidence_id="group-p25",
+        page=25,
+        table_label="集团产品销量",
+    )
+    parent = _sales_table_coverage(
+        report,
+        evidence_id="parent-p25",
+        page=25,
+        table_label="母公司产品销量",
+        status=CoverageStatus.UNCLEAR,
+        reason_code=CoverageReasonCode.REQUIRED_RESULT_MISSING,
+    )
+    assert coverage_reconciliation_identity(group) != coverage_reconciliation_identity(
+        parent
+    )
+
+
 def test_same_report_comparison_columns_are_not_the_same_identity():
     _payload, report, _result = _reference_bundle()
     prior = _coverage_row(
@@ -634,6 +725,38 @@ def test_blocked_overview_does_not_support_any_dimension():
     assert assessment.revenue_model.answered is False
     assert assessment.principal_business.missing_reason == "no_accepted_evidence"
     assert assessment.core_complete is False
+
+
+def _sales_table_coverage(
+    report,
+    *,
+    evidence_id: str,
+    page: int,
+    table_label: str,
+    status=CoverageStatus.OBSERVED,
+    reason_code=None,
+    row_label: str = "动力电池",
+    column_header: str = "2025年销售量",
+):
+    evidence = Evidence(
+        evidence_id=evidence_id,
+        report=report,
+        page=page,
+        section_title=table_label,
+        anchor=TableAnchor(
+            table_label=table_label,
+            row_label=row_label,
+            column_header=column_header,
+        ),
+    )
+    return CoverageResult(
+        field_id="sales_volume",
+        chapter_task=ChapterTask.EXTRACT_OPERATING_QUANTITIES,
+        requirement_level=RequirementLevel.CONDITIONAL,
+        status=status,
+        reason_code=reason_code,
+        evidence=(evidence,),
+    )
 
 
 def _coverage_row(

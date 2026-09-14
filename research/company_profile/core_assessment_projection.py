@@ -215,12 +215,13 @@ def coverage_reconciliation_identity(
     *,
     accepted_records: Sequence[SemanticRecord] = (),
     report_period: str | None = None,
-) -> tuple[str, str, str, str, str]:
-    """Return field/metric/period/object/obligation identity for one coverage row.
+) -> tuple[str, ...]:
+    """Return field/source identity for one coverage row.
 
-    Identity is this coverage's own physical source: field, column/cell, object,
-    and obligation. Accepted records and ``report_period`` do not rewrite the
-    key. A shared evidence ID only associates a source; it is not a match.
+    Identity is this coverage's own physical source: field, column, object,
+    obligation, report version, page, and table. Accepted records and
+    ``report_period`` do not rewrite the key. Page and table are first-class
+    and do not come from ``cell_locator``.
     """
 
     del report_period, accepted_records
@@ -230,13 +231,16 @@ def coverage_reconciliation_identity(
         _evidence_period_key(coverage.evidence),
         _evidence_object_key(coverage.evidence),
         coverage.requirement_level.value,
+        _evidence_report_key(coverage.evidence),
+        _evidence_page_key(coverage.evidence),
+        _evidence_table_key(coverage.evidence),
     )
 
 
-def coverage_identity_can_close(identity: tuple[str, str, str, str, str]) -> bool:
-    """Unknown period/column identity must not satisfy another scope's gap."""
+def coverage_identity_can_close(identity: tuple[str, ...]) -> bool:
+    """Unknown page, table, column, or object must not close another scope."""
 
-    return bool(identity[2])
+    return all(identity[index] for index in (2, 3, 5, 6, 7))
 
 
 def project_core_assessment(
@@ -458,6 +462,28 @@ def _unanswered(
         answered=False,
         missing_reason=reason,
     )
+
+
+def _evidence_report_key(evidence: Sequence[Evidence]) -> str:
+    parts = [
+        f"{item.report.report_id}|{item.report.document_version}"
+        for item in evidence
+    ]
+    return "|".join(parts) if parts else _PERIOD_UNKNOWN
+
+
+def _evidence_page_key(evidence: Sequence[Evidence]) -> str:
+    return "|".join(str(item.page) for item in evidence)
+
+
+def _evidence_table_key(evidence: Sequence[Evidence]) -> str:
+    parts: list[str] = []
+    for item in evidence:
+        label = getattr(item.anchor, "table_label", None)
+        if not label or not str(label).strip():
+            return _PERIOD_UNKNOWN
+        parts.append(str(label).strip())
+    return "|".join(parts) if parts else _PERIOD_UNKNOWN
 
 
 def _evidence_period_key(evidence: Sequence[Evidence]) -> str:
