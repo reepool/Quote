@@ -397,6 +397,70 @@ def test_illegal_default_group_with_subject_conflict_is_gold_failed():
     assert result.match_status == "failed"
 
 
+def test_illegal_default_group_fails_even_when_gold_subject_matches():
+    record, annotation = _capacity_pair()
+    record["subject_scope"] = "consolidated_group"
+    record["subject_basis"] = "report_default_group_scope"
+    record["uncertainty"] = ["主体冲突，无法归属"]
+    annotation["semantic"]["subject_scope"] = "consolidated_group"
+    annotation["semantic"]["subject_basis"] = "report_default_group_scope"
+    assert _record_matches_annotation(record, annotation) is True
+    assert _subject_match_status(record, annotation) == "failed"
+    assert _annotation_match_status(record, annotation) == "failed"
+    result = _evaluate_annotation(annotation, _observed_report(record))
+    assert result.passed is False
+    assert result.match_status == "failed"
+
+
+def test_explicit_subsidiary_revenue_is_not_default_group():
+    draft = apply_report_default_group_scope(
+        _measurement_draft(
+            source_native={"name": "子公司甲公司", "value": "100", "unit": "元"},
+            evidence=[
+                {
+                    "anchor": {"bounded_quote": "子公司甲公司营业收入100元"},
+                }
+            ],
+        )
+    )
+    assert draft["subject_scope"] == "unclear"
+    assert draft.get("subject_basis") != "report_default_group_scope"
+
+
+def test_geopolitical_conflict_wording_is_not_subject_conflict():
+    draft = apply_report_default_group_scope(
+        _measurement_draft(
+            evidence=[
+                {
+                    "anchor": {
+                        "bounded_quote": (
+                            "公司主要从事设备生产，俄乌冲突影响原材料采购"
+                        ),
+                    },
+                }
+            ],
+        )
+    )
+    assert draft["subject_scope"] == "consolidated_group"
+    assert draft["subject_basis"] == "report_default_group_scope"
+
+
+def test_mentioning_subsidiaries_does_not_block_default_group():
+    draft = apply_report_default_group_scope(
+        _measurement_draft(
+            evidence=[
+                {
+                    "anchor": {
+                        "bounded_quote": "公司主要从事设备生产，拥有多家子公司。",
+                    },
+                }
+            ],
+        )
+    )
+    assert draft["subject_scope"] == "consolidated_group"
+    assert draft["subject_basis"] == "report_default_group_scope"
+
+
 def test_legal_default_group_vs_historical_gold_subject_is_contract_conflict():
     record, annotation = _capacity_pair()
     record["subject_scope"] = "consolidated_group"

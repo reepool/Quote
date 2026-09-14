@@ -384,11 +384,17 @@ def _subject_match_status(
 ) -> Literal["exact", "accepted_with_uncertainty", "gold_contract_conflict", "failed"]:
     semantic = annotation.get("semantic", {})
     expected_subject = semantic.get("subject_scope")
-    if not expected_subject:
-        return "exact"
     actual_subject = record.get("subject_scope")
     expected_basis = semantic.get("subject_basis")
     actual_basis = record.get("subject_basis")
+    if (
+        actual_subject == "consolidated_group"
+        and actual_basis == "report_default_group_scope"
+        and not report_default_group_is_legal(record)
+    ):
+        return "failed"
+    if not expected_subject:
+        return "exact"
     legal_default = (
         actual_subject == "consolidated_group"
         and actual_basis == "report_default_group_scope"

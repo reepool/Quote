@@ -31,8 +31,23 @@ _NARROWER_SCOPES = frozenset(
     {"issuer", "named_subsidiary", "business_segment"}
 )
 _DEFAULT_GROUP_BASES = frozenset({None, "", "unclear", "report_default_group_scope"})
-_SUBJECT_CONFLICT = re.compile(r"冲突|不可区分|无法归属|conflict", re.IGNORECASE)
-_NARROWER_IN_LOCAL = re.compile(r"母公司|本公司单体|业务分部")
+_SUBJECT_ASSIGNMENT_FAILURE = re.compile(r"无法归属|不可区分")
+_SUBJECT_SCOPE_CONFLICT = re.compile(
+    r"(?:主体|口径|归属).{0,12}(?:冲突|conflict)"
+    r"|(?:冲突|conflict).{0,12}(?:主体|口径|归属)",
+    re.IGNORECASE,
+)
+_PARENT_OR_SEGMENT_SCOPE = re.compile(r"母公司|本公司单体|业务分部")
+_GROUP_INCLUSIVE_SUBSIDIARY = re.compile(
+    r"(?:本公司|本集团|公司)及(?:其)?(?:所属|全资|控股)?子公司"
+)
+_NAMED_SUBSIDIARY_PREFIX = re.compile(r"^(?:全资|控股|所属)?子公司[\u4e00-\u9fffA-Za-z0-9（）()]{1,20}公司")
+_NAMED_SUBSIDIARY_FACT = re.compile(
+    r"(?<![及和与])(?:全资|控股|所属)?子公司"
+    r"[\u4e00-\u9fffA-Za-z0-9（）()]{1,20}公司"
+    r"(?:的)?"
+    r"(?:营业收入|营业成本|营业利润|营收|收入|成本|毛利|净利润|利润总额|产能|产量|销量)"
+)
 
 CORE_CHAPTERS = (
     "extract_business_overview",
@@ -191,9 +206,9 @@ def report_default_group_is_legal(
     if _draft_is_third_party_activity(data):
         return False
     text = _local_subject_evidence_text(payload)
-    if _SUBJECT_CONFLICT.search(text):
+    if _has_subject_scope_conflict(text):
         return False
-    return _NARROWER_IN_LOCAL.search(text) is None
+    return not _has_explicit_narrower_local_scope(payload, text)
 
 
 def default_group_subject_is_unsupported(record: SemanticRecord) -> bool:
@@ -293,6 +308,65 @@ def _local_subject_evidence_text(
             ):
                 parts.append(str(anchor.get(key) or ""))
     return " ".join(part for part in parts if part)
+
+
+def _has_subject_scope_conflict(text: str) -> bool:
+    return bool(
+        _SUBJECT_ASSIGNMENT_FAILURE.search(text) or _SUBJECT_SCOPE_CONFLICT.search(text)
+    )
+
+
+def _has_explicit_narrower_local_scope(
+    payload: SemanticRecord | Mapping[str, Any],
+    text: str,
+) -> bool:
+    if _PARENT_OR_SEGMENT_SCOPE.search(text):
+        return True
+    remainder = _GROUP_INCLUSIVE_SUBSIDIARY.sub("", text)
+    if _NAMED_SUBSIDIARY_FACT.search(remainder):
+        return True
+    return any(
+        _NAMED_SUBSIDIARY_PREFIX.match(field.strip())
+        for field in _local_subject_identity_fields(payload)
+        if field and field.strip()
+    )
+
+
+def _local_subject_identity_fields(
+    payload: SemanticRecord | Mapping[str, Any],
+) -> list[str]:
+    if not isinstance(payload, Mapping):
+        fields = [
+            str(payload.source_native.name or ""),
+            str(payload.source_native.header or ""),
+            str(payload.subject_name or ""),
+        ]
+        if isinstance(payload, BusinessOverview):
+            fields.append(payload.source_text)
+        for evidence in payload.evidence:
+            fields.append(evidence.section_title)
+            anchor = evidence.anchor
+            for key in ("bounded_quote", "row_label", "table_label", "column_header"):
+                fields.append(str(getattr(anchor, key, "") or ""))
+        return fields
+
+    source = payload.get("source_native") or {}
+    fields = [
+        str(source.get("name") or "") if isinstance(source, Mapping) else "",
+        str(source.get("header") or "") if isinstance(source, Mapping) else "",
+        str(payload.get("source_text") or ""),
+        str(payload.get("subject_name") or ""),
+    ]
+    for evidence in payload.get("evidence") or ():
+        if not isinstance(evidence, Mapping):
+            continue
+        fields.append(str(evidence.get("section_title") or ""))
+        anchor = evidence.get("anchor") or {}
+        if not isinstance(anchor, Mapping):
+            continue
+        for key in ("bounded_quote", "row_label", "table_label", "column_header"):
+            fields.append(str(anchor.get(key) or ""))
+    return fields
 
 
 def _clear_default_group_subject(candidate: dict[str, Any]) -> dict[str, Any]:
