@@ -44,15 +44,15 @@ _CLAUSE_SPLIT = re.compile(r"[。；;\n]+")
 _REVENUE_INFLOW_PATTERN = re.compile(
     r"(收入来[源于自]|营业收入构成|主营业务收入|"
     r"通过.{0,30}(?:销售|提供).{0,30}(?:取得|获得|收取)|"
-    r"取得货款|向客户销售|向客户提供|"
-    r"(?:收取|取得|获得).{0,16}(?:货款|价款|服务费|手续费|佣金|保费)|"
+    r"取得货款|"
+    r"向客户(?:销售|提供).{0,24}(?:取得|获得|收取)|"
+    r"向客户收取|"
+    r"(?:公司|本公司)(?:收取|取得|获得).{0,16}(?:货款|价款|服务费|手续费|佣金|保费)|"
     r"利息净收入|分成收入|经纪业务收入|保费收入|"
     r"手续费及佣金(?:净)?收入|(?:服务费|手续费|佣金)收入)"
 )
-_REVENUE_OUTFLOW_PATTERN = re.compile(
-    r"(?:支付|缴纳).{0,20}(?:手续费|佣金|服务费|保费|费用)|"
-    r"(?:手续费|佣金|服务费|保费).{0,8}(?:支出|费用)|"
-    r"银行手续费"
+_REVENUE_BLOCK_PATTERN = re.compile(
+    r"(免费|无偿|不收取|未收取|并不收取|无需(?:支付|收取)|向(?:公司|本公司)收取)"
 )
 _PRODUCT_ACTIONS = frozenset(
     {
@@ -289,9 +289,7 @@ def _overview_states_revenue(text: str) -> bool:
         clause = clause.strip()
         if not clause:
             continue
-        if _REVENUE_OUTFLOW_PATTERN.search(clause) and not _REVENUE_INFLOW_PATTERN.search(
-            clause
-        ):
+        if _REVENUE_BLOCK_PATTERN.search(clause):
             continue
         if _REVENUE_INFLOW_PATTERN.search(clause):
             return True

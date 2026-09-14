@@ -6,6 +6,7 @@ from research.announcement_assets.models import (
     EffectiveAnnualReport,
     EffectiveDecisionState,
 )
+from research.announcement_assets.repository import _snapshot_at_not_after
 from research.company_profile.candidate_registry import (
     CANDIDATE_REGISTRY_SCHEMA_VERSION,
     PRODUCTION_SCOPE_POLICY,
@@ -255,6 +256,110 @@ def test_access_projection_shape_binds_effective_report():
     assert report.decision_state == "current"
     assert report.availability == "local_valid"
     assert report.fiscal_year == 2025
+
+
+def test_repository_date_only_as_of_uses_shanghai_end_of_day():
+    assert _snapshot_at_not_after("2025-01-01T15:00:00Z", "2025-01-01") is True
+    assert _snapshot_at_not_after("2025-01-01T18:00:00Z", "2025-01-01") is False
+    try:
+        _snapshot_at_not_after("not-a-timestamp", "2025-01-01")
+    except ValueError:
+        pass
+    else:
+        raise AssertionError("expected invalid snapshot_at to fail closed")
+
+
+def test_date_only_as_of_uses_shanghai_end_of_day():
+    after_shanghai_day = build_a_share_candidate_registry(
+        as_of="2025-01-01",
+        eligible_instruments=(
+            {
+                "instrument_id": "601398.SH",
+                "exchange": "SSE",
+                "name": "工商银行",
+            },
+        ),
+        asset_coverage={"601398.SH": {"status": "available"}},
+        effective_reports={
+            "601398.SH": _access_projection(published_at="2025-01-01T18:00:00Z")
+        },
+    )
+    assert after_shanghai_day.candidate("601398.SH").latest_effective_annual_report is None
+
+    still_on_shanghai_day = build_a_share_candidate_registry(
+        as_of="2025-01-01",
+        eligible_instruments=(
+            {
+                "instrument_id": "601398.SH",
+                "exchange": "SSE",
+                "name": "工商银行",
+            },
+        ),
+        asset_coverage={"601398.SH": {"status": "available"}},
+        effective_reports={
+            "601398.SH": _access_projection(published_at="2025-01-01T15:00:00Z")
+        },
+    )
+    assert still_on_shanghai_day.candidate("601398.SH").latest_effective_annual_report is not None
+
+
+def test_invalid_as_of_timestamp_fails_closed():
+    try:
+        build_a_share_candidate_registry(
+            as_of="2025-01-01",
+            eligible_instruments=(
+                {
+                    "instrument_id": "601398.SH",
+                    "exchange": "SSE",
+                    "name": "工商银行",
+                },
+            ),
+            effective_reports={
+                "601398.SH": _access_projection(published_at="not-a-timestamp")
+            },
+        )
+    except ValueError as exc:
+        assert "timestamp" in str(exc).lower() or "as_of" in str(exc).lower()
+    else:
+        raise AssertionError("expected invalid published_at to fail closed")
+
+
+def test_loader_rejects_snapshot_after_shanghai_date_as_of():
+    class _Universe:
+        def get_latest_full_market_universe_snapshot(self):
+            return {
+                "snapshot_id": "snap-utc-evening",
+                "policy_version": "a_share_active.v1",
+                "snapshot_at": "2025-01-01T18:00:00Z",
+                "paired_census_snapshot_id": "census-utc-evening",
+                "instrument_rows": {
+                    "items": [
+                        {
+                            "instrument_id": "601398.SH",
+                            "exchange": "SSE",
+                            "name": "工商银行",
+                        }
+                    ]
+                },
+            }
+
+        def get_latest_complete_universe_snapshot(self):
+            raise AssertionError("must not fall back after a post-cutoff snapshot")
+
+        def list_asset_coverage(self, universe_snapshot_id: str):
+            return []
+
+    try:
+        load_a_share_candidate_registry(
+            universe_repository=_Universe(),
+            industry_lookup=lambda *_args, **_kwargs: None,
+            effective_report_lookup=lambda *_args, **_kwargs: None,
+            as_of="2025-01-01",
+        )
+    except ValueError as exc:
+        assert "as of 2025-01-01" in str(exc)
+    else:
+        raise AssertionError("expected 18:00Z snapshot to be after Shanghai 2025-01-01")
 
 
 def test_future_published_report_is_rejected_at_historical_as_of():

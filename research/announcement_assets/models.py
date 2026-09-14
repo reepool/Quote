@@ -6,7 +6,7 @@ import hashlib
 import json
 from collections.abc import Mapping
 from dataclasses import dataclass, field
-from datetime import date, datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 from enum import Enum
 from typing import Any
 from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
@@ -661,6 +661,39 @@ def stable_id(prefix: str, *parts: Any) -> str:
 
 def utc_now_iso() -> str:
     return datetime.now(timezone.utc).isoformat()
+
+
+_SHANGHAI_TZ = timezone(timedelta(hours=8))
+
+
+def parse_aware_timestamp(value: str) -> datetime:
+    """Parse an ISO timestamp; naive values are Shanghai local time."""
+
+    text = str(value or "").strip()
+    if not text:
+        raise ValueError("timestamp is required")
+    try:
+        parsed = datetime.fromisoformat(text.replace("Z", "+00:00"))
+    except ValueError as exc:
+        raise ValueError(f"invalid timestamp: {text}") from exc
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=_SHANGHAI_TZ)
+    return parsed.astimezone(timezone.utc)
+
+
+def inclusive_shanghai_as_of(value: str) -> datetime:
+    """Treat a date-only as_of as the end of that Shanghai calendar day."""
+
+    text = str(value or "").strip()
+    if not text:
+        raise ValueError("as_of is required")
+    if len(text) == 10:
+        text = f"{text}T23:59:59.999999+08:00"
+    return parse_aware_timestamp(text)
+
+
+def timestamp_not_after_as_of(value: str, as_of: str) -> bool:
+    return parse_aware_timestamp(value) <= inclusive_shanghai_as_of(as_of)
 
 
 def normalize_instrument_id(value: str) -> str:

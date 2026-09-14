@@ -9,10 +9,11 @@ from __future__ import annotations
 
 import inspect
 from collections.abc import Callable, Mapping, Sequence
-from datetime import datetime, timezone
 from typing import Any, Literal, Protocol
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
+
+from research.announcement_assets.models import timestamp_not_after_as_of
 
 from .models import PRODUCTION_AUTHORIZATION
 
@@ -531,20 +532,8 @@ def _timestamp_not_after(value: str, as_of: str, *, missing_ok: bool) -> bool:
     if not text:
         return missing_ok
     if not bound:
-        return False
-    if len(bound) == 10:
-        return text.replace("Z", "+00:00")[:10] <= bound
-    try:
-        return _parse_timestamp(text) <= _parse_timestamp(bound)
-    except ValueError:
-        return text[:10] <= bound[:10]
-
-
-def _parse_timestamp(value: str) -> datetime:
-    parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
-    if parsed.tzinfo is None:
-        parsed = parsed.replace(tzinfo=timezone.utc)
-    return parsed.astimezone(timezone.utc)
+        raise ValueError("as_of is required")
+    return timestamp_not_after_as_of(text, bound)
 
 
 def _enum_value(value: Any) -> Any:

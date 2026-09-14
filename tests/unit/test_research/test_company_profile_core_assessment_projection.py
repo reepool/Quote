@@ -248,6 +248,28 @@ def test_fee_income_clause_still_answers_revenue_model():
     assert assessment.revenue_model.answered is True
 
 
+def test_free_customer_service_does_not_answer_revenue_model():
+    report, overview = _overview_record("向客户提供免费安装服务")
+    assessment = project_core_assessment(
+        report=report,
+        task_results=(_accepted_records(report, [overview]),),
+    )
+    assert assessment.revenue_model.answered is False
+    assert assessment.revenue_model.missing_reason == "overview_lacks_dimension"
+
+
+def test_third_party_commission_does_not_answer_revenue_model():
+    report, overview = _overview_record(
+        "销售代理商向公司收取佣金，公司支付相关费用"
+    )
+    assessment = project_core_assessment(
+        report=report,
+        task_results=(_accepted_records(report, [overview]),),
+    )
+    assert assessment.revenue_model.answered is False
+    assert assessment.revenue_model.missing_reason == "overview_lacks_dimension"
+
+
 def test_region_segment_does_not_answer_products_services():
     report, _overview = _overview_record("公司主要从事电池研发、生产和销售。")
     region = _segment_record(

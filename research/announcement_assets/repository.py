@@ -52,6 +52,7 @@ from .models import (
     normalize_source,
     normalize_source_url,
     stable_id,
+    timestamp_not_after_as_of,
     utc_now_iso,
 )
 from .schema import OBSOLETE_COLUMNS, OBSOLETE_TABLES, SCHEMA_SQL, SCHEMA_VERSION
@@ -5291,9 +5292,4 @@ def _snapshot_at_not_after(snapshot_at: object, as_of: str) -> bool:
     bound = str(as_of or "").strip()
     if not text or not bound:
         return False
-    if len(bound) == 10:
-        return text.replace("Z", "+00:00")[:10] <= bound
-    try:
-        return not _iso_after(text, bound)
-    except ValueError:
-        return text[:10] <= bound[:10]
+    return timestamp_not_after_as_of(text, bound)
