@@ -18,6 +18,7 @@ from .models import (
     Activity,
     ActivityAction,
     BusinessOverview,
+    CoverageResult,
     Evidence,
     Measurement,
     MetricType,
@@ -203,6 +204,36 @@ def resolved_core_field_ids(records: Sequence[SemanticRecord]) -> frozenset[str]
         record.field_id
         for record in records
         if core_record_is_reusable(record)
+    )
+
+
+def coverage_reconciliation_identity(
+    coverage: CoverageResult,
+    *,
+    report_period: str,
+    accepted_records: Sequence[SemanticRecord] = (),
+) -> tuple[str, str, str, str, str]:
+    """Return field/metric/period/object/obligation identity for one coverage row."""
+
+    matched = [
+        record
+        for record in accepted_records
+        if record.field_id == coverage.field_id
+    ]
+    if matched:
+        metrics = tuple(sorted({_record_metric_key(record) for record in matched}))
+        periods = tuple(sorted({record.reported_period for record in matched}))
+        objects = tuple(sorted({_record_object_key(record) for record in matched}))
+    else:
+        metrics = (coverage.field_id,)
+        periods = (report_period,)
+        objects = (_evidence_object_key(coverage.evidence),)
+    return (
+        coverage.field_id,
+        "|".join(metrics),
+        "|".join(periods),
+        "|".join(objects),
+        coverage.requirement_level.value,
     )
 
 
@@ -425,6 +456,40 @@ def _unanswered(
         answered=False,
         missing_reason=reason,
     )
+
+
+def _record_object_key(record: SemanticRecord) -> str:
+    if isinstance(record, Activity):
+        return record.object_name.strip()
+    if isinstance(record, Measurement):
+        return (record.segment_label or record.measured_object or "").strip()
+    if isinstance(record, Segment):
+        return record.label.strip()
+    if isinstance(record, BusinessOverview):
+        return "overview"
+    name = record.source_native.name
+    return str(name).strip() if name else ""
+
+
+def _record_metric_key(record: SemanticRecord) -> str:
+    if isinstance(record, Measurement):
+        return record.metric_type.value
+    return record.field_id
+
+
+def _evidence_object_key(evidence: Sequence[Evidence]) -> str:
+    parts: list[str] = []
+    for item in evidence:
+        row = getattr(item.anchor, "row_label", None)
+        if row:
+            parts.append(str(row).strip())
+            continue
+        quote = getattr(item.anchor, "bounded_quote", None)
+        if quote:
+            parts.append(re.sub(r"\s+", " ", str(quote).strip()))
+        else:
+            parts.append(f"page:{item.page}")
+    return "|".join(part for part in parts if part)
 
 
 def _excerpt_and_anchor(record: SemanticRecord) -> tuple[str | None, dict[str, Any] | None]:

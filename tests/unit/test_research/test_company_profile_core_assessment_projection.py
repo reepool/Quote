@@ -19,10 +19,15 @@ from research.company_profile.core_assessment_projection import (
     project_core_assessment,
 )
 from research.company_profile.models import (
+    CoverageReasonCode,
     CoverageResult,
+    CoverageStatus,
     ReportIdentity,
+    RequirementLevel,
     SemanticRecord,
+    TableAnchor,
 )
+from research.company_profile.projection import project_research_view
 
 ROOT = Path(__file__).resolve().parents[3]
 REFERENCE_INPUT = (
@@ -364,6 +369,85 @@ def test_elimination_revenue_does_not_answer_revenue_model():
     assert assessment.revenue_model.missing_reason == "no_qualifying_source"
 
 
+def test_blocked_activity_does_not_drop_accepted_overview():
+    report, result = _overview_only_result()
+    activity = _activity_record(record_id="blocked-activity")
+    mixed = CompanyProfileTaskResult(
+        request_id="overview-keeps",
+        records=result.records + (activity,),
+        dispositions=result.dispositions
+        + (
+            Disposition(
+                target_id=activity.record_id,
+                field_id=activity.field_id,
+                status=DispositionStatus.BLOCKED,
+                reason_codes=(ContractErrorCode.ACTION_NOT_ALLOWED,),
+            ),
+        ),
+        coverage=(),
+        human_review_items=(),
+        task_complete=False,
+    )
+    assessment = project_core_assessment(report=report, task_results=(mixed,))
+    view = project_research_view(
+        company_name="宁德时代",
+        report=report,
+        task_results=(mixed,),
+    )
+    assert assessment.principal_business.answered is True
+    assert "cp-300750-overview" in assessment.principal_business.supporting_record_ids
+    assert view.business_overview is not None
+    assert view.business_overview.record_id == "cp-300750-overview"
+    assert activity.record_id not in {
+        item.record_id for item in view.activities
+    }
+
+
+def test_numeric_rows_without_principal_business_are_not_a_complete_core():
+    _payload, report, _result = _reference_bundle()
+    revenue = _revenue_record(record_id="only-revenue")
+    assessment = project_core_assessment(
+        report=report,
+        task_results=(_accepted_records(report, [revenue]),),
+    )
+    assert assessment.principal_business.answered is False
+    assert assessment.revenue_model.answered is True
+    assert assessment.core_complete is False
+
+
+def test_research_view_keeps_distinct_coverage_gaps():
+    _payload, report, _result = _reference_bundle()
+    battery = _coverage_row(report, evidence_id="battery-sales", row_label="动力电池")
+    storage = _coverage_row(
+        report,
+        evidence_id="storage-sales",
+        row_label="储能电池",
+        status=CoverageStatus.UNCLEAR,
+        reason_code=CoverageReasonCode.REQUIRED_RESULT_MISSING,
+    )
+    result = CompanyProfileTaskResult(
+        request_id="coverage-gaps",
+        records=(),
+        dispositions=(),
+        coverage=(battery, storage),
+        human_review_items=(),
+        task_complete=False,
+    )
+    view = project_research_view(
+        company_name="宁德时代",
+        report=report,
+        task_results=(result,),
+    )
+    statuses = {item["status"] for item in view.coverage}
+    objects = {
+        item["evidence"][0]["anchor"]["row_label"]
+        for item in view.coverage
+        if item["field_id"] == "sales_volume"
+    }
+    assert statuses == {"observed", "unclear"}
+    assert objects == {"动力电池", "储能电池"}
+
+
 def test_blocked_overview_does_not_support_any_dimension():
     report, result = _overview_only_result()
     blocked = CompanyProfileTaskResult(
@@ -387,3 +471,31 @@ def test_blocked_overview_does_not_support_any_dimension():
     assert assessment.revenue_model.answered is False
     assert assessment.principal_business.missing_reason == "no_accepted_evidence"
     assert assessment.core_complete is False
+
+
+def _coverage_row(
+    report,
+    *,
+    evidence_id: str,
+    row_label: str,
+    status=CoverageStatus.OBSERVED,
+    reason_code=None,
+):
+    evidence = _revenue_record().evidence[0].model_copy(
+        update={
+            "evidence_id": evidence_id,
+            "anchor": TableAnchor(
+                row_label=row_label,
+                column_header="销售量",
+                cell_locator=f"page49/{row_label}/销售量",
+            ),
+        }
+    )
+    return CoverageResult(
+        field_id="sales_volume",
+        chapter_task=ChapterTask.EXTRACT_OPERATING_QUANTITIES,
+        requirement_level=RequirementLevel.CONDITIONAL,
+        status=status,
+        reason_code=reason_code,
+        evidence=(evidence,),
+    )

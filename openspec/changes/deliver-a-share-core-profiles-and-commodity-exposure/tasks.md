@@ -6,7 +6,7 @@
 - [x] 1.2 按 company_profile_common_core_mapping.v1 将三维评价映射到现有 overview/segment 任务，复用 business_overview_source、explicit_activity、segment_dimension、operating_revenue；实现逐维证据投影，保留六个 ChapterTask 闭集，不偷偷增加第七个任务或新 field_id；无增强包仍可执行基础任务。
 - [x] 1.3 自动生成通用 Evidence，复用已有完整财务/表格事实，只对未解决语义调用 LLM；不要求逐家公司人工冻结页计划。
 - [x] 1.4 核验 extract、verify、projection 和新评估均执行 report_default_group_scope；明确合法默认集团不是 unsupported promotion。先判实际事实/更窄主体错误 failed，再判仅历史Gold主体政策不一致为 gold_contract_conflict，最后应用 strictness；加入数值错误不能被冲突掩盖、母公司/分部优先、冲突 unclear、第三方 actor 不转移的回归，历史Gold和bundle不改写。
-- [ ] 1.5 实现三维骨架评价与记录级隔离，修复当前跨 scope 重复缺项/同页不同对象冲突；对象、期间、指标和义务不相同不能互补，业务总述不随一条 Activity 失败丢失。
+- [x] 1.5 实现三维骨架评价与记录级隔离，修复当前跨 scope 重复缺项/同页不同对象冲突；对象、期间、指标和义务不相同不能互补，业务总述不随一条 Activity 失败丢失。
 - [ ] 1.6 用跨制造、服务、金融等不同披露形态的实际来源/可控 fixture 证明通用任务能形成骨架；不将银行套制造业产销存，不以数百条表格值充当完整主营。
 
 ## 2. M2 持续任务和可读取交付

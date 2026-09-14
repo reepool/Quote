@@ -9,6 +9,7 @@ from pydantic import BaseModel, ConfigDict
 
 from .acceptance_policy import derive_confidence, usage_policy
 from .contracts import CompanyProfileTaskResult, DispositionStatus
+from .core_assessment_projection import coverage_reconciliation_identity
 from .models import (
     PRODUCTION_AUTHORIZATION,
     RESEARCH_VIEW_SCHEMA_VERSION,
@@ -84,7 +85,7 @@ def project_research_view(
     """
 
     accepted: dict[str, tuple[SemanticRecord, DispositionStatus]] = {}
-    coverage_by_identity: dict[tuple[str, str], dict[str, Any]] = {}
+    coverage_by_identity: dict[tuple[str, ...], dict[str, Any]] = {}
     for result in task_results:
         statuses = {item.target_id: item.status for item in result.dispositions}
         for record in result.records:
@@ -95,14 +96,23 @@ def project_research_view(
                 and record.data_status == "research_fixture"
             ):
                 accepted[record.record_id] = (record, statuses[record.record_id])
+        accepted_for_coverage = tuple(item[0] for item in accepted.values())
         for coverage in result.coverage:
             if any(item.report != report for item in coverage.evidence):
                 raise ValueError(
                     "research view cannot mix coverage from another report"
                 )
-            coverage_by_identity[(coverage.chapter_task.value, coverage.field_id)] = (
-                coverage.model_dump(mode="json")
+            identity = coverage_reconciliation_identity(
+                coverage,
+                report_period=report.report_period,
+                accepted_records=accepted_for_coverage,
             )
+            payload = coverage.model_dump(mode="json")
+            existing = coverage_by_identity.get(identity)
+            if existing is None or _coverage_status_rank(
+                payload["status"]
+            ) > _coverage_status_rank(existing["status"]):
+                coverage_by_identity[identity] = payload
 
     records = sorted(
         (item[0] for item in accepted.values()),
@@ -231,3 +241,11 @@ def _project_record(
         confidence=derive_confidence(record, disposition=disposition),
         details=details,
     )
+
+
+def _coverage_status_rank(status: str) -> int:
+    if status in {"observed", "not_disclosed", "not_applicable"}:
+        return 3
+    if status == "unclear":
+        return 1
+    return 0

@@ -29,6 +29,7 @@ from .contracts import (
 )
 from .core_assessment_projection import (
     CompanyProfileCoreAssessment,
+    coverage_reconciliation_identity,
     project_core_assessment,
 )
 from .models import (
@@ -1171,8 +1172,8 @@ def _core_chapter_dimensions(
             if item.prepared_scope.chapter_task == chapter_enum
         ]
         required = required_by_chapter.get(chapter_enum, set())
-        satisfied_fields = {
-            coverage.field_id
+        satisfied = {
+            _scope_coverage_identity(scope, coverage)
             for scope in scopes
             for coverage in scope.task_result.coverage
             if coverage.status
@@ -1182,34 +1183,20 @@ def _core_chapter_dimensions(
                 CoverageStatus.NOT_APPLICABLE,
             }
         }
-        seen = {
-            coverage.field_id
-            for scope in scopes
-            for coverage in scope.task_result.coverage
-            if coverage.field_id in required
-            and coverage.status
-            in {
-                CoverageStatus.OBSERVED,
-                CoverageStatus.NOT_DISCLOSED,
-                CoverageStatus.NOT_APPLICABLE,
-            }
-        }
+        satisfied_fields = {identity[0] for identity in satisfied}
         failures: list[str] = []
         for scope in scopes:
             unresolved_reviews = [
                 review
                 for review in scope.task_result.human_review_items
-                if not (
-                    review.reason_codes
-                    == (ContractErrorCode.REQUIRED_COVERAGE_MISSING,)
-                    and review.field_id in satisfied_fields
-                )
+                if not _coverage_missing_is_satisfied(scope, review, satisfied)
             ]
             if not scope.task_result.task_complete and (
                 not scope.task_result.human_review_items or unresolved_reviews
             ):
                 failures.append(scope.scope_id)
             for coverage in scope.task_result.coverage:
+                identity = _scope_coverage_identity(scope, coverage)
                 if (
                     coverage.field_id in required
                     and coverage.status
@@ -1218,12 +1205,12 @@ def _core_chapter_dimensions(
                         CoverageStatus.NOT_DISCLOSED,
                         CoverageStatus.NOT_APPLICABLE,
                     }
-                    and coverage.field_id not in seen
+                    and identity not in satisfied
                 ):
                     failures.append(
                         f"{scope.scope_id}:{coverage.field_id}:{coverage.status.value}"
                     )
-        missing = sorted(required - seen)
+        missing = sorted(required - satisfied_fields)
         if not scopes:
             failures.append("missing_scope")
         if missing:
@@ -1237,6 +1224,32 @@ def _core_chapter_dimensions(
             )
         )
     return tuple(dimensions)
+
+
+def _scope_coverage_identity(
+    scope: Stage5ScopeResult,
+    coverage: CoverageResult,
+) -> tuple[str, str, str, str, str]:
+    return coverage_reconciliation_identity(
+        coverage,
+        report_period=scope.prepared_scope.report.report_period,
+        accepted_records=scope.task_result.accepted_records(),
+    )
+
+
+def _coverage_missing_is_satisfied(
+    scope: Stage5ScopeResult,
+    review: HumanReviewItem,
+    satisfied: set[tuple[str, str, str, str, str]],
+) -> bool:
+    if review.reason_codes != (ContractErrorCode.REQUIRED_COVERAGE_MISSING,):
+        return False
+    for coverage in scope.task_result.coverage:
+        if coverage.field_id != review.field_id:
+            continue
+        if _scope_coverage_identity(scope, coverage) in satisfied:
+            return True
+    return False
 
 
 def _derive_report_status(

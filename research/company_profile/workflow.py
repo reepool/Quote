@@ -779,6 +779,7 @@ def _semantic_reconciliation_slot(record: SemanticRecord) -> str:
         material.update(
             action=record.action.value,
             source_verb=record.source_verb,
+            object_name=record.object_name,
         )
     elif isinstance(record, Measurement):
         material["logical_slot"] = record.logical_slot.value

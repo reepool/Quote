@@ -36,6 +36,7 @@ from research.company_profile.models import (
     Segment,
     SourceNativeValue,
     SubjectScope,
+    TableAnchor,
     TextAnchor,
 )
 from research.company_profile.projection import project_research_view
@@ -899,20 +900,32 @@ def _operating_scope_result(
     status: CoverageStatus,
     task_complete: bool,
     review_reason: ContractErrorCode | None = None,
+    quote: str = "产品 生产量 销售量 库存量",
+    row_label: str | None = None,
+    report_period: str = "2025-12-31",
+    requirement_level: RequirementLevel = RequirementLevel.CONDITIONAL,
 ) -> Stage5ScopeResult:
     report = ReportIdentity(
         instrument_id="688295.SH",
         report_id="coverage-report",
         document_version="coverage-version",
-        report_period="2025-12-31",
+        report_period=report_period,
         published_at="2026-04-01",
     )
+    if row_label is None:
+        anchor = TextAnchor(bounded_quote=quote)
+    else:
+        anchor = TableAnchor(
+            row_label=row_label,
+            column_header="销售量",
+            cell_locator=f"page10/{row_label}/销售量",
+        )
     evidence = Evidence(
         evidence_id=f"{scope_id}-evidence",
         report=report,
         page=10,
         section_title="产销量",
-        anchor=TextAnchor(bounded_quote="产品 生产量 销售量 库存量"),
+        anchor=anchor,
     )
     scope = PreparedRequestScope(
         sample_id="coverage-sample",
@@ -924,7 +937,7 @@ def _operating_scope_result(
         page_contexts=(
             PreparedPageContext(
                 page=10,
-                text=evidence.anchor.bounded_quote,
+                text=quote if row_label is None else f"{row_label} 销售量",
                 text_hash="a" * 64,
                 extraction_method="test",
                 quality_status="native",
@@ -935,7 +948,7 @@ def _operating_scope_result(
     coverage = CoverageResult(
         field_id="sales_volume",
         chapter_task=ChapterTask.EXTRACT_OPERATING_QUANTITIES,
-        requirement_level=RequirementLevel.CONDITIONAL,
+        requirement_level=requirement_level,
         status=status,
         reason_code=(
             CoverageReasonCode.SOURCE_REASON_UNSPECIFIED
@@ -1032,3 +1045,87 @@ def test_core_chapter_keeps_unexplained_incomplete_scope_blocking() -> None:
 
     assert dimension.passed is False
     assert dimension.details["failures"] == ["operating-01"]
+
+
+def _operating_chapter(scopes):
+    return next(
+        item
+        for item in _core_chapter_dimensions(scopes)
+        if item.name == "core_chapter:extract_operating_quantities"
+    )
+
+
+def test_core_chapter_does_not_close_different_object_missing_coverage() -> None:
+    missing_storage = _operating_scope_result(
+        scope_id="operating-storage",
+        status=CoverageStatus.UNCLEAR,
+        task_complete=False,
+        review_reason=ContractErrorCode.REQUIRED_COVERAGE_MISSING,
+        row_label="储能电池",
+    )
+    observed_battery = _operating_scope_result(
+        scope_id="operating-battery",
+        status=CoverageStatus.OBSERVED,
+        task_complete=True,
+        row_label="动力电池",
+    )
+
+    dimension = _operating_chapter([missing_storage, observed_battery])
+    assert dimension.passed is False
+    assert any("operating-storage" in item for item in dimension.details["failures"])
+
+
+def test_core_chapter_does_not_close_different_period_or_obligation() -> None:
+    missing_prior = _operating_scope_result(
+        scope_id="operating-2024",
+        status=CoverageStatus.UNCLEAR,
+        task_complete=False,
+        review_reason=ContractErrorCode.REQUIRED_COVERAGE_MISSING,
+        report_period="2024-12-31",
+    )
+    observed_current = _operating_scope_result(
+        scope_id="operating-2025",
+        status=CoverageStatus.OBSERVED,
+        task_complete=True,
+        report_period="2025-12-31",
+    )
+    period = _operating_chapter([missing_prior, observed_current])
+    assert period.passed is False
+    assert any("operating-2024" in item for item in period.details["failures"])
+
+    missing_required = _operating_scope_result(
+        scope_id="operating-required",
+        status=CoverageStatus.UNCLEAR,
+        task_complete=False,
+        review_reason=ContractErrorCode.REQUIRED_COVERAGE_MISSING,
+        requirement_level=RequirementLevel.REQUIRED,
+    )
+    observed_conditional = _operating_scope_result(
+        scope_id="operating-conditional",
+        status=CoverageStatus.OBSERVED,
+        task_complete=True,
+        requirement_level=RequirementLevel.CONDITIONAL,
+    )
+    obligation = _operating_chapter([missing_required, observed_conditional])
+    assert obligation.passed is False
+    assert any("operating-required" in item for item in obligation.details["failures"])
+
+
+def test_core_chapter_still_closes_same_object_period_metric_and_obligation() -> None:
+    missing_here = _operating_scope_result(
+        scope_id="operating-01",
+        status=CoverageStatus.UNCLEAR,
+        task_complete=False,
+        review_reason=ContractErrorCode.REQUIRED_COVERAGE_MISSING,
+        row_label="动力电池",
+    )
+    observed_elsewhere = _operating_scope_result(
+        scope_id="operating-02",
+        status=CoverageStatus.OBSERVED,
+        task_complete=True,
+        row_label="动力电池",
+    )
+
+    dimension = _operating_chapter([missing_here, observed_elsewhere])
+    assert dimension.passed is True
+    assert dimension.details["failures"] == []

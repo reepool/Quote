@@ -9,6 +9,7 @@ from pydantic import TypeAdapter, ValidationError
 from research import company_profile
 from research.company_profile import (
     Activity,
+    ActivityAction,
     ChapterTask,
     ChecklistItem,
     CompanyProfileSemanticService,
@@ -28,7 +29,9 @@ from research.company_profile import (
     VerifyStatus,
 )
 from research.company_profile.contracts import CandidateResponseItem, ContractErrorCode
+from research.company_profile.core_assessment_projection import project_core_assessment
 from research.company_profile.models import SemanticRecord
+from research.company_profile.projection import project_research_view
 
 ROOT = Path(__file__).resolve().parents[3]
 REFERENCE_INPUT = (
@@ -846,6 +849,74 @@ def test_unresolved_without_provider_creates_programmatic_human_review_item():
         item.reason_codes == (ContractErrorCode.PROVIDER_UNAVAILABLE,)
         for item in result.human_review_items
     )
+
+
+def test_same_page_activities_with_different_objects_are_not_conflicts():
+    battery = _record("explicit_activity")
+    storage = _replace_record(
+        battery,
+        record_id="storage-activity",
+        object_name="储能电池系统",
+    )
+    result = CompanyProfileSemanticService().run_task(_request((battery, storage)))
+    assert result.task_complete is True
+    assert {item.status for item in result.dispositions} == {
+        DispositionStatus.ACCEPTED_FOR_REVIEW
+    }
+    assert {item.object_name for item in result.accepted_records()} == {
+        battery.object_name,
+        "储能电池系统",
+    }
+
+
+def test_action_not_allowed_does_not_drop_accepted_overview():
+    overview = _record("business_overview_source")
+    activity = _record("explicit_activity")
+    request = _request((overview, activity))
+    checklist = []
+    for item in request.package_manifest.checklist:
+        if item.field_id == "explicit_activity":
+            item = item.model_copy(update={"allowed_actions": (ActivityAction.SELLS,)})
+        checklist.append(item)
+    request = request.model_copy(
+        update={
+            "allowed_actions": (ActivityAction.SELLS,),
+            "package_manifest": request.package_manifest.model_copy(
+                update={"checklist": tuple(checklist)}
+            ),
+        }
+    )
+    result = CompanyProfileSemanticService().run_task(request)
+    overview_status = next(
+        item.status
+        for item in result.dispositions
+        if item.target_id == overview.record_id
+    )
+    activity_status = next(
+        item.status
+        for item in result.dispositions
+        if item.target_id == activity.record_id
+    )
+    assert overview_status == DispositionStatus.ACCEPTED_FOR_REVIEW
+    assert activity_status == DispositionStatus.BLOCKED
+    assert any(
+        item.target_id == activity.record_id
+        and item.reason_codes == (ContractErrorCode.ACTION_NOT_ALLOWED,)
+        for item in result.dispositions
+    )
+    assessment = project_core_assessment(
+        report=request.report,
+        task_results=(result,),
+    )
+    view = project_research_view(
+        company_name="宁德时代",
+        report=request.report,
+        task_results=(result,),
+    )
+    assert assessment.principal_business.answered is True
+    assert overview.record_id in assessment.principal_business.supporting_record_ids
+    assert view.business_overview is not None
+    assert view.business_overview.record_id == overview.record_id
 
 
 def test_overview_and_activity_can_share_one_physical_occurrence():
