@@ -19,6 +19,7 @@ from research.shareholder_snapshot_policy import build_shareholder_coverage_scop
 
 from .akshare_support import load_akshare
 from .base import BaseShareholderProvider, ShareholderSnapshot
+from .cninfo_http import wrap_cninfo_proxy_fallback
 
 
 _logger = logging.getLogger("DataManager")
@@ -108,7 +109,9 @@ class CninfoShareholdersProvider(BaseShareholderProvider):
             )
             return []
 
-        session = create_requests_session(tls_config=self.tls_config)
+        session = wrap_cninfo_proxy_fallback(
+            create_requests_session(tls_config=self.tls_config)
+        )
         holder_count_rows = self._load_latest_holder_count_rows(akshare, symbols)
         control_rows = self._load_control_holder_rows(akshare, symbols)
         top_holder_bundles = self._load_top_holder_bundles(

@@ -26,6 +26,7 @@ from .base import (
     FinancialFilingPayload,
     FinancialSourceFileManifest,
 )
+from .cninfo_http import wrap_cninfo_proxy_fallback
 
 
 @dataclass(frozen=True)
@@ -801,7 +802,9 @@ class ConfiguredOfficialFinancialFilingProvider(BaseOfficialFinancialFilingProvi
             source_name=source_name,
             extra_ca_cert_path=source_config.get("extra_ca_cert_path"),
         )
-        self.session = session or create_requests_session(tls_config=self.tls_config)
+        self.session = wrap_cninfo_proxy_fallback(
+            session or create_requests_session(tls_config=self.tls_config)
+        )
 
     async def fetch_financial_filings(
         self,
