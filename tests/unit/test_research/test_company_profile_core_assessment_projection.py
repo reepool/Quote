@@ -475,6 +475,86 @@ def test_research_view_keeps_other_object_gap_regardless_of_scope_order():
     assert _coverage_pairs((storage_result, battery_result)) == expected
 
 
+def test_shared_evidence_id_does_not_merge_different_objects():
+    _payload, report, _result = _reference_bundle()
+    shared_id = "page25-revenue-table"
+    battery_record, battery_coverage = _revenue_scope(
+        report,
+        record_id="battery-revenue",
+        measured_object="动力电池",
+        status=CoverageStatus.OBSERVED,
+        evidence_id=shared_id,
+    )
+    _storage_record, storage_coverage = _revenue_scope(
+        report,
+        record_id="storage-revenue",
+        measured_object="储能电池",
+        status=CoverageStatus.UNCLEAR,
+        reason_code=CoverageReasonCode.REQUIRED_RESULT_MISSING,
+        include_record=False,
+        evidence_id=shared_id,
+    )
+    result = CompanyProfileTaskResult(
+        request_id="shared-evidence",
+        records=(battery_record,),
+        dispositions=(
+            Disposition(
+                target_id=battery_record.record_id,
+                field_id=battery_record.field_id,
+                status=DispositionStatus.ACCEPTED_FOR_REVIEW,
+            ),
+        ),
+        coverage=(battery_coverage, storage_coverage),
+        human_review_items=(),
+        task_complete=False,
+    )
+    view = project_research_view(
+        company_name="宁德时代",
+        report=report,
+        task_results=(result,),
+    )
+    pairs = {
+        (item["status"], item["evidence"][0]["anchor"]["row_label"])
+        for item in view.coverage
+        if item["field_id"] == "operating_revenue"
+    }
+    assert pairs == {("observed", "动力电池"), ("unclear", "储能电池")}
+    assert coverage_reconciliation_identity(
+        battery_coverage,
+        accepted_records=(battery_record,),
+    ) != coverage_reconciliation_identity(
+        storage_coverage,
+        accepted_records=(battery_record,),
+    )
+
+
+def test_same_source_identity_does_not_depend_on_accepted_records():
+    _payload, _report, _result = _reference_bundle()
+    record = _revenue_record()
+    observed = CoverageResult(
+        field_id=record.field_id,
+        chapter_task=record.chapter_task,
+        requirement_level=RequirementLevel.CONDITIONAL,
+        status=CoverageStatus.OBSERVED,
+        evidence=record.evidence,
+    )
+    missing = observed.model_copy(
+        update={
+            "status": CoverageStatus.UNCLEAR,
+            "reason_code": CoverageReasonCode.REQUIRED_RESULT_MISSING,
+        }
+    )
+    with_record = coverage_reconciliation_identity(
+        observed,
+        accepted_records=(record,),
+    )
+    without_record = coverage_reconciliation_identity(missing)
+    assert with_record == without_record
+    assert with_record[2] != record.reported_period
+    assert "营业收入" in with_record[2]
+    assert "动力电池系统" in with_record[3]
+
+
 def test_same_report_comparison_columns_are_not_the_same_identity():
     _payload, report, _result = _reference_bundle()
     prior = _coverage_row(
@@ -595,10 +675,11 @@ def _revenue_scope(
     status,
     reason_code=None,
     include_record: bool = True,
+    evidence_id: str | None = None,
 ):
     evidence = _revenue_record().evidence[0].model_copy(
         update={
-            "evidence_id": f"{record_id}-evidence",
+            "evidence_id": evidence_id or f"{record_id}-evidence",
             "anchor": TableAnchor(
                 row_label=measured_object,
                 column_header="营业收入",

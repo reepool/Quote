@@ -218,25 +218,17 @@ def coverage_reconciliation_identity(
 ) -> tuple[str, str, str, str, str]:
     """Return field/metric/period/object/obligation identity for one coverage row.
 
-    ``report_period`` is accepted for compatibility and is not used. Period comes
-    from bound records or this coverage's own column/cell identity.
+    Identity is this coverage's own physical source: field, column/cell, object,
+    and obligation. Accepted records and ``report_period`` do not rewrite the
+    key. A shared evidence ID only associates a source; it is not a match.
     """
 
-    del report_period
-    bound = _records_bound_to_coverage(coverage, accepted_records)
-    if bound:
-        metrics = tuple(sorted({_record_metric_key(record) for record in bound}))
-        periods = tuple(sorted({record.reported_period for record in bound}))
-        objects = tuple(sorted({_record_object_key(record) for record in bound}))
-    else:
-        metrics = (coverage.field_id,)
-        periods = (_evidence_period_key(coverage.evidence),)
-        objects = (_evidence_object_key(coverage.evidence),)
+    del report_period, accepted_records
     return (
         coverage.field_id,
-        "|".join(metrics),
-        "|".join(periods),
-        "|".join(objects),
+        coverage.field_id,
+        _evidence_period_key(coverage.evidence),
+        _evidence_object_key(coverage.evidence),
         coverage.requirement_level.value,
     )
 
@@ -466,51 +458,6 @@ def _unanswered(
         answered=False,
         missing_reason=reason,
     )
-
-
-def _record_object_key(record: SemanticRecord) -> str:
-    if isinstance(record, Activity):
-        return record.object_name.strip()
-    if isinstance(record, Measurement):
-        return (record.segment_label or record.measured_object or "").strip()
-    if isinstance(record, Segment):
-        return record.label.strip()
-    if isinstance(record, BusinessOverview):
-        return "overview"
-    name = record.source_native.name
-    return str(name).strip() if name else ""
-
-
-def _record_metric_key(record: SemanticRecord) -> str:
-    if isinstance(record, Measurement):
-        return record.metric_type.value
-    return record.field_id
-
-
-def _records_bound_to_coverage(
-    coverage: CoverageResult,
-    accepted_records: Sequence[SemanticRecord],
-) -> list[SemanticRecord]:
-    evidence_ids = {item.evidence_id for item in coverage.evidence}
-    object_key = _evidence_object_key(coverage.evidence)
-    period_key = _evidence_period_key(coverage.evidence)
-    bound: list[SemanticRecord] = []
-    for record in accepted_records:
-        if record.field_id != coverage.field_id:
-            continue
-        record_evidence_ids = {item.evidence_id for item in record.evidence}
-        if evidence_ids and record_evidence_ids & evidence_ids:
-            bound.append(record)
-            continue
-        if not object_key or _record_object_key(record) != object_key:
-            continue
-        record_period = _evidence_period_key(record.evidence)
-        if period_key and record_period == period_key:
-            bound.append(record)
-            continue
-        if period_key and record.reported_period == period_key:
-            bound.append(record)
-    return bound
 
 
 def _evidence_period_key(evidence: Sequence[Evidence]) -> str:

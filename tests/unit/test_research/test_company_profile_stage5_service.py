@@ -905,6 +905,7 @@ def _operating_scope_result(
     column_header: str | None = None,
     report_period: str = "2025-12-31",
     requirement_level: RequirementLevel = RequirementLevel.CONDITIONAL,
+    accepted_reported_period: str | None = None,
 ) -> Stage5ScopeResult:
     report = ReportIdentity(
         instrument_id="688295.SH",
@@ -967,10 +968,45 @@ def _operating_scope_result(
             reason_codes=(review_reason,),
         ),
     ) if review_reason is not None else ()
+    records = ()
+    dispositions = ()
+    if accepted_reported_period is not None:
+        label = row_label or "销售量"
+        header = column_header or "销售量"
+        record = Measurement(
+            record_id=f"{scope_id}-record",
+            field_id="sales_volume",
+            chapter_task=ChapterTask.EXTRACT_OPERATING_QUANTITIES,
+            report=report,
+            subject_scope=SubjectScope.ISSUER,
+            reported_period=accepted_reported_period,
+            period_type=PeriodType.DURATION,
+            assertion_class=AssertionClass.REPORTED_FACT,
+            evidence=(evidence,),
+            source_native=SourceNativeValue(
+                name=label,
+                value="1",
+                unit="GWh",
+                header=header,
+            ),
+            metric_type=MetricType.SALES_VOLUME,
+            logical_slot=LogicalSlot.SALES_VOLUME,
+            measured_object=label,
+            segment_dimension="产品",
+            segment_label=label,
+        )
+        records = (record,)
+        dispositions = (
+            Disposition(
+                target_id=record.record_id,
+                field_id=record.field_id,
+                status=DispositionStatus.ACCEPTED_FOR_REVIEW,
+            ),
+        )
     result = CompanyProfileTaskResult(
         request_id=f"{scope_id}-request",
-        records=(),
-        dispositions=(),
+        records=records,
+        dispositions=dispositions,
         coverage=(coverage,),
         human_review_items=reviews,
         task_complete=task_complete,
@@ -1137,6 +1173,29 @@ def test_core_chapter_does_not_close_same_report_comparison_columns() -> None:
     dimension = _operating_chapter([missing_prior, observed_current])
     assert dimension.passed is False
     assert any("operating-2024-col" in item for item in dimension.details["failures"])
+
+
+def test_core_chapter_closes_same_source_with_or_without_accepted_record() -> None:
+    missing_here = _operating_scope_result(
+        scope_id="operating-01",
+        status=CoverageStatus.UNCLEAR,
+        task_complete=False,
+        review_reason=ContractErrorCode.REQUIRED_COVERAGE_MISSING,
+        row_label="动力电池",
+        column_header="营业收入",
+    )
+    observed_elsewhere = _operating_scope_result(
+        scope_id="operating-02",
+        status=CoverageStatus.OBSERVED,
+        task_complete=True,
+        row_label="动力电池",
+        column_header="营业收入",
+        accepted_reported_period="2025",
+    )
+
+    dimension = _operating_chapter([missing_here, observed_elsewhere])
+    assert dimension.passed is True
+    assert dimension.details["failures"] == []
 
 
 def test_core_chapter_still_closes_same_object_period_metric_and_obligation() -> None:
