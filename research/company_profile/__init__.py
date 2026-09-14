@@ -4,6 +4,13 @@ Production authorization remains ``not_authorized``.  Stage five only adds bound
 local evidence preparation; it still exposes no production database writer.
 """
 
+from .candidate_registry import (
+    AShareCandidateRegistry,
+    AShareProfileCandidate,
+    build_a_share_candidate_registry,
+    candidate_registry_schema_manifest,
+    load_a_share_candidate_registry,
+)
 from .contracts import (
     ChecklistItem,
     CompanyProfileTaskResult,
@@ -23,6 +30,12 @@ from .contracts import (
     VerifyStatus,
     contract_example_manifest,
     contract_schema_manifest,
+)
+from .core_assessment_projection import (
+    COMMON_CORE_MAPPING_VERSION,
+    CompanyProfileCoreAssessment,
+    core_assessment_schema_manifest,
+    project_core_assessment,
 )
 from .models import (
     PRODUCTION_AUTHORIZATION,
@@ -117,9 +130,12 @@ from .workflow import (
 
 __all__ = [
     "APPROVED_STAGE5_SAMPLES",
+    "COMMON_CORE_MAPPING_VERSION",
     "PRODUCTION_AUTHORIZATION",
     "STAGE55_ADJUDICATION_SCHEMA",
     "STAGE55_BASELINE_RUN_ID",
+    "AShareCandidateRegistry",
+    "AShareProfileCandidate",
     "Activity",
     "ActivityAction",
     "AssertionClass",
@@ -130,6 +146,7 @@ __all__ = [
     "ChapterTask",
     "ChecklistItem",
     "CommonGatewaySemanticProvider",
+    "CompanyProfileCoreAssessment",
     "CompanyProfileResearchView",
     "CompanyProfileSemanticService",
     "CompanyProfileTaskResult",
@@ -205,11 +222,16 @@ __all__ = [
     "VerifyRequest",
     "VerifyResponse",
     "VerifyStatus",
+    "build_a_share_candidate_registry",
+    "candidate_registry_schema_manifest",
     "contract_example_manifest",
     "contract_schema_manifest",
+    "core_assessment_schema_manifest",
+    "load_a_share_candidate_registry",
     "load_stage5_evidence_plan",
     "load_stage5_sample_manifest",
     "load_stage55_adjudication_ledger",
+    "project_core_assessment",
     "project_research_view",
     "semantic_record_json_schema",
     "stage5_evidence_plan_hash",

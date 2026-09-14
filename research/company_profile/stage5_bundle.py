@@ -15,6 +15,7 @@ from typing import Any, Literal
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from .contracts import CompanyProfileTaskResult
+from .core_assessment_projection import CompanyProfileCoreAssessment
 from .models import PRODUCTION_AUTHORIZATION, ReportIdentity
 from .projection import CompanyProfileResearchView
 from .stage5 import APPROVED_STAGE5_SAMPLES, KNOWN_STAGE5_SAMPLES, PreparedRequestScope
@@ -274,6 +275,7 @@ class Stage5ReportBundle(_StrictModel):
     scope_results: tuple[Stage5ScopeResult, ...] = Field(min_length=1)
     review_decisions: tuple[Stage5ReviewDecision, ...] = ()
     research_view: CompanyProfileResearchView
+    core_assessment: CompanyProfileCoreAssessment | None = None
     report_status: Stage5ReportStatus
     benchmark: Stage5BenchmarkResult
     created_at: str = Field(min_length=1)

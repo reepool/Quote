@@ -27,6 +27,10 @@ from .contracts import (
     SemanticProvider,
     SemanticTaskRequest,
 )
+from .core_assessment_projection import (
+    CompanyProfileCoreAssessment,
+    project_core_assessment,
+)
 from .models import (
     Activity,
     ActivityAction,
@@ -235,6 +239,7 @@ class Stage5ReportExecutionResult(_StrictModel):
     report: ReportIdentity
     scope_results: tuple[Stage5ScopeResult, ...]
     research_view: CompanyProfileResearchView
+    core_assessment: CompanyProfileCoreAssessment | None = None
     report_status: Stage5ReportStatus
     benchmark: Stage5BenchmarkResult
     created_at: str
@@ -418,6 +423,7 @@ class ManufacturingMaterialsProfileSliceService:
             scope_results=result.scope_results,
             review_decisions=review_decisions,
             research_view=result.research_view,
+            core_assessment=result.core_assessment,
             report_status=result.report_status,
             benchmark=result.benchmark,
             created_at=result.created_at,
@@ -473,6 +479,10 @@ class ManufacturingMaterialsProfileSliceService:
             report=asset.report,
             task_results=task_results,
         )
+        core_assessment = project_core_assessment(
+            report=asset.report,
+            task_results=task_results,
+        )
         benchmark = _contract_benchmark(task_results, scope_results)
         report_status = _derive_report_status(
             task_results=task_results,
@@ -486,6 +496,7 @@ class ManufacturingMaterialsProfileSliceService:
             report=asset.report,
             scope_results=tuple(scope_results),
             research_view=view,
+            core_assessment=core_assessment,
             report_status=report_status,
             benchmark=benchmark,
             created_at=_utc_now(),
@@ -991,6 +1002,10 @@ def _apply_activity_review_decisions(
         report=report.report,
         task_results=task_results,
     )
+    core_assessment = project_core_assessment(
+        report=report.report,
+        task_results=task_results,
+    )
     benchmark = _contract_benchmark(task_results, updated_scopes)
     status = _derive_report_status(
         task_results=task_results,
@@ -1002,6 +1017,7 @@ def _apply_activity_review_decisions(
             "scope_results": tuple(updated_scopes),
             "review_decisions": tuple(recorded_decisions),
             "research_view": view,
+            "core_assessment": core_assessment,
             "report_status": status,
             "benchmark": benchmark,
             "created_at": _utc_now(),
