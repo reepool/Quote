@@ -520,7 +520,7 @@ def _field_covered_for_span(
     if not covering:
         return False
     if field_id == "business_overview_source":
-        return True
+        return _overview_covers_excerpt(covering, span)
     demanded = _demanded_objects(field_id, span.excerpt)
     if not demanded:
         return False
@@ -563,8 +563,46 @@ def _source_range_matches(record: SemanticRecord, span: CoreEvidenceSpan) -> boo
     for item in record.evidence:
         record_pages.add(item.page)
         record_pages.update(item.continuation_pages)
-        record_pages.update(item.subject_evidence_pages)
     return bool(record_pages & span_pages)
+
+
+def _overview_covers_excerpt(
+    records: Sequence[SemanticRecord],
+    span: CoreEvidenceSpan,
+) -> bool:
+    body = _compact_overview_body(span.excerpt, span.section_title)
+    if not body:
+        return False
+    for record in records:
+        if not isinstance(record, BusinessOverview):
+            continue
+        accepted = [_compact_source_text(record.source_text)]
+        for item in record.evidence:
+            if isinstance(item.anchor, TextAnchor):
+                accepted.append(_compact_source_text(item.anchor.bounded_quote))
+        if any(
+            body == item or body in item
+            for item in (_strip_company_prefix(text) for text in accepted)
+            if item
+        ):
+            return True
+    return False
+
+
+def _compact_overview_body(excerpt: str, heading: str) -> str:
+    compact = _compact_source_text(excerpt)
+    heading_compact = _compact_source_text(heading)
+    if heading_compact and compact.startswith(heading_compact):
+        compact = compact[len(heading_compact) :]
+    return _strip_company_prefix(compact)
+
+
+def _compact_source_text(value: str) -> str:
+    return re.sub(r"[\s。；;，,：:]+$", "", re.sub(r"\s+", "", value))
+
+
+def _strip_company_prefix(value: str) -> str:
+    return re.sub(r"^(?:公司|本公司)", "", value)
 
 
 def _record_objects(record: SemanticRecord) -> set[str]:

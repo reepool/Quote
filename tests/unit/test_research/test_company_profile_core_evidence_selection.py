@@ -139,7 +139,7 @@ def test_reuses_accepted_structured_facts_and_skips_those_fields():
                 "page": 14,
                 "text": (
                     "报告期内公司从事的主要业务\n"
-                    "公司主要从事动力电池系统的研发、生产和销售。\n"
+                    "公司主要从事动力电池、储能电池的研发、生产、销售。\n"
                     "二、风险因素"
                 ),
             },
@@ -153,18 +153,18 @@ def test_reuses_accepted_structured_facts_and_skips_those_fields():
     reused_fields = {item.field_id for item in selected.reused_facts}
     assert reused_fields >= {
         "business_overview_source",
-        "explicit_activity",
         "segment_dimension",
         "operating_revenue",
     }
     assert {item.record_id for item in selected.reused_facts} >= {
         "cp-300750-overview",
-        "cp-300750-produces",
         "cp-300750-segment",
         "cp-300750-revenue",
     }
     assert all(item.requires_llm is False for item in selected.reused_facts)
-    assert selected.unresolved_field_ids == ()
+    assert "business_overview_source" not in selected.unresolved_field_ids
+    assert "segment_dimension" not in selected.unresolved_field_ids
+    assert "operating_revenue" not in selected.unresolved_field_ids
 
 
 def test_unreadable_continuation_is_an_explicit_gap():
@@ -311,6 +311,49 @@ def test_header_only_revenue_table_stays_unresolved():
     )
     assert any(item.record_id == "cp-300750-revenue" for item in selected.reused_facts)
     assert "operating_revenue" in selected.unresolved_field_ids
+
+
+def test_subject_evidence_page_is_not_a_fact_source():
+    revenue = _reference_records("cp-300750-revenue")[0]
+    payload = json.loads(revenue.model_dump_json())
+    payload["evidence"][0]["subject_evidence_pages"] = [70]
+    cited = _record(payload)
+    selected = select_core_evidence(
+        report=_reference_report(),
+        pages=(
+            {
+                "page": 70,
+                "text": (
+                    "分产品\n动力电池系统 营业收入 316506369 千元\n"
+                    "三、主要销售客户"
+                ),
+            },
+        ),
+        accepted_records=(cited,),
+    )
+    assert selected.reused_facts == ()
+    assert "operating_revenue" in selected.unresolved_field_ids
+
+
+def test_partial_overview_does_not_close_added_revenue_sentence():
+    overview = _reference_records("cp-300750-overview")[0]
+    selected = select_core_evidence(
+        report=_reference_report(),
+        pages=(
+            {
+                "page": 14,
+                "text": (
+                    "报告期内公司从事的主要业务\n"
+                    "公司主要从事动力电池、储能电池的研发、生产、销售。"
+                    "公司通过向客户收取技术服务费。\n"
+                    "二、风险因素"
+                ),
+            },
+        ),
+        accepted_records=(overview,),
+    )
+    assert any(item.record_id == "cp-300750-overview" for item in selected.reused_facts)
+    assert "business_overview_source" in selected.unresolved_field_ids
 
 
 def test_same_object_on_other_page_is_not_reused():
