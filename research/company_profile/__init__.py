@@ -46,6 +46,13 @@ from .core_evidence_selection import (
     core_evidence_schema_manifest,
     select_core_evidence,
 )
+from .core_skeleton import (
+    COMMON_CORE_CHAPTERS,
+    ActivatedChapter,
+    CoreSkeletonResult,
+    form_core_skeleton,
+    select_activated_chapters,
+)
 from .models import (
     PRODUCTION_AUTHORIZATION,
     Activity,
@@ -139,6 +146,7 @@ from .workflow import (
 
 __all__ = [
     "APPROVED_STAGE5_SAMPLES",
+    "COMMON_CORE_CHAPTERS",
     "COMMON_CORE_MAPPING_VERSION",
     "CORE_EVIDENCE_SCHEMA_VERSION",
     "PRODUCTION_AUTHORIZATION",
@@ -146,6 +154,7 @@ __all__ = [
     "STAGE55_BASELINE_RUN_ID",
     "AShareCandidateRegistry",
     "AShareProfileCandidate",
+    "ActivatedChapter",
     "Activity",
     "ActivityAction",
     "AssertionClass",
@@ -162,6 +171,7 @@ __all__ = [
     "CompanyProfileTaskResult",
     "ComparisonBasis",
     "CoreEvidenceSelection",
+    "CoreSkeletonResult",
     "CoverageReasonCode",
     "CoverageResult",
     "CoverageStatus",
@@ -240,6 +250,7 @@ __all__ = [
     "contract_schema_manifest",
     "core_assessment_schema_manifest",
     "core_evidence_schema_manifest",
+    "form_core_skeleton",
     "load_a_share_candidate_registry",
     "load_stage5_evidence_plan",
     "load_stage5_sample_manifest",
@@ -248,6 +259,7 @@ __all__ = [
     "project_core_assessment",
     "project_research_view",
     "resolved_core_field_ids",
+    "select_activated_chapters",
     "select_core_evidence",
     "semantic_record_json_schema",
     "stage5_evidence_plan_hash",
