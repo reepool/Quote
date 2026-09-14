@@ -270,6 +270,45 @@ def test_third_party_commission_does_not_answer_revenue_model():
     assert assessment.revenue_model.missing_reason == "overview_lacks_dimension"
 
 
+def test_free_add_on_does_not_veto_sales_proceeds():
+    report, overview = _overview_record(
+        "通过向客户销售设备取得货款，并提供免费安装服务"
+    )
+    assessment = project_core_assessment(
+        report=report,
+        task_results=(_accepted_records(report, [overview]),),
+    )
+    assert assessment.revenue_model.answered is True
+
+
+def test_negated_receipt_alone_does_not_answer_revenue_model():
+    report, overview = _overview_record("报告期内尚未取得货款")
+    assessment = project_core_assessment(
+        report=report,
+        task_results=(_accepted_records(report, [overview]),),
+    )
+    assert assessment.revenue_model.answered is False
+    assert assessment.revenue_model.missing_reason == "overview_lacks_dimension"
+
+
+def test_unpaid_receivable_does_not_drop_established_revenue_model():
+    report, sales = _overview_record(
+        "通过向客户销售设备取得货款，报告期内尚未回款",
+        record_id="cp-review-sales",
+    )
+    _report, unpaid = _overview_record(
+        "报告期内尚未取得货款",
+        record_id="cp-review-unpaid",
+    )
+    assessment = project_core_assessment(
+        report=report,
+        task_results=(_accepted_records(report, [sales, unpaid]),),
+    )
+    assert assessment.revenue_model.answered is True
+    assert sales.record_id in assessment.revenue_model.supporting_record_ids
+    assert unpaid.record_id not in assessment.revenue_model.supporting_record_ids
+
+
 def test_region_segment_does_not_answer_products_services():
     report, _overview = _overview_record("公司主要从事电池研发、生产和销售。")
     region = _segment_record(

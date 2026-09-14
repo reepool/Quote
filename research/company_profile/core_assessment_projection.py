@@ -40,7 +40,7 @@ _PRODUCT_PATTERN = re.compile(
     r"(主要产品|主要服务|业务线|产品包括|服务包括|"
     r"从事.{1,40}(?:的研发|的生产|的制造|的加工|的销售|服务))"
 )
-_CLAUSE_SPLIT = re.compile(r"[。；;\n]+")
+_STATEMENT_SPLIT = re.compile(r"[。；;，,\n]+")
 _REVENUE_INFLOW_PATTERN = re.compile(
     r"(收入来[源于自]|营业收入构成|主营业务收入|"
     r"通过.{0,30}(?:销售|提供).{0,30}(?:取得|获得|收取)|"
@@ -54,6 +54,7 @@ _REVENUE_INFLOW_PATTERN = re.compile(
 _REVENUE_BLOCK_PATTERN = re.compile(
     r"(免费|无偿|不收取|未收取|并不收取|无需(?:支付|收取)|向(?:公司|本公司)收取)"
 )
+_REVENUE_NEGATION_PREFIX = re.compile(r"(尚未|还未|仍未|并未|没有|未|不)$")
 _PRODUCT_ACTIONS = frozenset(
     {
         ActivityAction.DEVELOPS,
@@ -285,14 +286,18 @@ def _assess_revenue_model(
 
 
 def _overview_states_revenue(text: str) -> bool:
-    for clause in _CLAUSE_SPLIT.split(text):
-        clause = clause.strip()
-        if not clause:
+    for statement in _STATEMENT_SPLIT.split(text):
+        statement = statement.strip()
+        if not statement:
             continue
-        if _REVENUE_BLOCK_PATTERN.search(clause):
+        if _REVENUE_BLOCK_PATTERN.search(statement):
             continue
-        if _REVENUE_INFLOW_PATTERN.search(clause):
-            return True
+        match = _REVENUE_INFLOW_PATTERN.search(statement)
+        if match is None:
+            continue
+        if _REVENUE_NEGATION_PREFIX.search(statement[: match.start()]):
+            continue
+        return True
     return False
 
 
