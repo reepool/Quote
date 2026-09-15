@@ -341,7 +341,6 @@ class CompanyProfileStageRuntime:
         results: list[CompanyProfileTaskResult] = []
         state.provider_calls.clear()
         state.reused_scope_ids.clear()
-        state.predecessor_lineage.clear()
         for chapter in COMMON_CORE_CHAPTERS:
             activation = next(
                 item for item in state.chapters if item.chapter_task == chapter

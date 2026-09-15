@@ -1251,3 +1251,127 @@ def test_gateway_traces_supply_model_attempts_and_tokens(tmp_path):
     assert published["execution"]["token_budget"]["tokens_used"] == 42
     assert provider.applied_token_budgets
     assert "unspecified" not in {item["model"] for item in attempts}
+
+
+def test_successor_resume_keeps_predecessor_lineage(tmp_path):
+    writer = CompanyProfileResearchWriter(tmp_path)
+    first_report = _report(report_id="asset-lineage-resume-v1", document_version="ver-1")
+    asyncio.run(
+        _drive(
+            CompanyProfileStageRuntime(
+                writer=writer,
+                provider=_RequestBoundOverviewProvider(),
+            ),
+            _item(
+                first_report,
+                (_overview_page(SERVICE_OVERVIEW), _segment_page(SEGMENT_LINE)),
+                work_id="work-lineage-v1",
+            ),
+        )
+    )
+
+    successor_report = _report(
+        report_id="asset-lineage-resume-v2",
+        document_version="ver-2",
+    )
+    item = _item(
+        successor_report,
+        (_overview_page(SERVICE_OVERVIEW), _segment_page(CHANGED_SEGMENT_LINE)),
+        work_id="work-lineage-v2",
+    )
+    first = _RequestBoundOverviewProvider()
+    with pytest.raises(RuntimeError, match="scope stop"):
+        asyncio.run(
+            CompanyProfileStageRuntime(
+                writer=writer,
+                provider=first,
+                stop_after_chapter=ChapterTask.EXTRACT_SEGMENT_FINANCIALS,
+            )("semantic", item)
+        )
+    stopped = json.loads(
+        (writer.output_root / "checkpoints" / "work-lineage-v2.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    assert stopped["execution"]["predecessor_lineage"]
+    assert stopped["execution"]["predecessor_lineage"][0][
+        "predecessor_request_id"
+    ].startswith("work-lineage-v1:")
+
+    second = _RequestBoundOverviewProvider()
+    published = asyncio.run(
+        _drive(CompanyProfileStageRuntime(writer=writer, provider=second), item)
+    )
+
+    assert ChapterTask.EXTRACT_BUSINESS_OVERVIEW not in first.extract_chapters
+    assert first.extract_chapters == [ChapterTask.EXTRACT_SEGMENT_FINANCIALS]
+    assert second.extract_chapters == []
+    assert published["execution"]["predecessor_lineage"]
+    assert published["predecessor_lineage"]
+    assert published["predecessor_lineage"][0]["predecessor_request_id"].startswith(
+        "work-lineage-v1:"
+    )
+
+
+def test_failover_failed_route_attempt_is_not_marked_success(tmp_path):
+    class _FailoverTraceProvider(_RequestBoundOverviewProvider):
+        def __init__(self) -> None:
+            super().__init__()
+            self._traces: list[Stage5ProviderCallTrace] = []
+
+        @property
+        def traces(self) -> tuple[Stage5ProviderCallTrace, ...]:
+            return tuple(self._traces)
+
+        def extract(self, request):
+            result = super().extract(request)
+            self._traces.append(
+                Stage5ProviderCallTrace(
+                    call_type="extract",
+                    semantic_request_id=request.request_id,
+                    status="success",
+                    profile="semantic_extraction",
+                    model="good-model",
+                    selected_profile="route-good",
+                    attempts=(
+                        {
+                            "model": "bad-model",
+                            "selected_profile": "route-bad",
+                            "attempt_sequence": 1,
+                            "error_code": "transient_transport_error",
+                        },
+                        {
+                            "model": "good-model",
+                            "selected_profile": "route-good",
+                            "attempt_sequence": 2,
+                            "status": "success",
+                        },
+                    ),
+                    input_tokens=11,
+                    output_tokens=22,
+                    total_tokens=33,
+                )
+            )
+            return result
+
+    report = _report(report_id="asset-runtime-failover-attempts")
+    item = _item(report, (_overview_page(SERVICE_OVERVIEW),), work_id="work-failover")
+    published = asyncio.run(
+        _drive(
+            CompanyProfileStageRuntime(
+                writer=CompanyProfileResearchWriter(tmp_path),
+                provider=_FailoverTraceProvider(),
+            ),
+            item,
+        )
+    )
+    extract_attempts = [
+        item
+        for item in published["execution"]["model_attempts"]
+        if item["call_type"] == "extract"
+    ]
+
+    assert [(item["model"], item["status"]) for item in extract_attempts] == [
+        ("bad-model", "transport_failed"),
+        ("good-model", "success"),
+    ]

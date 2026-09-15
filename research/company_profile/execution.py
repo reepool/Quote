@@ -31,6 +31,14 @@ DEFAULT_VERIFY_BASE_TOKENS = 2_000
 TRANSPORT_RETRY_LIMIT = 2
 SMALL_SCOPE_SIZE_THRESHOLD = 4
 _TRANSPORT_CODES = frozenset({ContractErrorCode.DEADLINE_EXCEEDED})
+_TRANSPORT_ATTEMPT_ERROR_CODES = frozenset(
+    {
+        ContractErrorCode.DEADLINE_EXCEEDED.value,
+        "transient_transport_error",
+        "rate_limit_error",
+        "cancelled",
+    }
+)
 _NON_SEMANTIC_REVIEW_CODES = frozenset(
     {
         ContractErrorCode.DEADLINE_EXCEEDED,
@@ -409,19 +417,25 @@ def _attempt_status(
     trace: Any,
     default_status: str | None,
 ) -> str:
-    raw = str(attempt.get("status") or attempt.get("error_code") or "")
-    if raw == "success":
-        return "success"
-    if raw in {"transport_failed", ContractErrorCode.DEADLINE_EXCEEDED.value}:
+    error_code = str(attempt.get("error_code") or "").strip()
+    status = str(attempt.get("status") or "").strip()
+    if error_code in _TRANSPORT_ATTEMPT_ERROR_CODES or status in {
+        "transport_failed",
+        ContractErrorCode.DEADLINE_EXCEEDED.value,
+    }:
         return "transport_failed"
-    if raw in {"semantic_failed", ContractErrorCode.CANDIDATE_SCHEMA_INVALID.value}:
+    if error_code:
+        return "semantic_failed"
+    if status == "success":
+        return "success"
+    if status == "semantic_failed":
         return "semantic_failed"
     trace_status = getattr(trace, "status", None)
     trace_error = getattr(trace, "error_code", None)
     if isinstance(trace, Mapping):
         trace_status = trace.get("status")
         trace_error = trace.get("error_code")
-    if trace_error == ContractErrorCode.DEADLINE_EXCEEDED.value:
+    if trace_error in _TRANSPORT_ATTEMPT_ERROR_CODES:
         return "transport_failed"
     if trace_status == "failed":
         return "semantic_failed"
