@@ -9,7 +9,9 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import re
+import tempfile
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -20,6 +22,7 @@ from pydantic import BaseModel, ConfigDict, Field, TypeAdapter
 from .contracts import (
     ChecklistItem,
     CompanyProfileTaskResult,
+    ContractErrorCode,
     PackageManifest,
     PreparedEvidence,
     SemanticProvider,
@@ -139,6 +142,7 @@ class _WorkState:
     completed_scopes: dict[str, CompanyProfileTaskResult] = field(default_factory=dict)
     scope_digests: dict[str, str] = field(default_factory=dict)
     reused_scope_ids: list[str] = field(default_factory=list)
+    predecessor_lineage: list[dict[str, Any]] = field(default_factory=list)
 
 
 class CompanyProfileResearchWriter:
@@ -284,6 +288,7 @@ class CompanyProfileStageRuntime:
         results: list[CompanyProfileTaskResult] = []
         state.provider_calls.clear()
         state.reused_scope_ids.clear()
+        state.predecessor_lineage.clear()
         for chapter in COMMON_CORE_CHAPTERS:
             activation = next(
                 item for item in state.chapters if item.chapter_task == chapter
@@ -310,30 +315,54 @@ class CompanyProfileStageRuntime:
                 report=state.report,
                 bundle=bundle,
             )
-            saved = self._reusable_scope(state, chapter, digest)
+            saved = self._saved_scope(state, chapter, digest)
+            accepted = list(reused)
+            adapted = None
+            lineage = None
             if saved is not None:
-                result = _rebind_task_result(saved, state.report)
-                results.append(result)
-                state.completed_scopes[chapter.value] = result
-                state.scope_digests[chapter.value] = digest
-                state.reused_scope_ids.append(chapter.value)
-                continue
-            unresolved = (
-                ()
-                if chapter_unread
-                else tuple(
-                    field_id
-                    for field_id in state.evidence.unresolved_field_ids
-                    if field_id in _CORE_FIELDS[chapter]
+                adapted, lineage = _adapt_scope_result(
+                    saved,
+                    work_id=state.work_id,
+                    chapter=chapter,
+                    report=state.report,
+                    bundle=bundle,
                 )
-            )
+                accepted.extend(adapted.accepted_records())
+            accepted = _unique_records(accepted)
+            accepted_fields = {record.field_id for record in accepted}
+            if chapter_unread:
+                unresolved: tuple[str, ...] = ()
+            elif saved is None:
+                unresolved = tuple(
+                    field_id
+                    for field_id in _CORE_FIELDS[chapter]
+                    if field_id not in accepted_fields
+                    and field_id in state.evidence.unresolved_field_ids
+                )
+            else:
+                retryable = _retryable_field_ids(saved)
+                unresolved = tuple(
+                    field_id
+                    for field_id in _CORE_FIELDS[chapter]
+                    if field_id not in accepted_fields and field_id in retryable
+                )
+            if adapted is not None and not unresolved:
+                result = self._commit_reused_scope(
+                    state,
+                    chapter=chapter,
+                    digest=digest,
+                    result=adapted,
+                    lineage=lineage,
+                )
+                results.append(result)
+                continue
             request = _semantic_request(
                 work_id=state.work_id,
                 report=state.report,
                 chapter=chapter,
                 evidence_bundle=bundle,
                 unresolved_field_ids=unresolved,
-                deterministic_candidates=reused,
+                deterministic_candidates=tuple(accepted),
             )
             provider = self.provider if unresolved and not chapter_unread else None
             result = self._semantic_service.run_task(request, provider=provider)
@@ -348,18 +377,21 @@ class CompanyProfileStageRuntime:
                     f"company-profile scope stop after {chapter.value}"
                 )
         state.task_results = tuple(results)
+        self._persist_work(state)
         return self._result(state, status="success", stage="semantic")
 
     def _verify(self, state: _WorkState) -> dict[str, Any]:
         if state.report is None:
             raise ValueError("verify requires a bound report")
-        if not state.task_results and state.evidence is None:
+        self._restore_task_results(state)
+        if not state.task_results:
             self._semantic(state)
         assert state.report is not None
         state.assessment = project_core_assessment(
             report=state.report,
             task_results=state.task_results,
         )
+        self._persist_work(state)
         return self._result(state, status="success", stage="verify")
 
     def _publish(self, state: _WorkState) -> dict[str, Any]:
@@ -405,6 +437,7 @@ class CompanyProfileStageRuntime:
                 for record in result.accepted_records()
             ],
             "reused_scope_ids": list(state.reused_scope_ids),
+            "predecessor_lineage": list(state.predecessor_lineage),
             "evidence_gap_codes": (
                 [gap.code for gap in state.evidence.gaps] if state.evidence else []
             ),
@@ -469,8 +502,18 @@ class CompanyProfileStageRuntime:
             state.completed_scopes[chapter] = result
             if item.get("source_digest"):
                 state.scope_digests[chapter] = str(item["source_digest"])
+        self._restore_task_results(state)
 
-    def _reusable_scope(
+    def _restore_task_results(self, state: _WorkState) -> None:
+        if state.task_results or not state.completed_scopes:
+            return
+        state.task_results = tuple(
+            state.completed_scopes[chapter.value]
+            for chapter in COMMON_CORE_CHAPTERS
+            if chapter.value in state.completed_scopes
+        )
+
+    def _saved_scope(
         self,
         state: _WorkState,
         chapter: ChapterTask,
@@ -501,6 +544,24 @@ class CompanyProfileStageRuntime:
         state.scope_digests[chapter.value] = digest
         return result
 
+    def _commit_reused_scope(
+        self,
+        state: _WorkState,
+        *,
+        chapter: ChapterTask,
+        digest: str,
+        result: CompanyProfileTaskResult,
+        lineage: dict[str, Any] | None,
+    ) -> CompanyProfileTaskResult:
+        state.completed_scopes[chapter.value] = result
+        state.scope_digests[chapter.value] = digest
+        state.reused_scope_ids.append(chapter.value)
+        if lineage is not None:
+            state.predecessor_lineage.append(lineage)
+        self._persist_scope(state, chapter, digest, result)
+        self._persist_work(state)
+        return result
+
     def _persist_scope(
         self,
         state: _WorkState,
@@ -511,64 +572,75 @@ class CompanyProfileStageRuntime:
         if state.report is None:
             return
         path = self._scope_receipt_path(state.report, chapter)
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(
-            json.dumps(
-                {
-                    "schema_version": SCOPE_CHECKPOINT_SCHEMA,
-                    "instrument_id": state.report.instrument_id,
-                    "report_period": state.report.report_period,
-                    "chapter_task": chapter.value,
-                    "source_digest": digest,
-                    "policy_version": COMMON_CORE_MAPPING_VERSION,
-                    "task_result": json_compatible(result),
-                },
-                ensure_ascii=False,
-                indent=2,
-            ),
-            encoding="utf-8",
+        _atomic_write_json(
+            path,
+            {
+                "schema_version": SCOPE_CHECKPOINT_SCHEMA,
+                "instrument_id": state.report.instrument_id,
+                "report_period": state.report.report_period,
+                "chapter_task": chapter.value,
+                "source_digest": digest,
+                "policy_version": COMMON_CORE_MAPPING_VERSION,
+                "task_complete": result.task_complete,
+                "task_result": json_compatible(result),
+            },
         )
 
     def _persist_work(self, state: _WorkState) -> None:
         path = self._work_checkpoint_path(state.work_id)
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(
-            json.dumps(
-                {
-                    "schema_version": SCOPE_CHECKPOINT_SCHEMA,
-                    "work_id": state.work_id,
-                    "report": (
-                        json_compatible(state.report) if state.report is not None else None
-                    ),
-                    "pages": [dict(page) for page in state.pages],
-                    "accepted_records": [
-                        json_compatible(record) for record in state.accepted_records
-                    ],
-                    "evidence": (
-                        json_compatible(state.evidence)
-                        if state.evidence is not None
-                        else None
-                    ),
-                    "chapters": [json_compatible(item) for item in state.chapters],
-                    "completed_scopes": [
-                        {
-                            "chapter_task": chapter,
-                            "source_digest": state.scope_digests.get(chapter, ""),
-                            "policy_version": COMMON_CORE_MAPPING_VERSION,
-                            "task_result": json_compatible(result),
-                        }
-                        for chapter, result in state.completed_scopes.items()
-                    ],
-                },
-                ensure_ascii=False,
-                indent=2,
-            ),
-            encoding="utf-8",
+        _atomic_write_json(
+            path,
+            {
+                "schema_version": SCOPE_CHECKPOINT_SCHEMA,
+                "work_id": state.work_id,
+                "report": (
+                    json_compatible(state.report) if state.report is not None else None
+                ),
+                "pages": [dict(page) for page in state.pages],
+                "accepted_records": [
+                    json_compatible(record) for record in state.accepted_records
+                ],
+                "evidence": (
+                    json_compatible(state.evidence)
+                    if state.evidence is not None
+                    else None
+                ),
+                "chapters": [json_compatible(item) for item in state.chapters],
+                "completed_scopes": [
+                    {
+                        "chapter_task": chapter,
+                        "source_digest": state.scope_digests.get(chapter, ""),
+                        "policy_version": COMMON_CORE_MAPPING_VERSION,
+                        "task_complete": result.task_complete,
+                        "task_result": json_compatible(result),
+                    }
+                    for chapter, result in state.completed_scopes.items()
+                ],
+            },
         )
 
 
 def json_compatible(model: BaseModel) -> dict[str, Any]:
     return model.model_dump(mode="json")
+
+
+def _atomic_write_json(path: Path, payload: Mapping[str, Any]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    handle, tmp_name = tempfile.mkstemp(
+        dir=path.parent,
+        prefix=f".{path.name}.",
+        suffix=".tmp",
+    )
+    tmp_path = Path(tmp_name)
+    try:
+        with os.fdopen(handle, "w", encoding="utf-8") as writer:
+            json.dump(payload, writer, ensure_ascii=False, indent=2)
+            writer.flush()
+            os.fsync(writer.fileno())
+        os.replace(tmp_path, path)
+    except Exception:
+        tmp_path.unlink(missing_ok=True)
+        raise
 
 
 def _semantic_request(
@@ -677,7 +749,20 @@ def _scope_source_digest(
             {
                 "field_id": item.field_id,
                 "page": item.evidence.page,
+                "section_title": item.evidence.section_title,
+                "continuation_pages": list(item.evidence.continuation_pages),
                 "anchor": item.evidence.anchor.model_dump(mode="json"),
+                "source_native": (
+                    item.source_native.model_dump(mode="json")
+                    if item.source_native is not None
+                    else None
+                ),
+                "context_complete": item.context_complete,
+                "headers_complete": item.headers_complete,
+                "unit_context_complete": item.unit_context_complete,
+                "footnotes_complete": item.footnotes_complete,
+                "continuation_complete": item.continuation_complete,
+                "source_readable": item.source_readable,
             }
             for item in bundle
         ],
@@ -686,21 +771,157 @@ def _scope_source_digest(
     return hashlib.sha256(blob.encode("utf-8")).hexdigest()
 
 
-def _rebind_task_result(
+def _adapt_scope_result(
     result: CompanyProfileTaskResult,
+    *,
+    work_id: str,
+    chapter: ChapterTask,
     report: ReportIdentity,
-) -> CompanyProfileTaskResult:
-    if all(record.report == report for record in result.records):
-        return result
+    bundle: Sequence[PreparedEvidence],
+) -> tuple[CompanyProfileTaskResult, dict[str, Any] | None]:
+    request_id = f"{work_id}:{chapter.value}"
+    same_request = result.request_id == request_id
+    same_report = all(record.report == report for record in result.records)
+    if same_request and same_report:
+        return result, None
+    predecessor = {
+        "chapter_task": chapter.value,
+        "predecessor_request_id": result.request_id,
+        "predecessor_report_id": next(
+            (record.report.report_id for record in result.records),
+            None,
+        ),
+        "predecessor_document_version": next(
+            (record.report.document_version for record in result.records),
+            None,
+        ),
+        "predecessor_evidence_ids": sorted(
+            {
+                evidence.evidence_id
+                for record in result.records
+                for evidence in record.evidence
+            }
+        ),
+    }
     payload = json.loads(result.model_dump_json())
+    payload["request_id"] = request_id
     report_payload = json.loads(report.model_dump_json())
+
+    def mapped_evidence(
+        items: Sequence[Mapping[str, Any]],
+        field_id: str | None,
+    ) -> list[dict[str, Any]]:
+        mapped: list[dict[str, Any]] = []
+        for item in items:
+            current = _current_evidence(bundle, field_id, item)
+            if current is None:
+                updated = dict(item)
+                updated["report"] = report_payload
+                mapped.append(updated)
+                continue
+            mapped.append(json.loads(current.model_dump_json()))
+        return mapped
+
     for record in payload["records"]:
         record["report"] = report_payload
-        for evidence in record.get("evidence") or ():
-            evidence["report"] = report_payload
-    return CompanyProfileTaskResult.model_validate_json(
+        record["evidence"] = mapped_evidence(
+            record.get("evidence") or (),
+            record.get("field_id"),
+        )
+    for coverage in payload["coverage"]:
+        coverage["evidence"] = mapped_evidence(
+            coverage.get("evidence") or (),
+            coverage.get("field_id"),
+        )
+    for review in payload["human_review_items"]:
+        review["evidence"] = mapped_evidence(
+            review.get("evidence") or (),
+            review.get("field_id"),
+        )
+        candidate = review.get("candidate")
+        if candidate:
+            candidate["report"] = report_payload
+            candidate["evidence"] = mapped_evidence(
+                candidate.get("evidence") or (),
+                candidate.get("field_id"),
+            )
+    adapted = CompanyProfileTaskResult.model_validate_json(
         json.dumps(payload, ensure_ascii=False)
     )
+    return adapted, predecessor
+
+
+def _current_evidence(
+    bundle: Sequence[PreparedEvidence],
+    field_id: str | None,
+    previous: Mapping[str, Any],
+):
+    if field_id:
+        match = next((item for item in bundle if item.field_id == field_id), None)
+        if match is not None:
+            return match.evidence
+    return next(
+        (
+            item.evidence
+            for item in bundle
+            if item.evidence.page == int(previous.get("page") or 0)
+            and item.evidence.section_title == str(previous.get("section_title") or "")
+        ),
+        None,
+    )
+
+
+def _unique_records(records: Sequence[SemanticRecord]) -> list[SemanticRecord]:
+    seen: set[str] = set()
+    unique: list[SemanticRecord] = []
+    for record in records:
+        if record.record_id in seen:
+            continue
+        seen.add(record.record_id)
+        unique.append(record)
+    return unique
+
+
+def _incomplete_field_ids(result: CompanyProfileTaskResult | None) -> frozenset[str]:
+    if result is None or result.task_complete:
+        return frozenset()
+    accepted = {record.field_id for record in result.accepted_records()}
+    reviewed = {item.field_id for item in result.human_review_items}
+    failed_coverage = {
+        item.field_id
+        for item in result.coverage
+        if item.status
+        in {CoverageStatus.EXTRACTION_FAILED, CoverageStatus.UNCLEAR}
+    }
+    return frozenset(reviewed | failed_coverage) - accepted
+
+
+_RETRYABLE_REVIEW_CODES = frozenset(
+    {
+        ContractErrorCode.PROVIDER_UNAVAILABLE,
+        ContractErrorCode.CANDIDATE_SCHEMA_INVALID,
+        ContractErrorCode.DEADLINE_EXCEEDED,
+    }
+)
+
+
+def _retryable_field_ids(result: CompanyProfileTaskResult | None) -> frozenset[str]:
+    if result is None or result.task_complete:
+        return frozenset()
+    accepted = {record.field_id for record in result.accepted_records()}
+    retryable = {
+        item.field_id
+        for item in result.human_review_items
+        if any(code in _RETRYABLE_REVIEW_CODES for code in item.reason_codes)
+    }
+    retryable.update(
+        item.field_id
+        for item in result.coverage
+        if item.status == CoverageStatus.EXTRACTION_FAILED
+    )
+    if "extract" not in result.provider_calls:
+        retryable.update(_incomplete_field_ids(result))
+    return frozenset(retryable) - accepted
 
 
 def _checklist_item(field_id: str, chapter: ChapterTask) -> ChecklistItem:

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+import os
 from copy import deepcopy
 from pathlib import Path
 
@@ -17,6 +18,7 @@ from research.business_profile_async_production import (
 )
 from research.company_profile import ChapterTask
 from research.company_profile.contracts import CandidateResponseItem, ExtractResponse
+from research.company_profile.core_evidence_selection import select_core_evidence
 from research.company_profile.models import ReportIdentity, SemanticRecord
 from research.company_profile.runtime import (
     COMMON_CORE_STORAGE_NAMESPACE,
@@ -56,10 +58,16 @@ def _report(**overrides) -> ReportIdentity:
     return ReportIdentity.model_validate(payload)
 
 
-def _overview_page(text: str, *, readable: bool = True) -> dict[str, object]:
+def _overview_page(
+    text: str,
+    *,
+    readable: bool = True,
+    closed: bool = True,
+) -> dict[str, object]:
+    suffix = "\n二、风险因素\n宏观经济波动。" if closed else ""
     return {
         "page": 14,
-        "text": f"报告期内公司从事的主要业务\n{text}\n二、风险因素\n宏观经济波动。",
+        "text": f"报告期内公司从事的主要业务\n{text}{suffix}",
         "readable": readable,
     }
 
@@ -551,3 +559,161 @@ def test_duplicate_queue_submit_does_not_repeat_provider(tmp_path):
     assert second_run["acquire"]["claimed"] == 0
     assert second_run["publish"]["completed"] == 0
     assert provider.extract_calls == calls_after_first == 1
+
+
+def test_verify_and_publish_after_restart_keep_completed_profile(tmp_path):
+    report = _report(report_id="asset-runtime-restart-verify")
+    pages = (
+        _overview_page(SERVICE_OVERVIEW),
+        _segment_page(SEGMENT_LINE),
+    )
+    item = _item(report, pages, work_id="work-restart-verify")
+    writer = CompanyProfileResearchWriter(tmp_path)
+    first = _RequestBoundOverviewProvider()
+    runtime = CompanyProfileStageRuntime(writer=writer, provider=first)
+    for stage in ("acquire", "parse", "semantic"):
+        asyncio.run(runtime(stage, item))
+    assert first.extract_calls == 2
+
+    verified = asyncio.run(
+        CompanyProfileStageRuntime(writer=writer, provider=first)("verify", item)
+    )
+    published = asyncio.run(
+        CompanyProfileStageRuntime(writer=writer, provider=first)("publish", item)
+    )
+
+    assert verified["assessment"]["core_complete"] is True
+    assert verified["accepted_record_ids"]
+    assert published["assessment"]["core_complete"] is True
+    assert published["accepted_record_ids"]
+    assert first.extract_calls == 2
+
+
+def test_incomplete_scope_retries_unresolved_with_working_provider(tmp_path):
+    report = _report(report_id="asset-runtime-incomplete")
+    item = _item(report, (_overview_page(SERVICE_OVERVIEW),), work_id="work-incomplete")
+    writer = CompanyProfileResearchWriter(tmp_path)
+    blocked = asyncio.run(
+        _drive(CompanyProfileStageRuntime(writer=writer), item)
+    )
+    assert blocked["assessment"]["core_complete"] is False
+
+    provider = _RequestBoundOverviewProvider()
+    published = asyncio.run(
+        _drive(CompanyProfileStageRuntime(writer=writer, provider=provider), item)
+    )
+
+    assert provider.extract_calls >= 1
+    assert published["assessment"]["core_complete"] is True
+    assert published["accepted_record_ids"]
+
+
+def test_closed_context_does_not_reuse_failed_open_context(tmp_path):
+    writer = CompanyProfileResearchWriter(tmp_path)
+    first_report = _report(report_id="asset-open-context", document_version="ver-open")
+    asyncio.run(
+        _drive(
+            CompanyProfileStageRuntime(writer=writer),
+            _item(
+                first_report,
+                (_overview_page(SERVICE_OVERVIEW, closed=False),),
+                work_id="work-open-context",
+            ),
+        )
+    )
+
+    successor_report = _report(report_id="asset-closed-context", document_version="ver-closed")
+    provider = _RequestBoundOverviewProvider()
+    published = asyncio.run(
+        _drive(
+            CompanyProfileStageRuntime(writer=writer, provider=provider),
+            _item(
+                successor_report,
+                (_overview_page(SERVICE_OVERVIEW, closed=True),),
+                work_id="work-closed-context",
+            ),
+        )
+    )
+
+    assert provider.extract_calls == 1
+    assert published["assessment"]["core_complete"] is True
+
+
+def test_successor_rebinding_uses_current_evidence_and_keeps_lineage(tmp_path):
+    writer = CompanyProfileResearchWriter(tmp_path)
+    first_report = _report(report_id="asset-lineage-v1", document_version="ver-1")
+    asyncio.run(
+        _drive(
+            CompanyProfileStageRuntime(
+                writer=writer,
+                provider=_RequestBoundOverviewProvider(),
+            ),
+            _item(
+                first_report,
+                (_overview_page(SERVICE_OVERVIEW),),
+                work_id="work-lineage-v1",
+            ),
+        )
+    )
+
+    successor_report = _report(report_id="asset-lineage-v2", document_version="ver-2")
+    item = _item(
+        successor_report,
+        (_overview_page(SERVICE_OVERVIEW),),
+        work_id="work-lineage-v2",
+    )
+    runtime = CompanyProfileStageRuntime(
+        writer=writer,
+        provider=_RequestBoundOverviewProvider(),
+    )
+    published = asyncio.run(_drive(runtime, item))
+    current_ids = {
+        item.evidence.evidence_id
+        for item in select_core_evidence(
+            report=successor_report,
+            pages=item["pages"],
+        ).prepared_evidence
+    }
+    accepted_ids = {
+        evidence.evidence_id
+        for result in runtime._states[item["work_id"]].task_results
+        for record in result.accepted_records()
+        for evidence in record.evidence
+    }
+
+    assert published["reused_scope_ids"] == [
+        ChapterTask.EXTRACT_BUSINESS_OVERVIEW.value
+    ]
+    assert accepted_ids
+    assert accepted_ids <= current_ids
+    assert any(
+        result.request_id.startswith("work-lineage-v2:")
+        for result in runtime._states[item["work_id"]].task_results
+    )
+    assert published["predecessor_lineage"]
+    assert published["predecessor_lineage"][0]["predecessor_request_id"].startswith(
+        "work-lineage-v1:"
+    )
+
+
+def test_checkpoint_replace_keeps_previous_file_if_interrupted(tmp_path, monkeypatch):
+    report = _report(report_id="asset-runtime-atomic")
+    item = _item(report, (_overview_page(SERVICE_OVERVIEW),), work_id="work-atomic")
+    writer = CompanyProfileResearchWriter(tmp_path)
+    runtime = CompanyProfileStageRuntime(
+        writer=writer,
+        provider=_RequestBoundOverviewProvider(),
+    )
+    asyncio.run(runtime("acquire", item))
+    path = writer.output_root / "checkpoints" / "work-atomic.json"
+    original = path.read_text(encoding="utf-8")
+    json.loads(original)
+
+    def boom_replace(_src, _dst):
+        raise OSError("interrupted before replace")
+
+    monkeypatch.setattr(os, "replace", boom_replace)
+    with pytest.raises(OSError, match="interrupted before replace"):
+        asyncio.run(runtime("parse", item))
+    assert path.read_text(encoding="utf-8") == original
+    json.loads(path.read_text(encoding="utf-8"))
