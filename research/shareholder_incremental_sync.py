@@ -19,6 +19,10 @@ from research.announcements import (
 )
 from research.providers import ShareholderProviderRegistry
 from research.providers.base import ShareholderSnapshot
+from research.providers.cninfo_http import (
+    begin_cninfo_access_observation,
+    snapshot_cninfo_access_runtime,
+)
 from research.providers.registry import OfficialAnnouncementProviderRegistry
 from research.shareholder_announcement_filters import (
     ShareholderAnnouncementCandidate,
@@ -90,6 +94,7 @@ class ShareholderIncrementalSyncService:
         dry_run: bool = False,
     ) -> Dict[str, Any]:
         started_at = time.monotonic()
+        begin_cninfo_access_observation()
         module_cfg = self.research_config.modules.get("shareholders", {})
         incremental_cfg = module_cfg.get("incremental_sync", {})
         required_scope = {
@@ -230,9 +235,17 @@ class ShareholderIncrementalSyncService:
                 failure_count=write_result["failed_instruments"],
                 scan_errors=scan_result["errors"],
             )
+            cninfo_access = snapshot_cninfo_access_runtime(
+                sources=getattr(self.research_config, "sources", None)
+            )
+            dm_logger.info(
+                "[ShareholderIncremental] CNInfo hop snapshot: %s",
+                cninfo_access,
+            )
             metadata = {
                 "exchanges": target_exchanges,
                 "dry_run": dry_run,
+                "cninfo_access": cninfo_access,
                 "announcements_scanned": scan_result["announcements_scanned"],
                 "selected_announcements": scan_result["selected_announcements"],
                 "pages_scanned": scan_result["pages_scanned"],

@@ -1237,6 +1237,8 @@ def test_incremental_sync_succeeds_when_cninfo_fails_but_fallback_writes(tmp_pat
     assert result["source_routing"]["fallback_successes"] == 1
     assert result["source_routing"]["final_source"] == "fallback"
     assert result["status"] == "success"
+    assert result["cninfo_access"]["preferred_mode"] == "headed_chrome"
+    assert "seen_access_modes" in result["cninfo_access"]
 
 
 def test_incremental_sync_remains_degraded_when_fallback_is_incomplete(tmp_path):
@@ -1572,6 +1574,76 @@ def test_repair_router_keeps_partial_cninfo_and_falls_back_for_missing_fact(
     assert result["fallback_successes"] == 1
     assert result["final_source"] == "mixed"
     assert result["errors"] == []
+
+
+def test_repair_router_falls_back_when_cninfo_data20_source_fails(
+    tmp_path,
+    monkeypatch,
+):
+    storage = _FakeStorage(ready=False)
+    config = _research_config(tmp_path)
+    config.modules["financial_statements"]["disclosure_incremental_sync"] = {
+        "repair_source_order": ["cninfo_data20", "ths_report", "sina_report"],
+    }
+    router = FinancialMaintenanceRepairRouter(
+        storage=storage,
+        research_config=config,
+    )
+    target = FinancialMaintenanceRepairTarget(
+        instrument_id="002731.SZ",
+        symbol="002731",
+        exchange="SZSE",
+        report_period="2026-06-30",
+        profile="nonbank",
+    )
+    fallback_calls = []
+
+    async def _fake_cninfo(**kwargs):
+        return {
+            "attempts": 1,
+            "batch_successes": 0,
+            "failed_instrument_periods": 1,
+            "source_failures": 1,
+            "parsed_instrument_periods": 0,
+            "partial_instrument_periods": 0,
+            "numeric_facts": 0,
+            "missing_required_core_facts": ["total_assets"],
+            "errors": ["cninfo_data20:SZSE:2026-06-30:source_failed:failed=1/1"],
+        }
+
+    async def _fake_fallback(**kwargs):
+        fallback_calls.append(kwargs)
+        storage.financial_statements.ready = True
+        storage.financial_statements.missing_fields = []
+
+    router._run_cninfo_data20_import = _fake_cninfo
+    monkeypatch.setattr(
+        "research.financial_statement_maintenance_repair.ResearchStorageManager",
+        lambda research_config: storage,
+    )
+    monkeypatch.setattr(
+        "scripts.dev_validation.validate_sina_ths_local_core_dryrun.run_local_core_dryrun",
+        _fake_fallback,
+    )
+
+    result = _run(
+        router.repair_targets(
+            targets=[target],
+            required_core_facts=["total_assets"],
+            mapping_version="test",
+            db_path=tmp_path / "financials.db",
+            request_interval_seconds=0.0,
+            request_timeout_seconds=1.0,
+        )
+    )
+
+    assert result["source_order"] == ["cninfo_data20", "ths_report", "sina_report"]
+    assert result["cninfo_source_failures"] == 1
+    assert result["cninfo_successes"] == 0
+    assert result["fallback_attempts"] == 1
+    assert result["fallback_successes"] == 1
+    assert result["final_source"] == "fallback"
+    assert fallback_calls[0]["source_order"] == ["ths_report", "sina_report"]
 
 
 def test_official_validation_uses_cninfo_numeric_facts_for_readiness():
@@ -2108,3 +2180,105 @@ def test_reconciliation_persisted_states_still_report_balanced_limit(tmp_path):
     assert result["candidate_unlimited_count"] == 2
     assert result["candidate_limit"] == 1
     assert result["candidate_sources"]["accepted_state"] == 1
+
+
+def test_reconciliation_deletes_ready_stale_local_gap_bookmarks(tmp_path):
+    storage = _FakeStorage(
+        ready=True,
+        pending_states=[
+            {
+                "instrument_id": "002731.SZ",
+                "symbol": "002731",
+                "exchange": "SZSE",
+                "report_period": "2026-03-31",
+                "announcement_id": "local-gap:002731.SZ:2026-03-31",
+                "status": "blocking_gap",
+                "classification": "local_core_gap",
+                "selection_reasons": ["missing_or_incomplete_local_core"],
+            },
+            {
+                "instrument_id": "002731.SZ",
+                "symbol": "002731",
+                "exchange": "SZSE",
+                "report_period": "2025-12-31",
+                "announcement_id": "local-gap:002731.SZ:2025-12-31",
+                "status": "blocking_gap",
+                "classification": "local_core_gap",
+                "selection_reasons": ["missing_or_incomplete_local_core"],
+            },
+        ],
+    )
+    service = FinancialDisclosureIncrementalSyncService(
+        db_ops=_FakeStCuihuaDbOps(),
+        storage=storage,
+        research_config=_research_config(tmp_path),
+        announcement_service=_FakeAnnouncementService([]),
+    )
+
+    result = _run(
+        service.sync(
+            exchanges=["SZSE"],
+            report_periods=["2026-03-31"],
+            dry_run=False,
+            reconciliation=True,
+        )
+    )
+
+    assert result["status"] == "success"
+    assert result["candidate_count"] == 0
+    assert result["stale_local_gap_cleared"] == 2
+    assert storage.deleted_states == [
+        {
+            "instrument_id": "002731.SZ",
+            "report_period": "2026-03-31",
+            "announcement_id": "local-gap:002731.SZ:2026-03-31",
+            "statuses": ["blocking_gap", "mapping_policy_gap", "source_missing"],
+        },
+        {
+            "instrument_id": "002731.SZ",
+            "report_period": "2025-12-31",
+            "announcement_id": "local-gap:002731.SZ:2025-12-31",
+            "statuses": ["blocking_gap", "mapping_policy_gap", "source_missing"],
+        },
+    ]
+
+
+def test_reconciliation_keeps_unready_local_gap_bookmarks(tmp_path):
+    storage = _FakeStorage(
+        ready=False,
+        pending_states=[
+            {
+                "instrument_id": "002731.SZ",
+                "symbol": "002731",
+                "exchange": "SZSE",
+                "report_period": "2026-03-31",
+                "announcement_id": "local-gap:002731.SZ:2026-03-31",
+                "status": "blocking_gap",
+                "classification": "local_core_gap",
+                "selection_reasons": ["missing_or_incomplete_local_core"],
+            }
+        ],
+    )
+    service = FinancialDisclosureIncrementalSyncService(
+        db_ops=_FakeStCuihuaDbOps(),
+        storage=storage,
+        research_config=_research_config(tmp_path),
+        announcement_service=_FakeAnnouncementService([]),
+    )
+
+    async def _noop_import(**kwargs):
+        return service.repair_router.default_summary()
+
+    service._run_targeted_import = _noop_import
+
+    result = _run(
+        service.sync(
+            exchanges=["SZSE"],
+            report_periods=["2026-03-31"],
+            dry_run=False,
+            reconciliation=True,
+        )
+    )
+
+    assert result["stale_local_gap_cleared"] == 0
+    assert storage.deleted_states == []

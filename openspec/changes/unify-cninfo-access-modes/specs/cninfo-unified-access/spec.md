@@ -232,3 +232,59 @@ This change SHALL not move shareholder, announcement, or official-filing parse/w
 #### Scenario: Operator scripts are not migrated
 - **WHEN** an operator script still calls CNInfo with raw `requests`
 - **THEN** this change SHALL NOT rewrite that script onto the mux
+
+### Requirement: Direct Hop Is Preferred And Existing Providers Stay As Backup
+The new `attach_cninfo_access` hop SHALL be the preferred first-party www / data20 HTTP path. Existing backup providers SHALL remain registered on the current source-routing and repair frameworks. The mux SHALL NOT replace AkShare, efinance, exchange announcement routes, THS/Sina, baostock, tdx, or the in-mux `chrome_tls` / proxy hops.
+
+#### Scenario: Shareholder incremental keeps cninfo primary
+- **WHEN** the shareholder incremental resolver has `cninfo:direct` as the first candidate and a backup `akshare` candidate
+- **AND** the cninfo provider returns snapshots that cover the required scope
+- **THEN** the job SHALL write those cninfo snapshots
+- **AND** it SHALL NOT call the backup provider for those instruments
+
+#### Scenario: Shareholder incremental switches after cninfo fails
+- **WHEN** the shareholder incremental resolver has `cninfo:direct` first and `akshare:direct` as backup
+- **AND** the cninfo provider raises or returns no covering snapshot for an instrument
+- **THEN** the job SHALL attempt the backup provider for the remaining instruments
+- **AND** a covering backup snapshot SHALL be accepted without rewriting the resolver or registry
+
+#### Scenario: Shareholder incremental switches after incomplete cninfo scope
+- **WHEN** the cninfo provider returns a snapshot that does not cover the required scope
+- **AND** a backup provider can cover the missing scope
+- **THEN** the job SHALL keep the uncovered instrument in the remaining set
+- **AND** it SHALL call the backup provider for that remaining set
+
+#### Scenario: Financial repair keeps official data20 first
+- **WHEN** financial maintenance repair uses `repair_source_order` of `cninfo_data20`, then `ths_report`, then `sina_report`
+- **AND** cninfo data20 leaves the target unready
+- **THEN** the existing repair router SHALL attempt the THS/Sina fallback sources
+- **AND** it SHALL NOT add a second repair owner or migrate THS/Sina into the mux
+
+#### Scenario: Backup providers are not mux work
+- **WHEN** shareholder valuation, holder-count, or control code calls AkShare `*_cninfo`
+- **OR** financial fallback uses THS/Sina
+- **OR** announcement acquisition falls through to an exchange source
+- **THEN** those calls SHALL stay on their existing providers
+- **AND** this change SHALL NOT treat that leftover usage as an incomplete mux migration
+
+### Requirement: Exhausted Direct Hops Surface Failure To Existing Routing
+When every hop inside `attach_cninfo_access` fails to return usable first-party www / data20 data, the mux SHALL surface an HTTP error or raise. Domain providers SHALL treat that as an uncovered candidate so the existing resolver or repair router can continue to a backup provider. The mux SHALL NOT convert a blocked or empty failure into a successful covered result.
+
+#### Scenario: Headed blocked and proxy failure keeps the HTTP error
+- **WHEN** preferred mode is `headed_chrome`
+- **AND** the headed hop reports `chrome_blocked` with an HTTP 403 response
+- **AND** the www proxy hop raises
+- **THEN** the mux SHALL return that HTTP 403 response (or raise)
+- **AND** it SHALL NOT return HTTP 200 empty JSON solely to hide the failure
+
+#### Scenario: Legacy stack exhaustion keeps the HTTP error
+- **WHEN** the runtime is using the `chrome_tls` stack
+- **AND** Chrome TLS returns HTTP 403
+- **AND** the www proxy hop raises
+- **THEN** the mux SHALL return that HTTP 403 response
+- **AND** a domain provider that treats HTTP >= 400 as failure SHALL be able to fail the candidate and let routing continue
+
+#### Scenario: Daily jobs expose a hop snapshot
+- **WHEN** shareholder incremental or financial disclosure incremental finishes a run
+- **THEN** the result SHALL include a `cninfo_access` snapshot with preferred mode, seen hops, sticky, and request count
+- **AND** starting that run SHALL reset those counters without stopping headed Chrome or clearing www sticky

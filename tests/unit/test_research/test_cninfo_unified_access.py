@@ -17,8 +17,10 @@ from research.providers.cninfo_headed_chrome import (
 )
 from research.providers.cninfo_http import (
     attach_cninfo_access,
+    begin_cninfo_access_observation,
     reset_cninfo_access_runtime,
     resolve_cninfo_access_mode,
+    snapshot_cninfo_access_runtime,
 )
 from tests.unit.test_research.test_cninfo_headed_chrome import _FakePageSession
 
@@ -647,3 +649,74 @@ def test_mux_does_not_read_supports_proxy_patch_or_allow_paid_proxy():
         proxy_request=proxy,
     )
     assert session.get(DATA20_URL).access_mode == "proxy_patch"
+
+
+def test_headed_blocked_and_proxy_failure_returns_http_error():
+    blocked = _Resp(status_code=403, text="wangsu", reason="Forbidden")
+    headed = _HeadedHop(outcomes=[CninfoHeadedFetchOutcome("chrome_blocked", blocked)])
+    session = _attach(
+        preferred_mode="headed_chrome",
+        headed_hop=headed,
+        impersonated_request=_CallableHop(
+            responses=[AssertionError("TLS must not follow chrome_blocked")]
+        ),
+        proxy_request=_CallableHop(error=RuntimeError("proxy exhausted")),
+    )
+
+    response = session.get(DATA20_URL)
+
+    assert response.status_code == 403
+    assert response.reason == "Forbidden"
+
+
+def test_chrome_tls_403_and_proxy_failure_returns_http_error():
+    session = _attach(
+        preferred_mode="chrome_tls",
+        headed_hop=_HeadedHop(outcomes=[AssertionError("headed must not run")]),
+        impersonated_request=_CallableHop(
+            responses=[_Resp(status_code=403, text="wangsu", reason="Forbidden")]
+        ),
+        proxy_request=_CallableHop(error=RuntimeError("proxy exhausted")),
+    )
+
+    response = session.get(DATA20_URL)
+
+    assert response.status_code == 403
+    assert response.reason == "Forbidden"
+    assert response.access_mode == "chrome_tls"
+
+
+def test_access_observation_records_modes_and_begin_clears_counts_not_sticky():
+    headed = _HeadedHop(
+        outcomes=[
+            CninfoHeadedFetchOutcome("chrome_blocked"),
+            AssertionError("headed must stop after blocked"),
+        ]
+    )
+    proxy = _CallableHop(responses=[_Resp({"via": "proxy"})])
+    session = _attach(
+        headed_hop=headed,
+        impersonated_request=_CallableHop(
+            responses=[AssertionError("TLS must not follow chrome_blocked")]
+        ),
+        proxy_request=proxy,
+    )
+    first = session.get(DATA20_URL)
+    snapshot = snapshot_cninfo_access_runtime(
+        sources={"cninfo": {"access": {"preferred_mode": "headed_chrome"}}}
+    )
+
+    assert first.access_mode == "proxy_patch"
+    assert snapshot["seen_access_modes"] == ["proxy_patch"]
+    assert snapshot["access_mode_counts"]["proxy_patch"] == 1
+    assert snapshot["www_sticky"] == "proxy"
+    assert snapshot["www_request_count"] == 1
+
+    begin_cninfo_access_observation()
+    reset_snapshot = snapshot_cninfo_access_runtime(
+        sources={"cninfo": {"access": {"preferred_mode": "headed_chrome"}}}
+    )
+    assert reset_snapshot["www_request_count"] == 0
+    assert reset_snapshot["seen_access_modes"] == []
+    assert reset_snapshot["last_access_mode"] is None
+    assert reset_snapshot["www_sticky"] == "proxy"

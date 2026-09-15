@@ -22,3 +22,17 @@
 - [x] 4.1 Add mux unit tests for preferred-mode selection, invalid mode, argument/env/config precedence, `/data20/` admission, unallowlisted www → TLS, static/webapi never headed, injected-session policy, blocked-Chrome → runtime-wide www proxy-only, unavailable-Chrome → runtime-wide TLS+proxy, logical 429 is not blocked, proxy HTML accept, shared runtime + serialization, loop-safe `request()`, `headless=true` refuse, response `reason`, and `access_mode`.
 - [x] 4.2 Move `test_cninfo_http.py` off production `wrap()` if needed, invert or replace `test_attach_cninfo_access_does_not_construct_headed_chrome`, and keep headed-Chrome hop tests plus announcement 403 tests passing.
 - [x] 4.3 Run the focused unit tests. If a display/Chrome environment is available, exercise `attach_cninfo_access()` against one data20 URL, one announcement POST, and one static URL without writing research snapshots.
+
+## 5. Direct Hop Preferred; Backup Providers Stay
+
+- [x] 5.1 Document on `attach_cninfo_access` that it is the preferred first-party hop and a reusable module, not a replacement for existing backup providers or parse/write owners.
+- [x] 5.2 Add simulated shareholder incremental tests: cninfo success does not call akshare; cninfo raise or empty/incomplete scope continues to akshare on the existing resolver/registry.
+- [x] 5.3 Add a simulated financial repair test: cninfo_data20 source/transport failure leaves the target unready and the existing router attempts THS/Sina. Do not add a second repair owner.
+- [x] 5.4 Add a mux unit test that exhausted hops (headed blocked + proxy raise, and chrome_tls 403 + proxy raise) return HTTP 403 or raise instead of a covered HTTP 200 empty body.
+- [x] 5.5 Re-run the write-free `attach_cninfo_access()` probe for one data20 GET, one announcement POST, and one static URL when a display/Chrome environment is available. Do not add a default-CI live network test. Observed 2026-09-15: data20 and announcement `headed_chrome` HTTP 200 JSON; static stayed on `chrome_tls` (sample PDF URL 404, hop correct).
+
+## 6. Later: First Job And Official Data20 Gate
+
+- [x] 6.1 Surface a per-job `cninfo_access` snapshot (preferred mode, seen hops, sticky, request count) on shareholder incremental and financial disclosure results and Telegram reports so an operator can observe the new hop when running those two daily jobs. Do not run the production jobs in this slice. Rollback remains `QUOTE_CNINFO_ACCESS_MODE=chrome_tls`.
+- [ ] 6.2 Only after operator observation of the two daily jobs, decide whether to enable `official_structured_sources` / `sources.cninfo.financial_statements`. The 21:45 disclosure incremental already prefers `cninfo_data20` via the existing repair router and `attach_cninfo_access`; do not flip those flags just to test that job. Keep THS/Sina as backup.
+- [ ] 6.3 Optional later job change: move announcement scan off the running asyncio loop. Not a mux or backup-provider task.

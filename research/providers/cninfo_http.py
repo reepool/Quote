@@ -14,7 +14,7 @@ import concurrent.futures
 import logging
 import os
 import threading
-from typing import Any, Callable, Mapping, Optional
+from typing import Any, Callable, Dict, Mapping, Optional
 from urllib.parse import urlparse
 
 import requests
@@ -176,6 +176,26 @@ class _CninfoAccessRuntime:
         self.lock = threading.RLock()
         self.www_sticky: Optional[str] = None
         self.headed: Any = _UNSET
+        self.access_mode_counts: Dict[str, int] = {}
+        self.last_access_mode: Optional[str] = None
+        self.www_request_count = 0
+
+    def record_access_mode(self, mode: str) -> None:
+        normalized = str(mode or "").strip()
+        if not normalized:
+            return
+        with self.lock:
+            self.last_access_mode = normalized
+            self.www_request_count += 1
+            self.access_mode_counts[normalized] = (
+                self.access_mode_counts.get(normalized, 0) + 1
+            )
+
+    def begin_observation(self) -> None:
+        with self.lock:
+            self.access_mode_counts.clear()
+            self.last_access_mode = None
+            self.www_request_count = 0
 
     def install_headed(self, hop: Any) -> None:
         self.headed = hop
@@ -230,6 +250,35 @@ def _runtime() -> _CninfoAccessRuntime:
         return _RUNTIME
 
 
+def begin_cninfo_access_observation() -> None:
+    """Reset per-job hop counters without stopping Chrome or clearing sticky."""
+    _runtime().begin_observation()
+
+
+def snapshot_cninfo_access_runtime(
+    *,
+    environ: Optional[Mapping[str, str]] = None,
+    sources: Optional[Mapping[str, Any]] = None,
+) -> Dict[str, Any]:
+    """Return the current process hop snapshot for job reports."""
+    runtime = _runtime()
+    with runtime.lock:
+        counts = dict(runtime.access_mode_counts)
+        headed = runtime.headed
+        sticky = runtime.www_sticky
+        last_mode = runtime.last_access_mode
+        request_count = runtime.www_request_count
+    return {
+        "preferred_mode": resolve_cninfo_access_mode(environ=environ, sources=sources),
+        "www_sticky": sticky,
+        "seen_access_modes": list(counts),
+        "access_mode_counts": counts,
+        "last_access_mode": last_mode,
+        "www_request_count": request_count,
+        "headed_live": headed is not _UNSET and headed is not None,
+    }
+
+
 def reset_cninfo_access_runtime() -> None:
     """Drop the shared mux runtime so tests do not share Chrome or sticky state."""
     global _RUNTIME
@@ -249,8 +298,11 @@ def _decorate_response(response: Any, *, access_mode: str, url: str = "") -> Any
             from research.providers.cninfo_headed_chrome import http_reason_for_status
 
             response.reason = http_reason_for_status(int(getattr(response, "status_code", 0) or 0))
-        return response
-    return CninfoAccessResponse.from_raw(response, access_mode=access_mode, url=url)
+        decorated = response
+    else:
+        decorated = CninfoAccessResponse.from_raw(response, access_mode=access_mode, url=url)
+    _runtime().record_access_mode(access_mode)
+    return decorated
 
 
 class CninfoProxyFallbackSession:
@@ -449,6 +501,10 @@ class CninfoAccessMux:
                     return self._proxy_www(method, url, **kwargs)
                 except Exception:
                     if outcome.response is not None:
+                        _runtime().record_access_mode(
+                            getattr(outcome.response, "access_mode", None)
+                            or "headed_chrome"
+                        )
                         return outcome.response
                     raise
             return self._request_legacy_www(method, url, **kwargs)
@@ -607,7 +663,15 @@ def attach_cninfo_access(
     environ: Optional[Mapping[str, str]] = None,
     sources: Optional[Mapping[str, Any]] = None,
 ) -> Any:
-    """Attach the unified CNInfo access mux to a new or caller-injected session."""
+    """Attach the unified CNInfo first-party HTTP hop to a session.
+
+    This is the preferred www/data20 transport for current and future
+    attach callers (headed Chrome, then chrome_tls / proxy). Domain
+    providers keep parse and write ownership. AkShare, efinance,
+    exchange, THS/Sina, baostock, tdx, and other registered sources
+    stay as backup providers on the existing resolver and repair
+    routes when this hop cannot return usable data.
+    """
     from utils.http_transport import create_requests_session
 
     mode = resolve_cninfo_access_mode(

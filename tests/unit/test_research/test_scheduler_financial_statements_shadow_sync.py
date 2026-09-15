@@ -92,6 +92,17 @@ def test_financial_disclosure_report_includes_stale_run_recovery():
     assert "历史异常明细: run 1102" in text
 
 
+def test_financial_disclosure_report_includes_stale_local_gap_cleanup():
+    text = task_module._format_financial_disclosure_scheduler_report(
+        {
+            "status": "success",
+            "stale_local_gap_cleared": 20,
+        }
+    )
+
+    assert "过期本地缺口书签已清理: 20" in text
+
+
 def test_financial_disclosure_report_includes_expired_pending_and_source_degradation():
     text = task_module._format_financial_disclosure_scheduler_report(
         {
@@ -163,6 +174,26 @@ def test_financial_disclosure_report_marks_successful_fallback_collection():
     assert "解析成功 1" in text
     assert "CNInfo待补字段: equity_parent" in text
     assert "补数源警告:" not in text
+
+
+def test_financial_disclosure_report_includes_cninfo_access_line():
+    text = task_module._format_financial_disclosure_scheduler_report(
+        {
+            "status": "success",
+            "db_path": "data/financials.db",
+            "cninfo_access": {
+                "preferred_mode": "headed_chrome",
+                "seen_access_modes": ["headed_chrome"],
+                "www_sticky": None,
+                "www_request_count": 3,
+            },
+        }
+    )
+
+    assert (
+        "CNInfo hop: preferred=`headed_chrome` seen=`headed_chrome` "
+        "sticky=`none` requests=3"
+    ) in text
 
 
 def test_financial_statements_catchup_task_passes_incremental_controls(monkeypatch):

@@ -313,3 +313,30 @@ def test_shareholder_incremental_scheduler_scan_is_unlimited():
     assert incremental["max_candidates"] == 0
     assert incremental["max_pages_per_market"] >= 40
     assert incremental["max_runtime_seconds"] >= 7200
+
+
+def test_shareholder_incremental_report_includes_cninfo_access_line():
+    text = task_module._format_shareholder_incremental_scheduler_report(
+        {
+            "status": "success",
+            "changed_instruments": 1,
+            "unchanged_instruments": 0,
+            "pending_rechecks": 0,
+            "failed_instruments": 0,
+            "candidate_instruments": 1,
+            "snapshots_written": 1,
+            "attempted_sources": ["cninfo:direct"],
+            "successful_sources": ["cninfo:direct"],
+            "cninfo_access": {
+                "preferred_mode": "headed_chrome",
+                "seen_access_modes": ["headed_chrome", "proxy_patch"],
+                "www_sticky": "proxy",
+                "www_request_count": 8,
+            },
+        }
+    )
+
+    assert (
+        "CNInfo hop: preferred=`headed_chrome` "
+        "seen=`headed_chrome,proxy_patch` sticky=`proxy` requests=8"
+    ) in text

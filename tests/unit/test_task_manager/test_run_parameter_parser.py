@@ -21,6 +21,28 @@ def test_run_parameter_parser_preserves_numeric_one_and_zero():
     assert params["repair_pending_factor_quotes"] is True
 
 
+def test_run_parameter_parser_splits_financial_disclosure_target_lists():
+    handler = TaskManagerHandlers.__new__(TaskManagerHandlers)
+
+    params = handler._parse_run_runtime_parameters(
+        [
+            "exchanges=SZSE",
+            "target_instrument_ids=000001.SZ,002731.SZ",
+            "target_symbols=000001,002731",
+            "report_periods=2026-06-30,2026-03-31",
+            "max_candidates=5",
+            "dry_run",
+        ]
+    )
+
+    assert params["exchanges"] == ["SZSE"]
+    assert params["target_instrument_ids"] == ["000001.SZ", "002731.SZ"]
+    assert params["target_symbols"] == ["000001", "002731"]
+    assert params["report_periods"] == ["2026-06-30", "2026-03-31"]
+    assert params["max_candidates"] == 5
+    assert params["dry_run"] is True
+
+
 def test_run_parameter_parser_splits_source_event_keys():
     handler = TaskManagerHandlers.__new__(TaskManagerHandlers)
 

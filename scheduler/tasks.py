@@ -2878,6 +2878,20 @@ def _format_financial_l1_import_scheduler_report(result: Dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
+def _format_cninfo_access_report_line(result: Dict[str, Any]) -> Optional[str]:
+    access = result.get("cninfo_access")
+    if not isinstance(access, dict) or not access:
+        return None
+    seen = ",".join(str(item) for item in access.get("seen_access_modes") or []) or "none"
+    sticky = access.get("www_sticky") or "none"
+    return (
+        "CNInfo hop: "
+        f"preferred=`{access.get('preferred_mode') or 'unset'}` "
+        f"seen=`{seen}` sticky=`{sticky}` "
+        f"requests={int(access.get('www_request_count') or 0)}"
+    )
+
+
 def _format_financial_disclosure_scheduler_report(result: Dict[str, Any]) -> str:
     """Build compact Telegram content for financial disclosure maintenance."""
     status = result.get("status", "unknown")
@@ -2915,6 +2929,12 @@ def _format_financial_disclosure_scheduler_report(result: Dict[str, Any]) -> str
         f"历史异常运行: 本轮自动收敛 {result.get('stale_run_count', 0)}",
         f"耗时: `{result.get('elapsed_seconds', 0)}s`",
     ]
+    stale_local_gap_cleared = int(result.get("stale_local_gap_cleared") or 0)
+    if stale_local_gap_cleared:
+        lines.append(f"过期本地缺口书签已清理: {stale_local_gap_cleared}")
+    cninfo_access_line = _format_cninfo_access_report_line(result)
+    if cninfo_access_line:
+        lines.append(cninfo_access_line)
     stale_run_samples = result.get("stale_run_samples") or []
     if stale_run_samples:
         rendered_stale_runs = [
@@ -3157,6 +3177,9 @@ def _format_shareholder_incremental_scheduler_report(
                 "成功: " + (", ".join(str(item) for item in successful_sources) or "N/A"),
             ]
         )
+    cninfo_access_line = _format_cninfo_access_report_line(result)
+    if cninfo_access_line:
+        lines.append(cninfo_access_line)
 
     if isinstance(readiness, dict):
         ready = bool(readiness.get("ready_for_paid_high_availability_rollout"))

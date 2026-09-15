@@ -41,6 +41,10 @@ from research.financial_statement_maintenance_repair import (
 )
 from research.financial_statement_profile import resolve_financial_statement_profile
 from research.financial_statements_sync import build_financial_report_periods
+from research.providers.cninfo_http import (
+    begin_cninfo_access_observation,
+    snapshot_cninfo_access_runtime,
+)
 from research.providers.registry import OfficialAnnouncementProviderRegistry
 from research.storage import ResearchStorageManager
 from scripts.dev_validation.audit_financial_numeric_fact_coverage import (
@@ -82,6 +86,11 @@ STALE_FINANCIAL_JOB_NAMES = (
     "financial_disclosure_incremental_sync",
     "financial_disclosure_reconciliation_sync",
     "financial_statements_shadow_sync",
+)
+STALE_LOCAL_GAP_STATE_STATUSES = (
+    "blocking_gap",
+    "mapping_policy_gap",
+    "source_missing",
 )
 
 
@@ -223,6 +232,7 @@ class FinancialDisclosureIncrementalSyncService:
         reconciliation: bool = False,
     ) -> Dict[str, Any]:
         started_at = time.monotonic()
+        begin_cninfo_access_observation()
         module_cfg = self.research_config.modules.get("financial_statements", {})
         maintenance_cfg = module_cfg.get("disclosure_incremental_sync", {})
         target_exchanges = exchanges or list(self.research_config.markets)
@@ -357,7 +367,20 @@ class FinancialDisclosureIncrementalSyncService:
                 run_id=run_id,
                 dry_run=dry_run,
             )
+            stale_local_gap_cleared = self._clear_stale_ready_local_gap_states(
+                instruments=instruments,
+                required_core_facts=required_facts,
+                mapping_version=MAPPING_VERSION,
+                dry_run=dry_run,
+            )
             elapsed = round(time.monotonic() - started_at, 3)
+            cninfo_access = snapshot_cninfo_access_runtime(
+                sources=getattr(self.research_config, "sources", None)
+            )
+            dm_logger.info(
+                "[FinancialDisclosure] CNInfo hop snapshot: %s",
+                cninfo_access,
+            )
             status = self._derive_status(
                 candidate_count=len(candidates),
                 failed_count=write_result["failed_count"],
@@ -406,8 +429,10 @@ class FinancialDisclosureIncrementalSyncService:
                 "scan_errors": scan_result["errors"][:10],
                 "stale_run_count": len(stale_runs),
                 "stale_run_samples": stale_runs[:10],
+                "stale_local_gap_cleared": stale_local_gap_cleared,
                 "elapsed_seconds": elapsed,
                 **write_result,
+                "cninfo_access": cninfo_access,
             }
             if run_id is not None:
                 with self.storage.financial_database_scope():
@@ -870,6 +895,65 @@ class FinancialDisclosureIncrementalSyncService:
             expired_pending=expired_pending,
         )
         return limited
+
+    def _clear_stale_ready_local_gap_states(
+        self,
+        *,
+        instruments: Sequence[Mapping[str, Any]],
+        required_core_facts: Sequence[str],
+        mapping_version: str,
+        dry_run: bool,
+    ) -> int:
+        """Delete leftover local-gap bookmarks once current readiness is already complete."""
+        instruments_by_id = {
+            str(instrument.get("instrument_id") or ""): instrument
+            for instrument in instruments
+            if instrument.get("instrument_id")
+        }
+        if not instruments_by_id:
+            return 0
+        with self.storage.financial_database_scope():
+            states = self.storage.list_financial_disclosure_event_states(
+                statuses=list(STALE_LOCAL_GAP_STATE_STATUSES),
+            )
+        cleared = 0
+        for state in states:
+            instrument_id = str(state.get("instrument_id") or "")
+            report_period = str(state.get("report_period") or "")
+            announcement_id = str(state.get("announcement_id") or "")
+            instrument = instruments_by_id.get(instrument_id)
+            if instrument is None or not report_period:
+                continue
+            if announcement_id != f"local-gap:{instrument_id}:{report_period}":
+                continue
+            candidate = self._candidate_for_period(instrument, report_period)
+            readiness = self._readiness_for_candidate(
+                candidate,
+                required_core_facts=self._required_core_facts_for_profile(
+                    candidate.profile,
+                    required_core_facts,
+                ),
+                mapping_version=mapping_version,
+            )
+            if not readiness.get("ready"):
+                continue
+            cleared += 1
+            if dry_run:
+                continue
+            with self.storage.financial_database_scope():
+                self.storage.delete_financial_disclosure_event_state(
+                    instrument_id=instrument_id,
+                    report_period=report_period,
+                    announcement_id=announcement_id,
+                    statuses=list(STALE_LOCAL_GAP_STATE_STATUSES),
+                )
+        if cleared:
+            dm_logger.info(
+                "[FinancialDisclosure] Cleared stale ready local-gap states count=%s dry_run=%s",
+                cleared,
+                dry_run,
+            )
+        return cleared
 
     @staticmethod
     def _limit_candidates_balanced(

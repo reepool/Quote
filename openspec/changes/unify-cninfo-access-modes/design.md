@@ -60,6 +60,9 @@ This is CNInfo first-party HTTP only. It is not a DCE / Ruishu / attachment-down
 - Do not change canonical tables, job ids, or financial time semantics.
 - Do not expand static-PDF proxy accept beyond today's JSON-only helper.
 - Do not rewrite announcement scan to `asyncio.to_thread` in this change.
+- Do not delete, wrap, or migrate backup providers (AkShare `*_cninfo`, efinance, exchange announcement routes, THS/Sina, baostock, tdx, or the in-mux `chrome_tls` / proxy hops) into a second access stack.
+- Do not treat leftover use of those backup providers as unfinished mux work.
+- Do not enable `official_structured_sources` or `sources.cninfo.financial_statements` in this change. That is a later, bounded production switch after the mux is live.
 
 ## Decisions
 
@@ -199,6 +202,8 @@ Current `CninfoProxyFallbackSession.__getattr__` forwards unknown attributes to 
 - [Shared runtime leaks across pytest] → Reset/inject helper is mandatory in mux tests.
 - [AkShare `*_cninfo` or attachment downloads still 403] → Out of scope.
 - [Default `headed_chrome` starts Chrome on the first nightly job] → Rollback is config/env. Verify mux on the scheduler host for data20 + announcement + one static URL before relying on the default.
+- [Someone reads leftover AkShare/THS as “mux incomplete”] → Those are backup providers. Subsequent work tests the switch; it does not migrate them into the mux.
+- [Mux returns HTTP 200 empty JSON after hops fail] → Domain provider may mark the instrument covered and skip akshare/THS. Exhausted hops must surface as HTTP error, raise, or uncovered scope.
 
 ## Migration Plan
 
@@ -216,3 +221,30 @@ Current `CninfoProxyFallbackSession.__getattr__` forwards unknown attributes to 
 - Sharing one Chrome with DCE in the same process stays closed.
 - Config-driven extra www prefixes stay deferred until a real caller needs a path outside the current allowlist and `/data20/`.
 - Moving announcement scan off the scheduler loop is a later job change, not this mux.
+
+## Subsequent Work
+
+The mux slice (sections 1–4 in `tasks.md`) is the new preferred first-party hop. Later work on this same change keeps the three-layer model:
+
+```text
+new attach() hop  (headed → chrome_tls → proxy)
+        |
+        v
+existing domain provider  (parse / write owner unchanged)
+        |
+        v
+existing backup providers  (akshare / efinance / THS / Sina / exchange / …)
+```
+
+Do now, without a production job:
+
+1. Simulated shareholder incremental switch: `cninfo` raise or incomplete scope → `akshare` (and optionally `efinance`) fills remaining instruments. Primary `cninfo` success MUST NOT call the backup.
+2. Simulated financial repair switch: `cninfo_data20` transport/source failure → THS/Sina fallback on the existing repair router. Do not invent a second repair owner.
+3. Mux exhausted hops MUST return the HTTP error (or raise) so the domain provider can fail that candidate and the resolver can continue. Do not convert a blocked empty body into a covered success.
+4. Write-free `attach_cninfo_access()` probe for one data20 GET, one announcement POST, and one static URL. This is operator/dev verification, not a default CI live test.
+
+Do later, after the hop is on the scheduler host:
+
+5. Operator runs `shareholder_incremental_sync` and `financial_disclosure_incremental_sync` separately (dry-run or bounded `/run`) and reads `cninfo_access`, uncovered instruments, and backup-source fields. Rollback remains `QUOTE_CNINFO_ACCESS_MODE=chrome_tls`.
+6. Bounded official data20 enablement for `official_structured_sources` / `sources.cninfo.financial_statements` only after that observation. The 21:45 incremental already uses `cninfo_data20` first through the existing repair router; those flags are for official L1/shadow write, not a prerequisite for testing the daily disclosure job.
+7. Optional later job change: move announcement scan off the running asyncio loop. Not a mux or backup-provider task.

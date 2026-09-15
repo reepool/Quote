@@ -91,8 +91,26 @@ class _FakeAnnouncementService:
 class _EmptyShareholderProvider(BaseShareholderProvider):
     source_name = "cninfo"
 
+    def __init__(self, source_name=None):
+        if source_name is not None:
+            self.source_name = source_name
+
     async def fetch_shareholder_snapshots(self, *, instruments, exchange, mode="direct", limit=None):
         return []
+
+
+class _RaisingShareholderProvider(BaseShareholderProvider):
+    source_name = "cninfo"
+
+    def __init__(self, error="cninfo direct hops exhausted", source_name=None):
+        if source_name is not None:
+            self.source_name = source_name
+        self.error = error
+        self.calls = []
+
+    async def fetch_shareholder_snapshots(self, *, instruments, exchange, mode="direct", limit=None):
+        self.calls.append({"instruments": list(instruments), "exchange": exchange, "mode": mode})
+        raise RuntimeError(self.error)
 
 
 class _ShareholderProvider(BaseShareholderProvider):
@@ -103,7 +121,10 @@ class _ShareholderProvider(BaseShareholderProvider):
         holder_count=100,
         report_date="2026-03-31",
         coverage_scope=None,
+        source_name=None,
     ):
+        if source_name is not None:
+            self.source_name = source_name
         self.holder_count = holder_count
         self.report_date = report_date
         self.coverage_scope = coverage_scope or [
@@ -131,7 +152,7 @@ class _ShareholderProvider(BaseShareholderProvider):
                 top_holders_total_ratio=50.0 if has_top else None,
                 control_owner_name="控股股东A" if has_owner else None,
                 control_owner_ratio=50.0 if has_owner else None,
-                source="cninfo",
+                source=self.source_name,
                 source_mode=mode,
                 snapshot_json={
                     "coverage_scope": list(self.coverage_scope),
@@ -282,6 +303,35 @@ def _build_config(tmp_path):
             }
         },
     )
+
+
+def _enable_backup_shareholder_sources(config):
+    config.routing["shareholders"]["fallback_chain"] = [
+        {"source": "akshare", "mode": "direct"},
+        {"source": "efinance", "mode": "direct"},
+    ]
+    config.sources["akshare"] = {
+        "enabled": True,
+        "supports_proxy_patch": False,
+        "cost_tier": "free",
+    }
+    config.sources["efinance"] = {
+        "enabled": True,
+        "supports_proxy_patch": False,
+        "cost_tier": "free",
+    }
+    return config
+
+
+def _sse_instrument():
+    return {
+        "instrument_id": "600519.SH",
+        "symbol": "600519",
+        "name": "贵州茅台",
+        "exchange": "SSE",
+        "type": "stock",
+        "is_active": True,
+    }
 
 
 @pytest.mark.asyncio
@@ -750,3 +800,90 @@ async def test_incremental_persists_cninfo_control_change_history(tmp_path):
     assert [item["change_date"] for item in history] == ["2014-06-30"]
     assert stored["snapshot"]["ownership_clues"]["control_type"] == "单独控制"
     assert stored["snapshot"]["ownership_clues"]["direct_controller_name"] == "茅台集团"
+
+
+def _incremental_backup_service(tmp_path, registry):
+    config = _enable_backup_shareholder_sources(_build_config(tmp_path))
+    storage = ResearchStorageManager(config)
+    storage.initialize()
+    instrument = _sse_instrument()
+    service = ShareholderIncrementalSyncService(
+        db_ops=_MockDbOps([instrument]),
+        storage=storage,
+        research_config=config,
+        resolver=ResearchSourcePolicyResolver(config),
+        registry=ShareholderProviderRegistry(registry),
+        announcement_service=_FakeAnnouncementService(
+            [_quarter_report_announcement(instrument)]
+        ),
+    )
+    return service, storage, instrument
+
+
+@pytest.mark.asyncio
+async def test_incremental_keeps_cninfo_primary_without_calling_backup(tmp_path):
+    cninfo = _ShareholderProvider(holder_count=100)
+    akshare = _ShareholderProvider(holder_count=999, source_name="akshare")
+    service, storage, instrument = _incremental_backup_service(
+        tmp_path,
+        {"cninfo": cninfo, "akshare": akshare},
+    )
+
+    result = await service.sync(exchanges=["SSE"], pending_recheck_days=0)
+
+    stored = storage.get_shareholder_snapshot(instrument["instrument_id"])
+    assert result["status"] == "success"
+    assert result["attempted_sources"] == ["cninfo:direct"]
+    assert result["successful_sources"] == ["cninfo:direct"]
+    assert result["snapshots_written"] == 1
+    assert akshare.calls == []
+    assert stored["holder_count"] == 100
+    assert stored["source"] == "cninfo"
+    assert result["cninfo_access"]["preferred_mode"] == "headed_chrome"
+    assert result["cninfo_access"]["www_request_count"] == 0
+
+
+@pytest.mark.asyncio
+async def test_incremental_switches_to_akshare_when_cninfo_raises(tmp_path):
+    cninfo = _RaisingShareholderProvider()
+    akshare = _ShareholderProvider(holder_count=200, source_name="akshare")
+    service, storage, instrument = _incremental_backup_service(
+        tmp_path,
+        {"cninfo": cninfo, "akshare": akshare},
+    )
+
+    result = await service.sync(exchanges=["SSE"], pending_recheck_days=0)
+
+    stored = storage.get_shareholder_snapshot(instrument["instrument_id"])
+    assert result["status"] == "success"
+    assert result["attempted_sources"] == ["akshare:direct", "cninfo:direct"]
+    assert result["successful_sources"] == ["akshare:direct"]
+    assert result["snapshots_written"] == 1
+    assert len(cninfo.calls) == 1
+    assert len(akshare.calls) == 1
+    assert stored["holder_count"] == 200
+    assert stored["source"] == "akshare"
+
+
+@pytest.mark.asyncio
+async def test_incremental_switches_to_akshare_when_cninfo_scope_is_incomplete(tmp_path):
+    cninfo = _ShareholderProvider(
+        holder_count=80,
+        coverage_scope=["holder_count"],
+    )
+    akshare = _ShareholderProvider(holder_count=180, source_name="akshare")
+    service, storage, instrument = _incremental_backup_service(
+        tmp_path,
+        {"cninfo": cninfo, "akshare": akshare},
+    )
+
+    result = await service.sync(exchanges=["SSE"], pending_recheck_days=0)
+
+    stored = storage.get_shareholder_snapshot(instrument["instrument_id"])
+    assert result["status"] == "success"
+    assert result["attempted_sources"] == ["akshare:direct", "cninfo:direct"]
+    assert result["successful_sources"] == ["akshare:direct", "cninfo:direct"]
+    assert result["snapshots_written"] == 1
+    assert len(akshare.calls) == 1
+    assert stored["top_holders_count"] == 10
+    assert stored["holder_count"] in {80, 180}
