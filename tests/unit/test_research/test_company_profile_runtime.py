@@ -5,6 +5,7 @@ import json
 import os
 from copy import deepcopy
 from pathlib import Path
+from typing import ClassVar
 
 import pytest
 from pydantic import TypeAdapter
@@ -17,7 +18,15 @@ from research.business_profile_async_production import (
     get_business_profile_write_coordinator,
 )
 from research.company_profile import ChapterTask
-from research.company_profile.contracts import CandidateResponseItem, ExtractResponse
+from research.company_profile.contracts import (
+    CandidateResponseItem,
+    ContractErrorCode,
+    ExtractResponse,
+    SemanticProviderError,
+)
+from research.company_profile.core_assessment_projection import (
+    COMMON_CORE_MAPPING_VERSION,
+)
 from research.company_profile.core_evidence_selection import select_core_evidence
 from research.company_profile.models import ReportIdentity, SemanticRecord
 from research.company_profile.runtime import (
@@ -31,6 +40,9 @@ from tests.unit.test_research.test_business_profile_async_production import (
 )
 from tests.unit.test_research.test_business_profile_exposure_components import (
     _storage,
+)
+from tests.unit.test_research.test_business_profile_production_operations import (
+    _announcement,
 )
 
 ROOT = Path(__file__).resolve().parents[3]
@@ -110,6 +122,13 @@ def _item(report: ReportIdentity, pages, work_id: str = "work-core-1") -> dict:
 
 
 class _RequestBoundOverviewProvider:
+    model = "fixture-overview"
+    last_usage: ClassVar[dict[str, int]] = {
+        "input_tokens": 10,
+        "output_tokens": 20,
+        "total_tokens": 30,
+    }
+
     def __init__(self) -> None:
         self.extract_calls = 0
         self.extract_chapters: list[ChapterTask] = []
@@ -815,3 +834,213 @@ def test_corrected_accepted_input_is_not_overwritten_by_old_scope(tmp_path):
     assert ChapterTask.EXTRACT_SEGMENT_FINANCIALS.value not in published["reused_scope_ids"]
     assert output.source_native.qualifier == "corrected-accepted-input"
     assert output.record_id == "corrected-accepted-input"
+
+
+def test_execution_record_captures_identity_attempts_tokens_and_disputes(tmp_path):
+    report = _report(report_id="asset-runtime-execution")
+    item = _item(report, (_overview_page(SERVICE_OVERVIEW),), work_id="work-execution")
+    item["processing_identity"] = {"rules": "company_profile_common_core.v1"}
+    writer = CompanyProfileResearchWriter(tmp_path)
+    published = asyncio.run(
+        _drive(
+            CompanyProfileStageRuntime(
+                writer=writer,
+                provider=_RequestBoundOverviewProvider(),
+            ),
+            item,
+        )
+    )
+    execution = published["execution"]
+    written = json.loads(writer.latest_path().read_text(encoding="utf-8"))["execution"]
+    checkpoint = json.loads(
+        (writer.output_root / "checkpoints" / "work-execution.json").read_text(
+            encoding="utf-8"
+        )
+    )["execution"]
+
+    assert execution["input_identity"]["report_id"] == "asset-runtime-execution"
+    assert execution["input_identity"]["policy_version"] == COMMON_CORE_MAPPING_VERSION
+    assert execution["input_identity"]["processing_identity"]["rules"] == (
+        "company_profile_common_core.v1"
+    )
+    assert execution["scope_digests"]
+    assert execution["model_attempts"]
+    assert execution["model_attempts"][0]["model"] == "fixture-overview"
+    assert execution["token_budget"]["tokens_used"] == 60
+    assert execution["token_budget"]["tokens_remaining"] == 50_000 - 60
+    assert execution["token_budget"]["extract_max_output_tokens"] >= 4_000
+    assert any(
+        item["reason_codes"] == ["required_coverage_missing"]
+        for item in execution["semantic_disputes"]
+    )
+    assert written["token_budget"]["tokens_used"] == 60
+    assert checkpoint["input_identity"]["report_id"] == "asset-runtime-execution"
+
+
+def test_transport_timeout_retries_then_delivers_gaps(tmp_path):
+    class _TimeoutThenGood(_RequestBoundOverviewProvider):
+        def extract(self, request):
+            if self.extract_calls < 2:
+                self.extract_calls += 1
+                self.extract_chapters.append(request.chapter_task)
+                raise SemanticProviderError(
+                    ContractErrorCode.DEADLINE_EXCEEDED, "gateway timeout"
+                )
+            return super().extract(request)
+
+    report = _report(report_id="asset-runtime-transport")
+    item = _item(report, (_overview_page(SERVICE_OVERVIEW),), work_id="work-transport")
+    writer = CompanyProfileResearchWriter(tmp_path)
+    provider = _TimeoutThenGood()
+    published = asyncio.run(
+        _drive(
+            CompanyProfileStageRuntime(writer=writer, provider=provider),
+            item,
+        )
+    )
+
+    assert provider.extract_calls == 3
+    assert published["execution"]["transport_retries"] == 2
+    assert published["accepted_record_ids"]
+    assert published["assessment"]["principal_business"]["answered"] is True
+
+
+def test_illegal_extract_is_not_retried_as_transport(tmp_path):
+    report = _report(report_id="asset-runtime-semantic-no-retry")
+    item = _item(report, (_overview_page(SERVICE_OVERVIEW),), work_id="work-semantic")
+    writer = CompanyProfileResearchWriter(tmp_path)
+    first = _IllegalExtractProvider()
+    published = asyncio.run(
+        _drive(CompanyProfileStageRuntime(writer=writer, provider=first), item)
+    )
+
+    assert first.extract_calls == 1
+    assert published["execution"]["transport_retries"] == 0
+    assert any(
+        "candidate_schema_invalid" in item["reason_codes"]
+        for item in published["execution"]["semantic_disputes"]
+    )
+
+
+def test_token_budget_skips_later_scope_without_blocking_delivery(tmp_path):
+    report = _report(report_id="asset-runtime-budget")
+    pages = (
+        _overview_page(SERVICE_OVERVIEW),
+        _segment_page(SEGMENT_LINE),
+    )
+    item = _item(report, pages, work_id="work-budget")
+    provider = _RequestBoundOverviewProvider()
+    published = asyncio.run(
+        _drive(
+            CompanyProfileStageRuntime(
+                writer=CompanyProfileResearchWriter(tmp_path),
+                provider=provider,
+                token_budget=30,
+            ),
+            item,
+        )
+    )
+
+    assert provider.extract_calls == 1
+    assert provider.extract_chapters == [ChapterTask.EXTRACT_BUSINESS_OVERVIEW]
+    assert published["accepted_record_ids"]
+    assert published["execution"]["token_budget"]["tokens_remaining"] == 0
+
+
+def test_one_company_failure_does_not_block_another(tmp_path):
+    storage = _storage(tmp_path)
+    frontier, _instrument = _frontier(storage)
+    frontier.upsert_record(
+        instrument={
+            "instrument_id": "000001.SZ",
+            "symbol": "000001",
+            "exchange": "SZSE",
+        },
+        record=_announcement(
+            "annual-2025-sz",
+            "另一公司2025年年度报告",
+            published_at="2026-03-21T08:00:00+08:00",
+        ),
+    )
+    queue = BusinessProfileWorkRepository(
+        storage, checkpoint_root=tmp_path / "checkpoints"
+    )
+    enqueued = queue.enqueue_latest_annual(
+        knowledge_cutoff="2026-08-30",
+        processing_identity={"rules": "company_profile_common_core.v1"},
+    )
+    writer = CompanyProfileResearchWriter(tmp_path)
+    good = _RequestBoundOverviewProvider()
+
+    class _ByCompany:
+        model = "fixture-overview"
+        last_usage: ClassVar[dict[str, int]] = {
+            "input_tokens": 10,
+            "output_tokens": 20,
+            "total_tokens": 30,
+        }
+
+        def extract(self, request):
+            if request.report.instrument_id == "600000.SH":
+                raise SemanticProviderError(
+                    ContractErrorCode.DEADLINE_EXCEEDED, "always timeout"
+                )
+            return good.extract(request)
+
+        def repair(self, request):
+            raise RuntimeError("repair is not part of the 2.3 path")
+
+        def verify(self, request):
+            return good.verify(request)
+
+    def load_pages(item):
+        instrument_id = str(item["instrument_id"])
+        return {
+            "report": _report(
+                instrument_id=instrument_id,
+                report_id=f"asset-{instrument_id}",
+            ),
+            "pages": (_overview_page(SERVICE_OVERVIEW),),
+        }
+
+    service = BusinessProfileAsyncProductionService(
+        repository=queue,
+        discovery_runner=lambda **_kwargs: None,
+        stage_runner=CompanyProfileStageRuntime(
+            writer=writer,
+            provider=_ByCompany(),
+            page_source=load_pages,
+        ),
+        write_coordinator=get_business_profile_write_coordinator(storage),
+        lease_seconds=30,
+    )
+    budget = StageBudget(max_items=2, max_concurrency=1, max_elapsed_seconds=20)
+
+    async def drain_all():
+        return {
+            stage: await service._drain_stage(stage, budget) for stage in WORK_STAGES
+        }
+
+    drained = asyncio.run(drain_all())
+    with storage.get_connection() as conn:
+        rows = {
+            row["instrument_id"]: dict(row)
+            for row in conn.execute(
+                "SELECT instrument_id, status, last_error FROM business_profile_work_items"
+            )
+        }
+
+    assert enqueued["inserted"] == 2
+    assert drained["publish"]["completed"] >= 1
+    assert rows["000001.SZ"]["status"] == "completed"
+    assert rows["600000.SH"]["status"] == "completed"
+    written = [
+        json.loads(path.read_text(encoding="utf-8"))
+        for path in writer.output_root.glob("*.json")
+    ]
+    by_instrument = {
+        item["report"]["instrument_id"]: item for item in written
+    }
+    assert by_instrument["000001.SZ"]["assessment"]["core_complete"] is True
+    assert by_instrument["600000.SH"]["assessment"]["principal_business"]["answered"] is False
+    assert by_instrument["600000.SH"]["execution"]["transport_retries"] == 2

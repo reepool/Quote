@@ -42,6 +42,20 @@ from .core_skeleton import (
     ActivatedChapter,
     select_activated_chapters,
 )
+from .execution import (
+    DEFAULT_EXTRACT_BASE_TOKENS,
+    DEFAULT_TOTAL_TOKEN_BUDGET,
+    DEFAULT_VERIFY_BASE_TOKENS,
+    TRANSPORT_RETRY_LIMIT,
+    CompanyProfileExecutionRecord,
+    CompanyProfileModelAttempt,
+    CompanyProfileTokenBudget,
+    TransportRetryingProvider,
+    build_execution_record,
+    collect_semantic_disputes,
+    dynamic_scope_token_budget,
+    processing_identity_from_item,
+)
 from .models import (
     PRODUCTION_AUTHORIZATION,
     ActivityAction,
@@ -123,6 +137,7 @@ class CompanyProfileRuntimeRecord(_StrictModel):
     evidence_gap_codes: tuple[str, ...]
     provider_calls: tuple[str, ...]
     provider_blocked: bool
+    execution: CompanyProfileExecutionRecord
     legacy_writers_invoked: tuple[str, ...] = ()
 
 
@@ -143,6 +158,13 @@ class _WorkState:
     scope_digests: dict[str, str] = field(default_factory=dict)
     reused_scope_ids: list[str] = field(default_factory=list)
     predecessor_lineage: list[dict[str, Any]] = field(default_factory=list)
+    processing_identity: dict[str, Any] = field(default_factory=dict)
+    model_attempts: list[CompanyProfileModelAttempt] = field(default_factory=list)
+    transport_retries: int = 0
+    tokens_used: int = 0
+    input_tokens: int = 0
+    output_tokens: int = 0
+    extract_max_output_tokens: int = DEFAULT_EXTRACT_BASE_TOKENS
 
 
 class CompanyProfileResearchWriter:
@@ -188,13 +210,34 @@ class CompanyProfileStageRuntime:
         page_source: Callable[[Mapping[str, Any]], Mapping[str, Any] | None]
         | None = None,
         stop_after_chapter: ChapterTask | None = None,
+        token_budget: int = DEFAULT_TOTAL_TOKEN_BUDGET,
+        extract_base_tokens: int = DEFAULT_EXTRACT_BASE_TOKENS,
+        verify_base_tokens: int = DEFAULT_VERIFY_BASE_TOKENS,
+        transport_retries: int = TRANSPORT_RETRY_LIMIT,
     ) -> None:
         self.writer = writer
-        self.provider = provider
         self.page_source = page_source
         self.stop_after_chapter = stop_after_chapter
+        self._total_token_budget = max(0, int(token_budget))
+        self._extract_base_tokens = max(0, int(extract_base_tokens))
+        self._verify_base_tokens = max(0, int(verify_base_tokens))
+        self._active_state: _WorkState | None = None
+        self.provider = (
+            TransportRetryingProvider(
+                provider,
+                ledger_getter=self._active_ledger,
+                max_retries=transport_retries,
+            )
+            if provider is not None
+            else None
+        )
         self._semantic_service = semantic_service or CompanyProfileSemanticService()
         self._states: dict[str, _WorkState] = {}
+
+    def _active_ledger(self) -> _WorkState:
+        if self._active_state is None:
+            raise RuntimeError("company-profile execution ledger is not bound")
+        return self._active_state
 
     async def __call__(
         self,
@@ -211,15 +254,19 @@ class CompanyProfileStageRuntime:
         if stage not in QUEUE_STAGES:
             raise ValueError(f"unsupported company-profile runtime stage: {stage}")
         state = self._bind(item)
-        if stage == "acquire":
-            return self._acquire(state, item)
-        if stage == "parse":
-            return self._parse(state)
-        if stage == "semantic":
-            return self._semantic(state)
-        if stage == "verify":
-            return self._verify(state)
-        return self._publish(state)
+        self._active_state = state
+        try:
+            if stage == "acquire":
+                return self._acquire(state, item)
+            if stage == "parse":
+                return self._parse(state)
+            if stage == "semantic":
+                return self._semantic(state)
+            if stage == "verify":
+                return self._verify(state)
+            return self._publish(state)
+        finally:
+            self._active_state = None
 
     def _bind(self, item: Mapping[str, Any]) -> _WorkState:
         work_id = str(item["work_id"])
@@ -237,6 +284,7 @@ class CompanyProfileStageRuntime:
             state.pages = tuple(item["pages"])
         if item.get("accepted_records"):
             state.accepted_records = tuple(item["accepted_records"])
+        state.processing_identity = processing_identity_from_item(item)
         return state
 
     def _acquire(
@@ -289,6 +337,12 @@ class CompanyProfileStageRuntime:
         state.provider_calls.clear()
         state.reused_scope_ids.clear()
         state.predecessor_lineage.clear()
+        state.model_attempts.clear()
+        state.transport_retries = 0
+        state.tokens_used = 0
+        state.input_tokens = 0
+        state.output_tokens = 0
+        state.extract_max_output_tokens = self._extract_base_tokens
         for chapter in COMMON_CORE_CHAPTERS:
             activation = next(
                 item for item in state.chapters if item.chapter_task == chapter
@@ -365,7 +419,20 @@ class CompanyProfileStageRuntime:
                 unresolved_field_ids=unresolved,
                 deterministic_candidates=tuple(accepted),
             )
-            provider = self.provider if unresolved and not chapter_unread else None
+            state.extract_max_output_tokens = max(
+                state.extract_max_output_tokens,
+                dynamic_scope_token_budget(
+                    field_count=len(_CORE_FIELDS[chapter]),
+                    evidence_count=len(bundle),
+                    base_tokens=self._extract_base_tokens,
+                ),
+            )
+            budget_left = state.tokens_used < self._total_token_budget
+            provider = (
+                self.provider
+                if unresolved and not chapter_unread and budget_left
+                else None
+            )
             result = self._semantic_service.run_task(request, provider=provider)
             results.append(result)
             state.provider_calls.extend(result.provider_calls)
@@ -409,6 +476,7 @@ class CompanyProfileStageRuntime:
             evidence_gap_codes=tuple(gap.code for gap in state.evidence.gaps),
             provider_calls=tuple(state.provider_calls),
             provider_blocked=state.provider_blocked,
+            execution=self._execution_for(state),
             legacy_writers_invoked=(),
         )
         self.writer.persist(record)
@@ -439,6 +507,7 @@ class CompanyProfileStageRuntime:
             ],
             "reused_scope_ids": list(state.reused_scope_ids),
             "predecessor_lineage": list(state.predecessor_lineage),
+            "execution": json_compatible(self._execution_for(state)),
             "evidence_gap_codes": (
                 [gap.code for gap in state.evidence.gaps] if state.evidence else []
             ),
@@ -448,6 +517,25 @@ class CompanyProfileStageRuntime:
         if state.published is not None:
             payload["published_path"] = str(self.writer.latest_path())
         return payload
+
+    def _execution_for(self, state: _WorkState) -> CompanyProfileExecutionRecord:
+        used = max(0, int(state.tokens_used))
+        return build_execution_record(
+            report=state.report,
+            processing_identity=state.processing_identity,
+            scope_digests=state.scope_digests,
+            model_attempts=state.model_attempts,
+            token_budget=CompanyProfileTokenBudget(
+                total_token_budget=self._total_token_budget,
+                extract_max_output_tokens=state.extract_max_output_tokens,
+                verify_max_output_tokens=self._verify_base_tokens,
+                tokens_used=used,
+                tokens_remaining=max(0, self._total_token_budget - used),
+            ),
+            transport_retries=state.transport_retries,
+            semantic_disputes=collect_semantic_disputes(state.task_results),
+            predecessor_lineage=state.predecessor_lineage,
+        )
 
     def _work_checkpoint_path(self, work_id: str) -> Path:
         return self.writer.output_root / "checkpoints" / f"{work_id}.json"
@@ -504,6 +592,26 @@ class CompanyProfileStageRuntime:
             if item.get("source_digest"):
                 state.scope_digests[chapter] = str(item["source_digest"])
         self._restore_task_results(state)
+        execution = payload.get("execution")
+        if isinstance(execution, Mapping):
+            identity = execution.get("input_identity")
+            if isinstance(identity, Mapping) and identity.get("processing_identity"):
+                state.processing_identity = dict(identity["processing_identity"])
+            state.model_attempts = [
+                CompanyProfileModelAttempt.model_validate(item)
+                for item in execution.get("model_attempts") or ()
+            ]
+            state.transport_retries = int(execution.get("transport_retries") or 0)
+            budget = execution.get("token_budget") or {}
+            if isinstance(budget, Mapping):
+                state.tokens_used = int(budget.get("tokens_used") or 0)
+                state.extract_max_output_tokens = int(
+                    budget.get("extract_max_output_tokens")
+                    or DEFAULT_EXTRACT_BASE_TOKENS
+                )
+            state.predecessor_lineage = [
+                dict(item) for item in execution.get("predecessor_lineage") or ()
+            ]
 
     def _restore_task_results(self, state: _WorkState) -> None:
         if state.task_results or not state.completed_scopes:
@@ -617,6 +725,7 @@ class CompanyProfileStageRuntime:
                     }
                     for chapter, result in state.completed_scopes.items()
                 ],
+                "execution": json_compatible(self._execution_for(state)),
             },
         )
 
