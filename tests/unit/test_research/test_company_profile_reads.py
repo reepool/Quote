@@ -8,6 +8,7 @@ from research.company_profile.models import PRODUCTION_AUTHORIZATION
 from research.company_profile.reads import (
     EXPORT_SCHEMA_VERSION,
     PROFILE_SCHEMA_VERSION,
+    _accepted_facts,
 )
 from research.company_profile.runtime import (
     COMMON_CORE_STORAGE_NAMESPACE,
@@ -108,6 +109,91 @@ def test_query_delivers_completed_company_without_waiting_for_the_batch(tmp_path
     assert result["state"] == "found"
     assert result["profiles"][0]["instrument_id"] == "600000.SH"
     assert result["missing_instrument_ids"] == []
+
+
+def test_accepted_facts_exclude_all_rejected_records_when_no_id_is_accepted():
+    facts = _accepted_facts(
+        {
+            "completed_scopes": [
+                {
+                    "task_result": {
+                        "dispositions": [
+                            {"target_id": "blocked-1", "status": "blocked"},
+                            {"target_id": "unresolved-1", "status": "unresolved"},
+                        ],
+                        "records": [
+                            {"record_id": "blocked-1", "field_id": "principal_business"},
+                            {
+                                "record_id": "unresolved-1",
+                                "field_id": "products_services",
+                            },
+                        ],
+                    }
+                }
+            ]
+        }
+    )
+
+    assert facts == []
+
+
+def test_accepted_facts_keep_only_accepted_for_review_from_mixed_scope():
+    facts = _accepted_facts(
+        {
+            "accepted_records": [
+                {"record_id": "top-level-1", "field_id": "principal_business"},
+            ],
+            "completed_scopes": [
+                {
+                    "task_result": {
+                        "dispositions": [
+                            {"target_id": "ok-1", "status": "accepted_for_review"},
+                            {"target_id": "blocked-1", "status": "blocked"},
+                        ],
+                        "records": [
+                            {"record_id": "ok-1", "field_id": "principal_business"},
+                            {"record_id": "blocked-1", "field_id": "products_services"},
+                        ],
+                    }
+                }
+            ]
+        }
+    )
+
+    assert [item["record_id"] for item in facts] == ["top-level-1", "ok-1"]
+
+
+def test_query_does_not_treat_blocked_records_as_accepted_facts(tmp_path):
+    storage = _storage(tmp_path)
+    _frontier(storage)
+    _publish_one(tmp_path, storage)
+    checkpoint_path = next(
+        (tmp_path / "output" / COMMON_CORE_STORAGE_NAMESPACE / "checkpoints").glob(
+            "*.json"
+        )
+    )
+    payload = json.loads(checkpoint_path.read_text(encoding="utf-8"))
+    payload["accepted_records"] = []
+    payload["completed_scopes"] = [
+        {
+            "task_result": {
+                "dispositions": [
+                    {"target_id": "blocked-1", "status": "blocked"},
+                ],
+                "records": [
+                    {"record_id": "blocked-1", "field_id": "principal_business"},
+                ],
+            }
+        }
+    ]
+    checkpoint_path.write_text(json.dumps(payload), encoding="utf-8")
+
+    result = asyncio.run(
+        _service(tmp_path, storage).execute("query", instrument_ids=["600000.SH"])
+    )
+
+    assert result["state"] == "found"
+    assert result["profiles"][0]["accepted_facts"] == []
 
 
 def test_query_missing_instrument_is_not_found(tmp_path):

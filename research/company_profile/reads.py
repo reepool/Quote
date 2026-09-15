@@ -240,7 +240,7 @@ def _accepted_facts(checkpoint: Mapping[str, Any]) -> list[dict[str, Any]]:
             if not isinstance(raw, Mapping):
                 continue
             record_id = str(raw.get("record_id") or "")
-            if accepted_ids and record_id not in accepted_ids:
+            if record_id not in accepted_ids:
                 continue
             _append_fact(facts, seen, raw)
     return facts
