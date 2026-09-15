@@ -224,6 +224,52 @@ def test_unread_or_failed_status_does_not_publish_a_completed_list():
     _assert_not_zero_claim(failed)
 
 
+def test_published_json_rejects_contradictory_assessment_states():
+    sale = _activity("阴极铜", record_id="act-sale")
+    assessed = _assess((sale,))
+    payload = json.loads(assessed.model_dump_json())
+    unread_with_exposures = {**payload, "assessment_status": "not_assessed"}
+    unread_with_checked = {
+        **payload,
+        "assessment_status": "not_assessed",
+        "exposures": [],
+    }
+    failed_with_exposures = {**payload, "assessment_status": "extraction_failed"}
+
+    with pytest.raises(ValidationError, match="not_assessed"):
+        CommodityExposureAssessment.model_validate_json(
+            json.dumps(unread_with_exposures)
+        )
+    with pytest.raises(ValidationError, match="not_assessed"):
+        CommodityExposureAssessment.model_validate_json(
+            json.dumps(unread_with_checked)
+        )
+    with pytest.raises(ValidationError, match="extraction_failed"):
+        CommodityExposureAssessment.model_validate_json(
+            json.dumps(failed_with_exposures)
+        )
+    CommodityExposureAssessment.model_validate_json(json.dumps(payload))
+    CommodityExposureAssessment.model_validate_json(
+        json.dumps(
+            {
+                **payload,
+                "assessment_status": "not_assessed",
+                "exposures": [],
+                "checked_evidence_ids": [],
+            }
+        )
+    )
+    CommodityExposureAssessment.model_validate_json(
+        json.dumps(
+            {
+                **payload,
+                "assessment_status": "extraction_failed",
+                "exposures": [],
+            }
+        )
+    )
+
+
 def test_assessment_stays_id_only_and_off_stage5():
     sale = _activity("阴极铜", record_id="act-sale")
     assessment = _assess((sale,))

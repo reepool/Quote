@@ -290,13 +290,20 @@ class CommodityExposureAssessment(_StrictModel):
     exposures: tuple[CommodityExposure, ...] = ()
 
     @model_validator(mode="after")
-    def _empty_list_is_not_zero_exposure(self) -> CommodityExposureAssessment:
+    def _status_matches_association_scope(self) -> CommodityExposureAssessment:
         _reject_blank_ids(self.checked_evidence_ids, label="checked_evidence_ids")
         if any(item.report != self.report for item in self.exposures):
             raise ValueError("assessment exposures must belong to the same report")
-        if (
-            self.assessment_status == AssessmentStatus.ASSESSED
-            and not self.exposures
+        if self.assessment_status == AssessmentStatus.NOT_ASSESSED:
+            if self.exposures:
+                raise ValueError("not_assessed assessment cannot carry exposures")
+            if self.checked_evidence_ids:
+                raise ValueError("not_assessed assessment cannot carry checked evidence")
+        elif self.assessment_status == AssessmentStatus.EXTRACTION_FAILED:
+            if self.exposures:
+                raise ValueError("extraction_failed assessment cannot carry exposures")
+        elif (
+            not self.exposures
             and not self.checked_evidence_ids
         ):
             raise ValueError(
