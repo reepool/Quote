@@ -211,3 +211,49 @@ def test_cninfo_wrapper_does_not_retry_requests_tls_after_chrome_tls_403():
     assert len(impersonated.calls) == 1
     assert inner.calls == []
     assert session._prefer_proxy is True
+
+
+def test_cninfo_wrapper_falls_back_to_proxy_when_chrome_tls_raises_typeerror():
+    inner = _QueuedSession(
+        [AssertionError("requests TLS must not run after chrome TLS setup failure")]
+    )
+    proxy_response = _FakeResponse({"code": 200, "data": {"records": [{"SECCODE": "600000"}]}})
+
+    def broken_chrome_tls(*_args, **_kwargs):
+        raise TypeError("Session.__init__() got an unexpected keyword argument 'impersonate'")
+
+    session = wrap_cninfo_proxy_fallback(
+        inner,
+        impersonated_request=broken_chrome_tls,
+        proxy_request=lambda *args, **kwargs: proxy_response,
+    )
+    response = session.get(
+        "https://www.cninfo.com.cn/new/hisAnnouncement/query"
+    )
+
+    assert response.json()["data"]["records"][0]["SECCODE"] == "600000"
+    assert inner.calls == []
+    assert session._prefer_proxy is True
+
+
+def test_cninfo_chrome_tls_session_survives_akshare_proxy_session_replacement(monkeypatch):
+    import curl_cffi.requests as curl_requests
+    from curl_cffi.requests.session import Session as RealChromeSession
+
+    from research.providers import cninfo_http
+
+    class PatchedSession:
+        def __init__(self, *args, **kwargs):
+            if "impersonate" in kwargs:
+                raise TypeError(
+                    "Session.__init__() got an unexpected keyword argument 'impersonate'"
+                )
+
+    monkeypatch.setattr(curl_requests, "Session", PatchedSession)
+    cninfo_http._THREAD_LOCAL.session = None
+    try:
+        session = cninfo_http._impersonated_session()
+        assert isinstance(session, RealChromeSession)
+        assert not isinstance(session, PatchedSession)
+    finally:
+        cninfo_http._THREAD_LOCAL.session = None

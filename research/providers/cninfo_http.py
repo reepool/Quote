@@ -45,9 +45,12 @@ def _impersonated_session() -> Any:
     session = getattr(_THREAD_LOCAL, "session", None)
     if session is not None:
         return session
-    from curl_cffi import requests as curl_requests
+    # Import the real class from the submodule. akshare_proxy_patch replaces
+    # curl_cffi.requests.Session with a stdlib requests wrapper that rejects
+    # impersonate= and would otherwise crash CNInfo announcement scans.
+    from curl_cffi.requests.session import Session as ChromeTlsSession
 
-    session = curl_requests.Session(impersonate="chrome")
+    session = ChromeTlsSession(impersonate="chrome")
     _THREAD_LOCAL.session = session
     return session
 
@@ -103,7 +106,28 @@ class CninfoProxyFallbackSession:
             return self._inner_request(normalized_method, url, **kwargs)
         if self._prefer_proxy:
             return self._request_via_proxy(normalized_method, url, **kwargs)
-        response = self._request_direct(normalized_method, url, **kwargs)
+        try:
+            response = self._request_direct(normalized_method, url, **kwargs)
+        except Exception as exc:
+            if self._impersonated_request is None:
+                raise
+            LOGGER.warning(
+                "[CninfoHttp] Chrome TLS direct request failed: %s",
+                type(exc).__name__,
+            )
+            try:
+                proxy_response = self._request_via_proxy(normalized_method, url, **kwargs)
+            except Exception as proxy_exc:
+                LOGGER.warning(
+                    "[CninfoHttp] akshare proxy fallback failed after Chrome TLS error: %s",
+                    type(proxy_exc).__name__,
+                )
+                raise exc
+            self._prefer_proxy = True
+            LOGGER.info(
+                "[CninfoHttp] Chrome TLS unavailable; using akshare_proxy_patch"
+            )
+            return proxy_response
         if getattr(response, "status_code", 200) != 403:
             return response
         try:
