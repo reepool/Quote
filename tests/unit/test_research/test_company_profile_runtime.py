@@ -28,6 +28,7 @@ from research.company_profile.core_assessment_projection import (
     COMMON_CORE_MAPPING_VERSION,
 )
 from research.company_profile.core_evidence_selection import select_core_evidence
+from research.company_profile.execution import dynamic_scope_token_budget
 from research.company_profile.models import ReportIdentity, SemanticRecord
 from research.company_profile.runtime import (
     COMMON_CORE_STORAGE_NAMESPACE,
@@ -35,6 +36,7 @@ from research.company_profile.runtime import (
     CompanyProfileResearchWriter,
     CompanyProfileStageRuntime,
 )
+from research.company_profile.stage5_bundle import Stage5ProviderCallTrace
 from tests.unit.test_research.test_business_profile_async_production import (
     _frontier,
 )
@@ -131,7 +133,22 @@ class _RequestBoundOverviewProvider:
 
     def __init__(self) -> None:
         self.extract_calls = 0
+        self.verify_calls = 0
         self.extract_chapters: list[ChapterTask] = []
+        self.applied_token_budgets: list[dict[str, int]] = []
+
+    def apply_output_token_budget(
+        self,
+        *,
+        extract_max_output_tokens: int,
+        verify_max_output_tokens: int,
+    ) -> None:
+        self.applied_token_budgets.append(
+            {
+                "extract_max_output_tokens": extract_max_output_tokens,
+                "verify_max_output_tokens": verify_max_output_tokens,
+            }
+        )
 
     def extract(self, request):
         self.extract_calls += 1
@@ -197,6 +214,7 @@ class _RequestBoundOverviewProvider:
     def verify(self, request):
         from research.company_profile import VerifyCheck, VerifyResponse, VerifyStatus
 
+        self.verify_calls += 1
         return VerifyResponse(
             request_id=request.request_id,
             checks=tuple(
@@ -868,7 +886,11 @@ def test_execution_record_captures_identity_attempts_tokens_and_disputes(tmp_pat
     assert execution["model_attempts"][0]["model"] == "fixture-overview"
     assert execution["token_budget"]["tokens_used"] == 60
     assert execution["token_budget"]["tokens_remaining"] == 50_000 - 60
-    assert execution["token_budget"]["extract_max_output_tokens"] >= 4_000
+    assert execution["token_budget"]["extract_max_output_tokens"] == 4_000
+    assert execution["scope_token_allocations"]["extract_business_overview"] == {
+        "extract_max_output_tokens": 4_000,
+        "verify_max_output_tokens": 2_000,
+    }
     assert any(
         item["reason_codes"] == ["required_coverage_missing"]
         for item in execution["semantic_disputes"]
@@ -903,6 +925,10 @@ def test_transport_timeout_retries_then_delivers_gaps(tmp_path):
     assert published["execution"]["transport_retries"] == 2
     assert published["accepted_record_ids"]
     assert published["assessment"]["principal_business"]["answered"] is True
+    assert all(
+        "deadline_exceeded" not in item["reason_codes"]
+        for item in published["execution"]["semantic_disputes"]
+    )
 
 
 def test_illegal_extract_is_not_retried_as_transport(tmp_path):
@@ -919,6 +945,11 @@ def test_illegal_extract_is_not_retried_as_transport(tmp_path):
     assert any(
         "candidate_schema_invalid" in item["reason_codes"]
         for item in published["execution"]["semantic_disputes"]
+    )
+    assert published["execution"]["model_attempts"]
+    assert all(
+        item["status"] == "semantic_failed"
+        for item in published["execution"]["model_attempts"]
     )
 
 
@@ -942,9 +973,12 @@ def test_token_budget_skips_later_scope_without_blocking_delivery(tmp_path):
     )
 
     assert provider.extract_calls == 1
+    assert provider.verify_calls == 0
     assert provider.extract_chapters == [ChapterTask.EXTRACT_BUSINESS_OVERVIEW]
     assert published["accepted_record_ids"]
+    assert published["execution"]["token_budget"]["tokens_used"] == 30
     assert published["execution"]["token_budget"]["tokens_remaining"] == 0
+    assert provider.applied_token_budgets
 
 
 def test_one_company_failure_does_not_block_another(tmp_path):
@@ -1044,3 +1078,176 @@ def test_one_company_failure_does_not_block_another(tmp_path):
     assert by_instrument["000001.SZ"]["assessment"]["core_complete"] is True
     assert by_instrument["600000.SH"]["assessment"]["principal_business"]["answered"] is False
     assert by_instrument["600000.SH"]["execution"]["transport_retries"] == 2
+    assert all(
+        "deadline_exceeded" not in item["reason_codes"]
+        for item in by_instrument["600000.SH"]["execution"]["semantic_disputes"]
+    )
+
+
+def test_small_scope_keeps_base_token_budget():
+    assert dynamic_scope_token_budget(field_count=0, evidence_count=0) == 4_000
+    assert dynamic_scope_token_budget(field_count=2, evidence_count=2) == 4_000
+    assert dynamic_scope_token_budget(field_count=6, evidence_count=6) == 6_000
+    assert (
+        dynamic_scope_token_budget(
+            field_count=6,
+            evidence_count=4,
+            base_tokens=2_000,
+        )
+        == 3_500
+    )
+
+
+def test_resume_keeps_accumulated_execution_ledger(tmp_path):
+    report = _report(report_id="asset-runtime-ledger-resume")
+    pages = (
+        _overview_page(SERVICE_OVERVIEW),
+        _segment_page(SEGMENT_LINE),
+    )
+    item = _item(report, pages, work_id="work-ledger-resume")
+    writer = CompanyProfileResearchWriter(tmp_path)
+    first = _RequestBoundOverviewProvider()
+    first.model = "first-model"
+    runtime = CompanyProfileStageRuntime(
+        writer=writer,
+        provider=first,
+        stop_after_chapter=ChapterTask.EXTRACT_BUSINESS_OVERVIEW,
+    )
+    asyncio.run(runtime("acquire", item))
+    asyncio.run(runtime("parse", item))
+    with pytest.raises(RuntimeError, match="scope stop"):
+        asyncio.run(runtime("semantic", item))
+    stopped = json.loads(
+        (writer.output_root / "checkpoints" / "work-ledger-resume.json").read_text(
+            encoding="utf-8"
+        )
+    )["execution"]
+    assert stopped["token_budget"]["tokens_used"] == 60
+    assert [item["model"] for item in stopped["model_attempts"]] == [
+        "first-model",
+        "first-model",
+    ]
+
+    second = _RequestBoundOverviewProvider()
+    second.model = "second-model"
+    published = asyncio.run(
+        _drive(CompanyProfileStageRuntime(writer=writer, provider=second), item)
+    )
+    attempts = published["execution"]["model_attempts"]
+
+    assert first.extract_chapters == [ChapterTask.EXTRACT_BUSINESS_OVERVIEW]
+    assert second.extract_chapters == [ChapterTask.EXTRACT_SEGMENT_FINANCIALS]
+    assert [item["model"] for item in attempts] == [
+        "first-model",
+        "first-model",
+        "second-model",
+        "second-model",
+    ]
+    assert published["execution"]["token_budget"]["tokens_used"] == 120
+    assert published["execution"]["token_budget"]["tokens_remaining"] == 50_000 - 120
+    assert published["execution"]["scope_token_allocations"] == {
+        "extract_business_overview": {
+            "extract_max_output_tokens": 4_000,
+            "verify_max_output_tokens": 2_000,
+        },
+        "extract_segment_financials": {
+            "extract_max_output_tokens": 4_000,
+            "verify_max_output_tokens": 2_000,
+        },
+    }
+
+
+def test_gateway_traces_supply_model_attempts_and_tokens(tmp_path):
+    class _GatewayTraceProvider:
+        def __init__(self) -> None:
+            self._inner = _RequestBoundOverviewProvider()
+            self._traces: list[Stage5ProviderCallTrace] = []
+            self.applied_token_budgets: list[dict[str, int]] = []
+
+        @property
+        def traces(self) -> tuple[Stage5ProviderCallTrace, ...]:
+            return tuple(self._traces)
+
+        def apply_output_token_budget(
+            self,
+            *,
+            extract_max_output_tokens: int,
+            verify_max_output_tokens: int,
+        ) -> None:
+            self.applied_token_budgets.append(
+                {
+                    "extract_max_output_tokens": extract_max_output_tokens,
+                    "verify_max_output_tokens": verify_max_output_tokens,
+                }
+            )
+
+        def extract(self, request):
+            result = self._inner.extract(request)
+            self._traces.append(
+                Stage5ProviderCallTrace(
+                    call_type="extract",
+                    semantic_request_id=request.request_id,
+                    status="success",
+                    profile="semantic_extraction",
+                    model="gateway-model",
+                    selected_profile="route-profile",
+                    attempts=(
+                        {
+                            "model": "gateway-model",
+                            "selected_profile": "route-profile",
+                            "status": "success",
+                        },
+                    ),
+                    input_tokens=11,
+                    output_tokens=22,
+                    total_tokens=33,
+                )
+            )
+            return result
+
+        def repair(self, request):
+            raise RuntimeError("repair is not part of the 2.3 path")
+
+        def verify(self, request):
+            result = self._inner.verify(request)
+            self._traces.append(
+                Stage5ProviderCallTrace(
+                    call_type="verify",
+                    semantic_request_id=request.request_id,
+                    status="success",
+                    profile="semantic_extraction",
+                    model="gateway-model",
+                    selected_profile="route-profile",
+                    attempts=(
+                        {
+                            "model": "gateway-model",
+                            "selected_profile": "route-profile",
+                            "status": "success",
+                        },
+                    ),
+                    input_tokens=4,
+                    output_tokens=5,
+                    total_tokens=9,
+                )
+            )
+            return result
+
+    report = _report(report_id="asset-runtime-gateway-traces")
+    item = _item(report, (_overview_page(SERVICE_OVERVIEW),), work_id="work-traces")
+    provider = _GatewayTraceProvider()
+    published = asyncio.run(
+        _drive(
+            CompanyProfileStageRuntime(
+                writer=CompanyProfileResearchWriter(tmp_path),
+                provider=provider,
+            ),
+            item,
+        )
+    )
+    attempts = published["execution"]["model_attempts"]
+
+    assert [item["model"] for item in attempts] == ["gateway-model", "gateway-model"]
+    assert {item["profile"] for item in attempts} == {"route-profile"}
+    assert published["execution"]["token_budget"]["tokens_used"] == 42
+    assert provider.applied_token_budgets
+    assert "unspecified" not in {item["model"] for item in attempts}

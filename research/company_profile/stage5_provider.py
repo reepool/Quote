@@ -4092,6 +4092,19 @@ class CommonGatewaySemanticProvider:
         self._physical_call_admission = physical_call_admission
         self._traces: list[Stage5ProviderCallTrace] = []
 
+    def apply_output_token_budget(
+        self,
+        *,
+        extract_max_output_tokens: int,
+        verify_max_output_tokens: int,
+    ) -> None:
+        if extract_max_output_tokens < 1:
+            raise ValueError("max_output_tokens must be positive")
+        if verify_max_output_tokens < 1:
+            raise ValueError("verify_max_output_tokens must be positive")
+        self._extract_max_output_tokens = int(extract_max_output_tokens)
+        self._verify_max_output_tokens = int(verify_max_output_tokens)
+
     @property
     def traces(self) -> tuple[Stage5ProviderCallTrace, ...]:
         return tuple(self._traces)

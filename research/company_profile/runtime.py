@@ -49,6 +49,7 @@ from .execution import (
     TRANSPORT_RETRY_LIMIT,
     CompanyProfileExecutionRecord,
     CompanyProfileModelAttempt,
+    CompanyProfileScopeTokenAllocation,
     CompanyProfileTokenBudget,
     TransportRetryingProvider,
     build_execution_record,
@@ -165,6 +166,9 @@ class _WorkState:
     input_tokens: int = 0
     output_tokens: int = 0
     extract_max_output_tokens: int = DEFAULT_EXTRACT_BASE_TOKENS
+    scope_token_allocations: dict[str, CompanyProfileScopeTokenAllocation] = field(
+        default_factory=dict
+    )
 
 
 class CompanyProfileResearchWriter:
@@ -227,6 +231,7 @@ class CompanyProfileStageRuntime:
                 provider,
                 ledger_getter=self._active_ledger,
                 max_retries=transport_retries,
+                total_token_budget=self._total_token_budget,
             )
             if provider is not None
             else None
@@ -337,12 +342,6 @@ class CompanyProfileStageRuntime:
         state.provider_calls.clear()
         state.reused_scope_ids.clear()
         state.predecessor_lineage.clear()
-        state.model_attempts.clear()
-        state.transport_retries = 0
-        state.tokens_used = 0
-        state.input_tokens = 0
-        state.output_tokens = 0
-        state.extract_max_output_tokens = self._extract_base_tokens
         for chapter in COMMON_CORE_CHAPTERS:
             activation = next(
                 item for item in state.chapters if item.chapter_task == chapter
@@ -419,14 +418,30 @@ class CompanyProfileStageRuntime:
                 unresolved_field_ids=unresolved,
                 deterministic_candidates=tuple(accepted),
             )
+            extract_budget = dynamic_scope_token_budget(
+                field_count=len(_CORE_FIELDS[chapter]),
+                evidence_count=len(bundle),
+                base_tokens=self._extract_base_tokens,
+            )
+            verify_budget = dynamic_scope_token_budget(
+                field_count=len(_CORE_FIELDS[chapter]),
+                evidence_count=len(bundle),
+                base_tokens=self._verify_base_tokens,
+            )
+            allocation = CompanyProfileScopeTokenAllocation(
+                extract_max_output_tokens=extract_budget,
+                verify_max_output_tokens=verify_budget,
+            )
+            state.scope_token_allocations[chapter.value] = allocation
             state.extract_max_output_tokens = max(
                 state.extract_max_output_tokens,
-                dynamic_scope_token_budget(
-                    field_count=len(_CORE_FIELDS[chapter]),
-                    evidence_count=len(bundle),
-                    base_tokens=self._extract_base_tokens,
-                ),
+                extract_budget,
             )
+            if self.provider is not None:
+                self.provider.apply_output_token_budget(
+                    extract_max_output_tokens=extract_budget,
+                    verify_max_output_tokens=verify_budget,
+                )
             budget_left = state.tokens_used < self._total_token_budget
             provider = (
                 self.provider
@@ -520,6 +535,13 @@ class CompanyProfileStageRuntime:
 
     def _execution_for(self, state: _WorkState) -> CompanyProfileExecutionRecord:
         used = max(0, int(state.tokens_used))
+        verify_max = max(
+            (
+                item.verify_max_output_tokens
+                for item in state.scope_token_allocations.values()
+            ),
+            default=self._verify_base_tokens,
+        )
         return build_execution_record(
             report=state.report,
             processing_identity=state.processing_identity,
@@ -528,13 +550,14 @@ class CompanyProfileStageRuntime:
             token_budget=CompanyProfileTokenBudget(
                 total_token_budget=self._total_token_budget,
                 extract_max_output_tokens=state.extract_max_output_tokens,
-                verify_max_output_tokens=self._verify_base_tokens,
+                verify_max_output_tokens=verify_max,
                 tokens_used=used,
                 tokens_remaining=max(0, self._total_token_budget - used),
             ),
             transport_retries=state.transport_retries,
             semantic_disputes=collect_semantic_disputes(state.task_results),
             predecessor_lineage=state.predecessor_lineage,
+            scope_token_allocations=state.scope_token_allocations,
         )
 
     def _work_checkpoint_path(self, work_id: str) -> Path:
@@ -612,6 +635,12 @@ class CompanyProfileStageRuntime:
             state.predecessor_lineage = [
                 dict(item) for item in execution.get("predecessor_lineage") or ()
             ]
+            state.scope_token_allocations = {
+                str(chapter): CompanyProfileScopeTokenAllocation.model_validate(item)
+                for chapter, item in (
+                    execution.get("scope_token_allocations") or {}
+                ).items()
+            }
 
     def _restore_task_results(self, state: _WorkState) -> None:
         if state.task_results or not state.completed_scopes:

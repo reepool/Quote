@@ -10,22 +10,38 @@ from __future__ import annotations
 from collections.abc import Callable, Mapping, Sequence
 from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 from .contracts import (
     CompanyProfileTaskResult,
     ContractErrorCode,
+    ExtractResponse,
+    RepairResponse,
     SemanticProviderError,
+    VerifyResponse,
 )
 from .core_assessment_projection import COMMON_CORE_MAPPING_VERSION
 from .models import PRODUCTION_AUTHORIZATION, ReportIdentity
+from .workflow import _deterministic_verify
 
 EXECUTION_RECORD_SCHEMA = "company_profile_execution_record.v1"
 DEFAULT_TOTAL_TOKEN_BUDGET = 50_000
 DEFAULT_EXTRACT_BASE_TOKENS = 4_000
 DEFAULT_VERIFY_BASE_TOKENS = 2_000
 TRANSPORT_RETRY_LIMIT = 2
+SMALL_SCOPE_SIZE_THRESHOLD = 4
 _TRANSPORT_CODES = frozenset({ContractErrorCode.DEADLINE_EXCEEDED})
+_NON_SEMANTIC_REVIEW_CODES = frozenset(
+    {
+        ContractErrorCode.DEADLINE_EXCEEDED,
+        ContractErrorCode.PROVIDER_UNAVAILABLE,
+    }
+)
+_RESPONSE_MODELS = {
+    "extract": ExtractResponse,
+    "repair": RepairResponse,
+    "verify": VerifyResponse,
+}
 
 
 class _StrictModel(BaseModel):
@@ -56,6 +72,11 @@ class CompanyProfileTokenBudget(_StrictModel):
     tokens_remaining: int = Field(ge=0)
 
 
+class CompanyProfileScopeTokenAllocation(_StrictModel):
+    extract_max_output_tokens: int = Field(ge=0)
+    verify_max_output_tokens: int = Field(ge=0)
+
+
 class CompanyProfileSemanticDispute(_StrictModel):
     field_id: str = Field(min_length=1)
     reason_codes: tuple[str, ...] = ()
@@ -71,6 +92,9 @@ class CompanyProfileExecutionRecord(_StrictModel):
     scope_digests: dict[str, str] = Field(default_factory=dict)
     model_attempts: tuple[CompanyProfileModelAttempt, ...] = ()
     token_budget: CompanyProfileTokenBudget
+    scope_token_allocations: dict[str, CompanyProfileScopeTokenAllocation] = Field(
+        default_factory=dict
+    )
     transport_retries: int = Field(ge=0)
     semantic_disputes: tuple[CompanyProfileSemanticDispute, ...] = ()
     predecessor_lineage: tuple[dict[str, Any], ...] = ()
@@ -99,8 +123,11 @@ def dynamic_scope_token_budget(
 ) -> int:
     """Bounded per-scope output budget from request size, not semantic guesses."""
 
-    size = max(1, int(field_count) + int(evidence_count))
-    return min(int(base_tokens) + 250 * size, int(base_tokens) * 2)
+    size = max(0, int(field_count)) + max(0, int(evidence_count))
+    if size <= SMALL_SCOPE_SIZE_THRESHOLD:
+        return int(base_tokens)
+    extra = size - SMALL_SCOPE_SIZE_THRESHOLD
+    return min(int(base_tokens) + 250 * extra, int(base_tokens) * 2)
 
 
 def collect_semantic_disputes(
@@ -111,6 +138,8 @@ def collect_semantic_disputes(
     for result in results:
         for item in result.human_review_items:
             if item.review_id in seen:
+                continue
+            if any(code in _NON_SEMANTIC_REVIEW_CODES for code in item.reason_codes):
                 continue
             seen.add(item.review_id)
             disputes.append(
@@ -133,6 +162,9 @@ def build_execution_record(
     transport_retries: int,
     semantic_disputes: Sequence[CompanyProfileSemanticDispute],
     predecessor_lineage: Sequence[Mapping[str, Any]],
+    scope_token_allocations: Mapping[str, CompanyProfileScopeTokenAllocation]
+    | Mapping[str, Mapping[str, Any]]
+    | None = None,
 ) -> CompanyProfileExecutionRecord:
     identity = None
     if report is not None:
@@ -150,11 +182,20 @@ def build_execution_record(
         else CompanyProfileModelAttempt.model_validate(item)
         for item in model_attempts
     )
+    allocations = {
+        key: (
+            value
+            if isinstance(value, CompanyProfileScopeTokenAllocation)
+            else CompanyProfileScopeTokenAllocation.model_validate(value)
+        )
+        for key, value in dict(scope_token_allocations or {}).items()
+    }
     return CompanyProfileExecutionRecord(
         input_identity=identity,
         scope_digests=dict(scope_digests),
         model_attempts=attempts,
         token_budget=token_budget,
+        scope_token_allocations=allocations,
         transport_retries=int(transport_retries),
         semantic_disputes=tuple(semantic_disputes),
         predecessor_lineage=tuple(dict(item) for item in predecessor_lineage),
@@ -170,10 +211,25 @@ class TransportRetryingProvider:
         *,
         ledger_getter: Callable[[], Any],
         max_retries: int = TRANSPORT_RETRY_LIMIT,
+        total_token_budget: int = DEFAULT_TOTAL_TOKEN_BUDGET,
     ) -> None:
         self._inner = inner
         self._ledger_getter = ledger_getter
         self._max_retries = max(0, int(max_retries))
+        self._total_token_budget = max(0, int(total_token_budget))
+
+    def apply_output_token_budget(
+        self,
+        *,
+        extract_max_output_tokens: int,
+        verify_max_output_tokens: int,
+    ) -> None:
+        hook = getattr(self._inner, "apply_output_token_budget", None)
+        if callable(hook):
+            hook(
+                extract_max_output_tokens=extract_max_output_tokens,
+                verify_max_output_tokens=verify_max_output_tokens,
+            )
 
     def extract(self, request):
         return self._invoke("extract", self._inner.extract, request)
@@ -182,40 +238,119 @@ class TransportRetryingProvider:
         return self._invoke("repair", self._inner.repair, request)
 
     def verify(self, request):
+        if self._budget_exhausted():
+            return _deterministic_verify(request)
         return self._invoke("verify", self._inner.verify, request)
 
+    def _budget_exhausted(self) -> bool:
+        ledger = self._ledger_getter()
+        return int(getattr(ledger, "tokens_used", 0)) >= self._total_token_budget
+
     def _invoke(self, call_type: str, func, request):
+        if self._budget_exhausted():
+            raise SemanticProviderError(
+                ContractErrorCode.PROVIDER_UNAVAILABLE,
+                "token budget exhausted",
+            )
         last_error: SemanticProviderError | None = None
         for attempt in range(self._max_retries + 1):
+            before = len(self._current_traces())
             try:
                 result = func(request)
-                self._record_attempt(call_type, "success")
-                self._consume_usage()
-                return result
             except SemanticProviderError as exc:
                 transport = exc.code in _TRANSPORT_CODES
-                self._record_attempt(
-                    call_type,
-                    "transport_failed" if transport else "semantic_failed",
-                )
+                if not self._ingest_traces(call_type, before):
+                    self._record_attempt(
+                        call_type,
+                        "transport_failed" if transport else "semantic_failed",
+                    )
                 if not transport or attempt >= self._max_retries:
                     raise
-                ledger = self._ledger_getter()
-                ledger.transport_retries += 1
+                self._ledger_getter().transport_retries += 1
                 last_error = exc
+                continue
+            valid = _response_is_valid(call_type, result)
+            if not self._ingest_traces(
+                call_type,
+                before,
+                default_status="success" if valid else "semantic_failed",
+            ):
+                self._record_attempt(
+                    call_type,
+                    "success" if valid else "semantic_failed",
+                )
+                if valid:
+                    self._consume_usage()
+            return result
         assert last_error is not None
         raise last_error
 
-    def _record_attempt(self, call_type: str, status: str) -> None:
+    def _current_traces(self) -> tuple[Any, ...]:
+        traces = getattr(self._inner, "traces", None)
+        if callable(traces):
+            traces = traces()
+        if not traces:
+            return ()
+        return tuple(traces)
+
+    def _ingest_traces(
+        self,
+        call_type: str,
+        before: int,
+        default_status: str | None = None,
+    ) -> bool:
+        new_traces = self._current_traces()[before:]
+        if not new_traces:
+            return False
+        for trace in new_traces:
+            attempts = tuple(getattr(trace, "attempts", ()) or ())
+            if attempts:
+                for item in attempts:
+                    payload = item if isinstance(item, Mapping) else {}
+                    self._record_attempt(
+                        call_type,
+                        _attempt_status(payload, trace, default_status),
+                        model=payload.get("model") or getattr(trace, "model", None),
+                        profile=(
+                            payload.get("selected_profile")
+                            or getattr(trace, "selected_profile", None)
+                            or getattr(trace, "profile", None)
+                        ),
+                    )
+            else:
+                self._record_attempt(
+                    call_type,
+                    _attempt_status({}, trace, default_status),
+                    model=getattr(trace, "model", None),
+                    profile=(
+                        getattr(trace, "selected_profile", None)
+                        or getattr(trace, "profile", None)
+                    ),
+                )
+            self._consume_trace_tokens(trace)
+        return True
+
+    def _record_attempt(
+        self,
+        call_type: str,
+        status: str,
+        *,
+        model: Any = None,
+        profile: Any = None,
+    ) -> None:
         ledger = self._ledger_getter()
-        model = str(getattr(self._inner, "model", None) or "unspecified")
-        profile = getattr(self._inner, "profile", None)
+        resolved_model = str(
+            model or getattr(self._inner, "model", None) or "unspecified"
+        )
+        resolved_profile = profile
+        if resolved_profile is None:
+            resolved_profile = getattr(self._inner, "profile", None)
         ledger.model_attempts.append(
             CompanyProfileModelAttempt(
-                model=model,
+                model=resolved_model,
                 call_type=call_type,  # type: ignore[arg-type]
                 status=status,  # type: ignore[arg-type]
-                profile=str(profile) if profile else None,
+                profile=str(resolved_profile) if resolved_profile else None,
             )
         )
 
@@ -223,10 +358,73 @@ class TransportRetryingProvider:
         usage = getattr(self._inner, "last_usage", None)
         if not isinstance(usage, Mapping):
             return
-        ledger = self._ledger_getter()
-        ledger.input_tokens += int(usage.get("input_tokens") or 0)
-        ledger.output_tokens += int(usage.get("output_tokens") or 0)
-        ledger.tokens_used += int(
-            usage.get("total_tokens")
-            or (int(usage.get("input_tokens") or 0) + int(usage.get("output_tokens") or 0))
+        self._add_tokens(
+            input_tokens=int(usage.get("input_tokens") or 0),
+            output_tokens=int(usage.get("output_tokens") or 0),
+            total_tokens=usage.get("total_tokens"),
         )
+
+    def _consume_trace_tokens(self, trace: Any) -> None:
+        if isinstance(trace, Mapping):
+            self._add_tokens(
+                input_tokens=int(trace.get("input_tokens") or 0),
+                output_tokens=int(trace.get("output_tokens") or 0),
+                total_tokens=trace.get("total_tokens"),
+            )
+            return
+        self._add_tokens(
+            input_tokens=int(getattr(trace, "input_tokens", 0) or 0),
+            output_tokens=int(getattr(trace, "output_tokens", 0) or 0),
+            total_tokens=getattr(trace, "total_tokens", None),
+        )
+
+    def _add_tokens(
+        self,
+        *,
+        input_tokens: int,
+        output_tokens: int,
+        total_tokens: Any,
+    ) -> None:
+        ledger = self._ledger_getter()
+        ledger.input_tokens += input_tokens
+        ledger.output_tokens += output_tokens
+        ledger.tokens_used += int(
+            total_tokens if total_tokens is not None else input_tokens + output_tokens
+        )
+
+
+def _response_is_valid(call_type: str, result: Any) -> bool:
+    model = _RESPONSE_MODELS[call_type]
+    if isinstance(result, model):
+        return True
+    try:
+        model.model_validate(result)
+    except (ValidationError, TypeError, ValueError):
+        return False
+    return True
+
+
+def _attempt_status(
+    attempt: Mapping[str, Any],
+    trace: Any,
+    default_status: str | None,
+) -> str:
+    raw = str(attempt.get("status") or attempt.get("error_code") or "")
+    if raw == "success":
+        return "success"
+    if raw in {"transport_failed", ContractErrorCode.DEADLINE_EXCEEDED.value}:
+        return "transport_failed"
+    if raw in {"semantic_failed", ContractErrorCode.CANDIDATE_SCHEMA_INVALID.value}:
+        return "semantic_failed"
+    trace_status = getattr(trace, "status", None)
+    trace_error = getattr(trace, "error_code", None)
+    if isinstance(trace, Mapping):
+        trace_status = trace.get("status")
+        trace_error = trace.get("error_code")
+    if trace_error == ContractErrorCode.DEADLINE_EXCEEDED.value:
+        return "transport_failed"
+    if trace_status == "failed":
+        return "semantic_failed"
+    if default_status is not None:
+        return default_status
+    return "success" if trace_status == "success" else "semantic_failed"
