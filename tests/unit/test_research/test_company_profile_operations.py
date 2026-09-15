@@ -396,6 +396,55 @@ def test_zero_delivery_is_not_completed_success(tmp_path):
     assert records == []
 
 
+def test_historical_completion_does_not_mark_current_zero_delivery_complete(tmp_path):
+    storage = _storage(tmp_path)
+    _second_frontier(storage)
+    first_provider = _RequestBoundOverviewProvider()
+    first_report = _report(instrument_id="600000.SH", report_id="asset-ops-hist")
+
+    def load_first(item):
+        if item["instrument_id"] != "600000.SH":
+            return None
+        return {
+            "report": first_report,
+            "pages": (_overview_page(SERVICE_OVERVIEW),),
+        }
+
+    first = _service(
+        tmp_path,
+        storage,
+        provider=first_provider,
+        page_source=load_first,
+    )
+    first_result = asyncio.run(
+        first.execute(
+            "run",
+            knowledge_cutoff="2026-08-30",
+            instrument_ids=["600000.SH"],
+            max_items=1,
+        )
+    )
+    second = _service(tmp_path, storage)
+    second_result = asyncio.run(
+        second.execute(
+            "run",
+            knowledge_cutoff="2026-08-30",
+            instrument_ids=["600036.SH"],
+            max_items=1,
+        )
+    )
+    current_records = list(
+        (tmp_path / "output" / COMMON_CORE_STORAGE_NAMESPACE).glob("*.json")
+    )
+
+    assert first_result["state"] == "completed"
+    assert second_result["enqueue"]["inserted"] == 1
+    assert second_result["queue"]["completed"] >= 1
+    assert second_result["queue"]["machine_rework"] == 1
+    assert second_result["state"] != "completed"
+    assert len(current_records) == 1
+
+
 def test_published_run_binds_official_annual_pages_without_injected_page_source(
     tmp_path,
 ):

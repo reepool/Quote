@@ -491,6 +491,7 @@ class CompanyProfileTaskService:
             stopped=stopped,
             enqueue_result=enqueue_result,
             health=health,
+            drain=drain,
         )
         result = self._payload(
             action=action,
@@ -509,11 +510,11 @@ class CompanyProfileTaskService:
         stopped: bool,
         enqueue_result: Mapping[str, Any],
         health: Mapping[str, Any],
+        drain: Mapping[str, Any] | None = None,
     ) -> str:
         if stopped:
             return "paused"
-        completed = int(health.get("completed") or 0)
-        if completed > 0 or self._published_count() > 0:
+        if self._delivered_this_round(drain):
             return "completed"
         inserted = int(enqueue_result.get("inserted") or 0)
         reused = int(enqueue_result.get("reused") or 0)
@@ -523,14 +524,11 @@ class CompanyProfileTaskService:
             return "idle"
         return "incomplete"
 
-    def _published_count(self) -> int:
-        return len(
-            [
-                path
-                for path in self.writer.output_root.glob("*.json")
-                if path.is_file()
-            ]
-        )
+    def _delivered_this_round(self, drain: Mapping[str, Any] | None) -> bool:
+        if self.writer.paths:
+            return True
+        publish = dict((drain or {}).get("publish") or {})
+        return int(publish.get("completed") or 0) > 0
 
     def _queue_health(self) -> dict[str, Any]:
         return self.repository.health(
