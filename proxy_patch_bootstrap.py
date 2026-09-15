@@ -36,6 +36,25 @@ class ProxyPatchState:
 _AKSHARE_STATE = ProxyPatchState(target="akshare")
 
 
+def restore_unpatched_curl_cffi_session() -> None:
+    """Put back the real curl_cffi Session after akshare_proxy_patch install.
+
+    install_patch() replaces curl_cffi.requests.Session with a stdlib
+    requests wrapper. That wrapper rejects impersonate=, which breaks
+    yfinance.new_session() and any other Chrome-TLS clients. Eastmoney
+    hooks stay on the patched stdlib requests.Session.
+    """
+    try:
+        import curl_cffi.requests as curl_requests
+        from curl_cffi.requests.session import Session as RealSession
+    except ImportError:
+        return
+    if getattr(curl_requests, "Session", None) is RealSession:
+        return
+    curl_requests.Session = RealSession
+    _logger.info("restored unpatched curl_cffi.requests.Session for Chrome TLS clients")
+
+
 def install_akshare_proxy_patch(*, required: bool = False) -> ProxyPatchState:
     defaults = {
         "gateway": "101.201.173.125",
@@ -69,6 +88,7 @@ def _install_patch(
     required: bool,
 ) -> ProxyPatchState:
     if state.ready:
+        restore_unpatched_curl_cffi_session()
         return state
     if state.attempted and state.error:
         if required:
@@ -128,6 +148,9 @@ def _install_patch(
             raise RuntimeError(state.error) from exc
         _logger.warning(state.error)
         return state
+
+    if installer_name == "install_patch":
+        restore_unpatched_curl_cffi_session()
 
     state.ready = True
     state.error = None

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import importlib
 from types import SimpleNamespace
 
 import pytest
@@ -154,3 +155,97 @@ def test_acquire_akshare_proxy_lease_is_fresh_and_redacts_credentials(monkeypatc
     assert first.endpoint == "proxy.example:8080"
     assert "lease-secret" not in repr(first)
     assert "private-cookie" not in repr(first)
+
+
+def test_restore_unpatched_curl_cffi_session_allows_yfinance_chrome_tls(monkeypatch):
+    import curl_cffi.requests as curl_requests
+    import yfinance._http as yfinance_http
+    from curl_cffi.requests.session import Session as RealChromeSession
+
+    from proxy_patch_bootstrap import restore_unpatched_curl_cffi_session
+
+    class PatchedSession(requests.Session):
+        pass
+
+    monkeypatch.setattr(curl_requests, "Session", PatchedSession)
+
+    with pytest.raises(TypeError, match="impersonate"):
+        curl_requests.Session(impersonate="chrome")
+    with pytest.raises(TypeError, match="impersonate"):
+        yfinance_http.new_session()
+
+    restore_unpatched_curl_cffi_session()
+
+    assert isinstance(curl_requests.Session(impersonate="chrome"), RealChromeSession)
+    assert isinstance(yfinance_http.new_session(), RealChromeSession)
+
+
+def test_akshare_patch_install_restores_curl_cffi_session_for_yfinance(monkeypatch):
+    import curl_cffi.requests as curl_requests
+    import yfinance._http as yfinance_http
+    from curl_cffi.requests.session import Session as RealChromeSession
+
+    import proxy_patch_bootstrap as bootstrap
+
+    class PatchedSession(requests.Session):
+        pass
+
+    def fake_installer(*_args, **_kwargs):
+        curl_requests.Session = PatchedSession
+
+    monkeypatch.setattr(
+        bootstrap,
+        "_load_proxy_patch_config",
+        lambda _name: {
+            "enabled": True,
+            "gateway": "127.0.0.1",
+            "auth_token": "unit-test-token",
+            "retry": 1,
+            "hook_domains": ["fund.eastmoney.com"],
+        },
+    )
+    real_import_module = importlib.import_module
+
+    def fake_import_module(name, package=None):
+        if name == "akshare_proxy_patch":
+            return SimpleNamespace(install_patch=fake_installer)
+        return real_import_module(name, package)
+
+    monkeypatch.setattr(importlib, "import_module", fake_import_module)
+
+    state = bootstrap.ProxyPatchState(target="akshare")
+    result = bootstrap._install_patch(
+        state=state,
+        config={
+            "enabled": True,
+            "gateway": "127.0.0.1",
+            "auth_token": "unit-test-token",
+            "retry": 1,
+            "hook_domains": ["fund.eastmoney.com"],
+        },
+        defaults={},
+        installer_name="install_patch",
+        required=True,
+    )
+
+    assert result.ready is True
+    assert curl_requests.Session is RealChromeSession
+    assert isinstance(yfinance_http.new_session(), RealChromeSession)
+
+    curl_requests.Session = PatchedSession
+    reused = bootstrap._install_patch(
+        state=result,
+        config={
+            "enabled": True,
+            "gateway": "127.0.0.1",
+            "auth_token": "unit-test-token",
+            "retry": 1,
+            "hook_domains": ["fund.eastmoney.com"],
+        },
+        defaults={},
+        installer_name="install_patch",
+        required=True,
+    )
+    assert reused.ready is True
+    assert curl_requests.Session is RealChromeSession
+    assert isinstance(yfinance_http.new_session(), RealChromeSession)

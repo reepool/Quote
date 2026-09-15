@@ -244,6 +244,9 @@ def _install_patch(
     required: bool,
 ) -> ProxyPatchState:
     if state.ready:
+        from proxy_patch_bootstrap import restore_unpatched_curl_cffi_session
+
+        restore_unpatched_curl_cffi_session()
         return state
     if state.attempted and state.error:
         if required:
@@ -295,6 +298,11 @@ def _install_patch(
     if hook_domains:
         kwargs["hook_domains"] = hook_domains
 
+    from proxy_patch_bootstrap import restore_unpatched_curl_cffi_session
+
+    if installer_name == "install_yfinance_patch":
+        restore_unpatched_curl_cffi_session()
+
     try:
         installer(gateway, **kwargs)
     except Exception as exc:
@@ -303,6 +311,9 @@ def _install_patch(
             raise RuntimeError(state.error) from exc
         _logger.warning(state.error)
         return state
+
+    if installer_name == "install_patch":
+        restore_unpatched_curl_cffi_session()
 
     state.ready = True
     state.error = None
