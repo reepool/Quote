@@ -60,6 +60,7 @@ _SEGMENT_HEADINGS = (
     "分行业",
     "分产品",
 )
+CORE_SEGMENT_HEADINGS = _SEGMENT_HEADINGS
 _ALL_HEADINGS = _OVERVIEW_HEADINGS + _SEGMENT_HEADINGS
 _HEADING_PREFIX = re.compile(
     r"^(?:第[一二三四五六七八九十百]+[节章]"
@@ -333,6 +334,16 @@ def _select_owned_span(
     return _OwnedSelection(None, gaps)
 
 
+def owned_section_heading(
+    text: str,
+    headings: Sequence[str],
+) -> str | None:
+    """Return the first title-line heading owned by this page, if any."""
+
+    owned = _owned_heading(text, tuple(headings))
+    return None if owned is None else owned[0]
+
+
 def _owned_heading(
     text: str,
     headings: tuple[str, ...],
@@ -350,7 +361,7 @@ def _owned_heading(
 
 def _heading_if_title_line(line: str, headings: tuple[str, ...]) -> str | None:
     stripped = line.strip()
-    if not stripped or _is_toc_line(stripped):
+    if not stripped or _is_toc_line(stripped, headings):
         return None
     compact = re.sub(r"\s+", "", stripped)
     compact = _HEADING_PREFIX.sub("", compact, count=1)
@@ -372,14 +383,15 @@ def _is_toc_page(text: str) -> bool:
     return "......" in text[:400] or "……" in text[:400]
 
 
-def _is_toc_line(line: str) -> bool:
+def _is_toc_line(line: str, headings: Sequence[str] = ()) -> bool:
     if "......" in line or "……" in line:
         return True
     compact = re.sub(r"\s+", "", line)
     if not re.search(r"\d{1,4}$", compact):
         return False
     body = _HEADING_PREFIX.sub("", compact, count=1)
-    return any(heading in body for heading in _ALL_HEADINGS)
+    known = tuple(dict.fromkeys((*_ALL_HEADINGS, *headings)))
+    return any(heading in body for heading in known)
 
 
 def _collect_section(

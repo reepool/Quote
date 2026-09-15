@@ -12,9 +12,11 @@ from research.company_profile.contracts import (
     Disposition,
     DispositionStatus,
 )
+from research.company_profile.core_evidence_selection import select_core_evidence
 from research.company_profile.core_skeleton import (
     COMMON_CORE_CHAPTERS,
     form_core_skeleton,
+    select_activated_chapters,
 )
 from research.company_profile.models import ReportIdentity, SemanticRecord
 
@@ -270,3 +272,93 @@ def test_many_bank_table_rows_are_not_a_complete_principal_business():
         if item.chapter_task == ChapterTask.EXTRACT_OPERATING_QUANTITIES
     )
     assert quantity.status == "not_applicable"
+
+
+def _chapter(chapters, task: ChapterTask):
+    return next(item for item in chapters if item.chapter_task == task)
+
+
+def test_toc_does_not_activate_segment_or_quantity_against_evidence():
+    pages = (
+        {
+            "page": 3,
+            "text": "目录：“分部信息120、主要产品的产销量情况35”",
+        },
+    )
+    selected = select_core_evidence(report=_report(), pages=pages)
+    chapters = select_activated_chapters(pages)
+
+    assert selected.spans == ()
+    assert _chapter(chapters, ChapterTask.EXTRACT_SEGMENT_FINANCIALS).status == (
+        "not_applicable"
+    )
+    assert _chapter(chapters, ChapterTask.EXTRACT_OPERATING_QUANTITIES).status == (
+        "not_applicable"
+    )
+
+
+def test_risk_body_and_explicit_negation_do_not_activate_quantities():
+    risk = select_activated_chapters(
+        (
+            {
+                "page": 40,
+                "text": "主要产品产销量下降可能影响收入",
+            },
+        )
+    )
+    negated = select_activated_chapters(
+        (
+            {
+                "page": 49,
+                "text": "公司实物销售收入是否大于劳务收入：否",
+            },
+        )
+    )
+    negated_section = select_activated_chapters(
+        (
+            {
+                "page": 49,
+                "text": "公司实物销售收入是否大于劳务收入\n否",
+            },
+        )
+    )
+
+    assert _chapter(risk, ChapterTask.EXTRACT_OPERATING_QUANTITIES).status == (
+        "not_applicable"
+    )
+    assert _chapter(negated, ChapterTask.EXTRACT_OPERATING_QUANTITIES).status == (
+        "not_applicable"
+    )
+    assert _chapter(negated, ChapterTask.EXTRACT_OPERATING_QUANTITIES).reason == (
+        "explicit_negation"
+    )
+    assert _chapter(
+        negated_section, ChapterTask.EXTRACT_OPERATING_QUANTITIES
+    ).status == "not_applicable"
+    assert _chapter(
+        negated_section, ChapterTask.EXTRACT_OPERATING_QUANTITIES
+    ).reason == "explicit_negation"
+
+
+def test_disabled_enhancements_are_not_activated_even_when_disclosed():
+    chapters = select_activated_chapters(
+        (
+            {
+                "page": 30,
+                "text": (
+                    "主要原材料及能源\n正极材料采购\n"
+                    "前五名客户的销售情况\n客户A\n"
+                    "报告期内主营业务未发生重大变化"
+                ),
+            },
+        )
+    )
+
+    for task in (
+        ChapterTask.EXTRACT_MATERIAL_INPUTS,
+        ChapterTask.EXTRACT_COUNTERPARTIES_AND_CONCENTRATION,
+        ChapterTask.EXTRACT_BUSINESS_REGIME,
+    ):
+        item = _chapter(chapters, task)
+        assert item.status == "not_activated"
+        assert item.reason == "not_enabled_in_this_slice"

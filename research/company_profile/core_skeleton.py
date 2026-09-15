@@ -20,8 +20,10 @@ from .core_assessment_projection import (
     project_core_assessment,
 )
 from .core_evidence_selection import (
+    CORE_SEGMENT_HEADINGS,
     CoreEvidenceSelection,
     ReportPageText,
+    owned_section_heading,
     select_core_evidence,
 )
 from .models import (
@@ -34,16 +36,19 @@ COMMON_CORE_CHAPTERS = (
     ChapterTask.EXTRACT_BUSINESS_OVERVIEW,
     ChapterTask.EXTRACT_SEGMENT_FINANCIALS,
 )
-_QUANTITY_OWNING = re.compile(
-    r"主要产品(?:的)?产销(?:量|存)|"
-    r"生产量.{0,40}销售量.{0,40}库存量|"
-    r"公司实物销售收入是否大于劳务收入"
+_QUANTITY_HEADINGS = (
+    "主要产品的产销量情况",
+    "主要产品产销量情况",
+    "产销量情况分析表",
+    "公司实物销售收入是否大于劳务收入",
 )
-_SEGMENT_OWNING = re.compile(
-    r"占公司营业收入或营业利润10%以上|"
-    r"主营业务分(?:行业|产品)|"
-    r"分部(?:报告|信息)|"
-    r"(?:^|\n)\s*分(?:产品|行业)\b"
+_QUANTITY_NEGATED = re.compile(
+    r"公司实物销售收入是否大于劳务收入.{0,80}(?:[√☑])?(?:否|不适用)"
+)
+_SLICE_DISABLED_CHAPTERS = (
+    ChapterTask.EXTRACT_MATERIAL_INPUTS,
+    ChapterTask.EXTRACT_COUNTERPARTIES_AND_CONCENTRATION,
+    ChapterTask.EXTRACT_BUSINESS_REGIME,
 )
 
 
@@ -54,7 +59,14 @@ class _StrictModel(BaseModel):
 class ActivatedChapter(_StrictModel):
     chapter_task: ChapterTask
     role: Literal["common_core", "enhancement"]
-    status: Literal["activated", "not_applicable"]
+    status: Literal["activated", "not_applicable", "not_activated"]
+    reason: Literal[
+        "common_core_overview",
+        "owned_heading",
+        "no_owned_heading",
+        "explicit_negation",
+        "not_enabled_in_this_slice",
+    ]
 
 
 class CoreSkeletonResult(_StrictModel):
@@ -102,29 +114,74 @@ def select_activated_chapters(
 ) -> tuple[ActivatedChapter, ...]:
     """Return which existing chapter tasks the source actually supports."""
 
-    text = "\n".join(
+    texts = tuple(
         item.text if isinstance(item, ReportPageText) else str(item.get("text") or "")
         for item in pages
     )
-    has_segment = bool(_SEGMENT_OWNING.search(text))
-    has_quantity = bool(_QUANTITY_OWNING.search(text))
+    has_segment = any(
+        owned_section_heading(text, CORE_SEGMENT_HEADINGS) for text in texts
+    )
+    quantity_negated = any(
+        _QUANTITY_NEGATED.search(re.sub(r"\s+", "", text)) for text in texts
+    )
+    has_quantity = any(
+        owned_section_heading(text, _QUANTITY_HEADINGS) for text in texts
+    )
     activated: list[ActivatedChapter] = []
     for chapter in ChapterTask:
-        if chapter in COMMON_CORE_CHAPTERS:
-            role: Literal["common_core", "enhancement"] = "common_core"
-            if chapter == ChapterTask.EXTRACT_BUSINESS_OVERVIEW:
-                status: Literal["activated", "not_applicable"] = "activated"
-            else:
-                status = "activated" if has_segment else "not_applicable"
-        else:
-            role = "enhancement"
-            status = (
-                "activated"
-                if chapter == ChapterTask.EXTRACT_OPERATING_QUANTITIES
-                and has_quantity
-                else "not_applicable"
-            )
         activated.append(
-            ActivatedChapter(chapter_task=chapter, role=role, status=status)
+            _activate_chapter(
+                chapter,
+                has_segment=has_segment,
+                has_quantity=has_quantity,
+                quantity_negated=quantity_negated,
+            )
         )
     return tuple(activated)
+
+
+def _activate_chapter(
+    chapter: ChapterTask,
+    *,
+    has_segment: bool,
+    has_quantity: bool,
+    quantity_negated: bool,
+) -> ActivatedChapter:
+    if chapter in _SLICE_DISABLED_CHAPTERS:
+        return ActivatedChapter(
+            chapter_task=chapter,
+            role="enhancement",
+            status="not_activated",
+            reason="not_enabled_in_this_slice",
+        )
+    if chapter is ChapterTask.EXTRACT_BUSINESS_OVERVIEW:
+        return ActivatedChapter(
+            chapter_task=chapter,
+            role="common_core",
+            status="activated",
+            reason="common_core_overview",
+        )
+    if chapter is ChapterTask.EXTRACT_SEGMENT_FINANCIALS:
+        return ActivatedChapter(
+            chapter_task=chapter,
+            role="common_core",
+            status="activated" if has_segment else "not_applicable",
+            reason="owned_heading" if has_segment else "no_owned_heading",
+        )
+    if quantity_negated:
+        status: Literal["activated", "not_applicable"] = "not_applicable"
+        reason: Literal["owned_heading", "no_owned_heading", "explicit_negation"] = (
+            "explicit_negation"
+        )
+    elif has_quantity:
+        status = "activated"
+        reason = "owned_heading"
+    else:
+        status = "not_applicable"
+        reason = "no_owned_heading"
+    return ActivatedChapter(
+        chapter_task=chapter,
+        role="enhancement",
+        status=status,
+        reason=reason,
+    )
