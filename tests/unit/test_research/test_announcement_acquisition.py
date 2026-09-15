@@ -485,7 +485,7 @@ def test_cninfo_transport_falls_back_to_akshare_proxy_on_http_403(monkeypatch):
         return proxy_response
 
     monkeypatch.setattr(
-        "research.providers.cninfo_announcements.request_with_akshare_proxy",
+        "research.providers.cninfo_http.request_with_akshare_proxy",
         fake_proxy,
     )
     provider = CninfoAnnouncementProvider(
@@ -547,7 +547,7 @@ def test_cninfo_transport_stays_on_proxy_after_direct_403(monkeypatch):
         return proxy_responses.pop(0)
 
     monkeypatch.setattr(
-        "research.providers.cninfo_announcements.request_with_akshare_proxy",
+        "research.providers.cninfo_http.request_with_akshare_proxy",
         fake_proxy,
     )
     result = _cninfo_provider(session).discover(_query(page_size=30, max_pages=0))
@@ -566,7 +566,7 @@ def test_cninfo_transport_keeps_403_when_proxy_unavailable(monkeypatch):
         raise RuntimeError("akshare proxy fallback is not fully configured")
 
     monkeypatch.setattr(
-        "research.providers.cninfo_announcements.request_with_akshare_proxy",
+        "research.providers.cninfo_http.request_with_akshare_proxy",
         fake_proxy,
     )
     provider = CninfoAnnouncementProvider(

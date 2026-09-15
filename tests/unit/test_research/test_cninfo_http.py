@@ -42,7 +42,11 @@ def test_cninfo_wrapper_falls_back_to_proxy_on_http_403():
         proxy_calls.append({"method": method, "url": url, "params": kwargs.get("params")})
         return proxy_response
 
-    session = wrap_cninfo_proxy_fallback(inner, proxy_request=fake_proxy)
+    session = wrap_cninfo_proxy_fallback(
+        inner,
+        impersonated_request=None,
+        proxy_request=fake_proxy,
+    )
     response = session.get(
         "https://www.cninfo.com.cn/data20/companyOverview/getCompanyInfo",
         params={"scode": "600000"},
@@ -73,6 +77,7 @@ def test_cninfo_wrapper_stays_on_proxy_after_direct_403():
 
     session = wrap_cninfo_proxy_fallback(
         inner,
+        impersonated_request=None,
         proxy_request=lambda method, url, **kwargs: proxy_responses.pop(0),
     )
 
@@ -91,6 +96,7 @@ def test_cninfo_wrapper_does_not_proxy_non_cninfo_hosts():
 
     session = wrap_cninfo_proxy_fallback(
         inner,
+        impersonated_request=None,
         proxy_request=lambda *args, **kwargs: proxy_calls.append(True) or _FakeResponse({}),
     )
     response = session.get("https://query.sse.com.cn/commonQuery.do")
@@ -106,7 +112,11 @@ def test_cninfo_wrapper_keeps_403_when_proxy_unavailable():
     def fake_proxy(*_args, **_kwargs):
         raise RuntimeError("akshare proxy fallback is not fully configured")
 
-    session = wrap_cninfo_proxy_fallback(inner, proxy_request=fake_proxy)
+    session = wrap_cninfo_proxy_fallback(
+        inner,
+        impersonated_request=None,
+        proxy_request=fake_proxy,
+    )
     response = session.get(
         "https://www.cninfo.com.cn/data20/financialData/getIncomeStatement"
     )
@@ -136,6 +146,7 @@ def test_cninfo_shareholders_data20_uses_proxy_on_http_403():
     )
     session = wrap_cninfo_proxy_fallback(
         inner,
+        impersonated_request=None,
         proxy_request=lambda *args, **kwargs: proxy_response,
     )
     provider = CninfoShareholdersProvider(request_interval_seconds=0)
@@ -149,3 +160,54 @@ def test_cninfo_shareholders_data20_uses_proxy_on_http_403():
     assert records[0]["F002V"] == "测试股东"
     assert payload["code"] == 200
     assert len(inner.calls) == 1
+
+
+def test_cninfo_wrapper_uses_chrome_tls_before_requests_or_proxy():
+    inner = _QueuedSession([AssertionError("Python requests TLS must not hit CNInfo")])
+    impersonated = _QueuedSession(
+        [_FakeResponse({"code": 200, "data": {"records": [{"SECCODE": "600000"}]}})]
+    )
+    proxy_calls = []
+
+    session = wrap_cninfo_proxy_fallback(
+        inner,
+        impersonated_request=impersonated.request,
+        proxy_request=lambda *args, **kwargs: proxy_calls.append(True) or _FakeResponse({}),
+    )
+    response = session.get(
+        "https://www.cninfo.com.cn/data20/companyOverview/getCompanyInfo",
+        params={"scode": "600000"},
+    )
+
+    assert response.json()["data"]["records"][0]["SECCODE"] == "600000"
+    assert impersonated.calls == [
+        {
+            "method": "GET",
+            "url": "https://www.cninfo.com.cn/data20/companyOverview/getCompanyInfo",
+            "params": {"scode": "600000"},
+        }
+    ]
+    assert inner.calls == []
+    assert proxy_calls == []
+
+
+def test_cninfo_wrapper_does_not_retry_requests_tls_after_chrome_tls_403():
+    inner = _QueuedSession(
+        [AssertionError("requests TLS after a 403 poisons the same egress IP")]
+    )
+    impersonated = _QueuedSession([_FakeResponse(status_code=403, text="blocked")])
+    proxy_response = _FakeResponse({"code": 200, "data": {"records": [{"SECCODE": "600000"}]}})
+
+    session = wrap_cninfo_proxy_fallback(
+        inner,
+        impersonated_request=impersonated.request,
+        proxy_request=lambda *args, **kwargs: proxy_response,
+    )
+    response = session.get(
+        "https://www.cninfo.com.cn/data20/stockholderCapital/getTopTenStockholders"
+    )
+
+    assert response.json()["data"]["records"][0]["SECCODE"] == "600000"
+    assert len(impersonated.calls) == 1
+    assert inner.calls == []
+    assert session._prefer_proxy is True

@@ -1,8 +1,9 @@
-"""Shared CNInfo HTTP helper that falls back to akshare_proxy_patch on 403."""
+"""Shared CNInfo HTTP helper: Chrome TLS first, then akshare proxy on 403."""
 
 from __future__ import annotations
 
 import logging
+import threading
 from typing import Any, Callable, Optional
 from urllib.parse import urlparse
 
@@ -13,6 +14,8 @@ from utils.proxy_patch_runtime import request_with_akshare_proxy
 
 LOGGER = logging.getLogger(__name__)
 ProxyRequest = Callable[..., requests.Response]
+_UNSET = object()
+_THREAD_LOCAL = threading.local()
 
 
 def is_cninfo_url(url: str) -> bool:
@@ -28,17 +31,61 @@ def _accept_cninfo_proxy_response(response: Any) -> bool:
     return isinstance(payload, (dict, list))
 
 
+def _normalize_timeout(timeout: Any) -> float:
+    if timeout is None:
+        return 20.0
+    if isinstance(timeout, (tuple, list)):
+        if not timeout:
+            return 20.0
+        return float(timeout[-1] or 20.0)
+    return float(timeout)
+
+
+def _impersonated_session() -> Any:
+    session = getattr(_THREAD_LOCAL, "session", None)
+    if session is not None:
+        return session
+    from curl_cffi import requests as curl_requests
+
+    session = curl_requests.Session(impersonate="chrome")
+    _THREAD_LOCAL.session = session
+    return session
+
+
+def request_cninfo_with_chrome_tls(
+    method: str,
+    url: str,
+    **kwargs: Any,
+) -> Any:
+    """Issue one CNInfo request with a Chrome TLS fingerprint."""
+    return _impersonated_session().request(
+        method,
+        url,
+        timeout=_normalize_timeout(kwargs.get("timeout")),
+        headers=kwargs.get("headers"),
+        params=kwargs.get("params"),
+        data=kwargs.get("data"),
+        json=kwargs.get("json"),
+    )
+
+
 class CninfoProxyFallbackSession:
-    """Delegate HTTP calls; CNInfo 403 responses retry through akshare proxy."""
+    """CNInfo calls use Chrome TLS first; HTTP 403 retries through akshare proxy."""
 
     def __init__(
         self,
         inner: Any,
         *,
         proxy_request: Optional[ProxyRequest] = None,
+        impersonated_request: Any = _UNSET,
     ) -> None:
         self._inner = inner
         self._proxy_request = proxy_request or request_with_akshare_proxy
+        self._impersonated_request = (
+            request_cninfo_with_chrome_tls
+            if impersonated_request is _UNSET
+            else impersonated_request
+        )
         self._prefer_proxy = False
 
     def __getattr__(self, name: str) -> Any:
@@ -56,7 +103,7 @@ class CninfoProxyFallbackSession:
             return self._inner_request(normalized_method, url, **kwargs)
         if self._prefer_proxy:
             return self._request_via_proxy(normalized_method, url, **kwargs)
-        response = self._inner_request(normalized_method, url, **kwargs)
+        response = self._request_direct(normalized_method, url, **kwargs)
         if getattr(response, "status_code", 200) != 403:
             return response
         try:
@@ -72,6 +119,11 @@ class CninfoProxyFallbackSession:
             "[CninfoHttp] direct CNInfo blocked with HTTP 403; using akshare_proxy_patch"
         )
         return proxy_response
+
+    def _request_direct(self, method: str, url: str, **kwargs: Any) -> Any:
+        if self._impersonated_request is not None:
+            return self._impersonated_request(method, url, **kwargs)
+        return self._inner_request(method, url, **kwargs)
 
     def _inner_request(self, method: str, url: str, **kwargs: Any) -> Any:
         if method == "GET" and hasattr(self._inner, "get"):
@@ -89,7 +141,7 @@ class CninfoProxyFallbackSession:
             method,
             url,
             attempts=3,
-            timeout=20.0 if timeout is None else float(timeout),
+            timeout=20.0 if timeout is None else _normalize_timeout(timeout),
             headers=kwargs.get("headers"),
             params=kwargs.get("params"),
             data=kwargs.get("data"),
@@ -103,10 +155,38 @@ def wrap_cninfo_proxy_fallback(
     session: Any,
     *,
     proxy_request: Optional[ProxyRequest] = None,
+    impersonated_request: Any = _UNSET,
 ) -> Any:
-    """Wrap a session so CNInfo 403s use akshare_proxy_patch."""
+    """Wrap a session so CNInfo uses Chrome TLS, then akshare_proxy_patch on 403."""
     if isinstance(session, CninfoProxyFallbackSession):
         if proxy_request is not None:
             session._proxy_request = proxy_request
+        if impersonated_request is not _UNSET:
+            session._impersonated_request = impersonated_request
         return session
-    return CninfoProxyFallbackSession(session, proxy_request=proxy_request)
+    return CninfoProxyFallbackSession(
+        session,
+        proxy_request=proxy_request,
+        impersonated_request=impersonated_request,
+    )
+
+
+def attach_cninfo_access(
+    session: Optional[Any] = None,
+    *,
+    tls_config: Any = None,
+    proxy_request: Optional[ProxyRequest] = None,
+) -> Any:
+    """Attach CNInfo access policy to a new or caller-injected session."""
+    from utils.http_transport import create_requests_session
+
+    if session is None:
+        return wrap_cninfo_proxy_fallback(
+            create_requests_session(tls_config=tls_config),
+            proxy_request=proxy_request,
+        )
+    return wrap_cninfo_proxy_fallback(
+        session,
+        proxy_request=proxy_request,
+        impersonated_request=None,
+    )

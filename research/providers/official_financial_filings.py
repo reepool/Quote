@@ -19,14 +19,14 @@ import requests
 from research.financial_fetch_progress import log_financial_fetch_progress
 from research.official_financial_source_profiles import source_profile_metadata
 from utils import dm_logger
-from utils.http_transport import HttpTlsConfig, create_requests_session
+from utils.http_transport import HttpTlsConfig
 
 from .base import (
     BaseOfficialFinancialFilingProvider,
     FinancialFilingPayload,
     FinancialSourceFileManifest,
 )
-from .cninfo_http import wrap_cninfo_proxy_fallback
+from .cninfo_http import attach_cninfo_access
 
 
 @dataclass(frozen=True)
@@ -802,8 +802,9 @@ class ConfiguredOfficialFinancialFilingProvider(BaseOfficialFinancialFilingProvi
             source_name=source_name,
             extra_ca_cert_path=source_config.get("extra_ca_cert_path"),
         )
-        self.session = wrap_cninfo_proxy_fallback(
-            session or create_requests_session(tls_config=self.tls_config)
+        self.session = attach_cninfo_access(
+            session,
+            tls_config=self.tls_config,
         )
 
     async def fetch_financial_filings(
