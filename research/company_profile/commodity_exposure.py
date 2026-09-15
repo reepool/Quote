@@ -17,11 +17,15 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 from research.company_profile.models import (
     PRODUCTION_AUTHORIZATION,
     Activity,
+    ActivityAction,
     AssertionClass,
+    BusinessEvent,
     Evidence,
     Measurement,
+    MetricType,
     PeriodType,
     Relationship,
+    RelationshipType,
     ReportIdentity,
     SemanticRecord,
     SubjectBasis,
@@ -30,6 +34,7 @@ from research.company_profile.models import (
 
 COMMODITY_EXPOSURE_SCHEMA_VERSION = "company_profile_commodity_exposure.v1"
 COMMODITY_EXPOSURE_POLICY_VERSION = "company_profile_commodity_exposure.v1"
+COMMODITY_ROLE_RULE_VERSION = "company_profile_commodity_role.v1"
 _FORBIDDEN_PROJECTION_FIELDS = frozenset(
     {
         "net_profit_direction",
@@ -56,6 +61,33 @@ class CommodityRole:
     ENERGY_CONSUMPTION = "energy_consumption"
     HEDGE_UNDERLYING = "hedge_underlying"
     UNKNOWN = "unknown"
+
+
+_ENERGY_CONSUMPTION_VERBS = frozenset({"消耗", "耗用", "用电", "耗电"})
+_ENERGY_CONSUMPTION_OBJECTS = frozenset({"电力", "蒸汽", "用电量", "电"})
+_HEDGE_MARKERS = ("套保", "套期", "hedge")
+_ROLE_MEASUREMENT_METRICS: dict[str, frozenset[MetricType]] = {
+    CommodityRole.PRODUCT_SALES: frozenset(
+        {
+            MetricType.SALES_VOLUME,
+            MetricType.CUSTOMER_SALES_AMOUNT,
+            MetricType.OPERATING_REVENUE,
+        }
+    ),
+    CommodityRole.RAW_MATERIAL_INPUT: frozenset(
+        {
+            MetricType.SUPPLIER_PURCHASE_AMOUNT,
+            MetricType.OPERATING_COST,
+        }
+    ),
+    CommodityRole.ENERGY_CONSUMPTION: frozenset(
+        {
+            MetricType.SUPPLIER_PURCHASE_AMOUNT,
+            MetricType.OPERATING_COST,
+        }
+    ),
+    CommodityRole.HEDGE_UNDERLYING: frozenset(),
+}
 
 
 class MarketLinkStatus:
@@ -353,19 +385,23 @@ def measurement_record_ids(records: Sequence[Any]) -> tuple[str, ...]:
     )
 
 
-def _catalog_source_name(source: Activity | Measurement | Relationship) -> str:
+def _catalog_source_name(
+    source: Activity | Measurement | Relationship | BusinessEvent,
+) -> str:
     if isinstance(source, Measurement):
         return str(source.measured_object).strip()
+    if isinstance(source, BusinessEvent):
+        return str(source.source_native.name or "").strip()
     return str(source.object_name).strip()
 
 
 def resolve_catalog_mapping(
-    source: Activity | Measurement | Relationship,
+    source: Activity | Measurement | Relationship | BusinessEvent,
     *,
     catalog: Any | None = None,
     knowledge_time: str | None = None,
 ) -> CommodityCatalogMapping:
-    """Map a new-model Activity, Measurement, or Relationship name through the catalog."""
+    """Map a new-model Activity, Measurement, Relationship, or hedge event name."""
 
     from research.business_profile_product_catalog import load_business_product_catalog
 
@@ -401,3 +437,182 @@ def resolve_catalog_mapping(
         catalog_version=str(active.catalog_version),
         mapping_version=str(active.catalog_version),
     )
+
+
+def _is_hedge_fact(source: SemanticRecord) -> bool:
+    texts: tuple[str, ...]
+    if isinstance(source, BusinessEvent):
+        texts = (source.event_type, source.description, source.source_native.name or "")
+    elif isinstance(source, Activity):
+        texts = (source.source_verb, source.object_name, source.source_native.name or "")
+    else:
+        return False
+    blob = " ".join(texts).lower()
+    return any(marker.lower() in blob or marker in blob for marker in _HEDGE_MARKERS)
+
+
+def _is_energy_consumption_evidence(source: SemanticRecord) -> bool:
+    name = _catalog_source_name(source) if isinstance(
+        source, (Activity, Measurement, Relationship, BusinessEvent)
+    ) else ""
+    verb = getattr(source, "source_verb", "") or ""
+    qualifier = ""
+    native = getattr(source, "source_native", None)
+    if native is not None:
+        qualifier = str(native.qualifier or "")
+        if not name:
+            name = str(native.name or "").strip()
+    if any(token in verb for token in _ENERGY_CONSUMPTION_VERBS):
+        return True
+    if "能源" in qualifier or "燃料消耗" in qualifier:
+        return True
+    return name in _ENERGY_CONSUMPTION_OBJECTS
+
+
+def derive_commodity_role(source: SemanticRecord) -> str | None:
+    """Return an evidence-backed role, or None when the fact does not support one."""
+
+    if _is_hedge_fact(source):
+        return CommodityRole.HEDGE_UNDERLYING
+    if isinstance(source, Activity):
+        if source.action == ActivityAction.SELLS:
+            return CommodityRole.PRODUCT_SALES
+        if source.action == ActivityAction.PURCHASES:
+            if _is_energy_consumption_evidence(source):
+                return CommodityRole.ENERGY_CONSUMPTION
+            return CommodityRole.RAW_MATERIAL_INPUT
+        return None
+    if isinstance(source, Relationship):
+        if source.relation_type == RelationshipType.MATERIAL_INPUT:
+            if _is_energy_consumption_evidence(source):
+                return CommodityRole.ENERGY_CONSUMPTION
+            return CommodityRole.RAW_MATERIAL_INPUT
+        return None
+    if isinstance(source, Measurement):
+        if source.metric_type in _ROLE_MEASUREMENT_METRICS[CommodityRole.PRODUCT_SALES]:
+            return CommodityRole.PRODUCT_SALES
+        if source.metric_type in _ROLE_MEASUREMENT_METRICS[
+            CommodityRole.RAW_MATERIAL_INPUT
+        ]:
+            if _is_energy_consumption_evidence(source):
+                return CommodityRole.ENERGY_CONSUMPTION
+            return CommodityRole.RAW_MATERIAL_INPUT
+        return None
+    return None
+
+
+def _compatible_measurements(
+    source: SemanticRecord,
+    records: Sequence[SemanticRecord],
+    role: str,
+) -> tuple[Measurement, ...]:
+    allowed = _ROLE_MEASUREMENT_METRICS.get(role, frozenset())
+    if not allowed:
+        return ()
+    name = _catalog_source_name(source) if isinstance(
+        source, (Activity, Measurement, Relationship, BusinessEvent)
+    ) else ""
+    attached: list[Measurement] = []
+    for item in records:
+        if not isinstance(item, Measurement):
+            continue
+        if item.record_id == getattr(source, "record_id", None):
+            if item.metric_type in allowed:
+                attached.append(item)
+            continue
+        if (
+            item.report == source.report
+            and item.reported_period == source.reported_period
+            and item.measured_object == name
+            and item.metric_type in allowed
+        ):
+            attached.append(item)
+    return tuple(attached)
+
+
+def _project_one_exposure(
+    source: SemanticRecord,
+    records: Sequence[SemanticRecord],
+    *,
+    catalog: Any | None,
+) -> CommodityExposure:
+    role = derive_commodity_role(source)
+    if role is None:
+        raise ValueError("source does not support a commodity role")
+    name = _catalog_source_name(source)
+    if not name:
+        raise ValueError("commodity role requires a source-native name")
+    mapping = resolve_catalog_mapping(
+        source,
+        catalog=catalog,
+        knowledge_time=source.knowledge_time,
+    )
+    quantities = _compatible_measurements(source, records, role)
+    if (
+        isinstance(source, Measurement)
+        and source not in quantities
+        and source.metric_type in _ROLE_MEASUREMENT_METRICS.get(role, frozenset())
+    ):
+        quantities = (source, *quantities)
+    evidence_ids = tuple(item.evidence_id for item in source.evidence)
+    exposure = CommodityExposure(
+        exposure_id=build_exposure_id(
+            source_record_ids=(source.record_id,),
+            role=role,
+            source_native_name=name,
+            commodity_id=mapping.commodity_id,
+            reported_period=source.reported_period,
+        ),
+        report=source.report,
+        reported_period=source.reported_period,
+        period_type=source.period_type,
+        knowledge_time=source.knowledge_time,
+        subject_scope=source.subject_scope,
+        subject_basis=source.subject_basis,
+        business_object=name,
+        source_record_ids=(source.record_id,),
+        evidence_ids=evidence_ids,
+        measurement_record_ids=measurement_record_ids(quantities),
+        source_native_name=name,
+        commodity_id=mapping.commodity_id,
+        mapping_status=mapping.mapping_status,
+        role=role,
+        mapping_version=f"{mapping.mapping_version}+{COMMODITY_ROLE_RULE_VERSION}",
+        market_link_status=MarketLinkStatus.NOT_LINKED,
+        uncertainty=source.uncertainty,
+    )
+    return bind_commodity_exposure(exposure, accepted_records=(*records, source))
+
+
+def project_commodity_exposures(
+    accepted_records: Sequence[SemanticRecord],
+    *,
+    catalog: Any | None = None,
+) -> tuple[CommodityExposure, ...]:
+    """Derive evidence-backed roles without inventing profit direction or quantities."""
+
+    primaries: list[SemanticRecord] = []
+    attached_measurement_ids: set[str] = set()
+    for record in accepted_records:
+        if isinstance(record, Measurement):
+            continue
+        role = derive_commodity_role(record)
+        if role is None or not _catalog_source_name(record):
+            continue
+        primaries.append(record)
+        attached_measurement_ids.update(
+            item.record_id
+            for item in _compatible_measurements(record, accepted_records, role)
+        )
+    leftovers = [
+        record
+        for record in accepted_records
+        if isinstance(record, Measurement)
+        and derive_commodity_role(record) is not None
+        and record.record_id not in attached_measurement_ids
+    ]
+    exposures = [
+        _project_one_exposure(source, accepted_records, catalog=catalog)
+        for source in (*primaries, *leftovers)
+    ]
+    return tuple(exposures)

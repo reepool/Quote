@@ -19,6 +19,8 @@ from .commodity_exposure import (
     bind_commodity_exposure,
     bind_commodity_exposure_assessment,
     commodity_exposure_schema_manifest,
+    derive_commodity_role,
+    project_commodity_exposures,
 )
 from .contracts import (
     ChecklistItem,
@@ -274,12 +276,14 @@ __all__ = [
     "contract_schema_manifest",
     "core_assessment_schema_manifest",
     "core_evidence_schema_manifest",
+    "derive_commodity_role",
     "form_core_skeleton",
     "load_a_share_candidate_registry",
     "load_stage5_evidence_plan",
     "load_stage5_sample_manifest",
     "load_stage55_adjudication_ledger",
     "overview_dimension_hits",
+    "project_commodity_exposures",
     "project_core_assessment",
     "project_research_view",
     "resolved_core_field_ids",
