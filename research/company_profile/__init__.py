@@ -65,6 +65,12 @@ from .core_skeleton import (
     form_core_skeleton,
     select_activated_chapters,
 )
+from .live_plan import (
+    LIVE_PLAN_SCHEMA_VERSION,
+    CompanyProfileLivePlan,
+    live_plan_schema_manifest,
+    record_company_profile_live_plan,
+)
 from .models import (
     PRODUCTION_AUTHORIZATION,
     Activity,
@@ -170,6 +176,7 @@ __all__ = [
     "COMMON_CORE_STORAGE_NAMESPACE",
     "COMMON_CORE_WRITER_NAME",
     "CORE_EVIDENCE_SCHEMA_VERSION",
+    "LIVE_PLAN_SCHEMA_VERSION",
     "PRODUCTION_AUTHORIZATION",
     "STAGE55_ADJUDICATION_SCHEMA",
     "STAGE55_BASELINE_RUN_ID",
@@ -189,6 +196,7 @@ __all__ = [
     "CommodityExposureAssessment",
     "CommonGatewaySemanticProvider",
     "CompanyProfileCoreAssessment",
+    "CompanyProfileLivePlan",
     "CompanyProfileResearchView",
     "CompanyProfileResearchWriter",
     "CompanyProfileSemanticService",
@@ -282,6 +290,7 @@ __all__ = [
     "core_evidence_schema_manifest",
     "derive_commodity_role",
     "form_core_skeleton",
+    "live_plan_schema_manifest",
     "load_a_share_candidate_registry",
     "load_stage5_evidence_plan",
     "load_stage5_sample_manifest",
@@ -290,6 +299,7 @@ __all__ = [
     "project_commodity_exposures",
     "project_core_assessment",
     "project_research_view",
+    "record_company_profile_live_plan",
     "resolved_core_field_ids",
     "select_activated_chapters",
     "select_core_evidence",
