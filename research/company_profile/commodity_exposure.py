@@ -2,7 +2,9 @@
 
 This is the unique owner for company_profile_commodity_exposure.v1. It does
 not add Stage 5 extract objects or field_ids, and it does not copy quantities
-from legacy Activity numeric fields. Writer activation stays out of this slice.
+from legacy Activity numeric fields. Empty, unread, and failed association
+lists are coverage states, not a zero-exposure claim. Writer activation and
+query surfaces stay out of this slice.
 """
 
 from __future__ import annotations
@@ -351,6 +353,7 @@ def commodity_exposure_schema_manifest() -> dict[str, Any]:
             AssessmentStatus.ASSESSED,
             AssessmentStatus.EXTRACTION_FAILED,
         ),
+        "empty_association_is_not_zero_exposure": True,
         "forbidden_fields": tuple(sorted(_FORBIDDEN_PROJECTION_FIELDS)),
         "exposure_schema": CommodityExposure.model_json_schema(),
         "assessment_schema": CommodityExposureAssessment.model_json_schema(),
@@ -648,3 +651,47 @@ def project_commodity_exposures(
         for source in (*primaries, *leftovers)
     ]
     return tuple(exposures)
+
+
+def assess_commodity_exposures(
+    *,
+    report: ReportIdentity,
+    assessment_status: str,
+    accepted_records: Sequence[SemanticRecord] = (),
+    checked_evidence: Sequence[Evidence] = (),
+    catalog: Any | None = None,
+) -> CommodityExposureAssessment:
+    """Assemble the report-level association list without netting or zero claims."""
+
+    if assessment_status not in {
+        AssessmentStatus.NOT_ASSESSED,
+        AssessmentStatus.ASSESSED,
+        AssessmentStatus.EXTRACTION_FAILED,
+    }:
+        raise ValueError(f"unsupported assessment_status: {assessment_status}")
+    scoped_records = tuple(
+        item for item in accepted_records if item.report == report
+    )
+    scoped_evidence = tuple(
+        item for item in checked_evidence if item.report == report
+    )
+    exposures = (
+        project_commodity_exposures(scoped_records, catalog=catalog)
+        if assessment_status == AssessmentStatus.ASSESSED
+        else ()
+    )
+    checked_ids = (
+        ()
+        if assessment_status == AssessmentStatus.NOT_ASSESSED
+        else tuple(dict.fromkeys(item.evidence_id for item in scoped_evidence))
+    )
+    assessment = CommodityExposureAssessment(
+        report=report,
+        assessment_status=assessment_status,
+        checked_evidence_ids=checked_ids,
+        exposures=exposures,
+    )
+    return bind_commodity_exposure_assessment(
+        assessment,
+        checked_evidence=scoped_evidence,
+    )
