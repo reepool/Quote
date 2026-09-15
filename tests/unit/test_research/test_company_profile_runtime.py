@@ -119,6 +119,8 @@ class _RequestBoundOverviewProvider:
         self.extract_chapters.append(request.chapter_task)
         if request.chapter_task == ChapterTask.EXTRACT_SEGMENT_FINANCIALS:
             return self._segment_response(request)
+        if "business_overview_source" not in request.unresolved_field_ids:
+            return ExtractResponse(request_id=request.request_id)
         prepared = request.evidence_bundle[0]
         template = deepcopy(
             next(
@@ -149,7 +151,7 @@ class _RequestBoundOverviewProvider:
             ("cp-300750-revenue", "operating_revenue"),
         ):
             prepared = by_field.get(field_id)
-            if prepared is None:
+            if prepared is None or field_id not in request.unresolved_field_ids:
                 continue
             template = deepcopy(
                 next(
@@ -187,6 +189,33 @@ class _RequestBoundOverviewProvider:
                 for record in request.candidates
             ),
         )
+
+
+class _IllegalExtractProvider:
+    def __init__(self) -> None:
+        self.extract_calls = 0
+        self.unresolved_field_ids: list[tuple[str, ...]] = []
+
+    def extract(self, request):
+        self.extract_calls += 1
+        self.unresolved_field_ids.append(tuple(request.unresolved_field_ids))
+        return {"not": "an extract response"}
+
+    def repair(self, request):
+        raise RuntimeError("repair is not part of the 2.1 runtime path")
+
+    def verify(self, request):
+        raise RuntimeError("illegal extract never reaches verify")
+
+
+class _RecordingOverviewProvider(_RequestBoundOverviewProvider):
+    def __init__(self) -> None:
+        super().__init__()
+        self.unresolved_field_ids: list[tuple[str, ...]] = []
+
+    def extract(self, request):
+        self.unresolved_field_ids.append(tuple(request.unresolved_field_ids))
+        return super().extract(request)
 
 
 async def _drive(runtime: CompanyProfileStageRuntime, item: dict) -> dict:
@@ -717,3 +746,72 @@ def test_checkpoint_replace_keeps_previous_file_if_interrupted(tmp_path, monkeyp
         asyncio.run(runtime("parse", item))
     assert path.read_text(encoding="utf-8") == original
     json.loads(path.read_text(encoding="utf-8"))
+
+
+def test_illegal_extract_retries_all_unaccepted_request_fields(tmp_path):
+    report = _report(report_id="asset-runtime-illegal-extract")
+    item = _item(report, (_overview_page(SERVICE_OVERVIEW),), work_id="work-illegal")
+    writer = CompanyProfileResearchWriter(tmp_path)
+    first = _IllegalExtractProvider()
+    blocked = asyncio.run(
+        _drive(CompanyProfileStageRuntime(writer=writer, provider=first), item)
+    )
+    assert first.extract_calls == 1
+    assert first.unresolved_field_ids == [
+        ("business_overview_source", "explicit_activity")
+    ]
+    assert blocked["assessment"]["core_complete"] is False
+
+    second = _RecordingOverviewProvider()
+    published = asyncio.run(
+        _drive(CompanyProfileStageRuntime(writer=writer, provider=second), item)
+    )
+
+    assert second.extract_calls == 1
+    assert "explicit_activity" in second.unresolved_field_ids[0]
+    assert "business_overview_source" in second.unresolved_field_ids[0]
+    assert published["accepted_record_ids"]
+    assert published["assessment"]["principal_business"]["answered"] is True
+
+
+def test_corrected_accepted_input_is_not_overwritten_by_old_scope(tmp_path):
+    report = _report(report_id="asset-runtime-accepted-correction")
+    pages = (
+        _overview_page(SERVICE_OVERVIEW),
+        _segment_page(SEGMENT_LINE),
+    )
+    writer = CompanyProfileResearchWriter(tmp_path)
+    first = CompanyProfileStageRuntime(
+        writer=writer,
+        provider=_RequestBoundOverviewProvider(),
+    )
+    asyncio.run(_drive(first, _item(report, pages, work_id="work-accepted-v1")))
+    original = next(
+        record
+        for result in first._states["work-accepted-v1"].task_results
+        for record in result.accepted_records()
+        if record.field_id == "segment_dimension"
+    )
+    corrected = original.model_copy(
+        update={
+            "record_id": "corrected-accepted-input",
+            "source_native": original.source_native.model_copy(
+                update={"qualifier": "corrected-accepted-input"}
+            ),
+        }
+    )
+    item = _item(report, pages, work_id="work-accepted-v2")
+    item["accepted_records"] = (corrected,)
+    provider = _RequestBoundOverviewProvider()
+    runtime = CompanyProfileStageRuntime(writer=writer, provider=provider)
+    published = asyncio.run(_drive(runtime, item))
+    output = next(
+        record
+        for result in runtime._states["work-accepted-v2"].task_results
+        for record in result.accepted_records()
+        if record.field_id == "segment_dimension"
+    )
+
+    assert ChapterTask.EXTRACT_SEGMENT_FINANCIALS.value not in published["reused_scope_ids"]
+    assert output.source_native.qualifier == "corrected-accepted-input"
+    assert output.record_id == "corrected-accepted-input"

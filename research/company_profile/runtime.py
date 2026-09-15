@@ -314,6 +314,7 @@ class CompanyProfileStageRuntime:
                 chapter=chapter,
                 report=state.report,
                 bundle=bundle,
+                deterministic_candidates=reused,
             )
             saved = self._saved_scope(state, chapter, digest)
             accepted = list(reused)
@@ -739,6 +740,7 @@ def _scope_source_digest(
     chapter: ChapterTask,
     report: ReportIdentity,
     bundle: Sequence[PreparedEvidence],
+    deterministic_candidates: Sequence[SemanticRecord] = (),
 ) -> str:
     payload = {
         "chapter_task": chapter.value,
@@ -765,6 +767,16 @@ def _scope_source_digest(
                 "source_readable": item.source_readable,
             }
             for item in bundle
+        ],
+        "deterministic_candidates": [
+            {
+                "field_id": record.field_id,
+                "fingerprint": record.semantic_content_fingerprint(),
+            }
+            for record in sorted(
+                deterministic_candidates,
+                key=lambda item: (item.field_id, item.record_id),
+            )
         ],
     }
     blob = json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
@@ -905,6 +917,15 @@ _RETRYABLE_REVIEW_CODES = frozenset(
 )
 
 
+def _request_level_extract_failed(result: CompanyProfileTaskResult) -> bool:
+    return any(
+        item.review_id.endswith(":extract-contract")
+        or item.review_id.endswith(":extract-provider")
+        or item.review_id.endswith(":provider-unavailable")
+        for item in result.human_review_items
+    )
+
+
 def _retryable_field_ids(result: CompanyProfileTaskResult | None) -> frozenset[str]:
     if result is None or result.task_complete:
         return frozenset()
@@ -919,7 +940,10 @@ def _retryable_field_ids(result: CompanyProfileTaskResult | None) -> frozenset[s
         for item in result.coverage
         if item.status == CoverageStatus.EXTRACTION_FAILED
     )
-    if "extract" not in result.provider_calls:
+    if (
+        "extract" not in result.provider_calls
+        or _request_level_extract_failed(result)
+    ):
         retryable.update(_incomplete_field_ids(result))
     return frozenset(retryable) - accepted
 
