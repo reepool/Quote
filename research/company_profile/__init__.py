@@ -12,6 +12,12 @@ from .candidate_registry import (
     candidate_registry_schema_manifest,
     load_a_share_candidate_registry,
 )
+from .commodity_exposure import (
+    COMMODITY_EXPOSURE_SCHEMA_VERSION,
+    CommodityExposure,
+    CommodityExposureAssessment,
+    commodity_exposure_schema_manifest,
+)
 from .contracts import (
     ChecklistItem,
     CompanyProfileTaskResult,
@@ -152,6 +158,7 @@ from .workflow import (
 
 __all__ = [
     "APPROVED_STAGE5_SAMPLES",
+    "COMMODITY_EXPOSURE_SCHEMA_VERSION",
     "COMMON_CORE_CHAPTERS",
     "COMMON_CORE_MAPPING_VERSION",
     "COMMON_CORE_STORAGE_NAMESPACE",
@@ -172,6 +179,8 @@ __all__ = [
     "CapacityKind",
     "ChapterTask",
     "ChecklistItem",
+    "CommodityExposure",
+    "CommodityExposureAssessment",
     "CommonGatewaySemanticProvider",
     "CompanyProfileCoreAssessment",
     "CompanyProfileResearchView",
@@ -256,6 +265,7 @@ __all__ = [
     "announcement_access_report_lookup",
     "build_a_share_candidate_registry",
     "candidate_registry_schema_manifest",
+    "commodity_exposure_schema_manifest",
     "contract_example_manifest",
     "contract_schema_manifest",
     "core_assessment_schema_manifest",
