@@ -18,10 +18,12 @@ from research.company_profile.models import (
     PRODUCTION_AUTHORIZATION,
     Activity,
     AssertionClass,
+    Evidence,
     Measurement,
     PeriodType,
     Relationship,
     ReportIdentity,
+    SemanticRecord,
     SubjectBasis,
     SubjectScope,
 )
@@ -68,6 +70,26 @@ class AssessmentStatus:
     EXTRACTION_FAILED = "extraction_failed"
 
 
+def _reject_blank_ids(ids: Sequence[str], *, label: str) -> None:
+    if any(not str(item).strip() for item in ids):
+        raise ValueError(f"{label} cannot be blank")
+
+
+def _accepted_index(
+    records: Sequence[SemanticRecord],
+) -> dict[str, SemanticRecord]:
+    index: dict[str, SemanticRecord] = {}
+    for record in records:
+        key = str(record.record_id).strip()
+        if not key:
+            raise ValueError("accepted record_id cannot be blank")
+        existing = index.get(key)
+        if existing is not None and existing != record:
+            raise ValueError("accepted records have conflicting record_id")
+        index[key] = record
+    return index
+
+
 class CommodityCatalogMapping(_StrictModel):
     source_native_name: str = Field(min_length=1)
     mapping_status: Literal["mapped", "pending", "ambiguous"]
@@ -102,6 +124,7 @@ class CommodityExposure(_StrictModel):
     source_record_ids: tuple[str, ...] = Field(min_length=1)
     evidence_ids: tuple[str, ...] = Field(min_length=1)
     measurement_record_ids: tuple[str, ...] = ()
+    accepted_records: tuple[SemanticRecord, ...] = Field(min_length=1)
     source_native_name: str = Field(min_length=1)
     commodity_id: str | None = None
     mapping_status: Literal["mapped", "pending", "ambiguous"]
@@ -127,6 +150,45 @@ class CommodityExposure(_StrictModel):
 
     @model_validator(mode="after")
     def _contract_invariants(self) -> CommodityExposure:
+        _reject_blank_ids(self.source_record_ids, label="source_record_ids")
+        _reject_blank_ids(self.evidence_ids, label="evidence_ids")
+        _reject_blank_ids(self.measurement_record_ids, label="measurement_record_ids")
+        index = _accepted_index(self.accepted_records)
+        sources = []
+        for record_id in self.source_record_ids:
+            record = index.get(record_id)
+            if record is None:
+                raise ValueError(
+                    "source_record_ids must resolve to accepted new-model facts"
+                )
+            if record.report != self.report:
+                raise ValueError("source_record_ids must belong to the same report")
+            sources.append(record)
+        measurements = []
+        for record_id in self.measurement_record_ids:
+            record = index.get(record_id)
+            if record is None or not isinstance(record, Measurement):
+                raise ValueError(
+                    "measurement_record_ids must resolve to same-report Measurement"
+                )
+            if record.report != self.report:
+                raise ValueError(
+                    "measurement_record_ids must belong to the same report"
+                )
+            measurements.append(record)
+        owned_evidence = {
+            item.evidence_id: item
+            for record in (*sources, *measurements)
+            for item in record.evidence
+        }
+        for evidence_id in self.evidence_ids:
+            evidence = owned_evidence.get(evidence_id)
+            if evidence is None:
+                raise ValueError(
+                    "evidence_ids must belong to the referenced source facts"
+                )
+            if evidence.report != self.report:
+                raise ValueError("evidence_ids must belong to the same report")
         if self.mapping_status == MappingStatus.MAPPED:
             if not self.commodity_id:
                 raise ValueError("mapped commodity requires commodity_id")
@@ -150,12 +212,25 @@ class CommodityExposureAssessment(_StrictModel):
     report: ReportIdentity
     assessment_status: Literal["not_assessed", "assessed", "extraction_failed"]
     checked_evidence_ids: tuple[str, ...] = ()
+    checked_evidence: tuple[Evidence, ...] = ()
     exposures: tuple[CommodityExposure, ...] = ()
 
     @model_validator(mode="after")
     def _empty_list_is_not_zero_exposure(self) -> CommodityExposureAssessment:
+        _reject_blank_ids(self.checked_evidence_ids, label="checked_evidence_ids")
         if any(item.report != self.report for item in self.exposures):
             raise ValueError("assessment exposures must belong to the same report")
+        if any(item.report != self.report for item in self.checked_evidence):
+            raise ValueError("checked evidence must belong to the same report")
+        if any(not str(item.evidence_id).strip() for item in self.checked_evidence):
+            raise ValueError("checked evidence_id cannot be blank")
+        by_id = {item.evidence_id: item for item in self.checked_evidence}
+        for evidence_id in self.checked_evidence_ids:
+            evidence = by_id.get(evidence_id)
+            if evidence is None:
+                raise ValueError(
+                    "checked_evidence_ids must resolve to this-report Evidence"
+                )
         if (
             self.assessment_status == AssessmentStatus.ASSESSED
             and not self.exposures
