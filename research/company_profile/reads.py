@@ -2,6 +2,8 @@
 
 This is the unique read owner for query/export. It does not enqueue work or
 call Stage 5 writers. One completed company can be delivered immediately.
+Commodity associations reuse the published assessment schema and keep DCF,
+trading, and price-sensitivity consumers unauthorized.
 """
 
 from __future__ import annotations
@@ -15,7 +17,15 @@ from typing import Any
 
 from pydantic import TypeAdapter
 
-from research.company_profile.models import PRODUCTION_AUTHORIZATION, SemanticRecord
+from research.company_profile.commodity_exposure import (
+    AssessmentStatus,
+    assess_commodity_exposures,
+)
+from research.company_profile.models import (
+    PRODUCTION_AUTHORIZATION,
+    ReportIdentity,
+    SemanticRecord,
+)
 from research.company_profile.runtime import (
     COMMON_CORE_STORAGE_NAMESPACE,
     COMMON_CORE_WRITER_NAME,
@@ -25,6 +35,11 @@ from research.company_profile.runtime import (
 
 PROFILE_SCHEMA_VERSION = "company_profile_common_core_profile.v1"
 EXPORT_SCHEMA_VERSION = "company_profile_common_core_export.v1"
+COMMODITY_CONSUMER_AUTHORIZATION = {
+    "dcf": False,
+    "trading": False,
+    "price_sensitivity": False,
+}
 _RECORD_ADAPTER = TypeAdapter(SemanticRecord)
 _SAFE_NAME = re.compile(r"[^A-Za-z0-9._-]+")
 
@@ -185,6 +200,11 @@ class CompanyProfileReadService:
             "accepted_facts": accepted,
             "gaps": gaps,
             "evidence_gap_codes": list(record.evidence_gap_codes),
+            "commodity_exposure": _commodity_exposure_view(
+                report=record.report,
+                checkpoint=checkpoint,
+                knowledge_time=knowledge_time,
+            ),
         }
 
     def _load_checkpoint(self, work_id: str) -> dict[str, Any]:
@@ -219,11 +239,55 @@ def _dimension_view(item: Any) -> dict[str, Any]:
     }
 
 
-def _accepted_facts(checkpoint: Mapping[str, Any]) -> list[dict[str, Any]]:
-    facts: list[dict[str, Any]] = []
-    seen: set[str] = set()
-    for raw in checkpoint.get("accepted_records") or ():
-        _append_fact(facts, seen, raw)
+def commodity_consumer_authorized(consumer: str) -> bool:
+    """DCF, trading, and price-sensitivity stay unauthorized on this read path."""
+
+    if consumer not in COMMODITY_CONSUMER_AUTHORIZATION:
+        raise ValueError(f"unsupported commodity consumer: {consumer}")
+    return COMMODITY_CONSUMER_AUTHORIZATION[consumer]
+
+
+def _commodity_exposure_view(
+    *,
+    report: ReportIdentity,
+    checkpoint: Mapping[str, Any],
+    knowledge_time: str,
+) -> dict[str, Any]:
+    records = _accepted_semantic_records(checkpoint)
+    evidence = tuple(
+        item
+        for record in records
+        for item in record.evidence
+        if item.report == report
+    )
+    status = (
+        AssessmentStatus.ASSESSED
+        if records
+        else AssessmentStatus.NOT_ASSESSED
+    )
+    try:
+        assessment = assess_commodity_exposures(
+            report=report,
+            assessment_status=status,
+            accepted_records=records,
+            checked_evidence=evidence,
+        )
+    except (TypeError, ValueError):
+        assessment = assess_commodity_exposures(
+            report=report,
+            assessment_status=AssessmentStatus.EXTRACTION_FAILED,
+            checked_evidence=evidence,
+        )
+    return {
+        "assessment": json_compatible(assessment),
+        "reported_period": report.report_period,
+        "knowledge_time": knowledge_time,
+        "consumer_authorization": dict(COMMODITY_CONSUMER_AUTHORIZATION),
+    }
+
+
+def _iter_accepted_raw(checkpoint: Mapping[str, Any]) -> list[Any]:
+    items: list[Any] = list(checkpoint.get("accepted_records") or ())
     for scope in checkpoint.get("completed_scopes") or ():
         if not isinstance(scope, Mapping):
             continue
@@ -242,7 +306,35 @@ def _accepted_facts(checkpoint: Mapping[str, Any]) -> list[dict[str, Any]]:
             record_id = str(raw.get("record_id") or "")
             if record_id not in accepted_ids:
                 continue
-            _append_fact(facts, seen, raw)
+            items.append(raw)
+    return items
+
+
+def _accepted_semantic_records(
+    checkpoint: Mapping[str, Any],
+) -> tuple[SemanticRecord, ...]:
+    records: list[SemanticRecord] = []
+    seen: set[str] = set()
+    for raw in _iter_accepted_raw(checkpoint):
+        try:
+            if isinstance(raw, Mapping):
+                record = _RECORD_ADAPTER.validate_json(json.dumps(raw))
+            else:
+                record = _RECORD_ADAPTER.validate_python(raw)
+        except (TypeError, ValueError):
+            continue
+        if not record.record_id or record.record_id in seen:
+            continue
+        seen.add(record.record_id)
+        records.append(record)
+    return tuple(records)
+
+
+def _accepted_facts(checkpoint: Mapping[str, Any]) -> list[dict[str, Any]]:
+    facts: list[dict[str, Any]] = []
+    seen: set[str] = set()
+    for raw in _iter_accepted_raw(checkpoint):
+        _append_fact(facts, seen, raw)
     return facts
 
 

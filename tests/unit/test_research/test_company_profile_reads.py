@@ -4,8 +4,10 @@ import asyncio
 import csv
 import json
 
+from research.company_profile.commodity_exposure import CommodityExposureAssessment
 from research.company_profile.models import PRODUCTION_AUTHORIZATION
 from research.company_profile.reads import (
+    COMMODITY_CONSUMER_AUTHORIZATION,
     EXPORT_SCHEMA_VERSION,
     PROFILE_SCHEMA_VERSION,
     _accepted_facts,
@@ -85,6 +87,14 @@ def test_query_returns_profile_template_for_one_published_company(tmp_path):
     assert profile["accepted_facts"]
     assert any(item.get("evidence") for item in profile["accepted_facts"])
     assert isinstance(profile["gaps"], list)
+    commodity = profile["commodity_exposure"]
+    assert commodity["reported_period"] == profile["freshness"]["report_period"]
+    assert commodity["knowledge_time"] == profile["freshness"]["knowledge_time"]
+    assert commodity["consumer_authorization"] == COMMODITY_CONSUMER_AUTHORIZATION
+    CommodityExposureAssessment.model_validate_json(
+        json.dumps(commodity["assessment"])
+    )
+    assert "net_profit_direction" not in json.dumps(commodity)
 
 
 def test_query_delivers_completed_company_without_waiting_for_the_batch(tmp_path):
