@@ -481,6 +481,7 @@ class CompanyProfileTaskService:
             "inserted": 0,
             "reused": 0,
         }
+        published_before = len(self.writer.paths)
         if enqueue:
             enqueue_result = self.repository.enqueue_latest_annual(
                 knowledge_cutoff=knowledge_cutoff,
@@ -527,6 +528,7 @@ class CompanyProfileTaskService:
             enqueue_result=enqueue_result,
             health=health,
             drain=drain,
+            published_this_round=len(self.writer.paths) > published_before,
         )
         result = self._payload(
             action=action,
@@ -546,10 +548,11 @@ class CompanyProfileTaskService:
         enqueue_result: Mapping[str, Any],
         health: Mapping[str, Any],
         drain: Mapping[str, Any] | None = None,
+        published_this_round: bool = False,
     ) -> str:
         if stopped:
             return "paused"
-        if self._delivered_this_round(drain):
+        if published_this_round or self._delivered_this_round(drain):
             return "completed"
         inserted = int(enqueue_result.get("inserted") or 0)
         reused = int(enqueue_result.get("reused") or 0)
@@ -557,11 +560,11 @@ class CompanyProfileTaskService:
         claimable = int(health.get("claimable") or 0)
         if inserted == 0 and reused == 0 and rework == 0 and claimable == 0:
             return "idle"
+        if inserted == 0 and reused > 0 and rework == 0 and claimable == 0:
+            return "completed"
         return "incomplete"
 
     def _delivered_this_round(self, drain: Mapping[str, Any] | None) -> bool:
-        if self.writer.paths:
-            return True
         publish = dict((drain or {}).get("publish") or {})
         return int(publish.get("completed") or 0) > 0
 
