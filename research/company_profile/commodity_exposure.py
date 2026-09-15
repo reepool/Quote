@@ -66,26 +66,29 @@ class CommodityRole:
 _ENERGY_CONSUMPTION_VERBS = frozenset({"消耗", "耗用", "用电", "耗电"})
 _ENERGY_CONSUMPTION_OBJECTS = frozenset({"电力", "蒸汽", "用电量", "电"})
 _HEDGE_MARKERS = ("套保", "套期", "hedge")
-_ROLE_MEASUREMENT_METRICS: dict[str, frozenset[MetricType]] = {
-    CommodityRole.PRODUCT_SALES: frozenset(
-        {
-            MetricType.SALES_VOLUME,
-            MetricType.CUSTOMER_SALES_AMOUNT,
-            MetricType.OPERATING_REVENUE,
-        }
-    ),
-    CommodityRole.RAW_MATERIAL_INPUT: frozenset(
-        {
-            MetricType.SUPPLIER_PURCHASE_AMOUNT,
-            MetricType.OPERATING_COST,
-        }
-    ),
-    CommodityRole.ENERGY_CONSUMPTION: frozenset(
-        {
-            MetricType.SUPPLIER_PURCHASE_AMOUNT,
-            MetricType.OPERATING_COST,
-        }
-    ),
+_HEDGE_NEGATIONS = (
+    "未开展",
+    "未进行",
+    "未从事",
+    "未参与",
+    "未做",
+    "不开展",
+    "不进行",
+    "无套保",
+    "无套期",
+    "没有开展",
+    "没有进行",
+    "不存在套保",
+    "不存在套期",
+    "no hedge",
+    "not hedge",
+    "without hedge",
+)
+_ROLE_SOURCE_METRICS = frozenset({MetricType.SALES_VOLUME})
+_ROLE_QUANTITY_METRICS: dict[str, frozenset[MetricType]] = {
+    CommodityRole.PRODUCT_SALES: frozenset({MetricType.SALES_VOLUME}),
+    CommodityRole.RAW_MATERIAL_INPUT: frozenset(),
+    CommodityRole.ENERGY_CONSUMPTION: frozenset(),
     CommodityRole.HEDGE_UNDERLYING: frozenset(),
 }
 
@@ -447,8 +450,11 @@ def _is_hedge_fact(source: SemanticRecord) -> bool:
         texts = (source.source_verb, source.object_name, source.source_native.name or "")
     else:
         return False
-    blob = " ".join(texts).lower()
-    return any(marker.lower() in blob or marker in blob for marker in _HEDGE_MARKERS)
+    blob = " ".join(texts)
+    lowered = blob.lower()
+    if any(marker in blob or marker in lowered for marker in _HEDGE_NEGATIONS):
+        return False
+    return any(marker.lower() in lowered or marker in blob for marker in _HEDGE_MARKERS)
 
 
 def _is_energy_consumption_evidence(source: SemanticRecord) -> bool:
@@ -489,14 +495,8 @@ def derive_commodity_role(source: SemanticRecord) -> str | None:
             return CommodityRole.RAW_MATERIAL_INPUT
         return None
     if isinstance(source, Measurement):
-        if source.metric_type in _ROLE_MEASUREMENT_METRICS[CommodityRole.PRODUCT_SALES]:
+        if source.metric_type in _ROLE_SOURCE_METRICS:
             return CommodityRole.PRODUCT_SALES
-        if source.metric_type in _ROLE_MEASUREMENT_METRICS[
-            CommodityRole.RAW_MATERIAL_INPUT
-        ]:
-            if _is_energy_consumption_evidence(source):
-                return CommodityRole.ENERGY_CONSUMPTION
-            return CommodityRole.RAW_MATERIAL_INPUT
         return None
     return None
 
@@ -506,7 +506,7 @@ def _compatible_measurements(
     records: Sequence[SemanticRecord],
     role: str,
 ) -> tuple[Measurement, ...]:
-    allowed = _ROLE_MEASUREMENT_METRICS.get(role, frozenset())
+    allowed = _ROLE_QUANTITY_METRICS.get(role, frozenset())
     if not allowed:
         return ()
     name = _catalog_source_name(source) if isinstance(
@@ -523,6 +523,8 @@ def _compatible_measurements(
         if (
             item.report == source.report
             and item.reported_period == source.reported_period
+            and item.subject_scope == source.subject_scope
+            and item.subject_name == source.subject_name
             and item.measured_object == name
             and item.metric_type in allowed
         ):
@@ -551,7 +553,7 @@ def _project_one_exposure(
     if (
         isinstance(source, Measurement)
         and source not in quantities
-        and source.metric_type in _ROLE_MEASUREMENT_METRICS.get(role, frozenset())
+        and source.metric_type in _ROLE_QUANTITY_METRICS.get(role, frozenset())
     ):
         quantities = (source, *quantities)
     evidence_ids = tuple(item.evidence_id for item in source.evidence)

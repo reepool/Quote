@@ -69,13 +69,16 @@ def _activity(
     action: ActivityAction = ActivityAction.SELLS,
     record_id: str = "act-role",
     source_verb: str = "销售",
+    subject_scope: SubjectScope = SubjectScope.ISSUER,
+    subject_name: str | None = None,
 ) -> Activity:
     return Activity(
         record_id=record_id,
         field_id="explicit_activity",
         chapter_task=ChapterTask.EXTRACT_BUSINESS_OVERVIEW,
         report=_report(),
-        subject_scope=SubjectScope.ISSUER,
+        subject_scope=subject_scope,
+        subject_name=subject_name,
         reported_period="2025",
         period_type=PeriodType.DURATION,
         assertion_class=AssertionClass.REPORTED_FACT,
@@ -119,14 +122,18 @@ def _measurement(
     record_id: str = "meas-role",
     metric: MetricType = MetricType.SALES_VOLUME,
     slot: LogicalSlot = LogicalSlot.SALES_VOLUME,
+    field_id: str = "sales_volume",
     value: str = "10",
+    subject_scope: SubjectScope = SubjectScope.ISSUER,
+    subject_name: str | None = None,
 ) -> Measurement:
     return Measurement(
         record_id=record_id,
-        field_id="sales_volume",
+        field_id=field_id,
         chapter_task=ChapterTask.EXTRACT_OPERATING_QUANTITIES,
         report=_report(),
-        subject_scope=SubjectScope.ISSUER,
+        subject_scope=subject_scope,
+        subject_name=subject_name,
         reported_period="2025",
         period_type=PeriodType.DURATION,
         assertion_class=AssertionClass.REPORTED_FACT,
@@ -257,6 +264,73 @@ def test_roles_are_not_converted_into_assessment_profit_or_zero_exposure():
     assert assessment.exposures[0].role == CommodityRole.PRODUCT_SALES
     assert "net_profit_direction" not in dumped
     assert dumped["exposures"][0]["role"] != "positive"
+
+
+def test_concentration_and_product_cost_are_not_commodity_roles():
+    customer = _measurement(
+        "前五名客户",
+        record_id="meas-customer",
+        metric=MetricType.CUSTOMER_SALES_AMOUNT,
+        slot=LogicalSlot.CUSTOMER_SALES_AMOUNT,
+        field_id="customer_sales_amount",
+        value="12",
+    )
+    supplier = _measurement(
+        "前五名供应商",
+        record_id="meas-supplier",
+        metric=MetricType.SUPPLIER_PURCHASE_AMOUNT,
+        slot=LogicalSlot.SUPPLIER_PURCHASE_AMOUNT,
+        field_id="supplier_purchase_amount",
+        value="8",
+    )
+    product_cost = _measurement(
+        "阴极铜",
+        record_id="meas-cost",
+        metric=MetricType.OPERATING_COST,
+        slot=LogicalSlot.COST,
+        field_id="operating_cost",
+        value="6",
+    )
+
+    assert derive_commodity_role(customer) is None
+    assert derive_commodity_role(supplier) is None
+    assert derive_commodity_role(product_cost) is None
+    assert project_commodity_exposures((customer, supplier, product_cost)) == ()
+
+
+def test_quantity_does_not_attach_across_subjects():
+    issuer_sale = _activity(record_id="act-issuer")
+    subsidiary_volume = _measurement(
+        record_id="meas-sub",
+        subject_scope=SubjectScope.NAMED_SUBSIDIARY,
+        subject_name="云南铜业",
+    )
+    exposures = project_commodity_exposures((issuer_sale, subsidiary_volume))
+
+    issuer = next(item for item in exposures if item.source_record_ids == ("act-issuer",))
+    assert issuer.measurement_record_ids == ()
+    assert "meas-sub" not in issuer.measurement_record_ids
+
+
+def test_negated_hedge_statement_is_not_a_hedge_role():
+    denied = BusinessEvent(
+        record_id="evt-no-hedge",
+        field_id="business_regime_source",
+        chapter_task=ChapterTask.EXTRACT_BUSINESS_REGIME,
+        report=_report(),
+        subject_scope=SubjectScope.ISSUER,
+        reported_period="2025",
+        period_type=PeriodType.EVENT,
+        assertion_class=AssertionClass.REPORTED_FACT,
+        evidence=(_evidence("未开展套保"),),
+        source_native=SourceNativeValue(name="阴极铜"),
+        event_type="commodity_hedge",
+        description="未开展阴极铜期货套期保值业务",
+    )
+
+    assert derive_commodity_role(denied) is None
+    assert project_commodity_exposures((denied,)) == ()
+    assert derive_commodity_role(_hedge_event()) == CommodityRole.HEDGE_UNDERLYING
 
 
 def test_role_derivation_does_not_reuse_legacy_exposure_producer():
