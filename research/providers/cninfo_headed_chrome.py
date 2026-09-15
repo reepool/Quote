@@ -613,7 +613,9 @@ class CninfoHeadedChromeAccess:
                 "[CninfoHeadedChrome] in-page request failed: %s",
                 type(exc).__name__,
             )
-            if not self._session_started:
+            if not self._session_started or (
+                self._restarted_dead and _is_dead_session(exc)
+            ):
                 self._chrome_unusable = True
                 return CninfoHeadedFetchOutcome("chrome_unavailable")
             return CninfoHeadedFetchOutcome("chrome_blocked")
@@ -719,6 +721,11 @@ class CninfoHeadedChromeAccess:
             return self._page.fetch(method, target_url, **fetch_kwargs)
         except Exception as exc:
             if self._restarted_dead or not _is_dead_session(exc):
+                if self._restarted_dead and _is_dead_session(exc):
+                    self._chrome_unusable = True
+                    raise _ChromeUnusable(
+                        "headed Chrome dead after one restart"
+                    ) from exc
                 raise
             LOGGER.warning("[CninfoHeadedChrome] restarting dead Chrome session once")
             self._restarted_dead = True
@@ -727,7 +734,15 @@ class CninfoHeadedChromeAccess:
             self._ensure_started()
             retry_kwargs = self._fetch_kwargs(url, **kwargs)
             retry_url = retry_kwargs.pop("url")
-            return self._page.fetch(method, retry_url, **retry_kwargs)
+            try:
+                return self._page.fetch(method, retry_url, **retry_kwargs)
+            except Exception as retry_exc:
+                if _is_dead_session(retry_exc):
+                    self._chrome_unusable = True
+                    raise _ChromeUnusable(
+                        "headed Chrome dead after one restart"
+                    ) from retry_exc
+                raise
 
     def _fetch_kwargs(self, url: str, **kwargs: Any) -> dict[str, Any]:
         data = kwargs.get("data")

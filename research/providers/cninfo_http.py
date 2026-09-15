@@ -3,7 +3,8 @@
 ``attach_cninfo_access`` is the only production factory. ``chrome_tls`` is a
 ``curl_cffi`` Chrome TLS fingerprint, not ``headless=true`` Chrome.
 ``wrap_cninfo_proxy_fallback`` is a test/internal TLS+proxy seam and requires
-explicit hops; production callers must not use it as a factory.
+explicit ``impersonated_request`` and ``proxy_request`` hops; production
+callers must not use it as a factory.
 """
 
 from __future__ import annotations
@@ -361,6 +362,12 @@ def wrap_cninfo_proxy_fallback(
         if impersonated_request is not _UNSET:
             session._impersonated_request = impersonated_request
         return session
+    if impersonated_request is _UNSET or proxy_request is None:
+        raise TypeError(
+            "wrap_cninfo_proxy_fallback is a test/internal seam; pass "
+            "impersonated_request and proxy_request explicitly. "
+            "Production code must call attach_cninfo_access."
+        )
     return CninfoProxyFallbackSession(
         session,
         proxy_request=proxy_request,

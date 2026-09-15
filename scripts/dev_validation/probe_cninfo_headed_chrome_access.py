@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Write-free probe of CNInfo headed-Chrome access.
+"""Write-free probe of production CNInfo access via attach_cninfo_access.
 
-Constructs the headed-Chrome access provider directly and exercises homepage
-bootstrap, one data20 endpoint, and one announcement query. It does not upsert
-shareholder snapshots or finish an ingestion run.
+Exercises one data20 GET, one announcement POST, and one static URL. It does
+not upsert shareholder snapshots or finish an ingestion run. Headed Chrome
+unit-hop probes belong in tests, not this production-factory path.
 """
 
 from __future__ import annotations
@@ -19,14 +19,15 @@ ROOT_DIR = Path(__file__).resolve().parents[2]
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
-from research.providers.cninfo_headed_chrome import (  # noqa: E402
-    create_cninfo_headed_chrome_access,
+from research.providers.cninfo_http import (  # noqa: E402
+    attach_cninfo_access,
+    reset_cninfo_access_runtime,
 )
 
 
-HOMEPAGE = "https://www.cninfo.com.cn/"
 DATA20_URL = "https://www.cninfo.com.cn/data20/stockholderCapital/getTopTenStockholders"
 ANNOUNCEMENT_URL = "https://www.cninfo.com.cn/new/hisAnnouncement/query"
+STATIC_URL = "https://static.cninfo.com.cn/finalpage/2026-04-30/1223234965.PDF"
 ANNOUNCEMENT_HEADERS = {
     "Accept": "application/json, text/plain, */*",
     "Origin": "https://www.cninfo.com.cn",
@@ -64,20 +65,20 @@ def main() -> int:
     parser.add_argument("--scode", default="000001", help="data20 stock code")
     args = parser.parse_args()
 
-    access = create_cninfo_headed_chrome_access()
+    reset_cninfo_access_runtime()
+    session = attach_cninfo_access()
     reports = []
     try:
-        reports.append(_report("homepage", access.get(HOMEPAGE, timeout=30)))
         reports.append(
             _report(
                 "data20",
-                access.get(DATA20_URL, params={"scode": args.scode}, timeout=30),
+                session.get(DATA20_URL, params={"scode": args.scode}, timeout=30),
             )
         )
         reports.append(
             _report(
                 "announcement",
-                access.post(
+                session.post(
                     ANNOUNCEMENT_URL,
                     data={
                         "pageNum": "1",
@@ -91,20 +92,28 @@ def main() -> int:
                 ),
             )
         )
+        reports.append(_report("static", session.get(STATIC_URL, timeout=20)))
     finally:
-        access.close()
+        reset_cninfo_access_runtime()
 
-    modes = {item.get("access_mode") for item in reports}
+    by_name = {item["name"]: item for item in reports}
+    www_ok = all(
+        int(by_name[name].get("status") or 0) < 400 for name in ("data20", "announcement")
+    )
+    static_mode = by_name.get("static", {}).get("access_mode")
+    static_off_chrome = static_mode in {"chrome_tls", "proxy_patch"}
     print(
         json.dumps(
             {
-                "ok": all(int(item.get("status") or 0) < 400 for item in reports),
-                "access_modes": sorted(mode for mode in modes if mode),
+                "ok": www_ok and static_off_chrome,
+                "access_modes": [
+                    item.get("access_mode") for item in reports if item.get("access_mode")
+                ],
             },
             ensure_ascii=False,
         )
     )
-    return 0 if all(int(item.get("status") or 0) < 400 for item in reports) else 1
+    return 0 if www_ok and static_off_chrome else 1
 
 
 if __name__ == "__main__":

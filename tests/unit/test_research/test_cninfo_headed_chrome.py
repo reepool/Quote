@@ -462,6 +462,47 @@ def test_fetch_allowlisted_reports_unavailable_on_start_failure():
     assert proxy_calls == []
 
 
+def test_fetch_allowlisted_dead_session_after_restart_is_unavailable():
+    page = _FakePageSession(
+        fetches=[
+            RuntimeError("Target closed"),
+            RuntimeError("session closed"),
+        ]
+    )
+    proxy_calls = []
+    access = create_cninfo_headed_chrome_access(
+        page_session=page,
+        proxy_request=lambda *args, **kwargs: proxy_calls.append(True),
+    )
+
+    outcome = access.fetch_allowlisted("GET", DATA20_URL)
+
+    assert outcome.status == "chrome_unavailable"
+    assert outcome.response is None
+    assert proxy_calls == []
+    assert page.started == 2
+
+
+def test_fetch_allowlisted_timeout_after_dead_restart_stays_blocked():
+    page = _FakePageSession(
+        fetches=[
+            RuntimeError("Target closed"),
+            TimeoutError("evaluate timed out"),
+        ]
+    )
+    access = create_cninfo_headed_chrome_access(
+        page_session=page,
+        proxy_request=lambda *args, **kwargs: (_ for _ in ()).throw(
+            AssertionError("hop must not choose proxy")
+        ),
+    )
+
+    outcome = access.fetch_allowlisted("GET", DATA20_URL)
+
+    assert outcome.status == "chrome_blocked"
+    assert page.started == 2
+
+
 def test_fetch_allowlisted_treats_logical_429_as_success():
     page = _FakePageSession(
         fetches=[

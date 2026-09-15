@@ -257,3 +257,14 @@ def test_cninfo_chrome_tls_session_survives_akshare_proxy_session_replacement(mo
         assert not isinstance(session, PatchedSession)
     finally:
         cninfo_http._THREAD_LOCAL.session = None
+
+
+def test_wrap_cninfo_proxy_fallback_requires_explicit_hops():
+    inner = _QueuedSession([])
+
+    try:
+        wrap_cninfo_proxy_fallback(inner)
+    except TypeError as exc:
+        assert "attach_cninfo_access" in str(exc)
+    else:
+        raise AssertionError("wrap must not be a default-hop production factory")

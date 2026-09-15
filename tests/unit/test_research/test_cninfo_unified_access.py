@@ -20,6 +20,7 @@ from research.providers.cninfo_http import (
     reset_cninfo_access_runtime,
     resolve_cninfo_access_mode,
 )
+from tests.unit.test_research.test_cninfo_headed_chrome import _FakePageSession
 
 
 DATA20_URL = "https://www.cninfo.com.cn/data20/stockholderCapital/getTopTenStockholders"
@@ -368,6 +369,38 @@ def test_chrome_blocked_uses_proxy_only_and_is_runtime_sticky_for_www():
     assert len(headed.calls) == 1
     assert tls.calls == []
     assert static_tls.calls[0]["url"] == STATIC_URL
+
+
+def test_dead_session_after_restart_uses_tls_stack_not_www_proxy_sticky():
+    page = _FakePageSession(
+        fetches=[
+            RuntimeError("Target closed"),
+            RuntimeError("session closed"),
+        ]
+    )
+    hop = create_cninfo_headed_chrome_access(
+        page_session=page,
+        proxy_request=lambda *args, **kwargs: (_ for _ in ()).throw(
+            AssertionError("headed hop must not choose proxy")
+        ),
+    )
+    tls = _CallableHop(responses=[_Resp({"via": "tls-1"}), _Resp({"via": "tls-2"})])
+    proxy = _CallableHop(responses=[AssertionError("must not sticky www proxy")])
+    first = _attach(
+        headed_hop=hop,
+        impersonated_request=tls,
+        proxy_request=proxy,
+    )
+    first_response = first.get(DATA20_URL)
+    second = _attach(impersonated_request=tls, proxy_request=proxy)
+    second_response = second.get(DATA20_URL)
+
+    assert first_response.access_mode == "chrome_tls"
+    assert second_response.access_mode == "chrome_tls"
+    assert first_response.json()["via"] == "tls-1"
+    assert second_response.json()["via"] == "tls-2"
+    assert page.started == 2
+    assert page.closed >= 1
 
 
 def test_chrome_unavailable_uses_tls_stack_and_does_not_restart_chrome():
