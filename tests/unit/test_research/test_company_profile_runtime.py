@@ -5,6 +5,7 @@ import json
 from copy import deepcopy
 from pathlib import Path
 
+import pytest
 from pydantic import TypeAdapter
 
 from research.business_profile_async_production import (
@@ -41,6 +42,8 @@ SERVICE_OVERVIEW = (
     "主要服务包括系统集成、运维和技术咨询，"
     "通过向客户提供技术服务收取服务费。"
 )
+SEGMENT_LINE = "动力电池系统 营业收入 316506369 千元"
+CHANGED_SEGMENT_LINE = "储能系统 营业收入 100 千元"
 
 
 def _reference_payload():
@@ -57,6 +60,18 @@ def _overview_page(text: str, *, readable: bool = True) -> dict[str, object]:
     return {
         "page": 14,
         "text": f"报告期内公司从事的主要业务\n{text}\n二、风险因素\n宏观经济波动。",
+        "readable": readable,
+    }
+
+
+def _segment_page(line: str, *, readable: bool = True) -> dict[str, object]:
+    return {
+        "page": 25,
+        "text": (
+            "占公司营业收入或营业利润10%以上\n"
+            f"分产品\n{line}\n"
+            "三、主要销售客户"
+        ),
         "readable": readable,
     }
 
@@ -89,9 +104,13 @@ def _item(report: ReportIdentity, pages, work_id: str = "work-core-1") -> dict:
 class _RequestBoundOverviewProvider:
     def __init__(self) -> None:
         self.extract_calls = 0
+        self.extract_chapters: list[ChapterTask] = []
 
     def extract(self, request):
         self.extract_calls += 1
+        self.extract_chapters.append(request.chapter_task)
+        if request.chapter_task == ChapterTask.EXTRACT_SEGMENT_FINANCIALS:
+            return self._segment_response(request)
         prepared = request.evidence_bundle[0]
         template = deepcopy(
             next(
@@ -113,6 +132,35 @@ class _RequestBoundOverviewProvider:
             request_id=request.request_id,
             items=(CandidateResponseItem(candidate=record),),
         )
+
+    def _segment_response(self, request):
+        by_field = {item.field_id: item for item in request.evidence_bundle}
+        items = []
+        for record_id, field_id in (
+            ("cp-300750-segment", "segment_dimension"),
+            ("cp-300750-revenue", "operating_revenue"),
+        ):
+            prepared = by_field.get(field_id)
+            if prepared is None:
+                continue
+            template = deepcopy(
+                next(
+                    row
+                    for row in _reference_payload()["records"]
+                    if row["record_id"] == record_id
+                )
+            )
+            template["record_id"] = f"{request.request_id}:{field_id}"
+            template["report"] = json.loads(request.report.model_dump_json())
+            template["evidence"] = [json.loads(prepared.evidence.model_dump_json())]
+            items.append(
+                CandidateResponseItem(
+                    candidate=RECORD_ADAPTER.validate_json(
+                        json.dumps(template, ensure_ascii=False)
+                    )
+                )
+            )
+        return ExtractResponse(request_id=request.request_id, items=tuple(items))
 
     def repair(self, request):
         raise RuntimeError("repair is not part of the 2.1 runtime path")
@@ -377,3 +425,129 @@ def test_unbound_real_queue_item_is_machine_rework_not_terminal(tmp_path):
     assert acquire["machine_rework_deferred"] == 1
     assert row["status"] == "machine_rework"
     assert "pages_not_bound" in str(row["last_error"])
+
+
+def test_completed_scope_survives_stop_and_resume_skips_provider(tmp_path):
+    report = _report(report_id="asset-runtime-resume")
+    pages = (
+        _overview_page(SERVICE_OVERVIEW),
+        _segment_page(SEGMENT_LINE),
+    )
+    item = _item(report, pages, work_id="work-resume")
+    writer = CompanyProfileResearchWriter(tmp_path)
+    first = _RequestBoundOverviewProvider()
+    runtime = CompanyProfileStageRuntime(
+        writer=writer,
+        provider=first,
+        stop_after_chapter=ChapterTask.EXTRACT_BUSINESS_OVERVIEW,
+    )
+    asyncio.run(runtime("acquire", item))
+    asyncio.run(runtime("parse", item))
+    with pytest.raises(RuntimeError, match="scope stop"):
+        asyncio.run(runtime("semantic", item))
+
+    second = _RequestBoundOverviewProvider()
+    resumed = CompanyProfileStageRuntime(writer=writer, provider=second)
+    published = asyncio.run(_drive(resumed, item))
+
+    assert first.extract_chapters == [ChapterTask.EXTRACT_BUSINESS_OVERVIEW]
+    assert second.extract_chapters == [ChapterTask.EXTRACT_SEGMENT_FINANCIALS]
+    assert ChapterTask.EXTRACT_BUSINESS_OVERVIEW.value in published["reused_scope_ids"]
+    assert published["assessment"]["core_complete"] is True
+
+
+def test_source_version_successor_reruns_only_changed_scope(tmp_path):
+    writer = CompanyProfileResearchWriter(tmp_path)
+    first_report = _report(report_id="asset-v1", document_version="ver-1")
+    first = _RequestBoundOverviewProvider()
+    asyncio.run(
+        _drive(
+            CompanyProfileStageRuntime(writer=writer, provider=first),
+            _item(
+                first_report,
+                (_overview_page(SERVICE_OVERVIEW), _segment_page(SEGMENT_LINE)),
+                work_id="work-source-v1",
+            ),
+        )
+    )
+
+    successor_report = _report(report_id="asset-v2", document_version="ver-2")
+    successor = _RequestBoundOverviewProvider()
+    published = asyncio.run(
+        _drive(
+            CompanyProfileStageRuntime(writer=writer, provider=successor),
+            _item(
+                successor_report,
+                (
+                    _overview_page(SERVICE_OVERVIEW),
+                    _segment_page(CHANGED_SEGMENT_LINE),
+                ),
+                work_id="work-source-v2",
+            ),
+        )
+    )
+
+    assert first.extract_calls == 2
+    assert successor.extract_chapters == [ChapterTask.EXTRACT_SEGMENT_FINANCIALS]
+    assert ChapterTask.EXTRACT_BUSINESS_OVERVIEW.value in published["reused_scope_ids"]
+    assert published["assessment"]["principal_business"]["answered"] is True
+
+
+def test_duplicate_queue_submit_does_not_repeat_provider(tmp_path):
+    storage = _storage(tmp_path)
+    _frontier(storage)
+    queue = BusinessProfileWorkRepository(
+        storage, checkpoint_root=tmp_path / "checkpoints"
+    )
+    identity = {"rules": "company_profile_common_core.v1"}
+    first = queue.enqueue_latest_annual(
+        knowledge_cutoff="2026-08-30",
+        processing_identity=identity,
+    )
+    second = queue.enqueue_latest_annual(
+        knowledge_cutoff="2026-08-30",
+        processing_identity=identity,
+    )
+    report = _report(instrument_id="600000.SH", report_id="asset-queue-reuse")
+    provider = _RequestBoundOverviewProvider()
+
+    def load_pages(item):
+        return {
+            "report": report,
+            "pages": (_overview_page(SERVICE_OVERVIEW),),
+        }
+
+    runtime = CompanyProfileStageRuntime(
+        writer=CompanyProfileResearchWriter(tmp_path),
+        provider=provider,
+        page_source=load_pages,
+    )
+    service = BusinessProfileAsyncProductionService(
+        repository=queue,
+        discovery_runner=lambda **_kwargs: None,
+        stage_runner=runtime,
+        write_coordinator=get_business_profile_write_coordinator(storage),
+        lease_seconds=30,
+    )
+    budget = StageBudget(max_items=1, max_concurrency=1, max_elapsed_seconds=15)
+
+    async def drain_all():
+        return {
+            stage: await service._drain_stage(stage, budget) for stage in WORK_STAGES
+        }
+
+    first_run = asyncio.run(drain_all())
+    calls_after_first = provider.extract_calls
+    third = queue.enqueue_latest_annual(
+        knowledge_cutoff="2026-08-30",
+        processing_identity=identity,
+    )
+    second_run = asyncio.run(drain_all())
+
+    assert first["inserted"] == 1
+    assert second["reused"] == 1
+    assert third["reused"] == 1
+    assert first_run["publish"]["completed"] == 1
+    assert second_run["acquire"]["claimed"] == 0
+    assert second_run["publish"]["completed"] == 0
+    assert provider.extract_calls == calls_after_first == 1
