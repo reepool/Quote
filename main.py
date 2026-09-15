@@ -1185,7 +1185,7 @@ def create_parser():
     job_parser.add_argument('--job-id', required=True, help='任务ID')
     job_parser.add_argument(
         '--action',
-        choices=['preview', 'run', 'status', 'pause', 'resume'],
+        choices=['preview', 'run', 'status', 'pause', 'resume', 'query', 'export'],
         help='company_profile_common_core 等任务的操作',
     )
     job_parser.add_argument('--knowledge-cutoff', help='知识截止日 YYYY-MM-DD')
@@ -1198,6 +1198,11 @@ def create_parser():
         help='每阶段最长秒数',
     )
     job_parser.add_argument('--reason', help='pause 原因')
+    job_parser.add_argument(
+        '--output-directory',
+        dest='output_directory',
+        help='query/export 结构化输出目录',
+    )
 
     # 交互式下载
     interactive_parser = subparsers.add_parser('interactive', help='交互式下载模式')
@@ -1330,6 +1335,7 @@ async def main():
                 "token_budget",
                 "max_elapsed_seconds",
                 "reason",
+                "output_directory",
             ):
                 value = getattr(args, key, None)
                 if value is not None:

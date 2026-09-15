@@ -8567,9 +8567,10 @@ class ScheduledTasks:
         token_budget: int = 50000,
         max_elapsed_seconds: float = 300.0,
         reason: str = "operator_request",
+        output_directory: Optional[str] = None,
         job_config: Optional[JobConfig] = None,
     ) -> bool:
-        """Forward Stage 5 common-core preview/run/status/pause/resume."""
+        """Forward Stage 5 common-core preview/run/status/pause/resume/query/export."""
         task_id = "company_profile_common_core"
         self._active_tasks.add(task_id)
         try:
@@ -8604,13 +8605,11 @@ class ScheduledTasks:
                 token_budget=token_budget,
                 max_elapsed_seconds=max_elapsed_seconds,
                 reason=reason,
+                output_directory=output_directory,
             )
             status = str(result.get("state") or "failed")
-            if str(action or "").strip().lower() in {
-                "preview",
-                "status",
-                "pause",
-            }:
+            normalized_action = str(action or "").strip().lower()
+            if normalized_action in {"preview", "status", "pause", "query"}:
                 success = status in {
                     "idle",
                     "completed",
@@ -8618,7 +8617,11 @@ class ScheduledTasks:
                     "stop_requested",
                     "running",
                     "incomplete",
+                    "found",
+                    "not_found",
                 }
+            elif normalized_action == "export":
+                success = status in {"completed", "idle"}
             else:
                 success = status in {"completed", "paused"}
             await self._send_task_report(

@@ -28,7 +28,9 @@ from .dependencies import SchedulerDependencyExecutor
 
 
 _SCHEDULER_ALREADY_TRACKED_PARAM = "_scheduler_already_tracked"
-_JOB_CONTROL_ACTIONS = frozenset({"preview", "status", "pause", "stop"})
+_JOB_CONTROL_ACTIONS = frozenset(
+    {"preview", "status", "pause", "stop", "query", "export"}
+)
 
 
 @singleton

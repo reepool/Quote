@@ -74,6 +74,8 @@ def test_published_catalog_lists_verified_task_not_design_or_legacy_names():
         "status",
         "pause",
         "resume",
+        "query",
+        "export",
     )
     assert catalog["parameters"]["action"] == list(PUBLISHED_ACTIONS)
     assert catalog["storage_namespace"] == COMMON_CORE_STORAGE_NAMESPACE
@@ -177,6 +179,8 @@ def test_status_reports_queue_control_and_published_catalog(tmp_path):
         "status",
         "pause",
         "resume",
+        "query",
+        "export",
     ]
     assert "business_profile_backfill" in result["task"][
         "legacy_task_names_not_connected"
@@ -524,6 +528,12 @@ def test_control_actions_reach_owner_while_run_holds_the_instance(monkeypatch):
             {"action": "status"},
         )
     )
+    query_ok = asyncio.run(
+        scheduler._run_configured_task_raw(
+            "company_profile_common_core",
+            {"action": "query", "instrument_ids": ["600000.SH"]},
+        )
+    )
     run_ok = asyncio.run(
         scheduler._run_configured_task_raw(
             "company_profile_common_core",
@@ -533,8 +543,9 @@ def test_control_actions_reach_owner_while_run_holds_the_instance(monkeypatch):
 
     assert pause_ok is True
     assert status_ok is True
+    assert query_ok is True
     assert run_ok is False
-    assert invoked == ["pause", "status"]
+    assert invoked == ["pause", "status", "query"]
 
 
 def test_cli_forwards_five_actions_to_execute_job_direct(monkeypatch):
@@ -548,7 +559,7 @@ def test_cli_forwards_five_actions_to_execute_job_direct(monkeypatch):
     )
     system = QuoteSystem.__new__(QuoteSystem)
 
-    for action in ("preview", "run", "status", "pause", "resume"):
+    for action in ("preview", "run", "status", "pause", "resume", "query", "export"):
         args = parser.parse_args(
             [
                 "job",

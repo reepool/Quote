@@ -30,6 +30,7 @@ from research.company_profile.execution import (
     default_processing_identity,
 )
 from research.company_profile.models import PRODUCTION_AUTHORIZATION
+from research.company_profile.reads import CompanyProfileReadService
 from research.company_profile.runtime import (
     COMMON_CORE_STORAGE_NAMESPACE,
     COMMON_CORE_WRITER_NAME,
@@ -41,7 +42,15 @@ from utils.date_utils import get_shanghai_time
 logger = logging.getLogger(__name__)
 
 PUBLISHED_TASK_NAME = "company_profile_common_core"
-PUBLISHED_ACTIONS = ("preview", "run", "status", "pause", "resume")
+PUBLISHED_ACTIONS = (
+    "preview",
+    "run",
+    "status",
+    "pause",
+    "resume",
+    "query",
+    "export",
+)
 CONTROL_SCHEMA_VERSION = "company_profile_task_control.v1"
 DEFAULT_OUTPUT_ROOT = "data/research/company_profile_common_core"
 DEFAULT_CHECKPOINT_ROOT = "data/checkpoints/company_profile_common_core"
@@ -70,6 +79,7 @@ def published_task_catalog() -> dict[str, Any]:
             "token_budget": DEFAULT_TOTAL_TOKEN_BUDGET,
             "max_elapsed_seconds": DEFAULT_MAX_ELAPSED_SECONDS,
             "reason": "operator_request",
+            "output_directory": None,
         },
         "storage_namespace": COMMON_CORE_STORAGE_NAMESPACE,
         "writer": COMMON_CORE_WRITER_NAME,
@@ -333,6 +343,7 @@ class CompanyProfileTaskService:
             self.repository
         )
         self.writer = CompanyProfileResearchWriter(self.output_root)
+        self.reads = CompanyProfileReadService(self.output_root)
         self.control = CompanyProfileTaskControl(self.checkpoint_root)
         self.runtime = CompanyProfileStageRuntime(
             writer=self.writer,
@@ -367,6 +378,7 @@ class CompanyProfileTaskService:
         token_budget: int | None = None,
         max_elapsed_seconds: float = DEFAULT_MAX_ELAPSED_SECONDS,
         reason: str = "operator_request",
+        output_directory: str | Path | None = None,
     ) -> dict[str, Any]:
         normalized = str(action or "").strip().lower()
         if normalized not in PUBLISHED_ACTIONS:
@@ -384,6 +396,13 @@ class CompanyProfileTaskService:
             return self._status()
         if normalized == "pause":
             return self.pause(reason=reason)
+        if normalized == "query":
+            return self._query(instrument_ids=instruments)
+        if normalized == "export":
+            return self._export(
+                instrument_ids=instruments,
+                output_directory=output_directory,
+            )
         if normalized == "run":
             return await self._run(
                 knowledge_cutoff=cutoff,
@@ -421,6 +440,22 @@ class CompanyProfileTaskService:
             action="status",
             state=str(self.control.read().get("state") or "idle"),
         )
+
+    def _query(self, *, instrument_ids: Sequence[str]) -> dict[str, Any]:
+        result = self.reads.query(instrument_ids)
+        return self._payload(**result)
+
+    def _export(
+        self,
+        *,
+        instrument_ids: Sequence[str],
+        output_directory: str | Path | None,
+    ) -> dict[str, Any]:
+        result = self.reads.export(
+            instrument_ids,
+            export_directory=output_directory,
+        )
+        return self._payload(**result)
 
     async def _run(
         self,
@@ -566,6 +601,7 @@ async def execute_published_task(
     token_budget: int = DEFAULT_TOTAL_TOKEN_BUDGET,
     max_elapsed_seconds: float = DEFAULT_MAX_ELAPSED_SECONDS,
     reason: str = "operator_request",
+    output_directory: str | Path | None = None,
 ) -> dict[str, Any]:
     """Unique owner entry for the published company-profile task operations."""
 
@@ -586,4 +622,5 @@ async def execute_published_task(
         token_budget=token_budget,
         max_elapsed_seconds=max_elapsed_seconds,
         reason=reason,
+        output_directory=output_directory,
     )
