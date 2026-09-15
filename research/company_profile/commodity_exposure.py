@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 from collections.abc import Sequence
 from typing import Any, Literal
 
@@ -84,6 +85,7 @@ _HEDGE_NEGATIONS = (
     "not hedge",
     "without hedge",
 )
+_CLAUSE_SPLIT = re.compile(r"[,，;；。.!！?？]+")
 _ROLE_SOURCE_METRICS = frozenset({MetricType.SALES_VOLUME})
 _ROLE_QUANTITY_METRICS: dict[str, frozenset[MetricType]] = {
     CommodityRole.PRODUCT_SALES: frozenset({MetricType.SALES_VOLUME}),
@@ -442,19 +444,47 @@ def resolve_catalog_mapping(
     )
 
 
+def _contains_markers(text: str, markers: tuple[str, ...]) -> bool:
+    lowered = text.lower()
+    return any(marker in text or marker.lower() in lowered for marker in markers)
+
+
+def _statement_clauses(*texts: str) -> tuple[str, ...]:
+    clauses: list[str] = []
+    for text in texts:
+        value = str(text or "").strip()
+        if not value:
+            continue
+        parts = [part.strip() for part in _CLAUSE_SPLIT.split(value) if part.strip()]
+        clauses.extend(parts)
+    return tuple(clauses)
+
+
 def _is_hedge_fact(source: SemanticRecord) -> bool:
-    texts: tuple[str, ...]
     if isinstance(source, BusinessEvent):
-        texts = (source.event_type, source.description, source.source_native.name or "")
+        statements = (source.description, source.source_native.name or "")
     elif isinstance(source, Activity):
-        texts = (source.source_verb, source.object_name, source.source_native.name or "")
+        statements = (
+            " ".join(
+                part
+                for part in (
+                    source.source_verb,
+                    source.object_name,
+                    source.source_native.name or "",
+                )
+                if str(part or "").strip()
+            ),
+        )
     else:
         return False
-    blob = " ".join(texts)
-    lowered = blob.lower()
-    if any(marker in blob or marker in lowered for marker in _HEDGE_NEGATIONS):
-        return False
-    return any(marker.lower() in lowered or marker in blob for marker in _HEDGE_MARKERS)
+    hedge_clauses = [
+        clause
+        for clause in _statement_clauses(*statements)
+        if _contains_markers(clause, _HEDGE_MARKERS)
+    ]
+    return any(
+        not _contains_markers(clause, _HEDGE_NEGATIONS) for clause in hedge_clauses
+    )
 
 
 def _is_energy_consumption_evidence(source: SemanticRecord) -> bool:

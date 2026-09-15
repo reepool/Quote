@@ -145,9 +145,15 @@ def _measurement(
     )
 
 
-def _hedge_event(object_name: str = "阴极铜") -> BusinessEvent:
+def _hedge_event(
+    object_name: str = "阴极铜",
+    *,
+    record_id: str = "evt-hedge",
+    description: str = "阴极铜期货套保",
+    evidence_quote: str = "套保",
+) -> BusinessEvent:
     return BusinessEvent(
-        record_id="evt-hedge",
+        record_id=record_id,
         field_id="business_regime_source",
         chapter_task=ChapterTask.EXTRACT_BUSINESS_REGIME,
         report=_report(),
@@ -155,10 +161,10 @@ def _hedge_event(object_name: str = "阴极铜") -> BusinessEvent:
         reported_period="2025",
         period_type=PeriodType.EVENT,
         assertion_class=AssertionClass.REPORTED_FACT,
-        evidence=(_evidence("套保"),),
+        evidence=(_evidence(evidence_quote),),
         source_native=SourceNativeValue(name=object_name),
         event_type="commodity_hedge",
-        description="阴极铜期货套保",
+        description=description,
     )
 
 
@@ -331,6 +337,26 @@ def test_negated_hedge_statement_is_not_a_hedge_role():
     assert derive_commodity_role(denied) is None
     assert project_commodity_exposures((denied,)) == ()
     assert derive_commodity_role(_hedge_event()) == CommodityRole.HEDGE_UNDERLYING
+
+
+def test_unrelated_negation_does_not_suppress_affirmative_hedge():
+    mixed = _hedge_event(
+        record_id="evt-hedge-not-speculate",
+        description="开展套期保值业务，未开展投机交易",
+        evidence_quote="开展套保未开展投机",
+    )
+    reversed_order = _hedge_event(
+        record_id="evt-hedge-after-speculation",
+        description="未开展投机交易，开展套期保值业务",
+        evidence_quote="未开展投机开展套保",
+    )
+
+    assert derive_commodity_role(mixed) == CommodityRole.HEDGE_UNDERLYING
+    assert derive_commodity_role(reversed_order) == CommodityRole.HEDGE_UNDERLYING
+    exposures = project_commodity_exposures((mixed,))
+    assert len(exposures) == 1
+    assert exposures[0].role == CommodityRole.HEDGE_UNDERLYING
+    assert exposures[0].source_record_ids == ("evt-hedge-not-speculate",)
 
 
 def test_role_derivation_does_not_reuse_legacy_exposure_producer():
