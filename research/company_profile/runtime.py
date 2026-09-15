@@ -7,7 +7,7 @@ semantic writers. Production stays not_authorized.
 
 from __future__ import annotations
 
-from collections.abc import Mapping, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Literal
@@ -171,9 +171,12 @@ class CompanyProfileStageRuntime:
         writer: CompanyProfileResearchWriter,
         provider: SemanticProvider | None = None,
         semantic_service: CompanyProfileSemanticService | None = None,
+        page_source: Callable[[Mapping[str, Any]], Mapping[str, Any] | None]
+        | None = None,
     ) -> None:
         self.writer = writer
         self.provider = provider
+        self.page_source = page_source
         self._semantic_service = semantic_service or CompanyProfileSemanticService()
         self._states: dict[str, _WorkState] = {}
 
@@ -193,7 +196,7 @@ class CompanyProfileStageRuntime:
             raise ValueError(f"unsupported company-profile runtime stage: {stage}")
         state = self._bind(item)
         if stage == "acquire":
-            return self._acquire(state)
+            return self._acquire(state, item)
         if stage == "parse":
             return self._parse(state)
         if stage == "semantic":
@@ -217,11 +220,26 @@ class CompanyProfileStageRuntime:
             state.accepted_records = tuple(item["accepted_records"])
         return state
 
-    def _acquire(self, state: _WorkState) -> dict[str, Any]:
+    def _acquire(
+        self,
+        state: _WorkState,
+        item: Mapping[str, Any],
+    ) -> dict[str, Any]:
+        if (state.report is None or not state.pages) and self.page_source is not None:
+            loaded = self.page_source(item)
+            if loaded:
+                state = self._bind(
+                    {**dict(item), **dict(loaded), "work_id": state.work_id}
+                )
         if state.report is None or not state.pages:
             return {
                 "status": "blocked",
                 "reason": "pages_not_bound",
+                "quality": {
+                    "stage_ready": False,
+                    "blocking_machine_rework": 1,
+                    "machine_rework_reasons": {"pages_not_bound": 1},
+                },
                 "storage_namespace": COMMON_CORE_STORAGE_NAMESPACE,
                 "production_authorization": PRODUCTION_AUTHORIZATION,
             }
@@ -254,10 +272,14 @@ class CompanyProfileStageRuntime:
             )
             if activation.status != "activated":
                 continue
-            bundle = tuple(
-                item
-                for item in state.evidence.prepared_evidence
-                if item.field_id in _CORE_FIELDS[chapter]
+            reused = _reused_records_for_chapter(state, chapter)
+            bundle = _bundle_with_reused_evidence(
+                tuple(
+                    item
+                    for item in state.evidence.prepared_evidence
+                    if item.field_id in _CORE_FIELDS[chapter]
+                ),
+                reused,
             )
             if not bundle:
                 continue
@@ -267,7 +289,7 @@ class CompanyProfileStageRuntime:
             )
             unresolved = (
                 ()
-                if state.provider_blocked or chapter_unread
+                if chapter_unread
                 else tuple(
                     field_id
                     for field_id in state.evidence.unresolved_field_ids
@@ -280,12 +302,9 @@ class CompanyProfileStageRuntime:
                 chapter=chapter,
                 evidence_bundle=bundle,
                 unresolved_field_ids=unresolved,
+                deterministic_candidates=reused,
             )
-            provider = (
-                self.provider
-                if unresolved and not (state.provider_blocked or chapter_unread)
-                else None
-            )
+            provider = self.provider if unresolved and not chapter_unread else None
             result = self._semantic_service.run_task(request, provider=provider)
             results.append(result)
             state.provider_calls.extend(result.provider_calls)
@@ -341,6 +360,11 @@ class CompanyProfileStageRuntime:
             "legacy_writers_invoked": [],
             "provider_calls": list(state.provider_calls),
             "provider_blocked": state.provider_blocked,
+            "accepted_record_ids": [
+                record.record_id
+                for result in state.task_results
+                for record in result.accepted_records()
+            ],
             "evidence_gap_codes": (
                 [gap.code for gap in state.evidence.gaps] if state.evidence else []
             ),
@@ -363,6 +387,7 @@ def _semantic_request(
     chapter: ChapterTask,
     evidence_bundle: Sequence[PreparedEvidence],
     unresolved_field_ids: Sequence[str],
+    deterministic_candidates: Sequence[SemanticRecord] = (),
 ) -> SemanticTaskRequest:
     fields = _CORE_FIELDS[chapter]
     checklist = tuple(_checklist_item(field_id, chapter) for field_id in fields)
@@ -404,7 +429,46 @@ def _semantic_request(
             "production approval or publication eligibility",
         ),
         unresolved_field_ids=tuple(unresolved_field_ids),
+        deterministic_candidates=tuple(deterministic_candidates),
     )
+
+
+def _reused_records_for_chapter(
+    state: _WorkState,
+    chapter: ChapterTask,
+) -> tuple[SemanticRecord, ...]:
+    if state.evidence is None:
+        return ()
+    reused_ids = {
+        item.record_id
+        for item in state.evidence.reused_facts
+        if item.field_id in _CORE_FIELDS[chapter]
+    }
+    return tuple(
+        record
+        for record in state.accepted_records
+        if record.record_id in reused_ids and record.chapter_task == chapter
+    )
+
+
+def _bundle_with_reused_evidence(
+    bundle: Sequence[PreparedEvidence],
+    reused: Sequence[SemanticRecord],
+) -> tuple[PreparedEvidence, ...]:
+    extra = [
+        PreparedEvidence(evidence=evidence, field_id=record.field_id)
+        for record in reused
+        for evidence in record.evidence
+    ]
+    seen = {(item.evidence.evidence_id, item.field_id) for item in bundle}
+    merged = list(bundle)
+    for item in extra:
+        identity = (item.evidence.evidence_id, item.field_id)
+        if identity in seen:
+            continue
+        seen.add(identity)
+        merged.append(item)
+    return tuple(merged)
 
 
 def _checklist_item(field_id: str, chapter: ChapterTask) -> ChecklistItem:
