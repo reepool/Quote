@@ -367,6 +367,40 @@ class BusinessProfileWorkRepository:
             supersede_older=True,
         )
 
+    def preview_latest_annual(
+        self,
+        *,
+        knowledge_cutoff: str,
+        instrument_ids: Sequence[str] = (),
+    ) -> dict[str, Any]:
+        """Count latest-annual frontier rows without inserting work items."""
+
+        cutoff = _date_text(knowledge_cutoff, "knowledge_cutoff")
+        rows = self._frontier_rows(
+            knowledge_cutoff=cutoff,
+            start_date=None,
+            end_date=None,
+            instrument_ids=instrument_ids,
+            document_types=AUTOMATIC_DOCUMENT_TYPES,
+        )
+        latest: dict[str, Mapping[str, Any]] = {}
+        for row in rows:
+            instrument_id = str(row["instrument_id"])
+            if instrument_id not in latest or _frontier_sort_key(
+                row
+            ) > _frontier_sort_key(latest[instrument_id]):
+                latest[instrument_id] = row
+        return {
+            "eligible": len(latest),
+            "instrument_ids": sorted(latest),
+            "frontier_ids": [
+                str(latest[instrument_id]["frontier_id"])
+                for instrument_id in sorted(latest)
+            ],
+            "knowledge_cutoff": cutoff,
+            "inserted": 0,
+        }
+
     def enqueue_bound_annual_report_asset(
         self,
         *,

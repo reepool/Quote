@@ -8558,6 +8558,87 @@ class ScheduledTasks:
         finally:
             self._active_tasks.discard('company_profile_shadow_sync')
 
+    async def company_profile_common_core(
+        self,
+        action: str = "preview",
+        knowledge_cutoff: Optional[str] = None,
+        instrument_ids: Optional[List[str]] = None,
+        max_items: int = 2,
+        token_budget: int = 50000,
+        max_elapsed_seconds: float = 300.0,
+        reason: str = "operator_request",
+        job_config: Optional[JobConfig] = None,
+    ) -> bool:
+        """Forward Stage 5 common-core preview/run/status/pause/resume."""
+        task_id = "company_profile_common_core"
+        self._active_tasks.add(task_id)
+        try:
+            from research.company_profile.operations import (
+                DEFAULT_CHECKPOINT_ROOT,
+                DEFAULT_OUTPUT_ROOT,
+                execute_published_task,
+            )
+
+            storage = getattr(data_manager, "research_storage", None)
+            if storage is None:
+                raise RuntimeError("research storage is not initialized")
+            result = await execute_published_task(
+                action=action,
+                storage=storage,
+                output_root=DEFAULT_OUTPUT_ROOT,
+                checkpoint_root=DEFAULT_CHECKPOINT_ROOT,
+                knowledge_cutoff=knowledge_cutoff,
+                instrument_ids=instrument_ids,
+                max_items=max_items,
+                token_budget=token_budget,
+                max_elapsed_seconds=max_elapsed_seconds,
+                reason=reason,
+            )
+            status = str(result.get("state") or "failed")
+            success = status in {"idle", "completed", "paused", "stop_requested"}
+            await self._send_task_report(
+                report_data={
+                    "name": "公司画像通用骨架任务报告",
+                    "status": "success" if success else "error",
+                    "tasks_completed": int(
+                        (result.get("queue") or {}).get("completed") or 0
+                    ),
+                    "duration": "N/A",
+                    "maintenance_tasks": [
+                        {
+                            "task_name": task_id,
+                            "status": f"{result.get('action')} {status}",
+                        }
+                    ],
+                    "company_profile_common_core": result,
+                },
+                report_type="maintenance_report",
+                task_name="公司画像通用骨架任务",
+                job_config=job_config,
+            )
+            return success
+        except Exception as exc:
+            scheduler_logger.exception(
+                "[Scheduler] Company-profile common-core task failed: %s", exc
+            )
+            await self._send_task_report(
+                report_data={
+                    "name": "公司画像通用骨架任务报告",
+                    "status": "error",
+                    "tasks_completed": 0,
+                    "duration": "N/A",
+                    "maintenance_tasks": [
+                        {"task_name": task_id, "status": str(exc)}
+                    ],
+                },
+                report_type="maintenance_report",
+                task_name="公司画像通用骨架任务",
+                job_config=job_config,
+            )
+            return False
+        finally:
+            self._active_tasks.discard(task_id)
+
     async def business_profile_structured_sync(
         self,
         as_of_date: Optional[str] = None,

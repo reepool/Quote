@@ -992,6 +992,26 @@
           "max_runtime_seconds": 3600
         }
       },
+      "company_profile_common_core": {
+        "enabled": true,
+        "manual_only": true,
+        "description": "公司画像通用骨架 Stage 5 任务：preview|run|status|pause|resume，入口只转发到 research.company_profile.operations",
+        "report": true,
+        "pre_run_notify": false,
+        "max_instances": 1,
+        "misfire_grace_time": 300,
+        "coalesce": true,
+        "parameters": {
+          "action": "preview",
+          "knowledge_cutoff": null,
+          "instrument_ids": [],
+          "max_items": 2,
+          "token_budget": 50000,
+          "max_elapsed_seconds": 300,
+          "reason": "operator_request",
+          "max_runtime_seconds": 3600
+        }
+      },
       "business_profile_structured_sync": {
         "enabled": false,
         "manual_only": false,
