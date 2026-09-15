@@ -16,6 +16,8 @@ from .commodity_exposure import (
     COMMODITY_EXPOSURE_SCHEMA_VERSION,
     CommodityExposure,
     CommodityExposureAssessment,
+    bind_commodity_exposure,
+    bind_commodity_exposure_assessment,
     commodity_exposure_schema_manifest,
 )
 from .contracts import (
@@ -263,6 +265,8 @@ __all__ = [
     "VerifyResponse",
     "VerifyStatus",
     "announcement_access_report_lookup",
+    "bind_commodity_exposure",
+    "bind_commodity_exposure_assessment",
     "build_a_share_candidate_registry",
     "candidate_registry_schema_manifest",
     "commodity_exposure_schema_manifest",

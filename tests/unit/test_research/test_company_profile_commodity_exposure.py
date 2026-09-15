@@ -14,6 +14,8 @@ from research.company_profile.commodity_exposure import (
     CommodityRole,
     MappingStatus,
     MarketLinkStatus,
+    bind_commodity_exposure,
+    bind_commodity_exposure_assessment,
     build_exposure_id,
     commodity_exposure_schema_manifest,
     measurement_record_ids,
@@ -156,9 +158,14 @@ def test_schema_manifest_registers_projection_without_stage5_extract_ids():
     assert "hedge_underlying" not in STAGE5_FIELDS
     assert "net_profit_direction" in manifest["forbidden_fields"]
     exposure_props = manifest["exposure_schema"]["properties"]
+    assessment_props = manifest["assessment_schema"]["properties"]
     assert exposure_props["source_record_ids"]["minItems"] == 1
     assert exposure_props["evidence_ids"]["minItems"] == 1
     assert exposure_props["measurement_record_ids"].get("minItems", 0) == 0
+    assert "accepted_records" not in exposure_props
+    assert "checked_evidence" not in assessment_props
+    assert exposure_props["source_record_ids"]["items"]["type"] == "string"
+    assert exposure_props["measurement_record_ids"]["items"]["type"] == "string"
 
 
 def test_mapped_exposure_roundtrip_and_rejects_profit_direction():
@@ -181,7 +188,6 @@ def test_mapped_exposure_roundtrip_and_rejects_profit_direction():
         source_record_ids=("act-copper",),
         evidence_ids=("ev-commodity",),
         measurement_record_ids=("meas-copper",),
-        accepted_records=(_activity(), _measurement()),
         source_native_name="阴极铜",
         commodity_id="COMMODITY.metal.refined_copper",
         mapping_status=MappingStatus.MAPPED,
@@ -189,11 +195,18 @@ def test_mapped_exposure_roundtrip_and_rejects_profit_direction():
         mapping_version="catalog-v1",
         market_link_status=MarketLinkStatus.NOT_LINKED,
     )
-    restored = CommodityExposure.model_validate_json(exposure.model_dump_json())
+    dumped = json.loads(exposure.model_dump_json())
+    restored = CommodityExposure.model_validate_json(json.dumps(dumped))
+    bind_commodity_exposure(
+        restored,
+        accepted_records=(_activity(), _measurement()),
+    )
 
     assert restored.schema_version == COMMODITY_EXPOSURE_SCHEMA_VERSION
     assert restored.assertion_class == AssertionClass.DETERMINISTIC_DERIVATION.value
     assert restored.measurement_record_ids == ("meas-copper",)
+    assert "accepted_records" not in dumped
+    assert "10" not in json.dumps(dumped, ensure_ascii=False)
     with pytest.raises(ValidationError):
         CommodityExposure.model_validate(
             {
@@ -213,7 +226,6 @@ def test_mapping_and_market_link_invariants():
         subject_scope=SubjectScope.ISSUER,
         source_record_ids=("act-unknown",),
         evidence_ids=("ev-commodity",),
-        accepted_records=(_activity("未知矿", record_id="act-unknown"),),
         source_native_name="未知矿",
         mapping_status=MappingStatus.PENDING,
         role=CommodityRole.UNKNOWN,
@@ -248,7 +260,6 @@ def test_source_and_evidence_ids_are_required():
         subject_scope=SubjectScope.ISSUER,
         source_record_ids=("act-unknown",),
         evidence_ids=("ev-commodity",),
-        accepted_records=(_activity("未知矿", record_id="act-unknown"),),
         source_native_name="未知矿",
         mapping_status=MappingStatus.PENDING,
         role=CommodityRole.UNKNOWN,
@@ -279,9 +290,15 @@ def test_assessed_empty_list_requires_checked_evidence():
         report=report,
         assessment_status=AssessmentStatus.ASSESSED,
         checked_evidence_ids=("ev-commodity",),
-        checked_evidence=(_evidence(),),
         exposures=(),
     )
+    bind_commodity_exposure_assessment(
+        assessed,
+        checked_evidence=(_evidence(),),
+    )
+    assessed_payload = json.loads(assessed.model_dump_json())
+    assert "checked_evidence" not in assessed_payload
+    CommodityExposureAssessment.model_validate_json(json.dumps(assessed_payload))
     unread = CommodityExposureAssessment(
         report=report,
         assessment_status=AssessmentStatus.NOT_ASSESSED,
@@ -301,7 +318,6 @@ def test_assessed_empty_list_requires_checked_evidence():
         subject_scope=SubjectScope.ISSUER,
         source_record_ids=("act-other",),
         evidence_ids=("ev-other",),
-        accepted_records=(foreign_activity,),
         source_native_name="阴极铜",
         mapping_status=MappingStatus.PENDING,
         role=CommodityRole.UNKNOWN,
@@ -312,9 +328,9 @@ def test_assessed_empty_list_requires_checked_evidence():
             report=report,
             assessment_status=AssessmentStatus.ASSESSED,
             checked_evidence_ids=("ev-commodity",),
-            checked_evidence=(_evidence(),),
             exposures=(foreign,),
         )
+    bind_commodity_exposure(foreign, accepted_records=(foreign_activity,))
     assert assessed.exposures == ()
     assert unread.assessment_status == AssessmentStatus.NOT_ASSESSED
 
@@ -355,7 +371,6 @@ def test_mapped_input_without_quantity_or_market_stays_usable():
         business_object="铜精矿",
         source_record_ids=("rel-copper",),
         evidence_ids=("ev-commodity",),
-        accepted_records=(_relationship(),),
         source_native_name="铜精矿",
         commodity_id="COMMODITY.metal.copper_concentrate",
         mapping_status=MappingStatus.MAPPED,
@@ -381,24 +396,33 @@ def test_reference_ids_must_resolve_to_same_report_accepted_facts():
     report = _report()
     activity = _activity()
     measurement = _measurement()
-    valid = {
-        "exposure_id": "commodity-exposure-bound",
-        "report": report,
-        "reported_period": "2025",
-        "period_type": PeriodType.DURATION,
-        "subject_scope": SubjectScope.ISSUER,
-        "source_record_ids": ("act-copper",),
-        "evidence_ids": ("ev-commodity",),
-        "accepted_records": (activity, measurement),
-        "source_native_name": "阴极铜",
-        "mapping_status": MappingStatus.PENDING,
-        "role": CommodityRole.UNKNOWN,
-        "mapping_version": "catalog-v1",
-    }
-    CommodityExposure.model_validate(valid)
+    valid = CommodityExposure(
+        exposure_id="commodity-exposure-bound",
+        report=report,
+        reported_period="2025",
+        period_type=PeriodType.DURATION,
+        subject_scope=SubjectScope.ISSUER,
+        source_record_ids=("act-copper",),
+        evidence_ids=("ev-commodity",),
+        source_native_name="阴极铜",
+        mapping_status=MappingStatus.PENDING,
+        role=CommodityRole.UNKNOWN,
+        mapping_version="catalog-v1",
+    )
+    bind_commodity_exposure(valid, accepted_records=(activity, measurement))
     with pytest.raises(ValidationError, match="cannot be blank"):
-        CommodityExposure.model_validate(
-            {**valid, "source_record_ids": (" ",), "evidence_ids": (" ",)}
+        CommodityExposure(
+            exposure_id="commodity-exposure-blank",
+            report=report,
+            reported_period="2025",
+            period_type=PeriodType.DURATION,
+            subject_scope=SubjectScope.ISSUER,
+            source_record_ids=(" ",),
+            evidence_ids=(" ",),
+            source_native_name="阴极铜",
+            mapping_status=MappingStatus.PENDING,
+            role=CommodityRole.UNKNOWN,
+            mapping_version="catalog-v1",
         )
     foreign_report = _report(report_id="asset-commodity-other")
     foreign_activity = _activity(
@@ -406,26 +430,68 @@ def test_reference_ids_must_resolve_to_same_report_accepted_facts():
         record_id="act-other",
         evidence=_evidence(report=foreign_report, evidence_id="ev-other"),
     )
-    with pytest.raises(ValidationError, match="same report|accepted"):
-        CommodityExposure.model_validate(
-            {
-                **valid,
-                "source_record_ids": ("act-other",),
-                "evidence_ids": ("ev-other",),
-                "accepted_records": (foreign_activity,),
-            }
-        )
-    with pytest.raises(ValidationError, match="Measurement"):
-        CommodityExposure.model_validate(
-            {**valid, "measurement_record_ids": ("act-copper",)}
+    foreign_ids = valid.model_copy(
+        update={
+            "source_record_ids": ("act-other",),
+            "evidence_ids": ("ev-other",),
+        }
+    )
+    with pytest.raises(ValueError, match="same report|accepted"):
+        bind_commodity_exposure(foreign_ids, accepted_records=(foreign_activity,))
+    with pytest.raises(ValueError, match="Measurement"):
+        bind_commodity_exposure(
+            valid.model_copy(update={"measurement_record_ids": ("act-copper",)}),
+            accepted_records=(activity, measurement),
         )
     foreign_evidence = _evidence(report=foreign_report, evidence_id="ev-other")
-    with pytest.raises(ValidationError, match="this-report Evidence|same report"):
-        CommodityExposureAssessment(
-            report=report,
-            assessment_status=AssessmentStatus.ASSESSED,
-            checked_evidence_ids=("ev-other",),
+    assessment = CommodityExposureAssessment(
+        report=report,
+        assessment_status=AssessmentStatus.ASSESSED,
+        checked_evidence_ids=("ev-other",),
+    )
+    with pytest.raises(ValueError, match="this-report Evidence|same report"):
+        bind_commodity_exposure_assessment(
+            assessment,
             checked_evidence=(foreign_evidence,),
+        )
+
+
+def test_conflicting_evidence_ids_are_rejected():
+    report = _report()
+    first = _evidence()
+    second = Evidence(
+        evidence_id="ev-commodity",
+        report=report,
+        page=21,
+        section_title="主营业务",
+        anchor=TextAnchor(bounded_quote="电解铜"),
+    )
+    left = _activity(record_id="act-left", evidence=first)
+    right = _activity(record_id="act-right", evidence=second)
+    exposure = CommodityExposure(
+        exposure_id="commodity-exposure-conflict",
+        report=report,
+        reported_period="2025",
+        period_type=PeriodType.DURATION,
+        subject_scope=SubjectScope.ISSUER,
+        source_record_ids=("act-left", "act-right"),
+        evidence_ids=("ev-commodity",),
+        source_native_name="阴极铜",
+        mapping_status=MappingStatus.PENDING,
+        role=CommodityRole.UNKNOWN,
+        mapping_version="catalog-v1",
+    )
+    with pytest.raises(ValueError, match="conflicting evidence"):
+        bind_commodity_exposure(exposure, accepted_records=(left, right))
+    assessment = CommodityExposureAssessment(
+        report=report,
+        assessment_status=AssessmentStatus.ASSESSED,
+        checked_evidence_ids=("ev-commodity",),
+    )
+    with pytest.raises(ValueError, match="conflicting evidence"):
+        bind_commodity_exposure_assessment(
+            assessment,
+            checked_evidence=(first, second),
         )
 
 
