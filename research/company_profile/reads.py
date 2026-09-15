@@ -18,6 +18,7 @@ from typing import Any
 from pydantic import TypeAdapter
 
 from research.company_profile.commodity_exposure import (
+    COMMODITY_EXPOSURE_READ_OWNER,
     AssessmentStatus,
     assess_commodity_exposures,
 )
@@ -46,6 +47,8 @@ _SAFE_NAME = re.compile(r"[^A-Za-z0-9._-]+")
 
 class CompanyProfileReadService:
     """Load published common-core records into a researcher-facing template."""
+
+    read_owner = COMMODITY_EXPOSURE_READ_OWNER
 
     def __init__(self, output_root: str | Path) -> None:
         self.output_root = Path(output_root)

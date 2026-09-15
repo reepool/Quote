@@ -38,6 +38,8 @@ from research.company_profile.models import (
 COMMODITY_EXPOSURE_SCHEMA_VERSION = "company_profile_commodity_exposure.v1"
 COMMODITY_EXPOSURE_POLICY_VERSION = "company_profile_commodity_exposure.v1"
 COMMODITY_ROLE_RULE_VERSION = "company_profile_commodity_role.v1"
+COMMODITY_EXPOSURE_WRITER = "company_profile_research_writer.v1"
+COMMODITY_EXPOSURE_READ_OWNER = "company_profile_read_service.v1"
 _FORBIDDEN_PROJECTION_FIELDS = frozenset(
     {
         "net_profit_direction",
@@ -341,6 +343,9 @@ def commodity_exposure_schema_manifest() -> dict[str, Any]:
         "schema_version": COMMODITY_EXPOSURE_SCHEMA_VERSION,
         "policy_version": COMMODITY_EXPOSURE_POLICY_VERSION,
         "production_authorization": PRODUCTION_AUTHORIZATION,
+        "writer": COMMODITY_EXPOSURE_WRITER,
+        "read_owner": COMMODITY_EXPOSURE_READ_OWNER,
+        "legacy_writer": None,
         "stage5_object_types": (),
         "stage5_field_ids": (),
         "roles": (
@@ -364,6 +369,19 @@ def commodity_exposure_schema_manifest() -> dict[str, Any]:
         "forbidden_fields": tuple(sorted(_FORBIDDEN_PROJECTION_FIELDS)),
         "exposure_schema": CommodityExposure.model_json_schema(),
         "assessment_schema": CommodityExposureAssessment.model_json_schema(),
+    }
+
+
+def commodity_publication_owner() -> dict[str, Any]:
+    """Name the single new-contract write/read owner without enabling production."""
+
+    return {
+        "schema_owner": "research.company_profile.commodity_exposure",
+        "writer": COMMODITY_EXPOSURE_WRITER,
+        "read_owner": COMMODITY_EXPOSURE_READ_OWNER,
+        "production_authorization": PRODUCTION_AUTHORIZATION,
+        "legacy_writer": None,
+        "legacy_producer": None,
     }
 
 

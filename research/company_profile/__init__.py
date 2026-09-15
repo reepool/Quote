@@ -20,6 +20,7 @@ from .commodity_exposure import (
     bind_commodity_exposure,
     bind_commodity_exposure_assessment,
     commodity_exposure_schema_manifest,
+    commodity_publication_owner,
     derive_commodity_role,
     project_commodity_exposures,
 )
@@ -274,6 +275,7 @@ __all__ = [
     "build_a_share_candidate_registry",
     "candidate_registry_schema_manifest",
     "commodity_exposure_schema_manifest",
+    "commodity_publication_owner",
     "contract_example_manifest",
     "contract_schema_manifest",
     "core_assessment_schema_manifest",
