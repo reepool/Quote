@@ -550,19 +550,37 @@ class CompanyProfileTaskService:
         drain: Mapping[str, Any] | None = None,
         published_this_round: bool = False,
     ) -> str:
+        del health
         if stopped:
             return "paused"
         if published_this_round or self._delivered_this_round(drain):
             return "completed"
+        work_ids = tuple(
+            str(item)
+            for item in enqueue_result.get("work_ids") or ()
+            if str(item).strip()
+        )
+        if work_ids:
+            statuses = self._selected_work_statuses(work_ids)
+            if statuses and all(status == "completed" for status in statuses):
+                return "completed"
+            return "incomplete"
         inserted = int(enqueue_result.get("inserted") or 0)
         reused = int(enqueue_result.get("reused") or 0)
-        rework = int(health.get("machine_rework") or 0)
-        claimable = int(health.get("claimable") or 0)
-        if inserted == 0 and reused == 0 and rework == 0 and claimable == 0:
+        if inserted == 0 and reused == 0:
             return "idle"
-        if inserted == 0 and reused > 0 and rework == 0 and claimable == 0:
-            return "completed"
         return "incomplete"
+
+    def _selected_work_statuses(self, work_ids: Sequence[str]) -> list[str]:
+        statuses: list[str] = []
+        for work_id in work_ids:
+            try:
+                item = self.repository.get(work_id)
+            except KeyError:
+                statuses.append("missing")
+                continue
+            statuses.append(str(item.get("status") or "missing"))
+        return statuses
 
     def _delivered_this_round(self, drain: Mapping[str, Any] | None) -> bool:
         publish = dict((drain or {}).get("publish") or {})

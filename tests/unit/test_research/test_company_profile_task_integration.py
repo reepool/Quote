@@ -58,6 +58,87 @@ def _page_source(reports):
     return load_pages
 
 
+def test_repeat_run_is_not_polluted_by_other_queue_rework(tmp_path):
+    storage = _storage(tmp_path)
+    _second_frontier(storage)
+    provider = _RequestBoundOverviewProvider()
+    good = _report(instrument_id="600000.SH", report_id="asset-rework-pollution")
+    asyncio.run(
+        _service(
+            tmp_path,
+            storage,
+            provider=provider,
+            page_source=_page_source(
+                {
+                    "600000.SH": good,
+                    "annual-2025": good,
+                }
+            ),
+        ).execute("run", knowledge_cutoff="2026-08-30", max_items=2)
+    )
+    repeated = asyncio.run(
+        _service(
+            tmp_path,
+            storage,
+            provider=provider,
+            page_source=_page_source(
+                {
+                    "600000.SH": good,
+                    "annual-2025": good,
+                }
+            ),
+        ).execute(
+            "run",
+            knowledge_cutoff="2026-08-30",
+            instrument_ids=["600000.SH"],
+            max_items=1,
+        )
+    )
+
+    assert repeated["enqueue"]["inserted"] == 0
+    assert repeated["enqueue"]["reused"] == 1
+    assert repeated["queue"]["machine_rework"] == 1
+    assert repeated["state"] == "completed"
+    assert provider.extract_calls == 1
+
+
+def test_reused_unfinished_work_is_not_completed(tmp_path):
+    storage = _storage(tmp_path)
+    _frontier(storage)
+    first = asyncio.run(
+        _service(tmp_path, storage).execute(
+            "run",
+            knowledge_cutoff="2026-08-30",
+            instrument_ids=["600000.SH"],
+            max_items=1,
+        )
+    )
+    work_id = first["enqueue"]["work_ids"][0]
+    with storage.get_connection() as conn:
+        conn.execute(
+            "UPDATE business_profile_work_items "
+            "SET status = 'terminal_failure' WHERE work_id = ?",
+            (work_id,),
+        )
+        conn.commit()
+    repeated = asyncio.run(
+        _service(tmp_path, storage).execute(
+            "run",
+            knowledge_cutoff="2026-08-30",
+            instrument_ids=["600000.SH"],
+            max_items=1,
+        )
+    )
+
+    assert first["state"] != "completed"
+    assert repeated["enqueue"]["inserted"] == 0
+    assert repeated["enqueue"]["reused"] == 1
+    assert repeated["enqueue"]["work_ids"] == [work_id]
+    assert repeated["queue"]["machine_rework"] == 0
+    assert repeated["queue"]["claimable"] == 0
+    assert repeated["state"] != "completed"
+
+
 def test_repeat_run_reuses_completed_work_without_recalling_provider(tmp_path):
     storage = _storage(tmp_path)
     _frontier(storage)
