@@ -362,3 +362,67 @@ def test_disabled_enhancements_are_not_activated_even_when_disclosed():
         item = _chapter(chapters, task)
         assert item.status == "not_activated"
         assert item.reason == "not_enabled_in_this_slice"
+
+
+def test_checked_yes_is_not_quantity_negation():
+    checked_yes = select_activated_chapters(
+        (
+            {
+                "page": 49,
+                "text": "公司实物销售收入是否大于劳务收入\n☑是 □否",
+            },
+        )
+    )
+    item = _chapter(checked_yes, ChapterTask.EXTRACT_OPERATING_QUANTITIES)
+    assert item.status == "activated"
+    assert item.reason == "owned_heading"
+
+    later_heading = select_activated_chapters(
+        (
+            {
+                "page": 49,
+                "text": "公司实物销售收入是否大于劳务收入\n☑是 □否",
+            },
+            {
+                "page": 50,
+                "text": "主要产品的产销量情况\n产品 生产量 销售量 库存量",
+            },
+        )
+    )
+    later = _chapter(later_heading, ChapterTask.EXTRACT_OPERATING_QUANTITIES)
+    assert later.status == "activated"
+    assert later.reason == "owned_heading"
+
+
+def test_checked_no_remains_negation_unless_another_page_owns_quantity():
+    checked_no = _chapter(
+        select_activated_chapters(
+            (
+                {
+                    "page": 49,
+                    "text": "公司实物销售收入是否大于劳务收入\n□是 ☑否",
+                },
+            )
+        ),
+        ChapterTask.EXTRACT_OPERATING_QUANTITIES,
+    )
+    assert checked_no.status == "not_applicable"
+    assert checked_no.reason == "explicit_negation"
+
+    later_heading = _chapter(
+        select_activated_chapters(
+            (
+                {
+                    "page": 49,
+                    "text": "公司实物销售收入是否大于劳务收入\n□是 ☑否",
+                },
+                {
+                    "page": 50,
+                    "text": "主要产品的产销量情况\n产品 生产量 销售量 库存量",
+                },
+            )
+        ),
+        ChapterTask.EXTRACT_OPERATING_QUANTITIES,
+    )
+    assert later_heading.status == "activated"
+    assert later_heading.reason == "owned_heading"

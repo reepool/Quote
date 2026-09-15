@@ -43,7 +43,8 @@ _QUANTITY_HEADINGS = (
     "公司实物销售收入是否大于劳务收入",
 )
 _QUANTITY_NEGATED = re.compile(
-    r"公司实物销售收入是否大于劳务收入.{0,80}(?:[√☑])?(?:否|不适用)"
+    r"公司实物销售收入是否大于劳务收入"
+    r"(?:[:：](?:否|不适用)|(?:否|不适用)|.{0,80}[√☑](?:否|不适用))"
 )
 _SLICE_DISABLED_CHAPTERS = (
     ChapterTask.EXTRACT_MATERIAL_INPUTS,
@@ -121,12 +122,7 @@ def select_activated_chapters(
     has_segment = any(
         owned_section_heading(text, CORE_SEGMENT_HEADINGS) for text in texts
     )
-    quantity_negated = any(
-        _QUANTITY_NEGATED.search(re.sub(r"\s+", "", text)) for text in texts
-    )
-    has_quantity = any(
-        owned_section_heading(text, _QUANTITY_HEADINGS) for text in texts
-    )
+    has_quantity, quantity_negated = _quantity_heading_state(texts)
     activated: list[ActivatedChapter] = []
     for chapter in ChapterTask:
         activated.append(
@@ -138,6 +134,21 @@ def select_activated_chapters(
             )
         )
     return tuple(activated)
+
+
+def _quantity_heading_state(texts: Sequence[str]) -> tuple[bool, bool]:
+    """Prefer a live owned heading over a negation found on another page."""
+
+    has_live_heading = False
+    saw_negation = False
+    for text in texts:
+        owned = owned_section_heading(text, _QUANTITY_HEADINGS)
+        negated = _QUANTITY_NEGATED.search(re.sub(r"\s+", "", text)) is not None
+        if owned and not negated:
+            has_live_heading = True
+        elif negated:
+            saw_negation = True
+    return has_live_heading, saw_negation and not has_live_heading
 
 
 def _activate_chapter(
