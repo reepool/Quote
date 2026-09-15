@@ -1845,6 +1845,10 @@
         "cost_tier": "free",
         "anti_crawl_risk": "medium",
         "supports_proxy_patch": false,
+        "access": {
+          "preferred_mode": "headed_chrome",
+          "note": "First-party www / data20 HTTP via attach_cninfo_access. headed_chrome is headed Chrome (headless=false). chrome_tls is curl_cffi Chrome TLS then akshare_proxy_patch on HTTP 403; it is not headless Chrome. Override with QUOTE_CNINFO_ACCESS_MODE=chrome_tls. Mux proxy fallback is independent of supports_proxy_patch."
+        },
         "role": "official_a_share_disclosure_fallback",
         "shareholders": {
           "request_timeout_seconds": 15.0,

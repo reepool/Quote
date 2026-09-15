@@ -414,9 +414,75 @@ def test_response_exposes_session_fields_and_access_mode():
     assert response.status_code == 200
     assert response.url == DATA20_URL
     assert response.access_mode == "headed_chrome"
+    assert response.reason == "OK"
     assert response.json()["code"] == 200
     assert response.content
     response.raise_for_status()
+
+
+def test_fetch_allowlisted_reports_blocked_without_calling_proxy():
+    page = _FakePageSession(
+        fetches=[
+            {
+                "status": 403,
+                "url": DATA20_URL,
+                "headers": {},
+                "text": "<title>403 Forbidden</title>",
+                "body": b"<title>403 Forbidden</title>",
+            }
+        ]
+    )
+    proxy_calls = []
+    access = create_cninfo_headed_chrome_access(
+        page_session=page,
+        proxy_request=lambda *args, **kwargs: proxy_calls.append(True),
+    )
+
+    outcome = access.fetch_allowlisted("GET", DATA20_URL)
+
+    assert outcome.status == "chrome_blocked"
+    assert outcome.response is not None
+    assert outcome.response.status_code == 403
+    assert outcome.response.reason == "Forbidden"
+    assert proxy_calls == []
+
+
+def test_fetch_allowlisted_reports_unavailable_on_start_failure():
+    page = _FakePageSession(start_error=RuntimeError("xvfb missing"))
+    proxy_calls = []
+    access = create_cninfo_headed_chrome_access(
+        page_session=page,
+        proxy_request=lambda *args, **kwargs: proxy_calls.append(True),
+    )
+
+    outcome = access.fetch_allowlisted("GET", DATA20_URL)
+
+    assert outcome.status == "chrome_unavailable"
+    assert outcome.response is None
+    assert proxy_calls == []
+
+
+def test_fetch_allowlisted_treats_logical_429_as_success():
+    page = _FakePageSession(
+        fetches=[
+            _json_fetch(
+                {"data": {"resultCode": 429, "resultMsg": "too many requests"}},
+                url=DATA20_URL,
+            )
+        ]
+    )
+    proxy_calls = []
+    access = create_cninfo_headed_chrome_access(
+        page_session=page,
+        proxy_request=lambda *args, **kwargs: proxy_calls.append(True),
+    )
+
+    outcome = access.fetch_allowlisted("GET", DATA20_URL)
+
+    assert outcome.status == "success"
+    assert outcome.response.access_mode == "headed_chrome"
+    assert outcome.response.json()["data"]["resultCode"] == 429
+    assert proxy_calls == []
 
 
 def test_reuses_existing_display_and_close_stops_only_started_xvfb():
@@ -474,16 +540,23 @@ def test_nodriver_close_accepts_sync_stop():
     session.close()
 
 
-def test_attach_cninfo_access_does_not_construct_headed_chrome():
+def test_attach_cninfo_access_does_not_construct_headed_chrome_at_factory_time():
     from research.providers.cninfo_http import attach_cninfo_access
     from research.providers import cninfo_http
     from research.providers import cninfo_announcements
     from research.providers import cninfo_shareholders
     from research.providers import official_financial_filings
 
-    session = attach_cninfo_access()
+    session = attach_cninfo_access(
+        preferred_mode="chrome_tls",
+        headed_hop=None,
+        impersonated_request=lambda *args, **kwargs: None,
+        environ={},
+        sources={"cninfo": {"access": {"preferred_mode": "chrome_tls"}}},
+    )
+    assert session.__class__.__name__ == "CninfoAccessMux"
     assert session.__class__.__name__ != "CninfoHeadedChromeAccess"
-    assert "cninfo_headed_chrome" not in inspect.getsource(cninfo_http)
+    assert "cninfo_headed_chrome" in inspect.getsource(cninfo_http)
     assert "cninfo_headed_chrome" not in inspect.getsource(cninfo_announcements)
     assert "cninfo_headed_chrome" not in inspect.getsource(cninfo_shareholders)
     assert "cninfo_headed_chrome" not in inspect.getsource(official_financial_filings)

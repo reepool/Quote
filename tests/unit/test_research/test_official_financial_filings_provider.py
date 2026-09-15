@@ -1,6 +1,35 @@
+import pytest
+
+from research.providers.cninfo_http import dispatch_inner_session_request
 from research.providers.official_financial_filings import (
     ConfiguredOfficialFinancialFilingProvider,
 )
+
+
+@pytest.fixture(autouse=True)
+def _official_filing_tests_keep_injected_session(monkeypatch):
+    from research.providers import cninfo_http
+    from research.providers import official_financial_filings
+
+    real_attach = cninfo_http.attach_cninfo_access
+
+    def attach(session=None, **kwargs):
+        if session is not None:
+            kwargs.setdefault("preferred_mode", "chrome_tls")
+            kwargs.setdefault("headed_hop", None)
+            kwargs.setdefault(
+                "impersonated_request",
+                lambda method, url, **kw: dispatch_inner_session_request(
+                    session,
+                    method,
+                    url,
+                    **kw,
+                ),
+            )
+        return real_attach(session, **kwargs)
+
+    monkeypatch.setattr(cninfo_http, "attach_cninfo_access", attach)
+    monkeypatch.setattr(official_financial_filings, "attach_cninfo_access", attach)
 
 
 class _FakeResponse:

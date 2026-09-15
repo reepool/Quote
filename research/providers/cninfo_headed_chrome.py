@@ -1,13 +1,16 @@
-"""Instance-owned headed Chrome access for first-party www.cninfo.com.cn HTTP.
+"""Instance-owned headed Chrome hop for first-party www.cninfo.com.cn HTTP.
 
-This is not a wholesale replacement of ``attach_cninfo_access``. It only accepts
-allowed www URLs. Official-filing PDF downloads on ``static.cninfo.com.cn`` must
-stay on the current TLS/proxy pass-through.
+Production jobs go through ``attach_cninfo_access``. This module reports
+``success`` / ``chrome_blocked`` / ``chrome_unavailable`` via
+``fetch_allowlisted``; the mux owns fallback. Standalone ``request()`` may
+still jump headed-to-proxy for hop unit tests. Official-filing PDFs on
+``static.cninfo.com.cn`` must never enter this hop.
 """
 
 from __future__ import annotations
 
 import asyncio
+import http.client
 import json
 import logging
 import os
@@ -162,6 +165,42 @@ def _accept_proxy_response(url: str) -> Callable[[Any], bool]:
     return accept
 
 
+def http_reason_for_status(status_code: int) -> str:
+    try:
+        return str(http.client.responses.get(int(status_code), "") or "")
+    except (TypeError, ValueError):
+        return ""
+
+
+class _CaseInsensitiveHeaders(dict):
+    """dict with case-insensitive ``get`` for Content-Type and similar headers."""
+
+    def get(self, key, default=None):  # type: ignore[override]
+        if key in self:
+            return dict.get(self, key, default)
+        needle = str(key).lower()
+        for existing, value in self.items():
+            if str(existing).lower() == needle:
+                return value
+        return default
+
+
+class CninfoHeadedFetchOutcome:
+    """Headed hop result. The production mux owns fallback from ``status``."""
+
+    __slots__ = ("status", "response")
+
+    def __init__(
+        self,
+        status: str,
+        response: Optional["CninfoAccessResponse"] = None,
+    ) -> None:
+        if status not in {"success", "chrome_blocked", "chrome_unavailable"}:
+            raise ValueError(f"unsupported headed fetch status: {status}")
+        self.status = status
+        self.response = response
+
+
 class CninfoAccessResponse:
     """Session-shaped response with an explicit CNInfo access mode."""
 
@@ -175,13 +214,15 @@ class CninfoAccessResponse:
         content: bytes,
         access_mode: str,
         raw: Any = None,
+        reason: str = "",
     ) -> None:
         self.status_code = int(status_code)
         self.url = str(url or "")
-        self.headers = dict(headers or {})
+        self.headers = _CaseInsensitiveHeaders(headers or {})
         self.text = str(text or "")
         self.content = bytes(content or b"")
         self.access_mode = str(access_mode)
+        self.reason = str(reason or "") or http_reason_for_status(self.status_code)
         self._raw = raw
 
     @classmethod
@@ -190,13 +231,15 @@ class CninfoAccessResponse:
         body = result.get("body")
         if body is None:
             body = text.encode("utf-8")
+        status_code = int(result.get("status") or 0)
         return cls(
-            status_code=int(result.get("status") or 0),
+            status_code=status_code,
             url=str(result.get("url") or ""),
             headers=dict(result.get("headers") or {}),
             text=text,
             content=bytes(body),
             access_mode=access_mode,
+            reason=str(result.get("reason") or "") or http_reason_for_status(status_code),
         )
 
     @classmethod
@@ -205,14 +248,17 @@ class CninfoAccessResponse:
         content = getattr(response, "content", None)
         if content is None:
             content = text.encode("utf-8")
+        status_code = int(getattr(response, "status_code", 0) or 0)
+        reason = str(getattr(response, "reason", "") or "")
         return cls(
-            status_code=int(getattr(response, "status_code", 0) or 0),
+            status_code=status_code,
             url=str(getattr(response, "url", "") or url),
             headers=dict(getattr(response, "headers", {}) or {}),
             text=text,
             content=bytes(content or b""),
             access_mode=access_mode,
             raw=response,
+            reason=reason or http_reason_for_status(status_code),
         )
 
     def json(self) -> Any:
@@ -223,6 +269,11 @@ class CninfoAccessResponse:
         return json.loads(self.text)
 
     def raise_for_status(self) -> None:
+        if self._raw is not None:
+            raw_raise = getattr(self._raw, "raise_for_status", None)
+            if callable(raw_raise):
+                raw_raise()
+                return
         if self.status_code >= 400:
             raise RuntimeError(f"HTTP {self.status_code}")
 
@@ -465,6 +516,24 @@ class CninfoHeadedChromeAccess:
         with self._lock:
             return self._request_locked(str(method or "GET").upper(), url, **kwargs)
 
+    def fetch_allowlisted(
+        self,
+        method: str,
+        url: str,
+        **kwargs: Any,
+    ) -> CninfoHeadedFetchOutcome:
+        """Fetch an allowlisted www URL and report outcome only. No proxy."""
+        if not is_allowed_cninfo_headed_chrome_url(url):
+            raise CninfoHeadedChromeUrlError(
+                f"CNInfo headed Chrome rejects URL outside the www allowlist: {url}"
+            )
+        with self._lock:
+            return self._fetch_allowlisted_locked(
+                str(method or "GET").upper(),
+                url,
+                **kwargs,
+            )
+
     def close(self) -> None:
         with self._lock:
             page = self._page
@@ -486,48 +555,84 @@ class CninfoHeadedChromeAccess:
     def _request_locked(self, method: str, url: str, **kwargs: Any) -> CninfoAccessResponse:
         if self._prefer_proxy:
             return self._request_via_proxy(method, url, **kwargs)
+        outcome = self._fetch_allowlisted_locked(method, url, **kwargs)
+        if outcome.status == "success" and outcome.response is not None:
+            return outcome.response
+        try:
+            response = self._request_via_proxy(method, url, **kwargs)
+        except Exception:
+            if outcome.response is not None:
+                return outcome.response
+            raise
+        self._prefer_proxy = True
+        return response
+
+    def _fetch_allowlisted_locked(
+        self,
+        method: str,
+        url: str,
+        **kwargs: Any,
+    ) -> CninfoHeadedFetchOutcome:
         try:
             self._ensure_started()
+        except CninfoHeadedChromeConfigError:
+            raise
         except Exception as exc:
             LOGGER.warning(
                 "[CninfoHeadedChrome] Chrome start/bootstrap failed: %s",
                 type(exc).__name__,
             )
             self._chrome_unusable = True
-            self._prefer_proxy = True
-            return self._request_via_proxy(method, url, **kwargs)
+            return CninfoHeadedFetchOutcome("chrome_unavailable")
 
         if _is_homepage_url(url):
             bootstrap = dict(self._bootstrap or {})
-            return CninfoAccessResponse.from_fetch(
-                {
-                    "status": int(bootstrap.get("status") or 200),
-                    "url": CNINFO_HOMEPAGE,
-                    "headers": {"content-type": "text/html"},
-                    "text": str(bootstrap.get("text") or ""),
-                    "body": str(bootstrap.get("text") or "").encode("utf-8"),
-                },
-                access_mode="headed_chrome",
+            return CninfoHeadedFetchOutcome(
+                "success",
+                CninfoAccessResponse.from_fetch(
+                    {
+                        "status": int(bootstrap.get("status") or 200),
+                        "url": CNINFO_HOMEPAGE,
+                        "headers": {"content-type": "text/html"},
+                        "text": str(bootstrap.get("text") or ""),
+                        "body": str(bootstrap.get("text") or "").encode("utf-8"),
+                    },
+                    access_mode="headed_chrome",
+                ),
             )
 
         try:
             result = self._in_page_request(method, url, **kwargs)
+        except CninfoHeadedChromeConfigError:
+            raise
+        except _ChromeUnusable:
+            self._chrome_unusable = True
+            return CninfoHeadedFetchOutcome("chrome_unavailable")
         except Exception as exc:
             LOGGER.warning(
                 "[CninfoHeadedChrome] in-page request failed: %s",
                 type(exc).__name__,
             )
-            return self._fallback_proxy_after_chrome(method, url, chrome_result=None, **kwargs)
+            if not self._session_started:
+                self._chrome_unusable = True
+                return CninfoHeadedFetchOutcome("chrome_unavailable")
+            return CninfoHeadedFetchOutcome("chrome_blocked")
 
         if result is None:
             LOGGER.warning("[CninfoHeadedChrome] in-page evaluate returned null")
-            return self._fallback_proxy_after_chrome(method, url, chrome_result=None, **kwargs)
+            return CninfoHeadedFetchOutcome("chrome_blocked")
         if _is_wangsu_block_page(
             status=result.get("status"),
             text=str(result.get("text") or ""),
         ):
-            return self._fallback_proxy_after_chrome(method, url, chrome_result=result, **kwargs)
-        return CninfoAccessResponse.from_fetch(result, access_mode="headed_chrome")
+            return CninfoHeadedFetchOutcome(
+                "chrome_blocked",
+                CninfoAccessResponse.from_fetch(result, access_mode="headed_chrome"),
+            )
+        return CninfoHeadedFetchOutcome(
+            "success",
+            CninfoAccessResponse.from_fetch(result, access_mode="headed_chrome"),
+        )
 
     def _ensure_started(self) -> None:
         if self._session_started and self._page is not None:
@@ -643,26 +748,6 @@ class CninfoHeadedChromeAccess:
             "content_type": content_type,
             "credentials": "include",
         }
-
-    def _fallback_proxy_after_chrome(
-        self,
-        method: str,
-        url: str,
-        *,
-        chrome_result: Optional[Mapping[str, Any]],
-        **kwargs: Any,
-    ) -> CninfoAccessResponse:
-        try:
-            response = self._request_via_proxy(method, url, **kwargs)
-        except Exception:
-            if chrome_result is not None:
-                return CninfoAccessResponse.from_fetch(
-                    chrome_result,
-                    access_mode="headed_chrome",
-                )
-            raise
-        self._prefer_proxy = True
-        return response
 
     def _request_via_proxy(self, method: str, url: str, **kwargs: Any) -> CninfoAccessResponse:
         timeout = kwargs.get("timeout")

@@ -31,6 +31,7 @@ from research.announcements.models import (
 from research.providers.cninfo_announcements import (
     CninfoAnnouncementProvider,
 )
+from research.providers.cninfo_http import dispatch_inner_session_request
 from research.providers.official_exchange_announcements import (
     OfficialExchangeAnnouncementProvider,
     OfficialExchangeAnnouncementSourceConfig,
@@ -418,6 +419,41 @@ class _TrackingThrottle:
 
     def record_throttle(self, status_code, *, retry_after=None):
         self.throttles.append((status_code, retry_after))
+
+
+@pytest.fixture(autouse=True)
+def _cninfo_announcement_tests_keep_injected_session(monkeypatch):
+    """Announcement parse tests inject fake sessions; do not start Chrome."""
+    from research.providers import cninfo_announcements
+    from research.providers import cninfo_http
+
+    def _unconfigured_proxy(*_args, **_kwargs):
+        raise RuntimeError("akshare proxy fallback is not fully configured")
+
+    monkeypatch.setattr(cninfo_http, "request_with_akshare_proxy", _unconfigured_proxy)
+    real_attach = cninfo_http.attach_cninfo_access
+
+    def attach(session=None, **kwargs):
+        if session is not None:
+            kwargs.setdefault("preferred_mode", "chrome_tls")
+            kwargs.setdefault("headed_hop", None)
+            kwargs.setdefault(
+                "impersonated_request",
+                lambda method, url, **kw: dispatch_inner_session_request(
+                    session,
+                    method,
+                    url,
+                    **kw,
+                ),
+            )
+            kwargs.setdefault(
+                "proxy_request",
+                lambda *args, **kw: cninfo_http.request_with_akshare_proxy(*args, **kw),
+            )
+        return real_attach(session, **kwargs)
+
+    monkeypatch.setattr(cninfo_http, "attach_cninfo_access", attach)
+    monkeypatch.setattr(cninfo_announcements, "attach_cninfo_access", attach)
 
 
 def _cninfo_provider(session):
