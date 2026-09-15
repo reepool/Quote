@@ -146,6 +146,10 @@ def test_schema_manifest_registers_projection_without_stage5_extract_ids():
     assert "energy_consumption" not in STAGE5_FIELDS
     assert "hedge_underlying" not in STAGE5_FIELDS
     assert "net_profit_direction" in manifest["forbidden_fields"]
+    exposure_props = manifest["exposure_schema"]["properties"]
+    assert exposure_props["source_record_ids"]["minItems"] == 1
+    assert exposure_props["evidence_ids"]["minItems"] == 1
+    assert exposure_props["measurement_record_ids"].get("minItems", 0) == 0
 
 
 def test_mapped_exposure_roundtrip_and_rejects_profit_direction():
@@ -197,6 +201,8 @@ def test_mapping_and_market_link_invariants():
         reported_period="2025",
         period_type=PeriodType.DURATION,
         subject_scope=SubjectScope.ISSUER,
+        source_record_ids=("act-unknown",),
+        evidence_ids=("ev-commodity",),
         source_native_name="未知矿",
         mapping_status=MappingStatus.PENDING,
         role=CommodityRole.UNKNOWN,
@@ -216,9 +222,35 @@ def test_mapping_and_market_link_invariants():
         CommodityExposure.model_validate_json(
             json.dumps({**base, "market_link_status": "linked", "market_series_id": None})
         )
-    with pytest.raises(ValidationError, match="hedge"):
+    with pytest.raises(ValidationError, match="source_record|at least 1"):
         CommodityExposure.model_validate_json(
             json.dumps({**base, "role": "hedge_underlying", "source_record_ids": []})
+        )
+
+
+def test_source_and_evidence_ids_are_required():
+    report = _report()
+    payload = {
+        "exposure_id": "commodity-exposure-pending",
+        "report": json.loads(report.model_dump_json()),
+        "reported_period": "2025",
+        "period_type": PeriodType.DURATION.value,
+        "subject_scope": SubjectScope.ISSUER.value,
+        "source_record_ids": ["act-unknown"],
+        "evidence_ids": ["ev-commodity"],
+        "source_native_name": "未知矿",
+        "mapping_status": "pending",
+        "role": "unknown",
+        "mapping_version": "catalog-v1",
+    }
+    CommodityExposure.model_validate_json(json.dumps(payload))
+    with pytest.raises(ValidationError, match="source_record|at least 1"):
+        CommodityExposure.model_validate_json(
+            json.dumps({**payload, "source_record_ids": []})
+        )
+    with pytest.raises(ValidationError, match="evidence|at least 1"):
+        CommodityExposure.model_validate_json(
+            json.dumps({**payload, "evidence_ids": []})
         )
 
 
@@ -242,6 +274,32 @@ def test_assessed_empty_list_requires_checked_evidence():
         assessment_status=AssessmentStatus.NOT_ASSESSED,
         exposures=(),
     )
+    foreign = CommodityExposure(
+        exposure_id="commodity-exposure-foreign",
+        report=ReportIdentity(
+            instrument_id="000878.SZ",
+            report_id="asset-commodity-other",
+            document_version="ver-1",
+            report_period="2025-12-31",
+            published_at="2026-03-20T08:00:00+08:00",
+        ),
+        reported_period="2025",
+        period_type=PeriodType.DURATION,
+        subject_scope=SubjectScope.ISSUER,
+        source_record_ids=("act-other",),
+        evidence_ids=("ev-other",),
+        source_native_name="阴极铜",
+        mapping_status=MappingStatus.PENDING,
+        role=CommodityRole.UNKNOWN,
+        mapping_version="catalog-v1",
+    )
+    with pytest.raises(ValidationError, match="same report"):
+        CommodityExposureAssessment(
+            report=report,
+            assessment_status=AssessmentStatus.ASSESSED,
+            checked_evidence_ids=("ev-commodity",),
+            exposures=(foreign,),
+        )
     assert assessed.exposures == ()
     assert unread.assessment_status == AssessmentStatus.NOT_ASSESSED
 
@@ -251,6 +309,7 @@ def test_catalog_adapts_activity_and_relationship_names():
     ambiguous = resolve_catalog_mapping(_activity("铜产品"))
     pending = resolve_catalog_mapping(_activity("行业常识金属"))
     material = resolve_catalog_mapping(_relationship("铜精矿"))
+    measured = resolve_catalog_mapping(_measurement())
 
     assert mapped.mapping_status == MappingStatus.MAPPED
     assert mapped.commodity_id == "COMMODITY.metal.refined_copper"
@@ -259,6 +318,9 @@ def test_catalog_adapts_activity_and_relationship_names():
     assert pending.mapping_status == MappingStatus.PENDING
     assert material.mapping_status == MappingStatus.MAPPED
     assert material.commodity_id == "COMMODITY.metal.copper_concentrate"
+    assert measured.mapping_status == MappingStatus.MAPPED
+    assert measured.commodity_id == "COMMODITY.metal.refined_copper"
+    assert measured.source_native_name == "阴极铜"
 
 
 def test_mapped_input_without_quantity_or_market_stays_usable():

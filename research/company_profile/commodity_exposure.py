@@ -99,8 +99,8 @@ class CommodityExposure(_StrictModel):
     subject_scope: SubjectScope
     subject_basis: SubjectBasis | None = None
     business_object: str | None = None
-    source_record_ids: tuple[str, ...] = ()
-    evidence_ids: tuple[str, ...] = ()
+    source_record_ids: tuple[str, ...] = Field(min_length=1)
+    evidence_ids: tuple[str, ...] = Field(min_length=1)
     measurement_record_ids: tuple[str, ...] = ()
     source_native_name: str = Field(min_length=1)
     commodity_id: str | None = None
@@ -154,6 +154,8 @@ class CommodityExposureAssessment(_StrictModel):
 
     @model_validator(mode="after")
     def _empty_list_is_not_zero_exposure(self) -> CommodityExposureAssessment:
+        if any(item.report != self.report for item in self.exposures):
+            raise ValueError("assessment exposures must belong to the same report")
         if (
             self.assessment_status == AssessmentStatus.ASSESSED
             and not self.exposures
@@ -230,20 +232,26 @@ def measurement_record_ids(records: Sequence[Any]) -> tuple[str, ...]:
     )
 
 
+def _catalog_source_name(source: Activity | Measurement | Relationship) -> str:
+    if isinstance(source, Measurement):
+        return str(source.measured_object).strip()
+    return str(source.object_name).strip()
+
+
 def resolve_catalog_mapping(
-    source: Activity | Relationship,
+    source: Activity | Measurement | Relationship,
     *,
     catalog: Any | None = None,
     knowledge_time: str | None = None,
 ) -> CommodityCatalogMapping:
-    """Map a new-model Activity or Relationship name through the product catalog."""
+    """Map a new-model Activity, Measurement, or Relationship name through the catalog."""
 
     from research.business_profile_product_catalog import load_business_product_catalog
 
     active = catalog or load_business_product_catalog(
         document_date=(str(knowledge_time)[:10] if knowledge_time else None)
     )
-    name = str(source.object_name).strip()
+    name = _catalog_source_name(source)
     resolution = active.resolve_alias(name)
     product_ids = tuple(resolution.product_ids)
     commodity_ids = []
