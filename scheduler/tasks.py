@@ -8582,11 +8582,22 @@ class ScheduledTasks:
             storage = getattr(data_manager, "research_storage", None)
             if storage is None:
                 raise RuntimeError("research storage is not initialized")
+            shared_asset_access = None
+            getter = getattr(data_manager, "_get_announcement_asset_access", None)
+            if callable(getter):
+                try:
+                    shared_asset_access = getter(initialize_schema=False)
+                except Exception as exc:
+                    scheduler_logger.warning(
+                        "[Scheduler] Official annual-report access unavailable: %s",
+                        exc,
+                    )
             result = await execute_published_task(
                 action=action,
                 storage=storage,
                 output_root=DEFAULT_OUTPUT_ROOT,
                 checkpoint_root=DEFAULT_CHECKPOINT_ROOT,
+                shared_asset_access=shared_asset_access,
                 knowledge_cutoff=knowledge_cutoff,
                 instrument_ids=instrument_ids,
                 max_items=max_items,
@@ -8595,7 +8606,21 @@ class ScheduledTasks:
                 reason=reason,
             )
             status = str(result.get("state") or "failed")
-            success = status in {"idle", "completed", "paused", "stop_requested"}
+            if str(action or "").strip().lower() in {
+                "preview",
+                "status",
+                "pause",
+            }:
+                success = status in {
+                    "idle",
+                    "completed",
+                    "paused",
+                    "stop_requested",
+                    "running",
+                    "incomplete",
+                }
+            else:
+                success = status in {"completed", "paused"}
             await self._send_task_report(
                 report_data={
                     "name": "公司画像通用骨架任务报告",

@@ -28,6 +28,7 @@ from .dependencies import SchedulerDependencyExecutor
 
 
 _SCHEDULER_ALREADY_TRACKED_PARAM = "_scheduler_already_tracked"
+_JOB_CONTROL_ACTIONS = frozenset({"preview", "status", "pause", "stop"})
 
 
 @singleton
@@ -251,7 +252,9 @@ class TaskScheduler:
             all_parameters.pop(metadata_key, None)
         run_id = datetime.now().strftime('%Y%m%d_%H%M%S_%f')
         tracked_here = False
-        if not already_tracked:
+        action = str(all_parameters.get("action") or "").strip().lower()
+        uses_exclusive_slot = action not in _JOB_CONTROL_ACTIONS
+        if not already_tracked and uses_exclusive_slot:
             max_instances = int(getattr(job_config, "max_instances", 1) or 1)
             active_runs = self.running_tasks.get(job_id, {})
             if len(active_runs) >= max_instances:

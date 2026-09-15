@@ -452,12 +452,13 @@ class QuoteSystem:
             dm_logger.error(f"[Main] Failed to get download stats: {e}")
             return {}
 
-    async def run_job(self, job_id: str, target_date=None):
+    async def run_job(self, job_id: str, target_date=None, parameters=None):
         """运行指定任务
 
         Args:
             job_id: 任务ID
             target_date: 可选，指定补数据日期（仅 daily_data_update 有效）
+            parameters: 可选，转发给 execute_job_direct 的任务参数
         """
         try:
             scheduler_logger.info(f"[Main] Running job: {job_id}")
@@ -510,13 +511,22 @@ class QuoteSystem:
                 return success
 
             else:
-                # 回退到调度器方式
-                scheduler_logger.warning(f"[Main] Job {job_id} not implemented directly, falling back to scheduler")
-                success = await task_scheduler.run_job_now(job_id)
+                job_config_manager = getattr(
+                    task_scheduler, "job_config_manager", None
+                )
+                job_configs = getattr(job_config_manager, "job_configs", None)
+                if job_config_manager is not None and not job_configs:
+                    loader = getattr(job_config_manager, "load_job_configs", None)
+                    if callable(loader):
+                        loader()
+                success = await task_scheduler.execute_job_direct(
+                    job_id,
+                    dict(parameters or {}),
+                )
                 if success:
-                    scheduler_logger.info(f"[Main] Job {job_id} scheduled successfully")
+                    scheduler_logger.info(f"[Main] Job {job_id} completed successfully")
                 else:
-                    scheduler_logger.error(f"[Main] Failed to schedule job {job_id}")
+                    scheduler_logger.error(f"[Main] Failed to execute job {job_id}")
                 return success
 
         except Exception as e:
@@ -1173,6 +1183,21 @@ def create_parser():
     # 运行任务
     job_parser = subparsers.add_parser('job', help='运行指定任务')
     job_parser.add_argument('--job-id', required=True, help='任务ID')
+    job_parser.add_argument(
+        '--action',
+        choices=['preview', 'run', 'status', 'pause', 'resume'],
+        help='company_profile_common_core 等任务的操作',
+    )
+    job_parser.add_argument('--knowledge-cutoff', help='知识截止日 YYYY-MM-DD')
+    job_parser.add_argument('--instrument-ids', help='逗号分隔证券代码，可空')
+    job_parser.add_argument('--max-items', type=int, help='每阶段有界条数')
+    job_parser.add_argument('--token-budget', type=int, help='总 token 预算')
+    job_parser.add_argument(
+        '--max-elapsed-seconds',
+        type=float,
+        help='每阶段最长秒数',
+    )
+    job_parser.add_argument('--reason', help='pause 原因')
 
     # 交互式下载
     interactive_parser = subparsers.add_parser('interactive', help='交互式下载模式')
@@ -1296,7 +1321,20 @@ async def main():
             await system.show_system_status()
 
         elif args.command == 'job':
-            await system.run_job(args.job_id)
+            job_parameters = {}
+            for key in (
+                "action",
+                "knowledge_cutoff",
+                "instrument_ids",
+                "max_items",
+                "token_budget",
+                "max_elapsed_seconds",
+                "reason",
+            ):
+                value = getattr(args, key, None)
+                if value is not None:
+                    job_parameters[key] = value
+            await system.run_job(args.job_id, parameters=job_parameters or None)
 
         elif args.command == 'interactive':
             await system.interactive_download(args.mode)

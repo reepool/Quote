@@ -88,10 +88,128 @@ def _normalize_instrument_ids(value: Any) -> tuple[str, ...]:
     return tuple(str(item).strip() for item in value if str(item).strip())
 
 
+def _resolve_shared_asset_access(storage: Any) -> Any | None:
+    existing = getattr(storage, "_announcement_asset_access", None)
+    if existing is not None:
+        return existing
+    research_config = getattr(storage, "research_config", None)
+    db_path = getattr(getattr(research_config, "storage", None), "db_path", None)
+    if db_path is None:
+        db_path = getattr(storage, "db_path", None)
+    if research_config is None or db_path is None:
+        return None
+    try:
+        from research.announcement_assets import (
+            AnnouncementAssetAccess,
+            AnnouncementAssetConfig,
+            AnnouncementAssetRepository,
+            AnnouncementAssetService,
+        )
+
+        path = Path(str(db_path))
+        if not path.is_absolute():
+            path = Path.cwd() / path
+        repository = AnnouncementAssetRepository(path)
+        config = AnnouncementAssetConfig.from_research_config(
+            research_config,
+            project_root=Path.cwd(),
+        )
+        service = AnnouncementAssetService(
+            repository=repository,
+            config=config,
+            acquisition_service=None,
+            attachment_retriever=None,
+        )
+        return AnnouncementAssetAccess(
+            repository=repository,
+            config=config,
+            service=service,
+        )
+    except Exception as exc:  # noqa: BLE001 - local access setup must not crash the task
+        logger.warning(
+            "company-profile official annual-report access unavailable: %s",
+            exc,
+        )
+        return None
+
+
 def _knowledge_cutoff(value: str | None) -> str:
     if value:
         return str(value)[:10]
     return get_shanghai_time().date().isoformat()
+
+
+class OfficialAnnualReportPageSource:
+    """Load report identity and pages from the existing official annual-report store."""
+
+    def __init__(self, repository: BusinessProfileWorkRepository) -> None:
+        self.repository = repository
+
+    def __call__(self, item: Mapping[str, Any]) -> dict[str, Any] | None:
+        if self.repository.shared_asset_access is None:
+            return None
+        try:
+            asset = self.repository.get_bound_source_asset(item)
+        except Exception as exc:  # noqa: BLE001 - missing local assets become machine_rework
+            logger.warning(
+                "company-profile official annual-report asset unavailable: %s",
+                exc,
+            )
+            return None
+        if not asset:
+            return None
+        from research.business_profile_pdf_artifacts import (
+            ensure_archived_pdf_page_artifact,
+        )
+        from research.company_profile.models import ReportIdentity
+
+        try:
+            extracted = ensure_archived_pdf_page_artifact(asset)
+        except Exception as exc:  # noqa: BLE001 - extract failures become machine_rework
+            logger.warning(
+                "company-profile official annual-report pages unavailable: %s",
+                exc,
+            )
+            return None
+        artifact = extracted.get("artifact")
+        raw_pages = getattr(artifact, "pages", None) or []
+        pages = [
+            {
+                "page": int(page.page_number),
+                "text": str(page.text or ""),
+                "readable": str(page.native_text_status) == "extracted"
+                and bool(str(page.text or "").strip()),
+            }
+            for page in raw_pages
+        ]
+        if not pages:
+            return None
+        published_at = str(
+            asset.get("published_at") or item.get("published_at") or ""
+        )
+        if not published_at:
+            return None
+        return {
+            "report": ReportIdentity(
+                instrument_id=str(
+                    item.get("instrument_id") or asset.get("instrument_id") or ""
+                ),
+                report_id=str(
+                    asset.get("source_asset_id") or asset.get("filing_id") or ""
+                ),
+                document_version=str(asset.get("content_hash") or "unknown"),
+                report_period=str(
+                    asset.get("report_period") or item.get("report_period") or ""
+                ),
+                published_at=published_at,
+                document_type=str(
+                    item.get("document_type")
+                    or asset.get("report_type")
+                    or "annual_report"
+                ),
+            ),
+            "pages": pages,
+        }
 
 
 class CompanyProfileTaskControl:
@@ -195,11 +313,11 @@ class CompanyProfileTaskService:
         | None = None,
         provider: SemanticProvider | None = None,
         token_budget: int = DEFAULT_TOTAL_TOKEN_BUDGET,
+        shared_asset_access: Any | None = None,
     ) -> None:
         self.storage = storage
         self.output_root = Path(output_root)
         self.checkpoint_root = Path(checkpoint_root)
-        self.page_source = page_source
         self.provider = provider
         self.token_budget = max(0, int(token_budget))
         self.processing_identity = default_processing_identity()
@@ -208,13 +326,18 @@ class CompanyProfileTaskService:
         self.repository = BusinessProfileWorkRepository(
             storage,
             checkpoint_root=self.checkpoint_root,
+            shared_asset_access=shared_asset_access
+            or _resolve_shared_asset_access(storage),
+        )
+        self.page_source = page_source or OfficialAnnualReportPageSource(
+            self.repository
         )
         self.writer = CompanyProfileResearchWriter(self.output_root)
         self.control = CompanyProfileTaskControl(self.checkpoint_root)
         self.runtime = CompanyProfileStageRuntime(
             writer=self.writer,
             provider=provider,
-            page_source=page_source,
+            page_source=self.page_source,
             token_budget=self.token_budget,
         )
         self.production = BusinessProfileAsyncProductionService(
@@ -363,16 +486,51 @@ class CompanyProfileTaskService:
             )
             self.control.finish(state="failed", result=failed)
             raise
-        state = "paused" if stopped else "completed"
+        health = self._queue_health()
+        state = self._delivery_state(
+            stopped=stopped,
+            enqueue_result=enqueue_result,
+            health=health,
+        )
         result = self._payload(
             action=action,
             state=state,
             knowledge_cutoff=knowledge_cutoff,
             enqueue=enqueue_result,
             drain=drain,
+            queue=health,
         )
         self.control.finish(state=state, result=result)
         return result
+
+    def _delivery_state(
+        self,
+        *,
+        stopped: bool,
+        enqueue_result: Mapping[str, Any],
+        health: Mapping[str, Any],
+    ) -> str:
+        if stopped:
+            return "paused"
+        completed = int(health.get("completed") or 0)
+        if completed > 0 or self._published_count() > 0:
+            return "completed"
+        inserted = int(enqueue_result.get("inserted") or 0)
+        reused = int(enqueue_result.get("reused") or 0)
+        rework = int(health.get("machine_rework") or 0)
+        claimable = int(health.get("claimable") or 0)
+        if inserted == 0 and reused == 0 and rework == 0 and claimable == 0:
+            return "idle"
+        return "incomplete"
+
+    def _published_count(self) -> int:
+        return len(
+            [
+                path
+                for path in self.writer.output_root.glob("*.json")
+                if path.is_file()
+            ]
+        )
 
     def _queue_health(self) -> dict[str, Any]:
         return self.repository.health(
@@ -403,6 +561,7 @@ async def execute_published_task(
     page_source: Callable[[Mapping[str, Any]], Mapping[str, Any] | None]
     | None = None,
     provider: SemanticProvider | None = None,
+    shared_asset_access: Any | None = None,
     knowledge_cutoff: str | None = None,
     instrument_ids: Sequence[str] | str | None = None,
     max_items: int = DEFAULT_MAX_ITEMS,
@@ -419,6 +578,7 @@ async def execute_published_task(
         page_source=page_source,
         provider=provider,
         token_budget=token_budget,
+        shared_asset_access=shared_asset_access,
     )
     return await service.execute(
         action,
