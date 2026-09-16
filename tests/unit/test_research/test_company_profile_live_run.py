@@ -129,6 +129,10 @@ def test_select_live_run_targets_deduplicates_repeated_instrument_ids():
     assert report.universe.completed == 1
     payload = json.loads(report.model_dump_json())
     payload["selected_instrument_ids"] = ["600000.SH", "600000.SH"]
+    payload["selected_strata"] = [
+        payload["selected_strata"][0],
+        payload["selected_strata"][0],
+    ]
     payload["universe"]["selected_for_run"] = 2
     payload["universe"]["completed"] = 2
     payload["company_outcomes"] = [
@@ -163,6 +167,13 @@ def test_record_live_run_keeps_universe_denominator_and_rejects_batch_rerun():
     assert report.scale_quality_claim_allowed is False
     assert report.company_outcomes[0].delivered is True
     assert report.company_outcomes[1].supplement_incomplete is True
+    assert tuple(
+        (item.instrument_id, item.exchange, item.disclosure_form)
+        for item in report.selected_strata
+    ) == (
+        ("600000.SH", "SSE", "finance"),
+        ("600036.SH", "SSE", "finance"),
+    )
     assert report.company_outcomes[1].batch_rerun_triggered is False
 
     payload = json.loads(report.model_dump_json())

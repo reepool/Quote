@@ -6,6 +6,7 @@ import json
 import pytest
 from pydantic import ValidationError
 
+from research.company_profile.candidate_registry import build_a_share_candidate_registry
 from research.company_profile.live_plan import record_company_profile_live_plan
 from research.company_profile.live_run import (
     load_live_run_report,
@@ -30,17 +31,62 @@ from research.company_profile.source_review import (
 from tests.unit.test_research.test_company_profile_live_run import _registry
 
 
-def _live_run():
+def _live_run(registry=None):
     plan = record_company_profile_live_plan()
-    registry = _registry()
+    registry = registry or _registry()
     selected = select_live_run_targets(registry, plan)
     return record_live_run_report(
         plan=plan,
         registry=registry,
         selected_instrument_ids=selected,
-        delivered_instrument_ids=("600000.SH",),
+        delivered_instrument_ids=selected[:1],
         knowledge_cutoff="2026-08-30",
-        incomplete_supplement_ids=("600036.SH",),
+        incomplete_supplement_ids=selected[1:],
+    )
+
+
+def _two_stratum_registry():
+    return build_a_share_candidate_registry(
+        as_of="2026-08-30",
+        universe_coverage_guarantee="full_market",
+        eligible_instruments=(
+            {
+                "instrument_id": "600000.SH",
+                "exchange": "SSE",
+                "name": "浦发银行",
+            },
+            {
+                "instrument_id": "000001.SZ",
+                "exchange": "SZSE",
+                "name": "平安银行",
+            },
+        ),
+        asset_coverage={
+            "600000.SH": {"status": "available", "fiscal_year": 2025},
+            "000001.SZ": {"status": "available", "fiscal_year": 2025},
+        },
+        industry_memberships={
+            "600000.SH": {"sw_l1_name": "银行", "taxonomy_system": "sw"},
+            "000001.SZ": {"sw_l1_name": "银行", "taxonomy_system": "sw"},
+        },
+        effective_reports={
+            "600000.SH": {
+                "asset_id": "asset-600000-2025",
+                "fiscal_year": 2025,
+                "report_period": "2025-12-31",
+                "availability": "local_valid",
+                "decision_state": "effective",
+                "published_at": "2026-03-20T00:00:00+08:00",
+            },
+            "000001.SZ": {
+                "asset_id": "asset-000001-2025",
+                "fiscal_year": 2025,
+                "report_period": "2025-12-31",
+                "availability": "local_valid",
+                "decision_state": "effective",
+                "published_at": "2026-03-21T00:00:00+08:00",
+            },
+        },
     )
 
 
@@ -65,6 +111,31 @@ def _finding(
         fact_accurate=fact_accurate,
         critical_numeric_error=critical_numeric_error,
     )
+
+
+def _complete_findings(*instrument_ids: str) -> tuple[SemanticFinding, ...]:
+    findings: list[SemanticFinding] = []
+    for instrument_id in instrument_ids:
+        findings.extend(
+            (
+                _finding(
+                    instrument_id=instrument_id,
+                    aspect="core_skeleton",
+                    disclosure_id=f"{instrument_id}-principal-business",
+                ),
+                _finding(
+                    instrument_id=instrument_id,
+                    aspect="important_disclosure",
+                    disclosure_id=f"{instrument_id}-net-fee-income",
+                ),
+                _finding(
+                    instrument_id=instrument_id,
+                    aspect="commodity_role",
+                    disclosure_id=f"{instrument_id}-no-commodity-role",
+                ),
+            )
+        )
+    return tuple(findings)
 
 
 def test_structure_only_review_leaves_semantic_metrics_unassessed():
@@ -120,7 +191,7 @@ def test_structure_only_review_leaves_semantic_metrics_unassessed():
     }
     payload["source_accuracy"] = payload["source_recall"]
     payload["critical_numeric_errors"] = {"status": "assessed", "value": 0}
-    with pytest.raises(ValidationError, match="structure-only"):
+    with pytest.raises(ValidationError, match="follow semantic findings"):
         CompanyProfileSourceReviewReport.model_validate_json(json.dumps(payload))
 
 
@@ -157,7 +228,8 @@ def test_independent_semantic_review_reports_recall_accuracy_and_workload():
     assert report.critical_numeric_errors.status == "assessed"
     assert report.critical_numeric_errors.value == 0
     assert report.independently_reviewed_reports == 2
-    assert report.occupied_strata_reviewed.status == "unassessed"
+    assert report.occupied_strata_reviewed.status == "assessed"
+    assert report.occupied_strata_reviewed.value == 1
     assert report.workload.tokens_used.value == 1200
     assert report.workload.elapsed_seconds.value == 45.0
     assert report.workload.human_review_minutes.value == 30.0
@@ -173,33 +245,137 @@ def test_independent_semantic_review_reports_recall_accuracy_and_workload():
             live_run=live_run,
             semantic_findings=(_finding(instrument_id="000001.SZ"),),
         )
-    with pytest.raises(ValidationError, match="occupied strata"):
-        record_source_review_report(
-            live_run=live_run,
-            occupied_strata_reviewed=1,
-        )
-    perfect = record_source_review_report(
-        live_run=live_run,
+
+
+def test_occupied_strata_follow_live_run_sample_layers():
+    same_layer = record_source_review_report(
+        live_run=_live_run(),
+        semantic_findings=_complete_findings("600000.SH", "600036.SH"),
+        tokens_used=100,
+        elapsed_seconds=10.0,
+    )
+    two_layers = record_source_review_report(
+        live_run=_live_run(_two_stratum_registry()),
+        semantic_findings=_complete_findings("600000.SH", "000001.SZ"),
+        tokens_used=100,
+        elapsed_seconds=10.0,
+    )
+
+    assert same_layer.occupied_strata_reviewed.value == 1
+    assert same_layer.expansion_gates_met is False
+    assert two_layers.occupied_strata_reviewed.value == 2
+    assert two_layers.expansion_gates_met is True
+
+    payload = json.loads(same_layer.model_dump_json())
+    payload["occupied_strata_reviewed"] = {"status": "assessed", "value": 2}
+    payload["expansion_gates_met"] = True
+    with pytest.raises(ValidationError, match="live-run sample layers"):
+        CompanyProfileSourceReviewReport.model_validate_json(json.dumps(payload))
+
+
+def test_unassessed_delivered_facts_block_source_accuracy():
+    report = record_source_review_report(
+        live_run=_live_run(_two_stratum_registry()),
         semantic_findings=(
-            _finding(aspect="core_skeleton", disclosure_id="principal-business"),
+            *_complete_findings("600000.SH"),
             _finding(
-                instrument_id="600036.SH",
+                instrument_id="000001.SZ",
+                aspect="core_skeleton",
+                disclosure_id="000001.SZ-principal-business",
+            ),
+            _finding(
+                instrument_id="000001.SZ",
                 aspect="important_disclosure",
-                disclosure_id="net-fee-income",
+                disclosure_id="000001.SZ-net-fee-income",
+                fact_accurate=None,
+            ),
+            _finding(
+                instrument_id="000001.SZ",
+                aspect="commodity_role",
+                disclosure_id="000001.SZ-no-commodity-role",
             ),
         ),
-        occupied_strata_reviewed=2,
+        tokens_used=100,
+        elapsed_seconds=10.0,
     )
-    assert perfect.source_recall.value == 1.0
-    assert perfect.source_accuracy.value == 1.0
-    assert perfect.occupied_strata_reviewed.value == 2
-    assert perfect.expansion_gates_met is True
-    short_stratum = record_source_review_report(
+
+    assert report.source_accuracy.status == "unassessed"
+    assert report.source_accuracy.value is None
+    assert report.expansion_gates_met is False
+
+
+def test_expansion_gates_require_plan_cost_caps_and_three_aspects():
+    live_run = _live_run(_two_stratum_registry())
+    findings = _complete_findings("600000.SH", "000001.SZ")
+    over_budget = record_source_review_report(
         live_run=live_run,
-        semantic_findings=perfect.semantic_findings,
-        occupied_strata_reviewed=1,
+        semantic_findings=findings,
+        tokens_used=999999,
+        elapsed_seconds=999999.0,
     )
-    assert short_stratum.expansion_gates_met is False
+    unassessed_cost = record_source_review_report(
+        live_run=live_run,
+        semantic_findings=findings,
+    )
+    skeleton_only = record_source_review_report(
+        live_run=live_run,
+        semantic_findings=(
+            _finding(instrument_id="600000.SH"),
+            _finding(
+                instrument_id="000001.SZ",
+                disclosure_id="000001.SZ-principal-business",
+            ),
+        ),
+        tokens_used=100,
+        elapsed_seconds=10.0,
+    )
+
+    assert over_budget.expansion_gates_met is False
+    assert unassessed_cost.expansion_gates_met is False
+    assert skeleton_only.expansion_gates_met is False
+
+
+def test_public_json_cannot_contradict_semantic_findings():
+    report = record_source_review_report(
+        live_run=_live_run(_two_stratum_registry()),
+        semantic_findings=(
+            *_complete_findings("600000.SH"),
+            _finding(
+                instrument_id="000001.SZ",
+                aspect="core_skeleton",
+                disclosure_id="000001.SZ-principal-business",
+            ),
+            _finding(
+                instrument_id="000001.SZ",
+                aspect="important_disclosure",
+                disclosure_id="000001.SZ-net-fee-income",
+            ),
+            _finding(
+                instrument_id="000001.SZ",
+                aspect="commodity_role",
+                disclosure_id="000001.SZ-no-commodity-role",
+                present_in_delivery=False,
+                fact_accurate=None,
+            ),
+        ),
+        tokens_used=100,
+        elapsed_seconds=10.0,
+    )
+    payload = json.loads(report.model_dump_json())
+
+    assert report.source_recall.numerator == 5
+    assert report.source_recall.denominator == 6
+    assert report.expansion_gates_met is False
+
+    payload["source_recall"] = {
+        "status": "assessed",
+        "numerator": 2,
+        "denominator": 2,
+        "value": 1.0,
+    }
+    payload["expansion_gates_met"] = True
+    with pytest.raises(ValidationError, match="follow semantic findings"):
+        CompanyProfileSourceReviewReport.model_validate_json(json.dumps(payload))
 
 
 def test_published_owner_persists_source_review_beside_live_run(tmp_path):
@@ -236,7 +412,6 @@ def test_published_owner_persists_source_review_beside_live_run(tmp_path):
                 fact_accurate=None,
             ),
         ),
-        occupied_strata_reviewed=1,
         human_review_minutes=20.0,
     )
     path = tmp_path / "checkpoints" / "reports" / f"{SOURCE_REVIEW_SCHEMA_VERSION}.json"

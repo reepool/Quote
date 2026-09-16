@@ -22,6 +22,7 @@ from research.company_profile.candidate_registry import (
 from research.company_profile.live_plan import (
     CompanyProfileLivePlan,
     StratifiedSamplingRule,
+    assign_disclosure_form,
     record_company_profile_live_plan,
     select_stratified_review_sample,
 )
@@ -29,6 +30,11 @@ from research.company_profile.models import PRODUCTION_AUTHORIZATION
 
 LIVE_RUN_SCHEMA_VERSION = "company_profile_live_run.v1"
 _SELECTED_OUTCOMES = frozenset({"completed", "failed"})
+_INSTRUMENT_EXCHANGES = {
+    ".SH": "SSE",
+    ".SZ": "SZSE",
+    ".BJ": "BSE",
+}
 
 
 class _StrictModel(BaseModel):
@@ -60,6 +66,19 @@ class UniverseRunDenominator(_StrictModel):
         return self
 
 
+class SelectedSampleStratum(_StrictModel):
+    instrument_id: str = Field(min_length=1)
+    exchange: str = Field(min_length=1)
+    disclosure_form: str = Field(min_length=1)
+
+    @model_validator(mode="after")
+    def _stratum_follows_instrument(self) -> SelectedSampleStratum:
+        expected = _exchange_from_instrument_id(self.instrument_id)
+        if self.exchange != expected:
+            raise ValueError("selected stratum exchange must follow the instrument id")
+        return self
+
+
 class CompanyRunOutcome(_StrictModel):
     instrument_id: str = Field(min_length=1)
     outcome: Literal["completed", "failed"]
@@ -84,6 +103,7 @@ class CompanyProfileLiveRunReport(_StrictModel):
     knowledge_cutoff: str = Field(min_length=1)
     plan: CompanyProfileLivePlan
     selected_instrument_ids: tuple[str, ...]
+    selected_strata: tuple[SelectedSampleStratum, ...]
     universe: UniverseRunDenominator
     company_outcomes: tuple[CompanyRunOutcome, ...]
     whole_batch_rerun: Literal[False]
@@ -108,6 +128,15 @@ class CompanyProfileLiveRunReport(_StrictModel):
             raise ValueError("outcome order must follow the selected run set")
         if len(set(self.selected_instrument_ids)) != len(self.selected_instrument_ids):
             raise ValueError("selected run set cannot contain duplicate companies")
+        stratum_ids = tuple(item.instrument_id for item in self.selected_strata)
+        if stratum_ids != self.selected_instrument_ids:
+            raise ValueError("selected strata must follow the selected run set")
+        sampling = self.plan.sampling
+        for item in self.selected_strata:
+            if item.exchange not in sampling.exchange_strata:
+                raise ValueError("selected stratum exchange is outside the sampling plan")
+            if item.disclosure_form not in sampling.disclosure_form_strata:
+                raise ValueError("selected stratum form is outside the sampling plan")
         return self
 
 
@@ -174,6 +203,14 @@ def record_live_run_report(
         knowledge_cutoff=knowledge_cutoff,
         plan=plan,
         selected_instrument_ids=selected,
+        selected_strata=tuple(
+            SelectedSampleStratum(
+                instrument_id=instrument_id,
+                exchange=by_id[instrument_id].exchange,
+                disclosure_form=assign_disclosure_form(by_id[instrument_id]),
+            )
+            for instrument_id in selected
+        ),
         universe=UniverseRunDenominator(
             policy_version=PRODUCTION_SCOPE_POLICY,
             as_of=knowledge_cutoff,
@@ -234,3 +271,10 @@ def _review_eligible(
     rule: StratifiedSamplingRule,
 ) -> bool:
     return bool(select_stratified_review_sample((candidate,), rule=rule))
+
+
+def _exchange_from_instrument_id(instrument_id: str) -> str:
+    for suffix, exchange in _INSTRUMENT_EXCHANGES.items():
+        if instrument_id.endswith(suffix):
+            return exchange
+    raise ValueError("selected instrument id must map to SSE, SZSE or BSE")

@@ -20,6 +20,9 @@ from research.company_profile.models import PRODUCTION_AUTHORIZATION
 
 SOURCE_REVIEW_SCHEMA_VERSION = "company_profile_source_review.v1"
 ReviewAspect = Literal["core_skeleton", "important_disclosure", "commodity_role"]
+_REQUIRED_ASPECTS = frozenset(
+    {"core_skeleton", "important_disclosure", "commodity_role"}
+)
 
 
 class _StrictModel(BaseModel):
@@ -171,11 +174,23 @@ class CompanyProfileSourceReviewReport(_StrictModel):
         ]
         if len(finding_keys) != len(set(finding_keys)):
             raise ValueError("semantic findings cannot repeat the same disclosure")
-        reviewed = {
-            item.instrument_id for item in self.semantic_findings
-        }
-        if self.independently_reviewed_reports != len(reviewed):
+        derived = _derived_metrics(
+            live_run=self.live_run,
+            findings=self.semantic_findings,
+            workload=self.workload,
+        )
+        if self.independently_reviewed_reports != derived["independently_reviewed_reports"]:
             raise ValueError("reviewed-report count must follow semantic findings")
+        if self.occupied_strata_reviewed != derived["occupied_strata_reviewed"]:
+            raise ValueError("occupied strata must follow the live-run sample layers")
+        if self.source_recall != derived["source_recall"]:
+            raise ValueError("source recall must follow semantic findings")
+        if self.source_accuracy != derived["source_accuracy"]:
+            raise ValueError("source accuracy must follow semantic findings")
+        if self.critical_numeric_errors != derived["critical_numeric_errors"]:
+            raise ValueError("critical numeric errors must follow semantic findings")
+        if self.expansion_gates_met != derived["expansion_gates_met"]:
+            raise ValueError("expansion gates must follow findings and the live plan")
         if not self.semantic_findings:
             if self.source_recall.status != "unassessed":
                 raise ValueError("structure-only review cannot assess source recall")
@@ -189,40 +204,6 @@ class CompanyProfileSourceReviewReport(_StrictModel):
                 raise ValueError("structure-only review cannot assess occupied strata")
             if self.expansion_gates_met:
                 raise ValueError("unassessed source review cannot meet expansion gates")
-        elif self.occupied_strata_reviewed.status == "assessed":
-            if self.occupied_strata_reviewed.value < 1:
-                raise ValueError("assessed occupied strata must cover at least one")
-            if self.occupied_strata_reviewed.value > self.independently_reviewed_reports:
-                raise ValueError("occupied strata cannot exceed reviewed reports")
-        if self.expansion_gates_met:
-            thresholds = self.live_run.plan.expansion_thresholds
-            if self.independently_reviewed_reports < (
-                thresholds.min_independently_reviewed_reports
-            ):
-                raise ValueError("expansion gates require the reviewed-report threshold")
-            if self.occupied_strata_reviewed.status != "assessed":
-                raise ValueError("expansion gates require assessed occupied strata")
-            if (
-                self.occupied_strata_reviewed.value
-                < thresholds.min_occupied_strata_reviewed
-            ):
-                raise ValueError("expansion gates require the occupied-strata threshold")
-            if (
-                self.source_recall.status != "assessed"
-                or self.source_recall.value < thresholds.min_source_recall_ratio
-            ):
-                raise ValueError("expansion gates require complete source recall")
-            if (
-                self.source_accuracy.status != "assessed"
-                or self.source_accuracy.value < thresholds.min_source_accuracy_ratio
-            ):
-                raise ValueError("expansion gates require complete source accuracy")
-            if (
-                self.critical_numeric_errors.status != "assessed"
-                or self.critical_numeric_errors.value
-                > thresholds.max_critical_numeric_errors
-            ):
-                raise ValueError("expansion gates require zero critical numeric errors")
         coverage = self.delivery_coverage
         universe = self.live_run.universe
         if (
@@ -243,7 +224,6 @@ def record_source_review_report(
     semantic_findings: Sequence[SemanticFinding] = (),
     fixture_guards: Sequence[FixtureGuardResult] = (),
     freshness: Sequence[FreshnessObservation] = (),
-    occupied_strata_reviewed: int | None = None,
     tokens_used: int | None = None,
     elapsed_seconds: float | None = None,
     human_review_minutes: float | None = None,
@@ -251,33 +231,24 @@ def record_source_review_report(
     """Record independent source review without filling unassessed metrics as 0."""
 
     findings = tuple(semantic_findings)
-    checks = tuple(structural_checks)
-    recall = _source_recall(findings)
-    accuracy = _source_accuracy(findings)
-    critical = _critical_errors(findings)
-    occupied = _count(occupied_strata_reviewed)
-    reviewed = {item.instrument_id for item in findings}
-    thresholds = live_run.plan.expansion_thresholds
-    gates_met = (
-        bool(findings)
-        and len(reviewed) >= thresholds.min_independently_reviewed_reports
-        and occupied.status == "assessed"
-        and occupied.value >= thresholds.min_occupied_strata_reviewed
-        and recall.status == "assessed"
-        and recall.value >= thresholds.min_source_recall_ratio
-        and accuracy.status == "assessed"
-        and accuracy.value >= thresholds.min_source_accuracy_ratio
-        and critical.status == "assessed"
-        and critical.value <= thresholds.max_critical_numeric_errors
+    workload = SourceReviewWorkload(
+        tokens_used=_count(tokens_used),
+        elapsed_seconds=_duration(elapsed_seconds),
+        human_review_minutes=_duration(human_review_minutes),
+    )
+    derived = _derived_metrics(
+        live_run=live_run,
+        findings=findings,
+        workload=workload,
     )
     universe = live_run.universe
     return CompanyProfileSourceReviewReport(
         live_run=live_run,
-        structural_checks=checks,
+        structural_checks=tuple(structural_checks),
         semantic_findings=findings,
         fixture_guards=tuple(fixture_guards),
-        independently_reviewed_reports=len(reviewed),
-        occupied_strata_reviewed=occupied,
+        independently_reviewed_reports=derived["independently_reviewed_reports"],
+        occupied_strata_reviewed=derived["occupied_strata_reviewed"],
         delivery_coverage=DeliveryCoverage(
             universe_total=universe.total,
             selected_for_run=universe.selected_for_run,
@@ -286,16 +257,12 @@ def record_source_review_report(
             missing_asset=universe.missing_asset,
             semantic_status="not_a_source_metric",
         ),
-        source_recall=recall,
-        source_accuracy=accuracy,
-        critical_numeric_errors=critical,
+        source_recall=derived["source_recall"],
+        source_accuracy=derived["source_accuracy"],
+        critical_numeric_errors=derived["critical_numeric_errors"],
         freshness=tuple(freshness),
-        workload=SourceReviewWorkload(
-            tokens_used=_count(tokens_used),
-            elapsed_seconds=_duration(elapsed_seconds),
-            human_review_minutes=_duration(human_review_minutes),
-        ),
-        expansion_gates_met=gates_met,
+        workload=workload,
+        expansion_gates_met=derived["expansion_gates_met"],
         scale_quality_claim_allowed=False,
         zero_recurrence_claimed=False,
     )
@@ -328,6 +295,95 @@ def source_review_schema_manifest() -> dict[str, Any]:
     }
 
 
+def _derived_metrics(
+    *,
+    live_run: CompanyProfileLiveRunReport,
+    findings: Sequence[SemanticFinding],
+    workload: SourceReviewWorkload,
+) -> dict[str, Any]:
+    reviewed = {item.instrument_id for item in findings}
+    recall = _source_recall(findings)
+    accuracy = _source_accuracy(findings)
+    critical = _critical_errors(findings)
+    occupied = _occupied_strata(live_run, findings)
+    return {
+        "independently_reviewed_reports": len(reviewed),
+        "occupied_strata_reviewed": occupied,
+        "source_recall": recall,
+        "source_accuracy": accuracy,
+        "critical_numeric_errors": critical,
+        "expansion_gates_met": _expansion_gates_met(
+            live_run=live_run,
+            findings=findings,
+            reviewed=reviewed,
+            occupied=occupied,
+            recall=recall,
+            accuracy=accuracy,
+            critical=critical,
+            workload=workload,
+        ),
+    }
+
+
+def _occupied_strata(
+    live_run: CompanyProfileLiveRunReport,
+    findings: Sequence[SemanticFinding],
+) -> AssessedCount | UnassessedValue:
+    reviewed = {item.instrument_id for item in findings}
+    if not reviewed:
+        return UnassessedValue()
+    by_id = {
+        item.instrument_id: (item.exchange, item.disclosure_form)
+        for item in live_run.selected_strata
+    }
+    sampled = [instrument_id for instrument_id in reviewed if instrument_id in by_id]
+    if not sampled:
+        return UnassessedValue()
+    return AssessedCount(value=len({by_id[instrument_id] for instrument_id in sampled}))
+
+
+def _covers_required_aspects(findings: Sequence[SemanticFinding]) -> bool:
+    reviewed: dict[str, set[str]] = {}
+    for item in findings:
+        reviewed.setdefault(item.instrument_id, set()).add(item.aspect)
+    return bool(reviewed) and all(
+        aspects >= _REQUIRED_ASPECTS for aspects in reviewed.values()
+    )
+
+
+def _expansion_gates_met(
+    *,
+    live_run: CompanyProfileLiveRunReport,
+    findings: Sequence[SemanticFinding],
+    reviewed: set[str],
+    occupied: AssessedCount | UnassessedValue,
+    recall: AssessedRatio | UnassessedValue,
+    accuracy: AssessedRatio | UnassessedValue,
+    critical: AssessedCount | UnassessedValue,
+    workload: SourceReviewWorkload,
+) -> bool:
+    thresholds = live_run.plan.expansion_thresholds
+    tokens = workload.tokens_used
+    elapsed = workload.elapsed_seconds
+    return (
+        bool(findings)
+        and _covers_required_aspects(findings)
+        and len(reviewed) >= thresholds.min_independently_reviewed_reports
+        and occupied.status == "assessed"
+        and occupied.value >= thresholds.min_occupied_strata_reviewed
+        and recall.status == "assessed"
+        and recall.value >= thresholds.min_source_recall_ratio
+        and accuracy.status == "assessed"
+        and accuracy.value >= thresholds.min_source_accuracy_ratio
+        and critical.status == "assessed"
+        and critical.value <= thresholds.max_critical_numeric_errors
+        and tokens.status == "assessed"
+        and tokens.value <= thresholds.max_tokens
+        and elapsed.status == "assessed"
+        and elapsed.value <= thresholds.max_elapsed_seconds
+    )
+
+
 def _source_recall(
     findings: Sequence[SemanticFinding],
 ) -> AssessedRatio | UnassessedValue:
@@ -345,18 +401,16 @@ def _source_recall(
 def _source_accuracy(
     findings: Sequence[SemanticFinding],
 ) -> AssessedRatio | UnassessedValue:
-    reviewed = tuple(
-        item
-        for item in findings
-        if item.present_in_delivery and item.fact_accurate is not None
-    )
-    if not reviewed:
+    delivered = tuple(item for item in findings if item.present_in_delivery)
+    if not delivered:
         return UnassessedValue()
-    accurate = sum(bool(item.fact_accurate) for item in reviewed)
+    if any(item.fact_accurate is None for item in delivered):
+        return UnassessedValue()
+    accurate = sum(bool(item.fact_accurate) for item in delivered)
     return AssessedRatio(
         numerator=accurate,
-        denominator=len(reviewed),
-        value=accurate / len(reviewed),
+        denominator=len(delivered),
+        value=accurate / len(delivered),
     )
 
 
