@@ -98,7 +98,18 @@ class TaskScheduler:
 
             for job_id, job_config in self.job_configs.items():
                 try:
+                    from research.company_profile.operator_closure import (
+                        is_retired_operator_entry,
+                    )
+
                     # 只调度已启用的任务
+                    if is_retired_operator_entry(job_id):
+                        scheduler_logger.info(
+                            "[Scheduler] Job '%s' is a retired company-profile entry, "
+                            "skipping scheduling.",
+                            job_id,
+                        )
+                        continue
                     if not job_config.enabled:
                         scheduler_logger.info(f"[Scheduler] Job '{job_id}' is disabled, skipping scheduling.")
                         continue
@@ -489,6 +500,11 @@ class TaskScheduler:
         operator_principal: Optional[str] = None,
     ) -> bool:
         """Execute a configured job immediately, including manual-only jobs."""
+        from research.company_profile.operator_closure import (
+            refuse_retired_operator_entry,
+        )
+
+        refuse_retired_operator_entry(job_id)
         try:
             job_config = self.job_config_manager.get_job_config(job_id)
             if job_config is None:

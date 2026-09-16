@@ -41,6 +41,9 @@ RETIRED_OPERATOR_ENTRIES = (
     "business_profile_semantic_repair",
     "company_profile_shadow_sync",
 )
+RETIRED_OPERATOR_ENTRY_MESSAGE = (
+    "is disconnected; use company_profile_common_core"
+)
 CLI_INSTRUCTIONS = (
     "python main.py job --job-id company_profile_common_core --action preview --knowledge-cutoff YYYY-MM-DD",
     "python main.py job --job-id company_profile_common_core --action run --max-items 2",
@@ -161,6 +164,22 @@ class CompanyProfileOperatorClosureReport(_StrictModel):
         if self.operator_instructions != _declared_instructions():
             raise ValueError("operator closure must keep the published operator copy")
         return self
+
+
+def is_retired_operator_entry(job_id: str) -> bool:
+    """Return True when an external job id is a replaced leftover entry."""
+
+    return str(job_id or "").strip() in RETIRED_OPERATOR_ENTRIES
+
+
+def refuse_retired_operator_entry(job_id: str) -> None:
+    """Reject leftover job ids at the CLI/Telegram execution parse layer."""
+
+    normalized = str(job_id or "").strip()
+    if is_retired_operator_entry(normalized):
+        raise ValueError(
+            f"retired operator entry {normalized!r} {RETIRED_OPERATOR_ENTRY_MESSAGE}"
+        )
 
 
 def record_operator_closure_report(

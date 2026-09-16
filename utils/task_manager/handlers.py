@@ -951,6 +951,11 @@ class TaskManagerHandlers:
         """执行任务操作"""
         try:
             if action == "run":
+                from research.company_profile.operator_closure import (
+                    refuse_retired_operator_entry,
+                )
+
+                refuse_retired_operator_entry(job_id)
                 if job_id.startswith("annual_report_asset_"):
                     return await self.task_manager.task_scheduler.execute_job_direct(
                         job_id,
@@ -3351,6 +3356,11 @@ class TaskManagerHandlers:
             runtime_params: 可选，/run key=value 传入的任务参数覆盖项
         """
         try:
+            from research.company_profile.operator_closure import (
+                refuse_retired_operator_entry,
+            )
+
+            refuse_retired_operator_entry(job_id)
             runtime_params = dict(runtime_params or {})
             protected_adapter_keys = {
                 "operator_principal",

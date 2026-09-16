@@ -2,14 +2,14 @@
 
 > 文档类型：requirements（唯一权威产品总需求）
 > 版本：`company_profile_product_contract.2026-09-14`
-> 实施前澄清：2026-09-14，补齐三维任务映射、Gold 判定顺序和商品投影字段；实现任务仍未完成
-> 状态：用户批准重新规划；新增生产能力待实现，不能把文档批准视为上线
+> 实施状态：M1—M3 与 4.1—4.6 已接通；权威入口为 `company_profile_common_core`；生产仍为 `not_authorized`；M4 行业增强与共性缺陷见 `company_profile_operator_closure.v1`
+> 状态：研究发布范围已切换，文档批准或 change 勾选不等于生产上线；DCF、交易和旧 writer 仍未授权
 > 当前实施 change：`deliver-a-share-core-profiles-and-commodity-exposure`
 > 历史阶段 0—5 为研究/实现基线，历史合同与运行只用于回归和复核
 
 ## 0. 文档权威关系
 
-本文件统一全市场目标、核心信息、主体、验收、行业增强、商品暴露和迁移路线。OpenSpec 主规范描述目标合同，不保证功能已上线；当前 change 的未勾选 tasks 是实施缺口的权威清单。行业文档只能细化增强字段，不得重新引入全市场整报否决或不同主体政策。
+本文件统一全市场目标、核心信息、主体、验收、行业增强、商品暴露和迁移路线。OpenSpec 主规范描述目标合同，不保证功能已上线；剩余缺口以 `company_profile_operator_closure.v1` 的 M4 待办为准，不以未勾选 tasks 或旧入口为生产命令。行业文档只能细化增强字段，不得重新引入全市场整报否决或不同主体政策。
 
 旧固定四/八/二十报告、全部六章完成、Gold 全通过、研究样本必须未见过、每家公司人工冻结 Evidence 等规则仅适用于对应已退役的历史试验。不能作为日常生产规则。历史 Gold/原始 bundle 不改写；旧标签冲突在新评测单列，不能用旧 Gold 否决现行主体政策。
 
@@ -17,7 +17,7 @@
 
 ## 1. 当前状态与旧链边界
 
-当前已具备制造/材料 Stage 5 抽取、校验、隔离 bundle 和 accepted 事实导出。全 A 股通用任务、持续续跑、核心骨架评价、新模型商品暴露及生产切换仍待实现。
+当前已具备制造/材料 Stage 5 抽取、校验、隔离 bundle 和 accepted 事实导出。全 A 股通用任务、持续续跑、核心骨架评价、基础商品暴露和研究范围切换已由 `company_profile_common_core` 接通；生产仍为 `not_authorized`。M4 行业增强与共性缺陷待后续迭代。
 
 旧 `business_profile_llm_report.v2` / `business_profile_atomic_extraction.v6` writer 继续冻结。保留正式公告/PDF 获取、版本、原始证据、队列/租约/checkpoint、公共 LLM 池和只读/停止能力。本规划不执行数据 reset，不开启旧 backfill，不把研究 fixture 批量改成 approved。
 
@@ -98,7 +98,7 @@ Activity 描述行动，Measurement 描述单一指标。Measurement 同时绑�
 | `products_services` | overview 的 `business_overview_source`、`explicit_activity`；如披露分部则用 `extract_segment_financials` 的 `segment_dimension` 补充 | 主要产品/服务/业务线在原文中可定位，Activity.object_name 或 Segment.label 可支持 |
 | `revenue_model` | overview 的主营/销售/服务收费等原文；如披露构成则用 segment 的 `operating_revenue` 和对应 Segment | 原文说明如何形成收入，或经营收入记录明确归属；不能用总收入数值或“公司制造X”自动补出变现方式 |
 
-有界 overview scope 可以一次抽取支持多个维度的原文，不为三维重复调用三次。每个维度分别保存 `answered`、`supporting_record_ids`、`evidence_ids`、原文摘录/表格锚点和 `missing_reason`。这些属于 M1 待实现的版本化研究投影；不要求现有 LLM 响应偷偷增加字段。程序必须检验关联证据确实回答该维度，不能因一个 BusinessOverview 存在而自动把三维全标 answered。无标准 action 映射时，已接受的业务原文仍可支持产品/服务维度。
+有界 overview scope 可以一次抽取支持多个维度的原文，不为三维重复调用三次。每个维度分别保存 `answered`、`supporting_record_ids`、`evidence_ids`、原文摘录/表格锚点和 `missing_reason`。这些属于已接通的 `company_profile_common_core_mapping.v1` 版本化研究投影；不要求现有 LLM 响应偷偷增加字段。程序必须检验关联证据确实回答该维度，不能因一个 BusinessOverview 存在而自动把三维全标 answered。无标准 action 映射时，已接受的业务原文仍可支持产品/服务维度。
 
 ## 10. 确定性解析与 LLM 分工
 
@@ -160,7 +160,7 @@ A 股通用基础包自动适用于全部行业。制造/材料、资源、能�
 
 独立行业文档定义指标、模板、触发、单位、正反例与小型验证；这是增强范围的验收，不是全行业基础采集前置审批。固定 Gold 只用于其版本回归；运行中发现新形态形成共性修复，不做无限公司专项补丁。
 
-当前：通用模型已实现但跨行业基础任务待接入；制造/材料研究基线已形成；其他增强待实现/验收。不能把文档登记或八报告 CSV 导出等同全市场能力。
+当前：跨行业通用基础任务已接入；制造/材料研究基线已形成但未授权生产增强；其他行业增强属 M4。不能把文档登记或八报告 CSV 导出等同全市场生产上线。
 
 ## 19. 单一执行链与任务
 
@@ -168,7 +168,7 @@ A 股通用基础包自动适用于全部行业。制造/材料、资源、能�
 
 复用现有队列、租约、checkpoint、源资产和 gateway；禁止并行新旧 writer 写同一事实空间。幂等键覆盖证券、报告版本、输入范围和处理政策身份；规则升级只重做受影响任务，不一键重跑所有公司。
 
-提供预览、运行、状态、暂停、继续，入口名在接通并测试后发布；旧 backfill 名称不能默认为已接 Stage 5。按时间/调用预算工作，默认结果复用；不要求指定公司、不要求凑齐50家。完成 scope 即保存，失败续跑不重复已经完成的 scope。
+已发布入口 `company_profile_common_core`（preview、run、status、pause、resume、query、export）；旧 backfill / daily incremental / semantic repair / shadow_sync 名称在 CLI 与 Telegram 执行解析层被拒绝，不能当作已接 Stage 5。按时间/调用预算工作，默认结果复用；不要求指定公司、不要求凑齐50家。完成 scope 即保存，失败续跑不重复已经完成的 scope。
 
 ## 20. 基础商品暴露与有限价值链角色
 

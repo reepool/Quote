@@ -1,8 +1,11 @@
 from __future__ import annotations
 
+import asyncio
 import inspect
 import json
 from pathlib import Path
+from types import SimpleNamespace
+from unittest.mock import AsyncMock
 
 import pytest
 from pydantic import ValidationError
@@ -23,6 +26,7 @@ from research.company_profile.operator_closure import (
     CompanyProfileOperatorClosureReport,
     operator_closure_schema_manifest,
     record_operator_closure_report,
+    refuse_retired_operator_entry,
 )
 from research.company_profile.publication import record_publication_control
 from research.company_profile.runtime import COMMON_CORE_WRITER_NAME
@@ -145,3 +149,58 @@ def test_scheduler_copy_closes_leftover_entries():
     description = jobs["company_profile_common_core"]["description"]
     for action in PUBLISHED_ACTIONS:
         assert action in description
+
+
+def test_external_parse_layer_refuses_retired_job_ids_before_handlers():
+    from scheduler.scheduler import TaskScheduler
+    from scheduler.tasks import ScheduledTasks
+    from utils.task_manager.handlers import TaskManagerHandlers
+
+    looked_up: list[str] = []
+    scheduler = SimpleNamespace(
+        job_config_manager=SimpleNamespace(
+            get_job_config=lambda job_id: looked_up.append(job_id)
+        )
+    )
+    scheduler_cls = TaskScheduler.__closure__[0].cell_contents
+    execute = AsyncMock(return_value=True)
+    handler = TaskManagerHandlers(
+        SimpleNamespace(
+            logger=SimpleNamespace(
+                info=lambda *args, **kwargs: None,
+                error=lambda *args, **kwargs: None,
+            ),
+            task_scheduler=SimpleNamespace(
+                execute_job_direct=execute,
+                jobs={},
+            ),
+        )
+    )
+
+    for job_id in RETIRED_OPERATOR_ENTRIES:
+        with pytest.raises(ValueError, match="disconnected"):
+            refuse_retired_operator_entry(job_id)
+        with pytest.raises(ValueError, match="disconnected"):
+            asyncio.run(scheduler_cls.execute_job_direct(scheduler, job_id))
+        assert asyncio.run(handler._execute_task_direct(chat_id=1, job_id=job_id)) is False
+        assert getattr(ScheduledTasks, job_id) is not None
+
+    refuse_retired_operator_entry(PUBLISHED_TASK_NAME)
+    assert looked_up == []
+    execute.assert_not_awaited()
+
+
+def test_authoritative_requirements_match_connected_operator_entry():
+    requirements = Path(
+        "docs/development/company_profile_product_and_industry_semantic_requirements.md"
+    ).read_text(encoding="utf-8")
+    index = Path("docs/README.md").read_text(encoding="utf-8")
+
+    assert "实现任务仍未完成" not in requirements
+    assert "新增生产能力待实现" not in requirements
+    assert "生产切换仍待实现" not in requirements
+    assert "跨行业基础任务待接入" not in requirements
+    assert "入口名在接通并测试后发布" not in requirements
+    assert "未勾选 tasks 是实施缺口的权威清单" not in requirements
+    assert "company_profile_common_core" in requirements
+    assert "4.1—4.6" in index

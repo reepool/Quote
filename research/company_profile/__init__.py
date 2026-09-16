@@ -130,9 +130,11 @@ from .models import (
 from .operator_closure import (
     OPERATOR_CLOSURE_SCHEMA_VERSION,
     CompanyProfileOperatorClosureReport,
+    is_retired_operator_entry,
     operator_closure_schema_manifest,
     persist_operator_closure_report,
     record_operator_closure_report,
+    refuse_retired_operator_entry,
 )
 from .projection import CompanyProfileResearchView, project_research_view
 from .publication import (
@@ -341,6 +343,7 @@ __all__ = [
     "core_evidence_schema_manifest",
     "derive_commodity_role",
     "form_core_skeleton",
+    "is_retired_operator_entry",
     "legacy_retirement_schema_manifest",
     "live_plan_schema_manifest",
     "live_run_schema_manifest",
@@ -367,6 +370,7 @@ __all__ = [
     "record_operator_closure_report",
     "record_publication_control",
     "record_source_review_report",
+    "refuse_retired_operator_entry",
     "resolved_core_field_ids",
     "select_activated_chapters",
     "select_core_evidence",
