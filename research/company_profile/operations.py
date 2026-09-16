@@ -953,4 +953,3 @@ def apply_published_publication(
         )
         payload["control"] = task_control.read()
     return payload
-
