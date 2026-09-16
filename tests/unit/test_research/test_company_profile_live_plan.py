@@ -34,6 +34,31 @@ def _plan_payload() -> dict:
     return json.loads(record_company_profile_live_plan().model_dump_json())
 
 
+def _report(*, asset_id: str) -> dict[str, object]:
+    return {
+        "asset_id": asset_id,
+        "fiscal_year": 2025,
+        "report_period": "2025-12-31",
+        "availability": "available",
+        "decision_state": "accepted",
+    }
+
+
+def _reviewable(
+    instrument_id: str,
+    exchange: str,
+    **extra: object,
+) -> dict[str, object]:
+    payload: dict[str, object] = {
+        "instrument_id": instrument_id,
+        "exchange": exchange,
+        "asset_status": "available",
+        "latest_effective_annual_report": _report(asset_id=instrument_id),
+    }
+    payload.update(extra)
+    return payload
+
+
 def test_record_live_plan_reuses_operator_budget_and_does_not_require_fifty():
     plan = record_company_profile_live_plan()
 
@@ -85,6 +110,8 @@ def test_sampling_rule_is_executable_and_not_used_to_fit_thresholds():
     assert sampling.stratum_priority[1] == ("SZSE", "manufacturing")
     assert sampling.per_stratum_first_draw == 1
     assert sampling.max_sample_size == plan.budget.max_companies_this_round == 2
+    assert sampling.review_eligible_asset_status == "available"
+    assert sampling.review_requires_latest_effective_annual_report is True
     assert sampling.excludes_from_universe is False
     assert sampling.used_to_fit_thresholds is False
 
@@ -93,26 +120,10 @@ def test_select_stratified_sample_follows_priority_and_instrument_id():
     plan = record_company_profile_live_plan()
     selected = select_stratified_review_sample(
         (
-            {
-                "instrument_id": "000001.SZ",
-                "exchange": "SZSE",
-                "sw_l1_name": "银行",
-            },
-            {
-                "instrument_id": "600000.SH",
-                "exchange": "SSE",
-                "sw_l1_name": "银行",
-            },
-            {
-                "instrument_id": "000878.SZ",
-                "exchange": "SZSE",
-                "sw_l1_name": "有色金属",
-            },
-            {
-                "instrument_id": "601398.SH",
-                "exchange": "SSE",
-                "classification_status": "missing",
-            },
+            _reviewable("000001.SZ", "SZSE", sw_l1_name="银行"),
+            _reviewable("600000.SH", "SSE", sw_l1_name="银行"),
+            _reviewable("000878.SZ", "SZSE", sw_l1_name="有色金属"),
+            _reviewable("601398.SH", "SSE", classification_status="missing"),
         ),
         rule=plan.sampling,
     )
@@ -129,21 +140,66 @@ def test_empty_stratum_is_skipped_and_missing_classification_stays_drawable():
     plan = record_company_profile_live_plan()
     selected = select_stratified_review_sample(
         (
-            {
-                "instrument_id": "601398.SH",
-                "exchange": "SSE",
-                "classification_status": "missing",
-            },
-            {
-                "instrument_id": "600036.SH",
-                "exchange": "SSE",
-                "sw_l1_name": "银行",
-            },
+            _reviewable("601398.SH", "SSE", classification_status="missing"),
+            _reviewable("600036.SH", "SSE", sw_l1_name="银行"),
         ),
         rule=plan.sampling,
     )
 
     assert selected == ("600036.SH", "601398.SH")
+
+
+def test_missing_official_report_stays_in_universe_but_not_review_sample():
+    plan = record_company_profile_live_plan()
+    selected = select_stratified_review_sample(
+        (
+            {
+                "instrument_id": "000878.SZ",
+                "exchange": "SZSE",
+                "sw_l1_name": "有色金属",
+                "asset_status": "confirmed_missing",
+                "latest_effective_annual_report": None,
+            },
+            {
+                "instrument_id": "000001.SZ",
+                "exchange": "SZSE",
+                "sw_l1_name": "银行",
+                "asset_status": "available",
+                "latest_effective_annual_report": None,
+            },
+            _reviewable("600000.SH", "SSE", sw_l1_name="银行"),
+            _reviewable("600036.SH", "SSE", sw_l1_name="银行"),
+        ),
+        rule=plan.sampling,
+    )
+
+    assert selected == ("600000.SH", "600036.SH")
+    assert "000878.SZ" not in selected
+    assert "000001.SZ" not in selected
+    assert plan.universe_denominator.includes_missing_assets is True
+
+
+def test_caller_disclosure_form_cannot_bypass_closed_shenwan_map():
+    assert (
+        assign_disclosure_form(
+            {
+                "sw_l1_name": "银行",
+                "disclosure_form": "manufacturing",
+            }
+        )
+        == "finance"
+    )
+    assert assign_disclosure_form({"disclosure_form": "manufacturing"}) == "other"
+    assert (
+        assign_disclosure_form(
+            {
+                "classification_status": "missing",
+                "disclosure_form": "finance",
+                "sw_l1_name": "银行",
+            }
+        )
+        == "other"
+    )
 
 
 def test_universe_denominator_keeps_missing_assets_and_classification():
@@ -313,6 +369,15 @@ def test_schema_rejects_plans_that_contradict_registered_denominators():
                 "includes_missing_classification": True,
             }
         )
+
+    payload = _plan_payload()
+    payload["sampling"]["review_eligible_asset_status"] = "confirmed_missing"
+    with pytest.raises(ValidationError):
+        CompanyProfileLivePlan.model_validate_json(json.dumps(payload))
+    payload = _plan_payload()
+    payload["sampling"]["review_requires_latest_effective_annual_report"] = False
+    with pytest.raises(ValidationError):
+        CompanyProfileLivePlan.model_validate_json(json.dumps(payload))
 
 
 def test_schema_rejects_budget_and_threshold_mismatch():

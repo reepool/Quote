@@ -112,16 +112,37 @@ def _classification_status_of(candidate: Any) -> str | None:
     return str(status) if status is not None else None
 
 
-def assign_disclosure_form(candidate: Any) -> str:
-    """Map a candidate onto a predeclared disclosure-form stratum."""
-
+def _asset_status_of(candidate: Any) -> str | None:
     if isinstance(candidate, Mapping):
-        explicit = candidate.get("disclosure_form")
-        if explicit in _DISCLOSURE_FORMS:
-            return str(explicit)
-    explicit = getattr(candidate, "disclosure_form", None)
-    if explicit in _DISCLOSURE_FORMS:
-        return str(explicit)
+        status = candidate.get("asset_status")
+        return str(status) if status is not None else None
+    status = getattr(candidate, "asset_status", None)
+    return str(status) if status is not None else None
+
+
+def _latest_effective_annual_report_of(candidate: Any) -> Any:
+    if isinstance(candidate, Mapping):
+        return candidate.get("latest_effective_annual_report")
+    return getattr(candidate, "latest_effective_annual_report", None)
+
+
+def _has_effective_annual_report(candidate: Any) -> bool:
+    report = _latest_effective_annual_report_of(candidate)
+    if report is None:
+        return False
+    if isinstance(report, Mapping):
+        return bool(report.get("asset_id") or report.get("report_period"))
+    return bool(getattr(report, "asset_id", None) or getattr(report, "report_period", None))
+
+
+def assign_disclosure_form(candidate: Any) -> str:
+    """Map a candidate onto a predeclared disclosure-form stratum.
+
+    Form comes only from the closed Shenwan L1 table. Caller-supplied
+    ``disclosure_form`` is ignored. Missing or unlisted classification is
+    ``other``.
+    """
+
     if _classification_status_of(candidate) == "missing":
         return "other"
     name = _sw_l1_name_of(candidate)
@@ -162,6 +183,8 @@ class StratifiedSamplingRule(_StrictModel):
     stratum_priority: tuple[tuple[str, str], ...]
     per_stratum_first_draw: Literal[1]
     max_sample_size: int = Field(ge=1)
+    review_eligible_asset_status: Literal["available"]
+    review_requires_latest_effective_annual_report: Literal[True]
     excludes_from_universe: Literal[False]
     used_to_fit_thresholds: Literal[False]
 
@@ -187,6 +210,10 @@ class StratifiedSamplingRule(_StrictModel):
             raise ValueError("sampling cannot be used to fit thresholds")
         if self.excludes_from_universe:
             raise ValueError("sampling cannot exclude names from the universe")
+        if self.review_eligible_asset_status != "available":
+            raise ValueError("review sample can only draw available official reports")
+        if not self.review_requires_latest_effective_annual_report:
+            raise ValueError("review sample requires a latest effective annual report")
         return self
 
 
@@ -307,6 +334,8 @@ def _sampling_rule(*, max_sample_size: int) -> StratifiedSamplingRule:
         stratum_priority=_STRATUM_PRIORITY,
         per_stratum_first_draw=1,
         max_sample_size=max_sample_size,
+        review_eligible_asset_status="available",
+        review_requires_latest_effective_annual_report=True,
         excludes_from_universe=False,
         used_to_fit_thresholds=False,
     )
@@ -389,7 +418,10 @@ def select_stratified_review_sample(
     *,
     rule: StratifiedSamplingRule,
 ) -> tuple[str, ...]:
-    """Pick instrument IDs with the predeclared rule. Ignores model output."""
+    """Pick instrument IDs with the predeclared rule.
+
+    Missing-asset names stay out of the review sample. Model output is ignored.
+    """
 
     buckets: dict[tuple[str, str], list[str]] = {
         stratum: [] for stratum in rule.stratum_priority
@@ -398,6 +430,13 @@ def select_stratified_review_sample(
         instrument_id = _instrument_id_of(candidate)
         exchange = _exchange_of(candidate)
         if not instrument_id or exchange not in rule.exchange_strata:
+            continue
+        if _asset_status_of(candidate) != rule.review_eligible_asset_status:
+            continue
+        if (
+            rule.review_requires_latest_effective_annual_report
+            and not _has_effective_annual_report(candidate)
+        ):
             continue
         form = assign_disclosure_form(candidate)
         buckets[(exchange, form)].append(instrument_id)
