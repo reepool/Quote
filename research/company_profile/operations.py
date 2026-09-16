@@ -44,6 +44,12 @@ from research.company_profile.live_run import (
     select_live_run_targets,
 )
 from research.company_profile.models import PRODUCTION_AUTHORIZATION
+from research.company_profile.publication import (
+    load_publication_control,
+    persist_publication_control,
+    publication_allows_new_writes,
+    record_publication_control,
+)
 from research.company_profile.reads import CompanyProfileReadService
 from research.company_profile.runtime import (
     COMMON_CORE_STORAGE_NAMESPACE,
@@ -433,6 +439,8 @@ class CompanyProfileTaskService:
             )
         registry = candidate_registry or self.candidate_registry
         plan = live_plan or self.live_plan
+        if normalized in {"run", "resume"}:
+            self._ensure_publication_allows_writes()
         if normalized == "run" and registry is not None:
             return await self._run_live(
                 knowledge_cutoff=cutoff,
@@ -756,6 +764,22 @@ class CompanyProfileTaskService:
             human_review_minutes=human_review_minutes,
         )
 
+    def apply_publication(self, action: str) -> dict[str, Any]:
+        """Switch the new-contract research publication scope."""
+
+        return apply_published_publication(
+            action=action,
+            checkpoint_root=self.checkpoint_root,
+        )
+
+    def _ensure_publication_allows_writes(self) -> None:
+        control = load_publication_control(self.checkpoint_root)
+        if not publication_allows_new_writes(control):
+            state = control.state if control is not None else "unknown"
+            raise ValueError(
+                f"research publication is {state}; new official writes are stopped"
+            )
+
     def _payload(self, *, action: str, state: str, **extra: Any) -> dict[str, Any]:
         payload = {
             "action": action,
@@ -767,6 +791,9 @@ class CompanyProfileTaskService:
             "storage_namespace": COMMON_CORE_STORAGE_NAMESPACE,
             "writer": COMMON_CORE_WRITER_NAME,
         }
+        publication = load_publication_control(self.checkpoint_root)
+        if publication is not None:
+            payload["publication"] = publication.model_dump(mode="json")
         payload.update(extra)
         return payload
 
@@ -807,6 +834,14 @@ async def execute_published_task(
 ) -> dict[str, Any]:
     """Unique owner entry for the published company-profile task operations."""
 
+    normalized = str(action or "").strip().lower()
+    if normalized in {"run", "resume"}:
+        publication = load_publication_control(checkpoint_root)
+        if not publication_allows_new_writes(publication):
+            state = publication.state if publication is not None else "unknown"
+            raise ValueError(
+                f"research publication is {state}; new official writes are stopped"
+            )
     access = shared_asset_access or _resolve_shared_asset_access(storage)
     registry = candidate_registry
     if str(action or "").strip().lower() == "run" and registry is None:
@@ -885,3 +920,37 @@ def record_published_source_review(
         )
         payload["control"] = control.read()
     return payload
+
+
+def apply_published_publication(
+    *,
+    action: str,
+    checkpoint_root: str | Path = DEFAULT_CHECKPOINT_ROOT,
+) -> dict[str, Any]:
+    """Unique owner entry for the new-contract research publication switch."""
+
+    current = load_publication_control(checkpoint_root)
+    publication = record_publication_control(action, current)
+    path = persist_publication_control(publication, checkpoint_root)
+    task_control = CompanyProfileTaskControl(checkpoint_root)
+    payload = {
+        "action": "publication",
+        "state": publication.state,
+        "publication": publication.model_dump(mode="json"),
+        "publication_path": str(path),
+        "production_authorization": PRODUCTION_AUTHORIZATION,
+        "storage_namespace": COMMON_CORE_STORAGE_NAMESPACE,
+        "writer": COMMON_CORE_WRITER_NAME,
+        "legacy_writer_enabled": False,
+    }
+    if task_control.path.exists():
+        snapshot = task_control.read()
+        latest = dict(snapshot.get("latest_result") or {})
+        latest["publication"] = payload["publication"]
+        task_control.finish(
+            state=str(snapshot.get("state") or publication.state),
+            result=latest,
+        )
+        payload["control"] = task_control.read()
+    return payload
+

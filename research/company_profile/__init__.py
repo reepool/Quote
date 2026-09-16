@@ -121,6 +121,13 @@ from .models import (
     semantic_record_json_schema,
 )
 from .projection import CompanyProfileResearchView, project_research_view
+from .publication import (
+    PUBLICATION_SCHEMA_VERSION,
+    CompanyProfilePublicationControl,
+    persist_publication_control,
+    publication_schema_manifest,
+    record_publication_control,
+)
 from .runtime import (
     COMMON_CORE_STORAGE_NAMESPACE,
     COMMON_CORE_WRITER_NAME,
@@ -198,6 +205,7 @@ __all__ = [
     "LIVE_PLAN_SCHEMA_VERSION",
     "LIVE_RUN_SCHEMA_VERSION",
     "PRODUCTION_AUTHORIZATION",
+    "PUBLICATION_SCHEMA_VERSION",
     "SOURCE_REVIEW_SCHEMA_VERSION",
     "STAGE55_ADJUDICATION_SCHEMA",
     "STAGE55_BASELINE_RUN_ID",
@@ -219,6 +227,7 @@ __all__ = [
     "CompanyProfileCoreAssessment",
     "CompanyProfileLivePlan",
     "CompanyProfileLiveRunReport",
+    "CompanyProfilePublicationControl",
     "CompanyProfileResearchView",
     "CompanyProfileResearchWriter",
     "CompanyProfileSemanticService",
@@ -324,12 +333,15 @@ __all__ = [
     "load_stage55_adjudication_ledger",
     "overview_dimension_hits",
     "persist_live_run_report",
+    "persist_publication_control",
     "persist_source_review_report",
     "project_commodity_exposures",
     "project_core_assessment",
     "project_research_view",
+    "publication_schema_manifest",
     "record_company_profile_live_plan",
     "record_live_run_report",
+    "record_publication_control",
     "record_source_review_report",
     "resolved_core_field_ids",
     "select_activated_chapters",
