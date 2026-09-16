@@ -7,7 +7,15 @@ import json
 import pytest
 from pydantic import ValidationError
 
-from research.company_profile.candidate_registry import build_a_share_candidate_registry
+from research.business_profile_async_production import BusinessProfileWorkRepository
+from research.business_profile_production_operations import (
+    BusinessProfileAnnouncementFrontierRepository,
+)
+from research.company_profile.candidate_registry import (
+    build_a_share_candidate_registry,
+    load_official_task_candidate_registry,
+)
+from research.company_profile.execution import default_processing_identity
 from research.company_profile.live_plan import record_company_profile_live_plan
 from research.company_profile.live_run import (
     LIVE_RUN_SCHEMA_VERSION,
@@ -17,8 +25,12 @@ from research.company_profile.live_run import (
     select_live_run_targets,
 )
 from research.company_profile.models import PRODUCTION_AUTHORIZATION
+from research.company_profile.operations import execute_published_task
 from research.company_profile.runtime import COMMON_CORE_STORAGE_NAMESPACE
 from tests.unit.test_research.test_business_profile_exposure_components import _storage
+from tests.unit.test_research.test_business_profile_production_operations import (
+    _announcement,
+)
 from tests.unit.test_research.test_company_profile_operations import (
     _second_frontier,
     _service,
@@ -187,6 +199,249 @@ def test_budget_limited_live_run_saves_one_company_without_batch_rerun(tmp_path)
     assert provider.extract_calls == 1
     assert second["live_run"]["whole_batch_rerun"] is False
     assert second["enqueue"]["inserted"] == 0
+    control = json.loads(
+        (tmp_path / "checkpoints" / "control" / "task_control.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    report_path = (
+        tmp_path / "checkpoints" / "reports" / f"{LIVE_RUN_SCHEMA_VERSION}.json"
+    )
+    assert control["latest_result"]["live_run"]["schema_version"] == (
+        LIVE_RUN_SCHEMA_VERSION
+    )
+    assert first["control"]["latest_result"]["live_run"]["selected_instrument_ids"] == [
+        "600000.SH",
+        "600036.SH",
+    ]
+    assert report_path.is_file()
+    assert json.loads(report_path.read_text(encoding="utf-8"))[
+        "schema_version"
+    ] == LIVE_RUN_SCHEMA_VERSION
+
+
+def test_published_run_loads_official_registry_without_caller_injection(
+    tmp_path, monkeypatch
+):
+    storage = _storage(tmp_path)
+    _second_frontier(storage)
+    registry = _registry()
+    loaded = []
+
+    def fake_load(**kwargs):
+        loaded.append(kwargs)
+        return registry
+
+    monkeypatch.setattr(
+        "research.company_profile.operations.load_official_task_candidate_registry",
+        fake_load,
+    )
+    provider = _RequestBoundOverviewProvider()
+    good_report = _report(instrument_id="600000.SH", report_id="asset-live-entry")
+
+    def load_pages(item):
+        if item["instrument_id"] != "600000.SH":
+            return None
+        return {
+            "report": good_report,
+            "pages": (_overview_page(SERVICE_OVERVIEW),),
+        }
+
+    result = asyncio.run(
+        execute_published_task(
+            action="run",
+            storage=storage,
+            output_root=tmp_path / "output",
+            checkpoint_root=tmp_path / "checkpoints",
+            page_source=load_pages,
+            provider=provider,
+            knowledge_cutoff="2026-08-30",
+            shared_asset_access=object(),
+        )
+    )
+    source = inspect.getsource(execute_published_task)
+
+    assert loaded
+    assert loaded[0]["as_of"] == "2026-08-30"
+    assert "load_official_task_candidate_registry" in source
+    assert result["live_run"]["selected_instrument_ids"] == [
+        "600000.SH",
+        "600036.SH",
+    ]
+    assert result["control"]["latest_result"]["live_run"]["universe"]["total"] == 3
+    assert (
+        tmp_path / "checkpoints" / "reports" / f"{LIVE_RUN_SCHEMA_VERSION}.json"
+    ).is_file()
+
+
+def test_official_registry_loader_uses_existing_universe_and_report_ports():
+    class _Universe:
+        def get_latest_full_market_universe_snapshot(self):
+            return {
+                "snapshot_id": "snap-live",
+                "policy_version": "a_share_active.v1",
+                "snapshot_at": "2026-08-30T00:00:00+00:00",
+                "instrument_rows": {
+                    "items": [
+                        {
+                            "instrument_id": "600000.SH",
+                            "exchange": "SSE",
+                            "name": "浦发银行",
+                        }
+                    ]
+                },
+            }
+
+        def get_latest_complete_universe_snapshot(self):
+            raise AssertionError("full-market snapshot already present")
+
+        def list_asset_coverage(self, universe_snapshot_id: str):
+            assert universe_snapshot_id == "snap-live"
+            return [{"instrument_id": "600000.SH", "status": "available"}]
+
+    class _Access:
+        repository = _Universe()
+
+        def get_effective_asset(self, instrument_id: str, **kwargs):
+            assert instrument_id == "600000.SH"
+            return {
+                "asset_id": "asset-600000-2025",
+                "fiscal_year": 2025,
+                "report_period": "2025-12-31",
+                "availability": "local_valid",
+                "decision_state": "effective",
+                "published_at": "2026-03-20T00:00:00+08:00",
+            }
+
+    class _Storage:
+        def get_industry_membership_as_of(self, instrument_id: str, as_of: str):
+            assert instrument_id == "600000.SH"
+            assert as_of == "2026-08-30"
+            return {"sw_l1_name": "银行", "taxonomy_system": "sw"}
+
+    registry = load_official_task_candidate_registry(
+        as_of="2026-08-30",
+        storage=_Storage(),
+        shared_asset_access=_Access(),
+    )
+    assert registry.counts["total"] == 1
+    assert registry.candidate("600000.SH").latest_effective_annual_report is not None
+    with pytest.raises(ValueError, match="announcement asset access"):
+        load_official_task_candidate_registry(
+            as_of="2026-08-30",
+            storage=_Storage(),
+            shared_asset_access=None,
+        )
+
+
+def test_live_run_does_not_drain_preexisting_queue_work(tmp_path):
+    storage = _storage(tmp_path)
+    _second_frontier(storage)
+    leftover = {
+        "instrument_id": "601000.SH",
+        "symbol": "601000",
+        "exchange": "SSE",
+    }
+    BusinessProfileAnnouncementFrontierRepository(storage).upsert_record(
+        instrument=leftover,
+        record=_announcement(
+            "annual-2025-601000",
+            "排队公司2025年年度报告",
+            published_at="2026-03-22T08:00:00+08:00",
+        ),
+    )
+    leftover_queue = BusinessProfileWorkRepository(
+        storage, checkpoint_root=tmp_path / "checkpoints"
+    )
+    leftover_enqueue = leftover_queue.enqueue_latest_annual(
+        knowledge_cutoff="2026-08-30",
+        processing_identity=default_processing_identity(),
+        instrument_ids=("601000.SH",),
+    )
+    processed: list[str] = []
+    provider = _RequestBoundOverviewProvider()
+
+    def load_pages(item):
+        processed.append(item["instrument_id"])
+        if item["instrument_id"] == "601000.SH":
+            return {
+                "report": _report(
+                    instrument_id="601000.SH", report_id="asset-live-leftover"
+                ),
+                "pages": (_overview_page(SERVICE_OVERVIEW),),
+            }
+        if item["instrument_id"] != "600000.SH":
+            return None
+        return {
+            "report": _report(
+                instrument_id="600000.SH", report_id="asset-live-selected"
+            ),
+            "pages": (_overview_page(SERVICE_OVERVIEW),),
+        }
+
+    service = _service(
+        tmp_path,
+        storage,
+        provider=provider,
+        page_source=load_pages,
+        candidate_registry=_registry(),
+        live_plan=record_company_profile_live_plan(),
+    )
+    result = asyncio.run(service.execute("run", knowledge_cutoff="2026-08-30"))
+    leftover_item = leftover_queue.get(leftover_enqueue["work_ids"][0])
+
+    assert leftover_enqueue["inserted"] == 1
+    assert leftover_item["status"] == "pending"
+    assert "601000.SH" not in processed
+    assert "601000.SH" not in result["live_run"]["selected_instrument_ids"]
+    assert result["live_run"]["selected_instrument_ids"] == [
+        "600000.SH",
+        "600036.SH",
+    ]
+    assert result["live_run"]["universe"]["completed"] == 1
+    assert provider.extract_calls == 1
+
+
+def test_live_run_outcomes_ignore_historical_profiles_and_parser_crashes(tmp_path):
+    storage = _storage(tmp_path)
+    _second_frontier(storage)
+    output = tmp_path / "output" / COMMON_CORE_STORAGE_NAMESPACE
+    output.mkdir(parents=True, exist_ok=True)
+    (output / "old-600036.json").write_text(
+        json.dumps({"report": {"instrument_id": "600036.SH"}}),
+        encoding="utf-8",
+    )
+    provider = _RequestBoundOverviewProvider()
+
+    def load_pages(item):
+        if item["instrument_id"] == "600000.SH":
+            return {
+                "report": _report(
+                    instrument_id="600000.SH", report_id="asset-live-crash"
+                ),
+                "pages": (_overview_page(SERVICE_OVERVIEW),),
+            }
+        raise RuntimeError("pdf parser crashed")
+
+    service = _service(
+        tmp_path,
+        storage,
+        provider=provider,
+        page_source=load_pages,
+        candidate_registry=_registry(),
+        live_plan=record_company_profile_live_plan(),
+    )
+    result = asyncio.run(service.execute("run", knowledge_cutoff="2026-08-30"))
+    outcomes = {
+        item["instrument_id"]: item for item in result["live_run"]["company_outcomes"]
+    }
+
+    assert result["live_run"]["universe"]["completed"] == 1
+    assert result["live_run"]["universe"]["failed"] == 1
+    assert outcomes["600000.SH"]["delivered"] is True
+    assert outcomes["600036.SH"]["outcome"] == "failed"
+    assert outcomes["600036.SH"]["delivered"] is False
+    assert outcomes["600036.SH"]["supplement_incomplete"] is False
 
 
 def test_live_run_module_has_no_llm_or_legacy_writer_entry():

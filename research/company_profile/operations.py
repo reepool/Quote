@@ -24,7 +24,10 @@ from research.business_profile_async_production import (
     ensure_business_profile_storage_ready,
     get_business_profile_write_coordinator,
 )
-from research.company_profile.candidate_registry import AShareCandidateRegistry
+from research.company_profile.candidate_registry import (
+    AShareCandidateRegistry,
+    load_official_task_candidate_registry,
+)
 from research.company_profile.contracts import SemanticProvider
 from research.company_profile.execution import (
     DEFAULT_TOTAL_TOKEN_BUDGET,
@@ -35,6 +38,7 @@ from research.company_profile.live_plan import (
     record_company_profile_live_plan,
 )
 from research.company_profile.live_run import (
+    persist_live_run_report,
     record_live_run_report,
     select_live_run_targets,
 )
@@ -505,29 +509,35 @@ class CompanyProfileTaskService:
             plan,
             instrument_ids=instrument_ids,
         )
-        result = await self._run(
+
+        def attach_live_run(
+            result: dict[str, Any],
+            enqueue_result: Mapping[str, Any],
+        ) -> None:
+            delivered, incomplete = self._this_round_live_outcomes(
+                selected,
+                tuple(enqueue_result.get("work_ids") or ()),
+            )
+            report = record_live_run_report(
+                plan=plan,
+                registry=registry,
+                selected_instrument_ids=selected,
+                delivered_instrument_ids=delivered,
+                knowledge_cutoff=knowledge_cutoff,
+                incomplete_supplement_ids=incomplete,
+            )
+            persist_live_run_report(report, self.checkpoint_root)
+            result["live_run"] = report.model_dump(mode="json")
+
+        return await self._run(
             knowledge_cutoff=knowledge_cutoff,
             instrument_ids=selected,
             max_items=plan.budget.max_companies_this_round,
             max_elapsed_seconds=plan.budget.max_elapsed_seconds,
             enqueue=True,
+            limit_drain_to_enqueued=True,
+            attach_result=attach_live_run,
         )
-        delivered = _delivered_instrument_ids(self.writer.output_root)
-        incomplete = tuple(
-            instrument_id
-            for instrument_id in selected
-            if instrument_id not in delivered
-        )
-        report = record_live_run_report(
-            plan=plan,
-            registry=registry,
-            selected_instrument_ids=selected,
-            delivered_instrument_ids=sorted(delivered),
-            knowledge_cutoff=knowledge_cutoff,
-            incomplete_supplement_ids=incomplete,
-        )
-        result["live_run"] = report.model_dump(mode="json")
-        return result
 
     async def _run(
         self,
@@ -537,6 +547,9 @@ class CompanyProfileTaskService:
         max_items: int,
         max_elapsed_seconds: float,
         enqueue: bool,
+        limit_drain_to_enqueued: bool = False,
+        attach_result: Callable[[dict[str, Any], Mapping[str, Any]], None]
+        | None = None,
     ) -> dict[str, Any]:
         action = "run" if enqueue else "resume"
         run_id = f"{PUBLISHED_TASK_NAME}-{uuid.uuid4().hex[:12]}"
@@ -567,6 +580,11 @@ class CompanyProfileTaskService:
         )
         drain: dict[str, Any] = {}
         stopped = False
+        include_work_ids = (
+            tuple(str(item) for item in enqueue_result.get("work_ids") or ())
+            if limit_drain_to_enqueued
+            else None
+        )
         try:
             for stage in WORK_STAGES:
                 if self.control.stop_requested():
@@ -576,6 +594,7 @@ class CompanyProfileTaskService:
                     stage,
                     budget,
                     processing_identity_hash=self.processing_identity_hash,
+                    include_work_ids=include_work_ids,
                     should_stop=self.control.stop_requested,
                 )
                 if drain[stage].get("stop_requested") or drain[stage].get(
@@ -592,6 +611,8 @@ class CompanyProfileTaskService:
                 enqueue=enqueue_result,
                 drain=drain,
             )
+            if attach_result is not None:
+                attach_result(failed, enqueue_result)
             self.control.finish(state="failed", result=failed)
             raise
         health = self._queue_health()
@@ -610,7 +631,10 @@ class CompanyProfileTaskService:
             drain=drain,
             queue=health,
         )
+        if attach_result is not None:
+            attach_result(result, enqueue_result)
         self.control.finish(state=state, result=result)
+        result["control"] = self.control.read()
         return result
 
     def _delivery_state(
@@ -663,6 +687,34 @@ class CompanyProfileTaskService:
             processing_identity_hash=self.processing_identity_hash
         )
 
+    def _this_round_live_outcomes(
+        self,
+        selected: Sequence[str],
+        work_ids: Sequence[str],
+    ) -> tuple[tuple[str, ...], tuple[str, ...]]:
+        items_by_instrument: dict[str, Mapping[str, Any]] = {}
+        for work_id in work_ids:
+            try:
+                item = self.repository.get(str(work_id))
+            except KeyError:
+                continue
+            instrument_id = str(item.get("instrument_id") or "").strip()
+            if instrument_id:
+                items_by_instrument[instrument_id] = item
+        delivered: list[str] = []
+        incomplete: list[str] = []
+        for instrument_id in selected:
+            item = items_by_instrument.get(instrument_id)
+            if item is None:
+                continue
+            persist = self.writer.output_root / f"{item['work_id']}.json"
+            if str(item.get("status") or "") == "completed" and persist.is_file():
+                delivered.append(instrument_id)
+                continue
+            if _supplement_incomplete(item):
+                incomplete.append(instrument_id)
+        return tuple(delivered), tuple(incomplete)
+
     def _payload(self, *, action: str, state: str, **extra: Any) -> dict[str, Any]:
         payload = {
             "action": action,
@@ -678,17 +730,18 @@ class CompanyProfileTaskService:
         return payload
 
 
-def _delivered_instrument_ids(output_root: Path) -> set[str]:
-    delivered: set[str] = set()
-    if not output_root.exists():
-        return delivered
-    for path in output_root.glob("*.json"):
-        payload = json.loads(path.read_text(encoding="utf-8"))
-        report = payload.get("report") or {}
-        instrument_id = str(report.get("instrument_id") or "").strip()
-        if instrument_id:
-            delivered.add(instrument_id)
-    return delivered
+def _supplement_incomplete(item: Mapping[str, Any]) -> bool:
+    error = str(item.get("last_error") or "")
+    if "pages_not_bound" in error:
+        return True
+    metadata = item.get("metadata") or {}
+    for result in dict(metadata.get("stage_results") or {}).values():
+        if not isinstance(result, Mapping):
+            continue
+        reasons = dict((result.get("quality") or {}).get("machine_rework_reasons") or {})
+        if int(reasons.get("pages_not_bound") or 0) > 0:
+            return True
+    return False
 
 
 async def execute_published_task(
@@ -713,6 +766,14 @@ async def execute_published_task(
 ) -> dict[str, Any]:
     """Unique owner entry for the published company-profile task operations."""
 
+    access = shared_asset_access or _resolve_shared_asset_access(storage)
+    registry = candidate_registry
+    if str(action or "").strip().lower() == "run" and registry is None:
+        registry = load_official_task_candidate_registry(
+            as_of=_knowledge_cutoff(knowledge_cutoff),
+            storage=storage,
+            shared_asset_access=access,
+        )
     service = CompanyProfileTaskService(
         storage=storage,
         output_root=output_root,
@@ -720,8 +781,8 @@ async def execute_published_task(
         page_source=page_source,
         provider=provider,
         token_budget=token_budget,
-        shared_asset_access=shared_asset_access,
-        candidate_registry=candidate_registry,
+        shared_asset_access=access,
+        candidate_registry=registry,
         live_plan=live_plan,
     )
     return await service.execute(
@@ -733,6 +794,6 @@ async def execute_published_task(
         max_elapsed_seconds=max_elapsed_seconds,
         reason=reason,
         output_directory=output_directory,
-        candidate_registry=candidate_registry,
+        candidate_registry=registry,
         live_plan=live_plan,
     )

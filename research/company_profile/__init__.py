@@ -11,6 +11,7 @@ from .candidate_registry import (
     build_a_share_candidate_registry,
     candidate_registry_schema_manifest,
     load_a_share_candidate_registry,
+    load_official_task_candidate_registry,
 )
 from .commodity_exposure import (
     COMMODITY_EXPOSURE_SCHEMA_VERSION,
@@ -77,6 +78,7 @@ from .live_run import (
     LIVE_RUN_SCHEMA_VERSION,
     CompanyProfileLiveRunReport,
     live_run_schema_manifest,
+    persist_live_run_report,
     record_live_run_report,
     select_live_run_targets,
 )
@@ -305,10 +307,12 @@ __all__ = [
     "live_plan_schema_manifest",
     "live_run_schema_manifest",
     "load_a_share_candidate_registry",
+    "load_official_task_candidate_registry",
     "load_stage5_evidence_plan",
     "load_stage5_sample_manifest",
     "load_stage55_adjudication_ledger",
     "overview_dimension_hits",
+    "persist_live_run_report",
     "project_commodity_exposures",
     "project_core_assessment",
     "project_research_view",

@@ -262,6 +262,44 @@ def announcement_access_report_lookup(access: Any) -> ReportLookup:
     return lookup
 
 
+def load_official_task_candidate_registry(
+    *,
+    as_of: str,
+    storage: Any,
+    shared_asset_access: Any,
+) -> AShareCandidateRegistry:
+    """Load the official A-share denominator for the published task owner."""
+
+    if shared_asset_access is None:
+        raise ValueError("official live run requires announcement asset access")
+    repository = getattr(shared_asset_access, "repository", None)
+    if repository is None:
+        raise ValueError("official live run requires a universe repository")
+    return load_a_share_candidate_registry(
+        universe_repository=repository,
+        industry_lookup=_storage_industry_lookup(storage),
+        effective_report_lookup=announcement_access_report_lookup(shared_asset_access),
+        as_of=as_of,
+    )
+
+
+def _storage_industry_lookup(storage: Any) -> IndustryLookup:
+    def lookup(instrument_id: str, as_of: str) -> Mapping[str, Any] | None:
+        as_of_getter = getattr(storage, "get_industry_membership_as_of", None)
+        if callable(as_of_getter):
+            row = as_of_getter(instrument_id, as_of)
+            if isinstance(row, Mapping):
+                return row
+        getter = getattr(storage, "get_industry_membership", None)
+        if callable(getter):
+            row = getter(instrument_id)
+            if isinstance(row, Mapping):
+                return row
+        return None
+
+    return lookup
+
+
 def _candidates_from_rows(
     rows: Sequence[Mapping[str, Any]],
     *,

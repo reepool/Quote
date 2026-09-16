@@ -333,6 +333,8 @@ def test_scheduler_job_only_forwards_to_operations_owner(monkeypatch):
     data_manager.run_business_profile_backfill.assert_not_awaited()
     assert "_drain_stage" not in source
     assert "enqueue_latest_annual" not in source
+    assert "load_a_share_candidate_registry" not in source
+    assert "load_official_task_candidate_registry" not in source
     assert "company_profile_common_core" not in task._active_tasks
 
 

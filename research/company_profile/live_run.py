@@ -9,6 +9,7 @@ batch because one company is missing supplemental information.
 from __future__ import annotations
 
 from collections.abc import Sequence
+from pathlib import Path
 from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
@@ -183,6 +184,20 @@ def record_live_run_report(
         whole_batch_rerun=False,
         scale_quality_claim_allowed=False,
     )
+
+
+def persist_live_run_report(
+    report: CompanyProfileLiveRunReport,
+    root: str | Path,
+) -> Path:
+    """Write company_profile_live_run.v1 next to the task control snapshot."""
+
+    path = Path(root) / "reports" / f"{LIVE_RUN_SCHEMA_VERSION}.json"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = path.with_suffix(".tmp")
+    tmp.write_text(report.model_dump_json(indent=2), encoding="utf-8")
+    tmp.replace(path)
+    return path
 
 
 def live_run_schema_manifest() -> dict[str, Any]:
