@@ -374,7 +374,10 @@ class CompanyProfileTaskService:
         self.page_source = page_source or OfficialAnnualReportPageSource(
             self.repository
         )
-        self.writer = CompanyProfileResearchWriter(self.output_root)
+        self.writer = CompanyProfileResearchWriter(
+            self.output_root,
+            write_gate=self._publication_allows_writes,
+        )
         self.reads = CompanyProfileReadService(self.output_root)
         self.control = CompanyProfileTaskControl(self.checkpoint_root)
         self.runtime = CompanyProfileStageRuntime(
@@ -612,7 +615,7 @@ class CompanyProfileTaskService:
         try:
             if include_work_ids is None or include_work_ids:
                 for stage in WORK_STAGES:
-                    if self.control.stop_requested():
+                    if self._should_stop_run():
                         stopped = True
                         break
                     drain[stage] = await self.production._drain_stage(
@@ -620,7 +623,7 @@ class CompanyProfileTaskService:
                         budget,
                         processing_identity_hash=self.processing_identity_hash,
                         include_work_ids=include_work_ids,
-                        should_stop=self.control.stop_requested,
+                        should_stop=self._should_stop_run,
                     )
                     if drain[stage].get("stop_requested") or drain[stage].get(
                         "status"
@@ -772,9 +775,17 @@ class CompanyProfileTaskService:
             checkpoint_root=self.checkpoint_root,
         )
 
+    def _publication_allows_writes(self) -> bool:
+        return publication_allows_new_writes(
+            load_publication_control(self.checkpoint_root)
+        )
+
+    def _should_stop_run(self) -> bool:
+        return self.control.stop_requested() or not self._publication_allows_writes()
+
     def _ensure_publication_allows_writes(self) -> None:
-        control = load_publication_control(self.checkpoint_root)
-        if not publication_allows_new_writes(control):
+        if not self._publication_allows_writes():
+            control = load_publication_control(self.checkpoint_root)
             state = control.state if control is not None else "unknown"
             raise ValueError(
                 f"research publication is {state}; new official writes are stopped"

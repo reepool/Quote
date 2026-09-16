@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 import inspect
 import json
+from types import SimpleNamespace
 
 import pytest
 from pydantic import ValidationError
@@ -16,12 +17,25 @@ from research.company_profile.publication import (
     PUBLICATION_SCHEMA_VERSION,
     CompanyProfilePublicationControl,
     default_publication_control,
+    load_publication_control,
     publication_allows_new_writes,
     publication_schema_manifest,
     record_publication_control,
 )
-from research.company_profile.runtime import COMMON_CORE_WRITER_NAME
+from research.company_profile.runtime import (
+    COMMON_CORE_STORAGE_NAMESPACE,
+    COMMON_CORE_WRITER_NAME,
+    CompanyProfileResearchWriter,
+)
 from tests.unit.test_research.test_business_profile_exposure_components import _storage
+from tests.unit.test_research.test_company_profile_live_run import _registry
+from tests.unit.test_research.test_company_profile_operations import _frontier
+from tests.unit.test_research.test_company_profile_runtime import (
+    SERVICE_OVERVIEW,
+    _overview_page,
+    _report,
+    _RequestBoundOverviewProvider,
+)
 
 
 def test_enable_opens_only_company_facts_and_commodity_associations():
@@ -138,6 +152,111 @@ def test_published_owner_persists_publication_and_blocks_paused_run(tmp_path):
     assert queried["action"] == "query"
     assert queried["publication"]["retains_saved_records"] is True
     assert queried["publication"]["legacy_writer_enabled"] is False
+
+
+def _stub_runtime_record(work_id: str) -> SimpleNamespace:
+    record = SimpleNamespace(
+        storage_namespace=COMMON_CORE_STORAGE_NAMESPACE,
+        writer=COMMON_CORE_WRITER_NAME,
+        production_authorization=PRODUCTION_AUTHORIZATION,
+        legacy_writers_invoked=(),
+        work_id=work_id,
+    )
+    record.model_dump_json = lambda indent=2: "{}"
+    return record
+
+
+def test_writer_persist_rechecks_publication_before_write(tmp_path):
+    checkpoint_root = tmp_path / "checkpoints"
+    apply_published_publication(action="enable", checkpoint_root=checkpoint_root)
+    writer = CompanyProfileResearchWriter(
+        tmp_path / "output",
+        write_gate=lambda: publication_allows_new_writes(
+            load_publication_control(checkpoint_root)
+        ),
+    )
+
+    writer.persist(_stub_runtime_record("work-open"))
+    apply_published_publication(action="pause", checkpoint_root=checkpoint_root)
+    with pytest.raises(ValueError, match="stopped new writes"):
+        writer.persist(_stub_runtime_record("work-paused"))
+
+    assert (writer.output_root / "work-open.json").is_file()
+    assert not (writer.output_root / "work-paused.json").exists()
+
+
+@pytest.mark.parametrize("stop_action", ["pause", "rollback"])
+def test_in_flight_official_run_stops_publish_after_publication_switch(
+    tmp_path, monkeypatch, stop_action
+):
+    storage = _storage(tmp_path)
+    _frontier(storage)
+    checkpoint_root = tmp_path / "checkpoints"
+    monkeypatch.setattr(
+        "research.company_profile.operations.load_official_task_candidate_registry",
+        lambda **_kwargs: _registry(),
+    )
+    apply_published_publication(action="enable", checkpoint_root=checkpoint_root)
+    provider = _RequestBoundOverviewProvider()
+    original_extract = provider.extract
+
+    def extract_and_switch_publication(request):
+        apply_published_publication(
+            action=stop_action,
+            checkpoint_root=checkpoint_root,
+        )
+        return original_extract(request)
+
+    provider.extract = extract_and_switch_publication
+    report = _report(instrument_id="600000.SH", report_id="asset-pub-inflight")
+
+    def load_pages(item):
+        return {
+            "report": report,
+            "pages": (_overview_page(SERVICE_OVERVIEW),),
+        }
+
+    result = asyncio.run(
+        execute_published_task(
+            action="run",
+            storage=storage,
+            output_root=tmp_path / "output",
+            checkpoint_root=checkpoint_root,
+            page_source=load_pages,
+            provider=provider,
+            knowledge_cutoff="2026-08-30",
+            instrument_ids=["600000.SH"],
+            max_items=1,
+            shared_asset_access=object(),
+        )
+    )
+    records = list(
+        (tmp_path / "output" / COMMON_CORE_STORAGE_NAMESPACE).glob("*.json")
+    )
+    publish = dict((result.get("drain") or {}).get("publish") or {})
+
+    assert result["state"] == "paused"
+    assert result["publication"]["state"] == (
+        "rolled_back" if stop_action == "rollback" else "paused"
+    )
+    assert result["publication"]["allows_new_writes"] is False
+    assert provider.extract_calls == 1
+    assert records == []
+    assert int(publish.get("completed") or 0) == 0
+    blocked = "paused" if stop_action == "pause" else "rolled_back"
+    with pytest.raises(ValueError, match=blocked):
+        asyncio.run(
+            execute_published_task(
+                action="resume",
+                storage=storage,
+                output_root=tmp_path / "output",
+                checkpoint_root=checkpoint_root,
+                page_source=load_pages,
+                provider=provider,
+                knowledge_cutoff="2026-08-30",
+                shared_asset_access=object(),
+            )
+        )
 
 
 def test_publication_module_has_no_llm_or_legacy_writer_entry():

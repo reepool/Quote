@@ -177,10 +177,23 @@ class CompanyProfileResearchWriter:
     namespace = COMMON_CORE_STORAGE_NAMESPACE
     writer_name = COMMON_CORE_WRITER_NAME
 
-    def __init__(self, output_root: str | Path) -> None:
+    def __init__(
+        self,
+        output_root: str | Path,
+        *,
+        write_gate: Callable[[], bool] | None = None,
+    ) -> None:
         self.output_root = Path(output_root).resolve() / self.namespace
         self.output_root.mkdir(parents=True, exist_ok=True)
         self.paths: list[Path] = []
+        self._write_gate = write_gate
+
+    def allows_new_writes(self) -> bool:
+        """Keep 4.2 writes open unless a publication gate has stopped them."""
+
+        if self._write_gate is None:
+            return True
+        return bool(self._write_gate())
 
     def persist(self, record: CompanyProfileRuntimeRecord) -> Path:
         if record.storage_namespace != self.namespace:
@@ -191,6 +204,8 @@ class CompanyProfileResearchWriter:
             raise ValueError("runtime writer cannot authorize production")
         if record.legacy_writers_invoked:
             raise ValueError("runtime writer cannot record legacy writer use")
+        if not self.allows_new_writes():
+            raise ValueError("research publication has stopped new writes")
         path = self.output_root / f"{record.work_id}.json"
         path.write_text(record.model_dump_json(indent=2), encoding="utf-8")
         self.paths.append(path)
@@ -477,6 +492,8 @@ class CompanyProfileStageRuntime:
         return self._result(state, status="success", stage="verify")
 
     def _publish(self, state: _WorkState) -> dict[str, Any]:
+        if not self.writer.allows_new_writes():
+            raise ValueError("research publication has stopped new writes")
         if state.assessment is None:
             self._verify(state)
         assert state.report is not None
