@@ -130,7 +130,7 @@ OpenSpec CLI 位于：
 - `project_development_governance.md`：长期开发总纲；
 - `framework_refactoring_program.md`：框架改造需求和进度；
 - `company_profile_product_and_industry_semantic_requirements.md`：全 A 股核心骨架、主体默认政策、基础商品暴露和持续任务路线的唯一权威总需求；
-- `../../openspec/changes/deliver-a-share-core-profiles-and-commodity-exposure/`：当前规划与未完成实现任务；
+- `../../openspec/changes/deliver-a-share-core-profiles-and-commodity-exposure/`：当前实施主线；生产仍未授权，M4 待办已登记；
 - `company_profile_industry_research_method.md`：行业增强研究方法，不是全市场基础画像前置门；
 - `company_profile_industry_requirements_template.md`：独立行业 requirements 模板；
 - `company_profile_industry_sample_manifest.template.json`、`company_profile_industry_gold_annotation.template.json`：`research_contract_only` 的样本与 gold 标注模板；

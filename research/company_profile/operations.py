@@ -48,6 +48,10 @@ from research.company_profile.live_run import (
     select_live_run_targets,
 )
 from research.company_profile.models import PRODUCTION_AUTHORIZATION
+from research.company_profile.operator_closure import (
+    persist_operator_closure_report,
+    record_operator_closure_report,
+)
 from research.company_profile.publication import (
     load_publication_control,
     persist_publication_control,
@@ -788,6 +792,13 @@ class CompanyProfileTaskService:
             checkpoint_root=self.checkpoint_root,
         )
 
+    def record_operator_closure(self) -> dict[str, Any]:
+        """Record leftover-entry closure and the M4 backlog after cutover."""
+
+        return record_published_operator_closure(
+            checkpoint_root=self.checkpoint_root,
+        )
+
     def _publication_allows_writes(self) -> bool:
         return publication_allows_new_writes(
             load_publication_control(self.checkpoint_root)
@@ -976,6 +987,44 @@ def record_published_legacy_retirement(
         snapshot = task_control.read()
         latest = dict(snapshot.get("latest_result") or {})
         latest["legacy_retirement"] = payload["legacy_retirement"]
+        task_control.finish(
+            state=str(snapshot.get("state") or "recorded"),
+            result=latest,
+        )
+        payload["control"] = task_control.read()
+    return payload
+
+
+def record_published_operator_closure(
+    *,
+    checkpoint_root: str | Path = DEFAULT_CHECKPOINT_ROOT,
+) -> dict[str, Any]:
+    """Unique owner entry for leftover-entry closure and M4 backlog."""
+
+    publication = load_publication_control(checkpoint_root)
+    if publication is None:
+        raise ValueError(
+            "research publication cutover is required before operator closure"
+        )
+    report = record_operator_closure_report(publication)
+    path = persist_operator_closure_report(report, checkpoint_root)
+    task_control = CompanyProfileTaskControl(checkpoint_root)
+    payload = {
+        "action": "operator_closure",
+        "state": "recorded",
+        "operator_closure": report.model_dump(mode="json"),
+        "operator_closure_path": str(path),
+        "production_authorization": PRODUCTION_AUTHORIZATION,
+        "storage_namespace": COMMON_CORE_STORAGE_NAMESPACE,
+        "writer": COMMON_CORE_WRITER_NAME,
+        "legacy_writer_enabled": False,
+        "database_deletion_authorized": False,
+        "executed": False,
+    }
+    if task_control.path.exists():
+        snapshot = task_control.read()
+        latest = dict(snapshot.get("latest_result") or {})
+        latest["operator_closure"] = payload["operator_closure"]
         task_control.finish(
             state=str(snapshot.get("state") or "recorded"),
             result=latest,

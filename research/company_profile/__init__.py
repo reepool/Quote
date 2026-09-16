@@ -127,6 +127,13 @@ from .models import (
     TextAnchor,
     semantic_record_json_schema,
 )
+from .operator_closure import (
+    OPERATOR_CLOSURE_SCHEMA_VERSION,
+    CompanyProfileOperatorClosureReport,
+    operator_closure_schema_manifest,
+    persist_operator_closure_report,
+    record_operator_closure_report,
+)
 from .projection import CompanyProfileResearchView, project_research_view
 from .publication import (
     PUBLICATION_SCHEMA_VERSION,
@@ -212,6 +219,7 @@ __all__ = [
     "LEGACY_RETIREMENT_SCHEMA_VERSION",
     "LIVE_PLAN_SCHEMA_VERSION",
     "LIVE_RUN_SCHEMA_VERSION",
+    "OPERATOR_CLOSURE_SCHEMA_VERSION",
     "PRODUCTION_AUTHORIZATION",
     "PUBLICATION_SCHEMA_VERSION",
     "SOURCE_REVIEW_SCHEMA_VERSION",
@@ -236,6 +244,7 @@ __all__ = [
     "CompanyProfileLegacyRetirementReport",
     "CompanyProfileLivePlan",
     "CompanyProfileLiveRunReport",
+    "CompanyProfileOperatorClosureReport",
     "CompanyProfilePublicationControl",
     "CompanyProfileResearchView",
     "CompanyProfileResearchWriter",
@@ -341,9 +350,11 @@ __all__ = [
     "load_stage5_evidence_plan",
     "load_stage5_sample_manifest",
     "load_stage55_adjudication_ledger",
+    "operator_closure_schema_manifest",
     "overview_dimension_hits",
     "persist_legacy_retirement_report",
     "persist_live_run_report",
+    "persist_operator_closure_report",
     "persist_publication_control",
     "persist_source_review_report",
     "project_commodity_exposures",
@@ -353,6 +364,7 @@ __all__ = [
     "record_company_profile_live_plan",
     "record_legacy_retirement_report",
     "record_live_run_report",
+    "record_operator_closure_report",
     "record_publication_control",
     "record_source_review_report",
     "resolved_core_field_ids",

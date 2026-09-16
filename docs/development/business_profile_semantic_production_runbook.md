@@ -4,6 +4,7 @@
 > 已关闭。本文中的回补、阶段推进和 10.3 类命令不得继续执行；当前仅保留本地只读审计、
 > 状态查询、协作停止和必要排障。恢复生产必须以
 > `company_profile_product_and_industry_semantic_requirements.md` 及新的行业合同完成验收为前提。
+> 当前可执行入口见总需求 §28：`company_profile_common_core`。
 >
 > 以下正文、状态和命令均为冻结前运行描述，仅供历史排障，不是当前可执行指引。
 

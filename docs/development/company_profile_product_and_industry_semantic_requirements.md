@@ -247,6 +247,20 @@ M1—M3 是近期同一产品闭环，在当前 change 分段实现。M4 为后�
 
 ## 28. 当前执行入口与完成说明
 
-当前实施待办以 `openspec/changes/deliver-a-share-core-profiles-and-commodity-exposure/tasks.md` 为准。规划修改不勾选代码/运行任务。
+当前实施待办以 `openspec/changes/deliver-a-share-core-profiles-and-commodity-exposure/tasks.md` 为准。规划修改不勾选代码/运行任务。M4 行业增强与共性缺陷由 `company_profile_operator_closure.v1` 登记，不在本 change 实现。
 
-已可用的离线导出：`scripts/export_company_profile_research_data.py --batch-directory <已有batch> --output-directory <全新目录>`，生成完整 JSON 和 CSV；它不执行新公司分析、不估计语义准确率、不代表全市场生产已上线。
+权威任务名：`company_profile_common_core`。Scheduler、CLI 和 Telegram 只转发到 `research.company_profile.operations`。已发布动作：preview、run、status、pause、resume、query、export。生产授权仍为 `not_authorized`。旧 `business_profile_*` 与 `company_profile_shadow_sync` 入口已断开，不得再作为执行命令。
+
+```text
+python main.py job --job-id company_profile_common_core --action preview --knowledge-cutoff YYYY-MM-DD
+python main.py job --job-id company_profile_common_core --action run --max-items 2
+python main.py job --job-id company_profile_common_core --action status
+python main.py job --job-id company_profile_common_core --action pause --reason operator_request
+python main.py job --job-id company_profile_common_core --action resume
+python main.py job --job-id company_profile_common_core --action query --instrument-ids 600000.SH
+python main.py job --job-id company_profile_common_core --action export --output-directory <目录>
+```
+
+Telegram / Scheduler：`/run company_profile_common_core action=preview knowledge_cutoff=YYYY-MM-DD`
+
+已有 batch 的离线导出仍可用：`scripts/export_company_profile_research_data.py --batch-directory <已有batch> --output-directory <全新目录>`；它不执行新公司分析、不估计语义准确率、不代表全市场生产已上线。
