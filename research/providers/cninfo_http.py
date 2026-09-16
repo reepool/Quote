@@ -105,15 +105,54 @@ def request_cninfo_with_chrome_tls(
 
     This is curl_cffi impersonation, not a headless Chrome browser.
     """
-    return _impersonated_session().request(
-        method,
-        url,
-        timeout=_normalize_timeout(kwargs.get("timeout")),
-        headers=kwargs.get("headers"),
-        params=kwargs.get("params"),
-        data=kwargs.get("data"),
-        json=kwargs.get("json"),
+    request_kwargs: Dict[str, Any] = {
+        "timeout": _normalize_timeout(kwargs.get("timeout")),
+        "headers": kwargs.get("headers"),
+        "params": kwargs.get("params"),
+        "data": kwargs.get("data"),
+        "json": kwargs.get("json"),
+    }
+    if "allow_redirects" in kwargs:
+        request_kwargs["allow_redirects"] = kwargs["allow_redirects"]
+    return _impersonated_session().request(method, url, **request_kwargs)
+
+
+def _accept_cninfo_static_proxy_response(response: Any) -> bool:
+    """Accept static CDN PDF / historical HTML; reject Wangsu pages and JSON APIs."""
+    try:
+        status = int(getattr(response, "status_code", 0) or 0)
+    except (TypeError, ValueError):
+        return False
+    if status != 200:
+        return False
+    raw_content = getattr(response, "content", None)
+    if raw_content is None:
+        raw_content = str(getattr(response, "text", "") or "").encode("utf-8")
+    body = bytes(raw_content or b"")
+    if not body:
+        return False
+    if body.startswith(b"%PDF-"):
+        return True
+    headers = getattr(response, "headers", {}) or {}
+    media = str(
+        headers.get("Content-Type") or headers.get("content-type") or ""
+    ).split(";", 1)[0].strip().lower()
+    prefix = body[:2048].lstrip().lower()
+    is_html = media in {"text/html", "application/xhtml+xml"} or prefix.startswith(
+        (b"<!doctype html", b"<html", b"<head", b"<body")
     )
+    if is_html:
+        return b"403 forbidden" not in body[:4000].lower()
+    if media == "application/pdf":
+        return not prefix.startswith((b"<!doctype", b"<html"))
+    return media == "application/octet-stream"
+
+
+def _accept_cninfo_non_www_proxy_response(url: str) -> Callable[[Any], bool]:
+    host = (urlparse(str(url or "")).hostname or "").lower()
+    if host == "static.cninfo.com.cn":
+        return _accept_cninfo_static_proxy_response
+    return _accept_cninfo_proxy_response
 
 
 def _validate_preferred_mode(value: Any) -> str:
@@ -170,12 +209,15 @@ def resolve_cninfo_access_mode(
 
 
 class _CninfoAccessRuntime:
-    """Process-scoped headed Chrome and www sticky fallback."""
+    """Process-scoped headed Chrome and host-class sticky fallback."""
 
     def __init__(self) -> None:
         self.lock = threading.RLock()
         self.www_sticky: Optional[str] = None
+        self.static_sticky: Optional[str] = None
         self.headed: Any = _UNSET
+        self._injected_headed = False
+        self._headed_factory: Any = _UNSET
         self.access_mode_counts: Dict[str, int] = {}
         self.last_access_mode: Optional[str] = None
         self.www_request_count = 0
@@ -199,11 +241,28 @@ class _CninfoAccessRuntime:
 
     def install_headed(self, hop: Any) -> None:
         self.headed = hop
+        self._injected_headed = True
+        self._headed_factory = hop
 
     def get_or_create_headed(self) -> Any:
         if self.headed is None:
             return None
         if self.headed is not _UNSET:
+            return self.headed
+        return self._construct_headed()
+
+    def get_or_create_headed_for_static(self) -> Any:
+        if self.www_sticky == "chrome_tls":
+            return None
+        if self.headed is not _UNSET and self.headed is not None:
+            return self.headed
+        if self._injected_headed and self._headed_factory is None:
+            return None
+        return self._construct_headed()
+
+    def _construct_headed(self) -> Any:
+        if self._injected_headed:
+            self.headed = self._headed_factory
             return self.headed
         from research.providers.cninfo_headed_chrome import (
             CninfoHeadedChromeConfigError,
@@ -266,11 +325,13 @@ def snapshot_cninfo_access_runtime(
         counts = dict(runtime.access_mode_counts)
         headed = runtime.headed
         sticky = runtime.www_sticky
+        static_sticky = runtime.static_sticky
         last_mode = runtime.last_access_mode
         request_count = runtime.www_request_count
     return {
         "preferred_mode": resolve_cninfo_access_mode(environ=environ, sources=sources),
         "www_sticky": sticky,
+        "static_sticky": static_sticky,
         "seen_access_modes": list(counts),
         "access_mode_counts": counts,
         "last_access_mode": last_mode,
@@ -456,12 +517,18 @@ class CninfoAccessMux:
         normalized = str(method or "GET").upper()
         if not is_cninfo_url(url):
             return dispatch_inner_session_request(self._inner, normalized, url, **kwargs)
+        from research.providers.cninfo_headed_chrome import (
+            is_allowed_cninfo_headed_static_url,
+        )
+
+        if is_allowed_cninfo_headed_static_url(url):
+            return self._request_static(normalized, url, **kwargs)
         if is_first_party_www_cninfo_url(url):
             return self._request_first_party_www(normalized, url, **kwargs)
         return self._request_legacy(
             normalized,
             url,
-            accept_response=_accept_cninfo_proxy_response,
+            accept_response=_accept_cninfo_non_www_proxy_response(url),
             sticky_www=False,
             **kwargs,
         )
@@ -553,6 +620,101 @@ class CninfoAccessMux:
         with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
             return pool.submit(run).result()
 
+    def _request_static(self, method: str, url: str, **kwargs: Any) -> Any:
+        runtime = _runtime()
+        with runtime.lock:
+            static_sticky = runtime.static_sticky
+            www_sticky = runtime.www_sticky
+        if static_sticky == "proxy":
+            return self._proxy_static(method, url, **kwargs)
+        if self._preferred_mode != "headed_chrome" or www_sticky == "chrome_tls":
+            return self._request_legacy_static(method, url, **kwargs)
+
+        outcome = self._headed_fetch_static(method, url, **kwargs)
+        if outcome is None:
+            return self._request_legacy_static(method, url, **kwargs)
+        if outcome.status == "success" and outcome.response is not None:
+            return _decorate_response(
+                outcome.response,
+                access_mode="headed_chrome",
+                url=url,
+            )
+        if outcome.status == "chrome_blocked":
+            try:
+                return self._proxy_static(method, url, **kwargs)
+            except Exception:
+                if outcome.response is not None:
+                    _runtime().record_access_mode(
+                        getattr(outcome.response, "access_mode", None)
+                        or "headed_chrome"
+                    )
+                    return outcome.response
+                raise
+        return self._request_legacy_static(method, url, **kwargs)
+
+    def _headed_fetch_static(self, method: str, url: str, **kwargs: Any) -> Any:
+        from research.providers.cninfo_headed_chrome import CninfoHeadedChromeConfigError
+
+        def run() -> Any:
+            runtime = _runtime()
+            with runtime.lock:
+                if runtime.static_sticky == "proxy":
+                    return None
+                if runtime.www_sticky == "chrome_tls":
+                    return None
+                hop = runtime.get_or_create_headed_for_static()
+                if hop is None:
+                    runtime.www_sticky = "chrome_tls"
+                    return None
+                try:
+                    outcome = hop.fetch_allowlisted(method, url, **kwargs)
+                except CninfoHeadedChromeConfigError:
+                    raise
+                if outcome.status == "chrome_blocked":
+                    runtime.static_sticky = "proxy"
+                    LOGGER.info(
+                        "[CninfoHttp] headed Chrome blocked by Wangsu on static; "
+                        "using akshare_proxy_patch for static.cninfo.com.cn"
+                    )
+                    return outcome
+                if outcome.status == "chrome_unavailable":
+                    runtime.www_sticky = "chrome_tls"
+                    runtime.stop_headed()
+                    LOGGER.info(
+                        "[CninfoHttp] headed Chrome unavailable; "
+                        "using chrome_tls stack for static.cninfo.com.cn"
+                    )
+                    return outcome
+                return outcome
+
+        try:
+            asyncio.get_running_loop()
+        except RuntimeError:
+            return run()
+        with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
+            return pool.submit(run).result()
+
+    def _request_legacy_static(self, method: str, url: str, **kwargs: Any) -> Any:
+        return self._request_legacy(
+            method,
+            url,
+            accept_response=_accept_cninfo_static_proxy_response,
+            sticky_www=False,
+            **kwargs,
+        )
+
+    def _proxy_static(self, method: str, url: str, **kwargs: Any) -> Any:
+        return _decorate_response(
+            self._request_via_proxy(
+                method,
+                url,
+                accept_response=_accept_cninfo_static_proxy_response,
+                **kwargs,
+            ),
+            access_mode="proxy_patch",
+            url=url,
+        )
+
     def _request_legacy_www(self, method: str, url: str, **kwargs: Any) -> Any:
         return self._request_legacy(
             method,
@@ -638,18 +800,19 @@ class CninfoAccessMux:
         **kwargs: Any,
     ) -> Any:
         timeout = kwargs.get("timeout")
-        return self._proxy_request(
-            method,
-            url,
-            attempts=3,
-            timeout=20.0 if timeout is None else _normalize_timeout(timeout),
-            headers=kwargs.get("headers"),
-            params=kwargs.get("params"),
-            data=kwargs.get("data"),
-            json=kwargs.get("json"),
-            accept_response=accept_response,
-            warning_logger=LOGGER,
-        )
+        proxy_kwargs: Dict[str, Any] = {
+            "attempts": 3,
+            "timeout": 20.0 if timeout is None else _normalize_timeout(timeout),
+            "headers": kwargs.get("headers"),
+            "params": kwargs.get("params"),
+            "data": kwargs.get("data"),
+            "json": kwargs.get("json"),
+            "accept_response": accept_response,
+            "warning_logger": LOGGER,
+        }
+        if "allow_redirects" in kwargs:
+            proxy_kwargs["allow_redirects"] = kwargs["allow_redirects"]
+        return self._proxy_request(method, url, **proxy_kwargs)
 
 
 def attach_cninfo_access(
@@ -665,12 +828,13 @@ def attach_cninfo_access(
 ) -> Any:
     """Attach the unified CNInfo first-party HTTP hop to a session.
 
-    This is the preferred www/data20 transport for current and future
-    attach callers (headed Chrome, then chrome_tls / proxy). Domain
-    providers keep parse and write ownership. AkShare, efinance,
-    exchange, THS/Sina, baostock, tdx, and other registered sources
-    stay as backup providers on the existing resolver and repair
-    routes when this hop cannot return usable data.
+    This is the preferred www/data20 and static-attachment transport
+    for current and future attach callers (headed Chrome on allowlisted
+    www and HTTPS ``static.cninfo.com.cn``, then chrome_tls / proxy).
+    Domain providers keep parse and write ownership.
+    AkShare, efinance, exchange, THS/Sina, baostock, tdx, and other
+    registered sources stay as backup providers on the existing resolver
+    and repair routes when this hop cannot return usable data.
     """
     from utils.http_transport import create_requests_session
 

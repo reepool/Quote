@@ -1,7 +1,7 @@
 ## 1. Mux Contract And Mode Switch
 
 - [x] 1.1 Extend `attach_cninfo_access` into the only production mux. Resolve mode as attach argument, then non-empty `QUOTE_CNINFO_ACCESS_MODE`, then `research_config.sources.cninfo.access.preferred_mode`, then `headed_chrome`; raise on an invalid mode; accept explicit `preferred_mode` / headed / TLS / proxy injections so tests do not start Chrome.
-- [x] 1.2 Route by host/path: allowlisted first-party www (including any `/data20/` path) uses the preferred mode; unallowlisted www, `static`, `webapi`, and `http` never enter headed Chrome and use the chrome_tls stack; exact `/` is not a prefix; AkShare `*_cninfo` and `AnnouncementAttachmentRetriever` stay untouched.
+- [x] 1.2 Route by host/path: allowlisted first-party www (including any `/data20/` path) uses the preferred mode; unallowlisted www, `webapi`, and `http` never enter headed Chrome and use the chrome_tls stack; HTTPS `static.cninfo.com.cn` headed-first is owned by `cninfo-headed-static-pdf-access`; exact `/` is not a prefix; AkShare `*_cninfo` stay outside the mux.
 - [x] 1.3 Stop disabling Chrome TLS / headed policy when a caller injects a session; keep inner-session `__getattr__` forwarding; do not leave `wrap_cninfo_proxy_fallback` as a second production factory.
 
 ## 2. Split Fallback And Shared Runtime
@@ -36,3 +36,11 @@
 - [x] 6.1 Surface a per-job `cninfo_access` snapshot (preferred mode, seen hops, sticky, request count) on shareholder incremental and financial disclosure results and Telegram reports so an operator can observe the new hop when running those two daily jobs. Do not run the production jobs in this slice. Rollback remains `QUOTE_CNINFO_ACCESS_MODE=chrome_tls`.
 - [ ] 6.2 Only after operator observation of the two daily jobs, decide whether to enable `official_structured_sources` / `sources.cninfo.financial_statements`. The 21:45 disclosure incremental already prefers `cninfo_data20` via the existing repair router and `attach_cninfo_access`; do not flip those flags just to test that job. Keep THS/Sina as backup.
 - [ ] 6.3 Optional later job change: move announcement scan off the running asyncio loop. Not a mux or backup-provider task.
+
+## 7. Attachment Downloads Join The Mux
+
+Superseded for headed-first static PDF by `cninfo-headed-static-pdf-access`. This section only landed attach() + TLS/proxy accept.
+
+- [x] 7.1 Default CNInfo `AnnouncementAttachmentRetriever` sessions call `attach_cninfo_access`. Injected sessions stay unwrapped. Headed-first static PDF moved to `cninfo-headed-static-pdf-access`.
+- [x] 7.2 Static proxy accept allows PDF and trusted historical HTML and rejects Wangsu block pages and JSON API payloads. Chrome TLS forwards `allow_redirects`.
+- [x] 7.3 Tests: retriever attaches for cninfo and not for other sources; static 403 falls back to a proxy PDF; static proxy rejects Wangsu HTML; existing attachment tests still pass. Observed 2026-09-16: 600629 `1225566315.PDF` and 002523 sample both `proxy_patch` HTTP 200 `%PDF-1.7` through the retriever. Headed-first static tests belong to `cninfo-headed-static-pdf-access`.

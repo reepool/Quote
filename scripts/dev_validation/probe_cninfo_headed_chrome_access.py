@@ -2,8 +2,10 @@
 """Write-free probe of production CNInfo access via attach_cninfo_access.
 
 Exercises one data20 GET, one announcement POST, and one static URL. It does
-not upsert shareholder snapshots or finish an ingestion run. Headed Chrome
-unit-hop probes belong in tests, not this production-factory path.
+not upsert shareholder snapshots or finish an ingestion run. HTTPS static
+prefers headed Chrome through ``attach_cninfo_access``; Chrome TLS and proxy
+remain backups. Headed Chrome unit-hop probes belong in tests, not this
+production-factory path.
 """
 
 from __future__ import annotations
@@ -27,7 +29,7 @@ from research.providers.cninfo_http import (  # noqa: E402
 
 DATA20_URL = "https://www.cninfo.com.cn/data20/stockholderCapital/getTopTenStockholders"
 ANNOUNCEMENT_URL = "https://www.cninfo.com.cn/new/hisAnnouncement/query"
-STATIC_URL = "https://static.cninfo.com.cn/finalpage/2026-04-30/1223234965.PDF"
+STATIC_URL = "https://static.cninfo.com.cn/finalpage/2026-09-16/1225566315.PDF"
 ANNOUNCEMENT_HEADERS = {
     "Accept": "application/json, text/plain, */*",
     "Origin": "https://www.cninfo.com.cn",
@@ -48,6 +50,7 @@ def _is_json(response: Any) -> bool:
 
 
 def _report(name: str, response: Any) -> dict[str, Any]:
+    content = bytes(getattr(response, "content", b"") or b"")
     payload = {
         "name": name,
         "status": getattr(response, "status_code", None),
@@ -55,6 +58,8 @@ def _report(name: str, response: Any) -> dict[str, Any]:
         "access_mode": getattr(response, "access_mode", None),
         "json": _is_json(response),
         "body_chars": len(str(getattr(response, "text", "") or "")),
+        "body_bytes": len(content),
+        "pdf": content.startswith(b"%PDF-"),
     }
     print(json.dumps(payload, ensure_ascii=False))
     return payload
@@ -100,12 +105,16 @@ def main() -> int:
     www_ok = all(
         int(by_name[name].get("status") or 0) < 400 for name in ("data20", "announcement")
     )
-    static_mode = by_name.get("static", {}).get("access_mode")
-    static_off_chrome = static_mode in {"chrome_tls", "proxy_patch"}
+    static = by_name.get("static", {})
+    static_mode = static.get("access_mode")
+    static_status = int(static.get("status") or 0)
+    static_ok = static_mode in {"headed_chrome", "chrome_tls", "proxy_patch"} and (
+        static.get("pdf") is True or static_status in {404, 410}
+    )
     print(
         json.dumps(
             {
-                "ok": www_ok and static_off_chrome,
+                "ok": www_ok and static_ok,
                 "access_modes": [
                     item.get("access_mode") for item in reports if item.get("access_mode")
                 ],
@@ -113,7 +122,7 @@ def main() -> int:
             ensure_ascii=False,
         )
     )
-    return 0 if www_ok and static_off_chrome else 1
+    return 0 if www_ok and static_ok else 1
 
 
 if __name__ == "__main__":

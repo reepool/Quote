@@ -8,6 +8,7 @@ import threading
 import time
 
 import pytest
+import requests
 
 from research.providers.cninfo_headed_chrome import (
     CninfoAccessResponse,
@@ -159,6 +160,22 @@ def _headed_success(payload, *, url=DATA20_URL):
     )
 
 
+def _headed_pdf_success(*, url=STATIC_URL, body=b"%PDF-1.7 headed"):
+    return CninfoHeadedFetchOutcome(
+        "success",
+        CninfoAccessResponse.from_fetch(
+            {
+                "status": 200,
+                "url": url,
+                "headers": {"content-type": "application/pdf"},
+                "text": "",
+                "body": body,
+            },
+            access_mode="headed_chrome",
+        ),
+    )
+
+
 def _attach(session=None, **kwargs):
     kwargs.setdefault("environ", {})
     kwargs.setdefault("sources", {"cninfo": {"access": {"preferred_mode": "headed_chrome"}}})
@@ -277,9 +294,9 @@ def test_data20_prefix_is_allowlisted():
 
 @pytest.mark.parametrize(
     "url",
-    [UNALLOWLISTED_WWW, STATIC_URL, WEBAPI_URL, HTTP_WWW],
+    [UNALLOWLISTED_WWW, WEBAPI_URL, HTTP_WWW, "http://static.cninfo.com.cn/finalpage/report.PDF"],
 )
-def test_unallowlisted_static_webapi_http_never_use_headed(url):
+def test_unallowlisted_webapi_http_never_use_headed(url):
     headed = _HeadedHop(outcomes=[AssertionError("headed must not run")])
     tls = _CallableHop(responses=[_Resp({"via": "tls"}, url=url)])
     session = _attach(
@@ -354,8 +371,10 @@ def test_chrome_blocked_uses_proxy_only_and_is_runtime_sticky_for_www():
     )
     second_response = second.get(ANNOUNCEMENT_URL, data={"pageNum": "1"})
     unallowlisted = second.get(UNALLOWLISTED_WWW)
-    static_tls = _CallableHop(responses=[_Resp(text="%PDF", url=STATIC_URL)])
+    static_headed = _HeadedHop(outcomes=[_headed_pdf_success()])
+    static_tls = _CallableHop(responses=[AssertionError("www sticky must not skip static headed")])
     static_session = _attach(
+        headed_hop=static_headed,
         impersonated_request=static_tls,
         proxy_request=_CallableHop(responses=[AssertionError("static must not use www sticky")]),
     )
@@ -366,11 +385,12 @@ def test_chrome_blocked_uses_proxy_only_and_is_runtime_sticky_for_www():
     assert second_response.access_mode == "proxy_patch"
     assert second_response.json()["via"] == "proxy-2"
     assert unallowlisted.access_mode == "proxy_patch"
-    assert static_response.access_mode == "chrome_tls"
+    assert static_response.access_mode == "headed_chrome"
+    assert static_response.content.startswith(b"%PDF-")
     assert headed.closed == 1
     assert len(headed.calls) == 1
     assert tls.calls == []
-    assert static_tls.calls[0]["url"] == STATIC_URL
+    assert static_headed.calls[0]["url"] == STATIC_URL
 
 
 def test_dead_session_after_restart_uses_tls_stack_not_www_proxy_sticky():
@@ -720,3 +740,207 @@ def test_access_observation_records_modes_and_begin_clears_counts_not_sticky():
     assert reset_snapshot["seen_access_modes"] == []
     assert reset_snapshot["last_access_mode"] is None
     assert reset_snapshot["www_sticky"] == "proxy"
+    assert reset_snapshot["static_sticky"] is None
+
+
+def test_static_headed_success_returns_pdf_bytes():
+    headed = _HeadedHop(outcomes=[_headed_pdf_success()])
+    session = _attach(
+        headed_hop=headed,
+        impersonated_request=_CallableHop(responses=[AssertionError("TLS must not run")]),
+        proxy_request=_CallableHop(responses=[AssertionError("proxy must not run")]),
+    )
+    response = session.get(STATIC_URL, allow_redirects=False, stream=True)
+    assert response.access_mode == "headed_chrome"
+    assert response.content.startswith(b"%PDF-")
+    assert headed.calls[0]["allow_redirects"] is False
+    assert headed.calls[0]["stream"] is True
+
+
+def test_static_preferred_chrome_tls_skips_headed():
+    headed = _HeadedHop(outcomes=[AssertionError("headed must not run")])
+    tls = _CallableHop(responses=[_Resp(text="%PDF-1.7", url=STATIC_URL)])
+    tls.responses[0].content = b"%PDF-1.7"
+    session = _attach(
+        preferred_mode="chrome_tls",
+        headed_hop=headed,
+        impersonated_request=tls,
+        proxy_request=_CallableHop(responses=[AssertionError("tls succeeded")]),
+    )
+    response = session.get(STATIC_URL, allow_redirects=False)
+    assert response.access_mode == "chrome_tls"
+    assert headed.calls == []
+    assert tls.calls[0]["allow_redirects"] is False
+
+
+def test_static_chrome_blocked_uses_proxy_not_tls_and_does_not_stop_headed():
+    headed = _HeadedHop(
+        outcomes=[
+            CninfoHeadedFetchOutcome("chrome_blocked"),
+            _headed_success({"www": "still-headed"}),
+            AssertionError("static must stay on proxy sticky"),
+        ]
+    )
+    tls = _CallableHop(responses=[AssertionError("TLS must not follow static chrome_blocked")])
+    pdf = _Resp(
+        payload=None,
+        text="%PDF-1.7 fixture",
+        headers={"Content-Type": "application/pdf"},
+        url=STATIC_URL,
+    )
+    pdf.content = b"%PDF-1.7 fixture"
+
+    def fake_proxy(method, url, **kwargs):
+        accept = kwargs["accept_response"]
+        assert accept(pdf) is True
+        wangsu = _Resp(
+            payload=None,
+            text="<!doctype html><html><title>403 Forbidden</title></html>",
+            headers={"Content-Type": "text/html"},
+        )
+        assert accept(wangsu) is False
+        assert accept(_Resp({"announcements": []})) is False
+        assert kwargs.get("allow_redirects") is False
+        return pdf
+
+    session = _attach(
+        headed_hop=headed,
+        impersonated_request=tls,
+        proxy_request=fake_proxy,
+    )
+    response = session.get(STATIC_URL, allow_redirects=False)
+    www = session.get(DATA20_URL)
+    later_static = session.get(STATIC_URL, allow_redirects=False)
+    snapshot = snapshot_cninfo_access_runtime(
+        sources={"cninfo": {"access": {"preferred_mode": "headed_chrome"}}}
+    )
+
+    assert response.access_mode == "proxy_patch"
+    assert response.content.startswith(b"%PDF-")
+    assert later_static.access_mode == "proxy_patch"
+    assert www.access_mode == "headed_chrome"
+    assert headed.closed == 0
+    assert tls.calls == []
+    assert snapshot["static_sticky"] == "proxy"
+    assert snapshot["www_sticky"] is None
+
+
+def test_static_chrome_unavailable_uses_tls_then_proxy():
+    headed = _HeadedHop(
+        outcomes=[
+            CninfoHeadedFetchOutcome("chrome_unavailable"),
+            AssertionError("must not restart headed after unavailable"),
+        ]
+    )
+    tls = _CallableHop(
+        responses=[
+            _Resp(status_code=403, text="blocked"),
+            _Resp(status_code=403, text="blocked-again"),
+        ]
+    )
+    pdf = _Resp(
+        payload=None,
+        text="%PDF-1.7 tls-fallback",
+        headers={"Content-Type": "application/pdf"},
+        url=STATIC_URL,
+    )
+    pdf.content = b"%PDF-1.7 tls-fallback"
+    proxy = _CallableHop(responses=[pdf, pdf])
+    session = _attach(
+        headed_hop=headed,
+        impersonated_request=tls,
+        proxy_request=proxy,
+    )
+    first = session.get(STATIC_URL, allow_redirects=False)
+    later_www = _attach(
+        impersonated_request=_CallableHop(responses=[_Resp({"via": "tls-www"})]),
+        proxy_request=_CallableHop(),
+    ).get(DATA20_URL)
+    later_static = session.get(STATIC_URL, allow_redirects=False)
+
+    assert first.access_mode == "proxy_patch"
+    assert first.content.startswith(b"%PDF-")
+    assert later_static.access_mode == "proxy_patch"
+    assert later_www.access_mode == "chrome_tls"
+    assert len(headed.calls) == 1
+    assert tls.calls[0]["allow_redirects"] is False
+
+
+def test_static_404_is_not_proxied():
+    headed = _HeadedHop(
+        outcomes=[
+            CninfoHeadedFetchOutcome(
+                "success",
+                CninfoAccessResponse.from_fetch(
+                    {
+                        "status": 404,
+                        "url": STATIC_URL,
+                        "headers": {"content-type": "text/html"},
+                        "text": "missing",
+                        "body": b"missing",
+                    },
+                    access_mode="headed_chrome",
+                ),
+            )
+        ]
+    )
+    session = _attach(
+        headed_hop=headed,
+        impersonated_request=_CallableHop(responses=[AssertionError("404 is not TLS")]),
+        proxy_request=_CallableHop(responses=[AssertionError("404 is not proxy")]),
+    )
+    response = session.get(STATIC_URL)
+    assert response.access_mode == "headed_chrome"
+    assert response.status_code == 404
+    with pytest.raises(requests.HTTPError) as exc:
+        response.raise_for_status()
+    assert exc.value.response.status_code == 404
+
+
+def test_static_blocked_and_proxy_failure_returns_http_error():
+    blocked = CninfoAccessResponse.from_fetch(
+        {
+            "status": 403,
+            "url": STATIC_URL,
+            "headers": {"content-type": "text/html"},
+            "text": "wangsu",
+            "body": b"wangsu",
+        },
+        access_mode="headed_chrome",
+    )
+    headed = _HeadedHop(outcomes=[CninfoHeadedFetchOutcome("chrome_blocked", blocked)])
+    session = _attach(
+        headed_hop=headed,
+        impersonated_request=_CallableHop(
+            responses=[AssertionError("TLS must not follow static chrome_blocked")]
+        ),
+        proxy_request=_CallableHop(error=RuntimeError("proxy exhausted")),
+    )
+    response = session.get(STATIC_URL)
+    assert response.status_code == 403
+    assert response.access_mode == "headed_chrome"
+
+
+def test_www_proxy_sticky_starts_replacement_headed_for_static():
+    first_headed = _HeadedHop(outcomes=[CninfoHeadedFetchOutcome("chrome_blocked")])
+    proxy = _CallableHop(responses=[_Resp({"via": "www-proxy"})])
+    _attach(
+        headed_hop=first_headed,
+        impersonated_request=_CallableHop(
+            responses=[AssertionError("TLS must not follow chrome_blocked")]
+        ),
+        proxy_request=proxy,
+    ).get(DATA20_URL)
+    assert first_headed.closed == 1
+
+    replacement = _HeadedHop(outcomes=[_headed_pdf_success()])
+    static = _attach(
+        headed_hop=replacement,
+        impersonated_request=_CallableHop(
+            responses=[AssertionError("www proxy sticky must not skip static headed")]
+        ),
+        proxy_request=_CallableHop(responses=[AssertionError("static headed succeeded")]),
+    ).get(STATIC_URL)
+    assert static.access_mode == "headed_chrome"
+    assert static.content.startswith(b"%PDF-")
+    assert snapshot_cninfo_access_runtime()["www_sticky"] == "proxy"

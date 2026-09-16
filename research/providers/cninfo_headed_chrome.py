@@ -1,15 +1,17 @@
-"""Instance-owned headed Chrome hop for first-party www.cninfo.com.cn HTTP.
+"""Instance-owned headed Chrome hop for first-party www and static CNInfo HTTP.
 
 Production jobs go through ``attach_cninfo_access``. This module reports
 ``success`` / ``chrome_blocked`` / ``chrome_unavailable`` via
 ``fetch_allowlisted``; the mux owns fallback. Standalone ``request()`` may
-still jump headed-to-proxy for hop unit tests. Official-filing PDFs on
-``static.cninfo.com.cn`` must never enter this hop.
+still jump headed-to-proxy for hop unit tests. HTTPS
+``static.cninfo.com.cn`` attachments use a binary same-Chrome read, not the
+www JSON ``r.text()`` path.
 """
 
 from __future__ import annotations
 
 import asyncio
+import base64
 import http.client
 import json
 import logging
@@ -17,6 +19,8 @@ import os
 import threading
 from typing import Any, Callable, Mapping, MutableMapping, Optional
 from urllib.parse import parse_qsl, urlencode, urlparse, urlunparse
+
+import requests
 
 from utils.proxy_patch_runtime import request_with_akshare_proxy
 
@@ -33,6 +37,8 @@ _ALLOWED_EXACT_PATHS = frozenset(
     }
 )
 _ALLOWED_PREFIXES = ("/data20/", "/new/disclosure/")
+_STATIC_HOST = "static.cninfo.com.cn"
+_STATIC_MAX_BYTES = 50 * 1024 * 1024
 _DEFAULT_TIMEOUT = 20.0
 ProxyRequest = Callable[..., Any]
 
@@ -42,7 +48,7 @@ class CninfoHeadedChromeConfigError(ValueError):
 
 
 class CninfoHeadedChromeUrlError(ValueError):
-    """Raised when a URL is outside the first-party www CNInfo allowlist."""
+    """Raised when a URL is outside the headed CNInfo allowlist."""
 
 
 class _ChromeUnusable(RuntimeError):
@@ -69,8 +75,18 @@ def _normalize_path(url: str) -> str:
     return path
 
 
+def is_allowed_cninfo_headed_static_url(url: str) -> bool:
+    """Return True for https://static.cninfo.com.cn/ (any path)."""
+    parsed = urlparse(str(url or ""))
+    if parsed.scheme.lower() != "https":
+        return False
+    return (parsed.hostname or "").lower() == _STATIC_HOST
+
+
 def is_allowed_cninfo_headed_chrome_url(url: str) -> bool:
-    """Return True for https www/cninfo.com.cn paths this access provider may fetch."""
+    """Return True for allowlisted www paths or HTTPS static CNInfo attachments."""
+    if is_allowed_cninfo_headed_static_url(url):
+        return True
     parsed = urlparse(str(url or ""))
     if parsed.scheme.lower() != "https":
         return False
@@ -93,6 +109,96 @@ def _is_homepage_url(url: str) -> bool:
 
 def _is_disclosure_html_url(url: str) -> bool:
     return _normalize_path(url).startswith("/new/disclosure/")
+
+
+def _static_media_type(headers: Mapping[str, Any]) -> str:
+    if headers is None:
+        return ""
+    getter = getattr(headers, "get", None)
+    raw = ""
+    if callable(getter):
+        raw = getter("Content-Type") or getter("content-type") or ""
+    return str(raw).split(";", 1)[0].strip().lower()
+
+
+def _is_trusted_static_html(body: bytes, media_type: str = "") -> bool:
+    if not body:
+        return False
+    snippet = body[:4000].decode("utf-8", "replace")
+    if _is_wangsu_block_page(text=snippet):
+        return False
+    prefix = body[:2048].lstrip().lower()
+    if media_type in {"text/html", "application/xhtml+xml"}:
+        return True
+    return prefix.startswith((b"<!doctype html", b"<html", b"<head", b"<body"))
+
+
+def _is_usable_static_attachment(body: bytes, media_type: str = "") -> bool:
+    if body.startswith(b"%PDF-"):
+        return True
+    return _is_trusted_static_html(body, media_type)
+
+
+def _is_in_page_cors_or_opaque(
+    result: Optional[Mapping[str, Any]],
+    exc: Optional[BaseException] = None,
+) -> bool:
+    markers = ("failed to fetch", "cors", "networkerror", "opaque", "access-control")
+    if exc is not None:
+        text = str(exc).lower()
+        return any(marker in text for marker in markers)
+    if result is None:
+        return True
+    try:
+        status = int(result.get("status") or 0)
+    except (TypeError, ValueError):
+        status = 0
+    if status <= 0:
+        return True
+    rtype = str(result.get("type") or "").lower()
+    if rtype in {"opaque", "opaqueredirect", "error"}:
+        return True
+    text = str(result.get("text") or "").lower()
+    return any(marker in text for marker in markers)
+
+
+def _static_result_needs_same_chrome_fallback(result: Optional[Mapping[str, Any]]) -> bool:
+    if result is None or _is_in_page_cors_or_opaque(result):
+        return True
+    try:
+        status = int(result.get("status") or 0)
+    except (TypeError, ValueError):
+        return True
+    body = result.get("body")
+    if body is None:
+        body = str(result.get("text") or "").encode("utf-8")
+    content = bytes(body or b"")
+    return status in {200, 206} and not content
+
+
+def _classify_static_headed_result(result: Mapping[str, Any]) -> "CninfoHeadedFetchOutcome":
+    try:
+        status = int(result.get("status") or 0)
+    except (TypeError, ValueError):
+        status = 0
+    body = result.get("body")
+    if body is None:
+        body = str(result.get("text") or "").encode("utf-8")
+    content = bytes(body or b"")
+    media = _static_media_type(dict(result.get("headers") or {}))
+    text = str(result.get("text") or "") or content[:4000].decode("utf-8", "replace")
+    response = CninfoAccessResponse.from_fetch(result, access_mode="headed_chrome")
+    if status in {404, 410}:
+        return CninfoHeadedFetchOutcome("success", response)
+    if status == 403 or _is_wangsu_block_page(status=status, text=text):
+        return CninfoHeadedFetchOutcome("chrome_blocked", response)
+    if status in {200, 206}:
+        if len(content) > _STATIC_MAX_BYTES:
+            return CninfoHeadedFetchOutcome("chrome_blocked", response)
+        if _is_usable_static_attachment(content, media):
+            return CninfoHeadedFetchOutcome("success", response)
+        return CninfoHeadedFetchOutcome("chrome_blocked", response)
+    return CninfoHeadedFetchOutcome("chrome_blocked", response)
 
 
 def _is_wangsu_block_page(
@@ -275,7 +381,9 @@ class CninfoAccessResponse:
                 raw_raise()
                 return
         if self.status_code >= 400:
-            raise RuntimeError(f"HTTP {self.status_code}")
+            error = requests.HTTPError(f"HTTP {self.status_code} {self.reason}".strip())
+            error.response = self
+            raise error
 
 
 class _NodriverPageSession:
@@ -313,6 +421,14 @@ class _NodriverPageSession:
 
     def fetch(self, method: str, url: str, **kwargs: Any) -> Optional[dict[str, Any]]:
         return self._run(self._async_fetch(method, url, **kwargs))
+
+    def fetch_binary_same_chrome(
+        self,
+        method: str,
+        url: str,
+        **kwargs: Any,
+    ) -> Optional[dict[str, Any]]:
+        return self._run(self._async_fetch_binary_same_chrome(method, url, **kwargs))
 
     def close(self) -> None:
         if self._loop is None:
@@ -372,15 +488,60 @@ class _NodriverPageSession:
     async def _async_fetch(self, method: str, url: str, **kwargs: Any) -> Optional[dict[str, Any]]:
         if self._page is None:
             raise _ChromeUnusable("headed Chrome page is not started")
+        timeout = _normalize_timeout(kwargs.get("timeout"))
+        script = self._in_page_fetch_script(method, url, **kwargs)
+        raw = await self._evaluate_json(script, timeout=timeout)
+        return self._decode_in_page_fetch(raw, url=url, binary=bool(kwargs.get("binary")))
+
+    async def _async_fetch_binary_same_chrome(
+        self,
+        method: str,
+        url: str,
+        **kwargs: Any,
+    ) -> Optional[dict[str, Any]]:
+        if self._browser is None or self._page is None:
+            raise _ChromeUnusable("headed Chrome page is not started")
+        timeout = _normalize_timeout(kwargs.get("timeout"))
+        loaded = await self._try_cdp_network_resource(url, timeout=timeout)
+        if loaded is not None:
+            self._assert_static_final_host(loaded, fallback_url=url)
+            return loaded
+        if str(method or "GET").upper() != "GET":
+            raise RuntimeError("same-Chrome static fallback only supports GET")
+        extra = None
+        try:
+            getter = self._browser.get
+            try:
+                extra = await asyncio.wait_for(getter(url, new_tab=True), timeout=timeout)
+            except TypeError:
+                extra = await asyncio.wait_for(getter(url), timeout=timeout)
+            kwargs = dict(kwargs)
+            kwargs["binary"] = True
+            script = self._in_page_fetch_script(method, url, **kwargs)
+            raw = await self._evaluate_json_on(extra, script, timeout=timeout)
+            result = self._decode_in_page_fetch(raw, url=url, binary=True)
+            if result is None:
+                raise RuntimeError("same-Chrome tab returned no static body")
+            self._assert_static_final_host(result, fallback_url=url)
+            return result
+        finally:
+            await self._close_extra_tab(extra)
+
+    def _in_page_fetch_script(self, method: str, url: str, **kwargs: Any) -> str:
         headers = dict(kwargs.get("headers") or {})
         content_type = kwargs.get("content_type")
-        timeout = _normalize_timeout(kwargs.get("timeout"))
-        script = (
+        binary = bool(kwargs.get("binary"))
+        redirect_mode = "follow" if kwargs.get("allow_redirects", True) is not False else "manual"
+        return (
             "(async () => {\n"
-            f"  const opt = {{ method: {method!r}, credentials: 'include', headers: {json.dumps(headers, ensure_ascii=False)} }};\n"
+            f"  const opt = {{ method: {method!r}, credentials: 'include', "
+            f"headers: {json.dumps(headers, ensure_ascii=False)}, "
+            f"redirect: {redirect_mode!r} }};\n"
             f"  const contentType = {json.dumps(content_type)};\n"
             f"  const jsonBody = {json.dumps(kwargs.get('json'), ensure_ascii=False)};\n"
             f"  const formBody = {json.dumps(kwargs.get('data'), ensure_ascii=False)};\n"
+            f"  const binary = {json.dumps(binary)};\n"
+            f"  const maxBytes = {int(_STATIC_MAX_BYTES)};\n"
             "  if (contentType === 'application/json' && jsonBody !== null) {\n"
             "    opt.headers['Content-Type'] = 'application/json';\n"
             "    opt.body = JSON.stringify(jsonBody);\n"
@@ -390,29 +551,212 @@ class _NodriverPageSession:
             "  }\n"
             "  try {\n"
             f"    const r = await fetch({url!r}, opt);\n"
-            "    const text = await r.text();\n"
             "    const headers = {};\n"
             "    r.headers.forEach((value, key) => { headers[key] = value; });\n"
-            "    return JSON.stringify({status: r.status, url: r.url, headers, text});\n"
+            "    if (binary) {\n"
+            "      const buf = await r.arrayBuffer();\n"
+            "      const bytes = new Uint8Array(buf);\n"
+            "      if (bytes.length > maxBytes) {\n"
+            "        return JSON.stringify({status: r.status, url: r.url, headers, "
+            "text: '', body_b64: '', oversized: true, type: r.type});\n"
+            "      }\n"
+            "      let binaryStr = '';\n"
+            "      const chunk = 0x8000;\n"
+            "      for (let i = 0; i < bytes.length; i += chunk) {\n"
+            "        binaryStr += String.fromCharCode.apply(null, bytes.subarray(i, i + chunk));\n"
+            "      }\n"
+            "      return JSON.stringify({status: r.status, url: r.url, headers, "
+            "body_b64: btoa(binaryStr), type: r.type});\n"
+            "    }\n"
+            "    const text = await r.text();\n"
+            "    return JSON.stringify({status: r.status, url: r.url, headers, text, type: r.type});\n"
             "  } catch (error) {\n"
-            "    return JSON.stringify({status: -1, url: '', headers: {}, text: String(error)});\n"
+            "    return JSON.stringify({status: -1, url: '', headers: {}, text: String(error), type: 'error'});\n"
             "  }\n"
             "})()"
         )
-        raw = await self._evaluate_json(script, timeout=timeout)
+
+    def _decode_in_page_fetch(
+        self,
+        raw: Optional[Mapping[str, Any]],
+        *,
+        url: str,
+        binary: bool,
+    ) -> Optional[dict[str, Any]]:
         if raw is None:
             return None
         status = int(raw.get("status") or 0)
         text = str(raw.get("text") or "")
         if status <= 0:
+            if binary:
+                return {
+                    "status": status,
+                    "url": str(raw.get("url") or url),
+                    "headers": dict(raw.get("headers") or {}),
+                    "text": text,
+                    "body": b"",
+                    "type": str(raw.get("type") or ""),
+                }
             raise TimeoutError(text or "in-page fetch failed")
+        if binary:
+            if raw.get("oversized"):
+                return {
+                    "status": status,
+                    "url": str(raw.get("url") or url),
+                    "headers": dict(raw.get("headers") or {}),
+                    "text": "",
+                    "body": b"",
+                    "type": str(raw.get("type") or ""),
+                }
+            body_b64 = raw.get("body_b64")
+            if body_b64:
+                try:
+                    body = base64.b64decode(body_b64)
+                except Exception:
+                    body = b""
+            else:
+                body = b""
+            return {
+                "status": status,
+                "url": str(raw.get("url") or url),
+                "headers": dict(raw.get("headers") or {}),
+                "text": "",
+                "body": body,
+                "type": str(raw.get("type") or ""),
+            }
         return {
             "status": status,
             "url": str(raw.get("url") or url),
             "headers": dict(raw.get("headers") or {}),
             "text": text,
             "body": text.encode("utf-8"),
+            "type": str(raw.get("type") or ""),
         }
+
+    @staticmethod
+    def _assert_static_final_host(result: Mapping[str, Any], *, fallback_url: str) -> None:
+        final = str(result.get("url") or fallback_url or "")
+        if not final:
+            return
+        if not is_allowed_cninfo_headed_static_url(final) and urlparse(final).hostname:
+            raise RuntimeError(f"static headed fetch left approved host: {final}")
+
+    async def _try_cdp_network_resource(
+        self,
+        url: str,
+        *,
+        timeout: float,
+    ) -> Optional[dict[str, Any]]:
+        send = getattr(self._page, "send", None)
+        if not callable(send):
+            return None
+        try:
+            from nodriver import cdp
+        except Exception:
+            return None
+        try:
+            frame_id = None
+            try:
+                tree = await asyncio.wait_for(
+                    send(cdp.page.get_frame_tree()),
+                    timeout=min(5.0, timeout),
+                )
+                frame = getattr(getattr(tree, "frame_tree", tree), "frame", None)
+                frame_id = getattr(frame, "id", None)
+            except Exception:
+                frame_id = None
+            options = cdp.network.LoadNetworkResourceOptions(
+                disable_cache=False,
+                include_credentials=True,
+            )
+            send_kwargs: dict[str, Any] = {"url": url, "options": options}
+            if frame_id is not None:
+                send_kwargs["frame_id"] = frame_id
+            raw = await asyncio.wait_for(
+                send(cdp.network.load_network_resource(**send_kwargs)),
+                timeout=timeout,
+            )
+        except Exception:
+            LOGGER.debug("[CninfoHeadedChrome] CDP loadNetworkResource failed", exc_info=True)
+            return None
+        return self._normalize_cdp_resource(raw, url)
+
+    @staticmethod
+    def _normalize_cdp_resource(raw: Any, url: str) -> Optional[dict[str, Any]]:
+        resource = getattr(raw, "resource", raw)
+        if isinstance(raw, dict):
+            resource = raw.get("resource") or raw
+        success = getattr(resource, "success", None)
+        if isinstance(resource, dict):
+            success = resource.get("success", success)
+        if success is False:
+            return None
+        status = getattr(resource, "http_status_code", None)
+        if status is None:
+            status = getattr(resource, "httpStatusCode", None)
+        headers = getattr(resource, "headers", None)
+        body = getattr(resource, "body", None)
+        if isinstance(resource, dict):
+            status = resource.get("httpStatusCode") or resource.get("http_status_code") or status
+            headers = resource.get("headers") if headers is None else headers
+            body = resource.get("body") if body is None else body
+        if body is None:
+            return None
+        if isinstance(body, str):
+            try:
+                content = base64.b64decode(body)
+            except Exception:
+                content = body.encode("latin-1")
+        else:
+            content = bytes(body)
+        return {
+            "status": int(status or 200),
+            "url": url,
+            "headers": dict(headers or {}),
+            "text": "",
+            "body": content,
+        }
+
+    async def _evaluate_json_on(
+        self,
+        page: Any,
+        script: str,
+        *,
+        timeout: float,
+    ) -> Optional[dict[str, Any]]:
+        if page is None:
+            return None
+        try:
+            raw = await asyncio.wait_for(
+                page.evaluate(script, await_promise=True, return_by_value=True),
+                timeout=timeout,
+            )
+        except TypeError:
+            raw = await asyncio.wait_for(page.evaluate(script), timeout=timeout)
+        if raw is None:
+            return None
+        if isinstance(raw, dict):
+            return raw
+        try:
+            payload = json.loads(raw)
+        except (TypeError, ValueError):
+            return None
+        if isinstance(payload, dict):
+            return payload
+        return None
+
+    async def _close_extra_tab(self, tab: Any) -> None:
+        if tab is None or tab is self._page:
+            return
+        closer = getattr(tab, "close", None)
+        if not callable(closer):
+            return
+        try:
+            maybe = closer()
+            if asyncio.iscoroutine(maybe) or asyncio.isfuture(maybe):
+                await maybe
+        except Exception:
+            LOGGER.debug("[CninfoHeadedChrome] extra tab close failed", exc_info=True)
 
     async def _evaluate_value(self, script: str) -> Any:
         if self._page is None:
@@ -511,7 +855,7 @@ class CninfoHeadedChromeAccess:
     def request(self, method: str, url: str, **kwargs: Any) -> CninfoAccessResponse:
         if not is_allowed_cninfo_headed_chrome_url(url):
             raise CninfoHeadedChromeUrlError(
-                f"CNInfo headed Chrome rejects URL outside the www allowlist: {url}"
+                f"CNInfo headed Chrome rejects URL outside the headed allowlist: {url}"
             )
         with self._lock:
             return self._request_locked(str(method or "GET").upper(), url, **kwargs)
@@ -522,10 +866,10 @@ class CninfoHeadedChromeAccess:
         url: str,
         **kwargs: Any,
     ) -> CninfoHeadedFetchOutcome:
-        """Fetch an allowlisted www URL and report outcome only. No proxy."""
+        """Fetch an allowlisted www or static URL and report outcome only. No proxy."""
         if not is_allowed_cninfo_headed_chrome_url(url):
             raise CninfoHeadedChromeUrlError(
-                f"CNInfo headed Chrome rejects URL outside the www allowlist: {url}"
+                f"CNInfo headed Chrome rejects URL outside the headed allowlist: {url}"
             )
         with self._lock:
             return self._fetch_allowlisted_locked(
@@ -601,6 +945,9 @@ class CninfoHeadedChromeAccess:
                 ),
             )
 
+        if is_allowed_cninfo_headed_static_url(url):
+            return self._static_binary_outcome(method, url, **kwargs)
+
         try:
             result = self._in_page_request(method, url, **kwargs)
         except CninfoHeadedChromeConfigError:
@@ -635,6 +982,41 @@ class CninfoHeadedChromeAccess:
             "success",
             CninfoAccessResponse.from_fetch(result, access_mode="headed_chrome"),
         )
+
+    def _static_binary_outcome(
+        self,
+        method: str,
+        url: str,
+        **kwargs: Any,
+    ) -> CninfoHeadedFetchOutcome:
+        try:
+            result = self._static_binary_request(method, url, **kwargs)
+        except CninfoHeadedChromeConfigError:
+            raise
+        except _ChromeUnusable:
+            self._chrome_unusable = True
+            return CninfoHeadedFetchOutcome("chrome_unavailable")
+        except Exception as exc:
+            LOGGER.warning(
+                "[CninfoHeadedChrome] static binary request failed: %s",
+                type(exc).__name__,
+            )
+            if not self._session_started or (
+                self._restarted_dead and _is_dead_session(exc)
+            ):
+                self._chrome_unusable = True
+                return CninfoHeadedFetchOutcome("chrome_unavailable")
+            return CninfoHeadedFetchOutcome("chrome_blocked")
+        if result is None:
+            LOGGER.warning("[CninfoHeadedChrome] static binary evaluate returned null")
+            return CninfoHeadedFetchOutcome("chrome_blocked")
+        final = str(result.get("url") or url)
+        if final and urlparse(final).hostname and not is_allowed_cninfo_headed_static_url(final):
+            return CninfoHeadedFetchOutcome(
+                "chrome_blocked",
+                CninfoAccessResponse.from_fetch(result, access_mode="headed_chrome"),
+            )
+        return _classify_static_headed_result(result)
 
     def _ensure_started(self) -> None:
         if self._session_started and self._page is not None:
@@ -736,6 +1118,64 @@ class CninfoHeadedChromeAccess:
             retry_url = retry_kwargs.pop("url")
             try:
                 return self._page.fetch(method, retry_url, **retry_kwargs)
+            except Exception as retry_exc:
+                if _is_dead_session(retry_exc):
+                    self._chrome_unusable = True
+                    raise _ChromeUnusable(
+                        "headed Chrome dead after one restart"
+                    ) from retry_exc
+                raise
+
+    def _static_binary_request(self, method: str, url: str, **kwargs: Any) -> Optional[dict[str, Any]]:
+        def _once() -> Optional[dict[str, Any]]:
+            fetch_kwargs = self._fetch_kwargs(url, **kwargs)
+            target_url = fetch_kwargs.pop("url")
+            fetch_kwargs["binary"] = True
+            if "allow_redirects" in kwargs:
+                fetch_kwargs["allow_redirects"] = kwargs["allow_redirects"]
+            result: Optional[dict[str, Any]] = None
+            cors_exc: Optional[BaseException] = None
+            try:
+                result = self._page.fetch(method, target_url, **fetch_kwargs)
+            except Exception as exc:
+                if _is_dead_session(exc):
+                    raise
+                if not _is_in_page_cors_or_opaque(None, exc):
+                    raise
+                cors_exc = exc
+            if result is not None and not _static_result_needs_same_chrome_fallback(result):
+                return result
+            cdp = getattr(self._page, "fetch_binary_same_chrome", None)
+            if not callable(cdp):
+                if cors_exc is not None:
+                    raise cors_exc
+                return result
+            try:
+                return cdp(method, target_url, **fetch_kwargs)
+            except Exception as cdp_exc:
+                if _is_dead_session(cdp_exc):
+                    raise
+                if cors_exc is not None:
+                    raise RuntimeError(str(cdp_exc)) from cdp_exc
+                raise
+
+        try:
+            return _once()
+        except Exception as exc:
+            if self._restarted_dead or not _is_dead_session(exc):
+                if self._restarted_dead and _is_dead_session(exc):
+                    self._chrome_unusable = True
+                    raise _ChromeUnusable(
+                        "headed Chrome dead after one restart"
+                    ) from exc
+                raise
+            LOGGER.warning("[CninfoHeadedChrome] restarting dead Chrome session once")
+            self._restarted_dead = True
+            self._safe_close_page()
+            self._session_started = False
+            self._ensure_started()
+            try:
+                return _once()
             except Exception as retry_exc:
                 if _is_dead_session(retry_exc):
                     self._chrome_unusable = True

@@ -12,6 +12,8 @@ from research.providers.cninfo_headed_chrome import (
     CninfoHeadedChromeUrlError,
     _NodriverPageSession,
     create_cninfo_headed_chrome_access,
+    is_allowed_cninfo_headed_chrome_url,
+    is_allowed_cninfo_headed_static_url,
 )
 
 
@@ -20,6 +22,8 @@ ANNOUNCEMENT_URL = "https://www.cninfo.com.cn/new/hisAnnouncement/query"
 TOP_SEARCH_URL = "https://www.cninfo.com.cn/new/information/topSearch/query"
 DISCLOSURE_URL = "https://www.cninfo.com.cn/new/disclosure/stock?stockCode=000001"
 HOMEPAGE = "https://www.cninfo.com.cn/"
+STATIC_PDF_URL = "https://static.cninfo.com.cn/finalpage/report.pdf"
+HTTP_STATIC_URL = "http://static.cninfo.com.cn/finalpage/report.pdf"
 
 
 class _FakeResponse:
@@ -42,12 +46,14 @@ class _FakePageSession:
         *,
         bootstrap=None,
         fetches=None,
+        cdp_fetches=None,
         start_error=None,
     ):
         self.started = 0
         self.closed = 0
         self.navigations = []
         self.in_page_calls = []
+        self.cdp_calls = []
         self.start_error = start_error
         self.bootstrap = bootstrap or {
             "status": 200,
@@ -56,6 +62,7 @@ class _FakePageSession:
             "url": HOMEPAGE,
         }
         self.fetches = list(fetches or [])
+        self.cdp_fetches = list(cdp_fetches or [])
 
     def start(self, homepage: str):
         if self.start_error is not None:
@@ -69,6 +76,15 @@ class _FakePageSession:
         if not self.fetches:
             raise AssertionError("unexpected in-page fetch")
         result = self.fetches.pop(0)
+        if isinstance(result, Exception):
+            raise result
+        return result
+
+    def fetch_binary_same_chrome(self, method, url, **kwargs):
+        self.cdp_calls.append({"method": method, "url": url, **kwargs})
+        if not self.cdp_fetches:
+            raise RuntimeError("Failed to fetch: same-Chrome binary read failed")
+        result = self.cdp_fetches.pop(0)
         if isinstance(result, Exception):
             raise result
         return result
@@ -121,7 +137,7 @@ def test_headless_true_is_hard_error_and_does_not_fall_back_to_proxy():
     [
         "http://www.cninfo.com.cn/data20/stockholderCapital/getTopTenStockholders",
         "https://webapi.cninfo.com.cn/api/stock/p_stock2215",
-        "https://static.cninfo.com.cn/finalpage/report.pdf",
+        "http://static.cninfo.com.cn/finalpage/report.pdf",
         "https://query.sse.com.cn/commonQuery.do",
         "https://www.cninfo.com.cn/foo",
         "https://www.cninfo.com.cn/new/js/app.js",
@@ -604,3 +620,182 @@ def test_attach_cninfo_access_does_not_construct_headed_chrome_at_factory_time()
     assert "probe_cninfo_headed_chrome_access" not in inspect.getsource(cninfo_announcements)
     assert "probe_cninfo_headed_chrome_access" not in inspect.getsource(cninfo_shareholders)
     assert "probe_cninfo_headed_chrome_access" not in inspect.getsource(official_financial_filings)
+
+
+def _pdf_fetch(url=STATIC_PDF_URL, *, status=200, body=b"%PDF-1.7 hop"):
+    return {
+        "status": status,
+        "url": url,
+        "headers": {"content-type": "application/pdf"},
+        "text": "",
+        "body": body,
+    }
+
+
+def test_admits_https_static_and_rejects_http_static():
+    assert is_allowed_cninfo_headed_static_url(STATIC_PDF_URL) is True
+    assert is_allowed_cninfo_headed_chrome_url(STATIC_PDF_URL) is True
+    assert is_allowed_cninfo_headed_static_url(HTTP_STATIC_URL) is False
+    assert is_allowed_cninfo_headed_chrome_url(HTTP_STATIC_URL) is False
+    assert is_allowed_cninfo_headed_chrome_url(
+        "https://webapi.cninfo.com.cn/api/stock/p_stock2215"
+    ) is False
+
+
+def test_static_pdf_bytes_survive_headed_hop_without_utf8_roundtrip():
+    page = _FakePageSession(fetches=[_pdf_fetch()])
+    access = create_cninfo_headed_chrome_access(page_session=page)
+    outcome = access.fetch_allowlisted("GET", STATIC_PDF_URL, allow_redirects=False)
+
+    assert outcome.status == "success"
+    assert outcome.response is not None
+    assert outcome.response.content.startswith(b"%PDF-")
+    assert outcome.response.content == b"%PDF-1.7 hop"
+    assert page.in_page_calls[0]["binary"] is True
+    assert page.in_page_calls[0]["allow_redirects"] is False
+    assert page.cdp_calls == []
+    from research.providers import cninfo_headed_chrome
+
+    assert "DceOfficialBrowserClient" not in inspect.getsource(cninfo_headed_chrome)
+
+
+def test_static_404_is_headed_success_not_blocked():
+    page = _FakePageSession(
+        fetches=[{
+            "status": 404,
+            "url": STATIC_PDF_URL,
+            "headers": {"content-type": "text/html"},
+            "text": "missing",
+            "body": b"missing",
+        }]
+    )
+    access = create_cninfo_headed_chrome_access(page_session=page)
+    outcome = access.fetch_allowlisted("GET", STATIC_PDF_URL)
+    assert outcome.status == "success"
+    assert outcome.response.status_code == 404
+
+
+def test_static_wangsu_and_empty_200_are_chrome_blocked():
+    blocked_page = _FakePageSession(
+        fetches=[{
+            "status": 403,
+            "url": STATIC_PDF_URL,
+            "headers": {"content-type": "text/html"},
+            "text": "403 Forbidden ws-action",
+            "body": b"403 Forbidden ws-action",
+        }]
+    )
+    blocked = create_cninfo_headed_chrome_access(page_session=blocked_page)
+    assert blocked.fetch_allowlisted("GET", STATIC_PDF_URL).status == "chrome_blocked"
+
+    empty_page = _FakePageSession(
+        fetches=[{
+            "status": 200,
+            "url": STATIC_PDF_URL,
+            "headers": {"content-type": "application/pdf"},
+            "text": "",
+            "body": b"",
+        }],
+        cdp_fetches=[{
+            "status": 200,
+            "url": STATIC_PDF_URL,
+            "headers": {"content-type": "application/pdf"},
+            "text": "",
+            "body": b"",
+        }],
+    )
+    empty = create_cninfo_headed_chrome_access(page_session=empty_page)
+    assert empty.fetch_allowlisted("GET", STATIC_PDF_URL).status == "chrome_blocked"
+
+
+def test_static_cors_uses_same_chrome_binary_then_live_fail_is_blocked():
+    ok_page = _FakePageSession(
+        fetches=[{
+            "status": -1,
+            "url": "",
+            "headers": {},
+            "text": "TypeError: Failed to fetch",
+            "type": "error",
+            "body": b"",
+        }],
+        cdp_fetches=[_pdf_fetch(body=b"%PDF-1.7 cdp")],
+    )
+    ok = create_cninfo_headed_chrome_access(page_session=ok_page)
+    outcome = ok.fetch_allowlisted("GET", STATIC_PDF_URL, allow_redirects=False)
+    assert outcome.status == "success"
+    assert outcome.response.content == b"%PDF-1.7 cdp"
+    assert ok_page.cdp_calls[0]["allow_redirects"] is False
+
+    live_fail = _FakePageSession(
+        fetches=[{
+            "status": -1,
+            "url": "",
+            "headers": {},
+            "text": "TypeError: Failed to fetch",
+            "type": "error",
+            "body": b"",
+        }]
+    )
+    blocked = create_cninfo_headed_chrome_access(page_session=live_fail)
+    assert blocked.fetch_allowlisted("GET", STATIC_PDF_URL).status == "chrome_blocked"
+
+
+def test_static_cors_then_dead_chrome_is_unavailable():
+    page = _FakePageSession(
+        fetches=[
+            {
+                "status": -1,
+                "url": "",
+                "headers": {},
+                "text": "TypeError: Failed to fetch",
+                "type": "error",
+                "body": b"",
+            },
+            {
+                "status": -1,
+                "url": "",
+                "headers": {},
+                "text": "TypeError: Failed to fetch",
+                "type": "error",
+                "body": b"",
+            },
+        ],
+        cdp_fetches=[
+            RuntimeError("Target closed"),
+            RuntimeError("session closed"),
+        ],
+    )
+    access = create_cninfo_headed_chrome_access(page_session=page)
+    outcome = access.fetch_allowlisted("GET", STATIC_PDF_URL)
+    assert outcome.status == "chrome_unavailable"
+
+
+def test_static_trusted_html_not_wangsu():
+    page = _FakePageSession(
+        fetches=[{
+            "status": 200,
+            "url": "https://static.cninfo.com.cn/finalpage/1993-05-15/12598339.html",
+            "headers": {"content-type": "text/html"},
+            "text": "",
+            "body": b"<!doctype html><html><head></head><body>ann</body></html>",
+        }]
+    )
+    access = create_cninfo_headed_chrome_access(page_session=page)
+    outcome = access.fetch_allowlisted(
+        "GET",
+        "https://static.cninfo.com.cn/finalpage/1993-05-15/12598339.html",
+    )
+    assert outcome.status == "success"
+    assert outcome.response.content.startswith(b"<!doctype html")
+
+    wangsu = _FakePageSession(
+        fetches=[{
+            "status": 200,
+            "url": STATIC_PDF_URL,
+            "headers": {"content-type": "text/html"},
+            "text": "",
+            "body": b"<!doctype html><html><title>403 Forbidden</title></html>",
+        }]
+    )
+    blocked = create_cninfo_headed_chrome_access(page_session=wangsu)
+    assert blocked.fetch_allowlisted("GET", STATIC_PDF_URL).status == "chrome_blocked"

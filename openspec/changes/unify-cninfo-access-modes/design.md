@@ -16,13 +16,13 @@ A headed-Chrome access hop already exists (`create_cninfo_headed_chrome_access`)
 
 Facts that block a naive swap:
 
-1. Official filings use one session for allowlisted www (disclosure HTML, data20, topSearch) **and** `static.cninfo.com.cn` PDFs. Headed Chrome must never see static.
+1. Official filings use one session for allowlisted www (disclosure HTML, data20, topSearch) **and** `static.cninfo.com.cn` PDFs. Headed-first static is owned by `cninfo-headed-static-pdf-access`.
 2. `ShareholderIncrementalSyncService.sync()` and financial incremental scan call announcement `session.post` on the running asyncio loop. Headed Chrome currently raises if `request()` runs on that loop.
 3. `attach_cninfo_access(session=...)` currently sets `impersonated_request=None`, so announcements and filings skip Chrome TLS and hit Wangsu with plain `requests`.
 4. The same job constructs more than one attach session. Sticky fallback that lives on one session object will not stop the next session from probing headed Chrome again.
 5. `CninfoAccessResponse` is missing `reason`, which `cninfo_shareholders` reads on HTTP >= 400. A thin wrapper would break that caller.
 6. `wrap_cninfo_proxy_fallback` is a second public helper. If only `attach()` becomes the mux, `wrap()` remains a production bypass.
-7. `AnnouncementAttachmentRetriever` already downloads `static.cninfo.com.cn` with `request_get` (`stream=True`, its own redirects). That path is not an `attach()` caller and is out of scope.
+7. `AnnouncementAttachmentRetriever` used to download `static.cninfo.com.cn` with bare `request_get` (`stream=True`, its own redirects). That bypass is a live Wangsu 403 hole (XDXR path-B PDFs). Default CNInfo sessions now attach the mux. Injected test sessions stay unwrapped. Headed-first static PDF is owned by `cninfo-headed-static-pdf-access`.
 8. data20 HTTP 200 + `resultCode=429` is a domain retry in `cninfo_shareholders`, not a Wangsu block.
 
 Wangsu behavior this design must preserve:
@@ -32,14 +32,14 @@ Wangsu behavior this design must preserve:
 - `curl_cffi` Chrome TLS works only on a clean egress; after a bot 403 it is the wrong next hop.
 - Headed Chrome (`headless=false`) is the current first hop that can open the homepage.
 
-This is CNInfo first-party HTTP only. It is not a DCE / Ruishu / attachment-download / project-wide browser platform.
+This is CNInfo first-party HTTP only. It is not a DCE / Ruishu / project-wide browser platform. Static PDF bytes reuse the same mux; headed-first static is owned by `cninfo-headed-static-pdf-access`.
 
 ## Goals / Non-Goals
 
 **Goals:**
 
 - One production factory (`attach_cninfo_access`) that current and future first-party CNInfo / data20 attach callers use.
-- Classify by host/path so new `/data20/` endpoints work without a new access stack, unallowlisted www still get the old stack, and static/webapi never enter Chrome.
+- Classify by host/path so new `/data20/` endpoints work without a new access stack, unallowlisted www still get the old stack, and webapi/http never enter Chrome. HTTPS static headed-first is owned by `cninfo-headed-static-pdf-access`.
 - Two operator-selectable access modes: `headed_chrome` (preferred while Wangsu lasts) and `chrome_tls` (standby / rollback). Proxy is a fallback hop, not a third preferred mode.
 - Runtime-scoped fallback: Chrome connected but blocked → proxy only for later first-party www. Chrome never started / unusable → full old stack for later first-party www.
 - Loop-safe headed calls so existing announcement code does not raise on a running asyncio loop.
@@ -50,7 +50,7 @@ This is CNInfo first-party HTTP only. It is not a DCE / Ruishu / attachment-down
 
 - Do not replace `CninfoShareholdersProvider`, `cninfo_announcements`, or official-filing parsers / writers.
 - Do not wrap AkShare `stock_hold_num_cninfo` / `stock_hold_control_cninfo` / `stock_hold_change_cninfo`.
-- Do not move `AnnouncementAttachmentRetriever` or announcement-asset PDF downloads onto the mux.
+- Default CNInfo `AnnouncementAttachmentRetriever` sessions MUST call `attach_cninfo_access`; injected sessions stay unwrapped. Headed-first static PDF is owned by `cninfo-headed-static-pdf-access`.
 - Do not migrate operator scripts that still use raw `requests` (for example `validate_cninfo_top10_shareholders_live.py`).
 - Do not enable true `headless=true` Chrome, and do not describe `chrome_tls` as a headless browser.
 - Do not reuse or subclass `DceOfficialBrowserClient`.
@@ -58,7 +58,7 @@ This is CNInfo first-party HTTP only. It is not a DCE / Ruishu / attachment-down
 - Do not add scheduler jobs, API routes, or new loops in `data_manager.py` / `scheduler/tasks.py` / `research/storage.py` / `api/routes.py`.
 - Do not import `scripts/` from production modules.
 - Do not change canonical tables, job ids, or financial time semantics.
-- Do not expand static-PDF proxy accept beyond today's JSON-only helper.
+- Static-PDF proxy accept MUST allow PDF and trusted historical HTML and MUST reject Wangsu block pages and JSON API payloads. webapi and other non-www CNInfo hosts keep the JSON-only helper.
 - Do not rewrite announcement scan to `asyncio.to_thread` in this change.
 - Do not delete, wrap, or migrate backup providers (AkShare `*_cninfo`, efinance, exchange announcement routes, THS/Sina, baostock, tdx, or the in-mux `chrome_tls` / proxy hops) into a second access stack.
 - Do not treat leftover use of those backup providers as unfinished mux work.
@@ -109,16 +109,18 @@ Routing:
 
 ```text
 non-CNInfo host                         → inner session only
-static / webapi / http                  → never headed; chrome_tls (TLS then proxy)
+webapi / http                           → never headed; chrome_tls (TLS then proxy)
 unallowlisted https www path            → never headed; chrome_tls (TLS then proxy)
 allowlisted first-party www             → preferred mode, then the fallback below
+https://static.cninfo.com.cn/           → attach the mux; headed-first is
+                                          cninfo-headed-static-pdf-access
 ```
 
 A new `/data20/...` path is automatically allowlisted. A new www path outside the list still works through `attach()` on the old stack; headed Chrome requires one allowlist edit plus tests.
 
 `is_cninfo_url()` stays too wide to be the headed-Chrome gate.
 
-After the injected-session fix, official-filing PDFs on `static.cninfo.com.cn` use the chrome_tls pass-through (TLS, then proxy on HTTP 403), not bare `requests`. Do not send those bytes through headed Chrome. Do not change today's JSON-only static-PDF proxy accept.
+Official-filing PDFs and announcement attachments on `static.cninfo.com.cn` attach the mux, not bare `requests`. This change lands TLS-then-proxy and PDF proxy accept. Headed-first static PDF is owned by `cninfo-headed-static-pdf-access`. Static proxy accept MUST allow PDF and trusted historical HTML and MUST reject Wangsu block pages.
 
 Homepage `/` is bootstrap-only. Mux MUST NOT require homepage success through a JSON-only proxy acceptor.
 
@@ -200,7 +202,8 @@ Current `CninfoProxyFallbackSession.__getattr__` forwards unknown attributes to 
 - [Someone gates proxy on `supports_proxy_patch`] → Mux fallback stays independent.
 - [GET `/` via JSON-only proxy] → Homepage is bootstrap-only.
 - [Shared runtime leaks across pytest] → Reset/inject helper is mandatory in mux tests.
-- [AkShare `*_cninfo` or attachment downloads still 403] → Out of scope.
+- [AkShare `*_cninfo` still 403] → Out of scope; those remain backup providers.
+- [Attachment downloads still 403] → Default CNInfo retriever sessions attach the mux. Static never headed. If Chrome TLS and proxy both fail, surface the HTTP error.
 - [Default `headed_chrome` starts Chrome on the first nightly job] → Rollback is config/env. Verify mux on the scheduler host for data20 + announcement + one static URL before relying on the default.
 - [Someone reads leftover AkShare/THS as “mux incomplete”] → Those are backup providers. Subsequent work tests the switch; it does not migrate them into the mux.
 - [Mux returns HTTP 200 empty JSON after hops fail] → Domain provider may mark the instrument covered and skip akshare/THS. Exhausted hops must surface as HTTP error, raise, or uncovered scope.

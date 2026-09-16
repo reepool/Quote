@@ -21,6 +21,15 @@ REDIRECT_STATUSES = frozenset({301, 302, 303, 307, 308})
 LOGGER = logging.getLogger(__name__)
 
 
+def _policy_uses_cninfo_access(policy: AttachmentRetrievalPolicy) -> bool:
+    if str(policy.source or "").strip().lower() == "cninfo":
+        return True
+    return any(
+        host == "cninfo.com.cn" or host.endswith(".cninfo.com.cn")
+        for host in policy.approved_hosts
+    )
+
+
 def _content_signature_status(
     content: bytes,
     response_media_type: Optional[str],
@@ -119,7 +128,7 @@ class AnnouncementAttachmentRetriever:
         self.policies = {
             str(source).strip().lower(): policy for source, policy in policies.items()
         }
-        self.sessions: Dict[str, requests.Session] = dict(sessions or {})
+        self.sessions: Dict[str, Any] = dict(sessions or {})
 
     @classmethod
     def from_provider_configs(
@@ -276,10 +285,7 @@ class AnnouncementAttachmentRetriever:
         redirect_count = 0
         session = self.sessions.get(policy.source)
         if session is None:
-            session = create_requests_session(
-                tls_config=HttpTlsConfig(source_name=policy.source),
-                headers=policy.headers,
-            )
+            session = self._build_session(policy)
             self.sessions[policy.source] = session
         while True:
             self._validate_url(policy, current_url)
@@ -333,6 +339,22 @@ class AnnouncementAttachmentRetriever:
         if len(content) > limit:
             raise ValueError("attachment_size_limit_exceeded")
         return content
+
+    def _build_session(self, policy: AttachmentRetrievalPolicy) -> Any:
+        session = create_requests_session(
+            tls_config=HttpTlsConfig(source_name=policy.source),
+            headers=policy.headers,
+        )
+        if not _policy_uses_cninfo_access(policy):
+            return session
+        from research.providers.cninfo_http import attach_cninfo_access
+
+        # static.cninfo.com.cn uses the same mux: headed Chrome first,
+        # then chrome_tls / proxy.
+        return attach_cninfo_access(
+            session,
+            tls_config=HttpTlsConfig(source_name=policy.source),
+        )
 
     def _policy(self, source: str) -> AttachmentRetrievalPolicy:
         policy = self.policies.get(str(source or "").strip().lower())

@@ -2034,6 +2034,39 @@ def test_attachment_retrieval_classifies_terminal_missing_document_without_retry
     assert len(session.calls) == 1
 
 
+def test_retriever_classifies_headed_mux_404_as_terminal_http_error():
+    from research.providers.cninfo_headed_chrome import CninfoAccessResponse
+
+    headed_404 = CninfoAccessResponse.from_fetch(
+        {
+            "status": 404,
+            "url": "https://static.cninfo.com.cn/finalpage/missing.PDF",
+            "headers": {"content-type": "text/html"},
+            "text": "missing",
+            "body": b"missing",
+        },
+        access_mode="headed_chrome",
+    )
+    unused = CninfoAccessResponse.from_fetch(
+        {
+            "status": 200,
+            "url": "https://static.cninfo.com.cn/finalpage/missing.PDF",
+            "headers": {"content-type": "application/pdf"},
+            "text": "",
+            "body": b"%PDF-should-not-be-used",
+        },
+        access_mode="headed_chrome",
+    )
+    session = _AttachmentSession([headed_404, unused])
+    result = _retriever(session, retries=2).retrieve(
+        "cninfo",
+        AnnouncementAttachment(source_url="finalpage/missing.PDF"),
+    )
+    assert result.status == "failed"
+    assert result.errors == ("attachment_http_404",)
+    assert len(session.calls) == 1
+
+
 def test_attachment_retrieval_retries_transport_failure_without_partial_success():
     session = _AttachmentSession(
         [TimeoutError("timeout"), _AttachmentResponse(b"%PDF-retry")]
@@ -2046,3 +2079,91 @@ def test_attachment_retrieval_retries_transport_failure_without_partial_success(
     assert result.status == "success"
     assert result.diagnostics["attempt"] == 2
     assert len(session.calls) == 2
+
+
+def test_cninfo_attachment_builds_attach_session(monkeypatch):
+    fake = _AttachmentSession(
+        [
+            _AttachmentResponse(
+                b"%PDF-ok",
+                headers={"Content-Type": "application/pdf"},
+            )
+        ]
+    )
+    calls = []
+
+    def attach(session=None, **kwargs):
+        calls.append({"session": session, **kwargs})
+        return fake
+
+    monkeypatch.setattr(
+        "research.providers.cninfo_http.attach_cninfo_access", attach
+    )
+    retriever = AnnouncementAttachmentRetriever(
+        {
+            "cninfo": AttachmentRetrievalPolicy(
+                source="cninfo",
+                artifact_base_url="https://static.cninfo.com.cn/",
+                approved_hosts=("static.cninfo.com.cn",),
+                request_timeout_seconds=5,
+                request_interval_seconds=0,
+                retry_attempts=0,
+                retry_backoff_seconds=0,
+                max_attachment_bytes=1024,
+                max_redirects=2,
+            )
+        }
+    )
+    result = retriever.retrieve(
+        "cninfo",
+        AnnouncementAttachment(source_url="finalpage/report.pdf"),
+        require_pdf=True,
+    )
+    assert result.status == "success"
+    assert calls
+    assert retriever.sessions["cninfo"] is fake
+
+
+def test_non_cninfo_attachment_does_not_attach(monkeypatch):
+    attach_calls = []
+
+    def attach(*args, **kwargs):
+        attach_calls.append(1)
+        raise AssertionError("non-cninfo must not attach")
+
+    monkeypatch.setattr(
+        "research.providers.cninfo_http.attach_cninfo_access", attach
+    )
+    monkeypatch.setattr(
+        "research.announcements.retrieval.create_requests_session",
+        lambda **kwargs: object(),
+    )
+    monkeypatch.setattr(
+        "research.announcements.retrieval.request_get",
+        lambda *args, **kwargs: _AttachmentResponse(
+            b"%PDF-ok",
+            headers={"Content-Type": "application/pdf"},
+        ),
+    )
+    retriever = AnnouncementAttachmentRetriever(
+        {
+            "hkexnews": AttachmentRetrievalPolicy(
+                source="hkexnews",
+                artifact_base_url="https://www.hkexnews.hk/",
+                approved_hosts=("www.hkexnews.hk",),
+                request_timeout_seconds=5,
+                request_interval_seconds=0,
+                retry_attempts=0,
+                retry_backoff_seconds=0,
+                max_attachment_bytes=1024,
+                max_redirects=2,
+            )
+        }
+    )
+    result = retriever.retrieve(
+        "hkexnews",
+        AnnouncementAttachment(source_url="https://www.hkexnews.hk/a.pdf"),
+        require_pdf=True,
+    )
+    assert result.status == "success"
+    assert attach_calls == []
