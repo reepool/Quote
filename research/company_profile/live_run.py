@@ -103,7 +103,7 @@ class CompanyProfileLiveRunReport(_StrictModel):
     knowledge_cutoff: str = Field(min_length=1)
     plan: CompanyProfileLivePlan
     selected_instrument_ids: tuple[str, ...]
-    selected_strata: tuple[SelectedSampleStratum, ...]
+    selected_strata: tuple[SelectedSampleStratum, ...] = ()
     universe: UniverseRunDenominator
     company_outcomes: tuple[CompanyRunOutcome, ...]
     whole_batch_rerun: Literal[False]
@@ -128,6 +128,8 @@ class CompanyProfileLiveRunReport(_StrictModel):
             raise ValueError("outcome order must follow the selected run set")
         if len(set(self.selected_instrument_ids)) != len(self.selected_instrument_ids):
             raise ValueError("selected run set cannot contain duplicate companies")
+        if not self.selected_strata:
+            return self
         stratum_ids = tuple(item.instrument_id for item in self.selected_strata)
         if stratum_ids != self.selected_instrument_ids:
             raise ValueError("selected strata must follow the selected run set")
@@ -244,7 +246,12 @@ def persist_live_run_report(
 
 
 def load_live_run_report(root: str | Path) -> CompanyProfileLiveRunReport:
-    """Load the persisted live-run report required by source review."""
+    """Load the persisted live-run report required by source review.
+
+    Pre-strata ``company_profile_live_run.v1`` snapshots remain readable.
+    Missing layer records stay empty so source review cannot assess occupied
+    strata or meet expansion gates.
+    """
 
     path = Path(root) / "reports" / f"{LIVE_RUN_SCHEMA_VERSION}.json"
     if not path.is_file():

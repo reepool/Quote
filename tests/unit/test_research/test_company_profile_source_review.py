@@ -138,6 +138,15 @@ def _complete_findings(*instrument_ids: str) -> tuple[SemanticFinding, ...]:
     return tuple(findings)
 
 
+def _write_legacy_live_run(live_run, root):
+    payload = json.loads(live_run.model_dump_json())
+    del payload["selected_strata"]
+    path = root / "reports" / "company_profile_live_run.v1.json"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(payload), encoding="utf-8")
+    return path
+
+
 def test_structure_only_review_leaves_semantic_metrics_unassessed():
     report = record_source_review_report(
         live_run=_live_run(),
@@ -267,6 +276,33 @@ def test_occupied_strata_follow_live_run_sample_layers():
     assert two_layers.expansion_gates_met is True
 
     payload = json.loads(same_layer.model_dump_json())
+    payload["occupied_strata_reviewed"] = {"status": "assessed", "value": 2}
+    payload["expansion_gates_met"] = True
+    with pytest.raises(ValidationError, match="live-run sample layers"):
+        CompanyProfileSourceReviewReport.model_validate_json(json.dumps(payload))
+
+
+def test_legacy_v1_live_run_enters_official_source_review_without_passing_gates(
+    tmp_path,
+):
+    live_run = _live_run(_two_stratum_registry())
+    _write_legacy_live_run(live_run, tmp_path / "checkpoints")
+    loaded = load_live_run_report(tmp_path / "checkpoints")
+    result = record_published_source_review(
+        checkpoint_root=tmp_path / "checkpoints",
+        semantic_findings=_complete_findings("600000.SH", "000001.SZ"),
+        tokens_used=100,
+        elapsed_seconds=10.0,
+    )
+
+    assert loaded.selected_instrument_ids == live_run.selected_instrument_ids
+    assert loaded.selected_strata == ()
+    assert result["source_review"]["occupied_strata_reviewed"]["status"] == (
+        "unassessed"
+    )
+    assert result["source_review"]["occupied_strata_reviewed"]["value"] is None
+    assert result["source_review"]["expansion_gates_met"] is False
+    payload = json.loads(json.dumps(result["source_review"]))
     payload["occupied_strata_reviewed"] = {"status": "assessed", "value": 2}
     payload["expansion_gates_met"] = True
     with pytest.raises(ValidationError, match="live-run sample layers"):

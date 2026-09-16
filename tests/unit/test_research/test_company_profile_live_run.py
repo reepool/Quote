@@ -188,6 +188,15 @@ def test_record_live_run_keeps_universe_denominator_and_rejects_batch_rerun():
             delivered_instrument_ids=(),
             knowledge_cutoff="2026-08-30",
         )
+    legacy = json.loads(report.model_dump_json())
+    del legacy["selected_strata"]
+    loaded = CompanyProfileLiveRunReport.model_validate_json(json.dumps(legacy))
+    assert loaded.selected_instrument_ids == report.selected_instrument_ids
+    assert loaded.selected_strata == ()
+    incomplete = json.loads(report.model_dump_json())
+    incomplete["selected_strata"] = [incomplete["selected_strata"][0]]
+    with pytest.raises(ValidationError, match="selected strata"):
+        CompanyProfileLiveRunReport.model_validate_json(json.dumps(incomplete))
 
 
 def test_budget_limited_live_run_saves_one_company_without_batch_rerun(tmp_path):

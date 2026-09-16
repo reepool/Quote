@@ -330,7 +330,7 @@ def _occupied_strata(
     findings: Sequence[SemanticFinding],
 ) -> AssessedCount | UnassessedValue:
     reviewed = {item.instrument_id for item in findings}
-    if not reviewed:
+    if not reviewed or not live_run.selected_strata:
         return UnassessedValue()
     by_id = {
         item.instrument_id: (item.exchange, item.disclosure_form)
