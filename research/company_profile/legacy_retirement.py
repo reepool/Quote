@@ -133,9 +133,7 @@ class CompanyProfileLegacyRetirementReport(_StrictModel):
             raise ValueError("legacy retirement cannot block new-space delivery")
         if self.retained_classes != RETAINED_CLASSES:
             raise ValueError("legacy retirement must retain official sources and new writes")
-        declared = tuple(item.item_id for item in _declared_items())
-        actual = tuple(item.item_id for item in self.items)
-        if actual != declared:
+        if self.items != _declared_items():
             raise ValueError("legacy retirement must keep the confirmed-invalid catalog")
         return self
 

@@ -99,6 +99,16 @@ def test_public_json_cannot_authorize_deletion_or_protected_targets():
     with pytest.raises(ValidationError):
         CompanyProfileLegacyRetirementReport.model_validate(payload)
     payload["dcf_authorized"] = False
+    original_object = payload["items"][0]["object"]
+    original_reason = payload["items"][0]["reason"]
+    payload["items"][0]["object"] = "invented_legacy_writer.v9"
+    with pytest.raises(ValidationError):
+        CompanyProfileLegacyRetirementReport.model_validate(payload)
+    payload["items"][0]["object"] = original_object
+    payload["items"][0]["reason"] = "rewritten catalog"
+    with pytest.raises(ValidationError):
+        CompanyProfileLegacyRetirementReport.model_validate(payload)
+    payload["items"][0]["reason"] = original_reason
     payload["items"][0]["object"] = "company_profile_common_core.v1"
     with pytest.raises(ValidationError):
         CompanyProfileLegacyRetirementReport.model_validate(payload)
