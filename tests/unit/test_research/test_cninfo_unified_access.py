@@ -944,3 +944,155 @@ def test_www_proxy_sticky_starts_replacement_headed_for_static():
     assert static.access_mode == "headed_chrome"
     assert static.content.startswith(b"%PDF-")
     assert snapshot_cninfo_access_runtime()["www_sticky"] == "proxy"
+
+
+def test_mux_static_413_does_not_sticky_proxy():
+    headed = _HeadedHop(
+        outcomes=[
+            CninfoHeadedFetchOutcome(
+                "success",
+                CninfoAccessResponse.from_fetch(
+                    {
+                        "status": 413,
+                        "url": STATIC_URL,
+                        "headers": {},
+                        "text": "",
+                        "body": b"",
+                    },
+                    access_mode="headed_chrome",
+                ),
+            ),
+            _headed_pdf_success(body=b"%PDF-1.7 later"),
+        ]
+    )
+    session = _attach(
+        headed_hop=headed,
+        impersonated_request=_CallableHop(responses=[AssertionError("413 must not TLS")]),
+        proxy_request=_CallableHop(responses=[AssertionError("413 must not proxy")]),
+    )
+    first = session.get(STATIC_URL, allow_redirects=False)
+    second = session.get(STATIC_URL, allow_redirects=False)
+    assert first.status_code == 413
+    assert first.access_mode == "headed_chrome"
+    assert second.access_mode == "headed_chrome"
+    assert second.content == b"%PDF-1.7 later"
+    assert snapshot_cninfo_access_runtime()["static_sticky"] is None
+
+
+def test_mux_document_success_after_in_page_403_leaves_later_static_on_headed():
+    page = _FakePageSession(
+        fetches=[
+            {
+                "status": 403,
+                "url": STATIC_URL,
+                "headers": {"content-type": "text/html"},
+                "text": "403 Forbidden",
+                "body": b"403 Forbidden",
+            },
+            {
+                "status": 403,
+                "url": STATIC_URL,
+                "headers": {"content-type": "text/html"},
+                "text": "403 Forbidden",
+                "body": b"403 Forbidden",
+            },
+        ],
+        document_fetches=[
+            {
+                "status": 200,
+                "url": STATIC_URL,
+                "headers": {"content-type": "application/pdf"},
+                "text": "",
+                "body": b"%PDF-1.7 first",
+            },
+            {
+                "status": 200,
+                "url": STATIC_URL,
+                "headers": {"content-type": "application/pdf"},
+                "text": "",
+                "body": b"%PDF-1.7 second",
+            },
+        ],
+    )
+    hop = create_cninfo_headed_chrome_access(page_session=page)
+    session = _attach(
+        headed_hop=hop,
+        impersonated_request=_CallableHop(responses=[AssertionError("must not TLS")]),
+        proxy_request=_CallableHop(responses=[AssertionError("must not proxy")]),
+    )
+    first = session.get(STATIC_URL, allow_redirects=False)
+    second = session.get(STATIC_URL, allow_redirects=False)
+    assert first.access_mode == "headed_chrome"
+    assert first.content == b"%PDF-1.7 first"
+    assert second.access_mode == "headed_chrome"
+    assert second.content == b"%PDF-1.7 second"
+    assert snapshot_cninfo_access_runtime()["static_sticky"] is None
+    assert len(page.document_calls) == 2
+
+
+def test_mux_overlapping_static_gets_do_not_start_second_chrome():
+    headed = _HeadedHop(
+        outcomes=[_headed_pdf_success(), _headed_pdf_success()],
+        delay=0.05,
+    )
+    session = _attach(
+        headed_hop=headed,
+        impersonated_request=_CallableHop(responses=[AssertionError("must not TLS")]),
+        proxy_request=_CallableHop(responses=[AssertionError("must not proxy")]),
+    )
+
+    def _get():
+        return session.get(STATIC_URL, allow_redirects=False)
+
+    first = threading.Thread(target=_get)
+    second = threading.Thread(target=_get)
+    first.start()
+    second.start()
+    first.join()
+    second.join()
+    assert headed.max_in_flight == 1
+    assert headed.closed == 0
+
+
+def test_mux_www_still_headed_after_static_document_read():
+    page = _FakePageSession(
+        fetches=[
+            {
+                "status": 403,
+                "url": STATIC_URL,
+                "headers": {"content-type": "text/html"},
+                "text": "403 Forbidden",
+                "body": b"403 Forbidden",
+            },
+            {
+                "status": 200,
+                "url": DATA20_URL,
+                "headers": {"content-type": "application/json"},
+                "text": '{"code": 200}',
+                "body": b'{"code": 200}',
+            },
+        ],
+        document_fetches=[
+            {
+                "status": 200,
+                "url": STATIC_URL,
+                "headers": {"content-type": "application/pdf"},
+                "text": "",
+                "body": b"%PDF-1.7 after-www",
+            }
+        ],
+    )
+    hop = create_cninfo_headed_chrome_access(page_session=page)
+    session = _attach(
+        headed_hop=hop,
+        impersonated_request=_CallableHop(responses=[AssertionError("must not TLS")]),
+        proxy_request=_CallableHop(responses=[AssertionError("must not proxy")]),
+    )
+    static = session.get(STATIC_URL, allow_redirects=False)
+    www = session.get(DATA20_URL)
+    assert static.access_mode == "headed_chrome"
+    assert static.content.startswith(b"%PDF-")
+    assert www.access_mode == "headed_chrome"
+    assert www.json()["code"] == 200
+    assert page.homepage_url == "https://www.cninfo.com.cn/"
+    assert snapshot_cninfo_access_runtime()["www_sticky"] is None

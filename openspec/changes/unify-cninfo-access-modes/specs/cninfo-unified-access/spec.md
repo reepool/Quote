@@ -71,7 +71,7 @@ The system SHALL provide exactly two preferred CNInfo access modes: `headed_chro
 - **AND** it SHALL NOT send a `headless=true` Chrome session to `www.cninfo.com.cn`
 
 ### Requirement: Host And Path Routing Without Per-Domain Copies
-The mux SHALL route by URL host and path. Allowlisted first-party www URLs MAY use headed Chrome. HTTPS `static.cninfo.com.cn` SHALL use the same preferred headed hop and blocked-versus-unavailable backup; that headed-first static behavior is owned by `cninfo-headed-static-pdf-access`. Unallowlisted https www paths, `webapi.cninfo.com.cn`, non-https URLs, and non-CNInfo hosts SHALL never use headed Chrome. Prefix `/data20/` SHALL admit future data20 endpoints to the allowlisted www hop without a new access implementation.
+The mux SHALL route by URL host and path. Allowlisted first-party www URLs MAY use headed Chrome. HTTPS `static.cninfo.com.cn` SHALL use the same preferred headed hop and blocked-versus-unavailable backup; headed-first static admission is owned by `cninfo-headed-static-pdf-access`, and document-level classification / size / timeout are owned by `cninfo-headed-static-document-read`. Unallowlisted https www paths, `webapi.cninfo.com.cn`, non-https URLs, and non-CNInfo hosts SHALL never use headed Chrome. Prefix `/data20/` SHALL admit future data20 endpoints to the allowlisted www hop without a new access implementation.
 
 #### Scenario: Data20 uses the first-party www hop
 - **WHEN** a caller GETs `https://www.cninfo.com.cn/data20/` on any path under that prefix
@@ -81,7 +81,7 @@ The mux SHALL route by URL host and path. Allowlisted first-party www URLs MAY u
 #### Scenario: Static PDF uses preferred headed then backup
 - **WHEN** official-filing or announcement-attachment code GETs `https://static.cninfo.com.cn/` for a PDF through an attached session
 - **THEN** the mux SHALL send that URL through `attach_cninfo_access`
-- **AND** headed-first static behavior SHALL follow `cninfo-headed-static-pdf-access`
+- **AND** headed-first static behavior SHALL follow `cninfo-headed-static-pdf-access` and `cninfo-headed-static-document-read`
 - **AND** it SHALL NOT use bare Python `requests` TLS solely because a session was injected
 - **AND** proxy fallback SHALL accept a PDF or trusted historical HTML body
 - **AND** proxy fallback SHALL reject a Wangsu block page and a JSON API payload
@@ -106,7 +106,7 @@ The mux SHALL route by URL host and path. Allowlisted first-party www URLs MAY u
 #### Scenario: Announcement attachments use the mux with headed Chrome first
 - **WHEN** `AnnouncementAttachmentRetriever` downloads a `static.cninfo.com.cn` attachment and the caller did not inject a session
 - **THEN** that download SHALL obtain HTTP access through `attach_cninfo_access`
-- **AND** headed-first static behavior SHALL follow `cninfo-headed-static-pdf-access`
+- **AND** headed-first static behavior SHALL follow `cninfo-headed-static-pdf-access` and `cninfo-headed-static-document-read`
 - **AND** an injected session SHALL remain unwrapped so tests keep their fake transport
 
 ### Requirement: Split Fallback For Blocked Versus Unavailable Chrome

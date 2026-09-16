@@ -4,7 +4,11 @@
 ``curl_cffi`` Chrome TLS fingerprint, not ``headless=true`` Chrome.
 ``wrap_cninfo_proxy_fallback`` is a test/internal TLS+proxy seam and requires
 explicit ``impersonated_request`` and ``proxy_request`` hops; production
-callers must not use it as a factory.
+callers must not use it as a factory. HTTPS static uses the same preferred
+headed hop; in-page 403 is not a finished Wangsu block. Document-level
+classification, the 200 MiB ceiling, and the 120 s document timeout live in
+the hop. ``static_sticky=proxy`` is set only after that hop reports
+``chrome_blocked``.
 """
 
 from __future__ import annotations
@@ -673,7 +677,8 @@ class CninfoAccessMux:
                 if outcome.status == "chrome_blocked":
                     runtime.static_sticky = "proxy"
                     LOGGER.info(
-                        "[CninfoHttp] headed Chrome blocked by Wangsu on static; "
+                        "[CninfoHttp] headed Chrome static hop chrome_blocked "
+                        "after document-level read; "
                         "using akshare_proxy_patch for static.cninfo.com.cn"
                     )
                     return outcome

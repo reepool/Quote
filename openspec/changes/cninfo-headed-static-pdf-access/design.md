@@ -161,3 +161,7 @@ Write-free `attach().get` of one known static PDF on the scheduler host is opera
 
 - Whether the first successful headed static fetch on this host is in-page `arrayBuffer` or CDP/navigation is an implementation spike inside the hop, not a second architecture. The mux contract does not change.
 - Surfacing `cninfo_access` on the XDXR Telegram report is optional later work and MUST NOT grow domain logic in `scheduler/tasks.py` beyond a thin display line if added.
+
+## Superseded Hop Rules
+
+Follow-up change `cninfo-headed-static-document-read` supersedes two hop rules from this design: in-page 403 / empty body is **not** terminal `chrome_blocked`, and the headed size ceiling is **not** 50 MiB. Implementers MUST follow that change for static classification, document-level read, and the 200 MiB annual-report bound.

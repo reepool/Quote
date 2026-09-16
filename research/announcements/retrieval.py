@@ -54,7 +54,7 @@ class AttachmentRetrievalPolicy:
     artifact_base_url: str
     approved_hosts: Tuple[str, ...]
     headers: Dict[str, str] = field(default_factory=dict)
-    request_timeout_seconds: float = 20.0
+    request_timeout_seconds: float = 120.0
     request_interval_seconds: float = 0.2
     retry_attempts: int = 2
     retry_backoff_seconds: float = 0.5
@@ -97,7 +97,7 @@ class AttachmentRetrievalPolicy:
             headers=headers,
             request_timeout_seconds=max(
                 1.0,
-                float(value.get("request_timeout_seconds", 20.0)),
+                float(value.get("request_timeout_seconds", 120.0)),
             ),
             request_interval_seconds=max(
                 0.0,
@@ -251,7 +251,7 @@ class AnnouncementAttachmentRetriever:
                     if status_code is not None
                     else f"{type(exc).__name__}:{exc}"
                 )
-                if status_code in {404, 410}:
+                if status_code in {404, 410, 413}:
                     break
                 if attempt >= policy.retry_attempts:
                     break

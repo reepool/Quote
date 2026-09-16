@@ -1871,7 +1871,7 @@
           "approved_attachment_hosts": [
             "static.cninfo.com.cn"
           ],
-          "request_timeout_seconds": 20.0,
+          "request_timeout_seconds": 120.0,
           "request_interval_seconds": 0.2,
           "retry_attempts": 2,
           "retry_backoff_seconds": 0.5,

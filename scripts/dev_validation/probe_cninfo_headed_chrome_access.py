@@ -3,9 +3,10 @@
 
 Exercises one data20 GET, one announcement POST, and one static URL. It does
 not upsert shareholder snapshots or finish an ingestion run. HTTPS static
-prefers headed Chrome through ``attach_cninfo_access``; Chrome TLS and proxy
-remain backups. Headed Chrome unit-hop probes belong in tests, not this
-production-factory path.
+prefers headed Chrome through ``attach_cninfo_access`` (in-page fast path,
+then same-Chrome document-level read); Chrome TLS and proxy remain backups.
+Headed Chrome unit-hop probes belong in tests, not this production-factory
+path.
 """
 
 from __future__ import annotations

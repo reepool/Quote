@@ -67,7 +67,7 @@ provider 参数位于 `config/10_research.json` 的 `research_config.sources.<so
 - 限制 timeout、retry、redirect、字节数和 pacing；
 - 返回 bytes、SHA-256、长度、final URL、媒体类型、PDF signature 和 retrieval time。
 
-CNInfo 附件 HTTP 走 `attach_cninfo_access`。`https://static.cninfo.com.cn/` 优先有头 Chrome，再 Chrome TLS / 代理；`webapi` 与 `http` 不进有头 Chrome。其他源仍走各自 session。
+CNInfo 附件 HTTP 走 `attach_cninfo_access`。`https://static.cninfo.com.cn/` 优先有头 Chrome：同页 `fetch` 只作为小文件快路径，不可用时在同一 Chrome 上做 document-level 读取；有头上限至少 200 MiB、document timeout 至少 120 秒。同页 403 / 空体不是终态 Wangsu。Chrome TLS / 代理仍是备份；`webapi` 与 `http` 不进有头 Chrome。其他源仍走各自 session。
 
 年报附件由 `research.announcement_assets` 统一归档和管理，公司业务画像与券商风控通过共享资产 API 获取年报，并继续拥有各自的 parser、OCR、LLM 和业务事实。其他公告类型仍由对应业务维护其业务归档。业务模块不得硬编码 CNInfo 或交易所附件 host，也不得保留第二套下载 transport。
 

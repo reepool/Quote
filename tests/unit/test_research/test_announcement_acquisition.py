@@ -2067,6 +2067,39 @@ def test_retriever_classifies_headed_mux_404_as_terminal_http_error():
     assert len(session.calls) == 1
 
 
+def test_retriever_classifies_headed_mux_413_as_terminal_http_error():
+    from research.providers.cninfo_headed_chrome import CninfoAccessResponse
+
+    headed_413 = CninfoAccessResponse.from_fetch(
+        {
+            "status": 413,
+            "url": "https://static.cninfo.com.cn/finalpage/huge.PDF",
+            "headers": {"content-type": "application/pdf"},
+            "text": "",
+            "body": b"",
+        },
+        access_mode="headed_chrome",
+    )
+    unused = CninfoAccessResponse.from_fetch(
+        {
+            "status": 200,
+            "url": "https://static.cninfo.com.cn/finalpage/huge.PDF",
+            "headers": {"content-type": "application/pdf"},
+            "text": "",
+            "body": b"%PDF-should-not-be-used",
+        },
+        access_mode="headed_chrome",
+    )
+    session = _AttachmentSession([headed_413, unused])
+    result = _retriever(session, retries=2).retrieve(
+        "cninfo",
+        AnnouncementAttachment(source_url="finalpage/huge.PDF"),
+    )
+    assert result.status == "failed"
+    assert result.errors == ("attachment_http_413",)
+    assert len(session.calls) == 1
+
+
 def test_attachment_retrieval_retries_transport_failure_without_partial_success():
     session = _AttachmentSession(
         [TimeoutError("timeout"), _AttachmentResponse(b"%PDF-retry")]

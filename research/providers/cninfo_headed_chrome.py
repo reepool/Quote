@@ -4,8 +4,10 @@ Production jobs go through ``attach_cninfo_access``. This module reports
 ``success`` / ``chrome_blocked`` / ``chrome_unavailable`` via
 ``fetch_allowlisted``; the mux owns fallback. Standalone ``request()`` may
 still jump headed-to-proxy for hop unit tests. HTTPS
-``static.cninfo.com.cn`` attachments use a binary same-Chrome read, not the
-www JSON ``r.text()`` path.
+``static.cninfo.com.cn`` attachments use an in-page binary fast path, then a
+same-Chrome document-level read. In-page 403 / empty / CORS is not a finished
+Wangsu block. The headed size ceiling is the official annual-report bound
+(200 MiB), not the 50 MiB XDXR default.
 """
 
 from __future__ import annotations
@@ -16,7 +18,10 @@ import http.client
 import json
 import logging
 import os
+import shutil
+import tempfile
 import threading
+import time
 from typing import Any, Callable, Mapping, MutableMapping, Optional
 from urllib.parse import parse_qsl, urlencode, urlparse, urlunparse
 
@@ -38,8 +43,11 @@ _ALLOWED_EXACT_PATHS = frozenset(
 )
 _ALLOWED_PREFIXES = ("/data20/", "/new/disclosure/")
 _STATIC_HOST = "static.cninfo.com.cn"
-_STATIC_MAX_BYTES = 50 * 1024 * 1024
+_STATIC_MAX_BYTES = 200 * 1024 * 1024
+_IN_PAGE_MAX_BYTES = 2 * 1024 * 1024
+_DOCUMENT_TIMEOUT = 120.0
 _DEFAULT_TIMEOUT = 20.0
+_REDIRECT_STATUSES = frozenset({301, 302, 303, 307, 308})
 ProxyRequest = Callable[..., Any]
 
 
@@ -162,39 +170,116 @@ def _is_in_page_cors_or_opaque(
     return any(marker in text for marker in markers)
 
 
-def _static_result_needs_same_chrome_fallback(result: Optional[Mapping[str, Any]]) -> bool:
-    if result is None or _is_in_page_cors_or_opaque(result):
+def _static_body_bytes(result: Mapping[str, Any]) -> bytes:
+    body = result.get("body")
+    if body is None:
+        body = str(result.get("text") or "").encode("utf-8")
+    return bytes(body or b"")
+
+
+def _is_redirect_status(status: int) -> bool:
+    return status in _REDIRECT_STATUSES or 300 <= status < 400
+
+
+def _static_result_as_413(result: Mapping[str, Any], url: str) -> dict[str, Any]:
+    return {
+        "status": 413,
+        "url": str(result.get("url") or url),
+        "headers": dict(result.get("headers") or {}),
+        "text": "",
+        "body": b"",
+        "path": str(result.get("path") or "document_fetch"),
+        "reason": "Payload Too Large",
+    }
+
+
+def _static_off_host_redirect(url: str, final: str) -> dict[str, Any]:
+    return {
+        "status": 302,
+        "url": url,
+        "headers": {"Location": final},
+        "text": "",
+        "body": b"",
+        "path": "document_fetch",
+        "reason": "Found",
+    }
+
+
+def _static_in_page_needs_document_read(
+    result: Optional[Mapping[str, Any]],
+    *,
+    allow_redirects: bool = True,
+) -> bool:
+    """True unless in-page already has a small usable body, 404/410, or 3xx."""
+    if result is None or result.get("oversized") or _is_in_page_cors_or_opaque(result):
         return True
     try:
         status = int(result.get("status") or 0)
     except (TypeError, ValueError):
         return True
-    body = result.get("body")
-    if body is None:
-        body = str(result.get("text") or "").encode("utf-8")
-    content = bytes(body or b"")
-    return status in {200, 206} and not content
+    if status in {404, 410}:
+        return False
+    if _is_redirect_status(status) and allow_redirects is False:
+        return False
+    content = _static_body_bytes(result)
+    if len(content) > _IN_PAGE_MAX_BYTES:
+        return True
+    media = _static_media_type(dict(result.get("headers") or {}))
+    text = str(result.get("text") or "") or content[:4000].decode("utf-8", "replace")
+    if status in {200, 206} and _is_usable_static_attachment(content, media):
+        return False
+    if status in {200, 206} and not content:
+        return True
+    if status == 403 or _is_wangsu_block_page(status=status, text=text):
+        return True
+    return True
 
 
-def _classify_static_headed_result(result: Mapping[str, Any]) -> "CninfoHeadedFetchOutcome":
+def _static_document_is_finished(result: Optional[Mapping[str, Any]]) -> bool:
+    """True when Fetch already has a definitive status or a usable/blocked body."""
+    if result is None:
+        return False
+    try:
+        status = int(result.get("status") or 0)
+    except (TypeError, ValueError):
+        return False
+    if status in {404, 410, 413} or _is_redirect_status(status) or status == 403:
+        return True
+    content = _static_body_bytes(result)
+    media = _static_media_type(dict(result.get("headers") or {}))
+    text = str(result.get("text") or "") or content[:4000].decode("utf-8", "replace")
+    if result.get("oversized") or len(content) > _STATIC_MAX_BYTES:
+        return True
+    if _is_usable_static_attachment(content, media):
+        return True
+    if _is_wangsu_block_page(status=status, text=text):
+        return True
+    return False
+
+
+def _classify_static_headed_result(
+    result: Mapping[str, Any],
+    *,
+    url: str = "",
+) -> "CninfoHeadedFetchOutcome":
     try:
         status = int(result.get("status") or 0)
     except (TypeError, ValueError):
         status = 0
-    body = result.get("body")
-    if body is None:
-        body = str(result.get("text") or "").encode("utf-8")
-    content = bytes(body or b"")
+    content = _static_body_bytes(result)
     media = _static_media_type(dict(result.get("headers") or {}))
     text = str(result.get("text") or "") or content[:4000].decode("utf-8", "replace")
+    if result.get("oversized") or len(content) > _STATIC_MAX_BYTES:
+        result = _static_result_as_413(result, url)
+        status = 413
+        content = b""
+        text = ""
     response = CninfoAccessResponse.from_fetch(result, access_mode="headed_chrome")
-    if status in {404, 410}:
+    if status in {404, 410, 413} or _is_redirect_status(status):
         return CninfoHeadedFetchOutcome("success", response)
     if status == 403 or _is_wangsu_block_page(status=status, text=text):
         return CninfoHeadedFetchOutcome("chrome_blocked", response)
     if status in {200, 206}:
-        if len(content) > _STATIC_MAX_BYTES:
-            return CninfoHeadedFetchOutcome("chrome_blocked", response)
         if _is_usable_static_attachment(content, media):
             return CninfoHeadedFetchOutcome("success", response)
         return CninfoHeadedFetchOutcome("chrome_blocked", response)
@@ -238,6 +323,26 @@ def _normalize_timeout(timeout: Any) -> float:
             return _DEFAULT_TIMEOUT
         return float(timeout[-1] or _DEFAULT_TIMEOUT)
     return float(timeout)
+
+
+def _document_timeout(timeout: Any) -> float:
+    return max(_DOCUMENT_TIMEOUT, _normalize_timeout(timeout))
+
+
+def _fetch_header_map(headers: Any) -> dict[str, str]:
+    mapped: dict[str, str] = {}
+    if not headers:
+        return mapped
+    if isinstance(headers, Mapping):
+        return {str(key): str(value) for key, value in headers.items()}
+    for item in headers:
+        name = getattr(item, "name", None)
+        value = getattr(item, "value", None)
+        if name is None and isinstance(item, (tuple, list)) and len(item) >= 2:
+            name, value = item[0], item[1]
+        if name is not None:
+            mapped[str(name)] = str(value or "")
+    return mapped
 
 
 def _apply_params(url: str, params: Optional[Mapping[str, Any]]) -> str:
@@ -400,6 +505,16 @@ class _NodriverPageSession:
         self._loop: Optional[asyncio.AbstractEventLoop] = None
         self._browser: Any = None
         self._page: Any = None
+        self._document_tab: Any = None
+        self._document_capture: Optional[dict[str, Any]] = None
+        self._document_event: Optional[asyncio.Event] = None
+        self._document_allow_redirects = True
+        self._document_target_url = ""
+        self._document_token = 0
+        self._download_dir: Optional[str] = None
+        self._download_event: Optional[asyncio.Event] = None
+        self._download_path: Optional[str] = None
+        self._download_behavior_ready = False
 
     def _run(self, coro: Any) -> Any:
         try:
@@ -430,6 +545,14 @@ class _NodriverPageSession:
     ) -> Optional[dict[str, Any]]:
         return self._run(self._async_fetch_binary_same_chrome(method, url, **kwargs))
 
+    def fetch_static_document(
+        self,
+        method: str,
+        url: str,
+        **kwargs: Any,
+    ) -> Optional[dict[str, Any]]:
+        return self._run(self._async_fetch_static_document(method, url, **kwargs))
+
     def close(self) -> None:
         if self._loop is None:
             return
@@ -444,6 +567,13 @@ class _NodriverPageSession:
         self._loop = None
         self._browser = None
         self._page = None
+        self._document_tab = None
+        self._document_capture = None
+        self._document_event = None
+        self._download_dir = None
+        self._download_event = None
+        self._download_path = None
+        self._download_behavior_ready = False
 
     async def _async_start(self, homepage: str) -> dict[str, Any]:
         try:
@@ -527,11 +657,377 @@ class _NodriverPageSession:
         finally:
             await self._close_extra_tab(extra)
 
+    async def _async_fetch_static_document(
+        self,
+        method: str,
+        url: str,
+        **kwargs: Any,
+    ) -> Optional[dict[str, Any]]:
+        if self._browser is None or self._page is None:
+            raise _ChromeUnusable("headed Chrome page is not started")
+        if str(method or "GET").upper() != "GET":
+            raise RuntimeError("document-level static read only supports GET")
+        timeout = _document_timeout(kwargs.get("timeout"))
+        allow_redirects = kwargs.get("allow_redirects", True) is not False
+        extra = None
+        download_dir: Optional[str] = None
+        self._document_token += 1
+        token = self._document_token
+        self._document_capture = None
+        self._document_event = asyncio.Event()
+        self._document_allow_redirects = allow_redirects
+        self._document_target_url = url
+        self._download_event = asyncio.Event()
+        self._download_path = None
+        started = time.monotonic()
+        try:
+            download_dir = tempfile.mkdtemp(prefix="cninfo-headed-static-")
+            self._download_dir = download_dir
+            extra = await self._open_static_document_tab(url, timeout=timeout)
+            await self._wait_static_document(timeout)
+            captured = self._document_capture
+            if token == self._document_token and not _static_document_is_finished(captured):
+                remaining = max(0.1, timeout - (time.monotonic() - started))
+                await self._wait_download_after_empty_fetch(remaining)
+            downloaded = self._read_download_result(url)
+            if downloaded is not None and (
+                not _static_document_is_finished(captured)
+                or _is_usable_static_attachment(_static_body_bytes(downloaded))
+            ):
+                return downloaded
+            if captured is not None:
+                return captured
+            if downloaded is not None:
+                return downloaded
+            return {
+                "status": 200,
+                "url": url,
+                "headers": {},
+                "text": "",
+                "body": b"",
+                "path": "document_fetch",
+            }
+        finally:
+            await self._close_extra_tab(extra)
+            self._document_token += 1
+            self._document_tab = None
+            self._document_event = None
+            self._document_capture = None
+            self._download_event = None
+            self._download_path = None
+            self._download_dir = None
+            if download_dir:
+                shutil.rmtree(download_dir, ignore_errors=True)
+
+    async def _open_static_document_tab(self, url: str, *, timeout: float) -> Any:
+        getter = getattr(self._browser, "get", None)
+        if not callable(getter):
+            raise _ChromeUnusable("headed Chrome cannot open a static document tab")
+        try:
+            extra = await asyncio.wait_for(getter("about:blank", new_tab=True), timeout=timeout)
+        except TypeError as exc:
+            raise _ChromeUnusable(
+                "headed Chrome cannot open a static document tab"
+            ) from exc
+        self._document_tab = extra
+        await self._enable_static_fetch_on(extra)
+        await self._ensure_download_behavior()
+        try:
+            from nodriver import cdp
+        except Exception as exc:
+            raise _ChromeUnusable("headed Chrome CDP is unavailable") from exc
+        send = getattr(extra, "send", None)
+        if callable(send):
+            await asyncio.wait_for(
+                send(cdp.page.navigate(url=url, referrer=CNINFO_HOMEPAGE)),
+                timeout=timeout,
+            )
+        else:
+            await asyncio.wait_for(extra.get(url), timeout=timeout)
+        return extra
+
+    async def _enable_static_fetch_on(self, tab: Any) -> None:
+        try:
+            from nodriver import cdp
+        except Exception:
+            return
+        add_handler = getattr(tab, "add_handler", None)
+        if callable(add_handler):
+            add_handler(cdp.fetch.RequestPaused, self._on_static_fetch_paused)
+        send = getattr(tab, "send", None)
+        if not callable(send):
+            return
+        await send(
+            cdp.fetch.enable(
+                patterns=[
+                    cdp.fetch.RequestPattern(
+                        url_pattern="https://static.cninfo.com.cn/*",
+                        request_stage=cdp.fetch.RequestStage.RESPONSE,
+                    )
+                ]
+            )
+        )
+
+    async def _ensure_download_behavior(self) -> None:
+        if not self._download_dir:
+            return
+        try:
+            from nodriver import cdp
+        except Exception:
+            return
+        send = getattr(self._browser, "send", None) or getattr(self._page, "send", None)
+        if not callable(send):
+            return
+        try:
+            await send(
+                cdp.browser.set_download_behavior(
+                    behavior="allow",
+                    download_path=self._download_dir,
+                    events_enabled=True,
+                )
+            )
+        except Exception:
+            LOGGER.debug(
+                "[CninfoHeadedChrome] setDownloadBehavior failed",
+                exc_info=True,
+            )
+            return
+        if self._download_behavior_ready:
+            return
+        add_handler = getattr(self._browser, "add_handler", None) or getattr(
+            self._page, "add_handler", None
+        )
+        if callable(add_handler):
+            add_handler(cdp.browser.DownloadProgress, self._on_static_download_progress)
+        self._download_behavior_ready = True
+
+    async def _wait_static_document(self, timeout: float) -> None:
+        event = self._document_event
+        download_event = self._download_event
+        if event is None:
+            return
+        waiters = [asyncio.create_task(event.wait())]
+        if download_event is not None:
+            waiters.append(asyncio.create_task(download_event.wait()))
+        try:
+            done, pending = await asyncio.wait(
+                waiters,
+                timeout=timeout,
+                return_when=asyncio.FIRST_COMPLETED,
+            )
+            for task in pending:
+                task.cancel()
+            if not done:
+                return
+        except Exception:
+            LOGGER.debug("[CninfoHeadedChrome] document wait failed", exc_info=True)
+
+    async def _wait_download_after_empty_fetch(self, timeout: float) -> None:
+        download_event = self._download_event
+        if download_event is None or download_event.is_set():
+            return
+        try:
+            await asyncio.wait_for(download_event.wait(), timeout=max(0.1, float(timeout)))
+        except Exception:
+            LOGGER.debug("[CninfoHeadedChrome] download wait failed", exc_info=True)
+
+    def _set_document_capture(
+        self,
+        result: Mapping[str, Any],
+        *,
+        token: int,
+        finished: bool = True,
+    ) -> None:
+        if token != self._document_token:
+            return
+        if self._document_capture is None:
+            self._document_capture = dict(result)
+        if not finished:
+            return
+        if self._document_event is not None and not self._document_event.is_set():
+            self._document_event.set()
+
+    async def _on_static_fetch_paused(self, event: Any) -> None:
+        token = self._document_token
+        tab = self._document_tab
+        if tab is None:
+            return
+        try:
+            from nodriver import cdp
+        except Exception:
+            return
+        request = getattr(event, "request", None)
+        request_url = str(getattr(request, "url", "") or "")
+        request_id = getattr(event, "request_id", None)
+        send = getattr(tab, "send", None)
+        if not callable(send) or request_id is None:
+            return
+
+        async def _continue() -> None:
+            try:
+                await send(cdp.fetch.continue_request(request_id=request_id))
+            except Exception:
+                try:
+                    await send(cdp.fetch.continue_response(request_id=request_id))
+                except Exception:
+                    LOGGER.debug(
+                        "[CninfoHeadedChrome] Fetch.continue failed",
+                        exc_info=True,
+                    )
+
+        async def _abort() -> None:
+            try:
+                await send(
+                    cdp.fetch.fail_request(
+                        request_id=request_id,
+                        error_reason=cdp.network.ErrorReason.ABORTED,
+                    )
+                )
+            except Exception:
+                await _continue()
+
+        if token != self._document_token:
+            await _continue()
+            return
+        if request_url and not is_allowed_cninfo_headed_static_url(request_url):
+            if urlparse(request_url).hostname:
+                self._set_document_capture(
+                    _static_off_host_redirect(self._document_target_url, request_url),
+                    token=token,
+                )
+            await _continue()
+            return
+        status = getattr(event, "response_status_code", None)
+        if status is None:
+            await _continue()
+            return
+        headers = _fetch_header_map(getattr(event, "response_headers", None))
+        try:
+            status_code = int(status)
+        except (TypeError, ValueError):
+            await _continue()
+            return
+        if _is_redirect_status(status_code) and self._document_allow_redirects is False:
+            self._set_document_capture(
+                {
+                    "status": status_code,
+                    "url": request_url or self._document_target_url,
+                    "headers": headers,
+                    "text": "",
+                    "body": b"",
+                    "path": "document_fetch",
+                },
+                token=token,
+            )
+            await _abort()
+            return
+        content_length = headers.get("Content-Length") or headers.get("content-length")
+        try:
+            announced = int(content_length) if content_length not in (None, "") else 0
+        except (TypeError, ValueError):
+            announced = 0
+        if announced > _STATIC_MAX_BYTES:
+            self._set_document_capture(
+                _static_result_as_413(
+                    {"headers": headers, "url": request_url},
+                    request_url or self._document_target_url,
+                ),
+                token=token,
+            )
+            await _abort()
+            return
+        body = b""
+        try:
+            raw_body, encoded = await send(cdp.fetch.get_response_body(request_id=request_id))
+            if encoded:
+                body = base64.b64decode(raw_body or "")
+            elif isinstance(raw_body, str):
+                body = raw_body.encode("utf-8")
+            else:
+                body = bytes(raw_body or b"")
+        except Exception:
+            LOGGER.debug(
+                "[CninfoHeadedChrome] Fetch.getResponseBody failed",
+                exc_info=True,
+            )
+        if len(body) > _STATIC_MAX_BYTES:
+            captured = _static_result_as_413(
+                {"headers": headers, "url": request_url},
+                request_url or self._document_target_url,
+            )
+            self._set_document_capture(captured, token=token)
+            await _abort()
+            return
+        captured = {
+            "status": status_code,
+            "url": request_url or self._document_target_url,
+            "headers": headers,
+            "text": "",
+            "body": body,
+            "path": "document_fetch",
+        }
+        self._set_document_capture(
+            captured,
+            token=token,
+            finished=_static_document_is_finished(captured),
+        )
+        await _continue()
+
+    def _on_static_download_progress(self, event: Any) -> None:
+        state = str(getattr(event, "state", "") or "").lower()
+        if state not in {"completed", "complete"}:
+            return
+        path = str(getattr(event, "file_path", "") or "")
+        download_dir = self._download_dir
+        if path and download_dir and not os.path.abspath(path).startswith(
+            os.path.abspath(download_dir) + os.sep
+        ):
+            return
+        if path:
+            self._download_path = path
+        if self._download_event is not None and not self._download_event.is_set():
+            self._download_event.set()
+
+    def _read_download_result(self, url: str) -> Optional[dict[str, Any]]:
+        path = self._download_path
+        if not path and self._download_dir:
+            try:
+                names = [
+                    name
+                    for name in os.listdir(self._download_dir)
+                    if not name.startswith(".") and not name.endswith(".crdownload")
+                ]
+            except OSError:
+                names = []
+            if names:
+                path = os.path.join(self._download_dir, names[0])
+        if not path or not os.path.isfile(path):
+            return None
+        try:
+            size = os.path.getsize(path)
+            if size > _STATIC_MAX_BYTES:
+                return _static_result_as_413({"url": url}, url)
+            with open(path, "rb") as handle:
+                body = handle.read(_STATIC_MAX_BYTES + 1)
+        except OSError:
+            return None
+        if len(body) > _STATIC_MAX_BYTES:
+            return _static_result_as_413({"url": url}, url)
+        return {
+            "status": 200,
+            "url": url,
+            "headers": {},
+            "text": "",
+            "body": body,
+            "path": "document_download",
+        }
+
     def _in_page_fetch_script(self, method: str, url: str, **kwargs: Any) -> str:
         headers = dict(kwargs.get("headers") or {})
         content_type = kwargs.get("content_type")
         binary = bool(kwargs.get("binary"))
         redirect_mode = "follow" if kwargs.get("allow_redirects", True) is not False else "manual"
+        max_bytes = int(kwargs.get("max_bytes") or _IN_PAGE_MAX_BYTES)
         return (
             "(async () => {\n"
             f"  const opt = {{ method: {method!r}, credentials: 'include', "
@@ -541,7 +1037,7 @@ class _NodriverPageSession:
             f"  const jsonBody = {json.dumps(kwargs.get('json'), ensure_ascii=False)};\n"
             f"  const formBody = {json.dumps(kwargs.get('data'), ensure_ascii=False)};\n"
             f"  const binary = {json.dumps(binary)};\n"
-            f"  const maxBytes = {int(_STATIC_MAX_BYTES)};\n"
+            f"  const maxBytes = {max_bytes};\n"
             "  if (contentType === 'application/json' && jsonBody !== null) {\n"
             "    opt.headers['Content-Type'] = 'application/json';\n"
             "    opt.body = JSON.stringify(jsonBody);\n"
@@ -554,6 +1050,37 @@ class _NodriverPageSession:
             "    const headers = {};\n"
             "    r.headers.forEach((value, key) => { headers[key] = value; });\n"
             "    if (binary) {\n"
+            "      const announced = parseInt(r.headers.get('content-length') || '0', 10);\n"
+            "      if (announced > maxBytes) {\n"
+            "        if (r.body && r.body.cancel) { try { r.body.cancel(); } catch (e) {} }\n"
+            "        return JSON.stringify({status: r.status, url: r.url, headers, "
+            "text: '', body_b64: '', oversized: true, type: r.type});\n"
+            "      }\n"
+            "      const reader = r.body && r.body.getReader ? r.body.getReader() : null;\n"
+            "      if (reader) {\n"
+            "        let seen = 0;\n"
+            "        const chunks = [];\n"
+            "        while (true) {\n"
+            "          const step = await reader.read();\n"
+            "          if (step.done) break;\n"
+            "          seen += step.value.length;\n"
+            "          if (seen > maxBytes) {\n"
+            "            try { await reader.cancel(); } catch (e) {}\n"
+            "            return JSON.stringify({status: r.status, url: r.url, headers, "
+            "text: '', body_b64: '', oversized: true, type: r.type});\n"
+            "          }\n"
+            "          chunks.push(step.value);\n"
+            "        }\n"
+            "        let binaryStr = '';\n"
+            "        const chunk = 0x8000;\n"
+            "        for (const part of chunks) {\n"
+            "          for (let i = 0; i < part.length; i += chunk) {\n"
+            "            binaryStr += String.fromCharCode.apply(null, part.subarray(i, i + chunk));\n"
+            "          }\n"
+            "        }\n"
+            "        return JSON.stringify({status: r.status, url: r.url, headers, "
+            "body_b64: btoa(binaryStr), type: r.type});\n"
+            "      }\n"
             "      const buf = await r.arrayBuffer();\n"
             "      const bytes = new Uint8Array(buf);\n"
             "      if (bytes.length > maxBytes) {\n"
@@ -607,6 +1134,8 @@ class _NodriverPageSession:
                     "text": "",
                     "body": b"",
                     "type": str(raw.get("type") or ""),
+                    "oversized": True,
+                    "path": "in_page",
                 }
             body_b64 = raw.get("body_b64")
             if body_b64:
@@ -623,6 +1152,7 @@ class _NodriverPageSession:
                 "text": "",
                 "body": body,
                 "type": str(raw.get("type") or ""),
+                "path": "in_page",
             }
         return {
             "status": status,
@@ -989,34 +1519,67 @@ class CninfoHeadedChromeAccess:
         url: str,
         **kwargs: Any,
     ) -> CninfoHeadedFetchOutcome:
+        started = time.monotonic()
+        path = "in_page"
+        status_code = 0
+        nbytes = 0
         try:
             result = self._static_binary_request(method, url, **kwargs)
         except CninfoHeadedChromeConfigError:
             raise
         except _ChromeUnusable:
             self._chrome_unusable = True
+            LOGGER.info(
+                "[CninfoHeadedChrome] static read path=document_fetch "
+                "status=unavailable bytes=0 elapsed=%.3f",
+                time.monotonic() - started,
+            )
             return CninfoHeadedFetchOutcome("chrome_unavailable")
         except Exception as exc:
             LOGGER.warning(
-                "[CninfoHeadedChrome] static binary request failed: %s",
+                "[CninfoHeadedChrome] static document request failed: %s",
                 type(exc).__name__,
             )
             if not self._session_started or (
                 self._restarted_dead and _is_dead_session(exc)
             ):
                 self._chrome_unusable = True
+                LOGGER.info(
+                    "[CninfoHeadedChrome] static read path=document_fetch "
+                    "status=unavailable bytes=0 elapsed=%.3f",
+                    time.monotonic() - started,
+                )
                 return CninfoHeadedFetchOutcome("chrome_unavailable")
+            LOGGER.info(
+                "[CninfoHeadedChrome] static read path=document_fetch "
+                "status=blocked bytes=0 elapsed=%.3f",
+                time.monotonic() - started,
+            )
             return CninfoHeadedFetchOutcome("chrome_blocked")
         if result is None:
-            LOGGER.warning("[CninfoHeadedChrome] static binary evaluate returned null")
+            LOGGER.info(
+                "[CninfoHeadedChrome] static read path=document_fetch "
+                "status=blocked bytes=0 elapsed=%.3f",
+                time.monotonic() - started,
+            )
             return CninfoHeadedFetchOutcome("chrome_blocked")
+        path = str(result.get("path") or "document_fetch")
         final = str(result.get("url") or url)
         if final and urlparse(final).hostname and not is_allowed_cninfo_headed_static_url(final):
-            return CninfoHeadedFetchOutcome(
-                "chrome_blocked",
-                CninfoAccessResponse.from_fetch(result, access_mode="headed_chrome"),
-            )
-        return _classify_static_headed_result(result)
+            result = _static_off_host_redirect(url, final)
+            path = str(result.get("path") or path)
+        outcome = _classify_static_headed_result(result, url=url)
+        if outcome.response is not None:
+            status_code = int(outcome.response.status_code)
+            nbytes = len(outcome.response.content)
+        LOGGER.info(
+            "[CninfoHeadedChrome] static read path=%s status=%s bytes=%s elapsed=%.3f",
+            path,
+            status_code or outcome.status,
+            nbytes,
+            time.monotonic() - started,
+        )
+        return outcome
 
     def _ensure_started(self) -> None:
         if self._session_started and self._page is not None:
@@ -1131,33 +1694,43 @@ class CninfoHeadedChromeAccess:
             fetch_kwargs = self._fetch_kwargs(url, **kwargs)
             target_url = fetch_kwargs.pop("url")
             fetch_kwargs["binary"] = True
+            fetch_kwargs["max_bytes"] = _IN_PAGE_MAX_BYTES
             if "allow_redirects" in kwargs:
                 fetch_kwargs["allow_redirects"] = kwargs["allow_redirects"]
+            allow_redirects = fetch_kwargs.get("allow_redirects", True) is not False
             result: Optional[dict[str, Any]] = None
-            cors_exc: Optional[BaseException] = None
+            in_page_exc: Optional[BaseException] = None
             try:
                 result = self._page.fetch(method, target_url, **fetch_kwargs)
             except Exception as exc:
                 if _is_dead_session(exc):
                     raise
-                if not _is_in_page_cors_or_opaque(None, exc):
-                    raise
-                cors_exc = exc
-            if result is not None and not _static_result_needs_same_chrome_fallback(result):
+                in_page_exc = exc
+            if result is not None:
+                result.setdefault("path", "in_page")
+            if result is not None and not _static_in_page_needs_document_read(
+                result,
+                allow_redirects=allow_redirects,
+            ):
                 return result
-            cdp = getattr(self._page, "fetch_binary_same_chrome", None)
-            if not callable(cdp):
-                if cors_exc is not None:
-                    raise cors_exc
+            document = getattr(self._page, "fetch_static_document", None)
+            if not callable(document):
+                if in_page_exc is not None:
+                    raise in_page_exc
                 return result
+            document_kwargs = dict(fetch_kwargs)
+            document_kwargs["timeout"] = _document_timeout(kwargs.get("timeout"))
             try:
-                return cdp(method, target_url, **fetch_kwargs)
-            except Exception as cdp_exc:
-                if _is_dead_session(cdp_exc):
+                captured = document(method, target_url, **document_kwargs)
+            except Exception as document_exc:
+                if _is_dead_session(document_exc):
                     raise
-                if cors_exc is not None:
-                    raise RuntimeError(str(cdp_exc)) from cdp_exc
+                if in_page_exc is not None:
+                    raise RuntimeError(str(document_exc)) from document_exc
                 raise
+            if captured is not None:
+                captured.setdefault("path", captured.get("path") or "document_fetch")
+            return captured
 
         try:
             return _once()
