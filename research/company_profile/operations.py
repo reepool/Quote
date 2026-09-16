@@ -24,10 +24,19 @@ from research.business_profile_async_production import (
     ensure_business_profile_storage_ready,
     get_business_profile_write_coordinator,
 )
+from research.company_profile.candidate_registry import AShareCandidateRegistry
 from research.company_profile.contracts import SemanticProvider
 from research.company_profile.execution import (
     DEFAULT_TOTAL_TOKEN_BUDGET,
     default_processing_identity,
+)
+from research.company_profile.live_plan import (
+    CompanyProfileLivePlan,
+    record_company_profile_live_plan,
+)
+from research.company_profile.live_run import (
+    record_live_run_report,
+    select_live_run_targets,
 )
 from research.company_profile.models import PRODUCTION_AUTHORIZATION
 from research.company_profile.reads import CompanyProfileReadService
@@ -324,12 +333,16 @@ class CompanyProfileTaskService:
         provider: SemanticProvider | None = None,
         token_budget: int = DEFAULT_TOTAL_TOKEN_BUDGET,
         shared_asset_access: Any | None = None,
+        candidate_registry: AShareCandidateRegistry | None = None,
+        live_plan: CompanyProfileLivePlan | None = None,
     ) -> None:
         self.storage = storage
         self.output_root = Path(output_root)
         self.checkpoint_root = Path(checkpoint_root)
         self.provider = provider
         self.token_budget = max(0, int(token_budget))
+        self.candidate_registry = candidate_registry
+        self.live_plan = live_plan
         self.processing_identity = default_processing_identity()
         self.processing_identity_hash = _stable_hash(self.processing_identity)
         ensure_business_profile_storage_ready(storage)
@@ -379,6 +392,8 @@ class CompanyProfileTaskService:
         max_elapsed_seconds: float = DEFAULT_MAX_ELAPSED_SECONDS,
         reason: str = "operator_request",
         output_directory: str | Path | None = None,
+        candidate_registry: AShareCandidateRegistry | None = None,
+        live_plan: CompanyProfileLivePlan | None = None,
     ) -> dict[str, Any]:
         normalized = str(action or "").strip().lower()
         if normalized not in PUBLISHED_ACTIONS:
@@ -402,6 +417,18 @@ class CompanyProfileTaskService:
             return self._export(
                 instrument_ids=instruments,
                 output_directory=output_directory,
+            )
+        registry = candidate_registry or self.candidate_registry
+        plan = live_plan or self.live_plan
+        if normalized == "run" and registry is not None:
+            return await self._run_live(
+                knowledge_cutoff=cutoff,
+                instrument_ids=instruments,
+                max_items=int(max_items),
+                max_elapsed_seconds=float(max_elapsed_seconds),
+                token_budget=self.token_budget,
+                registry=registry,
+                live_plan=plan,
             )
         if normalized == "run":
             return await self._run(
@@ -456,6 +483,51 @@ class CompanyProfileTaskService:
             export_directory=output_directory,
         )
         return self._payload(**result)
+
+    async def _run_live(
+        self,
+        *,
+        knowledge_cutoff: str,
+        instrument_ids: Sequence[str],
+        max_items: int,
+        max_elapsed_seconds: float,
+        token_budget: int,
+        registry: AShareCandidateRegistry,
+        live_plan: CompanyProfileLivePlan | None,
+    ) -> dict[str, Any]:
+        plan = live_plan or record_company_profile_live_plan(
+            max_companies_this_round=max_items,
+            token_budget=token_budget,
+            max_elapsed_seconds=max_elapsed_seconds,
+        )
+        selected = select_live_run_targets(
+            registry,
+            plan,
+            instrument_ids=instrument_ids,
+        )
+        result = await self._run(
+            knowledge_cutoff=knowledge_cutoff,
+            instrument_ids=selected,
+            max_items=plan.budget.max_companies_this_round,
+            max_elapsed_seconds=plan.budget.max_elapsed_seconds,
+            enqueue=True,
+        )
+        delivered = _delivered_instrument_ids(self.writer.output_root)
+        incomplete = tuple(
+            instrument_id
+            for instrument_id in selected
+            if instrument_id not in delivered
+        )
+        report = record_live_run_report(
+            plan=plan,
+            registry=registry,
+            selected_instrument_ids=selected,
+            delivered_instrument_ids=sorted(delivered),
+            knowledge_cutoff=knowledge_cutoff,
+            incomplete_supplement_ids=incomplete,
+        )
+        result["live_run"] = report.model_dump(mode="json")
+        return result
 
     async def _run(
         self,
@@ -606,6 +678,19 @@ class CompanyProfileTaskService:
         return payload
 
 
+def _delivered_instrument_ids(output_root: Path) -> set[str]:
+    delivered: set[str] = set()
+    if not output_root.exists():
+        return delivered
+    for path in output_root.glob("*.json"):
+        payload = json.loads(path.read_text(encoding="utf-8"))
+        report = payload.get("report") or {}
+        instrument_id = str(report.get("instrument_id") or "").strip()
+        if instrument_id:
+            delivered.add(instrument_id)
+    return delivered
+
+
 async def execute_published_task(
     *,
     action: str,
@@ -623,6 +708,8 @@ async def execute_published_task(
     max_elapsed_seconds: float = DEFAULT_MAX_ELAPSED_SECONDS,
     reason: str = "operator_request",
     output_directory: str | Path | None = None,
+    candidate_registry: AShareCandidateRegistry | None = None,
+    live_plan: CompanyProfileLivePlan | None = None,
 ) -> dict[str, Any]:
     """Unique owner entry for the published company-profile task operations."""
 
@@ -634,6 +721,8 @@ async def execute_published_task(
         provider=provider,
         token_budget=token_budget,
         shared_asset_access=shared_asset_access,
+        candidate_registry=candidate_registry,
+        live_plan=live_plan,
     )
     return await service.execute(
         action,
@@ -644,4 +733,6 @@ async def execute_published_task(
         max_elapsed_seconds=max_elapsed_seconds,
         reason=reason,
         output_directory=output_directory,
+        candidate_registry=candidate_registry,
+        live_plan=live_plan,
     )
