@@ -27,10 +27,15 @@ from research.company_profile.operator_closure import (
     operator_closure_schema_manifest,
     record_operator_closure_report,
     refuse_retired_operator_entry,
+    retired_operator_entry_notice,
 )
 from research.company_profile.publication import record_publication_control
 from research.company_profile.runtime import COMMON_CORE_WRITER_NAME
 from utils.config_manager import UnifiedConfigManager
+from utils.task_manager.formatters import TaskManagerFormatters
+from utils.task_manager.handlers import TaskManagerHandlers
+from utils.task_manager.keyboards import TaskManagerKeyboards
+from utils.task_manager.models import TaskStatus, TaskStatusInfo
 
 
 def test_operator_closure_requires_publication_cutover(tmp_path):
@@ -188,6 +193,182 @@ def test_external_parse_layer_refuses_retired_job_ids_before_handlers():
     refuse_retired_operator_entry(PUBLISHED_TASK_NAME)
     assert looked_up == []
     execute.assert_not_awaited()
+
+
+def _silent_logger() -> SimpleNamespace:
+    return SimpleNamespace(
+        debug=lambda *args, **kwargs: None,
+        info=lambda *args, **kwargs: None,
+        error=lambda *args, **kwargs: None,
+        warning=lambda *args, **kwargs: None,
+    )
+
+
+def _telegram_handler(
+    *,
+    job_configs: dict | None = None,
+    execute_job_direct: AsyncMock | None = None,
+    update_nested: AsyncMock | None = None,
+) -> tuple[TaskManagerHandlers, SimpleNamespace]:
+    manager = SimpleNamespace(
+        logger=_silent_logger(),
+        send_message=AsyncMock(),
+        is_authorized=lambda chat_id: True,
+        task_scheduler=SimpleNamespace(
+            get_all_jobs_status=lambda: {"jobs": {}},
+            execute_job_direct=execute_job_direct or AsyncMock(return_value=True),
+            jobs={},
+        ),
+        job_config_manager=SimpleNamespace(job_configs=job_configs or {}),
+        config_manager=SimpleNamespace(
+            update_nested=update_nested or AsyncMock(return_value=True),
+        ),
+    )
+    return TaskManagerHandlers(manager), manager
+
+
+def test_retired_operator_entry_notice_names_the_published_entry():
+    notice = retired_operator_entry_notice("business_profile_backfill")
+    assert "入口已断开" in notice
+    assert "business_profile_backfill" in notice
+    assert PUBLISHED_TASK_NAME in notice
+    with pytest.raises(ValueError, match="not a retired operator entry"):
+        retired_operator_entry_notice(PUBLISHED_TASK_NAME)
+
+
+@pytest.mark.asyncio
+async def test_telegram_status_omits_retired_run_copy():
+    jobs = {
+        PUBLISHED_TASK_NAME: SimpleNamespace(
+            enabled=False,
+            description="company profile common core",
+            parameters={},
+        )
+    }
+    for name in RETIRED_OPERATOR_ENTRIES:
+        jobs[name] = SimpleNamespace(
+            enabled=False,
+            description=f"已冻结 {name}",
+            parameters={},
+        )
+    handler, _manager = _telegram_handler(job_configs=jobs)
+    running, disabled, total = await handler._get_all_tasks_status()
+    ids = {task.job_id for task in (*running, *disabled)}
+    assert ids == {PUBLISHED_TASK_NAME}
+    assert total == 1
+    text = TaskManagerFormatters.format_task_status_summary(running, disabled, total)
+    for name in RETIRED_OPERATOR_ENTRIES:
+        assert f"/run {name}" not in text
+    assert f"/run {PUBLISHED_TASK_NAME}" in text
+
+
+@pytest.mark.asyncio
+async def test_run_command_refuses_retired_before_enabled_prompt(monkeypatch):
+    import utils
+
+    looked_up: list[str] = []
+
+    def get_nested(path, default=None):
+        looked_up.append(path)
+        return {"enabled": False, "description": "已冻结"}
+
+    monkeypatch.setattr(utils.config_manager, "get_nested", get_nested)
+    handler, manager = _telegram_handler()
+    handler._execute_task_direct = AsyncMock(return_value=True)
+    await handler.handle_run_command(
+        SimpleNamespace(
+            chat_id=1,
+            sender_id=2,
+            text="/run business_profile_backfill",
+        )
+    )
+    message = manager.send_message.await_args.args[1]
+    assert "入口已断开" in message
+    assert "请先启用" not in message
+    assert PUBLISHED_TASK_NAME in message
+    handler._execute_task_direct.assert_not_awaited()
+    manager.task_scheduler.execute_job_direct.assert_not_awaited()
+    assert looked_up == []
+
+
+@pytest.mark.asyncio
+async def test_run_command_still_reaches_published_entry(monkeypatch):
+    import utils
+
+    monkeypatch.setattr(
+        utils.config_manager,
+        "get_nested",
+        lambda path, default=None: {"enabled": True, "manual_only": True}
+        if path == f"scheduler_config.jobs.{PUBLISHED_TASK_NAME}"
+        else default,
+    )
+    handler, manager = _telegram_handler()
+    handler._execute_task_direct = AsyncMock(return_value=True)
+    await handler.handle_run_command(
+        SimpleNamespace(
+            chat_id=1,
+            sender_id=2,
+            text=f"/run {PUBLISHED_TASK_NAME}",
+        )
+    )
+    messages = [call.args[1] for call in manager.send_message.await_args_list]
+    assert all("入口已断开" not in message for message in messages)
+    handler._execute_task_direct.assert_awaited_once()
+
+
+@pytest.mark.asyncio
+async def test_task_detail_and_enable_omit_retired_entry():
+    handler, manager = _telegram_handler()
+    await handler._show_task_detail_safe(1, "business_profile_backfill")
+    detail = manager.send_message.await_args.args[1]
+    assert "入口已断开" in detail
+    assert "启用任务" not in detail
+
+    retired = TaskStatusInfo(
+        job_id="business_profile_backfill",
+        description="已冻结",
+        enabled=False,
+        in_scheduler=False,
+        status=TaskStatus.DISABLED,
+        trigger_info=None,
+    )
+    retired_texts = [
+        button["text"]
+        for row in TaskManagerKeyboards.task_detail_menu(retired)
+        for button in row
+    ]
+    retired_callbacks = [
+        button["callback"]
+        for row in TaskManagerKeyboards.task_detail_menu(retired)
+        for button in row
+    ]
+    assert all("启用任务" not in text for text in retired_texts)
+    assert all("立即执行" not in text for text in retired_texts)
+    assert all(not callback.startswith("task_action:") for callback in retired_callbacks)
+
+    published = TaskStatusInfo(
+        job_id=PUBLISHED_TASK_NAME,
+        description="common core",
+        enabled=False,
+        in_scheduler=False,
+        status=TaskStatus.DISABLED,
+        trigger_info=None,
+    )
+    published_texts = [
+        button["text"]
+        for row in TaskManagerKeyboards.task_detail_menu(published)
+        for button in row
+    ]
+    assert any("启用任务" in text for text in published_texts)
+
+    await handler._handle_task_action(1, "enable", "business_profile_backfill")
+    assert "入口已断开" in manager.send_message.await_args.args[1]
+
+    update = AsyncMock(return_value=True)
+    action_handler, _manager = _telegram_handler(update_nested=update)
+    with pytest.raises(Exception, match="disconnected"):
+        await action_handler._perform_task_action("enable", "business_profile_backfill")
+    update.assert_not_awaited()
 
 
 def test_authoritative_requirements_match_connected_operator_entry():

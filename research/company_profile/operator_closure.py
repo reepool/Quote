@@ -182,6 +182,19 @@ def refuse_retired_operator_entry(job_id: str) -> None:
         )
 
 
+def retired_operator_entry_notice(job_id: str) -> str:
+    """Operator-facing copy when a leftover Telegram entry is still typed."""
+
+    normalized = str(job_id or "").strip()
+    if not is_retired_operator_entry(normalized):
+        raise ValueError(f"not a retired operator entry: {normalized}")
+    return (
+        "❌ *入口已断开*\n\n"
+        f"任务ID: `{normalized}`\n\n"
+        "当前入口只有 `company_profile_common_core`。"
+    )
+
+
 def record_operator_closure_report(
     publication: CompanyProfilePublicationControl,
 ) -> CompanyProfileOperatorClosureReport:

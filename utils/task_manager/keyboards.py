@@ -69,20 +69,23 @@ class TaskManagerKeyboards:
     @staticmethod
     def task_detail_menu(task: TaskStatusInfo) -> List[List[dict]]:
         """任务详情菜单键盘"""
+        from research.company_profile.operator_closure import is_retired_operator_entry
+
         keyboard = []
 
         # 根据任务状态显示不同的操作按钮
-        if task.enabled and task.in_scheduler:
-            # 任务正在运行
-            keyboard.append([
-                {"text": "🚀 立即执行", "callback": f"task_action:run:{task.job_id}"},
-                {"text": "🔴 禁用任务", "callback": f"task_action:disable:{task.job_id}"}
-            ])
-        elif not task.enabled:
-            # 任务已禁用
-            keyboard.append([
-                {"text": "✅ 启用任务", "callback": f"task_action:enable:{task.job_id}"}
-            ])
+        if not is_retired_operator_entry(task.job_id):
+            if task.enabled and task.in_scheduler:
+                # 任务正在运行
+                keyboard.append([
+                    {"text": "🚀 立即执行", "callback": f"task_action:run:{task.job_id}"},
+                    {"text": "🔴 禁用任务", "callback": f"task_action:disable:{task.job_id}"}
+                ])
+            elif not task.enabled:
+                # 任务已禁用
+                keyboard.append([
+                    {"text": "✅ 启用任务", "callback": f"task_action:enable:{task.job_id}"}
+                ])
 
         # 通用操作按钮
         keyboard.append([

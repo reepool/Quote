@@ -23,6 +23,23 @@ class TaskManagerHandlers:
         self.task_manager = task_manager
         self.user_states: Dict[int, TaskManagerState] = {}
 
+    async def _publish_retired_operator_entry_notice(
+        self, chat_id: int, job_id: str
+    ) -> bool:
+        from research.company_profile.operator_closure import (
+            is_retired_operator_entry,
+            retired_operator_entry_notice,
+        )
+
+        if not is_retired_operator_entry(job_id):
+            return False
+        await self.task_manager.send_message(
+            chat_id,
+            retired_operator_entry_notice(job_id),
+            parse_mode="markdown",
+        )
+        return True
+
     async def handle_start_command(self, event) -> None:
         """处理 /start 命令"""
         chat_id = event.chat_id
@@ -305,6 +322,9 @@ class TaskManagerHandlers:
         try:
             self.task_manager.logger.debug(f"[TaskManagerHandlers] 安全获取任务详情: {job_id}")
 
+            if await self._publish_retired_operator_entry_notice(chat_id, job_id):
+                return
+
             # 从配置文件直接获取信息
             from utils import config_manager
             job_cfg = config_manager.get_nested(f'scheduler_config.jobs.{job_id}', {})
@@ -390,6 +410,9 @@ class TaskManagerHandlers:
         """处理任务操作"""
         user_state = self._get_user_state(chat_id)
 
+        if await self._publish_retired_operator_entry_notice(chat_id, job_id):
+            return
+
         if action in ["disable", "enable"]:
             # 需要确认的操作
             task_detail = await self._get_task_detail(job_id)
@@ -429,6 +452,9 @@ class TaskManagerHandlers:
         operator_principal: Optional[str] = None,
     ) -> None:
         """处理确认操作"""
+        if await self._publish_retired_operator_entry_notice(chat_id, job_id):
+            return
+
         await self._execute_task_action(
             chat_id,
             action,
@@ -682,8 +708,14 @@ class TaskManagerHandlers:
             running_tasks = []
             disabled_tasks = []
             total_tasks = 0
+            from research.company_profile.operator_closure import is_retired_operator_entry
 
             for job_id, job_config in job_configs.items():
+                if is_retired_operator_entry(job_id):
+                    self.task_manager.logger.debug(
+                        f"[TaskManagerHandlers] 跳过已断开入口: {job_id}"
+                    )
+                    continue
                 total_tasks += 1
                 self.task_manager.logger.debug(f"[TaskManagerHandlers] 处理任务: {job_id}")
 
@@ -818,6 +850,11 @@ class TaskManagerHandlers:
         try:
             self.task_manager.logger.debug(f"[TaskManagerHandlers] 开始获取任务详情: {job_id}")
 
+            from research.company_profile.operator_closure import is_retired_operator_entry
+
+            if is_retired_operator_entry(job_id):
+                return None
+
             # 获取调度器状态
             scheduler_status = self.task_manager.task_scheduler.get_all_jobs_status()
             self.task_manager.logger.debug(f"[TaskManagerHandlers] 调度器状态获取成功")
@@ -950,12 +987,12 @@ class TaskManagerHandlers:
     ) -> bool:
         """执行任务操作"""
         try:
-            if action == "run":
-                from research.company_profile.operator_closure import (
-                    refuse_retired_operator_entry,
-                )
+            from research.company_profile.operator_closure import (
+                refuse_retired_operator_entry,
+            )
 
-                refuse_retired_operator_entry(job_id)
+            refuse_retired_operator_entry(job_id)
+            if action == "run":
                 if job_id.startswith("annual_report_asset_"):
                     return await self.task_manager.task_scheduler.execute_job_direct(
                         job_id,
@@ -985,6 +1022,11 @@ class TaskManagerHandlers:
     async def _enable_task(self, job_id: str) -> bool:
         """启用任务"""
         try:
+            from research.company_profile.operator_closure import (
+                refuse_retired_operator_entry,
+            )
+
+            refuse_retired_operator_entry(job_id)
             # 更新配置
             config_path = f"scheduler_config.jobs.{job_id}.enabled"
             return await self.task_manager.config_manager.update_nested(config_path, True)
@@ -995,6 +1037,11 @@ class TaskManagerHandlers:
     async def _disable_task(self, job_id: str) -> bool:
         """禁用任务"""
         try:
+            from research.company_profile.operator_closure import (
+                refuse_retired_operator_entry,
+            )
+
+            refuse_retired_operator_entry(job_id)
             # 更新配置
             config_path = f"scheduler_config.jobs.{job_id}.enabled"
             return await self.task_manager.config_manager.update_nested(config_path, False)
@@ -1203,6 +1250,8 @@ class TaskManagerHandlers:
             return
 
         job_id = parts[1]
+        if await self._publish_retired_operator_entry_notice(chat_id, job_id):
+            return
         if job_id == 'futures_official_calendar_backfill' and len(parts) > 2:
             await self.handle_futures_calendar_backfill_command(
                 SimpleNamespace(
