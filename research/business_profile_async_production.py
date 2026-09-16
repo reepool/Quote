@@ -774,9 +774,12 @@ class BusinessProfileWorkRepository:
         """Release a configuration-blocked lease without consuming an attempt."""
 
         now = get_shanghai_time()
+        delay = int(retry_after_seconds)
         next_attempt_at = (
-            now + timedelta(seconds=max(1, int(retry_after_seconds)))
-        ).isoformat()
+            now.isoformat()
+            if delay <= 0
+            else (now + timedelta(seconds=max(1, delay))).isoformat()
+        )
         with self.storage.get_connection() as conn:
             self.storage._apply_pragmas(conn)
             cursor = conn.execute(
@@ -3273,13 +3276,18 @@ class BusinessProfileAsyncProductionService:
                     reasons = ",".join(
                         sorted(dict(quality.get("blocked_configuration_reasons") or {}))
                     )
+                    retry_after = quality.get("retry_after_seconds")
                     deferred_status = await self._run_storage_operation(
                         self.repository.defer_configuration,
                         str(item["work_id"]),
                         lease_owner=lease_owner,
                         reason="blocked_configuration:"
                         + (reasons or "semantic_gateway_unavailable"),
-                        retry_after_seconds=self.retry_backoff_seconds,
+                        retry_after_seconds=(
+                            int(retry_after)
+                            if retry_after is not None
+                            else self.retry_backoff_seconds
+                        ),
                     )
                     if deferred_status == "configuration_blocked":
                         configuration_blocked += 1

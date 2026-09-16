@@ -376,7 +376,7 @@ class CompanyProfileTaskService:
         )
         self.writer = CompanyProfileResearchWriter(
             self.output_root,
-            write_gate=self._publication_allows_writes,
+            checkpoint_root=self.checkpoint_root,
         )
         self.reads = CompanyProfileReadService(self.output_root)
         self.control = CompanyProfileTaskControl(self.checkpoint_root)
@@ -625,9 +625,11 @@ class CompanyProfileTaskService:
                         include_work_ids=include_work_ids,
                         should_stop=self._should_stop_run,
                     )
-                    if drain[stage].get("stop_requested") or drain[stage].get(
-                        "status"
-                    ) == "stopped":
+                    if (
+                        self._should_stop_run()
+                        or drain[stage].get("stop_requested")
+                        or drain[stage].get("status") == "stopped"
+                    ):
                         stopped = True
                         break
         except Exception:

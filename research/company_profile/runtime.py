@@ -76,6 +76,10 @@ COMMON_CORE_RUNTIME_SCHEMA = "company_profile_common_core_runtime.v1"
 COMMON_CORE_STORAGE_NAMESPACE = "company_profile_common_core.v1"
 COMMON_CORE_WRITER_NAME = "company_profile_research_writer.v1"
 SCOPE_CHECKPOINT_SCHEMA = "company_profile_scope_checkpoint.v1"
+
+
+class PublicationWritesStopped(ValueError):
+    """Publication pause or rollback refused a new profile write."""
 QUEUE_STAGES = ("acquire", "parse", "semantic", "verify", "publish")
 _CORE_FIELDS: dict[ChapterTask, tuple[str, ...]] = {
     ChapterTask.EXTRACT_BUSINESS_OVERVIEW: (
@@ -182,11 +186,15 @@ class CompanyProfileResearchWriter:
         output_root: str | Path,
         *,
         write_gate: Callable[[], bool] | None = None,
+        checkpoint_root: str | Path | None = None,
     ) -> None:
         self.output_root = Path(output_root).resolve() / self.namespace
         self.output_root.mkdir(parents=True, exist_ok=True)
         self.paths: list[Path] = []
         self._write_gate = write_gate
+        self.checkpoint_root = (
+            Path(checkpoint_root).resolve() if checkpoint_root is not None else None
+        )
 
     def allows_new_writes(self) -> bool:
         """Keep 4.2 writes open unless a publication gate has stopped them."""
@@ -204,11 +212,28 @@ class CompanyProfileResearchWriter:
             raise ValueError("runtime writer cannot authorize production")
         if record.legacy_writers_invoked:
             raise ValueError("runtime writer cannot record legacy writer use")
-        if not self.allows_new_writes():
-            raise ValueError("research publication has stopped new writes")
         path = self.output_root / f"{record.work_id}.json"
-        path.write_text(record.model_dump_json(indent=2), encoding="utf-8")
-        self.paths.append(path)
+        payload = record.model_dump_json(indent=2)
+
+        def write() -> None:
+            tmp = path.with_suffix(".tmp")
+            tmp.write_text(payload, encoding="utf-8")
+            tmp.replace(path)
+            self.paths.append(path)
+
+        if self.checkpoint_root is not None:
+            from research.company_profile.publication import (
+                commit_research_profile_write,
+            )
+
+            if not commit_research_profile_write(self.checkpoint_root, write):
+                raise PublicationWritesStopped(
+                    "research publication has stopped new writes"
+                )
+            return path
+        if not self.allows_new_writes():
+            raise PublicationWritesStopped("research publication has stopped new writes")
+        write()
         return path
 
     def latest_path(self) -> Path:
@@ -492,8 +517,6 @@ class CompanyProfileStageRuntime:
         return self._result(state, status="success", stage="verify")
 
     def _publish(self, state: _WorkState) -> dict[str, Any]:
-        if not self.writer.allows_new_writes():
-            raise ValueError("research publication has stopped new writes")
         if state.assessment is None:
             self._verify(state)
         assert state.report is not None
@@ -510,9 +533,22 @@ class CompanyProfileStageRuntime:
             execution=self._execution_for(state),
             legacy_writers_invoked=(),
         )
-        self.writer.persist(record)
+        try:
+            self.writer.persist(record)
+        except PublicationWritesStopped:
+            return self._publication_blocked(state)
         state.published = record
         return self._result(state, status="success", stage="publish")
+
+    def _publication_blocked(self, state: _WorkState) -> dict[str, Any]:
+        payload = self._result(state, status="blocked", stage="publish")
+        payload["reason"] = "research_publication_stopped"
+        payload["quality"] = {
+            "blocked_configuration": True,
+            "blocked_configuration_reasons": {"research_publication_stopped": 1},
+            "retry_after_seconds": 0,
+        }
+        return payload
 
     def _result(
         self,

@@ -9,6 +9,9 @@ authorization stays not_authorized.
 
 from __future__ import annotations
 
+import fcntl
+from collections.abc import Callable, Iterator
+from contextlib import contextmanager
 from pathlib import Path
 from typing import Any, Literal
 
@@ -145,10 +148,28 @@ def persist_publication_control(
 
     path = Path(root) / "reports" / f"{PUBLICATION_SCHEMA_VERSION}.json"
     path.parent.mkdir(parents=True, exist_ok=True)
-    tmp = path.with_suffix(".tmp")
-    tmp.write_text(control.model_dump_json(indent=2), encoding="utf-8")
-    tmp.replace(path)
+    with _publication_lock(root):
+        tmp = path.with_suffix(".tmp")
+        tmp.write_text(control.model_dump_json(indent=2), encoding="utf-8")
+        tmp.replace(path)
     return path
+
+
+def commit_research_profile_write(
+    root: str | Path,
+    write: Callable[[], None],
+) -> bool:
+    """Commit a profile write only if publication still allows it.
+
+    The publication switch and the profile writer share one exclusive lock, so
+    a completed pause or rollback cannot be followed by a new visible write.
+    """
+
+    with _publication_lock(root):
+        if not publication_allows_new_writes(load_publication_control(root)):
+            return False
+        write()
+        return True
 
 
 def load_publication_control(
@@ -178,6 +199,18 @@ def publication_schema_manifest() -> dict[str, Any]:
         "trading_authorized": False,
         "control_schema": CompanyProfilePublicationControl.model_json_schema(),
     }
+
+
+@contextmanager
+def _publication_lock(root: str | Path) -> Iterator[None]:
+    path = Path(root) / "reports" / f"{PUBLICATION_SCHEMA_VERSION}.lock"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("a+b") as handle:
+        fcntl.flock(handle, fcntl.LOCK_EX)
+        try:
+            yield
+        finally:
+            fcntl.flock(handle, fcntl.LOCK_UN)
 
 
 def _control(*, state: PublicationState) -> CompanyProfilePublicationControl:

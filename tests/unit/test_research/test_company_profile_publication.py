@@ -3,6 +3,8 @@ from __future__ import annotations
 import asyncio
 import inspect
 import json
+import threading
+import time
 from types import SimpleNamespace
 
 import pytest
@@ -16,8 +18,8 @@ from research.company_profile.operations import (
 from research.company_profile.publication import (
     PUBLICATION_SCHEMA_VERSION,
     CompanyProfilePublicationControl,
+    commit_research_profile_write,
     default_publication_control,
-    load_publication_control,
     publication_allows_new_writes,
     publication_schema_manifest,
     record_publication_control,
@@ -26,6 +28,8 @@ from research.company_profile.runtime import (
     COMMON_CORE_STORAGE_NAMESPACE,
     COMMON_CORE_WRITER_NAME,
     CompanyProfileResearchWriter,
+    CompanyProfileStageRuntime,
+    PublicationWritesStopped,
 )
 from tests.unit.test_research.test_business_profile_exposure_components import _storage
 from tests.unit.test_research.test_company_profile_live_run import _registry
@@ -171,18 +175,61 @@ def test_writer_persist_rechecks_publication_before_write(tmp_path):
     apply_published_publication(action="enable", checkpoint_root=checkpoint_root)
     writer = CompanyProfileResearchWriter(
         tmp_path / "output",
-        write_gate=lambda: publication_allows_new_writes(
-            load_publication_control(checkpoint_root)
-        ),
+        checkpoint_root=checkpoint_root,
     )
 
     writer.persist(_stub_runtime_record("work-open"))
     apply_published_publication(action="pause", checkpoint_root=checkpoint_root)
-    with pytest.raises(ValueError, match="stopped new writes"):
+    with pytest.raises(PublicationWritesStopped, match="stopped new writes"):
         writer.persist(_stub_runtime_record("work-paused"))
 
     assert (writer.output_root / "work-open.json").is_file()
     assert not (writer.output_root / "work-paused.json").exists()
+
+
+def test_completed_pause_cannot_be_followed_by_in_flight_write(tmp_path):
+    checkpoint_root = tmp_path / "checkpoints"
+    apply_published_publication(action="enable", checkpoint_root=checkpoint_root)
+    in_write = threading.Event()
+    finish_write = threading.Event()
+    order: list[str] = []
+    committed: list[bool] = []
+    profile = tmp_path / "profile.json"
+
+    def held_write() -> None:
+        order.append("write_acquired")
+        in_write.set()
+        assert finish_write.wait(timeout=2)
+        profile.write_text("{}", encoding="utf-8")
+        order.append("write_done")
+
+    def do_write() -> None:
+        committed.append(commit_research_profile_write(checkpoint_root, held_write))
+
+    def do_pause() -> None:
+        order.append("pause_start")
+        apply_published_publication(action="pause", checkpoint_root=checkpoint_root)
+        order.append("pause_done")
+
+    writer = threading.Thread(target=do_write)
+    pauser = threading.Thread(target=do_pause)
+    writer.start()
+    assert in_write.wait(timeout=2)
+    pauser.start()
+    time.sleep(0.1)
+    assert pauser.is_alive()
+    finish_write.set()
+    writer.join(timeout=2)
+    pauser.join(timeout=2)
+
+    assert committed == [True]
+    assert profile.is_file()
+    assert order.index("write_done") < order.index("pause_done")
+    assert commit_research_profile_write(
+        checkpoint_root,
+        lambda: (tmp_path / "after-pause.json").write_text("no", encoding="utf-8"),
+    ) is False
+    assert not (tmp_path / "after-pause.json").exists()
 
 
 @pytest.mark.parametrize("stop_action", ["pause", "rollback"])
@@ -257,6 +304,94 @@ def test_in_flight_official_run_stops_publish_after_publication_switch(
                 shared_asset_access=object(),
             )
         )
+
+
+@pytest.mark.parametrize("stop_action", ["pause", "rollback"])
+def test_publish_claimed_publication_stop_stays_resumable(
+    tmp_path, monkeypatch, stop_action
+):
+    storage = _storage(tmp_path)
+    _frontier(storage)
+    checkpoint_root = tmp_path / "checkpoints"
+    monkeypatch.setattr(
+        "research.company_profile.operations.load_official_task_candidate_registry",
+        lambda **_kwargs: _registry(),
+    )
+    apply_published_publication(action="enable", checkpoint_root=checkpoint_root)
+    original_publish = CompanyProfileStageRuntime._publish
+
+    def pause_after_publish_claimed(self, state):
+        apply_published_publication(
+            action=stop_action,
+            checkpoint_root=checkpoint_root,
+        )
+        return original_publish(self, state)
+
+    monkeypatch.setattr(
+        CompanyProfileStageRuntime,
+        "_publish",
+        pause_after_publish_claimed,
+    )
+    provider = _RequestBoundOverviewProvider()
+    report = _report(instrument_id="600000.SH", report_id="asset-pub-claimed")
+
+    def load_pages(item):
+        return {
+            "report": report,
+            "pages": (_overview_page(SERVICE_OVERVIEW),),
+        }
+
+    stopped = asyncio.run(
+        execute_published_task(
+            action="run",
+            storage=storage,
+            output_root=tmp_path / "output",
+            checkpoint_root=checkpoint_root,
+            page_source=load_pages,
+            provider=provider,
+            knowledge_cutoff="2026-08-30",
+            instrument_ids=["600000.SH"],
+            max_items=1,
+            shared_asset_access=object(),
+        )
+    )
+    with storage.get_connection() as conn:
+        rows = conn.execute(
+            "SELECT stage, status FROM business_profile_work_items"
+        ).fetchall()
+    records = list(
+        (tmp_path / "output" / COMMON_CORE_STORAGE_NAMESPACE).glob("*.json")
+    )
+
+    assert stopped["state"] == "paused"
+    assert records == []
+    assert rows
+    assert all(str(row["status"]) != "terminal_failure" for row in rows)
+    assert any(str(row["stage"]) == "publish" for row in rows)
+
+    monkeypatch.setattr(CompanyProfileStageRuntime, "_publish", original_publish)
+    apply_published_publication(
+        action="resume" if stop_action == "pause" else "enable",
+        checkpoint_root=checkpoint_root,
+    )
+    resumed = asyncio.run(
+        execute_published_task(
+            action="resume",
+            storage=storage,
+            output_root=tmp_path / "output",
+            checkpoint_root=checkpoint_root,
+            page_source=load_pages,
+            provider=provider,
+            knowledge_cutoff="2026-08-30",
+            shared_asset_access=object(),
+        )
+    )
+    published = list(
+        (tmp_path / "output" / COMMON_CORE_STORAGE_NAMESPACE).glob("*.json")
+    )
+
+    assert resumed["state"] == "completed"
+    assert len(published) == 1
 
 
 def test_publication_module_has_no_llm_or_legacy_writer_entry():
