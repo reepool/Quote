@@ -26,6 +26,9 @@ from research.special_commodity_market_data import (
     ConfiguredSourceChainProvider,
     CctdaBspiPortPriceProvider,
     CctdaTtciPortInventoryProvider,
+    CqcoalBspiPortPriceProvider,
+    CompilerPublicPriceGovernanceAdapter,
+    parse_bspi_period_and_value,
     EiaCommodityProvider,
     FredCommodityProvider,
     NbsMonthlyIndustrialOutputProvider,
@@ -130,7 +133,7 @@ def test_special_commodity_master_schema_and_seed(tmp_path):
     ).sync()
 
     assert result["status"] == "success"
-    assert result["instruments"] == 44
+    assert result["instruments"] == 45
     assert result["series"] >= 45
 
     dictionary = storage.read_dictionary()
@@ -156,6 +159,7 @@ def test_special_commodity_master_schema_and_seed(tmp_path):
         "CN.CHEMICAL.CAUSTIC_SODA.SPOT",
         "CN.CHEMICAL.SODA_ASH.SPOT",
         "CN.COAL.PORT_PRICE.BSPI.CCTDA",
+        "CN.COAL.PORT_PRICE.BSPI.CQCOAL",
         "CN.BUILDING.GLASS.SPOT",
         "CN.ENERGY.ASPHALT.SPOT",
         "CN.ENERGY.LPG.SPOT",
@@ -183,6 +187,8 @@ def test_special_commodity_master_schema_and_seed(tmp_path):
         "CMD.CN.COAL.RAW_COAL.OUTPUT.NBS.YTD.MONTHLY",
         "CMD.CN.COAL.FREIGHT.CBCFI.SSE.DAILY",
         "CMD.CN.COAL.PORT_INVENTORY.BOHAI_RIM.CCTDA.WEEKLY",
+        "CMD.CN.COAL.PORT_PRICE.BSPI.CCTDA.WEEKLY",
+        "CMD.CN.COAL.PORT_PRICE.BSPI.CQCOAL.WEEKLY",
     }
 
 
@@ -1899,7 +1905,7 @@ def test_cctda_bspi_provider_preserves_weekly_price_semantics(monkeypatch):
     cfg = config_manager.get_research_config().modules["commodity_market_data"][
         "special_commodity_market_data"
     ]
-    item = CommodityUniverseSelector(cfg).resolve(scope_id="cn_coal_bspi")[0]
+    item = _cctda_bspi_series(cfg)
     source_cfg = deepcopy(cfg["source_profiles"][item.source_profile])
     source_cfg["listing_urls"] = ["https://www.cctda.org.cn/list-6-1.html"]
     source_cfg["listing_max_pages"] = 2
@@ -1975,7 +1981,7 @@ def test_cctda_bspi_provider_fetches_latest_article_despite_homepage_breadcrumb(
     cfg = config_manager.get_research_config().modules["commodity_market_data"][
         "special_commodity_market_data"
     ]
-    item = CommodityUniverseSelector(cfg).resolve(scope_id="cn_coal_bspi")[0]
+    item = _cctda_bspi_series(cfg)
     source_cfg = deepcopy(cfg["source_profiles"][item.source_profile])
     source_cfg["listing_urls"] = ["https://www.cctda.org.cn/list-6-1.html"]
     source_cfg["listing_max_pages"] = 1
@@ -2051,8 +2057,14 @@ def _cctda_bspi_article_html_for_period(
     """
 
 
+def _cctda_bspi_series(cfg) -> CommoditySeries:
+    resolved = CommodityUniverseSelector(cfg).resolve(scope_id="cn_coal_bspi_cctda")
+    assert resolved, "cn_coal_bspi_cctda must resolve the CCTDA reprint series"
+    return resolved[0]
+
+
 def _cctda_bspi_provider(cfg, *, listing_html: str, articles: dict[str, str], monkeypatch):
-    item = CommodityUniverseSelector(cfg).resolve(scope_id="cn_coal_bspi")[0]
+    item = _cctda_bspi_series(cfg)
     source_cfg = deepcopy(cfg["source_profiles"][item.source_profile])
     source_cfg["listing_urls"] = ["https://www.cctda.org.cn/list-6-1.html"]
     source_cfg["listing_max_pages"] = 1
@@ -2217,7 +2229,7 @@ def test_cctda_bspi_sync_keeps_late_published_observation_without_date_warning(
     storage = SpecialCommodityStorageManager(cfg)
     storage.initialize()
     SpecialCommodityMasterDataService(storage, module_cfg).sync()
-    item = CommodityUniverseSelector(module_cfg).resolve(scope_id="cn_coal_bspi")[0]
+    item = _cctda_bspi_series(module_cfg)
     fetched = _seed_cctda_bspi_observation(
         storage, item, observation_date="2026-09-01"
     )
@@ -2239,7 +2251,7 @@ def test_cctda_bspi_sync_keeps_late_published_observation_without_date_warning(
     )
 
     result = SpecialCommodityPriceSyncService(storage, cfg).sync(
-        scope_id="cn_coal_bspi",
+        scope_id="cn_coal_bspi_cctda",
         start_date="2026-09-02",
         end_date="2026-09-11",
         dry_run=False,
@@ -2265,7 +2277,7 @@ def test_cctda_bspi_empty_listing_stays_success_when_local_period_is_fresh(
     storage = SpecialCommodityStorageManager(cfg)
     storage.initialize()
     SpecialCommodityMasterDataService(storage, module_cfg).sync()
-    item = CommodityUniverseSelector(module_cfg).resolve(scope_id="cn_coal_bspi")[0]
+    item = _cctda_bspi_series(module_cfg)
     _seed_cctda_bspi_observation(storage, item, observation_date="2026-09-01")
 
     monkeypatch.setattr(
@@ -2280,7 +2292,7 @@ def test_cctda_bspi_empty_listing_stays_success_when_local_period_is_fresh(
     )
 
     result = SpecialCommodityPriceSyncService(storage, cfg).sync(
-        scope_id="cn_coal_bspi",
+        scope_id="cn_coal_bspi_cctda",
         start_date="2026-09-02",
         end_date="2026-09-11",
         dry_run=False,
@@ -2303,7 +2315,7 @@ def test_cctda_bspi_empty_listing_warns_when_local_period_is_stale(
     storage = SpecialCommodityStorageManager(cfg)
     storage.initialize()
     SpecialCommodityMasterDataService(storage, module_cfg).sync()
-    item = CommodityUniverseSelector(module_cfg).resolve(scope_id="cn_coal_bspi")[0]
+    item = _cctda_bspi_series(module_cfg)
     _seed_cctda_bspi_observation(storage, item, observation_date="2026-08-25")
 
     monkeypatch.setattr(
@@ -2318,16 +2330,16 @@ def test_cctda_bspi_empty_listing_warns_when_local_period_is_stale(
     )
 
     result = SpecialCommodityPriceSyncService(storage, cfg).sync(
-        scope_id="cn_coal_bspi",
+        scope_id="cn_coal_bspi_cctda",
         start_date="2026-09-02",
         end_date="2026-09-11",
         dry_run=False,
     )
 
-    assert result["status"] == "warning"
-    assert result["date_governance"] == "warning"
+    assert result["status"] == "success"
+    assert result["date_governance"] == "success"
     assert result["fetched_rows"] == 0
-    assert result["warnings"][0]["reason"] == "source_observation_stale"
+    assert result["warnings"][0]["reason"] == "comparison_source_observation_stale"
     assert result["warnings"][0]["series_id"] == item.series_id
     assert result["warnings"][0]["latest_observation_date"] == "2026-08-25"
     assert result["warnings"][0]["age_days"] == 17
@@ -2340,7 +2352,7 @@ def test_association_public_price_governance_keeps_price_semantics():
     cfg = config_manager.get_research_config().modules["commodity_market_data"][
         "special_commodity_market_data"
     ]
-    item = CommodityUniverseSelector(cfg).resolve(scope_id="cn_coal_bspi")[0]
+    item = _cctda_bspi_series(cfg)
     provider_result = CommodityProviderResult()
 
     class FakeProvider:
@@ -2361,6 +2373,587 @@ def test_association_public_price_governance_keeps_price_semantics():
     assert result.records[0]["lifecycle_start"] == "2025-06-03"
     assert result.records[0]["metadata"]["data_kind"] == "market_price"
     assert result.prefetched_result is provider_result
+
+
+def _cqcoal_listing_payload(rows: list[dict]) -> dict:
+    return {
+        "data": {
+            "list": rows,
+            "hasNextPage": False,
+            "pages": 1,
+            "total": len(rows),
+        }
+    }
+
+
+def _cqcoal_article_payload(
+    *,
+    article_id: str,
+    title: str,
+    publication_date: str,
+    body: str,
+) -> dict:
+    return {
+        "data": {
+            "id": article_id,
+            "info_til": title,
+            "info_dteStr": publication_date,
+            "info_cont": body,
+        }
+    }
+
+
+def _cqcoal_week_body(*, period_start: str, period_end: str, value: str) -> str:
+    start = date.fromisoformat(period_start)
+    end = date.fromisoformat(period_end)
+    end_year = f"{end.year}年" if end.year != start.year else ""
+    return (
+        f"<p>本报告期（{start.year}年{start.month}月{start.day}日至"
+        f"{end_year}{end.month}月{end.day}日），环渤海动力煤价格指数报收于{value}元/吨。</p>"
+    )
+
+
+def _cqcoal_series(cfg) -> CommoditySeries:
+    return CommodityUniverseSelector(cfg).resolve(
+        series_ids=["CMD.CN.COAL.PORT_PRICE.BSPI.CQCOAL.WEEKLY"]
+    )[0]
+
+
+def _cqcoal_provider(cfg, *, listing_rows: list[dict], articles: dict[str, dict], monkeypatch):
+    item = _cqcoal_series(cfg)
+    source_cfg = deepcopy(cfg["source_profiles"][item.source_profile])
+
+    def fake_post(url, *args, **kwargs):
+        target = str(url)
+        data = kwargs.get("data") or {}
+        if target.endswith("/indexmark/listPage"):
+            payload = _cqcoal_listing_payload(listing_rows)
+        elif target.endswith("/indexmark/infoById"):
+            article_id = str(data.get("id") or "")
+            if article_id not in articles:
+                raise AssertionError(f"unexpected article id: {article_id}")
+            payload = articles[article_id]
+        elif "infonew" in target:
+            raise AssertionError(f"homepage snapshot must not be fetched: {target}")
+        else:
+            raise AssertionError(f"unexpected URL: {url}")
+        return SimpleNamespace(
+            json=lambda: payload,
+            raise_for_status=lambda: None,
+        )
+
+    monkeypatch.setattr(
+        "research.special_commodity_market_data.request_post", fake_post
+    )
+    return item, CqcoalBspiPortPriceProvider(item.source_profile, source_cfg)
+
+
+def test_research_scope_cn_coal_bspi_resolves_compiler_series():
+    cfg = config_manager.get_research_config().modules["commodity_market_data"][
+        "special_commodity_market_data"
+    ]
+    resolved = CommodityUniverseSelector(cfg).resolve(scope_id="cn_coal_bspi")
+    assert [item.series_id for item in resolved] == [
+        "CMD.CN.COAL.PORT_PRICE.BSPI.CQCOAL.WEEKLY"
+    ]
+    reprint = CommodityUniverseSelector(cfg).resolve(scope_id="cn_coal_bspi_cctda")
+    assert [item.series_id for item in reprint] == [
+        "CMD.CN.COAL.PORT_PRICE.BSPI.CCTDA.WEEKLY"
+    ]
+
+
+def test_cqcoal_bspi_provider_parses_week_35_and_36_from_catalog_publication_date(
+    monkeypatch,
+):
+    cfg = config_manager.get_research_config().modules["commodity_market_data"][
+        "special_commodity_market_data"
+    ]
+    item, provider = _cqcoal_provider(
+        cfg,
+        listing_rows=[
+            {
+                "id": 108013,
+                "info_til": "环渤海动力煤价格指数周评（2026年第36周）",
+                "info_dteStr": "2026-09-16",
+            },
+            {
+                "id": 108012,
+                "info_til": "环渤海动力煤价格指数周评（2026年第35周）",
+                "info_dteStr": "2026-09-09",
+            },
+        ],
+        articles={
+            "108013": _cqcoal_article_payload(
+                article_id="108013",
+                title="环渤海动力煤价格指数周评（2026年第36周）",
+                publication_date="2026-09-16",
+                body=_cqcoal_week_body(
+                    period_start="2026-09-09",
+                    period_end="2026-09-15",
+                    value="728",
+                ),
+            ),
+            "108012": _cqcoal_article_payload(
+                article_id="108012",
+                title="环渤海动力煤价格指数周评（2026年第35周）",
+                publication_date="2026-09-09",
+                body=_cqcoal_week_body(
+                    period_start="2026-09-02",
+                    period_end="2026-09-08",
+                    value="728",
+                ),
+            ),
+        },
+        monkeypatch=monkeypatch,
+    )
+
+    result = provider.fetch([item], start_date="2026-09-02", end_date="2026-09-16")
+
+    assert result.blockers == []
+    assert [row.observation_date for row in result.observations] == [
+        "2026-09-08",
+        "2026-09-15",
+    ]
+    assert {row.value for row in result.observations} == {728.0}
+    assert result.observations[0].series_id == "CMD.CN.COAL.PORT_PRICE.BSPI.CQCOAL.WEEKLY"
+    assert result.observations[0].metadata["publication_date"] == "2026-09-09"
+    assert result.observations[1].metadata["publication_date"] == "2026-09-16"
+    assert all(
+        "checkdet.jsp?id=" in row.source_url for row in result.observations
+    )
+
+
+def test_cqcoal_title_without_price_stays_coverage_gap(monkeypatch):
+    cfg = config_manager.get_research_config().modules["commodity_market_data"][
+        "special_commodity_market_data"
+    ]
+    item, provider = _cqcoal_provider(
+        cfg,
+        listing_rows=[
+            {
+                "id": 108099,
+                "info_til": "环渤海动力煤价格指数周评（2026年第30周）",
+                "info_dteStr": "2026-08-05",
+            }
+        ],
+        articles={
+            "108099": _cqcoal_article_payload(
+                article_id="108099",
+                title="环渤海动力煤价格指数周评（2026年第30周）",
+                publication_date="2026-08-05",
+                body="<p>本报告期（2026年7月29日至2026年8月4日），市场综述。</p>",
+            )
+        },
+        monkeypatch=monkeypatch,
+    )
+
+    result = provider.fetch([item], start_date="2026-08-01", end_date="2026-08-10")
+
+    assert result.observations == []
+    assert result.metadata["source_coverage"]["reports_without_metric"] == 1
+    assert result.blockers[0]["reason"] == "cqcoal_bspi_no_parseable_observations"
+
+
+def test_cqcoal_homepage_snapshot_is_rejected():
+    cfg = config_manager.get_research_config().modules["commodity_market_data"][
+        "special_commodity_market_data"
+    ]
+    item = _cqcoal_series(cfg)
+    source_cfg = deepcopy(cfg["source_profiles"][item.source_profile])
+    source_cfg["listing_endpoint"] = "http://www.cqcoal.com/mars-web/indexmark/infonew"
+    result = CqcoalBspiPortPriceProvider(item.source_profile, source_cfg).fetch(
+        [item], start_date="2026-09-02", end_date="2026-09-16"
+    )
+    assert result.blockers[0]["reason"] == "cqcoal_bspi_homepage_snapshot_rejected"
+
+
+def test_cqcoal_provider_drops_period_far_older_than_publication(monkeypatch):
+    cfg = config_manager.get_research_config().modules["commodity_market_data"][
+        "special_commodity_market_data"
+    ]
+    item, provider = _cqcoal_provider(
+        cfg,
+        listing_rows=[
+            {
+                "id": 100001,
+                "info_til": "环渤海动力煤价格指数周评（2025年第1周）",
+                "info_dteStr": "2026-09-10",
+            }
+        ],
+        articles={
+            "100001": _cqcoal_article_payload(
+                article_id="100001",
+                title="环渤海动力煤价格指数周评（2025年第1周）",
+                publication_date="2026-09-10",
+                body=_cqcoal_week_body(
+                    period_start="2025-06-03",
+                    period_end="2025-06-03",
+                    value="669",
+                ),
+            )
+        },
+        monkeypatch=monkeypatch,
+    )
+
+    result = provider.fetch([item], start_date="2026-09-02", end_date="2026-09-11")
+
+    assert result.observations == []
+    assert result.metadata["source_coverage"]["period_lag_exceeded"] == 1
+
+
+def test_cqcoal_provider_does_not_write_cctda_series(monkeypatch):
+    cfg = config_manager.get_research_config().modules["commodity_market_data"][
+        "special_commodity_market_data"
+    ]
+    item, provider = _cqcoal_provider(
+        cfg,
+        listing_rows=[
+            {
+                "id": 108013,
+                "info_til": "环渤海动力煤价格指数周评（2026年第36周）",
+                "info_dteStr": "2026-09-16",
+            }
+        ],
+        articles={
+            "108013": _cqcoal_article_payload(
+                article_id="108013",
+                title="环渤海动力煤价格指数周评（2026年第36周）",
+                publication_date="2026-09-16",
+                body=_cqcoal_week_body(
+                    period_start="2026-09-09",
+                    period_end="2026-09-15",
+                    value="728",
+                ),
+            )
+        },
+        monkeypatch=monkeypatch,
+    )
+
+    result = provider.fetch([item], start_date="2026-09-09", end_date="2026-09-16")
+
+    assert result.observations[0].series_id == item.series_id
+    assert result.observations[0].source_profile == "cqcoal_bspi_weekly_port_price"
+    assert "CCTDA" not in result.observations[0].series_id
+
+
+def test_shared_bspi_parser_does_not_require_body_timestamp():
+    parsed = parse_bspi_period_and_value(
+        _cqcoal_week_body(
+            period_start="2026-09-09",
+            period_end="2026-09-15",
+            value="728",
+        ),
+        listing_title="环渤海动力煤价格指数周评（2026年第36周）",
+    )
+    assert parsed["observation_date"] == "2026-09-15"
+    assert parsed["value"] == 728.0
+    assert "publication_date" not in parsed
+
+
+def test_compiler_public_price_governance_uses_compiler_quality_flag():
+    cfg = config_manager.get_research_config().modules["commodity_market_data"][
+        "special_commodity_market_data"
+    ]
+    item = _cqcoal_series(cfg)
+
+    class FakeProvider:
+        def fetch(self, series, *, start_date, end_date):
+            return CommodityProviderResult()
+
+    result = CompilerPublicPriceGovernanceAdapter(
+        cfg["source_profiles"][item.source_profile]
+    ).govern_master([item], FakeProvider(), start_date="2026-09-09", end_date="2026-09-16")
+
+    assert result.blockers == []
+    assert result.records[0]["quality_flag"] == "compiler_public_price_master_verified"
+
+
+def _seed_bspi_observation(
+    storage: SpecialCommodityStorageManager,
+    item: CommoditySeries,
+    *,
+    observation_date: str,
+    value: float,
+) -> CommodityObservation:
+    observation = CommodityObservation(
+        series_id=item.series_id,
+        observation_date=observation_date,
+        value=value,
+        currency=item.currency,
+        unit=item.unit,
+        raw_value=value,
+        raw_currency=item.currency,
+        raw_unit=item.unit,
+        source_profile=item.source_profile,
+        source_url=f"http://example.test/{item.series_id}/{observation_date}",
+        quality_flag="compiler_public_web",
+        source_symbol=item.source_symbol,
+        parser_version=f"{item.source_profile}.v1",
+        raw_payload_hash=f"{item.series_id}-{observation_date}",
+        metadata={
+            "data_kind": "market_price",
+            "publication_date": observation_date,
+            "source_period_end": observation_date,
+        },
+    )
+    storage.upsert_observations([observation], ingestion_run_id=None, dry_run=False)
+    return observation
+
+
+def _bspi_pair(module_cfg):
+    module_cfg["source_profiles"]["cctda_bspi_weekly_port_price"][
+        "research_role"
+    ] = "comparison"
+    module_cfg["source_profiles"]["cqcoal_bspi_weekly_port_price"][
+        "research_role"
+    ] = "primary"
+    selector = CommodityUniverseSelector(module_cfg)
+    primary = selector.resolve(
+        series_ids=["CMD.CN.COAL.PORT_PRICE.BSPI.CQCOAL.WEEKLY"]
+    )[0]
+    reprint = selector.resolve(scope_id="cn_coal_bspi_cctda")[0]
+    return primary, reprint
+
+
+def test_comparison_stale_reprint_does_not_warn_when_primary_is_fresh(
+    tmp_path, monkeypatch
+):
+    cfg = _research_config(tmp_path)
+    module_cfg = cfg.modules["commodity_market_data"]["special_commodity_market_data"]
+    storage = SpecialCommodityStorageManager(cfg)
+    storage.initialize()
+    SpecialCommodityMasterDataService(storage, module_cfg).sync()
+    primary, reprint = _bspi_pair(module_cfg)
+    fetched = _seed_bspi_observation(
+        storage, primary, observation_date="2026-09-15", value=728.0
+    )
+    _seed_bspi_observation(storage, reprint, observation_date="2026-09-01", value=720.0)
+
+    monkeypatch.setattr(
+        CqcoalBspiPortPriceProvider,
+        "fetch",
+        lambda self, series, *, start_date, end_date: CommodityProviderResult(
+            observations=[fetched],
+            metadata={"date_gap_fill": {"expected_periods": 1, "unresolved_dates": 0}},
+        ),
+    )
+    monkeypatch.setattr(
+        CctdaBspiPortPriceProvider,
+        "fetch",
+        lambda self, series, *, start_date, end_date: CommodityProviderResult(
+            metadata={"date_gap_fill": {"expected_periods": 0, "unresolved_dates": 0}}
+        ),
+    )
+
+    result = SpecialCommodityPriceSyncService(storage, cfg).sync(
+        series_ids=[primary.series_id, reprint.series_id],
+        start_date="2026-09-09",
+        end_date="2026-09-16",
+        dry_run=False,
+    )
+
+    assert result["status"] == "success"
+    assert result["date_governance"] == "success"
+    assert any(
+        item.get("reason") == "comparison_source_observation_stale"
+        for item in result["warnings"]
+    )
+    assert all(
+        item.get("reason") != "source_observation_stale" for item in result["warnings"]
+    )
+
+
+def test_comparison_listing_failure_does_not_block_successful_primary(
+    tmp_path, monkeypatch
+):
+    cfg = _research_config(tmp_path)
+    module_cfg = cfg.modules["commodity_market_data"]["special_commodity_market_data"]
+    storage = SpecialCommodityStorageManager(cfg)
+    storage.initialize()
+    SpecialCommodityMasterDataService(storage, module_cfg).sync()
+    primary, reprint = _bspi_pair(module_cfg)
+    fetched = _seed_bspi_observation(
+        storage, primary, observation_date="2026-09-15", value=728.0
+    )
+
+    monkeypatch.setattr(
+        CqcoalBspiPortPriceProvider,
+        "fetch",
+        lambda self, series, *, start_date, end_date: CommodityProviderResult(
+            observations=[fetched],
+            metadata={"date_gap_fill": {"expected_periods": 1, "unresolved_dates": 0}},
+        ),
+    )
+    monkeypatch.setattr(
+        CctdaBspiPortPriceProvider,
+        "fetch",
+        lambda self, series, *, start_date, end_date: CommodityProviderResult(
+            blockers=[{"reason": "cctda_bspi_no_parseable_observations", "articles": 1}],
+            metadata={"date_gap_fill": {"expected_periods": 1, "unresolved_dates": 0}},
+        ),
+    )
+
+    result = SpecialCommodityPriceSyncService(storage, cfg).sync(
+        series_ids=[primary.series_id, reprint.series_id],
+        start_date="2026-09-09",
+        end_date="2026-09-16",
+        dry_run=False,
+    )
+
+    assert result["status"] == "success"
+    assert result["date_governance"] == "success"
+    assert result["blockers"][0]["reason"] == "cctda_bspi_no_parseable_observations"
+    assert result["per_source"]["cctda_bspi_weekly_port_price"]["status"] == "blocked"
+
+
+def test_stale_compiler_primary_still_warns(tmp_path, monkeypatch):
+    cfg = _research_config(tmp_path)
+    module_cfg = cfg.modules["commodity_market_data"]["special_commodity_market_data"]
+    storage = SpecialCommodityStorageManager(cfg)
+    storage.initialize()
+    SpecialCommodityMasterDataService(storage, module_cfg).sync()
+    primary, reprint = _bspi_pair(module_cfg)
+    _seed_bspi_observation(storage, primary, observation_date="2026-08-25", value=720.0)
+    _seed_bspi_observation(storage, reprint, observation_date="2026-08-25", value=720.0)
+
+    empty = CommodityProviderResult(
+        metadata={"date_gap_fill": {"expected_periods": 0, "unresolved_dates": 0}}
+    )
+    monkeypatch.setattr(
+        CqcoalBspiPortPriceProvider,
+        "fetch",
+        lambda self, series, *, start_date, end_date: empty,
+    )
+    monkeypatch.setattr(
+        CctdaBspiPortPriceProvider,
+        "fetch",
+        lambda self, series, *, start_date, end_date: empty,
+    )
+
+    result = SpecialCommodityPriceSyncService(storage, cfg).sync(
+        series_ids=[primary.series_id, reprint.series_id],
+        start_date="2026-09-02",
+        end_date="2026-09-16",
+        dry_run=False,
+    )
+
+    assert result["status"] == "warning"
+    assert result["date_governance"] == "warning"
+    assert any(
+        item.get("reason") == "source_observation_stale"
+        and item.get("series_id") == primary.series_id
+        for item in result["warnings"]
+    )
+
+
+def test_compiler_legal_empty_window_stays_success_when_primary_is_fresh(
+    tmp_path, monkeypatch
+):
+    cfg = _research_config(tmp_path)
+    module_cfg = cfg.modules["commodity_market_data"]["special_commodity_market_data"]
+    storage = SpecialCommodityStorageManager(cfg)
+    storage.initialize()
+    SpecialCommodityMasterDataService(storage, module_cfg).sync()
+    primary, _reprint = _bspi_pair(module_cfg)
+    _seed_bspi_observation(storage, primary, observation_date="2026-09-15", value=728.0)
+
+    monkeypatch.setattr(
+        CqcoalBspiPortPriceProvider,
+        "fetch",
+        lambda self, series, *, start_date, end_date: CommodityProviderResult(
+            metadata={"date_gap_fill": {"expected_periods": 0, "unresolved_dates": 0}}
+        ),
+    )
+
+    result = SpecialCommodityPriceSyncService(storage, cfg).sync(
+        series_ids=[primary.series_id],
+        start_date="2026-09-16",
+        end_date="2026-09-16",
+        dry_run=False,
+    )
+
+    assert result["status"] == "success"
+    assert result["date_governance"] == "success"
+    assert result["fetched_rows"] == 0
+
+
+def test_empty_compiler_primary_is_not_legal_empty_success(tmp_path, monkeypatch):
+    cfg = _research_config(tmp_path)
+    module_cfg = cfg.modules["commodity_market_data"]["special_commodity_market_data"]
+    storage = SpecialCommodityStorageManager(cfg)
+    storage.initialize()
+    SpecialCommodityMasterDataService(storage, module_cfg).sync()
+    primary, _reprint = _bspi_pair(module_cfg)
+
+    monkeypatch.setattr(
+        CqcoalBspiPortPriceProvider,
+        "fetch",
+        lambda self, series, *, start_date, end_date: CommodityProviderResult(
+            metadata={"date_gap_fill": {"expected_periods": 0, "unresolved_dates": 0}}
+        ),
+    )
+
+    result = SpecialCommodityPriceSyncService(storage, cfg).sync(
+        series_ids=[primary.series_id],
+        start_date="2026-09-09",
+        end_date="2026-09-16",
+        dry_run=False,
+    )
+
+    assert result["status"] == "warning"
+    assert any(
+        item.get("reason") == "research_primary_series_empty"
+        for item in result["warnings"]
+    )
+
+
+def test_stored_value_conflict_does_not_downgrade_or_merge(tmp_path, monkeypatch):
+    cfg = _research_config(tmp_path)
+    module_cfg = cfg.modules["commodity_market_data"]["special_commodity_market_data"]
+    storage = SpecialCommodityStorageManager(cfg)
+    storage.initialize()
+    SpecialCommodityMasterDataService(storage, module_cfg).sync()
+    primary, reprint = _bspi_pair(module_cfg)
+    fetched = _seed_bspi_observation(
+        storage, primary, observation_date="2026-09-01", value=728.0
+    )
+    _seed_bspi_observation(storage, reprint, observation_date="2026-09-01", value=720.0)
+
+    monkeypatch.setattr(
+        CqcoalBspiPortPriceProvider,
+        "fetch",
+        lambda self, series, *, start_date, end_date: CommodityProviderResult(
+            observations=[fetched],
+            metadata={"date_gap_fill": {"expected_periods": 1, "unresolved_dates": 0}},
+        ),
+    )
+
+    result = SpecialCommodityPriceSyncService(storage, cfg).sync(
+        series_ids=[primary.series_id],
+        start_date="2026-09-01",
+        end_date="2026-09-01",
+        dry_run=False,
+    )
+
+    assert result["status"] == "success"
+    assert any(
+        item.get("reason") == "bspi_compiler_reprint_value_conflict"
+        and item.get("value") == 728.0
+        and item.get("other_value") == 720.0
+        for item in result["warnings"]
+    )
+    stored = {
+        row["series_id"]: row["value"]
+        for row in storage.read_observations(series_id=primary.series_id)
+        if row["observation_date"] == "2026-09-01"
+    }
+    reprint_stored = {
+        row["series_id"]: row["value"]
+        for row in storage.read_observations(series_id=reprint.series_id)
+        if row["observation_date"] == "2026-09-01"
+    }
+    assert stored[primary.series_id] == 728.0
+    assert reprint_stored[reprint.series_id] == 720.0
 
 
 def test_official_public_indicator_governance_uses_explicit_series_semantics(
@@ -4161,6 +4754,7 @@ def test_special_commodity_schedules_split_overseas_and_domestic_spot_scopes():
         "cn_100ppi_softwood_pulp",
         "cn_nbs_thermal_coal",
         "cn_coal_bspi",
+        "cn_coal_bspi_cctda",
     ]
     assert domestic_spot["parameters"]["lookback_days"] == 10
     industrial = jobs["special_commodity_industrial_indicator_sync"]

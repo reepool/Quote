@@ -189,6 +189,52 @@ def _request_with_retry(
     raise last_error
 
 
+def _request_post_with_retry(
+    url: str,
+    *,
+    data: Optional[Mapping[str, Any]] = None,
+    headers: Mapping[str, str],
+    timeout: float,
+    tls_config: Any,
+    retry_cfg: Optional[Mapping[str, Any]] = None,
+    log_context: str,
+) -> Any:
+    """Execute a POST with the same bounded retry policy as GET helpers."""
+    cfg = dict(retry_cfg or {})
+    max_attempts = max(1, int(cfg.get("max_attempts") or 3))
+    backoff_seconds = max(0.0, float(cfg.get("backoff_seconds") or 0.5))
+    last_error: Optional[Exception] = None
+    for attempt in range(1, max_attempts + 1):
+        try:
+            response = request_post(
+                url,
+                data=dict(data or {}),
+                headers=dict(headers),
+                timeout=timeout,
+                tls_config=tls_config,
+            )
+            response.raise_for_status()
+            return response
+        except Exception as exc:
+            last_error = exc
+            if attempt >= max_attempts:
+                break
+            sleep_seconds = backoff_seconds * attempt
+            logger.warning(
+                "[SpecialCommodityHTTP] retry context=%s attempt=%s next_attempt=%s "
+                "sleep_seconds=%s error=%s",
+                log_context,
+                attempt,
+                attempt + 1,
+                sleep_seconds,
+                exc,
+            )
+            if sleep_seconds:
+                time.sleep(sleep_seconds)
+    assert last_error is not None
+    raise last_error
+
+
 def _request_json_with_retry(
     url: str,
     *,
@@ -3923,8 +3969,170 @@ class CctdaTtciPortInventoryProvider:
         )
 
 
-class _CctdaBspiMetricNotReportedError(ValueError):
+class _BspiMetricNotReportedError(ValueError):
     """A public article does not contain a governable BSPI period and value."""
+
+
+class _CctdaBspiMetricNotReportedError(_BspiMetricNotReportedError):
+    """CCTDA alias for a missing governable BSPI period and value."""
+
+
+_BSPI_PERIOD = re.compile(
+    r"本报告期[（(]\s*(?P<start_year>20\d{2})年(?P<start_month>\d{1,2})月"
+    r"(?P<start_day>\d{1,2})日\s*至\s*(?:(?P<end_year>20\d{2})年)?"
+    r"(?P<end_month>\d{1,2})月(?P<end_day>\d{1,2})日\s*[）)]"
+)
+_BSPI_BODY_VALUE = re.compile(
+    r"环渤海动力煤(?:综合)?价格指数.{0,24}?(?:报收于|为)\s*"
+    r"(?P<value>\d+(?:\.\d+)?)\s*元\s*[／/]?\s*吨"
+)
+_BSPI_TITLE_VALUE = re.compile(
+    r"(?:BSPI.*?|环渤海动力煤价格指数)\s*(?P<value>\d+(?:\.\d+)?)"
+    r"\s*元\s*[／/]?\s*吨",
+    re.IGNORECASE,
+)
+_ISOLATED_COMPARISON_REASONS = {
+    "comparison_source_observation_stale",
+    "cctda_bspi_listing_failed",
+    "cctda_bspi_parse_failed",
+    "cctda_bspi_no_parseable_observations",
+    "bspi_compiler_reprint_value_conflict",
+    "no_source_observed_dates",
+}
+
+
+def _bspi_plain_text(value: str) -> str:
+    text = re.sub(r"<script\b.*?</script>", " ", value, flags=re.I | re.S)
+    text = re.sub(r"<style\b.*?</style>", " ", text, flags=re.I | re.S)
+    text = re.sub(r"<[^>]+>", " ", text)
+    return " ".join(html_lib.unescape(text).replace("\xa0", " ").split())
+
+
+def parse_bspi_period_and_value(
+    html: str,
+    *,
+    listing_title: str = "",
+    price_value_min: float = 100.0,
+    price_value_max: float = 3000.0,
+    allow_title_value: bool = True,
+) -> Dict[str, Any]:
+    """Extract report period and unique BSPI value. Publication date is caller-owned."""
+    text = _bspi_plain_text(html)
+    period_match = _BSPI_PERIOD.search(text)
+    if period_match is None:
+        raise _BspiMetricNotReportedError(
+            "BSPI article missing explicit report period"
+        )
+    start_year = int(period_match.group("start_year"))
+    end_year = int(period_match.group("end_year") or start_year)
+    try:
+        period_start = date(
+            start_year,
+            int(period_match.group("start_month")),
+            int(period_match.group("start_day")),
+        )
+        period_end = date(
+            end_year,
+            int(period_match.group("end_month")),
+            int(period_match.group("end_day")),
+        )
+    except ValueError as exc:
+        raise _BspiMetricNotReportedError(
+            "BSPI article has invalid report period"
+        ) from exc
+    if period_end < period_start:
+        raise _BspiMetricNotReportedError("BSPI article has reversed report period")
+
+    body_values = sorted(
+        {
+            float(match.group("value"))
+            for match in _BSPI_BODY_VALUE.finditer(text)
+            if price_value_min <= float(match.group("value")) <= price_value_max
+        }
+    )
+    if len(body_values) > 1:
+        raise ValueError(f"BSPI article has multiple plausible values: {body_values}")
+    if body_values:
+        return {
+            "period_start": period_start.isoformat(),
+            "period_end": period_end.isoformat(),
+            "observation_date": period_end.isoformat(),
+            "value": body_values[0],
+            "source_field_alignment": "article_body",
+        }
+    title_values = sorted(
+        {
+            float(match.group("value"))
+            for match in _BSPI_TITLE_VALUE.finditer(_bspi_plain_text(listing_title))
+            if price_value_min <= float(match.group("value")) <= price_value_max
+        }
+    )
+    if allow_title_value and len(title_values) == 1:
+        return {
+            "period_start": period_start.isoformat(),
+            "period_end": period_end.isoformat(),
+            "observation_date": period_end.isoformat(),
+            "value": title_values[0],
+            "source_field_alignment": "title_value_with_body_period",
+        }
+    raise _BspiMetricNotReportedError("BSPI article missing unique index value")
+
+
+def _research_role(source_cfg: Mapping[str, Any]) -> str:
+    return str(source_cfg.get("research_role") or "").strip().lower()
+
+
+def _annotate_source_diagnostics(
+    items: Sequence[Mapping[str, Any]],
+    *,
+    source_profile: str,
+    research_role: str,
+) -> List[Dict[str, Any]]:
+    annotated: List[Dict[str, Any]] = []
+    for item in items:
+        row = dict(item)
+        row.setdefault("source_profile", source_profile)
+        if research_role:
+            row.setdefault("research_role", research_role)
+        annotated.append(row)
+    return annotated
+
+
+def _is_isolated_comparison_diagnostic(item: Mapping[str, Any]) -> bool:
+    reason = str(item.get("reason") or "")
+    if reason in {
+        "comparison_source_observation_stale",
+        "bspi_compiler_reprint_value_conflict",
+    }:
+        return True
+    return (
+        str(item.get("research_role") or "") == "comparison"
+        and reason in _ISOLATED_COMPARISON_REASONS
+    )
+
+
+def _bspi_overlap_conflict_warnings(
+    observations: Sequence[CommodityObservation],
+    *,
+    sibling_series_id: str,
+    stored_values: Mapping[str, float],
+) -> List[Dict[str, Any]]:
+    warnings: List[Dict[str, Any]] = []
+    for observation in observations:
+        stored = stored_values.get(observation.observation_date)
+        if stored is None or float(stored) == float(observation.value):
+            continue
+        warnings.append(
+            {
+                "reason": "bspi_compiler_reprint_value_conflict",
+                "series_id": observation.series_id,
+                "other_series_id": sibling_series_id,
+                "observation_date": observation.observation_date,
+                "value": float(observation.value),
+                "other_value": float(stored),
+            }
+        )
+    return warnings
 
 
 class CctdaBspiPortPriceProvider:
@@ -3936,23 +4144,12 @@ class CctdaBspiPortPriceProvider:
         r"</span>\s*</li>",
         re.IGNORECASE,
     )
-    _PERIOD = re.compile(
-        r"本报告期[（(]\s*(?P<start_year>20\d{2})年(?P<start_month>\d{1,2})月"
-        r"(?P<start_day>\d{1,2})日\s*至\s*(?:(?P<end_year>20\d{2})年)?"
-        r"(?P<end_month>\d{1,2})月(?P<end_day>\d{1,2})日\s*[）)]"
-    )
+    _PERIOD = _BSPI_PERIOD
     _PUBLICATION_DATE = re.compile(
         r"(?P<date>20\d{2}-\d{2}-\d{2})\s+\d{2}:\d{2}:\d{2}"
     )
-    _BODY_VALUE = re.compile(
-        r"环渤海动力煤(?:综合)?价格指数.{0,24}?(?:报收于|为)\s*"
-        r"(?P<value>\d+(?:\.\d+)?)\s*元\s*[／/]?\s*吨"
-    )
-    _TITLE_VALUE = re.compile(
-        r"(?:BSPI.*?|环渤海动力煤价格指数)\s*(?P<value>\d+(?:\.\d+)?)"
-        r"\s*元\s*[／/]?\s*吨",
-        re.IGNORECASE,
-    )
+    _BODY_VALUE = _BSPI_BODY_VALUE
+    _TITLE_VALUE = _BSPI_TITLE_VALUE
 
     def __init__(self, source_profile: str, source_cfg: Mapping[str, Any]):
         self.source_profile = source_profile
@@ -3988,10 +4185,7 @@ class CctdaBspiPortPriceProvider:
 
     @staticmethod
     def _plain_text(value: str) -> str:
-        text = re.sub(r"<script\b.*?</script>", " ", value, flags=re.I | re.S)
-        text = re.sub(r"<style\b.*?</style>", " ", text, flags=re.I | re.S)
-        text = re.sub(r"<[^>]+>", " ", text)
-        return " ".join(html_lib.unescape(text).replace("\xa0", " ").split())
+        return _bspi_plain_text(value)
 
     @classmethod
     def parse_article(
@@ -4003,81 +4197,19 @@ class CctdaBspiPortPriceProvider:
         price_value_min: float = 100.0,
         price_value_max: float = 3000.0,
     ) -> Dict[str, Any]:
-        text = cls._plain_text(html)
-        period_match = cls._PERIOD.search(text)
-        if period_match is None:
-            raise _CctdaBspiMetricNotReportedError(
-                "CCTDA article missing explicit BSPI report period"
-            )
-        start_year = int(period_match.group("start_year"))
-        end_year = int(period_match.group("end_year") or start_year)
-        try:
-            period_start = date(
-                start_year,
-                int(period_match.group("start_month")),
-                int(period_match.group("start_day")),
-            )
-            period_end = date(
-                end_year,
-                int(period_match.group("end_month")),
-                int(period_match.group("end_day")),
-            )
-        except ValueError as exc:
-            raise _CctdaBspiMetricNotReportedError(
-                "CCTDA article has invalid BSPI report period"
-            ) from exc
-        if period_end < period_start:
-            raise _CctdaBspiMetricNotReportedError(
-                "CCTDA article has reversed BSPI report period"
-            )
-
-        body_values = sorted(
-            {
-                float(match.group("value"))
-                for match in cls._BODY_VALUE.finditer(text)
-                if price_value_min
-                <= float(match.group("value"))
-                <= price_value_max
-            }
+        parsed = parse_bspi_period_and_value(
+            html,
+            listing_title=listing_title,
+            price_value_min=price_value_min,
+            price_value_max=price_value_max,
+            allow_title_value=True,
         )
-        if len(body_values) > 1:
-            raise ValueError(
-                f"CCTDA article has multiple plausible BSPI values: {body_values}"
-            )
-        if body_values:
-            value = body_values[0]
-            source_field_alignment = "article_body"
-        else:
-            title_values = sorted(
-                {
-                    float(match.group("value"))
-                    for match in cls._TITLE_VALUE.finditer(
-                        cls._plain_text(listing_title)
-                    )
-                    if price_value_min
-                    <= float(match.group("value"))
-                    <= price_value_max
-                }
-            )
-            if len(title_values) != 1:
-                raise _CctdaBspiMetricNotReportedError(
-                    "CCTDA article missing unique BSPI value"
-                )
-            value = title_values[0]
-            source_field_alignment = "title_value_with_body_period"
-
-        publication_match = cls._PUBLICATION_DATE.search(text)
+        publication_match = cls._PUBLICATION_DATE.search(_bspi_plain_text(html))
         if publication_match is None:
             raise ValueError("CCTDA BSPI article missing publication date")
-        return {
-            "period_start": period_start.isoformat(),
-            "period_end": period_end.isoformat(),
-            "observation_date": period_end.isoformat(),
-            "publication_date": publication_match.group("date"),
-            "value": value,
-            "source_field_alignment": source_field_alignment,
-            "source_url": source_url,
-        }
+        parsed["publication_date"] = publication_match.group("date")
+        parsed["source_url"] = source_url
+        return parsed
 
     def _fetch_html(self, url: str, *, context: str) -> str:
         response = _request_with_retry(
@@ -4227,7 +4359,7 @@ class CctdaBspiPortPriceProvider:
                     price_value_min=price_value_min,
                     price_value_max=price_value_max,
                 )
-            except _CctdaBspiMetricNotReportedError as exc:
+            except _BspiMetricNotReportedError as exc:
                 reports_without_metric.append(
                     {
                         "publication_date": article["publication_date"],
@@ -4334,6 +4466,392 @@ class CctdaBspiPortPriceProvider:
             blockers=blockers,
             metadata={
                 "provider": "China Coal Transportation and Distribution Association",
+                "articles_discovered": len(articles),
+                "rows": len(observations),
+                "source_coverage": {
+                    "articles_discovered": len(articles),
+                    "metric_observations": len(observations),
+                    "reports_without_metric": len(reports_without_metric),
+                    "parse_failures": len(parse_failures),
+                    "out_of_range_after_period_parse": out_of_range_articles,
+                    "late_published_retained": late_published_retained,
+                    "period_lag_exceeded": period_lag_exceeded,
+                    "title_value_recoveries": title_value_recoveries,
+                    "coverage_ratio": (
+                        len(observations)
+                        / (len(articles) - out_of_range_articles)
+                        if len(articles) > out_of_range_articles
+                        else None
+                    ),
+                    "metric_absent_samples": reports_without_metric[:10],
+                },
+                "quality_diagnostics": {
+                    "observations": _observation_quality_diagnostics(observations)
+                },
+                "date_gap_fill": {
+                    "expected_periods": 0 if not articles else len(articles),
+                    "unresolved_dates": 0,
+                },
+            },
+        )
+
+
+class CqcoalBspiPortPriceProvider:
+    """Weekly Bohai-Rim Steam-Coal Price Index from 秦皇岛煤炭网 weekly reviews."""
+
+    _TITLE_MARKERS = ("环渤海动力煤价格指数周评",)
+    _HOMEPAGE_SNAPSHOT_MARKERS = ("infonew", "indexmark/infonew")
+
+    def __init__(self, source_profile: str, source_cfg: Mapping[str, Any]):
+        self.source_profile = source_profile
+        self.source_cfg = dict(source_cfg or {})
+        self.timeout = float(self.source_cfg.get("timeout_seconds") or 30)
+        self.base_url = str(
+            self.source_cfg.get("base_url") or "http://www.cqcoal.com"
+        ).rstrip("/")
+        self.listing_endpoint = str(
+            self.source_cfg.get("listing_endpoint")
+            or f"{self.base_url}/mars-web/indexmark/listPage"
+        )
+        self.article_endpoint = str(
+            self.source_cfg.get("article_endpoint")
+            or f"{self.base_url}/mars-web/indexmark/infoById"
+        )
+        self.article_url_template = str(
+            self.source_cfg.get("article_url_template")
+            or f"{self.base_url}/exp/checkdet.jsp?id={{id}}"
+        )
+        self.headers = {
+            "User-Agent": str(
+                self.source_cfg.get("user_agent")
+                or "QuoteSystem/SpecialCommodityMarketData"
+            ),
+            "Referer": str(
+                self.source_cfg.get("catalog_evidence_url")
+                or f"{self.base_url}/exp/weeklycheck.jsp"
+            ),
+            "X-Requested-With": "XMLHttpRequest",
+        }
+        self.tls_config = tls_config_from_source_config(
+            "cqcoal_bspi_weekly_port_price", self.source_cfg
+        )
+
+    def _is_homepage_snapshot(self, value: str) -> bool:
+        text = str(value or "").lower()
+        return any(marker in text for marker in self._HOMEPAGE_SNAPSHOT_MARKERS)
+
+    def _is_weekly_review_title(self, title: str) -> bool:
+        return any(marker in title for marker in self._TITLE_MARKERS)
+
+    def _article_url(self, article_id: str) -> str:
+        return self.article_url_template.format(id=article_id)
+
+    def _post_json(
+        self, url: str, data: Mapping[str, Any], *, context: str
+    ) -> Mapping[str, Any]:
+        if self._is_homepage_snapshot(url):
+            raise ValueError("homepage snapshot endpoint is not a weekly-review catalog")
+        response = _request_post_with_retry(
+            url,
+            data=data,
+            headers=self.headers,
+            timeout=self.timeout,
+            tls_config=self.tls_config,
+            retry_cfg=self.source_cfg.get("request_retry"),
+            log_context=context,
+        )
+        payload = response.json()
+        if not isinstance(payload, Mapping):
+            raise ValueError(f"{context} returned a non-object payload")
+        return payload
+
+    def _discover_articles(
+        self, start: Optional[date], end: Optional[date]
+    ) -> tuple[List[Dict[str, str]], List[Dict[str, Any]]]:
+        discovered: Dict[str, Dict[str, str]] = {}
+        warnings: List[Dict[str, Any]] = []
+        max_pages = max(1, int(self.source_cfg.get("listing_max_pages") or 40))
+        page_size = max(1, int(self.source_cfg.get("listing_page_size") or 50))
+        for page in range(1, max_pages + 1):
+            try:
+                payload = self._post_json(
+                    self.listing_endpoint,
+                    {
+                        "page": str(page),
+                        "rows": str(page_size),
+                        "sidx": "INFO_DTE",
+                        "sord": "desc",
+                    },
+                    context=f"cqcoal_bspi_listing page={page}",
+                )
+            except Exception as exc:
+                warnings.append(
+                    {
+                        "reason": "cqcoal_bspi_listing_failed",
+                        "source_url": self.listing_endpoint,
+                        "page": page,
+                        "error": str(exc),
+                    }
+                )
+                break
+            data = payload.get("data")
+            rows = data.get("list") if isinstance(data, Mapping) else None
+            if not isinstance(rows, list):
+                warnings.append(
+                    {
+                        "reason": "cqcoal_bspi_listing_failed",
+                        "source_url": self.listing_endpoint,
+                        "page": page,
+                        "error": "listing payload missing list",
+                    }
+                )
+                break
+            page_dates: List[date] = []
+            page_rows = 0
+            for raw in rows:
+                if not isinstance(raw, Mapping):
+                    continue
+                page_rows += 1
+                title = _bspi_plain_text(str(raw.get("info_til") or raw.get("title") or ""))
+                if not self._is_weekly_review_title(title):
+                    continue
+                publication_raw = str(raw.get("info_dteStr") or "")[:10]
+                publication_date = _parse_date(publication_raw)
+                if publication_date is None:
+                    continue
+                page_dates.append(publication_date)
+                if start and publication_date < start:
+                    continue
+                if end and publication_date > end + timedelta(days=14):
+                    continue
+                article_id = str(raw.get("id") or "").strip()
+                if not article_id:
+                    continue
+                source_url = self._article_url(article_id)
+                if self._is_homepage_snapshot(source_url):
+                    continue
+                discovered[article_id] = {
+                    "id": article_id,
+                    "title": title,
+                    "publication_date": publication_date.isoformat(),
+                    "source_url": source_url,
+                }
+            logger.info(
+                "[CqcoalBspiPortPrice] listing progress page=%s/%s page_rows=%s "
+                "candidates=%s oldest=%s newest=%s",
+                page,
+                max_pages,
+                page_rows,
+                len(discovered),
+                min(page_dates).isoformat() if page_dates else None,
+                max(page_dates).isoformat() if page_dates else None,
+            )
+            if page_rows == 0 or (start and page_dates and min(page_dates) < start):
+                break
+            if isinstance(data, Mapping) and not data.get("hasNextPage"):
+                pages = data.get("pages")
+                if pages is not None and page >= int(pages):
+                    break
+        rows = sorted(discovered.values(), key=lambda item: item["publication_date"])
+        if not start and not end and rows:
+            rows = rows[-1:]
+        return rows, warnings
+
+    def fetch(
+        self,
+        series: Sequence[CommoditySeries],
+        *,
+        start_date: Optional[str],
+        end_date: Optional[str],
+    ) -> CommodityProviderResult:
+        start = _parse_date(start_date)
+        end = _parse_date(end_date)
+        if start and end and start > end:
+            return CommodityProviderResult(
+                blockers=[
+                    {
+                        "reason": "invalid_cqcoal_bspi_date_range",
+                        "start_date": start_date,
+                        "end_date": end_date,
+                    }
+                ]
+            )
+        unsupported = [
+            item.series_id
+            for item in series
+            if item.source_symbol.upper() != "BSPI"
+        ]
+        if unsupported:
+            return CommodityProviderResult(
+                blockers=[
+                    {
+                        "reason": "unsupported_cqcoal_bspi_source_symbol",
+                        "series_ids": unsupported,
+                    }
+                ]
+            )
+        if self._is_homepage_snapshot(self.listing_endpoint) or self._is_homepage_snapshot(
+            self.article_endpoint
+        ):
+            return CommodityProviderResult(
+                blockers=[
+                    {
+                        "reason": "cqcoal_bspi_homepage_snapshot_rejected",
+                        "listing_endpoint": self.listing_endpoint,
+                        "article_endpoint": self.article_endpoint,
+                    }
+                ]
+            )
+        logger.info(
+            "[CqcoalBspiPortPrice] fetch start range=%s..%s series=%s",
+            start_date,
+            end_date,
+            len(series),
+        )
+        articles, warnings = self._discover_articles(start, end)
+        observations: List[CommodityObservation] = []
+        parse_failures: List[Dict[str, Any]] = []
+        reports_without_metric: List[Dict[str, Any]] = []
+        parsed_article_count = 0
+        price_value_min = float(self.source_cfg.get("price_value_min") or 100.0)
+        price_value_max = float(self.source_cfg.get("price_value_max") or 3000.0)
+        progress_every = max(
+            1, int(self.source_cfg.get("progress_log_every_articles") or 10)
+        )
+        title_value_recoveries = 0
+        out_of_range_articles = 0
+        late_published_retained = 0
+        period_lag_exceeded = 0
+        max_period_lag_days = max(
+            1, int(self.source_cfg.get("max_period_lag_days") or 60)
+        )
+        for index, article in enumerate(articles, start=1):
+            try:
+                payload = self._post_json(
+                    self.article_endpoint,
+                    {"id": article["id"]},
+                    context=f"cqcoal_bspi_article id={article['id']}",
+                )
+                raw = payload.get("data")
+                if not isinstance(raw, Mapping):
+                    raise ValueError("article payload missing data object")
+                body = str(raw.get("info_cont") or "")
+                parsed = parse_bspi_period_and_value(
+                    body,
+                    listing_title=article["title"],
+                    price_value_min=price_value_min,
+                    price_value_max=price_value_max,
+                    allow_title_value=True,
+                )
+                parsed["publication_date"] = article["publication_date"]
+                parsed["source_url"] = article["source_url"]
+            except _BspiMetricNotReportedError as exc:
+                reports_without_metric.append(
+                    {
+                        "publication_date": article["publication_date"],
+                        "source_url": article["source_url"],
+                        "reason": str(exc),
+                    }
+                )
+            except Exception as exc:
+                parse_failures.append(
+                    {
+                        "reason": "cqcoal_bspi_parse_failed",
+                        "publication_date": article["publication_date"],
+                        "source_url": article["source_url"],
+                        "error": str(exc),
+                    }
+                )
+            else:
+                parsed_article_count += 1
+                observed = date.fromisoformat(parsed["observation_date"])
+                published = _parse_date(parsed.get("publication_date"))
+                if end and observed > end:
+                    out_of_range_articles += 1
+                    continue
+                if published is not None and observed < published - timedelta(
+                    days=max_period_lag_days
+                ):
+                    period_lag_exceeded += 1
+                    continue
+                if start and observed < start:
+                    late_published_retained += 1
+                if parsed["source_field_alignment"] == "title_value_with_body_period":
+                    title_value_recoveries += 1
+                for item in series:
+                    observations.append(
+                        _build_observation(
+                            item=item,
+                            source_profile=self.source_profile,
+                            source_cfg=self.source_cfg,
+                            observation_date=parsed["observation_date"],
+                            value=parsed["value"],
+                            source_url=parsed["source_url"],
+                            source_symbol=item.source_symbol,
+                            raw_payload=parsed,
+                            metadata={
+                                "data_kind": "market_price",
+                                "publication_date": parsed["publication_date"],
+                                "source_period_start": parsed["period_start"],
+                                "source_period_end": parsed["period_end"],
+                                "region": "Bohai-Rim six coal ports",
+                                "specification": "BSPI weekly composite index",
+                                "source_report": "Qinhuangdao Coal Net weekly review",
+                                "source_field_alignment": parsed[
+                                    "source_field_alignment"
+                                ],
+                                "not_daily_spot_price": True,
+                                "not_long_term_contract_price": True,
+                            },
+                        )
+                    )
+            if index % progress_every == 0 or index == len(articles):
+                logger.info(
+                    "[CqcoalBspiPortPrice] article progress processed=%s/%s "
+                    "observations=%s metric_absent=%s parse_failures=%s "
+                    "out_of_range=%s title_value_recoveries=%s",
+                    index,
+                    len(articles),
+                    len(observations),
+                    len(reports_without_metric),
+                    len(parse_failures),
+                    out_of_range_articles,
+                    title_value_recoveries,
+                )
+        warnings.extend(parse_failures)
+        blockers: List[Dict[str, Any]] = []
+        if articles and parsed_article_count == 0:
+            blockers.append(
+                {
+                    "reason": "cqcoal_bspi_no_parseable_observations",
+                    "articles": len(articles),
+                    "reports_without_metric": len(reports_without_metric),
+                    "parse_failures": len(parse_failures),
+                }
+            )
+        logger.info(
+            "[CqcoalBspiPortPrice] fetch done range=%s..%s articles=%s "
+            "observations=%s metric_absent=%s title_value_recoveries=%s "
+            "out_of_range=%s late_published=%s period_lag_exceeded=%s "
+            "warnings=%s blockers=%s",
+            start_date,
+            end_date,
+            len(articles),
+            len(observations),
+            len(reports_without_metric),
+            title_value_recoveries,
+            out_of_range_articles,
+            late_published_retained,
+            period_lag_exceeded,
+            len(warnings),
+            len(blockers),
+        )
+        return CommodityProviderResult(
+            observations=observations,
+            warnings=warnings,
+            blockers=blockers,
+            metadata={
+                "provider": "Qinhuangdao Coal Net",
                 "articles_discovered": len(articles),
                 "rows": len(observations),
                 "source_coverage": {
@@ -6758,22 +7276,38 @@ def _source_freshness_warnings(
         if previous is None or observation.observation_date > previous:
             latest_by_series[observation.series_id] = observation.observation_date
     warnings: List[Dict[str, Any]] = []
+    role = _research_role(source_cfg)
+    stale_reason = (
+        "comparison_source_observation_stale"
+        if role == "comparison"
+        else "source_observation_stale"
+    )
     for item in series:
         latest = latest_by_series.get(item.series_id)
         latest_date = _parse_date(latest)
         if latest_date is None:
+            if role == "primary":
+                warnings.append(
+                    {
+                        "reason": "research_primary_series_empty",
+                        "series_id": item.series_id,
+                        "end_date": end_date,
+                        "research_role": role,
+                    }
+                )
             continue
         age_days = (end - latest_date).days
         if age_days <= freshness_days:
             continue
         warnings.append(
             {
-                "reason": "source_observation_stale",
+                "reason": stale_reason,
                 "series_id": item.series_id,
                 "latest_observation_date": latest,
                 "end_date": end_date,
                 "age_days": age_days,
                 "freshness_warning_days": freshness_days,
+                "research_role": role or None,
             }
         )
     return warnings
@@ -7372,6 +7906,9 @@ class OfficialPublicIndicatorGovernanceAdapter(SourceObservedDateGovernanceAdapt
 class AssociationPublicPriceGovernanceAdapter(SourceObservedDateGovernanceAdapter):
     """Govern an association-published price benchmark and its observed periods."""
 
+    master_quality_flag = "association_public_price_master_verified"
+    incomplete_reason = "association_public_price_master_mapping_incomplete"
+
     def govern_master(
         self,
         series: Sequence[CommoditySeries],
@@ -7404,7 +7941,7 @@ class AssociationPublicPriceGovernanceAdapter(SourceObservedDateGovernanceAdapte
                 missing.append("unit")
             if missing:
                 blocker = {
-                    "reason": "association_public_price_master_mapping_incomplete",
+                    "reason": self.incomplete_reason,
                     "series_id": item.series_id,
                     "missing_fields": missing,
                 }
@@ -7421,7 +7958,7 @@ class AssociationPublicPriceGovernanceAdapter(SourceObservedDateGovernanceAdapte
             records.append(
                 _master_governance_record(
                     item,
-                    quality_flag="association_public_price_master_verified",
+                    quality_flag=self.master_quality_flag,
                     source_name=str(item.metadata["source_name"]),
                     source_frequency=item.frequency,
                     source_currency=item.currency,
@@ -7450,6 +7987,13 @@ class AssociationPublicPriceGovernanceAdapter(SourceObservedDateGovernanceAdapte
             records=records,
             prefetched_result=result,
         )
+
+
+class CompilerPublicPriceGovernanceAdapter(AssociationPublicPriceGovernanceAdapter):
+    """Govern a compiler-published price benchmark with compiler provenance labels."""
+
+    master_quality_flag = "compiler_public_price_master_verified"
+    incomplete_reason = "compiler_public_price_master_mapping_incomplete"
 
 
 class NbsProductionMaterialsGovernanceAdapter(SourceObservedDateGovernanceAdapter):
@@ -7948,6 +8492,7 @@ class CommodityAdapterRegistry:
         "sse_cbcfi_public_latest": ShanghaiShippingExchangeCbcfiProvider,
         "cctda_ttci_port_inventory": CctdaTtciPortInventoryProvider,
         "cctda_bspi_weekly_port_price": CctdaBspiPortPriceProvider,
+        "cqcoal_bspi_weekly_port_price": CqcoalBspiPortPriceProvider,
         "nbs_production_materials": NbsProductionMaterialsProvider,
         "nbs_monthly_industrial_output": NbsMonthlyIndustrialOutputProvider,
         "akshare_foreign_futures": AkshareForeignFuturesProvider,
@@ -7960,6 +8505,7 @@ class CommodityAdapterRegistry:
         "100ppi_public_web": PublicWebCommodityGovernanceAdapter,
         "official_public_indicator": OfficialPublicIndicatorGovernanceAdapter,
         "association_public_price": AssociationPublicPriceGovernanceAdapter,
+        "compiler_public_price": CompilerPublicPriceGovernanceAdapter,
         "nbs_production_materials": NbsProductionMaterialsGovernanceAdapter,
         "foreign_futures": ForeignFuturesCommodityGovernanceAdapter,
         "configured_source_chain": ConfiguredSourceChainGovernanceAdapter,
@@ -8352,8 +8898,26 @@ class SpecialCommodityGovernancePipeline:
             for row in self.storage.latest_observations()
             if row.get("series_id")
         }
+        stored_values_by_series: Dict[str, Dict[str, float]] = {}
+
+        def _stored_values(series_id: str) -> Dict[str, float]:
+            if series_id not in stored_values_by_series:
+                stored_values_by_series[series_id] = {
+                    str(row["observation_date"]): float(row["value"])
+                    for row in self.storage.read_observations(series_id=series_id)
+                    if row.get("observation_date") is not None
+                    and row.get("value") is not None
+                }
+            return stored_values_by_series[series_id]
+
         for source_profile in sorted({item.source_profile for item in target_series}):
             source_series = [item for item in target_series if item.source_profile == source_profile]
+            source_cfg_lookup = (registry.module_cfg.get("source_profiles") or {}).get(
+                source_profile, {}
+            )
+            research_role = _research_role(
+                source_cfg_lookup if isinstance(source_cfg_lookup, Mapping) else {}
+            )
             provider, governance, resolution_blockers = registry.resolve(source_profile)
             logger.info(
                 "[SpecialCommodityGovernance] source start source_profile=%s series=%s start=%s end=%s dry_run=%s",
@@ -8374,7 +8938,14 @@ class SpecialCommodityGovernancePipeline:
                 ]
                 master_records.extend(resolution_records)
                 blockers.extend(
-                    [{**item, "governance_stage": "adapter_resolution"} for item in resolution_blockers]
+                    _annotate_source_diagnostics(
+                        [
+                            {**item, "governance_stage": "adapter_resolution"}
+                            for item in resolution_blockers
+                        ],
+                        source_profile=source_profile,
+                        research_role=research_role,
+                    )
                 )
                 per_source[source_profile] = {
                     "series": len(source_series),
@@ -8397,10 +8968,18 @@ class SpecialCommodityGovernancePipeline:
             )
             master_records.extend(master_result.records)
             warnings.extend(
-                [{**item, "governance_stage": "master_data"} for item in master_result.warnings]
+                _annotate_source_diagnostics(
+                    [{**item, "governance_stage": "master_data"} for item in master_result.warnings],
+                    source_profile=source_profile,
+                    research_role=research_role,
+                )
             )
             blockers.extend(
-                [{**item, "governance_stage": "master_data"} for item in master_result.blockers]
+                _annotate_source_diagnostics(
+                    [{**item, "governance_stage": "master_data"} for item in master_result.blockers],
+                    source_profile=source_profile,
+                    research_role=research_role,
+                )
             )
             blocked_series = {
                 str(item.get("series_id"))
@@ -8424,10 +9003,18 @@ class SpecialCommodityGovernancePipeline:
             else:
                 provider_result = CommodityProviderResult()
             warnings.extend(
-                [{**item, "governance_stage": "provider"} for item in provider_result.warnings]
+                _annotate_source_diagnostics(
+                    [{**item, "governance_stage": "provider"} for item in provider_result.warnings],
+                    source_profile=source_profile,
+                    research_role=research_role,
+                )
             )
             blockers.extend(
-                [{**item, "governance_stage": "provider"} for item in provider_result.blockers]
+                _annotate_source_diagnostics(
+                    [{**item, "governance_stage": "provider"} for item in provider_result.blockers],
+                    source_profile=source_profile,
+                    research_role=research_role,
+                )
             )
             provider_blocked_series = {
                 str(item.get("series_id"))
@@ -8488,10 +9075,18 @@ class SpecialCommodityGovernancePipeline:
                 )
             calendar_rows.extend(date_result.calendar_rows)
             warnings.extend(
-                [{**item, "governance_stage": "date"} for item in date_result.warnings]
+                _annotate_source_diagnostics(
+                    [{**item, "governance_stage": "date"} for item in date_result.warnings],
+                    source_profile=source_profile,
+                    research_role=research_role,
+                )
             )
             blockers.extend(
-                [{**item, "governance_stage": "date"} for item in date_result.blockers]
+                _annotate_source_diagnostics(
+                    [{**item, "governance_stage": "date"} for item in date_result.blockers],
+                    source_profile=source_profile,
+                    research_role=research_role,
+                )
             )
             source_cfg = getattr(governance, "source_cfg", None)
             if not isinstance(source_cfg, Mapping):
@@ -8506,7 +9101,11 @@ class SpecialCommodityGovernancePipeline:
                 end_date=end_date,
             )
             warnings.extend(
-                [{**item, "governance_stage": "date"} for item in freshness_warnings]
+                _annotate_source_diagnostics(
+                    [{**item, "governance_stage": "date"} for item in freshness_warnings],
+                    source_profile=source_profile,
+                    research_role=research_role,
+                )
             )
             allowed_keys = {
                 (str(row["series_id"]), str(row["observation_date"]))
@@ -8529,6 +9128,29 @@ class SpecialCommodityGovernancePipeline:
                     }
                 )
             observations.extend(governed_observations)
+            sibling_series_id = str(
+                (source_cfg if isinstance(source_cfg, Mapping) else {}).get(
+                    "comparison_series_id"
+                )
+                or ""
+            )
+            conflict_warnings = (
+                _annotate_source_diagnostics(
+                    [
+                        {**item, "governance_stage": "date"}
+                        for item in _bspi_overlap_conflict_warnings(
+                            governed_observations,
+                            sibling_series_id=sibling_series_id,
+                            stored_values=_stored_values(sibling_series_id),
+                        )
+                    ],
+                    source_profile=source_profile,
+                    research_role=research_role or "comparison",
+                )
+                if sibling_series_id and governed_observations
+                else []
+            )
+            warnings.extend(conflict_warnings)
             quality_diagnostics = dict(
                 provider_result.metadata.get("quality_diagnostics", {})
             )
@@ -8553,6 +9175,7 @@ class SpecialCommodityGovernancePipeline:
                 + len(provider_result.warnings)
                 + len(date_result.warnings)
                 + len(freshness_warnings)
+                + len(conflict_warnings)
             )
             per_source[source_profile] = {
                 "series": len(source_series),
@@ -8582,14 +9205,24 @@ class SpecialCommodityGovernancePipeline:
             )
         master_counts = self.storage.upsert_master_governance(master_records, dry_run=dry_run)
         calendar_counts = self.storage.upsert_publication_calendar(calendar_rows, dry_run=dry_run)
+        actionable_blockers = [
+            item for item in blockers if not _is_isolated_comparison_diagnostic(item)
+        ]
+        actionable_warnings = [
+            item for item in warnings if not _is_isolated_comparison_diagnostic(item)
+        ]
         master_status = "blocked" if any(
             item.get("governance_stage") in {"adapter_resolution", "master_data"}
-            for item in blockers
-        ) else ("warning" if any(item.get("governance_stage") == "master_data" for item in warnings) else "success")
+            for item in actionable_blockers
+        ) else (
+            "warning"
+            if any(item.get("governance_stage") == "master_data" for item in actionable_warnings)
+            else "success"
+        )
         date_status = "blocked" if any(
             item.get("governance_stage")
             in {"adapter_resolution", "master_data", "provider", "date"}
-            for item in blockers
+            for item in actionable_blockers
         ) else (
             "warning"
             if any(
@@ -8598,13 +9231,18 @@ class SpecialCommodityGovernancePipeline:
                     "no_source_observed_dates",
                     "nbs_unresolved_observation_periods",
                     "source_observation_stale",
+                    "research_primary_series_empty",
                 }
-                for item in warnings
+                for item in actionable_warnings
             )
             else "success"
         )
         return {
-            "status": "blocked" if blockers else ("warning" if warnings else "success"),
+            "status": (
+                "blocked"
+                if actionable_blockers
+                else ("warning" if actionable_warnings else "success")
+            ),
             "dry_run": dry_run,
             "start_date": start_date,
             "end_date": end_date,
