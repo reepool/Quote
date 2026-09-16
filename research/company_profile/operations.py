@@ -567,12 +567,19 @@ class CompanyProfileTaskService:
             "reused": 0,
         }
         published_before = len(self.writer.paths)
-        if enqueue:
+        if enqueue and not (limit_drain_to_enqueued and not instrument_ids):
             enqueue_result = self.repository.enqueue_latest_annual(
                 knowledge_cutoff=knowledge_cutoff,
                 processing_identity=self.processing_identity,
                 instrument_ids=instrument_ids,
             )
+        elif enqueue:
+            enqueue_result = {
+                "eligible": 0,
+                "inserted": 0,
+                "reused": 0,
+                "work_ids": [],
+            }
         budget = StageBudget(
             max_items=max(1, int(max_items)),
             max_concurrency=1,
@@ -586,22 +593,23 @@ class CompanyProfileTaskService:
             else None
         )
         try:
-            for stage in WORK_STAGES:
-                if self.control.stop_requested():
-                    stopped = True
-                    break
-                drain[stage] = await self.production._drain_stage(
-                    stage,
-                    budget,
-                    processing_identity_hash=self.processing_identity_hash,
-                    include_work_ids=include_work_ids,
-                    should_stop=self.control.stop_requested,
-                )
-                if drain[stage].get("stop_requested") or drain[stage].get(
-                    "status"
-                ) == "stopped":
-                    stopped = True
-                    break
+            if include_work_ids is None or include_work_ids:
+                for stage in WORK_STAGES:
+                    if self.control.stop_requested():
+                        stopped = True
+                        break
+                    drain[stage] = await self.production._drain_stage(
+                        stage,
+                        budget,
+                        processing_identity_hash=self.processing_identity_hash,
+                        include_work_ids=include_work_ids,
+                        should_stop=self.control.stop_requested,
+                    )
+                    if drain[stage].get("stop_requested") or drain[stage].get(
+                        "status"
+                    ) == "stopped":
+                        stopped = True
+                        break
         except Exception:
             logger.exception("company-profile task %s failed run_id=%s", action, run_id)
             failed = self._payload(

@@ -107,6 +107,38 @@ def test_select_live_run_targets_keeps_missing_assets_out_of_budget():
     assert registry.counts["total"] == 3
 
 
+def test_select_live_run_targets_deduplicates_repeated_instrument_ids():
+    plan = record_company_profile_live_plan()
+    registry = _registry()
+
+    selected = select_live_run_targets(
+        registry,
+        plan,
+        instrument_ids=("600000.SH", "600000.SH"),
+    )
+
+    assert selected == ("600000.SH",)
+    report = record_live_run_report(
+        plan=plan,
+        registry=registry,
+        selected_instrument_ids=selected,
+        delivered_instrument_ids=("600000.SH",),
+        knowledge_cutoff="2026-08-30",
+    )
+    assert report.universe.selected_for_run == 1
+    assert report.universe.completed == 1
+    payload = json.loads(report.model_dump_json())
+    payload["selected_instrument_ids"] = ["600000.SH", "600000.SH"]
+    payload["universe"]["selected_for_run"] = 2
+    payload["universe"]["completed"] = 2
+    payload["company_outcomes"] = [
+        payload["company_outcomes"][0],
+        payload["company_outcomes"][0],
+    ]
+    with pytest.raises(ValidationError, match="duplicate"):
+        CompanyProfileLiveRunReport.model_validate_json(json.dumps(payload))
+
+
 def test_record_live_run_keeps_universe_denominator_and_rejects_batch_rerun():
     plan = record_company_profile_live_plan()
     registry = _registry()
@@ -442,6 +474,99 @@ def test_live_run_outcomes_ignore_historical_profiles_and_parser_crashes(tmp_pat
     assert outcomes["600036.SH"]["outcome"] == "failed"
     assert outcomes["600036.SH"]["delivered"] is False
     assert outcomes["600036.SH"]["supplement_incomplete"] is False
+
+
+def test_empty_live_selection_does_not_enqueue_the_full_frontier(tmp_path):
+    storage = _storage(tmp_path)
+    _second_frontier(storage)
+    empty_registry = build_a_share_candidate_registry(
+        as_of="2026-08-30",
+        universe_coverage_guarantee="full_market",
+        eligible_instruments=(
+            {
+                "instrument_id": "000001.SZ",
+                "exchange": "SZSE",
+                "name": "平安银行",
+            },
+        ),
+        asset_coverage={"000001.SZ": {"status": "confirmed_missing"}},
+        industry_memberships={
+            "000001.SZ": {"sw_l1_name": "银行", "taxonomy_system": "sw"},
+        },
+    )
+    provider = _RequestBoundOverviewProvider()
+
+    def load_pages(item):
+        return {
+            "report": _report(
+                instrument_id=item["instrument_id"],
+                report_id=f"asset-empty-{item['instrument_id']}",
+            ),
+            "pages": (_overview_page(SERVICE_OVERVIEW),),
+        }
+
+    service = _service(
+        tmp_path,
+        storage,
+        provider=provider,
+        page_source=load_pages,
+        candidate_registry=empty_registry,
+        live_plan=record_company_profile_live_plan(),
+    )
+    result = asyncio.run(service.execute("run", knowledge_cutoff="2026-08-30"))
+    records = list(
+        (tmp_path / "output" / COMMON_CORE_STORAGE_NAMESPACE).glob("*.json")
+    )
+
+    assert result["live_run"]["selected_instrument_ids"] == []
+    assert result["live_run"]["universe"]["selected_for_run"] == 0
+    assert result["live_run"]["universe"]["completed"] == 0
+    assert result["enqueue"]["inserted"] == 0
+    assert result["enqueue"]["eligible"] == 0
+    assert provider.extract_calls == 0
+    assert records == []
+
+
+def test_duplicate_named_ids_count_as_one_live_company(tmp_path):
+    storage = _storage(tmp_path)
+    _second_frontier(storage)
+    provider = _RequestBoundOverviewProvider()
+
+    def load_pages(item):
+        if item["instrument_id"] != "600000.SH":
+            return None
+        return {
+            "report": _report(
+                instrument_id="600000.SH", report_id="asset-live-dup"
+            ),
+            "pages": (_overview_page(SERVICE_OVERVIEW),),
+        }
+
+    service = _service(
+        tmp_path,
+        storage,
+        provider=provider,
+        page_source=load_pages,
+        candidate_registry=_registry(),
+        live_plan=record_company_profile_live_plan(),
+    )
+    result = asyncio.run(
+        service.execute(
+            "run",
+            knowledge_cutoff="2026-08-30",
+            instrument_ids=("600000.SH", "600000.SH"),
+        )
+    )
+    records = list(
+        (tmp_path / "output" / COMMON_CORE_STORAGE_NAMESPACE).glob("*.json")
+    )
+
+    assert result["live_run"]["selected_instrument_ids"] == ["600000.SH"]
+    assert result["live_run"]["universe"]["selected_for_run"] == 1
+    assert result["live_run"]["universe"]["completed"] == 1
+    assert result["live_run"]["universe"]["failed"] == 0
+    assert provider.extract_calls == 1
+    assert len(records) == 1
 
 
 def test_live_run_module_has_no_llm_or_legacy_writer_entry():

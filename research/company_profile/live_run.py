@@ -106,6 +106,8 @@ class CompanyProfileLiveRunReport(_StrictModel):
         outcome_ids = tuple(item.instrument_id for item in self.company_outcomes)
         if outcome_ids != self.selected_instrument_ids:
             raise ValueError("outcome order must follow the selected run set")
+        if len(set(self.selected_instrument_ids)) != len(self.selected_instrument_ids):
+            raise ValueError("selected run set cannot contain duplicate companies")
         return self
 
 
@@ -120,13 +122,17 @@ def select_live_run_targets(
     if instrument_ids:
         by_id = {item.instrument_id: item for item in registry.candidates}
         selected: list[str] = []
+        seen: set[str] = set()
         for instrument_id in instrument_ids:
+            if instrument_id in seen:
+                continue
             candidate = by_id.get(instrument_id)
             if candidate is None:
                 continue
             if not _review_eligible(candidate, plan.sampling):
                 continue
             selected.append(instrument_id)
+            seen.add(instrument_id)
             if len(selected) >= plan.budget.max_companies_this_round:
                 break
         return tuple(selected)
