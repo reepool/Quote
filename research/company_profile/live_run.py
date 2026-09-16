@@ -206,6 +206,17 @@ def persist_live_run_report(
     return path
 
 
+def load_live_run_report(root: str | Path) -> CompanyProfileLiveRunReport:
+    """Load the persisted live-run report required by source review."""
+
+    path = Path(root) / "reports" / f"{LIVE_RUN_SCHEMA_VERSION}.json"
+    if not path.is_file():
+        raise ValueError("source review requires a persisted live-run report")
+    return CompanyProfileLiveRunReport.model_validate_json(
+        path.read_text(encoding="utf-8")
+    )
+
+
 def live_run_schema_manifest() -> dict[str, Any]:
     """Register the live-run report schema without enabling production."""
 

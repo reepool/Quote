@@ -38,6 +38,7 @@ from research.company_profile.live_plan import (
     record_company_profile_live_plan,
 )
 from research.company_profile.live_run import (
+    load_live_run_report,
     persist_live_run_report,
     record_live_run_report,
     select_live_run_targets,
@@ -49,6 +50,14 @@ from research.company_profile.runtime import (
     COMMON_CORE_WRITER_NAME,
     CompanyProfileResearchWriter,
     CompanyProfileStageRuntime,
+)
+from research.company_profile.source_review import (
+    FixtureGuardResult,
+    FreshnessObservation,
+    SemanticFinding,
+    StructuralCheck,
+    persist_source_review_report,
+    record_source_review_report,
 )
 from utils.date_utils import get_shanghai_time
 
@@ -723,6 +732,32 @@ class CompanyProfileTaskService:
                 incomplete.append(instrument_id)
         return tuple(delivered), tuple(incomplete)
 
+    def record_source_review(
+        self,
+        *,
+        structural_checks: Sequence[StructuralCheck] = (),
+        semantic_findings: Sequence[SemanticFinding] = (),
+        fixture_guards: Sequence[FixtureGuardResult] = (),
+        freshness: Sequence[FreshnessObservation] = (),
+        occupied_strata_reviewed: int | None = None,
+        tokens_used: int | None = None,
+        elapsed_seconds: float | None = None,
+        human_review_minutes: float | None = None,
+    ) -> dict[str, Any]:
+        """Record independent source review against the persisted live-run sample."""
+
+        return record_published_source_review(
+            checkpoint_root=self.checkpoint_root,
+            structural_checks=structural_checks,
+            semantic_findings=semantic_findings,
+            fixture_guards=fixture_guards,
+            freshness=freshness,
+            occupied_strata_reviewed=occupied_strata_reviewed,
+            tokens_used=tokens_used,
+            elapsed_seconds=elapsed_seconds,
+            human_review_minutes=human_review_minutes,
+        )
+
     def _payload(self, *, action: str, state: str, **extra: Any) -> dict[str, Any]:
         payload = {
             "action": action,
@@ -805,3 +840,52 @@ async def execute_published_task(
         candidate_registry=registry,
         live_plan=live_plan,
     )
+
+
+def record_published_source_review(
+    *,
+    checkpoint_root: str | Path = DEFAULT_CHECKPOINT_ROOT,
+    structural_checks: Sequence[StructuralCheck] = (),
+    semantic_findings: Sequence[SemanticFinding] = (),
+    fixture_guards: Sequence[FixtureGuardResult] = (),
+    freshness: Sequence[FreshnessObservation] = (),
+    occupied_strata_reviewed: int | None = None,
+    tokens_used: int | None = None,
+    elapsed_seconds: float | None = None,
+    human_review_minutes: float | None = None,
+) -> dict[str, Any]:
+    """Unique owner entry for independent source review after a live run."""
+
+    live_run = load_live_run_report(checkpoint_root)
+    report = record_source_review_report(
+        live_run=live_run,
+        structural_checks=structural_checks,
+        semantic_findings=semantic_findings,
+        fixture_guards=fixture_guards,
+        freshness=freshness,
+        occupied_strata_reviewed=occupied_strata_reviewed,
+        tokens_used=tokens_used,
+        elapsed_seconds=elapsed_seconds,
+        human_review_minutes=human_review_minutes,
+    )
+    path = persist_source_review_report(report, checkpoint_root)
+    control = CompanyProfileTaskControl(checkpoint_root)
+    payload = {
+        "action": "source_review",
+        "state": "recorded",
+        "source_review": report.model_dump(mode="json"),
+        "source_review_path": str(path),
+        "production_authorization": PRODUCTION_AUTHORIZATION,
+        "storage_namespace": COMMON_CORE_STORAGE_NAMESPACE,
+        "writer": COMMON_CORE_WRITER_NAME,
+    }
+    if control.path.exists():
+        current = control.read()
+        latest = dict(current.get("latest_result") or {})
+        latest["source_review"] = payload["source_review"]
+        control.finish(
+            state=str(current.get("state") or "recorded"),
+            result=latest,
+        )
+        payload["control"] = control.read()
+    return payload
