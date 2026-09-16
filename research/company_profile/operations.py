@@ -33,6 +33,10 @@ from research.company_profile.execution import (
     DEFAULT_TOTAL_TOKEN_BUDGET,
     default_processing_identity,
 )
+from research.company_profile.legacy_retirement import (
+    persist_legacy_retirement_report,
+    record_legacy_retirement_report,
+)
 from research.company_profile.live_plan import (
     CompanyProfileLivePlan,
     record_company_profile_live_plan,
@@ -777,6 +781,13 @@ class CompanyProfileTaskService:
             checkpoint_root=self.checkpoint_root,
         )
 
+    def record_legacy_retirement(self) -> dict[str, Any]:
+        """Record the dry-run legacy inventory after the reader cutover."""
+
+        return record_published_legacy_retirement(
+            checkpoint_root=self.checkpoint_root,
+        )
+
     def _publication_allows_writes(self) -> bool:
         return publication_allows_new_writes(
             load_publication_control(self.checkpoint_root)
@@ -932,6 +943,44 @@ def record_published_source_review(
             result=latest,
         )
         payload["control"] = control.read()
+    return payload
+
+
+def record_published_legacy_retirement(
+    *,
+    checkpoint_root: str | Path = DEFAULT_CHECKPOINT_ROOT,
+) -> dict[str, Any]:
+    """Unique owner entry for the post-cutover legacy dry-run inventory."""
+
+    publication = load_publication_control(checkpoint_root)
+    if publication is None:
+        raise ValueError(
+            "research publication cutover is required before legacy retirement dry-run"
+        )
+    report = record_legacy_retirement_report(publication)
+    path = persist_legacy_retirement_report(report, checkpoint_root)
+    task_control = CompanyProfileTaskControl(checkpoint_root)
+    payload = {
+        "action": "legacy_retirement",
+        "state": "recorded",
+        "legacy_retirement": report.model_dump(mode="json"),
+        "legacy_retirement_path": str(path),
+        "production_authorization": PRODUCTION_AUTHORIZATION,
+        "storage_namespace": COMMON_CORE_STORAGE_NAMESPACE,
+        "writer": COMMON_CORE_WRITER_NAME,
+        "legacy_writer_enabled": False,
+        "database_deletion_authorized": False,
+        "executed": False,
+    }
+    if task_control.path.exists():
+        snapshot = task_control.read()
+        latest = dict(snapshot.get("latest_result") or {})
+        latest["legacy_retirement"] = payload["legacy_retirement"]
+        task_control.finish(
+            state=str(snapshot.get("state") or "recorded"),
+            result=latest,
+        )
+        payload["control"] = task_control.read()
     return payload
 
 

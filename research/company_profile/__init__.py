@@ -66,6 +66,13 @@ from .core_skeleton import (
     form_core_skeleton,
     select_activated_chapters,
 )
+from .legacy_retirement import (
+    LEGACY_RETIREMENT_SCHEMA_VERSION,
+    CompanyProfileLegacyRetirementReport,
+    legacy_retirement_schema_manifest,
+    persist_legacy_retirement_report,
+    record_legacy_retirement_report,
+)
 from .live_plan import (
     LIVE_PLAN_SCHEMA_VERSION,
     CompanyProfileLivePlan,
@@ -202,6 +209,7 @@ __all__ = [
     "COMMON_CORE_STORAGE_NAMESPACE",
     "COMMON_CORE_WRITER_NAME",
     "CORE_EVIDENCE_SCHEMA_VERSION",
+    "LEGACY_RETIREMENT_SCHEMA_VERSION",
     "LIVE_PLAN_SCHEMA_VERSION",
     "LIVE_RUN_SCHEMA_VERSION",
     "PRODUCTION_AUTHORIZATION",
@@ -225,6 +233,7 @@ __all__ = [
     "CommodityExposureAssessment",
     "CommonGatewaySemanticProvider",
     "CompanyProfileCoreAssessment",
+    "CompanyProfileLegacyRetirementReport",
     "CompanyProfileLivePlan",
     "CompanyProfileLiveRunReport",
     "CompanyProfilePublicationControl",
@@ -323,6 +332,7 @@ __all__ = [
     "core_evidence_schema_manifest",
     "derive_commodity_role",
     "form_core_skeleton",
+    "legacy_retirement_schema_manifest",
     "live_plan_schema_manifest",
     "live_run_schema_manifest",
     "load_a_share_candidate_registry",
@@ -332,6 +342,7 @@ __all__ = [
     "load_stage5_sample_manifest",
     "load_stage55_adjudication_ledger",
     "overview_dimension_hits",
+    "persist_legacy_retirement_report",
     "persist_live_run_report",
     "persist_publication_control",
     "persist_source_review_report",
@@ -340,6 +351,7 @@ __all__ = [
     "project_research_view",
     "publication_schema_manifest",
     "record_company_profile_live_plan",
+    "record_legacy_retirement_report",
     "record_live_run_report",
     "record_publication_control",
     "record_source_review_report",
