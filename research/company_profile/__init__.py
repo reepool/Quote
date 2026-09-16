@@ -68,8 +68,10 @@ from .core_skeleton import (
 from .live_plan import (
     LIVE_PLAN_SCHEMA_VERSION,
     CompanyProfileLivePlan,
+    assign_disclosure_form,
     live_plan_schema_manifest,
     record_company_profile_live_plan,
+    select_stratified_review_sample,
 )
 from .models import (
     PRODUCTION_AUTHORIZATION,
@@ -278,6 +280,7 @@ __all__ = [
     "VerifyStatus",
     "announcement_access_report_lookup",
     "assess_commodity_exposures",
+    "assign_disclosure_form",
     "bind_commodity_exposure",
     "bind_commodity_exposure_assessment",
     "build_a_share_candidate_registry",
@@ -303,6 +306,7 @@ __all__ = [
     "resolved_core_field_ids",
     "select_activated_chapters",
     "select_core_evidence",
+    "select_stratified_review_sample",
     "semantic_record_json_schema",
     "stage5_evidence_plan_hash",
 ]
