@@ -4,13 +4,17 @@
 - [ ] 1.2 Feed those records as deterministic_candidates and stop emitting provider-unavailable / required_coverage_missing for fields the excerpt already satisfies
 - [ ] 1.3 Add fixture tests from the 302132.SZ official p11–p14 excerpts proving accepted principal_business, products_services, and aviation-manufacturing revenue facts with provider=None
 
-## 2. Bank and service heading ownership
+## 2. Bank heading and 经营范围 same-line field value
 
-- [ ] 2.1 Own 公司主要业务情况, 公司金融业务, and 经营范围 as business-overview titles after numbering/section prefixes, while keeping TOC and dotted page-number lines unowned
-- [ ] 2.2 Add fixture tests from the 600000.SH official 经营范围 and 3.6 公司主要业务情况 pages proving extract_business_overview locates the section and does not record chapter_missing
+- [ ] 2.1 Own standalone titles 公司主要业务情况 and 公司金融业务 after numbering/section prefixes, while keeping TOC and dotted page-number lines unowned
+- [ ] 2.2 Own a 公司简介 line whose label is 经营范围 and whose same-line remainder is the business-scope value, using the official 600000.SH p22 line 经营范围 银行业务；证券投资基金托管；公募证券投资基金销售；经批准的其它业务。; do not require a standalone title or punctuation-only remainder
+- [ ] 2.3 Add fixture tests proving 3.6 公司主要业务情况 locates overview, the p22 经营范围 line owns 银行业务, incidental mid-sentence 经营范围 stays unowned, and chapter_missing is not recorded for those official pages
 
-## 3. Same-sample re-observation
+## 3. Controlled successor replay and authoritative query
 
-- [ ] 3.1 Re-run the published company_profile_common_core path on 302132.SZ and 600000.SH only, still not_authorized and without enabling DCF, trading, or old writers
-- [ ] 3.2 Independently re-read the same official reports, record source review, and stop if recall stays 0 or accuracy stays unassessed because delivery is still empty
-- [ ] 3.3 Leave sw_l1 finance classification and M4 out of this change
+- [ ] 3.1 Publish a processing identity distinct from {"rules": "company_profile_common_core.v1"} on the unique company_profile_common_core owner
+- [ ] 3.2 Make enqueue insert successor work for 302132.SZ and 600000.SH instead of reusing the completed empty items; refuse to reuse a predecessor scope receipt that has no accepted records; do not delete the database or published JSON as the replay method
+- [ ] 3.3 Make query select the current-identity successor for the same report_id and document_version; add a fixture where the empty predecessor work_id sorts after the successor and query still returns the successor accepted facts
+- [ ] 3.4 Re-run the published path on only those two companies, still not_authorized, and assert query returns accepted facts that the empty deliveries lacked
+- [ ] 3.5 Independently re-read the same official reports, record source review, and stop if recall stays 0 or accuracy stays unassessed because query still returns an empty delivery
+- [ ] 3.6 Leave sw_l1 finance classification and M4 out of this change
