@@ -35,6 +35,7 @@ from .core_assessment_projection import (
 )
 from .core_evidence_selection import (
     CoreEvidenceSelection,
+    project_owned_page_facts,
     select_core_evidence,
 )
 from .core_skeleton import (
@@ -387,7 +388,12 @@ class CompanyProfileStageRuntime:
             )
             if activation.status != "activated":
                 continue
-            reused = _reused_records_for_chapter(state, chapter)
+            reused = _unique_records(
+                (
+                    *_reused_records_for_chapter(state, chapter),
+                    *project_owned_page_facts(state.evidence, chapter),
+                )
+            )
             bundle = _bundle_with_reused_evidence(
                 tuple(
                     item
@@ -730,6 +736,15 @@ class CompanyProfileStageRuntime:
         result = CompanyProfileTaskResult.model_validate_json(
             json.dumps(payload["task_result"], ensure_ascii=False)
         )
+        if not result.accepted_records():
+            return None
+        receipt_identity = payload.get("processing_identity")
+        if (
+            isinstance(receipt_identity, Mapping)
+            and receipt_identity
+            and dict(receipt_identity) != dict(state.processing_identity)
+        ):
+            return None
         state.completed_scopes[chapter.value] = result
         state.scope_digests[chapter.value] = digest
         return result
@@ -771,6 +786,7 @@ class CompanyProfileStageRuntime:
                 "chapter_task": chapter.value,
                 "source_digest": digest,
                 "policy_version": COMMON_CORE_MAPPING_VERSION,
+                "processing_identity": dict(state.processing_identity),
                 "task_complete": result.task_complete,
                 "task_result": json_compatible(result),
             },

@@ -520,3 +520,112 @@ def test_heading_without_usable_context_is_extraction_failed():
     )
     assert selected.spans == ()
     assert any(gap.code == "extraction_failed" for gap in selected.gaps)
+
+
+def test_bank_title_3_6_locates_overview_and_is_not_chapter_missing():
+    selected = select_core_evidence(
+        report=_report(),
+        pages=(
+            {
+                "page": 4,
+                "text": "目录\n3.6 公司主要业务情况 62",
+            },
+            {
+                "page": 62,
+                "text": (
+                    "3.6 公司主要业务情况\n"
+                    "公司致力于为客户提供全面而专业的金融服务，"
+                    "涵盖商业信贷、交易银行、投资银行、电子银行、"
+                    "跨境业务、离岸业务等多个领域。\n"
+                    "二、风险因素\n宏观风险。"
+                ),
+            },
+        ),
+    )
+    assert selected.spans[0].section_title == "公司主要业务情况"
+    assert selected.spans[0].page == 62
+    assert "商业信贷" in selected.spans[0].excerpt
+    assert selected.spans[0].context_complete is True
+    assert not any(gap.code == "chapter_missing" for gap in selected.gaps)
+
+
+def test_stated_bank_overview_stays_closed_across_open_continuation_pages():
+    pages = [
+        {
+            "page": 62,
+            "text": (
+                "3.6 公司主要业务情况\n"
+                "公司致力于为客户提供全面而专业的金融服务，"
+                "涵盖商业信贷、交易银行、投资银行、电子银行、"
+                "跨境业务、离岸业务等多个领域。"
+            ),
+        }
+    ]
+    pages.extend(
+        {"page": page, "text": f"续表正文第{page}页。"} for page in range(63, 71)
+    )
+    selected = select_core_evidence(report=_report(), pages=pages)
+    assert selected.spans[0].section_title == "公司主要业务情况"
+    assert selected.spans[0].context_complete is True
+    assert selected.spans[0].continuation_pages == ()
+    assert "商业信贷" in selected.spans[0].excerpt
+    assert "续表正文" not in selected.spans[0].excerpt
+    assert not any(gap.code == "page_unreadable" for gap in selected.gaps)
+
+
+def test_official_business_scope_line_owns_same_line_value():
+    selected = select_core_evidence(
+        report=_report(),
+        pages=(
+            {
+                "page": 22,
+                "text": (
+                    "经营范围 银行业务；证券投资基金托管；"
+                    "公募证券投资基金销售；经批准的其它业务。\n"
+                    "注册资本 293.52亿元"
+                ),
+            },
+        ),
+    )
+    assert selected.spans[0].section_title == "经营范围"
+    assert "银行业务" in selected.spans[0].excerpt
+    assert not any(gap.code == "chapter_missing" for gap in selected.gaps)
+
+
+def test_incidental_business_scope_mention_stays_unowned():
+    selected = select_core_evidence(
+        report=_report(),
+        pages=(
+            {
+                "page": 80,
+                "text": (
+                    "本公司在报告期内未改变经营范围，"
+                    "亦未因经营范围与同业产生诉讼。"
+                ),
+            },
+        ),
+    )
+    assert selected.spans == ()
+    assert any(gap.code == "chapter_missing" for gap in selected.gaps)
+
+
+def test_standalone_title_is_preferred_over_business_scope_label():
+    selected = select_core_evidence(
+        report=_report(),
+        pages=(
+            {
+                "page": 22,
+                "text": "经营范围 银行业务；证券投资基金托管。",
+            },
+            {
+                "page": 62,
+                "text": (
+                    "3.6 公司主要业务情况\n"
+                    "公司致力于为客户提供全面而专业的金融服务。\n"
+                    "二、风险因素"
+                ),
+            },
+        ),
+    )
+    assert selected.spans[0].section_title == "公司主要业务情况"
+    assert selected.spans[0].page == 62

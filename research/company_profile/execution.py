@@ -108,8 +108,15 @@ class CompanyProfileExecutionRecord(_StrictModel):
     predecessor_lineage: tuple[dict[str, Any], ...] = ()
 
 
+EMPTY_DELIVERY_PROCESSING_IDENTITY = {"rules": "company_profile_common_core.v1"}
+OWNED_PAGE_FACTS_IDENTITY_VALUE = "v1"
+
+
 def default_processing_identity() -> dict[str, Any]:
-    return {"rules": "company_profile_common_core.v1"}
+    return {
+        "rules": "company_profile_common_core.v1",
+        "owned_page_facts": OWNED_PAGE_FACTS_IDENTITY_VALUE,
+    }
 
 
 def processing_identity_from_item(item: Mapping[str, Any]) -> dict[str, Any]:

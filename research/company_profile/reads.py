@@ -22,6 +22,7 @@ from research.company_profile.commodity_exposure import (
     AssessmentStatus,
     assess_commodity_exposures,
 )
+from research.company_profile.execution import default_processing_identity
 from research.company_profile.models import (
     PRODUCTION_AUTHORIZATION,
     ReportIdentity,
@@ -221,11 +222,23 @@ class CompanyProfileReadService:
         return payload if isinstance(payload, dict) else {}
 
 
-def _record_sort_key(record: CompanyProfileRuntimeRecord) -> tuple[str, str, str, str]:
+def _record_processing_identity(record: CompanyProfileRuntimeRecord) -> dict[str, Any]:
+    identity = record.execution.input_identity
+    if identity is None:
+        return {}
+    raw = identity.processing_identity
+    return dict(raw) if raw else {}
+
+
+def _record_sort_key(
+    record: CompanyProfileRuntimeRecord,
+) -> tuple[str, str, str, int, str]:
+    current = default_processing_identity()
     return (
         str(record.report.report_period),
         str(record.report.published_at),
         str(record.report.document_version),
+        1 if _record_processing_identity(record) == current else 0,
         str(record.work_id),
     )
 

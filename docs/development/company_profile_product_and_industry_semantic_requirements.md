@@ -2,7 +2,7 @@
 
 > 文档类型：requirements（唯一权威产品总需求）
 > 版本：`company_profile_product_contract.2026-09-14`
-> 实施状态：M1—M3 与 4.1—4.6 已接通并归档；权威入口为 `company_profile_common_core`；生产仍为 `not_authorized`；2026-09-17 首次真实观察与独立核原文已完成，4.1 扩大门槛未达到；现场空交付由 `repair-common-core-empty-delivery-on-owned-pages` 修复；门槛达到前不启动 M4 或生产授权
+> 实施状态：M1—M3 与 4.1—4.6 已接通并归档；权威入口为 `company_profile_common_core`；生产仍为 `not_authorized`；`repair-common-core-empty-delivery-on-owned-pages` 已消除 302132.SZ / 600000.SH 现场空交付；重新核原文后 source recall 3/7、accuracy 1.0，4.1 扩大门槛仍未达到；门槛达到前不启动 M4 或生产授权
 > 状态：研究发布范围已切换，文档批准或已归档 change 不等于生产上线；DCF、交易和旧 writer 仍未授权
 > 已归档 change：`openspec/changes/archive/2026-09-17-deliver-a-share-core-profiles-and-commodity-exposure/`
 > 历史阶段 0—5 为研究/实现基线，历史合同与运行只用于回归和复核
@@ -247,7 +247,7 @@ M1—M3 是近期同一产品闭环，在当前 change 分段实现。M4 为后�
 
 ## 28. 当前执行入口与完成说明
 
-`deliver-a-share-core-profiles-and-commodity-exposure` 已于 2026-09-17 归档，不再作为实施待办。2026-09-17 首次真实观察与独立核原文已完成：样本为 302132.SZ、600000.SH，source recall 0/7，accuracy unassessed，`expansion_gates_met=false`。现场空交付由在途 change `repair-common-core-empty-delivery-on-owned-pages` 修复。门槛达到前不启动 M4 或生产授权；M4 行业增强仍见 `company_profile_operator_closure.v1`。
+`deliver-a-share-core-profiles-and-commodity-exposure` 已于 2026-09-17 归档，继续保持归档。`repair-common-core-empty-delivery-on-owned-pages` 已消除同一样本的现场空交付，但 change 须等实现、定向测试、两家公司受控 replay、query 验收和重新核原文完成后再归档。2026-09-17 重新核原文：样本仍为 302132.SZ、600000.SH，source recall 3/7，accuracy 1.0，critical numeric errors 0，`expansion_gates_met=false`。4.1 门槛须全部重算通过后才另行决定是否立项 M4。生产授权仍需独立明确批准。
 
 权威任务名：`company_profile_common_core`。Scheduler、CLI 和 Telegram 只转发到 `research.company_profile.operations`。已发布动作：preview、run、status、pause、resume、query、export。生产授权仍为 `not_authorized`。旧 `business_profile_*` 与 `company_profile_shadow_sync` 入口已断开，不得再作为执行命令。
 

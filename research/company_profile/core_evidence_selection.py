@@ -23,14 +23,21 @@ from .core_assessment_projection import (
 from .models import (
     PRODUCTION_AUTHORIZATION,
     Activity,
+    ActivityAction,
+    AssertionClass,
     BusinessOverview,
     ChapterTask,
     Evidence,
+    LogicalSlot,
     Measurement,
+    MetricType,
     PeriodType,
     ReportIdentity,
     Segment,
     SemanticRecord,
+    SourceNativeValue,
+    SubjectBasis,
+    SubjectScope,
     TextAnchor,
 )
 
@@ -49,8 +56,11 @@ _OVERVIEW_HEADINGS = (
     "主要产品",
     "经营模式",
     "主营业务",
+    "公司主要业务情况",
+    "公司金融业务",
     "主要业务",
 )
+_OVERVIEW_FIELD_LABELS = ("经营范围",)
 _SEGMENT_HEADINGS = (
     "占公司营业收入或营业利润10%以上",
     "主营业务分行业",
@@ -61,12 +71,12 @@ _SEGMENT_HEADINGS = (
     "分产品",
 )
 CORE_SEGMENT_HEADINGS = _SEGMENT_HEADINGS
-_ALL_HEADINGS = _OVERVIEW_HEADINGS + _SEGMENT_HEADINGS
+_ALL_HEADINGS = _OVERVIEW_HEADINGS + _OVERVIEW_FIELD_LABELS + _SEGMENT_HEADINGS
 _HEADING_PREFIX = re.compile(
     r"^(?:第[一二三四五六七八九十百]+[节章]"
     r"|[一二三四五六七八九十]+、"
     r"|[（(][一二三四五六七八九十\d]+[)）]"
-    r"|[0-9]+[.、．])"
+    r"|[0-9]+(?:[.、．][0-9]+)*[.、．]?)"
 )
 _SECTION_BOUNDARY = re.compile(
     r"(?:^|\n|(?<=[。；;]))\s*(?:第[一二三四五六七八九十百]+[节章]"
@@ -180,6 +190,19 @@ def select_core_evidence(
         field_ids=("business_overview_source", "explicit_activity"),
         require_substance=True,
     )
+    if overview.span is None:
+        labeled = _select_owned_span(
+            normalized,
+            headings=(),
+            field_labels=_OVERVIEW_FIELD_LABELS,
+            chapter_task=ChapterTask.EXTRACT_BUSINESS_OVERVIEW,
+            field_ids=("business_overview_source", "explicit_activity"),
+            require_substance=False,
+        )
+        if labeled.span is not None:
+            overview = labeled
+        else:
+            gaps.extend(labeled.gaps)
     if overview.span is not None:
         spans.append(overview.span)
     gaps.extend(overview.gaps)
@@ -271,11 +294,12 @@ def _select_owned_span(
     chapter_task: ChapterTask,
     field_ids: tuple[str, ...],
     require_substance: bool,
+    field_labels: tuple[str, ...] = (),
 ) -> _OwnedSelection:
     by_page = {item.page: item for item in pages}
     gaps: list[CoreEvidenceGap] = []
     for page in pages:
-        owned = _owned_heading(page.text, headings)
+        owned = _owned_heading(page.text, headings, field_labels=field_labels)
         if owned is None:
             continue
         heading, _line_start, line_end = owned
@@ -289,14 +313,30 @@ def _select_owned_span(
                 )
             )
             return _OwnedSelection(None, gaps)
-        excerpt, continuations, closed, gap = _collect_section(
-            page,
-            heading=heading,
-            line_end=line_end,
-            by_page=by_page,
-            chapter_task=chapter_task,
-        )
+        if heading in field_labels:
+            excerpt, continuations, closed, gap = _collect_field_label(
+                page,
+                heading=heading,
+                line_end=line_end,
+            )
+        else:
+            preview = f"{heading}\n{_cut_at_boundary(page.text[line_end:]).text}".strip()
+            if _usable_excerpt(
+                preview, heading, require_substance
+            ) and _excerpt_states_owned_overview(preview):
+                excerpt, continuations, closed, gap = preview, [], True, None
+            else:
+                excerpt, continuations, closed, gap = _collect_section(
+                    page,
+                    heading=heading,
+                    line_end=line_end,
+                    by_page=by_page,
+                    chapter_task=chapter_task,
+                )
         usable = _usable_excerpt(excerpt, heading, require_substance)
+        if usable and _excerpt_states_owned_overview(excerpt):
+            closed = True
+            gap = None
         if gap is not None and not usable:
             gaps.append(gap)
             return _OwnedSelection(None, gaps)
@@ -347,6 +387,8 @@ def owned_section_heading(
 def _owned_heading(
     text: str,
     headings: tuple[str, ...],
+    *,
+    field_labels: tuple[str, ...] = (),
 ) -> tuple[str, int, int] | None:
     if _is_toc_page(text):
         return None
@@ -355,6 +397,9 @@ def _owned_heading(
         heading = _heading_if_title_line(line, headings)
         if heading is not None:
             return heading, offset, offset + len(line)
+        heading = _heading_if_field_label(line, field_labels)
+        if heading is not None:
+            return heading, offset, offset + _heading_end_in_line(line, heading)
         offset += len(line)
     return None
 
@@ -376,6 +421,42 @@ def _heading_if_title_line(line: str, headings: tuple[str, ...]) -> str | None:
     return None
 
 
+_FIELD_LABEL_VALUE = re.compile(r"[\u4e00-\u9fffA-Za-z]{2,}")
+
+
+def _heading_if_field_label(line: str, headings: tuple[str, ...]) -> str | None:
+    stripped = line.strip()
+    if not stripped or not headings or _is_toc_line(stripped, headings):
+        return None
+    compact = _HEADING_PREFIX.sub("", re.sub(r"\s+", "", stripped), count=1)
+    for heading in sorted(headings, key=len, reverse=True):
+        if not compact.startswith(heading):
+            continue
+        rest = compact[len(heading) :]
+        if rest and _FIELD_LABEL_VALUE.search(rest) and not re.fullmatch(
+            r"[:：.。]+", rest
+        ):
+            return heading
+    return None
+
+
+def _heading_end_in_line(line: str, heading: str) -> int:
+    compact_chars: list[tuple[int, str]] = [
+        (index, char) for index, char in enumerate(line) if not char.isspace()
+    ]
+    compact = "".join(char for _, char in compact_chars)
+    prefix = _HEADING_PREFIX.match(compact)
+    start = prefix.end() if prefix else 0
+    if compact[start : start + len(heading)] != heading:
+        start = compact.find(heading)
+        if start < 0:
+            return len(line)
+    end_index = start + len(heading) - 1
+    if end_index >= len(compact_chars):
+        return len(line)
+    return compact_chars[end_index][0] + 1
+
+
 def _is_toc_page(text: str) -> bool:
     head = text[:200]
     if re.search(r"(?:^|\n)\s*目录\s*(?:\n|$)", head):
@@ -392,6 +473,20 @@ def _is_toc_line(line: str, headings: Sequence[str] = ()) -> bool:
     body = _HEADING_PREFIX.sub("", compact, count=1)
     known = tuple(dict.fromkeys((*_ALL_HEADINGS, *headings)))
     return any(heading in body for heading in known)
+
+
+def _collect_field_label(
+    page: ReportPageText,
+    *,
+    heading: str,
+    line_end: int,
+) -> tuple[str, list[int], bool, CoreEvidenceGap | None]:
+    rest = page.text[line_end:]
+    line = rest.split("\n", 1)[0]
+    excerpt = f"{heading}{line}".strip()
+    if not _FIELD_LABEL_VALUE.search(line):
+        return excerpt, [], False, None
+    return excerpt, [], True, None
 
 
 def _collect_section(
@@ -682,3 +777,383 @@ def _prepared_evidence(
             )
         )
     return tuple(items)
+
+
+_CLAUSE_PATTERNS = (
+    re.compile(r"主营业务为\s*([^。；;]{2,80})"),
+    re.compile(r"主要产品包括\s*([^。；;]{2,80})"),
+    re.compile(r"主要产品为\s*([^。；;]{2,80})"),
+    re.compile(r"经营范围\s*([^。；;]{2,120})"),
+    re.compile(r"涵盖\s*([^。；;]{2,80})"),
+)
+_ACTION_TOKEN = re.compile(r"(研发|开发|制造|生产|加工|销售|维修|服务保障)")
+_VAGUE_OBJECT = re.compile(r"^(?:经批准的)?(?:其它|其他)业务$")
+_SKIP_SEGMENT_LABELS = frozenset(
+    {
+        "营业收入",
+        "营业成本",
+        "毛利率",
+        "项目",
+        "分行业",
+        "分产品",
+        "分地区",
+        "同比增减",
+        "其中",
+        "合计",
+        "总计",
+        "小计",
+        "汇总",
+    }
+)
+
+
+def project_owned_page_facts(
+    selection: CoreEvidenceSelection,
+    chapter: ChapterTask | None = None,
+) -> tuple[SemanticRecord, ...]:
+    """Project source-native core facts already stated in owned excerpts."""
+
+    records: list[SemanticRecord] = []
+    for span in selection.spans:
+        if chapter is not None and span.chapter_task != chapter.value:
+            continue
+        if span.chapter_task == ChapterTask.EXTRACT_BUSINESS_OVERVIEW.value:
+            records.extend(_project_overview_span(selection, span))
+        elif span.chapter_task == ChapterTask.EXTRACT_SEGMENT_FINANCIALS.value:
+            records.extend(_project_segment_span(selection, span))
+    return tuple(records)
+
+
+def _prepared_for(
+    selection: CoreEvidenceSelection,
+    span: CoreEvidenceSpan,
+    field_id: str,
+) -> PreparedEvidence | None:
+    for item in selection.prepared_evidence:
+        if (
+            item.field_id == field_id
+            and item.evidence.page == span.page
+            and item.evidence.section_title == span.section_title
+        ):
+            return item
+    return None
+
+
+def _project_overview_span(
+    selection: CoreEvidenceSelection,
+    span: CoreEvidenceSpan,
+) -> tuple[SemanticRecord, ...]:
+    overview_item = _prepared_for(selection, span, "business_overview_source")
+    activity_item = _prepared_for(selection, span, "explicit_activity")
+    records: list[SemanticRecord] = []
+    if overview_item is not None and _excerpt_states_owned_overview(span.excerpt):
+        source_text = _overview_source_text(
+            span.excerpt,
+            overview_item.evidence.anchor.bounded_quote
+            if isinstance(overview_item.evidence.anchor, TextAnchor)
+            else "",
+            heading=span.section_title,
+        )
+        if source_text:
+            records.append(
+                _base_fact(
+                    BusinessOverview,
+                    report=selection.report,
+                    record_id=f"owned:{overview_item.evidence.evidence_id}:overview",
+                    field_id="business_overview_source",
+                    chapter_task=ChapterTask.EXTRACT_BUSINESS_OVERVIEW,
+                    evidence=overview_item.evidence,
+                    source_native=SourceNativeValue(name=span.section_title),
+                    source_text=source_text,
+                )
+            )
+    if activity_item is None:
+        return tuple(records)
+    seen: set[str] = set()
+    for pattern in _CLAUSE_PATTERNS:
+        for match in pattern.finditer(span.excerpt):
+            verb = "经营"
+            if match.group(0).startswith("主营"):
+                verb = "为"
+            elif "从事" in match.group(0):
+                verb = "从事"
+            elif "包括" in match.group(0):
+                verb = "包括"
+            elif "涵盖" in match.group(0):
+                verb = "涵盖"
+            for raw in _split_listed(match.group(1)):
+                object_name, action, source_verb = _object_and_action(raw, verb)
+                key = re.sub(r"\s+", "", object_name)
+                if not key or key in seen:
+                    continue
+                seen.add(key)
+                records.append(
+                    _base_fact(
+                        Activity,
+                        report=selection.report,
+                        record_id=(
+                            f"owned:{activity_item.evidence.evidence_id}"
+                            f":activity:{len(seen)}"
+                        ),
+                        field_id="explicit_activity",
+                        chapter_task=ChapterTask.EXTRACT_BUSINESS_OVERVIEW,
+                        evidence=activity_item.evidence,
+                        source_native=SourceNativeValue(name=object_name),
+                        action=action,
+                        activity_actor="公司",
+                        source_actor="公司",
+                        actor_basis=SubjectBasis.DIRECT_GRAMMATICAL_ACTOR,
+                        object_name=object_name,
+                        source_verb=source_verb,
+                    )
+                )
+    return tuple(records)
+
+
+def _project_segment_span(
+    selection: CoreEvidenceSelection,
+    span: CoreEvidenceSpan,
+) -> tuple[SemanticRecord, ...]:
+    segment_item = _prepared_for(selection, span, "segment_dimension")
+    revenue_item = _prepared_for(selection, span, "operating_revenue")
+    if segment_item is None and revenue_item is None:
+        return ()
+    unit = _unit_from_excerpt(span.excerpt)
+    dimension = _segment_dimension(span.excerpt)
+    records: list[SemanticRecord] = []
+    for line in span.excerpt.splitlines():
+        parsed = _parse_segment_row(line)
+        if parsed is None:
+            continue
+        label, amount, _share = parsed
+        source_line = line.strip()
+        if segment_item is not None and source_line in (
+            segment_item.evidence.anchor.bounded_quote
+            if isinstance(segment_item.evidence.anchor, TextAnchor)
+            else ""
+        ):
+            records.append(
+                _base_fact(
+                    Segment,
+                    report=selection.report,
+                    record_id=(
+                        f"owned:{segment_item.evidence.evidence_id}:segment:{label}"
+                    ),
+                    field_id="segment_dimension",
+                    chapter_task=ChapterTask.EXTRACT_SEGMENT_FINANCIALS,
+                    evidence=segment_item.evidence,
+                    source_native=SourceNativeValue(
+                        name=label,
+                        value=amount,
+                        unit=unit,
+                    ),
+                    dimension=dimension,
+                    label=label,
+                )
+            )
+        if revenue_item is not None and source_line in (
+            revenue_item.evidence.anchor.bounded_quote
+            if isinstance(revenue_item.evidence.anchor, TextAnchor)
+            else ""
+        ):
+            records.append(
+                _base_fact(
+                    Measurement,
+                    report=selection.report,
+                    record_id=(
+                        f"owned:{revenue_item.evidence.evidence_id}:revenue:{label}"
+                    ),
+                    field_id="operating_revenue",
+                    chapter_task=ChapterTask.EXTRACT_SEGMENT_FINANCIALS,
+                    evidence=revenue_item.evidence,
+                    source_native=SourceNativeValue(
+                        name=label,
+                        value=amount,
+                        unit=unit,
+                    ),
+                    metric_type=MetricType.OPERATING_REVENUE,
+                    logical_slot=LogicalSlot.REVENUE,
+                    measured_object=label,
+                    segment_dimension=dimension,
+                    segment_label=label,
+                )
+            )
+    return tuple(records)
+
+
+def _base_fact(model, **kwargs):
+    report = kwargs["report"]
+    evidence = kwargs.pop("evidence")
+    return model(
+        subject_scope=SubjectScope.UNCLEAR,
+        subject_basis=None,
+        reported_period=report.report_period,
+        period_type=PeriodType.DURATION,
+        assertion_class=AssertionClass.REPORTED_FACT,
+        evidence=(evidence,),
+        **kwargs,
+    )
+
+
+def _excerpt_states_owned_overview(excerpt: str) -> bool:
+    return bool(
+        re.search(
+            r"主营业务为|主要产品包括|主要产品为|经营范围|公司主要业务情况|公司金融业务",
+            excerpt,
+        )
+    )
+
+
+def _join_wrapped_lines(text: str) -> str:
+    return re.sub(r"[\r\n]+", "", text)
+
+
+_PREFERRED_OVERVIEW_STATEMENT = re.compile(
+    r"(?:主营业务为|主要从事|主要产品包括|主要产品为|"
+    r"经营范围\s*[\u4e00-\u9fff]|"
+    r"(?:公司|本公司)致力于.{0,40}提供|"
+    r"涵盖[^。；;]{2,80}(?:信贷|银行|基金))"
+)
+
+
+def _sentence_containing(text: str, index: int) -> str:
+    start = max(text.rfind(mark, 0, index) for mark in ("。", "；", ";", "\n"))
+    start = 0 if start < 0 else start + 1
+    end_candidates = [text.find(mark, index) for mark in ("。", "；", ";")]
+    end_candidates = [item for item in end_candidates if item >= 0]
+    end = min(end_candidates) + 1 if end_candidates else len(text)
+    return text[start:end].strip()
+
+
+def _original_span_matching(text: str, compact_target: str) -> str:
+    compact_chars = [
+        (index, char) for index, char in enumerate(text) if not char.isspace()
+    ]
+    compact = "".join(char for _, char in compact_chars)
+    start = compact.find(compact_target)
+    if start < 0 or not compact_target:
+        return ""
+    end = start + len(compact_target) - 1
+    return text[compact_chars[start][0] : compact_chars[end][0] + 1].strip()
+
+
+def _overview_source_text(excerpt: str, quote: str, *, heading: str) -> str:
+    if not excerpt or not quote:
+        return ""
+    joined = _join_wrapped_lines(excerpt)
+    preferred = _PREFERRED_OVERVIEW_STATEMENT.search(joined)
+    if preferred is not None:
+        sentence = _sentence_containing(joined, preferred.start())
+        text = _original_span_matching(excerpt, re.sub(r"\s+", "", sentence))
+        if text and (text in quote or text in excerpt):
+            return text
+    chosen: list[str] = []
+    heading_compact = re.sub(r"\s+", "", heading)
+    for sentence in re.split(r"(?<=[。；;\n])", excerpt):
+        compact = re.sub(r"\s+", "", sentence)
+        if not compact or compact == heading_compact:
+            continue
+        if overview_dimension_hits(sentence) or heading_compact in compact:
+            chosen.append(sentence)
+        if chosen and len("".join(chosen)) >= 24:
+            break
+    text = "".join(chosen).strip() or excerpt.strip()
+    if re.sub(r"\s+", "", text) == heading_compact:
+        substance = next(
+            (
+                sentence.strip()
+                for sentence in re.split(r"(?<=[。；;\n])", excerpt)
+                if _OVERVIEW_SUBSTANCE.search(sentence)
+            ),
+            excerpt.strip(),
+        )
+        text = substance
+    if text in quote:
+        return text
+    if excerpt in quote:
+        return excerpt
+    return quote if quote in excerpt or excerpt in quote else ""
+
+
+def _split_listed(clause: str) -> list[str]:
+    text = clause.strip().strip("：:。；;，,")
+    text = re.sub(r"(?:等(?:多个领域)?)$", "", text)
+    if _looks_like_action_chain(text):
+        return [text] if text else []
+    parts: list[str] = []
+    for chunk in re.split(r"[、；;]|以及", text):
+        parts.extend(item.strip() for item in re.split(r"和", chunk) if item.strip())
+    return [
+        item
+        for item in parts
+        if len(item) >= 2 and _VAGUE_OBJECT.fullmatch(item) is None
+    ]
+
+
+def _looks_like_action_chain(text: str) -> bool:
+    return len(_ACTION_TOKEN.findall(text)) >= 2
+
+
+def _object_and_action(
+    raw: str,
+    default_verb: str,
+) -> tuple[str, ActivityAction, str]:
+    text = raw.strip()
+    if _looks_like_action_chain(text):
+        object_name = _ACTION_TOKEN.split(text)[0].strip("的 、") or text
+        if "制造" in text or "生产" in text:
+            return object_name, ActivityAction.PRODUCES, "制造" if "制造" in text else "生产"
+        if "研发" in text or "开发" in text:
+            return object_name, ActivityAction.DEVELOPS, "研发"
+        if "销售" in text:
+            return object_name, ActivityAction.SELLS, "销售"
+        return object_name, ActivityAction.OPERATES, default_verb
+    if any(token in text for token in ("托管", "银行", "基金", "信贷", "服务", "咨询", "运维")):
+        return text[:40], ActivityAction.PROVIDES_SERVICE, default_verb
+    if "销售" in text:
+        return re.sub(r"的?销售.*$", "", text) or text, ActivityAction.SELLS, "销售"
+    if "研发" in text or "开发" in text:
+        return re.sub(r"的?(?:研发|开发).*$", "", text) or text, ActivityAction.DEVELOPS, "研发"
+    if any(token in text for token in ("制造", "生产", "加工")):
+        return (
+            re.sub(r"的?(?:制造|生产|加工).*$", "", text) or text,
+            ActivityAction.PRODUCES,
+            "生产",
+        )
+    return text[:40], ActivityAction.OPERATES, default_verb
+
+
+def _segment_dimension(excerpt: str) -> str:
+    if "分行业" in excerpt:
+        return "industry"
+    if "分产品" in excerpt:
+        return "product"
+    if "分地区" in excerpt:
+        return "region"
+    return "industry"
+
+
+def _unit_from_excerpt(excerpt: str) -> str:
+    for unit in ("百万元", "千元", "亿元", "万元", "元"):
+        if unit in excerpt:
+            return unit
+    return "元"
+
+
+def _parse_segment_row(line: str) -> tuple[str, str, str | None] | None:
+    text = line.strip()
+    if not text:
+        return None
+    tokens = text.split()
+    if len(tokens) < 3:
+        return None
+    label = tokens[0]
+    if (
+        label in _SKIP_SEGMENT_LABELS
+        or tokens[1] == "营业收入"
+        or not re.fullmatch(r"[\u4e00-\u9fffA-Za-z0-9（）]{2,20}", label)
+        or not re.fullmatch(r"-?[\d,]+(?:\.\d+)?", tokens[1])
+        or not re.fullmatch(r"-?[\d.]+%?", tokens[2])
+    ):
+        return None
+    return label, tokens[1], tokens[2]
