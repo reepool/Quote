@@ -12,8 +12,10 @@ from research.business_profile_async_production import (
 )
 from research.company_profile.contracts import (
     CompanyProfileTaskResult,
+    ContractErrorCode,
     Disposition,
     DispositionStatus,
+    PreparedEvidence,
 )
 from research.company_profile.core_assessment_projection import project_core_assessment
 from research.company_profile.core_evidence_selection import (
@@ -27,12 +29,19 @@ from research.company_profile.execution import (
     OWNED_PAGE_FACTS_V3_IDENTITY,
     default_processing_identity,
 )
-from research.company_profile.models import PRODUCTION_AUTHORIZATION, ChapterTask
+from research.company_profile.models import (
+    PRODUCTION_AUTHORIZATION,
+    ChapterTask,
+    SubjectBasis,
+    SubjectScope,
+)
 from research.company_profile.operations import CompanyProfileTaskService
 from research.company_profile.runtime import (
     CompanyProfileResearchWriter,
     CompanyProfileStageRuntime,
+    _semantic_request,
 )
+from research.company_profile.workflow import _candidate_issue
 from tests.unit.test_research.test_business_profile_async_production import _frontier
 from tests.unit.test_research.test_business_profile_exposure_components import _storage
 from tests.unit.test_research.test_business_profile_production_operations import (
@@ -579,6 +588,91 @@ def test_spdb_income_analysis_projects_group_mix_and_skips_business_total():
     assessment = project_core_assessment(report=report, task_results=(result,))
     assert assessment.revenue_model.answered is True
     assert any("利息净收入" in item for item in assessment.revenue_model.supporting_record_ids)
+
+
+def _runtime_issue(record):
+    bundle = tuple(
+        PreparedEvidence(
+            evidence=item,
+            field_id=record.field_id,
+            source_native=record.source_native,
+        )
+        for item in record.evidence
+    )
+    request = _semantic_request(
+        work_id="accept-boundary",
+        report=record.report,
+        chapter=ChapterTask.EXTRACT_SEGMENT_FINANCIALS,
+        evidence_bundle=bundle,
+        unresolved_field_ids=(),
+        deterministic_candidates=(record,),
+    )
+    return _candidate_issue(record, request)
+
+
+def _spdb_mix_records():
+    report = _report(instrument_id="600000.SH", report_id="asset-spdb-accept")
+    selected = select_core_evidence(
+        report=report,
+        pages=({"page": 71, "text": SPDB_INCOME, "readable": True},),
+    )
+    projected = project_owned_page_facts(selected)
+    total = next(
+        record
+        for record in projected
+        if getattr(record, "measured_object", "") == "营业收入"
+        and getattr(record, "segment_dimension", None) is None
+    )
+    share = next(
+        record
+        for record in projected
+        if getattr(record, "metric_type", None)
+        and record.metric_type.value == "disclosed_share"
+    )
+    return total, share
+
+
+def test_acceptance_keeps_projected_group_mix():
+    total, share = _spdb_mix_records()
+    assert _runtime_issue(total) is None
+    assert _runtime_issue(share) is None
+
+
+def test_acceptance_blocks_share_bound_to_business_total():
+    _total, share = _spdb_mix_records()
+    mutated = share.model_copy(update={"relationship_context": "业务总收入"})
+    assert mutated.relationship_context == "业务总收入"
+    assert _runtime_issue(mutated) == ContractErrorCode.METRIC_NOT_ALLOWED
+
+
+def test_acceptance_blocks_group_revenue_without_direct_group_subject():
+    total, _share = _spdb_mix_records()
+    issuer = total.model_copy(
+        update={
+            "subject_scope": SubjectScope.ISSUER,
+            "subject_basis": SubjectBasis.DIRECT_SOURCE_WORDING,
+        }
+    )
+    unclear = total.model_copy(
+        update={"subject_scope": SubjectScope.UNCLEAR, "subject_basis": None}
+    )
+    assert _runtime_issue(issuer) == ContractErrorCode.SUBJECT_UNSUPPORTED
+    assert _runtime_issue(unclear) == ContractErrorCode.SUBJECT_UNSUPPORTED
+
+
+def test_acceptance_keeps_manufacturing_total_without_group_wording():
+    report = _report(instrument_id="302132.SZ", report_id="asset-avic-accept")
+    selected = select_core_evidence(
+        report=report,
+        pages=({"page": 14, "text": COMPANY_TOTAL_ONLY, "readable": True},),
+    )
+    total = next(
+        record
+        for record in project_owned_page_facts(selected)
+        if getattr(record, "measured_object", "") == "营业收入合计"
+    )
+    assert total.subject_scope == SubjectScope.UNCLEAR
+    assert _runtime_issue(total) is None
 
 
 def test_income_analysis_ready_excerpt_is_complete_after_clip():

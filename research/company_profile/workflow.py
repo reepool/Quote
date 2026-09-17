@@ -12,6 +12,8 @@ from pydantic import BaseModel, ValidationError
 from .acceptance_policy import (
     activity_promotes_third_party_to_group,
     default_group_subject_is_unsupported,
+    explicit_group_wording_subject_is_unsupported,
+    operating_revenue_share_is_unsupported,
 )
 from .contracts import (
     CompanyProfileTaskResult,
@@ -550,6 +552,10 @@ def _candidate_issue(
             return ContractErrorCode.ACTIVITY_ACTOR_UNSUPPORTED
         if activity_promotes_third_party_to_group(record):
             return ContractErrorCode.SUBJECT_UNSUPPORTED
+    if operating_revenue_share_is_unsupported(record):
+        return ContractErrorCode.METRIC_NOT_ALLOWED
+    if explicit_group_wording_subject_is_unsupported(record):
+        return ContractErrorCode.SUBJECT_UNSUPPORTED
     if default_group_subject_is_unsupported(record):
         return ContractErrorCode.SUBJECT_UNSUPPORTED
     source_by_identity = {

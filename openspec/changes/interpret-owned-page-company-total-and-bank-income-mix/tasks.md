@@ -11,6 +11,7 @@
 - [x] 2.3 Bind 本集团 to `consolidated_group` + `direct_source_wording`
 - [x] 2.4 Skip the 业务总收入 table; do not project 净息差, 成本收入比, or loan-structure rows
 - [x] 2.5 Allow 利息净收入 mix to support `revenue_model` without answering it from the total alone
+- [x] 2.6 Reject unbound share denominators and non-group subjects at the acceptance boundary
 
 ## 3. Successor replay and review
 

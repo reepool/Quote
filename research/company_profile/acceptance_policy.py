@@ -19,6 +19,7 @@ from .models import (
     BusinessRegime,
     IndustryPackageAssignment,
     Measurement,
+    MetricType,
     Relationship,
     Segment,
     SemanticRecord,
@@ -219,6 +220,33 @@ def default_group_subject_is_unsupported(record: SemanticRecord) -> bool:
     if record.subject_basis != SubjectBasis.REPORT_DEFAULT_GROUP_SCOPE:
         return False
     return not report_default_group_is_legal(record)
+
+
+def operating_revenue_share_is_unsupported(record: SemanticRecord) -> bool:
+    """Return True when a revenue share is not the locked 利息净收入 / 营业收入 row."""
+
+    if not isinstance(record, Measurement) or record.field_id != "operating_revenue":
+        return False
+    if record.metric_type != MetricType.DISCLOSED_SHARE:
+        return False
+    return not (
+        record.measured_object == "利息净收入"
+        and record.relationship_context == "营业收入"
+        and record.source_native.unit == "%"
+    )
+
+
+def explicit_group_wording_subject_is_unsupported(record: SemanticRecord) -> bool:
+    """Return True when 本集团 is stated but the subject is not the group."""
+
+    if not isinstance(record, Measurement) or record.field_id != "operating_revenue":
+        return False
+    if "本集团" not in _local_subject_evidence_text(record):
+        return False
+    return not (
+        record.subject_scope == SubjectScope.CONSOLIDATED_GROUP
+        and record.subject_basis == SubjectBasis.DIRECT_SOURCE_WORDING
+    )
 
 
 def activity_promotes_third_party_to_group(record: SemanticRecord) -> bool:

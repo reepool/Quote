@@ -27,6 +27,19 @@ Common-core MUST own a title line 利润表分析 or 营业收入构成. Inside 
 - **THEN** those records MAY support `revenue_model`
 - **AND** 净息差, 成本收入比, and loan-structure rows are absent from accepted records
 
+### Requirement: Acceptance rejects unbound share or group subject
+The semantic acceptance boundary MUST reject an `operating_revenue` `DISCLOSED_SHARE` unless `measured_object` is `利息净收入`, `relationship_context` is `营业收入`, and the unit is `%`. When local evidence states `本集团`, an `operating_revenue` Measurement MUST use `subject_scope=consolidated_group` and `subject_basis=direct_source_wording`. Provider output, recovered receipts, or constructed records that violate either rule MUST be blocked before they become accepted facts.
+
+#### Scenario: Share bound to 业务总收入 is blocked
+- **WHEN** a `DISCLOSED_SHARE` otherwise matching the interest-income mix has `relationship_context=业务总收入`
+- **THEN** acceptance returns `metric_not_allowed`
+- **AND** the record is not accepted
+
+#### Scenario: Group wording with a non-group subject is blocked
+- **WHEN** an `operating_revenue` Measurement whose evidence states `本集团` has `subject_scope=issuer` or `unclear`
+- **THEN** acceptance returns `subject_unsupported`
+- **AND** the record is not accepted
+
 ### Requirement: Repair replay uses owned_page_facts v4
 The published owner MUST use `{"rules":"company_profile_common_core.v1","owned_page_facts":"v4"}`. A run on 302132.SZ and 600000.SH MUST enqueue successor work and MUST NOT reuse, overwrite, or delete completed v1–v3 work. Query MUST return the v4 successor. After replay, source review MUST be recorded independently; 4.1 gates MUST be recalculated from that review and MUST NOT be presumed to be 7/7.
 
