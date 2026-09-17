@@ -2,9 +2,9 @@
 
 > 文档类型：requirements（唯一权威产品总需求）
 > 版本：`company_profile_product_contract.2026-09-14`
-> 实施状态：M1—M3 与 4.1—4.6 已接通并归档；权威入口为 `company_profile_common_core`；生产仍为 `not_authorized`；`openspec/changes/interpret-owned-page-company-total-and-bank-income-mix/` 已发布 `owned_page_facts=v4` successor，补公司级营业收入总额与银行 MD&A 收入构成；官方页重跑后核原文 source recall 7/7、accuracy 7/7、critical numeric 0，4.1 数字门槛此次算过，但本 change 不是 M4，须先独立 Review，通过后才决定是否提出 M4；v1–v3 JSON 保留
+> 实施状态：M1—M3 与 4.1—4.6 已接通并归档；权威入口为 `company_profile_common_core`；生产仍为 `not_authorized`；`openspec/changes/archive/2026-09-17-interpret-owned-page-company-total-and-bank-income-mix/` 已验收并归档，`owned_page_facts=v4` successor 补公司级营业收入总额与银行 MD&A 收入构成；官方页重跑后核原文 source recall 7/7、accuracy 7/7、critical numeric 0，4.1 数字门槛此次算过；独立 Review 已通过；v1–v3 JSON 保留；`openspec/changes/expand-company-profile-m4-first-expansion/` 已提案，只待审范围，不得直接实现
 > 状态：研究发布范围已切换，文档批准或已归档 change 不等于生产上线；DCF、交易和旧 writer 仍未授权
-> 已归档 change：`openspec/changes/archive/2026-09-17-deliver-a-share-core-profiles-and-commodity-exposure/`；`openspec/changes/archive/2026-09-17-repair-common-core-empty-delivery-on-owned-pages/`
+> 已归档 change：`openspec/changes/archive/2026-09-17-deliver-a-share-core-profiles-and-commodity-exposure/`；`openspec/changes/archive/2026-09-17-repair-common-core-empty-delivery-on-owned-pages/`；`openspec/changes/archive/2026-09-17-interpret-owned-page-company-total-and-bank-income-mix/`
 > 历史阶段 0—5 为研究/实现基线，历史合同与运行只用于回归和复核
 
 ## 0. 文档权威关系
@@ -17,7 +17,7 @@
 
 ## 1. 当前状态与旧链边界
 
-当前已具备制造/材料 Stage 5 抽取、校验、隔离 bundle 和 accepted 事实导出。全 A 股通用任务、持续续跑、核心骨架评价、基础商品暴露和研究范围切换已由 `company_profile_common_core` 接通；生产仍为 `not_authorized`。M4 行业增强与共性缺陷待后续迭代。
+当前已具备制造/材料 Stage 5 抽取、校验、隔离 bundle 和 accepted 事实导出。全 A 股通用任务、持续续跑、核心骨架评价、基础商品暴露和研究范围切换已由 `company_profile_common_core` 接通；生产仍为 `not_authorized`。4.1 数字门槛已在当前两家样本上算过；M4 第一片见 `openspec/changes/expand-company-profile-m4-first-expansion/`，只待审范围，不得直接实现，也不得把 v4 归档当成生产授权。
 
 旧 `business_profile_llm_report.v2` / `business_profile_atomic_extraction.v6` writer 继续冻结。保留正式公告/PDF 获取、版本、原始证据、队列/租约/checkpoint、公共 LLM 池和只读/停止能力。本规划不执行数据 reset，不开启旧 backfill，不把研究 fixture 批量改成 approved。
 
@@ -235,7 +235,7 @@ DCF、交易、价格预测不在本 change 自动启用范围。not_authorized 
 | M3 基础商品暴露和研究发布 | 商品与业务角色、期间和来源可查，未绑定行情仍可用 | M1事实＋M2持久化；明确映射/读取契约、范围切换，不等净利润模型 |
 | M4 行业深度与市场扩展 | 按真实缺口增强关键指标，扩大吞吐 | 基础任务持续交付；逐项验证增强，不要求全部公司齐全 |
 
-M1—M3 是近期同一产品闭环，在当前 change 分段实现。M4 为后续迭代。旧阶段6 reset 变为M2/M3切换后的清理工作，旧阶段7增强与基础生产解耦，旧阶段8生产不再排在所有增强之后。
+M1—M3 是近期同一产品闭环，已归档。M4 第一片已提案为 `expand-company-profile-m4-first-expansion`，只待审范围，不得直接实现。旧阶段6 reset 变为M2/M3切换后的清理工作，旧阶段7增强与基础生产解耦，旧阶段8生产不再排在所有增强之后。
 
 ## 27. 验收与扩大运行
 
@@ -247,7 +247,7 @@ M1—M3 是近期同一产品闭环，在当前 change 分段实现。M4 为后�
 
 ## 28. 当前执行入口与完成说明
 
-`deliver-a-share-core-profiles-and-commodity-exposure` 已于 2026-09-17 归档，继续保持归档。`openspec/changes/archive/2026-09-17-repair-common-core-empty-delivery-on-owned-pages/` 的 v3 交付保留。`openspec/changes/interpret-owned-page-company-total-and-bank-income-mix/` 已对 302132.SZ / 600000.SH 发布 `owned_page_facts=v4` successor，不覆盖 v1–v3 completed work。2026-09-17 按官方页面重跑并核原文：中航 `营业收入合计 75,358,958,001.86` 为无分部维度 company-total，`直销` 仍为 `sales_mode`；浦发主证据为 p71 `利润表分析`，交付集团营业收入 `173,964` 百万元、利息净收入 `120,483` 百万元及其占营业收入 `69.26%`，未收业务总收入 `325,269`、净息差或成本收入比。source recall 7/7，accuracy 7/7，critical numeric errors 0，`expansion_gates_met=true`。本 change 不是 M4，也不是生产授权；先停在独立 Review，通过后才决定是否提出 M4。
+`deliver-a-share-core-profiles-and-commodity-exposure` 已于 2026-09-17 归档，继续保持归档。`openspec/changes/archive/2026-09-17-repair-common-core-empty-delivery-on-owned-pages/` 的 v3 交付保留。`openspec/changes/archive/2026-09-17-interpret-owned-page-company-total-and-bank-income-mix/` 已验收并归档：对 302132.SZ / 600000.SH 发布 `owned_page_facts=v4` successor，不覆盖 v1–v3 completed work。2026-09-17 按官方页面重跑并核原文：中航 `营业收入合计 75,358,958,001.86` 为无分部维度 company-total，`直销` 仍为 `sales_mode`；浦发主证据为 p71 `利润表分析`，交付集团营业收入 `173,964` 百万元、利息净收入 `120,483` 百万元及其占营业收入 `69.26%`，未收业务总收入 `325,269`、净息差或成本收入比。source recall 7/7，accuracy 7/7，critical numeric errors 0，`expansion_gates_met=true`。独立 Review 已通过。本次归档不是生产授权；生产继续 `not_authorized`。M4 第一片已另提案为 `openspec/changes/expand-company-profile-m4-first-expansion/`：只扩大独立核原文到至少新增 `service` 层，并改写过时的 `first_expansion_gates_unmet`；不建行业包，不授权生产。范围未审过不得 apply。
 
 权威任务名：`company_profile_common_core`。Scheduler、CLI 和 Telegram 只转发到 `research.company_profile.operations`。已发布动作：preview、run、status、pause、resume、query、export。生产授权仍为 `not_authorized`。旧 `business_profile_*` 与 `company_profile_shadow_sync` 入口已断开，不得再作为执行命令。
 

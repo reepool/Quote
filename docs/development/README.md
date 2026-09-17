@@ -130,7 +130,9 @@ OpenSpec CLI 位于：
 - `project_development_governance.md`：长期开发总纲；
 - `framework_refactoring_program.md`：框架改造需求和进度；
 - `company_profile_product_and_industry_semantic_requirements.md`：全 A 股核心骨架、主体默认政策、基础商品暴露和持续任务路线的唯一权威总需求；
-- `../../openspec/changes/archive/2026-09-17-deliver-a-share-core-profiles-and-commodity-exposure/`：已归档的全 A 股通用骨架与基础商品暴露实施；生产仍未授权；2026-09-17 首次观察未过 4.1 门槛；`openspec/changes/interpret-owned-page-company-total-and-bank-income-mix/` 已发布 `owned_page_facts=v4`，重新核原文后 recall 7/7、accuracy 7/7，4.1 数字门槛此次算过，须先独立 Review，不是 M4；
+- `../../openspec/changes/archive/2026-09-17-deliver-a-share-core-profiles-and-commodity-exposure/`：已归档的全 A 股通用骨架与基础商品暴露实施；生产仍未授权；2026-09-17 首次观察未过 4.1 门槛；
+- `../../openspec/changes/archive/2026-09-17-interpret-owned-page-company-total-and-bank-income-mix/`：已验收并归档的 `owned_page_facts=v4`；重新核原文后 recall 7/7、accuracy 7/7，4.1 数字门槛此次算过；独立 Review 已通过；不是生产授权；
+- `../../openspec/changes/expand-company-profile-m4-first-expansion/`：已提案的 M4 第一片，只待审范围，不得直接实现；不是生产授权；
 - `company_profile_industry_research_method.md`：行业增强研究方法，不是全市场基础画像前置门；
 - `company_profile_industry_requirements_template.md`：独立行业 requirements 模板；
 - `company_profile_industry_sample_manifest.template.json`、`company_profile_industry_gold_annotation.template.json`：`research_contract_only` 的样本与 gold 标注模板；

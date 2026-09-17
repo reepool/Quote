@@ -81,10 +81,10 @@ Each official segment row MUST inherit the nearest preceding standalone heading 
 - **AND** 直销 is not a `products_services` supporting record
 
 ### Requirement: A sales-mode amount is not delivered company operating revenue
-A Measurement whose `measured_object` or `segment_label` is 直销 MUST NOT be counted as delivered company-wide 营业收入合计. A row whose label contains 合计 MUST NOT become an accepted Segment or Measurement. While the company total remains unpublished, source review MUST keep `302132.SZ-fy2025-operating-revenue-75358958001.86` as `present_in_delivery=false`.
+A Measurement whose `measured_object` or `segment_label` is 直销 MUST NOT be counted as delivered company-wide 营业收入合计. A row whose label contains 合计 MUST NOT become an accepted Segment. Equal amounts MUST NOT merge a sales-mode row with a company-total Measurement. Formal company-total acceptance of `营业收入合计` is defined by `company-profile-common-core-company-total-and-income-mix`.
 
 #### Scenario: Official 直销 amount equals the company total
 - **WHEN** the official excerpt states 直销 75,358,958,001.86 under 分销售模式 and also prints 营业收入合计 with the same amount
 - **THEN** the published records may include the 直销 / `sales_mode` measurement
-- **AND** they MUST NOT include an accepted 营业收入合计 record
-- **AND** the company-wide operating-revenue disclosure remains undelivered
+- **AND** 直销 MUST NOT be treated as the company-wide total
+- **AND** the two records MUST NOT be merged because the amounts are equal

@@ -30,7 +30,10 @@
 
 - `docs/development/research_data_engine_execution.md`：研究数据引擎实施与现状
 - `docs/development/company_profile_product_and_industry_semantic_requirements.md`：全 A 股通用骨架、事实级交付、report_default_group_scope、基础商品暴露与 M1—M4 路线的唯一产品总需求
-- `openspec/changes/archive/2026-09-17-deliver-a-share-core-profiles-and-commodity-exposure/`：已归档的全 A 股通用骨架与基础商品暴露实施；入口为 `company_profile_common_core`，生产仍为 not_authorized；2026-09-17 首次观察未过 4.1 门槛；`openspec/changes/interpret-owned-page-company-total-and-bank-income-mix/` 已发布 `owned_page_facts=v4`，重新核原文后 recall 7/7、accuracy 7/7，4.1 数字门槛此次算过，须先独立 Review，不是 M4
+- `openspec/changes/archive/2026-09-17-deliver-a-share-core-profiles-and-commodity-exposure/`：已归档的全 A 股通用骨架与基础商品暴露实施；入口为 `company_profile_common_core`，生产仍为 not_authorized；2026-09-17 首次观察未过 4.1 门槛
+- `openspec/changes/archive/2026-09-17-interpret-owned-page-company-total-and-bank-income-mix/`：已验收并归档的 `owned_page_facts=v4`；重新核原文后 recall 7/7、accuracy 7/7，4.1 数字门槛此次算过；独立 Review 已通过；不是生产授权
+- `openspec/specs/company-profile-common-core-company-total-and-income-mix/spec.md`：公司级营业收入总额与银行收入构成的当前合同
+- `openspec/changes/expand-company-profile-m4-first-expansion/`：已提案的 M4 第一片，只待审范围，不得直接实现；不是生产授权
 - `openspec/specs/company-profile-a-share-delivery/spec.md`：全市场目标合同；规范存在不等于能力上线
 - `docs/development/company_profile_industry_research_method.md`：行业增强的研究方法；不阻塞通用基础画像
 - `docs/development/company_profile_manufacturing_materials_requirements.md`、`company_profile_manufacturing_materials_research_index.md`：已通过阶段 3 研究验收的制造/材料行业合同与证据索引；不代表生产授权
