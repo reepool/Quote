@@ -16,7 +16,10 @@ from research.company_profile.operator_closure import (
     OPERATOR_CLOSURE_SCHEMA_VERSION,
     load_operator_closure_report,
 )
-from research.company_profile.source_review import SOURCE_REVIEW_SCHEMA_VERSION
+from research.company_profile.source_review import (
+    SOURCE_REVIEW_SCHEMA_VERSION,
+    SemanticFinding,
+)
 
 
 _HASH_A = "a" * 64
@@ -90,15 +93,68 @@ class _FakeAccess:
         report = candidate.latest_effective_annual_report
         binding = self._bindings[instrument_id]
         return {
-            "asset_id": report.asset_id,
+            "asset_id": binding.get("asset_id") or report.asset_id,
             "source_asset_id": binding.get("report_id") or binding.get("filing_id"),
             "filing_id": binding.get("filing_id") or binding.get("report_id"),
             "source_announcement_id": binding.get("filing_id") or binding.get("report_id"),
             "content_hash": (
                 binding.get("document_version") or report.content_hash
             ),
-            "report_period": report.report_period,
+            "report_period": binding.get("report_period") or report.report_period,
         }
+
+
+def _persist_assessed_expansion(root, plan, registry):
+    from research.company_profile.first_expansion import (
+        persist_first_expansion_live_run,
+        persist_first_expansion_source_review,
+    )
+    from research.company_profile.live_run import record_live_run_report
+    from research.company_profile.source_review import record_source_review_report
+
+    expansion = record_live_run_report(
+        plan=plan.live_plan,
+        registry=registry,
+        selected_instrument_ids=plan.selected_instrument_ids,
+        delivered_instrument_ids=plan.selected_instrument_ids,
+        knowledge_cutoff=_CUTOFF,
+        first_expansion_plan_id=plan.plan_id,
+        frozen_report_references=plan.reports,
+    )
+    persist_first_expansion_live_run(expansion, root, plan)
+    persist_first_expansion_source_review(
+        record_source_review_report(
+            live_run=expansion,
+            semantic_findings=_assessed_findings(plan.selected_instrument_ids),
+        ),
+        root,
+        plan,
+    )
+    return expansion
+
+
+def _assessed_findings(instrument_ids) -> tuple[SemanticFinding, ...]:
+    findings: list[SemanticFinding] = []
+    for instrument_id in instrument_ids:
+        findings.extend(
+            SemanticFinding(
+                instrument_id=instrument_id,
+                aspect=aspect,
+                kind="semantic",
+                source="independently_read_official_report",
+                disclosure_id=f"{instrument_id}-{aspect}",
+                disclosed_in_source=True,
+                present_in_delivery=True,
+                fact_accurate=True,
+                critical_numeric_error=False,
+            )
+            for aspect in (
+                "core_skeleton",
+                "important_disclosure",
+                "commodity_role",
+            )
+        )
+    return tuple(findings)
 
 
 def test_mode_defaults_to_inactive_without_a_snapshot(tmp_path):
@@ -329,16 +385,13 @@ def test_operator_closure_v2_keeps_v1_readable_and_uses_post_execution_text(
         activate_first_expansion,
         complete_first_expansion,
         load_first_expansion_mode,
-        persist_first_expansion_source_review,
         record_first_expansion_plan,
     )
-    from research.company_profile.live_run import record_live_run_report
     from research.company_profile.operator_closure import (
         persist_operator_closure_report,
         record_operator_closure_report,
     )
     from research.company_profile.publication import record_publication_control
-    from research.company_profile.source_review import record_source_review_report
 
     registry = _registry()
     plan = record_first_expansion_plan(
@@ -350,20 +403,7 @@ def test_operator_closure_v2_keeps_v1_readable_and_uses_post_execution_text(
     publication = record_publication_control("enable")
     v1 = record_operator_closure_report(publication)
     persist_operator_closure_report(v1, tmp_path)
-    expansion = record_live_run_report(
-        plan=plan.live_plan,
-        registry=registry,
-        selected_instrument_ids=plan.selected_instrument_ids,
-        delivered_instrument_ids=plan.selected_instrument_ids,
-        knowledge_cutoff=_CUTOFF,
-        first_expansion_plan_id=plan.plan_id,
-        frozen_report_references=plan.reports,
-    )
-    persist_first_expansion_source_review(
-        record_source_review_report(live_run=expansion),
-        tmp_path,
-        plan,
-    )
+    _persist_assessed_expansion(tmp_path, plan, registry)
     v2 = complete_first_expansion(tmp_path, publication=publication)
     loaded_v1 = load_operator_closure_report(tmp_path)
     assert loaded_v1 is not None
@@ -401,12 +441,9 @@ def test_completed_mode_does_not_reactivate_from_ordinary_run(tmp_path):
         complete_first_expansion,
         first_expansion_should_constrain_run,
         load_first_expansion_mode,
-        persist_first_expansion_source_review,
         record_first_expansion_plan,
     )
-    from research.company_profile.live_run import record_live_run_report
     from research.company_profile.publication import record_publication_control
-    from research.company_profile.source_review import record_source_review_report
 
     registry = _registry()
     plan = record_first_expansion_plan(
@@ -415,20 +452,7 @@ def test_completed_mode_does_not_reactivate_from_ordinary_run(tmp_path):
         official_bindings=_bindings(),
     )
     activate_first_expansion(tmp_path, plan)
-    expansion = record_live_run_report(
-        plan=plan.live_plan,
-        registry=registry,
-        selected_instrument_ids=plan.selected_instrument_ids,
-        delivered_instrument_ids=plan.selected_instrument_ids,
-        knowledge_cutoff=_CUTOFF,
-        first_expansion_plan_id=plan.plan_id,
-        frozen_report_references=plan.reports,
-    )
-    persist_first_expansion_source_review(
-        record_source_review_report(live_run=expansion),
-        tmp_path,
-        plan,
-    )
+    _persist_assessed_expansion(tmp_path, plan, registry)
     complete_first_expansion(tmp_path, publication=record_publication_control("enable"))
     with pytest.raises(ValueError, match="completed"):
         activate_first_expansion(tmp_path, plan)
@@ -505,16 +529,13 @@ async def test_completed_run_does_not_use_frozen_enqueue(tmp_path):
         activate_first_expansion,
         complete_first_expansion,
         first_expansion_should_constrain_run,
-        persist_first_expansion_source_review,
         record_first_expansion_plan,
     )
-    from research.company_profile.live_run import record_live_run_report
     from research.company_profile.operations import (
         CompanyProfileTaskService,
         apply_published_publication,
     )
     from research.company_profile.publication import record_publication_control
-    from research.company_profile.source_review import record_source_review_report
     from tests.unit.test_research.test_business_profile_exposure_components import (
         _storage,
     )
@@ -526,21 +547,7 @@ async def test_completed_run_does_not_use_frozen_enqueue(tmp_path):
         official_bindings=_bindings(),
     )
     activate_first_expansion(tmp_path / "checkpoints", plan)
-    persist_first_expansion_source_review(
-        record_source_review_report(
-            live_run=record_live_run_report(
-                plan=plan.live_plan,
-                registry=registry,
-                selected_instrument_ids=plan.selected_instrument_ids,
-                delivered_instrument_ids=plan.selected_instrument_ids,
-                knowledge_cutoff=_CUTOFF,
-                first_expansion_plan_id=plan.plan_id,
-                frozen_report_references=plan.reports,
-            )
-        ),
-        tmp_path / "checkpoints",
-        plan,
-    )
+    _persist_assessed_expansion(tmp_path / "checkpoints", plan, registry)
     apply_published_publication(
         action="enable",
         checkpoint_root=tmp_path / "checkpoints",
@@ -601,3 +608,243 @@ def test_official_two_company_baseline_json_still_loads_without_expansion_fields
     assert review.live_run.selected_instrument_ids == live_run.selected_instrument_ids
     assert review.expansion_gates_met is True
     assert review.scale_quality_claim_allowed is False
+
+
+@pytest.mark.asyncio
+async def test_active_run_refuses_when_immutable_snapshot_is_missing_or_diverges(
+    tmp_path,
+):
+    from research.company_profile.first_expansion import (
+        activate_first_expansion,
+        persist_first_expansion_live_run,
+        persist_first_expansion_source_review,
+        record_first_expansion_plan,
+    )
+    from research.company_profile.live_run import record_live_run_report
+    from research.company_profile.operations import (
+        CompanyProfileTaskService,
+        apply_published_publication,
+    )
+    from research.company_profile.source_review import record_source_review_report
+    from tests.unit.test_research.test_business_profile_exposure_components import (
+        _storage,
+    )
+
+    registry = _registry()
+    plan = record_first_expansion_plan(
+        registry=registry,
+        knowledge_cutoff=_CUTOFF,
+        official_bindings=_bindings(),
+    )
+    activate_first_expansion(tmp_path / "checkpoints", plan)
+    apply_published_publication(
+        action="enable",
+        checkpoint_root=tmp_path / "checkpoints",
+    )
+    (
+        tmp_path
+        / "checkpoints"
+        / "reports"
+        / "first_expansion"
+        / f"company_profile_first_expansion_plan.v1.{plan.plan_id}.json"
+    ).unlink()
+    service = CompanyProfileTaskService(
+        storage=_storage(tmp_path),
+        output_root=tmp_path / "output",
+        checkpoint_root=tmp_path / "checkpoints",
+        candidate_registry=registry,
+        shared_asset_access=_FakeAccess(registry),
+    )
+    with pytest.raises(ValueError, match="snapshot"):
+        await service.execute(
+            "run",
+            knowledge_cutoff=_CUTOFF,
+            candidate_registry=registry,
+        )
+
+    drifted_reports = tuple(
+        item.model_copy(update={"document_version": "d" * 64})
+        if item.instrument_id == "601888.SH"
+        else item
+        for item in plan.reports
+    )
+    expansion = record_live_run_report(
+        plan=plan.live_plan,
+        registry=registry,
+        selected_instrument_ids=plan.selected_instrument_ids,
+        delivered_instrument_ids=plan.selected_instrument_ids,
+        knowledge_cutoff=_CUTOFF,
+        first_expansion_plan_id=plan.plan_id,
+        frozen_report_references=drifted_reports,
+    )
+    with pytest.raises(ValueError, match="report"):
+        persist_first_expansion_live_run(expansion, tmp_path / "checkpoints", plan)
+    with pytest.raises(ValueError, match="report"):
+        persist_first_expansion_source_review(
+            record_source_review_report(live_run=expansion),
+            tmp_path / "checkpoints",
+            plan,
+        )
+
+
+def test_drift_refuses_when_current_asset_id_or_report_period_changes(tmp_path):
+    from research.company_profile.first_expansion import (
+        activate_first_expansion,
+        official_bindings_from_shared_access,
+        record_first_expansion_plan,
+        refuse_first_expansion_drift,
+    )
+
+    registry = _registry()
+    plan = record_first_expansion_plan(
+        registry=registry,
+        knowledge_cutoff=_CUTOFF,
+        official_bindings=_bindings(),
+    )
+    activate_first_expansion(tmp_path, plan)
+    drifted = dict(_bindings())
+    drifted["601888.SH"] = {
+        "filing_id": "filing-601888",
+        "asset_id": "asset-601888-corrected",
+        "report_period": "2024-12-31",
+    }
+    with pytest.raises(ValueError, match="report"):
+        refuse_first_expansion_drift(
+            plan,
+            knowledge_cutoff=_CUTOFF,
+            registry=registry,
+            official_bindings=official_bindings_from_shared_access(
+                _FakeAccess(registry, drifted),
+                plan.selected_instrument_ids,
+                knowledge_cutoff=_CUTOFF,
+            ),
+        )
+
+
+@pytest.mark.asyncio
+async def test_frozen_work_survives_interrupt_and_resume_marks_delivery(tmp_path):
+    from research.company_profile.first_expansion import (
+        activate_first_expansion,
+        load_first_expansion_mode,
+        record_first_expansion_plan,
+        remember_first_expansion_work_ids,
+    )
+    from research.company_profile.operations import (
+        CompanyProfileTaskService,
+        apply_published_publication,
+    )
+    from tests.unit.test_research.test_business_profile_exposure_components import (
+        _storage,
+    )
+
+    registry = _registry()
+    plan = record_first_expansion_plan(
+        registry=registry,
+        knowledge_cutoff=_CUTOFF,
+        official_bindings=_bindings(),
+    )
+    checkpoint = tmp_path / "checkpoints"
+    activate_first_expansion(checkpoint, plan)
+    apply_published_publication(action="enable", checkpoint_root=checkpoint)
+    service = CompanyProfileTaskService(
+        storage=_storage(tmp_path),
+        output_root=tmp_path / "output",
+        checkpoint_root=checkpoint,
+        candidate_registry=registry,
+        shared_asset_access=_FakeAccess(registry),
+    )
+
+    def fake_enqueue(**kwargs):
+        return {
+            "eligible": 2,
+            "inserted": 2,
+            "reused": 0,
+            "work_ids": ["work-frozen-a", "work-frozen-b"],
+        }
+
+    async def boom(self, **kwargs):
+        raise RuntimeError("drain interrupted")
+
+    service.repository.enqueue_latest_annual = fake_enqueue
+    service._run = boom.__get__(service, CompanyProfileTaskService)
+    with pytest.raises(RuntimeError, match="interrupted"):
+        await service.execute(
+            "run",
+            knowledge_cutoff=_CUTOFF,
+            candidate_registry=registry,
+        )
+    assert load_first_expansion_mode(checkpoint).work_ids == (
+        "work-frozen-a",
+        "work-frozen-b",
+    )
+
+    remember_first_expansion_work_ids(
+        checkpoint,
+        work_ids=("work-frozen-a", "work-frozen-b"),
+    )
+
+    async def fake_resume(self, **kwargs):
+        return {
+            "action": "resume",
+            "state": "completed",
+            "live_run": {
+                "company_outcomes": [
+                    {"delivered": True} for _ in plan.selected_instrument_ids
+                ]
+            },
+        }
+
+    service._run = fake_resume.__get__(service, CompanyProfileTaskService)
+    await service.execute(
+        "resume",
+        knowledge_cutoff=_CUTOFF,
+        candidate_registry=registry,
+    )
+    assert load_first_expansion_mode(checkpoint).delivered is True
+    again = await service.execute(
+        "run",
+        knowledge_cutoff=_CUTOFF,
+        candidate_registry=registry,
+    )
+    assert again.get("first_expansion_idempotent") is True
+
+
+def test_closure_v2_refuses_unassessed_or_undelivered_review(tmp_path):
+    from research.company_profile.first_expansion import (
+        activate_first_expansion,
+        complete_first_expansion,
+        persist_first_expansion_live_run,
+        persist_first_expansion_source_review,
+        record_first_expansion_plan,
+    )
+    from research.company_profile.live_run import record_live_run_report
+    from research.company_profile.publication import record_publication_control
+    from research.company_profile.source_review import record_source_review_report
+
+    registry = _registry()
+    plan = record_first_expansion_plan(
+        registry=registry,
+        knowledge_cutoff=_CUTOFF,
+        official_bindings=_bindings(),
+    )
+    activate_first_expansion(tmp_path, plan)
+    undelivered = record_live_run_report(
+        plan=plan.live_plan,
+        registry=registry,
+        selected_instrument_ids=plan.selected_instrument_ids,
+        delivered_instrument_ids=(),
+        knowledge_cutoff=_CUTOFF,
+        first_expansion_plan_id=plan.plan_id,
+        frozen_report_references=plan.reports,
+    )
+    persist_first_expansion_live_run(undelivered, tmp_path, plan)
+    persist_first_expansion_source_review(
+        record_source_review_report(live_run=undelivered),
+        tmp_path,
+        plan,
+    )
+    with pytest.raises(ValueError, match="delivered|assessed|cover"):
+        complete_first_expansion(
+            tmp_path,
+            publication=record_publication_control("enable"),
+        )

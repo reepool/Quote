@@ -148,12 +148,23 @@ def first_expansion_should_constrain_run(root: str | Path) -> bool:
 
 
 def load_first_expansion_plan(root: str | Path) -> FirstExpansionPlan | None:
-    """Load the current immutable first-expansion plan, if one was recorded."""
+    """Load the frozen plan only when pointer and immutable snapshot match."""
 
-    path = _plan_pointer_path(root)
-    if not path.is_file():
+    pointer_path = _plan_pointer_path(root)
+    if not pointer_path.is_file():
         return None
-    return FirstExpansionPlan.model_validate_json(path.read_text(encoding="utf-8"))
+    pointer = FirstExpansionPlan.model_validate_json(
+        pointer_path.read_text(encoding="utf-8")
+    )
+    snapshot_path = _plan_snapshot_path(root, pointer.plan_id)
+    if not snapshot_path.is_file():
+        raise ValueError("active first expansion requires a matching plan snapshot")
+    snapshot = FirstExpansionPlan.model_validate_json(
+        snapshot_path.read_text(encoding="utf-8")
+    )
+    if snapshot != pointer:
+        raise ValueError("first expansion plan snapshot does not match the pointer")
+    return snapshot
 
 
 def record_first_expansion_plan(
@@ -370,8 +381,7 @@ def persist_first_expansion_live_run(
 ) -> Path:
     """Write a live-run snapshot that does not overwrite the v1 baseline."""
 
-    if report.first_expansion_plan_id != plan.plan_id:
-        raise ValueError("first-expansion live run must carry the frozen plan id")
+    _require_observation_matches_plan(report, plan)
     path = _expansion_report_path(root, plan.plan_id, f"{LIVE_RUN_SCHEMA_VERSION}.json")
     return persist_live_run_report(report, root, destination=path)
 
@@ -397,9 +407,7 @@ def persist_first_expansion_source_review(
 ) -> Path:
     """Write a source-review snapshot that does not overwrite the v1 baseline."""
 
-    live_run = report.live_run
-    if live_run.first_expansion_plan_id != plan.plan_id:
-        raise ValueError("first-expansion source review must carry the frozen plan id")
+    _require_observation_matches_plan(report.live_run, plan)
     path = _expansion_report_path(
         root, plan.plan_id, f"{SOURCE_REVIEW_SCHEMA_VERSION}.json"
     )
@@ -483,8 +491,14 @@ def official_bindings_from_shared_access(
             raise ValueError("first expansion requires an official report_id")
         if not document_version or document_version.lower() == "unknown":
             raise ValueError("first expansion cannot use unknown document_version")
+        asset_id = str(asset.get("asset_id") or "").strip()
+        report_period = str(asset.get("report_period") or "").strip()
+        if not asset_id or not report_period:
+            raise ValueError("first expansion requires official asset_id and report_period")
         bindings[str(instrument_id)] = {
+            "asset_id": asset_id,
             "report_id": report_id,
+            "report_period": report_period,
             "filing_id": str(asset.get("filing_id") or "").strip(),
             "source_asset_id": str(asset.get("source_asset_id") or "").strip(),
             "source_announcement_id": str(
@@ -508,8 +522,27 @@ def complete_first_expansion(
     plan = load_first_expansion_plan(root)
     if plan is None or plan.plan_id != current.plan_id:
         raise ValueError("operator closure v2 requires the frozen first-expansion plan")
-    if load_first_expansion_source_review(root, plan) is None:
+    live_run = load_first_expansion_live_run(root, plan)
+    review = load_first_expansion_source_review(root, plan)
+    if live_run is None or review is None:
         raise ValueError("operator closure v2 requires the new source-review snapshot")
+    _require_observation_matches_plan(live_run, plan)
+    _require_observation_matches_plan(review.live_run, plan)
+    if not live_run.company_outcomes or not all(
+        item.delivered for item in live_run.company_outcomes
+    ):
+        raise ValueError("operator closure v2 requires the frozen sample to be delivered")
+    reviewed = {item.instrument_id for item in review.semantic_findings}
+    if reviewed != set(plan.selected_instrument_ids):
+        raise ValueError("operator closure v2 must cover the frozen sample")
+    if (
+        review.source_recall.status != "assessed"
+        or review.source_accuracy.status != "assessed"
+        or review.critical_numeric_errors.status != "assessed"
+    ):
+        raise ValueError(
+            "operator closure v2 cannot complete from an unassessed source review"
+        )
     report = record_operator_closure_v2_report(publication)
     persist_operator_closure_v2_report(report, root)
     _persist_mode(
@@ -544,13 +577,36 @@ def _frozen_report(
         )
     if not report_id:
         raise ValueError("first expansion requires an official report_id")
+    asset_id = ""
+    report_period = ""
+    if binding is not None:
+        asset_id = str(binding.get("asset_id") or "").strip()
+        report_period = str(binding.get("report_period") or "").strip()
+    if not asset_id:
+        asset_id = str(getattr(report, "asset_id", "") or "").strip()
+    if not report_period:
+        report_period = str(getattr(report, "report_period", "") or "").strip()
+    if not asset_id or not report_period:
+        raise ValueError("first expansion requires official asset_id and report_period")
     return FirstExpansionReportReference(
         instrument_id=str(candidate.instrument_id),
-        asset_id=str(report.asset_id),
+        asset_id=asset_id,
         report_id=report_id,
-        report_period=str(report.report_period),
+        report_period=report_period,
         document_version=document_version,
     )
+
+
+def _require_observation_matches_plan(
+    report: CompanyProfileLiveRunReport,
+    plan: FirstExpansionPlan,
+) -> None:
+    if report.first_expansion_plan_id != plan.plan_id:
+        raise ValueError("first-expansion live run must carry the frozen plan id")
+    if report.frozen_report_references != plan.reports:
+        raise ValueError(
+            "first-expansion observation must match the frozen report references"
+        )
 
 
 def _plan_id(

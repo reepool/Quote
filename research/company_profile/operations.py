@@ -639,13 +639,33 @@ class CompanyProfileTaskService:
             official_bindings=bindings,
         )
 
+        remembered = state.work_ids
+        if action == "run":
+            enqueue_result = self.repository.enqueue_latest_annual(
+                knowledge_cutoff=knowledge_cutoff,
+                processing_identity=self.processing_identity,
+                instrument_ids=plan.selected_instrument_ids,
+            )
+            remembered = tuple(
+                str(item)
+                for item in enqueue_result.get("work_ids") or ()
+                if str(item).strip()
+            )
+            if remembered:
+                remember_first_expansion_work_ids(
+                    self.checkpoint_root,
+                    work_ids=remembered,
+                )
+        elif not remembered:
+            raise ValueError("active first expansion resume requires frozen work ids")
+
         def attach_expansion(
             result: dict[str, Any],
             enqueue_result: Mapping[str, Any],
         ) -> None:
             delivered, incomplete = self._this_round_live_outcomes(
                 plan.selected_instrument_ids,
-                tuple(enqueue_result.get("work_ids") or state.work_ids),
+                tuple(enqueue_result.get("work_ids") or remembered),
             )
             report = record_live_run_report(
                 plan=plan.live_plan,
@@ -661,38 +681,16 @@ class CompanyProfileTaskService:
             result["live_run"] = report.model_dump(mode="json")
             result["first_expansion_plan_id"] = plan.plan_id
 
-        if action == "resume":
-            if not state.work_ids:
-                raise ValueError("active first expansion resume requires frozen work ids")
-            return await self._run(
-                knowledge_cutoff=knowledge_cutoff,
-                instrument_ids=plan.selected_instrument_ids,
-                max_items=plan.live_plan.budget.max_companies_this_round,
-                max_elapsed_seconds=plan.live_plan.budget.max_elapsed_seconds,
-                enqueue=False,
-                limit_drain_to_enqueued=True,
-                include_work_ids=state.work_ids,
-                attach_result=attach_expansion,
-            )
         result = await self._run(
             knowledge_cutoff=knowledge_cutoff,
             instrument_ids=plan.selected_instrument_ids,
             max_items=plan.live_plan.budget.max_companies_this_round,
             max_elapsed_seconds=plan.live_plan.budget.max_elapsed_seconds,
-            enqueue=True,
+            enqueue=False,
             limit_drain_to_enqueued=True,
+            include_work_ids=remembered,
             attach_result=attach_expansion,
         )
-        work_ids = tuple(
-            str(item)
-            for item in (result.get("enqueue") or {}).get("work_ids") or ()
-            if str(item).strip()
-        )
-        if work_ids:
-            remember_first_expansion_work_ids(
-                self.checkpoint_root,
-                work_ids=work_ids,
-            )
         outcomes = (result.get("live_run") or {}).get("company_outcomes") or ()
         if outcomes and all(item.get("delivered") for item in outcomes):
             mark_first_expansion_delivery(self.checkpoint_root)

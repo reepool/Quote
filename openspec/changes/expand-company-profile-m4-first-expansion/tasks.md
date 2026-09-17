@@ -20,6 +20,8 @@
 
 Official 2026-09-17 registry probe: 5564 names, available forms `{other: 5474, manufacturing: 1}`, `service_available_count=0`. Existing classification path cannot occupy `service`. Stopped before activate/enqueue. Did not hard-code an instrument or change the Shenwan L1 table.
 
+A-class contract repair after `1fe3133b`: runtime now requires pointer + immutable snapshot + full plan equality; observation snapshots must match `plan.reports`; current asset `asset_id`/`report_id`/`report_period`/`document_version` freeze and compare together; work ids persist before drain; resume marks delivery; closure v2 requires a delivered, assessed, full-sample review. 3.4 / 3.5 / 4.5 stay unchecked.
+
 ## 4. Operator closure v2 and completion
 
 - [x] 4.1 Publish `company_profile_operator_closure.v2` without changing or overwriting the v1 catalog; prove historical v1 JSON still loads
