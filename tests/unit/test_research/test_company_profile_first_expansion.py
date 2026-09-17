@@ -762,11 +762,11 @@ async def test_frozen_work_survives_interrupt_and_resume_marks_delivery(tmp_path
             "work_ids": ["work-frozen-a", "work-frozen-b"],
         }
 
-    async def boom(self, **kwargs):
+    async def boom(*args, **kwargs):
         raise RuntimeError("drain interrupted")
 
     service.repository.enqueue_latest_annual = fake_enqueue
-    service._run = boom.__get__(service, CompanyProfileTaskService)
+    service.production._drain_stage = boom
     with pytest.raises(RuntimeError, match="interrupted"):
         await service.execute(
             "run",
@@ -807,6 +807,104 @@ async def test_frozen_work_survives_interrupt_and_resume_marks_delivery(tmp_path
         candidate_registry=registry,
     )
     assert again.get("first_expansion_idempotent") is True
+
+
+@pytest.mark.asyncio
+async def test_active_run_keeps_run_accounting_and_does_not_report_idle(tmp_path):
+    from research.company_profile.first_expansion import (
+        activate_first_expansion,
+        load_first_expansion_mode,
+        record_first_expansion_plan,
+    )
+    from research.company_profile.operations import (
+        CompanyProfileTaskService,
+        apply_published_publication,
+    )
+    from tests.unit.test_research.test_business_profile_exposure_components import (
+        _storage,
+    )
+
+    registry = _registry()
+    plan = record_first_expansion_plan(
+        registry=registry,
+        knowledge_cutoff=_CUTOFF,
+        official_bindings=_bindings(),
+    )
+    checkpoint = tmp_path / "checkpoints"
+    activate_first_expansion(checkpoint, plan)
+    apply_published_publication(action="enable", checkpoint_root=checkpoint)
+    service = CompanyProfileTaskService(
+        storage=_storage(tmp_path),
+        output_root=tmp_path / "output",
+        checkpoint_root=checkpoint,
+        candidate_registry=registry,
+        shared_asset_access=_FakeAccess(registry),
+    )
+    enqueue_calls: list[dict[str, object]] = []
+
+    def fake_enqueue(**kwargs):
+        enqueue_calls.append(dict(kwargs))
+        return {
+            "eligible": 2,
+            "inserted": 2,
+            "reused": 0,
+            "work_ids": ["work-frozen-a", "work-frozen-b"],
+        }
+
+    async def boom_drain(*args, **kwargs):
+        raise RuntimeError("drain interrupted")
+
+    seen_enqueue: list[bool | None] = []
+    original_run = service._run
+
+    async def spy_run(self, **kwargs):
+        seen_enqueue.append(kwargs.get("enqueue"))
+        return await original_run(**kwargs)
+
+    service.repository.enqueue_latest_annual = fake_enqueue
+    service.production._drain_stage = boom_drain
+    service._run = spy_run.__get__(service, CompanyProfileTaskService)
+    with pytest.raises(RuntimeError, match="interrupted"):
+        await service.execute(
+            "run",
+            knowledge_cutoff=_CUTOFF,
+            candidate_registry=registry,
+        )
+    assert seen_enqueue == [True]
+    assert len(enqueue_calls) == 1
+    assert load_first_expansion_mode(checkpoint).work_ids == (
+        "work-frozen-a",
+        "work-frozen-b",
+    )
+    control = service.control.read()
+    latest = control["latest_result"]
+    assert control["action"] == "run"
+    assert latest["action"] == "run"
+    assert latest["enqueue"]["eligible"] == 2
+    assert latest["enqueue"]["inserted"] == 2
+    assert latest["enqueue"]["reused"] == 0
+    assert latest["enqueue"]["work_ids"] == ["work-frozen-a", "work-frozen-b"]
+    assert latest["state"] == "failed"
+    assert latest["state"] not in {"idle", "completed"}
+
+    async def empty_drain(*args, **kwargs):
+        return {"completed": 0, "status": "ok"}
+
+    service.production._drain_stage = empty_drain
+    result = await service.execute(
+        "run",
+        knowledge_cutoff=_CUTOFF,
+        candidate_registry=registry,
+    )
+    assert seen_enqueue == [True, True]
+    assert result["action"] == "run"
+    assert result["control"]["action"] == "run"
+    assert result["enqueue"]["eligible"] == 2
+    assert result["enqueue"]["inserted"] == 2
+    assert result["enqueue"]["reused"] == 0
+    assert result["enqueue"]["work_ids"] == ["work-frozen-a", "work-frozen-b"]
+    assert result["state"] == "incomplete"
+    assert result["state"] not in {"idle", "completed"}
 
 
 def test_closure_v2_refuses_unassessed_or_undelivered_review(tmp_path):

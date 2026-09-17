@@ -640,24 +640,19 @@ class CompanyProfileTaskService:
         )
 
         remembered = state.work_ids
-        if action == "run":
-            enqueue_result = self.repository.enqueue_latest_annual(
-                knowledge_cutoff=knowledge_cutoff,
-                processing_identity=self.processing_identity,
-                instrument_ids=plan.selected_instrument_ids,
-            )
-            remembered = tuple(
-                str(item)
-                for item in enqueue_result.get("work_ids") or ()
-                if str(item).strip()
-            )
-            if remembered:
-                remember_first_expansion_work_ids(
-                    self.checkpoint_root,
-                    work_ids=remembered,
-                )
+        enqueue = action == "run"
+        if enqueue:
+            include_work_ids = None
         elif not remembered:
             raise ValueError("active first expansion resume requires frozen work ids")
+        else:
+            include_work_ids = remembered
+
+        def remember_work_ids(work_ids: Sequence[str]) -> None:
+            remember_first_expansion_work_ids(
+                self.checkpoint_root,
+                work_ids=work_ids,
+            )
 
         def attach_expansion(
             result: dict[str, Any],
@@ -686,9 +681,10 @@ class CompanyProfileTaskService:
             instrument_ids=plan.selected_instrument_ids,
             max_items=plan.live_plan.budget.max_companies_this_round,
             max_elapsed_seconds=plan.live_plan.budget.max_elapsed_seconds,
-            enqueue=False,
+            enqueue=enqueue,
             limit_drain_to_enqueued=True,
-            include_work_ids=remembered,
+            include_work_ids=include_work_ids,
+            remember_work_ids=remember_work_ids if enqueue else None,
             attach_result=attach_expansion,
         )
         outcomes = (result.get("live_run") or {}).get("company_outcomes") or ()
@@ -706,6 +702,7 @@ class CompanyProfileTaskService:
         enqueue: bool,
         limit_drain_to_enqueued: bool = False,
         include_work_ids: Sequence[str] | None = None,
+        remember_work_ids: Callable[[Sequence[str]], None] | None = None,
         attach_result: Callable[[dict[str, Any], Mapping[str, Any]], None]
         | None = None,
     ) -> dict[str, Any]:
@@ -738,6 +735,14 @@ class CompanyProfileTaskService:
                 "reused": 0,
                 "work_ids": [],
             }
+        if remember_work_ids is not None:
+            persisted = tuple(
+                str(item)
+                for item in enqueue_result.get("work_ids") or ()
+                if str(item).strip()
+            )
+            if persisted:
+                remember_work_ids(persisted)
         budget = StageBudget(
             max_items=max(1, int(max_items)),
             max_concurrency=1,
@@ -795,6 +800,7 @@ class CompanyProfileTaskService:
             health=health,
             drain=drain,
             published_this_round=len(self.writer.paths) > published_before,
+            selected_work_ids=include_work_ids,
         )
         result = self._payload(
             action=action,
@@ -818,6 +824,7 @@ class CompanyProfileTaskService:
         health: Mapping[str, Any],
         drain: Mapping[str, Any] | None = None,
         published_this_round: bool = False,
+        selected_work_ids: Sequence[str] | None = None,
     ) -> str:
         del health
         if stopped:
@@ -826,7 +833,7 @@ class CompanyProfileTaskService:
             return "completed"
         work_ids = tuple(
             str(item)
-            for item in enqueue_result.get("work_ids") or ()
+            for item in enqueue_result.get("work_ids") or selected_work_ids or ()
             if str(item).strip()
         )
         if work_ids:
