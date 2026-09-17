@@ -117,7 +117,7 @@ _FIELD_CONTRACT: dict[
     "operating_revenue": (
         ObjectType.MEASUREMENT,
         RequirementLevel.CONDITIONAL,
-        (MetricType.OPERATING_REVENUE,),
+        (MetricType.OPERATING_REVENUE, MetricType.DISCLOSED_SHARE),
         (),
     ),
 }

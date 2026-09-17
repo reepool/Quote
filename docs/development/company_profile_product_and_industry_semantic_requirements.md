@@ -2,7 +2,7 @@
 
 > 文档类型：requirements（唯一权威产品总需求）
 > 版本：`company_profile_product_contract.2026-09-14`
-> 实施状态：M1—M3 与 4.1—4.6 已接通并归档；权威入口为 `company_profile_common_core`；生产仍为 `not_authorized`；`openspec/changes/archive/2026-09-17-repair-common-core-empty-delivery-on-owned-pages/` 已发布 `owned_page_facts=v3`，按行绑定分部维度并纠正营业收入合计召回；重新核原文后 source recall 4/7、accuracy 4/4，4.1 扩大门槛仍未达到；门槛达到前不启动 M4 或生产授权
+> 实施状态：M1—M3 与 4.1—4.6 已接通并归档；权威入口为 `company_profile_common_core`；生产仍为 `not_authorized`；`openspec/changes/interpret-owned-page-company-total-and-bank-income-mix/` 已发布 `owned_page_facts=v4` successor，补公司级营业收入总额与银行 MD&A 收入构成；官方页重跑后核原文 source recall 7/7、accuracy 7/7、critical numeric 0，4.1 数字门槛此次算过，但本 change 不是 M4，须先独立 Review，通过后才决定是否提出 M4；v1–v3 JSON 保留
 > 状态：研究发布范围已切换，文档批准或已归档 change 不等于生产上线；DCF、交易和旧 writer 仍未授权
 > 已归档 change：`openspec/changes/archive/2026-09-17-deliver-a-share-core-profiles-and-commodity-exposure/`；`openspec/changes/archive/2026-09-17-repair-common-core-empty-delivery-on-owned-pages/`
 > 历史阶段 0—5 为研究/实现基线，历史合同与运行只用于回归和复核
@@ -247,7 +247,7 @@ M1—M3 是近期同一产品闭环，在当前 change 分段实现。M4 为后�
 
 ## 28. 当前执行入口与完成说明
 
-`deliver-a-share-core-profiles-and-commodity-exposure` 已于 2026-09-17 归档，继续保持归档。`openspec/changes/archive/2026-09-17-repair-common-core-empty-delivery-on-owned-pages/` 已对 302132.SZ / 600000.SH 发布 `owned_page_facts=v3` successor，不覆盖 v1/v2 completed work。2026-09-17 按官方页面重跑并核原文：source recall 4/7，accuracy 4/4，critical numeric errors 0，`expansion_gates_met=false`。中航 `75,358,958,001.86` 仅作为 `直销` / `sales_mode` 存在，不算已交付的营业收入合计；浦发 173,964 百万元与利息净收入占比 69.26 仍未交付。4.1 门槛须全部重算通过后才另行决定是否立项 M4。生产授权仍需独立明确批准。
+`deliver-a-share-core-profiles-and-commodity-exposure` 已于 2026-09-17 归档，继续保持归档。`openspec/changes/archive/2026-09-17-repair-common-core-empty-delivery-on-owned-pages/` 的 v3 交付保留。`openspec/changes/interpret-owned-page-company-total-and-bank-income-mix/` 已对 302132.SZ / 600000.SH 发布 `owned_page_facts=v4` successor，不覆盖 v1–v3 completed work。2026-09-17 按官方页面重跑并核原文：中航 `营业收入合计 75,358,958,001.86` 为无分部维度 company-total，`直销` 仍为 `sales_mode`；浦发主证据为 p71 `利润表分析`，交付集团营业收入 `173,964` 百万元、利息净收入 `120,483` 百万元及其占营业收入 `69.26%`，未收业务总收入 `325,269`、净息差或成本收入比。source recall 7/7，accuracy 7/7，critical numeric errors 0，`expansion_gates_met=true`。本 change 不是 M4，也不是生产授权；先停在独立 Review，通过后才决定是否提出 M4。
 
 权威任务名：`company_profile_common_core`。Scheduler、CLI 和 Telegram 只转发到 `research.company_profile.operations`。已发布动作：preview、run、status、pause、resume、query、export。生产授权仍为 `not_authorized`。旧 `business_profile_*` 与 `company_profile_shadow_sync` 入口已断开，不得再作为执行命令。
 

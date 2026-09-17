@@ -117,7 +117,11 @@ OWNED_PAGE_FACTS_V2_IDENTITY = {
     "rules": "company_profile_common_core.v1",
     "owned_page_facts": "v2",
 }
-OWNED_PAGE_FACTS_IDENTITY_VALUE = "v3"
+OWNED_PAGE_FACTS_V3_IDENTITY = {
+    "rules": "company_profile_common_core.v1",
+    "owned_page_facts": "v3",
+}
+OWNED_PAGE_FACTS_IDENTITY_VALUE = "v4"
 
 
 def default_processing_identity() -> dict[str, Any]:

@@ -70,8 +70,17 @@ _SEGMENT_HEADINGS = (
     "分行业",
     "分产品",
 )
+_INCOME_ANALYSIS_HEADINGS = (
+    "利润表分析",
+    "营业收入构成",
+)
 CORE_SEGMENT_HEADINGS = _SEGMENT_HEADINGS
-_ALL_HEADINGS = _OVERVIEW_HEADINGS + _OVERVIEW_FIELD_LABELS + _SEGMENT_HEADINGS
+_ALL_HEADINGS = (
+    _OVERVIEW_HEADINGS
+    + _OVERVIEW_FIELD_LABELS
+    + _SEGMENT_HEADINGS
+    + _INCOME_ANALYSIS_HEADINGS
+)
 _HEADING_PREFIX = re.compile(
     r"^(?:第[一二三四五六七八九十百]+[节章]"
     r"|[一二三四五六七八九十]+、"
@@ -218,6 +227,17 @@ def select_core_evidence(
         spans.append(segment.span)
     gaps.extend(segment.gaps)
 
+    income = _select_owned_span(
+        normalized,
+        headings=_INCOME_ANALYSIS_HEADINGS,
+        chapter_task=ChapterTask.EXTRACT_SEGMENT_FINANCIALS,
+        field_ids=("segment_dimension", "operating_revenue"),
+        require_substance=False,
+    )
+    if income.span is not None:
+        spans.append(income.span)
+    gaps.extend(income.gaps)
+
     if overview.span is None and not any(
         gap.code == "chapter_missing"
         and gap.chapter_task == ChapterTask.EXTRACT_BUSINESS_OVERVIEW.value
@@ -254,9 +274,7 @@ def select_core_evidence(
                 unresolved.append(field_id)
             seen_fields.add(field_id)
 
-    prepared: list[PreparedEvidence] = []
-    for span in spans:
-        prepared.extend(_prepared_evidence(report, span))
+    prepared = _prepared_evidence_for_spans(report, spans)
     return CoreEvidenceSelection(
         report=report,
         spans=tuple(spans),
@@ -337,6 +355,12 @@ def _select_owned_span(
             declared = _unit_declaration(page.text)
             if declared and declared not in excerpt:
                 excerpt = f"{declared}\n{excerpt}"
+        if heading in _INCOME_ANALYSIS_HEADINGS:
+            excerpt = _clip_income_analysis_excerpt(excerpt)
+            if not _income_analysis_excerpt_ready(excerpt):
+                continue
+            closed = True
+            gap = None
         usable = _usable_excerpt(excerpt, heading, require_substance)
         if usable and _excerpt_states_owned_overview(excerpt):
             closed = True
@@ -756,6 +780,21 @@ def _object_mentioned(needle: str, haystack: str) -> bool:
     return needle in haystack
 
 
+def _prepared_evidence_for_spans(
+    report: ReportIdentity,
+    spans: Sequence[CoreEvidenceSpan],
+) -> tuple[PreparedEvidence, ...]:
+    complete_chapters = {
+        span.chapter_task for span in spans if span.context_complete
+    }
+    prepared: list[PreparedEvidence] = []
+    for span in spans:
+        if not span.context_complete and span.chapter_task in complete_chapters:
+            continue
+        prepared.extend(_prepared_evidence(report, span))
+    return tuple(prepared)
+
+
 def _prepared_evidence(
     report: ReportIdentity,
     span: CoreEvidenceSpan,
@@ -792,7 +831,8 @@ _CLAUSE_PATTERNS = (
     re.compile(r"(?:^|[\n\r])经营范围(?!内)\s*[:：]?\s*([^。；;\n]{2,120})"),
     re.compile(r"涵盖\s*([^。；;]{2,80})"),
 )
-_UNIT_DECLARATION = re.compile(r"单位[:：]\s*(百万元|千元|亿元|万元|元)")
+_UNIT_DECLARATION = re.compile(r"单位[:：]\s*(?:人民币)?(百万元|千元|亿元|万元|元)")
+_PERCENT_UNIT = re.compile(r"单位[:：]\s*%")
 _PDF_AMOUNT_WRAP = re.compile(r"([0-9,]+\.)\s*[\r\n]+\s*(\d+)")
 _ACTION_TOKEN = re.compile(r"(研发|开发|制造|生产|加工|销售|维修|服务保障)")
 _VAGUE_OBJECT = re.compile(r"^(?:经批准的)?(?:其它|其他)业务$")
@@ -828,8 +868,12 @@ def project_owned_page_facts(
         if span.chapter_task == ChapterTask.EXTRACT_BUSINESS_OVERVIEW.value:
             records.extend(_project_overview_span(selection, span))
         elif span.chapter_task == ChapterTask.EXTRACT_SEGMENT_FINANCIALS.value:
-            records.extend(_project_segment_span(selection, span))
-    return tuple(records)
+            if span.section_title in _INCOME_ANALYSIS_HEADINGS:
+                records.extend(_project_income_analysis_span(selection, span))
+            else:
+                records.extend(_project_segment_span(selection, span))
+                records.extend(_project_company_total_rows(selection, span))
+    return _dedupe_owned_records(records)
 
 
 def _prepared_for(
@@ -1000,12 +1044,393 @@ def _project_segment_span(
     return tuple(records)
 
 
+_COMPANY_TOTAL_LABELS = frozenset({"营业收入合计", "营业总收入"})
+_INCOME_AMOUNT_LABELS = frozenset({"营业收入", "利息净收入"})
+_INCOME_SHARE_LABELS = frozenset({"利息净收入"})
+_INCOME_ITEM_DIMENSION = "income_item"
+_FORBIDDEN_INCOME_LABELS = frozenset(
+    {
+        "净息差",
+        "净利息收益率",
+        "成本收入比",
+        "贷款总额",
+        "贷款利息收入",
+        "投资利息收入",
+        "业务总收入",
+    }
+)
+_INCOME_ANALYSIS_STOP_HEADINGS = (
+    "利息净收入",
+    "净息差",
+    "手续费及佣金净收入",
+    "分行业",
+    "分产品",
+    "分地区",
+    "分销售模式",
+    "营业成本构成",
+)
+_AMOUNT_TOKEN = re.compile(r"-?[\d,]+(?:\.\d+)?")
+_SHARE_TOKEN = re.compile(r"-?[\d.]+")
+_TABLE_BLOCK_SPLIT = re.compile(r"(?=(?:下表|单位[:：]))")
+_BUSINESS_TOTAL_MARK = re.compile(r"业务总收入")
+_COMPOSITION_MARK = re.compile(r"营业收入构成|占营业收入百分比")
+_REGION_TABLE_MARK = re.compile(r"地区分部|分地区")
+
+
+def _project_company_total_rows(
+    selection: CoreEvidenceSelection,
+    span: CoreEvidenceSpan,
+) -> tuple[SemanticRecord, ...]:
+    revenue_item = _prepared_for(selection, span, "operating_revenue")
+    if revenue_item is None:
+        return ()
+    excerpt = _join_pdf_soft_breaks(span.excerpt)
+    quote = (
+        revenue_item.evidence.anchor.bounded_quote
+        if isinstance(revenue_item.evidence.anchor, TextAnchor)
+        else span.excerpt
+    )
+    unit = _unit_from_excerpt(excerpt)
+    if not unit:
+        return ()
+    records: list[SemanticRecord] = []
+    for line in excerpt.splitlines():
+        parsed = _parse_labeled_amount_row(line, _COMPANY_TOTAL_LABELS)
+        if parsed is None:
+            continue
+        label, amount = parsed
+        if not _stated_in_quote(line.strip(), quote or span.excerpt):
+            continue
+        records.append(
+            _company_total_measurement(
+                selection,
+                revenue_item,
+                label=label,
+                amount=amount,
+                unit=unit,
+                excerpt=excerpt,
+            )
+        )
+    return tuple(records)
+
+
+def _project_income_analysis_span(
+    selection: CoreEvidenceSelection,
+    span: CoreEvidenceSpan,
+) -> tuple[SemanticRecord, ...]:
+    revenue_item = _prepared_for(selection, span, "operating_revenue")
+    if revenue_item is None:
+        return ()
+    excerpt = _clip_income_analysis_excerpt(_join_pdf_soft_breaks(span.excerpt))
+    quote = (
+        revenue_item.evidence.anchor.bounded_quote
+        if isinstance(revenue_item.evidence.anchor, TextAnchor)
+        else span.excerpt
+    )
+    records: list[SemanticRecord] = []
+    parts = [part.strip() for part in _TABLE_BLOCK_SPLIT.split(excerpt) if part.strip()]
+    for index, block in enumerate(parts):
+        context = f"{parts[index - 1]}\n{block}" if index else block
+        if _BUSINESS_TOTAL_MARK.search(context):
+            continue
+        if re.search(r"地区分部", context) and not _COMPOSITION_MARK.search(context):
+            continue
+        unit = _first_declared_unit(block)
+        if unit == "%":
+            if not _COMPOSITION_MARK.search(context):
+                continue
+            records.extend(
+                _project_income_share_block(
+                    selection,
+                    revenue_item,
+                    block=block,
+                    quote=quote or span.excerpt,
+                    excerpt=excerpt,
+                )
+            )
+            continue
+        if not unit:
+            continue
+        records.extend(
+            _project_income_amount_block(
+                selection,
+                revenue_item,
+                block=block,
+                unit=unit,
+                quote=quote or span.excerpt,
+                excerpt=excerpt,
+            )
+        )
+    return tuple(records)
+
+
+def _project_income_amount_block(
+    selection: CoreEvidenceSelection,
+    revenue_item,
+    *,
+    block: str,
+    unit: str,
+    quote: str,
+    excerpt: str,
+) -> tuple[SemanticRecord, ...]:
+    records: list[SemanticRecord] = []
+    for line in block.splitlines():
+        parsed = _parse_labeled_amount_row(
+            line, _COMPANY_TOTAL_LABELS | _INCOME_AMOUNT_LABELS
+        )
+        if parsed is None:
+            continue
+        label, amount = parsed
+        if label in _FORBIDDEN_INCOME_LABELS:
+            continue
+        if not _stated_in_quote(line.strip(), quote):
+            continue
+        if label in _COMPANY_TOTAL_LABELS or label == "营业收入":
+            records.append(
+                _company_total_measurement(
+                    selection,
+                    revenue_item,
+                    label=label,
+                    amount=amount,
+                    unit=unit,
+                    excerpt=excerpt,
+                )
+            )
+            continue
+        if label in _INCOME_SHARE_LABELS:
+            records.append(
+                _income_item_measurement(
+                    selection,
+                    revenue_item,
+                    label=label,
+                    amount=amount,
+                    unit=unit,
+                    excerpt=excerpt,
+                )
+            )
+    return tuple(records)
+
+
+def _project_income_share_block(
+    selection: CoreEvidenceSelection,
+    revenue_item,
+    *,
+    block: str,
+    quote: str,
+    excerpt: str,
+) -> tuple[SemanticRecord, ...]:
+    records: list[SemanticRecord] = []
+    for line in block.splitlines():
+        parsed = _parse_labeled_share_row(line, _INCOME_SHARE_LABELS)
+        if parsed is None:
+            continue
+        label, share = parsed
+        if not _stated_in_quote(line.strip(), quote):
+            continue
+        records.append(
+            _income_share_measurement(
+                selection,
+                revenue_item,
+                label=label,
+                share=share,
+                excerpt=excerpt,
+            )
+        )
+    return tuple(records)
+
+
+def _company_total_measurement(
+    selection: CoreEvidenceSelection,
+    revenue_item,
+    *,
+    label: str,
+    amount: str,
+    unit: str,
+    excerpt: str,
+) -> Measurement:
+    return _base_fact(
+        Measurement,
+        report=selection.report,
+        record_id=(
+            f"owned:{revenue_item.evidence.evidence_id}"
+            f":revenue:company_total:{label}"
+        ),
+        field_id="operating_revenue",
+        chapter_task=ChapterTask.EXTRACT_SEGMENT_FINANCIALS,
+        evidence=revenue_item.evidence,
+        source_native=SourceNativeValue(name=label, value=amount, unit=unit),
+        metric_type=MetricType.OPERATING_REVENUE,
+        logical_slot=LogicalSlot.REVENUE,
+        measured_object=label,
+        excerpt_subject=excerpt,
+    )
+
+
+def _income_item_measurement(
+    selection: CoreEvidenceSelection,
+    revenue_item,
+    *,
+    label: str,
+    amount: str,
+    unit: str,
+    excerpt: str,
+) -> Measurement:
+    return _base_fact(
+        Measurement,
+        report=selection.report,
+        record_id=(
+            f"owned:{revenue_item.evidence.evidence_id}"
+            f":revenue:{_INCOME_ITEM_DIMENSION}:{label}"
+        ),
+        field_id="operating_revenue",
+        chapter_task=ChapterTask.EXTRACT_SEGMENT_FINANCIALS,
+        evidence=revenue_item.evidence,
+        source_native=SourceNativeValue(name=label, value=amount, unit=unit),
+        metric_type=MetricType.OPERATING_REVENUE,
+        logical_slot=LogicalSlot.REVENUE,
+        measured_object=label,
+        segment_dimension=_INCOME_ITEM_DIMENSION,
+        segment_label=label,
+        excerpt_subject=excerpt,
+    )
+
+
+def _income_share_measurement(
+    selection: CoreEvidenceSelection,
+    revenue_item,
+    *,
+    label: str,
+    share: str,
+    excerpt: str,
+) -> Measurement:
+    return _base_fact(
+        Measurement,
+        report=selection.report,
+        record_id=(
+            f"owned:{revenue_item.evidence.evidence_id}"
+            f":share:{label}:营业收入"
+        ),
+        field_id="operating_revenue",
+        chapter_task=ChapterTask.EXTRACT_SEGMENT_FINANCIALS,
+        evidence=revenue_item.evidence,
+        source_native=SourceNativeValue(
+            name=f"{label} / 营业收入",
+            value=share,
+            unit="%",
+        ),
+        metric_type=MetricType.DISCLOSED_SHARE,
+        logical_slot=LogicalSlot.DISCLOSED_SHARE,
+        measured_object=label,
+        relationship_context="营业收入",
+        excerpt_subject=excerpt,
+    )
+
+
+def _parse_labeled_amount_row(
+    line: str,
+    labels: frozenset[str],
+) -> tuple[str, str] | None:
+    text = line.strip()
+    if not text:
+        return None
+    tokens = text.split()
+    if len(tokens) < 2:
+        return None
+    label = tokens[0]
+    if label not in labels or not _AMOUNT_TOKEN.fullmatch(tokens[1]):
+        return None
+    return label, tokens[1]
+
+
+def _parse_labeled_share_row(
+    line: str,
+    labels: frozenset[str],
+) -> tuple[str, str] | None:
+    text = line.strip()
+    if not text:
+        return None
+    tokens = text.split()
+    if len(tokens) < 2:
+        return None
+    label = tokens[0]
+    if label not in labels or not _SHARE_TOKEN.fullmatch(tokens[1]):
+        return None
+    return label, tokens[1]
+
+
+def _income_analysis_excerpt_ready(excerpt: str) -> bool:
+    text = _clip_income_analysis_excerpt(_join_pdf_soft_breaks(excerpt))
+    if _first_declared_unit(text) is None:
+        return False
+    for line in text.splitlines():
+        if _parse_labeled_amount_row(
+            line, _COMPANY_TOTAL_LABELS | _INCOME_AMOUNT_LABELS
+        ) or _parse_labeled_share_row(line, _INCOME_SHARE_LABELS):
+            return True
+    return False
+
+
+def _clip_income_analysis_excerpt(excerpt: str) -> str:
+    kept: list[str] = []
+    for line in excerpt.splitlines():
+        heading = _heading_if_title_line(line, _INCOME_ANALYSIS_STOP_HEADINGS)
+        if heading is not None and kept:
+            break
+        if kept and _BUSINESS_TOTAL_MARK.search(line):
+            break
+        if kept and re.search(r"地区分部", line) and not _COMPOSITION_MARK.search(line):
+            break
+        kept.append(line)
+    return "\n".join(kept)
+
+
+def _first_declared_unit(text: str) -> str | None:
+    percent = _PERCENT_UNIT.search(text)
+    money = _UNIT_DECLARATION.search(text)
+    if percent is not None and (money is None or percent.start() <= money.start()):
+        return "%"
+    if money is not None:
+        return money.group(1)
+    return None
+
+
+def _subject_from_excerpt(excerpt: str) -> tuple[SubjectScope, SubjectBasis | None]:
+    if re.search(r"本集团", excerpt):
+        return SubjectScope.CONSOLIDATED_GROUP, SubjectBasis.DIRECT_SOURCE_WORDING
+    return SubjectScope.UNCLEAR, None
+
+
+def _dedupe_owned_records(
+    records: list[SemanticRecord],
+) -> tuple[SemanticRecord, ...]:
+    seen: set[tuple[object, ...]] = set()
+    unique: list[SemanticRecord] = []
+    for record in records:
+        if isinstance(record, Measurement):
+            key = (
+                record.metric_type,
+                record.measured_object,
+                record.source_native.value,
+                record.source_native.unit,
+                record.segment_dimension,
+                record.segment_label,
+                record.relationship_context,
+            )
+            if key in seen:
+                continue
+            seen.add(key)
+        unique.append(record)
+    return tuple(unique)
+
+
 def _base_fact(model, **kwargs):
     report = kwargs["report"]
     evidence = kwargs.pop("evidence")
+    excerpt = kwargs.pop("excerpt_subject", "")
+    subject_scope, subject_basis = _subject_from_excerpt(excerpt)
     return model(
-        subject_scope=SubjectScope.UNCLEAR,
-        subject_basis=None,
+        subject_scope=subject_scope,
+        subject_basis=subject_basis,
         reported_period=report.report_period,
         period_type=PeriodType.DURATION,
         assertion_class=AssertionClass.REPORTED_FACT,
@@ -1196,6 +1621,16 @@ def _is_pdf_soft_continuation(previous: str, nxt: str) -> bool:
     if _dimension_from_heading(prev) is not None:
         return False
     if _dimension_from_heading(current) is not None:
+        return False
+    if _UNIT_DECLARATION.search(prev) or _PERCENT_UNIT.search(prev):
+        return False
+    if _UNIT_DECLARATION.search(current) or _PERCENT_UNIT.search(current):
+        return False
+    if current.startswith(("下表", "项目", "营业收入", "营业总收入", "利息净收入")):
+        return False
+    if _parse_labeled_amount_row(
+        current, _COMPANY_TOTAL_LABELS | _INCOME_AMOUNT_LABELS
+    ) is not None:
         return False
     if _parse_segment_row(current) is not None:
         return False

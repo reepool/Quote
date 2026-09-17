@@ -10,6 +10,12 @@ from research.business_profile_async_production import (
     StageBudget,
     get_business_profile_write_coordinator,
 )
+from research.company_profile.contracts import (
+    CompanyProfileTaskResult,
+    Disposition,
+    DispositionStatus,
+)
+from research.company_profile.core_assessment_projection import project_core_assessment
 from research.company_profile.core_evidence_selection import (
     project_owned_page_facts,
     select_core_evidence,
@@ -18,6 +24,7 @@ from research.company_profile.execution import (
     EMPTY_DELIVERY_PROCESSING_IDENTITY,
     OWNED_PAGE_FACTS_V1_IDENTITY,
     OWNED_PAGE_FACTS_V2_IDENTITY,
+    OWNED_PAGE_FACTS_V3_IDENTITY,
     default_processing_identity,
 )
 from research.company_profile.models import PRODUCTION_AUTHORIZATION, ChapterTask
@@ -85,6 +92,38 @@ SPDB_TITLE = (
     "跨境业务、离岸业务等多个领域。\n"
     "二、风险因素\n宏观风险。"
 )
+SPDB_INCOME = (
+    "3.7 利润表分析\r\n"
+    "报告期内，本集团各项业务持续发展，实现营业收入 1,739.64 亿元。\r\n"
+    "单位：人民币百万元\r\n"
+    "项目 报告期 上年同期\r\n"
+    "营业收入 173,964 170,748\r\n"
+    "利息净收入 120,483 114,717\r\n"
+    "3.7.1 营业收入\r\n"
+    "下表列出本集团近三年营业收入构成的占比情况：\r\n"
+    "单位：%\r\n"
+    "项目 2025 年 2024 年 2023 年\r\n"
+    "利息净收入 69.26 67.18 68.29\r\n"
+    "下表列示出本集团业务总收入变动情况：\r\n"
+    "单位：人民币百万元\r\n"
+    "贷款利息收入 186,233 57.26\r\n"
+    "合计 325,269 100.00\r\n"
+    "3.7.2 利息净收入\r\n"
+    "净息差 1.37\r\n"
+    "成本收入比 28.50\r\n"
+)
+SPDB_HIGHLIGHTS = (
+    "2.7 主要会计数据和财务指标\r\n"
+    "单位：人民币百万元\r\n"
+    "营业收入 173,964 170,748\r\n"
+    "占营业收入百分比（%）\r\n"
+    "利息净收入比营业收入 69.26 67.18\r\n"
+)
+COMPANY_TOTAL_ONLY = (
+    "（1） 营业收入构成\r\n"
+    "单位：元\r\n"
+    "营业收入合计 75,358,958,001.86\r\n"
+)
 
 
 def _avic_pages():
@@ -105,9 +144,10 @@ def test_default_identity_is_distinct_from_empty_delivery():
     identity = default_processing_identity()
     assert identity != EMPTY_DELIVERY_PROCESSING_IDENTITY
     assert identity["rules"] == "company_profile_common_core.v1"
-    assert identity["owned_page_facts"] == "v3"
+    assert identity["owned_page_facts"] == "v4"
     assert identity != OWNED_PAGE_FACTS_V1_IDENTITY
     assert identity != OWNED_PAGE_FACTS_V2_IDENTITY
+    assert identity != OWNED_PAGE_FACTS_V3_IDENTITY
 
 
 def test_avic_official_excerpts_project_core_facts_without_provider():
@@ -148,11 +188,30 @@ def test_avic_official_excerpts_project_core_facts_without_provider():
     assert ("航空产品", "product") in by_label
     assert ("国内", "region") in by_label
     assert ("直销", "sales_mode") in by_label
-    assert not any(
-        (getattr(record, "label", "") == "营业收入合计"
-         or getattr(record, "segment_label", "") == "营业收入合计")
+    totals = [
+        record
         for record in projected
+        if getattr(record, "measured_object", "") == "营业收入合计"
+    ]
+    assert len(totals) == 1
+    assert totals[0].segment_dimension is None
+    assert totals[0].segment_label is None
+    assert totals[0].source_native.value == "75,358,958,001.86"
+    zhi_xiao = [
+        record
+        for record in projected
+        if getattr(record, "label", "") == "直销"
+        or getattr(record, "segment_label", "") == "直销"
+    ]
+    assert zhi_xiao
+    assert all(
+        (getattr(record, "dimension", None) or getattr(record, "segment_dimension", None))
+        == "sales_mode"
+        for record in zhi_xiao
     )
+    assert {record.record_id for record in totals} != {
+        record.record_id for record in zhi_xiao
+    }
 
 
 def test_official_avic_does_not_project_third_party_business_scope():
@@ -419,6 +478,213 @@ def test_v2_identity_enqueues_successor_instead_of_reusing_v1(tmp_path):
     assert first["work_ids"] != successor["work_ids"]
 
 
+def test_company_total_alone_keeps_revenue_model_numeric_total_only():
+    report = _report(instrument_id="302132.SZ", report_id="asset-total-only")
+    selected = select_core_evidence(
+        report=report,
+        pages=({"page": 14, "text": COMPANY_TOTAL_ONLY, "readable": True},),
+    )
+    projected = project_owned_page_facts(selected)
+    assert any(
+        getattr(record, "measured_object", "") == "营业收入合计"
+        and getattr(record, "segment_dimension", None) is None
+        for record in projected
+    )
+    result = CompanyProfileTaskResult(
+        request_id="total-only",
+        records=tuple(projected),
+        dispositions=tuple(
+            Disposition(
+                target_id=record.record_id,
+                field_id=record.field_id,
+                status=DispositionStatus.ACCEPTED_FOR_REVIEW,
+            )
+            for record in projected
+        ),
+        coverage=(),
+        human_review_items=(),
+        task_complete=True,
+    )
+    assessment = project_core_assessment(report=report, task_results=(result,))
+    assert assessment.revenue_model.answered is False
+    assert assessment.revenue_model.missing_reason == "numeric_total_only"
+
+
+def test_spdb_income_analysis_projects_group_mix_and_skips_business_total():
+    report = _report(instrument_id="600000.SH", report_id="asset-spdb-income")
+    selected = select_core_evidence(
+        report=report,
+        pages=({"page": 71, "text": SPDB_INCOME, "readable": True},),
+    )
+    assert any(span.section_title == "利润表分析" for span in selected.spans)
+    projected = project_owned_page_facts(selected)
+    totals = [
+        record
+        for record in projected
+        if getattr(record, "measured_object", "") == "营业收入"
+        and getattr(record, "segment_dimension", None) is None
+    ]
+    assert len(totals) == 1
+    assert totals[0].source_native.value == "173,964"
+    assert totals[0].source_native.unit == "百万元"
+    assert totals[0].subject_scope.value == "consolidated_group"
+    assert totals[0].subject_basis.value == "direct_source_wording"
+    interest = [
+        record
+        for record in projected
+        if getattr(record, "measured_object", "") == "利息净收入"
+        and getattr(record, "metric_type", None)
+        and record.metric_type.value == "operating_revenue"
+    ]
+    assert len(interest) == 1
+    assert interest[0].source_native.value == "120,483"
+    assert interest[0].segment_dimension == "income_item"
+    shares = [
+        record
+        for record in projected
+        if getattr(record, "metric_type", None)
+        and record.metric_type.value == "disclosed_share"
+    ]
+    assert len(shares) == 1
+    assert shares[0].source_native.value == "69.26"
+    assert shares[0].relationship_context == "营业收入"
+    values = {
+        getattr(record.source_native, "value", None)
+        for record in projected
+        if getattr(record, "source_native", None) is not None
+    }
+    assert "325,269" not in values
+    assert "186,233" not in values
+    texts = json.dumps(
+        [record.model_dump(mode="json") for record in projected],
+        ensure_ascii=False,
+    )
+    assert "净息差" not in texts
+    assert "成本收入比" not in texts
+    result = CompanyProfileTaskResult(
+        request_id="spdb-income",
+        records=tuple(projected),
+        dispositions=tuple(
+            Disposition(
+                target_id=record.record_id,
+                field_id=record.field_id,
+                status=DispositionStatus.ACCEPTED_FOR_REVIEW,
+            )
+            for record in projected
+        ),
+        coverage=(),
+        human_review_items=(),
+        task_complete=True,
+    )
+    assessment = project_core_assessment(report=report, task_results=(result,))
+    assert assessment.revenue_model.answered is True
+    assert any("利息净收入" in item for item in assessment.revenue_model.supporting_record_ids)
+
+
+def test_income_analysis_ready_excerpt_is_complete_after_clip():
+    report = _report(instrument_id="600000.SH", report_id="asset-spdb-income-closed")
+    selected = select_core_evidence(
+        report=report,
+        pages=({"page": 71, "text": SPDB_INCOME, "readable": True},),
+    )
+    income = next(
+        span for span in selected.spans if span.section_title == "利润表分析"
+    )
+    assert income.context_complete is True
+    assert all(
+        item.context_complete and item.continuation_complete
+        for item in selected.prepared_evidence
+        if item.evidence.section_title == "利润表分析"
+    )
+
+
+def test_runtime_keeps_income_mix_when_incomplete_segment_sibling_exists(tmp_path):
+    pages = (
+        {"page": 71, "text": SPDB_INCOME, "readable": True},
+        {
+            "page": 196,
+            "text": "分部报告\n本行按地区披露分部信息。\n",
+            "readable": True,
+        },
+    )
+    report = _report(instrument_id="600000.SH", report_id="asset-spdb-sibling")
+    selected = select_core_evidence(report=report, pages=pages)
+    assert any(span.section_title == "利润表分析" for span in selected.spans)
+    assert any(span.section_title == "分部报告" for span in selected.spans)
+    assert any(
+        span.section_title == "分部报告" and span.context_complete is False
+        for span in selected.spans
+    )
+    assert all(
+        item.evidence.section_title != "分部报告"
+        for item in selected.prepared_evidence
+    )
+    writer = CompanyProfileResearchWriter(tmp_path)
+    published = asyncio.run(
+        _drive(
+            CompanyProfileStageRuntime(writer=writer, provider=None),
+            _item(report, pages, work_id="work-spdb-sibling"),
+        )
+    )
+    scope = next(
+        path
+        for path in (writer.output_root / "scopes").rglob("*.json")
+        if path.name == "extract_segment_financials.json"
+    )
+    payload = json.loads(scope.read_text(encoding="utf-8"))
+    result = payload.get("task_result") or {}
+    records = result.get("records") or []
+    dispositions = {
+        item.get("target_id"): item.get("status")
+        for item in result.get("dispositions") or []
+    }
+    values = {
+        ((item.get("source_native") or {}).get("value"), item.get("measured_object"))
+        for item in records
+    }
+    assessment = published["assessment"]
+    assert ("173,964", "营业收入") in values
+    assert ("120,483", "利息净收入") in values
+    assert ("69.26", "利息净收入") in values
+    assert not any(value == "325,269" for value, _ in values)
+    assert all(
+        dispositions.get(item.get("record_id")) == "accepted_for_review"
+        for item in records
+        if (item.get("source_native") or {}).get("value")
+        in {"173,964", "120,483", "69.26"}
+    )
+    excerpt = next(
+        span.excerpt
+        for span in selected.spans
+        if span.section_title == "利润表分析"
+    )
+    assert "325,269" not in excerpt
+    assert "净息差" not in excerpt
+    assert assessment["revenue_model"]["answered"] is True
+    assert any(
+        "利息净收入" in item
+        for item in assessment["revenue_model"]["supporting_record_ids"]
+    )
+
+
+def test_financial_highlights_are_not_owned_as_income_analysis():
+    report = _report(instrument_id="600000.SH", report_id="asset-spdb-highlights")
+    selected = select_core_evidence(
+        report=report,
+        pages=({"page": 28, "text": SPDB_HIGHLIGHTS, "readable": True},),
+    )
+    assert not any(
+        span.section_title in {"主要会计数据和财务指标", "利润表分析"}
+        for span in selected.spans
+    )
+    projected = project_owned_page_facts(selected)
+    assert not any(
+        getattr(record, "source_native", None) is not None
+        and record.source_native.value in {"173,964", "69.26"}
+        for record in projected
+    )
+
+
 def test_v3_identity_enqueues_successor_instead_of_reusing_v2(tmp_path):
     storage = _storage(tmp_path)
     _frontier(storage)
@@ -428,6 +694,28 @@ def test_v3_identity_enqueues_successor_instead_of_reusing_v2(tmp_path):
     first = queue.enqueue_latest_annual(
         knowledge_cutoff="2026-08-30",
         processing_identity=OWNED_PAGE_FACTS_V2_IDENTITY,
+        instrument_ids=["600000.SH"],
+    )
+    successor = queue.enqueue_latest_annual(
+        knowledge_cutoff="2026-08-30",
+        processing_identity=OWNED_PAGE_FACTS_V3_IDENTITY,
+        instrument_ids=["600000.SH"],
+    )
+    assert first["inserted"] == 1
+    assert successor["inserted"] == 1
+    assert successor["reused"] == 0
+    assert first["work_ids"] != successor["work_ids"]
+
+
+def test_v4_identity_enqueues_successor_instead_of_reusing_v3(tmp_path):
+    storage = _storage(tmp_path)
+    _frontier(storage)
+    queue = BusinessProfileWorkRepository(
+        storage, checkpoint_root=tmp_path / "checkpoints"
+    )
+    first = queue.enqueue_latest_annual(
+        knowledge_cutoff="2026-08-30",
+        processing_identity=OWNED_PAGE_FACTS_V3_IDENTITY,
         instrument_ids=["600000.SH"],
     )
     successor = queue.enqueue_latest_annual(

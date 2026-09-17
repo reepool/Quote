@@ -185,10 +185,14 @@ def core_record_is_reusable(record: SemanticRecord) -> bool:
         )
     ):
         return True
+    if not isinstance(record, Measurement) or record.field_id != "operating_revenue":
+        return False
+    if _is_income_mix_measurement(record):
+        return True
+    if _is_company_total_measurement(record):
+        return True
     return (
-        isinstance(record, Measurement)
-        and record.field_id == "operating_revenue"
-        and record.metric_type == MetricType.OPERATING_REVENUE
+        record.metric_type == MetricType.OPERATING_REVENUE
         and bool(record.segment_dimension)
         and bool(record.segment_label)
         and not _is_skeleton_noise_segment(
@@ -358,12 +362,15 @@ def _assess_revenue_model(
         ):
             supports.append(record)
             continue
-        if (
-            isinstance(record, Measurement)
-            and record.field_id == "operating_revenue"
-            and record.metric_type == MetricType.OPERATING_REVENUE
-        ):
-            if not record.segment_dimension or not record.segment_label:
+        if isinstance(record, Measurement) and record.field_id == "operating_revenue":
+            if _is_income_mix_measurement(record):
+                supports.append(record)
+                continue
+            if record.metric_type != MetricType.OPERATING_REVENUE:
+                continue
+            if _is_company_total_measurement(record) or not (
+                record.segment_dimension and record.segment_label
+            ):
                 totals.append(record)
                 continue
             if _is_skeleton_noise_segment(
@@ -403,6 +410,33 @@ def _overview_states_revenue(text: str) -> bool:
             continue
         return True
     return False
+
+
+def _is_company_total_measurement(record: SemanticRecord) -> bool:
+    return (
+        isinstance(record, Measurement)
+        and record.metric_type == MetricType.OPERATING_REVENUE
+        and record.measured_object in {"营业收入合计", "营业总收入", "营业收入"}
+        and not record.segment_dimension
+        and not record.segment_label
+    )
+
+
+def _is_income_mix_measurement(record: SemanticRecord) -> bool:
+    if not isinstance(record, Measurement):
+        return False
+    if (
+        record.metric_type == MetricType.DISCLOSED_SHARE
+        and record.measured_object == "利息净收入"
+        and record.relationship_context == "营业收入"
+    ):
+        return True
+    return (
+        record.metric_type == MetricType.OPERATING_REVENUE
+        and record.segment_dimension == "income_item"
+        and record.segment_label == "利息净收入"
+        and record.measured_object == "利息净收入"
+    )
 
 
 def _is_skeleton_noise_segment(
