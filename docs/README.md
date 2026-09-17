@@ -30,12 +30,12 @@
 
 - `docs/development/research_data_engine_execution.md`：研究数据引擎实施与现状
 - `docs/development/company_profile_product_and_industry_semantic_requirements.md`：全 A 股通用骨架、事实级交付、report_default_group_scope、基础商品暴露与 M1—M4 路线的唯一产品总需求
-- `openspec/changes/deliver-a-share-core-profiles-and-commodity-exposure/`：当前实施主线；M1—M3 与 4.1—4.6 已接通，入口为 `company_profile_common_core`，生产仍为 not_authorized；M4 为后续行业增强
+- `openspec/changes/archive/2026-09-17-deliver-a-share-core-profiles-and-commodity-exposure/`：已归档的全 A 股通用骨架与基础商品暴露实施；入口为 `company_profile_common_core`，生产仍为 not_authorized；下一步为有界研究路径的首次真实质量观察与独立核原文，M4 另立项
 - `openspec/specs/company-profile-a-share-delivery/spec.md`：全市场目标合同；规范存在不等于能力上线
 - `docs/development/company_profile_industry_research_method.md`：行业增强的研究方法；不阻塞通用基础画像
 - `docs/development/company_profile_manufacturing_materials_requirements.md`、`company_profile_manufacturing_materials_research_index.md`：已通过阶段 3 研究验收的制造/材料行业合同与证据索引；不代表生产授权
 - `docs/development/company_profile_common_semantic_model.md`：阶段 4 历史实现与可复用模型参考；当前政策以总需求为准
-- `openspec/changes/deliver-a-share-core-profiles-and-commodity-exposure/replan-record.md`：旧执行change退役、失效审计删除和恢复位置；含16/19归档计数说明及29个旧business-profile计划退役清单，历史记录不作为当前生产入口
+- `openspec/changes/archive/2026-09-17-deliver-a-share-core-profiles-and-commodity-exposure/replan-record.md`：旧执行change退役、失效审计删除和恢复位置；含16/19归档计数说明及29个旧business-profile计划退役清单，历史记录不作为当前生产入口
 - `openspec/changes/archive/2026-09-06-slice-manufacturing-materials-company-profile/`：已归档的阶段 5 隔离竖切合同；不恢复旧生产链
 - `openspec/changes/archive/2026-09-08-close-manufacturing-materials-profile-research-slice/`：阶段 5.5 研究切片闭包合同；权威结果为 `research_slice_usable`、Gold 14/24，生产仍未授权
 - `openspec/changes/archive/2026-09-08-refine-company-profile-period-and-event-semantics/`：已归档的离线期间、qualifier、Gold 主体严格度和成飞事件裁决 change；权威运行仍为 `stage55-closure-four-20260907-a`，离线 Gold 为 18/24，生产仍未授权且未启动阶段 6
