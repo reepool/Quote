@@ -22,7 +22,9 @@ Official 2026-09-17 registry probe: 5564 names, available forms `{other: 5474, m
 
 A-class contract repair after `1fe3133b`: runtime now requires pointer + immutable snapshot + full plan equality; observation snapshots must match `plan.reports`; current asset `asset_id`/`report_id`/`report_period`/`document_version` freeze and compare together; work ids persist before drain; resume marks delivery; closure v2 requires a delivered, assessed, full-sample review.
 
-Active-run accounting repair after `3ec82b97`: `_run()` persists work ids after its own enqueue and before drain; active `run` keeps `enqueue=True` and returns real inserted/reused/work_ids; undelivered or failed rounds are not idle/completed. 3.4 / 3.5 / 4.5 stay unchecked.
+Active-run accounting repair after `3ec82b97`: `_run()` persists work ids after its own enqueue and before drain; active `run` keeps `enqueue=True` and returns real inserted/reused/work_ids; undelivered or failed rounds are not idle/completed.
+
+Two-company cap repair after `23858958`: `record_first_expansion_plan()` samples only the existing two-company budget; if that sample cannot occupy `service`, activation is refused. 3.4 / 3.5 / 4.5 stay unchecked.
 
 ## 4. Operator closure v2 and completion
 

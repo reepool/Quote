@@ -20,6 +20,7 @@ from research.company_profile.candidate_registry import (
     AShareCandidateRegistry,
 )
 from research.company_profile.live_plan import (
+    DEFAULT_LIVE_MAX_COMPANIES,
     CompanyProfileLivePlan,
     assign_disclosure_form,
     record_company_profile_live_plan,
@@ -104,6 +105,13 @@ class FirstExpansionPlan(_StrictModel):
             self.selected_instrument_ids
         ):
             raise ValueError("frozen reports must follow selected instrument ids")
+        if len(self.selected_instrument_ids) > DEFAULT_LIVE_MAX_COMPANIES:
+            raise ValueError("first expansion cannot freeze more than two companies")
+        if (
+            self.live_plan.budget.max_companies_this_round
+            > DEFAULT_LIVE_MAX_COMPANIES
+        ):
+            raise ValueError("first expansion cannot exceed the two-company budget")
         if "service" not in {item.disclosure_form for item in self.selected_strata}:
             raise ValueError("first expansion plan must occupy a service stratum")
         if self.registry.as_of != self.knowledge_cutoff:
@@ -174,37 +182,25 @@ def record_first_expansion_plan(
     official_bindings: Mapping[str, Mapping[str, Any]] | None = None,
     official_access: Any | None = None,
 ) -> FirstExpansionPlan:
-    """Select the smallest stratified sample that occupies service and freeze it."""
+    """Freeze at most two companies; refuse if that sample has no service stratum."""
 
     cutoff = str(knowledge_cutoff or "").strip()
     if registry.as_of != cutoff:
         raise ValueError("knowledge_cutoff must match the registry as_of used to sample")
-    selected: tuple[str, ...] = ()
-    live_plan: CompanyProfileLivePlan | None = None
-    reviewable = sum(
-        1
-        for item in registry.candidates
-        if item.asset_status == "available" and item.latest_effective_annual_report
+    candidate_plan = record_company_profile_live_plan(
+        max_companies_this_round=DEFAULT_LIVE_MAX_COMPANIES
     )
-    for size in range(2, max(2, reviewable) + 1):
-        candidate_plan = record_company_profile_live_plan(max_companies_this_round=size)
-        selected = select_live_run_targets(registry, candidate_plan)
-        forms = tuple(
-            assign_disclosure_form(registry.candidate(instrument_id))
-            for instrument_id in selected
-        )
-        if "service" in forms:
-            live_plan = record_company_profile_live_plan(
-                max_companies_this_round=len(selected)
-            )
-            if live_plan.budget.max_companies_this_round != len(selected):
-                continue
-            break
-    if live_plan is None or "service" not in {
+    selected = select_live_run_targets(registry, candidate_plan)
+    if len(selected) > DEFAULT_LIVE_MAX_COMPANIES:
+        raise ValueError("first expansion cannot freeze more than two companies")
+    if "service" not in {
         assign_disclosure_form(registry.candidate(instrument_id))
         for instrument_id in selected
     }:
         raise ValueError("first expansion cannot activate without a service stratum")
+    live_plan = record_company_profile_live_plan(
+        max_companies_this_round=len(selected)
+    )
     resolved_bindings = dict(official_bindings or {})
     if official_access is not None:
         resolved_bindings.update(

@@ -215,6 +215,67 @@ def test_activation_requires_service_stratum_and_official_report_versions(tmp_pa
     assert stored["plan_id"] == plan.plan_id
 
 
+def test_first_expansion_refuses_when_service_is_beyond_two_company_cap():
+    from research.company_profile.first_expansion import record_first_expansion_plan
+    from research.company_profile.live_plan import (
+        assign_disclosure_form,
+        record_company_profile_live_plan,
+    )
+    from research.company_profile.live_run import select_live_run_targets
+
+    instruments = [
+        {"instrument_id": "600001.SH", "exchange": "SSE", "name": "制造甲"},
+        {"instrument_id": "000001.SZ", "exchange": "SZSE", "name": "制造乙"},
+        {"instrument_id": "430001.BJ", "exchange": "BSE", "name": "制造丙"},
+        {"instrument_id": "600002.SH", "exchange": "SSE", "name": "服务丁"},
+    ]
+    coverage = {
+        item["instrument_id"]: {"status": "available", "fiscal_year": 2025}
+        for item in instruments
+    }
+    memberships = {
+        "600001.SH": {"sw_l1_name": "有色金属", "taxonomy_system": "sw"},
+        "000001.SZ": {"sw_l1_name": "有色金属", "taxonomy_system": "sw"},
+        "430001.BJ": {"sw_l1_name": "有色金属", "taxonomy_system": "sw"},
+        "600002.SH": {"sw_l1_name": "商贸零售", "taxonomy_system": "sw"},
+    }
+    reports = {
+        "600001.SH": _effective_report(asset_id="asset-600001", content_hash=_HASH_A),
+        "000001.SZ": _effective_report(asset_id="asset-000001", content_hash=_HASH_B),
+        "430001.BJ": _effective_report(asset_id="asset-430001", content_hash=_HASH_C),
+        "600002.SH": _effective_report(asset_id="asset-600002", content_hash="d" * 64),
+    }
+    registry = build_a_share_candidate_registry(
+        as_of=_CUTOFF,
+        universe_snapshot_id="snap-overflow",
+        universe_coverage_guarantee="full_market",
+        eligible_instruments=instruments,
+        asset_coverage=coverage,
+        industry_memberships=memberships,
+        effective_reports=reports,
+    )
+    oversized = select_live_run_targets(
+        registry,
+        record_company_profile_live_plan(max_companies_this_round=4),
+    )
+    assert oversized == ("600001.SH", "000001.SZ", "430001.BJ", "600002.SH")
+    assert [
+        assign_disclosure_form(registry.candidate(item)) for item in oversized
+    ] == ["manufacturing", "manufacturing", "manufacturing", "service"]
+
+    with pytest.raises(ValueError, match="service"):
+        record_first_expansion_plan(
+            registry=registry,
+            knowledge_cutoff=_CUTOFF,
+            official_bindings={
+                "600001.SH": {"filing_id": "filing-600001"},
+                "000001.SZ": {"filing_id": "filing-000001"},
+                "430001.BJ": {"filing_id": "filing-430001"},
+                "600002.SH": {"filing_id": "filing-600002"},
+            },
+        )
+
+
 def test_active_mode_refuses_cutoff_registry_or_report_drift(tmp_path):
     from research.company_profile.first_expansion import (
         activate_first_expansion,
