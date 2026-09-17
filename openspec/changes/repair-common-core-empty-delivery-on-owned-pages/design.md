@@ -47,10 +47,10 @@
 3. **标题分两类：独立章节标题，以及公司简介字段标签 + 同行值。**
    独立标题增加「公司主要业务情况」「公司金融业务」。去前缀后必须整行等于标题，或标题后仅有全角/半角标点。
    「经营范围」是公司简介字段标签，不是独立标题。官方浦发 p22 为同一行：`经营范围` + 空白 + 业务值。匹配必须允许标签后直接跟值，并拥有该行值作为 overview span。
-   目录页、带「……」或末尾页码的目录行、以及正文中间偶然出现的「经营范围 / 主要业务」不得拥有。业务值不得为空或仅标点。
+   目录页、带「……」或末尾页码的目录行、以及正文中间偶然出现的「经营范围 / 主要业务」不得拥有。`经营范围内` 是普通正文，不是字段标签，不得投影为发行人经营范围。业务值不得为空或仅标点。
 
 4. **修复走 successor，不原地替换。**
-   发布新 identity，例如 `{"rules": "company_profile_common_core.v1", "owned_page_facts": "v1"}`，与空交付的 `{"rules": "company_profile_common_core.v1"}` 区分。
+   `owned_page_facts=v1` 已有 completed 错误交付，当前 published identity 必须是 successor `{"rules": "company_profile_common_core.v1", "owned_page_facts": "v2"}`。不得覆盖、删除或复用 v1 work。空交付 identity 仍是 `{"rules": "company_profile_common_core.v1"}`。
    已有 enqueue 在 identity 变更时 insert 新 work 并 identity-supersede 旧项。本 change 必须使用这条路径。
    空的 predecessor scope 回执不得被 successor 当完成结果复用。scope 复用必须同时匹配当前 processing identity；或对无 accepted records / `provider-unavailable` 的回执拒绝复用。
    旧空 JSON 可留在命名空间里作为 predecessor。query 必须在同一 `instrument_id` + 同一 `report_id` / `document_version` 上优先选当前 published identity 的记录。`work_id` 只允许在 identity 相同的记录之间做最后决胜。验收必须构造 predecessor `work_id` 字典序大于 successor 的夹具，证明 query 仍返回 successor 的 accepted facts。

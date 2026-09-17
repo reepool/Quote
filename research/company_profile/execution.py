@@ -109,7 +109,11 @@ class CompanyProfileExecutionRecord(_StrictModel):
 
 
 EMPTY_DELIVERY_PROCESSING_IDENTITY = {"rules": "company_profile_common_core.v1"}
-OWNED_PAGE_FACTS_IDENTITY_VALUE = "v1"
+OWNED_PAGE_FACTS_V1_IDENTITY = {
+    "rules": "company_profile_common_core.v1",
+    "owned_page_facts": "v1",
+}
+OWNED_PAGE_FACTS_IDENTITY_VALUE = "v2"
 
 
 def default_processing_identity() -> dict[str, Any]:

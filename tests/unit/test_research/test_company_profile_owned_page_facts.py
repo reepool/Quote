@@ -16,6 +16,7 @@ from research.company_profile.core_evidence_selection import (
 )
 from research.company_profile.execution import (
     EMPTY_DELIVERY_PROCESSING_IDENTITY,
+    OWNED_PAGE_FACTS_V1_IDENTITY,
     default_processing_identity,
 )
 from research.company_profile.models import PRODUCTION_AUTHORIZATION, ChapterTask
@@ -36,16 +37,28 @@ from tests.unit.test_research.test_company_profile_runtime import (
 )
 
 AVIC_OVERVIEW = (
-    "报告期内公司从事的主要业务\n"
-    "公司主营业务为航空产品研发、制造、销售、维修与服务保障。"
-    "主要产品包括航空防务装备、民用航空产品和智能测控产品。\n"
+    "一、报告期内公司从事的主要业务\n"
+    "（一）主要业务、主要产品及其用途\r\n"
+    "报告期内，公司主营业务为航空产品研发、制造、销售、维修与服务保障，主要产品包括航空防务\r\n"
+    "装备、民用航空产品和智能测控产品。\r\n"
+    "与依法取得军品出口经营权、并在核定的经营范围内从事军品出口经营活动的军\r\n"
+    "贸公司共同合作，公司进行产品的研发、生产、技术服务等。\n"
     "二、风险因素\n宏观风险。"
 )
 AVIC_SEGMENT = (
-    "占公司营业收入或营业利润10%以上\n"
-    "分行业\n"
-    "航空制造业 73,551,376,777.21 97.60\n"
+    "（1） 营业收入构成\r\n"
+    "单位：元\r\n"
+    "分行业\r\n"
+    "航空制造业 73,551,376,777.\r\n"
+    "21 97.60% 63,195,455,418.\r\n"
+    "89 97.14% 16.39%\r\n"
     "三、主要销售客户"
+)
+SPDB_TITLE_WRAPPED = (
+    "3.6 公司主要业务情况\r\n"
+    "公司致力于为客户提\r\n"
+    "供全面而专业的金融服务，涵盖商业信贷、交易银行、投资银行、电子银行、跨境业务、离岸业务等多\r\n"
+    "个领域。"
 )
 SPDB_SCOPE = (
     "经营范围 银行业务；证券投资基金托管；"
@@ -79,7 +92,8 @@ def test_default_identity_is_distinct_from_empty_delivery():
     identity = default_processing_identity()
     assert identity != EMPTY_DELIVERY_PROCESSING_IDENTITY
     assert identity["rules"] == "company_profile_common_core.v1"
-    assert identity["owned_page_facts"] == "v1"
+    assert identity["owned_page_facts"] == "v2"
+    assert identity != OWNED_PAGE_FACTS_V1_IDENTITY
 
 
 def test_avic_official_excerpts_project_core_facts_without_provider():
@@ -97,10 +111,92 @@ def test_avic_official_excerpts_project_core_facts_without_provider():
         for record in projected
     )
     assert "航空产品" in texts
-    assert "航空防务装备" in texts or "民用航空产品" in texts
+    assert "航空防务装备" in texts
     assert "航空制造业" in texts
     assert "73,551,376,777.21" in texts
     assert all(record.data_status == "research_fixture" for record in projected)
+    assert not any("\n" in getattr(record, "object_name", "") for record in projected)
+    assert not any("军贸" in getattr(record, "object_name", "") for record in projected)
+    revenues = [
+        record
+        for record in projected
+        if getattr(record, "field_id", "") == "operating_revenue"
+    ]
+    assert revenues
+    assert all(record.source_native.unit == "元" for record in revenues)
+
+
+def test_official_avic_does_not_project_third_party_business_scope():
+    report = _report(instrument_id="302132.SZ", report_id="asset-avic-scope-boundary")
+    selected = select_core_evidence(report=report, pages=_avic_pages())
+    projected = project_owned_page_facts(selected)
+    objects = [getattr(record, "object_name", "") for record in projected]
+    joined = " ".join(objects)
+    assert "军贸公司" not in joined
+    assert "经营范围内" not in joined
+    assert all("\r" not in item and "\n" not in item for item in objects if item)
+
+
+def test_wrapped_line_starting_with_business_scope_suffix_is_not_a_field_label():
+    report = _report(instrument_id="302132.SZ", report_id="asset-avic-scope-wrap")
+    selected = select_core_evidence(
+        report=report,
+        pages=(
+            {
+                "page": 11,
+                "text": (
+                    "与依法取得军品出口经营权、并在核定的\r\n"
+                    "经营范围内从事军品出口经营活动的军贸公司共同合作，"
+                    "公司进行产品的研发、生产、技术服务等。\n"
+                    "二、风险因素\n宏观风险。"
+                ),
+                "readable": True,
+            },
+        ),
+    )
+    projected = project_owned_page_facts(selected)
+    objects = [getattr(record, "object_name", "") for record in projected]
+    titles = [span.section_title for span in selected.spans]
+    assert "经营范围" not in titles
+    assert not any("军贸" in item for item in objects)
+
+
+def test_official_spdb_soft_wrap_does_not_pollute_activity_objects():
+    report = _report(instrument_id="600000.SH", report_id="asset-spdb-wrap")
+    selected = select_core_evidence(
+        report=report,
+        pages=({"page": 62, "text": SPDB_TITLE_WRAPPED, "readable": True},),
+    )
+    projected = project_owned_page_facts(selected)
+    objects = [getattr(record, "object_name", "") for record in projected]
+    assert "商业信贷" in objects
+    assert "离岸业务" in objects
+    assert all("等多" not in item for item in objects)
+    assert all("\n" not in item and "\r" not in item for item in objects if item)
+
+
+def test_wrapped_segment_row_without_unit_is_not_invented():
+    report = _report(instrument_id="302132.SZ", report_id="asset-avic-nounit")
+    selected = select_core_evidence(
+        report=report,
+        pages=(
+            {
+                "page": 14,
+                "text": (
+                    "分行业\r\n"
+                    "航空制造业 73,551,376,777.\r\n"
+                    "21 97.60%\r\n"
+                    "三、主要销售客户"
+                ),
+                "readable": True,
+            },
+        ),
+    )
+    projected = project_owned_page_facts(selected)
+    assert any(getattr(record, "label", "") == "航空制造业" for record in projected)
+    assert not any(
+        getattr(record, "field_id", "") == "operating_revenue" for record in projected
+    )
 
 
 def test_runtime_accepts_avic_facts_with_provider_none(tmp_path):
@@ -266,6 +362,28 @@ def test_new_identity_enqueues_successor_instead_of_reusing_empty(tmp_path):
     assert first["inserted"] == 1
     assert successor["inserted"] == 1
     assert successor["reused"] == 0
+
+
+def test_v2_identity_enqueues_successor_instead_of_reusing_v1(tmp_path):
+    storage = _storage(tmp_path)
+    _frontier(storage)
+    queue = BusinessProfileWorkRepository(
+        storage, checkpoint_root=tmp_path / "checkpoints"
+    )
+    first = queue.enqueue_latest_annual(
+        knowledge_cutoff="2026-08-30",
+        processing_identity=OWNED_PAGE_FACTS_V1_IDENTITY,
+        instrument_ids=["600000.SH"],
+    )
+    successor = queue.enqueue_latest_annual(
+        knowledge_cutoff="2026-08-30",
+        processing_identity=default_processing_identity(),
+        instrument_ids=["600000.SH"],
+    )
+    assert first["inserted"] == 1
+    assert successor["inserted"] == 1
+    assert successor["reused"] == 0
+    assert first["work_ids"] != successor["work_ids"]
 
 
 def test_query_prefers_current_identity_when_predecessor_work_id_sorts_later(

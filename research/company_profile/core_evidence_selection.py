@@ -333,6 +333,10 @@ def _select_owned_span(
                     by_page=by_page,
                     chapter_task=chapter_task,
                 )
+        if chapter_task is ChapterTask.EXTRACT_SEGMENT_FINANCIALS:
+            declared = _unit_declaration(page.text)
+            if declared and declared not in excerpt:
+                excerpt = f"{declared}\n{excerpt}"
         usable = _usable_excerpt(excerpt, heading, require_substance)
         if usable and _excerpt_states_owned_overview(excerpt):
             closed = True
@@ -433,6 +437,8 @@ def _heading_if_field_label(line: str, headings: tuple[str, ...]) -> str | None:
         if not compact.startswith(heading):
             continue
         rest = compact[len(heading) :]
+        if heading == "经营范围" and rest.startswith("内"):
+            continue
         if rest and _FIELD_LABEL_VALUE.search(rest) and not re.fullmatch(
             r"[:：.。]+", rest
         ):
@@ -566,7 +572,7 @@ def _usable_excerpt(excerpt: str, heading: str, require_substance: bool) -> bool
     if not excerpt.strip() or excerpt.strip() == heading:
         return False
     if require_substance:
-        return _OVERVIEW_SUBSTANCE.search(excerpt) is not None
+        return _OVERVIEW_SUBSTANCE.search(_join_pdf_soft_breaks(excerpt)) is not None
     return True
 
 
@@ -783,9 +789,11 @@ _CLAUSE_PATTERNS = (
     re.compile(r"主营业务为\s*([^。；;]{2,80})"),
     re.compile(r"主要产品包括\s*([^。；;]{2,80})"),
     re.compile(r"主要产品为\s*([^。；;]{2,80})"),
-    re.compile(r"经营范围\s*([^。；;]{2,120})"),
+    re.compile(r"(?:^|[\n\r])经营范围(?!内)\s*[:：]?\s*([^。；;\n]{2,120})"),
     re.compile(r"涵盖\s*([^。；;]{2,80})"),
 )
+_UNIT_DECLARATION = re.compile(r"单位[:：]\s*(百万元|千元|亿元|万元|元)")
+_PDF_AMOUNT_WRAP = re.compile(r"([0-9,]+\.)\s*[\r\n]+\s*(\d+)")
 _ACTION_TOKEN = re.compile(r"(研发|开发|制造|生产|加工|销售|维修|服务保障)")
 _VAGUE_OBJECT = re.compile(r"^(?:经批准的)?(?:其它|其他)业务$")
 _SKIP_SEGMENT_LABELS = frozenset(
@@ -870,8 +878,9 @@ def _project_overview_span(
     if activity_item is None:
         return tuple(records)
     seen: set[str] = set()
+    excerpt = _join_pdf_soft_breaks(span.excerpt)
     for pattern in _CLAUSE_PATTERNS:
-        for match in pattern.finditer(span.excerpt):
+        for match in pattern.finditer(excerpt):
             verb = "经营"
             if match.group(0).startswith("主营"):
                 verb = "为"
@@ -914,24 +923,32 @@ def _project_segment_span(
     selection: CoreEvidenceSelection,
     span: CoreEvidenceSpan,
 ) -> tuple[SemanticRecord, ...]:
+    if not span.context_complete:
+        return ()
     segment_item = _prepared_for(selection, span, "segment_dimension")
     revenue_item = _prepared_for(selection, span, "operating_revenue")
     if segment_item is None and revenue_item is None:
         return ()
-    unit = _unit_from_excerpt(span.excerpt)
-    dimension = _segment_dimension(span.excerpt)
+    excerpt = _join_pdf_soft_breaks(span.excerpt)
+    quote = (
+        segment_item.evidence.anchor.bounded_quote
+        if segment_item is not None and isinstance(segment_item.evidence.anchor, TextAnchor)
+        else ""
+    )
+    if revenue_item is not None and isinstance(revenue_item.evidence.anchor, TextAnchor):
+        quote = quote or revenue_item.evidence.anchor.bounded_quote
+    unit = _unit_from_excerpt(excerpt)
+    dimension = _segment_dimension(excerpt)
     records: list[SemanticRecord] = []
-    for line in span.excerpt.splitlines():
+    for line in excerpt.splitlines():
         parsed = _parse_segment_row(line)
         if parsed is None:
             continue
         label, amount, _share = parsed
         source_line = line.strip()
-        if segment_item is not None and source_line in (
-            segment_item.evidence.anchor.bounded_quote
-            if isinstance(segment_item.evidence.anchor, TextAnchor)
-            else ""
-        ):
+        if not _stated_in_quote(source_line, quote or span.excerpt):
+            continue
+        if segment_item is not None:
             records.append(
                 _base_fact(
                     Segment,
@@ -951,11 +968,7 @@ def _project_segment_span(
                     label=label,
                 )
             )
-        if revenue_item is not None and source_line in (
-            revenue_item.evidence.anchor.bounded_quote
-            if isinstance(revenue_item.evidence.anchor, TextAnchor)
-            else ""
-        ):
+        if revenue_item is not None and unit:
             records.append(
                 _base_fact(
                     Measurement,
@@ -998,7 +1011,8 @@ def _base_fact(model, **kwargs):
 def _excerpt_states_owned_overview(excerpt: str) -> bool:
     return bool(
         re.search(
-            r"主营业务为|主要产品包括|主要产品为|经营范围|公司主要业务情况|公司金融业务",
+            r"主营业务为|主要产品包括|主要产品为|经营范围(?!内)|"
+            r"公司主要业务情况|公司金融业务",
             excerpt,
         )
     )
@@ -1010,7 +1024,7 @@ def _join_wrapped_lines(text: str) -> str:
 
 _PREFERRED_OVERVIEW_STATEMENT = re.compile(
     r"(?:主营业务为|主要从事|主要产品包括|主要产品为|"
-    r"经营范围\s*[\u4e00-\u9fff]|"
+    r"经营范围(?!内)\s*[\u4e00-\u9fff]|"
     r"(?:公司|本公司)致力于.{0,40}提供|"
     r"涵盖[^。；;]{2,80}(?:信贷|银行|基金))"
 )
@@ -1076,7 +1090,7 @@ def _overview_source_text(excerpt: str, quote: str, *, heading: str) -> str:
 
 
 def _split_listed(clause: str) -> list[str]:
-    text = clause.strip().strip("：:。；;，,")
+    text = _join_pdf_soft_breaks(clause).strip().strip("：:。；;，,")
     text = re.sub(r"(?:等(?:多个领域)?)$", "", text)
     if _looks_like_action_chain(text):
         return [text] if text else []
@@ -1133,11 +1147,52 @@ def _segment_dimension(excerpt: str) -> str:
     return "industry"
 
 
-def _unit_from_excerpt(excerpt: str) -> str:
-    for unit in ("百万元", "千元", "亿元", "万元", "元"):
-        if unit in excerpt:
-            return unit
-    return "元"
+def _unit_declaration(text: str) -> str:
+    match = _UNIT_DECLARATION.search(text)
+    return "" if match is None else match.group(0)
+
+
+def _unit_from_excerpt(excerpt: str) -> str | None:
+    match = _UNIT_DECLARATION.search(excerpt)
+    return None if match is None else match.group(1)
+
+
+def _join_pdf_soft_breaks(text: str) -> str:
+    normalized = text.replace("\r\n", "\n").replace("\r", "\n")
+    normalized = _PDF_AMOUNT_WRAP.sub(r"\1\2", normalized)
+    merged: list[str] = []
+    for line in normalized.split("\n"):
+        if merged and _is_pdf_soft_continuation(merged[-1], line):
+            merged[-1] = f"{merged[-1].rstrip()}{line.lstrip()}"
+        else:
+            merged.append(line)
+    return "\n".join(merged)
+
+
+def _is_pdf_soft_continuation(previous: str, nxt: str) -> bool:
+    prev = previous.rstrip()
+    current = nxt.lstrip()
+    if not prev or not current:
+        return False
+    if prev[-1] in "。！？；;：:":
+        return False
+    if _heading_if_title_line(prev, _ALL_HEADINGS) is not None:
+        return False
+    if _heading_if_title_line(current, _ALL_HEADINGS) is not None:
+        return False
+    if _parse_segment_row(current) is not None:
+        return False
+    return bool(
+        re.search(r"[\u4e00-\u9fff]$", prev) and re.match(r"[\u4e00-\u9fff]", current)
+    )
+
+
+def _stated_in_quote(text: str, quote: str) -> bool:
+    if not text or not quote:
+        return False
+    if text in quote:
+        return True
+    return re.sub(r"\s+", "", text) in re.sub(r"\s+", "", quote)
 
 
 def _parse_segment_row(line: str) -> tuple[str, str, str | None] | None:
@@ -1150,6 +1205,7 @@ def _parse_segment_row(line: str) -> tuple[str, str, str | None] | None:
     label = tokens[0]
     if (
         label in _SKIP_SEGMENT_LABELS
+        or "合计" in label
         or tokens[1] == "营业收入"
         or not re.fullmatch(r"[\u4e00-\u9fffA-Za-z0-9（）]{2,20}", label)
         or not re.fullmatch(r"-?[\d,]+(?:\.\d+)?", tokens[1])

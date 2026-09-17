@@ -18,3 +18,11 @@
 - [x] 3.4 Re-run the published path on only those two companies, still not_authorized, and assert query returns accepted facts that the empty deliveries lacked
 - [x] 3.5 Independently re-read the same official reports, record source review, and stop if recall stays 0 or accuracy stays unassessed because query still returns an empty delivery
 - [x] 3.6 Leave sw_l1 finance classification and M4 out of this change
+
+## 4. A-class owned-page projection repair
+
+- [x] 4.1 Project 经营范围 only as a field-label + same-line issuer value; official 中航 p11 经营范围内从事军品出口 must not become an issuer Activity
+- [x] 4.2 Join PDF soft wraps before listing objects or segment rows; official 航空防务/装备 and 离岸业务等多个领域 must not keep newline fragments
+- [x] 4.3 Parse official 中航 p14 wrapped 航空制造业 amount/share with 单位：元; do not invent 元 when the excerpt has no unit declaration
+- [x] 4.4 Publish owned_page_facts=v2 successor identity; do not reuse, overwrite, or delete v1 completed work
+- [x] 4.5 Re-run 302132.SZ and 600000.SH on v2, record source review, keep M4 and production closed
