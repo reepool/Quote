@@ -17,6 +17,7 @@ from research.company_profile.core_evidence_selection import (
 from research.company_profile.execution import (
     EMPTY_DELIVERY_PROCESSING_IDENTITY,
     OWNED_PAGE_FACTS_V1_IDENTITY,
+    OWNED_PAGE_FACTS_V2_IDENTITY,
     default_processing_identity,
 )
 from research.company_profile.models import PRODUCTION_AUTHORIZATION, ChapterTask
@@ -52,6 +53,18 @@ AVIC_SEGMENT = (
     "航空制造业 73,551,376,777.\r\n"
     "21 97.60% 63,195,455,418.\r\n"
     "89 97.14% 16.39%\r\n"
+    "分产品\r\n"
+    "航空产品 73,551,376,777.\r\n"
+    "21 97.60% 63,195,455,418.\r\n"
+    "89 97.14% 16.39%\r\n"
+    "分地区\r\n"
+    "国内 74,034,112,060.\r\n"
+    "93 98.24%\r\n"
+    "分销售模式\r\n"
+    "直销 75,358,958,001.\r\n"
+    "86 100.00%\r\n"
+    "营业收入合计 75,358,958,001.\r\n"
+    "86 100%\r\n"
     "三、主要销售客户"
 )
 SPDB_TITLE_WRAPPED = (
@@ -92,8 +105,9 @@ def test_default_identity_is_distinct_from_empty_delivery():
     identity = default_processing_identity()
     assert identity != EMPTY_DELIVERY_PROCESSING_IDENTITY
     assert identity["rules"] == "company_profile_common_core.v1"
-    assert identity["owned_page_facts"] == "v2"
+    assert identity["owned_page_facts"] == "v3"
     assert identity != OWNED_PAGE_FACTS_V1_IDENTITY
+    assert identity != OWNED_PAGE_FACTS_V2_IDENTITY
 
 
 def test_avic_official_excerpts_project_core_facts_without_provider():
@@ -124,6 +138,21 @@ def test_avic_official_excerpts_project_core_facts_without_provider():
     ]
     assert revenues
     assert all(record.source_native.unit == "元" for record in revenues)
+    by_label = {
+        (getattr(record, "label", "") or getattr(record, "segment_label", ""),
+         getattr(record, "dimension", None) or getattr(record, "segment_dimension", None))
+        for record in projected
+        if getattr(record, "label", "") or getattr(record, "segment_label", "")
+    }
+    assert ("航空制造业", "industry") in by_label
+    assert ("航空产品", "product") in by_label
+    assert ("国内", "region") in by_label
+    assert ("直销", "sales_mode") in by_label
+    assert not any(
+        (getattr(record, "label", "") == "营业收入合计"
+         or getattr(record, "segment_label", "") == "营业收入合计")
+        for record in projected
+    )
 
 
 def test_official_avic_does_not_project_third_party_business_scope():
@@ -215,6 +244,10 @@ def test_runtime_accepts_avic_facts_with_provider_none(tmp_path):
     assert assessment["revenue_model"]["answered"] is True
     assert "航空" in assessment["principal_business"]["excerpt"]
     assert "航空制造业" in json.dumps(assessment, ensure_ascii=False)
+    products_ids = assessment["products_services"]["supporting_record_ids"]
+    assert not any("直销" in item for item in products_ids)
+    assert not any("国内" in item for item in products_ids)
+    assert any("航空制造业" in item or "航空产品" in item for item in products_ids)
     disputes = published["execution"]["semantic_disputes"]
     assert not any(
         "provider-unavailable" in item.get("reason_codes", [])
@@ -373,6 +406,28 @@ def test_v2_identity_enqueues_successor_instead_of_reusing_v1(tmp_path):
     first = queue.enqueue_latest_annual(
         knowledge_cutoff="2026-08-30",
         processing_identity=OWNED_PAGE_FACTS_V1_IDENTITY,
+        instrument_ids=["600000.SH"],
+    )
+    successor = queue.enqueue_latest_annual(
+        knowledge_cutoff="2026-08-30",
+        processing_identity=OWNED_PAGE_FACTS_V2_IDENTITY,
+        instrument_ids=["600000.SH"],
+    )
+    assert first["inserted"] == 1
+    assert successor["inserted"] == 1
+    assert successor["reused"] == 0
+    assert first["work_ids"] != successor["work_ids"]
+
+
+def test_v3_identity_enqueues_successor_instead_of_reusing_v2(tmp_path):
+    storage = _storage(tmp_path)
+    _frontier(storage)
+    queue = BusinessProfileWorkRepository(
+        storage, checkpoint_root=tmp_path / "checkpoints"
+    )
+    first = queue.enqueue_latest_annual(
+        knowledge_cutoff="2026-08-30",
+        processing_identity=OWNED_PAGE_FACTS_V2_IDENTITY,
         instrument_ids=["600000.SH"],
     )
     successor = queue.enqueue_latest_annual(

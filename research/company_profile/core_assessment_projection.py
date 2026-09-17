@@ -320,6 +320,8 @@ def _assess_products_services(
             ):
                 rejected = True
                 continue
+            if record.dimension not in {"industry", "product"}:
+                continue
             if record.label.strip():
                 supports.append(record)
             continue

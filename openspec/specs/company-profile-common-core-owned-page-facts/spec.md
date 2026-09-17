@@ -1,4 +1,9 @@
-## ADDED Requirements
+# company-profile-common-core-owned-page-facts Specification
+
+## Purpose
+Common-core must accept official owned page excerpts as page-grounded facts without an LLM, bind each segment row to its nearest section dimension, and publish successor processing identities without overwriting completed predecessors.
+
+## Requirements
 
 ### Requirement: Owned official excerpts become accepted core facts without LLM
 When `select_core_evidence` has already located a readable owned overview or segment excerpt and that excerpt already states the corresponding common-core field, the common-core runtime MUST accept a page-grounded SemanticRecord without calling an LLM provider. A missing provider MUST NOT convert such a field into `provider-unavailable` or `required_coverage_missing`. Fields the excerpt does not state MAY remain uncovered.
@@ -66,3 +71,20 @@ The published common-core owner MUST use a processing identity distinct from the
 - **WHEN** an empty predecessor record and a repaired successor record exist for the same instrument and document version, and the predecessor `work_id` is lexicographically greater than the successor `work_id`
 - **THEN** query for that instrument returns the successor
 - **AND** `accepted_facts` is non-empty for the dimensions the official excerpt already stated
+
+### Requirement: Segment rows bind the nearest section dimension
+Each official segment row MUST inherit the nearest preceding standalone heading among 分行业, 分产品, 分地区, and 分销售模式. The runtime MUST NOT compute one dimension for the whole excerpt and apply it to every row. `products_services` MAY use `industry` or `product` rows as supporting records; `region` and `sales_mode` rows MUST NOT support `products_services`.
+
+#### Scenario: Official mixed 分行业 / 分产品 / 分地区 / 分销售模式 excerpt
+- **WHEN** an owned 营业收入构成 excerpt states 航空制造业 under 分行业, 航空产品 under 分产品, 国内 under 分地区, and 直销 under 分销售模式
+- **THEN** those rows bind `industry`, `product`, `region`, and `sales_mode` respectively
+- **AND** 直销 is not a `products_services` supporting record
+
+### Requirement: A sales-mode amount is not delivered company operating revenue
+A Measurement whose `measured_object` or `segment_label` is 直销 MUST NOT be counted as delivered company-wide 营业收入合计. A row whose label contains 合计 MUST NOT become an accepted Segment or Measurement. While the company total remains unpublished, source review MUST keep `302132.SZ-fy2025-operating-revenue-75358958001.86` as `present_in_delivery=false`.
+
+#### Scenario: Official 直销 amount equals the company total
+- **WHEN** the official excerpt states 直销 75,358,958,001.86 under 分销售模式 and also prints 营业收入合计 with the same amount
+- **THEN** the published records may include the 直销 / `sales_mode` measurement
+- **AND** they MUST NOT include an accepted 营业收入合计 record
+- **AND** the company-wide operating-revenue disclosure remains undelivered

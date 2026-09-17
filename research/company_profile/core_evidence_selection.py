@@ -938,11 +938,15 @@ def _project_segment_span(
     if revenue_item is not None and isinstance(revenue_item.evidence.anchor, TextAnchor):
         quote = quote or revenue_item.evidence.anchor.bounded_quote
     unit = _unit_from_excerpt(excerpt)
-    dimension = _segment_dimension(excerpt)
+    dimension = _dimension_from_heading(span.section_title)
     records: list[SemanticRecord] = []
     for line in excerpt.splitlines():
+        section = _dimension_from_heading(line)
+        if section is not None:
+            dimension = section
+            continue
         parsed = _parse_segment_row(line)
-        if parsed is None:
+        if parsed is None or dimension is None:
             continue
         label, amount, _share = parsed
         source_line = line.strip()
@@ -954,7 +958,8 @@ def _project_segment_span(
                     Segment,
                     report=selection.report,
                     record_id=(
-                        f"owned:{segment_item.evidence.evidence_id}:segment:{label}"
+                        f"owned:{segment_item.evidence.evidence_id}"
+                        f":segment:{dimension}:{label}"
                     ),
                     field_id="segment_dimension",
                     chapter_task=ChapterTask.EXTRACT_SEGMENT_FINANCIALS,
@@ -974,7 +979,8 @@ def _project_segment_span(
                     Measurement,
                     report=selection.report,
                     record_id=(
-                        f"owned:{revenue_item.evidence.evidence_id}:revenue:{label}"
+                        f"owned:{revenue_item.evidence.evidence_id}"
+                        f":revenue:{dimension}:{label}"
                     ),
                     field_id="operating_revenue",
                     chapter_task=ChapterTask.EXTRACT_SEGMENT_FINANCIALS,
@@ -1137,14 +1143,21 @@ def _object_and_action(
     return text[:40], ActivityAction.OPERATES, default_verb
 
 
-def _segment_dimension(excerpt: str) -> str:
-    if "分行业" in excerpt:
-        return "industry"
-    if "分产品" in excerpt:
-        return "product"
-    if "分地区" in excerpt:
-        return "region"
-    return "industry"
+_SEGMENT_SECTION_HEADINGS = {
+    "主营业务分行业": "industry",
+    "分行业": "industry",
+    "主营业务分产品": "product",
+    "分产品": "product",
+    "分地区": "region",
+    "分销售模式": "sales_mode",
+}
+
+
+def _dimension_from_heading(text: str) -> str | None:
+    heading = _heading_if_title_line(text, tuple(_SEGMENT_SECTION_HEADINGS))
+    if heading is None:
+        return None
+    return _SEGMENT_SECTION_HEADINGS[heading]
 
 
 def _unit_declaration(text: str) -> str:
@@ -1179,6 +1192,10 @@ def _is_pdf_soft_continuation(previous: str, nxt: str) -> bool:
     if _heading_if_title_line(prev, _ALL_HEADINGS) is not None:
         return False
     if _heading_if_title_line(current, _ALL_HEADINGS) is not None:
+        return False
+    if _dimension_from_heading(prev) is not None:
+        return False
+    if _dimension_from_heading(current) is not None:
         return False
     if _parse_segment_row(current) is not None:
         return False

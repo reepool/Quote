@@ -26,3 +26,9 @@
 - [x] 4.3 Parse official 中航 p14 wrapped 航空制造业 amount/share with 单位：元; do not invent 元 when the excerpt has no unit declaration
 - [x] 4.4 Publish owned_page_facts=v2 successor identity; do not reuse, overwrite, or delete v1 completed work
 - [x] 4.5 Re-run 302132.SZ and 600000.SH on v2, record source review, keep M4 and production closed
+
+## 5. Per-row segment dimension and recall correction
+
+- [x] 5.1 Bind each official 中航 p14 row to its nearest 分行业/分产品/分地区/分销售模式 heading; 直销 must not support products_services
+- [x] 5.2 Do not treat 直销 75,358,958,001.86 as delivered 营业收入合计; keep 合计 rows unpublished unless the excerpt states that label as the measured object
+- [x] 5.3 Publish owned_page_facts=v3 successor; do not reuse, overwrite, or delete v2; re-run both companies and record source review as 4/7 if 营业收入合计 is still unpublished
