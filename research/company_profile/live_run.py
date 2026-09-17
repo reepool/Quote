@@ -79,6 +79,22 @@ class SelectedSampleStratum(_StrictModel):
         return self
 
 
+class FrozenOfficialReportReference(_StrictModel):
+    instrument_id: str = Field(min_length=1)
+    asset_id: str = Field(min_length=1)
+    report_id: str = Field(min_length=1)
+    report_period: str = Field(min_length=1)
+    document_version: str = Field(min_length=1)
+
+    @model_validator(mode="after")
+    def _no_unknown_document_version(self) -> FrozenOfficialReportReference:
+        if self.document_version.strip().lower() == "unknown":
+            raise ValueError("first expansion cannot use unknown document_version")
+        if not self.report_id.strip():
+            raise ValueError("first expansion requires an official report_id")
+        return self
+
+
 class CompanyRunOutcome(_StrictModel):
     instrument_id: str = Field(min_length=1)
     outcome: Literal["completed", "failed"]
@@ -108,6 +124,8 @@ class CompanyProfileLiveRunReport(_StrictModel):
     company_outcomes: tuple[CompanyRunOutcome, ...]
     whole_batch_rerun: Literal[False]
     scale_quality_claim_allowed: Literal[False]
+    first_expansion_plan_id: str | None = None
+    frozen_report_references: tuple[FrozenOfficialReportReference, ...] = ()
 
     @model_validator(mode="after")
     def _report_matches_plan_and_selection(self) -> CompanyProfileLiveRunReport:
@@ -128,6 +146,15 @@ class CompanyProfileLiveRunReport(_StrictModel):
             raise ValueError("outcome order must follow the selected run set")
         if len(set(self.selected_instrument_ids)) != len(self.selected_instrument_ids):
             raise ValueError("selected run set cannot contain duplicate companies")
+        if self.first_expansion_plan_id:
+            if not self.frozen_report_references:
+                raise ValueError("first-expansion live run must freeze report references")
+            if tuple(item.instrument_id for item in self.frozen_report_references) != (
+                self.selected_instrument_ids
+            ):
+                raise ValueError("frozen reports must follow the selected run set")
+        elif self.frozen_report_references:
+            raise ValueError("frozen report references require a first-expansion plan id")
         if not self.selected_strata:
             return self
         stratum_ids = tuple(item.instrument_id for item in self.selected_strata)
@@ -178,6 +205,8 @@ def record_live_run_report(
     delivered_instrument_ids: Sequence[str],
     knowledge_cutoff: str,
     incomplete_supplement_ids: Sequence[str] = (),
+    first_expansion_plan_id: str | None = None,
+    frozen_report_references: Sequence[FrozenOfficialReportReference] = (),
 ) -> CompanyProfileLiveRunReport:
     """Record universe counts and selected outcomes after one bounded run."""
 
@@ -228,16 +257,24 @@ def record_live_run_report(
         company_outcomes=outcomes,
         whole_batch_rerun=False,
         scale_quality_claim_allowed=False,
+        first_expansion_plan_id=first_expansion_plan_id,
+        frozen_report_references=tuple(frozen_report_references),
     )
 
 
 def persist_live_run_report(
     report: CompanyProfileLiveRunReport,
     root: str | Path,
+    *,
+    destination: Path | None = None,
 ) -> Path:
     """Write company_profile_live_run.v1 next to the task control snapshot."""
 
-    path = Path(root) / "reports" / f"{LIVE_RUN_SCHEMA_VERSION}.json"
+    path = (
+        Path(destination)
+        if destination is not None
+        else Path(root) / "reports" / f"{LIVE_RUN_SCHEMA_VERSION}.json"
+    )
     path.parent.mkdir(parents=True, exist_ok=True)
     tmp = path.with_suffix(".tmp")
     tmp.write_text(report.model_dump_json(indent=2), encoding="utf-8")

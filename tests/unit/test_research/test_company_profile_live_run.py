@@ -193,6 +193,14 @@ def test_record_live_run_keeps_universe_denominator_and_rejects_batch_rerun():
     loaded = CompanyProfileLiveRunReport.model_validate_json(json.dumps(legacy))
     assert loaded.selected_instrument_ids == report.selected_instrument_ids
     assert loaded.selected_strata == ()
+    baseline = json.loads(report.model_dump_json())
+    baseline.pop("first_expansion_plan_id", None)
+    baseline.pop("frozen_report_references", None)
+    loaded_baseline = CompanyProfileLiveRunReport.model_validate_json(
+        json.dumps(baseline)
+    )
+    assert loaded_baseline.first_expansion_plan_id is None
+    assert loaded_baseline.frozen_report_references == ()
     incomplete = json.loads(report.model_dump_json())
     incomplete["selected_strata"] = [incomplete["selected_strata"][0]]
     with pytest.raises(ValidationError, match="selected strata"):

@@ -271,10 +271,16 @@ def record_source_review_report(
 def persist_source_review_report(
     report: CompanyProfileSourceReviewReport,
     root: str | Path,
+    *,
+    destination: Path | None = None,
 ) -> Path:
     """Write company_profile_source_review.v1 next to the live-run report."""
 
-    path = Path(root) / "reports" / f"{SOURCE_REVIEW_SCHEMA_VERSION}.json"
+    path = (
+        Path(destination)
+        if destination is not None
+        else Path(root) / "reports" / f"{SOURCE_REVIEW_SCHEMA_VERSION}.json"
+    )
     path.parent.mkdir(parents=True, exist_ok=True)
     tmp = path.with_suffix(".tmp")
     tmp.write_text(report.model_dump_json(indent=2), encoding="utf-8")

@@ -329,3 +329,120 @@ def _declared_m4_backlog() -> tuple[M4BacklogItem, ...]:
             ),
         ),
     )
+
+
+OPERATOR_CLOSURE_V2_SCHEMA_VERSION = "company_profile_operator_closure.v2"
+
+
+class CompanyProfileOperatorClosureV2Report(_StrictModel):
+    schema_version: Literal["company_profile_operator_closure.v2"] = (
+        OPERATOR_CLOSURE_V2_SCHEMA_VERSION
+    )
+    production_authorization: Literal["not_authorized"] = PRODUCTION_AUTHORIZATION
+    writer: Literal["company_profile_research_writer.v1"] = COMMON_CORE_WRITER_NAME
+    reader: Literal["company_profile_read_service.v1"] = PUBLICATION_READER
+    publication_cutover_verified: Literal[True]
+    publication_state: PublicationState
+    executed: Literal[False] = False
+    database_deletion_authorized: Literal[False] = False
+    historical_modules_deleted: Literal[False] = False
+    official_pdfs_deleted: Literal[False] = False
+    raw_evidence_deleted: Literal[False] = False
+    legacy_writer_enabled: Literal[False] = False
+    dcf_authorized: Literal[False] = False
+    trading_authorized: Literal[False] = False
+    price_sensitivity_authorized: Literal[False] = False
+    operator_instructions: OperatorInstructions
+    retired_entries: tuple[RetiredOperatorEntry, ...]
+    m4_backlog: tuple[M4BacklogItem, ...]
+
+    @model_validator(mode="after")
+    def _closure_stays_bounded(self) -> CompanyProfileOperatorClosureV2Report:
+        if self.production_authorization != "not_authorized":
+            raise ValueError("operator closure cannot authorize production")
+        if self.legacy_writer_enabled:
+            raise ValueError("operator closure cannot enable the legacy writer")
+        if (
+            self.dcf_authorized
+            or self.trading_authorized
+            or self.price_sensitivity_authorized
+        ):
+            raise ValueError("operator closure cannot authorize DCF or trading")
+        if self.executed or self.database_deletion_authorized:
+            raise ValueError("operator closure cannot delete data")
+        if (
+            self.historical_modules_deleted
+            or self.official_pdfs_deleted
+            or self.raw_evidence_deleted
+        ):
+            raise ValueError("operator closure cannot delete retained sources")
+        if self.retired_entries != _declared_retired_entries():
+            raise ValueError("operator closure must keep the retired-entry catalog")
+        if self.m4_backlog != _declared_m4_backlog_v2():
+            raise ValueError("operator closure v2 must keep the post-execution catalog")
+        if self.operator_instructions != _declared_instructions():
+            raise ValueError("operator closure must keep the published operator copy")
+        return self
+
+
+def record_operator_closure_v2_report(
+    publication: CompanyProfilePublicationControl,
+) -> CompanyProfileOperatorClosureV2Report:
+    """Record leftover-entry closure after first expansion has been executed."""
+
+    if publication.reader != PUBLICATION_READER:
+        raise ValueError("operator closure requires the new-contract reader cutover")
+    if publication.legacy_writer_enabled:
+        raise ValueError("operator closure cannot run while the legacy writer is enabled")
+    return CompanyProfileOperatorClosureV2Report(
+        publication_cutover_verified=True,
+        publication_state=publication.state,
+        operator_instructions=_declared_instructions(),
+        retired_entries=_declared_retired_entries(),
+        m4_backlog=_declared_m4_backlog_v2(),
+    )
+
+
+def persist_operator_closure_v2_report(
+    report: CompanyProfileOperatorClosureV2Report,
+    root: str | Path,
+) -> Path:
+    """Write company_profile_operator_closure.v2 without touching the v1 file."""
+
+    path = Path(root) / "reports" / f"{OPERATOR_CLOSURE_V2_SCHEMA_VERSION}.json"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = path.with_suffix(".tmp")
+    tmp.write_text(report.model_dump_json(indent=2), encoding="utf-8")
+    tmp.replace(path)
+    return path
+
+
+def load_operator_closure_v2_report(
+    root: str | Path,
+) -> CompanyProfileOperatorClosureV2Report | None:
+    """Load the persisted v2 operator-closure report, if one has been recorded."""
+
+    path = Path(root) / "reports" / f"{OPERATOR_CLOSURE_V2_SCHEMA_VERSION}.json"
+    if not path.is_file():
+        return None
+    return CompanyProfileOperatorClosureV2Report.model_validate_json(
+        path.read_text(encoding="utf-8")
+    )
+
+
+def _declared_m4_backlog_v2() -> tuple[M4BacklogItem, ...]:
+    replacement = M4BacklogItem(
+        item_id="first_expansion_executed_not_next_round",
+        kind="throughput",
+        object="company_profile_first_expansion_plan.v1 executed sample",
+        reason=(
+            "First expansion has been executed under the reviewed plan. "
+            "The new source-review snapshot is this-round authority. "
+            "This change does not authorize the next expansion, a scale-quality "
+            "claim, or production."
+        ),
+    )
+    return tuple(
+        replacement if item.item_id == "first_expansion_gates_unmet" else item
+        for item in _declared_m4_backlog()
+    )

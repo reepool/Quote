@@ -33,6 +33,20 @@ from research.company_profile.execution import (
     DEFAULT_TOTAL_TOKEN_BUDGET,
     default_processing_identity,
 )
+from research.company_profile.first_expansion import (
+    activate_first_expansion,
+    complete_first_expansion,
+    first_expansion_should_constrain_run,
+    load_first_expansion_mode,
+    load_first_expansion_plan,
+    mark_first_expansion_delivery,
+    official_bindings_from_shared_access,
+    persist_first_expansion_live_run,
+    record_first_expansion_plan,
+    record_first_expansion_source_review,
+    refuse_first_expansion_drift,
+    remember_first_expansion_work_ids,
+)
 from research.company_profile.legacy_retirement import (
     persist_legacy_retirement_report,
     record_legacy_retirement_report,
@@ -235,15 +249,27 @@ class OfficialAnnualReportPageSource:
         )
         if not published_at:
             return None
+        report_id = str(
+            asset.get("source_asset_id")
+            or asset.get("filing_id")
+            or asset.get("source_announcement_id")
+            or ""
+        ).strip()
+        document_version = str(asset.get("content_hash") or "").strip()
+        if first_expansion_should_constrain_run(self.repository.checkpoint_root):
+            if not report_id:
+                raise ValueError("first expansion requires an official report_id")
+            if not document_version or document_version.lower() == "unknown":
+                raise ValueError("first expansion cannot use unknown document_version")
+        elif not document_version:
+            document_version = "unknown"
         return {
             "report": ReportIdentity(
                 instrument_id=str(
                     item.get("instrument_id") or asset.get("instrument_id") or ""
                 ),
-                report_id=str(
-                    asset.get("source_asset_id") or asset.get("filing_id") or ""
-                ),
-                document_version=str(asset.get("content_hash") or "unknown"),
+                report_id=report_id,
+                document_version=document_version,
                 report_period=str(
                     asset.get("report_period") or item.get("report_period") or ""
                 ),
@@ -452,6 +478,19 @@ class CompanyProfileTaskService:
         plan = live_plan or self.live_plan
         if normalized in {"run", "resume"}:
             self._ensure_publication_allows_writes()
+            if first_expansion_should_constrain_run(self.checkpoint_root):
+                if registry is None:
+                    access = self.repository.shared_asset_access
+                    registry = load_official_task_candidate_registry(
+                        as_of=cutoff,
+                        storage=self.storage,
+                        shared_asset_access=access,
+                    )
+                return await self._run_first_expansion(
+                    action=normalized,
+                    knowledge_cutoff=cutoff,
+                    registry=registry,
+                )
         if normalized == "run" and registry is not None:
             return await self._run_live(
                 knowledge_cutoff=cutoff,
@@ -567,6 +606,98 @@ class CompanyProfileTaskService:
             attach_result=attach_live_run,
         )
 
+    async def _run_first_expansion(
+        self,
+        *,
+        action: str,
+        knowledge_cutoff: str,
+        registry: AShareCandidateRegistry,
+    ) -> dict[str, Any]:
+        state = load_first_expansion_mode(self.checkpoint_root)
+        plan = load_first_expansion_plan(self.checkpoint_root)
+        if plan is None or not state.plan_id:
+            raise ValueError("active first expansion requires a matching plan snapshot")
+        if plan.plan_id != state.plan_id:
+            raise ValueError("active first expansion plan snapshot does not match")
+        if state.delivered:
+            return self._payload(
+                action=action,
+                state="idle",
+                first_expansion_idempotent=True,
+                first_expansion_plan_id=plan.plan_id,
+                knowledge_cutoff=knowledge_cutoff,
+            )
+        bindings = official_bindings_from_shared_access(
+            self.repository.shared_asset_access,
+            plan.selected_instrument_ids,
+            knowledge_cutoff=knowledge_cutoff,
+        )
+        refuse_first_expansion_drift(
+            plan,
+            knowledge_cutoff=knowledge_cutoff,
+            registry=registry,
+            official_bindings=bindings,
+        )
+
+        def attach_expansion(
+            result: dict[str, Any],
+            enqueue_result: Mapping[str, Any],
+        ) -> None:
+            delivered, incomplete = self._this_round_live_outcomes(
+                plan.selected_instrument_ids,
+                tuple(enqueue_result.get("work_ids") or state.work_ids),
+            )
+            report = record_live_run_report(
+                plan=plan.live_plan,
+                registry=registry,
+                selected_instrument_ids=plan.selected_instrument_ids,
+                delivered_instrument_ids=delivered,
+                knowledge_cutoff=knowledge_cutoff,
+                incomplete_supplement_ids=incomplete,
+                first_expansion_plan_id=plan.plan_id,
+                frozen_report_references=plan.reports,
+            )
+            persist_first_expansion_live_run(report, self.checkpoint_root, plan)
+            result["live_run"] = report.model_dump(mode="json")
+            result["first_expansion_plan_id"] = plan.plan_id
+
+        if action == "resume":
+            if not state.work_ids:
+                raise ValueError("active first expansion resume requires frozen work ids")
+            return await self._run(
+                knowledge_cutoff=knowledge_cutoff,
+                instrument_ids=plan.selected_instrument_ids,
+                max_items=plan.live_plan.budget.max_companies_this_round,
+                max_elapsed_seconds=plan.live_plan.budget.max_elapsed_seconds,
+                enqueue=False,
+                limit_drain_to_enqueued=True,
+                include_work_ids=state.work_ids,
+                attach_result=attach_expansion,
+            )
+        result = await self._run(
+            knowledge_cutoff=knowledge_cutoff,
+            instrument_ids=plan.selected_instrument_ids,
+            max_items=plan.live_plan.budget.max_companies_this_round,
+            max_elapsed_seconds=plan.live_plan.budget.max_elapsed_seconds,
+            enqueue=True,
+            limit_drain_to_enqueued=True,
+            attach_result=attach_expansion,
+        )
+        work_ids = tuple(
+            str(item)
+            for item in (result.get("enqueue") or {}).get("work_ids") or ()
+            if str(item).strip()
+        )
+        if work_ids:
+            remember_first_expansion_work_ids(
+                self.checkpoint_root,
+                work_ids=work_ids,
+            )
+        outcomes = (result.get("live_run") or {}).get("company_outcomes") or ()
+        if outcomes and all(item.get("delivered") for item in outcomes):
+            mark_first_expansion_delivery(self.checkpoint_root)
+        return result
+
     async def _run(
         self,
         *,
@@ -576,6 +707,7 @@ class CompanyProfileTaskService:
         max_elapsed_seconds: float,
         enqueue: bool,
         limit_drain_to_enqueued: bool = False,
+        include_work_ids: Sequence[str] | None = None,
         attach_result: Callable[[dict[str, Any], Mapping[str, Any]], None]
         | None = None,
     ) -> dict[str, Any]:
@@ -615,11 +747,16 @@ class CompanyProfileTaskService:
         )
         drain: dict[str, Any] = {}
         stopped = False
-        include_work_ids = (
-            tuple(str(item) for item in enqueue_result.get("work_ids") or ())
-            if limit_drain_to_enqueued
-            else None
-        )
+        if include_work_ids is not None:
+            include_work_ids = tuple(
+                str(item) for item in include_work_ids if str(item).strip()
+            )
+        else:
+            include_work_ids = (
+                tuple(str(item) for item in enqueue_result.get("work_ids") or ())
+                if limit_drain_to_enqueued
+                else None
+            )
         try:
             if include_work_ids is None or include_work_ids:
                 for stage in WORK_STAGES:
@@ -798,6 +935,72 @@ class CompanyProfileTaskService:
         return record_published_operator_closure(
             checkpoint_root=self.checkpoint_root,
         )
+
+    def activate_first_expansion_from_registry(
+        self,
+        *,
+        knowledge_cutoff: str,
+        candidate_registry: AShareCandidateRegistry | None = None,
+    ) -> dict[str, Any]:
+        """Persist the immutable first-expansion plan and mark the owner active."""
+
+        registry = candidate_registry or self.candidate_registry
+        if registry is None:
+            registry = load_official_task_candidate_registry(
+                as_of=_knowledge_cutoff(knowledge_cutoff),
+                storage=self.storage,
+                shared_asset_access=self.repository.shared_asset_access,
+            )
+        cutoff = _knowledge_cutoff(knowledge_cutoff)
+        plan = record_first_expansion_plan(
+            registry=registry,
+            knowledge_cutoff=cutoff,
+            official_access=self.repository.shared_asset_access,
+        )
+        state = activate_first_expansion(self.checkpoint_root, plan)
+        return {
+            "action": "first_expansion_activate",
+            "state": state.mode,
+            "plan_id": plan.plan_id,
+            "selected_instrument_ids": list(plan.selected_instrument_ids),
+            "production_authorization": PRODUCTION_AUTHORIZATION,
+            "scale_quality_claim_allowed": False,
+        }
+
+    def record_first_expansion_review(self, **kwargs: Any) -> dict[str, Any]:
+        """Record this-round source review without overwriting the v1 baseline."""
+
+        report = record_first_expansion_source_review(self.checkpoint_root, **kwargs)
+        return {
+            "action": "first_expansion_source_review",
+            "state": "recorded",
+            "source_review": report.model_dump(mode="json"),
+            "production_authorization": PRODUCTION_AUTHORIZATION,
+            "scale_quality_claim_allowed": report.scale_quality_claim_allowed,
+            "expansion_gates_met": report.expansion_gates_met,
+        }
+
+    def record_operator_closure_v2(self) -> dict[str, Any]:
+        """Write operator-closure v2 after the new source-review snapshot exists."""
+
+        publication = load_publication_control(self.checkpoint_root)
+        if publication is None:
+            raise ValueError(
+                "research publication cutover is required before operator closure"
+            )
+        report = complete_first_expansion(
+            self.checkpoint_root,
+            publication=publication,
+        )
+        return {
+            "action": "operator_closure_v2",
+            "state": "completed",
+            "operator_closure": report.model_dump(mode="json"),
+            "production_authorization": PRODUCTION_AUTHORIZATION,
+            "legacy_writer_enabled": report.legacy_writer_enabled,
+            "dcf_authorized": report.dcf_authorized,
+            "trading_authorized": report.trading_authorized,
+        }
 
     def _publication_allows_writes(self) -> bool:
         return publication_allows_new_writes(
