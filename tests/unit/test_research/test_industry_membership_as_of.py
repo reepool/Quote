@@ -93,6 +93,14 @@ def test_as_of_before_any_classification_returns_none():
     assert _call_as_of("2019-01-01") is None
 
 
+def test_history_only_after_cutoff_blocks_current_membership():
+    stub = _StorageStub(_make_conn())
+    method = ResearchStorageManager.industry_classification_history_blocks_current_membership
+    assert method(stub, "600000.SH", "2019-01-01") is True
+    assert method(stub, "600000.SH", "2021-03-15") is False
+    assert method(stub, "000001.SZ", "2019-01-01") is False
+
+
 @pytest.mark.asyncio
 async def test_route_returns_as_of_response(monkeypatch):
     import api.routes as routes

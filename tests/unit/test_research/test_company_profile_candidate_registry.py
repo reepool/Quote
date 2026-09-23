@@ -586,3 +586,194 @@ def test_repository_effective_report_object_and_access_lookup_bind():
         loaded.candidate("601398.SH").latest_effective_annual_report.decision_state
         == "current"
     )
+
+
+def _official_one_name_registry(storage, instrument_id: str = "601888.SH"):
+    from research.company_profile.candidate_registry import (
+        load_official_task_candidate_registry,
+    )
+
+    class _Universe:
+        def get_latest_full_market_universe_snapshot(self):
+            return {
+                "snapshot_id": "snap-l1",
+                "policy_version": "a_share_active.v1",
+                "snapshot_at": "2026-09-17T00:00:00+00:00",
+                "paired_census_snapshot_id": "census-l1",
+                "instrument_rows": {
+                    "items": [
+                        {
+                            "instrument_id": instrument_id,
+                            "exchange": "SSE",
+                            "name": "样本",
+                        }
+                    ]
+                },
+            }
+
+        def get_latest_complete_universe_snapshot(self):
+            raise AssertionError("full-market snapshot already present")
+
+        def list_asset_coverage(self, universe_snapshot_id: str):
+            assert universe_snapshot_id == "snap-l1"
+            return [{"instrument_id": instrument_id, "status": "available"}]
+
+    class _Access:
+        repository = _Universe()
+
+        def get_effective_asset(self, instrument_id: str, **kwargs):
+            return None
+
+    return load_official_task_candidate_registry(
+        as_of="2026-09-17",
+        storage=storage,
+        shared_asset_access=_Access(),
+    )
+
+
+def _nested_l1(name: str | None) -> dict[str, object]:
+    return {
+        "official_industry_code": "450000",
+        "taxonomy_system": "sw",
+        "classification": {
+            "levels": {
+                "sw_l1": {
+                    "industry_code": "450000",
+                    "industry_name": name,
+                }
+            }
+        },
+    }
+
+
+def test_as_of_nested_l1_name_is_exposed_and_uses_existing_service_form():
+    from research.company_profile.live_plan import assign_disclosure_form
+
+    class _Storage:
+        def get_industry_membership_as_of(self, instrument_id: str, as_of: str):
+            assert instrument_id == "601888.SH"
+            assert as_of == "2026-09-17"
+            return _nested_l1("商贸零售")
+
+        def get_industry_membership(self, instrument_id: str):
+            raise AssertionError("current membership must not replace the as-of row")
+
+    registry = _official_one_name_registry(_Storage())
+    candidate = registry.candidate("601888.SH")
+    assert candidate.classification is not None
+    assert candidate.classification.sw_l1_name == "商贸零售"
+    assert assign_disclosure_form(candidate) == "service"
+
+
+def test_as_of_top_level_l1_name_wins_over_nested_name():
+    from research.company_profile.live_plan import assign_disclosure_form
+
+    class _Storage:
+        def get_industry_membership_as_of(self, instrument_id: str, as_of: str):
+            row = _nested_l1("社会服务")
+            row["sw_l1_name"] = "银行"
+            return row
+
+    registry = _official_one_name_registry(_Storage(), instrument_id="600000.SH")
+    candidate = registry.candidate("600000.SH")
+    assert candidate.classification is not None
+    assert candidate.classification.sw_l1_name == "银行"
+    assert assign_disclosure_form(candidate) == "finance"
+
+
+def test_as_of_without_stored_l1_name_stays_other():
+    from research.company_profile.live_plan import assign_disclosure_form
+
+    class _Storage:
+        def get_industry_membership_as_of(self, instrument_id: str, as_of: str):
+            return {
+                "official_industry_code": "450000",
+                "taxonomy_system": "sw",
+                "classification": {"levels": {"sw_l1": {"industry_name": "  "}}},
+            }
+
+        def get_industry_membership(self, instrument_id: str):
+            raise AssertionError("missing as-of L1 name must not use current membership")
+
+    registry = _official_one_name_registry(_Storage())
+    candidate = registry.candidate("601888.SH")
+    assert candidate.classification_status == "present"
+    assert candidate.classification is not None
+    assert candidate.classification.sw_l1_name is None
+    assert assign_disclosure_form(candidate) == "other"
+
+
+def test_history_without_pre_cutoff_row_does_not_use_later_current_membership():
+    from research.company_profile.live_plan import assign_disclosure_form
+
+    class _Storage:
+        def get_industry_membership_as_of(self, instrument_id: str, as_of: str):
+            return None
+
+        def industry_classification_history_blocks_current_membership(
+            self, instrument_id: str, as_of: str
+        ):
+            assert instrument_id == "601888.SH"
+            assert as_of == "2026-09-17"
+            return True
+
+        def get_industry_membership(self, instrument_id: str):
+            raise AssertionError("later current membership must not fill a pre-cutoff gap")
+
+    registry = _official_one_name_registry(_Storage())
+    candidate = registry.candidate("601888.SH")
+    assert candidate.classification_status == "missing"
+    assert assign_disclosure_form(candidate) == "other"
+
+
+def test_as_of_row_missing_l1_name_does_not_copy_current_service():
+    from research.company_profile.live_plan import assign_disclosure_form
+
+    class _Storage:
+        def get_industry_membership_as_of(self, instrument_id: str, as_of: str):
+            return {"official_industry_code": "450000", "taxonomy_system": "sw"}
+
+        def get_industry_membership(self, instrument_id: str):
+            return {"sw_l1_name": "商贸零售", "taxonomy_system": "sw"}
+
+    registry = _official_one_name_registry(_Storage())
+    candidate = registry.candidate("601888.SH")
+    assert candidate.classification is not None
+    assert candidate.classification.sw_l1_name is None
+    assert assign_disclosure_form(candidate) == "other"
+
+
+def test_closed_shenwan_table_and_two_company_budget_stay_unchanged():
+    from research.company_profile.live_plan import (
+        _FINANCE_L1,
+        _MANUFACTURING_L1,
+        _SERVICE_L1,
+        DEFAULT_LIVE_MAX_COMPANIES,
+        record_company_profile_live_plan,
+    )
+    from research.company_profile.models import PRODUCTION_AUTHORIZATION
+
+    assert _SERVICE_L1 == frozenset(
+        {
+            "交通运输",
+            "房地产",
+            "商贸零售",
+            "社会服务",
+            "计算机",
+            "传媒",
+            "通信",
+            "综合",
+            "美容护理",
+            "建筑装饰",
+            "公用事业",
+            "环保",
+        }
+    )
+    assert _FINANCE_L1 == frozenset({"银行", "非银金融"})
+    assert "有色金属" in _MANUFACTURING_L1
+    assert "商贸零售" not in _MANUFACTURING_L1
+    plan = record_company_profile_live_plan()
+    assert DEFAULT_LIVE_MAX_COMPANIES == 2
+    assert plan.budget.max_companies_this_round == 2
+    assert plan.expansion_thresholds.scale_quality_claim_allowed is False
+    assert PRODUCTION_AUTHORIZATION == "not_authorized"

@@ -25,12 +25,17 @@ After the stored L1 name is exposed, disclosure form MUST be assigned only by th
 - **THEN** the disclosure form is `other`
 
 ### Requirement: Later current membership cannot replace the as-of row
-When an as-of history row exists, the registry MUST NOT fill its Shenwan L1 name from a current membership row whose effective information is later than the requested cutoff. A current membership may be used only when no as-of history row exists.
+When an as-of history row exists, the registry MUST NOT fill its Shenwan L1 name from a current membership row. When industry classification history exists for the instrument but no row is effective on or before the requested cutoff, the registry MUST NOT use a current membership either. A current membership may be used only when that instrument has no industry classification history.
 
 #### Scenario: Later membership does not override history
 - **WHEN** the as-of history row stores no Shenwan L1 name and a current membership row has `sw_l1_name` `商贸零售`
 - **THEN** the registry does not copy `商贸零售` from that current row
 - **AND** the disclosure form stays `other`
+
+#### Scenario: History before cutoff is absent
+- **WHEN** industry classification history exists only after the cutoff and the current membership `sw_l1_name` is `商贸零售`
+- **THEN** the registry does not use that current membership
+- **AND** the disclosure form is `other`
 
 ### Requirement: This read does not move the first-expansion budget
 This change MUST NOT alter the first-expansion two-company budget, MUST NOT record or activate a first-expansion plan, and MUST NOT write a first-expansion observation or closure. Production MUST remain `not_authorized`. `scale_quality_claim_allowed` MUST remain false.

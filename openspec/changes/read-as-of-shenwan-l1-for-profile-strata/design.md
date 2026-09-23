@@ -26,7 +26,7 @@
    as-of 行没有顶层 `sw_l1_name` 时，从该行 `classification.levels.sw_l1.industry_name` 投影。已有顶层名称时保持原值。备选是回写历史列，会扩大成数据迁移，超出这个读取缺口。
 
 2. **as-of 行存在时不回退当前 membership。**
-   当前 membership 可能晚于 `knowledge_cutoff`。历史行存在就只用该行；名称不在该行里则披露层为 `other`。
+   当前 membership 可能晚于 `knowledge_cutoff`。历史行存在就只用该行；名称不在该行里则披露层为 `other`。历史行存在但没有 cutoff 前生效的记录时，同样不使用当前 membership。只有该证券完全没有行业历史时，才允许读当前 membership。
 
 3. **封闭表保持唯一分层规则。**
    投影出的名称交给现有 `assign_disclosure_form`。表外名称、空名称和缺失分类都仍是 `other`。

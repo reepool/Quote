@@ -8794,6 +8794,35 @@ class ResearchStorageManager:
         data["as_of_date"] = as_of_str
         return data
 
+    def industry_classification_history_blocks_current_membership(
+        self,
+        instrument_id: str,
+        as_of_date: str,
+        *,
+        taxonomy_system: str | None = None,
+    ) -> bool:
+        """True when history exists but none of it is effective on as_of_date."""
+
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            rows = conn.execute(
+                """
+                SELECT official_start_date, official_update_time
+                FROM industry_classification_history
+                WHERE instrument_id = ?
+                  AND (? IS NULL OR taxonomy_system = ?)
+                """,
+                (instrument_id, taxonomy_system, taxonomy_system),
+            ).fetchall()
+        if not rows:
+            return False
+        as_of_str = str(as_of_date)[:10]
+
+        def _start(row: sqlite3.Row) -> str:
+            return (row["official_start_date"] or row["official_update_time"] or "")[:10]
+
+        return not any(_start(row) and _start(row) <= as_of_str for row in rows)
+
     # ----- REQ-13: 无风险利率序列 -----
 
     def upsert_risk_free_rate_series(self, series: Dict[str, Any]) -> None:
