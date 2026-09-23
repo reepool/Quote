@@ -26,7 +26,9 @@ Active-run accounting repair after `3ec82b97`: `_run()` persists work ids after 
 
 Two-company cap repair after `23858958`: `record_first_expansion_plan()` samples only the existing two-company budget; if that sample cannot occupy `service`, activation is refused.
 
-Contract lock after `5cfa40c3`: design and spec require the fixed two-company budget and refuse a public plan payload enlarged to three companies. 3.4 / 3.5 / 4.5 stay unchecked.
+Contract lock after `5cfa40c3`: design and spec require the fixed two-company budget and refuse a public plan payload enlarged to three companies.
+
+Code-slice acceptance at `5fd681d9`: independent recheck closed the OpenSpec two-company contract and the public three-company schema counterexample. This accepts the code foundation only. 3.4 / 3.5 / 4.5 stay unchecked. The change stays open. Official registry still has no legal `service` sample; the as-of Shenwan L1 read is a separate change and must not alter this slice's two-company budget.
 
 ## 4. Operator closure v2 and completion
 
