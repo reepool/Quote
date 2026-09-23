@@ -236,7 +236,7 @@
             }
           },
           {
-            "source_label": "scorpio:grok-4.7",
+            "source_label": "scorpio:grok-4.6",
             "weight": 1,
             "profiles": {
               "semantic_extraction": "semantic_extraction__scorpio_grok",
@@ -294,13 +294,13 @@
       "semantic_extraction__scorpio_grok": {
         "provider": "openai_compatible",
         "provider_resource": "scorpio:grok",
-        "source_label": "scorpio:grok-4.7",
+        "source_label": "scorpio:grok-4.6",
         "default_workload": "corporate_action_semantic_extraction",
         "enabled": true,
         "base_url": "https://scorpio.reepool.com",
         "endpoint": "/v1/chat/completions",
         "api_key_env": "QUOTE_LLM_SCORPIO_GROK_API_KEY",
-        "model": "grok-4.7",
+        "model": "grok-4.6",
         "structured_output_mode": "auto",
         "supported_structured_output_modes": ["json_object"],
         "allow_prompt_only": false,
@@ -439,13 +439,13 @@
       "corporate_action_title_classification__scorpio_grok": {
         "provider": "openai_compatible",
         "provider_resource": "scorpio:grok",
-        "source_label": "scorpio:grok-4.7",
+        "source_label": "scorpio:grok-4.6",
         "default_workload": "corporate_action_title_classification",
         "enabled": true,
         "base_url": "https://scorpio.reepool.com",
         "endpoint": "/v1/chat/completions",
         "api_key_env": "QUOTE_LLM_SCORPIO_GROK_API_KEY",
-        "model": "grok-4.7",
+        "model": "grok-4.6",
         "structured_output_mode": "auto",
         "supported_structured_output_modes": ["json_object"],
         "allow_prompt_only": false,

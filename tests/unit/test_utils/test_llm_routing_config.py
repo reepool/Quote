@@ -412,7 +412,7 @@ def test_repository_llm_config_is_enabled_non_secret_and_has_one_owner():
     assert [member.source_label for member in members] == [
         "scorpio:gemini-3.8-flash-high",
         "zai:glm-5.3-flash",
-        "scorpio:grok-4.7",
+        "scorpio:grok-4.6",
         "scorpio:gpt-5.6-luna",
         "deepseek:deepseek-flash",
     ]
