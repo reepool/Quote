@@ -276,6 +276,79 @@ def test_first_expansion_refuses_when_service_is_beyond_two_company_cap():
         )
 
 
+def test_public_plan_schema_refuses_consistent_three_company_json():
+    from research.company_profile.first_expansion import (
+        FirstExpansionPlan,
+        FirstExpansionStratum,
+        record_first_expansion_plan,
+    )
+    from research.company_profile.live_plan import record_company_profile_live_plan
+    from research.company_profile.live_run import FrozenOfficialReportReference
+
+    plan = record_first_expansion_plan(
+        registry=_registry(),
+        knowledge_cutoff=_CUTOFF,
+        official_bindings=_bindings(),
+    )
+    payload = json.loads(plan.model_dump_json())
+    FirstExpansionPlan.model_validate_json(json.dumps(payload))
+    third = "600002.SH"
+    payload["selected_instrument_ids"].append(third)
+    payload["selected_strata"].append(
+        {
+            "instrument_id": third,
+            "exchange": "SSE",
+            "disclosure_form": "manufacturing",
+        }
+    )
+    payload["reports"].append(
+        {
+            "instrument_id": third,
+            "asset_id": "asset-600002",
+            "report_id": "filing-600002",
+            "report_period": "2025-12-31",
+            "document_version": "d" * 64,
+        }
+    )
+    live_plan = payload["live_plan"]
+    live_plan["budget"]["max_companies_this_round"] = 3
+    live_plan["sampling"]["max_sample_size"] = 3
+    thresholds = live_plan["expansion_thresholds"]
+    thresholds["min_independently_reviewed_reports"] = 3
+    thresholds["min_occupied_strata_reviewed"] = 3
+    thresholds["max_companies_this_expansion"] = 3
+    enlarged = {
+        "plan_id": plan.plan_id,
+        "knowledge_cutoff": plan.knowledge_cutoff,
+        "live_plan": record_company_profile_live_plan(max_companies_this_round=3),
+        "registry": plan.registry,
+        "selected_instrument_ids": (*plan.selected_instrument_ids, third),
+        "selected_strata": (
+            *plan.selected_strata,
+            FirstExpansionStratum(
+                instrument_id=third,
+                exchange="SSE",
+                disclosure_form="manufacturing",
+            ),
+        ),
+        "reports": (
+            *plan.reports,
+            FrozenOfficialReportReference(
+                instrument_id=third,
+                asset_id="asset-600002",
+                report_id="filing-600002",
+                report_period="2025-12-31",
+                document_version="d" * 64,
+            ),
+        ),
+    }
+
+    with pytest.raises(ValidationError, match="two"):
+        FirstExpansionPlan.model_validate(enlarged)
+    with pytest.raises(ValidationError, match="two"):
+        FirstExpansionPlan.model_validate_json(json.dumps(payload))
+
+
 def test_active_mode_refuses_cutoff_registry_or_report_drift(tmp_path):
     from research.company_profile.first_expansion import (
         activate_first_expansion,

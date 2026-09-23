@@ -33,7 +33,7 @@
    在现有 task control / checkpoint 上记录 `first_expansion_mode`：`inactive` | `active` | `completed`。默认 `inactive`，`run`/`resume` 保持今天的全市场 enqueue / 续跑。apply 时由同一 owner 写入不可变计划快照并切到 `active`；这不是新的对外动作。`active` 期间 `run` 只入队冻结报告，`resume` 只 drain 这些 work；快照缺失或不匹配才拒绝。冻结 work 已交付后再 `run`/`resume` 必须幂等返回，不再观察。写入 operator_closure v2 后进入 `completed`：恢复普通 `run`/`resume`，不得自动再激活，不得重跑冻结样本。另开 change 之前禁止再写一份首次扩大计划。备选是无条件拒无快照的 enqueue，会阻断正常研究运行。
 
 3. **计划冻结报告版本，不只冻证券代码。**
-   `company_profile_first_expansion_plan.v1` 必须包含：`plan_id` 或内容 hash、live-plan 规则、`knowledge_cutoff`、选样所用 registry 身份（`company_profile_a_share_candidate_registry.v1`、`as_of`、`universe_snapshot_id` 若当时存在）、`selected_instrument_ids`、`selected_strata`（必须含 `service`），以及每家正式年报的 `asset_id`、`report_id`、`report_period`、`document_version`。这些字段按现有入队/registry 语义取值，不发明新身份。enqueue / resume 必须校验同一引用；更正年报、有效资产变化或不同 cutoff 导致漂移时拒绝，不得改用新版本。抽样仍走现有分层规则，不点名证券代码；写入后不可变。
+   `company_profile_first_expansion_plan.v1` 必须包含：`plan_id` 或内容 hash、live-plan 规则、`knowledge_cutoff`、选样所用 registry 身份（`company_profile_a_share_candidate_registry.v1`、`as_of`、`universe_snapshot_id` 若当时存在）、`selected_instrument_ids`、`selected_strata`（必须含 `service`），以及每家正式年报的 `asset_id`、`report_id`、`report_period`、`document_version`。这些字段按现有入队/registry 语义取值，不发明新身份。enqueue / resume 必须校验同一引用；更正年报、有效资产变化或不同 cutoff 导致漂移时拒绝，不得改用新版本。抽样仍走现有分层规则，不点名证券代码；写入后不可变。样本固定为现有两家公司预算。两家内占不到 `service` 必须拒绝记录和激活，不得为占层扩大样本。公开计划模型必须拒绝预算、证券、分层和报告同时扩到三家及以上的载荷。
 
 4. **新观察写独立快照，基线 v1 文件不动。**
    新 live-run / source-review 必须携带同一 plan 引用和同一组报告引用，且不覆盖固定 v1 文件。完成后新 source-review 是本轮权威，基线仍可读。
@@ -50,7 +50,7 @@
 ## Risks / Trade-offs
 
 - [模式状态写在 control 上被普通 run 清掉] → 完成标记与计划快照独立持久化；`completed` 后普通 run 不得删除或重写计划。
-- [分层器抽不到 service] → 不得激活模式，不得 enqueue。
+- [两家分层样本占不到 service] → 拒绝记录和激活，不得扩大样本，不得 enqueue。
 - [年报在计划后更正] → 按冻结引用拒绝，不换新文件。
 - [把 active 当成永久样本锁] → `completed` 后恢复普通路径；重复首次扩大必须另审。
 - [未审范围就开始改代码] → 任务 1.1 未勾选不得 apply。
@@ -58,12 +58,11 @@
 ## Migration Plan
 
 1. 勾选 1.1 后才允许 apply。
-2. 按分层规则在声明的 cutoff / registry 时点选样，写入不可变计划并激活模式。
+2. 按既有两家公司预算和分层规则，在声明的 cutoff / registry 时点选样。占不到 `service` 则拒绝，不扩大样本，不激活。占到后写入不可变计划并激活模式。
 3. 用现有 `run`/`resume` 只处理冻结报告；新 live-run / source-review 写独立快照。
 4. 核原文后写 operator_closure v2，模式变为 `completed`。
 5. 回滚：回到 `inactive` 或保留 `completed` 而不再激活；保留 v4、v1 基线和 v1 closure；生产状态不变。
 
 ## Open Questions
 
-- `max_companies_this_round` 以能新占 `service` 的最小值为准，写入快照后冻结。
 - 新样本若出现可复用解释缺口，另开 change。
