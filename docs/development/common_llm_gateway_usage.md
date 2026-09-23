@@ -14,7 +14,7 @@
 - 逻辑 profile：`semantic_extraction`
 - provider：`openai_compatible`
 - base URL：`https://scorpio.reepool.com`
-- profiles：Grok（停用）、`gpt-5.6-luna`、`deepseek-v4-flash-0731`
+- profiles：`grok-4.7`（停用）、`gpt-5.6-luna`、`deepseek-v4-flash-0731`
 - key 环境变量：`QUOTE_LLM_SCORPIO_GROK_API_KEY`、`QUOTE_LLM_SCORPIO_LUNA_API_KEY`、`QUOTE_LLM_SCORPIO_DEEPSEEK_API_KEY`
 - 当前启用的 provider quota bucket：Luna 使用 `scorpio:luna`，DeepSeek 使用 `scorpio:deepseek`
 
