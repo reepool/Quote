@@ -52,7 +52,7 @@ from utils.llm import (
 )
 
 MODEL_ROUTES = {
-    "grok-4.6": "semantic_extraction__scorpio_grok",
+    "grok-4.7": "semantic_extraction__scorpio_grok",
     "glm-5.3-flash": "semantic_extraction__zai",
     "gemini-3.8-flash": "semantic_extraction__scorpio_gemini",
 }
