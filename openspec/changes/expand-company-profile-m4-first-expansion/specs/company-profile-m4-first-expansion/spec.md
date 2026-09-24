@@ -102,6 +102,20 @@ The change MUST publish `company_profile_operator_closure.v2` as a new snapshot 
 - **AND** `first_expansion_mode` is `completed`
 - **AND** the other five backlog item ids remain
 
+### Requirement: A complete failed review can end the round
+`completed` MUST mean only that this round's observation has ended. It MUST NOT mean `expansion_gates_met=true`, and it MUST NOT authorize the next expansion, a scale-quality claim, or production. Operator closure v2 MUST be allowed for an assessed-accuracy review and for a zero-delivery review whose accuracy stays `unassessed`. The zero-delivery path MUST require every frozen live-run outcome `delivered=true`, findings that cover exactly the frozen sample, all three aspects `core_skeleton`, `important_disclosure`, and `commodity_role` for every selected company, assessed recall, assessed critical numeric errors, every finding `present_in_delivery=false`, and every `fact_accurate` null. The authoritative failure MUST remain in the this-round source-review. Closure MUST NOT add a `failed` mode or extend the closure v2 schema. Closure MUST refuse a partial sample, a company missing any of the three aspects, a frozen work that is not delivered, a delivered finding whose accuracy is still unassessed, unassessed recall or critical numeric errors, and any drift in the plan, report references, or source-review binding.
+
+#### Scenario: Zero delivery closes without becoming a quality pass
+- **WHEN** both frozen works are delivered and the source review covers both companies and all three aspects with recall 0/9, unassessed accuracy, zero critical numeric errors, no delivered facts, and `expansion_gates_met=false`
+- **THEN** operator closure v2 may be written and the mode may become `completed`
+- **AND** the source review remains recall 0/9, accuracy unassessed, and `expansion_gates_met=false`
+- **AND** completion does not authorize the next expansion, a scale-quality claim, or production
+
+#### Scenario: An unfinished or mixed review cannot close
+- **WHEN** the review covers fewer or more companies than the frozen sample, omits an aspect, includes an undelivered frozen work, leaves accuracy null on a delivered finding, or leaves recall or critical numeric errors unassessed
+- **THEN** operator closure v2 is refused
+- **AND** the mode stays `active`
+
 ### Requirement: This slice does not implement industry packages
 The first M4 expansion MUST NOT implement a manufacturing/materials production enhancement, MUST NOT build banking, service, or TMT industry packages, and MUST NOT project 净息差, 成本收入比, or loan-structure rows. A reusable interpretability gap found on the new sample MUST become a separate change with its own processing identity. This change MUST NOT publish `owned_page_facts=v5` unless that later change is separately reviewed.
 
