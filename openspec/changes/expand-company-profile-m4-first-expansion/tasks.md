@@ -3,37 +3,55 @@
 - [x] 1.1 Independent review accepts this first-slice scope and does not enlarge it into industry packages or production
 - [x] 1.2 Confirm implementation must not start until 1.1 is checked
 
-## 2. First-expansion mode and frozen plan
+Checked tasks below mean the control capability is implemented and tested. They do not mean an official first-expansion plan, mode, run, snapshot, or closure has been written.
 
-- [x] 2.1 Persist `first_expansion_mode` on the existing owner as `inactive` / `active` / `completed` without adding a published action
-- [x] 2.2 Persist `company_profile_first_expansion_plan.v1` before activating the mode, with plan id or hash, `knowledge_cutoff`, registry identity, strata including `service`, and per-report `asset_id`, `report_id`, `report_period`, and `document_version`
-- [x] 2.3 Refuse enqueue or resume only while `active` if the snapshot is missing or the cutoff, registry identity, or report references drift
-- [x] 2.4 Keep ordinary `run`/`resume` unchanged while `inactive` or `completed`; keep missing assets in the denominator and `scale_quality_claim_allowed=false`
+## 2. First-expansion mode and immutable plan capability
 
-## 3. New-sample review snapshots
+- [x] 2.1 Implement and test persisting `first_expansion_mode` on the existing owner as `inactive` / `active` / `completed` without adding a published action
+- [x] 2.2 Implement and test the immutable `company_profile_first_expansion_plan.v1` model, persist path, and validation for plan id or hash, `knowledge_cutoff`, registry identity, strata including `service`, and per-report `asset_id`, `report_id`, `report_period`, and `document_version`
+- [x] 2.3 Implement and test refusal of enqueue or resume only while `active` if the snapshot is missing or the cutoff, registry identity, or report references drift
+- [x] 2.4 Implement and test that ordinary `run`/`resume` stay unchanged while `inactive` or `completed`, that missing assets stay in the denominator, and that `scale_quality_claim_allowed=false`
 
-- [x] 3.1 Run the published `run`/`resume` path only on the frozen report references without overwriting v1–v4 work JSON
-- [x] 3.2 Limit `resume` in `active` mode to that frozen work; after delivery, later `run`/`resume` are idempotent
-- [x] 3.3 Write live-run and source-review snapshots that carry the same plan and report references and do not overwrite the two-company v1 baseline files
-- [ ] 3.4 Independently review official pages and recount 4.1; do not presume 7/7
-- [ ] 3.5 If a reusable interpretability gap appears, record it and stop; do not add an extractor or v5 in this change
+## 3. Frozen work and independent snapshot capability
 
-Historical baseline before the taxonomy parent-chain read, 2026-09-17 registry probe: 5564 names, available forms `{other: 5474, manufacturing: 1}`, `service_available_count=0`. That count is not the post-fix conclusion. The official registry has not been re-probed since `read-as-of-shenwan-l1-for-profile-strata` archived. Stopped before activate/enqueue. Did not hard-code an instrument or change the Shenwan L1 table. The two-company budget is unchanged.
+- [x] 3.1 Implement and test that an active published `run`/`resume` stays on the frozen report references and does not overwrite v1–v4 work JSON
+- [x] 3.2 Implement and test that `resume` in `active` mode continues only that frozen work, and that after delivery later `run`/`resume` are idempotent
+- [x] 3.3 Implement and test writing independent live-run and source-review snapshots that carry the same plan and report references and do not overwrite the two-company v1 baseline files
 
-A-class contract repair after `1fe3133b`: runtime now requires pointer + immutable snapshot + full plan equality; observation snapshots must match `plan.reports`; current asset `asset_id`/`report_id`/`report_period`/`document_version` freeze and compare together; work ids persist before drain; resume marks delivery; closure v2 requires a delivered, assessed, full-sample review.
+## 4. Operator closure v2 capability
 
-Active-run accounting repair after `3ec82b97`: `_run()` persists work ids after its own enqueue and before drain; active `run` keeps `enqueue=True` and returns real inserted/reused/work_ids; undelivered or failed rounds are not idle/completed.
+- [x] 4.1 Implement and test generating `company_profile_operator_closure.v2` without changing or overwriting the v1 catalog, and prove historical v1 JSON still loads
+- [x] 4.2 Implement and test that the replacement backlog is written only after a new source-review snapshot exists, uses post-execution wording, marks mode `completed`, and keeps the other five backlog item ids
+- [x] 4.3 Implement and test that a post-completion `run` does not rerun the frozen sample or start another expansion
+- [x] 4.4 Implement and test that production, DCF, trading, and the legacy writer remain unauthorized
 
-Two-company cap repair after `23858958`: `record_first_expansion_plan()` samples only the existing two-company budget; if that sample cannot occupy `service`, activation is refused.
+## 5. Official first expansion, not yet executed
 
-Contract lock after `5cfa40c3`: design and spec require the fixed two-company budget and refuse a public plan payload enlarged to three companies.
+Do not check any task in this section until that official step has actually happened. Do not run an ordinary published `run` before the immutable plan is recorded and first expansion is activated. That ordinary run is not a substitute for this first expansion. If the fixed two-company draw does not include `service`, stop at 5.2 and do not record a plan, activate, enqueue, or review source pages.
 
-Code-slice acceptance at `5fd681d9`: independent recheck closed the OpenSpec two-company contract and the public three-company schema counterexample. This accepts the code foundation only. 3.4 / 3.5 / 4.5 stay unchecked. The change stays open. The control code is implemented, but no first-expansion plan or mode has been recorded, and this slice has not activated, enqueued, reviewed source pages, or written closure v2. The as-of Shenwan L1 read is archived and must not alter this slice's two-company budget. `scale_quality_claim_allowed` stays false and production stays `not_authorized`.
+- [ ] 5.1 Read-only re-probe of the official registry. Do not write a plan, mode, snapshot, or closure
+- [ ] 5.2 Confirm whether the fixed two-company sample under the current rule includes `service`
+- [ ] 5.3 If 5.2 includes `service`, record the immutable first-expansion plan
+- [ ] 5.4 Activate first expansion only after 5.3
+- [ ] 5.5 Execute the published `run`/`resume` only after 5.4
+- [ ] 5.6 Confirm the independent live-run snapshot has been written
+- [ ] 5.7 Independently review the official pages and write the source-review snapshot
+- [ ] 5.8 Recalculate 4.1 from that source review. Do not presume 7/7
+- [ ] 5.9 Judge and record any reusable interpretability gap. Do not add an extractor or `owned_page_facts=v5` in this change
+- [ ] 5.10 Check that publication control is the legal control required before closure
+- [ ] 5.11 Write operator closure v2 and set the mode to `completed`
+- [ ] 5.12 After independent Review of the official execution, archiving this change is allowed. Do not authorize production or the next expansion
 
-## 4. Operator closure v2 and completion
+The former unchecked 3.4, 3.5, and 4.5 are this section. They stay unchecked.
 
-- [x] 4.1 Publish `company_profile_operator_closure.v2` without changing or overwriting the v1 catalog; prove historical v1 JSON still loads
-- [x] 4.2 Write the replacement backlog only after the new source-review snapshot exists, using post-execution wording, mark mode `completed`, and keep the other five backlog item ids
-- [x] 4.3 Prove a post-completion `run` does not rerun the frozen sample or start another expansion
-- [x] 4.4 Prove production, DCF, trading, and the legacy writer remain unauthorized
-- [ ] 4.5 Stop for independent Review of the applied slice; do not authorize production or the next expansion
+## 6. Retained history
+
+These observations stay as history and are not overwritten:
+
+- Pre-fix 2026-09-17 registry probe: 5564 names, available forms `{other: 5474, manufacturing: 1}`, `service_available_count=0`. That count is the baseline before the taxonomy parent-chain read, not a post-fix conclusion. The official registry has not been re-probed since `read-as-of-shenwan-l1-for-profile-strata` archived.
+- The original two-company v1 live-run and source-review baseline files remain the retained 7/7 observation.
+- Existing v1–v4 work JSON remains on disk.
+
+The two-company budget is unchanged. No official first-expansion plan, mode, live-run snapshot, source-review snapshot, or closure v2 has been written. `scale_quality_claim_allowed` stays false and production stays `not_authorized`.
+
+Capability repairs already tested, not official execution: after `1fe3133b`, pointer, immutable snapshot, and full plan must match, and closure v2 requires a delivered assessed full sample; after `3ec82b97`, active `run` keeps real enqueue accounting; after `23858958`, the sample stays at two companies; after `5fd681d9`, the code foundation was accepted and 3.4 / 3.5 / 4.5 stayed unchecked.
