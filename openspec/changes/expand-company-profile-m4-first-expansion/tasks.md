@@ -35,14 +35,14 @@ Do not check 5.6–5.12 until that official step has actually happened. Do not e
 - [x] 5.4 Activated first expansion through `CompanyProfileTaskService.activate_first_expansion_from_registry()`. Mode is `active`, `plan_id=cd8031cb5a440da19d7a7b8a41af0fdf`, `work_ids=()`, `delivered=false`. Did not run, enqueue, or write an observation
 - [x] 5.5 Executed one published `run` at `knowledge_cutoff=2026-09-17`. Returned `action=run`, `state=incomplete`. Enqueued and froze `bp-work-5d1215f542d18b4d16ddd500` (`600004.SH`) and `bp-work-97e7eed49d4b1e5cf477974f` (`600006.SH`). Did not resume, source-review, recount 4.1, or write closure v2
 - [x] 5.6 Confirmed the independent live-run snapshot after controlled resume. Both frozen works completed with `delivered=true` and `supplement_incomplete=false`. Did not write source-review or closure v2
-- [ ] 5.7 Independently review the official pages and write the source-review snapshot
-- [ ] 5.8 Recalculate 4.1 from that source review. Do not presume 7/7
+- [x] 5.7 Independently reviewed the official pages and wrote the this-round source-review. Dongfeng page 24 raw-material input is in the recall denominator. Did not presume 7/7
+- [x] 5.8 Recalculated 4.1 only from the current source-review. Recall 0/9 is below 1.0, accuracy is unassessed, and elapsed 862.208 exceeds 300. Reviewed reports 2, occupied strata 2, critical numeric errors 0, and tokens 0 pass their own gates. `expansion_gates_met=false`. Did not authorize the next expansion, a scale-quality claim, or production. Did not rerun, rewrite the source-review, change mode, or write closure v2. Closure v2 still cannot accept this unassessed accuracy; that lifecycle block is recorded here and left for a later decision before 5.11
 - [ ] 5.9 Judge and record any reusable interpretability gap. Do not add an extractor or `owned_page_facts=v5` in this change
 - [ ] 5.10 Check that publication control is the legal control required before closure
 - [ ] 5.11 Write operator closure v2 and set the mode to `completed`
 - [ ] 5.12 After independent Review of the official execution, archiving this change is allowed. Do not authorize production or the next expansion
 
-The former unchecked 3.4, 3.5, and 4.5 are this section. 5.6–5.12 stay unchecked.
+The former unchecked 3.4, 3.5, and 4.5 are this section. 5.9–5.12 stay unchecked.
 
 ## 7. Reserved service seat, not yet implemented
 
@@ -58,6 +58,6 @@ These observations stay as history and are not overwritten:
 - The original two-company v1 live-run and source-review baseline files remain the retained 7/7 observation.
 - Existing v1–v4 work JSON remains on disk.
 
-The immutable plan is recorded and the mode is active. One published `run` froze `bp-work-5d1215f542d18b4d16ddd500` and `bp-work-97e7eed49d4b1e5cf477974f`. A later controlled resume of those same IDs delivered both companies. The live-run snapshot records `completed`, `delivered=true`, and `supplement_incomplete=false`. A this-round source-review snapshot is written under the frozen plan and does not replace the v1 baseline. There is no closure v2. `scale_quality_claim_allowed` stays false and production stays `not_authorized`. 5.7 remains unchecked pending independent review of that source-review.
+The immutable plan is recorded and the mode is active. One published `run` froze `bp-work-5d1215f542d18b4d16ddd500` and `bp-work-97e7eed49d4b1e5cf477974f`. A later controlled resume of those same IDs delivered both companies. The live-run snapshot records `completed`, `delivered=true`, and `supplement_incomplete=false`. A this-round source-review snapshot is written under the frozen plan and does not replace the v1 baseline. 4.1 from that snapshot fails independently on recall 0/9 < 1.0, unassessed accuracy, and elapsed 862.208 > 300. Reports 2, strata 2, critical numeric errors 0, and tokens 0 meet their gates. `expansion_gates_met=false`. There is no closure v2. A later closure is blocked because zero delivery legally leaves accuracy unassessed while closure v2 requires an assessed accuracy. That block is not fixed in this step. `scale_quality_claim_allowed` stays false and production stays `not_authorized`. Mode stays active.
 
 Capability repairs already tested, not official execution: after `1fe3133b`, pointer, immutable snapshot, and full plan must match, and closure v2 requires a delivered assessed full sample; after `3ec82b97`, active `run` keeps real enqueue accounting; after `23858958`, the sample stays at two companies; after `5fd681d9`, the code foundation was accepted and 3.4 / 3.5 / 4.5 stayed unchecked.
