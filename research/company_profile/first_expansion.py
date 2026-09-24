@@ -29,6 +29,7 @@ from research.company_profile.live_run import (
     LIVE_RUN_SCHEMA_VERSION,
     CompanyProfileLiveRunReport,
     FrozenOfficialReportReference,
+    _exchange_from_instrument_id,
     persist_live_run_report,
 )
 from research.company_profile.models import PRODUCTION_AUTHORIZATION
@@ -113,6 +114,14 @@ class FirstExpansionPlan(_StrictModel):
             != DEFAULT_LIVE_MAX_COMPANIES
         ):
             raise ValueError("first expansion cannot exceed the two-company budget")
+        sampling = self.live_plan.sampling
+        for item in self.selected_strata:
+            if item.exchange not in sampling.exchange_strata:
+                raise ValueError("first expansion stratum exchange is outside the sampling plan")
+            if item.disclosure_form not in sampling.disclosure_form_strata:
+                raise ValueError("first expansion stratum form is outside the sampling plan")
+            if item.exchange != _exchange_from_instrument_id(item.instrument_id):
+                raise ValueError("first expansion stratum exchange must follow the instrument id")
         if "service" not in {item.disclosure_form for item in self.selected_strata}:
             raise ValueError("first expansion plan must occupy a service stratum")
         if len({(item.exchange, item.disclosure_form) for item in self.selected_strata}) < 2:
@@ -418,6 +427,23 @@ def refuse_first_expansion_drift(
             raise ValueError(
                 "report reference drifted from the frozen first-expansion plan"
             )
+    try:
+        recomputed = tuple(
+            (
+                instrument_id,
+                registry.candidate(instrument_id).exchange,
+                assign_disclosure_form(registry.candidate(instrument_id)),
+            )
+            for instrument_id in plan.selected_instrument_ids
+        )
+    except KeyError as exc:
+        raise ValueError("stratum drifted from the frozen first-expansion plan") from exc
+    frozen = tuple(
+        (item.instrument_id, item.exchange, item.disclosure_form)
+        for item in plan.selected_strata
+    )
+    if recomputed != frozen:
+        raise ValueError("stratum drifted from the frozen first-expansion plan")
 
 
 def persist_first_expansion_live_run(
@@ -649,6 +675,18 @@ def _require_observation_matches_plan(
 ) -> None:
     if report.first_expansion_plan_id != plan.plan_id:
         raise ValueError("first-expansion live run must carry the frozen plan id")
+    if report.selected_instrument_ids != plan.selected_instrument_ids:
+        raise ValueError("first-expansion observation must match the frozen instrument ids")
+    observed_strata = tuple(
+        (item.instrument_id, item.exchange, item.disclosure_form)
+        for item in report.selected_strata
+    )
+    frozen_strata = tuple(
+        (item.instrument_id, item.exchange, item.disclosure_form)
+        for item in plan.selected_strata
+    )
+    if observed_strata != frozen_strata:
+        raise ValueError("first-expansion observation must match the frozen strata")
     if report.frozen_report_references != plan.reports:
         raise ValueError(
             "first-expansion observation must match the frozen report references"

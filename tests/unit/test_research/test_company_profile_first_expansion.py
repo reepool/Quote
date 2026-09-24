@@ -423,12 +423,121 @@ def test_public_plan_schema_refuses_consistent_three_company_json():
         FirstExpansionPlan.model_validate_json(json.dumps(repeated))
 
     same_stratum = json.loads(plan.model_dump_json())
+    same_stratum["selected_instrument_ids"][1] = "600004.SH"
+    same_stratum["selected_strata"][1]["instrument_id"] = "600004.SH"
     same_stratum["selected_strata"][1]["exchange"] = same_stratum["selected_strata"][0]["exchange"]
     same_stratum["selected_strata"][1]["disclosure_form"] = same_stratum["selected_strata"][0][
         "disclosure_form"
     ]
+    same_stratum["reports"][1]["instrument_id"] = "600004.SH"
     with pytest.raises(ValidationError, match="strata"):
         FirstExpansionPlan.model_validate_json(json.dumps(same_stratum))
+
+
+def test_plan_rejects_exchange_suffix_mismatch_and_unknown_strata():
+    from research.company_profile.first_expansion import (
+        FirstExpansionPlan,
+        record_first_expansion_plan,
+    )
+
+    plan = record_first_expansion_plan(
+        registry=_registry(),
+        knowledge_cutoff=_CUTOFF,
+        official_bindings=_bindings(),
+    )
+    assert "000878.SZ" in plan.selected_instrument_ids
+    payload = json.loads(plan.model_dump_json())
+    for item in payload["selected_strata"]:
+        if item["instrument_id"] == "000878.SZ":
+            item["exchange"] = "BSE"
+    with pytest.raises(ValidationError, match="instrument id"):
+        FirstExpansionPlan.model_validate_json(json.dumps(payload))
+
+    fake_exchange = json.loads(plan.model_dump_json())
+    other = next(
+        item
+        for item in fake_exchange["selected_strata"]
+        if item["instrument_id"] != "601888.SH"
+    )
+    other["exchange"] = "FAKE"
+    with pytest.raises(ValidationError, match="exchange is outside"):
+        FirstExpansionPlan.model_validate_json(json.dumps(fake_exchange))
+
+    fake_form = json.loads(plan.model_dump_json())
+    other = next(
+        item
+        for item in fake_form["selected_strata"]
+        if item["instrument_id"] != "601888.SH"
+    )
+    other["disclosure_form"] = "invented"
+    with pytest.raises(ValidationError, match="form is outside"):
+        FirstExpansionPlan.model_validate_json(json.dumps(fake_form))
+
+
+def test_drift_refuses_registry_stratum_change_and_live_run_stratum_mismatch(tmp_path):
+    from research.company_profile.first_expansion import (
+        persist_first_expansion_live_run,
+        record_first_expansion_plan,
+        refuse_first_expansion_drift,
+    )
+    from research.company_profile.live_run import (
+        CompanyProfileLiveRunReport,
+        record_live_run_report,
+    )
+
+    registry = _registry()
+    plan = record_first_expansion_plan(
+        registry=registry,
+        knowledge_cutoff=_CUTOFF,
+        official_bindings=_bindings(),
+    )
+    drifted_registry = build_a_share_candidate_registry(
+        as_of=_CUTOFF,
+        universe_snapshot_id="snap-full",
+        universe_coverage_guarantee="full_market",
+        eligible_instruments=[
+            {"instrument_id": "000878.SZ", "exchange": "BSE", "name": "云南铜业"},
+            {"instrument_id": "601888.SH", "exchange": "SSE", "name": "中国中免"},
+            {"instrument_id": "600000.SH", "exchange": "SSE", "name": "浦发银行"},
+        ],
+        asset_coverage={
+            "000878.SZ": {"status": "available", "fiscal_year": 2025},
+            "601888.SH": {"status": "available", "fiscal_year": 2025},
+            "600000.SH": {"status": "available", "fiscal_year": 2025},
+        },
+        industry_memberships={
+            "000878.SZ": {"sw_l1_name": "商贸零售", "taxonomy_system": "sw"},
+            "601888.SH": {"sw_l1_name": "社会服务", "taxonomy_system": "sw"},
+            "600000.SH": {"sw_l1_name": "银行", "taxonomy_system": "sw"},
+        },
+        effective_reports={
+            "000878.SZ": _effective_report(asset_id="asset-000878", content_hash=_HASH_A),
+            "601888.SH": _effective_report(asset_id="asset-601888", content_hash=_HASH_B),
+            "600000.SH": _effective_report(asset_id="asset-600000", content_hash=_HASH_C),
+        },
+    )
+    with pytest.raises(ValueError, match="stratum"):
+        refuse_first_expansion_drift(
+            plan,
+            knowledge_cutoff=_CUTOFF,
+            registry=drifted_registry,
+            official_bindings=_bindings(),
+        )
+
+    expansion = record_live_run_report(
+        plan=plan.live_plan,
+        registry=registry,
+        selected_instrument_ids=plan.selected_instrument_ids,
+        delivered_instrument_ids=plan.selected_instrument_ids,
+        knowledge_cutoff=_CUTOFF,
+        first_expansion_plan_id=plan.plan_id,
+        frozen_report_references=plan.reports,
+    )
+    observed = json.loads(expansion.model_dump_json())
+    observed["selected_strata"][0]["disclosure_form"] = "finance"
+    drifted_run = CompanyProfileLiveRunReport.model_validate_json(json.dumps(observed))
+    with pytest.raises(ValueError, match="strata"):
+        persist_first_expansion_live_run(drifted_run, tmp_path, plan)
 
 
 def test_active_mode_refuses_cutoff_registry_or_report_drift(tmp_path):
