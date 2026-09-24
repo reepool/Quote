@@ -27,11 +27,11 @@ Checked tasks below mean the control capability is implemented and tested. They 
 
 ## 5. Official first expansion, not yet executed
 
-Do not check any task in this section until that official step has actually happened. Do not run an ordinary published `run` before the immutable plan is recorded and first expansion is activated. That ordinary run is not a substitute for this first expansion. If the fixed two-company draw does not include `service`, stop at 5.2 and do not record a plan, activate, enqueue, or review source pages.
+Do not check 5.3–5.12 until that official step has actually happened. Do not run an ordinary published `run` before the immutable plan is recorded and first expansion is activated. That ordinary run is not a substitute for this first expansion. The 2026-09-24 read-only probe showed the current global priority fills both seats with manufacturing, so 5.3 waits for the reserved-seat rule in 7.1. Do not enlarge the sample or change ordinary live-run priority because 5.2 found no `service`.
 
-- [ ] 5.1 Read-only re-probe of the official registry. Do not write a plan, mode, snapshot, or closure
-- [ ] 5.2 Confirm whether the fixed two-company sample under the current rule includes `service`
-- [ ] 5.3 If 5.2 includes `service`, record the immutable first-expansion plan
+- [x] 5.1 Read-only re-probe of the official registry at `knowledge_cutoff=2026-09-17` completed. No plan, mode, snapshot, or closure was written
+- [x] 5.2 The current two-company rule selected two manufacturing names and does not include `service`, although legal service candidates exist later in the priority
+- [ ] 5.3 After 7.1 is implemented and reviewed, record the immutable first-expansion plan from the reserved-seat sample. If that sample has no `service`, refuse and do not activate
 - [ ] 5.4 Activate first expansion only after 5.3
 - [ ] 5.5 Execute the published `run`/`resume` only after 5.4
 - [ ] 5.6 Confirm the independent live-run snapshot has been written
@@ -42,7 +42,13 @@ Do not check any task in this section until that official step has actually happ
 - [ ] 5.11 Write operator closure v2 and set the mode to `completed`
 - [ ] 5.12 After independent Review of the official execution, archiving this change is allowed. Do not authorize production or the next expansion
 
-The former unchecked 3.4, 3.5, and 4.5 are this section. They stay unchecked.
+The former unchecked 3.4, 3.5, and 4.5 are this section. 5.3–5.12 stay unchecked.
+
+## 7. Reserved service seat, not yet implemented
+
+Contract review must pass before any code change. Do not change ordinary live-run `_STRATUM_PRIORITY`, the two-company budget, or the closed Shenwan table.
+
+- [ ] 7.1 Implement and test the first-expansion-only rule that reserves one `service` seat inside the two-company budget, fills the other seat from the remaining global priority, requires two different strata, and refuses when no legal `service` candidate exists
 
 ## 6. Retained history
 

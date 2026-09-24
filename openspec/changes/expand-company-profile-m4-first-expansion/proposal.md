@@ -9,6 +9,7 @@
 - 首次扩大完成后进入 `completed`：不得自动开启下一轮，不得继续重跑冻结样本；重复 `run` 在 `active` 且已交付时幂等返回。
 - enqueue 前持久化不可变 `company_profile_first_expansion_plan.v1`：绑定 `knowledge_cutoff`、选样所用 universe/registry 时点或身份，以及每家正式年报的 `asset_id`/`report_id`、`report_period`、`document_version`（按现有字段）。漂移拒绝，不得静默换新版本。
 - 新 live-run / source-review 写独立快照，携带同一 plan 引用和报告引用；不得覆盖当前两家公司 7/7 的 v1 基线。
+- 首次扩大仍只选两家。专用选样预留一个 `service` 名额，另一个名额按现有全局优先级从剩余候选填充。没有合法 `service` 候选则拒绝。普通 live-run 的 `_STRATUM_PRIORITY` 不变。
 - 发布 `company_profile_operator_closure.v2` 并保留 v1。v2 使用执行后语义；不授权下一轮扩大、规模质量或生产。
 - 不建行业包，不抽净息差 / 成本收入比 / 贷款结构，不预授权 v5。生产继续 `not_authorized`。
 
