@@ -18,7 +18,7 @@
 - [ ] 3.4 Independently review official pages and recount 4.1; do not presume 7/7
 - [ ] 3.5 If a reusable interpretability gap appears, record it and stop; do not add an extractor or v5 in this change
 
-Official 2026-09-17 registry probe: 5564 names, available forms `{other: 5474, manufacturing: 1}`, `service_available_count=0`. Existing classification path cannot occupy `service`. Stopped before activate/enqueue. Did not hard-code an instrument or change the Shenwan L1 table.
+Historical baseline before the taxonomy parent-chain read, 2026-09-17 registry probe: 5564 names, available forms `{other: 5474, manufacturing: 1}`, `service_available_count=0`. That count is not the post-fix conclusion. The official registry has not been re-probed since `read-as-of-shenwan-l1-for-profile-strata` archived. Stopped before activate/enqueue. Did not hard-code an instrument or change the Shenwan L1 table. The two-company budget is unchanged.
 
 A-class contract repair after `1fe3133b`: runtime now requires pointer + immutable snapshot + full plan equality; observation snapshots must match `plan.reports`; current asset `asset_id`/`report_id`/`report_period`/`document_version` freeze and compare together; work ids persist before drain; resume marks delivery; closure v2 requires a delivered, assessed, full-sample review.
 
@@ -28,7 +28,7 @@ Two-company cap repair after `23858958`: `record_first_expansion_plan()` samples
 
 Contract lock after `5cfa40c3`: design and spec require the fixed two-company budget and refuse a public plan payload enlarged to three companies.
 
-Code-slice acceptance at `5fd681d9`: independent recheck closed the OpenSpec two-company contract and the public three-company schema counterexample. This accepts the code foundation only. 3.4 / 3.5 / 4.5 stay unchecked. The change stays open. Official registry still has no legal `service` sample; the as-of Shenwan L1 read is a separate change and must not alter this slice's two-company budget.
+Code-slice acceptance at `5fd681d9`: independent recheck closed the OpenSpec two-company contract and the public three-company schema counterexample. This accepts the code foundation only. 3.4 / 3.5 / 4.5 stay unchecked. The change stays open. The control code is implemented, but no first-expansion plan or mode has been recorded, and this slice has not activated, enqueued, reviewed source pages, or written closure v2. The as-of Shenwan L1 read is archived and must not alter this slice's two-company budget. `scale_quality_claim_allowed` stays false and production stays `not_authorized`.
 
 ## 4. Operator closure v2 and completion
 

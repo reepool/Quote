@@ -132,7 +132,8 @@ OpenSpec CLI 位于：
 - `company_profile_product_and_industry_semantic_requirements.md`：全 A 股核心骨架、主体默认政策、基础商品暴露和持续任务路线的唯一权威总需求；
 - `../../openspec/changes/archive/2026-09-17-deliver-a-share-core-profiles-and-commodity-exposure/`：已归档的全 A 股通用骨架与基础商品暴露实施；生产仍未授权；2026-09-17 首次观察未过 4.1 门槛；
 - `../../openspec/changes/archive/2026-09-17-interpret-owned-page-company-total-and-bank-income-mix/`：已验收并归档的 `owned_page_facts=v4`；重新核原文后 recall 7/7、accuracy 7/7，4.1 数字门槛此次算过；独立 Review 已通过；不是生产授权；
-- `../../openspec/changes/expand-company-profile-m4-first-expansion/`：已提案的 M4 第一片，只待审范围，不得直接实现；不是生产授权；
+- `../../openspec/changes/archive/2026-09-24-read-as-of-shenwan-l1-for-profile-strata/`：已归档的 as-of 申万一级名称读取。正式历史行只有股票代码、行业代码、计入日期和更新时间；一级名称沿同版本活动 taxonomy 父链解析；顶层 `sw_l1_name` 优先；不读嵌套 L1 名称；断链为 `other`；不回退 cutoff 后的当前 membership。2026-09-17 `service_available_count=0` 只是修复前历史基线，修复后尚未重新探查正式 registry；不是生产授权；
+- `../../openspec/changes/expand-company-profile-m4-first-expansion/`：首次扩大控制代码基础已实现，两家公司预算不变。尚未记录 plan、未激活、未 enqueue、未核原文、未写 closure v2。`scale_quality_claim_allowed=false`，生产仍为 `not_authorized`；
 - `company_profile_industry_research_method.md`：行业增强研究方法，不是全市场基础画像前置门；
 - `company_profile_industry_requirements_template.md`：独立行业 requirements 模板；
 - `company_profile_industry_sample_manifest.template.json`、`company_profile_industry_gold_annotation.template.json`：`research_contract_only` 的样本与 gold 标注模板；
