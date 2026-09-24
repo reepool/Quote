@@ -340,6 +340,18 @@ class CompanyProfileStageRuntime:
     ) -> dict[str, Any]:
         if (state.report is None or not state.pages) and self.page_source is not None:
             loaded = self.page_source(item)
+            if isinstance(loaded, Mapping) and loaded.get("pdf_parse_failed"):
+                return {
+                    "status": "blocked",
+                    "reason": "pdf_parse_failed",
+                    "quality": {
+                        "stage_ready": False,
+                        "blocking_machine_rework": 1,
+                        "machine_rework_reasons": {"pdf_parse_failed": 1},
+                    },
+                    "storage_namespace": COMMON_CORE_STORAGE_NAMESPACE,
+                    "production_authorization": PRODUCTION_AUTHORIZATION,
+                }
             if loaded:
                 state = self._bind(
                     {**dict(item), **dict(loaded), "work_id": state.work_id}

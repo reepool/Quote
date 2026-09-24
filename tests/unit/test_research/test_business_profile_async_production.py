@@ -91,6 +91,89 @@ def _configure_empty_shared_assets(manager, tmp_path):
     return shared
 
 
+def test_pdf_parse_failed_requeue_claims_only_named_works(tmp_path):
+    storage = _storage(tmp_path)
+    _frontier(storage)
+    queue = BusinessProfileWorkRepository(
+        storage,
+        checkpoint_root=tmp_path / "checkpoints",
+    )
+    queue.enqueue_latest_annual(
+        knowledge_cutoff="2026-08-30",
+        processing_identity={"rules": "v1"},
+    )
+    with storage.get_connection() as conn:
+        row = conn.execute(
+            "SELECT work_id, frontier_id, instrument_id, source, announcement_id, "
+            "report_period, document_type, policy, processing_identity_hash, "
+            "checkpoint_path, created_at FROM business_profile_work_items"
+        ).fetchone()
+        base = dict(row)
+        frozen = ("bp-work-frozen-a", "bp-work-frozen-b")
+        other = "bp-work-other"
+        now = base["created_at"]
+        conn.execute("DELETE FROM business_profile_work_items")
+        for work_id, instrument_id in (
+            (frozen[0], "600004.SH"),
+            (frozen[1], "600006.SH"),
+            (other, "600000.SH"),
+        ):
+            conn.execute(
+                """
+                INSERT INTO business_profile_work_items (
+                    work_id, frontier_id, instrument_id, source, announcement_id,
+                    report_period, document_type, policy, processing_identity_hash,
+                    stage, status, checkpoint_path, metadata_json, created_at, updated_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'semantic', 'machine_rework', ?, '{}', ?, ?)
+                """,
+                (
+                    work_id,
+                    f"{base['frontier_id']}-{work_id}",
+                    instrument_id,
+                    base["source"],
+                    f"{base['announcement_id']}-{work_id}",
+                    base["report_period"],
+                    base["document_type"],
+                    base["policy"],
+                    base["processing_identity_hash"],
+                    base["checkpoint_path"],
+                    now,
+                    now,
+                ),
+            )
+        conn.commit()
+
+    recovered = queue.requeue_pdf_parse_failed_works(frozen)
+    claimed = queue.claim(
+        "acquire",
+        limit=10,
+        lease_owner="resume-test",
+        lease_seconds=30,
+        include_work_ids=frozen,
+    )
+    leftover = queue.claim(
+        "acquire",
+        limit=10,
+        lease_owner="resume-test-other",
+        lease_seconds=30,
+    )
+
+    assert recovered == frozen
+    assert tuple(item["work_id"] for item in claimed) == frozen
+    assert leftover == ()
+    other_item = queue.get(other)
+    assert other_item["status"] == "machine_rework"
+    for work_id in frozen:
+        item = queue.get(work_id)
+        assert item["stage"] == "acquire"
+        assert item["status"] == "running"
+        assert item["processing_identity_hash"] == base["processing_identity_hash"]
+        assert item["metadata"]["pdf_parse_retry_authorized"] is True
+        assert item["metadata"]["recovery_history"][-1]["reason"] == (
+            "pdf_parse_failed_controlled_retry"
+        )
+
+
 def test_latest_annual_enqueue_is_idempotent_and_excludes_semiannual(tmp_path):
     storage = _storage(tmp_path)
     _frontier(storage)

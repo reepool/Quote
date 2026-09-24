@@ -224,7 +224,12 @@ class OfficialAnnualReportPageSource:
         from research.company_profile.models import ReportIdentity
 
         try:
-            extracted = ensure_archived_pdf_page_artifact(asset)
+            extracted = ensure_archived_pdf_page_artifact(
+                asset,
+                retry_failed_artifact=bool(
+                    (item.get("metadata") or {}).get("pdf_parse_retry_authorized")
+                ),
+            )
         except Exception as exc:  # noqa: BLE001 - extract failures become machine_rework
             logger.warning(
                 "company-profile official annual-report pages unavailable: %s",
@@ -232,6 +237,8 @@ class OfficialAnnualReportPageSource:
             )
             return None
         artifact = extracted.get("artifact")
+        if getattr(artifact, "status", "") == "parse_failed":
+            return {"pdf_parse_failed": True}
         raw_pages = getattr(artifact, "pages", None) or []
         pages = [
             {
@@ -1052,6 +1059,8 @@ def _supplement_incomplete(item: Mapping[str, Any]) -> bool:
         reasons = dict((result.get("quality") or {}).get("machine_rework_reasons") or {})
         if int(reasons.get("pages_not_bound") or 0) > 0:
             return True
+        if int(reasons.get("pdf_parse_failed") or 0) > 0:
+            return False
     return False
 
 

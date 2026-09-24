@@ -1161,6 +1161,7 @@ def ensure_archived_pdf_page_artifact(
     recovery_policy: str = "native_first",
     mode_budget: Any | None = None,
     cache_backend: Any | None = None,
+    retry_failed_artifact: bool = False,
 ) -> Dict[str, Any]:
     """Create or reuse native page artifacts for one verified archived PDF."""
 
@@ -1198,32 +1199,44 @@ def ensure_archived_pdf_page_artifact(
             expected_extractor_version=active_extractor.extractor_version,
             expected_parameter_hash=parameter_hash,
         )
-        completed = time.monotonic()
-        timings = {
-            "hash_read_seconds": round(hash_completed - started, 6),
-            "cache_read_seconds": round(completed - hash_completed, 6),
-            "extract_seconds": 0.0,
-            "write_seconds": 0.0,
-            "total_seconds": round(completed - started, 6),
-        }
-        logger.info(
-            "business-profile pdf artifact cache hit source_file_id=%s "
-            "bytes=%s pages=%s timings=%s path=%s",
-            source_file_id,
-            len(content),
-            artifact.page_count,
-            timings,
-            artifact_path,
-        )
-        return {
-            "artifact": artifact,
-            "artifact_path": str(artifact_path),
-            "artifact_hash": artifact.artifact_hash,
-            "status": "unchanged",
-            "cache_status": "hit",
-            "timings": timings,
-            "pypdf_warning_count": 0,
-        }
+        if artifact.status == "parse_failed" and retry_failed_artifact:
+            retained = artifact_path.with_name(
+                f"{artifact_path.name}.parse_failed.{int(time.time())}"
+            )
+            artifact_path.replace(retained)
+            logger.info(
+                "business-profile pdf parse_failed artifact retained for retry "
+                "source_file_id=%s retained=%s",
+                source_file_id,
+                retained,
+            )
+        else:
+            completed = time.monotonic()
+            timings = {
+                "hash_read_seconds": round(hash_completed - started, 6),
+                "cache_read_seconds": round(completed - hash_completed, 6),
+                "extract_seconds": 0.0,
+                "write_seconds": 0.0,
+                "total_seconds": round(completed - started, 6),
+            }
+            logger.info(
+                "business-profile pdf artifact cache hit source_file_id=%s "
+                "bytes=%s pages=%s timings=%s path=%s",
+                source_file_id,
+                len(content),
+                artifact.page_count,
+                timings,
+                artifact_path,
+            )
+            return {
+                "artifact": artifact,
+                "artifact_path": str(artifact_path),
+                "artifact_hash": artifact.artifact_hash,
+                "status": "unchanged",
+                "cache_status": "hit",
+                "timings": timings,
+                "pypdf_warning_count": 0,
+            }
     extract_started = time.monotonic()
     with _aggregate_pypdf_warnings() as warning_summary:
         artifact = active_extractor.extract_bytes(

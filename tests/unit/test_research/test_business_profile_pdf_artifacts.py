@@ -388,6 +388,65 @@ def test_archived_manifest_page_artifact_is_hash_bound_and_reused(tmp_path):
         ensure_archived_pdf_page_artifact(manifest)
 
 
+def test_failed_artifact_cache_does_not_block_explicit_retry(tmp_path):
+    source_path = tmp_path / "original" / "report.pdf"
+    source_path.parent.mkdir(parents=True)
+    content = _pdf_bytes(["Principal Business native text"])
+    source_path.write_bytes(content)
+    manifest = {
+        "source_file_id": "source-1",
+        "archive_path": str(source_path),
+        "content_hash": __import__("hashlib").sha256(content).hexdigest(),
+    }
+
+    class FailOnceExtractor(BusinessProfilePdfArtifactExtractor):
+        def __init__(self):
+            super().__init__(low_text_character_threshold=5)
+            self.calls = 0
+
+        def extract_bytes(self, raw, **kwargs):
+            self.calls += 1
+            if self.calls == 1:
+                return self._failure_artifact(
+                    source_file_id=kwargs.get("source_file_id"),
+                    source_pdf_path=kwargs.get("source_pdf_path"),
+                    source_content_hash=manifest["content_hash"],
+                    parameter_hash=self._parameter_hash(
+                        self._normalize_target_pages(kwargs.get("target_page_numbers") or ()),
+                        ocr_mode=kwargs.get("ocr_mode") or "none",
+                        recovery_policy=kwargs.get("recovery_policy") or "native_first",
+                    ),
+                    failure_class="native_worker_exit",
+                    error=RuntimeError("native worker exited with code 1"),
+                )
+            return super().extract_bytes(raw, **kwargs)
+
+    extractor = FailOnceExtractor()
+    failed = ensure_archived_pdf_page_artifact(manifest, extractor=extractor)
+    blocked = ensure_archived_pdf_page_artifact(manifest, extractor=extractor)
+    calls_after_block = extractor.calls
+    recovered = ensure_archived_pdf_page_artifact(
+        manifest,
+        extractor=extractor,
+        retry_failed_artifact=True,
+    )
+
+    assert failed["artifact"].status == "parse_failed"
+    assert blocked["cache_status"] == "hit"
+    assert blocked["artifact"].status == "parse_failed"
+    assert recovered["cache_status"] == "miss"
+    assert recovered["artifact"].status == "parsed"
+    assert recovered["artifact"].page_count > 0
+    assert extractor.calls == calls_after_block + 1
+    assert source_path.read_bytes() == content
+    retained = list(tmp_path.rglob("*.parse_failed.*"))
+    assert len(retained) == 1
+    import gzip
+
+    retained_text = gzip.decompress(retained[0].read_bytes()).decode("utf-8")
+    assert "native worker exited with code 1" in retained_text
+
+
 def test_archived_artifact_cache_is_separate_for_engine_profiles(tmp_path):
     source_path = tmp_path / "original" / "report.pdf"
     source_path.parent.mkdir(parents=True)

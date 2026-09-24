@@ -504,6 +504,68 @@ def test_live_run_outcomes_ignore_historical_profiles_and_parser_crashes(tmp_pat
     assert outcomes["600036.SH"]["supplement_incomplete"] is False
 
 
+def test_parse_failed_artifact_is_not_supplement_incomplete(tmp_path):
+    from research.company_profile.operations import (
+        OfficialAnnualReportPageSource,
+        _supplement_incomplete,
+    )
+    from research.company_profile.runtime import (
+        CompanyProfileResearchWriter,
+        CompanyProfileStageRuntime,
+    )
+
+    class _Artifact:
+        status = "parse_failed"
+        pages: tuple = ()
+        recovery_state = "source_unrecoverable"
+
+    class _Repository:
+        shared_asset_access = object()
+        checkpoint_root = tmp_path
+
+        def get_bound_source_asset(self, item):
+            return {
+                "archive_path": str(tmp_path / "report.pdf"),
+                "content_hash": "a" * 64,
+                "published_at": "2026-03-31T00:00:00+08:00",
+                "source_asset_id": "filing-1",
+            }
+
+    source = OfficialAnnualReportPageSource(_Repository())
+
+    def _failed_extract(asset, **kwargs):
+        return {"artifact": _Artifact()}
+
+    import research.business_profile_pdf_artifacts as artifacts
+
+    original = artifacts.ensure_archived_pdf_page_artifact
+    artifacts.ensure_archived_pdf_page_artifact = _failed_extract
+    try:
+        loaded = source({"work_id": "bp-work-frozen", "instrument_id": "600004.SH"})
+    finally:
+        artifacts.ensure_archived_pdf_page_artifact = original
+    assert loaded == {"pdf_parse_failed": True}
+
+    runtime = CompanyProfileStageRuntime(
+        writer=CompanyProfileResearchWriter(
+            tmp_path / "output",
+            checkpoint_root=tmp_path / "checkpoints",
+        ),
+        page_source=lambda item: {"pdf_parse_failed": True},
+    )
+    blocked = runtime._acquire(runtime._bind({"work_id": "bp-work-frozen"}), {"work_id": "bp-work-frozen"})
+    assert blocked["reason"] == "pdf_parse_failed"
+    assert _supplement_incomplete(
+        {
+            "metadata": {
+                "stage_results": {
+                    "acquire": blocked,
+                }
+            }
+        }
+    ) is False
+
+
 def test_empty_live_selection_does_not_enqueue_the_full_frontier(tmp_path):
     storage = _storage(tmp_path)
     _second_frontier(storage)

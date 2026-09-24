@@ -896,6 +896,59 @@ class BusinessProfileWorkRepository:
             return "context_reselect_deferred"
         return "machine_rework"
 
+    def requeue_pdf_parse_failed_works(
+        self,
+        work_ids: Sequence[str],
+    ) -> tuple[str, ...]:
+        """Return exact machine_rework items to claimable acquire without a new identity."""
+
+        wanted = tuple(dict.fromkeys(str(item) for item in work_ids if str(item)))
+        if not wanted:
+            return ()
+        now = get_shanghai_time().isoformat()
+        recovered: list[str] = []
+        with self.storage.get_connection() as conn:
+            self.storage._apply_pragmas(conn)
+            conn.execute("BEGIN IMMEDIATE")
+            for work_id in wanted:
+                row = conn.execute(
+                    "SELECT * FROM business_profile_work_items WHERE work_id = ?",
+                    (work_id,),
+                ).fetchone()
+                if row is None or str(row["status"]) != "machine_rework":
+                    continue
+                item = _decode_work_row(row)
+                metadata = dict(item.get("metadata") or {})
+                history = list(metadata.get("recovery_history") or [])
+                history.append(
+                    {
+                        "reason": "pdf_parse_failed_controlled_retry",
+                        "recovered_at": now,
+                        "from_stage": item.get("stage"),
+                        "from_status": item.get("status"),
+                        "from_attempt_count": item.get("attempt_count"),
+                        "invalidated_stage_results": metadata.get("stage_results") or {},
+                    }
+                )
+                metadata["recovery_history"] = history[-10:]
+                metadata.pop("stage_results", None)
+                metadata["pdf_parse_retry_authorized"] = True
+                cursor = conn.execute(
+                    """
+                    UPDATE business_profile_work_items
+                    SET stage = 'acquire', status = 'pending', attempt_count = 0,
+                        next_attempt_at = NULL, lease_owner = NULL,
+                        lease_expires_at = NULL, last_error = NULL,
+                        metadata_json = ?, completed_at = NULL, updated_at = ?
+                    WHERE work_id = ? AND status = 'machine_rework'
+                    """,
+                    (_canonical_json(metadata), now, work_id),
+                )
+                if int(cursor.rowcount or 0) == 1:
+                    recovered.append(work_id)
+            conn.commit()
+        return tuple(recovered)
+
     def get(self, work_id: str) -> dict[str, Any]:
         with self.storage.get_connection() as conn:
             self.storage._apply_pragmas(conn)

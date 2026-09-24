@@ -34,7 +34,7 @@ Do not check 5.6–5.12 until that official step has actually happened. Do not e
 - [x] 5.3 Recorded immutable plan `cd8031cb5a440da19d7a7b8a41af0fdf` for `600004.SH` SSE service and `600006.SH` SSE manufacturing at `knowledge_cutoff=2026-09-17`, snapshot `universe_5a919396af823bb61d02a7894b330184`. Mode remains `inactive`. Did not activate
 - [x] 5.4 Activated first expansion through `CompanyProfileTaskService.activate_first_expansion_from_registry()`. Mode is `active`, `plan_id=cd8031cb5a440da19d7a7b8a41af0fdf`, `work_ids=()`, `delivered=false`. Did not run, enqueue, or write an observation
 - [x] 5.5 Executed one published `run` at `knowledge_cutoff=2026-09-17`. Returned `action=run`, `state=incomplete`. Enqueued and froze `bp-work-5d1215f542d18b4d16ddd500` (`600004.SH`) and `bp-work-97e7eed49d4b1e5cf477974f` (`600006.SH`). Did not resume, source-review, recount 4.1, or write closure v2
-- [ ] 5.6 Confirm the independent live-run snapshot has been written
+- [x] 5.6 Confirmed the independent live-run snapshot after controlled resume. Both frozen works completed with `delivered=true` and `supplement_incomplete=false`. Did not write source-review or closure v2
 - [ ] 5.7 Independently review the official pages and write the source-review snapshot
 - [ ] 5.8 Recalculate 4.1 from that source review. Do not presume 7/7
 - [ ] 5.9 Judge and record any reusable interpretability gap. Do not add an extractor or `owned_page_facts=v5` in this change
@@ -58,6 +58,6 @@ These observations stay as history and are not overwritten:
 - The original two-company v1 live-run and source-review baseline files remain the retained 7/7 observation.
 - Existing v1–v4 work JSON remains on disk.
 
-The immutable plan is recorded and the mode is active. One published `run` has enqueued the frozen sample. Work IDs are `bp-work-5d1215f542d18b4d16ddd500` and `bp-work-97e7eed49d4b1e5cf477974f`. There is no source-review snapshot or closure v2. `scale_quality_claim_allowed` stays false and production stays `not_authorized`.
+The immutable plan is recorded and the mode is active. One published `run` froze `bp-work-5d1215f542d18b4d16ddd500` and `bp-work-97e7eed49d4b1e5cf477974f`. A later controlled resume of those same IDs delivered both companies. The live-run snapshot records `completed`, `delivered=true`, and `supplement_incomplete=false`. There is no source-review snapshot or closure v2. `scale_quality_claim_allowed` stays false and production stays `not_authorized`.
 
 Capability repairs already tested, not official execution: after `1fe3133b`, pointer, immutable snapshot, and full plan must match, and closure v2 requires a delivered assessed full sample; after `3ec82b97`, active `run` keeps real enqueue accounting; after `23858958`, the sample stays at two companies; after `5fd681d9`, the code foundation was accepted and 3.4 / 3.5 / 4.5 stayed unchecked.
