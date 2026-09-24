@@ -48,7 +48,7 @@ The former unchecked 3.4, 3.5, and 4.5 are this section. 5.3–5.12 stay uncheck
 
 Contract review must pass before any code change. Do not change ordinary live-run `_STRATUM_PRIORITY`, the two-company budget, or the closed Shenwan table.
 
-- [ ] 7.1 Implement and test the first-expansion-only rule that reserves one `service` seat inside the two-company budget, fills the other seat from the remaining global priority, requires two different strata, and refuses when no legal `service` candidate exists
+- [x] 7.1 Implement and test the first-expansion-only rule that reserves one `service` seat inside the two-company budget, fills the other seat from the remaining global priority, requires two different strata, and refuses when no legal `service` candidate exists
 
 ## 6. Retained history
 

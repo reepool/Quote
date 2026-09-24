@@ -30,7 +30,6 @@ from research.company_profile.live_run import (
     CompanyProfileLiveRunReport,
     FrozenOfficialReportReference,
     persist_live_run_report,
-    select_live_run_targets,
 )
 from research.company_profile.models import PRODUCTION_AUTHORIZATION
 from research.company_profile.operator_closure import (
@@ -105,15 +104,19 @@ class FirstExpansionPlan(_StrictModel):
             self.selected_instrument_ids
         ):
             raise ValueError("frozen reports must follow selected instrument ids")
-        if len(self.selected_instrument_ids) > DEFAULT_LIVE_MAX_COMPANIES:
-            raise ValueError("first expansion cannot freeze more than two companies")
+        if len(self.selected_instrument_ids) != DEFAULT_LIVE_MAX_COMPANIES:
+            raise ValueError("first expansion must freeze exactly two companies")
+        if len(set(self.selected_instrument_ids)) != DEFAULT_LIVE_MAX_COMPANIES:
+            raise ValueError("first expansion cannot repeat an instrument")
         if (
             self.live_plan.budget.max_companies_this_round
-            > DEFAULT_LIVE_MAX_COMPANIES
+            != DEFAULT_LIVE_MAX_COMPANIES
         ):
             raise ValueError("first expansion cannot exceed the two-company budget")
         if "service" not in {item.disclosure_form for item in self.selected_strata}:
             raise ValueError("first expansion plan must occupy a service stratum")
+        if len({(item.exchange, item.disclosure_form) for item in self.selected_strata}) < 2:
+            raise ValueError("first expansion must occupy two different strata")
         if self.registry.as_of != self.knowledge_cutoff:
             raise ValueError("registry as_of must match knowledge_cutoff")
         return self
@@ -182,24 +185,14 @@ def record_first_expansion_plan(
     official_bindings: Mapping[str, Mapping[str, Any]] | None = None,
     official_access: Any | None = None,
 ) -> FirstExpansionPlan:
-    """Freeze at most two companies; refuse if that sample has no service stratum."""
+    """Freeze two companies, including one reserved service seat."""
 
     cutoff = str(knowledge_cutoff or "").strip()
     if registry.as_of != cutoff:
         raise ValueError("knowledge_cutoff must match the registry as_of used to sample")
-    candidate_plan = record_company_profile_live_plan(
-        max_companies_this_round=DEFAULT_LIVE_MAX_COMPANIES
-    )
-    selected = select_live_run_targets(registry, candidate_plan)
-    if len(selected) > DEFAULT_LIVE_MAX_COMPANIES:
-        raise ValueError("first expansion cannot freeze more than two companies")
-    if "service" not in {
-        assign_disclosure_form(registry.candidate(instrument_id))
-        for instrument_id in selected
-    }:
-        raise ValueError("first expansion cannot activate without a service stratum")
+    selected = select_first_expansion_targets(registry)
     live_plan = record_company_profile_live_plan(
-        max_companies_this_round=len(selected)
+        max_companies_this_round=DEFAULT_LIVE_MAX_COMPANIES
     )
     resolved_bindings = dict(official_bindings or {})
     if official_access is not None:
@@ -247,6 +240,63 @@ def record_first_expansion_plan(
         selected_strata=strata,
         reports=reports,
     )
+
+
+def select_first_expansion_targets(
+    registry: AShareCandidateRegistry,
+) -> tuple[str, str]:
+    """Reserve one service seat, then fill a different stratum from global priority.
+
+    Ordinary live-run sampling is unchanged. This selector is only for the
+    first-expansion plan.
+    """
+
+    rule = record_company_profile_live_plan(
+        max_companies_this_round=DEFAULT_LIVE_MAX_COMPANIES
+    ).sampling
+    exchange_order = {name: index for index, name in enumerate(rule.exchange_strata)}
+    eligible = [
+        candidate
+        for candidate in registry.candidates
+        if candidate.exchange in exchange_order
+        and candidate.asset_status == rule.review_eligible_asset_status
+        and (
+            not rule.review_requires_latest_effective_annual_report
+            or candidate.latest_effective_annual_report is not None
+        )
+    ]
+    services = sorted(
+        (
+            candidate
+            for candidate in eligible
+            if assign_disclosure_form(candidate) == "service"
+        ),
+        key=lambda candidate: (
+            exchange_order[candidate.exchange],
+            candidate.instrument_id,
+        ),
+    )
+    if not services:
+        raise ValueError("first expansion cannot activate without a service stratum")
+    service = services[0]
+    service_key = (service.exchange, "service")
+    buckets: dict[tuple[str, str], list[str]] = {
+        stratum: [] for stratum in rule.stratum_priority
+    }
+    for candidate in eligible:
+        if candidate.instrument_id == service.instrument_id:
+            continue
+        key = (candidate.exchange, assign_disclosure_form(candidate))
+        if key == service_key or key not in buckets:
+            continue
+        buckets[key].append(candidate.instrument_id)
+    for stratum in rule.stratum_priority:
+        if stratum == service_key:
+            continue
+        members = sorted(set(buckets[stratum]))
+        if members:
+            return (service.instrument_id, members[0])
+    raise ValueError("first expansion cannot activate without a second stratum")
 
 
 def persist_first_expansion_plan(
