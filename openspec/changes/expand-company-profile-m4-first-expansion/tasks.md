@@ -27,12 +27,12 @@ Checked tasks below mean the control capability is implemented and tested. They 
 
 ## 5. Official first expansion, not yet executed
 
-Do not check 5.4–5.12 until that official step has actually happened. Do not run an ordinary published `run` before first expansion is activated. That ordinary run is not a substitute for this first expansion. Do not enlarge the sample or change ordinary live-run priority.
+Do not check 5.5–5.12 until that official step has actually happened. Do not run an ordinary published `run` as a substitute for the activated first expansion. Do not enlarge the sample or change ordinary live-run priority.
 
 - [x] 5.1 Read-only re-probe of the official registry at `knowledge_cutoff=2026-09-17` completed. No plan, mode, snapshot, or closure was written
 - [x] 5.2 The current two-company rule selected two manufacturing names and does not include `service`, although legal service candidates exist later in the priority
 - [x] 5.3 Recorded immutable plan `cd8031cb5a440da19d7a7b8a41af0fdf` for `600004.SH` SSE service and `600006.SH` SSE manufacturing at `knowledge_cutoff=2026-09-17`, snapshot `universe_5a919396af823bb61d02a7894b330184`. Mode remains `inactive`. Did not activate
-- [ ] 5.4 Activate first expansion only after 5.3
+- [x] 5.4 Activated first expansion through `CompanyProfileTaskService.activate_first_expansion_from_registry()`. Mode is `active`, `plan_id=cd8031cb5a440da19d7a7b8a41af0fdf`, `work_ids=()`, `delivered=false`. Did not run, enqueue, or write an observation
 - [ ] 5.5 Execute the published `run`/`resume` only after 5.4
 - [ ] 5.6 Confirm the independent live-run snapshot has been written
 - [ ] 5.7 Independently review the official pages and write the source-review snapshot
@@ -42,7 +42,7 @@ Do not check 5.4–5.12 until that official step has actually happened. Do not r
 - [ ] 5.11 Write operator closure v2 and set the mode to `completed`
 - [ ] 5.12 After independent Review of the official execution, archiving this change is allowed. Do not authorize production or the next expansion
 
-The former unchecked 3.4, 3.5, and 4.5 are this section. 5.4–5.12 stay unchecked.
+The former unchecked 3.4, 3.5, and 4.5 are this section. 5.5–5.12 stay unchecked.
 
 ## 7. Reserved service seat, not yet implemented
 
@@ -58,6 +58,6 @@ These observations stay as history and are not overwritten:
 - The original two-company v1 live-run and source-review baseline files remain the retained 7/7 observation.
 - Existing v1–v4 work JSON remains on disk.
 
-The two-company budget is unchanged. No official first-expansion plan, mode, live-run snapshot, source-review snapshot, or closure v2 has been written. `scale_quality_claim_allowed` stays false and production stays `not_authorized`.
+The immutable plan is recorded and the mode is active. The sample has not been executed. There is no live-run snapshot, source-review snapshot, or closure v2. `scale_quality_claim_allowed` stays false and production stays `not_authorized`.
 
 Capability repairs already tested, not official execution: after `1fe3133b`, pointer, immutable snapshot, and full plan must match, and closure v2 requires a delivered assessed full sample; after `3ec82b97`, active `run` keeps real enqueue accounting; after `23858958`, the sample stays at two companies; after `5fd681d9`, the code foundation was accepted and 3.4 / 3.5 / 4.5 stayed unchecked.
