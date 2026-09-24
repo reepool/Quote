@@ -1,6 +1,6 @@
 ## Context
 
-`load_official_task_candidate_registry` 通过 `_storage_industry_lookup` 先调用 `get_industry_membership_as_of`。历史行有 `official_industry_code`，以及 `classification.levels.sw_l1.industry_name`。画像分类 `_classification` 只读取顶层 `sw_l1_name`。历史行因此被当成“分类存在但没有一级名称”，`assign_disclosure_form` 返回 `other`。当前 membership 虽有顶层 `sw_l1_name`，只要 as-of 行存在就不会被使用。
+`load_official_task_candidate_registry` 通过 `_storage_industry_lookup` 先调用 `get_industry_membership_as_of`。正式 provider 写入的 `classification_json` 只有股票代码、行业代码、计入日期和更新日期，没有 `classification.levels.sw_l1.industry_name`。一级名称在同版本 `industry_taxonomy` 父链上，例如 `480301` → `480300` → `480000` `银行`。画像分类只读顶层 `sw_l1_name` 时，历史行会被当成没有一级名称，披露层落到 `other`。
 
 2026-09-17 正式登记的可核披露层是 `{other: 5474, manufacturing: 1}`，`service_available_count=0`。首次扩大的两家预算因此不能占到 `service`。
 
@@ -22,8 +22,8 @@
 
 ## Decisions
 
-1. **在画像读取处投影已保存名称，不改历史表。**
-   as-of 行没有顶层 `sw_l1_name` 时，从该行 `classification.levels.sw_l1.industry_name` 投影。已有顶层名称时保持原值。备选是回写历史列，会扩大成数据迁移，超出这个读取缺口。
+1. **用历史行上的分类版本和官方代码走既有 taxonomy 父链，不改历史表。**
+   as-of 行没有顶层 `sw_l1_name` 时，按 `taxonomy_system`、`taxonomy_version`、`official_industry_code` 在 `industry_taxonomy` 上沿 `parent_code` 找到一级节点名称。已有顶层名称时保持原值。不读取正式生产者不会写的 `levels.sw_l1`。断链或节点缺失则保持 `other`。不回写历史列。
 
 2. **as-of 行存在时不回退当前 membership。**
    当前 membership 可能晚于 `knowledge_cutoff`。历史行存在就只用该行；名称不在该行里则披露层为 `other`。历史行存在但没有 cutoff 前生效的记录时，同样不使用当前 membership。只有该证券完全没有行业历史时，才允许读当前 membership。
@@ -33,7 +33,7 @@
 
 ## Risks / Trade-offs
 
-- [历史载荷不是 `levels.sw_l1.industry_name`] → 只认这个已写入形状；认不出就保持 `other`，不另造名称。
+- [taxonomy 父链断开或版本对不上] → 披露层保持 `other`，不改用当前 membership，不硬编码证券。
 - [投影后仍没有 service] → 说明库存历史本身没有可映射的服务层名称。本 change 到此停止，不改首次扩大预算。
 - [把当前行业填进历史时点] → as-of 行存在时禁止这条回退。
 

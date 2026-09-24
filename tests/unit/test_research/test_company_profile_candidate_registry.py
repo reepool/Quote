@@ -631,48 +631,201 @@ def _official_one_name_registry(storage, instrument_id: str = "601888.SH"):
     )
 
 
-def _nested_l1(name: str | None) -> dict[str, object]:
-    return {
-        "official_industry_code": "450000",
-        "taxonomy_system": "sw",
-        "classification": {
-            "levels": {
-                "sw_l1": {
-                    "industry_code": "450000",
-                    "industry_name": name,
+def _provider_history_storage(symbol: str, industry_code: str, *, break_parent: bool = False):
+    import json
+    import sqlite3
+    from contextlib import contextmanager
+
+    import pandas as pd
+
+    from research.providers.swsresearch_shenwan_classification import (
+        SWSResearchShenwanClassificationProvider,
+    )
+    from research.storage import ResearchStorageManager
+
+    provider = SWSResearchShenwanClassificationProvider()
+    taxonomy = provider._parse_taxonomy_nodes(
+        pd.DataFrame(
+            [
+                {"行业代码": "480000", "一级行业名称": "银行", "二级行业名称": "", "三级行业名称": ""},
+                {"行业代码": "480300", "一级行业名称": "银行", "二级行业名称": "银行", "三级行业名称": ""},
+                {
+                    "行业代码": "480301",
+                    "一级行业名称": "银行",
+                    "二级行业名称": "银行",
+                    "三级行业名称": "股份制银行",
+                },
+                {
+                    "行业代码": "450000",
+                    "一级行业名称": "商贸零售",
+                    "二级行业名称": "",
+                    "三级行业名称": "",
+                },
+                {
+                    "行业代码": "450100",
+                    "一级行业名称": "商贸零售",
+                    "二级行业名称": "一般零售",
+                    "三级行业名称": "",
+                },
+                {
+                    "行业代码": "450101",
+                    "一级行业名称": "商贸零售",
+                    "二级行业名称": "一般零售",
+                    "三级行业名称": "百货",
+                },
+            ]
+        )
+    )
+    history = provider._parse_history_rows(
+        pd.DataFrame(
+            [
+                {
+                    "股票代码": symbol,
+                    "计入日期": "2020-01-01",
+                    "行业代码": industry_code,
+                    "更新日期": "2020-01-02",
                 }
-            }
-        },
+            ]
+        )
+    )
+    assert history[0].classification_json == {
+        "股票代码": symbol,
+        "计入日期": "2020-01-01",
+        "行业代码": industry_code,
+        "更新日期": "2020-01-02",
     }
-
-
-def test_as_of_nested_l1_name_is_exposed_and_uses_existing_service_form():
-    from research.company_profile.live_plan import assign_disclosure_form
+    assert "levels" not in history[0].classification_json
+    conn = sqlite3.connect(":memory:")
+    conn.row_factory = sqlite3.Row
+    conn.execute(
+        """
+        CREATE TABLE industry_classification_history (
+            row_hash TEXT PRIMARY KEY,
+            instrument_id TEXT, symbol TEXT, exchange TEXT,
+            taxonomy_system TEXT, taxonomy_version TEXT,
+            official_industry_code TEXT, official_start_date TEXT,
+            official_update_time TEXT, classification_json TEXT,
+            source TEXT, source_mode TEXT, created_at TEXT, updated_at TEXT
+        )
+        """
+    )
+    conn.execute(
+        """
+        CREATE TABLE industry_taxonomy (
+            taxonomy_system TEXT, taxonomy_version TEXT, industry_code TEXT,
+            industry_name TEXT, industry_level INTEGER, parent_code TEXT,
+            is_active INTEGER
+        )
+        """
+    )
+    row = history[0]
+    conn.execute(
+        """
+        INSERT INTO industry_classification_history VALUES
+        (?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+        """,
+        (
+            row.row_hash,
+            row.instrument_id,
+            row.symbol,
+            row.exchange,
+            row.taxonomy_system,
+            row.taxonomy_version,
+            row.official_industry_code,
+            row.official_start_date,
+            row.official_update_time,
+            json.dumps(row.classification_json, ensure_ascii=False),
+            row.source,
+            row.source_mode,
+            "2020-01-02",
+            "2020-01-02",
+        ),
+    )
+    for node in taxonomy:
+        parent = node.parent_code
+        if break_parent and node.industry_code == industry_code:
+            parent = "missing-parent"
+        conn.execute(
+            """
+            INSERT INTO industry_taxonomy VALUES (?,?,?,?,?,?,?)
+            """,
+            (
+                node.taxonomy_system,
+                node.taxonomy_version or "",
+                node.industry_code,
+                node.industry_name,
+                node.industry_level,
+                parent,
+                1,
+            ),
+        )
+    conn.commit()
 
     class _Storage:
-        def get_industry_membership_as_of(self, instrument_id: str, as_of: str):
-            assert instrument_id == "601888.SH"
-            assert as_of == "2026-09-17"
-            return _nested_l1("商贸零售")
+        def __init__(self) -> None:
+            self._conn = conn
+
+        @contextmanager
+        def get_connection(self):
+            yield self._conn
+
+        def _apply_pragmas(self, connection):
+            del connection
+
+        def _deserialize_json(self, value):
+            if not value:
+                return None
+            return json.loads(value)
 
         def get_industry_membership(self, instrument_id: str):
             raise AssertionError("current membership must not replace the as-of row")
 
-    registry = _official_one_name_registry(_Storage())
-    candidate = registry.candidate("601888.SH")
+    storage = _Storage()
+    storage.get_industry_membership_as_of = (
+        ResearchStorageManager.get_industry_membership_as_of.__get__(storage)
+    )
+    storage.resolve_industry_taxonomy_l1_name = (
+        ResearchStorageManager.resolve_industry_taxonomy_l1_name.__get__(storage)
+    )
+    return storage, row.instrument_id
+
+
+def test_official_history_code_resolves_bank_l1_to_finance():
+    from research.company_profile.live_plan import assign_disclosure_form
+
+    storage, instrument_id = _provider_history_storage("600000", "480301")
+    registry = _official_one_name_registry(storage, instrument_id=instrument_id)
+    candidate = registry.candidate(instrument_id)
+    assert candidate.classification is not None
+    assert candidate.classification.sw_l1_name == "银行"
+    assert assign_disclosure_form(candidate) == "finance"
+
+
+def test_official_history_code_resolves_retail_l1_to_service():
+    from research.company_profile.live_plan import assign_disclosure_form
+
+    storage, instrument_id = _provider_history_storage("601888", "450101")
+    registry = _official_one_name_registry(storage, instrument_id=instrument_id)
+    candidate = registry.candidate(instrument_id)
     assert candidate.classification is not None
     assert candidate.classification.sw_l1_name == "商贸零售"
     assert assign_disclosure_form(candidate) == "service"
 
 
-def test_as_of_top_level_l1_name_wins_over_nested_name():
+def test_as_of_top_level_l1_name_wins_over_taxonomy_chain():
     from research.company_profile.live_plan import assign_disclosure_form
 
     class _Storage:
         def get_industry_membership_as_of(self, instrument_id: str, as_of: str):
-            row = _nested_l1("社会服务")
-            row["sw_l1_name"] = "银行"
-            return row
+            return {
+                "sw_l1_name": "银行",
+                "official_industry_code": "450101",
+                "taxonomy_system": "sw",
+                "taxonomy_version": "sw_2021",
+            }
+
+        def resolve_industry_taxonomy_l1_name(self, **kwargs):
+            raise AssertionError("top-level L1 name must not walk taxonomy")
 
     registry = _official_one_name_registry(_Storage(), instrument_id="600000.SH")
     candidate = registry.candidate("600000.SH")
@@ -681,23 +834,16 @@ def test_as_of_top_level_l1_name_wins_over_nested_name():
     assert assign_disclosure_form(candidate) == "finance"
 
 
-def test_as_of_without_stored_l1_name_stays_other():
+def test_broken_taxonomy_parent_chain_stays_other():
     from research.company_profile.live_plan import assign_disclosure_form
 
-    class _Storage:
-        def get_industry_membership_as_of(self, instrument_id: str, as_of: str):
-            return {
-                "official_industry_code": "450000",
-                "taxonomy_system": "sw",
-                "classification": {"levels": {"sw_l1": {"industry_name": "  "}}},
-            }
-
-        def get_industry_membership(self, instrument_id: str):
-            raise AssertionError("missing as-of L1 name must not use current membership")
-
-    registry = _official_one_name_registry(_Storage())
-    candidate = registry.candidate("601888.SH")
-    assert candidate.classification_status == "present"
+    storage, instrument_id = _provider_history_storage(
+        "601888",
+        "450101",
+        break_parent=True,
+    )
+    registry = _official_one_name_registry(storage, instrument_id=instrument_id)
+    candidate = registry.candidate(instrument_id)
     assert candidate.classification is not None
     assert candidate.classification.sw_l1_name is None
     assert assign_disclosure_form(candidate) == "other"

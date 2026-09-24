@@ -289,7 +289,7 @@ def _storage_industry_lookup(storage: Any) -> IndustryLookup:
         if callable(as_of_getter):
             row = as_of_getter(instrument_id, as_of)
             if isinstance(row, Mapping):
-                return row
+                return _with_taxonomy_l1_name(storage, row)
             blocker = getattr(
                 storage,
                 "industry_classification_history_blocks_current_membership",
@@ -386,7 +386,7 @@ def _classification(row: Mapping[str, Any] | None) -> ClassificationInfo | None:
         return None
     info = ClassificationInfo(
         sw_l1_code=_optional_text(row.get("sw_l1_code")),
-        sw_l1_name=_stored_sw_l1_name(row),
+        sw_l1_name=_optional_text(row.get("sw_l1_name")),
         sw_l2_code=_optional_text(row.get("sw_l2_code")),
         sw_l2_name=_optional_text(row.get("sw_l2_name")),
         sw_l3_code=_optional_text(row.get("sw_l3_code")),
@@ -628,22 +628,31 @@ def _company_name(row: Mapping[str, Any]) -> str:
     ).strip()
 
 
-def _stored_sw_l1_name(row: Mapping[str, Any]) -> str | None:
-    """Use the as-of row's stored L1 name. Top-level wins over nested history."""
+def _with_taxonomy_l1_name(
+    storage: Any,
+    row: Mapping[str, Any],
+) -> Mapping[str, Any]:
+    """Attach the L1 name from the stored taxonomy parent chain."""
 
-    direct = _optional_text(row.get("sw_l1_name"))
-    if direct:
-        return direct
-    classification = row.get("classification")
-    if not isinstance(classification, Mapping):
-        return None
-    levels = classification.get("levels")
-    if not isinstance(levels, Mapping):
-        return None
-    level = levels.get("sw_l1")
-    if not isinstance(level, Mapping):
-        return None
-    return _optional_text(level.get("industry_name"))
+    if _optional_text(row.get("sw_l1_name")):
+        return row
+    resolver = getattr(storage, "resolve_industry_taxonomy_l1_name", None)
+    system = _optional_text(row.get("taxonomy_system"))
+    code = _optional_text(row.get("official_industry_code"))
+    if not callable(resolver) or not system or not code:
+        return row
+    name = _optional_text(
+        resolver(
+            taxonomy_system=system,
+            taxonomy_version=row.get("taxonomy_version") or "",
+            industry_code=code,
+        )
+    )
+    if not name:
+        return row
+    projected = dict(row)
+    projected["sw_l1_name"] = name
+    return projected
 
 
 def _optional_text(value: Any) -> str | None:

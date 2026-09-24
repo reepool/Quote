@@ -8823,6 +8823,50 @@ class ResearchStorageManager:
 
         return not any(_start(row) and _start(row) <= as_of_str for row in rows)
 
+    def resolve_industry_taxonomy_l1_name(
+        self,
+        *,
+        taxonomy_system: str,
+        taxonomy_version: str | None,
+        industry_code: str,
+    ) -> str | None:
+        """Walk the active taxonomy parent chain to the level-1 industry name."""
+
+        code = str(industry_code or "").strip()
+        system = str(taxonomy_system or "").strip()
+        version = str(taxonomy_version or "")
+        if not code or not system:
+            return None
+        seen: set[str] = set()
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            for _ in range(6):
+                if code in seen:
+                    return None
+                seen.add(code)
+                node = conn.execute(
+                    """
+                    SELECT industry_name, industry_level, parent_code
+                    FROM industry_taxonomy
+                    WHERE taxonomy_system = ?
+                      AND taxonomy_version = ?
+                      AND industry_code = ?
+                      AND is_active = 1
+                    LIMIT 1
+                    """,
+                    (system, version, code),
+                ).fetchone()
+                if node is None:
+                    return None
+                if int(node["industry_level"] or 0) == 1:
+                    name = str(node["industry_name"] or "").strip()
+                    return name or None
+                parent = str(node["parent_code"] or "").strip()
+                if not parent or parent == code:
+                    return None
+                code = parent
+        return None
+
     # ----- REQ-13: 无风险利率序列 -----
 
     def upsert_risk_free_rate_series(self, series: Dict[str, Any]) -> None:

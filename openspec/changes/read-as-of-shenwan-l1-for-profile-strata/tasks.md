@@ -5,7 +5,7 @@
 
 ## 2. Project the stored as-of L1 name
 
-- [x] 2.1 When an as-of history row has no top-level `sw_l1_name`, expose `classification.levels.sw_l1.industry_name` as the registry classification name
+- [x] 2.1 When an as-of history row has no top-level `sw_l1_name`, resolve the L1 name from `taxonomy_system`, `taxonomy_version`, and `official_industry_code` by walking the existing `industry_taxonomy` parent chain
 - [x] 2.2 Keep an existing top-level `sw_l1_name` unchanged
 - [x] 2.3 Leave the disclosure form as `other` when that history row stores no Shenwan L1 name
 - [x] 2.4 Do not copy a later current membership name over an existing as-of row
