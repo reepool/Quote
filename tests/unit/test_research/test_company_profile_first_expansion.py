@@ -1271,3 +1271,140 @@ def test_closure_v2_refuses_unassessed_or_undelivered_review(tmp_path):
             tmp_path,
             publication=record_publication_control("enable"),
         )
+
+
+def _zero_delivery_finding(instrument_id: str, aspect: str, **overrides):
+    payload = {
+        "instrument_id": instrument_id,
+        "aspect": aspect,
+        "kind": "semantic",
+        "source": "independently_read_official_report",
+        "disclosure_id": f"{instrument_id}-{aspect}",
+        "disclosed_in_source": True,
+        "present_in_delivery": False,
+        "fact_accurate": None,
+        "critical_numeric_error": False,
+    }
+    payload.update(overrides)
+    return SemanticFinding(**payload)
+
+
+def _persist_zero_delivery_review(root, plan, registry, findings):
+    from research.company_profile.first_expansion import (
+        persist_first_expansion_live_run,
+        persist_first_expansion_source_review,
+    )
+    from research.company_profile.live_run import record_live_run_report
+    from research.company_profile.source_review import record_source_review_report
+
+    expansion = record_live_run_report(
+        plan=plan.live_plan,
+        registry=registry,
+        selected_instrument_ids=plan.selected_instrument_ids,
+        delivered_instrument_ids=plan.selected_instrument_ids,
+        knowledge_cutoff=_CUTOFF,
+        first_expansion_plan_id=plan.plan_id,
+        frozen_report_references=plan.reports,
+    )
+    persist_first_expansion_live_run(expansion, root, plan)
+    review = record_source_review_report(
+        live_run=expansion,
+        semantic_findings=findings,
+    )
+    persist_first_expansion_source_review(review, root, plan)
+    return review
+
+
+def test_zero_delivery_complete_review_can_close_without_passing_gates(tmp_path):
+    from research.company_profile.first_expansion import (
+        activate_first_expansion,
+        complete_first_expansion,
+        first_expansion_should_constrain_run,
+        load_first_expansion_mode,
+        load_first_expansion_source_review,
+        record_first_expansion_plan,
+    )
+    from research.company_profile.publication import record_publication_control
+
+    registry = _registry()
+    plan = record_first_expansion_plan(
+        registry=registry,
+        knowledge_cutoff=_CUTOFF,
+        official_bindings=_bindings(),
+    )
+    activate_first_expansion(tmp_path, plan)
+    findings = tuple(
+        _zero_delivery_finding(instrument_id, aspect)
+        for instrument_id in plan.selected_instrument_ids
+        for aspect in ("core_skeleton", "important_disclosure", "commodity_role")
+    )
+    _persist_zero_delivery_review(tmp_path, plan, registry, findings)
+    closed = complete_first_expansion(
+        tmp_path,
+        publication=record_publication_control("enable"),
+    )
+    review = load_first_expansion_source_review(tmp_path, plan)
+    assert review is not None
+    assert review.source_recall.numerator == 0
+    assert review.source_recall.denominator == 6
+    assert review.source_accuracy.status == "unassessed"
+    assert review.expansion_gates_met is False
+    assert closed.production_authorization == PRODUCTION_AUTHORIZATION
+    assert closed.legacy_writer_enabled is False
+    assert closed.dcf_authorized is False
+    assert closed.trading_authorized is False
+    assert load_first_expansion_mode(tmp_path).mode == "completed"
+    assert first_expansion_should_constrain_run(tmp_path) is False
+
+
+def test_closure_refuses_missing_aspect_or_unassessed_delivered_fact(tmp_path):
+    from research.company_profile.first_expansion import (
+        activate_first_expansion,
+        complete_first_expansion,
+        record_first_expansion_plan,
+    )
+    from research.company_profile.publication import record_publication_control
+
+    registry = _registry()
+    plan = record_first_expansion_plan(
+        registry=registry,
+        knowledge_cutoff=_CUTOFF,
+        official_bindings=_bindings(),
+    )
+    activate_first_expansion(tmp_path, plan)
+    missing_aspect = tuple(
+        _zero_delivery_finding(instrument_id, aspect)
+        for instrument_id in plan.selected_instrument_ids
+        for aspect in ("core_skeleton", "important_disclosure")
+    )
+    _persist_zero_delivery_review(tmp_path, plan, registry, missing_aspect)
+    with pytest.raises(ValueError, match="aspect"):
+        complete_first_expansion(
+            tmp_path,
+            publication=record_publication_control("enable"),
+        )
+
+    delivered_unassessed = (
+        _zero_delivery_finding(
+            plan.selected_instrument_ids[0],
+            "core_skeleton",
+            present_in_delivery=True,
+            fact_accurate=None,
+            disclosure_id="delivered-unassessed",
+        ),
+        *(
+            _zero_delivery_finding(instrument_id, aspect)
+            for instrument_id in plan.selected_instrument_ids
+            for aspect in ("core_skeleton", "important_disclosure", "commodity_role")
+            if not (
+                instrument_id == plan.selected_instrument_ids[0]
+                and aspect == "core_skeleton"
+            )
+        ),
+    )
+    _persist_zero_delivery_review(tmp_path, plan, registry, delivered_unassessed)
+    with pytest.raises(ValueError, match="delivered fact"):
+        complete_first_expansion(
+            tmp_path,
+            publication=record_publication_control("enable"),
+        )

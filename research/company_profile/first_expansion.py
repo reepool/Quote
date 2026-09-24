@@ -607,14 +607,7 @@ def complete_first_expansion(
     reviewed = {item.instrument_id for item in review.semantic_findings}
     if reviewed != set(plan.selected_instrument_ids):
         raise ValueError("operator closure v2 must cover the frozen sample")
-    if (
-        review.source_recall.status != "assessed"
-        or review.source_accuracy.status != "assessed"
-        or review.critical_numeric_errors.status != "assessed"
-    ):
-        raise ValueError(
-            "operator closure v2 cannot complete from an unassessed source review"
-        )
+    _require_closure_review(review, plan.selected_instrument_ids)
     report = record_operator_closure_v2_report(publication)
     persist_operator_closure_v2_report(report, root)
     _persist_mode(
@@ -622,6 +615,49 @@ def complete_first_expansion(
         root,
     )
     return report
+
+
+_CLOSURE_ASPECTS = frozenset(
+    {"core_skeleton", "important_disclosure", "commodity_role"}
+)
+
+
+def _require_closure_review(review: Any, instrument_ids: Sequence[str]) -> None:
+    """Allow assessed accuracy, or a fully reviewed zero-delivery failure."""
+
+    findings = tuple(review.semantic_findings)
+    aspects: dict[str, set[str]] = {}
+    for item in findings:
+        aspects.setdefault(item.instrument_id, set()).add(item.aspect)
+    if set(aspects) != set(instrument_ids) or any(
+        aspects[item] < _CLOSURE_ASPECTS for item in instrument_ids
+    ):
+        raise ValueError("operator closure v2 requires every frozen aspect")
+    if (
+        review.source_recall.status != "assessed"
+        or review.critical_numeric_errors.status != "assessed"
+    ):
+        raise ValueError(
+            "operator closure v2 cannot complete from an unassessed source review"
+        )
+    if review.source_accuracy.status == "assessed":
+        return
+    delivered_unassessed = any(
+        item.present_in_delivery and item.fact_accurate is None for item in findings
+    )
+    if delivered_unassessed:
+        raise ValueError(
+            "operator closure v2 cannot leave a delivered fact unassessed"
+        )
+    zero_delivery = bool(findings) and all(
+        not item.present_in_delivery and item.fact_accurate is None
+        for item in findings
+    )
+    if zero_delivery and review.source_accuracy.status == "unassessed":
+        return
+    raise ValueError(
+        "operator closure v2 cannot complete from an unassessed source review"
+    )
 
 
 def _frozen_report(

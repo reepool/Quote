@@ -66,4 +66,4 @@
 ## Open Questions
 
 - 2026-09-24 首次扩大零交付集中成两个可复用 common-core 缺口，不在本 change 修复，也不发布 `owned_page_facts=v5`。后续最小 repair change 只覆盖这两项：overview 投影前置判断不接受 owned 标题下的“公司主要从事……”，而后文选择规则已经认识“主要从事”；“主营业务分析 / 收入和成本分析”下的正式收入构成表没有进入 segment/revenue 投影，路由落到后部“分部报告 / 分部信息”会计模板页。该 repair 不得按公司硬编码，不得打开 LLM 掩盖 `provider_unavailable`。白云机场吞吐量、土地及广告补偿，以及东风产销量、材料成本和钢材/铝材/碳酸锂/镍投入角色，留在后续 M4 行业能力，不纳入这次 common-core repair。本卡只登记候选范围，不创建、不 apply。
-- 5.9 复验之后的下一优先级不是 5.10。完整复核但零交付的失败观察应能以失败状态离开 `active`；部分样本或真正未完成的语义审查仍必须拒绝。当前阻塞在 `complete_first_expansion` 要求准确率已评估。该合同修正另作决策，不在本 change 顺手修改。
+- 5.9a 已允许完整复核、零交付、质量门失败的观察写入现有 closure v2 并进入 `completed`。`completed` 只表示本轮结束，不表示 `expansion_gates_met=true`。准确率已评估的原路径保留。少样本、缺 aspect、未全部交付、已交付事实未评估、recall 或 critical errors 未评估，以及计划或报告引用漂移，仍然拒绝。正式 closure 尚未执行。
