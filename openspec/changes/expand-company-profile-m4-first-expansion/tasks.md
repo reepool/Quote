@@ -27,11 +27,11 @@ Checked tasks below mean the control capability is implemented and tested. They 
 
 ## 5. Official first expansion, not yet executed
 
-Do not check 5.3–5.12 until that official step has actually happened. Do not run an ordinary published `run` before the immutable plan is recorded and first expansion is activated. That ordinary run is not a substitute for this first expansion. The 2026-09-24 read-only probe showed the current global priority fills both seats with manufacturing, so 5.3 waits for the reserved-seat rule in 7.1. Do not enlarge the sample or change ordinary live-run priority because 5.2 found no `service`.
+Do not check 5.4–5.12 until that official step has actually happened. Do not run an ordinary published `run` before first expansion is activated. That ordinary run is not a substitute for this first expansion. Do not enlarge the sample or change ordinary live-run priority.
 
 - [x] 5.1 Read-only re-probe of the official registry at `knowledge_cutoff=2026-09-17` completed. No plan, mode, snapshot, or closure was written
 - [x] 5.2 The current two-company rule selected two manufacturing names and does not include `service`, although legal service candidates exist later in the priority
-- [ ] 5.3 After 7.1 is implemented and reviewed, record the immutable first-expansion plan from the reserved-seat sample. If that sample has no `service`, refuse and do not activate
+- [x] 5.3 Recorded immutable plan `cd8031cb5a440da19d7a7b8a41af0fdf` for `600004.SH` SSE service and `600006.SH` SSE manufacturing at `knowledge_cutoff=2026-09-17`, snapshot `universe_5a919396af823bb61d02a7894b330184`. Mode remains `inactive`. Did not activate
 - [ ] 5.4 Activate first expansion only after 5.3
 - [ ] 5.5 Execute the published `run`/`resume` only after 5.4
 - [ ] 5.6 Confirm the independent live-run snapshot has been written
@@ -42,7 +42,7 @@ Do not check 5.3–5.12 until that official step has actually happened. Do not r
 - [ ] 5.11 Write operator closure v2 and set the mode to `completed`
 - [ ] 5.12 After independent Review of the official execution, archiving this change is allowed. Do not authorize production or the next expansion
 
-The former unchecked 3.4, 3.5, and 4.5 are this section. 5.3–5.12 stay unchecked.
+The former unchecked 3.4, 3.5, and 4.5 are this section. 5.4–5.12 stay unchecked.
 
 ## 7. Reserved service seat, not yet implemented
 
