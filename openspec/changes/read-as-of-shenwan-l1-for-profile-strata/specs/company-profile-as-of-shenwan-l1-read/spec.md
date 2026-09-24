@@ -13,7 +13,7 @@ The official company-profile registry MUST read industry membership as of the re
 - **THEN** the registry classification keeps `银行`
 
 ### Requirement: Disclosure form still uses only the closed Shenwan table
-After the stored L1 name is exposed, disclosure form MUST be assigned only by the existing closed Shenwan L1 table. A name already listed as service, finance, or manufacturing MUST receive that existing form. A name absent from the table, an empty stored name, and a missing classification MUST remain `other`. This change MUST NOT add, remove, or rename any Shenwan L1 entry.
+After the taxonomy parent chain exposes an L1 name, disclosure form MUST be assigned only by the existing closed Shenwan L1 table. A name already listed as service, finance, or manufacturing MUST receive that existing form. A name absent from the table, an empty stored name, and a missing classification MUST remain `other`. This change MUST NOT add, remove, or rename any Shenwan L1 entry.
 
 #### Scenario: Official service code uses the existing service form
 - **WHEN** the as-of history row's official industry code walks the stored taxonomy parent chain to `商贸零售`
@@ -29,7 +29,7 @@ After the stored L1 name is exposed, disclosure form MUST be assigned only by th
 When an as-of history row exists, the registry MUST NOT fill its Shenwan L1 name from a current membership row. When industry classification history exists for the instrument but no row is effective on or before the requested cutoff, the registry MUST NOT use a current membership either. A current membership may be used only when that instrument has no industry classification history.
 
 #### Scenario: Later membership does not override history
-- **WHEN** the as-of history row stores no Shenwan L1 name and a current membership row has `sw_l1_name` `商贸零售`
+- **WHEN** the as-of history row's taxonomy parent chain yields no L1 name and a current membership row has `sw_l1_name` `商贸零售`
 - **THEN** the registry does not copy `商贸零售` from that current row
 - **AND** the disclosure form stays `other`
 
@@ -42,6 +42,6 @@ When an as-of history row exists, the registry MUST NOT fill its Shenwan L1 name
 This change MUST NOT alter the first-expansion two-company budget, MUST NOT record or activate a first-expansion plan, and MUST NOT write a first-expansion observation or closure. Production MUST remain `not_authorized`. `scale_quality_claim_allowed` MUST remain false.
 
 #### Scenario: Restored service name does not activate first expansion
-- **WHEN** the as-of read exposes a stored service L1 name
+- **WHEN** the as-of read resolves a service L1 name from the taxonomy parent chain
 - **THEN** no first-expansion plan, mode, live-run snapshot, source-review snapshot, or closure v2 is written by this change
 - **AND** production authorization remains `not_authorized`
