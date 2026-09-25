@@ -654,12 +654,10 @@
         "enabled": true,
         "exchanges": {
           "SHFE": {
-            "listing_url": "https://www.shfe.com.cn/services/calenderandholidays/holiday/",
-            "notice_url": "https://www.shfe.com.cn/publicnotice/notice/202512/t20251217_829805.html"
+            "listing_url": "https://www.shfe.com.cn/services/calenderandholidays/holiday/"
           },
           "INE": {
-            "listing_url": "http://www.ine.cn/services/calenderandholidays/holiday/",
-            "notice_url": "http://www.ine.cn/services/calenderandholidays/holiday/"
+            "listing_url": "http://www.ine.cn/services/calenderandholidays/holiday/"
           },
           "DCE": {
             "adopt_notice_from": "SHFE",
@@ -670,7 +668,7 @@
             "note": "CZCE has no pinned official holiday-notice URL. Adopt SHFE's parsed CSRC holiday closures and keep the SHFE notice URL as evidence."
           },
           "GFEX": {
-            "listing_url": "http://www.gfex.com.cn/gfex/tzts/202512/0134914f8c674fa68c2ba9041a5cd798.shtml",
+            "listing_url": "http://www.gfex.com.cn/gfex/tzts/list_tzts.shtml",
             "notice_url": "http://www.gfex.com.cn/gfex/tzts/202512/0134914f8c674fa68c2ba9041a5cd798.shtml"
           }
         }

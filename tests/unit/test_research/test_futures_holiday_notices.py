@@ -8,7 +8,10 @@ from research.futures_market_data import (
     FuturesTradingDayGovernanceService,
 )
 from research.providers.official_futures import OfficialFuturesDailyProbeResult
-from research.providers.official_futures_calendar import parse_holiday_notice_text
+from research.providers.official_futures_calendar import (
+    parse_holiday_notice_text,
+    select_holiday_notice_target,
+)
 from utils.config_manager import ResearchConfig, ResearchStorageConfig
 
 
@@ -377,3 +380,24 @@ def test_backfill_parse_failure_does_not_invent_closures(monkeypatch, tmp_path):
     assert result["exchanges"][0]["holiday_notice"]["status"] == "review_required"
     assert stored[0]["is_trading_day"] is True
     assert stored[0]["metadata"]["classification_rule"] == "official_daily_rows"
+
+
+def test_listing_page_selects_the_newest_holiday_notice():
+    html = """
+    <a href="/2026/holiday.html">关于2026年休市安排的通知</a>
+    <a href="/2027/holiday.html">关于2027年休市安排的通知</a>
+    """
+    selected = select_holiday_notice_target(html, "http://www.gfex.com.cn/gfex/tzts/list_tzts.shtml")
+
+    assert selected["url"] == "http://www.gfex.com.cn/2027/holiday.html"
+    assert selected["notice_year"] == 2027
+
+
+def test_holiday_page_body_is_used_without_following_links():
+    selected = select_holiday_notice_target(
+        NOTICE_TEXT,
+        "https://www.shfe.com.cn/services/calenderandholidays/holiday/",
+    )
+
+    assert selected["url"] == "https://www.shfe.com.cn/services/calenderandholidays/holiday/"
+    assert selected["notice_year"] == 2026

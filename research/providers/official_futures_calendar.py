@@ -8,6 +8,7 @@ import re
 from dataclasses import dataclass, field
 from datetime import date, timedelta
 from typing import Any, Dict, List, Optional
+from urllib.parse import urljoin
 
 from research.futures_market_data import (
     FUTURES_TRADING_DAY_GOVERNANCE_VERSION,
@@ -144,7 +145,11 @@ class OfficialFuturesCalendarProvider:
         return ParsedFuturesCalendarNotice(notice=parsed_notice, calendar_days=calendar_days)
 
     def fetch_holiday_notice_text(self, exchange: str) -> Dict[str, Any]:
-        """Fetch the configured holiday-notice page for one exchange."""
+        """Fetch the current holiday notice for one exchange.
+
+        A stable holiday page that already contains closure ranges is used as-is.
+        A listing page is followed to the newest linked 休市安排 notice.
+        """
         exchange_key = str(exchange or "").upper()
         governance_cfg = (
             self.research_config.modules.get("commodity_market_data", {}).get("trading_day_governance")
@@ -152,11 +157,25 @@ class OfficialFuturesCalendarProvider:
         )
         notices_cfg = governance_cfg.get("holiday_notices") or {}
         exchange_cfg = (notices_cfg.get("exchanges") or {}).get(exchange_key) or {}
-        url = str(exchange_cfg.get("notice_url") or exchange_cfg.get("listing_url") or "")
-        if not url:
+        page_url = str(exchange_cfg.get("listing_url") or "")
+        fallback_url = str(exchange_cfg.get("notice_url") or "")
+        if not page_url and not fallback_url:
             raise OfficialFuturesCalendarSourceUnavailable(
                 f"missing holiday notice URL for {exchange_key}"
             )
+        if page_url:
+            page_text = self._read_holiday_page(page_url)
+            selected = select_holiday_notice_target(page_text, page_url)
+            document_url = selected["url"]
+            document_text = page_text if document_url == page_url else self._read_holiday_page(document_url)
+            if parse_holiday_notice_text(document_text).get("confident"):
+                return {"exchange": exchange_key, "url": document_url, "text": document_text}
+        if fallback_url:
+            fallback_text = self._read_holiday_page(fallback_url)
+            return {"exchange": exchange_key, "url": fallback_url, "text": fallback_text}
+        return {"exchange": exchange_key, "url": page_url, "text": page_text}
+
+    def _read_holiday_page(self, url: str) -> str:
         session = create_requests_session(tls_config=self.tls_config, headers=self.DEFAULT_HEADERS)
         response = request_get(
             url,
@@ -166,7 +185,7 @@ class OfficialFuturesCalendarProvider:
         )
         response.raise_for_status()
         response.encoding = response.apparent_encoding or response.encoding or "utf-8"
-        return {"exchange": exchange_key, "url": url, "text": response.text}
+        return response.text
 
 
 def _extract_structured_calendar_rows(payload: Dict[str, Any]) -> List[Dict[str, Any]]:
@@ -195,6 +214,34 @@ def _extract_structured_calendar_rows(payload: Dict[str, Any]) -> List[Dict[str,
             }
         )
     return rows
+
+
+def select_holiday_notice_target(html: str, page_url: str) -> Dict[str, Any]:
+    """Choose the current holiday-notice document from a page.
+
+    Pages that already state closure ranges are themselves the notice. Listing
+    pages yield the linked 休市安排 notice with the newest year.
+    """
+    if parse_holiday_notice_text(html).get("confident"):
+        return {"url": page_url, "notice_year": parse_holiday_notice_text(html).get("notice_year")}
+    candidates = []
+    for match in re.finditer(
+        r"""href=["']([^"']+)["'][^>]*>(.*?)</a>""",
+        html,
+        flags=re.IGNORECASE | re.DOTALL,
+    ):
+        href = match.group(1).strip()
+        label = re.sub(r"<[^>]+>", "", match.group(2))
+        blob = f"{label} {href}"
+        if "休市安排" not in blob:
+            continue
+        years = [int(item) for item in re.findall(r"20\d{2}", blob)]
+        candidates.append((max(years) if years else 0, urljoin(page_url, href)))
+    if not candidates:
+        return {"url": page_url, "notice_year": None}
+    candidates.sort(reverse=True)
+    year, url = candidates[0]
+    return {"url": url, "notice_year": year or None}
 
 
 def parse_holiday_notice_text(text: str, *, notice_year: Optional[int] = None) -> Dict[str, Any]:

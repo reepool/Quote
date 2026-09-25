@@ -7558,6 +7558,8 @@ class FuturesOfficialCalendarBackfillService:
         max_total_days = int(max_days) if max_days else None
 
         try:
+            self._holiday_notice_cache = {}
+            self._prefetch_source_holiday_notices(exchange_list, dry_run=dry_run)
             for exchange in exchange_list:
                 publication = _futures_publication_context(
                     exchange,
@@ -8147,11 +8149,25 @@ class FuturesOfficialCalendarBackfillService:
             },
         )
 
+    def _prefetch_source_holiday_notices(self, exchanges: Sequence[str], *, dry_run: bool) -> None:
+        notices_cfg = (self.module_cfg.get("trading_day_governance") or {}).get("holiday_notices") or {}
+        exchange_cfgs = notices_cfg.get("exchanges") or {}
+        for exchange in exchanges:
+            exchange_cfg = exchange_cfgs.get(exchange) or {}
+            if exchange_cfg.get("adopt_notice_from"):
+                continue
+            if not (exchange_cfg.get("listing_url") or exchange_cfg.get("notice_url")):
+                continue
+            self._holiday_notice_cache[exchange] = self._refresh_holiday_notice(exchange, dry_run=dry_run)
+
     def _refresh_holiday_notice(self, exchange: str, *, dry_run: bool) -> Dict[str, Any]:
         governance_cfg = self.module_cfg.get("trading_day_governance") or {}
         notices_cfg = governance_cfg.get("holiday_notices") or {}
         if not notices_cfg.get("enabled", False):
             return {"status": "disabled", "closed_dates": [], "open_dates": [], "calendar_days": []}
+        cached = getattr(self, "_holiday_notice_cache", {}).get(exchange)
+        if cached is not None:
+            return cached
         exchange_cfg = (notices_cfg.get("exchanges") or {}).get(exchange) or {}
         if not exchange_cfg:
             return {"status": "disabled", "closed_dates": [], "open_dates": [], "calendar_days": []}
@@ -8185,6 +8201,8 @@ class FuturesOfficialCalendarBackfillService:
                 dry_run=dry_run,
             )
             if applied.get("status") == "parsed" or not donor_exchange:
+                applied["source_text"] = str(fetched.get("text") or "")
+                applied["source_url"] = str(fetched.get("url") or "")
                 return applied
             fetch_error = fetch_error or "holiday notice text was not confident"
         if donor_exchange:
@@ -8203,17 +8221,23 @@ class FuturesOfficialCalendarBackfillService:
         return {"status": "disabled", "closed_dates": [], "open_dates": [], "calendar_days": []}
 
     def _adopt_holiday_notice(self, exchange: str, donor_exchange: str, *, dry_run: bool) -> Dict[str, Any]:
-        notices = self.storage.list_calendar_notices(exchange=donor_exchange, parse_status="parsed")
-        donor = next(
-            (
-                item for item in notices
-                if str(item.get("notice_type") or "") == "holiday_notice"
-                and str((item.get("raw_payload") or {}).get("text") or "").strip()
-            ),
-            None,
-        )
-        if donor is None:
-            return {"status": "unavailable", "error": f"no parsed holiday notice for {donor_exchange}"}
+        cached = getattr(self, "_holiday_notice_cache", {}).get(donor_exchange) or {}
+        donor_text = str(cached.get("source_text") or "")
+        donor_url = str(cached.get("source_url") or "")
+        if not donor_text:
+            notices = self.storage.list_calendar_notices(exchange=donor_exchange, parse_status="parsed")
+            donor = next(
+                (
+                    item for item in notices
+                    if str(item.get("notice_type") or "") == "holiday_notice"
+                    and str((item.get("raw_payload") or {}).get("text") or "").strip()
+                ),
+                None,
+            )
+            if donor is None:
+                return {"status": "unavailable", "error": f"no parsed holiday notice for {donor_exchange}"}
+            donor_text = str((donor.get("raw_payload") or {}).get("text") or "")
+            donor_url = str(donor.get("url") or "")
         governance = FuturesTradingDayGovernanceService(
             self.storage,
             self.module_cfg,
@@ -8221,8 +8245,8 @@ class FuturesOfficialCalendarBackfillService:
         )
         return governance.apply_holiday_notice_text(
             exchange=exchange,
-            url=str(donor.get("url") or ""),
-            text=str((donor.get("raw_payload") or {}).get("text") or ""),
+            url=donor_url,
+            text=donor_text,
             dry_run=dry_run,
             donor_exchange=donor_exchange,
         )
