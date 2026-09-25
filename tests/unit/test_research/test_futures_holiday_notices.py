@@ -117,12 +117,20 @@ def test_apply_holiday_notice_keeps_verified_trading_day_and_writes_other_closur
     storage.upsert_trading_calendar([
         FuturesTradingCalendarDay(
             exchange="SHFE",
+            trade_date="2026-09-24",
+            is_trading_day=True,
+            source_profile="exchange_official_daily_probe",
+            quality_flag="backfilled_verified",
+            metadata={"classification_rule": "official_daily_rows"},
+        ),
+        FuturesTradingCalendarDay(
+            exchange="SHFE",
             trade_date="2026-09-25",
             is_trading_day=True,
             source_profile="exchange_official_daily_probe",
             quality_flag="backfilled_verified",
             metadata={"classification_rule": "official_daily_rows"},
-        )
+        ),
     ])
     service = FuturesTradingDayGovernanceService(storage, config.modules["commodity_market_data"])
 
@@ -137,6 +145,8 @@ def test_apply_holiday_notice_keeps_verified_trading_day_and_writes_other_closur
     }
 
     assert "2026-09-25" in result["review_dates"]
+    assert stored["2026-09-24"]["is_trading_day"] is True
+    assert stored["2026-09-24"]["metadata"]["night_session_suspended"] is True
     assert stored["2026-09-25"]["is_trading_day"] is True
     assert stored["2026-09-26"]["is_trading_day"] is False
     assert stored["2026-09-26"]["metadata"]["classification_rule"] == "official_holiday_notice"

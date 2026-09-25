@@ -4854,7 +4854,9 @@ class FuturesTradingDayGovernanceService:
             metadata["night_session_suspended"] = True
             metadata["night_session_notice_id"] = notice_id
             self.storage.upsert_trading_calendar([
-                self._calendar_day_from_existing({**existing, "metadata": metadata})
+                FuturesOfficialCalendarBackfillService._calendar_day_from_existing(
+                    {**existing, "metadata": metadata}
+                )
             ])
         return {
             "status": parse_status,
