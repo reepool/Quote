@@ -1348,6 +1348,68 @@ def test_eligibility_snapshot_marks_scheme_gap_but_not_completed_consolidation()
     assert by_id["03038.HK"]["trading_status"] == 0
 
 
+def test_counter_closure_window_blocks_original_code_until_reopen():
+    from datetime import date
+
+    from data_sources.hkex_instrument_master import (
+        build_hkex_trading_eligibility_snapshot,
+        hkex_local_ids_outside_research_scope,
+    )
+
+    closed = _hkexnews_record(
+        announcement_id="653-temp",
+        title=(
+            "SHARE CONSOLIDATION WILL BECOME EFFECTIVE ON 11 SEPTEMBER 2026. "
+            "A TEMPORARY COUNTER WILL COMMENCE ON 11 SEPTEMBER 2026. "
+            "DEALINGS ON THE ORIGINAL COUNTER ARE EXPECTED TO RESUME ON 30 SEPTEMBER 2026"
+        ),
+        published_at="2026-09-09T08:00:00+00:00",
+        symbols=("00653",),
+        headline_category="capital_reorganisation",
+    )
+    completed = _hkexnews_record(
+        announcement_id="1777-done",
+        title="SHARE CONSOLIDATION BECAME EFFECTIVE ON 12 AUGUST 2026",
+        published_at="2026-08-12T04:00:00+00:00",
+        symbols=("01777",),
+        headline_category="capital_reorganisation",
+    )
+    last_day = _hkexnews_record(
+        announcement_id="232-last",
+        title="LAST DAY OF DEALINGS IN THE SHARES ON 22 SEPTEMBER 2026",
+        published_at="2026-09-18T08:00:00+00:00",
+        symbols=("00232",),
+        headline_category="trading_arrangement",
+    )
+
+    during = build_hkex_trading_eligibility_snapshot(
+        [closed, completed, last_day],
+        as_of=date(2026, 9, 25),
+    )
+    by_id = {row["instrument_id"]: row for row in during.rows}
+    assert by_id["00653.HK"]["trading_status"] == 0
+    assert by_id["00653.HK"]["expected_resume_date"] == "2026-09-30"
+    assert "01777.HK" not in by_id
+    assert by_id["00232.HK"]["trading_status"] == 0
+
+    reopened = build_hkex_trading_eligibility_snapshot(
+        [closed],
+        as_of=date(2026, 9, 30),
+    )
+    assert reopened.rows == []
+    assert hkex_local_ids_outside_research_scope([
+        {
+            "instrument_id": "09483.HK",
+            "is_active": 1,
+            "trading_status": 1,
+            "symbol": "09483",
+            "name": "易方达高股息-U",
+        },
+        {"instrument_id": "09988.HK", "is_active": 1, "trading_status": 1, "symbol": "09988", "name": "腾讯控股"},
+        {"instrument_id": "09001.HK", "is_active": 0, "trading_status": 0, "symbol": "09001", "name": "PP中地美债-U"},
+    ]) == ["09483.HK"]
+
+
 def test_eligibility_window_reopens_after_expected_resume_date():
     from datetime import date
 

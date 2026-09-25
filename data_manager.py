@@ -17898,12 +17898,17 @@ class DataManager:
             if hasattr(self.db_ops, 'save_instrument_master_metadata_batch'):
                 metadata_saved = await self.db_ops.save_instrument_master_metadata_batch(metadata_rows)
             if hasattr(self.db_ops, 'mark_instruments_excluded'):
+                from data_sources.hkex_instrument_master import (
+                    hkex_local_ids_outside_research_scope,
+                )
+
                 excluded_ids = [
                     row.get('instrument_id')
                     for row in metadata_rows
                     if row.get('instrument_id')
                     and row.get('research_scope') == 'exclude'
                 ]
+                excluded_ids.extend(hkex_local_ids_outside_research_scope(local_rows))
                 excluded_count = await self.db_ops.mark_instruments_excluded(
                     excluded_ids,
                     source='hkex_product_scope_exclusion',

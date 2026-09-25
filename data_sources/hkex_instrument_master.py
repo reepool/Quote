@@ -175,6 +175,26 @@ _HKEX_RESUME_DATE_HINTS = (
     "resumption",
     "dealings expected",
 )
+_HKEX_COUNTER_CLOSURE_TOKENS = (
+    "SHARE CONSOLIDATION",
+    "SHARE SUBDIVISION",
+    "TEMPORARY COUNTER",
+    "PARALLEL TRADING",
+    "LAST DAY OF DEALING",
+)
+_HKEX_ORIGINAL_COUNTER_HINTS = (
+    "original counter",
+    "existing counter",
+    "re-open",
+    "reopen",
+)
+_HKEX_NON_SHARE_LAST_DAY_TOKENS = (
+    "IN THE NOTES",
+    "IN THE BONDS",
+    "IN THE WARRANTS",
+    "IN THE CONVERTIBLE",
+    "IN THE DEBENTURE",
+)
 _HKEX_MONTH_MAP = {
     "jan": 1,
     "january": 1,
@@ -314,6 +334,9 @@ def classify_hkex_product(row: Dict[str, Any]) -> Dict[str, Any]:
         research_scope = code_range["research_scope"]
     elif "trading only" in combined or "nasdaq-amex pilot" in combined or "nasdaq amex pilot" in combined:
         product_type = "trading_only"
+        research_scope = "exclude"
+    elif name.endswith("-u"):
+        product_type = "usd_counter"
         research_scope = "exclude"
     elif _is_hkex_temporary_counter_code(numeric_code):
         product_type = "temporary_counter"
@@ -807,6 +830,8 @@ def is_hkex_untradable_window(
         return effective_date is not None and as_of >= effective_date
     if category in {CIS_MATTERS_CATEGORY, WITHDRAWAL_OF_LISTING_CATEGORY}:
         return effective_date is None or as_of >= effective_date
+    if category in {TRADING_ARRANGEMENT_CATEGORY, CAPITAL_REORGANISATION_CATEGORY}:
+        return _hkex_counter_closure_blocks(title, as_of)
     return False
 
 
@@ -854,6 +879,11 @@ def build_hkex_trading_eligibility_snapshot(
         ):
             continue
         dates = extract_hkex_timetable_dates(item["title"])
+        closure_dates = _hkex_counter_closure_dates(item["title"])
+        if dates["effective_date"] is None:
+            dates["effective_date"] = closure_dates["effective_date"]
+        if dates["expected_resume_date"] is None:
+            dates["expected_resume_date"] = closure_dates["expected_resume_date"]
         source = (
             HKEX_PRODUCT_CESSATION_SOURCE
             if item["event"] in {CIS_MATTERS_CATEGORY, WITHDRAWAL_OF_LISTING_CATEGORY}
@@ -926,6 +956,70 @@ def build_hkex_trading_eligibility_snapshot(
             "as_of": as_of.isoformat(),
         },
     )
+
+
+def _hkex_counter_closure_dates(title: Any) -> Dict[str, Optional[date]]:
+    """Read the original-counter close and reopen dates from one headline.
+
+    A consolidation that only says it became effective keeps the same code
+    tradable. A temporary counter, parallel-trading window, or last dealing
+    day closes the original code until the headline gives a reopen date.
+    """
+    text = str(title or "")
+    upper = text.upper()
+    effective_date: Optional[date] = None
+    resume_date: Optional[date] = None
+    for parsed, start, end in _iter_hkex_title_dates(text):
+        window = text[max(0, start - 72) : min(len(text), end + 24)].lower()
+        if any(hint in window for hint in _HKEX_ORIGINAL_COUNTER_HINTS) or (
+            "resume" in window or "resumption" in window
+        ):
+            resume_date = parsed
+        elif any(hint in window for hint in ("effective", "last day", "with effect")):
+            if effective_date is None:
+                effective_date = parsed
+        elif "temporary counter" in window and "commence" in window and effective_date is None:
+            effective_date = parsed
+    return {
+        "effective_date": effective_date,
+        "expected_resume_date": resume_date,
+    }
+
+
+def _hkex_counter_closure_blocks(title: Any, as_of: date) -> bool:
+    text = str(title or "")
+    upper = text.upper()
+    if any(token in upper for token in _HKEX_NON_SHARE_LAST_DAY_TOKENS):
+        return False
+    if not any(token in upper for token in _HKEX_COUNTER_CLOSURE_TOKENS):
+        return False
+    dates = _hkex_counter_closure_dates(text)
+    effective_date = dates["effective_date"]
+    resume_date = dates["expected_resume_date"]
+    if "LAST DAY OF DEALING" in upper and "SHARE" in upper:
+        return effective_date is not None and as_of >= effective_date
+    if effective_date is None or resume_date is None or resume_date <= effective_date:
+        return False
+    return effective_date <= as_of < resume_date
+
+
+def hkex_local_ids_outside_research_scope(
+    rows: Iterable[Mapping[str, Any]],
+) -> List[str]:
+    """Return tradable local rows whose code is already outside equity scope."""
+    ids: List[str] = []
+    for row in rows or []:
+        instrument_id = str((row or {}).get("instrument_id") or "").strip()
+        if not instrument_id:
+            continue
+        if (row or {}).get("is_active") not in (True, 1, "1"):
+            continue
+        if (row or {}).get("trading_status") not in (True, 1, "1"):
+            continue
+        if classify_hkex_product(row).get("research_scope") != "exclude":
+            continue
+        ids.append(instrument_id)
+    return sorted(set(ids))
 
 
 def _hkex_record_title(record: Any) -> str:
