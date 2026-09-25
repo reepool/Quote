@@ -63,6 +63,9 @@ _OVERVIEW_HEADINGS = (
 _OVERVIEW_FIELD_LABELS = ("经营范围",)
 _SEGMENT_HEADINGS = (
     "占公司营业收入或营业利润10%以上",
+    "主营业务分行业情况",
+    "主营业务分产品情况",
+    "收入和成本分析",
     "主营业务分行业",
     "主营业务分产品",
     "分部报告",
@@ -361,6 +364,13 @@ def _select_owned_span(
                 continue
             closed = True
             gap = None
+        if heading in {"收入和成本分析", "主营业务分行业情况", "主营业务分产品情况"}:
+            excerpt = _clip_before_later_segment_template(excerpt)
+            if _unit_from_excerpt(excerpt) and any(
+                _parse_segment_row(line) for line in excerpt.splitlines()
+            ):
+                closed = True
+                gap = None
         usable = _usable_excerpt(excerpt, heading, require_substance)
         if usable and _excerpt_states_owned_overview(excerpt):
             closed = True
@@ -826,6 +836,7 @@ def _prepared_evidence(
 
 _CLAUSE_PATTERNS = (
     re.compile(r"主营业务为\s*([^。；;]{2,80})"),
+    re.compile(r"主要从事\s*([^。；;]{2,120})"),
     re.compile(r"主要产品包括\s*([^。；;]{2,80})"),
     re.compile(r"主要产品为\s*([^。；;]{2,80})"),
     re.compile(r"(?:^|[\n\r])经营范围(?!内)\s*[:：]?\s*([^。；;\n]{2,120})"),
@@ -1370,6 +1381,18 @@ def _income_analysis_excerpt_ready(excerpt: str) -> bool:
     return False
 
 
+def _clip_before_later_segment_template(excerpt: str) -> str:
+    """Keep the MD&A revenue table and stop at a later segment-report template."""
+
+    kept: list[str] = []
+    for line in excerpt.splitlines():
+        heading = _heading_if_title_line(line, ("分部报告", "分部信息"))
+        if heading is not None and kept:
+            break
+        kept.append(line)
+    return "\n".join(kept).strip()
+
+
 def _clip_income_analysis_excerpt(excerpt: str) -> str:
     kept: list[str] = []
     for line in excerpt.splitlines():
@@ -1442,7 +1465,7 @@ def _base_fact(model, **kwargs):
 def _excerpt_states_owned_overview(excerpt: str) -> bool:
     return bool(
         re.search(
-            r"主营业务为|主要产品包括|主要产品为|经营范围(?!内)|"
+            r"主营业务为|主要从事|主要产品包括|主要产品为|经营范围(?!内)|"
             r"公司主要业务情况|公司金融业务",
             excerpt,
         )
@@ -1569,8 +1592,10 @@ def _object_and_action(
 
 
 _SEGMENT_SECTION_HEADINGS = {
+    "主营业务分行业情况": "industry",
     "主营业务分行业": "industry",
     "分行业": "industry",
+    "主营业务分产品情况": "product",
     "主营业务分产品": "product",
     "分产品": "product",
     "分地区": "region",

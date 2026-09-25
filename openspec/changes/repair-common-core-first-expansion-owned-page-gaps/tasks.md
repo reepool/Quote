@@ -1,14 +1,14 @@
 ## 1. Scope review gate
 
-- [ ] 1.1 Independent review accepts this two-gap scope
-- [ ] 1.2 Do not change business code until 1.1 is checked
+- [x] 1.1 Independent review accepts this two-gap scope
+- [x] 1.2 Do not change business code until 1.1 is checked
 
 ## 2. Implementation after review
 
-- [ ] 2.1 Accept “公司主要从事” under an existing owned overview heading in the current principal-business and products-services projection, without hard-coding a security, page, or company
-- [ ] 2.2 Route a titled revenue-composition table under “主营业务分析 / 收入和成本分析” into the current segment/revenue projection, while still allowing a later segment-report template and refusing cross-table, equal-amount, and untitled matches
-- [ ] 2.3 Publish the repair as `owned_page_facts=v5` and prove v1–v4 work JSON is not overwritten
-- [ ] 2.4 Add direct counterexamples for the overview wording, the MD&A table route, and the refused loose matches
+- [x] 2.1 Accept “公司主要从事” under an existing owned overview heading in the current principal-business and products-services projection, without hard-coding a security, page, or company
+- [x] 2.2 Route a titled revenue-composition table under “主营业务分析 / 收入和成本分析” into the current segment/revenue projection, while still allowing a later segment-report template and refusing cross-table, equal-amount, and untitled matches
+- [x] 2.3 Publish the repair as `owned_page_facts=v5` and prove v1–v4 work JSON is not overwritten
+- [x] 2.4 Add direct counterexamples for the overview wording, the MD&A table route, and the refused loose matches
 
 ## 3. Official successor replay, not yet authorized
 

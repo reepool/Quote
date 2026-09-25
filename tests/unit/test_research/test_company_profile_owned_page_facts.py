@@ -27,6 +27,7 @@ from research.company_profile.execution import (
     OWNED_PAGE_FACTS_V1_IDENTITY,
     OWNED_PAGE_FACTS_V2_IDENTITY,
     OWNED_PAGE_FACTS_V3_IDENTITY,
+    OWNED_PAGE_FACTS_V4_IDENTITY,
     default_processing_identity,
 )
 from research.company_profile.models import (
@@ -153,10 +154,11 @@ def test_default_identity_is_distinct_from_empty_delivery():
     identity = default_processing_identity()
     assert identity != EMPTY_DELIVERY_PROCESSING_IDENTITY
     assert identity["rules"] == "company_profile_common_core.v1"
-    assert identity["owned_page_facts"] == "v4"
+    assert identity["owned_page_facts"] == "v5"
     assert identity != OWNED_PAGE_FACTS_V1_IDENTITY
     assert identity != OWNED_PAGE_FACTS_V2_IDENTITY
     assert identity != OWNED_PAGE_FACTS_V3_IDENTITY
+    assert identity != OWNED_PAGE_FACTS_V4_IDENTITY
 
 
 def test_avic_official_excerpts_project_core_facts_without_provider():
@@ -955,6 +957,192 @@ def test_same_identity_repeat_still_reuses_completed_work(tmp_path):
     )
     assert first["inserted"] == 1
     assert second["reused"] == 1
+
+
+OWNED_PRINCIPAL = (
+    "（一）主营业务\n"
+    "公司主要从事汽车、发动机的开发、设计、生产和销售业务。\n"
+    "二、报告期内公司所处行业情况\n"
+)
+LOOSE_PRINCIPAL = "公司主要从事汽车、发动机的开发、设计、生产和销售业务。\n"
+MDA_REVENUE = (
+    "（一）主营业务分析\n"
+    "2、收入和成本分析\n"
+    "单位：元 币种：人民币\n"
+    "主营业务分行业情况\n"
+    "分行业 营业收入 营业成本 毛利率（%）\n"
+    "航空服务业 7955002081.35 5940772752.65 25.32\n"
+    "6、分部信息\n"
+    "分行业\n"
+    "航空服务业 7955002081.35 1.00 1.00\n"
+)
+UNTITLED_REVENUE = "航空服务业 7955002081.35 5940772752.65 25.32\n"
+SEGMENT_TEMPLATE = (
+    "分部信息\n"
+    "分行业\n"
+    "单位：元\n"
+    "航空地面服务 1361162400.00 10.00\n"
+)
+
+
+def test_owned_heading_projects_principally_engaged_wording():
+    report = _report(instrument_id="600006.SH", report_id="asset-principal")
+    selected = select_core_evidence(
+        report=report,
+        pages=({"page": 8, "text": OWNED_PRINCIPAL, "readable": True},),
+    )
+    records = project_owned_page_facts(selected)
+    overview = next(item for item in records if item.field_id == "business_overview_source")
+    activities = [item for item in records if item.field_id == "explicit_activity"]
+    assert "主要从事" in overview.source_text
+    assert activities
+    assert any("汽车" in item.object_name for item in activities)
+    assert overview.evidence[0].page == 8
+
+
+def test_principally_engaged_wording_outside_owned_heading_is_refused():
+    report = _report(instrument_id="600006.SH", report_id="asset-loose-principal")
+    selected = select_core_evidence(
+        report=report,
+        pages=({"page": 8, "text": LOOSE_PRINCIPAL, "readable": True},),
+    )
+    assert not any(
+        span.chapter_task == ChapterTask.EXTRACT_BUSINESS_OVERVIEW.value
+        for span in selected.spans
+    )
+    assert not any(
+        item.field_id in {"business_overview_source", "explicit_activity"}
+        for item in project_owned_page_facts(selected)
+    )
+
+
+def test_mda_revenue_table_keeps_source_binding_and_ignores_later_equal_amount():
+    report = _report(instrument_id="600004.SH", report_id="asset-mda-revenue")
+    selected = select_core_evidence(
+        report=report,
+        pages=(
+            {"page": 12, "text": MDA_REVENUE, "readable": True},
+            {"page": 198, "text": SEGMENT_TEMPLATE, "readable": True},
+        ),
+    )
+    revenue_span = next(
+        span for span in selected.spans if span.section_title == "收入和成本分析"
+    )
+    assert "航空服务业 7955002081.35" in revenue_span.excerpt
+    assert "航空地面服务" not in revenue_span.excerpt
+    records = [
+        item
+        for item in project_owned_page_facts(selected)
+        if item.field_id in {"segment_dimension", "operating_revenue"}
+        and getattr(item, "segment_label", None) == "航空服务业"
+        or (
+            item.field_id == "operating_revenue"
+            and getattr(getattr(item, "source_native", None), "value", None)
+            == "7955002081.35"
+        )
+    ]
+    assert records
+    assert all(item.evidence[0].page == 12 for item in records)
+    assert all(item.evidence[0].section_title == "收入和成本分析" for item in records)
+    assert any(getattr(item, "segment_dimension", None) == "industry" for item in records)
+    assert any(
+        getattr(getattr(item, "source_native", None), "unit", None) == "元"
+        for item in records
+    )
+    assert not any(
+        getattr(getattr(item, "source_native", None), "value", None) == "1.00"
+        for item in project_owned_page_facts(selected)
+    )
+
+
+def test_untitled_revenue_row_is_refused():
+    report = _report(instrument_id="600004.SH", report_id="asset-untitled")
+    selected = select_core_evidence(
+        report=report,
+        pages=({"page": 12, "text": UNTITLED_REVENUE, "readable": True},),
+    )
+    assert not any(
+        span.chapter_task == ChapterTask.EXTRACT_SEGMENT_FINANCIALS.value
+        for span in selected.spans
+    )
+
+
+def test_segment_information_template_remains_usable():
+    report = _report(instrument_id="600004.SH", report_id="asset-segment-template")
+    selected = select_core_evidence(
+        report=report,
+        pages=({"page": 198, "text": SEGMENT_TEMPLATE, "readable": True},),
+    )
+    assert any(span.section_title == "分部信息" for span in selected.spans)
+
+
+def test_owned_disclosure_projects_without_provider(tmp_path):
+    report = _report(instrument_id="600006.SH", report_id="asset-no-provider")
+    pages = ({"page": 8, "text": OWNED_PRINCIPAL, "readable": True},)
+    writer = CompanyProfileResearchWriter(tmp_path)
+    published = asyncio.run(
+        _drive(
+            CompanyProfileStageRuntime(writer=writer, provider=None),
+            _item(report, pages, work_id="work-no-provider"),
+        )
+    )
+    assert published["provider_calls"] == []
+    assert published["assessment"]["principal_business"]["answered"] is True
+    assert published["assessment"]["products_services"]["answered"] is True
+
+
+def test_v5_enqueues_successor_and_query_prefers_it_over_later_v4_work_id(tmp_path):
+    storage = _storage(tmp_path)
+    _frontier(storage)
+    queue = BusinessProfileWorkRepository(
+        storage, checkpoint_root=tmp_path / "checkpoints"
+    )
+    first = queue.enqueue_latest_annual(
+        knowledge_cutoff="2026-08-30",
+        processing_identity=OWNED_PAGE_FACTS_V4_IDENTITY,
+        instrument_ids=["600000.SH"],
+    )
+    successor = queue.enqueue_latest_annual(
+        knowledge_cutoff="2026-08-30",
+        processing_identity=default_processing_identity(),
+        instrument_ids=["600000.SH"],
+    )
+    assert default_processing_identity()["owned_page_facts"] == "v5"
+    assert first["inserted"] == 1
+    assert successor["inserted"] == 1
+    assert successor["reused"] == 0
+    assert first["work_ids"] != successor["work_ids"]
+
+    report = _report(instrument_id="600000.SH", report_id="asset-v5-query")
+    writer = CompanyProfileResearchWriter(tmp_path / "output")
+    predecessor = _item(
+        report,
+        ({"page": 1, "text": "目录\n无业务章节", "readable": True},),
+        work_id="zz-v4-empty",
+    )
+    predecessor["processing_identity"] = OWNED_PAGE_FACTS_V4_IDENTITY
+    current = _item(
+        report,
+        ({"page": 8, "text": OWNED_PRINCIPAL, "readable": True},),
+        work_id="aa-v5-successor",
+    )
+    current["processing_identity"] = default_processing_identity()
+    asyncio.run(
+        _drive(CompanyProfileStageRuntime(writer=writer, provider=None), predecessor)
+    )
+    asyncio.run(
+        _drive(CompanyProfileStageRuntime(writer=writer, provider=None), current)
+    )
+    queried = asyncio.run(
+        CompanyProfileTaskService(
+            storage=_storage(tmp_path / "query"),
+            output_root=tmp_path / "output",
+            checkpoint_root=tmp_path / "checkpoints",
+        ).execute("query", instrument_ids=["600000.SH"])
+    )
+    profile = queried["profiles"][0]
+    assert profile["work_id"] == "aa-v5-successor"
+    assert profile["accepted_facts"]
 
 
 def test_repair_does_not_rewrite_sw_l1_or_start_m4():
