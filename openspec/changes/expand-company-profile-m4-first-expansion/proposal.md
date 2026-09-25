@@ -1,6 +1,6 @@
 ## Why
 
-`owned_page_facts=v4` 已在 302132.SZ / 600000.SH 上通过独立核原文，4.1 数字门槛此次算过。`company_profile_operator_closure.v1` 仍登记 `first_expansion_gates_unmet`。产品 M4 可以提出第一片，但不能把 4.1 通过写成生产或规模质量。现有入口仍是同一 `company_profile_common_core` 的 `run` / `resume`；若无条件要求首次扩大快照，会阻断普通研究运行，或在快照落盘后永久重跑同一批样本。只绑 instrument / strata 也不足以冻结观察对象：更正年报或不同 `knowledge_cutoff` 会让 enqueue 处理另一份报告。
+`owned_page_facts=v4` 已在 302132.SZ / 600000.SH 上通过独立核原文，4.1 数字门槛此次算过。v1 closure 的 schema/catalog 仍包含 `first_expansion_gates_unmet`；本次正式 checkpoint 没有发现 v1 快照，不能把 catalog 写成已经落盘的历史文件。产品 M4 可以提出第一片，但不能把 4.1 通过写成生产或规模质量。现有入口仍是同一 `company_profile_common_core` 的 `run` / `resume`；若无条件要求首次扩大快照，会阻断普通研究运行，或在快照落盘后永久重跑同一批样本。只绑 instrument / strata 也不足以冻结观察对象：更正年报或不同 `knowledge_cutoff` 会让 enqueue 处理另一份报告。
 
 ## What Changes
 
@@ -10,7 +10,7 @@
 - enqueue 前持久化不可变 `company_profile_first_expansion_plan.v1`：绑定 `knowledge_cutoff`、选样所用 universe/registry 时点或身份，以及每家正式年报的 `asset_id`/`report_id`、`report_period`、`document_version`（按现有字段）。漂移拒绝，不得静默换新版本。
 - 新 live-run / source-review 写独立快照，携带同一 plan 引用和报告引用；不得覆盖当前两家公司 7/7 的 v1 基线。
 - 首次扩大仍只选两家。专用选样预留一个 `service` 名额，另一个名额按现有全局优先级从剩余候选填充。没有合法 `service` 候选则拒绝。普通 live-run 的 `_STRATUM_PRIORITY` 不变。
-- 发布 `company_profile_operator_closure.v2` 并保留 v1。v2 使用执行后语义；不授权下一轮扩大、规模质量或生产。
+- 发布 `company_profile_operator_closure.v2`。v1 schema/catalog 继续受支持；若已有历史 v1 JSON，必须保持可读且不得被 v2 覆盖。本次正式 checkpoint 未发现 v1 快照，不得为此重构或伪造。v2 使用执行后语义；不授权下一轮扩大、规模质量或生产。
 - 不建行业包，不抽净息差 / 成本收入比 / 贷款结构，不预授权 v5。生产继续 `not_authorized`。
 
 ## Capabilities

@@ -14,14 +14,14 @@
 - 只在该模式 `active` 且快照缺失/不匹配时拒绝；普通路径不回归。
 - 计划冻结 `knowledge_cutoff`、registry/universe 身份，以及每家年报的现有身份字段；漂移拒绝。
 - 新观察写独立快照；保留两家公司 7/7 基线。
-- 发布 operator_closure v2，保留 v1；完成后不得自动下一轮或重跑冻结样本。
+- 发布 operator_closure v2。v1 schema 继续可读；已有历史 v1 文件不得覆盖。本次正式目录没有 v1 快照，不得补造。完成后不得自动下一轮或重跑冻结样本。
 
 **Non-Goals:**
 
 - 不新增 published action 或平行执行链。
 - 不授权生产、DCF、交易、旧 writer、规模质量或下一轮扩大。
 - 不建行业包，不抽净息差 / 成本收入比 / 贷款结构，不预写 v5。
-- 不覆盖 operator_closure v1 清单。
+- 不改写 v1 closure catalog。没有正式 v1 快照时，不新建一份冒充历史的 v1。
 - 任务 1.1 未勾选不得改代码。
 
 ## Decisions
@@ -38,8 +38,8 @@
 4. **新观察写独立快照，基线 v1 文件不动。**
    新 live-run / source-review 必须携带同一 plan 引用和同一组报告引用，且不覆盖固定 v1 文件。完成后新 source-review 是本轮权威，基线仍可读。
 
-5. **operator_closure 发 v2，保留 v1；文案用执行后语义。**
-   不改 v1 唯一合法清单。v2 在新 source-review 之后写：首次扩大已按受审计划执行；新 source-review 是本轮权威；不授权下一轮、规模质量或生产。写入 v2 即完成模式。
+5. **operator_closure 发 v2；v1 是 schema 兼容，不是本次已证实的正式快照。**
+   v1 catalog 仍是合法历史格式，单元测试中的合法 v1 JSON 必须能读。若将来提供可信历史 v1 文件，它必须继续可读，且 v2 不得改写该 catalog 或覆盖该文件。2026-09-25 只读搜索确认本次正式 checkpoint、Git 和文档都没有 v1 原件，因此不得调用持久化入口补造。v2 在新 source-review 之后写：首次扩大已按受审计划执行；新 source-review 是本轮权威；不授权下一轮、规模质量或生产。写入 v2 即完成模式。缺失 v1 不阻止 v2 成为本轮正式 closure。
 
 6. **不改 published identity，除非另批解释器。**
    默认继续 v4。可复用缺口另开 change。
@@ -61,9 +61,9 @@
 2. 合同 Review 通过后，才实现首次扩大专用的 service 保留名额。两家预算不变。没有合法 service 候选则拒绝，不扩大样本，不激活。
 3. 用现有 `run`/`resume` 只处理冻结报告；新 live-run / source-review 写独立快照。
 4. 核原文后写 operator_closure v2，模式变为 `completed`。
-5. 回滚：回到 `inactive` 或保留 `completed` 而不再激活；保留 v4、v1 基线和 v1 closure；生产状态不变。
+5. 回滚：回到 `inactive` 或保留 `completed` 而不再激活；保留 v4 和已有的 live-run/source-review v1 基线。若历史 closure v1 文件存在则保留；本次没有该文件，不得补造。生产状态不变。
 
 ## Open Questions
 
 - 2026-09-24 首次扩大零交付集中成两个可复用 common-core 缺口，不在本 change 修复，也不发布 `owned_page_facts=v5`。后续最小 repair change 只覆盖这两项：overview 投影前置判断不接受 owned 标题下的“公司主要从事……”，而后文选择规则已经认识“主要从事”；“主营业务分析 / 收入和成本分析”下的正式收入构成表没有进入 segment/revenue 投影，路由落到后部“分部报告 / 分部信息”会计模板页。该 repair 不得按公司硬编码，不得打开 LLM 掩盖 `provider_unavailable`。白云机场吞吐量、土地及广告补偿，以及东风产销量、材料成本和钢材/铝材/碳酸锂/镍投入角色，留在后续 M4 行业能力，不纳入这次 common-core repair。本卡只登记候选范围，不创建、不 apply。
-- 5.9a 已允许完整复核、零交付、质量门失败的观察写入现有 closure v2 并进入 `completed`。`completed` 只表示本轮结束，不表示 `expansion_gates_met=true`。准确率已评估的原路径保留。少样本、缺 aspect、未全部交付、已交付事实未评估、recall 或 critical errors 未评估，以及计划或报告引用漂移，仍然拒绝。正式 closure 尚未执行。
+- 5.9a 已允许完整复核、零交付、质量门失败的观察写入现有 closure v2 并进入 `completed`。`completed` 只表示本轮结束，不表示 `expansion_gates_met=true`。准确率已评估的原路径保留。少样本、缺 aspect、未全部交付、已交付事实未评估、recall 或 critical errors 未评估，以及计划或报告引用漂移，仍然拒绝。正式 closure v2 已写入；正式 v1 closure 快照从未被证明存在，schema 兼容测试仍然保留。

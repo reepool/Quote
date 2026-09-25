@@ -83,14 +83,21 @@ After the frozen plan runs, source review MUST be recorded from independently re
 - **AND** expansion gates are recalculated from those findings
 - **AND** predecessor v4 JSON files remain readable
 
-### Requirement: Operator closure publishes v2 and keeps v1 readable
-The change MUST publish `company_profile_operator_closure.v2` as a new snapshot and MUST NOT change the unique legal backlog of `company_profile_operator_closure.v1`. Existing v1 JSON MUST remain readable against the original catalog that includes `first_expansion_gates_unmet`. The runtime MUST NOT require historical v1 reports to match the v2 catalog. The v2 catalog MUST replace `first_expansion_gates_unmet` and MUST keep the other five backlog item ids: manufacturing/materials is not production, non-manufacturing industry packages are absent, unassessed semantics are not a pass, missing assets stay in the denominator, and Gold24/fixture guards are not live quality. Every backlog item MUST keep `execute_this_round=false` and `production_authorized=false`.
+### Requirement: Operator closure publishes v2 and keeps the v1 schema compatible
+The change MUST publish `company_profile_operator_closure.v2` as a new snapshot and MUST NOT change the unique legal backlog of the `company_profile_operator_closure.v1` schema. The v1 schema and catalog MUST remain supported, including `first_expansion_gates_unmet`. A legal v1 JSON fixture MUST still load, and the runtime MUST NOT require that fixture to match the v2 catalog. If a historical v1 JSON file exists, it MUST remain readable and v2 MUST NOT overwrite it. This official checkpoint has no discovered v1 snapshot, so the change MUST NOT reconstruct or forge one. Absence of that file MUST NOT prevent v2 from being this round's official closure. The v2 catalog MUST replace `first_expansion_gates_unmet` and MUST keep the other five backlog item ids: manufacturing/materials is not production, non-manufacturing industry packages are absent, unassessed semantics are not a pass, missing assets stay in the denominator, and Gold24/fixture guards are not live quality. Every backlog item MUST keep `execute_this_round=false` and `production_authorized=false`.
 
 #### Scenario: v1 report remains readable after v2 is published
 - **WHEN** a historical `company_profile_operator_closure.v1` report contains `first_expansion_gates_unmet`
 - **THEN** that file still loads
 - **AND** the current snapshot is `company_profile_operator_closure.v2`
 - **AND** the v1 file is not overwritten
+
+#### Scenario: Official v1 snapshot is absent
+- **WHEN** the official checkpoint has no `company_profile_operator_closure.v1` file
+- **THEN** `load_operator_closure_report()` returns none
+- **AND** the written v2 snapshot remains this round's official closure
+- **AND** no v1 file is created to impersonate that missing history
+- **AND** the v1 loader and schema compatibility tests remain in place
 
 ### Requirement: v2 replacement backlog uses post-execution wording
 `company_profile_operator_closure.v2` MUST be written only after the frozen plan has been executed and the new source-review snapshot exists. Writing that report MUST mark `first_expansion_mode=completed`. The replacement backlog item MUST state that first expansion has already been executed under the reviewed plan, that the new source-review snapshot is this-round authority, and that this change does not authorize the next expansion, a scale-quality claim, or production. The item MUST NOT say that first expansion still requires this change or a new plan.
