@@ -13,5 +13,5 @@
 ## 3. Official successor replay, not yet authorized
 
 - [x] 3.1 After implementation review, replay only the official 600004.SH and 600006.SH annual reports on the v5 identity
-- [ ] 3.2 Independently recount recall, accuracy, critical numeric errors, and elapsed. Do not presume 4.1 passes
+- [x] 3.2 Independently recount recall, accuracy, critical numeric errors, and elapsed. Do not presume 4.1 passes
 - [ ] 3.3 Do not start another expansion, authorize scale quality or production, or add the deferred industry disclosures
