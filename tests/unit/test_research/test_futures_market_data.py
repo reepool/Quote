@@ -5241,6 +5241,52 @@ def test_futures_sync_stamps_pre_cutoff_and_post_cutoff_publication_state(tmp_pa
     assert incomplete.metadata["finalization_reason"] == "incomplete_final_fields"
 
 
+def test_futures_sync_finalizes_official_untraded_settlement_after_cutoff(tmp_path):
+    config = _research_config(tmp_path)
+    storage = FuturesStorageManager(config)
+    storage.initialize()
+    service = FuturesMarketDataSyncService(storage, config)
+    untraded = FuturesBar(
+        series_id="CNF.WR.SHFE.main",
+        trade_date="2026-09-14",
+        open=None,
+        high=None,
+        low=None,
+        close=3394.0,
+        settlement=3394.0,
+        volume=0.0,
+        open_interest=38.0,
+        quality_flag="official_untraded_with_settlement",
+        raw_payload_hash="untraded-settlement",
+    )
+
+    before_cutoff = service._with_publication_state(
+        untraded,
+        exchange="SHFE",
+        run_at=datetime(2026, 9, 14, 10, 0, tzinfo=ZoneInfo("Asia/Shanghai")),
+        ingestion_run_id=428,
+    )
+    after_cutoff = service._with_publication_state(
+        untraded,
+        exchange="SHFE",
+        run_at=datetime(2026, 9, 14, 21, 30, tzinfo=ZoneInfo("Asia/Shanghai")),
+        ingestion_run_id=429,
+    )
+    empty_volume = service._with_publication_state(
+        replace(untraded, volume=None, quality_flag="partial"),
+        exchange="SHFE",
+        run_at=datetime(2026, 9, 14, 21, 30, tzinfo=ZoneInfo("Asia/Shanghai")),
+        ingestion_run_id=429,
+    )
+
+    assert before_cutoff.metadata["publication_state"] == "provisional"
+    assert before_cutoff.metadata["finalization_reason"] == "before_publication_cutoff"
+    assert after_cutoff.metadata["publication_state"] == "final"
+    assert after_cutoff.metadata["finalization_reason"] == "publication_eligible_complete_payload"
+    assert empty_volume.metadata["publication_state"] == "provisional"
+    assert empty_volume.metadata["finalization_reason"] == "incomplete_final_fields"
+
+
 def test_official_calendar_daily_window_repairs_weak_dce_row(monkeypatch, tmp_path):
     config = _research_config(tmp_path)
     config.modules["commodity_market_data"]["trading_day_governance"] = {
@@ -5923,6 +5969,132 @@ def test_dce_official_zero_ohlc_with_settlement_gets_specific_quality_flag():
         )
         == "official_zero_ohlc_with_settlement"
     )
+
+
+def _shfe_untraded_settlement_row(**overrides: object) -> OfficialFuturesContractBar:
+    payload = {
+        "exchange": "SHFE",
+        "trade_date": "2026-09-14",
+        "variety": "WR",
+        "contract": "WR2701",
+        "open": None,
+        "high": None,
+        "low": None,
+        "close": 3394.0,
+        "settlement": 3394.0,
+        "volume": 0.0,
+        "open_interest": 38.0,
+        "amount": 0.0,
+        "source_interface": "official_shfe_daily_kx_dat",
+        "raw_payload": {
+            "PRODUCTGROUPID": "wr",
+            "DELIVERYMONTH": "2701",
+            "OPENPRICE": "",
+            "HIGHESTPRICE": "",
+            "LOWESTPRICE": "",
+            "CLOSEPRICE": 3394,
+            "SETTLEMENTPRICE": 3394,
+            "VOLUME": 0,
+            "OPENINTEREST": 38,
+            "TURNOVER": 0,
+        },
+        "warnings": ["amount_unit_exchange_reported", "missing_price_field"],
+    }
+    payload.update(overrides)
+    return OfficialFuturesContractBar(**payload)
+
+
+def test_shfe_official_untraded_empty_ohlc_with_settlement_gets_specific_quality_flag():
+    row = _shfe_untraded_settlement_row()
+
+    assert _bar_quality_flag(row) == "official_untraded_with_settlement"
+    assert (
+        _quality_flag(
+            row.open,
+            row.high,
+            row.low,
+            row.close,
+            settlement=row.settlement,
+            volume=row.volume,
+            open_interest=row.open_interest,
+            amount=row.amount,
+        )
+        == "partial"
+    )
+
+
+@pytest.mark.parametrize(
+    "overrides",
+    [
+        {"volume": None},
+        {"settlement": None},
+        {"close": None, "settlement": 3394.0},
+        {"close": 3394.0, "settlement": 3400.0},
+        {"open_interest": None},
+        {"open": 3394.0, "high": None, "low": None},
+        {"warnings": ["amount_unit_exchange_reported", "missing_price_field", "parser_truncated"]},
+    ],
+)
+def test_official_untraded_quality_flag_rejects_empty_or_inconsistent_rows(overrides):
+    row = _shfe_untraded_settlement_row(**overrides)
+
+    assert _bar_quality_flag(row) != "official_untraded_with_settlement"
+    assert _bar_quality_flag(row) in {"partial", "missing_close"}
+
+
+def test_official_futures_provider_parses_shfe_untraded_settlement_row(tmp_path):
+    config = _research_config(tmp_path)
+    config.modules["commodity_market_data"]["sources"] = {
+        "exchange_official": {"enabled": True, "enabled_exchanges": ["SHFE"]}
+    }
+    provider = OfficialFuturesMarketDataProvider(config)
+    series = FuturesSeries(
+        series_id="CNF.WR.SHFE.main",
+        instrument_id="CNF.WR.SHFE",
+        symbol="WR0",
+        series_type="main_continuous",
+        source_profile="exchange_official",
+        source="exchange_official",
+        unit="CNY/ton",
+    )
+
+    rows = provider._parse_shfe_payload(
+        {
+            "o_curinstrument": [
+                {
+                    "PRODUCTGROUPID": "wr",
+                    "PRODUCTID": "wr_f",
+                    "PRODUCTNAME": "线材",
+                    "DELIVERYMONTH": "2701",
+                    "OPENPRICE": "",
+                    "HIGHESTPRICE": "",
+                    "LOWESTPRICE": "",
+                    "CLOSEPRICE": 3394,
+                    "SETTLEMENTPRICE": 3394,
+                    "VOLUME": 0,
+                    "OPENINTEREST": 38,
+                    "TURNOVER": 0,
+                }
+            ]
+        },
+        trade_date="2026-09-14",
+        exchange="SHFE",
+    )
+    artifacts = provider.build_series_artifacts_from_contract_rows(
+        series,
+        rows,
+        mode="direct",
+    )
+    bar = artifacts["series_bars"][0]
+
+    assert rows[0].volume == 0.0
+    assert rows[0].open is None
+    assert rows[0].close == 3394.0
+    assert rows[0].settlement == 3394.0
+    assert "missing_price_field" in rows[0].warnings
+    assert bar.quality_flag == "official_untraded_with_settlement"
+    assert bar.volume == 0.0
+    assert bar.close == 3394.0
 
 
 def test_official_futures_provider_parses_shfe_and_selects_main_contract(tmp_path):
@@ -7101,6 +7273,73 @@ async def test_futures_market_data_sync_finalizes_pre_cutoff_partial_row_at_2130
     assert stored["close"] == 11
     assert stored["quality_flag"] == "ok"
     assert stored["metadata"]["publication_state"] == "final"
+
+
+@pytest.mark.asyncio
+async def test_futures_market_data_sync_finalizes_shfe_untraded_settlement_after_cutoff(
+    monkeypatch,
+    tmp_path,
+):
+    config = _research_config(tmp_path)
+    config.modules["commodity_market_data"]["sources"] = {
+        "exchange_official": {
+            "enabled": True,
+            "enabled_exchanges": ["SHFE"],
+            "timeout_seconds": 1,
+        },
+        "akshare_futures": {"enabled": False},
+    }
+    storage = FuturesStorageManager(config)
+    storage.initialize()
+    registry = default_futures_registry(config.modules["commodity_market_data"])
+    storage.upsert_instruments_and_series(registry["instruments"], registry["series"])
+    _seed_verified_calendar(storage, trade_date="2026-09-14")
+
+    async def fake_official_fetch(self, exchange, trade_date, *, mode="direct"):
+        return [
+            _shfe_untraded_settlement_row(
+                trade_date=trade_date,
+                variety="CU",
+                contract="CU2609",
+            )
+        ]
+
+    monkeypatch.setattr(
+        "research.providers.official_futures.OfficialFuturesMarketDataProvider.fetch_exchange_contract_bars",
+        fake_official_fetch,
+    )
+    monkeypatch.setattr(
+        "research.providers.official_futures.OfficialFuturesMarketDataProvider.close",
+        lambda self: None,
+    )
+
+    result = await FuturesMarketDataSyncService(
+        storage,
+        config,
+        now_provider=lambda: datetime(
+            2026,
+            9,
+            14,
+            21,
+            30,
+            tzinfo=ZoneInfo("Asia/Shanghai"),
+        ),
+    ).sync(
+        series_ids=["CNF.CU.SHFE.main"],
+        start_date="2026-09-14",
+        end_date="2026-09-14",
+    )
+    stored = storage.get_price_bars("CNF.CU.SHFE.main")[0]
+    completeness = result["exchange_completeness"]["SHFE"]
+
+    assert result["status"] == "success"
+    assert completeness["status"] == "success"
+    assert completeness["remaining_provisional_dates"] == []
+    assert completeness["blockers"] == []
+    assert stored["quality_flag"] == "official_untraded_with_settlement"
+    assert stored["metadata"]["publication_state"] == "final"
+    assert stored["close"] == 3394.0
+    assert stored["volume"] == 0.0
 
 
 @pytest.mark.asyncio

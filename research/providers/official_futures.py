@@ -4363,11 +4363,35 @@ def _quality_warnings(row: Mapping[str, Any], *, amount_unit: str) -> List[str]:
     return sorted(set(warnings))
 
 
+def _is_official_untraded_empty_ohlc_with_settlement(row: OfficialFuturesContractBar) -> bool:
+    """Return whether an official row is a published no-trade settlement print.
+
+    Empty or truncated fetches stay out of this path: volume must be the
+    official numeric 0, not a missing field, and close must equal settlement.
+    """
+    if row.volume != 0.0 or row.open_interest is None:
+        return False
+    if row.close is None or row.settlement is None:
+        return False
+    if float(row.close) != float(row.settlement):
+        return False
+    return row.open is None and row.high is None and row.low is None
+
+
 def _bar_quality_flag(row: OfficialFuturesContractBar) -> str:
+    ignored_warnings = {"amount_unit_exchange_reported"}
+    if _is_official_untraded_empty_ohlc_with_settlement(row):
+        ignored_warnings = ignored_warnings | {"missing_price_field"}
+        material_warnings = {
+            warning for warning in row.warnings if warning not in ignored_warnings
+        }
+        if material_warnings:
+            return "partial"
+        return "official_untraded_with_settlement"
     material_warnings = {
         warning
         for warning in row.warnings
-        if warning not in {"amount_unit_exchange_reported"}
+        if warning not in ignored_warnings
     }
     if material_warnings:
         return "partial"
