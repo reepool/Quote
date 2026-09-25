@@ -1,0 +1,68 @@
+## 1. Scope review gate
+
+- [x] 1.1 Independent review accepts this first-slice scope and does not enlarge it into industry packages or production
+- [x] 1.2 Confirm implementation must not start until 1.1 is checked
+
+Checked tasks below mean the control capability is implemented and tested. They do not mean an official first-expansion plan, mode, run, snapshot, or closure has been written.
+
+## 2. First-expansion mode and immutable plan capability
+
+- [x] 2.1 Implement and test persisting `first_expansion_mode` on the existing owner as `inactive` / `active` / `completed` without adding a published action
+- [x] 2.2 Implement and test the immutable `company_profile_first_expansion_plan.v1` model, persist path, and validation for plan id or hash, `knowledge_cutoff`, registry identity, strata including `service`, and per-report `asset_id`, `report_id`, `report_period`, and `document_version`
+- [x] 2.3 Implement and test refusal of enqueue or resume only while `active` if the snapshot is missing or the cutoff, registry identity, or report references drift
+- [x] 2.4 Implement and test that ordinary `run`/`resume` stay unchanged while `inactive` or `completed`, that missing assets stay in the denominator, and that `scale_quality_claim_allowed=false`
+
+## 3. Frozen work and independent snapshot capability
+
+- [x] 3.1 Implement and test that an active published `run`/`resume` stays on the frozen report references and does not overwrite v1–v4 work JSON
+- [x] 3.2 Implement and test that `resume` in `active` mode continues only that frozen work, and that after delivery later `run`/`resume` are idempotent
+- [x] 3.3 Implement and test writing independent live-run and source-review snapshots that carry the same plan and report references and do not overwrite the two-company v1 baseline files
+
+## 4. Operator closure v2 capability
+
+- [x] 4.1 Implement and test generating `company_profile_operator_closure.v2` without changing the v1 catalog, and prove a legal v1 JSON fixture still loads. This capability test is not evidence that an official v1 snapshot exists
+- [x] 4.2 Implement and test that the replacement backlog is written only after a new source-review snapshot exists, uses post-execution wording, marks mode `completed`, and keeps the other five backlog item ids
+- [x] 4.3 Implement and test that a post-completion `run` does not rerun the frozen sample or start another expansion
+- [x] 4.4 Implement and test that production, DCF, trading, and the legacy writer remain unauthorized
+
+## 5. Official first expansion
+
+The official sequence below has been executed. Do not enlarge the sample or change ordinary live-run priority.
+
+- [x] 5.1 Read-only re-probe of the official registry at `knowledge_cutoff=2026-09-17` completed. No plan, mode, snapshot, or closure was written
+- [x] 5.2 The current two-company rule selected two manufacturing names and does not include `service`, although legal service candidates exist later in the priority
+- [x] 5.3 Recorded immutable plan `cd8031cb5a440da19d7a7b8a41af0fdf` for `600004.SH` SSE service and `600006.SH` SSE manufacturing at `knowledge_cutoff=2026-09-17`, snapshot `universe_5a919396af823bb61d02a7894b330184`. Mode remains `inactive`. Did not activate
+- [x] 5.4 Activated first expansion through `CompanyProfileTaskService.activate_first_expansion_from_registry()`. Mode is `active`, `plan_id=cd8031cb5a440da19d7a7b8a41af0fdf`, `work_ids=()`, `delivered=false`. Did not run, enqueue, or write an observation
+- [x] 5.5 Executed one published `run` at `knowledge_cutoff=2026-09-17`. Returned `action=run`, `state=incomplete`. Enqueued and froze `bp-work-5d1215f542d18b4d16ddd500` (`600004.SH`) and `bp-work-97e7eed49d4b1e5cf477974f` (`600006.SH`). Did not resume, source-review, recount 4.1, or write closure v2
+- [x] 5.6 Confirmed the independent live-run snapshot after controlled resume. Both frozen works completed with `delivered=true` and `supplement_incomplete=false`. Did not write source-review or closure v2
+- [x] 5.7 Independently reviewed the official pages and wrote the this-round source-review. Dongfeng page 24 raw-material input is in the recall denominator. Did not presume 7/7
+- [x] 5.8 Recalculated 4.1 only from the current source-review. Recall 0/9 is below 1.0, accuracy is unassessed, and elapsed 862.208 exceeds 300. Reviewed reports 2, occupied strata 2, critical numeric errors 0, and tokens 0 pass their own gates. `expansion_gates_met=false`. Did not authorize the next expansion, a scale-quality claim, or production. Did not rerun, rewrite the source-review, change mode, or write closure v2. This complete zero-delivery observation now has closure eligibility. The quality gates still fail. Official closure has not been executed. Mode remains active. 5.10–5.12 have not started
+- [x] 5.9 Recorded two reusable common-core gaps and left industry items out of this change. The overview gate rejects “公司主要从事……” while a later sentence rule already accepts that wording. Revenue composition under “主营业务分析 / 收入和成本分析” is not the page routed into segment/revenue projection; the later “分部报告 / 分部信息” template is. Airport throughput, land and advertising compensation, vehicle volumes, material-cost share, and Dongfeng raw-material roles stay later industry capabilities. Did not add an extractor, publish `owned_page_facts=v5`, rerun, overwrite the source-review, change mode, or authorize expansion, scale quality, or production. A later minimal repair change may cover only those two common-core gaps; it is not created or applied here
+- [x] 5.9a Implemented closure eligibility for a complete zero-delivery review inside this change. `completed` ends the observation and does not mean `expansion_gates_met=true`. Partial samples, missing aspects, undelivered frozen work, unassessed delivered facts, and unassessed recall or critical errors stay refused. Did not execute official closure, create publication control, or enter 5.10
+- [x] 5.9b Removed the leftover task wording that still said unassessed accuracy blocked closure. Did not change code, publication control, mode, or the live snapshots
+- [x] 5.10 Read `load_publication_control()` on the official checkpoint. `company_profile_research_publication.v1.json` is absent; only the publication lock exists, so the control does not parse. Closure prerequisite is not met. A temporary checkpoint without that file still refuses `record_operator_closure_v2()`. Did not write, replace, enable, pause, resume, or roll back publication, and did not execute closure
+- [x] 5.10a Wrote the official publication control through `apply_published_publication(enable)`. The persisted file is `enabled`, uses the new-contract writer and reader, declares only `company_facts` and `commodity_associations`, and keeps legacy writer, DCF, trading, price sensitivity, and production unauthorized. Did not run, resume, enqueue, drain, or write closure in that step
+- [x] 5.11 Wrote operator closure v2 through `CompanyProfileTaskService.record_operator_closure_v2()`. Mode is `completed` for plan `cd8031cb5a440da19d7a7b8a41af0fdf`. Source review remains recall 0/9, accuracy unassessed, critical numeric errors 0, and `expansion_gates_met=false`. Did not authorize the next expansion, a scale-quality claim, or production. Did not rerun, enqueue, or change publication scope. v1 live-run and source-review baselines and work JSON were not overwritten. The official v1 closure file was not on disk to preserve
+- [x] 5.11a Searched the official checkpoint, OpenSpec/docs, and Git history for `company_profile_operator_closure.v1.json`. No original file or hash was found. `data/` is gitignored, and the only copies are pytest fixtures. Did not restore, invent, or rewrite a v1 closure. 5.12 stays blocked
+- [x] 5.11b Corrected the contract so v1 schema support is separate from an official v1 snapshot. A historical v1 file, if one is later supplied, must still load and must not be overwritten. This checkpoint has none, so none was forged. v2 remains the official closure for this failed review. Did not change code, checkpoints, or rerun closure. 5.12 stays unchecked
+- [x] 5.12 Independent review passed. This round is closed and the quality gates failed: recall 0/9, accuracy unassessed, critical numeric errors 0, and `expansion_gates_met=false`. The change is archived. This does not authorize the next expansion, a scale-quality claim, or production
+
+The former unchecked 3.4, 3.5, and 4.5 are this section. Official execution is recorded through 5.12.
+
+## 7. Reserved service seat, not yet implemented
+
+Contract review must pass before any code change. Do not change ordinary live-run `_STRATUM_PRIORITY`, the two-company budget, or the closed Shenwan table.
+
+- [x] 7.1 Implement and test the first-expansion-only rule that reserves one `service` seat inside the two-company budget, fills the other seat from the remaining global priority, requires two different strata, and refuses when no legal `service` candidate exists
+
+## 6. Retained history
+
+These observations stay as history and are not overwritten:
+
+- Pre-fix 2026-09-17 registry probe: 5564 names, available forms `{other: 5474, manufacturing: 1}`, `service_available_count=0`. That count is the baseline before the taxonomy parent-chain read, not a post-fix conclusion. The official registry has not been re-probed since `read-as-of-shenwan-l1-for-profile-strata` archived.
+- The original two-company v1 live-run and source-review baseline files remain the retained 7/7 observation.
+- Existing v1–v4 work JSON remains on disk.
+
+The immutable plan `cd8031cb5a440da19d7a7b8a41af0fdf` is recorded. One published `run` froze `bp-work-5d1215f542d18b4d16ddd500` and `bp-work-97e7eed49d4b1e5cf477974f`. A later controlled resume delivered both companies. The this-round source review fails 4.1: recall 0/9, accuracy unassessed, elapsed 862.208 seconds, critical numeric errors 0, reviewed reports 2, and occupied strata 2. `expansion_gates_met=false`. Publication control is `enabled` with only `company_facts` and `commodity_associations`, and production stays `not_authorized`. Operator closure v2 is written and the mode is `completed`. No official closure v1 snapshot was found, so none was forged. The reusable gaps remain the overview “主要从事” gate and the revenue-table route. Airport throughput, compensation, vehicle volumes, material cost, and named raw-material roles stay outside common-core v5. This archive does not authorize the next expansion, a scale-quality claim, or production.
+
+Capability repairs already tested, not official execution: after `1fe3133b`, pointer, immutable snapshot, and full plan must match; that commit required assessed accuracy before closure, and 5.9a later also accepts a complete zero-delivery review. After `3ec82b97`, active `run` keeps real enqueue accounting; after `23858958`, the sample stays at two companies; after `5fd681d9`, the code foundation was accepted and 3.4 / 3.5 / 4.5 stayed unchecked.
