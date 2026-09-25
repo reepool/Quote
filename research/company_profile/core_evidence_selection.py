@@ -364,13 +364,17 @@ def _select_owned_span(
                 continue
             closed = True
             gap = None
-        if heading in {"收入和成本分析", "主营业务分行业情况", "主营业务分产品情况"}:
+        if heading in _MDA_REVENUE_HEADINGS:
             excerpt = _clip_before_later_segment_template(excerpt)
-            if _unit_from_excerpt(excerpt) and any(
-                _parse_segment_row(line) for line in excerpt.splitlines()
-            ):
-                closed = True
-                gap = None
+            if not _formal_segment_table_ready(excerpt):
+                continue
+            closed = True
+            gap = None
+        elif heading in {"分部报告", "分部信息"} and _formal_segment_table_ready(
+            excerpt
+        ):
+            closed = True
+            gap = None
         usable = _usable_excerpt(excerpt, heading, require_substance)
         if usable and _excerpt_states_owned_overview(excerpt):
             closed = True
@@ -1377,6 +1381,27 @@ def _income_analysis_excerpt_ready(excerpt: str) -> bool:
         if _parse_labeled_amount_row(
             line, _COMPANY_TOTAL_LABELS | _INCOME_AMOUNT_LABELS
         ) or _parse_labeled_share_row(line, _INCOME_SHARE_LABELS):
+            return True
+    return False
+
+
+_MDA_REVENUE_HEADINGS = frozenset(
+    {"收入和成本分析", "主营业务分行业情况", "主营业务分产品情况"}
+)
+
+
+def _formal_segment_table_ready(excerpt: str) -> bool:
+    """Require a unit, a segment dimension, and a parseable row in that dimension."""
+
+    if _unit_from_excerpt(excerpt) is None:
+        return False
+    dimension = None
+    for line in excerpt.splitlines():
+        section = _dimension_from_heading(line)
+        if section is not None:
+            dimension = section
+            continue
+        if dimension is not None and _parse_segment_row(line) is not None:
             return True
     return False
 

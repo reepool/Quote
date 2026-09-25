@@ -1067,6 +1067,51 @@ def test_untitled_revenue_row_is_refused():
     )
 
 
+INVALID_MDA_PROSE = (
+    "2、收入和成本分析\n"
+    "报告期内公司收入结构未发生变化，详见后附财务报表。\n"
+)
+INVALID_MDA_UNTITLED = (
+    "2、收入和成本分析\n"
+    "单位：元\n"
+    "航空服务业 7955002081.35 5940772752.65 25.32\n"
+)
+
+
+def test_invalid_mda_section_falls_through_to_later_segment_template():
+    report = _report(instrument_id="600004.SH", report_id="asset-mda-fallback")
+    selected = select_core_evidence(
+        report=report,
+        pages=(
+            {"page": 12, "text": INVALID_MDA_PROSE, "readable": True},
+            {"page": 198, "text": SEGMENT_TEMPLATE, "readable": True},
+        ),
+    )
+    assert any(span.section_title == "分部信息" and span.page == 198 for span in selected.spans)
+    assert not any(span.section_title == "收入和成本分析" for span in selected.spans)
+    records = project_owned_page_facts(selected)
+    assert any(getattr(item, "segment_label", None) == "航空地面服务" for item in records)
+    assert all(item.evidence[0].page == 198 for item in records if item.field_id == "segment_dimension")
+
+
+def test_untitled_amount_row_does_not_block_later_segment_template():
+    report = _report(instrument_id="600004.SH", report_id="asset-untitled-fallback")
+    selected = select_core_evidence(
+        report=report,
+        pages=(
+            {"page": 12, "text": INVALID_MDA_UNTITLED, "readable": True},
+            {"page": 198, "text": SEGMENT_TEMPLATE, "readable": True},
+        ),
+    )
+    assert any(span.section_title == "分部信息" and span.page == 198 for span in selected.spans)
+    records = project_owned_page_facts(selected)
+    assert any(getattr(item, "segment_label", None) == "航空地面服务" for item in records)
+    assert not any(
+        getattr(getattr(item, "source_native", None), "value", None) == "7955002081.35"
+        for item in records
+    )
+
+
 def test_segment_information_template_remains_usable():
     report = _report(instrument_id="600004.SH", report_id="asset-segment-template")
     selected = select_core_evidence(
