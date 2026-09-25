@@ -49,6 +49,7 @@ CORE_SOURCE_FIELD_IDS = (
     "operating_revenue",
 )
 _OVERVIEW_HEADINGS = (
+    "报告期内公司从事的业务情况",
     "报告期内公司从事的主要业务",
     "公司从事的主要业务",
     "主营业务分析",
@@ -1051,13 +1052,16 @@ def _project_segment_span(
     )
     if revenue_item is not None and isinstance(revenue_item.evidence.anchor, TextAnchor):
         quote = quote or revenue_item.evidence.anchor.bounded_quote
-    unit = _unit_from_excerpt(excerpt)
+    unit = None
     dimension = _dimension_from_heading(span.section_title)
     records: list[SemanticRecord] = []
     started = False
     for line in excerpt.splitlines():
         if started and _is_revenue_table_stop(line):
             break
+        declared = _unit_from_excerpt(line)
+        if declared is not None and _UNIT_DECLARATION.search(line):
+            unit = declared
         if _dimension_from_heading(line) is not None or _parse_segment_row(line) is not None:
             started = True
         section = _dimension_from_heading(line)

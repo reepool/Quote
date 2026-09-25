@@ -17,7 +17,10 @@ from research.company_profile.contracts import (
     DispositionStatus,
     PreparedEvidence,
 )
-from research.company_profile.core_assessment_projection import project_core_assessment
+from research.company_profile.core_assessment_projection import (
+    overview_dimension_hits,
+    project_core_assessment,
+)
 from research.company_profile.core_evidence_selection import (
     project_owned_page_facts,
     select_core_evidence,
@@ -28,6 +31,7 @@ from research.company_profile.execution import (
     OWNED_PAGE_FACTS_V2_IDENTITY,
     OWNED_PAGE_FACTS_V3_IDENTITY,
     OWNED_PAGE_FACTS_V4_IDENTITY,
+    OWNED_PAGE_FACTS_V5_IDENTITY,
     default_processing_identity,
 )
 from research.company_profile.models import (
@@ -154,11 +158,12 @@ def test_default_identity_is_distinct_from_empty_delivery():
     identity = default_processing_identity()
     assert identity != EMPTY_DELIVERY_PROCESSING_IDENTITY
     assert identity["rules"] == "company_profile_common_core.v1"
-    assert identity["owned_page_facts"] == "v5"
+    assert identity["owned_page_facts"] == "v6"
     assert identity != OWNED_PAGE_FACTS_V1_IDENTITY
     assert identity != OWNED_PAGE_FACTS_V2_IDENTITY
     assert identity != OWNED_PAGE_FACTS_V3_IDENTITY
     assert identity != OWNED_PAGE_FACTS_V4_IDENTITY
+    assert identity != OWNED_PAGE_FACTS_V5_IDENTITY
 
 
 def test_avic_official_excerpts_project_core_facts_without_provider():
@@ -985,6 +990,28 @@ SEGMENT_TEMPLATE = (
 )
 
 
+BUSINESS_SITUATION = (
+    "一、报告期内公司从事的业务情况\n"
+    "公司为机场的管理和运营机构，公司以该机场为经营载体，主要从事航空服务业务，"
+    "以及商业场地租赁服务等航空性延伸服务业务。\n"
+    "二、报告期内公司所处行业情况\n"
+)
+
+
+def test_business_situation_heading_projects_principal_business():
+    report = _report(instrument_id="SHAPE.SH", report_id="asset-business-situation")
+    selected = select_core_evidence(
+        report=report,
+        pages=({"page": 8, "text": BUSINESS_SITUATION, "readable": True},),
+    )
+    records = project_owned_page_facts(selected)
+    overview = next(item for item in records if item.field_id == "business_overview_source")
+    assert overview.evidence[0].section_title == "报告期内公司从事的业务情况"
+    assert "主要从事" in overview.source_text
+    assert "为经营载体" in overview.source_text
+    assert "principal_business" in overview_dimension_hits(overview.source_text)
+
+
 def test_owned_heading_projects_principally_engaged_wording():
     report = _report(instrument_id="600006.SH", report_id="asset-principal")
     selected = select_core_evidence(
@@ -1062,6 +1089,7 @@ AIRPORT_REVENUE_SHAPE = (
     "一、航空性收入 325,184.77 40.88 295,218.84 39.77 10.15\n"
     "1、飞机起降相关收入 114,986.00 14.45 113,873.61 15.34 0.98\n"
     "二、非航空性收入 470,315.44 59.12 447,140.89 60.23 5.18\n"
+    "单位：元 币种：人民币\n"
     "主营业务分行业情况\n"
     "分行业 营业收入 营业成本 毛利率（%）\n"
     "航空服务业 7,955,002,081.35 5,940,772,752.65 25.32 7.16 9.69 -1.73\n"
@@ -1133,6 +1161,14 @@ def test_enumerated_income_classes_use_revenue_composition_dimension():
     assert classes["非航空性收入"] == "revenue_composition"
     assert classes["航空服务业"] == "industry"
     assert "货币资金" not in classes
+    units = {
+        item.measured_object: item.source_native.unit
+        for item in records
+        if item.field_id == "operating_revenue"
+    }
+    assert units["航空性收入"] == "万元"
+    assert units["非航空性收入"] == "万元"
+    assert units["航空服务业"] == "元"
     assert all(item.evidence[0].section_title == "收入和成本分析" for item in records if item.field_id == "segment_dimension")
 
 
@@ -1155,6 +1191,11 @@ def test_wrapped_industry_and_product_rows_stop_before_later_tables():
     assert classes["境外"] == "region"
     assert classes["代理销售模式"] == "sales_mode"
     assert classes["订单销售模式"] == "sales_mode"
+    assert all(
+        item.source_native.unit == "元"
+        for item in records
+        if item.field_id == "operating_revenue"
+    )
     assert "个百分点订单销售模式" not in classes
     assert not any("个百分点" in label for label in classes)
     values = {
@@ -1276,7 +1317,8 @@ def test_v5_enqueues_successor_and_query_prefers_it_over_later_v4_work_id(tmp_pa
         processing_identity=default_processing_identity(),
         instrument_ids=["600000.SH"],
     )
-    assert default_processing_identity()["owned_page_facts"] == "v5"
+    assert default_processing_identity()["owned_page_facts"] == "v6"
+    assert default_processing_identity() != OWNED_PAGE_FACTS_V5_IDENTITY
     assert first["inserted"] == 1
     assert successor["inserted"] == 1
     assert successor["reused"] == 0

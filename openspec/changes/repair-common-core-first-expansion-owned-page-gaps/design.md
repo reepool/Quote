@@ -8,7 +8,7 @@ v4 首次扩大已经以失败观察关闭：recall 0/9，accuracy unassessed，
 
 - 让 owned 标题下的“公司主要从事……”进入现有 principal-business / products-services 投影，并保留原文主体和证据。
 - 让“主营业务分析 / 收入和成本分析”下的正式收入构成表进入现有 segment/revenue 投影，并保留表格主体、单位、分部维度和来源绑定。
-- 用 `owned_page_facts=v5` 作为 successor identity。v1–v4 文件保持可读、不被覆盖。
+- 用 `owned_page_facts=v6` 作为当前 successor identity。v1–v5 文件保持可读、不被覆盖。v5 现场复核保留为失败观察。
 
 **Non-Goals:**
 

@@ -42,10 +42,26 @@ A titled official revenue-composition table under “主营业务分析” and �
 - **WHEN** a candidate revenue row has no heading, joins two tables, or is selected only because its amount equals another table
 - **THEN** that candidate does not enter segment or revenue projection
 
+### Requirement: Owned overview accepts the business-situation heading
+The owned overview headings MUST include “报告期内公司从事的业务情况”. A sentence under that heading that says the company uses an operation carrier and principally engages in stated services MUST enter the existing principal-business projection. Wording outside an owned heading, a business-scope line, a table-of-contents line, or a sentence without a company subject MUST stay refused. The rule MUST NOT hard-code an instrument id, a page number, or a company name.
+
+#### Scenario: Business-situation heading projects the principal statement
+- **WHEN** an owned “报告期内公司从事的业务情况” section says the company principally engages in stated services through an operation carrier
+- **THEN** the existing projection emits a principal-business fact from that sentence
+- **AND** the company subject remains on the fact
+
+### Requirement: Revenue units bind to the formal table that declares them
+An operating-revenue fact MUST use the unit declared by its own formal table. A later table in the same excerpt MUST NOT inherit an earlier table’s unit, and the projection MUST NOT convert an amount from one unit to another.
+
+#### Scenario: Composition and industry tables keep their own units
+- **WHEN** one income-and-cost excerpt declares 万元 for the revenue-composition table and 元 for the following industry table
+- **THEN** composition rows use 万元 and the industry row uses 元
+- **AND** the recorded amounts stay in the unit written in each table
+
 ### Requirement: Repair publishes a successor identity without overwriting predecessors
-The repair MUST publish processing identity `{"rules":"company_profile_common_core.v1","owned_page_facts":"v5"}`. It MUST NOT overwrite or delete v1–v4 work JSON. Query MUST be able to keep reading those predecessor identities. This change MUST NOT alter the universe denominator, taxonomy, ordinary live-run sampling, or publication scope. It MUST NOT authorize the next expansion, a scale-quality claim, production, DCF, trading, or the legacy writer. It MUST NOT add airport throughput, compensation, vehicle volume, material-cost, raw-material industry packages, net interest margin, cost-to-income ratio, or loan-structure projection.
+The repair MUST publish processing identity `{"rules":"company_profile_common_core.v1","owned_page_facts":"v6"}`. It MUST NOT overwrite or delete v1–v5 work JSON. Query MUST be able to keep reading those predecessor identities. This change MUST NOT alter the universe denominator, taxonomy, ordinary live-run sampling, or publication scope. It MUST NOT authorize the next expansion, a scale-quality claim, production, DCF, trading, or the legacy writer. It MUST NOT add airport throughput, compensation, vehicle volume, material-cost, raw-material industry packages, net interest margin, cost-to-income ratio, or loan-structure projection.
 
 #### Scenario: Predecessor work remains readable
-- **WHEN** v5 successor work is written for a report that already has v4 work
-- **THEN** the v4 work JSON remains on disk and readable
+- **WHEN** v6 successor work is written for a report that already has v5 work
+- **THEN** the v5 work JSON remains on disk and readable
 - **AND** production authorization remains `not_authorized`
