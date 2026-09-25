@@ -8026,6 +8026,18 @@ class FuturesOfficialCalendarBackfillService:
         elif total_not_due:
             overall_status = "warning"
 
+        holiday_notice_warnings = [
+            str((item.get("holiday_notice") or {}).get("warning"))
+            for item in exchange_results
+            if (item.get("holiday_notice") or {}).get("warning")
+        ]
+        warnings = (
+            ["future_dates_require_official_notice_evidence"]
+            if requested_end > today
+            else []
+        )
+        warnings.extend(holiday_notice_warnings)
+
         return {
             "status": overall_status,
             "domain": "futures_official_trading_calendar_backfill",
@@ -8066,11 +8078,8 @@ class FuturesOfficialCalendarBackfillService:
                 "rate_limit_backoff_seconds": total_rate_limit_backoff_seconds,
                 "preserved_verified": total_preserved_verified,
             },
-            "warnings": (
-                ["future_dates_require_official_notice_evidence"]
-                if requested_end > today
-                else []
-            ),
+            "warnings": warnings,
+            "holiday_notice_warnings": holiday_notice_warnings,
             "blockers": (
                 ["unresolved_official_calendar_dates"]
                 if total_blocking_unresolved
@@ -8200,14 +8209,23 @@ class FuturesOfficialCalendarBackfillService:
                 text=str(fetched.get("text") or ""),
                 dry_run=dry_run,
             )
-            if applied.get("status") == "parsed" or not donor_exchange:
+            if applied.get("status") == "parsed":
                 applied["source_text"] = str(fetched.get("text") or "")
                 applied["source_url"] = str(fetched.get("url") or "")
+                if donor_exchange and self._donor_notice_is_newer(donor_exchange, applied["source_text"]):
+                    adopted = self._adopt_holiday_notice(exchange, donor_exchange, dry_run=dry_run)
+                    if adopted.get("status") == "parsed":
+                        adopted["warning"] = self._stale_holiday_notice_warning(exchange, donor_exchange)
+                        return adopted
+                return applied
+            if not donor_exchange:
                 return applied
             fetch_error = fetch_error or "holiday notice text was not confident"
         if donor_exchange:
             adopted = self._adopt_holiday_notice(exchange, donor_exchange, dry_run=dry_run)
             if adopted.get("status") == "parsed":
+                if exchange_cfg.get("notice_url") or exchange_cfg.get("listing_url"):
+                    adopted["warning"] = self._stale_holiday_notice_warning(exchange, donor_exchange)
                 return adopted
             fetch_error = fetch_error or str(adopted.get("error") or "donor holiday notice unavailable")
         if fetch_error:
@@ -8219,6 +8237,31 @@ class FuturesOfficialCalendarBackfillService:
                 "error": fetch_error,
             }
         return {"status": "disabled", "closed_dates": [], "open_dates": [], "calendar_days": []}
+
+    @staticmethod
+    def _stale_holiday_notice_warning(exchange: str, donor_exchange: str) -> str:
+        return (
+            f"{exchange}未发现新年度休市安排，已采用{donor_exchange}公告，"
+            f"请核对{exchange}新通知地址"
+        )
+
+    def _donor_notice_is_newer(self, donor_exchange: str, own_text: str) -> bool:
+        from research.providers.official_futures_calendar import parse_holiday_notice_text
+
+        donor_text = str((getattr(self, "_holiday_notice_cache", {}).get(donor_exchange) or {}).get("source_text") or "")
+        if not donor_text:
+            notices = self.storage.list_calendar_notices(exchange=donor_exchange, parse_status="parsed")
+            donor = next(
+                (
+                    item for item in notices
+                    if str(item.get("notice_type") or "") == "holiday_notice"
+                ),
+                None,
+            )
+            donor_text = str(((donor or {}).get("raw_payload") or {}).get("text") or "")
+        donor_year = parse_holiday_notice_text(donor_text).get("notice_year")
+        own_year = parse_holiday_notice_text(own_text).get("notice_year")
+        return bool(donor_year and own_year and donor_year > own_year)
 
     def _adopt_holiday_notice(self, exchange: str, donor_exchange: str, *, dry_run: bool) -> Dict[str, Any]:
         cached = getattr(self, "_holiday_notice_cache", {}).get(donor_exchange) or {}

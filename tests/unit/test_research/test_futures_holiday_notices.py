@@ -382,6 +382,59 @@ def test_backfill_parse_failure_does_not_invent_closures(monkeypatch, tmp_path):
     assert stored[0]["metadata"]["classification_rule"] == "official_daily_rows"
 
 
+def test_gfex_adopts_newer_shfe_notice_and_warns(monkeypatch, tmp_path):
+    config = _config(tmp_path)
+    governance = config.modules["commodity_market_data"]["trading_day_governance"]
+    governance["enabled_exchanges"] = ["SHFE", "GFEX"]
+    governance["publication_policy"]["exchanges"]["GFEX"] = {"timezone": "Asia/Shanghai", "cutoff": "18:00"}
+    governance["holiday_notices"] = {
+        "enabled": True,
+        "exchanges": {
+            "SHFE": {"listing_url": "https://example.test/shfe"},
+            "GFEX": {
+                "listing_url": "https://example.test/gfex-list",
+                "notice_url": "https://example.test/gfex-2026",
+                "adopt_notice_from": "SHFE",
+            },
+        },
+    }
+    storage = FuturesStorageManager(config)
+    storage.initialize()
+    service = FuturesOfficialCalendarBackfillService(
+        storage,
+        config,
+        config.modules["commodity_market_data"],
+        now_provider=lambda: datetime(2027, 1, 4, 21, 30, tzinfo=ZoneInfo("Asia/Shanghai")),
+    )
+    service._holiday_notice_cache = {
+        "SHFE": {
+            "status": "parsed",
+            "source_text": "上海期货交易所关于2027年休市安排的公告\n元旦：1月1日（星期五）至1月3日（星期日）休市。",
+            "source_url": "https://example.test/shfe-2027",
+        }
+    }
+
+    def _fetch(self, exchange):
+        assert exchange == "GFEX"
+        return {
+            "exchange": exchange,
+            "url": "https://example.test/gfex-2026",
+            "text": "广州期货交易所关于2026年休市安排的通知\n中秋节：9月25日（星期五）至9月27日（星期日）休市。",
+        }
+
+    monkeypatch.setattr(
+        "research.providers.official_futures_calendar.OfficialFuturesCalendarProvider.fetch_holiday_notice_text",
+        _fetch,
+    )
+    refreshed = service._refresh_holiday_notice("GFEX", dry_run=True)
+
+    assert refreshed["status"] == "parsed"
+    assert refreshed["adopted_from_exchange"] == "SHFE"
+    assert "2027-01-01" in refreshed["closed_dates"]
+    assert "未发现新年度休市安排" in refreshed["warning"]
+    assert "请核对GFEX新通知地址" in refreshed["warning"]
+
+
 def test_listing_page_selects_the_newest_holiday_notice():
     html = """
     <a href="/2026/holiday.html">关于2026年休市安排的通知</a>

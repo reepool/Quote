@@ -3792,6 +3792,13 @@ def _format_futures_market_data_scheduler_report(
             "```text\n"
             + "\n".join(detail_lines)
             + "\n```"
+            + (
+                "\n\n公告提示:\n```text\n"
+                + "\n".join(result.get("holiday_notice_warnings") or [])
+                + "\n```"
+                if result.get("holiday_notice_warnings")
+                else ""
+            )
             + failure_text
         )
     governance = dict(result.get("trading_day_governance") or result.get("target_date_expansion") or {})
@@ -4053,7 +4060,14 @@ def _format_futures_market_data_scheduler_reports(result: Dict[str, Any]) -> Lis
                 f"新增品种: `{master_counts.get('auto_promoted', 0)}`｜"
                 f"待确认品种: `{master_counts.get('pending', 0)}`｜"
                 f"生命周期跳过: `{lifecycle_skipped_total}`\n\n"
-                "交易所明细:\n"
+                + (
+                    "公告提示:\n```text\n"
+                    + "\n".join(result.get("holiday_notice_warnings") or [])
+                    + "\n```\n\n"
+                    if result.get("holiday_notice_warnings")
+                    else ""
+                )
+                + "交易所明细:\n"
                 "```text\n"
                 + "\n".join(lines)
                 + "\n```"
@@ -9758,6 +9772,7 @@ class ScheduledTasks:
             master_results: List[Dict[str, Any]] = []
             blocked_calendar_exchanges: List[str] = []
             blocked_master_exchanges: List[str] = []
+            holiday_notice_warnings: List[str] = []
             effective_scope_id = scope_id
             effective_scope_ids = scope_ids
             effective_exchanges = exchanges
@@ -9801,6 +9816,11 @@ class ScheduledTasks:
                         calendar_end_date,
                         calendar_backfill_result.get("totals") or {},
                     )
+                    holiday_notice_warnings = [
+                        str(item)
+                        for item in (calendar_backfill_result.get("holiday_notice_warnings") or [])
+                        if str(item).strip()
+                    ]
                     if calendar_backfill_result.get("status") == "blocked" and not dry_run:
                         exchange_results = calendar_backfill_result.get("exchanges") or []
                         blocked_calendar_exchanges = sorted(
@@ -10058,6 +10078,8 @@ class ScheduledTasks:
                 dry_run=dry_run,
                 official_provider=official_provider,
             )
+            if holiday_notice_warnings:
+                result["holiday_notice_warnings"] = holiday_notice_warnings
             if master_results:
                 master_governance_summary = _summarize_futures_master_governance_results(master_results)
                 result["master_data_governance"] = master_governance_summary
