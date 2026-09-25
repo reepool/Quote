@@ -20,6 +20,19 @@ A titled official revenue-composition table under “主营业务分析” and �
 - **THEN** segment and revenue projection uses that table
 - **AND** the table subject, unit, segment dimension, and source binding remain on the projected facts
 
+#### Scenario: Enumerated income classes use revenue composition
+- **WHEN** a titled income-and-cost table lists classes such as “一、航空性收入” and “二、非航空性收入”
+- **THEN** those rows use segment dimension `revenue_composition`
+- **AND** they are not labeled `industry` or `product`
+
+#### Scenario: Revenue projection stops at the next formal table
+- **WHEN** a cost table, production-volume table, or balance-sheet section follows the revenue table
+- **THEN** those later rows are not projected as operating revenue
+
+#### Scenario: Invalid income analysis falls through on the same page
+- **WHEN** an income-and-cost heading has no formal table and a later segment-information heading on that same page does
+- **THEN** projection uses the later segment-information table
+
 #### Scenario: Untitled or cross-table matches stay refused
 - **WHEN** a candidate revenue row has no heading, joins two tables, or is selected only because its amount equals another table
 - **THEN** that candidate does not enter segment or revenue projection

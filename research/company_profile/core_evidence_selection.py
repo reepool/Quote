@@ -320,100 +320,131 @@ def _select_owned_span(
     by_page = {item.page: item for item in pages}
     gaps: list[CoreEvidenceGap] = []
     for page in pages:
-        owned = _owned_heading(page.text, headings, field_labels=field_labels)
-        if owned is None:
+        owned_headings = _iter_owned_headings(
+            page.text, headings, field_labels=field_labels
+        )
+        if not owned_headings:
             continue
-        heading, _line_start, line_end = owned
-        if not page.readable:
-            gaps.append(
-                CoreEvidenceGap(
-                    code="page_unreadable",
-                    chapter_task=chapter_task.value,
-                    page=page.page,
-                    message=f"owned section page is unreadable: {page.page}",
-                )
+        for heading, _line_start, line_end in owned_headings:
+            selected = _selection_for_owned_heading(
+                page,
+                by_page=by_page,
+                heading=heading,
+                line_end=line_end,
+                chapter_task=chapter_task,
+                field_ids=field_ids,
+                require_substance=require_substance,
+                field_labels=field_labels,
+                gaps=gaps,
             )
-            return _OwnedSelection(None, gaps)
-        if heading in field_labels:
-            excerpt, continuations, closed, gap = _collect_field_label(
+            if selected is _SKIP_OWNED_HEADING:
+                continue
+            return selected
+    return _OwnedSelection(None, gaps)
+
+
+_SKIP_OWNED_HEADING = object()
+
+
+def _selection_for_owned_heading(
+    page: ReportPageText,
+    *,
+    by_page: Mapping[int, ReportPageText],
+    heading: str,
+    line_end: int,
+    chapter_task: ChapterTask,
+    field_ids: tuple[str, ...],
+    require_substance: bool,
+    field_labels: tuple[str, ...],
+    gaps: list[CoreEvidenceGap],
+) -> _OwnedSelection | object:
+    if not page.readable:
+        gaps.append(
+            CoreEvidenceGap(
+                code="page_unreadable",
+                chapter_task=chapter_task.value,
+                page=page.page,
+                message=f"owned section page is unreadable: {page.page}",
+            )
+        )
+        return _OwnedSelection(None, gaps)
+    if heading in field_labels:
+        excerpt, continuations, closed, gap = _collect_field_label(
+            page,
+            heading=heading,
+            line_end=line_end,
+        )
+    else:
+        preview = f"{heading}\n{_cut_at_boundary(page.text[line_end:]).text}".strip()
+        if _usable_excerpt(
+            preview, heading, require_substance
+        ) and _excerpt_states_owned_overview(preview):
+            excerpt, continuations, closed, gap = preview, [], True, None
+        else:
+            excerpt, continuations, closed, gap = _collect_section(
                 page,
                 heading=heading,
                 line_end=line_end,
+                by_page=by_page,
+                chapter_task=chapter_task,
             )
-        else:
-            preview = f"{heading}\n{_cut_at_boundary(page.text[line_end:]).text}".strip()
-            if _usable_excerpt(
-                preview, heading, require_substance
-            ) and _excerpt_states_owned_overview(preview):
-                excerpt, continuations, closed, gap = preview, [], True, None
-            else:
-                excerpt, continuations, closed, gap = _collect_section(
-                    page,
-                    heading=heading,
-                    line_end=line_end,
-                    by_page=by_page,
-                    chapter_task=chapter_task,
-                )
-        if chapter_task is ChapterTask.EXTRACT_SEGMENT_FINANCIALS:
-            declared = _unit_declaration(page.text)
-            if declared and declared not in excerpt:
-                excerpt = f"{declared}\n{excerpt}"
-        if heading in _INCOME_ANALYSIS_HEADINGS:
-            excerpt = _clip_income_analysis_excerpt(excerpt)
-            if not _income_analysis_excerpt_ready(excerpt):
-                continue
-            closed = True
-            gap = None
-        if heading in _MDA_REVENUE_HEADINGS:
-            excerpt = _clip_before_later_segment_template(excerpt)
-            if not _formal_segment_table_ready(excerpt):
-                continue
-            closed = True
-            gap = None
-        elif heading in {"分部报告", "分部信息"} and _formal_segment_table_ready(
-            excerpt
-        ):
-            closed = True
-            gap = None
-        usable = _usable_excerpt(excerpt, heading, require_substance)
-        if usable and _excerpt_states_owned_overview(excerpt):
-            closed = True
-            gap = None
-        if gap is not None and not usable:
-            gaps.append(gap)
-            return _OwnedSelection(None, gaps)
-        if gap is not None:
-            gaps.append(gap)
-        if not excerpt.strip() or excerpt.strip() == heading:
-            gaps.append(
-                CoreEvidenceGap(
-                    code="extraction_failed",
-                    chapter_task=chapter_task.value,
-                    page=page.page,
-                    message="owned heading has no usable context",
-                )
-            )
-            return _OwnedSelection(None, gaps)
-        if not usable:
-            continue
-        dimensions = overview_dimension_hits(excerpt)
-        if chapter_task is ChapterTask.EXTRACT_SEGMENT_FINANCIALS:
-            dimensions = ("products_services", "revenue_model")
-        return _OwnedSelection(
-            CoreEvidenceSpan(
-                page=page.page,
-                continuation_pages=tuple(continuations),
-                section_title=heading,
-                excerpt=excerpt,
-                bounded_quote=_display_quote(excerpt, heading),
+    if chapter_task is ChapterTask.EXTRACT_SEGMENT_FINANCIALS:
+        declared = _unit_declaration(page.text)
+        if declared and declared not in excerpt:
+            excerpt = f"{declared}\n{excerpt}"
+    if heading in _INCOME_ANALYSIS_HEADINGS:
+        excerpt = _clip_income_analysis_excerpt(excerpt)
+        if not _income_analysis_excerpt_ready(excerpt):
+            return _SKIP_OWNED_HEADING
+        closed = True
+        gap = None
+    if heading in _MDA_REVENUE_HEADINGS:
+        excerpt = _clip_before_later_segment_template(excerpt)
+        if not _formal_segment_table_ready(excerpt):
+            return _SKIP_OWNED_HEADING
+        closed = True
+        gap = None
+    elif heading in {"分部报告", "分部信息"} and _formal_segment_table_ready(excerpt):
+        closed = True
+        gap = None
+    usable = _usable_excerpt(excerpt, heading, require_substance)
+    if usable and _excerpt_states_owned_overview(excerpt):
+        closed = True
+        gap = None
+    if gap is not None and not usable:
+        gaps.append(gap)
+        return _OwnedSelection(None, gaps)
+    if gap is not None:
+        gaps.append(gap)
+    if not excerpt.strip() or excerpt.strip() == heading:
+        gaps.append(
+            CoreEvidenceGap(
+                code="extraction_failed",
                 chapter_task=chapter_task.value,
-                field_ids=field_ids,
-                dimension_ids=dimensions,
-                context_complete=closed,
-            ),
-            gaps,
+                page=page.page,
+                message="owned heading has no usable context",
+            )
         )
-    return _OwnedSelection(None, gaps)
+        return _OwnedSelection(None, gaps)
+    if not usable:
+        return _SKIP_OWNED_HEADING
+    dimensions = overview_dimension_hits(excerpt)
+    if chapter_task is ChapterTask.EXTRACT_SEGMENT_FINANCIALS:
+        dimensions = ("products_services", "revenue_model")
+    return _OwnedSelection(
+        CoreEvidenceSpan(
+            page=page.page,
+            continuation_pages=tuple(continuations),
+            section_title=heading,
+            excerpt=excerpt,
+            bounded_quote=_display_quote(excerpt, heading),
+            chapter_task=chapter_task.value,
+            field_ids=field_ids,
+            dimension_ids=dimensions,
+            context_complete=closed,
+        ),
+        gaps,
+    )
 
 
 def owned_section_heading(
@@ -432,18 +463,30 @@ def _owned_heading(
     *,
     field_labels: tuple[str, ...] = (),
 ) -> tuple[str, int, int] | None:
+    found = _iter_owned_headings(text, headings, field_labels=field_labels)
+    return found[0] if found else None
+
+
+def _iter_owned_headings(
+    text: str,
+    headings: tuple[str, ...],
+    *,
+    field_labels: tuple[str, ...] = (),
+) -> list[tuple[str, int, int]]:
     if _is_toc_page(text):
-        return None
+        return []
+    found: list[tuple[str, int, int]] = []
     offset = 0
     for line in text.splitlines(keepends=True):
         heading = _heading_if_title_line(line, headings)
         if heading is not None:
-            return heading, offset, offset + len(line)
-        heading = _heading_if_field_label(line, field_labels)
-        if heading is not None:
-            return heading, offset, offset + _heading_end_in_line(line, heading)
+            found.append((heading, offset, offset + len(line)))
+        else:
+            heading = _heading_if_field_label(line, field_labels)
+            if heading is not None:
+                found.append((heading, offset, offset + _heading_end_in_line(line, heading)))
         offset += len(line)
-    return None
+    return found
 
 
 def _heading_if_title_line(line: str, headings: tuple[str, ...]) -> str | None:
@@ -598,12 +641,22 @@ class _PageChunk:
 
 
 def _cut_at_boundary(text: str) -> _PageChunk:
-    match = _SECTION_BOUNDARY.search(text)
-    if match is None:
-        return _PageChunk(text.strip(), False)
-    if match.start() == 0:
-        return _PageChunk("", True)
-    return _PageChunk(text[: match.start()].strip(), True)
+    cursor = 0
+    while True:
+        match = _SECTION_BOUNDARY.search(text, cursor)
+        if match is None:
+            return _PageChunk(text.strip(), False)
+        line_start = match.start()
+        if line_start < len(text) and text[line_start] == "\n":
+            line_start += 1
+        line_end = text.find("\n", line_start)
+        line = text[line_start : line_end if line_end >= 0 else None]
+        if re.search(r"\d", line):
+            cursor = match.end()
+            continue
+        if match.start() == 0:
+            return _PageChunk("", True)
+        return _PageChunk(text[: match.start()].strip(), True)
 
 
 def _usable_excerpt(excerpt: str, heading: str, require_substance: bool) -> bool:
@@ -988,7 +1041,7 @@ def _project_segment_span(
     revenue_item = _prepared_for(selection, span, "operating_revenue")
     if segment_item is None and revenue_item is None:
         return ()
-    excerpt = _join_pdf_soft_breaks(span.excerpt)
+    excerpt = _join_segment_label_amounts(_join_pdf_soft_breaks(span.excerpt))
     quote = (
         segment_item.evidence.anchor.bounded_quote
         if segment_item is not None and isinstance(segment_item.evidence.anchor, TextAnchor)
@@ -999,15 +1052,25 @@ def _project_segment_span(
     unit = _unit_from_excerpt(excerpt)
     dimension = _dimension_from_heading(span.section_title)
     records: list[SemanticRecord] = []
+    started = False
     for line in excerpt.splitlines():
+        if started and _is_revenue_table_stop(line):
+            break
+        if _dimension_from_heading(line) is not None or _parse_segment_row(line) is not None:
+            started = True
         section = _dimension_from_heading(line)
         if section is not None:
             dimension = section
             continue
         parsed = _parse_segment_row(line)
-        if parsed is None or dimension is None:
+        if parsed is None:
             continue
         label, amount, _share = parsed
+        row_dimension = (
+            "revenue_composition" if _is_enumerated_revenue_class(line) else dimension
+        )
+        if row_dimension is None:
+            continue
         source_line = line.strip()
         if not _stated_in_quote(source_line, quote or span.excerpt):
             continue
@@ -1018,7 +1081,7 @@ def _project_segment_span(
                     report=selection.report,
                     record_id=(
                         f"owned:{segment_item.evidence.evidence_id}"
-                        f":segment:{dimension}:{label}"
+                        f":segment:{row_dimension}:{label}"
                     ),
                     field_id="segment_dimension",
                     chapter_task=ChapterTask.EXTRACT_SEGMENT_FINANCIALS,
@@ -1028,7 +1091,7 @@ def _project_segment_span(
                         value=amount,
                         unit=unit,
                     ),
-                    dimension=dimension,
+                    dimension=row_dimension,
                     label=label,
                 )
             )
@@ -1039,7 +1102,7 @@ def _project_segment_span(
                     report=selection.report,
                     record_id=(
                         f"owned:{revenue_item.evidence.evidence_id}"
-                        f":revenue:{dimension}:{label}"
+                        f":revenue:{row_dimension}:{label}"
                     ),
                     field_id="operating_revenue",
                     chapter_task=ChapterTask.EXTRACT_SEGMENT_FINANCIALS,
@@ -1052,7 +1115,7 @@ def _project_segment_span(
                     metric_type=MetricType.OPERATING_REVENUE,
                     logical_slot=LogicalSlot.REVENUE,
                     measured_object=label,
-                    segment_dimension=dimension,
+                    segment_dimension=row_dimension,
                     segment_label=label,
                 )
             )
@@ -1391,28 +1454,79 @@ _MDA_REVENUE_HEADINGS = frozenset(
 
 
 def _formal_segment_table_ready(excerpt: str) -> bool:
-    """Require a unit, a segment dimension, and a parseable row in that dimension."""
+    """Require a unit plus either a segment heading or an enumerated class row."""
 
-    if _unit_from_excerpt(excerpt) is None:
+    normalized = _join_segment_label_amounts(_join_pdf_soft_breaks(excerpt))
+    if _unit_from_excerpt(normalized) is None:
         return False
     dimension = None
-    for line in excerpt.splitlines():
+    started = False
+    for line in normalized.splitlines():
+        if started and _is_revenue_table_stop(line):
+            break
         section = _dimension_from_heading(line)
         if section is not None:
             dimension = section
+            started = True
             continue
-        if dimension is not None and _parse_segment_row(line) is not None:
+        if _parse_segment_row(line) is None:
+            continue
+        if dimension is not None or _is_enumerated_revenue_class(line):
             return True
     return False
 
 
+_REVENUE_TABLE_STOP_TITLES = (
+    "成本分析",
+    "产销量",
+    "资产及负债",
+    "费用",
+    "分部报告",
+    "分部信息",
+    "主要销售客户",
+    "重大采购",
+)
+
+
+def _is_revenue_table_stop(line: str) -> bool:
+    compact = _HEADING_PREFIX.sub("", re.sub(r"\s+", "", line.strip()), count=1)
+    compact = compact.lstrip(".．、")
+    if "收入和成本" in compact:
+        return False
+    return any(title in compact for title in _REVENUE_TABLE_STOP_TITLES)
+
+
+def _is_enumerated_revenue_class(line: str) -> bool:
+    return re.match(r"\s*(?:[一二三四五六七八九十]+|\d+)[、.．]", line) is not None
+
+
+def _join_segment_label_amounts(text: str) -> str:
+    """Attach a wrapped label to the amount line that follows it."""
+
+    lines = text.splitlines()
+    merged: list[str] = []
+    index = 0
+    while index < len(lines):
+        current = lines[index]
+        nxt = lines[index + 1] if index + 1 < len(lines) else ""
+        if (
+            re.fullmatch(r"\s*[\u4e00-\u9fff]{2,12}\s*", current)
+            and re.match(r"\s*-?[\d,]", nxt)
+        ):
+            merged.append(f"{current.strip()} {nxt.strip()}")
+            index += 2
+            continue
+        merged.append(current)
+        index += 1
+    return "\n".join(merged)
+
+
 def _clip_before_later_segment_template(excerpt: str) -> str:
-    """Keep the MD&A revenue table and stop at a later segment-report template."""
+    """Keep the MD&A revenue table and stop at the next non-revenue section."""
 
     kept: list[str] = []
     for line in excerpt.splitlines():
-        heading = _heading_if_title_line(line, ("分部报告", "分部信息"))
-        if heading is not None and kept:
+        if kept and _is_revenue_table_stop(line):
             break
         kept.append(line)
     return "\n".join(kept).strip()
@@ -1676,6 +1790,8 @@ def _is_pdf_soft_continuation(previous: str, nxt: str) -> bool:
         return False
     if _UNIT_DECLARATION.search(current) or _PERCENT_UNIT.search(current):
         return False
+    if "营业收入" in prev or "营业成本" in prev or _is_revenue_table_stop(prev):
+        return False
     if current.startswith(("下表", "项目", "营业收入", "营业总收入", "利息净收入")):
         return False
     if _parse_labeled_amount_row(
@@ -1699,6 +1815,7 @@ def _stated_in_quote(text: str, quote: str) -> bool:
 
 def _parse_segment_row(line: str) -> tuple[str, str, str | None] | None:
     text = line.strip()
+    text = re.sub(r"^(?:[一二三四五六七八九十]+|\d+)[、.．]\s*", "", text)
     if not text:
         return None
     tokens = text.split()
@@ -1711,7 +1828,7 @@ def _parse_segment_row(line: str) -> tuple[str, str, str | None] | None:
         or tokens[1] == "营业收入"
         or not re.fullmatch(r"[\u4e00-\u9fffA-Za-z0-9（）]{2,20}", label)
         or not re.fullmatch(r"-?[\d,]+(?:\.\d+)?", tokens[1])
-        or not re.fullmatch(r"-?[\d.]+%?", tokens[2])
+        or not re.fullmatch(r"-?[\d,]+(?:\.\d+)?%?", tokens[2])
     ):
         return None
     return label, tokens[1], tokens[2]

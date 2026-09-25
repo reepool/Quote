@@ -1055,6 +1055,108 @@ def test_mda_revenue_table_keeps_source_binding_and_ignores_later_equal_amount()
     )
 
 
+AIRPORT_REVENUE_SHAPE = (
+    "（一）主营业务分析\n"
+    "2、收入和成本分析\n"
+    "单位：万元 币种：人民币\n"
+    "一、航空性收入 325,184.77 40.88 295,218.84 39.77 10.15\n"
+    "1、飞机起降相关收入 114,986.00 14.45 113,873.61 15.34 0.98\n"
+    "二、非航空性收入 470,315.44 59.12 447,140.89 60.23 5.18\n"
+    "主营业务分行业情况\n"
+    "分行业 营业收入 营业成本 毛利率（%）\n"
+    "航空服务业 7,955,002,081.35 5,940,772,752.65 25.32 7.16 9.69 -1.73\n"
+    "(3). 成本分析表\n"
+    "货币资金 65,885,912.67 65,885,912.67\n"
+)
+VEHICLE_REVENUE_SHAPE = (
+    "2、收入和成本分析\n"
+    "单位：元 币种：人民币\n"
+    "主营业务分行业情况\n"
+    "分行业 营业收入 营业成本\n"
+    "汽车制\n"
+    "造业\n"
+    "8,809,766,813.05 8,930,817,225.01 -1.37 -19.12 -16.75\n"
+    "主营业务分产品情况\n"
+    "分产品 营业收入 营业成本\n"
+    "整车 7,303,679,564.58 7,579,828,607.20 -3.78\n"
+    "非整车 1,506,087,248.47 1,350,988,617.81 10.30\n"
+    "主营产销量情况分析表\n"
+    "客车 辆 3,751 4,567 242\n"
+    "(3). 成本分析表\n"
+    "整车 7,579,828,607.20 84.87 9,870,621,824.11\n"
+    "货币资金 65,885,912.67 65,885,912.67\n"
+    "应付账款 1,139,889,932.98 35.99\n"
+)
+SAME_PAGE_INVALID_MDA = (
+    "2、收入和成本分析\n"
+    "报告期内收入结构未发生变化。\n"
+    "分部信息\n"
+    "分行业\n"
+    "单位：元\n"
+    "航空地面服务 1361162400.00 10.00\n"
+)
+
+
+def _labels(records):
+    return {getattr(item, "segment_label", None) for item in records}
+
+
+def test_enumerated_income_classes_use_revenue_composition_dimension():
+    report = _report(instrument_id="SHAPE.SH", report_id="asset-airport-shape")
+    selected = select_core_evidence(
+        report=report,
+        pages=({"page": 12, "text": AIRPORT_REVENUE_SHAPE, "readable": True},),
+    )
+    records = project_owned_page_facts(selected)
+    classes = {
+        item.label: item.dimension
+        for item in records
+        if item.field_id == "segment_dimension"
+    }
+    assert classes["航空性收入"] == "revenue_composition"
+    assert classes["非航空性收入"] == "revenue_composition"
+    assert classes["航空服务业"] == "industry"
+    assert "货币资金" not in classes
+    assert all(item.evidence[0].section_title == "收入和成本分析" for item in records if item.field_id == "segment_dimension")
+
+
+def test_wrapped_industry_and_product_rows_stop_before_later_tables():
+    report = _report(instrument_id="SHAPE.SH", report_id="asset-vehicle-shape")
+    selected = select_core_evidence(
+        report=report,
+        pages=({"page": 11, "text": VEHICLE_REVENUE_SHAPE, "readable": True},),
+    )
+    records = project_owned_page_facts(selected)
+    classes = {
+        item.label: item.dimension
+        for item in records
+        if item.field_id == "segment_dimension"
+    }
+    assert classes["汽车制造业"] == "industry"
+    assert classes["整车"] == "product"
+    assert classes["非整车"] == "product"
+    values = {
+        getattr(getattr(item, "source_native", None), "value", None) for item in records
+    }
+    assert "7,303,679,564.58" in values
+    assert "7,579,828,607.20" not in values
+    assert "65,885,912.67" not in values
+    assert "客车" not in classes
+    assert "货币资金" not in classes
+    assert "应付账款" not in classes
+
+
+def test_invalid_mda_falls_through_to_segment_template_on_the_same_page():
+    report = _report(instrument_id="SHAPE.SH", report_id="asset-same-page-fallback")
+    selected = select_core_evidence(
+        report=report,
+        pages=({"page": 12, "text": SAME_PAGE_INVALID_MDA, "readable": True},),
+    )
+    assert any(span.section_title == "分部信息" and span.page == 12 for span in selected.spans)
+    records = project_owned_page_facts(selected)
+    assert any(getattr(item, "segment_label", None) == "航空地面服务" for item in records)
+
+
 def test_untitled_revenue_row_is_refused():
     report = _report(instrument_id="600004.SH", report_id="asset-untitled")
     selected = select_core_evidence(
