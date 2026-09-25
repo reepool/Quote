@@ -7658,6 +7658,8 @@ class FuturesOfficialCalendarBackfillService:
                         "open_dates",
                         "night_session_suspensions",
                         "review_dates",
+                        "warning",
+                        "adopted_from_exchange",
                     )
                 }
                 notice_closed = set(holiday_notice.get("closed_dates") or [])
