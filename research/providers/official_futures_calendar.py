@@ -6,6 +6,7 @@ import asyncio
 import hashlib
 import re
 from dataclasses import dataclass, field
+from datetime import date, timedelta
 from typing import Any, Dict, List, Optional
 
 from research.futures_market_data import (
@@ -142,6 +143,31 @@ class OfficialFuturesCalendarProvider:
         )
         return ParsedFuturesCalendarNotice(notice=parsed_notice, calendar_days=calendar_days)
 
+    def fetch_holiday_notice_text(self, exchange: str) -> Dict[str, Any]:
+        """Fetch the configured holiday-notice page for one exchange."""
+        exchange_key = str(exchange or "").upper()
+        governance_cfg = (
+            self.research_config.modules.get("commodity_market_data", {}).get("trading_day_governance")
+            or {}
+        )
+        notices_cfg = governance_cfg.get("holiday_notices") or {}
+        exchange_cfg = (notices_cfg.get("exchanges") or {}).get(exchange_key) or {}
+        url = str(exchange_cfg.get("notice_url") or exchange_cfg.get("listing_url") or "")
+        if not url:
+            raise OfficialFuturesCalendarSourceUnavailable(
+                f"missing holiday notice URL for {exchange_key}"
+            )
+        session = create_requests_session(tls_config=self.tls_config, headers=self.DEFAULT_HEADERS)
+        response = request_get(
+            url,
+            session=session,
+            tls_config=self.tls_config,
+            timeout=self.timeout_seconds,
+        )
+        response.raise_for_status()
+        response.encoding = response.apparent_encoding or response.encoding or "utf-8"
+        return {"exchange": exchange_key, "url": url, "text": response.text}
+
 
 def _extract_structured_calendar_rows(payload: Dict[str, Any]) -> List[Dict[str, Any]]:
     candidates = []
@@ -169,6 +195,72 @@ def _extract_structured_calendar_rows(payload: Dict[str, Any]) -> List[Dict[str,
             }
         )
     return rows
+
+
+def parse_holiday_notice_text(text: str, *, notice_year: Optional[int] = None) -> Dict[str, Any]:
+    """Parse an official 休市安排 notice into closures, opens, and night suspensions.
+
+    A bare month-day uses ``notice_year`` or the first year stated in the text.
+    An explicit year on a date is kept. Night-session sentences are not closures.
+    """
+    body = str(text or "")
+    stated_years = [int(item) for item in re.findall(r"(20\d{2})年", body)]
+    year = notice_year or (stated_years[0] if stated_years else None)
+    if year is None:
+        return {
+            "notice_year": None,
+            "closed_dates": [],
+            "open_dates": [],
+            "night_session_suspensions": [],
+            "confident": False,
+        }
+
+    def _resolve(explicit: str, month: str, day: str) -> str:
+        used = int(explicit) if explicit else year
+        return date(used, int(month), int(day)).isoformat()
+
+    closed: set[str] = set()
+    range_pattern = re.compile(
+        r"(?:(20\d{2})年)?(\d{1,2})月(\d{1,2})日(?:（[^）]*）)?\s*至\s*"
+        r"(?:(20\d{2})年)?(\d{1,2})月(\d{1,2})日(?:（[^）]*）)?\s*休市"
+    )
+    for match in range_pattern.finditer(body):
+        start = date.fromisoformat(_resolve(match.group(1) or "", match.group(2), match.group(3)))
+        end = date.fromisoformat(_resolve(match.group(4) or "", match.group(5), match.group(6)))
+        if end < start:
+            continue
+        cursor = start
+        while cursor <= end:
+            closed.add(cursor.isoformat())
+            cursor += timedelta(days=1)
+
+    open_dates: set[str] = set()
+    open_pattern = re.compile(
+        r"(?:(20\d{2})年)?(\d{1,2})月(\d{1,2})日（星期([六日])）"
+        r"([^。\n]{0,24}?)(?:照常开市|为交易日|安排交易)"
+    )
+    for match in open_pattern.finditer(body):
+        window = match.group(5) or ""
+        if "休市" in window:
+            continue
+        open_dates.add(_resolve(match.group(1) or "", match.group(2), match.group(3)))
+    open_dates -= closed
+
+    nights: set[str] = set()
+    night_pattern = re.compile(
+        r"(?:(20\d{2})年)?(\d{1,2})月(\d{1,2})日(?:（[^）]*）)?[^。\n]{0,24}?不进行夜盘"
+    )
+    for match in night_pattern.finditer(body):
+        nights.add(_resolve(match.group(1) or "", match.group(2), match.group(3)))
+    nights -= closed
+
+    return {
+        "notice_year": year,
+        "closed_dates": sorted(closed),
+        "open_dates": sorted(open_dates),
+        "night_session_suspensions": sorted(nights),
+        "confident": bool(closed or open_dates),
+    }
 
 
 def _extract_text_calendar_rows(text: str) -> List[Dict[str, Any]]:

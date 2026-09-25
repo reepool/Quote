@@ -4731,6 +4731,170 @@ class FuturesTradingDayGovernanceService:
             "review_required_written": review_written,
         }
 
+    def apply_holiday_notice_text(
+        self,
+        *,
+        exchange: str,
+        url: str,
+        text: str,
+        dry_run: bool = False,
+    ) -> Dict[str, Any]:
+        """Persist one exchange holiday notice and its non-conflicting calendar rows."""
+        from research.providers.official_futures_calendar import parse_holiday_notice_text
+
+        exchange_key = str(exchange or "").upper()
+        parsed = parse_holiday_notice_text(text)
+        payload_hash = hashlib.sha256(str(text or "").encode("utf-8")).hexdigest()
+        notice_id = f"{exchange_key}:holiday_notice:{payload_hash[:20]}"
+        relevant_dates = [
+            *parsed["closed_dates"],
+            *parsed["open_dates"],
+            *parsed["night_session_suspensions"],
+        ]
+        existing_rows = {}
+        if relevant_dates:
+            existing_rows = {
+                str(item.get("trade_date")): item
+                for item in self.storage.list_calendar_days(
+                    exchange=exchange_key,
+                    start_date=min(relevant_dates),
+                    end_date=max(relevant_dates),
+                )
+            }
+        review_dates: List[str] = []
+        closed_days: List[FuturesTradingCalendarDay] = []
+        open_days: List[FuturesTradingCalendarDay] = []
+        for trade_date in parsed["closed_dates"]:
+            existing = existing_rows.get(trade_date) or {}
+            if existing and bool(existing.get("is_trading_day")):
+                review_dates.append(trade_date)
+                continue
+            closed_days.append(
+                self._holiday_calendar_day(
+                    exchange_key,
+                    trade_date,
+                    is_trading_day=False,
+                    notice_id=notice_id,
+                    url=url,
+                    metadata={"night_session_suspended": trade_date in parsed["night_session_suspensions"]},
+                )
+            )
+        for trade_date in parsed["open_dates"]:
+            existing = existing_rows.get(trade_date) or {}
+            rule = str((existing.get("metadata") or {}).get("classification_rule") or "")
+            if existing and not bool(existing.get("is_trading_day")) and rule not in {
+                "",
+                "deterministic_weekend",
+                "official_holiday_notice",
+            }:
+                review_dates.append(trade_date)
+                continue
+            open_days.append(
+                self._holiday_calendar_day(
+                    exchange_key,
+                    trade_date,
+                    is_trading_day=True,
+                    notice_id=notice_id,
+                    url=url,
+                    metadata={"notice_opened_weekend": True},
+                )
+            )
+        night_only = [
+            item for item in parsed["night_session_suspensions"] if item not in parsed["closed_dates"]
+        ]
+        parse_status = "parsed" if parsed["confident"] else "review_required"
+        notice = FuturesCalendarNotice(
+            notice_id=notice_id,
+            exchange=exchange_key,
+            source_profile="exchange_official_holiday_notice",
+            notice_type="holiday_notice",
+            title=f"{exchange_key} {parsed.get('notice_year') or ''} holiday notice".strip(),
+            url=url,
+            raw_content_hash=payload_hash,
+            raw_payload={"text": text},
+            parse_status=parse_status,
+            confidence=0.8 if parsed["confident"] else 0.0,
+            derived_changes=[
+                {"trade_date": item.trade_date, "is_trading_day": item.is_trading_day}
+                for item in [*closed_days, *open_days]
+            ],
+            metadata={
+                "notice_year": parsed.get("notice_year"),
+                "night_session_suspensions": night_only,
+                "review_dates": review_dates,
+            },
+        )
+        if dry_run:
+            return {
+                "status": parse_status,
+                "exchange": exchange_key,
+                "notice_id": notice_id,
+                "closed_dates": [item.trade_date for item in closed_days],
+                "open_dates": [item.trade_date for item in open_days],
+                "night_session_suspensions": night_only,
+                "review_dates": review_dates,
+                "calendar_days": [*closed_days, *open_days],
+            }
+        self.upsert_official_notice(notice, derived_days=[*closed_days, *open_days])
+        for trade_date in review_dates:
+            self.create_review_required(
+                exchange=exchange_key,
+                evidence_ref=notice_id,
+                reason="holiday notice disagrees with verified calendar row",
+                scope_type="exchange",
+                scope_id=exchange_key,
+                trade_dates=[trade_date],
+                metadata={"notice_url": url},
+            )
+        for trade_date in night_only:
+            existing = existing_rows.get(trade_date) or {}
+            if not existing or not bool(existing.get("is_trading_day")):
+                continue
+            metadata = dict(existing.get("metadata") or {})
+            metadata["night_session_suspended"] = True
+            metadata["night_session_notice_id"] = notice_id
+            self.storage.upsert_trading_calendar([
+                self._calendar_day_from_existing({**existing, "metadata": metadata})
+            ])
+        return {
+            "status": parse_status,
+            "exchange": exchange_key,
+            "notice_id": notice_id,
+            "closed_dates": [item.trade_date for item in closed_days],
+            "open_dates": [item.trade_date for item in open_days],
+            "night_session_suspensions": night_only,
+            "review_dates": review_dates,
+            "calendar_days": [*closed_days, *open_days],
+        }
+
+    @staticmethod
+    def _holiday_calendar_day(
+        exchange: str,
+        trade_date: str,
+        *,
+        is_trading_day: bool,
+        notice_id: str,
+        url: str,
+        metadata: Dict[str, Any],
+    ) -> FuturesTradingCalendarDay:
+        return FuturesTradingCalendarDay(
+            exchange=exchange,
+            trade_date=trade_date,
+            is_trading_day=is_trading_day,
+            timezone="Asia/Shanghai",
+            session_type="day_and_night" if is_trading_day else "closed",
+            source_profile="exchange_official_holiday_notice",
+            quality_flag="backfilled_verified",
+            evidence_url=url,
+            notice_id=notice_id,
+            metadata={
+                "classification_status": "trading" if is_trading_day else "closed",
+                "classification_rule": "official_holiday_notice",
+                "verified_by": "official_holiday_notice",
+                **metadata,
+            },
+        )
+
     def create_review_required(
         self,
         *,
@@ -7473,16 +7637,63 @@ class FuturesOfficialCalendarBackfillService:
                     )
                 }
                 weak_unresolved_dates: set[str] = set()
+                holiday_notice = self._refresh_holiday_notice(exchange, dry_run=dry_run)
+                result["holiday_notice"] = {
+                    key: holiday_notice.get(key)
+                    for key in (
+                        "status",
+                        "notice_id",
+                        "closed_dates",
+                        "open_dates",
+                        "night_session_suspensions",
+                        "review_dates",
+                    )
+                }
+                notice_closed = set(holiday_notice.get("closed_dates") or [])
+                notice_open = set(holiday_notice.get("open_dates") or [])
+                notice_days = {
+                    item.trade_date: item for item in holiday_notice.get("calendar_days") or []
+                }
                 if exchange_start <= exchange_probe_end:
                     current = date.fromisoformat(exchange_start)
                     end_obj = date.fromisoformat(exchange_probe_end)
                     while current <= end_obj:
                         key = current.isoformat()
+                        if key in notice_closed and key in notice_days:
+                            verified_by_date[key] = notice_days[key]
+                            current += timedelta(days=1)
+                            continue
                         if current.weekday() >= 5:
-                            verified_by_date[key] = self._weekend_calendar_day(
-                                exchange,
-                                key,
-                                existing_by_date.get(key),
+                            existing_weekend = existing_by_date.get(key) or {}
+                            existing_weekend_rule = str(
+                                (existing_weekend.get("metadata") or {}).get("classification_rule") or ""
+                            )
+                            if key in notice_open and key in notice_days:
+                                verified_by_date[key] = notice_days[key]
+                            elif (
+                                existing_weekend_rule == "official_holiday_notice"
+                                and bool(existing_weekend.get("is_trading_day"))
+                            ):
+                                verified_by_date[key] = self._calendar_day_from_existing(existing_weekend)
+                            else:
+                                verified_by_date[key] = self._weekend_calendar_day(
+                                    exchange,
+                                    key,
+                                    existing_weekend or None,
+                                )
+                            current += timedelta(days=1)
+                            continue
+                        existing_rule = str(
+                            ((existing_by_date.get(key) or {}).get("metadata") or {}).get(
+                                "classification_rule"
+                            )
+                            or ""
+                        )
+                        if existing_rule == "official_holiday_notice" and not bool(
+                            (existing_by_date.get(key) or {}).get("is_trading_day")
+                        ):
+                            verified_by_date[key] = self._calendar_day_from_existing(
+                                existing_by_date[key]
                             )
                             current += timedelta(days=1)
                             continue
@@ -7509,6 +7720,7 @@ class FuturesOfficialCalendarBackfillService:
                             existing=existing_by_date.get(key),
                         )
                         if calendar_day:
+                            calendar_day = self._attach_night_suspension(calendar_day, holiday_notice)
                             verified_by_date[key] = calendar_day
                             if calendar_day.metadata.get("calendar_repair"):
                                 result["repaired_dates"].append(key)
@@ -7621,6 +7833,9 @@ class FuturesOfficialCalendarBackfillService:
                                     existing=existing_by_date.get(key),
                                 )
                                 if calendar_day:
+                                    calendar_day = self._attach_night_suspension(
+                                        calendar_day, holiday_notice
+                                    )
                                     verified_by_date[key] = calendar_day
                                     unresolved_reasons.pop(key, None)
                                     weak_unresolved_dates.discard(key)
@@ -7904,6 +8119,62 @@ class FuturesOfficialCalendarBackfillService:
             notice_id=str(row.get("notice_id") or ""),
             manual_override_id=str(row.get("manual_override_id") or ""),
             metadata=dict(row.get("metadata") or {}),
+        )
+
+    @staticmethod
+    def _attach_night_suspension(
+        calendar_day: FuturesTradingCalendarDay,
+        holiday_notice: Mapping[str, Any],
+    ) -> FuturesTradingCalendarDay:
+        nights = set(holiday_notice.get("night_session_suspensions") or [])
+        if calendar_day.trade_date not in nights or not calendar_day.is_trading_day:
+            return calendar_day
+        return replace(
+            calendar_day,
+            metadata={
+                **dict(calendar_day.metadata or {}),
+                "night_session_suspended": True,
+                "night_session_notice_id": holiday_notice.get("notice_id"),
+            },
+        )
+
+    def _refresh_holiday_notice(self, exchange: str, *, dry_run: bool) -> Dict[str, Any]:
+        governance_cfg = self.module_cfg.get("trading_day_governance") or {}
+        notices_cfg = governance_cfg.get("holiday_notices") or {}
+        if not notices_cfg.get("enabled", False):
+            return {"status": "disabled", "closed_dates": [], "open_dates": [], "calendar_days": []}
+        exchange_cfg = (notices_cfg.get("exchanges") or {}).get(exchange) or {}
+        if not exchange_cfg:
+            return {"status": "disabled", "closed_dates": [], "open_dates": [], "calendar_days": []}
+        try:
+            from research.providers.official_futures_calendar import OfficialFuturesCalendarProvider
+
+            fetched = OfficialFuturesCalendarProvider(self.research_config).fetch_holiday_notice_text(
+                exchange
+            )
+        except Exception as exc:
+            logger.warning(
+                "[FuturesOfficialCalendarBackfill] holiday notice unavailable exchange=%s error=%s",
+                exchange,
+                exc,
+            )
+            return {
+                "status": "unavailable",
+                "closed_dates": [],
+                "open_dates": [],
+                "calendar_days": [],
+                "error": str(exc),
+            }
+        governance = FuturesTradingDayGovernanceService(
+            self.storage,
+            self.module_cfg,
+            now_provider=self.now_provider,
+        )
+        return governance.apply_holiday_notice_text(
+            exchange=exchange,
+            url=str(fetched.get("url") or ""),
+            text=str(fetched.get("text") or ""),
+            dry_run=dry_run,
         )
 
     def _weekend_calendar_day(

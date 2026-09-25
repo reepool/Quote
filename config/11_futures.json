@@ -649,6 +649,29 @@
           "GFEX": "2022-12-22"
         },
         "note": "Historical exchange calendars are verified from official daily market-data endpoints. Future dates are not weekday-filled unless an official notice source explicitly verifies them."
+      },
+      "holiday_notices": {
+        "enabled": true,
+        "exchanges": {
+          "SHFE": {
+            "listing_url": "https://www.shfe.com.cn/services/calenderandholidays/holiday/",
+            "notice_url": "https://www.shfe.com.cn/publicnotice/notice/202512/t20251217_829805.html"
+          },
+          "INE": {
+            "listing_url": "http://www.ine.cn/services/calenderandholidays/holiday/",
+            "notice_url": "http://www.ine.cn/services/calenderandholidays/holiday/"
+          },
+          "DCE": {
+            "note": "Pin notice_url to the official DCE 2026 holiday notice. Homepage HTML is not a notice."
+          },
+          "CZCE": {
+            "note": "Pin notice_url to the official CZCE 2026 holiday notice. Homepage HTML is not a notice."
+          },
+          "GFEX": {
+            "listing_url": "http://www.gfex.com.cn/gfex/tzts/202512/0134914f8c674fa68c2ba9041a5cd798.shtml",
+            "notice_url": "http://www.gfex.com.cn/gfex/tzts/202512/0134914f8c674fa68c2ba9041a5cd798.shtml"
+          }
+        }
       }
     },
     "market_data_sync": {
