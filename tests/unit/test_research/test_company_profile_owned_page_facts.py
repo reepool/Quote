@@ -1080,6 +1080,22 @@ VEHICLE_REVENUE_SHAPE = (
     "分产品 营业收入 营业成本\n"
     "整车 7,303,679,564.58 7,579,828,607.20 -3.78\n"
     "非整车 1,506,087,248.47 1,350,988,617.81 10.30\n"
+    "主营业务分地区情况\n"
+    "分地区 营业收入 营业成本\n"
+    "境内 8,267,285,112.72 8,329,539,226.59 -0.75\n"
+    "个百分点\n"
+    "境外 542,481,700.33 601,277,998.42 -10.84\n"
+    "主营业务分销售模式情况\n"
+    "销售模\n"
+    "式\n"
+    "营业收入 营业成本\n"
+    "代理销\n"
+    "售模式\n"
+    "7,497,059,102.65 7,620,318,256.67 -1.64\n"
+    "个百分点\n"
+    "订单销\n"
+    "售模式\n"
+    "1,312,707,710.40 1,310,498,968.34 0.17\n"
     "主营产销量情况分析表\n"
     "客车 辆 3,751 4,567 242\n"
     "(3). 成本分析表\n"
@@ -1135,6 +1151,12 @@ def test_wrapped_industry_and_product_rows_stop_before_later_tables():
     assert classes["汽车制造业"] == "industry"
     assert classes["整车"] == "product"
     assert classes["非整车"] == "product"
+    assert classes["境内"] == "region"
+    assert classes["境外"] == "region"
+    assert classes["代理销售模式"] == "sales_mode"
+    assert classes["订单销售模式"] == "sales_mode"
+    assert "个百分点订单销售模式" not in classes
+    assert not any("个百分点" in label for label in classes)
     values = {
         getattr(getattr(item, "source_native", None), "value", None) for item in records
     }

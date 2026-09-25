@@ -20,6 +20,11 @@ A titled official revenue-composition table under “主营业务分析” and �
 - **THEN** segment and revenue projection uses that table
 - **AND** the table subject, unit, segment dimension, and source binding remain on the projected facts
 
+#### Scenario: Official region and sales-mode headings keep their dimensions
+- **WHEN** a titled income-and-cost table contains “主营业务分地区情况” and “主营业务分销售模式情况”
+- **THEN** region rows use `region` and sales-mode rows use `sales_mode`
+- **AND** a following “个百分点” note is not prefixed onto the next segment label
+
 #### Scenario: Enumerated income classes use revenue composition
 - **WHEN** a titled income-and-cost table lists classes such as “一、航空性收入” and “二、非航空性收入”
 - **THEN** those rows use segment dimension `revenue_composition`

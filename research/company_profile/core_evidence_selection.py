@@ -65,6 +65,8 @@ _SEGMENT_HEADINGS = (
     "占公司营业收入或营业利润10%以上",
     "主营业务分行业情况",
     "主营业务分产品情况",
+    "主营业务分地区情况",
+    "主营业务分销售模式情况",
     "收入和成本分析",
     "主营业务分行业",
     "主营业务分产品",
@@ -1737,7 +1739,9 @@ _SEGMENT_SECTION_HEADINGS = {
     "主营业务分产品情况": "product",
     "主营业务分产品": "product",
     "分产品": "product",
+    "主营业务分地区情况": "region",
     "分地区": "region",
+    "主营业务分销售模式情况": "sales_mode",
     "分销售模式": "sales_mode",
 }
 
@@ -1791,6 +1795,8 @@ def _is_pdf_soft_continuation(previous: str, nxt: str) -> bool:
     if _UNIT_DECLARATION.search(current) or _PERCENT_UNIT.search(current):
         return False
     if "营业收入" in prev or "营业成本" in prev or _is_revenue_table_stop(prev):
+        return False
+    if prev.endswith("个百分点"):
         return False
     if current.startswith(("下表", "项目", "营业收入", "营业总收入", "利息净收入")):
         return False
