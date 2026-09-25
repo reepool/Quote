@@ -103,7 +103,71 @@ def test_weekend_rule_keeps_notice_opened_weekend_when_notice_refresh_is_unavail
     assert stored["metadata"]["classification_rule"] == "official_holiday_notice"
 
 
-def test_unparsed_notice_is_not_confident():
+def test_dce_adopts_parsed_shfe_holiday_notice_without_probing_the_closure(monkeypatch, tmp_path):
+    config = _config(tmp_path)
+    config.modules["commodity_market_data"]["trading_day_governance"]["enabled_exchanges"] = ["SHFE", "DCE"]
+    config.modules["commodity_market_data"]["trading_day_governance"]["holiday_notices"] = {
+        "enabled": True,
+        "exchanges": {
+            "SHFE": {"notice_url": "https://example.test/shfe-2026"},
+            "DCE": {"adopt_notice_from": "SHFE"},
+        },
+    }
+    config.modules["commodity_market_data"]["trading_day_governance"]["publication_policy"]["exchanges"]["DCE"] = {
+        "timezone": "Asia/Shanghai",
+        "cutoff": "18:00",
+    }
+    config.modules["commodity_market_data"]["sources"]["exchange_official"]["enabled_exchanges"] = ["SHFE", "DCE"]
+    storage = FuturesStorageManager(config)
+    storage.initialize()
+    FuturesTradingDayGovernanceService(
+        storage,
+        config.modules["commodity_market_data"],
+    ).apply_holiday_notice_text(
+        exchange="SHFE",
+        url="https://example.test/shfe-2026",
+        text=NOTICE_TEXT,
+    )
+    probed = []
+
+    def _fetch(self, exchange):
+        raise AssertionError(f"{exchange} should adopt the stored SHFE notice")
+
+    def _probe(self, exchange, trade_date):
+        probed.append((exchange, trade_date))
+        return OfficialFuturesDailyProbeResult(
+            exchange=exchange,
+            trade_date=trade_date,
+            status="trading",
+            is_trading_day=True,
+            row_count=1,
+            source_interface="fixture",
+            evidence_url=f"https://official.example/{trade_date}",
+            parser_version="fixture.v1",
+            metadata={"classification_rule": "official_daily_rows"},
+        )
+
+    monkeypatch.setattr(
+        "research.providers.official_futures_calendar.OfficialFuturesCalendarProvider.fetch_holiday_notice_text",
+        _fetch,
+    )
+    monkeypatch.setattr(
+        "research.providers.official_futures.OfficialFuturesMarketDataProvider.probe_exchange_trading_day",
+        _probe,
+    )
+    result = FuturesOfficialCalendarBackfillService(
+        storage,
+        config,
+        config.modules["commodity_market_data"],
+        now_provider=lambda: datetime(2026, 9, 25, 21, 30, tzinfo=ZoneInfo("Asia/Shanghai")),
+    ).run(exchanges=["DCE"], start_date="2026-09-25", end_date="2026-09-25")
+    stored = storage.list_calendar_days(exchange="DCE", start_date="2026-09-25", end_date="2026-09-25")[0]
+
+    assert result["status"] == "success"
+    assert probed == []
+    assert stored["is_trading_day"] is False
+    assert stored["metadata"]["adopted_from_exchange"] == "SHFE"
+    assert stored["evidence_url"] == "https://example.test/shfe-2026"
     parsed = parse_holiday_notice_text("关于调整保证金的通知，不涉及休市日期。", notice_year=2026)
 
     assert parsed["confident"] is False

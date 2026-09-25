@@ -4738,6 +4738,7 @@ class FuturesTradingDayGovernanceService:
         url: str,
         text: str,
         dry_run: bool = False,
+        donor_exchange: Optional[str] = None,
     ) -> Dict[str, Any]:
         """Persist one exchange holiday notice and its non-conflicting calendar rows."""
         from research.providers.official_futures_calendar import parse_holiday_notice_text
@@ -4776,7 +4777,10 @@ class FuturesTradingDayGovernanceService:
                     is_trading_day=False,
                     notice_id=notice_id,
                     url=url,
-                    metadata={"night_session_suspended": trade_date in parsed["night_session_suspensions"]},
+                    metadata={
+                        "night_session_suspended": trade_date in parsed["night_session_suspensions"],
+                        **({"adopted_from_exchange": donor_exchange} if donor_exchange else {}),
+                    },
                 )
             )
         for trade_date in parsed["open_dates"]:
@@ -4822,6 +4826,7 @@ class FuturesTradingDayGovernanceService:
                 "notice_year": parsed.get("notice_year"),
                 "night_session_suspensions": night_only,
                 "review_dates": review_dates,
+                **({"adopted_from_exchange": donor_exchange} if donor_exchange else {}),
             },
         )
         if dry_run:
@@ -4833,6 +4838,7 @@ class FuturesTradingDayGovernanceService:
                 "open_dates": [item.trade_date for item in open_days],
                 "night_session_suspensions": night_only,
                 "review_dates": review_dates,
+                "adopted_from_exchange": donor_exchange,
                 "calendar_days": [*closed_days, *open_days],
             }
         self.upsert_official_notice(notice, derived_days=[*closed_days, *open_days])
@@ -4866,6 +4872,7 @@ class FuturesTradingDayGovernanceService:
             "open_dates": [item.trade_date for item in open_days],
             "night_session_suspensions": night_only,
             "review_dates": review_dates,
+            "adopted_from_exchange": donor_exchange,
             "calendar_days": [*closed_days, *open_days],
         }
 
@@ -8148,25 +8155,65 @@ class FuturesOfficialCalendarBackfillService:
         exchange_cfg = (notices_cfg.get("exchanges") or {}).get(exchange) or {}
         if not exchange_cfg:
             return {"status": "disabled", "closed_dates": [], "open_dates": [], "calendar_days": []}
-        try:
-            from research.providers.official_futures_calendar import OfficialFuturesCalendarProvider
+        donor_exchange = str(exchange_cfg.get("adopt_notice_from") or "").upper()
+        fetched = None
+        fetch_error = ""
+        if exchange_cfg.get("notice_url") or exchange_cfg.get("listing_url"):
+            try:
+                from research.providers.official_futures_calendar import OfficialFuturesCalendarProvider
 
-            fetched = OfficialFuturesCalendarProvider(self.research_config).fetch_holiday_notice_text(
-                exchange
+                fetched = OfficialFuturesCalendarProvider(self.research_config).fetch_holiday_notice_text(
+                    exchange
+                )
+            except Exception as exc:
+                fetch_error = str(exc)
+                logger.warning(
+                    "[FuturesOfficialCalendarBackfill] holiday notice unavailable exchange=%s error=%s",
+                    exchange,
+                    exc,
+                )
+        if fetched and str(fetched.get("text") or "").strip():
+            governance = FuturesTradingDayGovernanceService(
+                self.storage,
+                self.module_cfg,
+                now_provider=self.now_provider,
             )
-        except Exception as exc:
-            logger.warning(
-                "[FuturesOfficialCalendarBackfill] holiday notice unavailable exchange=%s error=%s",
-                exchange,
-                exc,
+            applied = governance.apply_holiday_notice_text(
+                exchange=exchange,
+                url=str(fetched.get("url") or ""),
+                text=str(fetched.get("text") or ""),
+                dry_run=dry_run,
             )
+            if applied.get("status") == "parsed" or not donor_exchange:
+                return applied
+            fetch_error = fetch_error or "holiday notice text was not confident"
+        if donor_exchange:
+            adopted = self._adopt_holiday_notice(exchange, donor_exchange, dry_run=dry_run)
+            if adopted.get("status") == "parsed":
+                return adopted
+            fetch_error = fetch_error or str(adopted.get("error") or "donor holiday notice unavailable")
+        if fetch_error:
             return {
                 "status": "unavailable",
                 "closed_dates": [],
                 "open_dates": [],
                 "calendar_days": [],
-                "error": str(exc),
+                "error": fetch_error,
             }
+        return {"status": "disabled", "closed_dates": [], "open_dates": [], "calendar_days": []}
+
+    def _adopt_holiday_notice(self, exchange: str, donor_exchange: str, *, dry_run: bool) -> Dict[str, Any]:
+        notices = self.storage.list_calendar_notices(exchange=donor_exchange, parse_status="parsed")
+        donor = next(
+            (
+                item for item in notices
+                if str(item.get("notice_type") or "") == "holiday_notice"
+                and str((item.get("raw_payload") or {}).get("text") or "").strip()
+            ),
+            None,
+        )
+        if donor is None:
+            return {"status": "unavailable", "error": f"no parsed holiday notice for {donor_exchange}"}
         governance = FuturesTradingDayGovernanceService(
             self.storage,
             self.module_cfg,
@@ -8174,9 +8221,10 @@ class FuturesOfficialCalendarBackfillService:
         )
         return governance.apply_holiday_notice_text(
             exchange=exchange,
-            url=str(fetched.get("url") or ""),
-            text=str(fetched.get("text") or ""),
+            url=str(donor.get("url") or ""),
+            text=str((donor.get("raw_payload") or {}).get("text") or ""),
             dry_run=dry_run,
+            donor_exchange=donor_exchange,
         )
 
     def _weekend_calendar_day(

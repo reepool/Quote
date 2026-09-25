@@ -662,10 +662,12 @@
             "notice_url": "http://www.ine.cn/services/calenderandholidays/holiday/"
           },
           "DCE": {
-            "note": "Pin notice_url to the official DCE 2026 holiday notice. Homepage HTML is not a notice."
+            "adopt_notice_from": "SHFE",
+            "note": "DCE has no pinned official holiday-notice URL. Adopt SHFE's parsed CSRC holiday closures and keep the SHFE notice URL as evidence."
           },
           "CZCE": {
-            "note": "Pin notice_url to the official CZCE 2026 holiday notice. Homepage HTML is not a notice."
+            "adopt_notice_from": "SHFE",
+            "note": "CZCE has no pinned official holiday-notice URL. Adopt SHFE's parsed CSRC holiday closures and keep the SHFE notice URL as evidence."
           },
           "GFEX": {
             "listing_url": "http://www.gfex.com.cn/gfex/tzts/202512/0134914f8c674fa68c2ba9041a5cd798.shtml",
