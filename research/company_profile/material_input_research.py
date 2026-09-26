@@ -17,7 +17,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from .commodity_exposure import project_commodity_exposures
 from .contracts import (
@@ -51,7 +51,7 @@ from .stage5 import (
 from .stage5_bundle import Stage5RunBundleStore
 from .workflow import CompanyProfileSemanticService
 
-MATERIAL_INPUT_RESEARCH_SCHEMA = "company_profile_material_input_research.v1"
+MATERIAL_INPUT_RESEARCH_SCHEMA = "company_profile_material_input_research.v2"
 MATERIAL_INPUT_RESEARCH_PLAN_VERSION = (
     "manufacturing_materials_stage4_material_inputs.2026-09-26.1"
 )
@@ -68,17 +68,120 @@ class _StrictModel(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
 
 
+class ResearchReportIdentity(_StrictModel):
+    instrument_id: str = Field(min_length=1)
+    report_id: str = Field(min_length=1)
+    document_version: str = Field(min_length=1)
+    report_period: str = Field(min_length=1)
+    published_at: str = Field(min_length=1)
+    document_type: Literal["annual_report"] = "annual_report"
+
+
+class ResearchEvidenceRef(_StrictModel):
+    """One Evidence binding that can be read without the report-level record."""
+
+    binding_status: Literal["bound", "unbound"]
+    evidence_id: str | None = None
+    chapter_task: Literal["extract_material_inputs"] = "extract_material_inputs"
+    instrument_id: str = Field(min_length=1)
+    report_id: str = Field(min_length=1)
+    document_version: str = Field(min_length=1)
+    page: int = Field(ge=1)
+    section_title: str | None = None
+    bounded_quote: str | None = None
+    page_text_hash: str | None = Field(default=None, pattern=r"^[0-9a-f]{64}$")
+
+    @model_validator(mode="after")
+    def _bound_evidence_is_complete(self) -> ResearchEvidenceRef:
+        if self.binding_status == "bound":
+            if (
+                not self.evidence_id
+                or not self.section_title
+                or not self.bounded_quote
+                or not self.page_text_hash
+            ):
+                raise ValueError(
+                    "bound evidence requires an id, section, quote, and page text hash"
+                )
+            return self
+        if self.evidence_id or self.bounded_quote or self.page_text_hash:
+            raise ValueError(
+                "unbound evidence must not imitate a prepared Evidence object"
+            )
+        if not self.section_title:
+            raise ValueError("unbound evidence still cites the planned section")
+        return self
+
+
 class MaterialInputResearchFact(_StrictModel):
     sample_id: str = Field(min_length=1)
-    object_name: str = Field(min_length=1)
+    record_id: str = Field(min_length=1)
+    field_id: Literal["material_input"] = "material_input"
+    chapter_task: Literal["extract_material_inputs"] = "extract_material_inputs"
     relation_type: Literal["material_input"] = "material_input"
     role: Literal["raw_material_input"] = "raw_material_input"
-    page: int = Field(ge=1)
+    source_native_name: str = Field(min_length=1)
+    object_name: str = Field(min_length=1)
+    report: ResearchReportIdentity
+    reported_period: str = Field(min_length=1)
+    period_type: Literal["duration"] = "duration"
+    subject_scope: str = Field(min_length=1)
+    subject_basis: str = Field(min_length=1)
+    assertion_class: Literal["reported_fact"] = "reported_fact"
+    evidence: tuple[ResearchEvidenceRef, ...] = Field(min_length=1)
     disposition: Literal["accepted_for_review"] = "accepted_for_review"
     quantity: None = None
     mapping_status: Literal["mapped", "pending", "ambiguous"]
     commodity_id: str | None = None
-    companion_sales_role: bool = False
+
+    @model_validator(mode="after")
+    def _fact_matches_its_evidence(self) -> MaterialInputResearchFact:
+        if self.source_native_name != self.object_name:
+            raise ValueError("source-native name and object name must stay together")
+        if self.reported_period != self.report.report_period:
+            raise ValueError("fact period must match its report identity")
+        if any(item.binding_status != "bound" for item in self.evidence):
+            raise ValueError("an accepted input fact requires bound evidence")
+        if any(item.report_id != self.report.report_id for item in self.evidence):
+            raise ValueError("fact evidence must belong to the same report")
+        return self
+
+
+class MaterialInputSalesRole(_StrictModel):
+    sample_id: str = Field(min_length=1)
+    record_id: str = Field(min_length=1)
+    field_id: Literal["explicit_activity"] = "explicit_activity"
+    chapter_task: Literal["extract_material_inputs"] = "extract_material_inputs"
+    role: Literal["product_sales"] = "product_sales"
+    action: Literal["sells"] = "sells"
+    source_native_name: str = Field(min_length=1)
+    object_name: str = Field(min_length=1)
+    report: ResearchReportIdentity
+    reported_period: str = Field(min_length=1)
+    period_type: Literal["duration"] = "duration"
+    subject_scope: str = Field(min_length=1)
+    subject_basis: str = Field(min_length=1)
+    actor_basis: str = Field(min_length=1)
+    activity_actor: str = Field(min_length=1)
+    source_actor: str = Field(min_length=1)
+    source_verb: str = Field(min_length=1)
+    assertion_class: Literal["reported_fact"] = "reported_fact"
+    evidence: tuple[ResearchEvidenceRef, ...] = Field(min_length=1)
+    disposition: Literal["accepted_for_review"] = "accepted_for_review"
+    mapping_status: Literal["mapped", "pending", "ambiguous"]
+    commodity_id: str | None = None
+
+    @model_validator(mode="after")
+    def _sales_role_has_its_own_evidence(self) -> MaterialInputSalesRole:
+        if self.source_native_name != self.object_name:
+            raise ValueError("sales role must keep the source-native name")
+        if self.activity_actor != self.source_actor:
+            raise ValueError("sales actor must match the source actor")
+        if self.reported_period != self.report.report_period:
+            raise ValueError("sales period must match its report identity")
+        if any(item.binding_status != "bound" for item in self.evidence):
+            raise ValueError("a sales role requires its own bound evidence")
+        return self
 
 
 class MaterialInputScopeOutcome(_StrictModel):
@@ -87,6 +190,31 @@ class MaterialInputScopeOutcome(_StrictModel):
     kind: str = Field(min_length=1)
     outcome: Literal["observed", "legal_empty", "unclear", "extraction_failure"]
     names: tuple[str, ...] = ()
+    reason: str = Field(min_length=1)
+    failure_code: str | None = None
+    evidence: tuple[ResearchEvidenceRef, ...] = ()
+
+    @model_validator(mode="after")
+    def _negative_outcomes_cite_evidence(self) -> MaterialInputScopeOutcome:
+        if self.outcome == "extraction_failure":
+            if not self.failure_code or self.names:
+                raise ValueError(
+                    "extraction failure needs a code and no material names"
+                )
+            if not self.evidence or any(
+                item.binding_status != "unbound" for item in self.evidence
+            ):
+                raise ValueError("extraction failure must cite the unbound page")
+            return self
+        if not self.evidence or any(
+            item.binding_status != "bound" for item in self.evidence
+        ):
+            raise ValueError("a prepared outcome must cite bound evidence")
+        if self.outcome == "legal_empty" and self.names:
+            raise ValueError("legal empty must not carry named inputs")
+        if self.outcome == "observed" and not self.names:
+            raise ValueError("an observed input scope must name the materials")
+        return self
 
 
 class MaterialInputReportBindingRecord(_StrictModel):
@@ -100,7 +228,7 @@ class MaterialInputReportBindingRecord(_StrictModel):
 
 
 class MaterialInputResearchBundle(_StrictModel):
-    schema_version: Literal["company_profile_material_input_research.v1"] = (
+    schema_version: Literal["company_profile_material_input_research.v2"] = (
         MATERIAL_INPUT_RESEARCH_SCHEMA
     )
     run_id: str = Field(min_length=1)
@@ -114,6 +242,7 @@ class MaterialInputResearchBundle(_StrictModel):
     )
     scope_outcomes: tuple[MaterialInputScopeOutcome, ...] = Field(min_length=1)
     facts: tuple[MaterialInputResearchFact, ...] = Field(min_length=1)
+    sales_roles: tuple[MaterialInputSalesRole, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -293,15 +422,35 @@ def material_input_research_bindings() -> tuple[MaterialInputReportBinding, ...]
     )
 
 
-def classify_material_scope(
-    kind: str, names: tuple[str, ...]
-) -> Literal["observed", "legal_empty", "unclear"]:
-    """Separate an observed input from a refusal that must not become a fact."""
+_MATERIAL_MENTION = re.compile(r"主要原材料|原材料包括|原材料为")
+_EXPRESS_OMISSION = re.compile(r"未披露|不适用|无主要原材料|不涉及")
+_AMBIGUOUS_SUBJECT = re.compile(r"客户|供应商|下游|销售|出售")
 
-    if kind == "named_input":
-        return "observed" if names else "unclear"
+
+def classify_material_scope(
+    kind: str,
+    names: tuple[str, ...],
+    *,
+    text: str = "",
+) -> Literal["observed", "legal_empty", "unclear"]:
+    """Separate an observed input from legal empty and unclear binding.
+
+    A named-input page with no names is legal empty when the report does not
+    state a company input. It is unclear when the cited sentence mentions a
+    material list but does not uniquely bind that list to the company.
+    """
+
+    if kind == "named_input" and names:
+        return "observed"
     if names:
         return "unclear"
+    if kind == "named_input":
+        compact = re.sub(r"\s+", "", text)
+        if _EXPRESS_OMISSION.search(compact):
+            return "legal_empty"
+        if _MATERIAL_MENTION.search(compact) or _AMBIGUOUS_SUBJECT.search(compact):
+            return "unclear"
+        return "legal_empty"
     if kind in {
         "direct_material_cost",
         "inventory_amount",
@@ -310,6 +459,42 @@ def classify_material_scope(
     }:
         return "legal_empty"
     raise ValueError(f"unknown material scope kind: {kind}")
+
+
+def extraction_failure_outcome(
+    *,
+    sample_id: str,
+    scope_id: str,
+    instrument_id: str,
+    report_id: str,
+    document_version: str,
+    page: int,
+    section_title: str,
+    code: str,
+    message: str,
+) -> MaterialInputScopeOutcome:
+    """Record an unbound page without turning it into a material fact."""
+
+    return MaterialInputScopeOutcome(
+        sample_id=sample_id,
+        scope_id=scope_id,
+        kind="named_input",
+        outcome="extraction_failure",
+        names=(),
+        reason=message,
+        failure_code=code,
+        evidence=(
+            ResearchEvidenceRef(
+                binding_status="unbound",
+                chapter_task="extract_material_inputs",
+                instrument_id=instrument_id,
+                report_id=report_id,
+                document_version=document_version,
+                page=page,
+                section_title=section_title,
+            ),
+        ),
+    )
 
 
 def commit_material_input_research(
@@ -363,6 +548,7 @@ def build_material_input_research_bundle(
     active_preparer = preparer or Stage5EvidencePreparer()
     outcomes: list[MaterialInputScopeOutcome] = []
     facts: list[MaterialInputResearchFact] = []
+    sales_roles: list[MaterialInputSalesRole] = []
     report_records: list[MaterialInputReportBindingRecord] = []
     for binding in material_input_research_bindings():
         prepared = active_preparer.prepare_single_chapter(
@@ -381,7 +567,7 @@ def build_material_input_research_bundle(
             )
             names = explicit_material_input_names(text)
             scope_names[spec.scope_id] = names
-            outcome = classify_material_scope(spec.kind, names)
+            outcome = classify_material_scope(spec.kind, names, text=text)
             outcomes.append(
                 MaterialInputScopeOutcome(
                     sample_id=binding.sample_id,
@@ -389,11 +575,17 @@ def build_material_input_research_bundle(
                     kind=spec.kind,
                     outcome=outcome,
                     names=names,
+                    reason=_outcome_reason(spec.kind, outcome),
+                    evidence=_bound_evidence(by_scope[spec.scope_id]),
                 )
             )
         named = next(item for item in binding.scopes if item.kind == "named_input")
         if (
-            classify_material_scope(named.kind, scope_names[named.scope_id])
+            classify_material_scope(
+                named.kind,
+                scope_names[named.scope_id],
+                text=_scope_text(by_scope[named.scope_id]),
+            )
             != "observed"
         ):
             raise MaterialInputResearchError(
@@ -413,39 +605,33 @@ def build_material_input_research_bundle(
             sales_names,
             product_evidence,
         )
-        exposures = {
-            item.source_native_name: item
-            for item in project_commodity_exposures(
-                tuple(
-                    record
-                    for record in accepted
-                    if getattr(record, "relation_type", None)
-                    == RelationshipType.MATERIAL_INPUT
-                ),
-                catalog=catalog,
-            )
+        page_hashes = {
+            page.page: page.text_hash
+            for scope in by_scope.values()
+            for page in scope.page_contexts
         }
-        kept_sales_names = {
-            record.object_name for record in accepted if isinstance(record, Activity)
+        exposures = {
+            item.source_record_ids[0]: item
+            for item in project_commodity_exposures(accepted, catalog=catalog)
         }
         for record in accepted:
-            if not isinstance(record, Relationship):
-                continue
-            exposure = exposures[record.object_name]
-            if exposure.role != "raw_material_input":
-                raise MaterialInputResearchError(
-                    f"{record.object_name} lost the material-input role"
+            exposure = exposures[record.record_id]
+            if isinstance(record, Relationship):
+                if exposure.role != "raw_material_input":
+                    raise MaterialInputResearchError(
+                        f"{record.object_name} lost the material-input role"
+                    )
+                facts.append(
+                    _input_fact(binding.sample_id, record, exposure, page_hashes)
                 )
-            facts.append(
-                MaterialInputResearchFact(
-                    sample_id=binding.sample_id,
-                    object_name=record.object_name,
-                    page=record.evidence[0].page,
-                    mapping_status=exposure.mapping_status,
-                    commodity_id=exposure.commodity_id,
-                    companion_sales_role=record.object_name in kept_sales_names,
+            elif isinstance(record, Activity):
+                if exposure.role != "product_sales":
+                    raise MaterialInputResearchError(
+                        f"{record.object_name} lost the independent sales role"
+                    )
+                sales_roles.append(
+                    _sales_role(binding.sample_id, record, exposure, page_hashes)
                 )
-            )
         dossier = repository_root / binding.relative_dossier_path
         report_records.append(
             MaterialInputReportBindingRecord(
@@ -463,6 +649,118 @@ def build_material_input_research_bundle(
         reports=tuple(report_records),
         scope_outcomes=tuple(outcomes),
         facts=tuple(facts),
+        sales_roles=tuple(sales_roles),
+    )
+
+
+def _scope_text(scope) -> str:
+    return "\n".join(page.text for page in scope.page_contexts)
+
+
+def _outcome_reason(kind: str, outcome: str) -> str:
+    if outcome == "observed":
+        return "the cited sentence binds named materials to the company's own input"
+    if outcome == "unclear" and kind == "named_input":
+        return (
+            "the cited evidence does not uniquely bind a material "
+            "to the company's own input"
+        )
+    if outcome == "unclear":
+        return "a name on this page is not uniquely bound as the company's input"
+    reasons = {
+        "named_input": "the report does not state a named company input",
+        "direct_material_cost": "a direct-material cost amount is not a named input",
+        "inventory_amount": "a raw-material inventory amount is not a named input",
+        "outsourced_processing": "outsourced processing is not a material input",
+        "product_overlap": "product or sales evidence alone does not create an input role",
+    }
+    try:
+        return reasons[kind]
+    except KeyError as exc:
+        raise ValueError(f"unknown material scope kind: {kind}") from exc
+
+
+def _bound_evidence(scope) -> tuple[ResearchEvidenceRef, ...]:
+    hashes = {page.page: page.text_hash for page in scope.page_contexts}
+    return tuple(
+        _evidence_ref(item.evidence, hashes[item.evidence.page])
+        for item in scope.evidence_bundle
+    )
+
+
+def _evidence_ref(evidence, page_text_hash: str) -> ResearchEvidenceRef:
+    quote = evidence.anchor.bounded_quote
+    return ResearchEvidenceRef(
+        binding_status="bound",
+        evidence_id=evidence.evidence_id,
+        instrument_id=evidence.report.instrument_id,
+        report_id=evidence.report.report_id,
+        document_version=evidence.report.document_version,
+        page=evidence.page,
+        section_title=evidence.section_title,
+        bounded_quote=quote,
+        page_text_hash=page_text_hash,
+    )
+
+
+def _report_view(report) -> ResearchReportIdentity:
+    return ResearchReportIdentity(
+        instrument_id=report.instrument_id,
+        report_id=report.report_id,
+        document_version=report.document_version,
+        report_period=report.report_period,
+        published_at=report.published_at,
+        document_type="annual_report",
+    )
+
+
+def _record_evidence(
+    record, page_hashes: dict[int, str]
+) -> tuple[ResearchEvidenceRef, ...]:
+    return tuple(
+        _evidence_ref(item, page_hashes[item.page]) for item in record.evidence
+    )
+
+
+def _input_fact(
+    sample_id: str, record: Relationship, exposure, page_hashes
+) -> MaterialInputResearchFact:
+    return MaterialInputResearchFact(
+        sample_id=sample_id,
+        record_id=record.record_id,
+        source_native_name=record.source_native.name or record.object_name,
+        object_name=record.object_name,
+        report=_report_view(record.report),
+        reported_period=record.reported_period,
+        period_type=record.period_type.value,
+        subject_scope=record.subject_scope.value,
+        subject_basis=record.subject_basis.value,
+        evidence=_record_evidence(record, page_hashes),
+        mapping_status=exposure.mapping_status,
+        commodity_id=exposure.commodity_id,
+    )
+
+
+def _sales_role(
+    sample_id: str, record: Activity, exposure, page_hashes
+) -> MaterialInputSalesRole:
+    return MaterialInputSalesRole(
+        sample_id=sample_id,
+        record_id=record.record_id,
+        source_native_name=record.source_native.name or record.object_name,
+        object_name=record.object_name,
+        report=_report_view(record.report),
+        reported_period=record.reported_period,
+        period_type=record.period_type.value,
+        subject_scope=record.subject_scope.value,
+        subject_basis=record.subject_basis.value,
+        actor_basis=record.actor_basis.value,
+        activity_actor=record.activity_actor,
+        source_actor=record.source_actor,
+        source_verb=record.source_verb,
+        evidence=_record_evidence(record, page_hashes),
+        mapping_status=exposure.mapping_status,
+        commodity_id=exposure.commodity_id,
     )
 
 

@@ -13,11 +13,28 @@ from research.company_profile.core_evidence_selection import (
     explicit_material_input_names,
 )
 from research.company_profile.material_input_research import (
+    MaterialInputScopeOutcome,
+    ResearchEvidenceRef,
     classify_material_scope,
     commit_material_input_research,
+    extraction_failure_outcome,
     material_input_research_bindings,
 )
-from research.company_profile.models import ChapterTask, ReportIdentity
+from research.company_profile.models import (
+    Activity,
+    ActivityAction,
+    AssertionClass,
+    ChapterTask,
+    Evidence,
+    PeriodType,
+    Relationship,
+    RelationshipType,
+    ReportIdentity,
+    SourceNativeValue,
+    SubjectBasis,
+    SubjectScope,
+    TextAnchor,
+)
 from research.company_profile.stage5 import (
     EvidencePreparationError,
     EvidenceReportPlan,
@@ -106,7 +123,15 @@ def test_historical_report_plan_still_rejects_a_single_chapter():
 
 def test_sales_cost_inventory_and_outsourcing_do_not_create_inputs():
     assert explicit_material_input_names(_SALES_ONLY) == ()
-    assert classify_material_scope("named_input", ()) == "unclear"
+    assert classify_material_scope("named_input", (), text=_SALES_ONLY) == "unclear"
+    assert (
+        classify_material_scope("named_input", (), text="公司未披露主要原材料名称。")
+        == "legal_empty"
+    )
+    assert (
+        classify_material_scope("named_input", (), text="本节讨论产能利用率。")
+        == "legal_empty"
+    )
     assert explicit_material_input_names(_COST_ONLY) == ()
     assert classify_material_scope("direct_material_cost", ()) == "legal_empty"
     assert explicit_material_input_names(_INVENTORY_ONLY) == ()
@@ -115,12 +140,61 @@ def test_sales_cost_inventory_and_outsourcing_do_not_create_inputs():
     assert "丁酮肟" not in explicit_material_input_names(_OUTSOURCED)
     assert classify_material_scope("outsourced_processing", ()) == "legal_empty"
     assert explicit_material_input_names(_UNCLEAR_SUBJECT) == ()
+    assert (
+        classify_material_scope("named_input", (), text=_UNCLEAR_SUBJECT) == "unclear"
+    )
     assert set(explicit_material_input_names(_CATL)) == {
         "正极材料",
         "负极材料",
         "隔膜",
         "电解液",
     }
+
+
+def test_named_input_without_names_keeps_evidence_for_each_empty_outcome():
+    evidence = ResearchEvidenceRef(
+        binding_status="bound",
+        evidence_id="stage5-evidence-named-empty",
+        instrument_id="300750.SZ",
+        report_id="asset-named-empty",
+        document_version="ver-named-empty",
+        page=40,
+        section_title="主要原材料",
+        bounded_quote="公司及下游客户主要原材料包括钢材、铜等。",
+        page_text_hash="a" * 64,
+    )
+    unclear = MaterialInputScopeOutcome(
+        sample_id="named-empty",
+        scope_id="named-input",
+        kind="named_input",
+        outcome="unclear",
+        reason="the cited evidence does not uniquely bind a material to the company's own input",
+        evidence=(evidence,),
+    )
+    legal_empty = unclear.model_copy(
+        update={
+            "outcome": "legal_empty",
+            "reason": "the report does not state a named company input",
+            "evidence": (
+                evidence.model_copy(
+                    update={"bounded_quote": "公司未披露主要原材料名称。"}
+                ),
+            ),
+        }
+    )
+    assert unclear.outcome == "unclear"
+    assert legal_empty.outcome == "legal_empty"
+    assert "下游客户" in unclear.evidence[0].bounded_quote
+    assert "未披露" in legal_empty.evidence[0].bounded_quote
+    assert unclear.reason != legal_empty.reason
+    with pytest.raises(ValidationError):
+        MaterialInputScopeOutcome(
+            sample_id="named-empty",
+            scope_id="named-input",
+            kind="named_input",
+            outcome="unclear",
+            reason="missing evidence",
+        )
 
 
 def test_missing_anchor_stays_an_extraction_failure():
@@ -167,6 +241,25 @@ def test_missing_anchor_stays_an_extraction_failure():
             },
         )
     assert caught.value.code is PreparationFailureCode.CONTEXT_INCOMPLETE
+    outcome = extraction_failure_outcome(
+        sample_id=binding.sample_id,
+        scope_id="missing-anchor",
+        instrument_id=binding.instrument_id,
+        report_id=binding.report_id,
+        document_version=binding.document_version,
+        page=40,
+        section_title="原材料",
+        code=caught.value.code.value,
+        message=str(caught.value),
+    )
+    assert outcome.outcome == "extraction_failure"
+    assert outcome.names == ()
+    assert outcome.failure_code == "context_incomplete"
+    assert outcome.evidence[0].binding_status == "unbound"
+    assert outcome.evidence[0].evidence_id is None
+    assert outcome.evidence[0].page == 40
+    assert outcome.evidence[0].report_id == binding.report_id
+    assert outcome.reason
 
 
 def test_three_reports_prepare_only_material_inputs_into_an_isolated_bundle(tmp_path):
@@ -200,6 +293,12 @@ def test_three_reports_prepare_only_material_inputs_into_an_isolated_bundle(tmp_
         assert fact["role"] == "raw_material_input"
         assert fact["relation_type"] == "material_input"
         assert fact["quantity"] is None
+        assert "companion_sales_role" not in fact
+        rebuilt = _rebuild_relationship(fact)
+        assert rebuilt.record_id == fact["record_id"]
+        assert rebuilt.source_native.name == fact["source_native_name"]
+        assert rebuilt.evidence[0].evidence_id == fact["evidence"][0]["evidence_id"]
+        assert fact["source_native_name"] in fact["evidence"][0]["bounded_quote"]
         by_sample.setdefault(fact["sample_id"], set()).add(fact["object_name"])
         if fact["object_name"] in {"正极材料", "焦类"}:
             assert fact["mapping_status"] == "ambiguous"
@@ -260,12 +359,93 @@ def test_three_reports_prepare_only_material_inputs_into_an_isolated_bundle(tmp_
     assert outcomes["manufacturing-materials-920015-2025", "outsourced_processing"] == (
         "legal_empty"
     )
+    for item in payload["scope_outcomes"]:
+        if item["outcome"] == "legal_empty":
+            assert item["names"] == []
+            assert item["reason"]
+            evidence = item["evidence"][0]
+            assert evidence["binding_status"] == "bound"
+            assert evidence["evidence_id"]
+            assert evidence["bounded_quote"]
+            assert evidence["page_text_hash"]
+            assert evidence["report_id"]
+            assert evidence["document_version"]
     cathode = next(
         item for item in payload["facts"] if item["object_name"] == "正极材料"
     )
-    assert cathode["companion_sales_role"] is True
-    assert cathode["page"] == 40
+    sales = next(
+        item for item in payload["sales_roles"] if item["object_name"] == "正极材料"
+    )
+    rebuilt_sales = _rebuild_sales(sales)
+    assert rebuilt_sales.action == ActivityAction.SELLS
+    assert sales["role"] == "product_sales"
+    assert sales["record_id"] != cathode["record_id"]
+    assert sales["evidence"][0]["evidence_id"] != cathode["evidence"][0]["evidence_id"]
+    assert sales["evidence"][0]["page"] == 15
+    assert cathode["evidence"][0]["page"] == 40
+    assert sales["source_native_name"] == cathode["source_native_name"]
+    assert sales["mapping_status"] == "ambiguous"
+    assert sales["commodity_id"] is None
+    assert cathode["role"] == "raw_material_input"
     assert _ROOT / "data" not in Path(destination).resolve().parents
+
+
+def _rebuild_relationship(fact: dict) -> Relationship:
+    report = ReportIdentity.model_validate(fact["report"])
+    evidence = _rebuild_evidence(report, fact["evidence"])
+    return Relationship(
+        record_id=fact["record_id"],
+        field_id=fact["field_id"],
+        chapter_task=ChapterTask(fact["chapter_task"]),
+        report=report,
+        subject_scope=SubjectScope(fact["subject_scope"]),
+        subject_basis=SubjectBasis(fact["subject_basis"]),
+        reported_period=fact["reported_period"],
+        period_type=PeriodType(fact["period_type"]),
+        assertion_class=AssertionClass(fact["assertion_class"]),
+        evidence=evidence,
+        source_native=SourceNativeValue(name=fact["source_native_name"]),
+        relation_type=RelationshipType(fact["relation_type"]),
+        object_name=fact["object_name"],
+    )
+
+
+def _rebuild_sales(fact: dict) -> Activity:
+    report = ReportIdentity.model_validate(fact["report"])
+    return Activity(
+        record_id=fact["record_id"],
+        field_id=fact["field_id"],
+        chapter_task=ChapterTask(fact["chapter_task"]),
+        report=report,
+        subject_scope=SubjectScope(fact["subject_scope"]),
+        subject_basis=SubjectBasis(fact["subject_basis"]),
+        reported_period=fact["reported_period"],
+        period_type=PeriodType(fact["period_type"]),
+        assertion_class=AssertionClass(fact["assertion_class"]),
+        evidence=_rebuild_evidence(report, fact["evidence"]),
+        source_native=SourceNativeValue(name=fact["source_native_name"]),
+        action=ActivityAction(fact["action"]),
+        activity_actor=fact["activity_actor"],
+        source_actor=fact["source_actor"],
+        actor_basis=SubjectBasis(fact["actor_basis"]),
+        object_name=fact["object_name"],
+        source_verb=fact["source_verb"],
+    )
+
+
+def _rebuild_evidence(
+    report: ReportIdentity, evidence: list[dict]
+) -> tuple[Evidence, ...]:
+    return tuple(
+        Evidence(
+            evidence_id=item["evidence_id"],
+            report=report,
+            page=item["page"],
+            section_title=item["section_title"],
+            anchor=TextAnchor(bounded_quote=item["bounded_quote"]),
+        )
+        for item in evidence
+    )
 
 
 def test_research_output_cannot_use_the_production_data_tree():
