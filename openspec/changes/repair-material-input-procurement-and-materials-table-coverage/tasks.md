@@ -11,6 +11,6 @@
 
 ## 3. Recount after implementation review, not yet authorized
 
-- [ ] 3.1 Replay only after implementation review, into a new research isolation directory. Do not overwrite the 2026-09-26 archive
+- [x] 3.1 Controlled replay of plan `.2026-09-26.2` is stored at `openspec/changes/repair-material-input-procurement-and-materials-table-coverage/replay/20260926.2`, run id `stage4-material-inputs-20260926.2`, disposition `accepted_for_review`. The 2026-09-26 archive was not overwritten. Recall, accuracy, critical numeric errors, and the gate are not filled
 - [ ] 3.2 Independently recount recall, accuracy, critical numeric errors, and the gate. Do not presume 23/23 or a passing gate
 - [ ] 3.3 Do not start another expansion, authorize scale quality or production, change the bitumen catalog alias, or enable the six-chapter package, operating quantities, counterparties, DCF, trading, or the legacy writer

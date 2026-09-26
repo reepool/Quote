@@ -1,0 +1,10 @@
+{
+  "schema_version": "company_profile_material_input_research_run.v1",
+  "chapter_task": "extract_material_inputs",
+  "disposition": "accepted_for_review",
+  "provider_calls": 0,
+  "production_authorization": "not_authorized",
+  "enqueue_sha256": "4152290506bdb18f0aa6d48187c54243bca4ca7c9249fe927723636608995ea8",
+  "bundle_dirname": "material-input-stage4-material-inputs-20260926.2",
+  "run_id": "stage4-material-inputs-20260926.2"
+}
