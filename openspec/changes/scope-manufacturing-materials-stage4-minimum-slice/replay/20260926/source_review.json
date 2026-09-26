@@ -1,0 +1,722 @@
+{
+  "schema_version": "company_profile_material_input_stage4_source_review.v1",
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false,
+  "method": "independently_read_official_report",
+  "binding": {
+    "enqueue_path": "enqueue.json",
+    "enqueue_sha256": "0a7fc577840ce3bed45c02ec268fecf289b776104f05ae0ff3806c2daa0f1a84",
+    "run_path": "run.json",
+    "bundle_dirname": "material-input-stage4-material-inputs-20260926",
+    "chapter_task": "extract_material_inputs",
+    "instruments": [
+      "300750.SZ",
+      "603659.SH",
+      "920015.BJ"
+    ]
+  },
+  "denominator_rule": "Distinct source-native materials the same official sentence or procurement row binds to the company's own raw-material purchase or consumption. Sales activities, direct-material cost, inventory amounts, outsourced-processing arrangements, energy rows, and price-only commodity mentions stay outside this denominator.",
+  "per_company": [
+    {
+      "instrument_id": "300750.SZ",
+      "disclosed_named_inputs": [
+        "正极材料",
+        "负极材料",
+        "隔膜",
+        "电解液",
+        "磷酸铁锂",
+        "锂盐",
+        "氢氧化锂"
+      ],
+      "delivered_named_inputs": [
+        "正极材料",
+        "负极材料",
+        "隔膜",
+        "电解液"
+      ],
+      "missing_named_inputs": [
+        "磷酸铁锂",
+        "锂盐",
+        "氢氧化锂"
+      ],
+      "recall_numerator": 4,
+      "recall_denominator": 7
+    },
+    {
+      "instrument_id": "603659.SH",
+      "disclosed_named_inputs": [
+        "焦类",
+        "初级石墨",
+        "沥青",
+        "隔膜基膜",
+        "陶瓷材料",
+        "氧化铝",
+        "氢氧化铝",
+        "钢材",
+        "机加工件"
+      ],
+      "delivered_named_inputs": [
+        "焦类",
+        "初级石墨",
+        "沥青",
+        "隔膜基膜",
+        "陶瓷材料",
+        "氧化铝",
+        "氢氧化铝",
+        "钢材",
+        "机加工件"
+      ],
+      "missing_named_inputs": [],
+      "recall_numerator": 9,
+      "recall_denominator": 9
+    },
+    {
+      "instrument_id": "920015.BJ",
+      "disclosed_named_inputs": [
+        "丁酮",
+        "双氧水",
+        "液氨",
+        "一甲基三氯硅烷",
+        "乙烯基三氯硅烷",
+        "乙醛",
+        "丁酮肟"
+      ],
+      "delivered_named_inputs": [
+        "丁酮",
+        "双氧水",
+        "液氨",
+        "一甲基三氯硅烷",
+        "乙烯基三氯硅烷",
+        "乙醛"
+      ],
+      "missing_named_inputs": [
+        "丁酮肟"
+      ],
+      "recall_numerator": 6,
+      "recall_denominator": 7
+    }
+  ],
+  "exclusions": [
+    {
+      "instrument_id": "300750.SZ",
+      "item": "直接材料成本",
+      "page": 27,
+      "outcome": "legal_empty",
+      "in_input_denominator": false
+    },
+    {
+      "instrument_id": "300750.SZ",
+      "item": "锂、镍、钴价格因素",
+      "page": 40,
+      "outcome": "excluded_price_risk",
+      "in_input_denominator": false
+    },
+    {
+      "instrument_id": "300750.SZ",
+      "item": "锂盐、前驱体产品列举",
+      "page": 15,
+      "outcome": "product_not_input",
+      "in_input_denominator": false
+    },
+    {
+      "instrument_id": "603659.SH",
+      "item": "直接材料成本",
+      "page": 20,
+      "outcome": "legal_empty",
+      "in_input_denominator": false
+    },
+    {
+      "instrument_id": "603659.SH",
+      "item": "原材料存货金额",
+      "page": 125,
+      "outcome": "legal_empty",
+      "in_input_denominator": false
+    },
+    {
+      "instrument_id": "920015.BJ",
+      "item": "丁酮肟委外加工安排",
+      "page": 12,
+      "outcome": "legal_empty",
+      "in_input_denominator": false
+    },
+    {
+      "instrument_id": "920015.BJ",
+      "item": "丁酮肟代加工服务",
+      "page": 50,
+      "outcome": "legal_empty",
+      "in_input_denominator": false
+    },
+    {
+      "instrument_id": "920015.BJ",
+      "item": "原材料存货金额",
+      "page": 108,
+      "outcome": "legal_empty",
+      "in_input_denominator": false
+    },
+    {
+      "instrument_id": "920015.BJ",
+      "item": "蒸汽、电",
+      "page": 51,
+      "outcome": "energy_not_raw_material_input",
+      "in_input_denominator": false
+    }
+  ],
+  "relationship_checks": [
+    {
+      "instrument_id": "300750.SZ",
+      "source_native_name": "正极材料",
+      "record_id": "manufacturing-materials-300750-2025:material:正极材料",
+      "page": 40,
+      "evidence_id": "stage5-evidence-13a990ae91dde86238b98434",
+      "role": "raw_material_input",
+      "mapping_status": "pending",
+      "commodity_id": null,
+      "quantity": null,
+      "checks": {
+        "name_in_source_quote": true,
+        "subject_scope": "consolidated_group",
+        "subject_basis": "direct_source_wording",
+        "reported_period": "2025-12-31",
+        "report_id": "asset_3b09f6c831975c7177b6bb3287cab781",
+        "document_version": "ver_09c0e677ec8192dc4fc12cb620069f29",
+        "page_text_hash_matches_pdf": true,
+        "role": "raw_material_input",
+        "commodity_id_rule_holds": true
+      },
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "300750.SZ",
+      "source_native_name": "负极材料",
+      "record_id": "manufacturing-materials-300750-2025:material:负极材料",
+      "page": 40,
+      "evidence_id": "stage5-evidence-13a990ae91dde86238b98434",
+      "role": "raw_material_input",
+      "mapping_status": "pending",
+      "commodity_id": null,
+      "quantity": null,
+      "checks": {
+        "name_in_source_quote": true,
+        "subject_scope": "consolidated_group",
+        "subject_basis": "direct_source_wording",
+        "reported_period": "2025-12-31",
+        "report_id": "asset_3b09f6c831975c7177b6bb3287cab781",
+        "document_version": "ver_09c0e677ec8192dc4fc12cb620069f29",
+        "page_text_hash_matches_pdf": true,
+        "role": "raw_material_input",
+        "commodity_id_rule_holds": true
+      },
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "300750.SZ",
+      "source_native_name": "隔膜",
+      "record_id": "manufacturing-materials-300750-2025:material:隔膜",
+      "page": 40,
+      "evidence_id": "stage5-evidence-13a990ae91dde86238b98434",
+      "role": "raw_material_input",
+      "mapping_status": "pending",
+      "commodity_id": null,
+      "quantity": null,
+      "checks": {
+        "name_in_source_quote": true,
+        "subject_scope": "consolidated_group",
+        "subject_basis": "direct_source_wording",
+        "reported_period": "2025-12-31",
+        "report_id": "asset_3b09f6c831975c7177b6bb3287cab781",
+        "document_version": "ver_09c0e677ec8192dc4fc12cb620069f29",
+        "page_text_hash_matches_pdf": true,
+        "role": "raw_material_input",
+        "commodity_id_rule_holds": true
+      },
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "300750.SZ",
+      "source_native_name": "电解液",
+      "record_id": "manufacturing-materials-300750-2025:material:电解液",
+      "page": 40,
+      "evidence_id": "stage5-evidence-13a990ae91dde86238b98434",
+      "role": "raw_material_input",
+      "mapping_status": "pending",
+      "commodity_id": null,
+      "quantity": null,
+      "checks": {
+        "name_in_source_quote": true,
+        "subject_scope": "consolidated_group",
+        "subject_basis": "direct_source_wording",
+        "reported_period": "2025-12-31",
+        "report_id": "asset_3b09f6c831975c7177b6bb3287cab781",
+        "document_version": "ver_09c0e677ec8192dc4fc12cb620069f29",
+        "page_text_hash_matches_pdf": true,
+        "role": "raw_material_input",
+        "commodity_id_rule_holds": true
+      },
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "603659.SH",
+      "source_native_name": "焦类",
+      "record_id": "manufacturing-materials-603659-2025:material:焦类",
+      "page": 33,
+      "evidence_id": "stage5-evidence-016a3ae537b5d97b80e3769a",
+      "role": "raw_material_input",
+      "mapping_status": "pending",
+      "commodity_id": null,
+      "quantity": null,
+      "checks": {
+        "name_in_source_quote": true,
+        "subject_scope": "consolidated_group",
+        "subject_basis": "direct_source_wording",
+        "reported_period": "2025-12-31",
+        "report_id": "asset_50c70429093f66b34fc57ad8f896fcee",
+        "document_version": "ver_c867a6a692048e88fd9cb80473fbf908",
+        "page_text_hash_matches_pdf": true,
+        "role": "raw_material_input",
+        "commodity_id_rule_holds": true
+      },
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "603659.SH",
+      "source_native_name": "初级石墨",
+      "record_id": "manufacturing-materials-603659-2025:material:初级石墨",
+      "page": 33,
+      "evidence_id": "stage5-evidence-016a3ae537b5d97b80e3769a",
+      "role": "raw_material_input",
+      "mapping_status": "pending",
+      "commodity_id": null,
+      "quantity": null,
+      "checks": {
+        "name_in_source_quote": true,
+        "subject_scope": "consolidated_group",
+        "subject_basis": "direct_source_wording",
+        "reported_period": "2025-12-31",
+        "report_id": "asset_50c70429093f66b34fc57ad8f896fcee",
+        "document_version": "ver_c867a6a692048e88fd9cb80473fbf908",
+        "page_text_hash_matches_pdf": true,
+        "role": "raw_material_input",
+        "commodity_id_rule_holds": true
+      },
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "603659.SH",
+      "source_native_name": "沥青",
+      "record_id": "manufacturing-materials-603659-2025:material:沥青",
+      "page": 33,
+      "evidence_id": "stage5-evidence-016a3ae537b5d97b80e3769a",
+      "role": "raw_material_input",
+      "mapping_status": "mapped",
+      "commodity_id": "COMMODITY.energy.bitumen",
+      "quantity": null,
+      "checks": {
+        "name_in_source_quote": true,
+        "subject_scope": "consolidated_group",
+        "subject_basis": "direct_source_wording",
+        "reported_period": "2025-12-31",
+        "report_id": "asset_50c70429093f66b34fc57ad8f896fcee",
+        "document_version": "ver_c867a6a692048e88fd9cb80473fbf908",
+        "page_text_hash_matches_pdf": true,
+        "role": "raw_material_input",
+        "commodity_id_rule_holds": true
+      },
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "603659.SH",
+      "source_native_name": "隔膜基膜",
+      "record_id": "manufacturing-materials-603659-2025:material:隔膜基膜",
+      "page": 33,
+      "evidence_id": "stage5-evidence-016a3ae537b5d97b80e3769a",
+      "role": "raw_material_input",
+      "mapping_status": "pending",
+      "commodity_id": null,
+      "quantity": null,
+      "checks": {
+        "name_in_source_quote": true,
+        "subject_scope": "consolidated_group",
+        "subject_basis": "direct_source_wording",
+        "reported_period": "2025-12-31",
+        "report_id": "asset_50c70429093f66b34fc57ad8f896fcee",
+        "document_version": "ver_c867a6a692048e88fd9cb80473fbf908",
+        "page_text_hash_matches_pdf": true,
+        "role": "raw_material_input",
+        "commodity_id_rule_holds": true
+      },
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "603659.SH",
+      "source_native_name": "陶瓷材料",
+      "record_id": "manufacturing-materials-603659-2025:material:陶瓷材料",
+      "page": 33,
+      "evidence_id": "stage5-evidence-016a3ae537b5d97b80e3769a",
+      "role": "raw_material_input",
+      "mapping_status": "pending",
+      "commodity_id": null,
+      "quantity": null,
+      "checks": {
+        "name_in_source_quote": true,
+        "subject_scope": "consolidated_group",
+        "subject_basis": "direct_source_wording",
+        "reported_period": "2025-12-31",
+        "report_id": "asset_50c70429093f66b34fc57ad8f896fcee",
+        "document_version": "ver_c867a6a692048e88fd9cb80473fbf908",
+        "page_text_hash_matches_pdf": true,
+        "role": "raw_material_input",
+        "commodity_id_rule_holds": true
+      },
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "603659.SH",
+      "source_native_name": "氧化铝",
+      "record_id": "manufacturing-materials-603659-2025:material:氧化铝",
+      "page": 33,
+      "evidence_id": "stage5-evidence-016a3ae537b5d97b80e3769a",
+      "role": "raw_material_input",
+      "mapping_status": "mapped",
+      "commodity_id": "COMMODITY.metal.alumina",
+      "quantity": null,
+      "checks": {
+        "name_in_source_quote": true,
+        "subject_scope": "consolidated_group",
+        "subject_basis": "direct_source_wording",
+        "reported_period": "2025-12-31",
+        "report_id": "asset_50c70429093f66b34fc57ad8f896fcee",
+        "document_version": "ver_c867a6a692048e88fd9cb80473fbf908",
+        "page_text_hash_matches_pdf": true,
+        "role": "raw_material_input",
+        "commodity_id_rule_holds": true
+      },
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "603659.SH",
+      "source_native_name": "氢氧化铝",
+      "record_id": "manufacturing-materials-603659-2025:material:氢氧化铝",
+      "page": 33,
+      "evidence_id": "stage5-evidence-016a3ae537b5d97b80e3769a",
+      "role": "raw_material_input",
+      "mapping_status": "pending",
+      "commodity_id": null,
+      "quantity": null,
+      "checks": {
+        "name_in_source_quote": true,
+        "subject_scope": "consolidated_group",
+        "subject_basis": "direct_source_wording",
+        "reported_period": "2025-12-31",
+        "report_id": "asset_50c70429093f66b34fc57ad8f896fcee",
+        "document_version": "ver_c867a6a692048e88fd9cb80473fbf908",
+        "page_text_hash_matches_pdf": true,
+        "role": "raw_material_input",
+        "commodity_id_rule_holds": true
+      },
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "603659.SH",
+      "source_native_name": "钢材",
+      "record_id": "manufacturing-materials-603659-2025:material:钢材",
+      "page": 33,
+      "evidence_id": "stage5-evidence-016a3ae537b5d97b80e3769a",
+      "role": "raw_material_input",
+      "mapping_status": "ambiguous",
+      "commodity_id": null,
+      "quantity": null,
+      "checks": {
+        "name_in_source_quote": true,
+        "subject_scope": "consolidated_group",
+        "subject_basis": "direct_source_wording",
+        "reported_period": "2025-12-31",
+        "report_id": "asset_50c70429093f66b34fc57ad8f896fcee",
+        "document_version": "ver_c867a6a692048e88fd9cb80473fbf908",
+        "page_text_hash_matches_pdf": true,
+        "role": "raw_material_input",
+        "commodity_id_rule_holds": true
+      },
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "603659.SH",
+      "source_native_name": "机加工件",
+      "record_id": "manufacturing-materials-603659-2025:material:机加工件",
+      "page": 33,
+      "evidence_id": "stage5-evidence-016a3ae537b5d97b80e3769a",
+      "role": "raw_material_input",
+      "mapping_status": "pending",
+      "commodity_id": null,
+      "quantity": null,
+      "checks": {
+        "name_in_source_quote": true,
+        "subject_scope": "consolidated_group",
+        "subject_basis": "direct_source_wording",
+        "reported_period": "2025-12-31",
+        "report_id": "asset_50c70429093f66b34fc57ad8f896fcee",
+        "document_version": "ver_c867a6a692048e88fd9cb80473fbf908",
+        "page_text_hash_matches_pdf": true,
+        "role": "raw_material_input",
+        "commodity_id_rule_holds": true
+      },
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "920015.BJ",
+      "source_native_name": "丁酮",
+      "record_id": "manufacturing-materials-920015-2025:material:丁酮",
+      "page": 26,
+      "evidence_id": "stage5-evidence-e3d1727b1bba30268a08d26f",
+      "role": "raw_material_input",
+      "mapping_status": "pending",
+      "commodity_id": null,
+      "quantity": null,
+      "checks": {
+        "name_in_source_quote": true,
+        "subject_scope": "consolidated_group",
+        "subject_basis": "direct_source_wording",
+        "reported_period": "2025-12-31",
+        "report_id": "asset_b87f1d1a48e662dae376c540cd021f69",
+        "document_version": "ver_cfdbd2d058af825b1fc39f494d7a9bd3",
+        "page_text_hash_matches_pdf": true,
+        "role": "raw_material_input",
+        "commodity_id_rule_holds": true
+      },
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "920015.BJ",
+      "source_native_name": "双氧水",
+      "record_id": "manufacturing-materials-920015-2025:material:双氧水",
+      "page": 26,
+      "evidence_id": "stage5-evidence-e3d1727b1bba30268a08d26f",
+      "role": "raw_material_input",
+      "mapping_status": "pending",
+      "commodity_id": null,
+      "quantity": null,
+      "checks": {
+        "name_in_source_quote": true,
+        "subject_scope": "consolidated_group",
+        "subject_basis": "direct_source_wording",
+        "reported_period": "2025-12-31",
+        "report_id": "asset_b87f1d1a48e662dae376c540cd021f69",
+        "document_version": "ver_cfdbd2d058af825b1fc39f494d7a9bd3",
+        "page_text_hash_matches_pdf": true,
+        "role": "raw_material_input",
+        "commodity_id_rule_holds": true
+      },
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "920015.BJ",
+      "source_native_name": "液氨",
+      "record_id": "manufacturing-materials-920015-2025:material:液氨",
+      "page": 26,
+      "evidence_id": "stage5-evidence-e3d1727b1bba30268a08d26f",
+      "role": "raw_material_input",
+      "mapping_status": "pending",
+      "commodity_id": null,
+      "quantity": null,
+      "checks": {
+        "name_in_source_quote": true,
+        "subject_scope": "consolidated_group",
+        "subject_basis": "direct_source_wording",
+        "reported_period": "2025-12-31",
+        "report_id": "asset_b87f1d1a48e662dae376c540cd021f69",
+        "document_version": "ver_cfdbd2d058af825b1fc39f494d7a9bd3",
+        "page_text_hash_matches_pdf": true,
+        "role": "raw_material_input",
+        "commodity_id_rule_holds": true
+      },
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "920015.BJ",
+      "source_native_name": "一甲基三氯硅烷",
+      "record_id": "manufacturing-materials-920015-2025:material:一甲基三氯硅烷",
+      "page": 26,
+      "evidence_id": "stage5-evidence-e3d1727b1bba30268a08d26f",
+      "role": "raw_material_input",
+      "mapping_status": "pending",
+      "commodity_id": null,
+      "quantity": null,
+      "checks": {
+        "name_in_source_quote": true,
+        "subject_scope": "consolidated_group",
+        "subject_basis": "direct_source_wording",
+        "reported_period": "2025-12-31",
+        "report_id": "asset_b87f1d1a48e662dae376c540cd021f69",
+        "document_version": "ver_cfdbd2d058af825b1fc39f494d7a9bd3",
+        "page_text_hash_matches_pdf": true,
+        "role": "raw_material_input",
+        "commodity_id_rule_holds": true
+      },
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "920015.BJ",
+      "source_native_name": "乙烯基三氯硅烷",
+      "record_id": "manufacturing-materials-920015-2025:material:乙烯基三氯硅烷",
+      "page": 26,
+      "evidence_id": "stage5-evidence-e3d1727b1bba30268a08d26f",
+      "role": "raw_material_input",
+      "mapping_status": "pending",
+      "commodity_id": null,
+      "quantity": null,
+      "checks": {
+        "name_in_source_quote": true,
+        "subject_scope": "consolidated_group",
+        "subject_basis": "direct_source_wording",
+        "reported_period": "2025-12-31",
+        "report_id": "asset_b87f1d1a48e662dae376c540cd021f69",
+        "document_version": "ver_cfdbd2d058af825b1fc39f494d7a9bd3",
+        "page_text_hash_matches_pdf": true,
+        "role": "raw_material_input",
+        "commodity_id_rule_holds": true
+      },
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "920015.BJ",
+      "source_native_name": "乙醛",
+      "record_id": "manufacturing-materials-920015-2025:material:乙醛",
+      "page": 26,
+      "evidence_id": "stage5-evidence-e3d1727b1bba30268a08d26f",
+      "role": "raw_material_input",
+      "mapping_status": "pending",
+      "commodity_id": null,
+      "quantity": null,
+      "checks": {
+        "name_in_source_quote": true,
+        "subject_scope": "consolidated_group",
+        "subject_basis": "direct_source_wording",
+        "reported_period": "2025-12-31",
+        "report_id": "asset_b87f1d1a48e662dae376c540cd021f69",
+        "document_version": "ver_cfdbd2d058af825b1fc39f494d7a9bd3",
+        "page_text_hash_matches_pdf": true,
+        "role": "raw_material_input",
+        "commodity_id_rule_holds": true
+      },
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    }
+  ],
+  "missing_disclosures": [
+    {
+      "instrument_id": "300750.SZ",
+      "source_native_name": "磷酸铁锂",
+      "page": 73,
+      "source_quote": "向关联方采购商品及提供服务采购原材料（磷酸铁锂）",
+      "present_in_delivery": false
+    },
+    {
+      "instrument_id": "300750.SZ",
+      "source_native_name": "锂盐",
+      "page": 73,
+      "source_quote": "向关联方采购商品采购原材料（锂盐及氢氧化锂）",
+      "present_in_delivery": false
+    },
+    {
+      "instrument_id": "300750.SZ",
+      "source_native_name": "氢氧化锂",
+      "page": 73,
+      "source_quote": "向关联方采购商品采购原材料（锂盐及氢氧化锂）",
+      "present_in_delivery": false
+    },
+    {
+      "instrument_id": "920015.BJ",
+      "source_native_name": "丁酮肟",
+      "page": 51,
+      "source_quote": "主要原材料及能源名称中列有丁酮肟，耗用情况为合理范围，采购模式为分散采购",
+      "present_in_delivery": false
+    }
+  ],
+  "sales_activity_check": {
+    "instrument_id": "300750.SZ",
+    "source_native_name": "正极材料",
+    "in_input_denominator": false,
+    "sales_record_id": "manufacturing-materials-300750-2025:sales:正极材料",
+    "input_record_id": "manufacturing-materials-300750-2025:material:正极材料",
+    "sales_evidence_id": "stage5-evidence-916ba044c8c22cfaab6f1990",
+    "input_evidence_id": "stage5-evidence-13a990ae91dde86238b98434",
+    "sales_page": 15,
+    "input_page": 40,
+    "sales_role": "product_sales",
+    "input_role": "raw_material_input",
+    "records_are_distinct": true,
+    "evidence_is_distinct": true,
+    "input_relationship_retained": true
+  },
+  "catalog_checks": [
+    {
+      "source_native_name": "沥青",
+      "catalog_version": "business_profile_products.2026.4",
+      "catalog_status": "mapped",
+      "catalog_commodity_id": "COMMODITY.energy.bitumen",
+      "run_status": "mapped",
+      "run_commodity_id": "COMMODITY.energy.bitumen",
+      "run_matches_catalog": true,
+      "accepted_as_substance_confirmation": false,
+      "note": "The report lists 沥青 with 焦类 and 初级石墨 as anode raw materials. The catalog's unique alias is energy bitumen. This review records that alias and does not confirm it."
+    },
+    {
+      "source_native_name": "氧化铝",
+      "catalog_version": "business_profile_products.2026.4",
+      "catalog_status": "mapped",
+      "catalog_commodity_id": "COMMODITY.metal.alumina",
+      "run_status": "mapped",
+      "run_commodity_id": "COMMODITY.metal.alumina",
+      "run_matches_catalog": true,
+      "accepted_as_substance_confirmation": false,
+      "note": "The catalog has one alias from the chemical name to metal.alumina. Matching that alias is not a market-link or quality pass."
+    },
+    {
+      "source_native_name": "钢材",
+      "catalog_version": "business_profile_products.2026.4",
+      "catalog_status": "ambiguous",
+      "catalog_product_ids": [
+        "steel.hot_rolled_coil",
+        "steel.rebar",
+        "steel.stainless_steel"
+      ],
+      "run_status": "ambiguous",
+      "run_commodity_id": null,
+      "run_matches_catalog": true,
+      "accepted_as_substance_confirmation": false,
+      "note": "Three catalog products match. The empty commodity id follows the ambiguous rule and does not identify a steel product."
+    }
+  ],
+  "other_catalog_statuses_match_run": true,
+  "source_recall": {
+    "numerator": 19,
+    "denominator": 23,
+    "value": 0.8260869565217391
+  },
+  "source_accuracy": {
+    "numerator": 19,
+    "denominator": 19,
+    "value": 1.0
+  },
+  "critical_numeric_errors": 0,
+  "expansion_gates_met": false,
+  "gate_rule": "This slice requires all three reports to be reread, source recall 1, source accuracy 1, and critical numeric errors 0. Catalog mapping status is not a gate input and is not a pass. A true gate would cover only this slice; this result is false.",
+  "not_reused_prior_result": "The fixed 600004.SH and 600006.SH 9/9 observation is not the denominator or the gate result."
+}
