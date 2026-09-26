@@ -15,4 +15,5 @@
 - [x] 3.1 After implementation review, replay only the official 600004.SH and 600006.SH annual reports on the v5 identity
 - [x] 3.2 Independently recount recall, accuracy, critical numeric errors, and elapsed. Do not presume 4.1 passes
 - [x] 3.2a Repair the business-situation overview heading and per-table revenue units, then replay and independently review only the frozen 600004.SH and 600006.SH reports on owned_page_facts=v6
+- [x] 3.2b Repair activity-object boundaries and per-table unit lifetime, then replay and independently review only the frozen 600004.SH and 600006.SH reports on owned_page_facts=v7. The v6 accuracy 8/8 snapshot stays on disk and is rejected by review
 - [ ] 3.3 Do not start another expansion, authorize scale quality or production, or add the deferred industry disclosures

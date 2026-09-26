@@ -32,6 +32,7 @@ from research.company_profile.execution import (
     OWNED_PAGE_FACTS_V3_IDENTITY,
     OWNED_PAGE_FACTS_V4_IDENTITY,
     OWNED_PAGE_FACTS_V5_IDENTITY,
+    OWNED_PAGE_FACTS_V6_IDENTITY,
     default_processing_identity,
 )
 from research.company_profile.models import (
@@ -158,12 +159,13 @@ def test_default_identity_is_distinct_from_empty_delivery():
     identity = default_processing_identity()
     assert identity != EMPTY_DELIVERY_PROCESSING_IDENTITY
     assert identity["rules"] == "company_profile_common_core.v1"
-    assert identity["owned_page_facts"] == "v6"
+    assert identity["owned_page_facts"] == "v7"
     assert identity != OWNED_PAGE_FACTS_V1_IDENTITY
     assert identity != OWNED_PAGE_FACTS_V2_IDENTITY
     assert identity != OWNED_PAGE_FACTS_V3_IDENTITY
     assert identity != OWNED_PAGE_FACTS_V4_IDENTITY
     assert identity != OWNED_PAGE_FACTS_V5_IDENTITY
+    assert identity != OWNED_PAGE_FACTS_V6_IDENTITY
 
 
 def test_avic_official_excerpts_project_core_facts_without_provider():
@@ -992,8 +994,9 @@ SEGMENT_TEMPLATE = (
 
 BUSINESS_SITUATION = (
     "一、报告期内公司从事的业务情况\n"
-    "公司为机场的管理和运营机构，公司以该机场为经营载体，主要从事航空服务业务，"
-    "以及商业场地租赁服务等航空性延伸服务业务。\n"
+    "公司为机场的管理和运营机构，公司以该机场为经营载体，主要从事以航空器、旅客和"
+    "货物、邮件为对象，提供飞机起降与停场、旅客综合服务、安全检查以及航空地面保障等航空服务业务，"
+    "以及商业场地租赁服务、特许经营服务、地面运输服务和广告服务等航空性延伸服务业务。\n"
     "二、报告期内公司所处行业情况\n"
 )
 
@@ -1010,6 +1013,14 @@ def test_business_situation_heading_projects_principal_business():
     assert "主要从事" in overview.source_text
     assert "为经营载体" in overview.source_text
     assert "principal_business" in overview_dimension_hits(overview.source_text)
+    activities = [item.object_name for item in records if item.field_id == "explicit_activity"]
+    assert activities
+    assert not any(name in {"以航空器", "旅客", "货物", "邮件"} or name.startswith("以") for name in activities)
+    assert any("起降" in name for name in activities)
+    assert any("旅客综合服务" in name for name in activities)
+    assert any("广告服务" in name for name in activities)
+    assert any(name == "航空地面保障" for name in activities)
+    assert not any("等" in name for name in activities)
 
 
 def test_owned_heading_projects_principally_engaged_wording():
@@ -1169,6 +1180,36 @@ def test_enumerated_income_classes_use_revenue_composition_dimension():
     assert units["航空性收入"] == "万元"
     assert units["非航空性收入"] == "万元"
     assert units["航空服务业"] == "元"
+
+
+UNDECLARED_NEXT_TABLE = (
+    "2、收入和成本分析\n"
+    "单位：万元\n"
+    "一、航空性收入 325,184.77 40.88 10.15\n"
+    "主营业务分行业情况\n"
+    "航空服务业 7,955,002,081.35 5,940,772,752.65 25.32\n"
+)
+
+
+def test_new_table_without_a_unit_does_not_inherit_the_previous_unit():
+    report = _report(instrument_id="SHAPE.SH", report_id="asset-unit-boundary")
+    selected = select_core_evidence(
+        report=report,
+        pages=({"page": 12, "text": UNDECLARED_NEXT_TABLE, "readable": True},),
+    )
+    records = project_owned_page_facts(selected)
+    revenues = {
+        item.measured_object: item.source_native.unit
+        for item in records
+        if item.field_id == "operating_revenue"
+    }
+    assert revenues["航空性收入"] == "万元"
+    assert "航空服务业" not in revenues
+    assert any(
+        item.label == "航空服务业" and item.dimension == "industry"
+        for item in records
+        if item.field_id == "segment_dimension"
+    )
     assert all(item.evidence[0].section_title == "收入和成本分析" for item in records if item.field_id == "segment_dimension")
 
 
@@ -1317,8 +1358,9 @@ def test_v5_enqueues_successor_and_query_prefers_it_over_later_v4_work_id(tmp_pa
         processing_identity=default_processing_identity(),
         instrument_ids=["600000.SH"],
     )
-    assert default_processing_identity()["owned_page_facts"] == "v6"
+    assert default_processing_identity()["owned_page_facts"] == "v7"
     assert default_processing_identity() != OWNED_PAGE_FACTS_V5_IDENTITY
+    assert default_processing_identity() != OWNED_PAGE_FACTS_V6_IDENTITY
     assert first["inserted"] == 1
     assert successor["inserted"] == 1
     assert successor["reused"] == 0

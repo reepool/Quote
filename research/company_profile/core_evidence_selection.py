@@ -896,7 +896,7 @@ def _prepared_evidence(
 
 _CLAUSE_PATTERNS = (
     re.compile(r"主营业务为\s*([^。；;]{2,80})"),
-    re.compile(r"主要从事\s*([^。；;]{2,120})"),
+    re.compile(r"主要从事\s*([^。；;]{2,400})"),
     re.compile(r"主要产品包括\s*([^。；;]{2,80})"),
     re.compile(r"主要产品为\s*([^。；;]{2,80})"),
     re.compile(r"(?:^|[\n\r])经营范围(?!内)\s*[:：]?\s*([^。；;\n]{2,120})"),
@@ -1005,7 +1005,7 @@ def _project_overview_span(
                 verb = "包括"
             elif "涵盖" in match.group(0):
                 verb = "涵盖"
-            for raw in _split_listed(match.group(1)):
+            for raw in _activity_object_clauses(match.group(1)):
                 object_name, action, source_verb = _object_and_action(raw, verb)
                 key = re.sub(r"\s+", "", object_name)
                 if not key or key in seen:
@@ -1053,21 +1053,30 @@ def _project_segment_span(
     if revenue_item is not None and isinstance(revenue_item.evidence.anchor, TextAnchor):
         quote = quote or revenue_item.evidence.anchor.bounded_quote
     unit = None
+    previous_was_unit = False
     dimension = _dimension_from_heading(span.section_title)
     records: list[SemanticRecord] = []
     started = False
     for line in excerpt.splitlines():
         if started and _is_revenue_table_stop(line):
             break
+        if not line.strip():
+            continue
         declared = _unit_from_excerpt(line)
         if declared is not None and _UNIT_DECLARATION.search(line):
             unit = declared
+            previous_was_unit = True
+            continue
         if _dimension_from_heading(line) is not None or _parse_segment_row(line) is not None:
             started = True
         section = _dimension_from_heading(line)
         if section is not None:
+            if not previous_was_unit:
+                unit = None
+            previous_was_unit = False
             dimension = section
             continue
+        previous_was_unit = False
         parsed = _parse_segment_row(line)
         if parsed is None:
             continue
@@ -1686,6 +1695,23 @@ def _overview_source_text(excerpt: str, quote: str, *, heading: str) -> str:
     if excerpt in quote:
         return excerpt
     return quote if quote in excerpt or excerpt in quote else ""
+
+
+def _activity_object_clauses(clause: str) -> list[str]:
+    """Drop service targets in “以……为对象，提供……” and keep the provided services."""
+
+    text = clause.strip()
+    provided = re.search(r"以.+?为对象[，,]?\s*提供(.+)", text)
+    if provided:
+        text = provided.group(1)
+    objects: list[str] = []
+    for item in _split_listed(text):
+        item = item.strip("，,、；;。 ")
+        item = re.sub(r"等[\u4e00-\u9fffA-Za-z0-9（）()]*$", "", item).strip("，,、；;。 ")
+        if len(item) < 2 or item.startswith("以") or "为对象" in item:
+            continue
+        objects.append(item)
+    return objects
 
 
 def _split_listed(clause: str) -> list[str]:
