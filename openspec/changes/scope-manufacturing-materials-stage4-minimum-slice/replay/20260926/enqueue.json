@@ -1,0 +1,143 @@
+{
+  "schema_version": "company_profile_material_input_research_enqueue.v1",
+  "chapter_task": "extract_material_inputs",
+  "production_authorization": "not_authorized",
+  "plan_version": "manufacturing_materials_stage4_material_inputs.2026-09-26.1",
+  "reports": [
+    {
+      "sample_id": "manufacturing-materials-300750-2025",
+      "instrument_id": "300750.SZ",
+      "report_id": "asset_3b09f6c831975c7177b6bb3287cab781",
+      "document_version": "ver_09c0e677ec8192dc4fc12cb620069f29",
+      "report_period": "2025-12-31",
+      "published_at": "2026-03-09T16:00:00+00:00",
+      "content_hash": "c15272977147dee7e6935a38ea0e4fd6855370aabb106f54cfe20f7cf6048ec9",
+      "dossier_path": "openspec/changes/scope-manufacturing-materials-stage4-minimum-slice/dossiers/300750-sz-2025.md",
+      "dossier_sha256": "f56f36d57798105cd90ac658586f8ef1466d21703f9c8aba2d79dcbb6a1cc566",
+      "plan_version": "manufacturing_materials_stage4_material_inputs.2026-09-26.1",
+      "chapter_task": "extract_material_inputs",
+      "scopes": [
+        {
+          "scope_id": "300750-named-input",
+          "kind": "named_input",
+          "page": 40,
+          "section_title": "原材料价格波动及供应风险",
+          "anchor_terms": [
+            "原材料价格波动"
+          ],
+          "chapter_task": "extract_material_inputs"
+        },
+        {
+          "scope_id": "300750-direct-cost",
+          "kind": "direct_material_cost",
+          "page": 27,
+          "section_title": "直接材料成本",
+          "anchor_terms": [
+            "直接材料"
+          ],
+          "chapter_task": "extract_material_inputs"
+        },
+        {
+          "scope_id": "300750-product-overlap",
+          "kind": "product_overlap",
+          "page": 15,
+          "section_title": "电池材料产品",
+          "anchor_terms": [
+            "电池材料产品"
+          ],
+          "chapter_task": "extract_material_inputs"
+        }
+      ]
+    },
+    {
+      "sample_id": "manufacturing-materials-603659-2025",
+      "instrument_id": "603659.SH",
+      "report_id": "asset_50c70429093f66b34fc57ad8f896fcee",
+      "document_version": "ver_c867a6a692048e88fd9cb80473fbf908",
+      "report_period": "2025-12-31",
+      "published_at": "2026-03-05T16:00:00+00:00",
+      "content_hash": "4e81f5539046ba1eee733100f38442a4abd5037afe3881115ba7f48678fa35b6",
+      "dossier_path": "openspec/changes/scope-manufacturing-materials-stage4-minimum-slice/dossiers/603659-sh-2025.md",
+      "dossier_sha256": "0d648b3443f8f5cf499624909715ccdd1541db32d7468cf7d193c5a8a5ce70b0",
+      "plan_version": "manufacturing_materials_stage4_material_inputs.2026-09-26.1",
+      "chapter_task": "extract_material_inputs",
+      "scopes": [
+        {
+          "scope_id": "603659-named-input",
+          "kind": "named_input",
+          "page": 33,
+          "section_title": "原材料价格上涨的风险",
+          "anchor_terms": [
+            "原材料价格上涨"
+          ],
+          "chapter_task": "extract_material_inputs"
+        },
+        {
+          "scope_id": "603659-direct-cost",
+          "kind": "direct_material_cost",
+          "page": 20,
+          "section_title": "直接材料成本",
+          "anchor_terms": [
+            "直接材料"
+          ],
+          "chapter_task": "extract_material_inputs"
+        },
+        {
+          "scope_id": "603659-inventory",
+          "kind": "inventory_amount",
+          "page": 125,
+          "section_title": "原材料存货",
+          "anchor_terms": [
+            "原材料"
+          ],
+          "chapter_task": "extract_material_inputs"
+        }
+      ]
+    },
+    {
+      "sample_id": "manufacturing-materials-920015-2025",
+      "instrument_id": "920015.BJ",
+      "report_id": "asset_b87f1d1a48e662dae376c540cd021f69",
+      "document_version": "ver_cfdbd2d058af825b1fc39f494d7a9bd3",
+      "report_period": "2025-12-31",
+      "published_at": "2026-04-22T16:00:00+00:00",
+      "content_hash": "4d2c1612f6f62a9024b8947d7a01b70c40f8f347c2975fa1a05b908d0770695a",
+      "dossier_path": "openspec/changes/scope-manufacturing-materials-stage4-minimum-slice/dossiers/920015-bj-2025.md",
+      "dossier_sha256": "5293da4a74c17e37d0d54f2e498d32b084b607be383d0ecaec61946a31c25e72",
+      "plan_version": "manufacturing_materials_stage4_material_inputs.2026-09-26.1",
+      "chapter_task": "extract_material_inputs",
+      "scopes": [
+        {
+          "scope_id": "920015-named-input",
+          "kind": "named_input",
+          "page": 26,
+          "section_title": "原材料价格上涨风险",
+          "anchor_terms": [
+            "主要原材料为"
+          ],
+          "chapter_task": "extract_material_inputs"
+        },
+        {
+          "scope_id": "920015-outsourced",
+          "kind": "outsourced_processing",
+          "page": 12,
+          "section_title": "委托外部厂商加工",
+          "anchor_terms": [
+            "委托外部厂商加工"
+          ],
+          "chapter_task": "extract_material_inputs"
+        },
+        {
+          "scope_id": "920015-inventory",
+          "kind": "inventory_amount",
+          "page": 108,
+          "section_title": "原材料存货",
+          "anchor_terms": [
+            "原材料"
+          ],
+          "chapter_task": "extract_material_inputs"
+        }
+      ]
+    }
+  ]
+}

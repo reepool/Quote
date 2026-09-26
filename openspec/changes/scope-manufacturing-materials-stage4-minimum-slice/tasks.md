@@ -12,6 +12,6 @@
 
 ## 3. Focused replay, not yet authorized
 
-- [ ] 3.1 After implementation review, replay only the approved reports for the selected slice
+- [x] 3.1 After implementation review, replay only the approved reports for the selected slice. Freeze the PDF hash, report identity, dossier hash, and material-input evidence binding before the run. Keep the run in the research isolation directory at `accepted_for_review`. Do not prefill recall, accuracy, critical errors, or gates
 - [ ] 3.2 Independently recount recall, accuracy, critical numeric errors, and expansion gates. Do not presume they pass, and do not reuse the fixed two-company 9/9
 - [ ] 3.3 Do not start another expansion, authorize scale quality or production, enable the six-chapter package, or open DCF, trading, or the legacy writer

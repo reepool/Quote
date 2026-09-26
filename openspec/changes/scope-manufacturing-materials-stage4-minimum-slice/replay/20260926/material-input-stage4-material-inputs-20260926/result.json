@@ -1,0 +1,1096 @@
+{
+  "schema_version": "company_profile_material_input_research.v2",
+  "run_id": "stage4-material-inputs-20260926",
+  "chapter_task": "extract_material_inputs",
+  "disposition": "accepted_for_review",
+  "provider_calls": 0,
+  "production_authorization": "not_authorized",
+  "plan_version": "manufacturing_materials_stage4_material_inputs.2026-09-26.1",
+  "reports": [
+    {
+      "sample_id": "manufacturing-materials-300750-2025",
+      "content_hash": "c15272977147dee7e6935a38ea0e4fd6855370aabb106f54cfe20f7cf6048ec9",
+      "dossier_path": "openspec/changes/scope-manufacturing-materials-stage4-minimum-slice/dossiers/300750-sz-2025.md",
+      "dossier_sha256": "f56f36d57798105cd90ac658586f8ef1466d21703f9c8aba2d79dcbb6a1cc566",
+      "instrument_id": "300750.SZ",
+      "report_id": "asset_3b09f6c831975c7177b6bb3287cab781",
+      "document_version": "ver_09c0e677ec8192dc4fc12cb620069f29"
+    },
+    {
+      "sample_id": "manufacturing-materials-603659-2025",
+      "content_hash": "4e81f5539046ba1eee733100f38442a4abd5037afe3881115ba7f48678fa35b6",
+      "dossier_path": "openspec/changes/scope-manufacturing-materials-stage4-minimum-slice/dossiers/603659-sh-2025.md",
+      "dossier_sha256": "0d648b3443f8f5cf499624909715ccdd1541db32d7468cf7d193c5a8a5ce70b0",
+      "instrument_id": "603659.SH",
+      "report_id": "asset_50c70429093f66b34fc57ad8f896fcee",
+      "document_version": "ver_c867a6a692048e88fd9cb80473fbf908"
+    },
+    {
+      "sample_id": "manufacturing-materials-920015-2025",
+      "content_hash": "4d2c1612f6f62a9024b8947d7a01b70c40f8f347c2975fa1a05b908d0770695a",
+      "dossier_path": "openspec/changes/scope-manufacturing-materials-stage4-minimum-slice/dossiers/920015-bj-2025.md",
+      "dossier_sha256": "5293da4a74c17e37d0d54f2e498d32b084b607be383d0ecaec61946a31c25e72",
+      "instrument_id": "920015.BJ",
+      "report_id": "asset_b87f1d1a48e662dae376c540cd021f69",
+      "document_version": "ver_cfdbd2d058af825b1fc39f494d7a9bd3"
+    }
+  ],
+  "scope_outcomes": [
+    {
+      "sample_id": "manufacturing-materials-300750-2025",
+      "scope_id": "300750-named-input",
+      "kind": "named_input",
+      "outcome": "observed",
+      "names": [
+        "正极材料",
+        "负极材料",
+        "隔膜",
+        "电解液"
+      ],
+      "reason": "the cited sentence binds named materials to the company's own input",
+      "failure_code": null,
+      "evidence": [
+        {
+          "binding_status": "bound",
+          "evidence_id": "stage5-evidence-13a990ae91dde86238b98434",
+          "chapter_task": "extract_material_inputs",
+          "instrument_id": "300750.SZ",
+          "report_id": "asset_3b09f6c831975c7177b6bb3287cab781",
+          "document_version": "ver_09c0e677ec8192dc4fc12cb620069f29",
+          "page": 40,
+          "section_title": "原材料价格波动及供应风险",
+          "bounded_quote": "宁德时代新能源科技股份有限公司 2025年年度报告全文 \n40 \n（3）新产品和新技术开发风险 \n由于对能量密度、循环寿命、补能效率及安全性等更高性能电池技术的追求，全球知名的车企、电\n池企业、材料企业、研究机构纷纷加大对新技术路线的研究开发。公司如果不能有效预判且始终保持研\n发能力的行业领先，市场竞争力和盈利能力可能会受到影响。 \n应对措施：公司基于先进的研发体系及强大的研发能力，通过高强度的研发投入、优秀的研发人才\n团队，利用算力驱动的智能化开发平台高效筛选有潜质的材料体系、快速推进电池设计、提升制造运营\n效率，在新产品新技术开发方面始终保持前瞻性及领先性，通过 领先的电池工程化能力以及供应链体系，\n快速推动新产品和新技术的商业化落地，以实现公司的高质量发展。 \n（4）原材料价格波动及供应风险 \n公司生产经营所需主要原材料包括正极材料、负极材料、隔膜和电解液等，上述原材料受锂、镍、\n钴等大宗商品或化工原料价格影响较大。受相关材料价格变动及市场供需情况的影响，公司原材料的采\n购价格及规模也会出现一定波动。 \n应对措施：公司不断深化全球供应链布局，并持续完善供应链管理体系，及时追踪重要原材料市场\n供求和价格变动，保障原材料供应及优化采购成本。公司已采取自制开采、投资合作、签署长协订单等\n措施保障供应链安全及稳定。公司持续重视回收技术的发展与应用，实现资源的可持续利用。 \n十二、报告期内接待调研、沟通、采访等活动登记表 \n适用 □不适用 \n接待时间 接待地点 接待方式 接待对象\n类型 接待对象 谈论的主要内容\n及提供的资料 调研的基本情况索引 \n2025 年 3 月\n14日 电话会议 电话沟通 机构及个\n人投资者 \n参与单位名称详\n见巨潮资讯网披\n露内容 \n参见巨潮资讯网 \n参见巨潮资讯网《 2025\n年 3月 14 日投资者关系\n活动记录表》 \n2025 年 4 月\n14日 电话会议 电话沟通 机构及个\n人投资者 \n参与单位名称详\n见巨潮资讯网披\n露内容 \n参见巨潮资讯网 \n参见巨潮资讯网《 2025\n年 4月 14 日投资者关系\n活动记录表》 \n2025 年 5 月\n14日 网络远程 其他 \n社会公\n众、投资\n者等 \n参与单位名称详\n见巨潮资讯网披\n露内容 \n参见巨潮资讯网 \n参见巨潮资讯网《 2025\n年 5月 14 日投资者关系\n活动记录表》 \n2025 年 7 月\n30日 电话会议 电话沟通 机构及个\n人投资者 \n参与单位名称详\n见巨潮资讯网披\n露内容 \n参见巨潮资讯网 \n参见巨潮资讯网《 2025\n年 7月 30 日投资者关系\n活动记录表》 \n2025 年 10 月\n20日 电话会议 电话沟通 机构及个\n人投资者 \n参与单位名称详\n见巨潮资讯网披\n露内容 \n参见巨潮资讯网 \n参见巨潮资讯网《 2025\n年 10月 20日投资者关系\n活动记录表》 \n十三、市值管理制度和估值提升计划的制定落实情况 \n公司是否制定了市值管理制度。",
+          "page_text_hash": "714a93b31d4f6cfdc3dc5cb15b8520a5189928a6288eb95f747cb34d5076a92e"
+        }
+      ]
+    },
+    {
+      "sample_id": "manufacturing-materials-300750-2025",
+      "scope_id": "300750-direct-cost",
+      "kind": "direct_material_cost",
+      "outcome": "legal_empty",
+      "names": [],
+      "reason": "a direct-material cost amount is not a named input",
+      "failure_code": null,
+      "evidence": [
+        {
+          "binding_status": "bound",
+          "evidence_id": "stage5-evidence-b2bc08d61d9f1019887dbc6d",
+          "chapter_task": "extract_material_inputs",
+          "instrument_id": "300750.SZ",
+          "report_id": "asset_3b09f6c831975c7177b6bb3287cab781",
+          "document_version": "ver_09c0e677ec8192dc4fc12cb620069f29",
+          "page": 27,
+          "section_title": "直接材料成本",
+          "bounded_quote": "进一步深化，公司产品产\n销两旺。  \n（4） 公司已签订的重大销售合同、重大采购合同截至本报告期的履行情况 \n适用 □不适用 \n已签订的重大销售合同截至本报告期的履行情况 \n适用 □不适用 \n单位：千元 \n合同标\n的 \n对方当\n事人 \n合同\n总金\n额 \n本报告期履\n行金额 \n待履行\n金额 \n本期确认的\n销售收入金\n额 \n应收\n账款\n回款\n情况 \n是否正常\n履行 \n影响重\n大合同\n履行的\n各项条\n件是否\n发生重\n大变化 \n是否存\n在合同\n无法履\n行的重\n大风险 \n合同未\n正常履\n行的说\n明 \n锂电池\n供应 客户 A(1) - 58,159,202 - 58,159,202 正常\n回款 是 否 否 不适用 \n注： \n(1) 基于双方保密协议约定，不便披露客户具体名称； \n(2) 该重大销售合同未明确约定合同总金额，最终销售金额以客户后续发出的订单方式确定。 \n已签订的重大采购合同截至本报告期的履行情况 \n□适用  不适用 \n（5） 营业成本构成 \n行业分类 \n单位：千元 \n行业分类 项目 \n2025年 2024年 \n同比增减 \n金额 占营业成本比重 金额 占营业成本比重 \n电池行业 直接材料 221,152,510 71.79% 202,723,479  76.48% -4.68% \n注：以上数据口径为主营业务。 \n（6） 报告期内合并范围是否发生变动 \n是 □否 \n详见本报告“第八节 财务报告”之“九、合并范围的变更”。 \n（7） 公司报告期内业务、产品或服务发生重大变化或调整有关情况 \n□适用 不适用",
+          "page_text_hash": "83a28d5ebb0cdf320040e2a5a76455365171d337e7c5641b2f097deb76ed465c"
+        }
+      ]
+    },
+    {
+      "sample_id": "manufacturing-materials-300750-2025",
+      "scope_id": "300750-product-overlap",
+      "kind": "product_overlap",
+      "outcome": "legal_empty",
+      "names": [],
+      "reason": "product or sales evidence alone does not create an input role",
+      "failure_code": null,
+      "evidence": [
+        {
+          "binding_status": "bound",
+          "evidence_id": "stage5-evidence-916ba044c8c22cfaab6f1990",
+          "chapter_task": "extract_material_inputs",
+          "instrument_id": "300750.SZ",
+          "report_id": "asset_3b09f6c831975c7177b6bb3287cab781",
+          "document_version": "ver_09c0e677ec8192dc4fc12cb620069f29",
+          "page": 15,
+          "section_title": "电池材料产品",
+          "bounded_quote": "域。此外，公司产品还可应用于船舶、航空器、电动工具、电动两轮车等领域。 \n（2）储能电池系统 \n公司提供电芯、电池柜、储能集装箱以及系统集成等储 能解决方案。公司的储能电池广泛应用于表\n前储能和表后储能领域，包括公用事业储能、工商业储能及数据中心储能等。 \n在表前领域，公司依托智能液冷控温、高成组 CTP、无热扩散等技术，推出了 EnerOne、EnerOne \nPlus等户外液冷电池柜，针对全气候场景的 EnerC、EnerC Plus、EnerD、EnerX等集装箱式液冷电池柜，\n以及单体 6.25MWh的天恒储能系统、全球首款可量产的 9MWh超大容量储能系统解决方案 TENER Stack、\n其他适应众多应用场景的 TENER 系列解决方案。在表后领域，公司产品已实现从低压、中压到高压平台\n的全场景覆盖。其中，PR系列、Unic系列及安鑫系列、PU系列分别可满足家庭储能、工商储能、数据中\n心能源管理需求。 \n根据相关需求，公司开发了适用于表前、表后市场的多场景、多工况的不同规格 电芯，具备超长寿\n命、零衰减、高安全、宽温度适应性等特性。 \n（3）电池材料、回收及矿产资源 \n公司电池材料产品主要包括锂盐、前驱体及正极材料等。公司亦通过回收方式，对废旧电池中的镍、\n钴、锰、锂、磷、铁、铝、铜等金属材料及其他材料进行加工、提纯、合成等工艺，生产锂电池生产所\n需的正极材料、三元前驱体、磷铁前驱 体、锂盐等材料，并将收集后的铜、铝等金属材料通过第三方回\n收利用，使电池生产所需的关键金属资源实现有效循环利用。 \n此外，为进一步保障电池生产所需的上游关键资源及材料供应，公司通过自建、参股、合资等多种\n方式参与锂、镍、钴、磷等电池矿产资源及相关产品的投资、建设及运营。 \n3、经营模式 \n公司拥有独立的研发、采购、生产和销售体系，主要通过销售动力电池、储能电池和电池材料等产\n品和解决方案实现盈利。研发方面，公司建立了完备的研发体系，形成以自主研发为主、外部合作为辅\n的研发模式，通过数字化、智能化的方式，紧密围绕材料及材料 体系、系统结构、绿色极限制造及商业\n模式领域开展创新，以引领行业技术发展。采购方面，公司通过严格的评估和考核程序遴选合格供应商，",
+          "page_text_hash": "43f8dfcdeb144d04fe2e3e783bca5daba4be511fda32defb657fded5b662bb0e"
+        }
+      ]
+    },
+    {
+      "sample_id": "manufacturing-materials-603659-2025",
+      "scope_id": "603659-named-input",
+      "kind": "named_input",
+      "outcome": "observed",
+      "names": [
+        "焦类",
+        "初级石墨",
+        "沥青",
+        "隔膜基膜",
+        "陶瓷材料",
+        "氧化铝",
+        "氢氧化铝",
+        "钢材",
+        "机加工件"
+      ],
+      "reason": "the cited sentence binds named materials to the company's own input",
+      "failure_code": null,
+      "evidence": [
+        {
+          "binding_status": "bound",
+          "evidence_id": "stage5-evidence-016a3ae537b5d97b80e3769a",
+          "chapter_task": "extract_material_inputs",
+          "instrument_id": "603659.SH",
+          "report_id": "asset_50c70429093f66b34fc57ad8f896fcee",
+          "document_version": "ver_c867a6a692048e88fd9cb80473fbf908",
+          "page": 33,
+          "section_title": "原材料价格上涨的风险",
+          "bounded_quote": "营机制，\n充分保障其自主经营活力和团队创新能力，深化与集团内材料业务的战略协同，借助资本市场平\n台强化其在新能源电池自动化装备领域的核心竞争力与市场影响力，加快嘉拓智能向智能化、集\n成化、国际化装备解决方案提供商转型升级。\n（6）提升数字化管理水平，加强人工智能技术在集团及各子公司的应用，推动 AI 应用从办\n公系统到生产前沿的普及，探索利用 AI 技术重塑办公、研发、生产、安全等业务流程，深化精益\n生产与管理，促进从办公效能到生产效率的全面提升。\n(四)可能面对的风险\n√适用 □不适用\n1、宏观经济与市场波动的风险\n全球宏观经济存在不确定性，若未来出现经济增长放缓和市场需求下滑，将影响整个新能源\n电池行业的发展，进而可能对公司的经营业绩和财务状况产生不利影响。\n2、市场竞争加剧的风险\n在全球各国推进绿色低碳经济转型的背景下，发展以新能源汽车、新型储能为代表的锂电池\n行业成为新的市场趋势，市场需求快速扩张，动力电池厂商与上游供应链企业纷纷大幅提升产能，\n存在市场竞争加剧的风险。若下游整车厂商持续向上游传递成本压力，导致新能源电池材料售价\n进一步下降，将对公司盈利水平造成不利影响。\n3、原材料价格上涨的风险\n公司负极材料原材料包括焦类、初级石墨、沥青等，涂覆隔膜生产所需原材料包括隔膜基膜、\n陶瓷材料、氧化铝和氢氧化铝等，锂电设备业务原材料钢材、机加工件等。报告期内，公司产品\n部分原材料价格有所上涨，若公司不能通过自身工艺技术创新降低成本或将原材料价格和委外加\n工价格上涨压力转移给下游，则公司经营业绩可能受到不利影响。\n4、产品升级和新兴技术路线替代风险\n由于对能量密度、安全性、快充等更高性能电池技术的追求，全球知名的车企、电池企业、材料\n企业、研究机构纷纷加大对新技术路线的研究开发。若新型电池性能大幅优于锂离子电池，或其他\n新兴技术路线快速成熟，能够快速实现商业化，而公司不能快速对公司产品进行升级或者研发进",
+          "page_text_hash": "4fa9c93bb385afbf3e838a915bed29bb5e09e92b412c7a5460590e2879b0fad4"
+        }
+      ]
+    },
+    {
+      "sample_id": "manufacturing-materials-603659-2025",
+      "scope_id": "603659-direct-cost",
+      "kind": "direct_material_cost",
+      "outcome": "legal_empty",
+      "names": [],
+      "reason": "a direct-material cost amount is not a named input",
+      "failure_code": null,
+      "evidence": [
+        {
+          "binding_status": "bound",
+          "evidence_id": "stage5-evidence-c04996297806d49a7a7926ff",
+          "chapter_task": "extract_material_inputs",
+          "instrument_id": "603659.SH",
+          "report_id": "asset_50c70429093f66b34fc57ad8f896fcee",
+          "document_version": "ver_c867a6a692048e88fd9cb80473fbf908",
+          "page": 20,
+          "section_title": "直接材料成本",
+          "bounded_quote": "上海璞泰来新能源科技集团股份有限公司2025 年年度报告\n20 / 203\n锂电池材\n料及设备\n直接材料 8,337,176,975.88 78.55 6,519,470,069.50 67.23 27.88\n主 要 由 于\n业 务 规 模\n增加所致。\n加工费 698,648,803.49 6.58 1,251,613,650.78 12.91 -44.18\n主 要 系 前\n期 库 存 的\n消 化 及 加\n工 业 务 自\n供 比 例 的\n增加所致。\n直接人工 890,885,565.71 8.39 619,462,266.97 6.39 43.82主 要 由 于\n业 务 规 模\n增加所致。\n制造费 用及\n辅助生产 2,757,863,008.78 25.98 2,321,503,232.47 23.94 18.80\n产品间抵消 -2,070,706,126.81 -19.51-1,014,126,470.47 -10.46 104.19\n合计 10,613,868,227.06 100.00 9,697,922,749.25 100.00 9.44\n分产品情况\n分产品 成本构成项\n目 本期金额\n本期占总\n成本比例\n(%)\n上年同期金额\n上年同期\n占总成本\n比例(%)\n本期金额较\n上年同期变\n动比例(%)\n情况\n说明\n新能源电\n池关键材\n料及服务\n直接材料 4,342,191,413.04 54.90 3,404,631,027.26 47.86 27.54\n主 要 由 于\n业 务 规 模\n增加所致。\n加工费 698,648,803.49 8.83 1,251,613,650.78 17.60 -44.18\n主 要 系 前\n期 库 存 的\n消 化 及 加\n工 业 务 原\n料 自 供 比\n例 的 增 加\n所致。\n直接人工 406,924,659.62 5.14 318,841,061.66 4.48 27.63主 要 由 于\n业 务 规 模\n增加所致。\n制造费 用及\n辅助生产 2,461,626,053.66 31.12 2,138,193,864.85 30.06 15.13\n小计 7,909,390,929.81 100.00 7,113,279,604.55 100.00 11.19\n新能源电\n池自动化\n装备\n直接材料 2,765,906,482.62 78.00 2,355,147,978.61 82.95 17.44\n直接人工 483,960,906.09 13.65 300,621,205.31 10.59 60.99主 要 系 锂\n电 市 场 回\n暖，客户加\n速 扩 产 叠\n加 压 缩 交\n期等因素，\n以 及 新 机\n型的交付，\n使 得 人 工\n和 费 用 快\n速增加。\n制造费 用及\n辅助生产 296,236,955.13 8.35 183,309,367.62 6.46 61.60\n小计 3,546,104,343.84 100.00 2,839,078,551.54 100.00 24.90\n产业投资\n贸易管理\n及其他\n1,229,079,080.22 759,691,063.63 61.79\n合并抵消\n项 -2,070,706,126.81 -1,014,126,470.47 104.19",
+          "page_text_hash": "350a2b8a4fe6e480349904028c62b64af0d56040533e66855a433d86545cd0e5"
+        }
+      ]
+    },
+    {
+      "sample_id": "manufacturing-materials-603659-2025",
+      "scope_id": "603659-inventory",
+      "kind": "inventory_amount",
+      "outcome": "legal_empty",
+      "names": [],
+      "reason": "a raw-material inventory amount is not a named input",
+      "failure_code": null,
+      "evidence": [
+        {
+          "binding_status": "bound",
+          "evidence_id": "stage5-evidence-a723322aeb4e439033655fac",
+          "chapter_task": "extract_material_inputs",
+          "instrument_id": "603659.SH",
+          "report_id": "asset_50c70429093f66b34fc57ad8f896fcee",
+          "document_version": "ver_c867a6a692048e88fd9cb80473fbf908",
+          "page": 125,
+          "section_title": "原材料存货",
+          "bounded_quote": "1 日，本集团同宁德聚能签订《债务展期协议》，约定宁德聚能于 2025 年 12 月 31\n日前向本集团归还剩余本金及利息，2026 年 1 月 1 日起年利率按 3.5%执行，2026 年 1 月 1 日\n前的年利率仍按 5.25%执行。截至 2025 年 12 月 31 日，本集团应收宁德聚能人民币\n38,613,278.46 元，计提坏账准备金额为人民币 19,306,639.23 元。\n注 2：大连鸿沣储能新材料有限公司（“大连鸿沣”）为本集团提供石墨化加工服务。2025\n年，本集团与大连鸿沣就加工费进行结算后无法收回剩余款项人民币 14,265,830.75 元。本集团\n于 2024 年 4 月向法院提起诉讼，要求大连鸿沣返还剩余预付款项，并按照 100%计提坏账准备。\n(7).因资金集中管理而列报于其他应收款\n□适用 √不适用\n其他说明：\n□适用 √不适用\n10、 存货\n(1).存货分类\n√适用 □不适用\n单位：元 币种：人民币\n项目\n期末余额 期初余额\n账面余额\n存货跌价准备/\n合同履约成本\n减值准备\n账面价值 账面余额\n存货跌价准备/\n合同履约成本\n减值准备\n账面价值\n原材料 710,316,626.49 2,696,510.57 707,620,115.92 640,336,401.78 15,414,838.47 624,921,563.31\n在产品 2,054,897,065.97 105,658,208.11 1,949,238,857.86 1,792,255,248.30 188,557,131.45 1,603,698,116.85\n库存商品 899,079,077.43 65,071,460.58 834,007,616.85 856,640,125.52 77,777,544.78 778,862,580.74\n发出商品 4,182,107,885.13 342,471,975.52 3,839,635,909.61 4,308,357,986.01 336,936,622.92 3,971,421,363.09\n委托加工\n物资 1,042,786,214.14 87,256,936.66 955,529,277.48 835,869,942.80 29,260,463.12 806,609,479.68\n包装物 15,412,523.74 15,412,523.74 11,780,545.22 11,780,545.22\n低值易耗\n品 4,627,630.82 4,627,630.82 4,771,866.93 4,771,866.93\n合同履约\n成本 600,556,199.82 1,829,318.67 598,726,881.15 565,226,577.53 2,817,845.89 562,408,731.64\n合计 9,509,783,223.54 604,984,410.11 8,904,798,813.43 9,015,238,694.09 650,764,446.63 8,364,474,247.46\n(2).确认为存货的数据资源\n□适用√不适用\n(3).存货跌价准备及合同履约成本减值准备\n√适用 □不适用\n单位：元 币种：人民币\n项目 期初余额 本期增加金额 本期减少金额 期末余额计提 其他 转回或转销 其他\n原材料 15,414,838.47 -4,049,504.52 8,668,823.38 2,696,510.57\n在产品 188,557,131.45 -20,737,067.19 62,161,856.15 105,658,208.11\n库存商品 77,777,544.78 66,151,627.58 78,857,711.78 65,071,460.58\n发出商品 336,936,622.92 417,343,997.00 411,808,644.40 342,471,975.52",
+          "page_text_hash": "82c68612101fa2641183a916df31a3fc82ddf69201ba951c321515bbb5e9c2c3"
+        }
+      ]
+    },
+    {
+      "sample_id": "manufacturing-materials-920015-2025",
+      "scope_id": "920015-named-input",
+      "kind": "named_input",
+      "outcome": "observed",
+      "names": [
+        "丁酮",
+        "双氧水",
+        "液氨",
+        "一甲基三氯硅烷",
+        "乙烯基三氯硅烷",
+        "乙醛"
+      ],
+      "reason": "the cited sentence binds named materials to the company's own input",
+      "failure_code": null,
+      "evidence": [
+        {
+          "binding_status": "bound",
+          "evidence_id": "stage5-evidence-e3d1727b1bba30268a08d26f",
+          "chapter_task": "extract_material_inputs",
+          "instrument_id": "920015.BJ",
+          "report_id": "asset_b87f1d1a48e662dae376c540cd021f69",
+          "document_version": "ver_cfdbd2d058af825b1fc39f494d7a9bd3",
+          "page": 26,
+          "section_title": "原材料价格上涨风险",
+          "bounded_quote": "称 公司持续到本年度的风险和应对措施 \n宏 观 经 济 波\n动 及 市 场 需\n求 下 降 的 风\n险 \n公司主要从事酮肟系列精细化学品的研发、生产和销售，产品主要用于生产有机硅密\n封胶和胶粘剂、农药、医药、 金属萃取剂、离子交换树脂和环保型染料等的关键原料。\n公司业务发展与下游的建筑建材、 光伏和风电等能源电力、 电子、 新能源汽车、 农药、\n医药、金属萃取剂、离子交换树脂和环保型染料等行业发展状况密切相关，受行业产\n能和下游需求影响较大， 具有一定的行业周期性波动特点。 若宏观经济出现不利变化，\n或客户所处行业及其下游行业景气度降低，将可能导致公司产品的市场需求下降，进\n而对公司经营业绩造成不利影响。 \n应对措施：发挥公司产业链完整、多产品经营、产业链协同效应的优势，强化精益管\n理，提升运营管理水平，创新市场开拓，提质增效，降本增效；利用“四新”技术，\n持续提高产品竞争能力； 坚持走新型工业化道路， 加快转型升级步伐， 优化产品结构，\n延伸产业链， 提升高端化、精细化、 高附加价值产品比重， 推进基础产品原料化进程，\n避免同质化过度竞争。 \n原 材 料 价 格\n上涨风险 \n公司产品主要原材料为丁酮、双氧水、液氨、一甲基三氯硅烷、乙烯基三氯硅烷、乙\n醛等，主要原材料采购价格的变化是影响公司利润的重要因素。受国内经济形势、市\n场供求变动等因素的影响， 报告期内公司主要原材料的平均采购价格呈现一定的波动。\n如果未来公司主要原材料的平均采购价格出现大幅上涨，而公司主要产品的销售价格\n无法同步提升，可能会对公司经营业绩造成不利影响。 \n应对措施： 加强市场信息收集与分析， 全方位收集原材料价格市场信息， 密切关注市\n场动态，为决策提供准确的数据支持；优化库存管理，狠抓原材料市场波动机遇；结\n合公司生产、销售计划，公司制定中长期采购计划，确保原材料供应的稳定性和合理\n性； 持续保持与现有优质供应商的稳定合作， 确保原材料的质量和供应稳定性;深化目\n标成本管理，推进生产装置数字化改造，实施对标管理、资源再利用，降低物耗、能\n耗。 \n安 全 生 产 风\n险 \n公司羟胺盐、乙醛肟等部分产品及丁酮、液氨等部分原材料属于危险化学品，在其运\n输、存储和使用过程中存在安全风险。尽管公司现有生产设备和安全设施运行良好，\n但公司仍存在因管理疏忽、操作不当、自然灾害等原因而造成安全事故或受到相关处\n罚的可能，从而对公司的正常生产经营带来不利影响。 \n应对措施： 继续坚持“安全第一， 预防为主、 综合治理”和“以人为本”的经营方针，\n树立底线管理思维，建立和完善质量、环境、职业健康安全卫生一体化管理体系，严\n格执行企业标准体系，积极推进数智化改革，提升装置本质安全水平，深化杜邦安全\n管理体系建设，加强危险源、环保因子的识别与控制，建立健全事故预案、应急处理\n机制，加强员工队伍建设，提升职业养和责任意识，科学管理、严格管理，实行从项\n目建设到生产销售的全过程风险控制。 \n毛 利 率 波 动\n风险 \n由于公司主要产品硅烷交联剂、羟胺盐、甲氧胺盐酸盐、乙醛肟等下游应用领域较为\n广泛，各细分产品下游市场需求的变化将导致公司产品销售价格的变化，部分产品的",
+          "page_text_hash": "e79ac6c44dd9cdc770fcc10476a4252cc54dd94b0aee96cca3850a12da0f921a"
+        }
+      ]
+    },
+    {
+      "sample_id": "manufacturing-materials-920015-2025",
+      "scope_id": "920015-outsourced",
+      "kind": "outsourced_processing",
+      "outcome": "legal_empty",
+      "names": [],
+      "reason": "outsourced processing is not a material input",
+      "failure_code": null,
+      "evidence": [
+        {
+          "binding_status": "bound",
+          "evidence_id": "stage5-evidence-24082d3a48a1a52f7c25c127",
+          "chapter_task": "extract_material_inputs",
+          "instrument_id": "920015.BJ",
+          "report_id": "asset_b87f1d1a48e662dae376c540cd021f69",
+          "document_version": "ver_cfdbd2d058af825b1fc39f494d7a9bd3",
+          "page": 12,
+          "section_title": "委托外部厂商加工",
+          "bounded_quote": "品主要用于生产广谱高\n效低毒农药和新型高效抗菌药物；公司乙醛肟产品主要用于生产广谱高效低毒农药。羟胺水溶液主要\n用于莱赛尔纤维生产稳定剂。 \n报告期内，新增电子级羟胺水溶液供应，主要用于集成电路制造过程中蚀刻后的清洗环节。 \n2、经营模式 \n（1）盈利模式 \n公司主要产品为硅烷交联剂、羟胺盐、甲氧胺盐酸盐、乙醛肟等精细化工产品，下游客户主要为\n有机硅密封胶和胶粘剂、农药、医药、金属萃取剂、离子交换树脂、环保型染料等产品生产厂商以及\n具有丰富终端客户资源的贸易商。公司通过多年经营积累，已拥有经验丰富的技术和管理团队、先进\n的生产制造体系、稳定的采购和销售渠道，能够为客户提供高质量的产品并获取收入，并且凭借先进\n制造技术和精益化管理带来的综合成本优势实现盈利。 \n（2）采购模式 \n公司采购模式主要为按需采购，并结合市场价格波动情况备有一定的原材料存货。公司设有仓储\n中心负责原材料采购及供应商管理。仓储中心根据公司生产计划和技术部门提出的质量技术要求，对\n符合条件的供应商进行询价，按照质优价低的原则确定供应商，向供应商下单采购，并采用银行转账\n或票据支付的方式进行结算。 \n报告期内，公司存在委托外部厂商加工丁酮肟的情况。委外加工是由公司提供外加工产品的主要 \n原料并支付固定加工费。 \n（3）生产模式 \n公司制定和执行生产计划时，主要采用以销定产、产销结合的生产模式，并通过定期召开产销平\n衡会，结合客户订单、市场价格变动及市场供需状况，对公司产品的中短期需求进行预计，及时调整\n生产计划。公司设有生产部，主要负责制定生产计划和原辅料需求计划，指导各生产车间实施生产和\n控制等工作。 \n（4）销售模式 \n公司销售模式包括直销模式和贸易商模式，公司产品销售均为买断式销售，产品售出后，该产品\n对应的风险与报酬全部转移，公司不存在保留发出商品风险与报酬的代理销售情形。公司产品以内销\n为主，同时还销往欧洲、亚洲、美洲、非洲等境外地区。 \n（5）研发模式 \n公司研发模式以自主研发为主,同时加强与浙江大学、北京化工大学等国内科研院所及高校合作。 \n为确保研发的必要性及可行性，公司会根据国家战略需求和市场调研，结合公司发展战略、技术研发\n能力和产业化实施能力，进行研发项目立项。公司设置了研发部负责研发项目的立项和日常管理。研\n发过程中产生的技术秘密及知识产权，公司主要通过申报专利等形式进行保护。",
+          "page_text_hash": "0dfced06980a7c348001c3ece31f295b2ee91fabc5f3f7b1e0448b2285aee13e"
+        }
+      ]
+    },
+    {
+      "sample_id": "manufacturing-materials-920015-2025",
+      "scope_id": "920015-inventory",
+      "kind": "inventory_amount",
+      "outcome": "legal_empty",
+      "names": [],
+      "reason": "a raw-material inventory amount is not a named input",
+      "failure_code": null,
+      "evidence": [
+        {
+          "binding_status": "bound",
+          "evidence_id": "stage5-evidence-1ed9c4be6403f24a32db7661",
+          "chapter_task": "extract_material_inputs",
+          "instrument_id": "920015.BJ",
+          "report_id": "asset_b87f1d1a48e662dae376c540cd021f69",
+          "document_version": "ver_cfdbd2d058af825b1fc39f494d7a9bd3",
+          "page": 108,
+          "section_title": "原材料存货",
+          "bounded_quote": "2.80  13,600.00 69,162.80 \n期末坏账准备计\n提比例（%） 5.00   26.15 5.95  \n(5) 其他应收款金额前 5 名情况 \n单位名称 款项性质 期末账面余额 账龄 占其他应收款余额\n的比例（%） \n期末坏账准\n备 \n出口退税 出口退税款 1,100,547.61 1 年以内 94.61 55,027.38 \n浙江汇盛投资集\n团有限公司 押金保证金 48,000.00 2-3 年 4.13 9,600.00 \n代扣代缴个人养\n老保险金 应收暂付款 10,071.12 1 年以内 0.87 503.56 \n浙江衢化氟化学\n有限公司 押金保证金 \n2,000.00 4-5 年 0.17 2,000.00 \n2,000.00 5 年以上 0.17 2,000.00 \n代扣代缴个人失\n业金 应收暂付款 631.11 1 年以内 0.05 31.56 \n小  计  1,163,249.84  100.00 69,162.50 \n  \n8. 存货 \n(1) 明细情况 \n项  目 \n期末数 期初数 \n账面余额 跌价准备 账面价值 账面余额 跌价准备 账面价值 \n原材料 18,723,415.97  18,723,415.97 16,701,959.32  16,701,959.32 \n在产品 3,209,666.97  3,209,666.97 4,315,591.45  4,315,591.45 \n库存商品 8,512,020.13 4,920,489.16 3,591,530.97 25,715,403.57 7,891,648.00 17,823,755.57 \n发出商品 5,275,676.10  5,275,676.10 2,678,665.15 38,667.02 2,639,998.13 \n合同履约成本 410,130.48  410,130.48 817,500.99  817,500.99 \n合  计 36,130,909.65 4,920,489.16 31,210,420.49 50,229,120.48 7,930,315.02 42,298,805.46 \n(2) 存货跌价准备 \n1) 明细情况 \n项  目 期初数 本期增加 本期减少 期末数",
+          "page_text_hash": "0db67039132b05b836482d4ba69931dec5756629384f1ba944810347c3f01063"
+        }
+      ]
+    }
+  ],
+  "facts": [
+    {
+      "sample_id": "manufacturing-materials-300750-2025",
+      "record_id": "manufacturing-materials-300750-2025:material:正极材料",
+      "field_id": "material_input",
+      "chapter_task": "extract_material_inputs",
+      "relation_type": "material_input",
+      "role": "raw_material_input",
+      "source_native_name": "正极材料",
+      "object_name": "正极材料",
+      "report": {
+        "instrument_id": "300750.SZ",
+        "report_id": "asset_3b09f6c831975c7177b6bb3287cab781",
+        "document_version": "ver_09c0e677ec8192dc4fc12cb620069f29",
+        "report_period": "2025-12-31",
+        "published_at": "2026-03-09T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "reported_period": "2025-12-31",
+      "period_type": "duration",
+      "subject_scope": "consolidated_group",
+      "subject_basis": "direct_source_wording",
+      "assertion_class": "reported_fact",
+      "evidence": [
+        {
+          "binding_status": "bound",
+          "evidence_id": "stage5-evidence-13a990ae91dde86238b98434",
+          "chapter_task": "extract_material_inputs",
+          "instrument_id": "300750.SZ",
+          "report_id": "asset_3b09f6c831975c7177b6bb3287cab781",
+          "document_version": "ver_09c0e677ec8192dc4fc12cb620069f29",
+          "page": 40,
+          "section_title": "原材料价格波动及供应风险",
+          "bounded_quote": "宁德时代新能源科技股份有限公司 2025年年度报告全文 \n40 \n（3）新产品和新技术开发风险 \n由于对能量密度、循环寿命、补能效率及安全性等更高性能电池技术的追求，全球知名的车企、电\n池企业、材料企业、研究机构纷纷加大对新技术路线的研究开发。公司如果不能有效预判且始终保持研\n发能力的行业领先，市场竞争力和盈利能力可能会受到影响。 \n应对措施：公司基于先进的研发体系及强大的研发能力，通过高强度的研发投入、优秀的研发人才\n团队，利用算力驱动的智能化开发平台高效筛选有潜质的材料体系、快速推进电池设计、提升制造运营\n效率，在新产品新技术开发方面始终保持前瞻性及领先性，通过 领先的电池工程化能力以及供应链体系，\n快速推动新产品和新技术的商业化落地，以实现公司的高质量发展。 \n（4）原材料价格波动及供应风险 \n公司生产经营所需主要原材料包括正极材料、负极材料、隔膜和电解液等，上述原材料受锂、镍、\n钴等大宗商品或化工原料价格影响较大。受相关材料价格变动及市场供需情况的影响，公司原材料的采\n购价格及规模也会出现一定波动。 \n应对措施：公司不断深化全球供应链布局，并持续完善供应链管理体系，及时追踪重要原材料市场\n供求和价格变动，保障原材料供应及优化采购成本。公司已采取自制开采、投资合作、签署长协订单等\n措施保障供应链安全及稳定。公司持续重视回收技术的发展与应用，实现资源的可持续利用。 \n十二、报告期内接待调研、沟通、采访等活动登记表 \n适用 □不适用 \n接待时间 接待地点 接待方式 接待对象\n类型 接待对象 谈论的主要内容\n及提供的资料 调研的基本情况索引 \n2025 年 3 月\n14日 电话会议 电话沟通 机构及个\n人投资者 \n参与单位名称详\n见巨潮资讯网披\n露内容 \n参见巨潮资讯网 \n参见巨潮资讯网《 2025\n年 3月 14 日投资者关系\n活动记录表》 \n2025 年 4 月\n14日 电话会议 电话沟通 机构及个\n人投资者 \n参与单位名称详\n见巨潮资讯网披\n露内容 \n参见巨潮资讯网 \n参见巨潮资讯网《 2025\n年 4月 14 日投资者关系\n活动记录表》 \n2025 年 5 月\n14日 网络远程 其他 \n社会公\n众、投资\n者等 \n参与单位名称详\n见巨潮资讯网披\n露内容 \n参见巨潮资讯网 \n参见巨潮资讯网《 2025\n年 5月 14 日投资者关系\n活动记录表》 \n2025 年 7 月\n30日 电话会议 电话沟通 机构及个\n人投资者 \n参与单位名称详\n见巨潮资讯网披\n露内容 \n参见巨潮资讯网 \n参见巨潮资讯网《 2025\n年 7月 30 日投资者关系\n活动记录表》 \n2025 年 10 月\n20日 电话会议 电话沟通 机构及个\n人投资者 \n参与单位名称详\n见巨潮资讯网披\n露内容 \n参见巨潮资讯网 \n参见巨潮资讯网《 2025\n年 10月 20日投资者关系\n活动记录表》 \n十三、市值管理制度和估值提升计划的制定落实情况 \n公司是否制定了市值管理制度。",
+          "page_text_hash": "714a93b31d4f6cfdc3dc5cb15b8520a5189928a6288eb95f747cb34d5076a92e"
+        }
+      ],
+      "disposition": "accepted_for_review",
+      "quantity": null,
+      "mapping_status": "pending",
+      "commodity_id": null
+    },
+    {
+      "sample_id": "manufacturing-materials-300750-2025",
+      "record_id": "manufacturing-materials-300750-2025:material:负极材料",
+      "field_id": "material_input",
+      "chapter_task": "extract_material_inputs",
+      "relation_type": "material_input",
+      "role": "raw_material_input",
+      "source_native_name": "负极材料",
+      "object_name": "负极材料",
+      "report": {
+        "instrument_id": "300750.SZ",
+        "report_id": "asset_3b09f6c831975c7177b6bb3287cab781",
+        "document_version": "ver_09c0e677ec8192dc4fc12cb620069f29",
+        "report_period": "2025-12-31",
+        "published_at": "2026-03-09T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "reported_period": "2025-12-31",
+      "period_type": "duration",
+      "subject_scope": "consolidated_group",
+      "subject_basis": "direct_source_wording",
+      "assertion_class": "reported_fact",
+      "evidence": [
+        {
+          "binding_status": "bound",
+          "evidence_id": "stage5-evidence-13a990ae91dde86238b98434",
+          "chapter_task": "extract_material_inputs",
+          "instrument_id": "300750.SZ",
+          "report_id": "asset_3b09f6c831975c7177b6bb3287cab781",
+          "document_version": "ver_09c0e677ec8192dc4fc12cb620069f29",
+          "page": 40,
+          "section_title": "原材料价格波动及供应风险",
+          "bounded_quote": "宁德时代新能源科技股份有限公司 2025年年度报告全文 \n40 \n（3）新产品和新技术开发风险 \n由于对能量密度、循环寿命、补能效率及安全性等更高性能电池技术的追求，全球知名的车企、电\n池企业、材料企业、研究机构纷纷加大对新技术路线的研究开发。公司如果不能有效预判且始终保持研\n发能力的行业领先，市场竞争力和盈利能力可能会受到影响。 \n应对措施：公司基于先进的研发体系及强大的研发能力，通过高强度的研发投入、优秀的研发人才\n团队，利用算力驱动的智能化开发平台高效筛选有潜质的材料体系、快速推进电池设计、提升制造运营\n效率，在新产品新技术开发方面始终保持前瞻性及领先性，通过 领先的电池工程化能力以及供应链体系，\n快速推动新产品和新技术的商业化落地，以实现公司的高质量发展。 \n（4）原材料价格波动及供应风险 \n公司生产经营所需主要原材料包括正极材料、负极材料、隔膜和电解液等，上述原材料受锂、镍、\n钴等大宗商品或化工原料价格影响较大。受相关材料价格变动及市场供需情况的影响，公司原材料的采\n购价格及规模也会出现一定波动。 \n应对措施：公司不断深化全球供应链布局，并持续完善供应链管理体系，及时追踪重要原材料市场\n供求和价格变动，保障原材料供应及优化采购成本。公司已采取自制开采、投资合作、签署长协订单等\n措施保障供应链安全及稳定。公司持续重视回收技术的发展与应用，实现资源的可持续利用。 \n十二、报告期内接待调研、沟通、采访等活动登记表 \n适用 □不适用 \n接待时间 接待地点 接待方式 接待对象\n类型 接待对象 谈论的主要内容\n及提供的资料 调研的基本情况索引 \n2025 年 3 月\n14日 电话会议 电话沟通 机构及个\n人投资者 \n参与单位名称详\n见巨潮资讯网披\n露内容 \n参见巨潮资讯网 \n参见巨潮资讯网《 2025\n年 3月 14 日投资者关系\n活动记录表》 \n2025 年 4 月\n14日 电话会议 电话沟通 机构及个\n人投资者 \n参与单位名称详\n见巨潮资讯网披\n露内容 \n参见巨潮资讯网 \n参见巨潮资讯网《 2025\n年 4月 14 日投资者关系\n活动记录表》 \n2025 年 5 月\n14日 网络远程 其他 \n社会公\n众、投资\n者等 \n参与单位名称详\n见巨潮资讯网披\n露内容 \n参见巨潮资讯网 \n参见巨潮资讯网《 2025\n年 5月 14 日投资者关系\n活动记录表》 \n2025 年 7 月\n30日 电话会议 电话沟通 机构及个\n人投资者 \n参与单位名称详\n见巨潮资讯网披\n露内容 \n参见巨潮资讯网 \n参见巨潮资讯网《 2025\n年 7月 30 日投资者关系\n活动记录表》 \n2025 年 10 月\n20日 电话会议 电话沟通 机构及个\n人投资者 \n参与单位名称详\n见巨潮资讯网披\n露内容 \n参见巨潮资讯网 \n参见巨潮资讯网《 2025\n年 10月 20日投资者关系\n活动记录表》 \n十三、市值管理制度和估值提升计划的制定落实情况 \n公司是否制定了市值管理制度。",
+          "page_text_hash": "714a93b31d4f6cfdc3dc5cb15b8520a5189928a6288eb95f747cb34d5076a92e"
+        }
+      ],
+      "disposition": "accepted_for_review",
+      "quantity": null,
+      "mapping_status": "pending",
+      "commodity_id": null
+    },
+    {
+      "sample_id": "manufacturing-materials-300750-2025",
+      "record_id": "manufacturing-materials-300750-2025:material:隔膜",
+      "field_id": "material_input",
+      "chapter_task": "extract_material_inputs",
+      "relation_type": "material_input",
+      "role": "raw_material_input",
+      "source_native_name": "隔膜",
+      "object_name": "隔膜",
+      "report": {
+        "instrument_id": "300750.SZ",
+        "report_id": "asset_3b09f6c831975c7177b6bb3287cab781",
+        "document_version": "ver_09c0e677ec8192dc4fc12cb620069f29",
+        "report_period": "2025-12-31",
+        "published_at": "2026-03-09T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "reported_period": "2025-12-31",
+      "period_type": "duration",
+      "subject_scope": "consolidated_group",
+      "subject_basis": "direct_source_wording",
+      "assertion_class": "reported_fact",
+      "evidence": [
+        {
+          "binding_status": "bound",
+          "evidence_id": "stage5-evidence-13a990ae91dde86238b98434",
+          "chapter_task": "extract_material_inputs",
+          "instrument_id": "300750.SZ",
+          "report_id": "asset_3b09f6c831975c7177b6bb3287cab781",
+          "document_version": "ver_09c0e677ec8192dc4fc12cb620069f29",
+          "page": 40,
+          "section_title": "原材料价格波动及供应风险",
+          "bounded_quote": "宁德时代新能源科技股份有限公司 2025年年度报告全文 \n40 \n（3）新产品和新技术开发风险 \n由于对能量密度、循环寿命、补能效率及安全性等更高性能电池技术的追求，全球知名的车企、电\n池企业、材料企业、研究机构纷纷加大对新技术路线的研究开发。公司如果不能有效预判且始终保持研\n发能力的行业领先，市场竞争力和盈利能力可能会受到影响。 \n应对措施：公司基于先进的研发体系及强大的研发能力，通过高强度的研发投入、优秀的研发人才\n团队，利用算力驱动的智能化开发平台高效筛选有潜质的材料体系、快速推进电池设计、提升制造运营\n效率，在新产品新技术开发方面始终保持前瞻性及领先性，通过 领先的电池工程化能力以及供应链体系，\n快速推动新产品和新技术的商业化落地，以实现公司的高质量发展。 \n（4）原材料价格波动及供应风险 \n公司生产经营所需主要原材料包括正极材料、负极材料、隔膜和电解液等，上述原材料受锂、镍、\n钴等大宗商品或化工原料价格影响较大。受相关材料价格变动及市场供需情况的影响，公司原材料的采\n购价格及规模也会出现一定波动。 \n应对措施：公司不断深化全球供应链布局，并持续完善供应链管理体系，及时追踪重要原材料市场\n供求和价格变动，保障原材料供应及优化采购成本。公司已采取自制开采、投资合作、签署长协订单等\n措施保障供应链安全及稳定。公司持续重视回收技术的发展与应用，实现资源的可持续利用。 \n十二、报告期内接待调研、沟通、采访等活动登记表 \n适用 □不适用 \n接待时间 接待地点 接待方式 接待对象\n类型 接待对象 谈论的主要内容\n及提供的资料 调研的基本情况索引 \n2025 年 3 月\n14日 电话会议 电话沟通 机构及个\n人投资者 \n参与单位名称详\n见巨潮资讯网披\n露内容 \n参见巨潮资讯网 \n参见巨潮资讯网《 2025\n年 3月 14 日投资者关系\n活动记录表》 \n2025 年 4 月\n14日 电话会议 电话沟通 机构及个\n人投资者 \n参与单位名称详\n见巨潮资讯网披\n露内容 \n参见巨潮资讯网 \n参见巨潮资讯网《 2025\n年 4月 14 日投资者关系\n活动记录表》 \n2025 年 5 月\n14日 网络远程 其他 \n社会公\n众、投资\n者等 \n参与单位名称详\n见巨潮资讯网披\n露内容 \n参见巨潮资讯网 \n参见巨潮资讯网《 2025\n年 5月 14 日投资者关系\n活动记录表》 \n2025 年 7 月\n30日 电话会议 电话沟通 机构及个\n人投资者 \n参与单位名称详\n见巨潮资讯网披\n露内容 \n参见巨潮资讯网 \n参见巨潮资讯网《 2025\n年 7月 30 日投资者关系\n活动记录表》 \n2025 年 10 月\n20日 电话会议 电话沟通 机构及个\n人投资者 \n参与单位名称详\n见巨潮资讯网披\n露内容 \n参见巨潮资讯网 \n参见巨潮资讯网《 2025\n年 10月 20日投资者关系\n活动记录表》 \n十三、市值管理制度和估值提升计划的制定落实情况 \n公司是否制定了市值管理制度。",
+          "page_text_hash": "714a93b31d4f6cfdc3dc5cb15b8520a5189928a6288eb95f747cb34d5076a92e"
+        }
+      ],
+      "disposition": "accepted_for_review",
+      "quantity": null,
+      "mapping_status": "pending",
+      "commodity_id": null
+    },
+    {
+      "sample_id": "manufacturing-materials-300750-2025",
+      "record_id": "manufacturing-materials-300750-2025:material:电解液",
+      "field_id": "material_input",
+      "chapter_task": "extract_material_inputs",
+      "relation_type": "material_input",
+      "role": "raw_material_input",
+      "source_native_name": "电解液",
+      "object_name": "电解液",
+      "report": {
+        "instrument_id": "300750.SZ",
+        "report_id": "asset_3b09f6c831975c7177b6bb3287cab781",
+        "document_version": "ver_09c0e677ec8192dc4fc12cb620069f29",
+        "report_period": "2025-12-31",
+        "published_at": "2026-03-09T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "reported_period": "2025-12-31",
+      "period_type": "duration",
+      "subject_scope": "consolidated_group",
+      "subject_basis": "direct_source_wording",
+      "assertion_class": "reported_fact",
+      "evidence": [
+        {
+          "binding_status": "bound",
+          "evidence_id": "stage5-evidence-13a990ae91dde86238b98434",
+          "chapter_task": "extract_material_inputs",
+          "instrument_id": "300750.SZ",
+          "report_id": "asset_3b09f6c831975c7177b6bb3287cab781",
+          "document_version": "ver_09c0e677ec8192dc4fc12cb620069f29",
+          "page": 40,
+          "section_title": "原材料价格波动及供应风险",
+          "bounded_quote": "宁德时代新能源科技股份有限公司 2025年年度报告全文 \n40 \n（3）新产品和新技术开发风险 \n由于对能量密度、循环寿命、补能效率及安全性等更高性能电池技术的追求，全球知名的车企、电\n池企业、材料企业、研究机构纷纷加大对新技术路线的研究开发。公司如果不能有效预判且始终保持研\n发能力的行业领先，市场竞争力和盈利能力可能会受到影响。 \n应对措施：公司基于先进的研发体系及强大的研发能力，通过高强度的研发投入、优秀的研发人才\n团队，利用算力驱动的智能化开发平台高效筛选有潜质的材料体系、快速推进电池设计、提升制造运营\n效率，在新产品新技术开发方面始终保持前瞻性及领先性，通过 领先的电池工程化能力以及供应链体系，\n快速推动新产品和新技术的商业化落地，以实现公司的高质量发展。 \n（4）原材料价格波动及供应风险 \n公司生产经营所需主要原材料包括正极材料、负极材料、隔膜和电解液等，上述原材料受锂、镍、\n钴等大宗商品或化工原料价格影响较大。受相关材料价格变动及市场供需情况的影响，公司原材料的采\n购价格及规模也会出现一定波动。 \n应对措施：公司不断深化全球供应链布局，并持续完善供应链管理体系，及时追踪重要原材料市场\n供求和价格变动，保障原材料供应及优化采购成本。公司已采取自制开采、投资合作、签署长协订单等\n措施保障供应链安全及稳定。公司持续重视回收技术的发展与应用，实现资源的可持续利用。 \n十二、报告期内接待调研、沟通、采访等活动登记表 \n适用 □不适用 \n接待时间 接待地点 接待方式 接待对象\n类型 接待对象 谈论的主要内容\n及提供的资料 调研的基本情况索引 \n2025 年 3 月\n14日 电话会议 电话沟通 机构及个\n人投资者 \n参与单位名称详\n见巨潮资讯网披\n露内容 \n参见巨潮资讯网 \n参见巨潮资讯网《 2025\n年 3月 14 日投资者关系\n活动记录表》 \n2025 年 4 月\n14日 电话会议 电话沟通 机构及个\n人投资者 \n参与单位名称详\n见巨潮资讯网披\n露内容 \n参见巨潮资讯网 \n参见巨潮资讯网《 2025\n年 4月 14 日投资者关系\n活动记录表》 \n2025 年 5 月\n14日 网络远程 其他 \n社会公\n众、投资\n者等 \n参与单位名称详\n见巨潮资讯网披\n露内容 \n参见巨潮资讯网 \n参见巨潮资讯网《 2025\n年 5月 14 日投资者关系\n活动记录表》 \n2025 年 7 月\n30日 电话会议 电话沟通 机构及个\n人投资者 \n参与单位名称详\n见巨潮资讯网披\n露内容 \n参见巨潮资讯网 \n参见巨潮资讯网《 2025\n年 7月 30 日投资者关系\n活动记录表》 \n2025 年 10 月\n20日 电话会议 电话沟通 机构及个\n人投资者 \n参与单位名称详\n见巨潮资讯网披\n露内容 \n参见巨潮资讯网 \n参见巨潮资讯网《 2025\n年 10月 20日投资者关系\n活动记录表》 \n十三、市值管理制度和估值提升计划的制定落实情况 \n公司是否制定了市值管理制度。",
+          "page_text_hash": "714a93b31d4f6cfdc3dc5cb15b8520a5189928a6288eb95f747cb34d5076a92e"
+        }
+      ],
+      "disposition": "accepted_for_review",
+      "quantity": null,
+      "mapping_status": "pending",
+      "commodity_id": null
+    },
+    {
+      "sample_id": "manufacturing-materials-603659-2025",
+      "record_id": "manufacturing-materials-603659-2025:material:焦类",
+      "field_id": "material_input",
+      "chapter_task": "extract_material_inputs",
+      "relation_type": "material_input",
+      "role": "raw_material_input",
+      "source_native_name": "焦类",
+      "object_name": "焦类",
+      "report": {
+        "instrument_id": "603659.SH",
+        "report_id": "asset_50c70429093f66b34fc57ad8f896fcee",
+        "document_version": "ver_c867a6a692048e88fd9cb80473fbf908",
+        "report_period": "2025-12-31",
+        "published_at": "2026-03-05T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "reported_period": "2025-12-31",
+      "period_type": "duration",
+      "subject_scope": "consolidated_group",
+      "subject_basis": "direct_source_wording",
+      "assertion_class": "reported_fact",
+      "evidence": [
+        {
+          "binding_status": "bound",
+          "evidence_id": "stage5-evidence-016a3ae537b5d97b80e3769a",
+          "chapter_task": "extract_material_inputs",
+          "instrument_id": "603659.SH",
+          "report_id": "asset_50c70429093f66b34fc57ad8f896fcee",
+          "document_version": "ver_c867a6a692048e88fd9cb80473fbf908",
+          "page": 33,
+          "section_title": "原材料价格上涨的风险",
+          "bounded_quote": "营机制，\n充分保障其自主经营活力和团队创新能力，深化与集团内材料业务的战略协同，借助资本市场平\n台强化其在新能源电池自动化装备领域的核心竞争力与市场影响力，加快嘉拓智能向智能化、集\n成化、国际化装备解决方案提供商转型升级。\n（6）提升数字化管理水平，加强人工智能技术在集团及各子公司的应用，推动 AI 应用从办\n公系统到生产前沿的普及，探索利用 AI 技术重塑办公、研发、生产、安全等业务流程，深化精益\n生产与管理，促进从办公效能到生产效率的全面提升。\n(四)可能面对的风险\n√适用 □不适用\n1、宏观经济与市场波动的风险\n全球宏观经济存在不确定性，若未来出现经济增长放缓和市场需求下滑，将影响整个新能源\n电池行业的发展，进而可能对公司的经营业绩和财务状况产生不利影响。\n2、市场竞争加剧的风险\n在全球各国推进绿色低碳经济转型的背景下，发展以新能源汽车、新型储能为代表的锂电池\n行业成为新的市场趋势，市场需求快速扩张，动力电池厂商与上游供应链企业纷纷大幅提升产能，\n存在市场竞争加剧的风险。若下游整车厂商持续向上游传递成本压力，导致新能源电池材料售价\n进一步下降，将对公司盈利水平造成不利影响。\n3、原材料价格上涨的风险\n公司负极材料原材料包括焦类、初级石墨、沥青等，涂覆隔膜生产所需原材料包括隔膜基膜、\n陶瓷材料、氧化铝和氢氧化铝等，锂电设备业务原材料钢材、机加工件等。报告期内，公司产品\n部分原材料价格有所上涨，若公司不能通过自身工艺技术创新降低成本或将原材料价格和委外加\n工价格上涨压力转移给下游，则公司经营业绩可能受到不利影响。\n4、产品升级和新兴技术路线替代风险\n由于对能量密度、安全性、快充等更高性能电池技术的追求，全球知名的车企、电池企业、材料\n企业、研究机构纷纷加大对新技术路线的研究开发。若新型电池性能大幅优于锂离子电池，或其他\n新兴技术路线快速成熟，能够快速实现商业化，而公司不能快速对公司产品进行升级或者研发进",
+          "page_text_hash": "4fa9c93bb385afbf3e838a915bed29bb5e09e92b412c7a5460590e2879b0fad4"
+        }
+      ],
+      "disposition": "accepted_for_review",
+      "quantity": null,
+      "mapping_status": "pending",
+      "commodity_id": null
+    },
+    {
+      "sample_id": "manufacturing-materials-603659-2025",
+      "record_id": "manufacturing-materials-603659-2025:material:初级石墨",
+      "field_id": "material_input",
+      "chapter_task": "extract_material_inputs",
+      "relation_type": "material_input",
+      "role": "raw_material_input",
+      "source_native_name": "初级石墨",
+      "object_name": "初级石墨",
+      "report": {
+        "instrument_id": "603659.SH",
+        "report_id": "asset_50c70429093f66b34fc57ad8f896fcee",
+        "document_version": "ver_c867a6a692048e88fd9cb80473fbf908",
+        "report_period": "2025-12-31",
+        "published_at": "2026-03-05T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "reported_period": "2025-12-31",
+      "period_type": "duration",
+      "subject_scope": "consolidated_group",
+      "subject_basis": "direct_source_wording",
+      "assertion_class": "reported_fact",
+      "evidence": [
+        {
+          "binding_status": "bound",
+          "evidence_id": "stage5-evidence-016a3ae537b5d97b80e3769a",
+          "chapter_task": "extract_material_inputs",
+          "instrument_id": "603659.SH",
+          "report_id": "asset_50c70429093f66b34fc57ad8f896fcee",
+          "document_version": "ver_c867a6a692048e88fd9cb80473fbf908",
+          "page": 33,
+          "section_title": "原材料价格上涨的风险",
+          "bounded_quote": "营机制，\n充分保障其自主经营活力和团队创新能力，深化与集团内材料业务的战略协同，借助资本市场平\n台强化其在新能源电池自动化装备领域的核心竞争力与市场影响力，加快嘉拓智能向智能化、集\n成化、国际化装备解决方案提供商转型升级。\n（6）提升数字化管理水平，加强人工智能技术在集团及各子公司的应用，推动 AI 应用从办\n公系统到生产前沿的普及，探索利用 AI 技术重塑办公、研发、生产、安全等业务流程，深化精益\n生产与管理，促进从办公效能到生产效率的全面提升。\n(四)可能面对的风险\n√适用 □不适用\n1、宏观经济与市场波动的风险\n全球宏观经济存在不确定性，若未来出现经济增长放缓和市场需求下滑，将影响整个新能源\n电池行业的发展，进而可能对公司的经营业绩和财务状况产生不利影响。\n2、市场竞争加剧的风险\n在全球各国推进绿色低碳经济转型的背景下，发展以新能源汽车、新型储能为代表的锂电池\n行业成为新的市场趋势，市场需求快速扩张，动力电池厂商与上游供应链企业纷纷大幅提升产能，\n存在市场竞争加剧的风险。若下游整车厂商持续向上游传递成本压力，导致新能源电池材料售价\n进一步下降，将对公司盈利水平造成不利影响。\n3、原材料价格上涨的风险\n公司负极材料原材料包括焦类、初级石墨、沥青等，涂覆隔膜生产所需原材料包括隔膜基膜、\n陶瓷材料、氧化铝和氢氧化铝等，锂电设备业务原材料钢材、机加工件等。报告期内，公司产品\n部分原材料价格有所上涨，若公司不能通过自身工艺技术创新降低成本或将原材料价格和委外加\n工价格上涨压力转移给下游，则公司经营业绩可能受到不利影响。\n4、产品升级和新兴技术路线替代风险\n由于对能量密度、安全性、快充等更高性能电池技术的追求，全球知名的车企、电池企业、材料\n企业、研究机构纷纷加大对新技术路线的研究开发。若新型电池性能大幅优于锂离子电池，或其他\n新兴技术路线快速成熟，能够快速实现商业化，而公司不能快速对公司产品进行升级或者研发进",
+          "page_text_hash": "4fa9c93bb385afbf3e838a915bed29bb5e09e92b412c7a5460590e2879b0fad4"
+        }
+      ],
+      "disposition": "accepted_for_review",
+      "quantity": null,
+      "mapping_status": "pending",
+      "commodity_id": null
+    },
+    {
+      "sample_id": "manufacturing-materials-603659-2025",
+      "record_id": "manufacturing-materials-603659-2025:material:沥青",
+      "field_id": "material_input",
+      "chapter_task": "extract_material_inputs",
+      "relation_type": "material_input",
+      "role": "raw_material_input",
+      "source_native_name": "沥青",
+      "object_name": "沥青",
+      "report": {
+        "instrument_id": "603659.SH",
+        "report_id": "asset_50c70429093f66b34fc57ad8f896fcee",
+        "document_version": "ver_c867a6a692048e88fd9cb80473fbf908",
+        "report_period": "2025-12-31",
+        "published_at": "2026-03-05T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "reported_period": "2025-12-31",
+      "period_type": "duration",
+      "subject_scope": "consolidated_group",
+      "subject_basis": "direct_source_wording",
+      "assertion_class": "reported_fact",
+      "evidence": [
+        {
+          "binding_status": "bound",
+          "evidence_id": "stage5-evidence-016a3ae537b5d97b80e3769a",
+          "chapter_task": "extract_material_inputs",
+          "instrument_id": "603659.SH",
+          "report_id": "asset_50c70429093f66b34fc57ad8f896fcee",
+          "document_version": "ver_c867a6a692048e88fd9cb80473fbf908",
+          "page": 33,
+          "section_title": "原材料价格上涨的风险",
+          "bounded_quote": "营机制，\n充分保障其自主经营活力和团队创新能力，深化与集团内材料业务的战略协同，借助资本市场平\n台强化其在新能源电池自动化装备领域的核心竞争力与市场影响力，加快嘉拓智能向智能化、集\n成化、国际化装备解决方案提供商转型升级。\n（6）提升数字化管理水平，加强人工智能技术在集团及各子公司的应用，推动 AI 应用从办\n公系统到生产前沿的普及，探索利用 AI 技术重塑办公、研发、生产、安全等业务流程，深化精益\n生产与管理，促进从办公效能到生产效率的全面提升。\n(四)可能面对的风险\n√适用 □不适用\n1、宏观经济与市场波动的风险\n全球宏观经济存在不确定性，若未来出现经济增长放缓和市场需求下滑，将影响整个新能源\n电池行业的发展，进而可能对公司的经营业绩和财务状况产生不利影响。\n2、市场竞争加剧的风险\n在全球各国推进绿色低碳经济转型的背景下，发展以新能源汽车、新型储能为代表的锂电池\n行业成为新的市场趋势，市场需求快速扩张，动力电池厂商与上游供应链企业纷纷大幅提升产能，\n存在市场竞争加剧的风险。若下游整车厂商持续向上游传递成本压力，导致新能源电池材料售价\n进一步下降，将对公司盈利水平造成不利影响。\n3、原材料价格上涨的风险\n公司负极材料原材料包括焦类、初级石墨、沥青等，涂覆隔膜生产所需原材料包括隔膜基膜、\n陶瓷材料、氧化铝和氢氧化铝等，锂电设备业务原材料钢材、机加工件等。报告期内，公司产品\n部分原材料价格有所上涨，若公司不能通过自身工艺技术创新降低成本或将原材料价格和委外加\n工价格上涨压力转移给下游，则公司经营业绩可能受到不利影响。\n4、产品升级和新兴技术路线替代风险\n由于对能量密度、安全性、快充等更高性能电池技术的追求，全球知名的车企、电池企业、材料\n企业、研究机构纷纷加大对新技术路线的研究开发。若新型电池性能大幅优于锂离子电池，或其他\n新兴技术路线快速成熟，能够快速实现商业化，而公司不能快速对公司产品进行升级或者研发进",
+          "page_text_hash": "4fa9c93bb385afbf3e838a915bed29bb5e09e92b412c7a5460590e2879b0fad4"
+        }
+      ],
+      "disposition": "accepted_for_review",
+      "quantity": null,
+      "mapping_status": "mapped",
+      "commodity_id": "COMMODITY.energy.bitumen"
+    },
+    {
+      "sample_id": "manufacturing-materials-603659-2025",
+      "record_id": "manufacturing-materials-603659-2025:material:隔膜基膜",
+      "field_id": "material_input",
+      "chapter_task": "extract_material_inputs",
+      "relation_type": "material_input",
+      "role": "raw_material_input",
+      "source_native_name": "隔膜基膜",
+      "object_name": "隔膜基膜",
+      "report": {
+        "instrument_id": "603659.SH",
+        "report_id": "asset_50c70429093f66b34fc57ad8f896fcee",
+        "document_version": "ver_c867a6a692048e88fd9cb80473fbf908",
+        "report_period": "2025-12-31",
+        "published_at": "2026-03-05T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "reported_period": "2025-12-31",
+      "period_type": "duration",
+      "subject_scope": "consolidated_group",
+      "subject_basis": "direct_source_wording",
+      "assertion_class": "reported_fact",
+      "evidence": [
+        {
+          "binding_status": "bound",
+          "evidence_id": "stage5-evidence-016a3ae537b5d97b80e3769a",
+          "chapter_task": "extract_material_inputs",
+          "instrument_id": "603659.SH",
+          "report_id": "asset_50c70429093f66b34fc57ad8f896fcee",
+          "document_version": "ver_c867a6a692048e88fd9cb80473fbf908",
+          "page": 33,
+          "section_title": "原材料价格上涨的风险",
+          "bounded_quote": "营机制，\n充分保障其自主经营活力和团队创新能力，深化与集团内材料业务的战略协同，借助资本市场平\n台强化其在新能源电池自动化装备领域的核心竞争力与市场影响力，加快嘉拓智能向智能化、集\n成化、国际化装备解决方案提供商转型升级。\n（6）提升数字化管理水平，加强人工智能技术在集团及各子公司的应用，推动 AI 应用从办\n公系统到生产前沿的普及，探索利用 AI 技术重塑办公、研发、生产、安全等业务流程，深化精益\n生产与管理，促进从办公效能到生产效率的全面提升。\n(四)可能面对的风险\n√适用 □不适用\n1、宏观经济与市场波动的风险\n全球宏观经济存在不确定性，若未来出现经济增长放缓和市场需求下滑，将影响整个新能源\n电池行业的发展，进而可能对公司的经营业绩和财务状况产生不利影响。\n2、市场竞争加剧的风险\n在全球各国推进绿色低碳经济转型的背景下，发展以新能源汽车、新型储能为代表的锂电池\n行业成为新的市场趋势，市场需求快速扩张，动力电池厂商与上游供应链企业纷纷大幅提升产能，\n存在市场竞争加剧的风险。若下游整车厂商持续向上游传递成本压力，导致新能源电池材料售价\n进一步下降，将对公司盈利水平造成不利影响。\n3、原材料价格上涨的风险\n公司负极材料原材料包括焦类、初级石墨、沥青等，涂覆隔膜生产所需原材料包括隔膜基膜、\n陶瓷材料、氧化铝和氢氧化铝等，锂电设备业务原材料钢材、机加工件等。报告期内，公司产品\n部分原材料价格有所上涨，若公司不能通过自身工艺技术创新降低成本或将原材料价格和委外加\n工价格上涨压力转移给下游，则公司经营业绩可能受到不利影响。\n4、产品升级和新兴技术路线替代风险\n由于对能量密度、安全性、快充等更高性能电池技术的追求，全球知名的车企、电池企业、材料\n企业、研究机构纷纷加大对新技术路线的研究开发。若新型电池性能大幅优于锂离子电池，或其他\n新兴技术路线快速成熟，能够快速实现商业化，而公司不能快速对公司产品进行升级或者研发进",
+          "page_text_hash": "4fa9c93bb385afbf3e838a915bed29bb5e09e92b412c7a5460590e2879b0fad4"
+        }
+      ],
+      "disposition": "accepted_for_review",
+      "quantity": null,
+      "mapping_status": "pending",
+      "commodity_id": null
+    },
+    {
+      "sample_id": "manufacturing-materials-603659-2025",
+      "record_id": "manufacturing-materials-603659-2025:material:陶瓷材料",
+      "field_id": "material_input",
+      "chapter_task": "extract_material_inputs",
+      "relation_type": "material_input",
+      "role": "raw_material_input",
+      "source_native_name": "陶瓷材料",
+      "object_name": "陶瓷材料",
+      "report": {
+        "instrument_id": "603659.SH",
+        "report_id": "asset_50c70429093f66b34fc57ad8f896fcee",
+        "document_version": "ver_c867a6a692048e88fd9cb80473fbf908",
+        "report_period": "2025-12-31",
+        "published_at": "2026-03-05T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "reported_period": "2025-12-31",
+      "period_type": "duration",
+      "subject_scope": "consolidated_group",
+      "subject_basis": "direct_source_wording",
+      "assertion_class": "reported_fact",
+      "evidence": [
+        {
+          "binding_status": "bound",
+          "evidence_id": "stage5-evidence-016a3ae537b5d97b80e3769a",
+          "chapter_task": "extract_material_inputs",
+          "instrument_id": "603659.SH",
+          "report_id": "asset_50c70429093f66b34fc57ad8f896fcee",
+          "document_version": "ver_c867a6a692048e88fd9cb80473fbf908",
+          "page": 33,
+          "section_title": "原材料价格上涨的风险",
+          "bounded_quote": "营机制，\n充分保障其自主经营活力和团队创新能力，深化与集团内材料业务的战略协同，借助资本市场平\n台强化其在新能源电池自动化装备领域的核心竞争力与市场影响力，加快嘉拓智能向智能化、集\n成化、国际化装备解决方案提供商转型升级。\n（6）提升数字化管理水平，加强人工智能技术在集团及各子公司的应用，推动 AI 应用从办\n公系统到生产前沿的普及，探索利用 AI 技术重塑办公、研发、生产、安全等业务流程，深化精益\n生产与管理，促进从办公效能到生产效率的全面提升。\n(四)可能面对的风险\n√适用 □不适用\n1、宏观经济与市场波动的风险\n全球宏观经济存在不确定性，若未来出现经济增长放缓和市场需求下滑，将影响整个新能源\n电池行业的发展，进而可能对公司的经营业绩和财务状况产生不利影响。\n2、市场竞争加剧的风险\n在全球各国推进绿色低碳经济转型的背景下，发展以新能源汽车、新型储能为代表的锂电池\n行业成为新的市场趋势，市场需求快速扩张，动力电池厂商与上游供应链企业纷纷大幅提升产能，\n存在市场竞争加剧的风险。若下游整车厂商持续向上游传递成本压力，导致新能源电池材料售价\n进一步下降，将对公司盈利水平造成不利影响。\n3、原材料价格上涨的风险\n公司负极材料原材料包括焦类、初级石墨、沥青等，涂覆隔膜生产所需原材料包括隔膜基膜、\n陶瓷材料、氧化铝和氢氧化铝等，锂电设备业务原材料钢材、机加工件等。报告期内，公司产品\n部分原材料价格有所上涨，若公司不能通过自身工艺技术创新降低成本或将原材料价格和委外加\n工价格上涨压力转移给下游，则公司经营业绩可能受到不利影响。\n4、产品升级和新兴技术路线替代风险\n由于对能量密度、安全性、快充等更高性能电池技术的追求，全球知名的车企、电池企业、材料\n企业、研究机构纷纷加大对新技术路线的研究开发。若新型电池性能大幅优于锂离子电池，或其他\n新兴技术路线快速成熟，能够快速实现商业化，而公司不能快速对公司产品进行升级或者研发进",
+          "page_text_hash": "4fa9c93bb385afbf3e838a915bed29bb5e09e92b412c7a5460590e2879b0fad4"
+        }
+      ],
+      "disposition": "accepted_for_review",
+      "quantity": null,
+      "mapping_status": "pending",
+      "commodity_id": null
+    },
+    {
+      "sample_id": "manufacturing-materials-603659-2025",
+      "record_id": "manufacturing-materials-603659-2025:material:氧化铝",
+      "field_id": "material_input",
+      "chapter_task": "extract_material_inputs",
+      "relation_type": "material_input",
+      "role": "raw_material_input",
+      "source_native_name": "氧化铝",
+      "object_name": "氧化铝",
+      "report": {
+        "instrument_id": "603659.SH",
+        "report_id": "asset_50c70429093f66b34fc57ad8f896fcee",
+        "document_version": "ver_c867a6a692048e88fd9cb80473fbf908",
+        "report_period": "2025-12-31",
+        "published_at": "2026-03-05T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "reported_period": "2025-12-31",
+      "period_type": "duration",
+      "subject_scope": "consolidated_group",
+      "subject_basis": "direct_source_wording",
+      "assertion_class": "reported_fact",
+      "evidence": [
+        {
+          "binding_status": "bound",
+          "evidence_id": "stage5-evidence-016a3ae537b5d97b80e3769a",
+          "chapter_task": "extract_material_inputs",
+          "instrument_id": "603659.SH",
+          "report_id": "asset_50c70429093f66b34fc57ad8f896fcee",
+          "document_version": "ver_c867a6a692048e88fd9cb80473fbf908",
+          "page": 33,
+          "section_title": "原材料价格上涨的风险",
+          "bounded_quote": "营机制，\n充分保障其自主经营活力和团队创新能力，深化与集团内材料业务的战略协同，借助资本市场平\n台强化其在新能源电池自动化装备领域的核心竞争力与市场影响力，加快嘉拓智能向智能化、集\n成化、国际化装备解决方案提供商转型升级。\n（6）提升数字化管理水平，加强人工智能技术在集团及各子公司的应用，推动 AI 应用从办\n公系统到生产前沿的普及，探索利用 AI 技术重塑办公、研发、生产、安全等业务流程，深化精益\n生产与管理，促进从办公效能到生产效率的全面提升。\n(四)可能面对的风险\n√适用 □不适用\n1、宏观经济与市场波动的风险\n全球宏观经济存在不确定性，若未来出现经济增长放缓和市场需求下滑，将影响整个新能源\n电池行业的发展，进而可能对公司的经营业绩和财务状况产生不利影响。\n2、市场竞争加剧的风险\n在全球各国推进绿色低碳经济转型的背景下，发展以新能源汽车、新型储能为代表的锂电池\n行业成为新的市场趋势，市场需求快速扩张，动力电池厂商与上游供应链企业纷纷大幅提升产能，\n存在市场竞争加剧的风险。若下游整车厂商持续向上游传递成本压力，导致新能源电池材料售价\n进一步下降，将对公司盈利水平造成不利影响。\n3、原材料价格上涨的风险\n公司负极材料原材料包括焦类、初级石墨、沥青等，涂覆隔膜生产所需原材料包括隔膜基膜、\n陶瓷材料、氧化铝和氢氧化铝等，锂电设备业务原材料钢材、机加工件等。报告期内，公司产品\n部分原材料价格有所上涨，若公司不能通过自身工艺技术创新降低成本或将原材料价格和委外加\n工价格上涨压力转移给下游，则公司经营业绩可能受到不利影响。\n4、产品升级和新兴技术路线替代风险\n由于对能量密度、安全性、快充等更高性能电池技术的追求，全球知名的车企、电池企业、材料\n企业、研究机构纷纷加大对新技术路线的研究开发。若新型电池性能大幅优于锂离子电池，或其他\n新兴技术路线快速成熟，能够快速实现商业化，而公司不能快速对公司产品进行升级或者研发进",
+          "page_text_hash": "4fa9c93bb385afbf3e838a915bed29bb5e09e92b412c7a5460590e2879b0fad4"
+        }
+      ],
+      "disposition": "accepted_for_review",
+      "quantity": null,
+      "mapping_status": "mapped",
+      "commodity_id": "COMMODITY.metal.alumina"
+    },
+    {
+      "sample_id": "manufacturing-materials-603659-2025",
+      "record_id": "manufacturing-materials-603659-2025:material:氢氧化铝",
+      "field_id": "material_input",
+      "chapter_task": "extract_material_inputs",
+      "relation_type": "material_input",
+      "role": "raw_material_input",
+      "source_native_name": "氢氧化铝",
+      "object_name": "氢氧化铝",
+      "report": {
+        "instrument_id": "603659.SH",
+        "report_id": "asset_50c70429093f66b34fc57ad8f896fcee",
+        "document_version": "ver_c867a6a692048e88fd9cb80473fbf908",
+        "report_period": "2025-12-31",
+        "published_at": "2026-03-05T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "reported_period": "2025-12-31",
+      "period_type": "duration",
+      "subject_scope": "consolidated_group",
+      "subject_basis": "direct_source_wording",
+      "assertion_class": "reported_fact",
+      "evidence": [
+        {
+          "binding_status": "bound",
+          "evidence_id": "stage5-evidence-016a3ae537b5d97b80e3769a",
+          "chapter_task": "extract_material_inputs",
+          "instrument_id": "603659.SH",
+          "report_id": "asset_50c70429093f66b34fc57ad8f896fcee",
+          "document_version": "ver_c867a6a692048e88fd9cb80473fbf908",
+          "page": 33,
+          "section_title": "原材料价格上涨的风险",
+          "bounded_quote": "营机制，\n充分保障其自主经营活力和团队创新能力，深化与集团内材料业务的战略协同，借助资本市场平\n台强化其在新能源电池自动化装备领域的核心竞争力与市场影响力，加快嘉拓智能向智能化、集\n成化、国际化装备解决方案提供商转型升级。\n（6）提升数字化管理水平，加强人工智能技术在集团及各子公司的应用，推动 AI 应用从办\n公系统到生产前沿的普及，探索利用 AI 技术重塑办公、研发、生产、安全等业务流程，深化精益\n生产与管理，促进从办公效能到生产效率的全面提升。\n(四)可能面对的风险\n√适用 □不适用\n1、宏观经济与市场波动的风险\n全球宏观经济存在不确定性，若未来出现经济增长放缓和市场需求下滑，将影响整个新能源\n电池行业的发展，进而可能对公司的经营业绩和财务状况产生不利影响。\n2、市场竞争加剧的风险\n在全球各国推进绿色低碳经济转型的背景下，发展以新能源汽车、新型储能为代表的锂电池\n行业成为新的市场趋势，市场需求快速扩张，动力电池厂商与上游供应链企业纷纷大幅提升产能，\n存在市场竞争加剧的风险。若下游整车厂商持续向上游传递成本压力，导致新能源电池材料售价\n进一步下降，将对公司盈利水平造成不利影响。\n3、原材料价格上涨的风险\n公司负极材料原材料包括焦类、初级石墨、沥青等，涂覆隔膜生产所需原材料包括隔膜基膜、\n陶瓷材料、氧化铝和氢氧化铝等，锂电设备业务原材料钢材、机加工件等。报告期内，公司产品\n部分原材料价格有所上涨，若公司不能通过自身工艺技术创新降低成本或将原材料价格和委外加\n工价格上涨压力转移给下游，则公司经营业绩可能受到不利影响。\n4、产品升级和新兴技术路线替代风险\n由于对能量密度、安全性、快充等更高性能电池技术的追求，全球知名的车企、电池企业、材料\n企业、研究机构纷纷加大对新技术路线的研究开发。若新型电池性能大幅优于锂离子电池，或其他\n新兴技术路线快速成熟，能够快速实现商业化，而公司不能快速对公司产品进行升级或者研发进",
+          "page_text_hash": "4fa9c93bb385afbf3e838a915bed29bb5e09e92b412c7a5460590e2879b0fad4"
+        }
+      ],
+      "disposition": "accepted_for_review",
+      "quantity": null,
+      "mapping_status": "pending",
+      "commodity_id": null
+    },
+    {
+      "sample_id": "manufacturing-materials-603659-2025",
+      "record_id": "manufacturing-materials-603659-2025:material:钢材",
+      "field_id": "material_input",
+      "chapter_task": "extract_material_inputs",
+      "relation_type": "material_input",
+      "role": "raw_material_input",
+      "source_native_name": "钢材",
+      "object_name": "钢材",
+      "report": {
+        "instrument_id": "603659.SH",
+        "report_id": "asset_50c70429093f66b34fc57ad8f896fcee",
+        "document_version": "ver_c867a6a692048e88fd9cb80473fbf908",
+        "report_period": "2025-12-31",
+        "published_at": "2026-03-05T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "reported_period": "2025-12-31",
+      "period_type": "duration",
+      "subject_scope": "consolidated_group",
+      "subject_basis": "direct_source_wording",
+      "assertion_class": "reported_fact",
+      "evidence": [
+        {
+          "binding_status": "bound",
+          "evidence_id": "stage5-evidence-016a3ae537b5d97b80e3769a",
+          "chapter_task": "extract_material_inputs",
+          "instrument_id": "603659.SH",
+          "report_id": "asset_50c70429093f66b34fc57ad8f896fcee",
+          "document_version": "ver_c867a6a692048e88fd9cb80473fbf908",
+          "page": 33,
+          "section_title": "原材料价格上涨的风险",
+          "bounded_quote": "营机制，\n充分保障其自主经营活力和团队创新能力，深化与集团内材料业务的战略协同，借助资本市场平\n台强化其在新能源电池自动化装备领域的核心竞争力与市场影响力，加快嘉拓智能向智能化、集\n成化、国际化装备解决方案提供商转型升级。\n（6）提升数字化管理水平，加强人工智能技术在集团及各子公司的应用，推动 AI 应用从办\n公系统到生产前沿的普及，探索利用 AI 技术重塑办公、研发、生产、安全等业务流程，深化精益\n生产与管理，促进从办公效能到生产效率的全面提升。\n(四)可能面对的风险\n√适用 □不适用\n1、宏观经济与市场波动的风险\n全球宏观经济存在不确定性，若未来出现经济增长放缓和市场需求下滑，将影响整个新能源\n电池行业的发展，进而可能对公司的经营业绩和财务状况产生不利影响。\n2、市场竞争加剧的风险\n在全球各国推进绿色低碳经济转型的背景下，发展以新能源汽车、新型储能为代表的锂电池\n行业成为新的市场趋势，市场需求快速扩张，动力电池厂商与上游供应链企业纷纷大幅提升产能，\n存在市场竞争加剧的风险。若下游整车厂商持续向上游传递成本压力，导致新能源电池材料售价\n进一步下降，将对公司盈利水平造成不利影响。\n3、原材料价格上涨的风险\n公司负极材料原材料包括焦类、初级石墨、沥青等，涂覆隔膜生产所需原材料包括隔膜基膜、\n陶瓷材料、氧化铝和氢氧化铝等，锂电设备业务原材料钢材、机加工件等。报告期内，公司产品\n部分原材料价格有所上涨，若公司不能通过自身工艺技术创新降低成本或将原材料价格和委外加\n工价格上涨压力转移给下游，则公司经营业绩可能受到不利影响。\n4、产品升级和新兴技术路线替代风险\n由于对能量密度、安全性、快充等更高性能电池技术的追求，全球知名的车企、电池企业、材料\n企业、研究机构纷纷加大对新技术路线的研究开发。若新型电池性能大幅优于锂离子电池，或其他\n新兴技术路线快速成熟，能够快速实现商业化，而公司不能快速对公司产品进行升级或者研发进",
+          "page_text_hash": "4fa9c93bb385afbf3e838a915bed29bb5e09e92b412c7a5460590e2879b0fad4"
+        }
+      ],
+      "disposition": "accepted_for_review",
+      "quantity": null,
+      "mapping_status": "ambiguous",
+      "commodity_id": null
+    },
+    {
+      "sample_id": "manufacturing-materials-603659-2025",
+      "record_id": "manufacturing-materials-603659-2025:material:机加工件",
+      "field_id": "material_input",
+      "chapter_task": "extract_material_inputs",
+      "relation_type": "material_input",
+      "role": "raw_material_input",
+      "source_native_name": "机加工件",
+      "object_name": "机加工件",
+      "report": {
+        "instrument_id": "603659.SH",
+        "report_id": "asset_50c70429093f66b34fc57ad8f896fcee",
+        "document_version": "ver_c867a6a692048e88fd9cb80473fbf908",
+        "report_period": "2025-12-31",
+        "published_at": "2026-03-05T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "reported_period": "2025-12-31",
+      "period_type": "duration",
+      "subject_scope": "consolidated_group",
+      "subject_basis": "direct_source_wording",
+      "assertion_class": "reported_fact",
+      "evidence": [
+        {
+          "binding_status": "bound",
+          "evidence_id": "stage5-evidence-016a3ae537b5d97b80e3769a",
+          "chapter_task": "extract_material_inputs",
+          "instrument_id": "603659.SH",
+          "report_id": "asset_50c70429093f66b34fc57ad8f896fcee",
+          "document_version": "ver_c867a6a692048e88fd9cb80473fbf908",
+          "page": 33,
+          "section_title": "原材料价格上涨的风险",
+          "bounded_quote": "营机制，\n充分保障其自主经营活力和团队创新能力，深化与集团内材料业务的战略协同，借助资本市场平\n台强化其在新能源电池自动化装备领域的核心竞争力与市场影响力，加快嘉拓智能向智能化、集\n成化、国际化装备解决方案提供商转型升级。\n（6）提升数字化管理水平，加强人工智能技术在集团及各子公司的应用，推动 AI 应用从办\n公系统到生产前沿的普及，探索利用 AI 技术重塑办公、研发、生产、安全等业务流程，深化精益\n生产与管理，促进从办公效能到生产效率的全面提升。\n(四)可能面对的风险\n√适用 □不适用\n1、宏观经济与市场波动的风险\n全球宏观经济存在不确定性，若未来出现经济增长放缓和市场需求下滑，将影响整个新能源\n电池行业的发展，进而可能对公司的经营业绩和财务状况产生不利影响。\n2、市场竞争加剧的风险\n在全球各国推进绿色低碳经济转型的背景下，发展以新能源汽车、新型储能为代表的锂电池\n行业成为新的市场趋势，市场需求快速扩张，动力电池厂商与上游供应链企业纷纷大幅提升产能，\n存在市场竞争加剧的风险。若下游整车厂商持续向上游传递成本压力，导致新能源电池材料售价\n进一步下降，将对公司盈利水平造成不利影响。\n3、原材料价格上涨的风险\n公司负极材料原材料包括焦类、初级石墨、沥青等，涂覆隔膜生产所需原材料包括隔膜基膜、\n陶瓷材料、氧化铝和氢氧化铝等，锂电设备业务原材料钢材、机加工件等。报告期内，公司产品\n部分原材料价格有所上涨，若公司不能通过自身工艺技术创新降低成本或将原材料价格和委外加\n工价格上涨压力转移给下游，则公司经营业绩可能受到不利影响。\n4、产品升级和新兴技术路线替代风险\n由于对能量密度、安全性、快充等更高性能电池技术的追求，全球知名的车企、电池企业、材料\n企业、研究机构纷纷加大对新技术路线的研究开发。若新型电池性能大幅优于锂离子电池，或其他\n新兴技术路线快速成熟，能够快速实现商业化，而公司不能快速对公司产品进行升级或者研发进",
+          "page_text_hash": "4fa9c93bb385afbf3e838a915bed29bb5e09e92b412c7a5460590e2879b0fad4"
+        }
+      ],
+      "disposition": "accepted_for_review",
+      "quantity": null,
+      "mapping_status": "pending",
+      "commodity_id": null
+    },
+    {
+      "sample_id": "manufacturing-materials-920015-2025",
+      "record_id": "manufacturing-materials-920015-2025:material:丁酮",
+      "field_id": "material_input",
+      "chapter_task": "extract_material_inputs",
+      "relation_type": "material_input",
+      "role": "raw_material_input",
+      "source_native_name": "丁酮",
+      "object_name": "丁酮",
+      "report": {
+        "instrument_id": "920015.BJ",
+        "report_id": "asset_b87f1d1a48e662dae376c540cd021f69",
+        "document_version": "ver_cfdbd2d058af825b1fc39f494d7a9bd3",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-22T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "reported_period": "2025-12-31",
+      "period_type": "duration",
+      "subject_scope": "consolidated_group",
+      "subject_basis": "direct_source_wording",
+      "assertion_class": "reported_fact",
+      "evidence": [
+        {
+          "binding_status": "bound",
+          "evidence_id": "stage5-evidence-e3d1727b1bba30268a08d26f",
+          "chapter_task": "extract_material_inputs",
+          "instrument_id": "920015.BJ",
+          "report_id": "asset_b87f1d1a48e662dae376c540cd021f69",
+          "document_version": "ver_cfdbd2d058af825b1fc39f494d7a9bd3",
+          "page": 26,
+          "section_title": "原材料价格上涨风险",
+          "bounded_quote": "称 公司持续到本年度的风险和应对措施 \n宏 观 经 济 波\n动 及 市 场 需\n求 下 降 的 风\n险 \n公司主要从事酮肟系列精细化学品的研发、生产和销售，产品主要用于生产有机硅密\n封胶和胶粘剂、农药、医药、 金属萃取剂、离子交换树脂和环保型染料等的关键原料。\n公司业务发展与下游的建筑建材、 光伏和风电等能源电力、 电子、 新能源汽车、 农药、\n医药、金属萃取剂、离子交换树脂和环保型染料等行业发展状况密切相关，受行业产\n能和下游需求影响较大， 具有一定的行业周期性波动特点。 若宏观经济出现不利变化，\n或客户所处行业及其下游行业景气度降低，将可能导致公司产品的市场需求下降，进\n而对公司经营业绩造成不利影响。 \n应对措施：发挥公司产业链完整、多产品经营、产业链协同效应的优势，强化精益管\n理，提升运营管理水平，创新市场开拓，提质增效，降本增效；利用“四新”技术，\n持续提高产品竞争能力； 坚持走新型工业化道路， 加快转型升级步伐， 优化产品结构，\n延伸产业链， 提升高端化、精细化、 高附加价值产品比重， 推进基础产品原料化进程，\n避免同质化过度竞争。 \n原 材 料 价 格\n上涨风险 \n公司产品主要原材料为丁酮、双氧水、液氨、一甲基三氯硅烷、乙烯基三氯硅烷、乙\n醛等，主要原材料采购价格的变化是影响公司利润的重要因素。受国内经济形势、市\n场供求变动等因素的影响， 报告期内公司主要原材料的平均采购价格呈现一定的波动。\n如果未来公司主要原材料的平均采购价格出现大幅上涨，而公司主要产品的销售价格\n无法同步提升，可能会对公司经营业绩造成不利影响。 \n应对措施： 加强市场信息收集与分析， 全方位收集原材料价格市场信息， 密切关注市\n场动态，为决策提供准确的数据支持；优化库存管理，狠抓原材料市场波动机遇；结\n合公司生产、销售计划，公司制定中长期采购计划，确保原材料供应的稳定性和合理\n性； 持续保持与现有优质供应商的稳定合作， 确保原材料的质量和供应稳定性;深化目\n标成本管理，推进生产装置数字化改造，实施对标管理、资源再利用，降低物耗、能\n耗。 \n安 全 生 产 风\n险 \n公司羟胺盐、乙醛肟等部分产品及丁酮、液氨等部分原材料属于危险化学品，在其运\n输、存储和使用过程中存在安全风险。尽管公司现有生产设备和安全设施运行良好，\n但公司仍存在因管理疏忽、操作不当、自然灾害等原因而造成安全事故或受到相关处\n罚的可能，从而对公司的正常生产经营带来不利影响。 \n应对措施： 继续坚持“安全第一， 预防为主、 综合治理”和“以人为本”的经营方针，\n树立底线管理思维，建立和完善质量、环境、职业健康安全卫生一体化管理体系，严\n格执行企业标准体系，积极推进数智化改革，提升装置本质安全水平，深化杜邦安全\n管理体系建设，加强危险源、环保因子的识别与控制，建立健全事故预案、应急处理\n机制，加强员工队伍建设，提升职业养和责任意识，科学管理、严格管理，实行从项\n目建设到生产销售的全过程风险控制。 \n毛 利 率 波 动\n风险 \n由于公司主要产品硅烷交联剂、羟胺盐、甲氧胺盐酸盐、乙醛肟等下游应用领域较为\n广泛，各细分产品下游市场需求的变化将导致公司产品销售价格的变化，部分产品的",
+          "page_text_hash": "e79ac6c44dd9cdc770fcc10476a4252cc54dd94b0aee96cca3850a12da0f921a"
+        }
+      ],
+      "disposition": "accepted_for_review",
+      "quantity": null,
+      "mapping_status": "pending",
+      "commodity_id": null
+    },
+    {
+      "sample_id": "manufacturing-materials-920015-2025",
+      "record_id": "manufacturing-materials-920015-2025:material:双氧水",
+      "field_id": "material_input",
+      "chapter_task": "extract_material_inputs",
+      "relation_type": "material_input",
+      "role": "raw_material_input",
+      "source_native_name": "双氧水",
+      "object_name": "双氧水",
+      "report": {
+        "instrument_id": "920015.BJ",
+        "report_id": "asset_b87f1d1a48e662dae376c540cd021f69",
+        "document_version": "ver_cfdbd2d058af825b1fc39f494d7a9bd3",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-22T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "reported_period": "2025-12-31",
+      "period_type": "duration",
+      "subject_scope": "consolidated_group",
+      "subject_basis": "direct_source_wording",
+      "assertion_class": "reported_fact",
+      "evidence": [
+        {
+          "binding_status": "bound",
+          "evidence_id": "stage5-evidence-e3d1727b1bba30268a08d26f",
+          "chapter_task": "extract_material_inputs",
+          "instrument_id": "920015.BJ",
+          "report_id": "asset_b87f1d1a48e662dae376c540cd021f69",
+          "document_version": "ver_cfdbd2d058af825b1fc39f494d7a9bd3",
+          "page": 26,
+          "section_title": "原材料价格上涨风险",
+          "bounded_quote": "称 公司持续到本年度的风险和应对措施 \n宏 观 经 济 波\n动 及 市 场 需\n求 下 降 的 风\n险 \n公司主要从事酮肟系列精细化学品的研发、生产和销售，产品主要用于生产有机硅密\n封胶和胶粘剂、农药、医药、 金属萃取剂、离子交换树脂和环保型染料等的关键原料。\n公司业务发展与下游的建筑建材、 光伏和风电等能源电力、 电子、 新能源汽车、 农药、\n医药、金属萃取剂、离子交换树脂和环保型染料等行业发展状况密切相关，受行业产\n能和下游需求影响较大， 具有一定的行业周期性波动特点。 若宏观经济出现不利变化，\n或客户所处行业及其下游行业景气度降低，将可能导致公司产品的市场需求下降，进\n而对公司经营业绩造成不利影响。 \n应对措施：发挥公司产业链完整、多产品经营、产业链协同效应的优势，强化精益管\n理，提升运营管理水平，创新市场开拓，提质增效，降本增效；利用“四新”技术，\n持续提高产品竞争能力； 坚持走新型工业化道路， 加快转型升级步伐， 优化产品结构，\n延伸产业链， 提升高端化、精细化、 高附加价值产品比重， 推进基础产品原料化进程，\n避免同质化过度竞争。 \n原 材 料 价 格\n上涨风险 \n公司产品主要原材料为丁酮、双氧水、液氨、一甲基三氯硅烷、乙烯基三氯硅烷、乙\n醛等，主要原材料采购价格的变化是影响公司利润的重要因素。受国内经济形势、市\n场供求变动等因素的影响， 报告期内公司主要原材料的平均采购价格呈现一定的波动。\n如果未来公司主要原材料的平均采购价格出现大幅上涨，而公司主要产品的销售价格\n无法同步提升，可能会对公司经营业绩造成不利影响。 \n应对措施： 加强市场信息收集与分析， 全方位收集原材料价格市场信息， 密切关注市\n场动态，为决策提供准确的数据支持；优化库存管理，狠抓原材料市场波动机遇；结\n合公司生产、销售计划，公司制定中长期采购计划，确保原材料供应的稳定性和合理\n性； 持续保持与现有优质供应商的稳定合作， 确保原材料的质量和供应稳定性;深化目\n标成本管理，推进生产装置数字化改造，实施对标管理、资源再利用，降低物耗、能\n耗。 \n安 全 生 产 风\n险 \n公司羟胺盐、乙醛肟等部分产品及丁酮、液氨等部分原材料属于危险化学品，在其运\n输、存储和使用过程中存在安全风险。尽管公司现有生产设备和安全设施运行良好，\n但公司仍存在因管理疏忽、操作不当、自然灾害等原因而造成安全事故或受到相关处\n罚的可能，从而对公司的正常生产经营带来不利影响。 \n应对措施： 继续坚持“安全第一， 预防为主、 综合治理”和“以人为本”的经营方针，\n树立底线管理思维，建立和完善质量、环境、职业健康安全卫生一体化管理体系，严\n格执行企业标准体系，积极推进数智化改革，提升装置本质安全水平，深化杜邦安全\n管理体系建设，加强危险源、环保因子的识别与控制，建立健全事故预案、应急处理\n机制，加强员工队伍建设，提升职业养和责任意识，科学管理、严格管理，实行从项\n目建设到生产销售的全过程风险控制。 \n毛 利 率 波 动\n风险 \n由于公司主要产品硅烷交联剂、羟胺盐、甲氧胺盐酸盐、乙醛肟等下游应用领域较为\n广泛，各细分产品下游市场需求的变化将导致公司产品销售价格的变化，部分产品的",
+          "page_text_hash": "e79ac6c44dd9cdc770fcc10476a4252cc54dd94b0aee96cca3850a12da0f921a"
+        }
+      ],
+      "disposition": "accepted_for_review",
+      "quantity": null,
+      "mapping_status": "pending",
+      "commodity_id": null
+    },
+    {
+      "sample_id": "manufacturing-materials-920015-2025",
+      "record_id": "manufacturing-materials-920015-2025:material:液氨",
+      "field_id": "material_input",
+      "chapter_task": "extract_material_inputs",
+      "relation_type": "material_input",
+      "role": "raw_material_input",
+      "source_native_name": "液氨",
+      "object_name": "液氨",
+      "report": {
+        "instrument_id": "920015.BJ",
+        "report_id": "asset_b87f1d1a48e662dae376c540cd021f69",
+        "document_version": "ver_cfdbd2d058af825b1fc39f494d7a9bd3",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-22T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "reported_period": "2025-12-31",
+      "period_type": "duration",
+      "subject_scope": "consolidated_group",
+      "subject_basis": "direct_source_wording",
+      "assertion_class": "reported_fact",
+      "evidence": [
+        {
+          "binding_status": "bound",
+          "evidence_id": "stage5-evidence-e3d1727b1bba30268a08d26f",
+          "chapter_task": "extract_material_inputs",
+          "instrument_id": "920015.BJ",
+          "report_id": "asset_b87f1d1a48e662dae376c540cd021f69",
+          "document_version": "ver_cfdbd2d058af825b1fc39f494d7a9bd3",
+          "page": 26,
+          "section_title": "原材料价格上涨风险",
+          "bounded_quote": "称 公司持续到本年度的风险和应对措施 \n宏 观 经 济 波\n动 及 市 场 需\n求 下 降 的 风\n险 \n公司主要从事酮肟系列精细化学品的研发、生产和销售，产品主要用于生产有机硅密\n封胶和胶粘剂、农药、医药、 金属萃取剂、离子交换树脂和环保型染料等的关键原料。\n公司业务发展与下游的建筑建材、 光伏和风电等能源电力、 电子、 新能源汽车、 农药、\n医药、金属萃取剂、离子交换树脂和环保型染料等行业发展状况密切相关，受行业产\n能和下游需求影响较大， 具有一定的行业周期性波动特点。 若宏观经济出现不利变化，\n或客户所处行业及其下游行业景气度降低，将可能导致公司产品的市场需求下降，进\n而对公司经营业绩造成不利影响。 \n应对措施：发挥公司产业链完整、多产品经营、产业链协同效应的优势，强化精益管\n理，提升运营管理水平，创新市场开拓，提质增效，降本增效；利用“四新”技术，\n持续提高产品竞争能力； 坚持走新型工业化道路， 加快转型升级步伐， 优化产品结构，\n延伸产业链， 提升高端化、精细化、 高附加价值产品比重， 推进基础产品原料化进程，\n避免同质化过度竞争。 \n原 材 料 价 格\n上涨风险 \n公司产品主要原材料为丁酮、双氧水、液氨、一甲基三氯硅烷、乙烯基三氯硅烷、乙\n醛等，主要原材料采购价格的变化是影响公司利润的重要因素。受国内经济形势、市\n场供求变动等因素的影响， 报告期内公司主要原材料的平均采购价格呈现一定的波动。\n如果未来公司主要原材料的平均采购价格出现大幅上涨，而公司主要产品的销售价格\n无法同步提升，可能会对公司经营业绩造成不利影响。 \n应对措施： 加强市场信息收集与分析， 全方位收集原材料价格市场信息， 密切关注市\n场动态，为决策提供准确的数据支持；优化库存管理，狠抓原材料市场波动机遇；结\n合公司生产、销售计划，公司制定中长期采购计划，确保原材料供应的稳定性和合理\n性； 持续保持与现有优质供应商的稳定合作， 确保原材料的质量和供应稳定性;深化目\n标成本管理，推进生产装置数字化改造，实施对标管理、资源再利用，降低物耗、能\n耗。 \n安 全 生 产 风\n险 \n公司羟胺盐、乙醛肟等部分产品及丁酮、液氨等部分原材料属于危险化学品，在其运\n输、存储和使用过程中存在安全风险。尽管公司现有生产设备和安全设施运行良好，\n但公司仍存在因管理疏忽、操作不当、自然灾害等原因而造成安全事故或受到相关处\n罚的可能，从而对公司的正常生产经营带来不利影响。 \n应对措施： 继续坚持“安全第一， 预防为主、 综合治理”和“以人为本”的经营方针，\n树立底线管理思维，建立和完善质量、环境、职业健康安全卫生一体化管理体系，严\n格执行企业标准体系，积极推进数智化改革，提升装置本质安全水平，深化杜邦安全\n管理体系建设，加强危险源、环保因子的识别与控制，建立健全事故预案、应急处理\n机制，加强员工队伍建设，提升职业养和责任意识，科学管理、严格管理，实行从项\n目建设到生产销售的全过程风险控制。 \n毛 利 率 波 动\n风险 \n由于公司主要产品硅烷交联剂、羟胺盐、甲氧胺盐酸盐、乙醛肟等下游应用领域较为\n广泛，各细分产品下游市场需求的变化将导致公司产品销售价格的变化，部分产品的",
+          "page_text_hash": "e79ac6c44dd9cdc770fcc10476a4252cc54dd94b0aee96cca3850a12da0f921a"
+        }
+      ],
+      "disposition": "accepted_for_review",
+      "quantity": null,
+      "mapping_status": "pending",
+      "commodity_id": null
+    },
+    {
+      "sample_id": "manufacturing-materials-920015-2025",
+      "record_id": "manufacturing-materials-920015-2025:material:一甲基三氯硅烷",
+      "field_id": "material_input",
+      "chapter_task": "extract_material_inputs",
+      "relation_type": "material_input",
+      "role": "raw_material_input",
+      "source_native_name": "一甲基三氯硅烷",
+      "object_name": "一甲基三氯硅烷",
+      "report": {
+        "instrument_id": "920015.BJ",
+        "report_id": "asset_b87f1d1a48e662dae376c540cd021f69",
+        "document_version": "ver_cfdbd2d058af825b1fc39f494d7a9bd3",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-22T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "reported_period": "2025-12-31",
+      "period_type": "duration",
+      "subject_scope": "consolidated_group",
+      "subject_basis": "direct_source_wording",
+      "assertion_class": "reported_fact",
+      "evidence": [
+        {
+          "binding_status": "bound",
+          "evidence_id": "stage5-evidence-e3d1727b1bba30268a08d26f",
+          "chapter_task": "extract_material_inputs",
+          "instrument_id": "920015.BJ",
+          "report_id": "asset_b87f1d1a48e662dae376c540cd021f69",
+          "document_version": "ver_cfdbd2d058af825b1fc39f494d7a9bd3",
+          "page": 26,
+          "section_title": "原材料价格上涨风险",
+          "bounded_quote": "称 公司持续到本年度的风险和应对措施 \n宏 观 经 济 波\n动 及 市 场 需\n求 下 降 的 风\n险 \n公司主要从事酮肟系列精细化学品的研发、生产和销售，产品主要用于生产有机硅密\n封胶和胶粘剂、农药、医药、 金属萃取剂、离子交换树脂和环保型染料等的关键原料。\n公司业务发展与下游的建筑建材、 光伏和风电等能源电力、 电子、 新能源汽车、 农药、\n医药、金属萃取剂、离子交换树脂和环保型染料等行业发展状况密切相关，受行业产\n能和下游需求影响较大， 具有一定的行业周期性波动特点。 若宏观经济出现不利变化，\n或客户所处行业及其下游行业景气度降低，将可能导致公司产品的市场需求下降，进\n而对公司经营业绩造成不利影响。 \n应对措施：发挥公司产业链完整、多产品经营、产业链协同效应的优势，强化精益管\n理，提升运营管理水平，创新市场开拓，提质增效，降本增效；利用“四新”技术，\n持续提高产品竞争能力； 坚持走新型工业化道路， 加快转型升级步伐， 优化产品结构，\n延伸产业链， 提升高端化、精细化、 高附加价值产品比重， 推进基础产品原料化进程，\n避免同质化过度竞争。 \n原 材 料 价 格\n上涨风险 \n公司产品主要原材料为丁酮、双氧水、液氨、一甲基三氯硅烷、乙烯基三氯硅烷、乙\n醛等，主要原材料采购价格的变化是影响公司利润的重要因素。受国内经济形势、市\n场供求变动等因素的影响， 报告期内公司主要原材料的平均采购价格呈现一定的波动。\n如果未来公司主要原材料的平均采购价格出现大幅上涨，而公司主要产品的销售价格\n无法同步提升，可能会对公司经营业绩造成不利影响。 \n应对措施： 加强市场信息收集与分析， 全方位收集原材料价格市场信息， 密切关注市\n场动态，为决策提供准确的数据支持；优化库存管理，狠抓原材料市场波动机遇；结\n合公司生产、销售计划，公司制定中长期采购计划，确保原材料供应的稳定性和合理\n性； 持续保持与现有优质供应商的稳定合作， 确保原材料的质量和供应稳定性;深化目\n标成本管理，推进生产装置数字化改造，实施对标管理、资源再利用，降低物耗、能\n耗。 \n安 全 生 产 风\n险 \n公司羟胺盐、乙醛肟等部分产品及丁酮、液氨等部分原材料属于危险化学品，在其运\n输、存储和使用过程中存在安全风险。尽管公司现有生产设备和安全设施运行良好，\n但公司仍存在因管理疏忽、操作不当、自然灾害等原因而造成安全事故或受到相关处\n罚的可能，从而对公司的正常生产经营带来不利影响。 \n应对措施： 继续坚持“安全第一， 预防为主、 综合治理”和“以人为本”的经营方针，\n树立底线管理思维，建立和完善质量、环境、职业健康安全卫生一体化管理体系，严\n格执行企业标准体系，积极推进数智化改革，提升装置本质安全水平，深化杜邦安全\n管理体系建设，加强危险源、环保因子的识别与控制，建立健全事故预案、应急处理\n机制，加强员工队伍建设，提升职业养和责任意识，科学管理、严格管理，实行从项\n目建设到生产销售的全过程风险控制。 \n毛 利 率 波 动\n风险 \n由于公司主要产品硅烷交联剂、羟胺盐、甲氧胺盐酸盐、乙醛肟等下游应用领域较为\n广泛，各细分产品下游市场需求的变化将导致公司产品销售价格的变化，部分产品的",
+          "page_text_hash": "e79ac6c44dd9cdc770fcc10476a4252cc54dd94b0aee96cca3850a12da0f921a"
+        }
+      ],
+      "disposition": "accepted_for_review",
+      "quantity": null,
+      "mapping_status": "pending",
+      "commodity_id": null
+    },
+    {
+      "sample_id": "manufacturing-materials-920015-2025",
+      "record_id": "manufacturing-materials-920015-2025:material:乙烯基三氯硅烷",
+      "field_id": "material_input",
+      "chapter_task": "extract_material_inputs",
+      "relation_type": "material_input",
+      "role": "raw_material_input",
+      "source_native_name": "乙烯基三氯硅烷",
+      "object_name": "乙烯基三氯硅烷",
+      "report": {
+        "instrument_id": "920015.BJ",
+        "report_id": "asset_b87f1d1a48e662dae376c540cd021f69",
+        "document_version": "ver_cfdbd2d058af825b1fc39f494d7a9bd3",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-22T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "reported_period": "2025-12-31",
+      "period_type": "duration",
+      "subject_scope": "consolidated_group",
+      "subject_basis": "direct_source_wording",
+      "assertion_class": "reported_fact",
+      "evidence": [
+        {
+          "binding_status": "bound",
+          "evidence_id": "stage5-evidence-e3d1727b1bba30268a08d26f",
+          "chapter_task": "extract_material_inputs",
+          "instrument_id": "920015.BJ",
+          "report_id": "asset_b87f1d1a48e662dae376c540cd021f69",
+          "document_version": "ver_cfdbd2d058af825b1fc39f494d7a9bd3",
+          "page": 26,
+          "section_title": "原材料价格上涨风险",
+          "bounded_quote": "称 公司持续到本年度的风险和应对措施 \n宏 观 经 济 波\n动 及 市 场 需\n求 下 降 的 风\n险 \n公司主要从事酮肟系列精细化学品的研发、生产和销售，产品主要用于生产有机硅密\n封胶和胶粘剂、农药、医药、 金属萃取剂、离子交换树脂和环保型染料等的关键原料。\n公司业务发展与下游的建筑建材、 光伏和风电等能源电力、 电子、 新能源汽车、 农药、\n医药、金属萃取剂、离子交换树脂和环保型染料等行业发展状况密切相关，受行业产\n能和下游需求影响较大， 具有一定的行业周期性波动特点。 若宏观经济出现不利变化，\n或客户所处行业及其下游行业景气度降低，将可能导致公司产品的市场需求下降，进\n而对公司经营业绩造成不利影响。 \n应对措施：发挥公司产业链完整、多产品经营、产业链协同效应的优势，强化精益管\n理，提升运营管理水平，创新市场开拓，提质增效，降本增效；利用“四新”技术，\n持续提高产品竞争能力； 坚持走新型工业化道路， 加快转型升级步伐， 优化产品结构，\n延伸产业链， 提升高端化、精细化、 高附加价值产品比重， 推进基础产品原料化进程，\n避免同质化过度竞争。 \n原 材 料 价 格\n上涨风险 \n公司产品主要原材料为丁酮、双氧水、液氨、一甲基三氯硅烷、乙烯基三氯硅烷、乙\n醛等，主要原材料采购价格的变化是影响公司利润的重要因素。受国内经济形势、市\n场供求变动等因素的影响， 报告期内公司主要原材料的平均采购价格呈现一定的波动。\n如果未来公司主要原材料的平均采购价格出现大幅上涨，而公司主要产品的销售价格\n无法同步提升，可能会对公司经营业绩造成不利影响。 \n应对措施： 加强市场信息收集与分析， 全方位收集原材料价格市场信息， 密切关注市\n场动态，为决策提供准确的数据支持；优化库存管理，狠抓原材料市场波动机遇；结\n合公司生产、销售计划，公司制定中长期采购计划，确保原材料供应的稳定性和合理\n性； 持续保持与现有优质供应商的稳定合作， 确保原材料的质量和供应稳定性;深化目\n标成本管理，推进生产装置数字化改造，实施对标管理、资源再利用，降低物耗、能\n耗。 \n安 全 生 产 风\n险 \n公司羟胺盐、乙醛肟等部分产品及丁酮、液氨等部分原材料属于危险化学品，在其运\n输、存储和使用过程中存在安全风险。尽管公司现有生产设备和安全设施运行良好，\n但公司仍存在因管理疏忽、操作不当、自然灾害等原因而造成安全事故或受到相关处\n罚的可能，从而对公司的正常生产经营带来不利影响。 \n应对措施： 继续坚持“安全第一， 预防为主、 综合治理”和“以人为本”的经营方针，\n树立底线管理思维，建立和完善质量、环境、职业健康安全卫生一体化管理体系，严\n格执行企业标准体系，积极推进数智化改革，提升装置本质安全水平，深化杜邦安全\n管理体系建设，加强危险源、环保因子的识别与控制，建立健全事故预案、应急处理\n机制，加强员工队伍建设，提升职业养和责任意识，科学管理、严格管理，实行从项\n目建设到生产销售的全过程风险控制。 \n毛 利 率 波 动\n风险 \n由于公司主要产品硅烷交联剂、羟胺盐、甲氧胺盐酸盐、乙醛肟等下游应用领域较为\n广泛，各细分产品下游市场需求的变化将导致公司产品销售价格的变化，部分产品的",
+          "page_text_hash": "e79ac6c44dd9cdc770fcc10476a4252cc54dd94b0aee96cca3850a12da0f921a"
+        }
+      ],
+      "disposition": "accepted_for_review",
+      "quantity": null,
+      "mapping_status": "pending",
+      "commodity_id": null
+    },
+    {
+      "sample_id": "manufacturing-materials-920015-2025",
+      "record_id": "manufacturing-materials-920015-2025:material:乙醛",
+      "field_id": "material_input",
+      "chapter_task": "extract_material_inputs",
+      "relation_type": "material_input",
+      "role": "raw_material_input",
+      "source_native_name": "乙醛",
+      "object_name": "乙醛",
+      "report": {
+        "instrument_id": "920015.BJ",
+        "report_id": "asset_b87f1d1a48e662dae376c540cd021f69",
+        "document_version": "ver_cfdbd2d058af825b1fc39f494d7a9bd3",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-22T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "reported_period": "2025-12-31",
+      "period_type": "duration",
+      "subject_scope": "consolidated_group",
+      "subject_basis": "direct_source_wording",
+      "assertion_class": "reported_fact",
+      "evidence": [
+        {
+          "binding_status": "bound",
+          "evidence_id": "stage5-evidence-e3d1727b1bba30268a08d26f",
+          "chapter_task": "extract_material_inputs",
+          "instrument_id": "920015.BJ",
+          "report_id": "asset_b87f1d1a48e662dae376c540cd021f69",
+          "document_version": "ver_cfdbd2d058af825b1fc39f494d7a9bd3",
+          "page": 26,
+          "section_title": "原材料价格上涨风险",
+          "bounded_quote": "称 公司持续到本年度的风险和应对措施 \n宏 观 经 济 波\n动 及 市 场 需\n求 下 降 的 风\n险 \n公司主要从事酮肟系列精细化学品的研发、生产和销售，产品主要用于生产有机硅密\n封胶和胶粘剂、农药、医药、 金属萃取剂、离子交换树脂和环保型染料等的关键原料。\n公司业务发展与下游的建筑建材、 光伏和风电等能源电力、 电子、 新能源汽车、 农药、\n医药、金属萃取剂、离子交换树脂和环保型染料等行业发展状况密切相关，受行业产\n能和下游需求影响较大， 具有一定的行业周期性波动特点。 若宏观经济出现不利变化，\n或客户所处行业及其下游行业景气度降低，将可能导致公司产品的市场需求下降，进\n而对公司经营业绩造成不利影响。 \n应对措施：发挥公司产业链完整、多产品经营、产业链协同效应的优势，强化精益管\n理，提升运营管理水平，创新市场开拓，提质增效，降本增效；利用“四新”技术，\n持续提高产品竞争能力； 坚持走新型工业化道路， 加快转型升级步伐， 优化产品结构，\n延伸产业链， 提升高端化、精细化、 高附加价值产品比重， 推进基础产品原料化进程，\n避免同质化过度竞争。 \n原 材 料 价 格\n上涨风险 \n公司产品主要原材料为丁酮、双氧水、液氨、一甲基三氯硅烷、乙烯基三氯硅烷、乙\n醛等，主要原材料采购价格的变化是影响公司利润的重要因素。受国内经济形势、市\n场供求变动等因素的影响， 报告期内公司主要原材料的平均采购价格呈现一定的波动。\n如果未来公司主要原材料的平均采购价格出现大幅上涨，而公司主要产品的销售价格\n无法同步提升，可能会对公司经营业绩造成不利影响。 \n应对措施： 加强市场信息收集与分析， 全方位收集原材料价格市场信息， 密切关注市\n场动态，为决策提供准确的数据支持；优化库存管理，狠抓原材料市场波动机遇；结\n合公司生产、销售计划，公司制定中长期采购计划，确保原材料供应的稳定性和合理\n性； 持续保持与现有优质供应商的稳定合作， 确保原材料的质量和供应稳定性;深化目\n标成本管理，推进生产装置数字化改造，实施对标管理、资源再利用，降低物耗、能\n耗。 \n安 全 生 产 风\n险 \n公司羟胺盐、乙醛肟等部分产品及丁酮、液氨等部分原材料属于危险化学品，在其运\n输、存储和使用过程中存在安全风险。尽管公司现有生产设备和安全设施运行良好，\n但公司仍存在因管理疏忽、操作不当、自然灾害等原因而造成安全事故或受到相关处\n罚的可能，从而对公司的正常生产经营带来不利影响。 \n应对措施： 继续坚持“安全第一， 预防为主、 综合治理”和“以人为本”的经营方针，\n树立底线管理思维，建立和完善质量、环境、职业健康安全卫生一体化管理体系，严\n格执行企业标准体系，积极推进数智化改革，提升装置本质安全水平，深化杜邦安全\n管理体系建设，加强危险源、环保因子的识别与控制，建立健全事故预案、应急处理\n机制，加强员工队伍建设，提升职业养和责任意识，科学管理、严格管理，实行从项\n目建设到生产销售的全过程风险控制。 \n毛 利 率 波 动\n风险 \n由于公司主要产品硅烷交联剂、羟胺盐、甲氧胺盐酸盐、乙醛肟等下游应用领域较为\n广泛，各细分产品下游市场需求的变化将导致公司产品销售价格的变化，部分产品的",
+          "page_text_hash": "e79ac6c44dd9cdc770fcc10476a4252cc54dd94b0aee96cca3850a12da0f921a"
+        }
+      ],
+      "disposition": "accepted_for_review",
+      "quantity": null,
+      "mapping_status": "pending",
+      "commodity_id": null
+    }
+  ],
+  "sales_roles": [
+    {
+      "sample_id": "manufacturing-materials-300750-2025",
+      "record_id": "manufacturing-materials-300750-2025:sales:正极材料",
+      "field_id": "explicit_activity",
+      "chapter_task": "extract_material_inputs",
+      "role": "product_sales",
+      "action": "sells",
+      "source_native_name": "正极材料",
+      "object_name": "正极材料",
+      "report": {
+        "instrument_id": "300750.SZ",
+        "report_id": "asset_3b09f6c831975c7177b6bb3287cab781",
+        "document_version": "ver_09c0e677ec8192dc4fc12cb620069f29",
+        "report_period": "2025-12-31",
+        "published_at": "2026-03-09T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "reported_period": "2025-12-31",
+      "period_type": "duration",
+      "subject_scope": "consolidated_group",
+      "subject_basis": "direct_source_wording",
+      "actor_basis": "direct_grammatical_actor",
+      "activity_actor": "公司",
+      "source_actor": "公司",
+      "source_verb": "产品包括",
+      "assertion_class": "reported_fact",
+      "evidence": [
+        {
+          "binding_status": "bound",
+          "evidence_id": "stage5-evidence-916ba044c8c22cfaab6f1990",
+          "chapter_task": "extract_material_inputs",
+          "instrument_id": "300750.SZ",
+          "report_id": "asset_3b09f6c831975c7177b6bb3287cab781",
+          "document_version": "ver_09c0e677ec8192dc4fc12cb620069f29",
+          "page": 15,
+          "section_title": "电池材料产品",
+          "bounded_quote": "域。此外，公司产品还可应用于船舶、航空器、电动工具、电动两轮车等领域。 \n（2）储能电池系统 \n公司提供电芯、电池柜、储能集装箱以及系统集成等储 能解决方案。公司的储能电池广泛应用于表\n前储能和表后储能领域，包括公用事业储能、工商业储能及数据中心储能等。 \n在表前领域，公司依托智能液冷控温、高成组 CTP、无热扩散等技术，推出了 EnerOne、EnerOne \nPlus等户外液冷电池柜，针对全气候场景的 EnerC、EnerC Plus、EnerD、EnerX等集装箱式液冷电池柜，\n以及单体 6.25MWh的天恒储能系统、全球首款可量产的 9MWh超大容量储能系统解决方案 TENER Stack、\n其他适应众多应用场景的 TENER 系列解决方案。在表后领域，公司产品已实现从低压、中压到高压平台\n的全场景覆盖。其中，PR系列、Unic系列及安鑫系列、PU系列分别可满足家庭储能、工商储能、数据中\n心能源管理需求。 \n根据相关需求，公司开发了适用于表前、表后市场的多场景、多工况的不同规格 电芯，具备超长寿\n命、零衰减、高安全、宽温度适应性等特性。 \n（3）电池材料、回收及矿产资源 \n公司电池材料产品主要包括锂盐、前驱体及正极材料等。公司亦通过回收方式，对废旧电池中的镍、\n钴、锰、锂、磷、铁、铝、铜等金属材料及其他材料进行加工、提纯、合成等工艺，生产锂电池生产所\n需的正极材料、三元前驱体、磷铁前驱 体、锂盐等材料，并将收集后的铜、铝等金属材料通过第三方回\n收利用，使电池生产所需的关键金属资源实现有效循环利用。 \n此外，为进一步保障电池生产所需的上游关键资源及材料供应，公司通过自建、参股、合资等多种\n方式参与锂、镍、钴、磷等电池矿产资源及相关产品的投资、建设及运营。 \n3、经营模式 \n公司拥有独立的研发、采购、生产和销售体系，主要通过销售动力电池、储能电池和电池材料等产\n品和解决方案实现盈利。研发方面，公司建立了完备的研发体系，形成以自主研发为主、外部合作为辅\n的研发模式，通过数字化、智能化的方式，紧密围绕材料及材料 体系、系统结构、绿色极限制造及商业\n模式领域开展创新，以引领行业技术发展。采购方面，公司通过严格的评估和考核程序遴选合格供应商，",
+          "page_text_hash": "43f8dfcdeb144d04fe2e3e783bca5daba4be511fda32defb657fded5b662bb0e"
+        }
+      ],
+      "disposition": "accepted_for_review",
+      "mapping_status": "pending",
+      "commodity_id": null
+    }
+  ]
+}

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 from dataclasses import replace
 from pathlib import Path
@@ -21,6 +22,7 @@ from research.company_profile.material_input_research import (
     commit_material_input_research,
     extraction_failure_outcome,
     material_input_research_bindings,
+    replay_material_input_research,
 )
 from research.company_profile.models import (
     Activity,
@@ -545,6 +547,65 @@ def test_commit_persists_empty_outcomes_and_preparation_failures(tmp_path):
         for item in payload["sales_roles"]
     )
     assert _ROOT / "data" not in Path(destination).resolve().parents
+
+
+def test_replay_freezes_the_three_reports_before_the_isolated_run(tmp_path):
+    run_path = replay_material_input_research(
+        tmp_path / "replay",
+        repository_root=_ROOT,
+        catalog=_Catalog(),
+        run_id="stage4-replay-test",
+    )
+    output_root = run_path.parent
+    enqueue = json.loads((output_root / "enqueue.json").read_text(encoding="utf-8"))
+    run = json.loads(run_path.read_text(encoding="utf-8"))
+    assert [item["instrument_id"] for item in enqueue["reports"]] == [
+        "300750.SZ",
+        "603659.SH",
+        "920015.BJ",
+    ]
+    assert enqueue["chapter_task"] == "extract_material_inputs"
+    assert "600004.SH" not in json.dumps(enqueue)
+    assert "600006.SH" not in json.dumps(enqueue)
+    for report, binding in zip(
+        enqueue["reports"], material_input_research_bindings(), strict=True
+    ):
+        pdf = _ROOT / binding.relative_pdf_path
+        dossier = _ROOT / binding.relative_dossier_path
+        assert report["content_hash"] == binding.content_hash
+        assert report["report_id"] == binding.report_id
+        assert report["document_version"] == binding.document_version
+        assert report["report_period"] == "2025-12-31"
+        assert report["dossier_sha256"] == _sha256(dossier)
+        assert report["chapter_task"] == "extract_material_inputs"
+        assert {item["chapter_task"] for item in report["scopes"]} == {
+            "extract_material_inputs"
+        }
+        assert _sha256(pdf) == report["content_hash"]
+    assert "正极材料" not in json.dumps(enqueue, ensure_ascii=False)
+    bundle = json.loads(
+        (output_root / run["bundle_dirname"] / "result.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    assert run["disposition"] == "accepted_for_review"
+    assert run["provider_calls"] == 0
+    assert run["enqueue_sha256"] == _sha256(output_root / "enqueue.json")
+    assert bundle["disposition"] == "accepted_for_review"
+    assert bundle["provider_calls"] == 0
+    forbidden = {
+        "recall",
+        "accuracy",
+        "critical_errors",
+        "expansion_gates",
+        "scale_quality_claim_allowed",
+    }
+    assert forbidden.isdisjoint(run)
+    assert _ROOT / "data" not in output_root.resolve().parents
+
+
+def _sha256(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
 def test_research_output_cannot_use_the_production_data_tree():
