@@ -119,6 +119,31 @@ def test_price_risk_generic_cost_and_inventory_do_not_create_inputs():
         assert records == []
 
 
+def test_third_party_and_nearby_manufacturing_words_do_not_activate():
+    refused = (
+        "客户采购钢材用于生产。\n",
+        "供应商采购钢材用于生产。\n",
+        "下游企业采购钢材用于生产。\n",
+        "公司销售钢材、铝材等主要原材料，主要客户为制造企业。\n",
+        "钢材、铝材等主要原材料价格上涨将影响下游制造企业。\n",
+    )
+    for text in refused:
+        _report_obj, selected, records = _materials(text)
+        assert records == []
+        assert project_commodity_exposures(records) == ()
+        assert not any(
+            span.chapter_task == "extract_material_inputs" for span in selected.spans
+        )
+        material = next(
+            item
+            for item in select_activated_chapters(
+                ({"page": 24, "text": text, "readable": True},)
+            )
+            if item.chapter_task == ChapterTask.EXTRACT_MATERIAL_INPUTS
+        )
+        assert material.status == "not_applicable"
+
+
 def test_sales_evidence_alone_does_not_create_an_input_role():
     report, _selected, records = _materials(SALES_ONLY)
     assert records == []

@@ -1633,34 +1633,62 @@ def _dedupe_owned_records(
 
 
 _MATERIAL_NAME = r"[\u4e00-\u9fffA-Za-z]{1,8}"
-_PROCURED_MATERIAL_INPUT = re.compile(
-    rf"(?:公司|本公司)?(?:采购|购入|消耗|投入)(?:了)?({_MATERIAL_NAME})"
+_COMPANY_PROCUREMENT = re.compile(
+    rf"(?:本公司|公司)(?:向[\u4e00-\u9fff]{{1,8}})?"
+    rf"(?:采购|购入|消耗|投入)(?:了)?({_MATERIAL_NAME})"
     rf"(?:用于(?:生产|制造|经营)|作为(?:原材料|原料|投入))"
 )
-_MATERIAL_BINDING = re.compile(r"生产|制造|投入|消耗|采购")
+_COMPANY_INPUT_COST = re.compile(
+    r"(?:直接)?(?:推高|抬高|提高|增加)"
+    r"(?P<gap>.{0,8})(?:制造|生产|经营)成本"
+)
+_THIRD_PARTY_COST = re.compile(r"下游|客户|供应商|制造企业|生产企业")
+_NOT_A_MATERIAL_NAME = re.compile(r"销售|出售|客户|供应商|下游|企业|价格|风险|公司")
 _GENERIC_MATERIAL_NAMES = frozenset(
     {"材料", "原材料", "原料", "原燃料", "燃料", "能源", "直接材料", "存货"}
 )
 
 
 def explicit_material_input_names(text: str) -> tuple[str, ...]:
-    """Return named materials the text itself binds to company production or operations."""
+    """Return named materials the same sentence binds to the company's own input."""
 
     compact = re.sub(r"\s+", "", text)
     names: list[str] = []
-    for match in re.finditer("等主要原材料", compact):
-        if _MATERIAL_BINDING.search(compact[match.end() : match.end() + 80]) is None:
-            continue
-        clause = re.split(r"[。；;，,：:]", compact[: match.start()])[-1]
-        names.extend(_split_material_names(clause))
-    for match in _PROCURED_MATERIAL_INPUT.finditer(compact):
+    for sentence in re.split(r"[。；;]", compact):
+        names.extend(_named_inputs_in_sentence(sentence))
+    for match in _COMPANY_PROCUREMENT.finditer(compact):
         names.append(match.group(1))
     unique: list[str] = []
     for name in names:
-        if name in _GENERIC_MATERIAL_NAMES or name in unique:
+        if not _accept_material_name(name) or name in unique:
             continue
         unique.append(name)
     return tuple(unique)
+
+
+def _named_inputs_in_sentence(sentence: str) -> list[str]:
+    """Accept a raw-material list only when that sentence states the company's cost."""
+
+    if not _sentence_binds_company_input_cost(sentence):
+        return []
+    names: list[str] = []
+    for match in re.finditer("等主要原材料", sentence):
+        clause = re.split(r"[，,：:]", sentence[: match.start()])[-1]
+        names.extend(_split_material_names(clause))
+    return names
+
+
+def _sentence_binds_company_input_cost(sentence: str) -> bool:
+    match = _COMPANY_INPUT_COST.search(sentence)
+    if match is None:
+        return False
+    return _THIRD_PARTY_COST.search(match.group("gap") or "") is None
+
+
+def _accept_material_name(name: str) -> bool:
+    if name in _GENERIC_MATERIAL_NAMES or not re.fullmatch(_MATERIAL_NAME, name):
+        return False
+    return _NOT_A_MATERIAL_NAME.search(name) is None
 
 
 def _split_material_names(text: str) -> list[str]:
@@ -1696,17 +1724,13 @@ def _select_material_span(
 def _material_quote(text: str) -> tuple[str, str]:
     compact = re.sub(r"\s+", "", text)
     marker = text.find("等主要原材料")
-    compact_marker = compact.find("等主要原材料")
-    if (
-        marker >= 0
-        and compact_marker >= 0
-        and _MATERIAL_BINDING.search(compact[compact_marker : compact_marker + 80])
-    ):
+    if marker >= 0:
         line_start = text.rfind("\n", 0, marker) + 1
         end = text.find("。", marker)
         quote = text[line_start : len(text) if end < 0 else end + 1].strip()
-        return _material_section(text, quote), quote
-    match = _PROCURED_MATERIAL_INPUT.search(compact)
+        if _named_inputs_in_sentence(re.sub(r"\s+", "", quote)):
+            return _material_section(text, quote), quote
+    match = _COMPANY_PROCUREMENT.search(compact)
     if match is None:
         return "主要原材料", text.strip()
     quote = _original_span_matching(text, match.group(0)) or match.group(0)

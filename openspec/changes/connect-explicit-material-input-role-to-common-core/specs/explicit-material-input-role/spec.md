@@ -23,7 +23,7 @@ When an official report states that a named material is an input to the company'
 - **AND** the rule does not depend on one instrument id
 
 ### Requirement: Non-explicit material wording stays refused
-The owner MUST NOT activate material input for a price-risk sentence that does not say the named material is a company input, for a generic label such as direct material cost or raw-material inventory, or for a balance-sheet amount. Sales evidence alone MUST NOT support `raw_material_input`. Energy input MUST keep the existing `energy_consumption` role. The projection MUST NOT derive a profit direction, price sensitivity, or net exposure from a price-risk sentence.
+The owner MUST NOT activate material input for a price-risk sentence that does not say the named material is a company input, for a generic label such as direct material cost or raw-material inventory, or for a balance-sheet amount. The named material and the company's own input MUST be bound in the same sentence. A purchase, consumption, or input verb whose subject is a customer, supplier, or downstream party MUST NOT activate the chapter. A principal-raw-material list MUST NOT activate only because 制造 or 生产 appears later in a fixed window. Sales evidence alone MUST NOT support `raw_material_input`. Energy input MUST keep the existing `energy_consumption` role. The projection MUST NOT derive a profit direction, price sensitivity, or net exposure from a price-risk sentence.
 
 #### Scenario: Price risk without a company input is refused
 - **WHEN** the text only says raw-material prices may rise and does not state that a named material is a company input
@@ -36,6 +36,19 @@ The owner MUST NOT activate material input for a price-risk sentence that does n
 #### Scenario: Sales evidence alone does not create an input role
 - **WHEN** the only evidence is that the company sells a named product
 - **THEN** that evidence does not emit `raw_material_input`
+
+#### Scenario: A third party purchasing for production is not the company's input
+- **WHEN** the sentence says a customer, supplier, or downstream party purchases a named material for production
+- **THEN** the material chapter stays inactive
+- **AND** no `raw_material_input` relationship is emitted
+
+#### Scenario: Selling principal materials to manufacturers is not an input
+- **WHEN** the company sells named principal raw materials and the customers are manufacturers
+- **THEN** nearby manufacturing words do not emit `raw_material_input`
+
+#### Scenario: A price move affecting downstream manufacturers is not an input
+- **WHEN** a principal-raw-material price sentence says the move affects downstream manufacturers
+- **THEN** no `raw_material_input` relationship is emitted
 
 #### Scenario: Independent sales and input evidence keep both roles
 - **WHEN** one accepted fact says the company sells a source-native commodity and a separate accepted fact says that same commodity is a production input
