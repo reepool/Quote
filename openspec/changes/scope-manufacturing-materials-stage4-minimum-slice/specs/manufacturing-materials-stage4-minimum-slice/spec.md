@@ -1,12 +1,18 @@
 ## ADDED Requirements
 
 ### Requirement: Stage-four scope uses the verified cross-sample portfolio
-This change MUST use at least three locally valid official annual reports from at least two companies, and MUST include at least two reports that challenge any single focus report. The minimum portfolio MUST be the stage-three reports `300750.SZ` 2025, `603659.SH` 2025, and `920015.BJ` 2025, covering SZSE, SSE, and BSE. `600004.SH` and `600006.SH` MUST NOT be the sole or defining sample. Each dossier MUST record exchange, report identity, business mode, disclosure form, and coverage gaps from the report itself. A narrow disclosure-form or business-mode overlap MUST remain a recorded gap. This change MUST NOT add an unverified issuer to close the stage-three regime gap, and MUST NOT treat the historical four-report six-chapter slice as the current admission contract.
+This change MUST use at least three locally valid official annual reports from at least two companies, and MUST include at least two reports that challenge any single focus report. The minimum slice sample MUST be `300750.SZ` 2025, `603659.SH` 2025, and `920015.BJ` 2025, covering SZSE, SSE, and BSE. These three reports are the floor for this slice, not the whole stage-three sample. Stage-three regime coverage is already complete: verified `302132.SZ` 2025 remains the historical regime baseline and MUST NOT be part of this card's defining sample. This change MUST NOT select `extract_business_regime` and MUST NOT claim that results from the three reports re-validate regime capability. `600004.SH` and `600006.SH` MUST NOT be the sole or defining sample. Each dossier MUST record exchange, report identity, business mode, disclosure form, and coverage gaps from the report itself. A narrow disclosure-form or business-mode overlap MUST remain a recorded gap. This change MUST NOT treat the historical four-report six-chapter slice as the current admission contract.
 
-#### Scenario: The stage-three portfolio is the scope floor
-- **WHEN** the scope review lists the three stage-three annual reports across SZSE, SSE, and BSE
+#### Scenario: Three reports are the slice floor, not the whole stage-three sample
+- **WHEN** the scope review lists `300750.SZ`, `603659.SH`, and `920015.BJ` across SZSE, SSE, and BSE
 - **THEN** at least two reports are challengers to any one focus report
+- **AND** verified `302132.SZ` stays the stage-three regime baseline outside this defining sample
 - **AND** the fixed `600004.SH` / `600006.SH` pair is not used to define the slice
+
+#### Scenario: The three-report slice does not re-validate regime
+- **WHEN** dossiers or later results are produced only for the three defining reports
+- **THEN** the change does not select `extract_business_regime`
+- **AND** those results are not reported as a new regime validation
 
 #### Scenario: Disclosure diversity is not invented
 - **WHEN** the three reports do not yet show distinct disclosure forms or business modes
@@ -22,7 +28,7 @@ Each selected report MUST have its own dossier before any common field obligatio
 - **AND** the other dossiers are completed before any common obligation is written
 
 ### Requirement: Exactly one existing chapter task is the minimum slice
-After the dossiers are complete, the change MUST select exactly one existing chapter task as the manufacturing/materials vertical slice. The selected task MUST be supported by dossiers from at least two companies. The other chapter tasks MUST stay inactive. The change MUST NOT enable the full six-chapter industry package in the same implementation, and MUST NOT hard-code one company, one page, or one material name.
+After the dossiers are complete, the change MUST select exactly one existing chapter task as the manufacturing/materials vertical slice. The selected task MUST be supported by dossiers from at least two companies and MUST NOT be `extract_business_regime`. The other chapter tasks MUST stay inactive. The change MUST NOT enable the full six-chapter industry package in the same implementation, and MUST NOT hard-code one company, one page, or one material name.
 
 #### Scenario: Dossiers support one shared task
 - **WHEN** at least two company dossiers support the same existing chapter task and its legal-empty behavior
