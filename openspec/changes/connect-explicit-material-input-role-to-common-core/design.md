@@ -27,18 +27,22 @@ v8 repair 已归档。正式复核是 recall 8/9、accuracy 8/8、critical numer
    激活条件从“本切片固定不启用”改为“原文已经明示具名投入品”。投影、接受和商品角色继续走 Stage 5 与 `derive_commodity_role`。能源证据仍走既有 `energy_consumption`。
 
 2. **明示投入才激活。**
-   句子必须把具名物料说成公司生产或经营投入。只说价格上涨、只给“直接材料成本”或“原材料存货”等泛称、只给资产负债表金额、或把销售产品写成采购，都不激活。不得用行业常识补名称。
+   句子必须把具名物料说成公司生产或经营投入。只说价格上涨、只给“直接材料成本”或“原材料存货”等泛称、只给资产负债表金额，都不激活。销售证据本身不能推出投入角色。若另一份独立且已接受的证据说明同一 source-native 商品也是生产投入，则同时保留 `product_sales` 和 `raw_material_input`，不覆盖、不净额化。不得用行业常识补名称。
 
-3. **identity 正交，不覆盖 v8。**
+3. **映射失败不丢掉已成立角色。**
+   复用现有 `mapped` / `pending` / `ambiguous`。无匹配为 `pending`，多个候选无法唯一选择为 `ambiguous`，二者 `commodity_id` 都为空，并保留 `source_native_name`。只有 `mapped` 才允许非空唯一 `commodity_id`。不新建 catalog，不改映射表，不绑市场序列。
+
+4. **identity 正交，不覆盖 v8。**
    新 work 使用 `{"rules":"company_profile_common_core.v1","owned_page_facts":"v8","material_input_facts":"v1"}`。v1–v8 work 和全部旧 source-review 保留。查询按当前 identity 选择 successor。
 
-4. **样本只在实现审核之后 replay。**
+5. **样本只在实现审核之后 replay。**
    正式年报里已确认的具名投入句是正例形状；无明示商品角色的服务公司年报是负例形状。规则不得按证券、页码或具体物料名硬编码。另用一个既有非东风制造业 fixture 证明不是单公司补丁。受控 replay 和独立重算晚于 1.1 范围审核和实现审核。
 
 ## Risks / Trade-offs
 
 - [价格风险句被放得过宽] → 没有把具名物料说成公司投入时拒绝。
-- [销售产品被当成投入] → 销售或产品角色继续走既有产品路径，不标成 `raw_material_input`。
+- [销售证据被当成投入] → 只有销售证据时不生成 `raw_material_input`；独立投入证据存在时两个角色都保留，不净额化。
+- [目录无法唯一映射] → 仍交付投入角色，`pending` 或 `ambiguous`，`commodity_id` 为空。
 - [能源被标成原料] → 既有能源判断优先，角色保持 `energy_consumption`。
 - [replay 仍达不到扩大门槛] → 记录现场结果，不改门槛，不授权生产或下一轮扩大。
 

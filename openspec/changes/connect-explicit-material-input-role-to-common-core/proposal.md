@@ -7,7 +7,8 @@ v8 的 common-core repair 已归档，正式复核是 recall 8/9、accuracy 8/8�
 - 只在原文明示具名物料是公司生产或经营投入时，通过现有 `company_profile_common_core` owner 激活 `ChapterTask.EXTRACT_MATERIAL_INPUTS`。
 - 路径保持：正式原文 → 现有 `extract_material_inputs` → `material_input` Relationship → `CommodityExposure(role=raw_material_input)` → 现有 `company_facts` / `commodity_associations` 读取范围。
 - 保留来源名称、主体、报告身份、期间和 Evidence。没有数量或市场序列不阻止关系交付。
-- 不根据行业常识补齐。价格风险、泛称成本、存货金额、销售产品和能源输入继续拒绝或走既有 `energy_consumption`。
+- 不根据行业常识补齐。价格风险、泛称成本和存货金额继续拒绝。销售证据本身不能推出投入角色；若另有独立且已接受的投入证据，同一 source-native 商品同时保留 `product_sales` 和 `raw_material_input`，不覆盖、不净额化。能源输入继续走既有 `energy_consumption`。
+- catalog 无匹配时仍交付投入角色，`mapping_status=pending` 且 `commodity_id=null`。多个候选无法唯一选择时用 `ambiguous`，不猜测 commodity id。只有 `mapped` 才允许非空唯一 `commodity_id`。不新建 catalog 或市场序列。
 - successor 保留 `owned_page_facts=v8`，增加正交的 `material_input_facts=v1`。不得在完全相同的 v8 identity 下 force replay。v1–v8 work 和全部旧 source-review 保留。
 - 实现审核通过后才对冻结报告做受控 replay，并重新独立计算指标。不预设 recall 9/9 或门槛通过。
 

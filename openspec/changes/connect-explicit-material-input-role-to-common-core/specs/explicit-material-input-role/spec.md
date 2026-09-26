@@ -23,7 +23,7 @@ When an official report states that a named material is an input to the company'
 - **AND** the rule does not depend on one instrument id
 
 ### Requirement: Non-explicit material wording stays refused
-The owner MUST NOT activate material input for a price-risk sentence that does not say the named material is a company input, for a generic label such as direct material cost or raw-material inventory, for a balance-sheet amount, or for a product the company sells. Energy input MUST keep the existing `energy_consumption` role. The projection MUST NOT derive a profit direction, price sensitivity, or net exposure from a price-risk sentence.
+The owner MUST NOT activate material input for a price-risk sentence that does not say the named material is a company input, for a generic label such as direct material cost or raw-material inventory, or for a balance-sheet amount. Sales evidence alone MUST NOT support `raw_material_input`. Energy input MUST keep the existing `energy_consumption` role. The projection MUST NOT derive a profit direction, price sensitivity, or net exposure from a price-risk sentence.
 
 #### Scenario: Price risk without a company input is refused
 - **WHEN** the text only says raw-material prices may rise and does not state that a named material is a company input
@@ -33,9 +33,14 @@ The owner MUST NOT activate material input for a price-risk sentence that does n
 - **WHEN** the text only says direct material cost or raw-material inventory, or only gives a balance-sheet amount
 - **THEN** no `raw_material_input` relationship is emitted
 
-#### Scenario: A sold product is not a purchased input
-- **WHEN** the text names a product the company sells
-- **THEN** that name is not delivered as `raw_material_input`
+#### Scenario: Sales evidence alone does not create an input role
+- **WHEN** the only evidence is that the company sells a named product
+- **THEN** that evidence does not emit `raw_material_input`
+
+#### Scenario: Independent sales and input evidence keep both roles
+- **WHEN** one accepted fact says the company sells a source-native commodity and a separate accepted fact says that same commodity is a production input
+- **THEN** the delivery keeps both `product_sales` and `raw_material_input`
+- **AND** neither role overwrites the other or is netted away
 
 #### Scenario: Energy keeps its existing role
 - **WHEN** the explicit input is an energy consumption already recognized by the existing energy rule
@@ -45,3 +50,19 @@ The owner MUST NOT activate material input for a price-risk sentence that does n
 #### Scenario: Price risk does not become sensitivity
 - **WHEN** a sentence discusses raw-material price movement
 - **THEN** the delivery does not add a profit direction, price sensitivity, or net exposure
+
+### Requirement: Unmapped named inputs still deliver the role
+An explicit named input MUST still deliver the Relationship and CommodityExposure when the existing catalog has no match or more than one candidate. The exposure MUST keep `source_native_name`. No match MUST use `mapping_status=pending` and `commodity_id=null`. Multiple candidates that cannot be chosen uniquely MUST use `mapping_status=ambiguous` and `commodity_id=null`. A non-empty unique `commodity_id` MUST be allowed only when `mapping_status=mapped`. Mapping failure MUST NOT drop the established input role. This change MUST NOT build a new catalog or market-series link.
+
+#### Scenario: No catalog match stays pending
+- **WHEN** an explicit named input has no catalog match
+- **THEN** the Relationship and CommodityExposure are still delivered
+- **AND** `source_native_name` is preserved
+- **AND** `mapping_status` is `pending`
+- **AND** `commodity_id` is null
+
+#### Scenario: Ambiguous catalog candidates are not guessed
+- **WHEN** an explicit named input matches more than one catalog candidate and no unique choice is stated
+- **THEN** the input role is still delivered
+- **AND** `mapping_status` is `ambiguous`
+- **AND** `commodity_id` is null
