@@ -33,8 +33,11 @@
 - `openspec/changes/archive/2026-09-17-deliver-a-share-core-profiles-and-commodity-exposure/`：已归档的全 A 股通用骨架与基础商品暴露实施；入口为 `company_profile_common_core`，生产仍为 not_authorized；2026-09-17 首次观察未过 4.1 门槛
 - `openspec/changes/archive/2026-09-17-interpret-owned-page-company-total-and-bank-income-mix/`：已验收并归档的 `owned_page_facts=v4`；重新核原文后 recall 7/7、accuracy 7/7，4.1 数字门槛此次算过；独立 Review 已通过；不是生产授权
 - `openspec/specs/company-profile-common-core-company-total-and-income-mix/spec.md`：公司级营业收入总额与银行收入构成的当前合同
-- `openspec/changes/archive/2026-09-24-read-as-of-shenwan-l1-for-profile-strata/`：已归档的 as-of 申万一级名称读取。正式历史行只有股票代码、行业代码、计入日期和更新时间；一级名称沿同版本活动 taxonomy 父链解析；顶层 `sw_l1_name` 优先；不读 `classification.levels.sw_l1.industry_name`；断链为 `other`；不回退 cutoff 后的当前 membership。2026-09-17 `service_available_count=0` 只是该修复前的历史基线，修复后尚未重新探查正式 registry。不是生产授权
-- `openspec/changes/expand-company-profile-m4-first-expansion/`：首次扩大控制代码基础已实现，两家公司预算不变。尚未记录 plan、未激活、未 enqueue、未核原文、未写 closure v2。3.4、3.5、4.5 未勾选。`scale_quality_claim_allowed=false`，生产仍为 `not_authorized`
+- `openspec/changes/archive/2026-09-24-read-as-of-shenwan-l1-for-profile-strata/`：已归档的 as-of 申万一级名称读取。正式历史行只有股票代码、行业代码、计入日期和更新时间；一级名称沿同版本活动 taxonomy 父链解析；顶层 `sw_l1_name` 优先；不读 `classification.levels.sw_l1.industry_name`；断链为 `other`；不回退 cutoff 后的当前 membership。2026-09-17 `service_available_count=0` 只是该修复前的历史基线。固定样本已重新探查并执行：600004.SH / service、600006.SH / manufacturing。不是生产授权
+- `openspec/changes/archive/2026-09-25-expand-company-profile-m4-first-expansion/`：已于 2026-09-25 执行、关闭并归档的首次扩大。固定样本为 600004.SH / service 与 600006.SH / manufacturing。原始观察 recall 0/9、accuracy unassessed、mode completed，正式 closure v2 已写入；checkpoint 没有正式 v1 快照，不得补造。`expansion_gates_met=false`，`scale_quality_claim_allowed=false`，生产仍为 `not_authorized`，不授权下一轮扩大
+- `openspec/specs/company-profile-m4-first-expansion/spec.md`：首次扩大的当前合同；剩余 M4 待办以正式 closure v2 为准
+- `openspec/changes/archive/2026-09-26-repair-common-core-first-expansion-owned-page-gaps/`：已于 2026-09-26 归档的 common-core repair。当前 identity 为 `owned_page_facts=v8`。v8 recall 8/9、accuracy 8/8、critical numeric errors 0、`expansion_gates_met=false`。v6、v7 的 8/8 快照保留并已被后续 Review 否决。不授权下一轮扩大、规模质量声明或生产
+- `openspec/specs/common-core-owned-page-gap-repair/spec.md`：owned 业务标题下的主营及服务投影，以及正式收入表和组合表组单位作用域的当前合同；当前 identity 为 v8
 - `openspec/specs/company-profile-a-share-delivery/spec.md`：全市场目标合同；规范存在不等于能力上线
 - `docs/development/company_profile_industry_research_method.md`：行业增强的研究方法；不阻塞通用基础画像
 - `docs/development/company_profile_manufacturing_materials_requirements.md`、`company_profile_manufacturing_materials_research_index.md`：已通过阶段 3 研究验收的制造/材料行业合同与证据索引；不代表生产授权
