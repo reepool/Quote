@@ -41,7 +41,7 @@ The dossiers MUST be complete before the slice is named. The named slice MUST be
 - **AND** the six-chapter package is not enabled
 
 ### Requirement: Material-input acceptance follows the dossier boundaries
-A material input MUST be a named material the same report sentence binds to the company's own production or operating input. Sales evidence alone MUST NOT create an input role. A generic direct-material cost or a raw-material inventory amount MUST be refused. Outsourced processing, including Jinhua's 丁酮肟 processing, MUST NOT be recorded as a material input. Absence of a quantity MUST NOT block delivery of an otherwise explicit named input. The same source-native name MAY also have a separate product or sales fact, and that overlap MUST NOT erase the input fact or be netted. Legal non-disclosure means the report does not state the named input or expressly omits it. `unclear` means the cited evidence does not uniquely bind the material to the company's own input. Extraction failure means the page, header, unit, or evidence context cannot be bound. These three outcomes MUST NOT be rewritten as a zero, a guessed commodity id, or a successful fact.
+A material input MUST be a named material the same report sentence binds to the company's own production or operating input. Sales evidence alone MUST NOT create an input role. A generic direct-material cost or a raw-material inventory amount MUST be refused. An outsourced-processing arrangement alone MUST NOT create a `material_input` fact. Jinhua's physical pages 12 and 50 describe an outside party processing 丁酮肟 from material supplied by the company; that arrangement alone MUST NOT be recorded as a material input. The same source-native name MAY still support an input fact when a separate company purchase or consumption disclosure names it. A formal “主要原材料及能源” table MUST accept only raw-material rows; energy rows such as 蒸汽 and 电 MUST stay excluded. Absence of a quantity MUST NOT block delivery of an otherwise explicit named input. The same source-native name MAY also have a separate product or sales fact, and that overlap MUST NOT erase the input fact or be netted. Legal non-disclosure means the report does not state the named input or expressly omits it. `unclear` means the cited evidence does not uniquely bind the material to the company's own input. Extraction failure means the page, header, unit, or evidence context cannot be bound. These three outcomes MUST NOT be rewritten as a zero, a guessed commodity id, or a successful fact.
 
 #### Scenario: A named production input has no quantity
 - **WHEN** a dossier sentence names the company's production raw materials and gives no purchase quantity
@@ -57,10 +57,20 @@ A material input MUST be a named material the same report sentence binds to the 
 - **WHEN** the text only states direct material cost or a raw-material inventory balance
 - **THEN** no named material input is created from that amount
 
-#### Scenario: Outsourced processing is not a material input
-- **WHEN** `920015.BJ` states that an outside party processes 丁酮肟 from material supplied by the company
+#### Scenario: Outsourced processing alone is not a material input
+- **WHEN** `920015.BJ` states on physical pages 12 and 50 that an outside party processes 丁酮肟 from material supplied by the company
 - **THEN** that processing arrangement is not recorded as the material-input fact
 - **AND** the separately named raw materials on physical page 26 are not replaced by the processing sentence
+
+#### Scenario: An independent purchase or consumption row can still be an input
+- **WHEN** the same source-native name, including 丁酮肟, appears in a separate company purchase or consumption disclosure
+- **THEN** that independent evidence may support a `material_input` fact
+- **AND** the outsourced-processing arrangement remains excluded
+
+#### Scenario: Energy rows in the materials-and-energy table stay excluded
+- **WHEN** a formal “主要原材料及能源” table lists raw-material rows together with energy rows such as 蒸汽 or 电
+- **THEN** only the raw-material rows may be material inputs
+- **AND** the energy rows are not recorded as `raw_material_input`
 
 #### Scenario: Legal non-disclosure, unclear binding, and extraction failure stay distinct
 - **WHEN** a report has no named-input sentence, the cited sentence does not uniquely bind the material to the company, or the page, header, unit, or evidence cannot be bound
@@ -100,3 +110,18 @@ No Python change, enqueue, replay, or checkpoint write is authorized before inde
 - **WHEN** an approved slice is replayed on the approved reports
 - **THEN** recall, accuracy, critical numeric errors, and expansion gates are derived from that replay
 - **AND** the fixed two-company 9/9 observation is not reused as this slice's result
+
+### Requirement: The closed observation is recall 19/23 and does not authorize expansion
+The authoritative observation for this change is the bound source review at `replay/20260926/source_review.json`. It MUST record source recall 19/23, source accuracy 19/19, critical numeric errors 0, and `expansion_gates_met=false`. The delivered set is 19 `raw_material_input` Relationships plus one independent `product_sales` Activity for 宁德时代 正极材料. The four missing disclosures MUST remain 宁德时代 physical page 73 磷酸铁锂, 锂盐, and 氢氧化锂, and 锦华新材 physical page 51 丁酮肟. Those gaps MUST be described as two later disclosure forms: a company raw-material input in a related-party purchase row, and a raw-material row in a formal “主要原材料及能源” table, with energy rows still excluded. This false gate MUST NOT reject the accuracy of the 19 delivered facts, MUST NOT overwrite the fixed two-company history, and MUST NOT authorize the next expansion, scale quality, or production. This change MUST NOT repair the four gaps, expand the Evidence plan, or recalculate the metrics inside the observation close.
+
+#### Scenario: The recount stays bound to the replay files
+- **WHEN** the observation is cited
+- **THEN** it stays bound to enqueue SHA-256 `0a7fc577840ce3bed45c02ec268fecf289b776104f05ae0ff3806c2daa0f1a84`, run SHA-256 `f80c96e5523704d05cc880c3a56cd4201549081f2fca9a10e8a0433629819852`, and result SHA-256 `9a7444d285b8c8897f5206cce0abe00420edc12ba133ae29e3ccd795e82279b9`
+- **AND** recall remains 19/23, accuracy remains 19/19, critical numeric errors remain 0, and `expansion_gates_met` remains false
+
+#### Scenario: The false gate does not open the next expansion
+- **WHEN** the slice misses the four named inputs above
+- **THEN** `expansion_gates_met` is false
+- **AND** the 19 delivered facts stay accuracy 19/19
+- **AND** the fixed two-company 9/9 observation is left in place
+- **AND** expansion, scale quality, and production stay unauthorized

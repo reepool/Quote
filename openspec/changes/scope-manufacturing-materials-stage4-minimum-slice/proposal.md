@@ -15,7 +15,7 @@
 
 ### New Capabilities
 
-- `manufacturing-materials-stage4-minimum-slice`: 跨样本 dossier、单一最小竖切、字段义务和研究隔离的范围合同。1.1 通过前不授权实现。
+- `manufacturing-materials-stage4-minimum-slice`: 已完成的阶段 4 最小竖切观察。它包含三份 dossier、研究 Python 与测试、隔离 replay 和 source review。观察结果是 recall 19/23、accuracy 19/19、critical numeric errors 0、`expansion_gates_met=false`。它不授权扩大、规模质量或生产。
 
 ### Modified Capabilities
 
@@ -23,7 +23,7 @@
 
 ## Impact
 
-- 本卡只增加 OpenSpec 范围文档。
-- 不修改 Python、checkpoint、work、source-review、publication、closure 或 mode。
+- 本 change 实际包含研究 Python、测试、三份 dossier、隔离 replay 和 source review。
+- 没有修改 common-core checkpoint、work、publication、closure、completed mode 或生产 identity。当前 identity 仍是 `owned_page_facts=v8` + `material_input_facts=v1`。
 - `scale_quality_claim_allowed` 保持 false，`production_authorization` 保持 `not_authorized`。
-- 固定两家公司的 9/9 仍只覆盖该 identity 的局部验收，不构成全市场或规模质量结论。
+- 固定两家公司的 9/9 仍只覆盖该 identity 的局部验收，不构成全市场或规模质量结论，也不被这次 19/23 覆盖。
