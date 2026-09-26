@@ -14,4 +14,5 @@
 
 - [x] 3.1 After implementation review, replay only the approved reports for the selected slice. Freeze the PDF hash, report identity, dossier hash, and material-input evidence binding before the run. Keep the run in the research isolation directory at `accepted_for_review`. Do not prefill recall, accuracy, critical errors, or gates
 - [x] 3.2 Independently recount recall, accuracy, critical numeric errors, and expansion gates. Do not presume they pass, and do not reuse the fixed two-company 9/9. Snapshot: `replay/20260926/source_review.json`. Recall 19/23, accuracy 19/19, critical numeric errors 0, expansion_gates_met false. Catalog mapping is not a pass
+- [x] 3.2a Bind the source review to `run.json` sha256 `f80c96e5523704d05cc880c3a56cd4201549081f2fca9a10e8a0433629819852` and `material-input-stage4-material-inputs-20260926/result.json` sha256 `9a7444d285b8c8897f5206cce0abe00420edc12ba133ae29e3ccd795e82279b9`. Do not replay or change the 19/23 recount
 - [ ] 3.3 Do not start another expansion, authorize scale quality or production, enable the six-chapter package, or open DCF, trading, or the legacy writer

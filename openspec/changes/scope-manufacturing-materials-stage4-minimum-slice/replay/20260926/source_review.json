@@ -7,7 +7,12 @@
     "enqueue_path": "enqueue.json",
     "enqueue_sha256": "0a7fc577840ce3bed45c02ec268fecf289b776104f05ae0ff3806c2daa0f1a84",
     "run_path": "run.json",
+    "run_id": "stage4-material-inputs-20260926",
+    "run_sha256": "f80c96e5523704d05cc880c3a56cd4201549081f2fca9a10e8a0433629819852",
     "bundle_dirname": "material-input-stage4-material-inputs-20260926",
+    "bundle_result_path": "material-input-stage4-material-inputs-20260926/result.json",
+    "bundle_result_sha256": "9a7444d285b8c8897f5206cce0abe00420edc12ba133ae29e3ccd795e82279b9",
+    "bundle_schema_version": "company_profile_material_input_research.v2",
     "chapter_task": "extract_material_inputs",
     "instruments": [
       "300750.SZ",
