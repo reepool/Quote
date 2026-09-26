@@ -53,6 +53,44 @@ v8 repair 已归档。正式复核是 recall 8/9、accuracy 8/8、critical numer
 3. 审核通过后只对已冻结报告做受控 successor replay。
 4. 独立重算 recall、accuracy、critical numeric errors 和 workload。回滚时保留 v8 文件和失败观察，不删除 successor work，除非另有审核。
 
+## Field result
+
+受控 successor 只覆盖已冻结的 600004.SH 与 600006.SH。没有新一轮扩样、重新选样或新增 work。两家各仍只有 6 条 completed work，其中本轮新增的是：
+
+- 600004.SH：`bp-work-946a0a5296c2144c1ebc161a`
+- 600006.SH：`bp-work-7b81740827ce0ccca634e2e9`
+
+processing identity 为 `{"rules":"company_profile_common_core.v1","owned_page_facts":"v8","material_input_facts":"v1"}`。
+
+身份绑定链是：
+
+1. `data/checkpoints/company_profile_common_core/reports/material_input_facts_v1_successor_enqueue.20260926.json`
+2. 上面两个 work ID
+3. 各 work 内的 processing identity
+4. query 优先返回这两个 work 的交付
+5. `data/checkpoints/company_profile_common_core/reports/material_input_facts_v1_successor_source_review.20260926.json`，SHA-256 `9f6fb61e4e7fdbee9e680d091c0bc4bc13ca89f319b92cdd0457fdc3e2cdfbec`
+
+`material_input_facts_v1_successor_live_run.20260926.json` 的 SHA-256 是 `456345ea55253717dc2316227810f12e414ba1df9a26b92d19fd780216fd2871`，与 v5–v8 live-run 字节相同。它只证明冻结样本和两家都已交付，不单独证明 successor 身份。live-run schema 不改。
+
+Source review 由正式模型派生，不是手工填写门槛：
+
+- source recall 9/9
+- source accuracy 9/9
+- critical numeric errors 0
+- independently reviewed reports 2，occupied strata 2
+- tokens 0
+- elapsed 5.149175 秒
+- human review unassessed
+- `expansion_gates_met=true`
+
+三层语义分开：
+
+- `expansion_gates_met=true` 只表示固定两家公司、本次 successor identity 的验收门槛通过。
+- `scale_quality_claim_allowed=false`，不能声称全市场或规模化质量已经成立。
+- `production_authorization=not_authorized`，不授权生产。
+
+本轮没有修改 first-expansion completed mode，没有覆盖 closure v2，没有启用完整制造业包，没有抽取产销量、材料成本率、采购、储备、供应商或客户，也没有开启 DCF、交易、价格敏感性或生产。
+
 ## Open Questions
 
-- 无。正式样本的指标留到 replay 之后再记，不在本设计里预设 9/9 或门槛通过。
+- 无。现场结果已记在 Field result。门槛通过不授权下一轮扩大。

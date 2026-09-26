@@ -10,8 +10,8 @@
 - [x] 2.4 Add direct counterexamples for an explicit named input, a report with no explicit commodity role, one existing non-Dongfeng manufacturing fixture, price-risk-only wording, generic cost or inventory amounts, sales evidence alone not creating an input role, independent sales and input evidence keeping both roles without netting, pending and ambiguous catalog mappings still delivering the role, and energy consumption staying `energy_consumption`
 - [x] 2.4a Bind a named material to the company's own input in the same sentence. Reject third-party procurement subjects and a principal-material list that only has 制造 or 生产 in a later window. Keep the four-name vehicle sentence.
 
-## 3. Official successor replay, not yet authorized
+## 3. Official successor replay
 
 - [x] 3.1 After implementation review, replay only the already frozen official reports on the new identity
 - [x] 3.2 Independently recount recall, accuracy, critical numeric errors, and workload. Do not presume recall 9/9 or that expansion gates pass
-- [ ] 3.3 Do not start another expansion, authorize scale quality or production, add a full manufacturing package, or enable volume, material-cost ratio, procurement, reserves, suppliers, or customers
+- [x] 3.3 Do not start another expansion, authorize scale quality or production, add a full manufacturing package, or enable volume, material-cost ratio, procurement, reserves, suppliers, or customers. Field result: works `bp-work-946a0a5296c2144c1ebc161a` and `bp-work-7b81740827ce0ccca634e2e9` on `owned_page_facts=v8` plus `material_input_facts=v1`; source review `material_input_facts_v1_successor_source_review.20260926.json` SHA-256 `9f6fb61e4e7fdbee9e680d091c0bc4bc13ca89f319b92cdd0457fdc3e2cdfbec`; recall 9/9, accuracy 9/9, critical 0, elapsed 5.149175 seconds, `expansion_gates_met=true`. That gate covers only these two frozen companies and this identity. `scale_quality_claim_allowed=false` and `production_authorization=not_authorized` stay in force. The live-run file matches the v5–v8 bytes and does not by itself prove the successor identity.
