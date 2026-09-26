@@ -41,6 +41,12 @@
 5. **1.1 通过后才允许实现和 focused replay。**
    通过标准是样本多样性、单一竖切规则、字段边界、研究隔离和后续验证方式被独立 Review 接受。focused replay 只覆盖已选报告和已选章节，并单独重算指标。门槛结果由正式模型派生，不在本设计里预填。
 
+6. **观察收口以 3.2 的 source review 为权威结果。**
+   绑定 `replay/20260926/source_review.json`。`enqueue.json` SHA-256 `0a7fc577840ce3bed45c02ec268fecf289b776104f05ae0ff3806c2daa0f1a84`，`run.json` SHA-256 `f80c96e5523704d05cc880c3a56cd4201549081f2fca9a10e8a0433629819852`，`material-input-stage4-material-inputs-20260926/result.json` SHA-256 `9a7444d285b8c8897f5206cce0abe00420edc12ba133ae29e3ccd795e82279b9`。run id 是 `stage4-material-inputs-20260926`，bundle schema 是 `company_profile_material_input_research.v2`。
+   样本是三份 2025 年报、三个交易所：`300750.SZ`（SZSE）、`603659.SH`（SSE）、`920015.BJ`（BSE）。只运行 `extract_material_inputs`。交付 19 条 `raw_material_input` Relationship，以及宁德时代正极材料一条独立的 `product_sales` Activity。source recall 19/23，source accuracy 19/19，critical numeric errors 0，`expansion_gates_met=false`。
+   四个召回缺口是：宁德时代第 73 页关联采购表中的磷酸铁锂、锂盐、氢氧化锂；锦华新材第 51 页主要原材料及能源表中的丁酮肟。它们归纳为两个后续业务形态，本 change 不实现：正文关联采购行中的公司原材料投入；正式“主要原材料及能源”表中的原材料行，能源行继续排除。
+   这次 false 只说明当前跨样本竖切没有达到召回门槛。它不否定已交付 19 条事实的准确性，不覆盖 `600004.SH` / `600006.SH` 此前的历史观察，也不授权下一轮扩大、规模质量或生产。目录映射状态不是质量通过。
+
 ## Risks / Trade-offs
 
 - [三份报告的披露形态仍然相近] → dossier 记录缺口；不把单一形态提升为全行业 required。
@@ -55,9 +61,19 @@
 1. 1.1 范围审核和 2.1 三份 dossier 已完成。
 2. 2.2 只记录 `extract_material_inputs` 的选择和边界，不实现代码。
 3. 2.2 审核通过后才做 2.3 最小研究实现。
-4. 实现审核通过后才做 focused replay，并单独重算指标。
-5. 回滚本 change 只删除这份范围文档；不删除已有 common-core work。
+4. 实现审核通过后才做 focused replay，并单独重算指标。该 replay 和 3.2 复核已经完成，权威数字见决策 6。
+5. 回滚本 change 只删除这份范围文档；不删除已有 common-core work。本 change 暂不归档，也不在本 change 内修复四个召回缺口。
 
 ## Open Questions
 
-- 无。最小竖切已定为 `extract_material_inputs`。合法未披露、unclear 和 extraction failure 的边界见 spec，不在实现前另选章节。
+- 无。本 change 的观察已经收口。两个后续业务形态留在本 change 之外，不在这里扩 Evidence plan。
+
+## 只读控制面
+
+3.3 只读核对，没有改这些文件：
+
+- common-core identity 仍是 `{"rules":"company_profile_common_core.v1","owned_page_facts":"v8","material_input_facts":"v1"}`。
+- `company_profile_research_publication.v1` 的 active scopes 仍是 `company_facts` 和 `commodity_associations`；`legacy_writer_enabled=false`，`dcf_authorized=false`，`trading_authorized=false`，`price_sensitivity_authorized=false`，`production_authorization=not_authorized`。
+- `company_profile_first_expansion_mode.v1` 仍是 `completed`，plan id `cd8031cb5a440da19d7a7b8a41af0fdf`，`work_ids` 为空，`production_authorization=not_authorized`。
+- `company_profile_operator_closure.v2` 的 `executed=false`，legacy writer、DCF、交易和价格敏感性仍关闭，`production_authorization=not_authorized`。
+- 本次 replay 只跑了 `extract_material_inputs`。历史六章 `EvidenceReportPlan` 没有被当作本样本的执行合同。
