@@ -33,6 +33,7 @@ from .models import (
     AssertionClass,
     ChapterTask,
     CoverageStatus,
+    Evidence,
     ObjectType,
     PeriodType,
     Relationship,
@@ -42,6 +43,7 @@ from .models import (
     SourceNativeValue,
     SubjectBasis,
     SubjectScope,
+    TextAnchor,
 )
 from .stage5 import (
     EvidencePreparationError,
@@ -56,6 +58,9 @@ from .workflow import CompanyProfileSemanticService
 MATERIAL_INPUT_RESEARCH_SCHEMA = "company_profile_material_input_research.v2"
 MATERIAL_INPUT_RESEARCH_PLAN_VERSION = (
     "manufacturing_materials_stage4_material_inputs.2026-09-26.1"
+)
+MATERIAL_INPUT_PROCUREMENT_PLAN_VERSION = (
+    "manufacturing_materials_stage4_material_inputs.2026-09-26.2"
 )
 MATERIAL_INPUT_CHAPTER = ChapterTask.EXTRACT_MATERIAL_INPUTS
 _REPOSITORY_ROOT = Path(__file__).resolve().parents[2]
@@ -259,6 +264,8 @@ class _ScopeBinding:
         "inventory_amount",
         "outsourced_processing",
         "product_overlap",
+        "company_purchase",
+        "materials_energy_table",
     ]
     page: int
     section_title: str
@@ -280,6 +287,7 @@ class MaterialInputReportBinding:
     page_count: int
     relative_dossier_path: str
     scopes: tuple[_ScopeBinding, ...]
+    plan_version: str = MATERIAL_INPUT_RESEARCH_PLAN_VERSION
 
 
 def material_input_research_bindings() -> tuple[MaterialInputReportBinding, ...]:
@@ -307,7 +315,7 @@ def material_input_research_bindings() -> tuple[MaterialInputReportBinding, ...]
             content_length=2043710,
             page_count=232,
             relative_dossier_path=(
-                "openspec/changes/scope-manufacturing-materials-stage4-minimum-slice/"
+                "openspec/changes/archive/2026-09-26-scope-manufacturing-materials-stage4-minimum-slice/"
                 "dossiers/300750-sz-2025.md"
             ),
             scopes=(
@@ -352,7 +360,7 @@ def material_input_research_bindings() -> tuple[MaterialInputReportBinding, ...]
             content_length=1740667,
             page_count=203,
             relative_dossier_path=(
-                "openspec/changes/scope-manufacturing-materials-stage4-minimum-slice/"
+                "openspec/changes/archive/2026-09-26-scope-manufacturing-materials-stage4-minimum-slice/"
                 "dossiers/603659-sh-2025.md"
             ),
             scopes=(
@@ -397,7 +405,7 @@ def material_input_research_bindings() -> tuple[MaterialInputReportBinding, ...]
             content_length=1845726,
             page_count=143,
             relative_dossier_path=(
-                "openspec/changes/scope-manufacturing-materials-stage4-minimum-slice/"
+                "openspec/changes/archive/2026-09-26-scope-manufacturing-materials-stage4-minimum-slice/"
                 "dossiers/920015-bj-2025.md"
             ),
             scopes=(
@@ -432,6 +440,158 @@ _EXPRESS_OMISSION = re.compile(r"未披露|不适用|无主要原材料|不涉�
 _AMBIGUOUS_SUBJECT = re.compile(r"客户|供应商|下游|销售|出售")
 
 
+_ACTIVATED_SCOPE_KINDS = frozenset({"company_purchase", "materials_energy_table"})
+_ENERGY_ROW_NAMES = frozenset(
+    {"蒸汽", "电", "电力", "天然气", "柴油", "汽油", "原煤", "煤炭", "能源"}
+)
+_GENERIC_ROW_NAMES = frozenset(
+    {"材料", "原材料", "原料", "原燃料", "燃料", "直接材料", "存货"}
+)
+_ROW_NAME = re.compile(r"^[\u4e00-\u9fffA-Za-z]{1,8}$")
+_ROW_NAME_REJECTED = re.compile(r"销售|出售|客户|供应商|下游|企业|价格|风险|公司|服务")
+_TABLE_GLUE = (
+    "主要原材料及能源",
+    "原材料及能源名称",
+    "原材料及能源",
+    "耗用情况",
+    "采购模式",
+    "供应稳定性分析",
+    "价格走势及变动情况分析",
+    "价格波动对营业成本的影响",
+    "营业成本随价格的涨跌而增减变动",
+    "分散采购",
+    "定向采购",
+    "较上年下降",
+    "合理范围",
+    "稳定",
+    "名称",
+)
+_PURCHASE_HEADERS = ("购销商品", "向关联方采购", "关联交易", "采购商品")
+
+
+class ResearchMaterialHit:
+    """One named input bound to a table header, row, and transaction direction."""
+
+    def __init__(
+        self, *, name: str, section_title: str, quote: str, direction: str
+    ) -> None:
+        self.name = name
+        self.section_title = section_title
+        self.quote = quote
+        self.direction = direction
+
+
+def research_material_hits(
+    kind: str,
+    text: str,
+    plan_version: str,
+) -> tuple[ResearchMaterialHit, ...]:
+    """Return row-bound inputs for a research scope.
+
+    Purchase rows and materials-table rows activate only on the procurement
+    plan. The archived 2026-09-26.1 plan and common-core extraction stay unchanged.
+    """
+
+    if plan_version != MATERIAL_INPUT_PROCUREMENT_PLAN_VERSION:
+        return ()
+    if kind == "company_purchase":
+        return _company_purchase_hits(text)
+    if kind == "materials_energy_table":
+        return _materials_table_hits(text)
+    return ()
+
+
+def _row_name_ok(name: str) -> bool:
+    return (
+        bool(_ROW_NAME.fullmatch(name))
+        and name not in _GENERIC_ROW_NAMES
+        and name not in _ENERGY_ROW_NAMES
+        and _ROW_NAME_REJECTED.search(name) is None
+    )
+
+
+def _split_row_names(text: str) -> tuple[str, ...]:
+    names: list[str] = []
+    for part in re.split(r"[、，,及和与]", text):
+        part = part.strip()
+        if _row_name_ok(part) and part not in names:
+            names.append(part)
+    return tuple(names)
+
+
+def _company_purchase_hits(text: str) -> tuple[ResearchMaterialHit, ...]:
+    compact = re.sub(r"\s+", "", text)
+    if not any(header in compact for header in _PURCHASE_HEADERS):
+        return ()
+    hits: list[ResearchMaterialHit] = []
+    seen: set[str] = set()
+    for match in re.finditer(r"采购原材料[（(]([^）)]+)[）)]", compact):
+        row_at = max(
+            compact.rfind(token, 0, match.start())
+            for token in ("向关联方采购", "本公司采购", "公司采购")
+        )
+        if row_at < 0:
+            continue
+        local = compact[max(0, match.start() - 16) : match.end()]
+        if re.search(r"(?:供应商|客户|下游)采购原材料", local):
+            continue
+        positions = [
+            compact.rfind(header, 0, match.start())
+            for header in _PURCHASE_HEADERS
+            if compact.rfind(header, 0, match.start()) >= 0
+        ]
+        start = min(positions) if positions else row_at
+        quote = compact[start : match.end()]
+        header = next(item for item in _PURCHASE_HEADERS if item in quote)
+        for name in _split_row_names(match.group(1)):
+            if name in seen:
+                continue
+            seen.add(name)
+            hits.append(
+                ResearchMaterialHit(
+                    name=name,
+                    section_title=header,
+                    quote=quote,
+                    direction="采购原材料",
+                )
+            )
+    return tuple(hits)
+
+
+def _materials_table_hits(text: str) -> tuple[ResearchMaterialHit, ...]:
+    compact = re.sub(r"\s+", "", text)
+    marker = compact.find("主要原材料及能源")
+    if marker < 0:
+        return ()
+    body = compact[marker:]
+    hits: list[ResearchMaterialHit] = []
+    seen: set[str] = set()
+    for match in re.finditer(r"([\u4e00-\u9fff]{2,24})合理范围", body):
+        name = _table_row_name(match.group(1))
+        if not _row_name_ok(name) or name in seen:
+            continue
+        seen.add(name)
+        quote = f"主要原材料及能源{name}耗用"
+        hits.append(
+            ResearchMaterialHit(
+                name=name,
+                section_title="主要原材料及能源",
+                quote=quote,
+                direction="耗用",
+            )
+        )
+    return tuple(hits)
+
+
+def _table_row_name(raw: str) -> str:
+    cut = 0
+    for token in _TABLE_GLUE:
+        index = raw.rfind(token)
+        if index >= 0:
+            cut = max(cut, index + len(token))
+    return raw[cut:]
+
+
 def classify_material_scope(
     kind: str,
     names: tuple[str, ...],
@@ -447,8 +607,12 @@ def classify_material_scope(
 
     if kind == "named_input" and names:
         return "observed"
+    if kind in {"company_purchase", "materials_energy_table"} and names:
+        return "observed"
     if names:
         return "unclear"
+    if kind in {"company_purchase", "materials_energy_table"}:
+        return "legal_empty"
     if kind == "named_input":
         compact = re.sub(r"\s+", "", text)
         if _EXPRESS_OMISSION.search(compact):
@@ -645,6 +809,7 @@ def _enqueue_snapshot(repository_root: Path) -> MaterialInputEnqueueSnapshot:
                 content_hash=content_hash,
                 dossier_path=binding.relative_dossier_path,
                 dossier_sha256=hashlib.sha256(dossier.read_bytes()).hexdigest(),
+                plan_version=binding.plan_version,
                 scopes=tuple(
                     MaterialInputEnqueueScope(
                         scope_id=item.scope_id,
@@ -733,13 +898,14 @@ def build_material_input_research_bundle(
     for binding in selected:
         by_scope: dict[str, Any] = {}
         scope_names: dict[str, tuple[str, ...]] = {}
+        activated_hits: list[tuple[Any, ResearchMaterialHit]] = []
         for spec in binding.scopes:
             try:
                 prepared = active_preparer.prepare_single_chapter(
                     asset=_asset(binding, repository_root),
                     chapter_task=MATERIAL_INPUT_CHAPTER,
                     scopes=(_scope_plan(spec),),
-                    plan_version=MATERIAL_INPUT_RESEARCH_PLAN_VERSION,
+                    plan_version=binding.plan_version,
                 )
             except EvidencePreparationError as exc:
                 if exc.code not in _SCOPE_PREPARATION_FAILURES:
@@ -767,7 +933,12 @@ def build_material_input_research_bundle(
                 )
             by_scope[spec.scope_id] = prepared[0]
             text = _scope_text(prepared[0])
-            names = explicit_material_input_names(text)
+            if spec.kind in _ACTIVATED_SCOPE_KINDS:
+                hits = research_material_hits(spec.kind, text, binding.plan_version)
+                activated_hits.extend((prepared[0], hit) for hit in hits)
+                names = tuple(hit.name for hit in hits)
+            else:
+                names = explicit_material_input_names(text)
             scope_names[spec.scope_id] = names
             outcome = classify_material_scope(spec.kind, names, text=text)
             outcomes.append(
@@ -781,31 +952,46 @@ def build_material_input_research_bundle(
                     evidence=_bound_evidence(prepared[0]),
                 )
             )
-        named = next(item for item in binding.scopes if item.kind == "named_input")
-        prepared_named = by_scope.get(named.scope_id)
-        if prepared_named is None or (
+        named = next(
+            (item for item in binding.scopes if item.kind == "named_input"), None
+        )
+        prepared_named = by_scope.get(named.scope_id) if named is not None else None
+        named_observed = prepared_named is not None and (
             classify_material_scope(
-                named.kind,
+                "named_input",
                 scope_names[named.scope_id],
                 text=_scope_text(prepared_named),
             )
-            != "observed"
-        ):
+            == "observed"
+        )
+        if not named_observed and not activated_hits:
             _append_report_record(report_records, binding, repository_root)
             continue
-        sales_names = _sales_names(binding, by_scope, scope_names[named.scope_id])
+        sales_names = (
+            _sales_names(binding, by_scope, scope_names[named.scope_id])
+            if named_observed and named is not None
+            else ()
+        )
         product_evidence = None
         if sales_names:
             product = next(
                 item for item in binding.scopes if item.kind == "product_overlap"
             )
             product_evidence = by_scope[product.scope_id].evidence_bundle[0].evidence
+        additional = tuple(
+            (
+                hit.name,
+                _row_evidence(_identity(binding), prepared_scope, hit),
+            )
+            for prepared_scope, hit in activated_hits
+        )
         accepted = _accept_report(
             binding,
-            by_scope[named.scope_id],
-            scope_names[named.scope_id],
+            prepared_named if named_observed else None,
+            scope_names[named.scope_id] if named_observed and named is not None else (),
             sales_names,
             product_evidence,
+            additional,
         )
         page_hashes = {
             page.page: page.text_hash
@@ -881,6 +1067,8 @@ def _outcome_reason(kind: str, outcome: str) -> str:
         "inventory_amount": "a raw-material inventory amount is not a named input",
         "outsourced_processing": "outsourced processing is not a material input",
         "product_overlap": "product or sales evidence alone does not create an input role",
+        "company_purchase": "no company purchase row names a raw material",
+        "materials_energy_table": "no raw-material row is purchased or consumed",
     }
     try:
         return reasons[kind]
@@ -996,15 +1184,76 @@ def _sales_names(
     return tuple(found)
 
 
-def _accept_report(binding, named_scope, names, sales_names, product_evidence):
-    report = _identity(binding)
-    evidence_by_page = {
-        item.evidence.page: item.evidence for item in named_scope.evidence_bundle
-    }
-    evidence = evidence_by_page[named_scope.page_contexts[0].page]
-    relationships = tuple(
-        _relationship(report, evidence, name, binding.sample_id) for name in names
+def _row_evidence(
+    report: ReportIdentity, prepared_scope, hit: ResearchMaterialHit
+) -> Evidence:
+    page = prepared_scope.page_contexts[0].page
+    if (
+        hit.section_title not in hit.quote
+        or hit.direction not in hit.quote
+        or hit.name not in hit.quote
+    ):
+        raise MaterialInputResearchError(
+            "material evidence must bind the table header, row direction, and name"
+        )
+    return Evidence(
+        evidence_id=(
+            "stage5-evidence-"
+            + hashlib.sha256(hit.quote.encode("utf-8")).hexdigest()[:24]
+        ),
+        report=report,
+        page=page,
+        section_title=hit.section_title,
+        anchor=TextAnchor(bounded_quote=hit.quote),
     )
+
+
+def _accept_report(
+    binding,
+    named_scope,
+    names,
+    sales_names,
+    product_evidence,
+    additional: tuple[tuple[str, Evidence], ...] = (),
+):
+    report = _identity(binding)
+    relationships_list: list[Relationship] = []
+    prepared_items: list[PreparedEvidence] = []
+    if names and named_scope is not None:
+        evidence_by_page = {
+            item.evidence.page: item.evidence for item in named_scope.evidence_bundle
+        }
+        evidence = evidence_by_page[named_scope.page_contexts[0].page]
+        for name in names:
+            relationships_list.append(
+                _relationship(report, evidence, name, binding.sample_id)
+            )
+        prepared_items.extend(
+            PreparedEvidence(
+                evidence=item.evidence,
+                field_id="material_input",
+                context_complete=item.context_complete,
+                headers_complete=item.headers_complete,
+                unit_context_complete=item.unit_context_complete,
+                footnotes_complete=item.footnotes_complete,
+                continuation_complete=item.continuation_complete,
+                source_readable=item.source_readable,
+            )
+            for item in named_scope.evidence_bundle
+        )
+    for name, evidence in additional:
+        relationships_list.append(
+            _relationship(report, evidence, name, binding.sample_id)
+        )
+        prepared_items.append(
+            PreparedEvidence(
+                evidence=evidence,
+                field_id="material_input",
+                context_complete=True,
+                source_readable=True,
+            )
+        )
+    relationships = tuple(relationships_list)
     activities = tuple(
         _sales_activity(report, product_evidence, name, binding.sample_id)
         for name in sales_names
@@ -1041,19 +1290,7 @@ def _accept_report(binding, named_scope, names, sales_names, product_evidence):
             )
         )
         allowed_actions = (ActivityAction.SELLS,)
-    prepared = tuple(
-        PreparedEvidence(
-            evidence=item.evidence,
-            field_id="material_input",
-            context_complete=item.context_complete,
-            headers_complete=item.headers_complete,
-            unit_context_complete=item.unit_context_complete,
-            footnotes_complete=item.footnotes_complete,
-            continuation_complete=item.continuation_complete,
-            source_readable=item.source_readable,
-        )
-        for item in named_scope.evidence_bundle
-    )
+    prepared = tuple(prepared_items)
     if activities:
         prepared = prepared + (
             PreparedEvidence(
@@ -1068,7 +1305,7 @@ def _accept_report(binding, named_scope, names, sales_names, product_evidence):
         report=report,
         package_manifest=PackageManifest(
             package_name="manufacturing_materials",
-            package_version=MATERIAL_INPUT_RESEARCH_PLAN_VERSION,
+            package_version=binding.plan_version,
             report=report,
             checklist=tuple(checklist),
         ),
