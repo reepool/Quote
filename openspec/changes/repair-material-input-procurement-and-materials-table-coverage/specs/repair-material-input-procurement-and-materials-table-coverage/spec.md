@@ -1,24 +1,29 @@
 ## ADDED Requirements
 
 ### Requirement: Company purchase rows can name a material input
-A row MUST be eligible for `extract_material_inputs` only when its table heading, transaction direction, and row content together show that the report subject purchases a raw material. A named material stated in the raw-material cell or in parentheses MAY become a `material_input` relationship. The rule MUST NOT hard-code an instrument id, a page number, or a material name. A sales row, a service row, a generic purchase amount with no material name, or a row whose buyer cannot be determined MUST NOT create an input role. The Ningde Times page 73 related-party purchase table is an acceptance fixture for this rule, not part of the rule.
+A row MUST be eligible for `extract_material_inputs` only when its table heading, transaction direction, and row content together show that the report subject purchases a raw material. When those three conditions hold, each named material stated in the raw-material cell or in parentheses MUST be delivered as a `material_input` relationship. The rule MUST NOT hard-code an instrument id, a page number, or a material name. A word such as 服务 in a compound table heading MUST NOT reject the whole table. Each row MUST be judged by its own transaction direction. A sales row, a true service row, a generic purchase amount with no material name, or a row whose buyer cannot be determined MUST NOT create an input role. The Ningde Times page 73 related-party purchase table is an acceptance fixture for this rule, not part of the rule.
 
 #### Scenario: A related-party purchase names the company's raw materials
-- **WHEN** a table says the report subject purchases raw materials and the row names those materials in the cell or in parentheses
-- **THEN** each named material may be delivered as a `material_input` relationship
+- **WHEN** the table heading, transaction direction, and row content together show that the report subject purchases raw materials and the row names those materials in the cell or in parentheses
+- **THEN** each named material MUST be delivered as a `material_input` relationship
 - **AND** the delivery does not depend on one instrument id, page, or material name
+
+#### Scenario: A compound heading does not reject purchase rows
+- **WHEN** the table heading also contains a word such as 服务 and a specific row shows that the report subject purchases a named raw material
+- **THEN** that purchase row MUST still be delivered as a `material_input` relationship
+- **AND** a different row that is only a provided service MUST NOT create an input role
 
 #### Scenario: Sales, services, generic amounts, and unclear buyers stay refused
 - **WHEN** the row records a sale, a provided service, only a generic purchase amount, or does not show that the report subject is the buyer
 - **THEN** no `material_input` relationship is created from that row
 
 ### Requirement: A materials-and-energy table admits raw-material rows only
-A formal “主要原材料及能源” table MUST contribute a material input only for a row that is explicitly a raw material. An independent company purchase or consumption row for a named material, including 丁酮肟, MAY create an input fact. Energy rows, including 蒸汽 and 电, MUST stay excluded. An outsourced-processing arrangement by itself MUST NOT create an input role, even when the processed object is the same source-native name.
+A formal “主要原材料及能源” table MUST contribute a material input only for a row that is explicitly a raw material. A named raw-material row that the company purchases or consumes MUST be delivered as a `material_input` fact, including 丁酮肟 when that name appears in such a row. Absence of a quantity MUST still allow that delivery. Energy rows, including 蒸汽 and 电, MUST stay excluded. An outsourced-processing arrangement by itself MUST NOT create an input role, even when the processed object is the same source-native name.
 
-#### Scenario: A consumed raw-material row is eligible
+#### Scenario: A consumed raw-material row is delivered
 - **WHEN** the table lists a named raw material as purchased or consumed by the company
-- **THEN** that row may support a `material_input` fact
-- **AND** the fact does not require a quantity
+- **THEN** that row MUST be delivered as a `material_input` fact
+- **AND** the delivery remains allowed when the row states no quantity
 
 #### Scenario: Energy rows are excluded
 - **WHEN** the same table lists 蒸汽, 电, or another energy row
@@ -27,10 +32,10 @@ A formal “主要原材料及能源” table MUST contribute a material input o
 #### Scenario: Toll processing remains a separate disclosure
 - **WHEN** the report only says an outside party processes a named material supplied by the company
 - **THEN** that arrangement does not create a `material_input` fact
-- **AND** a separate purchase or consumption row for the same name may still be eligible
+- **AND** a separate purchase or consumption row for the same name MUST still be delivered when that row names the material as the company's own raw-material purchase or consumption
 
 ### Requirement: The repair reuses the isolated material-input path
-The repair MUST reuse the existing `extract_material_inputs` chapter, Evidence preparation, Stage 5 extract, repair, and verify, and the research isolation bundle. Output disposition MUST remain `accepted_for_review`. Sales evidence alone, generic direct-material cost, and raw-material inventory amounts MUST keep their existing refusals. Legal-empty, unclear, and extraction failure MUST stay distinct and MUST NOT be rewritten as a zero, a guessed commodity id, or a successful fact. The same source-native name MAY keep both a sales role and an input role without netting. A pending or ambiguous catalog mapping MUST keep an established input relationship and MUST NOT carry a commodity id.
+The repair MUST reuse the existing `extract_material_inputs` chapter, Evidence preparation, Stage 5 extract, repair, and verify, and the research isolation bundle. Output disposition MUST remain `accepted_for_review`. Sales evidence alone, generic direct-material cost, and raw-material inventory amounts MUST keep their existing refusals. Legal-empty, unclear, and extraction failure MUST stay distinct and MUST NOT be rewritten as a zero, a guessed commodity id, or a successful fact. The same source-native name MAY keep both a sales role and an input role without netting. Pending and ambiguous catalog mappings affect only the catalog mapping. They MUST NOT block an established input relationship, and they MUST NOT carry a commodity id.
 
 #### Scenario: A repaired run stays research-only
 - **WHEN** the two disclosure forms are implemented
