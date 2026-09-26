@@ -32,6 +32,8 @@ from .models import (
     Measurement,
     MetricType,
     PeriodType,
+    Relationship,
+    RelationshipType,
     ReportIdentity,
     Segment,
     SemanticRecord,
@@ -47,6 +49,7 @@ CORE_SOURCE_FIELD_IDS = (
     "explicit_activity",
     "segment_dimension",
     "operating_revenue",
+    "material_input",
 )
 _OVERVIEW_HEADINGS = (
     "报告期内公司从事的业务情况",
@@ -130,7 +133,9 @@ class CoreEvidenceSpan(_StrictModel):
     excerpt: str = Field(min_length=1)
     bounded_quote: str = Field(min_length=1)
     chapter_task: Literal[
-        "extract_business_overview", "extract_segment_financials"
+        "extract_business_overview",
+        "extract_segment_financials",
+        "extract_material_inputs",
     ]
     field_ids: tuple[str, ...]
     dimension_ids: tuple[str, ...] = ()
@@ -146,7 +151,9 @@ class ReusedStructuredFact(_StrictModel):
 class CoreEvidenceGap(_StrictModel):
     code: Literal["page_unreadable", "chapter_missing", "extraction_failed"]
     chapter_task: Literal[
-        "extract_business_overview", "extract_segment_financials"
+        "extract_business_overview",
+        "extract_segment_financials",
+        "extract_material_inputs",
     ]
     page: int | None = None
     message: str = Field(min_length=1)
@@ -176,6 +183,7 @@ def core_evidence_schema_manifest() -> dict[str, Any]:
         "chapter_tasks": (
             "extract_business_overview",
             "extract_segment_financials",
+            "extract_material_inputs",
         ),
         "source_field_ids": CORE_SOURCE_FIELD_IDS,
         "title": schema.get("title", "CoreEvidenceSelection"),
@@ -243,6 +251,10 @@ def select_core_evidence(
     if income.span is not None:
         spans.append(income.span)
     gaps.extend(income.gaps)
+
+    material = _select_material_span(normalized)
+    if material is not None:
+        spans.append(material)
 
     if overview.span is None and not any(
         gap.code == "chapter_missing"
@@ -944,6 +956,8 @@ def project_owned_page_facts(
             else:
                 records.extend(_project_segment_span(selection, span))
                 records.extend(_project_company_total_rows(selection, span))
+        elif span.chapter_task == ChapterTask.EXTRACT_MATERIAL_INPUTS.value:
+            records.extend(_project_material_span(selection, span))
     return _dedupe_owned_records(records)
 
 
@@ -1616,6 +1630,125 @@ def _dedupe_owned_records(
             seen.add(key)
         unique.append(record)
     return tuple(unique)
+
+
+_MATERIAL_NAME = r"[\u4e00-\u9fffA-Za-z]{1,8}"
+_PROCURED_MATERIAL_INPUT = re.compile(
+    rf"(?:公司|本公司)?(?:采购|购入|消耗|投入)(?:了)?({_MATERIAL_NAME})"
+    rf"(?:用于(?:生产|制造|经营)|作为(?:原材料|原料|投入))"
+)
+_MATERIAL_BINDING = re.compile(r"生产|制造|投入|消耗|采购")
+_GENERIC_MATERIAL_NAMES = frozenset(
+    {"材料", "原材料", "原料", "原燃料", "燃料", "能源", "直接材料", "存货"}
+)
+
+
+def explicit_material_input_names(text: str) -> tuple[str, ...]:
+    """Return named materials the text itself binds to company production or operations."""
+
+    compact = re.sub(r"\s+", "", text)
+    names: list[str] = []
+    for match in re.finditer("等主要原材料", compact):
+        if _MATERIAL_BINDING.search(compact[match.end() : match.end() + 80]) is None:
+            continue
+        clause = re.split(r"[。；;，,：:]", compact[: match.start()])[-1]
+        names.extend(_split_material_names(clause))
+    for match in _PROCURED_MATERIAL_INPUT.finditer(compact):
+        names.append(match.group(1))
+    unique: list[str] = []
+    for name in names:
+        if name in _GENERIC_MATERIAL_NAMES or name in unique:
+            continue
+        unique.append(name)
+    return tuple(unique)
+
+
+def _split_material_names(text: str) -> list[str]:
+    names: list[str] = []
+    for part in re.split(r"[、及和]", text):
+        if not re.fullmatch(_MATERIAL_NAME, part):
+            continue
+        if part in _GENERIC_MATERIAL_NAMES:
+            continue
+        names.append(part)
+    return names
+
+
+def _select_material_span(
+    pages: Sequence[ReportPageText],
+) -> CoreEvidenceSpan | None:
+    for page in pages:
+        if not page.readable or not explicit_material_input_names(page.text):
+            continue
+        section_title, quote = _material_quote(page.text)
+        return CoreEvidenceSpan(
+            page=page.page,
+            section_title=section_title,
+            excerpt=quote,
+            bounded_quote=quote,
+            chapter_task="extract_material_inputs",
+            field_ids=("material_input",),
+            context_complete=True,
+        )
+    return None
+
+
+def _material_quote(text: str) -> tuple[str, str]:
+    compact = re.sub(r"\s+", "", text)
+    marker = text.find("等主要原材料")
+    compact_marker = compact.find("等主要原材料")
+    if (
+        marker >= 0
+        and compact_marker >= 0
+        and _MATERIAL_BINDING.search(compact[compact_marker : compact_marker + 80])
+    ):
+        line_start = text.rfind("\n", 0, marker) + 1
+        end = text.find("。", marker)
+        quote = text[line_start : len(text) if end < 0 else end + 1].strip()
+        return _material_section(text, quote), quote
+    match = _PROCURED_MATERIAL_INPUT.search(compact)
+    if match is None:
+        return "主要原材料", text.strip()
+    quote = _original_span_matching(text, match.group(0)) or match.group(0)
+    return _material_section(text, quote), quote.strip()
+
+
+def _material_section(text: str, quote: str) -> str:
+    anchor = quote[:12]
+    index = text.find(anchor) if anchor else -1
+    before = text[:index] if index > 0 else ""
+    lines = [line.strip() for line in before.splitlines() if line.strip()]
+    if lines and len(lines[-1]) <= 30 and "等主要原材料" not in lines[-1]:
+        return lines[-1]
+    return "主要原材料"
+
+
+def _project_material_span(
+    selection: CoreEvidenceSelection,
+    span: CoreEvidenceSpan,
+) -> tuple[SemanticRecord, ...]:
+    item = _prepared_for(selection, span, "material_input")
+    if item is None:
+        return ()
+    records: list[SemanticRecord] = []
+    for name in explicit_material_input_names(span.excerpt):
+        records.append(
+            _base_fact(
+                Relationship,
+                report=selection.report,
+                record_id=(
+                    f"owned:{item.evidence.evidence_id}:material:{name}"
+                ),
+                field_id="material_input",
+                chapter_task=ChapterTask.EXTRACT_MATERIAL_INPUTS,
+                evidence=item.evidence,
+                source_native=SourceNativeValue(name=name),
+                relation_type=RelationshipType.MATERIAL_INPUT,
+                object_name=name,
+                excerpt_subject=span.excerpt,
+            )
+        )
+    return tuple(records)
 
 
 def _base_fact(model, **kwargs):

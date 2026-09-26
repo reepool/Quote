@@ -34,6 +34,7 @@ from research.company_profile.execution import (
     OWNED_PAGE_FACTS_V5_IDENTITY,
     OWNED_PAGE_FACTS_V6_IDENTITY,
     OWNED_PAGE_FACTS_V7_IDENTITY,
+    OWNED_PAGE_FACTS_V8_IDENTITY,
     default_processing_identity,
 )
 from research.company_profile.models import (
@@ -161,6 +162,7 @@ def test_default_identity_is_distinct_from_empty_delivery():
     assert identity != EMPTY_DELIVERY_PROCESSING_IDENTITY
     assert identity["rules"] == "company_profile_common_core.v1"
     assert identity["owned_page_facts"] == "v8"
+    assert identity["material_input_facts"] == "v1"
     assert identity != OWNED_PAGE_FACTS_V1_IDENTITY
     assert identity != OWNED_PAGE_FACTS_V2_IDENTITY
     assert identity != OWNED_PAGE_FACTS_V3_IDENTITY
@@ -168,6 +170,7 @@ def test_default_identity_is_distinct_from_empty_delivery():
     assert identity != OWNED_PAGE_FACTS_V5_IDENTITY
     assert identity != OWNED_PAGE_FACTS_V6_IDENTITY
     assert identity != OWNED_PAGE_FACTS_V7_IDENTITY
+    assert identity != OWNED_PAGE_FACTS_V8_IDENTITY
 
 
 def test_avic_official_excerpts_project_core_facts_without_provider():
@@ -1378,9 +1381,11 @@ def test_v5_enqueues_successor_and_query_prefers_it_over_later_v4_work_id(tmp_pa
         instrument_ids=["600000.SH"],
     )
     assert default_processing_identity()["owned_page_facts"] == "v8"
+    assert default_processing_identity()["material_input_facts"] == "v1"
     assert default_processing_identity() != OWNED_PAGE_FACTS_V5_IDENTITY
     assert default_processing_identity() != OWNED_PAGE_FACTS_V6_IDENTITY
     assert default_processing_identity() != OWNED_PAGE_FACTS_V7_IDENTITY
+    assert default_processing_identity() != OWNED_PAGE_FACTS_V8_IDENTITY
     assert first["inserted"] == 1
     assert successor["inserted"] == 1
     assert successor["reused"] == 0

@@ -130,6 +130,7 @@ def test_common_core_does_not_add_tasks_or_require_manufacturing_quantities():
     assert COMMON_CORE_CHAPTERS == (
         ChapterTask.EXTRACT_BUSINESS_OVERVIEW,
         ChapterTask.EXTRACT_SEGMENT_FINANCIALS,
+        ChapterTask.EXTRACT_MATERIAL_INPUTS,
     )
     assert [item.value for item in ChapterTask] == [
         "extract_business_overview",
@@ -354,8 +355,10 @@ def test_disabled_enhancements_are_not_activated_even_when_disclosed():
         )
     )
 
+    material = _chapter(chapters, ChapterTask.EXTRACT_MATERIAL_INPUTS)
+    assert material.status == "not_applicable"
+    assert material.reason == "no_owned_heading"
     for task in (
-        ChapterTask.EXTRACT_MATERIAL_INPUTS,
         ChapterTask.EXTRACT_COUNTERPARTIES_AND_CONCENTRATION,
         ChapterTask.EXTRACT_BUSINESS_REGIME,
     ):

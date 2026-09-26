@@ -1,8 +1,8 @@
 """Form the all-industry three-dimension skeleton from existing core owners.
 
 This module does not add ChapterTask values or manufacturing-only required
-fields. Quantity and material tasks stay enhancements and activate only when
-the source owns that disclosure.
+fields. Quantity tasks stay enhancements. Material inputs activate only when
+the source names a production or operating input.
 """
 
 from __future__ import annotations
@@ -23,6 +23,7 @@ from .core_evidence_selection import (
     CORE_SEGMENT_HEADINGS,
     CoreEvidenceSelection,
     ReportPageText,
+    explicit_material_input_names,
     owned_section_heading,
     select_core_evidence,
 )
@@ -35,6 +36,7 @@ from .models import (
 COMMON_CORE_CHAPTERS = (
     ChapterTask.EXTRACT_BUSINESS_OVERVIEW,
     ChapterTask.EXTRACT_SEGMENT_FINANCIALS,
+    ChapterTask.EXTRACT_MATERIAL_INPUTS,
 )
 _QUANTITY_HEADINGS = (
     "主要产品的产销量情况",
@@ -47,7 +49,6 @@ _QUANTITY_NEGATED = re.compile(
     r"(?:[:：](?:否|不适用)|(?:否|不适用)|.{0,80}[√☑](?:否|不适用))"
 )
 _SLICE_DISABLED_CHAPTERS = (
-    ChapterTask.EXTRACT_MATERIAL_INPUTS,
     ChapterTask.EXTRACT_COUNTERPARTIES_AND_CONCENTRATION,
     ChapterTask.EXTRACT_BUSINESS_REGIME,
 )
@@ -122,6 +123,7 @@ def select_activated_chapters(
     has_segment = any(
         owned_section_heading(text, CORE_SEGMENT_HEADINGS) for text in texts
     )
+    has_material = any(explicit_material_input_names(text) for text in texts)
     has_quantity, quantity_negated = _quantity_heading_state(texts)
     activated: list[ActivatedChapter] = []
     for chapter in ChapterTask:
@@ -129,6 +131,7 @@ def select_activated_chapters(
             _activate_chapter(
                 chapter,
                 has_segment=has_segment,
+                has_material=has_material,
                 has_quantity=has_quantity,
                 quantity_negated=quantity_negated,
             )
@@ -155,6 +158,7 @@ def _activate_chapter(
     chapter: ChapterTask,
     *,
     has_segment: bool,
+    has_material: bool,
     has_quantity: bool,
     quantity_negated: bool,
 ) -> ActivatedChapter:
@@ -178,6 +182,13 @@ def _activate_chapter(
             role="common_core",
             status="activated" if has_segment else "not_applicable",
             reason="owned_heading" if has_segment else "no_owned_heading",
+        )
+    if chapter is ChapterTask.EXTRACT_MATERIAL_INPUTS:
+        return ActivatedChapter(
+            chapter_task=chapter,
+            role="common_core",
+            status="activated" if has_material else "not_applicable",
+            reason="owned_heading" if has_material else "no_owned_heading",
         )
     if quantity_negated:
         status: Literal["activated", "not_applicable"] = "not_applicable"

@@ -91,6 +91,7 @@ _CORE_FIELDS: dict[ChapterTask, tuple[str, ...]] = {
         "segment_dimension",
         "operating_revenue",
     ),
+    ChapterTask.EXTRACT_MATERIAL_INPUTS: ("material_input",),
 }
 _FIELD_CONTRACT: dict[
     str,
@@ -118,6 +119,12 @@ _FIELD_CONTRACT: dict[
         ObjectType.MEASUREMENT,
         RequirementLevel.CONDITIONAL,
         (MetricType.OPERATING_REVENUE, MetricType.DISCLOSED_SHARE),
+        (),
+    ),
+    "material_input": (
+        ObjectType.RELATIONSHIP,
+        RequirementLevel.CONDITIONAL,
+        (),
         (),
     ),
 }

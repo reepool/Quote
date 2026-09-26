@@ -65,6 +65,7 @@ def test_schema_keeps_six_chapter_tasks_and_existing_field_ids():
     assert manifest["chapter_tasks"] == (
         "extract_business_overview",
         "extract_segment_financials",
+        "extract_material_inputs",
     )
     assert "extract_revenue_model" not in json.dumps(manifest)
 
