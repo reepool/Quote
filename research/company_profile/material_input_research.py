@@ -44,7 +44,9 @@ from .models import (
     SubjectScope,
 )
 from .stage5 import (
+    EvidencePreparationError,
     EvidenceScopePlan,
+    PreparationFailureCode,
     Stage5EvidencePreparer,
     Stage5ReportAsset,
 )
@@ -241,7 +243,7 @@ class MaterialInputResearchBundle(_StrictModel):
         min_length=3, max_length=3
     )
     scope_outcomes: tuple[MaterialInputScopeOutcome, ...] = Field(min_length=1)
-    facts: tuple[MaterialInputResearchFact, ...] = Field(min_length=1)
+    facts: tuple[MaterialInputResearchFact, ...] = ()
     sales_roles: tuple[MaterialInputSalesRole, ...] = ()
 
 
@@ -497,6 +499,18 @@ def extraction_failure_outcome(
     )
 
 
+_SCOPE_PREPARATION_FAILURES = frozenset(
+    {
+        PreparationFailureCode.PAGE_UNREADABLE,
+        PreparationFailureCode.CONTEXT_INCOMPLETE,
+        PreparationFailureCode.HEADER_MISSING,
+        PreparationFailureCode.UNIT_MISSING,
+        PreparationFailureCode.FOOTNOTE_MISSING,
+        PreparationFailureCode.CONTINUATION_INCOMPLETE,
+    }
+)
+
+
 def commit_material_input_research(
     output_root: str | Path,
     *,
@@ -504,6 +518,7 @@ def commit_material_input_research(
     catalog: Any | None = None,
     run_id: str = "stage4-material-inputs",
     preparer: Stage5EvidencePreparer | None = None,
+    bindings: tuple[MaterialInputReportBinding, ...] | None = None,
 ) -> Path:
     """Prepare the three reports and commit one review-only bundle.
 
@@ -518,6 +533,7 @@ def commit_material_input_research(
         catalog=catalog,
         run_id=run_id,
         preparer=preparer,
+        bindings=bindings,
     )
     destination = store.output_root / f"material-input-{bundle.run_id}"
     if destination.exists():
@@ -544,27 +560,55 @@ def build_material_input_research_bundle(
     catalog: Any | None,
     run_id: str,
     preparer: Stage5EvidencePreparer | None,
+    bindings: tuple[MaterialInputReportBinding, ...] | None = None,
 ) -> MaterialInputResearchBundle:
+    selected = material_input_research_bindings() if bindings is None else bindings
+    if len(selected) != 3 or len({item.sample_id for item in selected}) != 3:
+        raise MaterialInputResearchError(
+            "the research slice prepares the three dossier reports"
+        )
     active_preparer = preparer or Stage5EvidencePreparer()
     outcomes: list[MaterialInputScopeOutcome] = []
     facts: list[MaterialInputResearchFact] = []
     sales_roles: list[MaterialInputSalesRole] = []
     report_records: list[MaterialInputReportBindingRecord] = []
-    for binding in material_input_research_bindings():
-        prepared = active_preparer.prepare_single_chapter(
-            asset=_asset(binding, repository_root),
-            chapter_task=MATERIAL_INPUT_CHAPTER,
-            scopes=tuple(_scope_plan(item) for item in binding.scopes),
-            plan_version=MATERIAL_INPUT_RESEARCH_PLAN_VERSION,
-        )
-        if any(item.chapter_task is not MATERIAL_INPUT_CHAPTER for item in prepared):
-            raise MaterialInputResearchError("research scope prepared a second chapter")
-        by_scope = {item.scope_id: item for item in prepared}
+    for binding in selected:
+        by_scope: dict[str, Any] = {}
         scope_names: dict[str, tuple[str, ...]] = {}
         for spec in binding.scopes:
-            text = "\n".join(
-                page.text for page in by_scope[spec.scope_id].page_contexts
-            )
+            try:
+                prepared = active_preparer.prepare_single_chapter(
+                    asset=_asset(binding, repository_root),
+                    chapter_task=MATERIAL_INPUT_CHAPTER,
+                    scopes=(_scope_plan(spec),),
+                    plan_version=MATERIAL_INPUT_RESEARCH_PLAN_VERSION,
+                )
+            except EvidencePreparationError as exc:
+                if exc.code not in _SCOPE_PREPARATION_FAILURES:
+                    raise
+                outcomes.append(
+                    extraction_failure_outcome(
+                        sample_id=binding.sample_id,
+                        scope_id=spec.scope_id,
+                        instrument_id=binding.instrument_id,
+                        report_id=binding.report_id,
+                        document_version=binding.document_version,
+                        page=spec.page,
+                        section_title=spec.section_title,
+                        code=exc.code.value,
+                        message=str(exc),
+                    )
+                )
+                continue
+            if (
+                len(prepared) != 1
+                or prepared[0].chapter_task is not MATERIAL_INPUT_CHAPTER
+            ):
+                raise MaterialInputResearchError(
+                    "research scope prepared a second chapter"
+                )
+            by_scope[spec.scope_id] = prepared[0]
+            text = _scope_text(prepared[0])
             names = explicit_material_input_names(text)
             scope_names[spec.scope_id] = names
             outcome = classify_material_scope(spec.kind, names, text=text)
@@ -576,21 +620,21 @@ def build_material_input_research_bundle(
                     outcome=outcome,
                     names=names,
                     reason=_outcome_reason(spec.kind, outcome),
-                    evidence=_bound_evidence(by_scope[spec.scope_id]),
+                    evidence=_bound_evidence(prepared[0]),
                 )
             )
         named = next(item for item in binding.scopes if item.kind == "named_input")
-        if (
+        prepared_named = by_scope.get(named.scope_id)
+        if prepared_named is None or (
             classify_material_scope(
                 named.kind,
                 scope_names[named.scope_id],
-                text=_scope_text(by_scope[named.scope_id]),
+                text=_scope_text(prepared_named),
             )
             != "observed"
         ):
-            raise MaterialInputResearchError(
-                f"{binding.sample_id} named-input evidence did not uniquely bind"
-            )
+            _append_report_record(report_records, binding, repository_root)
+            continue
         sales_names = _sales_names(binding, by_scope, scope_names[named.scope_id])
         product_evidence = None
         if sales_names:
@@ -632,24 +676,30 @@ def build_material_input_research_bundle(
                 sales_roles.append(
                     _sales_role(binding.sample_id, record, exposure, page_hashes)
                 )
-        dossier = repository_root / binding.relative_dossier_path
-        report_records.append(
-            MaterialInputReportBindingRecord(
-                sample_id=binding.sample_id,
-                content_hash=binding.content_hash,
-                dossier_path=binding.relative_dossier_path,
-                dossier_sha256=hashlib.sha256(dossier.read_bytes()).hexdigest(),
-                instrument_id=binding.instrument_id,
-                report_id=binding.report_id,
-                document_version=binding.document_version,
-            )
-        )
+        _append_report_record(report_records, binding, repository_root)
     return MaterialInputResearchBundle(
         run_id=run_id,
         reports=tuple(report_records),
         scope_outcomes=tuple(outcomes),
         facts=tuple(facts),
         sales_roles=tuple(sales_roles),
+    )
+
+
+def _append_report_record(
+    records: list, binding: MaterialInputReportBinding, repository_root: Path
+) -> None:
+    dossier = repository_root / binding.relative_dossier_path
+    records.append(
+        MaterialInputReportBindingRecord(
+            sample_id=binding.sample_id,
+            content_hash=binding.content_hash,
+            dossier_path=binding.relative_dossier_path,
+            dossier_sha256=hashlib.sha256(dossier.read_bytes()).hexdigest(),
+            instrument_id=binding.instrument_id,
+            report_id=binding.report_id,
+            document_version=binding.document_version,
+        )
     )
 
 
@@ -772,7 +822,7 @@ def _sales_names(
     found: list[str] = []
     inputs = set(input_names)
     for spec in binding.scopes:
-        if spec.kind != "product_overlap":
+        if spec.kind != "product_overlap" or spec.scope_id not in by_scope:
             continue
         text = re.sub(
             r"\s+",

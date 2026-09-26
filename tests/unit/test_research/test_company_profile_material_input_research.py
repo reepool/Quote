@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from dataclasses import replace
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -15,6 +16,7 @@ from research.company_profile.core_evidence_selection import (
 from research.company_profile.material_input_research import (
     MaterialInputScopeOutcome,
     ResearchEvidenceRef,
+    _ScopeBinding,
     classify_material_scope,
     commit_material_input_research,
     extraction_failure_outcome,
@@ -446,6 +448,103 @@ def _rebuild_evidence(
         )
         for item in evidence
     )
+
+
+def test_commit_persists_empty_outcomes_and_preparation_failures(tmp_path):
+    catl, putailai, jinhua = material_input_research_bindings()
+    catl = replace(
+        catl,
+        scopes=(
+            _ScopeBinding(
+                "300750-named-input",
+                "named_input",
+                5,
+                "非标准审计意见",
+                ("非标准审计意见",),
+            ),
+            *catl.scopes[1:],
+        ),
+    )
+    putailai = replace(
+        putailai,
+        scopes=(
+            _ScopeBinding(
+                "603659-named-input",
+                "named_input",
+                20,
+                "直接材料成本",
+                ("直接材料",),
+            ),
+            *putailai.scopes[1:],
+        ),
+    )
+    inventory = jinhua.scopes[2]
+    jinhua = replace(
+        jinhua,
+        scopes=(
+            *jinhua.scopes[:2],
+            _ScopeBinding(
+                inventory.scope_id,
+                inventory.kind,
+                inventory.page,
+                inventory.section_title,
+                ("这个锚点不在页面上",),
+            ),
+        ),
+    )
+    destination = commit_material_input_research(
+        tmp_path / "empty-outcomes",
+        repository_root=_ROOT,
+        catalog=_Catalog(),
+        run_id="stage4-empty-outcomes",
+        bindings=(catl, putailai, jinhua),
+    )
+    payload = json.loads((destination / "result.json").read_text(encoding="utf-8"))
+    assert payload["disposition"] == "accepted_for_review"
+    assert payload["provider_calls"] == 0
+    outcomes = {
+        (item["sample_id"], item["scope_id"]): item
+        for item in payload["scope_outcomes"]
+    }
+    legal_empty = outcomes[
+        ("manufacturing-materials-300750-2025", "300750-named-input")
+    ]
+    assert legal_empty["outcome"] == "legal_empty"
+    assert legal_empty["names"] == []
+    assert legal_empty["reason"]
+    assert legal_empty["evidence"][0]["binding_status"] == "bound"
+    assert legal_empty["evidence"][0]["evidence_id"]
+    assert legal_empty["evidence"][0]["page"] == 5
+    unclear = outcomes[("manufacturing-materials-603659-2025", "603659-named-input")]
+    assert unclear["outcome"] == "unclear"
+    assert unclear["names"] == []
+    assert unclear["reason"]
+    assert unclear["evidence"][0]["binding_status"] == "bound"
+    assert unclear["evidence"][0]["evidence_id"]
+    assert unclear["evidence"][0]["page"] == 20
+    failed = outcomes[("manufacturing-materials-920015-2025", "920015-inventory")]
+    assert failed["outcome"] == "extraction_failure"
+    assert failed["failure_code"] == "context_incomplete"
+    assert failed["names"] == []
+    assert failed["evidence"][0]["binding_status"] == "unbound"
+    assert failed["evidence"][0]["evidence_id"] is None
+    assert failed["evidence"][0]["bounded_quote"] is None
+    assert failed["evidence"][0]["page"] == 108
+    assert failed["evidence"][0]["section_title"] == "原材料存货"
+    assert failed["evidence"][0]["chapter_task"] == "extract_material_inputs"
+    fact_samples = {item["sample_id"] for item in payload["facts"]}
+    assert fact_samples == {"manufacturing-materials-920015-2025"}
+    for fact in payload["facts"]:
+        assert fact["disposition"] == "accepted_for_review"
+        assert fact["evidence"][0]["page"] == 26
+        assert fact["evidence"][0]["evidence_id"]
+        rebuilt = _rebuild_relationship(fact)
+        assert rebuilt.object_name == fact["source_native_name"]
+    assert all(
+        item["sample_id"] != "manufacturing-materials-300750-2025"
+        for item in payload["sales_roles"]
+    )
+    assert _ROOT / "data" not in Path(destination).resolve().parents
 
 
 def test_research_output_cannot_use_the_production_data_tree():

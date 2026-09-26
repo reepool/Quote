@@ -8,6 +8,7 @@
 - [x] 2.2 Name exactly one existing chapter task that two company dossiers support, excluding `extract_business_regime`, and leave the other chapters inactive. Selected task: `extract_material_inputs`, supported by the 300750.SZ, 603659.SH, and 920015.BJ dossiers. Operating quantities, counterparties, regime, and the other chapters stay closed. No extractor implementation in this task
 - [x] 2.3 Implement that slice only by reusing Evidence, Stage 5 extract/repair/verify, and the research isolation bundle, with output limited to `accepted_for_review`
 - [x] 2.3a Keep each research fact reconstructable from its own report identity, period, subject, record id, and Evidence. Store a sales role as its own Activity with separate Evidence. Cite Evidence and a reason for legal_empty, unclear, and extraction_failure. Do not replay
+- [x] 2.3b Persist named-input legal_empty, unclear, and preparation extraction_failure through the research bundle writer. A failed page stays extraction_failure and does not become a fact. Do not replay
 
 ## 3. Focused replay, not yet authorized
 
