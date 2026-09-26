@@ -27,18 +27,45 @@ Each selected report MUST have its own dossier before any common field obligatio
 - **THEN** that field is not marked package-wide required
 - **AND** the other dossiers are completed before any common obligation is written
 
-### Requirement: Exactly one existing chapter task is the minimum slice
-After the dossiers are complete, the change MUST select exactly one existing chapter task as the manufacturing/materials vertical slice. The selected task MUST be supported by dossiers from at least two companies and MUST NOT be `extract_business_regime`. The other chapter tasks MUST stay inactive. The change MUST NOT enable the full six-chapter industry package in the same implementation, and MUST NOT hard-code one company, one page, or one material name.
+### Requirement: The minimum slice is extract_material_inputs
+The dossiers MUST be complete before the slice is named. The named slice MUST be the existing chapter task `extract_material_inputs`, because the `300750.SZ`, `603659.SH`, and `920015.BJ` dossiers each contain a company-owned named-material input sentence with a different disclosure shape. `extract_business_regime`, operating quantities, counterparties, and every other existing chapter MUST stay inactive. The change MUST NOT enable the six-chapter package, and MUST NOT hard-code one company, one page, or one material name. If those dossiers had not supported one material-input meaning, the slice MUST NOT have been forced by industry knowledge.
 
-#### Scenario: Dossiers support one shared task
-- **WHEN** at least two company dossiers support the same existing chapter task and its legal-empty behavior
-- **THEN** that task may be named as the single minimum slice
-- **AND** the remaining chapter tasks stay out of scope
+#### Scenario: Three dossiers support named material inputs
+- **WHEN** `300750.SZ` physical page 40 names cathode material, anode material, separator, and electrolyte as production inputs, `603659.SH` physical page 33 names business-line production materials, and `920015.BJ` physical page 26 names the product raw materials
+- **THEN** `extract_material_inputs` is the single selected chapter
+- **AND** at least two companies, in this case all three, support that selection
 
-#### Scenario: No cross-company task is supported
-- **WHEN** no existing chapter task is supported by two companies after the dossiers
-- **THEN** the slice is not invented from industry knowledge
-- **AND** implementation stays blocked instead of enabling all six chapters
+#### Scenario: Other chapters stay closed
+- **WHEN** the material-input slice is selected
+- **THEN** `extract_business_regime`, operating quantities, and customer or supplier chapters remain inactive
+- **AND** the six-chapter package is not enabled
+
+### Requirement: Material-input acceptance follows the dossier boundaries
+A material input MUST be a named material the same report sentence binds to the company's own production or operating input. Sales evidence alone MUST NOT create an input role. A generic direct-material cost or a raw-material inventory amount MUST be refused. Outsourced processing, including Jinhua's 丁酮肟 processing, MUST NOT be recorded as a material input. Absence of a quantity MUST NOT block delivery of an otherwise explicit named input. The same source-native name MAY also have a separate product or sales fact, and that overlap MUST NOT erase the input fact or be netted. Legal non-disclosure means the report does not state the named input or expressly omits it. `unclear` means the cited evidence does not uniquely bind the material to the company's own input. Extraction failure means the page, header, unit, or evidence context cannot be bound. These three outcomes MUST NOT be rewritten as a zero, a guessed commodity id, or a successful fact.
+
+#### Scenario: A named production input has no quantity
+- **WHEN** a dossier sentence names the company's production raw materials and gives no purchase quantity
+- **THEN** the named input remains deliverable for research review
+- **AND** no quantity is invented
+
+#### Scenario: Sales evidence or product overlap does not create the input by itself
+- **WHEN** a report lists a material as a product sold by the company and does not also bind it as the company's own input
+- **THEN** that sales or product evidence does not create an input role
+- **AND** a separate accepted input sentence for the same source-native name may still be kept without netting
+
+#### Scenario: Generic cost and inventory amounts are refused
+- **WHEN** the text only states direct material cost or a raw-material inventory balance
+- **THEN** no named material input is created from that amount
+
+#### Scenario: Outsourced processing is not a material input
+- **WHEN** `920015.BJ` states that an outside party processes 丁酮肟 from material supplied by the company
+- **THEN** that processing arrangement is not recorded as the material-input fact
+- **AND** the separately named raw materials on physical page 26 are not replaced by the processing sentence
+
+#### Scenario: Legal non-disclosure, unclear binding, and extraction failure stay distinct
+- **WHEN** a report has no named-input sentence, the cited sentence does not uniquely bind the material to the company, or the page, header, unit, or evidence cannot be bound
+- **THEN** the outcome is legal non-disclosure, `unclear`, or extraction failure respectively
+- **AND** none of those outcomes is delivered as an accurate material input
 
 ### Requirement: Legal non-disclosure stays distinct from extraction failure
 The slice MUST distinguish subject, period, unit, physical page anchor, and Evidence from one another. A source that lawfully omits a named input or other slice field MUST be recorded as legal-empty or not disclosed. Missing context, an unreadable page, or an unbound unit MUST be recorded as extraction failure. Absence MUST NOT be rewritten as a zero, a guessed commodity id, a profit direction, or a successful fact.
