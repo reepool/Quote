@@ -12,6 +12,6 @@
 
 ## 3. Official successor replay, not yet authorized
 
-- [ ] 3.1 After implementation review, replay only the already frozen official reports on the new identity
+- [x] 3.1 After implementation review, replay only the already frozen official reports on the new identity
 - [ ] 3.2 Independently recount recall, accuracy, critical numeric errors, and workload. Do not presume recall 9/9 or that expansion gates pass
 - [ ] 3.3 Do not start another expansion, authorize scale quality or production, add a full manufacturing package, or enable volume, material-cost ratio, procurement, reserves, suppliers, or customers
