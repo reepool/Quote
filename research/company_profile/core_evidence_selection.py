@@ -1656,6 +1656,7 @@ def explicit_material_input_names(text: str) -> tuple[str, ...]:
     names: list[str] = []
     for sentence in re.split(r"[。；;]", compact):
         names.extend(_named_inputs_in_sentence(sentence))
+        names.extend(_company_owned_material_lists(sentence))
     for match in _COMPANY_PROCUREMENT.finditer(compact):
         names.append(match.group(1))
     unique: list[str] = []
@@ -1693,12 +1694,55 @@ def _accept_material_name(name: str) -> bool:
 
 def _split_material_names(text: str) -> list[str]:
     names: list[str] = []
-    for part in re.split(r"[、及和]", text):
+    for part in re.split(r"[、，,及和]", text):
+        part = part.removesuffix("等")
         if not re.fullmatch(_MATERIAL_NAME, part):
             continue
         if part in _GENERIC_MATERIAL_NAMES:
             continue
         names.append(part)
+    return names
+
+
+_LIST_BODY = rf"(?:{_MATERIAL_NAME}[、和])+{_MATERIAL_NAME}"
+_COMPANY_SUBJECT = r"(?<!供应商)(?<!客户)(?<!下游)(?<!子)(?:本公司|公司)"
+_COMPANY_PRIMARY_LIST = re.compile(
+    rf"{_COMPANY_SUBJECT}"
+    rf"(?P<line>(?:产品|生产经营所需)?)"
+    rf"主要原材料(?:包括|为)(?P<list>{_LIST_BODY})"
+)
+_COMPANY_LINE_LIST = re.compile(
+    rf"{_COMPANY_SUBJECT}"
+    rf"(?P<line>[\u4e00-\u9fff]{{1,12}})"
+    rf"原材料包括(?P<list>{_LIST_BODY})"
+)
+_CONTINUATION_LIST = re.compile(
+    rf"(?:生产所需原材料包括|业务原材料)(?P<list>{_LIST_BODY})"
+)
+_LIST_SUBJECT_REJECTED = re.compile(r"客户|供应商|下游|销售|出售")
+
+
+def _company_owned_material_lists(sentence: str) -> list[str]:
+    """Accept a company-subject raw-material list without requiring a cost verb.
+
+    The older ``等主要原材料`` path still requires the company's own cost
+    sentence. This path is the disclosure shape ``公司…主要原材料包括/为``
+    and a same-sentence continuation such as ``生产所需原材料包括``.
+    """
+
+    names: list[str] = []
+    matched = False
+    for pattern in (_COMPANY_PRIMARY_LIST, _COMPANY_LINE_LIST):
+        for match in pattern.finditer(sentence):
+            line = match.group("line") or ""
+            if _LIST_SUBJECT_REJECTED.search(line):
+                continue
+            matched = True
+            names.extend(_split_material_names(match.group("list")))
+    if not matched:
+        return []
+    for match in _CONTINUATION_LIST.finditer(sentence):
+        names.extend(_split_material_names(match.group("list")))
     return names
 
 

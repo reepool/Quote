@@ -747,11 +747,49 @@ class Stage5EvidencePreparer:
                 "evidence report plan does not match its report asset",
                 sample_id=asset.sample_id,
             )
+        return self._prepare_task_plans(
+            asset=asset,
+            tasks=plan.tasks,
+            plan_version=plan_version,
+            page_results=page_results,
+        )
+
+    def prepare_single_chapter(
+        self,
+        *,
+        asset: Stage5ReportAsset,
+        chapter_task: ChapterTask,
+        scopes: tuple[EvidenceScopePlan, ...],
+        plan_version: str,
+        page_results: Mapping[int, Any] | None = None,
+    ) -> tuple[PreparedRequestScope, ...]:
+        """Prepare one chapter on the shared owner.
+
+        The historical ``EvidenceReportPlan`` still requires six frozen tasks.
+        This entry is the narrow research boundary for a single chapter.
+        """
+
+        task = EvidenceTaskPlan(chapter_task=chapter_task, request_scopes=scopes)
+        return self._prepare_task_plans(
+            asset=asset,
+            tasks=(task,),
+            plan_version=plan_version,
+            page_results=page_results,
+        )
+
+    def _prepare_task_plans(
+        self,
+        *,
+        asset: Stage5ReportAsset,
+        tasks: tuple[EvidenceTaskPlan, ...],
+        plan_version: str,
+        page_results: Mapping[int, Any] | None,
+    ) -> tuple[PreparedRequestScope, ...]:
         pages = tuple(
             sorted(
                 {
                     page
-                    for task in plan.tasks
+                    for task in tasks
                     for scope in task.request_scopes
                     for page in (*scope.pages, *scope.subject_pages)
                 }
@@ -780,7 +818,7 @@ class Stage5EvidencePreparer:
         else:
             resolved_pages = page_results
         prepared: list[PreparedRequestScope] = []
-        for task in plan.tasks:
+        for task in tasks:
             for scope in task.request_scopes:
                 prepared.append(
                     self._prepare_scope(

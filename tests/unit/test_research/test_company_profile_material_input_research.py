@@ -1,0 +1,277 @@
+"""Provider-free evidence preparation for the three-report material-input slice."""
+
+from __future__ import annotations
+
+import json
+from pathlib import Path
+from types import SimpleNamespace
+
+import pytest
+from pydantic import ValidationError
+
+from research.company_profile.core_evidence_selection import (
+    explicit_material_input_names,
+)
+from research.company_profile.material_input_research import (
+    classify_material_scope,
+    commit_material_input_research,
+    material_input_research_bindings,
+)
+from research.company_profile.models import ChapterTask, ReportIdentity
+from research.company_profile.stage5 import (
+    EvidencePreparationError,
+    EvidenceReportPlan,
+    EvidenceScopePlan,
+    EvidenceTaskPlan,
+    PreparationFailureCode,
+    Stage5EvidencePreparer,
+    Stage5ReportAsset,
+)
+
+_ROOT = Path(__file__).resolve().parents[3]
+_SALES_ONLY = "公司销售钢材、铝材等主要原材料，主要客户为制造企业。"
+_COST_ONLY = "直接材料 221,152,510 千元"
+_INVENTORY_ONLY = "原材料 18,723,415.97 元"
+_OUTSOURCED = "公司委托外部厂商加工丁酮肟，公司提供主要原材料并支付加工费。"
+_UNCLEAR_SUBJECT = "公司及下游客户主要原材料包括钢材、铜等。"
+_CATL = "公司生产经营所需主要原材料包括正极材料、负极材料、隔膜和电解液等。"
+
+
+class _Catalog:
+    catalog_version = "stage4-research-fixture"
+
+    def resolve_alias(self, name: str):
+        if name in {"正极材料", "焦类"}:
+            return SimpleNamespace(product_ids=("left", "right"))
+        return SimpleNamespace(product_ids=())
+
+    def commodity_candidates(self, product_id: str):
+        return (SimpleNamespace(commodity_id=f"commodity-{product_id}"),)
+
+
+def test_bindings_are_the_three_reports_and_one_chapter():
+    bindings = material_input_research_bindings()
+    assert [item.instrument_id for item in bindings] == [
+        "300750.SZ",
+        "603659.SH",
+        "920015.BJ",
+    ]
+    assert [
+        sum(item.kind == "named_input" for item in binding.scopes)
+        for binding in bindings
+    ] == [
+        1,
+        1,
+        1,
+    ]
+    chapters = {
+        scope.field_ids
+        for binding in bindings
+        for scope in (
+            EvidenceScopePlan(
+                scope_id=item.scope_id,
+                field_ids=("material_input",),
+                pages=(item.page,),
+                section_titles=(item.section_title,),
+                anchor_terms=item.anchor_terms,
+            )
+            for item in binding.scopes
+        )
+    }
+    assert chapters == {("material_input",)}
+    assert "302132.SZ" not in {item.instrument_id for item in bindings}
+
+
+def test_historical_report_plan_still_rejects_a_single_chapter():
+    task = EvidenceTaskPlan(
+        chapter_task=ChapterTask.EXTRACT_MATERIAL_INPUTS,
+        request_scopes=(
+            EvidenceScopePlan(
+                scope_id="only-material",
+                field_ids=("material_input",),
+                pages=(1,),
+                section_titles=("材料",),
+                anchor_terms=("原材料",),
+            ),
+        ),
+    )
+    with pytest.raises(ValidationError):
+        EvidenceReportPlan(
+            sample_id="one-chapter",
+            content_hash="a" * 64,
+            plan_version="historical",
+            tasks=(task,),
+        )
+
+
+def test_sales_cost_inventory_and_outsourcing_do_not_create_inputs():
+    assert explicit_material_input_names(_SALES_ONLY) == ()
+    assert classify_material_scope("named_input", ()) == "unclear"
+    assert explicit_material_input_names(_COST_ONLY) == ()
+    assert classify_material_scope("direct_material_cost", ()) == "legal_empty"
+    assert explicit_material_input_names(_INVENTORY_ONLY) == ()
+    assert classify_material_scope("inventory_amount", ()) == "legal_empty"
+    assert explicit_material_input_names(_OUTSOURCED) == ()
+    assert "丁酮肟" not in explicit_material_input_names(_OUTSOURCED)
+    assert classify_material_scope("outsourced_processing", ()) == "legal_empty"
+    assert explicit_material_input_names(_UNCLEAR_SUBJECT) == ()
+    assert set(explicit_material_input_names(_CATL)) == {
+        "正极材料",
+        "负极材料",
+        "隔膜",
+        "电解液",
+    }
+
+
+def test_missing_anchor_stays_an_extraction_failure():
+    binding = material_input_research_bindings()[0]
+    asset = Stage5ReportAsset(
+        sample_id=binding.sample_id,
+        company_name=binding.company_name,
+        exchange=binding.exchange,
+        report=ReportIdentity(
+            instrument_id=binding.instrument_id,
+            report_id=binding.report_id,
+            document_version=binding.document_version,
+            report_period="2025-12-31",
+            published_at=binding.published_at,
+        ),
+        content_hash=binding.content_hash,
+        local_path=_ROOT / binding.relative_pdf_path,
+        content_length=binding.content_length,
+        page_count=binding.page_count,
+        regime_type="stable",
+        regime_effective_period="2025",
+    )
+    with pytest.raises(EvidencePreparationError) as caught:
+        Stage5EvidencePreparer().prepare_single_chapter(
+            asset=asset,
+            chapter_task=ChapterTask.EXTRACT_MATERIAL_INPUTS,
+            scopes=(
+                EvidenceScopePlan(
+                    scope_id="missing-anchor",
+                    field_ids=("material_input",),
+                    pages=(40,),
+                    section_titles=("原材料",),
+                    anchor_terms=("这个锚点不在页面上",),
+                ),
+            ),
+            plan_version="test",
+            page_results={
+                40: SimpleNamespace(
+                    selected_usable_for_semantic=True,
+                    selected_text="公司生产经营所需主要原材料包括正极材料、负极材料。",
+                    selected_method="native",
+                    quality_status="readable",
+                )
+            },
+        )
+    assert caught.value.code is PreparationFailureCode.CONTEXT_INCOMPLETE
+
+
+def test_three_reports_prepare_only_material_inputs_into_an_isolated_bundle(tmp_path):
+    destination = commit_material_input_research(
+        tmp_path / "material-input-research",
+        repository_root=_ROOT,
+        catalog=_Catalog(),
+    )
+    payload = json.loads((destination / "result.json").read_text(encoding="utf-8"))
+    assert payload["disposition"] == "accepted_for_review"
+    assert payload["chapter_task"] == "extract_material_inputs"
+    assert payload["provider_calls"] == 0
+    assert payload["production_authorization"] == "not_authorized"
+    assert [item["instrument_id"] for item in payload["reports"]] == [
+        "300750.SZ",
+        "603659.SH",
+        "920015.BJ",
+    ]
+    for report, binding in zip(
+        payload["reports"], material_input_research_bindings(), strict=True
+    ):
+        pdf = _ROOT / binding.relative_pdf_path
+        dossier = _ROOT / binding.relative_dossier_path
+        assert report["content_hash"] == binding.content_hash
+        assert pdf.is_file()
+        assert dossier.is_file()
+        assert report["dossier_path"] == binding.relative_dossier_path
+    by_sample = {}
+    for fact in payload["facts"]:
+        assert fact["disposition"] == "accepted_for_review"
+        assert fact["role"] == "raw_material_input"
+        assert fact["relation_type"] == "material_input"
+        assert fact["quantity"] is None
+        by_sample.setdefault(fact["sample_id"], set()).add(fact["object_name"])
+        if fact["object_name"] in {"正极材料", "焦类"}:
+            assert fact["mapping_status"] == "ambiguous"
+        else:
+            assert fact["mapping_status"] == "pending"
+        assert fact["commodity_id"] is None
+    assert by_sample["manufacturing-materials-300750-2025"] == {
+        "正极材料",
+        "负极材料",
+        "隔膜",
+        "电解液",
+    }
+    assert by_sample["manufacturing-materials-603659-2025"] == {
+        "焦类",
+        "初级石墨",
+        "沥青",
+        "隔膜基膜",
+        "陶瓷材料",
+        "氧化铝",
+        "氢氧化铝",
+        "钢材",
+        "机加工件",
+    }
+    assert by_sample["manufacturing-materials-920015-2025"] == {
+        "丁酮",
+        "双氧水",
+        "液氨",
+        "一甲基三氯硅烷",
+        "乙烯基三氯硅烷",
+        "乙醛",
+    }
+    assert by_sample["manufacturing-materials-300750-2025"].isdisjoint(
+        by_sample["manufacturing-materials-920015-2025"]
+    )
+    refused = {
+        "丁酮肟",
+        "直接材料",
+        "原材料",
+        "存货",
+        "锂盐",
+        "前驱体",
+    }
+    assert refused.isdisjoint(name for names in by_sample.values() for name in names)
+    outcomes = {
+        (item["sample_id"], item["kind"]): item["outcome"]
+        for item in payload["scope_outcomes"]
+    }
+    assert outcomes["manufacturing-materials-300750-2025", "named_input"] == "observed"
+    assert outcomes["manufacturing-materials-300750-2025", "direct_material_cost"] == (
+        "legal_empty"
+    )
+    assert outcomes["manufacturing-materials-300750-2025", "product_overlap"] == (
+        "legal_empty"
+    )
+    assert outcomes["manufacturing-materials-603659-2025", "inventory_amount"] == (
+        "legal_empty"
+    )
+    assert outcomes["manufacturing-materials-920015-2025", "outsourced_processing"] == (
+        "legal_empty"
+    )
+    cathode = next(
+        item for item in payload["facts"] if item["object_name"] == "正极材料"
+    )
+    assert cathode["companion_sales_role"] is True
+    assert cathode["page"] == 40
+    assert _ROOT / "data" not in Path(destination).resolve().parents
+
+
+def test_research_output_cannot_use_the_production_data_tree():
+    with pytest.raises(ValueError, match="production data/config"):
+        commit_material_input_research(
+            _ROOT / "data" / "research" / "material_input_stage4",
+            repository_root=_ROOT,
+            catalog=_Catalog(),
+        )
