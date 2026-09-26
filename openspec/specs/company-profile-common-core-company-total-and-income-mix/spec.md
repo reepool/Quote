@@ -46,7 +46,7 @@ The semantic acceptance boundary MUST reject an `operating_revenue` `DISCLOSED_S
 - **AND** the record is not accepted
 
 ### Requirement: Repair replay uses owned_page_facts v4
-The published owner MUST use `{"rules":"company_profile_common_core.v1","owned_page_facts":"v4"}`. A run on 302132.SZ and 600000.SH MUST enqueue successor work and MUST NOT reuse, overwrite, or delete completed v1–v3 work. Query MUST return the v4 successor. After replay, source review MUST be recorded independently; 4.1 gates MUST be recalculated from that review and MUST NOT be presumed to be 7/7.
+That repair published `{"rules":"company_profile_common_core.v1","owned_page_facts":"v4"}`. A run on 302132.SZ and 600000.SH under v4 MUST enqueue successor work and MUST NOT reuse, overwrite, or delete completed v1–v3 work. Query for that identity MUST return the v4 successor. The current published identity is v8, defined by common-core-owned-page-gap-repair. After replay, source review MUST be recorded independently; 4.1 gates MUST be recalculated from that review and MUST NOT be presumed to be 7/7.
 
 #### Scenario: v4 enqueues instead of reusing v3
 - **WHEN** completed v3 deliveries exist and the published identity is v4

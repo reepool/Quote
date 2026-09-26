@@ -10,11 +10,11 @@
 - [x] 2.3 Publish the repair as `owned_page_facts=v5` and prove v1–v4 work JSON is not overwritten
 - [x] 2.4 Add direct counterexamples for the overview wording, the MD&A table route, and the refused loose matches
 
-## 3. Official successor replay, not yet authorized
+## 3. Official successor replay
 
 - [x] 3.1 After implementation review, replay only the official 600004.SH and 600006.SH annual reports on the v5 identity
 - [x] 3.2 Independently recount recall, accuracy, critical numeric errors, and elapsed. Do not presume 4.1 passes
 - [x] 3.2a Repair the business-situation overview heading and per-table revenue units, then replay and independently review only the frozen 600004.SH and 600006.SH reports on owned_page_facts=v6
 - [x] 3.2b Repair activity-object boundaries and per-table unit lifetime, then replay and independently review only the frozen 600004.SH and 600006.SH reports on owned_page_facts=v7. The v6 accuracy 8/8 snapshot stays on disk and is rejected by review
 - [x] 3.2c Share one declared unit across a combined revenue-table group, then replay and independently review only the frozen 600004.SH and 600006.SH reports on owned_page_facts=v8. The v7 accuracy 8/8 snapshot stays on disk and is rejected by review
-- [ ] 3.3 Do not start another expansion, authorize scale quality or production, or add the deferred industry disclosures
+- [x] 3.3 Do not start another expansion, authorize scale quality or production, or add the deferred industry disclosures. The final authority is the v8 source-review: recall 8/9, accuracy 8/8, critical numeric errors 0, expansion_gates_met=false. That false gate does not accept the next expansion, a scale-quality claim, or production. Steel, aluminum, lithium carbonate, nickel, and other industry packages stay out. v5–v8 replay and source-review files stay. The v6 and v7 8/8 snapshots remain and stay rejected by later review

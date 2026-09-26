@@ -58,6 +58,11 @@ The owned overview headings MUST include “报告期内公司从事的业务情
 ### Requirement: Revenue units bind to the formal table that declares them
 An operating-revenue fact MUST use the unit of its formal table or combined table group. One unit declaration on a combined heading that names several of 分行业, 分产品, 分地区 and 分销售模式 covers the consecutive subtables in that group. After the group ends, an independent table without its own unit MUST NOT inherit the group unit and MUST NOT emit an operating-revenue measurement. A unit line immediately before a single table heading still binds to that table. The projection MUST NOT convert an amount from one unit to another. A segment row may still be kept without an invented unit.
 
+#### Scenario: A combined table group shares one unit
+- **WHEN** one heading names 分行业, 分产品, 分地区, and 分销售模式 and declares a single unit before those consecutive subtables
+- **THEN** each subtable's operating-revenue measurement uses that unit
+- **AND** an independent later table without its own unit does not inherit it
+
 #### Scenario: Composition and industry tables keep their own units
 - **WHEN** one income-and-cost excerpt declares 万元 for the revenue-composition table and 元 for the following industry table
 - **THEN** composition rows use 万元 and the industry row uses 元

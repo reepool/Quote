@@ -88,3 +88,11 @@ A Measurement whose `measured_object` or `segment_label` is 直销 MUST NOT be c
 - **THEN** the published records may include the 直销 / `sales_mode` measurement
 - **AND** 直销 MUST NOT be treated as the company-wide total
 - **AND** the two records MUST NOT be merged because the amounts are equal
+
+### Requirement: Current published identity is owned_page_facts v8
+The current published processing identity MUST be `{"rules":"company_profile_common_core.v1","owned_page_facts":"v8"}`. Query MUST prefer that identity. v1–v7 work JSON MUST remain readable and MUST NOT be overwritten. Owned overview projection and formal revenue-table unit scope are defined by `common-core-owned-page-gap-repair`.
+
+#### Scenario: Query prefers v8 over an older successor
+- **WHEN** the same report has readable v7 and v8 work
+- **THEN** query returns the v8 accepted facts
+- **AND** the v7 work JSON remains on disk
