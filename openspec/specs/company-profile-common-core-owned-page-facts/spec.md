@@ -90,9 +90,9 @@ A Measurement whose `measured_object` or `segment_label` is 直销 MUST NOT be c
 - **AND** the two records MUST NOT be merged because the amounts are equal
 
 ### Requirement: Current published identity is owned_page_facts v8
-The current published processing identity MUST be `{"rules":"company_profile_common_core.v1","owned_page_facts":"v8"}`. Query MUST prefer that identity. v1–v7 work JSON MUST remain readable and MUST NOT be overwritten. Owned overview projection and formal revenue-table unit scope are defined by `common-core-owned-page-gap-repair`.
+The current published processing identity MUST be `{"rules":"company_profile_common_core.v1","owned_page_facts":"v8","material_input_facts":"v1"}`. `owned_page_facts` MUST remain `v8`. Query MUST prefer that full identity over an older identity that lacks `material_input_facts`. v1–v8 work JSON MUST remain readable and MUST NOT be overwritten. Owned overview projection and formal revenue-table unit scope remain defined by `common-core-owned-page-gap-repair`. Explicit named material input remains defined by `explicit-material-input-role`.
 
-#### Scenario: Query prefers v8 over an older successor
-- **WHEN** the same report has readable v7 and v8 work
-- **THEN** query returns the v8 accepted facts
-- **AND** the v7 work JSON remains on disk
+#### Scenario: Query prefers the material-input successor over v8-only work
+- **WHEN** the same report has readable v8 work and successor work that adds `material_input_facts=v1`
+- **THEN** query returns the successor accepted facts
+- **AND** the v8 work JSON remains on disk

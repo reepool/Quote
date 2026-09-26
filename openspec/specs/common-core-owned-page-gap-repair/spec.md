@@ -1,7 +1,7 @@
 # common-core-owned-page-gap-repair Specification
 
 ## Purpose
-Common-core projects an owned principal-business statement and the services that sentence says the company provides, and it binds operating-revenue units to the formal table or combined table group that declares them. The current published identity is owned_page_facts v8. v1–v7 remain readable. The v8 source-review is the final authority for this repair: recall 8/9, accuracy 8/8, critical numeric errors 0, expansion_gates_met false. That result does not authorize the next expansion, a scale-quality claim, or production.
+Common-core projects an owned principal-business statement and the services that sentence says the company provides, and it binds operating-revenue units to the formal table or combined table group that declares them. `owned_page_facts=v8` remains the owned-page component version. The current full processing identity adds `material_input_facts=v1`. v1–v8 remain readable. The v8 source-review is the historical observation of this owned-page repair: recall 8/9, accuracy 8/8, critical numeric errors 0, expansion_gates_met false. The later material-input successor's recall 9/9 does not overwrite or forge that v8 result. Neither observation authorizes the next expansion, a scale-quality claim, or production.
 
 ## Requirements
 
@@ -74,9 +74,10 @@ An operating-revenue fact MUST use the unit of its formal table or combined tabl
 - **AND** the recorded amounts stay in the unit written in each table
 
 ### Requirement: Repair publishes a successor identity without overwriting predecessors
-The repair MUST publish processing identity `{"rules":"company_profile_common_core.v1","owned_page_facts":"v8"}`. It MUST NOT overwrite or delete v1–v7 work JSON. Query MUST be able to keep reading those predecessor identities. The recorded lineage is v5, then v6, then v7, then v8. The v6 and v7 source-review snapshots that reported accuracy 8/8 remain on disk and are rejected by later review. This change MUST NOT alter the universe denominator, taxonomy, ordinary live-run sampling, or publication scope. It MUST NOT authorize the next expansion, a scale-quality claim, production, DCF, trading, or the legacy writer. It MUST NOT add airport throughput, compensation, vehicle volume, material-cost, raw-material industry packages, net interest margin, cost-to-income ratio, or loan-structure projection.
+The current published processing identity MUST be `{"rules":"company_profile_common_core.v1","owned_page_facts":"v8","material_input_facts":"v1"}`. `owned_page_facts` MUST remain `v8`. The owner MUST NOT force-replay or overwrite a work whose identity is only `owned_page_facts=v8`. It MUST NOT overwrite or delete v1–v8 work JSON or existing source-review snapshots. Query MUST be able to keep reading those predecessor identities. The v8 repair observation remains recall 8/9, accuracy 8/8, critical numeric errors 0, and `expansion_gates_met=false`. The v6 and v7 source-review snapshots that reported accuracy 8/8 remain on disk and stay rejected by later review. This change MUST NOT alter the universe denominator, taxonomy, ordinary live-run sampling, publication scope, closure, or completed mode. It MUST NOT authorize the next expansion, a scale-quality claim, production, DCF, trading, or the legacy writer. Explicit named material input is specified by `explicit-material-input-role` and MUST NOT grow into a full raw-material industry package, airport throughput, compensation, vehicle volume, material-cost ratio, procurement mode, strategic reserve, supplier or customer chapter, net interest margin, cost-to-income ratio, or loan-structure projection.
 
 #### Scenario: Predecessor work remains readable
-- **WHEN** v8 successor work is written for a report that already has v7 work
-- **THEN** the v7 work JSON remains on disk and readable
+- **WHEN** successor work with `material_input_facts=v1` is written for a report that already has v8 work
+- **THEN** the v8 work JSON remains on disk and readable
 - **AND** production authorization remains `not_authorized`
+- **AND** the same v8 identity is not force-replayed

@@ -55,7 +55,7 @@ v8 repair 已归档。正式复核是 recall 8/9、accuracy 8/8、critical numer
 
 ## Field result
 
-受控 successor 只覆盖已冻结的 600004.SH 与 600006.SH。没有新一轮扩样、重新选样或新增 work。两家各仍只有 6 条 completed work，其中本轮新增的是：
+受控 successor 只覆盖已冻结的 600004.SH 与 600006.SH。3.1 新增两条 successor work。3.2 和 3.3 没有再新增 work。没有重新选样，也没有启动下一轮扩大。两家各仍只有 6 条 completed work，其中 3.1 新增的是：
 
 - 600004.SH：`bp-work-946a0a5296c2144c1ebc161a`
 - 600006.SH：`bp-work-7b81740827ce0ccca634e2e9`
