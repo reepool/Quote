@@ -8,7 +8,7 @@ v4 首次扩大已经以失败观察关闭：recall 0/9，accuracy unassessed，
 
 - 让 owned 标题下的“公司主要从事……”进入现有 principal-business / products-services 投影，并保留原文主体和证据。
 - 让“主营业务分析 / 收入和成本分析”下的正式收入构成表进入现有 segment/revenue 投影，并保留表格主体、单位、分部维度和来源绑定。
-- 用 `owned_page_facts=v7` 作为当前 successor identity。v1–v6 文件保持可读、不被覆盖。v5 现场复核和被否决的 v6 8/8 复核都保留。
+- 用 `owned_page_facts=v8` 作为当前 successor identity。v1–v7 文件保持可读、不被覆盖。v5 现场复核，以及被否决的 v6 8/8 和 v7 8/8 复核，都保留。
 
 **Non-Goals:**
 
@@ -29,8 +29,8 @@ v4 首次扩大已经以失败观察关闭：recall 0/9，accuracy unassessed，
 2. **收入构成表与后部分部模板并列，而不是互相替代。**
    “主营业务分析 / 收入和成本分析”下带标题的正式收入构成表必须能进入 segment/revenue 投影。一、/1、这类正式分类行使用 `revenue_composition`，不标成 industry 或 product；分行业、分产品、分地区、分销售模式仍用原维度。投影在下一个成本、产销量、资产负债或后部分部标题处停止。无效收入标题不占用路由，同页或后续页的分部报告/分部信息继续扫描。后部模板仍可匹配，但不再是唯一合法路径。没有标题、跨表拼接或仅凭金额相等的匹配继续拒绝。
 
-3. **v7 是当前 successor，不是原地覆盖。**
-   新 work 使用 `{"rules":"company_profile_common_core.v1","owned_page_facts":"v7"}`。查询按该 identity 选择 successor。v1–v6 JSON 留在磁盘。v5 失败观察和被否决的 v6 8/8 快照不改写。
+3. **v8 是当前 successor，不是原地覆盖。**
+   新 work 使用 `{"rules":"company_profile_common_core.v1","owned_page_facts":"v8"}`。查询按该 identity 选择 successor。v1–v7 JSON 留在磁盘。v5 失败观察，以及被否决的 v6 8/8 和 v7 8/8 快照，不改写。正式组合表组声明一次单位后，组内连续的分行业、分产品、分地区、分销售模式子表共用该单位；离开表组后的独立表没有自己的单位时不再继承。
 
 4. **正式 replay 晚于范围审核和实现审核。**
    600004.SH 与 600006.SH 只作为实现通过后的 successor replay 样本。recall、accuracy、critical numeric errors 和 elapsed 在 replay 之后独立重算，不预设 4.1 通过。

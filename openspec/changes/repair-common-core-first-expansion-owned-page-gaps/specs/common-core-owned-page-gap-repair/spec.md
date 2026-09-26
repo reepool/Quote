@@ -56,7 +56,7 @@ The owned overview headings MUST include “报告期内公司从事的业务情
 - **AND** the company subject remains on the fact
 
 ### Requirement: Revenue units bind to the formal table that declares them
-An operating-revenue fact MUST use the unit declared for its own formal table. A unit line immediately before a table heading binds to that table. A later table without its own unit declaration MUST NOT inherit an earlier table’s unit and MUST NOT emit an operating-revenue measurement. The projection MUST NOT convert an amount from one unit to another. A segment row may still be kept without an invented unit.
+An operating-revenue fact MUST use the unit of its formal table or combined table group. One unit declaration on a combined heading that names several of 分行业, 分产品, 分地区 and 分销售模式 covers the consecutive subtables in that group. After the group ends, an independent table without its own unit MUST NOT inherit the group unit and MUST NOT emit an operating-revenue measurement. A unit line immediately before a single table heading still binds to that table. The projection MUST NOT convert an amount from one unit to another. A segment row may still be kept without an invented unit.
 
 #### Scenario: Composition and industry tables keep their own units
 - **WHEN** one income-and-cost excerpt declares 万元 for the revenue-composition table and 元 for the following industry table
@@ -64,9 +64,9 @@ An operating-revenue fact MUST use the unit declared for its own formal table. A
 - **AND** the recorded amounts stay in the unit written in each table
 
 ### Requirement: Repair publishes a successor identity without overwriting predecessors
-The repair MUST publish processing identity `{"rules":"company_profile_common_core.v1","owned_page_facts":"v7"}`. It MUST NOT overwrite or delete v1–v6 work JSON. Query MUST be able to keep reading those predecessor identities. The recorded lineage is v5, then v6, then v7. The v6 source-review snapshot that reported accuracy 8/8 remains on disk and is rejected by later review. This change MUST NOT alter the universe denominator, taxonomy, ordinary live-run sampling, or publication scope. It MUST NOT authorize the next expansion, a scale-quality claim, production, DCF, trading, or the legacy writer. It MUST NOT add airport throughput, compensation, vehicle volume, material-cost, raw-material industry packages, net interest margin, cost-to-income ratio, or loan-structure projection.
+The repair MUST publish processing identity `{"rules":"company_profile_common_core.v1","owned_page_facts":"v8"}`. It MUST NOT overwrite or delete v1–v7 work JSON. Query MUST be able to keep reading those predecessor identities. The recorded lineage is v5, then v6, then v7, then v8. The v6 and v7 source-review snapshots that reported accuracy 8/8 remain on disk and are rejected by later review. This change MUST NOT alter the universe denominator, taxonomy, ordinary live-run sampling, or publication scope. It MUST NOT authorize the next expansion, a scale-quality claim, production, DCF, trading, or the legacy writer. It MUST NOT add airport throughput, compensation, vehicle volume, material-cost, raw-material industry packages, net interest margin, cost-to-income ratio, or loan-structure projection.
 
 #### Scenario: Predecessor work remains readable
-- **WHEN** v7 successor work is written for a report that already has v6 work
-- **THEN** the v6 work JSON remains on disk and readable
+- **WHEN** v8 successor work is written for a report that already has v7 work
+- **THEN** the v7 work JSON remains on disk and readable
 - **AND** production authorization remains `not_authorized`

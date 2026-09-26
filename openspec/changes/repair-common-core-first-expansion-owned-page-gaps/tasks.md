@@ -16,4 +16,5 @@
 - [x] 3.2 Independently recount recall, accuracy, critical numeric errors, and elapsed. Do not presume 4.1 passes
 - [x] 3.2a Repair the business-situation overview heading and per-table revenue units, then replay and independently review only the frozen 600004.SH and 600006.SH reports on owned_page_facts=v6
 - [x] 3.2b Repair activity-object boundaries and per-table unit lifetime, then replay and independently review only the frozen 600004.SH and 600006.SH reports on owned_page_facts=v7. The v6 accuracy 8/8 snapshot stays on disk and is rejected by review
+- [x] 3.2c Share one declared unit across a combined revenue-table group, then replay and independently review only the frozen 600004.SH and 600006.SH reports on owned_page_facts=v8. The v7 accuracy 8/8 snapshot stays on disk and is rejected by review
 - [ ] 3.3 Do not start another expansion, authorize scale quality or production, or add the deferred industry disclosures

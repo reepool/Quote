@@ -1054,6 +1054,7 @@ def _project_segment_span(
         quote = quote or revenue_item.evidence.anchor.bounded_quote
     unit = None
     previous_was_unit = False
+    group_dimensions: frozenset[str] | None = None
     dimension = _dimension_from_heading(span.section_title)
     records: list[SemanticRecord] = []
     started = False
@@ -1067,15 +1068,32 @@ def _project_segment_span(
             unit = declared
             previous_was_unit = True
             continue
+        opened = _open_segment_group(line)
+        if opened is not None:
+            if not previous_was_unit:
+                unit = None
+            group_dimensions = opened
+            previous_was_unit = False
+            started = True
+            continue
         if _dimension_from_heading(line) is not None or _parse_segment_row(line) is not None:
             started = True
         section = _dimension_from_heading(line)
         if section is not None:
+            if group_dimensions is not None and section in group_dimensions:
+                previous_was_unit = False
+                dimension = section
+                continue
+            group_dimensions = None
             if not previous_was_unit:
                 unit = None
             previous_was_unit = False
             dimension = section
             continue
+        if group_dimensions is not None and _is_enumerated_revenue_class(line):
+            group_dimensions = None
+            if not previous_was_unit:
+                unit = None
         previous_was_unit = False
         parsed = _parse_segment_row(line)
         if parsed is None:
@@ -1774,6 +1792,32 @@ _SEGMENT_SECTION_HEADINGS = {
     "主营业务分销售模式情况": "sales_mode",
     "分销售模式": "sales_mode",
 }
+
+
+_GROUP_NAME_TO_DIMENSION = {
+    "分销售模式": "sales_mode",
+    "分地区": "region",
+    "分产品": "product",
+    "分行业": "industry",
+}
+
+
+def _open_segment_group(line: str) -> frozenset[str] | None:
+    """Return dimensions named together in one formal combined-table heading."""
+
+    compact = _HEADING_PREFIX.sub("", re.sub(r"\s+", "", line.strip()), count=1)
+    compact = compact.lstrip(".．、")
+    compact = compact.removeprefix("主营业务")
+    found = [name for name in _GROUP_NAME_TO_DIMENSION if name in compact]
+    if len(found) < 2:
+        return None
+    remainder = compact
+    for name in found:
+        remainder = remainder.replace(name, "", 1)
+    remainder = re.sub(r"[、，,和及情况]", "", remainder)
+    if remainder:
+        return None
+    return frozenset(_GROUP_NAME_TO_DIMENSION[name] for name in found)
 
 
 def _dimension_from_heading(text: str) -> str | None:

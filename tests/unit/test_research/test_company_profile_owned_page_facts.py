@@ -33,6 +33,7 @@ from research.company_profile.execution import (
     OWNED_PAGE_FACTS_V4_IDENTITY,
     OWNED_PAGE_FACTS_V5_IDENTITY,
     OWNED_PAGE_FACTS_V6_IDENTITY,
+    OWNED_PAGE_FACTS_V7_IDENTITY,
     default_processing_identity,
 )
 from research.company_profile.models import (
@@ -159,13 +160,14 @@ def test_default_identity_is_distinct_from_empty_delivery():
     identity = default_processing_identity()
     assert identity != EMPTY_DELIVERY_PROCESSING_IDENTITY
     assert identity["rules"] == "company_profile_common_core.v1"
-    assert identity["owned_page_facts"] == "v7"
+    assert identity["owned_page_facts"] == "v8"
     assert identity != OWNED_PAGE_FACTS_V1_IDENTITY
     assert identity != OWNED_PAGE_FACTS_V2_IDENTITY
     assert identity != OWNED_PAGE_FACTS_V3_IDENTITY
     assert identity != OWNED_PAGE_FACTS_V4_IDENTITY
     assert identity != OWNED_PAGE_FACTS_V5_IDENTITY
     assert identity != OWNED_PAGE_FACTS_V6_IDENTITY
+    assert identity != OWNED_PAGE_FACTS_V7_IDENTITY
 
 
 def test_avic_official_excerpts_project_core_facts_without_provider():
@@ -1109,6 +1111,7 @@ AIRPORT_REVENUE_SHAPE = (
 )
 VEHICLE_REVENUE_SHAPE = (
     "2、收入和成本分析\n"
+    "(1). 主营业务分行业、分产品、分地区、分销售模式情况\n"
     "单位：元 币种：人民币\n"
     "主营业务分行业情况\n"
     "分行业 营业收入 营业成本\n"
@@ -1135,6 +1138,8 @@ VEHICLE_REVENUE_SHAPE = (
     "订单销\n"
     "售模式\n"
     "1,312,707,710.40 1,310,498,968.34 0.17\n"
+    "其他业务收入\n"
+    "一、咨询服务收入 99.00 1.00 1.00\n"
     "主营产销量情况分析表\n"
     "客车 辆 3,751 4,567 242\n"
     "(3). 成本分析表\n"
@@ -1232,10 +1237,24 @@ def test_wrapped_industry_and_product_rows_stop_before_later_tables():
     assert classes["境外"] == "region"
     assert classes["代理销售模式"] == "sales_mode"
     assert classes["订单销售模式"] == "sales_mode"
-    assert all(
-        item.source_native.unit == "元"
+    revenues = {
+        item.measured_object: item.source_native.unit
         for item in records
         if item.field_id == "operating_revenue"
+    }
+    assert set(revenues) == {
+        "汽车制造业",
+        "整车",
+        "非整车",
+        "境内",
+        "境外",
+        "代理销售模式",
+        "订单销售模式",
+    }
+    assert set(revenues.values()) == {"元"}
+    assert "咨询服务收入" not in revenues
+    assert any(
+        item.label == "咨询服务收入" for item in records if item.field_id == "segment_dimension"
     )
     assert "个百分点订单销售模式" not in classes
     assert not any("个百分点" in label for label in classes)
@@ -1358,9 +1377,10 @@ def test_v5_enqueues_successor_and_query_prefers_it_over_later_v4_work_id(tmp_pa
         processing_identity=default_processing_identity(),
         instrument_ids=["600000.SH"],
     )
-    assert default_processing_identity()["owned_page_facts"] == "v7"
+    assert default_processing_identity()["owned_page_facts"] == "v8"
     assert default_processing_identity() != OWNED_PAGE_FACTS_V5_IDENTITY
     assert default_processing_identity() != OWNED_PAGE_FACTS_V6_IDENTITY
+    assert default_processing_identity() != OWNED_PAGE_FACTS_V7_IDENTITY
     assert first["inserted"] == 1
     assert successor["inserted"] == 1
     assert successor["reused"] == 0
