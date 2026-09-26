@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 from dataclasses import replace
 from pathlib import Path
 from types import SimpleNamespace
@@ -15,12 +16,15 @@ from research.company_profile.core_evidence_selection import (
     explicit_material_input_names,
 )
 from research.company_profile.material_input_research import (
+    MATERIAL_INPUT_PROCUREMENT_PLAN_VERSION,
     MaterialInputScopeOutcome,
     ResearchEvidenceRef,
     _ScopeBinding,
+    build_material_input_research_bundle,
     classify_material_scope,
     commit_material_input_research,
     extraction_failure_outcome,
+    material_input_procurement_bindings,
     material_input_research_bindings,
     replay_material_input_research,
 )
@@ -602,6 +606,156 @@ def test_replay_freezes_the_three_reports_before_the_isolated_run(tmp_path):
     }
     assert forbidden.isdisjoint(run)
     assert _ROOT / "data" not in output_root.resolve().parents
+
+
+_ORIGINAL_NAMES = {
+    "manufacturing-materials-300750-2025": {"正极材料", "负极材料", "隔膜", "电解液"},
+    "manufacturing-materials-603659-2025": {
+        "焦类",
+        "初级石墨",
+        "沥青",
+        "隔膜基膜",
+        "陶瓷材料",
+        "氧化铝",
+        "氢氧化铝",
+        "钢材",
+        "机加工件",
+    },
+    "manufacturing-materials-920015-2025": {
+        "丁酮",
+        "双氧水",
+        "液氨",
+        "一甲基三氯硅烷",
+        "乙烯基三氯硅烷",
+        "乙醛",
+    },
+}
+_NEW_NAMES = {
+    "manufacturing-materials-300750-2025": {"磷酸铁锂", "锂盐", "氢氧化锂"},
+    "manufacturing-materials-603659-2025": set(),
+    "manufacturing-materials-920015-2025": {"丁酮肟"},
+}
+_REFUSED_INPUTS = {"电芯", "蒸汽", "电", "电力", "服务", "直接材料", "原材料", "存货"}
+
+
+def test_procurement_replay_binds_plan_two_and_keeps_original_evidence(tmp_path):
+    from pypdf import PdfReader
+
+    selected = material_input_procurement_bindings()
+    run_path = replay_material_input_research(
+        tmp_path / "procurement-replay",
+        repository_root=_ROOT,
+        catalog=_Catalog(),
+        run_id="stage4-procurement-replay",
+    )
+    output_root = run_path.parent
+    enqueue = json.loads((output_root / "enqueue.json").read_text(encoding="utf-8"))
+    run = json.loads(run_path.read_text(encoding="utf-8"))
+    bundle = json.loads(
+        (output_root / run["bundle_dirname"] / "result.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    assert enqueue["plan_version"] == MATERIAL_INPUT_PROCUREMENT_PLAN_VERSION
+    assert bundle["plan_version"] == enqueue["plan_version"]
+    assert {item["plan_version"] for item in enqueue["reports"]} == {
+        enqueue["plan_version"]
+    }
+    assert run["provider_calls"] == 0
+    assert run["disposition"] == "accepted_for_review"
+    assert bundle["provider_calls"] == 0
+    assert bundle["disposition"] == "accepted_for_review"
+    for report, binding in zip(enqueue["reports"], selected, strict=True):
+        assert [
+            (item["scope_id"], item["kind"], item["page"]) for item in report["scopes"]
+        ] == [(item.scope_id, item.kind, item.page) for item in binding.scopes]
+    frozen_kinds = {
+        (report["instrument_id"], item["kind"], item["page"])
+        for report in enqueue["reports"]
+        for item in report["scopes"]
+    }
+    assert ("300750.SZ", "company_purchase", 73) in frozen_kinds
+    assert ("920015.BJ", "materials_energy_table", 51) in frozen_kinds
+    assert not any(
+        item["kind"] in {"company_purchase", "materials_energy_table"}
+        for item in enqueue["reports"][1]["scopes"]
+    )
+    record_ids = [item["record_id"] for item in bundle["facts"]]
+    assert record_ids
+    assert len(record_ids) == len(set(record_ids))
+    by_sample: dict[str, set[str]] = {}
+    for fact in bundle["facts"]:
+        by_sample.setdefault(fact["sample_id"], set()).add(fact["object_name"])
+    for sample_id, names in _ORIGINAL_NAMES.items():
+        assert names <= by_sample[sample_id]
+        assert by_sample[sample_id] - names == _NEW_NAMES[sample_id]
+    assert _REFUSED_INPUTS.isdisjoint(
+        name for names in by_sample.values() for name in names
+    )
+    named_pages = {
+        binding.sample_id: next(
+            item.page for item in binding.scopes if item.kind == "named_input"
+        )
+        for binding in material_input_research_bindings()
+    }
+    for fact in bundle["facts"]:
+        if fact["object_name"] in _ORIGINAL_NAMES[fact["sample_id"]]:
+            assert fact["evidence"][0]["page"] == named_pages[fact["sample_id"]]
+    oxime = next(item for item in bundle["facts"] if item["object_name"] == "丁酮肟")
+    assert oxime["evidence"][0]["page"] == 51
+    jinhua = selected[2]
+    page_text = (
+        PdfReader(_ROOT / jinhua.relative_pdf_path).pages[50].extract_text() or ""
+    )
+    quote = oxime["evidence"][0]["bounded_quote"]
+    assert quote in page_text
+    assert "丁酮肟" in re.sub(r"\s+", "", quote)
+    assert quote != "主要原材料及能源丁酮肟耗用"
+    assert "蒸汽" not in quote
+    purchase = next(
+        item for item in bundle["facts"] if item["object_name"] == "磷酸铁锂"
+    )
+    assert purchase["evidence"][0]["page"] == 73
+    assert "电芯" not in re.sub(r"\s+", "", purchase["evidence"][0]["bounded_quote"])
+    outcomes = {
+        (item["sample_id"], item["kind"]): item["outcome"]
+        for item in bundle["scope_outcomes"]
+    }
+    assert outcomes["manufacturing-materials-920015-2025", "outsourced_processing"] == (
+        "legal_empty"
+    )
+    assert _ROOT / "data" not in output_root.resolve().parents
+
+
+def test_new_scope_extraction_failure_keeps_its_kind():
+    broken = tuple(
+        replace(
+            binding,
+            scopes=tuple(
+                replace(scope, anchor_terms=("这个锚点不在页面上",))
+                if scope.kind in {"company_purchase", "materials_energy_table"}
+                else scope
+                for scope in binding.scopes
+            ),
+        )
+        for binding in material_input_procurement_bindings()
+    )
+    bundle = build_material_input_research_bundle(
+        repository_root=_ROOT,
+        catalog=_Catalog(),
+        run_id="scope-kind",
+        preparer=None,
+        bindings=broken,
+    )
+    failed = {
+        item.kind
+        for item in bundle.scope_outcomes
+        if item.outcome == "extraction_failure"
+    }
+    assert failed == {"company_purchase", "materials_energy_table"}
+    assert "named_input" not in failed
+    names = {item.source_native_name for item in bundle.facts}
+    assert {"磷酸铁锂", "锂盐", "氢氧化锂", "丁酮肟"}.isdisjoint(names)
 
 
 def _sha256(path: Path) -> str:

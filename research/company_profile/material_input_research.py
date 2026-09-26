@@ -290,6 +290,68 @@ class MaterialInputReportBinding:
     plan_version: str = MATERIAL_INPUT_RESEARCH_PLAN_VERSION
 
 
+def material_input_procurement_bindings() -> tuple[MaterialInputReportBinding, ...]:
+    """Return the .2 plan: prior scopes plus the two missed disclosure forms.
+
+    Ningde Times gains the related-party purchase page. Jinhua gains the
+    materials-and-energy table. Putailai keeps its prior scopes on this plan.
+    """
+
+    catl, putailai, jinhua = material_input_research_bindings()
+    return (
+        _with_plan(
+            catl,
+            scopes=catl.scopes
+            + (
+                _ScopeBinding(
+                    "300750-company-purchase",
+                    "company_purchase",
+                    73,
+                    "关联交易",
+                    ("采购原材料",),
+                ),
+            ),
+        ),
+        _with_plan(putailai, scopes=putailai.scopes),
+        _with_plan(
+            jinhua,
+            scopes=jinhua.scopes
+            + (
+                _ScopeBinding(
+                    "920015-materials-energy",
+                    "materials_energy_table",
+                    51,
+                    "主要原材料及能源",
+                    ("主要原材料及能源",),
+                ),
+            ),
+        ),
+    )
+
+
+def _with_plan(
+    binding: MaterialInputReportBinding,
+    *,
+    scopes: tuple[_ScopeBinding, ...],
+) -> MaterialInputReportBinding:
+    return MaterialInputReportBinding(
+        sample_id=binding.sample_id,
+        company_name=binding.company_name,
+        exchange=binding.exchange,
+        instrument_id=binding.instrument_id,
+        report_id=binding.report_id,
+        document_version=binding.document_version,
+        published_at=binding.published_at,
+        content_hash=binding.content_hash,
+        relative_pdf_path=binding.relative_pdf_path,
+        content_length=binding.content_length,
+        page_count=binding.page_count,
+        relative_dossier_path=binding.relative_dossier_path,
+        scopes=scopes,
+        plan_version=MATERIAL_INPUT_PROCUREMENT_PLAN_VERSION,
+    )
+
+
 def material_input_research_bindings() -> tuple[MaterialInputReportBinding, ...]:
     """Return the three dossier reports and their material-input pages.
 
@@ -519,10 +581,33 @@ def _split_row_names(text: str) -> tuple[str, ...]:
     return tuple(names)
 
 
+def _compact_index(text: str) -> tuple[str, list[int]]:
+    chars: list[str] = []
+    indexes: list[int] = []
+    for index, char in enumerate(text):
+        if char.isspace():
+            continue
+        chars.append(char)
+        indexes.append(index)
+    return "".join(chars), indexes
+
+
+def _original_slice(text: str, indexes: list[int], start: int, end: int) -> str:
+    return text[indexes[start] : indexes[end - 1] + 1]
+
+
 def _company_purchase_hits(text: str) -> tuple[ResearchMaterialHit, ...]:
-    compact = re.sub(r"\s+", "", text)
+    compact, indexes = _compact_index(text)
     if not any(header in compact for header in _PURCHASE_HEADERS):
         return ()
+    section = next(
+        (
+            header
+            for header in ("关联交易", "购销商品", "采购商品")
+            if header in compact
+        ),
+        "采购商品",
+    )
     hits: list[ResearchMaterialHit] = []
     seen: set[str] = set()
     for match in re.finditer(r"采购原材料[（(]([^）)]+)[）)]", compact):
@@ -535,14 +620,12 @@ def _company_purchase_hits(text: str) -> tuple[ResearchMaterialHit, ...]:
         local = compact[max(0, match.start() - 16) : match.end()]
         if re.search(r"(?:供应商|客户|下游)采购原材料", local):
             continue
-        positions = [
-            compact.rfind(header, 0, match.start())
-            for header in _PURCHASE_HEADERS
-            if compact.rfind(header, 0, match.start()) >= 0
-        ]
-        start = min(positions) if positions else row_at
-        quote = compact[start : match.end()]
-        header = next(item for item in _PURCHASE_HEADERS if item in quote)
+        row = compact[row_at : match.end()]
+        if row.count("采购原材料") != 1:
+            continue
+        quote = _original_slice(text, indexes, row_at, match.end())
+        if quote not in text:
+            continue
         for name in _split_row_names(match.group(1)):
             if name in seen:
                 continue
@@ -550,7 +633,7 @@ def _company_purchase_hits(text: str) -> tuple[ResearchMaterialHit, ...]:
             hits.append(
                 ResearchMaterialHit(
                     name=name,
-                    section_title=header,
+                    section_title=section,
                     quote=quote,
                     direction="采购原材料",
                 )
@@ -559,25 +642,36 @@ def _company_purchase_hits(text: str) -> tuple[ResearchMaterialHit, ...]:
 
 
 def _materials_table_hits(text: str) -> tuple[ResearchMaterialHit, ...]:
-    compact = re.sub(r"\s+", "", text)
+    compact, indexes = _compact_index(text)
     marker = compact.find("主要原材料及能源")
     if marker < 0:
         return ()
-    body = compact[marker:]
     hits: list[ResearchMaterialHit] = []
     seen: set[str] = set()
-    for match in re.finditer(r"([\u4e00-\u9fff]{2,24})合理范围", body):
-        name = _table_row_name(match.group(1))
+    for match in re.finditer(r"([\u4e00-\u9fff]{2,24})合理范围", compact[marker:]):
+        raw = match.group(1)
+        name = _table_row_name(raw)
         if not _row_name_ok(name) or name in seen:
             continue
+        name_start = marker + match.start(1) + (len(raw) - len(name))
+        tail = compact[name_start : name_start + 24]
+        purchase_at = tail.find("采购")
+        if purchase_at < 0:
+            continue
+        end = name_start + purchase_at + len("采购")
+        row = compact[name_start:end]
+        if row.count("合理范围") != 1:
+            continue
+        quote = _original_slice(text, indexes, name_start, end)
+        if quote not in text or name not in re.sub(r"\s+", "", quote):
+            continue
         seen.add(name)
-        quote = f"主要原材料及能源{name}耗用"
         hits.append(
             ResearchMaterialHit(
                 name=name,
                 section_title="主要原材料及能源",
                 quote=quote,
-                direction="耗用",
+                direction="采购",
             )
         )
     return tuple(hits)
@@ -641,13 +735,14 @@ def extraction_failure_outcome(
     section_title: str,
     code: str,
     message: str,
+    kind: str = "named_input",
 ) -> MaterialInputScopeOutcome:
     """Record an unbound page without turning it into a material fact."""
 
     return MaterialInputScopeOutcome(
         sample_id=sample_id,
         scope_id=scope_id,
-        kind="named_input",
+        kind=kind,
         outcome="extraction_failure",
         names=(),
         reason=message,
@@ -729,6 +824,7 @@ def freeze_material_input_research_enqueue(
     output_root: str | Path,
     *,
     repository_root: str | Path | None = None,
+    bindings: tuple[MaterialInputReportBinding, ...] | None = None,
 ) -> Path:
     """Record the three-report binding before any research run starts."""
 
@@ -739,7 +835,7 @@ def freeze_material_input_research_enqueue(
         raise FileExistsError(
             f"material-input enqueue snapshot already exists: {destination}"
         )
-    snapshot = _enqueue_snapshot(root)
+    snapshot = _enqueue_snapshot(root, bindings)
     _write_json_atomic(
         store.output_root, destination.name, snapshot.model_dump(mode="json")
     )
@@ -761,8 +857,9 @@ def replay_material_input_research(
     """
 
     root = Path(repository_root) if repository_root is not None else _REPOSITORY_ROOT
+    selected = material_input_procurement_bindings()
     enqueue_path = freeze_material_input_research_enqueue(
-        output_root, repository_root=root
+        output_root, repository_root=root, bindings=selected
     )
     bundle_dir = commit_material_input_research(
         output_root,
@@ -770,6 +867,7 @@ def replay_material_input_research(
         catalog=catalog,
         run_id=run_id,
         preparer=preparer,
+        bindings=selected,
     )
     run = MaterialInputRunSnapshot(
         enqueue_sha256=hashlib.sha256(enqueue_path.read_bytes()).hexdigest(),
@@ -783,8 +881,11 @@ def replay_material_input_research(
     return run_path
 
 
-def _enqueue_snapshot(repository_root: Path) -> MaterialInputEnqueueSnapshot:
-    bindings = material_input_research_bindings()
+def _enqueue_snapshot(
+    repository_root: Path,
+    bindings: tuple[MaterialInputReportBinding, ...] | None = None,
+) -> MaterialInputEnqueueSnapshot:
+    bindings = material_input_procurement_bindings() if bindings is None else bindings
     instruments = tuple(item.instrument_id for item in bindings)
     if instruments != _REPLAY_INSTRUMENTS:
         raise MaterialInputResearchError(
@@ -822,7 +923,14 @@ def _enqueue_snapshot(repository_root: Path) -> MaterialInputEnqueueSnapshot:
                 ),
             )
         )
-    return MaterialInputEnqueueSnapshot(reports=tuple(reports))
+    versions = {item.plan_version for item in bindings}
+    if len(versions) != 1:
+        raise MaterialInputResearchError(
+            "material-input enqueue bindings must share one plan version"
+        )
+    return MaterialInputEnqueueSnapshot(
+        plan_version=versions.pop(), reports=tuple(reports)
+    )
 
 
 def _write_json_atomic(directory: Path, name: str, payload: dict[str, Any]) -> None:
@@ -921,6 +1029,7 @@ def build_material_input_research_bundle(
                         section_title=spec.section_title,
                         code=exc.code.value,
                         message=str(exc),
+                        kind=spec.kind,
                     )
                 )
                 continue
@@ -978,12 +1087,21 @@ def build_material_input_research_bundle(
                 item for item in binding.scopes if item.kind == "product_overlap"
             )
             product_evidence = by_scope[product.scope_id].evidence_bundle[0].evidence
+        delivered = set(
+            scope_names[named.scope_id] if named_observed and named is not None else ()
+        )
+        fresh_hits: list[tuple[Any, ResearchMaterialHit]] = []
+        for prepared_scope, hit in activated_hits:
+            if hit.name in delivered:
+                continue
+            delivered.add(hit.name)
+            fresh_hits.append((prepared_scope, hit))
         additional = tuple(
             (
                 hit.name,
                 _row_evidence(_identity(binding), prepared_scope, hit),
             )
-            for prepared_scope, hit in activated_hits
+            for prepared_scope, hit in fresh_hits
         )
         accepted = _accept_report(
             binding,
@@ -1021,8 +1139,14 @@ def build_material_input_research_bundle(
                     _sales_role(binding.sample_id, record, exposure, page_hashes)
                 )
         _append_report_record(report_records, binding, repository_root)
+    versions = {item.plan_version for item in selected}
+    if len(versions) != 1:
+        raise MaterialInputResearchError(
+            "material-input bundle bindings must share one plan version"
+        )
     return MaterialInputResearchBundle(
         run_id=run_id,
+        plan_version=versions.pop(),
         reports=tuple(report_records),
         scope_outcomes=tuple(outcomes),
         facts=tuple(facts),
@@ -1187,15 +1311,19 @@ def _sales_names(
 def _row_evidence(
     report: ReportIdentity, prepared_scope, hit: ResearchMaterialHit
 ) -> Evidence:
-    page = prepared_scope.page_contexts[0].page
+    page_text = _scope_text(prepared_scope)
+    compact_page = re.sub(r"\s+", "", page_text)
+    compact_quote = re.sub(r"\s+", "", hit.quote)
     if (
-        hit.section_title not in hit.quote
-        or hit.direction not in hit.quote
-        or hit.name not in hit.quote
+        hit.quote not in page_text
+        or hit.name not in compact_quote
+        or hit.direction not in compact_quote
+        or hit.section_title not in compact_page
     ):
         raise MaterialInputResearchError(
             "material evidence must bind the table header, row direction, and name"
         )
+    page = prepared_scope.page_contexts[0].page
     return Evidence(
         evidence_id=(
             "stage5-evidence-"
@@ -1241,7 +1369,11 @@ def _accept_report(
             )
             for item in named_scope.evidence_bundle
         )
+    delivered_names = {item.object_name for item in relationships_list}
     for name, evidence in additional:
+        if name in delivered_names:
+            continue
+        delivered_names.add(name)
         relationships_list.append(
             _relationship(report, evidence, name, binding.sample_id)
         )

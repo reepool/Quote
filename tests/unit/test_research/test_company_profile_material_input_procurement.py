@@ -50,11 +50,14 @@ def _report() -> ReportIdentity:
 def _relationships(kind: str, text: str, plan: str = _PLAN):
     report = _report()
     hits = research_material_hits(kind, text, plan)
+    compact_text = "".join(text.split())
     records = []
     for hit in hits:
-        assert hit.section_title in hit.quote
-        assert hit.direction in hit.quote
-        assert hit.name in hit.quote
+        compact_quote = "".join(hit.quote.split())
+        assert hit.quote in text
+        assert hit.name in compact_quote
+        assert hit.direction in compact_quote
+        assert hit.section_title in compact_text
         evidence = Evidence(
             evidence_id=f"evidence-{hit.name}",
             report=report,
@@ -67,6 +70,14 @@ def _relationships(kind: str, text: str, plan: str = _PLAN):
 
 
 def test_purchase_rows_in_a_service_heading_deliver_each_named_material():
+    hits = {
+        hit.name: hit
+        for hit in research_material_hits("company_purchase", _COMPOUND, _PLAN)
+    }
+    assert "电芯" not in "".join(hits["磷酸铁锂"].quote.split())
+    assert "氢氧化锂" not in "".join(hits["磷酸铁锂"].quote.split())
+    assert "磷酸铁锂" not in "".join(hits["锂盐"].quote.split())
+    assert hits["锂盐"].quote == hits["氢氧化锂"].quote
     records = _relationships("company_purchase", _COMPOUND)
     assert {item.object_name for item in records} == {"磷酸铁锂", "锂盐", "氢氧化锂"}
     assert all(item.relation_type.value == "material_input" for item in records)
@@ -82,6 +93,11 @@ def test_purchase_rows_in_a_service_heading_deliver_each_named_material():
 
 
 def test_materials_table_delivers_raw_material_rows_without_quantity():
+    hits = research_material_hits("materials_energy_table", _TABLE, _PLAN)
+    assert [hit.name for hit in hits] == ["丁酮肟"]
+    assert hits[0].quote in _TABLE
+    assert hits[0].quote != "主要原材料及能源丁酮肟耗用"
+    assert "蒸汽" not in hits[0].quote
     records = _relationships("materials_energy_table", _TABLE)
     assert [item.object_name for item in records] == ["丁酮肟"]
     assert records[0].source_native.value is None
