@@ -12,5 +12,5 @@
 ## 3. Recount after implementation review, not yet authorized
 
 - [x] 3.1 Controlled replay of plan `.2026-09-26.2` is stored at `openspec/changes/repair-material-input-procurement-and-materials-table-coverage/replay/20260926.2`, run id `stage4-material-inputs-20260926.2`, disposition `accepted_for_review`. The 2026-09-26 archive was not overwritten. Recall, accuracy, critical numeric errors, and the gate are not filled
-- [ ] 3.2 Independently recount recall, accuracy, critical numeric errors, and the gate. Do not presume 23/23 or a passing gate
+- [x] 3.2 Independently recount the `.2` replay from the three PDFs. Snapshot: `replay/20260926.2/source_review.json`. Per company the disclosed inputs are 7/7, 9/9, and 7/7. Derived source recall is 23/23, accuracy 23/23, and critical numeric errors 0. `expansion_gates_met` is the conjunction of three reports reread, recall 1, accuracy 1, and critical numeric errors 0; that conjunction is true for this slice only. Catalog mapping is not a pass. `scale_quality_claim_allowed` stays false and production stays `not_authorized`. Do not start 3.3 or archive in this card
 - [ ] 3.3 Do not start another expansion, authorize scale quality or production, change the bitumen catalog alias, or enable the six-chapter package, operating quantities, counterparties, DCF, trading, or the legacy writer
