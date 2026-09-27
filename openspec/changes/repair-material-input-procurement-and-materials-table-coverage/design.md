@@ -41,6 +41,10 @@
 4. **研究隔离和现有边界不变。**
    销售证据单独不生成投入角色。直接材料成本和原材料存货金额继续拒绝。legal-empty、unclear 和 extraction failure 继续分开，并且不得改写成零、猜测的 commodity id 或成功事实。同一 source-native 名称可以同时保留销售和投入角色，不净额化。pending 和 ambiguous 只影响目录映射，不得阻止已成立的投入关系，也不得携带 commodity id。
 
+5. **`.2` replay 的权威观察只覆盖这三份报告的单章节切片。**
+   权威文件是 `replay/20260926.2/source_review.json`，SHA-256 `b6aec33bcf7402e4d880a19f232bc1f7001e2c90793b900136e6fcf3cab6f6f9`。派生结果是 recall 23/23、accuracy 23/23、critical numeric errors 0、`expansion_gates_met=true`。这个 true 只适用于三份冻结年报、计划 `manufacturing_materials_stage4_material_inputs.2026-09-26.2` 和 `extract_material_inputs`。它不是跨行业规模质量结论，不授权下一轮扩大，也不把 `scale_quality_claim_allowed` 或 `production_authorization` 打开。
+   已归档阶段 4 的 19/23、19/19、0 和 `expansion_gates_met=false` 继续独立存在，本观察不覆盖、不改写那份归档。固定两家公司此前的 9/9 不进入这次分母。沥青仍映射到目录里的 energy bitumen 别名；本卡不修改该别名，也不把 mapped 状态认定成物质映射正确。
+
 ## Risks / Trade-offs
 
 - [把关联采购里的销售或服务行收成投入] → 交易方向必须是报告主体采购原材料；复合表头含“服务”时按行判断，真正的服务行、销售行和主体不清的行拒绝。
@@ -55,7 +59,19 @@
 2. 1.1 通过后才把两个入口接到现有材料章节，并补 provider-free 测试。
 3. 实现审核通过后才可以做受控研究 replay，并单独重算指标。
 4. 回滚本 change 只删除这份范围文档；不删除 2026-09-26 归档。
+5. 3.3 只登记上面的权威观察和控制面读数。本卡不归档，不创建下一轮扩大，也不写 checkpoint、publication、closure 或生产控制。
 
 ## Open Questions
 
-- 无。1.1 审核前不另选章节，也不预设修复后的召回分数。
+- 无。观察已经收口。归档留到本卡之后的独立 Review，不在 3.3 里执行。
+
+## 只读控制面
+
+3.3 只读核对，没有改这些文件：
+
+- common-core identity 仍是 `{"rules":"company_profile_common_core.v1","owned_page_facts":"v8","material_input_facts":"v1"}`。
+- `company_profile_research_publication.v1` 的 state 仍是 enabled，active scopes 仍是 `company_facts` 和 `commodity_associations`。`legacy_writer_enabled=false`，`dcf_authorized=false`，`trading_authorized=false`，`price_sensitivity_authorized=false`，`production_authorization=not_authorized`。
+- `company_profile_first_expansion_mode.v1` 仍是 `completed`，plan id `cd8031cb5a440da19d7a7b8a41af0fdf`，`work_ids` 为空，`production_authorization=not_authorized`。
+- `company_profile_operator_closure.v2` 的 `executed=false`。legacy writer、DCF、交易和价格敏感性仍关闭，`production_authorization=not_authorized`。
+- source review 里 `scale_quality_claim_allowed=false`，`production_authorization=not_authorized`。
+- 本次 replay 只跑了 `extract_material_inputs`。common-core 章节仍是 overview、segment 和 material inputs。客户供应商与 regime 仍在未启用章节里。产销量、六章制造业包、DCF、交易、价格敏感性和旧 writer 都没有启用。
