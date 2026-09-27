@@ -24,30 +24,47 @@ The selected chapter MUST be the existing `extract_operating_quantities` task. T
 ### Requirement: Capacity, volume, amount, and utilization stay distinct
 The chapter MUST distinguish production capacity, capacity under construction, capacity utilization, production volume, sales volume, and inventory volume by the source label. A reported capacity or utilization MUST NOT be used to calculate a production volume. A sales amount, revenue amount, or order amount MUST NOT be recorded as sales volume. An inventory balance-sheet amount MUST NOT be recorded as inventory volume. Industry knowledge MUST NOT supply a missing quantity. Each observed quantity MUST keep its source unit, period, and one-based physical page anchor. A table that continues across pages MUST anchor the row on the page where that row is printed.
 
-#### Scenario: Capacity without output stays empty
+#### Scenario: Capacity without output stays not disclosed
 - **WHEN** a readable operating section reports capacity or utilization and does not report production volume
-- **THEN** production volume is legal empty
+- **THEN** production volume has coverage status `not_disclosed`
 - **AND** no production volume is calculated from capacity or utilization
 
 #### Scenario: Money amounts are not physical volumes
 - **WHEN** the source states a sales amount or an inventory amount and does not state a physical quantity and unit
 - **THEN** no sales volume or inventory volume is created from that amount
 
-### Requirement: Empty, unclear, and extraction failure remain separate outcomes
-A readable report that omits a quantity, or that expressly marks the quantity disclosure not applicable, MUST be recorded as legal empty or not applicable. Evidence that names a quantity but does not uniquely determine the metric, unit, period, subject, or table header MUST be recorded as unclear. A page, header, unit, or cross-page context that cannot be bound MUST be recorded as extraction failure. None of these outcomes MUST be rewritten as zero, a guessed unit, or a successful fact. An unclear subject MUST NOT be promoted to the consolidated group by default.
+### Requirement: Coverage statuses stay distinct inside any legal-empty bundle result
+A readable applicable operating section that does not disclose the quantity MUST be recorded as `not_disclosed`. A disclosure that the source expressly marks not applicable, or that the report structure makes not applicable, MUST be recorded as `not_applicable`. An extractor miss MUST NOT be recorded as `not_applicable`. Evidence that exists but does not uniquely determine the subject, unit, period, or table header MUST be recorded as `unclear`. A page, header, unit, or continuation that cannot be bound MUST be recorded as `extraction_failed`. None of these coverage statuses MUST be rewritten as zero, a guessed unit, or a successful fact. An unclear subject MUST NOT be promoted to the consolidated group by default. If the research bundle uses `legal_empty`, that bundle result MUST wrap one of these concrete coverage statuses and MUST NOT replace it.
 
-#### Scenario: An express not-applicable statement is legal empty
-- **WHEN** the report states that classified physical quantities are not applicable or cannot be reported
-- **THEN** the outcome is legal empty or not applicable
-- **AND** no quantity is invented to fill the disclosure
+#### Scenario: Jinhua's readable capacity chapter omits output volume
+- **WHEN** `920015.BJ` has a readable capacity and utilization section and does not disclose production volume, sales volume, or inventory volume
+- **THEN** each omitted volume has coverage status `not_disclosed`
+- **AND** the status is not `not_applicable`
+- **AND** no volume is calculated from the reported capacity or utilization
+
+#### Scenario: Avic Chengfei expressly cannot classify physical quantities
+- **WHEN** `302132.SZ` states that its physical products are too numerous to classify and therefore classified physical quantities cannot be reported
+- **THEN** the classified volume has coverage status `not_applicable`
+- **AND** the status is not `not_disclosed`
+- **AND** no classified quantity is invented
+
+#### Scenario: Ambiguous evidence stays unclear
+- **WHEN** a quantity is present but the subject, unit, period, or table header cannot be uniquely determined
+- **THEN** the coverage status is `unclear`
+- **AND** the subject is not promoted to the consolidated group by default
 
 #### Scenario: Unbound context is extraction failure
 - **WHEN** the selected table's page, header, unit, or continuation cannot be bound
-- **THEN** the outcome is extraction failure
+- **THEN** the coverage status is `extraction_failed`
 - **AND** it is not counted as an accurate quantity
 
+#### Scenario: A legal-empty bundle result keeps the coverage status
+- **WHEN** a research bundle records `legal_empty` for a missing or refused quantity
+- **THEN** the record still carries `not_disclosed`, `not_applicable`, `unclear`, or `extraction_failed`
+- **AND** `legal_empty` does not replace that coverage status
+
 ### Requirement: One entrance covers at least two disclosure forms
-The same `extract_operating_quantities` entrance MUST cover at least two real disclosure forms. One form MUST separate production volume, sales volume, and inventory volume by source labels. Another form MUST be a capacity, utilization, and under-construction disclosure that can remain legal empty for production volume. The change MUST NOT accept the slice by checking only one of those forms. Page numbers and product names are dossier fixtures, not hard-coded extraction rules. Field labels required, conditional, optional, legal empty, unclear, and extraction failure MUST be written only after each report has its own operating-quantity dossier.
+The same `extract_operating_quantities` entrance MUST cover at least two real disclosure forms. One form MUST separate production volume, sales volume, and inventory volume by source labels. Another form MUST be a capacity, utilization, and under-construction disclosure whose missing production volume is `not_disclosed`. The change MUST NOT accept the slice by checking only one of those forms. Page numbers and product names are dossier fixtures, not hard-coded extraction rules. Field labels required, conditional, optional, `not_disclosed`, `not_applicable`, `unclear`, and `extraction_failed` MUST be written only after each report has its own operating-quantity dossier.
 
 #### Scenario: Two forms use the same chapter
 - **WHEN** one report discloses a classified physical-volume table and another discloses capacity and utilization without production volume
@@ -68,7 +85,7 @@ Implementation after scope approval MUST reuse existing Evidence preparation, St
 - **AND** identity, publication, closure, completed mode, and production authorization remain unchanged
 
 ### Requirement: Scope review blocks implementation and does not presume metrics
-No Python change, Evidence-plan change, dossier write, enqueue, or replay is authorized before independent scope review accepts the sample contract, the single-chapter rule, the quantity boundaries, the separate empty outcomes, the two-form entrance, and research isolation. The change MUST NOT presume recall, accuracy, critical numeric errors, or the expansion gate. It MUST NOT start another expansion or authorize scale quality or production before that review.
+No Python change, Evidence-plan change, dossier write, enqueue, or replay is authorized before independent scope review accepts the sample contract, the single-chapter rule, the quantity boundaries, the distinct `not_disclosed`, `not_applicable`, `unclear`, and `extraction_failed` coverage statuses, the two-form entrance, and research isolation. The change MUST NOT presume recall, accuracy, critical numeric errors, or the expansion gate. It MUST NOT start another expansion or authorize scale quality or production before that review.
 
 #### Scenario: Scope review has not passed
 - **WHEN** task 1.1 is still unchecked

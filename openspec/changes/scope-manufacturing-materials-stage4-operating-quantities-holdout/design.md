@@ -12,7 +12,7 @@
 - 只使用现有 `extract_operating_quantities`。
 - 样本合同要求至少 3 份、覆盖 SZSE/SSE/BSE，并且至少 1 份是材料投入 replay 的 holdout。
 - 同一个最小入口必须能覆盖至少两种真实数量披露形态。
-- 合法空值、明确不适用、未披露、主体不清和 extraction failure 保持可区分。
+- `not_disclosed`、`not_applicable`、`unclear` 和 `extraction_failed` 保持可区分。`legal_empty` 只作为 bundle 层外壳，必须带上具体 `coverage_status`。
 
 **Non-Goals:**
 
@@ -33,16 +33,16 @@
    可进入 dossier 的报告只有 `300750.SZ`（SZSE）、`603659.SH`（SSE）、`920015.BJ`（BSE）和 `302132.SZ`（SZSE，材料投入 replay 未使用）。定义样本至少 3 份且三个交易所都要出现，所以三份已用报告不能单独构成这份竖切；至少要有一份 holdout。`302132.SZ` 是唯一已批准的 holdout 候选。它的 dossier 必须先确认产销量章节适合这家重组发行人；不适合就停止，不从清单外补报告。它进入本样本也不等于重新验证 regime。
 
 3. **dossier 先于字段义务。**
-   每份候选报告先写独立的产销量 dossier，再标注 required、conditional、optional、legal empty、unclear 或 extraction failure。旧 gold 只说明这些报告已经在研究清单里，并且提示可能存在不同披露形态；gold 不回填运行时，也不代替本 change 的 dossier。
+   每份候选报告先写独立的产销量 dossier，再标注 required、conditional、optional，以及 `not_disclosed`、`not_applicable`、`unclear` 或 `extraction_failed`。旧 gold 只说明这些报告已经在研究清单里，并且提示可能存在不同披露形态；gold 不回填运行时，也不代替本 change 的 dossier。旧 regime dossier 不能代替 `302132.SZ` 的新 operating-quantity dossier。
 
 4. **至少两种披露形态共用一个入口。**
-   第一种是分类实物量表，生产量、销量和库存量按来源标签分开。第二种是产能、产能利用率和在建产能章节；报告只给产能和利用率、没有产量时，产量保持合法空值，不得倒算。`302132.SZ` 若 dossier 确认报告明确写了分类实物量不适用，那是第三种合法空值，不是第二种形态的替代品，也不能单独满足“两种形态”。页码和产品名只作为 dossier 要核对的 fixture，不得写进抽取规则。
+   第一种是分类实物量表，生产量、销量和库存量按来源标签分开。第二种是产能、产能利用率和在建产能章节。`920015.BJ` 是第二种的 fixture：目标章节可读，报告给了产能和利用率，但没有产销量；产量的 `coverage_status` 必须是 `not_disclosed`，不得倒算，也不得写成 `not_applicable`。`302132.SZ` 若 dossier 确认正文写明产品众多、无法分类统计，那是 `not_applicable`，不是 `not_disclosed`，也不能单独充当第二种形态。页码和产品名只作为 dossier 要核对的 fixture，不得写进抽取规则。
 
 5. **数量、金额、产能和利用率保持不同语义。**
    产量、销量和库存量必须带来源单位、期间和物理页锚点。销售金额、营业收入和订单金额不是销量。存货账面金额不是库存量。产能必须保留来源里的产能类型，在建产能不并入当期产能。产能利用率是报告值，不得用来反推产量。跨页表格按延续页锚定，不把多页拼成一个不存在的单元格。主体无法从正文确定时记 unclear，不默认成合并口径。
 
-6. **三种空结果分开落盘。**
-   合法空值是报告可读，但没有该数量，或明确勾选不适用。unclear 是证据存在，但数量、单位、期间、主体或表头不能唯一判断。extraction failure 是页面、表头、单位或跨页上下文无法绑定。三者都不得改写成零、猜测单位或成功事实。
+6. **四个 coverage 状态分开落盘。**
+   目标章节和连续页可读，该数量对这家报告适用，但正文没有披露该事实时，记 `not_disclosed`。报告原文明示不适用，或模板、业务形态明确不适用时，记 `not_applicable`；不能因为抽取器没找到就判不适用。证据已经存在，但主体、单位、期间或表头不能唯一确定时，记 `unclear`。页、表头、单位或续页无法绑定时，记 `extraction_failed`。这四者都不得改写成零、猜测单位或成功事实。`legal_empty` 如果作为 bundle 层结果出现，必须包住上述某一个具体 `coverage_status`，不能用 `legal_empty` 代替这个状态。
 
 7. **研究隔离，1.1 通过前不实现。**
    通过后的实现复用 Evidence、Stage 5 extract/repair/verify 和研究隔离 bundle，输出只到 `accepted_for_review`。identity 保持 `owned_page_facts=v8` 加 `material_input_facts=v1`。publication、closure、completed mode 和生产授权不改。`scale_quality_claim_allowed` 保持 false。
@@ -52,9 +52,9 @@
 - [只用三份材料投入报告，看不出跨样本] → 定义样本必须包含至少一份 holdout，并且覆盖三个交易所。
 - [302132 的重组披露不适合产销量] → dossier 不确认就不纳入；不另选清单外发行人，本卡也不改成 regime 竖切。
 - [两种形态被收成一张表的特例] → 分类实物量和产能章节必须都能走同一个 `extract_operating_quantities` 入口；规则不得绑定某一家或某一页。
-- [用利用率补出产量] → 利用率只作为报告值；没有产量就是合法空值。
+- [用利用率补出产量] → 利用率只作为报告值；章节可读但没有产量时记 `not_disclosed`。
 - [把金额列读成数量] → 销售金额和存货金额拒绝；只有带实物单位的来源数量可以成为销量或库存量。
-- [合法空值、unclear 和抽取失败混成成功或零] → 三种结果分开落盘，都不能提高 recall。
+- [把未披露和不适用合成一个空值] → `920015.BJ` 的可读未披露产量是 `not_disclosed`；`302132.SZ` 的明确无法分类统计是 `not_applicable`。`legal_empty` 不能盖住这个差别。
 - [局部材料 gate 被当成产销量或生产授权] → 材料投入 23/23 保持为另一切片的历史观察；本 change 不预填指标。
 
 ## Migration Plan
