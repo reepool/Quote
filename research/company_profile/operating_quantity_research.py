@@ -192,6 +192,7 @@ class OperatingQuantityReportBinding:
     published_at: str
     content_hash: str
     relative_pdf_path: str
+    relative_dossier_path: str
     content_length: int
     page_count: int
     regime_type: Literal["stable", "restructuring"]
@@ -277,6 +278,10 @@ def operating_quantity_research_bindings() -> tuple[
                 "data/filings/announcements/blobs/c1/"
                 "c15272977147dee7e6935a38ea0e4fd6855370aabb106f54cfe20f7cf6048ec9.pdf"
             ),
+            relative_dossier_path=(
+                "openspec/changes/scope-manufacturing-materials-stage4-operating-quantities-holdout/"
+                "dossiers/300750-sz-2025.md"
+            ),
             content_length=2043710,
             page_count=232,
             regime_type="stable",
@@ -304,6 +309,10 @@ def operating_quantity_research_bindings() -> tuple[
             relative_pdf_path=(
                 "data/filings/announcements/blobs/4e/"
                 "4e81f5539046ba1eee733100f38442a4abd5037afe3881115ba7f48678fa35b6.pdf"
+            ),
+            relative_dossier_path=(
+                "openspec/changes/scope-manufacturing-materials-stage4-operating-quantities-holdout/"
+                "dossiers/603659-sh-2025.md"
             ),
             content_length=1740667,
             page_count=203,
@@ -352,6 +361,10 @@ def operating_quantity_research_bindings() -> tuple[
                 "data/filings/announcements/blobs/4d/"
                 "4d2c1612f6f62a9024b8947d7a01b70c40f8f347c2975fa1a05b908d0770695a.pdf"
             ),
+            relative_dossier_path=(
+                "openspec/changes/scope-manufacturing-materials-stage4-operating-quantities-holdout/"
+                "dossiers/920015-bj-2025.md"
+            ),
             content_length=1845726,
             page_count=143,
             regime_type="stable",
@@ -379,6 +392,10 @@ def operating_quantity_research_bindings() -> tuple[
             relative_pdf_path=(
                 "data/filings/announcements/blobs/60/"
                 "605394bd0879f906a829a9fcd3a2dab037d8aad2554b741a7d95757a3a5e3020.pdf"
+            ),
+            relative_dossier_path=(
+                "openspec/changes/scope-manufacturing-materials-stage4-operating-quantities-holdout/"
+                "dossiers/302132-sz-2025.md"
             ),
             content_length=1721821,
             page_count=186,
@@ -417,6 +434,181 @@ def interpret_operating_quantity_pages(
     unique = _dedupe_hits(hits)
     coverages = _cover_missing(spaced, pages, unique)
     return tuple(unique), tuple(coverages)
+
+
+class OperatingQuantityEnqueueScope(_StrictModel):
+    scope_id: str = Field(min_length=1)
+    pages: tuple[int, ...] = Field(min_length=1)
+    section_title: str = Field(min_length=1)
+    anchor_terms: tuple[str, ...] = Field(min_length=1)
+    covered_fields: tuple[str, ...] = Field(min_length=1)
+    chapter_task: Literal["extract_operating_quantities"] = (
+        "extract_operating_quantities"
+    )
+
+
+class OperatingQuantityEnqueueReport(_StrictModel):
+    sample_id: str = Field(min_length=1)
+    instrument_id: str = Field(min_length=1)
+    report_id: str = Field(min_length=1)
+    document_version: str = Field(min_length=1)
+    report_period: Literal["2025-12-31"] = "2025-12-31"
+    published_at: str = Field(min_length=1)
+    content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    dossier_path: str = Field(min_length=1)
+    dossier_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    plan_version: str = OPERATING_QUANTITY_PLAN_VERSION
+    chapter_task: Literal["extract_operating_quantities"] = (
+        "extract_operating_quantities"
+    )
+    scopes: tuple[OperatingQuantityEnqueueScope, ...] = Field(min_length=1)
+
+
+class OperatingQuantityEnqueueSnapshot(_StrictModel):
+    schema_version: Literal[
+        "company_profile_operating_quantity_research_enqueue.v1"
+    ] = "company_profile_operating_quantity_research_enqueue.v1"
+    chapter_task: Literal["extract_operating_quantities"] = (
+        "extract_operating_quantities"
+    )
+    production_authorization: Literal["not_authorized"] = "not_authorized"
+    plan_version: str = OPERATING_QUANTITY_PLAN_VERSION
+    reports: tuple[OperatingQuantityEnqueueReport, ...] = Field(
+        min_length=4, max_length=4
+    )
+
+
+class OperatingQuantityRunSnapshot(_StrictModel):
+    schema_version: Literal["company_profile_operating_quantity_research_run.v1"] = (
+        "company_profile_operating_quantity_research_run.v1"
+    )
+    chapter_task: Literal["extract_operating_quantities"] = (
+        "extract_operating_quantities"
+    )
+    disposition: Literal["accepted_for_review"] = "accepted_for_review"
+    provider_calls: Literal[0] = 0
+    production_authorization: Literal["not_authorized"] = "not_authorized"
+    enqueue_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    bundle_dirname: str = Field(min_length=1)
+    run_id: str = Field(min_length=1)
+
+
+def freeze_operating_quantity_research_enqueue(
+    output_root: str | Path,
+    *,
+    repository_root: str | Path | None = None,
+    bindings: tuple[OperatingQuantityReportBinding, ...] | None = None,
+) -> Path:
+    """Record the four-report binding before the operating-quantity run starts."""
+
+    root = Path(repository_root) if repository_root is not None else _REPOSITORY_ROOT
+    store = Stage5RunBundleStore(output_root, repository_root=root)
+    destination = store.output_root / "enqueue.json"
+    if destination.exists():
+        raise FileExistsError(
+            f"operating-quantity enqueue snapshot already exists: {destination}"
+        )
+    snapshot = _enqueue_snapshot(root, bindings)
+    _write_json_atomic(
+        store.output_root, destination.name, snapshot.model_dump(mode="json")
+    )
+    return destination
+
+
+def replay_operating_quantity_research(
+    output_root: str | Path,
+    *,
+    repository_root: str | Path | None = None,
+    run_id: str = "stage4-operating-quantities-20260928",
+    preparer: Stage5EvidencePreparer | None = None,
+) -> Path:
+    """Freeze the four dossiers, then run only extract_operating_quantities.
+
+    The run snapshot records the isolated bundle. It does not record recall,
+    accuracy, critical errors, or expansion gates.
+    """
+
+    root = Path(repository_root) if repository_root is not None else _REPOSITORY_ROOT
+    selected = operating_quantity_research_bindings()
+    enqueue_path = freeze_operating_quantity_research_enqueue(
+        output_root, repository_root=root, bindings=selected
+    )
+    bundle_dir = commit_operating_quantity_research(
+        output_root,
+        repository_root=root,
+        run_id=run_id,
+        preparer=preparer,
+        bindings=selected,
+    )
+    run = OperatingQuantityRunSnapshot(
+        enqueue_sha256=hashlib.sha256(enqueue_path.read_bytes()).hexdigest(),
+        bundle_dirname=bundle_dir.name,
+        run_id=run_id,
+    )
+    run_path = enqueue_path.parent / "run.json"
+    if run_path.exists():
+        raise FileExistsError(
+            f"operating-quantity run snapshot already exists: {run_path}"
+        )
+    _write_json_atomic(enqueue_path.parent, run_path.name, run.model_dump(mode="json"))
+    return run_path
+
+
+def _enqueue_snapshot(
+    repository_root: Path,
+    bindings: tuple[OperatingQuantityReportBinding, ...] | None = None,
+) -> OperatingQuantityEnqueueSnapshot:
+    selected = operating_quantity_research_bindings() if bindings is None else bindings
+    if tuple(item.instrument_id for item in selected) != (
+        "300750.SZ",
+        "603659.SH",
+        "920015.BJ",
+        "302132.SZ",
+    ):
+        raise OperatingQuantityResearchError(
+            "operating-quantity replay only admits the four defining reports"
+        )
+    reports: list[OperatingQuantityEnqueueReport] = []
+    for binding in selected:
+        pdf = repository_root / binding.relative_pdf_path
+        dossier = repository_root / binding.relative_dossier_path
+        content_hash = hashlib.sha256(pdf.read_bytes()).hexdigest()
+        if content_hash != binding.content_hash:
+            raise OperatingQuantityResearchError(
+                f"{binding.instrument_id} PDF hash does not match the frozen binding"
+            )
+        reports.append(
+            OperatingQuantityEnqueueReport(
+                sample_id=binding.sample_id,
+                instrument_id=binding.instrument_id,
+                report_id=binding.report_id,
+                document_version=binding.document_version,
+                published_at=binding.published_at,
+                content_hash=content_hash,
+                dossier_path=binding.relative_dossier_path,
+                dossier_sha256=hashlib.sha256(dossier.read_bytes()).hexdigest(),
+                scopes=tuple(
+                    OperatingQuantityEnqueueScope(
+                        scope_id=item.scope_id,
+                        pages=item.pages,
+                        section_title=item.section_title,
+                        anchor_terms=item.anchor_terms,
+                        covered_fields=item.covered_fields,
+                    )
+                    for item in binding.scopes
+                ),
+            )
+        )
+    return OperatingQuantityEnqueueSnapshot(reports=tuple(reports))
+
+
+def _write_json_atomic(directory: Path, name: str, payload: dict[str, Any]) -> None:
+    temporary = directory / f".stage5-tmp-{name}-{uuid.uuid4().hex}"
+    temporary.write_text(
+        json.dumps(payload, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
+    os.replace(temporary, directory / name)
 
 
 def commit_operating_quantity_research(

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 from dataclasses import replace
 from pathlib import Path
@@ -13,6 +14,7 @@ from research.company_profile.operating_quantity_research import (
     commit_operating_quantity_research,
     interpret_operating_quantity_pages,
     operating_quantity_research_bindings,
+    replay_operating_quantity_research,
 )
 from research.company_profile.stage5 import (
     EvidenceScopePlan,
@@ -217,6 +219,106 @@ def test_one_failed_scope_keeps_the_other_pages(tmp_path):
         for item in bundle.coverage
     )
     assert bundle.disposition == "accepted_for_review"
+
+
+def test_replay_freezes_the_four_dossiers_before_the_run(tmp_path):
+    run_path = replay_operating_quantity_research(
+        tmp_path / "replay",
+        repository_root=_ROOT,
+        run_id="stage4-operating-quantities-replay-test",
+    )
+    output_root = run_path.parent
+    enqueue = json.loads((output_root / "enqueue.json").read_text(encoding="utf-8"))
+    run = json.loads(run_path.read_text(encoding="utf-8"))
+    bundle = json.loads(
+        (output_root / run["bundle_dirname"] / "result.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    assert enqueue["chapter_task"] == "extract_operating_quantities"
+    assert bundle["chapter_task"] == "extract_operating_quantities"
+    assert run["provider_calls"] == 0
+    assert run["disposition"] == "accepted_for_review"
+    assert bundle["provider_calls"] == 0
+    assert bundle["disposition"] == "accepted_for_review"
+    assert {
+        "recall",
+        "accuracy",
+        "critical_numeric_errors",
+        "expansion_gates_met",
+    }.isdisjoint(enqueue)
+    assert {
+        "recall",
+        "accuracy",
+        "critical_numeric_errors",
+        "expansion_gates_met",
+    }.isdisjoint(bundle)
+    assert [item["instrument_id"] for item in enqueue["reports"]] == [
+        "300750.SZ",
+        "603659.SH",
+        "920015.BJ",
+        "302132.SZ",
+    ]
+    for report, binding in zip(
+        enqueue["reports"], operating_quantity_research_bindings(), strict=True
+    ):
+        assert report["content_hash"] == binding.content_hash
+        assert report["report_id"] == binding.report_id
+        assert report["document_version"] == binding.document_version
+        assert report["report_period"] == "2025-12-31"
+        dossier = _ROOT / binding.relative_dossier_path
+        assert (
+            report["dossier_sha256"] == hashlib.sha256(dossier.read_bytes()).hexdigest()
+        )
+    by_sample = {}
+    for fact in bundle["facts"]:
+        by_sample.setdefault(fact["sample_id"], []).append(fact)
+        assert fact["report_period"] == "2025-12-31"
+        assert fact["evidence_id"].startswith("stage5-evidence-")
+        assert len(fact["page_text_hash"]) == 64
+    catl = by_sample["manufacturing-materials-300750-2025"]
+    assert any(
+        item["metric_type"] == "production_volume" and item["page"] == 26
+        for item in catl
+    )
+    assert any(
+        item["metric_type"] == "inventory_volume"
+        and item["page"] == 27
+        and item["period_type"] == "instant"
+        for item in catl
+    )
+    putailai = by_sample["manufacturing-materials-603659-2025"]
+    assert any(
+        item["metric_type"] == "processing_volume" and item["page"] == 14
+        for item in putailai
+    )
+    assert any(
+        item["metric_type"] == "sales_volume"
+        and item["page"] == 19
+        and item["measured_object"] == "涂覆隔膜"
+        for item in putailai
+    )
+    jinhua = {
+        item["field_id"]: item["coverage_status"]
+        for item in bundle["coverage"]
+        if item["sample_id"].endswith("920015-2025")
+    }
+    assert jinhua["production_volume"] == "not_disclosed"
+    assert any(
+        item["sample_id"].endswith("920015-2025")
+        and item["metric_type"] == "production_capacity"
+        for item in bundle["facts"]
+    )
+    avic = {
+        item["field_id"]: item["coverage_status"]
+        for item in bundle["coverage"]
+        if "302132" in item["sample_id"]
+    }
+    assert avic["sales_volume"] == "not_applicable"
+    assert avic["production_capacity"] == "not_disclosed"
+    assert (output_root / "enqueue.json").stat().st_mtime <= (
+        output_root / run["bundle_dirname"] / "result.json"
+    ).stat().st_mtime
 
 
 def test_missing_anchor_stays_extraction_failed(tmp_path):
