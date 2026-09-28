@@ -1,0 +1,196 @@
+{
+  "schema_version": "company_profile_operating_quantity_research_enqueue.v1",
+  "chapter_task": "extract_operating_quantities",
+  "production_authorization": "not_authorized",
+  "plan_version": "manufacturing_materials_stage4_operating_quantities.2026-09-28.2",
+  "reports": [
+    {
+      "sample_id": "manufacturing-materials-300750-2025",
+      "instrument_id": "300750.SZ",
+      "report_id": "asset_3b09f6c831975c7177b6bb3287cab781",
+      "document_version": "ver_09c0e677ec8192dc4fc12cb620069f29",
+      "report_period": "2025-12-31",
+      "published_at": "2026-03-09T16:00:00+00:00",
+      "content_hash": "c15272977147dee7e6935a38ea0e4fd6855370aabb106f54cfe20f7cf6048ec9",
+      "dossier_path": "openspec/changes/scope-manufacturing-materials-stage4-operating-quantities-holdout/dossiers/300750-sz-2025.md",
+      "dossier_sha256": "180cbb1d5e3bcae46e4dcc78047b13b25bf0602204c9250fa5ff02c552a1b0a7",
+      "plan_version": "manufacturing_materials_stage4_operating_quantities.2026-09-28.2",
+      "chapter_task": "extract_operating_quantities",
+      "scopes": [
+        {
+          "scope_id": "300750-operating-table",
+          "pages": [
+            26,
+            27
+          ],
+          "section_title": "产销情况",
+          "anchor_terms": [
+            "产销情况",
+            "销售量",
+            "库存量"
+          ],
+          "covered_fields": [
+            "production_capacity",
+            "capacity_under_construction",
+            "capacity_utilization",
+            "production_volume",
+            "sales_volume",
+            "inventory_volume",
+            "processing_volume"
+          ],
+          "chapter_task": "extract_operating_quantities"
+        }
+      ]
+    },
+    {
+      "sample_id": "manufacturing-materials-603659-2025",
+      "instrument_id": "603659.SH",
+      "report_id": "asset_50c70429093f66b34fc57ad8f896fcee",
+      "document_version": "ver_c867a6a692048e88fd9cb80473fbf908",
+      "report_period": "2025-12-31",
+      "published_at": "2026-03-05T16:00:00+00:00",
+      "content_hash": "4e81f5539046ba1eee733100f38442a4abd5037afe3881115ba7f48678fa35b6",
+      "dossier_path": "openspec/changes/scope-manufacturing-materials-stage4-operating-quantities-holdout/dossiers/603659-sh-2025.md",
+      "dossier_sha256": "4458a489585741d36fe3bd44156b06067e6194bccd9adab2cbda7b51a18ebaee",
+      "plan_version": "manufacturing_materials_stage4_operating_quantities.2026-09-28.2",
+      "chapter_task": "extract_operating_quantities",
+      "scopes": [
+        {
+          "scope_id": "603659-processing",
+          "pages": [
+            14
+          ],
+          "section_title": "涂覆加工",
+          "anchor_terms": [
+            "涂覆加工量"
+          ],
+          "covered_fields": [
+            "processing_volume"
+          ],
+          "chapter_task": "extract_operating_quantities"
+        },
+        {
+          "scope_id": "603659-capacity-narrative",
+          "pages": [
+            15
+          ],
+          "section_title": "有效产能",
+          "anchor_terms": [
+            "有效产能"
+          ],
+          "covered_fields": [
+            "production_capacity",
+            "capacity_under_construction",
+            "capacity_utilization"
+          ],
+          "chapter_task": "extract_operating_quantities"
+        },
+        {
+          "scope_id": "603659-volume-table",
+          "pages": [
+            19
+          ],
+          "section_title": "产销量情况分析表",
+          "anchor_terms": [
+            "产销量情况分析表",
+            "库存量"
+          ],
+          "covered_fields": [
+            "production_volume",
+            "sales_volume",
+            "inventory_volume"
+          ],
+          "chapter_task": "extract_operating_quantities"
+        },
+        {
+          "scope_id": "603659-project-capacity",
+          "pages": [
+            27
+          ],
+          "section_title": "重大的非股权投资",
+          "anchor_terms": [
+            "重大的非股权投资",
+            "一体化建设项目"
+          ],
+          "covered_fields": [
+            "production_capacity",
+            "capacity_under_construction"
+          ],
+          "chapter_task": "extract_operating_quantities"
+        }
+      ]
+    },
+    {
+      "sample_id": "manufacturing-materials-920015-2025",
+      "instrument_id": "920015.BJ",
+      "report_id": "asset_b87f1d1a48e662dae376c540cd021f69",
+      "document_version": "ver_cfdbd2d058af825b1fc39f494d7a9bd3",
+      "report_period": "2025-12-31",
+      "published_at": "2026-04-22T16:00:00+00:00",
+      "content_hash": "4d2c1612f6f62a9024b8947d7a01b70c40f8f347c2975fa1a05b908d0770695a",
+      "dossier_path": "openspec/changes/scope-manufacturing-materials-stage4-operating-quantities-holdout/dossiers/920015-bj-2025.md",
+      "dossier_sha256": "b49b61490d9740b0218af424ee10674f8bbf5f519136edb37db53ef22905a6b8",
+      "plan_version": "manufacturing_materials_stage4_operating_quantities.2026-09-28.2",
+      "chapter_task": "extract_operating_quantities",
+      "scopes": [
+        {
+          "scope_id": "920015-capacity-table",
+          "pages": [
+            49,
+            50
+          ],
+          "section_title": "产能与开工情况",
+          "anchor_terms": [
+            "产能与开工情况",
+            "设计产能"
+          ],
+          "covered_fields": [
+            "production_capacity",
+            "capacity_under_construction",
+            "capacity_utilization",
+            "production_volume",
+            "sales_volume",
+            "inventory_volume",
+            "processing_volume"
+          ],
+          "chapter_task": "extract_operating_quantities"
+        }
+      ]
+    },
+    {
+      "sample_id": "manufacturing-materials-302132-2025-regime",
+      "instrument_id": "302132.SZ",
+      "report_id": "asset_0a488da55636b09107be6d719c9ebf39",
+      "document_version": "ver_2d20ba3aebc5fac6c562cd619695995a",
+      "report_period": "2025-12-31",
+      "published_at": "2026-04-28T16:00:00+00:00",
+      "content_hash": "605394bd0879f906a829a9fcd3a2dab037d8aad2554b741a7d95757a3a5e3020",
+      "dossier_path": "openspec/changes/scope-manufacturing-materials-stage4-operating-quantities-holdout/dossiers/302132-sz-2025.md",
+      "dossier_sha256": "f0b8123f3f6abe9a769a0b918398808dd8060a2c1326749d9343ac4cb9aa2e36",
+      "plan_version": "manufacturing_materials_stage4_operating_quantities.2026-09-28.2",
+      "chapter_task": "extract_operating_quantities",
+      "scopes": [
+        {
+          "scope_id": "302132-physical-sales",
+          "pages": [
+            15
+          ],
+          "section_title": "实物销售收入",
+          "anchor_terms": [
+            "无法进行分类统计"
+          ],
+          "covered_fields": [
+            "production_capacity",
+            "capacity_under_construction",
+            "capacity_utilization",
+            "production_volume",
+            "sales_volume",
+            "inventory_volume",
+            "processing_volume"
+          ],
+          "chapter_task": "extract_operating_quantities"
+        }
+      ]
+    }
+  ]
+}
