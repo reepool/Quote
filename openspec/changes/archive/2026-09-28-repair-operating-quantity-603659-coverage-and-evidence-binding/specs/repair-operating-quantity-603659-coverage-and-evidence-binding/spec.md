@@ -82,11 +82,11 @@ Implementation after scope approval MUST write enqueue, run, and result only in 
 - **AND** its directory is not `replay/20260928`
 - **AND** the 20260928 enqueue, run, result, and source_review hashes are unchanged
 
-### Requirement: Metrics are not preset by this repair
-This change MUST NOT record source recall, source accuracy, critical numeric errors, or `expansion_gates_met` before a new independent source review rereads the successor output. The historical 26/36, 26/27, and one critical error describe only the 20260928 run. The material-input 23/23, the stage-4 19/23, and the fixed two-company 9/9 MUST NOT be reused as this repair's result. The original change's task 3.3 and archive MUST wait until that new source review passes.
+### Requirement: The closed four-report regression stays failed
+The independent source review of `replay/20260928.2` records that the 23 Putailai target facts were delivered correctly, while the four-report result remains source recall 36/38, source accuracy 36/36, critical numeric errors 0, coverage 13/13, and `expansion_gates_met=false`. The false gate MUST remain the absence of the two CATL segment sales from that bundle. The later CATL `.3` result of 38/38 MUST NOT be written back into this observation. The original `replay/20260928` result of 26/36, 26/27, and one critical error MUST stay a third record. Archiving this change MUST keep those bytes unchanged and MUST NOT treat the failed gate as a pass.
 
-#### Scenario: Scope approval does not fill the gate
-- **WHEN** this repair is accepted at scope review or implemented before the successor source review
-- **THEN** recall, accuracy, critical numeric errors, and the gate remain unfilled for the successor
-- **AND** the 20260928 gate remains false
-- **AND** no archive is started
+#### Scenario: Archive retains the failed regression
+- **WHEN** this change is archived
+- **THEN** the recorded gate stays false
+- **AND** the 23 target facts remain a correct delivery inside that failed regression
+- **AND** the CATL 38/38 result is not described as a recount of this bundle

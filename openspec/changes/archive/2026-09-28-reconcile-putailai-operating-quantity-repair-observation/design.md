@@ -60,6 +60,10 @@
 3. `git mv` 到 `openspec/changes/archive/2026-09-28-repair-operating-quantity-603659-coverage-and-evidence-binding/`，复核四份制品哈希不变。
 4. 不改控制面，不启动下一次扩大。
 
+## Closed observation
+
+2026-09-28 收口已执行。璞泰来 change 按保留失败观察的方式归档。`.2` 四份制品哈希在移动前后保持 `b38b3fb11ea3f3a59b21f3072ac719ed7c7fbe4bc1063ea39294b9ca8afa79bc`、`387340ccfaa95237010b4fe7fa2cffd4a8467a11cc3b4b5679260ac97b246319`、`17c990a55ce099459fdf8c24683fbc34499c5819fd987e6483d93c8846ece571`、`81ed17c742fc6f64e1e2aa88b5e5ac8068c73c036e03374b1757b3d7c45575ea`。3.2 未标为通过。没有新 replay，也没有改 CATL `.3` 或阶段 4 原始 replay。
+
 ## Open Questions
 
-- 无。若 1.1 认为失败观察不能归档，再另开 successor replay；那不是本决定。
+- 无。失败观察已按原样归档。

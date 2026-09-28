@@ -67,6 +67,14 @@
 5. 只有这次新的 source-review 通过，才考虑原 change 的 3.3 和归档。
 6. 回滚本 change 只删除这份范围文档；不删除 20260928 replay，不改控制面。
 
+## Closed observation
+
+目标修复的 23 条璞泰来事实已正确交付。四报告回归仍是 recall 36/38、accuracy 36/36、critical numeric errors 0、coverage 13/13、`expansion_gates_met=false`。失败原因仍是该 bundle 没有宁德时代第 21 页动力电池 541 GWh 和第 22 页储能电池 121 GWh。
+
+这两条已由独立且已归档的 CATL `.3` change 修复。它的 38/38 不回填 `.2`，也不是 `.2` 的重算。阶段 4 原始 `replay/20260928` 的 26/36、26/27、critical numeric errors 1 仍是第三个独立观察。
+
+`.2` 四份制品保持原字节。3.2 不标记为通过。3.3 只表示保留这次失败观察后归档。不新建 successor replay，不改生产授权。
+
 ## Open Questions
 
-- 无。1.1 审核前不把修复后的召回或 gate 预设为通过，也不把第 15 页两条句子合成一条。
+- 无。收口不把失败回归改写成通过。
