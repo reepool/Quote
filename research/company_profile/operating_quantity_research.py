@@ -55,8 +55,11 @@ from .stage5 import (
 from .stage5_bundle import Stage5RunBundleStore
 from .workflow import CompanyProfileSemanticService
 
-OPERATING_QUANTITY_PLAN_VERSION = (
+OPERATING_QUANTITY_HISTORICAL_PLAN_VERSION = (
     "manufacturing_materials_stage4_operating_quantities.2026-09-27.1"
+)
+OPERATING_QUANTITY_PLAN_VERSION = (
+    "manufacturing_materials_stage4_operating_quantities.2026-09-28.2"
 )
 OPERATING_QUANTITY_CHAPTER = ChapterTask.EXTRACT_OPERATING_QUANTITIES
 _SCHEMA = "company_profile_operating_quantity_research.v1"
@@ -510,6 +513,7 @@ def freeze_operating_quantity_research_enqueue(
     *,
     repository_root: str | Path | None = None,
     bindings: tuple[OperatingQuantityReportBinding, ...] | None = None,
+    plan_version: str = OPERATING_QUANTITY_PLAN_VERSION,
 ) -> Path:
     """Record the four-report binding before the operating-quantity run starts."""
 
@@ -520,7 +524,7 @@ def freeze_operating_quantity_research_enqueue(
         raise FileExistsError(
             f"operating-quantity enqueue snapshot already exists: {destination}"
         )
-    snapshot = _enqueue_snapshot(root, bindings)
+    snapshot = _enqueue_snapshot(root, bindings, plan_version=plan_version)
     _write_json_atomic(
         store.output_root, destination.name, snapshot.model_dump(mode="json")
     )
@@ -533,6 +537,7 @@ def replay_operating_quantity_research(
     repository_root: str | Path | None = None,
     run_id: str = "stage4-operating-quantities-20260928",
     preparer: Stage5EvidencePreparer | None = None,
+    plan_version: str = OPERATING_QUANTITY_PLAN_VERSION,
 ) -> Path:
     """Freeze the four dossiers, then run only extract_operating_quantities.
 
@@ -543,7 +548,10 @@ def replay_operating_quantity_research(
     root = Path(repository_root) if repository_root is not None else _REPOSITORY_ROOT
     selected = operating_quantity_research_bindings()
     enqueue_path = freeze_operating_quantity_research_enqueue(
-        output_root, repository_root=root, bindings=selected
+        output_root,
+        repository_root=root,
+        bindings=selected,
+        plan_version=plan_version,
     )
     bundle_dir = commit_operating_quantity_research(
         output_root,
@@ -551,6 +559,7 @@ def replay_operating_quantity_research(
         run_id=run_id,
         preparer=preparer,
         bindings=selected,
+        plan_version=plan_version,
     )
     run = OperatingQuantityRunSnapshot(
         enqueue_sha256=hashlib.sha256(enqueue_path.read_bytes()).hexdigest(),
@@ -569,6 +578,7 @@ def replay_operating_quantity_research(
 def _enqueue_snapshot(
     repository_root: Path,
     bindings: tuple[OperatingQuantityReportBinding, ...] | None = None,
+    plan_version: str = OPERATING_QUANTITY_PLAN_VERSION,
 ) -> OperatingQuantityEnqueueSnapshot:
     selected = operating_quantity_research_bindings() if bindings is None else bindings
     if tuple(item.instrument_id for item in selected) != (
@@ -599,6 +609,7 @@ def _enqueue_snapshot(
                 content_hash=content_hash,
                 dossier_path=binding.relative_dossier_path,
                 dossier_sha256=hashlib.sha256(dossier.read_bytes()).hexdigest(),
+                plan_version=plan_version,
                 scopes=tuple(
                     OperatingQuantityEnqueueScope(
                         scope_id=item.scope_id,
@@ -611,7 +622,9 @@ def _enqueue_snapshot(
                 ),
             )
         )
-    return OperatingQuantityEnqueueSnapshot(reports=tuple(reports))
+    return OperatingQuantityEnqueueSnapshot(
+        plan_version=plan_version, reports=tuple(reports)
+    )
 
 
 def _write_json_atomic(directory: Path, name: str, payload: dict[str, Any]) -> None:
@@ -630,6 +643,7 @@ def commit_operating_quantity_research(
     run_id: str = "stage4-operating-quantities",
     preparer: Stage5EvidencePreparer | None = None,
     bindings: tuple[OperatingQuantityReportBinding, ...] | None = None,
+    plan_version: str = OPERATING_QUANTITY_PLAN_VERSION,
 ) -> Path:
     """Prepare the defining reports and commit one review-only bundle."""
 
@@ -640,6 +654,7 @@ def commit_operating_quantity_research(
         run_id=run_id,
         preparer=preparer,
         bindings=bindings,
+        plan_version=plan_version,
     )
     destination = store.output_root / f"operating-quantity-{bundle.run_id}"
     if destination.exists():
@@ -668,6 +683,7 @@ def build_operating_quantity_research_bundle(
     run_id: str,
     preparer: Stage5EvidencePreparer | None,
     bindings: tuple[OperatingQuantityReportBinding, ...] | None = None,
+    plan_version: str = OPERATING_QUANTITY_PLAN_VERSION,
 ) -> OperatingQuantityResearchBundle:
     selected = operating_quantity_research_bindings() if bindings is None else bindings
     active_preparer = preparer or Stage5EvidencePreparer()
@@ -684,7 +700,7 @@ def build_operating_quantity_research_bundle(
                     asset=_asset(binding, repository_root),
                     chapter_task=OPERATING_QUANTITY_CHAPTER,
                     scopes=(_scope_plan(spec),),
-                    plan_version=OPERATING_QUANTITY_PLAN_VERSION,
+                    plan_version=plan_version,
                 )
             except EvidencePreparationError as exc:
                 if exc.code not in _PREPARATION_FAILURES:
@@ -696,6 +712,10 @@ def build_operating_quantity_research_bundle(
             ):
                 raise OperatingQuantityResearchError(
                     "research scope prepared a second chapter"
+                )
+            if prepared[0].plan_version != plan_version:
+                raise OperatingQuantityResearchError(
+                    "stage5 preparation returned a different plan version"
                 )
             for page in prepared[0].page_contexts:
                 if page.page not in page_hashes:
@@ -709,7 +729,7 @@ def build_operating_quantity_research_bundle(
             coverages = tuple(
                 item for item in coverages if item.field_id not in failed_fields
             )
-            accepted = _accept(binding, hits, coverages)
+            accepted = _accept(binding, hits, coverages, plan_version=plan_version)
             facts.extend(
                 _fact(binding.sample_id, item, page_hashes) for item in accepted[0]
             )
@@ -739,6 +759,7 @@ def build_operating_quantity_research_bundle(
         )
     return OperatingQuantityResearchBundle(
         run_id=run_id,
+        plan_version=plan_version,
         reports=tuple(reports),
         facts=tuple(facts),
         coverage=tuple(coverage_facts),
@@ -1333,6 +1354,8 @@ def _accept(
     binding: OperatingQuantityReportBinding,
     hits: tuple[QuantityHit, ...],
     coverages: tuple[QuantityCoverage, ...],
+    *,
+    plan_version: str = OPERATING_QUANTITY_PLAN_VERSION,
 ) -> tuple[tuple[Any, ...], tuple[CoverageResult, ...]]:
     report = _identity(binding)
     prepared: list[PreparedEvidence] = []
@@ -1372,7 +1395,7 @@ def _accept(
         report=report,
         package_manifest=PackageManifest(
             package_name="manufacturing_materials",
-            package_version=OPERATING_QUANTITY_PLAN_VERSION,
+            package_version=plan_version,
             report=report,
             checklist=tuple(_checklist(field_id) for field_id in _FIELDS),
         ),

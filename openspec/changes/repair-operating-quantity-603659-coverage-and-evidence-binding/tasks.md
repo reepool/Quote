@@ -6,6 +6,8 @@
 
 - [x] 2.1 After 1.1, add the smallest implementation and tests for measured object, comparison qualifier, evidence binding, physical page, and page text hash. Deliver the ten missed `603659.SH` facts and replace the page 15 misbinding with two evidence-backed facts. Keep the other three reports, the 26 accurate facts, and the 13 coverage statuses unchanged. Do not hard-code the instrument, page, or product name in runtime. Do not start the successor replay in this task. Result: the four-report bundle now has 36 facts and the same 13 coverage rows. PVDF keeps `超过` and 勃姆石和氧化铝 keeps `已达`, with different evidence. The base-film 20 亿平方米 addition is one fact. No enqueue, replay, source-review, or metric was written
 
+- [x] 2.1a The official successor entry uses plan `manufacturing_materials_stage4_operating_quantities.2026-09-28.2` for enqueue, each report binding, the result bundle, and Stage 5 preparation. The historical `.2026-09-27.1` remains available only as an explicit argument and does not rewrite `replay/20260928`. Do not start 3.1 in this repair
+
 ## 3. Successor replay and recount, not yet authorized
 
 - [ ] 3.1 After the implementation review, replay only `extract_operating_quantities` into a new research isolation directory with plan `manufacturing_materials_stage4_operating_quantities.2026-09-28.2`. Do not write into `replay/20260928` and do not modify its artifacts

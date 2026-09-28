@@ -9,6 +9,8 @@ from pathlib import Path
 
 from research.company_profile.models import ChapterTask, ReportIdentity
 from research.company_profile.operating_quantity_research import (
+    OPERATING_QUANTITY_HISTORICAL_PLAN_VERSION,
+    OPERATING_QUANTITY_PLAN_VERSION,
     _ScopeBinding,
     build_operating_quantity_research_bundle,
     commit_operating_quantity_research,
@@ -17,12 +19,27 @@ from research.company_profile.operating_quantity_research import (
     replay_operating_quantity_research,
 )
 from research.company_profile.stage5 import (
+    EvidencePreparationError,
     EvidenceScopePlan,
+    PreparationFailureCode,
     Stage5EvidencePreparer,
     Stage5ReportAsset,
 )
 
+_SUCCESSOR_PLAN = "manufacturing_materials_stage4_operating_quantities.2026-09-28.2"
 _ROOT = Path(__file__).resolve().parents[3]
+_HISTORICAL_REPLAY = (
+    _ROOT
+    / "openspec/changes/scope-manufacturing-materials-stage4-operating-quantities-holdout/replay/20260928"
+)
+_HISTORICAL_HASHES = {
+    "enqueue.json": "5fffde878890fb43c136c4e0082f4eba32fc9e65402e166a96cca164396fab7a",
+    "run.json": "3fa107b4bf914cf7603ee1e2e73937392a04ad95bf52df4e68d5bff304a5e9cf",
+    "operating-quantity-stage4-operating-quantities-20260928/result.json": (
+        "67e37d98ed0d0dc57f9672f6ef224482db52fc3e9ce96ece8f366866a1e87302"
+    ),
+    "source_review.json": "5568d4ee73cbc332c63cb935fba42a13ea99e4dfe0344f6b700ad4fcc212ab0b",
+}
 
 
 def test_four_reports_keep_volumes_capacity_and_coverage_distinct(tmp_path):
@@ -35,6 +52,7 @@ def test_four_reports_keep_volumes_capacity_and_coverage_distinct(tmp_path):
     assert payload["disposition"] == "accepted_for_review"
     assert payload["provider_calls"] == 0
     assert payload["chapter_task"] == "extract_operating_quantities"
+    assert payload["plan_version"] == _SUCCESSOR_PLAN
     assert payload["production_authorization"] == "not_authorized"
     assert {
         "recall",
@@ -126,7 +144,9 @@ def test_four_reports_keep_volumes_capacity_and_coverage_distinct(tmp_path):
     )
     assert any("产成品数量" in note for note in anode_inventory["footnote_refs"])
     assert len(catl) == 6
-    assert len([item for item in facts if item["sample_id"].endswith("920015-2025")]) == 7
+    assert (
+        len([item for item in facts if item["sample_id"].endswith("920015-2025")]) == 7
+    )
     assert not rows("302132-2025")
 
     def putailai_one(metric: str, name: str, value: str):
@@ -287,12 +307,63 @@ def test_one_failed_scope_keeps_the_other_pages(tmp_path):
     assert bundle.disposition == "accepted_for_review"
 
 
+class _RecordingPreparer(Stage5EvidencePreparer):
+    def __init__(self) -> None:
+        super().__init__()
+        self.plan_versions: list[str] = []
+
+    def prepare_single_chapter(self, *, asset, chapter_task, scopes, plan_version):
+        self.plan_versions.append(plan_version)
+        return super().prepare_single_chapter(
+            asset=asset,
+            chapter_task=chapter_task,
+            scopes=scopes,
+            plan_version=plan_version,
+        )
+
+
+class _PlanVersionProbe(Stage5EvidencePreparer):
+    def __init__(self) -> None:
+        super().__init__()
+        self.plan_versions: list[str] = []
+
+    def prepare_single_chapter(self, *, asset, chapter_task, scopes, plan_version):
+        self.plan_versions.append(plan_version)
+        raise EvidencePreparationError(
+            PreparationFailureCode.PAGE_UNREADABLE,
+            "plan-version probe",
+            sample_id=asset.sample_id,
+            chapter_task=chapter_task,
+            scope_id=scopes[0].scope_id,
+        )
+
+
+def test_historical_plan_version_stays_explicit():
+    probe = _PlanVersionProbe()
+    binding = operating_quantity_research_bindings()[0]
+    bundle = build_operating_quantity_research_bundle(
+        repository_root=_ROOT,
+        run_id="historical-plan-probe",
+        preparer=probe,
+        bindings=(binding,),
+        plan_version=OPERATING_QUANTITY_HISTORICAL_PLAN_VERSION,
+    )
+    assert bundle.plan_version == OPERATING_QUANTITY_HISTORICAL_PLAN_VERSION
+    assert set(probe.plan_versions) == {OPERATING_QUANTITY_HISTORICAL_PLAN_VERSION}
+    for relative, expected in _HISTORICAL_HASHES.items():
+        archived = _HISTORICAL_REPLAY / relative
+        assert hashlib.sha256(archived.read_bytes()).hexdigest() == expected
+
+
 def test_replay_freezes_the_four_dossiers_before_the_run(tmp_path):
+    preparer = _RecordingPreparer()
     run_path = replay_operating_quantity_research(
         tmp_path / "replay",
         repository_root=_ROOT,
         run_id="stage4-operating-quantities-replay-test",
+        preparer=preparer,
     )
+    assert set(preparer.plan_versions) == {_SUCCESSOR_PLAN}
     output_root = run_path.parent
     enqueue = json.loads((output_root / "enqueue.json").read_text(encoding="utf-8"))
     run = json.loads(run_path.read_text(encoding="utf-8"))
@@ -301,8 +372,17 @@ def test_replay_freezes_the_four_dossiers_before_the_run(tmp_path):
             encoding="utf-8"
         )
     )
+    assert OPERATING_QUANTITY_PLAN_VERSION == _SUCCESSOR_PLAN
+    assert enqueue["plan_version"] == _SUCCESSOR_PLAN
+    assert bundle["plan_version"] == _SUCCESSOR_PLAN
+    assert {item["plan_version"] for item in enqueue["reports"]} == {_SUCCESSOR_PLAN}
     assert enqueue["chapter_task"] == "extract_operating_quantities"
     assert bundle["chapter_task"] == "extract_operating_quantities"
+    assert len(bundle["facts"]) == 36
+    assert len(bundle["coverage"]) == 13
+    for relative, expected in _HISTORICAL_HASHES.items():
+        archived = _HISTORICAL_REPLAY / relative
+        assert hashlib.sha256(archived.read_bytes()).hexdigest() == expected
     assert run["provider_calls"] == 0
     assert run["disposition"] == "accepted_for_review"
     assert bundle["provider_calls"] == 0
