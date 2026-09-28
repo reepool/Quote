@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 from pathlib import Path
 
@@ -9,6 +10,7 @@ import pytest
 
 from research.company_profile.models import ChapterTask
 from research.company_profile.segment_financial_research import (
+    SEGMENT_FINANCIAL_HISTORICAL_PLAN_VERSION,
     SEGMENT_FINANCIAL_PLAN_VERSION,
     SegmentFinancialResearchError,
     build_segment_financial_research_bundle,
@@ -36,7 +38,14 @@ def test_bindings_are_the_four_approved_reports():
         for scope in binding.scopes
         for term in scope.anchor_terms
     )
-    assert SEGMENT_FINANCIAL_PLAN_VERSION.endswith("2026-09-28.1")
+    assert SEGMENT_FINANCIAL_PLAN_VERSION.endswith("2026-09-29.2")
+    assert SEGMENT_FINANCIAL_HISTORICAL_PLAN_VERSION.endswith("2026-09-28.1")
+    pages = {
+        scope.scope_id: scope.pages for binding in bindings for scope in binding.scopes
+    }
+    assert pages["300750-revenue-cost-note"] == (195,)
+    assert pages["920015-income-composition"] == (16,)
+    assert pages["302132-mda-table"] == (14, 15)
 
 
 def test_same_amount_keeps_source_dimension_labels():
@@ -439,6 +448,20 @@ def _fixture_for(sample_id: str, scope_id: str) -> str:
         ("manufacturing-materials-300750-2025", "300750-single-segment"): (
             "管理层认为本公司仅有一个经营分部，无需披露分类业绩。"
         ),
+        ("manufacturing-materials-300750-2025", "300750-revenue-cost-note"): """
+单位：千元
+营业收入和营业成本
+本期发生额 上期发生额
+收入 成本 收入 成本
+主营业务 406,785,222 308,033,498 344,524,735 265,082,813
+""",
+        ("manufacturing-materials-920015-2025", "920015-income-composition"): """
+单位：元
+收入构成
+项目 2025 年 2024 年 变动比例%
+主营业务收入 1,014,715,549.55 1,232,762,645.51 -17.69%
+主营业务成本 708,496,694.98 887,317,477.02 -20.15%
+""",
         ("manufacturing-materials-603659-2025", "603659-segment-table"): """
 单位：元
 分产品
@@ -475,6 +498,236 @@ def _fixture_for(sample_id: str, scope_id: str) -> str:
 """,
     }
     return fixtures[(sample_id, scope_id)]
+
+
+def test_page25_composition_does_not_fill_cost_or_margin():
+    hits, _coverages = interpret_segment_financial_pages(
+        (
+            (
+                25,
+                """
+单位：千元
+营业收入构成
+金额 占营业收入比重 金额 占营业收入比重 同比增减
+分地区
+境内 294,060,576 69.40% 251,677,045 69.52% 16.84%
+境外 129,641,258 30.60% 110,335,509 30.48% 17.50%
+项目 营业收入 营业成本 毛利率 营业收入比上年同期增减 营业成本比上年同期增减 毛利率比上年同期增减
+分地区
+境内 294,060,576 223,497,885 24.00% 16.84% 14.22% 1.75%
+境外 129,641,258 88,885,412 31.44% 17.50% 14.19% 1.99%
+""",
+            ),
+        )
+    )
+    values = {(item.field_id, item.label, item.value) for item in hits}
+    assert ("operating_cost", "境内", "251,677,045") not in values
+    assert ("gross_margin_reported", "境内", "69.52%") not in values
+    assert ("operating_cost", "境外", "110,335,509") not in values
+    assert ("gross_margin_reported", "境外", "30.48%") not in values
+    assert ("operating_cost", "境内", "223,497,885") in values
+    assert ("gross_margin_reported", "境内", "24.00%") in values
+    assert ("operating_cost", "境外", "88,885,412") in values
+    assert ("gross_margin_reported", "境外", "31.44%") in values
+
+
+def test_ten_current_cells_become_measurements_without_merging_repeats():
+    hits, _coverages = interpret_segment_financial_pages(
+        (
+            (
+                24,
+                """
+单位：千元
+营业收入构成
+金额 占营业收入比重 金额 占营业收入比重 同比增减
+营业收入合计 423,701,834 100.00% 362,012,554 100.00% 17.04%
+分产品
+其他业务 16,916,612 3.99% 17,487,818 4.83% -3.27%
+""",
+            ),
+            (
+                195,
+                """
+单位：千元
+营业收入和营业成本
+项目
+本期发生额 上期发生额
+收入 成本 收入 成本
+主营业务 406,785,222 308,033,498 344,524,735 265,082,813
+其他业务 16,916,612 4,349,799 17,487,818 8,436,146
+合计 423,701,834 312,383,297 362,012,554 273,518,959
+营业收入、营业成本的分解信息
+电气机械及器材制造业 采选冶炼行业 合计
+营业收入 营业成本 营业收入 营业成本 营业收入 营业成本
+境内 288,841,747 218,857,074 5,218,829 4,640,812 294,060,576 223,497,885
+税金及附加
+项目 本期发生额 上期发生额
+合计 2,832,322 2,057,466
+""",
+            ),
+            (
+                16,
+                """
+单位：元
+营业收入 1,032,297,576.85
+毛利率 29.98%
+收入构成
+项目 2025 年 2024 年 变动比例%
+主营业务收入 1,014,715,549.55 1,232,762,645.51 -17.69%
+主营业务成本 708,496,694.98 887,317,477.02 -20.15%
+""",
+            ),
+            (
+                14,
+                """
+单位：元
+营业收入构成
+金额 占营业收入比重 金额 占营业收入比重 同比增减
+营业收入合计 75,358,958,001.86 100% 65,054,925,106.17 100% 15.84%
+分销售模式
+直销 75,358,958,001.86 100.00% 65,054,925,106.17 100.00% 15.84%
+""",
+            ),
+            (
+                15,
+                """
+单位：元
+营业成本构成
+金额 占营业成本比
+重 金额 占营业成本比
+重
+航空制造业 营业成本 67,921,791,741.91 98.46% 56,870,679,297.66 98.01% 19.43%
+其他 营业成本 1,062,261,143.96 1.54% 1,156,035,387.54 1.99% -8.11%
+""",
+            ),
+        )
+    )
+    measurements = {
+        (item.page, item.field_id, item.source_dimension, item.label, item.value)
+        for item in hits
+        if item.field_id != "segment_dimension"
+    }
+    expected = {
+        (24, "operating_revenue", "营业收入构成", "营业收入合计", "423,701,834"),
+        (24, "operating_revenue", "分产品", "其他业务", "16,916,612"),
+        (195, "operating_revenue", "营业收入和营业成本", "主营业务", "406,785,222"),
+        (195, "operating_cost", "营业收入和营业成本", "主营业务", "308,033,498"),
+        (195, "operating_cost", "营业收入和营业成本", "其他业务", "4,349,799"),
+        (195, "operating_cost", "营业收入和营业成本", "合计", "312,383,297"),
+        (16, "operating_revenue", "收入构成", "主营业务收入", "1,014,715,549.55"),
+        (16, "operating_cost", "收入构成", "主营业务成本", "708,496,694.98"),
+        (14, "operating_revenue", "营业收入构成", "营业收入合计", "75,358,958,001.86"),
+        (15, "operating_cost", "营业成本构成", "其他", "1,062,261,143.96"),
+    }
+    assert expected <= measurements
+    totals = {
+        item.label
+        for item in hits
+        if item.field_id == "operating_revenue" and item.value == "75,358,958,001.86"
+    }
+    assert totals == {"营业收入合计", "直销"}
+    company_totals = [
+        item
+        for item in hits
+        if item.field_id == "operating_revenue" and item.value == "423,701,834"
+    ]
+    assert {(item.page, item.label) for item in company_totals} == {
+        (24, "营业收入合计"),
+        (195, "合计"),
+    }
+    assert not any(
+        item.value
+        in {
+            "362,012,554",
+            "344,524,735",
+            "265,082,813",
+            "218,857,074",
+            "2,832,322",
+            "1,232,762,645.51",
+            "887,317,477.02",
+            "29.98%",
+        }
+        for item in hits
+    )
+    assert any(
+        item.page == 15
+        and item.source_dimension == "营业成本构成"
+        and item.label == "航空制造业"
+        and item.field_id == "operating_cost"
+        and item.value == "67,921,791,741.91"
+        for item in hits
+    )
+
+
+def test_split_change_header_keeps_118_30_out_of_margin():
+    hits, coverages = interpret_segment_financial_pages(
+        (
+            (
+                19,
+                """
+单位：元
+分产品 营业收入 营业成本 毛利率
+（%）
+营业收入比上年增减（%） 营业成本比上年增减（%） 毛利率比上年增减（%）
+合并抵消项 -2,098,859,323.96 -2,070,706,126.81 118.30 104.19
+""",
+            ),
+        )
+    )
+    assert not any(item.value in {"118.30", "104.19"} for item in hits)
+    assert any(
+        item.label == "合并抵消项"
+        and item.row_class == "consolidation_adjustment"
+        and item.field_id == "operating_revenue"
+        for item in hits
+    )
+    assert any(
+        item.label == "合并抵消项" and item.status.value == "not_disclosed"
+        for item in coverages
+        if item.field_id == "gross_margin_reported"
+    )
+
+
+def test_runtime_rules_do_not_hardcode_sample_identity():
+    source = Path(segment_financial_research_bindings.__code__.co_filename).read_text(
+        encoding="utf-8"
+    )
+    start = source.index("def interpret_segment_financial_pages")
+    end = source.index("def build_segment_financial_research_bundle")
+    rules = source[start:end]
+    for token in (
+        "300750",
+        "603659",
+        "920015",
+        "302132",
+        "宁德时代",
+        "璞泰来",
+        "锦华新材",
+        "中航成飞",
+        "动力电池",
+        "硅烷",
+        "航空产品",
+        "195",
+    ):
+        assert token not in rules
+
+
+def test_original_replay_bytes_stay_unchanged():
+    root = (
+        _ROOT
+        / "openspec/changes/scope-manufacturing-materials-stage4-segment-financials"
+        / "replay/20260928"
+    )
+    expected = {
+        "enqueue.json": "935578cc64a58a84d84224443354c8a6e5f0d9a6167fd1753cbf156e7079ffe3",
+        "run.json": "974dbbfda8608cd1de535215390a9b1accf67b8e7810a9770966620e2e45634b",
+        "segment-financial-stage4-segment-financials-20260928/result.json": (
+            "7c2d5ea6e6433586b46545ad2c597a3c7cc60016ca1023559e7a137c8117d859"
+        ),
+        "source_review.json": "ff2f01fd4365cc621dcfeac2b2778d97b446bcf3d73c1d7f3bb06cb7b9035c2d",
+    }
+    for name, digest in expected.items():
+        assert hashlib.sha256((root / name).read_bytes()).hexdigest() == digest
 
 
 def test_bundle_builder_refuses_a_second_chapter():

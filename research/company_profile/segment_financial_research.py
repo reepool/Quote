@@ -51,8 +51,11 @@ from .stage5 import Stage5EvidencePreparer, Stage5ReportAsset
 from .stage5_bundle import Stage5RunBundleStore
 from .workflow import CompanyProfileSemanticService
 
-SEGMENT_FINANCIAL_PLAN_VERSION = (
+SEGMENT_FINANCIAL_HISTORICAL_PLAN_VERSION = (
     "manufacturing_materials_stage4_segment_financials.2026-09-28.1"
+)
+SEGMENT_FINANCIAL_PLAN_VERSION = (
+    "manufacturing_materials_stage4_segment_financials.2026-09-29.2"
 )
 SEGMENT_FINANCIAL_CHAPTER = ChapterTask.EXTRACT_SEGMENT_FINANCIALS
 _SCHEMA = "company_profile_segment_financial_research.v1"
@@ -160,6 +163,8 @@ class _PageState:
     saw_sales_mode_title: bool = False
     saw_sales_mode_row: bool = False
     revenue_only: bool = False
+    roles: tuple[str, ...] = ()
+    row_metric: bool = False
     column_table: bool = False
     saw_margin_row: bool = False
     single_segment_quote: str = ""
@@ -259,6 +264,12 @@ def segment_financial_research_bindings() -> tuple[SegmentFinancialReportBinding
                     ("分产品", "毛利率"),
                 ),
                 _ScopeBinding(
+                    "300750-revenue-cost-note",
+                    (195,),
+                    "营业收入和营业成本",
+                    ("营业收入和营业成本", "主营业务"),
+                ),
+                _ScopeBinding(
                     "300750-single-segment",
                     (223,),
                     "分部信息",
@@ -322,6 +333,12 @@ def segment_financial_research_bindings() -> tuple[SegmentFinancialReportBinding
             regime_type="stable",
             regime_effective_period="2025",
             scopes=(
+                _ScopeBinding(
+                    "920015-income-composition",
+                    (16,),
+                    "收入构成",
+                    ("收入构成", "主营业务收入"),
+                ),
                 _ScopeBinding(
                     "920015-product-region",
                     (17,),
@@ -389,9 +406,17 @@ def interpret_segment_financial_pages(
     sales_mode_quote = ""
     sales_mode_page = 0
     carried_unit: str | None = None
+    carried_roles: tuple[str, ...] = ()
+    carried_dimension: str | None = None
+    carried_row_metric = False
+    carried_revenue_only = False
     for page, text in pages:
         state = _PageState()
         state.unit = carried_unit
+        state.roles = carried_roles
+        state.dimension = carried_dimension
+        state.row_metric = carried_row_metric
+        state.revenue_only = carried_revenue_only
         if not text.strip():
             coverages.append(
                 _coverage(
@@ -409,6 +434,8 @@ def interpret_segment_financial_pages(
         for line in _prepare_lines(text):
             if _stopped(line):
                 state.mode = None
+                state.roles = ()
+                state.row_metric = False
                 continue
             _consume_line(state, page, line, hits, coverages)
         if state.saw_sales_mode_title:
@@ -418,6 +445,10 @@ def interpret_segment_financial_pages(
         if state.saw_sales_mode_row:
             saw_sales_mode_row = True
         carried_unit = state.unit or carried_unit
+        carried_roles = state.roles
+        carried_dimension = state.dimension
+        carried_row_metric = state.row_metric
+        carried_revenue_only = state.revenue_only
         _finish_page(state, page, text, coverages)
     if saw_sales_mode_title and not saw_sales_mode_row:
         coverages.append(
@@ -807,30 +838,66 @@ def _consume_line(
     if _is_column_header(line):
         state.mode = "columns"
         state.column_table = True
+        state.roles = ()
+        state.row_metric = False
+        state.revenue_only = False
         state.columns = _column_names(line)
         return
-    if _is_metric_header(line):
+    if _closes_open_table(line):
+        state.roles = ()
+        state.row_metric = False
+        state.mode = None
+        state.revenue_only = False
+        return
+    section = _table_section(line)
+    if section is not None:
+        state.dimension = section
+        state.roles = ()
+        state.row_metric = False
+        state.mode = None
+        state.revenue_only = False
+        return
+    roles = _roles_from_header(line)
+    if roles is not None:
+        if set(roles) <= {"ignore"} and _open_measure_roles(state.roles):
+            state.roles = state.roles + roles
+            return
         state.saw_metric_header = True
-        state.mode = "revenue_only" if "营业成本" not in compact else "metrics"
-        if state.mode == "revenue_only":
-            state.revenue_only = True
+        state.roles = roles
+        state.row_metric = False
+        state.mode = "metrics"
+        state.revenue_only = "revenue" in roles and "cost" not in roles
         header_dimension = _dimension_on_header(line)
         if header_dimension is not None:
             state.dimension = header_dimension
         return
-    section = _column_section(line)
-    if section is not None:
-        state.column_section = section
+    if _is_period_header(line) and not state.roles:
+        state.row_metric = True
+        state.mode = "metrics"
+        state.revenue_only = False
+        return
+    ignore_roles = _ignore_roles(line)
+    if ignore_roles and _open_measure_roles(state.roles):
+        state.roles = state.roles + ignore_roles
+        return
+    if _is_new_clause(line):
+        state.roles = ()
+        state.row_metric = False
+        state.mode = None
+        state.revenue_only = False
+        return
+    column_section = _column_section(line)
+    if column_section is not None:
+        state.column_section = column_section
         return
     dimension = _dimension_label(line)
     if dimension is not None:
         state.dimension = dimension
-        state.mode = state.mode or "metrics"
         return
     if state.mode == "columns":
         _consume_column_row(state, page, line, hits)
         return
-    if state.dimension is None or state.mode not in {"metrics", "revenue_only"}:
+    if not state.roles and not state.row_metric:
         return
     _consume_metric_row(state, page, line, hits, coverages)
 
@@ -867,7 +934,7 @@ def _finish_page(
             )
         )
         return
-    if state.revenue_only and state.parsed_row:
+    if state.revenue_only and state.parsed_row and "cost" not in state.roles:
         for field_id in ("operating_cost", "gross_margin_reported"):
             coverages.append(
                 _coverage(
@@ -917,61 +984,76 @@ def _consume_metric_row(
     label, tail = _label_and_tail(line)
     if label is None or state.dimension is None:
         return
-    if label in {"项目", "分行业", "分产品", "分地区", "分业务", "分销售模式"}:
+    if label in {
+        "项目",
+        "分行业",
+        "分产品",
+        "分地区",
+        "分业务",
+        "分销售模式",
+        "营业收入",
+        "营业成本",
+        "毛利率",
+    }:
         return
-    money = [token for token in tail if _is_money(token)]
-    needed = 1 if state.mode == "revenue_only" else 2
-    if len(money) < needed:
+    values = _value_tokens(tail)
+    if not values:
         return
     adjustment = _ELIMINATION.search(label) is not None
-    _append_row(
-        hits,
-        page=page,
-        source_dimension=state.dimension,
-        label=label,
-        revenue=money[0],
-        cost=money[1] if needed == 2 else None,
-        unit=state.unit or "元",
-        quote=line,
-        adjustment=adjustment,
-    )
+    if state.row_metric:
+        _consume_labeled_metric_row(state, page, line, label, values, hits, adjustment)
+        return
+    if not state.roles:
+        return
+    assigned = _assign_roles(values, state.roles)
+    revenue = assigned.get("revenue")
+    cost = assigned.get("cost")
+    if revenue is None and cost is None and "margin" not in assigned:
+        return
+    if revenue is not None or cost is not None:
+        _append_row(
+            hits,
+            page=page,
+            source_dimension=state.dimension,
+            label=label,
+            revenue=revenue,
+            cost=cost,
+            unit=state.unit or "元",
+            quote=line,
+            adjustment=adjustment,
+        )
     state.parsed_row = True
     if state.dimension == "分销售模式":
         state.saw_sales_mode_row = True
-    if needed == 1 or state.unit is None and "毛利率" not in line:
+    margin = assigned.get("margin")
+    if "margin" not in state.roles:
         return
-    if needed == 2:
-        margin, status = _reported_margin(tail[tail.index(money[1]) + 1 :])
-        if status == "observed" and margin is not None:
-            hits.append(
-                SegmentHit(
-                    page=page,
-                    field_id="gross_margin_reported",
-                    source_dimension=state.dimension,
-                    label=label,
-                    value=margin,
-                    unit="%",
-                    quote=line,
-                    row_class="consolidation_adjustment" if adjustment else None,
-                )
+    if margin is None:
+        coverages.append(
+            _coverage(
+                page,
+                "gross_margin_reported",
+                CoverageStatus.NOT_DISCLOSED,
+                CoverageReasonCode.SOURCE_REASON_UNSPECIFIED,
+                "margin cell is empty or not a reported percentage",
+                line,
+                source_dimension=state.dimension,
+                label=label,
             )
-        else:
-            coverages.append(
-                _coverage(
-                    page,
-                    "gross_margin_reported",
-                    CoverageStatus.NOT_DISCLOSED
-                    if status == "not_disclosed"
-                    else CoverageStatus.UNCLEAR,
-                    CoverageReasonCode.SOURCE_REASON_UNSPECIFIED
-                    if status == "not_disclosed"
-                    else CoverageReasonCode.CANDIDATE_UNRESOLVED,
-                    "margin cell is empty or not a reported percentage",
-                    line,
-                    source_dimension=state.dimension,
-                    label=label,
-                )
-            )
+        )
+        return
+    hits.append(
+        SegmentHit(
+            page=page,
+            field_id="gross_margin_reported",
+            source_dimension=state.dimension,
+            label=label,
+            value=margin,
+            unit="%",
+            quote=line,
+            row_class="consolidation_adjustment" if adjustment else None,
+        )
+    )
 
 
 def _consume_column_row(
@@ -1034,7 +1116,7 @@ def _append_row(
     page: int,
     source_dimension: str,
     label: str,
-    revenue: str,
+    revenue: str | None,
     cost: str | None,
     unit: str,
     quote: str,
@@ -1053,18 +1135,19 @@ def _append_row(
             row_class=row_class,
         )
     )
-    hits.append(
-        SegmentHit(
-            page=page,
-            field_id="operating_revenue",
-            source_dimension=source_dimension,
-            label=label,
-            value=revenue,
-            unit=unit,
-            quote=quote,
-            row_class=row_class,
+    if revenue is not None:
+        hits.append(
+            SegmentHit(
+                page=page,
+                field_id="operating_revenue",
+                source_dimension=source_dimension,
+                label=label,
+                value=revenue,
+                unit=unit,
+                quote=quote,
+                row_class=row_class,
+            )
         )
-    )
     if cost is not None:
         hits.append(
             SegmentHit(
@@ -1377,6 +1460,7 @@ def _prepare_lines(text: str) -> list[str]:
     lines = [line for line in lines if line]
     lines = _join_broken_amounts(lines)
     lines = _join_header_shards(lines)
+    lines = _join_split_headers(lines)
     lines = _join_wrapped_labels(lines)
     return _join_following_amounts(lines)
 
@@ -1440,6 +1524,81 @@ def _join_header_shards(lines: list[str]) -> list[str]:
     return joined
 
 
+def _join_split_headers(lines: list[str]) -> list[str]:
+    """Bind one formal header when a PDF wraps its column titles."""
+
+    joined: list[str] = []
+    index = 0
+    while index < len(lines):
+        current = lines[index]
+        extras = 0
+        while (
+            extras < 6
+            and index + 1 < len(lines)
+            and _header_continues(current, lines[index + 1])
+        ):
+            current = f"{current} {lines[index + 1]}"
+            index += 1
+            extras += 1
+        joined.append(current)
+        index += 1
+    return joined
+
+
+def _header_continues(current: str, nxt: str) -> bool:
+    if _first_money(current) is not None or _first_money(nxt) is not None:
+        return False
+    if _table_section(current) is not None or _table_section(nxt) is not None:
+        return False
+    if (
+        _dimension_label(nxt) is not None
+        or _is_column_header(nxt)
+        or _closes_open_table(nxt)
+    ):
+        return False
+    current_compact = re.sub(r"\s+", "", current)
+    next_compact = re.sub(r"\s+", "", nxt)
+    if (
+        _is_role_word_line(next_compact)
+        and not _is_role_word_line(current_compact)
+        and "比重" not in next_compact
+        and "增减" not in next_compact
+    ):
+        return False
+    if not _looks_like_header(current_compact):
+        return False
+    return _looks_like_header_shard(next_compact)
+
+
+def _looks_like_header(compact: str) -> bool:
+    return any(
+        token in compact
+        for token in ("金额", "营业收入", "营业成本", "毛利率", "比重", "项目", "同比")
+    )
+
+
+def _looks_like_header_shard(compact: str) -> bool:
+    if compact in {
+        "重",
+        "比重",
+        "比重%",
+        "的比重%",
+        "增减",
+        "增减%",
+        "同期增减",
+        "年同期增减",
+        "比上",
+        "比上年同期增减",
+    }:
+        return True
+    if len(compact) > 24:
+        return False
+    return any(
+        token in compact
+        for token in ("比重", "增减", "同期", "毛利率", "营业收入", "营业成本", "金额")
+    )
+
+
 def _join_wrapped_labels(lines: list[str]) -> list[str]:
     joined: list[str] = []
     index = 0
@@ -1478,6 +1637,7 @@ def _is_label_fragment(line: str) -> bool:
         or _dimension_label(line) is not None
         or _is_metric_header(line)
         or _is_column_header(line)
+        or _is_role_word_line(compact)
         or compact in {"合", "计", "合计", "小计", "分", "部", "间", "抵", "销"}
         or any(
             token in compact
@@ -1515,6 +1675,233 @@ def _can_continue_row(line: str) -> bool:
         or _is_column_header(line)
         or not re.search(r"[\u4e00-\u9fff]", line)
     )
+
+
+def _consume_labeled_metric_row(
+    state: _PageState,
+    page: int,
+    line: str,
+    label: str,
+    values: list[str],
+    hits: list[SegmentHit],
+    adjustment: bool,
+) -> None:
+    if not values:
+        return
+    current = values[0]
+    if current in _DASHES:
+        return
+    if "成本" in label:
+        field = "cost"
+    elif "收入" in label:
+        field = "revenue"
+    else:
+        return
+    _append_row(
+        hits,
+        page=page,
+        source_dimension=state.dimension or "",
+        label=label,
+        revenue=current if field == "revenue" else None,
+        cost=current if field == "cost" else None,
+        unit=state.unit or "元",
+        quote=line,
+        adjustment=adjustment,
+    )
+    state.parsed_row = True
+
+
+def _value_tokens(tail: list[str]) -> list[str]:
+    values: list[str] = []
+    for token in tail:
+        if token in {"增加", "减少", "个百分点", "个", "营业成本"}:
+            continue
+        if (
+            _is_money(token)
+            or token in _DASHES
+            or token.endswith("%")
+            or _PLAIN.fullmatch(token)
+        ):
+            values.append(token)
+    return values
+
+
+def _assign_roles(values: list[str], roles: tuple[str, ...]) -> dict[str, str | None]:
+    assigned: dict[str, str | None] = {}
+    if "margin" in roles:
+        margin_index = roles.index("margin")
+        trailing_roles = [
+            role for role in roles[margin_index + 1 :] if role == "ignore"
+        ]
+        if margin_index < len(values):
+            candidate = values[margin_index]
+            trailing_values = values[margin_index + 1 :]
+            if candidate in _DASHES:
+                assigned["margin"] = None
+            elif str(candidate).endswith("%"):
+                assigned["margin"] = str(candidate)
+            elif trailing_roles and 0 < len(trailing_values) < len(trailing_roles):
+                assigned["margin"] = None
+            elif _PLAIN.fullmatch(str(candidate)):
+                assigned["margin"] = str(candidate)
+            else:
+                assigned["margin"] = None
+        else:
+            assigned["margin"] = None
+    for role, value in zip(roles, values, strict=False):
+        if role in {"revenue", "cost"} and value not in _DASHES:
+            assigned.setdefault(role, value)
+    return assigned
+
+
+def _roles_from_header(line: str) -> tuple[str, ...] | None:
+    compact = re.sub(r"\s+", "", line).replace("的", "")
+    if _first_money(line) is not None:
+        return None
+    if (
+        "占营业收入比重" in compact
+        and "营业成本" not in compact
+        and "毛利率" not in compact
+    ):
+        return ("revenue", "ignore", "ignore", "ignore", "ignore")
+    if (
+        "占营业成本比重" in compact
+        and "营业收入" not in compact
+        and "毛利率" not in compact
+    ):
+        return ("cost", "ignore", "ignore", "ignore", "ignore")
+    pair = _pair_roles(compact)
+    if pair is not None:
+        return pair
+    if "营业收入" not in compact or "营业成本" not in compact:
+        return None
+    roles = _metric_roles(compact)
+    if (
+        roles.count("revenue") != 1
+        or roles.count("cost") != 1
+        or roles.count("margin") > 1
+    ):
+        return None
+    if "毛利率" in compact and "margin" not in roles:
+        return None
+    return roles
+
+
+def _ignore_roles(line: str) -> tuple[str, ...] | None:
+    compact = re.sub(r"\s+", "", line).replace("的", "")
+    if _first_money(line) is not None:
+        return None
+    roles = _metric_roles(compact)
+    if roles and set(roles) <= {"ignore"}:
+        return roles
+    return None
+
+
+def _closes_open_table(line: str) -> bool:
+    compact = re.sub(r"\s+", "", line)
+    if _table_section(line) is not None:
+        return False
+    if "分解" in compact and "营业" in compact:
+        return True
+    if _roles_from_header(line) is not None or _first_money(line) is not None:
+        return False
+    roles = _metric_roles(compact)
+    return roles.count("revenue") > 1 or roles.count("cost") > 1
+
+
+def _open_measure_roles(roles: tuple[str, ...]) -> bool:
+    return "revenue" in roles or "cost" in roles or "margin" in roles
+
+
+def _pair_roles(compact: str) -> tuple[str, ...] | None:
+    if any(token in compact for token in ("营业收入", "营业成本", "毛利率", "比重")):
+        return None
+    tokens = re.findall(r"收入|成本", compact)
+    if not tokens or set(tokens) != {"收入", "成本"}:
+        return None
+    if compact.replace("收入", "").replace("成本", ""):
+        return None
+    roles: list[str] = []
+    closed = False
+    for token in tokens:
+        if closed:
+            roles.append("ignore")
+            continue
+        roles.append("revenue" if token == "收入" else "cost")
+        if token == "成本" and "revenue" in roles:
+            closed = True
+    return tuple(roles)
+
+
+def _metric_roles(compact: str) -> tuple[str, ...]:
+    roles: list[str] = []
+    pattern = re.compile(
+        r"营业收入比|营业成本比|毛利率比|同比增减|营业收入|营业成本|毛利率"
+    )
+    for match in pattern.finditer(compact):
+        word = match.group()
+        if "比" in word or word == "同比增减":
+            roles.append("ignore")
+        elif word == "营业收入":
+            roles.append("revenue")
+        elif word == "营业成本":
+            roles.append("cost")
+        elif word == "毛利率":
+            roles.append("margin")
+    return tuple(roles)
+
+
+def _is_period_header(line: str) -> bool:
+    compact = re.sub(r"\s+", "", line)
+    if _first_money(line) is not None or "毛利率" in compact or "金额" in compact:
+        return False
+    current = "2025" in compact or "本期" in compact
+    prior = "2024" in compact or "上期" in compact or "上年" in compact
+    return current and prior
+
+
+def _table_section(line: str) -> str | None:
+    compact = re.sub(r"\s+", "", line)
+    if _first_money(line) is not None or len(compact) > 40 or "变动" in compact:
+        return None
+    if "营业收入和营业成本" in compact and "分解" not in compact:
+        return "营业收入和营业成本"
+    if "营业收入构成" in compact:
+        return "营业收入构成"
+    if "收入构成" in compact and "营业收入" not in compact:
+        return "收入构成"
+    if "营业成本构成" in compact:
+        return "营业成本构成"
+    return None
+
+
+def _is_new_clause(line: str) -> bool:
+    compact = re.sub(r"\s+", "", line)
+    if (
+        not compact
+        or _first_money(line) is not None
+        or _table_section(line) is not None
+        or _dimension_label(line) is not None
+    ):
+        return False
+    return re.match(r"^(?:（\d+）|\(\d+\)|\d+[）)、.]|\d+、)", compact) is not None
+
+
+def _is_role_word_line(compact: str) -> bool:
+    remainder = compact
+    for word in (
+        "营业收入",
+        "营业成本",
+        "毛利率",
+        "收入",
+        "成本",
+        "金额",
+        "比重",
+        "项目",
+    ):
+        remainder = remainder.replace(word, "")
+    remainder = re.sub(r"[%（）()比上年同期增减发生额本期上期年月日]", "", remainder)
+    return remainder == "" and bool(compact)
 
 
 def _dimension_on_header(line: str) -> str | None:
@@ -1590,6 +1977,12 @@ def _label_and_tail(line: str) -> tuple[str | None, list[str]]:
     for index, token in enumerate(tokens):
         if _is_money(token) or token in _DASHES or token.endswith("%"):
             label = "".join(tokens[:index])
+            if (
+                len(tokens[:index]) >= 2
+                and tokens[index - 1] == "营业成本"
+                and tokens[0] != "营业成本"
+            ):
+                label = tokens[0]
             if not label:
                 return None, []
             return label, tokens[index:]
@@ -1598,6 +1991,8 @@ def _label_and_tail(line: str) -> tuple[str | None, list[str]]:
 
 def _is_money(token: str) -> bool:
     if token in _DASHES or token.endswith("%"):
+        return False
+    if re.fullmatch(r"(?:19|20)\d{2}", token):
         return False
     if not re.fullmatch(r"-?[\d,]+(?:\.\d+)?", token):
         return False
