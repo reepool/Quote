@@ -4,7 +4,7 @@
 
 ## 2. Dossiers, not yet authorized
 
-- [ ] 2.1 After 1.1, confirm `302132.SZ` first. If its segment revenue, cost, and margin section does not fit, stop without adding an issuer outside the approved list. Then write a new segment-financials dossier for each defining report before marking any field required, conditional, optional, `not_disclosed`, `not_applicable`, `unclear`, or `extraction_failed`. Confirm at least two disclosure forms. Do not implement or replay in this task
+- [ ] 2.1 After 1.1, confirm `302132.SZ` first. If its segment revenue, cost, and margin section does not fit, stop without adding an issuer outside the approved list. Then write a new segment-financials dossier for each defining report before marking any field required, conditional, optional, `not_disclosed`, `not_applicable`, `unclear`, or `extraction_failed`. Confirm at least two disclosure forms. Do not implement or replay in this task. Dossiers are written at `dossiers/302132-sz-2025.md`, `dossiers/300750-sz-2025.md`, `dossiers/603659-sh-2025.md`, `dossiers/920015-bj-2025.md`, and `dossiers/sample-decision.md`. The new 302132 dossier finds the chapter fit, so the proposed defining sample is all four approved reports and covers SZSE, SSE, and BSE. Do not check 2.1 until independent dossier review. Do not start implementation, enqueue, or replay before that review
 
 ## 3. Minimum research path, not yet authorized
 
