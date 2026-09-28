@@ -279,6 +279,44 @@ def test_two_pages_keep_note_margin_not_disclosed():
     assert {item.page for item in page_15}.isdisjoint({item.page for item in page_178})
 
 
+def test_wrapped_pdf_lines_keep_the_source_label_and_amount():
+    hits, coverages = interpret_segment_financial_pages(
+        (
+            (
+                25,
+                """
+单位：千元
+占公司营业收入或营业利润10%以上的行业、产品、地区、销售模式的情况
+营业收入 营业成本 毛利率
+分业务
+电气机械及器材
+制造业 417,723,738
+307,077,698 26.49% 17.17% 14.37% 1.80%
+""",
+            ),
+            (
+                19,
+                """
+分产品 营业收入 营业成本 毛利率（%）
+新能源电池材
+料与服务 11,792,842,608.70 7,909,390,929.81 32.93 20.69 11.19 增加 5.73 个
+百分点
+境外 936,450,803.90 821,701,248.84 12.25
+""",
+            ),
+        )
+    )
+    assert any(
+        item.label == "电气机械及器材制造业" and item.value == "26.49%" for item in hits
+    )
+    assert any(
+        item.label == "新能源电池材料与服务" and item.value == "32.93" for item in hits
+    )
+    assert not any(item.label.startswith("百分点") for item in hits)
+    assert not any(item.value == "118.30" for item in hits)
+    assert coverages or hits
+
+
 def test_printed_margin_is_not_recalculated_from_revenue_and_cost():
     hits, _ = interpret_segment_financial_pages(
         (

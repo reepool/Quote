@@ -18,7 +18,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 from .contracts import (
     ChecklistItem,
@@ -384,8 +384,14 @@ def interpret_segment_financial_pages(
 
     hits: list[SegmentHit] = []
     coverages: list[SegmentCoverage] = []
+    saw_sales_mode_title = False
+    saw_sales_mode_row = False
+    sales_mode_quote = ""
+    sales_mode_page = 0
+    carried_unit: str | None = None
     for page, text in pages:
         state = _PageState()
+        state.unit = carried_unit
         if not text.strip():
             coverages.append(
                 _coverage(
@@ -400,15 +406,32 @@ def interpret_segment_financial_pages(
             continue
         if _SINGLE_SEGMENT.search(re.sub(r"\s+", "", text)):
             state.single_segment_quote = _sentence(text, "仅有一个经营分部")
-        for raw in text.splitlines():
-            line = raw.strip()
-            if not line or _stopped(line):
-                if _stopped(line):
-                    state.mode = None
+        for line in _prepare_lines(text):
+            if _stopped(line):
+                state.mode = None
                 continue
             _consume_line(state, page, line, hits, coverages)
+        if state.saw_sales_mode_title:
+            saw_sales_mode_title = True
+            sales_mode_quote = sales_mode_quote or _sentence(text, "销售模式")
+            sales_mode_page = sales_mode_page or page
+        if state.saw_sales_mode_row:
+            saw_sales_mode_row = True
+        carried_unit = state.unit or carried_unit
         _finish_page(state, page, text, coverages)
-    return tuple(_dedupe_hits(hits)), tuple(coverages)
+    if saw_sales_mode_title and not saw_sales_mode_row:
+        coverages.append(
+            _coverage(
+                sales_mode_page,
+                "segment_dimension",
+                CoverageStatus.NOT_DISCLOSED,
+                CoverageReasonCode.SOURCE_REASON_UNSPECIFIED,
+                "sales-mode section has no data row",
+                sales_mode_quote,
+                source_dimension="分销售模式",
+            )
+        )
+    return tuple(_dedupe_hits(hits)), tuple(_dedupe_coverages(coverages))
 
 
 def build_segment_financial_research_bundle(
@@ -526,6 +549,201 @@ def commit_segment_financial_research(
     return destination
 
 
+class SegmentFinancialEnqueueScope(_StrictModel):
+    scope_id: str = Field(min_length=1)
+    pages: tuple[int, ...] = Field(min_length=1)
+    section_title: str = Field(min_length=1)
+    anchor_terms: tuple[str, ...] = Field(min_length=1)
+    chapter_task: Literal["extract_segment_financials"] = (
+        SEGMENT_FINANCIAL_CHAPTER.value
+    )
+
+
+class SegmentFinancialEnqueueReport(_StrictModel):
+    sample_id: str = Field(min_length=1)
+    instrument_id: str = Field(min_length=1)
+    report_id: str = Field(min_length=1)
+    document_version: str = Field(min_length=1)
+    report_period: Literal["2025-12-31"] = "2025-12-31"
+    published_at: str = Field(min_length=1)
+    content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    dossier_path: str = Field(min_length=1)
+    dossier_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    plan_version: str = SEGMENT_FINANCIAL_PLAN_VERSION
+    chapter_task: Literal["extract_segment_financials"] = (
+        SEGMENT_FINANCIAL_CHAPTER.value
+    )
+    scopes: tuple[SegmentFinancialEnqueueScope, ...] = Field(min_length=1)
+
+
+class SegmentFinancialEnqueueSnapshot(_StrictModel):
+    schema_version: Literal["company_profile_segment_financial_research_enqueue.v1"] = (
+        "company_profile_segment_financial_research_enqueue.v1"
+    )
+    chapter_task: Literal["extract_segment_financials"] = (
+        SEGMENT_FINANCIAL_CHAPTER.value
+    )
+    production_authorization: Literal["not_authorized"] = "not_authorized"
+    plan_version: str = SEGMENT_FINANCIAL_PLAN_VERSION
+    reports: tuple[SegmentFinancialEnqueueReport, ...] = Field(
+        min_length=4, max_length=4
+    )
+
+
+class SegmentFinancialRunSnapshot(_StrictModel):
+    schema_version: Literal["company_profile_segment_financial_research_run.v1"] = (
+        "company_profile_segment_financial_research_run.v1"
+    )
+    chapter_task: Literal["extract_segment_financials"] = (
+        SEGMENT_FINANCIAL_CHAPTER.value
+    )
+    disposition: Literal["accepted_for_review"] = "accepted_for_review"
+    provider_calls: Literal[0] = 0
+    production_authorization: Literal["not_authorized"] = "not_authorized"
+    plan_version: str = SEGMENT_FINANCIAL_PLAN_VERSION
+    enqueue_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    bundle_dirname: str = Field(min_length=1)
+    run_id: str = Field(min_length=1)
+
+
+def freeze_segment_financial_research_enqueue(
+    output_root: str | Path,
+    *,
+    repository_root: str | Path | None = None,
+    bindings: tuple[SegmentFinancialReportBinding, ...] | None = None,
+    plan_version: str = SEGMENT_FINANCIAL_PLAN_VERSION,
+) -> Path:
+    """Record PDF identity and dossier hashes before the run starts."""
+
+    root = Path(repository_root) if repository_root is not None else _REPOSITORY_ROOT
+    store = Stage5RunBundleStore(output_root, repository_root=root)
+    destination = store.output_root / "enqueue.json"
+    if destination.exists():
+        raise FileExistsError(
+            f"segment-financial enqueue snapshot already exists: {destination}"
+        )
+    snapshot = _enqueue_snapshot(root, bindings, plan_version=plan_version)
+    _write_json_atomic(
+        store.output_root, destination.name, snapshot.model_dump(mode="json")
+    )
+    return destination
+
+
+def replay_segment_financial_research(
+    output_root: str | Path,
+    *,
+    repository_root: str | Path | None = None,
+    run_id: str = "stage4-segment-financials-20260928",
+    preparer: Stage5EvidencePreparer | None = None,
+    plan_version: str = SEGMENT_FINANCIAL_PLAN_VERSION,
+) -> Path:
+    """Freeze enqueue, prepare one chapter, then write run and result.
+
+    The snapshots do not record recall, accuracy, critical errors, or a gate.
+    """
+
+    root = Path(repository_root) if repository_root is not None else _REPOSITORY_ROOT
+    selected = segment_financial_research_bindings()
+    enqueue_path = freeze_segment_financial_research_enqueue(
+        output_root,
+        repository_root=root,
+        bindings=selected,
+        plan_version=plan_version,
+    )
+    bundle_dir = commit_segment_financial_research(
+        output_root,
+        repository_root=root,
+        run_id=run_id,
+        preparer=preparer,
+        bindings=selected,
+        plan_version=plan_version,
+    )
+    run = SegmentFinancialRunSnapshot(
+        plan_version=plan_version,
+        enqueue_sha256=hashlib.sha256(enqueue_path.read_bytes()).hexdigest(),
+        bundle_dirname=bundle_dir.name,
+        run_id=run_id,
+    )
+    run_path = enqueue_path.parent / "run.json"
+    if run_path.exists():
+        raise FileExistsError(
+            f"segment-financial run snapshot already exists: {run_path}"
+        )
+    _write_json_atomic(enqueue_path.parent, run_path.name, run.model_dump(mode="json"))
+    return run_path
+
+
+def _enqueue_snapshot(
+    repository_root: Path,
+    bindings: tuple[SegmentFinancialReportBinding, ...] | None = None,
+    plan_version: str = SEGMENT_FINANCIAL_PLAN_VERSION,
+) -> SegmentFinancialEnqueueSnapshot:
+    selected = segment_financial_research_bindings() if bindings is None else bindings
+    if tuple(item.instrument_id for item in selected) != (
+        "300750.SZ",
+        "603659.SH",
+        "920015.BJ",
+        "302132.SZ",
+    ):
+        raise SegmentFinancialResearchError(
+            "segment-financial replay only admits the four defining reports"
+        )
+    reports: list[SegmentFinancialEnqueueReport] = []
+    for binding in selected:
+        pdf = repository_root / binding.relative_pdf_path
+        dossier = repository_root / binding.relative_dossier_path
+        content_hash = hashlib.sha256(pdf.read_bytes()).hexdigest()
+        if content_hash != binding.content_hash:
+            raise SegmentFinancialResearchError(
+                f"{binding.instrument_id} PDF hash does not match the frozen binding"
+            )
+        reports.append(
+            SegmentFinancialEnqueueReport(
+                sample_id=binding.sample_id,
+                instrument_id=binding.instrument_id,
+                report_id=binding.report_id,
+                document_version=binding.document_version,
+                published_at=binding.published_at,
+                content_hash=content_hash,
+                dossier_path=binding.relative_dossier_path,
+                dossier_sha256=hashlib.sha256(dossier.read_bytes()).hexdigest(),
+                plan_version=plan_version,
+                scopes=tuple(
+                    SegmentFinancialEnqueueScope(
+                        scope_id=item.scope_id,
+                        pages=item.pages,
+                        section_title=item.section_title,
+                        anchor_terms=item.anchor_terms,
+                    )
+                    for item in binding.scopes
+                ),
+            )
+        )
+    return SegmentFinancialEnqueueSnapshot(
+        plan_version=plan_version, reports=tuple(reports)
+    )
+
+
+def _write_json_atomic(directory: Path, name: str, payload: dict[str, Any]) -> None:
+    forbidden = {
+        "recall",
+        "accuracy",
+        "critical_numeric_errors",
+        "expansion_gates_met",
+        "source_review",
+    }
+    if forbidden & set(payload):
+        raise SegmentFinancialResearchError(
+            "segment-financial snapshot preset a review metric"
+        )
+    temporary = directory / f".stage5-tmp-{name}-{uuid.uuid4().hex}"
+    temporary.write_text(
+        json.dumps(payload, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
+    os.replace(temporary, directory / name)
+
+
 def _binding(**kwargs: Any) -> SegmentFinancialReportBinding:
     return SegmentFinancialReportBinding(**kwargs)
 
@@ -596,6 +814,9 @@ def _consume_line(
         state.mode = "revenue_only" if "营业成本" not in compact else "metrics"
         if state.mode == "revenue_only":
             state.revenue_only = True
+        header_dimension = _dimension_on_header(line)
+        if header_dimension is not None:
+            state.dimension = header_dimension
         return
     section = _column_section(line)
     if section is not None:
@@ -646,18 +867,6 @@ def _finish_page(
             )
         )
         return
-    if state.saw_sales_mode_title and not state.saw_sales_mode_row:
-        coverages.append(
-            _coverage(
-                page,
-                "segment_dimension",
-                CoverageStatus.NOT_DISCLOSED,
-                CoverageReasonCode.SOURCE_REASON_UNSPECIFIED,
-                "sales-mode section has no data row",
-                _sentence(text, "销售模式"),
-                source_dimension="分销售模式",
-            )
-        )
     if state.revenue_only and state.parsed_row:
         for field_id in ("operating_cost", "gross_margin_reported"):
             coverages.append(
@@ -1131,6 +1340,24 @@ def _coverage(
     )
 
 
+def _dedupe_coverages(items: list[SegmentCoverage]) -> list[SegmentCoverage]:
+    unique: list[SegmentCoverage] = []
+    seen: set[tuple[int, str, str, str, str]] = set()
+    for item in items:
+        key = (
+            item.page,
+            item.field_id,
+            item.source_dimension,
+            item.label,
+            item.status.value,
+        )
+        if key in seen:
+            continue
+        seen.add(key)
+        unique.append(item)
+    return unique
+
+
 def _dedupe_hits(hits: list[SegmentHit]) -> list[SegmentHit]:
     unique: list[SegmentHit] = []
     seen: set[tuple[int, str, str, str, str]] = set()
@@ -1141,6 +1368,161 @@ def _dedupe_hits(hits: list[SegmentHit]) -> list[SegmentHit]:
         seen.add(key)
         unique.append(hit)
     return unique
+
+
+def _prepare_lines(text: str) -> list[str]:
+    """Join PDF line wraps inside a label or a broken amount."""
+
+    lines = [re.sub(r"[^\S\n]+", " ", line).strip() for line in text.splitlines()]
+    lines = [line for line in lines if line]
+    lines = _join_broken_amounts(lines)
+    lines = _join_header_shards(lines)
+    lines = _join_wrapped_labels(lines)
+    return _join_following_amounts(lines)
+
+
+def _join_broken_amounts(lines: list[str]) -> list[str]:
+    joined: list[str] = []
+    index = 0
+    while index < len(lines):
+        current = lines[index]
+        while index + 1 < len(lines) and _amount_continues(current, lines[index + 1]):
+            nxt = lines[index + 1].strip()
+            if current == "-" or current.endswith(("-", ",")) or nxt.startswith(","):
+                current = f"{current}{nxt}"
+            else:
+                head, _, last = current.rpartition(" ")
+                token = f"{last}{nxt.split()[0]}"
+                rest = " ".join(nxt.split()[1:])
+                current = " ".join(part for part in (head, token, rest) if part)
+            index += 1
+        joined.append(current)
+        index += 1
+    return joined
+
+
+def _amount_continues(current: str, nxt: str) -> bool:
+    follow = nxt.strip()
+    if not follow or re.match(r"[\u4e00-\u9fff]", follow):
+        return False
+    if follow.startswith(","):
+        return True
+    if not re.match(r"\d", follow):
+        return False
+    token = current.split()[-1] if current.split() else current
+    if token == "-":
+        return True
+    if token.endswith((",", ".")):
+        return True
+    return re.search(r"(?:,\d{1,2}|\.\d)$", token) is not None
+
+
+def _join_header_shards(lines: list[str]) -> list[str]:
+    """Attach a vertically wrapped 分部间抵销 / 合计 token to its header row."""
+
+    joined: list[str] = []
+    for line in lines:
+        shard = re.sub(r"\s+", "", line)
+        if (
+            joined
+            and re.fullmatch(r"[\u4e00-\u9fff]{1,3}", shard)
+            and (
+                "项" in joined[-1]
+                or joined[-1].endswith(("分", "部", "抵", "间", "合"))
+            )
+        ):
+            if joined[-1][-1] in "分部抵间合":
+                joined[-1] = f"{joined[-1]}{shard}"
+            else:
+                joined[-1] = f"{joined[-1]} {shard}"
+            continue
+        joined.append(line)
+    return joined
+
+
+def _join_wrapped_labels(lines: list[str]) -> list[str]:
+    joined: list[str] = []
+    index = 0
+    while index < len(lines):
+        current = lines[index]
+        nxt = lines[index + 1] if index + 1 < len(lines) else ""
+        if nxt and _is_label_fragment(current) and _starts_with_label_amount(nxt):
+            prefix = re.sub(r"\s+", "", current)
+            joined.append(prefix + nxt.strip())
+            index += 2
+            continue
+        joined.append(current)
+        index += 1
+    return joined
+
+
+def _join_following_amounts(lines: list[str]) -> list[str]:
+    joined: list[str] = []
+    for line in lines:
+        first = line.split()[0] if line.split() else ""
+        if (
+            joined
+            and (_is_money(first) or _is_signed_money(first))
+            and _can_continue_row(joined[-1])
+        ):
+            joined[-1] = f"{joined[-1]} {line}"
+            continue
+        joined.append(line)
+    return joined
+
+
+def _is_label_fragment(line: str) -> bool:
+    compact = re.sub(r"\s+", "", line)
+    if (
+        not compact
+        or _dimension_label(line) is not None
+        or _is_metric_header(line)
+        or _is_column_header(line)
+        or compact in {"合", "计", "合计", "小计", "分", "部", "间", "抵", "销"}
+        or any(
+            token in compact
+            for token in (
+                "增减",
+                "毛利率",
+                "营业收入",
+                "营业成本",
+                "百分点",
+                "同期",
+                "项目",
+            )
+        )
+    ):
+        return False
+    return re.fullmatch(r"[\u4e00-\u9fff]{1,24}", compact) is not None
+
+
+def _starts_with_label_amount(line: str) -> bool:
+    compact = re.sub(r"\s+", "", line)
+    return (
+        re.match(r"[\u4e00-\u9fff]", compact) is not None
+        and _first_money(line) is not None
+    )
+
+
+def _is_signed_money(token: str) -> bool:
+    return token.startswith("-") and _is_money(token)
+
+
+def _can_continue_row(line: str) -> bool:
+    return not (
+        _dimension_label(line) is not None
+        or _is_metric_header(line)
+        or _is_column_header(line)
+        or not re.search(r"[\u4e00-\u9fff]", line)
+    )
+
+
+def _dimension_on_header(line: str) -> str | None:
+    compact = re.sub(r"\s+", "", line)
+    found = [mark for mark in _DIMENSION_MARKS if mark in compact]
+    if len(found) == 1:
+        return found[0]
+    return None
 
 
 def _dimension_label(line: str) -> str | None:
@@ -1159,7 +1541,7 @@ def _is_metric_header(line: str) -> bool:
     compact = re.sub(r"\s+", "", line)
     if _first_money(line) is not None:
         return False
-    if "营业收入" in compact and "占营业收入" in compact and "营业成本" not in compact:
+    if "占营业收入比重" in compact and "营业成本" not in compact:
         return True
     return "营业收入" in compact and "营业成本" in compact and "毛利率" in compact
 
@@ -1172,18 +1554,23 @@ def _is_column_header(line: str) -> bool:
 
 
 def _column_names(line: str) -> tuple[str, ...]:
-    tokens = line.split()
+    normalized = re.sub(r"合\s*计", "合计", re.sub(r"项\s*目", "项目", line))
+    tokens = normalized.split()
     if tokens and tokens[0] == "项目":
         tokens = tokens[1:]
     return tuple(tokens)
 
 
 def _column_section(line: str) -> str | None:
-    compact = re.sub(r"\s+", "", line).strip("：:（）()")
+    compact = re.sub(r"[\s0-9.．（）()]", "", line)
     if _first_money(line) is not None or _ELIMINATION.search(compact):
         return None
-    if compact in {"地区分部", "业务分部", "报告分部的财务信息"}:
-        return compact
+    if compact.endswith("地区分部"):
+        return "地区分部"
+    if compact.endswith("业务分部"):
+        return "业务分部"
+    if compact.endswith("报告分部的财务信息"):
+        return "报告分部的财务信息"
     return None
 
 
