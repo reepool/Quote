@@ -8,6 +8,6 @@
 
 ## 3. Minimum research path, not yet authorized
 
-- [ ] 3.1 After the dossiers, reuse `extract_segment_financials` only. Keep output at `accepted_for_review` in a new isolation directory. Do not calculate margin, turn amounts into activities, or replace table evidence with narrative. Do not enable counterparties, regime, the six-chapter package, DCF, trading, price sensitivity, or the legacy writer
+- [ ] 3.1 After the dossiers, reuse `extract_segment_financials` only. Keep output at `accepted_for_review` in a new isolation directory. Do not calculate margin, turn amounts into activities, or replace table evidence with narrative. Do not enable counterparties, regime, the six-chapter package, DCF, trading, price sensitivity, or the legacy writer. Implementation is in `research/company_profile/segment_financial_research.py` with directed tests. Do not check 3.1 until implementation review. Do not enqueue, replay, or fill recall, accuracy, critical numeric errors, or the gate in this card
 - [ ] 3.2 Replay only after implementation review. Do not overwrite operating-quantity or material-input archives
 - [ ] 3.3 Independently recount recall, accuracy, critical numeric errors, and the gate. Do not presume they pass, and do not reuse 38/38, 36/38, 26/36, 23/23, 19/23, or 9/9
