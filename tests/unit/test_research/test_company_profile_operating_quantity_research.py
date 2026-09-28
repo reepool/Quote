@@ -125,6 +125,72 @@ def test_four_reports_keep_volumes_capacity_and_coverage_distinct(tmp_path):
         and item["measured_object"] == "负极材料"
     )
     assert any("产成品数量" in note for note in anode_inventory["footnote_refs"])
+    assert len(catl) == 6
+    assert len([item for item in facts if item["sample_id"].endswith("920015-2025")]) == 7
+    assert not rows("302132-2025")
+
+    def putailai_one(metric: str, name: str, value: str):
+        matched = [
+            item
+            for item in putailai
+            if item["metric_type"] == metric
+            and item["measured_object"] == name
+            and item["value"] == value
+        ]
+        assert len(matched) == 1, (metric, name, value, matched)
+        return matched[0]
+
+    base_film_capacity = putailai_one("production_capacity", "基膜", "21")
+    assert base_film_capacity["unit"] == "亿㎡"
+    assert base_film_capacity["page"] == 14
+    base_film_sales = putailai_one("sales_volume", "基膜", "14.95")
+    assert base_film_sales["page"] == 14
+    assert base_film_sales["unit"] == "亿㎡"
+    electrode = putailai_one("production_capacity", "制浆和极片涂布线", "8")
+    assert electrode["unit"] == "GWh"
+    assert electrode["page"] == 14
+    assert putailai_one("production_capacity", "负极材料", "25")["page"] == 15
+    pvdf = putailai_one("production_capacity", "PVDF", "3")
+    boehmite = putailai_one("production_capacity", "勃姆石和氧化铝", "3")
+    assert pvdf["comparison_qualifier"] == "超过"
+    assert boehmite["comparison_qualifier"] == "已达"
+    assert pvdf["page"] == 15 and boehmite["page"] == 15
+    assert "PVDF" in pvdf["bounded_quote"] and "超过" in pvdf["bounded_quote"]
+    assert "勃姆石和氧化铝" in boehmite["bounded_quote"]
+    assert "已达" in boehmite["bounded_quote"]
+    assert "超过" not in boehmite["bounded_quote"]
+    assert pvdf["evidence_id"] != boehmite["evidence_id"]
+    assert pvdf["page_text_hash"] == boehmite["page_text_hash"]
+    assert len(pvdf["page_text_hash"]) == 64
+    assert "勃姆石和氧化铝:3:15" not in pvdf["record_id"]
+    assert not any(
+        item["measured_object"] == "勃姆石和氧化铝" and "PVDF" in item["bounded_quote"]
+        for item in putailai
+    )
+    base_film_addition = [
+        item
+        for item in putailai
+        if item["metric_type"] == "capacity_under_construction"
+        and item["measured_object"] == "基膜"
+        and item["value"] == "20"
+    ]
+    assert len(base_film_addition) == 1
+    coating_addition = putailai_one("capacity_under_construction", "涂覆", "30")
+    assert coating_addition["page"] == 27
+    assert putailai_one("production_capacity", "四川紫宸一体化项目", "28")["page"] == 27
+    assert putailai_one("production_capacity", "四川紫宸一期", "10")["page"] == 27
+    assert putailai_one("production_capacity", "涂覆隔膜", "140")["page"] == 14
+    assert putailai_one("capacity_under_construction", "PVDF", "1")["page"] == 15
+    assert putailai_one("capacity_under_construction", "PVDF", "1.5")["page"] == 15
+    assert len(facts) == 36
+    assert len(coverage) == 13
+    assert any(
+        item["sample_id"].endswith("603659-2025")
+        and item["field_id"] == "capacity_utilization"
+        and item["coverage_status"] == "not_disclosed"
+        and item["bundle_outcome"] == "legal_empty"
+        for item in coverage
+    )
 
     jinhua = {
         (item["field_id"], item["coverage_status"], item["bundle_outcome"])
@@ -319,6 +385,89 @@ def test_replay_freezes_the_four_dossiers_before_the_run(tmp_path):
     assert (output_root / "enqueue.json").stat().st_mtime <= (
         output_root / run["bundle_dirname"] / "result.json"
     ).stat().st_mtime
+
+
+def test_two_capacity_sentences_keep_their_own_qualifiers():
+    hits, _ = interpret_operating_quantity_pages(
+        (
+            (
+                1,
+                (
+                    "截至报告期末，PVDF 有效产能超过 3 万吨。"
+                    "公司勃姆石和氧化铝的有效产能已达 3 万吨。"
+                ),
+            ),
+        )
+    )
+    capacity = [item for item in hits if item.field_id == "production_capacity"]
+    by_name = {item.name: item for item in capacity}
+    pvdf = by_name["PVDF"]
+    boehmite = by_name["勃姆石和氧化铝"]
+    assert pvdf.value == "3"
+    assert pvdf.unit == "万吨"
+    assert pvdf.qualifier == "超过"
+    assert "超过" in pvdf.quote and "PVDF" in pvdf.quote
+    assert "勃姆石" not in pvdf.quote
+    assert boehmite.value == "3"
+    assert boehmite.qualifier == "已达"
+    assert "已达" in boehmite.quote and "勃姆石和氧化铝" in boehmite.quote
+    assert "超过" not in boehmite.quote
+    assert pvdf.quote != boehmite.quote
+
+
+def test_narrative_capacity_sales_and_project_phases_stay_distinct():
+    hits, _ = interpret_operating_quantity_pages(
+        (
+            (
+                1,
+                (
+                    "截至报告期末，公司已形成年产 21 亿㎡基膜的产能。"
+                    "公司基膜业务获得认可，全年销量达 14.95 亿㎡。"
+                    "8GWh 制浆和极片涂布线产能投产。"
+                    "已经形成年产 25 万吨负极材料的产能。"
+                    "四川紫宸年产 28 万吨一体化建设项目，项目分为三期建设，"
+                    "一期 10 万吨项目的部分产线已逐步投产；"
+                    "二期 10 万吨项目将于明年择机投产。"
+                ),
+            ),
+        )
+    )
+
+    def one(field_id: str, name: str, value: str):
+        matched = [
+            item
+            for item in hits
+            if item.field_id == field_id and item.name == name and item.value == value
+        ]
+        assert len(matched) == 1
+        return matched[0]
+
+    assert one("production_capacity", "基膜", "21").unit == "亿㎡"
+    assert one("sales_volume", "基膜", "14.95").unit == "亿㎡"
+    assert one("production_capacity", "制浆和极片涂布线", "8").unit == "GWh"
+    assert one("production_capacity", "负极材料", "25").unit == "万吨"
+    assert one("production_capacity", "四川紫宸一体化项目", "28").unit == "万吨"
+    phase = one("production_capacity", "四川紫宸一期", "10")
+    assert phase.unit == "万吨"
+    assert not any("二期" in item.name for item in hits)
+
+
+def test_repeated_addition_is_counted_once():
+    hits, _ = interpret_operating_quantity_pages(
+        (
+            (1, "建成后新增基膜年产能 20 亿 m2。"),
+            (2, "建成后将新增基膜年产能 20 亿平方米、涂覆年产能 30 亿平方米。"),
+        )
+    )
+    additions = [
+        item for item in hits if item.field_id == "capacity_under_construction"
+    ]
+    base_film = [
+        item for item in additions if item.name == "基膜" and item.value == "20"
+    ]
+    coating = [item for item in additions if item.name == "涂覆" and item.value == "30"]
+    assert len(base_film) == 1
+    assert len(coating) == 1
 
 
 def test_missing_anchor_stays_extraction_failed(tmp_path):

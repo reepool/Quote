@@ -113,7 +113,7 @@ _NAME = (
     r"(?:[A-Za-z]+|[\u4e00-\u9fff])"
     r"(?:\s*(?:及|含|[A-Za-z]+|[\u4e00-\u9fff])){0,8}?"
 )
-_NUM = r"\d{1,3}(?:,\d{3})*(?:\.\d+)?|\d+(?:\.\d+)?"
+_NUM = r"(?:\d{1,3}(?:,\d{3})*(?:\.\d+)?|\d+(?:\.\d+)?)"
 
 
 class OperatingQuantityResearchError(ValueError):
@@ -139,6 +139,7 @@ class QuantityHit:
         capacity_kind: CapacityKind | None = None,
         source_aliases: tuple[str, ...] = (),
         footnote: str | None = None,
+        qualifier: str | None = None,
     ) -> None:
         self.field_id = field_id
         self.name = name
@@ -149,6 +150,7 @@ class QuantityHit:
         self.capacity_kind = capacity_kind
         self.source_aliases = source_aliases
         self.footnote = footnote
+        self.qualifier = qualifier
 
 
 class QuantityCoverage:
@@ -217,6 +219,7 @@ class OperatingQuantityFact(_StrictModel):
     evidence_id: str
     page_text_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
     capacity_kind: str | None = None
+    comparison_qualifier: str | None = None
     source_aliases: tuple[str, ...] = ()
     footnote_refs: tuple[str, ...] = ()
     disposition: Literal["accepted_for_review"] = "accepted_for_review"
@@ -344,6 +347,13 @@ def operating_quantity_research_bindings() -> tuple[
                     ("产销量情况分析表", "库存量"),
                     ("production_volume", "sales_volume", "inventory_volume"),
                 ),
+                _ScopeBinding(
+                    "603659-project-capacity",
+                    (27,),
+                    "重大的非股权投资",
+                    ("重大的非股权投资", "一体化建设项目"),
+                    ("production_capacity", "capacity_under_construction"),
+                ),
             ),
         ),
         OperatingQuantityReportBinding(
@@ -430,6 +440,8 @@ def interpret_operating_quantity_pages(
     _collect_design_capacity(spaced, pages, hits)
     _collect_processing(spaced, pages, hits)
     _collect_effective_capacity(spaced, pages, hits)
+    _collect_business_sales(spaced, pages, hits)
+    _collect_project_capacity(spaced, pages, hits)
     _collect_narrative_under_construction(spaced, pages, hits)
     unique = _dedupe_hits(hits)
     coverages = _cover_missing(spaced, pages, unique)
@@ -924,22 +936,117 @@ def _collect_effective_capacity(
     spaced: str, pages: tuple[tuple[int, str], ...], hits: list[QuantityHit]
 ) -> None:
     formed = re.compile(
-        rf"已形成\s*(?P<value>{_NUM})\s*(?P<unit>亿㎡|万㎡|万吨|吨)\s*"
-        rf"(?P<name>{_NAME})加工的有效产能"
+        rf"已经?形成(?:年产)?\s*(?P<value>{_NUM})\s*(?P<unit>亿㎡|万㎡|万吨|吨|GWh)\s*"
+        rf"(?P<name>{_NAME})(?:加工)?的(?:有效)?产能"
     )
     reached = re.compile(
-        rf"(?P<name>{_NAME})的有效产能已达\s*(?P<value>{_NUM})\s*(?P<unit>万吨|吨|亿㎡)"
+        rf"(?P<name>{_NAME})的有效产能已达\s*(?P<value>{_NUM})\s*"
+        rf"(?P<unit>万吨|吨|亿㎡|GWh)"
     )
-    for match in (*formed.finditer(spaced), *reached.finditer(spaced)):
+    exceeded = re.compile(
+        rf"(?P<name>[A-Za-z][A-Za-z0-9]*|{_NAME})\s*有效产能超过\s*"
+        rf"(?P<value>{_NUM})\s*(?P<unit>万吨|吨|亿㎡|GWh)"
+    )
+    commissioned = re.compile(
+        rf"(?P<value>{_NUM})\s*(?P<unit>GWh|亿㎡|万吨|吨)\s*(?P<name>{_NAME})产能投产"
+    )
+    for match in formed.finditer(spaced):
+        _add_capacity(hits, pages, match, CapacityKind.EFFECTIVE_CAPACITY)
+    for match in reached.finditer(spaced):
+        _add_capacity(
+            hits, pages, match, CapacityKind.EFFECTIVE_CAPACITY, qualifier="已达"
+        )
+    for match in exceeded.finditer(spaced):
+        _add_capacity(
+            hits, pages, match, CapacityKind.EFFECTIVE_CAPACITY, qualifier="超过"
+        )
+    for match in commissioned.finditer(spaced):
+        _add_capacity(hits, pages, match, CapacityKind.SOURCE_NATIVE_OTHER)
+
+
+def _collect_business_sales(
+    spaced: str, pages: tuple[tuple[int, str], ...], hits: list[QuantityHit]
+) -> None:
+    pattern = re.compile(
+        rf"(?P<name>[\u4e00-\u9fff]{{2,8}})业务[\s\S]{{0,180}}?全年销量达\s*"
+        rf"(?P<value>{_NUM})\s*(?P<unit>亿㎡|万㎡|万吨|吨|GWh)"
+    )
+    for match in pattern.finditer(spaced):
+        _add_hit(
+            hits,
+            pages,
+            field_id="sales_volume",
+            name=_clean_name(match.group("name")),
+            value=match.group("value"),
+            unit=match.group("unit"),
+        )
+
+
+def _collect_project_capacity(
+    spaced: str, pages: tuple[tuple[int, str], ...], hits: list[QuantityHit]
+) -> None:
+    project = re.compile(
+        rf"(?P<name>[\u4e00-\u9fff]{{2,12}})年产\s*(?P<value>{_NUM})\s*"
+        rf"(?P<unit>万吨|吨)一体化建设项目"
+    )
+    phase = re.compile(
+        rf"(?P<name>[\u4e00-\u9fff]{{2,12}})年产\s*{_NUM}\s*万吨一体化建设项目"
+        rf"[\s\S]{{0,80}}?一期\s*(?P<value>{_NUM})\s*(?P<unit>万吨|吨)项目的部分产线已"
+    )
+    addition = re.compile(
+        rf"(?:新增|、)\s*(?P<name>[\u4e00-\u9fff]{{2,8}})年产能\s*(?P<value>{_NUM})\s*"
+        rf"(?P<unit>亿平方米|亿㎡|亿\s*m2|万㎡)"
+    )
+    for match in project.finditer(spaced):
         _add_hit(
             hits,
             pages,
             field_id="production_capacity",
-            name=_clean_name(match.group("name")),
+            name=_clean_name(match.group("name")) + "一体化项目",
             value=match.group("value"),
             unit=match.group("unit"),
-            capacity_kind=CapacityKind.EFFECTIVE_CAPACITY,
+            capacity_kind=CapacityKind.SOURCE_NATIVE_OTHER,
+            locate_terms=(match.group("name"), match.group("value")),
         )
+    for match in phase.finditer(spaced):
+        _add_hit(
+            hits,
+            pages,
+            field_id="production_capacity",
+            name=_clean_name(match.group("name")) + "一期",
+            value=match.group("value"),
+            unit=match.group("unit"),
+            capacity_kind=CapacityKind.SOURCE_NATIVE_OTHER,
+            locate_terms=("一期", match.group("value")),
+        )
+    for match in addition.finditer(spaced):
+        _add_hit(
+            hits,
+            pages,
+            field_id="capacity_under_construction",
+            name=_clean_name(match.group("name")),
+            value=match.group("value"),
+            unit=re.sub(r"\s+", "", match.group("unit")),
+        )
+
+
+def _add_capacity(
+    hits: list[QuantityHit],
+    pages: tuple[tuple[int, str], ...],
+    match: re.Match[str],
+    capacity_kind: CapacityKind,
+    qualifier: str | None = None,
+) -> None:
+    _add_hit(
+        hits,
+        pages,
+        field_id="production_capacity",
+        name=_clean_name(match.group("name")),
+        value=match.group("value"),
+        unit=match.group("unit"),
+        capacity_kind=capacity_kind,
+        qualifier=qualifier,
+    )
 
 
 def _collect_narrative_under_construction(
@@ -1090,10 +1197,14 @@ def _add_hit(
     capacity_kind: CapacityKind | None = None,
     source_aliases: tuple[str, ...] = (),
     footnote: str | None = None,
+    qualifier: str | None = None,
+    locate_terms: tuple[str, ...] = (),
 ) -> None:
     if _is_currency(unit) or not name or not value:
         return
-    located = _locate(pages, value, name, unit)
+    located = _locate(
+        pages, value, name, unit, qualifier=qualifier, locate_terms=locate_terms
+    )
     if located is None:
         return
     page, quote = located
@@ -1108,30 +1219,52 @@ def _add_hit(
             capacity_kind=capacity_kind,
             source_aliases=source_aliases,
             footnote=footnote,
+            qualifier=qualifier,
         )
     )
 
 
 def _locate(
-    pages: tuple[tuple[int, str], ...], value: str, name: str, unit: str
+    pages: tuple[tuple[int, str], ...],
+    value: str,
+    name: str,
+    unit: str,
+    qualifier: str | None = None,
+    locate_terms: tuple[str, ...] = (),
 ) -> tuple[int, str] | None:
     compact_unit = re.sub(r"\s+", "", unit)
     needle = re.sub(r"\s+", "", f"{value}{unit}")
+    terms = tuple(
+        re.sub(r"\s+", "", term) for term in (locate_terms or ((name,) if name else ()))
+    )
+    found: list[tuple[int, str, str]] = []
     for page, text in pages:
-        quote = _slice_containing(text, needle) or _slice_containing(text, value)
-        if quote is None:
-            continue
-        compact_quote = re.sub(r"\s+", "", quote)
-        if compact_unit and compact_unit not in compact_quote and unit != "%":
-            continue
-        if needle not in compact_quote and len(value) <= 2:
-            continue
-        return page, quote
+        for quote in _slices_containing(text, needle) or _slices_containing(
+            text, value
+        ):
+            compact_quote = re.sub(r"\s+", "", quote)
+            if compact_unit and compact_unit not in compact_quote and unit != "%":
+                continue
+            if needle not in compact_quote and len(value) <= 2:
+                continue
+            if qualifier and qualifier not in compact_quote:
+                continue
+            found.append((page, quote, compact_quote))
+    named = [item for item in found if terms and all(term in item[2] for term in terms)]
+    if named:
+        return named[0][0], named[0][1]
+    if len(found) == 1 and not qualifier:
+        return found[0][0], found[0][1]
     return None
 
 
 def _slice_containing(text: str, token: str) -> str | None:
-    compact = []
+    slices = _slices_containing(text, token)
+    return slices[0] if slices else None
+
+
+def _slices_containing(text: str, token: str) -> list[str]:
+    compact: list[str] = []
     indexes: list[int] = []
     for index, char in enumerate(text):
         if char.isspace():
@@ -1140,12 +1273,30 @@ def _slice_containing(text: str, token: str) -> str | None:
         indexes.append(index)
     compact_text = "".join(compact)
     needle = re.sub(r"\s+", "", token)
-    found = compact_text.find(needle)
-    if found < 0:
-        return None
-    start = max(0, found - 80)
-    end = min(len(compact_text), found + len(needle) + 16)
-    return text[indexes[start] : indexes[end - 1] + 1]
+    if not needle:
+        return []
+    quotes: list[str] = []
+    start_at = 0
+    while True:
+        found = compact_text.find(needle, start_at)
+        if found < 0:
+            return quotes
+        start = max(0, found - 80)
+        end = min(len(compact_text), found + len(needle) + 16)
+        prefix = compact_text[start:found]
+        for stop in ("。", "；"):
+            index = prefix.rfind(stop)
+            if index >= 0:
+                start = start + index + 1
+                break
+        suffix = compact_text[found + len(needle) : end]
+        for stop in ("。", "；"):
+            index = suffix.find(stop)
+            if index >= 0:
+                end = found + len(needle) + index + 1
+                break
+        quotes.append(text[indexes[start] : indexes[end - 1] + 1])
+        start_at = found + len(needle)
 
 
 def _dedupe_hits(hits: list[QuantityHit]) -> list[QuantityHit]:
@@ -1154,12 +1305,17 @@ def _dedupe_hits(hits: list[QuantityHit]) -> list[QuantityHit]:
     for hit in hits:
         if hit.field_id == "sales_volume" and "加工量" in hit.name:
             continue
-        key = (hit.field_id, hit.name, hit.value, hit.unit)
+        key = (hit.field_id, hit.name, hit.value, _normal_unit(hit.unit), hit.qualifier)
         if key in seen:
             continue
         seen.add(key)
         unique.append(hit)
     return unique
+
+
+def _normal_unit(unit: str) -> str:
+    compact = re.sub(r"\s+", "", unit)
+    return compact.replace("平方米", "㎡").replace("m2", "㎡")
 
 
 def _clean_name(value: str) -> str:
@@ -1272,7 +1428,7 @@ def _measurement(report, sample_id: str, hit: QuantityHit, evidence: Evidence):
         else PeriodType.DURATION
     )
     return Measurement(
-        record_id=(f"{sample_id}:{hit.field_id}:{hit.name}:{hit.value}:{hit.page}"),
+        record_id=_record_id(sample_id, hit),
         field_id=hit.field_id,
         chapter_task=OPERATING_QUANTITY_CHAPTER,
         report=report,
@@ -1286,6 +1442,7 @@ def _measurement(report, sample_id: str, hit: QuantityHit, evidence: Evidence):
             name=hit.name,
             value=hit.value,
             unit=hit.unit,
+            qualifier=hit.qualifier,
             footnote_refs=((hit.footnote,) if hit.footnote else ()),
             source_aliases=hit.source_aliases,
         ),
@@ -1325,6 +1482,14 @@ def _checklist(field_id: str) -> ChecklistItem:
     )
 
 
+def _record_id(sample_id: str, hit: QuantityHit) -> str:
+    parts = [sample_id, hit.field_id, hit.name]
+    if hit.qualifier:
+        parts.append(hit.qualifier)
+    parts.extend((hit.value, str(hit.page)))
+    return ":".join(parts)
+
+
 def _fact(sample_id: str, record, page_hashes: dict[int, str]) -> OperatingQuantityFact:
     evidence = record.evidence[0]
     return OperatingQuantityFact(
@@ -1346,6 +1511,7 @@ def _fact(sample_id: str, record, page_hashes: dict[int, str]) -> OperatingQuant
         capacity_kind=(
             record.capacity_kind.value if record.capacity_kind is not None else None
         ),
+        comparison_qualifier=record.source_native.qualifier,
         source_aliases=record.source_native.source_aliases,
         footnote_refs=record.source_native.footnote_refs,
     )
