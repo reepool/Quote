@@ -58,8 +58,11 @@ from .workflow import CompanyProfileSemanticService
 OPERATING_QUANTITY_HISTORICAL_PLAN_VERSION = (
     "manufacturing_materials_stage4_operating_quantities.2026-09-27.1"
 )
-OPERATING_QUANTITY_PLAN_VERSION = (
+OPERATING_QUANTITY_PRIOR_SUCCESSOR_PLAN_VERSION = (
     "manufacturing_materials_stage4_operating_quantities.2026-09-28.2"
+)
+OPERATING_QUANTITY_PLAN_VERSION = (
+    "manufacturing_materials_stage4_operating_quantities.2026-09-28.3"
 )
 OPERATING_QUANTITY_CHAPTER = ChapterTask.EXTRACT_OPERATING_QUANTITIES
 _SCHEMA = "company_profile_operating_quantity_research.v1"
@@ -299,6 +302,13 @@ def operating_quantity_research_bindings() -> tuple[
                     "产销情况",
                     ("产销情况", "销售量", "库存量"),
                 ),
+                _ScopeBinding(
+                    "300750-segment-sales",
+                    (21, 22),
+                    "分业务销量",
+                    ("动力电池销量", "储能电池销量"),
+                    ("sales_volume",),
+                ),
             ),
         ),
         OperatingQuantityReportBinding(
@@ -444,6 +454,7 @@ def interpret_operating_quantity_pages(
     _collect_processing(spaced, pages, hits)
     _collect_effective_capacity(spaced, pages, hits)
     _collect_business_sales(spaced, pages, hits)
+    _collect_segment_sales(spaced, pages, hits)
     _collect_project_capacity(spaced, pages, hits)
     _collect_narrative_under_construction(spaced, pages, hits)
     unique = _dedupe_hits(hits)
@@ -983,6 +994,24 @@ def _collect_effective_capacity(
         )
     for match in commissioned.finditer(spaced):
         _add_capacity(hits, pages, match, CapacityKind.SOURCE_NATIVE_OTHER)
+
+
+def _collect_segment_sales(
+    spaced: str, pages: tuple[tuple[int, str], ...], hits: list[QuantityHit]
+) -> None:
+    pattern = re.compile(
+        rf"实现(?P<name>[\u4e00-\u9fff]{{2,12}})销量\s*(?P<value>{_NUM})\s*"
+        rf"(?P<unit>GWh|亿㎡|万㎡|万吨|吨)"
+    )
+    for match in pattern.finditer(spaced):
+        _add_hit(
+            hits,
+            pages,
+            field_id="sales_volume",
+            name=_clean_name(match.group("name")),
+            value=match.group("value"),
+            unit=match.group("unit"),
+        )
 
 
 def _collect_business_sales(

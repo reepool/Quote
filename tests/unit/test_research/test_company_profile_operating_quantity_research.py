@@ -11,6 +11,7 @@ from research.company_profile.models import ChapterTask, ReportIdentity
 from research.company_profile.operating_quantity_research import (
     OPERATING_QUANTITY_HISTORICAL_PLAN_VERSION,
     OPERATING_QUANTITY_PLAN_VERSION,
+    OPERATING_QUANTITY_PRIOR_SUCCESSOR_PLAN_VERSION,
     _ScopeBinding,
     build_operating_quantity_research_bundle,
     commit_operating_quantity_research,
@@ -26,7 +27,10 @@ from research.company_profile.stage5 import (
     Stage5ReportAsset,
 )
 
-_SUCCESSOR_PLAN = "manufacturing_materials_stage4_operating_quantities.2026-09-28.2"
+_SUCCESSOR_PLAN = "manufacturing_materials_stage4_operating_quantities.2026-09-28.3"
+_PRIOR_SUCCESSOR_PLAN = (
+    "manufacturing_materials_stage4_operating_quantities.2026-09-28.2"
+)
 _ROOT = Path(__file__).resolve().parents[3]
 _HISTORICAL_REPLAY = (
     _ROOT
@@ -39,6 +43,18 @@ _HISTORICAL_HASHES = {
         "67e37d98ed0d0dc57f9672f6ef224482db52fc3e9ce96ece8f366866a1e87302"
     ),
     "source_review.json": "5568d4ee73cbc332c63cb935fba42a13ea99e4dfe0344f6b700ad4fcc212ab0b",
+}
+_PRIOR_REPLAY = (
+    _ROOT
+    / "openspec/changes/repair-operating-quantity-603659-coverage-and-evidence-binding/replay/20260928.2"
+)
+_PRIOR_HASHES = {
+    "enqueue.json": "b38b3fb11ea3f3a59b21f3072ac719ed7c7fbe4bc1063ea39294b9ca8afa79bc",
+    "run.json": "387340ccfaa95237010b4fe7fa2cffd4a8467a11cc3b4b5679260ac97b246319",
+    "operating-quantity-stage4-operating-quantities-20260928.2/result.json": (
+        "17c990a55ce099459fdf8c24683fbc34499c5819fd987e6483d93c8846ece571"
+    ),
+    "source_review.json": "81ed17c742fc6f64e1e2aa88b5e5ac8068c73c036e03374b1757b3d7c45575ea",
 }
 
 
@@ -143,7 +159,26 @@ def test_four_reports_keep_volumes_capacity_and_coverage_distinct(tmp_path):
         and item["measured_object"] == "负极材料"
     )
     assert any("产成品数量" in note for note in anode_inventory["footnote_refs"])
-    assert len(catl) == 6
+    assert len(catl) == 8
+    table_sales = next(
+        item
+        for item in catl
+        if item["metric_type"] == "sales_volume"
+        and item["measured_object"] == "电池系统"
+    )
+    assert table_sales["value"] == "661"
+    assert table_sales["page"] == 26
+    power = next(item for item in catl if item["measured_object"] == "动力电池")
+    storage = next(item for item in catl if item["measured_object"] == "储能电池")
+    assert power["metric_type"] == "sales_volume"
+    assert power["value"] == "541"
+    assert power["unit"] == "GWh"
+    assert power["page"] == 21
+    assert storage["value"] == "121"
+    assert storage["page"] == 22
+    assert power["evidence_id"] != storage["evidence_id"]
+    assert power["page_text_hash"] != storage["page_text_hash"]
+    assert not any(item["value"] == "662" for item in facts)
     assert (
         len([item for item in facts if item["sample_id"].endswith("920015-2025")]) == 7
     )
@@ -202,7 +237,7 @@ def test_four_reports_keep_volumes_capacity_and_coverage_distinct(tmp_path):
     assert putailai_one("production_capacity", "涂覆隔膜", "140")["page"] == 14
     assert putailai_one("capacity_under_construction", "PVDF", "1")["page"] == 15
     assert putailai_one("capacity_under_construction", "PVDF", "1.5")["page"] == 15
-    assert len(facts) == 36
+    assert len(facts) == 38
     assert len(coverage) == 13
     assert any(
         item["sample_id"].endswith("603659-2025")
@@ -339,17 +374,23 @@ class _PlanVersionProbe(Stage5EvidencePreparer):
 
 
 def test_historical_plan_version_stays_explicit():
-    probe = _PlanVersionProbe()
     binding = operating_quantity_research_bindings()[0]
-    bundle = build_operating_quantity_research_bundle(
-        repository_root=_ROOT,
-        run_id="historical-plan-probe",
-        preparer=probe,
-        bindings=(binding,),
-        plan_version=OPERATING_QUANTITY_HISTORICAL_PLAN_VERSION,
-    )
-    assert bundle.plan_version == OPERATING_QUANTITY_HISTORICAL_PLAN_VERSION
-    assert set(probe.plan_versions) == {OPERATING_QUANTITY_HISTORICAL_PLAN_VERSION}
+    for version in (
+        OPERATING_QUANTITY_HISTORICAL_PLAN_VERSION,
+        OPERATING_QUANTITY_PRIOR_SUCCESSOR_PLAN_VERSION,
+    ):
+        probe = _PlanVersionProbe()
+        bundle = build_operating_quantity_research_bundle(
+            repository_root=_ROOT,
+            run_id=f"historical-plan-probe-{version[-1]}",
+            preparer=probe,
+            bindings=(binding,),
+            plan_version=version,
+        )
+        assert bundle.plan_version == version
+        assert set(probe.plan_versions) == {version}
+    assert OPERATING_QUANTITY_PRIOR_SUCCESSOR_PLAN_VERSION == _PRIOR_SUCCESSOR_PLAN
+    assert OPERATING_QUANTITY_PLAN_VERSION == _SUCCESSOR_PLAN
     for relative, expected in _HISTORICAL_HASHES.items():
         archived = _HISTORICAL_REPLAY / relative
         assert hashlib.sha256(archived.read_bytes()).hexdigest() == expected
@@ -378,10 +419,13 @@ def test_replay_freezes_the_four_dossiers_before_the_run(tmp_path):
     assert {item["plan_version"] for item in enqueue["reports"]} == {_SUCCESSOR_PLAN}
     assert enqueue["chapter_task"] == "extract_operating_quantities"
     assert bundle["chapter_task"] == "extract_operating_quantities"
-    assert len(bundle["facts"]) == 36
+    assert len(bundle["facts"]) == 38
     assert len(bundle["coverage"]) == 13
     for relative, expected in _HISTORICAL_HASHES.items():
         archived = _HISTORICAL_REPLAY / relative
+        assert hashlib.sha256(archived.read_bytes()).hexdigest() == expected
+    for relative, expected in _PRIOR_HASHES.items():
+        archived = _PRIOR_REPLAY / relative
         assert hashlib.sha256(archived.read_bytes()).hexdigest() == expected
     assert run["provider_calls"] == 0
     assert run["disposition"] == "accepted_for_review"
@@ -530,6 +574,27 @@ def test_narrative_capacity_sales_and_project_phases_stay_distinct():
     phase = one("production_capacity", "四川紫宸一期", "10")
     assert phase.unit == "万吨"
     assert not any("二期" in item.name for item in hits)
+
+
+def test_segment_sales_stay_separate_from_the_table_total():
+    hits, _ = interpret_operating_quantity_pages(
+        (
+            (1, "行业分类 项目 单位 2025年 电池系统 销售量 GWh 661"),
+            (2, "报告期内，公司实现动力电池销量 541GWh，同比增长 41.85%。"),
+            (3, "报告期内，公司实现储能电池销量 121GWh，同比增长 29.13%。"),
+        )
+    )
+    sales = [item for item in hits if item.field_id == "sales_volume"]
+    by_name = {item.name: item for item in sales}
+    assert by_name["电池系统"].value == "661"
+    assert by_name["动力电池"].value == "541"
+    assert by_name["动力电池"].unit == "GWh"
+    assert by_name["动力电池"].page == 2
+    assert "动力电池销量541" in by_name["动力电池"].quote.replace(" ", "")
+    assert by_name["储能电池"].value == "121"
+    assert by_name["储能电池"].page == 3
+    assert by_name["动力电池"].quote != by_name["储能电池"].quote
+    assert not any(item.value == "662" for item in hits)
 
 
 def test_repeated_addition_is_counted_once():
