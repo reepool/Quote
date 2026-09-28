@@ -178,6 +178,7 @@ class _ScopeBinding:
     pages: tuple[int, ...]
     section_title: str
     anchor_terms: tuple[str, ...]
+    covered_fields: tuple[str, ...] = _FIELDS
 
 
 @dataclass(frozen=True)
@@ -208,6 +209,12 @@ class OperatingQuantityFact(_StrictModel):
     unit: str
     page: int
     bounded_quote: str
+    report_id: str
+    document_version: str
+    report_period: str
+    period_type: Literal["duration", "instant", "event", "expected"]
+    evidence_id: str
+    page_text_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
     capacity_kind: str | None = None
     source_aliases: tuple[str, ...] = ()
     footnote_refs: tuple[str, ...] = ()
@@ -217,6 +224,7 @@ class OperatingQuantityFact(_StrictModel):
 class OperatingQuantityCoverageFact(_StrictModel):
     sample_id: str
     field_id: str
+    scope_id: str = ""
     coverage_status: str
     bundle_outcome: str
     page: int
@@ -307,18 +315,25 @@ def operating_quantity_research_bindings() -> tuple[
                     (14,),
                     "涂覆加工",
                     ("涂覆加工量",),
+                    ("processing_volume",),
                 ),
                 _ScopeBinding(
                     "603659-capacity-narrative",
                     (15,),
                     "有效产能",
                     ("有效产能",),
+                    (
+                        "production_capacity",
+                        "capacity_under_construction",
+                        "capacity_utilization",
+                    ),
                 ),
                 _ScopeBinding(
                     "603659-volume-table",
                     (19,),
                     "产销量情况分析表",
                     ("产销量情况分析表", "库存量"),
+                    ("production_volume", "sales_volume", "inventory_volume"),
                 ),
             ),
         ),
@@ -457,7 +472,8 @@ def build_operating_quantity_research_bundle(
     reports: list[OperatingQuantityReportRecord] = []
     for binding in selected:
         pages: list[tuple[int, str]] = []
-        scope_failed = False
+        page_hashes: dict[int, str] = {}
+        failures: list[tuple[_ScopeBinding, EvidencePreparationError]] = []
         for spec in binding.scopes:
             try:
                 prepared = active_preparer.prepare_single_chapter(
@@ -469,10 +485,7 @@ def build_operating_quantity_research_bundle(
             except EvidencePreparationError as exc:
                 if exc.code not in _PREPARATION_FAILURES:
                     raise
-                scope_failed = True
-                coverage_facts.extend(
-                    _failure_coverage(binding.sample_id, spec.pages[0], exc)
-                )
+                failures.append((spec, exc))
                 continue
             if len(prepared) != 1 or prepared[0].chapter_task is not (
                 OPERATING_QUANTITY_CHAPTER
@@ -481,14 +494,35 @@ def build_operating_quantity_research_bundle(
                     "research scope prepared a second chapter"
                 )
             for page in prepared[0].page_contexts:
-                if all(existing != page.page for existing, _ in pages):
+                if page.page not in page_hashes:
                     pages.append((page.page, page.text))
-        if pages and not scope_failed:
+                    page_hashes[page.page] = page.text_hash
+        if pages:
             hits, coverages = interpret_operating_quantity_pages(tuple(pages))
+            failed_fields = {
+                field_id for spec, _exc in failures for field_id in spec.covered_fields
+            }
+            coverages = tuple(
+                item for item in coverages if item.field_id not in failed_fields
+            )
             accepted = _accept(binding, hits, coverages)
-            facts.extend(_fact(binding.sample_id, item) for item in accepted[0])
+            facts.extend(
+                _fact(binding.sample_id, item, page_hashes) for item in accepted[0]
+            )
             coverage_facts.extend(
                 _coverage_fact(binding.sample_id, item) for item in accepted[1]
+            )
+        delivered = {
+            item.field_id for item in facts if item.sample_id == binding.sample_id
+        }
+        for spec, exc in failures:
+            coverage_facts.extend(
+                _failure_coverage(
+                    binding.sample_id,
+                    spec,
+                    exc,
+                    skip_fields=delivered,
+                )
             )
         reports.append(
             OperatingQuantityReportRecord(
@@ -1099,7 +1133,7 @@ def _checklist(field_id: str) -> ChecklistItem:
     )
 
 
-def _fact(sample_id: str, record) -> OperatingQuantityFact:
+def _fact(sample_id: str, record, page_hashes: dict[int, str]) -> OperatingQuantityFact:
     evidence = record.evidence[0]
     return OperatingQuantityFact(
         sample_id=sample_id,
@@ -1111,6 +1145,12 @@ def _fact(sample_id: str, record) -> OperatingQuantityFact:
         unit=record.source_native.unit or "",
         page=evidence.page,
         bounded_quote=evidence.anchor.bounded_quote,
+        report_id=record.report.report_id,
+        document_version=record.report.document_version,
+        report_period=record.reported_period,
+        period_type=record.period_type.value,
+        evidence_id=evidence.evidence_id,
+        page_text_hash=page_hashes[evidence.page],
         capacity_kind=(
             record.capacity_kind.value if record.capacity_kind is not None else None
         ),
@@ -1139,7 +1179,13 @@ def _coverage_fact(
     )
 
 
-def _failure_coverage(sample_id: str, page: int, exc: EvidencePreparationError):
+def _failure_coverage(
+    sample_id: str,
+    spec: _ScopeBinding,
+    exc: EvidencePreparationError,
+    *,
+    skip_fields: set[str],
+):
     reason = CoverageReasonCode.TABLE_CONTEXT_INCOMPLETE
     if exc.code == PreparationFailureCode.PAGE_UNREADABLE:
         reason = CoverageReasonCode.SOURCE_UNREADABLE
@@ -1149,14 +1195,16 @@ def _failure_coverage(sample_id: str, page: int, exc: EvidencePreparationError):
         OperatingQuantityCoverageFact(
             sample_id=sample_id,
             field_id=field_id,
+            scope_id=spec.scope_id,
             coverage_status=CoverageStatus.EXTRACTION_FAILED.value,
             bundle_outcome=CoverageStatus.EXTRACTION_FAILED.value,
-            page=page,
+            page=spec.pages[0],
             bounded_quote="",
             reason_code=reason.value,
             reason=str(exc),
         )
-        for field_id in _FIELDS
+        for field_id in spec.covered_fields
+        if field_id not in skip_fields
     )
 
 
