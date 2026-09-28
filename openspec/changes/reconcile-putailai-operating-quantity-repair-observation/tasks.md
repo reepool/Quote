@@ -1,0 +1,8 @@
+## 1. Scope review gate
+
+- [ ] 1.1 Independent review accepts this ledger decision: the Putailai `.2` replay stays recall 36/38, accuracy 36/36, critical numeric errors 0, coverage 13/13, and `expansion_gates_met=false`. Its 23 target facts stay a correct delivery. The two missing CATL segment sales stay the reason for that false gate. The archived CATL `.3` result of 38/38 is a later repair and is not a recount of `.2`. The original `replay/20260928` result of 26/36, 26/27, and one critical error stays a third observation. Because failed gates are already archived in this repository as historical observations, the authorized close-out is to archive the Putailai change without a new replay and without rewriting its four artifacts. Do not check 1.1 until that review. Do not change Python, replay bytes, publication, closure, mode, checkpoint, or production authorization, and do not start an expansion or the six-chapter package
+
+## 2. Ledger close-out, not yet authorized
+
+- [ ] 2.1 After 1.1, record the preserved 36/38 observation in the Putailai design and tasks. Leave its 3.2 unmarked as a pass. Mark its 3.3 only as an archive that keeps the failed regression. Do not edit enqueue, run, result, or source_review
+- [ ] 2.2 Archive `repair-operating-quantity-603659-coverage-and-evidence-binding` on the review date with `git mv`. The four `.2` artifact hashes must match the frozen values. Confirm the active change directory is gone and the archive path remains traceable. Do not archive or alter the CATL repair, and do not merge the two changes
