@@ -1,0 +1,13 @@
+## 1. Scope review gate
+
+- [ ] 1.1 Independent review accepts one existing `extract_segment_financials` entrance, the approved-list sample contract, the holdout rule for `302132.SZ`, and the separation of dimension, operating revenue, operating cost, source-reported gross margin, and consolidation elimination. The sample MUST contain at least three reports and cover SZSE, SSE, and BSE, using only `300750.SZ`, `603659.SH`, `920015.BJ`, and `302132.SZ`. `302132.SZ` enters only after a new segment-financials dossier confirms fitness. Do not recalculate gross margin, convert an amount table into an Activity, or replace a formal table with narrative. Coverage statuses stay distinct, and `legal_empty` may only wrap one of them. Research output stays `accepted_for_review` in a new isolation directory. Do not check 1.1 until that review. Do not write dossiers, change Python, identity, publication, closure, mode, checkpoint, or existing replays, and do not preset recall, accuracy, critical numeric errors, or the gate
+
+## 2. Dossiers, not yet authorized
+
+- [ ] 2.1 After 1.1, confirm `302132.SZ` first. If its segment revenue, cost, and margin section does not fit, stop without adding an issuer outside the approved list. Then write a new segment-financials dossier for each defining report before marking any field required, conditional, optional, `not_disclosed`, `not_applicable`, `unclear`, or `extraction_failed`. Confirm at least two disclosure forms. Do not implement or replay in this task
+
+## 3. Minimum research path, not yet authorized
+
+- [ ] 3.1 After the dossiers, reuse `extract_segment_financials` only. Keep output at `accepted_for_review` in a new isolation directory. Do not calculate margin, turn amounts into activities, or replace table evidence with narrative. Do not enable counterparties, regime, the six-chapter package, DCF, trading, price sensitivity, or the legacy writer
+- [ ] 3.2 Replay only after implementation review. Do not overwrite operating-quantity or material-input archives
+- [ ] 3.3 Independently recount recall, accuracy, critical numeric errors, and the gate. Do not presume they pass, and do not reuse 38/38, 36/38, 26/36, 23/23, 19/23, or 9/9
