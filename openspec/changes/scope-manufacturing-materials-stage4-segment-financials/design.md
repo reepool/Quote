@@ -8,7 +8,7 @@
 
 **Goals:**
 
-- 把分部财务最小竖切写成可审核合同。1.1、2.1 和 3.1 已通过。3.2 已写入 `replay/20260928`。3.3 独立 source-review 尚未开始。
+- 把分部财务最小竖切写成可审核合同。1.1、2.1、3.1 和 3.2 已通过。3.3 source-review 已写入，gate 为 false，3.3 未按通过勾选。
 - 只复用 `extract_segment_financials`。
 - 定义样本至少三份，覆盖 SZSE、SSE、BSE，且只来自已批准清单。
 - 先写 dossier，再标字段义务和空值状态。
