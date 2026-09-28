@@ -1,0 +1,880 @@
+{
+  "schema_version": "company_profile_operating_quantity_stage4_source_review.v1",
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false,
+  "method": "independently_read_official_report",
+  "review_passed": false,
+  "binding": {
+    "enqueue_path": "enqueue.json",
+    "enqueue_sha256": "5fffde878890fb43c136c4e0082f4eba32fc9e65402e166a96cca164396fab7a",
+    "run_path": "run.json",
+    "run_id": "stage4-operating-quantities-20260928",
+    "run_sha256": "3fa107b4bf914cf7603ee1e2e73937392a04ad95bf52df4e68d5bff304a5e9cf",
+    "plan_version": "manufacturing_materials_stage4_operating_quantities.2026-09-27.1",
+    "bundle_dirname": "operating-quantity-stage4-operating-quantities-20260928",
+    "bundle_result_path": "operating-quantity-stage4-operating-quantities-20260928/result.json",
+    "bundle_result_sha256": "67e37d98ed0d0dc57f9672f6ef224482db52fc3e9ce96ece8f366866a1e87302",
+    "bundle_schema_version": "company_profile_operating_quantity_research.v1",
+    "chapter_task": "extract_operating_quantities",
+    "disposition": "accepted_for_review",
+    "provider_calls": 0,
+    "instruments": [
+      {
+        "instrument_id": "300750.SZ",
+        "report_id": "asset_3b09f6c831975c7177b6bb3287cab781",
+        "document_version": "ver_09c0e677ec8192dc4fc12cb620069f29",
+        "report_period": "2025-12-31",
+        "content_hash": "c15272977147dee7e6935a38ea0e4fd6855370aabb106f54cfe20f7cf6048ec9"
+      },
+      {
+        "instrument_id": "603659.SH",
+        "report_id": "asset_50c70429093f66b34fc57ad8f896fcee",
+        "document_version": "ver_c867a6a692048e88fd9cb80473fbf908",
+        "report_period": "2025-12-31",
+        "content_hash": "4e81f5539046ba1eee733100f38442a4abd5037afe3881115ba7f48678fa35b6"
+      },
+      {
+        "instrument_id": "920015.BJ",
+        "report_id": "asset_b87f1d1a48e662dae376c540cd021f69",
+        "document_version": "ver_cfdbd2d058af825b1fc39f494d7a9bd3",
+        "report_period": "2025-12-31",
+        "content_hash": "4d2c1612f6f62a9024b8947d7a01b70c40f8f347c2975fa1a05b908d0770695a"
+      },
+      {
+        "instrument_id": "302132.SZ",
+        "report_id": "asset_0a488da55636b09107be6d719c9ebf39",
+        "document_version": "ver_2d20ba3aebc5fac6c562cd619695995a",
+        "report_period": "2025-12-31",
+        "content_hash": "605394bd0879f906a829a9fcd3a2dab037d8aad2554b741a7d95757a3a5e3020"
+      }
+    ]
+  },
+  "artifacts_not_modified": [
+    "enqueue.json",
+    "run.json",
+    "operating-quantity-stage4-operating-quantities-20260928/result.json"
+  ],
+  "denominator_rule": "A disclosed fact is one company-owned 2025 physical operating quantity: formed, effective, design, or report-period production capacity; under-construction physical capacity; a numeric capacity utilization; or production, sales, shipment, inventory, or processing volume. The same object, metric, and quantity restated in another sentence or unit is counted once, using the formal table when the table is more precise. Legal-empty coverage is reviewed separately and is not a recall gap. Industry statistics, currency and investment amounts, growth rates, market share, margins, future-year targets, and equipment single-line nameplates are outside the denominator. This count is not taken from 23/23, 19/23, or 9/9.",
+  "page_text_hashes_reread": {
+    "300750.SZ:26": "3510780e5e7d8ab0e8111d401dcc5ab5fb64ff82cd01877a861387cf6c11d6fc",
+    "300750.SZ:27": "83a28d5ebb0cdf320040e2a5a76455365171d337e7c5641b2f097deb76ed465c",
+    "603659.SH:14": "51c62ec98648b1dd6146079130d3247927872a241146b2923a26f38ce0d17e26",
+    "603659.SH:15": "12b474277bea2c20790e16f651c5182b1719354ab048a570da633e5b9b1e688b",
+    "603659.SH:19": "efa2a62fe3cf80ce2f4b1e8ddbb56c943fe1c6cca65172d5bcd85d5e144cf772",
+    "920015.BJ:49": "aedc4baeeae458394f3435ee3c7dd2b28fcc7a944573e8623d59e6a36c22a10b",
+    "920015.BJ:50": "5e468769f5aa1e03f4ba3040ebaf43c496e69cbbd7fb06b176e31c66da1d8f57",
+    "302132.SZ:15": "d5b8211968aeb05676f5a17ac7fbe29eedad48b9c92b5f75555efa75c97b395b"
+  },
+  "page_15_adjudication": {
+    "instrument_id": "603659.SH",
+    "physical_page": 15,
+    "page_text_hash": "12b474277bea2c20790e16f651c5182b1719354ab048a570da633e5b9b1e688b",
+    "delivered_record_id": "manufacturing-materials-603659-2025:production_capacity:勃姆石和氧化铝:3:15",
+    "delivered_evidence_id": "stage5-evidence-7c84a4c503f168817fb12df3",
+    "delivered_object": "勃姆石和氧化铝",
+    "delivered_value": "3",
+    "delivered_unit": "万吨",
+    "quote_supports_only_pvdf": true,
+    "quote_text": "截至 2025 年末，PVDF 有效产能超过 3 万吨",
+    "independent_boehmite_sentence_exists": true,
+    "independent_boehmite_sentence": "截至 2025 年末，公司勃姆石和氧化铝的有效产能已达 3 万吨。",
+    "independent_sentence_is_the_delivered_evidence": false,
+    "exceed_qualifier_required": true,
+    "exact_value_3_matches_pvdf_sentence": false,
+    "attained_qualifier_on_boehmite_sentence": "已达",
+    "fact_is_error": true,
+    "may_repair_by_renaming_or_swapping_evidence_in_place": false,
+    "ruling": "The delivered evidence supports PVDF effective capacity of more than 3 万吨, not an exact 3 and not 勃姆石和氧化铝. A separate sentence on the same page supports 勃姆石和氧化铝 effective capacity that has reached 3 万吨. That sentence is not this record's evidence. The record is an error. A later repair must not rename the object or silently replace the quote inside this result."
+  },
+  "reports_reread": [
+    "300750.SZ",
+    "603659.SH",
+    "920015.BJ",
+    "302132.SZ"
+  ],
+  "per_company": [
+    {
+      "instrument_id": "300750.SZ",
+      "disclosed_quantity_facts": 6,
+      "correctly_recalled": 6,
+      "missing": [],
+      "inaccurate_record_ids": []
+    },
+    {
+      "instrument_id": "603659.SH",
+      "disclosed_quantity_facts": 23,
+      "correctly_recalled": 13,
+      "missing": [
+        "基膜 formed capacity 21 亿㎡, page 14",
+        "基膜 sales volume 14.95 亿㎡, page 14",
+        "极片涂布线 commissioned capacity 8 GWh, page 14",
+        "负极材料 formed capacity 25 万吨, page 15",
+        "PVDF effective capacity 超过 3 万吨, page 15",
+        "勃姆石和氧化铝 effective capacity 已达 3 万吨, page 15",
+        "基膜 under-construction capacity 20 亿平方米, pages 15 and 27, counted once",
+        "涂覆 under-construction capacity 30 亿平方米, page 27",
+        "四川紫宸一体化 project capacity 28 万吨, page 27",
+        "四川紫宸一期 capacity 10 万吨, page 27"
+      ],
+      "inaccurate_record_ids": [
+        "manufacturing-materials-603659-2025:production_capacity:勃姆石和氧化铝:3:15"
+      ]
+    },
+    {
+      "instrument_id": "920015.BJ",
+      "disclosed_quantity_facts": 7,
+      "correctly_recalled": 7,
+      "missing": [],
+      "inaccurate_record_ids": []
+    },
+    {
+      "instrument_id": "302132.SZ",
+      "disclosed_quantity_facts": 0,
+      "correctly_recalled": 0,
+      "missing": [],
+      "inaccurate_record_ids": [],
+      "note": "No company physical operating quantity is disclosed. Coverage is reviewed below and is not a recall gap."
+    }
+  ],
+  "missing_disclosures": [
+    {
+      "instrument_id": "603659.SH",
+      "metric_type": "production_capacity",
+      "measured_object": "隔膜基膜",
+      "value": "21",
+      "unit": "亿㎡",
+      "comparison_qualifier": null,
+      "page": 14,
+      "source_sentence": "截至 2025 年末，公司已形成年产 21 亿㎡基膜的产能。",
+      "present_in_delivery": false
+    },
+    {
+      "instrument_id": "603659.SH",
+      "metric_type": "sales_volume",
+      "measured_object": "隔膜基膜",
+      "value": "14.95",
+      "unit": "亿㎡",
+      "comparison_qualifier": null,
+      "page": 14,
+      "source_sentence": "全年销量达 14.95 亿㎡",
+      "present_in_delivery": false
+    },
+    {
+      "instrument_id": "603659.SH",
+      "metric_type": "production_capacity",
+      "measured_object": "制浆和极片涂布线",
+      "value": "8",
+      "unit": "GWh",
+      "comparison_qualifier": null,
+      "page": 14,
+      "source_sentence": "8GWh 制浆和极片涂布线产能投产",
+      "present_in_delivery": false
+    },
+    {
+      "instrument_id": "603659.SH",
+      "metric_type": "production_capacity",
+      "measured_object": "负极材料",
+      "value": "25",
+      "unit": "万吨",
+      "comparison_qualifier": null,
+      "page": 15,
+      "source_sentence": "截至 2025 年末，已经形成年产 25 万吨负极材料的产能。",
+      "present_in_delivery": false
+    },
+    {
+      "instrument_id": "603659.SH",
+      "metric_type": "production_capacity",
+      "measured_object": "PVDF",
+      "value": "3",
+      "unit": "万吨",
+      "comparison_qualifier": "超过",
+      "page": 15,
+      "source_sentence": "截至 2025 年末，PVDF 有效产能超过 3 万吨",
+      "present_in_delivery": false,
+      "note": "The delivered record uses this sentence but names 勃姆石和氧化铝 and stores an exact 3. That record does not recall this fact."
+    },
+    {
+      "instrument_id": "603659.SH",
+      "metric_type": "production_capacity",
+      "measured_object": "勃姆石和氧化铝",
+      "value": "3",
+      "unit": "万吨",
+      "comparison_qualifier": "已达",
+      "page": 15,
+      "source_sentence": "截至 2025 年末，公司勃姆石和氧化铝的有效产能已达 3 万吨。",
+      "present_in_delivery": false,
+      "note": "Independent support exists. It is not the evidence attached to the delivered record, so the delivered record does not recall this fact."
+    },
+    {
+      "instrument_id": "603659.SH",
+      "metric_type": "capacity_under_construction",
+      "measured_object": "基膜",
+      "value": "20",
+      "unit": "亿平方米",
+      "comparison_qualifier": null,
+      "page": 15,
+      "source_sentence": "建成后新增基膜年产能 20 亿 m2",
+      "also_on_page": 27,
+      "present_in_delivery": false
+    },
+    {
+      "instrument_id": "603659.SH",
+      "metric_type": "capacity_under_construction",
+      "measured_object": "涂覆",
+      "value": "30",
+      "unit": "亿平方米",
+      "comparison_qualifier": null,
+      "page": 27,
+      "source_sentence": "建成后将新增基膜年产能 20 亿平方米、涂覆年产能 30 亿平方米，项目正在建设过程中。",
+      "present_in_delivery": false
+    },
+    {
+      "instrument_id": "603659.SH",
+      "metric_type": "production_capacity",
+      "measured_object": "四川紫宸一体化项目",
+      "value": "28",
+      "unit": "万吨",
+      "comparison_qualifier": null,
+      "page": 27,
+      "source_sentence": "四川紫宸年产 28 万吨一体化建设项目",
+      "present_in_delivery": false
+    },
+    {
+      "instrument_id": "603659.SH",
+      "metric_type": "production_capacity",
+      "measured_object": "四川紫宸一期",
+      "value": "10",
+      "unit": "万吨",
+      "comparison_qualifier": null,
+      "page": 27,
+      "source_sentence": "一期 10 万吨项目的部分产线已逐步投产",
+      "present_in_delivery": false
+    }
+  ],
+  "exclusions": [
+    {
+      "instrument_id": "300750.SZ",
+      "item": "Page 24 restates 锂电池产能 772GWh and 在建产能 321GWh",
+      "outcome": "same_fact_as_page_26_table",
+      "in_quantity_denominator": false
+    },
+    {
+      "instrument_id": "300750.SZ",
+      "item": "Page 2 and page 27 restate 销量 or 生产量 661GWh and 748GWh",
+      "outcome": "same_fact_as_pages_26_27",
+      "in_quantity_denominator": false
+    },
+    {
+      "instrument_id": "300750.SZ",
+      "item": "SNE Research industry shipment figures, qualitative global capacity, and audit language about utilization",
+      "outcome": "not_company_period_quantity",
+      "in_quantity_denominator": false
+    },
+    {
+      "instrument_id": "300750.SZ",
+      "item": "Major-contract and direct-material amounts in 千元",
+      "outcome": "currency_amount_not_volume",
+      "in_quantity_denominator": false
+    },
+    {
+      "instrument_id": "603659.SH",
+      "item": "Page 13 EVTank and global vehicle volumes",
+      "outcome": "industry_statistic",
+      "in_quantity_denominator": false
+    },
+    {
+      "instrument_id": "603659.SH",
+      "item": "负极出货量 14.30 万吨 and PVDF 销量 4.13 万吨 on page 15",
+      "outcome": "rounded_restatement_of_page_19_sales_rows",
+      "in_quantity_denominator": false
+    },
+    {
+      "instrument_id": "603659.SH",
+      "item": "涂覆加工量 109.42 亿㎡ and page 19 涂覆隔膜销售量 1,094,249.25 万㎡",
+      "outcome": "kept_as_two_source_anchors",
+      "in_quantity_denominator": true,
+      "note": "109.42 亿㎡ is the rounded magnitude of the table sales row, but the source labels and units differ. Both stay in the denominator and both were delivered separately."
+    },
+    {
+      "instrument_id": "603659.SH",
+      "item": "基膜设备单线产能已达 2 亿㎡/年 and 新一代单线产能超 3 亿㎡/年, page 16",
+      "outcome": "equipment_nameplate_not_period_operating_capacity",
+      "in_quantity_denominator": false
+    },
+    {
+      "instrument_id": "603659.SH",
+      "item": "2026 年总产能有望达到 5 万吨, and page 32 力争 2026 targets",
+      "outcome": "future_year_target",
+      "in_quantity_denominator": false
+    },
+    {
+      "instrument_id": "603659.SH",
+      "item": "四川紫宸二期 10 万吨将于 2026 年择机投产, and 三期 8 万吨逐步推进",
+      "outcome": "future_or_conditional_phase",
+      "in_quantity_denominator": false
+    },
+    {
+      "instrument_id": "603659.SH",
+      "item": "产能利用率提高 without a percent, page 15",
+      "outcome": "not_disclosed",
+      "in_quantity_denominator": false
+    },
+    {
+      "instrument_id": "920015.BJ",
+      "item": "Page 13 新增 40kt/a 羟胺盐装置",
+      "outcome": "same_fact_as_page_50_under_construction_40000_吨每年",
+      "in_quantity_denominator": false
+    },
+    {
+      "instrument_id": "920015.BJ",
+      "item": "Investment 10,632.17 万元",
+      "outcome": "currency_amount_not_capacity",
+      "in_quantity_denominator": false
+    },
+    {
+      "instrument_id": "920015.BJ",
+      "item": "丁酮肟代加工服务 and industry 2028 capacity forecast",
+      "outcome": "toll_processing_or_industry_forecast",
+      "in_quantity_denominator": false
+    },
+    {
+      "instrument_id": "920015.BJ",
+      "item": "Production, sales, inventory, and processing volumes",
+      "outcome": "not_disclosed",
+      "in_quantity_denominator": false
+    },
+    {
+      "instrument_id": "302132.SZ",
+      "item": "科研生产能力 on page 13 and 资本化 on page 115",
+      "outcome": "no_physical_quantity",
+      "in_quantity_denominator": false
+    },
+    {
+      "instrument_id": "302132.SZ",
+      "item": "Classified production, sales, and inventory",
+      "outcome": "not_applicable",
+      "in_quantity_denominator": false
+    }
+  ],
+  "coverage_review": {
+    "in_quantity_denominator": false,
+    "rows_reviewed": 13,
+    "rows_status_correct": 13,
+    "rows": [
+      {
+        "instrument_id": "300750.SZ",
+        "field_id": "processing_volume",
+        "coverage_status": "not_disclosed",
+        "bundle_outcome": "legal_empty",
+        "status_correct": true,
+        "basis": "Pages 26–27 state capacity, utilization, production, sales, and inventory. They do not state a processing volume."
+      },
+      {
+        "instrument_id": "603659.SH",
+        "field_id": "capacity_utilization",
+        "coverage_status": "not_disclosed",
+        "bundle_outcome": "legal_empty",
+        "status_correct": true,
+        "page_in_bundle": 19,
+        "basis": "No numeric utilization is disclosed. Page 15 says 产能利用率提高 without a percent. The bundle anchors the empty status to the page 19 table. The status is still not_disclosed, not not_applicable."
+      },
+      {
+        "instrument_id": "920015.BJ",
+        "field_id": "production_volume",
+        "coverage_status": "not_disclosed",
+        "bundle_outcome": "legal_empty",
+        "status_correct": true
+      },
+      {
+        "instrument_id": "920015.BJ",
+        "field_id": "sales_volume",
+        "coverage_status": "not_disclosed",
+        "bundle_outcome": "legal_empty",
+        "status_correct": true
+      },
+      {
+        "instrument_id": "920015.BJ",
+        "field_id": "inventory_volume",
+        "coverage_status": "not_disclosed",
+        "bundle_outcome": "legal_empty",
+        "status_correct": true
+      },
+      {
+        "instrument_id": "920015.BJ",
+        "field_id": "processing_volume",
+        "coverage_status": "not_disclosed",
+        "bundle_outcome": "legal_empty",
+        "status_correct": true,
+        "basis": "The capacity table is readable and applicable. It does not disclose these volumes. Toll processing on page 50 is not a company output volume. 不适用 on 非正常停产 does not make the volumes not_applicable."
+      },
+      {
+        "instrument_id": "302132.SZ",
+        "field_id": "production_volume",
+        "coverage_status": "not_applicable",
+        "bundle_outcome": "legal_empty",
+        "status_correct": true
+      },
+      {
+        "instrument_id": "302132.SZ",
+        "field_id": "sales_volume",
+        "coverage_status": "not_applicable",
+        "bundle_outcome": "legal_empty",
+        "status_correct": true
+      },
+      {
+        "instrument_id": "302132.SZ",
+        "field_id": "inventory_volume",
+        "coverage_status": "not_applicable",
+        "bundle_outcome": "legal_empty",
+        "status_correct": true,
+        "basis": "Page 15 says 因公司实物销售产品众多，无法进行分类统计. The checkbox 是 only says physical sales exceed service revenue."
+      },
+      {
+        "instrument_id": "302132.SZ",
+        "field_id": "production_capacity",
+        "coverage_status": "not_disclosed",
+        "bundle_outcome": "legal_empty",
+        "status_correct": true
+      },
+      {
+        "instrument_id": "302132.SZ",
+        "field_id": "capacity_under_construction",
+        "coverage_status": "not_disclosed",
+        "bundle_outcome": "legal_empty",
+        "status_correct": true
+      },
+      {
+        "instrument_id": "302132.SZ",
+        "field_id": "capacity_utilization",
+        "coverage_status": "not_disclosed",
+        "bundle_outcome": "legal_empty",
+        "status_correct": true
+      },
+      {
+        "instrument_id": "302132.SZ",
+        "field_id": "processing_volume",
+        "coverage_status": "not_disclosed",
+        "bundle_outcome": "legal_empty",
+        "status_correct": true,
+        "basis": "The report has no numeric capacity, utilization, under-construction capacity, or processing volume. 科研生产能力 and 资本化 are not those facts. not_applicable is limited to the three classified volumes."
+      }
+    ]
+  },
+  "fact_checks": [
+    {
+      "record_id": "manufacturing-materials-300750-2025:production_capacity:电池系统:772:26",
+      "evidence_id": "stage5-evidence-10a6d80f9770f0d247080701",
+      "page_text_hash_matches_pdf": true,
+      "measured_object_matches_quote": true,
+      "metric_type": "production_capacity",
+      "value": "772",
+      "comparison_qualifier": null,
+      "unit": "GWh",
+      "period_type": "duration",
+      "page": 26,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "record_id": "manufacturing-materials-300750-2025:capacity_under_construction:电池系统:321:26",
+      "evidence_id": "stage5-evidence-1b2c13a1d46400a41df8b6ee",
+      "page_text_hash_matches_pdf": true,
+      "measured_object_matches_quote": true,
+      "metric_type": "capacity_under_construction",
+      "value": "321",
+      "comparison_qualifier": null,
+      "unit": "GWh",
+      "period_type": "duration",
+      "page": 26,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "record_id": "manufacturing-materials-300750-2025:capacity_utilization:电池系统:96.9:26",
+      "evidence_id": "stage5-evidence-71584b09d83275cf9aa61dee",
+      "page_text_hash_matches_pdf": true,
+      "measured_object_matches_quote": true,
+      "metric_type": "capacity_utilization",
+      "value": "96.9",
+      "comparison_qualifier": null,
+      "unit": "%",
+      "period_type": "duration",
+      "page": 26,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "record_id": "manufacturing-materials-300750-2025:production_volume:电池系统:748:26",
+      "evidence_id": "stage5-evidence-dc1ae023408b22e61f4bb794",
+      "page_text_hash_matches_pdf": true,
+      "measured_object_matches_quote": true,
+      "metric_type": "production_volume",
+      "value": "748",
+      "comparison_qualifier": null,
+      "unit": "GWh",
+      "period_type": "duration",
+      "page": 26,
+      "fact_accurate": true,
+      "critical_numeric_error": false,
+      "note": "Page 27 repeats 生产量 748 GWh as the same cross-page cell. One fact is correct."
+    },
+    {
+      "record_id": "manufacturing-materials-300750-2025:sales_volume:电池系统:661:26",
+      "evidence_id": "stage5-evidence-5a868629e13347531c592946",
+      "page_text_hash_matches_pdf": true,
+      "measured_object_matches_quote": true,
+      "metric_type": "sales_volume",
+      "value": "661",
+      "comparison_qualifier": null,
+      "unit": "GWh",
+      "period_type": "duration",
+      "page": 26,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "record_id": "manufacturing-materials-300750-2025:inventory_volume:电池系统:186:27",
+      "evidence_id": "stage5-evidence-53896dc80e873be1f85ba0ea",
+      "page_text_hash_matches_pdf": true,
+      "measured_object_matches_quote": true,
+      "metric_type": "inventory_volume",
+      "value": "186",
+      "comparison_qualifier": null,
+      "unit": "GWh",
+      "period_type": "instant",
+      "page": 27,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "record_id": "manufacturing-materials-603659-2025:production_volume:负极材料:151,178.99:19",
+      "evidence_id": "stage5-evidence-e682a0b2f89515006cb72776",
+      "page_text_hash_matches_pdf": true,
+      "measured_object_matches_quote": true,
+      "metric_type": "production_volume",
+      "value": "151,178.99",
+      "comparison_qualifier": null,
+      "unit": "吨",
+      "period_type": "duration",
+      "page": 19,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "record_id": "manufacturing-materials-603659-2025:sales_volume:负极材料:143,009.19:19",
+      "evidence_id": "stage5-evidence-a757a999131ebb75cfc20d14",
+      "page_text_hash_matches_pdf": true,
+      "measured_object_matches_quote": true,
+      "metric_type": "sales_volume",
+      "value": "143,009.19",
+      "comparison_qualifier": null,
+      "unit": "吨",
+      "period_type": "duration",
+      "page": 19,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "record_id": "manufacturing-materials-603659-2025:inventory_volume:负极材料:39,299.86:19",
+      "evidence_id": "stage5-evidence-b442cbe4a6b0c1b386006b29",
+      "page_text_hash_matches_pdf": true,
+      "measured_object_matches_quote": true,
+      "metric_type": "inventory_volume",
+      "value": "39,299.86",
+      "comparison_qualifier": null,
+      "unit": "吨",
+      "period_type": "instant",
+      "page": 19,
+      "fact_accurate": true,
+      "critical_numeric_error": false,
+      "note": "Footnote 库存量为产成品数量 is retained."
+    },
+    {
+      "record_id": "manufacturing-materials-603659-2025:production_volume:涂覆隔膜:1,158,602.82:19",
+      "evidence_id": "stage5-evidence-ca8644fd7edd86ed1ae75ef2",
+      "page_text_hash_matches_pdf": true,
+      "measured_object_matches_quote": true,
+      "metric_type": "production_volume",
+      "value": "1,158,602.82",
+      "comparison_qualifier": null,
+      "unit": "万㎡",
+      "period_type": "duration",
+      "page": 19,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "record_id": "manufacturing-materials-603659-2025:sales_volume:涂覆隔膜:1,094,249.25:19",
+      "evidence_id": "stage5-evidence-869730112e7edc26851d101b",
+      "page_text_hash_matches_pdf": true,
+      "measured_object_matches_quote": true,
+      "metric_type": "sales_volume",
+      "value": "1,094,249.25",
+      "comparison_qualifier": null,
+      "unit": "万㎡",
+      "period_type": "duration",
+      "page": 19,
+      "fact_accurate": true,
+      "critical_numeric_error": false,
+      "note": "Kept separate from page 14 processing volume 109.42 亿㎡."
+    },
+    {
+      "record_id": "manufacturing-materials-603659-2025:inventory_volume:涂覆隔膜:202,802.13:19",
+      "evidence_id": "stage5-evidence-0a6069fa2a8bdf2e8e249be7",
+      "page_text_hash_matches_pdf": true,
+      "measured_object_matches_quote": true,
+      "metric_type": "inventory_volume",
+      "value": "202,802.13",
+      "comparison_qualifier": null,
+      "unit": "万㎡",
+      "period_type": "instant",
+      "page": 19,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "record_id": "manufacturing-materials-603659-2025:production_volume:PVDF及含氟聚合物:44,027.49:19",
+      "evidence_id": "stage5-evidence-5d2d83fb542d06d81a4955ea",
+      "page_text_hash_matches_pdf": true,
+      "measured_object_matches_quote": true,
+      "metric_type": "production_volume",
+      "value": "44,027.49",
+      "comparison_qualifier": null,
+      "unit": "吨",
+      "period_type": "duration",
+      "page": 19,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "record_id": "manufacturing-materials-603659-2025:sales_volume:PVDF及含氟聚合物:41,315.50:19",
+      "evidence_id": "stage5-evidence-43e506c9777c94c534a1bdec",
+      "page_text_hash_matches_pdf": true,
+      "measured_object_matches_quote": true,
+      "metric_type": "sales_volume",
+      "value": "41,315.50",
+      "comparison_qualifier": null,
+      "unit": "吨",
+      "period_type": "duration",
+      "page": 19,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "record_id": "manufacturing-materials-603659-2025:inventory_volume:PVDF及含氟聚合物:5,509.79:19",
+      "evidence_id": "stage5-evidence-d409f9580e21b18043f71e51",
+      "page_text_hash_matches_pdf": true,
+      "measured_object_matches_quote": true,
+      "metric_type": "inventory_volume",
+      "value": "5,509.79",
+      "comparison_qualifier": null,
+      "unit": "吨",
+      "period_type": "instant",
+      "page": 19,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "record_id": "manufacturing-materials-603659-2025:processing_volume:涂覆加工量（销量）:109.42:14",
+      "evidence_id": "stage5-evidence-b4c13c6f6502a0696564d798",
+      "page_text_hash_matches_pdf": true,
+      "measured_object_matches_quote": true,
+      "metric_type": "processing_volume",
+      "value": "109.42",
+      "comparison_qualifier": null,
+      "unit": "亿㎡",
+      "period_type": "duration",
+      "page": 14,
+      "source_aliases": ["销量"],
+      "fact_accurate": true,
+      "critical_numeric_error": false,
+      "note": "The source parenthetical 销量 stays an alias. It is not converted into the page 19 sales row."
+    },
+    {
+      "record_id": "manufacturing-materials-603659-2025:production_capacity:涂覆隔膜:140:14",
+      "evidence_id": "stage5-evidence-e4e350ccfabdf64b580a3585",
+      "page_text_hash_matches_pdf": true,
+      "measured_object_matches_quote": true,
+      "metric_type": "production_capacity",
+      "value": "140",
+      "comparison_qualifier": null,
+      "unit": "亿㎡",
+      "capacity_kind": "effective_capacity",
+      "period_type": "duration",
+      "page": 14,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "record_id": "manufacturing-materials-603659-2025:production_capacity:勃姆石和氧化铝:3:15",
+      "evidence_id": "stage5-evidence-7c84a4c503f168817fb12df3",
+      "page_text_hash_matches_pdf": true,
+      "measured_object_matches_quote": false,
+      "metric_type": "production_capacity",
+      "value": "3",
+      "comparison_qualifier_in_quote": "超过",
+      "comparison_qualifier_retained": false,
+      "unit": "万吨",
+      "capacity_kind": "effective_capacity",
+      "period_type": "duration",
+      "page": 15,
+      "fact_accurate": false,
+      "critical_numeric_error": true,
+      "note": "Quote is PVDF 有效产能超过 3 万吨. Object 勃姆石和氧化铝 is a different sentence, 已达 3 万吨, and that sentence is not this evidence."
+    },
+    {
+      "record_id": "manufacturing-materials-603659-2025:capacity_under_construction:PVDF:1:15",
+      "evidence_id": "stage5-evidence-61c40a2a3702c67677ced30a",
+      "page_text_hash_matches_pdf": true,
+      "measured_object_matches_quote": true,
+      "metric_type": "capacity_under_construction",
+      "value": "1",
+      "comparison_qualifier": null,
+      "unit": "万吨",
+      "period_type": "duration",
+      "page": 15,
+      "fact_accurate": true,
+      "critical_numeric_error": false,
+      "note": "Source says 年产 1 万吨 PVDF 产能即将投入生产."
+    },
+    {
+      "record_id": "manufacturing-materials-603659-2025:capacity_under_construction:PVDF:1.5:15",
+      "evidence_id": "stage5-evidence-dab025c79b42625ba2480079",
+      "page_text_hash_matches_pdf": true,
+      "measured_object_matches_quote": true,
+      "metric_type": "capacity_under_construction",
+      "value": "1.5",
+      "comparison_qualifier": null,
+      "unit": "万吨",
+      "period_type": "duration",
+      "page": 15,
+      "fact_accurate": true,
+      "critical_numeric_error": false,
+      "note": "Source says 年产 1.5 万吨 PVDF 项目正在建设中."
+    },
+    {
+      "record_id": "manufacturing-materials-920015-2025:production_capacity:硅烷交联剂:70,000:49",
+      "evidence_id": "stage5-evidence-b19c78028d84730c8b97a5b2",
+      "page_text_hash_matches_pdf": true,
+      "measured_object_matches_quote": true,
+      "metric_type": "production_capacity",
+      "value": "70,000",
+      "comparison_qualifier": null,
+      "unit": "吨/年",
+      "capacity_kind": "design_capacity",
+      "period_type": "duration",
+      "page": 49,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "record_id": "manufacturing-materials-920015-2025:capacity_utilization:硅烷交联剂:65.12:49",
+      "evidence_id": "stage5-evidence-79da3060e71d1afe5238cfd5",
+      "page_text_hash_matches_pdf": true,
+      "measured_object_matches_quote": true,
+      "metric_type": "capacity_utilization",
+      "value": "65.12",
+      "comparison_qualifier": null,
+      "unit": "%",
+      "period_type": "duration",
+      "page": 49,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "record_id": "manufacturing-materials-920015-2025:production_capacity:羟胺盐:35,000:49",
+      "evidence_id": "stage5-evidence-5f5f146a65d69169f2f44803",
+      "page_text_hash_matches_pdf": true,
+      "measured_object_matches_quote": true,
+      "metric_type": "production_capacity",
+      "value": "35,000",
+      "comparison_qualifier": null,
+      "unit": "吨/年",
+      "capacity_kind": "design_capacity",
+      "period_type": "duration",
+      "page": 49,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "record_id": "manufacturing-materials-920015-2025:capacity_utilization:羟胺盐:99.13:49",
+      "evidence_id": "stage5-evidence-9c67fe183b1536f52dd686dc",
+      "page_text_hash_matches_pdf": true,
+      "measured_object_matches_quote": true,
+      "metric_type": "capacity_utilization",
+      "value": "99.13",
+      "comparison_qualifier": null,
+      "unit": "%",
+      "period_type": "duration",
+      "page": 49,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "record_id": "manufacturing-materials-920015-2025:production_capacity:其他主营产品:36,000:50",
+      "evidence_id": "stage5-evidence-1f1548e07f89c1c8b82fda45",
+      "page_text_hash_matches_pdf": true,
+      "measured_object_matches_quote": true,
+      "metric_type": "production_capacity",
+      "value": "36,000",
+      "comparison_qualifier": null,
+      "unit": "吨/年",
+      "capacity_kind": "design_capacity",
+      "period_type": "duration",
+      "page": 50,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "record_id": "manufacturing-materials-920015-2025:capacity_utilization:其他主营产品:30.65:50",
+      "evidence_id": "stage5-evidence-dc56b18d835bce3f8d9f0885",
+      "page_text_hash_matches_pdf": true,
+      "measured_object_matches_quote": true,
+      "metric_type": "capacity_utilization",
+      "value": "30.65",
+      "comparison_qualifier": null,
+      "unit": "%",
+      "period_type": "duration",
+      "page": 50,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "record_id": "manufacturing-materials-920015-2025:capacity_under_construction:羟胺盐:40,000:50",
+      "evidence_id": "stage5-evidence-34591182449366959c24bd48",
+      "page_text_hash_matches_pdf": true,
+      "measured_object_matches_quote": false,
+      "measured_object_supported_by_cross_page_cell": true,
+      "metric_type": "capacity_under_construction",
+      "value": "40,000",
+      "comparison_qualifier": null,
+      "unit": "吨/年",
+      "period_type": "duration",
+      "page": 50,
+      "fact_accurate": true,
+      "critical_numeric_error": false,
+      "note": "Page 49 ends with 新增羟胺盐 and page 50 continues 产能 40,000 吨/年. The pages agree. This is not an object contradiction. The 万元 investment is not used as capacity."
+    }
+  ],
+  "source_recall": {
+    "numerator": 26,
+    "denominator": 36,
+    "value": 0.7222222222222222,
+    "by_company": {
+      "300750.SZ": {"numerator": 6, "denominator": 6},
+      "603659.SH": {"numerator": 13, "denominator": 23},
+      "920015.BJ": {"numerator": 7, "denominator": 7},
+      "302132.SZ": {"numerator": 0, "denominator": 0}
+    }
+  },
+  "source_accuracy": {
+    "numerator": 26,
+    "denominator": 27,
+    "value": 0.9629629629629629
+  },
+  "critical_numeric_errors": 1,
+  "expansion_gates_met": false,
+  "gate_rule": "expansion_gates_met is true only when all four reports were reread, source recall equals 1, source accuracy equals 1, and critical numeric errors equal 0. Legal-empty coverage is not part of the quantity recall denominator. The boolean is that conjunction. It is false for this four-report read. A false value does not authorize a repair inside these artifacts, an archive, another expansion, a scale-quality claim, or production.",
+  "not_reused_prior_result": "The material-input 23/23 observation, the stage-4 19/23 observation, and the fixed two-company 9/9 observation were not used as this denominator or this gate.",
+  "next_step": "Do not mark task 3.2 passed and do not archive. The confirmed page-15 mismatch requires a separate minimal repair change, a new controlled replay, and a new source review. Task 3.3 stays unchecked."
+}
