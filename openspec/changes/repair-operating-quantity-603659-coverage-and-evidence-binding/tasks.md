@@ -1,0 +1,13 @@
+## 1. Scope review gate
+
+- [ ] 1.1 Independent review accepts this repair contract: only `603659.SH` 2025, only the existing `extract_operating_quantities` chapter, no new report, no resample, and no regime review. The ten missed quantities from the 2026-09-28 source review are the delivery fixture. Page 15 PVDF `超过` 3 万吨 and 勃姆石和氧化铝 `已达` 3 万吨 stay two facts with their own quotes, objects, and qualifiers. The base-film 20 亿平方米 disclosure on pages 15 and 27 counts once. Page 14 processing volume and page 19 official sales volume stay separate anchors. The 26 previously accurate facts and 13 coverage statuses stay, and legal-empty coverage is not turned into a quantity. Successor output stays `accepted_for_review` in a new isolation directory under plan `manufacturing_materials_stage4_operating_quantities.2026-09-28.2`. The `replay/20260928` enqueue, run, result, and source_review are not rewritten. Do not check 1.1 until that review. Do not change Python, enqueue, replay, common-core, publication, closure, mode, or production authorization, and do not preset recall, accuracy, critical numeric errors, or the gate
+
+## 2. Minimum repair, not yet authorized
+
+- [ ] 2.1 After 1.1, add the smallest implementation and tests for measured object, comparison qualifier, evidence binding, physical page, and page text hash. Deliver the ten missed `603659.SH` facts and replace the page 15 misbinding with two evidence-backed facts. Keep the other three reports, the 26 accurate facts, and the 13 coverage statuses unchanged. Do not hard-code the instrument, page, or product name in runtime. Do not start the successor replay in this task
+
+## 3. Successor replay and recount, not yet authorized
+
+- [ ] 3.1 After the implementation review, replay only `extract_operating_quantities` into a new research isolation directory with plan `manufacturing_materials_stage4_operating_quantities.2026-09-28.2`. Do not write into `replay/20260928` and do not modify its artifacts
+- [ ] 3.2 Independently reread the successor output and recompute source recall, source accuracy, critical numeric errors, and `expansion_gates_met`. Do not presume they pass, and do not reuse 26/36, 26/27, 23/23, 19/23, or 9/9
+- [ ] 3.3 Do not start the original change's close-out or archive, another expansion, a scale-quality claim, production, the six-chapter package, counterparties, regime, DCF, trading, or price sensitivity until the new source review passes
