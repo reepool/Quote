@@ -26,4 +26,15 @@
 
 每份报告自己的 `not_disclosed`、`not_applicable`、`unclear` 写在该报告 dossier 里。本决定不把其中任何一项提升为四份报告共同的 required 字段。
 
-研究范围仍停在文档。不改 Python、identity、publication、closure、mode、checkpoint 或既有 replay。dossier 独立审核通过前不实现、不入队、不 replay。`production_authorization` 保持 `not_authorized`。
+## 各报告字段义务
+
+独立审核确认：四份报告都不设跨样本 required。已经印出的正式表单元格在该报告内是 conditional。缺失单元格保持该 dossier 的 coverage，不改成 0，不标成 optional 后丢掉。`row_class=consolidation_adjustment` 只用于明确的抵消行或抵消列。
+
+| 报告 | conditional 的已印出单元格 | 保持的空值 |
+| --- | --- | --- |
+| 300750.SZ | 分行业、分产品、分地区收入；10% 表的分业务、分产品、分地区收入、成本、报告毛利率；注释 50 的收入和成本 | 分销售模式 `not_disclosed`；其他业务未进入 10% 表的成本与毛利率 `not_disclosed`；附注多分部损益和抵消 `not_applicable` |
+| 603659.SH | 四个维度的收入和成本；除抵消项外的报告毛利率；合并抵消项的收入和成本 | 抵消项毛利率 `not_disclosed`；`118.30`、`104.19` 留在增减列 |
+| 920015.BJ | 产品行和区域行的收入、成本、报告毛利率 | 合计行“-”为 `not_disclosed`；物理页 139 抵消金额 `unclear` |
+| 302132.SZ | 物理页 14 四个维度的收入；物理页 15 的 10% 行收入、成本、报告毛利率；物理页 178 五个分部及分部间抵销的收入和成本 | 附注没有毛利率行，记 `not_disclosed`，不自行计算 |
+
+研究范围仍停在文档。不改 Python、identity、publication、closure、mode、checkpoint 或既有 replay。独立审核确认样本后，下一张才是 3.1 最小实现；本决定不入队、不 replay，不填写 recall、accuracy、critical numeric errors 或 gate。`production_authorization` 保持 `not_authorized`。
