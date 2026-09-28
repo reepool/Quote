@@ -62,6 +62,14 @@
 5. 只有这次新的 source-review 通过，才讨论本 change 的收口和归档。
 6. 回滚本 change 只删除这份范围文档；不删除已有 replay，不改控制面。
 
+## Closed observation
+
+独立 source-review 绑定 `replay/20260928.3`，run id `stage4-operating-quantities-20260928.3`，计划 `manufacturing_materials_stage4_operating_quantities.2026-09-28.3`。enqueue `30315acceaed18e870e3ded36ca5f5beb58c54e919d667b100bef8c81b9b2eb2`，run `f14af3b32355551805e5dca0c9d6e732dc06c8bed0a76c2d83fa0f28232588c5`，result `4a1f9823922881a9e210b9889067afeb0063b6106c7f5669791e6199c830d420`，source_review `f1e041ecfc6a7d35ad041fcaef753adce13e51e21f871acf79a4052663a06345`。
+
+重读结果是 recall 38/38、accuracy 38/38、critical numeric errors 0、coverage 13/13、`expansion_gates_met=true`。动力电池 541 GWh、储能电池 121 GWh 和电池系统 661 GWh 保持三条独立销量。第 20 页与第 26 页的 661 GWh 只计一次。
+
+这个 true 只覆盖上述四份报告、该计划和 `extract_operating_quantities`。`scale_quality_claim_allowed` 仍为 false。`production_authorization` 仍为 `not_authorized`。common-core identity 仍是 `owned_page_facts=v8` 加 `material_input_facts=v1`。publication、closure、completed mode 和 checkpoint 没有因本次收口改写。`.2` 与旧 `.1` replay 未改。璞泰来 repair 仍按它自己的 3.2/3.3 处理。
+
 ## Open Questions
 
-- 无。1.1 审核前不把两条分段销量合成一条，也不预设修复后的召回或 gate。
+- 无。收口不授权下一轮扩大。

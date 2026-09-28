@@ -47,11 +47,11 @@ Implementation after scope approval MUST write enqueue, run, and result only in 
 - **AND** its directory is neither `replay/20260928.2` nor `replay/20260928`
 - **AND** the 20260928.2 and 20260928 artifact hashes are unchanged
 
-### Requirement: Metrics are not preset by this repair
-This change MUST NOT record source recall, source accuracy, critical numeric errors, or `expansion_gates_met` before a new independent source review rereads the successor output. The historical 36/38, 36/36, and zero critical errors describe only the 20260928.2 run. The operating-quantity 26/36 and 26/27, the material-input 23/23, the stage-4 19/23, and the fixed two-company 9/9 MUST NOT be reused as this repair's result. This change MUST NOT be archived, and its close-out MUST wait until that new source review passes.
+### Requirement: The closed gate covers only this successor slice
+The independent source review of `replay/20260928.3` records source recall 38/38, source accuracy 38/38, critical numeric errors 0, coverage 13/13, and `expansion_gates_met=true`. That true value MUST cover only the four frozen 2025 reports, plan `manufacturing_materials_stage4_operating_quantities.2026-09-28.3`, and `extract_operating_quantities`. It MUST NOT authorize scale quality, production, another expansion, or a change to the Putailai repair. The 36/38 observation remains the `replay/20260928.2` result. The 20260928 failure, the material-input 23/23, the stage-4 19/23, and the fixed two-company 9/9 MUST stay independent.
 
-#### Scenario: Scope approval does not fill the gate
-- **WHEN** this repair is accepted at scope review or implemented before the successor source review
-- **THEN** recall, accuracy, critical numeric errors, and the gate remain unfilled for the successor
-- **AND** the 20260928.2 gate remains false
-- **AND** no archive is started
+#### Scenario: Close-out does not widen the gate
+- **WHEN** this change is archived after the `.2026-09-28.3` source review
+- **THEN** the recorded gate stays limited to those four reports, that plan, and `extract_operating_quantities`
+- **AND** production authorization remains `not_authorized`
+- **AND** the `.2` and `.1` replay bytes stay unchanged

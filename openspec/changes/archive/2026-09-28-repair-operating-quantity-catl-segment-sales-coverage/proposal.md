@@ -26,4 +26,4 @@
 - 1.1 通过前只增加本 change 的 OpenSpec 范围文档。
 - 通过后的实现只复用现有产销量章节和研究隔离 bundle。证券代码、页码和产品名只作为验收 fixture，不得写进抽取规则。
 - `scale_quality_claim_allowed` 保持 false，`production_authorization` 保持 `not_authorized`。
-- 新的 recall、accuracy、critical numeric errors 和 gate 只由后续独立 source-review 重读后填写。通过前不进入本 change 的收口，也不归档。
+- 2026-09-28 独立 source-review 的实际结果只覆盖四份冻结年报、计划 `manufacturing_materials_stage4_operating_quantities.2026-09-28.3` 和 `extract_operating_quantities`：recall 38/38、accuracy 38/38、critical numeric errors 0、coverage 13/13、`expansion_gates_met=true`。这个 true 不是规模质量声明，也不是生产授权。它不改写璞泰来 repair 的 36/38，也不改 20260928 的失败观察、材料投入 23/23、阶段 4 的 19/23 或固定两家公司的 9/9。
