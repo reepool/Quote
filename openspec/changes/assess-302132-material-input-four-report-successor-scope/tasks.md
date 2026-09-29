@@ -1,0 +1,12 @@
+## 1. Scope review gate
+
+- [ ] 1.1 Independent review accepts this read-only assessment contract: only `302132.SZ` and its approved 2025 report identity, PDF content hash, and report period `2025-12-31`; only the existing `extract_material_inputs`; a new material-input dossier rather than the regime dossier; no reorganization or package-regime review; no issuer outside the approved list; and no Python, enqueue, replay, or prefilled metric. Do not write `dossier.md` or a fitness result in this review. Do not check 2.1, 2.2, or 3.1. Do not change MI-1, MI-2, historical artifacts, publication, closure, mode, identity, or checkpoint. Do not add `302132.SZ` to MI-2, create a four-report successor replay, or reopen the aggregate gate. Do not start restricted promotion, the six-chapter package, scale quality, or production
+
+## 2. Dossier and fitness, not yet authorized
+
+- [ ] 2.1 After 1.1, write a new `dossier.md` for `302132.SZ` and `extract_material_inputs` only. Check procurement mode and named procurement objects, the formal main-materials table, named inputs in cost composition, named material rows in related-party procurement, explicit raw-material disclosure in the risk chapter, and any `not_disclosed`, `not_applicable`, `unclear`, or `extraction_failed`. Bind each candidate to its physical page, formal section and header, bounded quote, page-text hash, subject, report period, source-native name, and stated unit. Do not infer materials from aviation-manufacturing knowledge, energy, sales counterparties, inventory amounts, or generic "直接材料". Do not mix facts from before and after the reorganization, and do not present a legal empty as an observed fact. Do not reuse the regime dossier. Do not record suitable or unsuitable in this task
+- [ ] 2.2 After the dossier review, record exactly one result. Suitable allows only a later separate four-report material-input successor scope change; this change still does not implement or replay. Unsuitable records the reason and stops, and the Stage 4 aggregate stays hold with no issuer added outside the approved list. Do not rewrite MI-1 or MI-2, add `302132.SZ` to MI-2, create a successor replay, or reopen the aggregate gate
+
+## 3. Archive, not yet authorized
+
+- [ ] 3.1 After 2.2, keep that fitness conclusion and archive this read-only assessment. Do not create the successor change, a replay, or a production admission in this task
