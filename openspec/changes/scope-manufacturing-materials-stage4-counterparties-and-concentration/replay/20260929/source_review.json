@@ -1,0 +1,883 @@
+{
+  "schema_version": "company_profile_counterparty_stage4_source_review.v1",
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false,
+  "method": "independently_read_official_report",
+  "review_passed": true,
+  "binding": {
+    "enqueue_path": "enqueue.json",
+    "enqueue_sha256": "7e9c1a72f11723f2d8508d751c27f8ea3f96cae048eb0ab6edc6224eb301bf7a",
+    "run_path": "run.json",
+    "run_id": "stage4-counterparties-20260929",
+    "run_sha256": "8d3c7bd7a6c1f81a2e2b76064eb3d7fe9685d7570442a1e4d113b786a4cf0d7f",
+    "plan_version": "manufacturing_materials_stage4_counterparties.2026-09-29.1",
+    "bundle_dirname": "counterparty-stage4-counterparties-20260929",
+    "bundle_result_path": "counterparty-stage4-counterparties-20260929/result.json",
+    "bundle_result_sha256": "b0344d3d577f423a1716b6dacc7c46b100ef3fe9ddddb5d37ef0160c2458a57a",
+    "chapter_task": "extract_counterparties_and_concentration",
+    "disposition": "accepted_for_review",
+    "provider_calls": 0,
+    "fact_rows_in_bundle": 45,
+    "relationship_rows_in_bundle": 21,
+    "measurement_rows_in_bundle": 24,
+    "coverage_rows_in_bundle": 12,
+    "bundle_fact_count_not_used_as_denominator": true
+  },
+  "denominator_rule": "A disclosed fact is either one formal counterparty row or one formal concentration figure. A row is one Relationship: instrument, customer or supplier, contract versus rank, and the printed name. Customer rank 第一名 and supplier rank 第一名 are two facts. 客户 A(1) and customer 第一名 stay two facts when the text does not say they are the same party. The printed amount is part of that row, and a rank row's printed share must remain in its quote. A concentration Measurement is one top-five total amount, one top-five share, or one related-party amount or share, identified by instrument, side, and figure kind. The same total printed again on the 合计 row is one fact. A 合计 row and a related-party share do not create a Relationship. Name coverage not_disclosed and an express 不适用 are coverage checks, not extra relationship facts. The 45 bundle rows were not used to choose this denominator.",
+  "reports_reread": [
+    "300750.SZ",
+    "603659.SH",
+    "920015.BJ",
+    "302132.SZ"
+  ],
+  "page_text_hashes": [
+    {
+      "instrument_id": "300750.SZ",
+      "page": 27,
+      "sha256": "83a28d5ebb0cdf320040e2a5a76455365171d337e7c5641b2f097deb76ed465c"
+    },
+    {
+      "instrument_id": "300750.SZ",
+      "page": 28,
+      "sha256": "23bb76548dbf87f5da42077d8df738f533aa8a0b286bcb313ce5b61ab036c444"
+    },
+    {
+      "instrument_id": "603659.SH",
+      "page": 21,
+      "sha256": "a6b57ec2977c21b3742a6484517b747f15d01f33cc8aac21b3e5a2fc5ceef658"
+    },
+    {
+      "instrument_id": "603659.SH",
+      "page": 22,
+      "sha256": "cd95236465db78a3a3b9793bacaaba2b611ee3f51cb9ad9f8c3b2554201da7d0"
+    },
+    {
+      "instrument_id": "920015.BJ",
+      "page": 17,
+      "sha256": "4c850ade55e57bacc3b0b903fab9293f0fd521eab4152fb18f3d2eb1d57d1d4e"
+    },
+    {
+      "instrument_id": "920015.BJ",
+      "page": 18,
+      "sha256": "4bcafaaa1421fb8af6cd603b5173c1f1dd80872d571ebb0f4da5d16d2833b692"
+    },
+    {
+      "instrument_id": "302132.SZ",
+      "page": 15,
+      "sha256": "d5b8211968aeb05676f5a17ac7fbe29eedad48b9c92b5f75555efa75c97b395b"
+    },
+    {
+      "instrument_id": "302132.SZ",
+      "page": 16,
+      "sha256": "279c094d74baeaac175a9e38dce960874b83f34113e3e255f4354b8f0a4f3bb9"
+    }
+  ],
+  "source_facts": [
+    {
+      "instrument_id": "300750.SZ",
+      "object_kind": "relationship",
+      "relation_type": "customer",
+      "name": "客户 A(1)",
+      "relationship_context": "contract_customer",
+      "value": "58,159,202",
+      "unit": "千元",
+      "page": 27,
+      "in_denominator": true,
+      "matched_bundle": true,
+      "identity_class": "report_local_anonymous"
+    },
+    {
+      "instrument_id": "300750.SZ",
+      "object_kind": "relationship",
+      "relation_type": "customer",
+      "name": "第一名",
+      "relationship_context": "rank_customer",
+      "value": "58,159,202",
+      "unit": "千元",
+      "page": 28,
+      "in_denominator": true,
+      "matched_bundle": true,
+      "identity_class": "report_local_anonymous",
+      "printed_share_in_quote": "13.73%"
+    },
+    {
+      "instrument_id": "300750.SZ",
+      "object_kind": "relationship",
+      "relation_type": "customer",
+      "name": "第二名",
+      "relationship_context": "rank_customer",
+      "value": "47,127,609",
+      "unit": "千元",
+      "page": 28,
+      "in_denominator": true,
+      "matched_bundle": true,
+      "identity_class": "report_local_anonymous",
+      "printed_share_in_quote": "11.12%"
+    },
+    {
+      "instrument_id": "300750.SZ",
+      "object_kind": "relationship",
+      "relation_type": "customer",
+      "name": "第三名",
+      "relationship_context": "rank_customer",
+      "value": "30,201,701",
+      "unit": "千元",
+      "page": 28,
+      "in_denominator": true,
+      "matched_bundle": true,
+      "identity_class": "report_local_anonymous",
+      "printed_share_in_quote": "7.13%"
+    },
+    {
+      "instrument_id": "300750.SZ",
+      "object_kind": "relationship",
+      "relation_type": "customer",
+      "name": "第四名",
+      "relationship_context": "rank_customer",
+      "value": "15,419,319",
+      "unit": "千元",
+      "page": 28,
+      "in_denominator": true,
+      "matched_bundle": true,
+      "identity_class": "report_local_anonymous",
+      "printed_share_in_quote": "3.64%"
+    },
+    {
+      "instrument_id": "300750.SZ",
+      "object_kind": "relationship",
+      "relation_type": "customer",
+      "name": "第五名",
+      "relationship_context": "rank_customer",
+      "value": "14,153,702",
+      "unit": "千元",
+      "page": 28,
+      "in_denominator": true,
+      "matched_bundle": true,
+      "identity_class": "report_local_anonymous",
+      "printed_share_in_quote": "3.34%"
+    },
+    {
+      "instrument_id": "300750.SZ",
+      "object_kind": "relationship",
+      "relation_type": "supplier",
+      "name": "第一名",
+      "relationship_context": "rank_supplier",
+      "value": "23,318,360",
+      "unit": "千元",
+      "page": 28,
+      "in_denominator": true,
+      "matched_bundle": true,
+      "identity_class": "report_local_anonymous",
+      "printed_share_in_quote": "4.04%"
+    },
+    {
+      "instrument_id": "300750.SZ",
+      "object_kind": "relationship",
+      "relation_type": "supplier",
+      "name": "第二名",
+      "relationship_context": "rank_supplier",
+      "value": "11,601,437",
+      "unit": "千元",
+      "page": 28,
+      "in_denominator": true,
+      "matched_bundle": true,
+      "identity_class": "report_local_anonymous",
+      "printed_share_in_quote": "2.01%"
+    },
+    {
+      "instrument_id": "300750.SZ",
+      "object_kind": "relationship",
+      "relation_type": "supplier",
+      "name": "第三名",
+      "relationship_context": "rank_supplier",
+      "value": "9,241,133",
+      "unit": "千元",
+      "page": 28,
+      "in_denominator": true,
+      "matched_bundle": true,
+      "identity_class": "report_local_anonymous",
+      "printed_share_in_quote": "1.60%"
+    },
+    {
+      "instrument_id": "300750.SZ",
+      "object_kind": "relationship",
+      "relation_type": "supplier",
+      "name": "第四名",
+      "relationship_context": "rank_supplier",
+      "value": "8,258,913",
+      "unit": "千元",
+      "page": 28,
+      "in_denominator": true,
+      "matched_bundle": true,
+      "identity_class": "report_local_anonymous",
+      "printed_share_in_quote": "1.43%"
+    },
+    {
+      "instrument_id": "300750.SZ",
+      "object_kind": "relationship",
+      "relation_type": "supplier",
+      "name": "第五名",
+      "relationship_context": "rank_supplier",
+      "value": "7,518,360",
+      "unit": "千元",
+      "page": 28,
+      "in_denominator": true,
+      "matched_bundle": true,
+      "identity_class": "report_local_anonymous",
+      "printed_share_in_quote": "1.30%"
+    },
+    {
+      "instrument_id": "300750.SZ",
+      "object_kind": "measurement",
+      "relation_type": "customer",
+      "name": "前五名客户合计",
+      "relationship_context": "top_five_customers",
+      "value": "165,061,533",
+      "unit": "千元",
+      "page": 28,
+      "in_denominator": true,
+      "matched_bundle": true
+    },
+    {
+      "instrument_id": "300750.SZ",
+      "object_kind": "measurement",
+      "relation_type": "customer",
+      "name": "前五名客户合计",
+      "relationship_context": "top_five_customers",
+      "value": "38.96",
+      "unit": "%",
+      "page": 28,
+      "in_denominator": true,
+      "matched_bundle": true
+    },
+    {
+      "instrument_id": "300750.SZ",
+      "object_kind": "measurement",
+      "relation_type": "customer",
+      "name": "关联方销售额",
+      "relationship_context": "related_party_customers",
+      "value": "0.00",
+      "unit": "%",
+      "page": 28,
+      "in_denominator": true,
+      "matched_bundle": true
+    },
+    {
+      "instrument_id": "300750.SZ",
+      "object_kind": "measurement",
+      "relation_type": "supplier",
+      "name": "前五名供应商合计",
+      "relationship_context": "top_five_suppliers",
+      "value": "59,938,203",
+      "unit": "千元",
+      "page": 28,
+      "in_denominator": true,
+      "matched_bundle": true
+    },
+    {
+      "instrument_id": "300750.SZ",
+      "object_kind": "measurement",
+      "relation_type": "supplier",
+      "name": "前五名供应商合计",
+      "relationship_context": "top_five_suppliers",
+      "value": "10.38",
+      "unit": "%",
+      "page": 28,
+      "in_denominator": true,
+      "matched_bundle": true
+    },
+    {
+      "instrument_id": "300750.SZ",
+      "object_kind": "measurement",
+      "relation_type": "supplier",
+      "name": "关联方采购额",
+      "relationship_context": "related_party_suppliers",
+      "value": "0.00",
+      "unit": "%",
+      "page": 28,
+      "in_denominator": true,
+      "matched_bundle": true
+    },
+    {
+      "instrument_id": "603659.SH",
+      "object_kind": "measurement",
+      "relation_type": "customer",
+      "name": "前五名客户合计",
+      "relationship_context": "top_five_customers",
+      "value": "913,511",
+      "unit": "万元",
+      "page": 21,
+      "in_denominator": true,
+      "matched_bundle": true
+    },
+    {
+      "instrument_id": "603659.SH",
+      "object_kind": "measurement",
+      "relation_type": "customer",
+      "name": "前五名客户合计",
+      "relationship_context": "top_five_customers",
+      "value": "58.14",
+      "unit": "%",
+      "page": 21,
+      "in_denominator": true,
+      "matched_bundle": true
+    },
+    {
+      "instrument_id": "603659.SH",
+      "object_kind": "measurement",
+      "relation_type": "customer",
+      "name": "关联方销售额",
+      "relationship_context": "related_party_customers",
+      "value": "0",
+      "unit": "万元",
+      "page": 21,
+      "in_denominator": true,
+      "matched_bundle": true
+    },
+    {
+      "instrument_id": "603659.SH",
+      "object_kind": "measurement",
+      "relation_type": "customer",
+      "name": "关联方销售额",
+      "relationship_context": "related_party_customers",
+      "value": "0",
+      "unit": "%",
+      "page": 21,
+      "in_denominator": true,
+      "matched_bundle": true
+    },
+    {
+      "instrument_id": "603659.SH",
+      "object_kind": "measurement",
+      "relation_type": "supplier",
+      "name": "前五名供应商合计",
+      "relationship_context": "top_five_suppliers",
+      "value": "115,002",
+      "unit": "万元",
+      "page": 21,
+      "in_denominator": true,
+      "matched_bundle": true
+    },
+    {
+      "instrument_id": "603659.SH",
+      "object_kind": "measurement",
+      "relation_type": "supplier",
+      "name": "前五名供应商合计",
+      "relationship_context": "top_five_suppliers",
+      "value": "13.98",
+      "unit": "%",
+      "page": 21,
+      "in_denominator": true,
+      "matched_bundle": true
+    },
+    {
+      "instrument_id": "603659.SH",
+      "object_kind": "measurement",
+      "relation_type": "supplier",
+      "name": "关联方采购额",
+      "relationship_context": "related_party_suppliers",
+      "value": "0",
+      "unit": "万元",
+      "page": 21,
+      "in_denominator": true,
+      "matched_bundle": true
+    },
+    {
+      "instrument_id": "603659.SH",
+      "object_kind": "measurement",
+      "relation_type": "supplier",
+      "name": "关联方采购额",
+      "relationship_context": "related_party_suppliers",
+      "value": "0",
+      "unit": "%",
+      "page": 21,
+      "in_denominator": true,
+      "matched_bundle": true
+    },
+    {
+      "instrument_id": "920015.BJ",
+      "object_kind": "relationship",
+      "relation_type": "customer",
+      "name": "浙江衢州硅宝化工有限公司同一控制 下企业",
+      "relationship_context": "rank_customer",
+      "value": "178,099,027.98",
+      "unit": "元",
+      "page": 17,
+      "in_denominator": true,
+      "matched_bundle": true,
+      "identity_class": "report_local_aggregate",
+      "related_party": "是",
+      "printed_share_in_quote": "17.25%"
+    },
+    {
+      "instrument_id": "920015.BJ",
+      "object_kind": "relationship",
+      "relation_type": "customer",
+      "name": "J 公司",
+      "relationship_context": "rank_customer",
+      "value": "102,138,447.77",
+      "unit": "元",
+      "page": 17,
+      "in_denominator": true,
+      "matched_bundle": true,
+      "identity_class": "report_local_anonymous",
+      "related_party": "否",
+      "printed_share_in_quote": "9.89%"
+    },
+    {
+      "instrument_id": "920015.BJ",
+      "object_kind": "relationship",
+      "relation_type": "customer",
+      "name": "K 公司",
+      "relationship_context": "rank_customer",
+      "value": "96,572,440.35",
+      "unit": "元",
+      "page": 17,
+      "in_denominator": true,
+      "matched_bundle": true,
+      "identity_class": "report_local_anonymous",
+      "related_party": "否",
+      "printed_share_in_quote": "9.36%"
+    },
+    {
+      "instrument_id": "920015.BJ",
+      "object_kind": "relationship",
+      "relation_type": "customer",
+      "name": "L 公司",
+      "relationship_context": "rank_customer",
+      "value": "77,381,436.14",
+      "unit": "元",
+      "page": 17,
+      "in_denominator": true,
+      "matched_bundle": true,
+      "identity_class": "report_local_anonymous",
+      "related_party": "否",
+      "printed_share_in_quote": "7.50%"
+    },
+    {
+      "instrument_id": "920015.BJ",
+      "object_kind": "relationship",
+      "relation_type": "customer",
+      "name": "M 公司",
+      "relationship_context": "rank_customer",
+      "value": "64,767,267.08",
+      "unit": "元",
+      "page": 18,
+      "in_denominator": true,
+      "matched_bundle": true,
+      "identity_class": "report_local_anonymous",
+      "related_party": "否",
+      "printed_share_in_quote": "6.27%"
+    },
+    {
+      "instrument_id": "920015.BJ",
+      "object_kind": "measurement",
+      "relation_type": "customer",
+      "name": "前五名客户合计",
+      "relationship_context": "top_five_customers",
+      "value": "518,958,619.32",
+      "unit": "元",
+      "page": 18,
+      "in_denominator": true,
+      "matched_bundle": true
+    },
+    {
+      "instrument_id": "920015.BJ",
+      "object_kind": "measurement",
+      "relation_type": "customer",
+      "name": "前五名客户合计",
+      "relationship_context": "top_five_customers",
+      "value": "50.27",
+      "unit": "%",
+      "page": 18,
+      "in_denominator": true,
+      "matched_bundle": true
+    },
+    {
+      "instrument_id": "920015.BJ",
+      "object_kind": "relationship",
+      "relation_type": "supplier",
+      "name": "巨化集团有限公司及其控制的企业",
+      "relationship_context": "rank_supplier",
+      "value": "176,687,834.41",
+      "unit": "元",
+      "page": 18,
+      "in_denominator": true,
+      "matched_bundle": true,
+      "identity_class": "report_local_aggregate",
+      "related_party": "是",
+      "printed_share_in_quote": "23.42%"
+    },
+    {
+      "instrument_id": "920015.BJ",
+      "object_kind": "relationship",
+      "relation_type": "supplier",
+      "name": "A 公司",
+      "relationship_context": "rank_supplier",
+      "value": "64,084,947.81",
+      "unit": "元",
+      "page": 18,
+      "in_denominator": true,
+      "matched_bundle": true,
+      "identity_class": "report_local_anonymous",
+      "related_party": "否",
+      "printed_share_in_quote": "8.49%"
+    },
+    {
+      "instrument_id": "920015.BJ",
+      "object_kind": "relationship",
+      "relation_type": "supplier",
+      "name": "B 公司",
+      "relationship_context": "rank_supplier",
+      "value": "53,396,542.16",
+      "unit": "元",
+      "page": 18,
+      "in_denominator": true,
+      "matched_bundle": true,
+      "identity_class": "report_local_anonymous",
+      "related_party": "否",
+      "printed_share_in_quote": "7.08%"
+    },
+    {
+      "instrument_id": "920015.BJ",
+      "object_kind": "relationship",
+      "relation_type": "supplier",
+      "name": "C 公司",
+      "relationship_context": "rank_supplier",
+      "value": "46,894,579.64",
+      "unit": "元",
+      "page": 18,
+      "in_denominator": true,
+      "matched_bundle": true,
+      "identity_class": "report_local_anonymous",
+      "related_party": "否",
+      "printed_share_in_quote": "6.22%"
+    },
+    {
+      "instrument_id": "920015.BJ",
+      "object_kind": "relationship",
+      "relation_type": "supplier",
+      "name": "D 公司",
+      "relationship_context": "rank_supplier",
+      "value": "46,729,645.68",
+      "unit": "元",
+      "page": 18,
+      "in_denominator": true,
+      "matched_bundle": true,
+      "identity_class": "report_local_anonymous",
+      "related_party": "否",
+      "printed_share_in_quote": "6.19%"
+    },
+    {
+      "instrument_id": "920015.BJ",
+      "object_kind": "measurement",
+      "relation_type": "supplier",
+      "name": "前五名供应商合计",
+      "relationship_context": "top_five_suppliers",
+      "value": "387,793,549.7",
+      "unit": "元",
+      "page": 18,
+      "in_denominator": true,
+      "matched_bundle": true
+    },
+    {
+      "instrument_id": "920015.BJ",
+      "object_kind": "measurement",
+      "relation_type": "supplier",
+      "name": "前五名供应商合计",
+      "relationship_context": "top_five_suppliers",
+      "value": "51.40",
+      "unit": "%",
+      "page": 18,
+      "in_denominator": true,
+      "matched_bundle": true
+    },
+    {
+      "instrument_id": "302132.SZ",
+      "object_kind": "measurement",
+      "relation_type": "customer",
+      "name": "前五名客户合计",
+      "relationship_context": "top_five_customers",
+      "value": "72,672,513,444.91",
+      "unit": "元",
+      "page": 16,
+      "in_denominator": true,
+      "matched_bundle": true
+    },
+    {
+      "instrument_id": "302132.SZ",
+      "object_kind": "measurement",
+      "relation_type": "customer",
+      "name": "前五名客户合计",
+      "relationship_context": "top_five_customers",
+      "value": "96.44",
+      "unit": "%",
+      "page": 16,
+      "in_denominator": true,
+      "matched_bundle": true
+    },
+    {
+      "instrument_id": "302132.SZ",
+      "object_kind": "measurement",
+      "relation_type": "customer",
+      "name": "关联方销售额",
+      "relationship_context": "related_party_customers",
+      "value": "4.93",
+      "unit": "%",
+      "page": 16,
+      "in_denominator": true,
+      "matched_bundle": true
+    },
+    {
+      "instrument_id": "302132.SZ",
+      "object_kind": "measurement",
+      "relation_type": "supplier",
+      "name": "前五名供应商合计",
+      "relationship_context": "top_five_suppliers",
+      "value": "51,613,058,963.17",
+      "unit": "元",
+      "page": 16,
+      "in_denominator": true,
+      "matched_bundle": true
+    },
+    {
+      "instrument_id": "302132.SZ",
+      "object_kind": "measurement",
+      "relation_type": "supplier",
+      "name": "前五名供应商合计",
+      "relationship_context": "top_five_suppliers",
+      "value": "74.16",
+      "unit": "%",
+      "page": 16,
+      "in_denominator": true,
+      "matched_bundle": true
+    },
+    {
+      "instrument_id": "302132.SZ",
+      "object_kind": "measurement",
+      "relation_type": "supplier",
+      "name": "关联方采购额",
+      "relationship_context": "related_party_suppliers",
+      "value": "42.17",
+      "unit": "%",
+      "page": 16,
+      "in_denominator": true,
+      "matched_bundle": true
+    }
+  ],
+  "coverage_checks": [
+    {
+      "instrument_id": "300750.SZ",
+      "status": "not_applicable",
+      "relation_type": "supplier",
+      "label": "已签订的重大采购合同截至本报告期的履行情况",
+      "matched": true
+    },
+    {
+      "instrument_id": "300750.SZ",
+      "status": "not_applicable",
+      "relation_type": "customer",
+      "label": "主要客户其他情况说明",
+      "matched": true
+    },
+    {
+      "instrument_id": "300750.SZ",
+      "status": "not_applicable",
+      "relation_type": "supplier",
+      "label": "主要供应商其他情况说明",
+      "matched": true
+    },
+    {
+      "instrument_id": "300750.SZ",
+      "status": "not_applicable",
+      "relation_type": "customer",
+      "label": "贸易业务收入占营业收入比例超过",
+      "matched": true
+    },
+    {
+      "instrument_id": "603659.SH",
+      "status": "not_disclosed",
+      "relation_type": "customer",
+      "label": "前五名客户",
+      "matched": true
+    },
+    {
+      "instrument_id": "603659.SH",
+      "status": "not_disclosed",
+      "relation_type": "supplier",
+      "label": "前五名供应商",
+      "matched": true
+    },
+    {
+      "instrument_id": "603659.SH",
+      "status": "not_applicable",
+      "relation_type": "customer",
+      "label": "贸易业务收入占营业收入比例超过",
+      "matched": true
+    },
+    {
+      "instrument_id": "920015.BJ",
+      "status": "not_applicable",
+      "relation_type": "customer",
+      "label": "贸易业务收入占营业收入比例超过",
+      "matched": true
+    },
+    {
+      "instrument_id": "302132.SZ",
+      "status": "not_applicable",
+      "relation_type": "customer",
+      "label": "重大销售合同、重大采购合同截至本报告期的履行情况",
+      "matched": true
+    },
+    {
+      "instrument_id": "302132.SZ",
+      "status": "not_applicable",
+      "relation_type": "supplier",
+      "label": "重大销售合同、重大采购合同截至本报告期的履行情况",
+      "matched": true
+    },
+    {
+      "instrument_id": "302132.SZ",
+      "status": "not_disclosed",
+      "relation_type": "customer",
+      "label": "前五名客户",
+      "matched": true
+    },
+    {
+      "instrument_id": "302132.SZ",
+      "status": "not_disclosed",
+      "relation_type": "supplier",
+      "label": "前五名供应商",
+      "matched": true
+    }
+  ],
+  "boundary_checks": [
+    {
+      "check": "300750 客户 A(1), customer 第一名, and supplier 第一名 stay three records",
+      "passed": true
+    },
+    {
+      "check": "603659 and 302132 top-five name coverage stays not_disclosed and creates no Relationship",
+      "passed": true
+    },
+    {
+      "check": "920015 keeps report-local aggregate identities, letter-anonymous identities, and the related-party column",
+      "passed": true
+    },
+    {
+      "check": "920015 supplier total keeps the printed token 387,793,549.7",
+      "passed": true
+    },
+    {
+      "check": "total rows and related-party shares do not create Relationships",
+      "passed": true
+    },
+    {
+      "check": "other-receivable, credit-risk, and later related-party tables do not backfill this chapter",
+      "passed": true
+    },
+    {
+      "check": "every fact subject_scope is unclear",
+      "passed": true
+    },
+    {
+      "check": "unclear and extraction_failed are not used to replace not_disclosed or not_applicable on these readable pages",
+      "passed": true
+    }
+  ],
+  "outside_denominator": [
+    {
+      "instrument_id": "300750.SZ",
+      "item": "Page 28 合计 rows restating 165,061,533 / 38.96% and 59,938,203 / 10.38%",
+      "reason": "same top-five total already counted from the summary lines"
+    },
+    {
+      "instrument_id": "300750.SZ",
+      "item": "Page 27 second 58,159,202 on 本期确认的销售收入金额",
+      "reason": "same contract row as 客户 A(1) 本报告期履行金额"
+    },
+    {
+      "instrument_id": "300750.SZ",
+      "item": "Page 27 contract total dash",
+      "reason": "empty contract total is not a zero and not a concentration figure"
+    },
+    {
+      "instrument_id": "603659.SH",
+      "item": "Section B and section C boxes marked 不适用",
+      "reason": "conditional detail templates; section A already supplies the totals and not_disclosed names"
+    },
+    {
+      "instrument_id": "603659.SH",
+      "item": "Later other-receivable top-five names",
+      "reason": "not the customer or supplier chapter"
+    },
+    {
+      "instrument_id": "920015.BJ",
+      "item": "Page 129 credit-risk sentence that 94.72% of receivables come from the top five balances",
+      "reason": "not annual sales concentration and not a counterparty row"
+    },
+    {
+      "instrument_id": "920015.BJ",
+      "item": "Narrative that 浙江衢州硅宝同一控制下企业 remains a related party",
+      "reason": "explains the aggregate row already counted; it is not a second relationship"
+    },
+    {
+      "instrument_id": "302132.SZ",
+      "item": "Later related-party receivable names",
+      "reason": "must not fill the absent top-five names"
+    }
+  ],
+  "source_recall": {
+    "numerator": 45,
+    "denominator": 45,
+    "value": 1.0,
+    "by_company": {
+      "300750.SZ": {
+        "numerator": 17,
+        "denominator": 17,
+        "relationships": 11,
+        "measurements": 6
+      },
+      "603659.SH": {
+        "numerator": 8,
+        "denominator": 8,
+        "relationships": 0,
+        "measurements": 8
+      },
+      "920015.BJ": {
+        "numerator": 14,
+        "denominator": 14,
+        "relationships": 10,
+        "measurements": 4
+      },
+      "302132.SZ": {
+        "numerator": 6,
+        "denominator": 6,
+        "relationships": 0,
+        "measurements": 6
+      }
+    }
+  },
+  "source_accuracy": {
+    "numerator": 45,
+    "denominator": 45,
+    "value": 1.0
+  },
+  "critical_numeric_errors": 0,
+  "expansion_gates_met": true,
+  "gate_rule": "expansion_gates_met is true only when all four reports were reread, source recall equals 1, source accuracy equals 1, and critical numeric errors equal 0. Correct not_disclosed and not_applicable coverage is not a recall gap. The boolean is that conjunction for this four-report read of plan manufacturing_materials_stage4_counterparties.2026-09-29.1 and extract_counterparties_and_concentration. It is not an aggregate Stage 4 gate, and it does not authorize scale quality or production.",
+  "not_reused_prior_result": [
+    "material-input 19/23",
+    "material-input 23/23",
+    "operating-quantity 26/36",
+    "operating-quantity 36/38",
+    "operating-quantity 38/38",
+    "segment-financial 122/132",
+    "segment-financial 102/132",
+    "segment-financial 132/132",
+    "two-company 9/9"
+  ],
+  "stage4_aggregate_expansion_gates_met": false,
+  "replay_artifacts_modified": false,
+  "next_step": "The gate is true only for this four-report read, this plan, and extract_counterparties_and_concentration. Do not edit enqueue.json, run.json, or result.json. Do not import this boolean into the other stage-4 slices."
+}
