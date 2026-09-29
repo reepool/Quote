@@ -53,4 +53,8 @@
 
 不接受的解决办法：事后把 `302132.SZ` 补进 `.2` 的三报告结果；用产销量、分部财务或客户供应商的四报告结果代替材料投入的报告集；在本卡创建材料投入四报告 successor，或修改 `.2` 的历史观察。
 
-因此 2.1 只能冻结这份不相容的合同要素，2.2 以后只能记录 hold。本裁决不预填跨章节分数，也不勾选 2.1 或 2.2。`production_authorization` 保持 `not_authorized`，`scale_quality_claim_allowed` 保持 false。restricted-promotion、六章包、规模质量和生产保持关闭。
+因此 2.1 只能冻结这份不相容的合同要素，2.2 以后只能记录 hold。本裁决不预填跨章节分数，也不勾选 2.1 或 2.2。
+
+## Contract binding
+
+2.1 的落账写在 `contract-binding.md`。它从已审核账本复制四个纳入计划、统一四报告集、各自行的 source-review 与制品哈希，以及五条失败观察的原指标。材料投入 `.2` 仍只有三份报告，没有补入 `302132.SZ`。该文件没有 aggregate 行，没有跨章节分数，也没有把 hold 写成 2.2 的完成结论。已归档的 `ledger.md` 未改。`production_authorization` 保持 `not_authorized`，`scale_quality_claim_allowed` 保持 false。restricted-promotion、六章包、规模质量和生产保持关闭。
