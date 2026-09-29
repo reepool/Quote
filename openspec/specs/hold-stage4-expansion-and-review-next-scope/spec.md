@@ -1,4 +1,10 @@
-## ADDED Requirements
+# hold-stage4-expansion-and-review-next-scope Specification
+
+## Purpose
+
+This hold keeps the Stage 4 observation index read-only. Material-input, operating-quantity, and segment-financial results stay independent by plan, report set, and chapter. The dossier assessment of the four approved 2025 reports is complete, and `extract_counterparties_and_concentration` was implemented and archived in its own change. Neither that local 45/45 nor any earlier local pass creates an aggregate `expansion_gates_met=true`. `scale_quality_claim_allowed` stays false and `production_authorization` stays `not_authorized`. The hold does not open the six-chapter package, scale quality, production, or a successor replay.
+
+## Requirements
 
 ### Requirement: The stage-4 index is read-only
 The change MUST record the archived material-input, operating-quantity, and segment-financial observations as independent rows. Each row MUST keep its chapter, plan, report set, recall, accuracy, critical numeric errors, gate, and archive path. The change MUST NOT recompute those metrics and MUST NOT write a later result back into an earlier replay.
@@ -29,3 +35,12 @@ After scope approval, the only next business assessment MUST be `extract_counter
 - **WHEN** the 1.1 review accepts this hold
 - **THEN** Python, enqueue, and replay remain unchanged
 - **AND** the six-chapter package stays inactive
+
+### Requirement: Closing the hold does not create an aggregate gate
+The completed dossier assessment of the four approved 2025 reports MUST stay in this change. The later `extract_counterparties_and_concentration` implementation and replay MUST remain in their own archived change. That slice's local pass MUST NOT be written into this index as an aggregate `expansion_gates_met=true`. `scale_quality_claim_allowed` MUST remain false and `production_authorization` MUST remain `not_authorized`. Closing this hold MUST NOT open the six-chapter package, scale quality, production, or a successor replay for an archived slice.
+
+#### Scenario: The counterparty pass stays outside this index
+- **WHEN** the hold is archived after the counterparty slice is archived
+- **THEN** this change still has no aggregate Stage 4 gate
+- **AND** the counterparty 45/45 remains a separate observation
+- **AND** production stays `not_authorized`

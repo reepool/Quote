@@ -53,6 +53,10 @@
 - [样本不够时从清单外补报告] → 合同要求停止。
 - [1.1 未过就开始 dossier 或代码] → tasks 把 dossier 放在 1.1 之后，并把实现排除在本 change 之外。
 
+## Close-out
+
+本 change 只保留阶段 4 的只读观察索引和客户供应商 dossier 结论。已批准四份 2025 年报的 dossier 评估已经完成。`extract_counterparties_and_concentration` 的实现、replay 和 source-review 在独立 change `openspec/changes/archive/2026-09-29-scope-manufacturing-materials-stage4-counterparties-and-concentration/` 中完成并归档。那里的局部 45/45 不写入本索引，也不产生 aggregate `expansion_gates_met=true`。`scale_quality_claim_allowed` 保持 false，`production_authorization` 保持 `not_authorized`。阶段 4 停在多条独立研究切片已完成、整体质量门未建立、生产未授权。不启动六章包、下一轮扩大、规模质量或生产，也不为已归档局部观察另建 successor replay。
+
 ## Dossier assessment
 
 2026-09-29 只读核对已批准清单中的四份 2025 年报。文件 SHA-256 与 manifest 一致：300750 `c1527297…048ec9`，603659 `4e81f553…fa35b6`，920015 `4d2c1612…70695a`，302132 `605394bd…5e3020`。页码是 pypdf 一基物理页。页面文本哈希是 `extract_text().strip()` 的 SHA-256。本节不填写 recall、accuracy、critical numeric errors 或 `expansion_gates_met`。
