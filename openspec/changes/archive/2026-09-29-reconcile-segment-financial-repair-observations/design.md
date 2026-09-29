@@ -39,3 +39,13 @@
 - [`.3` 的 132/132 覆盖旧分母] → 合同写明它不回填、不重算 `.1` 或 `.2`。
 - [顺手收口产销量 26/36] → 明确排除，另立独立 reconciliation。
 - [归档移动改变制品字节] → 只使用 `git mv`，并在移动后重算哈希。
+
+## Outcome
+
+两本失败 change 已按保留失败观察归档。原始 task 3.3 与 column-binding task 3.2 仍未勾选，两个 gate 仍为 false。`.3` 的 132/132、144/144 仍是独立局部通过，不回填前两层。没有新建 replay。
+
+- 原始分部财务：`openspec/changes/archive/2026-09-29-scope-manufacturing-materials-stage4-segment-financials/`。recall 122/132，accuracy 129/133，critical numeric errors 4，`expansion_gates_met=false`。enqueue `935578cc64a58a84d84224443354c8a6e5f0d9a6167fd1753cbf156e7079ffe3`，run `974dbbfda8608cd1de535215390a9b1accf67b8e7810a9770966620e2e45634b`，result `7c2d5ea6e6433586b46545ad2c597a3c7cc60016ca1023559e7a137c8117d859`，source-review `ff2f01fd4365cc621dcfeac2b2778d97b446bcf3d73c1d7f3bb06cb7b9035c2d`。
+- 列角色修复：`openspec/changes/archive/2026-09-29-repair-segment-financial-column-binding-and-cell-coverage/`。recall 102/132，accuracy 114/142，critical numeric errors 0，`expansion_gates_met=false`。enqueue `2a4c778790678197eda9472a907b8fc1c132be7f08fdbd5d95a3a0cc86c70f19`，run `b5aad9e75ea4200a385ad107f6c044d7d14787f231156b077888018a68708b5e`，result `6ca3e2960e11f90a13aaaa75e71dc43452344864b78d10db51566f9bff6912b1`，source-review `6851d7d6b80274a03a14b04f7fe200278a7fff53b5ea4ed734c3470bb015a0ff`。
+- footnote `.3`：`openspec/changes/archive/2026-09-29-repair-segment-financial-footnote-dimension-binding/replay/20260929.3`。recall 132/132，accuracy 144/144，critical numeric errors 0，`expansion_gates_met=true`，只覆盖四份冻结 2025 年报、计划 `.2026-09-29.3` 和 `extract_segment_financials`。
+
+`production_authorization` 保持 `not_authorized`，`scale_quality_claim_allowed` 保持 false。不再为这两本失败观察创建 successor replay。

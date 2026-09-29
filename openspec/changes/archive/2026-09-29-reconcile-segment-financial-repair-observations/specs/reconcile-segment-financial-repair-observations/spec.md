@@ -39,3 +39,12 @@ Because archived project changes already retain `expansion_gates_met=false` as h
 - **WHEN** the 1.1 review rejects archiving a failed gate
 - **THEN** both changes stay active
 - **AND** a later successor replay, if any, is a new change rather than an edit of `.1` or `.2`
+
+### Requirement: The completed archive keeps both gates false
+The reconciliation close-out records that both failed changes are archived and their gates remain false. The original change is at `openspec/changes/archive/2026-09-29-scope-manufacturing-materials-stage4-segment-financials/`, with task 3.3 unchecked. The column-binding change is at `openspec/changes/archive/2026-09-29-repair-segment-financial-column-binding-and-cell-coverage/`, with task 3.2 unchecked. The footnote `.3` observation remains the independent slice result of recall 132/132, accuracy 144/144, critical numeric errors 0, and `expansion_gates_met=true` for only the four frozen 2025 reports, plan `manufacturing_materials_stage4_segment_financials.2026-09-29.3`, and `extract_segment_financials`. No further successor replay MUST be created to archive these failed observations.
+
+#### Scenario: Close-out leaves three records in place
+- **WHEN** this reconciliation is archived
+- **THEN** the original gate stays false at 122/132 and 129/133 with four critical errors
+- **AND** the column-binding gate stays false at 102/132 and 114/142 with zero critical errors
+- **AND** the `.3` slice gate stays limited to its own plan and chapter
