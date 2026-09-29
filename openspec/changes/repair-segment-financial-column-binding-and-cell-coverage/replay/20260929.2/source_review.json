@@ -1,0 +1,673 @@
+{
+  "schema_version": "company_profile_segment_financial_stage4_source_review.v1",
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false,
+  "method": "independently_read_official_report",
+  "review_passed": false,
+  "binding": {
+    "enqueue_path": "enqueue.json",
+    "enqueue_sha256": "2a4c778790678197eda9472a907b8fc1c132be7f08fdbd5d95a3a0cc86c70f19",
+    "run_path": "run.json",
+    "run_id": "stage4-segment-financials-20260929.2",
+    "run_sha256": "b5aad9e75ea4200a385ad107f6c044d7d14787f231156b077888018a68708b5e",
+    "plan_version": "manufacturing_materials_stage4_segment_financials.2026-09-29.2",
+    "bundle_dirname": "segment-financial-stage4-segment-financials-20260929.2",
+    "bundle_result_path": "segment-financial-stage4-segment-financials-20260929.2/result.json",
+    "bundle_result_sha256": "6ca3e2960e11f90a13aaaa75e71dc43452344864b78d10db51566f9bff6912b1",
+    "chapter_task": "extract_segment_financials",
+    "disposition": "accepted_for_review",
+    "provider_calls": 0,
+    "fact_rows_in_bundle": 210,
+    "measurement_rows_in_bundle": 142,
+    "coverage_rows_in_bundle": 16,
+    "bundle_fact_count_not_used_as_denominator": true
+  },
+  "denominator_rule": "A disclosed fact is one current-period cell on a formal segment table: operating revenue, operating cost, or a gross-margin percentage printed in the margin column. Identity is instrument, source section, row label, and field. The same amount under two labels or two sections is two facts. A restatement of the same section, label, and field on another table is one fact. Prior-year columns, year-over-year columns, empty margin cells, empty elimination amounts, the company-level 29.98% profit-structure line, 其中 restatements, asset and liability rows, and a cost-composition line that only repeats an already counted segment cost are outside the denominator. The 210 bundle facts were not used to build this denominator, and the prior 122/132 and 129/133 results were not reused.",
+  "reports_reread": [
+    "300750.SZ",
+    "603659.SH",
+    "920015.BJ",
+    "302132.SZ"
+  ],
+  "page_text_hashes": [
+    {
+      "instrument_id": "300750.SZ",
+      "page": 24,
+      "sha256": "d590a28c356544c61e7416e25560629802f0450c7fd6dc03c8baa3b2005fa99b"
+    },
+    {
+      "instrument_id": "300750.SZ",
+      "page": 25,
+      "sha256": "93950e14db5ad073505954e8766cd4fe469ce73beada7ff0ff9c6e27c4044394"
+    },
+    {
+      "instrument_id": "300750.SZ",
+      "page": 195,
+      "sha256": "c3dff438cb1ac2e0e729719825c2ddacf0a2e33e4c763b23b76fd0ed64cc8a3c"
+    },
+    {
+      "instrument_id": "300750.SZ",
+      "page": 223,
+      "sha256": "2526a76fb7195aed05f6f785f58ab66640113b0e75787df274d349cdcbc3401b"
+    },
+    {
+      "instrument_id": "603659.SH",
+      "page": 18,
+      "sha256": "eff7c1d501a3b1919c13a64ba56c38b6d820e600d2cca595bc6bf1670a0ef25e"
+    },
+    {
+      "instrument_id": "603659.SH",
+      "page": 19,
+      "sha256": "efa2a62fe3cf80ce2f4b1e8ddbb56c943fe1c6cca65172d5bcd85d5e144cf772"
+    },
+    {
+      "instrument_id": "920015.BJ",
+      "page": 16,
+      "sha256": "d7cadd1441275e76475ce455aba690dab4ad03d06639c5eabd01039de9a5d937"
+    },
+    {
+      "instrument_id": "920015.BJ",
+      "page": 17,
+      "sha256": "4c850ade55e57bacc3b0b903fab9293f0fd521eab4152fb18f3d2eb1d57d1d4e"
+    },
+    {
+      "instrument_id": "920015.BJ",
+      "page": 139,
+      "sha256": "8581b73e7fc0d5a40668f5bd23f77071a96de25084661d0025578b779bd89a81"
+    },
+    {
+      "instrument_id": "302132.SZ",
+      "page": 14,
+      "sha256": "e3e26810d2fecf55c873cbfe3ae45931baedad4d4434a27a6d8f78f856e12b05"
+    },
+    {
+      "instrument_id": "302132.SZ",
+      "page": 15,
+      "sha256": "d5b8211968aeb05676f5a17ac7fbe29eedad48b9c92b5f75555efa75c97b395b"
+    },
+    {
+      "instrument_id": "302132.SZ",
+      "page": 178,
+      "sha256": "ab5c3c96a9e83ce769fb949d3029328dc495ca04cace274107ca6bb150986232"
+    }
+  ],
+  "evidence_binding": {
+    "measurement_rows_checked": 142,
+    "bounded_quotes_contained_in_physical_page_text": 142,
+    "report_identity_matches_enqueue": true,
+    "report_period": "2025-12-31",
+    "units_match_table_headers": true,
+    "source_dimension_matches_printed_section": false,
+    "consolidation_adjustment_only_on_elimination_labels": true,
+    "page_text_hash_method": "sha256 of pypdf extract_text().strip()"
+  },
+  "per_company": [
+    {
+      "instrument_id": "300750.SZ",
+      "disclosed_cells": 32,
+      "correctly_recalled": 32,
+      "missing_cells": 0,
+      "delivered_measurement_rows": 37,
+      "accurate_measurement_rows": 37,
+      "critical_numeric_errors": 0
+    },
+    {
+      "instrument_id": "603659.SH",
+      "disclosed_cells": 29,
+      "correctly_recalled": 29,
+      "missing_cells": 0,
+      "delivered_measurement_rows": 29,
+      "accurate_measurement_rows": 29,
+      "critical_numeric_errors": 0
+    },
+    {
+      "instrument_id": "920015.BJ",
+      "disclosed_cells": 40,
+      "correctly_recalled": 24,
+      "missing_cells": 16,
+      "delivered_measurement_rows": 40,
+      "accurate_measurement_rows": 26,
+      "critical_numeric_errors": 0
+    },
+    {
+      "instrument_id": "302132.SZ",
+      "disclosed_cells": 31,
+      "correctly_recalled": 17,
+      "missing_cells": 14,
+      "delivered_measurement_rows": 36,
+      "accurate_measurement_rows": 22,
+      "critical_numeric_errors": 0
+    }
+  ],
+  "repaired_cells_delivered_once": [
+    {
+      "instrument_id": "300750.SZ",
+      "page": 24,
+      "source_dimension": "营业收入构成",
+      "label": "营业收入合计",
+      "field_id": "operating_revenue",
+      "value": "423,701,834",
+      "unit": "千元"
+    },
+    {
+      "instrument_id": "300750.SZ",
+      "page": 25,
+      "source_dimension": "分产品",
+      "label": "其他业务",
+      "field_id": "operating_revenue",
+      "value": "16,916,612",
+      "unit": "千元"
+    },
+    {
+      "instrument_id": "300750.SZ",
+      "page": 195,
+      "source_dimension": "营业收入和营业成本",
+      "label": "主营业务",
+      "field_id": "operating_revenue",
+      "value": "406,785,222",
+      "unit": "千元"
+    },
+    {
+      "instrument_id": "300750.SZ",
+      "page": 195,
+      "source_dimension": "营业收入和营业成本",
+      "label": "主营业务",
+      "field_id": "operating_cost",
+      "value": "308,033,498",
+      "unit": "千元"
+    },
+    {
+      "instrument_id": "300750.SZ",
+      "page": 195,
+      "source_dimension": "营业收入和营业成本",
+      "label": "其他业务",
+      "field_id": "operating_cost",
+      "value": "4,349,799",
+      "unit": "千元"
+    },
+    {
+      "instrument_id": "300750.SZ",
+      "page": 195,
+      "source_dimension": "营业收入和营业成本",
+      "label": "合计",
+      "field_id": "operating_cost",
+      "value": "312,383,297",
+      "unit": "千元"
+    },
+    {
+      "instrument_id": "920015.BJ",
+      "page": 16,
+      "source_dimension": "收入构成",
+      "label": "主营业务收入",
+      "field_id": "operating_revenue",
+      "value": "1,014,715,549.55",
+      "unit": "元"
+    },
+    {
+      "instrument_id": "920015.BJ",
+      "page": 16,
+      "source_dimension": "收入构成",
+      "label": "主营业务成本",
+      "field_id": "operating_cost",
+      "value": "708,496,694.98",
+      "unit": "元"
+    },
+    {
+      "instrument_id": "302132.SZ",
+      "page": 14,
+      "source_dimension": "营业收入构成",
+      "label": "营业收入合计",
+      "field_id": "operating_revenue",
+      "value": "75,358,958,001.86",
+      "unit": "元"
+    },
+    {
+      "instrument_id": "302132.SZ",
+      "page": 15,
+      "source_dimension": "营业成本构成",
+      "label": "其他",
+      "field_id": "operating_cost",
+      "value": "1,062,261,143.96",
+      "unit": "元"
+    }
+  ],
+  "page25_prior_year_misbindings_absent": [
+    "251,677,045",
+    "69.52%",
+    "110,335,509",
+    "30.48%"
+  ],
+  "page25_retained_region_cells": [
+    {
+      "label": "境内",
+      "field_id": "operating_cost",
+      "value": "223,497,885"
+    },
+    {
+      "label": "境内",
+      "field_id": "gross_margin_reported",
+      "value": "24.00%"
+    },
+    {
+      "label": "境外",
+      "field_id": "operating_cost",
+      "value": "88,885,412"
+    },
+    {
+      "label": "境外",
+      "field_id": "gross_margin_reported",
+      "value": "31.44%"
+    }
+  ],
+  "missing_disclosures": [
+    {
+      "instrument_id": "920015.BJ",
+      "page": 139,
+      "source_dimension": "地区分部",
+      "label": "境内",
+      "field_id": "operating_revenue",
+      "value": "895,512,828.11",
+      "unit": "元"
+    },
+    {
+      "instrument_id": "920015.BJ",
+      "page": 139,
+      "source_dimension": "地区分部",
+      "label": "境内",
+      "field_id": "operating_cost",
+      "value": "641,113,535.22",
+      "unit": "元"
+    },
+    {
+      "instrument_id": "920015.BJ",
+      "page": 139,
+      "source_dimension": "地区分部",
+      "label": "境外",
+      "field_id": "operating_revenue",
+      "value": "136,784,748.74",
+      "unit": "元"
+    },
+    {
+      "instrument_id": "920015.BJ",
+      "page": 139,
+      "source_dimension": "地区分部",
+      "label": "境外",
+      "field_id": "operating_cost",
+      "value": "81,751,343.79",
+      "unit": "元"
+    },
+    {
+      "instrument_id": "920015.BJ",
+      "page": 139,
+      "source_dimension": "地区分部",
+      "label": "合计",
+      "field_id": "operating_revenue",
+      "value": "1,032,297,576.85",
+      "unit": "元"
+    },
+    {
+      "instrument_id": "920015.BJ",
+      "page": 139,
+      "source_dimension": "地区分部",
+      "label": "合计",
+      "field_id": "operating_cost",
+      "value": "722,864,879.01",
+      "unit": "元"
+    },
+    {
+      "instrument_id": "920015.BJ",
+      "page": 139,
+      "source_dimension": "业务分部",
+      "label": "硅烷交联剂",
+      "field_id": "operating_revenue",
+      "value": "575,652,405.05",
+      "unit": "元"
+    },
+    {
+      "instrument_id": "920015.BJ",
+      "page": 139,
+      "source_dimension": "业务分部",
+      "label": "硅烷交联剂",
+      "field_id": "operating_cost",
+      "value": "456,934,716.38",
+      "unit": "元"
+    },
+    {
+      "instrument_id": "920015.BJ",
+      "page": 139,
+      "source_dimension": "业务分部",
+      "label": "羟胺盐",
+      "field_id": "operating_revenue",
+      "value": "285,241,030.19",
+      "unit": "元"
+    },
+    {
+      "instrument_id": "920015.BJ",
+      "page": 139,
+      "source_dimension": "业务分部",
+      "label": "羟胺盐",
+      "field_id": "operating_cost",
+      "value": "159,734,692.43",
+      "unit": "元"
+    },
+    {
+      "instrument_id": "920015.BJ",
+      "page": 139,
+      "source_dimension": "业务分部",
+      "label": "其他主营产品",
+      "field_id": "operating_revenue",
+      "value": "153,822,114.31",
+      "unit": "元"
+    },
+    {
+      "instrument_id": "920015.BJ",
+      "page": 139,
+      "source_dimension": "业务分部",
+      "label": "其他主营产品",
+      "field_id": "operating_cost",
+      "value": "91,827,286.17",
+      "unit": "元"
+    },
+    {
+      "instrument_id": "920015.BJ",
+      "page": 139,
+      "source_dimension": "业务分部",
+      "label": "其他",
+      "field_id": "operating_revenue",
+      "value": "17,582,027.30",
+      "unit": "元"
+    },
+    {
+      "instrument_id": "920015.BJ",
+      "page": 139,
+      "source_dimension": "业务分部",
+      "label": "其他",
+      "field_id": "operating_cost",
+      "value": "14,368,184.03",
+      "unit": "元"
+    },
+    {
+      "instrument_id": "920015.BJ",
+      "page": 139,
+      "source_dimension": "业务分部",
+      "label": "合计",
+      "field_id": "operating_revenue",
+      "value": "1,032,297,576.85",
+      "unit": "元"
+    },
+    {
+      "instrument_id": "920015.BJ",
+      "page": 139,
+      "source_dimension": "业务分部",
+      "label": "合计",
+      "field_id": "operating_cost",
+      "value": "722,864,879.01",
+      "unit": "元"
+    },
+    {
+      "instrument_id": "302132.SZ",
+      "page": 178,
+      "source_dimension": "报告分部的财务信息",
+      "label": "西南分部",
+      "field_id": "operating_revenue",
+      "value": "75,978,283,261.22",
+      "unit": "元"
+    },
+    {
+      "instrument_id": "302132.SZ",
+      "page": 178,
+      "source_dimension": "报告分部的财务信息",
+      "label": "西南分部",
+      "field_id": "operating_cost",
+      "value": "70,230,919,218.85",
+      "unit": "元"
+    },
+    {
+      "instrument_id": "302132.SZ",
+      "page": 178,
+      "source_dimension": "报告分部的财务信息",
+      "label": "华中分部",
+      "field_id": "operating_revenue",
+      "value": "625,322,175.89",
+      "unit": "元"
+    },
+    {
+      "instrument_id": "302132.SZ",
+      "page": 178,
+      "source_dimension": "报告分部的财务信息",
+      "label": "华中分部",
+      "field_id": "operating_cost",
+      "value": "561,218,695.77",
+      "unit": "元"
+    },
+    {
+      "instrument_id": "302132.SZ",
+      "page": 178,
+      "source_dimension": "报告分部的财务信息",
+      "label": "西北分部",
+      "field_id": "operating_revenue",
+      "value": "1,906,280,413.25",
+      "unit": "元"
+    },
+    {
+      "instrument_id": "302132.SZ",
+      "page": 178,
+      "source_dimension": "报告分部的财务信息",
+      "label": "西北分部",
+      "field_id": "operating_cost",
+      "value": "1,404,651,012.67",
+      "unit": "元"
+    },
+    {
+      "instrument_id": "302132.SZ",
+      "page": 178,
+      "source_dimension": "报告分部的财务信息",
+      "label": "华东分部",
+      "field_id": "operating_revenue",
+      "value": "206,785,336.59",
+      "unit": "元"
+    },
+    {
+      "instrument_id": "302132.SZ",
+      "page": 178,
+      "source_dimension": "报告分部的财务信息",
+      "label": "华东分部",
+      "field_id": "operating_cost",
+      "value": "167,504,503.99",
+      "unit": "元"
+    },
+    {
+      "instrument_id": "302132.SZ",
+      "page": 178,
+      "source_dimension": "报告分部的财务信息",
+      "label": "华北分部",
+      "field_id": "operating_revenue",
+      "value": "248,873,530.99",
+      "unit": "元"
+    },
+    {
+      "instrument_id": "302132.SZ",
+      "page": 178,
+      "source_dimension": "报告分部的财务信息",
+      "label": "华北分部",
+      "field_id": "operating_cost",
+      "value": "156,019,354.67",
+      "unit": "元"
+    },
+    {
+      "instrument_id": "302132.SZ",
+      "page": 178,
+      "source_dimension": "报告分部的财务信息",
+      "label": "分部间抵销",
+      "field_id": "operating_revenue",
+      "value": "-3,606,586,716.08",
+      "unit": "元"
+    },
+    {
+      "instrument_id": "302132.SZ",
+      "page": 178,
+      "source_dimension": "报告分部的财务信息",
+      "label": "分部间抵销",
+      "field_id": "operating_cost",
+      "value": "-3,536,259,900.08",
+      "unit": "元"
+    },
+    {
+      "instrument_id": "302132.SZ",
+      "page": 178,
+      "source_dimension": "报告分部的财务信息",
+      "label": "合计",
+      "field_id": "operating_revenue",
+      "value": "75,358,958,001.86",
+      "unit": "元"
+    },
+    {
+      "instrument_id": "302132.SZ",
+      "page": 178,
+      "source_dimension": "报告分部的财务信息",
+      "label": "合计",
+      "field_id": "operating_cost",
+      "value": "68,984,052,885.87",
+      "unit": "元"
+    }
+  ],
+  "dimension_mismatches": [
+    {
+      "instrument_id": "920015.BJ",
+      "page": 139,
+      "printed_sections": [
+        "地区分部",
+        "业务分部"
+      ],
+      "stored_source_dimension": "报告分部",
+      "delivered_rows": 14,
+      "business_total_not_stored_separately": true,
+      "note": "Region and business columns were stored under the default section name. The business 合计 amount remains inside the product-row quote and is not a separate 业务分部 total."
+    },
+    {
+      "instrument_id": "302132.SZ",
+      "page": 178,
+      "printed_sections": [
+        "报告分部的财务信息"
+      ],
+      "stored_source_dimension": "报告分部",
+      "delivered_rows": 14,
+      "note": "The five segments, 分部间抵销, and 合计 keep the printed current amounts and consolidation_adjustment on the elimination label, under the default section name."
+    }
+  ],
+  "critical_numeric_errors_detail": [],
+  "boundary_checks": {
+    "300750_page25_prior_year_columns": "251,677,045, 69.52%, 110,335,509, and 30.48% are absent; domestic cost 223,497,885 with margin 24.00% and overseas cost 88,885,412 with margin 31.44% remain",
+    "300750_single_operating_segment": "page 223 coverage is not_applicable for segment_dimension, operating_revenue, operating_cost, and gross_margin_reported",
+    "300750_sales_mode": "page 25 coverage is not_disclosed for 分销售模式; no sales-mode amount was invented",
+    "300750_note50": "page 195 current 主营业务 revenue and cost, 其他业务 cost, and 合计 cost are present once; 其他业务 revenue and 合计 revenue repeat the composition cells and stay outside the denominator",
+    "603659_change_columns": "118.30 and 104.19 are absent from every stored value; 合并抵消项 gross margin coverage is not_disclosed",
+    "603659_elimination": "合并抵消项 revenue -2,098,859,323.96 and cost -2,070,706,126.81 use row_class consolidation_adjustment",
+    "920015_total_dash": "page 17 分产品 and 分地区 合计 margin coverage is not_disclosed; no stored 0",
+    "920015_company_margin": "29.98% is absent from stored segment margins",
+    "920015_blank_elimination": "page 139 stores one unclear revenue coverage and one unclear cost coverage for 分部间抵销, with no stored 0; the two printed sections are not kept apart",
+    "920015_page16": "主营业务收入 1,014,715,549.55 and 主营业务成本 708,496,694.98 are present once under 收入构成; page 16 其他业务收入 and 其他业务成本 repeat page 17 and stay outside the denominator",
+    "302132_pages_15_and_178": "page 15 margins 7.65%, 8.50%, and 8.46% stay separate from page 178 elimination amounts",
+    "302132_note_margin": "page 178 gross_margin_reported coverage is not_disclosed; no margin was calculated",
+    "302132_cost_composition_other": "page 15 营业成本构成 其他 cost 1,062,261,143.96 is present once; the 航空制造业 cost on that table repeats the 10% row and stays outside the denominator"
+  },
+  "exclusions": [
+    {
+      "instrument_id": "300750.SZ",
+      "item": "Note 50 其他业务 revenue 16,916,612 and 合计 revenue 423,701,834",
+      "outcome": "same_current_amount_as_the_composition_table",
+      "in_denominator": false
+    },
+    {
+      "instrument_id": "300750.SZ",
+      "item": "Prior-year composition columns and year-over-year percentages",
+      "outcome": "comparative_or_change_column",
+      "in_denominator": false
+    },
+    {
+      "instrument_id": "603659.SH",
+      "item": "合并抵消项 margin cell and the 118.30 / 104.19 change columns",
+      "outcome": "empty_margin_and_change_columns",
+      "in_denominator": false
+    },
+    {
+      "instrument_id": "920015.BJ",
+      "item": "Page 16 company gross margin 29.98%",
+      "outcome": "company_profit_structure_not_a_segment_row",
+      "in_denominator": false
+    },
+    {
+      "instrument_id": "920015.BJ",
+      "item": "Page 16 其他业务收入 and 其他业务成本",
+      "outcome": "same_cells_as_page_17_其他业务收入",
+      "in_denominator": false
+    },
+    {
+      "instrument_id": "920015.BJ",
+      "item": "Page 17 total-row dashes and page 139 empty 分部间抵销 cells",
+      "outcome": "not_disclosed_or_unclear",
+      "in_denominator": false
+    },
+    {
+      "instrument_id": "920015.BJ",
+      "item": "Page 139 其中 contract-revenue line",
+      "outcome": "restatement_of_the_revenue_row",
+      "in_denominator": false
+    },
+    {
+      "instrument_id": "302132.SZ",
+      "item": "Page 178 asset and liability rows, and the absent note margin",
+      "outcome": "not_segment_revenue_cost_or_reported_margin",
+      "in_denominator": false
+    },
+    {
+      "instrument_id": "302132.SZ",
+      "item": "Page 15 航空制造业 cost in 营业成本构成",
+      "outcome": "same_cost_as_the_10_percent_table_row",
+      "in_denominator": false
+    }
+  ],
+  "source_recall": {
+    "numerator": 102,
+    "denominator": 132,
+    "value": 0.7727272727272727,
+    "by_company": {
+      "300750.SZ": {
+        "numerator": 32,
+        "denominator": 32
+      },
+      "603659.SH": {
+        "numerator": 29,
+        "denominator": 29
+      },
+      "920015.BJ": {
+        "numerator": 24,
+        "denominator": 40
+      },
+      "302132.SZ": {
+        "numerator": 17,
+        "denominator": 31
+      }
+    }
+  },
+  "source_accuracy": {
+    "numerator": 114,
+    "denominator": 142,
+    "value": 0.8028169014084507
+  },
+  "critical_numeric_errors": 0,
+  "expansion_gates_met": false,
+  "gate_rule": "expansion_gates_met is true only when all four reports were reread, source recall equals 1, source accuracy equals 1, and critical numeric errors equal 0. Empty margin cells, empty elimination amounts, and not_applicable single-segment coverage are not recall gaps. The boolean is that conjunction for this four-report read. It does not authorize another expansion, a scale-quality claim, or production.",
+  "not_reused_prior_result": [
+    "segment-financial 122/132",
+    "segment-financial 129/133",
+    "operating-quantity 26/36",
+    "operating-quantity 36/38",
+    "operating-quantity 38/38",
+    "material-input 19/23",
+    "material-input 23/23",
+    "two-company 9/9"
+  ],
+  "replay_artifacts_modified": false,
+  "next_step": "The gate is false. Page 139 and page 178 section names were not bound, so those current cells are not recalled. Do not edit enqueue.json, run.json, or result.json in this replay directory. Do not archive this change as a pass. Do not rewrite replay/20260928."
+}
