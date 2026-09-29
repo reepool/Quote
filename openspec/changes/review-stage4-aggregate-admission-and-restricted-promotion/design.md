@@ -52,3 +52,38 @@
 - [用失败观察缺失来制造 true] → 原始 26/36、36/38、122/132、102/132 必须留在账本里。
 - [hold 被写成新的 recall 分数] → 2.2 只写 hold 或不允许 promotion 设计，不发明跨章节指标。
 - [审核滑进实现] → 1.1 通过前不落账；全程不改 Python、不 replay、不改控制面。
+
+## Admission
+
+2.2 只根据已审核的 `ledger.md` 和本 change 的范围合同作判断。没有重读业务事实，没有重算指标，也没有修改账本。
+
+### 合同条件
+
+| 条件 | 账本与合同中的状态 |
+|---|---|
+| 书面 aggregate gate 合同 | 没有。本 change 是准入审核，不是那份合同。 |
+| 合同点名纳入的章节和计划 | 没有。九行各自有计划，没有一份合同把它们收成一个集合。 |
+| 逐计划 source-review | 九行各自有 source-review。没有 aggregate 合同指定哪些行纳入。 |
+| 同一报告集 | 不满足。MI-1、MI-2 是三份报告；OQ、SF、CP 七行是四份报告。 |
+| 合同要求的 SZSE、SSE、BSE 覆盖 | 没有 aggregate 合同提出这个要求。各行自己的报告集不能拼成一个报告集。 |
+| 保留失败观察和 critical numeric errors | 账本保留了这些行，没有被后续局部 true 覆盖。 |
+| 禁止局部 true 回填或跨章节相加 | 账本没有回填，也没有跨章节分数。 |
+
+### 当前不满足项
+
+- 材料投入 `.2` 的三报告集与其余四报告切片不是同一报告集。
+- 产销量仍有 26/36 和 36/38 两条失败观察。原始观察的 critical numeric errors 是 1。
+- 分部财务仍有 122/132 和 102/132 两条失败观察。原始观察的 critical numeric errors 是 4。
+- 23/23、38/38、132/132、45/45 的 gate 范围分别限于自己的计划、报告集和章节。
+- 没有一份已经独立审核通过、点名章节集合和统一样本口径的 Stage 4 aggregate quality gate 合同。
+
+### 结论
+
+准入结论是 **hold**。
+
+- 不产生 aggregate `expansion_gates_met=true`。
+- 不计算跨章节 recall、accuracy 或 critical-error 分数。
+- 不授权 restricted-promotion 设计或实现。
+- 不启动六章包、规模质量或生产。
+
+`production_authorization` 保持 `not_authorized`。`scale_quality_claim_allowed` 保持 false。publication、closure、mode、identity、checkpoint 不改。不创建 successor replay，不改历史制品。除非将来另有独立、书面且通过审核的 aggregate gate 合同，阶段 4 继续保持只读 hold。
