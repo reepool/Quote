@@ -1,0 +1,11 @@
+{
+  "schema_version": "company_profile_segment_financial_research_run.v1",
+  "chapter_task": "extract_segment_financials",
+  "disposition": "accepted_for_review",
+  "provider_calls": 0,
+  "production_authorization": "not_authorized",
+  "plan_version": "manufacturing_materials_stage4_segment_financials.2026-09-29.3",
+  "enqueue_sha256": "0f2ebfa087f8aa4327d15d4e0366af568bcd06a41ab923ba595899ec4e3cdd9b",
+  "bundle_dirname": "segment-financial-stage4-segment-financials-20260929.3",
+  "run_id": "stage4-segment-financials-20260929.3"
+}

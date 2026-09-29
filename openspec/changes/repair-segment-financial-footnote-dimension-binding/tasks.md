@@ -4,8 +4,8 @@
 
 ## 2. Minimum repair, not yet authorized
 
-- [ ] 2.1 After 1.1, bind each footnote table to its printed section title and reset the previous table's section state when the next printed title starts. Keep same-amount totals, ordinary rows, and elimination columns in their own sections. Do not hard-code a security code, page number, company name, or product name in the runtime extractor
-- [ ] 2.2 Add directed tests for the two page-139 sections, the page-178 printed title, the unmerged same-amount rows, and the unchanged column-role, ten-cell, elimination, dash, and company-margin boundaries. Do not enqueue or replay in this task
+- [x] 2.1 After 1.1, bind each footnote table to its printed section title and reset the previous table's section state when the next printed title starts. Keep same-amount totals, ordinary rows, and elimination columns in their own sections. Do not hard-code a security code, page number, company name, or product name in the runtime extractor
+- [x] 2.2 Add directed tests for the two page-139 sections, the page-178 printed title, the unmerged same-amount rows, and the unchanged column-role, ten-cell, elimination, dash, and company-margin boundaries. Do not enqueue or replay in this task
 
 ## 3. Successor replay and source review, not yet authorized
 
