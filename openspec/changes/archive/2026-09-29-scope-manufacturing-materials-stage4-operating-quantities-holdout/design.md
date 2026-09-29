@@ -68,3 +68,7 @@
 ## Open Questions
 
 - 无。1.1 审核前不把 `302132.SZ` 预定为已经适合，也不预设产销量召回或 gate。
+
+## Retained failed observation
+
+`replay/20260928` 保持 source recall 26/36，source accuracy 26/27，critical numeric errors 1，`expansion_gates_met=false`。失败点是第 15 页 PVDF「有效产能超过 3 万吨」被绑到「勃姆石和氧化铝」的精确 3。task 3.2 与 task 3.3 不勾选。四份制品哈希保持 enqueue `5fffde878890fb43c136c4e0082f4eba32fc9e65402e166a96cca164396fab7a`、run `3fa107b4bf914cf7603ee1e2e73937392a04ad95bf52df4e68d5bff304a5e9cf`、result `67e37d98ed0d0dc57f9672f6ef224482db52fc3e9ce96ece8f366866a1e87302`、source-review `5568d4ee73cbc332c63cb935fba42a13ea99e4dfe0344f6b700ad4fcc212ab0b`。已归档 Putailai `.2` 的 36/38 和 CATL `.3` 的 38/38 不回填本观察。本 change 作为保留失败观察归档。
