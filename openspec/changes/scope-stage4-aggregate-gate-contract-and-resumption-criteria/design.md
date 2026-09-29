@@ -58,3 +58,24 @@
 ## Contract binding
 
 2.1 的落账写在 `contract-binding.md`。它从已审核账本复制四个纳入计划、统一四报告集、各自行的 source-review 与制品哈希，以及五条失败观察的原指标。材料投入 `.2` 仍只有三份报告，没有补入 `302132.SZ`。该文件没有 aggregate 行，没有跨章节分数，也没有把 hold 写成 2.2 的完成结论。已归档的 `ledger.md` 未改。`production_authorization` 保持 `not_authorized`，`scale_quality_claim_allowed` 保持 false。restricted-promotion、六章包、规模质量和生产保持关闭。
+
+## Contract application
+
+2.2 只读取 `contract-binding.md`、已审核账本和本合同。没有重算九行观察，也没有修改 `contract-binding.md` 或历史账本。
+
+| 条件 | 结果 |
+|---|---|
+| 四个纳入计划都满足同一四报告集 | 不满足。OQ-3、SF-3、CP-1 是四报告；MI-2 是三报告。 |
+| MI-2 满足包含 `302132.SZ` 的 aggregate 报告集 | 不满足。MI-2 只有 `300750.SZ`、`603659.SH`、`920015.BJ`。 |
+| 每个计划有自己的 source-review、身份和制品绑定 | 满足。四行哈希各自绑定，没有跨计划串用。MI-2 与 OQ-3 的 processing identity 为空。 |
+| 五条失败观察和 critical numeric errors 仍被保留 | 满足。产销量 critical numeric errors 为 1，分部财务为 4。 |
+| 局部 gate 被回填或跨章节相加 | 没有。 |
+
+准入结论是 **hold**。
+
+- 不产生 aggregate `expansion_gates_met=true`。
+- 不创建跨章节 recall、accuracy 或 critical-error 分数。
+- 不授权 restricted-promotion 设计。
+- 不启动六章包、规模质量或生产。
+
+`production_authorization` 保持 `not_authorized`。`scale_quality_claim_allowed` 保持 false。publication、closure、mode、identity、checkpoint 不改。不创建材料投入四报告 successor，不改历史制品。
