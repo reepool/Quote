@@ -1,6 +1,6 @@
 ## 1. Scope review gate
 
-- [ ] 1.1 Independent review accepts this read-only admission contract: the three-layer ledger only copies archived observations, local true gates stay inside their own plan, report set, and chapter, and a missing aggregate contract or any unmet condition yields hold. Do not check 1.1 until that review. Do not change Python, enqueue, replay, publication, closure, mode, identity, or any archived artifact. Do not add a report, preset an aggregate `expansion_gates_met=true`, or invent a cross-chapter metric. Do not start the six-chapter package, scale quality, production, or a restricted-promotion implementation
+- [x] 1.1 Independent review accepts this read-only admission contract: the three-layer ledger only copies archived observations, local true gates stay inside their own plan, report set, and chapter, and a missing aggregate contract or any unmet condition yields hold. The 1.1 review accepted this contract. Do not change Python, enqueue, replay, publication, closure, mode, identity, checkpoint, or any archived artifact. Do not add a report, preset an aggregate `expansion_gates_met=true`, or invent a cross-chapter metric. Do not start the six-chapter package, scale quality, production, or a restricted-promotion implementation
 
 ## 2. Ledger and admission, not yet authorized
 
