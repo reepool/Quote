@@ -5,7 +5,7 @@
 ## 2. Freeze and judgment, not yet authorized
 
 - [x] 2.1 After 1.1, record the frozen chapters, plan versions, four-report set, exchange coverage, and failure-retention rules from this contract. Copy bindings from the existing ledger. Do not recompute the nine historical observations or edit archived files. The copy is `contract-binding.md`. Material-input `.2` stays a three-report row. This task does not record the 2.2 hold. Independent review accepted the binding. Do not start 2.2 in that review
-- [ ] 2.2 After 2.1, apply this contract to that ledger. If any condition fails, record hold. Do not invent aggregate `expansion_gates_met=true` or a cross-chapter score, and do not authorize restricted-promotion design in that task. The application is in design.md under "Contract application": hold, because MI-2 is a three-report row and the aggregate set includes `302132.SZ`. `contract-binding.md` is unchanged. Leave this box unchecked until that judgment is reviewed
+- [x] 2.2 After 2.1, apply this contract to that ledger. If any condition fails, record hold. Do not invent aggregate `expansion_gates_met=true` or a cross-chapter score, and do not authorize restricted-promotion design in that task. The application is in design.md under "Contract application": hold, because MI-2 is a three-report row and the aggregate set includes `302132.SZ`. `contract-binding.md` is unchanged. Independent review accepted this hold. Do not archive in that review
 
 ## 3. Archive, not yet authorized
 
