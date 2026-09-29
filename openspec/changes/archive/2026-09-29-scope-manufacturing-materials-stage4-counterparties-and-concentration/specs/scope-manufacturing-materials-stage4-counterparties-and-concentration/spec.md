@@ -30,3 +30,12 @@ Readable omission of an applicable name MUST be `not_disclosed`. An express or s
 - **THEN** the contract item is `not_applicable`
 - **AND** the concentration Measurement remains observed
 - **AND** missing counterparty names stay `not_disclosed` rather than `extraction_failed`
+
+### Requirement: The closed observation stays slice-limited
+The archived observation MUST record source recall 45/45, source accuracy 45/45, critical numeric errors 0, and `expansion_gates_met=true` only for plan `manufacturing_materials_stage4_counterparties.2026-09-29.1`, the four frozen 2025 reports, and `extract_counterparties_and_concentration`. The source-review SHA-256 MUST remain `b2c38f9fa1cf947ab69e542606332689ac25ea1e6df63facc50ac6a1fa56baf4`. The enqueue, run, and result SHA-256 MUST remain `7e9c1a72f11723f2d8508d751c27f8ea3f96cae048eb0ab6edc6224eb301bf7a`, `8d3c7bd7a6c1f81a2e2b76064eb3d7fe9685d7570442a1e4d113b786a4cf0d7f`, and `b0344d3d577f423a1716b6dacc7c46b100ef3fe9ddddb5d37ef0160c2458a57a`. Stage 4 MUST NOT gain an aggregate gate from this result. The change MUST NOT authorize the six-chapter package, another expansion, scale quality, or production.
+
+#### Scenario: A local pass does not open the next expansion
+- **WHEN** a reader sees the counterparty gate true
+- **THEN** the true value stays limited to this plan, these four reports, and this chapter
+- **AND** `stage4_aggregate_expansion_gates_met` stays false
+- **AND** scale quality and production stay unauthorized

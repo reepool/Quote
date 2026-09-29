@@ -36,3 +36,9 @@
 - [金额相同就合并合同行和排名行] → 合同要求原文写明同一性，金额相同不足。
 - [用关联交易表补上未列名的前五名] → 前五名 name coverage 保持 `not_disclosed`，其他表的关系即使存在也独立，并且不在本章回填。
 - [实现滑进 common-core 或六章包] → 输出只限研究隔离目录和 `accepted_for_review`。
+
+## Outcome
+
+2026-09-29 的独立 source-review 接受本次观察。计划 `manufacturing_materials_stage4_counterparties.2026-09-29.1`，run id `stage4-counterparties-20260929`，目录 `replay/20260929`。分母来自四份年报的正式披露，不是 bundle 的 45 行。recall 45/45，accuracy 45/45，critical numeric errors 0，`expansion_gates_met=true`。source-review SHA-256 是 `b2c38f9fa1cf947ab69e542606332689ac25ea1e6df63facc50ac6a1fa56baf4`。enqueue、run、result 的 SHA-256 分别是 `7e9c1a72f11723f2d8508d751c27f8ea3f96cae048eb0ab6edc6224eb301bf7a`、`8d3c7bd7a6c1f81a2e2b76064eb3d7fe9685d7570442a1e4d113b786a4cf0d7f`、`b0344d3d577f423a1716b6dacc7c46b100ef3fe9ddddb5d37ef0160c2458a57a`。
+
+这个 true 只覆盖该计划、四份冻结 2025 年报和 `extract_counterparties_and_concentration`。Stage 4 没有 aggregate gate。`stage4_aggregate_expansion_gates_met` 保持 false。不能据此启动六章包、下一轮扩大、规模质量或生产。`scale_quality_claim_allowed` 保持 false，`production_authorization` 保持 `not_authorized`。材料投入、产销量和分部财务的历史观察不改，也不另建 replay。
