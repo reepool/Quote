@@ -9,4 +9,4 @@
 
 ## 3. Archive, not yet authorized
 
-- [ ] 3.1 After 2.2, record the admission conclusion and archive this read-only review. Do not create a successor replay, and do not open scale quality or production
+- [x] 3.1 After 2.2, record the admission conclusion and archive this read-only review. The conclusion remains hold. `ledger.md` keeps nine rows and no aggregate row. design.md Admission stays the hold record. Archive to `openspec/changes/archive/2026-09-29-review-stage4-aggregate-admission-and-restricted-promotion/`. Do not create a successor replay, and do not open scale quality, production, or restricted promotion
