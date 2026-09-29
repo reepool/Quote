@@ -9,5 +9,5 @@
 
 ## 3. Successor replay and source review, not yet authorized
 
-- [ ] 3.1 After implementation review, run one controlled replay under plan `manufacturing_materials_stage4_segment_financials.2026-09-29.3` into a new isolation directory. Keep `accepted_for_review`, provider calls at the implementation contract, and `production_authorization=not_authorized`. Do not overwrite `replay/20260929.2` or `replay/20260928`
+- [x] 3.1 After implementation review, run one controlled replay under plan `manufacturing_materials_stage4_segment_financials.2026-09-29.3` into a new isolation directory. Keep `accepted_for_review`, provider calls at the implementation contract, and `production_authorization=not_authorized`. Do not overwrite `replay/20260929.2` or `replay/20260928`
 - [ ] 3.2 Independently reread the four reports and derive recall, accuracy, critical numeric errors, and the gate. Do not presume a true gate, and do not reuse 102/132, 114/142, 122/132, 129/133, 38/38, 36/38, 26/36, 23/23, 19/23, or 9/9
