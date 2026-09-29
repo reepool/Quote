@@ -1,4 +1,10 @@
-## ADDED Requirements
+# reconcile-operating-quantity-repair-observations Specification
+
+## Purpose
+
+This ledger closes the original operating-quantity holdout without rewriting it. `replay/20260928` stays recall 26/36, accuracy 26/27, critical numeric errors 1, and `expansion_gates_met=false`. Tasks 3.2 and 3.3 stay unchecked. The archived Putailai `.2` result stays 36/38 with gate false, and the archived CATL `.3` result stays 38/38 with a gate limited to plan `manufacturing_materials_stage4_operating_quantities.2026-09-28.3` and `extract_operating_quantities`. Neither later result is written back. The close-out archives the failed holdout. It does not create a successor replay, and it does not authorize scale quality or production.
+
+## Requirements
 
 ### Requirement: The original operating-quantity observation stays a failed holdout
 The reconciliation MUST preserve `scope-manufacturing-materials-stage4-operating-quantities-holdout/replay/20260928` as an immutable observation. Its recorded result MUST remain source recall 26/36, source accuracy 26/27, critical numeric errors 1, and `expansion_gates_met=false`. The failure reason MUST remain the page-15 PVDF and 勃姆石和氧化铝 evidence/object binding. Tasks 3.2 and 3.3 MUST remain unchecked. The reconciliation MUST NOT rewrite that enqueue, run, result, or source_review.
@@ -39,3 +45,12 @@ Because archived project changes already retain `expansion_gates_met=false` as h
 - **WHEN** the 1.1 review rejects archiving a failed gate
 - **THEN** the original holdout stays active
 - **AND** a later successor replay, if any, is a new change rather than an edit of `.1`
+
+### Requirement: The completed archive keeps the original gate false
+The reconciliation close-out records that the original holdout is archived at `openspec/changes/archive/2026-09-29-scope-manufacturing-materials-stage4-operating-quantities-holdout/` and its gate remains false. Tasks 3.2 and 3.3 MUST remain unchecked. The four artifact hashes recorded after the move MUST remain `5fffde878890fb43c136c4e0082f4eba32fc9e65402e166a96cca164396fab7a`, `3fa107b4bf914cf7603ee1e2e73937392a04ad95bf52df4e68d5bff304a5e9cf`, `67e37d98ed0d0dc57f9672f6ef224482db52fc3e9ce96ece8f366866a1e87302`, and `5568d4ee73cbc332c63cb935fba42a13ea99e4dfe0344f6b700ad4fcc212ab0b`. The Putailai `.2` and CATL `.3` observations MUST stay independent. No further successor replay MUST be created to turn the 26/36 observation into a pass.
+
+#### Scenario: Close-out leaves the failed holdout visible
+- **WHEN** this reconciliation is archived
+- **THEN** the original gate stays false at 26/36 and 26/27 with one critical error
+- **AND** tasks 3.2 and 3.3 stay unchecked
+- **AND** the `.2` and `.3` results are not written back

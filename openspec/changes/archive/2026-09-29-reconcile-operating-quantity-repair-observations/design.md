@@ -41,3 +41,7 @@
 - [38/38 覆盖原始分母] → 合同写明它不回填、不重算 `.1` 或 `.2`。
 - [顺手改分部财务或已归档 `.2`、`.3`] → 明确排除，只移动原始 holdout 和本 reconciliation。
 - [归档移动改变制品字节] → 只使用 `git mv`，并在移动后重算哈希。
+
+## Outcome
+
+原始 holdout 已作为保留失败观察归档到 `openspec/changes/archive/2026-09-29-scope-manufacturing-materials-stage4-operating-quantities-holdout/`。活动目录已删除。task 3.2 与 task 3.3 仍未勾选。指标仍是 source recall 26/36，source accuracy 26/27，critical numeric errors 1，`expansion_gates_met=false`。失败点仍是第 15 页 PVDF 与「勃姆石和氧化铝」的 Evidence/对象绑定。四份制品哈希为 enqueue `5fffde878890fb43c136c4e0082f4eba32fc9e65402e166a96cca164396fab7a`、run `3fa107b4bf914cf7603ee1e2e73937392a04ad95bf52df4e68d5bff304a5e9cf`、result `67e37d98ed0d0dc57f9672f6ef224482db52fc3e9ce96ece8f366866a1e87302`、source-review `5568d4ee73cbc332c63cb935fba42a13ea99e4dfe0344f6b700ad4fcc212ab0b`。Putailai `.2` 的 36/38 和 CATL `.3` 的 38/38 没有回填。没有新建 replay。`production_authorization` 保持 `not_authorized`，`scale_quality_claim_allowed` 保持 false。
