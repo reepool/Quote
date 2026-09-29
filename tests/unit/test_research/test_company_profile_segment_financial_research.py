@@ -12,6 +12,7 @@ from research.company_profile.models import ChapterTask
 from research.company_profile.segment_financial_research import (
     SEGMENT_FINANCIAL_HISTORICAL_PLAN_VERSION,
     SEGMENT_FINANCIAL_PLAN_VERSION,
+    SEGMENT_FINANCIAL_PRIOR_PLAN_VERSION,
     SegmentFinancialResearchError,
     build_segment_financial_research_bundle,
     commit_segment_financial_research,
@@ -38,7 +39,8 @@ def test_bindings_are_the_four_approved_reports():
         for scope in binding.scopes
         for term in scope.anchor_terms
     )
-    assert SEGMENT_FINANCIAL_PLAN_VERSION.endswith("2026-09-29.2")
+    assert SEGMENT_FINANCIAL_PLAN_VERSION.endswith("2026-09-29.3")
+    assert SEGMENT_FINANCIAL_PRIOR_PLAN_VERSION.endswith("2026-09-29.2")
     assert SEGMENT_FINANCIAL_HISTORICAL_PLAN_VERSION.endswith("2026-09-28.1")
     pages = {
         scope.scope_id: scope.pages for binding in bindings for scope in binding.scopes
@@ -710,6 +712,89 @@ def test_runtime_rules_do_not_hardcode_sample_identity():
         "195",
     ):
         assert token not in rules
+
+
+def test_printed_footnote_sections_stay_separate():
+    hits, coverages = interpret_segment_financial_pages(
+        (
+            (
+                139,
+                """
+单位：元
+(1) 地区分部
+项目 境内 境外 分部间抵销 合计
+营业收入 895,512,828.11 136,784,748.74 1,032,297,576.85
+营业成本 641,113,535.22 81,751,343.79 722,864,879.01
+(2) 业务分部
+项目 硅烷交联剂 羟胺盐 其他主营产品 其他 分部间抵销 合计
+营业收入 575,652,405.05 285,241,030.19 153,822,114.31 17,582,027.30 1,032,297,576.85
+营业成本 456,934,716.38 159,734,692.43 91,827,286.17 14,368,184.03 722,864,879.01
+""",
+            ),
+            (
+                178,
+                """
+单位：元
+（2） 报告分部的财务信息
+项目 西南分部 分部间抵销 合计
+营业收入 75,978,283,261.22 -3,606,586,716.08 75,358,958,001.86
+营业成本 70,230,919,218.85 -3,536,259,900.08 68,984,052,885.87
+""",
+            ),
+        )
+    )
+    totals = [
+        item
+        for item in hits
+        if item.page == 139
+        and item.field_id == "operating_revenue"
+        and item.label == "合计"
+    ]
+    assert {(item.source_dimension, item.value) for item in totals} == {
+        ("地区分部", "1,032,297,576.85"),
+        ("业务分部", "1,032,297,576.85"),
+    }
+    assert not any(item.source_dimension == "报告分部" for item in hits)
+    for section in ("地区分部", "业务分部"):
+        assert any(
+            item.page == 139
+            and item.source_dimension == section
+            and item.label == "分部间抵销"
+            and item.status.value == "unclear"
+            for item in coverages
+        )
+    note = [
+        item
+        for item in hits
+        if item.page == 178 and item.field_id != "segment_dimension"
+    ]
+    assert note
+    assert {item.source_dimension for item in note} == {"报告分部的财务信息"}
+    assert any(
+        item.label == "分部间抵销"
+        and item.field_id == "operating_revenue"
+        and item.value == "-3,606,586,716.08"
+        and item.row_class == "consolidation_adjustment"
+        for item in note
+    )
+    assert not any(item.value in {"0", "0.00"} for item in hits)
+
+
+def test_prior_successor_replay_bytes_stay_unchanged():
+    root = (
+        _ROOT
+        / "openspec/changes/repair-segment-financial-column-binding-and-cell-coverage"
+        / "replay/20260929.2"
+    )
+    expected = {
+        "enqueue.json": "2a4c778790678197eda9472a907b8fc1c132be7f08fdbd5d95a3a0cc86c70f19",
+        "run.json": "b5aad9e75ea4200a385ad107f6c044d7d14787f231156b077888018a68708b5e",
+        "segment-financial-stage4-segment-financials-20260929.2/result.json": (
+            "6ca3e2960e11f90a13aaaa75e71dc43452344864b78d10db51566f9bff6912b1"
+        ),
+    }
+    for name, digest in expected.items():
+        assert hashlib.sha256((root / name).read_bytes()).hexdigest() == digest
 
 
 def test_original_replay_bytes_stay_unchanged():

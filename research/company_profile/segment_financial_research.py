@@ -54,8 +54,11 @@ from .workflow import CompanyProfileSemanticService
 SEGMENT_FINANCIAL_HISTORICAL_PLAN_VERSION = (
     "manufacturing_materials_stage4_segment_financials.2026-09-28.1"
 )
-SEGMENT_FINANCIAL_PLAN_VERSION = (
+SEGMENT_FINANCIAL_PRIOR_PLAN_VERSION = (
     "manufacturing_materials_stage4_segment_financials.2026-09-29.2"
+)
+SEGMENT_FINANCIAL_PLAN_VERSION = (
+    "manufacturing_materials_stage4_segment_financials.2026-09-29.3"
 )
 SEGMENT_FINANCIAL_CHAPTER = ChapterTask.EXTRACT_SEGMENT_FINANCIALS
 _SCHEMA = "company_profile_segment_financial_research.v1"
@@ -156,7 +159,7 @@ class _PageState:
     unit: str | None = None
     dimension: str | None = None
     mode: str | None = None
-    column_section: str = "报告分部"
+    column_section: str = ""
     columns: tuple[str, ...] = ()
     parsed_row: bool = False
     saw_metric_header: bool = False
@@ -880,15 +883,16 @@ def _consume_line(
     if ignore_roles and _open_measure_roles(state.roles):
         state.roles = state.roles + ignore_roles
         return
+    column_section = _column_section(line)
+    if column_section is not None:
+        _bind_printed_section(state, column_section)
+        return
     if _is_new_clause(line):
         state.roles = ()
         state.row_metric = False
         state.mode = None
         state.revenue_only = False
-        return
-    column_section = _column_section(line)
-    if column_section is not None:
-        state.column_section = column_section
+        state.columns = ()
         return
     dimension = _dimension_label(line)
     if dimension is not None:
@@ -900,6 +904,19 @@ def _consume_line(
     if not state.roles and not state.row_metric:
         return
     _consume_metric_row(state, page, line, hits, coverages)
+
+
+def _bind_printed_section(state: _PageState, section: str) -> None:
+    """Bind the printed section, then drop the previous table's column state."""
+
+    if state.column_section != section:
+        state.columns = ()
+        state.mode = None
+        state.column_table = False
+        state.roles = ()
+        state.row_metric = False
+        state.revenue_only = False
+    state.column_section = section
 
 
 def _finish_page(
@@ -1063,7 +1080,7 @@ def _consume_column_row(
     hits: list[SegmentHit],
 ) -> None:
     label, tail = _label_and_tail(line)
-    if label is None or label.startswith("其中"):
+    if label is None or label.startswith("其中") or not state.column_section:
         return
     field_id = _column_field(label)
     if field_id is None or not state.columns:
@@ -1882,6 +1899,7 @@ def _is_new_clause(line: str) -> bool:
         or _first_money(line) is not None
         or _table_section(line) is not None
         or _dimension_label(line) is not None
+        or _column_section(line) is not None
     ):
         return False
     return re.match(r"^(?:（\d+）|\(\d+\)|\d+[）)、.]|\d+、)", compact) is not None
