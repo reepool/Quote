@@ -38,3 +38,7 @@
 - [相同合计金额被并成一行] → 身份包含印刷栏目，栏目不同则不合并。
 - [修复栏目时把页 25 的列角色或十个单元格带回退] → 定向测试同时锁住这些已正确结果和空值边界。
 - [新 replay 覆盖旧观察] → 新目录与新计划分开；旧制品只做哈希核对。
+
+## Outcome
+
+`replay/20260929.3` 的独立 source-review 已通过。source recall 132/132，source accuracy 144/144，critical numeric errors 0，`expansion_gates_met=true`。source-review SHA-256 是 `4446fb7619f39b49e865bc563cf7673b98d2288d481c0b229de67394ee9c3c74`。绑定链是 enqueue `0f2ebfa087f8aa4327d15d4e0366af568bcd06a41ab923ba595899ec4e3cdd9b`、run `2ab053d1b3e80b52351ea7963e45f323b97a2706971514c99486eaefd3234d1f`、result `92ec1e2a8be5d4a6ee8bc5b492d7dc09a26dbc84bfbd0ad592ca5aab6cdc1eeb`、run id `stage4-segment-financials-20260929.3`、计划 `manufacturing_materials_stage4_segment_financials.2026-09-29.3`、bundle `segment-financial-stage4-segment-financials-20260929.3`。213 条 fact 和 144 条 Measurement 只是 bundle 规模，不是分母。这个 true 只覆盖四份冻结 2025 年报、该计划和 `extract_segment_financials`。`scale_quality_claim_allowed` 仍为 false，`production_authorization` 仍为 `not_authorized`。`replay/20260929.2` 的 102/132 与 `replay/20260928` 的 122/132 继续作为失败观察保留。
