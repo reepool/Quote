@@ -6,7 +6,7 @@
 
 - 新建一份只读合同。1.1 通过前只写 proposal、design、spec、tasks，不改 Python，不入队，不 replay，不预填 aggregate gate 或跨章节指标。
 - 冻结 aggregate 纳入的四个章节和对应计划版本。业务概览与经营体制不纳入。六章包保持关闭。
-- 冻结统一报告集为已批准的四份 2025 年报，并要求同一报告集同时覆盖 SZSE、SSE、BSE。三报告的材料投入通过不能改写成四报告样本。
+- 冻结统一报告集为已批准的四份 2025 年报，并要求同一报告集同时覆盖 SZSE、SSE、BSE。三报告的材料投入通过不能改写成四报告样本。1.1 据此把本合同裁决为 hold-only：计划 `.2026-09-26.2` 不可能满足包含 `302132.SZ` 的四报告集。
 - 规定每章 source-review、冻结身份和制品哈希的绑定要求。历史失败观察与 critical numeric errors 必须保留。局部 true 不得回填、覆盖或跨章节相加。
 - 任一条件不满足时，后续判断只能记录 hold。aggregate gate 通过前不得进入 restricted-promotion 设计。即使将来通过，也最多允许另开设计卡，不直接授权生产。
 - `production_authorization` 保持 `not_authorized`，`scale_quality_claim_allowed` 保持 false。publication、closure、mode、identity、checkpoint 保持不变。

@@ -35,7 +35,7 @@
    - 分部财务 `.2026-09-28.1`：recall 122/132，accuracy 129/133，critical numeric errors 4，gate false
    - 分部财务 `.2026-09-29.2`：recall 102/132，accuracy 114/142，critical numeric errors 0，gate false
 5. 局部 true 只在自己的计划、报告集和章节内有效。不得回填到更早计划，不得跨章节相加。
-6. 2.2 对照已审核账本适用本合同时，任一条件不满足就只能记录 hold。hold 不产生 aggregate `expansion_gates_met=true`。本卡不预填该判断。
+6. 1.1 把本合同裁决为 hold-only 合同。纳入的材料投入计划 `.2026-09-26.2` 只有三份报告，而 aggregate 要求同一报告集包含 `302132.SZ`。该计划因此不可能满足这份 aggregate gate。不得把 `302132.SZ` 补进三报告结果，也不得用其他章节的四报告结果替代。2.2 仍是以后对照账本的正式记录；在那之前不把 hold 写成已经完成的复述，也不产生 aggregate `expansion_gates_met=true`。
 7. aggregate gate 通过前不得打开 restricted-promotion 设计。将来若有独立审核通过的 aggregate true，下一张卡最多是设计卡，不授权生产。`production_authorization` 保持 `not_authorized`，`scale_quality_claim_allowed` 保持 false。
 
 ## Risks / Trade-offs
@@ -44,3 +44,13 @@
 - [用三报告材料投入充当四报告集] → 统一报告集写明必须包含 `302132.SZ`，且不得事后补入。
 - [失败观察被局部 true 擦除] → 五条失败行的原指标和 critical numeric errors 保持可见。
 - [合同审核滑进实现] → 2.1 之后才允许冻结记录，全程不改 Python、不 replay、不改历史制品。
+
+## 1.1 adjudication
+
+1.1 选择 hold-only 合同，不选择可恢复准入合同。
+
+当前纳入的 `extract_material_inputs` 计划 `manufacturing_materials_stage4_material_inputs.2026-09-26.2` 只冻结 `300750.SZ`、`603659.SH`、`920015.BJ`。统一报告集还要求 `302132.SZ`。这两个冻结条件不相容，所以按本合同，当前 aggregate 不可能通过。
+
+不接受的解决办法：事后把 `302132.SZ` 补进 `.2` 的三报告结果；用产销量、分部财务或客户供应商的四报告结果代替材料投入的报告集；在本卡创建材料投入四报告 successor，或修改 `.2` 的历史观察。
+
+因此 2.1 只能冻结这份不相容的合同要素，2.2 以后只能记录 hold。本裁决不预填跨章节分数，也不勾选 2.1 或 2.2。`production_authorization` 保持 `not_authorized`，`scale_quality_claim_allowed` 保持 false。restricted-promotion、六章包、规模质量和生产保持关闭。
