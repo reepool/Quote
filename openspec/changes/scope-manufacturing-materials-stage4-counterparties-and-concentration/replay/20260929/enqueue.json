@@ -1,0 +1,121 @@
+{
+  "schema_version": "company_profile_counterparty_research_enqueue.v1",
+  "chapter_task": "extract_counterparties_and_concentration",
+  "production_authorization": "not_authorized",
+  "plan_version": "manufacturing_materials_stage4_counterparties.2026-09-29.1",
+  "reports": [
+    {
+      "sample_id": "manufacturing-materials-300750-2025",
+      "instrument_id": "300750.SZ",
+      "report_id": "asset_3b09f6c831975c7177b6bb3287cab781",
+      "document_version": "ver_09c0e677ec8192dc4fc12cb620069f29",
+      "report_period": "2025-12-31",
+      "published_at": "2026-03-09T16:00:00+00:00",
+      "content_hash": "c15272977147dee7e6935a38ea0e4fd6855370aabb106f54cfe20f7cf6048ec9",
+      "dossier_path": "openspec/changes/hold-stage4-expansion-and-review-next-scope/design.md",
+      "dossier_sha256": "e534553f956ca520ef1e09aca2bd972676ac704b224cc5245cb4653080b17c7d",
+      "plan_version": "manufacturing_materials_stage4_counterparties.2026-09-29.1",
+      "chapter_task": "extract_counterparties_and_concentration",
+      "scopes": [
+        {
+          "scope_id": "300750-counterparties",
+          "pages": [
+            27,
+            28
+          ],
+          "section_title": "主要销售客户和主要供应商情况",
+          "anchor_terms": [
+            "重大销售合同",
+            "主要销售客户",
+            "前五名供应商"
+          ],
+          "chapter_task": "extract_counterparties_and_concentration"
+        }
+      ]
+    },
+    {
+      "sample_id": "manufacturing-materials-603659-2025",
+      "instrument_id": "603659.SH",
+      "report_id": "asset_50c70429093f66b34fc57ad8f896fcee",
+      "document_version": "ver_c867a6a692048e88fd9cb80473fbf908",
+      "report_period": "2025-12-31",
+      "published_at": "2026-03-05T16:00:00+00:00",
+      "content_hash": "4e81f5539046ba1eee733100f38442a4abd5037afe3881115ba7f48678fa35b6",
+      "dossier_path": "openspec/changes/hold-stage4-expansion-and-review-next-scope/design.md",
+      "dossier_sha256": "e534553f956ca520ef1e09aca2bd972676ac704b224cc5245cb4653080b17c7d",
+      "plan_version": "manufacturing_materials_stage4_counterparties.2026-09-29.1",
+      "chapter_task": "extract_counterparties_and_concentration",
+      "scopes": [
+        {
+          "scope_id": "603659-counterparties",
+          "pages": [
+            21,
+            22
+          ],
+          "section_title": "主要销售客户及主要供应商情况",
+          "anchor_terms": [
+            "主要销售客户及主要供应商情况",
+            "前五名客户"
+          ],
+          "chapter_task": "extract_counterparties_and_concentration"
+        }
+      ]
+    },
+    {
+      "sample_id": "manufacturing-materials-920015-2025",
+      "instrument_id": "920015.BJ",
+      "report_id": "asset_b87f1d1a48e662dae376c540cd021f69",
+      "document_version": "ver_cfdbd2d058af825b1fc39f494d7a9bd3",
+      "report_period": "2025-12-31",
+      "published_at": "2026-04-22T16:00:00+00:00",
+      "content_hash": "4d2c1612f6f62a9024b8947d7a01b70c40f8f347c2975fa1a05b908d0770695a",
+      "dossier_path": "openspec/changes/hold-stage4-expansion-and-review-next-scope/design.md",
+      "dossier_sha256": "e534553f956ca520ef1e09aca2bd972676ac704b224cc5245cb4653080b17c7d",
+      "plan_version": "manufacturing_materials_stage4_counterparties.2026-09-29.1",
+      "chapter_task": "extract_counterparties_and_concentration",
+      "scopes": [
+        {
+          "scope_id": "920015-counterparties",
+          "pages": [
+            17,
+            18
+          ],
+          "section_title": "主要客户情况",
+          "anchor_terms": [
+            "主要客户情况",
+            "主要供应商情况"
+          ],
+          "chapter_task": "extract_counterparties_and_concentration"
+        }
+      ]
+    },
+    {
+      "sample_id": "manufacturing-materials-302132-2025-regime",
+      "instrument_id": "302132.SZ",
+      "report_id": "asset_0a488da55636b09107be6d719c9ebf39",
+      "document_version": "ver_2d20ba3aebc5fac6c562cd619695995a",
+      "report_period": "2025-12-31",
+      "published_at": "2026-04-28T16:00:00+00:00",
+      "content_hash": "605394bd0879f906a829a9fcd3a2dab037d8aad2554b741a7d95757a3a5e3020",
+      "dossier_path": "openspec/changes/hold-stage4-expansion-and-review-next-scope/design.md",
+      "dossier_sha256": "e534553f956ca520ef1e09aca2bd972676ac704b224cc5245cb4653080b17c7d",
+      "plan_version": "manufacturing_materials_stage4_counterparties.2026-09-29.1",
+      "chapter_task": "extract_counterparties_and_concentration",
+      "scopes": [
+        {
+          "scope_id": "302132-counterparties",
+          "pages": [
+            15,
+            16
+          ],
+          "section_title": "主要销售客户和主要供应商情况",
+          "anchor_terms": [
+            "重大销售合同",
+            "前五名客户"
+          ],
+          "chapter_task": "extract_counterparties_and_concentration"
+        }
+      ]
+    }
+  ]
+}

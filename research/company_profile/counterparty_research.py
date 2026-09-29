@@ -16,9 +16,9 @@ import shutil
 import uuid
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Literal
+from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 from .contracts import (
     ChecklistItem,
@@ -540,6 +540,199 @@ def commit_counterparty_research(
             shutil.rmtree(temporary)
         raise
     return destination
+
+
+class CounterpartyEnqueueScope(_StrictModel):
+    scope_id: str = Field(min_length=1)
+    pages: tuple[int, ...] = Field(min_length=1)
+    section_title: str = Field(min_length=1)
+    anchor_terms: tuple[str, ...] = Field(min_length=1)
+    chapter_task: Literal["extract_counterparties_and_concentration"] = (
+        COUNTERPARTY_CHAPTER.value
+    )
+
+
+class CounterpartyEnqueueReport(_StrictModel):
+    sample_id: str = Field(min_length=1)
+    instrument_id: str = Field(min_length=1)
+    report_id: str = Field(min_length=1)
+    document_version: str = Field(min_length=1)
+    report_period: Literal["2025-12-31"] = "2025-12-31"
+    published_at: str = Field(min_length=1)
+    content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    dossier_path: str = Field(min_length=1)
+    dossier_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    plan_version: str = COUNTERPARTY_PLAN_VERSION
+    chapter_task: Literal["extract_counterparties_and_concentration"] = (
+        COUNTERPARTY_CHAPTER.value
+    )
+    scopes: tuple[CounterpartyEnqueueScope, ...] = Field(min_length=1)
+
+
+class CounterpartyEnqueueSnapshot(_StrictModel):
+    schema_version: Literal["company_profile_counterparty_research_enqueue.v1"] = (
+        "company_profile_counterparty_research_enqueue.v1"
+    )
+    chapter_task: Literal["extract_counterparties_and_concentration"] = (
+        COUNTERPARTY_CHAPTER.value
+    )
+    production_authorization: Literal["not_authorized"] = "not_authorized"
+    plan_version: str = COUNTERPARTY_PLAN_VERSION
+    reports: tuple[CounterpartyEnqueueReport, ...] = Field(min_length=4, max_length=4)
+
+
+class CounterpartyRunSnapshot(_StrictModel):
+    schema_version: Literal["company_profile_counterparty_research_run.v1"] = (
+        "company_profile_counterparty_research_run.v1"
+    )
+    chapter_task: Literal["extract_counterparties_and_concentration"] = (
+        COUNTERPARTY_CHAPTER.value
+    )
+    disposition: Literal["accepted_for_review"] = "accepted_for_review"
+    provider_calls: Literal[0] = 0
+    production_authorization: Literal["not_authorized"] = "not_authorized"
+    plan_version: str = COUNTERPARTY_PLAN_VERSION
+    enqueue_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    bundle_dirname: str = Field(min_length=1)
+    run_id: str = Field(min_length=1)
+
+
+def freeze_counterparty_research_enqueue(
+    output_root: str | Path,
+    *,
+    repository_root: str | Path | None = None,
+    bindings: tuple[CounterpartyReportBinding, ...] | None = None,
+    plan_version: str = COUNTERPARTY_PLAN_VERSION,
+) -> Path:
+    """Record PDF identity and dossier hashes before the run starts."""
+
+    root = Path(repository_root) if repository_root is not None else _REPOSITORY_ROOT
+    store = Stage5RunBundleStore(output_root, repository_root=root)
+    destination = store.output_root / "enqueue.json"
+    if destination.exists():
+        raise FileExistsError(
+            f"counterparty enqueue snapshot already exists: {destination}"
+        )
+    snapshot = _enqueue_snapshot(root, bindings, plan_version=plan_version)
+    _write_json_atomic(
+        store.output_root, destination.name, snapshot.model_dump(mode="json")
+    )
+    return destination
+
+
+def replay_counterparty_research(
+    output_root: str | Path,
+    *,
+    repository_root: str | Path | None = None,
+    run_id: str = "stage4-counterparties-20260929",
+    preparer: Stage5EvidencePreparer | None = None,
+    plan_version: str = COUNTERPARTY_PLAN_VERSION,
+) -> Path:
+    """Freeze enqueue, prepare one chapter, then write run and result.
+
+    The snapshots do not record recall, accuracy, critical errors, or a gate.
+    """
+
+    root = Path(repository_root) if repository_root is not None else _REPOSITORY_ROOT
+    selected = counterparty_research_bindings()
+    enqueue_path = freeze_counterparty_research_enqueue(
+        output_root,
+        repository_root=root,
+        bindings=selected,
+        plan_version=plan_version,
+    )
+    bundle_dir = commit_counterparty_research(
+        output_root,
+        repository_root=root,
+        run_id=run_id,
+        preparer=preparer,
+        bindings=selected,
+        plan_version=plan_version,
+    )
+    run = CounterpartyRunSnapshot(
+        plan_version=plan_version,
+        enqueue_sha256=hashlib.sha256(enqueue_path.read_bytes()).hexdigest(),
+        bundle_dirname=bundle_dir.name,
+        run_id=run_id,
+    )
+    run_path = enqueue_path.parent / "run.json"
+    if run_path.exists():
+        raise FileExistsError(f"counterparty run snapshot already exists: {run_path}")
+    _write_json_atomic(enqueue_path.parent, run_path.name, run.model_dump(mode="json"))
+    return run_path
+
+
+def _enqueue_snapshot(
+    repository_root: Path,
+    bindings: tuple[CounterpartyReportBinding, ...] | None = None,
+    plan_version: str = COUNTERPARTY_PLAN_VERSION,
+) -> CounterpartyEnqueueSnapshot:
+    selected = counterparty_research_bindings() if bindings is None else bindings
+    if tuple(item.instrument_id for item in selected) != (
+        "300750.SZ",
+        "603659.SH",
+        "920015.BJ",
+        "302132.SZ",
+    ):
+        raise CounterpartyResearchError(
+            "counterparty replay only admits the four approved reports"
+        )
+    reports: list[CounterpartyEnqueueReport] = []
+    for binding in selected:
+        pdf = repository_root / binding.relative_pdf_path
+        dossier = repository_root / binding.relative_dossier_path
+        content_hash = hashlib.sha256(pdf.read_bytes()).hexdigest()
+        if content_hash != binding.content_hash:
+            raise CounterpartyResearchError(
+                f"{binding.instrument_id} PDF hash does not match the frozen binding"
+            )
+        if not dossier.is_file():
+            raise CounterpartyResearchError(
+                f"{binding.instrument_id} dossier is missing: {binding.relative_dossier_path}"
+            )
+        reports.append(
+            CounterpartyEnqueueReport(
+                sample_id=binding.sample_id,
+                instrument_id=binding.instrument_id,
+                report_id=binding.report_id,
+                document_version=binding.document_version,
+                published_at=binding.published_at,
+                content_hash=content_hash,
+                dossier_path=binding.relative_dossier_path,
+                dossier_sha256=hashlib.sha256(dossier.read_bytes()).hexdigest(),
+                plan_version=plan_version,
+                scopes=tuple(
+                    CounterpartyEnqueueScope(
+                        scope_id=item.scope_id,
+                        pages=item.pages,
+                        section_title=item.section_title,
+                        anchor_terms=item.anchor_terms,
+                    )
+                    for item in binding.scopes
+                ),
+            )
+        )
+    return CounterpartyEnqueueSnapshot(
+        plan_version=plan_version, reports=tuple(reports)
+    )
+
+
+def _write_json_atomic(directory: Path, name: str, payload: dict[str, Any]) -> None:
+    forbidden = {
+        "recall",
+        "accuracy",
+        "critical_numeric_errors",
+        "expansion_gates_met",
+        "source_review",
+    }
+    if forbidden & set(payload):
+        raise CounterpartyResearchError("counterparty snapshot preset a review metric")
+    temporary = directory / f".stage5-tmp-{name}-{uuid.uuid4().hex}"
+    temporary.write_text(
+        json.dumps(payload, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
+    os.replace(temporary, directory / name)
 
 
 def _binding(

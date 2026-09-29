@@ -4,4 +4,8 @@
 
 ## 2. Implementation, not yet authorized
 
-- [ ] 2.1 After 1.1, implement only the existing chapter against the fixtures in design.md. Do not hard-code instrument codes, pages, company names, or counterparty labels in the extractor. Do not start enqueue or replay in that card
+- [x] 2.1 After 1.1, implement only the existing chapter against the fixtures in design.md. Do not hard-code instrument codes, pages, company names, or counterparty labels in the extractor. Do not start enqueue or replay in that card. Implementation review accepted this slice
+
+## 3. Controlled replay, source review not yet authorized
+
+- [ ] 3.1 Replay only `extract_counterparties_and_concentration` through `replay_counterparty_research` with plan `manufacturing_materials_stage4_counterparties.2026-09-29.1` into `replay/20260929`. Freeze PDF hash, report_id, document_version, report period `2025-12-31`, and dossier hash before the run. Keep `accepted_for_review`, provider calls 0, and `production_authorization=not_authorized`. Do not write recall, accuracy, critical numeric errors, a gate, or source-review. Do not edit material-input, operating-quantity, or segment-financial artifacts. Leave this box unchecked until the replay is reviewed. The next card recounts the four reports independently and must not preset a pass

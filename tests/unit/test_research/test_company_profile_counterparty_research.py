@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 from pathlib import Path
 
@@ -9,7 +10,9 @@ from research.company_profile.counterparty_research import (
     COUNTERPARTY_PLAN_VERSION,
     build_counterparty_research_bundle,
     commit_counterparty_research,
+    counterparty_research_bindings,
     interpret_counterparty_pages,
+    replay_counterparty_research,
 )
 
 _ROOT = Path(__file__).resolve().parents[3]
@@ -325,3 +328,68 @@ def test_four_reports_stay_in_one_review_bundle(tmp_path):
     )
     assert bundle.disposition == "accepted_for_review"
     assert bundle.provider_calls == 0
+
+
+def test_replay_freezes_identity_and_omits_metrics(tmp_path):
+    run_path = replay_counterparty_research(
+        tmp_path / "replay",
+        repository_root=_ROOT,
+        run_id="stage4-counterparties-20260929",
+    )
+    enqueue = json.loads((run_path.parent / "enqueue.json").read_text(encoding="utf-8"))
+    run = json.loads(run_path.read_text(encoding="utf-8"))
+    result_path = run_path.parent / run["bundle_dirname"] / "result.json"
+    result = json.loads(result_path.read_text(encoding="utf-8"))
+    dossier = (
+        _ROOT / "openspec/changes/hold-stage4-expansion-and-review-next-scope/design.md"
+    )
+    dossier_hash = hashlib.sha256(dossier.read_bytes()).hexdigest()
+    bindings = counterparty_research_bindings()
+    assert enqueue["plan_version"] == COUNTERPARTY_PLAN_VERSION
+    assert enqueue["production_authorization"] == "not_authorized"
+    assert [item["instrument_id"] for item in enqueue["reports"]] == [
+        item.instrument_id for item in bindings
+    ]
+    for frozen, binding in zip(enqueue["reports"], bindings, strict=True):
+        assert frozen["report_id"] == binding.report_id
+        assert frozen["document_version"] == binding.document_version
+        assert frozen["report_period"] == "2025-12-31"
+        assert frozen["content_hash"] == binding.content_hash
+        assert frozen["dossier_sha256"] == dossier_hash
+        assert frozen["chapter_task"] == "extract_counterparties_and_concentration"
+    assert run["disposition"] == "accepted_for_review"
+    assert run["provider_calls"] == 0
+    assert run["production_authorization"] == "not_authorized"
+    assert run["plan_version"] == COUNTERPARTY_PLAN_VERSION
+    assert (
+        run["enqueue_sha256"]
+        == hashlib.sha256((run_path.parent / "enqueue.json").read_bytes()).hexdigest()
+    )
+    for payload in (enqueue, run, result):
+        for key in (
+            "recall",
+            "accuracy",
+            "critical_numeric_errors",
+            "expansion_gates_met",
+            "source_review",
+        ):
+            assert key not in payload
+    statuses = {item["coverage_status"] for item in result["coverage"]}
+    assert {"not_disclosed", "not_applicable"} <= statuses
+    assert "extraction_failed" not in statuses
+    assert "unclear" not in statuses
+    relations = {item["relation_type"] for item in result["facts"]}
+    assert relations == {"customer", "supplier"}
+    names = {
+        (item["relation_type"], item["name"], item["relationship_context"])
+        for item in result["facts"]
+        if item["object_type"] == "Relationship"
+    }
+    assert ("customer", "客户 A(1)", "contract_customer") in names
+    assert ("customer", "第一名", "rank_customer") in names
+    assert ("supplier", "第一名", "rank_supplier") in names
+    assert not any(
+        item["object_type"] == "Relationship" and item["name"] == "合计"
+        for item in result["facts"]
+    )
+    assert all(item["subject_scope"] == "unclear" for item in result["facts"])

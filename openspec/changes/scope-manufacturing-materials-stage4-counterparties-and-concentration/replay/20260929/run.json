@@ -1,0 +1,11 @@
+{
+  "schema_version": "company_profile_counterparty_research_run.v1",
+  "chapter_task": "extract_counterparties_and_concentration",
+  "disposition": "accepted_for_review",
+  "provider_calls": 0,
+  "production_authorization": "not_authorized",
+  "plan_version": "manufacturing_materials_stage4_counterparties.2026-09-29.1",
+  "enqueue_sha256": "7e9c1a72f11723f2d8508d751c27f8ea3f96cae048eb0ab6edc6224eb301bf7a",
+  "bundle_dirname": "counterparty-stage4-counterparties-20260929",
+  "run_id": "stage4-counterparties-20260929"
+}
