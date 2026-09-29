@@ -1,0 +1,177 @@
+{
+  "schema_version": "company_profile_segment_financial_research_enqueue.v1",
+  "chapter_task": "extract_segment_financials",
+  "production_authorization": "not_authorized",
+  "plan_version": "manufacturing_materials_stage4_segment_financials.2026-09-29.2",
+  "reports": [
+    {
+      "sample_id": "manufacturing-materials-300750-2025",
+      "instrument_id": "300750.SZ",
+      "report_id": "asset_3b09f6c831975c7177b6bb3287cab781",
+      "document_version": "ver_09c0e677ec8192dc4fc12cb620069f29",
+      "report_period": "2025-12-31",
+      "published_at": "2026-03-09T16:00:00+00:00",
+      "content_hash": "c15272977147dee7e6935a38ea0e4fd6855370aabb106f54cfe20f7cf6048ec9",
+      "dossier_path": "openspec/changes/scope-manufacturing-materials-stage4-segment-financials/dossiers/300750-sz-2025.md",
+      "dossier_sha256": "d97587dbe5a14ee086b54ade6ef59ce8d4cf112e02d7367046913a4a4e2f9cb8",
+      "plan_version": "manufacturing_materials_stage4_segment_financials.2026-09-29.2",
+      "chapter_task": "extract_segment_financials",
+      "scopes": [
+        {
+          "scope_id": "300750-segment-table",
+          "pages": [
+            24,
+            25
+          ],
+          "section_title": "收入与成本",
+          "anchor_terms": [
+            "分产品",
+            "毛利率"
+          ],
+          "chapter_task": "extract_segment_financials"
+        },
+        {
+          "scope_id": "300750-revenue-cost-note",
+          "pages": [
+            195
+          ],
+          "section_title": "营业收入和营业成本",
+          "anchor_terms": [
+            "营业收入和营业成本",
+            "主营业务"
+          ],
+          "chapter_task": "extract_segment_financials"
+        },
+        {
+          "scope_id": "300750-single-segment",
+          "pages": [
+            223
+          ],
+          "section_title": "分部信息",
+          "anchor_terms": [
+            "仅有一个经营分部"
+          ],
+          "chapter_task": "extract_segment_financials"
+        }
+      ]
+    },
+    {
+      "sample_id": "manufacturing-materials-603659-2025",
+      "instrument_id": "603659.SH",
+      "report_id": "asset_50c70429093f66b34fc57ad8f896fcee",
+      "document_version": "ver_c867a6a692048e88fd9cb80473fbf908",
+      "report_period": "2025-12-31",
+      "published_at": "2026-03-05T16:00:00+00:00",
+      "content_hash": "4e81f5539046ba1eee733100f38442a4abd5037afe3881115ba7f48678fa35b6",
+      "dossier_path": "openspec/changes/scope-manufacturing-materials-stage4-segment-financials/dossiers/603659-sh-2025.md",
+      "dossier_sha256": "f1fdfc75ccf24ba2581fbf4731b9b9bc8974198825f2e5310075c33fc78e4cb5",
+      "plan_version": "manufacturing_materials_stage4_segment_financials.2026-09-29.2",
+      "chapter_task": "extract_segment_financials",
+      "scopes": [
+        {
+          "scope_id": "603659-segment-table",
+          "pages": [
+            18,
+            19
+          ],
+          "section_title": "主营业务分行业、分产品、分地区、分销售模式情况",
+          "anchor_terms": [
+            "合并抵消项",
+            "毛利率"
+          ],
+          "chapter_task": "extract_segment_financials"
+        }
+      ]
+    },
+    {
+      "sample_id": "manufacturing-materials-920015-2025",
+      "instrument_id": "920015.BJ",
+      "report_id": "asset_b87f1d1a48e662dae376c540cd021f69",
+      "document_version": "ver_cfdbd2d058af825b1fc39f494d7a9bd3",
+      "report_period": "2025-12-31",
+      "published_at": "2026-04-22T16:00:00+00:00",
+      "content_hash": "4d2c1612f6f62a9024b8947d7a01b70c40f8f347c2975fa1a05b908d0770695a",
+      "dossier_path": "openspec/changes/scope-manufacturing-materials-stage4-segment-financials/dossiers/920015-bj-2025.md",
+      "dossier_sha256": "e09f80661e03235d46cb3de8a1c525f7c53d6dd24770fb9e749d55e0d173c06b",
+      "plan_version": "manufacturing_materials_stage4_segment_financials.2026-09-29.2",
+      "chapter_task": "extract_segment_financials",
+      "scopes": [
+        {
+          "scope_id": "920015-income-composition",
+          "pages": [
+            16
+          ],
+          "section_title": "收入构成",
+          "anchor_terms": [
+            "收入构成",
+            "主营业务收入"
+          ],
+          "chapter_task": "extract_segment_financials"
+        },
+        {
+          "scope_id": "920015-product-region",
+          "pages": [
+            17
+          ],
+          "section_title": "按产品分类分析",
+          "anchor_terms": [
+            "按产品分类",
+            "毛利率"
+          ],
+          "chapter_task": "extract_segment_financials"
+        },
+        {
+          "scope_id": "920015-note-segments",
+          "pages": [
+            139
+          ],
+          "section_title": "分部信息",
+          "anchor_terms": [
+            "分部间抵销"
+          ],
+          "chapter_task": "extract_segment_financials"
+        }
+      ]
+    },
+    {
+      "sample_id": "manufacturing-materials-302132-2025-regime",
+      "instrument_id": "302132.SZ",
+      "report_id": "asset_0a488da55636b09107be6d719c9ebf39",
+      "document_version": "ver_2d20ba3aebc5fac6c562cd619695995a",
+      "report_period": "2025-12-31",
+      "published_at": "2026-04-28T16:00:00+00:00",
+      "content_hash": "605394bd0879f906a829a9fcd3a2dab037d8aad2554b741a7d95757a3a5e3020",
+      "dossier_path": "openspec/changes/scope-manufacturing-materials-stage4-segment-financials/dossiers/302132-sz-2025.md",
+      "dossier_sha256": "726cc7554016e85ae3158490bc15789105d8087a30698cbacfd4a94c0ce3445c",
+      "plan_version": "manufacturing_materials_stage4_segment_financials.2026-09-29.2",
+      "chapter_task": "extract_segment_financials",
+      "scopes": [
+        {
+          "scope_id": "302132-mda-table",
+          "pages": [
+            14,
+            15
+          ],
+          "section_title": "收入与成本",
+          "anchor_terms": [
+            "分销售模式",
+            "毛利率"
+          ],
+          "chapter_task": "extract_segment_financials"
+        },
+        {
+          "scope_id": "302132-note-segments",
+          "pages": [
+            178
+          ],
+          "section_title": "报告分部的财务信息",
+          "anchor_terms": [
+            "分部间抵销",
+            "营业收入"
+          ],
+          "chapter_task": "extract_segment_financials"
+        }
+      ]
+    }
+  ]
+}

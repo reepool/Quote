@@ -4,8 +4,8 @@
 
 ## 2. Minimum repair, not yet authorized
 
-- [ ] 2.1 After 1.1, bind each formal table to its own header, column roles, and boundary. Keep prior-year revenue, prior-year share, and year-over-year columns out of current cost and margin. Deliver the ten source-review cells as Measurements. Do not hard-code a security code, page number, company name, or product name in the runtime extractor
-- [ ] 2.2 Add directed tests for the four absent misbindings, the retained ten-percent region rows, the ten delivered cells, and the unchanged empty-margin, empty-elimination, and company-margin boundaries. Do not enqueue or replay in this task
+- [x] 2.1 After 1.1, bind each formal table to its own header, column roles, and boundary. Keep prior-year revenue, prior-year share, and year-over-year columns out of current cost and margin. Deliver the ten source-review cells as Measurements. Do not hard-code a security code, page number, company name, or product name in the runtime extractor
+- [x] 2.2 Add directed tests for the four absent misbindings, the retained ten-percent region rows, the ten delivered cells, and the unchanged empty-margin, empty-elimination, and company-margin boundaries. Do not enqueue or replay in this task
 
 ## 3. Successor replay and source review, not yet authorized
 
