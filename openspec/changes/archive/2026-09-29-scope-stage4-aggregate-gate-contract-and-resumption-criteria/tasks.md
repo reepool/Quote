@@ -9,4 +9,4 @@
 
 ## 3. Archive, not yet authorized
 
-- [ ] 3.1 After 2.2, keep the conclusion and archive this read-only contract review. Do not create a successor replay or a promotion implementation
+- [x] 3.1 After 2.2, keep the conclusion and archive this read-only contract review. The conclusion remains hold. MI-2 stays a three-report row and is not rewritten to include `302132.SZ`. `contract-binding.md`, the historical ledger, and archived replay and source-review files stay unchanged. Archive to `openspec/changes/archive/2026-09-29-scope-stage4-aggregate-gate-contract-and-resumption-criteria/`. Do not create a successor replay or a promotion implementation
