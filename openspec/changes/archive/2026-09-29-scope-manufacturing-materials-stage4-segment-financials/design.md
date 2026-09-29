@@ -70,3 +70,7 @@
 ## Open Questions
 
 - 无。dossier 不预设分部财务召回或 gate。
+
+## Retained failed observation
+
+`replay/20260928` 保持 source recall 122/132，source accuracy 129/133，critical numeric errors 4，`expansion_gates_met=false`。task 3.3 不勾选。四份制品哈希保持 enqueue `935578cc64a58a84d84224443354c8a6e5f0d9a6167fd1753cbf156e7079ffe3`、run `974dbbfda8608cd1de535215390a9b1accf67b8e7810a9770966620e2e45634b`、result `7c2d5ea6e6433586b46545ad2c597a3c7cc60016ca1023559e7a137c8117d859`、source-review `ff2f01fd4365cc621dcfeac2b2778d97b446bcf3d73c1d7f3bb06cb7b9035c2d`。已归档 footnote repair 的 132/132、144/144 不回填本观察。本 change 作为保留失败观察归档。

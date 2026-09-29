@@ -58,3 +58,7 @@
 ## Open Questions
 
 - 无。1.1 审核前不把十四项补齐预定为 gate 通过。
+
+## Retained failed observation
+
+`replay/20260929.2` 保持 source recall 102/132，source accuracy 114/142，critical numeric errors 0，`expansion_gates_met=false`。失败原因是页 139 的「地区分部」「业务分部」和页 178 的「报告分部的财务信息」被写成泛化的「报告分部」。task 3.2 不勾选。四份制品哈希保持 enqueue `2a4c778790678197eda9472a907b8fc1c132be7f08fdbd5d95a3a0cc86c70f19`、run `b5aad9e75ea4200a385ad107f6c044d7d14787f231156b077888018a68708b5e`、result `6ca3e2960e11f90a13aaaa75e71dc43452344864b78d10db51566f9bff6912b1`、source-review `6851d7d6b80274a03a14b04f7fe200278a7fff53b5ea4ed734c3470bb015a0ff`。已归档 footnote repair 的 132/132、144/144 不回填本观察。本 change 作为保留失败观察归档。
