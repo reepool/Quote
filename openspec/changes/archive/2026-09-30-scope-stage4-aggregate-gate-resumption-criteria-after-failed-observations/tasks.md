@@ -8,4 +8,4 @@
 
 ## 3. Archive, not yet authorized
 
-- [ ] 3.1 After 2.1, keep the contract and archive this read-only scope. Do not start a repair or a production admission in that task
+- [x] 3.1 After 2.1, keep the contract and archive this read-only scope. Do not start a repair or a production admission in that task
