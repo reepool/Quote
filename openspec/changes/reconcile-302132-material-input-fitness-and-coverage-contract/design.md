@@ -53,7 +53,7 @@
 
 ## Open Questions
 
-两种定义已在下一节并列。哪一种约束 `302132.SZ`，留到 2.2。本节不选择。
+2.2 已在文末 Decision 选择 coverage-only suitable。Definition comparison 仍只并列两种定义，不代替该裁决。
 
 ## Definition comparison
 
@@ -75,3 +75,27 @@
 - Stage 4 aggregate 继续 hold。`302132.SZ` 不补入 MI-2。
 
 本对照没有记录 unsuitable 或 coverage-only suitable。那个二选一留给 2.2。
+
+## Decision
+
+2.2 只根据已审核 dossier 和上一节对照选择一个定义。没有重读年报，没有改写旧 dossier，也没有创建 successor。
+
+裁决是 **coverage-only suitable**。
+
+采用 coverage-only 定义。不采用“没有具名事实即样本不适合”。
+
+- 上位合同写明：未具名材料可以是 `not_disclosed`；完整读取后没有具名投入时，记录 legal-empty 或 `not_disclosed`，而不是 `extraction_failed`。`not_disclosed` 不生成事实，但是合法 coverage。`required` 表示必须检查，不表示报告必然披露具名材料。
+- 阶段 4 最小切片用三份已有具名投入句的报告选择 `extract_material_inputs`。那是开章条件，不是后来每一份在范围内的报告都必须再产出一条 fact 才能完成该章节。
+- `302132.SZ` 的采购模式、营业成本构成、关联采购和主要供应商合计已经检查，没有 source-native 具名材料。已归档 dossier 把这些位置记为 `not_disclosed` 或 `not_applicable`，没有记为 `extraction_failed`，也没有写成 observed fact。
+- 已归档 assessment 的 Fitness 把“没有可交付的 material_input fact”写成“不适合作为第四个样本”。那是把合法 coverage 误当成样本不适合。
+
+因此：
+
+- 旧 dossier 和历史 replay 保持不变。已归档的 unsuitable 文字留在原归档中，本裁决不回写它。
+- 本 change 不创建 successor。以后只允许另立独立的四报告材料投入 successor 范围 change。
+- 不入队，不 replay，不改 Python。
+- 不把 `302132.SZ` 补入 MI-2，不重开 aggregate gate。
+- 不产生 aggregate `expansion_gates_met=true`。Stage 4 aggregate 继续 hold。
+- 不新增跨章节 recall、accuracy 或 critical-error 分数。
+- `production_authorization` 保持 `not_authorized`。`scale_quality_claim_allowed` 保持 false。
+- 不启动 restricted-promotion、六章包、规模质量或生产。
