@@ -74,4 +74,19 @@ SF-3 的局部 true 不是 aggregate true。critical numeric errors 4 仍属于 
 
 ## Open Questions
 
-分部财务 successor 是否需要新的 replay，留到本卡独立审核之后再决定。本卡不创建该 successor，也不为它预填指标。
+2.1 已判断需要另立独立 successor implementation scope。该判断写在下一节。本 change 不创建 successor。
+
+## Successor decision
+
+2.1 只判断是否需要另立实现卡。没有创建 successor，没有修改 Python、enqueue、replay、source-review、ledger 或旧 archive，也没有填写新的 recall、accuracy 或 critical numeric errors。
+
+- SF-1 与 SF-2 继续作为历史行保留。SF-1 仍是 recall 122/132、accuracy 129/133、critical numeric errors 4。SF-2 仍是 recall 102/132、accuracy 114/142。
+- SF-3 的 recall 132/132、accuracy 144/144 只属于 `.2026-09-29.3`，不能回填 SF-1 或 SF-2。
+- 当前规则要求：新的当前纳入观察必须是新计划，并拥有独立的四报告 replay、source-review，以及 enqueue、run、result、source-review 哈希绑定。纳入声明只能写在那份新观察中。
+- 因此，若要让分部财务重新进入 aggregate 判断，必须另立独立的 successor implementation scope。
+
+结论是 **需要另立 successor**。该 successor 是下一张独立 change，不在本 change 内创建，也不在这里启动 replay。
+
+- 本 change 不产生 aggregate `expansion_gates_met=true`，也不计算跨章节分数。
+- `production_authorization` 保持 `not_authorized`。`scale_quality_claim_allowed` 保持 false。
+- 不改 publication、closure、mode、identity、checkpoint。

@@ -4,7 +4,7 @@
 
 ## 2. Successor decision, not yet authorized
 
-- [ ] 2.1 After 1.1, record whether a separate segment-financial successor implementation card is required. Do not create that successor, a replay, or a new recall, accuracy, or critical-error count in that task. Do not backfill `.3` into `.1` or `.2`. Do not reopen the aggregate gate
+- [x] 2.1 After 1.1, record whether a separate segment-financial successor implementation card is required. Do not create that successor, a replay, or a new recall, accuracy, or critical-error count in that task. Do not backfill `.3` into `.1` or `.2`. Do not reopen the aggregate gate. The decision is in design.md under "Successor decision": a separate successor implementation scope is required, and it is not created in this change. Do not archive in this task
 
 ## 3. Archive, not yet authorized
 
