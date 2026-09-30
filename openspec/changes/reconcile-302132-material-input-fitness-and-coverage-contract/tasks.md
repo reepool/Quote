@@ -1,6 +1,6 @@
 ## 1. Scope review gate
 
-- [ ] 1.1 Independent review accepts this read-only reconciliation: compare the manufacturing-materials requirements, the current stage-4 minimum-slice spec, the archived `302132.SZ` material-input dossier, and the archived assessment proposal, design, spec, and tasks. Do not modify those archives, MI-1, MI-2, the aggregate ledger, replay, or source-review. Do not choose retained unsuitable or coverage-only suitable in this review. Do not check 2.1, 2.2, or 3.1. Do not create a successor scope, change Python, enqueue, or replay. Do not add `302132.SZ` to MI-2 or reopen the aggregate gate. Do not start restricted promotion, the six-chapter package, scale quality, or production
+- [x] 1.1 Independent review accepts this read-only reconciliation: compare the manufacturing-materials requirements, the current stage-4 minimum-slice spec, the archived `302132.SZ` material-input dossier, and the archived assessment proposal, design, spec, and tasks. Do not modify those archives, MI-1, MI-2, the aggregate ledger, replay, or source-review. Do not choose retained unsuitable or coverage-only suitable in this review. Do not check 2.1, 2.2, or 3.1. Do not create a successor scope, change Python, enqueue, or replay. Do not add `302132.SZ` to MI-2 or reopen the aggregate gate. Do not start restricted promotion, the six-chapter package, scale quality, or production. Independent review accepted this contract. Do not start 2.1 in that review
 
 ## 2. Comparison and verdict, not yet authorized
 
