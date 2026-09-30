@@ -52,4 +52,33 @@
 
 ## Open Questions
 
-产销量和分部财务的 successor 是否会被另立，留到本合通过独立审核之后。本设计不预填 aggregate true，也不创建那些 successor。
+产销量和分部财务的 successor 是否会被另立，留到本合同归档之后。本卡不创建那些 successor。2.1 的准入结论写在下一节。
+
+## Admission
+
+2.1 只读取本 change 已冻结的账本和四个局部结果。没有重算指标，没有把四个局部 true 相加，也没有修改旧 hold-only archive、ledger、MI-2、replay 或 source-review。
+
+四个局部结果各自成立，但不跨章节合并：
+
+| 章节 | 计划 | 局部结果 |
+|---|---|---|
+| `extract_material_inputs` | `.2026-09-30.3` | recall 23/23，accuracy 23/23，critical numeric errors 0 |
+| `extract_operating_quantities` | `.2026-09-28.3` | 38/38 |
+| `extract_segment_financials` | `.2026-09-29.3` | recall 132/132，accuracy 144/144 |
+| `extract_counterparties_and_concentration` | `.2026-09-29.1` | 45/45 |
+
+它们都使用 `300750.SZ`、`603659.SH`、`920015.BJ`、`302132.SZ`。MI-2 `.2026-09-26.2` 继续是独立的三报告 23/23，没有被材料投入 `.3` 回填。
+
+后续局部 true 没有覆盖或消除这些历史失败行：
+
+- 产销量 recall 26/36，accuracy 26/27，critical numeric errors 1；另有 36/38，accuracy 36/36，critical numeric errors 0。
+- 分部财务 recall 122/132，accuracy 129/133，critical numeric errors 4；另有 recall 102/132，accuracy 114/142，critical numeric errors 0。
+
+这些失败行仍纳入判断，因此准入结论是 **hold**。`stage4_aggregate_expansion_gates_met` 保持 false。
+
+- 不产生 aggregate `expansion_gates_met=true`。
+- 不计算跨章节 recall、accuracy 或 critical-error 分数。
+- 不授权 restricted-promotion、六章包、规模质量或生产。
+- 不创建 repair successor 或 replay。
+- `production_authorization` 保持 `not_authorized`。`scale_quality_claim_allowed` 保持 false。
+- 不改 publication、closure、mode、identity、checkpoint。

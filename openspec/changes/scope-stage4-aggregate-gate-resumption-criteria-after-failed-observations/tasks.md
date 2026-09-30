@@ -4,7 +4,7 @@
 
 ## 2. Checklist, not yet authorized
 
-- [ ] 2.1 After 1.1, record the frozen resumption checklist from this contract. Do not create an operating-quantity or segment-financial successor, a replay, or an aggregate true in that task
+- [x] 2.1 After 1.1, record the frozen resumption checklist from this contract. Do not create an operating-quantity or segment-financial successor, a replay, or an aggregate true in that task. The admission is in design.md under "Admission": hold, because the retained operating-quantity and segment-financial failures remain in the judgment set. `stage4_aggregate_expansion_gates_met` stays false. Do not archive in this task
 
 ## 3. Archive, not yet authorized
 
