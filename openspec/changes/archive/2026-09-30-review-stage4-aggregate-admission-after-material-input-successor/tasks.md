@@ -8,4 +8,4 @@
 
 ## 3. Archive, not yet authorized
 
-- [ ] 3.1 After 2.1, keep that admission result and archive this read-only review. Do not create a replay or a production admission in that task
+- [x] 3.1 After 2.1, keep that admission result and archive this read-only review. The conclusion remains hold. `stage4_aggregate_expansion_gates_met` stays false. Archive to `openspec/changes/archive/2026-09-30-review-stage4-aggregate-admission-after-material-input-successor/`. Do not create a replay or a production admission in that task
