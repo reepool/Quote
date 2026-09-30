@@ -1,0 +1,236 @@
+{
+  "schema_version": "company_profile_material_input_stage4_source_review.v1",
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false,
+  "method": "independently_read_official_report",
+  "binding": {
+    "enqueue_path": "enqueue.json",
+    "enqueue_sha256": "09edffece890b126e33679a70b19800c8ad6b4fe094efe2aebf1793b168d15f8",
+    "run_path": "run.json",
+    "run_id": "stage4-material-inputs-20260930",
+    "run_sha256": "00aa0f4d5bacbf0ff914b9cc7fc3a9740e6b60fa08a5c7c693699f5b77d1714e",
+    "plan_version": "manufacturing_materials_stage4_material_inputs.2026-09-30.3",
+    "bundle_dirname": "material-input-stage4-material-inputs-20260930",
+    "bundle_result_path": "material-input-stage4-material-inputs-20260930/result.json",
+    "bundle_result_sha256": "2e4b795206b308caa5df6be9ff03c5dd8b8b864b734414faffe6e1df35ad0ed4",
+    "bundle_schema_version": "company_profile_material_input_research.v2",
+    "chapter_task": "extract_material_inputs",
+    "instruments": [
+      {
+        "instrument_id": "300750.SZ",
+        "report_id": "asset_3b09f6c831975c7177b6bb3287cab781",
+        "document_version": "ver_09c0e677ec8192dc4fc12cb620069f29",
+        "report_period": "2025-12-31",
+        "content_hash": "c15272977147dee7e6935a38ea0e4fd6855370aabb106f54cfe20f7cf6048ec9"
+      },
+      {
+        "instrument_id": "603659.SH",
+        "report_id": "asset_50c70429093f66b34fc57ad8f896fcee",
+        "document_version": "ver_c867a6a692048e88fd9cb80473fbf908",
+        "report_period": "2025-12-31",
+        "content_hash": "4e81f5539046ba1eee733100f38442a4abd5037afe3881115ba7f48678fa35b6"
+      },
+      {
+        "instrument_id": "920015.BJ",
+        "report_id": "asset_b87f1d1a48e662dae376c540cd021f69",
+        "document_version": "ver_cfdbd2d058af825b1fc39f494d7a9bd3",
+        "report_period": "2025-12-31",
+        "content_hash": "4d2c1612f6f62a9024b8947d7a01b70c40f8f347c2975fa1a05b908d0770695a"
+      },
+      {
+        "instrument_id": "302132.SZ",
+        "report_id": "asset_0a488da55636b09107be6d719c9ebf39",
+        "document_version": "ver_2d20ba3aebc5fac6c562cd619695995a",
+        "report_period": "2025-12-31",
+        "content_hash": "605394bd0879f906a829a9fcd3a2dab037d8aad2554b741a7d95757a3a5e3020"
+      }
+    ]
+  },
+  "denominator_rule": "Distinct source-native materials that an official sentence, a company purchase row, or a raw-material row in a formal materials-and-energy table binds to the company's own purchase or consumption. Sales rows, service rows, direct-material cost, inventory amounts, toll-processing arrangements, energy rows, generic unnamed purchases, supplier totals, and price-only commodity mentions stay outside this denominator. A report whose checked locations are only lawful coverage adds zero names and is not a miss. The denominator is the count of those names after this reading, not the bundle fact count.",
+  "reports_reread": [
+    "300750.SZ",
+    "603659.SH",
+    "920015.BJ",
+    "302132.SZ"
+  ],
+  "per_company": [
+    {
+      "instrument_id": "300750.SZ",
+      "disclosed_named_inputs": [
+        "正极材料",
+        "负极材料",
+        "隔膜",
+        "电解液",
+        "磷酸铁锂",
+        "锂盐",
+        "氢氧化锂"
+      ],
+      "delivered_named_inputs": [
+        "正极材料",
+        "负极材料",
+        "隔膜",
+        "电解液",
+        "磷酸铁锂",
+        "锂盐",
+        "氢氧化锂"
+      ],
+      "missing_named_inputs": [],
+      "recall_numerator": 7,
+      "recall_denominator": 7,
+      "reading": "Page 40 states the company's own production inputs as 正极材料、负极材料、隔膜和电解液. Page 73 purchase rows name 磷酸铁锂 and 锂盐及氢氧化锂. Lithium, nickel, and cobalt on page 40 are price factors, not extra named inputs."
+    },
+    {
+      "instrument_id": "603659.SH",
+      "disclosed_named_inputs": [
+        "焦类",
+        "初级石墨",
+        "沥青",
+        "隔膜基膜",
+        "陶瓷材料",
+        "氧化铝",
+        "氢氧化铝",
+        "钢材",
+        "机加工件"
+      ],
+      "delivered_named_inputs": [
+        "焦类",
+        "初级石墨",
+        "沥青",
+        "隔膜基膜",
+        "陶瓷材料",
+        "氧化铝",
+        "氢氧化铝",
+        "钢材",
+        "机加工件"
+      ],
+      "missing_named_inputs": [],
+      "recall_numerator": 9,
+      "recall_denominator": 9,
+      "reading": "Page 33 binds 焦类、初级石墨、沥青 to anode materials, 隔膜基膜、陶瓷材料、氧化铝、氢氧化铝 to coated-separator production, and 钢材、机加工件 to lithium-equipment materials."
+    },
+    {
+      "instrument_id": "920015.BJ",
+      "disclosed_named_inputs": [
+        "丁酮",
+        "双氧水",
+        "液氨",
+        "一甲基三氯硅烷",
+        "乙烯基三氯硅烷",
+        "乙醛",
+        "丁酮肟"
+      ],
+      "delivered_named_inputs": [
+        "丁酮",
+        "双氧水",
+        "液氨",
+        "一甲基三氯硅烷",
+        "乙烯基三氯硅烷",
+        "乙醛",
+        "丁酮肟"
+      ],
+      "missing_named_inputs": [],
+      "recall_numerator": 7,
+      "recall_denominator": 7,
+      "reading": "Page 26 names the company's product raw materials. Page 51 adds 丁酮肟 as a purchased raw-material row. 蒸汽 and 电 on that table are energy rows and stay outside the denominator."
+    },
+    {
+      "instrument_id": "302132.SZ",
+      "disclosed_named_inputs": [],
+      "delivered_named_inputs": [],
+      "missing_named_inputs": [],
+      "recall_numerator": 0,
+      "recall_denominator": 0,
+      "coverage_only": true,
+      "reading": "The full report has no 主要原材料包括/为, 原材料包括, or 采购原材料（名称） disclosure. Checked locations stay legal_empty and add no named input."
+    }
+  ],
+  "chengfei_coverage": [
+    {
+      "scope_id": "302132-procurement-mode",
+      "page": 11,
+      "item": "采购模式",
+      "outcome": "legal_empty",
+      "in_input_denominator": false
+    },
+    {
+      "scope_id": "302132-cost-composition",
+      "page": 15,
+      "item": "营业成本构成只有行业营业成本合计",
+      "outcome": "legal_empty",
+      "in_input_denominator": false
+    },
+    {
+      "scope_id": "302132-supplier-total",
+      "page": 16,
+      "item": "前五名供应商合计采购金额",
+      "outcome": "legal_empty",
+      "in_input_denominator": false
+    },
+    {
+      "scope_id": "302132-related-purchase",
+      "page": 61,
+      "item": "关联交易内容采购商品",
+      "outcome": "legal_empty",
+      "in_input_denominator": false
+    },
+    {
+      "scope_id": "302132-inventory-class",
+      "page": 134,
+      "item": "存货类别原材料金额",
+      "outcome": "legal_empty",
+      "in_input_denominator": false
+    }
+  ],
+  "exclusions": [
+    {
+      "instrument_id": "300750.SZ",
+      "item": "锂、镍、钴价格因素",
+      "page": 40,
+      "outcome": "excluded_price_risk",
+      "in_input_denominator": false
+    },
+    {
+      "instrument_id": "300750.SZ",
+      "item": "直接材料成本",
+      "page": 27,
+      "outcome": "legal_empty",
+      "in_input_denominator": false
+    },
+    {
+      "instrument_id": "920015.BJ",
+      "item": "蒸汽、电",
+      "page": 51,
+      "outcome": "energy_not_input",
+      "in_input_denominator": false
+    },
+    {
+      "instrument_id": "920015.BJ",
+      "item": "委托外部厂商加工丁酮肟",
+      "page": 12,
+      "outcome": "toll_processing_not_input",
+      "in_input_denominator": false
+    },
+    {
+      "instrument_id": "302132.SZ",
+      "item": "基础原材料、直接材料、材料费、燃料动力费、动力费、存货原材料、采购商品",
+      "page": null,
+      "outcome": "legal_empty",
+      "in_input_denominator": false
+    }
+  ],
+  "source_recall": {
+    "numerator": 23,
+    "denominator": 23,
+    "value": 1.0
+  },
+  "source_accuracy": {
+    "numerator": 23,
+    "denominator": 23,
+    "value": 1.0
+  },
+  "critical_numeric_errors": 0,
+  "expansion_gates_met": true,
+  "stage4_aggregate_expansion_gates_met": false,
+  "gate_rule": "expansion_gates_met is true only when all four frozen 2025 reports were reread, every disclosed named material input was delivered, every delivered name matches that reading, and critical numeric errors equal 0. 302132.SZ contributes lawful coverage and zero named inputs; that coverage is not a miss and not a fact. The boolean covers only plan manufacturing_materials_stage4_material_inputs.2026-09-30.3, these four reports, and extract_material_inputs. It does not pass the Stage 4 aggregate gate and does not replace the three-report MI-2 observation.",
+  "not_reused_prior_result": "MI-1 19/23 and MI-2 23/23 were not used as this denominator. The count 23 is the distinct names read from the four official reports, not the bundle row count."
+}
