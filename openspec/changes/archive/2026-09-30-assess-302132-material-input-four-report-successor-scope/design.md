@@ -55,4 +55,29 @@
 
 ## Open Questions
 
-`302132.SZ` 是否适合 `extract_material_inputs` 尚未判断。该判断留到 2.2，不能在本设计中预填。
+2.2 已记录适用性结论。结论写在下一节，不改 `dossier.md`。
+
+## Fitness
+
+2.2 只读取 `dossier.md`、已通过的范围合同和已通过的 dossier 审核。没有重读年报，没有把 coverage 改写成已观察事实。
+
+适用性结论是 **unsuitable**。
+
+`302132.SZ` 不能为 `extract_material_inputs` 提供可绑定、可复核的具名材料投入事实。依据是：
+
+- 没有 source-native 具名材料。全文没有正式主要原材料表。
+- 采购模式只有流程描述，没有具名采购对象。
+- 营业成本构成只有行业成本合计，项目列是“营业成本”。
+- 关联采购的交易内容只有“采购商品”，没有明示材料。
+- 主要供应商只有合计金额和比例，没有供应商名称或材料名称。
+- 其余相关文字是泛称“基础原材料”“直接材料”“材料费”“物料消耗”、能源项目“燃料动力费”“动力费”、存货类别“原材料”，或会计政策。这些都没有被提升为具名投入。
+
+因此：
+
+- `302132.SZ` 不进入材料投入 successor。本 change 不另立 successor 范围卡。
+- Stage 4 aggregate 继续保持 hold。不重开 aggregate gate。
+- 不从批准清单外补发行人。
+- MI-1、MI-2 和历史制品保持不变。不把 `302132.SZ` 追加到三报告结果。
+- 不改 Python，不入队，不 replay。
+- 不创建 restricted-promotion、六章包、规模质量或生产 change。
+- `production_authorization` 保持 `not_authorized`。`scale_quality_claim_allowed` 保持 false。
