@@ -9,4 +9,4 @@
 
 ## 3. Archive, not yet authorized
 
-- [ ] 3.1 After 2.2, keep that reconciliation verdict and archive this read-only comparison. Do not create the successor change unless 2.2 explicitly confirmed coverage-only suitable, and do not create it inside this archive task
+- [x] 3.1 After 2.2, keep that reconciliation verdict and archive this read-only comparison. The verdict remains coverage-only suitable. It does not create a successor, pass the aggregate gate, or rewrite the archived unsuitable text. Archive to `openspec/changes/archive/2026-09-30-reconcile-302132-material-input-fitness-and-coverage-contract/`. Do not create the successor change inside this archive task
