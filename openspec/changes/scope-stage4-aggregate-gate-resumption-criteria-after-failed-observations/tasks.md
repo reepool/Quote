@@ -1,0 +1,11 @@
+## 1. Scope review gate
+
+- [ ] 1.1 Independent review accepts this resumption contract: four named local passes and the four-report set stay bound to their own source-reviews; MI-2 stays a three-report row; operating-quantity failures 26/36 with critical numeric errors 1 and 36/38, and segment-financial failures 122/132 with critical numeric errors 4 and recall 102/132 with accuracy 114/142, remain historical rows; a future chapter re-entry requires a new same-set successor with its own source-review and artifact hashes; this card does not create that successor. Do not check 2.1 or 3.1 in this review. Do not prefill aggregate `expansion_gates_met=true`. Do not modify historical archives, the ledger, replay, source-review, Python, publication, closure, mode, identity, or checkpoint. Do not start restricted promotion, the six-chapter package, scale quality, or production
+
+## 2. Checklist, not yet authorized
+
+- [ ] 2.1 After 1.1, record the frozen resumption checklist from this contract. Do not create an operating-quantity or segment-financial successor, a replay, or an aggregate true in that task
+
+## 3. Archive, not yet authorized
+
+- [ ] 3.1 After 2.1, keep the contract and archive this read-only scope. Do not start a repair or a production admission in that task
