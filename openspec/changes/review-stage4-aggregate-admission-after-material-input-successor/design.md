@@ -48,4 +48,32 @@
 
 ## Open Questions
 
-当前四个局部通过加上保留的失败观察，是否仍使 aggregate 只能 hold，留到 1.1 之后的判定。本设计不预填。
+2.1 已在下一节记录准入结论。旧 hold-only aggregate 合同未改。
+
+## Admission
+
+2.1 只读取本 change 已冻结的观察。没有重算指标，没有把四个局部 true 相加，也没有修改历史账本、旧归档、replay 或 source-review。
+
+四个局部结果各自成立，但只属于各自计划、报告集和章节：
+
+| 章节 | 计划 | 局部结果 |
+|---|---|---|
+| `extract_material_inputs` | `.2026-09-30.3` | recall 23/23，accuracy 23/23，critical numeric errors 0 |
+| `extract_operating_quantities` | `.2026-09-28.3` | 38/38 |
+| `extract_segment_financials` | `.2026-09-29.3` | recall 132/132，accuracy 144/144 |
+| `extract_counterparties_and_concentration` | `.2026-09-29.1` | 45/45 |
+
+它们都使用 `300750.SZ`、`603659.SH`、`920015.BJ`、`302132.SZ`。MI-2 `.2026-09-26.2` 仍是三报告 23/23，与材料投入 `.3` 保持独立，没有被回填。
+
+失败观察没有被后续局部 true 擦除或替换：
+
+- 产销量 26/36，accuracy 26/27，critical numeric errors 1；另有 36/38，accuracy 36/36，critical numeric errors 0。
+- 分部财务 122/132，accuracy 129/133，critical numeric errors 4；另有 recall 102/132，accuracy 114/142，critical numeric errors 0。
+
+准入结论是 **hold**。`stage4_aggregate_expansion_gates_met` 保持 false。
+
+- 不产生 aggregate `expansion_gates_met=true`。
+- 不创建跨章节 recall、accuracy 或 critical-error 分数。
+- 不授权 restricted-promotion、六章包、规模质量或生产。
+- `production_authorization` 保持 `not_authorized`。`scale_quality_claim_allowed` 保持 false。
+- 不改 publication、closure、mode、identity、checkpoint。

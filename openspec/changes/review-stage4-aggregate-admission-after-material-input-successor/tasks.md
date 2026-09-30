@@ -4,7 +4,7 @@
 
 ## 2. Admission judgment, not yet authorized
 
-- [ ] 2.1 After 1.1, record the aggregate admission from those frozen observations only. If the named failed observations remain, the result is hold and there is no aggregate `expansion_gates_met=true`. Do not add the four local trues together, and do not start production
+- [x] 2.1 After 1.1, record the aggregate admission from those frozen observations only. If the named failed observations remain, the result is hold and there is no aggregate `expansion_gates_met=true`. Do not add the four local trues together, and do not start production. The result is in design.md under "Admission": hold, with `stage4_aggregate_expansion_gates_met` false. Do not archive in this task
 
 ## 3. Archive, not yet authorized
 
