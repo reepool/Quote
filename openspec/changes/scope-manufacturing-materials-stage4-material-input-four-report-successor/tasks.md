@@ -1,0 +1,13 @@
+## 1. Scope review gate
+
+- [ ] 1.1 Independent review accepts this successor scope: only existing `extract_material_inputs`; the approved four-report set `300750.SZ`, `603659.SH`, `920015.BJ`, and `302132.SZ` with their frozen identities; plan `manufacturing_materials_stage4_material_inputs.2026-09-30.3`; isolation directory `replay/20260930/`; and a later source-review bound only to that plan. `302132.SZ` may record evidenced `not_disclosed` or `not_applicable` and must not receive an invented material-input fact. Do not check 2.1 or any later task in this review. Do not change Python, enqueue, replay, MI-1, MI-2, the archived dossier, the archived assessment, the aggregate ledger, or historical replays. Do not add `302132.SZ` to MI-2. Do not prefill recall, accuracy, critical numeric errors, or a gate. Do not treat this successor as an aggregate pass, and do not start restricted promotion, the six-chapter package, scale quality, or production
+
+## 2. Implementation, not yet authorized
+
+- [ ] 2.1 After 1.1, implement the minimum four-report successor on the existing `replay_material_input_research` path and add directed tests. Use plan `.2026-09-30.3` and the four frozen reports. Do not enqueue or replay in that task, and do not rewrite the `.2026-09-26.2` three-report artifacts
+
+## 3. Replay and review, not yet authorized
+
+- [ ] 3.1 After the implementation review, run the controlled successor replay into `replay/20260930/` with run id `stage4-material-inputs-20260930`. Output `accepted_for_review` only. Do not put recall, accuracy, critical numeric errors, a gate, or a source-review in the bundle
+- [ ] 3.2 After replay, independently source-review the four reports. Derive recall, accuracy, critical numeric errors, and the gate from the reread. Keep named facts distinct from `not_disclosed` and `not_applicable`. Bind the review only to this plan's artifact hashes
+- [ ] 3.3 After the source-review, keep that observation and archive this successor only as its own plan, report set, and chapter. Do not backfill MI-2, do not clear the operating-quantity or segment-financial failures, and do not create aggregate `expansion_gates_met=true`
