@@ -4,7 +4,7 @@
 
 ## 2. Comparison and verdict, not yet authorized
 
-- [ ] 2.1 After 1.1, write the two suitability definitions side by side. One requires at least one bindable named material-input fact. The other requires only a complete review with evidenced `not_disclosed` or `not_applicable` coverage. Record that the checked locations were read and no source-native named material was found, and leave open whether that is an unauditable chapter or lawful non-disclosure. Do not choose a verdict in this task
+- [x] 2.1 After 1.1, write the two suitability definitions side by side. One requires at least one bindable named material-input fact. The other requires only a complete review with evidenced `not_disclosed` or `not_applicable` coverage. Record that the checked locations were read and no source-native named material was found, and leave open whether that is an unauditable chapter or lawful non-disclosure. The comparison is in design.md under "Definition comparison". Do not choose a verdict in this task. Do not start 2.2 in that task
 - [ ] 2.2 After 2.1, record exactly one result. Retained unsuitable must explain why every aggregate report must have a named material fact and why that bar does not violate the upstream `not_disclosed` contract; the Stage 4 aggregate then stays hold and no successor opens. Coverage-only suitable must record that the archived assessment treated lawful coverage as sample unsuitability, must not rewrite the dossier or historical replays, and may authorize only a later separate four-report material-input successor scope change. This task still does not implement, enqueue, or replay
 
 ## 3. Archive, not yet authorized

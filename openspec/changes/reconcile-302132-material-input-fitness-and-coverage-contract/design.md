@@ -53,4 +53,25 @@
 
 ## Open Questions
 
-`302132.SZ` 的完整 `not_disclosed` 是样本不适合，还是合法的 coverage-only 样本，留到 2.2。本设计不预填。
+两种定义已在下一节并列。哪一种约束 `302132.SZ`，留到 2.2。本节不选择。
+
+## Definition comparison
+
+2.1 只读取已通过的范围合同、上位制造/材料需求、阶段 4 最小切片 spec，以及已归档 dossier 和 assessment。没有重读年报，没有改写旧 dossier，也没有选择定义。
+
+| 定义 | 样本门槛 | 没有具名材料时 |
+|---|---|---|
+| 具名事实 | 每份报告至少产生一个可绑定的具名 `material_input` fact | 视为样本不适合 |
+| coverage-only | 规定位置已经完成完整审核 | 以有证据的 `not_disclosed` 或 `not_applicable` 作为合法 coverage，不生成 `material_input` fact |
+
+`302132.SZ` 的已归档 dossier 已经检查采购模式、营业成本构成、关联采购和主要供应商合计。这些位置没有 source-native 具名材料。本对照不判断这是“章节不可评估”还是“合法未披露”。
+
+以下边界在两种定义下都保持：
+
+- `not_disclosed` 不是 `extraction_failed`。后者只用于缺页、表头、单位或证据绑定。
+- coverage 不得改写成 observed `material_input` fact。
+- 旧 dossier、MI-1、MI-2、aggregate ledger 和 replay 不改。
+- 不创建 successor，不改 Python，不入队，不 replay。
+- Stage 4 aggregate 继续 hold。`302132.SZ` 不补入 MI-2。
+
+本对照没有记录 unsuitable 或 coverage-only suitable。那个二选一留给 2.2。
