@@ -13,7 +13,7 @@ import os
 import re
 import shutil
 import uuid
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Any, Literal
 
@@ -62,10 +62,19 @@ MATERIAL_INPUT_RESEARCH_PLAN_VERSION = (
 MATERIAL_INPUT_PROCUREMENT_PLAN_VERSION = (
     "manufacturing_materials_stage4_material_inputs.2026-09-26.2"
 )
+MATERIAL_INPUT_FOUR_REPORT_PLAN_VERSION = (
+    "manufacturing_materials_stage4_material_inputs.2026-09-30.3"
+)
 MATERIAL_INPUT_CHAPTER = ChapterTask.EXTRACT_MATERIAL_INPUTS
 _REPOSITORY_ROOT = Path(__file__).resolve().parents[2]
 _PRODUCT_MENTION = re.compile(r"产品主要包括|主要产品包括|主要产品为")
 _REPLAY_INSTRUMENTS = ("300750.SZ", "603659.SH", "920015.BJ")
+_FOUR_REPORT_INSTRUMENTS = (
+    "300750.SZ",
+    "603659.SH",
+    "920015.BJ",
+    "302132.SZ",
+)
 _ENQUEUE_SCHEMA = "company_profile_material_input_research_enqueue.v1"
 _RUN_SCHEMA = "company_profile_material_input_research_run.v1"
 
@@ -248,7 +257,7 @@ class MaterialInputResearchBundle(_StrictModel):
     production_authorization: Literal["not_authorized"] = "not_authorized"
     plan_version: str = MATERIAL_INPUT_RESEARCH_PLAN_VERSION
     reports: tuple[MaterialInputReportBindingRecord, ...] = Field(
-        min_length=3, max_length=3
+        min_length=3, max_length=4
     )
     scope_outcomes: tuple[MaterialInputScopeOutcome, ...] = Field(min_length=1)
     facts: tuple[MaterialInputResearchFact, ...] = ()
@@ -266,6 +275,7 @@ class _ScopeBinding:
         "product_overlap",
         "company_purchase",
         "materials_energy_table",
+        "supplier_total",
     ]
     page: int
     section_title: str
@@ -326,6 +336,85 @@ def material_input_procurement_bindings() -> tuple[MaterialInputReportBinding, .
                 ),
             ),
         ),
+    )
+
+
+def material_input_four_report_bindings() -> tuple[MaterialInputReportBinding, ...]:
+    """Return the .3 plan: the .2 scopes plus the coverage-only fourth report.
+
+    ``302132.SZ`` is bound to pages that were read for procurement, cost,
+    related-party purchases, and inventory. Those scopes do not embed a
+    material name. A complete read with no named input stays legal empty.
+    """
+
+    prior = tuple(
+        replace(item, plan_version=MATERIAL_INPUT_FOUR_REPORT_PLAN_VERSION)
+        for item in material_input_procurement_bindings()
+    )
+    return prior + (_chengfei_coverage_binding(),)
+
+
+def _chengfei_coverage_binding() -> MaterialInputReportBinding:
+    return MaterialInputReportBinding(
+        sample_id="manufacturing-materials-302132-2025-material-input",
+        company_name="中航成飞",
+        exchange="SZSE",
+        instrument_id="302132.SZ",
+        report_id="asset_0a488da55636b09107be6d719c9ebf39",
+        document_version="ver_2d20ba3aebc5fac6c562cd619695995a",
+        published_at="2026-04-28T16:00:00+00:00",
+        content_hash=(
+            "605394bd0879f906a829a9fcd3a2dab037d8aad2554b741a7d95757a3a5e3020"
+        ),
+        relative_pdf_path=(
+            "data/filings/announcements/blobs/60/"
+            "605394bd0879f906a829a9fcd3a2dab037d8aad2554b741a7d95757a3a5e3020.pdf"
+        ),
+        content_length=1721821,
+        page_count=186,
+        relative_dossier_path=(
+            "openspec/changes/archive/"
+            "2026-09-30-assess-302132-material-input-four-report-successor-scope/"
+            "dossier.md"
+        ),
+        scopes=(
+            _ScopeBinding(
+                "302132-cost-composition",
+                "direct_material_cost",
+                15,
+                "营业成本构成",
+                ("营业成本构成",),
+            ),
+            _ScopeBinding(
+                "302132-procurement-mode",
+                "company_purchase",
+                11,
+                "采购模式",
+                ("采购模式",),
+            ),
+            _ScopeBinding(
+                "302132-supplier-total",
+                "supplier_total",
+                16,
+                "公司主要供应商情况",
+                ("前五名供应商合计采购金额",),
+            ),
+            _ScopeBinding(
+                "302132-related-purchase",
+                "company_purchase",
+                61,
+                "重大关联交易",
+                ("采购商品",),
+            ),
+            _ScopeBinding(
+                "302132-inventory-class",
+                "inventory_amount",
+                134,
+                "存货分类",
+                ("原材料",),
+            ),
+        ),
+        plan_version=MATERIAL_INPUT_FOUR_REPORT_PLAN_VERSION,
     )
 
 
@@ -554,7 +643,10 @@ def research_material_hits(
     plan. The archived 2026-09-26.1 plan and common-core extraction stay unchanged.
     """
 
-    if plan_version != MATERIAL_INPUT_PROCUREMENT_PLAN_VERSION:
+    if plan_version not in {
+        MATERIAL_INPUT_PROCUREMENT_PLAN_VERSION,
+        MATERIAL_INPUT_FOUR_REPORT_PLAN_VERSION,
+    }:
         return ()
     if kind == "company_purchase":
         return _company_purchase_hits(text)
@@ -719,6 +811,7 @@ def classify_material_scope(
         "inventory_amount",
         "outsourced_processing",
         "product_overlap",
+        "supplier_total",
     }:
         return "legal_empty"
     raise ValueError(f"unknown material scope kind: {kind}")
@@ -804,7 +897,7 @@ class MaterialInputEnqueueSnapshot(_StrictModel):
     chapter_task: Literal["extract_material_inputs"] = "extract_material_inputs"
     production_authorization: Literal["not_authorized"] = "not_authorized"
     plan_version: str = MATERIAL_INPUT_RESEARCH_PLAN_VERSION
-    reports: tuple[MaterialInputEnqueueReport, ...] = Field(min_length=3, max_length=3)
+    reports: tuple[MaterialInputEnqueueReport, ...] = Field(min_length=3, max_length=4)
 
 
 class MaterialInputRunSnapshot(_StrictModel):
@@ -849,15 +942,18 @@ def replay_material_input_research(
     catalog: Any | None = None,
     run_id: str = "stage4-material-inputs-20260926",
     preparer: Stage5EvidencePreparer | None = None,
+    bindings: tuple[MaterialInputReportBinding, ...] | None = None,
 ) -> Path:
-    """Freeze the approved binding, then run only those three material-input reports.
+    """Freeze one approved binding, then run only those material-input reports.
 
+    The default binding remains the three-report ``.2026-09-26.2`` plan. The
+    four-report successor passes ``material_input_four_report_bindings()``.
     The run snapshot records the isolated bundle. It does not record recall,
     accuracy, critical errors, or expansion gates.
     """
 
     root = Path(repository_root) if repository_root is not None else _REPOSITORY_ROOT
-    selected = material_input_procurement_bindings()
+    selected = material_input_procurement_bindings() if bindings is None else bindings
     enqueue_path = freeze_material_input_research_enqueue(
         output_root, repository_root=root, bindings=selected
     )
@@ -886,11 +982,7 @@ def _enqueue_snapshot(
     bindings: tuple[MaterialInputReportBinding, ...] | None = None,
 ) -> MaterialInputEnqueueSnapshot:
     bindings = material_input_procurement_bindings() if bindings is None else bindings
-    instruments = tuple(item.instrument_id for item in bindings)
-    if instruments != _REPLAY_INSTRUMENTS:
-        raise MaterialInputResearchError(
-            "material-input replay only admits the three approved 2025 reports"
-        )
+    plan_version = _require_report_set(bindings)
     reports: list[MaterialInputEnqueueReport] = []
     for binding in bindings:
         pdf = repository_root / binding.relative_pdf_path
@@ -923,14 +1015,33 @@ def _enqueue_snapshot(
                 ),
             )
         )
-    versions = {item.plan_version for item in bindings}
-    if len(versions) != 1:
-        raise MaterialInputResearchError(
-            "material-input enqueue bindings must share one plan version"
-        )
     return MaterialInputEnqueueSnapshot(
-        plan_version=versions.pop(), reports=tuple(reports)
+        plan_version=plan_version, reports=tuple(reports)
     )
+
+
+def _require_report_set(bindings: tuple[MaterialInputReportBinding, ...]) -> str:
+    """Admit only a frozen instrument tuple with its own plan version."""
+
+    instruments = tuple(item.instrument_id for item in bindings)
+    plans = {item.plan_version for item in bindings}
+    if len(plans) != 1:
+        raise MaterialInputResearchError(
+            "material-input bindings must share one plan version"
+        )
+    plan = next(iter(plans))
+    allowed = {
+        _REPLAY_INSTRUMENTS: {
+            MATERIAL_INPUT_RESEARCH_PLAN_VERSION,
+            MATERIAL_INPUT_PROCUREMENT_PLAN_VERSION,
+        },
+        _FOUR_REPORT_INSTRUMENTS: {MATERIAL_INPUT_FOUR_REPORT_PLAN_VERSION},
+    }
+    if plan not in allowed.get(instruments, set()):
+        raise MaterialInputResearchError(
+            "material-input replay only admits its frozen report set and plan"
+        )
+    return plan
 
 
 def _write_json_atomic(directory: Path, name: str, payload: dict[str, Any]) -> None:
@@ -994,10 +1105,7 @@ def build_material_input_research_bundle(
     bindings: tuple[MaterialInputReportBinding, ...] | None = None,
 ) -> MaterialInputResearchBundle:
     selected = material_input_research_bindings() if bindings is None else bindings
-    if len(selected) != 3 or len({item.sample_id for item in selected}) != 3:
-        raise MaterialInputResearchError(
-            "the research slice prepares the three dossier reports"
-        )
+    plan_version = _require_report_set(selected)
     active_preparer = preparer or Stage5EvidencePreparer()
     outcomes: list[MaterialInputScopeOutcome] = []
     facts: list[MaterialInputResearchFact] = []
@@ -1139,14 +1247,9 @@ def build_material_input_research_bundle(
                     _sales_role(binding.sample_id, record, exposure, page_hashes)
                 )
         _append_report_record(report_records, binding, repository_root)
-    versions = {item.plan_version for item in selected}
-    if len(versions) != 1:
-        raise MaterialInputResearchError(
-            "material-input bundle bindings must share one plan version"
-        )
     return MaterialInputResearchBundle(
         run_id=run_id,
-        plan_version=versions.pop(),
+        plan_version=plan_version,
         reports=tuple(report_records),
         scope_outcomes=tuple(outcomes),
         facts=tuple(facts),
@@ -1193,6 +1296,7 @@ def _outcome_reason(kind: str, outcome: str) -> str:
         "product_overlap": "product or sales evidence alone does not create an input role",
         "company_purchase": "no company purchase row names a raw material",
         "materials_energy_table": "no raw-material row is purchased or consumed",
+        "supplier_total": "a supplier total is not a named material input",
     }
     try:
         return reasons[kind]

@@ -16,6 +16,7 @@ from research.company_profile.core_evidence_selection import (
     explicit_material_input_names,
 )
 from research.company_profile.material_input_research import (
+    MATERIAL_INPUT_FOUR_REPORT_PLAN_VERSION,
     MATERIAL_INPUT_PROCUREMENT_PLAN_VERSION,
     MaterialInputScopeOutcome,
     ResearchEvidenceRef,
@@ -24,6 +25,7 @@ from research.company_profile.material_input_research import (
     classify_material_scope,
     commit_material_input_research,
     extraction_failure_outcome,
+    material_input_four_report_bindings,
     material_input_procurement_bindings,
     material_input_research_bindings,
     replay_material_input_research,
@@ -760,6 +762,77 @@ def test_new_scope_extraction_failure_keeps_its_kind():
 
 def _sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def test_four_report_successor_binding_keeps_the_three_report_plan():
+    historical = material_input_procurement_bindings()
+    successor = material_input_four_report_bindings()
+    assert [item.instrument_id for item in historical] == [
+        "300750.SZ",
+        "603659.SH",
+        "920015.BJ",
+    ]
+    assert {item.plan_version for item in historical} == {
+        MATERIAL_INPUT_PROCUREMENT_PLAN_VERSION
+    }
+    assert "302132.SZ" not in {item.instrument_id for item in historical}
+    assert [item.instrument_id for item in successor] == [
+        "300750.SZ",
+        "603659.SH",
+        "920015.BJ",
+        "302132.SZ",
+    ]
+    assert {item.plan_version for item in successor} == {
+        MATERIAL_INPUT_FOUR_REPORT_PLAN_VERSION
+    }
+    chengfei = successor[-1]
+    assert chengfei.report_id == "asset_0a488da55636b09107be6d719c9ebf39"
+    assert chengfei.document_version == "ver_2d20ba3aebc5fac6c562cd619695995a"
+    assert chengfei.content_hash == (
+        "605394bd0879f906a829a9fcd3a2dab037d8aad2554b741a7d95757a3a5e3020"
+    )
+    assert {item.kind for item in chengfei.scopes} == {
+        "company_purchase",
+        "direct_material_cost",
+        "supplier_total",
+        "inventory_amount",
+    }
+
+
+def test_four_report_successor_keeps_chengfei_coverage_empty(tmp_path):
+    destination = commit_material_input_research(
+        tmp_path / "material-input-four-report",
+        repository_root=_ROOT,
+        catalog=_Catalog(),
+        run_id="stage4-material-inputs-20260930",
+        bindings=material_input_four_report_bindings(),
+    )
+    payload = json.loads((destination / "result.json").read_text(encoding="utf-8"))
+    assert payload["plan_version"] == MATERIAL_INPUT_FOUR_REPORT_PLAN_VERSION
+    assert payload["disposition"] == "accepted_for_review"
+    assert payload["production_authorization"] == "not_authorized"
+    assert payload["provider_calls"] == 0
+    assert [item["instrument_id"] for item in payload["reports"]] == [
+        "300750.SZ",
+        "603659.SH",
+        "920015.BJ",
+        "302132.SZ",
+    ]
+    for forbidden in (
+        "recall",
+        "accuracy",
+        "critical_numeric_errors",
+        "expansion_gates_met",
+    ):
+        assert forbidden not in payload
+    sample = "manufacturing-materials-302132-2025-material-input"
+    assert all(item["sample_id"] != sample for item in payload["facts"])
+    chengfei_outcomes = [
+        item for item in payload["scope_outcomes"] if item["sample_id"] == sample
+    ]
+    assert chengfei_outcomes
+    assert {item["outcome"] for item in chengfei_outcomes} == {"legal_empty"}
+    assert all(item["names"] == [] for item in chengfei_outcomes)
 
 
 def test_research_output_cannot_use_the_production_data_tree():

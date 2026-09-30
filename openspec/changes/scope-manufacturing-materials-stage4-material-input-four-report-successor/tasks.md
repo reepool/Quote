@@ -4,7 +4,7 @@
 
 ## 2. Implementation, not yet authorized
 
-- [ ] 2.1 After 1.1, implement the minimum four-report successor on the existing `replay_material_input_research` path and add directed tests. Use plan `.2026-09-30.3` and the four frozen reports. Do not enqueue or replay in that task, and do not rewrite the `.2026-09-26.2` three-report artifacts
+- [x] 2.1 After 1.1, implement the minimum four-report successor on the existing `replay_material_input_research` path and add directed tests. Use plan `.2026-09-30.3` and the four frozen reports. Do not enqueue or replay in that task, and do not rewrite the `.2026-09-26.2` three-report artifacts. Implementation and tests are in place. Do not start 3.1 in that task
 
 ## 3. Replay and review, not yet authorized
 
