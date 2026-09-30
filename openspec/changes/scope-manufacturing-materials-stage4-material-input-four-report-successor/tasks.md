@@ -8,6 +8,6 @@
 
 ## 3. Replay and review, not yet authorized
 
-- [ ] 3.1 After the implementation review, run the controlled successor replay into `replay/20260930/` with run id `stage4-material-inputs-20260930`. Output `accepted_for_review` only. Do not put recall, accuracy, critical numeric errors, a gate, or a source-review in the bundle
+- [x] 3.1 After the implementation review, run the controlled successor replay into `replay/20260930/` with run id `stage4-material-inputs-20260930`. Output `accepted_for_review` only. Do not put recall, accuracy, critical numeric errors, a gate, or a source-review in the bundle. The `.2026-09-30.3` four-report replay is in that directory. Do not start 3.2 in that task
 - [ ] 3.2 After replay, independently source-review the four reports. Derive recall, accuracy, critical numeric errors, and the gate from the reread. Keep named facts distinct from `not_disclosed` and `not_applicable`. Bind the review only to this plan's artifact hashes
 - [ ] 3.3 After the source-review, keep that observation and archive this successor only as its own plan, report set, and chapter. Do not backfill MI-2, do not clear the operating-quantity or segment-financial failures, and do not create aggregate `expansion_gates_met=true`
