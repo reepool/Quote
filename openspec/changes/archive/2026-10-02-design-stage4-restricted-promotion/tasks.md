@@ -16,4 +16,4 @@
 
 ## 5. Archive, not yet authorized
 
-- [ ] 5.1 After 4.1, keep that export behavior and archive this scope. Do not start overview, regime, the six-chapter package, or a production admission in that task.
+- [x] 5.1 After 4.1, keep that export behavior and archive this scope. Do not start overview, regime, the six-chapter package, or a production admission in that task.
