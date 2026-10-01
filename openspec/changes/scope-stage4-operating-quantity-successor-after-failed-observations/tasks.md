@@ -4,7 +4,7 @@
 
 ## 2. Implementation, not yet authorized
 
-- [ ] 2.1 After 1.1, point the dossier bindings at the archived directory and reuse `replay_operating_quantity_research` with explicit plan `.2026-10-01.4`. Add directed tests for plan passing, four-report binding, dossier readability, and the inherited quantity boundaries. Do not change the default plan `.2026-09-28.3`, dossier bytes, PDF hashes, or extraction rules. Do not enqueue or replay in that task
+- [x] 2.1 After 1.1, point the dossier bindings at the archived directory and reuse `replay_operating_quantity_research` with explicit plan `.2026-10-01.4`. Add directed tests for plan passing, four-report binding, dossier readability, and the inherited quantity boundaries. Do not change the default plan `.2026-09-28.3`, dossier bytes, PDF hashes, or extraction rules. Do not enqueue or replay in that task. The archived dossier paths are readable, the explicit `.4` fixture stays isolated, and the default remains `.3`. Do not start 3.1 in that task
 
 ## 3. Replay and source review, not yet authorized
 

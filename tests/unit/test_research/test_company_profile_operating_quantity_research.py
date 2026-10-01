@@ -12,6 +12,7 @@ from research.company_profile.operating_quantity_research import (
     OPERATING_QUANTITY_HISTORICAL_PLAN_VERSION,
     OPERATING_QUANTITY_PLAN_VERSION,
     OPERATING_QUANTITY_PRIOR_SUCCESSOR_PLAN_VERSION,
+    OPERATING_QUANTITY_SUCCESSOR_PLAN_VERSION,
     _ScopeBinding,
     build_operating_quantity_research_bundle,
     commit_operating_quantity_research,
@@ -34,7 +35,9 @@ _PRIOR_SUCCESSOR_PLAN = (
 _ROOT = Path(__file__).resolve().parents[3]
 _HISTORICAL_REPLAY = (
     _ROOT
-    / "openspec/changes/scope-manufacturing-materials-stage4-operating-quantities-holdout/replay/20260928"
+    / "openspec/changes/archive"
+    / "2026-09-29-scope-manufacturing-materials-stage4-operating-quantities-holdout"
+    / "replay/20260928"
 )
 _HISTORICAL_HASHES = {
     "enqueue.json": "5fffde878890fb43c136c4e0082f4eba32fc9e65402e166a96cca164396fab7a",
@@ -46,7 +49,35 @@ _HISTORICAL_HASHES = {
 }
 _PRIOR_REPLAY = (
     _ROOT
-    / "openspec/changes/repair-operating-quantity-603659-coverage-and-evidence-binding/replay/20260928.2"
+    / "openspec/changes/archive"
+    / "2026-09-28-repair-operating-quantity-603659-coverage-and-evidence-binding"
+    / "replay/20260928.2"
+)
+_OQ3_REPLAY = (
+    _ROOT
+    / "openspec/changes/archive"
+    / "2026-09-28-repair-operating-quantity-catl-segment-sales-coverage"
+    / "replay/20260928.3"
+)
+_OQ3_HASHES = {
+    "enqueue.json": "30315acceaed18e870e3ded36ca5f5beb58c54e919d667b100bef8c81b9b2eb2",
+    "run.json": "f14af3b32355551805e5dca0c9d6e732dc06c8bed0a76c2d83fa0f28232588c5",
+    "operating-quantity-stage4-operating-quantities-20260928.3/result.json": (
+        "4a1f9823922881a9e210b9889067afeb0063b6106c7f5669791e6199c830d420"
+    ),
+    "source_review.json": "f1e041ecfc6a7d35ad041fcaef753adce13e51e21f871acf79a4052663a06345",
+}
+_DOSSIER_HASHES = {
+    "300750-sz-2025.md": "180cbb1d5e3bcae46e4dcc78047b13b25bf0602204c9250fa5ff02c552a1b0a7",
+    "603659-sh-2025.md": "4458a489585741d36fe3bd44156b06067e6194bccd9adab2cbda7b51a18ebaee",
+    "920015-bj-2025.md": "b49b61490d9740b0218af424ee10674f8bbf5f519136edb37db53ef22905a6b8",
+    "302132-sz-2025.md": "f0b8123f3f6abe9a769a0b918398808dd8060a2c1326749d9343ac4cb9aa2e36",
+}
+_OFFICIAL_REPLAY = (
+    _ROOT
+    / "openspec/changes"
+    / "scope-stage4-operating-quantity-successor-after-failed-observations"
+    / "replay/20261001"
 )
 _PRIOR_HASHES = {
     "enqueue.json": "b38b3fb11ea3f3a59b21f3072ac719ed7c7fbe4bc1063ea39294b9ca8afa79bc",
@@ -509,6 +540,113 @@ def test_replay_freezes_the_four_dossiers_before_the_run(tmp_path):
     assert (output_root / "enqueue.json").stat().st_mtime <= (
         output_root / run["bundle_dirname"] / "result.json"
     ).stat().st_mtime
+
+
+def test_oq3_replay_bytes_stay_unchanged():
+    for relative, expected in _OQ3_HASHES.items():
+        archived = _OQ3_REPLAY / relative
+        assert hashlib.sha256(archived.read_bytes()).hexdigest() == expected
+
+
+def test_explicit_successor_plan_stays_in_the_fixture(tmp_path):
+    official_before = _artifact_fingerprint(_OFFICIAL_REPLAY)
+    historical_before = _historical_fingerprints()
+    present = tmp_path / "already-present"
+    present.mkdir()
+    (present / "enqueue.json").write_text('{"kept": true}\n', encoding="utf-8")
+    present_before = _artifact_fingerprint(present)
+    preparer = _PlanVersionProbe()
+    run_path = replay_operating_quantity_research(
+        tmp_path / "successor",
+        repository_root=_ROOT,
+        run_id="stage4-operating-quantities-20261001",
+        preparer=preparer,
+        plan_version=OPERATING_QUANTITY_SUCCESSOR_PLAN_VERSION,
+    )
+    assert set(preparer.plan_versions) == {OPERATING_QUANTITY_SUCCESSOR_PLAN_VERSION}
+    assert OPERATING_QUANTITY_PLAN_VERSION == _SUCCESSOR_PLAN
+    assert OPERATING_QUANTITY_SUCCESSOR_PLAN_VERSION != OPERATING_QUANTITY_PLAN_VERSION
+    output_root = run_path.parent
+    enqueue_path = output_root / "enqueue.json"
+    enqueue = json.loads(enqueue_path.read_text(encoding="utf-8"))
+    run = json.loads(run_path.read_text(encoding="utf-8"))
+    bundle = json.loads(
+        (output_root / run["bundle_dirname"] / "result.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    assert enqueue["plan_version"] == OPERATING_QUANTITY_SUCCESSOR_PLAN_VERSION
+    assert bundle["plan_version"] == OPERATING_QUANTITY_SUCCESSOR_PLAN_VERSION
+    assert "plan_version" not in run
+    assert (
+        run["enqueue_sha256"] == hashlib.sha256(enqueue_path.read_bytes()).hexdigest()
+    )
+    assert run["run_id"] == "stage4-operating-quantities-20261001"
+    assert {
+        "recall",
+        "accuracy",
+        "critical_numeric_errors",
+        "expansion_gates_met",
+        "source_review",
+    }.isdisjoint(enqueue)
+    assert {
+        "recall",
+        "accuracy",
+        "critical_numeric_errors",
+        "expansion_gates_met",
+        "source_review",
+    }.isdisjoint(bundle)
+    assert [item["instrument_id"] for item in enqueue["reports"]] == [
+        "300750.SZ",
+        "603659.SH",
+        "920015.BJ",
+        "302132.SZ",
+    ]
+    for report in enqueue["reports"]:
+        dossier = _ROOT / report["dossier_path"]
+        assert "changes/archive/" in report["dossier_path"]
+        assert dossier.is_file()
+        assert (
+            hashlib.sha256(dossier.read_bytes()).hexdigest()
+            == report["dossier_sha256"]
+            == _DOSSIER_HASHES[dossier.name]
+        )
+        assert report["plan_version"] == OPERATING_QUANTITY_SUCCESSOR_PLAN_VERSION
+    assert output_root.resolve() != _OFFICIAL_REPLAY.resolve()
+    assert _artifact_fingerprint(_OFFICIAL_REPLAY) == official_before
+    assert _historical_fingerprints() == historical_before
+    assert _artifact_fingerprint(present) == present_before
+
+
+def _artifact_fingerprint(path: Path) -> tuple[tuple[str, str], ...] | None:
+    if not path.exists():
+        return None
+    rows = []
+    for item in sorted(
+        candidate for candidate in path.rglob("*") if candidate.is_file()
+    ):
+        rows.append(
+            (
+                str(item.relative_to(path)),
+                hashlib.sha256(item.read_bytes()).hexdigest(),
+            )
+        )
+    return tuple(rows)
+
+
+def _historical_fingerprints() -> dict[str, str]:
+    fingerprints = {}
+    for root, hashes in (
+        (_HISTORICAL_REPLAY, _HISTORICAL_HASHES),
+        (_PRIOR_REPLAY, _PRIOR_HASHES),
+        (_OQ3_REPLAY, _OQ3_HASHES),
+    ):
+        for relative, expected in hashes.items():
+            archived = root / relative
+            digest = hashlib.sha256(archived.read_bytes()).hexdigest()
+            assert digest == expected
+            fingerprints[str(archived)] = digest
+    return fingerprints
 
 
 def test_two_capacity_sentences_keep_their_own_qualifiers():

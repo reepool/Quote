@@ -64,6 +64,14 @@ OPERATING_QUANTITY_PRIOR_SUCCESSOR_PLAN_VERSION = (
 OPERATING_QUANTITY_PLAN_VERSION = (
     "manufacturing_materials_stage4_operating_quantities.2026-09-28.3"
 )
+OPERATING_QUANTITY_SUCCESSOR_PLAN_VERSION = (
+    "manufacturing_materials_stage4_operating_quantities.2026-10-01.4"
+)
+_OPERATING_QUANTITY_DOSSIER_DIR = (
+    "openspec/changes/archive/"
+    "2026-09-29-scope-manufacturing-materials-stage4-operating-quantities-holdout/"
+    "dossiers"
+)
 OPERATING_QUANTITY_CHAPTER = ChapterTask.EXTRACT_OPERATING_QUANTITIES
 _SCHEMA = "company_profile_operating_quantity_research.v1"
 _REPOSITORY_ROOT = Path(__file__).resolve().parents[2]
@@ -288,8 +296,7 @@ def operating_quantity_research_bindings() -> tuple[
                 "c15272977147dee7e6935a38ea0e4fd6855370aabb106f54cfe20f7cf6048ec9.pdf"
             ),
             relative_dossier_path=(
-                "openspec/changes/scope-manufacturing-materials-stage4-operating-quantities-holdout/"
-                "dossiers/300750-sz-2025.md"
+                f"{_OPERATING_QUANTITY_DOSSIER_DIR}/300750-sz-2025.md"
             ),
             content_length=2043710,
             page_count=232,
@@ -327,8 +334,7 @@ def operating_quantity_research_bindings() -> tuple[
                 "4e81f5539046ba1eee733100f38442a4abd5037afe3881115ba7f48678fa35b6.pdf"
             ),
             relative_dossier_path=(
-                "openspec/changes/scope-manufacturing-materials-stage4-operating-quantities-holdout/"
-                "dossiers/603659-sh-2025.md"
+                f"{_OPERATING_QUANTITY_DOSSIER_DIR}/603659-sh-2025.md"
             ),
             content_length=1740667,
             page_count=203,
@@ -385,8 +391,7 @@ def operating_quantity_research_bindings() -> tuple[
                 "4d2c1612f6f62a9024b8947d7a01b70c40f8f347c2975fa1a05b908d0770695a.pdf"
             ),
             relative_dossier_path=(
-                "openspec/changes/scope-manufacturing-materials-stage4-operating-quantities-holdout/"
-                "dossiers/920015-bj-2025.md"
+                f"{_OPERATING_QUANTITY_DOSSIER_DIR}/920015-bj-2025.md"
             ),
             content_length=1845726,
             page_count=143,
@@ -417,8 +422,7 @@ def operating_quantity_research_bindings() -> tuple[
                 "605394bd0879f906a829a9fcd3a2dab037d8aad2554b741a7d95757a3a5e3020.pdf"
             ),
             relative_dossier_path=(
-                "openspec/changes/scope-manufacturing-materials-stage4-operating-quantities-holdout/"
-                "dossiers/302132-sz-2025.md"
+                f"{_OPERATING_QUANTITY_DOSSIER_DIR}/302132-sz-2025.md"
             ),
             content_length=1721821,
             page_count=186,
