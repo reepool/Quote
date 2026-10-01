@@ -17,4 +17,4 @@
 
 ## 5. Archive, not yet authorized
 
-- [ ] 5.1 After 4.1, archive this successor as its own plan, report set, and chapter. `stage4_aggregate_expansion_gates_met` stays false. Do not backfill SF-1 or SF-2, and do not create aggregate `expansion_gates_met=true`
+- [x] 5.1 After 4.1, archive this successor as its own plan, report set, and chapter. `stage4_aggregate_expansion_gates_met` stays false. Do not backfill SF-1 or SF-2, and do not create aggregate `expansion_gates_met=true`
