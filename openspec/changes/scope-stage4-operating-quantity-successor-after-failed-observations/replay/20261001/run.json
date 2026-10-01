@@ -1,0 +1,10 @@
+{
+  "schema_version": "company_profile_operating_quantity_research_run.v1",
+  "chapter_task": "extract_operating_quantities",
+  "disposition": "accepted_for_review",
+  "provider_calls": 0,
+  "production_authorization": "not_authorized",
+  "enqueue_sha256": "6f2363a463627a5e233a5f76e094577294b7276de90bd51db61598967e706e52",
+  "bundle_dirname": "operating-quantity-stage4-operating-quantities-20261001",
+  "run_id": "stage4-operating-quantities-20261001"
+}
