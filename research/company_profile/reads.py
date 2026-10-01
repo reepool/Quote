@@ -34,6 +34,9 @@ from research.company_profile.runtime import (
     CompanyProfileRuntimeRecord,
     json_compatible,
 )
+from research.company_profile.stage4_restricted_read import (
+    project_stage4_restricted_views,
+)
 
 PROFILE_SCHEMA_VERSION = "company_profile_common_core_profile.v1"
 EXPORT_SCHEMA_VERSION = "company_profile_common_core_export.v1"
@@ -71,6 +74,7 @@ class CompanyProfileReadService:
             "missing_instrument_ids": missing,
             "delivered": len(profiles),
             "profiles": profiles,
+            "stage4_restricted_views": project_stage4_restricted_views(requested),
             "production_authorization": PRODUCTION_AUTHORIZATION,
             "storage_namespace": COMMON_CORE_STORAGE_NAMESPACE,
             "writer": COMMON_CORE_WRITER_NAME,

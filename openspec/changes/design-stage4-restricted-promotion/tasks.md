@@ -4,7 +4,7 @@
 
 ## 2. Read accepted results, not yet authorized
 
-- [ ] 2.1 After 1.1, project the four frozen result bundles into the existing query response. Verify the 16 hashes, keep chapter-native facts, evidence, and coverage, and show `302132.SZ` material-input legal empty without creating facts. Do not write a runtime record or overwrite a common-core profile.
+- [x] 2.1 After 1.1, project the four frozen result bundles into the existing query response. Verify the 16 hashes, keep chapter-native facts, evidence, and coverage, and show `302132.SZ` material-input legal empty without creating facts. Do not write a runtime record or overwrite a common-core profile. Query returns `stage4_restricted_views` beside the existing profiles. Do not export in this task.
 
 ## 3. Export the same view, not yet authorized
 
