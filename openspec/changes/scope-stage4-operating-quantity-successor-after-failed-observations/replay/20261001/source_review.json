@@ -1,0 +1,278 @@
+{
+  "schema_version": "company_profile_operating_quantity_stage4_source_review.v1",
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false,
+  "stage4_aggregate_expansion_gates_met": false,
+  "method": "independently_read_official_report",
+  "review_passed": true,
+  "binding": {
+    "enqueue_path": "enqueue.json",
+    "enqueue_sha256": "6f2363a463627a5e233a5f76e094577294b7276de90bd51db61598967e706e52",
+    "run_path": "run.json",
+    "run_id": "stage4-operating-quantities-20261001",
+    "run_sha256": "977939ba5ceabe8da0238f594a284cdc6352edca5bafd9cfae8e4021d11a8788",
+    "plan_version": "manufacturing_materials_stage4_operating_quantities.2026-10-01.4",
+    "bundle_dirname": "operating-quantity-stage4-operating-quantities-20261001",
+    "bundle_result_path": "operating-quantity-stage4-operating-quantities-20261001/result.json",
+    "bundle_result_sha256": "6ccd40a07803ac7411631729a1abac69debd3d10119f80260a5731e73f747add",
+    "chapter_task": "extract_operating_quantities",
+    "disposition": "accepted_for_review",
+    "provider_calls": 0,
+    "fact_rows_in_bundle": 38,
+    "coverage_rows_in_bundle": 13,
+    "bundle_fact_count_not_used_as_denominator": true
+  },
+  "denominator_rule": "A disclosed fact is one company-owned 2025 physical operating quantity on the reread pages: formed, effective, design, or report-period production capacity; under-construction physical capacity; a numeric capacity utilization; or production, sales, inventory, or processing volume. Identity is instrument, measured object, metric, value, and unit. The same company total restated with the same number is counted once. A named segment volume with its own number is a separate fact. Legal-empty coverage is not a recall gap. Currency amounts, market share, growth rates, future-year targets, conditional later project phases, and industry statistics stay outside the denominator. The 38 bundle facts and the OQ-3 ratio 38/38 were not used to build this denominator.",
+  "reports_reread": [
+    "300750.SZ",
+    "603659.SH",
+    "920015.BJ",
+    "302132.SZ"
+  ],
+  "page_text_hashes": [
+    {
+      "instrument_id": "300750.SZ",
+      "page": 21,
+      "sha256": "90ea2f8475c7ed90d74c7327abbf767e41d1225d2b50ee1b9bae2c3c193b8d8a"
+    },
+    {
+      "instrument_id": "300750.SZ",
+      "page": 22,
+      "sha256": "59c39592d1e35d230f47ff421ea127ce61f90323387c4492c1bf7af9a0d84062"
+    },
+    {
+      "instrument_id": "300750.SZ",
+      "page": 26,
+      "sha256": "3510780e5e7d8ab0e8111d401dcc5ab5fb64ff82cd01877a861387cf6c11d6fc"
+    },
+    {
+      "instrument_id": "300750.SZ",
+      "page": 27,
+      "sha256": "83a28d5ebb0cdf320040e2a5a76455365171d337e7c5641b2f097deb76ed465c"
+    },
+    {
+      "instrument_id": "603659.SH",
+      "page": 14,
+      "sha256": "51c62ec98648b1dd6146079130d3247927872a241146b2923a26f38ce0d17e26"
+    },
+    {
+      "instrument_id": "603659.SH",
+      "page": 15,
+      "sha256": "12b474277bea2c20790e16f651c5182b1719354ab048a570da633e5b9b1e688b"
+    },
+    {
+      "instrument_id": "603659.SH",
+      "page": 19,
+      "sha256": "efa2a62fe3cf80ce2f4b1e8ddbb56c943fe1c6cca65172d5bcd85d5e144cf772"
+    },
+    {
+      "instrument_id": "603659.SH",
+      "page": 27,
+      "sha256": "dc3e7d1266065a50235356437e9d41b17b5555d54198b20b41b8491c128ef2ab"
+    },
+    {
+      "instrument_id": "920015.BJ",
+      "page": 49,
+      "sha256": "aedc4baeeae458394f3435ee3c7dd2b28fcc7a944573e8623d59e6a36c22a10b"
+    },
+    {
+      "instrument_id": "920015.BJ",
+      "page": 50,
+      "sha256": "5e468769f5aa1e03f4ba3040ebaf43c496e69cbbd7fb06b176e31c66da1d8f57"
+    },
+    {
+      "instrument_id": "302132.SZ",
+      "page": 15,
+      "sha256": "d5b8211968aeb05676f5a17ac7fbe29eedad48b9c92b5f75555efa75c97b395b"
+    }
+  ],
+  "evidence_binding": {
+    "quantity_facts_checked": 38,
+    "bounded_quotes_contained_in_physical_page_text": 38,
+    "stored_value_contained_in_bounded_quote": 38,
+    "page_text_hash_matches_reread": 38,
+    "report_identity_matches_enqueue": true,
+    "report_period": "2025-12-31",
+    "page_text_hash_method": "sha256 of pypdf extract_text().strip()"
+  },
+  "per_company": [
+    {
+      "instrument_id": "300750.SZ",
+      "disclosed_quantity_facts": 8,
+      "correctly_recalled": 8,
+      "missing": [],
+      "delivered_quantity_facts": 8,
+      "accurate_quantity_facts": 8,
+      "critical_numeric_errors": 0
+    },
+    {
+      "instrument_id": "603659.SH",
+      "disclosed_quantity_facts": 23,
+      "correctly_recalled": 23,
+      "missing": [],
+      "delivered_quantity_facts": 23,
+      "accurate_quantity_facts": 23,
+      "critical_numeric_errors": 0
+    },
+    {
+      "instrument_id": "920015.BJ",
+      "disclosed_quantity_facts": 7,
+      "correctly_recalled": 7,
+      "missing": [],
+      "delivered_quantity_facts": 7,
+      "accurate_quantity_facts": 7,
+      "critical_numeric_errors": 0
+    },
+    {
+      "instrument_id": "302132.SZ",
+      "disclosed_quantity_facts": 0,
+      "correctly_recalled": 0,
+      "missing": [],
+      "delivered_quantity_facts": 0,
+      "accurate_quantity_facts": 0,
+      "critical_numeric_errors": 0
+    }
+  ],
+  "dedup_notes": [
+    "300750 page 27 production 748 GWh restates the page 26 production row and is counted once.",
+    "603659 page 27 base-film addition of 20 亿平方米 restates the page 15 addition of 20 亿m2 and is counted once.",
+    "603659 narrative anode shipments of 14.30 万吨 and PVDF sales of 4.13 万吨 restate the page 19 table rows and are counted once.",
+    "603659 phase-two 10 万吨 and phase-three 8 万吨 are conditional later phases and stay outside the denominator.",
+    "603659 2026 total-capacity target of 5 万吨 stays outside the denominator."
+  ],
+  "boundary_checks": {
+    "catl_541_121_661_separate": "Page 21 power-battery sales 541 GWh, page 22 storage-battery sales 121 GWh, and page 26 battery-system sales 661 GWh are three facts. 662 is absent.",
+    "processing_versus_sales": "Page 14 coating processing volume 109.42 亿㎡ stays a processing_volume fact and is not merged into the page 19 coating-separator sales row.",
+    "capacity_kind": "Coating 140 亿㎡ and base film 21 亿㎡ are effective_capacity. 920015 rows are design_capacity. The 8 GWh coating line and Sichuan project totals are source_native_other.",
+    "project_phase": "Sichuan phase one 10 万吨 is retained. Phase two and phase three are not stored as current facts.",
+    "qualifiers": "PVDF effective capacity keeps comparison_qualifier 超过. Boehmite and alumina keep 已达.",
+    "inventory_footnote": "The three 603659 inventory rows cite the finished-goods footnote, including goods shipped but not yet recognized as revenue.",
+    "legal_empty": "920015 omitted volumes stay not_disclosed. 302132 classified volumes stay not_applicable. Each coverage row has bundle_outcome legal_empty and no invented quantity."
+  },
+  "coverage_checked": [
+    {
+      "instrument_id": "300750.SZ",
+      "field_id": "processing_volume",
+      "coverage_status": "not_disclosed",
+      "in_denominator": false
+    },
+    {
+      "instrument_id": "603659.SH",
+      "field_id": "capacity_utilization",
+      "coverage_status": "not_disclosed",
+      "in_denominator": false
+    },
+    {
+      "instrument_id": "920015.BJ",
+      "field_id": "production_volume",
+      "coverage_status": "not_disclosed",
+      "in_denominator": false
+    },
+    {
+      "instrument_id": "920015.BJ",
+      "field_id": "sales_volume",
+      "coverage_status": "not_disclosed",
+      "in_denominator": false
+    },
+    {
+      "instrument_id": "920015.BJ",
+      "field_id": "inventory_volume",
+      "coverage_status": "not_disclosed",
+      "in_denominator": false
+    },
+    {
+      "instrument_id": "920015.BJ",
+      "field_id": "processing_volume",
+      "coverage_status": "not_disclosed",
+      "in_denominator": false
+    },
+    {
+      "instrument_id": "302132.SZ",
+      "field_id": "production_volume",
+      "coverage_status": "not_applicable",
+      "in_denominator": false
+    },
+    {
+      "instrument_id": "302132.SZ",
+      "field_id": "sales_volume",
+      "coverage_status": "not_applicable",
+      "in_denominator": false
+    },
+    {
+      "instrument_id": "302132.SZ",
+      "field_id": "inventory_volume",
+      "coverage_status": "not_applicable",
+      "in_denominator": false
+    },
+    {
+      "instrument_id": "302132.SZ",
+      "field_id": "production_capacity",
+      "coverage_status": "not_disclosed",
+      "in_denominator": false
+    },
+    {
+      "instrument_id": "302132.SZ",
+      "field_id": "capacity_under_construction",
+      "coverage_status": "not_disclosed",
+      "in_denominator": false
+    },
+    {
+      "instrument_id": "302132.SZ",
+      "field_id": "capacity_utilization",
+      "coverage_status": "not_disclosed",
+      "in_denominator": false
+    },
+    {
+      "instrument_id": "302132.SZ",
+      "field_id": "processing_volume",
+      "coverage_status": "not_disclosed",
+      "in_denominator": false
+    }
+  ],
+  "missing_disclosures": [],
+  "critical_numeric_errors_detail": [],
+  "source_recall": {
+    "numerator": 38,
+    "denominator": 38,
+    "value": 1.0,
+    "by_company": {
+      "300750.SZ": {
+        "numerator": 8,
+        "denominator": 8
+      },
+      "603659.SH": {
+        "numerator": 23,
+        "denominator": 23
+      },
+      "920015.BJ": {
+        "numerator": 7,
+        "denominator": 7
+      },
+      "302132.SZ": {
+        "numerator": 0,
+        "denominator": 0
+      }
+    }
+  },
+  "source_accuracy": {
+    "numerator": 38,
+    "denominator": 38,
+    "value": 1.0
+  },
+  "critical_numeric_errors": 0,
+  "expansion_gates_met": true,
+  "gate_rule": "expansion_gates_met is true only when all four reports were reread, source recall equals 1, source accuracy equals 1, critical numeric errors equal 0, and the inherited quantity boundaries hold. Legal-empty not_disclosed and not_applicable rows are not recall gaps. The boolean is that conjunction for plan manufacturing_materials_stage4_operating_quantities.2026-10-01.4, these four reports, and extract_operating_quantities. It does not authorize aggregate admission, scale quality, or production. stage4_aggregate_expansion_gates_met stays false.",
+  "not_reused_prior_result": [
+    "operating-quantity 38/38",
+    "operating-quantity 36/38",
+    "operating-quantity 26/36",
+    "operating-quantity critical numeric errors 1"
+  ],
+  "historical_rows_unchanged": {
+    "OQ-1": "recall 26/36, accuracy 26/27, critical numeric errors 1",
+    "OQ-2": "recall 36/38, accuracy 36/36, critical numeric errors 0",
+    "OQ-3": "recall 38/38, accuracy 38/38, critical numeric errors 0 on .2026-09-28.3 only"
+  },
+  "replay_artifacts_modified": false,
+  "next_step": "The local gate is true only for this four-report read, plan .2026-10-01.4, and extract_operating_quantities. Do not edit enqueue.json, run.json, or result.json. Do not treat this boolean as current-chapter inclusion or as a Stage 4 aggregate pass. Inclusion remains task 4.1."
+}

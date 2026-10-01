@@ -9,7 +9,7 @@
 ## 3. Replay and source review, not yet authorized
 
 - [x] 3.1 After the implementation review, run the controlled four-report replay into `replay/20261001/` with run id `stage4-operating-quantities-20261001`. Output `accepted_for_review` only. Do not put recall, accuracy, critical numeric errors, a gate, or a source-review in the bundle. The `.2026-10-01.4` replay is in that directory. Do not start 3.2 in that task
-- [ ] 3.2 After replay, independently source-review the four reports. Build the denominator from the annual reports. A pass requires 100% source recall, 100% source accuracy, critical numeric errors 0, and the inherited boundaries. Do not prefill 38/38, and do not treat artifact hashes as that pass. Do not edit OQ-1, OQ-2, OQ-3, or the ledger
+- [x] 3.2 After replay, independently source-review the four reports. Build the denominator from the annual reports. A pass requires 100% source recall, 100% source accuracy, critical numeric errors 0, and the inherited boundaries. Do not prefill 38/38, and do not treat artifact hashes as that pass. Do not edit OQ-1, OQ-2, OQ-3, or the ledger. The review is `replay/20261001/source_review.json`: recall 38/38, accuracy 38/38, and critical numeric errors 0, counted from the reread. The local gate is only for plan `.2026-10-01.4`, these four reports, and `extract_operating_quantities`. Do not start 4.1 in that review
 
 ## 4. Inclusion judgment, not yet authorized
 
