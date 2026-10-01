@@ -8,4 +8,4 @@
 
 ## 3. Export the same view, not yet authorized
 
-- [ ] 3.1 After 2.1, export those facts, evidence, and coverage through the existing export action into the caller directory only. Repeated query and export must not duplicate stored facts or change replay, checkpoint, publication-control, or historical observation bytes. Do not add a UI, a generalized read model, overview, regime, or a production publication switch in that task.
+- [x] 3.1 After 2.1, export those facts, evidence, and coverage through the existing export action into the caller directory only. Repeated query and export must not duplicate stored facts or change replay, checkpoint, publication-control, or historical observation bytes. Do not add a UI, a generalized read model, overview, regime, or a production publication switch in that task. Export reuses one query. The application owner passes the frozen chapter binding. An unreadable artifact rejects only that chapter.

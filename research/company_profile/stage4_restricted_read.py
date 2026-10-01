@@ -167,24 +167,37 @@ def default_repo_root() -> Path:
     return Path(__file__).resolve().parents[2]
 
 
+def resolved_replay_dirs(
+    repo_root: Path,
+    chapters: Sequence[FrozenChapterArtifacts] = FROZEN_CHAPTERS,
+) -> tuple[Path, ...]:
+    """Return the replay directories the application owner must protect."""
+
+    resolved: list[Path] = []
+    for binding in chapters:
+        replay = Path(binding.replay_dir)
+        if not replay.is_absolute():
+            replay = repo_root / replay
+        resolved.append(replay)
+    return tuple(resolved)
+
+
 def project_stage4_restricted_views(
     instrument_ids: Sequence[str] = (),
     *,
-    repo_root: Path | None = None,
-    chapters: Sequence[FrozenChapterArtifacts] | None = None,
+    repo_root: Path,
+    chapters: Sequence[FrozenChapterArtifacts],
 ) -> list[dict[str, Any]]:
-    """Project frozen chapter bundles for the requested companies.
+    """Project the chapter bundles the caller explicitly bound.
 
     An empty instrument list returns the four frozen companies. Companies
     outside that set are omitted. Artifact failures reject only that chapter.
     """
 
-    root = repo_root or default_repo_root()
     selected = _selected_instruments(instrument_ids)
-    if not selected:
+    if not selected or not chapters:
         return []
-    bindings = tuple(chapters) if chapters is not None else FROZEN_CHAPTERS
-    loaded = [_load_chapter(root, binding) for binding in bindings]
+    loaded = [_load_chapter(repo_root, binding) for binding in chapters]
     return [_view_for(instrument_id, loaded) for instrument_id in selected]
 
 
@@ -201,15 +214,19 @@ def _load_chapter(
 ) -> tuple[FrozenChapterArtifacts, dict[str, Any] | None, str | None]:
     paths = _artifact_paths(root, binding)
     for name, path in paths.items():
-        if not path.is_file():
-            return binding, None, f"missing_artifact:{name}"
-    for name, path in paths.items():
-        expected = _expected_hash(binding, name)
-        if _sha256(path) != expected:
+        try:
+            if not path.is_file():
+                return binding, None, f"missing_artifact:{name}"
+            actual = _sha256(path)
+        except OSError:
+            return binding, None, f"unreadable_artifact:{name}"
+        if actual != _expected_hash(binding, name):
             return binding, None, f"hash_mismatch:{name}"
     try:
         payload = json.loads(paths["result"].read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError):
+    except OSError:
+        return binding, None, "unreadable_artifact:result"
+    except json.JSONDecodeError:
         return binding, None, "unreadable_result"
     if not isinstance(payload, dict):
         return binding, None, "unreadable_result"

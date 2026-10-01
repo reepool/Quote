@@ -35,6 +35,7 @@ from research.company_profile.runtime import (
     json_compatible,
 )
 from research.company_profile.stage4_restricted_read import (
+    FrozenChapterArtifacts,
     project_stage4_restricted_views,
 )
 
@@ -54,12 +55,26 @@ class CompanyProfileReadService:
 
     read_owner = COMMODITY_EXPOSURE_READ_OWNER
 
-    def __init__(self, output_root: str | Path) -> None:
+    def __init__(
+        self,
+        output_root: str | Path,
+        *,
+        stage4_chapters: Sequence[FrozenChapterArtifacts] = (),
+        stage4_root: str | Path | None = None,
+        protected_export_roots: Sequence[str | Path] = (),
+    ) -> None:
         self.output_root = Path(output_root)
         self.namespace_root = self.output_root / COMMON_CORE_STORAGE_NAMESPACE
+        self.stage4_chapters = tuple(stage4_chapters)
+        self.stage4_root = None if stage4_root is None else Path(stage4_root)
+        self.protected_export_roots = tuple(
+            Path(path) for path in protected_export_roots
+        )
 
     def query(self, instrument_ids: Sequence[str] = ()) -> dict[str, Any]:
-        requested = tuple(str(item).strip() for item in instrument_ids if str(item).strip())
+        requested = tuple(
+            str(item).strip() for item in instrument_ids if str(item).strip()
+        )
         profiles, missing = self._select_profiles(requested)
         if profiles:
             state = "found"
@@ -74,7 +89,7 @@ class CompanyProfileReadService:
             "missing_instrument_ids": missing,
             "delivered": len(profiles),
             "profiles": profiles,
-            "stage4_restricted_views": project_stage4_restricted_views(requested),
+            "stage4_restricted_views": self._stage4_views(requested),
             "production_authorization": PRODUCTION_AUTHORIZATION,
             "storage_namespace": COMMON_CORE_STORAGE_NAMESPACE,
             "writer": COMMON_CORE_WRITER_NAME,
@@ -86,40 +101,35 @@ class CompanyProfileReadService:
         instrument_ids: Sequence[str] = (),
         export_directory: str | Path | None = None,
     ) -> dict[str, Any]:
+        if export_directory is None or not str(export_directory).strip():
+            raise ValueError("export directory is required")
         queried = self.query(instrument_ids)
         profiles = list(queried.get("profiles") or [])
-        target = Path(export_directory or (self.output_root / "exports"))
+        views = list(queried.get("stage4_restricted_views") or [])
+        target = _resolve_export_directory(Path(export_directory))
+        _reject_protected_export(target, self.protected_export_roots)
+        profile_state = str(queried.get("state") or "idle")
         written: list[str] = []
-        if profiles:
+        if profiles or views:
+            _reject_existing_export(target)
             target.mkdir(parents=True, exist_ok=True)
-            for profile in profiles:
-                path = target / _profile_filename(profile)
-                path.write_text(
-                    json.dumps(profile, ensure_ascii=False, indent=2),
-                    encoding="utf-8",
-                )
-                written.append(str(path))
-            csv_path = target / "profiles.csv"
-            _write_profile_csv(csv_path, profiles)
-            written.append(str(csv_path))
-            manifest = {
-                "schema_version": EXPORT_SCHEMA_VERSION,
-                "production_authorization": PRODUCTION_AUTHORIZATION,
-                "storage_namespace": COMMON_CORE_STORAGE_NAMESPACE,
-                "writer": COMMON_CORE_WRITER_NAME,
-                "delivered": len(profiles),
-                "files": written,
-                "legacy_export_used": False,
-            }
+            written.extend(_write_profile_export(target, profiles))
+            written.extend(_write_stage4_export(target, views))
             manifest_path = target / "export_manifest.json"
+            manifest = _export_manifest(
+                profiles=profiles,
+                views=views,
+                profile_state=profile_state,
+                files=[*written, str(manifest_path)],
+            )
             manifest_path.write_text(
                 json.dumps(manifest, ensure_ascii=False, indent=2),
                 encoding="utf-8",
             )
             written.append(str(manifest_path))
-        if profiles:
+        if profiles or views:
             state = "completed"
-        elif queried["state"] == "not_found":
+        elif profile_state == "not_found":
             state = "not_found"
         else:
             state = "idle"
@@ -127,9 +137,20 @@ class CompanyProfileReadService:
             **queried,
             "action": "export",
             "state": state,
+            "profile_state": profile_state,
+            "restricted_delivered": len(views),
             "export_directory": str(target),
             "files": written,
         }
+
+    def _stage4_views(self, instrument_ids: Sequence[str]) -> list[dict[str, Any]]:
+        if not self.stage4_chapters or self.stage4_root is None:
+            return []
+        return project_stage4_restricted_views(
+            instrument_ids,
+            repo_root=self.stage4_root,
+            chapters=self.stage4_chapters,
+        )
 
     def _select_profiles(
         self,
@@ -470,3 +491,240 @@ def _write_profile_csv(path: Path, profiles: Sequence[Mapping[str, Any]]) -> Non
                     "gap_count": len(profile.get("gaps") or ()),
                 }
             )
+
+
+def _resolve_export_directory(path: Path) -> Path:
+    return path.expanduser().resolve()
+
+
+def _reject_protected_export(target: Path, roots: Sequence[Path]) -> None:
+    for root in roots:
+        resolved_root = root.expanduser().resolve()
+        if target == resolved_root or _is_relative_to(target, resolved_root):
+            raise ValueError(
+                f"export directory overlaps protected research inputs: {resolved_root}"
+            )
+
+
+def _is_relative_to(path: Path, root: Path) -> bool:
+    try:
+        path.relative_to(root)
+    except ValueError:
+        return False
+    return True
+
+
+def _reject_existing_export(target: Path) -> None:
+    if target.is_symlink() or (target.exists() and not target.is_dir()):
+        raise ValueError(f"export directory already contains output: {target}")
+    if target.is_dir() and any(target.iterdir()):
+        raise ValueError(f"export directory already contains output: {target}")
+
+
+def _write_profile_export(
+    target: Path,
+    profiles: Sequence[Mapping[str, Any]],
+) -> list[str]:
+    written: list[str] = []
+    if not profiles:
+        return written
+    for profile in profiles:
+        path = target / _profile_filename(profile)
+        path.write_text(
+            json.dumps(profile, ensure_ascii=False, indent=2),
+            encoding="utf-8",
+        )
+        written.append(str(path))
+    csv_path = target / "profiles.csv"
+    _write_profile_csv(csv_path, profiles)
+    written.append(str(csv_path))
+    return written
+
+
+def _write_stage4_export(
+    target: Path,
+    views: Sequence[Mapping[str, Any]],
+) -> list[str]:
+    written: list[str] = []
+    if not views:
+        return written
+    for view in views:
+        path = target / _stage4_filename(view)
+        path.write_text(
+            json.dumps(view, ensure_ascii=False, indent=2),
+            encoding="utf-8",
+        )
+        written.append(str(path))
+    csv_path = target / "stage4_records.csv"
+    _write_stage4_csv(csv_path, views)
+    written.append(str(csv_path))
+    return written
+
+
+def _stage4_filename(view: Mapping[str, Any]) -> str:
+    instrument = _SAFE_NAME.sub("_", str(view.get("instrument_id") or "unknown"))
+    period = _SAFE_NAME.sub(
+        "_",
+        str((view.get("report") or {}).get("report_period") or "unknown"),
+    )
+    return f"{instrument}_{period}.stage4.json"
+
+
+def _export_manifest(
+    *,
+    profiles: Sequence[Mapping[str, Any]],
+    views: Sequence[Mapping[str, Any]],
+    profile_state: str,
+    files: Sequence[str],
+) -> dict[str, Any]:
+    return {
+        "schema_version": EXPORT_SCHEMA_VERSION,
+        "production_authorization": PRODUCTION_AUTHORIZATION,
+        "scale_quality_claim_allowed": False,
+        "storage_namespace": COMMON_CORE_STORAGE_NAMESPACE,
+        "writer": COMMON_CORE_WRITER_NAME,
+        "profile_state": profile_state,
+        "delivered": len(profiles),
+        "restricted_delivered": len(views),
+        "profiles": [
+            {
+                "instrument_id": profile.get("instrument_id"),
+                "report_period": (profile.get("freshness") or {}).get("report_period"),
+                "file": _profile_filename(profile),
+            }
+            for profile in profiles
+        ],
+        "restricted_views": [
+            {
+                "instrument_id": view.get("instrument_id"),
+                "report": view.get("report"),
+                "core_profile_complete": view.get("core_profile_complete"),
+                "gaps": view.get("gaps"),
+                "production_authorization": view.get("production_authorization"),
+                "scale_quality_claim_allowed": view.get("scale_quality_claim_allowed"),
+                "chapters": [
+                    {
+                        "chapter_task": chapter.get("chapter_task"),
+                        "plan_version": chapter.get("plan_version"),
+                        "delivered": chapter.get("delivered"),
+                        "reason": chapter.get("reason"),
+                    }
+                    for chapter in view.get("chapters") or ()
+                ],
+                "file": _stage4_filename(view),
+            }
+            for view in views
+        ],
+        "files": list(files),
+        "legacy_export_used": False,
+    }
+
+
+_STAGE4_CSV_FIELDS = (
+    "instrument_id",
+    "report_id",
+    "document_version",
+    "content_hash",
+    "report_period",
+    "chapter_task",
+    "plan_version",
+    "delivered",
+    "reason",
+    "row_kind",
+    "record_id",
+    "page",
+    "unit",
+    "value",
+    "bounded_quote",
+    "outcome",
+    "coverage_status",
+    "payload_json",
+)
+
+
+def _write_stage4_csv(path: Path, views: Sequence[Mapping[str, Any]]) -> None:
+    with path.open("w", encoding="utf-8", newline="") as handle:
+        writer = csv.DictWriter(handle, fieldnames=_STAGE4_CSV_FIELDS)
+        writer.writeheader()
+        for view in views:
+            report = view.get("report") or {}
+            for chapter in view.get("chapters") or ():
+                facts = list(chapter.get("facts") or ())
+                coverage = list(chapter.get("coverage") or ())
+                if not facts and not coverage:
+                    writer.writerow(
+                        _stage4_csv_row(
+                            view,
+                            report,
+                            chapter,
+                            row_kind="chapter",
+                            payload={},
+                        )
+                    )
+                for fact in facts:
+                    writer.writerow(
+                        _stage4_csv_row(
+                            view,
+                            report,
+                            chapter,
+                            row_kind="fact",
+                            payload=fact,
+                        )
+                    )
+                for item in coverage:
+                    writer.writerow(
+                        _stage4_csv_row(
+                            view,
+                            report,
+                            chapter,
+                            row_kind="coverage",
+                            payload=item,
+                        )
+                    )
+
+
+def _stage4_csv_row(
+    view: Mapping[str, Any],
+    report: Mapping[str, Any],
+    chapter: Mapping[str, Any],
+    *,
+    row_kind: str,
+    payload: Mapping[str, Any],
+) -> dict[str, Any]:
+    return {
+        "instrument_id": view.get("instrument_id"),
+        "report_id": report.get("report_id"),
+        "document_version": report.get("document_version"),
+        "content_hash": report.get("content_hash"),
+        "report_period": report.get("report_period"),
+        "chapter_task": chapter.get("chapter_task"),
+        "plan_version": chapter.get("plan_version"),
+        "delivered": chapter.get("delivered"),
+        "reason": chapter.get("reason") or "",
+        "row_kind": row_kind,
+        "record_id": payload.get("record_id") or "",
+        "page": payload.get("page") if payload else "",
+        "unit": payload.get("unit") if payload else "",
+        "value": payload.get("value") if payload else "",
+        "bounded_quote": _bounded_quote(payload),
+        "outcome": payload.get("outcome") if payload else "",
+        "coverage_status": payload.get("coverage_status") if payload else "",
+        "payload_json": (json.dumps(payload, ensure_ascii=False) if payload else ""),
+    }
+
+
+def _bounded_quote(payload: Mapping[str, Any]) -> str:
+    if not payload:
+        return ""
+    direct = payload.get("bounded_quote")
+    if direct:
+        return str(direct)
+    evidence = payload.get("evidence")
+    if isinstance(evidence, list) and evidence and isinstance(evidence[0], Mapping):
+        quote = evidence[0].get("bounded_quote")
+        if quote:
+            return str(quote)
+        anchor = evidence[0].get("anchor")
+        if isinstance(anchor, Mapping) and anchor.get("bounded_quote"):
+            return str(anchor["bounded_quote"])
+    return ""

@@ -87,6 +87,11 @@ from research.company_profile.source_review import (
     persist_source_review_report,
     record_source_review_report,
 )
+from research.company_profile.stage4_restricted_read import (
+    FROZEN_CHAPTERS,
+    default_repo_root,
+    resolved_replay_dirs,
+)
 from utils.date_utils import get_shanghai_time
 
 logger = logging.getLogger(__name__)
@@ -251,9 +256,7 @@ class OfficialAnnualReportPageSource:
         ]
         if not pages:
             return None
-        published_at = str(
-            asset.get("published_at") or item.get("published_at") or ""
-        )
+        published_at = str(asset.get("published_at") or item.get("published_at") or "")
         if not published_at:
             return None
         report_id = str(
@@ -357,7 +360,9 @@ class CompanyProfileTaskControl:
             self._write(payload)
             return payload
 
-    def finish(self, *, state: str, result: Mapping[str, Any] | None = None) -> dict[str, Any]:
+    def finish(
+        self, *, state: str, result: Mapping[str, Any] | None = None
+    ) -> dict[str, Any]:
         now = get_shanghai_time().isoformat()
         with self._lock:
             payload = self.read()
@@ -419,7 +424,17 @@ class CompanyProfileTaskService:
             self.output_root,
             checkpoint_root=self.checkpoint_root,
         )
-        self.reads = CompanyProfileReadService(self.output_root)
+        stage4_root = default_repo_root()
+        self.reads = CompanyProfileReadService(
+            self.output_root,
+            stage4_chapters=FROZEN_CHAPTERS,
+            stage4_root=stage4_root,
+            protected_export_roots=(
+                self.output_root / COMMON_CORE_STORAGE_NAMESPACE,
+                self.checkpoint_root,
+                *resolved_replay_dirs(stage4_root),
+            ),
+        )
         self.control = CompanyProfileTaskControl(self.checkpoint_root)
         self.runtime = CompanyProfileStageRuntime(
             writer=self.writer,
@@ -1056,7 +1071,9 @@ def _supplement_incomplete(item: Mapping[str, Any]) -> bool:
     for result in dict(metadata.get("stage_results") or {}).values():
         if not isinstance(result, Mapping):
             continue
-        reasons = dict((result.get("quality") or {}).get("machine_rework_reasons") or {})
+        reasons = dict(
+            (result.get("quality") or {}).get("machine_rework_reasons") or {}
+        )
         if int(reasons.get("pages_not_bound") or 0) > 0:
             return True
         if int(reasons.get("pdf_parse_failed") or 0) > 0:
@@ -1070,8 +1087,7 @@ async def execute_published_task(
     storage: Any,
     output_root: str | Path = DEFAULT_OUTPUT_ROOT,
     checkpoint_root: str | Path = DEFAULT_CHECKPOINT_ROOT,
-    page_source: Callable[[Mapping[str, Any]], Mapping[str, Any] | None]
-    | None = None,
+    page_source: Callable[[Mapping[str, Any]], Mapping[str, Any] | None] | None = None,
     provider: SemanticProvider | None = None,
     shared_asset_access: Any | None = None,
     knowledge_cutoff: str | None = None,
