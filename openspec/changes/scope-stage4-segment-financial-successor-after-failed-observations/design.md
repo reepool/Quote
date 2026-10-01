@@ -76,7 +76,35 @@
 
 ## Open Questions
 
-`.4` 的实际 recall、accuracy、critical numeric errors 和局部 gate 尚未发生，不在本卡预填。通过标准已经写明。纳入资格留到业务条件和制品绑定都核对之后。
+`.4` 的纳入判断写在下一节。本结论不改旧 ledger，也不重新打开 aggregate。
+
+## Inclusion judgment
+
+4.1 对照 source review 和四份制品。业务通过与制品绑定同时成立，没有重跑 replay，也没有修改 enqueue、run、result 或 source review。
+
+`.2026-10-01.4` 是当前 `extract_segment_financials` 纳入观察。指标来自这次独立重读：recall 137/137，accuracy 144/144，critical numeric errors 0。分报告披露单元格是 300750.SZ 34、603659.SH 29、920015.BJ 42、302132.SZ 32。局部 gate 只属于这个计划、这四份报告和该章节。
+
+四报告身份与 SF-1、SF-2、SF-3 相同，报告期 2025-12-31：
+
+| Instrument | report_id | document_version |
+|---|---|---|
+| 300750.SZ | `asset_3b09f6c831975c7177b6bb3287cab781` | `ver_09c0e677ec8192dc4fc12cb620069f29` |
+| 603659.SH | `asset_50c70429093f66b34fc57ad8f896fcee` | `ver_c867a6a692048e88fd9cb80473fbf908` |
+| 920015.BJ | `asset_b87f1d1a48e662dae376c540cd021f69` | `ver_cfdbd2d058af825b1fc39f494d7a9bd3` |
+| 302132.SZ | `asset_0a488da55636b09107be6d719c9ebf39` | `ver_2d20ba3aebc5fac6c562cd619695995a` |
+
+本观察的制品哈希：
+
+| 制品 | SHA-256 |
+|---|---|
+| enqueue | `8c2c40e06848563723e208ca4d60d0310804ff986fa7ae86b50aecc7200d3bfa` |
+| run | `8f007a464e89adfd9bfcf80d810c27d47ce321e885d207e5faedfe6ecf897b90` |
+| result | `6c5188ef7dc43c45bb69c23478d2dbc3bd19e9e657ca3afb674ad2494c9acc59` |
+| source-review | `0a38ac4c78d65dacd756cf310ea1033e9cd1e40e793a6e0a5a5ac256030dcfbd` |
+
+SF-1 仍是 recall 122/132、accuracy 129/133、critical numeric errors 4。SF-2 仍是 recall 102/132、accuracy 114/142。SF-3 的 recall 132/132、accuracy 144/144 仍只属于 `.2026-09-29.3`。这三行保持原值，旧 ledger 不改。
+
+本结论只授予当前分部财务纳入资格。不计算跨章节分数，不启动产销量 successor、restricted-promotion 或生产。`stage4_aggregate_expansion_gates_met` 保持 false。`production_authorization` 保持 `not_authorized`。`scale_quality_claim_allowed` 保持 false。
 
 ## Acceptance
 
