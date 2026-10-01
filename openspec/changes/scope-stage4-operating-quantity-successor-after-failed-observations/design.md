@@ -23,8 +23,8 @@ Stage 4 aggregate 仍是只读 hold。分部财务 `.2026-10-01.4` 已取得当�
 
 ## Decisions
 
-1. 范围只有 `extract_operating_quantities`。新计划是 `manufacturing_materials_stage4_operating_quantities.2026-10-01.4`。它不是 `.2026-09-27.1`、`.2026-09-28.2` 或 `.2026-09-28.3`。2.1 必须调用 `replay_operating_quantity_research`，显式传入该计划和 run id `stage4-operating-quantities-20261001`。默认计划保持 `.2026-09-28.3`。不新增抽取器，不改抽取规则。
-2. 四份报告与 OQ-1、OQ-2、OQ-3 相同，报告期都是 2025-12-31：
+1. 范围只有 `extract_operating_quantities`。新计划是 `manufacturing_materials_stage4_operating_quantities.2026-10-01.4`。它不是 `.2026-09-27.1`、`.2026-09-28.2` 或 `.2026-09-28.3`。2.1 必须调用 `replay_operating_quantity_research`，显式传入该计划和 run id `stage4-operating-quantities-20261001`。默认计划保持 `.2026-09-28.3`。现有 `run.json` 不新增计划字段，通过 enqueue 哈希绑定计划。不新增抽取器，不改抽取规则。
+2. 四报告身份及 PDF 哈希与 OQ-1、OQ-2、OQ-3 相同，报告期都是 2025-12-31。来源页范围继承 OQ-3：OQ-2 才加入 `603659.SH` 第 27 页，OQ-3 才加入 `300750.SZ` 第 21–22 页。历史 enqueue 不改。本轮来源页是：
 
 | Instrument | Exchange | report_id | document_version | PDF SHA-256 | 物理页范围 |
 |---|---|---|---|---|---|
@@ -72,4 +72,8 @@ Stage 4 aggregate 仍是只读 hold。分部财务 `.2026-10-01.4` 已取得当�
 
 ## Open Questions
 
-`.4` 的 recall、accuracy、critical numeric errors 和局部 gate 尚未发生，不在本卡预填。`.4` 能否成为当前产销量纳入行，留到 source-review 通过之后。
+`.4` 的 recall、accuracy、critical numeric errors 和局部 gate 尚未发生，不在本卡预填。`.4` 能否成为当前产销量纳入行，留到 source-review 通过之后。业务通过和制品绑定必须同时成立。
+
+## Acceptance
+
+1.1 通过。新计划隔离在 `replay/20261001/`，默认计划仍是 `.2026-09-28.3`。dossier 只修路径。四报告身份及 PDF 哈希与 OQ-1、OQ-2、OQ-3 相同；来源页范围继承 OQ-3。历史 enqueue 不改。`run.json` 按现有 schema 通过 enqueue 哈希绑定计划，不新增字段。本卡不改 Python，也不创建 replay。
