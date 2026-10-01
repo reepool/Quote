@@ -60,6 +60,13 @@ SEGMENT_FINANCIAL_PRIOR_PLAN_VERSION = (
 SEGMENT_FINANCIAL_PLAN_VERSION = (
     "manufacturing_materials_stage4_segment_financials.2026-09-29.3"
 )
+SEGMENT_FINANCIAL_SUCCESSOR_PLAN_VERSION = (
+    "manufacturing_materials_stage4_segment_financials.2026-10-01.4"
+)
+_SEGMENT_FINANCIAL_DOSSIER_DIR = (
+    "openspec/changes/archive/"
+    "2026-09-29-scope-manufacturing-materials-stage4-segment-financials/dossiers"
+)
 SEGMENT_FINANCIAL_CHAPTER = ChapterTask.EXTRACT_SEGMENT_FINANCIALS
 _SCHEMA = "company_profile_segment_financial_research.v1"
 _REPOSITORY_ROOT = Path(__file__).resolve().parents[2]
@@ -252,8 +259,7 @@ def segment_financial_research_bindings() -> tuple[SegmentFinancialReportBinding
                 "c15272977147dee7e6935a38ea0e4fd6855370aabb106f54cfe20f7cf6048ec9.pdf"
             ),
             relative_dossier_path=(
-                "openspec/changes/scope-manufacturing-materials-stage4-segment-financials/"
-                "dossiers/300750-sz-2025.md"
+                f"{_SEGMENT_FINANCIAL_DOSSIER_DIR}/300750-sz-2025.md"
             ),
             content_length=2043710,
             page_count=232,
@@ -296,8 +302,7 @@ def segment_financial_research_bindings() -> tuple[SegmentFinancialReportBinding
                 "4e81f5539046ba1eee733100f38442a4abd5037afe3881115ba7f48678fa35b6.pdf"
             ),
             relative_dossier_path=(
-                "openspec/changes/scope-manufacturing-materials-stage4-segment-financials/"
-                "dossiers/603659-sh-2025.md"
+                f"{_SEGMENT_FINANCIAL_DOSSIER_DIR}/603659-sh-2025.md"
             ),
             content_length=1740667,
             page_count=203,
@@ -328,8 +333,7 @@ def segment_financial_research_bindings() -> tuple[SegmentFinancialReportBinding
                 "4d2c1612f6f62a9024b8947d7a01b70c40f8f347c2975fa1a05b908d0770695a.pdf"
             ),
             relative_dossier_path=(
-                "openspec/changes/scope-manufacturing-materials-stage4-segment-financials/"
-                "dossiers/920015-bj-2025.md"
+                f"{_SEGMENT_FINANCIAL_DOSSIER_DIR}/920015-bj-2025.md"
             ),
             content_length=1845726,
             page_count=143,
@@ -372,8 +376,7 @@ def segment_financial_research_bindings() -> tuple[SegmentFinancialReportBinding
                 "605394bd0879f906a829a9fcd3a2dab037d8aad2554b741a7d95757a3a5e3020.pdf"
             ),
             relative_dossier_path=(
-                "openspec/changes/scope-manufacturing-materials-stage4-segment-financials/"
-                "dossiers/302132-sz-2025.md"
+                f"{_SEGMENT_FINANCIAL_DOSSIER_DIR}/302132-sz-2025.md"
             ),
             content_length=1721821,
             page_count=186,

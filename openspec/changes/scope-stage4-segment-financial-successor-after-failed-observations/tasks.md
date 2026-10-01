@@ -4,7 +4,7 @@
 
 ## 2. Implementation, not yet authorized
 
-- [ ] 2.1 After 1.1, reuse `replay_segment_financial_research` with explicit plan `.2026-10-01.4` and add directed tests that the inherited boundaries still hold. Do not change the default plan `.2026-09-29.3`. Do not add a parser repair, enqueue, or replay in that task. Do not edit dossier bytes, PDF hashes, SF-1, SF-2, SF-3, or the ledger
+- [x] 2.1 After 1.1, reuse `replay_segment_financial_research` with explicit plan `.2026-10-01.4` and add directed tests that the inherited boundaries still hold. Do not change the default plan `.2026-09-29.3`. Do not add a parser repair, enqueue, or replay in that task. Do not edit dossier bytes, PDF hashes, SF-1, SF-2, SF-3, or the ledger. The archived dossier paths are readable, the explicit `.4` call stays isolated, and the default remains `.3`. Do not start 3.1 in that task
 
 ## 3. Replay and source review, not yet authorized
 

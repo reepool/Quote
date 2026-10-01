@@ -13,10 +13,13 @@ from research.company_profile.segment_financial_research import (
     SEGMENT_FINANCIAL_HISTORICAL_PLAN_VERSION,
     SEGMENT_FINANCIAL_PLAN_VERSION,
     SEGMENT_FINANCIAL_PRIOR_PLAN_VERSION,
+    SEGMENT_FINANCIAL_SUCCESSOR_PLAN_VERSION,
     SegmentFinancialResearchError,
     build_segment_financial_research_bundle,
     commit_segment_financial_research,
+    freeze_segment_financial_research_enqueue,
     interpret_segment_financial_pages,
+    replay_segment_financial_research,
     segment_financial_research_bindings,
 )
 from research.company_profile.stage5 import PreparedPageContext, PreparedRequestScope
@@ -40,8 +43,24 @@ def test_bindings_are_the_four_approved_reports():
         for term in scope.anchor_terms
     )
     assert SEGMENT_FINANCIAL_PLAN_VERSION.endswith("2026-09-29.3")
+    assert SEGMENT_FINANCIAL_SUCCESSOR_PLAN_VERSION.endswith("2026-10-01.4")
+    assert SEGMENT_FINANCIAL_SUCCESSOR_PLAN_VERSION != SEGMENT_FINANCIAL_PLAN_VERSION
     assert SEGMENT_FINANCIAL_PRIOR_PLAN_VERSION.endswith("2026-09-29.2")
     assert SEGMENT_FINANCIAL_HISTORICAL_PLAN_VERSION.endswith("2026-09-28.1")
+    dossier_hashes = {
+        "300750-sz-2025.md": "d97587dbe5a14ee086b54ade6ef59ce8d4cf112e02d7367046913a4a4e2f9cb8",
+        "603659-sh-2025.md": "f1fdfc75ccf24ba2581fbf4731b9b9bc8974198825f2e5310075c33fc78e4cb5",
+        "920015-bj-2025.md": "e09f80661e03235d46cb3de8a1c525f7c53d6dd24770fb9e749d55e0d173c06b",
+        "302132-sz-2025.md": "726cc7554016e85ae3158490bc15789105d8087a30698cbacfd4a94c0ce3445c",
+    }
+    for binding in bindings:
+        dossier = _ROOT / binding.relative_dossier_path
+        assert dossier.is_file()
+        assert "changes/archive/" in binding.relative_dossier_path
+        assert (
+            hashlib.sha256(dossier.read_bytes()).hexdigest()
+            == dossier_hashes[dossier.name]
+        )
     pages = {
         scope.scope_id: scope.pages for binding in bindings for scope in binding.scopes
     }
@@ -783,7 +802,8 @@ def test_printed_footnote_sections_stay_separate():
 def test_prior_successor_replay_bytes_stay_unchanged():
     root = (
         _ROOT
-        / "openspec/changes/repair-segment-financial-column-binding-and-cell-coverage"
+        / "openspec/changes/archive"
+        / "2026-09-29-repair-segment-financial-column-binding-and-cell-coverage"
         / "replay/20260929.2"
     )
     expected = {
@@ -800,7 +820,8 @@ def test_prior_successor_replay_bytes_stay_unchanged():
 def test_original_replay_bytes_stay_unchanged():
     root = (
         _ROOT
-        / "openspec/changes/scope-manufacturing-materials-stage4-segment-financials"
+        / "openspec/changes/archive"
+        / "2026-09-29-scope-manufacturing-materials-stage4-segment-financials"
         / "replay/20260928"
     )
     expected = {
@@ -813,6 +834,156 @@ def test_original_replay_bytes_stay_unchanged():
     }
     for name, digest in expected.items():
         assert hashlib.sha256((root / name).read_bytes()).hexdigest() == digest
+
+
+def test_sf3_replay_bytes_stay_unchanged():
+    root = (
+        _ROOT
+        / "openspec/changes/archive"
+        / "2026-09-29-repair-segment-financial-footnote-dimension-binding"
+        / "replay/20260929.3"
+    )
+    expected = {
+        "enqueue.json": "0f2ebfa087f8aa4327d15d4e0366af568bcd06a41ab923ba595899ec4e3cdd9b",
+        "run.json": "2ab053d1b3e80b52351ea7963e45f323b97a2706971514c99486eaefd3234d1f",
+        "segment-financial-stage4-segment-financials-20260929.3/result.json": (
+            "92ec1e2a8be5d4a6ee8bc5b492d7dc09a26dbc84bfbd0ad592ca5aab6cdc1eeb"
+        ),
+        "source_review.json": "4446fb7619f39b49e865bc563cf7673b98d2288d481c0b229de67394ee9c3c74",
+    }
+    for name, digest in expected.items():
+        assert hashlib.sha256((root / name).read_bytes()).hexdigest() == digest
+
+
+def test_default_enqueue_keeps_the_current_plan_and_readable_dossiers(tmp_path):
+    destination = freeze_segment_financial_research_enqueue(
+        tmp_path / "default",
+        repository_root=_ROOT,
+    )
+    payload = json.loads(destination.read_text(encoding="utf-8"))
+    assert payload["plan_version"] == SEGMENT_FINANCIAL_PLAN_VERSION
+    assert payload["production_authorization"] == "not_authorized"
+    assert [item["instrument_id"] for item in payload["reports"]] == [
+        "300750.SZ",
+        "603659.SH",
+        "920015.BJ",
+        "302132.SZ",
+    ]
+    for report in payload["reports"]:
+        dossier = _ROOT / report["dossier_path"]
+        assert dossier.is_file()
+        assert (
+            hashlib.sha256(dossier.read_bytes()).hexdigest() == report["dossier_sha256"]
+        )
+
+
+def test_explicit_successor_plan_stays_isolated_from_the_default(tmp_path):
+    class _Preparer:
+        def prepare_single_chapter(
+            self, *, asset, chapter_task, scopes, plan_version, page_results=None
+        ):
+            assert plan_version == SEGMENT_FINANCIAL_SUCCESSOR_PLAN_VERSION
+            spec = scopes[0]
+            text = _fixture_for(asset.sample_id, spec.scope_id)
+            pages = tuple(
+                PreparedPageContext(
+                    page=page,
+                    text=text,
+                    text_hash="c" * 64,
+                    extraction_method="fixture",
+                    quality_status="readable",
+                )
+                for page in spec.pages
+            )
+            from research.company_profile.contracts import PreparedEvidence
+            from research.company_profile.models import Evidence, TextAnchor
+
+            prepared = PreparedEvidence(
+                evidence=Evidence(
+                    evidence_id=f"fixture-{spec.scope_id}",
+                    report=asset.report,
+                    page=pages[0].page,
+                    section_title=spec.section_titles[0],
+                    anchor=TextAnchor(bounded_quote=text.strip().splitlines()[0]),
+                ),
+                field_id="segment_dimension",
+            )
+            return (
+                PreparedRequestScope(
+                    sample_id=asset.sample_id,
+                    scope_id=spec.scope_id,
+                    chapter_task=chapter_task,
+                    field_ids=spec.field_ids,
+                    report=asset.report,
+                    evidence_bundle=(prepared,),
+                    page_contexts=pages,
+                    plan_version=plan_version,
+                ),
+            )
+
+    output = tmp_path / "successor"
+    replay_segment_financial_research(
+        output,
+        repository_root=_ROOT,
+        run_id="stage4-segment-financials-20261001",
+        preparer=_Preparer(),
+        plan_version=SEGMENT_FINANCIAL_SUCCESSOR_PLAN_VERSION,
+    )
+    enqueue = json.loads((output / "enqueue.json").read_text(encoding="utf-8"))
+    run = json.loads((output / "run.json").read_text(encoding="utf-8"))
+    result = json.loads(
+        (
+            output
+            / "segment-financial-stage4-segment-financials-20261001"
+            / "result.json"
+        ).read_text(encoding="utf-8")
+    )
+    assert enqueue["plan_version"] == SEGMENT_FINANCIAL_SUCCESSOR_PLAN_VERSION
+    assert run["plan_version"] == SEGMENT_FINANCIAL_SUCCESSOR_PLAN_VERSION
+    assert result["plan_version"] == SEGMENT_FINANCIAL_SUCCESSOR_PLAN_VERSION
+    assert result["production_authorization"] == "not_authorized"
+    assert [item["instrument_id"] for item in enqueue["reports"]] == [
+        "300750.SZ",
+        "603659.SH",
+        "920015.BJ",
+        "302132.SZ",
+    ]
+    for report in enqueue["reports"]:
+        dossier = _ROOT / report["dossier_path"]
+        assert dossier.is_file()
+        assert (
+            hashlib.sha256(dossier.read_bytes()).hexdigest() == report["dossier_sha256"]
+        )
+        assert report["plan_version"] == SEGMENT_FINANCIAL_SUCCESSOR_PLAN_VERSION
+    elimination = [
+        item
+        for item in result["facts"]
+        if item["label"] == "合并抵消项" and item["field_id"] == "gross_margin_reported"
+    ]
+    assert elimination
+    assert {item["row_class"] for item in elimination} == {"consolidation_adjustment"}
+    assert not any(item["value"] in {"0", "0.00"} for item in result["facts"])
+    note = [
+        item
+        for item in result["facts"]
+        if item["page"] == 178 and item["field_id"] != "segment_dimension"
+    ]
+    assert note
+    assert {item["source_dimension"] for item in note} == {"报告分部的财务信息"}
+    assert not {
+        "recall",
+        "accuracy",
+        "critical_numeric_errors",
+        "expansion_gates_met",
+        "source_review",
+    } & set(result)
+    official = (
+        _ROOT
+        / "openspec/changes"
+        / "scope-stage4-segment-financial-successor-after-failed-observations"
+        / "replay/20261001"
+    )
+    assert not official.exists()
 
 
 def test_bundle_builder_refuses_a_second_chapter():
