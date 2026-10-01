@@ -72,7 +72,35 @@ Stage 4 aggregate 仍是只读 hold。分部财务 `.2026-10-01.4` 已取得当�
 
 ## Open Questions
 
-`.4` 的 recall、accuracy、critical numeric errors 和局部 gate 尚未发生，不在本卡预填。`.4` 能否成为当前产销量纳入行，留到 source-review 通过之后。业务通过和制品绑定必须同时成立。
+`.4` 的纳入判断写在下一节。本结论不改旧 ledger，也不重新打开 aggregate。
+
+## Inclusion judgment
+
+4.1 对照 source review 和四份制品。业务通过与制品绑定同时成立。没有重跑 replay，也没有修改 enqueue、run、result 或 source review。
+
+`manufacturing_materials_stage4_operating_quantities.2026-10-01.4` 是当前 `extract_operating_quantities` 纳入观察。指标来自这次独立重读：recall 38/38，accuracy 38/38，critical numeric errors 0。分报告来源分母是 300750.SZ 8、603659.SH 23、920015.BJ 7、302132.SZ 0。局部 gate 只属于这个计划、这四份报告和该章节。
+
+四报告身份与历史观察相同，报告期 2025-12-31：
+
+| Instrument | report_id | document_version |
+|---|---|---|
+| 300750.SZ | `asset_3b09f6c831975c7177b6bb3287cab781` | `ver_09c0e677ec8192dc4fc12cb620069f29` |
+| 603659.SH | `asset_50c70429093f66b34fc57ad8f896fcee` | `ver_c867a6a692048e88fd9cb80473fbf908` |
+| 920015.BJ | `asset_b87f1d1a48e662dae376c540cd021f69` | `ver_cfdbd2d058af825b1fc39f494d7a9bd3` |
+| 302132.SZ | `asset_0a488da55636b09107be6d719c9ebf39` | `ver_2d20ba3aebc5fac6c562cd619695995a` |
+
+本观察的制品哈希是这次重新计算的结果：
+
+| 制品 | SHA-256 |
+|---|---|
+| enqueue | `6f2363a463627a5e233a5f76e094577294b7276de90bd51db61598967e706e52` |
+| run | `977939ba5ceabe8da0238f594a284cdc6352edca5bafd9cfae8e4021d11a8788` |
+| result | `6ccd40a07803ac7411631729a1abac69debd3d10119f80260a5731e73f747add` |
+| source-review | `1a5c4753d0a3b407c84a188d68b98258e764e9ef463293ed5bdac0d0fcff8cdf` |
+
+OQ-1 与 OQ-2 继续是历史失败观察。OQ-1 仍是 recall 26/36、accuracy 26/27、critical numeric errors 1。OQ-2 仍是 recall 36/38、accuracy 36/36、critical numeric errors 0。OQ-3 的 recall 38/38、accuracy 38/38、critical numeric errors 0 仍只属于 `.2026-09-28.3`。旧 ledger 和全部历史 replay 不改。
+
+本结论只授予当前产销量纳入资格。不计算跨章节分数，不产生 aggregate `expansion_gates_met=true`。`stage4_aggregate_expansion_gates_met` 保持 false。`production_authorization` 保持 `not_authorized`。`scale_quality_claim_allowed` 保持 false。
 
 ## Acceptance
 

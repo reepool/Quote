@@ -13,7 +13,7 @@
 
 ## 4. Inclusion judgment, not yet authorized
 
-- [ ] 4.1 After 3.2, confirm `.2026-10-01.4` as the current operating-quantity inclusion row only when the business pass and the artifact binding both hold. If either fails, keep the failed observation and do not grant inclusion. Stage 4 aggregate stays a separate judgment
+- [x] 4.1 After 3.2, confirm `.2026-10-01.4` as the current operating-quantity inclusion row only when the business pass and the artifact binding both hold. If either fails, keep the failed observation and do not grant inclusion. Stage 4 aggregate stays a separate judgment. The judgment is in design.md under "Inclusion judgment": `.4` is the current operating-quantity inclusion row, with recall 38/38, accuracy 38/38, and critical numeric errors 0. `stage4_aggregate_expansion_gates_met` stays false. Do not archive in this task
 
 ## 5. Archive, not yet authorized
 
