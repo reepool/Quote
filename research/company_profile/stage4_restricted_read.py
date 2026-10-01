@@ -171,15 +171,31 @@ def resolved_replay_dirs(
     repo_root: Path,
     chapters: Sequence[FrozenChapterArtifacts] = FROZEN_CHAPTERS,
 ) -> tuple[Path, ...]:
-    """Return the replay directories the application owner must protect."""
+    """Return each archive ``replay`` root, including later sibling directories."""
 
     resolved: list[Path] = []
+    seen: set[Path] = set()
     for binding in chapters:
         replay = Path(binding.replay_dir)
         if not replay.is_absolute():
             replay = repo_root / replay
-        resolved.append(replay)
+        root = _replay_root(replay)
+        if root not in seen:
+            seen.add(root)
+            resolved.append(root)
     return tuple(resolved)
+
+
+def _replay_root(path: Path) -> Path:
+    resolved = path.resolve()
+    if resolved.name == "replay":
+        return resolved
+    if resolved.parent.name == "replay":
+        return resolved.parent
+    for candidate in resolved.parents:
+        if candidate.name == "replay":
+            return candidate
+    return resolved
 
 
 def project_stage4_restricted_views(

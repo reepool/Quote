@@ -41,12 +41,22 @@ The `302132.SZ` material-input section MUST show the stored `legal_empty` scope 
 - **AND** the stored legal-empty coverage remains visible
 
 ### Requirement: Repeated access does not duplicate or overwrite history
-Query MUST NOT write files. Export MUST write only inside the caller-supplied export directory. Repeated query MUST return the same facts without appending a second copy into research storage. Export MUST NOT write into a replay directory, the common-core namespace, a checkpoint, or a publication-control file. Existing common-core profiles MUST NOT be overwritten by this chapter projection.
+Query MUST NOT write files. Export MUST write only inside the caller-supplied export directory. Repeated query MUST return the same facts without appending a second copy into research storage. Export MUST NOT write into a replay root, including a later sibling of a dated replay directory, or into a symlink to that root. It MUST NOT write into the common-core namespace, a checkpoint, or a publication-control file. Before writing any output byte, export MUST acquire exclusive use of the target directory. A conflicting export MUST fail and MUST leave the first completed export unchanged. Existing common-core profiles MUST NOT be overwritten by this chapter projection.
 
 #### Scenario: A second query adds no stored facts
 - **WHEN** the same company and report are queried twice
 - **THEN** the returned facts are the same set
 - **AND** the frozen result files and historical observations keep their original bytes
+
+#### Scenario: A new replay subdirectory is rejected
+- **WHEN** an export targets a new directory under a protected replay root or a symlink to that root
+- **THEN** the export fails before writing
+- **AND** the replay root stays unchanged
+
+#### Scenario: Concurrent exports do not mix companies
+- **WHEN** two company exports target the same directory at the same time
+- **THEN** one export fails without writing
+- **AND** the completed export contains only its own company records
 
 ### Requirement: Four chapters do not complete the core profile
 The restricted view MUST set its own core-profile completeness to false. Missing `extract_business_overview` and `extract_business_regime` MUST be shown as gaps not included in this delivery. This contract MUST NOT require those chapters, a six-chapter package, or a regime date before the four accepted chapters can be queried.

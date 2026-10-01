@@ -9,9 +9,13 @@ trading, and price-sensitivity consumers unauthorized.
 from __future__ import annotations
 
 import csv
+import fcntl
 import json
+import os
 import re
-from collections.abc import Mapping, Sequence
+import threading
+from collections.abc import Iterator, Mapping, Sequence
+from contextlib import contextmanager
 from pathlib import Path
 from typing import Any
 
@@ -111,22 +115,21 @@ class CompanyProfileReadService:
         profile_state = str(queried.get("state") or "idle")
         written: list[str] = []
         if profiles or views:
-            _reject_existing_export(target)
-            target.mkdir(parents=True, exist_ok=True)
-            written.extend(_write_profile_export(target, profiles))
-            written.extend(_write_stage4_export(target, views))
-            manifest_path = target / "export_manifest.json"
-            manifest = _export_manifest(
-                profiles=profiles,
-                views=views,
-                profile_state=profile_state,
-                files=[*written, str(manifest_path)],
-            )
-            manifest_path.write_text(
-                json.dumps(manifest, ensure_ascii=False, indent=2),
-                encoding="utf-8",
-            )
-            written.append(str(manifest_path))
+            with _exclusive_export(target):
+                written.extend(_write_profile_export(target, profiles))
+                written.extend(_write_stage4_export(target, views))
+                manifest_path = target / "export_manifest.json"
+                manifest = _export_manifest(
+                    profiles=profiles,
+                    views=views,
+                    profile_state=profile_state,
+                    files=[*written, str(manifest_path)],
+                )
+                manifest_path.write_text(
+                    json.dumps(manifest, ensure_ascii=False, indent=2),
+                    encoding="utf-8",
+                )
+                written.append(str(manifest_path))
         if profiles or views:
             state = "completed"
         elif profile_state == "not_found":
@@ -512,6 +515,48 @@ def _is_relative_to(path: Path, root: Path) -> bool:
     except ValueError:
         return False
     return True
+
+
+_EXPORT_THREAD_GUARD = threading.Lock()
+_EXPORT_THREAD_LOCKS: dict[str, threading.Lock] = {}
+
+
+def _export_thread_lock(target: Path) -> threading.Lock:
+    key = str(target)
+    with _EXPORT_THREAD_GUARD:
+        lock = _EXPORT_THREAD_LOCKS.get(key)
+        if lock is None:
+            lock = threading.Lock()
+            _EXPORT_THREAD_LOCKS[key] = lock
+        return lock
+
+
+@contextmanager
+def _exclusive_export(target: Path) -> Iterator[None]:
+    """Hold the target directory exclusively before any export byte is written."""
+
+    thread_lock = _export_thread_lock(target)
+    if not thread_lock.acquire(blocking=False):
+        raise ValueError(f"export directory is already in use: {target}")
+    descriptor: int | None = None
+    try:
+        target.mkdir(parents=True, exist_ok=True)
+        descriptor = os.open(target, os.O_RDONLY)
+        try:
+            fcntl.flock(descriptor, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except OSError as exc:
+            raise ValueError(
+                f"export directory is already in use: {target}"
+            ) from exc
+        _reject_existing_export(target)
+        yield
+    finally:
+        if descriptor is not None:
+            try:
+                fcntl.flock(descriptor, fcntl.LOCK_UN)
+            finally:
+                os.close(descriptor)
+        thread_lock.release()
 
 
 def _reject_existing_export(target: Path) -> None:

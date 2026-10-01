@@ -4,6 +4,7 @@ import csv
 import hashlib
 import json
 import shutil
+import threading
 from pathlib import Path
 
 import pytest
@@ -16,6 +17,7 @@ from research.company_profile.stage4_restricted_read import (
     FrozenChapterArtifacts,
     default_repo_root,
     project_stage4_restricted_views,
+    resolved_replay_dirs,
 )
 
 _COMPANIES = ("300750.SZ", "603659.SH", "920015.BJ", "302132.SZ")
@@ -602,3 +604,95 @@ def test_repeated_export_does_not_overwrite(tmp_path):
         path: path.read_bytes() for path in destination.rglob("*") if path.is_file()
     }
     assert after == before
+
+
+def test_new_replay_subdirectory_and_symlink_are_rejected(tmp_path):
+    replay = tmp_path / "archive" / "replay"
+    dated = replay / "20261001"
+    dated.mkdir(parents=True)
+    binding = FrozenChapterArtifacts(
+        chapter_task=FROZEN_CHAPTERS[0].chapter_task,
+        plan_version=FROZEN_CHAPTERS[0].plan_version,
+        replay_dir=str(dated),
+        result_name=FROZEN_CHAPTERS[0].result_name,
+        enqueue_sha256=FROZEN_CHAPTERS[0].enqueue_sha256,
+        run_sha256=FROZEN_CHAPTERS[0].run_sha256,
+        result_sha256=FROZEN_CHAPTERS[0].result_sha256,
+        source_review_sha256=FROZEN_CHAPTERS[0].source_review_sha256,
+    )
+    roots = resolved_replay_dirs(tmp_path, (binding,))
+    service = _reader(tmp_path / "output", protected_export_roots=roots)
+    delivery = replay / "delivery"
+    alias = tmp_path / "replay-link"
+    alias.symlink_to(replay)
+    nested_alias = tmp_path / "delivery-link"
+    nested_alias.symlink_to(delivery)
+
+    assert roots == (replay.resolve(),)
+    for path in (delivery, alias, alias / "later", nested_alias):
+        with pytest.raises(ValueError, match="protected research inputs"):
+            service.export(("300750.SZ",), export_directory=path)
+
+    assert not delivery.exists()
+    assert list(replay.iterdir()) == [dated]
+
+
+def test_concurrent_export_does_not_mix_companies(tmp_path, monkeypatch):
+    entered = threading.Event()
+    release = threading.Event()
+    reads = __import__(
+        "research.company_profile.reads",
+        fromlist=["_write_stage4_export"],
+    )
+    real_write = reads._write_stage4_export
+
+    def slow_write(target, views):
+        entered.set()
+        assert release.wait(timeout=5)
+        return real_write(target, views)
+
+    monkeypatch.setattr(
+        "research.company_profile.reads._write_stage4_export",
+        slow_write,
+    )
+    service = _reader(tmp_path / "output")
+    destination = tmp_path / "delivery"
+    outcome: dict[str, object] = {}
+
+    def first_export() -> None:
+        try:
+            outcome["result"] = service.export(
+                ("300750.SZ",),
+                export_directory=destination,
+            )
+        except ValueError as exc:
+            outcome["error"] = exc
+
+    worker = threading.Thread(target=first_export)
+    worker.start()
+    assert entered.wait(timeout=5)
+    with pytest.raises(ValueError, match="already in use"):
+        service.export(("603659.SH",), export_directory=destination)
+    release.set()
+    worker.join(timeout=5)
+
+    assert "error" not in outcome
+    assert worker.is_alive() is False
+    names = {path.name for path in destination.iterdir()}
+    assert "300750.SZ_2025-12-31.stage4.json" in names
+    assert "603659.SH_2025-12-31.stage4.json" not in names
+    saved = json.loads(
+        (destination / "300750.SZ_2025-12-31.stage4.json").read_text(encoding="utf-8")
+    )
+    rows = list(
+        csv.DictReader((destination / "stage4_records.csv").open(encoding="utf-8"))
+    )
+    manifest = json.loads(
+        (destination / "export_manifest.json").read_text(encoding="utf-8")
+    )
+    assert saved["instrument_id"] == "300750.SZ"
+    assert {row["instrument_id"] for row in rows} == {"300750.SZ"}
+    assert [item["instrument_id"] for item in manifest["restricted_views"]] == [
+        "300750.SZ"
+    ]
+    assert outcome["result"]["restricted_delivered"] == 1

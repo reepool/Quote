@@ -9,3 +9,11 @@
 ## 3. Export the same view, not yet authorized
 
 - [x] 3.1 After 2.1, export those facts, evidence, and coverage through the existing export action into the caller directory only. Repeated query and export must not duplicate stored facts or change replay, checkpoint, publication-control, or historical observation bytes. Do not add a UI, a generalized read model, overview, regime, or a production publication switch in that task. Export reuses one query. The application owner passes the frozen chapter binding. An unreadable artifact rejects only that chapter.
+
+## 4. Export correctness
+
+- [x] 4.1 Protect the whole replay root and its symlink aliases, and take exclusive use of the export directory before writing any byte. A conflicting export fails and leaves the first completed export unchanged. Do not start the archive in that fix.
+
+## 5. Archive, not yet authorized
+
+- [ ] 5.1 After 4.1, keep that export behavior and archive this scope. Do not start overview, regime, the six-chapter package, or a production admission in that task.
