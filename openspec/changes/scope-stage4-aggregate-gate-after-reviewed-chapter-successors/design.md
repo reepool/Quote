@@ -51,7 +51,7 @@
 | 客户供应商 `.1` | `7e9c1a72f11723f2d8508d751c27f8ea3f96cae048eb0ab6edc6224eb301bf7a` | `8d3c7bd7a6c1f81a2e2b76064eb3d7fe9685d7570442a1e4d113b786a4cf0d7f` | `b0344d3d577f423a1716b6dacc7c46b100ef3fe9ddddb5d37ef0160c2458a57a` | `b2c38f9fa1cf947ab69e542606332689ac25ea1e6df63facc50ac6a1fa56baf4` |
 
 4. 历史观察不进入本次判断集合，原值保留：MI-1 19/23、19/19、critical numeric errors 0；MI-2 `.2026-09-26.2` 仍是三报告 23/23；OQ-1 26/36、26/27、critical numeric errors 1；OQ-2 36/38、36/36、critical numeric errors 0；OQ-3 `.2026-09-28.3` 的 38/38 只属于旧计划；SF-1 122/132、129/133、critical numeric errors 4；SF-2 102/132、114/142、critical numeric errors 0；SF-3 `.2026-09-29.3` 的 132/132、144/144 只属于旧计划。旧 hold 结论不改。critical numeric errors 1 和 4 不能改成 0。
-5. 以后应用本合同时，四项必须同时成立才可记录研究范围 aggregate pass：四行报告身份与上表一致；四行各自的 source-review 仍是业务通过，且 critical numeric errors 为 0；四份制品哈希与上表一致；各章 source-review 已记录的语义和 coverage 边界仍然成立。任一不成立，结论是 hold。不得把 23、38、137、144、45 相加。本卡不应用这四项，因此不记录 pass。
+5. 以后应用本合同时，四项必须同时成立才可记录研究范围 aggregate pass：四行报告身份与上表一致；四行各自的 source-review 仍是业务通过，且 critical numeric errors 为 0；四份制品哈希与上表一致；各章 source-review 已记录的语义和 coverage 边界仍然成立。任一不成立，结论是 hold。不得把 23、38、137、144、45 相加。应用结果写在 Admission。
 6. 若以后的应用记录了该 pass，它只属于本新合同的研究范围。它最多允许另立一张 restricted-promotion 设计卡。它不授权六章包、规模质量或生产。`production_authorization` 保持 `not_authorized`，`scale_quality_claim_allowed` 保持 false。在该应用完成前，`stage4_aggregate_expansion_gates_met` 保持 false。
 
 ## Risks / Trade-offs
@@ -66,4 +66,28 @@
 
 ## Open Questions
 
-四项条件是否同时成立，留到 1.1 通过之后的应用任务。本卡不预填 pass 或 hold 的应用结论。
+四项条件的应用结果写在下一节。
+
+## Admission
+
+2.1 只读取已归档的四份 source-review 和它们的 enqueue、run、result。没有重跑 replay，没有修改历史制品、旧 hold 合同、旧 ledger 或控制面，也没有把四章分数相加。
+
+四项条件都成立：
+
+| 条件 | 判断 | 证据 |
+|---|---|---|
+| 报告身份一致 | 成立 | 四份 enqueue 都是 `300750.SZ`、`603659.SH`、`920015.BJ`、`302132.SZ`，report_id、document_version、PDF hash 和报告期 2025-12-31 与本合同相同 |
+| 四行业务通过 | 成立 | 材料投入 23/23、23/23；产销量 38/38、38/38；分部财务 137/137、144/144；客户供应商 45/45、45/45。四行 critical numeric errors 都是 0，局部 gate 只属于各自计划 |
+| 制品绑定正确 | 成立 | 四份 enqueue、run、result、source-review 的 SHA-256 与本合同 Decision 3 一致 |
+| 语义与 coverage 边界 | 成立 | 材料投入把 `302132.SZ` 记为 lawful `legal_empty`，不计入具名投入分母；产销量保留 541、121、661 GWh 分开、加工量与销量分开，以及比较符、项目阶段和库存脚注；分部财务保留页 25 列角色、页 139 两个栏目、页 178 正式标题和合法空值；客户供应商的 boundary checks 与 coverage checks 均为通过，`not_disclosed` 没有被写成 Relationship |
+
+归档路径：
+
+- 材料投入 `.3`：`openspec/changes/archive/2026-09-30-scope-manufacturing-materials-stage4-material-input-four-report-successor/replay/20260930/`
+- 产销量 `.4`：`openspec/changes/archive/2026-10-01-scope-stage4-operating-quantity-successor-after-failed-observations/replay/20261001/`
+- 分部财务 `.4`：`openspec/changes/archive/2026-10-01-scope-stage4-segment-financial-successor-after-failed-observations/replay/20261001/`
+- 客户供应商 `.1`：`openspec/changes/archive/2026-09-29-scope-manufacturing-materials-stage4-counterparties-and-concentration/replay/20260929/`
+
+结论是本合同的研究范围 **aggregate pass**。它只覆盖这四行当前观察。MI-1、MI-2、OQ-1、OQ-2、OQ-3、SF-1、SF-2、SF-3 仍在集合外。OQ-1 的 critical numeric errors 1 和 SF-1 的 4 保持原值。
+
+该 pass 不授权六章包、规模质量或生产。它最多允许以后另立一张 restricted-promotion 设计卡。`production_authorization` 保持 `not_authorized`。`scale_quality_claim_allowed` 保持 false。控制面文件不改，因此控制面上的 `stage4_aggregate_expansion_gates_met` 仍是 false；本结论不把它写成生产扩展授权。
