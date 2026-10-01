@@ -8,4 +8,4 @@
 
 ## 3. Archive, not yet authorized
 
-- [ ] 3.1 After 2.1, keep that application result and archive this scope. Do not start a restricted-promotion implementation or a production admission in that task
+- [x] 3.1 After 2.1, keep that application result and archive this scope. Do not start a restricted-promotion implementation or a production admission in that task
