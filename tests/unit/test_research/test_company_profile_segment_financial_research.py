@@ -921,6 +921,17 @@ def test_explicit_successor_plan_stays_isolated_from_the_default(tmp_path):
                 ),
             )
 
+    official = (
+        _ROOT
+        / "openspec/changes"
+        / "scope-stage4-segment-financial-successor-after-failed-observations"
+        / "replay/20261001"
+    )
+    official_before = _artifact_fingerprint(official)
+    present = tmp_path / "already-present"
+    present.mkdir()
+    (present / "enqueue.json").write_text('{"kept": true}\n', encoding="utf-8")
+    present_before = _artifact_fingerprint(present)
     output = tmp_path / "successor"
     replay_segment_financial_research(
         output,
@@ -983,7 +994,28 @@ def test_explicit_successor_plan_stays_isolated_from_the_default(tmp_path):
         / "scope-stage4-segment-financial-successor-after-failed-observations"
         / "replay/20261001"
     )
-    assert not official.exists()
+    assert output.resolve() != official.resolve()
+    assert _artifact_fingerprint(official) == official_before
+    assert _artifact_fingerprint(present) == present_before
+    assert not (present / "run.json").exists()
+
+
+def _artifact_fingerprint(path: Path) -> tuple[tuple[str, str], ...] | None:
+    """Return file hashes, or None when the directory does not exist."""
+
+    if not path.exists():
+        return None
+    rows = []
+    for item in sorted(
+        candidate for candidate in path.rglob("*") if candidate.is_file()
+    ):
+        rows.append(
+            (
+                str(item.relative_to(path)),
+                hashlib.sha256(item.read_bytes()).hexdigest(),
+            )
+        )
+    return tuple(rows)
 
 
 def test_bundle_builder_refuses_a_second_chapter():
