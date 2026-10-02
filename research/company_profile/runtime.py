@@ -36,6 +36,7 @@ from .core_assessment_projection import (
 from .core_evidence_selection import (
     CoreEvidenceSelection,
     project_owned_page_facts,
+    revenue_sentence_repair_requested,
     select_core_evidence,
 )
 from .core_skeleton import (
@@ -434,7 +435,13 @@ class CompanyProfileStageRuntime:
             reused = _unique_records(
                 (
                     *_reused_records_for_chapter(state, chapter),
-                    *project_owned_page_facts(state.evidence, chapter),
+                    *project_owned_page_facts(
+                        state.evidence,
+                        chapter,
+                        repair_revenue_sentence=revenue_sentence_repair_requested(
+                            state.processing_identity
+                        ),
+                    ),
                 )
             )
             bundle = _bundle_with_reused_evidence(

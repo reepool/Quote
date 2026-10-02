@@ -1,6 +1,6 @@
 ## 1. Revenue sentence
 
-- [ ] 1.1 Keep an explicit company revenue sentence that shares the bounded evidence with the principal-business sentence, and deliver it through the existing acceptance, persistence, query, and export path. `600007.SH` must gain a sourced revenue answer. A negative sentence or a third party's revenue must not become the company's answer. Do not select commodity disclosures in this task.
+- [x] 1.1 Keep an explicit company revenue sentence that shares the bounded evidence with the principal-business sentence, and deliver it through the existing acceptance, persistence, query, and export path. `600007.SH` must gain a sourced revenue answer. A negative sentence or a third party's revenue must not become the company's answer. Do not select commodity disclosures in this task. The repair marker now keeps the sentence. Do not start 2.1 in this task.
 
 ## 2. Explicit commodity roles
 

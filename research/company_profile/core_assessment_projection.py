@@ -45,7 +45,7 @@ _PRODUCT_PATTERN = re.compile(
 )
 _STATEMENT_SPLIT = re.compile(r"[。；;，,\n]+")
 _REVENUE_INFLOW_PATTERN = re.compile(
-    r"(收入来[源于自]|营业收入构成|主营业务收入|"
+    r"(营业收入主要来源于|收入来[源于自]|营业收入构成|主营业务收入|"
     r"通过.{0,30}(?:销售|提供).{0,30}(?:取得|获得|收取)|"
     r"取得货款|"
     r"向客户(?:销售|提供).{0,24}(?:取得|获得|收取)|"
@@ -397,7 +397,8 @@ def _assess_revenue_model(
 
 
 def _overview_states_revenue(text: str) -> bool:
-    for statement in _STATEMENT_SPLIT.split(text):
+    joined = re.sub(r"[\r\n]+", "", text)
+    for statement in _STATEMENT_SPLIT.split(joined):
         statement = statement.strip()
         if not statement:
             continue
