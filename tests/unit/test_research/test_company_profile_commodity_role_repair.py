@@ -44,6 +44,14 @@ _PAGES = (
         "readable": True,
     },
     {
+        "page": 97,
+        "text": (
+            "主要经营活动：本公司属钢铁行业，主要生产销售黑色金属及其延压加工产品、冶金机械、\n"
+            "设备及配件、焦炭及焦化副产品生产和销售、汽车货物运输、钢铁生产技术咨询等。"
+        ),
+        "readable": True,
+    },
+    {
         "page": 140,
         "text": (
             "国贸有限公司 接受劳务 支付蒸汽费、热水费及电费等 7,407,073 7,382,121"
@@ -137,6 +145,16 @@ def _assert_sentence_bindings(profile: dict) -> None:
     assert ("稀土精矿", "product_sales") in _roles(profile)
     assert ("萤石", "product_sales") in _roles(profile)
     assert ("焦化产品", "product_sales") in _roles(profile)
+    assert ("焦化副产品", "product_sales") in _roles(profile)
+    assert any(
+        name == "焦炭" and role == "product_sales" and 97 in pages
+        for name, role, pages, _quote in rows
+    )
+    assert any(
+        item.get("source_native_name") == "焦化副产品"
+        and item.get("mapping_status") == "pending"
+        for item in profile["commodity_exposure"]["assessment"]["exposures"]
+    )
     assert any(
         name == "铁矿石" and role == "raw_material_input" and 220 in pages
         for name, role, pages, _quote in rows

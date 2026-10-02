@@ -1,4 +1,10 @@
-## ADDED Requirements
+# repair-company-profile-m4-revenue-and-commodity-role-gaps Specification
+
+## Purpose
+
+The v3 reread of the same two frozen reports is recall 18/18 and accuracy 21/21, with critical numeric errors 0. Expansion gates are not met. Fluorite sales stays a recorded evidence gap and is not a recall item. The archived 5/9, the historical 8/9 and 9/9, the 18/18 review, and the 19/21 review stay unchanged. Production remains not authorized, and scale quality is not claimed.
+
+## Requirements
 
 ### Requirement: The repair stays closed until this change is accepted
 Before implementation starts, the change MUST only contain its scope documents. It MUST NOT change Python. It MUST NOT enqueue, query, or export a repair run. It MUST NOT modify the archived 5/9 observation, the historical 8/9 or 9/9 observations, or the existing export bytes. It MUST NOT authorize production or scale quality.
@@ -26,7 +32,8 @@ The repair MUST select disclosures in which the company itself sells, procures, 
 #### Scenario: Each named role is checked on its own
 - **WHEN** the successor is reviewed
 - **THEN** the checklist names steam, hot water, and electricity for `600007.SH`
-- **AND** it names steel, rare-earth concentrate, fluorite, and coke-product sales for `600010.SH`
+- **AND** it names steel, rare-earth concentrate, coke, and coke-byproduct sales for `600010.SH`
+- **AND** fluorite sales is included only when a same-sentence or table-row sales disclosure is found
 - **AND** it names procurement of iron ore, lime, limestone, imported ore, and coke for `600010.SH`
 
 #### Scenario: Production and sales are not collapsed
@@ -73,3 +80,27 @@ The corrected delivery MUST use a new repair version, processing identity, and s
 - **WHEN** the corrected successor review is written
 - **THEN** it is stored in the new snapshot directory
 - **AND** the original 18/18 source review keeps its bytes
+
+### Requirement: Page 97 coke and coke-byproduct sales keep their source names
+The repair MUST treat “焦炭及焦化副产品生产和销售” on page 97 as the reporting company's sales when that phrase shares the sentence with the company subject, including when a PDF line break falls after an enumeration comma. The delivered names MUST be `焦炭` and `焦化副产品`. An unmapped name MUST stay pending. Query and export MUST show those associations. A same-name procurement sentence MUST remain procurement.
+
+#### Scenario: The wrapped page 97 sentence is delivered as sales
+- **WHEN** page 97 says the company produces and sells coke and coke byproducts
+- **THEN** query and export contain sales roles named `焦炭` and `焦化副产品`
+- **AND** `焦化副产品` stays pending when the catalog does not map it
+
+### Requirement: Fluorite sales is not an explicit checklist item without a sales sentence
+A fluorite product, capacity, or resource statement MUST NOT be recorded as an explicit fluorite sales disclosure. The product fact MAY remain. The sales-evidence gap MUST stay visible and MUST NOT be removed because delivery lacks a fluorite sales role.
+
+#### Scenario: No fluorite sales sentence is found
+- **WHEN** the sampled report states fluorite products, capacity, or resources and no sentence or table row states that the company sells fluorite
+- **THEN** fluorite sales is not a recall denominator item
+- **AND** the review still records the sales-evidence gap
+
+### Requirement: Recall identity is fixed before the next successor
+Before the next repair run, the recall checklist MUST be frozen as one item per instrument, direction, and source name. A later page that repeats the same name and direction is a restatement: it MUST be scored for accuracy and MUST NOT add another recall item. Accuracy MUST still cover every delivered association. The recorded 19/21 review and the older observations MUST stay unchanged. The new score MUST NOT be prefilled, and a frozen checklist miss MUST NOT be deleted from the denominator because the output lacks it.
+
+#### Scenario: Restated iron-ore procurement is one recall item
+- **WHEN** iron-ore procurement is delivered from both page 219 and page 220
+- **THEN** recall counts one iron-ore procurement item
+- **AND** accuracy scores both delivered associations

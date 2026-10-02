@@ -946,8 +946,13 @@ _SKIP_SEGMENT_LABELS = frozenset(
 REVENUE_SENTENCE_REPAIR = "revenue_sentence_repair"
 REVENUE_SENTENCE_REPAIR_V1 = "v1"
 REVENUE_SENTENCE_REPAIR_V2 = "v2"
+REVENUE_SENTENCE_REPAIR_V3 = "v3"
 _REVENUE_SENTENCE_REPAIR_VERSIONS = frozenset(
-    {REVENUE_SENTENCE_REPAIR_V1, REVENUE_SENTENCE_REPAIR_V2}
+    {
+        REVENUE_SENTENCE_REPAIR_V1,
+        REVENUE_SENTENCE_REPAIR_V2,
+        REVENUE_SENTENCE_REPAIR_V3,
+    }
 )
 
 
@@ -1709,6 +1714,8 @@ _REPAIR_SALES = (
     ("稀土精矿", ("稀土精矿",)),
     ("萤石", ("萤石精矿", "萤石")),
     ("焦化产品", ("焦化产品", "冶金焦炭")),
+    ("焦化副产品", ("焦化副产品",)),
+    ("焦炭", ("焦炭",)),
 )
 _REPAIR_PROCUREMENT = ("铁矿石", "白灰", "石灰石", "进口矿", "焦炭")
 _REPAIR_ENERGY = (("蒸汽", "蒸汽费"), ("热水", "热水费"), ("电", "电费"))
@@ -1747,15 +1754,35 @@ def _repair_commodity_spans(
 
 
 def _repair_commodity_clauses(excerpt: str) -> list[str]:
-    """One clause per sentence or table row, after joining a PDF soft wrap."""
+    """One clause per sentence or table row, after joining a PDF soft wrap.
 
-    clauses: list[str] = []
+    A line that ends with an enumeration comma continues the same sentence.
+    Page 97 breaks “冶金机械、 / 设备及配件、焦炭及焦化副产品生产和销售”.
+    """
+
+    merged: list[str] = []
     for line in _join_pdf_soft_breaks(excerpt).split("\n"):
+        if merged and merged[-1].rstrip().endswith(("、", "，", ",")):
+            merged[-1] = f"{merged[-1].rstrip()}{line.lstrip()}"
+        else:
+            merged.append(line)
+    clauses: list[str] = []
+    for line in merged:
         for part in re.split(r"[。；;]", line):
             compact = re.sub(r"\s+", "", part).strip()
             if compact:
                 clauses.append(compact)
     return clauses
+
+
+def _sales_alias_in(stated: str, alias: str) -> bool:
+    """Match a sales name without treating 冶金焦炭 as bare 焦炭."""
+
+    if alias not in stated:
+        return False
+    return not (
+        alias == "焦炭" and stated.count("焦炭") == stated.count("冶金焦炭")
+    )
 
 
 _ORG_NAME = re.compile(
@@ -1820,7 +1847,7 @@ def _project_repair_commodity_span(
         procures = any(token in stated for token in ("采购", "订购", "原辅料"))
         if company and sells and "采购协议" not in stated:
             for name, aliases in _REPAIR_SALES:
-                if any(alias in stated for alias in aliases):
+                if any(_sales_alias_in(stated, alias) for alias in aliases):
                     add_activity(name, ActivityAction.SELLS, "销售")
         if company and procures:
             for name in _REPAIR_PROCUREMENT:

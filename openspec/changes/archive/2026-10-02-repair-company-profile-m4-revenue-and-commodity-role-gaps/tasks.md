@@ -25,3 +25,11 @@
 ## 7. Corrected successor
 
 - [x] 7.1 After 5.1 and 6.1, run, query, and export both frozen reports again with a new repair version, processing identity, and snapshot directory, at cutoff `2026-09-17` and the shared budget. Do not reuse the completed incorrect result. Recalculate recall from the source checklist, and score accuracy on every delivered role and its evidence. Keep the archived 5/9, the historical 8/9 and 9/9, and the original 18/18 observation. Do not prefill the new score. Archive only after this review.
+
+## 8. Coke sales and fluorite evidence
+
+- [x] 8.1 Recognize page 97's “焦炭及焦化副产品生产和销售” as company sales. Keep the source names `焦炭` and `焦化副产品`, and keep an unmapped name pending. Prove acceptance, query, and export. Fluorite sales stays out of the explicit checklist unless a same-sentence or table-row sales disclosure is found; otherwise keep the product fact and record the sales-evidence gap. Page 9 and page 13 negatives and the one combined energy fee still hold.
+
+- [x] 8.2 Before the run, freeze the source checklist, item identity, and restatement dedup. Then deliver both frozen reports at cutoff `2026-09-17` with a new repair version and snapshot directory. Accuracy covers every delivered association. Keep the 19/21 review and the older observations. Do not prefill the score and do not drop a checklist miss because the output lacks it.
+
+- [x] 8.3 Record the items that passed, the remaining gaps, and the gate result, then archive this change. Later sample expansion follows that review. Production authorization and the scale-quality claim stay unchanged.
