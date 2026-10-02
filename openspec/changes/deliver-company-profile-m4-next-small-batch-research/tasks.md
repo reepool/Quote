@@ -13,8 +13,8 @@
 
 ## 4. Deliver the second disclosure form, not yet authorized
 
-- [ ] 4.1 After 3.1, run the manufacturing company with the remaining budget through the same path. Reuse a completed scope instead of calling the provider again. The round observation must still contain both companies. Query and export the delivered company.
+- [x] 4.1 After 3.1, run the manufacturing company with the remaining budget through the same path. Reuse a completed scope instead of calling the provider again. The round observation must still contain both companies. Query and export the delivered company. 600010.SH was run, queried, and exported. Do not score in this task.
 
 ## 5. Independent reading, not yet authorized
 
-- [ ] 5.1 After both runs, reread the two frozen reports against the combined observation and record this round's source-review snapshot. Count recall, accuracy, and critical numeric errors from that reading. Keep a miss as a miss. Do not authorize production or a scale-quality claim, and do not archive in that task.
+- [x] 5.1 After both runs, reread the two frozen reports against the combined observation and record this round's source-review snapshot. Count recall, accuracy, and critical numeric errors from that reading. Keep a miss as a miss. Do not authorize production or a scale-quality claim, and do not archive in that task. Independent reading recorded recall 5/9, accuracy 5/5, and critical numeric errors 0.
