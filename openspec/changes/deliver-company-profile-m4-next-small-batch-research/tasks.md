@@ -9,7 +9,7 @@
 
 ## 3. Deliver the first disclosure form, not yet authorized
 
-- [ ] 3.1 After 2.2, run the service company through the existing common-core path and then query and export that company. Keep a failure on that company and count its consumed tokens. Do not start the manufacturing company in that task, and do not calculate a source-review score.
+- [x] 3.1 After 2.2, run the service company through the existing common-core path and then query and export that company. Keep a failure on that company and count its consumed tokens. Do not start the manufacturing company in that task, and do not calculate a source-review score. 600007.SH was run, queried, and exported. Do not start 4.1 in this task.
 
 ## 4. Deliver the second disclosure form, not yet authorized
 
