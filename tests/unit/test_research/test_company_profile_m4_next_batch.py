@@ -636,6 +636,74 @@ def test_freeze_selects_in_exchange_order_and_keeps_the_same_bytes(tmp_path):
     assert path.read_bytes() == raw
 
 
+def test_explicit_directory_freeze_does_not_replace_the_old_plan(tmp_path):
+    candidates = (
+        _named("600100.SH", "SSE", "房地产"),
+        _named("600010.SH", "SSE", "钢铁"),
+        _named("600200.SH", "SSE", "社会服务"),
+        _named("000300.SZ", "SZSE", "钢铁"),
+    )
+    bindings = {
+        item.instrument_id: {
+            "asset_id": f"asset-{item.instrument_id}",
+            "report_id": f"report-{item.instrument_id}",
+            "report_period": "2025-12-31",
+            "document_version": f"ver-{item.instrument_id}",
+        }
+        for item in candidates
+    }
+    storage = _storage(tmp_path)
+    old_service = _service(tmp_path, storage, provider=_RequestBoundOverviewProvider())
+    old = old_service.freeze_m4_next_batch_plan(
+        knowledge_cutoff="2026-09-17",
+        registry=SimpleNamespace(candidates=candidates),
+        delivered_ids=set(),
+        readable=lambda candidate: candidate.asset_status == "available",
+        binding_for=bindings.get,
+    )
+    old_path = (
+        old_service.checkpoint_root
+        / "reports"
+        / "m4_next_small_batch"
+        / old.plan_id
+        / "plan.json"
+    )
+    before = old_path.read_bytes()
+    new_dir = tmp_path / "m4-v3-next"
+    service = _service(
+        tmp_path,
+        storage,
+        provider=_RequestBoundOverviewProvider(),
+        plan_directory=new_dir,
+    )
+    plan = service.freeze_m4_next_batch_plan(
+        knowledge_cutoff="2026-09-17",
+        registry=SimpleNamespace(candidates=candidates),
+        delivered_ids={"600100.SH", "600010.SH"},
+        readable=lambda candidate: candidate.asset_status == "available",
+        binding_for=bindings.get,
+    )
+    again = service.freeze_m4_next_batch_plan(
+        knowledge_cutoff="2026-09-17",
+        registry=SimpleNamespace(candidates=candidates),
+        delivered_ids={"600100.SH", "600010.SH"},
+        readable=lambda candidate: candidate.asset_status == "available",
+        binding_for=bindings.get,
+    )
+    loaded = load_m4_next_batch_plan(
+        service.checkpoint_root, plan_directory=new_dir
+    )
+    assert plan == again == loaded
+    assert plan.plan_id != old.plan_id
+    assert {item.instrument_id for item in plan.reports} == {
+        "600200.SH",
+        "000300.SZ",
+    }
+    assert (new_dir / "plan.json").is_file()
+    assert old_path.read_bytes() == before
+    assert load_m4_next_batch_plan(service.checkpoint_root).plan_id == old.plan_id
+
+
 def test_freeze_refuses_when_a_disclosure_form_has_no_candidate(tmp_path):
     storage = _storage(tmp_path)
     service = _service(tmp_path, storage, provider=_RequestBoundOverviewProvider())

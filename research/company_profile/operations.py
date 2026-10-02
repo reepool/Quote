@@ -829,7 +829,9 @@ class CompanyProfileTaskService:
             readable=readable,
             binding_for=binding_for,
         )
-        save_m4_next_batch_plan(self.checkpoint_root, plan)
+        save_m4_next_batch_plan(
+            self.checkpoint_root, plan, plan_directory=self.plan_directory
+        )
         stored = load_m4_next_batch_plan(
             self.checkpoint_root, plan_directory=self.plan_directory
         )
