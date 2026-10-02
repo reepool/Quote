@@ -287,6 +287,17 @@ class CompanyProfileStageRuntime:
         self._semantic_service = semantic_service or CompanyProfileSemanticService()
         self._states: dict[str, _WorkState] = {}
 
+    def apply_token_budget(self, token_budget: int) -> None:
+        """Push the remaining shared budget into this runtime and its provider."""
+
+        self._total_token_budget = max(0, int(token_budget))
+        apply = getattr(self.provider, "apply_total_token_budget", None)
+        if callable(apply):
+            apply(self._total_token_budget)
+
+    def tokens_consumed(self) -> int:
+        return sum(max(0, int(state.tokens_used)) for state in self._states.values())
+
     def _active_ledger(self) -> _WorkState:
         if self._active_state is None:
             raise RuntimeError("company-profile execution ledger is not bound")

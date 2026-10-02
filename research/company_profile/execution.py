@@ -267,6 +267,11 @@ class TransportRetryingProvider:
         self._max_retries = max(0, int(max_retries))
         self._total_token_budget = max(0, int(total_token_budget))
 
+    def apply_total_token_budget(self, total_token_budget: int) -> None:
+        """Replace the limit that was fixed when this provider was constructed."""
+
+        self._total_token_budget = max(0, int(total_token_budget))
+
     def apply_output_token_budget(
         self,
         *,

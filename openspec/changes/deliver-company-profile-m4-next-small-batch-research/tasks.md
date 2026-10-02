@@ -4,7 +4,7 @@
 
 ## 2. Owner adaptation, not yet authorized
 
-- [ ] 2.1 After 1.1, adapt `CompanyProfileTaskService` so an ordinary run consumes the frozen plan, refuses a drifted report reference, merges both company runs into one observation, and carries the remaining shared 50000-token budget. Failed calls consume budget. Reused completed scopes add none. Directed tests must cover drift refusal, a complete two-company observation, unchanged historical files, and budget reuse. Do not select real reports or enqueue in that task.
+- [x] 2.1 After 1.1, adapt `CompanyProfileTaskService` so an ordinary run consumes the frozen plan, refuses a drifted report reference, merges both company runs into one observation, and carries the remaining shared 50000-token budget. Failed calls consume budget. Reused completed scopes add none. Directed tests must cover drift refusal, a complete two-company observation, unchanged historical files, and budget reuse. Do not select real reports or enqueue in that task. The adapter is in place. Do not freeze the real plan in this task.
 - [ ] 2.2 After 2.1, select the two reports by the frozen rule and write only this round's plan snapshot. Record the cutoff, both report references, and the shared budget. Refuse the plan when either disclosure form has no legal candidate. Do not enqueue or overwrite the historical first-expansion files.
 
 ## 3. Deliver the first disclosure form, not yet authorized

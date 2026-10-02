@@ -61,6 +61,17 @@ from research.company_profile.live_run import (
     record_live_run_report,
     select_live_run_targets,
 )
+from research.company_profile.m4_next_batch import (
+    M4NextBatchOutcome,
+    M4NextBatchPlan,
+    drift_reason,
+    load_m4_next_batch_observation,
+    load_m4_next_batch_plan,
+    merge_outcome,
+    remaining_token_budget,
+    save_m4_next_batch_observation,
+    tokens_consumed_by_call,
+)
 from research.company_profile.models import PRODUCTION_AUTHORIZATION
 from research.company_profile.operator_closure import (
     persist_operator_closure_report,
@@ -714,6 +725,121 @@ class CompanyProfileTaskService:
             mark_first_expansion_delivery(self.checkpoint_root)
         return result
 
+    def _apply_m4_next_batch_gate(
+        self,
+        *,
+        plan: M4NextBatchPlan,
+        knowledge_cutoff: str,
+        instrument_ids: Sequence[str],
+    ) -> tuple[str, ...]:
+        """Refuse drifted frozen securities and push the remaining budget."""
+
+        frozen_ids = {report.instrument_id for report in plan.reports}
+        requested = [item for item in instrument_ids if item in frozen_ids]
+        if not requested:
+            return tuple(instrument_ids)
+        bindings = self._m4_official_bindings(requested, knowledge_cutoff)
+        observation = load_m4_next_batch_observation(self.checkpoint_root, plan)
+        accepted: list[str] = []
+        for instrument_id in instrument_ids:
+            report = plan.report_for(instrument_id)
+            if report is None:
+                accepted.append(instrument_id)
+                continue
+            reason = drift_reason(
+                plan,
+                report,
+                knowledge_cutoff=knowledge_cutoff,
+                binding=bindings.get(instrument_id),
+            )
+            if reason is None:
+                accepted.append(instrument_id)
+                continue
+            observation = merge_outcome(
+                observation,
+                M4NextBatchOutcome(
+                    instrument_id=instrument_id,
+                    status="refused",
+                    tokens_consumed=0,
+                    reused_scope=False,
+                    reason=reason,
+                ),
+            )
+        save_m4_next_batch_observation(self.checkpoint_root, observation)
+        remaining = remaining_token_budget(observation)
+        self.token_budget = remaining
+        self.runtime.apply_token_budget(remaining)
+        return tuple(accepted)
+
+    def _m4_official_bindings(
+        self,
+        instrument_ids: Sequence[str],
+        knowledge_cutoff: str,
+    ) -> dict[str, dict[str, str]]:
+        access = self.repository.shared_asset_access
+        getter = getattr(access, "get_effective_asset", None)
+        if not callable(getter):
+            return {}
+        bindings: dict[str, dict[str, str]] = {}
+        for instrument_id in instrument_ids:
+            try:
+                asset = getter(instrument_id, knowledge_cutoff=knowledge_cutoff)
+            except (TypeError, ValueError):
+                continue
+            if not isinstance(asset, Mapping):
+                continue
+            bindings[instrument_id] = {
+                "asset_id": str(asset.get("asset_id") or "").strip(),
+                "report_id": str(
+                    asset.get("report_id")
+                    or asset.get("source_asset_id")
+                    or asset.get("filing_id")
+                    or ""
+                ).strip(),
+                "report_period": str(asset.get("report_period") or "").strip(),
+                "document_version": str(
+                    asset.get("document_version") or asset.get("content_hash") or ""
+                ).strip(),
+            }
+        return bindings
+
+    def _record_m4_next_batch_call(
+        self,
+        *,
+        plan: M4NextBatchPlan | None,
+        instrument_ids: Sequence[str],
+        before_tokens: int,
+        reused_scope: bool,
+        failed: bool,
+    ) -> None:
+        if plan is None:
+            return
+        frozen_ids = {report.instrument_id for report in plan.reports}
+        called = [item for item in instrument_ids if item in frozen_ids]
+        if not called:
+            return
+        delta = max(0, self.runtime.tokens_consumed() - before_tokens)
+        consumed = tokens_consumed_by_call(
+            tokens_used=delta,
+            reused_scope=reused_scope and delta == 0,
+        )
+        observation = load_m4_next_batch_observation(self.checkpoint_root, plan)
+        for index, instrument_id in enumerate(called):
+            current = observation.outcome_for(instrument_id)
+            if current is not None and current.status == "refused":
+                continue
+            observation = merge_outcome(
+                observation,
+                M4NextBatchOutcome(
+                    instrument_id=instrument_id,
+                    status="failed" if failed else "completed",
+                    tokens_consumed=consumed if index == 0 else 0,
+                    reused_scope=reused_scope and delta == 0,
+                    reason="call_failed" if failed else None,
+                ),
+            )
+        save_m4_next_batch_observation(self.checkpoint_root, observation)
+
     async def _run(
         self,
         *,
@@ -728,6 +854,16 @@ class CompanyProfileTaskService:
         attach_result: Callable[[dict[str, Any], Mapping[str, Any]], None]
         | None = None,
     ) -> dict[str, Any]:
+        requested_ids = tuple(instrument_ids)
+        batch_plan = load_m4_next_batch_plan(self.checkpoint_root)
+        if batch_plan is not None and enqueue:
+            instrument_ids = self._apply_m4_next_batch_gate(
+                plan=batch_plan,
+                knowledge_cutoff=knowledge_cutoff,
+                instrument_ids=instrument_ids,
+            )
+        before_tokens = self.runtime.tokens_consumed()
+        batch_blocked = bool(requested_ids) and not instrument_ids
         action = "run" if enqueue else "resume"
         run_id = f"{PUBLISHED_TASK_NAME}-{uuid.uuid4().hex[:12]}"
         parameters = {
@@ -744,7 +880,14 @@ class CompanyProfileTaskService:
             "reused": 0,
         }
         published_before = len(self.writer.paths)
-        if enqueue and not (limit_drain_to_enqueued and not instrument_ids):
+        if enqueue and batch_blocked:
+            enqueue_result = {
+                "eligible": 0,
+                "inserted": 0,
+                "reused": 0,
+                "work_ids": [],
+            }
+        elif enqueue and not (limit_drain_to_enqueued and not instrument_ids):
             enqueue_result = self.repository.enqueue_latest_annual(
                 knowledge_cutoff=knowledge_cutoff,
                 processing_identity=self.processing_identity,
@@ -813,6 +956,13 @@ class CompanyProfileTaskService:
             )
             if attach_result is not None:
                 attach_result(failed, enqueue_result)
+            self._record_m4_next_batch_call(
+                plan=batch_plan,
+                instrument_ids=instrument_ids,
+                before_tokens=before_tokens,
+                reused_scope=False,
+                failed=True,
+            )
             self.control.finish(state="failed", result=failed)
             raise
         health = self._queue_health()
@@ -834,6 +984,13 @@ class CompanyProfileTaskService:
         )
         if attach_result is not None:
             attach_result(result, enqueue_result)
+        self._record_m4_next_batch_call(
+            plan=batch_plan,
+            instrument_ids=instrument_ids,
+            before_tokens=before_tokens,
+            reused_scope=int(enqueue_result.get("reused") or 0) > 0,
+            failed=False,
+        )
         self.control.finish(state=state, result=result)
         result["control"] = self.control.read()
         return result
