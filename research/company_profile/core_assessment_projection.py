@@ -257,6 +257,7 @@ def project_core_assessment(
     report: ReportIdentity,
     task_results: Sequence[CompanyProfileTaskResult],
     repair_revenue_sentence: bool = False,
+    named_role_repair: bool = False,
 ) -> CompanyProfileCoreAssessment:
     """Evaluate the common core from accepted same-report records."""
 
@@ -272,7 +273,9 @@ def project_core_assessment(
             ):
                 accepted.append(record)
 
-    principal = _assess_principal_business(accepted)
+    principal = _assess_principal_business(
+        accepted, named_role_repair=named_role_repair
+    )
     products = _assess_products_services(accepted)
     revenue = _assess_revenue_model(
         accepted,
@@ -291,6 +294,8 @@ def project_core_assessment(
 
 def _assess_principal_business(
     records: Sequence[SemanticRecord],
+    *,
+    named_role_repair: bool = False,
 ) -> CoreDimensionAssessment:
     supports: list[SemanticRecord] = []
     for record in records:
@@ -298,7 +303,10 @@ def _assess_principal_business(
             continue
         if record.field_id != "business_overview_source":
             continue
-        if _PRINCIPAL_PATTERN.search(record.source_text):
+        text = record.source_text or ""
+        if _PRINCIPAL_PATTERN.search(text) or (
+            named_role_repair and re.search(r"业务覆盖|专注于", text)
+        ):
             supports.append(record)
     if supports:
         return _answered("principal_business", supports)

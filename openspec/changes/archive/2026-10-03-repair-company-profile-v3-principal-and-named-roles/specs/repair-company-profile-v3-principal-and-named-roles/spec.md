@@ -20,6 +20,8 @@ The overview projection MUST accept a sentence in the business section that stat
 A commodity sales role MUST NOT be created from “分销售模式”, “销售区域”, or “销售部”. The sentence “销售钢铁产品” and the sentence stating imported iron-ore procurement MUST remain. Scrap in the company's supply table and energy medium in the company's related-party sales or procurement row MUST be delivered under those source names. An unmapped name MUST stay pending.
 
 #### Scenario: False steel sales stay out and the named gaps stay in
-- **WHEN** page 15, 35, 42, 54, or 201 is projected
-- **THEN** those pages do not add a steel sales role
-- **AND** scrap procurement and energy-medium sales and procurement are queryable with their sources
+- **WHEN** a sentence only contains “分销售模式”, “销售区域”, or “销售部”
+- **THEN** that sentence does not add a steel sales role
+- **AND** the page 15 production-and-sales row for “其他钢铁产品” remains a sales role
+- **AND** scrap is taken from page 24 “国内采购”, not from internal self-supply
+- **AND** page 69 energy medium keeps both sales and procurement under that source name, without splitting a mixed amount

@@ -107,6 +107,10 @@ _OVERVIEW_SUBSTANCE = re.compile(
     r"(?:公司|本公司).{0,40}(?:主营|主要从事|经营|生产|销售|提供|研发)|"
     r"取得货款|收入来[源于自]|向客户收取|主要产品为"
 )
+_COMPANY_BUSINESS_SENTENCE = re.compile(
+    r"(?<![\u4e00-\u9fff])(?:本公司|公司)(?:业务覆盖|专注于)[^。；;\n]{0,80}"
+)
+_PSEUDO_SALES = re.compile(r"销售(?:模式|区域|部)")
 _REVENUE_OBJECT = re.compile(
     r"([\u4e00-\u9fffA-Za-z0-9（）()]{2,40}?)\s*"
     r"(?:营业收入|主营业务收入)"
@@ -199,6 +203,7 @@ def select_core_evidence(
     pages: Sequence[ReportPageText | Mapping[str, Any]],
     accepted_records: Sequence[SemanticRecord] = (),
     repair_revenue_sentence: bool = False,
+    named_role_repair: bool = False,
 ) -> CoreEvidenceSelection:
     """Select bounded core Evidence without a frozen per-company page plan."""
 
@@ -215,6 +220,7 @@ def select_core_evidence(
         chapter_task=ChapterTask.EXTRACT_BUSINESS_OVERVIEW,
         field_ids=("business_overview_source", "explicit_activity"),
         require_substance=True,
+        substance_extra=_COMPANY_BUSINESS_SENTENCE if named_role_repair else None,
     )
     if overview.span is None:
         labeled = _select_owned_span(
@@ -336,6 +342,7 @@ def _select_owned_span(
     field_ids: tuple[str, ...],
     require_substance: bool,
     field_labels: tuple[str, ...] = (),
+    substance_extra: re.Pattern[str] | None = None,
 ) -> _OwnedSelection:
     by_page = {item.page: item for item in pages}
     gaps: list[CoreEvidenceGap] = []
@@ -356,6 +363,7 @@ def _select_owned_span(
                 require_substance=require_substance,
                 field_labels=field_labels,
                 gaps=gaps,
+                substance_extra=substance_extra,
             )
             if selected is _SKIP_OWNED_HEADING:
                 continue
@@ -377,6 +385,7 @@ def _selection_for_owned_heading(
     require_substance: bool,
     field_labels: tuple[str, ...],
     gaps: list[CoreEvidenceGap],
+    substance_extra: re.Pattern[str] | None = None,
 ) -> _OwnedSelection | object:
     if not page.readable:
         gaps.append(
@@ -397,8 +406,21 @@ def _selection_for_owned_heading(
     else:
         preview = f"{heading}\n{_cut_at_boundary(page.text[line_end:]).text}".strip()
         if _usable_excerpt(
-            preview, heading, require_substance
-        ) and _excerpt_states_owned_overview(preview):
+            preview,
+            heading,
+            require_substance,
+            substance_extra=substance_extra,
+        ) and (
+            _excerpt_states_owned_overview(preview)
+            or (
+                substance_extra is not None
+                and (
+                    substance_extra.search(preview) is not None
+                    or substance_extra.search(_join_pdf_soft_breaks(preview))
+                    is not None
+                )
+            )
+        ):
             excerpt, continuations, closed, gap = preview, [], True, None
         else:
             excerpt, continuations, closed, gap = _collect_section(
@@ -427,7 +449,12 @@ def _selection_for_owned_heading(
     elif heading in {"分部报告", "分部信息"} and _formal_segment_table_ready(excerpt):
         closed = True
         gap = None
-    usable = _usable_excerpt(excerpt, heading, require_substance)
+    usable = _usable_excerpt(
+        excerpt,
+        heading,
+        require_substance,
+        substance_extra=substance_extra,
+    )
     if usable and _excerpt_states_owned_overview(excerpt):
         closed = True
         gap = None
@@ -679,11 +706,23 @@ def _cut_at_boundary(text: str) -> _PageChunk:
         return _PageChunk(text[: match.start()].strip(), True)
 
 
-def _usable_excerpt(excerpt: str, heading: str, require_substance: bool) -> bool:
+def _usable_excerpt(
+    excerpt: str,
+    heading: str,
+    require_substance: bool,
+    *,
+    substance_extra: re.Pattern[str] | None = None,
+) -> bool:
     if not excerpt.strip() or excerpt.strip() == heading:
         return False
     if require_substance:
-        return _OVERVIEW_SUBSTANCE.search(_join_pdf_soft_breaks(excerpt)) is not None
+        joined = _join_pdf_soft_breaks(excerpt)
+        if _OVERVIEW_SUBSTANCE.search(joined):
+            return True
+        return substance_extra is not None and (
+            substance_extra.search(excerpt) is not None
+            or substance_extra.search(joined) is not None
+        )
     return True
 
 
@@ -947,11 +986,13 @@ REVENUE_SENTENCE_REPAIR = "revenue_sentence_repair"
 REVENUE_SENTENCE_REPAIR_V1 = "v1"
 REVENUE_SENTENCE_REPAIR_V2 = "v2"
 REVENUE_SENTENCE_REPAIR_V3 = "v3"
+REVENUE_SENTENCE_REPAIR_V4 = "v4"
 _REVENUE_SENTENCE_REPAIR_VERSIONS = frozenset(
     {
         REVENUE_SENTENCE_REPAIR_V1,
         REVENUE_SENTENCE_REPAIR_V2,
         REVENUE_SENTENCE_REPAIR_V3,
+        REVENUE_SENTENCE_REPAIR_V4,
     }
 )
 
@@ -970,11 +1011,24 @@ def revenue_sentence_repair_requested(identity: Mapping[str, Any] | None) -> boo
     return identity.get(REVENUE_SENTENCE_REPAIR) in _REVENUE_SENTENCE_REPAIR_VERSIONS
 
 
+def named_role_repair_requested(identity: Mapping[str, Any] | None) -> bool:
+    """Return whether this identity keeps principal sentences and named roles.
+
+    ``v4`` still carries the revenue-sentence repair. It also accepts “业务覆盖”
+    and “专注于”, and it separates a real sale from “销售模式”.
+    """
+
+    if not isinstance(identity, Mapping):
+        return False
+    return identity.get(REVENUE_SENTENCE_REPAIR) == REVENUE_SENTENCE_REPAIR_V4
+
+
 def project_owned_page_facts(
     selection: CoreEvidenceSelection,
     chapter: ChapterTask | None = None,
     *,
     repair_revenue_sentence: bool = False,
+    named_role_repair: bool = False,
 ) -> tuple[SemanticRecord, ...]:
     """Project source-native core facts already stated in owned excerpts."""
 
@@ -988,6 +1042,7 @@ def project_owned_page_facts(
                     selection,
                     span,
                     repair_revenue_sentence=repair_revenue_sentence,
+                    named_role_repair=named_role_repair,
                 )
             )
         elif span.chapter_task == ChapterTask.EXTRACT_SEGMENT_FINANCIALS.value:
@@ -1003,7 +1058,13 @@ def project_owned_page_facts(
         ChapterTask.EXTRACT_BUSINESS_OVERVIEW,
     ):
         for span in selection.spans:
-            records.extend(_project_repair_commodity_span(selection, span))
+            records.extend(
+                _project_repair_commodity_span(
+                    selection,
+                    span,
+                    named_role_repair=named_role_repair,
+                )
+            )
     return _dedupe_owned_records(records)
 
 
@@ -1027,17 +1088,23 @@ def _project_overview_span(
     span: CoreEvidenceSpan,
     *,
     repair_revenue_sentence: bool = False,
+    named_role_repair: bool = False,
 ) -> tuple[SemanticRecord, ...]:
     overview_item = _prepared_for(selection, span, "business_overview_source")
     activity_item = _prepared_for(selection, span, "explicit_activity")
     records: list[SemanticRecord] = []
-    if overview_item is not None and _excerpt_states_owned_overview(span.excerpt):
+    company_sentence = (
+        _company_business_source(span.excerpt) if named_role_repair else ""
+    )
+    if overview_item is not None and (
+        _excerpt_states_owned_overview(span.excerpt) or company_sentence
+    ):
         quote = (
             overview_item.evidence.anchor.bounded_quote
             if isinstance(overview_item.evidence.anchor, TextAnchor)
             else ""
         )
-        source_text = _overview_source_text(
+        source_text = company_sentence or _overview_source_text(
             span.excerpt,
             quote,
             heading=span.section_title,
@@ -1800,9 +1867,51 @@ def _without_org_names(compact: str) -> str:
     return _ORG_NAME.sub("", compact)
 
 
+def _has_real_sales_action(stated: str) -> bool:
+    """Ignore 销售模式, 销售区域, and 销售部."""
+
+    return "销售" in _PSEUDO_SALES.sub("", stated) or "生产与销售" in stated
+
+
+def _formal_sales_product_names(excerpt: str) -> list[str]:
+    """Product names from a 生产量/销售量 table, one row at a time."""
+
+    names: list[str] = []
+    in_table = False
+    for line in excerpt.replace("\r\n", "\n").replace("\r", "\n").split("\n"):
+        compact = re.sub(r"\s+", "", line)
+        if "生产量" in compact and "销售量" in compact and "钢铁" not in compact:
+            in_table = True
+            continue
+        if not in_table or not compact:
+            continue
+        if compact.startswith(("合计", "(")) or "产销量情况说明" in compact:
+            in_table = False
+            continue
+        match = re.match(r"([\u4e00-\u9fff]{2,12}?)(?:万吨|\d)", compact)
+        if match and "钢铁" in match.group(1):
+            names.append(match.group(1))
+    return names
+
+
+def _domestic_scrap_clause(excerpt: str) -> str:
+    """The company's scrap row that says 国内采购, not internal 自供."""
+
+    compact = re.sub(r"\s+", "", excerpt)
+    start = compact.find("废钢供应")
+    if start < 0:
+        return ""
+    window = compact[start : start + 240]
+    if "国内采购" not in window:
+        return ""
+    return window
+
+
 def _project_repair_commodity_span(
     selection: CoreEvidenceSelection,
     span: CoreEvidenceSpan,
+    *,
+    named_role_repair: bool = False,
 ) -> tuple[SemanticRecord, ...]:
     """Bind a role only when the company, name, and action share a clause."""
 
@@ -1810,12 +1919,13 @@ def _project_repair_commodity_span(
     if item is None:
         return ()
     records: list[SemanticRecord] = []
-    seen: set[str] = set()
+    seen: set[tuple[str, ActivityAction]] = set()
 
     def add_activity(name: str, action: ActivityAction, verb: str, value: str | None = None) -> None:
-        if name in seen:
+        key = (name, action)
+        if key in seen:
             return
-        seen.add(name)
+        seen.add(key)
         native = SourceNativeValue(name=name, value=value, unit="元" if value else None)
         records.append(
             _base_fact(
@@ -1843,8 +1953,17 @@ def _project_repair_commodity_span(
         company = _clause_names_company(compact)
         if "参股" in compact and "本公司" not in compact:
             company = False
-        sells = "销售" in stated or "生产与销售" in stated
+        sells = (
+            _has_real_sales_action(stated)
+            if named_role_repair
+            else "销售" in stated or "生产与销售" in stated
+        )
         procures = any(token in stated for token in ("采购", "订购", "原辅料"))
+        if named_role_repair and company and "能源介质" in stated:
+            if sells:
+                add_activity("能源介质", ActivityAction.SELLS, "销售")
+            if "采购" in stated or "订购" in stated:
+                add_activity("能源介质", ActivityAction.PURCHASES, "采购")
         if company and sells and "采购协议" not in stated:
             for name, aliases in _REPAIR_SALES:
                 if any(_sales_alias_in(stated, alias) for alias in aliases):
@@ -1868,7 +1987,26 @@ def _project_repair_commodity_span(
                     "消耗",
                     "7407073",
                 )
+    if named_role_repair:
+        for name in _formal_sales_product_names(span.excerpt):
+            add_activity(name, ActivityAction.SELLS, "销售")
+        if _domestic_scrap_clause(span.excerpt):
+            add_activity("废钢", ActivityAction.PURCHASES, "采购")
     return tuple(records)
+
+
+def _company_business_source(excerpt: str) -> str:
+    """The reporting company's own 业务覆盖 or 专注于 sentence."""
+
+    for line in excerpt.replace("\r\n", "\n").replace("\r", "\n").split("\n"):
+        match = _COMPANY_BUSINESS_SENTENCE.search(line.strip())
+        if match is None:
+            continue
+        compact = re.sub(r"\s+", "", match.group(0))
+        found = _original_span_matching(excerpt, compact)
+        if found:
+            return found
+    return ""
 
 
 def explicit_material_input_names(text: str) -> tuple[str, ...]:

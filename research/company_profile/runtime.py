@@ -35,6 +35,7 @@ from .core_assessment_projection import (
 )
 from .core_evidence_selection import (
     CoreEvidenceSelection,
+    named_role_repair_requested,
     project_owned_page_facts,
     revenue_sentence_repair_requested,
     select_core_evidence,
@@ -413,6 +414,9 @@ class CompanyProfileStageRuntime:
             repair_revenue_sentence=revenue_sentence_repair_requested(
                 state.processing_identity
             ),
+            named_role_repair=named_role_repair_requested(
+                state.processing_identity
+            ),
         )
         state.chapters = select_activated_chapters(state.pages)
         state.provider_blocked = any(
@@ -442,6 +446,9 @@ class CompanyProfileStageRuntime:
                         state.evidence,
                         chapter,
                         repair_revenue_sentence=revenue_sentence_repair_requested(
+                            state.processing_identity
+                        ),
+                        named_role_repair=named_role_repair_requested(
                             state.processing_identity
                         ),
                     ),
@@ -572,6 +579,9 @@ class CompanyProfileStageRuntime:
             report=state.report,
             task_results=state.task_results,
             repair_revenue_sentence=revenue_sentence_repair_requested(
+                state.processing_identity
+            ),
+            named_role_repair=named_role_repair_requested(
                 state.processing_identity
             ),
         )
