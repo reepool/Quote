@@ -1026,8 +1026,6 @@ class CompanyProfileTaskService:
                 enqueue=enqueue_result,
                 drain=drain,
             )
-            if attach_result is not None:
-                attach_result(failed, enqueue_result)
             self._record_m4_next_batch_call(
                 plan=batch_plan,
                 instrument_ids=instrument_ids,
@@ -1036,6 +1034,8 @@ class CompanyProfileTaskService:
                 failed=True,
                 result_state="failed",
             )
+            if attach_result is not None:
+                attach_result(failed, enqueue_result)
             self.control.finish(state="failed", result=failed)
             raise
         health = self._queue_health()

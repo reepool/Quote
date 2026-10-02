@@ -251,6 +251,18 @@ def build_execution_record(
     )
 
 
+def ledger_fresh_tokens(ledger: Any) -> int:
+    """Tokens spent in this run, after a restored ledger baseline."""
+
+    used = int(getattr(ledger, "tokens_used", 0) or 0)
+    restored = int(getattr(ledger, "tokens_restored", 0) or 0)
+    return max(0, used - restored)
+
+
+def ledger_budget_exhausted(ledger: Any, total_token_budget: int) -> bool:
+    return ledger_fresh_tokens(ledger) >= max(0, int(total_token_budget))
+
+
 class TransportRetryingProvider:
     """Retry only transport/protocol failures. Semantic errors pass through."""
 
@@ -297,8 +309,7 @@ class TransportRetryingProvider:
         return self._invoke("verify", self._inner.verify, request)
 
     def _budget_exhausted(self) -> bool:
-        ledger = self._ledger_getter()
-        return int(getattr(ledger, "tokens_used", 0)) >= self._total_token_budget
+        return ledger_budget_exhausted(self._ledger_getter(), self._total_token_budget)
 
     def _invoke(self, call_type: str, func, request):
         if self._budget_exhausted():

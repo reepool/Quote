@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import json
 from pathlib import Path
 
 import pytest
@@ -11,7 +12,11 @@ from research.company_profile.candidate_registry import (
     ClassificationInfo,
     LatestAnnualReport,
 )
-from research.company_profile.execution import DEFAULT_TOTAL_TOKEN_BUDGET
+from research.company_profile.contracts import SemanticProviderError
+from research.company_profile.execution import (
+    DEFAULT_TOTAL_TOKEN_BUDGET,
+    ledger_budget_exhausted,
+)
 from research.company_profile.m4_next_batch import (
     M4NextBatchOutcome,
     M4NextBatchPlan,
@@ -541,3 +546,131 @@ def test_cumulative_tokens_survive_retry_reuse_and_a_restored_ledger(tmp_path):
     assert kept.tokens_consumed == 170
     assert restored.runtime._total_token_budget == 49_830
     assert restored.runtime.provider._total_token_budget == 49_830
+
+
+def test_second_company_failure_is_in_the_live_run_before_source_review(tmp_path):
+    plan = _plan()
+    service_report, manufacturing = plan.reports
+    service, _seen = _prepare(
+        tmp_path,
+        plan,
+        {
+            service_report.instrument_id: _binding(service_report),
+            manufacturing.instrument_id: _binding(manufacturing),
+        },
+    )
+    before = _seed_history(service.checkpoint_root)
+    registry = _registry(plan)
+    service.repository.enqueue_latest_annual = lambda **_kwargs: {
+        "eligible": 0,
+        "inserted": 0,
+        "reused": 0,
+        "work_ids": [],
+    }
+    asyncio.run(
+        service.execute(
+            "run",
+            knowledge_cutoff=plan.knowledge_cutoff,
+            instrument_ids=[service_report.instrument_id],
+            candidate_registry=registry,
+        )
+    )
+
+    async def fail_drain(*_args, **_kwargs):
+        raise RuntimeError("second company failed")
+
+    service.production._drain_stage = fail_drain
+    service.repository.enqueue_latest_annual = lambda **_kwargs: {
+        "eligible": 1,
+        "inserted": 1,
+        "reused": 0,
+        "work_ids": ["second"],
+    }
+    with pytest.raises(RuntimeError, match="second company failed"):
+        asyncio.run(
+            service.execute(
+                "run",
+                knowledge_cutoff=plan.knowledge_cutoff,
+                instrument_ids=[manufacturing.instrument_id],
+                candidate_registry=registry,
+            )
+        )
+    observation = load_m4_next_batch_observation_for_source_review(
+        service.checkpoint_root
+    )
+    live_path = (
+        service.checkpoint_root
+        / "reports"
+        / "m4_next_small_batch"
+        / plan.plan_id
+        / "company_profile_live_run.v1.json"
+    )
+    live_ids = set(
+        json.loads(live_path.read_text(encoding="utf-8"))["selected_instrument_ids"]
+    )
+    assert {item.instrument_id for item in observation.outcomes} == live_ids
+    assert observation.outcome_for(manufacturing.instrument_id).status == "failed"
+    review = record_published_source_review(
+        checkpoint_root=service.checkpoint_root,
+        semantic_findings=[
+            SemanticFinding(
+                instrument_id=service_report.instrument_id,
+                aspect="core_skeleton",
+                kind="semantic",
+                source="independently_read_official_report",
+                disclosure_id="service-overview",
+                disclosed_in_source=True,
+                present_in_delivery=False,
+                fact_accurate=None,
+                critical_numeric_error=False,
+            ),
+            SemanticFinding(
+                instrument_id=manufacturing.instrument_id,
+                aspect="core_skeleton",
+                kind="semantic",
+                source="independently_read_official_report",
+                disclosure_id="manufacturing-overview",
+                disclosed_in_source=True,
+                present_in_delivery=False,
+                fact_accurate=None,
+                critical_numeric_error=False,
+            ),
+        ],
+    )
+    assert set(review["source_review"]["live_run"]["selected_instrument_ids"]) == {
+        service_report.instrument_id,
+        manufacturing.instrument_id,
+    }
+    assert snapshot_bytes(historical_snapshot_paths(service.checkpoint_root)) == before
+
+
+def test_restored_ledger_does_not_exhaust_the_remaining_budget():
+    class _Caller:
+        def __init__(self) -> None:
+            self.calls = 0
+
+        def extract(self, _request):
+            self.calls += 1
+            return {"ok": True}
+
+    caller = _Caller()
+    runtime = CompanyProfileStageRuntime(
+        writer=object(),
+        provider=caller,
+        token_budget=50_000,
+    )
+    from research.company_profile.runtime import _WorkState
+
+    ledger = _WorkState(work_id="restored")
+    ledger.tokens_restored = 30_000
+    ledger.tokens_used = 30_000
+    runtime._active_state = ledger
+    runtime.apply_token_budget(20_000)
+    runtime.provider.extract(None)
+    assert caller.calls == 1
+    assert not ledger_budget_exhausted(ledger, runtime._total_token_budget)
+    ledger.tokens_used = 50_000
+    assert ledger_budget_exhausted(ledger, runtime._total_token_budget)
+    with pytest.raises(SemanticProviderError, match="token budget exhausted"):
+        runtime.provider.extract(None)
+    assert caller.calls == 1

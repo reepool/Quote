@@ -56,6 +56,7 @@ from .execution import (
     build_execution_record,
     collect_semantic_disputes,
     dynamic_scope_token_budget,
+    ledger_budget_exhausted,
     processing_identity_from_item,
 )
 from .models import (
@@ -529,7 +530,7 @@ class CompanyProfileStageRuntime:
                     extract_max_output_tokens=extract_budget,
                     verify_max_output_tokens=verify_budget,
                 )
-            budget_left = state.tokens_used < self._total_token_budget
+            budget_left = not ledger_budget_exhausted(state, self._total_token_budget)
             provider = (
                 self.provider
                 if unresolved and not chapter_unread and budget_left
