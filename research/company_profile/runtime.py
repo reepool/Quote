@@ -175,6 +175,7 @@ class _WorkState:
     model_attempts: list[CompanyProfileModelAttempt] = field(default_factory=list)
     transport_retries: int = 0
     tokens_used: int = 0
+    tokens_restored: int = 0
     input_tokens: int = 0
     output_tokens: int = 0
     extract_max_output_tokens: int = DEFAULT_EXTRACT_BASE_TOKENS
@@ -297,6 +298,17 @@ class CompanyProfileStageRuntime:
 
     def tokens_consumed(self) -> int:
         return sum(max(0, int(state.tokens_used)) for state in self._states.values())
+
+    def fresh_tokens(self) -> int:
+        """Tokens spent in this process, excluding a ledger restored from disk."""
+
+        return sum(
+            max(
+                0,
+                int(state.tokens_used) - int(getattr(state, "tokens_restored", 0) or 0),
+            )
+            for state in self._states.values()
+        )
 
     def _active_ledger(self) -> _WorkState:
         if self._active_state is None:
@@ -715,7 +727,9 @@ class CompanyProfileStageRuntime:
             state.transport_retries = int(execution.get("transport_retries") or 0)
             budget = execution.get("token_budget") or {}
             if isinstance(budget, Mapping):
-                state.tokens_used = int(budget.get("tokens_used") or 0)
+                restored = int(budget.get("tokens_used") or 0)
+                state.tokens_restored = restored
+                state.tokens_used = restored
                 state.extract_max_output_tokens = int(
                     budget.get("extract_max_output_tokens")
                     or DEFAULT_EXTRACT_BASE_TOKENS

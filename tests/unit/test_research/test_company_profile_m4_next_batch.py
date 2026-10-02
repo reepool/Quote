@@ -5,6 +5,12 @@ from pathlib import Path
 
 import pytest
 
+from research.company_profile.candidate_registry import (
+    AShareCandidateRegistry,
+    AShareProfileCandidate,
+    ClassificationInfo,
+    LatestAnnualReport,
+)
 from research.company_profile.execution import DEFAULT_TOTAL_TOKEN_BUDGET
 from research.company_profile.m4_next_batch import (
     M4NextBatchOutcome,
@@ -21,7 +27,9 @@ from research.company_profile.m4_next_batch import (
     snapshot_bytes,
     tokens_consumed_by_call,
 )
+from research.company_profile.operations import record_published_source_review
 from research.company_profile.runtime import CompanyProfileStageRuntime
+from research.company_profile.source_review import SemanticFinding
 from tests.unit.test_research.test_business_profile_exposure_components import _storage
 from tests.unit.test_research.test_company_profile_operations import _service
 from tests.unit.test_research.test_company_profile_runtime import (
@@ -168,11 +176,11 @@ def test_two_runs_keep_both_outcomes_including_a_failure(tmp_path):
     )
 
     async def fail_drain(*_args, **_kwargs):
-        service.runtime._states["work"] = type(
-            "Ledger",
-            (),
-            {"tokens_used": 120},
-        )()
+        from research.company_profile.runtime import _WorkState
+
+        ledger = _WorkState(work_id="work")
+        ledger.tokens_used = 120
+        service.runtime._states["work"] = ledger
         raise RuntimeError("provider failed")
 
     service.production._drain_stage = fail_drain
@@ -214,12 +222,38 @@ def test_two_runs_keep_both_outcomes_including_a_failure(tmp_path):
 
     assert merged.outcome_for(service_report.instrument_id).status == "failed"
     assert merged.outcome_for(service_report.instrument_id).tokens_consumed == 120
-    assert merged.outcome_for(manufacturing.instrument_id).status == "completed"
+    assert merged.outcome_for(manufacturing.instrument_id).status == "incomplete"
     assert merged.outcome_for(manufacturing.instrument_id).reused_scope is True
     assert merged.outcome_for(manufacturing.instrument_id).tokens_consumed == 0
     assert merged.tokens_consumed == 120
     assert service.runtime._total_token_budget == 49_880
     assert service.runtime.provider._total_token_budget == 49_880
+
+
+def test_paused_run_keeps_paused_status(tmp_path):
+    plan = _plan()
+    report = plan.reports[0]
+    service, _seen = _prepare(
+        tmp_path,
+        plan,
+        {report.instrument_id: _binding(report)},
+    )
+    service._should_stop_run = lambda: True
+    service.repository.enqueue_latest_annual = lambda **_kwargs: {
+        "eligible": 1,
+        "inserted": 1,
+        "reused": 0,
+        "work_ids": ["paused-work"],
+    }
+    asyncio.run(
+        service.execute(
+            "run",
+            knowledge_cutoff=plan.knowledge_cutoff,
+            instrument_ids=[report.instrument_id],
+        )
+    )
+    observation = load_m4_next_batch_observation(service.checkpoint_root, plan)
+    assert observation.outcome_for(report.instrument_id).status == "paused"
 
 
 def test_drift_reason_covers_cutoff_and_each_identity_field():
@@ -298,3 +332,212 @@ def test_ordinary_run_without_a_batch_plan_keeps_the_runtime_limit(tmp_path):
     assert service.runtime._total_token_budget == DEFAULT_TOTAL_TOKEN_BUDGET
     assert service.runtime.provider._total_token_budget == DEFAULT_TOTAL_TOKEN_BUDGET
     assert load_m4_next_batch_plan(service.checkpoint_root) is None
+
+
+def _candidate(instrument_id: str, exchange: str, industry: str, asset_id: str):
+    return AShareProfileCandidate(
+        instrument_id=instrument_id,
+        exchange=exchange,
+        company_name=instrument_id,
+        universe_status="eligible",
+        classification_status="present",
+        classification=ClassificationInfo(sw_l1_name=industry),
+        asset_status="available",
+        latest_effective_annual_report=LatestAnnualReport(
+            asset_id=asset_id,
+            fiscal_year=2025,
+            report_period="2025-12-31",
+            availability="available",
+            decision_state="effective",
+            published_at="2026-03-20T00:00:00+00:00",
+        ),
+    )
+
+
+def _registry(plan: M4NextBatchPlan) -> AShareCandidateRegistry:
+    industries = {"service": "交通运输", "manufacturing": "汽车"}
+    exchanges = {"SH": "SSE", "SZ": "SZSE"}
+    candidates = tuple(
+        _candidate(
+            report.instrument_id,
+            exchanges[report.instrument_id.split(".")[-1]],
+            industries[report.disclosure_form],
+            report.asset_id,
+        )
+        for report in plan.reports
+    )
+    return AShareCandidateRegistry(
+        as_of=plan.knowledge_cutoff,
+        candidates=candidates,
+        counts={
+            "total": 2,
+            "eligible": 2,
+            "asset_not_available": 0,
+            "classification_missing": 0,
+        },
+    )
+
+
+def test_registry_runs_keep_both_companies_and_source_review_reads_them(tmp_path):
+    plan = _plan()
+    service_report, manufacturing = plan.reports
+    service, _seen = _prepare(
+        tmp_path,
+        plan,
+        {
+            service_report.instrument_id: _binding(service_report),
+            manufacturing.instrument_id: _binding(manufacturing),
+        },
+    )
+    before = _seed_history(service.checkpoint_root)
+    registry = _registry(plan)
+
+    def enqueue(**kwargs):
+        return {"eligible": 0, "inserted": 0, "reused": 0, "work_ids": []}
+
+    service.repository.enqueue_latest_annual = enqueue
+    for report in plan.reports:
+        asyncio.run(
+            service.execute(
+                "run",
+                knowledge_cutoff=plan.knowledge_cutoff,
+                instrument_ids=[report.instrument_id],
+                candidate_registry=registry,
+            )
+        )
+    observation = load_m4_next_batch_observation_for_source_review(
+        service.checkpoint_root
+    )
+    live_path = (
+        service.checkpoint_root
+        / "reports"
+        / "m4_next_small_batch"
+        / plan.plan_id
+        / "company_profile_live_run.v1.json"
+    )
+    assert live_path.is_file()
+    assert [item.status for item in observation.outcomes] == ["idle", "idle"]
+    review = record_published_source_review(
+        checkpoint_root=service.checkpoint_root,
+        semantic_findings=[
+            SemanticFinding(
+                instrument_id=service_report.instrument_id,
+                aspect="core_skeleton",
+                kind="semantic",
+                source="independently_read_official_report",
+                disclosure_id="service-overview",
+                disclosed_in_source=True,
+                present_in_delivery=False,
+                fact_accurate=None,
+                critical_numeric_error=False,
+            ),
+            SemanticFinding(
+                instrument_id=manufacturing.instrument_id,
+                aspect="core_skeleton",
+                kind="semantic",
+                source="independently_read_official_report",
+                disclosure_id="manufacturing-overview",
+                disclosed_in_source=True,
+                present_in_delivery=False,
+                fact_accurate=None,
+                critical_numeric_error=False,
+            ),
+        ],
+    )
+    assert set(review["source_review"]["live_run"]["selected_instrument_ids"]) == {
+        service_report.instrument_id,
+        manufacturing.instrument_id,
+    }
+    assert review["source_review_path"].endswith(
+        f"m4_next_small_batch/{plan.plan_id}/company_profile_source_review.v1.json"
+    )
+    assert snapshot_bytes(historical_snapshot_paths(service.checkpoint_root)) == before
+
+    other = tmp_path / "missing-company"
+    only_one = _service(other, _storage(other))
+    save_m4_next_batch_plan(only_one.checkpoint_root, plan)
+    with pytest.raises(ValueError, match="both company outcomes"):
+        record_published_source_review(checkpoint_root=only_one.checkpoint_root)
+
+
+def test_cumulative_tokens_survive_retry_reuse_and_a_restored_ledger(tmp_path):
+    plan = _plan()
+    report = plan.reports[0]
+    service, _seen = _prepare(
+        tmp_path,
+        plan,
+        {report.instrument_id: _binding(report)},
+    )
+
+    def spend(amount: int) -> None:
+        added = False
+
+        async def drain(*_args, **_kwargs):
+            nonlocal added
+            state = service.runtime._states.get("work")
+            if state is None:
+                from research.company_profile.runtime import _WorkState
+
+                state = _WorkState(work_id="work")
+                service.runtime._states["work"] = state
+            if not added:
+                state.tokens_used += amount
+                added = True
+            return {"status": "completed"}
+
+        service.production._drain_stage = drain
+        service.repository.enqueue_latest_annual = lambda **_kwargs: {
+            "eligible": 1,
+            "inserted": 1,
+            "reused": 0,
+            "work_ids": ["work"],
+        }
+        asyncio.run(
+            service.execute(
+                "run",
+                knowledge_cutoff=plan.knowledge_cutoff,
+                instrument_ids=[report.instrument_id],
+            )
+        )
+
+    spend(120)
+    spend(50)
+    observation = load_m4_next_batch_observation(service.checkpoint_root, plan)
+    assert observation.outcome_for(report.instrument_id).tokens_consumed == 170
+
+    restored = _service(
+        tmp_path,
+        _storage(tmp_path / "restored"),
+        provider=_RequestBoundOverviewProvider(),
+    )
+    save_m4_next_batch_plan(restored.checkpoint_root, plan)
+    save_m4_next_batch_observation(restored.checkpoint_root, observation)
+    restored.repository.shared_asset_access = service.repository.shared_asset_access
+    restored.repository.enqueue_latest_annual = lambda **_kwargs: {
+        "eligible": 1,
+        "inserted": 0,
+        "reused": 0,
+        "work_ids": ["old"],
+    }
+
+    async def restore_ledger(*_args, **_kwargs):
+        from research.company_profile.runtime import _WorkState
+
+        ledger = _WorkState(work_id="old")
+        ledger.tokens_restored = 170
+        ledger.tokens_used = 170
+        restored.runtime._states["old"] = ledger
+        return {"status": "completed"}
+
+    restored.production._drain_stage = restore_ledger
+    asyncio.run(
+        restored.execute(
+            "run",
+            knowledge_cutoff=plan.knowledge_cutoff,
+            instrument_ids=[report.instrument_id],
+        )
+    )
+    kept = load_m4_next_batch_observation(restored.checkpoint_root, plan)
+    assert kept.tokens_consumed == 170
+    assert restored.runtime._total_token_budget == 49_830
+    assert restored.runtime.provider._total_token_budget == 49_830

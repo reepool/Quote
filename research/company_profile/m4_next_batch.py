@@ -174,12 +174,17 @@ def merge_outcome(
     observation: M4NextBatchObservation,
     outcome: M4NextBatchOutcome,
 ) -> M4NextBatchObservation:
-    """Replace one company outcome and keep every other company already recorded."""
+    """Keep every other company and add this call's tokens to that company."""
 
+    previous = observation.outcome_for(outcome.instrument_id)
+    tokens = outcome.tokens_consumed
+    if previous is not None:
+        tokens = previous.tokens_consumed + outcome.tokens_consumed
+    stored = outcome.model_copy(update={"tokens_consumed": tokens})
     kept = tuple(
         item for item in observation.outcomes if item.instrument_id != outcome.instrument_id
     )
-    outcomes = kept + (outcome,)
+    outcomes = kept + (stored,)
     return observation.model_copy(
         update={
             "outcomes": outcomes,

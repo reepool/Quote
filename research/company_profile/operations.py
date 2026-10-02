@@ -56,6 +56,8 @@ from research.company_profile.live_plan import (
     record_company_profile_live_plan,
 )
 from research.company_profile.live_run import (
+    LIVE_RUN_SCHEMA_VERSION,
+    CompanyProfileLiveRunReport,
     load_live_run_report,
     persist_live_run_report,
     record_live_run_report,
@@ -64,8 +66,10 @@ from research.company_profile.live_run import (
 from research.company_profile.m4_next_batch import (
     M4NextBatchOutcome,
     M4NextBatchPlan,
+    batch_directory,
     drift_reason,
     load_m4_next_batch_observation,
+    load_m4_next_batch_observation_for_source_review,
     load_m4_next_batch_plan,
     merge_outcome,
     remaining_token_budget,
@@ -91,6 +95,7 @@ from research.company_profile.runtime import (
     CompanyProfileStageRuntime,
 )
 from research.company_profile.source_review import (
+    SOURCE_REVIEW_SCHEMA_VERSION,
     FixtureGuardResult,
     FreshnessObservation,
     SemanticFinding,
@@ -618,15 +623,29 @@ class CompanyProfileTaskService:
                 selected,
                 tuple(enqueue_result.get("work_ids") or ()),
             )
-            report = record_live_run_report(
-                plan=plan,
-                registry=registry,
-                selected_instrument_ids=selected,
-                delivered_instrument_ids=delivered,
-                knowledge_cutoff=knowledge_cutoff,
-                incomplete_supplement_ids=incomplete,
+            batch_plan = load_m4_next_batch_plan(self.checkpoint_root)
+            frozen_ids = (
+                {report.instrument_id for report in batch_plan.reports}
+                if batch_plan is not None
+                else set()
             )
-            persist_live_run_report(report, self.checkpoint_root)
+            if batch_plan is not None and frozen_ids.intersection(selected):
+                report = self._persist_m4_batch_live_run(
+                    batch_plan=batch_plan,
+                    live_plan=plan,
+                    registry=registry,
+                    knowledge_cutoff=knowledge_cutoff,
+                )
+            else:
+                report = record_live_run_report(
+                    plan=plan,
+                    registry=registry,
+                    selected_instrument_ids=selected,
+                    delivered_instrument_ids=delivered,
+                    knowledge_cutoff=knowledge_cutoff,
+                    incomplete_supplement_ids=incomplete,
+                )
+                persist_live_run_report(report, self.checkpoint_root)
             result["live_run"] = report.model_dump(mode="json")
 
         return await self._run(
@@ -811,6 +830,8 @@ class CompanyProfileTaskService:
         before_tokens: int,
         reused_scope: bool,
         failed: bool,
+        result_state: str,
+        delivered_ids: Sequence[str] = (),
     ) -> None:
         if plan is None:
             return
@@ -818,7 +839,7 @@ class CompanyProfileTaskService:
         called = [item for item in instrument_ids if item in frozen_ids]
         if not called:
             return
-        delta = max(0, self.runtime.tokens_consumed() - before_tokens)
+        delta = max(0, self.runtime.fresh_tokens() - before_tokens)
         consumed = tokens_consumed_by_call(
             tokens_used=delta,
             reused_scope=reused_scope and delta == 0,
@@ -832,13 +853,64 @@ class CompanyProfileTaskService:
                 observation,
                 M4NextBatchOutcome(
                     instrument_id=instrument_id,
-                    status="failed" if failed else "completed",
+                    status=self._m4_outcome_status(
+                        failed=failed,
+                        result_state=result_state,
+                        delivered=instrument_id in delivered_ids,
+                    ),
                     tokens_consumed=consumed if index == 0 else 0,
                     reused_scope=reused_scope and delta == 0,
                     reason="call_failed" if failed else None,
                 ),
             )
         save_m4_next_batch_observation(self.checkpoint_root, observation)
+
+    def _m4_outcome_status(
+        self,
+        *,
+        failed: bool,
+        result_state: str,
+        delivered: bool,
+    ) -> str:
+        if failed:
+            return "failed"
+        if delivered:
+            return "completed"
+        if result_state in {"paused", "failed", "incomplete", "idle"}:
+            return result_state
+        return "idle"
+
+    def _persist_m4_batch_live_run(
+        self,
+        *,
+        batch_plan: M4NextBatchPlan,
+        live_plan: CompanyProfileLivePlan,
+        registry: AShareCandidateRegistry,
+        knowledge_cutoff: str,
+    ):
+        observation = load_m4_next_batch_observation(self.checkpoint_root, batch_plan)
+        selected = tuple(
+            report.instrument_id
+            for report in batch_plan.reports
+            if observation.outcome_for(report.instrument_id) is not None
+        )
+        delivered = tuple(
+            instrument_id
+            for instrument_id in selected
+            if observation.outcome_for(instrument_id).status == "completed"
+        )
+        report = record_live_run_report(
+            plan=live_plan,
+            registry=registry,
+            selected_instrument_ids=selected,
+            delivered_instrument_ids=delivered,
+            knowledge_cutoff=knowledge_cutoff,
+        )
+        path = batch_directory(self.checkpoint_root, batch_plan.plan_id) / (
+            f"{LIVE_RUN_SCHEMA_VERSION}.json"
+        )
+        persist_live_run_report(report, self.checkpoint_root, destination=path)
+        return report
 
     async def _run(
         self,
@@ -862,7 +934,7 @@ class CompanyProfileTaskService:
                 knowledge_cutoff=knowledge_cutoff,
                 instrument_ids=instrument_ids,
             )
-        before_tokens = self.runtime.tokens_consumed()
+        before_tokens = self.runtime.fresh_tokens()
         batch_blocked = bool(requested_ids) and not instrument_ids
         action = "run" if enqueue else "resume"
         run_id = f"{PUBLISHED_TASK_NAME}-{uuid.uuid4().hex[:12]}"
@@ -962,6 +1034,7 @@ class CompanyProfileTaskService:
                 before_tokens=before_tokens,
                 reused_scope=False,
                 failed=True,
+                result_state="failed",
             )
             self.control.finish(state="failed", result=failed)
             raise
@@ -982,15 +1055,21 @@ class CompanyProfileTaskService:
             drain=drain,
             queue=health,
         )
-        if attach_result is not None:
-            attach_result(result, enqueue_result)
+        delivered_ids, _incomplete = self._this_round_live_outcomes(
+            instrument_ids,
+            tuple(enqueue_result.get("work_ids") or ()),
+        )
         self._record_m4_next_batch_call(
             plan=batch_plan,
             instrument_ids=instrument_ids,
             before_tokens=before_tokens,
             reused_scope=int(enqueue_result.get("reused") or 0) > 0,
             failed=False,
+            result_state=state,
+            delivered_ids=delivered_ids,
         )
+        if attach_result is not None:
+            attach_result(result, enqueue_result)
         self.control.finish(state=state, result=result)
         result["control"] = self.control.read()
         return result
@@ -1313,7 +1392,23 @@ def record_published_source_review(
 ) -> dict[str, Any]:
     """Unique owner entry for independent source review after a live run."""
 
-    live_run = load_live_run_report(checkpoint_root)
+    batch_plan = load_m4_next_batch_plan(checkpoint_root)
+    if batch_plan is not None:
+        load_m4_next_batch_observation_for_source_review(checkpoint_root)
+        live_path = batch_directory(checkpoint_root, batch_plan.plan_id) / (
+            f"{LIVE_RUN_SCHEMA_VERSION}.json"
+        )
+        if not live_path.is_file():
+            raise ValueError("m4 next-batch source review requires the merged live-run")
+        live_run = CompanyProfileLiveRunReport.model_validate_json(
+            live_path.read_text(encoding="utf-8")
+        )
+        destination = batch_directory(checkpoint_root, batch_plan.plan_id) / (
+            f"{SOURCE_REVIEW_SCHEMA_VERSION}.json"
+        )
+    else:
+        live_run = load_live_run_report(checkpoint_root)
+        destination = None
     report = record_source_review_report(
         live_run=live_run,
         structural_checks=structural_checks,
@@ -1324,7 +1419,11 @@ def record_published_source_review(
         elapsed_seconds=elapsed_seconds,
         human_review_minutes=human_review_minutes,
     )
-    path = persist_source_review_report(report, checkpoint_root)
+    path = persist_source_review_report(
+        report,
+        checkpoint_root,
+        destination=destination,
+    )
     control = CompanyProfileTaskControl(checkpoint_root)
     payload = {
         "action": "source_review",
