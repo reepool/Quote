@@ -15,7 +15,12 @@ from utils.singleton import singleton
 tgbot_logger.info("[tgbot] Reading system configuration...")
 config = config_manager
 telegram_config = config.get('telegram_config')
-intervals = telegram_config.get('intervals', {}) if hasattr(telegram_config, 'intervals') else {}
+# telegram_config 是普通 dict，必须用 .get 取 intervals，否则配置键会被静默忽略
+intervals = (
+    telegram_config.get('intervals')
+    if isinstance(telegram_config, dict)
+    else getattr(telegram_config, 'intervals', None)
+) or {}
 
 
 def _retry_on_failure(func):
@@ -26,14 +31,26 @@ def _retry_on_failure(func):
         self_instance = args[0]
         retry_interval = getattr(self_instance, 'tg_msg_retry_interval', 5)
         retry_times = getattr(self_instance, 'tg_msg_retry_times', 10)
+        attempt_timeout = getattr(self_instance, 'tg_msg_attempt_timeout', 0) or 0
 
         for attempt in range(retry_times):
             try:
+                if attempt_timeout > 0:
+                    # 网络黑洞时单次调用可能无限挂起，限制单次时长让重试有意义
+                    return await asyncio.wait_for(func(*args, **kwargs), timeout=attempt_timeout)
                 return await func(*args, **kwargs)
             except FloodError as e:
                 retry_after = e.seconds
                 tgbot_logger.warning(f"[tgbot] Flood error on {func.__name__}! Waiting {retry_after}s. Attempt: {attempt+1}")
                 await asyncio.sleep(retry_after)
+            except asyncio.TimeoutError:
+                # 超时意味着投递状态未知：取消协程不会把请求移出出站队列，
+                # 换新 random_id 重试可能在网络恢复后重复投递，因此放弃本次发送
+                tgbot_logger.error(
+                    f"[tgbot] Attempt timeout ({attempt_timeout}s) on {func.__name__}; "
+                    f"delivery unknown, giving up this message. Attempt: {attempt+1}"
+                )
+                break
             except Exception as e:
                 tgbot_logger.error(f"[tgbot] Error on {func.__name__}: {e}. Attempt: {attempt+1}")
                 if attempt < retry_times - 1:
@@ -52,6 +69,9 @@ class TelegramBot:
         # 将重试参数移至实例属性
         self.tg_msg_retry_interval = intervals.get('tg_msg_retry_interval', 5)
         self.tg_msg_retry_times = intervals.get('tg_msg_retry_times', 10)
+        # 单次尝试超时须大于 flood_sleep_threshold（默认 60）：限流等待由客户端
+        # 内部睡眠消化，预算不足会把可恢复的限流发送误判为超时丢弃
+        self.tg_msg_attempt_timeout = intervals.get('tg_msg_attempt_timeout_seconds', 65)
 
 
     async def __aenter__(self):
@@ -344,8 +364,9 @@ class TelegramBot:
             else:
                 target_chat_id = int(chat_id)
 
-            await self.bot_thon.send_message(target_chat_id, message)
+            result = await self.bot_thon.send_message(target_chat_id, message)
             tgbot_logger.info(f"[tgbot] Message sent successfully to {target_chat_id}: {message[:30]}...")
+            return result
         
         except Exception as e:
             tgbot_logger.error(f"[tgbot] Error sending message: {e}")
@@ -453,7 +474,11 @@ class TelegramBot:
                 try:
                     if await self.send_message_async(chat_id, formatted_message):
                         success_count += 1
-                    tgbot_logger.debug(f"[tgbot] Notification sent {formatted_message} successfully to {chat_id}")
+                        tgbot_logger.debug(f"[tgbot] Notification sent {formatted_message} successfully to {chat_id}")
+                    else:
+                        # send_message_async 超时放弃或重试耗尽时返回 None，必须计为失败
+                        failed_count += 1
+                        tgbot_logger.warning(f"[tgbot] Notification to {chat_id} not confirmed (send failed or timed out)")
 
                 except Exception as e:
                     failed_count += 1

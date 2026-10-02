@@ -165,12 +165,29 @@ class TaskScheduler:
             try:
                 # ★ 任务启动前 Telegram 通知
                 if job_config and getattr(job_config, 'pre_run_notify', False):
+                    notify_timeout_seconds = int(
+                        config_manager.get_nested(
+                            'api_config.report_send_timeout_seconds',
+                            45,
+                        )
+                        or 45
+                    )
                     try:
                         bot = TelegramBot()
-                        await bot.send_task_notification(
-                            f"开始执行...\n\n📋 任务: {job_config.description}",
-                            task_name=job_id,
-                            level="info"
+                        # 通知只是伴随信息，与报告发送一样不允许阻塞任务主体
+                        await asyncio.wait_for(
+                            bot.send_task_notification(
+                                f"开始执行...\n\n📋 任务: {job_config.description}",
+                                task_name=job_id,
+                                level="info"
+                            ),
+                            timeout=notify_timeout_seconds,
+                        )
+                    except asyncio.TimeoutError:
+                        scheduler_logger.warning(
+                            "[Scheduler] Task %s pre-run notify timed out after %ss; task proceeds",
+                            job_id,
+                            notify_timeout_seconds,
                         )
                     except Exception as notify_err:
                         scheduler_logger.warning(

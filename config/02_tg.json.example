@@ -28,6 +28,7 @@
     "intervals": {
       "tg_msg_retry_interval": 3,
       "tg_msg_retry_times": 5,
+      "tg_msg_attempt_timeout_seconds": 65,
       "tg_connect_timeout": 30,
       "tg_auto_reconnect": true,
       "tg_max_reconnect_attempts": 5,
