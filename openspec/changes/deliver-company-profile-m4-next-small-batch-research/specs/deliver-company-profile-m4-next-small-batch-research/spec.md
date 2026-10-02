@@ -17,12 +17,25 @@ The batch MUST run on `company_profile_common_core` through `CompanyProfileTaskS
 - **AND** it does not enqueue `600004.SH` or `600006.SH` again
 
 ### Requirement: Two new reports are frozen before enqueue
-After review, the owner MUST select two official annual reports that have no delivered runtime record under the current identity: the first available service disclosure and the first available manufacturing disclosure, ordered by SSE, SZSE, then BSE, and by ascending `instrument_id` within an exchange. The selection MUST NOT hard-code an instrument id. If either disclosure form has no legal candidate, the owner MUST refuse to record the plan. Before enqueue, the owner MUST persist an immutable plan with the knowledge cutoff, both report references (`asset_id`, `report_id`, `report_period`, `document_version`), `max_companies_this_round=2`, and `token_budget=50000`. A later effective report that differs from a frozen reference MUST be refused for that instrument.
+After review, the owner MUST select two official annual reports that have no delivered runtime record under the current identity: the first available service disclosure and the first available manufacturing disclosure, ordered by SSE, SZSE, then BSE, and by ascending `instrument_id` within an exchange. The selection MUST NOT hard-code an instrument id. If either disclosure form has no legal candidate, the owner MUST refuse to record the plan. Before enqueue, the owner MUST persist an immutable plan with the knowledge cutoff, both report references (`asset_id`, `report_id`, `report_period`, `document_version`), `max_companies_this_round=2`, and one shared `token_budget=50000`. A later effective report that differs in any frozen reference field MUST be refused for that instrument.
 
 #### Scenario: The plan exists before the first company runs
 - **WHEN** the batch is allowed to enqueue
-- **THEN** the plan snapshot already names both report identities and the budget
+- **THEN** the plan snapshot already names both report identities and the shared budget
 - **AND** a drifted document version is not substituted
+
+### Requirement: The owner consumes the frozen plan across two runs
+`CompanyProfileTaskService` MUST compare each ordinary run's effective annual report with the frozen reference and MUST refuse a drifted `asset_id`, `report_id`, `report_period`, or `document_version`. The live-run snapshot MUST keep both companies after the two separate runs; the second run MUST NOT replace the first company's outcome with only the securities of that call. Source review MUST read that combined observation. The 50000-token budget MUST be cumulative. Tokens consumed by a failed call MUST reduce the remainder. Reuse of a completed scope MUST add no consumption. The second run MUST receive the remaining budget rather than a fresh 50000.
+
+#### Scenario: Drift is refused and both companies stay in one observation
+- **WHEN** the service run has been recorded and the manufacturing run uses a drifted report version
+- **THEN** that manufacturing instrument is refused
+- **AND** the round observation still contains the service company's recorded outcome
+
+#### Scenario: The second run receives the remaining budget
+- **WHEN** the first run consumed tokens, including a failed call, and a completed scope is reused
+- **THEN** only the failed and newly executed calls reduce the 50000 budget
+- **AND** the second run is given the remainder
 
 ### Requirement: Snapshots for this round stay separate
 This round's plan, live-run, and source-review MUST be stored under `reports/m4_next_small_batch/<plan_id>/`. They MUST NOT overwrite the first-expansion plan pointer, mode file, closure v2, or the historical live-run and source-review files. `first_expansion_mode` MUST remain `completed`.
@@ -33,7 +46,7 @@ This round's plan, live-run, and source-review MUST be stored under `reports/m4_
 - **AND** `first_expansion_mode` is still `completed`
 
 ### Requirement: One disclosure form is delivered before the other
-The owner MUST run the service company through evidence selection, extraction and acceptance, persistence, query, and export before running the manufacturing company through that same path. A repeated submit MUST reuse a completed scope for the current identity and MUST NOT call the provider again for that scope. Failure of one company MUST remain on that company and MUST NOT prevent the other company from being delivered.
+The owner MUST run the service company through evidence selection, extraction and acceptance, persistence, query, and export before running the manufacturing company through that same path. The manufacturing run MUST receive the remaining shared token budget. A repeated submit MUST reuse a completed scope for the current identity, MUST NOT call the provider again for that scope, and MUST NOT add token consumption for that reuse. Failure of one company MUST remain in the combined observation and MUST NOT prevent the other company from being delivered.
 
 #### Scenario: The second company still runs after the first fails
 - **WHEN** the service company fails or is refused
