@@ -49,3 +49,27 @@ The repair MUST use the frozen `600007.SH` and `600010.SH` reports and cutoff `2
 - **WHEN** the repair source review is written
 - **THEN** its denominator is the reread checklist
 - **AND** neither 5/9 nor 9/9 is written in as the result
+
+### Requirement: A commodity role is bound inside one sentence or table row
+The repair MUST bind the reporting company, the commodity name, and the sales, procurement, or energy action inside the same sentence or the same formal table row. A capacity, reserve, or resource statement MUST NOT become a procurement or sales role because another sentence on the page contains that action. Correct procurement of iron ore, lime, limestone, and imported ore on page 220, and of coke on page 223, MUST remain. Query and export MUST expose the evidence page of each delivered role. The combined fee of `7407073` yuan MUST stay one amount, and an unmapped name MUST stay pending.
+
+#### Scenario: Capacity and reserves stay out of procurement
+- **WHEN** page 9 states coke capacity and page 13 states iron-ore reserves, while procurement words occur elsewhere on those pages
+- **THEN** those statements are not delivered as procurement roles
+- **AND** the page 220 and page 223 procurement sentences remain procurement roles
+
+### Requirement: An explicit repair plan cannot fall back to the archived round
+The public source-review method MUST forward the caller-selected repair directory. When that directory is requested and the plan is missing or invalid, the owner MUST refuse before execution and before any snapshot write. The refusal MUST NOT read or write the archived live-run or source review.
+
+#### Scenario: A missing repair plan does not select the old review
+- **WHEN** source review or a run is invoked with an explicit plan directory that has no readable plan
+- **THEN** the call fails before writing
+- **AND** the archived snapshot and export bytes stay unchanged
+
+### Requirement: The corrected successor is scored on every delivered role
+The corrected delivery MUST use a new repair version, processing identity, and snapshot directory, and MUST NOT reuse the completed incorrect result. Recall MUST be recalculated from the source checklist. Accuracy MUST cover every delivered commodity role and its evidence, not only the checklist hits. The archived 5/9, the historical 8/9 and 9/9, and the original 18/18 observation MUST remain unchanged. The new score MUST NOT be prefilled.
+
+#### Scenario: The original 18/18 observation stays in place
+- **WHEN** the corrected successor review is written
+- **THEN** it is stored in the new snapshot directory
+- **AND** the original 18/18 source review keeps its bytes

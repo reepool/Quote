@@ -945,6 +945,10 @@ _SKIP_SEGMENT_LABELS = frozenset(
 
 REVENUE_SENTENCE_REPAIR = "revenue_sentence_repair"
 REVENUE_SENTENCE_REPAIR_V1 = "v1"
+REVENUE_SENTENCE_REPAIR_V2 = "v2"
+_REVENUE_SENTENCE_REPAIR_VERSIONS = frozenset(
+    {REVENUE_SENTENCE_REPAIR_V1, REVENUE_SENTENCE_REPAIR_V2}
+)
 
 
 def revenue_sentence_repair_requested(identity: Mapping[str, Any] | None) -> bool:
@@ -952,11 +956,13 @@ def revenue_sentence_repair_requested(identity: Mapping[str, Any] | None) -> boo
 
     A different work identity does not change projection unless it carries this
     marker. The marker is read by the overview projection, not only stored.
+    ``v2`` is the corrected commodity-evidence identity and still keeps the
+    revenue-sentence repair.
     """
 
     if not isinstance(identity, Mapping):
         return False
-    return identity.get(REVENUE_SENTENCE_REPAIR) == REVENUE_SENTENCE_REPAIR_V1
+    return identity.get(REVENUE_SENTENCE_REPAIR) in _REVENUE_SENTENCE_REPAIR_VERSIONS
 
 
 def project_owned_page_facts(
@@ -1740,15 +1746,41 @@ def _repair_commodity_spans(
     return spans
 
 
+def _repair_commodity_clauses(excerpt: str) -> list[str]:
+    """One clause per sentence or table row, after joining a PDF soft wrap."""
+
+    clauses: list[str] = []
+    for line in _join_pdf_soft_breaks(excerpt).split("\n"):
+        for part in re.split(r"[。；;]", line):
+            compact = re.sub(r"\s+", "", part).strip()
+            if compact:
+                clauses.append(compact)
+    return clauses
+
+
+_ORG_NAME = re.compile(
+    r"[\u4e00-\u9fffA-Za-z0-9（）()]{2,40}(?:股份有限公司|有限责任公司|有限公司)"
+)
+
+
+def _clause_names_company(compact: str) -> bool:
+    return re.search(r"(?:本公司|公司)", compact) is not None
+
+
+def _without_org_names(compact: str) -> str:
+    """Drop named firms so “钢铁销售有限公司” is not a sales action."""
+
+    return _ORG_NAME.sub("", compact)
+
+
 def _project_repair_commodity_span(
     selection: CoreEvidenceSelection,
     span: CoreEvidenceSpan,
 ) -> tuple[SemanticRecord, ...]:
+    """Bind a role only when the company, name, and action share a clause."""
+
     item = _prepared_for(selection, span, "explicit_activity")
     if item is None:
-        return ()
-    compact = re.sub(r"\s+", "", span.excerpt)
-    if not re.search(r"(?:本公司|公司)", compact):
         return ()
     records: list[SemanticRecord] = []
     seen: set[str] = set()
@@ -1779,30 +1811,36 @@ def _project_repair_commodity_span(
             )
         )
 
-    sales_sentence = any(token in compact for token in ("销售", "生产与销售"))
-    procurement_sentence = any(
-        token in compact for token in ("采购", "原辅料", "供应")
-    )
-    if sales_sentence and "采购协议" not in compact:
-        for name, aliases in _REPAIR_SALES:
-            if any(alias in compact for alias in aliases):
-                add_activity(name, ActivityAction.SELLS, "销售")
-    if procurement_sentence:
-        for name in _REPAIR_PROCUREMENT:
-            if name in compact and "焦化产品" not in name:
-                if name == "焦炭" and "采购" not in compact and "原辅料" not in compact:
+    for compact in _repair_commodity_clauses(span.excerpt):
+        stated = _without_org_names(compact)
+        company = _clause_names_company(compact)
+        if "参股" in compact and "本公司" not in compact:
+            company = False
+        sells = "销售" in stated or "生产与销售" in stated
+        procures = any(token in stated for token in ("采购", "订购", "原辅料"))
+        if company and sells and "采购协议" not in stated:
+            for name, aliases in _REPAIR_SALES:
+                if any(alias in stated for alias in aliases):
+                    add_activity(name, ActivityAction.SELLS, "销售")
+        if company and procures:
+            for name in _REPAIR_PROCUREMENT:
+                if name not in stated:
+                    continue
+                if name == "焦炭" and not any(
+                    token in stated for token in ("采购", "订购", "作为原料")
+                ):
                     continue
                 add_activity(name, ActivityAction.PURCHASES, "采购")
-    if "蒸汽费" in compact and "热水费" in compact and "电费" in compact:
-        for name, _alias in _REPAIR_ENERGY:
-            add_activity(name, ActivityAction.PURCHASES, "消耗")
-        if "7407073" in compact or "7,407,073" in span.excerpt:
-            add_activity(
-                "蒸汽费、热水费及电费",
-                ActivityAction.PURCHASES,
-                "消耗",
-                "7407073",
-            )
+        if "蒸汽费" in compact and "热水费" in compact and "电费" in compact:
+            for name, _alias in _REPAIR_ENERGY:
+                add_activity(name, ActivityAction.PURCHASES, "消耗")
+            if "7407073" in compact or "7,407,073" in compact:
+                add_activity(
+                    "蒸汽费、热水费及电费",
+                    ActivityAction.PURCHASES,
+                    "消耗",
+                    "7407073",
+                )
     return tuple(records)
 
 

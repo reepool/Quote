@@ -13,3 +13,15 @@
 ## 4. Same-source successor
 
 - [x] 4.1 After 3.1, test the revenue and commodity boundaries, then run, query, and export both frozen reports at cutoff `2026-09-17`. Reread them independently and record recall, accuracy, and critical numeric errors from the per-name checklist. Do not prefill the score. Keep a miss as a miss. Do not authorize production or a scale-quality claim, and do not archive in that task.
+
+## 5. Commodity role evidence
+
+- [x] 5.1 Bind the company, the commodity name, and the sales, procurement, or energy action inside the same sentence or formal table row. Real page 9 capacity and page 13 reserves must not become procurement, and a fluorite resource must not become sales. Keep the correct procurement on pages 220 and 223. Query and export must show those specific associations. Keep `7407073` yuan as one combined fee, and keep an unmapped name pending.
+
+## 6. Owner isolation closure
+
+- [x] 6.1 Forward the repair directory from the public source-review method. When an explicitly requested plan is missing or invalid, refuse before execution and before writing. Through the owner path, old and new plans can coexist while the old snapshot, old review, and old export bytes stay unchanged.
+
+## 7. Corrected successor
+
+- [x] 7.1 After 5.1 and 6.1, run, query, and export both frozen reports again with a new repair version, processing identity, and snapshot directory, at cutoff `2026-09-17` and the shared budget. Do not reuse the completed incorrect result. Recalculate recall from the source checklist, and score accuracy on every delivered role and its evidence. Keep the archived 5/9, the historical 8/9 and 9/9, and the original 18/18 observation. Do not prefill the new score. Archive only after this review.

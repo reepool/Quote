@@ -12,7 +12,7 @@ from collections.abc import Callable, Mapping, Sequence
 from pathlib import Path
 from typing import Any
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
 
 SHARED_TOKEN_BUDGET = 50_000
 MAX_COMPANIES_THIS_ROUND = 2
@@ -105,6 +105,20 @@ def m4_snapshot_directory(
     if plan_directory is not None:
         return Path(plan_directory)
     return batch_directory(root, plan_id)
+
+
+def require_explicit_m4_plan(
+    plan_directory: str | Path,
+) -> M4NextBatchPlan:
+    """Load a caller-selected plan, or refuse before any run or review write."""
+
+    path = Path(plan_directory) / "plan.json"
+    if not path.is_file():
+        raise ValueError("explicit m4 plan is missing")
+    try:
+        return M4NextBatchPlan.model_validate_json(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError, ValidationError) as exc:
+        raise ValueError("explicit m4 plan is invalid") from exc
 
 
 def load_m4_next_batch_plan(

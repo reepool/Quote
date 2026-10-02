@@ -75,6 +75,7 @@ from research.company_profile.m4_next_batch import (
     m4_snapshot_directory,
     merge_outcome,
     remaining_token_budget,
+    require_explicit_m4_plan,
     save_m4_next_batch_observation,
     save_m4_next_batch_plan,
     tokens_consumed_by_call,
@@ -541,6 +542,8 @@ class CompanyProfileTaskService:
         registry = candidate_registry or self.candidate_registry
         plan = live_plan or self.live_plan
         if normalized in {"run", "resume"}:
+            if self.plan_directory is not None:
+                require_explicit_m4_plan(self.plan_directory)
             self._ensure_publication_allows_writes()
             if first_expansion_should_constrain_run(self.checkpoint_root):
                 if registry is None:
@@ -1288,9 +1291,11 @@ class CompanyProfileTaskService:
         tokens_used: int | None = None,
         elapsed_seconds: float | None = None,
         human_review_minutes: float | None = None,
+        plan_directory: str | Path | None = None,
     ) -> dict[str, Any]:
         """Record independent source review against the persisted live-run sample."""
 
+        directory = self.plan_directory if plan_directory is None else plan_directory
         return record_published_source_review(
             checkpoint_root=self.checkpoint_root,
             structural_checks=structural_checks,
@@ -1300,6 +1305,7 @@ class CompanyProfileTaskService:
             tokens_used=tokens_used,
             elapsed_seconds=elapsed_seconds,
             human_review_minutes=human_review_minutes,
+            plan_directory=directory,
         )
 
     def apply_publication(self, action: str) -> dict[str, Any]:
@@ -1526,9 +1532,10 @@ def record_published_source_review(
 ) -> dict[str, Any]:
     """Unique owner entry for independent source review after a live run."""
 
-    batch_plan = load_m4_next_batch_plan(
-        checkpoint_root, plan_directory=plan_directory
-    )
+    if plan_directory is not None:
+        batch_plan = require_explicit_m4_plan(plan_directory)
+    else:
+        batch_plan = load_m4_next_batch_plan(checkpoint_root)
     if batch_plan is not None and (
         plan_directory is not None or load_m4_next_batch_plan(checkpoint_root) is not None
     ):
