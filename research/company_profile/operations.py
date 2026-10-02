@@ -67,6 +67,8 @@ from research.company_profile.m4_next_batch import (
     M4NextBatchOutcome,
     M4NextBatchPlan,
     batch_directory,
+    build_m4_next_batch_plan,
+    delivered_instrument_ids,
     drift_reason,
     load_m4_next_batch_observation,
     load_m4_next_batch_observation_for_source_review,
@@ -74,6 +76,7 @@ from research.company_profile.m4_next_batch import (
     merge_outcome,
     remaining_token_budget,
     save_m4_next_batch_observation,
+    save_m4_next_batch_plan,
     tokens_consumed_by_call,
 )
 from research.company_profile.models import PRODUCTION_AUTHORIZATION
@@ -743,6 +746,71 @@ class CompanyProfileTaskService:
         if outcomes and all(item.get("delivered") for item in outcomes):
             mark_first_expansion_delivery(self.checkpoint_root)
         return result
+
+    def freeze_m4_next_batch_plan(
+        self,
+        *,
+        knowledge_cutoff: str,
+        registry: AShareCandidateRegistry | None = None,
+        delivered_ids: set[str] | None = None,
+        readable: Callable[[Any], bool] | None = None,
+        binding_for: Callable[[str], Mapping[str, Any] | None] | None = None,
+    ) -> M4NextBatchPlan:
+        """Select and freeze this round's plan. Does not enqueue."""
+
+        active_registry = registry or self.candidate_registry
+        if active_registry is None:
+            access = self.repository.shared_asset_access
+            active_registry = load_official_task_candidate_registry(
+                as_of=knowledge_cutoff,
+                storage=self.storage,
+                shared_asset_access=access,
+            )
+        if delivered_ids is None:
+            delivered_ids = delivered_instrument_ids(
+                self.output_root,
+                self.processing_identity,
+            )
+        if readable is None:
+            readable = self._m4_report_is_locally_readable
+        if binding_for is None:
+            def binding_for(instrument_id: str) -> Mapping[str, Any] | None:
+                return self._m4_official_bindings(
+                    (instrument_id,),
+                    knowledge_cutoff,
+                ).get(instrument_id)
+
+        plan = build_m4_next_batch_plan(
+            active_registry.candidates,
+            knowledge_cutoff=knowledge_cutoff,
+            delivered_instrument_ids=delivered_ids,
+            readable=readable,
+            binding_for=binding_for,
+        )
+        save_m4_next_batch_plan(self.checkpoint_root, plan)
+        stored = load_m4_next_batch_plan(self.checkpoint_root)
+        if stored is None:
+            raise ValueError("m4 next batch plan was not readable after freeze")
+        return stored
+
+    def _m4_report_is_locally_readable(self, candidate: Any) -> bool:
+        if getattr(candidate, "asset_status", None) != "available":
+            return False
+        report = getattr(candidate, "latest_effective_annual_report", None)
+        content_hash = str(getattr(report, "content_hash", "") or "").strip()
+        if report is None or not content_hash:
+            return False
+        access = self.repository.shared_asset_access
+        repository = getattr(access, "repository", None)
+        getter = getattr(repository, "get_blob", None)
+        if not callable(getter):
+            return False
+        blob = getter(content_hash)
+        path_text = getattr(blob, "canonical_path", None) if blob is not None else None
+        if not path_text:
+            return False
+        path = Path(path_text)
+        return path.is_file() and path.stat().st_size > 0
 
     def _apply_m4_next_batch_gate(
         self,

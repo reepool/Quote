@@ -6,14 +6,20 @@ and it does not rewrite the completed first-expansion snapshots.
 
 from __future__ import annotations
 
-from collections.abc import Mapping, Sequence
+import hashlib
+import json
+from collections.abc import Callable, Mapping, Sequence
 from pathlib import Path
 from typing import Any
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 SHARED_TOKEN_BUDGET = 50_000
+MAX_COMPANIES_THIS_ROUND = 2
 _BATCH_DIRNAME = "m4_next_small_batch"
+_EXCHANGE_ORDER = ("SSE", "SZSE", "BSE")
+_DISCLOSURE_FORMS = ("service", "manufacturing")
+HISTORICAL_COMPLETED_INSTRUMENTS = frozenset({"600004.SH", "600006.SH"})
 _REFERENCE_FIELDS = (
     "asset_id",
     "report_id",
@@ -38,8 +44,22 @@ class M4NextBatchReport(_StrictModel):
 class M4NextBatchPlan(_StrictModel):
     plan_id: str = Field(min_length=1)
     knowledge_cutoff: str = Field(min_length=1)
+    max_companies_this_round: int = MAX_COMPANIES_THIS_ROUND
     token_budget: int = SHARED_TOKEN_BUDGET
     reports: tuple[M4NextBatchReport, ...]
+
+    @model_validator(mode="after")
+    def _freeze_two_company_budget(self) -> M4NextBatchPlan:
+        if self.max_companies_this_round != MAX_COMPANIES_THIS_ROUND:
+            raise ValueError("m4 next batch is limited to two companies")
+        if self.token_budget != SHARED_TOKEN_BUDGET:
+            raise ValueError("m4 next batch shares one 50000 token budget")
+        if len(self.reports) != MAX_COMPANIES_THIS_ROUND:
+            raise ValueError("m4 next batch plan must name exactly two reports")
+        forms = [report.disclosure_form for report in self.reports]
+        if forms != list(_DISCLOSURE_FORMS):
+            raise ValueError("m4 next batch plan must list service then manufacturing")
+        return self
 
     def report_for(self, instrument_id: str) -> M4NextBatchReport | None:
         for report in self.reports:
@@ -89,9 +109,16 @@ def load_m4_next_batch_plan(root: str | Path) -> M4NextBatchPlan | None:
 
 
 def save_m4_next_batch_plan(root: str | Path, plan: M4NextBatchPlan) -> Path:
+    """Write the plan once. A different sample or version is refused."""
+
+    existing = load_m4_next_batch_plan(root)
+    if existing is not None:
+        if existing != plan:
+            raise ValueError("frozen m4 next batch plan cannot be replaced")
+        return batch_directory(root, existing.plan_id) / "plan.json"
     path = batch_directory(root, plan.plan_id) / "plan.json"
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(plan.model_dump_json(indent=2), encoding="utf-8")
+    path.write_text(plan.model_dump_json(indent=2) + "\n", encoding="utf-8")
     return path
 
 
@@ -143,6 +170,141 @@ def load_m4_next_batch_observation_for_source_review(
 
 def remaining_token_budget(observation: M4NextBatchObservation) -> int:
     return max(0, int(observation.token_budget) - int(observation.tokens_consumed))
+
+
+def stable_plan_id(
+    *,
+    knowledge_cutoff: str,
+    reports: Sequence[M4NextBatchReport],
+) -> str:
+    payload = {
+        "knowledge_cutoff": knowledge_cutoff,
+        "max_companies_this_round": MAX_COMPANIES_THIS_ROUND,
+        "token_budget": SHARED_TOKEN_BUDGET,
+        "reports": [report.model_dump() for report in reports],
+    }
+    encoded = json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+    return hashlib.sha256(encoded.encode()).hexdigest()
+
+
+def delivered_instrument_ids(
+    output_root: str | Path,
+    identity: Mapping[str, Any],
+) -> set[str]:
+    """Instruments that already have a runtime record for this processing identity."""
+
+    namespace = Path(output_root) / "company_profile_common_core.v1"
+    found: set[str] = set()
+    if not namespace.is_dir():
+        return found
+    for path in namespace.glob("*.json"):
+        try:
+            payload = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            continue
+        if not isinstance(payload, Mapping):
+            continue
+        execution = payload.get("execution") or {}
+        input_identity = execution.get("input_identity") or {}
+        processing = input_identity.get("processing_identity") or {}
+        if dict(processing) != dict(identity):
+            continue
+        instrument_id = str((payload.get("report") or {}).get("instrument_id") or "")
+        if instrument_id:
+            found.add(instrument_id)
+    return found
+
+
+def select_m4_next_batch_reports(
+    candidates: Sequence[Any],
+    *,
+    delivered_instrument_ids: set[str],
+    readable,
+    binding_for: Callable[[str], Mapping[str, Any] | None],
+) -> tuple[M4NextBatchReport, M4NextBatchReport]:
+    """Pick the first legal service company, then the first legal manufacturer."""
+
+    excluded = set(delivered_instrument_ids) | HISTORICAL_COMPLETED_INSTRUMENTS
+    chosen: list[M4NextBatchReport] = []
+    for form in _DISCLOSURE_FORMS:
+        report = _first_legal_report(
+            candidates,
+            disclosure_form=form,
+            excluded=excluded,
+            readable=readable,
+            binding_for=binding_for,
+        )
+        if report is None:
+            raise ValueError(f"m4 next batch has no legal {form} candidate")
+        chosen.append(report)
+        excluded.add(report.instrument_id)
+    return tuple(chosen)
+
+
+def build_m4_next_batch_plan(
+    candidates: Sequence[Any],
+    *,
+    knowledge_cutoff: str,
+    delivered_instrument_ids: set[str],
+    readable,
+    binding_for: Callable[[str], Mapping[str, Any] | None],
+) -> M4NextBatchPlan:
+    reports = select_m4_next_batch_reports(
+        candidates,
+        delivered_instrument_ids=delivered_instrument_ids,
+        readable=readable,
+        binding_for=binding_for,
+    )
+    return M4NextBatchPlan(
+        plan_id=stable_plan_id(knowledge_cutoff=knowledge_cutoff, reports=reports),
+        knowledge_cutoff=knowledge_cutoff,
+        max_companies_this_round=MAX_COMPANIES_THIS_ROUND,
+        token_budget=SHARED_TOKEN_BUDGET,
+        reports=reports,
+    )
+
+
+def _first_legal_report(
+    candidates: Sequence[Any],
+    *,
+    disclosure_form: str,
+    excluded: set[str],
+    readable,
+    binding_for: Callable[[str], Mapping[str, Any] | None],
+) -> M4NextBatchReport | None:
+    from research.company_profile.live_plan import assign_disclosure_form
+
+    grouped: dict[str, list[Any]] = {exchange: [] for exchange in _EXCHANGE_ORDER}
+    for candidate in candidates:
+        instrument_id = str(getattr(candidate, "instrument_id", "") or "")
+        exchange = str(getattr(candidate, "exchange", "") or "")
+        if not instrument_id or exchange not in grouped:
+            continue
+        if getattr(candidate, "universe_status", None) != "eligible":
+            continue
+        if instrument_id in excluded:
+            continue
+        if assign_disclosure_form(candidate) != disclosure_form:
+            continue
+        if not readable(candidate):
+            continue
+        grouped[exchange].append(candidate)
+    for exchange in _EXCHANGE_ORDER:
+        for candidate in sorted(grouped[exchange], key=lambda item: item.instrument_id):
+            binding = binding_for(candidate.instrument_id)
+            if binding is None:
+                continue
+            values = {
+                field: str(binding.get(field) or "").strip() for field in _REFERENCE_FIELDS
+            }
+            if any(not values[field] for field in _REFERENCE_FIELDS):
+                continue
+            return M4NextBatchReport(
+                instrument_id=candidate.instrument_id,
+                disclosure_form=disclosure_form,
+                **values,
+            )
+    return None
 
 
 def tokens_consumed_by_call(*, tokens_used: int, reused_scope: bool) -> int:

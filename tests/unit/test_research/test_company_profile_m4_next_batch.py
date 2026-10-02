@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 import json
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
@@ -546,6 +547,115 @@ def test_cumulative_tokens_survive_retry_reuse_and_a_restored_ledger(tmp_path):
     assert kept.tokens_consumed == 170
     assert restored.runtime._total_token_budget == 49_830
     assert restored.runtime.provider._total_token_budget == 49_830
+
+
+def _named(instrument_id: str, exchange: str, industry: str, *, readable: bool = True):
+    return SimpleNamespace(
+        instrument_id=instrument_id,
+        exchange=exchange,
+        universe_status="eligible",
+        asset_status="available" if readable else "confirmed_missing",
+        classification_status="present",
+        classification=SimpleNamespace(sw_l1_name=industry),
+        latest_effective_annual_report=SimpleNamespace(
+            content_hash=f"hash-{instrument_id}",
+            asset_id=f"asset-{instrument_id}",
+            report_period="2025-12-31",
+        ),
+    )
+
+
+def test_freeze_selects_in_exchange_order_and_keeps_the_same_bytes(tmp_path):
+    candidates = (
+        _named("600004.SH", "SSE", "交通运输"),
+        _named("600100.SH", "SSE", "交通运输"),
+        _named("600200.SH", "SSE", "交通运输"),
+        _named("000001.SZ", "SZSE", "社会服务"),
+        _named("600050.SH", "SSE", "汽车", readable=False),
+        _named("600300.SH", "SSE", "汽车"),
+        _named("830001.BJ", "BSE", "机械设备"),
+    )
+    bindings = {
+        item.instrument_id: {
+            "asset_id": f"asset-{item.instrument_id}",
+            "report_id": f"report-{item.instrument_id}",
+            "report_period": "2025-12-31",
+            "document_version": f"ver-{item.instrument_id}",
+        }
+        for item in candidates
+    }
+    storage = _storage(tmp_path)
+    service = _service(tmp_path, storage, provider=_RequestBoundOverviewProvider())
+    before = _seed_history(service.checkpoint_root)
+    registry = SimpleNamespace(candidates=candidates)
+
+    def readable(candidate) -> bool:
+        return candidate.asset_status == "available"
+
+    plan = service.freeze_m4_next_batch_plan(
+        knowledge_cutoff="2026-09-17",
+        registry=registry,
+        delivered_ids={"600100.SH"},
+        readable=readable,
+        binding_for=bindings.get,
+    )
+    loaded = load_m4_next_batch_plan(service.checkpoint_root)
+    path = (
+        service.checkpoint_root
+        / "reports"
+        / "m4_next_small_batch"
+        / plan.plan_id
+        / "plan.json"
+    )
+    raw = path.read_bytes()
+
+    again = service.freeze_m4_next_batch_plan(
+        knowledge_cutoff="2026-09-17",
+        registry=registry,
+        delivered_ids={"600100.SH"},
+        readable=readable,
+        binding_for=bindings.get,
+    )
+
+    assert loaded == plan == again
+    assert path.read_bytes() == raw
+    assert [item.instrument_id for item in plan.reports] == ["600200.SH", "600300.SH"]
+    assert [item.disclosure_form for item in plan.reports] == ["service", "manufacturing"]
+    assert plan.max_companies_this_round == 2
+    assert plan.token_budget == 50_000
+    assert plan.knowledge_cutoff == "2026-09-17"
+    assert not (
+        service.checkpoint_root / "reports" / "m4_next_small_batch" / plan.plan_id / "observation.json"
+    ).exists()
+    assert snapshot_bytes(historical_snapshot_paths(service.checkpoint_root)) == before
+    with pytest.raises(ValueError, match="cannot be replaced"):
+        save_m4_next_batch_plan(
+            service.checkpoint_root,
+            plan.model_copy(update={"knowledge_cutoff": "2026-10-02"}),
+        )
+    assert path.read_bytes() == raw
+
+
+def test_freeze_refuses_when_a_disclosure_form_has_no_candidate(tmp_path):
+    storage = _storage(tmp_path)
+    service = _service(tmp_path, storage, provider=_RequestBoundOverviewProvider())
+    registry = SimpleNamespace(
+        candidates=(_named("600200.SH", "SSE", "交通运输"),)
+    )
+    with pytest.raises(ValueError, match="no legal manufacturing"):
+        service.freeze_m4_next_batch_plan(
+            knowledge_cutoff="2026-09-17",
+            registry=registry,
+            delivered_ids=set(),
+            readable=lambda candidate: True,
+            binding_for=lambda instrument_id: {
+                "asset_id": "asset",
+                "report_id": "report",
+                "report_period": "2025-12-31",
+                "document_version": "ver",
+            },
+        )
+    assert load_m4_next_batch_plan(service.checkpoint_root) is None
 
 
 def test_second_company_failure_is_in_the_live_run_before_source_review(tmp_path):
