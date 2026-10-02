@@ -45,7 +45,7 @@ _PRODUCT_PATTERN = re.compile(
 )
 _STATEMENT_SPLIT = re.compile(r"[。；;，,\n]+")
 _REVENUE_INFLOW_PATTERN = re.compile(
-    r"(营业收入主要来源于|收入来[源于自]|营业收入构成|主营业务收入|"
+    r"(收入来[源于自]|营业收入构成|主营业务收入|"
     r"通过.{0,30}(?:销售|提供).{0,30}(?:取得|获得|收取)|"
     r"取得货款|"
     r"向客户(?:销售|提供).{0,24}(?:取得|获得|收取)|"
@@ -58,6 +58,9 @@ _REVENUE_BLOCK_PATTERN = re.compile(
     r"(免费|无偿|不收取|未收取|并不收取|无需(?:支付|收取)|向(?:公司|本公司)收取)"
 )
 _REVENUE_NEGATION_PREFIX = re.compile(r"(尚未|还未|仍未|并未|没有|未|不)$")
+_REPAIR_REVENUE_INFLOW_PATTERN = re.compile(
+    r"(营业收入主要来源于|" + _REVENUE_INFLOW_PATTERN.pattern[1:]
+)
 _PRODUCT_ACTIONS = frozenset(
     {
         ActivityAction.DEVELOPS,
@@ -253,6 +256,7 @@ def project_core_assessment(
     *,
     report: ReportIdentity,
     task_results: Sequence[CompanyProfileTaskResult],
+    repair_revenue_sentence: bool = False,
 ) -> CompanyProfileCoreAssessment:
     """Evaluate the common core from accepted same-report records."""
 
@@ -270,7 +274,10 @@ def project_core_assessment(
 
     principal = _assess_principal_business(accepted)
     products = _assess_products_services(accepted)
-    revenue = _assess_revenue_model(accepted)
+    revenue = _assess_revenue_model(
+        accepted,
+        repair_revenue_sentence=repair_revenue_sentence,
+    )
     return CompanyProfileCoreAssessment(
         report=report,
         principal_business=principal,
@@ -350,6 +357,8 @@ def _assess_products_services(
 
 def _assess_revenue_model(
     records: Sequence[SemanticRecord],
+    *,
+    repair_revenue_sentence: bool = False,
 ) -> CoreDimensionAssessment:
     supports: list[SemanticRecord] = []
     totals: list[SemanticRecord] = []
@@ -358,7 +367,10 @@ def _assess_revenue_model(
         if (
             isinstance(record, BusinessOverview)
             and record.field_id == "business_overview_source"
-            and _overview_states_revenue(record.source_text)
+            and _overview_states_revenue(
+                record.source_text,
+                repair_revenue_sentence=repair_revenue_sentence,
+            )
         ):
             supports.append(record)
             continue
@@ -382,7 +394,16 @@ def _assess_revenue_model(
                 continue
             supports.append(record)
     if supports:
-        return _answered("revenue_model", supports)
+        answered = _answered("revenue_model", supports)
+        if repair_revenue_sentence:
+            pieces = [
+                record.source_text.strip()
+                for record in supports
+                if isinstance(record, BusinessOverview) and record.source_text.strip()
+            ]
+            if pieces:
+                answered = answered.model_copy(update={"excerpt": "\n".join(pieces)})
+        return answered
     if totals:
         return _unanswered("revenue_model", "numeric_total_only")
     if any(
@@ -396,15 +417,24 @@ def _assess_revenue_model(
     return _unanswered("revenue_model", "no_accepted_evidence")
 
 
-def _overview_states_revenue(text: str) -> bool:
-    joined = re.sub(r"[\r\n]+", "", text)
-    for statement in _STATEMENT_SPLIT.split(joined):
+def _overview_states_revenue(
+    text: str,
+    *,
+    repair_revenue_sentence: bool = False,
+) -> bool:
+    source = re.sub(r"[\r\n]+", "", text) if repair_revenue_sentence else text
+    pattern = (
+        _REPAIR_REVENUE_INFLOW_PATTERN
+        if repair_revenue_sentence
+        else _REVENUE_INFLOW_PATTERN
+    )
+    for statement in _STATEMENT_SPLIT.split(source):
         statement = statement.strip()
         if not statement:
             continue
         if _REVENUE_BLOCK_PATTERN.search(statement):
             continue
-        match = _REVENUE_INFLOW_PATTERN.search(statement)
+        match = pattern.search(statement)
         if match is None:
             continue
         if _REVENUE_NEGATION_PREFIX.search(statement[: match.start()]):

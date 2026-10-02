@@ -198,6 +198,7 @@ def select_core_evidence(
     report: ReportIdentity,
     pages: Sequence[ReportPageText | Mapping[str, Any]],
     accepted_records: Sequence[SemanticRecord] = (),
+    repair_revenue_sentence: bool = False,
 ) -> CoreEvidenceSelection:
     """Select bounded core Evidence without a frozen per-company page plan."""
 
@@ -257,6 +258,8 @@ def select_core_evidence(
     material = _select_material_span(normalized)
     if material is not None:
         spans.append(material)
+    if repair_revenue_sentence:
+        spans.extend(_repair_commodity_spans(normalized, covered=spans))
 
     if overview.span is None and not any(
         gap.code == "chapter_missing"
@@ -984,6 +987,12 @@ def project_owned_page_facts(
                 records.extend(_project_company_total_rows(selection, span))
         elif span.chapter_task == ChapterTask.EXTRACT_MATERIAL_INPUTS.value:
             records.extend(_project_material_span(selection, span))
+    if repair_revenue_sentence and chapter in (
+        None,
+        ChapterTask.EXTRACT_BUSINESS_OVERVIEW,
+    ):
+        for span in selection.spans:
+            records.extend(_project_repair_commodity_span(selection, span))
     return _dedupe_owned_records(records)
 
 
@@ -1012,13 +1021,15 @@ def _project_overview_span(
     activity_item = _prepared_for(selection, span, "explicit_activity")
     records: list[SemanticRecord] = []
     if overview_item is not None and _excerpt_states_owned_overview(span.excerpt):
-        source_text = _overview_source_text(
-            span.excerpt,
+        quote = (
             overview_item.evidence.anchor.bounded_quote
             if isinstance(overview_item.evidence.anchor, TextAnchor)
-            else "",
+            else ""
+        )
+        source_text = _overview_source_text(
+            span.excerpt,
+            quote,
             heading=span.section_title,
-            repair_revenue_sentence=repair_revenue_sentence,
         )
         if source_text:
             records.append(
@@ -1031,6 +1042,15 @@ def _project_overview_span(
                     evidence=overview_item.evidence,
                     source_native=SourceNativeValue(name=span.section_title),
                     source_text=source_text,
+                )
+            )
+        if repair_revenue_sentence:
+            records.extend(
+                _revenue_sentence_records(
+                    selection,
+                    overview_item,
+                    excerpt=span.excerpt,
+                    principal_text=source_text,
                 )
             )
     if activity_item is None:
@@ -1678,6 +1698,114 @@ _GENERIC_MATERIAL_NAMES = frozenset(
 )
 
 
+_REPAIR_SALES = (
+    ("钢铁", ("钢铁产品", "钢铁")),
+    ("稀土精矿", ("稀土精矿",)),
+    ("萤石", ("萤石精矿", "萤石")),
+    ("焦化产品", ("焦化产品", "冶金焦炭")),
+)
+_REPAIR_PROCUREMENT = ("铁矿石", "白灰", "石灰石", "进口矿", "焦炭")
+_REPAIR_ENERGY = (("蒸汽", "蒸汽费"), ("热水", "热水费"), ("电", "电费"))
+_REPAIR_COMMODITY_CUE = re.compile(
+    r"采购|销售|蒸汽费|热水费|电费|生产与销售|原辅料|焦炭采购"
+)
+
+
+def _repair_commodity_spans(
+    pages: Sequence[ReportPageText],
+    *,
+    covered: Sequence[CoreEvidenceSpan],
+) -> list[CoreEvidenceSpan]:
+    covered_pages = {span.page for span in covered}
+    spans: list[CoreEvidenceSpan] = []
+    for page in pages:
+        if not page.readable or page.page in covered_pages:
+            continue
+        if _REPAIR_COMMODITY_CUE.search(re.sub(r"\s+", "", page.text)) is None:
+            continue
+        excerpt = page.text.strip()
+        if not excerpt:
+            continue
+        spans.append(
+            CoreEvidenceSpan(
+                page=page.page,
+                section_title="修复商品披露",
+                excerpt=excerpt,
+                bounded_quote=excerpt,
+                chapter_task=ChapterTask.EXTRACT_MATERIAL_INPUTS.value,
+                field_ids=("explicit_activity",),
+                dimension_ids=(),
+            )
+        )
+    return spans
+
+
+def _project_repair_commodity_span(
+    selection: CoreEvidenceSelection,
+    span: CoreEvidenceSpan,
+) -> tuple[SemanticRecord, ...]:
+    item = _prepared_for(selection, span, "explicit_activity")
+    if item is None:
+        return ()
+    compact = re.sub(r"\s+", "", span.excerpt)
+    if not re.search(r"(?:本公司|公司)", compact):
+        return ()
+    records: list[SemanticRecord] = []
+    seen: set[str] = set()
+
+    def add_activity(name: str, action: ActivityAction, verb: str, value: str | None = None) -> None:
+        if name in seen:
+            return
+        seen.add(name)
+        native = SourceNativeValue(name=name, value=value, unit="元" if value else None)
+        records.append(
+            _base_fact(
+                Activity,
+                report=selection.report,
+                record_id=(
+                    f"owned:{item.evidence.evidence_id}:commodity:{len(seen)}"
+                ),
+                field_id="explicit_activity",
+                chapter_task=ChapterTask.EXTRACT_BUSINESS_OVERVIEW,
+                evidence=item.evidence,
+                source_native=native,
+                action=action,
+                activity_actor="公司",
+                source_actor="公司",
+                actor_basis=SubjectBasis.DIRECT_GRAMMATICAL_ACTOR,
+                object_name=name,
+                source_verb=verb,
+                excerpt_subject=span.excerpt,
+            )
+        )
+
+    sales_sentence = any(token in compact for token in ("销售", "生产与销售"))
+    procurement_sentence = any(
+        token in compact for token in ("采购", "原辅料", "供应")
+    )
+    if sales_sentence and "采购协议" not in compact:
+        for name, aliases in _REPAIR_SALES:
+            if any(alias in compact for alias in aliases):
+                add_activity(name, ActivityAction.SELLS, "销售")
+    if procurement_sentence:
+        for name in _REPAIR_PROCUREMENT:
+            if name in compact and "焦化产品" not in name:
+                if name == "焦炭" and "采购" not in compact and "原辅料" not in compact:
+                    continue
+                add_activity(name, ActivityAction.PURCHASES, "采购")
+    if "蒸汽费" in compact and "热水费" in compact and "电费" in compact:
+        for name, _alias in _REPAIR_ENERGY:
+            add_activity(name, ActivityAction.PURCHASES, "消耗")
+        if "7407073" in compact or "7,407,073" in span.excerpt:
+            add_activity(
+                "蒸汽费、热水费及电费",
+                ActivityAction.PURCHASES,
+                "消耗",
+                "7407073",
+            )
+    return tuple(records)
+
+
 def explicit_material_input_names(text: str) -> tuple[str, ...]:
     """Return named materials the same sentence binds to the company's own input."""
 
@@ -1907,13 +2035,7 @@ def _original_span_matching(text: str, compact_target: str) -> str:
     return text[compact_chars[start][0] : compact_chars[end][0] + 1].strip()
 
 
-def _overview_source_text(
-    excerpt: str,
-    quote: str,
-    *,
-    heading: str,
-    repair_revenue_sentence: bool = False,
-) -> str:
+def _overview_source_text(excerpt: str, quote: str, *, heading: str) -> str:
     if not excerpt or not quote:
         return ""
     joined = _join_wrapped_lines(excerpt)
@@ -1922,11 +2044,7 @@ def _overview_source_text(
         sentence = _sentence_containing(joined, preferred.start())
         text = _original_span_matching(excerpt, re.sub(r"\s+", "", sentence))
         if text and (text in quote or text in excerpt):
-            return _with_revenue_clauses(
-                text,
-                excerpt,
-                repair_revenue_sentence=repair_revenue_sentence,
-            )
+            return text
     chosen: list[str] = []
     heading_compact = re.sub(r"\s+", "", heading)
     for sentence in re.split(r"(?<=[。；;\n])", excerpt):
@@ -1949,62 +2067,44 @@ def _overview_source_text(
         )
         text = substance
     if text in quote:
-        chosen_text = text
-    elif excerpt in quote:
-        chosen_text = excerpt
-    else:
-        chosen_text = quote if quote in excerpt or excerpt in quote else ""
-    return _with_revenue_clauses(
-        chosen_text,
-        excerpt,
-        repair_revenue_sentence=repair_revenue_sentence,
-    )
+        return text
+    if excerpt in quote:
+        return excerpt
+    return quote if quote in excerpt or excerpt in quote else ""
 
 
-def _with_revenue_clauses(
-    chosen_text: str,
-    excerpt: str,
+def _revenue_sentence_records(
+    selection: CoreEvidenceSelection,
+    overview_item: PreparedEvidence,
     *,
-    repair_revenue_sentence: bool,
-) -> str:
-    """Extend through the company's revenue clause without leaving the excerpt."""
+    excerpt: str,
+    principal_text: str,
+) -> tuple[SemanticRecord, ...]:
+    """One accepted fact per company revenue sentence, without the text between them."""
 
-    if not repair_revenue_sentence or not chosen_text:
-        return chosen_text
-    joined = _join_wrapped_lines(excerpt)
-    compact_joined = re.sub(r"\s+", "", joined)
-    revenue_end = 0
+    principal = re.sub(r"\s+", "", principal_text)
+    records: list[SemanticRecord] = []
+    seen: set[str] = set()
     for clause in _reporting_company_revenue_clauses(excerpt):
-        start = compact_joined.find(clause)
-        if start < 0:
+        if not clause or clause in principal or clause in seen:
             continue
-        revenue_end = max(revenue_end, start + len(clause))
-    if revenue_end == 0:
-        return chosen_text
-    principal = re.sub(r"\s+", "", chosen_text)
-    principal_at = compact_joined.find(principal)
-    start = max(principal_at, 0)
-    if revenue_end <= start:
-        return chosen_text
-    covered = _original_span_between(excerpt, start, revenue_end)
-    if not covered:
-        return chosen_text
-    return covered
-
-
-def _original_span_between(text: str, compact_start: int, compact_end: int) -> str:
-    compact_chars = [
-        (index, _char) for index, _char in enumerate(text) if not _char.isspace()
-    ]
-    if (
-        compact_start < 0
-        or compact_end <= compact_start
-        or compact_end > len(compact_chars)
-    ):
-        return ""
-    return text[
-        compact_chars[compact_start][0] : compact_chars[compact_end - 1][0] + 1
-    ].strip()
+        seen.add(clause)
+        source_text = _original_span_matching(excerpt, clause) or clause
+        records.append(
+            _base_fact(
+                BusinessOverview,
+                report=selection.report,
+                record_id=(
+                    f"owned:{overview_item.evidence.evidence_id}:revenue:{len(seen)}"
+                ),
+                field_id="business_overview_source",
+                chapter_task=ChapterTask.EXTRACT_BUSINESS_OVERVIEW,
+                evidence=overview_item.evidence,
+                source_native=SourceNativeValue(name=clause[:80]),
+                source_text=source_text,
+            )
+        )
+    return tuple(records)
 
 
 def _reporting_company_revenue_clauses(excerpt: str) -> list[str]:
@@ -2012,10 +2112,11 @@ def _reporting_company_revenue_clauses(excerpt: str) -> list[str]:
 
     joined = _join_wrapped_lines(excerpt)
     clauses: list[str] = []
-    for clause in re.split(r"[。；;]", joined):
-        compact = re.sub(r"\s+", "", clause).strip()
-        if _is_reporting_company_revenue(compact):
-            clauses.append(compact)
+    for sentence in re.split(r"[。；;]", joined):
+        for piece in re.split(r"[，,]", sentence):
+            compact = re.sub(r"\s+", "", piece).strip()
+            if _is_reporting_company_revenue(compact):
+                clauses.append(compact)
     return clauses
 
 
@@ -2037,7 +2138,7 @@ def _is_reporting_company_revenue(compact: str) -> bool:
         return False
     if re.search(r"[\u4e00-\u9fff]{2,}(?:有限公司|股份有限公司)", compact):
         return False
-    return _overview_states_revenue(compact)
+    return _overview_states_revenue(compact, repair_revenue_sentence=True)
 
 
 def _activity_object_clauses(clause: str) -> list[str]:

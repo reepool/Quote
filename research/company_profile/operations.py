@@ -66,13 +66,13 @@ from research.company_profile.live_run import (
 from research.company_profile.m4_next_batch import (
     M4NextBatchOutcome,
     M4NextBatchPlan,
-    batch_directory,
     build_m4_next_batch_plan,
     delivered_instrument_ids,
     drift_reason,
     load_m4_next_batch_observation,
     load_m4_next_batch_observation_for_source_review,
     load_m4_next_batch_plan,
+    m4_snapshot_directory,
     merge_outcome,
     remaining_token_budget,
     save_m4_next_batch_observation,
@@ -419,6 +419,8 @@ class CompanyProfileTaskService:
         shared_asset_access: Any | None = None,
         candidate_registry: AShareCandidateRegistry | None = None,
         live_plan: CompanyProfileLivePlan | None = None,
+        processing_identity: Mapping[str, Any] | None = None,
+        plan_directory: str | Path | None = None,
     ) -> None:
         self.storage = storage
         self.output_root = Path(output_root)
@@ -427,7 +429,14 @@ class CompanyProfileTaskService:
         self.token_budget = max(0, int(token_budget))
         self.candidate_registry = candidate_registry
         self.live_plan = live_plan
-        self.processing_identity = default_processing_identity()
+        self.plan_directory = (
+            None if plan_directory is None else Path(plan_directory)
+        )
+        self.processing_identity = (
+            dict(processing_identity)
+            if processing_identity
+            else default_processing_identity()
+        )
         self.processing_identity_hash = _stable_hash(self.processing_identity)
         ensure_business_profile_storage_ready(storage)
         self.repository = BusinessProfileWorkRepository(
@@ -491,7 +500,15 @@ class CompanyProfileTaskService:
         output_directory: str | Path | None = None,
         candidate_registry: AShareCandidateRegistry | None = None,
         live_plan: CompanyProfileLivePlan | None = None,
+        processing_identity: Mapping[str, Any] | None = None,
+        work_id: str | None = None,
+        plan_directory: str | Path | None = None,
     ) -> dict[str, Any]:
+        if processing_identity:
+            self.processing_identity = dict(processing_identity)
+            self.processing_identity_hash = _stable_hash(self.processing_identity)
+        if plan_directory is not None:
+            self.plan_directory = Path(plan_directory)
         normalized = str(action or "").strip().lower()
         if normalized not in PUBLISHED_ACTIONS:
             raise ValueError(
@@ -509,11 +526,17 @@ class CompanyProfileTaskService:
         if normalized == "pause":
             return self.pause(reason=reason)
         if normalized == "query":
-            return self._query(instrument_ids=instruments)
+            return self._query(
+                instrument_ids=instruments,
+                processing_identity=processing_identity,
+                work_id=work_id,
+            )
         if normalized == "export":
             return self._export(
                 instrument_ids=instruments,
                 output_directory=output_directory,
+                processing_identity=processing_identity,
+                work_id=work_id,
             )
         registry = candidate_registry or self.candidate_registry
         plan = live_plan or self.live_plan
@@ -580,8 +603,18 @@ class CompanyProfileTaskService:
             state=str(self.control.read().get("state") or "idle"),
         )
 
-    def _query(self, *, instrument_ids: Sequence[str]) -> dict[str, Any]:
-        result = self.reads.query(instrument_ids)
+    def _query(
+        self,
+        *,
+        instrument_ids: Sequence[str],
+        processing_identity: Mapping[str, Any] | None = None,
+        work_id: str | None = None,
+    ) -> dict[str, Any]:
+        result = self.reads.query(
+            instrument_ids,
+            processing_identity=processing_identity,
+            work_id=work_id,
+        )
         return self._payload(**result)
 
     def _export(
@@ -589,10 +622,14 @@ class CompanyProfileTaskService:
         *,
         instrument_ids: Sequence[str],
         output_directory: str | Path | None,
+        processing_identity: Mapping[str, Any] | None = None,
+        work_id: str | None = None,
     ) -> dict[str, Any]:
         result = self.reads.export(
             instrument_ids,
             export_directory=output_directory,
+            processing_identity=processing_identity,
+            work_id=work_id,
         )
         return self._payload(**result)
 
@@ -626,7 +663,9 @@ class CompanyProfileTaskService:
                 selected,
                 tuple(enqueue_result.get("work_ids") or ()),
             )
-            batch_plan = load_m4_next_batch_plan(self.checkpoint_root)
+            batch_plan = load_m4_next_batch_plan(
+            self.checkpoint_root, plan_directory=self.plan_directory
+        )
             frozen_ids = (
                 {report.instrument_id for report in batch_plan.reports}
                 if batch_plan is not None
@@ -788,7 +827,9 @@ class CompanyProfileTaskService:
             binding_for=binding_for,
         )
         save_m4_next_batch_plan(self.checkpoint_root, plan)
-        stored = load_m4_next_batch_plan(self.checkpoint_root)
+        stored = load_m4_next_batch_plan(
+            self.checkpoint_root, plan_directory=self.plan_directory
+        )
         if stored is None:
             raise ValueError("m4 next batch plan was not readable after freeze")
         return stored
@@ -826,7 +867,9 @@ class CompanyProfileTaskService:
         if not requested:
             return tuple(instrument_ids)
         bindings = self._m4_official_bindings(requested, knowledge_cutoff)
-        observation = load_m4_next_batch_observation(self.checkpoint_root, plan)
+        observation = load_m4_next_batch_observation(
+            self.checkpoint_root, plan, plan_directory=self.plan_directory
+        )
         accepted: list[str] = []
         for instrument_id in instrument_ids:
             report = plan.report_for(instrument_id)
@@ -852,7 +895,9 @@ class CompanyProfileTaskService:
                     reason=reason,
                 ),
             )
-        save_m4_next_batch_observation(self.checkpoint_root, observation)
+        save_m4_next_batch_observation(
+            self.checkpoint_root, observation, plan_directory=self.plan_directory
+        )
         remaining = remaining_token_budget(observation)
         self.token_budget = remaining
         self.runtime.apply_token_budget(remaining)
@@ -912,7 +957,9 @@ class CompanyProfileTaskService:
             tokens_used=delta,
             reused_scope=reused_scope and delta == 0,
         )
-        observation = load_m4_next_batch_observation(self.checkpoint_root, plan)
+        observation = load_m4_next_batch_observation(
+            self.checkpoint_root, plan, plan_directory=self.plan_directory
+        )
         for index, instrument_id in enumerate(called):
             current = observation.outcome_for(instrument_id)
             if current is not None and current.status == "refused":
@@ -931,7 +978,9 @@ class CompanyProfileTaskService:
                     reason="call_failed" if failed else None,
                 ),
             )
-        save_m4_next_batch_observation(self.checkpoint_root, observation)
+        save_m4_next_batch_observation(
+            self.checkpoint_root, observation, plan_directory=self.plan_directory
+        )
 
     def _m4_outcome_status(
         self,
@@ -956,7 +1005,9 @@ class CompanyProfileTaskService:
         registry: AShareCandidateRegistry,
         knowledge_cutoff: str,
     ):
-        observation = load_m4_next_batch_observation(self.checkpoint_root, batch_plan)
+        observation = load_m4_next_batch_observation(
+            self.checkpoint_root, batch_plan, plan_directory=self.plan_directory
+        )
         selected = tuple(
             report.instrument_id
             for report in batch_plan.reports
@@ -974,7 +1025,11 @@ class CompanyProfileTaskService:
             delivered_instrument_ids=delivered,
             knowledge_cutoff=knowledge_cutoff,
         )
-        path = batch_directory(self.checkpoint_root, batch_plan.plan_id) / (
+        path = m4_snapshot_directory(
+            self.checkpoint_root,
+            batch_plan.plan_id,
+            plan_directory=self.plan_directory,
+        ) / (
             f"{LIVE_RUN_SCHEMA_VERSION}.json"
         )
         persist_live_run_report(report, self.checkpoint_root, destination=path)
@@ -995,7 +1050,9 @@ class CompanyProfileTaskService:
         | None = None,
     ) -> dict[str, Any]:
         requested_ids = tuple(instrument_ids)
-        batch_plan = load_m4_next_batch_plan(self.checkpoint_root)
+        batch_plan = load_m4_next_batch_plan(
+            self.checkpoint_root, plan_directory=self.plan_directory
+        )
         if batch_plan is not None and enqueue:
             instrument_ids = self._apply_m4_next_batch_gate(
                 plan=batch_plan,
@@ -1403,6 +1460,9 @@ async def execute_published_task(
     output_directory: str | Path | None = None,
     candidate_registry: AShareCandidateRegistry | None = None,
     live_plan: CompanyProfileLivePlan | None = None,
+    processing_identity: Mapping[str, Any] | None = None,
+    work_id: str | None = None,
+    plan_directory: str | Path | None = None,
 ) -> dict[str, Any]:
     """Unique owner entry for the published company-profile task operations."""
 
@@ -1432,6 +1492,8 @@ async def execute_published_task(
         shared_asset_access=access,
         candidate_registry=registry,
         live_plan=live_plan,
+        processing_identity=processing_identity,
+        plan_directory=plan_directory,
     )
     return await service.execute(
         action,
@@ -1444,6 +1506,9 @@ async def execute_published_task(
         output_directory=output_directory,
         candidate_registry=registry,
         live_plan=live_plan,
+        processing_identity=processing_identity,
+        work_id=work_id,
+        plan_directory=plan_directory,
     )
 
 
@@ -1457,23 +1522,31 @@ def record_published_source_review(
     tokens_used: int | None = None,
     elapsed_seconds: float | None = None,
     human_review_minutes: float | None = None,
+    plan_directory: str | Path | None = None,
 ) -> dict[str, Any]:
     """Unique owner entry for independent source review after a live run."""
 
-    batch_plan = load_m4_next_batch_plan(checkpoint_root)
-    if batch_plan is not None:
-        load_m4_next_batch_observation_for_source_review(checkpoint_root)
-        live_path = batch_directory(checkpoint_root, batch_plan.plan_id) / (
-            f"{LIVE_RUN_SCHEMA_VERSION}.json"
+    batch_plan = load_m4_next_batch_plan(
+        checkpoint_root, plan_directory=plan_directory
+    )
+    if batch_plan is not None and (
+        plan_directory is not None or load_m4_next_batch_plan(checkpoint_root) is not None
+    ):
+        load_m4_next_batch_observation_for_source_review(
+            checkpoint_root, plan_directory=plan_directory
         )
+        snapshot = m4_snapshot_directory(
+            checkpoint_root,
+            batch_plan.plan_id,
+            plan_directory=plan_directory,
+        )
+        live_path = snapshot / f"{LIVE_RUN_SCHEMA_VERSION}.json"
         if not live_path.is_file():
             raise ValueError("m4 next-batch source review requires the merged live-run")
         live_run = CompanyProfileLiveRunReport.model_validate_json(
             live_path.read_text(encoding="utf-8")
         )
-        destination = batch_directory(checkpoint_root, batch_plan.plan_id) / (
-            f"{SOURCE_REVIEW_SCHEMA_VERSION}.json"
-        )
+        destination = snapshot / f"{SOURCE_REVIEW_SCHEMA_VERSION}.json"
     else:
         live_run = load_live_run_report(checkpoint_root)
         destination = None

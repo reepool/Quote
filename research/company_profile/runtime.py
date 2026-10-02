@@ -410,6 +410,9 @@ class CompanyProfileStageRuntime:
             report=state.report,
             pages=state.pages,
             accepted_records=state.accepted_records,
+            repair_revenue_sentence=revenue_sentence_repair_requested(
+                state.processing_identity
+            ),
         )
         state.chapters = select_activated_chapters(state.pages)
         state.provider_blocked = any(
@@ -568,6 +571,9 @@ class CompanyProfileStageRuntime:
         state.assessment = project_core_assessment(
             report=state.report,
             task_results=state.task_results,
+            repair_revenue_sentence=revenue_sentence_repair_requested(
+                state.processing_identity
+            ),
         )
         self._persist_work(state)
         return self._result(state, status="success", stage="verify")

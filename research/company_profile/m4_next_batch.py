@@ -94,9 +94,31 @@ def batch_directory(root: str | Path, plan_id: str) -> Path:
     return Path(root) / "reports" / _BATCH_DIRNAME / plan_id
 
 
-def load_m4_next_batch_plan(root: str | Path) -> M4NextBatchPlan | None:
+def m4_snapshot_directory(
+    root: str | Path,
+    plan_id: str,
+    *,
+    plan_directory: str | Path | None = None,
+) -> Path:
+    """Old rounds stay under the unique batch directory. A repair names its own."""
+
+    if plan_directory is not None:
+        return Path(plan_directory)
+    return batch_directory(root, plan_id)
+
+
+def load_m4_next_batch_plan(
+    root: str | Path,
+    *,
+    plan_directory: str | Path | None = None,
+) -> M4NextBatchPlan | None:
     """Load the single frozen plan for this round, if one has been written."""
 
+    if plan_directory is not None:
+        path = Path(plan_directory) / "plan.json"
+        if not path.is_file():
+            return None
+        return M4NextBatchPlan.model_validate_json(path.read_text(encoding="utf-8"))
     parent = Path(root) / "reports" / _BATCH_DIRNAME
     if not parent.is_dir():
         return None
@@ -108,15 +130,24 @@ def load_m4_next_batch_plan(root: str | Path) -> M4NextBatchPlan | None:
     return M4NextBatchPlan.model_validate_json(plans[0].read_text(encoding="utf-8"))
 
 
-def save_m4_next_batch_plan(root: str | Path, plan: M4NextBatchPlan) -> Path:
+def save_m4_next_batch_plan(
+    root: str | Path,
+    plan: M4NextBatchPlan,
+    *,
+    plan_directory: str | Path | None = None,
+) -> Path:
     """Write the plan once. A different sample or version is refused."""
 
-    existing = load_m4_next_batch_plan(root)
+    existing = load_m4_next_batch_plan(root, plan_directory=plan_directory)
     if existing is not None:
         if existing != plan:
             raise ValueError("frozen m4 next batch plan cannot be replaced")
-        return batch_directory(root, existing.plan_id) / "plan.json"
-    path = batch_directory(root, plan.plan_id) / "plan.json"
+        return m4_snapshot_directory(
+            root, existing.plan_id, plan_directory=plan_directory
+        ) / "plan.json"
+    path = m4_snapshot_directory(
+        root, plan.plan_id, plan_directory=plan_directory
+    ) / "plan.json"
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(plan.model_dump_json(indent=2) + "\n", encoding="utf-8")
     return path
@@ -125,8 +156,12 @@ def save_m4_next_batch_plan(root: str | Path, plan: M4NextBatchPlan) -> Path:
 def load_m4_next_batch_observation(
     root: str | Path,
     plan: M4NextBatchPlan,
+    *,
+    plan_directory: str | Path | None = None,
 ) -> M4NextBatchObservation:
-    path = batch_directory(root, plan.plan_id) / "observation.json"
+    path = m4_snapshot_directory(
+        root, plan.plan_id, plan_directory=plan_directory
+    ) / "observation.json"
     if not path.is_file():
         return M4NextBatchObservation(
             plan_id=plan.plan_id,
@@ -139,8 +174,12 @@ def load_m4_next_batch_observation(
 def save_m4_next_batch_observation(
     root: str | Path,
     observation: M4NextBatchObservation,
+    *,
+    plan_directory: str | Path | None = None,
 ) -> Path:
-    path = batch_directory(root, observation.plan_id) / "observation.json"
+    path = m4_snapshot_directory(
+        root, observation.plan_id, plan_directory=plan_directory
+    ) / "observation.json"
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(observation.model_dump_json(indent=2), encoding="utf-8")
     return path
@@ -148,13 +187,17 @@ def save_m4_next_batch_observation(
 
 def load_m4_next_batch_observation_for_source_review(
     root: str | Path,
+    *,
+    plan_directory: str | Path | None = None,
 ) -> M4NextBatchObservation:
     """Source review reads the merged round, not one call's securities."""
 
-    plan = load_m4_next_batch_plan(root)
+    plan = load_m4_next_batch_plan(root, plan_directory=plan_directory)
     if plan is None:
         raise ValueError("m4 next-batch source review requires the frozen plan")
-    observation = load_m4_next_batch_observation(root, plan)
+    observation = load_m4_next_batch_observation(
+        root, plan, plan_directory=plan_directory
+    )
     missing = [
         report.instrument_id
         for report in plan.reports

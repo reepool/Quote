@@ -75,11 +75,21 @@ class CompanyProfileReadService:
             Path(path) for path in protected_export_roots
         )
 
-    def query(self, instrument_ids: Sequence[str] = ()) -> dict[str, Any]:
+    def query(
+        self,
+        instrument_ids: Sequence[str] = (),
+        *,
+        processing_identity: Mapping[str, Any] | None = None,
+        work_id: str | None = None,
+    ) -> dict[str, Any]:
         requested = tuple(
             str(item).strip() for item in instrument_ids if str(item).strip()
         )
-        profiles, missing = self._select_profiles(requested)
+        profiles, missing = self._select_profiles(
+            requested,
+            processing_identity=processing_identity,
+            work_id=work_id,
+        )
         if profiles:
             state = "found"
         elif requested:
@@ -104,10 +114,16 @@ class CompanyProfileReadService:
         self,
         instrument_ids: Sequence[str] = (),
         export_directory: str | Path | None = None,
+        processing_identity: Mapping[str, Any] | None = None,
+        work_id: str | None = None,
     ) -> dict[str, Any]:
         if export_directory is None or not str(export_directory).strip():
             raise ValueError("export directory is required")
-        queried = self.query(instrument_ids)
+        queried = self.query(
+            instrument_ids,
+            processing_identity=processing_identity,
+            work_id=work_id,
+        )
         profiles = list(queried.get("profiles") or [])
         views = list(queried.get("stage4_restricted_views") or [])
         target = _resolve_export_directory(Path(export_directory))
@@ -158,8 +174,14 @@ class CompanyProfileReadService:
     def _select_profiles(
         self,
         instrument_ids: Sequence[str],
+        *,
+        processing_identity: Mapping[str, Any] | None = None,
+        work_id: str | None = None,
     ) -> tuple[list[dict[str, Any]], list[str]]:
-        latest = self._latest_by_instrument()
+        latest = self._latest_by_instrument(
+            processing_identity=processing_identity,
+            work_id=work_id,
+        )
         if instrument_ids:
             selected = [
                 latest[instrument_id]
@@ -176,10 +198,18 @@ class CompanyProfileReadService:
             missing = []
         return [self.render_profile(item) for item in selected], missing
 
-    def _latest_by_instrument(self) -> dict[str, CompanyProfileRuntimeRecord]:
+    def _latest_by_instrument(
+        self,
+        *,
+        processing_identity: Mapping[str, Any] | None = None,
+        work_id: str | None = None,
+    ) -> dict[str, CompanyProfileRuntimeRecord]:
         latest: dict[str, CompanyProfileRuntimeRecord] = {}
         if not self.namespace_root.is_dir():
             return latest
+        wanted_identity = (
+            None if processing_identity is None else dict(processing_identity)
+        )
         for path in self.namespace_root.glob("*.json"):
             if not path.is_file():
                 continue
@@ -188,6 +218,13 @@ class CompanyProfileReadService:
                     path.read_text(encoding="utf-8")
                 )
             except (OSError, ValueError):
+                continue
+            if work_id and record.work_id != work_id:
+                continue
+            if (
+                wanted_identity is not None
+                and _record_processing_identity(record) != wanted_identity
+            ):
                 continue
             instrument_id = record.report.instrument_id
             current = latest.get(instrument_id)

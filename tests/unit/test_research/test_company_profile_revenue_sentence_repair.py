@@ -88,6 +88,105 @@ def test_repair_marker_delivers_the_company_revenue_sentence(tmp_path):
     assert exported["production_authorization"] == "not_authorized"
 
 
+_SANDWICH = """报告期内公司从事的业务情况
+公司主要从事写字楼、商城和公寓出租。
+香格里拉营业收入主要来源于客房及餐饮。
+公司并未形成新的营业收入来源。
+公司的营业
+收入主要来源于租金。
+国贸有限公司的营业收入主要来源于物业管理。
+公司的营业收入主要来源于物业出租。
+"""
+
+_COMMA_SENTENCE = (
+    "报告期内公司从事的业务情况\n"
+    "公司主要从事写字楼出租，公司的营业收入主要来源于租金。\n"
+)
+
+
+async def _drive(runtime, item) -> None:
+    for stage in WORK_STAGES:
+        await runtime(stage, item)
+
+
+def test_intervening_third_party_and_denial_stay_out_of_the_answer(tmp_path):
+    identities = {
+        "marked": _identity(revenue_sentence_repair="v1"),
+        "plain": default_processing_identity(),
+        "other": _identity(successor="v9"),
+    }
+    for name, identity in identities.items():
+        root = tmp_path / name
+        asyncio.run(_drive(
+            CompanyProfileStageRuntime(
+                writer=CompanyProfileResearchWriter(root),
+                provider=None,
+            ),
+            {
+                "work_id": f"work-{name}",
+                "instrument_id": "600007.SH",
+                "report": _report(
+                    instrument_id="600007.SH",
+                    report_id="1225071290",
+                ).model_dump(mode="json"),
+                "pages": [{"page": 14, "text": _SANDWICH, "readable": True}],
+                "processing_identity": identity,
+            },
+        ))
+        revenue = _revenue(
+            CompanyProfileReadService(root).query(("600007.SH",))["profiles"][0]
+        )
+        excerpt = "".join((revenue["excerpt"] or "").split())
+        if name == "marked":
+            assert revenue["answered"] is True
+            assert "营业收入主要来源于租金" in excerpt
+            assert "营业收入主要来源于物业出租" in excerpt
+            assert "香格里拉营业收入" not in excerpt
+            assert "国贸有限公司的营业收入" not in excerpt
+            assert "并未形成" not in excerpt
+            assert len(revenue["evidence_ids"]) >= 1
+            assert len(revenue["supporting_record_ids"]) >= 2
+        else:
+            assert revenue["answered"] is False
+            assert revenue["missing_reason"] == "overview_lacks_dimension"
+
+
+def test_same_sentence_revenue_clause_stays_on_the_parent_rule(tmp_path):
+    text = _COMMA_SENTENCE
+    for name, identity, answered in (
+        ("marked", _identity(revenue_sentence_repair="v1"), True),
+        ("plain", default_processing_identity(), False),
+        ("other", _identity(owned_page_facts="v8", successor="v9"), False),
+    ):
+        root = tmp_path / name
+        asyncio.run(_drive(
+            CompanyProfileStageRuntime(
+                writer=CompanyProfileResearchWriter(root),
+                provider=None,
+            ),
+            {
+                "work_id": f"work-comma-{name}",
+                "instrument_id": "600007.SH",
+                "report": _report(
+                    instrument_id="600007.SH",
+                    report_id="1225071290",
+                ).model_dump(mode="json"),
+                "pages": [{"page": 14, "text": text, "readable": True}],
+                "processing_identity": identity,
+            },
+        ))
+        revenue = _revenue(
+            CompanyProfileReadService(root).query(("600007.SH",))["profiles"][0]
+        )
+        excerpt = "".join((revenue["excerpt"] or "").split())
+        assert revenue["answered"] is answered
+        if answered:
+            assert "营业收入主要来源于租金" in excerpt
+        else:
+            assert revenue["missing_reason"] == "overview_lacks_dimension"
+            assert "营业收入主要来源于" not in excerpt
+
+
 def test_unmarked_identity_keeps_the_revenue_gap(tmp_path):
     marked_root = tmp_path / "other-identity"
     plain_root = tmp_path / "plain"
