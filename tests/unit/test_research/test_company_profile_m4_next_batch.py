@@ -704,6 +704,95 @@ def test_explicit_directory_freeze_does_not_replace_the_old_plan(tmp_path):
     assert load_m4_next_batch_plan(service.checkpoint_root).plan_id == old.plan_id
 
 
+def test_v6_unseen_freeze_skips_companies_observed_under_older_identities(tmp_path):
+    """Same-identity delivery misses 600007 and 600010. The caller passes them."""
+
+    candidates = (
+        _named("600000.SH", "SSE", "银行"),
+        _named("600007.SH", "SSE", "环保"),
+        _named("600008.SH", "SSE", "环保"),
+        _named("600011.SH", "SSE", "环保"),
+        _named("600010.SH", "SSE", "钢铁"),
+        _named("600019.SH", "SSE", "钢铁"),
+        _named("600022.SH", "SSE", "钢铁"),
+        _named("302132.SZ", "SZSE", "钢铁"),
+        _named("000011.SZ", "SZSE", "环保"),
+    )
+    bindings = {
+        item.instrument_id: {
+            "asset_id": f"asset-{item.instrument_id}",
+            "report_id": f"report-{item.instrument_id}",
+            "report_period": "2025-12-31",
+            "document_version": f"ver-{item.instrument_id}",
+        }
+        for item in candidates
+    }
+    storage = _storage(tmp_path)
+    service = _service(
+        tmp_path,
+        storage,
+        provider=_RequestBoundOverviewProvider(),
+        plan_directory=tmp_path / "m4-v6-unseen",
+    )
+    same_identity = service.freeze_m4_next_batch_plan(
+        knowledge_cutoff="2026-09-17",
+        registry=SimpleNamespace(candidates=candidates),
+        delivered_ids={"600008.SH", "600019.SH"},
+        readable=lambda candidate: candidate.asset_status == "available",
+        binding_for=bindings.get,
+    )
+    assert [item.instrument_id for item in same_identity.reports] == [
+        "600007.SH",
+        "600010.SH",
+    ]
+    observed = {
+        "302132.SZ",
+        "600000.SH",
+        "600004.SH",
+        "600006.SH",
+        "600007.SH",
+        "600008.SH",
+        "600010.SH",
+        "600019.SH",
+    }
+    unseen_dir = tmp_path / "m4-v6-unseen-pass"
+    unseen = _service(
+        tmp_path,
+        storage,
+        provider=_RequestBoundOverviewProvider(),
+        plan_directory=unseen_dir,
+    )
+    plan = unseen.freeze_m4_next_batch_plan(
+        knowledge_cutoff="2026-09-17",
+        registry=SimpleNamespace(candidates=candidates),
+        delivered_ids=observed,
+        readable=lambda candidate: candidate.asset_status == "available",
+        binding_for=bindings.get,
+    )
+    again = unseen.freeze_m4_next_batch_plan(
+        knowledge_cutoff="2026-09-17",
+        registry=SimpleNamespace(candidates=candidates),
+        delivered_ids=observed,
+        readable=lambda candidate: candidate.asset_status == "available",
+        binding_for=bindings.get,
+    )
+    loaded = load_m4_next_batch_plan(
+        unseen.checkpoint_root, plan_directory=unseen_dir
+    )
+    assert plan == again == loaded
+    assert [item.instrument_id for item in plan.reports] == [
+        "600011.SH",
+        "600022.SH",
+    ]
+    assert plan.knowledge_cutoff == "2026-09-17"
+    assert plan.token_budget == 50_000
+    assert {item.disclosure_form for item in plan.reports} == {
+        "service",
+        "manufacturing",
+    }
+    assert observed.isdisjoint(item.instrument_id for item in plan.reports)
+
+
 def test_freeze_refuses_when_a_disclosure_form_has_no_candidate(tmp_path):
     storage = _storage(tmp_path)
     service = _service(tmp_path, storage, provider=_RequestBoundOverviewProvider())
