@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+import re
 
 from research.company_profile.execution import default_processing_identity
 from research.company_profile.reads import CompanyProfileReadService
@@ -244,6 +245,72 @@ def test_sinopec_profile_industry_table_and_internal_sales(tmp_path):
         for item in result["query"]["commodity_exposure"]["assessment"]["exposures"]
     }
     assert exposures["化工原料油"]["mapping_status"] == "pending"
+
+
+def test_wutong_toll_answers_and_blocked_measurements_are_delivered(tmp_path):
+    result = _drive(
+        tmp_path / "wutong",
+        "600012.SH",
+        "1225088001",
+        [
+            {
+                "page": 16,
+                "text": (
+                    "报告期内公司从事的业务情况\n"
+                    "公司的主营业务为投资、建设、运营及管理安徽省境内的部分收费公路。公司通过\n"
+                    "投资建设、收购或合作经营等多种方式获得经营性公路资产，为过往车辆提供通行\n"
+                    "服务，按照收费标准收取车辆通行费，并对运营公路进行养护维修和安全维护。\n"
+                ),
+                "readable": True,
+            },
+            {
+                "page": 25,
+                "text": (
+                    "2、收入和成本分析\n"
+                    "√适用 □不适用\n"
+                    "本集团报告期内实现营业收入 672,157.42 万元，其中主营业务收入 662,740.17 万\n"
+                    "元（包含收费公路业务营业收入 508,231.97 万元，建造服务收入 154,508.20 万\n"
+                    "元），其他业务收入 9,417.25 万元。\n"
+                    "(1). 主营业务分行业、分产品、分地区、分销售模式情况\n"
+                    "单位：元 币种：人民币\n"
+                    "主营业务分行业情况\n"
+                    "分行业 营业收入 营业成本\n"
+                    "收费公路业务 5,082,319,695.11 2,152,079,827.68 57.66 13.29\n"
+                    "建造服务收入/成\n"
+                    "本\n"
+                    "1,545,081,974.52 1,545,081,974.52 0.00 -50.69 -50.69\n"
+                    "主营业务分产品情况\n"
+                    "分产品 营业收入 营业成本\n"
+                    "合宁高速公路 1,487,013,977.77 537,750,350.15 63.84 7.08\n"
+                    "205 国道天长段新\n"
+                    "线\n"
+                    "87,442,156.79 43,291,675.18 50.49 8.04\n"
+                    "建造期收入/成本 1,545,081,974.52 1,545,081,974.52 0.00 -50.69\n"
+                    "主营业务分地区情况\n"
+                    "分地区 营业收入 营业成本\n"
+                    "安徽省 6,627,401,669.63 3,697,161,802.20 44.21 -13.02\n"
+                ),
+                "readable": True,
+            },
+        ],
+    )
+    for profile in (result["query"], result["export"]):
+        products = re.sub(r"\s+", "", _dimension(profile, "products_services"))
+        revenue = re.sub(r"\s+", "", _dimension(profile, "revenue_model"))
+        assert "通行服务" in products
+        assert "收取车辆通行费" in revenue or "通行服务" in products
+        revenues = [
+            item
+            for item in profile["accepted_facts"]
+            if item["field_id"] == "operating_revenue"
+        ]
+        names = {item.get("source_native_name") for item in revenues}
+        assert {"收费公路业务", "建造服务收入/成本", "205国道天长段新线",
+                "建造期收入/成本", "合宁高速公路", "安徽省"} <= names
+        for item in revenues:
+            assert item["source_native_value"]
+            assert item["source_native_unit"] == "元"
+    assert result["query"]["dimensions"][2]["answered"] is True
 
 
 def test_wrapped_spaced_product_row_keeps_industry_revenue_accepted(tmp_path):

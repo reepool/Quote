@@ -119,6 +119,9 @@ _MAIN_BUSINESS_SENTENCE = re.compile(
 _INTEGRATED_BUSINESS_SENTENCE = re.compile(
     r"(?:中国石化是|公司是)[^。]{8,900}主要从事[^。]{8,900}"
 )
+_TOLL_SERVICE_SENTENCE = re.compile(
+    r"公司的主营业务为[^。]{4,120}。[^。]{0,120}?通行服务[^。]{2,160}"
+)
 _CORE_ANSWER_SUBSTANCE = re.compile(
     _COMPANY_BUSINESS_SENTENCE.pattern + "|" + _STEEL_BUSINESS_SENTENCE.pattern
 )
@@ -1231,8 +1234,10 @@ def _project_overview_span(
     if core_answer_repair and not company_sentence:
         company_sentence = _steel_business_source(span.excerpt)
     if source_delivery_repair:
-        delivered = _main_business_source(span.excerpt) or _integrated_business_source(
-            span.excerpt
+        delivered = (
+            _main_business_source(span.excerpt)
+            or _integrated_business_source(span.excerpt)
+            or _toll_service_source(span.excerpt)
         )
         if delivered:
             company_sentence = delivered
@@ -1344,6 +1349,9 @@ def _project_segment_span(
     )
     if revenue_item is not None and isinstance(revenue_item.evidence.anchor, TextAnchor):
         quote = quote or revenue_item.evidence.anchor.bounded_quote
+    # The bounded quote carries the passage's own group wording (本集团…), which
+    # the acceptance policy checks; bind the subject from that same text.
+    subject_text = f"{span.excerpt}\n{quote}" if quote else span.excerpt
     column_unit = (
         "百万元"
         if source_delivery_repair and "人民币百万元" in re.sub(r"\s+", "", excerpt)
@@ -1441,6 +1449,7 @@ def _project_segment_span(
                     ),
                     dimension=row_dimension,
                     label=label,
+                    excerpt_subject=subject_text,
                 )
             )
         if revenue_item is not None and unit:
@@ -1466,6 +1475,7 @@ def _project_segment_span(
                     measured_object=label,
                     segment_dimension=row_dimension,
                     segment_label=label,
+                    excerpt_subject=subject_text,
                 )
             )
     return tuple(records)
@@ -1876,7 +1886,7 @@ def _join_segment_label_amounts(
         nxt = lines[index + 1] if index + 1 < len(lines) else ""
         compact_label = re.sub(r"\s+", "", current)
         if (
-            re.fullmatch(r"[\u4e00-\u9fff]{2,12}", compact_label)
+            re.fullmatch(r"[\u4e00-\u9fff0-9/]{2,12}", compact_label)
             and re.match(r"\s*-?[\d,]", nxt)
         ):
             merged.append(f"{compact_label} {nxt.strip()}")
@@ -2336,6 +2346,17 @@ def _main_business_source(excerpt: str) -> str:
 
     joined = _join_pdf_soft_breaks(excerpt)
     match = _MAIN_BUSINESS_SENTENCE.search(joined)
+    if match is None:
+        return ""
+    compact = re.sub(r"\s+", "", match.group(0))
+    return _original_span_matching(excerpt, compact) or ""
+
+
+def _toll_service_source(excerpt: str) -> str:
+    """The 主营业务为 sentence plus its following toll-service mechanism."""
+
+    joined = _join_pdf_soft_breaks(excerpt)
+    match = _TOLL_SERVICE_SENTENCE.search(joined)
     if match is None:
         return ""
     compact = re.sub(r"\s+", "", match.group(0))
@@ -3019,13 +3040,25 @@ def _parse_segment_row(line: str) -> tuple[str, str, str | None] | None:
     if len(tokens) < 3:
         return None
     label = tokens[0]
+    numbers = tokens[1:]
+    # A road row names the road with digits ("205 国道天长段新线"); the leading
+    # number belongs to the label, not the amount column.
+    if (
+        label.isdigit()
+        and numbers
+        and re.search(r"[\u4e00-\u9fff]", numbers[0])
+        and not re.fullmatch(r"-?[\d,]+(?:\.\d+)?%?", numbers[0])
+    ):
+        label = f"{label}{numbers[0]}"
+        numbers = numbers[1:]
     if (
         label in _SKIP_SEGMENT_LABELS
         or "合计" in label
-        or tokens[1] == "营业收入"
-        or not re.fullmatch(r"[\u4e00-\u9fffA-Za-z0-9（）]{2,20}", label)
-        or not re.fullmatch(r"-?[\d,]+(?:\.\d+)?", tokens[1])
-        or not re.fullmatch(r"-?[\d,]+(?:\.\d+)?%?", tokens[2])
+        or len(numbers) < 2
+        or numbers[0] == "营业收入"
+        or not re.fullmatch(r"[\u4e00-\u9fffA-Za-z0-9（）/]{2,20}", label)
+        or not re.fullmatch(r"-?[\d,]+(?:\.\d+)?", numbers[0])
+        or not re.fullmatch(r"-?[\d,]+(?:\.\d+)?%?", numbers[1])
     ):
         return None
-    return label, tokens[1], tokens[2]
+    return label, numbers[0], numbers[1]

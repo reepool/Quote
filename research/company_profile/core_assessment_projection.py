@@ -57,7 +57,8 @@ _REVENUE_INFLOW_PATTERN = re.compile(
     r"向客户收取|"
     r"(?:公司|本公司)(?:收取|取得|获得).{0,16}(?:货款|价款|服务费|手续费|佣金|保费)|"
     r"利息净收入|分成收入|经纪业务收入|保费收入|"
-    r"手续费及佣金(?:净)?收入|(?:服务费|手续费|佣金)收入)"
+    r"手续费及佣金(?:净)?收入|(?:服务费|手续费|佣金)收入|"
+    r"收取车辆通行费|通行费收入)"
 )
 _REVENUE_BLOCK_PATTERN = re.compile(
     r"(免费|无偿|不收取|未收取|并不收取|无需(?:支付|收取)|向(?:公司|本公司)收取)"
@@ -372,7 +373,7 @@ def _assess_products_services(
                 _PRODUCT_PATTERN.search(record.source_text)
                 or (
                     source_delivery_repair
-                    and re.search(r"主要业务是|主要从事", record.source_text or "")
+                    and re.search(r"主要业务是|主要从事|主营业务为", record.source_text or "")
                 )
             )
         ):
@@ -382,7 +383,7 @@ def _assess_products_services(
             record
             for record in supports
             if isinstance(record, BusinessOverview)
-            and re.search(r"主要产品有|主要业务是|主要从事", record.source_text or "")
+            and re.search(r"主要产品有|主要业务是|主要从事|主营业务为", record.source_text or "")
         ]
         if series:
             supports = [*series, *[record for record in supports if record not in series]]
