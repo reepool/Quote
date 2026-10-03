@@ -110,6 +110,16 @@ _OVERVIEW_SUBSTANCE = re.compile(
 _COMPANY_BUSINESS_SENTENCE = re.compile(
     r"(?<![\u4e00-\u9fff])(?:本公司|公司)(?:业务覆盖|专注于)[^。；;]{2,160}"
 )
+_STEEL_BUSINESS_SENTENCE = re.compile(
+    r"(?<![\u4e00-\u9fff])公司是[^。]{8,260}主要产品有[^。]{2,80}"
+)
+_CORE_ANSWER_SUBSTANCE = re.compile(
+    _COMPANY_BUSINESS_SENTENCE.pattern + "|" + _STEEL_BUSINESS_SENTENCE.pattern
+)
+_SPEC_OBJECT = re.compile(r"^(?:厚度|宽度|长度)")
+_REVENUE_PARENT_LABELS = frozenset({"航空性收入", "非航空性收入"})
+_AUDIT_PROCEDURE = re.compile(r"函证|截止测试|选取样本|关键审计事项|审计中的应对")
+_RESUME_CLAUSE = re.compile(r"历任|曾任")
 _PSEUDO_SALES = re.compile(r"销售(?:模式|区域|部)")
 _REVENUE_OBJECT = re.compile(
     r"([\u4e00-\u9fffA-Za-z0-9（）()]{2,40}?)\s*"
@@ -205,6 +215,7 @@ def select_core_evidence(
     repair_revenue_sentence: bool = False,
     named_role_repair: bool = False,
     service_operating_energy: bool = False,
+    core_answer_repair: bool = False,
 ) -> CoreEvidenceSelection:
     """Select bounded core Evidence without a frozen per-company page plan."""
 
@@ -221,7 +232,11 @@ def select_core_evidence(
         chapter_task=ChapterTask.EXTRACT_BUSINESS_OVERVIEW,
         field_ids=("business_overview_source", "explicit_activity"),
         require_substance=True,
-        substance_extra=_COMPANY_BUSINESS_SENTENCE if named_role_repair else None,
+        substance_extra=(
+            _CORE_ANSWER_SUBSTANCE
+            if core_answer_repair
+            else _COMPANY_BUSINESS_SENTENCE if named_role_repair else None
+        ),
     )
     if overview.span is None:
         labeled = _select_owned_span(
@@ -996,6 +1011,7 @@ REVENUE_SENTENCE_REPAIR_V3 = "v3"
 REVENUE_SENTENCE_REPAIR_V4 = "v4"
 REVENUE_SENTENCE_REPAIR_V5 = "v5"
 REVENUE_SENTENCE_REPAIR_V6 = "v6"
+REVENUE_SENTENCE_REPAIR_V7 = "v7"
 _REVENUE_SENTENCE_REPAIR_VERSIONS = frozenset(
     {
         REVENUE_SENTENCE_REPAIR_V1,
@@ -1004,6 +1020,7 @@ _REVENUE_SENTENCE_REPAIR_VERSIONS = frozenset(
         REVENUE_SENTENCE_REPAIR_V4,
         REVENUE_SENTENCE_REPAIR_V5,
         REVENUE_SENTENCE_REPAIR_V6,
+        REVENUE_SENTENCE_REPAIR_V7,
     }
 )
 
@@ -1035,6 +1052,7 @@ def named_role_repair_requested(identity: Mapping[str, Any] | None) -> bool:
         REVENUE_SENTENCE_REPAIR_V4,
         REVENUE_SENTENCE_REPAIR_V5,
         REVENUE_SENTENCE_REPAIR_V6,
+        REVENUE_SENTENCE_REPAIR_V7,
     }
 
 
@@ -1047,7 +1065,23 @@ def service_operating_energy_requested(identity: Mapping[str, Any] | None) -> bo
 
     if not isinstance(identity, Mapping):
         return False
-    return identity.get(REVENUE_SENTENCE_REPAIR) == REVENUE_SENTENCE_REPAIR_V6
+    return identity.get(REVENUE_SENTENCE_REPAIR) in {
+        REVENUE_SENTENCE_REPAIR_V6,
+        REVENUE_SENTENCE_REPAIR_V7,
+    }
+
+
+def core_answer_repair_requested(identity: Mapping[str, Any] | None) -> bool:
+    """Return whether this identity delivers substantive core answers.
+
+    ``v7`` still carries the named-role and service-energy repairs. It also
+    keeps a steel business sentence, a parent-child revenue table, and
+    row-level supply bindings.
+    """
+
+    if not isinstance(identity, Mapping):
+        return False
+    return identity.get(REVENUE_SENTENCE_REPAIR) == REVENUE_SENTENCE_REPAIR_V7
 
 
 def project_owned_page_facts(
@@ -1057,6 +1091,7 @@ def project_owned_page_facts(
     repair_revenue_sentence: bool = False,
     named_role_repair: bool = False,
     service_operating_energy: bool = False,
+    core_answer_repair: bool = False,
 ) -> tuple[SemanticRecord, ...]:
     """Project source-native core facts already stated in owned excerpts."""
 
@@ -1071,13 +1106,20 @@ def project_owned_page_facts(
                     span,
                     repair_revenue_sentence=repair_revenue_sentence,
                     named_role_repair=named_role_repair,
+                    core_answer_repair=core_answer_repair,
                 )
             )
         elif span.chapter_task == ChapterTask.EXTRACT_SEGMENT_FINANCIALS.value:
             if span.section_title in _INCOME_ANALYSIS_HEADINGS:
                 records.extend(_project_income_analysis_span(selection, span))
             else:
-                records.extend(_project_segment_span(selection, span))
+                records.extend(
+                    _project_segment_span(
+                        selection,
+                        span,
+                        core_answer_repair=core_answer_repair,
+                    )
+                )
                 records.extend(_project_company_total_rows(selection, span))
         elif span.chapter_task == ChapterTask.EXTRACT_MATERIAL_INPUTS.value:
             records.extend(_project_material_span(selection, span))
@@ -1092,6 +1134,7 @@ def project_owned_page_facts(
                     span,
                     named_role_repair=named_role_repair,
                     service_operating_energy=service_operating_energy,
+                    core_answer_repair=core_answer_repair,
                 )
             )
     return _dedupe_owned_records(records)
@@ -1118,6 +1161,7 @@ def _project_overview_span(
     *,
     repair_revenue_sentence: bool = False,
     named_role_repair: bool = False,
+    core_answer_repair: bool = False,
 ) -> tuple[SemanticRecord, ...]:
     overview_item = _prepared_for(selection, span, "business_overview_source")
     activity_item = _prepared_for(selection, span, "explicit_activity")
@@ -1125,6 +1169,8 @@ def _project_overview_span(
     company_sentence = (
         _company_business_source(span.excerpt) if named_role_repair else ""
     )
+    if core_answer_repair and not company_sentence:
+        company_sentence = _steel_business_source(span.excerpt)
     if overview_item is not None and (
         _excerpt_states_owned_overview(span.excerpt) or company_sentence
     ):
@@ -1177,6 +1223,8 @@ def _project_overview_span(
                 verb = "涵盖"
             for raw in _activity_object_clauses(match.group(1)):
                 object_name, action, source_verb = _object_and_action(raw, verb)
+                if core_answer_repair and _SPEC_OBJECT.match(object_name):
+                    continue
                 key = re.sub(r"\s+", "", object_name)
                 if not key or key in seen:
                     continue
@@ -1207,6 +1255,8 @@ def _project_overview_span(
 def _project_segment_span(
     selection: CoreEvidenceSelection,
     span: CoreEvidenceSpan,
+    *,
+    core_answer_repair: bool = False,
 ) -> tuple[SemanticRecord, ...]:
     if not span.context_complete:
         return ()
@@ -1214,7 +1264,10 @@ def _project_segment_span(
     revenue_item = _prepared_for(selection, span, "operating_revenue")
     if segment_item is None and revenue_item is None:
         return ()
-    excerpt = _join_segment_label_amounts(_join_pdf_soft_breaks(span.excerpt))
+    excerpt = _join_segment_label_amounts(
+        _join_pdf_soft_breaks(span.excerpt),
+        core_answer_repair=core_answer_repair,
+    )
     quote = (
         segment_item.evidence.anchor.bounded_quote
         if segment_item is not None and isinstance(segment_item.evidence.anchor, TextAnchor)
@@ -1226,6 +1279,7 @@ def _project_segment_span(
     previous_was_unit = False
     group_dimensions: frozenset[str] | None = None
     dimension = _dimension_from_heading(span.section_title)
+    revenue_parent = ""
     records: list[SemanticRecord] = []
     started = False
     for line in excerpt.splitlines():
@@ -1250,6 +1304,7 @@ def _project_segment_span(
             started = True
         section = _dimension_from_heading(line)
         if section is not None:
+            revenue_parent = ""
             if group_dimensions is not None and section in group_dimensions:
                 previous_was_unit = False
                 dimension = section
@@ -1272,6 +1327,16 @@ def _project_segment_span(
         row_dimension = (
             "revenue_composition" if _is_enumerated_revenue_class(line) else dimension
         )
+        row_header = None
+        if core_answer_repair and label in _REVENUE_PARENT_LABELS:
+            row_dimension = "revenue_composition"
+            revenue_parent = label
+        elif (
+            core_answer_repair
+            and row_dimension == "revenue_composition"
+            and revenue_parent
+        ):
+            row_header = revenue_parent
         if row_dimension is None:
             continue
         source_line = line.strip()
@@ -1293,6 +1358,7 @@ def _project_segment_span(
                         name=label,
                         value=amount,
                         unit=unit,
+                        header=row_header,
                     ),
                     dimension=row_dimension,
                     label=label,
@@ -1314,6 +1380,7 @@ def _project_segment_span(
                         name=label,
                         value=amount,
                         unit=unit,
+                        header=row_header,
                     ),
                     metric_type=MetricType.OPERATING_REVENUE,
                     logical_slot=LogicalSlot.REVENUE,
@@ -1703,13 +1770,23 @@ def _is_enumerated_revenue_class(line: str) -> bool:
     return re.match(r"\s*(?:[一二三四五六七八九十]+|\d+)[、.．]", line) is not None
 
 
-def _join_segment_label_amounts(text: str) -> str:
+def _join_segment_label_amounts(
+    text: str,
+    *,
+    core_answer_repair: bool = False,
+) -> str:
     """Attach a wrapped label to the amount line that follows it."""
 
     lines = text.splitlines()
     merged: list[str] = []
     index = 0
     while index < len(lines):
+        if core_answer_repair:
+            joined_at = _join_numbered_revenue_label(lines, index)
+            if joined_at is not None:
+                merged.append(joined_at[0])
+                index = joined_at[1]
+                continue
         current = lines[index]
         nxt = lines[index + 1] if index + 1 < len(lines) else ""
         if (
@@ -1722,6 +1799,33 @@ def _join_segment_label_amounts(text: str) -> str:
         merged.append(current)
         index += 1
     return "\n".join(merged)
+
+
+def _join_numbered_revenue_label(
+    lines: list[str],
+    index: int,
+) -> tuple[str, int] | None:
+    """Join “旅客及货邮航空 / 服务收入” onto the amount line."""
+
+    current = lines[index]
+    if not re.match(r"\s*\d+[、.．]", current) or re.search(r"-?[\d,]+\.\d", current):
+        return None
+    parts = [re.sub(r"\s+", "", current)]
+    cursor = index + 1
+    while cursor < len(lines):
+        nxt = lines[cursor]
+        if re.match(r"\s*-?[\d,]", nxt):
+            label = "".join(parts)
+            return f"{label} {nxt.strip()}", cursor + 1
+        if not nxt.strip():
+            cursor += 1
+            continue
+        if re.fullmatch(r"\s*[\u4e00-\u9fff]{2,12}\s*", nxt):
+            parts.append(re.sub(r"\s+", "", nxt))
+            cursor += 1
+            continue
+        return None
+    return None
 
 
 def _clip_before_later_segment_template(excerpt: str) -> str:
@@ -1989,6 +2093,7 @@ def _project_repair_commodity_span(
     *,
     named_role_repair: bool = False,
     service_operating_energy: bool = False,
+    core_answer_repair: bool = False,
 ) -> tuple[SemanticRecord, ...]:
     """Bind a role only when the company, name, and action share a clause."""
 
@@ -1996,7 +2101,7 @@ def _project_repair_commodity_span(
     if item is None:
         return ()
     records: list[SemanticRecord] = []
-    seen: set[tuple[str, ActivityAction]] = set()
+    seen: set[tuple[str, ActivityAction, str | None]] = set()
 
     def add_activity(
         name: str,
@@ -2007,7 +2112,7 @@ def _project_repair_commodity_span(
         actor: str = "公司",
         header: str | None = None,
     ) -> None:
-        key = (name, action)
+        key = (name, action, header)
         if key in seen:
             return
         seen.add(key)
@@ -2042,7 +2147,9 @@ def _project_repair_commodity_span(
         stated = _without_org_names(compact)
         if named_role_repair and re.search(r"合营企业|联营企业", compact) and "业务性质" in compact:
             continue
-        company = _clause_names_company(compact)
+        if core_answer_repair and "母公司" in compact and "业务性质" in compact:
+            continue
+        company = _clause_names_company(stated if core_answer_repair else compact)
         if "参股" in compact and "本公司" not in compact:
             company = False
         sells = (
@@ -2051,6 +2158,11 @@ def _project_repair_commodity_span(
             else "销售" in stated or "生产与销售" in stated
         )
         procures = any(token in stated for token in ("采购", "订购", "原辅料"))
+        if core_answer_repair and (
+            _AUDIT_PROCEDURE.search(compact) or _RESUME_CLAUSE.search(compact)
+        ):
+            sells = False
+            procures = False
         if named_role_repair and company and "能源介质" in stated:
             if sells:
                 add_activity("能源介质", ActivityAction.SELLS, "销售")
@@ -2086,8 +2198,11 @@ def _project_repair_commodity_span(
     if named_role_repair:
         for name in _formal_sales_product_names(span.excerpt):
             add_activity(name, ActivityAction.SELLS, "销售")
-        if _domestic_scrap_clause(span.excerpt):
+        if _domestic_scrap_clause(span.excerpt) and not core_answer_repair:
             add_activity("废钢", ActivityAction.PURCHASES, "采购")
+    if core_answer_repair:
+        for name, channel in _supply_source_rows(span.excerpt):
+            add_activity(name, ActivityAction.PURCHASES, "采购", header=channel)
     if service_operating_energy:
         for subject, business, item_name in _operating_energy_bindings(span.excerpt):
             add_activity(
@@ -2098,6 +2213,40 @@ def _project_repair_commodity_span(
                 header=business,
             )
     return tuple(records)
+
+
+def _supply_source_rows(excerpt: str) -> list[tuple[str, str]]:
+    """One supply commodity per table row, split by 国内采购 and 国外进口."""
+
+    rows: list[tuple[str, str]] = []
+    current = ""
+    for line in excerpt.replace("\r\n", "\n").replace("\r", "\n").split("\n"):
+        compact = re.sub(r"\s+", "", line)
+        named = re.search(r"(铁矿石|废钢)供应", compact)
+        if named:
+            current = named.group(1)
+            continue
+        if not current:
+            continue
+        if compact.startswith("合计"):
+            current = ""
+            continue
+        if compact.startswith("国内采购"):
+            rows.append((current, "国内采购"))
+        elif compact.startswith("国外进口"):
+            rows.append((current, "国外进口"))
+    return rows
+
+
+def _steel_business_source(excerpt: str) -> str:
+    """The company's steel description through its named product series."""
+
+    joined = _join_pdf_soft_breaks(excerpt)
+    match = _STEEL_BUSINESS_SENTENCE.search(joined)
+    if match is None:
+        return ""
+    compact = re.sub(r"\s+", "", match.group(0))
+    return _original_span_matching(excerpt, compact) or ""
 
 
 def _company_business_source(excerpt: str) -> str:

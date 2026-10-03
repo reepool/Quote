@@ -42,6 +42,8 @@ _PRINCIPAL_PATTERN = re.compile(
 _COMPLETE_COMPANY_BUSINESS = re.compile(
     r"(?<![\u4e00-\u9fff])(?:本公司|公司)(?:业务覆盖|专注于).{2,}"
 )
+_STEEL_BUSINESS = re.compile(r"公司是.{8,260}主要产品有.{2,80}")
+_SPEC_PRODUCT = re.compile(r"^(?:厚度|宽度|长度)")
 _PRODUCT_PATTERN = re.compile(
     r"(主要产品|主要服务|业务线|产品包括|服务包括|经营范围|"
     r"从事.{1,40}(?:的研发|的生产|的制造|的加工|的销售|服务))"
@@ -261,6 +263,7 @@ def project_core_assessment(
     task_results: Sequence[CompanyProfileTaskResult],
     repair_revenue_sentence: bool = False,
     named_role_repair: bool = False,
+    core_answer_repair: bool = False,
 ) -> CompanyProfileCoreAssessment:
     """Evaluate the common core from accepted same-report records."""
 
@@ -277,12 +280,17 @@ def project_core_assessment(
                 accepted.append(record)
 
     principal = _assess_principal_business(
-        accepted, named_role_repair=named_role_repair
+        accepted,
+        named_role_repair=named_role_repair,
+        core_answer_repair=core_answer_repair,
     )
-    products = _assess_products_services(accepted)
+    products = _assess_products_services(
+        accepted, core_answer_repair=core_answer_repair
+    )
     revenue = _assess_revenue_model(
         accepted,
         repair_revenue_sentence=repair_revenue_sentence,
+        core_answer_repair=core_answer_repair,
     )
     return CompanyProfileCoreAssessment(
         report=report,
@@ -299,6 +307,7 @@ def _assess_principal_business(
     records: Sequence[SemanticRecord],
     *,
     named_role_repair: bool = False,
+    core_answer_repair: bool = False,
 ) -> CoreDimensionAssessment:
     supports: list[SemanticRecord] = []
     for record in records:
@@ -309,7 +318,7 @@ def _assess_principal_business(
         text = re.sub(r"\s+", "", record.source_text or "")
         if _PRINCIPAL_PATTERN.search(text) or (
             named_role_repair and _COMPLETE_COMPANY_BUSINESS.search(text)
-        ):
+        ) or (core_answer_repair and _STEEL_BUSINESS.search(text)):
             supports.append(record)
     if supports:
         return _answered("principal_business", supports)
@@ -324,11 +333,15 @@ def _assess_principal_business(
 
 def _assess_products_services(
     records: Sequence[SemanticRecord],
+    *,
+    core_answer_repair: bool = False,
 ) -> CoreDimensionAssessment:
     supports: list[SemanticRecord] = []
     rejected = False
     for record in records:
         if isinstance(record, Activity) and record.field_id == "explicit_activity":
+            if core_answer_repair and _SPEC_PRODUCT.match(record.object_name.strip()):
+                continue
             if record.action in _PRODUCT_ACTIONS and record.object_name.strip():
                 supports.append(record)
             elif record.object_name.strip():
@@ -353,6 +366,14 @@ def _assess_products_services(
             and _PRODUCT_PATTERN.search(record.source_text)
         ):
             supports.append(record)
+    if core_answer_repair:
+        series = [
+            record
+            for record in supports
+            if isinstance(record, BusinessOverview) and "主要产品有" in (record.source_text or "")
+        ]
+        if series:
+            supports = [*series, *[record for record in supports if record not in series]]
     if supports:
         return _answered("products_services", supports)
     if any(
@@ -370,6 +391,7 @@ def _assess_revenue_model(
     records: Sequence[SemanticRecord],
     *,
     repair_revenue_sentence: bool = False,
+    core_answer_repair: bool = False,
 ) -> CoreDimensionAssessment:
     supports: list[SemanticRecord] = []
     totals: list[SemanticRecord] = []
@@ -414,6 +436,10 @@ def _assess_revenue_model(
             ]
             if pieces:
                 answered = answered.model_copy(update={"excerpt": "\n".join(pieces)})
+        if core_answer_repair:
+            structure = _revenue_structure_excerpt(supports)
+            if structure:
+                answered = answered.model_copy(update={"excerpt": structure})
         return answered
     if totals:
         return _unanswered("revenue_model", "numeric_total_only")
@@ -426,6 +452,33 @@ def _assess_revenue_model(
     if rejected:
         return _unanswered("revenue_model", "no_qualifying_source")
     return _unanswered("revenue_model", "no_accepted_evidence")
+
+
+def _revenue_structure_excerpt(records: Sequence[SemanticRecord]) -> str:
+    """Parent revenue lines followed by the child lines recorded under them."""
+
+    parents: list[str] = []
+    children: dict[str, list[str]] = {}
+    for record in records:
+        if not isinstance(record, Measurement):
+            continue
+        if record.segment_dimension != "revenue_composition":
+            continue
+        label = (record.segment_label or "").strip()
+        if not label:
+            continue
+        header = (record.source_native.header or "").strip()
+        if header:
+            bucket = children.setdefault(header, [])
+            if label not in bucket:
+                bucket.append(label)
+        elif label not in parents:
+            parents.append(label)
+    lines: list[str] = []
+    for parent in parents:
+        names = children.get(parent) or []
+        lines.append(f"{parent}：" + "、".join(names) if names else parent)
+    return "\n".join(lines)
 
 
 def _overview_states_revenue(
