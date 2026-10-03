@@ -39,6 +39,7 @@ from .core_evidence_selection import (
     project_owned_page_facts,
     revenue_sentence_repair_requested,
     select_core_evidence,
+    service_operating_energy_requested,
 )
 from .core_skeleton import (
     COMMON_CORE_CHAPTERS,
@@ -417,6 +418,9 @@ class CompanyProfileStageRuntime:
             named_role_repair=named_role_repair_requested(
                 state.processing_identity
             ),
+            service_operating_energy=service_operating_energy_requested(
+                state.processing_identity
+            ),
         )
         state.chapters = select_activated_chapters(state.pages)
         state.provider_blocked = any(
@@ -449,6 +453,9 @@ class CompanyProfileStageRuntime:
                             state.processing_identity
                         ),
                         named_role_repair=named_role_repair_requested(
+                            state.processing_identity
+                        ),
+                        service_operating_energy=service_operating_energy_requested(
                             state.processing_identity
                         ),
                     ),

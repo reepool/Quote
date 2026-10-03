@@ -300,6 +300,112 @@ def test_wrapped_focus_sentence_and_investee_table(tmp_path):
     assert exported["state"] == "completed"
 
 
+_PAGE_17 = (
+    "处理规模达 53.8 万吨/日。运营端持续深化精益管理，污水吨水药耗、电耗分别同比有所下降，核\n"
+    "心运营指标稳步优化，水务业务盈利韧性持续增强。\n"
+    "剔除新加坡 ECO 公司处置影响因素后，固废处理业务核心主业营收实现稳步增长。\n"
+    "累计上网电量 24.13 亿千瓦时，同比增长 6.88%，项目运营能力稳步提升。\n"
+    "宁波厨余项目完成价格调整，总体产能利用率提升至 86%。\n"
+    "同时公司通过技改优化、设备大修标准化、能耗管控等举措，焚烧业务柴油单耗、生物质度电燃料成本等关键指标显著下降，\n"
+    "运营效率与盈利水平同步提升。\n"
+    "公司面临电力价格风险。\n"
+    "子公司焚烧业务柴油单耗下降。\n"
+)
+
+
+def _service_profile(root, identity: dict[str, str], work_id: str) -> dict:
+    report = _report(instrument_id="600008.SH", report_id="1225095393")
+    runtime = CompanyProfileStageRuntime(
+        writer=CompanyProfileResearchWriter(root),
+        provider=None,
+    )
+    item = {
+        "work_id": work_id,
+        "instrument_id": "600008.SH",
+        "report": report.model_dump(mode="json"),
+        "pages": [
+            {
+                "page": 10,
+                "text": (
+                    "报告期内公司从事的业务情况\n"
+                    "公司业务覆盖水、固、气、能环保全产业链。\n"
+                ),
+                "readable": True,
+            },
+            {"page": 17, "text": _PAGE_17, "readable": True},
+        ],
+        "processing_identity": identity,
+    }
+
+    async def drive():
+        for stage in WORK_STAGES:
+            await runtime(stage, item)
+
+    asyncio.run(drive())
+    return CompanyProfileReadService(root).query(
+        ("600008.SH",),
+        processing_identity=identity,
+    )["profiles"][0]
+
+
+def test_service_operating_energy_keeps_subject_and_business_column(tmp_path):
+    identity = _identity(revenue_sentence_repair="v6")
+    root = tmp_path / "energy"
+    profile = _service_profile(root, identity, "work-energy")
+    facts = {item["record_id"]: item for item in profile["accepted_facts"]}
+    exposures = profile["commodity_exposure"]["assessment"]["exposures"]
+    energy = {
+        item["source_native_name"]: item
+        for item in exposures
+        if item["role"] == "energy_consumption"
+    }
+    assert set(energy) == {"电耗", "柴油单耗"}
+    for name, actor, header, quote_part in (
+        ("电耗", "运营端", "污水", "污水吨水药耗、电耗"),
+        ("柴油单耗", "公司", "焚烧业务", "焚烧业务柴油单耗"),
+    ):
+        exposure = energy[name]
+        assert exposure["measurement_record_ids"] == []
+        record = facts[exposure["source_record_ids"][0]]
+        assert record["source_actor"] == actor
+        assert record["source_native_header"] == header
+        assert record["source_native_value"] is None
+        evidence = record["evidence"]
+        assert evidence[0]["page"] == 17
+        assert quote_part in evidence[0]["bounded_quote"]
+        assert exposure["evidence_ids"]
+    names = [item["source_native_name"] for item in exposures]
+    assert "product_sales" not in {item["role"] for item in exposures}
+    assert "电力" not in names
+    assert names.count("柴油单耗") == 1
+    exported = CompanyProfileReadService(root).export(
+        ("600008.SH",),
+        export_directory=tmp_path / "energy-export",
+        processing_identity=identity,
+    )
+    assert exported["state"] == "completed"
+    payload = json.loads(
+        next((tmp_path / "energy-export").glob("600008.SH_*.json")).read_text(
+            encoding="utf-8"
+        )
+    )
+    exported_energy = [
+        item["source_native_name"]
+        for item in payload["commodity_exposure"]["assessment"]["exposures"]
+        if item["role"] == "energy_consumption"
+    ]
+    assert exported_energy == ["电耗", "柴油单耗"] or set(exported_energy) == {
+        "电耗",
+        "柴油单耗",
+    }
+
+
+def test_earlier_repair_does_not_take_service_operating_energy(tmp_path):
+    identity = _identity(revenue_sentence_repair="v5")
+    profile = _service_profile(tmp_path / "v5-energy", identity, "work-v5-energy")
+    assert profile["commodity_exposure"]["assessment"]["exposures"] == []
+
+
 def test_unmarked_identity_does_not_adopt_the_new_principal_sentence(tmp_path):
     identity = _identity(successor="v9")
     root = tmp_path / "plain"

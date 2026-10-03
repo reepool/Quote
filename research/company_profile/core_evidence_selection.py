@@ -204,6 +204,7 @@ def select_core_evidence(
     accepted_records: Sequence[SemanticRecord] = (),
     repair_revenue_sentence: bool = False,
     named_role_repair: bool = False,
+    service_operating_energy: bool = False,
 ) -> CoreEvidenceSelection:
     """Select bounded core Evidence without a frozen per-company page plan."""
 
@@ -265,7 +266,13 @@ def select_core_evidence(
     if material is not None:
         spans.append(material)
     if repair_revenue_sentence:
-        spans.extend(_repair_commodity_spans(normalized, covered=spans))
+        spans.extend(
+            _repair_commodity_spans(
+                normalized,
+                covered=spans,
+                service_operating_energy=service_operating_energy,
+            )
+        )
 
     if overview.span is None and not any(
         gap.code == "chapter_missing"
@@ -988,6 +995,7 @@ REVENUE_SENTENCE_REPAIR_V2 = "v2"
 REVENUE_SENTENCE_REPAIR_V3 = "v3"
 REVENUE_SENTENCE_REPAIR_V4 = "v4"
 REVENUE_SENTENCE_REPAIR_V5 = "v5"
+REVENUE_SENTENCE_REPAIR_V6 = "v6"
 _REVENUE_SENTENCE_REPAIR_VERSIONS = frozenset(
     {
         REVENUE_SENTENCE_REPAIR_V1,
@@ -995,6 +1003,7 @@ _REVENUE_SENTENCE_REPAIR_VERSIONS = frozenset(
         REVENUE_SENTENCE_REPAIR_V3,
         REVENUE_SENTENCE_REPAIR_V4,
         REVENUE_SENTENCE_REPAIR_V5,
+        REVENUE_SENTENCE_REPAIR_V6,
     }
 )
 
@@ -1025,7 +1034,20 @@ def named_role_repair_requested(identity: Mapping[str, Any] | None) -> bool:
     return identity.get(REVENUE_SENTENCE_REPAIR) in {
         REVENUE_SENTENCE_REPAIR_V4,
         REVENUE_SENTENCE_REPAIR_V5,
+        REVENUE_SENTENCE_REPAIR_V6,
     }
+
+
+def service_operating_energy_requested(identity: Mapping[str, Any] | None) -> bool:
+    """Return whether this identity keeps service operating energy use.
+
+    ``v6`` still carries the principal-sentence and named-role repairs. It also
+    binds 电耗 and 柴油单耗 to the source subject and business column.
+    """
+
+    if not isinstance(identity, Mapping):
+        return False
+    return identity.get(REVENUE_SENTENCE_REPAIR) == REVENUE_SENTENCE_REPAIR_V6
 
 
 def project_owned_page_facts(
@@ -1034,6 +1056,7 @@ def project_owned_page_facts(
     *,
     repair_revenue_sentence: bool = False,
     named_role_repair: bool = False,
+    service_operating_energy: bool = False,
 ) -> tuple[SemanticRecord, ...]:
     """Project source-native core facts already stated in owned excerpts."""
 
@@ -1068,6 +1091,7 @@ def project_owned_page_facts(
                     selection,
                     span,
                     named_role_repair=named_role_repair,
+                    service_operating_energy=service_operating_energy,
                 )
             )
     return _dedupe_owned_records(records)
@@ -1794,19 +1818,28 @@ _REPAIR_ENERGY = (("蒸汽", "蒸汽费"), ("热水", "热水费"), ("电", "电
 _REPAIR_COMMODITY_CUE = re.compile(
     r"采购|销售|蒸汽费|热水费|电费|生产与销售|原辅料|焦炭采购"
 )
+_SERVICE_ENERGY_CUE = re.compile(r"电耗|柴油单耗")
+_OPERATING_ENERGY = re.compile(
+    r"(?P<business>污水|焚烧业务)(?:吨水药耗、)?(?P<item>电耗|柴油单耗)"
+)
+_FIRM_ENDING = re.compile(r"[\u4e00-\u9fffA-Za-z0-9]{0,40}公司")
 
 
 def _repair_commodity_spans(
     pages: Sequence[ReportPageText],
     *,
     covered: Sequence[CoreEvidenceSpan],
+    service_operating_energy: bool = False,
 ) -> list[CoreEvidenceSpan]:
     covered_pages = {span.page for span in covered}
     spans: list[CoreEvidenceSpan] = []
     for page in pages:
         if not page.readable or page.page in covered_pages:
             continue
-        if _REPAIR_COMMODITY_CUE.search(re.sub(r"\s+", "", page.text)) is None:
+        compact = re.sub(r"\s+", "", page.text)
+        commodity = _REPAIR_COMMODITY_CUE.search(compact) is not None
+        energy = service_operating_energy and _SERVICE_ENERGY_CUE.search(compact) is not None
+        if not commodity and not energy:
             continue
         excerpt = page.text.strip()
         if not excerpt:
@@ -1912,11 +1945,50 @@ def _domestic_scrap_clause(excerpt: str) -> str:
     return window
 
 
+def _clause_names_other_firm(clause: str) -> bool:
+    """A named firm in the clause is not the reporting company."""
+
+    for match in _FIRM_ENDING.finditer(clause):
+        firm = match.group(0).removeprefix("同时")
+        if firm in {"公司", "本公司"}:
+            continue
+        return True
+    return False
+
+
+def _operating_energy_bindings(excerpt: str) -> list[tuple[str, str, str]]:
+    """Bind 电耗 and 柴油单耗 to the clause subject and business column.
+
+    A subsidiary firm, or a price-risk sentence with no operating-consumption
+    wording, does not become the reporting company's energy use.
+    """
+
+    bindings: list[tuple[str, str, str]] = []
+    for clause in _repair_commodity_clauses(excerpt):
+        if "子公司" in clause or _clause_names_other_firm(clause):
+            continue
+        match = _OPERATING_ENERGY.search(clause)
+        if match is None:
+            continue
+        if "价格风险" in clause:
+            continue
+        stated = _without_org_names(clause)
+        if "本公司" in stated or "公司" in stated:
+            subject = "公司"
+        elif "运营端" in clause:
+            subject = "运营端"
+        else:
+            continue
+        bindings.append((subject, match.group("business"), match.group("item")))
+    return bindings
+
+
 def _project_repair_commodity_span(
     selection: CoreEvidenceSelection,
     span: CoreEvidenceSpan,
     *,
     named_role_repair: bool = False,
+    service_operating_energy: bool = False,
 ) -> tuple[SemanticRecord, ...]:
     """Bind a role only when the company, name, and action share a clause."""
 
@@ -1926,12 +1998,25 @@ def _project_repair_commodity_span(
     records: list[SemanticRecord] = []
     seen: set[tuple[str, ActivityAction]] = set()
 
-    def add_activity(name: str, action: ActivityAction, verb: str, value: str | None = None) -> None:
+    def add_activity(
+        name: str,
+        action: ActivityAction,
+        verb: str,
+        value: str | None = None,
+        *,
+        actor: str = "公司",
+        header: str | None = None,
+    ) -> None:
         key = (name, action)
         if key in seen:
             return
         seen.add(key)
-        native = SourceNativeValue(name=name, value=value, unit="元" if value else None)
+        native = SourceNativeValue(
+            name=name,
+            value=value,
+            unit="元" if value else None,
+            header=header,
+        )
         records.append(
             _base_fact(
                 Activity,
@@ -1944,8 +2029,8 @@ def _project_repair_commodity_span(
                 evidence=item.evidence,
                 source_native=native,
                 action=action,
-                activity_actor="公司",
-                source_actor="公司",
+                activity_actor=actor,
+                source_actor=actor,
                 actor_basis=SubjectBasis.DIRECT_GRAMMATICAL_ACTOR,
                 object_name=name,
                 source_verb=verb,
@@ -1975,6 +2060,10 @@ def _project_repair_commodity_span(
             for name, aliases in _REPAIR_SALES:
                 if any(_sales_alias_in(stated, alias) for alias in aliases):
                     add_activity(name, ActivityAction.SELLS, "销售")
+        if service_operating_energy and "价格风险" in compact and not any(
+            token in stated for token in ("采购", "订购")
+        ):
+            procures = False
         if company and procures:
             for name in _REPAIR_PROCUREMENT:
                 if name not in stated:
@@ -1999,6 +2088,15 @@ def _project_repair_commodity_span(
             add_activity(name, ActivityAction.SELLS, "销售")
         if _domestic_scrap_clause(span.excerpt):
             add_activity("废钢", ActivityAction.PURCHASES, "采购")
+    if service_operating_energy:
+        for subject, business, item_name in _operating_energy_bindings(span.excerpt):
+            add_activity(
+                item_name,
+                ActivityAction.PURCHASES,
+                "消耗",
+                actor=subject,
+                header=business,
+            )
     return tuple(records)
 
 

@@ -454,12 +454,18 @@ def _append_fact(
             }
         )
     seen.add(record_id)
+    native = payload.get("source_native")
+    native_map = native if isinstance(native, Mapping) else {}
     facts.append(
         {
             "record_id": record_id,
             "field_id": payload.get("field_id"),
             "object_type": payload.get("object_type"),
             "source_text": payload.get("source_text"),
+            "source_actor": payload.get("source_actor"),
+            "source_native_name": native_map.get("name"),
+            "source_native_header": native_map.get("header"),
+            "source_native_value": native_map.get("value"),
             "knowledge_time": payload.get("knowledge_time"),
             "reported_period": payload.get("reported_period"),
             "evidence": evidence,
