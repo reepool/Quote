@@ -1,0 +1,12 @@
+## 1. Wutong service, toll revenue, and table amounts, not yet authorized
+
+- [ ] 1.1 After scope acceptance, bind the 本集团 direct-source-wording subject on the segment Segment and Measurement records so the blocked revenue Measurements pass acceptance; parse the digit-leading road label and the slash labels so the construction-service, 205 国道, and 建造期 rows are delivered; deliver the toll-service products answer and the toll-revenue revenue answer from the segment evidence. Keep digit, decimal, slash, and wrap boundaries; do not promote negated sentences, third-party tolls, or narrow-subject tables. Verify acceptance, query, and export. Do not start 2.1 in that task.
+
+## 2. Sany raw material and hedge roles, not yet authorized
+
+- [ ] 2.1 After 1.1, bind the p9 steel raw-material sentence as a raw_material_input and the p25 futures sentence as four independent hedge_underlying records for 钢材, 铜, 铝, and 原油 with empty values and existing catalog mapping. Do not split the futures aggregate amounts and do not infer physical purchases from the hedge wording. Verify acceptance, query, and export. Do not start 3.1 in that task.
+
+## 3. v11 isolated delivery and corrected review, not yet authorized
+
+- [ ] 3.1 After 2.1, rerun the two frozen reports under the full `revenue_sentence_repair=v11` identity in its own directory; query and export with the same identity. Do not write v10 unseen directories or prefill scores in that task.
+- [ ] 3.2 After 3.1, apply the fixed scoring and column criteria: rebuild the denominator from the two reports, judge each answer's own text, map every delivered fact to exactly one finding, and check Segment and Measurement records alike for subject, column, label, amount, and unit. Keep an explicit gap out of recall. Measure whole-round elapsed time and compute the fixed thresholds. Keep failures as failures. Do not authorize production, do not claim scale quality, and do not unfreeze the next batch.
