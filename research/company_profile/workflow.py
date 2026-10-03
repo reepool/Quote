@@ -789,6 +789,9 @@ def _semantic_reconciliation_slot(record: SemanticRecord) -> str:
         )
     elif isinstance(record, Measurement):
         material["logical_slot"] = record.logical_slot.value
+        # Rows in different table columns are coexisting facts, not drift:
+        # give each column context its own reconciliation slot.
+        material["segment_dimension"] = getattr(record, "segment_dimension", None)
     elif record.object_type == ObjectType.SEGMENT.value:
         material["dimension"] = getattr(record, "dimension", None)
     elif record.object_type == ObjectType.RELATIONSHIP.value:

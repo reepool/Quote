@@ -4,7 +4,7 @@
 
 ## 2. Wrapped product row and acceptance chain, not yet authorized
 
-- [ ] 2.1 After 1.1, make the in-table label join tolerate in-column spaces so the product/电力及热力 row is restored with its original amount and unit, and separate column contexts in the reconciliation slot so the industry revenue Measurement stays accepted while the product record is added. Verify the revenue regression: no occurrence_semantic_conflict for either record. These changes protect business results directly and belong to this same card. Do not start 3.1 in that task.
+- [x] 2.1 After 1.1, make the in-table label join tolerate in-column spaces so the product/电力及热力 row is restored with its original amount and unit, and separate column contexts in the reconciliation slot so the industry revenue Measurement stays accepted while the product record is added. Verify the revenue regression: no occurrence_semantic_conflict for either record. These changes protect business results directly and belong to this same card. Do not start 3.1 in that task. The label join now compacts in-column whitespace before the 2–12 character check; the Measurement reconciliation slot includes `segment_dimension` so industry and product rows are separate slots. Reverting only the slot change reproduces the diagnosed conflict (the industry revenue record disappears); with both fixes the drive test sees segment and revenue records for 电力及热力 in both industry and product with the original amount and 元. Do not start 3.1 in that task.
 
 ## 3. Unified-identity isolated review, not yet authorized
 

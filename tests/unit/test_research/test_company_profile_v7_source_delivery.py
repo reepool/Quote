@@ -246,6 +246,55 @@ def test_sinopec_profile_industry_table_and_internal_sales(tmp_path):
     assert exposures["化工原料油"]["mapping_status"] == "pending"
 
 
+def test_wrapped_spaced_product_row_keeps_industry_revenue_accepted(tmp_path):
+    result = _drive(
+        tmp_path / "huaneng-product-wrap",
+        "600011.SH",
+        "1225029354",
+        [
+            {
+                "page": 15,
+                "text": (
+                    "2、收入和成本分析\n"
+                    "(1). 主营业务分行业、分产品、分地区、分销售模式情况\n"
+                    "单位：元 币种：人民币\n"
+                    "主营业务分行业情况\n"
+                    "分行业 营业收入 营业成本\n"
+                    "电力及热力 220,961,342,675 181,509,430,965 17.85 -6.98\n"
+                    "个百分点\n"
+                    "主营业务分产品情况\n"
+                    "分产品 营业收入 营业成本\n"
+                    "电 力 及 热\n"
+                    "力\n"
+                    "220,961,342,675 181,509,430,965 17.85 -6.98 -10.76 增加 3.47\n"
+                    "个百分点\n"
+                ),
+                "readable": True,
+            },
+        ],
+    )
+    for profile in (result["query"], result["export"]):
+        record_ids = [
+            item["record_id"]
+            for item in profile["accepted_facts"]
+            if item.get("source_native_name") == "电力及热力"
+            and item["field_id"] in ("operating_revenue", "segment_dimension")
+        ]
+        assert any(":segment:industry:电力及热力" in rid for rid in record_ids)
+        assert any(":segment:product:电力及热力" in rid for rid in record_ids)
+        assert any(":revenue:industry:电力及热力" in rid for rid in record_ids)
+        assert any(":revenue:product:电力及热力" in rid for rid in record_ids)
+        for rid in record_ids:
+            if ":revenue:" in rid:
+                row = next(
+                    item
+                    for item in profile["accepted_facts"]
+                    if item["record_id"] == rid
+                )
+                assert row["source_native_value"] == "220,961,342,675"
+                assert row["source_native_unit"] == "元"
+
+
 def test_region_margin_wrap_leaves_no_fake_segment_in_query_or_export(tmp_path):
     result = _drive(
         tmp_path / "huaneng-region",

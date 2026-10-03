@@ -1867,11 +1867,12 @@ def _join_segment_label_amounts(
                 continue
         current = lines[index]
         nxt = lines[index + 1] if index + 1 < len(lines) else ""
+        compact_label = re.sub(r"\s+", "", current)
         if (
-            re.fullmatch(r"\s*[\u4e00-\u9fff]{2,12}\s*", current)
+            re.fullmatch(r"[\u4e00-\u9fff]{2,12}", compact_label)
             and re.match(r"\s*-?[\d,]", nxt)
         ):
-            merged.append(f"{current.strip()} {nxt.strip()}")
+            merged.append(f"{compact_label} {nxt.strip()}")
             index += 2
             continue
         merged.append(current)
