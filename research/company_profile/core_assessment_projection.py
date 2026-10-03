@@ -264,6 +264,7 @@ def project_core_assessment(
     repair_revenue_sentence: bool = False,
     named_role_repair: bool = False,
     core_answer_repair: bool = False,
+    source_delivery_repair: bool = False,
 ) -> CompanyProfileCoreAssessment:
     """Evaluate the common core from accepted same-report records."""
 
@@ -285,12 +286,15 @@ def project_core_assessment(
         core_answer_repair=core_answer_repair,
     )
     products = _assess_products_services(
-        accepted, core_answer_repair=core_answer_repair
+        accepted,
+        core_answer_repair=core_answer_repair,
+        source_delivery_repair=source_delivery_repair,
     )
     revenue = _assess_revenue_model(
         accepted,
         repair_revenue_sentence=repair_revenue_sentence,
         core_answer_repair=core_answer_repair,
+        source_delivery_repair=source_delivery_repair,
     )
     return CompanyProfileCoreAssessment(
         report=report,
@@ -335,6 +339,7 @@ def _assess_products_services(
     records: Sequence[SemanticRecord],
     *,
     core_answer_repair: bool = False,
+    source_delivery_repair: bool = False,
 ) -> CoreDimensionAssessment:
     supports: list[SemanticRecord] = []
     rejected = False
@@ -363,14 +368,21 @@ def _assess_products_services(
         if (
             isinstance(record, BusinessOverview)
             and record.field_id == "business_overview_source"
-            and _PRODUCT_PATTERN.search(record.source_text)
+            and (
+                _PRODUCT_PATTERN.search(record.source_text)
+                or (
+                    source_delivery_repair
+                    and re.search(r"主要业务是|主要从事", record.source_text or "")
+                )
+            )
         ):
             supports.append(record)
-    if core_answer_repair:
+    if core_answer_repair or source_delivery_repair:
         series = [
             record
             for record in supports
-            if isinstance(record, BusinessOverview) and "主要产品有" in (record.source_text or "")
+            if isinstance(record, BusinessOverview)
+            and re.search(r"主要产品有|主要业务是|主要从事", record.source_text or "")
         ]
         if series:
             supports = [*series, *[record for record in supports if record not in series]]
@@ -392,6 +404,7 @@ def _assess_revenue_model(
     *,
     repair_revenue_sentence: bool = False,
     core_answer_repair: bool = False,
+    source_delivery_repair: bool = False,
 ) -> CoreDimensionAssessment:
     supports: list[SemanticRecord] = []
     totals: list[SemanticRecord] = []
@@ -440,6 +453,10 @@ def _assess_revenue_model(
             structure = _revenue_structure_excerpt(supports)
             if structure:
                 answered = answered.model_copy(update={"excerpt": structure})
+        if source_delivery_repair:
+            industry = _industry_revenue_excerpt(supports)
+            if industry:
+                answered = answered.model_copy(update={"excerpt": industry})
         return answered
     if totals:
         return _unanswered("revenue_model", "numeric_total_only")
@@ -452,6 +469,24 @@ def _assess_revenue_model(
     if rejected:
         return _unanswered("revenue_model", "no_qualifying_source")
     return _unanswered("revenue_model", "no_accepted_evidence")
+
+
+def _industry_revenue_excerpt(records: Sequence[SemanticRecord]) -> str:
+    """The current-period industry lines, without eliminations or the total."""
+
+    wanted = ("勘探及开发", "炼油", "营销及分销", "化工")
+    found: list[str] = []
+    for record in records:
+        if not isinstance(record, Measurement):
+            continue
+        if record.segment_dimension != "industry":
+            continue
+        label = (record.segment_label or "").strip()
+        if label in wanted and label not in found:
+            found.append(label)
+    if len(found) < 2:
+        return ""
+    return "、".join(found)
 
 
 def _revenue_structure_excerpt(records: Sequence[SemanticRecord]) -> str:

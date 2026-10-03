@@ -466,6 +466,7 @@ def _append_fact(
             "source_native_name": native_map.get("name"),
             "source_native_header": native_map.get("header"),
             "source_native_value": native_map.get("value"),
+            "source_native_unit": native_map.get("unit"),
             "knowledge_time": payload.get("knowledge_time"),
             "reported_period": payload.get("reported_period"),
             "evidence": evidence,

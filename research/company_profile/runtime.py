@@ -41,6 +41,7 @@ from .core_evidence_selection import (
     revenue_sentence_repair_requested,
     select_core_evidence,
     service_operating_energy_requested,
+    source_delivery_repair_requested,
 )
 from .core_skeleton import (
     COMMON_CORE_CHAPTERS,
@@ -425,6 +426,9 @@ class CompanyProfileStageRuntime:
             core_answer_repair=core_answer_repair_requested(
                 state.processing_identity
             ),
+            source_delivery_repair=source_delivery_repair_requested(
+                state.processing_identity
+            ),
         )
         state.chapters = select_activated_chapters(state.pages)
         state.provider_blocked = any(
@@ -463,6 +467,9 @@ class CompanyProfileStageRuntime:
                             state.processing_identity
                         ),
                         core_answer_repair=core_answer_repair_requested(
+                            state.processing_identity
+                        ),
+                        source_delivery_repair=source_delivery_repair_requested(
                             state.processing_identity
                         ),
                     ),
@@ -599,6 +606,9 @@ class CompanyProfileStageRuntime:
                 state.processing_identity
             ),
             core_answer_repair=core_answer_repair_requested(
+                state.processing_identity
+            ),
+            source_delivery_repair=source_delivery_repair_requested(
                 state.processing_identity
             ),
         )

@@ -113,8 +113,19 @@ _COMPANY_BUSINESS_SENTENCE = re.compile(
 _STEEL_BUSINESS_SENTENCE = re.compile(
     r"(?<![\u4e00-\u9fff])公司是[^。]{8,260}主要产品有[^。]{2,80}"
 )
+_MAIN_BUSINESS_SENTENCE = re.compile(r"公司的主要业务是[^。]{8,500}")
+_INTEGRATED_BUSINESS_SENTENCE = re.compile(
+    r"(?:中国石化是|公司是)[^。]{8,900}主要从事[^。]{8,900}"
+)
 _CORE_ANSWER_SUBSTANCE = re.compile(
     _COMPANY_BUSINESS_SENTENCE.pattern + "|" + _STEEL_BUSINESS_SENTENCE.pattern
+)
+_SOURCE_DELIVERY_SUBSTANCE = re.compile(
+    _CORE_ANSWER_SUBSTANCE.pattern
+    + "|"
+    + _MAIN_BUSINESS_SENTENCE.pattern
+    + "|"
+    + _INTEGRATED_BUSINESS_SENTENCE.pattern
 )
 _SPEC_OBJECT = re.compile(r"^(?:厚度|宽度|长度)")
 _REVENUE_PARENT_LABELS = frozenset({"航空性收入", "非航空性收入"})
@@ -216,6 +227,7 @@ def select_core_evidence(
     named_role_repair: bool = False,
     service_operating_energy: bool = False,
     core_answer_repair: bool = False,
+    source_delivery_repair: bool = False,
 ) -> CoreEvidenceSelection:
     """Select bounded core Evidence without a frozen per-company page plan."""
 
@@ -228,12 +240,16 @@ def select_core_evidence(
 
     overview = _select_owned_span(
         normalized,
-        headings=_OVERVIEW_HEADINGS,
+        headings=(("公司简介",) + _OVERVIEW_HEADINGS)
+        if source_delivery_repair
+        else _OVERVIEW_HEADINGS,
         chapter_task=ChapterTask.EXTRACT_BUSINESS_OVERVIEW,
         field_ids=("business_overview_source", "explicit_activity"),
         require_substance=True,
         substance_extra=(
-            _CORE_ANSWER_SUBSTANCE
+            _SOURCE_DELIVERY_SUBSTANCE
+            if source_delivery_repair
+            else _CORE_ANSWER_SUBSTANCE
             if core_answer_repair
             else _COMPANY_BUSINESS_SENTENCE if named_role_repair else None
         ),
@@ -1012,6 +1028,7 @@ REVENUE_SENTENCE_REPAIR_V4 = "v4"
 REVENUE_SENTENCE_REPAIR_V5 = "v5"
 REVENUE_SENTENCE_REPAIR_V6 = "v6"
 REVENUE_SENTENCE_REPAIR_V7 = "v7"
+REVENUE_SENTENCE_REPAIR_V8 = "v8"
 _REVENUE_SENTENCE_REPAIR_VERSIONS = frozenset(
     {
         REVENUE_SENTENCE_REPAIR_V1,
@@ -1021,6 +1038,7 @@ _REVENUE_SENTENCE_REPAIR_VERSIONS = frozenset(
         REVENUE_SENTENCE_REPAIR_V5,
         REVENUE_SENTENCE_REPAIR_V6,
         REVENUE_SENTENCE_REPAIR_V7,
+        REVENUE_SENTENCE_REPAIR_V8,
     }
 )
 
@@ -1053,6 +1071,7 @@ def named_role_repair_requested(identity: Mapping[str, Any] | None) -> bool:
         REVENUE_SENTENCE_REPAIR_V5,
         REVENUE_SENTENCE_REPAIR_V6,
         REVENUE_SENTENCE_REPAIR_V7,
+        REVENUE_SENTENCE_REPAIR_V8,
     }
 
 
@@ -1068,6 +1087,7 @@ def service_operating_energy_requested(identity: Mapping[str, Any] | None) -> bo
     return identity.get(REVENUE_SENTENCE_REPAIR) in {
         REVENUE_SENTENCE_REPAIR_V6,
         REVENUE_SENTENCE_REPAIR_V7,
+        REVENUE_SENTENCE_REPAIR_V8,
     }
 
 
@@ -1081,7 +1101,23 @@ def core_answer_repair_requested(identity: Mapping[str, Any] | None) -> bool:
 
     if not isinstance(identity, Mapping):
         return False
-    return identity.get(REVENUE_SENTENCE_REPAIR) == REVENUE_SENTENCE_REPAIR_V7
+    return identity.get(REVENUE_SENTENCE_REPAIR) in {
+        REVENUE_SENTENCE_REPAIR_V7,
+        REVENUE_SENTENCE_REPAIR_V8,
+    }
+
+
+def source_delivery_repair_requested(identity: Mapping[str, Any] | None) -> bool:
+    """Return whether this identity delivers power and petrochemical sources.
+
+    ``v8`` still carries the v7 core-answer repair. It also keeps a full
+    “主要业务是” or “主要从事” sentence, a wrapped 百万元 industry table,
+    and coal, crude, and refined-product roles.
+    """
+
+    if not isinstance(identity, Mapping):
+        return False
+    return identity.get(REVENUE_SENTENCE_REPAIR) == REVENUE_SENTENCE_REPAIR_V8
 
 
 def project_owned_page_facts(
@@ -1092,6 +1128,7 @@ def project_owned_page_facts(
     named_role_repair: bool = False,
     service_operating_energy: bool = False,
     core_answer_repair: bool = False,
+    source_delivery_repair: bool = False,
 ) -> tuple[SemanticRecord, ...]:
     """Project source-native core facts already stated in owned excerpts."""
 
@@ -1107,6 +1144,7 @@ def project_owned_page_facts(
                     repair_revenue_sentence=repair_revenue_sentence,
                     named_role_repair=named_role_repair,
                     core_answer_repair=core_answer_repair,
+                    source_delivery_repair=source_delivery_repair,
                 )
             )
         elif span.chapter_task == ChapterTask.EXTRACT_SEGMENT_FINANCIALS.value:
@@ -1118,6 +1156,7 @@ def project_owned_page_facts(
                         selection,
                         span,
                         core_answer_repair=core_answer_repair,
+                        source_delivery_repair=source_delivery_repair,
                     )
                 )
                 records.extend(_project_company_total_rows(selection, span))
@@ -1135,6 +1174,7 @@ def project_owned_page_facts(
                     named_role_repair=named_role_repair,
                     service_operating_energy=service_operating_energy,
                     core_answer_repair=core_answer_repair,
+                    source_delivery_repair=source_delivery_repair,
                 )
             )
     return _dedupe_owned_records(records)
@@ -1162,6 +1202,7 @@ def _project_overview_span(
     repair_revenue_sentence: bool = False,
     named_role_repair: bool = False,
     core_answer_repair: bool = False,
+    source_delivery_repair: bool = False,
 ) -> tuple[SemanticRecord, ...]:
     overview_item = _prepared_for(selection, span, "business_overview_source")
     activity_item = _prepared_for(selection, span, "explicit_activity")
@@ -1171,6 +1212,12 @@ def _project_overview_span(
     )
     if core_answer_repair and not company_sentence:
         company_sentence = _steel_business_source(span.excerpt)
+    if source_delivery_repair:
+        delivered = _main_business_source(span.excerpt) or _integrated_business_source(
+            span.excerpt
+        )
+        if delivered:
+            company_sentence = delivered
     if overview_item is not None and (
         _excerpt_states_owned_overview(span.excerpt) or company_sentence
     ):
@@ -1225,6 +1272,8 @@ def _project_overview_span(
                 object_name, action, source_verb = _object_and_action(raw, verb)
                 if core_answer_repair and _SPEC_OBJECT.match(object_name):
                     continue
+                if source_delivery_repair and object_name.strip() in {"销售", "生产"}:
+                    continue
                 key = re.sub(r"\s+", "", object_name)
                 if not key or key in seen:
                     continue
@@ -1257,6 +1306,7 @@ def _project_segment_span(
     span: CoreEvidenceSpan,
     *,
     core_answer_repair: bool = False,
+    source_delivery_repair: bool = False,
 ) -> tuple[SemanticRecord, ...]:
     if not span.context_complete:
         return ()
@@ -1264,8 +1314,9 @@ def _project_segment_span(
     revenue_item = _prepared_for(selection, span, "operating_revenue")
     if segment_item is None and revenue_item is None:
         return ()
+    excerpt = _join_rmb_column_header(_join_pdf_soft_breaks(span.excerpt))
     excerpt = _join_segment_label_amounts(
-        _join_pdf_soft_breaks(span.excerpt),
+        excerpt,
         core_answer_repair=core_answer_repair,
     )
     quote = (
@@ -1275,7 +1326,12 @@ def _project_segment_span(
     )
     if revenue_item is not None and isinstance(revenue_item.evidence.anchor, TextAnchor):
         quote = quote or revenue_item.evidence.anchor.bounded_quote
-    unit = None
+    column_unit = (
+        "百万元"
+        if source_delivery_repair and "人民币百万元" in re.sub(r"\s+", "", excerpt)
+        else None
+    )
+    unit = column_unit
     previous_was_unit = False
     group_dimensions: frozenset[str] | None = None
     dimension = _dimension_from_heading(span.section_title)
@@ -1295,7 +1351,7 @@ def _project_segment_span(
         opened = _open_segment_group(line)
         if opened is not None:
             if not previous_was_unit:
-                unit = None
+                unit = column_unit
             group_dimensions = opened
             previous_was_unit = False
             started = True
@@ -1311,14 +1367,14 @@ def _project_segment_span(
                 continue
             group_dimensions = None
             if not previous_was_unit:
-                unit = None
+                unit = column_unit
             previous_was_unit = False
             dimension = section
             continue
         if group_dimensions is not None and _is_enumerated_revenue_class(line):
             group_dimensions = None
             if not previous_was_unit:
-                unit = None
+                unit = column_unit
         previous_was_unit = False
         parsed = _parse_segment_row(line)
         if parsed is None:
@@ -1726,7 +1782,9 @@ _MDA_REVENUE_HEADINGS = frozenset(
 def _formal_segment_table_ready(excerpt: str) -> bool:
     """Require a unit plus either a segment heading or an enumerated class row."""
 
-    normalized = _join_segment_label_amounts(_join_pdf_soft_breaks(excerpt))
+    normalized = _join_segment_label_amounts(
+        _join_rmb_column_header(_join_pdf_soft_breaks(excerpt))
+    )
     if _unit_from_excerpt(normalized) is None:
         return False
     dimension = None
@@ -2094,6 +2152,7 @@ def _project_repair_commodity_span(
     named_role_repair: bool = False,
     service_operating_energy: bool = False,
     core_answer_repair: bool = False,
+    source_delivery_repair: bool = False,
 ) -> tuple[SemanticRecord, ...]:
     """Bind a role only when the company, name, and action share a clause."""
 
@@ -2111,6 +2170,7 @@ def _project_repair_commodity_span(
         *,
         actor: str = "公司",
         header: str | None = None,
+        unit: str | None = None,
     ) -> None:
         key = (name, action, header)
         if key in seen:
@@ -2119,7 +2179,7 @@ def _project_repair_commodity_span(
         native = SourceNativeValue(
             name=name,
             value=value,
-            unit="元" if value else None,
+            unit=unit if unit is not None else ("元" if value else None),
             header=header,
         )
         records.append(
@@ -2203,6 +2263,17 @@ def _project_repair_commodity_span(
     if core_answer_repair:
         for name, channel in _supply_source_rows(span.excerpt):
             add_activity(name, ActivityAction.PURCHASES, "采购", header=channel)
+    if source_delivery_repair:
+        for binding in _power_and_oil_bindings(span.excerpt):
+            add_activity(
+                binding["name"],
+                binding["action"],
+                binding["verb"],
+                binding.get("value"),
+                actor=binding.get("actor") or "公司",
+                header=binding.get("header"),
+                unit=binding.get("unit"),
+            )
     if service_operating_energy:
         for subject, business, item_name in _operating_energy_bindings(span.excerpt):
             add_activity(
@@ -2213,6 +2284,97 @@ def _project_repair_commodity_span(
                 header=business,
             )
     return tuple(records)
+
+
+def _join_rmb_column_header(text: str) -> str:
+    """Join a wrapped column header such as 营业收入（人 / 民币百万元）."""
+
+    return re.sub(r"人\s*[\r\n]+\s*民币", "人民币", text)
+
+
+def _integrated_business_source(excerpt: str) -> str:
+    """A company-profile sentence that keeps every clause through the period."""
+
+    joined = _join_pdf_soft_breaks(excerpt)
+    match = _INTEGRATED_BUSINESS_SENTENCE.search(joined)
+    if match is None:
+        return ""
+    compact = re.sub(r"\s+", "", match.group(0))
+    return _original_span_matching(excerpt, compact) or ""
+
+
+def _main_business_source(excerpt: str) -> str:
+    """The reporting company's full 主要业务是 sentence."""
+
+    joined = _join_pdf_soft_breaks(excerpt)
+    match = _MAIN_BUSINESS_SENTENCE.search(joined)
+    if match is None:
+        return ""
+    compact = re.sub(r"\s+", "", match.group(0))
+    return _original_span_matching(excerpt, compact) or ""
+
+
+def _power_and_oil_bindings(excerpt: str) -> list[dict[str, Any]]:
+    """Coal volume, combined power-heat sales, crude purchase, and internal sales."""
+
+    compact = re.sub(r"\s+", "", _join_pdf_soft_breaks(excerpt))
+    bindings: list[dict[str, str | None]] = []
+    coal = re.search(r"公司共采购煤炭(?P<value>\d+(?:\.\d+)?)亿吨", compact)
+    if coal:
+        bindings.append(
+            {
+                "name": "煤炭",
+                "action": ActivityAction.PURCHASES,
+                "verb": "采购",
+                "value": coal.group("value"),
+                "unit": "亿吨",
+                "actor": "公司",
+                "header": None,
+            }
+        )
+    share = re.search(
+        r"公司电力、热力销售收入约占营业收入的(?P<value>\d+(?:\.\d+)?)%",
+        compact,
+    )
+    if share:
+        bindings.append(
+            {
+                "name": "电力、热力",
+                "action": ActivityAction.SELLS,
+                "verb": "销售",
+                "value": share.group("value"),
+                "unit": "%",
+                "actor": "公司",
+                "header": None,
+            }
+        )
+    if "炼油事业部" in compact and "购入原油" in compact:
+        bindings.append(
+            {
+                "name": "原油",
+                "action": ActivityAction.PURCHASES,
+                "verb": "购入",
+                "value": None,
+                "unit": None,
+                "actor": "炼油事业部",
+                "header": None,
+            }
+        )
+    if "炼油事业部" in compact and "内部销售" in compact:
+        for name in ("汽油", "柴油", "煤油"):
+            if name in compact:
+                bindings.append(
+                    {
+                        "name": name,
+                        "action": ActivityAction.SELLS,
+                        "verb": "内部销售",
+                        "value": None,
+                        "unit": None,
+                        "actor": "炼油事业部",
+                        "header": "内部销售",
+                    }
+                )
+    return bindings
 
 
 def _supply_source_rows(excerpt: str) -> list[tuple[str, str]]:
@@ -2717,8 +2879,13 @@ def _unit_declaration(text: str) -> str:
 
 
 def _unit_from_excerpt(excerpt: str) -> str | None:
-    match = _UNIT_DECLARATION.search(excerpt)
-    return None if match is None else match.group(1)
+    joined = _join_rmb_column_header(excerpt)
+    match = _UNIT_DECLARATION.search(joined)
+    if match is not None:
+        return match.group(1)
+    if "人民币百万元" in re.sub(r"\s+", "", joined):
+        return "百万元"
+    return None
 
 
 def _join_pdf_soft_breaks(text: str) -> str:
