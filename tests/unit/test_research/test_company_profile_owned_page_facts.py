@@ -1347,6 +1347,91 @@ def test_region_margin_wrap_never_becomes_a_segment_row():
     )
 
 
+SUBSIDIARY_AND_COMPANY_SENTENCES = (
+    "报告期内公司从事的业务情况\n"
+    "公司的主要业务是利用先进技术运营港口，为社会提供装卸及物流服务。\n"
+    "子公司的主要业务是煤炭开采与售电。\n"
+)
+
+
+def _overview_source_texts(pages_text: str, **flags: bool) -> list[str]:
+    report = _report(instrument_id="SHAPE.SH", report_id="asset-subject-boundary")
+    selected = select_core_evidence(
+        report=report,
+        pages=({"page": 8, "text": pages_text, "readable": True},),
+    )
+    records = project_owned_page_facts(selected, source_delivery_repair=True)
+    return [
+        item.source_text or ""
+        for item in records
+        if item.field_id == "business_overview_source"
+    ]
+
+
+def test_subsidiary_sentence_is_not_the_company_principal():
+    texts = _overview_source_texts(SUBSIDIARY_AND_COMPANY_SENTENCES)
+    assert texts, "company sentence should still deliver an overview source"
+    assert any("公司的主要业务是" in text and "港口" in text for text in texts)
+    assert not any("子公司的主要业务是" in text for text in texts)
+    assert not any("煤炭开采与售电" in text for text in texts)
+
+
+def test_company_own_sentence_still_delivers_with_company_prefix():
+    texts = _overview_source_texts(
+        "报告期内公司从事的业务情况\n"
+        "本公司的主要业务是从事天然气输配与销售。\n"
+    )
+    assert any("本公司的主要业务是" in text and "天然气" in text for text in texts)
+
+
+def test_subsidiary_only_excerpt_yields_no_principal_answer():
+    texts = _overview_source_texts(
+        "报告期内公司从事的业务情况\n"
+        "子公司的主要业务是煤炭开采与售电。\n"
+    )
+    assert not any("子公司的主要业务是" in text for text in texts)
+
+
+MILLION_YUAN_THEN_UNITLESS_TABLE = (
+    "主营业务分行业情况\n"
+    "分行业 营业收入（人\n"
+    "民币百万元）\n"
+    "勘探及开发 285,992 201,833 24.1\n"
+    "炼油 1,328,509 1,070,616 1.9\n"
+    "主营业务分产品情况\n"
+    "分产品 营业收入 营业成本\n"
+    "汽油 101,300 95,000 6.2\n"
+    "煤油 20,765 19,900 4.2\n"
+)
+
+
+def test_million_yuan_unit_stays_inside_its_own_table():
+    report = _report(instrument_id="SHAPE.SH", report_id="asset-unit-own-table")
+    selected = select_core_evidence(
+        report=report,
+        pages=({"page": 32, "text": MILLION_YUAN_THEN_UNITLESS_TABLE, "readable": True},),
+    )
+    records = project_owned_page_facts(selected, source_delivery_repair=True)
+    segments = {
+        item.label: (item.dimension, item.source_native.unit)
+        for item in records
+        if item.field_id == "segment_dimension"
+    }
+    assert segments["勘探及开发"] == ("industry", "百万元")
+    assert segments["炼油"] == ("industry", "百万元")
+    assert segments["汽油"] == ("product", None)
+    assert segments["煤油"] == ("product", None)
+    revenues = {
+        item.measured_object: item.source_native.unit
+        for item in records
+        if item.field_id == "operating_revenue"
+    }
+    assert revenues["勘探及开发"] == "百万元"
+    assert revenues["炼油"] == "百万元"
+    assert "汽油" not in revenues
+    assert "煤油" not in revenues
+
+
 def test_untitled_revenue_row_is_refused():
     report = _report(instrument_id="600004.SH", report_id="asset-untitled")
     selected = select_core_evidence(

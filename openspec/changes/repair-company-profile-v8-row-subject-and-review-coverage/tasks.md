@@ -4,7 +4,7 @@
 
 ## 2. Local boundaries, not yet authorized
 
-- [ ] 2.1 After 1.1, stop a “子公司的主要业务是” sentence from becoming the company principal while keeping the company-own sentence. Bind the wrapped million-yuan unit to its own table so a unitless independent later table inherits nothing, while combined-table groups keep sharing one declared unit. Keep this round's correct answers and roles. These changes protect business results directly and belong to this same repair card.
+- [x] 2.1 After 1.1, stop a “子公司的主要业务是” sentence from becoming the company principal while keeping the company-own sentence. Bind the wrapped million-yuan unit to its own table so a unitless independent later table inherits nothing, while combined-table groups keep sharing one declared unit. Keep this round's correct answers and roles. These changes protect business results directly and belong to this same repair card. The principal pattern now carries the house `(?<![\u4e00-\u9fff])` subject guard with a 本公司 variant; each independent table derives its unit from its own heading-to-first-row intro, and an enumerated exit reads its own intro instead of the group unit. Directed tests cover the subsidiary rejection, the 本公司 wording, and the million-yuan-then-unitless pair; existing group-sharing and airport tests pass unchanged.
 
 ## 3. Isolated delivery and complete review, not yet authorized
 

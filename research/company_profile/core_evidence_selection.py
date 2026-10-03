@@ -113,7 +113,9 @@ _COMPANY_BUSINESS_SENTENCE = re.compile(
 _STEEL_BUSINESS_SENTENCE = re.compile(
     r"(?<![\u4e00-\u9fff])公司是[^。]{8,260}主要产品有[^。]{2,80}"
 )
-_MAIN_BUSINESS_SENTENCE = re.compile(r"公司的主要业务是[^。]{8,500}")
+_MAIN_BUSINESS_SENTENCE = re.compile(
+    r"(?<![\u4e00-\u9fff])(?:本公司|公司)的主要业务是[^。]{8,500}"
+)
 _INTEGRATED_BUSINESS_SENTENCE = re.compile(
     r"(?:中国石化是|公司是)[^。]{8,900}主要从事[^。]{8,900}"
 )
@@ -1338,7 +1340,9 @@ def _project_segment_span(
     revenue_parent = ""
     records: list[SemanticRecord] = []
     started = False
-    for line in excerpt.splitlines():
+    lines = excerpt.splitlines()
+    last_heading_offset = -1
+    for offset, line in enumerate(lines):
         if started and _is_revenue_table_stop(line):
             break
         if not line.strip():
@@ -1351,10 +1355,11 @@ def _project_segment_span(
         opened = _open_segment_group(line)
         if opened is not None:
             if not previous_was_unit:
-                unit = column_unit
+                unit = _table_intro_unit(lines, offset)
             group_dimensions = opened
             previous_was_unit = False
             started = True
+            last_heading_offset = offset
             continue
         if _dimension_from_heading(line) is not None or _parse_segment_row(line) is not None:
             started = True
@@ -1364,17 +1369,19 @@ def _project_segment_span(
             if group_dimensions is not None and section in group_dimensions:
                 previous_was_unit = False
                 dimension = section
+                last_heading_offset = offset
                 continue
             group_dimensions = None
             if not previous_was_unit:
-                unit = column_unit
+                unit = _table_intro_unit(lines, offset)
             previous_was_unit = False
             dimension = section
+            last_heading_offset = offset
             continue
         if group_dimensions is not None and _is_enumerated_revenue_class(line):
             group_dimensions = None
             if not previous_was_unit:
-                unit = column_unit
+                unit = _table_intro_unit(lines, last_heading_offset)
         previous_was_unit = False
         parsed = _parse_segment_row(line)
         if parsed is None:
@@ -2890,6 +2897,29 @@ def _unit_from_excerpt(excerpt: str) -> str | None:
     if "人民币百万元" in re.sub(r"\s+", "", joined):
         return "百万元"
     return None
+
+
+def _table_intro_unit(lines: list[str], heading_index: int) -> str | None:
+    """The unit stated between a table heading and its first data row.
+
+    An independent table only carries the unit it declares for itself; the
+    wording of an earlier table must not flow into it.
+    """
+
+    intro: list[str] = []
+    for line in lines[heading_index + 1 : heading_index + 13]:
+        if _parse_segment_row(line) is not None:
+            break
+        if (
+            _open_segment_group(line) is not None
+            or _dimension_from_heading(line) is not None
+            or _is_revenue_table_stop(line)
+        ):
+            break
+        intro.append(line)
+    if not intro:
+        return None
+    return _unit_from_excerpt("\n".join(intro))
 
 
 def _join_pdf_soft_breaks(text: str) -> str:
