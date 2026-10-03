@@ -1031,6 +1031,7 @@ REVENUE_SENTENCE_REPAIR_V5 = "v5"
 REVENUE_SENTENCE_REPAIR_V6 = "v6"
 REVENUE_SENTENCE_REPAIR_V7 = "v7"
 REVENUE_SENTENCE_REPAIR_V8 = "v8"
+REVENUE_SENTENCE_REPAIR_V9 = "v9"
 _REVENUE_SENTENCE_REPAIR_VERSIONS = frozenset(
     {
         REVENUE_SENTENCE_REPAIR_V1,
@@ -1041,6 +1042,7 @@ _REVENUE_SENTENCE_REPAIR_VERSIONS = frozenset(
         REVENUE_SENTENCE_REPAIR_V6,
         REVENUE_SENTENCE_REPAIR_V7,
         REVENUE_SENTENCE_REPAIR_V8,
+        REVENUE_SENTENCE_REPAIR_V9,
     }
 )
 
@@ -1074,6 +1076,7 @@ def named_role_repair_requested(identity: Mapping[str, Any] | None) -> bool:
         REVENUE_SENTENCE_REPAIR_V6,
         REVENUE_SENTENCE_REPAIR_V7,
         REVENUE_SENTENCE_REPAIR_V8,
+        REVENUE_SENTENCE_REPAIR_V9,
     }
 
 
@@ -1090,6 +1093,7 @@ def service_operating_energy_requested(identity: Mapping[str, Any] | None) -> bo
         REVENUE_SENTENCE_REPAIR_V6,
         REVENUE_SENTENCE_REPAIR_V7,
         REVENUE_SENTENCE_REPAIR_V8,
+        REVENUE_SENTENCE_REPAIR_V9,
     }
 
 
@@ -1106,6 +1110,7 @@ def core_answer_repair_requested(identity: Mapping[str, Any] | None) -> bool:
     return identity.get(REVENUE_SENTENCE_REPAIR) in {
         REVENUE_SENTENCE_REPAIR_V7,
         REVENUE_SENTENCE_REPAIR_V8,
+        REVENUE_SENTENCE_REPAIR_V9,
     }
 
 
@@ -1114,12 +1119,16 @@ def source_delivery_repair_requested(identity: Mapping[str, Any] | None) -> bool
 
     ``v8`` still carries the v7 core-answer repair. It also keeps a full
     “主要业务是” or “主要从事” sentence, a wrapped 百万元 industry table,
-    and coal, crude, and refined-product roles.
+    and coal, crude, and refined-product roles. ``v9`` keeps those and marks
+    the row-subject and review-coverage repair round.
     """
 
     if not isinstance(identity, Mapping):
         return False
-    return identity.get(REVENUE_SENTENCE_REPAIR) == REVENUE_SENTENCE_REPAIR_V8
+    return identity.get(REVENUE_SENTENCE_REPAIR) in {
+        REVENUE_SENTENCE_REPAIR_V8,
+        REVENUE_SENTENCE_REPAIR_V9,
+    }
 
 
 def project_owned_page_facts(
