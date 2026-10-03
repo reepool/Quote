@@ -1,6 +1,6 @@
 ## 1. Revenue-table continuation parsing, not yet authorized
 
-- [ ] 1.1 After scope acceptance, stop decimal prefixes from becoming numbered rows: an enumeration mark followed by a digit is not row numbering, and a gross-margin or year-over-year continuation line must not produce a Segment. Restore “中国境外” with the 元 unit and its operating-revenue Measurement, keep legal numbered revenue rows and the airport parent-child revenue, add a real-table regression, and verify the fake record is absent from query and export. Do not start 2.1 in that task.
+- [x] 1.1 After scope acceptance, stop decimal prefixes from becoming numbered rows: an enumeration mark followed by a digit is not row numbering, and a gross-margin or year-over-year continuation line must not produce a Segment. Restore “中国境外” with the 元 unit and its operating-revenue Measurement, keep legal numbered revenue rows and the airport parent-child revenue, add a real-table regression, and verify the fake record is absent from query and export. Do not start 2.1 in that task. The `[、.．](?!\d)` guard is in the enumeration test and the row-label strip; the real Huaneng region-table regression reproduces the fake “40” row and the lost overseas unit before the fix, and the query/export drive shows no fake segment with the overseas revenue restored. Do not start 2.1 in that task.
 
 ## 2. Local boundaries, not yet authorized
 

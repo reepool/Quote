@@ -1283,6 +1283,70 @@ def test_invalid_mda_falls_through_to_segment_template_on_the_same_page():
     assert any(getattr(item, "segment_label", None) == "航空地面服务" for item in records)
 
 
+HUANENG_REGION_MARGIN_WRAP = (
+    "2、收入和成本分析\n"
+    "(1). 主营业务分行业、分产品、分地区、分销售模式情况\n"
+    "单位：元 币种：人民币\n"
+    "主营业务分行业情况\n"
+    "分行业 营业收入 营业成本\n"
+    "毛利率\n"
+    "（%）\n"
+    "电力及热\n"
+    "力\n"
+    "220,961,342,675 181,509,430,965 17.85 -6.98 -10.76 增加 3.47\n"
+    "个百分点\n"
+    "港口服务 218,140,695 161,840,937 25.81 0.56 5.52 减少 3.49\n"
+    "个百分点\n"
+    "主营业务分产品情况\n"
+    "分产品 营业收入 营业成本\n"
+    "港口服务 218,140,695 161,840,937 25.81 0.56 5.52 减少 3.49\n"
+    "个百分点\n"
+    "主营业务分地区情况\n"
+    "分地区 营业收入 营业成本\n"
+    "华能国际电力股份有限公司2025 年年度报告\n"
+    "16 / 372\n"
+    "中国境内 202,761,140,328 165,457,723,992\n"
+    "18.40 -6.29 -10.66 增加 4.00\n"
+    "个百分点\n"
+    "中国境外 18,523,422,143 16,302,529,972 11.99 -13.76 -11.44 减少 2.30\n"
+    "个百分点\n"
+)
+
+
+def test_region_margin_wrap_never_becomes_a_segment_row():
+    report = _report(instrument_id="SHAPE.SH", report_id="asset-region-margin-wrap")
+    selected = select_core_evidence(
+        report=report,
+        pages=({"page": 15, "text": HUANENG_REGION_MARGIN_WRAP, "readable": True},),
+    )
+    records = project_owned_page_facts(selected)
+    segments = {
+        item.label: (item.dimension, item.source_native.unit, item.source_native.value)
+        for item in records
+        if item.field_id == "segment_dimension"
+    }
+    assert "40" not in segments
+    assert "18" not in segments
+    assert "18.40" not in segments
+    assert not any("个百分点" in label for label in segments)
+    assert segments["中国境内"] == ("region", "元", "202,761,140,328")
+    assert segments["中国境外"] == ("region", "元", "18,523,422,143")
+    assert segments["电力及热力"] == ("industry", "元", "220,961,342,675")
+    assert segments["港口服务"][0] == "product"
+    revenues = {
+        item.measured_object: (item.source_native.value, item.source_native.unit)
+        for item in records
+        if item.field_id == "operating_revenue"
+    }
+    assert revenues["中国境外"] == ("18,523,422,143", "元")
+    assert revenues["中国境内"] == ("202,761,140,328", "元")
+    assert not any(
+        item.dimension == "revenue_composition"
+        for item in records
+        if item.field_id == "segment_dimension"
+    )
+
+
 def test_untitled_revenue_row_is_refused():
     report = _report(instrument_id="600004.SH", report_id="asset-untitled")
     selected = select_core_evidence(

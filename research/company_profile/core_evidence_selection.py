@@ -1825,7 +1825,11 @@ def _is_revenue_table_stop(line: str) -> bool:
 
 
 def _is_enumerated_revenue_class(line: str) -> bool:
-    return re.match(r"\s*(?:[一二三四五六七八九十]+|\d+)[、.．]", line) is not None
+    # "18.40" is a decimal amount, not an enumeration mark: the character
+    # after 、.． must not be a digit.
+    return (
+        re.match(r"\s*(?:[一二三四五六七八九十]+|\d+)[、.．](?!\d)", line) is not None
+    )
 
 
 def _join_segment_label_amounts(
@@ -2946,7 +2950,7 @@ def _stated_in_quote(text: str, quote: str) -> bool:
 
 def _parse_segment_row(line: str) -> tuple[str, str, str | None] | None:
     text = line.strip()
-    text = re.sub(r"^(?:[一二三四五六七八九十]+|\d+)[、.．]\s*", "", text)
+    text = re.sub(r"^(?:[一二三四五六七八九十]+|\d+)[、.．](?!\d)\s*", "", text)
     if not text:
         return None
     tokens = text.split()

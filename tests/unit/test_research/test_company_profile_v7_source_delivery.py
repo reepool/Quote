@@ -218,6 +218,62 @@ def test_sinopec_profile_industry_table_and_internal_sales(tmp_path):
         assert (name, "product_sales", "炼油事业部", "内部销售") in roles
 
 
+def test_region_margin_wrap_leaves_no_fake_segment_in_query_or_export(tmp_path):
+    result = _drive(
+        tmp_path / "huaneng-region",
+        "600011.SH",
+        "1225029354",
+        [
+            {
+                "page": 10,
+                "text": (
+                    "报告期内公司从事的业务情况\n"
+                    "公司的主要业务是利用现代化的技术和设备，在国内外开发、建设和运营\n"
+                    "发电厂，为社会提供电力、热力及综合能源服务。\n"
+                ),
+                "readable": True,
+            },
+            {
+                "page": 15,
+                "text": (
+                    "2、收入和成本分析\n"
+                    "(1). 主营业务分行业、分产品、分地区、分销售模式情况\n"
+                    "单位：元 币种：人民币\n"
+                    "主营业务分行业情况\n"
+                    "分行业 营业收入 营业成本\n"
+                    "电力及热力 220,961,342,675 181,509,430,965 17.85 -6.98\n"
+                    "个百分点\n"
+                    "主营业务分地区情况\n"
+                    "分地区 营业收入 营业成本\n"
+                    "中国境内 202,761,140,328 165,457,723,992\n"
+                    "18.40 -6.29 -10.66 增加 4.00\n"
+                    "个百分点\n"
+                    "中国境外 18,523,422,143 16,302,529,972 11.99 -13.76\n"
+                    "个百分点\n"
+                ),
+                "readable": True,
+            },
+        ],
+    )
+    for profile in (result["query"], result["export"]):
+        delivered = [
+            (item.get("source_native_name"), item.get("source_native_unit"))
+            for item in profile["accepted_facts"]
+            if item["field_id"] == "segment_dimension"
+        ]
+        assert ("40", None) not in delivered
+        assert ("18", None) not in delivered
+        assert ("中国境外", "元") in delivered
+        overseas_revenue = [
+            item
+            for item in profile["accepted_facts"]
+            if item["field_id"] == "operating_revenue"
+            and item.get("source_native_name") == "中国境外"
+        ]
+        assert overseas_revenue[0]["source_native_value"] == "18,523,422,143"
+        assert overseas_revenue[0]["source_native_unit"] == "元"
+
+
 def test_v8_keeps_steel_airport_energy_and_excludes_false_sales(tmp_path):
     from tests.unit.test_research.test_company_profile_v6_core_answers import (
         _REVENUE_PAGE,
