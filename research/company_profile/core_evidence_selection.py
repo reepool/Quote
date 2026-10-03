@@ -2394,6 +2394,21 @@ def _power_and_oil_bindings(excerpt: str) -> list[dict[str, Any]]:
                         "header": "内部销售",
                     }
                 )
+    if (
+        "炼油事业部" in compact
+        and "部分化工原料油内部销售给化工事业部" in compact
+    ):
+        bindings.append(
+            {
+                "name": "化工原料油",
+                "action": ActivityAction.SELLS,
+                "verb": "内部销售",
+                "value": None,
+                "unit": None,
+                "actor": "炼油事业部",
+                "header": "部分内部销售给化工事业部",
+            }
+        )
     return bindings
 
 

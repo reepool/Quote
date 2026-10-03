@@ -141,7 +141,8 @@ def test_sinopec_profile_industry_table_and_internal_sales(tmp_path):
                 "page": 26,
                 "text": (
                     "炼油事业部业务包括从第三方及勘探及开发事业部购入原油，并将原油加工成石油产品，\n"
-                    "大部分汽油、柴油、煤油内部销售给营销及分销事业部。\n"
+                    "大部分汽油、柴油、煤油内部销售给营销及分销事业部，部分化工原料油内部销售给化工事\n"
+                    "业部，其他精炼石油产品由炼油事业部外销给国内外客户。\n"
                 ),
                 "readable": True,
             },
@@ -216,6 +217,33 @@ def test_sinopec_profile_industry_table_and_internal_sales(tmp_path):
     assert ("原油", "raw_material_input", "炼油事业部", None) in roles
     for name in ("汽油", "柴油", "煤油"):
         assert (name, "product_sales", "炼油事业部", "内部销售") in roles
+    feedstock = facts.get("owned:core-ev-438ae54472b17daf:commodity:5") or next(
+        (
+            item
+            for item in result["query"]["accepted_facts"]
+            if item.get("source_native_name") == "化工原料油"
+        ),
+        None,
+    )
+    assert feedstock is not None
+    assert feedstock["source_actor"] == "炼油事业部"
+    assert feedstock["source_native_header"] == "部分内部销售给化工事业部"
+    assert feedstock["source_native_value"] in (None, "")
+    for profile in (result["query"], result["export"]):
+        exported_feedstock = [
+            item
+            for item in profile["accepted_facts"]
+            if item.get("source_native_name") == "化工原料油"
+        ]
+        assert exported_feedstock
+        assert exported_feedstock[0]["source_native_header"] == (
+            "部分内部销售给化工事业部"
+        )
+    exposures = {
+        item["source_native_name"]: item
+        for item in result["query"]["commodity_exposure"]["assessment"]["exposures"]
+    }
+    assert exposures["化工原料油"]["mapping_status"] == "pending"
 
 
 def test_region_margin_wrap_leaves_no_fake_segment_in_query_or_export(tmp_path):

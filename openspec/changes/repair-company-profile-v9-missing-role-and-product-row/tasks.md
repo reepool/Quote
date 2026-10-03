@@ -1,6 +1,6 @@
 ## 1. Chemical feedstock oil internal sale, not yet authorized
 
-- [ ] 1.1 After scope acceptance, extend the existing sentence binding so 部分化工原料油内部销售给化工事业部 delivers 化工原料油 with the refining-division subject, the 部分 internal-sales scope, and 化工事业部 as receiver; keep the value empty and the catalog-pending status. Verify acceptance, query, and export. Do not start 2.1 in that task.
+- [x] 1.1 After scope acceptance, extend the existing sentence binding so 部分化工原料油内部销售给化工事业部 delivers 化工原料油 with the refining-division subject, the 部分 internal-sales scope, and 化工事业部 as receiver; keep the value empty and the catalog-pending status. Verify acceptance, query, and export. Do not start 2.1 in that task. The binding keys on the full compact clause; the record carries 炼油事业部 as actor, 部分内部销售给化工事业部 as the source header, and an empty value, and `mapping_status=pending` holds in the exposure assessment. The Sinopec drive test now uses the real p26 sentence and asserts the record in both query and export. Do not start 2.1 in that task.
 
 ## 2. Wrapped product row and acceptance chain, not yet authorized
 
