@@ -793,6 +793,87 @@ def test_v6_unseen_freeze_skips_companies_observed_under_older_identities(tmp_pa
     assert observed.isdisjoint(item.instrument_id for item in plan.reports)
 
 
+def test_v7_unseen_freeze_also_skips_the_latest_observed_pair(tmp_path):
+    """The v6 observed set still selects 600009 and 600022. This round passes them."""
+
+    candidates = (
+        _named("600009.SH", "SSE", "环保"),
+        _named("600011.SH", "SSE", "环保"),
+        _named("600022.SH", "SSE", "钢铁"),
+        _named("600023.SH", "SSE", "钢铁"),
+        _named("000011.SZ", "SZSE", "环保"),
+    )
+    bindings = {
+        item.instrument_id: {
+            "asset_id": f"asset-{item.instrument_id}",
+            "report_id": f"report-{item.instrument_id}",
+            "report_period": "2025-12-31",
+            "document_version": f"ver-{item.instrument_id}",
+        }
+        for item in candidates
+    }
+    prior = {
+        "302132.SZ",
+        "600000.SH",
+        "600004.SH",
+        "600006.SH",
+        "600007.SH",
+        "600008.SH",
+        "600010.SH",
+        "600019.SH",
+    }
+    storage = _storage(tmp_path)
+    service = _service(
+        tmp_path,
+        storage,
+        provider=_RequestBoundOverviewProvider(),
+        plan_directory=tmp_path / "m4-v7-without-latest",
+    )
+    without_latest = service.freeze_m4_next_batch_plan(
+        knowledge_cutoff="2026-09-17",
+        registry=SimpleNamespace(candidates=candidates),
+        delivered_ids=prior,
+        readable=lambda candidate: candidate.asset_status == "available",
+        binding_for=bindings.get,
+    )
+    assert [item.instrument_id for item in without_latest.reports] == [
+        "600009.SH",
+        "600022.SH",
+    ]
+    observed = prior | {"600009.SH", "600022.SH"}
+    unseen_dir = tmp_path / "m4-v7-unseen"
+    unseen = _service(
+        tmp_path,
+        storage,
+        provider=_RequestBoundOverviewProvider(),
+        plan_directory=unseen_dir,
+    )
+    plan = unseen.freeze_m4_next_batch_plan(
+        knowledge_cutoff="2026-09-17",
+        registry=SimpleNamespace(candidates=candidates),
+        delivered_ids=observed,
+        readable=lambda candidate: candidate.asset_status == "available",
+        binding_for=bindings.get,
+    )
+    again = unseen.freeze_m4_next_batch_plan(
+        knowledge_cutoff="2026-09-17",
+        registry=SimpleNamespace(candidates=candidates),
+        delivered_ids=observed,
+        readable=lambda candidate: candidate.asset_status == "available",
+        binding_for=bindings.get,
+    )
+    loaded = load_m4_next_batch_plan(
+        unseen.checkpoint_root, plan_directory=unseen_dir
+    )
+    assert plan == again == loaded
+    assert [item.instrument_id for item in plan.reports] == [
+        "600011.SH",
+        "600023.SH",
+    ]
+    assert plan.token_budget == 50_000
+    assert observed.isdisjoint(item.instrument_id for item in plan.reports)
+
+
 def test_freeze_refuses_when_a_disclosure_form_has_no_candidate(tmp_path):
     storage = _storage(tmp_path)
     service = _service(tmp_path, storage, provider=_RequestBoundOverviewProvider())
