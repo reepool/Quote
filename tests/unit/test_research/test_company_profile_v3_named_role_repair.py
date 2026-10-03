@@ -163,7 +163,141 @@ def test_v4_keeps_a_focus_sentence_and_skips_internal_scrap(tmp_path):
     )
     assert principal["answered"] is True
     assert "专注于" in principal["excerpt"]
+    assert "钢铁业" in principal["excerpt"]
     assert ("废钢", "raw_material_input") not in _roles(profile)
+
+
+def test_bare_focus_phrase_is_not_a_complete_principal(tmp_path):
+    identity = _identity(revenue_sentence_repair="v5")
+    root = tmp_path / "bare"
+    report = _report(instrument_id="600019.SH", report_id="1225257227")
+    runtime = CompanyProfileStageRuntime(
+        writer=CompanyProfileResearchWriter(root),
+        provider=None,
+    )
+    item = {
+        "work_id": "work-bare",
+        "instrument_id": "600019.SH",
+        "report": report.model_dump(mode="json"),
+        "pages": [
+            {
+                "page": 9,
+                "text": "报告期内公司从事的业务情况\n公司专注于\n",
+                "readable": True,
+            }
+        ],
+        "processing_identity": identity,
+    }
+
+    async def drive():
+        for stage in WORK_STAGES:
+            await runtime(stage, item)
+
+    asyncio.run(drive())
+    profile = CompanyProfileReadService(root).query(
+        ("600019.SH",),
+        processing_identity=identity,
+    )["profiles"][0]
+    principal = next(
+        item
+        for item in profile["dimensions"]
+        if item["dimension_id"] == "principal_business"
+    )
+    assert principal["answered"] is False
+
+
+def test_wrapped_focus_sentence_and_investee_table(tmp_path):
+    identity = _identity(revenue_sentence_repair="v5")
+    root = tmp_path / "wrap"
+    report = _report(instrument_id="600019.SH", report_id="1225257227")
+    runtime = CompanyProfileStageRuntime(
+        writer=CompanyProfileResearchWriter(root),
+        provider=None,
+    )
+    item = {
+        "work_id": "work-wrap",
+        "instrument_id": "600019.SH",
+        "report": report.model_dump(mode="json"),
+        "pages": [
+            {
+                "page": 9,
+                "text": (
+                    "报告期内公司从事的业务情况\n"
+                    "公司是中国最现代化的特大型钢铁联合企业。公司专注于\n"
+                    "钢铁业，同时从事与钢铁主业相关的加工配送、化工及信息科技等业务。\n"
+                ),
+                "readable": True,
+            },
+            {
+                "page": 15,
+                "text": (
+                    "主要产品单位生产量销售量库存量\n"
+                    "其他钢铁产品万吨128147\n"
+                ),
+                "readable": True,
+            },
+            {
+                "page": 69,
+                "text": (
+                    "公司与主要关联方发生的日常关联交易。\n"
+                    "公司销售钢铁产品等市场价。\n"
+                    "公司销售能源介质等市场价。\n"
+                    "公司采购能源介质市场价。\n"
+                ),
+                "readable": True,
+            },
+            {
+                "page": 201,
+                "text": (
+                    "合营企业或联营企业名称主要经营地注册地业务性质\n"
+                    "（“广州JFE”）中国广州市钢铁生产\n"
+                    "（“平煤神马”）中国平顶山市煤炭开采与销售\n"
+                ),
+                "readable": True,
+            },
+        ],
+        "processing_identity": identity,
+    }
+
+    async def drive():
+        for stage in WORK_STAGES:
+            await runtime(stage, item)
+
+    asyncio.run(drive())
+    profile = CompanyProfileReadService(root).query(
+        ("600019.SH",),
+        processing_identity=identity,
+    )["profiles"][0]
+    principal = next(
+        item
+        for item in profile["dimensions"]
+        if item["dimension_id"] == "principal_business"
+    )
+    excerpt = principal["excerpt"] or ""
+    assert principal["answered"] is True
+    assert "钢铁业" in excerpt
+    assert "同时从事" in excerpt
+    assert excerpt.strip() != "公司专注于"
+    roles = _roles(profile)
+    assert ("其他钢铁产品", "product_sales") in roles
+    assert ("钢铁", "product_sales") in roles
+    assert ("能源介质", "product_sales") in roles
+    assert ("能源介质", "raw_material_input") in roles
+    pages_for_steel = []
+    facts = {item["record_id"]: item for item in profile["accepted_facts"]}
+    for item in profile["commodity_exposure"]["assessment"]["exposures"]:
+        if item.get("source_native_name") != "钢铁":
+            continue
+        for record_id in item.get("source_record_ids") or []:
+            for evidence in facts[record_id]["evidence"]:
+                pages_for_steel.append(evidence["page"])
+    assert 201 not in pages_for_steel
+    exported = CompanyProfileReadService(root).export(
+        ("600019.SH",),
+        export_directory=tmp_path / "wrap-export",
+        processing_identity=identity,
+    )
+    assert exported["state"] == "completed"
 
 
 def test_unmarked_identity_does_not_adopt_the_new_principal_sentence(tmp_path):

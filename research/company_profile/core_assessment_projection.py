@@ -39,6 +39,9 @@ CORE_DIMENSION_IDS = (
 _PRINCIPAL_PATTERN = re.compile(
     r"(主营|主要从事|主要业务|经营模式|经营范围|金融服务)"
 )
+_COMPLETE_COMPANY_BUSINESS = re.compile(
+    r"(?<![\u4e00-\u9fff])(?:本公司|公司)(?:业务覆盖|专注于).{2,}"
+)
 _PRODUCT_PATTERN = re.compile(
     r"(主要产品|主要服务|业务线|产品包括|服务包括|经营范围|"
     r"从事.{1,40}(?:的研发|的生产|的制造|的加工|的销售|服务))"
@@ -303,9 +306,9 @@ def _assess_principal_business(
             continue
         if record.field_id != "business_overview_source":
             continue
-        text = record.source_text or ""
+        text = re.sub(r"\s+", "", record.source_text or "")
         if _PRINCIPAL_PATTERN.search(text) or (
-            named_role_repair and re.search(r"业务覆盖|专注于", text)
+            named_role_repair and _COMPLETE_COMPANY_BUSINESS.search(text)
         ):
             supports.append(record)
     if supports:

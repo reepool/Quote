@@ -108,7 +108,7 @@ _OVERVIEW_SUBSTANCE = re.compile(
     r"取得货款|收入来[源于自]|向客户收取|主要产品为"
 )
 _COMPANY_BUSINESS_SENTENCE = re.compile(
-    r"(?<![\u4e00-\u9fff])(?:本公司|公司)(?:业务覆盖|专注于)[^。；;\n]{0,80}"
+    r"(?<![\u4e00-\u9fff])(?:本公司|公司)(?:业务覆盖|专注于)[^。；;]{2,160}"
 )
 _PSEUDO_SALES = re.compile(r"销售(?:模式|区域|部)")
 _REVENUE_OBJECT = re.compile(
@@ -987,12 +987,14 @@ REVENUE_SENTENCE_REPAIR_V1 = "v1"
 REVENUE_SENTENCE_REPAIR_V2 = "v2"
 REVENUE_SENTENCE_REPAIR_V3 = "v3"
 REVENUE_SENTENCE_REPAIR_V4 = "v4"
+REVENUE_SENTENCE_REPAIR_V5 = "v5"
 _REVENUE_SENTENCE_REPAIR_VERSIONS = frozenset(
     {
         REVENUE_SENTENCE_REPAIR_V1,
         REVENUE_SENTENCE_REPAIR_V2,
         REVENUE_SENTENCE_REPAIR_V3,
         REVENUE_SENTENCE_REPAIR_V4,
+        REVENUE_SENTENCE_REPAIR_V5,
     }
 )
 
@@ -1020,7 +1022,10 @@ def named_role_repair_requested(identity: Mapping[str, Any] | None) -> bool:
 
     if not isinstance(identity, Mapping):
         return False
-    return identity.get(REVENUE_SENTENCE_REPAIR) == REVENUE_SENTENCE_REPAIR_V4
+    return identity.get(REVENUE_SENTENCE_REPAIR) in {
+        REVENUE_SENTENCE_REPAIR_V4,
+        REVENUE_SENTENCE_REPAIR_V5,
+    }
 
 
 def project_owned_page_facts(
@@ -1950,6 +1955,8 @@ def _project_repair_commodity_span(
 
     for compact in _repair_commodity_clauses(span.excerpt):
         stated = _without_org_names(compact)
+        if named_role_repair and re.search(r"合营企业|联营企业", compact) and "业务性质" in compact:
+            continue
         company = _clause_names_company(compact)
         if "参股" in compact and "本公司" not in compact:
             company = False
@@ -1996,17 +2003,18 @@ def _project_repair_commodity_span(
 
 
 def _company_business_source(excerpt: str) -> str:
-    """The reporting company's own 业务覆盖 or 专注于 sentence."""
+    """The reporting company's full 业务覆盖 or 专注于 sentence.
 
-    for line in excerpt.replace("\r\n", "\n").replace("\r", "\n").split("\n"):
-        match = _COMPANY_BUSINESS_SENTENCE.search(line.strip())
-        if match is None:
-            continue
-        compact = re.sub(r"\s+", "", match.group(0))
-        found = _original_span_matching(excerpt, compact)
-        if found:
-            return found
-    return ""
+    Soft wraps are joined first. A bare “公司专注于” or “公司业务覆盖”
+    has no business content and is not a sentence.
+    """
+
+    joined = _join_pdf_soft_breaks(excerpt)
+    match = _COMPANY_BUSINESS_SENTENCE.search(joined)
+    if match is None:
+        return ""
+    compact = re.sub(r"\s+", "", match.group(0))
+    return _original_span_matching(excerpt, compact) or ""
 
 
 def explicit_material_input_names(text: str) -> tuple[str, ...]:
