@@ -1321,6 +1321,35 @@ def _project_overview_span(
                         source_verb=source_verb,
                     )
                 )
+    if source_delivery_repair and activity_item is not None:
+        steel = _steel_raw_material_binding(span.excerpt)
+        if steel:
+            records.append(
+                _base_fact(
+                    Activity,
+                    report=selection.report,
+                    record_id=(
+                        f"owned:{activity_item.evidence.evidence_id}"
+                        ":activity:steel-raw-material"
+                    ),
+                    field_id="explicit_activity",
+                    chapter_task=ChapterTask.EXTRACT_BUSINESS_OVERVIEW,
+                    evidence=activity_item.evidence,
+                    source_native=SourceNativeValue(
+                        name=steel["name"],
+                        value=steel.get("value"),
+                        unit=steel.get("unit"),
+                        header=steel.get("header"),
+                    ),
+                    action=steel["action"],
+                    activity_actor=steel["actor"],
+                    source_actor=steel["actor"],
+                    actor_basis=SubjectBasis.DIRECT_GRAMMATICAL_ACTOR,
+                    object_name=steel["name"],
+                    source_verb=steel["verb"],
+                    excerpt_subject=span.excerpt,
+                )
+            )
     return tuple(records)
 
 
@@ -2039,7 +2068,8 @@ def _repair_commodity_spans(
         compact = re.sub(r"\s+", "", page.text)
         commodity = _REPAIR_COMMODITY_CUE.search(compact) is not None
         energy = service_operating_energy and _SERVICE_ENERGY_CUE.search(compact) is not None
-        if not commodity and not energy:
+        hedge = "套期保值" in compact and "原料的期货业务" in compact
+        if not commodity and not energy and not hedge:
             continue
         excerpt = page.text.strip()
         if not excerpt:
@@ -2312,6 +2342,16 @@ def _project_repair_commodity_span(
                 header=binding.get("header"),
                 unit=binding.get("unit"),
             )
+        for binding in _hedge_underlying_bindings(span.excerpt):
+            add_activity(
+                binding["name"],
+                binding["action"],
+                binding["verb"],
+                binding.get("value"),
+                actor=binding.get("actor") or "公司",
+                header=binding.get("header"),
+                unit=binding.get("unit"),
+            )
     if service_operating_energy:
         for subject, business, item_name in _operating_energy_bindings(span.excerpt):
             add_activity(
@@ -2361,6 +2401,46 @@ def _toll_service_source(excerpt: str) -> str:
         return ""
     compact = re.sub(r"\s+", "", match.group(0))
     return _original_span_matching(excerpt, compact) or ""
+
+
+def _steel_raw_material_binding(excerpt: str) -> dict[str, Any] | None:
+    """The stated main raw-material steel, without quantities."""
+
+    compact = re.sub(r"\s+", "", _join_pdf_soft_breaks(excerpt))
+    if "主要原材料及零部件为" in compact and "钢材" in compact:
+        return {
+            "name": "钢材",
+            "action": ActivityAction.PURCHASES,
+            "verb": "采购",
+            "value": None,
+            "unit": None,
+            "actor": "公司",
+            "header": "主要原材料",
+        }
+    return None
+
+
+def _hedge_underlying_bindings(excerpt: str) -> list[dict[str, Any]]:
+    """Named futures hedge underlyings; amounts stay empty and unsplit."""
+
+    compact = re.sub(r"\s+", "", _join_pdf_soft_breaks(excerpt))
+    if "套期保值" not in compact or "原料的期货业务" not in compact:
+        return []
+    bindings: list[dict[str, str | None]] = []
+    for name in ("钢材", "铜", "铝", "原油"):
+        if name in compact:
+            bindings.append(
+                {
+                    "name": name,
+                    "action": ActivityAction.OPERATES,
+                    "verb": "期货套保",
+                    "value": None,
+                    "unit": None,
+                    "actor": "公司",
+                    "header": "套期保值标的",
+                }
+            )
+    return bindings
 
 
 def _power_and_oil_bindings(excerpt: str) -> list[dict[str, Any]]:

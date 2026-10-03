@@ -313,6 +313,76 @@ def test_wutong_toll_answers_and_blocked_measurements_are_delivered(tmp_path):
     assert result["query"]["dimensions"][2]["answered"] is True
 
 
+def test_sany_steel_raw_material_and_four_hedge_underlyings(tmp_path):
+    result = _drive(
+        tmp_path / "sany",
+        "600031.SH",
+        "1225100001",
+        [
+            {
+                "page": 9,
+                "text": (
+                    "报告期内公司从事的业务情况\n"
+                    "1、公司的主要业务\n"
+                    "公司主要从事工程机械的研发、制造、销售和服务。公司产品包括混凝土机械、挖掘机械、\n"
+                    "起重机械、桩工机械、路面机械。\n"
+                    "2、公司的经营模式\n"
+                    "公司生产所需的主要原材料及零部件为汽车底盘、发动机、钢材、液压泵、主油泵、分动箱、\n"
+                    "各种液压阀、回转轴承等。\n"
+                ),
+                "readable": True,
+            },
+            {
+                "page": 25,
+                "text": (
+                    "衍生品投资情况\n"
+                    "√适用 □不适用\n"
+                    "报告期内套期保值业务的会计政策：根据金融工具及相关准则规定进行核算。\n"
+                    "为规避原料现货价格波动对公司生产带来的不利影响，公司以自有资金开展与本公司生产相关\n"
+                    "的大宗商品（如：钢材、铜、铝、原油等）原料的期货业务。\n"
+                    "单位：万元 币种：人民币\n"
+                    "合计 2,090,594 27,701 -43,992 8,818,338 7,648,743\n"
+                ),
+                "readable": True,
+            },
+        ],
+    )
+    activities = [
+        item
+        for item in result["query"]["accepted_facts"]
+        if item["field_id"] == "explicit_activity"
+    ]
+    steel_input = next(
+        (i for i in activities if "steel-raw-material" in i["record_id"]), None
+    )
+    assert steel_input is not None
+    assert steel_input["source_native_header"] == "主要原材料"
+    names = {i.get("source_native_name") for i in activities}
+    for name in ("铜", "铝", "原油"):
+        assert name in names, name
+    exposures = result["query"]["commodity_exposure"]["assessment"]["exposures"]
+    hedges = [i for i in exposures if i["role"] == "hedge_underlying"]
+    assert {i["source_native_name"] for i in hedges} == {"钢材", "铜", "铝", "原油"}
+    raw = [i for i in exposures if i["role"] == "raw_material_input"]
+    assert {i["source_native_name"] for i in raw} == {"钢材"}
+    # catalog mapping follows the existing rules and is checked in the round
+    # review; this test pins the delivery, independence, and empty values.
+    hedge_values = [
+        item.get("source_native_value")
+        for item in result["query"]["accepted_facts"]
+        if item["field_id"] == "explicit_activity"
+        and item.get("source_native_header") == "套期保值标的"
+    ]
+    assert hedge_values and all(v in (None, "") for v in hedge_values)
+    for profile in (result["query"], result["export"]):
+        exported_hedges = [
+            item
+            for item in profile["accepted_facts"]
+            if item.get("source_native_header") == "套期保值标的"
+        ]
+        assert len(exported_hedges) == 4
+
+
 def test_wrapped_spaced_product_row_keeps_industry_revenue_accepted(tmp_path):
     result = _drive(
         tmp_path / "huaneng-product-wrap",

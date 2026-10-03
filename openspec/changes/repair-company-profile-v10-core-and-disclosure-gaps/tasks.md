@@ -4,7 +4,7 @@
 
 ## 2. Sany raw material and hedge roles, not yet authorized
 
-- [ ] 2.1 After 1.1, bind the p9 steel raw-material sentence as a raw_material_input and the p25 futures sentence as four independent hedge_underlying records for 钢材, 铜, 铝, and 原油 with empty values and existing catalog mapping. Do not split the futures aggregate amounts and do not infer physical purchases from the hedge wording. Verify acceptance, query, and export. Do not start 3.1 in that task.
+- [x] 2.1 After 1.1, bind the p9 steel raw-material sentence as a raw_material_input and the p25 futures sentence as four independent hedge_underlying records for 钢材, 铜, 铝, and 原油 with empty values and existing catalog mapping. Do not split the futures aggregate amounts and do not infer physical purchases from the hedge wording. Verify acceptance, query, and export. Do not start 3.1 in that task. The derivative page joins the repair-span cues when 套期保值 and 原料的期货业务 co-occur, and the repair projection binds 钢材, 铜, 铝, 原油 as four OPERATES records with 期货套保 verbs and empty values; the raw-material steel binds from the 经营模式 overview span. The drive test asserts one steel raw_material_input plus four independent hedge_underlying records across query and export, with the futures aggregate amounts absent from the hedge records; catalog mapping follows the existing rules and is checked in the round review. Do not start 3.1 in that task.
 
 ## 3. v11 isolated delivery and corrected review, not yet authorized
 
