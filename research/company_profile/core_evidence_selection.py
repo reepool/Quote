@@ -1036,6 +1036,7 @@ REVENUE_SENTENCE_REPAIR_V7 = "v7"
 REVENUE_SENTENCE_REPAIR_V8 = "v8"
 REVENUE_SENTENCE_REPAIR_V9 = "v9"
 REVENUE_SENTENCE_REPAIR_V10 = "v10"
+REVENUE_SENTENCE_REPAIR_V11 = "v11"
 _REVENUE_SENTENCE_REPAIR_VERSIONS = frozenset(
     {
         REVENUE_SENTENCE_REPAIR_V1,
@@ -1048,6 +1049,7 @@ _REVENUE_SENTENCE_REPAIR_VERSIONS = frozenset(
         REVENUE_SENTENCE_REPAIR_V8,
         REVENUE_SENTENCE_REPAIR_V9,
         REVENUE_SENTENCE_REPAIR_V10,
+        REVENUE_SENTENCE_REPAIR_V11,
     }
 )
 
@@ -1083,6 +1085,7 @@ def named_role_repair_requested(identity: Mapping[str, Any] | None) -> bool:
         REVENUE_SENTENCE_REPAIR_V8,
         REVENUE_SENTENCE_REPAIR_V9,
         REVENUE_SENTENCE_REPAIR_V10,
+        REVENUE_SENTENCE_REPAIR_V11,
     }
 
 
@@ -1101,6 +1104,7 @@ def service_operating_energy_requested(identity: Mapping[str, Any] | None) -> bo
         REVENUE_SENTENCE_REPAIR_V8,
         REVENUE_SENTENCE_REPAIR_V9,
         REVENUE_SENTENCE_REPAIR_V10,
+        REVENUE_SENTENCE_REPAIR_V11,
     }
 
 
@@ -1119,6 +1123,7 @@ def core_answer_repair_requested(identity: Mapping[str, Any] | None) -> bool:
         REVENUE_SENTENCE_REPAIR_V8,
         REVENUE_SENTENCE_REPAIR_V9,
         REVENUE_SENTENCE_REPAIR_V10,
+        REVENUE_SENTENCE_REPAIR_V11,
     }
 
 
@@ -1138,6 +1143,7 @@ def source_delivery_repair_requested(identity: Mapping[str, Any] | None) -> bool
         REVENUE_SENTENCE_REPAIR_V8,
         REVENUE_SENTENCE_REPAIR_V9,
         REVENUE_SENTENCE_REPAIR_V10,
+        REVENUE_SENTENCE_REPAIR_V11,
     }
 
 
@@ -1916,6 +1922,7 @@ def _join_segment_label_amounts(
         compact_label = re.sub(r"\s+", "", current)
         if (
             re.fullmatch(r"[\u4e00-\u9fff0-9/]{2,12}", compact_label)
+            and not compact_label.endswith("百分点")
             and re.match(r"\s*-?[\d,]", nxt)
         ):
             merged.append(f"{compact_label} {nxt.strip()}")

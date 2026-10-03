@@ -1580,3 +1580,39 @@ def test_repair_does_not_rewrite_sw_l1_or_start_m4():
     assert "sw_l1_name" not in execution
     assert "sw_l1_name" not in runtime
     assert "industry_package" not in default_processing_identity()
+
+
+WUTONG_PERCENT_TAIL_WRAP = (
+    "2、收入和成本分析\n"
+    "(1). 主营业务分行业、分产品、分地区、分销售模式情况\n"
+    "单位：元 币种：人民币\n"
+    "主营业务分行业情况\n"
+    "分行业 营业收入 营业成本\n"
+    "主营业务分产品情况\n"
+    "分产品 营业收入 营业成本\n"
+    "合宁高速公路 1,487,013,977.77 537,750,350.15 63.84 7.08 23.04\n"
+    "减少 4.69\n"
+    "个百分点\n"
+    "205 国道天长段新\n"
+    "线\n"
+    "87,442,156.79 43,291,675.18 50.49 8.04 1.84\n"
+    "增加 3.01\n"
+    "个百分点\n"
+)
+
+
+def test_percent_tail_does_not_swallow_the_next_digit_label_row():
+    report = _report(instrument_id="SHAPE.SH", report_id="asset-percent-tail")
+    selected = select_core_evidence(
+        report=report,
+        pages=({"page": 25, "text": WUTONG_PERCENT_TAIL_WRAP, "readable": True},),
+    )
+    records = project_owned_page_facts(selected)
+    segments = {
+        item.label: item.source_native.value
+        for item in records
+        if item.field_id == "segment_dimension"
+    }
+    assert segments.get("合宁高速公路") == "1,487,013,977.77"
+    assert segments.get("205国道天长段新线") == "87,442,156.79"
+    assert not any("个百分点" in label for label in segments)
