@@ -127,6 +127,9 @@ _MAIN_OPERATION_SENTENCE = re.compile(
     # narrative, so the bridge to 经营模式 allows bounded intermediate text.
     r"主要经营[^。]{8,220}(?:。[\s\S]{0,400}?经营模式[^。]{2,220})?"
 )
+_OPERATING_MODEL_SENTENCE = re.compile(
+    r"公司的经营模式主要为[:：][^。]{2,220}(?:，[^。]{2,220})?"
+)
 _COMPANY_AS_NARRATIVE = re.compile(
     r"[^。\n]{2,40}作为[^。]{2,80}(?:上市公司|工业企业)"
     r"[^。]{2,300}研发制造[^。]{4,300}"
@@ -1004,6 +1007,7 @@ def _prepared_evidence(
 
 
 _CLAUSE_PATTERNS = (
+    re.compile(r"经营模式主要为[:：]\s*([^。；;]{2,300})"),
     re.compile(r"主营业务为\s*([^。；;]{2,80})"),
     re.compile(r"主要从事\s*([^。；;]{2,400})"),
     re.compile(r"主要产品包括\s*([^。；;]{2,80})"),
@@ -1053,6 +1057,7 @@ REVENUE_SENTENCE_REPAIR_V14 = "v14"
 REVENUE_SENTENCE_REPAIR_V15 = "v15"
 REVENUE_SENTENCE_REPAIR_V16 = "v16"
 REVENUE_SENTENCE_REPAIR_V17 = "v17"
+REVENUE_SENTENCE_REPAIR_V18 = "v18"
 _REVENUE_SENTENCE_REPAIR_VERSIONS = frozenset(
     {
         REVENUE_SENTENCE_REPAIR_V1,
@@ -1072,6 +1077,7 @@ _REVENUE_SENTENCE_REPAIR_VERSIONS = frozenset(
         REVENUE_SENTENCE_REPAIR_V15,
         REVENUE_SENTENCE_REPAIR_V16,
         REVENUE_SENTENCE_REPAIR_V17,
+        REVENUE_SENTENCE_REPAIR_V18,
     }
 )
 
@@ -1114,6 +1120,7 @@ def named_role_repair_requested(identity: Mapping[str, Any] | None) -> bool:
         REVENUE_SENTENCE_REPAIR_V15,
         REVENUE_SENTENCE_REPAIR_V16,
         REVENUE_SENTENCE_REPAIR_V17,
+        REVENUE_SENTENCE_REPAIR_V18,
     }
 
 
@@ -1139,6 +1146,7 @@ def service_operating_energy_requested(identity: Mapping[str, Any] | None) -> bo
         REVENUE_SENTENCE_REPAIR_V15,
         REVENUE_SENTENCE_REPAIR_V16,
         REVENUE_SENTENCE_REPAIR_V17,
+        REVENUE_SENTENCE_REPAIR_V18,
     }
 
 
@@ -1164,6 +1172,7 @@ def core_answer_repair_requested(identity: Mapping[str, Any] | None) -> bool:
         REVENUE_SENTENCE_REPAIR_V15,
         REVENUE_SENTENCE_REPAIR_V16,
         REVENUE_SENTENCE_REPAIR_V17,
+        REVENUE_SENTENCE_REPAIR_V18,
     }
 
 
@@ -1190,6 +1199,7 @@ def source_delivery_repair_requested(identity: Mapping[str, Any] | None) -> bool
         REVENUE_SENTENCE_REPAIR_V15,
         REVENUE_SENTENCE_REPAIR_V16,
         REVENUE_SENTENCE_REPAIR_V17,
+        REVENUE_SENTENCE_REPAIR_V18,
     }
 
 
@@ -1291,6 +1301,7 @@ def _project_overview_span(
             or _integrated_business_source(span.excerpt)
             or _toll_service_source(span.excerpt)
             or _main_operation_source(span.excerpt)
+            or _operating_model_source(span.excerpt)
             or _company_as_narrative_source(span.excerpt)
         )
         if delivered:
@@ -2477,6 +2488,17 @@ def _company_as_narrative_source(excerpt: str) -> str:
     return _original_span_matching(excerpt, compact) or ""
 
 
+def _operating_model_source(excerpt: str) -> str:
+    """The 经营模式主要为 sentence with its provide-and-collect fees."""
+
+    joined = _join_pdf_soft_breaks(excerpt)
+    match = _OPERATING_MODEL_SENTENCE.search(joined)
+    if match is None:
+        return ""
+    compact = re.sub(r"\s+", "", match.group(0))
+    return _original_span_matching(excerpt, compact) or ""
+
+
 def _toll_service_source(excerpt: str) -> str:
     """The 主营业务为 sentence plus its following toll-service mechanism."""
 
@@ -3026,6 +3048,15 @@ def _activity_object_clauses(clause: str) -> list[str]:
     provided = re.search(r"以.+?为对象[，,]?\s*提供(.+)", text)
     if provided:
         text = provided.group(1)
+    # "为客户提供……服务，收取……费" is one provide-and-collect relationship:
+    # the company subject, the service, and the fee collection must stay in
+    # a single candidate instead of being split at the comma.
+    provide_collect = re.search(
+        r"(?:公司|本公司|本集团)?为(?:客户提供|相关客户提供)[^。；;]{2,60}服务[，,]收取[^。；;]{2,80}费",
+        text,
+    )
+    if provide_collect:
+        return [text]
     # "旋挖钻机，用于市政建设、公路桥梁……" enumerates where a product is used;
     # the application areas are not company activities.
     used_for = re.search(r"用于", text)

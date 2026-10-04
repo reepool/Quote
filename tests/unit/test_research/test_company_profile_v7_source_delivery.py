@@ -820,3 +820,61 @@ def _run_new_narrative_drives(tmp_path):
         revenue = re.sub(r"\s+", "", _dimension(profile, "revenue_model"))
         assert "为客户提供货物港口装卸作业及相关服务" in revenue
         assert "包干费" in revenue and "堆存费" in revenue and "物流其他费用" in revenue
+
+
+def test_sipg_operating_model_sentence_delivers_fees(tmp_path):
+    result = _drive(
+        tmp_path / "sipg",
+        "600018.SH",
+        "1225018001",
+        [
+            {
+                "page": 12,
+                "text": (
+                    "一、报告期内公司从事的业务情况\n"
+                    "上港集团是于 2003 年 1 月由原上海港务局改制后成立的大型专业化集团企业，是上海港公共\n"
+                    "码头运营商。公司主要从事港口相关业务，主营业务分为：集装箱板块、散杂\n"
+                    "货板块、港口物流板块和港口服务板块。\n"
+                    "公司的经营模式主要为：为客户提供港口及相关服务，收取港口作业包干费、库场使用费和港\n"
+                    "口其他收费。\n"
+                ),
+                "readable": True,
+            },
+            {
+                "page": 18,
+                "text": (
+                    "2、收入和成本分析\n"
+                    "(1). 主营业务分行业、分产品、分地区、分销售模式情况\n"
+                    "单位：元 币种：人民币\n"
+                    "主营业务分行业情况\n"
+                    "分行业 营业收入 营业成本\n"
+                    "集装箱\n"
+                    "板块 17,335,387,241.70 9,664,929,418.23 44.25 10.24\n"
+                    "主营业务分地区情况\n"
+                    "分地区 营业收入 营业成本\n"
+                    "国内 37,507,470,224.24 23,784,722,599.92 36.59 2.85\n"
+                ),
+                "readable": True,
+            },
+        ],
+    )
+    for profile in (result["query"], result["export"]):
+        rev = re.sub(r"\s+", "", next(
+            d.get("excerpt") or "" for d in profile["dimensions"]
+            if d["dimension_id"] == "revenue_model"
+        ))
+        pr = re.sub(r"\s+", "", next(
+            d.get("excerpt") or "" for d in profile["dimensions"]
+            if d["dimension_id"] == "principal_business"
+        ))
+        assert "为客户提供港口及相关服务" in rev
+        assert all(k in rev for k in ("包干费", "库场使用费", "港口其他收费"))
+        assert "经营模式主要为" in pr
+        overview_facts = [
+            i for i in profile["accepted_facts"]
+            if i["field_id"] == "business_overview_source"
+        ]
+        assert overview_facts
+        ot = re.sub(r"\s+", "", " ".join(i.get("source_text") or "" for i in overview_facts))
+        assert "经营模式主要为" in ot
+        assert all(k in ot for k in ("包干费", "库场使用费", "港口其他收费"))
