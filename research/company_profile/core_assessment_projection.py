@@ -540,12 +540,13 @@ def _overview_states_revenue(
     for sentence in re.split(r"[。；;\n]", source):
         if not sentence.strip():
             continue
-        # Joint sentence-level judgment: any clause that negates collection,
-        # plans it, or hands it to a third party disqualifies the whole
-        # sentence, even when an earlier clause states the service.
-        if _REVENUE_BLOCK_PATTERN.search(sentence):
+        # A collection-denial clause (不收取/未收取/无收费) denies the
+        # revenue for the whole sentence, and collection by a third party is
+        # never company revenue; planning and free wording only constrain
+        # their own clause below.
+        if re.search(r"(?:不收取|未收取|不再收取|无收费)", sentence):
             continue
-        if re.search(r"(?:尚未|拟|计划|预期|将)[^。；;]{0,12}(?:收取|形成)", sentence):
+        if re.search(r"第三方|代第三方|代收", sentence):
             continue
         # The subject may sit in an earlier clause of the same sentence
         # ("公司……，按照收费标准收取车辆通行费"), so the company subject is

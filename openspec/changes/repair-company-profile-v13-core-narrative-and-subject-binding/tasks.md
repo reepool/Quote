@@ -14,6 +14,16 @@
 
 - [x] 2.3 Keep the Zhongzhi originally enumerated products and manufacturing services (整机及零部件制造、通用飞机、航空转包生产和客户化服务) in the answer text, keep the Rizhao complete sentence (company provides the service and collects the 包干费、堆存费 and other logistics fees), require the company subject together with an affirmative collection action, refuse planned, negated, and third-party collection, and keep the 向客户收取技术服务费 positive. Assert the actual text in query and export. Do not start 3.1 in that task. The Zhongzhi capture keeps the 涉足 sentence (整机及零部件制造、通用飞机、航空转包生产和客户化服务), the Rizhao revenue answer carries 为客户提供…服务 and 包干费/堆存费/物流其他费用, the collection-semantics guard now refuses 计划/第三方/不收取 statements for every inflow keyword, the 向客户收取技术服务费 positive passes, and the drive asserts the actual query and export text under the formal v14 identity.
 
+## 5. Owner-audit scope-fix cards (free add-on regression and scoring)
+
+### 5.1 Revenue guard scope, not yet authorized
+
+- [x] 5.1 (implemented, pending the v16 round) The collection-denial clauses (不收取/未收取/不再收取/无收费) refuse at the sentence level, third-party collection (第三方/代第三方/代收) refuses at the sentence level, and planning (尚未/拟/计划/预期/将+收取/形成) plus the block list constrain their own clause. The free add-on positive (取得货款+免费安装) passes again, and the five toll counterexamples, the two established positives, the free-customer-service negative, the third-party commission negative, and the unpaid-receivable split all hold. Offline acceptance complete; no new samples started.
+
+### 5.2 v16 formal acceptance and closure, not yet authorized
+
+- [ ] 5.2 After 5.1, register the `revenue_sentence_repair=v16` cumulative switches, rerun the same frozen plan `3a9793e0…` under v16 in its own directory with the whole-round time from the first genuine execute to the second export return, honoring the shared 50000-token and 300-second gates. The review scores the six dimension answers and each accepted fact exactly once (Rizhao 5 + Zhongzhi 17 + six answers = 28 judgment objects), rebuilds recall from the established source list, reads freshness from the frozen assets, and gives each no-role negative its actual checked pages and evidence. The v14 and v15 snapshots are kept with sidecar scoring notes, the final OpenSpec contract is synced, and the change is then archived.
+
 ## 3. v14 formal delivery and review (executed; review superseded by the owner audit)
 
 - [x] 3.1 The formal v14 round ran as the first genuine execution (`reused_scope=false`) over plan `3a9793e0…` in `m4_v14_formal_acceptance`: 600017 84.2s + 600038 84.9s, whole round 169.3s, zero tokens. The earlier HOLD (unwired v14 switches, missing continuation pages) was resolved by cards 2.2/2.3 before the run.
