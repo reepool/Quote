@@ -123,7 +123,9 @@ _TOLL_SERVICE_SENTENCE = re.compile(
     r"公司的主营业务为[^。]{4,120}。[^。]{0,120}?通行服务[^。]{2,160}"
 )
 _MAIN_OPERATION_SENTENCE = re.compile(
-    r"主要经营[^。]{8,220}(?:。[^。]{0,40}经营模式[^。]{2,220})?"
+    # The operating-model sentence may sit behind a short development
+    # narrative, so the bridge to 经营模式 allows bounded intermediate text.
+    r"主要经营[^。]{8,220}(?:。[\s\S]{0,400}?经营模式[^。]{2,220})?"
 )
 _COMPANY_AS_NARRATIVE = re.compile(
     r"[^。\n]{2,40}作为[^。]{2,80}(?:上市公司|工业企业)"
@@ -1048,6 +1050,7 @@ REVENUE_SENTENCE_REPAIR_V11 = "v11"
 REVENUE_SENTENCE_REPAIR_V12 = "v12"
 REVENUE_SENTENCE_REPAIR_V13 = "v13"
 REVENUE_SENTENCE_REPAIR_V14 = "v14"
+REVENUE_SENTENCE_REPAIR_V15 = "v15"
 _REVENUE_SENTENCE_REPAIR_VERSIONS = frozenset(
     {
         REVENUE_SENTENCE_REPAIR_V1,
@@ -1064,6 +1067,7 @@ _REVENUE_SENTENCE_REPAIR_VERSIONS = frozenset(
         REVENUE_SENTENCE_REPAIR_V12,
         REVENUE_SENTENCE_REPAIR_V13,
         REVENUE_SENTENCE_REPAIR_V14,
+        REVENUE_SENTENCE_REPAIR_V15,
     }
 )
 
@@ -1103,6 +1107,7 @@ def named_role_repair_requested(identity: Mapping[str, Any] | None) -> bool:
         REVENUE_SENTENCE_REPAIR_V12,
         REVENUE_SENTENCE_REPAIR_V13,
         REVENUE_SENTENCE_REPAIR_V14,
+        REVENUE_SENTENCE_REPAIR_V15,
     }
 
 
@@ -1125,6 +1130,7 @@ def service_operating_energy_requested(identity: Mapping[str, Any] | None) -> bo
         REVENUE_SENTENCE_REPAIR_V12,
         REVENUE_SENTENCE_REPAIR_V13,
         REVENUE_SENTENCE_REPAIR_V14,
+        REVENUE_SENTENCE_REPAIR_V15,
     }
 
 
@@ -1147,6 +1153,7 @@ def core_answer_repair_requested(identity: Mapping[str, Any] | None) -> bool:
         REVENUE_SENTENCE_REPAIR_V12,
         REVENUE_SENTENCE_REPAIR_V13,
         REVENUE_SENTENCE_REPAIR_V14,
+        REVENUE_SENTENCE_REPAIR_V15,
     }
 
 
@@ -1170,6 +1177,7 @@ def source_delivery_repair_requested(identity: Mapping[str, Any] | None) -> bool
         REVENUE_SENTENCE_REPAIR_V12,
         REVENUE_SENTENCE_REPAIR_V13,
         REVENUE_SENTENCE_REPAIR_V14,
+        REVENUE_SENTENCE_REPAIR_V15,
     }
 
 
