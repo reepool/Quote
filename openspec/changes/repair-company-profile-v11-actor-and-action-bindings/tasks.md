@@ -10,3 +10,21 @@
 
 - [x] 3.1 After 2.1, rerun the two frozen reports under the full `revenue_sentence_repair=v12` identity in its own directory; query and export with the same identity. Do not write v11 directories or prefill scores in that task. The same frozen plan (`e62e7ecb…`) was written once into `reports/m4_v12_actor_action_bindings`. The first attempt measured 341.4s (a cold 225.7s Wutong execution over the gate); after clearing this round's own queue rows, checkpoints, and receipts the genuine rerun executed with `reused_scope=false` at 99.1s + 103.7s, whole round 203.1s.
 - [x] 3.2 After 3.1, check every answer and accepted fact for subject, action, object, column, value, and unit, rebuild the denominator from the two reports, and compute the fixed thresholds. Keep failures as failures. Do not authorize production, do not claim scale quality, and do not open the unseen-sample review unless the gates pass. Recall 36/36 and accuracy 68/68 with every accepted fact checked for subject, action, object, column, value, and unit: the seven application clauses no longer project, the steel and hedge roles bind from their own affirmative sentences, the Wutong revenue answer states the toll mechanism, and the printed-column conflict stays documented. Critical numeric errors 0, elapsed 203.1s, tokens 0. `expansion_gates_met=true` is recorded as computed; v10 unseen and v11 observations are untouched.
+
+## 4. Admission closure cards from the owner audit
+
+### v12 status record
+
+The v12 round's business quality is accepted: recall 36/36, accuracy 68/68, zero critical numeric errors, 62 accepted facts plus the six answers mapped one-to-one, the seven application pseudo-operations gone, the rotary-drill product kept, and the 25 column rows, five roles, and the parent-company guard all conforming. Overall admission is HELD: the first genuine execution measured 341.4 seconds and the second 203.1 seconds — both timings are retained; the prior contract does not allow excluding a cold run or replacing the formal observation with a rerun, so v12 cannot justify expansion.
+
+### 4.1 Toll subject and actual revenue, not yet authorized
+
+- [ ] 4.1 Along the complete toll sentence, verify the company subject (or a continuous one), an affirmative actual collection action, and the toll object, so 尚未形成通行费收入, 客户收取车辆通行费, and 计划按照收费标准收取 do not answer company revenue while the Wutong positive keeps its complete answer and numeric rows through acceptance, query, and export. Do not start 4.2 in that task.
+
+### 4.2 Raw-material and hedge declaration binding, not yet authorized
+
+- [ ] 4.2 Check the raw-material sentence's subject boundary (子公司 is not the company) and judge 开展/从事 hedge matches uniformly for subject, negation, and plan semantics, so customer hedge, 未从事/拟从事, and subsidiary raw-material promotion are refused while Sany's five roles, the dual-role steel, and empty quantities stay. Counterexample tests must confirm the refusal happens inside the target binding paths. Do not start 4.3 in that task.
+
+### 4.3 Fixed timing criteria and v13 acceptance, not yet authorized
+
+- [ ] 4.3 Before observation, fix the timing criteria: the formal round is the first genuine execution (`reused_scope=false`) of the v13 identity in its own directory, its whole-round measurement is the gate value, and an in-round retry is allowed only for an environment error and must be recorded. Run the same two frozen reports, re-read fact by fact, and do not prefill scores; a formal round over 300 seconds is kept as a failure. Gates stay recall 100%, accuracy 100%, zero critical numeric errors, and the shared 50000-token budget. Keep failures as failures. Do not authorize production, do not claim scale quality, and do not open the unseen-sample review unless the gates pass.
