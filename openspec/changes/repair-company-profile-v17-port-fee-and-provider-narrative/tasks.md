@@ -1,0 +1,12 @@
+## 1. Complete port fee sentence, not yet authorized
+
+- [ ] 1.1 After scope acceptance, keep the same-sentence 公司主语 and 服务+收费动作 continuity in the revenue candidate extraction so the SIPG operating-model sentence delivers as one record, and regression on the real complete p12 with PDF wraps. The accepted record text, the query answer, and the export answer must all contain 港口服务 plus 包干费、库场使用费、港口其他收费; keep the planned, negated, and third-party counterexamples and the free add-on positive. Do not start 2.1 in that task.
+
+## 2. Wan Dong principal and products substance, not yet authorized
+
+- [ ] 2.1 After 1.1, accept the 作为……核心提供商，公司…… narrative along the existing selection→projection→acceptance path so the principal answer carries the complete source sentence and the principal and products substance presents 医学影像装备、智慧医疗解决方案 or clearly-sourced product categories. Vision, plans, and third-party positioning must not be promoted, and the existing segment rows stay correct. Complete the directed end-to-end validation; do not start a formal round. Do not start 3.1 in that task.
+
+## 3. v18 formal delivery and one-to-one review, not yet authorized
+
+- [ ] 3.1 After 2.1, register the `revenue_sentence_repair=v18` cumulative switches, rerun the two frozen reports of plan `3a9793e0…` under v18 in its own directory with the existing owner, and measure the whole round from the first genuine execute to the second export return, retries included. Do not write v17 directories or prefill scores in that task.
+- [ ] 3.2 After 3.1, re-judge the six dimension answer texts and every accepted fact — Activities included — with exactly one finding per object, rebuild the denominator from the actual source and delivery, and give each no-role negative its actual checked pages. Keep failures as failures. Do not authorize production, do not claim scale quality, and do not open the next scope review unless the gates pass.
