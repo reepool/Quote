@@ -37,7 +37,7 @@ CORE_DIMENSION_IDS = (
     "revenue_model",
 )
 _PRINCIPAL_PATTERN = re.compile(
-    r"(主营|主要从事|主要业务|主要经营|经营模式|经营范围|金融服务)"
+    r"(主营|主要从事|主要业务|主要经营|经营模式|经营范围|金融服务|核心提供商)"
 )
 _COMPLETE_COMPANY_BUSINESS = re.compile(
     r"(?<![\u4e00-\u9fff])(?:本公司|公司)(?:业务覆盖|专注于).{2,}"
