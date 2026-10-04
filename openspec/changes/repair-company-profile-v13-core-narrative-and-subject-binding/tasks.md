@@ -14,7 +14,21 @@
 
 - [x] 2.3 Keep the Zhongzhi originally enumerated products and manufacturing services (整机及零部件制造、通用飞机、航空转包生产和客户化服务) in the answer text, keep the Rizhao complete sentence (company provides the service and collects the 包干费、堆存费 and other logistics fees), require the company subject together with an affirmative collection action, refuse planned, negated, and third-party collection, and keep the 向客户收取技术服务费 positive. Assert the actual text in query and export. Do not start 3.1 in that task. The Zhongzhi capture keeps the 涉足 sentence (整机及零部件制造、通用飞机、航空转包生产和客户化服务), the Rizhao revenue answer carries 为客户提供…服务 and 包干费/堆存费/物流其他费用, the collection-semantics guard now refuses 计划/第三方/不收取 statements for every inflow keyword, the 向客户收取技术服务费 positive passes, and the drive asserts the actual query and export text under the formal v14 identity.
 
-## 3. v14 formal delivery and review, not yet authorized
+## 3. v14 formal delivery and review (executed; review superseded by the owner audit)
 
-- [ ] 3.1 BLOCKED — see 3.1 note. After 2.1, rerun the two frozen reports under the full `revenue_sentence_repair=v14` identity in its own directory; query and export with the same identity, measure the whole round from the first genuine execute to the second export return, and keep failures and retries. Do not write v13 directories or prefill scores in that task. HOLD per the owner audit: the earlier pipeline-drop diagnosis was wrong — empty `unresolved_field_ids` does not drop candidates (workflow loads deterministic candidates first) and the span 0/1 variance was not reproduced with fixed input. The real blockers are: the v14 cumulative switches were not wired (a formal v14 identity would turn every repair off), and the failing fixtures were missing the continuation page (a real `table_context_incomplete` refusal). Cards 2.2 and 2.3 close both; the v14 formal round runs after they pass.
-- [ ] 3.2 After 3.1, re-judge the six dimension texts and every delivered fact for subject, column, amount, and unit, rebuild the denominator, and read freshness from the frozen report assets. Keep a checked no-role negative with its actual scope. Keep failures as failures. Do not authorize production, do not claim scale quality, and do not open the next scope review unless the gates pass.
+- [x] 3.1 The formal v14 round ran as the first genuine execution (`reused_scope=false`) over plan `3a9793e0…` in `m4_v14_formal_acceptance`: 600017 84.2s + 600038 84.9s, whole round 169.3s, zero tokens. The earlier HOLD (unwired v14 switches, missing continuation pages) was resolved by cards 2.2/2.3 before the run.
+- [x] 3.2 The review recorded recall 17/17, accuracy 29/29, zero critical numeric errors, freshness read from `effective_annual_reports` (600017 2026-03-26T16:00Z, 600038 amended 2026-05-15T16:00Z). SUPERSEDED BY THE OWNER AUDIT: the Rizhao revenue answer only carried 为客户提供…服务 without the three fees, yet the review scored both the answer and the fee mechanism delivered and accurate — the 17/17 and 29/29 therefore cannot justify expansion. See cards 4.1–4.3.
+
+## 4. Owner-audit closure cards (toll answer completeness)
+
+### 4.1 Deliver the complete toll sentence, not yet authorized
+
+- [x] 4.1 (implemented, pending the v15 round) The 主要经营 capture bridges the intervening development narrative (bounded `[\s\S]` gap) so the accepted overview source_text, the query answer, and the export answer all carry 提供服务 plus 收取…包干费、堆存费和物流其他费用; the drive fixture uses the real complete p9 including the development narrative and PDF wraps. Zhongzhi text and existing table results unchanged.
+
+### 4.2 Whole-sentence toll semantics, not yet authorized
+
+- [x] 4.2 (implemented, pending the v15 round) The revenue gate applies the block list and the planning guard at the sentence level, requires an affirmative collection verb for 为客户提供…服务 statements, and keeps the 向客户收取技术服务费 positive. All five counterexamples (但不收取/尚未收取/第三方收取/计划收取/仅提供服务无收费) are refused at the same gate.
+
+### 4.3 v15 formal delivery and honest review, not yet authorized
+
+- [ ] 4.3 After 4.1 and 4.2, register the `revenue_sentence_repair=v15` cumulative switches, rerun the same frozen plan `3a9793e0…` under v15 in its own directory, and measure the whole round from the first genuine execute to the second export return. Re-judge the six answers and every accepted fact; a toll mechanism that appears only in evidence quotes is scored NOT delivered. Freshness comes from the frozen assets; no-role negatives keep their actual check scope. Gates stay double 100%, zero critical numeric errors, 50000 tokens, 300 seconds. The v13 and v14 snapshots are kept byte-for-byte, and the v14 snapshot carries this audit-limitation note.
