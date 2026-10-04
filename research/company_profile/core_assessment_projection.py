@@ -382,7 +382,7 @@ def _assess_products_services(
                 _PRODUCT_PATTERN.search(record.source_text)
                 or (
                     source_delivery_repair
-                    and re.search(r"主要业务是|主要从事|主营业务为|主要经营|研发制造", record.source_text or "")
+                    and re.search(r"主要业务是|主要从事|主营业务为|主要经营|研发制造|核心提供商", record.source_text or "")
                 )
             )
         ):
@@ -392,7 +392,7 @@ def _assess_products_services(
             record
             for record in supports
             if isinstance(record, BusinessOverview)
-            and re.search(r"主要产品有|主要业务是|主要从事|主营业务为|主要经营|研发制造", record.source_text or "")
+            and re.search(r"主要产品有|主要业务是|主要从事|主营业务为|主要经营|研发制造|核心提供商", record.source_text or "")
         ]
         if series:
             supports = [*series, *[record for record in supports if record not in series]]

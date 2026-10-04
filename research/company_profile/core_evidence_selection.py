@@ -105,6 +105,7 @@ _SECTION_BOUNDARY = re.compile(
 _CONTINUATION_TAIL = re.compile(r"(如下[:：]?|见表|详见|续[见表]|：$)$")
 _OVERVIEW_SUBSTANCE = re.compile(
     r"(?:公司|本公司).{0,40}(?:主营|主要从事|经营|生产|销售|提供|研发)|"
+    r"作为[^。]{2,60}核心提供商|"
     r"取得货款|收入来[源于自]|向客户收取|主要产品为"
 )
 _COMPANY_BUSINESS_SENTENCE = re.compile(
@@ -134,6 +135,9 @@ _COMPANY_AS_NARRATIVE = re.compile(
     r"[^。\n]{2,40}作为[^。]{2,80}(?:上市公司|工业企业)"
     r"[^。]{2,300}研发制造[^。]{4,300}"
     r"(?:。[^。\n]{2,200}涉足[^。]{2,200})?"
+)
+_PROVIDER_NARRATIVE = re.compile(
+    r"作为[^。\n]{2,60}核心提供商[^。]{2,60}(?:公司|本公司)[^。]{8,300}"
 )
 _CORE_ANSWER_SUBSTANCE = re.compile(
     _COMPANY_BUSINESS_SENTENCE.pattern + "|" + _STEEL_BUSINESS_SENTENCE.pattern
@@ -1303,6 +1307,7 @@ def _project_overview_span(
             or _main_operation_source(span.excerpt)
             or _operating_model_source(span.excerpt)
             or _company_as_narrative_source(span.excerpt)
+            or _provider_narrative_source(span.excerpt)
         )
         if delivered:
             company_sentence = delivered
@@ -2471,6 +2476,17 @@ def _main_operation_source(excerpt: str) -> str:
 
     joined = _join_pdf_soft_breaks(excerpt)
     match = _MAIN_OPERATION_SENTENCE.search(joined)
+    if match is None:
+        return ""
+    compact = re.sub(r"\s+", "", match.group(0))
+    return _original_span_matching(excerpt, compact) or ""
+
+
+def _provider_narrative_source(excerpt: str) -> str:
+    """The 作为……核心提供商，公司…… current-business narrative."""
+
+    joined = _join_pdf_soft_breaks(excerpt)
+    match = _PROVIDER_NARRATIVE.search(joined)
     if match is None:
         return ""
     compact = re.sub(r"\s+", "", match.group(0))
