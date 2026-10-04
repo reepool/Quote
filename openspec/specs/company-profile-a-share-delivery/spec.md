@@ -29,6 +29,18 @@ The system MUST assess principal business, major products/services or business l
 - **WHEN** a result contains many accepted measurements but lacks principal-business evidence
 - **THEN** accepted facts remain deliverable and core completeness remains false.
 
+### Requirement: Planned collection vetoes the revenue sentence
+The revenue gate MUST judge the complete sentence: when any clause pairs 尚未/拟/计划/预期/将 with 收取 or 形成, the sentence MUST NOT answer company revenue, even when an earlier clause states the service with the company subject. Free add-on wording keeps its clause-level scope, and the accepted source text and the answer text MUST both carry the actual collected fees before the revenue answer counts as delivered.
+
+#### Scenario: A service clause cannot borrow a planned collection
+- **WHEN** an overview states 公司的经营模式主要为：为客户提供……服务，计划收取货物堆存费……
+- **THEN** the revenue gate refuses the sentence
+- **AND** an affirmative same-sentence collection still answers
+
+#### Scenario: Limited acceptance conclusion for the v13 narrative rounds
+- **WHEN** the v13–v16 narrative and subject rounds are summarized
+- **THEN** the recorded conclusion is a limited acceptance: the narrative captures, the default group subject, and the fee-mechanism text are delivered and verified, and the rounds never authorized production or scale quality.
+
 ### Requirement: Subject default is uniform across extraction and consumers
 Every active extractor, verifier, projection and evaluator MUST use consolidated_group with report_default_group_scope when no explicit narrower scope or unresolved subject conflict exists. Explicit issuer, named subsidiary and business segment evidence MUST take precedence. Direct wording and numerical reconciliation MUST retain their own basis. Original actor wording MUST remain unchanged; a default group MUST NOT transfer a third-party action to the listed company.
 
