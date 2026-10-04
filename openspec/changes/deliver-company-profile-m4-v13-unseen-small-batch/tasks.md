@@ -1,6 +1,6 @@
 ## 1. Unseen freeze, not yet authorized
 
-- [ ] 1.1 Pass all fourteen observed companies through `delivered_ids`, freeze one service company and one manufacturing company in SSE, SZSE, BSE and instrument-id order under cutoff `2026-09-17`, the full v13 identity, fixed report versions and PDF bindings, the independent directory `reports/m4_v13_unseen_small_batch`, and the shared 50000-token budget. A second read returns the same plan, both reports are unseen, and the historical files keep their recorded bytes. This card stops at the freeze; do not enqueue.
+- [x] 1.1 Pass all fourteen observed companies through `delivered_ids`, freeze one service company and one manufacturing company in SSE, SZSE, BSE and instrument-id order under cutoff `2026-09-17`, the full v13 identity, fixed report versions and PDF bindings, the independent directory `reports/m4_v13_unseen_small_batch`, and the shared 50000-token budget. A second read returns the same plan, both reports are unseen, and the historical files keep their recorded bytes. This card stops at the freeze; do not enqueue. The fourteen observed ids were passed through `delivered_ids`; the freeze selected `600017.SH` (service) and `600038.SH` (manufacturing), both outside the set, plan `3a9793e0…` read back identically, and the historical snapshot bytes were unchanged.
 
 ## 2. Controlled delivery, query, and export, not yet authorized
 
