@@ -128,6 +128,7 @@ _MAIN_OPERATION_SENTENCE = re.compile(
 _COMPANY_AS_NARRATIVE = re.compile(
     r"[^。\n]{2,40}作为[^。]{2,80}(?:上市公司|工业企业)"
     r"[^。]{2,300}研发制造[^。]{4,300}"
+    r"(?:。[^。\n]{2,200}涉足[^。]{2,200})?"
 )
 _CORE_ANSWER_SUBSTANCE = re.compile(
     _COMPANY_BUSINESS_SENTENCE.pattern + "|" + _STEEL_BUSINESS_SENTENCE.pattern
@@ -1046,6 +1047,7 @@ REVENUE_SENTENCE_REPAIR_V10 = "v10"
 REVENUE_SENTENCE_REPAIR_V11 = "v11"
 REVENUE_SENTENCE_REPAIR_V12 = "v12"
 REVENUE_SENTENCE_REPAIR_V13 = "v13"
+REVENUE_SENTENCE_REPAIR_V14 = "v14"
 _REVENUE_SENTENCE_REPAIR_VERSIONS = frozenset(
     {
         REVENUE_SENTENCE_REPAIR_V1,
@@ -1061,6 +1063,7 @@ _REVENUE_SENTENCE_REPAIR_VERSIONS = frozenset(
         REVENUE_SENTENCE_REPAIR_V11,
         REVENUE_SENTENCE_REPAIR_V12,
         REVENUE_SENTENCE_REPAIR_V13,
+        REVENUE_SENTENCE_REPAIR_V14,
     }
 )
 
@@ -1099,6 +1102,7 @@ def named_role_repair_requested(identity: Mapping[str, Any] | None) -> bool:
         REVENUE_SENTENCE_REPAIR_V11,
         REVENUE_SENTENCE_REPAIR_V12,
         REVENUE_SENTENCE_REPAIR_V13,
+        REVENUE_SENTENCE_REPAIR_V14,
     }
 
 
@@ -1120,6 +1124,7 @@ def service_operating_energy_requested(identity: Mapping[str, Any] | None) -> bo
         REVENUE_SENTENCE_REPAIR_V11,
         REVENUE_SENTENCE_REPAIR_V12,
         REVENUE_SENTENCE_REPAIR_V13,
+        REVENUE_SENTENCE_REPAIR_V14,
     }
 
 
@@ -1141,6 +1146,7 @@ def core_answer_repair_requested(identity: Mapping[str, Any] | None) -> bool:
         REVENUE_SENTENCE_REPAIR_V11,
         REVENUE_SENTENCE_REPAIR_V12,
         REVENUE_SENTENCE_REPAIR_V13,
+        REVENUE_SENTENCE_REPAIR_V14,
     }
 
 
@@ -1163,6 +1169,7 @@ def source_delivery_repair_requested(identity: Mapping[str, Any] | None) -> bool
         REVENUE_SENTENCE_REPAIR_V11,
         REVENUE_SENTENCE_REPAIR_V12,
         REVENUE_SENTENCE_REPAIR_V13,
+        REVENUE_SENTENCE_REPAIR_V14,
     }
 
 

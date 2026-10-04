@@ -689,6 +689,20 @@ def test_hedge_and_steel_bindings_refuse_at_the_function_level():
 
 
 def test_new_narratives_deliver_principal_and_products(tmp_path):
+    import tests.unit.test_research.test_company_profile_v7_source_delivery as sd
+
+    original_identity = sd._identity
+    sd._identity = lambda: {
+        **original_identity(),
+        "revenue_sentence_repair": "v14",
+    }
+    try:
+        _run_new_narrative_drives(tmp_path)
+    finally:
+        sd._identity = original_identity
+
+
+def _run_new_narrative_drives(tmp_path):
     rizhao = _drive(
         tmp_path / "rizhao",
         "600017.SH",
@@ -703,6 +717,21 @@ def test_new_narratives_deliver_principal_and_products(tmp_path):
                     "物运输代理、仓储等物流增值业务。\n"
                     "公司的经营模式主要为：为客户提供货物港口装卸作业及相关服务，收取货物港口装卸作业\n"
                     "包干费、货物堆存费和港口物流其他费用。\n"
+                ),
+                "readable": True,
+            },
+            {
+                "page": 13,
+                "text": (
+                    "2、收入和成本分析\n"
+                    "(1). 主营业务分行业、分产品、分地区、分销售模式情况\n"
+                    "单位：元 币种：人民币\n"
+                    "主营业务分行业情况\n"
+                    "分行业 营业收入 营业成本\n"
+                    "港口服务 7,325,091,884.88 5,866,953,061.24 19.91 -6.95\n"
+                    "主营业务分地区情况\n"
+                    "分地区 营业收入 营业成本\n"
+                    "境内 7,510,322,574.34 6,006,191,677.17 20.03 -6.79\n"
                 ),
                 "readable": True,
             },
@@ -722,11 +751,33 @@ def test_new_narratives_deliver_principal_and_products(tmp_path):
             {
                 "page": 10,
                 "text": (
+                    "第三节 管理层讨论与分析\n"
                     "一、报告期内公司从事的业务情况\n"
                     "中直股份作为我国直升机产业的专业化上市公司，也是致力于高端航空产品制造的现代化工\n"
                     "业企业，秉持“扶摇直上，无所不达”的产品理念，研发制造多型不同吨位、满足各类用途的各\n"
                     "领域直升机，以及运 12 和运 12F 系列通用飞机。公司产品结构合理，产品谱系齐全，涉足直升机\n"
-                    "整机及零部件制造、通用飞机、航空转包生产和客户化服务等多领域。\n"
+                    "整机及零部件制造、通用飞机、航空转包生产和客户化服务等多领域，成为国内领先的直升机整\n"
+                    "机及零部件供应商。为各类客户和消费者提供有竞争力的航空产品与服务，同时公司也是低空经\n"
+                    "济发展中的航空高科技核心骨干企业。\n"
+                    "报告期内公司新增重要非主营业务的说明\n"
+                    "□适用 √不适用\n"
+                    "二、报告期内公司所处行业情况\n"
+                    "先进航空装备制造业是现代大国博弈、强国争雄的高端平台，是国家综合国力的重要组成部分。\n"
+                ),
+                "readable": True,
+            },
+            {
+                "page": 14,
+                "text": (
+                    "2、收入和成本分析\n"
+                    "(1). 主营业务分行业、分产品、分地区、分销售模式情况\n"
+                    "单位：元 币种：人民币\n"
+                    "主营业务分行业情况\n"
+                    "分行业 营业收入 营业成本\n"
+                    "航空制造 28,875,236,882.59 26,180,458,895.93 9.33 -1.26\n"
+                    "主营业务分产品情况\n"
+                    "分产品 营业收入 营业成本\n"
+                    "航空产品 28,875,236,882.59 26,180,458,895.93 9.33 -1.26\n"
                 ),
                 "readable": True,
             },
@@ -737,3 +788,10 @@ def test_new_narratives_deliver_principal_and_products(tmp_path):
         products = re.sub(r"\s+", "", _dimension(profile, "products_services"))
         assert "中直股份作为我国直升机产业" in principal
         assert "直升机" in products and "运12" in products and "通用飞机" in products
+        assert "整机及零部件制造" in products
+        assert "航空转包生产" in products
+        assert "客户化服务" in products
+    for profile in (rizhao["query"], rizhao["export"]):
+        revenue = re.sub(r"\s+", "", _dimension(profile, "revenue_model"))
+        assert "为客户提供货物港口装卸作业及相关服务" in revenue
+        assert "包干费" in revenue and "堆存费" in revenue and "物流其他费用" in revenue

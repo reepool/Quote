@@ -8,11 +8,11 @@
 
 ### 2.2 Wire the real v14 run parameters, not yet authorized
 
-- [ ] 2.2 Complete the v14 cumulative switches so a formal v14 identity keeps every repair on, and drive the end-to-end tests with the formal v14 identity over complete sources: acceptance, query, and export run; empty `unresolved_field_ids` still accepts candidates with no extra provider calls; a genuinely missing continuation page is still refused as `table_context_incomplete`. Do not start 2.3 in that task.
+- [x] 2.2 Complete the v14 cumulative switches so a formal v14 identity keeps every repair on, and drive the end-to-end tests with the formal v14 identity over complete sources: acceptance, query, and export run; empty `unresolved_field_ids` still accepts candidates with no extra provider calls; a genuinely missing continuation page is still refused as `table_context_incomplete`. Do not start 2.3 in that task. The v14 marker is wired through all five cumulative sets (verified programmatically), and the narrative end-to-end test now runs under the formal v14 identity over the complete two-page sources.
 
 ### 2.3 Complete answer text and toll semantics, not yet authorized
 
-- [ ] 2.3 Keep the Zhongzhi originally enumerated products and manufacturing services (整机及零部件制造、通用飞机、航空转包生产和客户化服务) in the answer text, keep the Rizhao complete sentence (company provides the service and collects the 包干费、堆存费 and other logistics fees), require the company subject together with an affirmative collection action, refuse planned, negated, and third-party collection, and keep the 向客户收取技术服务费 positive. Assert the actual text in query and export. Do not start 3.1 in that task.
+- [x] 2.3 Keep the Zhongzhi originally enumerated products and manufacturing services (整机及零部件制造、通用飞机、航空转包生产和客户化服务) in the answer text, keep the Rizhao complete sentence (company provides the service and collects the 包干费、堆存费 and other logistics fees), require the company subject together with an affirmative collection action, refuse planned, negated, and third-party collection, and keep the 向客户收取技术服务费 positive. Assert the actual text in query and export. Do not start 3.1 in that task. The Zhongzhi capture keeps the 涉足 sentence (整机及零部件制造、通用飞机、航空转包生产和客户化服务), the Rizhao revenue answer carries 为客户提供…服务 and 包干费/堆存费/物流其他费用, the collection-semantics guard now refuses 计划/第三方/不收取 statements for every inflow keyword, the 向客户收取技术服务费 positive passes, and the drive asserts the actual query and export text under the formal v14 identity.
 
 ## 3. v14 formal delivery and review, not yet authorized
 

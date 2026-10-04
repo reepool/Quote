@@ -66,7 +66,7 @@ _REVENUE_INFLOW_PATTERN = re.compile(
 )
 _REVENUE_BLOCK_PATTERN = re.compile(
     r"(免费|无偿|不收取|未收取|并不收取|无需(?:支付|收取)|向(?:公司|本公司)收取|"
-    r"第三方|代第三方|代收|客户[^。；;]{0,8}收取)"
+    r"第三方|代第三方|代收|(?<!向)客户[^。；;]{0,8}收取)"
 )
 _REVENUE_NEGATION_PREFIX = re.compile(r"(尚未|还未|仍未|并未|没有|未|不|拟|计划)$")
 _REPAIR_REVENUE_INFLOW_PATTERN = re.compile(
@@ -554,6 +554,8 @@ def _overview_states_revenue(
             if match is None:
                 continue
             if _REVENUE_NEGATION_PREFIX.search(statement[: match.start()]):
+                continue
+            if re.search(r"(?:尚未|拟|计划|预期|将)[^。；;]{0,12}(?:收取|形成)", statement):
                 continue
             if "通行费" in statement and not _toll_statement_is_company_revenue(
                 sentence, company_subject
