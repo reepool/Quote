@@ -1,6 +1,6 @@
 ## 1. Application pseudo-operations, not yet authorized
 
-- [ ] 1.1 After scope acceptance, truncate application enumerations at 用于 so only the product projects, keeping the rotary-drill record and the application text in evidence. Verify the seven wrong actions disappear while the three answers, the machinery business, the five roles, and all numeric rows stay queryable and exportable. Do not start 2.1 in that task.
+- [x] 1.1 After scope acceptance, truncate application enumerations at 用于 so only the product projects, keeping the rotary-drill record and the application text in evidence. Verify the seven wrong actions disappear while the three answers, the machinery business, the five roles, and all numeric rows stay queryable and exportable. Do not start 2.1 in that task. `_activity_object_clauses` now truncates the captured group at 用于, and the Sany drive test asserts the seven application names no longer appear among company activities while the rotary-drill product, steel, and hedge records remain.
 
 ## 2. Same-sentence affirmative bindings, not yet authorized
 

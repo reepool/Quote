@@ -360,6 +360,17 @@ def test_sany_steel_raw_material_and_four_hedge_underlyings(tmp_path):
     names = {i.get("source_native_name") for i in activities}
     for name in ("铜", "铝", "原油"):
         assert name in names, name
+    # application areas of the rotary drill are not company operations
+    for application in (
+        "用于市政建设",
+        "公路桥梁",
+        "工业",
+        "民用建筑",
+        "地下连续墙",
+        "水利",
+        "防渗护坡",
+    ):
+        assert application not in names, application
     exposures = result["query"]["commodity_exposure"]["assessment"]["exposures"]
     hedges = [i for i in exposures if i["role"] == "hedge_underlying"]
     assert {i["source_native_name"] for i in hedges} == {"钢材", "铜", "铝", "原油"}

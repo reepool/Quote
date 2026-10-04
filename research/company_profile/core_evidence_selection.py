@@ -2919,6 +2919,11 @@ def _activity_object_clauses(clause: str) -> list[str]:
     provided = re.search(r"以.+?为对象[，,]?\s*提供(.+)", text)
     if provided:
         text = provided.group(1)
+    # "旋挖钻机，用于市政建设、公路桥梁……" enumerates where a product is used;
+    # the application areas are not company activities.
+    used_for = re.search(r"用于", text)
+    if used_for:
+        text = text[: used_for.start()]
     objects: list[str] = []
     for item in _split_listed(text):
         item = item.strip("，,、；;。 ")
