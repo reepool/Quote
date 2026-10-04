@@ -2435,7 +2435,7 @@ def _steel_raw_material_binding(excerpt: str) -> dict[str, Any] | None:
     joined = _join_pdf_soft_breaks(excerpt)
     for sentence in re.split(r"[。；;]", joined):
         compact = re.sub(r"\s+", "", sentence)
-        if "公司生产所需的主要原材料及零部件为" not in compact:
+        if not re.search(r"(?<![子母])公司生产所需的主要原材料及零部件为", compact):
             continue
         if "客户" in compact or "第三方" in compact:
             continue
@@ -2467,9 +2467,13 @@ def _hedge_underlying_bindings(excerpt: str) -> list[dict[str, Any]]:
         compact = re.sub(r"\s+", "", sentence)
         if "原料的期货业务" not in compact:
             continue
-        if re.search(r"(?:未|拟|计划|将)开展", compact):
+        if re.search(r"(?:未|拟|计划|将)(?:开展|从事)", compact):
             continue
         if "开展" not in compact and "从事" not in compact:
+            continue
+        if "客户" in compact or "第三方" in compact or "子公司" in compact:
+            continue
+        if not re.search(r"本公司|本集团|(?<![子母])公司", compact):
             continue
         if "套期保值" not in compact and "期货" not in compact:
             continue

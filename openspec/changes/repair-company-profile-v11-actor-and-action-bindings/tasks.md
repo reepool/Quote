@@ -19,11 +19,11 @@ The v12 round's business quality is accepted: recall 36/36, accuracy 68/68, zero
 
 ### 4.1 Toll subject and actual revenue, not yet authorized
 
-- [ ] 4.1 Along the complete toll sentence, verify the company subject (or a continuous one), an affirmative actual collection action, and the toll object, so 尚未形成通行费收入, 客户收取车辆通行费, and 计划按照收费标准收取 do not answer company revenue while the Wutong positive keeps its complete answer and numeric rows through acceptance, query, and export. Do not start 4.2 in that task.
+- [x] 4.1 Along the complete toll sentence, verify the company subject (or a continuous one), an affirmative actual collection action, and the toll object, so 尚未形成通行费收入, 客户收取车辆通行费, and 计划按照收费标准收取 do not answer company revenue while the Wutong positive keeps its complete answer and numeric rows through acceptance, query, and export. Do not start 4.2 in that task. The revenue assessor now judges the complete sentence: the company subject may sit in the opening clause (公司……，按照收费标准收取车辆通行费 answers), while 尚未形成, 客户收取, 计划收取, third-party collection, and 拟收取 are refused at the same gate. Directed tests cover the three exact counterexamples and the Wutong positive.
 
 ### 4.2 Raw-material and hedge declaration binding, not yet authorized
 
-- [ ] 4.2 Check the raw-material sentence's subject boundary (子公司 is not the company) and judge 开展/从事 hedge matches uniformly for subject, negation, and plan semantics, so customer hedge, 未从事/拟从事, and subsidiary raw-material promotion are refused while Sany's five roles, the dual-role steel, and empty quantities stay. Counterexample tests must confirm the refusal happens inside the target binding paths. Do not start 4.3 in that task.
+- [x] 4.2 Check the raw-material sentence's subject boundary (子公司 is not the company) and judge 开展/从事 hedge matches uniformly for subject, negation, and plan semantics, so customer hedge, 未从事/拟从事, and subsidiary raw-material promotion are refused while Sany's five roles, the dual-role steel, and empty quantities stay. Counterexample tests must confirm the refusal happens inside the target binding paths. Do not start 4.3 in that task. The steel binding requires the declaration phrase without a 子/母 prefix on 公司 and refuses customer or third-party subjects in the sentence; the hedge binding refuses 未从事/拟从事 (the guard now covers both verbs), customer, third-party, and subsidiary subjects, and requires the company actor in the sentence. Function-level tests drive each counterexample and the real positives directly through the binding paths.
 
 ### 4.3 Fixed timing criteria and v13 acceptance, not yet authorized
 

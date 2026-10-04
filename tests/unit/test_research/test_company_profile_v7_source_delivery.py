@@ -628,3 +628,61 @@ def test_parent_company_table_is_not_lifted_to_the_group_subject():
         assert item.subject_scope != SubjectScope.CONSOLIDATED_GROUP or (
             item.subject_basis != SubjectBasis.DIRECT_SOURCE_WORDING
         )
+
+
+def test_toll_counterexamples_do_not_answer_company_revenue():
+    """These statements are exactly what the revenue assessor evaluates on
+    the overview source text, so the gate itself must refuse them."""
+
+    from research.company_profile.core_assessment_projection import (
+        _overview_states_revenue,
+    )
+
+    for text in (
+        "报告期内尚未形成通行费收入。",
+        "通行费由客户收取车辆通行费后划付。",
+        "公司计划按照收费标准收取车辆通行费。",
+    ):
+        assert not _overview_states_revenue(text), text
+
+
+def test_hedge_and_steel_bindings_refuse_at_the_function_level():
+    from research.company_profile.core_evidence_selection import (
+        _hedge_underlying_bindings,
+        _steel_raw_material_binding,
+    )
+
+    assert (
+        _steel_raw_material_binding(
+            "子公司生产所需的主要原材料及零部件为汽车底盘、发动机、钢材。"
+        )
+        is None
+    )
+    assert (
+        _steel_raw_material_binding(
+            "公司生产所需的主要原材料及零部件为汽车底盘、发动机、钢材。"
+        )
+        is not None
+    )
+    assert (
+        _hedge_underlying_bindings(
+            "客户开展与生产相关的大宗商品（如：钢材、铜、铝、原油等）原料的期货业务。"
+        )
+        == []
+    )
+    assert (
+        _hedge_underlying_bindings(
+            "公司未从事原料的期货业务，无套期保值安排。"
+        )
+        == []
+    )
+    assert (
+        _hedge_underlying_bindings(
+            "公司拟开展与生产相关的大宗商品（如：钢材、铜、铝、原油等）原料的期货业务。"
+        )
+        == []
+    )
+    bound = _hedge_underlying_bindings(
+        "公司以自有资金开展与本公司生产相关的大宗商品（如：钢材、铜、铝、原油等）原料的期货业务。"
+    )
+    assert [item["name"] for item in bound] == ["钢材", "铜", "铝", "原油"]

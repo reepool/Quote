@@ -529,19 +529,45 @@ def _overview_states_revenue(
         if repair_revenue_sentence
         else _REVENUE_INFLOW_PATTERN
     )
-    for statement in _STATEMENT_SPLIT.split(source):
-        statement = statement.strip()
-        if not statement:
+    for sentence in re.split(r"[。；;\n]", source):
+        if not sentence.strip():
             continue
-        if _REVENUE_BLOCK_PATTERN.search(statement):
-            continue
-        match = pattern.search(statement)
-        if match is None:
-            continue
-        if _REVENUE_NEGATION_PREFIX.search(statement[: match.start()]):
-            continue
-        return True
+        # The subject may sit in an earlier clause of the same sentence
+        # ("公司……，按照收费标准收取车辆通行费"), so the company subject is
+        # judged at sentence level while the inflow keywords stay clause-level.
+        company_subject = re.search(r"本公司|本集团|公司", sentence) is not None
+        for statement in _STATEMENT_SPLIT.split(sentence):
+            statement = statement.strip()
+            if not statement:
+                continue
+            if _REVENUE_BLOCK_PATTERN.search(statement):
+                continue
+            match = pattern.search(statement)
+            if match is None:
+                continue
+            if _REVENUE_NEGATION_PREFIX.search(statement[: match.start()]):
+                continue
+            if "通行费" in statement and not _toll_statement_is_company_revenue(
+                sentence, company_subject
+            ):
+                continue
+            return True
     return False
+
+
+def _toll_statement_is_company_revenue(sentence: str, company_subject: bool) -> bool:
+    """A toll statement counts only with the company subject (stated in the
+    sentence or carried over from its opening clause) and an actual,
+    affirmative collection action — planned, unformed, or third-party tolls
+    are not company revenue."""
+
+    if not company_subject:
+        return False
+    if re.search(r"客户|第三方|代收", sentence):
+        return False
+    if re.search(r"(?:尚未|拟|计划|预期|将)[^。；;]{0,12}(?:收取|形成)", sentence):
+        return False
+    return bool(re.search(r"收取|实现|取得|获得", sentence))
 
 
 def _is_company_total_measurement(record: SemanticRecord) -> bool:
