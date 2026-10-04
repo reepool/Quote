@@ -914,3 +914,19 @@ def _revenue_scope(
         segment_label=measured_object,
     ).model_copy(update={"evidence": (evidence,)})
     return record, coverage
+
+
+def test_planned_collection_in_later_clause_does_not_answer_revenue_model():
+    """Real Rizhao p9 shape: the service clause sits before a planned
+    collection clause; the service clause must not borrow it."""
+
+    report, overview = _overview_record(
+        "公司的经营模式主要为：为客户提供货物港口装卸作业及相关服务，"
+        "计划收取货物堆存费和港口物流其他费用。"
+    )
+    assessment = project_core_assessment(
+        report=report,
+        task_results=(_accepted_records(report, [overview]),),
+    )
+    assert assessment.revenue_model.answered is False
+    assert assessment.revenue_model.missing_reason == "overview_lacks_dimension"

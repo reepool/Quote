@@ -1,6 +1,6 @@
 ## 1. Planned collection sentence veto, not yet authorized
 
-- [ ] 1.1 After scope acceptance, promote the planning guard (尚未/拟/计划/预期/将+收取/形成) to the sentence level so a service clause cannot borrow a later planned collection verb, and fix the real p9-shaped counterexample as an automated test verified through the acceptance and answer-generation chain. Keep the free add-on positive, the two toll positives, and the other four negatives unchanged. Stop at the local fix and offline acceptance.
+- [x] 1.1 (implemented, pending the v17 round) After scope acceptance, promote the planning guard (尚未/拟/计划/预期/将+收取/形成) to the sentence level so a service clause cannot borrow a later planned collection verb, and fix the real p9-shaped counterexample as an automated test verified through the acceptance and answer-generation chain. Keep the free add-on positive, the two toll positives, and the other four negatives unchanged. Stop at the local fix and offline acceptance. The planning guard now runs at the sentence level before the statement loop, and the real p9-shaped counterexample is fixed as an automated projection test; all ten contract cases pass.
 
 ## 2. v17 formal acceptance and spec closure, not yet authorized
 
