@@ -24,3 +24,11 @@ The rerun MUST use the new `revenue_sentence_repair=v14` identity, its own direc
 - **WHEN** the v14 round completes
 - **THEN** the freshness values come from the frozen report assets
 - **AND** the gates are computed from the honest counts of the formal round
+
+### Requirement: Revenue guard scope follows the collection clause
+The revenue gate MUST apply collection-denial clauses (不收取/未收取/不再收取/无收费) at the sentence level, MUST treat third-party collection (第三方/代第三方/代收) as never company revenue, and MUST constrain planning prefixes and free add-on wording to the clause that contains them. A sales-proceeds sentence with a free add-on service MUST still answer revenue, the five toll counterexamples MUST stay refused, and the 向客户收取技术服务费 positive MUST pass.
+
+#### Scenario: The free add-on does not veto the sales proceeds
+- **WHEN** a sentence states 通过向客户销售设备取得货款，并提供免费安装服务
+- **THEN** the revenue answer is delivered from the proceeds clause
+- **AND** each counterexample sentence remains refused at the same gate
