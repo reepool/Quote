@@ -712,11 +712,21 @@ def _run_new_narrative_drives(tmp_path):
                 "page": 9,
                 "text": (
                     "一、报告期内公司从事的业务情况\n"
+                    "日照港是改革开放后新建的港口。1982 年开工建设，1986 年开港开放。港口总体规划了石臼、\n"
+                    "岚山两大港区，274 个泊位，7.5 亿吨能力。目前已建成 79 个生产泊位，年通过能力超过 5 亿吨。\n"
+                    "其中，石臼港区以金属矿石、煤炭、铝矾土、焦炭、粮食、集装箱装卸业务为主，岚山港区以原\n"
+                    "油、金属矿石、钢铁、木材装卸和服务临港工业为主。\n"
                     "公司成立于 2002 年 7 月，是日照港集团的控股子公司。主要经营金属矿石、煤炭及其制品、\n"
                     "集装箱、粮食、木材、钢铁、非金属矿石等大宗散杂货和件杂货装卸、堆存及中转业务，港口货\n"
-                    "物运输代理、仓储等物流增值业务。\n"
+                    "物运输代理、仓储等物流增值业务。历经多年发展，公司已成为国内主要的铁矿石中转港之一，\n"
+                    "年中转铁矿石吞吐量近 2 亿吨；铁矿石、大豆、石油焦、木片、原木、下水冶金煤等货种吞吐量\n"
+                    "居全国沿海港口前列。\n"
                     "公司的经营模式主要为：为客户提供货物港口装卸作业及相关服务，收取货物港口装卸作业\n"
                     "包干费、货物堆存费和港口物流其他费用。\n"
+                    "报告期内公司新增重要非主营业务的说明\n"
+                    "□适用 √不适用\n"
+                    "二、报告期内公司所处行业情况\n"
+                    "港口是基础性、枢纽性设施，是经济发展的重要支撑。\n"
                 ),
                 "readable": True,
             },
@@ -740,9 +750,24 @@ def _run_new_narrative_drives(tmp_path):
     for profile in (rizhao["query"], rizhao["export"]):
         principal = re.sub(r"\s+", "", _dimension(profile, "principal_business"))
         products = re.sub(r"\s+", "", _dimension(profile, "products_services"))
+        revenue = re.sub(r"\s+", "", _dimension(profile, "revenue_model"))
         assert "主要经营金属矿石" in principal
         assert "装卸" in products and "堆存" in products and "中转" in products
         assert "仓储" in products or "运输代理" in products or "港口服务" in products
+        assert "为客户提供货物港口装卸作业及相关服务" in revenue
+        assert "包干费" in revenue and "堆存费" in revenue
+    accepted_overview = [
+        i
+        for i in rizhao["query"]["accepted_facts"]
+        if i["field_id"] == "business_overview_source"
+    ]
+    assert accepted_overview
+    overview_text = re.sub(
+        r"\s+", "", " ".join(i.get("source_text") or "" for i in accepted_overview)
+    )
+    assert "为客户提供货物港口装卸作业及相关服务" in overview_text
+    assert "包干费" in overview_text and "堆存费" in overview_text
+    assert "物流其他费用" in overview_text
     zhongzhi = _drive(
         tmp_path / "zhongzhi",
         "600038.SH",
