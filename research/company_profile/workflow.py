@@ -14,6 +14,7 @@ from .acceptance_policy import (
     default_group_subject_is_unsupported,
     explicit_group_wording_subject_is_unsupported,
     operating_revenue_share_is_unsupported,
+    report_default_group_is_legal,
 )
 from .contracts import (
     CompanyProfileTaskResult,
@@ -44,6 +45,8 @@ from .models import (
     ObjectType,
     RequirementLevel,
     SemanticRecord,
+    SubjectBasis,
+    SubjectScope,
 )
 
 _ResponseT = TypeVar("_ResponseT", bound=BaseModel)
@@ -207,7 +210,7 @@ class CompanyProfileSemanticService:
                     )
 
         unique_records, duplicate_dispositions, conflict_ids = _reconcile_occurrences(
-            records
+            _promote_default_group_subjects(records)
         )
         dispositions: dict[str, Disposition] = {
             item.target_id: item for item in duplicate_dispositions
@@ -722,6 +725,34 @@ def _is_resolved_supplemental_rejection(
 
 def _coverage_target_id(coverage: CoverageResult) -> str:
     return f"{coverage.chapter_task.value}:{coverage.field_id}"
+
+
+def _promote_default_group_subjects(
+    records: list[SemanticRecord],
+) -> list[SemanticRecord]:
+    """Wire the report default group scope for otherwise unqualified facts.
+
+    A record whose local evidence shows no narrower or conflicting subject
+    adopts the report-level group convention through the existing acceptance
+    rule; a narrower scope such as 母公司 keeps the record unclear.
+    """
+
+    promoted: list[SemanticRecord] = []
+    for record in records:
+        if record.subject_scope == SubjectScope.UNCLEAR and report_default_group_is_legal(
+            record
+        ):
+            promoted.append(
+                record.model_copy(
+                    update={
+                        "subject_scope": SubjectScope.CONSOLIDATED_GROUP,
+                        "subject_basis": SubjectBasis.REPORT_DEFAULT_GROUP_SCOPE,
+                    }
+                )
+            )
+        else:
+            promoted.append(record)
+    return promoted
 
 
 def _reconcile_occurrences(

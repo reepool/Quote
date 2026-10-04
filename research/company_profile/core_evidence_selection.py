@@ -122,6 +122,13 @@ _INTEGRATED_BUSINESS_SENTENCE = re.compile(
 _TOLL_SERVICE_SENTENCE = re.compile(
     r"公司的主营业务为[^。]{4,120}。[^。]{0,120}?通行服务[^。]{2,160}"
 )
+_MAIN_OPERATION_SENTENCE = re.compile(
+    r"主要经营[^。]{8,220}(?:。[^。]{0,40}经营模式[^。]{2,220})?"
+)
+_COMPANY_AS_NARRATIVE = re.compile(
+    r"[^。\n]{2,40}作为[^。]{2,80}(?:上市公司|工业企业)"
+    r"[^。]{2,300}研发制造[^。]{4,300}"
+)
 _CORE_ANSWER_SUBSTANCE = re.compile(
     _COMPANY_BUSINESS_SENTENCE.pattern + "|" + _STEEL_BUSINESS_SENTENCE.pattern
 )
@@ -1256,6 +1263,8 @@ def _project_overview_span(
             _main_business_source(span.excerpt)
             or _integrated_business_source(span.excerpt)
             or _toll_service_source(span.excerpt)
+            or _main_operation_source(span.excerpt)
+            or _company_as_narrative_source(span.excerpt)
         )
         if delivered:
             company_sentence = delivered
@@ -2419,6 +2428,28 @@ def _main_business_source(excerpt: str) -> str:
     return _original_span_matching(excerpt, compact) or ""
 
 
+def _main_operation_source(excerpt: str) -> str:
+    """The 主要经营 sentence with its full business enumeration."""
+
+    joined = _join_pdf_soft_breaks(excerpt)
+    match = _MAIN_OPERATION_SENTENCE.search(joined)
+    if match is None:
+        return ""
+    compact = re.sub(r"\s+", "", match.group(0))
+    return _original_span_matching(excerpt, compact) or ""
+
+
+def _company_as_narrative_source(excerpt: str) -> str:
+    """The 作为……上市公司/工业企业……研发制造 company narrative."""
+
+    joined = _join_pdf_soft_breaks(excerpt)
+    match = _COMPANY_AS_NARRATIVE.search(joined)
+    if match is None:
+        return ""
+    compact = re.sub(r"\s+", "", match.group(0))
+    return _original_span_matching(excerpt, compact) or ""
+
+
 def _toll_service_source(excerpt: str) -> str:
     """The 主营业务为 sentence plus its following toll-service mechanism."""
 
@@ -2816,7 +2847,7 @@ def _excerpt_states_owned_overview(excerpt: str) -> bool:
     return bool(
         re.search(
             r"主营业务为|主要从事|主要产品包括|主要产品为|经营范围(?!内)|"
-            r"公司主要业务情况|公司金融业务",
+            r"主要经营|公司主要业务情况|公司金融业务",
             excerpt,
         )
     )

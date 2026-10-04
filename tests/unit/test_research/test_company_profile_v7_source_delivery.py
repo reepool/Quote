@@ -686,3 +686,54 @@ def test_hedge_and_steel_bindings_refuse_at_the_function_level():
         "公司以自有资金开展与本公司生产相关的大宗商品（如：钢材、铜、铝、原油等）原料的期货业务。"
     )
     assert [item["name"] for item in bound] == ["钢材", "铜", "铝", "原油"]
+
+
+def test_new_narratives_deliver_principal_and_products(tmp_path):
+    rizhao = _drive(
+        tmp_path / "rizhao",
+        "600017.SH",
+        "1225170001",
+        [
+            {
+                "page": 9,
+                "text": (
+                    "一、报告期内公司从事的业务情况\n"
+                    "公司成立于 2002 年 7 月，是日照港集团的控股子公司。主要经营金属矿石、煤炭及其制品、\n"
+                    "集装箱、粮食、木材、钢铁、非金属矿石等大宗散杂货和件杂货装卸、堆存及中转业务，港口货\n"
+                    "物运输代理、仓储等物流增值业务。\n"
+                    "公司的经营模式主要为：为客户提供货物港口装卸作业及相关服务，收取货物港口装卸作业\n"
+                    "包干费、货物堆存费和港口物流其他费用。\n"
+                ),
+                "readable": True,
+            },
+        ],
+    )
+    for profile in (rizhao["query"], rizhao["export"]):
+        principal = re.sub(r"\s+", "", _dimension(profile, "principal_business"))
+        products = re.sub(r"\s+", "", _dimension(profile, "products_services"))
+        assert "主要经营金属矿石" in principal
+        assert "装卸" in products and "堆存" in products and "中转" in products
+        assert "仓储" in products or "运输代理" in products or "港口服务" in products
+    zhongzhi = _drive(
+        tmp_path / "zhongzhi",
+        "600038.SH",
+        "1225038001",
+        [
+            {
+                "page": 10,
+                "text": (
+                    "一、报告期内公司从事的业务情况\n"
+                    "中直股份作为我国直升机产业的专业化上市公司，也是致力于高端航空产品制造的现代化工\n"
+                    "业企业，秉持“扶摇直上，无所不达”的产品理念，研发制造多型不同吨位、满足各类用途的各\n"
+                    "领域直升机，以及运 12 和运 12F 系列通用飞机。公司产品结构合理，产品谱系齐全，涉足直升机\n"
+                    "整机及零部件制造、通用飞机、航空转包生产和客户化服务等多领域。\n"
+                ),
+                "readable": True,
+            },
+        ],
+    )
+    for profile in (zhongzhi["query"], zhongzhi["export"]):
+        principal = re.sub(r"\s+", "", _dimension(profile, "principal_business"))
+        products = re.sub(r"\s+", "", _dimension(profile, "products_services"))
+        assert "中直股份作为我国直升机产业" in principal
+        assert "直升机" in products and "运12" in products and "通用飞机" in products

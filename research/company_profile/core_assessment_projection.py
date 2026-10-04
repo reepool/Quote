@@ -37,12 +37,15 @@ CORE_DIMENSION_IDS = (
     "revenue_model",
 )
 _PRINCIPAL_PATTERN = re.compile(
-    r"(主营|主要从事|主要业务|经营模式|经营范围|金融服务)"
+    r"(主营|主要从事|主要业务|主要经营|经营模式|经营范围|金融服务)"
 )
 _COMPLETE_COMPANY_BUSINESS = re.compile(
     r"(?<![\u4e00-\u9fff])(?:本公司|公司)(?:业务覆盖|专注于).{2,}"
 )
 _STEEL_BUSINESS = re.compile(r"公司是.{8,260}主要产品有.{2,80}")
+_NARRATIVE_BUSINESS = re.compile(
+    r"作为[^。]{2,80}(?:上市公司|工业企业)[^。]{2,}研发制造"
+)
 _SPEC_PRODUCT = re.compile(r"^(?:厚度|宽度|长度)")
 _PRODUCT_PATTERN = re.compile(
     r"(主要产品|主要服务|业务线|产品包括|服务包括|经营范围|"
@@ -58,11 +61,12 @@ _REVENUE_INFLOW_PATTERN = re.compile(
     r"(?:公司|本公司)(?:收取|取得|获得).{0,16}(?:货款|价款|服务费|手续费|佣金|保费)|"
     r"利息净收入|分成收入|经纪业务收入|保费收入|"
     r"手续费及佣金(?:净)?收入|(?:服务费|手续费|佣金)收入|"
-    r"收取车辆通行费|通行费收入)"
+    r"收取车辆通行费|通行费收入|"
+    r"为客户提供[^。；;，]{2,40}服务|收取[^。；;，]{2,30}费)"
 )
 _REVENUE_BLOCK_PATTERN = re.compile(
     r"(免费|无偿|不收取|未收取|并不收取|无需(?:支付|收取)|向(?:公司|本公司)收取|"
-    r"第三方|代第三方|代收)"
+    r"第三方|代第三方|代收|客户[^。；;]{0,8}收取)"
 )
 _REVENUE_NEGATION_PREFIX = re.compile(r"(尚未|还未|仍未|并未|没有|未|不|拟|计划)$")
 _REPAIR_REVENUE_INFLOW_PATTERN = re.compile(
@@ -286,6 +290,7 @@ def project_core_assessment(
         accepted,
         named_role_repair=named_role_repair,
         core_answer_repair=core_answer_repair,
+        source_delivery_repair=source_delivery_repair,
     )
     products = _assess_products_services(
         accepted,
@@ -314,6 +319,7 @@ def _assess_principal_business(
     *,
     named_role_repair: bool = False,
     core_answer_repair: bool = False,
+    source_delivery_repair: bool = False,
 ) -> CoreDimensionAssessment:
     supports: list[SemanticRecord] = []
     for record in records:
@@ -324,7 +330,9 @@ def _assess_principal_business(
         text = re.sub(r"\s+", "", record.source_text or "")
         if _PRINCIPAL_PATTERN.search(text) or (
             named_role_repair and _COMPLETE_COMPANY_BUSINESS.search(text)
-        ) or (core_answer_repair and _STEEL_BUSINESS.search(text)):
+        ) or (core_answer_repair and _STEEL_BUSINESS.search(text)) or (
+            source_delivery_repair and _NARRATIVE_BUSINESS.search(text)
+        ):
             supports.append(record)
     if supports:
         return _answered("principal_business", supports)
@@ -374,7 +382,7 @@ def _assess_products_services(
                 _PRODUCT_PATTERN.search(record.source_text)
                 or (
                     source_delivery_repair
-                    and re.search(r"主要业务是|主要从事|主营业务为", record.source_text or "")
+                    and re.search(r"主要业务是|主要从事|主营业务为|主要经营|研发制造", record.source_text or "")
                 )
             )
         ):
@@ -384,7 +392,7 @@ def _assess_products_services(
             record
             for record in supports
             if isinstance(record, BusinessOverview)
-            and re.search(r"主要产品有|主要业务是|主要从事|主营业务为", record.source_text or "")
+            and re.search(r"主要产品有|主要业务是|主要从事|主营业务为|主要经营|研发制造", record.source_text or "")
         ]
         if series:
             supports = [*series, *[record for record in supports if record not in series]]
