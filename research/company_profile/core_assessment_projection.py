@@ -61,9 +61,10 @@ _REVENUE_INFLOW_PATTERN = re.compile(
     r"收取车辆通行费|通行费收入)"
 )
 _REVENUE_BLOCK_PATTERN = re.compile(
-    r"(免费|无偿|不收取|未收取|并不收取|无需(?:支付|收取)|向(?:公司|本公司)收取)"
+    r"(免费|无偿|不收取|未收取|并不收取|无需(?:支付|收取)|向(?:公司|本公司)收取|"
+    r"第三方|代第三方|代收)"
 )
-_REVENUE_NEGATION_PREFIX = re.compile(r"(尚未|还未|仍未|并未|没有|未|不)$")
+_REVENUE_NEGATION_PREFIX = re.compile(r"(尚未|还未|仍未|并未|没有|未|不|拟|计划)$")
 _REPAIR_REVENUE_INFLOW_PATTERN = re.compile(
     r"(营业收入主要来源于|" + _REVENUE_INFLOW_PATTERN.pattern[1:]
 )

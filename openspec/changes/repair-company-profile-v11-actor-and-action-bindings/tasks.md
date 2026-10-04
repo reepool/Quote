@@ -4,7 +4,7 @@
 
 ## 2. Same-sentence affirmative bindings, not yet authorized
 
-- [ ] 2.1 After 1.1, make the raw-material, hedge, and toll bindings check the commodity name inside the declaring sentence with an affirmative verb, refuse customer or third-party subjects and 未/拟/计划 prefixes, and keep table subjects local when the excerpt shows 母公司 wording. Cover both the real positives and the reproduced counterexamples in directed tests, keeping the steel dual roles, empty quantities, printed columns, and original amounts. Do not start 3.1 in that task.
+- [x] 2.1 After 1.1, make the raw-material, hedge, and toll bindings check the commodity name inside the declaring sentence with an affirmative verb, refuse customer or third-party subjects and 未/拟/计划 prefixes, and keep table subjects local when the excerpt shows 母公司 wording. Cover both the real positives and the reproduced counterexamples in directed tests, keeping the steel dual roles, empty quantities, printed columns, and original amounts. Do not start 3.1 in that task. The steel and hedge bindings now resolve names inside the declaring sentence with an affirmative 开展/从事 verb and no 未/拟/计划 prefix; the revenue block list gains 第三方/代第三方/代收 and the negation prefixes gain 拟/计划; the narrower 母公司 scope wins over the group narrative before the direct-wording binding and the quote merge is skipped for such tables. Directed tests refuse customer steel, planned hedge wording, third-party and planned tolls, and the parent-company lift, while every real positive passes unchanged.
 
 ## 3. v12 isolated delivery and review, not yet authorized
 

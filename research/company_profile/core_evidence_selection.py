@@ -1385,8 +1385,12 @@ def _project_segment_span(
     if revenue_item is not None and isinstance(revenue_item.evidence.anchor, TextAnchor):
         quote = quote or revenue_item.evidence.anchor.bounded_quote
     # The bounded quote carries the passage's own group wording (本集团…), which
-    # the acceptance policy checks; bind the subject from that same text.
-    subject_text = f"{span.excerpt}\n{quote}" if quote else span.excerpt
+    # the acceptance policy checks; bind the subject from that same text —
+    # unless the table itself shows a narrower scope such as 母公司, which the
+    # group narrative must not lift.
+    subject_text = span.excerpt
+    if quote and not re.search(r"母公司", span.excerpt):
+        subject_text = f"{span.excerpt}\n{quote}"
     column_unit = (
         "百万元"
         if source_delivery_repair and "人民币百万元" in re.sub(r"\s+", "", excerpt)
@@ -1996,6 +2000,10 @@ def _first_declared_unit(text: str) -> str | None:
 
 
 def _subject_from_excerpt(excerpt: str) -> tuple[SubjectScope, SubjectBasis | None]:
+    # An explicit narrower local scope (母公司口径 tables) wins over the
+    # group narrative that the same page may also carry.
+    if re.search(r"母公司", excerpt):
+        return SubjectScope.UNCLEAR, None
     if re.search(r"本集团", excerpt):
         return SubjectScope.CONSOLIDATED_GROUP, SubjectBasis.DIRECT_SOURCE_WORDING
     return SubjectScope.UNCLEAR, None
@@ -2411,10 +2419,22 @@ def _toll_service_source(excerpt: str) -> str:
 
 
 def _steel_raw_material_binding(excerpt: str) -> dict[str, Any] | None:
-    """The stated main raw-material steel, without quantities."""
+    """The stated main raw-material steel, without quantities.
 
-    compact = re.sub(r"\s+", "", _join_pdf_soft_breaks(excerpt))
-    if "主要原材料及零部件为" in compact and "钢材" in compact:
+    The steel must sit in the same sentence as the company's own
+    raw-material declaration; a customer or third-party sentence elsewhere
+    in the excerpt never binds.
+    """
+
+    joined = _join_pdf_soft_breaks(excerpt)
+    for sentence in re.split(r"[。；;]", joined):
+        compact = re.sub(r"\s+", "", sentence)
+        if "公司生产所需的主要原材料及零部件为" not in compact:
+            continue
+        if "客户" in compact or "第三方" in compact:
+            continue
+        if "钢材" not in compact:
+            continue
         return {
             "name": "钢材",
             "action": ActivityAction.PURCHASES,
@@ -2428,25 +2448,38 @@ def _steel_raw_material_binding(excerpt: str) -> dict[str, Any] | None:
 
 
 def _hedge_underlying_bindings(excerpt: str) -> list[dict[str, Any]]:
-    """Named futures hedge underlyings; amounts stay empty and unsplit."""
+    """Named futures hedge underlyings; amounts stay empty and unsplit.
 
-    compact = re.sub(r"\s+", "", _join_pdf_soft_breaks(excerpt))
-    if "套期保值" not in compact or "原料的期货业务" not in compact:
-        return []
+    The names must sit in the sentence that affirms the futures business
+    (开展 or 从事 without a 未/拟/计划 prefix); a not-yet or planned
+    disclosure never binds.
+    """
+
+    joined = _join_pdf_soft_breaks(excerpt)
     bindings: list[dict[str, str | None]] = []
-    for name in ("钢材", "铜", "铝", "原油"):
-        if name in compact:
-            bindings.append(
-                {
-                    "name": name,
-                    "action": ActivityAction.OPERATES,
-                    "verb": "期货套保",
-                    "value": None,
-                    "unit": None,
-                    "actor": "公司",
-                    "header": "套期保值标的",
-                }
-            )
+    for sentence in re.split(r"[。；;]", joined):
+        compact = re.sub(r"\s+", "", sentence)
+        if "原料的期货业务" not in compact:
+            continue
+        if re.search(r"(?:未|拟|计划|将)开展", compact):
+            continue
+        if "开展" not in compact and "从事" not in compact:
+            continue
+        if "套期保值" not in compact and "期货" not in compact:
+            continue
+        for name in ("钢材", "铜", "铝", "原油"):
+            if name in compact:
+                bindings.append(
+                    {
+                        "name": name,
+                        "action": ActivityAction.OPERATES,
+                        "verb": "期货套保",
+                        "value": None,
+                        "unit": None,
+                        "actor": "公司",
+                        "header": "套期保值标的",
+                    }
+                )
     return bindings
 
 

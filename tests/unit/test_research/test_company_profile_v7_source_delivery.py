@@ -6,7 +6,12 @@ import asyncio
 import json
 import re
 
+from research.company_profile.core_evidence_selection import (
+    project_owned_page_facts,
+    select_core_evidence,
+)
 from research.company_profile.execution import default_processing_identity
+from research.company_profile.models import SubjectBasis, SubjectScope
 from research.company_profile.reads import CompanyProfileReadService
 from research.company_profile.runtime import (
     CompanyProfileResearchWriter,
@@ -547,3 +552,79 @@ def test_v8_keeps_steel_airport_energy_and_excludes_false_sales(tmp_path):
     assert ("电耗", "energy_consumption", (17,)) in roles
     assert ("柴油单耗", "energy_consumption", (17,)) in roles
     assert not any(page in {35, 62, 201} for _, _, pages in roles for page in pages)
+
+
+def test_binding_counterexamples_are_refused(tmp_path):
+    result = _drive(
+        tmp_path / "counter",
+        "600099.SH",
+        "1225999001",
+        [
+            {
+                "page": 9,
+                "text": (
+                    "报告期内公司从事的业务情况\n"
+                    "2、公司的经营模式\n"
+                    "公司生产所需的主要原材料及零部件为汽车底盘、发动机、液压泵等。\n"
+                    "子公司为客户供应钢材原料。\n"
+                ),
+                "readable": True,
+            },
+            {
+                "page": 25,
+                "text": (
+                    "衍生品投资情况\n"
+                    "公司拟开展与生产相关的大宗商品（如：钢材、铜、铝、原油等）原料的期货业务。\n"
+                ),
+                "readable": True,
+            },
+        ],
+    )
+    role_records = [
+        item
+        for item in result["query"]["accepted_facts"]
+        if item["field_id"] == "explicit_activity"
+        and item.get("source_native_name") in ("钢材", "铜", "铝", "原油")
+    ]
+    assert role_records == []
+
+
+def test_third_party_and_planned_tolls_are_not_company_revenue():
+    from research.company_profile.core_assessment_projection import (
+        _overview_states_revenue,
+    )
+
+    assert not _overview_states_revenue("受托代第三方收取车辆通行费，尚待结算。")
+    assert not _overview_states_revenue("公司拟收取车辆通行费。")
+    assert _overview_states_revenue(
+        "公司为过往车辆提供通行服务，按照收费标准收取车辆通行费。"
+    )
+
+
+def test_parent_company_table_is_not_lifted_to_the_group_subject():
+    report = _report(instrument_id="SHAPE.SH", report_id="asset-parent-table")
+    page_text = (
+        "2、收入和成本分析\n"
+        "本集团报告期内实现营业收入 672,157.42 万元。\n"
+        "(1). 主营业务分行业、分产品、分地区、分销售模式情况\n"
+        "单位：元 币种：人民币\n"
+        "主营业务分行业情况\n"
+        "分行业 营业收入 营业成本\n"
+        "母公司口径\n"
+        "公路业务 1,000,000.00 800,000.00 20.00\n"
+    )
+    selected = select_core_evidence(
+        report=report,
+        pages=({"page": 30, "text": page_text, "readable": True},),
+    )
+    records = project_owned_page_facts(selected)
+    table_records = [
+        item
+        for item in records
+        if item.field_id in ("segment_dimension", "operating_revenue")
+    ]
+    assert table_records
+    for item in table_records:
+        assert item.subject_scope != SubjectScope.CONSOLIDATED_GROUP or (
+            item.subject_basis != SubjectBasis.DIRECT_SOURCE_WORDING
+        )
