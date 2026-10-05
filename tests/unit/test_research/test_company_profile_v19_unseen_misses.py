@@ -10,7 +10,12 @@ from tests.unit.test_research.test_company_profile_v19_closure import _answer, _
 FIXTURES = Path(__file__).resolve().parents[2] / "fixtures"
 
 
-def _profiles(tmp_path, instrument, text_replace=None):
+@pytest.fixture(params=["v19", "v20"])
+def repair_version(request):
+    return request.param
+
+
+def _profiles(tmp_path, instrument, text_replace=None, *, repair_version="v19"):
     fixture = json.loads(
         (FIXTURES / f"company_profile_unseen_{instrument[:6]}_frozen.json").read_text()
     )
@@ -18,14 +23,15 @@ def _profiles(tmp_path, instrument, text_replace=None):
     if text_replace:
         pages = [{**p, "text": text_replace(p["text"])} for p in pages]
     return _drive(
-        tmp_path / instrument, instrument=instrument, fixture=fixture, pages=pages
+        tmp_path / instrument, instrument=instrument, fixture=fixture, pages=pages,
+        repair_version=repair_version
     )
 
 
 def test_complete_highway_pages_deliver_every_long_road_and_bound_company_actor(
-    tmp_path,
+    tmp_path, repair_version,
 ):
-    for profile in _profiles(tmp_path, "600020.SH"):
+    for profile in _profiles(tmp_path, "600020.SH", repair_version=repair_version):
         rows = [f for f in profile["accepted_facts"] if f["object_type"] == "Segment"]
         assert len(rows) == 12
         names = {f["source_native_name"]: f["source_native_value"] for f in rows}
@@ -43,8 +49,10 @@ def test_complete_highway_pages_deliver_every_long_road_and_bound_company_actor(
         assert all("利润" not in name for name in activities)
 
 
-def test_complete_pharma_pages_deliver_owned_overview_matrix_and_industry_mix(tmp_path):
-    for profile in _profiles(tmp_path, "600056.SH"):
+def test_complete_pharma_pages_deliver_owned_overview_matrix_and_industry_mix(
+    tmp_path, repair_version,
+):
+    for profile in _profiles(tmp_path, "600056.SH", repair_version=repair_version):
         principal = _answer(profile, "principal_business")
         products = _answer(profile, "products_services")
         for label in (
@@ -81,10 +89,10 @@ def test_complete_pharma_pages_deliver_owned_overview_matrix_and_industry_mix(tm
     "replacement", ["子公司业务：子公司", "第三方业务：第三方", "医药工业业务：公司拟"]
 )
 def test_business_blocks_do_not_promote_an_external_or_planned_position(
-    tmp_path, replacement
+    tmp_path, replacement, repair_version
 ):
     def change(text):
         return text.replace("医药工业业务：公司", replacement)
 
-    for profile in _profiles(tmp_path, "600056.SH", change):
+    for profile in _profiles(tmp_path, "600056.SH", change, repair_version=repair_version):
         assert not _answer(profile, "principal_business")

@@ -21,8 +21,8 @@ FIXTURES = Path(__file__).resolve().parents[2] / "fixtures"
 FEES = ("包干费", "库场使用费", "港口其他收费")
 
 
-def _drive(root, *, instrument, fixture, pages):
-    identity = {**default_processing_identity(), "revenue_sentence_repair": "v19"}
+def _drive(root, *, instrument, fixture, pages, repair_version="v19"):
+    identity = {**default_processing_identity(), "revenue_sentence_repair": repair_version}
     report = _report(instrument_id=instrument).model_copy(
         update={"document_version": fixture["document_version"]}
     )

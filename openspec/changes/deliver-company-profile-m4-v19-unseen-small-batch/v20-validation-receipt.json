@@ -1,0 +1,70 @@
+{
+  "baseline_commit": "4cbf0d06f88946fba09be3e3f001dd6d0f3f0a52",
+  "processing_identity": {
+    "rules": "company_profile_common_core.v1",
+    "owned_page_facts": "v8",
+    "material_input_facts": "v1",
+    "revenue_sentence_repair": "v20"
+  },
+  "cumulative_switches": {
+    "revenue_sentence_repair_requested": true,
+    "named_role_repair_requested": true,
+    "service_operating_energy_requested": true,
+    "core_answer_repair_requested": true,
+    "source_delivery_repair_requested": true
+  },
+  "tests": {
+    "passed": 107,
+    "warnings": 7,
+    "elapsed_seconds": 25.29,
+    "log_sha256": "4e6a8dfa9451d2e41fd910cdcdfc6c7bc233d033e2e10f63e3a22707b17df2e7"
+  },
+  "formal_execution_index": 1,
+  "whole_round_seconds": 187.6268910896033,
+  "independent_source_reader": "pypdf independent frozen PDF read, document SHA-256 verified",
+  "source_recall": {
+    "status": "assessed",
+    "numerator": 25,
+    "denominator": 25,
+    "value": 1.0
+  },
+  "source_accuracy": {
+    "status": "assessed",
+    "numerator": 63,
+    "denominator": 63,
+    "value": 1.0
+  },
+  "source_hierarchy": {
+    "parent": "医药工业",
+    "children": [
+      "原料药",
+      "制剂药",
+      "中药材加工及饮片"
+    ],
+    "children_sum": "2504497845.37",
+    "parent_revenue": "2504497845.37",
+    "top_level_sum_before_elimination": "35392427235.28",
+    "elimination": "-131479828.97",
+    "source_total": "35260947406.31",
+    "rule": "Children reconcile parent, never add to top-level total; source rows each recall once, Segment+Measurement each accuracy once."
+  },
+  "protected_files_unchanged": 475,
+  "v20_artifacts_checked": 19,
+  "first_v19_failure_unchanged": true,
+  "review": {
+    "method": "B-role manual current-change review and per-object frozen-PDF comparison",
+    "blocking_findings": [],
+    "optional_scope_expansion": false,
+    "pre_existing_failures": "deferred per A-role task; no rerun"
+  },
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false,
+  "a_role_acceptance": "pending",
+  "archive_status": "not_archived",
+  "next_batch": "paused",
+  "static_checks": {
+    "openspec_strict": "passed",
+    "changed_python_compileall": "passed",
+    "git_diff_check": "passed"
+  }
+}

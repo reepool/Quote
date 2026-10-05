@@ -1,0 +1,1289 @@
+{
+  "plan_id": "0bdc8dd3d5998ec78c23d384e2ce3c8f59ca820f85fbf9cb5bcba0094acf9bea",
+  "processing_identity": {
+    "rules": "company_profile_common_core.v1",
+    "owned_page_facts": "v8",
+    "material_input_facts": "v1",
+    "revenue_sentence_repair": "v20"
+  },
+  "formal_execution_index": 1,
+  "whole_round_seconds": 187.6268910896033,
+  "source_recall": {
+    "status": "assessed",
+    "numerator": 25,
+    "denominator": 25,
+    "value": 1.0
+  },
+  "source_accuracy": {
+    "status": "assessed",
+    "numerator": 63,
+    "denominator": 63,
+    "value": 1.0
+  },
+  "critical_numeric_errors": {
+    "status": "assessed",
+    "value": 0
+  },
+  "workload": {
+    "tokens_used": {
+      "status": "assessed",
+      "value": 0
+    },
+    "elapsed_seconds": {
+      "status": "assessed",
+      "value": 187.6268910896033
+    },
+    "human_review_minutes": {
+      "status": "unassessed",
+      "value": null
+    }
+  },
+  "expansion_gates_met": true,
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false,
+  "next_batch": "paused_pending_A_role_review",
+  "a_role_acceptance": "pending",
+  "source_rows": {
+    "600020.SH": [
+      {
+        "dimension": "industry",
+        "name": "交通运输业",
+        "value": "4,511,661,074.02",
+        "page": 17,
+        "parent": null,
+        "unit": "元"
+      },
+      {
+        "dimension": "industry",
+        "name": "房地产业",
+        "value": "47,247,581.14",
+        "page": 17,
+        "parent": null,
+        "unit": "元"
+      },
+      {
+        "dimension": "industry",
+        "name": "建造服务",
+        "value": "1,876,810,983.45",
+        "page": 17,
+        "parent": null,
+        "unit": "元"
+      },
+      {
+        "dimension": "region",
+        "name": "京港澳高速郑州至漯河高速公路",
+        "value": "1,994,414,866.70",
+        "page": 17,
+        "parent": null,
+        "unit": "元"
+      },
+      {
+        "dimension": "region",
+        "name": "京港澳高速漯河至驻马店高速公路",
+        "value": "439,759,072.91",
+        "page": 17,
+        "parent": null,
+        "unit": "元"
+      },
+      {
+        "dimension": "region",
+        "name": "郑栾高速郑州至尧山段",
+        "value": "802,617,594.13",
+        "page": 17,
+        "parent": null,
+        "unit": "元"
+      },
+      {
+        "dimension": "region",
+        "name": "郑州至民权高速公路郑州至开封段",
+        "value": "409,448,078.73",
+        "page": 18,
+        "parent": null,
+        "unit": "元"
+      },
+      {
+        "dimension": "region",
+        "name": "德上高速永城段",
+        "value": "107,746,393.37",
+        "page": 18,
+        "parent": null,
+        "unit": "元"
+      },
+      {
+        "dimension": "region",
+        "name": "商丘至登封高速公路",
+        "value": "643,198,814.17",
+        "page": 18,
+        "parent": null,
+        "unit": "元"
+      },
+      {
+        "dimension": "region",
+        "name": "郑州至民权高速公路开封至民权段",
+        "value": "114,476,254.01",
+        "page": 18,
+        "parent": null,
+        "unit": "元"
+      },
+      {
+        "dimension": "region",
+        "name": "房地产业",
+        "value": "47,247,581.14",
+        "page": 18,
+        "parent": null,
+        "unit": "元"
+      },
+      {
+        "dimension": "region",
+        "name": "建造服务",
+        "value": "1,876,810,983.45",
+        "page": 18,
+        "parent": null,
+        "unit": "元"
+      }
+    ],
+    "600056.SH": [
+      {
+        "dimension": "industry",
+        "name": "医药工业",
+        "value": "2,504,497,845.37",
+        "page": 13,
+        "parent": null,
+        "unit": "元"
+      },
+      {
+        "dimension": "industry",
+        "name": "原料药",
+        "value": "820,511,443.08",
+        "page": 13,
+        "parent": "医药工业",
+        "unit": "元"
+      },
+      {
+        "dimension": "industry",
+        "name": "制剂药",
+        "value": "1,372,540,668.47",
+        "page": 13,
+        "parent": "医药工业",
+        "unit": "元"
+      },
+      {
+        "dimension": "industry",
+        "name": "中药材加工及饮片",
+        "value": "311,445,733.82",
+        "page": 13,
+        "parent": "医药工业",
+        "unit": "元"
+      },
+      {
+        "dimension": "industry",
+        "name": "医药商业",
+        "value": "26,159,860,274.66",
+        "page": 13,
+        "parent": null,
+        "unit": "元"
+      },
+      {
+        "dimension": "industry",
+        "name": "国际贸易",
+        "value": "5,479,354,211.52",
+        "page": 13,
+        "parent": null,
+        "unit": "元"
+      },
+      {
+        "dimension": "industry",
+        "name": "大健康和电商",
+        "value": "1,248,714,903.73",
+        "page": 13,
+        "parent": null,
+        "unit": "元"
+      }
+    ]
+  },
+  "source_hierarchy": {
+    "parent": "医药工业",
+    "children": [
+      "原料药",
+      "制剂药",
+      "中药材加工及饮片"
+    ],
+    "children_sum": "2504497845.37",
+    "parent_revenue": "2504497845.37",
+    "top_level_sum_before_elimination": "35392427235.28",
+    "elimination": "-131479828.97",
+    "source_total": "35260947406.31",
+    "rule": "Children reconcile parent, never add to top-level total; source rows each recall once, Segment+Measurement each accuracy once."
+  },
+  "object_reviews": [
+    {
+      "instrument_id": "600020.SH",
+      "object_id": "answer:principal_business",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        10
+      ],
+      "text": "报告期内公司从事的业务情况\n报告期内，公司主营业务为高速公路的投资建设和运营管理，利润主要来源于高速公路运营\r\n及投资收益。",
+      "rationale": "Continuous current-company original business text and full scoped product matrix checked, including mixed industrial/commercial/device/trade/ecommerce blocks; sampling label is not a template."
+    },
+    {
+      "instrument_id": "600020.SH",
+      "object_id": "answer:products_services",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        10
+      ],
+      "text": "报告期内公司从事的业务情况\n报告期内，公司主营业务为高速公路的投资建设和运营管理，利润主要来源于高速公路运营\r\n及投资收益。",
+      "rationale": "Continuous current-company original business text and full scoped product matrix checked, including mixed industrial/commercial/device/trade/ecommerce blocks; sampling label is not a template."
+    },
+    {
+      "instrument_id": "600020.SH",
+      "object_id": "answer:revenue_model",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        17
+      ],
+      "text": "交通运输业、房地产业、建造服务",
+      "rationale": "Industry revenue labels match independently read source rows, including main revenue activities; no numerical aggregate is inferred from child labels."
+    },
+    {
+      "instrument_id": "600020.SH",
+      "object_id": "owned:core-ev-6466cfa3e8d4a731:overview",
+      "object_type": "BusinessOverview",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        10
+      ],
+      "text": "报告期内公司从事的业务情况\n报告期内，公司主营业务为高速公路的投资建设和运营管理，利润主要来源于高速公路运营\r\n及投资收益。",
+      "rationale": "Company-owned business/mode original passage retained; answer disclosure already counts recall."
+    },
+    {
+      "instrument_id": "600020.SH",
+      "object_id": "owned:core-ev-cc560affb2d75c83:activity:1",
+      "object_type": "Activity",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        10
+      ],
+      "text": "高速公路的投资建设",
+      "rationale": "Direct source actor is 公司 in 公司主营业务为; named subsidiary investment and property actions are not promoted."
+    },
+    {
+      "instrument_id": "600020.SH",
+      "object_id": "owned:core-ev-cc560affb2d75c83:activity:2",
+      "object_type": "Activity",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        10
+      ],
+      "text": "运营管理",
+      "rationale": "Direct source actor is 公司 in 公司主营业务为; named subsidiary investment and property actions are not promoted."
+    },
+    {
+      "instrument_id": "600020.SH",
+      "object_id": "owned:core-ev-c6f11af90840662c:segment:industry:交通运输业",
+      "object_type": "Segment",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        17
+      ],
+      "text": {
+        "source_native_name": "交通运输业",
+        "source_native_value": "4,511,661,074.02",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Source dimension, row, current-year amount, unit and period compared. Segment counts row recall once; Measurement is accuracy-only. Child parent: None. No repeated total."
+    },
+    {
+      "instrument_id": "600020.SH",
+      "object_id": "owned:core-ev-22db52db0a792b42:revenue:industry:交通运输业",
+      "object_type": "Measurement",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        17
+      ],
+      "text": {
+        "source_native_name": "交通运输业",
+        "source_native_value": "4,511,661,074.02",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Source dimension, row, current-year amount, unit and period compared. Segment counts row recall once; Measurement is accuracy-only. Child parent: None. No repeated total."
+    },
+    {
+      "instrument_id": "600020.SH",
+      "object_id": "owned:core-ev-c6f11af90840662c:segment:industry:房地产业",
+      "object_type": "Segment",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        17
+      ],
+      "text": {
+        "source_native_name": "房地产业",
+        "source_native_value": "47,247,581.14",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Source dimension, row, current-year amount, unit and period compared. Segment counts row recall once; Measurement is accuracy-only. Child parent: None. No repeated total."
+    },
+    {
+      "instrument_id": "600020.SH",
+      "object_id": "owned:core-ev-22db52db0a792b42:revenue:industry:房地产业",
+      "object_type": "Measurement",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        17
+      ],
+      "text": {
+        "source_native_name": "房地产业",
+        "source_native_value": "47,247,581.14",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Source dimension, row, current-year amount, unit and period compared. Segment counts row recall once; Measurement is accuracy-only. Child parent: None. No repeated total."
+    },
+    {
+      "instrument_id": "600020.SH",
+      "object_id": "owned:core-ev-c6f11af90840662c:segment:industry:建造服务",
+      "object_type": "Segment",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        17
+      ],
+      "text": {
+        "source_native_name": "建造服务",
+        "source_native_value": "1,876,810,983.45",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Source dimension, row, current-year amount, unit and period compared. Segment counts row recall once; Measurement is accuracy-only. Child parent: None. No repeated total."
+    },
+    {
+      "instrument_id": "600020.SH",
+      "object_id": "owned:core-ev-22db52db0a792b42:revenue:industry:建造服务",
+      "object_type": "Measurement",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        17
+      ],
+      "text": {
+        "source_native_name": "建造服务",
+        "source_native_value": "1,876,810,983.45",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Source dimension, row, current-year amount, unit and period compared. Segment counts row recall once; Measurement is accuracy-only. Child parent: None. No repeated total."
+    },
+    {
+      "instrument_id": "600020.SH",
+      "object_id": "owned:core-ev-c6f11af90840662c:segment:region:京港澳高速郑州至漯河高速公路",
+      "object_type": "Segment",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        17
+      ],
+      "text": {
+        "source_native_name": "京港澳高速郑州至漯河高速公路",
+        "source_native_value": "1,994,414,866.70",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Source dimension, row, current-year amount, unit and period compared. Segment counts row recall once; Measurement is accuracy-only. Child parent: None. No repeated total."
+    },
+    {
+      "instrument_id": "600020.SH",
+      "object_id": "owned:core-ev-22db52db0a792b42:revenue:region:京港澳高速郑州至漯河高速公路",
+      "object_type": "Measurement",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        17
+      ],
+      "text": {
+        "source_native_name": "京港澳高速郑州至漯河高速公路",
+        "source_native_value": "1,994,414,866.70",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Source dimension, row, current-year amount, unit and period compared. Segment counts row recall once; Measurement is accuracy-only. Child parent: None. No repeated total."
+    },
+    {
+      "instrument_id": "600020.SH",
+      "object_id": "owned:core-ev-c6f11af90840662c:segment:region:京港澳高速漯河至驻马店高速公路",
+      "object_type": "Segment",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        17
+      ],
+      "text": {
+        "source_native_name": "京港澳高速漯河至驻马店高速公路",
+        "source_native_value": "439,759,072.91",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Source dimension, row, current-year amount, unit and period compared. Segment counts row recall once; Measurement is accuracy-only. Child parent: None. No repeated total."
+    },
+    {
+      "instrument_id": "600020.SH",
+      "object_id": "owned:core-ev-22db52db0a792b42:revenue:region:京港澳高速漯河至驻马店高速公路",
+      "object_type": "Measurement",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        17
+      ],
+      "text": {
+        "source_native_name": "京港澳高速漯河至驻马店高速公路",
+        "source_native_value": "439,759,072.91",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Source dimension, row, current-year amount, unit and period compared. Segment counts row recall once; Measurement is accuracy-only. Child parent: None. No repeated total."
+    },
+    {
+      "instrument_id": "600020.SH",
+      "object_id": "owned:core-ev-c6f11af90840662c:segment:region:郑栾高速郑州至尧山段",
+      "object_type": "Segment",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        17
+      ],
+      "text": {
+        "source_native_name": "郑栾高速郑州至尧山段",
+        "source_native_value": "802,617,594.13",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Source dimension, row, current-year amount, unit and period compared. Segment counts row recall once; Measurement is accuracy-only. Child parent: None. No repeated total."
+    },
+    {
+      "instrument_id": "600020.SH",
+      "object_id": "owned:core-ev-22db52db0a792b42:revenue:region:郑栾高速郑州至尧山段",
+      "object_type": "Measurement",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        17
+      ],
+      "text": {
+        "source_native_name": "郑栾高速郑州至尧山段",
+        "source_native_value": "802,617,594.13",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Source dimension, row, current-year amount, unit and period compared. Segment counts row recall once; Measurement is accuracy-only. Child parent: None. No repeated total."
+    },
+    {
+      "instrument_id": "600020.SH",
+      "object_id": "owned:core-ev-c6f11af90840662c:segment:region:郑州至民权高速公路郑州至开封段",
+      "object_type": "Segment",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        18
+      ],
+      "text": {
+        "source_native_name": "郑州至民权高速公路郑州至开封段",
+        "source_native_value": "409,448,078.73",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Source dimension, row, current-year amount, unit and period compared. Segment counts row recall once; Measurement is accuracy-only. Child parent: None. No repeated total."
+    },
+    {
+      "instrument_id": "600020.SH",
+      "object_id": "owned:core-ev-22db52db0a792b42:revenue:region:郑州至民权高速公路郑州至开封段",
+      "object_type": "Measurement",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        18
+      ],
+      "text": {
+        "source_native_name": "郑州至民权高速公路郑州至开封段",
+        "source_native_value": "409,448,078.73",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Source dimension, row, current-year amount, unit and period compared. Segment counts row recall once; Measurement is accuracy-only. Child parent: None. No repeated total."
+    },
+    {
+      "instrument_id": "600020.SH",
+      "object_id": "owned:core-ev-c6f11af90840662c:segment:region:德上高速永城段",
+      "object_type": "Segment",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        18
+      ],
+      "text": {
+        "source_native_name": "德上高速永城段",
+        "source_native_value": "107,746,393.37",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Source dimension, row, current-year amount, unit and period compared. Segment counts row recall once; Measurement is accuracy-only. Child parent: None. No repeated total."
+    },
+    {
+      "instrument_id": "600020.SH",
+      "object_id": "owned:core-ev-22db52db0a792b42:revenue:region:德上高速永城段",
+      "object_type": "Measurement",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        18
+      ],
+      "text": {
+        "source_native_name": "德上高速永城段",
+        "source_native_value": "107,746,393.37",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Source dimension, row, current-year amount, unit and period compared. Segment counts row recall once; Measurement is accuracy-only. Child parent: None. No repeated total."
+    },
+    {
+      "instrument_id": "600020.SH",
+      "object_id": "owned:core-ev-c6f11af90840662c:segment:region:商丘至登封高速公路",
+      "object_type": "Segment",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        18
+      ],
+      "text": {
+        "source_native_name": "商丘至登封高速公路",
+        "source_native_value": "643,198,814.17",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Source dimension, row, current-year amount, unit and period compared. Segment counts row recall once; Measurement is accuracy-only. Child parent: None. No repeated total."
+    },
+    {
+      "instrument_id": "600020.SH",
+      "object_id": "owned:core-ev-22db52db0a792b42:revenue:region:商丘至登封高速公路",
+      "object_type": "Measurement",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        18
+      ],
+      "text": {
+        "source_native_name": "商丘至登封高速公路",
+        "source_native_value": "643,198,814.17",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Source dimension, row, current-year amount, unit and period compared. Segment counts row recall once; Measurement is accuracy-only. Child parent: None. No repeated total."
+    },
+    {
+      "instrument_id": "600020.SH",
+      "object_id": "owned:core-ev-c6f11af90840662c:segment:region:郑州至民权高速公路开封至民权段",
+      "object_type": "Segment",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        18
+      ],
+      "text": {
+        "source_native_name": "郑州至民权高速公路开封至民权段",
+        "source_native_value": "114,476,254.01",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Source dimension, row, current-year amount, unit and period compared. Segment counts row recall once; Measurement is accuracy-only. Child parent: None. No repeated total."
+    },
+    {
+      "instrument_id": "600020.SH",
+      "object_id": "owned:core-ev-22db52db0a792b42:revenue:region:郑州至民权高速公路开封至民权段",
+      "object_type": "Measurement",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        18
+      ],
+      "text": {
+        "source_native_name": "郑州至民权高速公路开封至民权段",
+        "source_native_value": "114,476,254.01",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Source dimension, row, current-year amount, unit and period compared. Segment counts row recall once; Measurement is accuracy-only. Child parent: None. No repeated total."
+    },
+    {
+      "instrument_id": "600020.SH",
+      "object_id": "owned:core-ev-c6f11af90840662c:segment:region:房地产业",
+      "object_type": "Segment",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        18
+      ],
+      "text": {
+        "source_native_name": "房地产业",
+        "source_native_value": "47,247,581.14",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Source dimension, row, current-year amount, unit and period compared. Segment counts row recall once; Measurement is accuracy-only. Child parent: None. No repeated total."
+    },
+    {
+      "instrument_id": "600020.SH",
+      "object_id": "owned:core-ev-22db52db0a792b42:revenue:region:房地产业",
+      "object_type": "Measurement",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        18
+      ],
+      "text": {
+        "source_native_name": "房地产业",
+        "source_native_value": "47,247,581.14",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Source dimension, row, current-year amount, unit and period compared. Segment counts row recall once; Measurement is accuracy-only. Child parent: None. No repeated total."
+    },
+    {
+      "instrument_id": "600020.SH",
+      "object_id": "owned:core-ev-c6f11af90840662c:segment:region:建造服务",
+      "object_type": "Segment",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        18
+      ],
+      "text": {
+        "source_native_name": "建造服务",
+        "source_native_value": "1,876,810,983.45",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Source dimension, row, current-year amount, unit and period compared. Segment counts row recall once; Measurement is accuracy-only. Child parent: None. No repeated total."
+    },
+    {
+      "instrument_id": "600020.SH",
+      "object_id": "owned:core-ev-22db52db0a792b42:revenue:region:建造服务",
+      "object_type": "Measurement",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        18
+      ],
+      "text": {
+        "source_native_name": "建造服务",
+        "source_native_value": "1,876,810,983.45",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Source dimension, row, current-year amount, unit and period compared. Segment counts row recall once; Measurement is accuracy-only. Child parent: None. No repeated total."
+    },
+    {
+      "instrument_id": "600056.SH",
+      "object_id": "answer:principal_business",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        9
+      ],
+      "text": "公司所从事的主要业务情况及经营模式\r\n医药工业业务：公司工业板块构建了覆盖化学制剂、化学原料药、中成药、中药饮片等多领\r\n域的完整产品矩阵，具备国内领先的化学原料药、特色化学药与现代中药的产业化平台。在化学\r\n药领域，聚焦发酵类与特色原料药的研发生产，制剂板块则深耕抗感染、心脑血管等核心治疗领\r\n域。所有生产基地均严格遵循国家新版 GMP 规范，建立全流程质量管控体系，从研发、原料药生\r\n产到制剂销售实现闭环管理。销售端以精细化招商与专业推广为核心，并持续参与国家及地方集\r\n采，保障产品可及性与市场竞争力。在中药领域，着力培育集种植、加工、生产、销售为一体的\r\n中药全产业链经营模式，业务产品涵盖中药材、中药饮片、中药提取物、中成药及大健康产品等\r\n多个品类，建立了全程可追溯的质量体系，进一步强化了公司在中药领域的资源掌控与品质保障\r\n能力。通过合作共建模式，与人参、甘草、黄芪等核心药材种植基地建立长期稳定的供应链关系。\r\n医药商业业务：近年来，公司商业板块积极从配送商向综合供应链服务商转型，持续拓展服\r\n务边界。公司已形成以北京、广东、江西、河南、河北、湖北、新疆、东北区域为重点的覆盖全\r\n国的配送、分销一体化营销网络体系，在北京、广东、河南、河北、辽宁等地建有大型医药物流\r\n中心。同时不断丰富经营品种，产品类别涵盖化学制剂、诊断药品及试剂、医用耗材、医疗器械、\r\n特医产品、医美产品、中成药、中药饮片、配方颗粒、生物制剂、营养保健品等。主要的经营模\r\n式包括医院纯销、商业分销、药房零售及第三方物流业务等。\r\n医疗器械业务：公司紧跟行业改革步伐，不断完善医疗器械业务布局，持续延伸服务链条，\r\n加大器械业务开发，经营业态多元、经营品类丰富、经营资质齐全、行业知名度和影响力不断提\r\n升。业务模式涉及进出口贸易、直销、分销、配送、SPD 等，涵盖医疗器械流通全业态。经营品\r\n类众多涉及医疗及康复设备、耗材、IVD 等。科技创新方面，积极对接医疗器械科技创新领域的\r\n医疗机构、高校院所、产业联盟、投资机构等，针对产业未来发展方向布局科技创新，加速高新\r\n科技成果转化应用，打造产业链前端专业技术服务能力；开放式构建研发制造能力，向产业链上\r\n游高端延伸，打造安全可控的供应链体系，以“科技创新”保障“产业控制”和“安全支撑”作\r\n用发挥。\r\n国际贸易业务：面向国内、国际两个市场，桥接国内外高端资源，可在医药制剂、原料药及\r\n中间体、医疗设备、医用耗材、中药材、提取物等领域为客户提供多元化产品；在医院与药厂建\r\n设、政府采购、对外援助等项目中为客户提供包括项目设计、产品供应、售后维护等在内的专业\r\n化集成解决方案；在市场营销方面为客户提供产品注册、渠道拓展、市场推广、终端维护等在内\r\n的一体化配套服务。\r\n大健康和电商业务：公司以旗下金穗科技为核心平台，依托其专业的品牌策划、数字营销与\r\n渠道管理能力，通过整合流量资源、优化营销策略，为合作伙伴提供从线上运营、渠道建设到品\r\n牌价值提升的全链路解决方案，助力其快速打开市场、强化品牌认知并实现规模化增长。",
+      "rationale": "Continuous current-company original business text and full scoped product matrix checked, including mixed industrial/commercial/device/trade/ecommerce blocks; sampling label is not a template."
+    },
+    {
+      "instrument_id": "600056.SH",
+      "object_id": "answer:products_services",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        9
+      ],
+      "text": "公司所从事的主要业务情况及经营模式\r\n医药工业业务：公司工业板块构建了覆盖化学制剂、化学原料药、中成药、中药饮片等多领\r\n域的完整产品矩阵，具备国内领先的化学原料药、特色化学药与现代中药的产业化平台。在化学\r\n药领域，聚焦发酵类与特色原料药的研发生产，制剂板块则深耕抗感染、心脑血管等核心治疗领\r\n域。所有生产基地均严格遵循国家新版 GMP 规范，建立全流程质量管控体系，从研发、原料药生\r\n产到制剂销售实现闭环管理。销售端以精细化招商与专业推广为核心，并持续参与国家及地方集\r\n采，保障产品可及性与市场竞争力。在中药领域，着力培育集种植、加工、生产、销售为一体的\r\n中药全产业链经营模式，业务产品涵盖中药材、中药饮片、中药提取物、中成药及大健康产品等\r\n多个品类，建立了全程可追溯的质量体系，进一步强化了公司在中药领域的资源掌控与品质保障\r\n能力。通过合作共建模式，与人参、甘草、黄芪等核心药材种植基地建立长期稳定的供应链关系。\r\n医药商业业务：近年来，公司商业板块积极从配送商向综合供应链服务商转型，持续拓展服\r\n务边界。公司已形成以北京、广东、江西、河南、河北、湖北、新疆、东北区域为重点的覆盖全\r\n国的配送、分销一体化营销网络体系，在北京、广东、河南、河北、辽宁等地建有大型医药物流\r\n中心。同时不断丰富经营品种，产品类别涵盖化学制剂、诊断药品及试剂、医用耗材、医疗器械、\r\n特医产品、医美产品、中成药、中药饮片、配方颗粒、生物制剂、营养保健品等。主要的经营模\r\n式包括医院纯销、商业分销、药房零售及第三方物流业务等。\r\n医疗器械业务：公司紧跟行业改革步伐，不断完善医疗器械业务布局，持续延伸服务链条，\r\n加大器械业务开发，经营业态多元、经营品类丰富、经营资质齐全、行业知名度和影响力不断提\r\n升。业务模式涉及进出口贸易、直销、分销、配送、SPD 等，涵盖医疗器械流通全业态。经营品\r\n类众多涉及医疗及康复设备、耗材、IVD 等。科技创新方面，积极对接医疗器械科技创新领域的\r\n医疗机构、高校院所、产业联盟、投资机构等，针对产业未来发展方向布局科技创新，加速高新\r\n科技成果转化应用，打造产业链前端专业技术服务能力；开放式构建研发制造能力，向产业链上\r\n游高端延伸，打造安全可控的供应链体系，以“科技创新”保障“产业控制”和“安全支撑”作\r\n用发挥。\r\n国际贸易业务：面向国内、国际两个市场，桥接国内外高端资源，可在医药制剂、原料药及\r\n中间体、医疗设备、医用耗材、中药材、提取物等领域为客户提供多元化产品；在医院与药厂建\r\n设、政府采购、对外援助等项目中为客户提供包括项目设计、产品供应、售后维护等在内的专业\r\n化集成解决方案；在市场营销方面为客户提供产品注册、渠道拓展、市场推广、终端维护等在内\r\n的一体化配套服务。\r\n大健康和电商业务：公司以旗下金穗科技为核心平台，依托其专业的品牌策划、数字营销与\r\n渠道管理能力，通过整合流量资源、优化营销策略，为合作伙伴提供从线上运营、渠道建设到品\r\n牌价值提升的全链路解决方案，助力其快速打开市场、强化品牌认知并实现规模化增长。",
+      "rationale": "Continuous current-company original business text and full scoped product matrix checked, including mixed industrial/commercial/device/trade/ecommerce blocks; sampling label is not a template."
+    },
+    {
+      "instrument_id": "600056.SH",
+      "object_id": "answer:revenue_model",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        13
+      ],
+      "text": "医药工业、原料药、制剂药、中药材加工及饮片、医药商业、国际贸易、大健康和电商",
+      "rationale": "Industry revenue labels match independently read source rows, including main revenue activities; no numerical aggregate is inferred from child labels."
+    },
+    {
+      "instrument_id": "600056.SH",
+      "object_id": "owned:core-ev-51516fe0ca18c17a:overview",
+      "object_type": "BusinessOverview",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        9
+      ],
+      "text": "公司所从事的主要业务情况及经营模式\r\n医药工业业务：公司工业板块构建了覆盖化学制剂、化学原料药、中成药、中药饮片等多领\r\n域的完整产品矩阵，具备国内领先的化学原料药、特色化学药与现代中药的产业化平台。在化学\r\n药领域，聚焦发酵类与特色原料药的研发生产，制剂板块则深耕抗感染、心脑血管等核心治疗领\r\n域。所有生产基地均严格遵循国家新版 GMP 规范，建立全流程质量管控体系，从研发、原料药生\r\n产到制剂销售实现闭环管理。销售端以精细化招商与专业推广为核心，并持续参与国家及地方集\r\n采，保障产品可及性与市场竞争力。在中药领域，着力培育集种植、加工、生产、销售为一体的\r\n中药全产业链经营模式，业务产品涵盖中药材、中药饮片、中药提取物、中成药及大健康产品等\r\n多个品类，建立了全程可追溯的质量体系，进一步强化了公司在中药领域的资源掌控与品质保障\r\n能力。通过合作共建模式，与人参、甘草、黄芪等核心药材种植基地建立长期稳定的供应链关系。\r\n医药商业业务：近年来，公司商业板块积极从配送商向综合供应链服务商转型，持续拓展服\r\n务边界。公司已形成以北京、广东、江西、河南、河北、湖北、新疆、东北区域为重点的覆盖全\r\n国的配送、分销一体化营销网络体系，在北京、广东、河南、河北、辽宁等地建有大型医药物流\r\n中心。同时不断丰富经营品种，产品类别涵盖化学制剂、诊断药品及试剂、医用耗材、医疗器械、\r\n特医产品、医美产品、中成药、中药饮片、配方颗粒、生物制剂、营养保健品等。主要的经营模\r\n式包括医院纯销、商业分销、药房零售及第三方物流业务等。\r\n医疗器械业务：公司紧跟行业改革步伐，不断完善医疗器械业务布局，持续延伸服务链条，\r\n加大器械业务开发，经营业态多元、经营品类丰富、经营资质齐全、行业知名度和影响力不断提\r\n升。业务模式涉及进出口贸易、直销、分销、配送、SPD 等，涵盖医疗器械流通全业态。经营品\r\n类众多涉及医疗及康复设备、耗材、IVD 等。科技创新方面，积极对接医疗器械科技创新领域的\r\n医疗机构、高校院所、产业联盟、投资机构等，针对产业未来发展方向布局科技创新，加速高新\r\n科技成果转化应用，打造产业链前端专业技术服务能力；开放式构建研发制造能力，向产业链上\r\n游高端延伸，打造安全可控的供应链体系，以“科技创新”保障“产业控制”和“安全支撑”作\r\n用发挥。\r\n国际贸易业务：面向国内、国际两个市场，桥接国内外高端资源，可在医药制剂、原料药及\r\n中间体、医疗设备、医用耗材、中药材、提取物等领域为客户提供多元化产品；在医院与药厂建\r\n设、政府采购、对外援助等项目中为客户提供包括项目设计、产品供应、售后维护等在内的专业\r\n化集成解决方案；在市场营销方面为客户提供产品注册、渠道拓展、市场推广、终端维护等在内\r\n的一体化配套服务。\r\n大健康和电商业务：公司以旗下金穗科技为核心平台，依托其专业的品牌策划、数字营销与\r\n渠道管理能力，通过整合流量资源、优化营销策略，为合作伙伴提供从线上运营、渠道建设到品\r\n牌价值提升的全链路解决方案，助力其快速打开市场、强化品牌认知并实现规模化增长。",
+      "rationale": "Company-owned business/mode original passage retained; answer disclosure already counts recall."
+    },
+    {
+      "instrument_id": "600056.SH",
+      "object_id": "owned:core-ev-baedbdd39e6efc78:activity:1",
+      "object_type": "Activity",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        9
+      ],
+      "text": "中药材",
+      "rationale": "Company-owned business products/services category in source p9, bounded before quality explanation; no invented direct manufacture or sale beyond stated category."
+    },
+    {
+      "instrument_id": "600056.SH",
+      "object_id": "owned:core-ev-baedbdd39e6efc78:activity:2",
+      "object_type": "Activity",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        9
+      ],
+      "text": "中药饮片",
+      "rationale": "Company-owned business products/services category in source p9, bounded before quality explanation; no invented direct manufacture or sale beyond stated category."
+    },
+    {
+      "instrument_id": "600056.SH",
+      "object_id": "owned:core-ev-baedbdd39e6efc78:activity:3",
+      "object_type": "Activity",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        9
+      ],
+      "text": "中药提取物",
+      "rationale": "Company-owned business products/services category in source p9, bounded before quality explanation; no invented direct manufacture or sale beyond stated category."
+    },
+    {
+      "instrument_id": "600056.SH",
+      "object_id": "owned:core-ev-baedbdd39e6efc78:activity:4",
+      "object_type": "Activity",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        9
+      ],
+      "text": "中成药及大健康产品",
+      "rationale": "Company-owned business products/services category in source p9, bounded before quality explanation; no invented direct manufacture or sale beyond stated category."
+    },
+    {
+      "instrument_id": "600056.SH",
+      "object_id": "owned:core-ev-baedbdd39e6efc78:activity:5",
+      "object_type": "Activity",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        9
+      ],
+      "text": "化学制剂",
+      "rationale": "Company-owned business products/services category in source p9, bounded before quality explanation; no invented direct manufacture or sale beyond stated category."
+    },
+    {
+      "instrument_id": "600056.SH",
+      "object_id": "owned:core-ev-baedbdd39e6efc78:activity:6",
+      "object_type": "Activity",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        9
+      ],
+      "text": "诊断药品及试剂",
+      "rationale": "Company-owned business products/services category in source p9, bounded before quality explanation; no invented direct manufacture or sale beyond stated category."
+    },
+    {
+      "instrument_id": "600056.SH",
+      "object_id": "owned:core-ev-baedbdd39e6efc78:activity:7",
+      "object_type": "Activity",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        9
+      ],
+      "text": "医用耗材",
+      "rationale": "Company-owned business products/services category in source p9, bounded before quality explanation; no invented direct manufacture or sale beyond stated category."
+    },
+    {
+      "instrument_id": "600056.SH",
+      "object_id": "owned:core-ev-baedbdd39e6efc78:activity:8",
+      "object_type": "Activity",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        9
+      ],
+      "text": "医疗器械",
+      "rationale": "Company-owned business products/services category in source p9, bounded before quality explanation; no invented direct manufacture or sale beyond stated category."
+    },
+    {
+      "instrument_id": "600056.SH",
+      "object_id": "owned:core-ev-baedbdd39e6efc78:activity:9",
+      "object_type": "Activity",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        9
+      ],
+      "text": "特医产品",
+      "rationale": "Company-owned business products/services category in source p9, bounded before quality explanation; no invented direct manufacture or sale beyond stated category."
+    },
+    {
+      "instrument_id": "600056.SH",
+      "object_id": "owned:core-ev-baedbdd39e6efc78:activity:10",
+      "object_type": "Activity",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        9
+      ],
+      "text": "医美产品",
+      "rationale": "Company-owned business products/services category in source p9, bounded before quality explanation; no invented direct manufacture or sale beyond stated category."
+    },
+    {
+      "instrument_id": "600056.SH",
+      "object_id": "owned:core-ev-baedbdd39e6efc78:activity:11",
+      "object_type": "Activity",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        9
+      ],
+      "text": "中成药",
+      "rationale": "Company-owned business products/services category in source p9, bounded before quality explanation; no invented direct manufacture or sale beyond stated category."
+    },
+    {
+      "instrument_id": "600056.SH",
+      "object_id": "owned:core-ev-baedbdd39e6efc78:activity:12",
+      "object_type": "Activity",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        9
+      ],
+      "text": "配方颗粒",
+      "rationale": "Company-owned business products/services category in source p9, bounded before quality explanation; no invented direct manufacture or sale beyond stated category."
+    },
+    {
+      "instrument_id": "600056.SH",
+      "object_id": "owned:core-ev-baedbdd39e6efc78:activity:13",
+      "object_type": "Activity",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        9
+      ],
+      "text": "生物制剂",
+      "rationale": "Company-owned business products/services category in source p9, bounded before quality explanation; no invented direct manufacture or sale beyond stated category."
+    },
+    {
+      "instrument_id": "600056.SH",
+      "object_id": "owned:core-ev-baedbdd39e6efc78:activity:14",
+      "object_type": "Activity",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        9
+      ],
+      "text": "营养保健品",
+      "rationale": "Company-owned business products/services category in source p9, bounded before quality explanation; no invented direct manufacture or sale beyond stated category."
+    },
+    {
+      "instrument_id": "600056.SH",
+      "object_id": "owned:core-ev-baedbdd39e6efc78:activity:15",
+      "object_type": "Activity",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        9
+      ],
+      "text": "医疗器械流通全业态",
+      "rationale": "Company-owned business products/services category in source p9, bounded before quality explanation; no invented direct manufacture or sale beyond stated category."
+    },
+    {
+      "instrument_id": "600056.SH",
+      "object_id": "owned:core-ev-8d5e3bd3c9c4f24d:segment:industry:医药工业",
+      "object_type": "Segment",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        13
+      ],
+      "text": {
+        "source_native_name": "医药工业",
+        "source_native_value": "2,504,497,845.37",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Source dimension, row, current-year amount, unit and period compared. Segment counts row recall once; Measurement is accuracy-only. Child parent: None. No repeated total."
+    },
+    {
+      "instrument_id": "600056.SH",
+      "object_id": "owned:core-ev-ea276b084896507d:revenue:industry:医药工业",
+      "object_type": "Measurement",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        13
+      ],
+      "text": {
+        "source_native_name": "医药工业",
+        "source_native_value": "2,504,497,845.37",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Source dimension, row, current-year amount, unit and period compared. Segment counts row recall once; Measurement is accuracy-only. Child parent: None. No repeated total."
+    },
+    {
+      "instrument_id": "600056.SH",
+      "object_id": "owned:core-ev-8d5e3bd3c9c4f24d:segment:industry:原料药",
+      "object_type": "Segment",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        13
+      ],
+      "text": {
+        "source_native_name": "原料药",
+        "source_native_value": "820,511,443.08",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Source dimension, row, current-year amount, unit and period compared. Segment counts row recall once; Measurement is accuracy-only. Child parent: 医药工业. No repeated total."
+    },
+    {
+      "instrument_id": "600056.SH",
+      "object_id": "owned:core-ev-ea276b084896507d:revenue:industry:原料药",
+      "object_type": "Measurement",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        13
+      ],
+      "text": {
+        "source_native_name": "原料药",
+        "source_native_value": "820,511,443.08",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Source dimension, row, current-year amount, unit and period compared. Segment counts row recall once; Measurement is accuracy-only. Child parent: 医药工业. No repeated total."
+    },
+    {
+      "instrument_id": "600056.SH",
+      "object_id": "owned:core-ev-8d5e3bd3c9c4f24d:segment:industry:制剂药",
+      "object_type": "Segment",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        13
+      ],
+      "text": {
+        "source_native_name": "制剂药",
+        "source_native_value": "1,372,540,668.47",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Source dimension, row, current-year amount, unit and period compared. Segment counts row recall once; Measurement is accuracy-only. Child parent: 医药工业. No repeated total."
+    },
+    {
+      "instrument_id": "600056.SH",
+      "object_id": "owned:core-ev-ea276b084896507d:revenue:industry:制剂药",
+      "object_type": "Measurement",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        13
+      ],
+      "text": {
+        "source_native_name": "制剂药",
+        "source_native_value": "1,372,540,668.47",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Source dimension, row, current-year amount, unit and period compared. Segment counts row recall once; Measurement is accuracy-only. Child parent: 医药工业. No repeated total."
+    },
+    {
+      "instrument_id": "600056.SH",
+      "object_id": "owned:core-ev-8d5e3bd3c9c4f24d:segment:industry:中药材加工及饮片",
+      "object_type": "Segment",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        13
+      ],
+      "text": {
+        "source_native_name": "中药材加工及饮片",
+        "source_native_value": "311,445,733.82",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Source dimension, row, current-year amount, unit and period compared. Segment counts row recall once; Measurement is accuracy-only. Child parent: 医药工业. No repeated total."
+    },
+    {
+      "instrument_id": "600056.SH",
+      "object_id": "owned:core-ev-ea276b084896507d:revenue:industry:中药材加工及饮片",
+      "object_type": "Measurement",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        13
+      ],
+      "text": {
+        "source_native_name": "中药材加工及饮片",
+        "source_native_value": "311,445,733.82",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Source dimension, row, current-year amount, unit and period compared. Segment counts row recall once; Measurement is accuracy-only. Child parent: 医药工业. No repeated total."
+    },
+    {
+      "instrument_id": "600056.SH",
+      "object_id": "owned:core-ev-8d5e3bd3c9c4f24d:segment:industry:医药商业",
+      "object_type": "Segment",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        13
+      ],
+      "text": {
+        "source_native_name": "医药商业",
+        "source_native_value": "26,159,860,274.66",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Source dimension, row, current-year amount, unit and period compared. Segment counts row recall once; Measurement is accuracy-only. Child parent: None. No repeated total."
+    },
+    {
+      "instrument_id": "600056.SH",
+      "object_id": "owned:core-ev-ea276b084896507d:revenue:industry:医药商业",
+      "object_type": "Measurement",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        13
+      ],
+      "text": {
+        "source_native_name": "医药商业",
+        "source_native_value": "26,159,860,274.66",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Source dimension, row, current-year amount, unit and period compared. Segment counts row recall once; Measurement is accuracy-only. Child parent: None. No repeated total."
+    },
+    {
+      "instrument_id": "600056.SH",
+      "object_id": "owned:core-ev-8d5e3bd3c9c4f24d:segment:industry:国际贸易",
+      "object_type": "Segment",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        13
+      ],
+      "text": {
+        "source_native_name": "国际贸易",
+        "source_native_value": "5,479,354,211.52",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Source dimension, row, current-year amount, unit and period compared. Segment counts row recall once; Measurement is accuracy-only. Child parent: None. No repeated total."
+    },
+    {
+      "instrument_id": "600056.SH",
+      "object_id": "owned:core-ev-ea276b084896507d:revenue:industry:国际贸易",
+      "object_type": "Measurement",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        13
+      ],
+      "text": {
+        "source_native_name": "国际贸易",
+        "source_native_value": "5,479,354,211.52",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Source dimension, row, current-year amount, unit and period compared. Segment counts row recall once; Measurement is accuracy-only. Child parent: None. No repeated total."
+    },
+    {
+      "instrument_id": "600056.SH",
+      "object_id": "owned:core-ev-8d5e3bd3c9c4f24d:segment:industry:大健康和电商",
+      "object_type": "Segment",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        13
+      ],
+      "text": {
+        "source_native_name": "大健康和电商",
+        "source_native_value": "1,248,714,903.73",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Source dimension, row, current-year amount, unit and period compared. Segment counts row recall once; Measurement is accuracy-only. Child parent: None. No repeated total."
+    },
+    {
+      "instrument_id": "600056.SH",
+      "object_id": "owned:core-ev-ea276b084896507d:revenue:industry:大健康和电商",
+      "object_type": "Measurement",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        13
+      ],
+      "text": {
+        "source_native_name": "大健康和电商",
+        "source_native_value": "1,248,714,903.73",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Source dimension, row, current-year amount, unit and period compared. Segment counts row recall once; Measurement is accuracy-only. Child parent: None. No repeated total."
+    }
+  ],
+  "missing_source_rows": [],
+  "runtime_evidence": [
+    {
+      "instrument_id": "600020.SH",
+      "work_id": "bp-work-b8c6da78f5c02255795a374b",
+      "reused_scope_ids_by_stage": {
+        "acquire": [],
+        "parse": [],
+        "publish": [],
+        "semantic": [],
+        "verify": []
+      },
+      "predecessor_lineage": [],
+      "completed_scopes": [
+        {
+          "chapter_task": "extract_business_overview",
+          "source_digest": "3669e50969e416219a28d06b25c66dcd11662c8d8497e9fca2616dea16fc08f5",
+          "task_complete": true
+        },
+        {
+          "chapter_task": "extract_segment_financials",
+          "source_digest": "02d67bfba8d6cce38b9443e038a603ea8be4bb3046973184291322f476453f99",
+          "task_complete": true
+        }
+      ],
+      "semantic_disputes": [],
+      "provider_calls": [],
+      "token_budget": {
+        "total_token_budget": 50000,
+        "extract_max_output_tokens": 8000,
+        "verify_max_output_tokens": 4000,
+        "tokens_used": 0,
+        "tokens_remaining": 50000
+      }
+    },
+    {
+      "instrument_id": "600056.SH",
+      "work_id": "bp-work-e3ff5bb2528d2810818dc5f7",
+      "reused_scope_ids_by_stage": {
+        "acquire": [],
+        "parse": [],
+        "publish": [],
+        "semantic": [],
+        "verify": []
+      },
+      "predecessor_lineage": [],
+      "completed_scopes": [
+        {
+          "chapter_task": "extract_business_overview",
+          "source_digest": "04d2f59c0188e719319f9eb14afc6995fcb725d94a9f586bf2eb7b25455d9175",
+          "task_complete": true
+        },
+        {
+          "chapter_task": "extract_segment_financials",
+          "source_digest": "8d3d0cf57b8d5fb5c6208f6d2d725c045a80b5717d219e882e0ca16d2c0c4f7b",
+          "task_complete": true
+        }
+      ],
+      "semantic_disputes": [],
+      "provider_calls": [],
+      "token_budget": {
+        "total_token_budget": 50000,
+        "extract_max_output_tokens": 8000,
+        "verify_max_output_tokens": 4000,
+        "tokens_used": 0,
+        "tokens_remaining": 50000
+      }
+    }
+  ],
+  "three_texts": [
+    {
+      "instrument_id": "600020.SH",
+      "object_id": "owned:core-ev-6466cfa3e8d4a731:overview",
+      "accepted_overview": "报告期内公司从事的业务情况\n报告期内，公司主营业务为高速公路的投资建设和运营管理，利润主要来源于高速公路运营\r\n及投资收益。",
+      "query_export_equal": true,
+      "source_page": 10
+    },
+    {
+      "instrument_id": "600056.SH",
+      "object_id": "owned:core-ev-51516fe0ca18c17a:overview",
+      "accepted_overview": "公司所从事的主要业务情况及经营模式\r\n医药工业业务：公司工业板块构建了覆盖化学制剂、化学原料药、中成药、中药饮片等多领\r\n域的完整产品矩阵，具备国内领先的化学原料药、特色化学药与现代中药的产业化平台。在化学\r\n药领域，聚焦发酵类与特色原料药的研发生产，制剂板块则深耕抗感染、心脑血管等核心治疗领\r\n域。所有生产基地均严格遵循国家新版 GMP 规范，建立全流程质量管控体系，从研发、原料药生\r\n产到制剂销售实现闭环管理。销售端以精细化招商与专业推广为核心，并持续参与国家及地方集\r\n采，保障产品可及性与市场竞争力。在中药领域，着力培育集种植、加工、生产、销售为一体的\r\n中药全产业链经营模式，业务产品涵盖中药材、中药饮片、中药提取物、中成药及大健康产品等\r\n多个品类，建立了全程可追溯的质量体系，进一步强化了公司在中药领域的资源掌控与品质保障\r\n能力。通过合作共建模式，与人参、甘草、黄芪等核心药材种植基地建立长期稳定的供应链关系。\r\n医药商业业务：近年来，公司商业板块积极从配送商向综合供应链服务商转型，持续拓展服\r\n务边界。公司已形成以北京、广东、江西、河南、河北、湖北、新疆、东北区域为重点的覆盖全\r\n国的配送、分销一体化营销网络体系，在北京、广东、河南、河北、辽宁等地建有大型医药物流\r\n中心。同时不断丰富经营品种，产品类别涵盖化学制剂、诊断药品及试剂、医用耗材、医疗器械、\r\n特医产品、医美产品、中成药、中药饮片、配方颗粒、生物制剂、营养保健品等。主要的经营模\r\n式包括医院纯销、商业分销、药房零售及第三方物流业务等。\r\n医疗器械业务：公司紧跟行业改革步伐，不断完善医疗器械业务布局，持续延伸服务链条，\r\n加大器械业务开发，经营业态多元、经营品类丰富、经营资质齐全、行业知名度和影响力不断提\r\n升。业务模式涉及进出口贸易、直销、分销、配送、SPD 等，涵盖医疗器械流通全业态。经营品\r\n类众多涉及医疗及康复设备、耗材、IVD 等。科技创新方面，积极对接医疗器械科技创新领域的\r\n医疗机构、高校院所、产业联盟、投资机构等，针对产业未来发展方向布局科技创新，加速高新\r\n科技成果转化应用，打造产业链前端专业技术服务能力；开放式构建研发制造能力，向产业链上\r\n游高端延伸，打造安全可控的供应链体系，以“科技创新”保障“产业控制”和“安全支撑”作\r\n用发挥。\r\n国际贸易业务：面向国内、国际两个市场，桥接国内外高端资源，可在医药制剂、原料药及\r\n中间体、医疗设备、医用耗材、中药材、提取物等领域为客户提供多元化产品；在医院与药厂建\r\n设、政府采购、对外援助等项目中为客户提供包括项目设计、产品供应、售后维护等在内的专业\r\n化集成解决方案；在市场营销方面为客户提供产品注册、渠道拓展、市场推广、终端维护等在内\r\n的一体化配套服务。\r\n大健康和电商业务：公司以旗下金穗科技为核心平台，依托其专业的品牌策划、数字营销与\r\n渠道管理能力，通过整合流量资源、优化营销策略，为合作伙伴提供从线上运营、渠道建设到品\r\n牌价值提升的全链路解决方案，助力其快速打开市场、强化品牌认知并实现规模化增长。",
+      "query_export_equal": true,
+      "source_page": 9
+    }
+  ],
+  "actual_accepted_fact_count": 57,
+  "answered_text_count": 6,
+  "denominator_method": "Source: six company-supported dimensions plus independently transcribed income rows, each row recalled once through Segment. Accuracy: every actually accepted fact and answered text once; missing answers excluded from delivered accuracy and counted as recall misses. No prescribed denominator or score.",
+  "no_role_checked_pages": {
+    "600020.SH": [
+      10,
+      11,
+      17,
+      18,
+      19
+    ],
+    "600056.SH": [
+      9,
+      10,
+      11,
+      13,
+      14,
+      15
+    ]
+  },
+  "source_scope_limit": "Scoped principal/product/service/revenue narratives and 12+7 current-period table rows, not whole-report completeness or every product/financial field. No catalogue-mapped commodity role on actual checked pages; generic raw drugs, fuel/power and herbs do not imply a catalogue role.",
+  "historical_files_unchanged": 475,
+  "artifact_sha256": {
+    "data/checkpoints/company_profile_common_core/reports/m4_v20_highway_pharma_repair/plan.json": "7171547ce14bc7a5a4d0ab26cb2b10459dfab57da1574bfff0bb854d95c1c102",
+    "data/checkpoints/company_profile_common_core/reports/m4_v20_highway_pharma_repair/company_profile_live_run.v1.json": "5db8c94624b891c8b224fedbb0804e4e4d606ce00479e2714a95fd042b80ee87",
+    "data/checkpoints/company_profile_common_core/reports/m4_v20_highway_pharma_repair/observation.json": "5fd14cb4086fb099e9dbac87d975ad4e55ef60ae99feaa3c01e459e67fd17247",
+    "data/checkpoints/company_profile_common_core/reports/m4_v20_highway_pharma_repair/formal_execution.json": "1abc1ab5a5238b6d53fe3b4497bece3a424553532ac784317e9ece2b98d0b057",
+    "data/checkpoints/company_profile_common_core/reports/m4_v20_highway_pharma_repair/company_profile_source_review.v1.json": "30c9455c33d8ea46df6491654be74910ae5647eb09ac8e82e79fff432688b130",
+    "data/exports/m4_v20_highway_pharma_repair/600020.SH/profiles.csv": "22cf8eefaad6445570ef80c0b634ba64c3f0866cbab1e6736f0a321e8447a736",
+    "data/exports/m4_v20_highway_pharma_repair/600020.SH/600020.SH_2025-12-31.json": "1886c416ecdc74beaffd6045d22b8b7d8b590a72a1c16c5f046af36aa3dc8ffe",
+    "data/exports/m4_v20_highway_pharma_repair/600020.SH/export_manifest.json": "d2d355b3b8d6562dde64545c42c5962303959d1f41db4e4b7fabcb2e9fe2374e",
+    "data/exports/m4_v20_highway_pharma_repair/600056.SH/profiles.csv": "5ed5e21512792e6a6683ad5c85ee500fc01b29e62733ebcb377c015dd1694d87",
+    "data/exports/m4_v20_highway_pharma_repair/600056.SH/600056.SH_2025-12-31.json": "e7e3a2d3cdc26651b06ed6d4dbd7babbac4531d38f5410c7621ae955d799ffb7",
+    "data/exports/m4_v20_highway_pharma_repair/600056.SH/export_manifest.json": "0bd506fd949e6d6f9187703b50482edca7a538653ac605ba50dd37e609d33865",
+    "data/research/company_profile_common_core/m4_v20_highway_pharma_repair/company_profile_common_core.v1/bp-work-e3ff5bb2528d2810818dc5f7.json": "aeba5af3f57ee6a7395e6b00a06dd440b9d05af2b16a8401e2fc7d15fb0762ee",
+    "data/research/company_profile_common_core/m4_v20_highway_pharma_repair/company_profile_common_core.v1/bp-work-b8c6da78f5c02255795a374b.json": "1a2ca7ba19f3ab5905440a4866157617e08a7a8c7edf20ec57c1623e96ebc2f1",
+    "data/research/company_profile_common_core/m4_v20_highway_pharma_repair/company_profile_common_core.v1/scopes/600020.SH/2025-12-31/extract_segment_financials.json": "036ec37f70844251fb50d0aeb08d2504127bbe119b34ba6ac9888ee18f9de6d1",
+    "data/research/company_profile_common_core/m4_v20_highway_pharma_repair/company_profile_common_core.v1/scopes/600020.SH/2025-12-31/extract_business_overview.json": "d38d33b5b984d07b5d7f5cc43fdd4cf35493f939507443ea7e061538dde26592",
+    "data/research/company_profile_common_core/m4_v20_highway_pharma_repair/company_profile_common_core.v1/scopes/600056.SH/2025-12-31/extract_segment_financials.json": "b15066c23a1ed99922cecbc3e51ab76622c8ded8161a45711c7bb53ce74af6eb",
+    "data/research/company_profile_common_core/m4_v20_highway_pharma_repair/company_profile_common_core.v1/scopes/600056.SH/2025-12-31/extract_business_overview.json": "6a494776ff75f176c9005b7e49fb9be4154955eefc027eb0a81cd0eeceb92c1d",
+    "data/research/company_profile_common_core/m4_v20_highway_pharma_repair/company_profile_common_core.v1/checkpoints/bp-work-e3ff5bb2528d2810818dc5f7.json": "faaa1e4f132a141018de98ae540be24d7e35d08d99c8260a7a778302bb46d93a",
+    "data/research/company_profile_common_core/m4_v20_highway_pharma_repair/company_profile_common_core.v1/checkpoints/bp-work-b8c6da78f5c02255795a374b.json": "2541fc47c43dbc12854ce45460ac75e0acbc75d3ff91ec0b6820d6499c1463e8"
+  },
+  "source_reader": "pypdf independent frozen PDF read, document SHA-256 verified"
+}

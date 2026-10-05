@@ -31,3 +31,12 @@ Local repair MUST address the actually observed long wrapped road labels, 其中
 - **WHEN** a local repair passes directed source-page regressions
 - **THEN** its local validation is reported separately from the original failed formal run
 - **AND** original artifacts and scores remain unchanged and the next batch stays paused pending A-role instructions
+
+### Requirement: The authorized v20 round validates the real corrected delivery
+The v20 identity MUST enable all five cumulative repair switches and pass frozen-source end-to-end regression. The formal run MUST reuse the exact frozen 0bdc8dd3… plan, cutoff 2026-09-17 and shared 50000-token budget in the independent m4_v20_highway_pharma_repair directory, with service before the mixed pharma company and the second using the remaining budget. Actual runtime scopes MUST show no reuse. First genuine execute through second export including retries MUST be measured; failed or over-limit artifacts MUST remain unchanged. Six answers and every accepted fact MUST each receive one independent source comparison with denominators derived from actual source and delivery. Child rows marked 其中 MUST retain their source hierarchy and MUST NOT be added again to the parent amount. No-role statements MUST be limited to actually checked pages. Dual 100%, zero critical numeric errors, at most 50000 tokens and 300 seconds MUST precede submission for finite A-role acceptance. Production and scale quality MUST remain unauthorized and the next batch paused until reviewed.
+
+#### Scenario: A corrected formal round is submitted without rewriting history
+- **WHEN** the first real v20 execution and independent source review complete
+- **THEN** the actual answers, facts, scope reuse, timing and recomputed scores are preserved in the new directory
+- **AND** the v19 failure remains unchanged, manufacturing sampling labels do not decide the profile template, and no child revenue is counted twice
+- **AND** finite acceptance and archive materials are submitted to A-role review without automatically expanding to another batch

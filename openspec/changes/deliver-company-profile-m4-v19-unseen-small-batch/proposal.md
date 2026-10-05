@@ -12,6 +12,8 @@ v19 修复已获 A 角声明范围内有限验收，下一目标是新年报上�
 
 ## Capabilities
 
+2026-10-05 A 角复验通过局部修复并授权 v20 正式轮：沿用原冻结计划，在 `m4_v20_highway_pharma_repair` 新目录、完整 v20 身份下真实运行并独立复核；不替换首轮失败，不扩批。验收依据两家实际业务，不由 manufacturing 抽样标签决定模板。
+
 ### New Capabilities
 
 - `deliver-company-profile-m4-v19-unseen-small-batch`: v19 未见两家公司冻结、受控交付与独立源复核。

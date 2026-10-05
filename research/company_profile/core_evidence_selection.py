@@ -1067,6 +1067,7 @@ REVENUE_SENTENCE_REPAIR_V16 = "v16"
 REVENUE_SENTENCE_REPAIR_V17 = "v17"
 REVENUE_SENTENCE_REPAIR_V18 = "v18"
 REVENUE_SENTENCE_REPAIR_V19 = "v19"
+REVENUE_SENTENCE_REPAIR_V20 = "v20"
 _REVENUE_SENTENCE_REPAIR_VERSIONS = frozenset(
     {
         REVENUE_SENTENCE_REPAIR_V1,
@@ -1088,6 +1089,7 @@ _REVENUE_SENTENCE_REPAIR_VERSIONS = frozenset(
         REVENUE_SENTENCE_REPAIR_V17,
         REVENUE_SENTENCE_REPAIR_V18,
         REVENUE_SENTENCE_REPAIR_V19,
+        REVENUE_SENTENCE_REPAIR_V20,
     }
 )
 
@@ -1132,6 +1134,7 @@ def named_role_repair_requested(identity: Mapping[str, Any] | None) -> bool:
         REVENUE_SENTENCE_REPAIR_V17,
         REVENUE_SENTENCE_REPAIR_V18,
         REVENUE_SENTENCE_REPAIR_V19,
+        REVENUE_SENTENCE_REPAIR_V20,
     }
 
 
@@ -1159,6 +1162,7 @@ def service_operating_energy_requested(identity: Mapping[str, Any] | None) -> bo
         REVENUE_SENTENCE_REPAIR_V17,
         REVENUE_SENTENCE_REPAIR_V18,
         REVENUE_SENTENCE_REPAIR_V19,
+        REVENUE_SENTENCE_REPAIR_V20,
     }
 
 
@@ -1186,6 +1190,7 @@ def core_answer_repair_requested(identity: Mapping[str, Any] | None) -> bool:
         REVENUE_SENTENCE_REPAIR_V17,
         REVENUE_SENTENCE_REPAIR_V18,
         REVENUE_SENTENCE_REPAIR_V19,
+        REVENUE_SENTENCE_REPAIR_V20,
     }
 
 
@@ -1214,6 +1219,7 @@ def source_delivery_repair_requested(identity: Mapping[str, Any] | None) -> bool
         REVENUE_SENTENCE_REPAIR_V17,
         REVENUE_SENTENCE_REPAIR_V18,
         REVENUE_SENTENCE_REPAIR_V19,
+        REVENUE_SENTENCE_REPAIR_V20,
     }
 
 
