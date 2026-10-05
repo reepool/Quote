@@ -1,0 +1,74 @@
+{
+  "created_at": "2026-10-05T13:06:15.943985+00:00",
+  "fixed_before_source_review": true,
+  "base_source_scope_sha256": "e41f824f5987674ff6b49528fee7d8fc0c052f6916b9c8a3d8d3dd142e24dd09",
+  "reason": "Continuing independent reading of originally checked p15 reveals five additional explicit current sold products. Preserve original scope bytes and append real source disclosures without fitting to delivered output.",
+  "native_roles": [
+    {
+      "instrument_id": "600062.SH",
+      "name": "厄贝沙坦分散片(豪降之)",
+      "role": "product_sales",
+      "page": 15,
+      "source_quote": "厄贝沙坦分散片(豪降之)销量同比增长18%",
+      "native_aliases": [
+        "厄贝沙坦分散片(豪降之)",
+        "厄贝沙坦分散片"
+      ],
+      "requires_current_own_context": true,
+      "scope_note": "Current company business-performance paragraph explicitly discloses sales volume or revenue. API and finished injection are separate native products; exact forms are not conflated."
+    },
+    {
+      "instrument_id": "600062.SH",
+      "name": "香雷糖足膏(速必一)",
+      "role": "product_sales",
+      "page": 15,
+      "source_quote": "香雷糖足膏(速必一)快速导入市场，收入同比增长超470%",
+      "native_aliases": [
+        "香雷糖足膏(速必一)",
+        "香雷糖足膏"
+      ],
+      "requires_current_own_context": true,
+      "scope_note": "Current company business-performance paragraph explicitly discloses sales volume or revenue. API and finished injection are separate native products; exact forms are not conflated."
+    },
+    {
+      "instrument_id": "600062.SH",
+      "name": "利福霉素S-Na盐",
+      "role": "product_sales",
+      "page": 15,
+      "source_quote": "利福霉素S-Na盐、依诺肝素钠、缬沙坦等原料药销量均实现双位数增长",
+      "native_aliases": [
+        "利福霉素S-Na盐",
+        "S-Na盐"
+      ],
+      "requires_current_own_context": true,
+      "scope_note": "Current company business-performance paragraph explicitly discloses sales volume or revenue. API and finished injection are separate native products; exact forms are not conflated."
+    },
+    {
+      "instrument_id": "600062.SH",
+      "name": "依诺肝素钠",
+      "role": "product_sales",
+      "page": 15,
+      "source_quote": "利福霉素S-Na盐、依诺肝素钠、缬沙坦等原料药销量均实现双位数增长",
+      "native_aliases": [
+        "依诺肝素钠",
+        "依诺肝素原料",
+        "依诺肝素钠原料药"
+      ],
+      "requires_current_own_context": true,
+      "scope_note": "Current company business-performance paragraph explicitly discloses sales volume or revenue. API and finished injection are separate native products; exact forms are not conflated."
+    },
+    {
+      "instrument_id": "600062.SH",
+      "name": "缬沙坦",
+      "role": "product_sales",
+      "page": 15,
+      "source_quote": "利福霉素S-Na盐、依诺肝素钠、缬沙坦等原料药销量均实现双位数增长",
+      "native_aliases": [
+        "缬沙坦"
+      ],
+      "requires_current_own_context": true,
+      "scope_note": "Current company business-performance paragraph explicitly discloses sales volume or revenue. API and finished injection are separate native products; exact forms are not conflated."
+    }
+  ],
+  "no_preset_scores": true
+}

@@ -1,0 +1,50 @@
+{
+  "tests": {
+    "command": "/home/python/miniconda3/envs/Quote/bin/python -m pytest -q tests/unit/test_research/test_company_profile_m4_next_batch.py tests/unit/test_research/test_company_profile_v20_identity.py",
+    "passed": 24,
+    "warnings": 7,
+    "seconds": 18.15,
+    "log_sha256": "4ba008027a71d20a4c4bb6d164b47890745c1db31c101545614e2f61899ee554"
+  },
+  "review": {
+    "method": "manual_current_diff_and_original_pdf_object_review",
+    "blocking_new_implementation_findings": [],
+    "observed_existing_core_business_gaps": [
+      "new full-narrative and compound project parsing",
+      "native multi-page income/volume table delivery",
+      "current native medicines sold without inference from counterparty names"
+    ],
+    "classification": "First genuine frozen-source formal failure; no algorithm edits in this task; repair is a future new identity/directory and does not rewrite this result.",
+    "unrelated_pre_existing": "Unchanged and deferred"
+  },
+  "formal_execution_index": 1,
+  "source_recall": {
+    "status": "assessed",
+    "numerator": 19,
+    "denominator": 62,
+    "value": 0.3064516129032258
+  },
+  "source_accuracy": {
+    "status": "assessed",
+    "numerator": 48,
+    "denominator": 57,
+    "value": 0.8421052631578947
+  },
+  "critical_numeric_errors": {
+    "status": "assessed",
+    "value": 0
+  },
+  "whole_round_seconds": 194.75035592913628,
+  "actual_runtime_no_reuse": true,
+  "shared_tokens_used": 0,
+  "shared_token_budget": 50000,
+  "history_unchanged": 593,
+  "first_formal_artifacts_unchanged": 18,
+  "openspec_strict": true,
+  "diff_check": true,
+  "old_change_archived": true,
+  "current_change_archived": false,
+  "next_batch": "paused_on_formal_failure",
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false
+}

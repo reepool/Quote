@@ -1,0 +1,19 @@
+{
+  "a_role_acceptance": "finite_pass",
+  "declared_source_recall": "32/32",
+  "source_accuracy": "57/57",
+  "critical_numeric_errors": 0,
+  "whole_round_seconds": 186.53159573860466,
+  "tokens_used": 0,
+  "shared_token_budget": 50000,
+  "actual_runtime_no_scope_reuse": true,
+  "protected_files_unchanged": 587,
+  "review_tests_passed": 48,
+  "openspec_strict": true,
+  "diff_check": true,
+  "authorization": "sync_specs_finite_archive_and_next_two_unseen_reports",
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false,
+  "scope_limit": "Declared source range only; not whole-report completeness. Historical v22 failure and earlier corrections preserved.",
+  "source": "User A-role review in this conversation on 2026-10-05"
+}
