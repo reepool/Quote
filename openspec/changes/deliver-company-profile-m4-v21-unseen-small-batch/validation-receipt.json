@@ -1,0 +1,71 @@
+{
+  "baseline_head": "bae89a9f1f721a44c6d902e51aa7ab651b64a331",
+  "completed_cards": [
+    "1.1",
+    "2.1",
+    "3.1 failure branch"
+  ],
+  "quality_passed": false,
+  "limited_acceptance_submitted": false,
+  "old_v21_acceptance": "A_role_finite_approved_and_archived",
+  "old_archive": "openspec/changes/archive/2026-10-05-deliver-company-profile-m4-v20-unseen-small-batch",
+  "old_original_tracked_bytes_unchanged": 17,
+  "plan_id": "07734df3db25a8aadbdca7ebecad897da3a81a4fe1f96a05738f7c48872b66ba",
+  "source_recall": {
+    "status": "assessed",
+    "numerator": 21,
+    "denominator": 32,
+    "value": 0.65625
+  },
+  "source_accuracy": {
+    "status": "assessed",
+    "numerator": 38,
+    "denominator": 45,
+    "value": 0.8444444444444444
+  },
+  "critical_numeric_errors": {
+    "status": "assessed",
+    "value": 0
+  },
+  "tokens_used": 0,
+  "whole_round_seconds": 196.5354736894369,
+  "actual_runtime_no_reuse": true,
+  "directed_tests": {
+    "command": "/home/python/miniconda3/envs/Quote/bin/python -m pytest -q tests/unit/test_research/test_company_profile_m4_next_batch.py tests/unit/test_research/test_company_profile_source_review.py",
+    "passed": 29,
+    "warnings": 7,
+    "seconds": 37.14
+  },
+  "openspec_strict": true,
+  "diff_check": true,
+  "core_code_changed": false,
+  "review_scope": "New documents, source assessment, finite archive, frozen plan, actual delivery/unique source-object check",
+  "blocking_business_misses_remain": true,
+  "historical_files_unchanged": 534,
+  "initial_review_correction": {
+    "initial_recall": "21/32",
+    "initial_accuracy": "39/45",
+    "corrected_recall": "21/32",
+    "corrected_accuracy": "38/45",
+    "reason": "600023.SH fixed source scope required actual sale/customer/market-trade mechanism. Initial review mistakenly credited 在某一时点确认 as sales mode; the revenue answer is materially incomplete and mislabels recognition timing. Correct only this answer accuracy judgment.",
+    "formal_execution_query_export_runtime_changed": false,
+    "original_artifact_json_paths": 17,
+    "other_original_json_paths_unchanged": 16,
+    "source_review_original_v1_initial_copy_exact": true,
+    "original_review_evidence_preserved": true
+  },
+  "next_batch": "paused",
+  "change_archive": "not_archived",
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false,
+  "preexisting_worktree": "Three modified docs and preexisting untracked directories/documents untouched and excluded",
+  "material_sha256": {
+    "openspec/changes/deliver-company-profile-m4-v21-unseen-small-batch/freeze-receipt.json": "b0c5cd2205d1a8d761fef724ffc93fd80fa6f4c5dfb54e681a505a4fe8bf7498",
+    "openspec/changes/deliver-company-profile-m4-v21-unseen-small-batch/v21-source-scope.json": "b34542c848c7671f3b802051c061e01dce809c5714466d75b08b9619a0a4e8d1",
+    "openspec/changes/deliver-company-profile-m4-v21-unseen-small-batch/unseen-source-review-evidence.json": "2c126e885aa2076a879ba8de5e58296aaba20ceacb100fb072d28ab79fc19583",
+    "openspec/changes/deliver-company-profile-m4-v21-unseen-small-batch/unseen-source-review-evidence.v2.json": "79a7ff50e1c5ce1c9366df76a6e01c0c26319fc9002ff8eea433fa907aab0dc9",
+    "openspec/changes/deliver-company-profile-m4-v21-unseen-small-batch/initial-company_profile_source_review.v1.json": "321736968e9c03d9eb0bb4af96a131c88de6048d302380953cbceda36a6bac63",
+    "openspec/changes/deliver-company-profile-m4-v21-unseen-small-batch/initial-observation.json": "b01243dc76d40ab340c4640df3eb22714fe82b45cd78a57d9166023a5cdaf98b",
+    "openspec/changes/deliver-company-profile-m4-v21-unseen-small-batch/review-submission.md": "f5253c2886426be39936b5c1f823ccf3e7ff1c61f0275a2f0b53d5ba4aacdee5"
+  }
+}

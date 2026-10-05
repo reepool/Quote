@@ -1,0 +1,27 @@
+{
+  "accepted_by": "A_role",
+  "accepted_at": "2026-10-05",
+  "scope": "Declared frozen source pages, six answers, 24 main-income rows and eight native roles; not full-report completeness",
+  "source_recall": "38/38",
+  "source_accuracy": "66/66",
+  "actual_accepted_facts": 60,
+  "answers": 6,
+  "critical_numeric_errors": 0,
+  "whole_round_seconds": 180.27239676192403,
+  "tokens_used": 0,
+  "shared_token_budget": 50000,
+  "actual_five_stage_scope_reuse": false,
+  "review_evidence_sha256": "191d5a2da5cfc9406db6a07d45aa53db676a2932b45bbabef9f1d3fb903fdabc",
+  "history": "513 protected current files unchanged; historical 29/36 and corrected 29/37 preserved; original source-review v1 bytes retained in initial copy",
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false,
+  "archive_authorized": true,
+  "next_change": "deliver-company-profile-m4-v21-unseen-small-batch",
+  "next_pair_only_authorized": true,
+  "a_role_validation": {
+    "passed": 165,
+    "deselected_existing_failure": 1,
+    "openspec_strict": true,
+    "diff_check": true
+  }
+}

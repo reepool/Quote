@@ -1,0 +1,1910 @@
+{
+  "plan_id": "07734df3db25a8aadbdca7ebecad897da3a81a4fe1f96a05738f7c48872b66ba",
+  "processing_identity": {
+    "rules": "company_profile_common_core.v1",
+    "owned_page_facts": "v8",
+    "material_input_facts": "v1",
+    "revenue_sentence_repair": "v21"
+  },
+  "formal_execution_index": 1,
+  "whole_round_seconds": 196.5354736894369,
+  "source_recall": {
+    "status": "assessed",
+    "numerator": 21,
+    "denominator": 32,
+    "value": 0.65625
+  },
+  "source_accuracy": {
+    "status": "assessed",
+    "numerator": 38,
+    "denominator": 45,
+    "value": 0.8444444444444444
+  },
+  "critical_numeric_errors": {
+    "status": "assessed",
+    "value": 0
+  },
+  "workload": {
+    "tokens_used": {
+      "status": "assessed",
+      "value": 0
+    },
+    "elapsed_seconds": {
+      "status": "assessed",
+      "value": 196.5354736894369
+    },
+    "human_review_minutes": {
+      "status": "unassessed",
+      "value": null
+    }
+  },
+  "expansion_gates_met": false,
+  "actual_runtime_no_reuse": true,
+  "actual_accepted_fact_count": 40,
+  "answered_text_count": 5,
+  "object_reviews": [
+    {
+      "instrument_id": "600023.SH",
+      "object_id": "owned:core-ev-96e166fac4c6c02e:overview",
+      "object_type": "BusinessOverview",
+      "accurate": true,
+      "critical_numeric_error": false,
+      "fact": {
+        "record_id": "owned:core-ev-96e166fac4c6c02e:overview",
+        "field_id": "business_overview_source",
+        "object_type": "BusinessOverview",
+        "source_text": "公司是浙江省内规模最大的发电企业，主要从事煤电、气电、核电、热电联产、综合能源等\r\n业务，管理及控股发电企业主要集中在浙江省内",
+        "source_actor": null,
+        "source_native_name": "报告期内公司从事的业务情况",
+        "source_native_header": null,
+        "source_native_value": null,
+        "source_native_unit": null,
+        "knowledge_time": null,
+        "reported_period": "2025-12-31",
+        "evidence": [
+          {
+            "page": 9,
+            "bounded_quote": "报告期内公司从事的业务情况\n公司是浙江省内规模最大的发电企业，主要从事煤电、气电、核电、热电联产、综合能源等\r\n业务，管理及控股发电企业主要集中在浙江省内。2023 年，公司取得中来股份控制权，中来股份\r\n为深圳证券交易所创业板上市公司（证券代码：300393.SZ），主要开展光伏辅材、高效电池及组\r\n件、光伏应用业务。\r\n电力是国民经济的基础性行业，发电企业业绩驱动的主要因素包括售电量（供热量）、电价\r\n（热价）及燃料价格等，受国家政策、经济运行形势、市场竞争和供求关系的影响较大。\r\n报告期内公司新增重要非主营业务的说明\r\n□适用 √不适用"
+          }
+        ]
+      },
+      "action": null,
+      "relation_type": null,
+      "rationale": "Continuous original company narrative, including subsidiary subjects and current/planned states, preserved verbatim."
+    },
+    {
+      "instrument_id": "600023.SH",
+      "object_id": "owned:core-ev-40eb6007feede347:activity:1",
+      "object_type": "Activity",
+      "accurate": true,
+      "critical_numeric_error": false,
+      "fact": {
+        "record_id": "owned:core-ev-40eb6007feede347:activity:1",
+        "field_id": "explicit_activity",
+        "object_type": "Activity",
+        "source_text": null,
+        "source_actor": "公司",
+        "source_native_name": "煤电",
+        "source_native_header": null,
+        "source_native_value": null,
+        "source_native_unit": null,
+        "knowledge_time": null,
+        "reported_period": "2025-12-31",
+        "evidence": [
+          {
+            "page": 9,
+            "bounded_quote": "报告期内公司从事的业务情况\n公司是浙江省内规模最大的发电企业，主要从事煤电、气电、核电、热电联产、综合能源等\r\n业务，管理及控股发电企业主要集中在浙江省内。2023 年，公司取得中来股份控制权，中来股份\r\n为深圳证券交易所创业板上市公司（证券代码：300393.SZ），主要开展光伏辅材、高效电池及组\r\n件、光伏应用业务。\r\n电力是国民经济的基础性行业，发电企业业绩驱动的主要因素包括售电量（供热量）、电价\r\n（热价）及燃料价格等，受国家政策、经济运行形势、市场竞争和供求关系的影响较大。\r\n报告期内公司新增重要非主营业务的说明\r\n□适用 √不适用"
+          }
+        ]
+      },
+      "action": "operates",
+      "relation_type": null,
+      "rationale": "Current company operates the individually named business in original p9 affirmative principal clause."
+    },
+    {
+      "instrument_id": "600023.SH",
+      "object_id": "owned:core-ev-40eb6007feede347:activity:2",
+      "object_type": "Activity",
+      "accurate": true,
+      "critical_numeric_error": false,
+      "fact": {
+        "record_id": "owned:core-ev-40eb6007feede347:activity:2",
+        "field_id": "explicit_activity",
+        "object_type": "Activity",
+        "source_text": null,
+        "source_actor": "公司",
+        "source_native_name": "气电",
+        "source_native_header": null,
+        "source_native_value": null,
+        "source_native_unit": null,
+        "knowledge_time": null,
+        "reported_period": "2025-12-31",
+        "evidence": [
+          {
+            "page": 9,
+            "bounded_quote": "报告期内公司从事的业务情况\n公司是浙江省内规模最大的发电企业，主要从事煤电、气电、核电、热电联产、综合能源等\r\n业务，管理及控股发电企业主要集中在浙江省内。2023 年，公司取得中来股份控制权，中来股份\r\n为深圳证券交易所创业板上市公司（证券代码：300393.SZ），主要开展光伏辅材、高效电池及组\r\n件、光伏应用业务。\r\n电力是国民经济的基础性行业，发电企业业绩驱动的主要因素包括售电量（供热量）、电价\r\n（热价）及燃料价格等，受国家政策、经济运行形势、市场竞争和供求关系的影响较大。\r\n报告期内公司新增重要非主营业务的说明\r\n□适用 √不适用"
+          }
+        ]
+      },
+      "action": "operates",
+      "relation_type": null,
+      "rationale": "Current company operates the individually named business in original p9 affirmative principal clause."
+    },
+    {
+      "instrument_id": "600023.SH",
+      "object_id": "owned:core-ev-40eb6007feede347:activity:3",
+      "object_type": "Activity",
+      "accurate": true,
+      "critical_numeric_error": false,
+      "fact": {
+        "record_id": "owned:core-ev-40eb6007feede347:activity:3",
+        "field_id": "explicit_activity",
+        "object_type": "Activity",
+        "source_text": null,
+        "source_actor": "公司",
+        "source_native_name": "核电",
+        "source_native_header": null,
+        "source_native_value": null,
+        "source_native_unit": null,
+        "knowledge_time": null,
+        "reported_period": "2025-12-31",
+        "evidence": [
+          {
+            "page": 9,
+            "bounded_quote": "报告期内公司从事的业务情况\n公司是浙江省内规模最大的发电企业，主要从事煤电、气电、核电、热电联产、综合能源等\r\n业务，管理及控股发电企业主要集中在浙江省内。2023 年，公司取得中来股份控制权，中来股份\r\n为深圳证券交易所创业板上市公司（证券代码：300393.SZ），主要开展光伏辅材、高效电池及组\r\n件、光伏应用业务。\r\n电力是国民经济的基础性行业，发电企业业绩驱动的主要因素包括售电量（供热量）、电价\r\n（热价）及燃料价格等，受国家政策、经济运行形势、市场竞争和供求关系的影响较大。\r\n报告期内公司新增重要非主营业务的说明\r\n□适用 √不适用"
+          }
+        ]
+      },
+      "action": "operates",
+      "relation_type": null,
+      "rationale": "Current company operates the individually named business in original p9 affirmative principal clause."
+    },
+    {
+      "instrument_id": "600023.SH",
+      "object_id": "owned:core-ev-40eb6007feede347:activity:4",
+      "object_type": "Activity",
+      "accurate": true,
+      "critical_numeric_error": false,
+      "fact": {
+        "record_id": "owned:core-ev-40eb6007feede347:activity:4",
+        "field_id": "explicit_activity",
+        "object_type": "Activity",
+        "source_text": null,
+        "source_actor": "公司",
+        "source_native_name": "热电联产",
+        "source_native_header": null,
+        "source_native_value": null,
+        "source_native_unit": null,
+        "knowledge_time": null,
+        "reported_period": "2025-12-31",
+        "evidence": [
+          {
+            "page": 9,
+            "bounded_quote": "报告期内公司从事的业务情况\n公司是浙江省内规模最大的发电企业，主要从事煤电、气电、核电、热电联产、综合能源等\r\n业务，管理及控股发电企业主要集中在浙江省内。2023 年，公司取得中来股份控制权，中来股份\r\n为深圳证券交易所创业板上市公司（证券代码：300393.SZ），主要开展光伏辅材、高效电池及组\r\n件、光伏应用业务。\r\n电力是国民经济的基础性行业，发电企业业绩驱动的主要因素包括售电量（供热量）、电价\r\n（热价）及燃料价格等，受国家政策、经济运行形势、市场竞争和供求关系的影响较大。\r\n报告期内公司新增重要非主营业务的说明\r\n□适用 √不适用"
+          }
+        ]
+      },
+      "action": "operates",
+      "relation_type": null,
+      "rationale": "Current company operates the individually named business in original p9 affirmative principal clause."
+    },
+    {
+      "instrument_id": "600023.SH",
+      "object_id": "owned:core-ev-40eb6007feede347:activity:5",
+      "object_type": "Activity",
+      "accurate": false,
+      "critical_numeric_error": false,
+      "fact": {
+        "record_id": "owned:core-ev-40eb6007feede347:activity:5",
+        "field_id": "explicit_activity",
+        "object_type": "Activity",
+        "source_text": null,
+        "source_actor": "公司",
+        "source_native_name": "综合能源等业务，管理及控股发电企业主要集中在浙江省内",
+        "source_native_header": null,
+        "source_native_value": null,
+        "source_native_unit": null,
+        "knowledge_time": null,
+        "reported_period": "2025-12-31",
+        "evidence": [
+          {
+            "page": 9,
+            "bounded_quote": "报告期内公司从事的业务情况\n公司是浙江省内规模最大的发电企业，主要从事煤电、气电、核电、热电联产、综合能源等\r\n业务，管理及控股发电企业主要集中在浙江省内。2023 年，公司取得中来股份控制权，中来股份\r\n为深圳证券交易所创业板上市公司（证券代码：300393.SZ），主要开展光伏辅材、高效电池及组\r\n件、光伏应用业务。\r\n电力是国民经济的基础性行业，发电企业业绩驱动的主要因素包括售电量（供热量）、电价\r\n（热价）及燃料价格等，受国家政策、经济运行形势、市场竞争和供求关系的影响较大。\r\n报告期内公司新增重要非主营业务的说明\r\n□适用 √不适用"
+          }
+        ]
+      },
+      "action": "operates",
+      "relation_type": null,
+      "rationale": "Company/consolidated-owned explicit current sales source, no invented quantity/price/grade; production/technical/plan-only fragment does not establish sale."
+    },
+    {
+      "instrument_id": "600023.SH",
+      "object_id": "owned:core-ev-374875d6ad2edbe6:commodity:1",
+      "object_type": "Activity",
+      "accurate": false,
+      "critical_numeric_error": false,
+      "fact": {
+        "record_id": "owned:core-ev-374875d6ad2edbe6:commodity:1",
+        "field_id": "explicit_activity",
+        "object_type": "Activity",
+        "source_text": null,
+        "source_actor": "公司",
+        "source_native_name": "电力万千瓦时",
+        "source_native_header": null,
+        "source_native_value": null,
+        "source_native_unit": null,
+        "knowledge_time": null,
+        "reported_period": "2025-12-31",
+        "evidence": [
+          {
+            "page": 12,
+            "bounded_quote": "浙江浙能电力股份有限公司2025 年年度报告\r\n12 / 224\r\n减（%） 减（%）\r\n电力 66,647,763,063.12 57,905,989,429.39 13.12 -5.90 -7.27 增加 1.29 个百分点\r\n蒸汽 6,222,382,362.79 4,556,243,406.92 26.78 -11.28 -13.72 增加 2.07 个百分点\r\n光伏产品 2,369,281,843.31 3,552,042,395.42 -49.92 -46.63 -20.95 减少 48.7 个百分点\r\n主营业务分地区情况\r\n分地区 营业收入 营业成本\r\n毛利率\r\n（%）\r\n营业收入\r\n比上年增\r\n减（%）\r\n营业成本\r\n比上年增\r\n减（%）\r\n毛利率比上年增减\r\n（%）\r\n境内 74,153,253,047.53 64,615,888,557.18 12.86 -8.44 -8.89 增加 0.44 个百分点\r\n境外 1,086,174,221.69 1,398,386,674.55 -28.74 -15.95 7.69 减少28.26个百分点\r\n主营业务分销售模式情况\r\n销售模式 营业收入 营业成本\r\n毛利率\r\n（%）\r\n营业收入\r\n比上年增\r\n减（%）\r\n营业成本\r\n比上年增\r\n减（%）\r\n毛利率比上年增减\r\n（%）\r\n在某一时点\r\n确认\r\n75,239,427,269.22 66,014,275,231.73 12.26 -8.56 -8.59 增加 0.04 个百分点\r\n(2). 产销量情况分析表\r\n√适用 □不适用\r\n主要产品 单位 生产量 销售量 库存量\r\n生产量比上\r\n年增减（%）\r\n销售量比上\r\n年增减（%）\r\n库存量比上\r\n年增减（%）\r\n电力 万千瓦时 18,328,427.23 17,371,982.51 0 5.36 5.47 0\r\n热力 万吨 3548.72 3548.72 0 -0.16 -0.16 0\r\n背板 万平方米 6899.62 7190.52 280.59 -48.25 -47.24 -55.89\r\n电池 MW 814.68 805.77 74.35 -79.01 -77.89 -29.39\r\n组件 MW 2082.22 2126.66 245.75 -39.51 -38.98 -15.66\r\n(3). 重大采购合同、重大销售合同的履行情况\r\n□适用 √不适用\r\n(4). 成本分析表\r\n单位：元 币种：人民币\r\n分行业情况\r\n分行业\r\n成本构成项\r\n目\r\n本期金额\r\n本期占\r\n总成本\r\n比例(%)\r\n上年同期金额\r\n上年同期\r\n占总成本\r\n比例(%)\r\n本期金额\r\n较上年同\r\n期变动比\r\n例(%)\r\n情\r\n况\r\n说\r\n明\r\n电力、热力生\r\n产及供应\r\n燃料及备件 49,365,007,880.88 74.78 55,286,212,202.19 76.55 -10.71\r\n电力、热力生\r\n产及供应\r\n长期资产折\r\n旧及摊销\r\n6,011,804,961.38 9.11 5,873,607,918.30 8.13 2.35\r\n电力、热力生\r\n产及供应\r\n其他 7,085,419,994.05 10.73 6,570,693,471.70 9.10 7.83\r\n光伏制造 直接材料 3,552,042,395.42 5.38 4,491,190,942.06 6.22 -20.91\r\n分产品情况\r\n分产品\r\n成本构成项\r\n目\r\n本期金额\r\n本期占\r\n总成本\r\n比例(%)\r\n上年同期金额\r\n上年同期\r\n占总成本\r\n比例(%)\r\n本期金额\r\n较上年同\r\n期变动比\r\n例(%)\r\n情\r\n况\r\n说\r\n明\r\n电力、热力产\r\n品\r\n燃料及备件 49,365,007,880.88 74.78 55,286,212,202.19 76.55 -10.71\r\n电力、热力产\r\n品\r\n长期资产折\r\n旧及摊销\r\n6,011,804,961.38 9.11 5,873,607,918.30 8.13 2.35\r\n电力、热力产 其他 7,085,419,994.05 10.73 6,570,693,471.70 9.10 7.83"
+          }
+        ]
+      },
+      "action": "sells",
+      "relation_type": null,
+      "rationale": "Company/consolidated-owned explicit current sales source, no invented quantity/price/grade; production/technical/plan-only fragment does not establish sale."
+    },
+    {
+      "instrument_id": "600023.SH",
+      "object_id": "owned:core-ev-374875d6ad2edbe6:commodity:2",
+      "object_type": "Activity",
+      "accurate": true,
+      "critical_numeric_error": false,
+      "fact": {
+        "record_id": "owned:core-ev-374875d6ad2edbe6:commodity:2",
+        "field_id": "explicit_activity",
+        "object_type": "Activity",
+        "source_text": null,
+        "source_actor": "公司",
+        "source_native_name": "热力",
+        "source_native_header": null,
+        "source_native_value": null,
+        "source_native_unit": null,
+        "knowledge_time": null,
+        "reported_period": "2025-12-31",
+        "evidence": [
+          {
+            "page": 12,
+            "bounded_quote": "浙江浙能电力股份有限公司2025 年年度报告\r\n12 / 224\r\n减（%） 减（%）\r\n电力 66,647,763,063.12 57,905,989,429.39 13.12 -5.90 -7.27 增加 1.29 个百分点\r\n蒸汽 6,222,382,362.79 4,556,243,406.92 26.78 -11.28 -13.72 增加 2.07 个百分点\r\n光伏产品 2,369,281,843.31 3,552,042,395.42 -49.92 -46.63 -20.95 减少 48.7 个百分点\r\n主营业务分地区情况\r\n分地区 营业收入 营业成本\r\n毛利率\r\n（%）\r\n营业收入\r\n比上年增\r\n减（%）\r\n营业成本\r\n比上年增\r\n减（%）\r\n毛利率比上年增减\r\n（%）\r\n境内 74,153,253,047.53 64,615,888,557.18 12.86 -8.44 -8.89 增加 0.44 个百分点\r\n境外 1,086,174,221.69 1,398,386,674.55 -28.74 -15.95 7.69 减少28.26个百分点\r\n主营业务分销售模式情况\r\n销售模式 营业收入 营业成本\r\n毛利率\r\n（%）\r\n营业收入\r\n比上年增\r\n减（%）\r\n营业成本\r\n比上年增\r\n减（%）\r\n毛利率比上年增减\r\n（%）\r\n在某一时点\r\n确认\r\n75,239,427,269.22 66,014,275,231.73 12.26 -8.56 -8.59 增加 0.04 个百分点\r\n(2). 产销量情况分析表\r\n√适用 □不适用\r\n主要产品 单位 生产量 销售量 库存量\r\n生产量比上\r\n年增减（%）\r\n销售量比上\r\n年增减（%）\r\n库存量比上\r\n年增减（%）\r\n电力 万千瓦时 18,328,427.23 17,371,982.51 0 5.36 5.47 0\r\n热力 万吨 3548.72 3548.72 0 -0.16 -0.16 0\r\n背板 万平方米 6899.62 7190.52 280.59 -48.25 -47.24 -55.89\r\n电池 MW 814.68 805.77 74.35 -79.01 -77.89 -29.39\r\n组件 MW 2082.22 2126.66 245.75 -39.51 -38.98 -15.66\r\n(3). 重大采购合同、重大销售合同的履行情况\r\n□适用 √不适用\r\n(4). 成本分析表\r\n单位：元 币种：人民币\r\n分行业情况\r\n分行业\r\n成本构成项\r\n目\r\n本期金额\r\n本期占\r\n总成本\r\n比例(%)\r\n上年同期金额\r\n上年同期\r\n占总成本\r\n比例(%)\r\n本期金额\r\n较上年同\r\n期变动比\r\n例(%)\r\n情\r\n况\r\n说\r\n明\r\n电力、热力生\r\n产及供应\r\n燃料及备件 49,365,007,880.88 74.78 55,286,212,202.19 76.55 -10.71\r\n电力、热力生\r\n产及供应\r\n长期资产折\r\n旧及摊销\r\n6,011,804,961.38 9.11 5,873,607,918.30 8.13 2.35\r\n电力、热力生\r\n产及供应\r\n其他 7,085,419,994.05 10.73 6,570,693,471.70 9.10 7.83\r\n光伏制造 直接材料 3,552,042,395.42 5.38 4,491,190,942.06 6.22 -20.91\r\n分产品情况\r\n分产品\r\n成本构成项\r\n目\r\n本期金额\r\n本期占\r\n总成本\r\n比例(%)\r\n上年同期金额\r\n上年同期\r\n占总成本\r\n比例(%)\r\n本期金额\r\n较上年同\r\n期变动比\r\n例(%)\r\n情\r\n况\r\n说\r\n明\r\n电力、热力产\r\n品\r\n燃料及备件 49,365,007,880.88 74.78 55,286,212,202.19 76.55 -10.71\r\n电力、热力产\r\n品\r\n长期资产折\r\n旧及摊销\r\n6,011,804,961.38 9.11 5,873,607,918.30 8.13 2.35\r\n电力、热力产 其他 7,085,419,994.05 10.73 6,570,693,471.70 9.10 7.83"
+          }
+        ]
+      },
+      "action": "sells",
+      "relation_type": null,
+      "rationale": "Company/consolidated-owned explicit current sales source, no invented quantity/price/grade; production/technical/plan-only fragment does not establish sale."
+    },
+    {
+      "instrument_id": "600023.SH",
+      "object_id": "owned:core-ev-374875d6ad2edbe6:commodity:3",
+      "object_type": "Activity",
+      "accurate": false,
+      "critical_numeric_error": false,
+      "fact": {
+        "record_id": "owned:core-ev-374875d6ad2edbe6:commodity:3",
+        "field_id": "explicit_activity",
+        "object_type": "Activity",
+        "source_text": null,
+        "source_actor": "公司",
+        "source_native_name": "背板万平方米",
+        "source_native_header": null,
+        "source_native_value": null,
+        "source_native_unit": null,
+        "knowledge_time": null,
+        "reported_period": "2025-12-31",
+        "evidence": [
+          {
+            "page": 12,
+            "bounded_quote": "浙江浙能电力股份有限公司2025 年年度报告\r\n12 / 224\r\n减（%） 减（%）\r\n电力 66,647,763,063.12 57,905,989,429.39 13.12 -5.90 -7.27 增加 1.29 个百分点\r\n蒸汽 6,222,382,362.79 4,556,243,406.92 26.78 -11.28 -13.72 增加 2.07 个百分点\r\n光伏产品 2,369,281,843.31 3,552,042,395.42 -49.92 -46.63 -20.95 减少 48.7 个百分点\r\n主营业务分地区情况\r\n分地区 营业收入 营业成本\r\n毛利率\r\n（%）\r\n营业收入\r\n比上年增\r\n减（%）\r\n营业成本\r\n比上年增\r\n减（%）\r\n毛利率比上年增减\r\n（%）\r\n境内 74,153,253,047.53 64,615,888,557.18 12.86 -8.44 -8.89 增加 0.44 个百分点\r\n境外 1,086,174,221.69 1,398,386,674.55 -28.74 -15.95 7.69 减少28.26个百分点\r\n主营业务分销售模式情况\r\n销售模式 营业收入 营业成本\r\n毛利率\r\n（%）\r\n营业收入\r\n比上年增\r\n减（%）\r\n营业成本\r\n比上年增\r\n减（%）\r\n毛利率比上年增减\r\n（%）\r\n在某一时点\r\n确认\r\n75,239,427,269.22 66,014,275,231.73 12.26 -8.56 -8.59 增加 0.04 个百分点\r\n(2). 产销量情况分析表\r\n√适用 □不适用\r\n主要产品 单位 生产量 销售量 库存量\r\n生产量比上\r\n年增减（%）\r\n销售量比上\r\n年增减（%）\r\n库存量比上\r\n年增减（%）\r\n电力 万千瓦时 18,328,427.23 17,371,982.51 0 5.36 5.47 0\r\n热力 万吨 3548.72 3548.72 0 -0.16 -0.16 0\r\n背板 万平方米 6899.62 7190.52 280.59 -48.25 -47.24 -55.89\r\n电池 MW 814.68 805.77 74.35 -79.01 -77.89 -29.39\r\n组件 MW 2082.22 2126.66 245.75 -39.51 -38.98 -15.66\r\n(3). 重大采购合同、重大销售合同的履行情况\r\n□适用 √不适用\r\n(4). 成本分析表\r\n单位：元 币种：人民币\r\n分行业情况\r\n分行业\r\n成本构成项\r\n目\r\n本期金额\r\n本期占\r\n总成本\r\n比例(%)\r\n上年同期金额\r\n上年同期\r\n占总成本\r\n比例(%)\r\n本期金额\r\n较上年同\r\n期变动比\r\n例(%)\r\n情\r\n况\r\n说\r\n明\r\n电力、热力生\r\n产及供应\r\n燃料及备件 49,365,007,880.88 74.78 55,286,212,202.19 76.55 -10.71\r\n电力、热力生\r\n产及供应\r\n长期资产折\r\n旧及摊销\r\n6,011,804,961.38 9.11 5,873,607,918.30 8.13 2.35\r\n电力、热力生\r\n产及供应\r\n其他 7,085,419,994.05 10.73 6,570,693,471.70 9.10 7.83\r\n光伏制造 直接材料 3,552,042,395.42 5.38 4,491,190,942.06 6.22 -20.91\r\n分产品情况\r\n分产品\r\n成本构成项\r\n目\r\n本期金额\r\n本期占\r\n总成本\r\n比例(%)\r\n上年同期金额\r\n上年同期\r\n占总成本\r\n比例(%)\r\n本期金额\r\n较上年同\r\n期变动比\r\n例(%)\r\n情\r\n况\r\n说\r\n明\r\n电力、热力产\r\n品\r\n燃料及备件 49,365,007,880.88 74.78 55,286,212,202.19 76.55 -10.71\r\n电力、热力产\r\n品\r\n长期资产折\r\n旧及摊销\r\n6,011,804,961.38 9.11 5,873,607,918.30 8.13 2.35\r\n电力、热力产 其他 7,085,419,994.05 10.73 6,570,693,471.70 9.10 7.83"
+          }
+        ]
+      },
+      "action": "sells",
+      "relation_type": null,
+      "rationale": "Company/consolidated-owned explicit current sales source, no invented quantity/price/grade; production/technical/plan-only fragment does not establish sale."
+    },
+    {
+      "instrument_id": "600023.SH",
+      "object_id": "owned:core-ev-63d80c544a4f3d04:segment:industry:光伏制造",
+      "object_type": "Segment",
+      "accurate": true,
+      "critical_numeric_error": false,
+      "fact": {
+        "record_id": "owned:core-ev-63d80c544a4f3d04:segment:industry:光伏制造",
+        "field_id": "segment_dimension",
+        "object_type": "Segment",
+        "source_text": null,
+        "source_actor": null,
+        "source_native_name": "光伏制造",
+        "source_native_header": null,
+        "source_native_value": "2,369,281,843.31",
+        "source_native_unit": "元",
+        "knowledge_time": null,
+        "reported_period": "2025-12-31",
+        "evidence": [
+          {
+            "page": 11,
+            "bounded_quote": "收入和成本分析\n□适用 √不适用\n(1). 主营业务分行业、分产品、分地区、分销售模式情况\n单位：元 币种：人民币\n主营业务分行业情况\n分行业 营业收入 营业成本\n毛利率\n（%）\n营业收入\n比上年增\n减（%）\n营业成本\n比上年增\n减（%）\n毛利率比上年增减\n（%）\n电力、热力生\n产及供应\n72,870,145,425.91 62,462,232,836.31 14.28 -6.38 -7.77 增加 1.29 个百分点\n光伏制造 2,369,281,843.31 3,552,042,395.42 -49.92 -46.63 -20.95 减少 48.7 个百分点\n主营业务分产品情况\n分产品 营业收入 营业成本\n毛利率\n（%）\n营业收入\n比上年增\n营业成本\n比上年增\n毛利率比上年增减\n（%）\n浙江浙能电力股份有限公司2025 年年度报告\n12 / 224\n减（%） 减（%）\n电力 66,647,763,063.12 57,905,989,429.39 13.12 -5.90 -7.27 增加 1.29 个百分点\n蒸汽 6,222,382,362.79 4,556,243,406.92 26.78 -11.28 -13.72 增加 2.07 个百分点\n光伏产品 2,369,281,843.31 3,552,042,395.42 -49.92 -46.63 -20.95 减少 48.7 个百分点\n主营业务分地区情况\n分地区 营业收入 营业成本\n毛利率\n（%）\n营业收入\n比上年增\n减（%）\n营业成本\n比上年增\n减（%）\n毛利率比上年增减\n（%）\n境内 74,153,253,047.53 64,615,888,557.18 12.86 -8.44 -8.89 增加 0.44 个百分点\n境外 1,086,174,221.69 1,398,386,674.55 -28.74 -15.95 7.69 减少28.26个百分点\n主营业务分销售模式情况\n销售模式 营业收入 营业成本\n毛利率\n（%）\n营业收入\n比上年增\n减（%）\n营业成本\n比上年增\n减（%）\n毛利率比上年增减\n（%）\n在某一时点\n确认\n75,239,427,269.22 66,014,275,231.73 12.26 -8.56 -8.59 增加 0.04 个百分点"
+          }
+        ]
+      },
+      "action": null,
+      "relation_type": null,
+      "rationale": "Source-owned current main income dimension, exact label/amount/currency/period; Measurement is an accuracy-only copy."
+    },
+    {
+      "instrument_id": "600023.SH",
+      "object_id": "owned:core-ev-cf8fba687b2e49d7:revenue:industry:光伏制造",
+      "object_type": "Measurement",
+      "accurate": true,
+      "critical_numeric_error": false,
+      "fact": {
+        "record_id": "owned:core-ev-cf8fba687b2e49d7:revenue:industry:光伏制造",
+        "field_id": "operating_revenue",
+        "object_type": "Measurement",
+        "source_text": null,
+        "source_actor": null,
+        "source_native_name": "光伏制造",
+        "source_native_header": null,
+        "source_native_value": "2,369,281,843.31",
+        "source_native_unit": "元",
+        "knowledge_time": null,
+        "reported_period": "2025-12-31",
+        "evidence": [
+          {
+            "page": 11,
+            "bounded_quote": "收入和成本分析\n□适用 √不适用\n(1). 主营业务分行业、分产品、分地区、分销售模式情况\n单位：元 币种：人民币\n主营业务分行业情况\n分行业 营业收入 营业成本\n毛利率\n（%）\n营业收入\n比上年增\n减（%）\n营业成本\n比上年增\n减（%）\n毛利率比上年增减\n（%）\n电力、热力生\n产及供应\n72,870,145,425.91 62,462,232,836.31 14.28 -6.38 -7.77 增加 1.29 个百分点\n光伏制造 2,369,281,843.31 3,552,042,395.42 -49.92 -46.63 -20.95 减少 48.7 个百分点\n主营业务分产品情况\n分产品 营业收入 营业成本\n毛利率\n（%）\n营业收入\n比上年增\n营业成本\n比上年增\n毛利率比上年增减\n（%）\n浙江浙能电力股份有限公司2025 年年度报告\n12 / 224\n减（%） 减（%）\n电力 66,647,763,063.12 57,905,989,429.39 13.12 -5.90 -7.27 增加 1.29 个百分点\n蒸汽 6,222,382,362.79 4,556,243,406.92 26.78 -11.28 -13.72 增加 2.07 个百分点\n光伏产品 2,369,281,843.31 3,552,042,395.42 -49.92 -46.63 -20.95 减少 48.7 个百分点\n主营业务分地区情况\n分地区 营业收入 营业成本\n毛利率\n（%）\n营业收入\n比上年增\n减（%）\n营业成本\n比上年增\n减（%）\n毛利率比上年增减\n（%）\n境内 74,153,253,047.53 64,615,888,557.18 12.86 -8.44 -8.89 增加 0.44 个百分点\n境外 1,086,174,221.69 1,398,386,674.55 -28.74 -15.95 7.69 减少28.26个百分点\n主营业务分销售模式情况\n销售模式 营业收入 营业成本\n毛利率\n（%）\n营业收入\n比上年增\n减（%）\n营业成本\n比上年增\n减（%）\n毛利率比上年增减\n（%）\n在某一时点\n确认\n75,239,427,269.22 66,014,275,231.73 12.26 -8.56 -8.59 增加 0.04 个百分点"
+          }
+        ]
+      },
+      "action": null,
+      "relation_type": null,
+      "rationale": "Source-owned current main income dimension, exact label/amount/currency/period; Measurement is an accuracy-only copy."
+    },
+    {
+      "instrument_id": "600023.SH",
+      "object_id": "owned:core-ev-63d80c544a4f3d04:segment:product:电力",
+      "object_type": "Segment",
+      "accurate": true,
+      "critical_numeric_error": false,
+      "fact": {
+        "record_id": "owned:core-ev-63d80c544a4f3d04:segment:product:电力",
+        "field_id": "segment_dimension",
+        "object_type": "Segment",
+        "source_text": null,
+        "source_actor": null,
+        "source_native_name": "电力",
+        "source_native_header": null,
+        "source_native_value": "66,647,763,063.12",
+        "source_native_unit": "元",
+        "knowledge_time": null,
+        "reported_period": "2025-12-31",
+        "evidence": [
+          {
+            "page": 11,
+            "bounded_quote": "收入和成本分析\n□适用 √不适用\n(1). 主营业务分行业、分产品、分地区、分销售模式情况\n单位：元 币种：人民币\n主营业务分行业情况\n分行业 营业收入 营业成本\n毛利率\n（%）\n营业收入\n比上年增\n减（%）\n营业成本\n比上年增\n减（%）\n毛利率比上年增减\n（%）\n电力、热力生\n产及供应\n72,870,145,425.91 62,462,232,836.31 14.28 -6.38 -7.77 增加 1.29 个百分点\n光伏制造 2,369,281,843.31 3,552,042,395.42 -49.92 -46.63 -20.95 减少 48.7 个百分点\n主营业务分产品情况\n分产品 营业收入 营业成本\n毛利率\n（%）\n营业收入\n比上年增\n营业成本\n比上年增\n毛利率比上年增减\n（%）\n浙江浙能电力股份有限公司2025 年年度报告\n12 / 224\n减（%） 减（%）\n电力 66,647,763,063.12 57,905,989,429.39 13.12 -5.90 -7.27 增加 1.29 个百分点\n蒸汽 6,222,382,362.79 4,556,243,406.92 26.78 -11.28 -13.72 增加 2.07 个百分点\n光伏产品 2,369,281,843.31 3,552,042,395.42 -49.92 -46.63 -20.95 减少 48.7 个百分点\n主营业务分地区情况\n分地区 营业收入 营业成本\n毛利率\n（%）\n营业收入\n比上年增\n减（%）\n营业成本\n比上年增\n减（%）\n毛利率比上年增减\n（%）\n境内 74,153,253,047.53 64,615,888,557.18 12.86 -8.44 -8.89 增加 0.44 个百分点\n境外 1,086,174,221.69 1,398,386,674.55 -28.74 -15.95 7.69 减少28.26个百分点\n主营业务分销售模式情况\n销售模式 营业收入 营业成本\n毛利率\n（%）\n营业收入\n比上年增\n减（%）\n营业成本\n比上年增\n减（%）\n毛利率比上年增减\n（%）\n在某一时点\n确认\n75,239,427,269.22 66,014,275,231.73 12.26 -8.56 -8.59 增加 0.04 个百分点"
+          }
+        ]
+      },
+      "action": null,
+      "relation_type": null,
+      "rationale": "Source-owned current main income dimension, exact label/amount/currency/period; Measurement is an accuracy-only copy."
+    },
+    {
+      "instrument_id": "600023.SH",
+      "object_id": "owned:core-ev-cf8fba687b2e49d7:revenue:product:电力",
+      "object_type": "Measurement",
+      "accurate": true,
+      "critical_numeric_error": false,
+      "fact": {
+        "record_id": "owned:core-ev-cf8fba687b2e49d7:revenue:product:电力",
+        "field_id": "operating_revenue",
+        "object_type": "Measurement",
+        "source_text": null,
+        "source_actor": null,
+        "source_native_name": "电力",
+        "source_native_header": null,
+        "source_native_value": "66,647,763,063.12",
+        "source_native_unit": "元",
+        "knowledge_time": null,
+        "reported_period": "2025-12-31",
+        "evidence": [
+          {
+            "page": 11,
+            "bounded_quote": "收入和成本分析\n□适用 √不适用\n(1). 主营业务分行业、分产品、分地区、分销售模式情况\n单位：元 币种：人民币\n主营业务分行业情况\n分行业 营业收入 营业成本\n毛利率\n（%）\n营业收入\n比上年增\n减（%）\n营业成本\n比上年增\n减（%）\n毛利率比上年增减\n（%）\n电力、热力生\n产及供应\n72,870,145,425.91 62,462,232,836.31 14.28 -6.38 -7.77 增加 1.29 个百分点\n光伏制造 2,369,281,843.31 3,552,042,395.42 -49.92 -46.63 -20.95 减少 48.7 个百分点\n主营业务分产品情况\n分产品 营业收入 营业成本\n毛利率\n（%）\n营业收入\n比上年增\n营业成本\n比上年增\n毛利率比上年增减\n（%）\n浙江浙能电力股份有限公司2025 年年度报告\n12 / 224\n减（%） 减（%）\n电力 66,647,763,063.12 57,905,989,429.39 13.12 -5.90 -7.27 增加 1.29 个百分点\n蒸汽 6,222,382,362.79 4,556,243,406.92 26.78 -11.28 -13.72 增加 2.07 个百分点\n光伏产品 2,369,281,843.31 3,552,042,395.42 -49.92 -46.63 -20.95 减少 48.7 个百分点\n主营业务分地区情况\n分地区 营业收入 营业成本\n毛利率\n（%）\n营业收入\n比上年增\n减（%）\n营业成本\n比上年增\n减（%）\n毛利率比上年增减\n（%）\n境内 74,153,253,047.53 64,615,888,557.18 12.86 -8.44 -8.89 增加 0.44 个百分点\n境外 1,086,174,221.69 1,398,386,674.55 -28.74 -15.95 7.69 减少28.26个百分点\n主营业务分销售模式情况\n销售模式 营业收入 营业成本\n毛利率\n（%）\n营业收入\n比上年增\n减（%）\n营业成本\n比上年增\n减（%）\n毛利率比上年增减\n（%）\n在某一时点\n确认\n75,239,427,269.22 66,014,275,231.73 12.26 -8.56 -8.59 增加 0.04 个百分点"
+          }
+        ]
+      },
+      "action": null,
+      "relation_type": null,
+      "rationale": "Source-owned current main income dimension, exact label/amount/currency/period; Measurement is an accuracy-only copy."
+    },
+    {
+      "instrument_id": "600023.SH",
+      "object_id": "owned:core-ev-63d80c544a4f3d04:segment:product:蒸汽",
+      "object_type": "Segment",
+      "accurate": true,
+      "critical_numeric_error": false,
+      "fact": {
+        "record_id": "owned:core-ev-63d80c544a4f3d04:segment:product:蒸汽",
+        "field_id": "segment_dimension",
+        "object_type": "Segment",
+        "source_text": null,
+        "source_actor": null,
+        "source_native_name": "蒸汽",
+        "source_native_header": null,
+        "source_native_value": "6,222,382,362.79",
+        "source_native_unit": "元",
+        "knowledge_time": null,
+        "reported_period": "2025-12-31",
+        "evidence": [
+          {
+            "page": 11,
+            "bounded_quote": "收入和成本分析\n□适用 √不适用\n(1). 主营业务分行业、分产品、分地区、分销售模式情况\n单位：元 币种：人民币\n主营业务分行业情况\n分行业 营业收入 营业成本\n毛利率\n（%）\n营业收入\n比上年增\n减（%）\n营业成本\n比上年增\n减（%）\n毛利率比上年增减\n（%）\n电力、热力生\n产及供应\n72,870,145,425.91 62,462,232,836.31 14.28 -6.38 -7.77 增加 1.29 个百分点\n光伏制造 2,369,281,843.31 3,552,042,395.42 -49.92 -46.63 -20.95 减少 48.7 个百分点\n主营业务分产品情况\n分产品 营业收入 营业成本\n毛利率\n（%）\n营业收入\n比上年增\n营业成本\n比上年增\n毛利率比上年增减\n（%）\n浙江浙能电力股份有限公司2025 年年度报告\n12 / 224\n减（%） 减（%）\n电力 66,647,763,063.12 57,905,989,429.39 13.12 -5.90 -7.27 增加 1.29 个百分点\n蒸汽 6,222,382,362.79 4,556,243,406.92 26.78 -11.28 -13.72 增加 2.07 个百分点\n光伏产品 2,369,281,843.31 3,552,042,395.42 -49.92 -46.63 -20.95 减少 48.7 个百分点\n主营业务分地区情况\n分地区 营业收入 营业成本\n毛利率\n（%）\n营业收入\n比上年增\n减（%）\n营业成本\n比上年增\n减（%）\n毛利率比上年增减\n（%）\n境内 74,153,253,047.53 64,615,888,557.18 12.86 -8.44 -8.89 增加 0.44 个百分点\n境外 1,086,174,221.69 1,398,386,674.55 -28.74 -15.95 7.69 减少28.26个百分点\n主营业务分销售模式情况\n销售模式 营业收入 营业成本\n毛利率\n（%）\n营业收入\n比上年增\n减（%）\n营业成本\n比上年增\n减（%）\n毛利率比上年增减\n（%）\n在某一时点\n确认\n75,239,427,269.22 66,014,275,231.73 12.26 -8.56 -8.59 增加 0.04 个百分点"
+          }
+        ]
+      },
+      "action": null,
+      "relation_type": null,
+      "rationale": "Source-owned current main income dimension, exact label/amount/currency/period; Measurement is an accuracy-only copy."
+    },
+    {
+      "instrument_id": "600023.SH",
+      "object_id": "owned:core-ev-cf8fba687b2e49d7:revenue:product:蒸汽",
+      "object_type": "Measurement",
+      "accurate": true,
+      "critical_numeric_error": false,
+      "fact": {
+        "record_id": "owned:core-ev-cf8fba687b2e49d7:revenue:product:蒸汽",
+        "field_id": "operating_revenue",
+        "object_type": "Measurement",
+        "source_text": null,
+        "source_actor": null,
+        "source_native_name": "蒸汽",
+        "source_native_header": null,
+        "source_native_value": "6,222,382,362.79",
+        "source_native_unit": "元",
+        "knowledge_time": null,
+        "reported_period": "2025-12-31",
+        "evidence": [
+          {
+            "page": 11,
+            "bounded_quote": "收入和成本分析\n□适用 √不适用\n(1). 主营业务分行业、分产品、分地区、分销售模式情况\n单位：元 币种：人民币\n主营业务分行业情况\n分行业 营业收入 营业成本\n毛利率\n（%）\n营业收入\n比上年增\n减（%）\n营业成本\n比上年增\n减（%）\n毛利率比上年增减\n（%）\n电力、热力生\n产及供应\n72,870,145,425.91 62,462,232,836.31 14.28 -6.38 -7.77 增加 1.29 个百分点\n光伏制造 2,369,281,843.31 3,552,042,395.42 -49.92 -46.63 -20.95 减少 48.7 个百分点\n主营业务分产品情况\n分产品 营业收入 营业成本\n毛利率\n（%）\n营业收入\n比上年增\n营业成本\n比上年增\n毛利率比上年增减\n（%）\n浙江浙能电力股份有限公司2025 年年度报告\n12 / 224\n减（%） 减（%）\n电力 66,647,763,063.12 57,905,989,429.39 13.12 -5.90 -7.27 增加 1.29 个百分点\n蒸汽 6,222,382,362.79 4,556,243,406.92 26.78 -11.28 -13.72 增加 2.07 个百分点\n光伏产品 2,369,281,843.31 3,552,042,395.42 -49.92 -46.63 -20.95 减少 48.7 个百分点\n主营业务分地区情况\n分地区 营业收入 营业成本\n毛利率\n（%）\n营业收入\n比上年增\n减（%）\n营业成本\n比上年增\n减（%）\n毛利率比上年增减\n（%）\n境内 74,153,253,047.53 64,615,888,557.18 12.86 -8.44 -8.89 增加 0.44 个百分点\n境外 1,086,174,221.69 1,398,386,674.55 -28.74 -15.95 7.69 减少28.26个百分点\n主营业务分销售模式情况\n销售模式 营业收入 营业成本\n毛利率\n（%）\n营业收入\n比上年增\n减（%）\n营业成本\n比上年增\n减（%）\n毛利率比上年增减\n（%）\n在某一时点\n确认\n75,239,427,269.22 66,014,275,231.73 12.26 -8.56 -8.59 增加 0.04 个百分点"
+          }
+        ]
+      },
+      "action": null,
+      "relation_type": null,
+      "rationale": "Source-owned current main income dimension, exact label/amount/currency/period; Measurement is an accuracy-only copy."
+    },
+    {
+      "instrument_id": "600023.SH",
+      "object_id": "owned:core-ev-63d80c544a4f3d04:segment:product:光伏产品",
+      "object_type": "Segment",
+      "accurate": true,
+      "critical_numeric_error": false,
+      "fact": {
+        "record_id": "owned:core-ev-63d80c544a4f3d04:segment:product:光伏产品",
+        "field_id": "segment_dimension",
+        "object_type": "Segment",
+        "source_text": null,
+        "source_actor": null,
+        "source_native_name": "光伏产品",
+        "source_native_header": null,
+        "source_native_value": "2,369,281,843.31",
+        "source_native_unit": "元",
+        "knowledge_time": null,
+        "reported_period": "2025-12-31",
+        "evidence": [
+          {
+            "page": 11,
+            "bounded_quote": "收入和成本分析\n□适用 √不适用\n(1). 主营业务分行业、分产品、分地区、分销售模式情况\n单位：元 币种：人民币\n主营业务分行业情况\n分行业 营业收入 营业成本\n毛利率\n（%）\n营业收入\n比上年增\n减（%）\n营业成本\n比上年增\n减（%）\n毛利率比上年增减\n（%）\n电力、热力生\n产及供应\n72,870,145,425.91 62,462,232,836.31 14.28 -6.38 -7.77 增加 1.29 个百分点\n光伏制造 2,369,281,843.31 3,552,042,395.42 -49.92 -46.63 -20.95 减少 48.7 个百分点\n主营业务分产品情况\n分产品 营业收入 营业成本\n毛利率\n（%）\n营业收入\n比上年增\n营业成本\n比上年增\n毛利率比上年增减\n（%）\n浙江浙能电力股份有限公司2025 年年度报告\n12 / 224\n减（%） 减（%）\n电力 66,647,763,063.12 57,905,989,429.39 13.12 -5.90 -7.27 增加 1.29 个百分点\n蒸汽 6,222,382,362.79 4,556,243,406.92 26.78 -11.28 -13.72 增加 2.07 个百分点\n光伏产品 2,369,281,843.31 3,552,042,395.42 -49.92 -46.63 -20.95 减少 48.7 个百分点\n主营业务分地区情况\n分地区 营业收入 营业成本\n毛利率\n（%）\n营业收入\n比上年增\n减（%）\n营业成本\n比上年增\n减（%）\n毛利率比上年增减\n（%）\n境内 74,153,253,047.53 64,615,888,557.18 12.86 -8.44 -8.89 增加 0.44 个百分点\n境外 1,086,174,221.69 1,398,386,674.55 -28.74 -15.95 7.69 减少28.26个百分点\n主营业务分销售模式情况\n销售模式 营业收入 营业成本\n毛利率\n（%）\n营业收入\n比上年增\n减（%）\n营业成本\n比上年增\n减（%）\n毛利率比上年增减\n（%）\n在某一时点\n确认\n75,239,427,269.22 66,014,275,231.73 12.26 -8.56 -8.59 增加 0.04 个百分点"
+          }
+        ]
+      },
+      "action": null,
+      "relation_type": null,
+      "rationale": "Source-owned current main income dimension, exact label/amount/currency/period; Measurement is an accuracy-only copy."
+    },
+    {
+      "instrument_id": "600023.SH",
+      "object_id": "owned:core-ev-cf8fba687b2e49d7:revenue:product:光伏产品",
+      "object_type": "Measurement",
+      "accurate": true,
+      "critical_numeric_error": false,
+      "fact": {
+        "record_id": "owned:core-ev-cf8fba687b2e49d7:revenue:product:光伏产品",
+        "field_id": "operating_revenue",
+        "object_type": "Measurement",
+        "source_text": null,
+        "source_actor": null,
+        "source_native_name": "光伏产品",
+        "source_native_header": null,
+        "source_native_value": "2,369,281,843.31",
+        "source_native_unit": "元",
+        "knowledge_time": null,
+        "reported_period": "2025-12-31",
+        "evidence": [
+          {
+            "page": 11,
+            "bounded_quote": "收入和成本分析\n□适用 √不适用\n(1). 主营业务分行业、分产品、分地区、分销售模式情况\n单位：元 币种：人民币\n主营业务分行业情况\n分行业 营业收入 营业成本\n毛利率\n（%）\n营业收入\n比上年增\n减（%）\n营业成本\n比上年增\n减（%）\n毛利率比上年增减\n（%）\n电力、热力生\n产及供应\n72,870,145,425.91 62,462,232,836.31 14.28 -6.38 -7.77 增加 1.29 个百分点\n光伏制造 2,369,281,843.31 3,552,042,395.42 -49.92 -46.63 -20.95 减少 48.7 个百分点\n主营业务分产品情况\n分产品 营业收入 营业成本\n毛利率\n（%）\n营业收入\n比上年增\n营业成本\n比上年增\n毛利率比上年增减\n（%）\n浙江浙能电力股份有限公司2025 年年度报告\n12 / 224\n减（%） 减（%）\n电力 66,647,763,063.12 57,905,989,429.39 13.12 -5.90 -7.27 增加 1.29 个百分点\n蒸汽 6,222,382,362.79 4,556,243,406.92 26.78 -11.28 -13.72 增加 2.07 个百分点\n光伏产品 2,369,281,843.31 3,552,042,395.42 -49.92 -46.63 -20.95 减少 48.7 个百分点\n主营业务分地区情况\n分地区 营业收入 营业成本\n毛利率\n（%）\n营业收入\n比上年增\n减（%）\n营业成本\n比上年增\n减（%）\n毛利率比上年增减\n（%）\n境内 74,153,253,047.53 64,615,888,557.18 12.86 -8.44 -8.89 增加 0.44 个百分点\n境外 1,086,174,221.69 1,398,386,674.55 -28.74 -15.95 7.69 减少28.26个百分点\n主营业务分销售模式情况\n销售模式 营业收入 营业成本\n毛利率\n（%）\n营业收入\n比上年增\n减（%）\n营业成本\n比上年增\n减（%）\n毛利率比上年增减\n（%）\n在某一时点\n确认\n75,239,427,269.22 66,014,275,231.73 12.26 -8.56 -8.59 增加 0.04 个百分点"
+          }
+        ]
+      },
+      "action": null,
+      "relation_type": null,
+      "rationale": "Source-owned current main income dimension, exact label/amount/currency/period; Measurement is an accuracy-only copy."
+    },
+    {
+      "instrument_id": "600023.SH",
+      "object_id": "owned:core-ev-63d80c544a4f3d04:segment:region:境内",
+      "object_type": "Segment",
+      "accurate": true,
+      "critical_numeric_error": false,
+      "fact": {
+        "record_id": "owned:core-ev-63d80c544a4f3d04:segment:region:境内",
+        "field_id": "segment_dimension",
+        "object_type": "Segment",
+        "source_text": null,
+        "source_actor": null,
+        "source_native_name": "境内",
+        "source_native_header": null,
+        "source_native_value": "74,153,253,047.53",
+        "source_native_unit": "元",
+        "knowledge_time": null,
+        "reported_period": "2025-12-31",
+        "evidence": [
+          {
+            "page": 11,
+            "bounded_quote": "收入和成本分析\n□适用 √不适用\n(1). 主营业务分行业、分产品、分地区、分销售模式情况\n单位：元 币种：人民币\n主营业务分行业情况\n分行业 营业收入 营业成本\n毛利率\n（%）\n营业收入\n比上年增\n减（%）\n营业成本\n比上年增\n减（%）\n毛利率比上年增减\n（%）\n电力、热力生\n产及供应\n72,870,145,425.91 62,462,232,836.31 14.28 -6.38 -7.77 增加 1.29 个百分点\n光伏制造 2,369,281,843.31 3,552,042,395.42 -49.92 -46.63 -20.95 减少 48.7 个百分点\n主营业务分产品情况\n分产品 营业收入 营业成本\n毛利率\n（%）\n营业收入\n比上年增\n营业成本\n比上年增\n毛利率比上年增减\n（%）\n浙江浙能电力股份有限公司2025 年年度报告\n12 / 224\n减（%） 减（%）\n电力 66,647,763,063.12 57,905,989,429.39 13.12 -5.90 -7.27 增加 1.29 个百分点\n蒸汽 6,222,382,362.79 4,556,243,406.92 26.78 -11.28 -13.72 增加 2.07 个百分点\n光伏产品 2,369,281,843.31 3,552,042,395.42 -49.92 -46.63 -20.95 减少 48.7 个百分点\n主营业务分地区情况\n分地区 营业收入 营业成本\n毛利率\n（%）\n营业收入\n比上年增\n减（%）\n营业成本\n比上年增\n减（%）\n毛利率比上年增减\n（%）\n境内 74,153,253,047.53 64,615,888,557.18 12.86 -8.44 -8.89 增加 0.44 个百分点\n境外 1,086,174,221.69 1,398,386,674.55 -28.74 -15.95 7.69 减少28.26个百分点\n主营业务分销售模式情况\n销售模式 营业收入 营业成本\n毛利率\n（%）\n营业收入\n比上年增\n减（%）\n营业成本\n比上年增\n减（%）\n毛利率比上年增减\n（%）\n在某一时点\n确认\n75,239,427,269.22 66,014,275,231.73 12.26 -8.56 -8.59 增加 0.04 个百分点"
+          }
+        ]
+      },
+      "action": null,
+      "relation_type": null,
+      "rationale": "Source-owned current main income dimension, exact label/amount/currency/period; Measurement is an accuracy-only copy."
+    },
+    {
+      "instrument_id": "600023.SH",
+      "object_id": "owned:core-ev-cf8fba687b2e49d7:revenue:region:境内",
+      "object_type": "Measurement",
+      "accurate": true,
+      "critical_numeric_error": false,
+      "fact": {
+        "record_id": "owned:core-ev-cf8fba687b2e49d7:revenue:region:境内",
+        "field_id": "operating_revenue",
+        "object_type": "Measurement",
+        "source_text": null,
+        "source_actor": null,
+        "source_native_name": "境内",
+        "source_native_header": null,
+        "source_native_value": "74,153,253,047.53",
+        "source_native_unit": "元",
+        "knowledge_time": null,
+        "reported_period": "2025-12-31",
+        "evidence": [
+          {
+            "page": 11,
+            "bounded_quote": "收入和成本分析\n□适用 √不适用\n(1). 主营业务分行业、分产品、分地区、分销售模式情况\n单位：元 币种：人民币\n主营业务分行业情况\n分行业 营业收入 营业成本\n毛利率\n（%）\n营业收入\n比上年增\n减（%）\n营业成本\n比上年增\n减（%）\n毛利率比上年增减\n（%）\n电力、热力生\n产及供应\n72,870,145,425.91 62,462,232,836.31 14.28 -6.38 -7.77 增加 1.29 个百分点\n光伏制造 2,369,281,843.31 3,552,042,395.42 -49.92 -46.63 -20.95 减少 48.7 个百分点\n主营业务分产品情况\n分产品 营业收入 营业成本\n毛利率\n（%）\n营业收入\n比上年增\n营业成本\n比上年增\n毛利率比上年增减\n（%）\n浙江浙能电力股份有限公司2025 年年度报告\n12 / 224\n减（%） 减（%）\n电力 66,647,763,063.12 57,905,989,429.39 13.12 -5.90 -7.27 增加 1.29 个百分点\n蒸汽 6,222,382,362.79 4,556,243,406.92 26.78 -11.28 -13.72 增加 2.07 个百分点\n光伏产品 2,369,281,843.31 3,552,042,395.42 -49.92 -46.63 -20.95 减少 48.7 个百分点\n主营业务分地区情况\n分地区 营业收入 营业成本\n毛利率\n（%）\n营业收入\n比上年增\n减（%）\n营业成本\n比上年增\n减（%）\n毛利率比上年增减\n（%）\n境内 74,153,253,047.53 64,615,888,557.18 12.86 -8.44 -8.89 增加 0.44 个百分点\n境外 1,086,174,221.69 1,398,386,674.55 -28.74 -15.95 7.69 减少28.26个百分点\n主营业务分销售模式情况\n销售模式 营业收入 营业成本\n毛利率\n（%）\n营业收入\n比上年增\n减（%）\n营业成本\n比上年增\n减（%）\n毛利率比上年增减\n（%）\n在某一时点\n确认\n75,239,427,269.22 66,014,275,231.73 12.26 -8.56 -8.59 增加 0.04 个百分点"
+          }
+        ]
+      },
+      "action": null,
+      "relation_type": null,
+      "rationale": "Source-owned current main income dimension, exact label/amount/currency/period; Measurement is an accuracy-only copy."
+    },
+    {
+      "instrument_id": "600023.SH",
+      "object_id": "owned:core-ev-63d80c544a4f3d04:segment:region:境外",
+      "object_type": "Segment",
+      "accurate": true,
+      "critical_numeric_error": false,
+      "fact": {
+        "record_id": "owned:core-ev-63d80c544a4f3d04:segment:region:境外",
+        "field_id": "segment_dimension",
+        "object_type": "Segment",
+        "source_text": null,
+        "source_actor": null,
+        "source_native_name": "境外",
+        "source_native_header": null,
+        "source_native_value": "1,086,174,221.69",
+        "source_native_unit": "元",
+        "knowledge_time": null,
+        "reported_period": "2025-12-31",
+        "evidence": [
+          {
+            "page": 11,
+            "bounded_quote": "收入和成本分析\n□适用 √不适用\n(1). 主营业务分行业、分产品、分地区、分销售模式情况\n单位：元 币种：人民币\n主营业务分行业情况\n分行业 营业收入 营业成本\n毛利率\n（%）\n营业收入\n比上年增\n减（%）\n营业成本\n比上年增\n减（%）\n毛利率比上年增减\n（%）\n电力、热力生\n产及供应\n72,870,145,425.91 62,462,232,836.31 14.28 -6.38 -7.77 增加 1.29 个百分点\n光伏制造 2,369,281,843.31 3,552,042,395.42 -49.92 -46.63 -20.95 减少 48.7 个百分点\n主营业务分产品情况\n分产品 营业收入 营业成本\n毛利率\n（%）\n营业收入\n比上年增\n营业成本\n比上年增\n毛利率比上年增减\n（%）\n浙江浙能电力股份有限公司2025 年年度报告\n12 / 224\n减（%） 减（%）\n电力 66,647,763,063.12 57,905,989,429.39 13.12 -5.90 -7.27 增加 1.29 个百分点\n蒸汽 6,222,382,362.79 4,556,243,406.92 26.78 -11.28 -13.72 增加 2.07 个百分点\n光伏产品 2,369,281,843.31 3,552,042,395.42 -49.92 -46.63 -20.95 减少 48.7 个百分点\n主营业务分地区情况\n分地区 营业收入 营业成本\n毛利率\n（%）\n营业收入\n比上年增\n减（%）\n营业成本\n比上年增\n减（%）\n毛利率比上年增减\n（%）\n境内 74,153,253,047.53 64,615,888,557.18 12.86 -8.44 -8.89 增加 0.44 个百分点\n境外 1,086,174,221.69 1,398,386,674.55 -28.74 -15.95 7.69 减少28.26个百分点\n主营业务分销售模式情况\n销售模式 营业收入 营业成本\n毛利率\n（%）\n营业收入\n比上年增\n减（%）\n营业成本\n比上年增\n减（%）\n毛利率比上年增减\n（%）\n在某一时点\n确认\n75,239,427,269.22 66,014,275,231.73 12.26 -8.56 -8.59 增加 0.04 个百分点"
+          }
+        ]
+      },
+      "action": null,
+      "relation_type": null,
+      "rationale": "Source-owned current main income dimension, exact label/amount/currency/period; Measurement is an accuracy-only copy."
+    },
+    {
+      "instrument_id": "600023.SH",
+      "object_id": "owned:core-ev-cf8fba687b2e49d7:revenue:region:境外",
+      "object_type": "Measurement",
+      "accurate": true,
+      "critical_numeric_error": false,
+      "fact": {
+        "record_id": "owned:core-ev-cf8fba687b2e49d7:revenue:region:境外",
+        "field_id": "operating_revenue",
+        "object_type": "Measurement",
+        "source_text": null,
+        "source_actor": null,
+        "source_native_name": "境外",
+        "source_native_header": null,
+        "source_native_value": "1,086,174,221.69",
+        "source_native_unit": "元",
+        "knowledge_time": null,
+        "reported_period": "2025-12-31",
+        "evidence": [
+          {
+            "page": 11,
+            "bounded_quote": "收入和成本分析\n□适用 √不适用\n(1). 主营业务分行业、分产品、分地区、分销售模式情况\n单位：元 币种：人民币\n主营业务分行业情况\n分行业 营业收入 营业成本\n毛利率\n（%）\n营业收入\n比上年增\n减（%）\n营业成本\n比上年增\n减（%）\n毛利率比上年增减\n（%）\n电力、热力生\n产及供应\n72,870,145,425.91 62,462,232,836.31 14.28 -6.38 -7.77 增加 1.29 个百分点\n光伏制造 2,369,281,843.31 3,552,042,395.42 -49.92 -46.63 -20.95 减少 48.7 个百分点\n主营业务分产品情况\n分产品 营业收入 营业成本\n毛利率\n（%）\n营业收入\n比上年增\n营业成本\n比上年增\n毛利率比上年增减\n（%）\n浙江浙能电力股份有限公司2025 年年度报告\n12 / 224\n减（%） 减（%）\n电力 66,647,763,063.12 57,905,989,429.39 13.12 -5.90 -7.27 增加 1.29 个百分点\n蒸汽 6,222,382,362.79 4,556,243,406.92 26.78 -11.28 -13.72 增加 2.07 个百分点\n光伏产品 2,369,281,843.31 3,552,042,395.42 -49.92 -46.63 -20.95 减少 48.7 个百分点\n主营业务分地区情况\n分地区 营业收入 营业成本\n毛利率\n（%）\n营业收入\n比上年增\n减（%）\n营业成本\n比上年增\n减（%）\n毛利率比上年增减\n（%）\n境内 74,153,253,047.53 64,615,888,557.18 12.86 -8.44 -8.89 增加 0.44 个百分点\n境外 1,086,174,221.69 1,398,386,674.55 -28.74 -15.95 7.69 减少28.26个百分点\n主营业务分销售模式情况\n销售模式 营业收入 营业成本\n毛利率\n（%）\n营业收入\n比上年增\n减（%）\n营业成本\n比上年增\n减（%）\n毛利率比上年增减\n（%）\n在某一时点\n确认\n75,239,427,269.22 66,014,275,231.73 12.26 -8.56 -8.59 增加 0.04 个百分点"
+          }
+        ]
+      },
+      "action": null,
+      "relation_type": null,
+      "rationale": "Source-owned current main income dimension, exact label/amount/currency/period; Measurement is an accuracy-only copy."
+    },
+    {
+      "instrument_id": "600023.SH",
+      "object_id": "owned:core-ev-63d80c544a4f3d04:segment:sales_mode:在某一时点确认",
+      "object_type": "Segment",
+      "accurate": true,
+      "critical_numeric_error": false,
+      "fact": {
+        "record_id": "owned:core-ev-63d80c544a4f3d04:segment:sales_mode:在某一时点确认",
+        "field_id": "segment_dimension",
+        "object_type": "Segment",
+        "source_text": null,
+        "source_actor": null,
+        "source_native_name": "在某一时点确认",
+        "source_native_header": null,
+        "source_native_value": "75,239,427,269.22",
+        "source_native_unit": "元",
+        "knowledge_time": null,
+        "reported_period": "2025-12-31",
+        "evidence": [
+          {
+            "page": 11,
+            "bounded_quote": "收入和成本分析\n□适用 √不适用\n(1). 主营业务分行业、分产品、分地区、分销售模式情况\n单位：元 币种：人民币\n主营业务分行业情况\n分行业 营业收入 营业成本\n毛利率\n（%）\n营业收入\n比上年增\n减（%）\n营业成本\n比上年增\n减（%）\n毛利率比上年增减\n（%）\n电力、热力生\n产及供应\n72,870,145,425.91 62,462,232,836.31 14.28 -6.38 -7.77 增加 1.29 个百分点\n光伏制造 2,369,281,843.31 3,552,042,395.42 -49.92 -46.63 -20.95 减少 48.7 个百分点\n主营业务分产品情况\n分产品 营业收入 营业成本\n毛利率\n（%）\n营业收入\n比上年增\n营业成本\n比上年增\n毛利率比上年增减\n（%）\n浙江浙能电力股份有限公司2025 年年度报告\n12 / 224\n减（%） 减（%）\n电力 66,647,763,063.12 57,905,989,429.39 13.12 -5.90 -7.27 增加 1.29 个百分点\n蒸汽 6,222,382,362.79 4,556,243,406.92 26.78 -11.28 -13.72 增加 2.07 个百分点\n光伏产品 2,369,281,843.31 3,552,042,395.42 -49.92 -46.63 -20.95 减少 48.7 个百分点\n主营业务分地区情况\n分地区 营业收入 营业成本\n毛利率\n（%）\n营业收入\n比上年增\n减（%）\n营业成本\n比上年增\n减（%）\n毛利率比上年增减\n（%）\n境内 74,153,253,047.53 64,615,888,557.18 12.86 -8.44 -8.89 增加 0.44 个百分点\n境外 1,086,174,221.69 1,398,386,674.55 -28.74 -15.95 7.69 减少28.26个百分点\n主营业务分销售模式情况\n销售模式 营业收入 营业成本\n毛利率\n（%）\n营业收入\n比上年增\n减（%）\n营业成本\n比上年增\n减（%）\n毛利率比上年增减\n（%）\n在某一时点\n确认\n75,239,427,269.22 66,014,275,231.73 12.26 -8.56 -8.59 增加 0.04 个百分点"
+          }
+        ]
+      },
+      "action": null,
+      "relation_type": null,
+      "rationale": "Source-owned current main income dimension, exact label/amount/currency/period; Measurement is an accuracy-only copy."
+    },
+    {
+      "instrument_id": "600023.SH",
+      "object_id": "owned:core-ev-cf8fba687b2e49d7:revenue:sales_mode:在某一时点确认",
+      "object_type": "Measurement",
+      "accurate": true,
+      "critical_numeric_error": false,
+      "fact": {
+        "record_id": "owned:core-ev-cf8fba687b2e49d7:revenue:sales_mode:在某一时点确认",
+        "field_id": "operating_revenue",
+        "object_type": "Measurement",
+        "source_text": null,
+        "source_actor": null,
+        "source_native_name": "在某一时点确认",
+        "source_native_header": null,
+        "source_native_value": "75,239,427,269.22",
+        "source_native_unit": "元",
+        "knowledge_time": null,
+        "reported_period": "2025-12-31",
+        "evidence": [
+          {
+            "page": 11,
+            "bounded_quote": "收入和成本分析\n□适用 √不适用\n(1). 主营业务分行业、分产品、分地区、分销售模式情况\n单位：元 币种：人民币\n主营业务分行业情况\n分行业 营业收入 营业成本\n毛利率\n（%）\n营业收入\n比上年增\n减（%）\n营业成本\n比上年增\n减（%）\n毛利率比上年增减\n（%）\n电力、热力生\n产及供应\n72,870,145,425.91 62,462,232,836.31 14.28 -6.38 -7.77 增加 1.29 个百分点\n光伏制造 2,369,281,843.31 3,552,042,395.42 -49.92 -46.63 -20.95 减少 48.7 个百分点\n主营业务分产品情况\n分产品 营业收入 营业成本\n毛利率\n（%）\n营业收入\n比上年增\n营业成本\n比上年增\n毛利率比上年增减\n（%）\n浙江浙能电力股份有限公司2025 年年度报告\n12 / 224\n减（%） 减（%）\n电力 66,647,763,063.12 57,905,989,429.39 13.12 -5.90 -7.27 增加 1.29 个百分点\n蒸汽 6,222,382,362.79 4,556,243,406.92 26.78 -11.28 -13.72 增加 2.07 个百分点\n光伏产品 2,369,281,843.31 3,552,042,395.42 -49.92 -46.63 -20.95 减少 48.7 个百分点\n主营业务分地区情况\n分地区 营业收入 营业成本\n毛利率\n（%）\n营业收入\n比上年增\n减（%）\n营业成本\n比上年增\n减（%）\n毛利率比上年增减\n（%）\n境内 74,153,253,047.53 64,615,888,557.18 12.86 -8.44 -8.89 增加 0.44 个百分点\n境外 1,086,174,221.69 1,398,386,674.55 -28.74 -15.95 7.69 减少28.26个百分点\n主营业务分销售模式情况\n销售模式 营业收入 营业成本\n毛利率\n（%）\n营业收入\n比上年增\n减（%）\n营业成本\n比上年增\n减（%）\n毛利率比上年增减\n（%）\n在某一时点\n确认\n75,239,427,269.22 66,014,275,231.73 12.26 -8.56 -8.59 增加 0.04 个百分点"
+          }
+        ]
+      },
+      "action": null,
+      "relation_type": null,
+      "rationale": "Source-owned current main income dimension, exact label/amount/currency/period; Measurement is an accuracy-only copy."
+    },
+    {
+      "instrument_id": "600023.SH",
+      "object_id": "answer:principal_business",
+      "object_type": "answer",
+      "accurate": true,
+      "present": true,
+      "text": "公司是浙江省内规模最大的发电企业，主要从事煤电、气电、核电、热电联产、综合能源等\r\n业务，管理及控股发电企业主要集中在浙江省内",
+      "required_source_substance": {
+        "pages": [
+          9
+        ],
+        "substance": [
+          "煤电",
+          "气电",
+          "核电",
+          "热电联产",
+          "综合能源"
+        ],
+        "actor_boundary": "中来股份业务可按合并范围叙述，必须保留子公司主语，不改成母公司直接生产活动"
+      }
+    },
+    {
+      "instrument_id": "600023.SH",
+      "object_id": "answer:products_services",
+      "object_type": "answer",
+      "accurate": false,
+      "present": true,
+      "text": "公司是浙江省内规模最大的发电企业，主要从事煤电、气电、核电、热电联产、综合能源等\r\n业务，管理及控股发电企业主要集中在浙江省内",
+      "required_source_substance": {
+        "pages": [
+          9,
+          12
+        ],
+        "substance": [
+          "电力",
+          "供热/热力/蒸汽",
+          "光伏辅材、高效电池及组件、光伏应用"
+        ],
+        "actor_boundary": "集团混合业务需保留公司主营和中来股份主体边界"
+      }
+    },
+    {
+      "instrument_id": "600023.SH",
+      "object_id": "answer:revenue_model",
+      "object_type": "answer",
+      "accurate": false,
+      "present": true,
+      "text": "营业收入分产品：电力、蒸汽、光伏产品\n销售模式：在某一时点确认",
+      "required_source_substance": {
+        "pages": [
+          11,
+          12,
+          13,
+          18
+        ],
+        "substance": [
+          "电力",
+          "蒸汽",
+          "光伏产品"
+        ],
+        "mechanism": "电力销售及市场化交易（p13销售客户主要国家电网；p18煤机市场化交易），在某一时点确认是源表收入确认时点，不虚构成销售渠道"
+      }
+    },
+    {
+      "instrument_id": "600060.SH",
+      "object_id": "owned:core-ev-6d48d3e22e8bf35a:commodity:1",
+      "object_type": "Activity",
+      "accurate": false,
+      "critical_numeric_error": false,
+      "fact": {
+        "record_id": "owned:core-ev-6d48d3e22e8bf35a:commodity:1",
+        "field_id": "explicit_activity",
+        "object_type": "Activity",
+        "source_text": null,
+        "source_actor": "公司",
+        "source_native_name": "显示产品万台",
+        "source_native_header": null,
+        "source_native_value": null,
+        "source_native_unit": null,
+        "knowledge_time": null,
+        "reported_period": "2025-12-31",
+        "evidence": [
+          {
+            "page": 28,
+            "bounded_quote": "海信视像科技股份有限公司2025 年年度报告\r\n28 / 242\r\n(2). 产销量情况分析表\r\n√适用 □不适用\r\n主要产品 单位 生产量 销售量 库存量\r\n生产量比\r\n上年增减\r\n（%）\r\n销售量比\r\n上年增减\r\n（%）\r\n库存量比\r\n上年增减\r\n（%）\r\n显示产品 万台 3,037.43 3,055.19 107.49 2.27 2.54 -14.18\r\n(3). 重大采购合同、重大销售合同的履行情况\r\n□适用 √不适用\r\n(4). 成本分析表\r\n单位：万元 币种：人民币\r\n分行业情况\r\n分行\r\n业\r\n成本构成\r\n项目\r\n本期金额\r\n本期占\r\n总成本\r\n比例(%)\r\n上年同期金\r\n额\r\n上年同期\r\n占总成本\r\n比例(%)\r\n本期金额\r\n较上年同\r\n期变动比\r\n例(%)\r\n情况\r\n说明\r\n显 示\r\n行业\r\n原材料 4,102,585.63 92.11 4,162,324.88 92.49 -1.44\r\n直接费用 105,591.47 2.37 96,081.35 2.13 9.90\r\n其他 245,682.17 5.52 242,044.46 5.38 1.50\r\n(5). 报告期主要子公司股权变动导致合并范围变化\r\n√适用 □不适用\r\n详见第八节 财务报告之“附注九、合并范围的变更 2、同一控制下企业合并”。\r\n(6). 公司报告期内业务、产品或服务发生重大变化或调整有关情况\r\n□适用 √不适用\r\n(7). 主要销售客户及主要供应商情况\r\n属于同一控制人控制的客户或供应商视为同一客户或供应商合并列示，受同一国有资产管理\r\n机构实际控制的除外。\r\n下列客户及供应商信息按照同一控制口径合并计算列示的情况说明\r\n海信集团控股及其其他子公司包含海信集团控股公司、海信家电及其子公司、海信国际营销\r\n及其子公司、香港海信公司、营销管理及其子公司等。\r\nA.公司主要销售客户及主要供应商情况\r\n√适用 □不适用\r\n前五名客户销售额4,006,814.46万元，占年度销售总额69.47%；其中前五名客户销售额中关联\r\n方销售额3,031,091.60万元，占年度销售总额52.55%。\r\n前五名供应商采购额3,173,996.84万元，占年度采购总额67.58%；其中前五名供应商采购额中\r\n关联方采购额1,973,995.30万元，占年度采购总额42.03%。"
+          }
+        ]
+      },
+      "action": "sells",
+      "relation_type": null,
+      "rationale": "Company/consolidated-owned explicit current sales source, no invented quantity/price/grade; production/technical/plan-only fragment does not establish sale."
+    },
+    {
+      "instrument_id": "600060.SH",
+      "object_id": "owned:core-ev-7f25347647dcc3d7:segment:industry:显示行业",
+      "object_type": "Segment",
+      "accurate": true,
+      "critical_numeric_error": false,
+      "fact": {
+        "record_id": "owned:core-ev-7f25347647dcc3d7:segment:industry:显示行业",
+        "field_id": "segment_dimension",
+        "object_type": "Segment",
+        "source_text": null,
+        "source_actor": null,
+        "source_native_name": "显示行业",
+        "source_native_header": null,
+        "source_native_value": "5,386,396.75",
+        "source_native_unit": "万元",
+        "knowledge_time": null,
+        "reported_period": "2025-12-31",
+        "evidence": [
+          {
+            "page": 27,
+            "bounded_quote": "收入和成本分析\n√适用 □不适用\n(1). 主营业务分行业、分产品、分地区、分销售模式情况\n单位：万元 币种：人民币\n主营业务分行业情况\n分行业 主营业务收入 主营业务成本 毛利率（%）\n主营业务收入比\n上年增减（%）\n主营业务成本比\n上年增减（%）\n毛利率比上年增减（%）\n显示行业 5,386,396.75 4,453,859.27 17.31 -0.10 -1.04 增加 0.78 个百分点\n主营业务分产品情况\n分产品 主营业务收入 主营业务成本 毛利率（%）\n主营业务收入比\n上年增减（%）\n主营业务成本比\n上年增减（%）\n毛利率比上年增减（%）\n智慧显示终端 4,496,372.07 3,815,722.90 15.14 -3.58 -4.36 增加 0.69 个百分点\n新显示新业务 845,789.89 608,342.26 28.07 24.92 28.31 减少 1.90 个百分点\n其他 44,234.79 29,794.11 32.65 -14.07 -18.60 增加 3.75 个百分点\n主营业务分地区情况\n分地区 主营业务收入 主营业务成本 毛利率（%）\n主营业务收入比\n上年增减（%）\n主营业务成本比\n上年增减（%）\n毛利率比上年增减（%）\n中国境内 2,463,388.58 1,882,617.05 23.58 -5.14 -6.35 增加 0.99 个百分点\n中国境外 2,923,008.17 2,571,242.22 12.03 4.57 3.26 增加 1.12 个百分点\n主营业务分销售模式情况\n销售模式 主营业务收入 主营业务成本 毛利率（%）\n主营业务收入比\n上年增减（%）\n主营业务成本比\n上年增减（%）\n毛利率比上年增减（%）\n直销 885,079.29 645,025.84 27.12 4.11 3.02 增加 0.77 个百分点\n经销 4,501,317.46 3,808,833.43 15.38 -0.89 -1.69 增加 0.69 个百分点\n主营业务分行业、分产品、分地区、分销售模式情况的说明\n1. 根据中国证券监督管理委员会公布的上市公司行业分类，公司属于计算机、通信和其他电子设备制造业。鉴于公司各项业务性质，将业务整体定位为\n显示行业。\n2．公司产品分为“智慧显示终端”、“新显示新业务”（新显示新业务包括激光显示、商用显示、云服务、芯片业务及其他新型业务）以及其他。\n海信视像科技股份有限公司2025 年年度报告\n28 / 242"
+          }
+        ]
+      },
+      "action": null,
+      "relation_type": null,
+      "rationale": "Source-owned current main income dimension, exact label/amount/currency/period; Measurement is an accuracy-only copy."
+    },
+    {
+      "instrument_id": "600060.SH",
+      "object_id": "owned:core-ev-c7bea061889aebbe:revenue:industry:显示行业",
+      "object_type": "Measurement",
+      "accurate": true,
+      "critical_numeric_error": false,
+      "fact": {
+        "record_id": "owned:core-ev-c7bea061889aebbe:revenue:industry:显示行业",
+        "field_id": "operating_revenue",
+        "object_type": "Measurement",
+        "source_text": null,
+        "source_actor": null,
+        "source_native_name": "显示行业",
+        "source_native_header": null,
+        "source_native_value": "5,386,396.75",
+        "source_native_unit": "万元",
+        "knowledge_time": null,
+        "reported_period": "2025-12-31",
+        "evidence": [
+          {
+            "page": 27,
+            "bounded_quote": "收入和成本分析\n√适用 □不适用\n(1). 主营业务分行业、分产品、分地区、分销售模式情况\n单位：万元 币种：人民币\n主营业务分行业情况\n分行业 主营业务收入 主营业务成本 毛利率（%）\n主营业务收入比\n上年增减（%）\n主营业务成本比\n上年增减（%）\n毛利率比上年增减（%）\n显示行业 5,386,396.75 4,453,859.27 17.31 -0.10 -1.04 增加 0.78 个百分点\n主营业务分产品情况\n分产品 主营业务收入 主营业务成本 毛利率（%）\n主营业务收入比\n上年增减（%）\n主营业务成本比\n上年增减（%）\n毛利率比上年增减（%）\n智慧显示终端 4,496,372.07 3,815,722.90 15.14 -3.58 -4.36 增加 0.69 个百分点\n新显示新业务 845,789.89 608,342.26 28.07 24.92 28.31 减少 1.90 个百分点\n其他 44,234.79 29,794.11 32.65 -14.07 -18.60 增加 3.75 个百分点\n主营业务分地区情况\n分地区 主营业务收入 主营业务成本 毛利率（%）\n主营业务收入比\n上年增减（%）\n主营业务成本比\n上年增减（%）\n毛利率比上年增减（%）\n中国境内 2,463,388.58 1,882,617.05 23.58 -5.14 -6.35 增加 0.99 个百分点\n中国境外 2,923,008.17 2,571,242.22 12.03 4.57 3.26 增加 1.12 个百分点\n主营业务分销售模式情况\n销售模式 主营业务收入 主营业务成本 毛利率（%）\n主营业务收入比\n上年增减（%）\n主营业务成本比\n上年增减（%）\n毛利率比上年增减（%）\n直销 885,079.29 645,025.84 27.12 4.11 3.02 增加 0.77 个百分点\n经销 4,501,317.46 3,808,833.43 15.38 -0.89 -1.69 增加 0.69 个百分点\n主营业务分行业、分产品、分地区、分销售模式情况的说明\n1. 根据中国证券监督管理委员会公布的上市公司行业分类，公司属于计算机、通信和其他电子设备制造业。鉴于公司各项业务性质，将业务整体定位为\n显示行业。\n2．公司产品分为“智慧显示终端”、“新显示新业务”（新显示新业务包括激光显示、商用显示、云服务、芯片业务及其他新型业务）以及其他。\n海信视像科技股份有限公司2025 年年度报告\n28 / 242"
+          }
+        ]
+      },
+      "action": null,
+      "relation_type": null,
+      "rationale": "Source-owned current main income dimension, exact label/amount/currency/period; Measurement is an accuracy-only copy."
+    },
+    {
+      "instrument_id": "600060.SH",
+      "object_id": "owned:core-ev-7f25347647dcc3d7:segment:product:智慧显示终端",
+      "object_type": "Segment",
+      "accurate": true,
+      "critical_numeric_error": false,
+      "fact": {
+        "record_id": "owned:core-ev-7f25347647dcc3d7:segment:product:智慧显示终端",
+        "field_id": "segment_dimension",
+        "object_type": "Segment",
+        "source_text": null,
+        "source_actor": null,
+        "source_native_name": "智慧显示终端",
+        "source_native_header": null,
+        "source_native_value": "4,496,372.07",
+        "source_native_unit": "万元",
+        "knowledge_time": null,
+        "reported_period": "2025-12-31",
+        "evidence": [
+          {
+            "page": 27,
+            "bounded_quote": "收入和成本分析\n√适用 □不适用\n(1). 主营业务分行业、分产品、分地区、分销售模式情况\n单位：万元 币种：人民币\n主营业务分行业情况\n分行业 主营业务收入 主营业务成本 毛利率（%）\n主营业务收入比\n上年增减（%）\n主营业务成本比\n上年增减（%）\n毛利率比上年增减（%）\n显示行业 5,386,396.75 4,453,859.27 17.31 -0.10 -1.04 增加 0.78 个百分点\n主营业务分产品情况\n分产品 主营业务收入 主营业务成本 毛利率（%）\n主营业务收入比\n上年增减（%）\n主营业务成本比\n上年增减（%）\n毛利率比上年增减（%）\n智慧显示终端 4,496,372.07 3,815,722.90 15.14 -3.58 -4.36 增加 0.69 个百分点\n新显示新业务 845,789.89 608,342.26 28.07 24.92 28.31 减少 1.90 个百分点\n其他 44,234.79 29,794.11 32.65 -14.07 -18.60 增加 3.75 个百分点\n主营业务分地区情况\n分地区 主营业务收入 主营业务成本 毛利率（%）\n主营业务收入比\n上年增减（%）\n主营业务成本比\n上年增减（%）\n毛利率比上年增减（%）\n中国境内 2,463,388.58 1,882,617.05 23.58 -5.14 -6.35 增加 0.99 个百分点\n中国境外 2,923,008.17 2,571,242.22 12.03 4.57 3.26 增加 1.12 个百分点\n主营业务分销售模式情况\n销售模式 主营业务收入 主营业务成本 毛利率（%）\n主营业务收入比\n上年增减（%）\n主营业务成本比\n上年增减（%）\n毛利率比上年增减（%）\n直销 885,079.29 645,025.84 27.12 4.11 3.02 增加 0.77 个百分点\n经销 4,501,317.46 3,808,833.43 15.38 -0.89 -1.69 增加 0.69 个百分点\n主营业务分行业、分产品、分地区、分销售模式情况的说明\n1. 根据中国证券监督管理委员会公布的上市公司行业分类，公司属于计算机、通信和其他电子设备制造业。鉴于公司各项业务性质，将业务整体定位为\n显示行业。\n2．公司产品分为“智慧显示终端”、“新显示新业务”（新显示新业务包括激光显示、商用显示、云服务、芯片业务及其他新型业务）以及其他。\n海信视像科技股份有限公司2025 年年度报告\n28 / 242"
+          }
+        ]
+      },
+      "action": null,
+      "relation_type": null,
+      "rationale": "Source-owned current main income dimension, exact label/amount/currency/period; Measurement is an accuracy-only copy."
+    },
+    {
+      "instrument_id": "600060.SH",
+      "object_id": "owned:core-ev-c7bea061889aebbe:revenue:product:智慧显示终端",
+      "object_type": "Measurement",
+      "accurate": true,
+      "critical_numeric_error": false,
+      "fact": {
+        "record_id": "owned:core-ev-c7bea061889aebbe:revenue:product:智慧显示终端",
+        "field_id": "operating_revenue",
+        "object_type": "Measurement",
+        "source_text": null,
+        "source_actor": null,
+        "source_native_name": "智慧显示终端",
+        "source_native_header": null,
+        "source_native_value": "4,496,372.07",
+        "source_native_unit": "万元",
+        "knowledge_time": null,
+        "reported_period": "2025-12-31",
+        "evidence": [
+          {
+            "page": 27,
+            "bounded_quote": "收入和成本分析\n√适用 □不适用\n(1). 主营业务分行业、分产品、分地区、分销售模式情况\n单位：万元 币种：人民币\n主营业务分行业情况\n分行业 主营业务收入 主营业务成本 毛利率（%）\n主营业务收入比\n上年增减（%）\n主营业务成本比\n上年增减（%）\n毛利率比上年增减（%）\n显示行业 5,386,396.75 4,453,859.27 17.31 -0.10 -1.04 增加 0.78 个百分点\n主营业务分产品情况\n分产品 主营业务收入 主营业务成本 毛利率（%）\n主营业务收入比\n上年增减（%）\n主营业务成本比\n上年增减（%）\n毛利率比上年增减（%）\n智慧显示终端 4,496,372.07 3,815,722.90 15.14 -3.58 -4.36 增加 0.69 个百分点\n新显示新业务 845,789.89 608,342.26 28.07 24.92 28.31 减少 1.90 个百分点\n其他 44,234.79 29,794.11 32.65 -14.07 -18.60 增加 3.75 个百分点\n主营业务分地区情况\n分地区 主营业务收入 主营业务成本 毛利率（%）\n主营业务收入比\n上年增减（%）\n主营业务成本比\n上年增减（%）\n毛利率比上年增减（%）\n中国境内 2,463,388.58 1,882,617.05 23.58 -5.14 -6.35 增加 0.99 个百分点\n中国境外 2,923,008.17 2,571,242.22 12.03 4.57 3.26 增加 1.12 个百分点\n主营业务分销售模式情况\n销售模式 主营业务收入 主营业务成本 毛利率（%）\n主营业务收入比\n上年增减（%）\n主营业务成本比\n上年增减（%）\n毛利率比上年增减（%）\n直销 885,079.29 645,025.84 27.12 4.11 3.02 增加 0.77 个百分点\n经销 4,501,317.46 3,808,833.43 15.38 -0.89 -1.69 增加 0.69 个百分点\n主营业务分行业、分产品、分地区、分销售模式情况的说明\n1. 根据中国证券监督管理委员会公布的上市公司行业分类，公司属于计算机、通信和其他电子设备制造业。鉴于公司各项业务性质，将业务整体定位为\n显示行业。\n2．公司产品分为“智慧显示终端”、“新显示新业务”（新显示新业务包括激光显示、商用显示、云服务、芯片业务及其他新型业务）以及其他。\n海信视像科技股份有限公司2025 年年度报告\n28 / 242"
+          }
+        ]
+      },
+      "action": null,
+      "relation_type": null,
+      "rationale": "Source-owned current main income dimension, exact label/amount/currency/period; Measurement is an accuracy-only copy."
+    },
+    {
+      "instrument_id": "600060.SH",
+      "object_id": "owned:core-ev-7f25347647dcc3d7:segment:product:新显示新业务",
+      "object_type": "Segment",
+      "accurate": true,
+      "critical_numeric_error": false,
+      "fact": {
+        "record_id": "owned:core-ev-7f25347647dcc3d7:segment:product:新显示新业务",
+        "field_id": "segment_dimension",
+        "object_type": "Segment",
+        "source_text": null,
+        "source_actor": null,
+        "source_native_name": "新显示新业务",
+        "source_native_header": null,
+        "source_native_value": "845,789.89",
+        "source_native_unit": "万元",
+        "knowledge_time": null,
+        "reported_period": "2025-12-31",
+        "evidence": [
+          {
+            "page": 27,
+            "bounded_quote": "收入和成本分析\n√适用 □不适用\n(1). 主营业务分行业、分产品、分地区、分销售模式情况\n单位：万元 币种：人民币\n主营业务分行业情况\n分行业 主营业务收入 主营业务成本 毛利率（%）\n主营业务收入比\n上年增减（%）\n主营业务成本比\n上年增减（%）\n毛利率比上年增减（%）\n显示行业 5,386,396.75 4,453,859.27 17.31 -0.10 -1.04 增加 0.78 个百分点\n主营业务分产品情况\n分产品 主营业务收入 主营业务成本 毛利率（%）\n主营业务收入比\n上年增减（%）\n主营业务成本比\n上年增减（%）\n毛利率比上年增减（%）\n智慧显示终端 4,496,372.07 3,815,722.90 15.14 -3.58 -4.36 增加 0.69 个百分点\n新显示新业务 845,789.89 608,342.26 28.07 24.92 28.31 减少 1.90 个百分点\n其他 44,234.79 29,794.11 32.65 -14.07 -18.60 增加 3.75 个百分点\n主营业务分地区情况\n分地区 主营业务收入 主营业务成本 毛利率（%）\n主营业务收入比\n上年增减（%）\n主营业务成本比\n上年增减（%）\n毛利率比上年增减（%）\n中国境内 2,463,388.58 1,882,617.05 23.58 -5.14 -6.35 增加 0.99 个百分点\n中国境外 2,923,008.17 2,571,242.22 12.03 4.57 3.26 增加 1.12 个百分点\n主营业务分销售模式情况\n销售模式 主营业务收入 主营业务成本 毛利率（%）\n主营业务收入比\n上年增减（%）\n主营业务成本比\n上年增减（%）\n毛利率比上年增减（%）\n直销 885,079.29 645,025.84 27.12 4.11 3.02 增加 0.77 个百分点\n经销 4,501,317.46 3,808,833.43 15.38 -0.89 -1.69 增加 0.69 个百分点\n主营业务分行业、分产品、分地区、分销售模式情况的说明\n1. 根据中国证券监督管理委员会公布的上市公司行业分类，公司属于计算机、通信和其他电子设备制造业。鉴于公司各项业务性质，将业务整体定位为\n显示行业。\n2．公司产品分为“智慧显示终端”、“新显示新业务”（新显示新业务包括激光显示、商用显示、云服务、芯片业务及其他新型业务）以及其他。\n海信视像科技股份有限公司2025 年年度报告\n28 / 242"
+          }
+        ]
+      },
+      "action": null,
+      "relation_type": null,
+      "rationale": "Source-owned current main income dimension, exact label/amount/currency/period; Measurement is an accuracy-only copy."
+    },
+    {
+      "instrument_id": "600060.SH",
+      "object_id": "owned:core-ev-c7bea061889aebbe:revenue:product:新显示新业务",
+      "object_type": "Measurement",
+      "accurate": true,
+      "critical_numeric_error": false,
+      "fact": {
+        "record_id": "owned:core-ev-c7bea061889aebbe:revenue:product:新显示新业务",
+        "field_id": "operating_revenue",
+        "object_type": "Measurement",
+        "source_text": null,
+        "source_actor": null,
+        "source_native_name": "新显示新业务",
+        "source_native_header": null,
+        "source_native_value": "845,789.89",
+        "source_native_unit": "万元",
+        "knowledge_time": null,
+        "reported_period": "2025-12-31",
+        "evidence": [
+          {
+            "page": 27,
+            "bounded_quote": "收入和成本分析\n√适用 □不适用\n(1). 主营业务分行业、分产品、分地区、分销售模式情况\n单位：万元 币种：人民币\n主营业务分行业情况\n分行业 主营业务收入 主营业务成本 毛利率（%）\n主营业务收入比\n上年增减（%）\n主营业务成本比\n上年增减（%）\n毛利率比上年增减（%）\n显示行业 5,386,396.75 4,453,859.27 17.31 -0.10 -1.04 增加 0.78 个百分点\n主营业务分产品情况\n分产品 主营业务收入 主营业务成本 毛利率（%）\n主营业务收入比\n上年增减（%）\n主营业务成本比\n上年增减（%）\n毛利率比上年增减（%）\n智慧显示终端 4,496,372.07 3,815,722.90 15.14 -3.58 -4.36 增加 0.69 个百分点\n新显示新业务 845,789.89 608,342.26 28.07 24.92 28.31 减少 1.90 个百分点\n其他 44,234.79 29,794.11 32.65 -14.07 -18.60 增加 3.75 个百分点\n主营业务分地区情况\n分地区 主营业务收入 主营业务成本 毛利率（%）\n主营业务收入比\n上年增减（%）\n主营业务成本比\n上年增减（%）\n毛利率比上年增减（%）\n中国境内 2,463,388.58 1,882,617.05 23.58 -5.14 -6.35 增加 0.99 个百分点\n中国境外 2,923,008.17 2,571,242.22 12.03 4.57 3.26 增加 1.12 个百分点\n主营业务分销售模式情况\n销售模式 主营业务收入 主营业务成本 毛利率（%）\n主营业务收入比\n上年增减（%）\n主营业务成本比\n上年增减（%）\n毛利率比上年增减（%）\n直销 885,079.29 645,025.84 27.12 4.11 3.02 增加 0.77 个百分点\n经销 4,501,317.46 3,808,833.43 15.38 -0.89 -1.69 增加 0.69 个百分点\n主营业务分行业、分产品、分地区、分销售模式情况的说明\n1. 根据中国证券监督管理委员会公布的上市公司行业分类，公司属于计算机、通信和其他电子设备制造业。鉴于公司各项业务性质，将业务整体定位为\n显示行业。\n2．公司产品分为“智慧显示终端”、“新显示新业务”（新显示新业务包括激光显示、商用显示、云服务、芯片业务及其他新型业务）以及其他。\n海信视像科技股份有限公司2025 年年度报告\n28 / 242"
+          }
+        ]
+      },
+      "action": null,
+      "relation_type": null,
+      "rationale": "Source-owned current main income dimension, exact label/amount/currency/period; Measurement is an accuracy-only copy."
+    },
+    {
+      "instrument_id": "600060.SH",
+      "object_id": "owned:core-ev-7f25347647dcc3d7:segment:product:其他",
+      "object_type": "Segment",
+      "accurate": true,
+      "critical_numeric_error": false,
+      "fact": {
+        "record_id": "owned:core-ev-7f25347647dcc3d7:segment:product:其他",
+        "field_id": "segment_dimension",
+        "object_type": "Segment",
+        "source_text": null,
+        "source_actor": null,
+        "source_native_name": "其他",
+        "source_native_header": null,
+        "source_native_value": "44,234.79",
+        "source_native_unit": "万元",
+        "knowledge_time": null,
+        "reported_period": "2025-12-31",
+        "evidence": [
+          {
+            "page": 27,
+            "bounded_quote": "收入和成本分析\n√适用 □不适用\n(1). 主营业务分行业、分产品、分地区、分销售模式情况\n单位：万元 币种：人民币\n主营业务分行业情况\n分行业 主营业务收入 主营业务成本 毛利率（%）\n主营业务收入比\n上年增减（%）\n主营业务成本比\n上年增减（%）\n毛利率比上年增减（%）\n显示行业 5,386,396.75 4,453,859.27 17.31 -0.10 -1.04 增加 0.78 个百分点\n主营业务分产品情况\n分产品 主营业务收入 主营业务成本 毛利率（%）\n主营业务收入比\n上年增减（%）\n主营业务成本比\n上年增减（%）\n毛利率比上年增减（%）\n智慧显示终端 4,496,372.07 3,815,722.90 15.14 -3.58 -4.36 增加 0.69 个百分点\n新显示新业务 845,789.89 608,342.26 28.07 24.92 28.31 减少 1.90 个百分点\n其他 44,234.79 29,794.11 32.65 -14.07 -18.60 增加 3.75 个百分点\n主营业务分地区情况\n分地区 主营业务收入 主营业务成本 毛利率（%）\n主营业务收入比\n上年增减（%）\n主营业务成本比\n上年增减（%）\n毛利率比上年增减（%）\n中国境内 2,463,388.58 1,882,617.05 23.58 -5.14 -6.35 增加 0.99 个百分点\n中国境外 2,923,008.17 2,571,242.22 12.03 4.57 3.26 增加 1.12 个百分点\n主营业务分销售模式情况\n销售模式 主营业务收入 主营业务成本 毛利率（%）\n主营业务收入比\n上年增减（%）\n主营业务成本比\n上年增减（%）\n毛利率比上年增减（%）\n直销 885,079.29 645,025.84 27.12 4.11 3.02 增加 0.77 个百分点\n经销 4,501,317.46 3,808,833.43 15.38 -0.89 -1.69 增加 0.69 个百分点\n主营业务分行业、分产品、分地区、分销售模式情况的说明\n1. 根据中国证券监督管理委员会公布的上市公司行业分类，公司属于计算机、通信和其他电子设备制造业。鉴于公司各项业务性质，将业务整体定位为\n显示行业。\n2．公司产品分为“智慧显示终端”、“新显示新业务”（新显示新业务包括激光显示、商用显示、云服务、芯片业务及其他新型业务）以及其他。\n海信视像科技股份有限公司2025 年年度报告\n28 / 242"
+          }
+        ]
+      },
+      "action": null,
+      "relation_type": null,
+      "rationale": "Source-owned current main income dimension, exact label/amount/currency/period; Measurement is an accuracy-only copy."
+    },
+    {
+      "instrument_id": "600060.SH",
+      "object_id": "owned:core-ev-c7bea061889aebbe:revenue:product:其他",
+      "object_type": "Measurement",
+      "accurate": true,
+      "critical_numeric_error": false,
+      "fact": {
+        "record_id": "owned:core-ev-c7bea061889aebbe:revenue:product:其他",
+        "field_id": "operating_revenue",
+        "object_type": "Measurement",
+        "source_text": null,
+        "source_actor": null,
+        "source_native_name": "其他",
+        "source_native_header": null,
+        "source_native_value": "44,234.79",
+        "source_native_unit": "万元",
+        "knowledge_time": null,
+        "reported_period": "2025-12-31",
+        "evidence": [
+          {
+            "page": 27,
+            "bounded_quote": "收入和成本分析\n√适用 □不适用\n(1). 主营业务分行业、分产品、分地区、分销售模式情况\n单位：万元 币种：人民币\n主营业务分行业情况\n分行业 主营业务收入 主营业务成本 毛利率（%）\n主营业务收入比\n上年增减（%）\n主营业务成本比\n上年增减（%）\n毛利率比上年增减（%）\n显示行业 5,386,396.75 4,453,859.27 17.31 -0.10 -1.04 增加 0.78 个百分点\n主营业务分产品情况\n分产品 主营业务收入 主营业务成本 毛利率（%）\n主营业务收入比\n上年增减（%）\n主营业务成本比\n上年增减（%）\n毛利率比上年增减（%）\n智慧显示终端 4,496,372.07 3,815,722.90 15.14 -3.58 -4.36 增加 0.69 个百分点\n新显示新业务 845,789.89 608,342.26 28.07 24.92 28.31 减少 1.90 个百分点\n其他 44,234.79 29,794.11 32.65 -14.07 -18.60 增加 3.75 个百分点\n主营业务分地区情况\n分地区 主营业务收入 主营业务成本 毛利率（%）\n主营业务收入比\n上年增减（%）\n主营业务成本比\n上年增减（%）\n毛利率比上年增减（%）\n中国境内 2,463,388.58 1,882,617.05 23.58 -5.14 -6.35 增加 0.99 个百分点\n中国境外 2,923,008.17 2,571,242.22 12.03 4.57 3.26 增加 1.12 个百分点\n主营业务分销售模式情况\n销售模式 主营业务收入 主营业务成本 毛利率（%）\n主营业务收入比\n上年增减（%）\n主营业务成本比\n上年增减（%）\n毛利率比上年增减（%）\n直销 885,079.29 645,025.84 27.12 4.11 3.02 增加 0.77 个百分点\n经销 4,501,317.46 3,808,833.43 15.38 -0.89 -1.69 增加 0.69 个百分点\n主营业务分行业、分产品、分地区、分销售模式情况的说明\n1. 根据中国证券监督管理委员会公布的上市公司行业分类，公司属于计算机、通信和其他电子设备制造业。鉴于公司各项业务性质，将业务整体定位为\n显示行业。\n2．公司产品分为“智慧显示终端”、“新显示新业务”（新显示新业务包括激光显示、商用显示、云服务、芯片业务及其他新型业务）以及其他。\n海信视像科技股份有限公司2025 年年度报告\n28 / 242"
+          }
+        ]
+      },
+      "action": null,
+      "relation_type": null,
+      "rationale": "Source-owned current main income dimension, exact label/amount/currency/period; Measurement is an accuracy-only copy."
+    },
+    {
+      "instrument_id": "600060.SH",
+      "object_id": "owned:core-ev-7f25347647dcc3d7:segment:region:中国境内",
+      "object_type": "Segment",
+      "accurate": true,
+      "critical_numeric_error": false,
+      "fact": {
+        "record_id": "owned:core-ev-7f25347647dcc3d7:segment:region:中国境内",
+        "field_id": "segment_dimension",
+        "object_type": "Segment",
+        "source_text": null,
+        "source_actor": null,
+        "source_native_name": "中国境内",
+        "source_native_header": null,
+        "source_native_value": "2,463,388.58",
+        "source_native_unit": "万元",
+        "knowledge_time": null,
+        "reported_period": "2025-12-31",
+        "evidence": [
+          {
+            "page": 27,
+            "bounded_quote": "收入和成本分析\n√适用 □不适用\n(1). 主营业务分行业、分产品、分地区、分销售模式情况\n单位：万元 币种：人民币\n主营业务分行业情况\n分行业 主营业务收入 主营业务成本 毛利率（%）\n主营业务收入比\n上年增减（%）\n主营业务成本比\n上年增减（%）\n毛利率比上年增减（%）\n显示行业 5,386,396.75 4,453,859.27 17.31 -0.10 -1.04 增加 0.78 个百分点\n主营业务分产品情况\n分产品 主营业务收入 主营业务成本 毛利率（%）\n主营业务收入比\n上年增减（%）\n主营业务成本比\n上年增减（%）\n毛利率比上年增减（%）\n智慧显示终端 4,496,372.07 3,815,722.90 15.14 -3.58 -4.36 增加 0.69 个百分点\n新显示新业务 845,789.89 608,342.26 28.07 24.92 28.31 减少 1.90 个百分点\n其他 44,234.79 29,794.11 32.65 -14.07 -18.60 增加 3.75 个百分点\n主营业务分地区情况\n分地区 主营业务收入 主营业务成本 毛利率（%）\n主营业务收入比\n上年增减（%）\n主营业务成本比\n上年增减（%）\n毛利率比上年增减（%）\n中国境内 2,463,388.58 1,882,617.05 23.58 -5.14 -6.35 增加 0.99 个百分点\n中国境外 2,923,008.17 2,571,242.22 12.03 4.57 3.26 增加 1.12 个百分点\n主营业务分销售模式情况\n销售模式 主营业务收入 主营业务成本 毛利率（%）\n主营业务收入比\n上年增减（%）\n主营业务成本比\n上年增减（%）\n毛利率比上年增减（%）\n直销 885,079.29 645,025.84 27.12 4.11 3.02 增加 0.77 个百分点\n经销 4,501,317.46 3,808,833.43 15.38 -0.89 -1.69 增加 0.69 个百分点\n主营业务分行业、分产品、分地区、分销售模式情况的说明\n1. 根据中国证券监督管理委员会公布的上市公司行业分类，公司属于计算机、通信和其他电子设备制造业。鉴于公司各项业务性质，将业务整体定位为\n显示行业。\n2．公司产品分为“智慧显示终端”、“新显示新业务”（新显示新业务包括激光显示、商用显示、云服务、芯片业务及其他新型业务）以及其他。\n海信视像科技股份有限公司2025 年年度报告\n28 / 242"
+          }
+        ]
+      },
+      "action": null,
+      "relation_type": null,
+      "rationale": "Source-owned current main income dimension, exact label/amount/currency/period; Measurement is an accuracy-only copy."
+    },
+    {
+      "instrument_id": "600060.SH",
+      "object_id": "owned:core-ev-c7bea061889aebbe:revenue:region:中国境内",
+      "object_type": "Measurement",
+      "accurate": true,
+      "critical_numeric_error": false,
+      "fact": {
+        "record_id": "owned:core-ev-c7bea061889aebbe:revenue:region:中国境内",
+        "field_id": "operating_revenue",
+        "object_type": "Measurement",
+        "source_text": null,
+        "source_actor": null,
+        "source_native_name": "中国境内",
+        "source_native_header": null,
+        "source_native_value": "2,463,388.58",
+        "source_native_unit": "万元",
+        "knowledge_time": null,
+        "reported_period": "2025-12-31",
+        "evidence": [
+          {
+            "page": 27,
+            "bounded_quote": "收入和成本分析\n√适用 □不适用\n(1). 主营业务分行业、分产品、分地区、分销售模式情况\n单位：万元 币种：人民币\n主营业务分行业情况\n分行业 主营业务收入 主营业务成本 毛利率（%）\n主营业务收入比\n上年增减（%）\n主营业务成本比\n上年增减（%）\n毛利率比上年增减（%）\n显示行业 5,386,396.75 4,453,859.27 17.31 -0.10 -1.04 增加 0.78 个百分点\n主营业务分产品情况\n分产品 主营业务收入 主营业务成本 毛利率（%）\n主营业务收入比\n上年增减（%）\n主营业务成本比\n上年增减（%）\n毛利率比上年增减（%）\n智慧显示终端 4,496,372.07 3,815,722.90 15.14 -3.58 -4.36 增加 0.69 个百分点\n新显示新业务 845,789.89 608,342.26 28.07 24.92 28.31 减少 1.90 个百分点\n其他 44,234.79 29,794.11 32.65 -14.07 -18.60 增加 3.75 个百分点\n主营业务分地区情况\n分地区 主营业务收入 主营业务成本 毛利率（%）\n主营业务收入比\n上年增减（%）\n主营业务成本比\n上年增减（%）\n毛利率比上年增减（%）\n中国境内 2,463,388.58 1,882,617.05 23.58 -5.14 -6.35 增加 0.99 个百分点\n中国境外 2,923,008.17 2,571,242.22 12.03 4.57 3.26 增加 1.12 个百分点\n主营业务分销售模式情况\n销售模式 主营业务收入 主营业务成本 毛利率（%）\n主营业务收入比\n上年增减（%）\n主营业务成本比\n上年增减（%）\n毛利率比上年增减（%）\n直销 885,079.29 645,025.84 27.12 4.11 3.02 增加 0.77 个百分点\n经销 4,501,317.46 3,808,833.43 15.38 -0.89 -1.69 增加 0.69 个百分点\n主营业务分行业、分产品、分地区、分销售模式情况的说明\n1. 根据中国证券监督管理委员会公布的上市公司行业分类，公司属于计算机、通信和其他电子设备制造业。鉴于公司各项业务性质，将业务整体定位为\n显示行业。\n2．公司产品分为“智慧显示终端”、“新显示新业务”（新显示新业务包括激光显示、商用显示、云服务、芯片业务及其他新型业务）以及其他。\n海信视像科技股份有限公司2025 年年度报告\n28 / 242"
+          }
+        ]
+      },
+      "action": null,
+      "relation_type": null,
+      "rationale": "Source-owned current main income dimension, exact label/amount/currency/period; Measurement is an accuracy-only copy."
+    },
+    {
+      "instrument_id": "600060.SH",
+      "object_id": "owned:core-ev-7f25347647dcc3d7:segment:region:中国境外",
+      "object_type": "Segment",
+      "accurate": true,
+      "critical_numeric_error": false,
+      "fact": {
+        "record_id": "owned:core-ev-7f25347647dcc3d7:segment:region:中国境外",
+        "field_id": "segment_dimension",
+        "object_type": "Segment",
+        "source_text": null,
+        "source_actor": null,
+        "source_native_name": "中国境外",
+        "source_native_header": null,
+        "source_native_value": "2,923,008.17",
+        "source_native_unit": "万元",
+        "knowledge_time": null,
+        "reported_period": "2025-12-31",
+        "evidence": [
+          {
+            "page": 27,
+            "bounded_quote": "收入和成本分析\n√适用 □不适用\n(1). 主营业务分行业、分产品、分地区、分销售模式情况\n单位：万元 币种：人民币\n主营业务分行业情况\n分行业 主营业务收入 主营业务成本 毛利率（%）\n主营业务收入比\n上年增减（%）\n主营业务成本比\n上年增减（%）\n毛利率比上年增减（%）\n显示行业 5,386,396.75 4,453,859.27 17.31 -0.10 -1.04 增加 0.78 个百分点\n主营业务分产品情况\n分产品 主营业务收入 主营业务成本 毛利率（%）\n主营业务收入比\n上年增减（%）\n主营业务成本比\n上年增减（%）\n毛利率比上年增减（%）\n智慧显示终端 4,496,372.07 3,815,722.90 15.14 -3.58 -4.36 增加 0.69 个百分点\n新显示新业务 845,789.89 608,342.26 28.07 24.92 28.31 减少 1.90 个百分点\n其他 44,234.79 29,794.11 32.65 -14.07 -18.60 增加 3.75 个百分点\n主营业务分地区情况\n分地区 主营业务收入 主营业务成本 毛利率（%）\n主营业务收入比\n上年增减（%）\n主营业务成本比\n上年增减（%）\n毛利率比上年增减（%）\n中国境内 2,463,388.58 1,882,617.05 23.58 -5.14 -6.35 增加 0.99 个百分点\n中国境外 2,923,008.17 2,571,242.22 12.03 4.57 3.26 增加 1.12 个百分点\n主营业务分销售模式情况\n销售模式 主营业务收入 主营业务成本 毛利率（%）\n主营业务收入比\n上年增减（%）\n主营业务成本比\n上年增减（%）\n毛利率比上年增减（%）\n直销 885,079.29 645,025.84 27.12 4.11 3.02 增加 0.77 个百分点\n经销 4,501,317.46 3,808,833.43 15.38 -0.89 -1.69 增加 0.69 个百分点\n主营业务分行业、分产品、分地区、分销售模式情况的说明\n1. 根据中国证券监督管理委员会公布的上市公司行业分类，公司属于计算机、通信和其他电子设备制造业。鉴于公司各项业务性质，将业务整体定位为\n显示行业。\n2．公司产品分为“智慧显示终端”、“新显示新业务”（新显示新业务包括激光显示、商用显示、云服务、芯片业务及其他新型业务）以及其他。\n海信视像科技股份有限公司2025 年年度报告\n28 / 242"
+          }
+        ]
+      },
+      "action": null,
+      "relation_type": null,
+      "rationale": "Source-owned current main income dimension, exact label/amount/currency/period; Measurement is an accuracy-only copy."
+    },
+    {
+      "instrument_id": "600060.SH",
+      "object_id": "owned:core-ev-c7bea061889aebbe:revenue:region:中国境外",
+      "object_type": "Measurement",
+      "accurate": true,
+      "critical_numeric_error": false,
+      "fact": {
+        "record_id": "owned:core-ev-c7bea061889aebbe:revenue:region:中国境外",
+        "field_id": "operating_revenue",
+        "object_type": "Measurement",
+        "source_text": null,
+        "source_actor": null,
+        "source_native_name": "中国境外",
+        "source_native_header": null,
+        "source_native_value": "2,923,008.17",
+        "source_native_unit": "万元",
+        "knowledge_time": null,
+        "reported_period": "2025-12-31",
+        "evidence": [
+          {
+            "page": 27,
+            "bounded_quote": "收入和成本分析\n√适用 □不适用\n(1). 主营业务分行业、分产品、分地区、分销售模式情况\n单位：万元 币种：人民币\n主营业务分行业情况\n分行业 主营业务收入 主营业务成本 毛利率（%）\n主营业务收入比\n上年增减（%）\n主营业务成本比\n上年增减（%）\n毛利率比上年增减（%）\n显示行业 5,386,396.75 4,453,859.27 17.31 -0.10 -1.04 增加 0.78 个百分点\n主营业务分产品情况\n分产品 主营业务收入 主营业务成本 毛利率（%）\n主营业务收入比\n上年增减（%）\n主营业务成本比\n上年增减（%）\n毛利率比上年增减（%）\n智慧显示终端 4,496,372.07 3,815,722.90 15.14 -3.58 -4.36 增加 0.69 个百分点\n新显示新业务 845,789.89 608,342.26 28.07 24.92 28.31 减少 1.90 个百分点\n其他 44,234.79 29,794.11 32.65 -14.07 -18.60 增加 3.75 个百分点\n主营业务分地区情况\n分地区 主营业务收入 主营业务成本 毛利率（%）\n主营业务收入比\n上年增减（%）\n主营业务成本比\n上年增减（%）\n毛利率比上年增减（%）\n中国境内 2,463,388.58 1,882,617.05 23.58 -5.14 -6.35 增加 0.99 个百分点\n中国境外 2,923,008.17 2,571,242.22 12.03 4.57 3.26 增加 1.12 个百分点\n主营业务分销售模式情况\n销售模式 主营业务收入 主营业务成本 毛利率（%）\n主营业务收入比\n上年增减（%）\n主营业务成本比\n上年增减（%）\n毛利率比上年增减（%）\n直销 885,079.29 645,025.84 27.12 4.11 3.02 增加 0.77 个百分点\n经销 4,501,317.46 3,808,833.43 15.38 -0.89 -1.69 增加 0.69 个百分点\n主营业务分行业、分产品、分地区、分销售模式情况的说明\n1. 根据中国证券监督管理委员会公布的上市公司行业分类，公司属于计算机、通信和其他电子设备制造业。鉴于公司各项业务性质，将业务整体定位为\n显示行业。\n2．公司产品分为“智慧显示终端”、“新显示新业务”（新显示新业务包括激光显示、商用显示、云服务、芯片业务及其他新型业务）以及其他。\n海信视像科技股份有限公司2025 年年度报告\n28 / 242"
+          }
+        ]
+      },
+      "action": null,
+      "relation_type": null,
+      "rationale": "Source-owned current main income dimension, exact label/amount/currency/period; Measurement is an accuracy-only copy."
+    },
+    {
+      "instrument_id": "600060.SH",
+      "object_id": "owned:core-ev-7f25347647dcc3d7:segment:sales_mode:直销",
+      "object_type": "Segment",
+      "accurate": true,
+      "critical_numeric_error": false,
+      "fact": {
+        "record_id": "owned:core-ev-7f25347647dcc3d7:segment:sales_mode:直销",
+        "field_id": "segment_dimension",
+        "object_type": "Segment",
+        "source_text": null,
+        "source_actor": null,
+        "source_native_name": "直销",
+        "source_native_header": null,
+        "source_native_value": "885,079.29",
+        "source_native_unit": "万元",
+        "knowledge_time": null,
+        "reported_period": "2025-12-31",
+        "evidence": [
+          {
+            "page": 27,
+            "bounded_quote": "收入和成本分析\n√适用 □不适用\n(1). 主营业务分行业、分产品、分地区、分销售模式情况\n单位：万元 币种：人民币\n主营业务分行业情况\n分行业 主营业务收入 主营业务成本 毛利率（%）\n主营业务收入比\n上年增减（%）\n主营业务成本比\n上年增减（%）\n毛利率比上年增减（%）\n显示行业 5,386,396.75 4,453,859.27 17.31 -0.10 -1.04 增加 0.78 个百分点\n主营业务分产品情况\n分产品 主营业务收入 主营业务成本 毛利率（%）\n主营业务收入比\n上年增减（%）\n主营业务成本比\n上年增减（%）\n毛利率比上年增减（%）\n智慧显示终端 4,496,372.07 3,815,722.90 15.14 -3.58 -4.36 增加 0.69 个百分点\n新显示新业务 845,789.89 608,342.26 28.07 24.92 28.31 减少 1.90 个百分点\n其他 44,234.79 29,794.11 32.65 -14.07 -18.60 增加 3.75 个百分点\n主营业务分地区情况\n分地区 主营业务收入 主营业务成本 毛利率（%）\n主营业务收入比\n上年增减（%）\n主营业务成本比\n上年增减（%）\n毛利率比上年增减（%）\n中国境内 2,463,388.58 1,882,617.05 23.58 -5.14 -6.35 增加 0.99 个百分点\n中国境外 2,923,008.17 2,571,242.22 12.03 4.57 3.26 增加 1.12 个百分点\n主营业务分销售模式情况\n销售模式 主营业务收入 主营业务成本 毛利率（%）\n主营业务收入比\n上年增减（%）\n主营业务成本比\n上年增减（%）\n毛利率比上年增减（%）\n直销 885,079.29 645,025.84 27.12 4.11 3.02 增加 0.77 个百分点\n经销 4,501,317.46 3,808,833.43 15.38 -0.89 -1.69 增加 0.69 个百分点\n主营业务分行业、分产品、分地区、分销售模式情况的说明\n1. 根据中国证券监督管理委员会公布的上市公司行业分类，公司属于计算机、通信和其他电子设备制造业。鉴于公司各项业务性质，将业务整体定位为\n显示行业。\n2．公司产品分为“智慧显示终端”、“新显示新业务”（新显示新业务包括激光显示、商用显示、云服务、芯片业务及其他新型业务）以及其他。\n海信视像科技股份有限公司2025 年年度报告\n28 / 242"
+          }
+        ]
+      },
+      "action": null,
+      "relation_type": null,
+      "rationale": "Source-owned current main income dimension, exact label/amount/currency/period; Measurement is an accuracy-only copy."
+    },
+    {
+      "instrument_id": "600060.SH",
+      "object_id": "owned:core-ev-c7bea061889aebbe:revenue:sales_mode:直销",
+      "object_type": "Measurement",
+      "accurate": true,
+      "critical_numeric_error": false,
+      "fact": {
+        "record_id": "owned:core-ev-c7bea061889aebbe:revenue:sales_mode:直销",
+        "field_id": "operating_revenue",
+        "object_type": "Measurement",
+        "source_text": null,
+        "source_actor": null,
+        "source_native_name": "直销",
+        "source_native_header": null,
+        "source_native_value": "885,079.29",
+        "source_native_unit": "万元",
+        "knowledge_time": null,
+        "reported_period": "2025-12-31",
+        "evidence": [
+          {
+            "page": 27,
+            "bounded_quote": "收入和成本分析\n√适用 □不适用\n(1). 主营业务分行业、分产品、分地区、分销售模式情况\n单位：万元 币种：人民币\n主营业务分行业情况\n分行业 主营业务收入 主营业务成本 毛利率（%）\n主营业务收入比\n上年增减（%）\n主营业务成本比\n上年增减（%）\n毛利率比上年增减（%）\n显示行业 5,386,396.75 4,453,859.27 17.31 -0.10 -1.04 增加 0.78 个百分点\n主营业务分产品情况\n分产品 主营业务收入 主营业务成本 毛利率（%）\n主营业务收入比\n上年增减（%）\n主营业务成本比\n上年增减（%）\n毛利率比上年增减（%）\n智慧显示终端 4,496,372.07 3,815,722.90 15.14 -3.58 -4.36 增加 0.69 个百分点\n新显示新业务 845,789.89 608,342.26 28.07 24.92 28.31 减少 1.90 个百分点\n其他 44,234.79 29,794.11 32.65 -14.07 -18.60 增加 3.75 个百分点\n主营业务分地区情况\n分地区 主营业务收入 主营业务成本 毛利率（%）\n主营业务收入比\n上年增减（%）\n主营业务成本比\n上年增减（%）\n毛利率比上年增减（%）\n中国境内 2,463,388.58 1,882,617.05 23.58 -5.14 -6.35 增加 0.99 个百分点\n中国境外 2,923,008.17 2,571,242.22 12.03 4.57 3.26 增加 1.12 个百分点\n主营业务分销售模式情况\n销售模式 主营业务收入 主营业务成本 毛利率（%）\n主营业务收入比\n上年增减（%）\n主营业务成本比\n上年增减（%）\n毛利率比上年增减（%）\n直销 885,079.29 645,025.84 27.12 4.11 3.02 增加 0.77 个百分点\n经销 4,501,317.46 3,808,833.43 15.38 -0.89 -1.69 增加 0.69 个百分点\n主营业务分行业、分产品、分地区、分销售模式情况的说明\n1. 根据中国证券监督管理委员会公布的上市公司行业分类，公司属于计算机、通信和其他电子设备制造业。鉴于公司各项业务性质，将业务整体定位为\n显示行业。\n2．公司产品分为“智慧显示终端”、“新显示新业务”（新显示新业务包括激光显示、商用显示、云服务、芯片业务及其他新型业务）以及其他。\n海信视像科技股份有限公司2025 年年度报告\n28 / 242"
+          }
+        ]
+      },
+      "action": null,
+      "relation_type": null,
+      "rationale": "Source-owned current main income dimension, exact label/amount/currency/period; Measurement is an accuracy-only copy."
+    },
+    {
+      "instrument_id": "600060.SH",
+      "object_id": "owned:core-ev-7f25347647dcc3d7:segment:sales_mode:经销",
+      "object_type": "Segment",
+      "accurate": true,
+      "critical_numeric_error": false,
+      "fact": {
+        "record_id": "owned:core-ev-7f25347647dcc3d7:segment:sales_mode:经销",
+        "field_id": "segment_dimension",
+        "object_type": "Segment",
+        "source_text": null,
+        "source_actor": null,
+        "source_native_name": "经销",
+        "source_native_header": null,
+        "source_native_value": "4,501,317.46",
+        "source_native_unit": "万元",
+        "knowledge_time": null,
+        "reported_period": "2025-12-31",
+        "evidence": [
+          {
+            "page": 27,
+            "bounded_quote": "收入和成本分析\n√适用 □不适用\n(1). 主营业务分行业、分产品、分地区、分销售模式情况\n单位：万元 币种：人民币\n主营业务分行业情况\n分行业 主营业务收入 主营业务成本 毛利率（%）\n主营业务收入比\n上年增减（%）\n主营业务成本比\n上年增减（%）\n毛利率比上年增减（%）\n显示行业 5,386,396.75 4,453,859.27 17.31 -0.10 -1.04 增加 0.78 个百分点\n主营业务分产品情况\n分产品 主营业务收入 主营业务成本 毛利率（%）\n主营业务收入比\n上年增减（%）\n主营业务成本比\n上年增减（%）\n毛利率比上年增减（%）\n智慧显示终端 4,496,372.07 3,815,722.90 15.14 -3.58 -4.36 增加 0.69 个百分点\n新显示新业务 845,789.89 608,342.26 28.07 24.92 28.31 减少 1.90 个百分点\n其他 44,234.79 29,794.11 32.65 -14.07 -18.60 增加 3.75 个百分点\n主营业务分地区情况\n分地区 主营业务收入 主营业务成本 毛利率（%）\n主营业务收入比\n上年增减（%）\n主营业务成本比\n上年增减（%）\n毛利率比上年增减（%）\n中国境内 2,463,388.58 1,882,617.05 23.58 -5.14 -6.35 增加 0.99 个百分点\n中国境外 2,923,008.17 2,571,242.22 12.03 4.57 3.26 增加 1.12 个百分点\n主营业务分销售模式情况\n销售模式 主营业务收入 主营业务成本 毛利率（%）\n主营业务收入比\n上年增减（%）\n主营业务成本比\n上年增减（%）\n毛利率比上年增减（%）\n直销 885,079.29 645,025.84 27.12 4.11 3.02 增加 0.77 个百分点\n经销 4,501,317.46 3,808,833.43 15.38 -0.89 -1.69 增加 0.69 个百分点\n主营业务分行业、分产品、分地区、分销售模式情况的说明\n1. 根据中国证券监督管理委员会公布的上市公司行业分类，公司属于计算机、通信和其他电子设备制造业。鉴于公司各项业务性质，将业务整体定位为\n显示行业。\n2．公司产品分为“智慧显示终端”、“新显示新业务”（新显示新业务包括激光显示、商用显示、云服务、芯片业务及其他新型业务）以及其他。\n海信视像科技股份有限公司2025 年年度报告\n28 / 242"
+          }
+        ]
+      },
+      "action": null,
+      "relation_type": null,
+      "rationale": "Source-owned current main income dimension, exact label/amount/currency/period; Measurement is an accuracy-only copy."
+    },
+    {
+      "instrument_id": "600060.SH",
+      "object_id": "owned:core-ev-c7bea061889aebbe:revenue:sales_mode:经销",
+      "object_type": "Measurement",
+      "accurate": true,
+      "critical_numeric_error": false,
+      "fact": {
+        "record_id": "owned:core-ev-c7bea061889aebbe:revenue:sales_mode:经销",
+        "field_id": "operating_revenue",
+        "object_type": "Measurement",
+        "source_text": null,
+        "source_actor": null,
+        "source_native_name": "经销",
+        "source_native_header": null,
+        "source_native_value": "4,501,317.46",
+        "source_native_unit": "万元",
+        "knowledge_time": null,
+        "reported_period": "2025-12-31",
+        "evidence": [
+          {
+            "page": 27,
+            "bounded_quote": "收入和成本分析\n√适用 □不适用\n(1). 主营业务分行业、分产品、分地区、分销售模式情况\n单位：万元 币种：人民币\n主营业务分行业情况\n分行业 主营业务收入 主营业务成本 毛利率（%）\n主营业务收入比\n上年增减（%）\n主营业务成本比\n上年增减（%）\n毛利率比上年增减（%）\n显示行业 5,386,396.75 4,453,859.27 17.31 -0.10 -1.04 增加 0.78 个百分点\n主营业务分产品情况\n分产品 主营业务收入 主营业务成本 毛利率（%）\n主营业务收入比\n上年增减（%）\n主营业务成本比\n上年增减（%）\n毛利率比上年增减（%）\n智慧显示终端 4,496,372.07 3,815,722.90 15.14 -3.58 -4.36 增加 0.69 个百分点\n新显示新业务 845,789.89 608,342.26 28.07 24.92 28.31 减少 1.90 个百分点\n其他 44,234.79 29,794.11 32.65 -14.07 -18.60 增加 3.75 个百分点\n主营业务分地区情况\n分地区 主营业务收入 主营业务成本 毛利率（%）\n主营业务收入比\n上年增减（%）\n主营业务成本比\n上年增减（%）\n毛利率比上年增减（%）\n中国境内 2,463,388.58 1,882,617.05 23.58 -5.14 -6.35 增加 0.99 个百分点\n中国境外 2,923,008.17 2,571,242.22 12.03 4.57 3.26 增加 1.12 个百分点\n主营业务分销售模式情况\n销售模式 主营业务收入 主营业务成本 毛利率（%）\n主营业务收入比\n上年增减（%）\n主营业务成本比\n上年增减（%）\n毛利率比上年增减（%）\n直销 885,079.29 645,025.84 27.12 4.11 3.02 增加 0.77 个百分点\n经销 4,501,317.46 3,808,833.43 15.38 -0.89 -1.69 增加 0.69 个百分点\n主营业务分行业、分产品、分地区、分销售模式情况的说明\n1. 根据中国证券监督管理委员会公布的上市公司行业分类，公司属于计算机、通信和其他电子设备制造业。鉴于公司各项业务性质，将业务整体定位为\n显示行业。\n2．公司产品分为“智慧显示终端”、“新显示新业务”（新显示新业务包括激光显示、商用显示、云服务、芯片业务及其他新型业务）以及其他。\n海信视像科技股份有限公司2025 年年度报告\n28 / 242"
+          }
+        ]
+      },
+      "action": null,
+      "relation_type": null,
+      "rationale": "Source-owned current main income dimension, exact label/amount/currency/period; Measurement is an accuracy-only copy."
+    },
+    {
+      "instrument_id": "600060.SH",
+      "object_id": "answer:principal_business",
+      "object_type": "answer",
+      "accurate": null,
+      "present": false,
+      "text": null,
+      "required_source_substance": {
+        "pages": [
+          12
+        ],
+        "substance": [
+          "多场景显示解决方案提供商",
+          "多场景大显示"
+        ],
+        "actor_boundary": "当前战略定位及持续业务成立；积极布局/未来事项保持原句状态"
+      }
+    },
+    {
+      "instrument_id": "600060.SH",
+      "object_id": "answer:products_services",
+      "object_type": "answer",
+      "accurate": false,
+      "present": true,
+      "text": "显示产品万台",
+      "required_source_substance": {
+        "pages": [
+          12,
+          27
+        ],
+        "substance": [
+          "智慧显示终端",
+          "激光显示",
+          "商用显示",
+          "芯片",
+          "云服务"
+        ],
+        "actor_boundary": "新显示新业务组成来自p12/p27，计划布局的智能穿戴等不作为既成核心产品"
+      }
+    },
+    {
+      "instrument_id": "600060.SH",
+      "object_id": "answer:revenue_model",
+      "object_type": "answer",
+      "accurate": true,
+      "present": true,
+      "text": "营业收入分产品：智慧显示终端、新显示新业务、其他\n销售模式：直销、经销",
+      "required_source_substance": {
+        "pages": [
+          27
+        ],
+        "substance": [
+          "智慧显示终端",
+          "新显示新业务",
+          "直销",
+          "经销"
+        ],
+        "mechanism": "产品/业务收入组成及实际直销、经销渠道"
+      }
+    }
+  ],
+  "source_disclosures": [
+    {
+      "instrument_id": "600023.SH",
+      "kind": "main_income_row",
+      "source": {
+        "dimension": "industry",
+        "name": "电力、热力生产及供应",
+        "value": "72,870,145,425.91",
+        "unit": "元",
+        "reported_period": "2025-12-31",
+        "page": 11
+      },
+      "present": false
+    },
+    {
+      "instrument_id": "600023.SH",
+      "kind": "main_income_row",
+      "source": {
+        "dimension": "industry",
+        "name": "光伏制造",
+        "value": "2,369,281,843.31",
+        "unit": "元",
+        "reported_period": "2025-12-31",
+        "page": 11
+      },
+      "present": true
+    },
+    {
+      "instrument_id": "600023.SH",
+      "kind": "main_income_row",
+      "source": {
+        "dimension": "product",
+        "name": "电力",
+        "value": "66,647,763,063.12",
+        "unit": "元",
+        "reported_period": "2025-12-31",
+        "page": 12
+      },
+      "present": true
+    },
+    {
+      "instrument_id": "600023.SH",
+      "kind": "main_income_row",
+      "source": {
+        "dimension": "product",
+        "name": "蒸汽",
+        "value": "6,222,382,362.79",
+        "unit": "元",
+        "reported_period": "2025-12-31",
+        "page": 12
+      },
+      "present": true
+    },
+    {
+      "instrument_id": "600023.SH",
+      "kind": "main_income_row",
+      "source": {
+        "dimension": "product",
+        "name": "光伏产品",
+        "value": "2,369,281,843.31",
+        "unit": "元",
+        "reported_period": "2025-12-31",
+        "page": 12
+      },
+      "present": true
+    },
+    {
+      "instrument_id": "600023.SH",
+      "kind": "main_income_row",
+      "source": {
+        "dimension": "region",
+        "name": "境内",
+        "value": "74,153,253,047.53",
+        "unit": "元",
+        "reported_period": "2025-12-31",
+        "page": 12
+      },
+      "present": true
+    },
+    {
+      "instrument_id": "600023.SH",
+      "kind": "main_income_row",
+      "source": {
+        "dimension": "region",
+        "name": "境外",
+        "value": "1,086,174,221.69",
+        "unit": "元",
+        "reported_period": "2025-12-31",
+        "page": 12
+      },
+      "present": true
+    },
+    {
+      "instrument_id": "600023.SH",
+      "kind": "main_income_row",
+      "source": {
+        "dimension": "sales_mode",
+        "name": "在某一时点确认",
+        "value": "75,239,427,269.22",
+        "unit": "元",
+        "reported_period": "2025-12-31",
+        "page": 12
+      },
+      "present": true
+    },
+    {
+      "instrument_id": "600023.SH",
+      "kind": "native_role",
+      "source": {
+        "instrument_id": "600023.SH",
+        "name": "电力",
+        "role": "product_sales",
+        "page": 12,
+        "source_quote": "电力 万千瓦时 18,328,427.23 17,371,982.51"
+      },
+      "present": false,
+      "delivered_exposure": null
+    },
+    {
+      "instrument_id": "600023.SH",
+      "kind": "native_role",
+      "source": {
+        "instrument_id": "600023.SH",
+        "name": "热力",
+        "role": "product_sales",
+        "page": 12,
+        "source_quote": "热力 万吨 3548.72 3548.72"
+      },
+      "present": true,
+      "delivered_exposure": {
+        "schema_version": "company_profile_commodity_exposure.v1",
+        "exposure_id": "commodity-exposure-b6ca4cd75b07f376e464a0f8",
+        "production_authorization": "not_authorized",
+        "report": {
+          "instrument_id": "600023.SH",
+          "report_id": "asset_ae19548e01fc06f9aef3ffec680e00a7",
+          "document_version": "72239dd644e8ba1dc1e78b66b406344562959a14b87362a98729d6045e7bcd40",
+          "report_period": "2025-12-31",
+          "published_at": "2026-04-27T16:00:00+00:00",
+          "document_type": "annual_report"
+        },
+        "reported_period": "2025-12-31",
+        "period_type": "duration",
+        "knowledge_time": null,
+        "subject_scope": "consolidated_group",
+        "subject_basis": "report_default_group_scope",
+        "business_object": "热力",
+        "source_record_ids": [
+          "owned:core-ev-374875d6ad2edbe6:commodity:2"
+        ],
+        "evidence_ids": [
+          "core-ev-374875d6ad2edbe6"
+        ],
+        "measurement_record_ids": [],
+        "source_native_name": "热力",
+        "commodity_id": null,
+        "mapping_status": "pending",
+        "role": "product_sales",
+        "assertion_class": "deterministic_derivation",
+        "mapping_version": "business_profile_products.2026.4+company_profile_commodity_role.v1",
+        "policy_version": "company_profile_commodity_exposure.v1",
+        "market_series_id": null,
+        "market_link_status": "not_linked",
+        "uncertainty": []
+      }
+    },
+    {
+      "instrument_id": "600023.SH",
+      "kind": "native_role",
+      "source": {
+        "instrument_id": "600023.SH",
+        "name": "背板",
+        "role": "product_sales",
+        "page": 12,
+        "source_quote": "背板 万平方米 6899.62 7190.52"
+      },
+      "present": false,
+      "delivered_exposure": null
+    },
+    {
+      "instrument_id": "600023.SH",
+      "kind": "native_role",
+      "source": {
+        "instrument_id": "600023.SH",
+        "name": "电池",
+        "role": "product_sales",
+        "page": 12,
+        "source_quote": "电池 MW 814.68 805.77"
+      },
+      "present": false,
+      "delivered_exposure": null
+    },
+    {
+      "instrument_id": "600023.SH",
+      "kind": "native_role",
+      "source": {
+        "instrument_id": "600023.SH",
+        "name": "组件",
+        "role": "product_sales",
+        "page": 12,
+        "source_quote": "组件 MW 2082.22 2126.66"
+      },
+      "present": false,
+      "delivered_exposure": null
+    },
+    {
+      "instrument_id": "600023.SH",
+      "kind": "native_role",
+      "source": {
+        "instrument_id": "600023.SH",
+        "name": "市场煤",
+        "role": "product_sales",
+        "page": 13,
+        "source_quote": "市场煤业务 286,336.52 437,035.03 -34.48"
+      },
+      "present": false,
+      "delivered_exposure": null
+    },
+    {
+      "instrument_id": "600023.SH",
+      "kind": "native_role",
+      "source": {
+        "instrument_id": "600023.SH",
+        "name": "煤炭",
+        "role": "raw_material_input",
+        "page": 26,
+        "source_quote": "煤炭成本在燃煤发电企业的发电成本中占比较大"
+      },
+      "present": false,
+      "delivered_exposure": null
+    },
+    {
+      "instrument_id": "600060.SH",
+      "kind": "main_income_row",
+      "source": {
+        "dimension": "industry",
+        "name": "显示行业",
+        "value": "5,386,396.75",
+        "unit": "万元",
+        "reported_period": "2025-12-31",
+        "page": 27
+      },
+      "present": true
+    },
+    {
+      "instrument_id": "600060.SH",
+      "kind": "main_income_row",
+      "source": {
+        "dimension": "product",
+        "name": "智慧显示终端",
+        "value": "4,496,372.07",
+        "unit": "万元",
+        "reported_period": "2025-12-31",
+        "page": 27
+      },
+      "present": true
+    },
+    {
+      "instrument_id": "600060.SH",
+      "kind": "main_income_row",
+      "source": {
+        "dimension": "product",
+        "name": "新显示新业务",
+        "value": "845,789.89",
+        "unit": "万元",
+        "reported_period": "2025-12-31",
+        "page": 27
+      },
+      "present": true
+    },
+    {
+      "instrument_id": "600060.SH",
+      "kind": "main_income_row",
+      "source": {
+        "dimension": "product",
+        "name": "其他",
+        "value": "44,234.79",
+        "unit": "万元",
+        "reported_period": "2025-12-31",
+        "page": 27
+      },
+      "present": true
+    },
+    {
+      "instrument_id": "600060.SH",
+      "kind": "main_income_row",
+      "source": {
+        "dimension": "region",
+        "name": "中国境内",
+        "value": "2,463,388.58",
+        "unit": "万元",
+        "reported_period": "2025-12-31",
+        "page": 27
+      },
+      "present": true
+    },
+    {
+      "instrument_id": "600060.SH",
+      "kind": "main_income_row",
+      "source": {
+        "dimension": "region",
+        "name": "中国境外",
+        "value": "2,923,008.17",
+        "unit": "万元",
+        "reported_period": "2025-12-31",
+        "page": 27
+      },
+      "present": true
+    },
+    {
+      "instrument_id": "600060.SH",
+      "kind": "main_income_row",
+      "source": {
+        "dimension": "sales_mode",
+        "name": "直销",
+        "value": "885,079.29",
+        "unit": "万元",
+        "reported_period": "2025-12-31",
+        "page": 27
+      },
+      "present": true
+    },
+    {
+      "instrument_id": "600060.SH",
+      "kind": "main_income_row",
+      "source": {
+        "dimension": "sales_mode",
+        "name": "经销",
+        "value": "4,501,317.46",
+        "unit": "万元",
+        "reported_period": "2025-12-31",
+        "page": 27
+      },
+      "present": true
+    },
+    {
+      "instrument_id": "600060.SH",
+      "kind": "native_role",
+      "source": {
+        "instrument_id": "600060.SH",
+        "name": "显示产品",
+        "role": "product_sales",
+        "page": 28,
+        "source_quote": "显示产品 万台 3,037.43 3,055.19"
+      },
+      "present": false,
+      "delivered_exposure": null
+    },
+    {
+      "instrument_id": "600060.SH",
+      "kind": "native_role",
+      "source": {
+        "instrument_id": "600060.SH",
+        "name": "芯片",
+        "role": "product_sales",
+        "page": 23,
+        "source_quote": "在主流品\n牌客户中实现量产出货"
+      },
+      "present": false,
+      "delivered_exposure": null
+    },
+    {
+      "instrument_id": "600060.SH",
+      "kind": "native_role",
+      "source": {
+        "instrument_id": "600060.SH",
+        "name": "AI 耳机",
+        "role": "product_sales",
+        "page": 24,
+        "source_quote": "开放式 AI 耳机 Vidda V11 国内上市销售"
+      },
+      "present": false,
+      "delivered_exposure": null
+    }
+  ],
+  "missing_disclosures": [
+    {
+      "instrument_id": "600023.SH",
+      "kind": "main_income_row",
+      "source": {
+        "dimension": "industry",
+        "name": "电力、热力生产及供应",
+        "value": "72,870,145,425.91",
+        "unit": "元",
+        "reported_period": "2025-12-31",
+        "page": 11
+      }
+    },
+    {
+      "instrument_id": "600023.SH",
+      "kind": "native_role",
+      "source": {
+        "instrument_id": "600023.SH",
+        "name": "电力",
+        "role": "product_sales",
+        "page": 12,
+        "source_quote": "电力 万千瓦时 18,328,427.23 17,371,982.51"
+      }
+    },
+    {
+      "instrument_id": "600023.SH",
+      "kind": "native_role",
+      "source": {
+        "instrument_id": "600023.SH",
+        "name": "背板",
+        "role": "product_sales",
+        "page": 12,
+        "source_quote": "背板 万平方米 6899.62 7190.52"
+      }
+    },
+    {
+      "instrument_id": "600023.SH",
+      "kind": "native_role",
+      "source": {
+        "instrument_id": "600023.SH",
+        "name": "电池",
+        "role": "product_sales",
+        "page": 12,
+        "source_quote": "电池 MW 814.68 805.77"
+      }
+    },
+    {
+      "instrument_id": "600023.SH",
+      "kind": "native_role",
+      "source": {
+        "instrument_id": "600023.SH",
+        "name": "组件",
+        "role": "product_sales",
+        "page": 12,
+        "source_quote": "组件 MW 2082.22 2126.66"
+      }
+    },
+    {
+      "instrument_id": "600023.SH",
+      "kind": "native_role",
+      "source": {
+        "instrument_id": "600023.SH",
+        "name": "市场煤",
+        "role": "product_sales",
+        "page": 13,
+        "source_quote": "市场煤业务 286,336.52 437,035.03 -34.48"
+      }
+    },
+    {
+      "instrument_id": "600023.SH",
+      "kind": "native_role",
+      "source": {
+        "instrument_id": "600023.SH",
+        "name": "煤炭",
+        "role": "raw_material_input",
+        "page": 26,
+        "source_quote": "煤炭成本在燃煤发电企业的发电成本中占比较大"
+      }
+    },
+    {
+      "instrument_id": "600060.SH",
+      "kind": "native_role",
+      "source": {
+        "instrument_id": "600060.SH",
+        "name": "显示产品",
+        "role": "product_sales",
+        "page": 28,
+        "source_quote": "显示产品 万台 3,037.43 3,055.19"
+      }
+    },
+    {
+      "instrument_id": "600060.SH",
+      "kind": "native_role",
+      "source": {
+        "instrument_id": "600060.SH",
+        "name": "芯片",
+        "role": "product_sales",
+        "page": 23,
+        "source_quote": "在主流品\n牌客户中实现量产出货"
+      }
+    },
+    {
+      "instrument_id": "600060.SH",
+      "kind": "native_role",
+      "source": {
+        "instrument_id": "600060.SH",
+        "name": "AI 耳机",
+        "role": "product_sales",
+        "page": 24,
+        "source_quote": "开放式 AI 耳机 Vidda V11 国内上市销售"
+      }
+    }
+  ],
+  "runtime_evidence": [
+    {
+      "instrument_id": "600023.SH",
+      "work_id": "bp-work-fb0e8d4524b0d532c5fa0c27",
+      "reused_scope_ids_by_stage": {
+        "acquire": [],
+        "parse": [],
+        "publish": [],
+        "semantic": [],
+        "verify": []
+      },
+      "predecessor_lineage": [],
+      "provider_calls": [],
+      "token_budget": {
+        "total_token_budget": 50000,
+        "extract_max_output_tokens": 8000,
+        "verify_max_output_tokens": 4000,
+        "tokens_used": 0,
+        "tokens_remaining": 50000
+      },
+      "semantic_disputes": []
+    },
+    {
+      "instrument_id": "600060.SH",
+      "work_id": "bp-work-60f725ba07a7e90f144c3615",
+      "reused_scope_ids_by_stage": {
+        "acquire": [],
+        "parse": [],
+        "publish": [],
+        "semantic": [],
+        "verify": []
+      },
+      "predecessor_lineage": [],
+      "provider_calls": [],
+      "token_budget": {
+        "total_token_budget": 50000,
+        "extract_max_output_tokens": 8000,
+        "verify_max_output_tokens": 4000,
+        "tokens_used": 0,
+        "tokens_remaining": 50000
+      },
+      "semantic_disputes": [
+        {
+          "field_id": "business_overview_source",
+          "reason_codes": [
+            "required_coverage_missing"
+          ],
+          "review_id": "bp-work-60f725ba07a7e90f144c3615:extract_business_overview:coverage:business_overview_source"
+        }
+      ]
+    }
+  ],
+  "source_scope_sha256": "b34542c848c7671f3b802051c061e01dce809c5714466d75b08b9619a0a4e8d1",
+  "denominator_method": "Source checklist independently fixed before execution: six answer disclosures, sixteen main-income rows and ten native roles. Actual accepted records plus present delivered answers uniquely checked for accuracy. Measurement copies accuracy only; native roles mark underlying accepted facts, no extra present accuracy object; missing rows/roles are absent findings. Display variants stay one parent role; chip and AI earphone current sales separate. No prior or preset scores.",
+  "historical_files_unchanged": 534,
+  "artifact_sha256": {
+    "data/checkpoints/company_profile_common_core/reports/m4_v21_unseen_small_batch/plan.json": "c98fa2a52745e3534f32d4289678a9638a59950662bbf9364777b2244df445c7",
+    "data/checkpoints/company_profile_common_core/reports/m4_v21_unseen_small_batch/company_profile_live_run.v1.json": "10669af165f4ac49503d951ff4e22dee7b004613c4a91633d7489fc1bb93d2bc",
+    "data/checkpoints/company_profile_common_core/reports/m4_v21_unseen_small_batch/observation.json": "b01243dc76d40ab340c4640df3eb22714fe82b45cd78a57d9166023a5cdaf98b",
+    "data/checkpoints/company_profile_common_core/reports/m4_v21_unseen_small_batch/formal_execution.json": "67e85e1f5793436838bed07283c2a38902f3125bc75e707696e98ee2515e12a1",
+    "data/checkpoints/company_profile_common_core/reports/m4_v21_unseen_small_batch/company_profile_source_review.v1.json": "497f2fa7f8dc7a92fe002a227761f0051b5dff3d5915640aa1779c54f69373a3",
+    "data/exports/m4_v21_unseen_small_batch/600023.SH/600023.SH_2025-12-31.json": "ea9e6bf148709b63c431f054e01bc14ca44c1756fff5018b97f48b6d81d571da",
+    "data/exports/m4_v21_unseen_small_batch/600023.SH/export_manifest.json": "0c158ca6bed97d8ebfd1cdeca73f32d780abd1e2e78ee3a6cfe3e4eff69a6a87",
+    "data/exports/m4_v21_unseen_small_batch/600060.SH/600060.SH_2025-12-31.json": "b8a2d0a4b1c723670df4209fc97a96655421d4d832e50e78a23dbf728cda3ec1",
+    "data/exports/m4_v21_unseen_small_batch/600060.SH/export_manifest.json": "bcec61ef623579c335926bc539d8f896bce0590e3007f6bc0f145b6b703ac2ec",
+    "data/research/company_profile_common_core/m4_v21_unseen_small_batch/company_profile_common_core.v1/bp-work-60f725ba07a7e90f144c3615.json": "4c7e93e27841fa621d0dc7a595547b4fed250634808ef78f9bbf22dbfd48f22a",
+    "data/research/company_profile_common_core/m4_v21_unseen_small_batch/company_profile_common_core.v1/bp-work-fb0e8d4524b0d532c5fa0c27.json": "15285bda9a82898157ff204b5d83abe640bcce3458d8e223e722eb7c6617d759",
+    "data/research/company_profile_common_core/m4_v21_unseen_small_batch/company_profile_common_core.v1/scopes/600023.SH/2025-12-31/extract_segment_financials.json": "2cdafa8a9469fa516e08abfab369090c9efa3f59b06748305881ccda7b382d55",
+    "data/research/company_profile_common_core/m4_v21_unseen_small_batch/company_profile_common_core.v1/scopes/600023.SH/2025-12-31/extract_business_overview.json": "183b1b4e8bbda9c0cc84d179a5925f827bceadb24023e7e61773effa54b74a19",
+    "data/research/company_profile_common_core/m4_v21_unseen_small_batch/company_profile_common_core.v1/scopes/600060.SH/2025-12-31/extract_segment_financials.json": "1722c03e9ae614926f7cf92b0a02bd61f9b4072f9038419b606abe5172aba631",
+    "data/research/company_profile_common_core/m4_v21_unseen_small_batch/company_profile_common_core.v1/scopes/600060.SH/2025-12-31/extract_business_overview.json": "1f2c0d12e47f31b9dec16e44ff80f2df78ba85604381ffdef2b57c8cb52e705c",
+    "data/research/company_profile_common_core/m4_v21_unseen_small_batch/company_profile_common_core.v1/checkpoints/bp-work-60f725ba07a7e90f144c3615.json": "a297b8b13d8cb7721170ceee2495b5c56ac3fcdcf08d9be1321a439284dfd518",
+    "data/research/company_profile_common_core/m4_v21_unseen_small_batch/company_profile_common_core.v1/checkpoints/bp-work-fb0e8d4524b0d532c5fa0c27.json": "611cc64760fd74c4ac787866b1d7fff7907e9371c58cb61a6bdbaa97d7793d07",
+    "data/exports/m4_v21_unseen_small_batch/600023.SH/profiles.csv": "8e29c919d5bde86258c98e323467599fe930bdd3638306a9fe8136ab808ef554",
+    "data/exports/m4_v21_unseen_small_batch/600060.SH/profiles.csv": "49f09e420a59b1d0b7f9f84b2ae370168b2310c1c071bc589f7084b376fb0b90"
+  },
+  "next_batch": "paused_pending_a_role",
+  "a_role_acceptance": "pending",
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false,
+  "initial_review_correction": {
+    "initial_recall": "21/32",
+    "initial_accuracy": "39/45",
+    "corrected_recall": "21/32",
+    "corrected_accuracy": "38/45",
+    "reason": "600023.SH fixed source scope required actual sale/customer/market-trade mechanism. Initial review mistakenly credited 在某一时点确认 as sales mode; the revenue answer is materially incomplete and mislabels recognition timing. Correct only this answer accuracy judgment.",
+    "formal_execution_query_export_runtime_changed": false,
+    "original_artifact_json_paths": 17,
+    "other_original_json_paths_unchanged": 16,
+    "source_review_original_v1_initial_copy_exact": true,
+    "original_review_evidence_preserved": true
+  }
+}
