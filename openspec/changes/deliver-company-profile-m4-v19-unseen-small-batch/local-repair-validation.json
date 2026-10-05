@@ -1,0 +1,168 @@
+{
+  "first_formal_result": "failed_unchanged",
+  "new_official_execution_performed": false,
+  "next_batch": "paused",
+  "results": {
+    "600020.SH": {
+      "validation_kind": "frozen_page_fixture_runtime_accept_query_export_not_official_round",
+      "answers": {
+        "principal_business": "报告期内公司从事的业务情况\n报告期内，公司主营业务为高速公路的投资建设和运营管理，利润主要来源于高速公路运营\r\n及投资收益。",
+        "products_services": "报告期内公司从事的业务情况\n报告期内，公司主营业务为高速公路的投资建设和运营管理，利润主要来源于高速公路运营\r\n及投资收益。",
+        "revenue_model": "交通运输业、房地产业、建造服务"
+      },
+      "segment_rows": [
+        {
+          "source_native_name": "交通运输业",
+          "source_native_value": "4,511,661,074.02",
+          "source_native_unit": "元",
+          "record_id": "owned:core-ev-1a9dfd19c8f37629:segment:industry:交通运输业"
+        },
+        {
+          "source_native_name": "房地产业",
+          "source_native_value": "47,247,581.14",
+          "source_native_unit": "元",
+          "record_id": "owned:core-ev-1a9dfd19c8f37629:segment:industry:房地产业"
+        },
+        {
+          "source_native_name": "建造服务",
+          "source_native_value": "1,876,810,983.45",
+          "source_native_unit": "元",
+          "record_id": "owned:core-ev-1a9dfd19c8f37629:segment:industry:建造服务"
+        },
+        {
+          "source_native_name": "京港澳高速郑州至漯河高速公路",
+          "source_native_value": "1,994,414,866.70",
+          "source_native_unit": "元",
+          "record_id": "owned:core-ev-1a9dfd19c8f37629:segment:region:京港澳高速郑州至漯河高速公路"
+        },
+        {
+          "source_native_name": "京港澳高速漯河至驻马店高速公路",
+          "source_native_value": "439,759,072.91",
+          "source_native_unit": "元",
+          "record_id": "owned:core-ev-1a9dfd19c8f37629:segment:region:京港澳高速漯河至驻马店高速公路"
+        },
+        {
+          "source_native_name": "郑栾高速郑州至尧山段",
+          "source_native_value": "802,617,594.13",
+          "source_native_unit": "元",
+          "record_id": "owned:core-ev-1a9dfd19c8f37629:segment:region:郑栾高速郑州至尧山段"
+        },
+        {
+          "source_native_name": "郑州至民权高速公路郑州至开封段",
+          "source_native_value": "409,448,078.73",
+          "source_native_unit": "元",
+          "record_id": "owned:core-ev-1a9dfd19c8f37629:segment:region:郑州至民权高速公路郑州至开封段"
+        },
+        {
+          "source_native_name": "德上高速永城段",
+          "source_native_value": "107,746,393.37",
+          "source_native_unit": "元",
+          "record_id": "owned:core-ev-1a9dfd19c8f37629:segment:region:德上高速永城段"
+        },
+        {
+          "source_native_name": "商丘至登封高速公路",
+          "source_native_value": "643,198,814.17",
+          "source_native_unit": "元",
+          "record_id": "owned:core-ev-1a9dfd19c8f37629:segment:region:商丘至登封高速公路"
+        },
+        {
+          "source_native_name": "郑州至民权高速公路开封至民权段",
+          "source_native_value": "114,476,254.01",
+          "source_native_unit": "元",
+          "record_id": "owned:core-ev-1a9dfd19c8f37629:segment:region:郑州至民权高速公路开封至民权段"
+        },
+        {
+          "source_native_name": "房地产业",
+          "source_native_value": "47,247,581.14",
+          "source_native_unit": "元",
+          "record_id": "owned:core-ev-1a9dfd19c8f37629:segment:region:房地产业"
+        },
+        {
+          "source_native_name": "建造服务",
+          "source_native_value": "1,876,810,983.45",
+          "source_native_unit": "元",
+          "record_id": "owned:core-ev-1a9dfd19c8f37629:segment:region:建造服务"
+        }
+      ],
+      "activities": [
+        "高速公路的投资建设",
+        "运营管理"
+      ],
+      "export_path": "/tmp/quote_v19_unseen_local_corrected_delivery/600020.SH/export/600020.SH_2025-12-31.json",
+      "source_fixture_sha256": "d9851bae7badd73cdf0661fa957c3ec46238f988bd1b4742a9be416a8ff2d9db"
+    },
+    "600056.SH": {
+      "validation_kind": "frozen_page_fixture_runtime_accept_query_export_not_official_round",
+      "answers": {
+        "principal_business": "公司所从事的主要业务情况及经营模式\r\n医药工业业务：公司工业板块构建了覆盖化学制剂、化学原料药、中成药、中药饮片等多领\r\n域的完整产品矩阵，具备国内领先的化学原料药、特色化学药与现代中药的产业化平台。在化学\r\n药领域，聚焦发酵类与特色原料药的研发生产，制剂板块则深耕抗感染、心脑血管等核心治疗领\r\n域。所有生产基地均严格遵循国家新版 GMP 规范，建立全流程质量管控体系，从研发、原料药生\r\n产到制剂销售实现闭环管理。销售端以精细化招商与专业推广为核心，并持续参与国家及地方集\r\n采，保障产品可及性与市场竞争力。在中药领域，着力培育集种植、加工、生产、销售为一体的\r\n中药全产业链经营模式，业务产品涵盖中药材、中药饮片、中药提取物、中成药及大健康产品等\r\n多个品类，建立了全程可追溯的质量体系，进一步强化了公司在中药领域的资源掌控与品质保障\r\n能力。通过合作共建模式，与人参、甘草、黄芪等核心药材种植基地建立长期稳定的供应链关系。\r\n医药商业业务：近年来，公司商业板块积极从配送商向综合供应链服务商转型，持续拓展服\r\n务边界。公司已形成以北京、广东、江西、河南、河北、湖北、新疆、东北区域为重点的覆盖全\r\n国的配送、分销一体化营销网络体系，在北京、广东、河南、河北、辽宁等地建有大型医药物流\r\n中心。同时不断丰富经营品种，产品类别涵盖化学制剂、诊断药品及试剂、医用耗材、医疗器械、\r\n特医产品、医美产品、中成药、中药饮片、配方颗粒、生物制剂、营养保健品等。主要的经营模\r\n式包括医院纯销、商业分销、药房零售及第三方物流业务等。\r\n医疗器械业务：公司紧跟行业改革步伐，不断完善医疗器械业务布局，持续延伸服务链条，\r\n加大器械业务开发，经营业态多元、经营品类丰富、经营资质齐全、行业知名度和影响力不断提\r\n升。业务模式涉及进出口贸易、直销、分销、配送、SPD 等，涵盖医疗器械流通全业态。经营品\r\n类众多涉及医疗及康复设备、耗材、IVD 等。科技创新方面，积极对接医疗器械科技创新领域的\r\n医疗机构、高校院所、产业联盟、投资机构等，针对产业未来发展方向布局科技创新，加速高新\r\n科技成果转化应用，打造产业链前端专业技术服务能力；开放式构建研发制造能力，向产业链上\r\n游高端延伸，打造安全可控的供应链体系，以“科技创新”保障“产业控制”和“安全支撑”作\r\n用发挥。\r\n国际贸易业务：面向国内、国际两个市场，桥接国内外高端资源，可在医药制剂、原料药及\r\n中间体、医疗设备、医用耗材、中药材、提取物等领域为客户提供多元化产品；在医院与药厂建\r\n设、政府采购、对外援助等项目中为客户提供包括项目设计、产品供应、售后维护等在内的专业\r\n化集成解决方案；在市场营销方面为客户提供产品注册、渠道拓展、市场推广、终端维护等在内\r\n的一体化配套服务。\r\n大健康和电商业务：公司以旗下金穗科技为核心平台，依托其专业的品牌策划、数字营销与\r\n渠道管理能力，通过整合流量资源、优化营销策略，为合作伙伴提供从线上运营、渠道建设到品\r\n牌价值提升的全链路解决方案，助力其快速打开市场、强化品牌认知并实现规模化增长。",
+        "products_services": "公司所从事的主要业务情况及经营模式\r\n医药工业业务：公司工业板块构建了覆盖化学制剂、化学原料药、中成药、中药饮片等多领\r\n域的完整产品矩阵，具备国内领先的化学原料药、特色化学药与现代中药的产业化平台。在化学\r\n药领域，聚焦发酵类与特色原料药的研发生产，制剂板块则深耕抗感染、心脑血管等核心治疗领\r\n域。所有生产基地均严格遵循国家新版 GMP 规范，建立全流程质量管控体系，从研发、原料药生\r\n产到制剂销售实现闭环管理。销售端以精细化招商与专业推广为核心，并持续参与国家及地方集\r\n采，保障产品可及性与市场竞争力。在中药领域，着力培育集种植、加工、生产、销售为一体的\r\n中药全产业链经营模式，业务产品涵盖中药材、中药饮片、中药提取物、中成药及大健康产品等\r\n多个品类，建立了全程可追溯的质量体系，进一步强化了公司在中药领域的资源掌控与品质保障\r\n能力。通过合作共建模式，与人参、甘草、黄芪等核心药材种植基地建立长期稳定的供应链关系。\r\n医药商业业务：近年来，公司商业板块积极从配送商向综合供应链服务商转型，持续拓展服\r\n务边界。公司已形成以北京、广东、江西、河南、河北、湖北、新疆、东北区域为重点的覆盖全\r\n国的配送、分销一体化营销网络体系，在北京、广东、河南、河北、辽宁等地建有大型医药物流\r\n中心。同时不断丰富经营品种，产品类别涵盖化学制剂、诊断药品及试剂、医用耗材、医疗器械、\r\n特医产品、医美产品、中成药、中药饮片、配方颗粒、生物制剂、营养保健品等。主要的经营模\r\n式包括医院纯销、商业分销、药房零售及第三方物流业务等。\r\n医疗器械业务：公司紧跟行业改革步伐，不断完善医疗器械业务布局，持续延伸服务链条，\r\n加大器械业务开发，经营业态多元、经营品类丰富、经营资质齐全、行业知名度和影响力不断提\r\n升。业务模式涉及进出口贸易、直销、分销、配送、SPD 等，涵盖医疗器械流通全业态。经营品\r\n类众多涉及医疗及康复设备、耗材、IVD 等。科技创新方面，积极对接医疗器械科技创新领域的\r\n医疗机构、高校院所、产业联盟、投资机构等，针对产业未来发展方向布局科技创新，加速高新\r\n科技成果转化应用，打造产业链前端专业技术服务能力；开放式构建研发制造能力，向产业链上\r\n游高端延伸，打造安全可控的供应链体系，以“科技创新”保障“产业控制”和“安全支撑”作\r\n用发挥。\r\n国际贸易业务：面向国内、国际两个市场，桥接国内外高端资源，可在医药制剂、原料药及\r\n中间体、医疗设备、医用耗材、中药材、提取物等领域为客户提供多元化产品；在医院与药厂建\r\n设、政府采购、对外援助等项目中为客户提供包括项目设计、产品供应、售后维护等在内的专业\r\n化集成解决方案；在市场营销方面为客户提供产品注册、渠道拓展、市场推广、终端维护等在内\r\n的一体化配套服务。\r\n大健康和电商业务：公司以旗下金穗科技为核心平台，依托其专业的品牌策划、数字营销与\r\n渠道管理能力，通过整合流量资源、优化营销策略，为合作伙伴提供从线上运营、渠道建设到品\r\n牌价值提升的全链路解决方案，助力其快速打开市场、强化品牌认知并实现规模化增长。",
+        "revenue_model": "医药工业、原料药、制剂药、中药材加工及饮片、医药商业、国际贸易、大健康和电商"
+      },
+      "segment_rows": [
+        {
+          "source_native_name": "医药工业",
+          "source_native_value": "2,504,497,845.37",
+          "source_native_unit": "元",
+          "record_id": "owned:core-ev-cc6fa92bdb01aeff:segment:industry:医药工业"
+        },
+        {
+          "source_native_name": "原料药",
+          "source_native_value": "820,511,443.08",
+          "source_native_unit": "元",
+          "record_id": "owned:core-ev-cc6fa92bdb01aeff:segment:industry:原料药"
+        },
+        {
+          "source_native_name": "制剂药",
+          "source_native_value": "1,372,540,668.47",
+          "source_native_unit": "元",
+          "record_id": "owned:core-ev-cc6fa92bdb01aeff:segment:industry:制剂药"
+        },
+        {
+          "source_native_name": "中药材加工及饮片",
+          "source_native_value": "311,445,733.82",
+          "source_native_unit": "元",
+          "record_id": "owned:core-ev-cc6fa92bdb01aeff:segment:industry:中药材加工及饮片"
+        },
+        {
+          "source_native_name": "医药商业",
+          "source_native_value": "26,159,860,274.66",
+          "source_native_unit": "元",
+          "record_id": "owned:core-ev-cc6fa92bdb01aeff:segment:industry:医药商业"
+        },
+        {
+          "source_native_name": "国际贸易",
+          "source_native_value": "5,479,354,211.52",
+          "source_native_unit": "元",
+          "record_id": "owned:core-ev-cc6fa92bdb01aeff:segment:industry:国际贸易"
+        },
+        {
+          "source_native_name": "大健康和电商",
+          "source_native_value": "1,248,714,903.73",
+          "source_native_unit": "元",
+          "record_id": "owned:core-ev-cc6fa92bdb01aeff:segment:industry:大健康和电商"
+        }
+      ],
+      "activities": [
+        "中药材",
+        "中药饮片",
+        "中药提取物",
+        "中成药及大健康产品",
+        "化学制剂",
+        "诊断药品及试剂",
+        "医用耗材",
+        "医疗器械",
+        "特医产品",
+        "医美产品",
+        "中成药",
+        "配方颗粒",
+        "生物制剂",
+        "营养保健品",
+        "医疗器械流通全业态"
+      ],
+      "export_path": "/tmp/quote_v19_unseen_local_corrected_delivery/600056.SH/export/600056.SH_2025-12-31.json",
+      "source_fixture_sha256": "0169a73956baee5fd99886fbf9fb68e101333fcfd122fc5f57ed9b83297043fa"
+    }
+  },
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false
+}

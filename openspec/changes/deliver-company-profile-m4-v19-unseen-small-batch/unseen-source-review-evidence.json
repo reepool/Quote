@@ -1,0 +1,1143 @@
+{
+  "plan_id": "0bdc8dd3d5998ec78c23d384e2ce3c8f59ca820f85fbf9cb5bcba0094acf9bea",
+  "processing_identity": {
+    "rules": "company_profile_common_core.v1",
+    "owned_page_facts": "v8",
+    "material_input_facts": "v1",
+    "revenue_sentence_repair": "v19"
+  },
+  "whole_round_seconds": 188.9832550631836,
+  "formal_execution_index": 1,
+  "source_recall": {
+    "status": "assessed",
+    "numerator": 19,
+    "denominator": 25,
+    "value": 0.76
+  },
+  "source_accuracy": {
+    "status": "assessed",
+    "numerator": 49,
+    "denominator": 57,
+    "value": 0.8596491228070176
+  },
+  "critical_numeric_errors": {
+    "status": "assessed",
+    "value": 0
+  },
+  "workload": {
+    "tokens_used": {
+      "status": "assessed",
+      "value": 0
+    },
+    "elapsed_seconds": {
+      "status": "assessed",
+      "value": 188.9832550631836
+    },
+    "human_review_minutes": {
+      "status": "unassessed",
+      "value": null
+    }
+  },
+  "expansion_gates_met": false,
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false,
+  "next_batch": "paused",
+  "a_role_acceptance": "pending",
+  "actual_accepted_fact_count": 52,
+  "required_answer_checks": 6,
+  "accuracy_denominator_method": "All actually delivered accepted facts plus the five answered dimension texts, each once. The unanswered principal dimension is reviewed once as missing source recall, excluded from delivered-object accuracy.",
+  "recall_denominator_method": "Six required source-supported dimensions plus independently read 12 highway and 7 pharma current-year revenue rows. Each row counted once through Segment; missing rows remain misses. No inherited 26/51 denominator.",
+  "source_rows": {
+    "600020.SH": [
+      {
+        "column": "industry",
+        "name": "交通运输业",
+        "value": "4,511,661,074.02",
+        "unit": "元",
+        "page": 17
+      },
+      {
+        "column": "industry",
+        "name": "房地产业",
+        "value": "47,247,581.14",
+        "unit": "元",
+        "page": 17
+      },
+      {
+        "column": "industry",
+        "name": "建造服务",
+        "value": "1,876,810,983.45",
+        "unit": "元",
+        "page": 17
+      },
+      {
+        "column": "region",
+        "name": "京港澳高速郑州至漯河高速公路",
+        "value": "1,994,414,866.70",
+        "unit": "元",
+        "page": 17
+      },
+      {
+        "column": "region",
+        "name": "京港澳高速漯河至驻马店高速公路",
+        "value": "439,759,072.91",
+        "unit": "元",
+        "page": 17
+      },
+      {
+        "column": "region",
+        "name": "郑栾高速郑州至尧山段",
+        "value": "802,617,594.13",
+        "unit": "元",
+        "page": 17
+      },
+      {
+        "column": "region",
+        "name": "郑州至民权高速公路郑州至开封段",
+        "value": "409,448,078.73",
+        "unit": "元",
+        "page": 18
+      },
+      {
+        "column": "region",
+        "name": "德上高速永城段",
+        "value": "107,746,393.37",
+        "unit": "元",
+        "page": 18
+      },
+      {
+        "column": "region",
+        "name": "商丘至登封高速公路",
+        "value": "643,198,814.17",
+        "unit": "元",
+        "page": 18
+      },
+      {
+        "column": "region",
+        "name": "郑州至民权高速公路开封至民权段",
+        "value": "114,476,254.01",
+        "unit": "元",
+        "page": 18
+      },
+      {
+        "column": "region",
+        "name": "房地产业",
+        "value": "47,247,581.14",
+        "unit": "元",
+        "page": 18
+      },
+      {
+        "column": "region",
+        "name": "建造服务",
+        "value": "1,876,810,983.45",
+        "unit": "元",
+        "page": 18
+      }
+    ],
+    "600056.SH": [
+      {
+        "column": "industry",
+        "name": "医药工业",
+        "value": "2,504,497,845.37",
+        "unit": "元",
+        "page": 13
+      },
+      {
+        "column": "industry",
+        "name": "原料药",
+        "value": "820,511,443.08",
+        "unit": "元",
+        "page": 13
+      },
+      {
+        "column": "industry",
+        "name": "制剂药",
+        "value": "1,372,540,668.47",
+        "unit": "元",
+        "page": 13
+      },
+      {
+        "column": "industry",
+        "name": "中药材加工及饮片",
+        "value": "311,445,733.82",
+        "unit": "元",
+        "page": 13
+      },
+      {
+        "column": "industry",
+        "name": "医药商业",
+        "value": "26,159,860,274.66",
+        "unit": "元",
+        "page": 13
+      },
+      {
+        "column": "industry",
+        "name": "国际贸易",
+        "value": "5,479,354,211.52",
+        "unit": "元",
+        "page": 13
+      },
+      {
+        "column": "industry",
+        "name": "大健康和电商",
+        "value": "1,248,714,903.73",
+        "unit": "元",
+        "page": 13
+      }
+    ]
+  },
+  "object_reviews": [
+    {
+      "instrument_id": "600020.SH",
+      "object_id": "answer:principal_business",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        10
+      ],
+      "text": "报告期内公司从事的业务情况\n报告期内，公司主营业务为高速公路的投资建设和运营管理，利润主要来源于高速公路运营\r\n及投资收益。",
+      "rationale": "Answer text compared with original current-business source and grouping table."
+    },
+    {
+      "instrument_id": "600020.SH",
+      "object_id": "answer:products_services",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        10
+      ],
+      "text": "报告期内公司从事的业务情况\n报告期内，公司主营业务为高速公路的投资建设和运营管理，利润主要来源于高速公路运营\r\n及投资收益。",
+      "rationale": "Answer text compared with original current-business source and grouping table."
+    },
+    {
+      "instrument_id": "600020.SH",
+      "object_id": "answer:revenue_model",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        17
+      ],
+      "text": "交通运输业",
+      "rationale": "Answer text compared with original current-business source and grouping table."
+    },
+    {
+      "instrument_id": "600020.SH",
+      "object_id": "owned:core-ev-6466cfa3e8d4a731:overview",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        10
+      ],
+      "text": "报告期内公司从事的业务情况\n报告期内，公司主营业务为高速公路的投资建设和运营管理，利润主要来源于高速公路运营\r\n及投资收益。",
+      "rationale": "Overview copied faithfully from source p10; answer disclosures already count recall."
+    },
+    {
+      "instrument_id": "600020.SH",
+      "object_id": "owned:core-ev-cc560affb2d75c83:activity:1",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        10
+      ],
+      "text": "高速公路的投资建设",
+      "rationale": "Actual actor, bounded action/object and period compared with source clause; no extra recall count."
+    },
+    {
+      "instrument_id": "600020.SH",
+      "object_id": "owned:core-ev-cc560affb2d75c83:activity:2",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        10
+      ],
+      "text": "运营管理，利润主要来源于高速公路运营及投资收益",
+      "rationale": "Actual actor, bounded action/object and period compared with source clause; no extra recall count."
+    },
+    {
+      "instrument_id": "600020.SH",
+      "object_id": "owned:core-ev-cc560affb2d75c83:activity:3",
+      "present": true,
+      "accurate": false,
+      "source_pages": [
+        10
+      ],
+      "text": "项目投资",
+      "rationale": "p10 grammatical actor is 秉原投资 (items 3–5) or 交投颐康 (item 6); accepted source_actor=公司 and DIRECT_GRAMMATICAL_ACTOR wrongly promote the named subsidiary to the reporting company."
+    },
+    {
+      "instrument_id": "600020.SH",
+      "object_id": "owned:core-ev-cc560affb2d75c83:activity:4",
+      "present": true,
+      "accurate": false,
+      "source_pages": [
+        10
+      ],
+      "text": "投资管理",
+      "rationale": "p10 grammatical actor is 秉原投资 (items 3–5) or 交投颐康 (item 6); accepted source_actor=公司 and DIRECT_GRAMMATICAL_ACTOR wrongly promote the named subsidiary to the reporting company."
+    },
+    {
+      "instrument_id": "600020.SH",
+      "object_id": "owned:core-ev-cc560affb2d75c83:activity:5",
+      "present": true,
+      "accurate": false,
+      "source_pages": [
+        10
+      ],
+      "text": "投资咨询",
+      "rationale": "p10 grammatical actor is 秉原投资 (items 3–5) or 交投颐康 (item 6); accepted source_actor=公司 and DIRECT_GRAMMATICAL_ACTOR wrongly promote the named subsidiary to the reporting company."
+    },
+    {
+      "instrument_id": "600020.SH",
+      "object_id": "owned:core-ev-cc560affb2d75c83:activity:6",
+      "present": true,
+      "accurate": false,
+      "source_pages": [
+        10
+      ],
+      "text": "房地产",
+      "rationale": "p10 grammatical actor is 秉原投资 (items 3–5) or 交投颐康 (item 6); accepted source_actor=公司 and DIRECT_GRAMMATICAL_ACTOR wrongly promote the named subsidiary to the reporting company."
+    },
+    {
+      "instrument_id": "600020.SH",
+      "object_id": "owned:core-ev-c6f11af90840662c:segment:industry:交通运输业",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        17
+      ],
+      "text": {
+        "source_native_name": "交通运输业",
+        "source_native_value": "4,511,661,074.02",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Independently transcribed grouping, row name, current-year revenue and 元 unit. Source-row recall counts Segment once; Measurement is accuracy-only."
+    },
+    {
+      "instrument_id": "600020.SH",
+      "object_id": "owned:core-ev-22db52db0a792b42:revenue:industry:交通运输业",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        17
+      ],
+      "text": {
+        "source_native_name": "交通运输业",
+        "source_native_value": "4,511,661,074.02",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Independently transcribed grouping, row name, current-year revenue and 元 unit. Source-row recall counts Segment once; Measurement is accuracy-only."
+    },
+    {
+      "instrument_id": "600020.SH",
+      "object_id": "owned:core-ev-c6f11af90840662c:segment:industry:房地产业",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        17
+      ],
+      "text": {
+        "source_native_name": "房地产业",
+        "source_native_value": "47,247,581.14",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Independently transcribed grouping, row name, current-year revenue and 元 unit. Source-row recall counts Segment once; Measurement is accuracy-only."
+    },
+    {
+      "instrument_id": "600020.SH",
+      "object_id": "owned:core-ev-22db52db0a792b42:revenue:industry:房地产业",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        17
+      ],
+      "text": {
+        "source_native_name": "房地产业",
+        "source_native_value": "47,247,581.14",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Independently transcribed grouping, row name, current-year revenue and 元 unit. Source-row recall counts Segment once; Measurement is accuracy-only."
+    },
+    {
+      "instrument_id": "600020.SH",
+      "object_id": "owned:core-ev-c6f11af90840662c:segment:industry:建造服务",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        17
+      ],
+      "text": {
+        "source_native_name": "建造服务",
+        "source_native_value": "1,876,810,983.45",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Independently transcribed grouping, row name, current-year revenue and 元 unit. Source-row recall counts Segment once; Measurement is accuracy-only."
+    },
+    {
+      "instrument_id": "600020.SH",
+      "object_id": "owned:core-ev-22db52db0a792b42:revenue:industry:建造服务",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        17
+      ],
+      "text": {
+        "source_native_name": "建造服务",
+        "source_native_value": "1,876,810,983.45",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Independently transcribed grouping, row name, current-year revenue and 元 unit. Source-row recall counts Segment once; Measurement is accuracy-only."
+    },
+    {
+      "instrument_id": "600020.SH",
+      "object_id": "owned:core-ev-c6f11af90840662c:segment:region:郑栾高速郑州至尧山段",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        17
+      ],
+      "text": {
+        "source_native_name": "郑栾高速郑州至尧山段",
+        "source_native_value": "802,617,594.13",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Independently transcribed grouping, row name, current-year revenue and 元 unit. Source-row recall counts Segment once; Measurement is accuracy-only."
+    },
+    {
+      "instrument_id": "600020.SH",
+      "object_id": "owned:core-ev-22db52db0a792b42:revenue:region:郑栾高速郑州至尧山段",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        17
+      ],
+      "text": {
+        "source_native_name": "郑栾高速郑州至尧山段",
+        "source_native_value": "802,617,594.13",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Independently transcribed grouping, row name, current-year revenue and 元 unit. Source-row recall counts Segment once; Measurement is accuracy-only."
+    },
+    {
+      "instrument_id": "600020.SH",
+      "object_id": "owned:core-ev-c6f11af90840662c:segment:region:德上高速永城段",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        18
+      ],
+      "text": {
+        "source_native_name": "德上高速永城段",
+        "source_native_value": "107,746,393.37",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Independently transcribed grouping, row name, current-year revenue and 元 unit. Source-row recall counts Segment once; Measurement is accuracy-only."
+    },
+    {
+      "instrument_id": "600020.SH",
+      "object_id": "owned:core-ev-22db52db0a792b42:revenue:region:德上高速永城段",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        18
+      ],
+      "text": {
+        "source_native_name": "德上高速永城段",
+        "source_native_value": "107,746,393.37",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Independently transcribed grouping, row name, current-year revenue and 元 unit. Source-row recall counts Segment once; Measurement is accuracy-only."
+    },
+    {
+      "instrument_id": "600020.SH",
+      "object_id": "owned:core-ev-c6f11af90840662c:segment:region:商丘至登封高速公路",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        18
+      ],
+      "text": {
+        "source_native_name": "商丘至登封高速公路",
+        "source_native_value": "643,198,814.17",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Independently transcribed grouping, row name, current-year revenue and 元 unit. Source-row recall counts Segment once; Measurement is accuracy-only."
+    },
+    {
+      "instrument_id": "600020.SH",
+      "object_id": "owned:core-ev-22db52db0a792b42:revenue:region:商丘至登封高速公路",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        18
+      ],
+      "text": {
+        "source_native_name": "商丘至登封高速公路",
+        "source_native_value": "643,198,814.17",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Independently transcribed grouping, row name, current-year revenue and 元 unit. Source-row recall counts Segment once; Measurement is accuracy-only."
+    },
+    {
+      "instrument_id": "600020.SH",
+      "object_id": "owned:core-ev-c6f11af90840662c:segment:region:房地产业",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        18
+      ],
+      "text": {
+        "source_native_name": "房地产业",
+        "source_native_value": "47,247,581.14",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Independently transcribed grouping, row name, current-year revenue and 元 unit. Source-row recall counts Segment once; Measurement is accuracy-only."
+    },
+    {
+      "instrument_id": "600020.SH",
+      "object_id": "owned:core-ev-22db52db0a792b42:revenue:region:房地产业",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        18
+      ],
+      "text": {
+        "source_native_name": "房地产业",
+        "source_native_value": "47,247,581.14",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Independently transcribed grouping, row name, current-year revenue and 元 unit. Source-row recall counts Segment once; Measurement is accuracy-only."
+    },
+    {
+      "instrument_id": "600020.SH",
+      "object_id": "owned:core-ev-c6f11af90840662c:segment:region:建造服务",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        18
+      ],
+      "text": {
+        "source_native_name": "建造服务",
+        "source_native_value": "1,876,810,983.45",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Independently transcribed grouping, row name, current-year revenue and 元 unit. Source-row recall counts Segment once; Measurement is accuracy-only."
+    },
+    {
+      "instrument_id": "600020.SH",
+      "object_id": "owned:core-ev-22db52db0a792b42:revenue:region:建造服务",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        18
+      ],
+      "text": {
+        "source_native_name": "建造服务",
+        "source_native_value": "1,876,810,983.45",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Independently transcribed grouping, row name, current-year revenue and 元 unit. Source-row recall counts Segment once; Measurement is accuracy-only."
+    },
+    {
+      "instrument_id": "600056.SH",
+      "object_id": "answer:principal_business",
+      "present": false,
+      "accurate": null,
+      "source_pages": [
+        9
+      ],
+      "text": null,
+      "rationale": "No principal answer, although p9 explicitly describes the established industrial, commercial, device, trade and health/ecommerce businesses."
+    },
+    {
+      "instrument_id": "600056.SH",
+      "object_id": "answer:products_services",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        9
+      ],
+      "text": "中药材",
+      "rationale": "Answer text compared with original current-business source and grouping table."
+    },
+    {
+      "instrument_id": "600056.SH",
+      "object_id": "answer:revenue_model",
+      "present": true,
+      "accurate": false,
+      "source_pages": [
+        13
+      ],
+      "text": "医药工业",
+      "rationale": "Only 医药工业 is answered; source p13 shows the dominant 医药商业 revenue plus 国际贸易 and 大健康和电商. This is materially incomplete as the company revenue-model answer."
+    },
+    {
+      "instrument_id": "600056.SH",
+      "object_id": "owned:core-ev-baedbdd39e6efc78:activity:1",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        9
+      ],
+      "text": "中药材",
+      "rationale": "Actual actor, bounded action/object and period compared with source clause; no extra recall count."
+    },
+    {
+      "instrument_id": "600056.SH",
+      "object_id": "owned:core-ev-baedbdd39e6efc78:activity:2",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        9
+      ],
+      "text": "中药饮片",
+      "rationale": "Actual actor, bounded action/object and period compared with source clause; no extra recall count."
+    },
+    {
+      "instrument_id": "600056.SH",
+      "object_id": "owned:core-ev-baedbdd39e6efc78:activity:3",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        9
+      ],
+      "text": "中药提取物",
+      "rationale": "Actual actor, bounded action/object and period compared with source clause; no extra recall count."
+    },
+    {
+      "instrument_id": "600056.SH",
+      "object_id": "owned:core-ev-baedbdd39e6efc78:activity:4",
+      "present": true,
+      "accurate": false,
+      "source_pages": [
+        9
+      ],
+      "text": "中成药及大健康产品等多个品类，建立了全程可追溯的质量体系，进一步强化了公司在中药",
+      "rationale": "Product object over-captures a following quality-system clause and cuts off at 公司在中药, leaving an incomplete fragment rather than a bounded product/category."
+    },
+    {
+      "instrument_id": "600056.SH",
+      "object_id": "owned:core-ev-baedbdd39e6efc78:activity:5",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        9
+      ],
+      "text": "化学制剂",
+      "rationale": "Actual actor, bounded action/object and period compared with source clause; no extra recall count."
+    },
+    {
+      "instrument_id": "600056.SH",
+      "object_id": "owned:core-ev-baedbdd39e6efc78:activity:6",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        9
+      ],
+      "text": "诊断药品及试剂",
+      "rationale": "Actual actor, bounded action/object and period compared with source clause; no extra recall count."
+    },
+    {
+      "instrument_id": "600056.SH",
+      "object_id": "owned:core-ev-baedbdd39e6efc78:activity:7",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        9
+      ],
+      "text": "医用耗材",
+      "rationale": "Actual actor, bounded action/object and period compared with source clause; no extra recall count."
+    },
+    {
+      "instrument_id": "600056.SH",
+      "object_id": "owned:core-ev-baedbdd39e6efc78:activity:8",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        9
+      ],
+      "text": "医疗器械",
+      "rationale": "Actual actor, bounded action/object and period compared with source clause; no extra recall count."
+    },
+    {
+      "instrument_id": "600056.SH",
+      "object_id": "owned:core-ev-baedbdd39e6efc78:activity:9",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        9
+      ],
+      "text": "特医产品",
+      "rationale": "Actual actor, bounded action/object and period compared with source clause; no extra recall count."
+    },
+    {
+      "instrument_id": "600056.SH",
+      "object_id": "owned:core-ev-baedbdd39e6efc78:activity:10",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        9
+      ],
+      "text": "医美产品",
+      "rationale": "Actual actor, bounded action/object and period compared with source clause; no extra recall count."
+    },
+    {
+      "instrument_id": "600056.SH",
+      "object_id": "owned:core-ev-baedbdd39e6efc78:activity:11",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        9
+      ],
+      "text": "中成药",
+      "rationale": "Actual actor, bounded action/object and period compared with source clause; no extra recall count."
+    },
+    {
+      "instrument_id": "600056.SH",
+      "object_id": "owned:core-ev-baedbdd39e6efc78:activity:12",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        9
+      ],
+      "text": "配方颗粒",
+      "rationale": "Actual actor, bounded action/object and period compared with source clause; no extra recall count."
+    },
+    {
+      "instrument_id": "600056.SH",
+      "object_id": "owned:core-ev-baedbdd39e6efc78:activity:13",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        9
+      ],
+      "text": "生物制剂",
+      "rationale": "Actual actor, bounded action/object and period compared with source clause; no extra recall count."
+    },
+    {
+      "instrument_id": "600056.SH",
+      "object_id": "owned:core-ev-baedbdd39e6efc78:activity:14",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        9
+      ],
+      "text": "营养保健品",
+      "rationale": "Actual actor, bounded action/object and period compared with source clause; no extra recall count."
+    },
+    {
+      "instrument_id": "600056.SH",
+      "object_id": "owned:core-ev-baedbdd39e6efc78:activity:15",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        9
+      ],
+      "text": "医疗器械流通全业态",
+      "rationale": "Actual actor, bounded action/object and period compared with source clause; no extra recall count."
+    },
+    {
+      "instrument_id": "600056.SH",
+      "object_id": "owned:core-ev-8d5e3bd3c9c4f24d:segment:industry:医药工业",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        13
+      ],
+      "text": {
+        "source_native_name": "医药工业",
+        "source_native_value": "2,504,497,845.37",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Independently transcribed grouping, row name, current-year revenue and 元 unit. Source-row recall counts Segment once; Measurement is accuracy-only."
+    },
+    {
+      "instrument_id": "600056.SH",
+      "object_id": "owned:core-ev-ea276b084896507d:revenue:industry:医药工业",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        13
+      ],
+      "text": {
+        "source_native_name": "医药工业",
+        "source_native_value": "2,504,497,845.37",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Independently transcribed grouping, row name, current-year revenue and 元 unit. Source-row recall counts Segment once; Measurement is accuracy-only."
+    },
+    {
+      "instrument_id": "600056.SH",
+      "object_id": "owned:core-ev-8d5e3bd3c9c4f24d:segment:industry:制剂药",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        13
+      ],
+      "text": {
+        "source_native_name": "制剂药",
+        "source_native_value": "1,372,540,668.47",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Independently transcribed grouping, row name, current-year revenue and 元 unit. Source-row recall counts Segment once; Measurement is accuracy-only."
+    },
+    {
+      "instrument_id": "600056.SH",
+      "object_id": "owned:core-ev-ea276b084896507d:revenue:industry:制剂药",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        13
+      ],
+      "text": {
+        "source_native_name": "制剂药",
+        "source_native_value": "1,372,540,668.47",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Independently transcribed grouping, row name, current-year revenue and 元 unit. Source-row recall counts Segment once; Measurement is accuracy-only."
+    },
+    {
+      "instrument_id": "600056.SH",
+      "object_id": "owned:core-ev-8d5e3bd3c9c4f24d:segment:industry:中药材加工及饮片",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        13
+      ],
+      "text": {
+        "source_native_name": "中药材加工及饮片",
+        "source_native_value": "311,445,733.82",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Independently transcribed grouping, row name, current-year revenue and 元 unit. Source-row recall counts Segment once; Measurement is accuracy-only."
+    },
+    {
+      "instrument_id": "600056.SH",
+      "object_id": "owned:core-ev-ea276b084896507d:revenue:industry:中药材加工及饮片",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        13
+      ],
+      "text": {
+        "source_native_name": "中药材加工及饮片",
+        "source_native_value": "311,445,733.82",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Independently transcribed grouping, row name, current-year revenue and 元 unit. Source-row recall counts Segment once; Measurement is accuracy-only."
+    },
+    {
+      "instrument_id": "600056.SH",
+      "object_id": "owned:core-ev-8d5e3bd3c9c4f24d:segment:industry:医药商业",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        13
+      ],
+      "text": {
+        "source_native_name": "医药商业",
+        "source_native_value": "26,159,860,274.66",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Independently transcribed grouping, row name, current-year revenue and 元 unit. Source-row recall counts Segment once; Measurement is accuracy-only."
+    },
+    {
+      "instrument_id": "600056.SH",
+      "object_id": "owned:core-ev-ea276b084896507d:revenue:industry:医药商业",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        13
+      ],
+      "text": {
+        "source_native_name": "医药商业",
+        "source_native_value": "26,159,860,274.66",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Independently transcribed grouping, row name, current-year revenue and 元 unit. Source-row recall counts Segment once; Measurement is accuracy-only."
+    },
+    {
+      "instrument_id": "600056.SH",
+      "object_id": "owned:core-ev-8d5e3bd3c9c4f24d:segment:industry:国际贸易",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        13
+      ],
+      "text": {
+        "source_native_name": "国际贸易",
+        "source_native_value": "5,479,354,211.52",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Independently transcribed grouping, row name, current-year revenue and 元 unit. Source-row recall counts Segment once; Measurement is accuracy-only."
+    },
+    {
+      "instrument_id": "600056.SH",
+      "object_id": "owned:core-ev-ea276b084896507d:revenue:industry:国际贸易",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        13
+      ],
+      "text": {
+        "source_native_name": "国际贸易",
+        "source_native_value": "5,479,354,211.52",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Independently transcribed grouping, row name, current-year revenue and 元 unit. Source-row recall counts Segment once; Measurement is accuracy-only."
+    },
+    {
+      "instrument_id": "600056.SH",
+      "object_id": "owned:core-ev-8d5e3bd3c9c4f24d:segment:industry:大健康和电商",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        13
+      ],
+      "text": {
+        "source_native_name": "大健康和电商",
+        "source_native_value": "1,248,714,903.73",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Independently transcribed grouping, row name, current-year revenue and 元 unit. Source-row recall counts Segment once; Measurement is accuracy-only."
+    },
+    {
+      "instrument_id": "600056.SH",
+      "object_id": "owned:core-ev-ea276b084896507d:revenue:industry:大健康和电商",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        13
+      ],
+      "text": {
+        "source_native_name": "大健康和电商",
+        "source_native_value": "1,248,714,903.73",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Independently transcribed grouping, row name, current-year revenue and 元 unit. Source-row recall counts Segment once; Measurement is accuracy-only."
+    },
+    {
+      "instrument_id": "600056.SH",
+      "object_id": "owned:core-ev-8d5e3bd3c9c4f24d:segment:industry:内部抵消",
+      "present": true,
+      "accurate": false,
+      "source_pages": [
+        13
+      ],
+      "text": {
+        "source_native_name": "内部抵消",
+        "source_native_value": "-131,479,828.97",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Internal elimination is a reconciliation row, not a business Segment or its ordinary operating revenue. The printed negative amount is numerically exact; the row class is wrong."
+    },
+    {
+      "instrument_id": "600056.SH",
+      "object_id": "owned:core-ev-ea276b084896507d:revenue:industry:内部抵消",
+      "present": true,
+      "accurate": false,
+      "source_pages": [
+        13
+      ],
+      "text": {
+        "source_native_name": "内部抵消",
+        "source_native_value": "-131,479,828.97",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Internal elimination is a reconciliation row, not a business Segment or its ordinary operating revenue. The printed negative amount is numerically exact; the row class is wrong."
+    }
+  ],
+  "missing_source_rows": [
+    {
+      "instrument_id": "600020.SH",
+      "source_row_column": "region",
+      "name": "京港澳高速漯河至驻马店高速公路",
+      "current_year_revenue": "439,759,072.91",
+      "unit": "元",
+      "source_page": 17,
+      "reason": "Original source row not accepted in delivery."
+    },
+    {
+      "instrument_id": "600020.SH",
+      "source_row_column": "region",
+      "name": "郑州至民权高速公路开封至民权段",
+      "current_year_revenue": "114,476,254.01",
+      "unit": "元",
+      "source_page": 18,
+      "reason": "Original source row not accepted in delivery."
+    },
+    {
+      "instrument_id": "600020.SH",
+      "source_row_column": "region",
+      "name": "京港澳高速郑州至漯河高速公路",
+      "current_year_revenue": "1,994,414,866.70",
+      "unit": "元",
+      "source_page": 17,
+      "reason": "Original source row not accepted in delivery."
+    },
+    {
+      "instrument_id": "600020.SH",
+      "source_row_column": "region",
+      "name": "郑州至民权高速公路郑州至开封段",
+      "current_year_revenue": "409,448,078.73",
+      "unit": "元",
+      "source_page": 18,
+      "reason": "Original source row not accepted in delivery."
+    },
+    {
+      "instrument_id": "600056.SH",
+      "source_row_column": "industry",
+      "name": "原料药",
+      "current_year_revenue": "820,511,443.08",
+      "unit": "元",
+      "source_page": 13,
+      "reason": "Original source row not accepted in delivery."
+    }
+  ],
+  "runtime_evidence": [
+    {
+      "instrument_id": "600020.SH",
+      "work_id": "bp-work-5b2d2e4b7e90318cd86c5b41",
+      "reused_scope_ids_by_stage": {
+        "acquire": [],
+        "parse": [],
+        "publish": [],
+        "semantic": [],
+        "verify": []
+      },
+      "predecessor_lineage": [],
+      "completed_scopes": [
+        {
+          "chapter_task": "extract_business_overview",
+          "source_digest": "712fc688e10e651fb6a1d4ac90e6884919ae19baba4abf069a2c28b55643c186",
+          "task_complete": true
+        },
+        {
+          "chapter_task": "extract_segment_financials",
+          "source_digest": "8bb658f485d824ca0d09afb897bfd6be53f9a3a656e214ea308bb2b271da7c03",
+          "task_complete": true
+        }
+      ],
+      "semantic_disputes": [],
+      "provider_calls": [],
+      "token_budget": {
+        "total_token_budget": 50000,
+        "extract_max_output_tokens": 8000,
+        "verify_max_output_tokens": 4000,
+        "tokens_used": 0,
+        "tokens_remaining": 50000
+      }
+    },
+    {
+      "instrument_id": "600056.SH",
+      "work_id": "bp-work-37d03d2512cdb36bc31015ee",
+      "reused_scope_ids_by_stage": {
+        "acquire": [],
+        "parse": [],
+        "publish": [],
+        "semantic": [],
+        "verify": []
+      },
+      "predecessor_lineage": [],
+      "completed_scopes": [
+        {
+          "chapter_task": "extract_business_overview",
+          "source_digest": "bba96eb14d7e4357cee149c70d9724557f080cb78f779bf7b72f5e08281b6685",
+          "task_complete": false
+        },
+        {
+          "chapter_task": "extract_segment_financials",
+          "source_digest": "1bdd2d5d7cae8ca83d82bde4cbe0572f2be64f7f0a69b55c4c9427ed91e773fe",
+          "task_complete": true
+        }
+      ],
+      "semantic_disputes": [
+        {
+          "field_id": "business_overview_source",
+          "reason_codes": [
+            "required_coverage_missing"
+          ],
+          "review_id": "bp-work-37d03d2512cdb36bc31015ee:extract_business_overview:coverage:business_overview_source"
+        }
+      ],
+      "provider_calls": [],
+      "token_budget": {
+        "total_token_budget": 50000,
+        "extract_max_output_tokens": 8000,
+        "verify_max_output_tokens": 4000,
+        "tokens_used": 0,
+        "tokens_remaining": 50000
+      }
+    }
+  ],
+  "no_role_checked_pages": {
+    "600020.SH": [
+      10,
+      11,
+      17,
+      18,
+      19
+    ],
+    "600056.SH": [
+      9,
+      10,
+      11,
+      13,
+      14,
+      15
+    ]
+  },
+  "no_role_limit": "Scoped negative only. Generic 燃料动力/原材料 costs and pharmaceutical raw drugs do not identify a supported named commodity-catalog role.",
+  "source_scope_limit": "Independent scoped business answers and specified current-period segment revenue tables, not whole-report completeness. 中药材 is a true product category but does not demonstrate full product-matrix coverage.",
+  "historical_files_unchanged": 456,
+  "artifact_sha256": {
+    "data/checkpoints/company_profile_common_core/reports/m4_v19_unseen_small_batch/plan.json": "7171547ce14bc7a5a4d0ab26cb2b10459dfab57da1574bfff0bb854d95c1c102",
+    "data/checkpoints/company_profile_common_core/reports/m4_v19_unseen_small_batch/company_profile_live_run.v1.json": "5db8c94624b891c8b224fedbb0804e4e4d606ce00479e2714a95fd042b80ee87",
+    "data/checkpoints/company_profile_common_core/reports/m4_v19_unseen_small_batch/observation.json": "5fd14cb4086fb099e9dbac87d975ad4e55ef60ae99feaa3c01e459e67fd17247",
+    "data/checkpoints/company_profile_common_core/reports/m4_v19_unseen_small_batch/formal_execution.json": "9cf4035d678e2a1ce46d2ca1fb650b3a93d6ca40d585370b3c32228b317374b4",
+    "data/checkpoints/company_profile_common_core/reports/m4_v19_unseen_small_batch/company_profile_source_review.v1.json": "86420a0cbc3a38400cfb916266caf76ac07bd5c207d3605d68e3054bd21f22e6",
+    "data/exports/m4_v19_unseen_small_batch/600020.SH/profiles.csv": "b69d096f4cb4d1b17b04015cbfcbd2c5a32f6e7fb4a1c92ffa83832928730ab7",
+    "data/exports/m4_v19_unseen_small_batch/600020.SH/600020.SH_2025-12-31.json": "7c8da6b185841280e8be101fa5d9c66484c08d87b477322d88f9059d90ca0fec",
+    "data/exports/m4_v19_unseen_small_batch/600020.SH/export_manifest.json": "87ee663b5061f2cd7f0bb61ad6ff17b572407d457c6d8f710d9f946bacca5c8f",
+    "data/exports/m4_v19_unseen_small_batch/600056.SH/profiles.csv": "e74b912e4f74fd962ebb759309707da4885b7d21121d135a9e91a26f9e5acd7e",
+    "data/exports/m4_v19_unseen_small_batch/600056.SH/600056.SH_2025-12-31.json": "efbd642e680b882137a9b6ecca4f36262658c8b9c413a170025d7f5d4488f4f5",
+    "data/exports/m4_v19_unseen_small_batch/600056.SH/export_manifest.json": "9aec47612c3d00838b96b2c47fc1c02266090e878f7aee50830458878dbc8b3c",
+    "data/research/company_profile_common_core/m4_v19_unseen_small_batch/company_profile_common_core.v1/bp-work-5b2d2e4b7e90318cd86c5b41.json": "ecf34fa8024527a155c74d4333178a5f6813b8d339887717086a416d36438933",
+    "data/research/company_profile_common_core/m4_v19_unseen_small_batch/company_profile_common_core.v1/bp-work-37d03d2512cdb36bc31015ee.json": "5cf42a837120de09108d0c08f7b157b8535b419c5ffdff26519061011b386c5d",
+    "data/research/company_profile_common_core/m4_v19_unseen_small_batch/company_profile_common_core.v1/scopes/600020.SH/2025-12-31/extract_segment_financials.json": "09d243992cee160fb793fd07101647ed53635a316365a915d6fb5504e069395e",
+    "data/research/company_profile_common_core/m4_v19_unseen_small_batch/company_profile_common_core.v1/scopes/600020.SH/2025-12-31/extract_business_overview.json": "35ba12bf2ed5f6181d9b3ced45ff1960c71ccd556b7c5af24679bc832bb72eff",
+    "data/research/company_profile_common_core/m4_v19_unseen_small_batch/company_profile_common_core.v1/scopes/600056.SH/2025-12-31/extract_segment_financials.json": "372f88815e411164cfa37289ff4156766859fb1e0080be423c15a9ae61bc01c6",
+    "data/research/company_profile_common_core/m4_v19_unseen_small_batch/company_profile_common_core.v1/scopes/600056.SH/2025-12-31/extract_business_overview.json": "b2a8fcff76d47f724ab4f89c2b750113e4bb8bdc182e63ffb64849b5811517f0",
+    "data/research/company_profile_common_core/m4_v19_unseen_small_batch/company_profile_common_core.v1/checkpoints/bp-work-5b2d2e4b7e90318cd86c5b41.json": "a680ce7c45ae68d2874576e8e35b2d1be0792e121824c61b2c90be9eabcd8851",
+    "data/research/company_profile_common_core/m4_v19_unseen_small_batch/company_profile_common_core.v1/checkpoints/bp-work-37d03d2512cdb36bc31015ee.json": "325148f24f39f498a6d552929d879a496622a25b1b9463848b540661b3ab0255"
+  }
+}

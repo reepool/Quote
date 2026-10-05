@@ -1318,6 +1318,7 @@ def _project_overview_span(
             or _operating_model_source(span.excerpt)
             or _company_as_narrative_source(span.excerpt)
             or _provider_narrative_source(span.excerpt)
+            or _business_blocks_source(span.excerpt)
         )
         if delivered:
             company_sentence = delivered
@@ -1362,6 +1363,14 @@ def _project_overview_span(
     excerpt = _join_pdf_soft_breaks(span.excerpt)
     for pattern in _CLAUSE_PATTERNS:
         for match in pattern.finditer(excerpt):
+            if source_delivery_repair and match.group(0).startswith("主要从事"):
+                prefix = _sentence_containing(excerpt, match.start())
+                prefix = prefix[: prefix.find("主要从事")]
+                if re.search(
+                    r"(?<![\u4e00-\u9fff])(?:本公司|公司|本集团)[^。；;]{0,40}$",
+                    prefix,
+                ) is None:
+                    continue
             verb = "经营"
             if match.group(0).startswith("主营"):
                 verb = "为"
@@ -1999,7 +2008,7 @@ def _join_segment_label_amounts(
         nxt = lines[index + 1] if index + 1 < len(lines) else ""
         compact_label = re.sub(r"\s+", "", current)
         if (
-            re.fullmatch(r"[\u4e00-\u9fff0-9/]{2,12}", compact_label)
+            re.fullmatch(r"[\u4e00-\u9fff0-9/]{2,40}", compact_label)
             and not compact_label.endswith("百分点")
             and re.match(r"\s*-?[\d,]", nxt)
         ):
@@ -2516,6 +2525,27 @@ def _provider_narrative_source(excerpt: str) -> str:
             continue
         return _original_span_matching(excerpt, compact) or ""
     return ""
+
+
+def _business_blocks_source(excerpt: str) -> str:
+    """Retain an owned business/mode section with multiple established blocks."""
+
+    joined = _join_pdf_soft_breaks(excerpt)
+    heading = re.search(r"公司所从事的主要业务情况及经营模式", joined)
+    if heading is None:
+        return ""
+    blocks = list(re.finditer(
+        r"[\u4e00-\u9fff]{2,12}业务[:：][^。]{8,600}。", joined[heading.end():]
+    ))
+    if len(blocks) < 2 or any(
+        re.search(r"业务[:：](?:子公司|第三方|公司拟|公司计划)", item.group(0))
+        for item in blocks
+    ):
+        return ""
+    end = heading.end() + blocks[-1].end()
+    return _original_span_matching(
+        excerpt, re.sub(r"\s+", "", joined[heading.start():end])
+    )
 
 
 def _company_as_narrative_source(excerpt: str) -> str:
@@ -3104,6 +3134,9 @@ def _activity_object_clauses(clause: str) -> list[str]:
     )
     if provide_collect:
         return [text]
+    # A following explanation of profit or quality control is not a product
+    # or service object, and a regex length bound can cut it mid-clause.
+    text = re.split(r"[，,](?:建立|进一步|利润)", text, maxsplit=1)[0]
     # "旋挖钻机，用于市政建设、公路桥梁……" enumerates where a product is used;
     # the application areas are not company activities.
     used_for = re.search(r"用于", text)
@@ -3310,6 +3343,7 @@ def _stated_in_quote(text: str, quote: str) -> bool:
 
 def _parse_segment_row(line: str) -> tuple[str, str, str | None] | None:
     text = line.strip()
+    text = re.sub(r"^其中[:：]\s*", "", text)
     text = re.sub(r"^(?:[一二三四五六七八九十]+|\d+)[、.．](?!\d)\s*", "", text)
     if not text:
         return None
@@ -3331,9 +3365,10 @@ def _parse_segment_row(line: str) -> tuple[str, str, str | None] | None:
     if (
         label in _SKIP_SEGMENT_LABELS
         or "合计" in label
+        or re.search(r"抵消|抵销|抵减", label)
         or len(numbers) < 2
         or numbers[0] == "营业收入"
-        or not re.fullmatch(r"[\u4e00-\u9fffA-Za-z0-9（）/]{2,20}", label)
+        or not re.fullmatch(r"[\u4e00-\u9fffA-Za-z0-9（）/]{2,40}", label)
         or not re.fullmatch(r"-?[\d,]+(?:\.\d+)?", numbers[0])
         or not re.fullmatch(r"-?[\d,]+(?:\.\d+)?%?", numbers[1])
     ):

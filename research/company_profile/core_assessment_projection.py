@@ -48,7 +48,7 @@ _NARRATIVE_BUSINESS = re.compile(
 )
 _SPEC_PRODUCT = re.compile(r"^(?:厚度|宽度|长度)")
 _PRODUCT_PATTERN = re.compile(
-    r"(主要产品|主要服务|业务线|产品包括|服务包括|经营范围|"
+    r"(主要产品|主要服务|业务线|产品包括|产品矩阵|服务包括|经营范围|"
     r"从事.{1,40}(?:的研发|的生产|的制造|的加工|的销售|服务))"
 )
 _STATEMENT_SPLIT = re.compile(r"[。；;，,\n]+")
@@ -392,7 +392,7 @@ def _assess_products_services(
             record
             for record in supports
             if isinstance(record, BusinessOverview)
-            and re.search(r"主要产品有|主要业务是|主要从事|主营业务为|主要经营|研发制造|核心提供商", record.source_text or "")
+            and re.search(r"主要产品有|产品矩阵|主要业务是|主要从事|主营业务为|主要经营|研发制造|核心提供商", record.source_text or "")
         ]
         if series:
             supports = [*series, *[record for record in supports if record not in series]]
@@ -484,7 +484,9 @@ def _assess_revenue_model(
 def _industry_revenue_excerpt(records: Sequence[SemanticRecord]) -> str:
     """The current-period industry lines, without eliminations or the total."""
 
-    wanted = ("勘探及开发", "炼油", "营销及分销", "化工")
+    # A genuine fee/collection narrative takes precedence over table labels.
+    if any(isinstance(record, BusinessOverview) for record in records):
+        return ""
     found: list[str] = []
     for record in records:
         if not isinstance(record, Measurement):
@@ -492,7 +494,9 @@ def _industry_revenue_excerpt(records: Sequence[SemanticRecord]) -> str:
         if record.segment_dimension != "industry":
             continue
         label = (record.segment_label or "").strip()
-        if label in wanted and label not in found:
+        if label and not _is_skeleton_noise_segment(
+            dimension="industry", label=label, row_class=record.row_class
+        ) and label not in found:
             found.append(label)
     if len(found) < 2:
         return ""

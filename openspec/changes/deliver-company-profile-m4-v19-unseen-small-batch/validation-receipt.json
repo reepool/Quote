@@ -1,0 +1,50 @@
+{
+  "baseline_commit": "7eaf71691f7faa8f633e939650da4c70f9644834",
+  "directed_regression": {
+    "passed": 101,
+    "warnings": 7,
+    "seconds": 38.66,
+    "files": [
+      "test_company_profile_m4_next_batch.py",
+      "test_company_profile_source_review.py",
+      "test_company_profile_core_assessment_projection.py",
+      "test_company_profile_v19_closure.py",
+      "test_company_profile_v7_source_delivery.py",
+      "test_company_profile_revenue_sentence_repair.py",
+      "test_company_profile_repair_isolation.py",
+      "test_company_profile_v19_unseen_misses.py"
+    ]
+  },
+  "additional_evidence_selection": {
+    "passed": 24,
+    "failed": 1,
+    "failed_test": "test_reads_through_section_and_stops_at_next_heading",
+    "baseline_reproduced": true,
+    "baseline_command": "/home/python/miniconda3/envs/Quote/bin/python -m pytest tests/unit/test_research/test_company_profile_core_evidence_selection.py::test_reads_through_section_and_stops_at_next_heading -q",
+    "baseline_result": "1 failed, 6 warnings; continuation_pages actual () vs expected (15,)",
+    "classification": "C: pre-existing, unchanged, not repaired in this card"
+  },
+  "preservation": {
+    "historical_files_checked": 456,
+    "first_formal_files_checked": 19,
+    "all_hashes_unchanged": true,
+    "archive_non_task_files_unchanged": 7
+  },
+  "new_official_execution_performed": false,
+  "first_formal_result": "failed_unchanged",
+  "next_batch": "paused",
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false,
+  "review": {
+    "method": "B-role manual review of current diff and business evidence",
+    "A": "actual first-round misses locally repaired and directed regressions passed; new formal acceptance outstanding",
+    "B": "no optional expansion",
+    "C": "baseline section-continuation test reproduced; previously reported runtime failures excluded"
+  },
+  "static_checks": {
+    "openspec_change_strict": "passed",
+    "synchronized_main_spec_strict": "passed",
+    "changed_python_compileall": "passed",
+    "git_diff_check": "passed"
+  }
+}
