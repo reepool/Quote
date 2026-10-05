@@ -1,0 +1,37 @@
+{
+  "plan": {
+    "plan_id": "07734df3db25a8aadbdca7ebecad897da3a81a4fe1f96a05738f7c48872b66ba",
+    "knowledge_cutoff": "2026-09-17",
+    "max_companies_this_round": 2,
+    "token_budget": 50000,
+    "reports": [
+      {
+        "instrument_id": "600023.SH",
+        "asset_id": "asset_ae19548e01fc06f9aef3ffec680e00a7",
+        "report_id": "1225200695",
+        "report_period": "2025-12-31",
+        "document_version": "72239dd644e8ba1dc1e78b66b406344562959a14b87362a98729d6045e7bcd40",
+        "disclosure_form": "service"
+      },
+      {
+        "instrument_id": "600060.SH",
+        "asset_id": "asset_bdcc313d410d69cbf44bbf9ce846af75",
+        "report_id": "1225051157",
+        "report_period": "2025-12-31",
+        "document_version": "23e8341c13ac4bb45cea4862b802a00d6b22fadcdc07ed833a2514f510f81ccc",
+        "disclosure_form": "manufacturing"
+      }
+    ]
+  },
+  "processing_identity": {
+    "rules": "company_profile_common_core.v1",
+    "owned_page_facts": "v8",
+    "material_input_facts": "v1",
+    "revenue_sentence_repair": "v22"
+  },
+  "repeat_read_identical": true,
+  "enqueued": false,
+  "official_reports_unchanged": true,
+  "protected_files_unchanged": 559,
+  "source_scope_sha256": "0d9e2cfffc2a23e97eb560fe52fffb0729931a7b3a707785f89f06116819935c"
+}

@@ -33,3 +33,19 @@ The independent review MUST rebuild source disclosures for principal, products/s
 - **WHEN** a company-owned current production/sales clause, owned formal sales-volume table, own cost-risk input list or furnace-input disclosure names a product or material
 - **THEN** existing native role projection may retain pending mapping without inventing a grade, procurement price or price-series link
 - **AND** subsidiary, third-party, planned and negated actions do not become the reporting company's established role
+
+### Requirement: Cumulative v22 repairs restore substantive delivery before the formal round
+The current change MUST restore the two frozen reports through existing selection, acceptance, query and export owners. The energy company's continuous principal/products narrative MUST retain the controlled photovoltaic company's subject and complete three-part business. Geographic management explanations MUST NOT become business Activity objects. Current insistence and ongoing business-development clauses MUST support the display company's five established businesses while vision and future layout retain their original state. Sixteen native revenue rows MUST retain labels, amounts, currencies and matching Segment/Measurement copies. Recognition timing MUST NOT be described as a sales channel; actual power customer and market-trading disclosure MUST support the revenue answer. Ten native sales/input roles MUST retain current company/group context, separated product/unit/numeric columns, pending or ambiguous unmapped names and no invented quantity, price, grade, panel input or future robot sale.
+
+#### Scenario: Complete frozen pages pass before genuine execution
+- **WHEN** full-page v22 acceptance, query and export regressions and company/external/planned boundary cases complete
+- **THEN** the formal v22 identity activates all five cumulative repair switches without changing the default identity
+- **AND** the first real round uses the original frozen plan and independent m4_v22_energy_display_repair directory
+
+### Requirement: Substantive recall and preserved failure trail determine finite review
+The v22 source conditions MUST be fixed before observation for six substantive answers, sixteen income rows and ten roles. An answered but wrong or incomplete text MUST NOT count as recalled. Every actual accepted fact and answered text MUST receive one accuracy judgment, with Measurement copies accuracy-only. The original 39/45 and corrected 38/45 observations and the limitation that 21/32 used answer-existence recall MUST remain preserved. First execute through second export and retries MUST determine the time gate, with actual runtime reused_scope_ids checked. Finite submission MUST require both semantic recall and accuracy 100%, critical numeric errors zero, shared tokens at most 50000 and whole-round time at most 300 seconds; otherwise following batches MUST remain paused. Current change MUST NOT be archived before A-role review, and production and scale-quality authorization MUST remain unchanged.
+
+#### Scenario: An existing answer lacks required source substance
+- **WHEN** a delivered answer is present but fails the independently fixed business substance
+- **THEN** it remains one actual accuracy object and its missing substantive disclosure fails recall
+- **AND** the answer-existence status cannot substitute for correct source coverage

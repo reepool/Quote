@@ -1,0 +1,28 @@
+{
+  "tests": {
+    "passed": 205,
+    "deselected": 1,
+    "warnings": 7,
+    "seconds": 38.29,
+    "log_sha256": "59a14b548f2a5050d92e68bc4c6bed6311c18a83e71cbba8fdb5a202ae790b7d"
+  },
+  "full_pages_and_boundaries": {
+    "passed": 28,
+    "seconds": 7.19
+  },
+  "openspec_strict": true,
+  "diff_check": true,
+  "review": {
+    "method": "manual_uncommitted_diff",
+    "blocking_found": "real owner three-line compound label/amount miss",
+    "blocking_local_fix": "allow 、 in wrapped label before numeric row",
+    "formal_acceptance": false,
+    "pre_existing_failure": "deselected; unchanged"
+  },
+  "protected_before_execution": 559,
+  "protected_after_failure_unchanged": 582,
+  "formal_rerun": false,
+  "next_batch": "paused",
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false
+}

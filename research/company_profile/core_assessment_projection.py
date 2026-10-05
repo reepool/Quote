@@ -44,7 +44,7 @@ _COMPLETE_COMPANY_BUSINESS = re.compile(
 )
 _STEEL_BUSINESS = re.compile(r"公司是.{8,260}主要产品有.{2,80}")
 _NARRATIVE_BUSINESS = re.compile(
-    r"作为[^。]{2,80}(?:上市公司|工业企业)[^。]{2,}研发制造"
+    r"作为[^。]{2,80}(?:上市公司|工业企业)[^。]{2,}研发制造|公司坚持以[^。]{2,150}为核心[^。]*。公司持续深耕"
 )
 _SPEC_PRODUCT = re.compile(r"^(?:厚度|宽度|长度)")
 _PRODUCT_PATTERN = re.compile(
@@ -53,7 +53,7 @@ _PRODUCT_PATTERN = re.compile(
 )
 _STATEMENT_SPLIT = re.compile(r"[。；;，,\n]+")
 _REVENUE_INFLOW_PATTERN = re.compile(
-    r"(收入来[源于自]|营业收入构成|主营业务收入|"
+    r"(公司电力销售客户主要为|公司煤机全年市场化交易累计成交电量|收入来[源于自]|营业收入构成|主营业务收入|"
     r"通过.{0,30}(?:销售|提供).{0,30}(?:取得|获得|收取)|"
     r"取得货款|"
     r"向客户(?:销售|提供).{0,24}(?:取得|获得|收取)|"
@@ -382,7 +382,10 @@ def _assess_products_services(
                 _PRODUCT_PATTERN.search(record.source_text)
                 or (
                     source_delivery_repair
-                    and re.search(r"主要业务是|主要从事|主营业务为|主要经营|研发制造|核心提供商", record.source_text or "")
+                    and re.search(
+                        r"主要业务是|主要从事|主营业务为|主要经营|研发制造|核心提供商|公司持续深耕",
+                        record.source_text or "",
+                    )
                 )
             )
         ):
@@ -392,10 +395,16 @@ def _assess_products_services(
             record
             for record in supports
             if isinstance(record, BusinessOverview)
-            and re.search(r"主要产品有|产品矩阵|主要业务是|主要从事|主营业务为|主要经营|研发制造|核心提供商", record.source_text or "")
+            and re.search(
+                r"主要产品有|产品矩阵|主要业务是|主要从事|主营业务为|主要经营|研发制造|核心提供商|公司持续深耕",
+                record.source_text or "",
+            )
         ]
         if series:
-            supports = [*series, *[record for record in supports if record not in series]]
+            supports = [
+                *series,
+                *[record for record in supports if record not in series],
+            ]
     if supports:
         return _answered("products_services", supports)
     if any(
@@ -485,7 +494,16 @@ def _industry_revenue_excerpt(records: Sequence[SemanticRecord]) -> str:
     """The current-period industry lines, without eliminations or the total."""
 
     # A genuine fee/collection narrative takes precedence over table labels.
-    if any(isinstance(record, BusinessOverview) for record in records):
+    narratives = [
+        record.source_text.strip()
+        for record in records
+        if isinstance(record, BusinessOverview)
+    ]
+    sales_mechanism = any(
+        "电力销售客户主要为" in text or "煤机全年市场化交易" in text
+        for text in narratives
+    )
+    if narratives and not sales_mechanism:
         return ""
     products: list[str] = []
     modes: list[str] = []
@@ -506,8 +524,14 @@ def _industry_revenue_excerpt(records: Sequence[SemanticRecord]) -> str:
             bucket.append(label)
     if products:
         text = "营业收入分产品：" + "、".join(products)
-        if modes:
-            text += "\n销售模式：" + "、".join(modes)
+        confirmations = [mode for mode in modes if "确认" in mode]
+        sales_modes = [mode for mode in modes if mode not in confirmations]
+        if sales_modes:
+            text += "\n销售模式：" + "、".join(sales_modes)
+        if confirmations:
+            text += "\n收入确认：" + "、".join(confirmations)
+        if sales_mechanism:
+            text += "\n" + "\n".join(narratives)
         return text
     found: list[str] = []
     for record in records:
@@ -516,9 +540,13 @@ def _industry_revenue_excerpt(records: Sequence[SemanticRecord]) -> str:
         if record.segment_dimension != "industry":
             continue
         label = (record.segment_label or "").strip()
-        if label and not _is_skeleton_noise_segment(
-            dimension="industry", label=label, row_class=record.row_class
-        ) and label not in found:
+        if (
+            label
+            and not _is_skeleton_noise_segment(
+                dimension="industry", label=label, row_class=record.row_class
+            )
+            and label not in found
+        ):
             found.append(label)
     if len(found) < 2:
         return ""

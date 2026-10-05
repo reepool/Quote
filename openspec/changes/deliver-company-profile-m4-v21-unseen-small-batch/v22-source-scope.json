@@ -1,0 +1,429 @@
+{
+  "created_at": "2026-10-05T09:49:40.239245+00:00",
+  "fixed_before_formal_execution": true,
+  "plan_id": "07734df3db25a8aadbdca7ebecad897da3a81a4fe1f96a05738f7c48872b66ba",
+  "processing_identity": {
+    "rules": "company_profile_common_core.v1",
+    "owned_page_facts": "v8",
+    "material_input_facts": "v1",
+    "revenue_sentence_repair": "v22"
+  },
+  "knowledge_cutoff": "2026-09-17",
+  "shared_token_budget": 50000,
+  "official_reports": [
+    {
+      "instrument_id": "600023.SH",
+      "asset_id": "asset_ae19548e01fc06f9aef3ffec680e00a7",
+      "report_id": "1225200695",
+      "report_period": "2025-12-31",
+      "document_version": "72239dd644e8ba1dc1e78b66b406344562959a14b87362a98729d6045e7bcd40",
+      "disclosure_form": "service"
+    },
+    {
+      "instrument_id": "600060.SH",
+      "asset_id": "asset_bdcc313d410d69cbf44bbf9ce846af75",
+      "report_id": "1225051157",
+      "report_period": "2025-12-31",
+      "document_version": "23e8341c13ac4bb45cea4862b802a00d6b22fadcdc07ed833a2514f510f81ccc",
+      "disclosure_form": "manufacturing"
+    }
+  ],
+  "versions": {
+    "600023.SH": {
+      "sha256": "72239dd644e8ba1dc1e78b66b406344562959a14b87362a98729d6045e7bcd40",
+      "pdf": "data/filings/announcements/blobs/72/72239dd644e8ba1dc1e78b66b406344562959a14b87362a98729d6045e7bcd40.pdf",
+      "checked_pages": [
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        17,
+        18,
+        25,
+        26
+      ]
+    },
+    "600060.SH": {
+      "sha256": "23e8341c13ac4bb45cea4862b802a00d6b22fadcdc07ed833a2514f510f81ccc",
+      "pdf": "data/filings/announcements/blobs/23/23e8341c13ac4bb45cea4862b802a00d6b22fadcdc07ed833a2514f510f81ccc.pdf",
+      "checked_pages": [
+        12,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        38,
+        39
+      ]
+    }
+  },
+  "source_rows": {
+    "600023.SH": [
+      {
+        "dimension": "industry",
+        "name": "电力、热力生产及供应",
+        "value": "72,870,145,425.91",
+        "unit": "元",
+        "reported_period": "2025-12-31",
+        "page": 11
+      },
+      {
+        "dimension": "industry",
+        "name": "光伏制造",
+        "value": "2,369,281,843.31",
+        "unit": "元",
+        "reported_period": "2025-12-31",
+        "page": 11
+      },
+      {
+        "dimension": "product",
+        "name": "电力",
+        "value": "66,647,763,063.12",
+        "unit": "元",
+        "reported_period": "2025-12-31",
+        "page": 12
+      },
+      {
+        "dimension": "product",
+        "name": "蒸汽",
+        "value": "6,222,382,362.79",
+        "unit": "元",
+        "reported_period": "2025-12-31",
+        "page": 12
+      },
+      {
+        "dimension": "product",
+        "name": "光伏产品",
+        "value": "2,369,281,843.31",
+        "unit": "元",
+        "reported_period": "2025-12-31",
+        "page": 12
+      },
+      {
+        "dimension": "region",
+        "name": "境内",
+        "value": "74,153,253,047.53",
+        "unit": "元",
+        "reported_period": "2025-12-31",
+        "page": 12
+      },
+      {
+        "dimension": "region",
+        "name": "境外",
+        "value": "1,086,174,221.69",
+        "unit": "元",
+        "reported_period": "2025-12-31",
+        "page": 12
+      },
+      {
+        "dimension": "sales_mode",
+        "name": "在某一时点确认",
+        "value": "75,239,427,269.22",
+        "unit": "元",
+        "reported_period": "2025-12-31",
+        "page": 12
+      }
+    ],
+    "600060.SH": [
+      {
+        "dimension": "industry",
+        "name": "显示行业",
+        "value": "5,386,396.75",
+        "unit": "万元",
+        "reported_period": "2025-12-31",
+        "page": 27
+      },
+      {
+        "dimension": "product",
+        "name": "智慧显示终端",
+        "value": "4,496,372.07",
+        "unit": "万元",
+        "reported_period": "2025-12-31",
+        "page": 27
+      },
+      {
+        "dimension": "product",
+        "name": "新显示新业务",
+        "value": "845,789.89",
+        "unit": "万元",
+        "reported_period": "2025-12-31",
+        "page": 27
+      },
+      {
+        "dimension": "product",
+        "name": "其他",
+        "value": "44,234.79",
+        "unit": "万元",
+        "reported_period": "2025-12-31",
+        "page": 27
+      },
+      {
+        "dimension": "region",
+        "name": "中国境内",
+        "value": "2,463,388.58",
+        "unit": "万元",
+        "reported_period": "2025-12-31",
+        "page": 27
+      },
+      {
+        "dimension": "region",
+        "name": "中国境外",
+        "value": "2,923,008.17",
+        "unit": "万元",
+        "reported_period": "2025-12-31",
+        "page": 27
+      },
+      {
+        "dimension": "sales_mode",
+        "name": "直销",
+        "value": "885,079.29",
+        "unit": "万元",
+        "reported_period": "2025-12-31",
+        "page": 27
+      },
+      {
+        "dimension": "sales_mode",
+        "name": "经销",
+        "value": "4,501,317.46",
+        "unit": "万元",
+        "reported_period": "2025-12-31",
+        "page": 27
+      }
+    ]
+  },
+  "native_roles": [
+    {
+      "instrument_id": "600023.SH",
+      "name": "电力",
+      "role": "product_sales",
+      "page": 12,
+      "source_quote": "电力 万千瓦时 18,328,427.23 17,371,982.51",
+      "native_aliases": [
+        "电力"
+      ],
+      "requires_current_own_context": true
+    },
+    {
+      "instrument_id": "600023.SH",
+      "name": "热力",
+      "role": "product_sales",
+      "page": 12,
+      "source_quote": "热力 万吨 3548.72 3548.72",
+      "native_aliases": [
+        "热力"
+      ],
+      "requires_current_own_context": true
+    },
+    {
+      "instrument_id": "600023.SH",
+      "name": "背板",
+      "role": "product_sales",
+      "page": 12,
+      "source_quote": "背板 万平方米 6899.62 7190.52",
+      "native_aliases": [
+        "背板"
+      ],
+      "requires_current_own_context": true
+    },
+    {
+      "instrument_id": "600023.SH",
+      "name": "电池",
+      "role": "product_sales",
+      "page": 12,
+      "source_quote": "电池 MW 814.68 805.77",
+      "native_aliases": [
+        "电池"
+      ],
+      "requires_current_own_context": true
+    },
+    {
+      "instrument_id": "600023.SH",
+      "name": "组件",
+      "role": "product_sales",
+      "page": 12,
+      "source_quote": "组件 MW 2082.22 2126.66",
+      "native_aliases": [
+        "组件"
+      ],
+      "requires_current_own_context": true
+    },
+    {
+      "instrument_id": "600023.SH",
+      "name": "市场煤",
+      "role": "product_sales",
+      "page": 13,
+      "source_quote": "市场煤业务 286,336.52 437,035.03 -34.48",
+      "native_aliases": [
+        "市场煤"
+      ],
+      "requires_current_own_context": true
+    },
+    {
+      "instrument_id": "600023.SH",
+      "name": "煤炭",
+      "role": "raw_material_input",
+      "page": 26,
+      "source_quote": "煤炭成本在燃煤发电企业的发电成本中占比较大",
+      "native_aliases": [
+        "煤炭"
+      ],
+      "requires_current_own_context": true,
+      "requires_additional_quote": "公司装机结构中煤电占比高"
+    },
+    {
+      "instrument_id": "600060.SH",
+      "name": "显示产品",
+      "role": "product_sales",
+      "page": 28,
+      "source_quote": "显示产品 万台 3,037.43 3,055.19",
+      "native_aliases": [
+        "显示产品"
+      ],
+      "requires_current_own_context": true
+    },
+    {
+      "instrument_id": "600060.SH",
+      "name": "芯片",
+      "role": "product_sales",
+      "page": 23,
+      "source_quote": "在主流品\n牌客户中实现量产出货",
+      "native_aliases": [
+        "芯片"
+      ],
+      "requires_current_own_context": true,
+      "required_scope": "consolidated_group",
+      "actor_source": "公司战略控股信芯微、乾照光电两家上游芯片企业"
+    },
+    {
+      "instrument_id": "600060.SH",
+      "name": "AI 耳机",
+      "role": "product_sales",
+      "page": 24,
+      "source_quote": "开放式 AI 耳机 Vidda V11 国内上市销售",
+      "native_aliases": [
+        "AI耳机"
+      ],
+      "requires_current_own_context": true
+    }
+  ],
+  "answers": {
+    "600023.SH": {
+      "principal_business": {
+        "pages": [
+          9
+        ],
+        "substance": [
+          "煤电",
+          "气电",
+          "核电",
+          "热电联产",
+          "综合能源",
+          "公司取得中来股份控制权",
+          "中来股份为",
+          "光伏辅材",
+          "高效电池及组件",
+          "光伏应用"
+        ],
+        "actor_boundary": "中来股份业务可按合并范围叙述，必须保留子公司主语，不改成母公司直接生产活动"
+      },
+      "products_services": {
+        "pages": [
+          9,
+          12
+        ],
+        "substance": [
+          "煤电",
+          "气电",
+          "核电",
+          "热电联产",
+          "综合能源",
+          "公司取得中来股份控制权",
+          "中来股份为",
+          "光伏辅材",
+          "高效电池及组件",
+          "光伏应用"
+        ],
+        "actor_boundary": "集团混合业务需保留公司主营和中来股份主体边界"
+      },
+      "revenue_model": {
+        "pages": [
+          11,
+          12,
+          13,
+          18
+        ],
+        "substance": [
+          "电力",
+          "蒸汽",
+          "光伏产品",
+          "国家电网",
+          "市场化交易",
+          "收入确认：在某一时点确认"
+        ],
+        "mechanism": "电力销售及市场化交易（p13销售客户主要国家电网；p18煤机市场化交易），在某一时点确认是源表收入确认时点，不虚构成销售渠道"
+      }
+    },
+    "600060.SH": {
+      "principal_business": {
+        "pages": [
+          12
+        ],
+        "substance": [
+          "公司坚持",
+          "多场景大显示",
+          "公司持续深耕",
+          "智慧显示终端",
+          "激光显示",
+          "商用显示",
+          "芯片",
+          "云服务",
+          "同时积极布局"
+        ],
+        "actor_boundary": "当前战略定位及持续业务成立；积极布局/未来事项保持原句状态"
+      },
+      "products_services": {
+        "pages": [
+          12,
+          27
+        ],
+        "substance": [
+          "智慧显示终端",
+          "激光显示",
+          "商用显示",
+          "芯片",
+          "云服务",
+          "公司持续深耕",
+          "同时积极布局"
+        ],
+        "actor_boundary": "新显示新业务组成来自p12/p27，计划布局的智能穿戴等不作为既成核心产品"
+      },
+      "revenue_model": {
+        "pages": [
+          27
+        ],
+        "substance": [
+          "智慧显示终端",
+          "新显示新业务",
+          "直销",
+          "经销"
+        ],
+        "mechanism": "产品/业务收入组成及实际直销、经销渠道"
+      }
+    }
+  },
+  "source_scope": "Six substantive business answer disclosures, sixteen current main income rows and ten explicit native product-sale/input roles. Source-native yuan and ten-thousand-yuan units retained. Product names in formal volume table count role only; quantities/cost breakdown deferred. Market coal trade revenue is sales evidence, not coal grade or quantity. Display product role is one parent disclosure: TV/laser/projection/Micro LED/smart screens/monitors are not extra duplicate product-role entries. Chip sales and AI earphone sales are separate current native goods; no plan-only robot or inferred panel input. No whole-report or no-role assertion.",
+  "no_preset_scores": true,
+  "recall_method": "Substantive source requirements, not answered state. A wrong/incomplete delivered answer is an accuracy object and an absent required substantive answer for recall. Wrong source rows/roles likewise do not count recalled. Measurement copies accuracy only."
+}
