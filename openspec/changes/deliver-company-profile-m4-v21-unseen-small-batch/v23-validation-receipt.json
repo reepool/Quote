@@ -1,0 +1,42 @@
+{
+  "tests": {
+    "passed": 48,
+    "warnings": 7,
+    "seconds": 11.03,
+    "command": "/home/python/miniconda3/envs/Quote/bin/python -m pytest -q tests/unit/test_research/test_company_profile_v20_identity.py tests/unit/test_research/test_company_profile_v22_energy_display.py",
+    "log_sha256": "333098a2c2d2334dfcc3f05d2cf8bd523ab93722a2ac3491e613dc2265e5db2a"
+  },
+  "openspec_strict": true,
+  "diff_check": true,
+  "review": {
+    "method": "manual_uncommitted_diff",
+    "blocking_findings": [],
+    "pre_existing_failures": "unchanged; postponed"
+  },
+  "protected_files_unchanged": 587,
+  "original_582_files_unchanged": true,
+  "formal_execution_index": 1,
+  "first_execute_to_second_export_seconds": 186.53159573860466,
+  "source_recall": {
+    "status": "assessed",
+    "numerator": 32,
+    "denominator": 32,
+    "value": 1.0
+  },
+  "source_accuracy": {
+    "status": "assessed",
+    "numerator": 57,
+    "denominator": 57,
+    "value": 1.0
+  },
+  "critical_numeric_errors": {
+    "status": "assessed",
+    "value": 0
+  },
+  "runtime_no_scope_reuse": true,
+  "a_role_acceptance": "pending",
+  "change_archived": false,
+  "next_batch": "paused_pending_a_role",
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false
+}

@@ -29,17 +29,20 @@ def _page(instrument, number):
 
 @pytest.mark.parametrize("instrument", ["600023.SH", "600060.SH"])
 @pytest.mark.parametrize("page_variant", ["pages", "owner_parser_pages"])
+@pytest.mark.parametrize("repair_version", ["v22", "v23"])
 def test_full_frozen_pages_accept_query_export_substantive_answers_rows_roles(
-    tmp_path, instrument, page_variant
+    tmp_path, instrument, page_variant, repair_version
 ):
     fixture = _fixture(instrument)
-    for profile in _drive(
+    profiles = _drive(
         tmp_path,
         instrument=instrument,
         fixture=fixture,
         pages=fixture[page_variant],
-        repair_version="v22",
-    ):
+        repair_version=repair_version,
+    )
+    assert profiles[0] == profiles[1]
+    for profile in profiles:
         facts = profile["accepted_facts"]
         for dimension in ("principal_business", "products_services"):
             text = _answer(profile, dimension)
@@ -161,7 +164,10 @@ def test_full_frozen_pages_accept_query_export_substantive_answers_rows_roles(
 
 
 @pytest.mark.parametrize("subject", ["子公司", "第三方公司", "公司拟", "公司计划"])
-def test_current_business_narrative_rejects_other_subjects_and_plans(tmp_path, subject):
+@pytest.mark.parametrize("repair_version", ["v22", "v23"])
+def test_current_business_narrative_rejects_other_subjects_and_plans(
+    tmp_path, subject, repair_version
+):
     page = _page("600060.SH", 12)
     # The complete business section is kept, including its own boundary and future layout.
     end = page["text"].index("二、报告期内公司所处行业情况")
@@ -175,7 +181,7 @@ def test_current_business_narrative_rejects_other_subjects_and_plans(tmp_path, s
         instrument="600060.SH",
         fixture=_fixture("600060.SH"),
         pages=[{**page, "text": text}],
-        repair_version="v22",
+        repair_version=repair_version,
     ):
         assert not _answer(profile, "principal_business")
         assert not _answer(profile, "products_services")
@@ -214,8 +220,9 @@ def test_shipped_products_keep_group_and_company_context_without_external_plans(
 
 @pytest.mark.parametrize("subject", ["子公司", "第三方公司", "公司拟", "公司计划"])
 @pytest.mark.parametrize("instrument", ["600023.SH", "600060.SH"])
+@pytest.mark.parametrize("repair_version", ["v22", "v23"])
 def test_full_page_negative_role_contexts_do_not_enter_query_export(
-    tmp_path, subject, instrument
+    tmp_path, subject, instrument, repair_version
 ):
     fixture = _fixture(instrument)
     replacements = (
@@ -249,7 +256,7 @@ def test_full_page_negative_role_contexts_do_not_enter_query_export(
         instrument=instrument,
         fixture=fixture,
         pages=pages,
-        repair_version="v22",
+        repair_version=repair_version,
     ):
         names = {
             x["source_native_name"]
