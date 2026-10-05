@@ -113,6 +113,8 @@ def form_core_skeleton(
 
 def select_activated_chapters(
     pages: Sequence[ReportPageText | Mapping[str, Any]],
+    *,
+    source_delivery_repair: bool = False,
 ) -> tuple[ActivatedChapter, ...]:
     """Return which existing chapter tasks the source actually supports."""
 
@@ -123,7 +125,12 @@ def select_activated_chapters(
     has_segment = any(
         owned_section_heading(text, CORE_SEGMENT_HEADINGS) for text in texts
     )
-    has_material = any(explicit_material_input_names(text) for text in texts)
+    has_material = any(
+        explicit_material_input_names(
+            text, source_delivery_repair=source_delivery_repair
+        )
+        for text in texts
+    )
     has_quantity, quantity_negated = _quantity_heading_state(texts)
     activated: list[ActivatedChapter] = []
     for chapter in ChapterTask:

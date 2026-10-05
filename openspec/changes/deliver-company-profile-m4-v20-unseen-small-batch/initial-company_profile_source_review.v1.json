@@ -1,0 +1,973 @@
+{
+  "schema_version": "company_profile_source_review.v1",
+  "production_authorization": "not_authorized",
+  "live_run": {
+    "schema_version": "company_profile_live_run.v1",
+    "production_authorization": "not_authorized",
+    "knowledge_cutoff": "2026-09-17",
+    "plan": {
+      "schema_version": "company_profile_live_plan.v1",
+      "production_authorization": "not_authorized",
+      "plan_status": "recorded_before_live",
+      "live_task_started": false,
+      "budget": {
+        "max_companies_this_round": 2,
+        "min_companies_this_round": 0,
+        "token_budget": 50000,
+        "max_elapsed_seconds": 300.0,
+        "require_fifty_companies": false
+      },
+      "sampling": {
+        "method": "predeclared_stratified_sample",
+        "purpose": "independent_source_review",
+        "allocation": "priority_round_robin_then_instrument_id",
+        "selection_key": "instrument_id_ascending",
+        "missing_classification_stratum": "other",
+        "empty_stratum_policy": "keep_in_universe_skip_draw",
+        "exchange_strata": [
+          "SSE",
+          "SZSE",
+          "BSE"
+        ],
+        "disclosure_form_strata": [
+          "manufacturing",
+          "service",
+          "finance",
+          "other"
+        ],
+        "stratum_priority": [
+          [
+            "SSE",
+            "manufacturing"
+          ],
+          [
+            "SZSE",
+            "manufacturing"
+          ],
+          [
+            "BSE",
+            "manufacturing"
+          ],
+          [
+            "SSE",
+            "service"
+          ],
+          [
+            "SZSE",
+            "service"
+          ],
+          [
+            "BSE",
+            "service"
+          ],
+          [
+            "SSE",
+            "finance"
+          ],
+          [
+            "SZSE",
+            "finance"
+          ],
+          [
+            "BSE",
+            "finance"
+          ],
+          [
+            "SSE",
+            "other"
+          ],
+          [
+            "SZSE",
+            "other"
+          ],
+          [
+            "BSE",
+            "other"
+          ]
+        ],
+        "per_stratum_first_draw": 1,
+        "max_sample_size": 2,
+        "review_eligible_asset_status": "available",
+        "review_requires_latest_effective_annual_report": true,
+        "excludes_from_universe": false,
+        "used_to_fit_thresholds": false
+      },
+      "universe_denominator": {
+        "policy_version": "a_share_full_market.v1",
+        "exchanges": [
+          "SSE",
+          "SZSE",
+          "BSE"
+        ],
+        "as_of": "declared_at_run_from_knowledge_cutoff",
+        "includes_missing_assets": true,
+        "includes_missing_classification": true
+      },
+      "recall_denominator": {
+        "definition": "independently_read_important_disclosures_from_sampled_official_reports",
+        "forbidden_sources": [
+          "model_listed_fields",
+          "evidence_id_existence",
+          "gold24_equality"
+        ]
+      },
+      "expansion_thresholds": {
+        "numeric_thresholds_basis": "operator_cost_constraint",
+        "min_independently_reviewed_reports": 2,
+        "min_occupied_strata_reviewed": 2,
+        "min_source_recall_ratio": 1.0,
+        "min_source_accuracy_ratio": 1.0,
+        "max_critical_numeric_errors": 0,
+        "max_tokens": 50000,
+        "max_elapsed_seconds": 300.0,
+        "max_companies_this_expansion": 2,
+        "scale_quality_claim_allowed": false,
+        "fitted_from_observed_results": false,
+        "fixture_guards_are_not_live_quality": true,
+        "gold24_equality_is_not_a_threshold": true,
+        "untriggered_negatives_are_not_passes": true,
+        "expansion_requires_independent_source_review": true
+      }
+    },
+    "selected_instrument_ids": [
+      "600021.SH",
+      "600059.SH"
+    ],
+    "selected_strata": [
+      {
+        "instrument_id": "600021.SH",
+        "exchange": "SSE",
+        "disclosure_form": "service"
+      },
+      {
+        "instrument_id": "600059.SH",
+        "exchange": "SSE",
+        "disclosure_form": "manufacturing"
+      }
+    ],
+    "universe": {
+      "policy_version": "a_share_full_market.v1",
+      "as_of": "2026-09-17",
+      "total": 5564,
+      "eligible": 5564,
+      "missing_asset": 89,
+      "missing_classification": 0,
+      "selected_for_run": 2,
+      "completed": 2,
+      "failed": 0,
+      "includes_missing_assets": true
+    },
+    "company_outcomes": [
+      {
+        "instrument_id": "600021.SH",
+        "outcome": "completed",
+        "supplement_incomplete": false,
+        "delivered": true,
+        "batch_rerun_triggered": false
+      },
+      {
+        "instrument_id": "600059.SH",
+        "outcome": "completed",
+        "supplement_incomplete": false,
+        "delivered": true,
+        "batch_rerun_triggered": false
+      }
+    ],
+    "whole_batch_rerun": false,
+    "scale_quality_claim_allowed": false,
+    "first_expansion_plan_id": null,
+    "frozen_report_references": []
+  },
+  "structural_checks": [],
+  "semantic_findings": [
+    {
+      "instrument_id": "600021.SH",
+      "aspect": "core_skeleton",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "answer:principal_business",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600021.SH",
+      "aspect": "core_skeleton",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "answer:products_services",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600021.SH",
+      "aspect": "core_skeleton",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "answer:revenue_model",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": false,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600021.SH",
+      "aspect": "core_skeleton",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-79dc8d97a2c09994:overview",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600021.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-9321e37a47f84394:activity:1",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": false,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600021.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-9321e37a47f84394:activity:2",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": false,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600021.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-69c58fcdb3c74064:segment:industry:电力行业",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600021.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-b36e908a4fb2fab7:revenue:industry:电力行业",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600021.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-69c58fcdb3c74064:segment:industry:其他行业",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600021.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-b36e908a4fb2fab7:revenue:industry:其他行业",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600021.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-69c58fcdb3c74064:segment:product:电力",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600021.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-b36e908a4fb2fab7:revenue:product:电力",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600021.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-69c58fcdb3c74064:segment:product:热力",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600021.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-b36e908a4fb2fab7:revenue:product:热力",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600021.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-69c58fcdb3c74064:segment:product:其他",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600021.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-b36e908a4fb2fab7:revenue:product:其他",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600021.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-69c58fcdb3c74064:segment:region:上海",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": false,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600021.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-b36e908a4fb2fab7:revenue:region:上海",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": false,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600021.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-69c58fcdb3c74064:segment:region:江苏地区",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600021.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-b36e908a4fb2fab7:revenue:region:江苏地区",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600021.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-69c58fcdb3c74064:segment:region:土耳其",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600021.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-b36e908a4fb2fab7:revenue:region:土耳其",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600021.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-69c58fcdb3c74064:segment:region:安徽地区",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600021.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-b36e908a4fb2fab7:revenue:region:安徽地区",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600021.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-69c58fcdb3c74064:segment:region:浙江地区",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600021.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-b36e908a4fb2fab7:revenue:region:浙江地区",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600021.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-69c58fcdb3c74064:segment:region:马耳他地区",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600021.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-b36e908a4fb2fab7:revenue:region:马耳他地区",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600021.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-69c58fcdb3c74064:segment:region:日本地区",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600021.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-b36e908a4fb2fab7:revenue:region:日本地区",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600021.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-69c58fcdb3c74064:segment:region:其他地区",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600021.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-b36e908a4fb2fab7:revenue:region:其他地区",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600021.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-69c58fcdb3c74064:segment:sales_mode:直销",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600021.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-b36e908a4fb2fab7:revenue:sales_mode:直销",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600021.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "missing-source-row:region:上海地区",
+      "disclosed_in_source": true,
+      "present_in_delivery": false,
+      "fact_accurate": null,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600021.SH",
+      "aspect": "commodity_role",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "native-role:电力:product_sales",
+      "disclosed_in_source": true,
+      "present_in_delivery": false,
+      "fact_accurate": null,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600021.SH",
+      "aspect": "commodity_role",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "native-role:热力:product_sales",
+      "disclosed_in_source": true,
+      "present_in_delivery": false,
+      "fact_accurate": null,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600021.SH",
+      "aspect": "commodity_role",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "native-role:标煤:raw_material_input",
+      "disclosed_in_source": true,
+      "present_in_delivery": false,
+      "fact_accurate": null,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600059.SH",
+      "aspect": "core_skeleton",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "answer:principal_business",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600059.SH",
+      "aspect": "core_skeleton",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "answer:products_services",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": false,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600059.SH",
+      "aspect": "core_skeleton",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "answer:revenue_model",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": false,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600059.SH",
+      "aspect": "core_skeleton",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-4881d8f2b0f7c19b:overview",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600059.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-76c968b54209e85e:activity:1",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600059.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-18bd051f86e5868a:segment:industry:酒类",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600059.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-232b0c9eb4597712:revenue:industry:酒类",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600059.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-18bd051f86e5868a:segment:industry:其他",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600059.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-232b0c9eb4597712:revenue:industry:其他",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600059.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-18bd051f86e5868a:segment:product:中高档酒",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600059.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-232b0c9eb4597712:revenue:product:中高档酒",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600059.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-18bd051f86e5868a:segment:product:普通酒",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600059.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-232b0c9eb4597712:revenue:product:普通酒",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600059.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-18bd051f86e5868a:segment:product:玻璃制品",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600059.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-232b0c9eb4597712:revenue:product:玻璃制品",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600059.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-18bd051f86e5868a:segment:product:其他产品",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600059.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-232b0c9eb4597712:revenue:product:其他产品",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600059.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-18bd051f86e5868a:segment:region:国内",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600059.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-232b0c9eb4597712:revenue:region:国内",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600059.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-18bd051f86e5868a:segment:region:国外",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600059.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-232b0c9eb4597712:revenue:region:国外",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600059.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-18bd051f86e5868a:segment:sales_mode:直销",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600059.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-232b0c9eb4597712:revenue:sales_mode:直销",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600059.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-18bd051f86e5868a:segment:sales_mode:批发",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600059.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-232b0c9eb4597712:revenue:sales_mode:批发",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600059.SH",
+      "aspect": "commodity_role",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "native-role:黄酒:product_sales",
+      "disclosed_in_source": true,
+      "present_in_delivery": false,
+      "fact_accurate": null,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600059.SH",
+      "aspect": "commodity_role",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "native-role:糯米:raw_material_input",
+      "disclosed_in_source": true,
+      "present_in_delivery": false,
+      "fact_accurate": null,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600059.SH",
+      "aspect": "commodity_role",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "native-role:小麦:raw_material_input",
+      "disclosed_in_source": true,
+      "present_in_delivery": false,
+      "fact_accurate": null,
+      "critical_numeric_error": false
+    }
+  ],
+  "fixture_guards": [],
+  "independently_reviewed_reports": 2,
+  "occupied_strata_reviewed": {
+    "status": "assessed",
+    "value": 2
+  },
+  "delivery_coverage": {
+    "universe_total": 5564,
+    "selected_for_run": 2,
+    "completed": 2,
+    "failed": 0,
+    "missing_asset": 89,
+    "semantic_status": "not_a_source_metric"
+  },
+  "source_recall": {
+    "status": "assessed",
+    "numerator": 29,
+    "denominator": 36,
+    "value": 0.8055555555555556
+  },
+  "source_accuracy": {
+    "status": "assessed",
+    "numerator": 52,
+    "denominator": 59,
+    "value": 0.8813559322033898
+  },
+  "critical_numeric_errors": {
+    "status": "assessed",
+    "value": 0
+  },
+  "freshness": [
+    {
+      "instrument_id": "600021.SH",
+      "report_period": "2025-12-31",
+      "published_at": "2026-04-13T16:00:00+00:00",
+      "knowledge_cutoff": "2026-09-17",
+      "available_at_cutoff": true
+    },
+    {
+      "instrument_id": "600059.SH",
+      "report_period": "2025-12-31",
+      "published_at": "2026-04-22T16:00:00+00:00",
+      "knowledge_cutoff": "2026-09-17",
+      "available_at_cutoff": true
+    }
+  ],
+  "workload": {
+    "tokens_used": {
+      "status": "assessed",
+      "value": 0
+    },
+    "elapsed_seconds": {
+      "status": "assessed",
+      "value": 195.69126701913774
+    },
+    "human_review_minutes": {
+      "status": "unassessed",
+      "value": null
+    }
+  },
+  "expansion_gates_met": false,
+  "scale_quality_claim_allowed": false,
+  "zero_recurrence_claimed": false
+}

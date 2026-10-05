@@ -487,6 +487,28 @@ def _industry_revenue_excerpt(records: Sequence[SemanticRecord]) -> str:
     # A genuine fee/collection narrative takes precedence over table labels.
     if any(isinstance(record, BusinessOverview) for record in records):
         return ""
+    products: list[str] = []
+    modes: list[str] = []
+    for record in records:
+        if not isinstance(record, Measurement):
+            continue
+        label = (record.segment_label or "").strip()
+        if not label or _is_skeleton_noise_segment(
+            dimension=record.segment_dimension, label=label, row_class=record.row_class
+        ):
+            continue
+        bucket = (
+            products
+            if record.segment_dimension == "product"
+            else modes if record.segment_dimension == "sales_mode" else None
+        )
+        if bucket is not None and label not in bucket:
+            bucket.append(label)
+    if products:
+        text = "营业收入分产品：" + "、".join(products)
+        if modes:
+            text += "\n销售模式：" + "、".join(modes)
+        return text
     found: list[str] = []
     for record in records:
         if not isinstance(record, Measurement):

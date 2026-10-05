@@ -439,7 +439,12 @@ class CompanyProfileStageRuntime:
                 state.processing_identity
             ),
         )
-        state.chapters = select_activated_chapters(state.pages)
+        state.chapters = select_activated_chapters(
+            state.pages,
+            source_delivery_repair=source_delivery_repair_requested(
+                state.processing_identity
+            ),
+        )
         state.provider_blocked = any(
             gap.code == "page_unreadable" for gap in state.evidence.gaps
         )

@@ -319,7 +319,25 @@ def select_core_evidence(
         spans.append(income.span)
     gaps.extend(income.gaps)
 
-    material = _select_material_span(normalized)
+    if source_delivery_repair and segment.span is not None:
+        income_source = _company_income_source(segment.span.excerpt)
+        if income_source:
+            spans.append(
+                CoreEvidenceSpan(
+                    page=segment.span.page,
+                    section_title="主营业务收入说明",
+                    excerpt=income_source,
+                    bounded_quote=segment.span.excerpt,
+                    continuation_pages=segment.span.continuation_pages,
+                    chapter_task=ChapterTask.EXTRACT_BUSINESS_OVERVIEW.value,
+                    field_ids=("business_overview_source", "explicit_activity"),
+                    context_complete=True,
+                )
+            )
+
+    material = _select_material_span(
+        normalized, source_delivery_repair=source_delivery_repair
+    )
     if material is not None:
         spans.append(material)
     if repair_revenue_sentence:
@@ -485,7 +503,23 @@ def _selection_for_owned_heading(
                 )
             )
         ):
-            excerpt, continuations, closed, gap = preview, [], True, None
+            # An already usable first page may still own a product matrix or
+            # operating model on the following page. Follow that section's
+            # real boundary before choosing its delivered sentences.
+            if (
+                substance_extra is _SOURCE_DELIVERY_SUBSTANCE
+                and not _cut_at_boundary(page.text[line_end:]).closed
+                and page.page + 1 in by_page
+            ):
+                excerpt, continuations, closed, gap = _collect_section(
+                    page,
+                    heading=heading,
+                    line_end=line_end,
+                    by_page=by_page,
+                    chapter_task=chapter_task,
+                )
+            else:
+                excerpt, continuations, closed, gap = preview, [], True, None
         else:
             excerpt, continuations, closed, gap = _collect_section(
                 page,
@@ -1264,7 +1298,11 @@ def project_owned_page_facts(
                 )
                 records.extend(_project_company_total_rows(selection, span))
         elif span.chapter_task == ChapterTask.EXTRACT_MATERIAL_INPUTS.value:
-            records.extend(_project_material_span(selection, span))
+            records.extend(
+                _project_material_span(
+                    selection, span, source_delivery_repair=source_delivery_repair
+                )
+            )
     if repair_revenue_sentence and chapter in (
         None,
         ChapterTask.EXTRACT_BUSINESS_OVERVIEW,
@@ -1325,6 +1363,7 @@ def _project_overview_span(
             or _company_as_narrative_source(span.excerpt)
             or _provider_narrative_source(span.excerpt)
             or _business_blocks_source(span.excerpt)
+            or _company_income_source(span.excerpt)
         )
         if delivered:
             company_sentence = delivered
@@ -1341,6 +1380,14 @@ def _project_overview_span(
             quote,
             heading=span.section_title,
         )
+        if source_delivery_repair and source_text:
+            supplements = _company_product_model_sources(span.excerpt)
+            start = span.excerpt.find(source_text)
+            ends = [span.excerpt.find(text) + len(text) for text in supplements]
+            if start >= 0 and ends:
+                # The contract requires one original continuous passage,
+                # including the intervening owned context, not stitched quotes.
+                source_text = span.excerpt[start : max(start + len(source_text), *ends)]
         if source_text:
             records.append(
                 _base_fact(
@@ -1386,6 +1433,8 @@ def _project_overview_span(
                 verb = "包括"
             elif "涵盖" in match.group(0):
                 verb = "涵盖"
+                if source_delivery_repair and re.search(r"参数|等级", match.group(1)):
+                    continue
             for raw in _activity_object_clauses(match.group(1)):
                 object_name, action, source_verb = _object_and_action(raw, verb)
                 if core_answer_repair and _SPEC_OBJECT.match(object_name):
@@ -1473,6 +1522,11 @@ def _project_segment_span(
     )
     if revenue_item is not None and isinstance(revenue_item.evidence.anchor, TextAnchor):
         quote = quote or revenue_item.evidence.anchor.bounded_quote
+    if core_answer_repair:
+        quote = _join_segment_label_amounts(
+            _join_pdf_soft_breaks(quote),
+            core_answer_repair=True,
+        )
     # The bounded quote carries the passage's own group wording (本集团…), which
     # the acceptance policy checks; bind the subject from that same text —
     # unless the table itself shows a narrower scope such as 母公司, which the
@@ -2001,6 +2055,28 @@ def _join_segment_label_amounts(
     """Attach a wrapped label to the amount line that follows it."""
 
     lines = text.splitlines()
+    if core_answer_repair:
+        # A row label and the final margin cell can both continue after a
+        # page header: 上海 <amounts> / <header> / 地区 个百分点.
+        # Only this explicit trailing label cell is joined, never a new row.
+        for row_index, line in enumerate(lines):
+            parsed = _parse_segment_row(line)
+            if parsed is None or parsed[0].endswith("地区"):
+                continue
+            cursor = row_index + 1
+            while cursor < len(lines) and cursor <= row_index + 4:
+                following = lines[cursor].strip()
+                if (
+                    not following
+                    or "年度报告" in following
+                    or re.fullmatch(r"\d+\s*/\s*\d+", following)
+                ):
+                    cursor += 1
+                    continue
+                if re.fullmatch(r"地区\s+个百分点", following):
+                    lines[row_index] = line.replace(parsed[0], parsed[0] + "地区", 1)
+                    lines[cursor] = "个百分点"
+                break
     merged: list[str] = []
     index = 0
     while index < len(lines):
@@ -2013,6 +2089,16 @@ def _join_segment_label_amounts(
         current = lines[index]
         nxt = lines[index + 1] if index + 1 < len(lines) else ""
         compact_label = re.sub(r"\s+", "", current)
+        next_row = _parse_segment_row(nxt) if core_answer_repair else None
+        if (
+            next_row is not None
+            and next_row[0] in {"行业", "地区"}
+            and re.fullmatch(r"[\u4e00-\u9fff]{1,12}", compact_label)
+            and not compact_label.endswith("百分点")
+        ):
+            merged.append(f"{compact_label}{nxt.strip()}")
+            index += 2
+            continue
         if (
             re.fullmatch(r"[\u4e00-\u9fff0-9/]{2,40}", compact_label)
             and not compact_label.endswith("百分点")
@@ -2245,7 +2331,9 @@ def _has_real_sales_action(stated: str) -> bool:
     return "销售" in _PSEUDO_SALES.sub("", stated) or "生产与销售" in stated
 
 
-def _formal_sales_product_names(excerpt: str) -> list[str]:
+def _formal_sales_product_names(
+    excerpt: str, *, owned_products: bool = False
+) -> list[str]:
     """Product names from a 生产量/销售量 table, one row at a time."""
 
     names: list[str] = []
@@ -2260,8 +2348,10 @@ def _formal_sales_product_names(excerpt: str) -> list[str]:
         if compact.startswith(("合计", "(")) or "产销量情况说明" in compact:
             in_table = False
             continue
-        match = re.match(r"([\u4e00-\u9fff]{2,12}?)(?:万吨|\d)", compact)
-        if match and "钢铁" in match.group(1):
+        match = re.match(
+            r"([\u4e00-\u9fff]{2,12}?)(?:亿千瓦时|万吉焦|万吨|\d)", compact
+        )
+        if match and ("钢铁" in match.group(1) or owned_products):
             names.append(match.group(1))
     return names
 
@@ -2428,7 +2518,14 @@ def _project_repair_commodity_span(
                     "7407073",
                 )
     if named_role_repair:
-        for name in _formal_sales_product_names(span.excerpt):
+        owned_products = source_delivery_repair and any(
+            candidate.chapter_task == ChapterTask.EXTRACT_SEGMENT_FINANCIALS.value
+            and span.page in (candidate.page, *candidate.continuation_pages)
+            for candidate in selection.spans
+        )
+        for name in _formal_sales_product_names(
+            span.excerpt, owned_products=owned_products
+        ):
             add_activity(name, ActivityAction.SELLS, "销售")
         if _domestic_scrap_clause(span.excerpt) and not core_answer_repair:
             add_activity("废钢", ActivityAction.PURCHASES, "采购")
@@ -2436,6 +2533,8 @@ def _project_repair_commodity_span(
         for name, channel in _supply_source_rows(span.excerpt):
             add_activity(name, ActivityAction.PURCHASES, "采购", header=channel)
     if source_delivery_repair:
+        for name in _company_sales_product_names(span.excerpt):
+            add_activity(name, ActivityAction.SELLS, "销售")
         for binding in _power_and_oil_bindings(span.excerpt):
             add_activity(
                 binding["name"],
@@ -2483,6 +2582,70 @@ def _integrated_business_source(excerpt: str) -> str:
         return ""
     compact = re.sub(r"\s+", "", match.group(0))
     return _original_span_matching(excerpt, compact) or ""
+
+
+def _current_company_sentence(sentence: str) -> bool:
+    return (
+        re.search(_COMPANY_SUBJECT, sentence) is not None
+        and re.search(
+            r"子公司|母公司|第三方|(?:客户|供应商)(?:公司|酿造|生产)", sentence
+        )
+        is None
+        and re.search(
+            r"(?:拟|计划|尚未|不再)[^。；;]{0,18}(?:作为|从事|生产|销售|构建|采用|有)"
+            r"|(?:不|未|没有|并无)(?:对外)?(?:销售|生产|采用|构建)",
+            sentence,
+        )
+        is None
+    )
+
+
+def _company_product_model_sources(excerpt: str) -> list[str]:
+    """Keep the owned, current product matrix and stated sales model whole."""
+
+    sources: list[str] = []
+    compact = re.sub(r"\s+", "", excerpt)
+    for sentence in re.split(r"(?<=。)", compact):
+        start = re.search(rf"(?<!第三方){_COMPANY_SUBJECT}(?:旗下|采用)", sentence)
+        if start is None:
+            continue
+        stated = sentence[start.start() :]
+        if not _current_company_sentence(stated):
+            continue
+        if "产品矩阵" not in stated and not ("销售模式" in stated and "采用" in stated):
+            continue
+        text = _original_span_matching(excerpt, stated)
+        if text:
+            sources.append(text)
+    return sources
+
+
+def _company_income_source(excerpt: str) -> str:
+    compact = re.sub(r"\s+", "", excerpt)
+    match = re.search(
+        rf"(?<!第三方){_COMPANY_SUBJECT}主营业务收入主要来[自源]于[^。]+。", compact
+    )
+    if match is None or not _current_company_sentence(
+        compact[max(0, compact.rfind("。", 0, match.start()) + 1) : match.end()]
+    ):
+        return ""
+    return _original_span_matching(excerpt, match.group(0))
+
+
+def _company_sales_product_names(excerpt: str) -> list[str]:
+    names: list[str] = []
+    compact = re.sub(r"\s+", "", excerpt)
+    for sentence in re.split(r"[。；;]", compact):
+        if not _current_company_sentence(sentence):
+            continue
+        for pattern in (
+            r"主要从事([\u4e00-\u9fff]{2,12})的(?:研发|酿造|生产)[、和及\u4e00-\u9fff]{0,20}销售",
+            r"公司有([\u4e00-\u9fff]{2,12})的生产[^。]{0,25}对外销售",
+        ):
+            match = re.search(pattern, sentence)
+            if match:
+                names.append(match.group(1))
+    return names
 
 
 def _main_business_source(excerpt: str) -> str:
@@ -2785,7 +2948,9 @@ def _company_business_source(excerpt: str) -> str:
     return _original_span_matching(excerpt, compact) or ""
 
 
-def explicit_material_input_names(text: str) -> tuple[str, ...]:
+def explicit_material_input_names(
+    text: str, *, source_delivery_repair: bool = False
+) -> tuple[str, ...]:
     """Return named materials the same sentence binds to the company's own input."""
 
     compact = re.sub(r"\s+", "", text)
@@ -2793,6 +2958,19 @@ def explicit_material_input_names(text: str) -> tuple[str, ...]:
     for sentence in re.split(r"[。；;]", compact):
         names.extend(_named_inputs_in_sentence(sentence))
         names.extend(_company_owned_material_lists(sentence))
+        if source_delivery_repair and _current_company_sentence(sentence):
+            cost_list = re.search(
+                rf"(?:酿造|生产)的主要原材料[（(]如(?P<list>{_LIST_BODY})[）)]",
+                sentence,
+            )
+            if cost_list and re.search(r"对(?:本)?公司的(?:盈利|成本)", sentence):
+                names.extend(_split_material_names(cost_list.group("list")))
+            furnace = re.search(
+                r"公司(?:合并口径)?入炉([\u4e00-\u9fff]{1,8}?)(?:单价|成本|消耗)",
+                sentence,
+            )
+            if furnace:
+                names.append(furnace.group(1))
     for match in _COMPANY_PROCUREMENT.finditer(compact):
         names.append(match.group(1))
     unique: list[str] = []
@@ -2884,9 +3062,13 @@ def _company_owned_material_lists(sentence: str) -> list[str]:
 
 def _select_material_span(
     pages: Sequence[ReportPageText],
+    *,
+    source_delivery_repair: bool = False,
 ) -> CoreEvidenceSpan | None:
     for page in pages:
-        if not page.readable or not explicit_material_input_names(page.text):
+        if not page.readable or not explicit_material_input_names(
+            page.text, source_delivery_repair=source_delivery_repair
+        ):
             continue
         section_title, quote = _material_quote(page.text)
         return CoreEvidenceSpan(
@@ -2930,12 +3112,16 @@ def _material_section(text: str, quote: str) -> str:
 def _project_material_span(
     selection: CoreEvidenceSelection,
     span: CoreEvidenceSpan,
+    *,
+    source_delivery_repair: bool = False,
 ) -> tuple[SemanticRecord, ...]:
     item = _prepared_for(selection, span, "material_input")
     if item is None:
         return ()
     records: list[SemanticRecord] = []
-    for name in explicit_material_input_names(span.excerpt):
+    for name in explicit_material_input_names(
+        span.excerpt, source_delivery_repair=source_delivery_repair
+    ):
         records.append(
             _base_fact(
                 Relationship,

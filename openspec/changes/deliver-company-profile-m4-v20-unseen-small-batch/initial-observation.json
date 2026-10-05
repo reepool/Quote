@@ -1,0 +1,22 @@
+{
+  "plan_id": "bcff2a299d9c7bd0197638f27aec1a1880c56ce68b2df7c3456c351626f3252f",
+  "knowledge_cutoff": "2026-09-17",
+  "token_budget": 50000,
+  "tokens_consumed": 0,
+  "outcomes": [
+    {
+      "instrument_id": "600021.SH",
+      "status": "completed",
+      "tokens_consumed": 0,
+      "reused_scope": false,
+      "reason": null
+    },
+    {
+      "instrument_id": "600059.SH",
+      "status": "completed",
+      "tokens_consumed": 0,
+      "reused_scope": false,
+      "reason": null
+    }
+  ]
+}

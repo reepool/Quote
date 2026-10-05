@@ -1,0 +1,1334 @@
+{
+  "plan_id": "bcff2a299d9c7bd0197638f27aec1a1880c56ce68b2df7c3456c351626f3252f",
+  "processing_identity": {
+    "rules": "company_profile_common_core.v1",
+    "owned_page_facts": "v8",
+    "material_input_facts": "v1",
+    "revenue_sentence_repair": "v20"
+  },
+  "formal_execution_index": 1,
+  "whole_round_seconds": 195.69126701913774,
+  "source_recall": {
+    "status": "assessed",
+    "numerator": 29,
+    "denominator": 36,
+    "value": 0.8055555555555556
+  },
+  "source_accuracy": {
+    "status": "assessed",
+    "numerator": 52,
+    "denominator": 59,
+    "value": 0.8813559322033898
+  },
+  "critical_numeric_errors": {
+    "status": "assessed",
+    "value": 0
+  },
+  "workload": {
+    "tokens_used": {
+      "status": "assessed",
+      "value": 0
+    },
+    "elapsed_seconds": {
+      "status": "assessed",
+      "value": 195.69126701913774
+    },
+    "human_review_minutes": {
+      "status": "unassessed",
+      "value": null
+    }
+  },
+  "expansion_gates_met": false,
+  "actual_accepted_fact_count": 53,
+  "answered_text_count": 6,
+  "source_rows": {
+    "600021.SH": [
+      {
+        "dimension": "industry",
+        "name": "电力行业",
+        "value": "41,067,548,992.30",
+        "unit": "元",
+        "page": 16
+      },
+      {
+        "dimension": "industry",
+        "name": "其他行业",
+        "value": "197,629,864.16",
+        "unit": "元",
+        "page": 16
+      },
+      {
+        "dimension": "product",
+        "name": "电力",
+        "value": "38,318,064,374.94",
+        "unit": "元",
+        "page": 16
+      },
+      {
+        "dimension": "product",
+        "name": "热力",
+        "value": "2,205,459,296.22",
+        "unit": "元",
+        "page": 16
+      },
+      {
+        "dimension": "product",
+        "name": "其他",
+        "value": "741,655,185.30",
+        "unit": "元",
+        "page": 16
+      },
+      {
+        "dimension": "region",
+        "name": "上海地区",
+        "value": "13,671,762,626.89",
+        "unit": "元",
+        "page": 16
+      },
+      {
+        "dimension": "region",
+        "name": "江苏地区",
+        "value": "12,201,395,146.49",
+        "unit": "元",
+        "page": 17
+      },
+      {
+        "dimension": "region",
+        "name": "土耳其",
+        "value": "5,190,407,424.19",
+        "unit": "元",
+        "page": 17
+      },
+      {
+        "dimension": "region",
+        "name": "安徽地区",
+        "value": "3,504,524,363.39",
+        "unit": "元",
+        "page": 17
+      },
+      {
+        "dimension": "region",
+        "name": "浙江地区",
+        "value": "2,357,907,447.75",
+        "unit": "元",
+        "page": 17
+      },
+      {
+        "dimension": "region",
+        "name": "马耳他地区",
+        "value": "579,550,341.74",
+        "unit": "元",
+        "page": 17
+      },
+      {
+        "dimension": "region",
+        "name": "日本地区",
+        "value": "781,328,518.28",
+        "unit": "元",
+        "page": 17
+      },
+      {
+        "dimension": "region",
+        "name": "其他地区",
+        "value": "2,978,302,987.73",
+        "unit": "元",
+        "page": 17
+      },
+      {
+        "dimension": "sales_mode",
+        "name": "直销",
+        "value": "41,265,178,856.46",
+        "unit": "元",
+        "page": 17
+      }
+    ],
+    "600059.SH": [
+      {
+        "dimension": "industry",
+        "name": "酒类",
+        "value": "1,801,700,702.70",
+        "unit": "元",
+        "page": 13
+      },
+      {
+        "dimension": "industry",
+        "name": "其他",
+        "value": "316,414.52",
+        "unit": "元",
+        "page": 13
+      },
+      {
+        "dimension": "product",
+        "name": "中高档酒",
+        "value": "1,328,589,266.11",
+        "unit": "元",
+        "page": 13
+      },
+      {
+        "dimension": "product",
+        "name": "普通酒",
+        "value": "473,111,436.59",
+        "unit": "元",
+        "page": 13
+      },
+      {
+        "dimension": "product",
+        "name": "玻璃制品",
+        "value": "299,223.08",
+        "unit": "元",
+        "page": 13
+      },
+      {
+        "dimension": "product",
+        "name": "其他产品",
+        "value": "17,191.44",
+        "unit": "元",
+        "page": 13
+      },
+      {
+        "dimension": "region",
+        "name": "国内",
+        "value": "1,761,795,214.53",
+        "unit": "元",
+        "page": 13
+      },
+      {
+        "dimension": "region",
+        "name": "国外",
+        "value": "40,221,902.69",
+        "unit": "元",
+        "page": 13
+      },
+      {
+        "dimension": "sales_mode",
+        "name": "直销",
+        "value": "449,043,996.71",
+        "unit": "元",
+        "page": 13
+      },
+      {
+        "dimension": "sales_mode",
+        "name": "批发",
+        "value": "1,352,973,120.51",
+        "unit": "元",
+        "page": 13
+      }
+    ]
+  },
+  "object_reviews": [
+    {
+      "instrument_id": "600021.SH",
+      "object_id": "answer:principal_business",
+      "present": true,
+      "accurate": true,
+      "text": "报告期内公司从事的业务情况\n上海电力致力于做绿色低碳行动的先行者和示范者，是集清洁能源、新能源、综合智慧能源\r\n科技研发、现代电力供应和服务业于一体的创新型、国际化现代能源企业，是中国五大发电集团\r\n之一国家电投集团旗下最主要的\r\n上市公司之一，也是上海市最主\r\n要的综合能源供应商和上海市最\r\n大的供热企业。\r\n2025 年度公司主要业务情况\r\n如下：\r\n1.发电业务\r\n发电业务是公司的核心业务。\r\n截至 2025 年 12 月底，公司控股\r\n装机容量为 2632.13 万千瓦，清洁\r\n能源占装机规模的 62.59%，其中：\r\n煤电 984.80 万千瓦、占比 37.41%，\r\n气电 382.51 万千瓦、占比 14.53%，风电 539.81 万千瓦、占比 20.51%，光伏发电 725.01 万千瓦、\r\n占比 27.55%。\n上海电力股份有限公司2025 年年度报告\r\n11 / 310\r\n煤电板块形成了 60 万千瓦、100 万千瓦为主的燃煤机组系列，涵盖了超临界、超超临界参数\r\n等级。气电板块形成了 E、F、H 级燃气轮机以及分布式供能小型内燃机等燃机系列，运行绩效优\r\n秀。新能源装机 1264.82 万千瓦。公司境内在运机组广泛分布在全国 24 个省市，其中经济发达的\r\n长三角地区装机占境内装机比例 79.34%。国际化发展成效显著，境外项目在运装机容量 213.37\r\n万千瓦，拥有土耳其、马耳他、匈牙利、日本等一批高质量项目。\r\n2025 年 1-12 月，公司完成合并口径发电量 782.32 亿千瓦时，同比上升 1.41%，其中煤电完\r\n成 510.06 亿千瓦时，同比下降 1.87%，气电完成 78.04 亿千瓦时，同比下降 14.22%，风电完成 115.09\r\n亿千瓦时，同比上升 19.05%，光伏发电完成 79.13 亿千瓦时，同比上升 23.58%；上网电量 749.60\r\n亿千瓦时，同比上升 1.42%。2025 年 1-12 月份，市场燃料价格有所下降，公司合并口径入炉标煤\r\n单价（含税）966.98 元/吨，同比下降 13.10%。\r\n2.热力业务\r\n热力业务是公司的重要业务，在沪机组供热量约占上海公用电厂供热量的一半。公司售热业\r\n务主要集中于上海地区，热力收入主要来自公司所属漕泾热电、漕泾电厂、外高桥发电等电厂，\r\n主要服务对象为重点工业企业。公司热电联供机组容量较大、效率较高，处于国内外同类设备先\r\n进水平。2025 年度，公司供热量 2166.16 万吉焦，同比增长 8.95%。\r\n3.新兴产业\r\n公司新兴产业多点布局，赋能新质生产力发展。吴泾独立储能项目于 2025 年全容量并网。公\r\n司稳步推进综合智慧能源，上海前滩、世博、西岸、临港机场南片区（一期）能源站已投运，供\r\n能面积 400 万平方米。上海长兴岛 CCUS 创新示范项目连续稳定运行，已累计捕集二氧化碳超 16\r\n万吨，创造并保持了火电行业碳捕集与利用装置连续运行的最长记录，成为老旧煤电机组转型发\r\n展的成功实践案例。漕泾电厂百万煤电机组成功掺烧芦竹生物质，实现全炉 22%热值比例掺烧，\r\n为低碳技术应用探路先行。\r\n报告期内公司新增重要非主营业务的说明\r\n□适用 √不适用",
+      "source_pages": [
+        10,
+        11,
+        16,
+        17
+      ],
+      "rationale": "Company-owned current business narrative compared with original continuous pages."
+    },
+    {
+      "instrument_id": "600021.SH",
+      "object_id": "answer:products_services",
+      "present": true,
+      "accurate": true,
+      "text": "报告期内公司从事的业务情况\n上海电力致力于做绿色低碳行动的先行者和示范者，是集清洁能源、新能源、综合智慧能源\r\n科技研发、现代电力供应和服务业于一体的创新型、国际化现代能源企业，是中国五大发电集团\r\n之一国家电投集团旗下最主要的\r\n上市公司之一，也是上海市最主\r\n要的综合能源供应商和上海市最\r\n大的供热企业。\r\n2025 年度公司主要业务情况\r\n如下：\r\n1.发电业务\r\n发电业务是公司的核心业务。\r\n截至 2025 年 12 月底，公司控股\r\n装机容量为 2632.13 万千瓦，清洁\r\n能源占装机规模的 62.59%，其中：\r\n煤电 984.80 万千瓦、占比 37.41%，\r\n气电 382.51 万千瓦、占比 14.53%，风电 539.81 万千瓦、占比 20.51%，光伏发电 725.01 万千瓦、\r\n占比 27.55%。\n上海电力股份有限公司2025 年年度报告\r\n11 / 310\r\n煤电板块形成了 60 万千瓦、100 万千瓦为主的燃煤机组系列，涵盖了超临界、超超临界参数\r\n等级。气电板块形成了 E、F、H 级燃气轮机以及分布式供能小型内燃机等燃机系列，运行绩效优\r\n秀。新能源装机 1264.82 万千瓦。公司境内在运机组广泛分布在全国 24 个省市，其中经济发达的\r\n长三角地区装机占境内装机比例 79.34%。国际化发展成效显著，境外项目在运装机容量 213.37\r\n万千瓦，拥有土耳其、马耳他、匈牙利、日本等一批高质量项目。\r\n2025 年 1-12 月，公司完成合并口径发电量 782.32 亿千瓦时，同比上升 1.41%，其中煤电完\r\n成 510.06 亿千瓦时，同比下降 1.87%，气电完成 78.04 亿千瓦时，同比下降 14.22%，风电完成 115.09\r\n亿千瓦时，同比上升 19.05%，光伏发电完成 79.13 亿千瓦时，同比上升 23.58%；上网电量 749.60\r\n亿千瓦时，同比上升 1.42%。2025 年 1-12 月份，市场燃料价格有所下降，公司合并口径入炉标煤\r\n单价（含税）966.98 元/吨，同比下降 13.10%。\r\n2.热力业务\r\n热力业务是公司的重要业务，在沪机组供热量约占上海公用电厂供热量的一半。公司售热业\r\n务主要集中于上海地区，热力收入主要来自公司所属漕泾热电、漕泾电厂、外高桥发电等电厂，\r\n主要服务对象为重点工业企业。公司热电联供机组容量较大、效率较高，处于国内外同类设备先\r\n进水平。2025 年度，公司供热量 2166.16 万吉焦，同比增长 8.95%。\r\n3.新兴产业\r\n公司新兴产业多点布局，赋能新质生产力发展。吴泾独立储能项目于 2025 年全容量并网。公\r\n司稳步推进综合智慧能源，上海前滩、世博、西岸、临港机场南片区（一期）能源站已投运，供\r\n能面积 400 万平方米。上海长兴岛 CCUS 创新示范项目连续稳定运行，已累计捕集二氧化碳超 16\r\n万吨，创造并保持了火电行业碳捕集与利用装置连续运行的最长记录，成为老旧煤电机组转型发\r\n展的成功实践案例。漕泾电厂百万煤电机组成功掺烧芦竹生物质，实现全炉 22%热值比例掺烧，\r\n为低碳技术应用探路先行。\r\n报告期内公司新增重要非主营业务的说明\r\n□适用 √不适用",
+      "source_pages": [
+        10,
+        11,
+        16,
+        17
+      ],
+      "rationale": "Company-owned current business narrative compared with original continuous pages."
+    },
+    {
+      "instrument_id": "600021.SH",
+      "object_id": "answer:revenue_model",
+      "present": true,
+      "accurate": false,
+      "text": "电力行业、其他行业",
+      "source_pages": [
+        10,
+        11,
+        16,
+        17
+      ],
+      "rationale": "Only 电力行业、其他行业; source product table specifically shows electricity and heat as the delivered service and revenue substance."
+    },
+    {
+      "instrument_id": "600021.SH",
+      "object_id": "owned:core-ev-79dc8d97a2c09994:overview",
+      "object_type": "BusinessOverview",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        10
+      ],
+      "text": "报告期内公司从事的业务情况\n上海电力致力于做绿色低碳行动的先行者和示范者，是集清洁能源、新能源、综合智慧能源\r\n科技研发、现代电力供应和服务业于一体的创新型、国际化现代能源企业，是中国五大发电集团\r\n之一国家电投集团旗下最主要的\r\n上市公司之一，也是上海市最主\r\n要的综合能源供应商和上海市最\r\n大的供热企业。\r\n2025 年度公司主要业务情况\r\n如下：\r\n1.发电业务\r\n发电业务是公司的核心业务。\r\n截至 2025 年 12 月底，公司控股\r\n装机容量为 2632.13 万千瓦，清洁\r\n能源占装机规模的 62.59%，其中：\r\n煤电 984.80 万千瓦、占比 37.41%，\r\n气电 382.51 万千瓦、占比 14.53%，风电 539.81 万千瓦、占比 20.51%，光伏发电 725.01 万千瓦、\r\n占比 27.55%。\n上海电力股份有限公司2025 年年度报告\r\n11 / 310\r\n煤电板块形成了 60 万千瓦、100 万千瓦为主的燃煤机组系列，涵盖了超临界、超超临界参数\r\n等级。气电板块形成了 E、F、H 级燃气轮机以及分布式供能小型内燃机等燃机系列，运行绩效优\r\n秀。新能源装机 1264.82 万千瓦。公司境内在运机组广泛分布在全国 24 个省市，其中经济发达的\r\n长三角地区装机占境内装机比例 79.34%。国际化发展成效显著，境外项目在运装机容量 213.37\r\n万千瓦，拥有土耳其、马耳他、匈牙利、日本等一批高质量项目。\r\n2025 年 1-12 月，公司完成合并口径发电量 782.32 亿千瓦时，同比上升 1.41%，其中煤电完\r\n成 510.06 亿千瓦时，同比下降 1.87%，气电完成 78.04 亿千瓦时，同比下降 14.22%，风电完成 115.09\r\n亿千瓦时，同比上升 19.05%，光伏发电完成 79.13 亿千瓦时，同比上升 23.58%；上网电量 749.60\r\n亿千瓦时，同比上升 1.42%。2025 年 1-12 月份，市场燃料价格有所下降，公司合并口径入炉标煤\r\n单价（含税）966.98 元/吨，同比下降 13.10%。\r\n2.热力业务\r\n热力业务是公司的重要业务，在沪机组供热量约占上海公用电厂供热量的一半。公司售热业\r\n务主要集中于上海地区，热力收入主要来自公司所属漕泾热电、漕泾电厂、外高桥发电等电厂，\r\n主要服务对象为重点工业企业。公司热电联供机组容量较大、效率较高，处于国内外同类设备先\r\n进水平。2025 年度，公司供热量 2166.16 万吉焦，同比增长 8.95%。\r\n3.新兴产业\r\n公司新兴产业多点布局，赋能新质生产力发展。吴泾独立储能项目于 2025 年全容量并网。公\r\n司稳步推进综合智慧能源，上海前滩、世博、西岸、临港机场南片区（一期）能源站已投运，供\r\n能面积 400 万平方米。上海长兴岛 CCUS 创新示范项目连续稳定运行，已累计捕集二氧化碳超 16\r\n万吨，创造并保持了火电行业碳捕集与利用装置连续运行的最长记录，成为老旧煤电机组转型发\r\n展的成功实践案例。漕泾电厂百万煤电机组成功掺烧芦竹生物质，实现全炉 22%热值比例掺烧，\r\n为低碳技术应用探路先行。\r\n报告期内公司新增重要非主营业务的说明\r\n□适用 √不适用",
+      "rationale": "Accepted continuous owned overview is faithful; dimension answers separately checked for substantive completeness."
+    },
+    {
+      "instrument_id": "600021.SH",
+      "object_id": "owned:core-ev-9321e37a47f84394:activity:1",
+      "object_type": "Activity",
+      "present": true,
+      "accurate": false,
+      "source_pages": [
+        10
+      ],
+      "text": "了超临界",
+      "rationale": "Source says coal unit series covers supercritical technical parameter levels. 了超临界 and 超超临界参数 are not company business/product objects; direct company actor is incorrectly invented."
+    },
+    {
+      "instrument_id": "600021.SH",
+      "object_id": "owned:core-ev-9321e37a47f84394:activity:2",
+      "object_type": "Activity",
+      "present": true,
+      "accurate": false,
+      "source_pages": [
+        10
+      ],
+      "text": "超超临界参数",
+      "rationale": "Source says coal unit series covers supercritical technical parameter levels. 了超临界 and 超超临界参数 are not company business/product objects; direct company actor is incorrectly invented."
+    },
+    {
+      "instrument_id": "600021.SH",
+      "object_id": "owned:core-ev-69c58fcdb3c74064:segment:industry:电力行业",
+      "object_type": "Segment",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        16
+      ],
+      "text": {
+        "source_native_name": "电力行业",
+        "source_native_value": "41,067,548,992.30",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Independently transcribed source dimension, row, current revenue, 元 and period. Segment recall once; Measurement accuracy only."
+    },
+    {
+      "instrument_id": "600021.SH",
+      "object_id": "owned:core-ev-b36e908a4fb2fab7:revenue:industry:电力行业",
+      "object_type": "Measurement",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        16
+      ],
+      "text": {
+        "source_native_name": "电力行业",
+        "source_native_value": "41,067,548,992.30",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Independently transcribed source dimension, row, current revenue, 元 and period. Segment recall once; Measurement accuracy only."
+    },
+    {
+      "instrument_id": "600021.SH",
+      "object_id": "owned:core-ev-69c58fcdb3c74064:segment:industry:其他行业",
+      "object_type": "Segment",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        16
+      ],
+      "text": {
+        "source_native_name": "其他行业",
+        "source_native_value": "197,629,864.16",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Independently transcribed source dimension, row, current revenue, 元 and period. Segment recall once; Measurement accuracy only."
+    },
+    {
+      "instrument_id": "600021.SH",
+      "object_id": "owned:core-ev-b36e908a4fb2fab7:revenue:industry:其他行业",
+      "object_type": "Measurement",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        16
+      ],
+      "text": {
+        "source_native_name": "其他行业",
+        "source_native_value": "197,629,864.16",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Independently transcribed source dimension, row, current revenue, 元 and period. Segment recall once; Measurement accuracy only."
+    },
+    {
+      "instrument_id": "600021.SH",
+      "object_id": "owned:core-ev-69c58fcdb3c74064:segment:product:电力",
+      "object_type": "Segment",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        16
+      ],
+      "text": {
+        "source_native_name": "电力",
+        "source_native_value": "38,318,064,374.94",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Independently transcribed source dimension, row, current revenue, 元 and period. Segment recall once; Measurement accuracy only."
+    },
+    {
+      "instrument_id": "600021.SH",
+      "object_id": "owned:core-ev-b36e908a4fb2fab7:revenue:product:电力",
+      "object_type": "Measurement",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        16
+      ],
+      "text": {
+        "source_native_name": "电力",
+        "source_native_value": "38,318,064,374.94",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Independently transcribed source dimension, row, current revenue, 元 and period. Segment recall once; Measurement accuracy only."
+    },
+    {
+      "instrument_id": "600021.SH",
+      "object_id": "owned:core-ev-69c58fcdb3c74064:segment:product:热力",
+      "object_type": "Segment",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        16
+      ],
+      "text": {
+        "source_native_name": "热力",
+        "source_native_value": "2,205,459,296.22",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Independently transcribed source dimension, row, current revenue, 元 and period. Segment recall once; Measurement accuracy only."
+    },
+    {
+      "instrument_id": "600021.SH",
+      "object_id": "owned:core-ev-b36e908a4fb2fab7:revenue:product:热力",
+      "object_type": "Measurement",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        16
+      ],
+      "text": {
+        "source_native_name": "热力",
+        "source_native_value": "2,205,459,296.22",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Independently transcribed source dimension, row, current revenue, 元 and period. Segment recall once; Measurement accuracy only."
+    },
+    {
+      "instrument_id": "600021.SH",
+      "object_id": "owned:core-ev-69c58fcdb3c74064:segment:product:其他",
+      "object_type": "Segment",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        16
+      ],
+      "text": {
+        "source_native_name": "其他",
+        "source_native_value": "741,655,185.30",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Independently transcribed source dimension, row, current revenue, 元 and period. Segment recall once; Measurement accuracy only."
+    },
+    {
+      "instrument_id": "600021.SH",
+      "object_id": "owned:core-ev-b36e908a4fb2fab7:revenue:product:其他",
+      "object_type": "Measurement",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        16
+      ],
+      "text": {
+        "source_native_name": "其他",
+        "source_native_value": "741,655,185.30",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Independently transcribed source dimension, row, current revenue, 元 and period. Segment recall once; Measurement accuracy only."
+    },
+    {
+      "instrument_id": "600021.SH",
+      "object_id": "owned:core-ev-69c58fcdb3c74064:segment:region:上海",
+      "object_type": "Segment",
+      "present": true,
+      "accurate": false,
+      "source_pages": [
+        16
+      ],
+      "text": {
+        "source_native_name": "上海",
+        "source_native_value": "13,671,762,626.89",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Actual 上海地区 wraps after the row amount across p16/p17; label accepted as 上海. Numeric value is exact; label is incomplete."
+    },
+    {
+      "instrument_id": "600021.SH",
+      "object_id": "owned:core-ev-b36e908a4fb2fab7:revenue:region:上海",
+      "object_type": "Measurement",
+      "present": true,
+      "accurate": false,
+      "source_pages": [
+        16
+      ],
+      "text": {
+        "source_native_name": "上海",
+        "source_native_value": "13,671,762,626.89",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Actual 上海地区 wraps after the row amount across p16/p17; label accepted as 上海. Numeric value is exact; label is incomplete."
+    },
+    {
+      "instrument_id": "600021.SH",
+      "object_id": "owned:core-ev-69c58fcdb3c74064:segment:region:江苏地区",
+      "object_type": "Segment",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        17
+      ],
+      "text": {
+        "source_native_name": "江苏地区",
+        "source_native_value": "12,201,395,146.49",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Independently transcribed source dimension, row, current revenue, 元 and period. Segment recall once; Measurement accuracy only."
+    },
+    {
+      "instrument_id": "600021.SH",
+      "object_id": "owned:core-ev-b36e908a4fb2fab7:revenue:region:江苏地区",
+      "object_type": "Measurement",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        17
+      ],
+      "text": {
+        "source_native_name": "江苏地区",
+        "source_native_value": "12,201,395,146.49",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Independently transcribed source dimension, row, current revenue, 元 and period. Segment recall once; Measurement accuracy only."
+    },
+    {
+      "instrument_id": "600021.SH",
+      "object_id": "owned:core-ev-69c58fcdb3c74064:segment:region:土耳其",
+      "object_type": "Segment",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        17
+      ],
+      "text": {
+        "source_native_name": "土耳其",
+        "source_native_value": "5,190,407,424.19",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Independently transcribed source dimension, row, current revenue, 元 and period. Segment recall once; Measurement accuracy only."
+    },
+    {
+      "instrument_id": "600021.SH",
+      "object_id": "owned:core-ev-b36e908a4fb2fab7:revenue:region:土耳其",
+      "object_type": "Measurement",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        17
+      ],
+      "text": {
+        "source_native_name": "土耳其",
+        "source_native_value": "5,190,407,424.19",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Independently transcribed source dimension, row, current revenue, 元 and period. Segment recall once; Measurement accuracy only."
+    },
+    {
+      "instrument_id": "600021.SH",
+      "object_id": "owned:core-ev-69c58fcdb3c74064:segment:region:安徽地区",
+      "object_type": "Segment",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        17
+      ],
+      "text": {
+        "source_native_name": "安徽地区",
+        "source_native_value": "3,504,524,363.39",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Independently transcribed source dimension, row, current revenue, 元 and period. Segment recall once; Measurement accuracy only."
+    },
+    {
+      "instrument_id": "600021.SH",
+      "object_id": "owned:core-ev-b36e908a4fb2fab7:revenue:region:安徽地区",
+      "object_type": "Measurement",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        17
+      ],
+      "text": {
+        "source_native_name": "安徽地区",
+        "source_native_value": "3,504,524,363.39",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Independently transcribed source dimension, row, current revenue, 元 and period. Segment recall once; Measurement accuracy only."
+    },
+    {
+      "instrument_id": "600021.SH",
+      "object_id": "owned:core-ev-69c58fcdb3c74064:segment:region:浙江地区",
+      "object_type": "Segment",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        17
+      ],
+      "text": {
+        "source_native_name": "浙江地区",
+        "source_native_value": "2,357,907,447.75",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Independently transcribed source dimension, row, current revenue, 元 and period. Segment recall once; Measurement accuracy only."
+    },
+    {
+      "instrument_id": "600021.SH",
+      "object_id": "owned:core-ev-b36e908a4fb2fab7:revenue:region:浙江地区",
+      "object_type": "Measurement",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        17
+      ],
+      "text": {
+        "source_native_name": "浙江地区",
+        "source_native_value": "2,357,907,447.75",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Independently transcribed source dimension, row, current revenue, 元 and period. Segment recall once; Measurement accuracy only."
+    },
+    {
+      "instrument_id": "600021.SH",
+      "object_id": "owned:core-ev-69c58fcdb3c74064:segment:region:马耳他地区",
+      "object_type": "Segment",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        17
+      ],
+      "text": {
+        "source_native_name": "马耳他地区",
+        "source_native_value": "579,550,341.74",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Independently transcribed source dimension, row, current revenue, 元 and period. Segment recall once; Measurement accuracy only."
+    },
+    {
+      "instrument_id": "600021.SH",
+      "object_id": "owned:core-ev-b36e908a4fb2fab7:revenue:region:马耳他地区",
+      "object_type": "Measurement",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        17
+      ],
+      "text": {
+        "source_native_name": "马耳他地区",
+        "source_native_value": "579,550,341.74",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Independently transcribed source dimension, row, current revenue, 元 and period. Segment recall once; Measurement accuracy only."
+    },
+    {
+      "instrument_id": "600021.SH",
+      "object_id": "owned:core-ev-69c58fcdb3c74064:segment:region:日本地区",
+      "object_type": "Segment",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        17
+      ],
+      "text": {
+        "source_native_name": "日本地区",
+        "source_native_value": "781,328,518.28",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Independently transcribed source dimension, row, current revenue, 元 and period. Segment recall once; Measurement accuracy only."
+    },
+    {
+      "instrument_id": "600021.SH",
+      "object_id": "owned:core-ev-b36e908a4fb2fab7:revenue:region:日本地区",
+      "object_type": "Measurement",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        17
+      ],
+      "text": {
+        "source_native_name": "日本地区",
+        "source_native_value": "781,328,518.28",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Independently transcribed source dimension, row, current revenue, 元 and period. Segment recall once; Measurement accuracy only."
+    },
+    {
+      "instrument_id": "600021.SH",
+      "object_id": "owned:core-ev-69c58fcdb3c74064:segment:region:其他地区",
+      "object_type": "Segment",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        17
+      ],
+      "text": {
+        "source_native_name": "其他地区",
+        "source_native_value": "2,978,302,987.73",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Independently transcribed source dimension, row, current revenue, 元 and period. Segment recall once; Measurement accuracy only."
+    },
+    {
+      "instrument_id": "600021.SH",
+      "object_id": "owned:core-ev-b36e908a4fb2fab7:revenue:region:其他地区",
+      "object_type": "Measurement",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        17
+      ],
+      "text": {
+        "source_native_name": "其他地区",
+        "source_native_value": "2,978,302,987.73",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Independently transcribed source dimension, row, current revenue, 元 and period. Segment recall once; Measurement accuracy only."
+    },
+    {
+      "instrument_id": "600021.SH",
+      "object_id": "owned:core-ev-69c58fcdb3c74064:segment:sales_mode:直销",
+      "object_type": "Segment",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        17
+      ],
+      "text": {
+        "source_native_name": "直销",
+        "source_native_value": "41,265,178,856.46",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Independently transcribed source dimension, row, current revenue, 元 and period. Segment recall once; Measurement accuracy only."
+    },
+    {
+      "instrument_id": "600021.SH",
+      "object_id": "owned:core-ev-b36e908a4fb2fab7:revenue:sales_mode:直销",
+      "object_type": "Measurement",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        17
+      ],
+      "text": {
+        "source_native_name": "直销",
+        "source_native_value": "41,265,178,856.46",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Independently transcribed source dimension, row, current revenue, 元 and period. Segment recall once; Measurement accuracy only."
+    },
+    {
+      "instrument_id": "600059.SH",
+      "object_id": "answer:principal_business",
+      "present": true,
+      "accurate": true,
+      "text": "报告期内公司从事的业务情况\n(一）主要业务情况\r\n报告期内，公司主营业务未发生重大变化，主要从事黄酒的研发、酿造、生产和销售等业务。",
+      "source_pages": [
+        7,
+        8,
+        13
+      ],
+      "rationale": "Company-owned current business narrative compared with original continuous pages."
+    },
+    {
+      "instrument_id": "600059.SH",
+      "object_id": "answer:products_services",
+      "present": true,
+      "accurate": false,
+      "text": "报告期内公司从事的业务情况\n(一）主要业务情况\r\n报告期内，公司主营业务未发生重大变化，主要从事黄酒的研发、酿造、生产和销售等业务。",
+      "source_pages": [
+        7,
+        8,
+        13
+      ],
+      "rationale": "Only 黄酒 generic activity; p8 explicitly lists 国酿/青花醉/库藏/金/清醇/无高低/果酒/露酒/米酒/坛装酒/海外产品 matrix; important declared product substance missing."
+    },
+    {
+      "instrument_id": "600059.SH",
+      "object_id": "answer:revenue_model",
+      "present": true,
+      "accurate": false,
+      "text": "酒类、其他",
+      "source_pages": [
+        7,
+        8,
+        13
+      ],
+      "rationale": "Only 酒类、其他; p13 explicitly states 黄酒销售99.98%, and source names direct/dealer sales. Industry labels omit the available mechanism."
+    },
+    {
+      "instrument_id": "600059.SH",
+      "object_id": "owned:core-ev-4881d8f2b0f7c19b:overview",
+      "object_type": "BusinessOverview",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        7
+      ],
+      "text": "报告期内公司从事的业务情况\n(一）主要业务情况\r\n报告期内，公司主营业务未发生重大变化，主要从事黄酒的研发、酿造、生产和销售等业务。",
+      "rationale": "Accepted continuous owned overview is faithful; dimension answers separately checked for substantive completeness."
+    },
+    {
+      "instrument_id": "600059.SH",
+      "object_id": "owned:core-ev-76c968b54209e85e:activity:1",
+      "object_type": "Activity",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        7
+      ],
+      "text": "黄酒",
+      "rationale": "Source 黄酒 R&D/production activity is current and company-owned; omitted separate sales role is a recall miss."
+    },
+    {
+      "instrument_id": "600059.SH",
+      "object_id": "owned:core-ev-18bd051f86e5868a:segment:industry:酒类",
+      "object_type": "Segment",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        13
+      ],
+      "text": {
+        "source_native_name": "酒类",
+        "source_native_value": "1,801,700,702.70",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Independently transcribed source dimension, row, current revenue, 元 and period. Segment recall once; Measurement accuracy only."
+    },
+    {
+      "instrument_id": "600059.SH",
+      "object_id": "owned:core-ev-232b0c9eb4597712:revenue:industry:酒类",
+      "object_type": "Measurement",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        13
+      ],
+      "text": {
+        "source_native_name": "酒类",
+        "source_native_value": "1,801,700,702.70",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Independently transcribed source dimension, row, current revenue, 元 and period. Segment recall once; Measurement accuracy only."
+    },
+    {
+      "instrument_id": "600059.SH",
+      "object_id": "owned:core-ev-18bd051f86e5868a:segment:industry:其他",
+      "object_type": "Segment",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        13
+      ],
+      "text": {
+        "source_native_name": "其他",
+        "source_native_value": "316,414.52",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Independently transcribed source dimension, row, current revenue, 元 and period. Segment recall once; Measurement accuracy only."
+    },
+    {
+      "instrument_id": "600059.SH",
+      "object_id": "owned:core-ev-232b0c9eb4597712:revenue:industry:其他",
+      "object_type": "Measurement",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        13
+      ],
+      "text": {
+        "source_native_name": "其他",
+        "source_native_value": "316,414.52",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Independently transcribed source dimension, row, current revenue, 元 and period. Segment recall once; Measurement accuracy only."
+    },
+    {
+      "instrument_id": "600059.SH",
+      "object_id": "owned:core-ev-18bd051f86e5868a:segment:product:中高档酒",
+      "object_type": "Segment",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        13
+      ],
+      "text": {
+        "source_native_name": "中高档酒",
+        "source_native_value": "1,328,589,266.11",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Independently transcribed source dimension, row, current revenue, 元 and period. Segment recall once; Measurement accuracy only."
+    },
+    {
+      "instrument_id": "600059.SH",
+      "object_id": "owned:core-ev-232b0c9eb4597712:revenue:product:中高档酒",
+      "object_type": "Measurement",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        13
+      ],
+      "text": {
+        "source_native_name": "中高档酒",
+        "source_native_value": "1,328,589,266.11",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Independently transcribed source dimension, row, current revenue, 元 and period. Segment recall once; Measurement accuracy only."
+    },
+    {
+      "instrument_id": "600059.SH",
+      "object_id": "owned:core-ev-18bd051f86e5868a:segment:product:普通酒",
+      "object_type": "Segment",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        13
+      ],
+      "text": {
+        "source_native_name": "普通酒",
+        "source_native_value": "473,111,436.59",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Independently transcribed source dimension, row, current revenue, 元 and period. Segment recall once; Measurement accuracy only."
+    },
+    {
+      "instrument_id": "600059.SH",
+      "object_id": "owned:core-ev-232b0c9eb4597712:revenue:product:普通酒",
+      "object_type": "Measurement",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        13
+      ],
+      "text": {
+        "source_native_name": "普通酒",
+        "source_native_value": "473,111,436.59",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Independently transcribed source dimension, row, current revenue, 元 and period. Segment recall once; Measurement accuracy only."
+    },
+    {
+      "instrument_id": "600059.SH",
+      "object_id": "owned:core-ev-18bd051f86e5868a:segment:product:玻璃制品",
+      "object_type": "Segment",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        13
+      ],
+      "text": {
+        "source_native_name": "玻璃制品",
+        "source_native_value": "299,223.08",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Independently transcribed source dimension, row, current revenue, 元 and period. Segment recall once; Measurement accuracy only."
+    },
+    {
+      "instrument_id": "600059.SH",
+      "object_id": "owned:core-ev-232b0c9eb4597712:revenue:product:玻璃制品",
+      "object_type": "Measurement",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        13
+      ],
+      "text": {
+        "source_native_name": "玻璃制品",
+        "source_native_value": "299,223.08",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Independently transcribed source dimension, row, current revenue, 元 and period. Segment recall once; Measurement accuracy only."
+    },
+    {
+      "instrument_id": "600059.SH",
+      "object_id": "owned:core-ev-18bd051f86e5868a:segment:product:其他产品",
+      "object_type": "Segment",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        13
+      ],
+      "text": {
+        "source_native_name": "其他产品",
+        "source_native_value": "17,191.44",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Independently transcribed source dimension, row, current revenue, 元 and period. Segment recall once; Measurement accuracy only."
+    },
+    {
+      "instrument_id": "600059.SH",
+      "object_id": "owned:core-ev-232b0c9eb4597712:revenue:product:其他产品",
+      "object_type": "Measurement",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        13
+      ],
+      "text": {
+        "source_native_name": "其他产品",
+        "source_native_value": "17,191.44",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Independently transcribed source dimension, row, current revenue, 元 and period. Segment recall once; Measurement accuracy only."
+    },
+    {
+      "instrument_id": "600059.SH",
+      "object_id": "owned:core-ev-18bd051f86e5868a:segment:region:国内",
+      "object_type": "Segment",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        13
+      ],
+      "text": {
+        "source_native_name": "国内",
+        "source_native_value": "1,761,795,214.53",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Independently transcribed source dimension, row, current revenue, 元 and period. Segment recall once; Measurement accuracy only."
+    },
+    {
+      "instrument_id": "600059.SH",
+      "object_id": "owned:core-ev-232b0c9eb4597712:revenue:region:国内",
+      "object_type": "Measurement",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        13
+      ],
+      "text": {
+        "source_native_name": "国内",
+        "source_native_value": "1,761,795,214.53",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Independently transcribed source dimension, row, current revenue, 元 and period. Segment recall once; Measurement accuracy only."
+    },
+    {
+      "instrument_id": "600059.SH",
+      "object_id": "owned:core-ev-18bd051f86e5868a:segment:region:国外",
+      "object_type": "Segment",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        13
+      ],
+      "text": {
+        "source_native_name": "国外",
+        "source_native_value": "40,221,902.69",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Independently transcribed source dimension, row, current revenue, 元 and period. Segment recall once; Measurement accuracy only."
+    },
+    {
+      "instrument_id": "600059.SH",
+      "object_id": "owned:core-ev-232b0c9eb4597712:revenue:region:国外",
+      "object_type": "Measurement",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        13
+      ],
+      "text": {
+        "source_native_name": "国外",
+        "source_native_value": "40,221,902.69",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Independently transcribed source dimension, row, current revenue, 元 and period. Segment recall once; Measurement accuracy only."
+    },
+    {
+      "instrument_id": "600059.SH",
+      "object_id": "owned:core-ev-18bd051f86e5868a:segment:sales_mode:直销",
+      "object_type": "Segment",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        13
+      ],
+      "text": {
+        "source_native_name": "直销",
+        "source_native_value": "449,043,996.71",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Independently transcribed source dimension, row, current revenue, 元 and period. Segment recall once; Measurement accuracy only."
+    },
+    {
+      "instrument_id": "600059.SH",
+      "object_id": "owned:core-ev-232b0c9eb4597712:revenue:sales_mode:直销",
+      "object_type": "Measurement",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        13
+      ],
+      "text": {
+        "source_native_name": "直销",
+        "source_native_value": "449,043,996.71",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Independently transcribed source dimension, row, current revenue, 元 and period. Segment recall once; Measurement accuracy only."
+    },
+    {
+      "instrument_id": "600059.SH",
+      "object_id": "owned:core-ev-18bd051f86e5868a:segment:sales_mode:批发",
+      "object_type": "Segment",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        13
+      ],
+      "text": {
+        "source_native_name": "批发",
+        "source_native_value": "1,352,973,120.51",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Independently transcribed source dimension, row, current revenue, 元 and period. Segment recall once; Measurement accuracy only."
+    },
+    {
+      "instrument_id": "600059.SH",
+      "object_id": "owned:core-ev-232b0c9eb4597712:revenue:sales_mode:批发",
+      "object_type": "Measurement",
+      "present": true,
+      "accurate": true,
+      "source_pages": [
+        13
+      ],
+      "text": {
+        "source_native_name": "批发",
+        "source_native_value": "1,352,973,120.51",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "rationale": "Independently transcribed source dimension, row, current revenue, 元 and period. Segment recall once; Measurement accuracy only."
+    }
+  ],
+  "missing_source_rows": [
+    {
+      "instrument_id": "600021.SH",
+      "dimension": "region",
+      "name": "上海地区",
+      "value": "13,671,762,626.89",
+      "page": 16
+    }
+  ],
+  "native_role_checks": [
+    {
+      "instrument_id": "600021.SH",
+      "name": "电力",
+      "role": "product_sales",
+      "source_page": 17,
+      "source_quote": "电力 亿千瓦时 782.32 749.60",
+      "present": false,
+      "mapping_requirement": "Native declared role; existing pending/ambiguous mapping is acceptable. No foreign wheat/thermal-coal grade or price link is inferred."
+    },
+    {
+      "instrument_id": "600021.SH",
+      "name": "热力",
+      "role": "product_sales",
+      "source_page": 17,
+      "source_quote": "热力 万吉焦 2166.16 1979.26",
+      "present": false,
+      "mapping_requirement": "Native declared role; existing pending/ambiguous mapping is acceptable. No foreign wheat/thermal-coal grade or price link is inferred."
+    },
+    {
+      "instrument_id": "600021.SH",
+      "name": "标煤",
+      "role": "raw_material_input",
+      "source_page": 11,
+      "source_quote": "公司合并口径入炉标煤单价（含税）966.98 元/吨",
+      "present": false,
+      "mapping_requirement": "Native declared role; existing pending/ambiguous mapping is acceptable. No foreign wheat/thermal-coal grade or price link is inferred."
+    },
+    {
+      "instrument_id": "600059.SH",
+      "name": "黄酒",
+      "role": "product_sales",
+      "source_page": 7,
+      "source_quote": "主要从事黄酒的研发、酿造、生产和销售等业务",
+      "present": false,
+      "mapping_requirement": "Native declared role; existing pending/ambiguous mapping is acceptable. No foreign wheat/thermal-coal grade or price link is inferred."
+    },
+    {
+      "instrument_id": "600059.SH",
+      "name": "糯米",
+      "role": "raw_material_input",
+      "source_page": 27,
+      "source_quote": "黄酒酿造的主要原材料（如糯米、小麦）",
+      "present": false,
+      "mapping_requirement": "Native declared role; existing pending/ambiguous mapping is acceptable. No foreign wheat/thermal-coal grade or price link is inferred."
+    },
+    {
+      "instrument_id": "600059.SH",
+      "name": "小麦",
+      "role": "raw_material_input",
+      "source_page": 27,
+      "source_quote": "黄酒酿造的主要原材料（如糯米、小麦）",
+      "present": false,
+      "mapping_requirement": "Native declared role; existing pending/ambiguous mapping is acceptable. No foreign wheat/thermal-coal grade or price link is inferred."
+    }
+  ],
+  "runtime_evidence": [
+    {
+      "instrument_id": "600021.SH",
+      "work_id": "bp-work-23a9a0e3ee3b4ac76ea57822",
+      "reused_scope_ids_by_stage": {
+        "acquire": [],
+        "parse": [],
+        "publish": [],
+        "semantic": [],
+        "verify": []
+      },
+      "predecessor_lineage": [],
+      "semantic_disputes": [],
+      "provider_calls": [],
+      "token_budget": {
+        "total_token_budget": 50000,
+        "extract_max_output_tokens": 8000,
+        "verify_max_output_tokens": 4000,
+        "tokens_used": 0,
+        "tokens_remaining": 50000
+      }
+    },
+    {
+      "instrument_id": "600059.SH",
+      "work_id": "bp-work-b49a5b3e3def0b6535249303",
+      "reused_scope_ids_by_stage": {
+        "acquire": [],
+        "parse": [],
+        "publish": [],
+        "semantic": [],
+        "verify": []
+      },
+      "predecessor_lineage": [],
+      "semantic_disputes": [],
+      "provider_calls": [],
+      "token_budget": {
+        "total_token_budget": 50000,
+        "extract_max_output_tokens": 8000,
+        "verify_max_output_tokens": 4000,
+        "tokens_used": 0,
+        "tokens_remaining": 50000
+      }
+    }
+  ],
+  "checked_source_pages": {
+    "600021.SH": [
+      10,
+      11,
+      16,
+      17,
+      18,
+      19,
+      36
+    ],
+    "600059.SH": [
+      7,
+      8,
+      13,
+      14,
+      15,
+      27
+    ]
+  },
+  "denominator_method": "Six answered dimension disclosures plus independently read 14+10 income rows and six native explicit product-sale/input roles for recall. Actual 53 accepted facts and six delivered answer texts each accuracy once. A partially delivered answer counts present but is inaccurate if materially incomplete. No inherited counts; Measurement copies never add source recall.",
+  "source_scope_limit": "Scoped narratives and stated income rows/native roles, not whole-report coverage. No claim of no native commodity role; assessment is empty despite disclosed roles. Catalogue mapping/promotion and industry enhancement remain deferred. Standard coal is a stated furnace input, not inferred physical grade, quantity, cost or procurement price; rice/wheat lists are current materials declared in the company cost-risk clause, not a future purchase plan.",
+  "source_reader": "Independent pypdf extraction of original frozen PDFs, SHA-256 verified",
+  "historical_files_unchanged": 494,
+  "artifact_sha256": {
+    "data/checkpoints/company_profile_common_core/reports/m4_v20_unseen_small_batch/plan.json": "ca91a333377da334c8ba8416181ba5f3a9f9cdc790673e1332f890d77238cad0",
+    "data/checkpoints/company_profile_common_core/reports/m4_v20_unseen_small_batch/company_profile_live_run.v1.json": "66bd9ae9b87fa2f69d20c6a7af381637eb66fa21d0a45d375b9d663cd9596c4d",
+    "data/checkpoints/company_profile_common_core/reports/m4_v20_unseen_small_batch/observation.json": "a5bc0626019339dd6942aa3a1a49c3ffbcb1da21a5c8dc6cc0cab135708d9557",
+    "data/checkpoints/company_profile_common_core/reports/m4_v20_unseen_small_batch/formal_execution.json": "15de720ca4a578b54ce9bdc1b1d882cbb600bcb6df3c1e700125c332af71dbe5",
+    "data/checkpoints/company_profile_common_core/reports/m4_v20_unseen_small_batch/company_profile_source_review.v1.json": "17369df7326d59f4f2af07843d87092da43ab2fd97d09854e95ff91a84bfdf03",
+    "data/exports/m4_v20_unseen_small_batch/600021.SH/profiles.csv": "5972aa4358c85cbfea009649a42c39102d8cfa49e05730caadca528e65387f4c",
+    "data/exports/m4_v20_unseen_small_batch/600021.SH/export_manifest.json": "5e18f20c185ddfa9493dba4200a039f9b71e7bfffe9f681445435f6ee9f1ce2d",
+    "data/exports/m4_v20_unseen_small_batch/600021.SH/600021.SH_2025-12-31.json": "f1a83c19a9a360dd54e29e611fee07eaa8c9679341f328264f722326059a8eb2",
+    "data/exports/m4_v20_unseen_small_batch/600059.SH/profiles.csv": "dadb7bce1e686cd1c94258722612f9e6bf746ab89aa05871344f4bbf154c170a",
+    "data/exports/m4_v20_unseen_small_batch/600059.SH/600059.SH_2025-12-31.json": "2760368ebfdbf2f8bd141df8d93fffcc5cdba182510831941063c5a0c92b7e07",
+    "data/exports/m4_v20_unseen_small_batch/600059.SH/export_manifest.json": "f94a09544882a2ca45ca424ac9c94d65c12f220052f6247bf010c2f1b42c30e3",
+    "data/research/company_profile_common_core/m4_v20_unseen_small_batch/company_profile_common_core.v1/bp-work-b49a5b3e3def0b6535249303.json": "939cc0a692305eda6a1ad74d1298d81303c8f60e18526a1bdab701aa7e9da0fb",
+    "data/research/company_profile_common_core/m4_v20_unseen_small_batch/company_profile_common_core.v1/bp-work-23a9a0e3ee3b4ac76ea57822.json": "2c1e8266282c76e442814e5eff4d583e06725c8332641948e4bb80752f5dfef4",
+    "data/research/company_profile_common_core/m4_v20_unseen_small_batch/company_profile_common_core.v1/scopes/600021.SH/2025-12-31/extract_segment_financials.json": "73be55dca7bb4a2428df7770cf3adea437370b0a64fbdac578087dc9d437ee7f",
+    "data/research/company_profile_common_core/m4_v20_unseen_small_batch/company_profile_common_core.v1/scopes/600021.SH/2025-12-31/extract_business_overview.json": "8a8412b5352cc3611268893f7082a4050bdf11401a47fc0659b097a7606f1cff",
+    "data/research/company_profile_common_core/m4_v20_unseen_small_batch/company_profile_common_core.v1/scopes/600059.SH/2025-12-31/extract_segment_financials.json": "54721dbe632c20cc58a60255b8c87f7145e08a7ef47dc34d4f217d137896463c",
+    "data/research/company_profile_common_core/m4_v20_unseen_small_batch/company_profile_common_core.v1/scopes/600059.SH/2025-12-31/extract_business_overview.json": "585a237e496792072728b0f7094a8fe7af72e5394628a0958858da346bb7891a",
+    "data/research/company_profile_common_core/m4_v20_unseen_small_batch/company_profile_common_core.v1/checkpoints/bp-work-b49a5b3e3def0b6535249303.json": "35b148d7f3aec9da35ef9497f875b72899c145f2daf0c5ac2943ce45dc3f1348",
+    "data/research/company_profile_common_core/m4_v20_unseen_small_batch/company_profile_common_core.v1/checkpoints/bp-work-23a9a0e3ee3b4ac76ea57822.json": "808cfb51ad48ddf33368ae9d73e0d091212b58a2f32a50f10e94f6b24efee5d5"
+  },
+  "next_batch": "paused",
+  "a_role_acceptance": "pending",
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false
+}
