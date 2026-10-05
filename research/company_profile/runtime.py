@@ -316,6 +316,15 @@ class CompanyProfileStageRuntime:
             for state in self._states.values()
         )
 
+    def reused_scopes_by_instrument(self) -> dict[str, tuple[str, ...]]:
+        """Expose actual runtime chapter reuse independently of tokens or enqueue."""
+
+        return {
+            state.report.instrument_id: tuple(state.reused_scope_ids)
+            for state in self._states.values()
+            if state.report is not None and state.reused_scope_ids
+        }
+
     def _active_ledger(self) -> _WorkState:
         if self._active_state is None:
             raise RuntimeError("company-profile execution ledger is not bound")

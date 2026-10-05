@@ -1,0 +1,1156 @@
+{
+  "plan_id": "a87005165e1d0bd5354de938178669938235cf9525459355ae4e948166400662",
+  "processing_identity": {
+    "rules": "company_profile_common_core.v1",
+    "owned_page_facts": "v8",
+    "material_input_facts": "v1",
+    "revenue_sentence_repair": "v19"
+  },
+  "measurement": "first_execute_to_second_export_return",
+  "formal_execution_index": 1,
+  "whole_round_seconds": 251.68984960764647,
+  "company_execute_through_export_seconds": {
+    "600018.SH": 162.28588021826,
+    "600055.SH": 89.40375118143857
+  },
+  "workload": {
+    "tokens_used": {
+      "status": "assessed",
+      "value": 0
+    },
+    "elapsed_seconds": {
+      "status": "assessed",
+      "value": 251.68984960764647
+    },
+    "human_review_minutes": {
+      "status": "unassessed",
+      "value": null
+    }
+  },
+  "source_recall": {
+    "status": "assessed",
+    "numerator": 26,
+    "denominator": 26,
+    "value": 1.0
+  },
+  "source_accuracy": {
+    "status": "assessed",
+    "numerator": 51,
+    "denominator": 51,
+    "value": 1.0
+  },
+  "critical_numeric_errors": {
+    "status": "assessed",
+    "value": 0
+  },
+  "computed_expansion_gates_met": true,
+  "production_authorization": "not_authorized",
+  "a_role_acceptance": "pending",
+  "archive_and_unseen_expansion": "paused",
+  "scale_quality_claim_allowed": false,
+  "accuracy_object_count": 51,
+  "accuracy_denominator_method": "Unique (instrument_id, answer dimension or accepted record_id) from actual query delivery; each reviewed once, identical exported profile checked.",
+  "recall_denominator_method": "Six required answer disclosures, independently transcribed current-year table rows once via Segment, and fee mechanism once via SIPG Overview. disclosed_in_source=false denotes accuracy-only findings here, not denial that their text occurs in the source.",
+  "source_rows": {
+    "600018.SH": [
+      {
+        "column": "industry",
+        "name": "集装箱板块",
+        "current_year_revenue": "17,335,387,241.70",
+        "unit": "元",
+        "page": 18
+      },
+      {
+        "column": "industry",
+        "name": "散杂货板块",
+        "current_year_revenue": "1,634,605,977.53",
+        "unit": "元",
+        "page": 18
+      },
+      {
+        "column": "industry",
+        "name": "港口物流板块",
+        "current_year_revenue": "14,434,866,466.79",
+        "unit": "元",
+        "page": 18
+      },
+      {
+        "column": "industry",
+        "name": "港口服务板块",
+        "current_year_revenue": "7,245,370,144.71",
+        "unit": "元",
+        "page": 18
+      },
+      {
+        "column": "industry",
+        "name": "其他",
+        "current_year_revenue": "1,858,834,784.17",
+        "unit": "元",
+        "page": 18
+      },
+      {
+        "column": "region",
+        "name": "国内",
+        "current_year_revenue": "37,507,470,224.24",
+        "unit": "元",
+        "page": 18
+      },
+      {
+        "column": "region",
+        "name": "国外",
+        "current_year_revenue": "852,790,317.17",
+        "unit": "元",
+        "page": 18
+      }
+    ],
+    "600055.SH": [
+      {
+        "column": "industry",
+        "name": "医疗器械销售业务",
+        "current_year_revenue": "1,215,067,024.87",
+        "unit": "元",
+        "page": 24
+      },
+      {
+        "column": "product",
+        "name": "医疗器械销售业务",
+        "current_year_revenue": "1,150,604,587.71",
+        "unit": "元",
+        "page": 24
+      },
+      {
+        "column": "product",
+        "name": "劳务及服务",
+        "current_year_revenue": "64,462,437.16",
+        "unit": "元",
+        "page": 24
+      },
+      {
+        "column": "region",
+        "name": "华北地区",
+        "current_year_revenue": "68,501,338.14",
+        "unit": "元",
+        "page": 24
+      },
+      {
+        "column": "region",
+        "name": "东北地区",
+        "current_year_revenue": "167,663,718.84",
+        "unit": "元",
+        "page": 25
+      },
+      {
+        "column": "region",
+        "name": "华东地区",
+        "current_year_revenue": "159,329,648.70",
+        "unit": "元",
+        "page": 25
+      },
+      {
+        "column": "region",
+        "name": "中南地区",
+        "current_year_revenue": "203,724,781.89",
+        "unit": "元",
+        "page": 25
+      },
+      {
+        "column": "region",
+        "name": "西南地区",
+        "current_year_revenue": "95,048,263.36",
+        "unit": "元",
+        "page": 25
+      },
+      {
+        "column": "region",
+        "name": "西北地区",
+        "current_year_revenue": "161,075,733.73",
+        "unit": "元",
+        "page": 25
+      },
+      {
+        "column": "region",
+        "name": "中国大陆以外区域",
+        "current_year_revenue": "359,723,540.21",
+        "unit": "元",
+        "page": 25
+      },
+      {
+        "column": "sales_mode",
+        "name": "直销",
+        "current_year_revenue": "196,671,722.46",
+        "unit": "元",
+        "page": 25
+      },
+      {
+        "column": "sales_mode",
+        "name": "分销",
+        "current_year_revenue": "1,018,395,302.41",
+        "unit": "元",
+        "page": 25
+      }
+    ]
+  },
+  "no_role_checked_pages": {
+    "600018.SH": [
+      12,
+      18,
+      19
+    ],
+    "600055.SH": [
+      11,
+      24,
+      25
+    ]
+  },
+  "no_role_limit": "No explicit named catalog role in checked evidence scope only, not a whole-report absence claim. Broad port 燃物料 service is not promoted into a specific fuel/crude-oil role.",
+  "runtime_reuse": [
+    {
+      "instrument_id": "600018.SH",
+      "work_id": "bp-work-a376d67f3090a69d1243c512",
+      "stage_reused_scope_ids": {
+        "acquire": [],
+        "parse": [],
+        "publish": [],
+        "semantic": [],
+        "verify": []
+      },
+      "predecessor_lineage": [],
+      "scope_digests": {
+        "extract_business_overview": "4f959b271f8a1f55eb387275685f5936e964287f887e233ccf23f533362b3555",
+        "extract_segment_financials": "0c5048f42c8c98390891673c0fbfc09e55fed7a3f7478e7d242022b3f985b88f"
+      },
+      "chapters": [
+        {
+          "chapter_task": "extract_business_overview",
+          "role": "common_core",
+          "status": "activated",
+          "reason": "common_core_overview"
+        },
+        {
+          "chapter_task": "extract_segment_financials",
+          "role": "common_core",
+          "status": "activated",
+          "reason": "owned_heading"
+        },
+        {
+          "chapter_task": "extract_operating_quantities",
+          "role": "enhancement",
+          "status": "not_applicable",
+          "reason": "no_owned_heading"
+        },
+        {
+          "chapter_task": "extract_material_inputs",
+          "role": "common_core",
+          "status": "not_applicable",
+          "reason": "no_owned_heading"
+        },
+        {
+          "chapter_task": "extract_counterparties_and_concentration",
+          "role": "enhancement",
+          "status": "not_activated",
+          "reason": "not_enabled_in_this_slice"
+        },
+        {
+          "chapter_task": "extract_business_regime",
+          "role": "enhancement",
+          "status": "not_activated",
+          "reason": "not_enabled_in_this_slice"
+        }
+      ],
+      "semantic_disputes": [],
+      "provider_calls": [],
+      "completed_scopes": [
+        {
+          "chapter_task": "extract_business_overview",
+          "source_digest": "4f959b271f8a1f55eb387275685f5936e964287f887e233ccf23f533362b3555",
+          "task_complete": true
+        },
+        {
+          "chapter_task": "extract_segment_financials",
+          "source_digest": "0c5048f42c8c98390891673c0fbfc09e55fed7a3f7478e7d242022b3f985b88f",
+          "task_complete": true
+        }
+      ]
+    },
+    {
+      "instrument_id": "600055.SH",
+      "work_id": "bp-work-ffaf3debeef5a988ee6464c4",
+      "stage_reused_scope_ids": {
+        "acquire": [],
+        "parse": [],
+        "publish": [],
+        "semantic": [],
+        "verify": []
+      },
+      "predecessor_lineage": [],
+      "scope_digests": {
+        "extract_business_overview": "51447e9979c4df5218a4d7d44e2a757bf7dd2632d3dd97ee8418845b2dc1eff0",
+        "extract_segment_financials": "5229ec3351201b0dc52e464657cfabc84d01f101710a3e5d1fd14eee81ead1a8"
+      },
+      "chapters": [
+        {
+          "chapter_task": "extract_business_overview",
+          "role": "common_core",
+          "status": "activated",
+          "reason": "common_core_overview"
+        },
+        {
+          "chapter_task": "extract_segment_financials",
+          "role": "common_core",
+          "status": "activated",
+          "reason": "owned_heading"
+        },
+        {
+          "chapter_task": "extract_operating_quantities",
+          "role": "enhancement",
+          "status": "not_applicable",
+          "reason": "no_owned_heading"
+        },
+        {
+          "chapter_task": "extract_material_inputs",
+          "role": "common_core",
+          "status": "not_applicable",
+          "reason": "no_owned_heading"
+        },
+        {
+          "chapter_task": "extract_counterparties_and_concentration",
+          "role": "enhancement",
+          "status": "not_activated",
+          "reason": "not_enabled_in_this_slice"
+        },
+        {
+          "chapter_task": "extract_business_regime",
+          "role": "enhancement",
+          "status": "not_activated",
+          "reason": "not_enabled_in_this_slice"
+        }
+      ],
+      "semantic_disputes": [
+        {
+          "field_id": "explicit_activity",
+          "reason_codes": [
+            "required_coverage_missing"
+          ],
+          "review_id": "bp-work-ffaf3debeef5a988ee6464c4:extract_business_overview:coverage:explicit_activity"
+        }
+      ],
+      "provider_calls": [],
+      "completed_scopes": [
+        {
+          "chapter_task": "extract_business_overview",
+          "source_digest": "51447e9979c4df5218a4d7d44e2a757bf7dd2632d3dd97ee8418845b2dc1eff0",
+          "task_complete": false
+        },
+        {
+          "chapter_task": "extract_segment_financials",
+          "source_digest": "5229ec3351201b0dc52e464657cfabc84d01f101710a3e5d1fd14eee81ead1a8",
+          "task_complete": true
+        }
+      ]
+    }
+  ],
+  "object_reviews": [
+    {
+      "instrument_id": "600018.SH",
+      "object_id": "answer:principal_business",
+      "source_pages": [
+        12
+      ],
+      "delivery_text": "公司经营模式主要为：为客户提供港口及相关服务，收取港口作业包干费、库场使用费和港\r\n口其他收费",
+      "included_in_recall": true,
+      "accurate": true,
+      "rationale": "Independently compared subject, established business and complete delivered wording with frozen official source; query/export identical."
+    },
+    {
+      "instrument_id": "600018.SH",
+      "object_id": "answer:products_services",
+      "source_pages": [
+        12
+      ],
+      "delivery_text": "为客户提供港口及相关服务，收取港口作业包干费、库场使用费和港口其他收费",
+      "included_in_recall": true,
+      "accurate": true,
+      "rationale": "Independently compared subject, established business and complete delivered wording with frozen official source; query/export identical."
+    },
+    {
+      "instrument_id": "600018.SH",
+      "object_id": "answer:revenue_model",
+      "source_pages": [
+        12
+      ],
+      "delivery_text": "公司经营模式主要为：为客户提供港口及相关服务，收取港口作业包干费、库场使用费和港\r\n口其他收费",
+      "included_in_recall": true,
+      "accurate": true,
+      "rationale": "Independently compared subject, established business and complete delivered wording with frozen official source; query/export identical."
+    },
+    {
+      "instrument_id": "600018.SH",
+      "object_id": "owned:core-ev-7bb998bb30563a05:overview",
+      "source_pages": [
+        12
+      ],
+      "delivery_text": "公司经营模式主要为：为客户提供港口及相关服务，收取港口作业包干费、库场使用费和港\r\n口其他收费",
+      "included_in_recall": true,
+      "accurate": true,
+      "rationale": "Complete affirmative source sentence. SIPG Overview is the sole fee-mechanism recall carrier; Wan Dong Overview is accuracy-only because positioning is covered by dimension recall."
+    },
+    {
+      "instrument_id": "600018.SH",
+      "object_id": "owned:core-ev-db74355a77c87062:activity:1",
+      "source_pages": [
+        12
+      ],
+      "delivery_text": "为客户提供港口及相关服务，收取港口作业包干费、库场使用费和港口其他收费",
+      "included_in_recall": false,
+      "accurate": true,
+      "rationale": "Reporting-company fee service or existing principal-business block explicitly in p12; exactly one accuracy finding per Activity ID, including the fee Activity."
+    },
+    {
+      "instrument_id": "600018.SH",
+      "object_id": "owned:core-ev-db74355a77c87062:activity:2",
+      "source_pages": [
+        12
+      ],
+      "delivery_text": "港口相关业务，主营业务分为：集装箱板块",
+      "included_in_recall": false,
+      "accurate": true,
+      "rationale": "Reporting-company fee service or existing principal-business block explicitly in p12; exactly one accuracy finding per Activity ID, including the fee Activity."
+    },
+    {
+      "instrument_id": "600018.SH",
+      "object_id": "owned:core-ev-db74355a77c87062:activity:3",
+      "source_pages": [
+        12
+      ],
+      "delivery_text": "散杂货板块",
+      "included_in_recall": false,
+      "accurate": true,
+      "rationale": "Reporting-company fee service or existing principal-business block explicitly in p12; exactly one accuracy finding per Activity ID, including the fee Activity."
+    },
+    {
+      "instrument_id": "600018.SH",
+      "object_id": "owned:core-ev-db74355a77c87062:activity:4",
+      "source_pages": [
+        12
+      ],
+      "delivery_text": "港口物流板块",
+      "included_in_recall": false,
+      "accurate": true,
+      "rationale": "Reporting-company fee service or existing principal-business block explicitly in p12; exactly one accuracy finding per Activity ID, including the fee Activity."
+    },
+    {
+      "instrument_id": "600018.SH",
+      "object_id": "owned:core-ev-db74355a77c87062:activity:5",
+      "source_pages": [
+        12
+      ],
+      "delivery_text": "港口服务板块",
+      "included_in_recall": false,
+      "accurate": true,
+      "rationale": "Reporting-company fee service or existing principal-business block explicitly in p12; exactly one accuracy finding per Activity ID, including the fee Activity."
+    },
+    {
+      "instrument_id": "600018.SH",
+      "object_id": "owned:core-ev-255806289de0aba3:segment:industry:集装箱板块",
+      "source_pages": [
+        18
+      ],
+      "delivery_text": {
+        "source_native_name": "集装箱板块",
+        "source_native_value": "17,335,387,241.70",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "included_in_recall": true,
+      "accurate": true,
+      "rationale": "Compared grouping column, row label, current-year revenue (not cost), unit 元 and reporting period with independently transcribed source row. Measurement is accuracy-only to avoid repeating source row recall."
+    },
+    {
+      "instrument_id": "600018.SH",
+      "object_id": "owned:core-ev-00c0543cce37a02b:revenue:industry:集装箱板块",
+      "source_pages": [
+        18
+      ],
+      "delivery_text": {
+        "source_native_name": "集装箱板块",
+        "source_native_value": "17,335,387,241.70",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "included_in_recall": false,
+      "accurate": true,
+      "rationale": "Compared grouping column, row label, current-year revenue (not cost), unit 元 and reporting period with independently transcribed source row. Measurement is accuracy-only to avoid repeating source row recall."
+    },
+    {
+      "instrument_id": "600018.SH",
+      "object_id": "owned:core-ev-255806289de0aba3:segment:industry:散杂货板块",
+      "source_pages": [
+        18
+      ],
+      "delivery_text": {
+        "source_native_name": "散杂货板块",
+        "source_native_value": "1,634,605,977.53",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "included_in_recall": true,
+      "accurate": true,
+      "rationale": "Compared grouping column, row label, current-year revenue (not cost), unit 元 and reporting period with independently transcribed source row. Measurement is accuracy-only to avoid repeating source row recall."
+    },
+    {
+      "instrument_id": "600018.SH",
+      "object_id": "owned:core-ev-00c0543cce37a02b:revenue:industry:散杂货板块",
+      "source_pages": [
+        18
+      ],
+      "delivery_text": {
+        "source_native_name": "散杂货板块",
+        "source_native_value": "1,634,605,977.53",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "included_in_recall": false,
+      "accurate": true,
+      "rationale": "Compared grouping column, row label, current-year revenue (not cost), unit 元 and reporting period with independently transcribed source row. Measurement is accuracy-only to avoid repeating source row recall."
+    },
+    {
+      "instrument_id": "600018.SH",
+      "object_id": "owned:core-ev-255806289de0aba3:segment:industry:港口物流板块",
+      "source_pages": [
+        18
+      ],
+      "delivery_text": {
+        "source_native_name": "港口物流板块",
+        "source_native_value": "14,434,866,466.79",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "included_in_recall": true,
+      "accurate": true,
+      "rationale": "Compared grouping column, row label, current-year revenue (not cost), unit 元 and reporting period with independently transcribed source row. Measurement is accuracy-only to avoid repeating source row recall."
+    },
+    {
+      "instrument_id": "600018.SH",
+      "object_id": "owned:core-ev-00c0543cce37a02b:revenue:industry:港口物流板块",
+      "source_pages": [
+        18
+      ],
+      "delivery_text": {
+        "source_native_name": "港口物流板块",
+        "source_native_value": "14,434,866,466.79",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "included_in_recall": false,
+      "accurate": true,
+      "rationale": "Compared grouping column, row label, current-year revenue (not cost), unit 元 and reporting period with independently transcribed source row. Measurement is accuracy-only to avoid repeating source row recall."
+    },
+    {
+      "instrument_id": "600018.SH",
+      "object_id": "owned:core-ev-255806289de0aba3:segment:industry:港口服务板块",
+      "source_pages": [
+        18
+      ],
+      "delivery_text": {
+        "source_native_name": "港口服务板块",
+        "source_native_value": "7,245,370,144.71",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "included_in_recall": true,
+      "accurate": true,
+      "rationale": "Compared grouping column, row label, current-year revenue (not cost), unit 元 and reporting period with independently transcribed source row. Measurement is accuracy-only to avoid repeating source row recall."
+    },
+    {
+      "instrument_id": "600018.SH",
+      "object_id": "owned:core-ev-00c0543cce37a02b:revenue:industry:港口服务板块",
+      "source_pages": [
+        18
+      ],
+      "delivery_text": {
+        "source_native_name": "港口服务板块",
+        "source_native_value": "7,245,370,144.71",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "included_in_recall": false,
+      "accurate": true,
+      "rationale": "Compared grouping column, row label, current-year revenue (not cost), unit 元 and reporting period with independently transcribed source row. Measurement is accuracy-only to avoid repeating source row recall."
+    },
+    {
+      "instrument_id": "600018.SH",
+      "object_id": "owned:core-ev-255806289de0aba3:segment:industry:其他",
+      "source_pages": [
+        18
+      ],
+      "delivery_text": {
+        "source_native_name": "其他",
+        "source_native_value": "1,858,834,784.17",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "included_in_recall": true,
+      "accurate": true,
+      "rationale": "Compared grouping column, row label, current-year revenue (not cost), unit 元 and reporting period with independently transcribed source row. Measurement is accuracy-only to avoid repeating source row recall."
+    },
+    {
+      "instrument_id": "600018.SH",
+      "object_id": "owned:core-ev-00c0543cce37a02b:revenue:industry:其他",
+      "source_pages": [
+        18
+      ],
+      "delivery_text": {
+        "source_native_name": "其他",
+        "source_native_value": "1,858,834,784.17",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "included_in_recall": false,
+      "accurate": true,
+      "rationale": "Compared grouping column, row label, current-year revenue (not cost), unit 元 and reporting period with independently transcribed source row. Measurement is accuracy-only to avoid repeating source row recall."
+    },
+    {
+      "instrument_id": "600018.SH",
+      "object_id": "owned:core-ev-255806289de0aba3:segment:region:国内",
+      "source_pages": [
+        18
+      ],
+      "delivery_text": {
+        "source_native_name": "国内",
+        "source_native_value": "37,507,470,224.24",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "included_in_recall": true,
+      "accurate": true,
+      "rationale": "Compared grouping column, row label, current-year revenue (not cost), unit 元 and reporting period with independently transcribed source row. Measurement is accuracy-only to avoid repeating source row recall."
+    },
+    {
+      "instrument_id": "600018.SH",
+      "object_id": "owned:core-ev-00c0543cce37a02b:revenue:region:国内",
+      "source_pages": [
+        18
+      ],
+      "delivery_text": {
+        "source_native_name": "国内",
+        "source_native_value": "37,507,470,224.24",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "included_in_recall": false,
+      "accurate": true,
+      "rationale": "Compared grouping column, row label, current-year revenue (not cost), unit 元 and reporting period with independently transcribed source row. Measurement is accuracy-only to avoid repeating source row recall."
+    },
+    {
+      "instrument_id": "600018.SH",
+      "object_id": "owned:core-ev-255806289de0aba3:segment:region:国外",
+      "source_pages": [
+        18
+      ],
+      "delivery_text": {
+        "source_native_name": "国外",
+        "source_native_value": "852,790,317.17",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "included_in_recall": true,
+      "accurate": true,
+      "rationale": "Compared grouping column, row label, current-year revenue (not cost), unit 元 and reporting period with independently transcribed source row. Measurement is accuracy-only to avoid repeating source row recall."
+    },
+    {
+      "instrument_id": "600018.SH",
+      "object_id": "owned:core-ev-00c0543cce37a02b:revenue:region:国外",
+      "source_pages": [
+        18
+      ],
+      "delivery_text": {
+        "source_native_name": "国外",
+        "source_native_value": "852,790,317.17",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "included_in_recall": false,
+      "accurate": true,
+      "rationale": "Compared grouping column, row label, current-year revenue (not cost), unit 元 and reporting period with independently transcribed source row. Measurement is accuracy-only to avoid repeating source row recall."
+    },
+    {
+      "instrument_id": "600055.SH",
+      "object_id": "answer:principal_business",
+      "source_pages": [
+        11
+      ],
+      "delivery_text": "2025 年，作为国产医学影像装备与智慧医疗解决方案的核心提供商，公司在大型医疗\r\n设备集采和 DRG 医保支付改革等变革中持续突破、在挑战中稳步前行，是公司承前启后、\r\n谋篇布局“十五五”发展的关键之年。",
+      "included_in_recall": true,
+      "accurate": true,
+      "rationale": "Independently compared subject, established business and complete delivered wording with frozen official source; query/export identical."
+    },
+    {
+      "instrument_id": "600055.SH",
+      "object_id": "answer:products_services",
+      "source_pages": [
+        11
+      ],
+      "delivery_text": "2025 年，作为国产医学影像装备与智慧医疗解决方案的核心提供商，公司在大型医疗\r\n设备集采和 DRG 医保支付改革等变革中持续突破、在挑战中稳步前行，是公司承前启后、\r\n谋篇布局“十五五”发展的关键之年。",
+      "included_in_recall": true,
+      "accurate": true,
+      "rationale": "Independently compared subject, established business and complete delivered wording with frozen official source; query/export identical."
+    },
+    {
+      "instrument_id": "600055.SH",
+      "object_id": "answer:revenue_model",
+      "source_pages": [
+        24
+      ],
+      "delivery_text": "医疗器械销售业务",
+      "included_in_recall": true,
+      "accurate": true,
+      "rationale": "Independently compared subject, established business and complete delivered wording with frozen official source; query/export identical."
+    },
+    {
+      "instrument_id": "600055.SH",
+      "object_id": "owned:core-ev-54ce7352fd4a7215:overview",
+      "source_pages": [
+        11
+      ],
+      "delivery_text": "2025 年，作为国产医学影像装备与智慧医疗解决方案的核心提供商，公司在大型医疗\r\n设备集采和 DRG 医保支付改革等变革中持续突破、在挑战中稳步前行，是公司承前启后、\r\n谋篇布局“十五五”发展的关键之年。",
+      "included_in_recall": false,
+      "accurate": true,
+      "rationale": "Complete affirmative source sentence. SIPG Overview is the sole fee-mechanism recall carrier; Wan Dong Overview is accuracy-only because positioning is covered by dimension recall."
+    },
+    {
+      "instrument_id": "600055.SH",
+      "object_id": "owned:core-ev-761b9281cbbd470e:segment:industry:医疗器械销售业务",
+      "source_pages": [
+        24
+      ],
+      "delivery_text": {
+        "source_native_name": "医疗器械销售业务",
+        "source_native_value": "1,215,067,024.87",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "included_in_recall": true,
+      "accurate": true,
+      "rationale": "Compared grouping column, row label, current-year revenue (not cost), unit 元 and reporting period with independently transcribed source row. Measurement is accuracy-only to avoid repeating source row recall."
+    },
+    {
+      "instrument_id": "600055.SH",
+      "object_id": "owned:core-ev-de3fe343480e9d65:revenue:industry:医疗器械销售业务",
+      "source_pages": [
+        24
+      ],
+      "delivery_text": {
+        "source_native_name": "医疗器械销售业务",
+        "source_native_value": "1,215,067,024.87",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "included_in_recall": false,
+      "accurate": true,
+      "rationale": "Compared grouping column, row label, current-year revenue (not cost), unit 元 and reporting period with independently transcribed source row. Measurement is accuracy-only to avoid repeating source row recall."
+    },
+    {
+      "instrument_id": "600055.SH",
+      "object_id": "owned:core-ev-761b9281cbbd470e:segment:product:医疗器械销售业务",
+      "source_pages": [
+        24
+      ],
+      "delivery_text": {
+        "source_native_name": "医疗器械销售业务",
+        "source_native_value": "1,150,604,587.71",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "included_in_recall": true,
+      "accurate": true,
+      "rationale": "Compared grouping column, row label, current-year revenue (not cost), unit 元 and reporting period with independently transcribed source row. Measurement is accuracy-only to avoid repeating source row recall."
+    },
+    {
+      "instrument_id": "600055.SH",
+      "object_id": "owned:core-ev-de3fe343480e9d65:revenue:product:医疗器械销售业务",
+      "source_pages": [
+        24
+      ],
+      "delivery_text": {
+        "source_native_name": "医疗器械销售业务",
+        "source_native_value": "1,150,604,587.71",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "included_in_recall": false,
+      "accurate": true,
+      "rationale": "Compared grouping column, row label, current-year revenue (not cost), unit 元 and reporting period with independently transcribed source row. Measurement is accuracy-only to avoid repeating source row recall."
+    },
+    {
+      "instrument_id": "600055.SH",
+      "object_id": "owned:core-ev-761b9281cbbd470e:segment:product:劳务及服务",
+      "source_pages": [
+        24
+      ],
+      "delivery_text": {
+        "source_native_name": "劳务及服务",
+        "source_native_value": "64,462,437.16",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "included_in_recall": true,
+      "accurate": true,
+      "rationale": "Compared grouping column, row label, current-year revenue (not cost), unit 元 and reporting period with independently transcribed source row. Measurement is accuracy-only to avoid repeating source row recall."
+    },
+    {
+      "instrument_id": "600055.SH",
+      "object_id": "owned:core-ev-de3fe343480e9d65:revenue:product:劳务及服务",
+      "source_pages": [
+        24
+      ],
+      "delivery_text": {
+        "source_native_name": "劳务及服务",
+        "source_native_value": "64,462,437.16",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "included_in_recall": false,
+      "accurate": true,
+      "rationale": "Compared grouping column, row label, current-year revenue (not cost), unit 元 and reporting period with independently transcribed source row. Measurement is accuracy-only to avoid repeating source row recall."
+    },
+    {
+      "instrument_id": "600055.SH",
+      "object_id": "owned:core-ev-761b9281cbbd470e:segment:region:华北地区",
+      "source_pages": [
+        24
+      ],
+      "delivery_text": {
+        "source_native_name": "华北地区",
+        "source_native_value": "68,501,338.14",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "included_in_recall": true,
+      "accurate": true,
+      "rationale": "Compared grouping column, row label, current-year revenue (not cost), unit 元 and reporting period with independently transcribed source row. Measurement is accuracy-only to avoid repeating source row recall."
+    },
+    {
+      "instrument_id": "600055.SH",
+      "object_id": "owned:core-ev-de3fe343480e9d65:revenue:region:华北地区",
+      "source_pages": [
+        24
+      ],
+      "delivery_text": {
+        "source_native_name": "华北地区",
+        "source_native_value": "68,501,338.14",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "included_in_recall": false,
+      "accurate": true,
+      "rationale": "Compared grouping column, row label, current-year revenue (not cost), unit 元 and reporting period with independently transcribed source row. Measurement is accuracy-only to avoid repeating source row recall."
+    },
+    {
+      "instrument_id": "600055.SH",
+      "object_id": "owned:core-ev-761b9281cbbd470e:segment:region:东北地区",
+      "source_pages": [
+        25
+      ],
+      "delivery_text": {
+        "source_native_name": "东北地区",
+        "source_native_value": "167,663,718.84",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "included_in_recall": true,
+      "accurate": true,
+      "rationale": "Compared grouping column, row label, current-year revenue (not cost), unit 元 and reporting period with independently transcribed source row. Measurement is accuracy-only to avoid repeating source row recall."
+    },
+    {
+      "instrument_id": "600055.SH",
+      "object_id": "owned:core-ev-de3fe343480e9d65:revenue:region:东北地区",
+      "source_pages": [
+        25
+      ],
+      "delivery_text": {
+        "source_native_name": "东北地区",
+        "source_native_value": "167,663,718.84",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "included_in_recall": false,
+      "accurate": true,
+      "rationale": "Compared grouping column, row label, current-year revenue (not cost), unit 元 and reporting period with independently transcribed source row. Measurement is accuracy-only to avoid repeating source row recall."
+    },
+    {
+      "instrument_id": "600055.SH",
+      "object_id": "owned:core-ev-761b9281cbbd470e:segment:region:华东地区",
+      "source_pages": [
+        25
+      ],
+      "delivery_text": {
+        "source_native_name": "华东地区",
+        "source_native_value": "159,329,648.70",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "included_in_recall": true,
+      "accurate": true,
+      "rationale": "Compared grouping column, row label, current-year revenue (not cost), unit 元 and reporting period with independently transcribed source row. Measurement is accuracy-only to avoid repeating source row recall."
+    },
+    {
+      "instrument_id": "600055.SH",
+      "object_id": "owned:core-ev-de3fe343480e9d65:revenue:region:华东地区",
+      "source_pages": [
+        25
+      ],
+      "delivery_text": {
+        "source_native_name": "华东地区",
+        "source_native_value": "159,329,648.70",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "included_in_recall": false,
+      "accurate": true,
+      "rationale": "Compared grouping column, row label, current-year revenue (not cost), unit 元 and reporting period with independently transcribed source row. Measurement is accuracy-only to avoid repeating source row recall."
+    },
+    {
+      "instrument_id": "600055.SH",
+      "object_id": "owned:core-ev-761b9281cbbd470e:segment:region:中南地区",
+      "source_pages": [
+        25
+      ],
+      "delivery_text": {
+        "source_native_name": "中南地区",
+        "source_native_value": "203,724,781.89",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "included_in_recall": true,
+      "accurate": true,
+      "rationale": "Compared grouping column, row label, current-year revenue (not cost), unit 元 and reporting period with independently transcribed source row. Measurement is accuracy-only to avoid repeating source row recall."
+    },
+    {
+      "instrument_id": "600055.SH",
+      "object_id": "owned:core-ev-de3fe343480e9d65:revenue:region:中南地区",
+      "source_pages": [
+        25
+      ],
+      "delivery_text": {
+        "source_native_name": "中南地区",
+        "source_native_value": "203,724,781.89",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "included_in_recall": false,
+      "accurate": true,
+      "rationale": "Compared grouping column, row label, current-year revenue (not cost), unit 元 and reporting period with independently transcribed source row. Measurement is accuracy-only to avoid repeating source row recall."
+    },
+    {
+      "instrument_id": "600055.SH",
+      "object_id": "owned:core-ev-761b9281cbbd470e:segment:region:西南地区",
+      "source_pages": [
+        25
+      ],
+      "delivery_text": {
+        "source_native_name": "西南地区",
+        "source_native_value": "95,048,263.36",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "included_in_recall": true,
+      "accurate": true,
+      "rationale": "Compared grouping column, row label, current-year revenue (not cost), unit 元 and reporting period with independently transcribed source row. Measurement is accuracy-only to avoid repeating source row recall."
+    },
+    {
+      "instrument_id": "600055.SH",
+      "object_id": "owned:core-ev-de3fe343480e9d65:revenue:region:西南地区",
+      "source_pages": [
+        25
+      ],
+      "delivery_text": {
+        "source_native_name": "西南地区",
+        "source_native_value": "95,048,263.36",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "included_in_recall": false,
+      "accurate": true,
+      "rationale": "Compared grouping column, row label, current-year revenue (not cost), unit 元 and reporting period with independently transcribed source row. Measurement is accuracy-only to avoid repeating source row recall."
+    },
+    {
+      "instrument_id": "600055.SH",
+      "object_id": "owned:core-ev-761b9281cbbd470e:segment:region:西北地区",
+      "source_pages": [
+        25
+      ],
+      "delivery_text": {
+        "source_native_name": "西北地区",
+        "source_native_value": "161,075,733.73",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "included_in_recall": true,
+      "accurate": true,
+      "rationale": "Compared grouping column, row label, current-year revenue (not cost), unit 元 and reporting period with independently transcribed source row. Measurement is accuracy-only to avoid repeating source row recall."
+    },
+    {
+      "instrument_id": "600055.SH",
+      "object_id": "owned:core-ev-de3fe343480e9d65:revenue:region:西北地区",
+      "source_pages": [
+        25
+      ],
+      "delivery_text": {
+        "source_native_name": "西北地区",
+        "source_native_value": "161,075,733.73",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "included_in_recall": false,
+      "accurate": true,
+      "rationale": "Compared grouping column, row label, current-year revenue (not cost), unit 元 and reporting period with independently transcribed source row. Measurement is accuracy-only to avoid repeating source row recall."
+    },
+    {
+      "instrument_id": "600055.SH",
+      "object_id": "owned:core-ev-761b9281cbbd470e:segment:region:中国大陆以外区域",
+      "source_pages": [
+        25
+      ],
+      "delivery_text": {
+        "source_native_name": "中国大陆以外区域",
+        "source_native_value": "359,723,540.21",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "included_in_recall": true,
+      "accurate": true,
+      "rationale": "Compared grouping column, row label, current-year revenue (not cost), unit 元 and reporting period with independently transcribed source row. Measurement is accuracy-only to avoid repeating source row recall."
+    },
+    {
+      "instrument_id": "600055.SH",
+      "object_id": "owned:core-ev-de3fe343480e9d65:revenue:region:中国大陆以外区域",
+      "source_pages": [
+        25
+      ],
+      "delivery_text": {
+        "source_native_name": "中国大陆以外区域",
+        "source_native_value": "359,723,540.21",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "included_in_recall": false,
+      "accurate": true,
+      "rationale": "Compared grouping column, row label, current-year revenue (not cost), unit 元 and reporting period with independently transcribed source row. Measurement is accuracy-only to avoid repeating source row recall."
+    },
+    {
+      "instrument_id": "600055.SH",
+      "object_id": "owned:core-ev-761b9281cbbd470e:segment:sales_mode:直销",
+      "source_pages": [
+        25
+      ],
+      "delivery_text": {
+        "source_native_name": "直销",
+        "source_native_value": "196,671,722.46",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "included_in_recall": true,
+      "accurate": true,
+      "rationale": "Compared grouping column, row label, current-year revenue (not cost), unit 元 and reporting period with independently transcribed source row. Measurement is accuracy-only to avoid repeating source row recall."
+    },
+    {
+      "instrument_id": "600055.SH",
+      "object_id": "owned:core-ev-de3fe343480e9d65:revenue:sales_mode:直销",
+      "source_pages": [
+        25
+      ],
+      "delivery_text": {
+        "source_native_name": "直销",
+        "source_native_value": "196,671,722.46",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "included_in_recall": false,
+      "accurate": true,
+      "rationale": "Compared grouping column, row label, current-year revenue (not cost), unit 元 and reporting period with independently transcribed source row. Measurement is accuracy-only to avoid repeating source row recall."
+    },
+    {
+      "instrument_id": "600055.SH",
+      "object_id": "owned:core-ev-761b9281cbbd470e:segment:sales_mode:分销",
+      "source_pages": [
+        25
+      ],
+      "delivery_text": {
+        "source_native_name": "分销",
+        "source_native_value": "1,018,395,302.41",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "included_in_recall": true,
+      "accurate": true,
+      "rationale": "Compared grouping column, row label, current-year revenue (not cost), unit 元 and reporting period with independently transcribed source row. Measurement is accuracy-only to avoid repeating source row recall."
+    },
+    {
+      "instrument_id": "600055.SH",
+      "object_id": "owned:core-ev-de3fe343480e9d65:revenue:sales_mode:分销",
+      "source_pages": [
+        25
+      ],
+      "delivery_text": {
+        "source_native_name": "分销",
+        "source_native_value": "1,018,395,302.41",
+        "source_native_unit": "元",
+        "reported_period": "2025-12-31"
+      },
+      "included_in_recall": false,
+      "accurate": true,
+      "rationale": "Compared grouping column, row label, current-year revenue (not cost), unit 元 and reporting period with independently transcribed source row. Measurement is accuracy-only to avoid repeating source row recall."
+    }
+  ],
+  "v18_unchanged_sha256": {
+    "data/checkpoints/company_profile_common_core/reports/m4_v18_port_fee_narrative/plan.json": "5a46e41fc783cca8e72248af815fcf127303947b94ad383e3e4095a5e656969b",
+    "data/checkpoints/company_profile_common_core/reports/m4_v18_port_fee_narrative/company_profile_live_run.v1.json": "9847466b443cc6579f873fcff3517daa288151140e475d87ca1267a95e69b70a",
+    "data/checkpoints/company_profile_common_core/reports/m4_v18_port_fee_narrative/observation.json": "6f1cb144ffa90ab93d79437af01d49d86fd018766a8dbc41bbc6ac5030e60919",
+    "data/checkpoints/company_profile_common_core/reports/m4_v18_port_fee_narrative/company_profile_source_review.v1.json": "f790ad03aeaf10f8077fe2aa2500e39eddcf4441dd6f9dcf3954201528309d5d",
+    "data/exports/m4_v18_port_fee_narrative/profiles.csv": "ebeb738e89a0c4ccf443bc79365e5cc4042a9609dbdccf67544f43d42e4f2973",
+    "data/exports/m4_v18_port_fee_narrative/600055.SH_2025-12-31.json": "993132e940f73176ebab3e4e8e2e71cb67090c0a8b484e05d7d1446922ab58b4",
+    "data/exports/m4_v18_port_fee_narrative/600018.SH_2025-12-31.json": "f5b0447e3c597228a0fcdb3d464448d3d48ac8cebb6e9cba0ead16d6aa8525fc",
+    "data/exports/m4_v18_port_fee_narrative/export_manifest.json": "b58809981dd1f37bced19698634dd576989e0c3864d6f706ebaada8027bed09e",
+    "data/research/company_profile_common_core/company_profile_common_core.v1/bp-work-05768416d7dcf3c961bfa98a.json": "0500454cd926ea3f001f469e6c4bc3fc2de1c2a4195621f06bd6862b47f0627d",
+    "data/research/company_profile_common_core/company_profile_common_core.v1/checkpoints/bp-work-05768416d7dcf3c961bfa98a.json": "58c545021d8fe236de39222f65428d80f95ebae439575c63e3bf790978e6f125",
+    "data/research/company_profile_common_core/company_profile_common_core.v1/bp-work-093944478c7eacf56b027dd7.json": "197f65ac92e574b62c4efa6887e3f15d0a64fa29799d3af5e0fa285007e458cd",
+    "data/research/company_profile_common_core/company_profile_common_core.v1/checkpoints/bp-work-093944478c7eacf56b027dd7.json": "733d655803ef941726b9bfaf666c008d8872e8d4b68474f488e3ef75364fb46f"
+  },
+  "v19_artifact_sha256": {
+    "data/exports/m4_v19_closure/600018.SH/600018.SH_2025-12-31.json": "425c57e7bbd7d33e85c9ac6ca2c08509bfa79ee5658020e53e4f1c5becb244e6",
+    "data/research/company_profile_common_core/m4_v19_closure/company_profile_common_core.v1/bp-work-a376d67f3090a69d1243c512.json": "e37c2c5923ade3defd2c867ee95bcac0526d94b6eb0349550ec54402f0adfc5d",
+    "data/research/company_profile_common_core/m4_v19_closure/company_profile_common_core.v1/checkpoints/bp-work-a376d67f3090a69d1243c512.json": "836fd5a80ea9c2b35193b14bf47802fe8a75eb73930213c3d91f1c3adc5177ff",
+    "data/exports/m4_v19_closure/600055.SH/600055.SH_2025-12-31.json": "723735f81311e370e96c8e8863ff1b4b3b02fb164d7610e0e407b32912ef0640",
+    "data/research/company_profile_common_core/m4_v19_closure/company_profile_common_core.v1/bp-work-ffaf3debeef5a988ee6464c4.json": "ad50fe2d51d35889de4bdcadf04391852cb3292d8ac873a31e8a6ab6cfc2ba7c",
+    "data/research/company_profile_common_core/m4_v19_closure/company_profile_common_core.v1/checkpoints/bp-work-ffaf3debeef5a988ee6464c4.json": "cb1837b5b7e1d1b33c1ce6db74a2d79f26476ede814a0062396b1426d6b29acc",
+    "data/checkpoints/company_profile_common_core/reports/m4_v19_closure/plan.json": "5a46e41fc783cca8e72248af815fcf127303947b94ad383e3e4095a5e656969b",
+    "data/checkpoints/company_profile_common_core/reports/m4_v19_closure/company_profile_live_run.v1.json": "9847466b443cc6579f873fcff3517daa288151140e475d87ca1267a95e69b70a",
+    "data/checkpoints/company_profile_common_core/reports/m4_v19_closure/observation.json": "6f1cb144ffa90ab93d79437af01d49d86fd018766a8dbc41bbc6ac5030e60919",
+    "data/checkpoints/company_profile_common_core/reports/m4_v19_closure/formal_execution.json": "e885c98c5e9fe464eed8792c5e4eaadcd4d427994ae537b5d236fbbee6802d59",
+    "data/checkpoints/company_profile_common_core/reports/m4_v19_closure/company_profile_source_review.v1.json": "ba9f8d69e6abc24b73dadcf41f5b7d72660e67a396698cc4b00c57ab6484b51e"
+  },
+  "known_delivery_limitations": [
+    "Wan Dong overview scope task_complete=false because explicit_activity required_coverage_missing remains recorded. Accepted Overview and three requested answers are delivered; this review does not assert complete extraction of every field or every report disclosure."
+  ],
+  "independent_source_scope": "Required six answer disclosures, 19 current-year revenue rows across the specified source tables, and SIPG fee mechanism; 100% recall applies only to this declared review scope.",
+  "official_source_pdfs": {
+    "600018.SH": {
+      "path": "data/filings/announcements/blobs/01/0100d2e99a61ea2d9d7022259f724b00530f1058c3a93163106630f0ffdcbfe7.pdf",
+      "sha256": "0100d2e99a61ea2d9d7022259f724b00530f1058c3a93163106630f0ffdcbfe7",
+      "checked_pages": [
+        12,
+        18,
+        19
+      ]
+    },
+    "600055.SH": {
+      "path": "data/filings/business_profile/2025/SSE/600055_SH_2025Q4_1225032068_f056575a51c47c5299710860826d677fcc24faf894b62c9e8818bc97459a866e.pdf",
+      "sha256": "f056575a51c47c5299710860826d677fcc24faf894b62c9e8818bc97459a866e",
+      "checked_pages": [
+        11,
+        24,
+        25
+      ]
+    }
+  }
+}

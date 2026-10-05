@@ -129,7 +129,7 @@ _MAIN_OPERATION_SENTENCE = re.compile(
     r"主要经营[^。]{8,220}(?:。[\s\S]{0,400}?经营模式[^。]{2,220})?"
 )
 _OPERATING_MODEL_SENTENCE = re.compile(
-    r"公司的经营模式主要为[:：][^。]{2,220}(?:，[^。]{2,220})?"
+    r"(?<![\u4e00-\u9fff])(?:本公司|公司)的?经营模式主要为[:：][^。]{2,300}"
 )
 _COMPANY_AS_NARRATIVE = re.compile(
     r"[^。\n]{2,40}作为[^。]{2,80}(?:上市公司|工业企业)"
@@ -137,7 +137,7 @@ _COMPANY_AS_NARRATIVE = re.compile(
     r"(?:。[^。\n]{2,200}涉足[^。]{2,200})?"
 )
 _PROVIDER_NARRATIVE = re.compile(
-    r"作为[^。\n]{2,60}核心提供商[^。]{2,60}(?:公司|本公司)[^。]{8,300}"
+    r"作为[^。；;\n]{2,60}核心提供商[，,]\s*(?:本公司|公司)[^。；;]{8,300}"
 )
 _CORE_ANSWER_SUBSTANCE = re.compile(
     _COMPANY_BUSINESS_SENTENCE.pattern + "|" + _STEEL_BUSINESS_SENTENCE.pattern
@@ -148,6 +148,10 @@ _SOURCE_DELIVERY_SUBSTANCE = re.compile(
     + _MAIN_BUSINESS_SENTENCE.pattern
     + "|"
     + _INTEGRATED_BUSINESS_SENTENCE.pattern
+    + "|"
+    + _OPERATING_MODEL_SENTENCE.pattern
+    + "|"
+    + _PROVIDER_NARRATIVE.pattern
 )
 _SPEC_OBJECT = re.compile(r"^(?:厚度|宽度|长度)")
 _REVENUE_PARENT_LABELS = frozenset({"航空性收入", "非航空性收入"})
@@ -1062,6 +1066,7 @@ REVENUE_SENTENCE_REPAIR_V15 = "v15"
 REVENUE_SENTENCE_REPAIR_V16 = "v16"
 REVENUE_SENTENCE_REPAIR_V17 = "v17"
 REVENUE_SENTENCE_REPAIR_V18 = "v18"
+REVENUE_SENTENCE_REPAIR_V19 = "v19"
 _REVENUE_SENTENCE_REPAIR_VERSIONS = frozenset(
     {
         REVENUE_SENTENCE_REPAIR_V1,
@@ -1082,6 +1087,7 @@ _REVENUE_SENTENCE_REPAIR_VERSIONS = frozenset(
         REVENUE_SENTENCE_REPAIR_V16,
         REVENUE_SENTENCE_REPAIR_V17,
         REVENUE_SENTENCE_REPAIR_V18,
+        REVENUE_SENTENCE_REPAIR_V19,
     }
 )
 
@@ -1125,6 +1131,7 @@ def named_role_repair_requested(identity: Mapping[str, Any] | None) -> bool:
         REVENUE_SENTENCE_REPAIR_V16,
         REVENUE_SENTENCE_REPAIR_V17,
         REVENUE_SENTENCE_REPAIR_V18,
+        REVENUE_SENTENCE_REPAIR_V19,
     }
 
 
@@ -1151,6 +1158,7 @@ def service_operating_energy_requested(identity: Mapping[str, Any] | None) -> bo
         REVENUE_SENTENCE_REPAIR_V16,
         REVENUE_SENTENCE_REPAIR_V17,
         REVENUE_SENTENCE_REPAIR_V18,
+        REVENUE_SENTENCE_REPAIR_V19,
     }
 
 
@@ -1177,6 +1185,7 @@ def core_answer_repair_requested(identity: Mapping[str, Any] | None) -> bool:
         REVENUE_SENTENCE_REPAIR_V16,
         REVENUE_SENTENCE_REPAIR_V17,
         REVENUE_SENTENCE_REPAIR_V18,
+        REVENUE_SENTENCE_REPAIR_V19,
     }
 
 
@@ -1204,6 +1213,7 @@ def source_delivery_repair_requested(identity: Mapping[str, Any] | None) -> bool
         REVENUE_SENTENCE_REPAIR_V16,
         REVENUE_SENTENCE_REPAIR_V17,
         REVENUE_SENTENCE_REPAIR_V18,
+        REVENUE_SENTENCE_REPAIR_V19,
     }
 
 
@@ -2483,14 +2493,29 @@ def _main_operation_source(excerpt: str) -> str:
 
 
 def _provider_narrative_source(excerpt: str) -> str:
-    """The 作为……核心提供商，公司…… current-business narrative."""
+    """Keep the whole affirmative positioning sentence of the reporting company."""
 
     joined = _join_pdf_soft_breaks(excerpt)
-    match = _PROVIDER_NARRATIVE.search(joined)
-    if match is None:
-        return ""
-    compact = re.sub(r"\s+", "", match.group(0))
-    return _original_span_matching(excerpt, compact) or ""
+    for match in _PROVIDER_NARRATIVE.finditer(joined):
+        sentence = _sentence_containing(joined, match.start())
+        compact = re.sub(r"\s+", "", sentence)
+        # The positioning clause and the immediately following grammatical
+        # subject must both describe this company. Do not discard a prefix
+        # such as 公司拟 when capturing from 作为.
+        if re.match(
+            r"^(?:\d{4}年[，,])?(?:(?:本公司|公司))?作为", compact
+        ) is None:
+            continue
+        role, _, predicate = compact.partition("核心提供商")
+        if re.search(r"拟|计划|未来|希望|愿景|目标|第三方|子公司", role):
+            continue
+        if re.match(
+            r"[，,](?:本公司|公司)(?:拟|计划|将|预期|尚未|未|不|希望|力争)",
+            predicate,
+        ):
+            continue
+        return _original_span_matching(excerpt, compact) or ""
+    return ""
 
 
 def _company_as_narrative_source(excerpt: str) -> str:
@@ -2509,7 +2534,9 @@ def _operating_model_source(excerpt: str) -> str:
 
     joined = _join_pdf_soft_breaks(excerpt)
     match = _OPERATING_MODEL_SENTENCE.search(joined)
-    if match is None:
+    if match is None or not _overview_states_revenue(
+        match.group(0), repair_revenue_sentence=True
+    ):
         return ""
     compact = re.sub(r"\s+", "", match.group(0))
     return _original_span_matching(excerpt, compact) or ""
@@ -3029,6 +3056,10 @@ def _reporting_company_revenue_clauses(excerpt: str) -> list[str]:
     joined = _join_wrapped_lines(excerpt)
     clauses: list[str] = []
     for sentence in re.split(r"[。；;]", joined):
+        operating_model = _operating_model_source(sentence)
+        if operating_model:
+            clauses.append(re.sub(r"\s+", "", operating_model))
+            continue
         for piece in re.split(r"[，,]", sentence):
             compact = re.sub(r"\s+", "", piece).strip()
             if _is_reporting_company_revenue(compact):

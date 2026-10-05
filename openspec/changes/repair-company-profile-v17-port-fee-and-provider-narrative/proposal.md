@@ -1,6 +1,6 @@
 ## Why
 
-v17 未见轮以 24/26、44/44 失败收口。owner 审核确认两类叙述缺口:上港 p12"公司的经营模式主要为:为客户提供港口及相关服务,收取港口作业包干费、库场使用费和港口其他收费"在候选提取处按逗号拆断——服务从句缺收费动作、收费从句缺公司主语,收入记录未生成,三类费用只在引文里,收入答案停留在"集装箱板块";万东 p11"作为国产医学影像装备与智慧医疗解决方案的核心提供商,公司……"未命中现有叙述捕获,概览候选未生成,主营缺失。复核亦有缺陷:漏计上港四条 Activity、负例未写实际检查页,44/44 不等于覆盖全部交付。
+v17 未见轮以 24/26、44/44 失败收口。owner 审核确认两类叙述缺口:上港 p12"公司经营模式主要为:为客户提供港口及相关服务,收取港口作业包干费、库场使用费和港口其他收费"在候选提取处按逗号拆断——服务从句缺收费动作、收费从句缺公司主语,收入记录未生成,三类费用只在引文里,收入答案停留在"集装箱板块";万东 p11"作为国产医学影像装备与智慧医疗解决方案的核心提供商,公司……"未命中现有叙述捕获,概览候选未生成,主营缺失。复核亦有缺陷:漏计上港四条 Activity、负例未写实际检查页,44/44 不等于覆盖全部交付。
 
 ## What Changes
 
@@ -23,3 +23,7 @@ v17 未见轮以 24/26、44/44 失败收口。owner 审核确认两类叙述缺�
 - 改动在现有候选提取与叙述捕获。不新增执行链。
 - `production_authorization` 保持 `not_authorized`,`scale_quality_claim_allowed` 保持 false。
 - 全部门槛通过后才评审下一组未见样本;未通过继续暂停。
+
+## 2026-10-05 closure amendment
+
+A-role review rejected v18. Tasks 4.1–4.3 supersede its acceptance claim: frozen full-page regression, affirmative reporting-company provider binding, runtime-based reuse reporting, and isolated v19 first execution with unique per-object scoring. The v18 observation and score bytes stay unchanged; its separate restriction is `v18-review-limitations.md`. Archive and unseen-sample expansion remain paused until A-role acceptance.

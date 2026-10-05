@@ -229,11 +229,64 @@ def test_two_runs_keep_both_outcomes_including_a_failure(tmp_path):
     assert merged.outcome_for(service_report.instrument_id).status == "failed"
     assert merged.outcome_for(service_report.instrument_id).tokens_consumed == 120
     assert merged.outcome_for(manufacturing.instrument_id).status == "incomplete"
-    assert merged.outcome_for(manufacturing.instrument_id).reused_scope is True
+    # Enqueue reuse is not proof of runtime chapter reuse.
+    assert merged.outcome_for(manufacturing.instrument_id).reused_scope is False
     assert merged.outcome_for(manufacturing.instrument_id).tokens_consumed == 0
     assert merged.tokens_consumed == 120
     assert service.runtime._total_token_budget == 49_880
     assert service.runtime.provider._total_token_budget == 49_880
+
+
+@pytest.mark.parametrize("fresh_tokens", [0, 120])
+def test_observation_tracks_actual_partial_scope_reuse_even_with_fresh_tokens(tmp_path, fresh_tokens):
+    from research.company_profile.runtime import _WorkState
+    from tests.unit.test_research.test_company_profile_runtime import _report
+
+    plan = _plan()
+    service_report, manufacturing = plan.reports
+    service, _ = _prepare(tmp_path, plan, {
+        service_report.instrument_id: _binding(service_report),
+        manufacturing.instrument_id: _binding(manufacturing),
+    })
+    service.runtime._states["reused"] = _WorkState(
+        work_id="reused", report=_report(instrument_id=service_report.instrument_id),
+        reused_scope_ids=["extract_segment_financials"], tokens_used=fresh_tokens,
+    )
+    service.runtime._states["fresh"] = _WorkState(
+        work_id="fresh", report=_report(instrument_id=manufacturing.instrument_id),
+    )
+    service._record_m4_next_batch_call(
+        plan=plan, instrument_ids=(service_report.instrument_id, manufacturing.instrument_id),
+        work_ids=(), before_tokens=0, failed=False, result_state="completed",
+        delivered_ids=(service_report.instrument_id, manufacturing.instrument_id),
+    )
+    observation = load_m4_next_batch_observation_for_source_review(service.checkpoint_root)
+    assert observation.outcome_for(service_report.instrument_id).reused_scope is True
+    assert observation.outcome_for(manufacturing.instrument_id).reused_scope is False
+    assert observation.tokens_consumed == fresh_tokens
+
+
+@pytest.mark.parametrize("fresh_tokens", [0, 120])
+def test_observation_uses_persisted_runtime_reuse_without_local_state(tmp_path, monkeypatch, fresh_tokens):
+    plan = _plan()
+    report = plan.reports[0]
+    service, _ = _prepare(tmp_path, plan, {report.instrument_id: _binding(report)})
+    monkeypatch.setattr(service.runtime, "fresh_tokens", lambda: fresh_tokens)
+    monkeypatch.setattr(service.repository, "get", lambda work_id: {
+        "instrument_id": report.instrument_id,
+        "metadata": {"stage_results": {"semantic": {
+            "reused_scope_ids": ["extract_segment_financials"],
+        }}},
+    })
+    assert not service.runtime.reused_scopes_by_instrument()
+    service._record_m4_next_batch_call(
+        plan=plan, instrument_ids=(report.instrument_id,), work_ids=("persisted-work",),
+        before_tokens=0, failed=False, result_state="completed",
+        delivered_ids=(report.instrument_id,),
+    )
+    observation = load_m4_next_batch_observation(service.checkpoint_root, plan)
+    assert observation.outcome_for(report.instrument_id).reused_scope is True
+    assert observation.tokens_consumed == fresh_tokens
 
 
 def test_paused_run_keeps_paused_status(tmp_path):

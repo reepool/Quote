@@ -78,7 +78,6 @@ from research.company_profile.m4_next_batch import (
     require_explicit_m4_plan,
     save_m4_next_batch_observation,
     save_m4_next_batch_plan,
-    tokens_consumed_by_call,
 )
 from research.company_profile.models import PRODUCTION_AUTHORIZATION
 from research.company_profile.operator_closure import (
@@ -946,7 +945,7 @@ class CompanyProfileTaskService:
         plan: M4NextBatchPlan | None,
         instrument_ids: Sequence[str],
         before_tokens: int,
-        reused_scope: bool,
+        work_ids: Sequence[str],
         failed: bool,
         result_state: str,
         delivered_ids: Sequence[str] = (),
@@ -958,10 +957,15 @@ class CompanyProfileTaskService:
         if not called:
             return
         delta = max(0, self.runtime.fresh_tokens() - before_tokens)
-        consumed = tokens_consumed_by_call(
-            tokens_used=delta,
-            reused_scope=reused_scope and delta == 0,
-        )
+        reused_instruments = set(self.runtime.reused_scopes_by_instrument())
+        for work_id in work_ids:
+            try:
+                item = self.repository.get(str(work_id))
+            except KeyError:
+                continue
+            stages = (item.get("metadata") or {}).get("stage_results") or {}
+            if any(result.get("reused_scope_ids") for result in stages.values()):
+                reused_instruments.add(str(item.get("instrument_id") or ""))
         observation = load_m4_next_batch_observation(
             self.checkpoint_root, plan, plan_directory=self.plan_directory
         )
@@ -978,8 +982,8 @@ class CompanyProfileTaskService:
                         result_state=result_state,
                         delivered=instrument_id in delivered_ids,
                     ),
-                    tokens_consumed=consumed if index == 0 else 0,
-                    reused_scope=reused_scope and delta == 0,
+                    tokens_consumed=delta if index == 0 else 0,
+                    reused_scope=instrument_id in reused_instruments,
                     reason="call_failed" if failed else None,
                 ),
             )
@@ -1160,7 +1164,7 @@ class CompanyProfileTaskService:
                 plan=batch_plan,
                 instrument_ids=instrument_ids,
                 before_tokens=before_tokens,
-                reused_scope=False,
+                work_ids=tuple(enqueue_result.get("work_ids") or ()),
                 failed=True,
                 result_state="failed",
             )
@@ -1193,7 +1197,7 @@ class CompanyProfileTaskService:
             plan=batch_plan,
             instrument_ids=instrument_ids,
             before_tokens=before_tokens,
-            reused_scope=int(enqueue_result.get("reused") or 0) > 0,
+            work_ids=tuple(enqueue_result.get("work_ids") or ()),
             failed=False,
             result_state=state,
             delivered_ids=delivered_ids,
