@@ -15,7 +15,10 @@ from tests.unit.test_research.test_company_profile_v19_closure import (
 
 
 @pytest.mark.parametrize("instrument", ["600021.SH", "600059.SH"])
-def test_frozen_full_pages_deliver_native_business_and_roles(tmp_path, instrument):
+@pytest.mark.parametrize("version", ["v20", "v21"])
+def test_frozen_full_pages_deliver_native_business_and_roles(
+    tmp_path, instrument, version
+):
     fixture = json.loads(
         (FIXTURES / "company_profile_v20_unseen_frozen_pages.json").read_text()
     )[instrument]
@@ -24,7 +27,7 @@ def test_frozen_full_pages_deliver_native_business_and_roles(tmp_path, instrumen
         instrument=instrument,
         fixture=fixture,
         pages=fixture["pages"],
-        repair_version="v20",
+        repair_version=version,
     ):
         roles = {
             (x["source_native_name"], x["role"])

@@ -1102,6 +1102,7 @@ REVENUE_SENTENCE_REPAIR_V17 = "v17"
 REVENUE_SENTENCE_REPAIR_V18 = "v18"
 REVENUE_SENTENCE_REPAIR_V19 = "v19"
 REVENUE_SENTENCE_REPAIR_V20 = "v20"
+REVENUE_SENTENCE_REPAIR_V21 = "v21"
 _REVENUE_SENTENCE_REPAIR_VERSIONS = frozenset(
     {
         REVENUE_SENTENCE_REPAIR_V1,
@@ -1124,6 +1125,7 @@ _REVENUE_SENTENCE_REPAIR_VERSIONS = frozenset(
         REVENUE_SENTENCE_REPAIR_V18,
         REVENUE_SENTENCE_REPAIR_V19,
         REVENUE_SENTENCE_REPAIR_V20,
+        REVENUE_SENTENCE_REPAIR_V21,
     }
 )
 
@@ -1169,6 +1171,7 @@ def named_role_repair_requested(identity: Mapping[str, Any] | None) -> bool:
         REVENUE_SENTENCE_REPAIR_V18,
         REVENUE_SENTENCE_REPAIR_V19,
         REVENUE_SENTENCE_REPAIR_V20,
+        REVENUE_SENTENCE_REPAIR_V21,
     }
 
 
@@ -1197,6 +1200,7 @@ def service_operating_energy_requested(identity: Mapping[str, Any] | None) -> bo
         REVENUE_SENTENCE_REPAIR_V18,
         REVENUE_SENTENCE_REPAIR_V19,
         REVENUE_SENTENCE_REPAIR_V20,
+        REVENUE_SENTENCE_REPAIR_V21,
     }
 
 
@@ -1225,6 +1229,7 @@ def core_answer_repair_requested(identity: Mapping[str, Any] | None) -> bool:
         REVENUE_SENTENCE_REPAIR_V18,
         REVENUE_SENTENCE_REPAIR_V19,
         REVENUE_SENTENCE_REPAIR_V20,
+        REVENUE_SENTENCE_REPAIR_V21,
     }
 
 
@@ -1254,6 +1259,7 @@ def source_delivery_repair_requested(identity: Mapping[str, Any] | None) -> bool
         REVENUE_SENTENCE_REPAIR_V18,
         REVENUE_SENTENCE_REPAIR_V19,
         REVENUE_SENTENCE_REPAIR_V20,
+        REVENUE_SENTENCE_REPAIR_V21,
     }
 
 
@@ -2535,6 +2541,10 @@ def _project_repair_commodity_span(
     if source_delivery_repair:
         for name in _company_sales_product_names(span.excerpt):
             add_activity(name, ActivityAction.SELLS, "销售")
+        for name in _company_trade_sales_product_names(span.excerpt):
+            # The row amount is revenue, not a commodity quantity or price.
+            # Keep it in the original evidence and project only the native role.
+            add_activity(name, ActivityAction.SELLS, "销售", header="本期营业收入")
         for binding in _power_and_oil_bindings(span.excerpt):
             add_activity(
                 binding["name"],
@@ -2630,6 +2640,31 @@ def _company_income_source(excerpt: str) -> str:
     ):
         return ""
     return _original_span_matching(excerpt, match.group(0))
+
+
+def _company_trade_sales_product_names(excerpt: str) -> list[str]:
+    """Names sold in an affirmed company-owned trade-revenue table."""
+
+    joined = _join_pdf_soft_breaks(excerpt)
+    heading = re.search(
+        r"(?:^|\n)\s*(?:[A-Z][.．]\s*)?报告期内(?:本公司|公司)存在贸易业务收入"
+        r"\s*\n\s*√适用\s*□不适用",
+        joined,
+    )
+    if heading is None:
+        return []
+    table = re.split(r"贸易业务(?:占|收入占)", joined[heading.end() :], maxsplit=1)[0]
+    if re.search(r"子公司|母公司|第三方|拟|计划|尚未|不存在", table):
+        return []
+    compact = re.sub(r"\s+", "", table)
+    if "贸易业务开展情况本期营业收入上期营业收入" not in compact:
+        return []
+    if _unit_from_excerpt(table) is None:
+        return []
+    return re.findall(
+        r"(?:^|\n)\s*销售([\u4e00-\u9fff]{1,12})\s+\d[\d,]*\.\d+\s+\d",
+        table,
+    )
 
 
 def _company_sales_product_names(excerpt: str) -> list[str]:

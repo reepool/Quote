@@ -1,5 +1,7 @@
 """The formal repair identity must activate all five cumulative paths."""
 
+import pytest
+
 from research.company_profile.core_evidence_selection import (
     core_answer_repair_requested,
     named_role_repair_requested,
@@ -10,9 +12,12 @@ from research.company_profile.core_evidence_selection import (
 from research.company_profile.execution import default_processing_identity
 
 
-def test_v20_activates_all_cumulative_repairs_without_changing_default():
+@pytest.mark.parametrize("version", ["v20", "v21"])
+def test_formal_identity_activates_all_cumulative_repairs_without_changing_default(
+    version,
+):
     default = default_processing_identity()
-    formal = {**default, "revenue_sentence_repair": "v20"}
+    formal = {**default, "revenue_sentence_repair": version}
     for requested in (
         revenue_sentence_repair_requested,
         named_role_repair_requested,

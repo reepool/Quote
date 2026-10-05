@@ -1,0 +1,344 @@
+{
+  "created_at": "2026-10-05T08:10:16.914742+00:00",
+  "fixed_before_formal_execution": true,
+  "plan_id": "bcff2a299d9c7bd0197638f27aec1a1880c56ce68b2df7c3456c351626f3252f",
+  "processing_identity": {
+    "rules": "company_profile_common_core.v1",
+    "owned_page_facts": "v8",
+    "material_input_facts": "v1",
+    "revenue_sentence_repair": "v21"
+  },
+  "knowledge_cutoff": "2026-09-17",
+  "shared_token_budget": 50000,
+  "official_reports": [
+    {
+      "instrument_id": "600021.SH",
+      "asset_id": "asset_879fd1bb4591fddb2677aaa775df98db",
+      "report_id": "1225098781",
+      "report_period": "2025-12-31",
+      "document_version": "16be40cc1c4be0c398a0d8292f5172b1a610b0056727b4612910d76f1d400b5b",
+      "disclosure_form": "service"
+    },
+    {
+      "instrument_id": "600059.SH",
+      "asset_id": "asset_b36cfe3de023d88f05df1f22a9ff64f9",
+      "report_id": "1225156626",
+      "report_period": "2025-12-31",
+      "document_version": "65b24ca036775f1e9c348ad2a6d9575b95c0658c75301428367571b3b1255df2",
+      "disclosure_form": "manufacturing"
+    }
+  ],
+  "versions": {
+    "600021.SH": {
+      "sha256": "16be40cc1c4be0c398a0d8292f5172b1a610b0056727b4612910d76f1d400b5b",
+      "pdf": "data/filings/announcements/blobs/16/16be40cc1c4be0c398a0d8292f5172b1a610b0056727b4612910d76f1d400b5b.pdf",
+      "checked_pages": [
+        10,
+        11,
+        16,
+        17,
+        18,
+        19
+      ]
+    },
+    "600059.SH": {
+      "sha256": "65b24ca036775f1e9c348ad2a6d9575b95c0658c75301428367571b3b1255df2",
+      "pdf": "data/filings/announcements/blobs/65/65b24ca036775f1e9c348ad2a6d9575b95c0658c75301428367571b3b1255df2.pdf",
+      "checked_pages": [
+        7,
+        8,
+        13,
+        14,
+        27
+      ]
+    }
+  },
+  "source_rows": {
+    "600021.SH": [
+      {
+        "dimension": "industry",
+        "name": "电力行业",
+        "value": "41,067,548,992.30",
+        "unit": "元",
+        "reported_period": "2025-12-31",
+        "page": 16
+      },
+      {
+        "dimension": "industry",
+        "name": "其他行业",
+        "value": "197,629,864.16",
+        "unit": "元",
+        "reported_period": "2025-12-31",
+        "page": 16
+      },
+      {
+        "dimension": "product",
+        "name": "电力",
+        "value": "38,318,064,374.94",
+        "unit": "元",
+        "reported_period": "2025-12-31",
+        "page": 16
+      },
+      {
+        "dimension": "product",
+        "name": "热力",
+        "value": "2,205,459,296.22",
+        "unit": "元",
+        "reported_period": "2025-12-31",
+        "page": 16
+      },
+      {
+        "dimension": "product",
+        "name": "其他",
+        "value": "741,655,185.30",
+        "unit": "元",
+        "reported_period": "2025-12-31",
+        "page": 16
+      },
+      {
+        "dimension": "region",
+        "name": "上海地区",
+        "value": "13,671,762,626.89",
+        "unit": "元",
+        "reported_period": "2025-12-31",
+        "page": 16
+      },
+      {
+        "dimension": "region",
+        "name": "江苏地区",
+        "value": "12,201,395,146.49",
+        "unit": "元",
+        "reported_period": "2025-12-31",
+        "page": 17
+      },
+      {
+        "dimension": "region",
+        "name": "土耳其",
+        "value": "5,190,407,424.19",
+        "unit": "元",
+        "reported_period": "2025-12-31",
+        "page": 17
+      },
+      {
+        "dimension": "region",
+        "name": "安徽地区",
+        "value": "3,504,524,363.39",
+        "unit": "元",
+        "reported_period": "2025-12-31",
+        "page": 17
+      },
+      {
+        "dimension": "region",
+        "name": "浙江地区",
+        "value": "2,357,907,447.75",
+        "unit": "元",
+        "reported_period": "2025-12-31",
+        "page": 17
+      },
+      {
+        "dimension": "region",
+        "name": "马耳他地区",
+        "value": "579,550,341.74",
+        "unit": "元",
+        "reported_period": "2025-12-31",
+        "page": 17
+      },
+      {
+        "dimension": "region",
+        "name": "日本地区",
+        "value": "781,328,518.28",
+        "unit": "元",
+        "reported_period": "2025-12-31",
+        "page": 17
+      },
+      {
+        "dimension": "region",
+        "name": "其他地区",
+        "value": "2,978,302,987.73",
+        "unit": "元",
+        "reported_period": "2025-12-31",
+        "page": 17
+      },
+      {
+        "dimension": "sales_mode",
+        "name": "直销",
+        "value": "41,265,178,856.46",
+        "unit": "元",
+        "reported_period": "2025-12-31",
+        "page": 17
+      }
+    ],
+    "600059.SH": [
+      {
+        "dimension": "industry",
+        "name": "酒类",
+        "value": "1,801,700,702.70",
+        "unit": "元",
+        "reported_period": "2025-12-31",
+        "page": 13
+      },
+      {
+        "dimension": "industry",
+        "name": "其他",
+        "value": "316,414.52",
+        "unit": "元",
+        "reported_period": "2025-12-31",
+        "page": 13
+      },
+      {
+        "dimension": "product",
+        "name": "中高档酒",
+        "value": "1,328,589,266.11",
+        "unit": "元",
+        "reported_period": "2025-12-31",
+        "page": 13
+      },
+      {
+        "dimension": "product",
+        "name": "普通酒",
+        "value": "473,111,436.59",
+        "unit": "元",
+        "reported_period": "2025-12-31",
+        "page": 13
+      },
+      {
+        "dimension": "product",
+        "name": "玻璃制品",
+        "value": "299,223.08",
+        "unit": "元",
+        "reported_period": "2025-12-31",
+        "page": 13
+      },
+      {
+        "dimension": "product",
+        "name": "其他产品",
+        "value": "17,191.44",
+        "unit": "元",
+        "reported_period": "2025-12-31",
+        "page": 13
+      },
+      {
+        "dimension": "region",
+        "name": "国内",
+        "value": "1,761,795,214.53",
+        "unit": "元",
+        "reported_period": "2025-12-31",
+        "page": 13
+      },
+      {
+        "dimension": "region",
+        "name": "国外",
+        "value": "40,221,902.69",
+        "unit": "元",
+        "reported_period": "2025-12-31",
+        "page": 13
+      },
+      {
+        "dimension": "sales_mode",
+        "name": "直销",
+        "value": "449,043,996.71",
+        "unit": "元",
+        "reported_period": "2025-12-31",
+        "page": 13
+      },
+      {
+        "dimension": "sales_mode",
+        "name": "批发",
+        "value": "1,352,973,120.51",
+        "unit": "元",
+        "reported_period": "2025-12-31",
+        "page": 13
+      }
+    ]
+  },
+  "native_roles": [
+    {
+      "instrument_id": "600021.SH",
+      "name": "电力",
+      "role": "product_sales",
+      "page": 17,
+      "source_quote": "电力 亿千瓦时 782.32 749.60"
+    },
+    {
+      "instrument_id": "600021.SH",
+      "name": "热力",
+      "role": "product_sales",
+      "page": 17,
+      "source_quote": "热力 万吉焦 2166.16 1979.26"
+    },
+    {
+      "instrument_id": "600021.SH",
+      "name": "标煤",
+      "role": "raw_material_input",
+      "page": 11,
+      "source_quote": "公司合并口径入炉标煤单价（含税）966.98 元/吨"
+    },
+    {
+      "instrument_id": "600021.SH",
+      "name": "燃料",
+      "role": "product_sales",
+      "page": 19,
+      "source_quote": "销售燃料 11,193.86 9,965.88 12.32"
+    },
+    {
+      "instrument_id": "600059.SH",
+      "name": "黄酒",
+      "role": "product_sales",
+      "page": 7,
+      "source_quote": "主要从事黄酒的研发、酿造、生产和销售等业务"
+    },
+    {
+      "instrument_id": "600059.SH",
+      "name": "玻璃瓶",
+      "role": "product_sales",
+      "page": 13,
+      "source_quote": "公司有玻璃瓶的生产，自用\n较多，少量对外销售"
+    },
+    {
+      "instrument_id": "600059.SH",
+      "name": "糯米",
+      "role": "raw_material_input",
+      "page": 27,
+      "source_quote": "黄酒酿造的主要原材料（如糯米、小麦）"
+    },
+    {
+      "instrument_id": "600059.SH",
+      "name": "小麦",
+      "role": "raw_material_input",
+      "page": 27,
+      "source_quote": "黄酒酿造的主要原材料（如糯米、小麦）"
+    }
+  ],
+  "answers": [
+    {
+      "instrument_id": "600021.SH",
+      "dimension_id": "principal_business"
+    },
+    {
+      "instrument_id": "600021.SH",
+      "dimension_id": "products_services"
+    },
+    {
+      "instrument_id": "600021.SH",
+      "dimension_id": "revenue_model"
+    },
+    {
+      "instrument_id": "600059.SH",
+      "dimension_id": "principal_business"
+    },
+    {
+      "instrument_id": "600059.SH",
+      "dimension_id": "products_services"
+    },
+    {
+      "instrument_id": "600059.SH",
+      "dimension_id": "revenue_model"
+    }
+  ],
+  "source_scope": "Six business answer disclosures, 24 main revenue rows, eight native product-sale/input roles. Detailed production/sales quantities and cost splits remain deferred. Fuel revenue stays in p19 evidence; no guessed grade, quantity, purchase price or market link.",
+  "no_preset_scores": true,
+  "queue_unchanged_during_preflight": {
+    "before": 101,
+    "after": 101
+  }
+}

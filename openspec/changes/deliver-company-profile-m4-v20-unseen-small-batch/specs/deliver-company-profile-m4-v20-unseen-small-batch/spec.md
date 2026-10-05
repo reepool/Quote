@@ -33,3 +33,19 @@ The independent review MUST rebuild source disclosures for principal, products/s
 - **WHEN** a company-owned current production/sales clause, owned formal sales-volume table, own cost-risk input list or furnace-input disclosure names a product or material
 - **THEN** existing native role projection may retain pending mapping without inventing a grade, procurement price or price-series link
 - **AND** subsidiary, third-party, planned and negated actions do not become the reporting company's established role
+
+### Requirement: The v21 repair delivers affirmed company trade sales before formal execution
+The v21 identity MUST activate all five cumulative repair switches without changing the default identity. The company's affirmed applicable trade-income table MUST support the native fuel/product_sales role with current period and original p19 evidence. Its 11,193.86万元 current revenue MUST remain revenue in the evidence and MUST NOT become physical quantity, purchase price or an inferred coal grade. Missing precise mapping MUST remain pending. Complete frozen-page acceptance, query and export regressions MUST preserve the original seven roles, six answer narratives and twenty-four main-income rows and reject subsidiary, third-party, planned and denied sales before formal execution.
+
+#### Scenario: The applicable owned trade table identifies fuel sales
+- **WHEN** the frozen p19 says the company currently has trade revenue and reports sales of fuel
+- **THEN** query and export contain fuel/product_sales bound to the accepted source and current period with pending mapping when unresolved
+- **AND** the revenue amount remains in evidence without a quantity or price assertion
+
+### Requirement: The authorized first v21 round receives an independent finite source review
+The existing owner MUST use the exact bcff2a29… frozen pair and report versions, cutoff 2026-09-17, shared 50000-token budget and independent m4_v21_power_wine_repair directory. First true execution MUST be the formal round, measured through the second export return including retries; the second company MUST receive the remaining budget. Actual runtime reused_scope_ids MUST show no reuse. The source scope MUST be fixed before observation as six answer disclosures, twenty-four main-income rows and eight native roles including fuel sales. Every actual accepted fact and answer MUST be evaluated uniquely, with Measurement copies counting accuracy only and no preset scores. Dual 100%, zero critical numeric errors, at most 50000 tokens and 300 seconds MUST precede submission for A-role finite acceptance; failure MUST retain artifacts and pause the next batch. The original 29/36 and corrected 29/37 reviews MUST remain preserved: 494 historical files and eighteen other first-round artifact paths remain unchanged, the source-review path contains v2 and its original v1 bytes remain in the initial copy. Production MUST remain not_authorized and scale quality false.
+
+#### Scenario: The v21 run preserves the prior review correction
+- **WHEN** the first authorized v21 execution and source review complete
+- **THEN** the real scope reuse, timing, tokens, answer texts and unique fact comparisons are preserved in the independent directory
+- **AND** the prior v1 and v2 reviews stay visible without falsely claiming all nineteen original paths were unchanged

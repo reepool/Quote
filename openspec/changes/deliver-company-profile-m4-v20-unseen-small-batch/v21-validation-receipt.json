@@ -1,0 +1,77 @@
+{
+  "baseline_head": "1b661eaf909c1712e76041fb3f2c59a6953b74b8",
+  "change": "deliver-company-profile-m4-v20-unseen-small-batch",
+  "completed_tasks": [
+    "5.1",
+    "5.2",
+    "5.3"
+  ],
+  "formal_execution_index": 1,
+  "directed_tests": {
+    "passed": 165,
+    "deselected_known_baseline": 1,
+    "warnings": 7,
+    "seconds": 31.51
+  },
+  "openspec_strict": {
+    "command": "openspec validate deliver-company-profile-m4-v20-unseen-small-batch --strict",
+    "exit_code": 0
+  },
+  "diff_check": {
+    "command": "git diff --check",
+    "exit_code": 0
+  },
+  "review": {
+    "blocking_findings_remaining": 0,
+    "resolved_current_issue": "Owned applicable trade-income table delivers fuel/product_sales, revenue stays evidence only",
+    "unrelated_baseline_failures_deferred": true,
+    "scope": "Current code/test/document changes; company actor, affirmative trade table, evidence/period/amount semantics, cumulative switches, unique score and history preservation"
+  },
+  "formal_result": {
+    "source_recall": {
+      "status": "assessed",
+      "numerator": 38,
+      "denominator": 38,
+      "value": 1.0
+    },
+    "source_accuracy": {
+      "status": "assessed",
+      "numerator": 66,
+      "denominator": 66,
+      "value": 1.0
+    },
+    "critical_numeric_errors": {
+      "status": "assessed",
+      "value": 0
+    },
+    "whole_round_seconds": 180.27239676192403,
+    "actual_runtime_no_reuse": true,
+    "actual_accepted_fact_count": 60,
+    "answered_text_count": 6
+  },
+  "tokens_used": 0,
+  "protected_current_files_unchanged": 513,
+  "historical_hash_note": {
+    "other_original_artifact_paths_unchanged": 18,
+    "source_review_path": "v2 preserved unchanged this turn",
+    "original_v1_initial_copy_exact": true
+  },
+  "code_sha256": {
+    "research/company_profile/core_evidence_selection.py": "bd38ad1714a9c43e36163c3a6576c9f95eee7698129200af16bc07a5ddb462ca",
+    "tests/unit/test_research/test_company_profile_v20_identity.py": "5ca689877830f8000d2e012e35913f32e320cf313de0b9b4b9c944535b1407c2",
+    "tests/unit/test_research/test_company_profile_v20_unseen_repair.py": "255ef8c694518bd9921a69b0116e155f466d6bc68a5ec70757f6e5a9c18fd145",
+    "tests/unit/test_research/test_company_profile_v21_trade_sales.py": "97f923b2fd9334a1aaba632c0aecc313adcaaf1ee4546f240874f8b531c9e697"
+  },
+  "material_sha256": {
+    "openspec/changes/deliver-company-profile-m4-v20-unseen-small-batch/v21-source-scope.json": "7dbdf58b2ac42e9661722866ba6cd22d3462cce113064c37c6bf4067de746058",
+    "openspec/changes/deliver-company-profile-m4-v20-unseen-small-batch/v21-prerequisite-validation.json": "cbb6da4d4db1e1d00900b0926112c1de7104670fa2449f13d4731452fa21665d",
+    "openspec/changes/deliver-company-profile-m4-v20-unseen-small-batch/v21-review-evidence.json": "191d5a2da5cfc9406db6a07d45aa53db676a2932b45bbabef9f1d3fb903fdabc",
+    "openspec/changes/deliver-company-profile-m4-v20-unseen-small-batch/v21-limited-review-submission.md": "7b2db53636622bb76e199467ad0df985d2b2fb89ca7c24a05287545565f6d07a"
+  },
+  "a_role_acceptance": "pending",
+  "change_archive": "not_archived",
+  "next_batch": "paused_pending_a_role",
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false,
+  "preexisting_worktree_changes": "Three modified development documents and preexisting untracked directories/documents remain untouched and excluded from staging"
+}
