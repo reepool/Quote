@@ -28,7 +28,7 @@ When an official report states that a named material is an input to the company'
 - **AND** the rule does not depend on one instrument id
 
 ### Requirement: Non-explicit material wording stays refused
-The owner MUST NOT activate material input for a price-risk sentence that does not say the named material is a company input, for a generic label such as direct material cost or raw-material inventory, or for a balance-sheet amount. The named material and the company's own input MUST be bound in the same sentence. A purchase, consumption, or input verb whose subject is a customer, supplier, or downstream party MUST NOT activate the chapter. A principal-raw-material list MUST NOT activate only because 制造 or 生产 appears later in a fixed window. Sales evidence alone MUST NOT support `raw_material_input`. Energy input MUST keep the existing `energy_consumption` role. The projection MUST NOT derive a profit direction, price sensitivity, or net exposure from a price-risk sentence.
+The owner MUST NOT activate material input for a price-risk sentence that does not say the named material is a company input, for a generic label such as direct material cost or raw-material inventory, or for a balance-sheet amount. The named material and the company's own input MUST be bound in the same sentence or an explicitly owned upstream-material table column. A purchase, consumption, or input verb whose subject is a customer, supplier, or downstream party MUST NOT activate the chapter. A principal-raw-material list MUST NOT activate only because 制造 or 生产 appears later in a fixed window. Sales evidence alone MUST NOT support `raw_material_input`. Energy input MUST keep the existing `energy_consumption` role. The projection MUST NOT derive a profit direction, price sensitivity, or net exposure from a price-risk sentence.
 
 #### Scenario: Price risk without a company input is refused
 - **WHEN** the text only says raw-material prices may rise and does not state that a named material is a company input
@@ -68,6 +68,21 @@ The owner MUST NOT activate material input for a price-risk sentence that does n
 #### Scenario: Price risk does not become sensitivity
 - **WHEN** a sentence discusses raw-material price movement
 - **THEN** the delivery does not add a profit direction, price sensitivity, or net exposure
+
+### Requirement: Upstream material use does not assert external purchase
+An owned current upstream-material column MUST use the existing material chapter and emit `Relationship(relation_type=material_input)`, retaining source name, subject, period, column and Evidence. Input use alone MUST NOT emit `Activity(action=purchases)`. External purchase MUST require independently stated purchase wording or an external-purchase column. Energy MUST retain its existing consumption semantics. Independent sale, material-input and external-purchase facts for the same native name MUST coexist without overwriting or netting. Third-party and planned inputs MUST remain refused. Accuracy review MUST verify each underlying action or relation against its own source; matching a commodity role alone MUST NOT establish fact accuracy.
+
+#### Scenario: An upstream item is used internally
+- **WHEN** the owned current table names a material as an upstream input without external-purchase disclosure
+- **THEN** the material chapter delivers its material_input Relationship and raw_material_input role without a purchases assertion from that column
+
+#### Scenario: Another source explicitly states external purchase
+- **WHEN** a separate owned table states external purchase of the same named material
+- **THEN** its purchase fact is retained independently of the input relationship and sales facts, while energy retains consumption semantics
+
+#### Scenario: A correct role has an unsupported purchase action
+- **WHEN** an accepted input role derives from a purchases fact supported only by an upstream-use column
+- **THEN** the underlying fact fails accuracy despite the role-name match
 
 ### Requirement: Unmapped named inputs still deliver the role
 An explicit named input MUST still deliver the Relationship and CommodityExposure when the existing catalog has no match or more than one candidate. The exposure MUST keep `source_native_name`. No match MUST use `mapping_status=pending` and `commodity_id=null`. Multiple candidates that cannot be chosen uniquely MUST use `mapping_status=ambiguous` and `commodity_id=null`. A non-empty unique `commodity_id` MUST be allowed only when `mapping_status=mapped`. Mapping failure MUST NOT drop the established input role. This change MUST NOT build a new catalog or market-series link.
