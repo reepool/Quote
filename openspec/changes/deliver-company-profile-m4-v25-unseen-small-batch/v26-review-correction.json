@@ -1,0 +1,47 @@
+{
+  "created_at": "2026-10-06T12:40:53.466104+00:00",
+  "reason": "Initial review used the preceding single-contiguous-passage answer guard for products. Both delivered products answers combine independently supported accepted overview passages. Full original-page comparison confirms every passage, exact delivered combination and all substantive groups. No execution or fact changed; only these two answer judgments corrected.",
+  "initial": {
+    "evidence_path": "openspec/changes/deliver-company-profile-m4-v25-unseen-small-batch/v26-source-review-evidence.json",
+    "evidence_sha256": "6f5150960295c28142854d52723bd108a918fc83c2818c343de302d4c632a89c",
+    "source_review_path": "openspec/changes/deliver-company-profile-m4-v25-unseen-small-batch/v26-source-review.initial.json",
+    "source_review_sha256": "4c93490be5c9b7bdeaab110bb72207e4719f1e8c83c083429be8e7dad3c1ac4f",
+    "recall": {
+      "status": "assessed",
+      "numerator": 75,
+      "denominator": 77,
+      "value": 0.974025974025974
+    },
+    "accuracy": {
+      "status": "assessed",
+      "numerator": 143,
+      "denominator": 145,
+      "value": 0.9862068965517241
+    }
+  },
+  "corrected": {
+    "evidence_path": "openspec/changes/deliver-company-profile-m4-v25-unseen-small-batch/v26-source-review-evidence.v2.json",
+    "evidence_sha256": "64aef88655c40348cc2dc8ed8d46fe49fc146a027fb8e0806558238922f7f68b",
+    "source_review_current_path": "data/checkpoints/company_profile_common_core/reports/m4_v26_shipping_materials_core_repair/company_profile_source_review.v1.json",
+    "source_review_current_sha256": "ff7b67079eeb50d0bc404f61145752daddcd7aabab0ff1d559841590c4ba83bf",
+    "recall": {
+      "status": "assessed",
+      "numerator": 77,
+      "denominator": 77,
+      "value": 1.0
+    },
+    "accuracy": {
+      "status": "assessed",
+      "numerator": 145,
+      "denominator": 145,
+      "value": 1.0
+    }
+  },
+  "corrected_objects": [
+    "600026.SH:answer:products_services",
+    "600063.SH:answer:products_services"
+  ],
+  "first_formal_execution_unchanged": true,
+  "first_formal_artifacts_unchanged": 18,
+  "new_execution_performed": false
+}

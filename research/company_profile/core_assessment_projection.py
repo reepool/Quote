@@ -37,7 +37,7 @@ CORE_DIMENSION_IDS = (
     "revenue_model",
 )
 _PRINCIPAL_PATTERN = re.compile(
-    r"(主营|主要从事|主要业务|主要经营|经营模式|经营范围|金融服务|核心提供商)"
+    r"(主营|核心主业|四大产业板块|主要从事|主要业务|主要经营|经营模式|经营范围|金融服务|核心提供商)"
 )
 _COMPLETE_COMPANY_BUSINESS = re.compile(
     r"(?<![\u4e00-\u9fff])(?:本公司|公司)(?:业务覆盖|专注于).{2,}"
@@ -70,7 +70,7 @@ _REVENUE_BLOCK_PATTERN = re.compile(
 )
 _REVENUE_NEGATION_PREFIX = re.compile(r"(尚未|还未|仍未|并未|没有|未|不|拟|计划)$")
 _REPAIR_REVENUE_INFLOW_PATTERN = re.compile(
-    r"(公司盈利主要来自发电收入|营业收入主要来源于|"
+    r"(本集团利用自有及控制的船舶开展|公司盈利主要来自发电收入|营业收入主要来源于|"
     + _REVENUE_INFLOW_PATTERN.pattern[1:]
 )
 _PRODUCT_ACTIONS = frozenset(
@@ -391,7 +391,7 @@ def _assess_products_services(
                 or (
                     source_delivery_repair
                     and re.search(
-                        r"主要业务是|主要从事|主营业务为|主要经营|研发制造|核心提供商|公司持续深耕",
+                        r"核心主业|四大产业板块|主要产品包括|主要业务是|主要从事|主营业务为|主要经营|研发制造|核心提供商|公司持续深耕|产品畅销|已稳定量产|成功开拓|深化运营",
                         record.source_text or "",
                     )
                 )
@@ -404,7 +404,7 @@ def _assess_products_services(
             for record in supports
             if isinstance(record, BusinessOverview)
             and re.search(
-                r"主要产品有|产品矩阵|主要业务是|主要从事|主营业务为|主要经营|研发制造|核心提供商|公司持续深耕",
+                r"核心主业|四大产业板块|主要产品包括|主要产品有|产品矩阵|主要业务是|主要从事|主营业务为|主要经营|研发制造|核心提供商|公司持续深耕|产品畅销|已稳定量产|成功开拓|深化运营",
                 record.source_text or "",
             )
         ]
@@ -415,6 +415,12 @@ def _assess_products_services(
             ]
     if supports:
         answered = _answered("products_services", supports)
+        if source_delivery_repair:
+            narratives = list(dict.fromkeys(
+                r.source_text.strip() for r in supports if isinstance(r, BusinessOverview)
+            ))
+            if narratives:
+                answered = answered.model_copy(update={"excerpt": "\n".join(narratives)})
         if source_delivery_repair and any(
             isinstance(record, BusinessOverview)
             and "项目的开发、建设、运营与管理" in record.source_text
@@ -529,7 +535,8 @@ def _industry_revenue_excerpt(records: Sequence[SemanticRecord]) -> str:
         if isinstance(record, BusinessOverview)
     ]
     sales_mechanism = any(
-        "电力销售客户主要为" in text
+        "核心主业" in text
+        or "电力销售客户主要为" in text
         or "煤机全年市场化交易" in text
         or "盈利主要来自发电收入" in re.sub(r"\s+", "", text)
         for text in narratives
@@ -548,7 +555,7 @@ def _industry_revenue_excerpt(records: Sequence[SemanticRecord]) -> str:
             continue
         bucket = (
             products
-            if record.segment_dimension == "product"
+            if record.segment_dimension in {"industry", "product"}
             else modes if record.segment_dimension == "sales_mode" else None
         )
         if bucket is not None and label not in bucket:

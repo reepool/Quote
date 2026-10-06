@@ -1,0 +1,9 @@
+{
+  "recall": "19/56",
+  "accuracy": "47/65",
+  "review_limitation": "p15 washing capsule/agrochemical packaging film sales and p27 PVA water-soluble film/upstream materials were read but omitted from original source list. Original scope and score retained; corrected v26 source conditions separately frozen.",
+  "change_archived": false,
+  "next_batch": "paused",
+  "history_data_file_count": 673,
+  "original_formal_artifact_count": 18
+}

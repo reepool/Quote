@@ -158,6 +158,7 @@ _SOURCE_DELIVERY_SUBSTANCE = re.compile(
     + _PROVIDER_NARRATIVE.pattern
     + "|"
     + _CURRENT_BUSINESS_NARRATIVE.pattern
+    + r"|本集团以[^。]+为两大核心主业|公司建成[^。]+四大产业板块"
 )
 _SPEC_OBJECT = re.compile(r"^(?:厚度|宽度|长度)")
 _REVENUE_PARENT_LABELS = frozenset({"航空性收入", "非航空性收入"})
@@ -355,6 +356,23 @@ def select_core_evidence(
                         section_title="销售客户及市场化交易",
                         excerpt=source,
                         bounded_quote=source,
+                        chapter_task=ChapterTask.EXTRACT_BUSINESS_OVERVIEW.value,
+                        field_ids=("business_overview_source",),
+                        context_complete=True,
+                    )
+                )
+
+    if source_delivery_repair:
+        for page in normalized:
+            if not page.readable:
+                continue
+            for source in _current_product_sources(page.text):
+                spans.append(
+                    CoreEvidenceSpan(
+                        page=page.page,
+                        section_title="当期产品及服务披露",
+                        excerpt=source,
+                        bounded_quote=page.text,
                         chapter_task=ChapterTask.EXTRACT_BUSINESS_OVERVIEW.value,
                         field_ids=("business_overview_source",),
                         context_complete=True,
@@ -1104,7 +1122,7 @@ _CLAUSE_PATTERNS = (
     re.compile(r"经营模式主要为[:：]\s*([^。；;]{2,300})"),
     re.compile(r"主营业务为\s*([^。；;]{2,80})"),
     re.compile(r"主要从事\s*([^。；;]{2,400})"),
-    re.compile(r"主要产品包括\s*([^。；;]{2,80})"),
+    re.compile(r"主要产品包括\s*([^。；;]{2,600})"),
     re.compile(r"主要产品为\s*([^。；;]{2,80})"),
     re.compile(r"(?:^|[\n\r])经营范围(?!内)\s*[:：]?\s*([^。；;\n]{2,120})"),
     re.compile(r"涵盖\s*([^。；;]{2,80})"),
@@ -1159,6 +1177,7 @@ REVENUE_SENTENCE_REPAIR_V22 = "v22"
 REVENUE_SENTENCE_REPAIR_V23 = "v23"
 REVENUE_SENTENCE_REPAIR_V24 = "v24"
 REVENUE_SENTENCE_REPAIR_V25 = "v25"
+REVENUE_SENTENCE_REPAIR_V26 = "v26"
 _REVENUE_SENTENCE_REPAIR_VERSIONS = frozenset(
     {
         REVENUE_SENTENCE_REPAIR_V1,
@@ -1186,6 +1205,7 @@ _REVENUE_SENTENCE_REPAIR_VERSIONS = frozenset(
         REVENUE_SENTENCE_REPAIR_V23,
         REVENUE_SENTENCE_REPAIR_V24,
         REVENUE_SENTENCE_REPAIR_V25,
+        REVENUE_SENTENCE_REPAIR_V26,
     }
 )
 
@@ -1236,6 +1256,7 @@ def named_role_repair_requested(identity: Mapping[str, Any] | None) -> bool:
         REVENUE_SENTENCE_REPAIR_V23,
         REVENUE_SENTENCE_REPAIR_V24,
         REVENUE_SENTENCE_REPAIR_V25,
+        REVENUE_SENTENCE_REPAIR_V26,
     }
 
 
@@ -1269,6 +1290,7 @@ def service_operating_energy_requested(identity: Mapping[str, Any] | None) -> bo
         REVENUE_SENTENCE_REPAIR_V23,
         REVENUE_SENTENCE_REPAIR_V24,
         REVENUE_SENTENCE_REPAIR_V25,
+        REVENUE_SENTENCE_REPAIR_V26,
     }
 
 
@@ -1302,6 +1324,7 @@ def core_answer_repair_requested(identity: Mapping[str, Any] | None) -> bool:
         REVENUE_SENTENCE_REPAIR_V23,
         REVENUE_SENTENCE_REPAIR_V24,
         REVENUE_SENTENCE_REPAIR_V25,
+        REVENUE_SENTENCE_REPAIR_V26,
     }
 
 
@@ -1336,6 +1359,7 @@ def source_delivery_repair_requested(identity: Mapping[str, Any] | None) -> bool
         REVENUE_SENTENCE_REPAIR_V23,
         REVENUE_SENTENCE_REPAIR_V24,
         REVENUE_SENTENCE_REPAIR_V25,
+        REVENUE_SENTENCE_REPAIR_V26,
     }
 
 
@@ -1413,6 +1437,8 @@ def _prepared_for(
             item.field_id == field_id
             and item.evidence.page == span.page
             and item.evidence.section_title == span.section_title
+            and isinstance(item.evidence.anchor, TextAnchor)
+            and item.evidence.anchor.bounded_quote == span.excerpt
         ):
             return item
     return None
@@ -1448,7 +1474,8 @@ def _project_overview_span(
         ):
             return ()
         delivered = (
-            numbered
+            _complete_current_business_source(span.excerpt)
+            or numbered
             or _project_business_source(span.excerpt)
             or _main_business_source(span.excerpt)
             or _integrated_business_source(span.excerpt)
@@ -1461,6 +1488,7 @@ def _project_overview_span(
             or _company_sales_mechanism_source(span.excerpt)
             or _business_blocks_source(span.excerpt)
             or _company_income_source(span.excerpt)
+            or next(iter(_current_product_sources(span.excerpt)), "")
         )
         if delivered:
             company_sentence = delivered
@@ -1554,6 +1582,7 @@ def _project_overview_span(
                     "销售",
                     "生产",
                     "建设",
+                    "利用",
                     "运营与管理",
                 }:
                     continue
@@ -1713,6 +1742,8 @@ def _project_segment_span(
             "revenue_composition" if _is_enumerated_revenue_class(line) else dimension
         )
         row_header = None
+        if source_delivery_repair and label.endswith("小计"):
+            row_dimension = "total"
         if core_answer_repair and label in _REVENUE_PARENT_LABELS:
             row_dimension = "revenue_composition"
             revenue_parent = label
@@ -1744,6 +1775,7 @@ def _project_segment_span(
                         value=amount,
                         unit=unit,
                         header=row_header,
+                        qualifier="小计" if row_dimension == "total" else None,
                     ),
                     dimension=row_dimension,
                     label=label,
@@ -1767,6 +1799,7 @@ def _project_segment_span(
                         value=amount,
                         unit=unit,
                         header=row_header,
+                        qualifier="小计" if row_dimension == "total" else None,
                     ),
                     metric_type=MetricType.OPERATING_REVENUE,
                     logical_slot=LogicalSlot.REVENUE,
@@ -2170,7 +2203,7 @@ def _join_segment_label_amounts(
 ) -> str:
     """Attach a wrapped label to the amount line that follows it."""
 
-    lines = text.splitlines()
+    lines = [line for line in text.splitlines() if line.strip()]
     if core_answer_repair:
         # A row label and the final margin cell can both continue after a
         # page header: 上海 <amounts> / <header> / 地区 个百分点.
@@ -2203,6 +2236,24 @@ def _join_segment_label_amounts(
                 index = joined_at[1]
                 continue
         current = lines[index]
+        if core_answer_repair and index + 2 < len(lines):
+            label_parts = [
+                re.sub(r"\s+", "", part) for part in lines[index : index + 2]
+            ]
+            if (
+                all(
+                    re.fullmatch(r"[\u4e00-\u9fffA-Za-z]{2,20}", part)
+                    for part in label_parts
+                )
+                and re.match(r"\s*-?[\d,]+\.", lines[index + 2])
+                and not any(
+                    re.search(r"营业|增减|百分点|毛利|报告", part)
+                    for part in label_parts
+                )
+            ):
+                merged.append("".join(label_parts) + " " + lines[index + 2].strip())
+                index += 3
+                continue
         nxt = lines[index + 1] if index + 1 < len(lines) else ""
         compact_label = re.sub(r"\s+", "", current)
         next_row = _parse_segment_row(nxt) if core_answer_repair else None
@@ -2212,15 +2263,21 @@ def _join_segment_label_amounts(
                 next_row[0] in {"行业", "地区"}
                 or (compact_label == "在某一时点" and next_row[0] == "确认")
                 or ("、" in compact_label and next_row[0] == "产及供应")
+                or re.match(r"[A-Z]{2,}[\u4e00-\u9fff]*$", next_row[0])
+                or (
+                    re.fullmatch(r"[\u4e00-\u9fffA-Za-z]{2,20}", compact_label)
+                    and not _dimension_from_heading(current)
+                    and not re.search(r"增减|毛利|报告|百分点|营业", current)
+                )
             )
-            and re.fullmatch(r"[\u4e00-\u9fff、]{1,20}", compact_label)
+            and re.fullmatch(r"[\u4e00-\u9fffA-Za-z、]{1,20}", compact_label)
             and not compact_label.endswith("百分点")
         ):
             merged.append(f"{compact_label}{nxt.strip()}")
             index += 2
             continue
         if (
-            re.fullmatch(r"[\u4e00-\u9fff0-9/、]{2,40}", compact_label)
+            re.fullmatch(r"[\u4e00-\u9fffA-Za-z0-9/、]{2,40}", compact_label)
             and not compact_label.endswith("百分点")
             and re.match(r"\s*-?[\d,]", nxt)
         ):
@@ -2399,9 +2456,9 @@ _REPAIR_SALES = (
 _REPAIR_PROCUREMENT = ("铁矿石", "白灰", "石灰石", "进口矿", "焦炭")
 _REPAIR_ENERGY = (("蒸汽", "蒸汽费"), ("热水", "热水费"), ("电", "电费"))
 _REPAIR_COMMODITY_CUE = re.compile(
-    r"采购|销售|量产出货|批量出货|蒸汽费|热水费|电费|生产与销售|原辅料|焦炭采购"
+    r"采购|销售|畅销|量产出货|批量出货|主要上游原材料|耗用量|蒸汽费|热水费|电费|生产与销售|原辅料|焦炭采购"
 )
-_SERVICE_ENERGY_CUE = re.compile(r"电耗|柴油单耗")
+_SERVICE_ENERGY_CUE = re.compile(r"电耗|柴油单耗|燃油消耗")
 _OPERATING_ENERGY = re.compile(
     r"(?P<business>污水|焚烧业务)(?:吨水药耗、)?(?P<item>电耗|柴油单耗)"
 )
@@ -2420,7 +2477,10 @@ def _repair_commodity_spans(
         if not page.readable:
             continue
         if page.page in covered_pages and not (
-            _company_trade_sales_product_names(page.text)
+            _operating_energy_bindings(page.text)
+            or _native_input_bindings(page.text)
+            or _native_current_product_bindings(page.text)
+            or _company_trade_sales_product_names(page.text)
             and not any(
                 _company_trade_sales_product_names(span.excerpt)
                 for span in covered
@@ -2569,12 +2629,12 @@ def _formal_sales_product_names(
         if re.search(r"年度报告|^\d+/\d+$|增减|库存量|销售量|生产量|^（?%", compact):
             continue
         match = re.match(
-            rf"(.+?)(?:{units})([\d,]+(?:\.\d+)?)([\d,]+(?:\.\d+)?)", compact
+            rf"(.*?)(?:{units})([\d,]+(?:\.\d+)?)([\d,]+(?:\.\d+)?)", compact
         )
         # Prefer separated numeric columns, while retaining native parentheses
         # and dosage forms in the name. The unit is never a product suffix.
         spaced = re.match(
-            rf"(.+?)\s+(?:{units})\s+[\d,]+(?:\.\d+)?\s+[\d,]+(?:\.\d+)?", line.strip()
+            rf"(.*?)\s*(?:{units})\s+[\d,]+(?:\.\d+)?\s+[\d,]+(?:\.\d+)?", line.strip()
         )
         if spaced:
             name = pending + re.sub(r"\s+", "", spaced.group(1))
@@ -2640,6 +2700,11 @@ def _operating_energy_bindings(excerpt: str) -> list[tuple[str, str, str]]:
         else:
             continue
         bindings.append((subject, match.group("business"), match.group("item")))
+    compact = re.sub(r"\s+", "", excerpt)
+    for sentence in re.split(r"[。；;]", compact):
+        match = re.search(r"(?:本集团|本公司|公司)[^。]{0,30}燃油消耗", sentence)
+        if match and not re.search(r"子公司|第三方|拟|计划|尚未|不消耗|未消耗", sentence[:match.end()]):
+            bindings.append(("本集团" if "本集团" in match.group(0) else "公司", "燃油消耗", "燃油"))
     return bindings
 
 
@@ -2790,6 +2855,10 @@ def _project_repair_commodity_span(
         for name, channel in _supply_source_rows(span.excerpt):
             add_activity(name, ActivityAction.PURCHASES, "采购", header=channel)
     if source_delivery_repair:
+        for name, verb, header in _native_current_product_bindings(span.excerpt):
+            add_activity(name, ActivityAction.SELLS, verb, header=header)
+        for name, verb, header in _native_input_bindings(span.excerpt):
+            add_activity(name, ActivityAction.PURCHASES, verb, header=header)
         for name, actor in _named_sales_bindings(span.excerpt):
             before = len(records)
             add_activity(name, ActivityAction.SELLS, "销售", actor=actor)
@@ -3041,7 +3110,7 @@ def _company_trade_sales_product_names(excerpt: str) -> list[str]:
             r"(?:^|\n)\s*([\u4e00-\u9fff]{2,10})业务\s+\d[\d,]*\.\d+\s+\d", table
         )
     )
-    return sales
+    return [name for name in sales if name not in {"贸易", "其他", "其它"}]
 
 
 def _direct_sales_objects(stated: str) -> str:
@@ -3855,7 +3924,8 @@ def _activity_object_clauses(clause: str) -> list[str]:
         return [text]
     # A following explanation of profit or quality control is not a product
     # or service object, and a regex length bound can cut it mid-clause.
-    text = re.split(r"[，,](?:建立|进一步|利润|管理及控股)", text, maxsplit=1)[0]
+    text = re.split(r"[，,](?:建立|进一步|利润|形成|管理及控股)", text, maxsplit=1)[0]
+    text = re.split(r"[，,]?以及其他", text, maxsplit=1)[0]
     # "旋挖钻机，用于市政建设、公路桥梁……" enumerates where a product is used;
     # the application areas are not company activities.
     used_for = re.search(r"用于", text)
@@ -3909,6 +3979,9 @@ def _object_and_action(
     default_verb: str,
 ) -> tuple[str, ActivityAction, str]:
     text = raw.strip()
+    produced = re.fullmatch(r"利用[^。]{2,30}生产的(.+)", text)
+    if produced:
+        return produced.group(1), ActivityAction.PRODUCES, "生产"
     if _looks_like_action_chain(text):
         object_name = _ACTION_TOKEN.split(text)[0].strip("的 、") or text
         if "制造" in text or "生产" in text:
@@ -3982,7 +4055,7 @@ def _open_segment_group(line: str) -> frozenset[str] | None:
     remainder = compact
     for name in found:
         remainder = remainder.replace(name, "", 1)
-    remainder = re.sub(r"[、，,和及情况]", "", remainder)
+    remainder = re.sub(r"[、，,和及情况模式]", "", remainder)
     if remainder:
         return None
     return frozenset(_GROUP_NAME_TO_DIMENSION[name] for name in found)
@@ -4098,8 +4171,14 @@ def _parse_segment_row(line: str) -> tuple[str, str, str | None] | None:
     tokens = text.split()
     if len(tokens) < 3:
         return None
-    label = tokens[0]
-    numbers = tokens[1:]
+    amount_index = next(
+        (i for i, token in enumerate(tokens[1:], 1)
+         if re.fullmatch(r"-?[\d,]+(?:\.\d+)?", token)), None
+    )
+    if amount_index is None:
+        return None
+    label = "".join(tokens[:amount_index])
+    numbers = tokens[amount_index:]
     # A road row names the road with digits ("205 国道天长段新线"); the leading
     # number belongs to the label, not the amount column.
     if (
@@ -4122,3 +4201,181 @@ def _parse_segment_row(line: str) -> tuple[str, str, str | None] | None:
     ):
         return None
     return label, numbers[0], numbers[1]
+
+def _complete_current_business_source(excerpt: str) -> str:
+    """Keep a multi-business owner's continuous section instead of a sub-branch."""
+    compact = re.sub(r"\s+", "", excerpt)
+    match = re.search(
+        r"本集团以[^。]+为两大核心主业" r"|公司建成[^。]+四大产业板块", compact
+    )
+    if not match:
+        return ""
+    prefix = compact[max(0, compact.rfind("。", 0, match.start()) + 1) : match.end()]
+    if re.search(r"第三方|子公司|拟|计划|将|尚未|未建成", prefix):
+        return ""
+    original = _original_span_matching(excerpt, compact[match.start() :])
+    return original
+
+
+def _current_product_sources(excerpt: str) -> list[str]:
+    """Affirmative product disclosures in the owned performance/product section."""
+    compact = re.sub(r"\s+", "", excerpt)
+    sources: list[str] = []
+    patterns = (
+        r"公司经过[^。]+主要产品包括[^。]+。",
+        r"公司还利用[^。]+。成功开拓了[^。]+产品。",
+        r"可降解[^。]{2,100}已实现[^。]{2,100}生产，产品畅销[^。]+。",
+        r"[\u4e00-\u9fffA-Za-z]{2,30}突破生产技术瓶颈，已稳定量产[^。]+。",
+        r"本集团[^。]{0,40}深化运营[^。]+供应链核心产品[^。]+。",
+    )
+    for pattern in patterns:
+        for match in re.finditer(pattern, compact):
+            sentence = compact[
+                max(0, compact.rfind("。", 0, match.start()) + 1) : match.end()
+            ]
+            if re.search(
+                r"子公司|第三方|公司拟|公司计划|公司尚未|将销售|尚未销售|未实现",
+                sentence,
+            ):
+                continue
+            source = _original_span_matching(excerpt, match.group(0))
+            if source:
+                sources.append(source)
+    return sources
+
+
+def _native_current_product_bindings(excerpt: str) -> list[tuple[str, str, str | None]]:
+    """Current sales bind one product's own performance paragraph, not its uses."""
+    compact = re.sub(r"\s+", "", excerpt)
+    bindings: list[tuple[str, str, str | None]] = []
+    for match in re.finditer(
+        r"报告期内，公司(?!拟|计划|将|尚未|未)(?P<name>[\u4e00-\u9fffA-Za-z]{2,30}?)(?:产品)?"
+        r"(?:实际)?产量[^。]+。",
+        compact,
+    ):
+        clause = match.group(0)
+        if re.search(r"(?:尚未|未|拟|计划|将)销售|未生产", clause):
+            continue
+        if re.search(r"(?:扣除内部自用后)?销售\d", clause):
+            name = match.group("name").removesuffix("产品")
+            bindings.append((name, "销售", None))
+    for match in re.finditer(
+        r"公司累计生产(?P<name>[^。]{2,30}?)\d[^。]+销售\d[^。]+。", compact
+    ):
+        if not re.search(
+            r"子公司|第三方|拟|计划|尚未|将销售|未销售",
+            compact[max(0, compact.rfind("。", 0, match.start()) + 1) : match.end()],
+        ):
+            bindings.append((match.group("name"), "销售", None))
+    # PVB胶片的本期生产结构句 explicitly continues to 全年...销售.
+    for match in re.finditer(
+        r"报告期内，公司根据[^。]+自主调整了(?P<name>[^。]{2,30}?)产品生产结构。"
+        r"全年(?P=name)产品实际产量[^。]+销售[^。]+。",
+        compact,
+    ):
+        if not re.search(r"拟|计划|尚未|将销售|未销售", match.group(0)):
+            bindings.append((match.group("name"), "销售", None))
+    for source in _current_product_sources(excerpt):
+        text = re.sub(r"\s+", "", source)
+        match = re.match(r"可降解(?P<names>[^。]+?)已实现[^。]+生产，产品畅销", text)
+        if match:
+            for name in match.group("names").split("、"):
+                bindings.append((name, "畅销", None))
+    if (
+        "产销量情况分析表" in compact
+        and "上表中公司主要产品的销售量" in compact
+        and not re.search(r"子公司|第三方|公司拟|公司计划|尚未销售|将销售", compact)
+    ):
+        table = re.split(r"产销量情况分析表", excerpt, maxsplit=1)[0]
+        table = _join_segment_label_amounts(
+            _join_pdf_soft_breaks(table), core_answer_repair=True
+        )
+        in_products = "分产品营业收入" in re.sub(r"\s+", "", table)
+        for line in table.splitlines():
+            dim = _dimension_from_heading(line)
+            if dim is not None:
+                in_products = dim == "product"
+            row = _parse_segment_row(line)
+            if in_products and row and row[0] not in {"其他", "水泥及熟料"}:
+                bindings.append((row[0], "销售", "营业收入"))
+    return list(dict.fromkeys(bindings))
+
+
+def _native_input_bindings(excerpt: str) -> list[tuple[str, str, str]]:
+    """Parse explicit upstream and purchase/consumption columns, never downstream."""
+    bindings: list[tuple[str, str, str]] = []
+    normalized = excerpt.replace("\r\n", "\n").replace("\r", "\n")
+    # The formal company product table declares upstream and downstream columns.
+    header = re.search(
+        r"产品\s+所属细分行业\s+主要上游原材料\s+主要下游应用领域", normalized
+    )
+    if header and not re.search(
+        r"子公司|第三方|拟|计划", normalized[: header.start()][-120:]
+    ):
+        table = re.split(
+            r"[（(]3[)）][.．]?研发创新", normalized[header.end() :], maxsplit=1
+        )[0]
+        # Each native row starts with product and industry. Within the upstream
+        # cell, a horizontal space starts the next column (except Latin names).
+        # Soft-wrapped list cells continue until that column boundary.
+        current: str | None = None
+        upstream = []
+        for line in table.splitlines():
+            row = re.search(r"(?:^|\s)(?:化工|化纤|建材|新材料)(?:\s+(.*)|$)", line)
+            if row:
+                if current:
+                    upstream.append(current)
+                current = row.group(1) or ""
+            elif current is not None:
+                if (
+                    not current
+                    or current.endswith(("、", "，"))
+                    or re.match(r"[\u4e00-\u9fff](?:[、，]| +\d+[.．])", line)
+                ):
+                    current += line.strip()
+                else:
+                    if current:
+                        upstream.append(current)
+                    current = None
+                    continue
+            else:
+                continue
+            current = re.sub(r"([A-Z]{2,}) +(?=[\u4e00-\u9fff])", r"\1", current)
+            boundary = re.search(r" +(?=[\u4e00-\u9fff])", current)
+            if boundary:
+                upstream.append(current[: boundary.start()])
+                current = None
+        if current:
+            upstream.append(current)
+        for cell in upstream:
+            # Route names describe production processes, not purchased objects.
+            cell = re.sub(r"\d+[.．][^：:]+[：:]", "、", cell)
+            for name in re.split(r"[、，]| +(?=\d+[.．])", cell):
+                name = re.sub(r"\s+", "", name)
+                if re.fullmatch(r"[\u4e00-\u9fffA-Za-z]{1,20}", name) and name not in {
+                    "助剂",
+                    "其他聚合乳液",
+                    "其他聚合",
+                }:
+                    bindings.append((name, "投入", "主要上游原材料"))
+    if "采购量" in normalized and "耗用量" in normalized:
+        section = ""
+        for line in normalized.splitlines():
+            compact = re.sub(r"\s+", "", line)
+            if "主要原材料" in compact and "基本情况" in compact:
+                section = (
+                    ""
+                    if re.search(r"子公司|第三方|拟|计划|尚未", compact)
+                    else "原材料"
+                )
+            if "主要能源" in compact and "基本情况" in compact:
+                section = (
+                    "" if re.search(r"子公司|第三方|拟|计划|尚未", compact) else "能源"
+                )
+            match = re.match(r"\s*([\u4e00-\u9fffA-Za-z]{1,18})\s+外购\s+[^\n]+", line)
+            if match and section and len(re.findall(r"[\d,]+\.\d+", line)) >= 3:
+                bindings.append(
+                    (match.group(1), "耗用" if section == "能源" else "采购", section)
+                )
+    # Deduplicate the same native input stated by table and procurement disclosure.
+    return list(dict.fromkeys(bindings))

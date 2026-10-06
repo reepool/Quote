@@ -1,0 +1,25 @@
+{
+  "created_at": "2026-10-06T12:36:22.306414+00:00",
+  "method": "Manual review of this task diff and full owner/PDF regression, classified by business blockers only",
+  "blocking_findings": [
+    {
+      "problem": "Long product enumeration becomes one false produced object due to 衍生产品 matching 生产.",
+      "resolution": "Stop before 以及其他/形成 explanation; retain object after 利用…生产的. Complete-source regression rejects the false concatenation.",
+      "status": "fixed_before_formal"
+    }
+  ],
+  "unresolved_blockers": [],
+  "nonblocking_suggestions": [
+    "Core-file restructuring remains deferred per task; existing owner preserved."
+  ],
+  "unrelated_baseline_failures": "Existing test_reads_through_section_and_stops_at_next_heading remains deselected; other prior failures not expanded.",
+  "checks": {
+    "pytest": "231 passed, 1 deselected",
+    "ruff": "passed",
+    "openspec_strict": "passed",
+    "diff_check": "passed"
+  },
+  "code_receipt": "v26-source-freeze-receipt.json",
+  "original_worktree_modified_files_unchanged": true,
+  "git_base": "ca9df011"
+}

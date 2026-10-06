@@ -24,3 +24,14 @@ Recall MUST use substantive new original conditions and MUST NOT credit incomple
 #### Scenario: Declared business and resource conditions pass
 - **WHEN** both original-source business scores reach100% with zero numeric errors and resource bounds met
 - **THEN** evidence is submitted to A-role finite acceptance limited to those source pages, without changing production or scale declarations
+
+### Requirement: v26 repairs complete owned source delivery without replacing failure
+The existing selection, projection, assessment and execution owners MUST deliver complete group and company business narratives, thirty non-aggregate revenue rows with native units and explicit sales/input/energy roles. A combined table MUST share its declared unit across its dimensions; an independent table MUST retain its own unit. Native subtotals MUST retain summary semantics without peer-product aggregation. Upstream inputs MUST come from the upstream column, never downstream uses. Generic trade and truncated action fragments MUST NOT become commodity objects. P15 film sales and P27 water-soluble film/upstream inputs MUST enter a separate corrected pre-execution source list; the original56 score and source bytes MUST remain preserved. The full v26 identity MUST enable all five cumulative repairs without changing the default. The first v26 owner execution MUST use the original plan, effective versions and cutoff in independent m4_v26_shipping_materials_core_repair directories, shared50000tokens and a whole-round timer including retries. Actual facts and answered texts MUST be uniquely reviewed against corrected source substance, with role recall counted once and Measurement accuracy only. Finite evidence MUST be submitted to A-role; no archive or next batch is permitted before acceptance.
+
+#### Scenario: Full owner pages recover native business substance
+- **WHEN** complete shipping/materials owner pages are accepted, queried and exported
+- **THEN** their complete narratives, native rows, units and current explicit roles agree while third-party, planned, downstream and generic-trade objects are rejected
+
+#### Scenario: First formal v26 observation is preserved
+- **WHEN** the corrected source conditions precede the first genuine v26 execution
+- **THEN** truthful dynamic scores, actual runtime reuse and complete elapsed time are retained alongside original failures for finite A-role review

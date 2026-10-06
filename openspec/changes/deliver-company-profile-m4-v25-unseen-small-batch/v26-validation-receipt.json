@@ -1,0 +1,48 @@
+{
+  "created_at": "2026-10-06T12:40:53.476608+00:00",
+  "verification": {
+    "pytest": "231 passed, 1 deselected",
+    "ruff": "passed",
+    "openspec_strict": "passed",
+    "diff_check": "passed",
+    "blocking_review": "No unresolved task-related blockers; false product enumeration fixed before formal"
+  },
+  "source_recall": {
+    "status": "assessed",
+    "numerator": 77,
+    "denominator": 77,
+    "value": 1.0
+  },
+  "source_accuracy": {
+    "status": "assessed",
+    "numerator": 145,
+    "denominator": 145,
+    "value": 1.0
+  },
+  "critical_numeric_errors": {
+    "status": "assessed",
+    "value": 0
+  },
+  "whole_round_seconds": 202.7754220990464,
+  "tokens_used": 0,
+  "shared_token_budget": 50000,
+  "all_five_stages_actual_no_reuse": true,
+  "original_protected_files": 681,
+  "original_historical_data_files": 673,
+  "original_change_json_files": 8,
+  "first_v26_artifacts_unchanged": 18,
+  "original_v25_first_artifacts_unchanged": 18,
+  "original_v25_score": "19/56;47/65",
+  "protection_unchanged": true,
+  "executed_code_unchanged": true,
+  "initial_modified_docs_sha256": {
+    "docs/development/common_llm_gateway_architecture.md": "7f2ad8851c0bc2e8953afc7f5451911ebedecd220f159d68263470ef468609de",
+    "docs/development/common_llm_gateway_usage.md": "e8a931f1c3a515d9e66769e955d980ae90031032b6c741a26bbe123e267c5cca",
+    "docs/development/pdf_engine_evaluation_local_corpus_20260825.json": "0ee90791f0e3eb1bca59e458a25ee19b7b4e05007127047ede21794f4aa6320e"
+  },
+  "initial_modified_docs_unchanged": true,
+  "change_archived": false,
+  "next_batch": "paused_pending_a_role_finite_review",
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false
+}

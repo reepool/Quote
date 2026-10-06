@@ -1,0 +1,1864 @@
+{
+  "schema_version": "company_profile_source_review.v1",
+  "production_authorization": "not_authorized",
+  "live_run": {
+    "schema_version": "company_profile_live_run.v1",
+    "production_authorization": "not_authorized",
+    "knowledge_cutoff": "2026-09-17",
+    "plan": {
+      "schema_version": "company_profile_live_plan.v1",
+      "production_authorization": "not_authorized",
+      "plan_status": "recorded_before_live",
+      "live_task_started": false,
+      "budget": {
+        "max_companies_this_round": 2,
+        "min_companies_this_round": 0,
+        "token_budget": 50000,
+        "max_elapsed_seconds": 300.0,
+        "require_fifty_companies": false
+      },
+      "sampling": {
+        "method": "predeclared_stratified_sample",
+        "purpose": "independent_source_review",
+        "allocation": "priority_round_robin_then_instrument_id",
+        "selection_key": "instrument_id_ascending",
+        "missing_classification_stratum": "other",
+        "empty_stratum_policy": "keep_in_universe_skip_draw",
+        "exchange_strata": [
+          "SSE",
+          "SZSE",
+          "BSE"
+        ],
+        "disclosure_form_strata": [
+          "manufacturing",
+          "service",
+          "finance",
+          "other"
+        ],
+        "stratum_priority": [
+          [
+            "SSE",
+            "manufacturing"
+          ],
+          [
+            "SZSE",
+            "manufacturing"
+          ],
+          [
+            "BSE",
+            "manufacturing"
+          ],
+          [
+            "SSE",
+            "service"
+          ],
+          [
+            "SZSE",
+            "service"
+          ],
+          [
+            "BSE",
+            "service"
+          ],
+          [
+            "SSE",
+            "finance"
+          ],
+          [
+            "SZSE",
+            "finance"
+          ],
+          [
+            "BSE",
+            "finance"
+          ],
+          [
+            "SSE",
+            "other"
+          ],
+          [
+            "SZSE",
+            "other"
+          ],
+          [
+            "BSE",
+            "other"
+          ]
+        ],
+        "per_stratum_first_draw": 1,
+        "max_sample_size": 2,
+        "review_eligible_asset_status": "available",
+        "review_requires_latest_effective_annual_report": true,
+        "excludes_from_universe": false,
+        "used_to_fit_thresholds": false
+      },
+      "universe_denominator": {
+        "policy_version": "a_share_full_market.v1",
+        "exchanges": [
+          "SSE",
+          "SZSE",
+          "BSE"
+        ],
+        "as_of": "declared_at_run_from_knowledge_cutoff",
+        "includes_missing_assets": true,
+        "includes_missing_classification": true
+      },
+      "recall_denominator": {
+        "definition": "independently_read_important_disclosures_from_sampled_official_reports",
+        "forbidden_sources": [
+          "model_listed_fields",
+          "evidence_id_existence",
+          "gold24_equality"
+        ]
+      },
+      "expansion_thresholds": {
+        "numeric_thresholds_basis": "operator_cost_constraint",
+        "min_independently_reviewed_reports": 2,
+        "min_occupied_strata_reviewed": 2,
+        "min_source_recall_ratio": 1.0,
+        "min_source_accuracy_ratio": 1.0,
+        "max_critical_numeric_errors": 0,
+        "max_tokens": 50000,
+        "max_elapsed_seconds": 300.0,
+        "max_companies_this_expansion": 2,
+        "scale_quality_claim_allowed": false,
+        "fitted_from_observed_results": false,
+        "fixture_guards_are_not_live_quality": true,
+        "gold24_equality_is_not_a_threshold": true,
+        "untriggered_negatives_are_not_passes": true,
+        "expansion_requires_independent_source_review": true
+      }
+    },
+    "selected_instrument_ids": [
+      "600026.SH",
+      "600063.SH"
+    ],
+    "selected_strata": [
+      {
+        "instrument_id": "600026.SH",
+        "exchange": "SSE",
+        "disclosure_form": "service"
+      },
+      {
+        "instrument_id": "600063.SH",
+        "exchange": "SSE",
+        "disclosure_form": "manufacturing"
+      }
+    ],
+    "universe": {
+      "policy_version": "a_share_full_market.v1",
+      "as_of": "2026-09-17",
+      "total": 5564,
+      "eligible": 5564,
+      "missing_asset": 89,
+      "missing_classification": 0,
+      "selected_for_run": 2,
+      "completed": 2,
+      "failed": 0,
+      "includes_missing_assets": true
+    },
+    "company_outcomes": [
+      {
+        "instrument_id": "600026.SH",
+        "outcome": "completed",
+        "supplement_incomplete": false,
+        "delivered": true,
+        "batch_rerun_triggered": false
+      },
+      {
+        "instrument_id": "600063.SH",
+        "outcome": "completed",
+        "supplement_incomplete": false,
+        "delivered": true,
+        "batch_rerun_triggered": false
+      }
+    ],
+    "whole_batch_rerun": false,
+    "scale_quality_claim_allowed": false,
+    "first_expansion_plan_id": null,
+    "frozen_report_references": []
+  },
+  "structural_checks": [],
+  "semantic_findings": [
+    {
+      "instrument_id": "600026.SH",
+      "aspect": "core_skeleton",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-1ce516e3333c1c70:overview",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600026.SH",
+      "aspect": "core_skeleton",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-070cca171e892619:overview",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600026.SH",
+      "aspect": "commodity_role",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-4acaf1344a2a5ab8:commodity:1",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600026.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-3f16cbe0bf220c0e:commodity:1",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600026.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-1d24617a8fc8f618:segment:product:内贸原油",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600026.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-154445c8401297c8:revenue:product:内贸原油",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600026.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-1d24617a8fc8f618:segment:product:内贸成品油",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600026.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-154445c8401297c8:revenue:product:内贸成品油",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600026.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-1d24617a8fc8f618:segment:product:内贸油轮出租",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600026.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-154445c8401297c8:revenue:product:内贸油轮出租",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600026.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-1d24617a8fc8f618:segment:total:内贸油品小计",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600026.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-154445c8401297c8:revenue:total:内贸油品小计",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600026.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-1d24617a8fc8f618:segment:product:外贸原油",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600026.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-154445c8401297c8:revenue:product:外贸原油",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600026.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-1d24617a8fc8f618:segment:product:外贸成品油",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600026.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-154445c8401297c8:revenue:product:外贸成品油",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600026.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-1d24617a8fc8f618:segment:product:外贸油轮出租",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600026.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-154445c8401297c8:revenue:product:外贸油轮出租",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600026.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-1d24617a8fc8f618:segment:total:外贸油品小计",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600026.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-154445c8401297c8:revenue:total:外贸油品小计",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600026.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-1d24617a8fc8f618:segment:product:LNG运输",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600026.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-154445c8401297c8:revenue:product:LNG运输",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600026.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-1d24617a8fc8f618:segment:product:LPG运输",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600026.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-154445c8401297c8:revenue:product:LPG运输",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600026.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-1d24617a8fc8f618:segment:product:化学品运输",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600026.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-154445c8401297c8:revenue:product:化学品运输",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600026.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-1d24617a8fc8f618:segment:region:国内运输",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600026.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-154445c8401297c8:revenue:region:国内运输",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600026.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-1d24617a8fc8f618:segment:region:国际运输",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600026.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-154445c8401297c8:revenue:region:国际运输",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600026.SH",
+      "aspect": "core_skeleton",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "answer:principal_business",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600026.SH",
+      "aspect": "core_skeleton",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "answer:products_services",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": false,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600026.SH",
+      "aspect": "core_skeleton",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "missing-substance:products_services",
+      "disclosed_in_source": true,
+      "present_in_delivery": false,
+      "fact_accurate": null,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600026.SH",
+      "aspect": "core_skeleton",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "answer:revenue_model",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "core_skeleton",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-d13dda1b3acca4e9:overview",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-8eec0ecc8dde46d2:activity:1",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-8eec0ecc8dde46d2:activity:2",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-8eec0ecc8dde46d2:activity:3",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-8eec0ecc8dde46d2:activity:4",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-8eec0ecc8dde46d2:activity:5",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-8eec0ecc8dde46d2:activity:6",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-8eec0ecc8dde46d2:activity:7",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-8eec0ecc8dde46d2:activity:8",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-8eec0ecc8dde46d2:activity:9",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-8eec0ecc8dde46d2:activity:10",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-8eec0ecc8dde46d2:activity:11",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-8eec0ecc8dde46d2:activity:12",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "core_skeleton",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-2c37f2d0908f3d2a:overview",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "core_skeleton",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-55cac379a35abe3c:overview",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "core_skeleton",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-43459998fb70633d:overview",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "core_skeleton",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-f97d0281c3204cfb:overview",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "commodity_role",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-8eec0ecc8dde46d2:commodity:1",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "commodity_role",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-8eec0ecc8dde46d2:commodity:2",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "commodity_role",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-8eec0ecc8dde46d2:commodity:3",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "commodity_role",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-8eec0ecc8dde46d2:commodity:4",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "commodity_role",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-8eec0ecc8dde46d2:commodity:5",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "commodity_role",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-8eec0ecc8dde46d2:commodity:6",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "commodity_role",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-8eec0ecc8dde46d2:commodity:7",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "commodity_role",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-8eec0ecc8dde46d2:commodity:8",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "commodity_role",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-8eec0ecc8dde46d2:commodity:9",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "commodity_role",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-e17d3882338135ab:commodity:1",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "commodity_role",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-e17d3882338135ab:commodity:2",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-790721ceb3ad889d:commodity:1",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "commodity_role",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-790721ceb3ad889d:commodity:2",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "commodity_role",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-790721ceb3ad889d:commodity:3",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "commodity_role",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-790721ceb3ad889d:commodity:5",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "commodity_role",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-790721ceb3ad889d:commodity:6",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-790721ceb3ad889d:commodity:7",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-790721ceb3ad889d:commodity:8",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-790721ceb3ad889d:commodity:9",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-790721ceb3ad889d:commodity:10",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-790721ceb3ad889d:commodity:11",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "commodity_role",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-790721ceb3ad889d:commodity:12",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-790721ceb3ad889d:commodity:13",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-790721ceb3ad889d:commodity:14",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-790721ceb3ad889d:commodity:15",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "commodity_role",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-e6d50dd0cc524db9:commodity:1",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "commodity_role",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-e6d50dd0cc524db9:commodity:2",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "commodity_role",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-e6d50dd0cc524db9:commodity:3",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "commodity_role",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-e6d50dd0cc524db9:commodity:4",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "commodity_role",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-e6d50dd0cc524db9:commodity:5",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "commodity_role",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-e6d50dd0cc524db9:commodity:6",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "commodity_role",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-e6d50dd0cc524db9:commodity:7",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "commodity_role",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-e6d50dd0cc524db9:commodity:8",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "commodity_role",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-e6d50dd0cc524db9:commodity:9",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "commodity_role",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-e6d50dd0cc524db9:commodity:10",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "commodity_role",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-e6d50dd0cc524db9:commodity:11",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "commodity_role",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-e6d50dd0cc524db9:commodity:12",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "commodity_role",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-e6d50dd0cc524db9:commodity:13",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "commodity_role",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-e6d50dd0cc524db9:commodity:14",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "commodity_role",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-e6d50dd0cc524db9:commodity:15",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "commodity_role",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-e6d50dd0cc524db9:commodity:16",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-e6d50dd0cc524db9:commodity:17",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "commodity_role",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-e6d50dd0cc524db9:commodity:18",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "commodity_role",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-e6d50dd0cc524db9:commodity:19",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "commodity_role",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-e6d50dd0cc524db9:commodity:20",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "commodity_role",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-e6d50dd0cc524db9:commodity:21",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "commodity_role",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-e6d50dd0cc524db9:commodity:22",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "commodity_role",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-e6d50dd0cc524db9:commodity:23",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "commodity_role",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-e6d50dd0cc524db9:commodity:24",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-4661ebbee05ef00e:commodity:1",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-4661ebbee05ef00e:commodity:2",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-4661ebbee05ef00e:commodity:3",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-4661ebbee05ef00e:commodity:4",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "commodity_role",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-4661ebbee05ef00e:commodity:5",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-655f1aa957c7d75b:segment:industry:化工行业",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-1323b0e30270b57d:revenue:industry:化工行业",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-655f1aa957c7d75b:segment:industry:化纤行业",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-1323b0e30270b57d:revenue:industry:化纤行业",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-655f1aa957c7d75b:segment:industry:建材行业",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-1323b0e30270b57d:revenue:industry:建材行业",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-655f1aa957c7d75b:segment:industry:新材料行业",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-1323b0e30270b57d:revenue:industry:新材料行业",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-655f1aa957c7d75b:segment:product:聚乙烯醇",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-1323b0e30270b57d:revenue:product:聚乙烯醇",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-655f1aa957c7d75b:segment:product:水泥及熟料",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-1323b0e30270b57d:revenue:product:水泥及熟料",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-655f1aa957c7d75b:segment:product:高强高模PVA纤维",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-1323b0e30270b57d:revenue:product:高强高模PVA纤维",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-655f1aa957c7d75b:segment:product:聚酯切片",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-1323b0e30270b57d:revenue:product:聚酯切片",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-655f1aa957c7d75b:segment:product:VAE乳液",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-1323b0e30270b57d:revenue:product:VAE乳液",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-655f1aa957c7d75b:segment:product:可再分散性胶粉",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-1323b0e30270b57d:revenue:product:可再分散性胶粉",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-655f1aa957c7d75b:segment:product:醋酸甲酯",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-1323b0e30270b57d:revenue:product:醋酸甲酯",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-655f1aa957c7d75b:segment:product:醋酸乙烯",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-1323b0e30270b57d:revenue:product:醋酸乙烯",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-655f1aa957c7d75b:segment:product:PVA光学膜",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-1323b0e30270b57d:revenue:product:PVA光学膜",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-655f1aa957c7d75b:segment:product:PVB中间膜",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-1323b0e30270b57d:revenue:product:PVB中间膜",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-655f1aa957c7d75b:segment:product:其他",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-1323b0e30270b57d:revenue:product:其他",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-655f1aa957c7d75b:segment:region:内销",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-1323b0e30270b57d:revenue:region:内销",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-655f1aa957c7d75b:segment:region:出口",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-1323b0e30270b57d:revenue:region:出口",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-655f1aa957c7d75b:segment:sales_mode:直销",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-1323b0e30270b57d:revenue:sales_mode:直销",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-655f1aa957c7d75b:segment:sales_mode:分销",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "important_disclosure",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "owned:core-ev-1323b0e30270b57d:revenue:sales_mode:分销",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "core_skeleton",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "answer:principal_business",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "core_skeleton",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "answer:products_services",
+      "disclosed_in_source": false,
+      "present_in_delivery": true,
+      "fact_accurate": false,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "core_skeleton",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "missing-substance:products_services",
+      "disclosed_in_source": true,
+      "present_in_delivery": false,
+      "fact_accurate": null,
+      "critical_numeric_error": false
+    },
+    {
+      "instrument_id": "600063.SH",
+      "aspect": "core_skeleton",
+      "kind": "semantic",
+      "source": "independently_read_official_report",
+      "disclosure_id": "answer:revenue_model",
+      "disclosed_in_source": true,
+      "present_in_delivery": true,
+      "fact_accurate": true,
+      "critical_numeric_error": false
+    }
+  ],
+  "fixture_guards": [],
+  "independently_reviewed_reports": 2,
+  "occupied_strata_reviewed": {
+    "status": "assessed",
+    "value": 2
+  },
+  "delivery_coverage": {
+    "universe_total": 5564,
+    "selected_for_run": 2,
+    "completed": 2,
+    "failed": 0,
+    "missing_asset": 89,
+    "semantic_status": "not_a_source_metric"
+  },
+  "source_recall": {
+    "status": "assessed",
+    "numerator": 75,
+    "denominator": 77,
+    "value": 0.974025974025974
+  },
+  "source_accuracy": {
+    "status": "assessed",
+    "numerator": 143,
+    "denominator": 145,
+    "value": 0.9862068965517241
+  },
+  "critical_numeric_errors": {
+    "status": "assessed",
+    "value": 0
+  },
+  "freshness": [
+    {
+      "instrument_id": "600026.SH",
+      "report_period": "2025-12-31",
+      "published_at": "2026-03-26T16:00:00+00:00",
+      "knowledge_cutoff": "2026-09-17",
+      "available_at_cutoff": true
+    },
+    {
+      "instrument_id": "600063.SH",
+      "report_period": "2025-12-31",
+      "published_at": "2026-03-19T16:00:00+00:00",
+      "knowledge_cutoff": "2026-09-17",
+      "available_at_cutoff": true
+    }
+  ],
+  "workload": {
+    "tokens_used": {
+      "status": "assessed",
+      "value": 0
+    },
+    "elapsed_seconds": {
+      "status": "assessed",
+      "value": 202.7754220990464
+    },
+    "human_review_minutes": {
+      "status": "unassessed",
+      "value": null
+    }
+  },
+  "expansion_gates_met": false,
+  "scale_quality_claim_allowed": false,
+  "zero_recurrence_claimed": false
+}
