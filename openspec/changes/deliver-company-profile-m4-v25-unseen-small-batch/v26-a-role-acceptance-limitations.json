@@ -1,0 +1,23 @@
+{
+  "created_at": "2026-10-06T13:08:13.408234+00:00",
+  "review_status": "not_accepted",
+  "original_claim": "77/77,145/145",
+  "accuracy_claim_adopted": false,
+  "confirmed_error": "24 upstream-column inputs on p27 were Activity purchases; source establishes material input, not external purchase. Includes internally consumed PVA, PVB resin and VAE emulsion.",
+  "preserved_originals": [
+    "v26-source-review-evidence.json",
+    "v26-source-review-evidence.v2.json",
+    "v26-source-review.initial.json",
+    "v26-review-correction.json",
+    "v26-first-formal-delivery-preservation.json"
+  ],
+  "trusted_runtime": {
+    "elapsed_seconds": 202.7754220990464,
+    "tokens_used": 0,
+    "actual_scope_reuse": false
+  },
+  "change_archived": false,
+  "next_batch": "paused",
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false
+}

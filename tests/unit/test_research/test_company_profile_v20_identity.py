@@ -12,7 +12,9 @@ from research.company_profile.core_evidence_selection import (
 from research.company_profile.execution import default_processing_identity
 
 
-@pytest.mark.parametrize("version", ["v20", "v21", "v22", "v23", "v24", "v25", "v26"])
+@pytest.mark.parametrize(
+    "version", ["v20", "v21", "v22", "v23", "v24", "v25", "v26", "v27"]
+)
 def test_formal_identity_activates_all_cumulative_repairs_without_changing_default(
     version,
 ):

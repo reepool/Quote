@@ -35,3 +35,25 @@ The existing selection, projection, assessment and execution owners MUST deliver
 #### Scenario: First formal v26 observation is preserved
 - **WHEN** the corrected source conditions precede the first genuine v26 execution
 - **THEN** truthful dynamic scores, actual runtime reuse and complete elapsed time are retained alongside original failures for finite A-role review
+
+### Requirement: v27 distinguishes upstream input from external purchase
+Named upstream-table inputs MUST activate the existing material chapter and be accepted as material_input Relationships, preserving native name, column, subject, period and evidence. They MUST NOT become purchases merely because they are inputs. Explicit external-purchase rows MUST retain purchases and operating energy MUST retain consumption semantics. Independent sale and input facts for the same name MUST coexist. Full owned and independent PDF pages MUST verify accepted object types, actions and relation types as well as query/export roles and the existing six answers, thirty revenue rows and forty-one native roles. Full v27 identity MUST activate all five cumulative repairs without changing the default identity.
+
+#### Scenario: Upstream self-use has no external-purchase assertion
+- **WHEN** an owned table names a material in its upstream column without external-purchase wording
+- **THEN** the material chapter delivers material_input Relationship and its input role, with no purchases assertion derived from that column
+
+#### Scenario: External purchase and energy remain independently supported
+- **WHEN** another original table explicitly discloses external purchase or consumption
+- **THEN** its purchases action and purchase or energy-consumption source verb remain supported by that table, independently of upstream input or sales facts
+
+### Requirement: v27 formal review checks each source action uniquely
+The first genuine v27 run-query-export MUST use the original plan, official versions and cutoff in independent m4_v27_input_relation_acceptance directories with the same seventy-seven source conditions frozen before execution. The whole-round timer MUST include all retries and actual five-stage reuse MUST be recorded. Each actual accepted fact and answered text MUST receive exactly one accuracy judgment including its action or relation_type against source wording; Measurement MUST count only for accuracy and role recall MUST avoid duplicates. Finite submission MUST require both business scores100%, zero numeric errors, at most300seconds and shared50000tokens. Original v26 scores, initial/corrected review and first artifacts MUST remain preserved with the latest A-role accuracy limitation attached. No archive or next batch is permitted before finite A-role acceptance; production and scale declarations MUST remain unchanged.
+
+#### Scenario: Role matches but action is unsupported
+- **WHEN** a delivery has an input role whose underlying purchases assertion is supported only by an upstream column
+- **THEN** that actual fact fails accuracy even if its role name matches the recall list
+
+#### Scenario: New formal action review passes within finite scope
+- **WHEN** the new first formal observation meets every declared business and resource threshold
+- **THEN** its uniquely scored evidence is submitted for A-role finite review while prior rounds and paused expansion remain intact

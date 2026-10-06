@@ -384,6 +384,32 @@ def select_core_evidence(
     )
     if material is not None:
         spans.append(material)
+    if source_delivery_repair:
+        for page in normalized:
+            if not page.readable or not any(
+                verb == "投入" for _, verb, _ in _native_input_bindings(page.text)
+            ):
+                continue
+            # An upstream column establishes use, not an external purchase.
+            # Keep the complete owned table in the existing material chapter.
+            if any(
+                span.page == page.page
+                and span.chapter_task == ChapterTask.EXTRACT_MATERIAL_INPUTS.value
+                and span.excerpt.strip() == page.text.strip()
+                for span in spans
+            ):
+                continue
+            spans.append(
+                CoreEvidenceSpan(
+                    page=page.page,
+                    section_title="主要上游原材料",
+                    excerpt=page.text,
+                    bounded_quote=page.text,
+                    chapter_task=ChapterTask.EXTRACT_MATERIAL_INPUTS.value,
+                    field_ids=("material_input",),
+                    context_complete=True,
+                )
+            )
     if repair_revenue_sentence:
         spans.extend(
             _repair_commodity_spans(
@@ -1178,6 +1204,7 @@ REVENUE_SENTENCE_REPAIR_V23 = "v23"
 REVENUE_SENTENCE_REPAIR_V24 = "v24"
 REVENUE_SENTENCE_REPAIR_V25 = "v25"
 REVENUE_SENTENCE_REPAIR_V26 = "v26"
+REVENUE_SENTENCE_REPAIR_V27 = "v27"
 _REVENUE_SENTENCE_REPAIR_VERSIONS = frozenset(
     {
         REVENUE_SENTENCE_REPAIR_V1,
@@ -1206,6 +1233,7 @@ _REVENUE_SENTENCE_REPAIR_VERSIONS = frozenset(
         REVENUE_SENTENCE_REPAIR_V24,
         REVENUE_SENTENCE_REPAIR_V25,
         REVENUE_SENTENCE_REPAIR_V26,
+        REVENUE_SENTENCE_REPAIR_V27,
     }
 )
 
@@ -1257,6 +1285,7 @@ def named_role_repair_requested(identity: Mapping[str, Any] | None) -> bool:
         REVENUE_SENTENCE_REPAIR_V24,
         REVENUE_SENTENCE_REPAIR_V25,
         REVENUE_SENTENCE_REPAIR_V26,
+        REVENUE_SENTENCE_REPAIR_V27,
     }
 
 
@@ -1291,6 +1320,7 @@ def service_operating_energy_requested(identity: Mapping[str, Any] | None) -> bo
         REVENUE_SENTENCE_REPAIR_V24,
         REVENUE_SENTENCE_REPAIR_V25,
         REVENUE_SENTENCE_REPAIR_V26,
+        REVENUE_SENTENCE_REPAIR_V27,
     }
 
 
@@ -1325,6 +1355,7 @@ def core_answer_repair_requested(identity: Mapping[str, Any] | None) -> bool:
         REVENUE_SENTENCE_REPAIR_V24,
         REVENUE_SENTENCE_REPAIR_V25,
         REVENUE_SENTENCE_REPAIR_V26,
+        REVENUE_SENTENCE_REPAIR_V27,
     }
 
 
@@ -1360,6 +1391,7 @@ def source_delivery_repair_requested(identity: Mapping[str, Any] | None) -> bool
         REVENUE_SENTENCE_REPAIR_V24,
         REVENUE_SENTENCE_REPAIR_V25,
         REVENUE_SENTENCE_REPAIR_V26,
+        REVENUE_SENTENCE_REPAIR_V27,
     }
 
 
@@ -2858,7 +2890,8 @@ def _project_repair_commodity_span(
         for name, verb, header in _native_current_product_bindings(span.excerpt):
             add_activity(name, ActivityAction.SELLS, verb, header=header)
         for name, verb, header in _native_input_bindings(span.excerpt):
-            add_activity(name, ActivityAction.PURCHASES, verb, header=header)
+            if verb != "投入":
+                add_activity(name, ActivityAction.PURCHASES, verb, header=header)
         for name, actor in _named_sales_bindings(span.excerpt):
             before = len(records)
             add_activity(name, ActivityAction.SELLS, "销售", actor=actor)
@@ -3548,6 +3581,10 @@ def explicit_material_input_names(
     names: list[str] = (
         ["煤炭"] if source_delivery_repair and _company_coal_risk_source(text) else []
     )
+    if source_delivery_repair:
+        names.extend(
+            name for name, verb, _ in _native_input_bindings(text) if verb == "投入"
+        )
     for sentence in re.split(r"[。；;]", compact):
         names.extend(_named_inputs_in_sentence(sentence))
         names.extend(_company_owned_material_lists(sentence))
@@ -3715,9 +3752,16 @@ def _project_material_span(
     if item is None:
         return ()
     records: list[SemanticRecord] = []
-    for name in explicit_material_input_names(
-        span.excerpt, source_delivery_repair=source_delivery_repair
-    ):
+    inputs: dict[str, str | None] = dict.fromkeys(
+        explicit_material_input_names(
+            span.excerpt, source_delivery_repair=source_delivery_repair
+        )
+    )
+    if source_delivery_repair:
+        for name, verb, header in _native_input_bindings(span.excerpt):
+            if verb == "投入":
+                inputs[name] = header
+    for name, header in inputs.items():
         records.append(
             _base_fact(
                 Relationship,
@@ -3728,7 +3772,7 @@ def _project_material_span(
                 field_id="material_input",
                 chapter_task=ChapterTask.EXTRACT_MATERIAL_INPUTS,
                 evidence=item.evidence,
-                source_native=SourceNativeValue(name=name),
+                source_native=SourceNativeValue(name=name, header=header),
                 relation_type=RelationshipType.MATERIAL_INPUT,
                 object_name=name,
                 excerpt_subject=span.excerpt,

@@ -23,3 +23,9 @@ Non-Goals：数量细分、成本拆分、行业增强、既有测试治理、�
 ## v26 局部修复边界
 
 沿 core_evidence_selection 的既有选段与 projection 收口完整业务段、表格标签、组合表单位、原生销售和上游/外购耗用列。core_assessment_projection 仅补充分业务构成与已接受正文的交付选择。不新增模板、写入owner、注册框架或数量/价格推断；大文件增量限本轮已复现源形态，拆分与框架治理后置。原56项及失败字节保留，v26-source-scope.json 在首次正式执行前单独固定p15/p27补正条件，Measurement只计准确率，别名/多个原页同角色只召回一次。两个小计使用原生total维度及小计qualifier保留，不作为同级产品累计。
+
+## v27 投入动作语义收口
+
+p27主要上游原材料列仅建立投入，不代表外购。复用 explicit_material_input_names 激活既有材料章节，完整上游页由材料 projection 输出 material_input Relationship，保留原名、栏目、主体、期间及 Evidence；commodity Activity 路径跳过投入绑定。p33外购行继续采购，电和船用燃油保持耗用语义，同名销售与投入并存。默认身份不变，正式 v27 开启五类累积修复。
+
+沿原计划/版本/cutoff，在独立 m4_v27_input_relation_acceptance 目录首次正式交付；执行前冻结相同77项来源条件，并固定逐事实动作/关系依据。准确率按所有实际接受事实与六维答案唯一重算，material_input 与 purchases 必须分别由投入列和外购列证明，角色命中不替代动作核验。v26原分数、初版/更正与原制品不改，审核限制旁挂。待A角有限复核，不归档、不扩批。

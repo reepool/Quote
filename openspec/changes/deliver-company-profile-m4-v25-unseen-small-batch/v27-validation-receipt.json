@@ -1,0 +1,53 @@
+{
+  "created_at": "2026-10-06T13:20:37.326785+00:00",
+  "verification": {
+    "pytest": "244 passed, 1 deselected",
+    "pytest_command": "/home/python/miniconda3/envs/Quote/bin/python -m pytest -q tests/unit/test_research/test_company_profile_v27_input_relation.py tests/unit/test_research/test_company_profile_v26_shipping_materials.py tests/unit/test_research/test_company_profile_v20_identity.py tests/unit/test_research/test_company_profile_v25_sales_semantics.py tests/unit/test_research/test_company_profile_v24_hydro_pharma.py tests/unit/test_research/test_company_profile_v22_energy_display.py tests/unit/test_research/test_company_profile_v21_trade_sales.py tests/unit/test_research/test_company_profile_v20_unseen_repair.py tests/unit/test_research/test_company_profile_v19_unseen_misses.py tests/unit/test_research/test_company_profile_v19_closure.py tests/unit/test_research/test_company_profile_revenue_sentence_repair.py tests/unit/test_research/test_company_profile_v7_source_delivery.py tests/unit/test_research/test_company_profile_v3_named_role_repair.py tests/unit/test_research/test_company_profile_core_evidence_selection.py tests/unit/test_research/test_company_profile_core_assessment_projection.py -k 'not test_reads_through_section_and_stops_at_next_heading'",
+    "ruff": "passed",
+    "openspec_strict": "passed",
+    "diff_check": "passed",
+    "review": "Manual review of the task diff, complete owner/independent PDF-page results and every accepted action/relation found no remaining task-related blocker. Existing excluded test and deferred industry/quantity/cost/framework work not changed."
+  },
+  "source_recall": {
+    "status": "assessed",
+    "numerator": 77,
+    "denominator": 77,
+    "value": 1.0
+  },
+  "source_accuracy": {
+    "status": "assessed",
+    "numerator": 145,
+    "denominator": 145,
+    "value": 1.0
+  },
+  "actual_accepted_fact_count": 139,
+  "answered_text_count": 6,
+  "upstream_material_input_relationships": 24,
+  "all_action_relation_source_checks_passed": true,
+  "critical_numeric_errors": {
+    "status": "assessed",
+    "value": 0
+  },
+  "whole_round_seconds": 190.02907550148666,
+  "tokens_used": 0,
+  "shared_token_budget": 50000,
+  "all_five_stages_actual_no_reuse": true,
+  "protected_files": 713,
+  "historical_data_files": 692,
+  "original_change_json_files": 21,
+  "first_v27_artifacts_unchanged": 19,
+  "first_v26_artifacts_unchanged": 18,
+  "protection_unchanged": true,
+  "executed_code_unchanged": true,
+  "initial_modified_docs_sha256": {
+    "docs/development/common_llm_gateway_architecture.md": "7f2ad8851c0bc2e8953afc7f5451911ebedecd220f159d68263470ef468609de",
+    "docs/development/common_llm_gateway_usage.md": "e8a931f1c3a515d9e66769e955d980ae90031032b6c741a26bbe123e267c5cca",
+    "docs/development/pdf_engine_evaluation_local_corpus_20260825.json": "0ee90791f0e3eb1bca59e458a25ee19b7b4e05007127047ede21794f4aa6320e"
+  },
+  "initial_modified_docs_unchanged": true,
+  "finite_submission_ready": true,
+  "change_archived": false,
+  "next_batch": "paused_pending_a_role_finite_review",
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false
+}
