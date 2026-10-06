@@ -35,3 +35,11 @@ Repair the real missing business narratives, continued revenue tables and named 
 ## v24首次正式结果（待A角有限验收）
 
 完整62项在执行前固定。现有owner首次正式201.09549884870648秒、0/50000token、实际五阶段无复用；实质召回62/62、唯一准确率104/104（98事实＋6答案）、数字错误0。六维正文、29收入行及27原生销售角色交付，主体、API/制剂及客户边界核实。保护616文件含原593历史＋18首次失败不变。达到声明门槛，提交有限验收；保持未归档和下一批暂停，原失败/范围时序限制保留。
+
+## Authorized v25 closure scope
+
+v24 metrics remain confirmed within the original 62 conditions, but overall acceptance is deferred because negated/future named marketing lists can generate current sales. Preserve original v24 bytes and attach the A-role limitation separately. Repair only the existing list binding; retain independently affirmed same-page sales, native actors, brands and API/formulation distinctions. Register v25 with all five cumulative paths and unchanged default identity. Fix the identical 62 source conditions before the first existing-owner formal round in m4_v25_named_sales_semantics_acceptance. Recalculate unique actual accuracy and submit finite acceptance; archive and further sampling stay paused pending A-role acceptance.
+
+## v25首次正式结果（提交A角有限验收）
+
+完整62项执行前固定且与v24逐项一致；首次正式196.67秒、0/50000token、五阶段实际无复用。独立实质召回62/62、唯一准确率104/104（98事实＋6答案）、数字错误0。否定/未来具名销售守卫回归通过，原26药品、主体/品牌/API区别保持。642保护文件及本轮首次制品字节保持。已达到声明来源申报门槛，A角有限验收待定；归档/下一批暂停，生产和规模声明不变。

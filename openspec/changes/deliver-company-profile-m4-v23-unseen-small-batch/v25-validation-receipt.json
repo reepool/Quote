@@ -1,0 +1,115 @@
+{
+  "stage": "5.1_and_5.2_complete_pending_a_role_finite_acceptance",
+  "tests": {
+    "passed": 215,
+    "deselected": 1,
+    "pre_existing_deferred_test": "test_reads_through_section_and_stops_at_next_heading",
+    "log_sha256": "867c475f713ae9b4c3d23ea127b501b822a8d6e26442feb0ea9d23936c175042",
+    "scope": "v25 full p39 owner/PDF action-semantic cases; v24/v25 complete pages, v20 identity, v22, v21, v20, v19 closure/misses, revenue sentence, v7, v3, core selection/assessment",
+    "files": [
+      "tests/unit/test_research/test_company_profile_v25_sales_semantics.py",
+      "tests/unit/test_research/test_company_profile_v24_hydro_pharma.py",
+      "tests/unit/test_research/test_company_profile_v20_identity.py",
+      "tests/unit/test_research/test_company_profile_v22_energy_display.py",
+      "tests/unit/test_research/test_company_profile_v21_trade_sales.py",
+      "tests/unit/test_research/test_company_profile_v20_unseen_repair.py",
+      "tests/unit/test_research/test_company_profile_v19_unseen_misses.py",
+      "tests/unit/test_research/test_company_profile_v19_closure.py",
+      "tests/unit/test_research/test_company_profile_revenue_sentence_repair.py",
+      "tests/unit/test_research/test_company_profile_v7_source_delivery.py",
+      "tests/unit/test_research/test_company_profile_v3_named_role_repair.py",
+      "tests/unit/test_research/test_company_profile_core_evidence_selection.py",
+      "tests/unit/test_research/test_company_profile_core_assessment_projection.py"
+    ],
+    "command": "/home/python/miniconda3/envs/Quote/bin/python -m pytest tests/unit/test_research/test_company_profile_v25_sales_semantics.py tests/unit/test_research/test_company_profile_v24_hydro_pharma.py tests/unit/test_research/test_company_profile_v20_identity.py tests/unit/test_research/test_company_profile_v22_energy_display.py tests/unit/test_research/test_company_profile_v21_trade_sales.py tests/unit/test_research/test_company_profile_v20_unseen_repair.py tests/unit/test_research/test_company_profile_v19_unseen_misses.py tests/unit/test_research/test_company_profile_v19_closure.py tests/unit/test_research/test_company_profile_revenue_sentence_repair.py tests/unit/test_research/test_company_profile_v7_source_delivery.py tests/unit/test_research/test_company_profile_v3_named_role_repair.py tests/unit/test_research/test_company_profile_core_evidence_selection.py tests/unit/test_research/test_company_profile_core_assessment_projection.py -q --tb=short -k 'not test_reads_through_section_and_stops_at_next_heading'"
+  },
+  "bug_reproduction": {
+    "original_identity": "v24",
+    "failed_full_page_cases": 4,
+    "log_sha256": "55b3ec300ef9f8b76afbab7239e69cabe9ff8105a0a9e29d71e41e57156f8ec1"
+  },
+  "boundary_cases": {
+    "page_variants": [
+      "owner",
+      "independent_pdf"
+    ],
+    "rejected_list_introductions": [
+      "尚未销售的主要产品有",
+      "公司将销售的主要产品有",
+      "公司未销售的主要产品有",
+      "公司计划销售的主要产品有"
+    ],
+    "accepted_query_export_consistent": true,
+    "single_occurrence_target": "丙戊酸镁缓释片",
+    "rejected_sales_only_supported_by_list": [
+      "丙戊酸镁缓释片",
+      "替尼泊苷注射液",
+      "白消安注射液",
+      "注射用牛肺表面活性剂",
+      "小儿复方氨基酸注射液"
+    ],
+    "retained_independently_affirmed_same_page_product": "复方杜仲健骨颗粒",
+    "retained_sales_roles_on_page": 14,
+    "retained_subsidiary_actor": "华润紫竹",
+    "actual_26_drug_sales_retained": true,
+    "brand_and_api_formulation_boundaries": true
+  },
+  "ruff": "passed",
+  "openspec_strict": true,
+  "diff_check": true,
+  "review": {
+    "method": "manual_uncommitted_diff_and_full_owner_page_accept_query_export",
+    "blocking_found_and_fixed": [
+      "Non-current named marketing list wrongly accepted as current sales"
+    ],
+    "non_blocking": [],
+    "unrelated": "Existing deferred test and all initial dirty files untouched"
+  },
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false,
+  "a_role_review": "pending",
+  "next_batch": "paused",
+  "change_archived": false,
+  "formal_result": {
+    "source_recall": {
+      "status": "assessed",
+      "numerator": 62,
+      "denominator": 62,
+      "value": 1.0
+    },
+    "source_accuracy": {
+      "status": "assessed",
+      "numerator": 104,
+      "denominator": 104,
+      "value": 1.0
+    },
+    "critical_numeric_errors": {
+      "status": "assessed",
+      "value": 0
+    },
+    "whole_round_seconds": 196.66800413373858,
+    "actual_runtime_no_reuse": true,
+    "actual_accepted_fact_count": 98,
+    "answered_text_count": 6,
+    "expansion_gates_met": true,
+    "tokens_used": {
+      "status": "assessed",
+      "value": 0
+    },
+    "first_execution": true,
+    "whole_round_includes_retries": true
+  },
+  "protection": {
+    "all_files_unchanged": 642,
+    "historical_data_files": 635,
+    "v24_existing_materials": 7,
+    "first_formal_artifacts_unchanged": 18,
+    "initial_dirty_files_unchanged": true
+  },
+  "freeze": {
+    "identical_v24_source_conditions": true,
+    "source_conditions_sha256": "b33b850462cdeb0b685cdde2caf0d859788d9dcc40a5fb860e791a394ba0ff55",
+    "fixed_before_formal_execution": true,
+    "source_condition_count": 62
+  }
+}

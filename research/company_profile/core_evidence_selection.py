@@ -1158,6 +1158,7 @@ REVENUE_SENTENCE_REPAIR_V21 = "v21"
 REVENUE_SENTENCE_REPAIR_V22 = "v22"
 REVENUE_SENTENCE_REPAIR_V23 = "v23"
 REVENUE_SENTENCE_REPAIR_V24 = "v24"
+REVENUE_SENTENCE_REPAIR_V25 = "v25"
 _REVENUE_SENTENCE_REPAIR_VERSIONS = frozenset(
     {
         REVENUE_SENTENCE_REPAIR_V1,
@@ -1184,6 +1185,7 @@ _REVENUE_SENTENCE_REPAIR_VERSIONS = frozenset(
         REVENUE_SENTENCE_REPAIR_V22,
         REVENUE_SENTENCE_REPAIR_V23,
         REVENUE_SENTENCE_REPAIR_V24,
+        REVENUE_SENTENCE_REPAIR_V25,
     }
 )
 
@@ -1233,6 +1235,7 @@ def named_role_repair_requested(identity: Mapping[str, Any] | None) -> bool:
         REVENUE_SENTENCE_REPAIR_V22,
         REVENUE_SENTENCE_REPAIR_V23,
         REVENUE_SENTENCE_REPAIR_V24,
+        REVENUE_SENTENCE_REPAIR_V25,
     }
 
 
@@ -1265,6 +1268,7 @@ def service_operating_energy_requested(identity: Mapping[str, Any] | None) -> bo
         REVENUE_SENTENCE_REPAIR_V22,
         REVENUE_SENTENCE_REPAIR_V23,
         REVENUE_SENTENCE_REPAIR_V24,
+        REVENUE_SENTENCE_REPAIR_V25,
     }
 
 
@@ -1297,6 +1301,7 @@ def core_answer_repair_requested(identity: Mapping[str, Any] | None) -> bool:
         REVENUE_SENTENCE_REPAIR_V22,
         REVENUE_SENTENCE_REPAIR_V23,
         REVENUE_SENTENCE_REPAIR_V24,
+        REVENUE_SENTENCE_REPAIR_V25,
     }
 
 
@@ -1330,6 +1335,7 @@ def source_delivery_repair_requested(identity: Mapping[str, Any] | None) -> bool
         REVENUE_SENTENCE_REPAIR_V22,
         REVENUE_SENTENCE_REPAIR_V23,
         REVENUE_SENTENCE_REPAIR_V24,
+        REVENUE_SENTENCE_REPAIR_V25,
     }
 
 
@@ -3067,9 +3073,15 @@ def _named_sales_bindings(excerpt: str) -> list[tuple[str, str]]:
         section = compact.split("销售费用情况分析")[0]
         for match in re.finditer(r"主要产品[为有]([^。；;]+)", section):
             sentence = _sentence_containing(section, match.start())
+            # A sale modifier belongs to this list, not every list on the page.
+            introduction = re.split(r"[，,。；;]", section[: match.start()])[-1]
             if re.search(
                 r"子公司|第三方|(?:公司)?(?:拟|计划)[^。]{0,30}(?:销售|主要产品)",
                 sentence,
+            ) or re.search(
+                r"(?:拟|计划|将(?:要)?|即将|未来|预计|准备|打算|尚未|暂未|"
+                r"未曾|从未|并未|没有|不再|未)[^，,。；;]{0,30}(?:销售|主要产品)|不销售",
+                introduction + "主要产品",
             ):
                 continue
             for branch in re.split(

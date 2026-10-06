@@ -20,8 +20,9 @@ def _fixture(instrument):
 
 @pytest.mark.parametrize("instrument", ["600025.SH", "600062.SH"])
 @pytest.mark.parametrize("page_kind", ["pages", "independent_pages"])
+@pytest.mark.parametrize("repair_version", ["v24", "v25"])
 def test_complete_owner_pages_deliver_source_substance_rows_and_sales(
-    tmp_path, instrument, page_kind
+    tmp_path, instrument, page_kind, repair_version
 ):
     fixture = _fixture(instrument)
     profiles = _drive(
@@ -29,7 +30,7 @@ def test_complete_owner_pages_deliver_source_substance_rows_and_sales(
         instrument=instrument,
         fixture=fixture,
         pages=fixture[page_kind],
-        repair_version="v24",
+        repair_version=repair_version,
     )
     assert profiles[0] == profiles[1]
     for profile in profiles:

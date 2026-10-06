@@ -1,0 +1,23 @@
+{
+  "a_role_decision": "overall_acceptance_deferred",
+  "confirmed_metrics": {
+    "recall": "62/62",
+    "accuracy": "104/104",
+    "critical_numeric_errors": 0,
+    "elapsed_seconds": 201.1
+  },
+  "blocking_issue": "Named marketing product list accepts 尚未销售 and 公司将销售 as current sells.",
+  "counterexamples": [
+    "尚未销售的主要产品有丙戊酸镁缓释片……",
+    "公司将销售的主要产品有丙戊酸镁缓释片……"
+  ],
+  "required_tasks": [
+    "5.1",
+    "5.2"
+  ],
+  "original_v24_bytes_preserved": true,
+  "next_batch": "paused",
+  "change_archived": false,
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false
+}

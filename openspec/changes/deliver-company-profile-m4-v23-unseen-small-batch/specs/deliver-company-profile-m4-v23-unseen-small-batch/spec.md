@@ -42,3 +42,17 @@ The full sixty-two source conditions MUST be fixed before v24 execution, preserv
 #### Scenario: First v24 observation is independently scored
 - **WHEN** both existing-owner run-query-export deliveries finish
 - **THEN** original-source substance determines recall and each actual fact/answered text is judged once, with truthful runtime/time/token gates and original failure preservation
+
+### Requirement: Named marketing lists require current affirmative sales semantics
+The existing named-list binding MUST reject negated or future sales introductions, including 尚未销售的主要产品有 and 公司将销售的主要产品有. The modifier MUST constrain the corresponding list, retaining other affirmative sales on the same page and independent affirmative support for the same product. Complete owner and independent PDF p39 MUST demonstrate absence of incorrect accepted sells facts and query/export roles. The twenty-six actual pharmaceutical sales, original 华润紫竹 actor, native brands and API/formulation distinction MUST remain valid. Original v24 bytes MUST remain unchanged with the A-role acceptance limitation attached separately.
+
+#### Scenario: A current marketing page includes one non-current list
+- **WHEN** one named-product list is changed to 尚未销售 or 公司将销售 on complete p39
+- **THEN** products supported only by that list have no accepted sales fact or delivered role, while separate affirmative terminal/distribution lists and original actors remain
+
+### Requirement: v25 first formal observation uses identical pre-fixed source conditions
+Identity v25 MUST activate all five cumulative paths without changing the default identity. The original plan74b8faf4… and official report versions/cutoff MUST be reused in independent m4_v25_named_sales_semantics_acceptance directories. The same sixty-two substantive source conditions MUST be fixed and compared before first execute. The existing owner MUST run-query-export both reports with the second using the remaining shared50000-token budget. First execute through second export including all retries MUST determine elapsed time, and five actual stage reused_scope_ids and predecessor_lineage MUST determine reuse. All actual accepted facts and six answered texts MUST be uniquely reviewed with a dynamic accuracy denominator; Measurement MUST be accuracy-only and roles MUST bind facts once. Finite submission MUST require double100%, zero numeric errors, at most300 seconds and50000 tokens. Original results and v23/v24 artifacts MUST remain preserved; failure MUST pause subsequent batches. Archive and next-pair review MUST await finite A-role acceptance. Production and scale-quality declarations MUST remain unchanged.
+
+#### Scenario: The first v25 delivery is independently reviewed
+- **WHEN** complete p39 regressions pass and both owner deliveries finish
+- **THEN** original substantive source conditions and uniquely reviewed actual delivery determine finite submission or truthful failure without replacing earlier rounds
