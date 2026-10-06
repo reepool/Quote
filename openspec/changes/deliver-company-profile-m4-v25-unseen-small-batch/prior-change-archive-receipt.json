@@ -1,0 +1,17 @@
+{
+  "archived_change": "deliver-company-profile-m4-v23-unseen-small-batch",
+  "archive_directory": "openspec/changes/archive/2026-10-06-deliver-company-profile-m4-v23-unseen-small-batch",
+  "main_specs_synced": [
+    "openspec/specs/deliver-company-profile-m4-v23-unseen-small-batch/spec.md",
+    "openspec/specs/company-profile-common-core-owned-page-facts/spec.md"
+  ],
+  "a_role_finite_acceptance": "openspec/changes/archive/2026-10-06-deliver-company-profile-m4-v23-unseen-small-batch/v25-a-role-finite-acceptance.json",
+  "archive_acceptance_sha256": "df81ef492c3fa9e9ed5f888d46703d30b461a659e9b4d080aaf5f3eeffaf58af",
+  "original_change_files_byte_identical": 29,
+  "original_data_files_unchanged": 654,
+  "v23_failure_retained": true,
+  "v24_a_role_limit_retained": true,
+  "v25_finite_acceptance_scope": "Declared source only; no whole-report or scale claim",
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false
+}

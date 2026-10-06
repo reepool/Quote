@@ -1,0 +1,57 @@
+{
+  "tests": {
+    "command": "/home/python/miniconda3/envs/Quote/bin/python -m pytest -q tests/unit/test_research/test_company_profile_m4_next_batch.py tests/unit/test_research/test_company_profile_v20_identity.py tests/unit/test_research/test_company_profile_source_review.py",
+    "passed": 35,
+    "warnings": 7,
+    "seconds": 17.98,
+    "log_sha256": "617ff1328bd6f5fbd82d1d843fad50540b382a911b40e3e5d0bdbd58b16ad48e"
+  },
+  "review": {
+    "method": "manual_uncommitted_spec_archive_diff_and_independent_original_PDF_object_review",
+    "blocking_new_implementation_findings": [],
+    "observed_existing_core_business_gaps": [
+      "Transport/group business and complete mechanism lost",
+      "千元 native unit omission and mixed Latin/wrapped revenue labels missing",
+      "Missing current named sales and company raw/energy inputs",
+      "Action fragment 利用, concatenated two-product sales, and generic 贸易 as commodity"
+    ],
+    "classification": "First genuine new frozen-source failure; no business algorithm edits in this task; subsequent repair must use a new identity and independent directories without replacing this observation.",
+    "unrelated_pre_existing": "Initial dirty files untouched, existing tests and industry/cost/quantity expansions deferred"
+  },
+  "formal_execution_index": 1,
+  "source_fixed_before_first_execute": true,
+  "source_recall": {
+    "status": "assessed",
+    "numerator": 19,
+    "denominator": 56,
+    "value": 0.3392857142857143
+  },
+  "source_accuracy": {
+    "status": "assessed",
+    "numerator": 47,
+    "denominator": 65,
+    "value": 0.7230769230769231
+  },
+  "critical_numeric_errors": {
+    "status": "assessed",
+    "value": 0
+  },
+  "numeric_error_policy": "Wrong printed numeric value or explicitly incorrect unit is a critical numeric error. Missing native unit is recorded separately as semantic/dimensional omission, fails accuracy and substantive row recall; no inferred unit or amount conversion is credited.",
+  "missing_native_unit_count": 11,
+  "whole_round_seconds": 203.39592755958438,
+  "actual_runtime_no_reuse": true,
+  "shared_tokens_used": 0,
+  "shared_token_budget": 50000,
+  "history_unchanged": 654,
+  "first_formal_artifacts_unchanged": 18,
+  "openspec_strict": true,
+  "diff_check": true,
+  "business_code_unchanged": true,
+  "initial_dirty_files_unchanged": true,
+  "old_change_finitely_archived": true,
+  "current_change_archived": false,
+  "next_batch": "paused_on_formal_failure",
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false,
+  "ruff": "passed"
+}

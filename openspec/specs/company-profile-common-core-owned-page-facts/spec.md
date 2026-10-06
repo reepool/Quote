@@ -96,3 +96,14 @@ The current published processing identity MUST be `{"rules":"company_profile_com
 - **WHEN** the same report has readable v8 work and successor work that adds `material_input_facts=v1`
 - **THEN** query returns the successor accepted facts
 - **AND** the v8 work JSON remains on disk
+
+### Requirement: Named sales lists bind current affirmative action and native actor
+Owned marketing product lists MUST create sells facts only from current affirmative sales. Negated or future introductions such as 尚未销售的主要产品有 and 公司将销售的主要产品有 MUST reject products supported only by that list. Other affirmed sales on the same page and independent affirmative support for the same product MUST remain valid. Native subsidiary actors and brands MUST remain attached; API and finished-formulation objects MUST remain distinct. Counterparty names with generic sales of goods MUST NOT identify an unstated sold product.
+
+#### Scenario: A future or negative marketing list accompanies established sales
+- **WHEN** a current owned marketing page includes a list qualified by 尚未销售 or 将销售 and other affirmative lists
+- **THEN** acceptance, query and export omit sales supported only by the qualified list while preserving independently established sales and native actors
+
+#### Scenario: A related-party customer name contains a commodity
+- **WHEN** a customer name names a commodity but the product/content column only states 销售商品
+- **THEN** no commodity sales fact or derived role is inferred from the customer name
