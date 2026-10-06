@@ -70,7 +70,8 @@ _REVENUE_BLOCK_PATTERN = re.compile(
 )
 _REVENUE_NEGATION_PREFIX = re.compile(r"(尚未|还未|仍未|并未|没有|未|不|拟|计划)$")
 _REPAIR_REVENUE_INFLOW_PATTERN = re.compile(
-    r"(营业收入主要来源于|" + _REVENUE_INFLOW_PATTERN.pattern[1:]
+    r"(公司盈利主要来自发电收入|营业收入主要来源于|"
+    + _REVENUE_INFLOW_PATTERN.pattern[1:]
 )
 _PRODUCT_ACTIONS = frozenset(
     {
@@ -328,10 +329,17 @@ def _assess_principal_business(
         if record.field_id != "business_overview_source":
             continue
         text = re.sub(r"\s+", "", record.source_text or "")
-        if _PRINCIPAL_PATTERN.search(text) or (
-            named_role_repair and _COMPLETE_COMPANY_BUSINESS.search(text)
-        ) or (core_answer_repair and _STEEL_BUSINESS.search(text)) or (
-            source_delivery_repair and _NARRATIVE_BUSINESS.search(text)
+        if (
+            _PRINCIPAL_PATTERN.search(text)
+            or (named_role_repair and _COMPLETE_COMPANY_BUSINESS.search(text))
+            or (core_answer_repair and _STEEL_BUSINESS.search(text))
+            or (
+                source_delivery_repair
+                and (
+                    _NARRATIVE_BUSINESS.search(text)
+                    or re.search(r"\d+[.．、][\u4e00-\u9fff]{2,12}业务", text)
+                )
+            )
         ):
             supports.append(record)
     if supports:
@@ -406,7 +414,28 @@ def _assess_products_services(
                 *[record for record in supports if record not in series],
             ]
     if supports:
-        return _answered("products_services", supports)
+        answered = _answered("products_services", supports)
+        if source_delivery_repair and any(
+            isinstance(record, BusinessOverview)
+            and "项目的开发、建设、运营与管理" in record.source_text
+            for record in supports
+        ):
+            product_labels = list(
+                dict.fromkeys(
+                    record.label
+                    for record in supports
+                    if isinstance(record, Segment) and record.dimension == "product"
+                )
+            )
+            if product_labels:
+                answered = answered.model_copy(
+                    update={
+                        "excerpt": (answered.excerpt or "")
+                        + "\n已披露产品："
+                        + "、".join(product_labels)
+                    }
+                )
+        return answered
     if any(
         isinstance(record, BusinessOverview)
         and record.field_id == "business_overview_source"
@@ -500,7 +529,9 @@ def _industry_revenue_excerpt(records: Sequence[SemanticRecord]) -> str:
         if isinstance(record, BusinessOverview)
     ]
     sales_mechanism = any(
-        "电力销售客户主要为" in text or "煤机全年市场化交易" in text
+        "电力销售客户主要为" in text
+        or "煤机全年市场化交易" in text
+        or "盈利主要来自发电收入" in re.sub(r"\s+", "", text)
         for text in narratives
     )
     if narratives and not sales_mechanism:

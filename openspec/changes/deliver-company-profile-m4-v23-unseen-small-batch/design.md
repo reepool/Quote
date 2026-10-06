@@ -19,3 +19,9 @@ Non-Goals：数量细分、成本拆分、行业增强、既有测试治理、�
 ## Risks / Trade-offs
 
 新披露形态可能漏项或错误→保留首次正式失败、暂停后续，只记录本轮真实业务缺口；任何修复另用新身份/目录。源范围有限→提交有限验收，不宣称全年报完整性。旧测试失败→继续后置，不掩盖本次结果。
+
+## v24 repair decisions
+
+Keep the existing selection/projection/runtime owner. Revenue-table boundaries begin at the native segment table, not pre-table expense explanations; actual missing continuations remain incomplete. Numbered owned business blocks and shared project/action wording retain complete original context. Named sales come from current owned production/sales columns, marketing lists or current performance disclosures, retaining brands, forms and subsidiary actors. A customer name plus generic 销售商品 does not bind a commodity. Generic/brand duplicate sales bind one native object with combined evidence; API and finished formulations remain distinct. No stock/report/page identifiers enter production parsing.
+
+v24 activates the same five cumulative repair paths without changing default identity. Fixed plan74b8faf4… and both official PDFs remain unchanged; m4_v24_hydro_pharma_core_repair is independent. v24-source-scope.json fixes all six substantive answers, 29 revenue rows and 27 native sales roles before execution. The old 62 denominator is explicitly final review scope with five drugs supplemented during execution, not an execution-before frozen scope. All first-failure bytes and previous files remain protected. First execute through second export including retries is one formal observation; unique actual facts and answered text determine accuracy after execution. A-role review is required for finite closure; no automatic archive or next sample execution.

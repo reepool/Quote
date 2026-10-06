@@ -1,0 +1,62 @@
+{
+  "tests": {
+    "passed": 202,
+    "deselected": 1,
+    "log_sha256": "0ae55b89ba5930338111cb857d8f562851dd67f0c78c822d8feefd73da204544",
+    "scope": "v24 full owner/independent pages and subject/plan/counterparty boundaries, v20 identity, v22, v21, v20, v19 closure/misses, revenue sentence, v7, v3, core selection/assessment",
+    "pre_existing_deferred_test": "test_reads_through_section_and_stops_at_next_heading"
+  },
+  "ruff": "passed",
+  "openspec_strict": true,
+  "diff_check": true,
+  "review": {
+    "method": "manual_uncommitted_diff_and_complete_source_page_delivery",
+    "blocking_found_and_fixed": [
+      "Pre-table expense wrongly cut income table",
+      "continued product header incorrectly marked complete",
+      "numbered business/platform and shared project object loss",
+      "wrapped production-sales units/names and current sales matrices missing",
+      "counterparty name wrongly inferred as steel",
+      "brand/generic duplicate native sales",
+      "source verb development was normalized to R&D"
+    ],
+    "non_blocking": [],
+    "unrelated": "Existing test failure deferred; initial unrelated dirty files left untouched"
+  },
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false,
+  "formal_result": {
+    "source_recall": {
+      "status": "assessed",
+      "numerator": 62,
+      "denominator": 62,
+      "value": 1.0
+    },
+    "source_accuracy": {
+      "status": "assessed",
+      "numerator": 104,
+      "denominator": 104,
+      "value": 1.0
+    },
+    "critical_numeric_errors": {
+      "status": "assessed",
+      "value": 0
+    },
+    "elapsed_seconds": 201.09549884870648,
+    "tokens_used": {
+      "status": "assessed",
+      "value": 0
+    },
+    "actual_runtime_no_reuse": true,
+    "first_execution": true,
+    "whole_round_includes_retries": true
+  },
+  "protection": {
+    "all_files_unchanged": 616,
+    "original_history_unchanged": 593,
+    "original_first_failure_unchanged": 18
+  },
+  "a_role_review": "pending",
+  "next_batch": "paused",
+  "change_archived": false
+}

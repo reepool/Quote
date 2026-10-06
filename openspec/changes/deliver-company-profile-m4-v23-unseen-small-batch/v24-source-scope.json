@@ -1,0 +1,921 @@
+{
+  "created_at": "2026-10-06T04:11:06.826305+00:00",
+  "fixed_before_formal_execution": true,
+  "plan_id": "74b8faf4e4ae428345fc948e8dcbf4f12ee042487262dda212067da85e0926f6",
+  "processing_identity": {
+    "rules": "company_profile_common_core.v1",
+    "owned_page_facts": "v8",
+    "material_input_facts": "v1",
+    "revenue_sentence_repair": "v24"
+  },
+  "knowledge_cutoff": "2026-09-17",
+  "shared_token_budget": 50000,
+  "official_reports": [
+    {
+      "instrument_id": "600025.SH",
+      "asset_id": "asset_eaa68dea89516310c7e557d16f37873b",
+      "report_id": "1225231661",
+      "report_period": "2025-12-31",
+      "document_version": "4de12e91314d22366e221f05cef4434e35ae32328d0bf4e9b88340cc77838bf5",
+      "disclosure_form": "service"
+    },
+    {
+      "instrument_id": "600062.SH",
+      "asset_id": "asset_7d1d31aa1e4ed311b1765c5911b117fd",
+      "report_id": "1225018795",
+      "report_period": "2025-12-31",
+      "document_version": "77816f62949d4ea1125c3bd4f9821daa2b86b0cf2695056e41e154fe6670574c",
+      "disclosure_form": "manufacturing"
+    }
+  ],
+  "versions": {
+    "600025.SH": {
+      "sha256": "4de12e91314d22366e221f05cef4434e35ae32328d0bf4e9b88340cc77838bf5",
+      "pdf": "data/filings/announcements/blobs/4d/4de12e91314d22366e221f05cef4434e35ae32328d0bf4e9b88340cc77838bf5.pdf",
+      "checked_pages": [
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28
+      ]
+    },
+    "600062.SH": {
+      "sha256": "77816f62949d4ea1125c3bd4f9821daa2b86b0cf2695056e41e154fe6670574c",
+      "pdf": "data/filings/announcements/blobs/77/77816f62949d4ea1125c3bd4f9821daa2b86b0cf2695056e41e154fe6670574c.pdf",
+      "checked_pages": [
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        25,
+        26,
+        39,
+        40,
+        43,
+        44,
+        45
+      ]
+    }
+  },
+  "source_rows": {
+    "600025.SH": [
+      {
+        "dimension": "industry",
+        "name": "电力行业",
+        "value": "26,464,419,442.73",
+        "unit": "元",
+        "reported_period": "2025-12-31",
+        "page": 13
+      },
+      {
+        "dimension": "product",
+        "name": "水力发电",
+        "value": "24,813,566,406.10",
+        "unit": "元",
+        "reported_period": "2025-12-31",
+        "page": 14
+      },
+      {
+        "dimension": "product",
+        "name": "风力发电",
+        "value": "161,166,300.45",
+        "unit": "元",
+        "reported_period": "2025-12-31",
+        "page": 14
+      },
+      {
+        "dimension": "product",
+        "name": "太阳能光伏发电",
+        "value": "1,447,618,109.09",
+        "unit": "元",
+        "reported_period": "2025-12-31",
+        "page": 14
+      },
+      {
+        "dimension": "product",
+        "name": "储能",
+        "value": "40,011,667.48",
+        "unit": "元",
+        "reported_period": "2025-12-31",
+        "page": 14
+      },
+      {
+        "dimension": "product",
+        "name": "其他",
+        "value": "2,056,959.61",
+        "unit": "元",
+        "reported_period": "2025-12-31",
+        "page": 14
+      },
+      {
+        "dimension": "region",
+        "name": "云南",
+        "value": "21,922,940,547.71",
+        "unit": "元",
+        "reported_period": "2025-12-31",
+        "page": 14
+      },
+      {
+        "dimension": "region",
+        "name": "四川",
+        "value": "3,041,315,249.60",
+        "unit": "元",
+        "reported_period": "2025-12-31",
+        "page": 14
+      },
+      {
+        "dimension": "region",
+        "name": "江苏",
+        "value": "6,207,281.01",
+        "unit": "元",
+        "reported_period": "2025-12-31",
+        "page": 14
+      },
+      {
+        "dimension": "region",
+        "name": "缅甸",
+        "value": "497,700,489.80",
+        "unit": "元",
+        "reported_period": "2025-12-31",
+        "page": 14
+      },
+      {
+        "dimension": "region",
+        "name": "柬埔寨",
+        "value": "996,255,874.61",
+        "unit": "元",
+        "reported_period": "2025-12-31",
+        "page": 14
+      },
+      {
+        "dimension": "sales_mode",
+        "name": "直销",
+        "value": "26,464,419,442.73",
+        "unit": "元",
+        "reported_period": "2025-12-31",
+        "page": 14
+      }
+    ],
+    "600062.SH": [
+      {
+        "dimension": "industry",
+        "name": "输液产品",
+        "value": "2,533,300,255.47",
+        "unit": "元",
+        "reported_period": "2025-12-31",
+        "page": 18
+      },
+      {
+        "dimension": "industry",
+        "name": "非输液产品",
+        "value": "8,347,953,907.46",
+        "unit": "元",
+        "reported_period": "2025-12-31",
+        "page": 18
+      },
+      {
+        "dimension": "product",
+        "name": "输液业务平台",
+        "value": "2,533,300,255.47",
+        "unit": "元",
+        "reported_period": "2025-12-31",
+        "page": 19
+      },
+      {
+        "dimension": "product",
+        "name": "慢病业务平台",
+        "value": "3,252,281,578.17",
+        "unit": "元",
+        "reported_period": "2025-12-31",
+        "page": 19
+      },
+      {
+        "dimension": "product",
+        "name": "专科业务平台",
+        "value": "3,045,984,905.31",
+        "unit": "元",
+        "reported_period": "2025-12-31",
+        "page": 19
+      },
+      {
+        "dimension": "product",
+        "name": "原料药业务平台",
+        "value": "1,261,040,541.60",
+        "unit": "元",
+        "reported_period": "2025-12-31",
+        "page": 19
+      },
+      {
+        "dimension": "product",
+        "name": "其他",
+        "value": "788,646,882.38",
+        "unit": "元",
+        "reported_period": "2025-12-31",
+        "page": 19
+      },
+      {
+        "dimension": "region",
+        "name": "华中及华东地区",
+        "value": "5,356,237,509.40",
+        "unit": "元",
+        "reported_period": "2025-12-31",
+        "page": 19
+      },
+      {
+        "dimension": "region",
+        "name": "华北地区",
+        "value": "2,006,795,328.05",
+        "unit": "元",
+        "reported_period": "2025-12-31",
+        "page": 19
+      },
+      {
+        "dimension": "region",
+        "name": "西北地区",
+        "value": "642,128,417.86",
+        "unit": "元",
+        "reported_period": "2025-12-31",
+        "page": 19
+      },
+      {
+        "dimension": "region",
+        "name": "华南及西南地区",
+        "value": "1,755,876,044.34",
+        "unit": "元",
+        "reported_period": "2025-12-31",
+        "page": 19
+      },
+      {
+        "dimension": "region",
+        "name": "东北地区",
+        "value": "389,040,184.72",
+        "unit": "元",
+        "reported_period": "2025-12-31",
+        "page": 19
+      },
+      {
+        "dimension": "region",
+        "name": "其他地区",
+        "value": "731,176,678.56",
+        "unit": "元",
+        "reported_period": "2025-12-31",
+        "page": 19
+      },
+      {
+        "dimension": "sales_mode",
+        "name": "终端推广模式",
+        "value": "4,275,149,562.07",
+        "unit": "元",
+        "reported_period": "2025-12-31",
+        "page": 19
+      },
+      {
+        "dimension": "sales_mode",
+        "name": "商业分销模式",
+        "value": "2,652,896,534.77",
+        "unit": "元",
+        "reported_period": "2025-12-31",
+        "page": 19
+      },
+      {
+        "dimension": "sales_mode",
+        "name": "招商代理模式",
+        "value": "2,601,573,107.40",
+        "unit": "元",
+        "reported_period": "2025-12-31",
+        "page": 19
+      },
+      {
+        "dimension": "sales_mode",
+        "name": "其他模式",
+        "value": "1,351,634,958.69",
+        "unit": "元",
+        "reported_period": "2025-12-31",
+        "page": 19
+      }
+    ]
+  },
+  "native_roles": [
+    {
+      "instrument_id": "600025.SH",
+      "name": "电力",
+      "role": "product_sales",
+      "page": 14,
+      "source_quote": "电力 亿千瓦时 1,269.32 1,254.77",
+      "native_aliases": [
+        "电力"
+      ],
+      "requires_current_own_context": true,
+      "scope_note": null
+    },
+    {
+      "instrument_id": "600062.SH",
+      "name": "复方利血平氨苯蝶啶片(0号)",
+      "role": "product_sales",
+      "page": 19,
+      "source_quote": "复方利血平氨苯蝶啶\n片(0 号) 万片 62,567 65,243",
+      "native_aliases": [
+        "复方利血平氨苯蝶啶片(0号)",
+        "复方利血平氨苯蝶啶片"
+      ],
+      "requires_current_own_context": true,
+      "scope_note": "Formal current production/sales table. Soft bag is source-native infusion product presentation, not an inferred standalone packaging business."
+    },
+    {
+      "instrument_id": "600062.SH",
+      "name": "左炔诺孕酮片(金毓婷)",
+      "role": "product_sales",
+      "page": 19,
+      "source_quote": "左 炔诺 孕酮 片(金 毓\n婷) 万片 3,768 3,799",
+      "native_aliases": [
+        "左炔诺孕酮片(金毓婷)",
+        "左炔诺孕酮片"
+      ],
+      "requires_current_own_context": true,
+      "scope_note": "Formal current production/sales table. Soft bag is source-native infusion product presentation, not an inferred standalone packaging business."
+    },
+    {
+      "instrument_id": "600062.SH",
+      "name": "胞磷胆碱钠片(诺百益)",
+      "role": "product_sales",
+      "page": 19,
+      "source_quote": "胞 磷胆 碱钠 片(诺 百\n益) 万片 58,205 50,102",
+      "native_aliases": [
+        "胞磷胆碱钠片(诺百益)",
+        "胞磷胆碱钠片"
+      ],
+      "requires_current_own_context": true,
+      "scope_note": "Formal current production/sales table. Soft bag is source-native infusion product presentation, not an inferred standalone packaging business."
+    },
+    {
+      "instrument_id": "600062.SH",
+      "name": "缬沙坦氢氯噻嗪片(复穗悦)",
+      "role": "product_sales",
+      "page": 20,
+      "source_quote": "缬 沙 坦 氢 氯 噻 嗪 片\n(复穗悦) 万片 37,874 35,032",
+      "native_aliases": [
+        "缬沙坦氢氯噻嗪片(复穗悦)",
+        "缬沙坦氢氯噻嗪片"
+      ],
+      "requires_current_own_context": true,
+      "scope_note": "Formal current production/sales table. Soft bag is source-native infusion product presentation, not an inferred standalone packaging business."
+    },
+    {
+      "instrument_id": "600062.SH",
+      "name": "软袋(含直立式)",
+      "role": "product_sales",
+      "page": 20,
+      "source_quote": "软袋(含直立式) 万袋 86,421 83,921",
+      "native_aliases": [
+        "软袋(含直立式)"
+      ],
+      "requires_current_own_context": true,
+      "scope_note": "Formal current production/sales table. Soft bag is source-native infusion product presentation, not an inferred standalone packaging business."
+    },
+    {
+      "instrument_id": "600062.SH",
+      "name": "苯磺酸氨氯地平片(压氏达)",
+      "role": "product_sales",
+      "page": 39,
+      "source_quote": "苯磺酸氨氯地平片(压氏达)",
+      "native_aliases": [
+        "苯磺酸氨氯地平片(压氏达)",
+        "苯磺酸氨氯地平片"
+      ],
+      "requires_current_own_context": true,
+      "scope_note": "Current owned sales-mode product matrix in p39, with company/group context. Brand/generic aliases count one disclosure; broad infusion/ordinary-drug parents do not duplicate named products."
+    },
+    {
+      "instrument_id": "600062.SH",
+      "name": "格列喹酮片(糖适平)",
+      "role": "product_sales",
+      "page": 39,
+      "source_quote": "格列喹酮片(糖适平)",
+      "native_aliases": [
+        "格列喹酮片(糖适平)",
+        "格列喹酮片"
+      ],
+      "requires_current_own_context": true,
+      "scope_note": "Current owned sales-mode product matrix in p39, with company/group context. Brand/generic aliases count one disclosure; broad infusion/ordinary-drug parents do not duplicate named products."
+    },
+    {
+      "instrument_id": "600062.SH",
+      "name": "溴夫定片",
+      "role": "product_sales",
+      "page": 39,
+      "source_quote": "溴夫定片",
+      "native_aliases": [
+        "溴夫定片"
+      ],
+      "requires_current_own_context": true,
+      "scope_note": "Current owned sales-mode product matrix in p39, with company/group context. Brand/generic aliases count one disclosure; broad infusion/ordinary-drug parents do not duplicate named products."
+    },
+    {
+      "instrument_id": "600062.SH",
+      "name": "盐酸右哌甲酯缓释胶囊",
+      "role": "product_sales",
+      "page": 39,
+      "source_quote": "盐酸右哌甲酯缓释胶囊",
+      "native_aliases": [
+        "盐酸右哌甲酯缓释胶囊"
+      ],
+      "requires_current_own_context": true,
+      "scope_note": "Current owned sales-mode product matrix in p39, with company/group context. Brand/generic aliases count one disclosure; broad infusion/ordinary-drug parents do not duplicate named products."
+    },
+    {
+      "instrument_id": "600062.SH",
+      "name": "复方杜仲健骨颗粒(伯司庄)",
+      "role": "product_sales",
+      "page": 39,
+      "source_quote": "复方杜仲健骨颗粒(伯司庄)",
+      "native_aliases": [
+        "复方杜仲健骨颗粒(伯司庄)",
+        "复方杜仲健骨颗粒"
+      ],
+      "requires_current_own_context": true,
+      "scope_note": "Current owned sales-mode product matrix in p39, with company/group context. Brand/generic aliases count one disclosure; broad infusion/ordinary-drug parents do not duplicate named products."
+    },
+    {
+      "instrument_id": "600062.SH",
+      "name": "腹膜透析液",
+      "role": "product_sales",
+      "page": 39,
+      "source_quote": "腹膜透析液",
+      "native_aliases": [
+        "腹膜透析液"
+      ],
+      "requires_current_own_context": true,
+      "scope_note": "Current owned sales-mode product matrix in p39, with company/group context. Brand/generic aliases count one disclosure; broad infusion/ordinary-drug parents do not duplicate named products."
+    },
+    {
+      "instrument_id": "600062.SH",
+      "name": "复方左炔诺孕酮片",
+      "role": "product_sales",
+      "page": 39,
+      "source_quote": "复方左炔诺孕酮片",
+      "native_aliases": [
+        "复方左炔诺孕酮片"
+      ],
+      "requires_current_own_context": true,
+      "scope_note": "Current owned sales-mode product matrix in p39, with company/group context. Brand/generic aliases count one disclosure; broad infusion/ordinary-drug parents do not duplicate named products."
+    },
+    {
+      "instrument_id": "600062.SH",
+      "name": "盐酸莫西沙星滴眼液",
+      "role": "product_sales",
+      "page": 39,
+      "source_quote": "盐酸莫西沙星滴眼液",
+      "native_aliases": [
+        "盐酸莫西沙星滴眼液"
+      ],
+      "requires_current_own_context": true,
+      "scope_note": "Current owned sales-mode product matrix in p39, with company/group context. Brand/generic aliases count one disclosure; broad infusion/ordinary-drug parents do not duplicate named products."
+    },
+    {
+      "instrument_id": "600062.SH",
+      "name": "丙戊酸镁缓释片(神泰)",
+      "role": "product_sales",
+      "page": 39,
+      "source_quote": "丙戊酸镁缓释片(神泰)",
+      "native_aliases": [
+        "丙戊酸镁缓释片(神泰)",
+        "丙戊酸镁缓释片"
+      ],
+      "requires_current_own_context": true,
+      "scope_note": "Current owned sales-mode product matrix in p39, with company/group context. Brand/generic aliases count one disclosure; broad infusion/ordinary-drug parents do not duplicate named products."
+    },
+    {
+      "instrument_id": "600062.SH",
+      "name": "替尼泊苷注射液(邦莱)",
+      "role": "product_sales",
+      "page": 39,
+      "source_quote": "替尼泊苷注射液(邦莱)",
+      "native_aliases": [
+        "替尼泊苷注射液(邦莱)",
+        "替尼泊苷注射液"
+      ],
+      "requires_current_own_context": true,
+      "scope_note": "Current owned sales-mode product matrix in p39, with company/group context. Brand/generic aliases count one disclosure; broad infusion/ordinary-drug parents do not duplicate named products."
+    },
+    {
+      "instrument_id": "600062.SH",
+      "name": "白消安注射液",
+      "role": "product_sales",
+      "page": 39,
+      "source_quote": "白消安注射液",
+      "native_aliases": [
+        "白消安注射液"
+      ],
+      "requires_current_own_context": true,
+      "scope_note": "Current owned sales-mode product matrix in p39, with company/group context. Brand/generic aliases count one disclosure; broad infusion/ordinary-drug parents do not duplicate named products."
+    },
+    {
+      "instrument_id": "600062.SH",
+      "name": "注射用牛肺表面活性剂(珂立苏)",
+      "role": "product_sales",
+      "page": 39,
+      "source_quote": "注射用牛肺表面活性剂(珂立苏)",
+      "native_aliases": [
+        "注射用牛肺表面活性剂(珂立苏)",
+        "注射用牛肺表面活性剂"
+      ],
+      "requires_current_own_context": true,
+      "scope_note": "Current owned sales-mode product matrix in p39, with company/group context. Brand/generic aliases count one disclosure; broad infusion/ordinary-drug parents do not duplicate named products."
+    },
+    {
+      "instrument_id": "600062.SH",
+      "name": "小儿复方氨基酸注射液(19AA-I)",
+      "role": "product_sales",
+      "page": 39,
+      "source_quote": "小儿复方氨基酸注射液(19AA-I)",
+      "native_aliases": [
+        "小儿复方氨基酸注射液(19AA-I)",
+        "小儿复方氨基酸注射液"
+      ],
+      "requires_current_own_context": true,
+      "scope_note": "Current owned sales-mode product matrix in p39, with company/group context. Brand/generic aliases count one disclosure; broad infusion/ordinary-drug parents do not duplicate named products."
+    },
+    {
+      "instrument_id": "600062.SH",
+      "name": "硝苯地平缓控释系列",
+      "role": "product_sales",
+      "page": 39,
+      "source_quote": "硝苯地平缓控释系列",
+      "native_aliases": [
+        "硝苯地平缓控释系列"
+      ],
+      "requires_current_own_context": true,
+      "scope_note": "Current owned sales-mode product matrix in p39, with company/group context. Brand/generic aliases count one disclosure; broad infusion/ordinary-drug parents do not duplicate named products."
+    },
+    {
+      "instrument_id": "600062.SH",
+      "name": "盐酸二甲双胍缓释片(卜可)",
+      "role": "product_sales",
+      "page": 39,
+      "source_quote": "盐酸二甲双胍缓释片(卜可)",
+      "native_aliases": [
+        "盐酸二甲双胍缓释片(卜可)",
+        "盐酸二甲双胍缓释片"
+      ],
+      "requires_current_own_context": true,
+      "scope_note": "Current owned sales-mode product matrix in p39, with company/group context. Brand/generic aliases count one disclosure; broad infusion/ordinary-drug parents do not duplicate named products."
+    },
+    {
+      "instrument_id": "600062.SH",
+      "name": "依诺肝素钠注射液",
+      "role": "product_sales",
+      "page": 39,
+      "source_quote": "依诺肝素钠注射液",
+      "native_aliases": [
+        "依诺肝素钠注射液"
+      ],
+      "requires_current_own_context": true,
+      "scope_note": "Current owned sales-mode product matrix in p39, with company/group context. Brand/generic aliases count one disclosure; broad infusion/ordinary-drug parents do not duplicate named products."
+    },
+    {
+      "instrument_id": "600062.SH",
+      "name": "厄贝沙坦分散片(豪降之)",
+      "role": "product_sales",
+      "page": 15,
+      "source_quote": "厄贝沙坦分散片(豪降之)销量同比增长18%",
+      "native_aliases": [
+        "厄贝沙坦分散片(豪降之)",
+        "厄贝沙坦分散片"
+      ],
+      "requires_current_own_context": true,
+      "scope_note": "Current company business-performance paragraph explicitly discloses sales volume or revenue. API and finished injection are separate native products; exact forms are not conflated."
+    },
+    {
+      "instrument_id": "600062.SH",
+      "name": "香雷糖足膏(速必一)",
+      "role": "product_sales",
+      "page": 15,
+      "source_quote": "香雷糖足膏(速必一)快速导入市场，收入同比增长超470%",
+      "native_aliases": [
+        "香雷糖足膏(速必一)",
+        "香雷糖足膏"
+      ],
+      "requires_current_own_context": true,
+      "scope_note": "Current company business-performance paragraph explicitly discloses sales volume or revenue. API and finished injection are separate native products; exact forms are not conflated."
+    },
+    {
+      "instrument_id": "600062.SH",
+      "name": "利福霉素S-Na盐",
+      "role": "product_sales",
+      "page": 15,
+      "source_quote": "利福霉素S-Na盐、依诺肝素钠、缬沙坦等原料药销量均实现双位数增长",
+      "native_aliases": [
+        "利福霉素S-Na盐",
+        "S-Na盐"
+      ],
+      "requires_current_own_context": true,
+      "scope_note": "Current company business-performance paragraph explicitly discloses sales volume or revenue. API and finished injection are separate native products; exact forms are not conflated."
+    },
+    {
+      "instrument_id": "600062.SH",
+      "name": "依诺肝素钠",
+      "role": "product_sales",
+      "page": 15,
+      "source_quote": "利福霉素S-Na盐、依诺肝素钠、缬沙坦等原料药销量均实现双位数增长",
+      "native_aliases": [
+        "依诺肝素钠",
+        "依诺肝素原料",
+        "依诺肝素钠原料药"
+      ],
+      "requires_current_own_context": true,
+      "scope_note": "Current company business-performance paragraph explicitly discloses sales volume or revenue. API and finished injection are separate native products; exact forms are not conflated."
+    },
+    {
+      "instrument_id": "600062.SH",
+      "name": "缬沙坦",
+      "role": "product_sales",
+      "page": 15,
+      "source_quote": "利福霉素S-Na盐、依诺肝素钠、缬沙坦等原料药销量均实现双位数增长",
+      "native_aliases": [
+        "缬沙坦"
+      ],
+      "requires_current_own_context": true,
+      "scope_note": "Current company business-performance paragraph explicitly discloses sales volume or revenue. API and finished injection are separate native products; exact forms are not conflated."
+    }
+  ],
+  "answers": {
+    "600025.SH": {
+      "principal_business": {
+        "pages": [
+          9,
+          10
+        ],
+        "required_groups": [
+          [
+            "水力"
+          ],
+          [
+            "新能源"
+          ],
+          [
+            "开发"
+          ],
+          [
+            "建设"
+          ],
+          [
+            "运营"
+          ],
+          [
+            "管理"
+          ]
+        ],
+        "description": "Current hydropower/new-energy development, construction, operation and management, retaining actual status of strategic wind/solar/storage layout."
+      },
+      "products_services": {
+        "pages": [
+          9,
+          10,
+          13,
+          14
+        ],
+        "required_groups": [
+          [
+            "水力",
+            "水电"
+          ],
+          [
+            "风力",
+            "风电"
+          ],
+          [
+            "太阳能光伏",
+            "太阳能",
+            "光伏"
+          ],
+          [
+            "储能"
+          ]
+        ],
+        "description": "Actual current product/business revenue matrix includes hydropower, wind, solar photovoltaic and storage; no inference from future layout alone."
+      },
+      "revenue_model": {
+        "pages": [
+          9,
+          13,
+          14,
+          23
+        ],
+        "required_groups": [
+          [
+            "发电收入",
+            "发电",
+            "电力"
+          ],
+          [
+            "水力发电",
+            "水电"
+          ],
+          [
+            "风力发电",
+            "风电"
+          ],
+          [
+            "太阳能光伏发电",
+            "光伏"
+          ],
+          [
+            "储能"
+          ],
+          [
+            "直销"
+          ],
+          [
+            "公司盈利主要来自发电收入"
+          ]
+        ],
+        "description": "Current power revenue/product composition including storage and disclosed direct-sales mechanism; market trading original p23 is supplementary and cannot be invented."
+      }
+    },
+    "600062.SH": {
+      "principal_business": {
+        "pages": [
+          11,
+          12
+        ],
+        "required_groups": [
+          [
+            "慢病"
+          ],
+          [
+            "专科"
+          ],
+          [
+            "输液"
+          ],
+          [
+            "原料药"
+          ]
+        ],
+        "description": "Four existing business platforms; mission/vision alone does not establish business."
+      },
+      "products_services": {
+        "pages": [
+          11,
+          12
+        ],
+        "required_groups": [
+          [
+            "慢病"
+          ],
+          [
+            "专科"
+          ],
+          [
+            "基础输液"
+          ],
+          [
+            "治疗性输液"
+          ],
+          [
+            "营养性输液"
+          ],
+          [
+            "化学合成"
+          ],
+          [
+            "生化提取"
+          ],
+          [
+            "生物发酵"
+          ],
+          [
+            "缬沙坦"
+          ],
+          [
+            "氨氯地平"
+          ],
+          [
+            "普瑞巴林"
+          ],
+          [
+            "氨苯蝶啶"
+          ],
+          [
+            "喷他佐辛"
+          ],
+          [
+            "匹伐他汀"
+          ],
+          [
+            "肝素钠"
+          ],
+          [
+            "依诺肝素"
+          ],
+          [
+            "辅酶Q10"
+          ],
+          [
+            "S-Na盐"
+          ]
+        ],
+        "description": "Complete four-business and API product matrix from continuous p11-12; preserve subsidiary subjects and approvals/plans as disclosed, not already sold."
+      },
+      "revenue_model": {
+        "pages": [
+          18,
+          19,
+          39
+        ],
+        "required_groups": [
+          [
+            "输液"
+          ],
+          [
+            "慢病"
+          ],
+          [
+            "专科"
+          ],
+          [
+            "原料药"
+          ],
+          [
+            "终端推广"
+          ],
+          [
+            "商业分销"
+          ],
+          [
+            "招商代理"
+          ],
+          [
+            "其他模式"
+          ]
+        ],
+        "description": "Four current business income platforms and original sales modes with company/group actor boundaries."
+      }
+    }
+  },
+  "no_preset_scores": true,
+  "scores_preset": false,
+  "source_scope": "Six substantive answers, 29 native revenue rows, 27 native sold-product roles; fixed together before first v24 execution.",
+  "recall_method": "Original-source substance required, answered status insufficient. Rows count once, Measurement accuracy only. Every actual accepted fact and answered text gets one unique accuracy judgment; roles bind underlying facts without another accuracy object.",
+  "no_named_input_conclusion": {
+    "scope": "No specific commodity input established within the actual checked business/cost/risk pages; generic raw materials and energy do not justify guessing a commodity.",
+    "checked_pages": {
+      "600025.SH": [
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28
+      ],
+      "600062.SH": [
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        25,
+        26,
+        39,
+        40,
+        43,
+        44,
+        45
+      ]
+    }
+  },
+  "previous_scope_limitation": "The original 62-item scope was final independent review scope: five named drugs were added during first v23 execution. Original scope and supplement bytes remain preserved."
+}

@@ -24,3 +24,21 @@ The source checklist MUST be rebuilt from both new frozen PDFs for three substan
 #### Scenario: All declared source and resource conditions pass
 - **WHEN** substantive recall and unique accuracy both reach 100% with zero numeric errors and resource limits met
 - **THEN** the results are submitted for A-role finite acceptance covering only the declared source range
+
+### Requirement: v24 delivers complete real business disclosures through existing owners
+The repair MUST preserve the twelve hydropower revenue rows, seventeen pharmaceutical revenue rows, native dimensions, current amounts and yuan units. Expense explanations before a table MUST NOT close it, and genuinely missing table continuations MUST remain rejected. Main business and product answers MUST retain complete current business blocks, shared project objects and their action chain, the four pharmaceutical platforms and original product matrix. The hydropower revenue answer MUST include the original generation-income mechanism and disclosed composition. Twenty-seven native sales roles MUST be supported by owned production/sales columns, current marketing lists or explicit current performance disclosures. Brands, formulations, APIs and original subsidiary actors MUST be preserved; aliases MUST NOT duplicate roles. Counterparty names with generic sales of goods MUST NOT infer unstated commodities. Plans, external subjects and technical parameters MUST NOT be raised to current owned business.
+
+#### Scenario: Frozen full owner pages contain continued income and named sales
+- **WHEN** the existing owner accepts, queries and exports both complete frozen source-page sets under v24
+- **THEN** substantive six-dimensional text, twenty-nine revenue rows and twenty-seven native sold-object roles are delivered consistently with source boundaries and evidence
+
+#### Scenario: Related-party hospital customer has an unstated goods column
+- **WHEN** a customer name contains steel and the transaction content says only sales of goods
+- **THEN** no steel Activity or derived product-sales exposure is created, while directly stated steel sales remain valid
+
+### Requirement: v24 formal review fixes complete scope before first execute
+The full sixty-two source conditions MUST be fixed before v24 execution, preserving the limitation that five drugs were supplemented during the initial v23 execution. Identity v24 MUST enable all five cumulative paths without changing default identity. Existing plan74b8faf4… and frozen official reports/cutoff MUST be reused in independent m4_v24_hydro_pharma_core_repair directories. First execute through second export including all retries MUST constitute the first formal repair observation with shared50000 tokens and actual runtime reuse records. Unique delivered facts and answered text MUST determine accuracy without preset denominator; Measurement MUST be accuracy-only and roles MUST bind underlying facts without duplicate scores. Finite submission MUST require double100%, zero numeric errors, at most300 seconds and50000 tokens; otherwise failures MUST remain preserved and subsequent batches paused. Production and scale-quality declarations MUST remain unchanged.
+
+#### Scenario: First v24 observation is independently scored
+- **WHEN** both existing-owner run-query-export deliveries finish
+- **THEN** original-source substance determines recall and each actual fact/answered text is judged once, with truthful runtime/time/token gates and original failure preservation
