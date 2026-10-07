@@ -32,3 +32,21 @@ Each actual accepted fact and answered body MUST be judged once for actor,object
 #### Scenario: Declared source and resource scope passes
 - **WHEN** both independently judged scores and actual resource limits meet thresholds
 - **THEN** finite evidence is submitted for A-role acceptance without authorizing production or scale quality
+
+### Requirement: Repair preserves the first contract and freezes eighty-six source conditions
+The authorized repair MUST preserve the first80conditions,19/80and45/56first scores and all failed artifacts. Before the successor first execute, it MUST freeze a separate86condition contract containing6substantive answers,63native income cells and17roles, adding only six independently verified p158current non-total project rows.
+
+#### Scenario: Current and prior project cells have blanks
+- **WHEN** a project label contains a parcel identifier and one year has no printed amount
+- **THEN** full native labels, table headers and original PDF column placement determine current amounts, the identifier is never an amount and prior-only rows do not create current revenue or zero values
+
+### Requirement: Full business content and action boundaries survive delivery
+The existing common-core selection and projection MUST deliver complete owned multi-business narratives and actual revenue mechanisms, original product/region/contract/report-segment/project columns, units and consolidated or parent scope. Internal receipts and eliminations MUST retain their original basis without cross-dimensional addition. Additive enumeration MUST stop before upstream/downstream actors while preserving all seven original components including DENE and the named subsidiary. Current affirmative goods procurement, sale and energy consumption MUST preserve original actors; purchase MUST NOT infer manufacturing input, upper-parent actions MUST NOT become listed-group actions, and plan or negative actions MUST NOT generate facts or exposures. Unknown mappings MUST remain pending or ambiguous.
+
+#### Scenario: Six bodies and native facts reach the reads
+- **WHEN** both full owner pages and independently read PDF pages are projected
+- **THEN** accepted facts, substantive query answers and exported bodies retain complete content, actors, qualifiers, current values and action/relation semantics
+
+#### Scenario: v30 first repair round is measured
+- **WHEN** five cumulative flags are verified for the complete v30 identity with the default unchanged
+- **THEN** the existing owner performs the first formal run-query-export in independent directories with the same plan and cutoff, remaining shared budget, full retry-inclusive timing, actual five-stage reuse evidence and unique dynamic source review

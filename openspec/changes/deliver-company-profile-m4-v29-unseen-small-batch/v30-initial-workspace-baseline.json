@@ -1,0 +1,9 @@
+{
+  "head": "e054daf72433cf856fdcd16e11dd1ac986a843c3",
+  "git_status": "## master...origin/master\n M docs/development/common_llm_gateway_architecture.md\n M docs/development/common_llm_gateway_usage.md\n M docs/development/pdf_engine_evaluation_local_corpus_20260825.json\n?? .v2c/\n?? .video_agent/\n?? \"<MagicMock name='data_manager.db_ops.db.db_path' id='139683238479184'>\"\n?? \"<MagicMock name='data_manager.db_ops.db.db_path' id='139684137640144'>\"\n?? \"<MagicMock name='data_manager.db_ops.db.db_path' id='139684138289808'>\"\n?? \"<MagicMock name='data_manager.db_ops.db.db_path' id='139856830311696'>\"\n?? \"<MagicMock name='data_manager.db_ops.db.db_path' id='139858376018960'>\"\n?? \"<MagicMock name='data_manager.db_ops.db.db_path' id='139859056463056'>\"\n?? docs/development/company_profile_manufacturing_materials_blind_review_submission.20260903.json\n?? docs/development/framework_audit_and_improvement_plan.md\n?? docs/development/pdf_parser_lab_handoff_600036_20260825.md\n?? docs/development/shareholder_exposure_supply_chain_code_review_20260828.md\n?? docs/development/shareholder_exposure_supply_chain_code_review_20260828_recheck.md\n?? docs/development/shareholder_exposure_supply_chain_code_review_20260828_recheck2.md\n?? docs/development/shareholder_exposure_supply_chain_code_review_20260828_recheck3.md\n?? sqlite:/\n?? tests/fixtures/company_profile_v30_airline_materials_frozen_pages.json\n",
+  "existing_modified_sha256": {
+    "docs/development/common_llm_gateway_architecture.md": "7f2ad8851c0bc2e8953afc7f5451911ebedecd220f159d68263470ef468609de",
+    "docs/development/common_llm_gateway_usage.md": "e8a931f1c3a515d9e66769e955d980ae90031032b6c741a26bbe123e267c5cca",
+    "docs/development/pdf_engine_evaluation_local_corpus_20260825.json": "0ee90791f0e3eb1bca59e458a25ee19b7b4e05007127047ede21794f4aa6320e"
+  }
+}

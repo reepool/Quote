@@ -1,0 +1,24 @@
+{
+  "formal_execution_index": 1,
+  "sha256": {
+    "data/checkpoints/company_profile_common_core/reports/m4_v30_airline_materials_core_repair/plan.json": "c36bbecac66122f63ccb4926df0faff6538e19cbf390eaaf262aae6be79d40b0",
+    "data/checkpoints/company_profile_common_core/reports/m4_v30_airline_materials_core_repair/company_profile_live_run.v1.json": "9ba7488a25b56885c12bb46f6dd7b222a0be48edbf9c408679ce468f373dce29",
+    "data/checkpoints/company_profile_common_core/reports/m4_v30_airline_materials_core_repair/observation.json": "9c19388c5fb156b2699a639b42bd0304bdc03bf37302d1f0893ce4ba1e7e62b8",
+    "data/checkpoints/company_profile_common_core/reports/m4_v30_airline_materials_core_repair/formal_execution.json": "08aee0892990e00b43048b3944b6328ea4f85cd4c63924d59ff3026fee68833e",
+    "data/research/company_profile_common_core/m4_v30_airline_materials_core_repair/company_profile_common_core.v1/bp-work-53304d72ff618ec6d2670dbb.json": "fa7ad0582cd16ddd343e0de8c0a5365f46bfb2b1742dfb50ad1120111e95825a",
+    "data/research/company_profile_common_core/m4_v30_airline_materials_core_repair/company_profile_common_core.v1/bp-work-24708cd29817e34dec234854.json": "5fa368287416aa9cb8f73370d487c3d231a24134685d9fe4f0713b7e64b2ffc8",
+    "data/research/company_profile_common_core/m4_v30_airline_materials_core_repair/company_profile_common_core.v1/scopes/600067.SH/2025-12-31/extract_segment_financials.json": "47ead45c294c244d2d47ba4c650c109c1127485fcd76f80fc58ee918385cb0ee",
+    "data/research/company_profile_common_core/m4_v30_airline_materials_core_repair/company_profile_common_core.v1/scopes/600067.SH/2025-12-31/extract_business_overview.json": "0e260863b545f8d08ab2189fa35f889835301304d1e18e29103698bb898d644b",
+    "data/research/company_profile_common_core/m4_v30_airline_materials_core_repair/company_profile_common_core.v1/scopes/600029.SH/2025-12-31/extract_segment_financials.json": "b1b88aeeeef21991c0f96a2c23e911940a3dd624768f4a42dceb077ed88dc9bc",
+    "data/research/company_profile_common_core/m4_v30_airline_materials_core_repair/company_profile_common_core.v1/scopes/600029.SH/2025-12-31/extract_material_inputs.json": "706cf8ff54fc5f94be66049731d8ec3870eb635c8e102570ec48a12d36ebb768",
+    "data/research/company_profile_common_core/m4_v30_airline_materials_core_repair/company_profile_common_core.v1/scopes/600029.SH/2025-12-31/extract_business_overview.json": "bafce609573c26103a5a5f82b21926852524161c9e6b472b12582772786a1ef8",
+    "data/research/company_profile_common_core/m4_v30_airline_materials_core_repair/company_profile_common_core.v1/checkpoints/bp-work-53304d72ff618ec6d2670dbb.json": "536b1faaf42e3d7823355866014fd79d3cfdf9889b738e892dd50fd755cfb927",
+    "data/research/company_profile_common_core/m4_v30_airline_materials_core_repair/company_profile_common_core.v1/checkpoints/bp-work-24708cd29817e34dec234854.json": "e5fc68730854be4e1f34011f42725477482090405fc576ef02f7474f26f6fd57",
+    "data/exports/m4_v30_airline_materials_core_repair/600067.SH/profiles.csv": "723976f7b75a3df3a78ac7e7284b33fbbe24573e23b5517df89cf86905add37d",
+    "data/exports/m4_v30_airline_materials_core_repair/600067.SH/600067.SH_2025-12-31.json": "7eace0d1766b027571728257fd244a0584588bf487f67effa8c1390a06ec6e6b",
+    "data/exports/m4_v30_airline_materials_core_repair/600067.SH/export_manifest.json": "000fa14ae82705cbdc27beb3efd9788d2d69d97c2d7ca04444ccd06620a7e431",
+    "data/exports/m4_v30_airline_materials_core_repair/600029.SH/profiles.csv": "4205ce6d5108ae3412e768849b9ed06bb4ae41b7b52e52072881327315b32526",
+    "data/exports/m4_v30_airline_materials_core_repair/600029.SH/600029.SH_2025-12-31.json": "fe45e35f6d7891c05ea278b0465c1c50505b7433581b19f7a67a8c68efb46b93",
+    "data/exports/m4_v30_airline_materials_core_repair/600029.SH/export_manifest.json": "fd5aaf04331a41642eecc36af754009a627b3d9f37ef4e0795f33a9f6b544a60"
+  }
+}

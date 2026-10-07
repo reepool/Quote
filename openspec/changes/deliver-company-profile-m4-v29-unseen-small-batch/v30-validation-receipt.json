@@ -1,0 +1,82 @@
+{
+  "created_at": "2026-10-07T12:47:59.916159+00:00",
+  "tests": {
+    "source_and_recent_closure": {
+      "command": "PYTHONPATH=. /home/python/miniconda3/envs/Quote/bin/python -m pytest tests/unit/test_research/test_company_profile_v30_airline_materials.py tests/unit/test_research/test_company_profile_v28_energy_bus.py tests/unit/test_research/test_company_profile_v26_shipping_materials.py tests/unit/test_research/test_company_profile_v27_input_relation.py tests/unit/test_research/test_company_profile_v24_hydro_pharma.py tests/unit/test_research/test_company_profile_v25_sales_semantics.py tests/unit/test_research/test_company_profile_v19_closure.py -q",
+      "result": "140 passed,7warnings;57.52seconds",
+      "log_sha256": "dd16bf26ef03451aad087bc4e1f3d8ab0962a755be8563807890c01ca54b78fd"
+    },
+    "shared_modules": {
+      "command": "PYTHONPATH=. /home/python/miniconda3/envs/Quote/bin/python -m pytest tests/unit/test_research/test_company_profile_core_evidence_selection.py tests/unit/test_research/test_company_profile_core_assessment_projection.py tests/unit/test_research/test_company_profile_owned_page_facts.py tests/unit/test_research/test_company_profile_operations.py -q",
+      "result": "111passed,5failed,18warnings;25.62seconds",
+      "log_sha256": "e58cc00390820f8d238d66bf66cca7500a6da78ebe373781bccb2af62d73e77e"
+    },
+    "baseline_reverification": {
+      "method": "copy existing company_profile package to independent /tmp import root and replace only three modified production modules with git HEAD originals;run exact same five failing tests against original package",
+      "baseline_head": "e054daf72433cf856fdcd16e11dd1ac986a843c3",
+      "result": "same5failed,7warnings;6.01seconds",
+      "tests": [
+        "test_reads_through_section_and_stops_at_next_heading",
+        "test_invalid_mda_falls_through_to_segment_template_on_the_same_page",
+        "test_run_uses_new_writer_and_does_not_call_legacy_semantic_writer",
+        "test_pause_stops_further_drain_and_resume_skips_completed_scopes",
+        "test_one_unbound_company_does_not_block_the_other"
+      ],
+      "original_code_sha256": {
+        "research/company_profile/core_evidence_selection.py": "7a42689a28759fb3c7c8b28703aaf4219c2a3b27a54bc78b2cb970aa2cc20adf",
+        "research/company_profile/core_assessment_projection.py": "47c8935e2447f1ebc9e43b3c93a4a440ee3544acfba0c8ff229ed9422fe4c56b",
+        "research/company_profile/operations.py": "056ec0ee4068e3a339e9ac06c887995acf14f5b8738b10ae39c5bae801220290"
+      },
+      "log_sha256": "7334d776036767a09c7c349c18deb54522e5576bf20e81b57f91679ae53b073c",
+      "classification": "unrelated_existing_failures_deferred_unchanged"
+    }
+  },
+  "ruff": "passed",
+  "openspec_strict": "passed",
+  "diff_check": "passed",
+  "review": {
+    "method": "task-scoped manual review of current business selection/projection/PDF-owner diff, full source regressions and every actual accepted fact/body, then staged diff review",
+    "blocking_current_issues_remaining": [],
+    "repaired_business_issues": [
+      "incomplete continuous business/mechanism delivery",
+      "missing native rows/units/basis and wrong parcel-code amount",
+      "upstream/downstream fake product/actions",
+      "missing current owned goods with incorrect action direction"
+    ],
+    "nonblocking": [
+      "Duplicate corroborating native cells retain separate accepted record ids;accuracy evaluates every real record once,recall counts source conditions once;no cross-basis sums. No deduplication/refactor expansion."
+    ],
+    "unrelated": [
+      "test_reads_through_section_and_stops_at_next_heading",
+      "test_invalid_mda_falls_through_to_segment_template_on_the_same_page",
+      "test_run_uses_new_writer_and_does_not_call_legacy_semantic_writer",
+      "test_pause_stops_further_drain_and_resume_skips_completed_scopes",
+      "test_one_unbound_company_does_not_block_the_other"
+    ]
+  },
+  "protection": {
+    "protected_files": 854,
+    "first_formal_files": 19,
+    "existing_modified_documents_unchanged": 3,
+    "executed_code_unchanged": 38
+  },
+  "formal": {
+    "recall": "86/86",
+    "accuracy": "222/222",
+    "accepted_facts": 216,
+    "answered_bodies": 6,
+    "critical_numeric_errors": 0,
+    "elapsed_seconds": 179.44878149684519,
+    "tokens": 0,
+    "budget": 50000,
+    "no_reuse": true,
+    "query_export_disk_equal": true,
+    "first_run_preserved": true
+  },
+  "scope_limit": "86 declared source conditions and all actual accepted objects;no full-report/scale quality claim;negative conclusions limited to frozen inspected pages",
+  "change_archived": false,
+  "next_batch": "paused_pending_a_role_review",
+  "a_role_acceptance": "pending_finite_review",
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false
+}

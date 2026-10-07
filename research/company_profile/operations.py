@@ -273,6 +273,22 @@ class OfficialAnnualReportPageSource:
             }
             for page in raw_pages
         ]
+        # Compact PDF text loses a blank current/prior amount cell. Read layout
+        # only for the affected native project-income table; keep cached page
+        # artifacts and their original text unchanged.
+        project_pages = [p for p in pages if "房地产销售收入分项列示如下" in p["text"]]
+        if project_pages:
+            from pypdf import PdfReader
+
+            try:
+                layout_reader = PdfReader(artifact.source_pdf_path)
+                for page in project_pages:
+                    page["layout_text"] = layout_reader.pages[page["page"] - 1].extract_text(
+                        extraction_mode="layout"
+                    ) or ""
+            except Exception as exc:  # noqa: BLE001 - failed column recovery becomes machine_rework
+                logger.warning("company-profile project-income layout unavailable: %s", exc)
+                return None
         if not pages:
             return None
         published_at = str(asset.get("published_at") or item.get("published_at") or "")

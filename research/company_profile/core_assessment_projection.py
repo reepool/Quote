@@ -37,7 +37,7 @@ CORE_DIMENSION_IDS = (
     "revenue_model",
 )
 _PRINCIPAL_PATTERN = re.compile(
-    r"(集[^。]{2,160}研发、制造与销售|主营|核心主业|四大产业板块|主要从事|主要业务|主要经营|经营模式|经营范围|金融服务|核心提供商|报告分部|已投入运行|所属售电公司|车队管理服务)"
+    r"(集[^。]{2,160}研发、制造与销售|主营|主业|业务分部|四大产业板块|主要从事|主要业务|主要经营|经营模式|经营范围|金融服务|核心提供商|报告分部|已投入运行|所属售电公司|车队管理服务)"
 )
 _COMPLETE_COMPANY_BUSINESS = re.compile(
     r"(?<![\u4e00-\u9fff])(?:本公司|公司)(?:业务覆盖|专注于).{2,}"
@@ -48,7 +48,7 @@ _NARRATIVE_BUSINESS = re.compile(
 )
 _SPEC_PRODUCT = re.compile(r"^(?:厚度|宽度|长度)")
 _PRODUCT_PATTERN = re.compile(
-    r"(主要产品|主要服务|业务线|产品包括|产品矩阵|服务包括|经营范围|"
+    r"(主要产品|主要服务|业务线|产品包括|产品矩阵|服务包括|经营范围|主业|业务分部|服务产品|产品战略|推广.{0,40}服务|贸易业务收入|"
     r"从事.{1,40}(?:的研发|的生产|的制造|的加工|的销售|服务))"
 )
 _STATEMENT_SPLIT = re.compile(r"[。；;，,\n]+")
@@ -70,7 +70,7 @@ _REVENUE_BLOCK_PATTERN = re.compile(
 )
 _REVENUE_NEGATION_PREFIX = re.compile(r"(尚未|还未|仍未|并未|没有|未|不|拟|计划)$")
 _REPAIR_REVENUE_INFLOW_PATTERN = re.compile(
-    r"(本集团利用自有及控制的船舶开展|公司盈利主要来自发电收入|营业收入主要来源于|"
+    r"(对外交易收入|产品定价按照|年度供货框架协议|票款收入|运输服务交易价格|常旅客里程奖励计划|租金收入|清算补偿费收入|本集团利用自有及控制的船舶开展|公司盈利主要来自发电收入|营业收入主要来源于|"
     + _REVENUE_INFLOW_PATTERN.pattern[1:]
 )
 _PRODUCT_ACTIONS = frozenset(
