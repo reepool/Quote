@@ -9,21 +9,17 @@ import aiohttp
 from typing import List, Dict, Any, Optional
 from datetime import datetime, timedelta
 import pandas as pd
-import io
-import os
-from contextlib import contextmanager
 from utils.proxy_patch_runtime import (
     get_yfinance_proxy_patch_state,
     install_yfinance_proxy_patch,
+    uninstall_yfinance_proxy_patch,
 )
-
-install_yfinance_proxy_patch(required=False)
 
 import yfinance as yf
 
 from .base_source import BaseDataSource, RateLimitConfig
 from .adjustment_config import AdjustmentConfig
-from utils import yfinance_logger, config_manager
+from utils import yfinance_logger
 
 class YFinanceConstants:
     """Yahoo Finance 数据源的常量"""
@@ -46,22 +42,11 @@ class YFinanceSource(BaseDataSource):
         self.aio_session = None
         self.user_agent = YFinanceConstants.DEFAULT_USER_AGENT
         
-        # 加载代理配置
+        # 传输策略：默认直连；直连被拒后安装 akshare_proxy_patch 走网关租约。
+        # patch 安装是进程级全局的（劫持 curl_cffi 对 finance.yahoo.com 的请求）。
         self.proxy_patch_state = get_yfinance_proxy_patch_state()
         self.proxy_patch_ready = bool(self.proxy_patch_state.get("ready"))
-        proxy_config = config_manager.get_nested('data_sources_config.yfinance.proxy', {})
-        self.proxy_dict = {}
-        if isinstance(proxy_config, dict):
-            http_proxy = proxy_config.get('http', '')
-            https_proxy = proxy_config.get('https', '')
-            if http_proxy:
-                self.proxy_dict['http'] = http_proxy
-            if https_proxy:
-                self.proxy_dict['https'] = https_proxy
-        
-        self.aio_proxy = self.proxy_dict.get('http') or self.proxy_dict.get('https')
-        # yfinance 库路径优先交给 akshare_proxy_patch；旧 HTTP proxy 只保留给底层 chart API fallback。
-        self.yf_proxy_arg = None if self.proxy_patch_ready else self.aio_proxy
+        self.direct_rejected = False
 
     async def _initialize_impl(self):
         """初始化Yahoo Finance数据源"""
@@ -87,23 +72,73 @@ class YFinanceSource(BaseDataSource):
             except Exception:
                 pass
 
-            # 测试连接 - 使用异步原生请求代替脆弱的 yfinance 内库
-            test_symbol = YFinanceConstants.TEST_SYMBOL_US
-            url = f"https://query1.finance.yahoo.com/v8/finance/chart/{test_symbol}"
-            
-            try:
-                async with self.aio_session.get(url, proxy=self.aio_proxy, timeout=5) as response:
-                    if response.status == 200:
-                        yfinance_logger.info(f"[{self.name}] Successfully connected to Yahoo Finance")
-                    else:
-                        yfinance_logger.warning(f"[{self.name}] Yahoo Finance connection test returned {response.status} - will use as backup source")
-            except Exception as e:
-                yfinance_logger.warning(f"[{self.name}] Yahoo Finance connection test failed: {e} - will use as backup source")
+            # 测试连接 - 默认直连；确认被拒且回落通道可用时才锁定网关模式
+            if await self._probe_direct(timeout_sec=5):
+                yfinance_logger.info(f"[{self.name}] Successfully connected to Yahoo Finance (direct)")
+            else:
+                yfinance_logger.warning(
+                    f"[{self.name}] Yahoo Finance direct connection rejected - preparing proxy patch fallback"
+                )
+                if self._ensure_proxy_patch():
+                    # 仅在回落通道可用时锁定，避免 patch 不可用时连直连重试都被跳过
+                    self.direct_rejected = True
+                    yfinance_logger.info(f"[{self.name}] Proxy patch ready as fallback transport")
+                else:
+                    yfinance_logger.warning(
+                        f"[{self.name}] Proxy patch unavailable - keeping direct as primary transport"
+                    )
 
         except Exception as e:
             yfinance_logger.warning(f"[{self.name}] Yahoo Finance initialization failed: {e}")
             yfinance_logger.info(f"[{self.name}] Will continue as backup data source")
             # 不抛出异常，允许作为备用数据源
+
+    def _ensure_proxy_patch(self) -> bool:
+        """确保 akshare_proxy_patch 已安装；直连被拒后的回落通道。"""
+        if self.proxy_patch_ready:
+            return True
+        state = install_yfinance_proxy_patch(required=False, force=True)
+        self.proxy_patch_state = state.as_dict()
+        self.proxy_patch_ready = bool(state.ready)
+        if not state.ready and state.error:
+            yfinance_logger.warning(f"[{self.name}] Proxy patch unavailable: {state.error}")
+        return self.proxy_patch_ready
+
+    async def _probe_direct(self, *, timeout_sec: int = 10) -> bool:
+        """直连探测 Yahoo chart API（不走任何代理）。"""
+        url = f"https://query1.finance.yahoo.com/v8/finance/chart/{YFinanceConstants.TEST_SYMBOL_US}"
+        try:
+            async with self.aio_session.get(url, timeout=timeout_sec) as response:
+                if response.status == 200:
+                    return True
+                yfinance_logger.warning(
+                    f"[{self.name}] Direct Yahoo probe got HTTP {response.status}"
+                )
+                return False
+        except Exception as e:
+            yfinance_logger.warning(f"[{self.name}] Direct Yahoo probe failed: {e}")
+            return False
+
+    def _gateway_probe_sync(self, *, timeout_sec: float = 10) -> bool:
+        """通过 yfinance 自身的传输层探测网关通路（阻塞，需在线程中调用）。
+
+        akshare_proxy_patch 会劫持 curl_cffi 会话中 finance.yahoo.com 的请求
+        并改走网关租约，因此复用 yfinance._http.new_session() 即与真实取数
+        路径完全一致。
+        """
+        from yfinance import _http
+
+        url = f"https://query1.finance.yahoo.com/v8/finance/chart/{YFinanceConstants.TEST_SYMBOL_US}"
+        with _http.new_session() as session:
+            response = session.get(url, timeout=timeout_sec)
+            return response.status_code == 200
+
+    async def _probe_gateway(self, *, timeout_sec: float = 10) -> bool:
+        try:
+            return await asyncio.to_thread(self._gateway_probe_sync, timeout_sec=timeout_sec)
+        except Exception as e:
+            yfinance_logger.warning(f"[{self.name}] Gateway Yahoo probe failed: {e}")
+            return False
 
     async def get_instrument_list(self, exchange: str = None) -> List[Dict[str, Any]]:
         """获取交易品种列表 - yfinance不支持此功能"""
@@ -244,8 +279,9 @@ class YFinanceSource(BaseDataSource):
                     return f"{symbol}.SZ"  # 深交所
         elif exchange_upper in ('HKEX', 'HK'):
             # 港股（exchange 来自 instrument_id.split('.') 时为 'HK'，来自配置时为 'HKEX'）
-            if len(symbol) == 5 and symbol.isdigit():
-                return f"{symbol}.HK"
+            # Yahoo 港股代码为 4 位有效数字（如 00700 → 0700.HK），5 位会 404
+            if symbol.isdigit():
+                return f"{str(int(symbol)).zfill(4)}.HK"
         elif exchange_upper in ['NASDAQ', 'NYSE']:
             # 美股
             return symbol
@@ -283,130 +319,88 @@ class YFinanceSource(BaseDataSource):
             yfinance_logger.warning(f"[{self.name}] Fetch operation failed for {symbol}: {e}")
             return None
 
-    @contextmanager
-    def _temporary_proxy_env(self):
-        """仅在执行时挂载代理，避免污染全局（针对 YF crumb 不听话的问题）"""
-        if self.proxy_patch_ready or not getattr(self, 'aio_proxy', None):
-            yield
-            return
-            
-        old_http = os.environ.get('HTTP_PROXY')
-        old_https = os.environ.get('HTTPS_PROXY')
-        
-        os.environ['HTTP_PROXY'] = self.aio_proxy
-        os.environ['HTTPS_PROXY'] = self.aio_proxy
-        try:
-            yield
-        finally:
-            if old_http is not None:
-                os.environ['HTTP_PROXY'] = old_http
-            else:
-                os.environ.pop('HTTP_PROXY', None)
-                
-            if old_https is not None:
-                os.environ['HTTPS_PROXY'] = old_https
-            else:
-                os.environ.pop('HTTPS_PROXY', None)
-
     async def _fetch_yahoo_data_library(self, symbol: str, start_date: datetime = None,
                                       end_date: datetime = None, period: str = None,
                                       timeout_sec: int = 8) -> Optional[pd.DataFrame]:
-        """使用yfinance库获取数据"""
-        try:
-            with self._temporary_proxy_env():
-                if self.proxy_patch_ready:
-                    # When proxy patch is active, keep the call path aligned with
-                    # the validated upstream usage pattern: install patch first,
-                    # then call yf.download() without injecting a custom session.
-                    if start_date and end_date:
-                        data = await asyncio.wait_for(
-                            asyncio.to_thread(
-                                yf.download,
-                                symbol,
-                                start=start_date.strftime('%Y-%m-%d'),
-                                end=end_date.strftime('%Y-%m-%d'),
-                                auto_adjust=False,
-                                progress=False,
-                                threads=False
-                            ),
-                            timeout=timeout_sec
-                        )
-                    elif period:
-                        data = await asyncio.wait_for(
-                            asyncio.to_thread(
-                                yf.download,
-                                symbol,
-                                period=period,
-                                auto_adjust=False,
-                                progress=False,
-                                threads=False
-                            ),
-                            timeout=timeout_sec
-                        )
-                    else:
-                        yfinance_logger.error(f"[{self.name}] Must specify either date range or period")
-                        return None
-                else:
-                    session = requests.Session()
-                    session.headers['User-Agent'] = self.user_agent
-                    session.headers.update({
-                        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-                        'Accept-Language': 'en-US,en;q=0.5',
-                        'Accept-Encoding': 'gzip, deflate',
-                        'Connection': 'keep-alive',
-                        'Upgrade-Insecure-Requests': '1',
-                    })
-
-                    # 使用旧 HTTP proxy 时才传入自定义 requests session。
-                    if self.proxy_dict:
-                        session.proxies.update(self.proxy_dict)
-                    ticker = yf.Ticker(symbol, session=session)
-
-                    if start_date and end_date:
-                        # 指定日期范围 — 关闭 auto_adjust，获取原始未复权价格
-                        data = await asyncio.wait_for(
-                            asyncio.to_thread(
-                                ticker.history,
-                                start=start_date.strftime('%Y-%m-%d'),
-                                end=end_date.strftime('%Y-%m-%d'),
-                                interval='1d',
-                                auto_adjust=False,   # 保留 Adj Close 列，用于因子计算
-                                repair=True,
-                                proxy=self.yf_proxy_arg
-                            ),
-                            timeout=timeout_sec
-                        )
-                    elif period:
-                        # 指定时间段
-                        data = await asyncio.wait_for(
-                            asyncio.to_thread(
-                                ticker.history,
-                                period=period,
-                                interval='1d',
-                                auto_adjust=False,
-                                repair=True,
-                                proxy=self.yf_proxy_arg
-                            ),
-                            timeout=timeout_sec
-                        )
-                    else:
-                        yfinance_logger.error(f"[{self.name}] Must specify either date range or period")
-                        return None
-
-            if data.empty:
-                yfinance_logger.debug(f"[{self.name}] No data returned for {symbol}")
-                return None
-
-            # 清理数据
-            data = data.dropna()
-            if data.empty:
-                return None
-
-            return data
-
-        except asyncio.TimeoutError:
-            yfinance_logger.debug(f"[{self.name}] yfinance library timed out for {symbol} after {timeout_sec}s")
+        """使用yfinance库获取数据：默认直连；确认直连被拒后回落 akshare_proxy_patch 网关。"""
+        def _download() -> Optional[pd.DataFrame]:
+            # 与 akshare_proxy_patch README 的验证用法保持一致：
+            # 安装 patch 后直接调用 yf.download()，不注入自定义 session。
+            # multi_level_index=False 让单代码下载返回单层列，匹配逐行转换逻辑。
+            if start_date and end_date:
+                return yf.download(
+                    symbol,
+                    start=start_date.strftime('%Y-%m-%d'),
+                    end=end_date.strftime('%Y-%m-%d'),
+                    auto_adjust=False,
+                    progress=False,
+                    threads=False,
+                    multi_level_index=False,
+                )
+            if period:
+                return yf.download(
+                    symbol,
+                    period=period,
+                    auto_adjust=False,
+                    progress=False,
+                    threads=False,
+                    multi_level_index=False,
+                )
+            yfinance_logger.error(f"[{self.name}] Must specify either date range or period")
             return None
+
+        async def _download_with_timeout() -> Optional[pd.DataFrame]:
+            try:
+                data = await asyncio.wait_for(
+                    asyncio.to_thread(_download), timeout=timeout_sec
+                )
+            except asyncio.TimeoutError:
+                yfinance_logger.debug(
+                    f"[{self.name}] yfinance download timed out for {symbol} after {timeout_sec}s"
+                )
+                return None
+            if data is None or data.empty:
+                return None
+            # 防御旧版本 yfinance 忽略 multi_level_index 时返回 (field, ticker) 双层列
+            if isinstance(data.columns, pd.MultiIndex) and data.shape[1] > 0:
+                tickers = data.columns.get_level_values(-1).unique()
+                if len(tickers) == 1:
+                    data = data.xs(tickers[0], axis=1, level=-1)
+                else:
+                    return None
+            # 清理全空行，保持与旧库路径一致
+            data = data.dropna()
+            return data if not data.empty else None
+
+        def _usable(data: Optional[pd.DataFrame]) -> bool:
+            return data is not None and not data.empty
+
+        try:
+            if not self.direct_rejected:
+                data = await _download_with_timeout()
+                if _usable(data):
+                    return data
+
+                # 直连结果为空时，用轻量探测区分“无数据”与“直连被拒”，
+                # 只有确认被拒才动用网关，避免为无效代码消耗网关租约。
+                if not await self._probe_direct(timeout_sec=5):
+                    if not self._ensure_proxy_patch():
+                        return None
+                    data = await _download_with_timeout()
+                    if _usable(data):
+                        self.direct_rejected = True
+                        yfinance_logger.warning(
+                            f"[{self.name}] Direct Yahoo rejected, gateway fallback fetched {symbol}"
+                        )
+                        return data
+                return None
+
+            # 已处于网关回落模式
+            if not self._ensure_proxy_patch():
+                return None
+            data = await _download_with_timeout()
+            return data if _usable(data) else None
+
         except Exception as e:
             yfinance_logger.debug(f"[{self.name}] yfinance library failed for {symbol}: {e}")
             return None
@@ -429,8 +423,7 @@ class YFinanceSource(BaseDataSource):
         try:
             def _do_fetch():
                 headers = {'User-Agent': self.user_agent, 'Accept': '*/*'}
-                proxies = {'http': self.aio_proxy, 'https': self.aio_proxy} if self.aio_proxy else None
-                return requests.get(url, params=params, headers=headers, proxies=proxies, timeout=15)
+                return requests.get(url, params=params, headers=headers, timeout=15)
 
             response = await asyncio.to_thread(_do_fetch)
             
@@ -611,24 +604,36 @@ class YFinanceSource(BaseDataSource):
             return []
 
     async def health_check(self) -> bool:
-        """健康检查"""
-        try:
-            # 使用简单的底层 HTTP 请求去验证代理连通性，避开 yfinance.Ticker 内核脆弱的 crumb 生成器
-            test_symbol = YFinanceConstants.TEST_SYMBOL_US
-            url = f"https://query1.finance.yahoo.com/v8/finance/chart/{test_symbol}"
-            
-            # 使用预设好的 AIO Session（携带了 User-Agent）和 代理
-            async with self.aio_session.get(url, proxy=self.aio_proxy, timeout=10) as response:
-                if response.status == 200:
-                    yfinance_logger.debug(f"[{self.name}] Health check passed directly to endpoints")
-                    return True
-                else:
-                    yfinance_logger.warning(f"[{self.name}] Health check HTTP failed with status {response.status}")
-                    return False
+        """健康检查：默认直连；直连被拒后经 akshare_proxy_patch 网关复测。"""
+        if await self._probe_direct(timeout_sec=10):
+            if self.direct_rejected:
+                yfinance_logger.info(
+                    f"[{self.name}] Direct Yahoo access recovered, restoring direct transport"
+                )
+                self.direct_rejected = False
+                try:
+                    uninstall_yfinance_proxy_patch()
+                except Exception as e:
+                    # 卸载失败时保持网关模式，避免传输层与健康状态不一致
+                    self.direct_rejected = True
+                    yfinance_logger.warning(f"[{self.name}] Proxy patch uninstall failed: {e}")
+            else:
+                yfinance_logger.debug(f"[{self.name}] Health check passed directly to endpoints")
+            return True
 
-        except Exception as e:
-            yfinance_logger.warning(f"[{self.name}] Health check failed: {e}")
+        if not self._ensure_proxy_patch():
+            yfinance_logger.warning(f"[{self.name}] Health check failed and proxy patch unavailable")
             return False
+
+        if await self._probe_gateway(timeout_sec=10):
+            self.direct_rejected = True
+            yfinance_logger.warning(
+                f"[{self.name}] Direct Yahoo rejected but gateway transport healthy"
+            )
+            return True
+
+        yfinance_logger.warning(f"[{self.name}] Health check failed: direct and gateway both unreachable")
+        return False
 
     async def close(self):
         """关闭数据源连接"""

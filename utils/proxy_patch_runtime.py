@@ -82,7 +82,9 @@ def install_akshare_proxy_patch(*, required: bool = False) -> ProxyPatchState:
     )
 
 
-def install_yfinance_proxy_patch(*, required: bool = False) -> ProxyPatchState:
+def install_yfinance_proxy_patch(
+    *, required: bool = False, force: bool = False
+) -> ProxyPatchState:
     """Install yfinance proxy patch using data_sources_config.yfinance.proxy_patch."""
     config = _load_proxy_patch_config("yfinance")
     akshare_config = _load_proxy_patch_config("akshare")
@@ -98,7 +100,26 @@ def install_yfinance_proxy_patch(*, required: bool = False) -> ProxyPatchState:
         defaults={"gateway": "101.201.173.125", "retry": 30},
         installer_name="install_yfinance_patch",
         required=required,
+        force=force,
     )
+
+
+def uninstall_yfinance_proxy_patch() -> ProxyPatchState:
+    """Remove the yfinance patch and reset install state so direct access resumes."""
+    try:
+        # uninstall_yfinance_patch_main 只在子模块中定义，未导出到顶层包
+        yfinance_patch = importlib.import_module("akshare_proxy_patch.yfinance")
+        uninstaller = getattr(yfinance_patch, "uninstall_yfinance_patch_main", None)
+        if callable(uninstaller):
+            uninstaller()
+        else:
+            _logger.warning("akshare_proxy_patch.yfinance has no uninstaller")
+    except ImportError:
+        _logger.info("akshare_proxy_patch is not installed; nothing to uninstall")
+    _YFINANCE_STATE.ready = False
+    _YFINANCE_STATE.attempted = False
+    _YFINANCE_STATE.error = None
+    return _YFINANCE_STATE
 
 
 def get_akshare_proxy_patch_state() -> Dict[str, Any]:
@@ -242,7 +263,11 @@ def _install_patch(
     defaults: Dict[str, Any],
     installer_name: str,
     required: bool,
+    force: bool = False,
 ) -> ProxyPatchState:
+    if force:
+        state.attempted = False
+        state.error = None
     if state.ready:
         from proxy_patch_bootstrap import restore_unpatched_curl_cffi_session
 

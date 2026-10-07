@@ -451,11 +451,7 @@
         "gateway": "101.201.173.125",
         "auth_token": "20260228D7XF",
         "retry": 30,
-        "note": "Use akshare_proxy_patch.install_yfinance_patch before importing yfinance. The token is shared with the configured akshare proxy patch unless overridden here."
-      },
-      "proxy": {
-        "http": "http://9c5af8dc464a7dbcf203__cr.us:a6bc9a2608f4ebd2@74.81.81.81:823",
-        "https": "http://9c5af8dc464a7dbcf203__cr.us:a6bc9a2608f4ebd2@74.81.81.81:823"
+        "note": "Direct access is the default transport. akshare_proxy_patch is installed lazily as fallback after direct Yahoo access is rejected."
       },
       "exchanges_supported": [
         "hk_stock",
