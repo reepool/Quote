@@ -1,0 +1,47 @@
+{
+  "created_at": "2026-10-07T09:44:15.642889+00:00",
+  "tests": {
+    "command": "PYTHONPATH=. /home/python/miniconda3/envs/Quote/bin/python -m pytest tests/unit/test_research/test_company_profile_m4_next_batch.py tests/unit/test_research/test_company_profile_v28_energy_bus.py -q",
+    "result": "64 passed, 7 warnings",
+    "elapsed_seconds": 96.84,
+    "log_sha256": "a8309aa3ff81c201a67227d0739ee468f8079faa92689d8fa846240c51238958"
+  },
+  "openspec_strict": {
+    "new_change": "passed",
+    "synced_finite_main_spec": "passed",
+    "synced_owned_page_facts_main_spec": "passed"
+  },
+  "diff_check": "passed",
+  "review": {
+    "method": "Task-scoped manual review of current spec/docs, source contracts, every accepted record/body and full original evidence; staged diff checked separately before commit",
+    "blocking_current_material_issues": [],
+    "business_blockers": "First formal delivery fails; preserved observation and repair cards registered, no product fixes performed",
+    "nonblocking": [
+      "Subsidiary names remain in full accepted evidence; source_actor display should be made more direct during current narrative repair, without promotion to parent-only production."
+    ],
+    "unrelated": "Existing dirty documents/Mock files and unrelated tests deferred, untouched"
+  },
+  "protection": {
+    "historical_files": 822,
+    "first_formal_files": 18,
+    "original_archive_materials_unchanged_excluding_closure_tasks": 46,
+    "existing_modified_documents_unchanged": 3,
+    "executed_production_code_unchanged": 38
+  },
+  "formal": {
+    "recall": "19/80",
+    "accuracy": "45/56",
+    "key_numeric_error_objects": 2,
+    "distinct_numeric_incidents": 1,
+    "elapsed_seconds": 215.1670278739184,
+    "tokens": 0,
+    "budget": 50000,
+    "actual_five_stage_no_reuse": true,
+    "first_run_preserved": true
+  },
+  "scope_limit": "80 pre-execute source conditions unchanged; p158 actual-object supplemental page accuracy verification separately retained; six current project rows to add in future repair source contract.",
+  "change_archived": false,
+  "next_batch": "paused_on_formal_failure",
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false
+}

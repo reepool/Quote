@@ -1,0 +1,388 @@
+{
+  "600029.SH": {
+    "facts": {
+      "owned:core-ev-d40d86f9ef1b3df9:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "recall_row_index": null,
+        "recall_role_index": null,
+        "rationale": "p12本公司经营范围原句字面成立，运输业务的集团依据由p107补证；这条局部事实没有编造业务。其完整性不足计在各正文实质条件，不把该真实局部事实重复判错。"
+      },
+      "owned:core-ev-48d1014f9cbc675d:segment:product:客运及客运相关服务": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "recall_row_index": 0,
+        "recall_role_index": null,
+        "rationale": "独立核原PDF p22（单位据p22）product原生营业收入列：客运及客运相关服务 156,688百万元；本期合并范围，非成本/上期/内部抵销列。完整接受证据及continuation_pages覆盖该行。该原生收入单元召回一次。"
+      },
+      "owned:core-ev-21de13c017bd7306:revenue:product:客运及客运相关服务": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "recall_row_index": null,
+        "recall_role_index": null,
+        "rationale": "独立核原PDF p22（单位据p22）product原生营业收入列：客运及客运相关服务 156,688百万元；本期合并范围，非成本/上期/内部抵销列。完整接受证据及continuation_pages覆盖该行。Measurement副本仅计准确率。"
+      },
+      "owned:core-ev-48d1014f9cbc675d:segment:product:货运及邮运": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "recall_row_index": 1,
+        "recall_role_index": null,
+        "rationale": "独立核原PDF p22（单位据p22）product原生营业收入列：货运及邮运 19,670百万元；本期合并范围，非成本/上期/内部抵销列。完整接受证据及continuation_pages覆盖该行。该原生收入单元召回一次。"
+      },
+      "owned:core-ev-21de13c017bd7306:revenue:product:货运及邮运": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "recall_row_index": null,
+        "recall_role_index": null,
+        "rationale": "独立核原PDF p22（单位据p22）product原生营业收入列：货运及邮运 19,670百万元；本期合并范围，非成本/上期/内部抵销列。完整接受证据及continuation_pages覆盖该行。Measurement副本仅计准确率。"
+      }
+    },
+    "answers": {
+      "principal_business": {
+        "accurate": false,
+        "rationale": "仅p12运输经营范围首句，未交付p198当前酒店、旅游、配餐等集团已经营业务；不能按answered算命中。"
+      },
+      "products_services": {
+        "accurate": false,
+        "rationale": "首条运输经营范围重复充当产品答案，缺维修/地面/代理/培训、酒店旅游配餐、航材及实际贸易与爱宠进客舱/行李到家服务。"
+      },
+      "revenue_model": {
+        "accurate": false,
+        "rationale": "仅两个主营产品标签，没有国内国际及其他收入构成、票款/交易价格机制和常旅客里程分配/奖励兑换语义。"
+      }
+    }
+  },
+  "600067.SH": {
+    "facts": {
+      "owned:core-ev-cc0eff5513d0fa7d:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "recall_row_index": null,
+        "recall_role_index": null,
+        "rationale": "p11至p12连续原句明确下属控股公司福建邵武创鑫从事添加剂研发生产销售，接受source_text保留其全称及原从属关系；作为合并集团下业务局部事实成立，不能代表完整公司主营，后者在答案单独判错。"
+      },
+      "owned:core-ev-1c760fdfde8f5e57:activity:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "recall_row_index": null,
+        "recall_role_index": null,
+        "rationale": "p12控股福建邵武创鑫当前电解液添加剂生产及主要产品原句成立，完整接受bounded_quote保留子公司全称；consolidated_group只是集团业务归属，不是母公司单体制造声明。该父添加剂produces动作明确，非未来研发。"
+      },
+      "owned:core-ev-1c760fdfde8f5e57:activity:2": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "recall_row_index": null,
+        "recall_role_index": null,
+        "rationale": "p12控股福建邵武创鑫当前电解液添加剂生产及主要产品原句成立，完整接受bounded_quote保留子公司全称；consolidated_group只是集团业务归属，不是母公司单体制造声明。该具名成分是当期产品枚举，原括号/缩写保留，operates/包括表述本身不推断单品sells。"
+      },
+      "owned:core-ev-1c760fdfde8f5e57:activity:3": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "recall_row_index": null,
+        "recall_role_index": null,
+        "rationale": "p12控股福建邵武创鑫当前电解液添加剂生产及主要产品原句成立，完整接受bounded_quote保留子公司全称；consolidated_group只是集团业务归属，不是母公司单体制造声明。该具名成分是当期产品枚举，原括号/缩写保留，operates/包括表述本身不推断单品sells。"
+      },
+      "owned:core-ev-1c760fdfde8f5e57:activity:4": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "recall_row_index": null,
+        "recall_role_index": null,
+        "rationale": "p12控股福建邵武创鑫当前电解液添加剂生产及主要产品原句成立，完整接受bounded_quote保留子公司全称；consolidated_group只是集团业务归属，不是母公司单体制造声明。该具名成分是当期产品枚举，原括号/缩写保留，operates/包括表述本身不推断单品sells。"
+      },
+      "owned:core-ev-1c760fdfde8f5e57:activity:5": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "recall_row_index": null,
+        "recall_role_index": null,
+        "rationale": "p12控股福建邵武创鑫当前电解液添加剂生产及主要产品原句成立，完整接受bounded_quote保留子公司全称；consolidated_group只是集团业务归属，不是母公司单体制造声明。该具名成分是当期产品枚举，原括号/缩写保留，operates/包括表述本身不推断单品sells。"
+      },
+      "owned:core-ev-1c760fdfde8f5e57:activity:6": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "recall_row_index": null,
+        "recall_role_index": null,
+        "rationale": "p12控股福建邵武创鑫当前电解液添加剂生产及主要产品原句成立，完整接受bounded_quote保留子公司全称；consolidated_group只是集团业务归属，不是母公司单体制造声明。该具名成分是当期产品枚举，原括号/缩写保留，operates/包括表述本身不推断单品sells。"
+      },
+      "owned:core-ev-1c760fdfde8f5e57:activity:7": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "recall_row_index": null,
+        "recall_role_index": null,
+        "rationale": "p12控股福建邵武创鑫当前电解液添加剂生产及主要产品原句成立，完整接受bounded_quote保留子公司全称；consolidated_group只是集团业务归属，不是母公司单体制造声明。该具名成分是当期产品枚举，原括号/缩写保留，operates/包括表述本身不推断单品sells。"
+      },
+      "owned:core-ev-1c760fdfde8f5e57:activity:8": {
+        "accurate": false,
+        "critical_numeric_error": false,
+        "recall_row_index": null,
+        "recall_role_index": null,
+        "rationale": "p12产品枚举在DENE等结束，后句为上游企业类型。将乙二醇（双丙腈）醚（DENE）等，上游企业为乙二醇整体当公司业务对象是跨分支拼接，假产品名。"
+      },
+      "owned:core-ev-1c760fdfde8f5e57:activity:9": {
+        "accurate": false,
+        "critical_numeric_error": false,
+        "recall_row_index": null,
+        "recall_role_index": null,
+        "rationale": "p12丁烯是上游企业类型披露，非本公司当前产品或生产动作；operates错误升格第三方行业上下文。"
+      },
+      "owned:core-ev-1c760fdfde8f5e57:activity:10": {
+        "accurate": false,
+        "critical_numeric_error": false,
+        "recall_row_index": null,
+        "recall_role_index": null,
+        "rationale": "p12碳酸酯类等化工企业，下游客户为电解液生产企业为上下游主体描述；把混合文本设为本公司produces对象错误。"
+      },
+      "owned:core-ev-1c760fdfde8f5e57:commodity:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "recall_row_index": null,
+        "recall_role_index": 2,
+        "rationale": "p11–12控股福建邵武创鑫明确生产销售电解液添加剂，p15及p19本期销售量437.18吨确证当前实际销售，合并集团sells及pending/product_sales成立；完整原证据保留子公司全称，标量source_actor公司按该段公司/控股主体语境，不能解释为母公司单体制造。父角色仅召回一次，不按7个成分各计销售。"
+      },
+      "owned:core-ev-8b61dd34d2da02bf:commodity:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "recall_row_index": null,
+        "recall_role_index": 0,
+        "rationale": "p19电磁线本期销售列9.37万吨及p11公司采购铜杆加工后销售的直接动作，支持公司/合并集团sells、电磁线pending/product_sales；角色不再按正文/量表多证据重复召回，不扩展数量验收。"
+      },
+      "owned:core-ev-6765b1e394b89c6d:segment:industry:工业": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "recall_row_index": 0,
+        "recall_role_index": null,
+        "rationale": "独立核原PDF p18（单位据p17）industry原生营业收入列：工业 7,377,841,016.99元；本期合并范围，非成本/上期/内部抵销列。完整接受证据及continuation_pages覆盖该行。该原生收入单元召回一次。"
+      },
+      "owned:core-ev-11f27a88f78a2c53:revenue:industry:工业": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "recall_row_index": null,
+        "recall_role_index": null,
+        "rationale": "独立核原PDF p18（单位据p17）industry原生营业收入列：工业 7,377,841,016.99元；本期合并范围，非成本/上期/内部抵销列。完整接受证据及continuation_pages覆盖该行。Measurement副本仅计准确率。"
+      },
+      "owned:core-ev-6765b1e394b89c6d:segment:industry:房地产业": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "recall_row_index": 1,
+        "recall_role_index": null,
+        "rationale": "独立核原PDF p18（单位据p17）industry原生营业收入列：房地产业 4,560,761,250.63元；本期合并范围，非成本/上期/内部抵销列。完整接受证据及continuation_pages覆盖该行。该原生收入单元召回一次。"
+      },
+      "owned:core-ev-11f27a88f78a2c53:revenue:industry:房地产业": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "recall_row_index": null,
+        "recall_role_index": null,
+        "rationale": "独立核原PDF p18（单位据p17）industry原生营业收入列：房地产业 4,560,761,250.63元；本期合并范围，非成本/上期/内部抵销列。完整接受证据及continuation_pages覆盖该行。Measurement副本仅计准确率。"
+      },
+      "owned:core-ev-6765b1e394b89c6d:segment:industry:服务业": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "recall_row_index": 2,
+        "recall_role_index": null,
+        "rationale": "独立核原PDF p18（单位据p17）industry原生营业收入列：服务业 112,691,930.88元；本期合并范围，非成本/上期/内部抵销列。完整接受证据及continuation_pages覆盖该行。该原生收入单元召回一次。"
+      },
+      "owned:core-ev-11f27a88f78a2c53:revenue:industry:服务业": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "recall_row_index": null,
+        "recall_role_index": null,
+        "rationale": "独立核原PDF p18（单位据p17）industry原生营业收入列：服务业 112,691,930.88元；本期合并范围，非成本/上期/内部抵销列。完整接受证据及continuation_pages覆盖该行。Measurement副本仅计准确率。"
+      },
+      "owned:core-ev-6765b1e394b89c6d:segment:product:电磁线": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "recall_row_index": 3,
+        "recall_role_index": null,
+        "rationale": "独立核原PDF p18（单位据p17）product原生营业收入列：电磁线 7,345,383,039.55元；本期合并范围，非成本/上期/内部抵销列。完整接受证据及continuation_pages覆盖该行。该原生收入单元召回一次。"
+      },
+      "owned:core-ev-11f27a88f78a2c53:revenue:product:电磁线": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "recall_row_index": null,
+        "recall_role_index": null,
+        "rationale": "独立核原PDF p18（单位据p17）product原生营业收入列：电磁线 7,345,383,039.55元；本期合并范围，非成本/上期/内部抵销列。完整接受证据及continuation_pages覆盖该行。Measurement副本仅计准确率。"
+      },
+      "owned:core-ev-6765b1e394b89c6d:segment:product:房地产开发与销售": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "recall_row_index": 4,
+        "recall_role_index": null,
+        "rationale": "独立核原PDF p18（单位据p17）product原生营业收入列：房地产开发与销售 4,560,761,250.63元；本期合并范围，非成本/上期/内部抵销列。完整接受证据及continuation_pages覆盖该行。该原生收入单元召回一次。"
+      },
+      "owned:core-ev-11f27a88f78a2c53:revenue:product:房地产开发与销售": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "recall_row_index": null,
+        "recall_role_index": null,
+        "rationale": "独立核原PDF p18（单位据p17）product原生营业收入列：房地产开发与销售 4,560,761,250.63元；本期合并范围，非成本/上期/内部抵销列。完整接受证据及continuation_pages覆盖该行。Measurement副本仅计准确率。"
+      },
+      "owned:core-ev-6765b1e394b89c6d:segment:product:其他": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "recall_row_index": 5,
+        "recall_role_index": null,
+        "rationale": "独立核原PDF p18（单位据p17）product原生营业收入列：其他 145,149,908.32元；本期合并范围，非成本/上期/内部抵销列。完整接受证据及continuation_pages覆盖该行。该原生收入单元召回一次。"
+      },
+      "owned:core-ev-11f27a88f78a2c53:revenue:product:其他": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "recall_row_index": null,
+        "recall_role_index": null,
+        "rationale": "独立核原PDF p18（单位据p17）product原生营业收入列：其他 145,149,908.32元；本期合并范围，非成本/上期/内部抵销列。完整接受证据及continuation_pages覆盖该行。Measurement副本仅计准确率。"
+      },
+      "owned:core-ev-6765b1e394b89c6d:segment:region:东北地区": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "recall_row_index": 6,
+        "recall_role_index": null,
+        "rationale": "独立核原PDF p18（单位据p17）region原生营业收入列：东北地区 129,518,891.35元；本期合并范围，非成本/上期/内部抵销列。完整接受证据及continuation_pages覆盖该行。该原生收入单元召回一次。"
+      },
+      "owned:core-ev-11f27a88f78a2c53:revenue:region:东北地区": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "recall_row_index": null,
+        "recall_role_index": null,
+        "rationale": "独立核原PDF p18（单位据p17）region原生营业收入列：东北地区 129,518,891.35元；本期合并范围，非成本/上期/内部抵销列。完整接受证据及continuation_pages覆盖该行。Measurement副本仅计准确率。"
+      },
+      "owned:core-ev-6765b1e394b89c6d:segment:region:西北地区": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "recall_row_index": 7,
+        "recall_role_index": null,
+        "rationale": "独立核原PDF p18（单位据p17）region原生营业收入列：西北地区 69,341,467.09元；本期合并范围，非成本/上期/内部抵销列。完整接受证据及continuation_pages覆盖该行。该原生收入单元召回一次。"
+      },
+      "owned:core-ev-11f27a88f78a2c53:revenue:region:西北地区": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "recall_row_index": null,
+        "recall_role_index": null,
+        "rationale": "独立核原PDF p18（单位据p17）region原生营业收入列：西北地区 69,341,467.09元；本期合并范围，非成本/上期/内部抵销列。完整接受证据及continuation_pages覆盖该行。Measurement副本仅计准确率。"
+      },
+      "owned:core-ev-6765b1e394b89c6d:segment:region:华南地区": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "recall_row_index": 8,
+        "recall_role_index": null,
+        "rationale": "独立核原PDF p18（单位据p17）region原生营业收入列：华南地区 228,821,539.68元；本期合并范围，非成本/上期/内部抵销列。完整接受证据及continuation_pages覆盖该行。该原生收入单元召回一次。"
+      },
+      "owned:core-ev-11f27a88f78a2c53:revenue:region:华南地区": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "recall_row_index": null,
+        "recall_role_index": null,
+        "rationale": "独立核原PDF p18（单位据p17）region原生营业收入列：华南地区 228,821,539.68元；本期合并范围，非成本/上期/内部抵销列。完整接受证据及continuation_pages覆盖该行。Measurement副本仅计准确率。"
+      },
+      "owned:core-ev-6765b1e394b89c6d:segment:region:华中地区": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "recall_row_index": 9,
+        "recall_role_index": null,
+        "rationale": "独立核原PDF p18（单位据p17）region原生营业收入列：华中地区 814,650,658.62元；本期合并范围，非成本/上期/内部抵销列。完整接受证据及continuation_pages覆盖该行。该原生收入单元召回一次。"
+      },
+      "owned:core-ev-11f27a88f78a2c53:revenue:region:华中地区": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "recall_row_index": null,
+        "recall_role_index": null,
+        "rationale": "独立核原PDF p18（单位据p17）region原生营业收入列：华中地区 814,650,658.62元；本期合并范围，非成本/上期/内部抵销列。完整接受证据及continuation_pages覆盖该行。Measurement副本仅计准确率。"
+      },
+      "owned:core-ev-6765b1e394b89c6d:segment:region:华北地区": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "recall_row_index": 10,
+        "recall_role_index": null,
+        "rationale": "独立核原PDF p18（单位据p17）region原生营业收入列：华北地区 4,595,726,672.31元；本期合并范围，非成本/上期/内部抵销列。完整接受证据及continuation_pages覆盖该行。该原生收入单元召回一次。"
+      },
+      "owned:core-ev-11f27a88f78a2c53:revenue:region:华北地区": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "recall_row_index": null,
+        "recall_role_index": null,
+        "rationale": "独立核原PDF p18（单位据p17）region原生营业收入列：华北地区 4,595,726,672.31元；本期合并范围，非成本/上期/内部抵销列。完整接受证据及continuation_pages覆盖该行。Measurement副本仅计准确率。"
+      },
+      "owned:core-ev-6765b1e394b89c6d:segment:region:华东地区": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "recall_row_index": 11,
+        "recall_role_index": null,
+        "rationale": "独立核原PDF p18（单位据p17）region原生营业收入列：华东地区 5,564,241,568.37元；本期合并范围，非成本/上期/内部抵销列。完整接受证据及continuation_pages覆盖该行。该原生收入单元召回一次。"
+      },
+      "owned:core-ev-11f27a88f78a2c53:revenue:region:华东地区": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "recall_row_index": null,
+        "recall_role_index": null,
+        "rationale": "独立核原PDF p18（单位据p17）region原生营业收入列：华东地区 5,564,241,568.37元；本期合并范围，非成本/上期/内部抵销列。完整接受证据及continuation_pages覆盖该行。Measurement副本仅计准确率。"
+      },
+      "owned:core-ev-6765b1e394b89c6d:segment:region:西南地区": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "recall_row_index": 12,
+        "recall_role_index": null,
+        "rationale": "独立核原PDF p18（单位据p17）region原生营业收入列：西南地区 430,982,305.62元；本期合并范围，非成本/上期/内部抵销列。完整接受证据及continuation_pages覆盖该行。该原生收入单元召回一次。"
+      },
+      "owned:core-ev-11f27a88f78a2c53:revenue:region:西南地区": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "recall_row_index": null,
+        "recall_role_index": null,
+        "rationale": "独立核原PDF p18（单位据p17）region原生营业收入列：西南地区 430,982,305.62元；本期合并范围，非成本/上期/内部抵销列。完整接受证据及continuation_pages覆盖该行。Measurement副本仅计准确率。"
+      },
+      "owned:core-ev-6765b1e394b89c6d:segment:region:境外": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "recall_row_index": 13,
+        "recall_role_index": null,
+        "rationale": "独立核原PDF p18（单位据p17）region原生营业收入列：境外 218,011,095.46元；本期合并范围，非成本/上期/内部抵销列。完整接受证据及continuation_pages覆盖该行。该原生收入单元召回一次。"
+      },
+      "owned:core-ev-11f27a88f78a2c53:revenue:region:境外": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "recall_row_index": null,
+        "recall_role_index": null,
+        "rationale": "独立核原PDF p18（单位据p17）region原生营业收入列：境外 218,011,095.46元；本期合并范围，非成本/上期/内部抵销列。完整接受证据及continuation_pages覆盖该行。Measurement副本仅计准确率。"
+      },
+      "owned:core-ev-6765b1e394b89c6d:segment:sales_mode:直销": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "recall_row_index": 14,
+        "recall_role_index": null,
+        "rationale": "独立核原PDF p18（单位据p17）sales_mode原生营业收入列：直销 12,051,294,198.50元；本期合并范围，非成本/上期/内部抵销列。完整接受证据及continuation_pages覆盖该行。该原生收入单元召回一次。"
+      },
+      "owned:core-ev-11f27a88f78a2c53:revenue:sales_mode:直销": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "recall_row_index": null,
+        "recall_role_index": null,
+        "rationale": "独立核原PDF p18（单位据p17）sales_mode原生营业收入列：直销 12,051,294,198.50元；本期合并范围，非成本/上期/内部抵销列。完整接受证据及continuation_pages覆盖该行。Measurement副本仅计准确率。"
+      },
+      "owned:core-ev-fe1f9bd1a9f18c49:Segment:sales_mode:太阳宫:销售收入": {
+        "accurate": false,
+        "critical_numeric_error": true,
+        "recall_row_index": null,
+        "recall_role_index": null,
+        "rationale": "独立PDF p158项目本期发生额列为太阳宫D区（CY00-0215-0627地块）土地一级开发1,705,813,761.06元；0627为地块编号，不是收入。接受记录错误金额0627元且把项目错误绑定sales_mode，判准确率错误及关键数字错误。本项目细分未在首次57单元召回范围，不能追加首次召回分母。"
+      },
+      "owned:core-ev-d41d9b3e6c9e6733:Measurement:sales_mode:太阳宫:销售收入": {
+        "accurate": false,
+        "critical_numeric_error": true,
+        "recall_row_index": null,
+        "recall_role_index": null,
+        "rationale": "独立PDF p158项目本期发生额列为太阳宫D区（CY00-0215-0627地块）土地一级开发1,705,813,761.06元；0627为地块编号，不是收入。接受记录错误金额0627元且把项目错误绑定sales_mode，判准确率错误及关键数字错误。本项目细分未在首次57单元召回范围，不能追加首次召回分母。"
+      }
+    },
+    "answers": {
+      "principal_business": {
+        "accurate": false,
+        "rationale": "仅提控股福建邵武创鑫添加剂分支，未回答电磁线、房地产及游艇码头/酒店/投资实际业务。"
+      },
+      "products_services": {
+        "accurate": false,
+        "rationale": "重复添加剂分支主营句，未包含电磁线/扁线/变频线、物业/土地开发/房地产、七成分产品矩阵、酒店游艇服务；存在支持记录假产品但正文不能按支持记录数量命中。"
+      },
+      "revenue_model": {
+        "accurate": false,
+        "rationale": "分行业/分产品名单及直销不包含年度框架/订单、基准铜价+加工费、租赁/土地开发清算补偿及多业务收入实质；太阳宫并非销售模式，来自编号的错误记录污染正文。"
+      }
+    }
+  }
+}

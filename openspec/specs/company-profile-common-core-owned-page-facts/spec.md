@@ -107,3 +107,17 @@ Owned marketing product lists MUST create sells facts only from current affirmat
 #### Scenario: A related-party customer name contains a commodity
 - **WHEN** a customer name names a commodity but the product/content column only states 销售商品
 - **THEN** no commodity sales fact or derived role is inferred from the customer name
+
+### Requirement: Group commodity action retains affirmative source and explicit scope
+A direct definition of the company and its subsidiaries as the group MUST bind a current affirmative commodity action to consolidated_group and direct_source_wording despite separate ultimate-parent ownership on the same page. The definition MUST NOT affirm a negated or future action. Native branch qualifiers such as 不从事煤炭销售 and 拟开展煤炭销售 MUST prevent accepted sells facts and derived sales roles for that branch while other established actions remain valid. Actual purchases require purchase wording; self-use energy MUST retain material_input Relationship and energy-consumption semantics without purchase inference.
+
+#### Scenario: A group action and ultimate parent share an original page
+- **WHEN** the company-group definition states affirmative current sales with a separate parent-ownership note
+- **THEN** the accepted fact and query/export role retain original group actor and direct source scope, with negated/planned branches rejected
+
+### Requirement: Native revenue cells preserve column basis and full evidence span
+Native income cells MUST retain industry/product/region/sales-mode or report-segment basis, original amounts and units, consolidated-versus-parent boundaries and separate total/external/intersegment income. Eliminations MUST retain adjustment semantics and MUST NOT become products or be summed across overlapping bases. Evidence verification MUST include bounded quotes and continuation_pages rather than requiring a table's physical page to equal the span's starting page.
+
+#### Scenario: A table continues after the evidence starting page
+- **WHEN** an accepted row is present in the full bounded quote and continuation pages
+- **THEN** its original row, revenue column, scope, amount and unit can be verified from the full evidence span, with Measurement judged only for accuracy

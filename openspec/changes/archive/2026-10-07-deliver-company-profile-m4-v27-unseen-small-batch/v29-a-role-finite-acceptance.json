@@ -1,0 +1,41 @@
+{
+  "created_at": "2026-10-07T09:24:46.954101+00:00",
+  "a_role_conclusion": "v29 finite accepted in declared source scope;5.2/5.3 closed",
+  "source_conditions": 49,
+  "source_recall": {
+    "status": "assessed",
+    "numerator": 49,
+    "denominator": 49,
+    "value": 1.0
+  },
+  "source_accuracy": {
+    "status": "assessed",
+    "numerator": 94,
+    "denominator": 94,
+    "value": 1.0
+  },
+  "actual_facts": 88,
+  "actual_answers": 6,
+  "critical_numeric_errors": 0,
+  "whole_round_seconds": 180.92225240264088,
+  "tokens": 0,
+  "token_budget": 50000,
+  "actual_five_stage_no_reuse": true,
+  "a_role_targeted_tests": "44 passed",
+  "a_role_ruff_openspec_commit_diff": "passed",
+  "review_correction_accepted": true,
+  "corrected_fact_judgments": 16,
+  "corrected_answer_judgments": 2,
+  "historical_files_verified": 817,
+  "first_formal_artifacts_verified": 19,
+  "preserved_failures": [
+    "v27 original40 first failure",
+    "v28 failure and corrections",
+    "v28 subject/action audit limitations",
+    "v29 initial source review and correction"
+  ],
+  "scope": "49 frozen source conditions and all actual checked objects; not whole-report or scale-quality acceptance",
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false,
+  "next_authorization": "One controlled unseen service/manufacturing pair excluding30 observed companies"
+}

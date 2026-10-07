@@ -1,0 +1,1740 @@
+{
+  "created_at": "2026-10-07T09:34:58.839245+00:00",
+  "fixed_before_formal_execution": true,
+  "plan_id": "11509035ad7823bf1a6c198d32689af7640306916afbbd56ef3326e02aaf5307",
+  "processing_identity": {
+    "rules": "company_profile_common_core.v1",
+    "owned_page_facts": "v8",
+    "material_input_facts": "v1",
+    "revenue_sentence_repair": "v29"
+  },
+  "knowledge_cutoff": "2026-09-17",
+  "shared_token_budget": 50000,
+  "official_reports": [
+    {
+      "instrument_id": "600029.SH",
+      "asset_id": "asset_4c88be38de8dd112877a542b6efab29d",
+      "report_id": "1225063223",
+      "report_period": "2025-12-31",
+      "document_version": "c91ccda54264f12d3a270b51ba05fce41b232fe7c4f432e170e74a08f31c9839",
+      "disclosure_form": "service"
+    },
+    {
+      "instrument_id": "600067.SH",
+      "asset_id": "asset_02a1edda9a6df10b3d7efe6da9fd29e4",
+      "report_id": "1225146253",
+      "report_period": "2025-12-31",
+      "document_version": "58edeab269b9592bc632f1a41ae8c58f34dcad80f9090304b1e5a0c5ff248a03",
+      "disclosure_form": "manufacturing"
+    }
+  ],
+  "versions": {
+    "600029.SH": {
+      "sha256": "c91ccda54264f12d3a270b51ba05fce41b232fe7c4f432e170e74a08f31c9839",
+      "pdf": "data/filings/announcements/blobs/c9/c91ccda54264f12d3a270b51ba05fce41b232fe7c4f432e170e74a08f31c9839.pdf",
+      "checked_pages": [
+        8,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        29,
+        30,
+        31,
+        34,
+        35,
+        98,
+        107,
+        108,
+        122,
+        131,
+        132,
+        133,
+        165,
+        177,
+        178,
+        179,
+        198,
+        199,
+        200,
+        203,
+        204,
+        205,
+        206,
+        207,
+        208,
+        240,
+        241,
+        242
+      ],
+      "independent_full_text_sha256": "3829d1a097362f813f943287c6186bfeaf26c2d24d8d721950668bd86de465a7"
+    },
+    "600067.SH": {
+      "sha256": "58edeab269b9592bc632f1a41ae8c58f34dcad80f9090304b1e5a0c5ff248a03",
+      "pdf": "data/filings/announcements/blobs/58/58edeab269b9592bc632f1a41ae8c58f34dcad80f9090304b1e5a0c5ff248a03.pdf",
+      "checked_pages": [
+        7,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        31,
+        32,
+        33,
+        34,
+        75,
+        77,
+        89,
+        101,
+        104,
+        156,
+        157,
+        174,
+        175,
+        176,
+        177,
+        178,
+        190,
+        198,
+        199,
+        212
+      ],
+      "independent_full_text_sha256": "efdc5dab15aaf8c1dc165fad24debbe6065c095da8c71bda20e450fbd37be4ac"
+    }
+  },
+  "answers": {
+    "600029.SH": {
+      "principal_business": {
+        "pages": [
+          12,
+          107,
+          198
+        ],
+        "required_groups": [
+          [
+            "航空客运",
+            "客运"
+          ],
+          [
+            "货运"
+          ],
+          [
+            "邮运"
+          ],
+          [
+            "国内",
+            "中国大陆"
+          ],
+          [
+            "国际"
+          ],
+          [
+            "酒店"
+          ],
+          [
+            "旅游"
+          ],
+          [
+            "配餐"
+          ]
+        ],
+        "source_substance": "Group core passenger/cargo/mail transport plus other operating businesses;registered broad scope retains licensed/branch limitations."
+      },
+      "products_services": {
+        "pages": [
+          12,
+          14,
+          20,
+          24,
+          178,
+          198,
+          207,
+          208
+        ],
+        "required_groups": [
+          [
+            "客运"
+          ],
+          [
+            "货运"
+          ],
+          [
+            "邮运"
+          ],
+          [
+            "酒店"
+          ],
+          [
+            "旅游"
+          ],
+          [
+            "配餐"
+          ],
+          [
+            "航空器维修",
+            "飞机维修"
+          ],
+          [
+            "地面"
+          ],
+          [
+            "代理"
+          ],
+          [
+            "飞行训练",
+            "机型培训"
+          ],
+          [
+            "航材",
+            "航空器材"
+          ],
+          [
+            "普通快消品",
+            "快消品"
+          ],
+          [
+            "食品"
+          ],
+          [
+            "爱宠进客舱"
+          ],
+          [
+            "行李到家"
+          ]
+        ],
+        "source_substance": "Full declared current transport,hotel/tourism,catering,repair/ground/ticket agency/flight training/material sales/positive trade and actually established service products. No upstream manufacturers or technical systems promoted."
+      },
+      "revenue_model": {
+        "pages": [
+          21,
+          22,
+          24,
+          132,
+          133,
+          177,
+          178,
+          179,
+          199,
+          200,
+          207,
+          208
+        ],
+        "required_groups": [
+          [
+            "客运"
+          ],
+          [
+            "货运"
+          ],
+          [
+            "邮运"
+          ],
+          [
+            "国内",
+            "中国大陆"
+          ],
+          [
+            "国际"
+          ],
+          [
+            "酒店"
+          ],
+          [
+            "配餐"
+          ],
+          [
+            "票款",
+            "票证"
+          ],
+          [
+            "常旅客"
+          ],
+          [
+            "里程"
+          ],
+          [
+            "奖励"
+          ],
+          [
+            "交易价格"
+          ],
+          [
+            "收费",
+            "价格",
+            "市场"
+          ]
+        ],
+        "source_substance": "Transport/customer ticket and transaction-price mechanism,frequent-flyer allocation/redeem state,auxiliary services and sales revenue plus multi-basis native income composition. Recognition timing remains accounting,not sales channel;subsidiary/parent distinctions retained."
+      }
+    },
+    "600067.SH": {
+      "principal_business": {
+        "pages": [
+          11,
+          12,
+          89,
+          198
+        ],
+        "required_groups": [
+          [
+            "电磁线"
+          ],
+          [
+            "房地产"
+          ],
+          [
+            "电解液添加剂"
+          ],
+          [
+            "游艇码头"
+          ],
+          [
+            "酒店"
+          ],
+          [
+            "对外投资",
+            "投资业务"
+          ]
+        ],
+        "source_substance": "Three main businesses plus actually stated other operations and investments; subsidiary actors retained,manufacturing label no template restriction."
+      },
+      "products_services": {
+        "pages": [
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "required_groups": [
+          [
+            "电磁线"
+          ],
+          [
+            "扁线"
+          ],
+          [
+            "变频线"
+          ],
+          [
+            "房地产"
+          ],
+          [
+            "一级土地开发",
+            "土地一级开发"
+          ],
+          [
+            "物业租赁",
+            "出租物业",
+            "房地产出租"
+          ],
+          [
+            "物业管理"
+          ],
+          [
+            "电解液添加剂"
+          ],
+          [
+            "三（三甲基硅烷）磷酸酯",
+            "TMSP"
+          ],
+          [
+            "二氟磷酸锂",
+            "DFP"
+          ],
+          [
+            "碳酸乙烯亚乙酯",
+            "VEC"
+          ],
+          [
+            "硫酸乙烯酯",
+            "DTD"
+          ],
+          [
+            "乙氧基（五氟）环三磷腈",
+            "NPCF"
+          ],
+          [
+            "三（三甲基硅烷）硼酸酯",
+            "TMSB"
+          ],
+          [
+            "乙二醇（双丙腈）醚",
+            "DENE"
+          ],
+          [
+            "游艇码头"
+          ],
+          [
+            "酒店"
+          ]
+        ],
+        "source_substance": "Complete current product/service matrix and subsidiary operating actors;full current seven additives,native parentheses/form. Product technologies retain status and uses not sales."
+      },
+      "revenue_model": {
+        "pages": [
+          11,
+          15,
+          16,
+          18,
+          101,
+          157,
+          199
+        ],
+        "required_groups": [
+          [
+            "电磁线"
+          ],
+          [
+            "房地产"
+          ],
+          [
+            "新能源",
+            "添加剂"
+          ],
+          [
+            "服务",
+            "酒店"
+          ],
+          [
+            "直销"
+          ],
+          [
+            "年度供货框架协议"
+          ],
+          [
+            "订单"
+          ],
+          [
+            "基准铜价"
+          ],
+          [
+            "加工费"
+          ],
+          [
+            "租金",
+            "租赁",
+            "出租"
+          ],
+          [
+            "土地一级开发",
+            "一级土地开发"
+          ],
+          [
+            "清算补偿"
+          ]
+        ],
+        "source_substance": "Actual multi-business revenue, wire direct order/framework/copper-base-plus-processing-fee pricing,property sale/land development compensation/rental and additive/service income;native financial bases overlap,not summed. General control-transfer policy not channel."
+      }
+    }
+  },
+  "source_rows": {
+    "600029.SH": [
+      {
+        "dimension": "product",
+        "name": "客运及客运相关服务",
+        "value": "156,688",
+        "unit": "百万元",
+        "page": 22,
+        "column": "营业收入",
+        "header": null,
+        "reported_period": "2025-12-31",
+        "source_actor": "本集团/公司及合并子公司",
+        "source_quote": "客运及客运相关服务156,688",
+        "unit_basis_page": 22,
+        "qualifier": null
+      },
+      {
+        "dimension": "product",
+        "name": "货运及邮运",
+        "value": "19,670",
+        "unit": "百万元",
+        "page": 22,
+        "column": "营业收入",
+        "header": null,
+        "reported_period": "2025-12-31",
+        "source_actor": "本集团/公司及合并子公司",
+        "source_quote": "货运及邮运 19,670 13,749 30.10 5.22 12.48 减少 4.51",
+        "unit_basis_page": 22,
+        "qualifier": null
+      },
+      {
+        "dimension": "region",
+        "name": "国内",
+        "value": "116,493",
+        "unit": "百万元",
+        "page": 22,
+        "column": "营业收入",
+        "header": "主营业务收入",
+        "reported_period": "2025-12-31",
+        "source_actor": "本集团/公司及合并子公司",
+        "source_quote": "国内 116,493 / / 0.16 / / ",
+        "unit_basis_page": 22,
+        "qualifier": null
+      },
+      {
+        "dimension": "region",
+        "name": "港澳台地区",
+        "value": "2,262",
+        "unit": "百万元",
+        "page": 22,
+        "column": "营业收入",
+        "header": "主营业务收入",
+        "reported_period": "2025-12-31",
+        "source_actor": "本集团/公司及合并子公司",
+        "source_quote": "港澳台地区 2,262  / / 8.85 / / ",
+        "unit_basis_page": 22,
+        "qualifier": null
+      },
+      {
+        "dimension": "region",
+        "name": "国际",
+        "value": "57,603",
+        "unit": "百万元",
+        "page": 22,
+        "column": "营业收入",
+        "header": "主营业务收入",
+        "reported_period": "2025-12-31",
+        "source_actor": "本集团/公司及合并子公司",
+        "source_quote": "国际 57,603  / / 15.15 / / ",
+        "unit_basis_page": 22,
+        "qualifier": null
+      },
+      {
+        "dimension": "trade",
+        "name": "普通快消品及食品贸易",
+        "value": "60",
+        "unit": "百万元",
+        "page": 24,
+        "column": "本期营业收入",
+        "header": null,
+        "reported_period": "2025-12-31",
+        "source_actor": "本集团/公司及合并子公司",
+        "source_quote": "主要是开展各类普通快消品及食品\n等贸易业务 60 67 （10.45）",
+        "unit_basis_page": 24,
+        "qualifier": null
+      },
+      {
+        "dimension": "business_type",
+        "name": "主营业务收入",
+        "value": "176,358",
+        "unit": "百万元",
+        "page": 177,
+        "column": "2025年",
+        "header": "营业收入",
+        "reported_period": "2025-12-31",
+        "source_actor": "本集团/公司及合并子公司",
+        "source_quote": "主营业务收入(a)176,358",
+        "unit_basis_page": 177,
+        "qualifier": null
+      },
+      {
+        "dimension": "business_type",
+        "name": "其他业务收入",
+        "value": "5,898",
+        "unit": "百万元",
+        "page": 177,
+        "column": "2025年",
+        "header": "营业收入",
+        "reported_period": "2025-12-31",
+        "source_actor": "本集团/公司及合并子公司",
+        "source_quote": "其他业务收入(b)5,898",
+        "unit_basis_page": 177,
+        "qualifier": null
+      },
+      {
+        "dimension": "product",
+        "name": "酒店及旅游业务",
+        "value": "778",
+        "unit": "百万元",
+        "page": 178,
+        "column": "营业收入",
+        "header": "其他业务收入",
+        "reported_period": "2025-12-31",
+        "source_actor": "本集团/公司及合并子公司",
+        "source_quote": "酒店及旅游业务 778  566  832  827 ",
+        "unit_basis_page": 178,
+        "qualifier": null
+      },
+      {
+        "dimension": "product",
+        "name": "航空配餐业务",
+        "value": "608",
+        "unit": "百万元",
+        "page": 178,
+        "column": "营业收入",
+        "header": "其他业务收入",
+        "reported_period": "2025-12-31",
+        "source_actor": "本集团/公司及合并子公司",
+        "source_quote": "航空配餐业务 608  539  535  477 ",
+        "unit_basis_page": 178,
+        "qualifier": null
+      },
+      {
+        "dimension": "product",
+        "name": "其他",
+        "value": "4,512",
+        "unit": "百万元",
+        "page": 178,
+        "column": "营业收入",
+        "header": "其他业务收入",
+        "reported_period": "2025-12-31",
+        "source_actor": "本集团/公司及合并子公司",
+        "source_quote": "其他 4,512  2,019  4,451  2,120 ",
+        "unit_basis_page": 178,
+        "qualifier": null
+      },
+      {
+        "dimension": "contract_type",
+        "name": "运输服务收入",
+        "value": "173,314",
+        "unit": "百万元",
+        "page": 178,
+        "column": "营业收入",
+        "header": "合同产生的收入",
+        "reported_period": "2025-12-31",
+        "source_actor": "本集团/公司及合并子公司",
+        "source_quote": "与客户间的运输合同产生的运输   \n服务收入 173,314  165,145",
+        "unit_basis_page": 178,
+        "qualifier": null
+      },
+      {
+        "dimension": "contract_type",
+        "name": "其他提供劳务或销售商品收入",
+        "value": "8,447",
+        "unit": "百万元",
+        "page": 178,
+        "column": "营业收入",
+        "header": "合同产生的收入",
+        "reported_period": "2025-12-31",
+        "source_actor": "本集团/公司及合并子公司",
+        "source_quote": "其他提供劳务或销售商品收入 8,447  8,693 ",
+        "unit_basis_page": 178,
+        "qualifier": null
+      },
+      {
+        "dimension": "product",
+        "name": "客运",
+        "value": "153,644",
+        "unit": "百万元",
+        "page": 179,
+        "column": "营业收入",
+        "header": "主营业务收入",
+        "reported_period": "2025-12-31",
+        "source_actor": "本集团/公司及合并子公司",
+        "source_quote": "客运  153,644  146,450",
+        "unit_basis_page": 179,
+        "qualifier": null
+      },
+      {
+        "dimension": "product",
+        "name": "其他",
+        "value": "3,044",
+        "unit": "百万元",
+        "page": 179,
+        "column": "营业收入",
+        "header": "主营业务收入",
+        "reported_period": "2025-12-31",
+        "source_actor": "本集团/公司及合并子公司",
+        "source_quote": "其他  3,044  3,261",
+        "unit_basis_page": 179,
+        "qualifier": null
+      },
+      {
+        "dimension": "report_segment",
+        "name": "航空营运业务分部",
+        "value": "179,834",
+        "unit": "百万元",
+        "page": 199,
+        "column": "对外交易收入",
+        "header": "对外交易收入",
+        "reported_period": "2025-12-31",
+        "source_actor": "本集团/公司及合并子公司",
+        "source_quote": "对外交易收入 179,834 171,829  2,422 2,395  - -  - -  182,256 174,224 ",
+        "unit_basis_page": 199,
+        "qualifier": null
+      },
+      {
+        "dimension": "report_segment",
+        "name": "其他业务分部",
+        "value": "2,422",
+        "unit": "百万元",
+        "page": 199,
+        "column": "对外交易收入",
+        "header": "对外交易收入",
+        "reported_period": "2025-12-31",
+        "source_actor": "本集团/公司及合并子公司",
+        "source_quote": "对外交易收入 179,834 171,829  2,422 2,395  - -  - -  182,256 174,224 ",
+        "unit_basis_page": 199,
+        "qualifier": null
+      },
+      {
+        "dimension": "report_segment",
+        "name": "航空营运业务分部",
+        "value": "815",
+        "unit": "百万元",
+        "page": 199,
+        "column": "分部间交易收入",
+        "header": "分部间交易收入",
+        "reported_period": "2025-12-31",
+        "source_actor": "本集团/公司及合并子公司",
+        "source_quote": "分部间交易收入 815 595  7,303 6,009  (8,118) (6,604)  - -  - - ",
+        "unit_basis_page": 199,
+        "qualifier": null
+      },
+      {
+        "dimension": "report_segment",
+        "name": "其他业务分部",
+        "value": "7,303",
+        "unit": "百万元",
+        "page": 199,
+        "column": "分部间交易收入",
+        "header": "分部间交易收入",
+        "reported_period": "2025-12-31",
+        "source_actor": "本集团/公司及合并子公司",
+        "source_quote": "分部间交易收入 815 595  7,303 6,009  (8,118) (6,604)  - -  - - ",
+        "unit_basis_page": 199,
+        "qualifier": null
+      },
+      {
+        "dimension": "region",
+        "name": "中国大陆",
+        "value": "122,391",
+        "unit": "百万元",
+        "page": 200,
+        "column": "营业收入",
+        "header": "对外交易收入",
+        "reported_period": "2025-12-31",
+        "source_actor": "本集团/公司及合并子公司",
+        "source_quote": "其中：中国大陆 122,391  122,121",
+        "unit_basis_page": 200,
+        "qualifier": "中国地区子项;中国124,653包含大陆及港澳台,不重复累计"
+      },
+      {
+        "dimension": "region",
+        "name": "港澳台地区",
+        "value": "2,262",
+        "unit": "百万元",
+        "page": 200,
+        "column": "营业收入",
+        "header": "对外交易收入",
+        "reported_period": "2025-12-31",
+        "source_actor": "本集团/公司及合并子公司",
+        "source_quote": "港澳台地区 2,262  2,078 ",
+        "unit_basis_page": 200,
+        "qualifier": null
+      },
+      {
+        "dimension": "region",
+        "name": "国际",
+        "value": "57,603",
+        "unit": "百万元",
+        "page": 200,
+        "column": "营业收入",
+        "header": "对外交易收入",
+        "reported_period": "2025-12-31",
+        "source_actor": "本集团/公司及合并子公司",
+        "source_quote": "国际 57,603  50,025 ",
+        "unit_basis_page": 200,
+        "qualifier": null
+      }
+    ],
+    "600067.SH": [
+      {
+        "dimension": "industry",
+        "name": "工业",
+        "value": "7,377,841,016.99",
+        "unit": "元",
+        "page": 18,
+        "column": "营业收入",
+        "header": null,
+        "reported_period": "2025-12-31",
+        "source_actor": "本集团/公司及合并子公司",
+        "source_quote": "工业 7,377,841,016.99 6,886,086,260.36 6.67 12.99 12.66 增加 0.28",
+        "unit_basis_page": 17,
+        "qualifier": null
+      },
+      {
+        "dimension": "industry",
+        "name": "房地产业",
+        "value": "4,560,761,250.63",
+        "unit": "元",
+        "page": 18,
+        "column": "营业收入",
+        "header": null,
+        "reported_period": "2025-12-31",
+        "source_actor": "本集团/公司及合并子公司",
+        "source_quote": "房地产业 4,560,761,250.63 3,982,875,259.41 12.67 210.02 261.94 减少 12.53",
+        "unit_basis_page": 17,
+        "qualifier": null
+      },
+      {
+        "dimension": "industry",
+        "name": "服务业",
+        "value": "112,691,930.88",
+        "unit": "元",
+        "page": 18,
+        "column": "营业收入",
+        "header": null,
+        "reported_period": "2025-12-31",
+        "source_actor": "本集团/公司及合并子公司",
+        "source_quote": "服务业 112,691,930.88 131,367,128.30 -16.57 12.30 8.46 增加 4.13",
+        "unit_basis_page": 17,
+        "qualifier": null
+      },
+      {
+        "dimension": "product",
+        "name": "电磁线",
+        "value": "7,345,383,039.55",
+        "unit": "元",
+        "page": 18,
+        "column": "营业收入",
+        "header": "主营业务收入",
+        "reported_period": "2025-12-31",
+        "source_actor": "本集团/公司及合并子公司",
+        "source_quote": "电磁线 7,345,383,039.55 6,844,898,350.37 6.81 13.10 12.83 增加 0.22",
+        "unit_basis_page": 17,
+        "qualifier": null
+      },
+      {
+        "dimension": "product",
+        "name": "房地产开发与销售",
+        "value": "4,560,761,250.63",
+        "unit": "元",
+        "page": 18,
+        "column": "营业收入",
+        "header": "主营业务收入",
+        "reported_period": "2025-12-31",
+        "source_actor": "本集团/公司及合并子公司",
+        "source_quote": "房地产开发与销售4,560,761,250.63",
+        "unit_basis_page": 17,
+        "qualifier": null
+      },
+      {
+        "dimension": "product",
+        "name": "其他",
+        "value": "145,149,908.32",
+        "unit": "元",
+        "page": 18,
+        "column": "营业收入",
+        "header": "主营业务收入",
+        "reported_period": "2025-12-31",
+        "source_actor": "本集团/公司及合并子公司",
+        "source_quote": "其他 145,149,908.32 172,555,038.29 -18.88 7.06 3.28 增加 4.35",
+        "unit_basis_page": 17,
+        "qualifier": null
+      },
+      {
+        "dimension": "region",
+        "name": "东北地区",
+        "value": "129,518,891.35",
+        "unit": "元",
+        "page": 18,
+        "column": "营业收入",
+        "header": "主营业务收入",
+        "reported_period": "2025-12-31",
+        "source_actor": "本集团/公司及合并子公司",
+        "source_quote": "东北地区 129,518,891.35 120,619,938.06 6.87 13.51 13.31 增加 0.16",
+        "unit_basis_page": 17,
+        "qualifier": null
+      },
+      {
+        "dimension": "region",
+        "name": "西北地区",
+        "value": "69,341,467.09",
+        "unit": "元",
+        "page": 18,
+        "column": "营业收入",
+        "header": "主营业务收入",
+        "reported_period": "2025-12-31",
+        "source_actor": "本集团/公司及合并子公司",
+        "source_quote": "西北地区 69,341,467.09 64,599,642.16 6.84 393.67 392.06 增加 0.31",
+        "unit_basis_page": 17,
+        "qualifier": null
+      },
+      {
+        "dimension": "region",
+        "name": "华南地区",
+        "value": "228,821,539.68",
+        "unit": "元",
+        "page": 18,
+        "column": "营业收入",
+        "header": "主营业务收入",
+        "reported_period": "2025-12-31",
+        "source_actor": "本集团/公司及合并子公司",
+        "source_quote": "华南地区 228,821,539.68 215,837,150.52 5.67 -50.10 -49.77 减少 0.62",
+        "unit_basis_page": 17,
+        "qualifier": null
+      },
+      {
+        "dimension": "region",
+        "name": "华中地区",
+        "value": "814,650,658.62",
+        "unit": "元",
+        "page": 18,
+        "column": "营业收入",
+        "header": "主营业务收入",
+        "reported_period": "2025-12-31",
+        "source_actor": "本集团/公司及合并子公司",
+        "source_quote": "华中地区 814,650,658.62 760,286,745.46 6.67 42.59 42.14 增加 0.29",
+        "unit_basis_page": 17,
+        "qualifier": null
+      },
+      {
+        "dimension": "region",
+        "name": "华北地区",
+        "value": "4,595,726,672.31",
+        "unit": "元",
+        "page": 18,
+        "column": "营业收入",
+        "header": "主营业务收入",
+        "reported_period": "2025-12-31",
+        "source_actor": "本集团/公司及合并子公司",
+        "source_quote": "华北地区 4,595,726,672.31 4,020,530,121.73 12.52 217.14 271.79 减少 12.85",
+        "unit_basis_page": 17,
+        "qualifier": null
+      },
+      {
+        "dimension": "region",
+        "name": "华东地区",
+        "value": "5,564,241,568.37",
+        "unit": "元",
+        "page": 18,
+        "column": "营业收入",
+        "header": "主营业务收入",
+        "reported_period": "2025-12-31",
+        "source_actor": "本集团/公司及合并子公司",
+        "source_quote": "华东地区 5,564,241,568.37 5,196,258,622.47 6.61 12.97 12.48 增加 0.41",
+        "unit_basis_page": 17,
+        "qualifier": null
+      },
+      {
+        "dimension": "region",
+        "name": "西南地区",
+        "value": "430,982,305.62",
+        "unit": "元",
+        "page": 18,
+        "column": "营业收入",
+        "header": "主营业务收入",
+        "reported_period": "2025-12-31",
+        "source_actor": "本集团/公司及合并子公司",
+        "source_quote": "西南地区 430,982,305.62 403,016,361.26 6.49 11.65 11.61 增加 0.03",
+        "unit_basis_page": 17,
+        "qualifier": null
+      },
+      {
+        "dimension": "region",
+        "name": "境外",
+        "value": "218,011,095.46",
+        "unit": "元",
+        "page": 18,
+        "column": "营业收入",
+        "header": "主营业务收入",
+        "reported_period": "2025-12-31",
+        "source_actor": "本集团/公司及合并子公司",
+        "source_quote": "境外 218,011,095.46 219,180,066.41 -0.54 19.35 16.87 增加 2.13",
+        "unit_basis_page": 17,
+        "qualifier": null
+      },
+      {
+        "dimension": "sales_mode",
+        "name": "直销",
+        "value": "12,051,294,198.50",
+        "unit": "元",
+        "page": 18,
+        "column": "营业收入",
+        "header": null,
+        "reported_period": "2025-12-31",
+        "source_actor": "本集团/公司及合并子公司",
+        "source_quote": "直销 12,051,294,198.50 11,000,328,648.07 8.72 48.76 49.99 减少 0.75",
+        "unit_basis_page": 17,
+        "qualifier": null
+      },
+      {
+        "dimension": "business_type",
+        "name": "主营业务",
+        "value": "12,051,294,198.50",
+        "unit": "元",
+        "page": 157,
+        "column": "收入",
+        "header": "营业收入",
+        "reported_period": "2025-12-31",
+        "source_actor": "本集团/公司及合并子公司",
+        "source_quote": "主营业务 12,051,294,198.50 11,000,328,648.07 8,101,184,553.68 7,333,976,952.40",
+        "unit_basis_page": 156,
+        "qualifier": null
+      },
+      {
+        "dimension": "business_type",
+        "name": "其他业务",
+        "value": "338,973,509.00",
+        "unit": "元",
+        "page": 157,
+        "column": "收入",
+        "header": "营业收入",
+        "reported_period": "2025-12-31",
+        "source_actor": "本集团/公司及合并子公司",
+        "source_quote": "其他业务 338,973,509.00 183,624,140.29 348,202,163.79 186,466,516.05",
+        "unit_basis_page": 156,
+        "qualifier": null
+      },
+      {
+        "dimension": "product",
+        "name": "电磁线",
+        "value": "7,579,621,351.62",
+        "unit": "元",
+        "page": 157,
+        "column": "合计/营业收入",
+        "header": "全部营业收入/商品类型",
+        "reported_period": "2025-12-31",
+        "source_actor": "本集团/公司及合并子公司",
+        "source_quote": "电磁线 7,579,621,351.62 6,973,215,976.01 7,579,621,351.62 6,973,215,976.01",
+        "unit_basis_page": 157,
+        "qualifier": null
+      },
+      {
+        "dimension": "product",
+        "name": "房地产开发与销售",
+        "value": "4,660,122,772.99",
+        "unit": "元",
+        "page": 157,
+        "column": "合计/营业收入",
+        "header": "全部营业收入/商品类型",
+        "reported_period": "2025-12-31",
+        "source_actor": "本集团/公司及合并子公司",
+        "source_quote": "房地产开发与销售 4,660,122,772.99 4,034,403,239.33 4,660,122,772.99 4,034,403,239.33",
+        "unit_basis_page": 157,
+        "qualifier": null
+      },
+      {
+        "dimension": "product",
+        "name": "新能源",
+        "value": "34,316,069.54",
+        "unit": "元",
+        "page": 157,
+        "column": "合计/营业收入",
+        "header": "全部营业收入/商品类型",
+        "reported_period": "2025-12-31",
+        "source_actor": "本集团/公司及合并子公司",
+        "source_quote": "新能源 34,316,069.54 42,740,350.28 34,316,069.54 42,740,350.28",
+        "unit_basis_page": 157,
+        "qualifier": null
+      },
+      {
+        "dimension": "product",
+        "name": "服务",
+        "value": "116,207,513.35",
+        "unit": "元",
+        "page": 157,
+        "column": "合计/营业收入",
+        "header": "全部营业收入/商品类型",
+        "reported_period": "2025-12-31",
+        "source_actor": "本集团/公司及合并子公司",
+        "source_quote": "服务 116,207,513.35 133,593,222.74 116,207,513.35 133,593,222.74",
+        "unit_basis_page": 157,
+        "qualifier": null
+      },
+      {
+        "dimension": "region",
+        "name": "华南地区",
+        "value": "229,726,846.59",
+        "unit": "元",
+        "page": 157,
+        "column": "合计/营业收入",
+        "header": "全部营业收入/经营地区",
+        "reported_period": "2025-12-31",
+        "source_actor": "本集团/公司及合并子公司",
+        "source_quote": "华南地区222,799,123.78208,189,954.156,927,722.818,067,093.81229,726,846.59",
+        "unit_basis_page": 157,
+        "qualifier": null
+      },
+      {
+        "dimension": "region",
+        "name": "华中地区",
+        "value": "814,650,658.62",
+        "unit": "元",
+        "page": 157,
+        "column": "合计/营业收入",
+        "header": "全部营业收入/经营地区",
+        "reported_period": "2025-12-31",
+        "source_actor": "本集团/公司及合并子公司",
+        "source_quote": "华中地区805,937,813.43750,336,625.788,712,845.199,950,119.68814,650,658.62",
+        "unit_basis_page": 157,
+        "qualifier": null
+      },
+      {
+        "dimension": "region",
+        "name": "华北地区",
+        "value": "4,682,675,333.26",
+        "unit": "元",
+        "page": 157,
+        "column": "合计/营业收入",
+        "header": "全部营业收入/经营地区",
+        "reported_period": "2025-12-31",
+        "source_actor": "本集团/公司及合并子公司",
+        "source_quote": "华北地区116,689,484.08108,961,612.864,548,595,885.443,931,452,208.8517,389,963.7416,943,016.764,682,675,333.26",
+        "unit_basis_page": 157,
+        "qualifier": null
+      },
+      {
+        "dimension": "region",
+        "name": "华东地区",
+        "value": "5,811,876,345.16",
+        "unit": "元",
+        "page": 157,
+        "column": "合计/营业收入",
+        "header": "全部营业收入/经营地区",
+        "reported_period": "2025-12-31",
+        "source_actor": "本集团/公司及合并子公司",
+        "source_quote": "华东地区5,684,258,419.815,206,095,343.86111,526,887.55102,951,030.4816,091,037.8031,591,438.235,811,876,345.16",
+        "unit_basis_page": 157,
+        "qualifier": null
+      },
+      {
+        "dimension": "region",
+        "name": "西南地区",
+        "value": "430,982,305.62",
+        "unit": "元",
+        "page": 157,
+        "column": "合计/营业收入",
+        "header": "全部营业收入/经营地区",
+        "reported_period": "2025-12-31",
+        "source_actor": "本集团/公司及合并子公司",
+        "source_quote": "西南地区427,859,664.04399,225,506.043,122,641.583,790,855.22430,982,305.62",
+        "unit_basis_page": 157,
+        "qualifier": null
+      },
+      {
+        "dimension": "region",
+        "name": "境外",
+        "value": "221,495,859.81",
+        "unit": "元",
+        "page": 157,
+        "column": "合计/营业收入",
+        "header": "全部营业收入/经营地区",
+        "reported_period": "2025-12-31",
+        "source_actor": "本集团/公司及合并子公司",
+        "source_quote": "境外123,216,488.04115,187,353.1098,279,371.77105,991,049.32221,495,859.81",
+        "unit_basis_page": 157,
+        "qualifier": null
+      },
+      {
+        "dimension": "report_segment",
+        "name": "电磁线",
+        "value": "7,579,621,351.62",
+        "unit": "元",
+        "page": 199,
+        "column": "营业收入",
+        "header": "营业收入",
+        "reported_period": "2025-12-31",
+        "source_actor": "本集团/公司及合并子公司",
+        "source_quote": "一、营业收入 7,579,621,351.62 4,667,400,724.16 164,459,011.21 -21,213,379.49 12,390,267,707.50",
+        "unit_basis_page": 199,
+        "qualifier": null
+      },
+      {
+        "dimension": "report_segment",
+        "name": "房地产",
+        "value": "4,667,400,724.16",
+        "unit": "元",
+        "page": 199,
+        "column": "营业收入",
+        "header": "营业收入",
+        "reported_period": "2025-12-31",
+        "source_actor": "本集团/公司及合并子公司",
+        "source_quote": "一、营业收入 7,579,621,351.62 4,667,400,724.16 164,459,011.21 -21,213,379.49 12,390,267,707.50",
+        "unit_basis_page": 199,
+        "qualifier": null
+      },
+      {
+        "dimension": "report_segment",
+        "name": "其他",
+        "value": "164,459,011.21",
+        "unit": "元",
+        "page": 199,
+        "column": "营业收入",
+        "header": "营业收入",
+        "reported_period": "2025-12-31",
+        "source_actor": "本集团/公司及合并子公司",
+        "source_quote": "一、营业收入 7,579,621,351.62 4,667,400,724.16 164,459,011.21 -21,213,379.49 12,390,267,707.50",
+        "unit_basis_page": 199,
+        "qualifier": null
+      },
+      {
+        "dimension": "report_segment",
+        "name": "电磁线",
+        "value": "7,579,621,351.62",
+        "unit": "元",
+        "page": 199,
+        "column": "对外交易收入",
+        "header": "对外交易收入",
+        "reported_period": "2025-12-31",
+        "source_actor": "本集团/公司及合并子公司",
+        "source_quote": "其中：对外交易收入 7,579,621,351.62 4,660,122,772.99 150,523,582.89 12,390,267,707.50",
+        "unit_basis_page": 199,
+        "qualifier": null
+      },
+      {
+        "dimension": "report_segment",
+        "name": "房地产",
+        "value": "4,660,122,772.99",
+        "unit": "元",
+        "page": 199,
+        "column": "对外交易收入",
+        "header": "对外交易收入",
+        "reported_period": "2025-12-31",
+        "source_actor": "本集团/公司及合并子公司",
+        "source_quote": "其中：对外交易收入 7,579,621,351.62 4,660,122,772.99 150,523,582.89 12,390,267,707.50",
+        "unit_basis_page": 199,
+        "qualifier": null
+      },
+      {
+        "dimension": "report_segment",
+        "name": "其他",
+        "value": "150,523,582.89",
+        "unit": "元",
+        "page": 199,
+        "column": "对外交易收入",
+        "header": "对外交易收入",
+        "reported_period": "2025-12-31",
+        "source_actor": "本集团/公司及合并子公司",
+        "source_quote": "其中：对外交易收入 7,579,621,351.62 4,660,122,772.99 150,523,582.89 12,390,267,707.50",
+        "unit_basis_page": 199,
+        "qualifier": null
+      },
+      {
+        "dimension": "report_segment",
+        "name": "房地产",
+        "value": "7,277,951.17",
+        "unit": "元",
+        "page": 199,
+        "column": "分部间交易收入",
+        "header": "分部间交易收入",
+        "reported_period": "2025-12-31",
+        "source_actor": "本集团/公司及合并子公司",
+        "source_quote": "分部间交易收入 7,277,951.17 13,935,428.32 -21,213,379.49",
+        "unit_basis_page": 199,
+        "qualifier": null
+      },
+      {
+        "dimension": "report_segment",
+        "name": "其他",
+        "value": "13,935,428.32",
+        "unit": "元",
+        "page": 199,
+        "column": "分部间交易收入",
+        "header": "分部间交易收入",
+        "reported_period": "2025-12-31",
+        "source_actor": "本集团/公司及合并子公司",
+        "source_quote": "分部间交易收入 7,277,951.17 13,935,428.32 -21,213,379.49",
+        "unit_basis_page": 199,
+        "qualifier": null
+      }
+    ]
+  },
+  "native_roles": [
+    {
+      "instrument_id": "600029.SH",
+      "name": "航油",
+      "role": "energy_consumption",
+      "native_aliases": [
+        "航油",
+        "航空煤油",
+        "燃油"
+      ],
+      "page": 35,
+      "source_quote": "虽然本集团已采用各种节油措施降低航油消耗量",
+      "source_actor": "本集团",
+      "reported_period": "2025-12-31",
+      "source_actions": [
+        "purchases"
+      ],
+      "source_relation_types": [
+        "material_input"
+      ],
+      "source_verb": "消耗",
+      "action_source_basis": "Actual group aviation fuel use. Consumption relationship does not imply external purchase;separate affirmative purchase clause exists.",
+      "quantity_acceptance": "Role/action only;no quantity/price/cost expansion. Native transaction money remains evidence, never inferred physical volume or price."
+    },
+    {
+      "instrument_id": "600029.SH",
+      "name": "航油",
+      "role": "raw_material_input",
+      "native_aliases": [
+        "航油",
+        "航空煤油",
+        "燃油"
+      ],
+      "page": 35,
+      "source_quote": "本集团大部分的航油消耗须以中国现货巿场价格在国内购买",
+      "source_actor": "本集团",
+      "reported_period": "2025-12-31",
+      "source_actions": [
+        "purchases"
+      ],
+      "source_relation_types": [],
+      "source_verb": "购买",
+      "action_source_basis": "Explicit domestic fuel purchase separately from use.",
+      "quantity_acceptance": "Role/action only;no quantity/price/cost expansion. Native transaction money remains evidence, never inferred physical volume or price."
+    },
+    {
+      "instrument_id": "600029.SH",
+      "name": "航材",
+      "role": "raw_material_input",
+      "native_aliases": [
+        "航材",
+        "航空器材",
+        "维修材料"
+      ],
+      "page": 205,
+      "source_quote": "采购维修材料费是指就广州飞机维修工程向本集团出售飞机维护及维修所\n需的航材而向其支付的费用",
+      "source_actor": "本集团",
+      "reported_period": "2025-12-31",
+      "source_actions": [
+        "purchases"
+      ],
+      "source_relation_types": [],
+      "source_verb": "采购",
+      "action_source_basis": "p203 actual procurement table andp205/206 reverse seller direction prove group purchase, not group sells.",
+      "quantity_acceptance": "Role/action only;no quantity/price/cost expansion. Native transaction money remains evidence, never inferred physical volume or price."
+    },
+    {
+      "instrument_id": "600029.SH",
+      "name": "航空配餐",
+      "role": "raw_material_input",
+      "native_aliases": [
+        "航空配餐",
+        "配餐"
+      ],
+      "page": 203,
+      "source_quote": "深圳航食 采购商品  航空配餐费",
+      "source_actor": "本集团",
+      "reported_period": "2025-12-31",
+      "source_actions": [
+        "purchases"
+      ],
+      "source_relation_types": [],
+      "source_verb": "采购",
+      "action_source_basis": "Native actual group purchase content,not supplier name.",
+      "quantity_acceptance": "Role/action only;no quantity/price/cost expansion. Native transaction money remains evidence, never inferred physical volume or price."
+    },
+    {
+      "instrument_id": "600029.SH",
+      "name": "文创产品",
+      "role": "raw_material_input",
+      "native_aliases": [
+        "文创产品"
+      ],
+      "page": 205,
+      "source_quote": "广告制作代理、宣传服务费和文创产品采购费",
+      "source_actor": "本集团",
+      "reported_period": "2025-12-31",
+      "source_actions": [
+        "purchases"
+      ],
+      "source_relation_types": [],
+      "source_verb": "采购",
+      "action_source_basis": "Named procurement object confirmed byp203 actual fee,not advertising amount assigned wholly to goods.",
+      "quantity_acceptance": "Role/action only;no quantity/price/cost expansion. Native transaction money remains evidence, never inferred physical volume or price."
+    },
+    {
+      "instrument_id": "600029.SH",
+      "name": "航材",
+      "role": "product_sales",
+      "native_aliases": [
+        "航材",
+        "航空器材"
+      ],
+      "page": 208,
+      "source_quote": "航材销售收入是指本集团向中国航空器材销售航空器材的收入",
+      "source_actor": "本集团",
+      "reported_period": "2025-12-31",
+      "source_actions": [
+        "sells"
+      ],
+      "source_relation_types": [],
+      "source_verb": "销售",
+      "action_source_basis": "p207 actual销售商品 product column andp208 group action;counterparty not object.",
+      "quantity_acceptance": "Role/action only;no quantity/price/cost expansion. Native transaction money remains evidence, never inferred physical volume or price."
+    },
+    {
+      "instrument_id": "600029.SH",
+      "name": "航空配餐",
+      "role": "product_sales",
+      "native_aliases": [
+        "航空配餐",
+        "配餐"
+      ],
+      "page": 207,
+      "source_quote": "深圳航食 销售商品 航空配餐 (vi)  5  6",
+      "source_actor": "本集团",
+      "reported_period": "2025-12-31",
+      "source_actions": [
+        "sells"
+      ],
+      "source_relation_types": [],
+      "source_verb": "销售",
+      "action_source_basis": "Current group goods sale column distinguishes catering service and goods.",
+      "quantity_acceptance": "Role/action only;no quantity/price/cost expansion. Native transaction money remains evidence, never inferred physical volume or price."
+    },
+    {
+      "instrument_id": "600029.SH",
+      "name": "普通快消品",
+      "role": "product_sales",
+      "native_aliases": [
+        "普通快消品",
+        "快消品"
+      ],
+      "page": 24,
+      "source_quote": "主要是开展各类普通快消品及食品\n等贸易业务 60",
+      "source_actor": "本集团",
+      "reported_period": "2025-12-31",
+      "source_actions": [
+        "sells"
+      ],
+      "source_relation_types": [],
+      "source_verb": "销售",
+      "action_source_basis": "Positive current trade-income row;native generic pending,not guessed commodity subtype.",
+      "quantity_acceptance": "Role/action only;no quantity/price/cost expansion. Native transaction money remains evidence, never inferred physical volume or price."
+    },
+    {
+      "instrument_id": "600029.SH",
+      "name": "食品",
+      "role": "product_sales",
+      "native_aliases": [
+        "食品"
+      ],
+      "page": 24,
+      "source_quote": "主要是开展各类普通快消品及食品\n等贸易业务 60",
+      "source_actor": "本集团",
+      "reported_period": "2025-12-31",
+      "source_actions": [
+        "sells"
+      ],
+      "source_relation_types": [],
+      "source_verb": "销售",
+      "action_source_basis": "Named positive trade revenue object,combined income not all assigned to food.",
+      "quantity_acceptance": "Role/action only;no quantity/price/cost expansion. Native transaction money remains evidence, never inferred physical volume or price."
+    },
+    {
+      "instrument_id": "600067.SH",
+      "name": "电磁线",
+      "role": "product_sales",
+      "native_aliases": [
+        "电磁线",
+        "电磁线产品"
+      ],
+      "page": 11,
+      "source_quote": "公司采购铜杆生产加工成电磁线产品销售给客户",
+      "source_actor": "公司",
+      "reported_period": "2025-12-31",
+      "source_actions": [
+        "sells"
+      ],
+      "source_relation_types": [],
+      "source_verb": "销售",
+      "action_source_basis": "Current explicit action plus p19 current sales,p14 period confirmation.",
+      "quantity_acceptance": "Role/action only;no quantity/price/cost expansion. Native transaction money remains evidence, never inferred physical volume or price."
+    },
+    {
+      "instrument_id": "600067.SH",
+      "name": "扁线",
+      "role": "product_sales",
+      "native_aliases": [
+        "扁线",
+        "漆包扁线"
+      ],
+      "page": 13,
+      "source_quote": "报告期内，公司累计实现扁线销售量达 2.13\n万吨",
+      "source_actor": "公司",
+      "reported_period": "2025-12-31",
+      "source_actions": [
+        "sells"
+      ],
+      "source_relation_types": [],
+      "source_verb": "销售",
+      "action_source_basis": "Actual current period sale;technical new products do not imply sale.",
+      "quantity_acceptance": "Role/action only;no quantity/price/cost expansion. Native transaction money remains evidence, never inferred physical volume or price."
+    },
+    {
+      "instrument_id": "600067.SH",
+      "name": "电解液添加剂",
+      "role": "product_sales",
+      "native_aliases": [
+        "电解液添加剂",
+        "锂电池电解液添加剂"
+      ],
+      "page": 15,
+      "source_quote": "公司电解液添加剂业务“量升价跌”，实现产量 422.67 吨，同比增长 35.99%；\n实现销售量 437.18 吨",
+      "source_actor": "公司/福建邵武创鑫",
+      "reported_period": "2025-12-31",
+      "source_actions": [
+        "sells"
+      ],
+      "source_relation_types": [],
+      "source_verb": "销售",
+      "action_source_basis": "Actual period sales,subsidiary producer retained;seven current compounds included in prose only,no per-compound sale inferred.",
+      "quantity_acceptance": "Role/action only;no quantity/price/cost expansion. Native transaction money remains evidence, never inferred physical volume or price."
+    },
+    {
+      "instrument_id": "600067.SH",
+      "name": "铜杆",
+      "role": "raw_material_input",
+      "native_aliases": [
+        "铜杆",
+        "铜"
+      ],
+      "page": 11,
+      "source_quote": "公司采购铜杆生产加工成电磁线产品销售给客户",
+      "source_actor": "公司",
+      "reported_period": "2025-12-31",
+      "source_actions": [
+        "purchases"
+      ],
+      "source_relation_types": [
+        "material_input"
+      ],
+      "source_verb": "采购",
+      "action_source_basis": "Explicit purchase and input relation;p34铜原材料 corroborates;production input never substitutes purchase evidence.",
+      "quantity_acceptance": "Role/action only;no quantity/price/cost expansion. Native transaction money remains evidence, never inferred physical volume or price."
+    },
+    {
+      "instrument_id": "600067.SH",
+      "name": "化妆品",
+      "role": "raw_material_input",
+      "native_aliases": [
+        "化妆品"
+      ],
+      "page": 190,
+      "source_quote": "购化妆品 109,710.00",
+      "source_actor": "公司及合并子公司",
+      "reported_period": "2025-12-31",
+      "source_actions": [
+        "purchases"
+      ],
+      "source_relation_types": [],
+      "source_verb": "购买",
+      "action_source_basis": "Current related procurement table. Existing purchase role does not infer a manufacturing use or raw-material recipe.",
+      "quantity_acceptance": "Role/action only;no quantity/price/cost expansion. Native transaction money remains evidence, never inferred physical volume or price."
+    },
+    {
+      "instrument_id": "600067.SH",
+      "name": "手表",
+      "role": "raw_material_input",
+      "native_aliases": [
+        "手表"
+      ],
+      "page": 190,
+      "source_quote": "购买手表 420,734.34",
+      "source_actor": "公司及合并子公司",
+      "reported_period": "2025-12-31",
+      "source_actions": [
+        "purchases"
+      ],
+      "source_relation_types": [],
+      "source_verb": "购买",
+      "action_source_basis": "Current related procurement table. Existing purchase role does not infer a manufacturing use or raw-material recipe.",
+      "quantity_acceptance": "Role/action only;no quantity/price/cost expansion. Native transaction money remains evidence, never inferred physical volume or price."
+    },
+    {
+      "instrument_id": "600067.SH",
+      "name": "酒",
+      "role": "raw_material_input",
+      "native_aliases": [
+        "酒"
+      ],
+      "page": 190,
+      "source_quote": "购酒 1,651,791.39",
+      "source_actor": "公司及合并子公司",
+      "reported_period": "2025-12-31",
+      "source_actions": [
+        "purchases"
+      ],
+      "source_relation_types": [],
+      "source_verb": "购买",
+      "action_source_basis": "Current related procurement table. Existing purchase role does not infer a manufacturing use or raw-material recipe.",
+      "quantity_acceptance": "Role/action only;no quantity/price/cost expansion. Native transaction money remains evidence, never inferred physical volume or price."
+    },
+    {
+      "instrument_id": "600067.SH",
+      "name": "酒",
+      "role": "product_sales",
+      "native_aliases": [
+        "酒"
+      ],
+      "page": 190,
+      "source_quote": "Bendura Bank AG 售酒 56,316.42",
+      "source_actor": "公司及合并子公司",
+      "reported_period": "2025-12-31",
+      "source_actions": [
+        "sells"
+      ],
+      "source_relation_types": [],
+      "source_verb": "售",
+      "action_source_basis": "Explicit current sale of酒;payment is transaction evidence only.",
+      "quantity_acceptance": "Role/action only;no quantity/price/cost expansion. Native transaction money remains evidence, never inferred physical volume or price."
+    }
+  ],
+  "denominator_method": "New independent full PDF source scope: six substantive answers plus important native income rows/cells with distinct basis and unique explicit commodity roles. Measurements accuracy only. Each actual accepted fact/body judged once;multiple evidence/aliases/parent displays do not duplicate role recalls. Corroborating identical rows and totals/adjustments preserved with hierarchy,not extra recalls.",
+  "negative_check_scope": {
+    "pages": {
+      "600029.SH": [
+        8,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        29,
+        30,
+        31,
+        34,
+        35,
+        98,
+        107,
+        108,
+        122,
+        131,
+        132,
+        133,
+        165,
+        177,
+        178,
+        179,
+        198,
+        199,
+        200,
+        203,
+        204,
+        205,
+        206,
+        207,
+        208,
+        240,
+        241,
+        242
+      ],
+      "600067.SH": [
+        7,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        31,
+        32,
+        33,
+        34,
+        75,
+        77,
+        89,
+        101,
+        104,
+        156,
+        157,
+        174,
+        175,
+        176,
+        177,
+        178,
+        190,
+        198,
+        199,
+        212
+      ]
+    },
+    "constraints": [
+      "Company registered legal scope alone does not prove every role or current sale.",
+      "South counterparty南航集团 is ultimate parent,not consolidated listed group;related table actor本集团 preserved.",
+      "Crown current seven additive product names remain in prose;no per-compound sale inferred solely from product enumeration.",
+      "Crown upstream companies乙二醇/丁烯/碳酸酯类 and downstream电解液 users are industry context,not explicit company input procurement.",
+      "Industry/source technology specifications,automobile/motor/robot uses and供应商铜业name cannot infer own purchased goods.",
+      "Related actual采购 and销售 separated;company purchase must not reverse supplier销售 verb.",
+      "Crown p22trade not applicable;South p24positive trade explicit.",
+      "Income and transaction money not physical quantity/price.",
+      "Full native scope/unit/revenue column and continuation_pages required;parent-company notesp240+/p212 not merged.",
+      "No absence/negative claim beyond actually checked pages."
+    ]
+  },
+  "source_hierarchy_and_corroboration": {
+    "south_hierarchy": {
+      "page": 179,
+      "main_parent": "客运及客运相关服务156,688=客运153,644+其他3,044;货运19,670 independent",
+      "other_parent": "其他业务5,898=778+608+4,512",
+      "segment_income": {
+        "page": 199,
+        "external": [
+          "179,834",
+          "2,422"
+        ],
+        "internal": [
+          "815",
+          "7,303"
+        ],
+        "elimination": "(8,118)"
+      },
+      "region_parent": {
+        "page": 200,
+        "中国": "124,653",
+        "中国大陆": "122,391",
+        "港澳台": "2,262",
+        "国际": "57,603"
+      },
+      "duplicate_corroboration": "p178客运及客运相关156,688/货邮19,670 corroboratep22; no new count. p179 subsidiary-column revenue reconciles to consolidatedp178,not additional income across overlapping dimensions."
+    },
+    "crown_hierarchy": {
+      "page": 199,
+      "operating": [
+        "7,579,621,351.62",
+        "4,667,400,724.16",
+        "164,459,011.21"
+      ],
+      "external": [
+        "7,579,621,351.62",
+        "4,660,122,772.99",
+        "150,523,582.89"
+      ],
+      "internal": [
+        null,
+        "7,277,951.17",
+        "13,935,428.32"
+      ],
+      "elimination": "-21,213,379.49",
+      "total": "12,390,267,707.50",
+      "duplicate_corroboration": "p157东北/西北区域全收入等于p18; duplicate confirms scope,not new count. Financial total/products/regions/segment bases not summed."
+    },
+    "excluded_costs_and_volumes": "Cost splits,physical quantity granularity and price projection remain deferred;actual sales volume columns only prove native role;trade/transaction money stays evidence."
+  }
+}
