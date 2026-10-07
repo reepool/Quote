@@ -1,0 +1,15 @@
+{
+  "original_baseline": "v29-protection-baseline.json",
+  "original_baseline_entries": 818,
+  "immutable_historical_entries": 817,
+  "excluded_live_owner_state": {
+    "data/checkpoints/company_profile_common_core/control/task_control.json": {
+      "pre_execution_sha256": "007833ac608ea4eba7aaf769a5e00a9addd28366da853b45073450edf481d02d",
+      "owner": "CompanyProfileTaskControl",
+      "implementation": "research/company_profile/operations.py:321",
+      "reason": "Current task control state is updated by the authorized run owner for each company. It is not an historical report or first-formal artifact; its pre-execution digest remains recorded in the original immutable baseline."
+    }
+  },
+  "original_baseline_unchanged": true,
+  "historical_and_first_artifact_exceptions": []
+}

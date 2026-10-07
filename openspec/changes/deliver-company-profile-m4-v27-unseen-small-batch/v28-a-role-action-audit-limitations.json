@@ -1,0 +1,18 @@
+{
+  "created_at": "2026-10-07T07:57:37.774919+00:00",
+  "audit": "A-role: group sales action semantics still accepts 不从事煤炭销售 and 拟开展煤炭销售 on complete owner and independent PDF p203.",
+  "original_v28_result": {
+    "recall": "48/49",
+    "accuracy": "93/94",
+    "critical_numeric_errors": 0,
+    "seconds": 199.5768147362396,
+    "tokens": 0
+  },
+  "formal_acceptance": "failed",
+  "original_submission_preserved": true,
+  "prior_next_step_restricted": "The previous submission suggestion to only register a new formal identity is superseded: complete task5.2 action boundary repair before task5.3 v29 first formal execution.",
+  "change_archived": false,
+  "next_batch": "paused",
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false
+}

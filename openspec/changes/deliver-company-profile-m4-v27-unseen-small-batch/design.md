@@ -34,3 +34,9 @@ Non-Goals：量价、成本拆分、行业增强、框架整理、无关旧失�
 首次交付48/49、93/94（初版47/49、92/94及补正轨迹保留），全正文和28收入单元通过，集团煤炭销售唯一受整页母公司所有权说明影响而scope不明。事后局部使用当前动作的明确集团定义绑定direct_source_wording，不改母公司财注表边界，不覆盖正式数据；逆向事后补丁可核对正式执行SHA。局部回归通过不替代新身份正式复验，归档/扩批仍暂停。
 
 代码增长限于现有owned-source选段、解析及assessment稳定边界中的实际业务修复；未触及四个受控门面、未新增owner/模板/抽象或平行执行链。框架整理按本卡明确要求后置，避免为本轮披露形态拆建第二套抽取系统。
+
+## v29 Action Boundary and Formal Round
+
+Keep the existing explicit-current-commodity binding and direct_source_wording group basis. Split the defined group's native activity enumeration and inspect the qualifier governing coal sales, rejecting negative/future branches locally; group identity alone does not imply a current affirmative action. Preserve unaffected sales, actual purchases and energy-use relationships. Complete owner and independent PDF p203 regressions assert accepted raw action and absence of query/export exposure, alongside all six answers,28 income cells and15 positive roles.
+
+The original v28 submission and its suggestion to only connect a new identity remain immutable, with v28-a-role-action-audit-limitations.json superseding that next step. v29 retains the original plan/report versions/cutoff and fixed49-condition substance, with no prefilled accuracy denominator. First execute to second export measures all retries, second-company remaining budget and actual runtime five-stage reused_scope_ids. Review every fact and answered body once, including action/relation and subject basis; Measurement accuracy only. Threshold failures stay preserved.

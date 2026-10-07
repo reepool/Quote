@@ -21,8 +21,12 @@ def fixture(instrument):
     return json.loads(FIXTURE.read_text())[instrument]
 
 
-def test_formal_v28_identity_keeps_all_five_repairs_and_default():
-    identity = {**default_processing_identity(), "revenue_sentence_repair": "v28"}
+@pytest.mark.parametrize("repair_version", ["v28", "v29"])
+def test_formal_identity_keeps_all_five_repairs_and_default(repair_version):
+    identity = {
+        **default_processing_identity(),
+        "revenue_sentence_repair": repair_version,
+    }
     assert "revenue_sentence_repair" not in default_processing_identity()
     assert default_processing_identity()["owned_page_facts"] == "v8"
     for fn in [
@@ -35,10 +39,11 @@ def test_formal_v28_identity_keeps_all_five_repairs_and_default():
         assert fn(identity)
 
 
+@pytest.mark.parametrize("repair_version", ["v28", "v29"])
 @pytest.mark.parametrize("instrument", ["600027.SH", "600066.SH"])
 @pytest.mark.parametrize("page_kind", ["pages", "independent_pages"])
 def test_full_pages_accept_query_export_complete_business(
-    tmp_path, instrument, page_kind
+    tmp_path, instrument, page_kind, repair_version
 ):
     f = fixture(instrument)
     query, exported = _drive(
@@ -46,7 +51,7 @@ def test_full_pages_accept_query_export_complete_business(
         instrument=instrument,
         fixture=f,
         pages=f[page_kind],
-        repair_version="v28",
+        repair_version=repair_version,
     )
     assert query == exported
     raw = {
@@ -312,4 +317,85 @@ def test_full_group_definition_does_not_promote_other_or_planned_sales(
         assert not any(
             x["role"] == "product_sales" and x["source_native_name"] == "煤炭"
             for x in profile["commodity_exposure"]["assessment"]["exposures"]
+        )
+
+
+@pytest.mark.parametrize("page_kind", ["pages", "independent_pages"])
+@pytest.mark.parametrize("repair_version", ["v28", "v29"])
+@pytest.mark.parametrize(
+    "action", ["不从事煤炭销售", "拟开展煤炭销售", "尚未开展煤炭销售", "将开展煤炭销售"]
+)
+def test_complete_group_page_rejects_negated_and_future_sales(
+    tmp_path, page_kind, action, repair_version
+):
+    f = fixture("600027.SH")
+    original = next(p for p in f[page_kind] if p["page"] == 203)
+    assert original["text"].count("煤炭销售") == 1
+    pages = [
+        {**p, "text": p["text"].replace("煤炭销售", action)} if p["page"] == 203 else p
+        for p in f[page_kind]
+    ]
+    query, exported = _drive(
+        tmp_path,
+        instrument="600027.SH",
+        fixture=f,
+        pages=pages,
+        repair_version=repair_version,
+    )
+    assert query == exported
+    for profile in (query, exported):
+        assert not any(
+            x["role"] == "product_sales" and x["source_native_name"] == "煤炭"
+            for x in profile["commodity_exposure"]["assessment"]["exposures"]
+        )
+        assert not any(
+            x["object_type"] == "Activity"
+            and x["source_native_name"] == "煤炭"
+            and x.get("action") == "sells"
+            for x in profile["accepted_facts"]
+        )
+        roles = {
+            (x["source_native_name"], x["role"])
+            for x in profile["commodity_exposure"]["assessment"]["exposures"]
+        }
+        assert ("电力", "product_sales") in roles
+        assert ("热力", "product_sales") in roles
+        assert ("燃料", "product_sales") in roles
+        assert ("煤炭", "raw_material_input") in roles
+        assert ("煤炭", "energy_consumption") in roles
+    checkpoint = json.loads(
+        next(
+            (tmp_path / "company_profile_common_core.v1/checkpoints").glob("*.json")
+        ).read_text()
+    )
+    assert not any(
+        r["object_type"] == "Activity"
+        and r.get("action") == "sells"
+        and r["source_native"]["name"] == "煤炭"
+        for r in _iter_accepted_raw(checkpoint)
+    )
+
+
+@pytest.mark.parametrize("page_kind", ["pages", "independent_pages"])
+def test_other_branch_modifier_preserves_current_group_coal_sales(tmp_path, page_kind):
+    f = fixture("600027.SH")
+    pages = [
+        {**p, "text": p["text"].replace("供热、煤炭销售", "拟开展供热、煤炭销售")}
+        if p["page"] == 203
+        else p
+        for p in f[page_kind]
+    ]
+    for profile in _drive(
+        tmp_path, instrument="600027.SH", fixture=f, pages=pages, repair_version="v29"
+    ):
+        roles = [
+            x
+            for x in profile["commodity_exposure"]["assessment"]["exposures"]
+            if x["role"] == "product_sales" and x["source_native_name"] == "煤炭"
+        ]
+        assert roles
+        assert all(
+            x["subject_scope"] == "consolidated_group"
+            and x["subject_basis"] == "direct_source_wording"
+            for x in roles
         )

@@ -54,3 +54,17 @@ The first genuine v28 execute MUST use the original frozen plan reports, officia
 #### Scenario: Explicit current group action shares a page with parent ownership
 - **WHEN** the source directly defines the company and its subsidiaries as the group and attributes a current sales action to that group, while the page separately identifies an ultimate parent
 - **THEN** the fact and derived role retain consolidated_group and direct_source_wording for that action without treating the ownership note as a parent-statement scope or promoting a third-party or planned action
+
+### Requirement: Explicit group sales require a current affirmative action
+An explicit consolidated-group definition MUST establish only subject scope, not affirmative current sales. The existing coal-sales binding MUST reject negated or future coal-sales branches, including 不从事煤炭销售 and 拟开展煤炭销售. Qualifiers MUST apply to their corresponding native branch without deleting unrelated valid actions. Complete owner and independent PDF p203 MUST prove absence of erroneous accepted sells facts and query/export roles. Actual affirmative group sales MUST retain 本集团, consolidated_group and direct_source_wording despite same-page ultimate-parent ownership. Six substantive answers, twenty-eight income cells and fifteen positive roles MUST remain valid. Original v28 materials MUST be preserved with a separate audit limitation.
+
+#### Scenario: Group actor exists but coal sales are negated or planned
+- **WHEN** complete p203 replaces the sole coal-sales disclosure with 不从事煤炭销售 or 拟开展煤炭销售
+- **THEN** no current coal sells fact or sales role is accepted, queried or exported, while other established page/report actions remain valid
+
+### Requirement: First formal v29 round independently rechecks the same source contract
+After action-boundary regression passes, complete v29 identity MUST enable all five cumulative repairs with defaults unchanged. The first genuine owner run-query-export MUST use the original frozen plan, official reports, cutoff2026-09-17 and same forty-nine source conditions in independent m4_v29_group_sales_action_acceptance directories. Timing MUST include all retries from first execute to second export; the second company MUST use remaining shared50000tokens. Actual five-stage reuse MUST be retained. Accuracy MUST uniquely judge every actual accepted fact and answered text for subject, action/relation, native column, amount and unit without prefilled94. Measurement MUST count only for accuracy and exposure MUST NOT duplicate its underlying fact. Both scores100%, zero critical numeric errors, whole-round≤300seconds and tokens≤50000 MUST precede finite submission to A-role. Failure MUST remain unchanged and expansion paused; original v27/v28 failures and corrections MUST remain preserved, production not_authorized and scale quality false.
+
+#### Scenario: v29 meets declared source and resource thresholds
+- **WHEN** unique original-source review and actual runtime meet all finite thresholds
+- **THEN** evidence is submitted for A-role finite review without archiving, production authorization or releasing another batch

@@ -1,0 +1,18 @@
+{
+  "original_evidence_sha256": "9f3a48960c742d8ed6f9d56ddb1dee957529fc4d09b1174c76e1896293e10433",
+  "original_owner_review_path": "data/checkpoints/company_profile_common_core/reports/m4_v29_group_sales_action_acceptance/initial_company_profile_source_review.v1.json",
+  "original_owner_review_sha256": "94c03ecfee7dd940288293b4b834bacb4a5e46374a13c358b2663e62796b84d7",
+  "original_scores": {
+    "recall": "39/49",
+    "accuracy": "76/94"
+  },
+  "reason": "Reviewer incorrectly required physical table page to equal the starting page of a multi-page evidence span. Original bounded quotes contain the native rows; raw evidence continuation_pages identifies the physical table pages. Correct review uses full evidence span and native bounded quote, preserving the original decisions and owner review bytes. No delivery, source condition, formal execution or production code changed.",
+  "corrected_scores": {
+    "recall": "49/49",
+    "accuracy": "94/94"
+  },
+  "corrected_evidence_sha256": "fef108beedae6907cc533d47f0c5ba26c18c3a4030cec3fcef12d18f0abab077",
+  "formal_delivery_changed": false,
+  "original_source_scope_changed": false,
+  "source_code_changed_after_formal": false
+}

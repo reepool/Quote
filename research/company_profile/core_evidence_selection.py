@@ -1220,6 +1220,7 @@ REVENUE_SENTENCE_REPAIR_V25 = "v25"
 REVENUE_SENTENCE_REPAIR_V26 = "v26"
 REVENUE_SENTENCE_REPAIR_V27 = "v27"
 REVENUE_SENTENCE_REPAIR_V28 = "v28"
+REVENUE_SENTENCE_REPAIR_V29 = "v29"
 _REVENUE_SENTENCE_REPAIR_VERSIONS = frozenset(
     {
         REVENUE_SENTENCE_REPAIR_V1,
@@ -1250,6 +1251,7 @@ _REVENUE_SENTENCE_REPAIR_VERSIONS = frozenset(
         REVENUE_SENTENCE_REPAIR_V26,
         REVENUE_SENTENCE_REPAIR_V27,
         REVENUE_SENTENCE_REPAIR_V28,
+        REVENUE_SENTENCE_REPAIR_V29,
     }
 )
 
@@ -1303,6 +1305,7 @@ def named_role_repair_requested(identity: Mapping[str, Any] | None) -> bool:
         REVENUE_SENTENCE_REPAIR_V26,
         REVENUE_SENTENCE_REPAIR_V27,
         REVENUE_SENTENCE_REPAIR_V28,
+        REVENUE_SENTENCE_REPAIR_V29,
     }
 
 
@@ -1339,6 +1342,7 @@ def service_operating_energy_requested(identity: Mapping[str, Any] | None) -> bo
         REVENUE_SENTENCE_REPAIR_V26,
         REVENUE_SENTENCE_REPAIR_V27,
         REVENUE_SENTENCE_REPAIR_V28,
+        REVENUE_SENTENCE_REPAIR_V29,
     }
 
 
@@ -1375,6 +1379,7 @@ def core_answer_repair_requested(identity: Mapping[str, Any] | None) -> bool:
         REVENUE_SENTENCE_REPAIR_V26,
         REVENUE_SENTENCE_REPAIR_V27,
         REVENUE_SENTENCE_REPAIR_V28,
+        REVENUE_SENTENCE_REPAIR_V29,
     }
 
 
@@ -1412,6 +1417,7 @@ def source_delivery_repair_requested(identity: Mapping[str, Any] | None) -> bool
         REVENUE_SENTENCE_REPAIR_V26,
         REVENUE_SENTENCE_REPAIR_V27,
         REVENUE_SENTENCE_REPAIR_V28,
+        REVENUE_SENTENCE_REPAIR_V29,
     }
 
 
@@ -4786,12 +4792,21 @@ def _explicit_current_commodity_bindings(excerpt: str) -> list[dict[str, Any]]:
         if not re.search(r"尚未|未销售|拟|计划|将销售", match.group()):
             for name in ("电力", "热力"):
                 add(name, ActivityAction.SELLS, "销售")
-    if re.search(
-        r"本公司及其子公司[（(]以下简称[“\"]本集团[”\"][)）]主要从事[^。]+煤炭销售",
+    for match in re.finditer(
+        r"本公司及其子公司[（(]以下简称[“\"]本集团[”\"][)）]主要从事(?P<activities>[^。]+)",
         text,
     ):
-        add("煤炭", ActivityAction.SELLS, "销售", "本集团")
-        bindings[-1]["subject_basis"] = SubjectBasis.DIRECT_SOURCE_WORDING
+        # An action modifier governs its enumerated branch, not the whole page.
+        # The group definition proves the actor, but cannot affirm a planned sale.
+        for branch in re.split(r"[、，,；;]|以及|及", match["activities"]):
+            sale = re.search(r"煤炭销售", branch)
+            if sale and not re.search(
+                r"不|未|没有|拟|计划|将|未来|预计|准备|打算",
+                branch[: sale.start()],
+            ):
+                add("煤炭", ActivityAction.SELLS, "销售", "本集团")
+                bindings[-1]["subject_basis"] = SubjectBasis.DIRECT_SOURCE_WORDING
+                break
     for m in re.finditer(
         r"\d{4}年，本公司向[^。]+?(采购|购买)(煤炭|燃料)的实际发生总金额[^。]+。", text
     ):

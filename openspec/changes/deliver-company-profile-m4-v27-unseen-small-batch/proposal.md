@@ -27,3 +27,7 @@ v27投入关系修复获A角声明来源范围有限通过，旧change已同步�
 ## v28 Repair Scope
 
 v27首次失败5/40、11/15保留；A角补充限制另存，40项不作为新目标。执行4.1–4.4，沿原计划官方报告/cutoff，补充当前自用光伏、所属售电公司综合能源服务、车队管理/KD/技术输出/品牌授权及三报告分部。收入恢复19原生行，并交付三分部的营业/对外/内部收入与抵销依据；商品15角色逐动作绑定。局部复用选段/解析/投影，不新增模板或owner。v28五类开关和完整源页接受→查询→导出回归通过后，固定新来源合同并使用m4_v28_energy_bus_core_repair独立目录首次正式交付，唯一复核按实际对象重算。失败保留并继续暂停，待A角有限验收。
+
+## v29 Group Sales Action Closure
+
+v28 remains failed. The explicit group definition only proves the actor: current affirmative coal sales must also be established. Reject negated/planned coal-sales branches on complete owner/PDF p203 while preserving other valid actions and same-page parent ownership. After full source regression, register v29 with all five cumulative switches, freeze the same49 source conditions and use independent m4_v29_group_sales_action_acceptance directories for the first formal owner round. Unique action-aware review derives the actual fact/answer denominator; preserve prior failures and correction tracks. No archive or next batch before A-role finite acceptance.
