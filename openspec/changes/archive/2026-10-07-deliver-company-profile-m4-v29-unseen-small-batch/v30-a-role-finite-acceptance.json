@@ -1,0 +1,39 @@
+{
+  "created_at": "2026-10-07T13:36:07.708622+00:00",
+  "a_role_conclusion": "v30 finite accepted in declared86 source scope;4.1-4.4 closed",
+  "source_conditions": 86,
+  "source_recall": {
+    "status": "assessed",
+    "numerator": 86,
+    "denominator": 86,
+    "value": 1.0
+  },
+  "source_accuracy": {
+    "status": "assessed",
+    "numerator": 222,
+    "denominator": 222,
+    "value": 1.0
+  },
+  "actual_facts": 216,
+  "actual_answers": 6,
+  "critical_numeric_errors": 0,
+  "whole_round_seconds": 179.44878149684519,
+  "tokens": 0,
+  "token_budget": 50000,
+  "actual_five_stage_no_reuse": true,
+  "query_export_disk_equal": true,
+  "a_role_targeted_tests": "19 passed",
+  "a_role_ruff_openspec_commit_diff": "passed",
+  "development_test_result": "140 passed and five original-code failures belong to development receipts,not repeated by A-role",
+  "historical_files_verified": 854,
+  "first_formal_artifacts_verified": 19,
+  "preserved_failures": [
+    "v29 original80 first contract",
+    "v29 recall19/80 andaccuracy45/56 first failure",
+    "v30 first formal86scope and222unique judgments"
+  ],
+  "scope": "86 frozen source conditions and actual reviewed objects;not whole-report or scale-quality acceptance",
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false,
+  "next_authorization": "One controlled unseen service/manufacturing pair excluding32 observed companies"
+}

@@ -1,0 +1,2206 @@
+{
+  "600032.SH": {
+    "facts": {
+      "owned:core-ev-6ee918aa26a86e68:commodity:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "完整p20产销表三类发电均有当期销售量，集团原主体及销售动作成立；电力同一角色不因三种来源重复召回。",
+        "source_pages": [
+          20
+        ],
+        "expected_current_amount": null,
+        "reviewed_object_index": 0,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        },
+        "recall_role_index": 0
+      },
+      "owned:core-ev-6ee918aa26a86e68:commodity:2": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "完整p20产销表三类发电均有当期销售量，集团原主体及销售动作成立；电力同一角色不因三种来源重复召回。",
+        "source_pages": [
+          20
+        ],
+        "expected_current_amount": null,
+        "reviewed_object_index": 1,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        }
+      },
+      "owned:core-ev-6ee918aa26a86e68:commodity:3": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "完整p20产销表三类发电均有当期销售量，集团原主体及销售动作成立；电力同一角色不因三种来源重复召回。",
+        "source_pages": [
+          20
+        ],
+        "expected_current_amount": null,
+        "reviewed_object_index": 2,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        }
+      },
+      "owned:core-ev-1b82cf590ddde18b:segment:industry:新能源发电": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p17完整有界证据续接p18/19；原行业/产品、本期收入首列及元单位正确，主营内绿证其他与附注其他范围可由完整证据区分。",
+        "source_pages": [
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24
+        ],
+        "expected_current_amount": null,
+        "reviewed_object_index": 3,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        },
+        "recall_row_index": 0
+      },
+      "owned:core-ev-80da7c1724856961:revenue:industry:新能源发电": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p17完整有界证据续接p18/19；原行业/产品、本期收入首列及元单位正确，主营内绿证其他与附注其他范围可由完整证据区分。",
+        "source_pages": [
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24
+        ],
+        "expected_current_amount": null,
+        "reviewed_object_index": 4,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        }
+      },
+      "owned:core-ev-1b82cf590ddde18b:segment:industry:其他业务": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p17完整有界证据续接p18/19；原行业/产品、本期收入首列及元单位正确，主营内绿证其他与附注其他范围可由完整证据区分。",
+        "source_pages": [
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24
+        ],
+        "expected_current_amount": null,
+        "reviewed_object_index": 5,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        },
+        "recall_row_index": 1
+      },
+      "owned:core-ev-80da7c1724856961:revenue:industry:其他业务": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p17完整有界证据续接p18/19；原行业/产品、本期收入首列及元单位正确，主营内绿证其他与附注其他范围可由完整证据区分。",
+        "source_pages": [
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24
+        ],
+        "expected_current_amount": null,
+        "reviewed_object_index": 6,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        }
+      },
+      "owned:core-ev-1b82cf590ddde18b:segment:product:水电业务": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p17完整有界证据续接p18/19；原行业/产品、本期收入首列及元单位正确，主营内绿证其他与附注其他范围可由完整证据区分。",
+        "source_pages": [
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24
+        ],
+        "expected_current_amount": null,
+        "reviewed_object_index": 7,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        },
+        "recall_row_index": 2
+      },
+      "owned:core-ev-80da7c1724856961:revenue:product:水电业务": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p17完整有界证据续接p18/19；原行业/产品、本期收入首列及元单位正确，主营内绿证其他与附注其他范围可由完整证据区分。",
+        "source_pages": [
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24
+        ],
+        "expected_current_amount": null,
+        "reviewed_object_index": 8,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        }
+      },
+      "owned:core-ev-1b82cf590ddde18b:segment:product:光伏业务": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p17完整有界证据续接p18/19；原行业/产品、本期收入首列及元单位正确，主营内绿证其他与附注其他范围可由完整证据区分。",
+        "source_pages": [
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24
+        ],
+        "expected_current_amount": null,
+        "reviewed_object_index": 9,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        },
+        "recall_row_index": 3
+      },
+      "owned:core-ev-80da7c1724856961:revenue:product:光伏业务": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p17完整有界证据续接p18/19；原行业/产品、本期收入首列及元单位正确，主营内绿证其他与附注其他范围可由完整证据区分。",
+        "source_pages": [
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24
+        ],
+        "expected_current_amount": null,
+        "reviewed_object_index": 10,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        }
+      },
+      "owned:core-ev-1b82cf590ddde18b:segment:product:风力业务": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p17完整有界证据续接p18/19；原行业/产品、本期收入首列及元单位正确，主营内绿证其他与附注其他范围可由完整证据区分。",
+        "source_pages": [
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24
+        ],
+        "expected_current_amount": null,
+        "reviewed_object_index": 11,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        },
+        "recall_row_index": 4
+      },
+      "owned:core-ev-80da7c1724856961:revenue:product:风力业务": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p17完整有界证据续接p18/19；原行业/产品、本期收入首列及元单位正确，主营内绿证其他与附注其他范围可由完整证据区分。",
+        "source_pages": [
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24
+        ],
+        "expected_current_amount": null,
+        "reviewed_object_index": 12,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        }
+      },
+      "owned:core-ev-1b82cf590ddde18b:segment:product:其他业务": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p17完整有界证据续接p18/19；原行业/产品、本期收入首列及元单位正确，主营内绿证其他与附注其他范围可由完整证据区分。",
+        "source_pages": [
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24
+        ],
+        "expected_current_amount": null,
+        "reviewed_object_index": 13,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        },
+        "recall_row_index": 5
+      },
+      "owned:core-ev-80da7c1724856961:revenue:product:其他业务": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p17完整有界证据续接p18/19；原行业/产品、本期收入首列及元单位正确，主营内绿证其他与附注其他范围可由完整证据区分。",
+        "source_pages": [
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24
+        ],
+        "expected_current_amount": null,
+        "reviewed_object_index": 14,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        }
+      },
+      "owned:core-ev-1b82cf590ddde18b:segment:region:山西省、内蒙古自治区中部": {
+        "accurate": false,
+        "critical_numeric_error": false,
+        "reason": "p18原地区标签被截断：仅剩山西/内蒙古中部或云南/西藏，遗漏华北/西南及其余省市；数值与元单位正确，业务地区对象错误。",
+        "source_pages": [
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24
+        ],
+        "expected_current_amount": null,
+        "reviewed_object_index": 15,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": false,
+          "current_period_amount": true,
+          "unit": true
+        }
+      },
+      "owned:core-ev-80da7c1724856961:revenue:region:山西省、内蒙古自治区中部": {
+        "accurate": false,
+        "critical_numeric_error": false,
+        "reason": "p18原地区标签被截断：仅剩山西/内蒙古中部或云南/西藏，遗漏华北/西南及其余省市；数值与元单位正确，业务地区对象错误。",
+        "source_pages": [
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24
+        ],
+        "expected_current_amount": null,
+        "reviewed_object_index": 16,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": false,
+          "current_period_amount": true,
+          "unit": true
+        }
+      },
+      "owned:core-ev-1b82cf590ddde18b:segment:region:云南省、西藏自治区": {
+        "accurate": false,
+        "critical_numeric_error": false,
+        "reason": "p18原地区标签被截断：仅剩山西/内蒙古中部或云南/西藏，遗漏华北/西南及其余省市；数值与元单位正确，业务地区对象错误。",
+        "source_pages": [
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24
+        ],
+        "expected_current_amount": null,
+        "reviewed_object_index": 17,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": false,
+          "current_period_amount": true,
+          "unit": true
+        }
+      },
+      "owned:core-ev-80da7c1724856961:revenue:region:云南省、西藏自治区": {
+        "accurate": false,
+        "critical_numeric_error": false,
+        "reason": "p18原地区标签被截断：仅剩山西/内蒙古中部或云南/西藏，遗漏华北/西南及其余省市；数值与元单位正确，业务地区对象错误。",
+        "source_pages": [
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24
+        ],
+        "expected_current_amount": null,
+        "reviewed_object_index": 18,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": false,
+          "current_period_amount": true,
+          "unit": true
+        }
+      },
+      "owned:core-ev-01f5b34710e3a122:Segment:business_type:主营业务:营业收入": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p221(1)合并主营/其他营业收入首列及元单位正确，business_type原生业务性质分类成立；不可与产品行业维度累加。",
+        "source_pages": [
+          221
+        ],
+        "expected_current_amount": null,
+        "reviewed_object_index": 19,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        },
+        "recall_row_index": 12
+      },
+      "owned:core-ev-1b5fd9dc7a85de83:Measurement:business_type:主营业务:营业收入": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p221(1)合并主营/其他营业收入首列及元单位正确，business_type原生业务性质分类成立；不可与产品行业维度累加。",
+        "source_pages": [
+          221
+        ],
+        "expected_current_amount": null,
+        "reviewed_object_index": 20,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        }
+      },
+      "owned:core-ev-01f5b34710e3a122:Segment:business_type:其他业务:营业收入": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p221(1)合并主营/其他营业收入首列及元单位正确，business_type原生业务性质分类成立；不可与产品行业维度累加。",
+        "source_pages": [
+          221
+        ],
+        "expected_current_amount": null,
+        "reviewed_object_index": 21,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        },
+        "recall_row_index": 13
+      },
+      "owned:core-ev-1b5fd9dc7a85de83:Measurement:business_type:其他业务:营业收入": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p221(1)合并主营/其他营业收入首列及元单位正确，business_type原生业务性质分类成立；不可与产品行业维度累加。",
+        "source_pages": [
+          221
+        ],
+        "expected_current_amount": null,
+        "reviewed_object_index": 22,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        }
+      },
+      "owned:core-ev-cb5af46b02f9d877:Segment:product:1．主营业务:全部营业收入/商品类型": {
+        "accurate": false,
+        "critical_numeric_error": true,
+        "reason": "p221本期/上期四数值列错误取上期收入为2025本期；应为4,823,262,864.55元。 原父项汇总层级须保留，不能作为同级产品累计。",
+        "source_pages": [
+          221
+        ],
+        "expected_current_amount": "4,823,262,864.55",
+        "reviewed_object_index": 23,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": false,
+          "unit": true
+        }
+      },
+      "owned:core-ev-9735fe056916a595:Measurement:product:1．主营业务:全部营业收入/商品类型": {
+        "accurate": false,
+        "critical_numeric_error": true,
+        "reason": "p221本期/上期四数值列错误取上期收入为2025本期；应为4,823,262,864.55元。 原父项汇总层级须保留，不能作为同级产品累计。",
+        "source_pages": [
+          221
+        ],
+        "expected_current_amount": "4,823,262,864.55",
+        "reviewed_object_index": 24,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": false,
+          "unit": true
+        }
+      },
+      "owned:core-ev-cb5af46b02f9d877:Segment:product:水电业务:全部营业收入/商品类型": {
+        "accurate": false,
+        "critical_numeric_error": true,
+        "reason": "p221本期/上期四数值列错误取上期收入为2025本期；应为987,514,388.38元。",
+        "source_pages": [
+          221
+        ],
+        "expected_current_amount": "987,514,388.38",
+        "reviewed_object_index": 25,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": false,
+          "unit": true
+        }
+      },
+      "owned:core-ev-9735fe056916a595:Measurement:product:水电业务:全部营业收入/商品类型": {
+        "accurate": false,
+        "critical_numeric_error": true,
+        "reason": "p221本期/上期四数值列错误取上期收入为2025本期；应为987,514,388.38元。",
+        "source_pages": [
+          221
+        ],
+        "expected_current_amount": "987,514,388.38",
+        "reviewed_object_index": 26,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": false,
+          "unit": true
+        }
+      },
+      "owned:core-ev-cb5af46b02f9d877:Segment:product:光伏业务:全部营业收入/商品类型": {
+        "accurate": false,
+        "critical_numeric_error": true,
+        "reason": "p221本期/上期四数值列错误取上期收入为2025本期；应为1,842,714,246.93元。",
+        "source_pages": [
+          221
+        ],
+        "expected_current_amount": "1,842,714,246.93",
+        "reviewed_object_index": 27,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": false,
+          "unit": true
+        }
+      },
+      "owned:core-ev-9735fe056916a595:Measurement:product:光伏业务:全部营业收入/商品类型": {
+        "accurate": false,
+        "critical_numeric_error": true,
+        "reason": "p221本期/上期四数值列错误取上期收入为2025本期；应为1,842,714,246.93元。",
+        "source_pages": [
+          221
+        ],
+        "expected_current_amount": "1,842,714,246.93",
+        "reviewed_object_index": 28,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": false,
+          "unit": true
+        }
+      },
+      "owned:core-ev-cb5af46b02f9d877:Segment:product:风力业务:全部营业收入/商品类型": {
+        "accurate": false,
+        "critical_numeric_error": true,
+        "reason": "p221本期/上期四数值列错误取上期收入为2025本期；应为1,985,652,905.95元。",
+        "source_pages": [
+          221
+        ],
+        "expected_current_amount": "1,985,652,905.95",
+        "reviewed_object_index": 29,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": false,
+          "unit": true
+        }
+      },
+      "owned:core-ev-9735fe056916a595:Measurement:product:风力业务:全部营业收入/商品类型": {
+        "accurate": false,
+        "critical_numeric_error": true,
+        "reason": "p221本期/上期四数值列错误取上期收入为2025本期；应为1,985,652,905.95元。",
+        "source_pages": [
+          221
+        ],
+        "expected_current_amount": "1,985,652,905.95",
+        "reviewed_object_index": 30,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": false,
+          "unit": true
+        }
+      },
+      "owned:core-ev-cb5af46b02f9d877:Segment:product:其他:全部营业收入/商品类型": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p221商品类型1.主营业务下其他本期7,381,323.29元成立；第二主营内其他与附注2.其他不同，完整证据保留层级；相同条目多证据仅准确率各计一次，不额外召回。",
+        "source_pages": [
+          221
+        ],
+        "expected_current_amount": null,
+        "reviewed_object_index": 31,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        }
+      },
+      "owned:core-ev-9735fe056916a595:Measurement:product:其他:全部营业收入/商品类型": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p221商品类型1.主营业务下其他本期7,381,323.29元成立；第二主营内其他与附注2.其他不同，完整证据保留层级；相同条目多证据仅准确率各计一次，不额外召回。",
+        "source_pages": [
+          221
+        ],
+        "expected_current_amount": null,
+        "reviewed_object_index": 32,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        }
+      },
+      "owned:core-ev-cb5af46b02f9d877:Segment:product:2．其他业务:全部营业收入/商品类型": {
+        "accurate": false,
+        "critical_numeric_error": true,
+        "reason": "p221本期/上期四数值列错误取上期收入为2025本期；应为52,892,062.76元。 原父项汇总层级须保留，不能作为同级产品累计。",
+        "source_pages": [
+          221
+        ],
+        "expected_current_amount": "52,892,062.76",
+        "reviewed_object_index": 33,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": false,
+          "unit": true
+        }
+      },
+      "owned:core-ev-9735fe056916a595:Measurement:product:2．其他业务:全部营业收入/商品类型": {
+        "accurate": false,
+        "critical_numeric_error": true,
+        "reason": "p221本期/上期四数值列错误取上期收入为2025本期；应为52,892,062.76元。 原父项汇总层级须保留，不能作为同级产品累计。",
+        "source_pages": [
+          221
+        ],
+        "expected_current_amount": "52,892,062.76",
+        "reviewed_object_index": 34,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": false,
+          "unit": true
+        }
+      },
+      "owned:core-ev-cb5af46b02f9d877:Segment:product:提供劳务:全部营业收入/商品类型": {
+        "accurate": false,
+        "critical_numeric_error": true,
+        "reason": "p221本期/上期四数值列错误取上期收入为2025本期；应为39,602,302.56元。",
+        "source_pages": [
+          221
+        ],
+        "expected_current_amount": "39,602,302.56",
+        "reviewed_object_index": 35,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": false,
+          "unit": true
+        }
+      },
+      "owned:core-ev-9735fe056916a595:Measurement:product:提供劳务:全部营业收入/商品类型": {
+        "accurate": false,
+        "critical_numeric_error": true,
+        "reason": "p221本期/上期四数值列错误取上期收入为2025本期；应为39,602,302.56元。",
+        "source_pages": [
+          221
+        ],
+        "expected_current_amount": "39,602,302.56",
+        "reviewed_object_index": 36,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": false,
+          "unit": true
+        }
+      },
+      "owned:core-ev-cb5af46b02f9d877:Segment:region:华东地区:全部营业收入/经营地区": {
+        "accurate": false,
+        "critical_numeric_error": true,
+        "reason": "p221本期/上期四数值列错误取上期收入为2025本期；应为2,848,499,223.44元。",
+        "source_pages": [
+          221
+        ],
+        "expected_current_amount": "2,848,499,223.44",
+        "reviewed_object_index": 37,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": false,
+          "unit": true
+        }
+      },
+      "owned:core-ev-9735fe056916a595:Measurement:region:华东地区:全部营业收入/经营地区": {
+        "accurate": false,
+        "critical_numeric_error": true,
+        "reason": "p221本期/上期四数值列错误取上期收入为2025本期；应为2,848,499,223.44元。",
+        "source_pages": [
+          221
+        ],
+        "expected_current_amount": "2,848,499,223.44",
+        "reviewed_object_index": 38,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": false,
+          "unit": true
+        }
+      },
+      "owned:core-ev-cb5af46b02f9d877:Segment:region:西北地区:全部营业收入/经营地区": {
+        "accurate": false,
+        "critical_numeric_error": true,
+        "reason": "p221本期/上期四数值列错误取上期收入为2025本期；应为1,553,550,569.34元。",
+        "source_pages": [
+          221
+        ],
+        "expected_current_amount": "1,553,550,569.34",
+        "reviewed_object_index": 39,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": false,
+          "unit": true
+        }
+      },
+      "owned:core-ev-9735fe056916a595:Measurement:region:西北地区:全部营业收入/经营地区": {
+        "accurate": false,
+        "critical_numeric_error": true,
+        "reason": "p221本期/上期四数值列错误取上期收入为2025本期；应为1,553,550,569.34元。",
+        "source_pages": [
+          221
+        ],
+        "expected_current_amount": "1,553,550,569.34",
+        "reviewed_object_index": 40,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": false,
+          "unit": true
+        }
+      },
+      "owned:core-ev-cb5af46b02f9d877:Segment:region:华北地区:全部营业收入/经营地区": {
+        "accurate": false,
+        "critical_numeric_error": true,
+        "reason": "p221本期/上期四数值列错误取上期收入为2025本期；应为29,190,632.38元。",
+        "source_pages": [
+          221
+        ],
+        "expected_current_amount": "29,190,632.38",
+        "reviewed_object_index": 41,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": false,
+          "unit": true
+        }
+      },
+      "owned:core-ev-9735fe056916a595:Measurement:region:华北地区:全部营业收入/经营地区": {
+        "accurate": false,
+        "critical_numeric_error": true,
+        "reason": "p221本期/上期四数值列错误取上期收入为2025本期；应为29,190,632.38元。",
+        "source_pages": [
+          221
+        ],
+        "expected_current_amount": "29,190,632.38",
+        "reviewed_object_index": 42,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": false,
+          "unit": true
+        }
+      },
+      "owned:core-ev-cb5af46b02f9d877:Segment:region:西南地区:全部营业收入/经营地区": {
+        "accurate": false,
+        "critical_numeric_error": true,
+        "reason": "p221本期/上期四数值列错误取上期收入为2025本期；应为286,716,719.55元。",
+        "source_pages": [
+          221
+        ],
+        "expected_current_amount": "286,716,719.55",
+        "reviewed_object_index": 43,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": false,
+          "unit": true
+        }
+      },
+      "owned:core-ev-9735fe056916a595:Measurement:region:西南地区:全部营业收入/经营地区": {
+        "accurate": false,
+        "critical_numeric_error": true,
+        "reason": "p221本期/上期四数值列错误取上期收入为2025本期；应为286,716,719.55元。",
+        "source_pages": [
+          221
+        ],
+        "expected_current_amount": "286,716,719.55",
+        "reviewed_object_index": 44,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": false,
+          "unit": true
+        }
+      },
+      "owned:core-ev-cb5af46b02f9d877:Segment:region:华中地区:全部营业收入/经营地区": {
+        "accurate": false,
+        "critical_numeric_error": true,
+        "reason": "p221本期/上期四数值列错误取上期收入为2025本期；应为989,863.17元。",
+        "source_pages": [
+          221
+        ],
+        "expected_current_amount": "989,863.17",
+        "reviewed_object_index": 45,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": false,
+          "unit": true
+        }
+      },
+      "owned:core-ev-9735fe056916a595:Measurement:region:华中地区:全部营业收入/经营地区": {
+        "accurate": false,
+        "critical_numeric_error": true,
+        "reason": "p221本期/上期四数值列错误取上期收入为2025本期；应为989,863.17元。",
+        "source_pages": [
+          221
+        ],
+        "expected_current_amount": "989,863.17",
+        "reviewed_object_index": 46,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": false,
+          "unit": true
+        }
+      },
+      "owned:core-ev-cb5af46b02f9d877:Segment:region:东北地区:全部营业收入/经营地区": {
+        "accurate": false,
+        "critical_numeric_error": true,
+        "reason": "p221本期/上期四数值列错误取上期收入为2025本期；应为104,315,856.67元。",
+        "source_pages": [
+          221
+        ],
+        "expected_current_amount": "104,315,856.67",
+        "reviewed_object_index": 47,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": false,
+          "unit": true
+        }
+      },
+      "owned:core-ev-9735fe056916a595:Measurement:region:东北地区:全部营业收入/经营地区": {
+        "accurate": false,
+        "critical_numeric_error": true,
+        "reason": "p221本期/上期四数值列错误取上期收入为2025本期；应为104,315,856.67元。",
+        "source_pages": [
+          221
+        ],
+        "expected_current_amount": "104,315,856.67",
+        "reviewed_object_index": 48,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": false,
+          "unit": true
+        }
+      },
+      "owned:core-ev-cb5af46b02f9d877:Segment:region:主营业务:全部营业收入/经营地区": {
+        "accurate": false,
+        "critical_numeric_error": true,
+        "reason": "p221本期/上期四数值列错误取上期收入为2025本期；应为4,823,262,864.55元。 收入确认时点分类的业务标签还被错误归为经营地区，且--并非真实标签。",
+        "source_pages": [
+          221
+        ],
+        "expected_current_amount": "4,823,262,864.55",
+        "reviewed_object_index": 49,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": false,
+          "unit": true
+        }
+      },
+      "owned:core-ev-9735fe056916a595:Measurement:region:主营业务:全部营业收入/经营地区": {
+        "accurate": false,
+        "critical_numeric_error": true,
+        "reason": "p221本期/上期四数值列错误取上期收入为2025本期；应为4,823,262,864.55元。 收入确认时点分类的业务标签还被错误归为经营地区，且--并非真实标签。",
+        "source_pages": [
+          221
+        ],
+        "expected_current_amount": "4,823,262,864.55",
+        "reviewed_object_index": 50,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": false,
+          "unit": true
+        }
+      },
+      "owned:core-ev-cb5af46b02f9d877:Segment:region:--其他业务:全部营业收入/经营地区": {
+        "accurate": false,
+        "critical_numeric_error": true,
+        "reason": "p221本期/上期四数值列错误取上期收入为2025本期；应为52,892,062.76元。 收入确认时点分类的业务标签还被错误归为经营地区，且--并非真实标签。",
+        "source_pages": [
+          221
+        ],
+        "expected_current_amount": "52,892,062.76",
+        "reviewed_object_index": 51,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": false,
+          "unit": true
+        }
+      },
+      "owned:core-ev-9735fe056916a595:Measurement:region:--其他业务:全部营业收入/经营地区": {
+        "accurate": false,
+        "critical_numeric_error": true,
+        "reason": "p221本期/上期四数值列错误取上期收入为2025本期；应为52,892,062.76元。 收入确认时点分类的业务标签还被错误归为经营地区，且--并非真实标签。",
+        "source_pages": [
+          221
+        ],
+        "expected_current_amount": "52,892,062.76",
+        "reviewed_object_index": 52,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": false,
+          "unit": true
+        }
+      },
+      "owned:core-ev-a20bc1fd3abc7ff2:Segment:product:1．主营业务:全部营业收入/商品类型": {
+        "accurate": false,
+        "critical_numeric_error": true,
+        "reason": "p221本期/上期四数值列错误取上期收入为2025本期；应为4,823,262,864.55元。 原父项汇总层级须保留，不能作为同级产品累计。",
+        "source_pages": [
+          221
+        ],
+        "expected_current_amount": "4,823,262,864.55",
+        "reviewed_object_index": 53,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": false,
+          "unit": true
+        }
+      },
+      "owned:core-ev-a20bc1fd3abc7ff2:Segment:product:水电业务:全部营业收入/商品类型": {
+        "accurate": false,
+        "critical_numeric_error": true,
+        "reason": "p221本期/上期四数值列错误取上期收入为2025本期；应为987,514,388.38元。",
+        "source_pages": [
+          221
+        ],
+        "expected_current_amount": "987,514,388.38",
+        "reviewed_object_index": 54,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": false,
+          "unit": true
+        }
+      },
+      "owned:core-ev-a20bc1fd3abc7ff2:Segment:product:光伏业务:全部营业收入/商品类型": {
+        "accurate": false,
+        "critical_numeric_error": true,
+        "reason": "p221本期/上期四数值列错误取上期收入为2025本期；应为1,842,714,246.93元。",
+        "source_pages": [
+          221
+        ],
+        "expected_current_amount": "1,842,714,246.93",
+        "reviewed_object_index": 55,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": false,
+          "unit": true
+        }
+      },
+      "owned:core-ev-a20bc1fd3abc7ff2:Segment:product:风力业务:全部营业收入/商品类型": {
+        "accurate": false,
+        "critical_numeric_error": true,
+        "reason": "p221本期/上期四数值列错误取上期收入为2025本期；应为1,985,652,905.95元。",
+        "source_pages": [
+          221
+        ],
+        "expected_current_amount": "1,985,652,905.95",
+        "reviewed_object_index": 56,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": false,
+          "unit": true
+        }
+      },
+      "owned:core-ev-a20bc1fd3abc7ff2:Segment:product:其他:全部营业收入/商品类型": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p221商品类型1.主营业务下其他本期7,381,323.29元成立；第二主营内其他与附注2.其他不同，完整证据保留层级；相同条目多证据仅准确率各计一次，不额外召回。",
+        "source_pages": [
+          221
+        ],
+        "expected_current_amount": null,
+        "reviewed_object_index": 57,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        }
+      },
+      "owned:core-ev-a20bc1fd3abc7ff2:Segment:product:2．其他业务:全部营业收入/商品类型": {
+        "accurate": false,
+        "critical_numeric_error": true,
+        "reason": "p221本期/上期四数值列错误取上期收入为2025本期；应为52,892,062.76元。 原父项汇总层级须保留，不能作为同级产品累计。",
+        "source_pages": [
+          221
+        ],
+        "expected_current_amount": "52,892,062.76",
+        "reviewed_object_index": 58,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": false,
+          "unit": true
+        }
+      },
+      "owned:core-ev-a20bc1fd3abc7ff2:Segment:product:提供劳务:全部营业收入/商品类型": {
+        "accurate": false,
+        "critical_numeric_error": true,
+        "reason": "p221本期/上期四数值列错误取上期收入为2025本期；应为39,602,302.56元。",
+        "source_pages": [
+          221
+        ],
+        "expected_current_amount": "39,602,302.56",
+        "reviewed_object_index": 59,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": false,
+          "unit": true
+        }
+      },
+      "owned:core-ev-a20bc1fd3abc7ff2:Segment:region:华东地区:全部营业收入/经营地区": {
+        "accurate": false,
+        "critical_numeric_error": true,
+        "reason": "p221本期/上期四数值列错误取上期收入为2025本期；应为2,848,499,223.44元。",
+        "source_pages": [
+          221
+        ],
+        "expected_current_amount": "2,848,499,223.44",
+        "reviewed_object_index": 60,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": false,
+          "unit": true
+        }
+      },
+      "owned:core-ev-a20bc1fd3abc7ff2:Segment:region:西北地区:全部营业收入/经营地区": {
+        "accurate": false,
+        "critical_numeric_error": true,
+        "reason": "p221本期/上期四数值列错误取上期收入为2025本期；应为1,553,550,569.34元。",
+        "source_pages": [
+          221
+        ],
+        "expected_current_amount": "1,553,550,569.34",
+        "reviewed_object_index": 61,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": false,
+          "unit": true
+        }
+      },
+      "owned:core-ev-a20bc1fd3abc7ff2:Segment:region:华北地区:全部营业收入/经营地区": {
+        "accurate": false,
+        "critical_numeric_error": true,
+        "reason": "p221本期/上期四数值列错误取上期收入为2025本期；应为29,190,632.38元。",
+        "source_pages": [
+          221
+        ],
+        "expected_current_amount": "29,190,632.38",
+        "reviewed_object_index": 62,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": false,
+          "unit": true
+        }
+      },
+      "owned:core-ev-a20bc1fd3abc7ff2:Segment:region:西南地区:全部营业收入/经营地区": {
+        "accurate": false,
+        "critical_numeric_error": true,
+        "reason": "p221本期/上期四数值列错误取上期收入为2025本期；应为286,716,719.55元。",
+        "source_pages": [
+          221
+        ],
+        "expected_current_amount": "286,716,719.55",
+        "reviewed_object_index": 63,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": false,
+          "unit": true
+        }
+      },
+      "owned:core-ev-a20bc1fd3abc7ff2:Segment:region:华中地区:全部营业收入/经营地区": {
+        "accurate": false,
+        "critical_numeric_error": true,
+        "reason": "p221本期/上期四数值列错误取上期收入为2025本期；应为989,863.17元。",
+        "source_pages": [
+          221
+        ],
+        "expected_current_amount": "989,863.17",
+        "reviewed_object_index": 64,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": false,
+          "unit": true
+        }
+      },
+      "owned:core-ev-a20bc1fd3abc7ff2:Segment:region:东北地区:全部营业收入/经营地区": {
+        "accurate": false,
+        "critical_numeric_error": true,
+        "reason": "p221本期/上期四数值列错误取上期收入为2025本期；应为104,315,856.67元。",
+        "source_pages": [
+          221
+        ],
+        "expected_current_amount": "104,315,856.67",
+        "reviewed_object_index": 65,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": false,
+          "unit": true
+        }
+      },
+      "owned:core-ev-a20bc1fd3abc7ff2:Segment:region:主营业务:全部营业收入/经营地区": {
+        "accurate": false,
+        "critical_numeric_error": true,
+        "reason": "p221本期/上期四数值列错误取上期收入为2025本期；应为4,823,262,864.55元。 收入确认时点分类的业务标签还被错误归为经营地区，且--并非真实标签。",
+        "source_pages": [
+          221
+        ],
+        "expected_current_amount": "4,823,262,864.55",
+        "reviewed_object_index": 66,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": false,
+          "unit": true
+        }
+      },
+      "owned:core-ev-a20bc1fd3abc7ff2:Segment:region:--其他业务:全部营业收入/经营地区": {
+        "accurate": false,
+        "critical_numeric_error": true,
+        "reason": "p221本期/上期四数值列错误取上期收入为2025本期；应为52,892,062.76元。 收入确认时点分类的业务标签还被错误归为经营地区，且--并非真实标签。",
+        "source_pages": [
+          221
+        ],
+        "expected_current_amount": "52,892,062.76",
+        "reviewed_object_index": 67,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": false,
+          "unit": true
+        }
+      }
+    },
+    "answers": {
+      "principal_business": {
+        "accurate": false,
+        "answered": false,
+        "reason": "未答，无接受主营概览。",
+        "failed_substance_groups": [
+          [
+            "风电"
+          ],
+          [
+            "光伏"
+          ],
+          [
+            "水电"
+          ],
+          [
+            "投资",
+            "开发"
+          ],
+          [
+            "运营",
+            "管理"
+          ]
+        ]
+      },
+      "products_services": {
+        "accurate": false,
+        "answered": true,
+        "reason": "仅风力发电，缺电力整体、水电光伏、绿证、劳务及分布式状态。",
+        "failed_substance_groups": [
+          [
+            "电力"
+          ],
+          [
+            "光伏",
+            "太阳能"
+          ],
+          [
+            "水"
+          ],
+          [
+            "绿证"
+          ],
+          [
+            "劳务",
+            "服务"
+          ],
+          [
+            "自发自用"
+          ],
+          [
+            "余电上网"
+          ]
+        ]
+      },
+      "revenue_model": {
+        "accurate": false,
+        "answered": true,
+        "reason": "只有收入行名称，缺月度实际电量/合同电价、电网与用户及市场/绿证机制；混入父项名。",
+        "failed_substance_groups": [
+          [
+            "电力"
+          ],
+          [
+            "绿证"
+          ],
+          [
+            "中长期"
+          ],
+          [
+            "现货"
+          ],
+          [
+            "绿电"
+          ],
+          [
+            "电力公司",
+            "电网"
+          ],
+          [
+            "用户",
+            "用户侧"
+          ],
+          [
+            "月度",
+            "每月"
+          ],
+          [
+            "合同上网电价",
+            "合同电价"
+          ]
+        ]
+      }
+    }
+  },
+  "600071.SH": {
+    "facts": {
+      "owned:core-ev-bb266ed26e53f361:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p8/9完整光学三分支与智能控制器当前业务声明均保留，概览事实切片忠实原文；最终答案额外状态/OEM/定价缺失另按实质合同评价。",
+        "source_pages": [
+          8,
+          9
+        ],
+        "expected_current_amount": null,
+        "reviewed_object_index": 0,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        }
+      },
+      "owned:core-ev-30b25d36686fd1b7:activity:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p8/9原公司当前光学产品清单与主体有依据；operates表示提供的当前业务对象而非销售动作，不据此派生sells。两种真实品名组合仍有完整原文支撑。",
+        "source_pages": [
+          8,
+          9
+        ],
+        "expected_current_amount": null,
+        "reviewed_object_index": 1,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        }
+      },
+      "owned:core-ev-30b25d36686fd1b7:activity:2": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p8/9原公司当前光学产品清单与主体有依据；operates表示提供的当前业务对象而非销售动作，不据此派生sells。两种真实品名组合仍有完整原文支撑。",
+        "source_pages": [
+          8,
+          9
+        ],
+        "expected_current_amount": null,
+        "reviewed_object_index": 2,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        }
+      },
+      "owned:core-ev-30b25d36686fd1b7:activity:3": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p8/9原公司当前光学产品清单与主体有依据；operates表示提供的当前业务对象而非销售动作，不据此派生sells。两种真实品名组合仍有完整原文支撑。",
+        "source_pages": [
+          8,
+          9
+        ],
+        "expected_current_amount": null,
+        "reviewed_object_index": 3,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        }
+      },
+      "owned:core-ev-30b25d36686fd1b7:activity:4": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p8/9原公司当前光学产品清单与主体有依据；operates表示提供的当前业务对象而非销售动作，不据此派生sells。两种真实品名组合仍有完整原文支撑。",
+        "source_pages": [
+          8,
+          9
+        ],
+        "expected_current_amount": null,
+        "reviewed_object_index": 4,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        }
+      },
+      "owned:core-ev-30b25d36686fd1b7:activity:5": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p8/9原公司当前光学产品清单与主体有依据；operates表示提供的当前业务对象而非销售动作，不据此派生sells。两种真实品名组合仍有完整原文支撑。",
+        "source_pages": [
+          8,
+          9
+        ],
+        "expected_current_amount": null,
+        "reviewed_object_index": 5,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        }
+      },
+      "owned:core-ev-30b25d36686fd1b7:activity:6": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p8/9原公司当前光学产品清单与主体有依据；operates表示提供的当前业务对象而非销售动作，不据此派生sells。两种真实品名组合仍有完整原文支撑。",
+        "source_pages": [
+          8,
+          9
+        ],
+        "expected_current_amount": null,
+        "reviewed_object_index": 6,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        }
+      },
+      "owned:core-ev-30b25d36686fd1b7:activity:7": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p8/9原公司当前光学产品清单与主体有依据；operates表示提供的当前业务对象而非销售动作，不据此派生sells。两种真实品名组合仍有完整原文支撑。",
+        "source_pages": [
+          8,
+          9
+        ],
+        "expected_current_amount": null,
+        "reviewed_object_index": 7,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        }
+      },
+      "owned:core-ev-30b25d36686fd1b7:activity:8": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p8/9原公司当前光学产品清单与主体有依据；operates表示提供的当前业务对象而非销售动作，不据此派生sells。两种真实品名组合仍有完整原文支撑。",
+        "source_pages": [
+          8,
+          9
+        ],
+        "expected_current_amount": null,
+        "reviewed_object_index": 8,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        }
+      },
+      "owned:core-ev-30b25d36686fd1b7:activity:9": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p8/9原公司当前光学产品清单与主体有依据；operates表示提供的当前业务对象而非销售动作，不据此派生sells。两种真实品名组合仍有完整原文支撑。",
+        "source_pages": [
+          8,
+          9
+        ],
+        "expected_current_amount": null,
+        "reviewed_object_index": 9,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        }
+      },
+      "owned:core-ev-30b25d36686fd1b7:activity:10": {
+        "accurate": false,
+        "critical_numeric_error": false,
+        "reason": "p9控制器产品所涵盖的家用电器/工业控制/新能源下游应用领域被错误升格为公司独立operates对象；最后一个还拼入后续供应商说明。",
+        "source_pages": [
+          8,
+          9
+        ],
+        "expected_current_amount": null,
+        "reviewed_object_index": 10,
+        "checks": {
+          "actor": true,
+          "action_relation": false,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        }
+      },
+      "owned:core-ev-30b25d36686fd1b7:activity:11": {
+        "accurate": false,
+        "critical_numeric_error": false,
+        "reason": "p9控制器产品所涵盖的家用电器/工业控制/新能源下游应用领域被错误升格为公司独立operates对象；最后一个还拼入后续供应商说明。",
+        "source_pages": [
+          8,
+          9
+        ],
+        "expected_current_amount": null,
+        "reviewed_object_index": 11,
+        "checks": {
+          "actor": true,
+          "action_relation": false,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        }
+      },
+      "owned:core-ev-30b25d36686fd1b7:activity:12": {
+        "accurate": false,
+        "critical_numeric_error": false,
+        "reason": "p9控制器产品所涵盖的家用电器/工业控制/新能源下游应用领域被错误升格为公司独立operates对象；最后一个还拼入后续供应商说明。",
+        "source_pages": [
+          8,
+          9
+        ],
+        "expected_current_amount": null,
+        "reviewed_object_index": 12,
+        "checks": {
+          "actor": true,
+          "action_relation": false,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        }
+      },
+      "owned:core-ev-6984936a4bbec564:commodity:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p14产销表精密加工销售量6,794.55万片，原产品/单位/数字列及公司销售动作成立；未知映射pending。",
+        "source_pages": [
+          14
+        ],
+        "expected_current_amount": null,
+        "reviewed_object_index": 13,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        },
+        "recall_role_index": 2
+      },
+      "owned:core-ev-80e162c15a169e72:segment:industry:制造业": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p13/14主营分行业/产品/地区/直销或p131合并主营/其他，本期收入首列、元及公司合并口径正确；锂电池只含1/2月，p14完整证据明确，不能推全年当前控制。",
+        "source_pages": [
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+        ],
+        "expected_current_amount": null,
+        "reviewed_object_index": 14,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        },
+        "recall_row_index": 0
+      },
+      "owned:core-ev-c57ffd7caa716f1a:revenue:industry:制造业": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p13/14主营分行业/产品/地区/直销或p131合并主营/其他，本期收入首列、元及公司合并口径正确；锂电池只含1/2月，p14完整证据明确，不能推全年当前控制。",
+        "source_pages": [
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+        ],
+        "expected_current_amount": null,
+        "reviewed_object_index": 15,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        }
+      },
+      "owned:core-ev-80e162c15a169e72:segment:product:控制器": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p13/14主营分行业/产品/地区/直销或p131合并主营/其他，本期收入首列、元及公司合并口径正确；锂电池只含1/2月，p14完整证据明确，不能推全年当前控制。",
+        "source_pages": [
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+        ],
+        "expected_current_amount": null,
+        "reviewed_object_index": 16,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        },
+        "recall_row_index": 1
+      },
+      "owned:core-ev-c57ffd7caa716f1a:revenue:product:控制器": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p13/14主营分行业/产品/地区/直销或p131合并主营/其他，本期收入首列、元及公司合并口径正确；锂电池只含1/2月，p14完整证据明确，不能推全年当前控制。",
+        "source_pages": [
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+        ],
+        "expected_current_amount": null,
+        "reviewed_object_index": 17,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        }
+      },
+      "owned:core-ev-80e162c15a169e72:segment:product:光学组件": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p13/14主营分行业/产品/地区/直销或p131合并主营/其他，本期收入首列、元及公司合并口径正确；锂电池只含1/2月，p14完整证据明确，不能推全年当前控制。",
+        "source_pages": [
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+        ],
+        "expected_current_amount": null,
+        "reviewed_object_index": 18,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        },
+        "recall_row_index": 2
+      },
+      "owned:core-ev-c57ffd7caa716f1a:revenue:product:光学组件": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p13/14主营分行业/产品/地区/直销或p131合并主营/其他，本期收入首列、元及公司合并口径正确；锂电池只含1/2月，p14完整证据明确，不能推全年当前控制。",
+        "source_pages": [
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+        ],
+        "expected_current_amount": null,
+        "reviewed_object_index": 19,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        }
+      },
+      "owned:core-ev-80e162c15a169e72:segment:product:精密加工": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p13/14主营分行业/产品/地区/直销或p131合并主营/其他，本期收入首列、元及公司合并口径正确；锂电池只含1/2月，p14完整证据明确，不能推全年当前控制。",
+        "source_pages": [
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+        ],
+        "expected_current_amount": null,
+        "reviewed_object_index": 20,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        },
+        "recall_row_index": 3
+      },
+      "owned:core-ev-c57ffd7caa716f1a:revenue:product:精密加工": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p13/14主营分行业/产品/地区/直销或p131合并主营/其他，本期收入首列、元及公司合并口径正确；锂电池只含1/2月，p14完整证据明确，不能推全年当前控制。",
+        "source_pages": [
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+        ],
+        "expected_current_amount": null,
+        "reviewed_object_index": 21,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        }
+      },
+      "owned:core-ev-80e162c15a169e72:segment:product:光学仪器": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p13/14主营分行业/产品/地区/直销或p131合并主营/其他，本期收入首列、元及公司合并口径正确；锂电池只含1/2月，p14完整证据明确，不能推全年当前控制。",
+        "source_pages": [
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+        ],
+        "expected_current_amount": null,
+        "reviewed_object_index": 22,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        },
+        "recall_row_index": 4
+      },
+      "owned:core-ev-c57ffd7caa716f1a:revenue:product:光学仪器": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p13/14主营分行业/产品/地区/直销或p131合并主营/其他，本期收入首列、元及公司合并口径正确；锂电池只含1/2月，p14完整证据明确，不能推全年当前控制。",
+        "source_pages": [
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+        ],
+        "expected_current_amount": null,
+        "reviewed_object_index": 23,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        }
+      },
+      "owned:core-ev-80e162c15a169e72:segment:product:锂电池": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p13/14主营分行业/产品/地区/直销或p131合并主营/其他，本期收入首列、元及公司合并口径正确；锂电池只含1/2月，p14完整证据明确，不能推全年当前控制。",
+        "source_pages": [
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+        ],
+        "expected_current_amount": null,
+        "reviewed_object_index": 24,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        },
+        "recall_row_index": 5
+      },
+      "owned:core-ev-c57ffd7caa716f1a:revenue:product:锂电池": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p13/14主营分行业/产品/地区/直销或p131合并主营/其他，本期收入首列、元及公司合并口径正确；锂电池只含1/2月，p14完整证据明确，不能推全年当前控制。",
+        "source_pages": [
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+        ],
+        "expected_current_amount": null,
+        "reviewed_object_index": 25,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        }
+      },
+      "owned:core-ev-80e162c15a169e72:segment:region:国内": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p13/14主营分行业/产品/地区/直销或p131合并主营/其他，本期收入首列、元及公司合并口径正确；锂电池只含1/2月，p14完整证据明确，不能推全年当前控制。",
+        "source_pages": [
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+        ],
+        "expected_current_amount": null,
+        "reviewed_object_index": 26,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        },
+        "recall_row_index": 6
+      },
+      "owned:core-ev-c57ffd7caa716f1a:revenue:region:国内": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p13/14主营分行业/产品/地区/直销或p131合并主营/其他，本期收入首列、元及公司合并口径正确；锂电池只含1/2月，p14完整证据明确，不能推全年当前控制。",
+        "source_pages": [
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+        ],
+        "expected_current_amount": null,
+        "reviewed_object_index": 27,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        }
+      },
+      "owned:core-ev-80e162c15a169e72:segment:region:国外": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p13/14主营分行业/产品/地区/直销或p131合并主营/其他，本期收入首列、元及公司合并口径正确；锂电池只含1/2月，p14完整证据明确，不能推全年当前控制。",
+        "source_pages": [
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+        ],
+        "expected_current_amount": null,
+        "reviewed_object_index": 28,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        },
+        "recall_row_index": 7
+      },
+      "owned:core-ev-c57ffd7caa716f1a:revenue:region:国外": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p13/14主营分行业/产品/地区/直销或p131合并主营/其他，本期收入首列、元及公司合并口径正确；锂电池只含1/2月，p14完整证据明确，不能推全年当前控制。",
+        "source_pages": [
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+        ],
+        "expected_current_amount": null,
+        "reviewed_object_index": 29,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        }
+      },
+      "owned:core-ev-80e162c15a169e72:segment:sales_mode:直销": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p13/14主营分行业/产品/地区/直销或p131合并主营/其他，本期收入首列、元及公司合并口径正确；锂电池只含1/2月，p14完整证据明确，不能推全年当前控制。",
+        "source_pages": [
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+        ],
+        "expected_current_amount": null,
+        "reviewed_object_index": 30,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        },
+        "recall_row_index": 8
+      },
+      "owned:core-ev-c57ffd7caa716f1a:revenue:sales_mode:直销": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p13/14主营分行业/产品/地区/直销或p131合并主营/其他，本期收入首列、元及公司合并口径正确；锂电池只含1/2月，p14完整证据明确，不能推全年当前控制。",
+        "source_pages": [
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+        ],
+        "expected_current_amount": null,
+        "reviewed_object_index": 31,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        }
+      },
+      "owned:core-ev-af56bfe124c81972:Segment:business_type:主营业务:营业收入": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p13/14主营分行业/产品/地区/直销或p131合并主营/其他，本期收入首列、元及公司合并口径正确；锂电池只含1/2月，p14完整证据明确，不能推全年当前控制。",
+        "source_pages": [
+          131
+        ],
+        "expected_current_amount": null,
+        "reviewed_object_index": 32,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        },
+        "recall_row_index": 9
+      },
+      "owned:core-ev-6dc13c5c0a8253cb:Measurement:business_type:主营业务:营业收入": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p13/14主营分行业/产品/地区/直销或p131合并主营/其他，本期收入首列、元及公司合并口径正确；锂电池只含1/2月，p14完整证据明确，不能推全年当前控制。",
+        "source_pages": [
+          131
+        ],
+        "expected_current_amount": null,
+        "reviewed_object_index": 33,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        }
+      },
+      "owned:core-ev-af56bfe124c81972:Segment:business_type:其他业务:营业收入": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p13/14主营分行业/产品/地区/直销或p131合并主营/其他，本期收入首列、元及公司合并口径正确；锂电池只含1/2月，p14完整证据明确，不能推全年当前控制。",
+        "source_pages": [
+          131
+        ],
+        "expected_current_amount": null,
+        "reviewed_object_index": 34,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        },
+        "recall_row_index": 10
+      },
+      "owned:core-ev-6dc13c5c0a8253cb:Measurement:business_type:其他业务:营业收入": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p13/14主营分行业/产品/地区/直销或p131合并主营/其他，本期收入首列、元及公司合并口径正确；锂电池只含1/2月，p14完整证据明确，不能推全年当前控制。",
+        "source_pages": [
+          131
+        ],
+        "expected_current_amount": null,
+        "reviewed_object_index": 35,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        }
+      }
+    },
+    "answers": {
+      "principal_business": {
+        "accurate": false,
+        "answered": true,
+        "reason": "光学/智能控制器主体及主要谱系已有实质内容，但缺锂电池报告期退出合并/剥离状态，未满足执行前完整条件。",
+        "failed_substance_groups": [
+          [
+            "剥离",
+            "丧失",
+            "不合并",
+            "不再将"
+          ]
+        ]
+      },
+      "products_services": {
+        "accurate": false,
+        "answered": true,
+        "reason": "主要完整光学矩阵/控制器服务已有，缺OEM/ODM服务与锂电池有限期退出状态。",
+        "failed_substance_groups": [
+          [
+            "OEM",
+            "ODM"
+          ],
+          [
+            "锂电池",
+            "剥离"
+          ]
+        ]
+      },
+      "revenue_model": {
+        "accurate": false,
+        "answered": true,
+        "reason": "多产品/直销已有，缺合同订单、内销签收/外销报关、30-90天月结及关联市场/协议定价；锂电池状态未在正文保留。",
+        "failed_substance_groups": [
+          [
+            "合同",
+            "订单"
+          ],
+          [
+            "内销"
+          ],
+          [
+            "外销"
+          ],
+          [
+            "签收",
+            "交付"
+          ],
+          [
+            "报关"
+          ],
+          [
+            "月结",
+            "30"
+          ],
+          [
+            "市场价格",
+            "协议价格"
+          ]
+        ]
+      }
+    }
+  }
+}

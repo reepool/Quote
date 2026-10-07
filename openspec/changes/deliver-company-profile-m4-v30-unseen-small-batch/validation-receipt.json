@@ -1,0 +1,33 @@
+{
+  "created_at": "2026-10-07T14:02:22.581884+00:00",
+  "business_code_changed": false,
+  "tests": [
+    {
+      "command": "PYTHONPATH=. /home/python/miniconda3/envs/Quote/bin/python -m pytest tests/unit/test_research/test_company_profile_m4_next_batch.py -q",
+      "result": "20 passed, 7 warnings, 22.98 seconds",
+      "repeated_after_freeze": false,
+      "scope": "batch owner isolation/reuse/budget/failure retention;does not substitute business acceptance"
+    }
+  ],
+  "checks": {
+    "ruff": "All checks passed for m4_next_batch.py,operations.py,next-batch tests",
+    "openspec_new_change_strict": "passed after failure cards/spec update",
+    "openspec_synced_main_specs_strict": "both passed",
+    "git_diff_check": "passed",
+    "object_review_unique": true,
+    "historical_hashes": 891,
+    "first_formal_hashes": 18,
+    "production_code_hashes": 38,
+    "preexisting_modified_document_hashes": 3
+  },
+  "self_review": {
+    "scope": "Own spec sync/archive/new frozen contract/owner first run/source review/failure cards only;existing changes excluded",
+    "blocking_workflow_findings": [],
+    "business_failure_findings": "Known P0/P1 recorded in tasks4.1-4.4,unchanged first observation preserved;local repair not performed in this batch card",
+    "contract_clarification": "source-contract-interpretation.json preserves original47 contract;native business-type normalization clarified without score or delivery change",
+    "nonblocking_suggestions": "None acted upon",
+    "unrelated_preexisting_failures": "five prior v30 failures deferred,not rerun"
+  },
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false
+}

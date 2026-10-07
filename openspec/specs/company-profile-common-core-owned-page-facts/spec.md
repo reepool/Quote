@@ -121,3 +121,33 @@ Native income cells MUST retain industry/product/region/sales-mode or report-seg
 #### Scenario: A table continues after the evidence starting page
 - **WHEN** an accepted row is present in the full bounded quote and continuation pages
 - **THEN** its original row, revenue column, scope, amount and unit can be verified from the full evidence span, with Measurement judged only for accuracy
+
+
+### Requirement: Complete current owned business narratives preserve scope and mechanism
+The owned-page common-core path MUST retain complete current multi-business and product/service substance rather than only its first subsidiary or business fragment. Actual ticket transaction prices, frequent-flyer mileage allocation and redemption states, direct-order/framework pricing, benchmark commodity price plus processing fee, rental and land-development compensation MUST remain source-qualified revenue mechanisms. Legal licensed business scope MUST retain its license, approval and branch limits without establishing all listed activities as current operations. Native subsidiary actors MUST remain traceable; negated, planned and third-party activities MUST NOT be promoted to established company actions.
+
+#### Scenario: Owned narrative combines current activities with legal scope
+- **WHEN** a full official owned page states several current businesses alongside a legally permitted business scope and revenue mechanism
+- **THEN** accepted records, substantive query bodies and exports retain the full established activities and mechanism with original actor and legal qualifiers
+
+### Requirement: Project revenue follows native headers and PDF column placement
+Native project-income tables MUST bind full project names to the current-period amount column using their original headers and, where text extraction loses blank-cell placement, original PDF layout. Parcel identifiers inside names MUST NOT become amounts. A prior-only project cell MUST NOT generate current revenue or a fabricated zero. Native industry, product, region, contract and report-segment columns MUST retain original units, consolidated-versus-parent scope and separate operating, external and internal income bases. A table MUST NOT be classified as sales mode solely because it mentions sales income. Overlapping bases and eliminations MUST NOT be accumulated as independent products.
+
+#### Scenario: Project name contains a numeric parcel identifier
+- **WHEN** a project row names 太阳宫D区（CY00-0215-0627地块）土地一级开发 and prints1,705,813,761.06元 in the current column
+- **THEN** the full project label and current amount are accepted without treating0627as revenue or labeling the project sales mode
+
+#### Scenario: Only the prior-period project cell is printed
+- **WHEN** the original PDF places a project's sole printed amount in the prior-period column
+- **THEN** no current-period Segment or operating_revenue Measurement is created for that project
+
+### Requirement: Native goods enumerations and actions retain actor boundaries
+Current product enumeration MUST stop before subsequent upstream/downstream actors or uses while preserving legitimate final components, parenthesized names and native subsidiary subjects. Goods purchase, sale and energy consumption MUST bind to their own current affirmative source wording. Reverse seller-to-group wording MUST retain the group as buyer; upper-parent actions MUST NOT become listed-company-group actions. Procurement alone MUST NOT imply manufacturing input. Same-object purchase and sale MAY coexist when independently disclosed, and named self-use energy MUST retain material_input rather than inferred external purchase. Unknown catalog mappings MUST remain pending or ambiguous.
+
+#### Scenario: Additive list ends before upstream and downstream prose
+- **WHEN** a named subsidiary's seven actual additive components end with DENE before an upstream/downstream description
+- **THEN** all seven original components including DENE retain the subsidiary actor while following actor/use text creates no fabricated product or production action
+
+#### Scenario: Current goods actions belong to different group scopes
+- **WHEN** an owned page states seller-to-listed-group procurement, listed-group sales or energy consumption and a distinct upper-parent action
+- **THEN** acceptance, query and export retain each original actor and action without promoting upper-parent activity or converting purchases into manufacturing input
