@@ -609,13 +609,17 @@
       "weekend_non_publication": true,
       "expected_non_publication_quality_flag": "expected_non_publication",
       "source_calendar_policy": "configured_source_policy_plus_local_observation",
+      "source_policies": {
+        "fx_derived_cross": "china_business_day_configured_holidays"
+      },
       "holiday_dates": {
         "cfets_rmb_fixing": [],
         "fred_trade_weighted_dollar": [],
         "ecb_reference_rates": [],
         "cnh_market_aggregated_public": [],
         "ice_dxy_official": [],
-        "manual_verified": []
+        "manual_verified": [],
+        "fx_derived_cross": []
       }
     },
     "quality": {

@@ -570,6 +570,55 @@ def test_fx_readiness_keeps_calendar_day_stale_window_without_holiday_policy(tmp
     assert series_status["latest_observation_date"] == "2026-08-28"
 
 
+def test_fx_readiness_extends_derived_cross_stale_window_over_cn_holidays(tmp_path):
+    config, storage = _seed_storage(tmp_path)
+    module_cfg = config.modules["fx_market_data"]
+    for series_id, value, flag in [
+        ("FX.USD_CNY.CFETS.MID.DAILY", 6.7351, "official"),
+        ("FX.EUR_CNY.CFETS.MID.DAILY", 7.6215, "official"),
+        ("FX.JPY_CNY.CFETS.MID.DAILY", 4.2727, "official"),
+        ("FX.USD_CNH.MARKET.SPOT.DAILY", 6.7036, "aggregated_public"),
+        ("FX.EUR_CNH.DERIVED.DAILY", 7.5919, "derived"),
+        ("FX.JPY_CNH.DERIVED.DAILY", 4.2561, "derived"),
+    ]:
+        storage.upsert_observation(
+            FxObservation(
+                series_id=series_id,
+                observation_date="2026-09-30" if flag != "aggregated_public" else "2026-10-06",
+                value=value,
+                base_currency="",
+                quote_currency="",
+                quote_multiplier=1,
+                source_profile="cnh_market_aggregated_public" if flag == "aggregated_public" else (
+                    "fx_derived_cross" if flag == "derived" else "cfets_rmb_fixing"
+                ),
+                quality_flag=flag,
+            )
+        )
+
+    without_policy = FxReadService(storage, module_cfg).readiness(as_of_date="2026-10-06")
+    module_cfg.setdefault("calendar", {})["source_policies"] = {
+        "fx_derived_cross": "china_business_day_configured_holidays"
+    }
+    readiness = FxReadService(storage, module_cfg).readiness(as_of_date="2026-10-06")
+    quality = FxQualityService(storage, module_cfg).run(as_of_date="2026-10-06")
+
+    assert without_policy["status"] == "blocked"
+    assert without_policy["blockers"] == [
+        "missing_or_stale_fx_series:FX.EUR_CNH.DERIVED.DAILY",
+        "missing_or_stale_fx_series:FX.JPY_CNH.DERIVED.DAILY",
+    ]
+    assert readiness["status"] == "ready"
+    assert readiness["blockers"] == []
+    assert quality["status"] != "blocked"
+    for series_id in ("FX.EUR_CNH.DERIVED.DAILY", "FX.JPY_CNH.DERIVED.DAILY"):
+        series_status = readiness["series"][series_id]
+        assert series_status["status"] == "ready"
+        assert series_status["latest_observation_date"] == "2026-09-30"
+        assert series_status["effective_max_stale_observation_days"] == 9
+        assert series_status["stale_lag_extension_days"] == 4
+
+
 def test_fx_configured_provider_contract_writes_reviewed_payloads(tmp_path):
     config, storage = _seed_storage(tmp_path)
     module_cfg = config.modules["fx_market_data"]
