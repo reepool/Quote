@@ -1,0 +1,44 @@
+--- research/company_profile/core_evidence_selection.py
++++ research/company_profile/core_evidence_selection.py
+@@ -2948,6 +2948,7 @@
+                 # Own energy use is projected by the material chapter; it
+                 # does not establish an external purchase Activity.
+                 continue
++            before = len(records)
+             add_activity(
+                 binding["name"],
+                 binding["action"],
+@@ -2957,6 +2958,15 @@
+                 header=binding.get("header"),
+                 unit=binding.get("unit"),
+             )
++            if len(records) > before and binding.get("subject_basis"):
++                # The action's explicit group definition wins over an
++                # unrelated parent-company ownership note elsewhere on page.
++                records[-1] = records[-1].model_copy(
++                    update={
++                        "subject_scope": SubjectScope.CONSOLIDATED_GROUP,
++                        "subject_basis": binding["subject_basis"],
++                    }
++                )
+         for binding in _hedge_underlying_bindings(span.excerpt):
+             add_activity(
+                 binding["name"],
+@@ -3637,7 +3647,8 @@
+             name for name, verb, _ in _native_input_bindings(text) if verb == "投入"
+         )
+         names.extend(
+-            binding["name"] for binding in _explicit_current_commodity_bindings(text)
++            binding["name"]
++            for binding in _explicit_current_commodity_bindings(text)
+             if binding.get("header") == "能源"
+         )
+     for sentence in re.split(r"[。；;]", compact):
+@@ -4780,6 +4791,7 @@
+         text,
+     ):
+         add("煤炭", ActivityAction.SELLS, "销售", "本集团")
++        bindings[-1]["subject_basis"] = SubjectBasis.DIRECT_SOURCE_WORDING
+     for m in re.finditer(
+         r"\d{4}年，本公司向[^。]+?(采购|购买)(煤炭|燃料)的实际发生总金额[^。]+。", text
+     ):

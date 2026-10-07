@@ -1,0 +1,9 @@
+{
+  "reason": "Initial review incorrectly propagated an auxiliary coal Activity scope defect into the verbatim products answer. The underlying Activity/exposure scope defect remains; the fully source-supported answer body is assessed independently.",
+  "initial_review_recall": "47/49",
+  "initial_review_accuracy": "92/94",
+  "original_evidence_sha256": "7c824f66046c2c98e68d5d09fe67eb061d22a42510edd1b48352a4ed9dbaa265",
+  "original_owner_review_path": "data/checkpoints/company_profile_common_core/reports/m4_v28_energy_bus_core_repair/initial_company_profile_source_review.v1.json",
+  "original_owner_review_sha256": "347f223616d571988edd108e1b90057a5389af1aa34737614d143b1f8ff0f947",
+  "first_delivery_unchanged": true
+}

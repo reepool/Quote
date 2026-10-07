@@ -1,0 +1,49 @@
+{
+  "created_at": "2026-10-07T02:07:02.730184+00:00",
+  "phase": "post_formal_scope_repair_local_regression",
+  "formal_result": "failure_preserved",
+  "full_frozen_page_tests": "21 passed",
+  "related_regression": {
+    "result": "265 passed, 1 deselected",
+    "test_files": [
+      "test_company_profile_v28_energy_bus.py",
+      "test_company_profile_v27_input_relation.py",
+      "test_company_profile_v26_shipping_materials.py",
+      "test_company_profile_v20_identity.py",
+      "test_company_profile_v25_sales_semantics.py",
+      "test_company_profile_v24_hydro_pharma.py",
+      "test_company_profile_v22_energy_display.py",
+      "test_company_profile_v21_trade_sales.py",
+      "test_company_profile_v20_unseen_repair.py",
+      "test_company_profile_v19_unseen_misses.py",
+      "test_company_profile_v19_closure.py",
+      "test_company_profile_revenue_sentence_repair.py",
+      "test_company_profile_v7_source_delivery.py",
+      "test_company_profile_v3_named_role_repair.py",
+      "test_company_profile_core_evidence_selection.py",
+      "test_company_profile_core_assessment_projection.py"
+    ],
+    "command_prefix": "PYTHONPATH=. /home/python/miniconda3/envs/Quote/bin/python -m pytest -q",
+    "test_directory": "tests/unit/test_research",
+    "selection": "-k 'not test_reads_through_section_and_stops_at_next_heading'",
+    "deferred_existing_failure": "test_reads_through_section_and_stops_at_next_heading",
+    "summary": "265 passed, 1 deselected, 7 warnings in 102.74s (0:01:42)"
+  },
+  "ruff_check": "passed",
+  "openspec_strict": "passed",
+  "diff_check": "passed",
+  "review": {
+    "method": "Scoped manual diff and real delivery/source review",
+    "blocking_found": "Group actor scope erased by unrelated parent ownership text; local explicit current group binding fixed and proved, formal first failure remains.",
+    "nonblocking": "Existing style/large-module cleanup explicitly deferred; no new framework or industry template.",
+    "unrelated": "One pre-existing test excluded as authorized, no existing user work changed."
+  },
+  "source_code_sha256": {
+    "research/company_profile/core_evidence_selection.py": "11d15e96035666c884ebd1c5851879de4ea5474a2c68923bb214f3840f82937d",
+    "research/company_profile/core_assessment_projection.py": "47c8935e2447f1ebc9e43b3c93a4a440ee3544acfba0c8ff229ed9422fe4c56b"
+  },
+  "test_sha256": "d8126633880ff6d8da49ab721ebad9c842ce7ac37b43ee02f71e6fff131c5ebd",
+  "fixture_sha256": "846af7ec3b3d888002713cacedad61026cf9a63d12c7ce785ec3c431a3cb8b9c",
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false
+}

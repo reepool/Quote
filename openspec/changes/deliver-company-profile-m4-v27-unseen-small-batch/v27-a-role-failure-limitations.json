@@ -1,0 +1,14 @@
+{
+  "created_at": "2026-10-07T01:39:57.193573+00:00",
+  "adopted_first_failure": {
+    "recall": "5/40",
+    "accuracy": "11/15",
+    "elapsed_seconds": 205.54,
+    "tokens": 0
+  },
+  "limitation": "Original40 contract omits Yutong p132 three report segments and native income bases; Huadian self-use solar/owned retail comprehensive energy services and Yutong fleet-management/KD/technology export/brand licensing must be in separate repair source contract. Original contract and scores retained, not adopted as new denominator.",
+  "first_artifacts_preserved": true,
+  "next_batch": "paused",
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false
+}

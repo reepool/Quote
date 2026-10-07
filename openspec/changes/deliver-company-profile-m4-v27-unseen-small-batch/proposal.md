@@ -23,3 +23,7 @@ v27投入关系修复获A角声明来源范围有限通过，旧change已同步�
 ## Impact
 
 复用CompanyProfileTaskService.freeze_m4_next_batch_plan、execute_published_task及record_published_source_review，保持单一写入owner与common-core三维合同。不改业务模板、生产入口/配置/身份默认值，不新增依赖或框架。量价、成本、行业增强、框架整理与无关旧失败后置。生产not_authorized，规模质量false。
+
+## v28 Repair Scope
+
+v27首次失败5/40、11/15保留；A角补充限制另存，40项不作为新目标。执行4.1–4.4，沿原计划官方报告/cutoff，补充当前自用光伏、所属售电公司综合能源服务、车队管理/KD/技术输出/品牌授权及三报告分部。收入恢复19原生行，并交付三分部的营业/对外/内部收入与抵销依据；商品15角色逐动作绑定。局部复用选段/解析/投影，不新增模板或owner。v28五类开关和完整源页接受→查询→导出回归通过后，固定新来源合同并使用m4_v28_energy_bus_core_repair独立目录首次正式交付，唯一复核按实际对象重算。失败保留并继续暂停，待A角有限验收。

@@ -32,3 +32,25 @@ Recall MUST use new original-source substance rather than answered status. Every
 #### Scenario: A new source disclosure is missing or incorrect
 - **WHEN** independent source comparison finds a real business gap
 - **THEN** truthful scores, unique objects and first-round artifacts are retained, later batches pause and only that business gap is proposed for repair
+
+### Requirement: v28 repairs full source substance with supplementary contract
+The original forty-item contract and v27 first failure MUST remain unchanged. A separate repair contract MUST include current self-use solar and owned retail-company comprehensive energy services with their status, current fleet management, KD cooperation, technology export and brand licensing, and all three report segments without inferring specific activities for the other segment. The existing owner MUST deliver full substantive six answers, all original nineteen revenue rows and nine report-segment income cells preserving total, external and intersegment bases, elimination and consolidated-versus-parent boundaries. Native units MUST remain unchanged and overlapping income bases MUST NOT be accumulated. Fifteen native roles MUST be bound to actual sales, actual purchase or energy-consumption sources; self-use MUST NOT imply external purchase, uses MUST NOT imply passenger service and supplier names MUST NOT imply materials. Full v28 identity MUST activate all five cumulative repairs with the default unchanged. Complete original PDF and actual owner pages MUST pass acceptance-query-export regression before the repair contract is fixed for formal execution.
+
+#### Scenario: Native segment columns have multiple revenue bases
+- **WHEN** the report discloses three report-segment columns and separate operating, external and intersegment revenue rows
+- **THEN** every native segment income cell retains its row basis, amount and unit with the elimination relationship, without summing overlapping bases or treating an elimination as a product
+
+#### Scenario: Current subsidiary and service models supplement the original business
+- **WHEN** current self-use generation, owned retail services, fleet management and KD/licensing are explicitly disclosed
+- **THEN** their complete original current substance and actors are accepted and visible in the corresponding answers without upgrading equity investment, future plans or technical parameters to current sales
+
+### Requirement: First formal v28 delivery and unique review preserve earlier failure
+The first genuine v28 execute MUST use the original frozen plan reports, official versions and cutoff in independent m4_v28_energy_bus_core_repair directories after the supplementary source contract is fixed. The whole-round timer MUST cover first execute through second export including all retries and the second company MUST use remaining shared50000tokens. Actual five-stage reused scopes MUST be recorded. Recall MUST use the supplemented substantive source conditions, and all actual accepted facts and answered texts MUST be uniquely checked for actor, action/relation, income basis, value and unit. Measurement MUST count only for accuracy and role evidence MUST NOT create duplicate recall. Both scores100%, zero numeric errors and at most300seconds/50000tokens MUST precede finite submission; otherwise failures MUST be preserved and expansion remain paused. Production and scale declarations MUST remain unchanged.
+
+#### Scenario: Supplementary review fails
+- **WHEN** the first formal repair round misses or misstates a supplemented source condition
+- **THEN** its true scores and artifacts remain preserved alongside the original40-item failure, with no archive or later batch release
+
+#### Scenario: Explicit current group action shares a page with parent ownership
+- **WHEN** the source directly defines the company and its subsidiaries as the group and attributes a current sales action to that group, while the page separately identifies an ultimate parent
+- **THEN** the fact and derived role retain consolidated_group and direct_source_wording for that action without treating the ownership note as a parent-statement scope or promoting a third-party or planned action
