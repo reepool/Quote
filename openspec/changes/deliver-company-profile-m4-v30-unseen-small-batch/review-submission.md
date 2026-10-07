@@ -21,3 +21,5 @@
 定向批次测试20passed；OpenSpec新change、两项同步主规格严格校验及diff检查通过。Ruff现有批次owner/operations及相关测试检查通过。本人范围Review未发现归档/冻结/计时/保护/唯一计分流程的阻塞；业务P0/P1已按失败分支登记4.1–4.4，未修代码。开发测试不替代以上正式失败。生产not_authorized，规模质量声明false。本轮范围仅声明来源及实际检查页，不声明全年报完整性；量价/成本/行业包/去重框架/性能/五既有失败后置。
 
 复核依据：source-review-evidence.json、actual-object-decisions.json、source-scope.json、source-freeze-receipt.json、freeze-receipt.json及first-formal-delivery-preservation.json。
+
+来源范围补充限制：冻结检查页p267的管理服务费及房屋/机器设备租赁未在原47条件单列。source-review-scope-limits.json保留原页金额/主体/语义；原分数与失败制品不改，4.1及4.4修复前补入明确来源条件，不能将这些租赁收入推成商品销量或设备销售。
