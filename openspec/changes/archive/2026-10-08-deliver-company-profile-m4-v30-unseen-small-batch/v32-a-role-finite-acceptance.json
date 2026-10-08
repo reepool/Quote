@@ -1,0 +1,35 @@
+{
+  "created_at": "2026-10-08T03:58:13.108491+00:00",
+  "conclusion": "A-role finite acceptance in51 declared conditions;5.2 and5.3 complete",
+  "source_recall": {
+    "status": "assessed",
+    "numerator": 51,
+    "denominator": 51,
+    "value": 1.0
+  },
+  "source_accuracy": {
+    "status": "assessed",
+    "numerator": 159,
+    "denominator": 159,
+    "value": 1.0
+  },
+  "facts": 153,
+  "answers": 6,
+  "numeric_errors": 0,
+  "whole_round_seconds": 188.69414335954934,
+  "tokens": 0,
+  "actual_five_stage_no_reuse": true,
+  "a_role_test": "40 passed",
+  "a_role_checks": "Ruff/OpenSpec strict/commit diff passed",
+  "history_verified": 957,
+  "formal_artifacts_verified": 19,
+  "execution_modules_verified": 38,
+  "scope": "51 source conditions and actual checked pages;not full-report completeness",
+  "preserved": [
+    "v30 original47 conditions and21/47,55/109,42 numeric errors",
+    "v31 first failure50/51,158/159 and correction trail",
+    "v32 first formal delivery and source review"
+  ],
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false
+}

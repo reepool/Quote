@@ -151,3 +151,17 @@ Current product enumeration MUST stop before subsequent upstream/downstream acto
 #### Scenario: Current goods actions belong to different group scopes
 - **WHEN** an owned page states seller-to-listed-group procurement, listed-group sales or energy consumption and a distinct upper-parent action
 - **THEN** acceptance, query and export retain each original actor and action without promoting upper-parent activity or converting purchases into manufacturing input
+
+### Requirement: Revenue column selection follows native period and aggregate headers
+The owned-page path MUST distinguish current-income/current-cost/prior-income/prior-cost tables from multi-segment aggregate tables using native headers and column placement. It MUST retain current revenue, full multiline regions, native business_type and revenue-confirmation timing dimensions, original units and consolidated/parent boundaries. Main-business other and all-income other MUST retain separate bases. Seller/service/lessor income MUST retain direction; asset purchases MUST NOT become income or leases become goods sales.
+
+#### Scenario: Four numeric columns distinguish the current and prior periods
+- **WHEN** a source table prints current income,current cost,prior income,prior cost
+- **THEN** Segment and revenue Measurement bind current income without changing valid aggregate-column selection in a report-segment table
+
+### Requirement: Accepted business state restrictions reach every affected answer
+When accepted business or product-income evidence is limited to a former subsidiary, part of the reporting period, loss of control or exit from consolidation, each affected principal-business,products/services and revenue answer MUST retain those original actor,period and state restrictions through query and export. Planned directions,downstream applications and legal scope MUST NOT establish current company operations. Answered status or keywords alone MUST NOT prove substantive completeness.
+
+#### Scenario: Former subsidiary lithium income exists only in January and February
+- **WHEN** accepted source evidence states the original subsidiary,January/February and loss of control/exit from consolidation
+- **THEN** all three affected answer bodies preserve those restrictions with accepted source support

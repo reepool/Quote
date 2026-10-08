@@ -1,0 +1,71 @@
+{
+  "created_at": "2026-10-08T04:15:54.986853+00:00",
+  "cards_completed": [
+    "old6.1",
+    "new1.1",
+    "new2.1_failure_branch"
+  ],
+  "old_change_archived": "openspec/changes/archive/2026-10-08-deliver-company-profile-m4-v30-unseen-small-batch",
+  "new_change": "deliver-company-profile-m4-v32-unseen-small-batch",
+  "processing_identity": {
+    "rules": "company_profile_common_core.v1",
+    "owned_page_facts": "v8",
+    "material_input_facts": "v1",
+    "revenue_sentence_repair": "v32"
+  },
+  "source_condition_count": 68,
+  "source_recall": {
+    "status": "assessed",
+    "numerator": 25,
+    "denominator": 68,
+    "value": 0.36764705882352944
+  },
+  "source_accuracy": {
+    "status": "assessed",
+    "numerator": 70,
+    "denominator": 100,
+    "value": 0.7
+  },
+  "critical_numeric_errors": {
+    "status": "assessed",
+    "value": 23
+  },
+  "whole_round_seconds": 199.1725757587701,
+  "tokens_used": 0,
+  "shared_token_budget": 50000,
+  "actual_runtime_no_reuse": true,
+  "actual_accepted_fact_count": 94,
+  "answered_text_count": 6,
+  "query_export_disk_equal": true,
+  "protected_historical_files": 997,
+  "first_delivery_and_review_files_protected": 19,
+  "execution_modules_protected": 38,
+  "checks": {
+    "test_command": "PYTHONPATH=. /home/python/miniconda3/envs/Quote/bin/python -m pytest -q tests/unit/test_research/test_company_profile_m4_next_batch.py tests/unit/test_research/test_company_profile_source_review.py",
+    "test_result": "29 passed,7 warnings",
+    "ruff": "passed",
+    "openspec_strict": "passed:new change and both synchronized main specs",
+    "diff": "passed",
+    "test_log_sha256": "d6b2188e1947ac0b1e53b08e0e102c57d3bdece3d5088f0fbb6baae1d2c82d90"
+  },
+  "review": {
+    "blocking_business_findings": [
+      "four incomplete substantive bodies",
+      "32 missing native income cells",
+      "seven missing explicit roles",
+      "prior revenue and expenses accepted as current income",
+      "wrong mother-company business category",
+      "truncated blade-design activity and subsidiary actor"
+    ],
+    "current_implementation_findings": [],
+    "deferred": "quantity/price,cost,industry,body trimming,dedup,performance,five unrelated failures",
+    "current_implementation_review": "Archive byte mapping,main-spec rules,full34 exclusions,source contract before execute,unique100 judgments,actual5-stage runtime and protected artifacts checked;no current-task implementation blocker."
+  },
+  "extraction_code_modified": false,
+  "new_business_acceptance": false,
+  "new_change_archived": false,
+  "next_batch": "paused_on_first_formal_failure",
+  "a_role_review": "pending_failure_review",
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false
+}

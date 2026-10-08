@@ -1,0 +1,1945 @@
+{
+  "600033.SH": {
+    "facts": {
+      "owned:core-ev-b7953cf4d7ba5394:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p9高速公路投资建设收费运营及收费收益真实；接受片段忠实，最终答案缺路段/其他服务另按实质评价。",
+        "source_pages": [
+          9,
+          10
+        ],
+        "reviewed_object_index": 0,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        }
+      },
+      "owned:core-ev-b7953cf4d7ba5394:revenue:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p9主营收入占比较高真实，不以该片段冒充完整收入机制。",
+        "source_pages": [
+          9,
+          10
+        ],
+        "reviewed_object_index": 1,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        }
+      },
+      "owned:core-ev-83d85411871a2556:activity:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p9当前高速投资、收费及运营管理成立；末对象包含同句收费收益限定但未新增第三方/未来动作。对象冗长不等于虚构事实，不扩正文精简。",
+        "source_pages": [
+          9,
+          10
+        ],
+        "reviewed_object_index": 2,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        }
+      },
+      "owned:core-ev-83d85411871a2556:activity:2": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p9当前高速投资、收费及运营管理成立；末对象包含同句收费收益限定但未新增第三方/未来动作。对象冗长不等于虚构事实，不扩正文精简。",
+        "source_pages": [
+          9,
+          10
+        ],
+        "reviewed_object_index": 3,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        }
+      },
+      "owned:core-ev-83d85411871a2556:activity:3": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p9当前高速投资、收费及运营管理成立；末对象包含同句收费收益限定但未新增第三方/未来动作。对象冗长不等于虚构事实，不扩正文精简。",
+        "source_pages": [
+          9,
+          10
+        ],
+        "reviewed_object_index": 4,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        }
+      },
+      "owned:core-ev-07fce74edf86f417:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p155本公司出租方表原文，本期/上期栏保留；表原文可作正文但不等于逐行结构化交付。",
+        "source_pages": [
+          155
+        ],
+        "reviewed_object_index": 5,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        }
+      },
+      "owned:core-ev-22895f6ffa8471e8:commodity:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p153本公司采购表明确购买商品；原生泛称商品保留，不推具体品种或生产耗用；该对象不满足具名角色召回。",
+        "source_pages": [
+          153
+        ],
+        "reviewed_object_index": 6,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        }
+      },
+      "owned:core-ev-d8d4c2d58fa5497b:segment:industry:高速公路收费": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p12/13主营行业/路段/地区或p134合并主营/其他首收入列、原单位正确；保持原生维度，不跨表重复累计。",
+        "source_pages": [
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19
+        ],
+        "reviewed_object_index": 7,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        },
+        "recall_row_index": 0
+      },
+      "owned:core-ev-63a5a5809dc898af:revenue:industry:高速公路收费": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p12/13主营行业/路段/地区或p134合并主营/其他首收入列、原单位正确；保持原生维度，不跨表重复累计。",
+        "source_pages": [
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19
+        ],
+        "reviewed_object_index": 8,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        }
+      },
+      "owned:core-ev-d8d4c2d58fa5497b:segment:product:泉厦高速公路": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p12/13主营行业/路段/地区或p134合并主营/其他首收入列、原单位正确；保持原生维度，不跨表重复累计。",
+        "source_pages": [
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19
+        ],
+        "reviewed_object_index": 9,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        },
+        "recall_row_index": 1
+      },
+      "owned:core-ev-63a5a5809dc898af:revenue:product:泉厦高速公路": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p12/13主营行业/路段/地区或p134合并主营/其他首收入列、原单位正确；保持原生维度，不跨表重复累计。",
+        "source_pages": [
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19
+        ],
+        "reviewed_object_index": 10,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        }
+      },
+      "owned:core-ev-d8d4c2d58fa5497b:segment:product:福泉高速公路": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p12/13主营行业/路段/地区或p134合并主营/其他首收入列、原单位正确；保持原生维度，不跨表重复累计。",
+        "source_pages": [
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19
+        ],
+        "reviewed_object_index": 11,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        },
+        "recall_row_index": 2
+      },
+      "owned:core-ev-63a5a5809dc898af:revenue:product:福泉高速公路": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p12/13主营行业/路段/地区或p134合并主营/其他首收入列、原单位正确；保持原生维度，不跨表重复累计。",
+        "source_pages": [
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19
+        ],
+        "reviewed_object_index": 12,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        }
+      },
+      "owned:core-ev-d8d4c2d58fa5497b:segment:product:罗宁高速公路": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p12/13主营行业/路段/地区或p134合并主营/其他首收入列、原单位正确；保持原生维度，不跨表重复累计。",
+        "source_pages": [
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19
+        ],
+        "reviewed_object_index": 13,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        },
+        "recall_row_index": 3
+      },
+      "owned:core-ev-63a5a5809dc898af:revenue:product:罗宁高速公路": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p12/13主营行业/路段/地区或p134合并主营/其他首收入列、原单位正确；保持原生维度，不跨表重复累计。",
+        "source_pages": [
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19
+        ],
+        "reviewed_object_index": 14,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        }
+      },
+      "owned:core-ev-d8d4c2d58fa5497b:segment:region:福建省": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p12/13主营行业/路段/地区或p134合并主营/其他首收入列、原单位正确；保持原生维度，不跨表重复累计。",
+        "source_pages": [
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19
+        ],
+        "reviewed_object_index": 15,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        },
+        "recall_row_index": 4
+      },
+      "owned:core-ev-63a5a5809dc898af:revenue:region:福建省": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p12/13主营行业/路段/地区或p134合并主营/其他首收入列、原单位正确；保持原生维度，不跨表重复累计。",
+        "source_pages": [
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19
+        ],
+        "reviewed_object_index": 16,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        }
+      },
+      "owned:core-ev-31ce52557a8e510c:Segment:business_type:主营业务:营业收入": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p12/13主营行业/路段/地区或p134合并主营/其他首收入列、原单位正确；保持原生维度，不跨表重复累计。",
+        "source_pages": [
+          134
+        ],
+        "reviewed_object_index": 17,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        },
+        "recall_row_index": 5
+      },
+      "owned:core-ev-c090b4ee030b70a6:Measurement:business_type:主营业务:营业收入": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p12/13主营行业/路段/地区或p134合并主营/其他首收入列、原单位正确；保持原生维度，不跨表重复累计。",
+        "source_pages": [
+          134
+        ],
+        "reviewed_object_index": 18,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        }
+      },
+      "owned:core-ev-31ce52557a8e510c:Segment:business_type:其他业务:营业收入": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p12/13主营行业/路段/地区或p134合并主营/其他首收入列、原单位正确；保持原生维度，不跨表重复累计。",
+        "source_pages": [
+          134
+        ],
+        "reviewed_object_index": 19,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        },
+        "recall_row_index": 6
+      },
+      "owned:core-ev-c090b4ee030b70a6:Measurement:business_type:其他业务:营业收入": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p12/13主营行业/路段/地区或p134合并主营/其他首收入列、原单位正确；保持原生维度，不跨表重复累计。",
+        "source_pages": [
+          134
+        ],
+        "reviewed_object_index": 20,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        }
+      },
+      "owned:core-ev-f5c773d653ca6798:Segment:business_type:主营业务:营业收入": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p170母公司主营/其他首列、issuer口径正确；证据锚p163续至p170有完整原表，不能当合并收入。",
+        "source_pages": [
+          163,
+          170
+        ],
+        "reviewed_object_index": 21,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        },
+        "recall_row_index": 7
+      },
+      "owned:core-ev-cfc8ae9635f8e1e4:Measurement:business_type:主营业务:营业收入": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p170母公司主营/其他首列、issuer口径正确；证据锚p163续至p170有完整原表，不能当合并收入。",
+        "source_pages": [
+          163,
+          170
+        ],
+        "reviewed_object_index": 22,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        }
+      },
+      "owned:core-ev-f5c773d653ca6798:Segment:business_type:其他业务:营业收入": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p170母公司主营/其他首列、issuer口径正确；证据锚p163续至p170有完整原表，不能当合并收入。",
+        "source_pages": [
+          163,
+          170
+        ],
+        "reviewed_object_index": 23,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        },
+        "recall_row_index": 8
+      },
+      "owned:core-ev-cfc8ae9635f8e1e4:Measurement:business_type:其他业务:营业收入": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p170母公司主营/其他首列、issuer口径正确；证据锚p163续至p170有完整原表，不能当合并收入。",
+        "source_pages": [
+          163,
+          170
+        ],
+        "reviewed_object_index": 24,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        }
+      },
+      "owned:core-ev-c7785099ed8e14cc:Segment:lease:房屋租赁:本公司作为出租方/本期确认的租赁收入": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p155本公司出租房屋给省经开，本期5,527,173.17元真实；剩余20租赁行没有结构化交付另计漏召回。",
+        "source_pages": [
+          155
+        ],
+        "reviewed_object_index": 25,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        },
+        "recall_row_index": 11
+      },
+      "owned:core-ev-31ebc8f432d569a8:Measurement:lease:房屋租赁:本公司作为出租方/本期确认的租赁收入": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p155本公司出租房屋给省经开，本期5,527,173.17元真实；剩余20租赁行没有结构化交付另计漏召回。",
+        "source_pages": [
+          155
+        ],
+        "reviewed_object_index": 26,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        }
+      }
+    },
+    "answers": {
+      "principal_business": {
+        "accurate": false,
+        "answered": true,
+        "reason": "收费高速主业已有实质，但泉厦/福泉/罗宁及参股浦南状态遗漏，未满足执行前完整主体业务条件。",
+        "failed_substance_groups": [
+          [
+            "泉厦"
+          ],
+          [
+            "罗宁"
+          ],
+          [
+            "参股",
+            "浦南"
+          ]
+        ]
+      },
+      "products_services": {
+        "accurate": false,
+        "answered": true,
+        "reason": "只有主业首句和首段租赁；三路段、广告/ETC/清障/经营开发、福泉受托服务遗漏，不能用支持record_id而无正文替代。",
+        "failed_substance_groups": [
+          [
+            "泉厦"
+          ],
+          [
+            "罗宁"
+          ],
+          [
+            "广告"
+          ],
+          [
+            "ETC"
+          ],
+          [
+            "清障"
+          ],
+          [
+            "经营开发"
+          ],
+          [
+            "托管",
+            "受托"
+          ]
+        ]
+      },
+      "revenue_model": {
+        "accurate": false,
+        "answered": true,
+        "reason": "缺p9其他收入及p93联网统一分配按月清算、80%里程费率/20%投资、一车一拆及免费车无收入，托管机制也遗漏。",
+        "failed_substance_groups": [
+          [
+            "分配"
+          ],
+          [
+            "广告"
+          ],
+          [
+            "ETC"
+          ],
+          [
+            "清障"
+          ],
+          [
+            "按月",
+            "月清算"
+          ],
+          [
+            "80%"
+          ],
+          [
+            "20%"
+          ],
+          [
+            "里程"
+          ],
+          [
+            "费率"
+          ],
+          [
+            "一车一拆"
+          ],
+          [
+            "托管",
+            "受托"
+          ]
+        ]
+      }
+    }
+  },
+  "600072.SH": {
+    "facts": {
+      "owned:core-ev-31464ffa6cd69cdd:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p11/12完整当前风电主机/叶片/塔筒/电站/运维/中船九院工程服务，预研和原子公司主体限定保留；p296出租方表原文忠实，末上期租赁行不推本期收入。",
+        "source_pages": [
+          11,
+          12
+        ],
+        "reviewed_object_index": 0,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        }
+      },
+      "owned:core-ev-d41bfb8065c04497:activity:1": {
+        "accurate": false,
+        "critical_numeric_error": false,
+        "reason": "p11原双瑞复材叶片设计/研发/制造被截断成produces“叶片的设计、”，并以公司direct_grammatical_actor代替双瑞复材；动作对象与原主体不成立。",
+        "source_pages": [
+          11,
+          12
+        ],
+        "reviewed_object_index": 1,
+        "checks": {
+          "actor": false,
+          "action_relation": false,
+          "native_label": false,
+          "current_period_amount": true,
+          "unit": true
+        }
+      },
+      "owned:core-ev-d41bfb8065c04497:activity:2": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p11/12当前装备制造、塔筒矩阵、智慧运维、技改/资产管理均有本公司依据；海上/钢混塔筒的适配参数仅原对象限定，不虚构独立技术参数经营或销量。",
+        "source_pages": [
+          11,
+          12
+        ],
+        "reviewed_object_index": 2,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        }
+      },
+      "owned:core-ev-d41bfb8065c04497:activity:3": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p11/12当前装备制造、塔筒矩阵、智慧运维、技改/资产管理均有本公司依据；海上/钢混塔筒的适配参数仅原对象限定，不虚构独立技术参数经营或销量。",
+        "source_pages": [
+          11,
+          12
+        ],
+        "reviewed_object_index": 3,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        }
+      },
+      "owned:core-ev-d41bfb8065c04497:activity:4": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p11/12当前装备制造、塔筒矩阵、智慧运维、技改/资产管理均有本公司依据；海上/钢混塔筒的适配参数仅原对象限定，不虚构独立技术参数经营或销量。",
+        "source_pages": [
+          11,
+          12
+        ],
+        "reviewed_object_index": 4,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        }
+      },
+      "owned:core-ev-d41bfb8065c04497:activity:5": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p11/12当前装备制造、塔筒矩阵、智慧运维、技改/资产管理均有本公司依据；海上/钢混塔筒的适配参数仅原对象限定，不虚构独立技术参数经营或销量。",
+        "source_pages": [
+          11,
+          12
+        ],
+        "reviewed_object_index": 5,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        }
+      },
+      "owned:core-ev-d41bfb8065c04497:activity:6": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p11/12当前装备制造、塔筒矩阵、智慧运维、技改/资产管理均有本公司依据；海上/钢混塔筒的适配参数仅原对象限定，不虚构独立技术参数经营或销量。",
+        "source_pages": [
+          11,
+          12
+        ],
+        "reviewed_object_index": 6,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        }
+      },
+      "owned:core-ev-d41bfb8065c04497:activity:7": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p11/12当前装备制造、塔筒矩阵、智慧运维、技改/资产管理均有本公司依据；海上/钢混塔筒的适配参数仅原对象限定，不虚构独立技术参数经营或销量。",
+        "source_pages": [
+          11,
+          12
+        ],
+        "reviewed_object_index": 7,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        }
+      },
+      "owned:core-ev-28638379269c8a80:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p11/12完整当前风电主机/叶片/塔筒/电站/运维/中船九院工程服务，预研和原子公司主体限定保留；p296出租方表原文忠实，末上期租赁行不推本期收入。",
+        "source_pages": [
+          296
+        ],
+        "reviewed_object_index": 8,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        }
+      },
+      "owned:core-ev-88f89c3be76fd39c:segment:industry:风电": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p24/25主营行业/产品/地区/直销或p234合并收入分类本期首列、集团元口径一致；相同商品类型多证据只评价实际record_id，不重复召回。",
+        "source_pages": [
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "reviewed_object_index": 9,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        },
+        "recall_row_index": 0
+      },
+      "owned:core-ev-627472bb0f4eb328:revenue:industry:风电": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p24/25主营行业/产品/地区/直销或p234合并收入分类本期首列、集团元口径一致；相同商品类型多证据只评价实际record_id，不重复召回。",
+        "source_pages": [
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "reviewed_object_index": 10,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        }
+      },
+      "owned:core-ev-88f89c3be76fd39c:segment:industry:工程勘察设计": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p24/25主营行业/产品/地区/直销或p234合并收入分类本期首列、集团元口径一致；相同商品类型多证据只评价实际record_id，不重复召回。",
+        "source_pages": [
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "reviewed_object_index": 11,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        },
+        "recall_row_index": 1
+      },
+      "owned:core-ev-627472bb0f4eb328:revenue:industry:工程勘察设计": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p24/25主营行业/产品/地区/直销或p234合并收入分类本期首列、集团元口径一致；相同商品类型多证据只评价实际record_id，不重复召回。",
+        "source_pages": [
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "reviewed_object_index": 12,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        }
+      },
+      "owned:core-ev-88f89c3be76fd39c:segment:product:风力发电机组及配件": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p24/25主营行业/产品/地区/直销或p234合并收入分类本期首列、集团元口径一致；相同商品类型多证据只评价实际record_id，不重复召回。",
+        "source_pages": [
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "reviewed_object_index": 13,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        },
+        "recall_row_index": 2
+      },
+      "owned:core-ev-627472bb0f4eb328:revenue:product:风力发电机组及配件": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p24/25主营行业/产品/地区/直销或p234合并收入分类本期首列、集团元口径一致；相同商品类型多证据只评价实际record_id，不重复召回。",
+        "source_pages": [
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "reviewed_object_index": 14,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        }
+      },
+      "owned:core-ev-88f89c3be76fd39c:segment:product:发电收入": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p24/25主营行业/产品/地区/直销或p234合并收入分类本期首列、集团元口径一致；相同商品类型多证据只评价实际record_id，不重复召回。",
+        "source_pages": [
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "reviewed_object_index": 15,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        },
+        "recall_row_index": 3
+      },
+      "owned:core-ev-627472bb0f4eb328:revenue:product:发电收入": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p24/25主营行业/产品/地区/直销或p234合并收入分类本期首列、集团元口径一致；相同商品类型多证据只评价实际record_id，不重复召回。",
+        "source_pages": [
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "reviewed_object_index": 16,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        }
+      },
+      "owned:core-ev-88f89c3be76fd39c:segment:product:工程总承包": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p24/25主营行业/产品/地区/直销或p234合并收入分类本期首列、集团元口径一致；相同商品类型多证据只评价实际record_id，不重复召回。",
+        "source_pages": [
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "reviewed_object_index": 17,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        },
+        "recall_row_index": 4
+      },
+      "owned:core-ev-627472bb0f4eb328:revenue:product:工程总承包": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p24/25主营行业/产品/地区/直销或p234合并收入分类本期首列、集团元口径一致；相同商品类型多证据只评价实际record_id，不重复召回。",
+        "source_pages": [
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "reviewed_object_index": 18,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        }
+      },
+      "owned:core-ev-88f89c3be76fd39c:segment:product:工程设计、勘察、咨询和监理": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p24/25主营行业/产品/地区/直销或p234合并收入分类本期首列、集团元口径一致；相同商品类型多证据只评价实际record_id，不重复召回。",
+        "source_pages": [
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "reviewed_object_index": 19,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        },
+        "recall_row_index": 5
+      },
+      "owned:core-ev-627472bb0f4eb328:revenue:product:工程设计、勘察、咨询和监理": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p24/25主营行业/产品/地区/直销或p234合并收入分类本期首列、集团元口径一致；相同商品类型多证据只评价实际record_id，不重复召回。",
+        "source_pages": [
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "reviewed_object_index": 20,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        }
+      },
+      "owned:core-ev-88f89c3be76fd39c:segment:product:其他": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p24/25主营行业/产品/地区/直销或p234合并收入分类本期首列、集团元口径一致；相同商品类型多证据只评价实际record_id，不重复召回。",
+        "source_pages": [
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "reviewed_object_index": 21,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        },
+        "recall_row_index": 6
+      },
+      "owned:core-ev-627472bb0f4eb328:revenue:product:其他": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p24/25主营行业/产品/地区/直销或p234合并收入分类本期首列、集团元口径一致；相同商品类型多证据只评价实际record_id，不重复召回。",
+        "source_pages": [
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "reviewed_object_index": 22,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        }
+      },
+      "owned:core-ev-88f89c3be76fd39c:segment:region:国内": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p24/25主营行业/产品/地区/直销或p234合并收入分类本期首列、集团元口径一致；相同商品类型多证据只评价实际record_id，不重复召回。",
+        "source_pages": [
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "reviewed_object_index": 23,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        },
+        "recall_row_index": 7
+      },
+      "owned:core-ev-627472bb0f4eb328:revenue:region:国内": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p24/25主营行业/产品/地区/直销或p234合并收入分类本期首列、集团元口径一致；相同商品类型多证据只评价实际record_id，不重复召回。",
+        "source_pages": [
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "reviewed_object_index": 24,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        }
+      },
+      "owned:core-ev-88f89c3be76fd39c:segment:region:国外": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p24/25主营行业/产品/地区/直销或p234合并收入分类本期首列、集团元口径一致；相同商品类型多证据只评价实际record_id，不重复召回。",
+        "source_pages": [
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "reviewed_object_index": 25,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        },
+        "recall_row_index": 8
+      },
+      "owned:core-ev-627472bb0f4eb328:revenue:region:国外": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p24/25主营行业/产品/地区/直销或p234合并收入分类本期首列、集团元口径一致；相同商品类型多证据只评价实际record_id，不重复召回。",
+        "source_pages": [
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "reviewed_object_index": 26,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        }
+      },
+      "owned:core-ev-88f89c3be76fd39c:segment:sales_mode:直销模式": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p24/25主营行业/产品/地区/直销或p234合并收入分类本期首列、集团元口径一致；相同商品类型多证据只评价实际record_id，不重复召回。",
+        "source_pages": [
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "reviewed_object_index": 27,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        },
+        "recall_row_index": 9
+      },
+      "owned:core-ev-627472bb0f4eb328:revenue:sales_mode:直销模式": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p24/25主营行业/产品/地区/直销或p234合并收入分类本期首列、集团元口径一致；相同商品类型多证据只评价实际record_id，不重复召回。",
+        "source_pages": [
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "reviewed_object_index": 28,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        }
+      },
+      "owned:core-ev-779da70e99f4998d:Segment:business_type:主营业务:营业收入": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p24/25主营行业/产品/地区/直销或p234合并收入分类本期首列、集团元口径一致；相同商品类型多证据只评价实际record_id，不重复召回。",
+        "source_pages": [
+          234
+        ],
+        "reviewed_object_index": 29,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        },
+        "recall_row_index": 10
+      },
+      "owned:core-ev-f6430b511bdd4e2f:Measurement:business_type:主营业务:营业收入": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p24/25主营行业/产品/地区/直销或p234合并收入分类本期首列、集团元口径一致；相同商品类型多证据只评价实际record_id，不重复召回。",
+        "source_pages": [
+          234
+        ],
+        "reviewed_object_index": 30,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        }
+      },
+      "owned:core-ev-779da70e99f4998d:Segment:business_type:其他业务:营业收入": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p24/25主营行业/产品/地区/直销或p234合并收入分类本期首列、集团元口径一致；相同商品类型多证据只评价实际record_id，不重复召回。",
+        "source_pages": [
+          234
+        ],
+        "reviewed_object_index": 31,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        },
+        "recall_row_index": 11
+      },
+      "owned:core-ev-f6430b511bdd4e2f:Measurement:business_type:其他业务:营业收入": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p24/25主营行业/产品/地区/直销或p234合并收入分类本期首列、集团元口径一致；相同商品类型多证据只评价实际record_id，不重复召回。",
+        "source_pages": [
+          234
+        ],
+        "reviewed_object_index": 32,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        }
+      },
+      "owned:core-ev-cfd577b660bb2653:Segment:product:发电收入:全部营业收入/商品类型": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p24/25主营行业/产品/地区/直销或p234合并收入分类本期首列、集团元口径一致；相同商品类型多证据只评价实际record_id，不重复召回。",
+        "source_pages": [
+          234
+        ],
+        "reviewed_object_index": 33,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        }
+      },
+      "owned:core-ev-4dec5c21d164e001:Measurement:product:发电收入:全部营业收入/商品类型": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p24/25主营行业/产品/地区/直销或p234合并收入分类本期首列、集团元口径一致；相同商品类型多证据只评价实际record_id，不重复召回。",
+        "source_pages": [
+          234
+        ],
+        "reviewed_object_index": 34,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        }
+      },
+      "owned:core-ev-cfd577b660bb2653:Segment:product:工程总承包:全部营业收入/商品类型": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p24/25主营行业/产品/地区/直销或p234合并收入分类本期首列、集团元口径一致；相同商品类型多证据只评价实际record_id，不重复召回。",
+        "source_pages": [
+          234
+        ],
+        "reviewed_object_index": 35,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        }
+      },
+      "owned:core-ev-4dec5c21d164e001:Measurement:product:工程总承包:全部营业收入/商品类型": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p24/25主营行业/产品/地区/直销或p234合并收入分类本期首列、集团元口径一致；相同商品类型多证据只评价实际record_id，不重复召回。",
+        "source_pages": [
+          234
+        ],
+        "reviewed_object_index": 36,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        }
+      },
+      "owned:core-ev-cfd577b660bb2653:Segment:product:船舶配件--:全部营业收入/商品类型": {
+        "accurate": false,
+        "critical_numeric_error": true,
+        "reason": "p234船舶配件本期收入和成本均为“-”；759,601,816.76元是2024收入，被错作2025收入且“-”拼入产品名称。原文不支持任何本期数值，也不能虚构0。",
+        "source_pages": [
+          234
+        ],
+        "reviewed_object_index": 37,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": false,
+          "current_period_amount": false,
+          "unit": true
+        }
+      },
+      "owned:core-ev-4dec5c21d164e001:Measurement:product:船舶配件--:全部营业收入/商品类型": {
+        "accurate": false,
+        "critical_numeric_error": true,
+        "reason": "p234船舶配件本期收入和成本均为“-”；759,601,816.76元是2024收入，被错作2025收入且“-”拼入产品名称。原文不支持任何本期数值，也不能虚构0。",
+        "source_pages": [
+          234
+        ],
+        "reviewed_object_index": 38,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": false,
+          "current_period_amount": false,
+          "unit": true
+        }
+      },
+      "owned:core-ev-cfd577b660bb2653:Segment:product:其他:全部营业收入/商品类型": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p24/25主营行业/产品/地区/直销或p234合并收入分类本期首列、集团元口径一致；相同商品类型多证据只评价实际record_id，不重复召回。",
+        "source_pages": [
+          234
+        ],
+        "reviewed_object_index": 39,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        },
+        "recall_row_index": 13
+      },
+      "owned:core-ev-4dec5c21d164e001:Measurement:product:其他:全部营业收入/商品类型": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p24/25主营行业/产品/地区/直销或p234合并收入分类本期首列、集团元口径一致；相同商品类型多证据只评价实际record_id，不重复召回。",
+        "source_pages": [
+          234
+        ],
+        "reviewed_object_index": 40,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        }
+      },
+      "owned:core-ev-b7619c0a40a968f0:Segment:product:发电收入:全部营业收入/商品类型": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p24/25主营行业/产品/地区/直销或p234合并收入分类本期首列、集团元口径一致；相同商品类型多证据只评价实际record_id，不重复召回。",
+        "source_pages": [
+          234,
+          235
+        ],
+        "reviewed_object_index": 41,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        }
+      },
+      "owned:core-ev-b7619c0a40a968f0:Segment:product:工程总承包:全部营业收入/商品类型": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p24/25主营行业/产品/地区/直销或p234合并收入分类本期首列、集团元口径一致；相同商品类型多证据只评价实际record_id，不重复召回。",
+        "source_pages": [
+          234,
+          235
+        ],
+        "reviewed_object_index": 42,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        }
+      },
+      "owned:core-ev-b7619c0a40a968f0:Segment:product:船舶配件--:全部营业收入/商品类型": {
+        "accurate": false,
+        "critical_numeric_error": true,
+        "reason": "p234船舶配件本期收入和成本均为“-”；759,601,816.76元是2024收入，被错作2025收入且“-”拼入产品名称。原文不支持任何本期数值，也不能虚构0。",
+        "source_pages": [
+          234,
+          235
+        ],
+        "reviewed_object_index": 43,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": false,
+          "current_period_amount": false,
+          "unit": true
+        }
+      },
+      "owned:core-ev-b7619c0a40a968f0:Segment:product:其他:全部营业收入/商品类型": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p24/25主营行业/产品/地区/直销或p234合并收入分类本期首列、集团元口径一致；相同商品类型多证据只评价实际record_id，不重复召回。",
+        "source_pages": [
+          234,
+          235
+        ],
+        "reviewed_object_index": 44,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true
+        },
+        "recall_row_index": 13
+      },
+      "owned:core-ev-b7619c0a40a968f0:Segment:region:印花税:全部营业收入/经营地区": {
+        "accurate": false,
+        "critical_numeric_error": true,
+        "reason": "收入表已于p234合计及p235履约说明结束；随后税金附加/销售费用的本期费用金额被接受为地区营业收入。数字来自真实费用列但作为收入金额无来源，是关键财务数值语义错误；栏目region和收入指标也错误。",
+        "source_pages": [
+          234,
+          235
+        ],
+        "reviewed_object_index": 45,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": false,
+          "current_period_amount": false,
+          "unit": true
+        }
+      },
+      "owned:core-ev-a6862c6f697c1f20:Measurement:region:印花税:全部营业收入/经营地区": {
+        "accurate": false,
+        "critical_numeric_error": true,
+        "reason": "收入表已于p234合计及p235履约说明结束；随后税金附加/销售费用的本期费用金额被接受为地区营业收入。数字来自真实费用列但作为收入金额无来源，是关键财务数值语义错误；栏目region和收入指标也错误。",
+        "source_pages": [
+          234,
+          235
+        ],
+        "reviewed_object_index": 46,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": false,
+          "current_period_amount": false,
+          "unit": true
+        }
+      },
+      "owned:core-ev-b7619c0a40a968f0:Segment:region:房产税:全部营业收入/经营地区": {
+        "accurate": false,
+        "critical_numeric_error": true,
+        "reason": "收入表已于p234合计及p235履约说明结束；随后税金附加/销售费用的本期费用金额被接受为地区营业收入。数字来自真实费用列但作为收入金额无来源，是关键财务数值语义错误；栏目region和收入指标也错误。",
+        "source_pages": [
+          234,
+          235
+        ],
+        "reviewed_object_index": 47,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": false,
+          "current_period_amount": false,
+          "unit": true
+        }
+      },
+      "owned:core-ev-a6862c6f697c1f20:Measurement:region:房产税:全部营业收入/经营地区": {
+        "accurate": false,
+        "critical_numeric_error": true,
+        "reason": "收入表已于p234合计及p235履约说明结束；随后税金附加/销售费用的本期费用金额被接受为地区营业收入。数字来自真实费用列但作为收入金额无来源，是关键财务数值语义错误；栏目region和收入指标也错误。",
+        "source_pages": [
+          234,
+          235
+        ],
+        "reviewed_object_index": 48,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": false,
+          "current_period_amount": false,
+          "unit": true
+        }
+      },
+      "owned:core-ev-b7619c0a40a968f0:Segment:region:城市维护建设税:全部营业收入/经营地区": {
+        "accurate": false,
+        "critical_numeric_error": true,
+        "reason": "收入表已于p234合计及p235履约说明结束；随后税金附加/销售费用的本期费用金额被接受为地区营业收入。数字来自真实费用列但作为收入金额无来源，是关键财务数值语义错误；栏目region和收入指标也错误。",
+        "source_pages": [
+          234,
+          235
+        ],
+        "reviewed_object_index": 49,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": false,
+          "current_period_amount": false,
+          "unit": true
+        }
+      },
+      "owned:core-ev-a6862c6f697c1f20:Measurement:region:城市维护建设税:全部营业收入/经营地区": {
+        "accurate": false,
+        "critical_numeric_error": true,
+        "reason": "收入表已于p234合计及p235履约说明结束；随后税金附加/销售费用的本期费用金额被接受为地区营业收入。数字来自真实费用列但作为收入金额无来源，是关键财务数值语义错误；栏目region和收入指标也错误。",
+        "source_pages": [
+          234,
+          235
+        ],
+        "reviewed_object_index": 50,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": false,
+          "current_period_amount": false,
+          "unit": true
+        }
+      },
+      "owned:core-ev-b7619c0a40a968f0:Segment:region:土地使用税:全部营业收入/经营地区": {
+        "accurate": false,
+        "critical_numeric_error": true,
+        "reason": "收入表已于p234合计及p235履约说明结束；随后税金附加/销售费用的本期费用金额被接受为地区营业收入。数字来自真实费用列但作为收入金额无来源，是关键财务数值语义错误；栏目region和收入指标也错误。",
+        "source_pages": [
+          234,
+          235
+        ],
+        "reviewed_object_index": 51,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": false,
+          "current_period_amount": false,
+          "unit": true
+        }
+      },
+      "owned:core-ev-a6862c6f697c1f20:Measurement:region:土地使用税:全部营业收入/经营地区": {
+        "accurate": false,
+        "critical_numeric_error": true,
+        "reason": "收入表已于p234合计及p235履约说明结束；随后税金附加/销售费用的本期费用金额被接受为地区营业收入。数字来自真实费用列但作为收入金额无来源，是关键财务数值语义错误；栏目region和收入指标也错误。",
+        "source_pages": [
+          234,
+          235
+        ],
+        "reviewed_object_index": 52,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": false,
+          "current_period_amount": false,
+          "unit": true
+        }
+      },
+      "owned:core-ev-b7619c0a40a968f0:Segment:region:教育费附加:全部营业收入/经营地区": {
+        "accurate": false,
+        "critical_numeric_error": true,
+        "reason": "收入表已于p234合计及p235履约说明结束；随后税金附加/销售费用的本期费用金额被接受为地区营业收入。数字来自真实费用列但作为收入金额无来源，是关键财务数值语义错误；栏目region和收入指标也错误。",
+        "source_pages": [
+          234,
+          235
+        ],
+        "reviewed_object_index": 53,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": false,
+          "current_period_amount": false,
+          "unit": true
+        }
+      },
+      "owned:core-ev-a6862c6f697c1f20:Measurement:region:教育费附加:全部营业收入/经营地区": {
+        "accurate": false,
+        "critical_numeric_error": true,
+        "reason": "收入表已于p234合计及p235履约说明结束；随后税金附加/销售费用的本期费用金额被接受为地区营业收入。数字来自真实费用列但作为收入金额无来源，是关键财务数值语义错误；栏目region和收入指标也错误。",
+        "source_pages": [
+          234,
+          235
+        ],
+        "reviewed_object_index": 54,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": false,
+          "current_period_amount": false,
+          "unit": true
+        }
+      },
+      "owned:core-ev-b7619c0a40a968f0:Segment:region:地方教育附加:全部营业收入/经营地区": {
+        "accurate": false,
+        "critical_numeric_error": true,
+        "reason": "收入表已于p234合计及p235履约说明结束；随后税金附加/销售费用的本期费用金额被接受为地区营业收入。数字来自真实费用列但作为收入金额无来源，是关键财务数值语义错误；栏目region和收入指标也错误。",
+        "source_pages": [
+          234,
+          235
+        ],
+        "reviewed_object_index": 55,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": false,
+          "current_period_amount": false,
+          "unit": true
+        }
+      },
+      "owned:core-ev-a6862c6f697c1f20:Measurement:region:地方教育附加:全部营业收入/经营地区": {
+        "accurate": false,
+        "critical_numeric_error": true,
+        "reason": "收入表已于p234合计及p235履约说明结束；随后税金附加/销售费用的本期费用金额被接受为地区营业收入。数字来自真实费用列但作为收入金额无来源，是关键财务数值语义错误；栏目region和收入指标也错误。",
+        "source_pages": [
+          234,
+          235
+        ],
+        "reviewed_object_index": 56,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": false,
+          "current_period_amount": false,
+          "unit": true
+        }
+      },
+      "owned:core-ev-b7619c0a40a968f0:Segment:region:其他:全部营业收入/经营地区": {
+        "accurate": false,
+        "critical_numeric_error": true,
+        "reason": "收入表已于p234合计及p235履约说明结束；随后税金附加/销售费用的本期费用金额被接受为地区营业收入。数字来自真实费用列但作为收入金额无来源，是关键财务数值语义错误；栏目region和收入指标也错误。",
+        "source_pages": [
+          234,
+          235
+        ],
+        "reviewed_object_index": 57,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": false,
+          "current_period_amount": false,
+          "unit": true
+        }
+      },
+      "owned:core-ev-a6862c6f697c1f20:Measurement:region:其他:全部营业收入/经营地区": {
+        "accurate": false,
+        "critical_numeric_error": true,
+        "reason": "收入表已于p234合计及p235履约说明结束；随后税金附加/销售费用的本期费用金额被接受为地区营业收入。数字来自真实费用列但作为收入金额无来源，是关键财务数值语义错误；栏目region和收入指标也错误。",
+        "source_pages": [
+          234,
+          235
+        ],
+        "reviewed_object_index": 58,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": false,
+          "current_period_amount": false,
+          "unit": true
+        }
+      },
+      "owned:core-ev-b7619c0a40a968f0:Segment:region:职工薪酬:全部营业收入/经营地区": {
+        "accurate": false,
+        "critical_numeric_error": true,
+        "reason": "收入表已于p234合计及p235履约说明结束；随后税金附加/销售费用的本期费用金额被接受为地区营业收入。数字来自真实费用列但作为收入金额无来源，是关键财务数值语义错误；栏目region和收入指标也错误。",
+        "source_pages": [
+          234,
+          235
+        ],
+        "reviewed_object_index": 59,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": false,
+          "current_period_amount": false,
+          "unit": true
+        }
+      },
+      "owned:core-ev-a6862c6f697c1f20:Measurement:region:职工薪酬:全部营业收入/经营地区": {
+        "accurate": false,
+        "critical_numeric_error": true,
+        "reason": "收入表已于p234合计及p235履约说明结束；随后税金附加/销售费用的本期费用金额被接受为地区营业收入。数字来自真实费用列但作为收入金额无来源，是关键财务数值语义错误；栏目region和收入指标也错误。",
+        "source_pages": [
+          234,
+          235
+        ],
+        "reviewed_object_index": 60,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": false,
+          "current_period_amount": false,
+          "unit": true
+        }
+      },
+      "owned:core-ev-b7619c0a40a968f0:Segment:region:差旅费:全部营业收入/经营地区": {
+        "accurate": false,
+        "critical_numeric_error": true,
+        "reason": "收入表已于p234合计及p235履约说明结束；随后税金附加/销售费用的本期费用金额被接受为地区营业收入。数字来自真实费用列但作为收入金额无来源，是关键财务数值语义错误；栏目region和收入指标也错误。",
+        "source_pages": [
+          234,
+          235
+        ],
+        "reviewed_object_index": 61,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": false,
+          "current_period_amount": false,
+          "unit": true
+        }
+      },
+      "owned:core-ev-a6862c6f697c1f20:Measurement:region:差旅费:全部营业收入/经营地区": {
+        "accurate": false,
+        "critical_numeric_error": true,
+        "reason": "收入表已于p234合计及p235履约说明结束；随后税金附加/销售费用的本期费用金额被接受为地区营业收入。数字来自真实费用列但作为收入金额无来源，是关键财务数值语义错误；栏目region和收入指标也错误。",
+        "source_pages": [
+          234,
+          235
+        ],
+        "reviewed_object_index": 62,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": false,
+          "current_period_amount": false,
+          "unit": true
+        }
+      },
+      "owned:core-ev-b7619c0a40a968f0:Segment:region:招标费用:全部营业收入/经营地区": {
+        "accurate": false,
+        "critical_numeric_error": true,
+        "reason": "收入表已于p234合计及p235履约说明结束；随后税金附加/销售费用的本期费用金额被接受为地区营业收入。数字来自真实费用列但作为收入金额无来源，是关键财务数值语义错误；栏目region和收入指标也错误。",
+        "source_pages": [
+          234,
+          235
+        ],
+        "reviewed_object_index": 63,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": false,
+          "current_period_amount": false,
+          "unit": true
+        }
+      },
+      "owned:core-ev-a6862c6f697c1f20:Measurement:region:招标费用:全部营业收入/经营地区": {
+        "accurate": false,
+        "critical_numeric_error": true,
+        "reason": "收入表已于p234合计及p235履约说明结束；随后税金附加/销售费用的本期费用金额被接受为地区营业收入。数字来自真实费用列但作为收入金额无来源，是关键财务数值语义错误；栏目region和收入指标也错误。",
+        "source_pages": [
+          234,
+          235
+        ],
+        "reviewed_object_index": 64,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": false,
+          "current_period_amount": false,
+          "unit": true
+        }
+      },
+      "owned:core-ev-36e82bdfb453bbd7:Segment:business_type:主营业务:营业收入": {
+        "accurate": false,
+        "critical_numeric_error": false,
+        "reason": "p326母公司主营为“-”，42,407,824.85元属于其他业务；接受为主营业务错误。金额/元/母公司口径本身一致，此处按业务类别错误计准确率，不重复记数字错。",
+        "source_pages": [
+          318,
+          326
+        ],
+        "reviewed_object_index": 65,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": false,
+          "current_period_amount": true,
+          "unit": true
+        }
+      },
+      "owned:core-ev-d114c29f3f104356:Measurement:business_type:主营业务:营业收入": {
+        "accurate": false,
+        "critical_numeric_error": false,
+        "reason": "p326母公司主营为“-”，42,407,824.85元属于其他业务；接受为主营业务错误。金额/元/母公司口径本身一致，此处按业务类别错误计准确率，不重复记数字错。",
+        "source_pages": [
+          318,
+          326
+        ],
+        "reviewed_object_index": 66,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": false,
+          "current_period_amount": true,
+          "unit": true
+        }
+      }
+    },
+    "answers": {
+      "principal_business": {
+        "accurate": true,
+        "answered": true,
+        "reason": "p11/12完整业务骨架、产品服务矩阵和双瑞复材/中船九院主体成立；预研机型保留状态，租赁表原方向正确。技术规格是原文限定，不推独立角色。",
+        "failed_substance_groups": []
+      },
+      "products_services": {
+        "accurate": true,
+        "answered": true,
+        "reason": "p11/12完整业务骨架、产品服务矩阵和双瑞复材/中船九院主体成立；预研机型保留状态，租赁表原方向正确。技术规格是原文限定，不推独立角色。",
+        "failed_substance_groups": []
+      },
+      "revenue_model": {
+        "accurate": false,
+        "answered": true,
+        "reason": "收入正文只有租赁表；风电装备/发电/工程多业务直销及招投标订单、电网月度结算、固定造价/成本加成与履约进度机制未进入正文。",
+        "failed_substance_groups": [
+          [
+            "风力发电"
+          ],
+          [
+            "配件"
+          ],
+          [
+            "发电"
+          ],
+          [
+            "工程"
+          ],
+          [
+            "直销"
+          ],
+          [
+            "招投标",
+            "招标"
+          ],
+          [
+            "订单"
+          ],
+          [
+            "省电网",
+            "电网公司"
+          ],
+          [
+            "每月"
+          ],
+          [
+            "结算单",
+            "电价"
+          ],
+          [
+            "固定造价"
+          ],
+          [
+            "成本加成"
+          ],
+          [
+            "履约进度",
+            "工作量"
+          ]
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "test_command": "PYTHONPATH=. /home/python/miniconda3/envs/Quote/bin/python -m pytest -q tests/unit/test_research/test_company_profile_m4_next_batch.py tests/unit/test_research/test_company_profile_source_review.py",
+  "test_result": "29 passed,7 warnings",
+  "ruff_command": "ruff check research/company_profile/core_evidence_selection.py research/company_profile/core_assessment_projection.py research/company_profile/operations.py research/company_profile/m4_next_batch.py",
+  "ruff": "passed",
+  "openspec": [
+    "newchange strict passed",
+    "company-profile-common-core-owned-page-facts main strict passed",
+    "deliver-company-profile-m4-v30-unseen-small-batch main strict passed"
+  ],
+  "diff": "passed",
+  "business_failure_is_not_hidden_by_tests": true,
+  "review_scope": "Only current archive/spec/sample delivery/review;business failures recorded for A-role;unrelated existing work untouched"
+}
