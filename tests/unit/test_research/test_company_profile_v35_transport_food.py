@@ -25,9 +25,13 @@ def fixture(i):
     return json.loads(FIXTURE.read_text())[i]
 
 
-def delivered(root, i, pages):
+def delivered(root, i, pages, repair_version="v36"):
     q, e = _drive(
-        root, instrument=i, fixture=fixture(i), pages=pages, repair_version="v35"
+        root,
+        instrument=i,
+        fixture=fixture(i),
+        pages=pages,
+        repair_version=repair_version,
     )
     assert q == e
     checkpoint = json.loads(
@@ -38,11 +42,14 @@ def delivered(root, i, pages):
     return q, list(_iter_accepted_raw(checkpoint))
 
 
+@pytest.mark.parametrize("repair_version", ["v35", "v36"])
 @pytest.mark.parametrize("i", ["600035.SH", "600073.SH"])
 @pytest.mark.parametrize("kind", ["pages", "independent_pages"])
-def test_full_owned_sources_deliver_all_substance_cells_and_roles(tmp_path, i, kind):
+def test_full_owned_sources_deliver_all_substance_cells_and_roles(
+    tmp_path, i, kind, repair_version
+):
     f = fixture(i)
-    q, raw = delivered(tmp_path, i, f[kind])
+    q, raw = delivered(tmp_path, i, f[kind], repair_version)
     for dim, rule in f["answers"].items():
         assert all(
             any(compact(s) in compact(_answer(q, dim)) for s in group)
@@ -190,7 +197,10 @@ def test_customer_purchase_project_is_issuer_sale_not_material_purchase(tmp_path
     assert len(q["commodity_exposure"]["assessment"]["exposures"]) == 3
 
 
-def test_successor_activates_five_cumulative_repairs_without_changing_default():
+@pytest.mark.parametrize("repair_version", ["v35", "v36"])
+def test_successor_activates_five_cumulative_repairs_without_changing_default(
+    repair_version,
+):
     identity = default_processing_identity()
     assert "revenue_sentence_repair" not in identity
     for flag in [
@@ -200,7 +210,9 @@ def test_successor_activates_five_cumulative_repairs_without_changing_default():
         "core_answer_repair_requested",
         "source_delivery_repair_requested",
     ]:
-        assert getattr(selection, flag)({**identity, "revenue_sentence_repair": "v35"})
+        assert getattr(selection, flag)(
+            {**identity, "revenue_sentence_repair": repair_version}
+        )
 
 
 @pytest.mark.parametrize("location", ["current", "prior", "unreconciled"])

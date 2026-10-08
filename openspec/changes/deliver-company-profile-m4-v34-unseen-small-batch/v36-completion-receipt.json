@@ -1,0 +1,62 @@
+{
+  "created_at": "2026-10-08T12:47:45.572170+00:00",
+  "cards_completed": [
+    "5.2",
+    "5.3"
+  ],
+  "processing_identity": {
+    "rules": "company_profile_common_core.v1",
+    "owned_page_facts": "v8",
+    "material_input_facts": "v1",
+    "revenue_sentence_repair": "v36"
+  },
+  "source_condition_count": 125,
+  "source_recall": {
+    "status": "assessed",
+    "numerator": 125,
+    "denominator": 125,
+    "value": 1.0
+  },
+  "source_accuracy": {
+    "status": "assessed",
+    "numerator": 265,
+    "denominator": 265,
+    "value": 1.0
+  },
+  "critical_numeric_errors": {
+    "status": "assessed",
+    "value": 0
+  },
+  "whole_round_seconds": 195.33771593496203,
+  "tokens_used": 0,
+  "shared_token_budget": 50000,
+  "actual_runtime_no_reuse": true,
+  "actual_accepted_fact_count": 259,
+  "answered_text_count": 6,
+  "query_export_disk_equal": true,
+  "protected_historical_files": 1181,
+  "first_delivery_files_protected": 19,
+  "formal_review_files_protected": 2,
+  "executed_modules_protected": 38,
+  "checks": {
+    "ruff": "passed",
+    "format": "passed",
+    "openspec_strict": "passed",
+    "diff": "passed"
+  },
+  "test_result": "27 passed, 7 warnings",
+  "review": {
+    "A_blocking": [],
+    "B_deferred": [
+      "quantity,price,cost,industry,body trimming,framework,performance"
+    ],
+    "C_unchanged": [
+      "preexisting workspace documents and unrelated failures"
+    ]
+  },
+  "status": "pending_a_role_finite_acceptance",
+  "new_change_archived": false,
+  "next_batch": "paused_pending_a_role_review",
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false
+}

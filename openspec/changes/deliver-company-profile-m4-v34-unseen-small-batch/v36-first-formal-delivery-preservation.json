@@ -1,0 +1,24 @@
+{
+  "formal_execution_index": 1,
+  "sha256": {
+    "data/checkpoints/company_profile_common_core/reports/m4_v36_transport_food_acceptance/plan.json": "1750b83f31686c552ef64186e8c5289ec92d2c34a4441d65357046f02c2add47",
+    "data/checkpoints/company_profile_common_core/reports/m4_v36_transport_food_acceptance/company_profile_live_run.v1.json": "9f44affb65b022d712a43fd14248fc59e13bd25a341b1c4abc397f876137b95b",
+    "data/checkpoints/company_profile_common_core/reports/m4_v36_transport_food_acceptance/observation.json": "94cdb4f126908ca5e7a29de9df5c15b9d1326d191aeb7e0379d22e14e241f2a5",
+    "data/checkpoints/company_profile_common_core/reports/m4_v36_transport_food_acceptance/formal_execution.json": "386c977bb1518ac17747186115b9ec6318ce62eedea45b8ba3a65150301ee4cb",
+    "data/research/company_profile_common_core/m4_v36_transport_food_acceptance/company_profile_common_core.v1/bp-work-625a691bfda21ffd38987815.json": "1acea1e1b9bf0b7e75e5f58fce538ca551a6d49d7308ef819f0c87240a33896d",
+    "data/research/company_profile_common_core/m4_v36_transport_food_acceptance/company_profile_common_core.v1/bp-work-359df7eae3cfcafd63e6bcfc.json": "80359986207288d090f9b36e29cf7e977c01b33a22850de0ebc5f8d513d62daf",
+    "data/research/company_profile_common_core/m4_v36_transport_food_acceptance/company_profile_common_core.v1/scopes/600035.SH/2025-12-31/extract_segment_financials.json": "5fff5e4cb58adc9924a3fa6ccd5d5c63f953abea7e61d02e92ef6a24996f7b26",
+    "data/research/company_profile_common_core/m4_v36_transport_food_acceptance/company_profile_common_core.v1/scopes/600035.SH/2025-12-31/extract_business_overview.json": "d507397ff2eb0a4521b6007676d43a6dba2b9a9349d620d711e7a7dfbba669ce",
+    "data/research/company_profile_common_core/m4_v36_transport_food_acceptance/company_profile_common_core.v1/scopes/600073.SH/2025-12-31/extract_segment_financials.json": "03039c02779b39256efcd886e8f608ff7aeb849d450a21103dbc9cfc930427f9",
+    "data/research/company_profile_common_core/m4_v36_transport_food_acceptance/company_profile_common_core.v1/scopes/600073.SH/2025-12-31/extract_material_inputs.json": "3d62266eb5b54d74264e1a57272c45c1d2c286d194c7f183c5b04cac4e8a912d",
+    "data/research/company_profile_common_core/m4_v36_transport_food_acceptance/company_profile_common_core.v1/scopes/600073.SH/2025-12-31/extract_business_overview.json": "f0028b4d128266b495d5d45656dc59594f725069c9b4c836dff7e7dbed8ccb38",
+    "data/research/company_profile_common_core/m4_v36_transport_food_acceptance/company_profile_common_core.v1/checkpoints/bp-work-625a691bfda21ffd38987815.json": "2ca0834270566170b7d53b18b2668003a6aaffc309f0b2238132d4d3d41f6b79",
+    "data/research/company_profile_common_core/m4_v36_transport_food_acceptance/company_profile_common_core.v1/checkpoints/bp-work-359df7eae3cfcafd63e6bcfc.json": "bb0a9ce5b7a6b5c29ceb1967521626d6aa92e93bb149d5442484ff674ce55a40",
+    "data/exports/m4_v36_transport_food_acceptance/600035.SH/profiles.csv": "12eb3730b1c968e0f72ee0a9882424888513d5dd349c9f0052492a59e17c8794",
+    "data/exports/m4_v36_transport_food_acceptance/600035.SH/600035.SH_2025-12-31.json": "e9e3e6c7d9c69258983e2d6cb4db8cc775cbb5c2c0f35c657fb4fdbc2c94bc9b",
+    "data/exports/m4_v36_transport_food_acceptance/600035.SH/export_manifest.json": "a35eb53be6a6e0f6e5675e999907a22e21d3c876ad67457a10f8ff340fb2d102",
+    "data/exports/m4_v36_transport_food_acceptance/600073.SH/profiles.csv": "3e19eb7308d9faca39a161ab964a64c159000b337ddad5b20998699440deccf7",
+    "data/exports/m4_v36_transport_food_acceptance/600073.SH/600073.SH_2025-12-31.json": "0b28cf3ebe86cde7143083bcc67961f25d1e84537c8bf44376ef267c687d6f9d",
+    "data/exports/m4_v36_transport_food_acceptance/600073.SH/export_manifest.json": "9fdaf58063d070b0800d3213c3d7e6f34a9408f91d906d2a0d1a3c497577b0eb"
+  }
+}

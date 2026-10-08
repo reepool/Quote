@@ -1,0 +1,52 @@
+diff --git a/research/company_profile/core_evidence_selection.py b/research/company_profile/core_evidence_selection.py
+index bfa85530..6bb5634d 100644
+--- a/research/company_profile/core_evidence_selection.py
++++ b/research/company_profile/core_evidence_selection.py
+@@ -1252,6 +1252,7 @@ REVENUE_SENTENCE_REPAIR_V32 = "v32"
+ REVENUE_SENTENCE_REPAIR_V33 = "v33"
+ REVENUE_SENTENCE_REPAIR_V34 = "v34"
+ REVENUE_SENTENCE_REPAIR_V35 = "v35"
++REVENUE_SENTENCE_REPAIR_V36 = "v36"
+ _REVENUE_SENTENCE_REPAIR_VERSIONS = frozenset(
+     {
+         REVENUE_SENTENCE_REPAIR_V1,
+@@ -1289,6 +1290,7 @@ _REVENUE_SENTENCE_REPAIR_VERSIONS = frozenset(
+         REVENUE_SENTENCE_REPAIR_V33,
+         REVENUE_SENTENCE_REPAIR_V34,
+         REVENUE_SENTENCE_REPAIR_V35,
++        REVENUE_SENTENCE_REPAIR_V36,
+     }
+ )
+ 
+@@ -1349,6 +1351,7 @@ def named_role_repair_requested(identity: Mapping[str, Any] | None) -> bool:
+         REVENUE_SENTENCE_REPAIR_V33,
+         REVENUE_SENTENCE_REPAIR_V34,
+         REVENUE_SENTENCE_REPAIR_V35,
++        REVENUE_SENTENCE_REPAIR_V36,
+     }
+ 
+ 
+@@ -1392,6 +1395,7 @@ def service_operating_energy_requested(identity: Mapping[str, Any] | None) -> bo
+         REVENUE_SENTENCE_REPAIR_V33,
+         REVENUE_SENTENCE_REPAIR_V34,
+         REVENUE_SENTENCE_REPAIR_V35,
++        REVENUE_SENTENCE_REPAIR_V36,
+     }
+ 
+ 
+@@ -1435,6 +1439,7 @@ def core_answer_repair_requested(identity: Mapping[str, Any] | None) -> bool:
+         REVENUE_SENTENCE_REPAIR_V33,
+         REVENUE_SENTENCE_REPAIR_V34,
+         REVENUE_SENTENCE_REPAIR_V35,
++        REVENUE_SENTENCE_REPAIR_V36,
+     }
+ 
+ 
+@@ -1479,6 +1484,7 @@ def source_delivery_repair_requested(identity: Mapping[str, Any] | None) -> bool
+         REVENUE_SENTENCE_REPAIR_V33,
+         REVENUE_SENTENCE_REPAIR_V34,
+         REVENUE_SENTENCE_REPAIR_V35,
++        REVENUE_SENTENCE_REPAIR_V36,
+     }
+ 
+ 

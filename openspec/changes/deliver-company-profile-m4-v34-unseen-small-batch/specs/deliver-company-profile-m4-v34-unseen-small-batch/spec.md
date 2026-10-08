@@ -78,3 +78,11 @@ The v35 first125condition contract,123/125recall,261/261accuracy and original de
 #### Scenario: Post-formal regression passes
 - **WHEN** local corrected owned-page acceptance, query and export succeed
 - **THEN** the original first failed score remains unchanged pending a successor formal identity and independent directory
+
+
+### Requirement: The successor formal identity proves the corrected native income coverage
+Full v36 identity MUST enable all five cumulative repair switches without changing the default identity. Complete real-owner and independent-PDF page regressions MUST precede first formal delivery in a new directory under the same125condition source contract,plan,official versions andcutoff. Review MUST uniquely evaluate every accepted fact and answered body with a dynamic denominator. p24 MD&A region income and p241 parent-company other income MUST retain native pages,columns,subjects and paired Segment/Measurement. v34/v35 failed observations MUST remain unchanged. Whole-round timing MUST include retries;sharedtokens MUST stay≤50000. Both scores100%,zero numeric errors and≤300seconds MUST precede finite A-role submission;archive MUST wait for A-role confirmation.
+
+#### Scenario: Corrected income passes a genuine new first formal round
+- **WHEN** the existing owner delivers both reports under v36 in the new directory
+- **THEN** actual query,export and disk establish native income coverage and unique accuracy without replacing earlier failed results

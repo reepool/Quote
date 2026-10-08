@@ -1,0 +1,34 @@
+{
+  "created_at": "2026-10-08T12:42:58.643934+00:00",
+  "repair_flags": {
+    "revenue_sentence_repair_requested": true,
+    "named_role_repair_requested": true,
+    "service_operating_energy_requested": true,
+    "core_answer_repair_requested": true,
+    "source_delivery_repair_requested": true
+  },
+  "default_identity_unchanged": true,
+  "test_command": "PYTHONPATH=. python -m pytest -q tests/unit/test_research/test_company_profile_v35_transport_food.py",
+  "test_result": "27 passed, 7 warnings",
+  "full_owner_and_independent_pages_under_both_v35_v36": true,
+  "source_page_column_and_actor_checked": true,
+  "prior_only_and_unreconciled_sparse_income_rejected": true,
+  "official_page_count": 66,
+  "protected_history_file_count": 1181,
+  "review": {
+    "A_blocking": [],
+    "B_deferred": [
+      "quantity,price,cost,industry,body trimming,framework,performance"
+    ],
+    "C_unchanged": [
+      "preexisting workspace documents and unrelated failures"
+    ]
+  },
+  "checks": {
+    "ruff": "passed",
+    "format": "passed",
+    "openspec_strict": "passed",
+    "diff": "passed"
+  },
+  "phase": "pre_formal_local_regression_only"
+}

@@ -1,0 +1,304 @@
+{
+  "600035.SH": {
+    "original_fact_count": 64,
+    "current_fact_count": 64,
+    "original_fact_semantics_unchanged": true,
+    "three_answer_bodies_byte_equal": true,
+    "new_income_records": [],
+    "actual_supplemental_official_page_count": 23,
+    "supplemental_original_pdf_equal": true,
+    "fixture_real_owner_fields_equal_v36_checkpoint": true
+  },
+  "600073.SH": {
+    "original_fact_count": 191,
+    "current_fact_count": 195,
+    "original_fact_semantics_unchanged": true,
+    "three_answer_bodies_byte_equal": true,
+    "new_income_records": [
+      {
+        "schema_version": "company_profile_semantic_object.v1",
+        "record_id": "owned:core-ev-7bf3612d49b2d7d0:segment:region:中国（含港澳台）",
+        "field_id": "segment_dimension",
+        "chapter_task": "extract_segment_financials",
+        "report": {
+          "instrument_id": "600073.SH",
+          "report_id": "asset_f87ebdfb97db033da029c37ea4584197",
+          "document_version": "9958ac6df230b53fd26d627265325e24b6d61db7aa6b2a07c843f2c6c44b7d9e",
+          "report_period": "2025-12-31",
+          "published_at": "2026-03-30T16:00:00+00:00",
+          "document_type": "annual_report"
+        },
+        "subject_scope": "consolidated_group",
+        "subject_name": null,
+        "subject_basis": "report_default_group_scope",
+        "reported_period": "2025-12-31",
+        "period_type": "duration",
+        "knowledge_time": null,
+        "assertion_class": "reported_fact",
+        "evidence": [
+          {
+            "evidence_id": "core-ev-7bf3612d49b2d7d0",
+            "report": {
+              "instrument_id": "600073.SH",
+              "report_id": "asset_f87ebdfb97db033da029c37ea4584197",
+              "document_version": "9958ac6df230b53fd26d627265325e24b6d61db7aa6b2a07c843f2c6c44b7d9e",
+              "report_period": "2025-12-31",
+              "published_at": "2026-03-30T16:00:00+00:00",
+              "document_type": "annual_report"
+            },
+            "page": 23,
+            "printed_page_label": null,
+            "section_title": "收入和成本分析",
+            "continuation_pages": [
+              24,
+              25,
+              26,
+              27,
+              28,
+              29,
+              30
+            ],
+            "subject_evidence_pages": [],
+            "anchor": {
+              "anchor_type": "text",
+              "bounded_quote": "收入和成本分析\n√适用 □不适用\n(1). 主营业务分行业、分产品、分地区、分销售模式情况\n单位：元 币种：人民币\n主营业务分行业情况\n分行业 营业收入 营业成本\n毛利率\n（%）\n营业收入\n比上年增\n减（%）\n营业成本\n比上年增\n减（%）\n毛利率比\n上年增减\n（%）\n肉类食品 17,958,740,231.95 16,652,130,216.46 7.28 6.76 7.19 减少 0.37\n个百分点\n品牌食品 3,036,319,721.04 1,931,189,398.18 36.40 -5.74 -14.04 增加 6.14\n个百分点\n其他 1,134,913,239.36 1,049,812,053.33 7.50 -41.64 -46.22 增加 7.88\n个百分点\n合计 22,129,973,192.35 19,633,131,667.97 11.28 0.65 -0.51 增加 1.03\n个百分点\n主营业务分产品情况\n分产品 营业收入 营业成本\n毛利率\n（%）\n营业收入\n比上年增\n减（%）\n营业成本\n比上年增\n减（%）\n毛利率比\n上年增减\n（%）\n牛羊肉 13,040,178,046.17 12,030,270,075.25 7.74 10.90 9.42 增加 1.25\n个百分点\n生猪养殖 1,504,577,681.67 1,667,299,613.48 -10.82 -20.66 -9.21减少 13.98\n个百分点\n猪肉制品 3,413,984,504.11 2,954,560,527.73 13.46 7.83 9.30 减少 1.16\n个百分点\n罐头食品 1,335,225,665.00 913,849,459.68 31.56 -6.65 -15.59 增加 7.24\n个百分点\n休闲食品 1,701,094,056.04 1,017,339,938.50 40.19 -5.01 -12.59 增加 5.19\n上海光明肉业集团股份有限公司2025 年年度报告\n24 / 244\n个百分点\n其他 1,134,913,239.36 1,049,812,053.33 7.50 -41.64 -46.22 增加 7.88\n个百分点\n合计 22,129,973,192.35 19,633,131,667.97 11.28 0.65 -0.51 增加 1.03\n个百分点\n主营业务分地区情况\n分地区 营业收入 营业成本\n毛利率\n（%）\n营业收入\n比上年增\n减（%）\n营业成本\n比上年增\n减（%）\n毛利率比\n上年增减\n（%）\n中国（含港澳\n台）\n11,277,548,234.22 9,650,135,105.83 14.43 -10.24 -11.29 增加 1.02\n个百分点\n海外 10,852,424,958.13 9,982,996,562.14 8.01 15.17 12.74 增加 1.98\n个百分点\n合计 22,129,973,192.35 19,633,131,667.97 11.28 0.65 -0.51 增加 1.03\n个百分点\n主营业务分销售模式情况\n销售模式 营业收入 营业成本\n毛利率\n（%）\n营业收入\n比上年增\n减（%）\n营业成本\n比上年增\n减（%）\n毛利率比\n上年增减\n（%）\n直营 4,687,856,787.91 3,802,043,664.96 18.90 -7.92 -8.21 增加 0.26\n个百分点\n分销 15,979,563,480.47 14,425,702,473.91 9.72 5.80 4.88 增加 0.79\n个百分点\n其他 1,462,552,923.97 1,405,385,529.10 3.91 -18.40 -23.47 增加 6.37\n个百分点\n合计 22,129,973,192.35 19,633,131,667.97 11.28 0.65 -0.51 增加 1.03\n个百分点\n主营业务分行业、分产品、分地区、分销售模式情况的说明\n报告期内，“其他”业务的营业收入及成本下降，主要系公司饲料贸易业务板块业务规模下降。",
+              "context_before": null,
+              "context_after": null,
+              "match_index": 0
+            }
+          }
+        ],
+        "source_native": {
+          "name": "中国（含港澳台）",
+          "value": "11,277,548,234.22",
+          "unit": "元",
+          "header": "主营业务收入",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        },
+        "uncertainty": [],
+        "data_status": "research_fixture",
+        "object_type": "Segment",
+        "dimension": "region",
+        "label": "中国（含港澳台）",
+        "row_class": null
+      },
+      {
+        "schema_version": "company_profile_semantic_object.v1",
+        "record_id": "owned:core-ev-2744e13e08d0d072:revenue:region:中国（含港澳台）",
+        "field_id": "operating_revenue",
+        "chapter_task": "extract_segment_financials",
+        "report": {
+          "instrument_id": "600073.SH",
+          "report_id": "asset_f87ebdfb97db033da029c37ea4584197",
+          "document_version": "9958ac6df230b53fd26d627265325e24b6d61db7aa6b2a07c843f2c6c44b7d9e",
+          "report_period": "2025-12-31",
+          "published_at": "2026-03-30T16:00:00+00:00",
+          "document_type": "annual_report"
+        },
+        "subject_scope": "consolidated_group",
+        "subject_name": null,
+        "subject_basis": "report_default_group_scope",
+        "reported_period": "2025-12-31",
+        "period_type": "duration",
+        "knowledge_time": null,
+        "assertion_class": "reported_fact",
+        "evidence": [
+          {
+            "evidence_id": "core-ev-2744e13e08d0d072",
+            "report": {
+              "instrument_id": "600073.SH",
+              "report_id": "asset_f87ebdfb97db033da029c37ea4584197",
+              "document_version": "9958ac6df230b53fd26d627265325e24b6d61db7aa6b2a07c843f2c6c44b7d9e",
+              "report_period": "2025-12-31",
+              "published_at": "2026-03-30T16:00:00+00:00",
+              "document_type": "annual_report"
+            },
+            "page": 23,
+            "printed_page_label": null,
+            "section_title": "收入和成本分析",
+            "continuation_pages": [
+              24,
+              25,
+              26,
+              27,
+              28,
+              29,
+              30
+            ],
+            "subject_evidence_pages": [],
+            "anchor": {
+              "anchor_type": "text",
+              "bounded_quote": "收入和成本分析\n√适用 □不适用\n(1). 主营业务分行业、分产品、分地区、分销售模式情况\n单位：元 币种：人民币\n主营业务分行业情况\n分行业 营业收入 营业成本\n毛利率\n（%）\n营业收入\n比上年增\n减（%）\n营业成本\n比上年增\n减（%）\n毛利率比\n上年增减\n（%）\n肉类食品 17,958,740,231.95 16,652,130,216.46 7.28 6.76 7.19 减少 0.37\n个百分点\n品牌食品 3,036,319,721.04 1,931,189,398.18 36.40 -5.74 -14.04 增加 6.14\n个百分点\n其他 1,134,913,239.36 1,049,812,053.33 7.50 -41.64 -46.22 增加 7.88\n个百分点\n合计 22,129,973,192.35 19,633,131,667.97 11.28 0.65 -0.51 增加 1.03\n个百分点\n主营业务分产品情况\n分产品 营业收入 营业成本\n毛利率\n（%）\n营业收入\n比上年增\n减（%）\n营业成本\n比上年增\n减（%）\n毛利率比\n上年增减\n（%）\n牛羊肉 13,040,178,046.17 12,030,270,075.25 7.74 10.90 9.42 增加 1.25\n个百分点\n生猪养殖 1,504,577,681.67 1,667,299,613.48 -10.82 -20.66 -9.21减少 13.98\n个百分点\n猪肉制品 3,413,984,504.11 2,954,560,527.73 13.46 7.83 9.30 减少 1.16\n个百分点\n罐头食品 1,335,225,665.00 913,849,459.68 31.56 -6.65 -15.59 增加 7.24\n个百分点\n休闲食品 1,701,094,056.04 1,017,339,938.50 40.19 -5.01 -12.59 增加 5.19\n上海光明肉业集团股份有限公司2025 年年度报告\n24 / 244\n个百分点\n其他 1,134,913,239.36 1,049,812,053.33 7.50 -41.64 -46.22 增加 7.88\n个百分点\n合计 22,129,973,192.35 19,633,131,667.97 11.28 0.65 -0.51 增加 1.03\n个百分点\n主营业务分地区情况\n分地区 营业收入 营业成本\n毛利率\n（%）\n营业收入\n比上年增\n减（%）\n营业成本\n比上年增\n减（%）\n毛利率比\n上年增减\n（%）\n中国（含港澳\n台）\n11,277,548,234.22 9,650,135,105.83 14.43 -10.24 -11.29 增加 1.02\n个百分点\n海外 10,852,424,958.13 9,982,996,562.14 8.01 15.17 12.74 增加 1.98\n个百分点\n合计 22,129,973,192.35 19,633,131,667.97 11.28 0.65 -0.51 增加 1.03\n个百分点\n主营业务分销售模式情况\n销售模式 营业收入 营业成本\n毛利率\n（%）\n营业收入\n比上年增\n减（%）\n营业成本\n比上年增\n减（%）\n毛利率比\n上年增减\n（%）\n直营 4,687,856,787.91 3,802,043,664.96 18.90 -7.92 -8.21 增加 0.26\n个百分点\n分销 15,979,563,480.47 14,425,702,473.91 9.72 5.80 4.88 增加 0.79\n个百分点\n其他 1,462,552,923.97 1,405,385,529.10 3.91 -18.40 -23.47 增加 6.37\n个百分点\n合计 22,129,973,192.35 19,633,131,667.97 11.28 0.65 -0.51 增加 1.03\n个百分点\n主营业务分行业、分产品、分地区、分销售模式情况的说明\n报告期内，“其他”业务的营业收入及成本下降，主要系公司饲料贸易业务板块业务规模下降。",
+              "context_before": null,
+              "context_after": null,
+              "match_index": 0
+            }
+          }
+        ],
+        "source_native": {
+          "name": "中国（含港澳台）",
+          "value": "11,277,548,234.22",
+          "unit": "元",
+          "header": "主营业务收入",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        },
+        "uncertainty": [],
+        "data_status": "research_fixture",
+        "object_type": "Measurement",
+        "metric_type": "operating_revenue",
+        "logical_slot": "revenue",
+        "measured_object": "中国（含港澳台）",
+        "segment_dimension": "region",
+        "segment_label": "中国（含港澳台）",
+        "capacity_kind": null,
+        "processing_direction": null,
+        "row_class": null,
+        "is_restated_comparative": false,
+        "comparison_basis": null,
+        "relationship_context": null
+      },
+      {
+        "schema_version": "company_profile_semantic_object.v1",
+        "record_id": "owned:core-ev-4e2edb118ff79ad2:Segment:business_type:其他业务:营业收入:row:1",
+        "field_id": "segment_dimension",
+        "chapter_task": "extract_segment_financials",
+        "report": {
+          "instrument_id": "600073.SH",
+          "report_id": "asset_f87ebdfb97db033da029c37ea4584197",
+          "document_version": "9958ac6df230b53fd26d627265325e24b6d61db7aa6b2a07c843f2c6c44b7d9e",
+          "report_period": "2025-12-31",
+          "published_at": "2026-03-30T16:00:00+00:00",
+          "document_type": "annual_report"
+        },
+        "subject_scope": "issuer",
+        "subject_name": null,
+        "subject_basis": "direct_source_wording",
+        "reported_period": "2025-12-31",
+        "period_type": "duration",
+        "knowledge_time": null,
+        "assertion_class": "reported_fact",
+        "evidence": [
+          {
+            "evidence_id": "core-ev-4e2edb118ff79ad2",
+            "report": {
+              "instrument_id": "600073.SH",
+              "report_id": "asset_f87ebdfb97db033da029c37ea4584197",
+              "document_version": "9958ac6df230b53fd26d627265325e24b6d61db7aa6b2a07c843f2c6c44b7d9e",
+              "report_period": "2025-12-31",
+              "published_at": "2026-03-30T16:00:00+00:00",
+              "document_type": "annual_report"
+            },
+            "page": 241,
+            "printed_page_label": null,
+            "section_title": "营业收入和营业成本情况",
+            "continuation_pages": [
+              230
+            ],
+            "subject_evidence_pages": [],
+            "anchor": {
+              "anchor_type": "text",
+              "bounded_quote": "十九、 母公司财务报表主要项目注释\n营业收入和营业成本情况\r\n√适用 □不适用\r\n单位：元 币种：人民币\r\n项目\r\n本期发生额 上期发生额\r\n收入 成本 收入 成本\r\n主营业务 1,303,873,935.00 1,134,480,974.41 1,390,550,886.48 1,226,712,859.00\r\n其他业务 471.70\r\n合计 1,303,874,406.70 1,134,480,974.41 1,390,550,886.48 1,226,712,859.00\r\n",
+              "context_before": null,
+              "context_after": null,
+              "match_index": 0
+            }
+          }
+        ],
+        "source_native": {
+          "name": "其他业务",
+          "value": "471.70",
+          "unit": "元",
+          "header": "营业收入",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        },
+        "uncertainty": [],
+        "data_status": "research_fixture",
+        "object_type": "Segment",
+        "dimension": "business_type",
+        "label": "其他业务",
+        "row_class": null
+      },
+      {
+        "schema_version": "company_profile_semantic_object.v1",
+        "record_id": "owned:core-ev-ace0aee4aa137e8a:Measurement:business_type:其他业务:营业收入:row:1",
+        "field_id": "operating_revenue",
+        "chapter_task": "extract_segment_financials",
+        "report": {
+          "instrument_id": "600073.SH",
+          "report_id": "asset_f87ebdfb97db033da029c37ea4584197",
+          "document_version": "9958ac6df230b53fd26d627265325e24b6d61db7aa6b2a07c843f2c6c44b7d9e",
+          "report_period": "2025-12-31",
+          "published_at": "2026-03-30T16:00:00+00:00",
+          "document_type": "annual_report"
+        },
+        "subject_scope": "issuer",
+        "subject_name": null,
+        "subject_basis": "direct_source_wording",
+        "reported_period": "2025-12-31",
+        "period_type": "duration",
+        "knowledge_time": null,
+        "assertion_class": "reported_fact",
+        "evidence": [
+          {
+            "evidence_id": "core-ev-ace0aee4aa137e8a",
+            "report": {
+              "instrument_id": "600073.SH",
+              "report_id": "asset_f87ebdfb97db033da029c37ea4584197",
+              "document_version": "9958ac6df230b53fd26d627265325e24b6d61db7aa6b2a07c843f2c6c44b7d9e",
+              "report_period": "2025-12-31",
+              "published_at": "2026-03-30T16:00:00+00:00",
+              "document_type": "annual_report"
+            },
+            "page": 241,
+            "printed_page_label": null,
+            "section_title": "营业收入和营业成本情况",
+            "continuation_pages": [
+              230
+            ],
+            "subject_evidence_pages": [],
+            "anchor": {
+              "anchor_type": "text",
+              "bounded_quote": "十九、 母公司财务报表主要项目注释\n营业收入和营业成本情况\r\n√适用 □不适用\r\n单位：元 币种：人民币\r\n项目\r\n本期发生额 上期发生额\r\n收入 成本 收入 成本\r\n主营业务 1,303,873,935.00 1,134,480,974.41 1,390,550,886.48 1,226,712,859.00\r\n其他业务 471.70\r\n合计 1,303,874,406.70 1,134,480,974.41 1,390,550,886.48 1,226,712,859.00\r\n",
+              "context_before": null,
+              "context_after": null,
+              "match_index": 0
+            }
+          }
+        ],
+        "source_native": {
+          "name": "其他业务",
+          "value": "471.70",
+          "unit": "元",
+          "header": "营业收入",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        },
+        "uncertainty": [],
+        "data_status": "research_fixture",
+        "object_type": "Measurement",
+        "metric_type": "operating_revenue",
+        "logical_slot": "revenue",
+        "measured_object": "其他业务",
+        "segment_dimension": "business_type",
+        "segment_label": "其他业务",
+        "capacity_kind": null,
+        "processing_direction": null,
+        "row_class": null,
+        "is_restated_comparative": false,
+        "comparison_basis": null,
+        "relationship_context": "营业收入"
+      }
+    ],
+    "actual_supplemental_official_page_count": 27,
+    "supplemental_original_pdf_equal": true,
+    "fixture_real_owner_fields_equal_v36_checkpoint": true,
+    "page241_owner_has_no_layout_text": true
+  }
+}
