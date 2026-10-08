@@ -29,9 +29,12 @@
 - [x] 5.1 P0/P1: 原125项合同不变，修括号原生标签与金额行承接；真实owner无layout稀疏行仅在本期合计需要打印值且上期收入已完整勾稽时定位本期。原金额不推算、不造成本零、不左移上期。恢复fixture的实际owner原字段，独立PDF布局另存；源页/原栏目、母公司主体、Segment/Measurement均核对。完整官方及owner页接受→查询→导出与当前/上期/不勾稽反例通过，六正文/71收入/48角色局部保持。v35正式执行代码可由基线＋原patch重建，事后patch单独记录；首次交付和正式复核原字节保留。
 - [x] 5.2 P0: A角已确认v35正式失败及5.1完成。登记完整v36身份和五开关、默认不变；同计划/官方版本/cutoff/125项合同，实际owner与独立PDF分别完整页回归后，在全新m4_v36_transport_food_acceptance目录首次正式run→query→export。第二家共享预算余量，首次execute至第二export整轮含重试，记录实际五阶段复用；v34/v35失败与首次制品原字节保留。
 - [x] 5.3 P0: 全部实际事实＋已答正文唯一实质复核，动态准确率，不预填分母。p24地区及p241母公司其他收入原页/栏目/主体/配对事实重点核验，六正文/71收入/48角色无回归。双100%/数字0/≤300秒/共享≤50000后提交A角有限审核；失败原样保留并暂停。
-- [ ] 5.4 通过后执行: 经A角确认后同步原生来源口径、稀疏本期收入规则和有限验收记录再归档；生产not_authorized、规模false，下一对另行规划。本轮止于5.3提交。
+- [x] 5.4 通过后执行: 经A角确认后同步原生来源口径、稀疏本期收入规则和有限验收记录再归档；生产not_authorized、规模false，下一对另行规划。本轮止于5.3提交。
 
 5.1证据：v35-post-formal-correction-baseline.json、v35-post-formal-correction-code.patch、v35-post-formal-correction-evidence.json及v35-post-formal-correction-receipt.json。局部证据不得替换v35首次正式分数。生产not_authorized、规模false。
 
 
 5.2/5.3回执：完整v36五开关、默认不变，同125项合同/计划/官方版本/cutoff，独立m4_v36_transport_food_acceptance首次run→query→export。执行前两类完整页及身份边界27 passed，66官方页与原合同实质hash固定。整轮195.337716秒、0/50000token，第二家剩余预算；实际五阶段无复用/前驱，query/export/磁盘一致。召回125/125，准确率265/265＝259事实＋6答案动态唯一，关键数字错误0。p24 MD&A地区及p241母公司其他收入原页/栏目/主体的Segment/Measurement重点复核，不用p180代替。1181历史、19首次交付、两正式复核和38执行模块保护。状态pending_a_role_finite_acceptance，提交A角；5.4等待A角确认，当前change不归档、扩批暂停、生产not_authorized/规模false。
+
+
+5.4回执：A角确认v36在原125项来源合同及实际检查页范围有限通过，125/125召回、265/265准确率（259事实＋6答案）、数字0、195.337716秒、0/50000token、实际五阶段无复用。74个独立核对页与官方PDF一致。原生页/栏目、跨行括号标签及稀疏本期收入有效规则同步主规格；v34/v35失败、补正轨迹及v36首次制品保持原字节，严格校验后有限归档。生产not_authorized、规模false；下一对须另建change和新来源分母。

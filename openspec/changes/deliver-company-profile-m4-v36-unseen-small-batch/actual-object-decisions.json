@@ -1,0 +1,2089 @@
+{
+  "600037.SH": {
+    "facts": {
+      "owned:core-ev-928119fe5103dddd:commodity:1": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          188
+        ],
+        "accurate": true,
+        "reason": "p188中广娱文传媒购买固定资产本期5,734,942.50，购买对象及公司合并主体真实；不从泛称资产推具体终端或制造投入，不替代工程物资采购角色。",
+        "actual_object_type": "Activity",
+        "actual_native_name": "固定资产",
+        "actual_action": "purchases",
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-aa592faf3325ed02:segment:industry:有线电视行业": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25
+        ],
+        "accurate": true,
+        "matched_source_row_index": 0,
+        "reason": "独立p18 主营业务分行业，有线电视行业原本期本期营业收入=2,219,754,557.95元，公司及合并子公司；金额/单位/期间及完整跨页证据均成立。原生栏目、主体成立；同额其他表不能替代，Measurement仅准确率。",
+        "recall_row_index": 0,
+        "actual_object_type": "Segment",
+        "actual_native_name": "有线电视行业",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-1710060dfd5cfd33:revenue:industry:有线电视行业": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25
+        ],
+        "accurate": true,
+        "matched_source_row_index": 0,
+        "reason": "独立p18 主营业务分行业，有线电视行业原本期本期营业收入=2,219,754,557.95元，公司及合并子公司；金额/单位/期间及完整跨页证据均成立。原生栏目、主体成立；同额其他表不能替代，Measurement仅准确率。",
+        "actual_object_type": "Measurement",
+        "actual_native_name": "有线电视行业",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-aa592faf3325ed02:segment:region:北京": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25
+        ],
+        "accurate": true,
+        "matched_source_row_index": 1,
+        "reason": "独立p18 主营业务分地区，北京原本期本期营业收入=2,217,111,146.02元，公司及合并子公司；金额/单位/期间及完整跨页证据均成立。原生栏目、主体成立；同额其他表不能替代，Measurement仅准确率。",
+        "recall_row_index": 1,
+        "actual_object_type": "Segment",
+        "actual_native_name": "北京",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-1710060dfd5cfd33:revenue:region:北京": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25
+        ],
+        "accurate": true,
+        "matched_source_row_index": 1,
+        "reason": "独立p18 主营业务分地区，北京原本期本期营业收入=2,217,111,146.02元，公司及合并子公司；金额/单位/期间及完整跨页证据均成立。原生栏目、主体成立；同额其他表不能替代，Measurement仅准确率。",
+        "actual_object_type": "Measurement",
+        "actual_native_name": "北京",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-aa592faf3325ed02:segment:region:涿州": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25
+        ],
+        "accurate": true,
+        "matched_source_row_index": 2,
+        "reason": "独立p18 主营业务分地区，涿州原本期本期营业收入=2,643,411.93元，公司及合并子公司；金额/单位/期间及完整跨页证据均成立。原生栏目、主体成立；同额其他表不能替代，Measurement仅准确率。",
+        "recall_row_index": 2,
+        "actual_object_type": "Segment",
+        "actual_native_name": "涿州",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-1710060dfd5cfd33:revenue:region:涿州": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25
+        ],
+        "accurate": true,
+        "matched_source_row_index": 2,
+        "reason": "独立p18 主营业务分地区，涿州原本期本期营业收入=2,643,411.93元，公司及合并子公司；金额/单位/期间及完整跨页证据均成立。原生栏目、主体成立；同额其他表不能替代，Measurement仅准确率。",
+        "actual_object_type": "Measurement",
+        "actual_native_name": "涿州",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-9e0e249ca3d56895:Segment:business_type:主营业务:营业收入:row:0": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          165
+        ],
+        "accurate": true,
+        "matched_source_row_index": 3,
+        "reason": "独立p165 合并营业收入和营业成本，主营业务原本期本期营业收入=2,194,621,020.58元，公司及合并子公司；金额/单位/期间及完整跨页证据均成立。原生栏目、主体成立；同额其他表不能替代，Measurement仅准确率。",
+        "recall_row_index": 3,
+        "actual_object_type": "Segment",
+        "actual_native_name": "主营业务",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-034c61291edd972d:Measurement:business_type:主营业务:营业收入:row:0": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          165
+        ],
+        "accurate": true,
+        "matched_source_row_index": 3,
+        "reason": "独立p165 合并营业收入和营业成本，主营业务原本期本期营业收入=2,194,621,020.58元，公司及合并子公司；金额/单位/期间及完整跨页证据均成立。原生栏目、主体成立；同额其他表不能替代，Measurement仅准确率。",
+        "actual_object_type": "Measurement",
+        "actual_native_name": "主营业务",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-9e0e249ca3d56895:Segment:business_type:其他业务:营业收入:row:1": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          165
+        ],
+        "accurate": true,
+        "matched_source_row_index": 4,
+        "reason": "独立p165 合并营业收入和营业成本，其他业务原本期本期营业收入=25,133,537.37元，公司及合并子公司；金额/单位/期间及完整跨页证据均成立。原生栏目、主体成立；同额其他表不能替代，Measurement仅准确率。",
+        "recall_row_index": 4,
+        "actual_object_type": "Segment",
+        "actual_native_name": "其他业务",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-034c61291edd972d:Measurement:business_type:其他业务:营业收入:row:1": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          165
+        ],
+        "accurate": true,
+        "matched_source_row_index": 4,
+        "reason": "独立p165 合并营业收入和营业成本，其他业务原本期本期营业收入=25,133,537.37元，公司及合并子公司；金额/单位/期间及完整跨页证据均成立。原生栏目、主体成立；同额其他表不能替代，Measurement仅准确率。",
+        "actual_object_type": "Measurement",
+        "actual_native_name": "其他业务",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-d82046598eafdb52:Segment:business_type:其他业务收入:营业收入:row:0": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          165
+        ],
+        "accurate": true,
+        "matched_source_row_index": 13,
+        "reason": "独立p165 营业收入明细/客户合同收入，其他业务收入原本期本期营业收入=6,390,329.03元，公司及合并子公司；金额/单位/期间及完整跨页证据均成立。原生栏目、主体成立；同额其他表不能替代，Measurement仅准确率。冻结合同service仅作收入明细容器；原名其他业务收入的business_type正确，不改首版合同。此6,390,329.03不冒充全部其他业务25,133,537.37；两个实际Segment各计事实准确率而收入条件只召回一次。",
+        "recall_row_index": 13,
+        "actual_object_type": "Segment",
+        "actual_native_name": "其他业务收入",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-a5593611825b1f9a:Measurement:business_type:其他业务收入:营业收入:row:0": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          165
+        ],
+        "accurate": true,
+        "matched_source_row_index": 13,
+        "reason": "独立p165 营业收入明细/客户合同收入，其他业务收入原本期本期营业收入=6,390,329.03元，公司及合并子公司；金额/单位/期间及完整跨页证据均成立。原生栏目、主体成立；同额其他表不能替代，Measurement仅准确率。冻结合同service仅作收入明细容器；原名其他业务收入的business_type正确，不改首版合同。此6,390,329.03不冒充全部其他业务25,133,537.37；两个实际Segment各计事实准确率而收入条件只召回一次。",
+        "actual_object_type": "Measurement",
+        "actual_native_name": "其他业务收入",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-78b5f897bc479b49:Segment:business_type:其他业务收入:营业收入:row:0": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          165,
+          166
+        ],
+        "accurate": true,
+        "matched_source_row_index": 13,
+        "reason": "独立p165 营业收入明细/客户合同收入，其他业务收入原本期本期营业收入=6,390,329.03元，公司及合并子公司；金额/单位/期间及完整跨页证据均成立。原生栏目、主体成立；同额其他表不能替代，Measurement仅准确率。冻结合同service仅作收入明细容器；原名其他业务收入的business_type正确，不改首版合同。此6,390,329.03不冒充全部其他业务25,133,537.37；两个实际Segment各计事实准确率而收入条件只召回一次。",
+        "recall_row_index": 13,
+        "actual_object_type": "Segment",
+        "actual_native_name": "其他业务收入",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-bf5a0460d9d2cbf2:Segment:business_type:主营业务:营业收入:row:0": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          197,
+          206
+        ],
+        "accurate": true,
+        "matched_source_row_index": 17,
+        "reason": "独立p206 母公司营业收入和营业成本，主营业务原本期本期营业收入=1,954,287,316.44元，母公司；金额/单位/期间及完整跨页证据均成立。原生栏目、主体成立；同额其他表不能替代，Measurement仅准确率。",
+        "recall_row_index": 17,
+        "actual_object_type": "Segment",
+        "actual_native_name": "主营业务",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "issuer"
+      },
+      "owned:core-ev-e757d371d9e46916:Measurement:business_type:主营业务:营业收入:row:0": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          197,
+          206
+        ],
+        "accurate": true,
+        "matched_source_row_index": 17,
+        "reason": "独立p206 母公司营业收入和营业成本，主营业务原本期本期营业收入=1,954,287,316.44元，母公司；金额/单位/期间及完整跨页证据均成立。原生栏目、主体成立；同额其他表不能替代，Measurement仅准确率。",
+        "actual_object_type": "Measurement",
+        "actual_native_name": "主营业务",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "issuer"
+      },
+      "owned:core-ev-bf5a0460d9d2cbf2:Segment:business_type:其他业务:营业收入:row:1": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          197,
+          206
+        ],
+        "accurate": true,
+        "matched_source_row_index": 18,
+        "reason": "独立p206 母公司营业收入和营业成本，其他业务原本期本期营业收入=13,785,288.75元，母公司；金额/单位/期间及完整跨页证据均成立。原生栏目、主体成立；同额其他表不能替代，Measurement仅准确率。",
+        "recall_row_index": 18,
+        "actual_object_type": "Segment",
+        "actual_native_name": "其他业务",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "issuer"
+      },
+      "owned:core-ev-e757d371d9e46916:Measurement:business_type:其他业务:营业收入:row:1": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          197,
+          206
+        ],
+        "accurate": true,
+        "matched_source_row_index": 18,
+        "reason": "独立p206 母公司营业收入和营业成本，其他业务原本期本期营业收入=13,785,288.75元，母公司；金额/单位/期间及完整跨页证据均成立。原生栏目、主体成立；同额其他表不能替代，Measurement仅准确率。",
+        "actual_object_type": "Measurement",
+        "actual_native_name": "其他业务",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "issuer"
+      },
+      "owned:core-ev-6a01e8f172bb7431:Segment:service:经营租赁收入:作为出租人的经营租赁/租赁收入:row:0": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          175
+        ],
+        "accurate": true,
+        "matched_source_row_index": 19,
+        "reason": "独立p175 作为出租人的经营租赁，经营租赁收入原本期租赁收入=146,594,318.86元，公司及合并子公司；金额/单位/期间及完整跨页证据均成立。原生栏目、主体成立；同额其他表不能替代，Measurement仅准确率。",
+        "recall_row_index": 19,
+        "actual_object_type": "Segment",
+        "actual_native_name": "经营租赁收入",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-e82f221ad25679b4:Measurement:service:经营租赁收入:作为出租人的经营租赁/租赁收入:row:0": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          175
+        ],
+        "accurate": true,
+        "matched_source_row_index": 19,
+        "reason": "独立p175 作为出租人的经营租赁，经营租赁收入原本期租赁收入=146,594,318.86元，公司及合并子公司；金额/单位/期间及完整跨页证据均成立。原生栏目、主体成立；同额其他表不能替代，Measurement仅准确率。",
+        "actual_object_type": "Measurement",
+        "actual_native_name": "经营租赁收入",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      }
+    },
+    "answers": {
+      "principal_business": {
+        "accurate": false,
+        "reason": "实际未答；没有接受BusinessOverview，不计答案准确率对象，仅召回缺失。"
+      },
+      "products_services": {
+        "accurate": false,
+        "reason": "实际仅“有线电视行业”行业标签，缺原网络/信息/点播/互联网/工程/5G/广告/租赁及当前产品服务矩阵，不满足实质正文。"
+      },
+      "revenue_model": {
+        "accurate": false,
+        "reason": "实际收入行业/主营其他标签不能替代p116收入机制、p121租赁计量及p10分类变化；主体和状态限制缺失。"
+      }
+    },
+    "review_method": "逐record_id核新官方原文：全部数值/单位/原栏目/主体/动作/期间，角色要求额外保留声明原子公司；同一条件仅召回一次。原始作用域分类标记不覆盖原文语义，不凭answered或关键词判正文。"
+  },
+  "600075.SH": {
+    "facts": {
+      "owned:core-ev-c802ddb58dc8721c:commodity:1": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          22,
+          23
+        ],
+        "accurate": false,
+        "reason": "完整owner p22把电/蒸汽/电石三原行压为同一行，单位、数字、后续产品串入唯一object_name；不存在此名字的原生商品，sells及派生exposure对象错误，不替代三个真实销售角色；数值未作为量价字段接受，关键数字不单计。",
+        "actual_object_type": "Activity",
+        "actual_native_name": "电兆瓦时7,798,711.2633,190.70-4.92-93.47-蒸汽吉焦4,764,247.60161,979.50--14.13-27.73-电石",
+        "actual_action": "sells",
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-c802ddb58dc8721c:commodity:2": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          22,
+          23
+        ],
+        "accurate": true,
+        "reason": "独立原p23肯定当前SPVC的sells，原产销/外购表本期列证明动作；公司合并/来源公司主体成立。集团合并销售有依据。",
+        "matched_source_role_index": 3,
+        "recall_role_index": 3,
+        "actual_object_type": "Activity",
+        "actual_native_name": "SPVC",
+        "actual_action": "sells",
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-c802ddb58dc8721c:commodity:3": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          22,
+          23
+        ],
+        "accurate": true,
+        "reason": "独立原p23肯定当前EPVC的sells，原产销/外购表本期列证明动作；公司合并/来源公司主体成立。集团合并销售有依据。",
+        "matched_source_role_index": 4,
+        "recall_role_index": 4,
+        "actual_object_type": "Activity",
+        "actual_native_name": "EPVC",
+        "actual_action": "sells",
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-c802ddb58dc8721c:commodity:4": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          22,
+          23
+        ],
+        "accurate": true,
+        "reason": "独立原p23肯定当前PVC树脂的sells，原产销/外购表本期列证明动作；公司合并/来源公司主体成立。集团合并销售有依据。",
+        "matched_source_role_index": 5,
+        "recall_role_index": 5,
+        "actual_object_type": "Activity",
+        "actual_native_name": "PVC树脂",
+        "actual_action": "sells",
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-c802ddb58dc8721c:commodity:5": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          22,
+          23
+        ],
+        "accurate": true,
+        "reason": "独立原p23肯定当前烧碱（固碱）的sells，原产销/外购表本期列证明动作；公司合并/来源公司主体成立。集团合并销售有依据。",
+        "matched_source_role_index": 6,
+        "recall_role_index": 6,
+        "actual_object_type": "Activity",
+        "actual_native_name": "烧碱（固碱）",
+        "actual_action": "sells",
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-c802ddb58dc8721c:commodity:6": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          22,
+          23
+        ],
+        "accurate": true,
+        "reason": "独立原p23肯定当前烧碱（液碱）的sells，原产销/外购表本期列证明动作；公司合并/来源公司主体成立。集团合并销售有依据。",
+        "matched_source_role_index": 7,
+        "recall_role_index": 7,
+        "actual_object_type": "Activity",
+        "actual_native_name": "烧碱（液碱）",
+        "actual_action": "sells",
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-c802ddb58dc8721c:commodity:7": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          22,
+          23
+        ],
+        "accurate": true,
+        "reason": "独立原p23肯定当前盐酸的sells，原产销/外购表本期列证明动作；公司合并/来源公司主体成立。集团合并销售有依据。",
+        "matched_source_role_index": 8,
+        "recall_role_index": 8,
+        "actual_object_type": "Activity",
+        "actual_native_name": "盐酸",
+        "actual_action": "sells",
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-c802ddb58dc8721c:commodity:8": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          22,
+          23
+        ],
+        "accurate": true,
+        "reason": "独立原p23肯定当前次氯酸钠的sells，原产销/外购表本期列证明动作；公司合并/来源公司主体成立。集团合并销售有依据。",
+        "matched_source_role_index": 9,
+        "recall_role_index": 9,
+        "actual_object_type": "Activity",
+        "actual_native_name": "次氯酸钠",
+        "actual_action": "sells",
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-c802ddb58dc8721c:commodity:9": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          22,
+          23
+        ],
+        "accurate": true,
+        "reason": "独立原p23肯定当前水泥的sells，原产销/外购表本期列证明动作；公司合并/来源公司主体成立。集团合并销售有依据。",
+        "matched_source_role_index": 10,
+        "recall_role_index": 10,
+        "actual_object_type": "Activity",
+        "actual_native_name": "水泥",
+        "actual_action": "sells",
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-c802ddb58dc8721c:commodity:10": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          22,
+          23
+        ],
+        "accurate": true,
+        "reason": "独立原p23肯定当前乙醇的sells，原产销/外购表本期列证明动作；公司合并/来源公司主体成立。集团合并销售有依据。原p23下文/37为天业汇祥乙醇，实际只交付公司合并销售；底层集团销售成立，但未保留声明子公司主体，不满足该角色召回。",
+        "matched_source_role_index": 11,
+        "actual_object_type": "Activity",
+        "actual_native_name": "乙醇",
+        "actual_action": "sells",
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-9a37aa3363d547f5:commodity:1": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          37
+        ],
+        "accurate": true,
+        "reason": "独立原p37肯定当前石灰的purchases，原产销/外购表本期列证明动作；公司合并/来源公司主体成立。unclear为保守subject_scope，source_actor仍明确公司，不指向第三方。",
+        "matched_source_role_index": 21,
+        "recall_role_index": 21,
+        "actual_object_type": "Activity",
+        "actual_native_name": "石灰",
+        "actual_action": "purchases",
+        "actual_relation_type": null,
+        "actual_subject_scope": "unclear"
+      },
+      "owned:core-ev-9a37aa3363d547f5:commodity:2": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          37
+        ],
+        "accurate": true,
+        "reason": "独立原p37肯定当前工业盐的purchases，原产销/外购表本期列证明动作；公司合并/来源公司主体成立。unclear为保守subject_scope，source_actor仍明确公司，不指向第三方。",
+        "matched_source_role_index": 22,
+        "recall_role_index": 22,
+        "actual_object_type": "Activity",
+        "actual_native_name": "工业盐",
+        "actual_action": "purchases",
+        "actual_relation_type": null,
+        "actual_subject_scope": "unclear"
+      },
+      "owned:core-ev-9a37aa3363d547f5:commodity:3": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          37
+        ],
+        "accurate": true,
+        "reason": "独立原p37肯定当前煤炭的purchases，原产销/外购表本期列证明动作；公司合并/来源公司主体成立。unclear为保守subject_scope，source_actor仍明确公司，不指向第三方。冻结合同raw_material_input为采购通用容器；原表明确能源，读取端energy_consumption为能源关联类别，底层action仍为purchases，仍按purchases独立判定，不替代耗用。",
+        "matched_source_role_index": 23,
+        "recall_role_index": 23,
+        "accepted_exposure_role": "energy_consumption",
+        "scope_role_marker": "raw_material_input",
+        "actual_object_type": "Activity",
+        "actual_native_name": "煤炭",
+        "actual_action": "purchases",
+        "actual_relation_type": null,
+        "actual_subject_scope": "unclear"
+      },
+      "owned:core-ev-9a37aa3363d547f5:commodity:4": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          37
+        ],
+        "accurate": true,
+        "reason": "独立原p37肯定当前焦炭的purchases，原产销/外购表本期列证明动作；公司合并/来源公司主体成立。unclear为保守subject_scope，source_actor仍明确公司，不指向第三方。冻结合同raw_material_input为采购通用容器；原表明确能源，读取端energy_consumption为能源关联类别，底层action仍为purchases，仍按purchases独立判定，不替代耗用。",
+        "matched_source_role_index": 24,
+        "recall_role_index": 24,
+        "accepted_exposure_role": "energy_consumption",
+        "scope_role_marker": "raw_material_input",
+        "actual_object_type": "Activity",
+        "actual_native_name": "焦炭",
+        "actual_action": "purchases",
+        "actual_relation_type": null,
+        "actual_subject_scope": "unclear"
+      },
+      "owned:core-ev-9a37aa3363d547f5:commodity:5": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          37
+        ],
+        "accurate": true,
+        "reason": "独立原p37肯定当前兰炭的purchases，原产销/外购表本期列证明动作；公司合并/来源公司主体成立。unclear为保守subject_scope，source_actor仍明确公司，不指向第三方。冻结合同raw_material_input为采购通用容器；原表明确能源，读取端energy_consumption为能源关联类别，底层action仍为purchases，仍按purchases独立判定，不替代耗用。",
+        "matched_source_role_index": 25,
+        "recall_role_index": 25,
+        "accepted_exposure_role": "energy_consumption",
+        "scope_role_marker": "raw_material_input",
+        "actual_object_type": "Activity",
+        "actual_native_name": "兰炭",
+        "actual_action": "purchases",
+        "actual_relation_type": null,
+        "actual_subject_scope": "unclear"
+      },
+      "owned:core-ev-9a37aa3363d547f5:commodity:6": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          37
+        ],
+        "accurate": true,
+        "reason": "独立原p37肯定当前天然气的purchases，原产销/外购表本期列证明动作；公司合并/来源公司主体成立。unclear为保守subject_scope，source_actor仍明确公司，不指向第三方。冻结合同raw_material_input为采购通用容器；原表明确能源，读取端energy_consumption为能源关联类别，底层action仍为purchases，仍按purchases独立判定，不替代耗用。",
+        "matched_source_role_index": 26,
+        "recall_role_index": 26,
+        "accepted_exposure_role": "energy_consumption",
+        "scope_role_marker": "raw_material_input",
+        "actual_object_type": "Activity",
+        "actual_native_name": "天然气",
+        "actual_action": "purchases",
+        "actual_relation_type": null,
+        "actual_subject_scope": "unclear"
+      },
+      "owned:core-ev-8b9eca48ad0c3e6f:segment:industry:工业": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28
+        ],
+        "accurate": true,
+        "matched_source_row_index": 0,
+        "reason": "独立p21 主营业务分行业，工业原本期本期营业收入=9,993,949,013.85元，公司及合并子公司；金额/单位/期间及完整跨页证据均成立。原生栏目、主体成立；同额其他表不能替代，Measurement仅准确率。",
+        "recall_row_index": 0,
+        "actual_object_type": "Segment",
+        "actual_native_name": "工业",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-14a1800aca069d73:revenue:industry:工业": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28
+        ],
+        "accurate": true,
+        "matched_source_row_index": 0,
+        "reason": "独立p21 主营业务分行业，工业原本期本期营业收入=9,993,949,013.85元，公司及合并子公司；金额/单位/期间及完整跨页证据均成立。原生栏目、主体成立；同额其他表不能替代，Measurement仅准确率。",
+        "actual_object_type": "Measurement",
+        "actual_native_name": "工业",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-8b9eca48ad0c3e6f:segment:industry:商业": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28
+        ],
+        "accurate": true,
+        "matched_source_row_index": 1,
+        "reason": "独立p21 主营业务分行业，商业原本期本期营业收入=156,097,914.74元，公司及合并子公司；金额/单位/期间及完整跨页证据均成立。原生栏目、主体成立；同额其他表不能替代，Measurement仅准确率。",
+        "recall_row_index": 1,
+        "actual_object_type": "Segment",
+        "actual_native_name": "商业",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-14a1800aca069d73:revenue:industry:商业": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28
+        ],
+        "accurate": true,
+        "matched_source_row_index": 1,
+        "reason": "独立p21 主营业务分行业，商业原本期本期营业收入=156,097,914.74元，公司及合并子公司；金额/单位/期间及完整跨页证据均成立。原生栏目、主体成立；同额其他表不能替代，Measurement仅准确率。",
+        "actual_object_type": "Measurement",
+        "actual_native_name": "商业",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-8b9eca48ad0c3e6f:segment:industry:服务业及其他": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28
+        ],
+        "accurate": true,
+        "matched_source_row_index": 2,
+        "reason": "独立p21 主营业务分行业，服务业及其他原本期本期营业收入=130,983,640.41元，公司及合并子公司；金额/单位/期间及完整跨页证据均成立。原生栏目、主体成立；同额其他表不能替代，Measurement仅准确率。",
+        "recall_row_index": 2,
+        "actual_object_type": "Segment",
+        "actual_native_name": "服务业及其他",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-14a1800aca069d73:revenue:industry:服务业及其他": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28
+        ],
+        "accurate": true,
+        "matched_source_row_index": 2,
+        "reason": "独立p21 主营业务分行业，服务业及其他原本期本期营业收入=130,983,640.41元，公司及合并子公司；金额/单位/期间及完整跨页证据均成立。原生栏目、主体成立；同额其他表不能替代，Measurement仅准确率。",
+        "actual_object_type": "Measurement",
+        "actual_native_name": "服务业及其他",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-8b9eca48ad0c3e6f:segment:product:聚氯乙烯树脂类": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28
+        ],
+        "accurate": true,
+        "matched_source_row_index": 3,
+        "reason": "独立p21 主营业务分产品，聚氯乙烯树脂类原本期本期营业收入=5,566,874,815.41元，公司及合并子公司；金额/单位/期间及完整跨页证据均成立。原生栏目、主体成立；同额其他表不能替代，Measurement仅准确率。",
+        "recall_row_index": 3,
+        "actual_object_type": "Segment",
+        "actual_native_name": "聚氯乙烯树脂类",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-14a1800aca069d73:revenue:product:聚氯乙烯树脂类": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28
+        ],
+        "accurate": true,
+        "matched_source_row_index": 3,
+        "reason": "独立p21 主营业务分产品，聚氯乙烯树脂类原本期本期营业收入=5,566,874,815.41元，公司及合并子公司；金额/单位/期间及完整跨页证据均成立。原生栏目、主体成立；同额其他表不能替代，Measurement仅准确率。",
+        "actual_object_type": "Measurement",
+        "actual_native_name": "聚氯乙烯树脂类",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-8b9eca48ad0c3e6f:segment:product:固体烧碱": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28
+        ],
+        "accurate": true,
+        "matched_source_row_index": 4,
+        "reason": "独立p21 主营业务分产品，固体烧碱原本期本期营业收入=2,342,482,192.64元，公司及合并子公司；金额/单位/期间及完整跨页证据均成立。原生栏目、主体成立；同额其他表不能替代，Measurement仅准确率。",
+        "recall_row_index": 4,
+        "actual_object_type": "Segment",
+        "actual_native_name": "固体烧碱",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-14a1800aca069d73:revenue:product:固体烧碱": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28
+        ],
+        "accurate": true,
+        "matched_source_row_index": 4,
+        "reason": "独立p21 主营业务分产品，固体烧碱原本期本期营业收入=2,342,482,192.64元，公司及合并子公司；金额/单位/期间及完整跨页证据均成立。原生栏目、主体成立；同额其他表不能替代，Measurement仅准确率。",
+        "actual_object_type": "Measurement",
+        "actual_native_name": "固体烧碱",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-8b9eca48ad0c3e6f:segment:product:乙醇": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28
+        ],
+        "accurate": true,
+        "matched_source_row_index": 5,
+        "reason": "独立p21 主营业务分产品，乙醇原本期本期营业收入=701,103,224.72元，公司及合并子公司；金额/单位/期间及完整跨页证据均成立。原生栏目、主体成立；同额其他表不能替代，Measurement仅准确率。",
+        "recall_row_index": 5,
+        "actual_object_type": "Segment",
+        "actual_native_name": "乙醇",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-14a1800aca069d73:revenue:product:乙醇": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28
+        ],
+        "accurate": true,
+        "matched_source_row_index": 5,
+        "reason": "独立p21 主营业务分产品，乙醇原本期本期营业收入=701,103,224.72元，公司及合并子公司；金额/单位/期间及完整跨页证据均成立。原生栏目、主体成立；同额其他表不能替代，Measurement仅准确率。",
+        "actual_object_type": "Measurement",
+        "actual_native_name": "乙醇",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-8b9eca48ad0c3e6f:segment:product:电、汽产品": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28
+        ],
+        "accurate": true,
+        "matched_source_row_index": 6,
+        "reason": "独立p21 主营业务分产品，电、汽产品原本期本期营业收入=61,602,093.65元，公司及合并子公司；金额/单位/期间及完整跨页证据均成立。原生栏目、主体成立；同额其他表不能替代，Measurement仅准确率。",
+        "recall_row_index": 6,
+        "actual_object_type": "Segment",
+        "actual_native_name": "电、汽产品",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-14a1800aca069d73:revenue:product:电、汽产品": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28
+        ],
+        "accurate": true,
+        "matched_source_row_index": 6,
+        "reason": "独立p21 主营业务分产品，电、汽产品原本期本期营业收入=61,602,093.65元，公司及合并子公司；金额/单位/期间及完整跨页证据均成立。原生栏目、主体成立；同额其他表不能替代，Measurement仅准确率。",
+        "actual_object_type": "Measurement",
+        "actual_native_name": "电、汽产品",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-8b9eca48ad0c3e6f:segment:product:其他化学制品": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28
+        ],
+        "accurate": true,
+        "matched_source_row_index": 7,
+        "reason": "独立p21 主营业务分产品，其他化学制品原本期本期营业收入=343,162,241.47元，公司及合并子公司；金额/单位/期间及完整跨页证据均成立。原生栏目、主体成立；同额其他表不能替代，Measurement仅准确率。",
+        "recall_row_index": 7,
+        "actual_object_type": "Segment",
+        "actual_native_name": "其他化学制品",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-14a1800aca069d73:revenue:product:其他化学制品": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28
+        ],
+        "accurate": true,
+        "matched_source_row_index": 7,
+        "reason": "独立p21 主营业务分产品，其他化学制品原本期本期营业收入=343,162,241.47元，公司及合并子公司；金额/单位/期间及完整跨页证据均成立。原生栏目、主体成立；同额其他表不能替代，Measurement仅准确率。",
+        "actual_object_type": "Measurement",
+        "actual_native_name": "其他化学制品",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-8b9eca48ad0c3e6f:segment:product:水泥": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28
+        ],
+        "accurate": true,
+        "matched_source_row_index": 8,
+        "reason": "独立p21 主营业务分产品，水泥原本期本期营业收入=969,452,345.09元，公司及合并子公司；金额/单位/期间及完整跨页证据均成立。原生栏目、主体成立；同额其他表不能替代，Measurement仅准确率。",
+        "recall_row_index": 8,
+        "actual_object_type": "Segment",
+        "actual_native_name": "水泥",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-14a1800aca069d73:revenue:product:水泥": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28
+        ],
+        "accurate": true,
+        "matched_source_row_index": 8,
+        "reason": "独立p21 主营业务分产品，水泥原本期本期营业收入=969,452,345.09元，公司及合并子公司；金额/单位/期间及完整跨页证据均成立。原生栏目、主体成立；同额其他表不能替代，Measurement仅准确率。",
+        "actual_object_type": "Measurement",
+        "actual_native_name": "水泥",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-8b9eca48ad0c3e6f:segment:product:包装材料": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28
+        ],
+        "accurate": true,
+        "matched_source_row_index": 9,
+        "reason": "独立p21 主营业务分产品，包装材料原本期本期营业收入=9,272,100.87元，公司及合并子公司；金额/单位/期间及完整跨页证据均成立。原生栏目、主体成立；同额其他表不能替代，Measurement仅准确率。",
+        "recall_row_index": 9,
+        "actual_object_type": "Segment",
+        "actual_native_name": "包装材料",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-14a1800aca069d73:revenue:product:包装材料": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28
+        ],
+        "accurate": true,
+        "matched_source_row_index": 9,
+        "reason": "独立p21 主营业务分产品，包装材料原本期本期营业收入=9,272,100.87元，公司及合并子公司；金额/单位/期间及完整跨页证据均成立。原生栏目、主体成立；同额其他表不能替代，Measurement仅准确率。",
+        "actual_object_type": "Measurement",
+        "actual_native_name": "包装材料",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-8b9eca48ad0c3e6f:segment:product:商业": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28
+        ],
+        "accurate": true,
+        "matched_source_row_index": 10,
+        "reason": "独立p21 主营业务分产品，商业原本期本期营业收入=156,097,914.74元，公司及合并子公司；金额/单位/期间及完整跨页证据均成立。原生栏目、主体成立；同额其他表不能替代，Measurement仅准确率。",
+        "recall_row_index": 10,
+        "actual_object_type": "Segment",
+        "actual_native_name": "商业",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-14a1800aca069d73:revenue:product:商业": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28
+        ],
+        "accurate": true,
+        "matched_source_row_index": 10,
+        "reason": "独立p21 主营业务分产品，商业原本期本期营业收入=156,097,914.74元，公司及合并子公司；金额/单位/期间及完整跨页证据均成立。原生栏目、主体成立；同额其他表不能替代，Measurement仅准确率。",
+        "actual_object_type": "Measurement",
+        "actual_native_name": "商业",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-8b9eca48ad0c3e6f:segment:product:公路运输": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28
+        ],
+        "accurate": true,
+        "matched_source_row_index": 11,
+        "reason": "独立p21 主营业务分产品，公路运输原本期本期营业收入=130,983,640.41元，公司及合并子公司；金额/单位/期间及完整跨页证据均成立。原生栏目、主体成立；同额其他表不能替代，Measurement仅准确率。",
+        "recall_row_index": 11,
+        "actual_object_type": "Segment",
+        "actual_native_name": "公路运输",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-14a1800aca069d73:revenue:product:公路运输": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28
+        ],
+        "accurate": true,
+        "matched_source_row_index": 11,
+        "reason": "独立p21 主营业务分产品，公路运输原本期本期营业收入=130,983,640.41元，公司及合并子公司；金额/单位/期间及完整跨页证据均成立。原生栏目、主体成立；同额其他表不能替代，Measurement仅准确率。",
+        "actual_object_type": "Measurement",
+        "actual_native_name": "公路运输",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-8b9eca48ad0c3e6f:segment:region:国内": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28
+        ],
+        "accurate": true,
+        "matched_source_row_index": 12,
+        "reason": "独立p22 主营业务分地区续页，国内原本期本期营业收入=9,649,063,688.04元，公司及合并子公司；金额/单位/期间及完整跨页证据均成立。原生栏目、主体成立；同额其他表不能替代，Measurement仅准确率。",
+        "recall_row_index": 12,
+        "actual_object_type": "Segment",
+        "actual_native_name": "国内",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-14a1800aca069d73:revenue:region:国内": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28
+        ],
+        "accurate": true,
+        "matched_source_row_index": 12,
+        "reason": "独立p22 主营业务分地区续页，国内原本期本期营业收入=9,649,063,688.04元，公司及合并子公司；金额/单位/期间及完整跨页证据均成立。原生栏目、主体成立；同额其他表不能替代，Measurement仅准确率。",
+        "actual_object_type": "Measurement",
+        "actual_native_name": "国内",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-8b9eca48ad0c3e6f:segment:region:疆内": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28
+        ],
+        "accurate": true,
+        "matched_source_row_index": 13,
+        "reason": "独立p22 主营业务分地区续页，其中:疆内原本期本期营业收入=2,824,368,561.17元，公司及合并子公司；金额/单位/期间及完整跨页证据均成立。原生栏目、主体成立；同额其他表不能替代，Measurement仅准确率。原其中标记为父子关系，不是地区名字符；名称疆内及bounded_quote含国内/其中原行完整，父子边界有据。",
+        "recall_row_index": 13,
+        "actual_object_type": "Segment",
+        "actual_native_name": "疆内",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-14a1800aca069d73:revenue:region:疆内": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28
+        ],
+        "accurate": true,
+        "matched_source_row_index": 13,
+        "reason": "独立p22 主营业务分地区续页，其中:疆内原本期本期营业收入=2,824,368,561.17元，公司及合并子公司；金额/单位/期间及完整跨页证据均成立。原生栏目、主体成立；同额其他表不能替代，Measurement仅准确率。原其中标记为父子关系，不是地区名字符；名称疆内及bounded_quote含国内/其中原行完整，父子边界有据。",
+        "actual_object_type": "Measurement",
+        "actual_native_name": "疆内",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-8b9eca48ad0c3e6f:segment:region:疆外": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28
+        ],
+        "accurate": true,
+        "matched_source_row_index": 14,
+        "reason": "独立p22 主营业务分地区续页，疆外原本期本期营业收入=6,824,695,126.87元，公司及合并子公司；金额/单位/期间及完整跨页证据均成立。原生栏目、主体成立；同额其他表不能替代，Measurement仅准确率。",
+        "recall_row_index": 14,
+        "actual_object_type": "Segment",
+        "actual_native_name": "疆外",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-14a1800aca069d73:revenue:region:疆外": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28
+        ],
+        "accurate": true,
+        "matched_source_row_index": 14,
+        "reason": "独立p22 主营业务分地区续页，疆外原本期本期营业收入=6,824,695,126.87元，公司及合并子公司；金额/单位/期间及完整跨页证据均成立。原生栏目、主体成立；同额其他表不能替代，Measurement仅准确率。",
+        "actual_object_type": "Measurement",
+        "actual_native_name": "疆外",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-8b9eca48ad0c3e6f:segment:region:国外": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28
+        ],
+        "accurate": true,
+        "matched_source_row_index": 15,
+        "reason": "独立p22 主营业务分地区续页，国外原本期本期营业收入=631,966,880.96元，公司及合并子公司；金额/单位/期间及完整跨页证据均成立。原生栏目、主体成立；同额其他表不能替代，Measurement仅准确率。",
+        "recall_row_index": 15,
+        "actual_object_type": "Segment",
+        "actual_native_name": "国外",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-14a1800aca069d73:revenue:region:国外": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28
+        ],
+        "accurate": true,
+        "matched_source_row_index": 15,
+        "reason": "独立p22 主营业务分地区续页，国外原本期本期营业收入=631,966,880.96元，公司及合并子公司；金额/单位/期间及完整跨页证据均成立。原生栏目、主体成立；同额其他表不能替代，Measurement仅准确率。",
+        "actual_object_type": "Measurement",
+        "actual_native_name": "国外",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-8b9eca48ad0c3e6f:segment:sales_mode:直销": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28
+        ],
+        "accurate": true,
+        "matched_source_row_index": 16,
+        "reason": "独立p22 主营业务分销售模式，直销原本期本期营业收入=1,543,444,116.18元，公司及合并子公司；金额/单位/期间及完整跨页证据均成立。原生栏目、主体成立；同额其他表不能替代，Measurement仅准确率。",
+        "recall_row_index": 16,
+        "actual_object_type": "Segment",
+        "actual_native_name": "直销",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-14a1800aca069d73:revenue:sales_mode:直销": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28
+        ],
+        "accurate": true,
+        "matched_source_row_index": 16,
+        "reason": "独立p22 主营业务分销售模式，直销原本期本期营业收入=1,543,444,116.18元，公司及合并子公司；金额/单位/期间及完整跨页证据均成立。原生栏目、主体成立；同额其他表不能替代，Measurement仅准确率。",
+        "actual_object_type": "Measurement",
+        "actual_native_name": "直销",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-8b9eca48ad0c3e6f:segment:sales_mode:经销": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28
+        ],
+        "accurate": true,
+        "matched_source_row_index": 17,
+        "reason": "独立p22 主营业务分销售模式，经销原本期本期营业收入=8,737,586,452.82元，公司及合并子公司；金额/单位/期间及完整跨页证据均成立。原生栏目、主体成立；同额其他表不能替代，Measurement仅准确率。",
+        "recall_row_index": 17,
+        "actual_object_type": "Segment",
+        "actual_native_name": "经销",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-14a1800aca069d73:revenue:sales_mode:经销": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28
+        ],
+        "accurate": true,
+        "matched_source_row_index": 17,
+        "reason": "独立p22 主营业务分销售模式，经销原本期本期营业收入=8,737,586,452.82元，公司及合并子公司；金额/单位/期间及完整跨页证据均成立。原生栏目、主体成立；同额其他表不能替代，Measurement仅准确率。",
+        "actual_object_type": "Measurement",
+        "actual_native_name": "经销",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-f98a84381ec2d8e6:Segment:business_type:主营业务:营业收入:row:0": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          185
+        ],
+        "accurate": true,
+        "matched_source_row_index": 26,
+        "reason": "独立p185 合并营业收入和营业成本，主营业务原本期本期营业收入=10,281,030,569.00元，公司及合并子公司；金额/单位/期间及完整跨页证据均成立。原生栏目、主体成立；同额其他表不能替代，Measurement仅准确率。",
+        "recall_row_index": 26,
+        "actual_object_type": "Segment",
+        "actual_native_name": "主营业务",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-6c294c13c9c6e3f0:Measurement:business_type:主营业务:营业收入:row:0": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          185
+        ],
+        "accurate": true,
+        "matched_source_row_index": 26,
+        "reason": "独立p185 合并营业收入和营业成本，主营业务原本期本期营业收入=10,281,030,569.00元，公司及合并子公司；金额/单位/期间及完整跨页证据均成立。原生栏目、主体成立；同额其他表不能替代，Measurement仅准确率。",
+        "actual_object_type": "Measurement",
+        "actual_native_name": "主营业务",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-f98a84381ec2d8e6:Segment:business_type:其他业务:营业收入:row:1": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          185
+        ],
+        "accurate": true,
+        "matched_source_row_index": 27,
+        "reason": "独立p185 合并营业收入和营业成本，其他业务原本期本期营业收入=206,793,160.91元，公司及合并子公司；金额/单位/期间及完整跨页证据均成立。原生栏目、主体成立；同额其他表不能替代，Measurement仅准确率。",
+        "recall_row_index": 27,
+        "actual_object_type": "Segment",
+        "actual_native_name": "其他业务",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-6c294c13c9c6e3f0:Measurement:business_type:其他业务:营业收入:row:1": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          185
+        ],
+        "accurate": true,
+        "matched_source_row_index": 27,
+        "reason": "独立p185 合并营业收入和营业成本，其他业务原本期本期营业收入=206,793,160.91元，公司及合并子公司；金额/单位/期间及完整跨页证据均成立。原生栏目、主体成立；同额其他表不能替代，Measurement仅准确率。",
+        "actual_object_type": "Measurement",
+        "actual_native_name": "其他业务",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-e2a901b4909cb8fb:Segment:product:化工产品:全部营业收入/商品类型:row:0": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          186
+        ],
+        "accurate": true,
+        "matched_source_row_index": 28,
+        "reason": "独立p186 合并合同分类/商品类型，化工产品原本期本期营业收入=9,015,224,567.89元，公司及合并子公司；金额/单位/期间及完整跨页证据均成立。原生栏目、主体成立；同额其他表不能替代，Measurement仅准确率。",
+        "recall_row_index": 28,
+        "actual_object_type": "Segment",
+        "actual_native_name": "化工产品",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-7205e48acf45ee63:Measurement:product:化工产品:全部营业收入/商品类型:row:0": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          186
+        ],
+        "accurate": true,
+        "matched_source_row_index": 28,
+        "reason": "独立p186 合并合同分类/商品类型，化工产品原本期本期营业收入=9,015,224,567.89元，公司及合并子公司；金额/单位/期间及完整跨页证据均成立。原生栏目、主体成立；同额其他表不能替代，Measurement仅准确率。",
+        "actual_object_type": "Measurement",
+        "actual_native_name": "化工产品",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-e2a901b4909cb8fb:Segment:product:水泥产品:全部营业收入/商品类型:row:1": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          186
+        ],
+        "accurate": true,
+        "matched_source_row_index": 29,
+        "reason": "独立p186 合并合同分类/商品类型，水泥产品原本期本期营业收入=969,452,345.09元，公司及合并子公司；金额/单位/期间及完整跨页证据均成立。原生栏目、主体成立；同额其他表不能替代，Measurement仅准确率。",
+        "recall_row_index": 29,
+        "actual_object_type": "Segment",
+        "actual_native_name": "水泥产品",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-7205e48acf45ee63:Measurement:product:水泥产品:全部营业收入/商品类型:row:1": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          186
+        ],
+        "accurate": true,
+        "matched_source_row_index": 29,
+        "reason": "独立p186 合并合同分类/商品类型，水泥产品原本期本期营业收入=969,452,345.09元，公司及合并子公司；金额/单位/期间及完整跨页证据均成立。原生栏目、主体成立；同额其他表不能替代，Measurement仅准确率。",
+        "actual_object_type": "Measurement",
+        "actual_native_name": "水泥产品",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-e2a901b4909cb8fb:Segment:product:公路运输:全部营业收入/商品类型:row:2": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          186
+        ],
+        "accurate": true,
+        "matched_source_row_index": 30,
+        "reason": "独立p186 合并合同分类/商品类型，公路运输原本期本期营业收入=130,983,640.41元，公司及合并子公司；金额/单位/期间及完整跨页证据均成立。原生栏目、主体成立；同额其他表不能替代，Measurement仅准确率。",
+        "recall_row_index": 30,
+        "actual_object_type": "Segment",
+        "actual_native_name": "公路运输",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-7205e48acf45ee63:Measurement:product:公路运输:全部营业收入/商品类型:row:2": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          186
+        ],
+        "accurate": true,
+        "matched_source_row_index": 30,
+        "reason": "独立p186 合并合同分类/商品类型，公路运输原本期本期营业收入=130,983,640.41元，公司及合并子公司；金额/单位/期间及完整跨页证据均成立。原生栏目、主体成立；同额其他表不能替代，Measurement仅准确率。",
+        "actual_object_type": "Measurement",
+        "actual_native_name": "公路运输",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-e2a901b4909cb8fb:Segment:product:包装材料:全部营业收入/商品类型:row:3": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          186
+        ],
+        "accurate": true,
+        "matched_source_row_index": 31,
+        "reason": "独立p186 合并合同分类/商品类型，包装材料原本期本期营业收入=9,272,100.87元，公司及合并子公司；金额/单位/期间及完整跨页证据均成立。原生栏目、主体成立；同额其他表不能替代，Measurement仅准确率。",
+        "recall_row_index": 31,
+        "actual_object_type": "Segment",
+        "actual_native_name": "包装材料",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-7205e48acf45ee63:Measurement:product:包装材料:全部营业收入/商品类型:row:3": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          186
+        ],
+        "accurate": true,
+        "matched_source_row_index": 31,
+        "reason": "独立p186 合并合同分类/商品类型，包装材料原本期本期营业收入=9,272,100.87元，公司及合并子公司；金额/单位/期间及完整跨页证据均成立。原生栏目、主体成立；同额其他表不能替代，Measurement仅准确率。",
+        "actual_object_type": "Measurement",
+        "actual_native_name": "包装材料",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-e2a901b4909cb8fb:Segment:product:其他:全部营业收入/商品类型:row:4": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          186
+        ],
+        "accurate": true,
+        "matched_source_row_index": 32,
+        "reason": "独立p186 合并合同分类/商品类型，其他原本期本期营业收入=362,891,075.65元，公司及合并子公司；金额/单位/期间及完整跨页证据均成立。原生栏目、主体成立；同额其他表不能替代，Measurement仅准确率。",
+        "recall_row_index": 32,
+        "actual_object_type": "Segment",
+        "actual_native_name": "其他",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-7205e48acf45ee63:Measurement:product:其他:全部营业收入/商品类型:row:4": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          186
+        ],
+        "accurate": true,
+        "matched_source_row_index": 32,
+        "reason": "独立p186 合并合同分类/商品类型，其他原本期本期营业收入=362,891,075.65元，公司及合并子公司；金额/单位/期间及完整跨页证据均成立。原生栏目、主体成立；同额其他表不能替代，Measurement仅准确率。",
+        "actual_object_type": "Measurement",
+        "actual_native_name": "其他",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-e2a901b4909cb8fb:Segment:product:国内:全部营业收入/商品类型:row:5": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          186
+        ],
+        "accurate": false,
+        "matched_source_row_index": 33,
+        "reason": "独立p186 合并合同分类/市场或客户类型，国内原本期本期营业收入=9,855,856,848.95元，公司及合并子公司；金额/单位/期间及完整跨页证据均成立。原栏目为region，实际却为product/全部营业收入/商品类型；原生分类错误，Segment及Measurement分别计错误，金额正确不计关键数字错误。",
+        "actual_object_type": "Segment",
+        "actual_native_name": "国内",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-7205e48acf45ee63:Measurement:product:国内:全部营业收入/商品类型:row:5": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          186
+        ],
+        "accurate": false,
+        "matched_source_row_index": 33,
+        "reason": "独立p186 合并合同分类/市场或客户类型，国内原本期本期营业收入=9,855,856,848.95元，公司及合并子公司；金额/单位/期间及完整跨页证据均成立。原栏目为region，实际却为product/全部营业收入/商品类型；原生分类错误，Segment及Measurement分别计错误，金额正确不计关键数字错误。",
+        "actual_object_type": "Measurement",
+        "actual_native_name": "国内",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-e2a901b4909cb8fb:Segment:product:境外:全部营业收入/商品类型:row:6": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          186
+        ],
+        "accurate": false,
+        "matched_source_row_index": 34,
+        "reason": "独立p186 合并合同分类/市场或客户类型，境外原本期本期营业收入=631,966,880.96元，公司及合并子公司；金额/单位/期间及完整跨页证据均成立。原栏目为region，实际却为product/全部营业收入/商品类型；原生分类错误，Segment及Measurement分别计错误，金额正确不计关键数字错误。",
+        "actual_object_type": "Segment",
+        "actual_native_name": "境外",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-7205e48acf45ee63:Measurement:product:境外:全部营业收入/商品类型:row:6": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          186
+        ],
+        "accurate": false,
+        "matched_source_row_index": 34,
+        "reason": "独立p186 合并合同分类/市场或客户类型，境外原本期本期营业收入=631,966,880.96元，公司及合并子公司；金额/单位/期间及完整跨页证据均成立。原栏目为region，实际却为product/全部营业收入/商品类型；原生分类错误，Segment及Measurement分别计错误，金额正确不计关键数字错误。",
+        "actual_object_type": "Measurement",
+        "actual_native_name": "境外",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-e2a901b4909cb8fb:Segment:revenue_timing:在某一时点确认:收入确认时点/:row:7": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          186
+        ],
+        "accurate": true,
+        "matched_source_row_index": 35,
+        "reason": "独立p186 合并合同分类/商品转让时间，在某一时点确认原本期本期营业收入=10,487,823,729.91元，公司及合并子公司；金额/单位/期间及完整跨页证据均成立。原生栏目、主体成立；同额其他表不能替代，Measurement仅准确率。",
+        "recall_row_index": 35,
+        "actual_object_type": "Segment",
+        "actual_native_name": "在某一时点确认",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-7205e48acf45ee63:Measurement:revenue_timing:在某一时点确认:收入确认时点/:row:7": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          186
+        ],
+        "accurate": true,
+        "matched_source_row_index": 35,
+        "reason": "独立p186 合并合同分类/商品转让时间，在某一时点确认原本期本期营业收入=10,487,823,729.91元，公司及合并子公司；金额/单位/期间及完整跨页证据均成立。原生栏目、主体成立；同额其他表不能替代，Measurement仅准确率。",
+        "actual_object_type": "Measurement",
+        "actual_native_name": "在某一时点确认",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-e2a901b4909cb8fb:Segment:sales_mode:直销:全部营业收入/销售渠道:row:8": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          186
+        ],
+        "accurate": true,
+        "matched_source_row_index": 36,
+        "reason": "独立p186 合并合同分类/销售渠道，直销原本期本期营业收入=1,750,237,277.09元，公司及合并子公司；金额/单位/期间及完整跨页证据均成立。原生栏目、主体成立；同额其他表不能替代，Measurement仅准确率。",
+        "recall_row_index": 36,
+        "actual_object_type": "Segment",
+        "actual_native_name": "直销",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-7205e48acf45ee63:Measurement:sales_mode:直销:全部营业收入/销售渠道:row:8": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          186
+        ],
+        "accurate": true,
+        "matched_source_row_index": 36,
+        "reason": "独立p186 合并合同分类/销售渠道，直销原本期本期营业收入=1,750,237,277.09元，公司及合并子公司；金额/单位/期间及完整跨页证据均成立。原生栏目、主体成立；同额其他表不能替代，Measurement仅准确率。",
+        "actual_object_type": "Measurement",
+        "actual_native_name": "直销",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-e2a901b4909cb8fb:Segment:sales_mode:经销:全部营业收入/销售渠道:row:9": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          186
+        ],
+        "accurate": true,
+        "matched_source_row_index": 37,
+        "reason": "独立p186 合并合同分类/销售渠道，经销原本期本期营业收入=8,737,586,452.82元，公司及合并子公司；金额/单位/期间及完整跨页证据均成立。原生栏目、主体成立；同额其他表不能替代，Measurement仅准确率。",
+        "recall_row_index": 37,
+        "actual_object_type": "Segment",
+        "actual_native_name": "经销",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-7205e48acf45ee63:Measurement:sales_mode:经销:全部营业收入/销售渠道:row:9": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          186
+        ],
+        "accurate": true,
+        "matched_source_row_index": 37,
+        "reason": "独立p186 合并合同分类/销售渠道，经销原本期本期营业收入=8,737,586,452.82元，公司及合并子公司；金额/单位/期间及完整跨页证据均成立。原生栏目、主体成立；同额其他表不能替代，Measurement仅准确率。",
+        "actual_object_type": "Measurement",
+        "actual_native_name": "经销",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-59907febbace421e:Segment:business_type:主营业务:营业收入:row:0": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          220,
+          231
+        ],
+        "accurate": true,
+        "matched_source_row_index": 42,
+        "reason": "独立p231 母公司营业收入和营业成本，主营业务原本期本期营业收入=7,713,529,831.05元，母公司；金额/单位/期间及完整跨页证据均成立。原生栏目、主体成立；同额其他表不能替代，Measurement仅准确率。",
+        "recall_row_index": 42,
+        "actual_object_type": "Segment",
+        "actual_native_name": "主营业务",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "issuer"
+      },
+      "owned:core-ev-3a18b137c30ce40c:Measurement:business_type:主营业务:营业收入:row:0": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          220,
+          231
+        ],
+        "accurate": true,
+        "matched_source_row_index": 42,
+        "reason": "独立p231 母公司营业收入和营业成本，主营业务原本期本期营业收入=7,713,529,831.05元，母公司；金额/单位/期间及完整跨页证据均成立。原生栏目、主体成立；同额其他表不能替代，Measurement仅准确率。",
+        "actual_object_type": "Measurement",
+        "actual_native_name": "主营业务",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "issuer"
+      },
+      "owned:core-ev-59907febbace421e:Segment:business_type:其他业务:营业收入:row:1": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          220,
+          231
+        ],
+        "accurate": true,
+        "matched_source_row_index": 43,
+        "reason": "独立p231 母公司营业收入和营业成本，其他业务原本期本期营业收入=5,023,893.53元，母公司；金额/单位/期间及完整跨页证据均成立。原生栏目、主体成立；同额其他表不能替代，Measurement仅准确率。",
+        "recall_row_index": 43,
+        "actual_object_type": "Segment",
+        "actual_native_name": "其他业务",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "issuer"
+      },
+      "owned:core-ev-3a18b137c30ce40c:Measurement:business_type:其他业务:营业收入:row:1": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          220,
+          231
+        ],
+        "accurate": true,
+        "matched_source_row_index": 43,
+        "reason": "独立p231 母公司营业收入和营业成本，其他业务原本期本期营业收入=5,023,893.53元，母公司；金额/单位/期间及完整跨页证据均成立。原生栏目、主体成立；同额其他表不能替代，Measurement仅准确率。",
+        "actual_object_type": "Measurement",
+        "actual_native_name": "其他业务",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "issuer"
+      },
+      "owned:core-ev-edea2f071fbcf4cd:Segment:product:化工产品:全部营业收入/商品类型:row:0": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          220,
+          232
+        ],
+        "accurate": true,
+        "matched_source_row_index": 44,
+        "reason": "独立p232 母公司合同分类/商品类型，化工产品原本期本期营业收入=6,632,647,912.62元，母公司；金额/单位/期间及完整跨页证据均成立。原生栏目、主体成立；同额其他表不能替代，Measurement仅准确率。",
+        "recall_row_index": 44,
+        "actual_object_type": "Segment",
+        "actual_native_name": "化工产品",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "issuer"
+      },
+      "owned:core-ev-d2a35515d2dfe461:Measurement:product:化工产品:全部营业收入/商品类型:row:0": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          220,
+          232
+        ],
+        "accurate": true,
+        "matched_source_row_index": 44,
+        "reason": "独立p232 母公司合同分类/商品类型，化工产品原本期本期营业收入=6,632,647,912.62元，母公司；金额/单位/期间及完整跨页证据均成立。原生栏目、主体成立；同额其他表不能替代，Measurement仅准确率。",
+        "actual_object_type": "Measurement",
+        "actual_native_name": "化工产品",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "issuer"
+      },
+      "owned:core-ev-edea2f071fbcf4cd:Segment:product:水泥产品:全部营业收入/商品类型:row:1": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          220,
+          232
+        ],
+        "accurate": true,
+        "matched_source_row_index": 45,
+        "reason": "独立p232 母公司合同分类/商品类型，水泥产品原本期本期营业收入=908,880,887.25元，母公司；金额/单位/期间及完整跨页证据均成立。原生栏目、主体成立；同额其他表不能替代，Measurement仅准确率。",
+        "recall_row_index": 45,
+        "actual_object_type": "Segment",
+        "actual_native_name": "水泥产品",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "issuer"
+      },
+      "owned:core-ev-d2a35515d2dfe461:Measurement:product:水泥产品:全部营业收入/商品类型:row:1": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          220,
+          232
+        ],
+        "accurate": true,
+        "matched_source_row_index": 45,
+        "reason": "独立p232 母公司合同分类/商品类型，水泥产品原本期本期营业收入=908,880,887.25元，母公司；金额/单位/期间及完整跨页证据均成立。原生栏目、主体成立；同额其他表不能替代，Measurement仅准确率。",
+        "actual_object_type": "Measurement",
+        "actual_native_name": "水泥产品",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "issuer"
+      },
+      "owned:core-ev-edea2f071fbcf4cd:Segment:product:包装材料:全部营业收入/商品类型:row:2": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          220,
+          232
+        ],
+        "accurate": true,
+        "matched_source_row_index": 46,
+        "reason": "独立p232 母公司合同分类/商品类型，包装材料原本期本期营业收入=172,001,031.18元，母公司；金额/单位/期间及完整跨页证据均成立。原生栏目、主体成立；同额其他表不能替代，Measurement仅准确率。",
+        "recall_row_index": 46,
+        "actual_object_type": "Segment",
+        "actual_native_name": "包装材料",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "issuer"
+      },
+      "owned:core-ev-d2a35515d2dfe461:Measurement:product:包装材料:全部营业收入/商品类型:row:2": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          220,
+          232
+        ],
+        "accurate": true,
+        "matched_source_row_index": 46,
+        "reason": "独立p232 母公司合同分类/商品类型，包装材料原本期本期营业收入=172,001,031.18元，母公司；金额/单位/期间及完整跨页证据均成立。原生栏目、主体成立；同额其他表不能替代，Measurement仅准确率。",
+        "actual_object_type": "Measurement",
+        "actual_native_name": "包装材料",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "issuer"
+      },
+      "owned:core-ev-edea2f071fbcf4cd:Segment:product:其他:全部营业收入/商品类型:row:3": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          220,
+          232
+        ],
+        "accurate": true,
+        "matched_source_row_index": 47,
+        "reason": "独立p232 母公司合同分类/商品类型，其他原本期本期营业收入=5,023,893.53元，母公司；金额/单位/期间及完整跨页证据均成立。原生栏目、主体成立；同额其他表不能替代，Measurement仅准确率。",
+        "recall_row_index": 47,
+        "actual_object_type": "Segment",
+        "actual_native_name": "其他",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "issuer"
+      },
+      "owned:core-ev-d2a35515d2dfe461:Measurement:product:其他:全部营业收入/商品类型:row:3": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          220,
+          232
+        ],
+        "accurate": true,
+        "matched_source_row_index": 47,
+        "reason": "独立p232 母公司合同分类/商品类型，其他原本期本期营业收入=5,023,893.53元，母公司；金额/单位/期间及完整跨页证据均成立。原生栏目、主体成立；同额其他表不能替代，Measurement仅准确率。",
+        "actual_object_type": "Measurement",
+        "actual_native_name": "其他",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "issuer"
+      },
+      "owned:core-ev-edea2f071fbcf4cd:Segment:product:国内:全部营业收入/商品类型:row:4": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          220,
+          232
+        ],
+        "accurate": false,
+        "matched_source_row_index": 48,
+        "reason": "独立p232 母公司合同分类/市场或客户类型，国内原本期本期营业收入=7,149,489,338.78元，母公司；金额/单位/期间及完整跨页证据均成立。原栏目为region，实际却为product/全部营业收入/商品类型；原生分类错误，Segment及Measurement分别计错误，金额正确不计关键数字错误。",
+        "actual_object_type": "Segment",
+        "actual_native_name": "国内",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "issuer"
+      },
+      "owned:core-ev-d2a35515d2dfe461:Measurement:product:国内:全部营业收入/商品类型:row:4": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          220,
+          232
+        ],
+        "accurate": false,
+        "matched_source_row_index": 48,
+        "reason": "独立p232 母公司合同分类/市场或客户类型，国内原本期本期营业收入=7,149,489,338.78元，母公司；金额/单位/期间及完整跨页证据均成立。原栏目为region，实际却为product/全部营业收入/商品类型；原生分类错误，Segment及Measurement分别计错误，金额正确不计关键数字错误。",
+        "actual_object_type": "Measurement",
+        "actual_native_name": "国内",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "issuer"
+      },
+      "owned:core-ev-edea2f071fbcf4cd:Segment:product:境外:全部营业收入/商品类型:row:5": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          220,
+          232
+        ],
+        "accurate": false,
+        "matched_source_row_index": 49,
+        "reason": "独立p232 母公司合同分类/市场或客户类型，境外原本期本期营业收入=569,064,385.80元，母公司；金额/单位/期间及完整跨页证据均成立。原栏目为region，实际却为product/全部营业收入/商品类型；原生分类错误，Segment及Measurement分别计错误，金额正确不计关键数字错误。",
+        "actual_object_type": "Segment",
+        "actual_native_name": "境外",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "issuer"
+      },
+      "owned:core-ev-d2a35515d2dfe461:Measurement:product:境外:全部营业收入/商品类型:row:5": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          220,
+          232
+        ],
+        "accurate": false,
+        "matched_source_row_index": 49,
+        "reason": "独立p232 母公司合同分类/市场或客户类型，境外原本期本期营业收入=569,064,385.80元，母公司；金额/单位/期间及完整跨页证据均成立。原栏目为region，实际却为product/全部营业收入/商品类型；原生分类错误，Segment及Measurement分别计错误，金额正确不计关键数字错误。",
+        "actual_object_type": "Measurement",
+        "actual_native_name": "境外",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "issuer"
+      },
+      "owned:core-ev-edea2f071fbcf4cd:Segment:product:在某一时点确认:全部营业收入/商品类型:row:6": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          220,
+          232
+        ],
+        "accurate": false,
+        "matched_source_row_index": 50,
+        "reason": "独立p232 母公司合同分类/转让时间，在某一时点确认原本期本期营业收入=7,718,553,724.58元，母公司；金额/单位/期间及完整跨页证据均成立。原栏目为revenue_timing，实际却为product/全部营业收入/商品类型；原生分类错误，Segment及Measurement分别计错误，金额正确不计关键数字错误。",
+        "actual_object_type": "Segment",
+        "actual_native_name": "在某一时点确认",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "issuer"
+      },
+      "owned:core-ev-d2a35515d2dfe461:Measurement:product:在某一时点确认:全部营业收入/商品类型:row:6": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          220,
+          232
+        ],
+        "accurate": false,
+        "matched_source_row_index": 50,
+        "reason": "独立p232 母公司合同分类/转让时间，在某一时点确认原本期本期营业收入=7,718,553,724.58元，母公司；金额/单位/期间及完整跨页证据均成立。原栏目为revenue_timing，实际却为product/全部营业收入/商品类型；原生分类错误，Segment及Measurement分别计错误，金额正确不计关键数字错误。",
+        "actual_object_type": "Measurement",
+        "actual_native_name": "在某一时点确认",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "issuer"
+      },
+      "owned:core-ev-edea2f071fbcf4cd:Segment:sales_mode:直销:全部营业收入/销售渠道:row:7": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          220,
+          232
+        ],
+        "accurate": true,
+        "matched_source_row_index": 51,
+        "reason": "独立p232 母公司合同分类/销售渠道，直销原本期本期营业收入=1,155,020,486.43元，母公司；金额/单位/期间及完整跨页证据均成立。原生栏目、主体成立；同额其他表不能替代，Measurement仅准确率。",
+        "recall_row_index": 51,
+        "actual_object_type": "Segment",
+        "actual_native_name": "直销",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "issuer"
+      },
+      "owned:core-ev-d2a35515d2dfe461:Measurement:sales_mode:直销:全部营业收入/销售渠道:row:7": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          220,
+          232
+        ],
+        "accurate": true,
+        "matched_source_row_index": 51,
+        "reason": "独立p232 母公司合同分类/销售渠道，直销原本期本期营业收入=1,155,020,486.43元，母公司；金额/单位/期间及完整跨页证据均成立。原生栏目、主体成立；同额其他表不能替代，Measurement仅准确率。",
+        "actual_object_type": "Measurement",
+        "actual_native_name": "直销",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "issuer"
+      },
+      "owned:core-ev-edea2f071fbcf4cd:Segment:sales_mode:经销:全部营业收入/销售渠道:row:8": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          220,
+          232
+        ],
+        "accurate": true,
+        "matched_source_row_index": 52,
+        "reason": "独立p232 母公司合同分类/销售渠道，经销原本期本期营业收入=6,563,533,238.15元，母公司；金额/单位/期间及完整跨页证据均成立。原生栏目、主体成立；同额其他表不能替代，Measurement仅准确率。",
+        "recall_row_index": 52,
+        "actual_object_type": "Segment",
+        "actual_native_name": "经销",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "issuer"
+      },
+      "owned:core-ev-d2a35515d2dfe461:Measurement:sales_mode:经销:全部营业收入/销售渠道:row:8": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          220,
+          232
+        ],
+        "accurate": true,
+        "matched_source_row_index": 52,
+        "reason": "独立p232 母公司合同分类/销售渠道，经销原本期本期营业收入=6,563,533,238.15元，母公司；金额/单位/期间及完整跨页证据均成立。原生栏目、主体成立；同额其他表不能替代，Measurement仅准确率。",
+        "actual_object_type": "Measurement",
+        "actual_native_name": "经销",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "issuer"
+      }
+    },
+    "answers": {
+      "principal_business": {
+        "accurate": false,
+        "reason": "实际未答；没有接受BusinessOverview，不计答案准确率对象，仅召回缺失。"
+      },
+      "products_services": {
+        "accurate": false,
+        "reason": "实际只交付电/蒸汽/电石单位数字拼成的假商品名；缺完整PVC各类/烧碱/乙醇/水泥/化学品/包装/物流租赁及子公司状态，不满足正文。"
+      },
+      "revenue_model": {
+        "accurate": false,
+        "reason": "实际只有收入类型和直销经销标签，且把母公司确认时点写入产品；缺订单生产、境内签收、自提/送货、境外报关、信用账期、线上线下及租赁机制与原主体状态。"
+      }
+    },
+    "review_method": "逐record_id核新官方原文：全部数值/单位/原栏目/主体/动作/期间，角色要求额外保留声明原子公司；同一条件仅召回一次。原始作用域分类标记不覆盖原文语义，不凭answered或关键词判正文。"
+  }
+}

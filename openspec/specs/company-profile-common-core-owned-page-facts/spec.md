@@ -116,7 +116,7 @@ A direct definition of the company and its subsidiaries as the group MUST bind a
 - **THEN** the accepted fact and query/export role retain original group actor and direct source scope, with negated/planned branches rejected
 
 ### Requirement: Native revenue cells preserve column basis and full evidence span
-Native income cells MUST retain industry/product/region/sales-mode or report-segment basis, original amounts and units, consolidated-versus-parent boundaries and separate total/external/intersegment income. Eliminations MUST retain adjustment semantics and MUST NOT become products or be summed across overlapping bases. Evidence verification MUST include bounded quotes and continuation_pages rather than requiring a table's physical page to equal the span's starting page.
+Native income cells MUST retain industry/product/region/sales-mode or report-segment basis, original amounts and units, consolidated-versus-parent-versus-native-subsidiary boundaries and separate total/external/intersegment income. Eliminations MUST retain adjustment semantics and MUST NOT become products or be summed across overlapping bases. Evidence verification MUST include bounded quotes and continuation_pages rather than requiring a table's physical page to equal the span's starting page.
 
 #### Scenario: A table continues after the evidence starting page
 - **WHEN** an accepted row is present in the full bounded quote and continuation pages
@@ -142,7 +142,7 @@ Native project-income tables MUST bind full project names to the current-period 
 - **THEN** no current-period Segment or operating_revenue Measurement is created for that project
 
 ### Requirement: Native goods enumerations and actions retain actor boundaries
-Current product enumeration MUST stop before subsequent upstream/downstream actors or uses while preserving legitimate final components, parenthesized names and native subsidiary subjects. Goods purchase, sale and energy consumption MUST bind to their own current affirmative source wording. Reverse seller-to-group wording MUST retain the group as buyer; upper-parent actions MUST NOT become listed-company-group actions. Procurement alone MUST NOT imply manufacturing input. Same-object purchase and sale MAY coexist when independently disclosed, and named self-use energy MUST retain material_input rather than inferred external purchase. Unknown catalog mappings MUST remain pending or ambiguous.
+Current product enumeration MUST stop before subsequent upstream/downstream actors, uses or brand lists while preserving legitimate final components, parenthesized names and native subsidiary subjects. Brands MUST retain their business context without becoming standalone commodity Activities or extending a preceding product enumeration. Goods purchase, sale and energy consumption MUST bind to their own current affirmative source wording. Reverse seller-to-group wording MUST retain the group as buyer; upper-parent actions MUST NOT become listed-company-group actions. Customer procurement-project wording inside the issuer's sales column MUST NOT reverse the issuer's sales action. Procurement alone MUST NOT imply manufacturing input. Same-object purchase, sale and material_input MAY coexist when independently disclosed, and named self-use energy MUST retain material_input rather than inferred external purchase. Negated, planned and third-party actions MUST NOT establish issuer or subsidiary roles while independently affirmed branches remain valid. Generic parent roles, aliases and multiple evidence for the same role MUST NOT duplicate recall of native named roles. Unknown catalog mappings MUST remain pending or ambiguous.
 
 #### Scenario: Additive list ends before upstream and downstream prose
 - **WHEN** a named subsidiary's seven actual additive components end with DENE before an upstream/downstream description
@@ -152,8 +152,12 @@ Current product enumeration MUST stop before subsequent upstream/downstream acto
 - **WHEN** an owned page states seller-to-listed-group procurement, listed-group sales or energy consumption and a distinct upper-parent action
 - **THEN** acceptance, query and export retain each original actor and action without promoting upper-parent activity or converting purchases into manufacturing input
 
+#### Scenario: Brands follow products and a sales project uses customer purchase wording
+- **WHEN** an owned page ends a current product list before the brands 银蕨、苏食、爱森、联豪 and an issuer sales column describes the customer's purchase project
+- **THEN** accepted facts, query and export retain the products' original subsidiary actors and sales direction without standalone brand Activities or cross-sentence product names
+
 ### Requirement: Revenue column selection follows native period and aggregate headers
-The owned-page path MUST distinguish current-income/current-cost/prior-income/prior-cost tables from multi-segment aggregate tables using native headers and column placement. It MUST retain current revenue, full multiline regions, native business_type and revenue-confirmation timing dimensions, original units and consolidated/parent boundaries. Main-business other and all-income other MUST retain separate bases. Seller/service/lessor income MUST retain direction; asset purchases MUST NOT become income or leases become goods sales.
+The owned-page path MUST distinguish current-income/current-cost/prior-income/prior-cost tables from multi-segment aggregate tables using native headers and column placement. It MUST retain current revenue, full multiline regions including parenthesized qualifiers, native business_type and revenue-confirmation timing dimensions, original units and consolidated/parent boundaries. Wrapped labels such as 中国（含港澳台） MUST retain their full native name in both Segment and Measurement through acceptance, query and export. Main-business other and all-income other MUST retain separate bases. Seller/service/lessor income MUST retain direction; asset purchases MUST NOT become income or leases become goods sales. Sparse cells without PDF layout MUST follow the unique native-total reconciliation rule in `company-profile-common-core-company-total-and-income-mix`.
 
 #### Scenario: Four numeric columns distinguish the current and prior periods
 - **WHEN** a source table prints current income,current cost,prior income,prior cost
@@ -180,3 +184,20 @@ Current-period blank cells MUST remain blank without prior amounts shifting left
 #### Scenario: Current income blanks precede prior values or expenses
 - **WHEN** a current-income row has a blank cell or the income table ends before an expense note
 - **THEN** no prior-only value or expense generates current-income facts or roles
+
+### Requirement: Native source pages and classifications cannot be substituted by equal amounts
+A native income source condition MUST be satisfied by its original owned page and native table classification, subject, current column, amount and unit in both Segment and Measurement. An equal name or amount in another note MUST NOT replace missing evidence from that page. Actual-owner page inputs MUST retain their real fields; independent PDF layout evidence MUST remain separate rather than being inserted into a layout-free owner input. Complete bounded evidence and necessary continuation pages MUST support acceptance, query and export.
+
+#### Scenario: MD&A region and contract note disclose equal income
+- **WHEN** 光明 p24 MD&A prints 中国（含港澳台） income of 11,277,548,234.22 元 and p180 contract-note income has the same amount
+- **THEN** only the complete p24 native region evidence satisfies the p24 condition, and p180 retains its separate native contract basis
+
+### Requirement: Finite successor review preserves failed observations and authorization boundaries
+A corrected formal round MUST use a distinct complete processing identity and independent directory, with its source contract fixed before first execute. Local regression or later evidence MUST NOT replace first failed formal observations. The v34 36/125 recall and 88/101 accuracy and v35 123/125 recall and 261/261 accuracy, their original 125-condition contracts, deliveries and review bytes MUST remain unchanged. Review MUST score each actual accepted fact and answered body once with a denominator derived from actual output; Measurement MUST count only for accuracy, and aliases, parent roles and multiple evidence for one role MUST NOT duplicate recall. Whole-round time MUST include first execute through second export and all retries, with shared tokens measured across both companies. The v36 conclusion MUST remain limited to its 125 source conditions and actual checked pages, without full-report completeness, production authorization or scale-quality claims; `production_authorization` MUST remain `not_authorized` and `scale_quality_claim_allowed` MUST remain false.
+
+#### Scenario: v36 establishes a finite source-reviewed successor result
+- **WHEN** the existing owner genuinely executes, queries and exports 600035.SH and 600073.SH under `{"rules":"company_profile_common_core.v1","owned_page_facts":"v8","material_input_facts":"v1","revenue_sentence_repair":"v36"}` without changing the default identity
+- **THEN** the finite reviewed result is recall 125/125, accuracy 265/265 from 259 accepted facts plus 6 answered bodies, and 0 critical numeric errors
+- **AND** actual whole-round duration is 195.337716 seconds with 0/50000 tokens, including retries and existing PDF parse caches
+- **AND** all five stages have empty reused_scope_ids and predecessor lineage is empty, while query, export and disk agree
+- **AND** the earlier v34/v35 failed observations and production/scale authorization boundaries remain unchanged

@@ -53,3 +53,19 @@ That repair published `{"rules":"company_profile_common_core.v1","owned_page_fac
 - **THEN** enqueue inserts successor work for both reports
 - **AND** predecessor JSON files remain on disk
 - **AND** query returns the v4 accepted facts
+
+### Requirement: Sparse current income requires unique native table reconciliation
+When a native current-income/current-cost/prior-income/prior-cost row contains one printed amount and actual-owner input has no PDF layout, common-core MUST leave its period unresolved unless the first native table's current-income total uniquely requires that printed value and the prior-income total is independently fully reconciled without it. Only the original printed income MAY then be accepted as current-period income; missing income or cost MUST NOT be invented, blank costs MUST NOT become zero, and a prior-only value MUST NOT shift left. The rule MUST preserve native page, full row label, unit, period, consolidated/parent/subsidiary scope and paired Segment/Measurement through acceptance, query and export. Company totals support this column check without becoming new segment rows or authorizing cross-basis accumulation.
+
+#### Scenario: Parent-company other income has no layout
+- **WHEN** 光明 p241 prints only 471.70 元 for 其他业务, actual-owner input has no layout_text, the first native current-income total uniquely needs that value and prior income already fully reconciles independently
+- **THEN** Segment and Measurement retain 471.70 元 as current parent-company other income with the p241 native evidence
+- **AND** no blank income or cost is fabricated and no prior amount changes column
+
+#### Scenario: Printed value belongs only to prior income
+- **WHEN** current income already reconciles without a sparse printed value and prior income requires it
+- **THEN** that value generates no current-income Segment or Measurement
+
+#### Scenario: Native totals cannot uniquely locate a sparse amount
+- **WHEN** current/prior totals are missing, inconsistent or cannot uniquely identify the printed value's period
+- **THEN** its period remains unresolved rather than being guessed from the first extracted numeric cell or borrowed PDF layout

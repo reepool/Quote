@@ -1,0 +1,36 @@
+{
+  "created_at": "2026-10-08T13:52:30.762900+00:00",
+  "source_scope_sha256": "f32d0d913bf65d713e69fc6f6512124f5a4f0065d5bf3a8ce2e7b0c7388b3f56",
+  "original_contract_unchanged": true,
+  "source_condition_count": 170,
+  "scope_interpretations": [
+    {
+      "field": "source_rows.600037.SH[13].dimension",
+      "original_marker": "service",
+      "native_semantics": "其他业务收入 is business_type in the explicit native income-detail row; source service is a container marker and does not override this. The 6,390,329.03 contract-detail condition is separate from 25,133,537.37 all-other income.",
+      "condition_changed": false
+    },
+    {
+      "field": "native_roles for four p37 energy purchases",
+      "original_marker": "raw_material_input",
+      "native_semantics": "Source_actions=purchases and original energy table govern. Existing reader derive_commodity_role produces energy_consumption category for purchased energy while preserving purchases in the underlying Activity. This does not satisfy separate self-use/consumption conditions.",
+      "condition_changed": false
+    },
+    {
+      "field": "native_roles for six consumption conditions",
+      "original_marker": "operating_energy_input/consumes",
+      "native_semantics": "Source wording denotes energy self-use. Existing reader category is energy_consumption, with material_input Relationship for a self-use fact. No such accepted relationships are present this round, so all six remain recall omissions. Future repair contract should use existing enum/relationship spelling before execute.",
+      "condition_changed": false
+    },
+    {
+      "field": "source_rows.600075.SH 其中:疆内",
+      "native_semantics": "其中 marks the native domestic parent-child relation, not a geographic name. Delivered 疆内 plus complete bounded quote preserves this marker and parent basis.",
+      "condition_changed": false
+    }
+  ],
+  "accuracy_interpretation": "Original action, actor, basis, amount and unit always prevail over scope helper categorization markers. None is a new source condition or post-execution denominator change.",
+  "source_unit_limitations": [
+    "天业p38销售渠道原表万元，数值与元表量级重合，原数原单位保留，不擅自推算。",
+    "天业p41/42控股参股表标题元，天业汇祥同数在p37明确万元；p201联营原元口径另列。原排版矛盾保留，未交付不作数字错误。"
+  ]
+}

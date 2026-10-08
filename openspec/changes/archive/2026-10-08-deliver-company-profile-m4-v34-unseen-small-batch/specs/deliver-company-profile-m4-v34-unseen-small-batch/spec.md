@@ -86,3 +86,11 @@ Full v36 identity MUST enable all five cumulative repair switches without changi
 #### Scenario: Corrected income passes a genuine new first formal round
 - **WHEN** the existing owner delivers both reports under v36 in the new directory
 - **THEN** actual query,export and disk establish native income coverage and unique accuracy without replacing earlier failed results
+
+
+### Requirement: A-role finite acceptance closes the declared v36 scope
+A-role confirmation MUST retain125/125recall (six substantive bodies,seventy-one income conditions,forty-eight native actions/relations),265/265unique accuracy (259facts and six answers),zero critical numeric errors,195.337716seconds and0/50000tokens with no actual five-stage reuse or predecessor inheritance. p24 MD&A region and p241 parent-company other income MUST retain native pages,columns,actors and paired facts; prior255facts and six bodies MUST remain unchanged. Acceptance MUST remain limited to125conditions and actual checked pages. v34/v35 failures,post-formal corrections and v36 first artifacts MUST remain unchanged. Production MUST remain not_authorized and scale quality false.
+
+#### Scenario: Archive after independent v36 finite confirmation
+- **WHEN** A-role confirms the declared v36 source scope
+- **THEN** verified native source,wrapped-label and sparse-current-income rules are synchronized and the change is finitely archived without replacing failed observations
