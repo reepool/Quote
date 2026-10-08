@@ -165,3 +165,18 @@ When accepted business or product-income evidence is limited to a former subsidi
 #### Scenario: Former subsidiary lithium income exists only in January and February
 - **WHEN** accepted source evidence states the original subsidiary,January/February and loss of control/exit from consolidation
 - **THEN** all three affected answer bodies preserve those restrictions with accepted source support
+
+### Requirement: Current income table boundaries and native lessor identity remain exact
+Current-period blank cells MUST remain blank without prior amounts shifting left or fabricated zeros. Income decomposition MUST end at a new numbered note or expense table;expense rows MUST NOT inherit an income classification. Native consolidated,parent,contract-classification and report-segment bases and eliminations MUST remain distinct. A lessor title MUST NOT enter a tenant name. Each original lease row MUST retain the exact native tenant,asset label,current revenue,unit,period and bounded continuation evidence in both Segment and Measurement;different tenants or original rows sharing names or amounts MUST remain separately identifiable. Trustee direction and original subsidiary actor MUST remain traceable. This rule MUST reuse the existing owner and local projection.
+
+#### Scenario: Lessor title precedes a wrapped tenant
+- **WHEN** the lessor title and column headers precede a tenant whose name spans lines
+- **THEN** acceptance,query and export retain the exact joined tenant name without the section title and retain matching native fields in Segment and Measurement
+
+#### Scenario: Different tenants share asset name and amount
+- **WHEN** two original current lease rows share the asset label and value but name different tenants
+- **THEN** both native rows retain distinct record identities and exact tenant qualifiers
+
+#### Scenario: Current income blanks precede prior values or expenses
+- **WHEN** a current-income row has a blank cell or the income table ends before an expense note
+- **THEN** no prior-only value or expense generates current-income facts or roles

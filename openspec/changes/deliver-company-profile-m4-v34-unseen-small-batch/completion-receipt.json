@@ -1,0 +1,77 @@
+{
+  "created_at": "2026-10-08T10:02:40.261564+00:00",
+  "cards_completed": [
+    "old5.4_finite_archive",
+    "new1.1",
+    "new2.1_failure_branch"
+  ],
+  "old_change_archived": "openspec/changes/archive/2026-10-08-deliver-company-profile-m4-v32-unseen-small-batch",
+  "new_change": "deliver-company-profile-m4-v34-unseen-small-batch",
+  "processing_identity": {
+    "rules": "company_profile_common_core.v1",
+    "owned_page_facts": "v8",
+    "material_input_facts": "v1",
+    "revenue_sentence_repair": "v34"
+  },
+  "source_condition_count": 125,
+  "source_recall": {
+    "status": "assessed",
+    "numerator": 36,
+    "denominator": 125,
+    "value": 0.288
+  },
+  "source_accuracy": {
+    "status": "assessed",
+    "numerator": 88,
+    "denominator": 101,
+    "value": 0.8712871287128713
+  },
+  "critical_numeric_errors": {
+    "status": "assessed",
+    "value": 0
+  },
+  "whole_round_seconds": 220.32679956965148,
+  "tokens_used": 0,
+  "shared_token_budget": 50000,
+  "actual_runtime_no_reuse": true,
+  "actual_accepted_fact_count": 95,
+  "answered_text_count": 6,
+  "query_export_disk_equal": true,
+  "protected_historical_files": 1109,
+  "first_delivery_files_protected": 18,
+  "formal_review_files_protected": 2,
+  "execution_modules_protected": 38,
+  "checks": {
+    "test_command": "pytest tests/unit/test_research/test_company_profile_m4_next_batch.py;pytest tests/unit/test_research/test_company_profile_source_review.py",
+    "test_result": "20 passed + 9 passed,7 warnings each",
+    "official_source_pages": "64 checked pages equal official PDF",
+    "ruff": "PASS: m4_next_batch.py, source_review.py, operations.py and two directly related test files; broader unchanged first_expansion.py has two baseline TRY004 findings, deferred",
+    "openspec_strict": "PASS:100 main specs; current v34 change strict",
+    "diff": "PASS:git diff --check and git diff --cached --check;76 own OpenSpec paths reviewed;existing files excluded"
+  },
+  "review": {
+    "blocking_business_findings": [
+      "five incomplete answer bodies",
+      "36 missing native income conditions",
+      "48 missing specific native roles",
+      "six malformed product/brand Activities",
+      "two mother-company channel/timing classification errors"
+    ],
+    "current_implementation_findings": [],
+    "deferred": "quantity/price,cost,industry,body trimming,performance,unrelated existing failures",
+    "method": "Direct review of own spec sync/archive, pre-execute source contract, exact actual record decisions, dynamic source review and immutable artifacts. All actual failures registered; no extraction repair performed.",
+    "classification": {
+      "A": "Observed business failures recorded in4.1–4.4; first observation stays failed and unarchived.",
+      "B": "Quantity/price, industry, body shortening, performance and frameworks deferred.",
+      "C": "Two broad Ruff TRY004 in unchanged first_expansion.py and unrelated baseline worktree files untouched."
+    },
+    "staged_review": "PASS:51 archival original files exact,125 source conditions fixed before execute,101 unique object decisions and failure branch consistent"
+  },
+  "extraction_code_modified": false,
+  "new_business_acceptance": false,
+  "new_change_archived": false,
+  "next_batch": "paused_on_first_formal_failure",
+  "a_role_review": "pending_failure_review",
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false
+}

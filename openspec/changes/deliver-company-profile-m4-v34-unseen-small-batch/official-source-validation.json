@@ -1,0 +1,21 @@
+{
+  "created_at": "2026-10-08T10:02:40.245870+00:00",
+  "reports": [
+    {
+      "instrument_id": "600035.SH",
+      "pdf": "data/filings/announcements/blobs/6f/6f2fdf1475878c133782022866d89b7aa80cac01984817e592289e7a07f65365.pdf",
+      "document_version": "6f2fdf1475878c133782022866d89b7aa80cac01984817e592289e7a07f65365",
+      "checked_page_count": 30,
+      "all_checked_pages_equal_official_pdf": true
+    },
+    {
+      "instrument_id": "600073.SH",
+      "pdf": "data/filings/announcements/blobs/99/9958ac6df230b53fd26d627265325e24b6d61db7aa6b2a07c843f2c6c44b7d9e.pdf",
+      "document_version": "9958ac6df230b53fd26d627265325e24b6d61db7aa6b2a07c843f2c6c44b7d9e",
+      "checked_page_count": 34,
+      "all_checked_pages_equal_official_pdf": true
+    }
+  ],
+  "total_checked_pages": 64,
+  "profile_execution_during_validation": false
+}

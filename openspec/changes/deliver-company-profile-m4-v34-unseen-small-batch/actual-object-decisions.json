@@ -1,0 +1,1395 @@
+{
+  "600035.SH": {
+    "facts": {
+      "owned:core-ev-9f6e5aad2b562f4b:overview": {
+        "accurate": true,
+        "reason": "p11完整路桥/智能科技/交通能源原文与退出嘉鱼限定，作为接受事实成立；答案完整性另核。",
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          11
+        ],
+        "actual_object_type": "BusinessOverview",
+        "actual_native_name": "报告期内公司从事的业务情况",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-9f6e5aad2b562f4b:revenue:1": {
+        "accurate": true,
+        "reason": "p11公司四板块收入来源原句，主体及当前期间正确。",
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          11
+        ],
+        "actual_object_type": "BusinessOverview",
+        "actual_native_name": "公司主营业务收入主要来源于路桥运营、智能科技、交通能源及建造服务收入",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-191d2236d8e23ff0:overview": {
+        "accurate": true,
+        "reason": "p233出租方整表原文，方向和两承租方原文成立；不能以Overview代替未交付Segment。",
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          233,
+          234
+        ],
+        "actual_object_type": "BusinessOverview",
+        "actual_native_name": "当期产品及服务披露",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-b93dc5c4083ef1fa:segment:industry:路桥运营业务": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          15
+        ],
+        "reason": "独立原表p15：主营业务分行业，路桥运营业务的本期营业收入=2,379,871,899.68元；原栏目、主体、期间、数字单位对应；Measurement仅准确率。",
+        "matched_source_row_index": 0,
+        "recall_row_index": 0,
+        "actual_object_type": "Segment",
+        "actual_native_name": "路桥运营业务",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-5c1215482d672632:revenue:industry:路桥运营业务": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          15
+        ],
+        "reason": "独立原表p15：主营业务分行业，路桥运营业务的本期营业收入=2,379,871,899.68元；原栏目、主体、期间、数字单位对应；Measurement仅准确率。",
+        "matched_source_row_index": 0,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "路桥运营业务",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-b93dc5c4083ef1fa:segment:industry:智能科技业务": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          15
+        ],
+        "reason": "独立原表p15：主营业务分行业，智能科技业务的本期营业收入=318,232,311.51元；原栏目、主体、期间、数字单位对应；Measurement仅准确率。",
+        "matched_source_row_index": 1,
+        "recall_row_index": 1,
+        "actual_object_type": "Segment",
+        "actual_native_name": "智能科技业务",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-5c1215482d672632:revenue:industry:智能科技业务": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          15
+        ],
+        "reason": "独立原表p15：主营业务分行业，智能科技业务的本期营业收入=318,232,311.51元；原栏目、主体、期间、数字单位对应；Measurement仅准确率。",
+        "matched_source_row_index": 1,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "智能科技业务",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-b93dc5c4083ef1fa:segment:industry:交通能源业务": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          16
+        ],
+        "reason": "独立原表p16：主营业务分行业/续表，交通能源业务的本期营业收入=690,455,880.70元；原栏目、主体、期间、数字单位对应；Measurement仅准确率。",
+        "matched_source_row_index": 2,
+        "recall_row_index": 2,
+        "actual_object_type": "Segment",
+        "actual_native_name": "交通能源业务",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-5c1215482d672632:revenue:industry:交通能源业务": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          16
+        ],
+        "reason": "独立原表p16：主营业务分行业/续表，交通能源业务的本期营业收入=690,455,880.70元；原栏目、主体、期间、数字单位对应；Measurement仅准确率。",
+        "matched_source_row_index": 2,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "交通能源业务",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-b93dc5c4083ef1fa:segment:industry:建造服务业务": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          16
+        ],
+        "reason": "独立原表p16：主营业务分行业/续表，建造服务业务的本期营业收入=2,958,019,960.84元；原栏目、主体、期间、数字单位对应；Measurement仅准确率。",
+        "matched_source_row_index": 3,
+        "recall_row_index": 3,
+        "actual_object_type": "Segment",
+        "actual_native_name": "建造服务业务",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-5c1215482d672632:revenue:industry:建造服务业务": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          16
+        ],
+        "reason": "独立原表p16：主营业务分行业/续表，建造服务业务的本期营业收入=2,958,019,960.84元；原栏目、主体、期间、数字单位对应；Measurement仅准确率。",
+        "matched_source_row_index": 3,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "建造服务业务",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-b93dc5c4083ef1fa:segment:region:汉宜高速": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          16
+        ],
+        "reason": "独立原表p16：主营业务分地区，汉宜高速的本期营业收入=1,325,843,509.37元；原栏目、主体、期间、数字单位对应；Measurement仅准确率。",
+        "matched_source_row_index": 4,
+        "recall_row_index": 4,
+        "actual_object_type": "Segment",
+        "actual_native_name": "汉宜高速",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-5c1215482d672632:revenue:region:汉宜高速": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          16
+        ],
+        "reason": "独立原表p16：主营业务分地区，汉宜高速的本期营业收入=1,325,843,509.37元；原栏目、主体、期间、数字单位对应；Measurement仅准确率。",
+        "matched_source_row_index": 4,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "汉宜高速",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-b93dc5c4083ef1fa:segment:region:大随高速": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          16
+        ],
+        "reason": "独立原表p16：主营业务分地区，大随高速的本期营业收入=86,057,788.55元；原栏目、主体、期间、数字单位对应；Measurement仅准确率。",
+        "matched_source_row_index": 5,
+        "recall_row_index": 5,
+        "actual_object_type": "Segment",
+        "actual_native_name": "大随高速",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-5c1215482d672632:revenue:region:大随高速": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          16
+        ],
+        "reason": "独立原表p16：主营业务分地区，大随高速的本期营业收入=86,057,788.55元；原栏目、主体、期间、数字单位对应；Measurement仅准确率。",
+        "matched_source_row_index": 5,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "大随高速",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-b93dc5c4083ef1fa:segment:region:黄咸高速": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          16
+        ],
+        "reason": "独立原表p16：主营业务分地区，黄咸高速的本期营业收入=216,502,015.74元；原栏目、主体、期间、数字单位对应；Measurement仅准确率。",
+        "matched_source_row_index": 6,
+        "recall_row_index": 6,
+        "actual_object_type": "Segment",
+        "actual_native_name": "黄咸高速",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-5c1215482d672632:revenue:region:黄咸高速": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          16
+        ],
+        "reason": "独立原表p16：主营业务分地区，黄咸高速的本期营业收入=216,502,015.74元；原栏目、主体、期间、数字单位对应；Measurement仅准确率。",
+        "matched_source_row_index": 6,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "黄咸高速",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-b93dc5c4083ef1fa:segment:region:大广北高速": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          16
+        ],
+        "reason": "独立原表p16：主营业务分地区，大广北高速的本期营业收入=509,933,759.26元；原栏目、主体、期间、数字单位对应；Measurement仅准确率。",
+        "matched_source_row_index": 7,
+        "recall_row_index": 7,
+        "actual_object_type": "Segment",
+        "actual_native_name": "大广北高速",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-5c1215482d672632:revenue:region:大广北高速": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          16
+        ],
+        "reason": "独立原表p16：主营业务分地区，大广北高速的本期营业收入=509,933,759.26元；原栏目、主体、期间、数字单位对应；Measurement仅准确率。",
+        "matched_source_row_index": 7,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "大广北高速",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-b93dc5c4083ef1fa:segment:region:新县高速": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          16
+        ],
+        "reason": "独立原表p16：主营业务分地区，新县高速的本期营业收入=162,727,980.85元；原栏目、主体、期间、数字单位对应；Measurement仅准确率。",
+        "matched_source_row_index": 8,
+        "recall_row_index": 8,
+        "actual_object_type": "Segment",
+        "actual_native_name": "新县高速",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-5c1215482d672632:revenue:region:新县高速": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          16
+        ],
+        "reason": "独立原表p16：主营业务分地区，新县高速的本期营业收入=162,727,980.85元；原栏目、主体、期间、数字单位对应；Measurement仅准确率。",
+        "matched_source_row_index": 8,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "新县高速",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-b93dc5c4083ef1fa:segment:region:光山高速": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          16
+        ],
+        "reason": "独立原表p16：主营业务分地区，光山高速的本期营业收入=78,806,845.91元；原栏目、主体、期间、数字单位对应；Measurement仅准确率。",
+        "matched_source_row_index": 9,
+        "recall_row_index": 9,
+        "actual_object_type": "Segment",
+        "actual_native_name": "光山高速",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-5c1215482d672632:revenue:region:光山高速": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          16
+        ],
+        "reason": "独立原表p16：主营业务分地区，光山高速的本期营业收入=78,806,845.91元；原栏目、主体、期间、数字单位对应；Measurement仅准确率。",
+        "matched_source_row_index": 9,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "光山高速",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-8417b32f50ad27f2:Segment:business_type:主营业务:营业收入:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          191
+        ],
+        "reason": "独立原表p191：合并营业收入和营业成本，主营业务的本期营业收入=6,346,580,052.73元；原栏目、主体、期间、数字单位对应；Measurement仅准确率。",
+        "matched_source_row_index": 11,
+        "recall_row_index": 11,
+        "actual_object_type": "Segment",
+        "actual_native_name": "主营业务",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-e9c54797b49e1c7e:Measurement:business_type:主营业务:营业收入:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          191
+        ],
+        "reason": "独立原表p191：合并营业收入和营业成本，主营业务的本期营业收入=6,346,580,052.73元；原栏目、主体、期间、数字单位对应；Measurement仅准确率。",
+        "matched_source_row_index": 11,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "主营业务",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-8417b32f50ad27f2:Segment:business_type:其他业务:营业收入:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          191
+        ],
+        "reason": "独立原表p191：合并营业收入和营业成本，其他业务的本期营业收入=226,930,306.07元；原栏目、主体、期间、数字单位对应；Measurement仅准确率。",
+        "matched_source_row_index": 12,
+        "recall_row_index": 12,
+        "actual_object_type": "Segment",
+        "actual_native_name": "其他业务",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-e9c54797b49e1c7e:Measurement:business_type:其他业务:营业收入:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          191
+        ],
+        "reason": "独立原表p191：合并营业收入和营业成本，其他业务的本期营业收入=226,930,306.07元；原栏目、主体、期间、数字单位对应；Measurement仅准确率。",
+        "matched_source_row_index": 12,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "其他业务",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-9affec9f5ac9a8fc:Segment:business_type:主营业务:营业收入:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          254
+        ],
+        "reason": "独立原表p254：母公司营业收入和营业成本，主营业务的本期营业收入=1,411,901,297.92元；原栏目、主体、期间、数字单位对应；Measurement仅准确率。",
+        "matched_source_row_index": 13,
+        "recall_row_index": 13,
+        "actual_object_type": "Segment",
+        "actual_native_name": "主营业务",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "issuer"
+      },
+      "owned:core-ev-d6acb8e9311e697d:Measurement:business_type:主营业务:营业收入:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          254
+        ],
+        "reason": "独立原表p254：母公司营业收入和营业成本，主营业务的本期营业收入=1,411,901,297.92元；原栏目、主体、期间、数字单位对应；Measurement仅准确率。",
+        "matched_source_row_index": 13,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "主营业务",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "issuer"
+      },
+      "owned:core-ev-9affec9f5ac9a8fc:Segment:business_type:其他业务:营业收入:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          254
+        ],
+        "reason": "独立原表p254：母公司营业收入和营业成本，其他业务的本期营业收入=29,443,016.32元；原栏目、主体、期间、数字单位对应；Measurement仅准确率。",
+        "matched_source_row_index": 14,
+        "recall_row_index": 14,
+        "actual_object_type": "Segment",
+        "actual_native_name": "其他业务",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "issuer"
+      },
+      "owned:core-ev-d6acb8e9311e697d:Measurement:business_type:其他业务:营业收入:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          254
+        ],
+        "reason": "独立原表p254：母公司营业收入和营业成本，其他业务的本期营业收入=29,443,016.32元；原栏目、主体、期间、数字单位对应；Measurement仅准确率。",
+        "matched_source_row_index": 14,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "其他业务",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "issuer"
+      }
+    },
+    "answers": {
+      "principal_business": {
+        "accurate": true,
+        "reason": "四板块、六现有高速、交通能源、智能科技、退出嘉鱼收费权益及出租业务实质均在正文；不推其他许可业务。"
+      },
+      "products_services": {
+        "accurate": false,
+        "reason": "路段、交通软硬件、能源补给和租赁有实质；建造服务未进入产品正文。"
+      },
+      "revenue_model": {
+        "accurate": false,
+        "reason": "四板块及政府通行收费存在，但缺p139联网资金划拨、国内数量质量/出口提单、项目进度、油品控制权、政府建造成本比例和租赁计量机制。"
+      }
+    },
+    "review_method": "逐个实际record_id独立核对原表、正文及动作；精确匹配只辅助核已读金额，不自动认定正文/Activity；没有索引范围全真或预填分母。"
+  },
+  "600073.SH": {
+    "facts": {
+      "owned:core-ev-46169c23213b59b8:overview": {
+        "accurate": true,
+        "reason": "p11当前猪肉/牛羊肉/品牌食品开发生产销售原句；接受事实准确，但不能证明完整答案。",
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          11,
+          12
+        ],
+        "actual_object_type": "BusinessOverview",
+        "actual_native_name": "报告期内公司从事的业务情况",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-1d34915f2a7e34bf:activity:1": {
+        "accurate": true,
+        "reason": "p11同句明确公司开发、生产和销售该集合；produces和合并主体有依据，不代替sells。",
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          11,
+          12
+        ],
+        "actual_object_type": "Activity",
+        "actual_native_name": "猪肉、牛羊肉类食品及品牌休闲类食品",
+        "actual_action": "produces",
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-1d34915f2a7e34bf:activity:2": {
+        "accurate": true,
+        "reason": "p11猪肉为公司实际产品；operates为当前业务对象，不能代替销售动作。",
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          11,
+          12
+        ],
+        "actual_object_type": "Activity",
+        "actual_native_name": "猪肉",
+        "actual_action": "operates",
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-1d34915f2a7e34bf:activity:3": {
+        "accurate": true,
+        "reason": "p11牛肉实际产品，合并公司经营范围成立；不推公司直接生产或销售。",
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          11,
+          12
+        ],
+        "actual_object_type": "Activity",
+        "actual_native_name": "牛肉",
+        "actual_action": "operates",
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-1d34915f2a7e34bf:activity:4": {
+        "accurate": true,
+        "reason": "p11羊肉实际产品，同页银蕨子公司另有原主体要求；此operates集团业务成立。",
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          11,
+          12
+        ],
+        "actual_object_type": "Activity",
+        "actual_native_name": "羊肉",
+        "actual_action": "operates",
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-1d34915f2a7e34bf:activity:5": {
+        "accurate": true,
+        "reason": "p11罐头食品是公司当前产品，operates成立，不代替销售。",
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          11,
+          12
+        ],
+        "actual_object_type": "Activity",
+        "actual_native_name": "罐头食品",
+        "actual_action": "operates",
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-1d34915f2a7e34bf:activity:6": {
+        "accurate": false,
+        "reason": "p11原枚举中肉制品与糖果为两对象；肉制品，及糖果是未结束分支拼合出的单一伪对象。",
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          11,
+          12
+        ],
+        "actual_object_type": "Activity",
+        "actual_native_name": "肉制品，及糖果",
+        "actual_action": "operates",
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-1d34915f2a7e34bf:activity:7": {
+        "accurate": true,
+        "reason": "p11蜂蜜公司当前产品，operates成立，不代替sells或子公司具名销售。",
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          11,
+          12
+        ],
+        "actual_object_type": "Activity",
+        "actual_native_name": "蜂蜜",
+        "actual_action": "operates",
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-1d34915f2a7e34bf:activity:8": {
+        "accurate": false,
+        "reason": "p11饮用水之后已切换主要品牌清单；饮用水等，主要品牌包括：梅林B2跨分支拼接为伪商品。",
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          11,
+          12
+        ],
+        "actual_object_type": "Activity",
+        "actual_native_name": "饮用水等，主要品牌包括：梅林 B2",
+        "actual_action": "operates",
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-1d34915f2a7e34bf:activity:9": {
+        "accurate": false,
+        "reason": "p11银蕨为品牌清单项，不是名为银蕨的商品/业务Activity。",
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          11,
+          12
+        ],
+        "actual_object_type": "Activity",
+        "actual_native_name": "银蕨",
+        "actual_action": "operates",
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-1d34915f2a7e34bf:activity:10": {
+        "accurate": false,
+        "reason": "p11苏食为品牌项，未指明具体商品，不成立operates商品对象。",
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          11,
+          12
+        ],
+        "actual_object_type": "Activity",
+        "actual_native_name": "苏食",
+        "actual_action": "operates",
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-1d34915f2a7e34bf:activity:11": {
+        "accurate": false,
+        "reason": "p11爱森为品牌项，不是独立商品/经营对象。",
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          11,
+          12
+        ],
+        "actual_object_type": "Activity",
+        "actual_native_name": "爱森",
+        "actual_action": "operates",
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-1d34915f2a7e34bf:activity:12": {
+        "accurate": false,
+        "reason": "p11联豪为品牌项，不是原生商品对象。",
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          11,
+          12
+        ],
+        "actual_object_type": "Activity",
+        "actual_native_name": "联豪",
+        "actual_action": "operates",
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-0bbe691e2ab1a885:overview": {
+        "accurate": true,
+        "reason": "p217原出租表，三笔当前租赁及完整承租方在Overview中成立；不替代收入单元。",
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          217,
+          218
+        ],
+        "actual_object_type": "BusinessOverview",
+        "actual_native_name": "当期产品及服务披露",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-84a45c28c1de9673:commodity:1": {
+        "accurate": true,
+        "reason": "p24牛羊肉销售量324,593.94吨肯定当前sells；父角色准确但不替代牛肉/羔羊/绵羊/鹿原主体叶子。",
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          24
+        ],
+        "actual_object_type": "Activity",
+        "actual_native_name": "牛羊肉",
+        "actual_action": "sells",
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-84a45c28c1de9673:commodity:2": {
+        "accurate": true,
+        "reason": "p24鲜冻猪肉销售量117,871.29吨为当前sells；父项不能分别证明冷鲜和冷冻各具名角色。",
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          24
+        ],
+        "actual_object_type": "Activity",
+        "actual_native_name": "鲜冻猪肉",
+        "actual_action": "sells",
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-84a45c28c1de9673:commodity:3": {
+        "accurate": true,
+        "reason": "p24其他鲜冻肉类销售量13,247.58吨为当前sells；不猜物种。",
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          24
+        ],
+        "actual_object_type": "Activity",
+        "actual_native_name": "其他鲜冻肉类",
+        "actual_action": "sells",
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-84a45c28c1de9673:commodity:4": {
+        "accurate": true,
+        "reason": "p24深加工半成品销售量22,921.26吨为当前sells；不代替三原生产品。",
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          24
+        ],
+        "actual_object_type": "Activity",
+        "actual_native_name": "深加工半成品",
+        "actual_action": "sells",
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-84a45c28c1de9673:commodity:5": {
+        "accurate": true,
+        "reason": "p24罐头食品销售量57,105吨为当前sells；父角色不能替代具名子产品。",
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          24
+        ],
+        "actual_object_type": "Activity",
+        "actual_native_name": "罐头食品",
+        "actual_action": "sells",
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-84a45c28c1de9673:commodity:6": {
+        "accurate": true,
+        "reason": "p24品牌食品销售量59,802.67吨为当前sells；不重复计具名商品角色召回。",
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          24
+        ],
+        "actual_object_type": "Activity",
+        "actual_native_name": "品牌食品",
+        "actual_action": "sells",
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-7bf3612d49b2d7d0:segment:industry:肉类食品": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          23
+        ],
+        "reason": "独立原表p23：主营业务分行业，肉类食品的本期营业收入=17,958,740,231.95元；原栏目、主体、期间、数字单位对应；Measurement仅准确率。",
+        "matched_source_row_index": 0,
+        "recall_row_index": 0,
+        "actual_object_type": "Segment",
+        "actual_native_name": "肉类食品",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-2744e13e08d0d072:revenue:industry:肉类食品": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          23
+        ],
+        "reason": "独立原表p23：主营业务分行业，肉类食品的本期营业收入=17,958,740,231.95元；原栏目、主体、期间、数字单位对应；Measurement仅准确率。",
+        "matched_source_row_index": 0,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "肉类食品",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-7bf3612d49b2d7d0:segment:industry:品牌食品": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          23
+        ],
+        "reason": "独立原表p23：主营业务分行业，品牌食品的本期营业收入=3,036,319,721.04元；原栏目、主体、期间、数字单位对应；Measurement仅准确率。",
+        "matched_source_row_index": 1,
+        "recall_row_index": 1,
+        "actual_object_type": "Segment",
+        "actual_native_name": "品牌食品",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-2744e13e08d0d072:revenue:industry:品牌食品": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          23
+        ],
+        "reason": "独立原表p23：主营业务分行业，品牌食品的本期营业收入=3,036,319,721.04元；原栏目、主体、期间、数字单位对应；Measurement仅准确率。",
+        "matched_source_row_index": 1,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "品牌食品",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-7bf3612d49b2d7d0:segment:industry:其他": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          23
+        ],
+        "reason": "独立原表p23：主营业务分行业，其他的本期营业收入=1,134,913,239.36元；原栏目、主体、期间、数字单位对应；Measurement仅准确率。",
+        "matched_source_row_index": 2,
+        "recall_row_index": 2,
+        "actual_object_type": "Segment",
+        "actual_native_name": "其他",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-2744e13e08d0d072:revenue:industry:其他": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          23
+        ],
+        "reason": "独立原表p23：主营业务分行业，其他的本期营业收入=1,134,913,239.36元；原栏目、主体、期间、数字单位对应；Measurement仅准确率。",
+        "matched_source_row_index": 2,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "其他",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-7bf3612d49b2d7d0:segment:product:牛羊肉": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          23
+        ],
+        "reason": "独立原表p23：主营业务分产品，牛羊肉的本期营业收入=13,040,178,046.17元；原栏目、主体、期间、数字单位对应；Measurement仅准确率。",
+        "matched_source_row_index": 3,
+        "recall_row_index": 3,
+        "actual_object_type": "Segment",
+        "actual_native_name": "牛羊肉",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-2744e13e08d0d072:revenue:product:牛羊肉": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          23
+        ],
+        "reason": "独立原表p23：主营业务分产品，牛羊肉的本期营业收入=13,040,178,046.17元；原栏目、主体、期间、数字单位对应；Measurement仅准确率。",
+        "matched_source_row_index": 3,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "牛羊肉",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-7bf3612d49b2d7d0:segment:product:生猪养殖": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          23
+        ],
+        "reason": "独立原表p23：主营业务分产品，生猪养殖的本期营业收入=1,504,577,681.67元；原栏目、主体、期间、数字单位对应；Measurement仅准确率。",
+        "matched_source_row_index": 4,
+        "recall_row_index": 4,
+        "actual_object_type": "Segment",
+        "actual_native_name": "生猪养殖",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-2744e13e08d0d072:revenue:product:生猪养殖": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          23
+        ],
+        "reason": "独立原表p23：主营业务分产品，生猪养殖的本期营业收入=1,504,577,681.67元；原栏目、主体、期间、数字单位对应；Measurement仅准确率。",
+        "matched_source_row_index": 4,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "生猪养殖",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-7bf3612d49b2d7d0:segment:product:猪肉制品": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          23
+        ],
+        "reason": "独立原表p23：主营业务分产品，猪肉制品的本期营业收入=3,413,984,504.11元；原栏目、主体、期间、数字单位对应；Measurement仅准确率。",
+        "matched_source_row_index": 5,
+        "recall_row_index": 5,
+        "actual_object_type": "Segment",
+        "actual_native_name": "猪肉制品",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-2744e13e08d0d072:revenue:product:猪肉制品": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          23
+        ],
+        "reason": "独立原表p23：主营业务分产品，猪肉制品的本期营业收入=3,413,984,504.11元；原栏目、主体、期间、数字单位对应；Measurement仅准确率。",
+        "matched_source_row_index": 5,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "猪肉制品",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-7bf3612d49b2d7d0:segment:product:罐头食品": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          23
+        ],
+        "reason": "独立原表p23：主营业务分产品，罐头食品的本期营业收入=1,335,225,665.00元；原栏目、主体、期间、数字单位对应；Measurement仅准确率。",
+        "matched_source_row_index": 6,
+        "recall_row_index": 6,
+        "actual_object_type": "Segment",
+        "actual_native_name": "罐头食品",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-2744e13e08d0d072:revenue:product:罐头食品": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          23
+        ],
+        "reason": "独立原表p23：主营业务分产品，罐头食品的本期营业收入=1,335,225,665.00元；原栏目、主体、期间、数字单位对应；Measurement仅准确率。",
+        "matched_source_row_index": 6,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "罐头食品",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-7bf3612d49b2d7d0:segment:product:休闲食品": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          23
+        ],
+        "reason": "独立原表p23：主营业务分产品，休闲食品的本期营业收入=1,701,094,056.04元；原栏目、主体、期间、数字单位对应；Measurement仅准确率。",
+        "matched_source_row_index": 7,
+        "recall_row_index": 7,
+        "actual_object_type": "Segment",
+        "actual_native_name": "休闲食品",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-2744e13e08d0d072:revenue:product:休闲食品": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          23
+        ],
+        "reason": "独立原表p23：主营业务分产品，休闲食品的本期营业收入=1,701,094,056.04元；原栏目、主体、期间、数字单位对应；Measurement仅准确率。",
+        "matched_source_row_index": 7,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "休闲食品",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-7bf3612d49b2d7d0:segment:product:其他": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          24
+        ],
+        "reason": "独立原表p24：主营业务分产品/续表，其他的本期营业收入=1,134,913,239.36元；原栏目、主体、期间、数字单位对应；Measurement仅准确率。",
+        "matched_source_row_index": 8,
+        "recall_row_index": 8,
+        "actual_object_type": "Segment",
+        "actual_native_name": "其他",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-2744e13e08d0d072:revenue:product:其他": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          24
+        ],
+        "reason": "独立原表p24：主营业务分产品/续表，其他的本期营业收入=1,134,913,239.36元；原栏目、主体、期间、数字单位对应；Measurement仅准确率。",
+        "matched_source_row_index": 8,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "其他",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-7bf3612d49b2d7d0:segment:region:海外": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          24
+        ],
+        "reason": "独立原表p24：主营业务分地区，海外的本期营业收入=10,852,424,958.13元；原栏目、主体、期间、数字单位对应；Measurement仅准确率。",
+        "matched_source_row_index": 10,
+        "recall_row_index": 10,
+        "actual_object_type": "Segment",
+        "actual_native_name": "海外",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-2744e13e08d0d072:revenue:region:海外": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          24
+        ],
+        "reason": "独立原表p24：主营业务分地区，海外的本期营业收入=10,852,424,958.13元；原栏目、主体、期间、数字单位对应；Measurement仅准确率。",
+        "matched_source_row_index": 10,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "海外",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-7bf3612d49b2d7d0:segment:sales_mode:直营": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          24
+        ],
+        "reason": "独立原表p24：主营业务分销售模式，直营的本期营业收入=4,687,856,787.91元；原栏目、主体、期间、数字单位对应；Measurement仅准确率。",
+        "matched_source_row_index": 11,
+        "recall_row_index": 11,
+        "actual_object_type": "Segment",
+        "actual_native_name": "直营",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-2744e13e08d0d072:revenue:sales_mode:直营": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          24
+        ],
+        "reason": "独立原表p24：主营业务分销售模式，直营的本期营业收入=4,687,856,787.91元；原栏目、主体、期间、数字单位对应；Measurement仅准确率。",
+        "matched_source_row_index": 11,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "直营",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-7bf3612d49b2d7d0:segment:sales_mode:分销": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          24
+        ],
+        "reason": "独立原表p24：主营业务分销售模式，分销的本期营业收入=15,979,563,480.47元；原栏目、主体、期间、数字单位对应；Measurement仅准确率。",
+        "matched_source_row_index": 12,
+        "recall_row_index": 12,
+        "actual_object_type": "Segment",
+        "actual_native_name": "分销",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-2744e13e08d0d072:revenue:sales_mode:分销": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          24
+        ],
+        "reason": "独立原表p24：主营业务分销售模式，分销的本期营业收入=15,979,563,480.47元；原栏目、主体、期间、数字单位对应；Measurement仅准确率。",
+        "matched_source_row_index": 12,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "分销",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-7bf3612d49b2d7d0:segment:sales_mode:其他": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          24
+        ],
+        "reason": "独立原表p24：主营业务分销售模式，其他的本期营业收入=1,462,552,923.97元；原栏目、主体、期间、数字单位对应；Measurement仅准确率。",
+        "matched_source_row_index": 13,
+        "recall_row_index": 13,
+        "actual_object_type": "Segment",
+        "actual_native_name": "其他",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-2744e13e08d0d072:revenue:sales_mode:其他": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          24
+        ],
+        "reason": "独立原表p24：主营业务分销售模式，其他的本期营业收入=1,462,552,923.97元；原栏目、主体、期间、数字单位对应；Measurement仅准确率。",
+        "matched_source_row_index": 13,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "其他",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-9b6df596fc5c8dd9:Segment:business_type:主营业务:营业收入:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          179
+        ],
+        "reason": "独立原表p179：合并营业收入和营业成本，主营业务的本期营业收入=22,073,833,670.86元；原栏目、主体、期间、数字单位对应；Measurement仅准确率。",
+        "matched_source_row_index": 15,
+        "recall_row_index": 15,
+        "actual_object_type": "Segment",
+        "actual_native_name": "主营业务",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-6d2b0ac3eb61c2ce:Measurement:business_type:主营业务:营业收入:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          179
+        ],
+        "reason": "独立原表p179：合并营业收入和营业成本，主营业务的本期营业收入=22,073,833,670.86元；原栏目、主体、期间、数字单位对应；Measurement仅准确率。",
+        "matched_source_row_index": 15,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "主营业务",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-9b6df596fc5c8dd9:Segment:business_type:其他业务:营业收入:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          179
+        ],
+        "reason": "独立原表p179：合并营业收入和营业成本，其他业务的本期营业收入=56,139,521.49元；原栏目、主体、期间、数字单位对应；Measurement仅准确率。",
+        "matched_source_row_index": 16,
+        "recall_row_index": 16,
+        "actual_object_type": "Segment",
+        "actual_native_name": "其他业务",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-6d2b0ac3eb61c2ce:Measurement:business_type:其他业务:营业收入:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          179
+        ],
+        "reason": "独立原表p179：合并营业收入和营业成本，其他业务的本期营业收入=56,139,521.49元；原栏目、主体、期间、数字单位对应；Measurement仅准确率。",
+        "matched_source_row_index": 16,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "其他业务",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-4e2edb118ff79ad2:Segment:business_type:主营业务:营业收入:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          241
+        ],
+        "reason": "独立原表p241：母公司营业收入和营业成本，主营业务的本期营业收入=1,303,873,935.00元；原栏目、主体、期间、数字单位对应；Measurement仅准确率。",
+        "matched_source_row_index": 18,
+        "recall_row_index": 18,
+        "actual_object_type": "Segment",
+        "actual_native_name": "主营业务",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "issuer"
+      },
+      "owned:core-ev-ace0aee4aa137e8a:Measurement:business_type:主营业务:营业收入:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          241
+        ],
+        "reason": "独立原表p241：母公司营业收入和营业成本，主营业务的本期营业收入=1,303,873,935.00元；原栏目、主体、期间、数字单位对应；Measurement仅准确率。",
+        "matched_source_row_index": 18,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "主营业务",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "issuer"
+      },
+      "owned:core-ev-3ad4822b7479ee83:Segment:product:罐头食品:全部营业收入/商品类型:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          241
+        ],
+        "reason": "独立原表p241：母公司合同分类/商品类型，罐头食品的本期营业收入=1,303,874,406.70元；原栏目、主体、期间、数字单位对应；Measurement仅准确率。",
+        "matched_source_row_index": 20,
+        "recall_row_index": 20,
+        "actual_object_type": "Segment",
+        "actual_native_name": "罐头食品",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "issuer"
+      },
+      "owned:core-ev-8059d4ae134ece47:Measurement:product:罐头食品:全部营业收入/商品类型:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          241
+        ],
+        "reason": "独立原表p241：母公司合同分类/商品类型，罐头食品的本期营业收入=1,303,874,406.70元；原栏目、主体、期间、数字单位对应；Measurement仅准确率。",
+        "matched_source_row_index": 20,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "罐头食品",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "issuer"
+      },
+      "owned:core-ev-3ad4822b7479ee83:Segment:region:中国(含港澳台):全部营业收入/经营地区:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          241
+        ],
+        "reason": "独立原表p241：母公司合同分类/按经营地区分类，中国（含港澳台）的本期营业收入=1,013,535,444.59元；原栏目、主体、期间、数字单位对应；Measurement仅准确率。",
+        "matched_source_row_index": 21,
+        "recall_row_index": 21,
+        "actual_object_type": "Segment",
+        "actual_native_name": "中国(含港澳台)",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "issuer"
+      },
+      "owned:core-ev-8059d4ae134ece47:Measurement:region:中国(含港澳台):全部营业收入/经营地区:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          241
+        ],
+        "reason": "独立原表p241：母公司合同分类/按经营地区分类，中国（含港澳台）的本期营业收入=1,013,535,444.59元；原栏目、主体、期间、数字单位对应；Measurement仅准确率。",
+        "matched_source_row_index": 21,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "中国(含港澳台)",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "issuer"
+      },
+      "owned:core-ev-3ad4822b7479ee83:Segment:region:海外:全部营业收入/经营地区:row:2": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          241
+        ],
+        "reason": "独立原表p241：母公司合同分类/按经营地区分类，海外的本期营业收入=290,338,962.11元；原栏目、主体、期间、数字单位对应；Measurement仅准确率。",
+        "matched_source_row_index": 22,
+        "recall_row_index": 22,
+        "actual_object_type": "Segment",
+        "actual_native_name": "海外",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "issuer"
+      },
+      "owned:core-ev-8059d4ae134ece47:Measurement:region:海外:全部营业收入/经营地区:row:2": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          241
+        ],
+        "reason": "独立原表p241：母公司合同分类/按经营地区分类，海外的本期营业收入=290,338,962.11元；原栏目、主体、期间、数字单位对应；Measurement仅准确率。",
+        "matched_source_row_index": 22,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "海外",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "issuer"
+      },
+      "owned:core-ev-3ad4822b7479ee83:Segment:revenue_timing:直营:收入确认时点/其他业务:row:3": {
+        "accurate": false,
+        "reason": "p241直营是按销售渠道分类，实际Segment却为revenue_timing、收入确认时点/其他业务；金额单位正确，栏目语义错误。",
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          241
+        ],
+        "actual_object_type": "Segment",
+        "actual_native_name": "直营",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "issuer"
+      },
+      "owned:core-ev-8059d4ae134ece47:Measurement:revenue_timing:直营:收入确认时点/其他业务:row:3": {
+        "accurate": false,
+        "reason": "p241同笔Measurement跟随错误收入确认时点/其他业务分类；金额原数正确，只计准确率错误。",
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          241
+        ],
+        "actual_object_type": "Measurement",
+        "actual_native_name": "直营",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "issuer"
+      },
+      "owned:core-ev-1d87b475a23eb2c6:Segment:lease:房屋建筑物:本公司作为出租方/本期确认的租赁收入:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          217
+        ],
+        "reason": "独立原表p217：本公司作为出租方，房屋建筑物的本期确认的租赁收入=513,761.52元；原栏目、主体、期间、数字单位及精确承租方子公司少数股东及附属公司对应；Measurement仅准确率。",
+        "matched_source_row_index": 44,
+        "recall_row_index": 44,
+        "actual_object_type": "Segment",
+        "actual_native_name": "房屋建筑物",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-37844384d6c1b712:Measurement:lease:房屋建筑物:本公司作为出租方/本期确认的租赁收入:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          217
+        ],
+        "reason": "独立原表p217：本公司作为出租方，房屋建筑物的本期确认的租赁收入=513,761.52元；原栏目、主体、期间、数字单位及精确承租方子公司少数股东及附属公司对应；Measurement仅准确率。",
+        "matched_source_row_index": 44,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "房屋建筑物",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-1d87b475a23eb2c6:Segment:lease:房屋建筑物:本公司作为出租方/本期确认的租赁收入:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          217
+        ],
+        "reason": "独立原表p217：本公司作为出租方，房屋建筑物的本期确认的租赁收入=571,428.56元；原栏目、主体、期间、数字单位及精确承租方光明食品(集团)有限公司及其他下属公司对应；Measurement仅准确率。",
+        "matched_source_row_index": 45,
+        "recall_row_index": 45,
+        "actual_object_type": "Segment",
+        "actual_native_name": "房屋建筑物",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      },
+      "owned:core-ev-37844384d6c1b712:Measurement:lease:房屋建筑物:本公司作为出租方/本期确认的租赁收入:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          217
+        ],
+        "reason": "独立原表p217：本公司作为出租方，房屋建筑物的本期确认的租赁收入=571,428.56元；原栏目、主体、期间、数字单位及精确承租方光明食品(集团)有限公司及其他下属公司对应；Measurement仅准确率。",
+        "matched_source_row_index": 45,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "房屋建筑物",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group"
+      }
+    },
+    "answers": {
+      "principal_business": {
+        "accurate": false,
+        "reason": "仅主营首段和租赁表；养殖/屠宰/深加工/分销全链及饲料贸易和子公司原主体未入正文。"
+      },
+      "products_services": {
+        "accurate": false,
+        "reason": "只有猪肉牛羊肉品牌食品首段和租赁，具体品类品牌/子公司矩阵及当期新品没有实质正文。"
+      },
+      "revenue_model": {
+        "accurate": false,
+        "reason": "仅出租方表，缺实际肉类/罐头/品牌渠道、定价竞价、交付接受控制权和款到发货/信用期机制。"
+      }
+    },
+    "review_method": "逐个实际record_id独立核对原表、正文及动作；精确匹配只辅助核已读金额，不自动认定正文/Activity；没有索引范围全真或预填分母。"
+  }
+}

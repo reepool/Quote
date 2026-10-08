@@ -1,0 +1,35 @@
+{
+  "created_at": "2026-10-08T09:35:06.163272+00:00",
+  "conclusion": "A-role finite acceptance;5.2/5.3 confirmed;5.4 authorized",
+  "source_recall": {
+    "status": "assessed",
+    "numerator": 68,
+    "denominator": 68,
+    "value": 1.0
+  },
+  "source_accuracy": {
+    "status": "assessed",
+    "numerator": 157,
+    "denominator": 157,
+    "value": 1.0
+  },
+  "facts": 151,
+  "answers": 6,
+  "numeric_errors": 0,
+  "whole_round_seconds": 184.45882215443999,
+  "tokens": 0,
+  "actual_five_stage_no_reuse": true,
+  "a_role_test": "22 passed",
+  "a_role_checks": "Ruff/format/OpenSpec strict/diff passed",
+  "history_verified": 1051,
+  "first_delivery_verified": 18,
+  "first_review_verified": true,
+  "scope": "68 declared source conditions and actual checked pages;not full-report completeness",
+  "preserved": [
+    "v32 first failure25/68,70/100 and23 numeric errors",
+    "v33 first failure66/68,153/157,initial/corrected review and post-formal correction",
+    "v34 first formal delivery and source review"
+  ],
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false
+}

@@ -1,0 +1,23 @@
+{
+  "formal_execution_index": 1,
+  "sha256": {
+    "data/checkpoints/company_profile_common_core/reports/m4_v34_unseen_small_batch/plan.json": "1750b83f31686c552ef64186e8c5289ec92d2c34a4441d65357046f02c2add47",
+    "data/checkpoints/company_profile_common_core/reports/m4_v34_unseen_small_batch/company_profile_live_run.v1.json": "9f44affb65b022d712a43fd14248fc59e13bd25a341b1c4abc397f876137b95b",
+    "data/checkpoints/company_profile_common_core/reports/m4_v34_unseen_small_batch/observation.json": "94cdb4f126908ca5e7a29de9df5c15b9d1326d191aeb7e0379d22e14e241f2a5",
+    "data/checkpoints/company_profile_common_core/reports/m4_v34_unseen_small_batch/formal_execution.json": "ce65247e3ca3f4f8ee3061b5b638e5a7f3dad51a76cd13582998019811883f94",
+    "data/research/company_profile_common_core/m4_v34_unseen_small_batch/company_profile_common_core.v1/bp-work-33a8ef939d96f5badd03843f.json": "f6a38ff83c3ab6a018e0373af5a4865faabd4f5b71977c978e684775ede33b03",
+    "data/research/company_profile_common_core/m4_v34_unseen_small_batch/company_profile_common_core.v1/bp-work-ba6743d25b593d578a1baa0f.json": "a68cd79412b1d984231f770ee13a1fd89c8ee02080cab7544d73d8bbf59046d4",
+    "data/research/company_profile_common_core/m4_v34_unseen_small_batch/company_profile_common_core.v1/scopes/600035.SH/2025-12-31/extract_segment_financials.json": "1b8a686343652a3c2962e36eb6f4cd87d26ef2713d2b916f279e7b21a788b224",
+    "data/research/company_profile_common_core/m4_v34_unseen_small_batch/company_profile_common_core.v1/scopes/600035.SH/2025-12-31/extract_business_overview.json": "f7849610614854d3fcf33501023ad61cb1dae7cf726c2371128e0f42d19df880",
+    "data/research/company_profile_common_core/m4_v34_unseen_small_batch/company_profile_common_core.v1/scopes/600073.SH/2025-12-31/extract_segment_financials.json": "cbe21f1ae5f5e0d9263236fa1e3162107ccdbbcd610b6974267423277d2efdee",
+    "data/research/company_profile_common_core/m4_v34_unseen_small_batch/company_profile_common_core.v1/scopes/600073.SH/2025-12-31/extract_business_overview.json": "f263a5f962573967bf615e1deaa167e463bf0e1dadcfd94c60819974191df529",
+    "data/research/company_profile_common_core/m4_v34_unseen_small_batch/company_profile_common_core.v1/checkpoints/bp-work-33a8ef939d96f5badd03843f.json": "beca685ce9e6ea69564a7ec737ba1fc0875f4b71813a021a8af5e9db790ffdc4",
+    "data/research/company_profile_common_core/m4_v34_unseen_small_batch/company_profile_common_core.v1/checkpoints/bp-work-ba6743d25b593d578a1baa0f.json": "a74b245da26d451680c8109239572628aa55ab346dd28b5b984acb46dcef885b",
+    "data/exports/m4_v34_unseen_small_batch/600035.SH/profiles.csv": "17b080e2577a4cb78755595d57ac399e51590106718242042b01189d6b102fad",
+    "data/exports/m4_v34_unseen_small_batch/600035.SH/600035.SH_2025-12-31.json": "8a994c85ce4c5bb186219281f830896d2d8f44d1358c0fb05a397806d2d2ff5b",
+    "data/exports/m4_v34_unseen_small_batch/600035.SH/export_manifest.json": "bf46d9df3642a5f8cd87c6d80df906221fd49be30ff58ec559c31c3e7074b041",
+    "data/exports/m4_v34_unseen_small_batch/600073.SH/profiles.csv": "31085f2c40ff54453d8c46e36e05bb9b322e08e2fcabb0a06165669660ae9e1d",
+    "data/exports/m4_v34_unseen_small_batch/600073.SH/600073.SH_2025-12-31.json": "aa8b35754b5fffb7a82039d03d5cda0414ada043ec2ae0e0c6c7e1d587ea8d58",
+    "data/exports/m4_v34_unseen_small_batch/600073.SH/export_manifest.json": "7621e6a14310709919feb15d4b67bb85be2350572e55b687f338239e24bb1729"
+  }
+}
