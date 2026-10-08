@@ -470,9 +470,10 @@ class DceOfficialBrowserClient:
                 await self._stop()
                 self._session_ready = False
                 logger.warning(
-                    "[OfficialFutures] DCE browser route failed route=%s error_type=%s",
+                    "[OfficialFutures] DCE browser route failed route=%s error_type=%s error=%s",
                     self._route_kind or "direct",
                     type(exc).__name__,
+                    _truncate_route_error_detail(exc, limit=300),
                 )
 
     async def _retry_validated_proxy_session(
@@ -620,6 +621,9 @@ class DceOfficialBrowserClient:
             return "DCE returned non-JSON payload"
         if "http 639" in text:
             return "proxy route returned HTTP 639"
+        detail = _truncate_route_error_detail(exc)
+        if detail:
+            return f"{type(exc).__name__} route failure: {detail}"
         return f"{type(exc).__name__} route failure"
 
     @staticmethod
@@ -3522,6 +3526,14 @@ def _sanitize_official_futures_error_text(value: Any) -> str:
         r"\1: ***",
         text,
     )
+    return text
+
+
+def _truncate_route_error_detail(value: Any, *, limit: int = 160) -> str:
+    """Collapse a route-failure exception into one sanitized, bounded line."""
+    text = " ".join(_sanitize_official_futures_error_text(value).split())
+    if len(text) > limit:
+        text = text[: max(0, limit - 3)].rstrip() + "..."
     return text
 
 

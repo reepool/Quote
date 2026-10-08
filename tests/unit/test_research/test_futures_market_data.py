@@ -59,6 +59,7 @@ from research.providers.official_futures import (
     OfficialFuturesSourceUnavailable,
     _bar_quality_flag,
     _normalize_czce_product_title,
+    _truncate_route_error_detail,
     classify_official_futures_failure,
 )
 from utils.config_manager import ResearchConfig, ResearchStorageConfig
@@ -1517,6 +1518,46 @@ def test_dce_proxy_407_classification_redacts_upstream_credentials():
     assert classification.evidence["raw"] == (
         "official DCE proxy authorization expired: HTTP 407"
     )
+
+
+def test_dce_route_error_summary_fallback_keeps_sanitized_detail():
+    exc = OfficialFuturesSourceUnavailable(
+        "browser session failed: RuntimeError: dial "
+        "http://user:secret@proxy.example:8080 refused"
+    )
+
+    summary = DceOfficialBrowserClient._safe_route_error_summary(exc)
+
+    assert summary.startswith("OfficialFuturesSourceUnavailable route failure: ")
+    assert "secret" not in summary
+    assert "***:***@proxy.example:8080" in summary
+
+
+def test_dce_route_error_summary_fallback_truncates_long_detail():
+    exc = OfficialFuturesSourceUnavailable("browser session failed: " + "x" * 400)
+
+    summary = DceOfficialBrowserClient._safe_route_error_summary(exc)
+
+    prefix = "OfficialFuturesSourceUnavailable route failure: "
+    assert len(summary) <= len(prefix) + 160
+    assert summary.endswith("...")
+
+
+def test_dce_route_error_summary_fallback_without_detail_keeps_type_only():
+    summary = DceOfficialBrowserClient._safe_route_error_summary(asyncio.TimeoutError())
+
+    assert summary == "TimeoutError route failure"
+
+
+def test_dce_route_error_detail_sanitizes_and_collapses_whitespace():
+    detail = _truncate_route_error_detail(
+        "browser session failed\n  http://user:secret@proxy.example:8080\n",
+        limit=300,
+    )
+
+    assert "secret" not in detail
+    assert "***:***@proxy.example:8080" in detail
+    assert "\n" not in detail
 
 
 def test_dce_http_412_is_not_relabelled_as_no_report(monkeypatch, tmp_path):
