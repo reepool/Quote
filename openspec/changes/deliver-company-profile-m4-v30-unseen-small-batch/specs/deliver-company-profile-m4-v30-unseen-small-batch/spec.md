@@ -43,3 +43,22 @@ The failure branch MUST preserve the original47-condition contract,first formal 
 #### Scenario: Controller application fields were promoted to independent operations
 - **WHEN** an original controller paragraph says the product covers home-appliance,industrial-control and new-energy applications
 - **THEN** those uses and following supplier prose create no independent own activity while actual microscope,lens and controller products retain their original subject
+
+
+### Requirement: Source-backed v31 repair precedes formal execution
+The existing owner MUST deliver six substantive bodies, thirty-eight income conditions and seven native roles from complete frozen pages. Current/prior columns MUST be distinguished from multi-segment aggregate columns. Parent-company scope, native business_type, revenue timing, units and lessor direction MUST remain explicit. Lithium sales MUST retain January/February and the former subsidiary control/consolidation limit. Downstream applications MUST NOT become owned activities. The original forty-seven-condition failure and artifacts MUST remain unchanged. Full-page acceptance-query-export regressions MUST precede the first independent v31 formal round under the same plan, versions, cutoff and shared budget. Production and scale authorization MUST remain unchanged.
+
+#### Scenario: Four additional related income conditions
+- **WHEN** seller/service and lessor tables disclose current management and rental income
+- **THEN** the four source-backed conditions are delivered without treating asset purchases as income or leases as goods sales
+
+#### Scenario: First repair observation
+- **WHEN** complete source-page regressions pass
+- **THEN** the fifty-one-condition contract is frozen before first execute, and actual unique accuracy, numeric errors, five-stage reuse, whole-round time and tokens determine finite submission or preserved failure
+
+#### Scenario: Revenue body lists a former limited-period business
+- **WHEN** the accepted product income is qualified by a limited period and the original subsidiary's loss of control or exit from consolidation
+- **THEN** the revenue body retains those accepted source restrictions and original actor, and keyword presence alone cannot establish substantive completeness
+
+
+v31首次正式复核补充：正文按原来源实质判断，产品收入列举含期间限定或原主体退出控制／合并时，收入答案也须保留对应限制，不能仅以关键词组命中通过。v31保留50/51、158/159、数字0的正式失败；局部事后补正复用已接受限定上下文，与执行代码哈希／原制品明确区分。当前change保持未归档、后续暂停，等待新的正式复验安排。

@@ -1,0 +1,28 @@
+{
+  "formal_execution_index": 1,
+  "first_delivery_count": 18,
+  "source_review_count": 1,
+  "result_files": 19,
+  "sha256": {
+    "data/checkpoints/company_profile_common_core/reports/m4_v31_energy_optics_core_repair/plan.json": "231e962a27188225e24a437a9117bbd567e5013d62a2df3488cc56000b0cf78f",
+    "data/checkpoints/company_profile_common_core/reports/m4_v31_energy_optics_core_repair/company_profile_live_run.v1.json": "1e7d481e59520a64b1b0e1733dac4f17eeb2a0121f78c92b617ade9b6e33d0b1",
+    "data/checkpoints/company_profile_common_core/reports/m4_v31_energy_optics_core_repair/observation.json": "3e0de81f74d9ed309b18542243b81872b34fbb4bdd81eef265100733e91ab98e",
+    "data/checkpoints/company_profile_common_core/reports/m4_v31_energy_optics_core_repair/formal_execution.json": "b2a90e9ace49cf37387a83823c5b711114a999ec8d5d3cb64ac5a804fba986c5",
+    "data/research/company_profile_common_core/m4_v31_energy_optics_core_repair/company_profile_common_core.v1/bp-work-8ba0b5cf5c41345b26e89ea6.json": "552d4ba6e64e54eea353c0d11c4c2c107f633a01b18f00a4a4cb3f49acfccaf0",
+    "data/research/company_profile_common_core/m4_v31_energy_optics_core_repair/company_profile_common_core.v1/bp-work-45c0642420e186a0614a7e62.json": "8c2936e4e98044ccffaa0c307206a09314c460e1ace2c91820fd1e208fd8b585",
+    "data/research/company_profile_common_core/m4_v31_energy_optics_core_repair/company_profile_common_core.v1/scopes/600071.SH/2025-12-31/extract_segment_financials.json": "f056f985e09dfa1e48abcc5f9137325ad6a770da8d1a6c2baf54d7c3504a280e",
+    "data/research/company_profile_common_core/m4_v31_energy_optics_core_repair/company_profile_common_core.v1/scopes/600071.SH/2025-12-31/extract_business_overview.json": "6504029bc9003bce5de14c3cdac0c701e253beb3d93a6e36d2cf1d2730a286c9",
+    "data/research/company_profile_common_core/m4_v31_energy_optics_core_repair/company_profile_common_core.v1/scopes/600032.SH/2025-12-31/extract_segment_financials.json": "3a2d70a6a47eb82a881bb597aad9dc5c645d8b2ab8ad6f6cb9f9bd8cf56240bc",
+    "data/research/company_profile_common_core/m4_v31_energy_optics_core_repair/company_profile_common_core.v1/scopes/600032.SH/2025-12-31/extract_business_overview.json": "1d3853b69ffbe97af670d4389014853b62a2f3a4438e3d22a69196f717f68999",
+    "data/research/company_profile_common_core/m4_v31_energy_optics_core_repair/company_profile_common_core.v1/checkpoints/bp-work-8ba0b5cf5c41345b26e89ea6.json": "21b9e6bd5865949d08c086c23ea3a1b3a91da13d17d7187f37528acd4caf1d6a",
+    "data/research/company_profile_common_core/m4_v31_energy_optics_core_repair/company_profile_common_core.v1/checkpoints/bp-work-45c0642420e186a0614a7e62.json": "65509b7b35db289ef76bd26517a3af6fc78246542094feebbfca6319e222bf33",
+    "data/exports/m4_v31_energy_optics_core_repair/600071.SH/profiles.csv": "1d892748812a498e340c725521d960cbb02cca8c034940f5af457d776459e947",
+    "data/exports/m4_v31_energy_optics_core_repair/600071.SH/export_manifest.json": "59ad525d6b36d74a5a954a7dc274210cb0f1bbf186e39d922a1138acd7eef43d",
+    "data/exports/m4_v31_energy_optics_core_repair/600071.SH/600071.SH_2025-12-31.json": "83d39e06bfa67c40c7f17516af2c85abd9e439050c905c9de3681f8e8a4b281f",
+    "data/exports/m4_v31_energy_optics_core_repair/600032.SH/profiles.csv": "8fbf0b929cff1b45e7ebee00efec36dcac1901ad98698a7ccbb06fced083e369",
+    "data/exports/m4_v31_energy_optics_core_repair/600032.SH/600032.SH_2025-12-31.json": "0c2030e446d35042fc1bc71dd135e5bb0fed805ae41c514782b29e1a8683b373",
+    "data/exports/m4_v31_energy_optics_core_repair/600032.SH/export_manifest.json": "96c6c9e0acc5201582c1a585c262de43748b6051547536f73b0ace7317a924bb",
+    "data/checkpoints/company_profile_common_core/reports/m4_v31_energy_optics_core_repair/company_profile_source_review.v1.json": "8c00dcac998b16aea4a8f15b439e64eb6f5aa3ca8d9dcbc5dd29223a9c57bcd1"
+  },
+  "failed_result_preserved": true
+}

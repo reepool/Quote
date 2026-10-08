@@ -94,6 +94,7 @@ def test_full_pages_accept_query_export_complete_business(
                 for x in facts
                 if x["field_id"] == field
                 and x["source_native_name"] == row["name"]
+                and raw[x["record_id"]]["subject_scope"] != "issuer"
                 and (
                     not row.get("header") or x["source_native_header"] == row["header"]
                 )
@@ -262,7 +263,7 @@ def test_segment_income_preserves_blank_elimination_and_separate_bases(tmp_path)
         )
 
 
-def test_native_income_uses_its_revenue_column_and_rejects_parent_statement(tmp_path):
+def test_native_income_uses_its_revenue_column_and_separates_parent_statement(tmp_path):
     f = fixture("600066.SH")
     page = next(p for p in f["pages"] if p["page"] == 109)
     text = page["text"].replace("收入 成本 收入 成本", "成本 收入 成本 收入")
@@ -277,6 +278,7 @@ def test_native_income_uses_its_revenue_column_and_rejects_parent_statement(tmp_
             x
             for x in profile["accepted_facts"]
             if x["source_native_name"] == "主营业务"
+            and not any("母公司财务报表" in ev["bounded_quote"] for ev in x["evidence"])
         ]
         assert len(matches) == 2
         assert all(x["source_native_value"] == "27,318,191,844.98" for x in matches)
@@ -292,9 +294,25 @@ def test_native_income_uses_its_revenue_column_and_rejects_parent_statement(tmp_
         ],
         repair_version="v28",
     ):
-        assert not any(
-            x["source_native_name"] in {"主营业务", "其他业务"}
+        parent = [
+            x
             for x in profile["accepted_facts"]
+            if x["source_native_name"] in {"主营业务", "其他业务"}
+        ]
+        checkpoint = json.loads(
+            next(
+                (tmp_path / "parent/company_profile_common_core.v1/checkpoints").glob(
+                    "*.json"
+                )
+            ).read_text()
+        )
+        parent_raw = {r["record_id"]: r for r in _iter_accepted_raw(checkpoint)}
+        assert parent and all(
+            parent_raw[x["record_id"]]["subject_scope"] == "issuer" for x in parent
+        )
+        assert all(
+            any("母公司财务报表" in ev["bounded_quote"] for ev in x["evidence"])
+            for x in parent
         )
 
 

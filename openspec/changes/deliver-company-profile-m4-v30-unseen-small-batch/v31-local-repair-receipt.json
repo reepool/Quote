@@ -1,0 +1,49 @@
+{
+  "created_at": "2026-10-08T02:30:39.384244+00:00",
+  "cards_completed": [
+    "4.1",
+    "4.2",
+    "4.3"
+  ],
+  "source_test_fixture": "tests/fixtures/company_profile_v31_energy_optics_frozen_pages.json",
+  "complete_page_kinds": [
+    "actual_first_owner_pages",
+    "independent_official_pdf_pages"
+  ],
+  "source_counts": {
+    "substantive_answers": 6,
+    "native_income_cells": 38,
+    "native_roles": 7
+  },
+  "tests": {
+    "directed": "175 passed,7 warnings",
+    "directed_log_sha256": "4e07f59bb014813dd0983db16a3bcd4d4616083ba8a3ba3ef5f357ff2491b3b4",
+    "shared": "111 passed,5 known unrelated failures deselected,18 warnings;final recheck complete",
+    "shared_log_sha256": "bbfd73eab52379f72503fcfbe67b3a355724c89449dbd157679a2f7506167e22"
+  },
+  "checks": {
+    "ruff": "passed",
+    "openspec_strict": "passed",
+    "diff": "passed"
+  },
+  "repair_identity": "v31",
+  "default_identity_unchanged": true,
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false,
+  "review": {
+    "blocking_fixed": [
+      "current/prior columns vs explicit multi-segment aggregate header",
+      "cross-line full region names",
+      "business_type and revenue_timing native dimensions",
+      "income parent/consolidated scope",
+      "current OEM service actor",
+      "limited-period former lithium subsidiary",
+      "downstream application pseudo activities"
+    ],
+    "unrelated_deferred": "five pre-existing failures;amount/price,cost,industry,performance,framework"
+  },
+  "first_contract_and_failure_preserved": true,
+  "protected_files": 922,
+  "protected_files_unchanged": true,
+  "post_formal_substantive_limit": "Formal income answer omitted former lithium actor,limited one/two-month period and loss of control.Initial keyword-based complete-page checks missed this;formal failure preserved;post-formal test now checks all three bodies."
+}

@@ -1,0 +1,11 @@
+{
+  "initial_decisions_sha256": "e908cdb417c6bfea1164920cbb79638b0f38f195fa76da8140ff18a1c8841f05",
+  "final_decisions_sha256": "d78764d9cc557edf417fd0207594490ca64162b762528693183aaa8b7cbb119b",
+  "affected_object": "600071.SH/answer:revenue_model",
+  "basis": "Frozen revenue_model.source_substance and original p14–15;semantic completeness not merely keyword match.",
+  "initial_keyword_pass_preserved": true,
+  "delivery_changed": false,
+  "source_contract_changed": false,
+  "execution_code_changed": false,
+  "before_formal_source_review": true
+}

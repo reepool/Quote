@@ -44,7 +44,7 @@ _COMPLETE_COMPANY_BUSINESS = re.compile(
 )
 _STEEL_BUSINESS = re.compile(r"公司是.{8,260}主要产品有.{2,80}")
 _NARRATIVE_BUSINESS = re.compile(
-    r"作为[^。]{2,80}(?:上市公司|工业企业)[^。]{2,}研发制造|公司坚持以[^。]{2,150}为核心[^。]*。公司持续深耕"
+    r"公司是[^。]+所属的专业从事[^。]+综合型能源企业|锂电池业务本期仅统计|公司丧失对[^。]+控制权|本公司作为出租方|出售商品/提供劳务|作为[^。]{2,80}(?:上市公司|工业企业)[^。]{2,}研发制造|公司坚持以[^。]{2,150}为核心[^。]*。公司持续深耕"
 )
 _SPEC_PRODUCT = re.compile(r"^(?:厚度|宽度|长度)")
 _PRODUCT_PATTERN = re.compile(
@@ -53,7 +53,7 @@ _PRODUCT_PATTERN = re.compile(
 )
 _STATEMENT_SPLIT = re.compile(r"[。；;，,\n]+")
 _REVENUE_INFLOW_PATTERN = re.compile(
-    r"(本集团的营业收入主要包括|订单模式提供|海外市场采取直销|本公司所属售电公司|市场化交易|公司电力销售客户主要为|公司煤机全年市场化交易累计成交电量|收入来[源于自]|营业收入构成|主营业务收入|"
+    r"(本公司电力销售在|中长期、现货、绿电交易|本公司按照业务类型确定的收入确认具体原则|本公司作为出租方|出售商品/提供劳务|合同或订单|月结|本集团的营业收入主要包括|订单模式提供|海外市场采取直销|本公司所属售电公司|市场化交易|公司电力销售客户主要为|公司煤机全年市场化交易累计成交电量|收入来[源于自]|营业收入构成|主营业务收入|"
     r"通过.{0,30}(?:销售|提供).{0,30}(?:取得|获得|收取)|"
     r"取得货款|"
     r"向客户(?:销售|提供).{0,24}(?:取得|获得|收取)|"
@@ -70,7 +70,7 @@ _REVENUE_BLOCK_PATTERN = re.compile(
 )
 _REVENUE_NEGATION_PREFIX = re.compile(r"(尚未|还未|仍未|并未|没有|未|不|拟|计划)$")
 _REPAIR_REVENUE_INFLOW_PATTERN = re.compile(
-    r"(对外交易收入|产品定价按照|年度供货框架协议|票款收入|运输服务交易价格|常旅客里程奖励计划|租金收入|清算补偿费收入|本集团利用自有及控制的船舶开展|公司盈利主要来自发电收入|营业收入主要来源于|"
+    r"(本公司电力销售在|中长期、现货、绿电交易|本公司按照业务类型确定的收入确认具体原则|本公司与[^。]+购销商品、提供服务的关联交易|本公司作为出租方|出售商品/提供劳务|对外交易收入|产品定价按照|年度供货框架协议|票款收入|运输服务交易价格|常旅客里程奖励计划|租金收入|清算补偿费收入|本集团利用自有及控制的船舶开展|公司盈利主要来自发电收入|营业收入主要来源于|"
     + _REVENUE_INFLOW_PATTERN.pattern[1:]
 )
 _PRODUCT_ACTIONS = frozenset(
@@ -102,9 +102,7 @@ class _StrictModel(BaseModel):
 
 
 class CoreDimensionAssessment(_StrictModel):
-    dimension_id: Literal[
-        "principal_business", "products_services", "revenue_model"
-    ]
+    dimension_id: Literal["principal_business", "products_services", "revenue_model"]
     answered: bool
     supporting_record_ids: tuple[str, ...] = ()
     evidence_ids: tuple[str, ...] = ()
@@ -222,9 +220,7 @@ def resolved_core_field_ids(records: Sequence[SemanticRecord]) -> frozenset[str]
     """Return core field IDs that have at least one reusable accepted record."""
 
     return frozenset(
-        record.field_id
-        for record in records
-        if core_record_is_reusable(record)
+        record.field_id for record in records if core_record_is_reusable(record)
     )
 
 
@@ -280,7 +276,9 @@ def project_core_assessment(
         statuses = {item.target_id: item.status for item in result.dispositions}
         for record in result.records:
             if record.report != report:
-                raise ValueError("core assessment cannot mix records from another report")
+                raise ValueError(
+                    "core assessment cannot mix records from another report"
+                )
             if (
                 statuses.get(record.record_id) == DispositionStatus.ACCEPTED_FOR_REVIEW
                 and record.data_status == "research_fixture"
@@ -309,9 +307,7 @@ def project_core_assessment(
         principal_business=principal,
         products_services=products,
         revenue_model=revenue,
-        core_complete=principal.answered
-        and products.answered
-        and revenue.answered,
+        core_complete=principal.answered and products.answered and revenue.answered,
     )
 
 
@@ -400,7 +396,7 @@ def _assess_products_services(
                 or (
                     source_delivery_repair
                     and re.search(
-                        r"核心主业|四大产业板块|主要产品包括|主要业务是|主要业务为|主要从事|主营业务为|主要经营|研发制造|核心提供商|公司持续深耕|产品畅销|已稳定量产|成功开拓|深化运营|自用光伏|综合能源|车队|KD|报告分部|客车产品研发|营业收入主要包括",
+                        r"OEM&ODM|自发自用|本公司作为出租方|出售商品/提供劳务|锂电池业务本期仅统计|公司丧失对[^。]+控制权|绿证交易业务|核心主业|四大产业板块|主要产品包括|主要业务是|主要业务为|主要从事|主营业务为|主要经营|研发制造|核心提供商|公司持续深耕|产品畅销|已稳定量产|成功开拓|深化运营|自用光伏|综合能源|车队|KD|报告分部|客车产品研发|营业收入主要包括",
                         record.source_text or "",
                     )
                 )
@@ -413,7 +409,7 @@ def _assess_products_services(
             for record in supports
             if isinstance(record, BusinessOverview)
             and re.search(
-                r"核心主业|四大产业板块|主要产品包括|主要产品有|产品矩阵|主要业务是|主要业务为|主要从事|主营业务为|主要经营|研发制造|核心提供商|公司持续深耕|产品畅销|已稳定量产|成功开拓|深化运营|自用光伏|综合能源|车队|KD|报告分部|客车产品研发|营业收入主要包括",
+                r"OEM&ODM|自发自用|本公司作为出租方|出售商品/提供劳务|锂电池业务本期仅统计|公司丧失对[^。]+控制权|绿证交易业务|核心主业|四大产业板块|主要产品包括|主要产品有|产品矩阵|主要业务是|主要业务为|主要从事|主营业务为|主要经营|研发制造|核心提供商|公司持续深耕|产品畅销|已稳定量产|成功开拓|深化运营|自用光伏|综合能源|车队|KD|报告分部|客车产品研发|营业收入主要包括",
                 record.source_text or "",
             )
         ]
@@ -425,11 +421,17 @@ def _assess_products_services(
     if supports:
         answered = _answered("products_services", supports)
         if source_delivery_repair:
-            narratives = list(dict.fromkeys(
-                r.source_text.strip() for r in supports if isinstance(r, BusinessOverview)
-            ))
+            narratives = list(
+                dict.fromkeys(
+                    r.source_text.strip()
+                    for r in supports
+                    if isinstance(r, BusinessOverview)
+                )
+            )
             if narratives:
-                answered = answered.model_copy(update={"excerpt": "\n".join(narratives)})
+                answered = answered.model_copy(
+                    update={"excerpt": "\n".join(narratives)}
+                )
         if source_delivery_repair and any(
             isinstance(record, BusinessOverview)
             and "项目的开发、建设、运营与管理" in record.source_text
@@ -502,6 +504,37 @@ def _assess_revenue_model(
                 rejected = True
                 continue
             supports.append(record)
+    if source_delivery_repair:
+        product_labels = {
+            r.segment_label
+            for r in supports
+            if isinstance(r, Measurement)
+            and r.segment_dimension == "product"
+            and r.segment_label
+        }
+        limited = [
+            r
+            for r in records
+            if isinstance(r, BusinessOverview)
+            and any(
+                re.search(
+                    rf"{re.escape(label)}业务本期仅统计",
+                    re.sub(r"\s+", "", r.source_text),
+                )
+                for label in product_labels
+            )
+        ]
+        if limited:
+            # Revenue labels must retain the accepted business's limited period
+            # and loss of control, just as the business/product answers do.
+            context = [
+                r
+                for r in records
+                if isinstance(r, BusinessOverview)
+                and "公司丧失" in r.source_text
+                and "合并范围" in r.source_text
+            ]
+            supports.extend(r for r in [*limited, *context] if r not in supports)
     if supports:
         answered = _answered("revenue_model", supports)
         if repair_revenue_sentence:
@@ -566,7 +599,9 @@ def _industry_revenue_excerpt(records: Sequence[SemanticRecord]) -> str:
         if isinstance(record, BusinessOverview)
     ]
     sales_mechanism = any(
-        "核心主业" in text
+        "合同或订单" in text
+        or "本公司电力销售在" in text
+        or "核心主业" in text
         or "电力销售客户主要为" in text
         or "煤机全年市场化交易" in text
         or "盈利主要来自发电收入" in re.sub(r"\s+", "", text)
@@ -714,7 +749,9 @@ def _overview_states_revenue(
                 continue
             if _REVENUE_NEGATION_PREFIX.search(statement[: match.start()]):
                 continue
-            if re.search(r"(?:尚未|拟|计划|预期|将)[^。；;]{0,12}(?:收取|形成)", statement):
+            if re.search(
+                r"(?:尚未|拟|计划|预期|将)[^。；;]{0,12}(?:收取|形成)", statement
+            ):
                 continue
             if "通行费" in statement and not _toll_statement_is_company_revenue(
                 sentence, company_subject
@@ -790,18 +827,14 @@ def _is_skeleton_noise_segment(
 
 
 def _answered(
-    dimension_id: Literal[
-        "principal_business", "products_services", "revenue_model"
-    ],
+    dimension_id: Literal["principal_business", "products_services", "revenue_model"],
     records: Sequence[SemanticRecord],
 ) -> CoreDimensionAssessment:
     primary = records[0]
     excerpt, anchor = _excerpt_and_anchor(primary)
     evidence_ids = tuple(
         dict.fromkeys(
-            evidence.evidence_id
-            for record in records
-            for evidence in record.evidence
+            evidence.evidence_id for record in records for evidence in record.evidence
         )
     )
     return CoreDimensionAssessment(
@@ -816,9 +849,7 @@ def _answered(
 
 
 def _unanswered(
-    dimension_id: Literal[
-        "principal_business", "products_services", "revenue_model"
-    ],
+    dimension_id: Literal["principal_business", "products_services", "revenue_model"],
     reason: Literal[
         "no_accepted_evidence",
         "overview_lacks_dimension",
@@ -835,8 +866,7 @@ def _unanswered(
 
 def _evidence_report_key(evidence: Sequence[Evidence]) -> str:
     parts = [
-        f"{item.report.report_id}|{item.report.document_version}"
-        for item in evidence
+        f"{item.report.report_id}|{item.report.document_version}" for item in evidence
     ]
     return "|".join(parts) if parts else _PERIOD_UNKNOWN
 
