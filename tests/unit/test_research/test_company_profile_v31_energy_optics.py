@@ -27,8 +27,9 @@ def _compact(value):
 
 @pytest.mark.parametrize("instrument", ["600032.SH", "600071.SH"])
 @pytest.mark.parametrize("page_kind", ["pages", "independent_pages"])
+@pytest.mark.parametrize("repair_version", ["v31", "v32"])
 def test_complete_sources_deliver_bodies_rows_and_roles(
-    tmp_path, instrument, page_kind
+    tmp_path, instrument, page_kind, repair_version
 ):
     fixture = _fixture(instrument)
     query, exported = _drive(
@@ -36,7 +37,7 @@ def test_complete_sources_deliver_bodies_rows_and_roles(
         instrument=instrument,
         fixture=fixture,
         pages=fixture[page_kind],
-        repair_version="v31",
+        repair_version=repair_version,
     )
     assert query == exported
     checkpoint = json.loads(
@@ -123,8 +124,12 @@ def test_complete_sources_deliver_bodies_rows_and_roles(
         )
 
 
-def test_v31_identity_keeps_all_repairs_and_default():
-    identity = {**default_processing_identity(), "revenue_sentence_repair": "v31"}
+@pytest.mark.parametrize("repair_version", ["v31", "v32"])
+def test_repair_identity_keeps_all_repairs_and_default(repair_version):
+    identity = {
+        **default_processing_identity(),
+        "revenue_sentence_repair": repair_version,
+    }
     assert "revenue_sentence_repair" not in default_processing_identity()
     assert all(
         fn(identity)

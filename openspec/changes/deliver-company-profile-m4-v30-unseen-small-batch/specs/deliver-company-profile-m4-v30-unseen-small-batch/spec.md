@@ -62,3 +62,14 @@ The existing owner MUST deliver six substantive bodies, thirty-eight income cond
 
 
 v31首次正式复核补充：正文按原来源实质判断，产品收入列举含期间限定或原主体退出控制／合并时，收入答案也须保留对应限制，不能仅以关键词组命中通过。v31保留50/51、158/159、数字0的正式失败；局部事后补正复用已接受限定上下文，与执行代码哈希／原制品明确区分。当前change保持未归档、后续暂停，等待新的正式复验安排。
+
+### Requirement: v32 formally verifies the accepted state restrictions
+The v32 identity MUST inherit all five repair flags without changing the default identity. Complete owned-page and independent-PDF regressions MUST establish original actor, January/February and loss-of-control/consolidation limits in all three optical-company answer bodies before first formal execution. The same fifty-one substantive source conditions, official versions, plan and cutoff MUST be retained in a new independent directory. The existing owner MUST perform first run-query-export for both companies under a shared 50000-token budget, timed from first execute through second export including retries. Actual five-stage reuse MUST be recorded. Every accepted fact and answered body MUST be assessed once with a dynamic denominator, without pre-filling159 or substituting keyword presence for substance. Prior failures and corrections MUST remain immutable. Both scores100%, zero numeric errors, at most300seconds and budget compliance MUST precede finite submission; A-role acceptance MUST precede main-spec synchronization, archiving or a subsequent batch.
+
+#### Scenario: Former subsidiary limitations reach the final income answer
+- **WHEN** the new first formal delivery lists the limited-period lithium business
+- **THEN** principal-business, products/services and revenue bodies each preserve the original subsidiary, January/February, loss of control and exit from consolidation as disclosed
+
+#### Scenario: Actual formal output determines the review denominator
+- **WHEN** v32 completes run-query-export
+- **THEN** all actual accepted facts and answered bodies receive unique source judgments and the resulting scores determine finite submission or preserved failure

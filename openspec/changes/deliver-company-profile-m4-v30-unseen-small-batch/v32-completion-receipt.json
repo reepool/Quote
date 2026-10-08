@@ -1,0 +1,111 @@
+{
+  "created_at": "2026-10-08T03:20:38.977703+00:00",
+  "cards_completed": [
+    "5.2",
+    "5.3"
+  ],
+  "processing_identity": {
+    "rules": "company_profile_common_core.v1",
+    "owned_page_facts": "v8",
+    "material_input_facts": "v1",
+    "revenue_sentence_repair": "v32"
+  },
+  "source_condition_count": 51,
+  "source_counts": {
+    "substantive_answers": 6,
+    "native_income_cells": 38,
+    "native_roles": 7
+  },
+  "same_substantive_source_conditions": true,
+  "official_frozen_pages": 63,
+  "actual_accepted_fact_count": 153,
+  "answered_text_count": 6,
+  "source_recall": {
+    "status": "assessed",
+    "numerator": 51,
+    "denominator": 51,
+    "value": 1.0
+  },
+  "source_accuracy": {
+    "status": "assessed",
+    "numerator": 159,
+    "denominator": 159,
+    "value": 1.0
+  },
+  "critical_numeric_errors": {
+    "status": "assessed",
+    "value": 0
+  },
+  "whole_round_seconds": 188.69414335954934,
+  "tokens_used": 0,
+  "shared_token_budget": 50000,
+  "actual_runtime_no_reuse": true,
+  "query_export_disk_equal": true,
+  "body_state_evidence": {
+    "principal_business": {
+      "original_actor": true,
+      "january_february": true,
+      "loss_of_control": true,
+      "exit_consolidation": true,
+      "source_pages": [
+        14,
+        15
+      ],
+      "accepted_supports_present": true
+    },
+    "products_services": {
+      "original_actor": true,
+      "january_february": true,
+      "loss_of_control": true,
+      "exit_consolidation": true,
+      "source_pages": [
+        14,
+        15
+      ],
+      "accepted_supports_present": true
+    },
+    "revenue_model": {
+      "original_actor": true,
+      "january_february": true,
+      "loss_of_control": true,
+      "exit_consolidation": true,
+      "source_pages": [
+        14,
+        15
+      ],
+      "accepted_supports_present": true
+    }
+  },
+  "prior_delivery_comparison": {
+    "600032.SH": {
+      "accepted_facts_unchanged": true,
+      "three_answers_unchanged": true
+    },
+    "600071.SH": {
+      "accepted_facts_unchanged": true
+    }
+  },
+  "historical_files_unchanged": 957,
+  "first_delivery_and_source_review_files_unchanged": 19,
+  "execution_code_unchanged": true,
+  "preformal_test": "40 passed,7 warnings",
+  "test_command": "PYTHONPATH=. /home/python/miniconda3/envs/Quote/bin/python -m pytest -q tests/unit/test_research/test_company_profile_v31_energy_optics.py",
+  "preformal_test_log_sha256": "54af02f3b6d1b65c69e6ef5f44ad729ef40d885b6a7f4e026718c9d98dfba599",
+  "checks": {
+    "ruff": "passed",
+    "openspec_strict": "passed",
+    "diff": "passed"
+  },
+  "review": {
+    "blocking_findings": [],
+    "implementation": "Only register v32 in five existing repair switches;use accepted state projection unchanged.",
+    "scope": "Same51source conditions and actual checked evidence;substantive answers,original actors,period/control state,current income columns and action/relation verified.",
+    "unrelated_deferred": "quantity/price,cost,industry,body trimming,dedup,performance,five known failures"
+  },
+  "finite_submission_ready": true,
+  "a_role_acceptance": "pending_finite_review",
+  "change_archived": false,
+  "next_batch": "paused_pending_a_role_review",
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false
+}

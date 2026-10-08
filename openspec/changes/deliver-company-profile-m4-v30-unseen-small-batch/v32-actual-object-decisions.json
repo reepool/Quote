@@ -1,0 +1,5069 @@
+{
+  "600032.SH": {
+    "facts": {
+      "owned:core-ev-9b43a638170ad8b3:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "完整原页连续业务/产品/收入机制或公司提供服务/出租收入事实，逐字与原文相符；子公司与退出控制、方向/论证、条件性会计原则仍按原状态披露。",
+        "source_pages": [
+          12
+        ],
+        "reviewed_object_index": 0,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "报告期内公司从事的业务情况",
+          "value": null,
+          "unit": null,
+          "header": null,
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-0f92cdb5488d534b:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "完整原页连续业务/产品/收入机制或公司提供服务/出租收入事实，逐字与原文相符；子公司与退出控制、方向/论证、条件性会计原则仍按原状态披露。",
+        "source_pages": [
+          265,
+          266,
+          267
+        ],
+        "reviewed_object_index": 1,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "当期产品及服务披露",
+          "value": null,
+          "unit": null,
+          "header": null,
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-e0538a07f7eab6ba:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "完整原页连续业务/产品/收入机制或公司提供服务/出租收入事实，逐字与原文相符；子公司与退出控制、方向/论证、条件性会计原则仍按原状态披露。",
+        "source_pages": [
+          267
+        ],
+        "reviewed_object_index": 2,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "当期产品及服务披露",
+          "value": null,
+          "unit": null,
+          "header": null,
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-9be317ba746e57fa:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "完整原页连续业务/产品/收入机制或公司提供服务/出租收入事实，逐字与原文相符；子公司与退出控制、方向/论证、条件性会计原则仍按原状态披露。",
+        "source_pages": [
+          15
+        ],
+        "reviewed_object_index": 3,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "当期产品及服务披露",
+          "value": null,
+          "unit": null,
+          "header": null,
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-a73571d894903f1d:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "完整原页连续业务/产品/收入机制或公司提供服务/出租收入事实，逐字与原文相符；子公司与退出控制、方向/论证、条件性会计原则仍按原状态披露。",
+        "source_pages": [
+          19
+        ],
+        "reviewed_object_index": 4,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "当期产品及服务披露",
+          "value": null,
+          "unit": null,
+          "header": null,
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-496692a36f743838:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "完整原页连续业务/产品/收入机制或公司提供服务/出租收入事实，逐字与原文相符；子公司与退出控制、方向/论证、条件性会计原则仍按原状态披露。",
+        "source_pages": [
+          20
+        ],
+        "reviewed_object_index": 5,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "当期产品及服务披露",
+          "value": null,
+          "unit": null,
+          "header": null,
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-14d520f3c03a5873:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "完整原页连续业务/产品/收入机制或公司提供服务/出租收入事实，逐字与原文相符；子公司与退出控制、方向/论证、条件性会计原则仍按原状态披露。",
+        "source_pages": [
+          151
+        ],
+        "reviewed_object_index": 6,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "当期产品及服务披露",
+          "value": null,
+          "unit": null,
+          "header": null,
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-79bb683c91cd01e6:commodity:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原产销表当期销售列或明确当期绿证交易收入绑定真实销售；目录未知保持pending，未将数量/收入作量价扩展。",
+        "source_pages": [
+          19
+        ],
+        "reviewed_object_index": 7,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": "sells",
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": "本公司",
+        "source_native": {
+          "name": "绿证",
+          "value": null,
+          "unit": null,
+          "header": "当期绿证交易收入",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        },
+        "recall_role_index": 1
+      },
+      "owned:core-ev-6ee918aa26a86e68:commodity:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原产销表当期销售列或明确当期绿证交易收入绑定真实销售；目录未知保持pending，未将数量/收入作量价扩展。",
+        "source_pages": [
+          20
+        ],
+        "reviewed_object_index": 8,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": "sells",
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": "公司",
+        "source_native": {
+          "name": "风力发电",
+          "value": null,
+          "unit": null,
+          "header": null,
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        },
+        "recall_role_index": 0
+      },
+      "owned:core-ev-6ee918aa26a86e68:commodity:2": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原产销表当期销售列或明确当期绿证交易收入绑定真实销售；目录未知保持pending，未将数量/收入作量价扩展。",
+        "source_pages": [
+          20
+        ],
+        "reviewed_object_index": 9,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": "sells",
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": "公司",
+        "source_native": {
+          "name": "水力发电",
+          "value": null,
+          "unit": null,
+          "header": null,
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-6ee918aa26a86e68:commodity:3": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原产销表当期销售列或明确当期绿证交易收入绑定真实销售；目录未知保持pending，未将数量/收入作量价扩展。",
+        "source_pages": [
+          20
+        ],
+        "reviewed_object_index": 10,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": "sells",
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": "公司",
+        "source_native": {
+          "name": "光伏发电",
+          "value": null,
+          "unit": null,
+          "header": null,
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-1b82cf590ddde18b:segment:industry:新能源发电": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p18及完整续页核原生industry、本期4,815,881,541.26元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24
+        ],
+        "reviewed_object_index": 11,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "新能源发电",
+          "value": "4,815,881,541.26",
+          "unit": "元",
+          "header": null,
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        },
+        "recall_row_index": 0
+      },
+      "owned:core-ev-80da7c1724856961:revenue:industry:新能源发电": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p18及完整续页核原生industry、本期4,815,881,541.26元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24
+        ],
+        "reviewed_object_index": 12,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "新能源发电",
+          "value": "4,815,881,541.26",
+          "unit": "元",
+          "header": null,
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-1b82cf590ddde18b:segment:industry:其他业务": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p18及完整续页核原生industry、本期7,381,323.29元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24
+        ],
+        "reviewed_object_index": 13,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "其他业务",
+          "value": "7,381,323.29",
+          "unit": "元",
+          "header": null,
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        },
+        "recall_row_index": 1
+      },
+      "owned:core-ev-80da7c1724856961:revenue:industry:其他业务": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p18及完整续页核原生industry、本期7,381,323.29元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24
+        ],
+        "reviewed_object_index": 14,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "其他业务",
+          "value": "7,381,323.29",
+          "unit": "元",
+          "header": null,
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-1b82cf590ddde18b:segment:product:水电业务": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p18及完整续页核原生product、本期987,514,388.38元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24
+        ],
+        "reviewed_object_index": 15,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "水电业务",
+          "value": "987,514,388.38",
+          "unit": "元",
+          "header": "主营业务收入",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        },
+        "recall_row_index": 2
+      },
+      "owned:core-ev-80da7c1724856961:revenue:product:水电业务": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p18及完整续页核原生product、本期987,514,388.38元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24
+        ],
+        "reviewed_object_index": 16,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "水电业务",
+          "value": "987,514,388.38",
+          "unit": "元",
+          "header": "主营业务收入",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-1b82cf590ddde18b:segment:product:光伏业务": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p18及完整续页核原生product、本期1,842,714,246.93元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24
+        ],
+        "reviewed_object_index": 17,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "光伏业务",
+          "value": "1,842,714,246.93",
+          "unit": "元",
+          "header": "主营业务收入",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        },
+        "recall_row_index": 3
+      },
+      "owned:core-ev-80da7c1724856961:revenue:product:光伏业务": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p18及完整续页核原生product、本期1,842,714,246.93元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24
+        ],
+        "reviewed_object_index": 18,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "光伏业务",
+          "value": "1,842,714,246.93",
+          "unit": "元",
+          "header": "主营业务收入",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-1b82cf590ddde18b:segment:product:风力业务": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p18及完整续页核原生product、本期1,985,652,905.95元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24
+        ],
+        "reviewed_object_index": 19,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "风力业务",
+          "value": "1,985,652,905.95",
+          "unit": "元",
+          "header": "主营业务收入",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        },
+        "recall_row_index": 4
+      },
+      "owned:core-ev-80da7c1724856961:revenue:product:风力业务": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p18及完整续页核原生product、本期1,985,652,905.95元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24
+        ],
+        "reviewed_object_index": 20,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "风力业务",
+          "value": "1,985,652,905.95",
+          "unit": "元",
+          "header": "主营业务收入",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-1b82cf590ddde18b:segment:product:其他业务": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p18及完整续页核原生product、本期7,381,323.29元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24
+        ],
+        "reviewed_object_index": 21,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "其他业务",
+          "value": "7,381,323.29",
+          "unit": "元",
+          "header": "主营业务收入",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        },
+        "recall_row_index": 5
+      },
+      "owned:core-ev-80da7c1724856961:revenue:product:其他业务": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p18及完整续页核原生product、本期7,381,323.29元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24
+        ],
+        "reviewed_object_index": 22,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "其他业务",
+          "value": "7,381,323.29",
+          "unit": "元",
+          "header": "主营业务收入",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-1b82cf590ddde18b:segment:region:华东：上海市、江苏省、浙江省、安徽省、江西省、山东省、福建省，以及台湾省": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p18及完整续页核原生region、本期2,848,499,223.44元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24
+        ],
+        "reviewed_object_index": 23,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "华东：上海市、江苏省、浙江省、安徽省、江西省、山东省、福建省，以及台湾省",
+          "value": "2,848,499,223.44",
+          "unit": "元",
+          "header": "主营业务收入",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        },
+        "recall_row_index": 6
+      },
+      "owned:core-ev-80da7c1724856961:revenue:region:华东：上海市、江苏省、浙江省、安徽省、江西省、山东省、福建省，以及台湾省": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p18及完整续页核原生region、本期2,848,499,223.44元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24
+        ],
+        "reviewed_object_index": 24,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "华东：上海市、江苏省、浙江省、安徽省、江西省、山东省、福建省，以及台湾省",
+          "value": "2,848,499,223.44",
+          "unit": "元",
+          "header": "主营业务收入",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-1b82cf590ddde18b:segment:region:西北：陕西省、甘肃省、青海省、宁夏回族自治区、新疆维吾尔自治区、内蒙古自治区西部（阿拉善盟、巴彦淖尔市、乌海市、鄂尔多斯市）": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p18及完整续页核原生region、本期1,553,550,569.34元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24
+        ],
+        "reviewed_object_index": 25,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "西北：陕西省、甘肃省、青海省、宁夏回族自治区、新疆维吾尔自治区、内蒙古自治区西部（阿拉善盟、巴彦淖尔市、乌海市、鄂尔多斯市）",
+          "value": "1,553,550,569.34",
+          "unit": "元",
+          "header": "主营业务收入",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        },
+        "recall_row_index": 7
+      },
+      "owned:core-ev-80da7c1724856961:revenue:region:西北：陕西省、甘肃省、青海省、宁夏回族自治区、新疆维吾尔自治区、内蒙古自治区西部（阿拉善盟、巴彦淖尔市、乌海市、鄂尔多斯市）": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p18及完整续页核原生region、本期1,553,550,569.34元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24
+        ],
+        "reviewed_object_index": 26,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "西北：陕西省、甘肃省、青海省、宁夏回族自治区、新疆维吾尔自治区、内蒙古自治区西部（阿拉善盟、巴彦淖尔市、乌海市、鄂尔多斯市）",
+          "value": "1,553,550,569.34",
+          "unit": "元",
+          "header": "主营业务收入",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-1b82cf590ddde18b:segment:region:华北：北京市、天津市、河北省、山西省、内蒙古自治区中部": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p18及完整续页核原生region、本期29,190,632.38元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24
+        ],
+        "reviewed_object_index": 27,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "华北：北京市、天津市、河北省、山西省、内蒙古自治区中部",
+          "value": "29,190,632.38",
+          "unit": "元",
+          "header": "主营业务收入",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        },
+        "recall_row_index": 8
+      },
+      "owned:core-ev-80da7c1724856961:revenue:region:华北：北京市、天津市、河北省、山西省、内蒙古自治区中部": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p18及完整续页核原生region、本期29,190,632.38元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24
+        ],
+        "reviewed_object_index": 28,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "华北：北京市、天津市、河北省、山西省、内蒙古自治区中部",
+          "value": "29,190,632.38",
+          "unit": "元",
+          "header": "主营业务收入",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-1b82cf590ddde18b:segment:region:西南：重庆市、四川省、贵州省、云南省、西藏自治区": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p18及完整续页核原生region、本期286,716,719.55元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24
+        ],
+        "reviewed_object_index": 29,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "西南：重庆市、四川省、贵州省、云南省、西藏自治区",
+          "value": "286,716,719.55",
+          "unit": "元",
+          "header": "主营业务收入",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        },
+        "recall_row_index": 9
+      },
+      "owned:core-ev-80da7c1724856961:revenue:region:西南：重庆市、四川省、贵州省、云南省、西藏自治区": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p18及完整续页核原生region、本期286,716,719.55元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24
+        ],
+        "reviewed_object_index": 30,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "西南：重庆市、四川省、贵州省、云南省、西藏自治区",
+          "value": "286,716,719.55",
+          "unit": "元",
+          "header": "主营业务收入",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-1b82cf590ddde18b:segment:region:华中：河南省、湖北省、湖南省": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p19及完整续页核原生region、本期989,863.17元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24
+        ],
+        "reviewed_object_index": 31,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "华中：河南省、湖北省、湖南省",
+          "value": "989,863.17",
+          "unit": "元",
+          "header": "主营业务收入",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        },
+        "recall_row_index": 10
+      },
+      "owned:core-ev-80da7c1724856961:revenue:region:华中：河南省、湖北省、湖南省": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p19及完整续页核原生region、本期989,863.17元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24
+        ],
+        "reviewed_object_index": 32,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "华中：河南省、湖北省、湖南省",
+          "value": "989,863.17",
+          "unit": "元",
+          "header": "主营业务收入",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-1b82cf590ddde18b:segment:region:东北：黑龙江省、吉林省、辽宁省、内蒙古自治区东部": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p19及完整续页核原生region、本期104,315,856.67元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24
+        ],
+        "reviewed_object_index": 33,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "东北：黑龙江省、吉林省、辽宁省、内蒙古自治区东部",
+          "value": "104,315,856.67",
+          "unit": "元",
+          "header": "主营业务收入",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        },
+        "recall_row_index": 11
+      },
+      "owned:core-ev-80da7c1724856961:revenue:region:东北：黑龙江省、吉林省、辽宁省、内蒙古自治区东部": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p19及完整续页核原生region、本期104,315,856.67元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24
+        ],
+        "reviewed_object_index": 34,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "东北：黑龙江省、吉林省、辽宁省、内蒙古自治区东部",
+          "value": "104,315,856.67",
+          "unit": "元",
+          "header": "主营业务收入",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-01f5b34710e3a122:Segment:business_type:主营业务:营业收入": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p221及完整续页核原生business_type、本期4,823,262,864.55元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          221
+        ],
+        "reviewed_object_index": 35,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "主营业务",
+          "value": "4,823,262,864.55",
+          "unit": "元",
+          "header": "营业收入",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        },
+        "recall_row_index": 12
+      },
+      "owned:core-ev-1b5fd9dc7a85de83:Measurement:business_type:主营业务:营业收入": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p221及完整续页核原生business_type、本期4,823,262,864.55元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          221
+        ],
+        "reviewed_object_index": 36,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "主营业务",
+          "value": "4,823,262,864.55",
+          "unit": "元",
+          "header": "营业收入",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-01f5b34710e3a122:Segment:business_type:其他业务:营业收入": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p221及完整续页核原生business_type、本期52,892,062.76元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          221
+        ],
+        "reviewed_object_index": 37,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "其他业务",
+          "value": "52,892,062.76",
+          "unit": "元",
+          "header": "营业收入",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        },
+        "recall_row_index": 13
+      },
+      "owned:core-ev-1b5fd9dc7a85de83:Measurement:business_type:其他业务:营业收入": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p221及完整续页核原生business_type、本期52,892,062.76元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          221
+        ],
+        "reviewed_object_index": 38,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "其他业务",
+          "value": "52,892,062.76",
+          "unit": "元",
+          "header": "营业收入",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-3eb99a6c78ef883e:Segment:business_type:主营业务:营业收入": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p221及完整续页核原生business_type、本期4,823,262,864.55元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          221,
+          222
+        ],
+        "reviewed_object_index": 39,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "主营业务",
+          "value": "4,823,262,864.55",
+          "unit": "元",
+          "header": "营业收入",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-3eb99a6c78ef883e:Segment:product:水电业务:全部营业收入/商品类型/主营业务": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p18及完整续页核原生product、本期987,514,388.38元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          221,
+          222
+        ],
+        "reviewed_object_index": 40,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "水电业务",
+          "value": "987,514,388.38",
+          "unit": "元",
+          "header": "全部营业收入/商品类型/主营业务",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-61e96c3f76d85380:Measurement:product:水电业务:全部营业收入/商品类型/主营业务": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p18及完整续页核原生product、本期987,514,388.38元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          221,
+          222
+        ],
+        "reviewed_object_index": 41,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "水电业务",
+          "value": "987,514,388.38",
+          "unit": "元",
+          "header": "全部营业收入/商品类型/主营业务",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-3eb99a6c78ef883e:Segment:product:光伏业务:全部营业收入/商品类型/主营业务": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p18及完整续页核原生product、本期1,842,714,246.93元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          221,
+          222
+        ],
+        "reviewed_object_index": 42,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "光伏业务",
+          "value": "1,842,714,246.93",
+          "unit": "元",
+          "header": "全部营业收入/商品类型/主营业务",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-61e96c3f76d85380:Measurement:product:光伏业务:全部营业收入/商品类型/主营业务": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p18及完整续页核原生product、本期1,842,714,246.93元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          221,
+          222
+        ],
+        "reviewed_object_index": 43,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "光伏业务",
+          "value": "1,842,714,246.93",
+          "unit": "元",
+          "header": "全部营业收入/商品类型/主营业务",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-3eb99a6c78ef883e:Segment:product:风力业务:全部营业收入/商品类型/主营业务": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p18及完整续页核原生product、本期1,985,652,905.95元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          221,
+          222
+        ],
+        "reviewed_object_index": 44,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "风力业务",
+          "value": "1,985,652,905.95",
+          "unit": "元",
+          "header": "全部营业收入/商品类型/主营业务",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-61e96c3f76d85380:Measurement:product:风力业务:全部营业收入/商品类型/主营业务": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p18及完整续页核原生product、本期1,985,652,905.95元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          221,
+          222
+        ],
+        "reviewed_object_index": 45,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "风力业务",
+          "value": "1,985,652,905.95",
+          "unit": "元",
+          "header": "全部营业收入/商品类型/主营业务",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-3eb99a6c78ef883e:Segment:product:其他:全部营业收入/商品类型/主营业务": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p221商品类型1.主营业务下其他本期7,381,323.29元，为绿证；与2.其他业务父项及13,289,760.20元其他子项分开。",
+        "source_pages": [
+          221,
+          222
+        ],
+        "reviewed_object_index": 46,
+        "checks": {
+          "actor": true,
+          "action_relation": "主营内其他",
+          "native_label": "其中层级原文保留",
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "其他",
+          "value": "7,381,323.29",
+          "unit": "元",
+          "header": "全部营业收入/商品类型/主营业务",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-61e96c3f76d85380:Measurement:product:其他:全部营业收入/商品类型/主营业务": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p221商品类型1.主营业务下其他本期7,381,323.29元，为绿证；与2.其他业务父项及13,289,760.20元其他子项分开。",
+        "source_pages": [
+          221,
+          222
+        ],
+        "reviewed_object_index": 47,
+        "checks": {
+          "actor": true,
+          "action_relation": "主营内其他",
+          "native_label": "其中层级原文保留",
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "其他",
+          "value": "7,381,323.29",
+          "unit": "元",
+          "header": "全部营业收入/商品类型/主营业务",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-3eb99a6c78ef883e:Segment:business_type:其他业务:营业收入": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p221及完整续页核原生business_type、本期52,892,062.76元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          221,
+          222
+        ],
+        "reviewed_object_index": 48,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "其他业务",
+          "value": "52,892,062.76",
+          "unit": "元",
+          "header": "营业收入",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-3eb99a6c78ef883e:Segment:product:提供劳务:全部营业收入/商品类型/其他业务": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p221及完整续页核原生product、本期39,602,302.56元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          221,
+          222
+        ],
+        "reviewed_object_index": 49,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "提供劳务",
+          "value": "39,602,302.56",
+          "unit": "元",
+          "header": "全部营业收入/商品类型/其他业务",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        },
+        "recall_row_index": 14
+      },
+      "owned:core-ev-61e96c3f76d85380:Measurement:product:提供劳务:全部营业收入/商品类型/其他业务": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p221及完整续页核原生product、本期39,602,302.56元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          221,
+          222
+        ],
+        "reviewed_object_index": 50,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "提供劳务",
+          "value": "39,602,302.56",
+          "unit": "元",
+          "header": "全部营业收入/商品类型/其他业务",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-3eb99a6c78ef883e:Segment:product:其他:全部营业收入/商品类型/其他业务": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p221及完整续页核原生product、本期13,289,760.20元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          221,
+          222
+        ],
+        "reviewed_object_index": 51,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "其他",
+          "value": "13,289,760.20",
+          "unit": "元",
+          "header": "全部营业收入/商品类型/其他业务",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        },
+        "recall_row_index": 15
+      },
+      "owned:core-ev-61e96c3f76d85380:Measurement:product:其他:全部营业收入/商品类型/其他业务": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p221及完整续页核原生product、本期13,289,760.20元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          221,
+          222
+        ],
+        "reviewed_object_index": 52,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "其他",
+          "value": "13,289,760.20",
+          "unit": "元",
+          "header": "全部营业收入/商品类型/其他业务",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-3eb99a6c78ef883e:Segment:region:华东地区:全部营业收入/经营地区": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p18及完整续页核原生region、本期2,848,499,223.44元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          221,
+          222
+        ],
+        "reviewed_object_index": 53,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "华东地区",
+          "value": "2,848,499,223.44",
+          "unit": "元",
+          "header": "全部营业收入/经营地区",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-61e96c3f76d85380:Measurement:region:华东地区:全部营业收入/经营地区": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p18及完整续页核原生region、本期2,848,499,223.44元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          221,
+          222
+        ],
+        "reviewed_object_index": 54,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "华东地区",
+          "value": "2,848,499,223.44",
+          "unit": "元",
+          "header": "全部营业收入/经营地区",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-3eb99a6c78ef883e:Segment:region:西北地区:全部营业收入/经营地区": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p18及完整续页核原生region、本期1,553,550,569.34元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          221,
+          222
+        ],
+        "reviewed_object_index": 55,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "西北地区",
+          "value": "1,553,550,569.34",
+          "unit": "元",
+          "header": "全部营业收入/经营地区",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-61e96c3f76d85380:Measurement:region:西北地区:全部营业收入/经营地区": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p18及完整续页核原生region、本期1,553,550,569.34元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          221,
+          222
+        ],
+        "reviewed_object_index": 56,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "西北地区",
+          "value": "1,553,550,569.34",
+          "unit": "元",
+          "header": "全部营业收入/经营地区",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-3eb99a6c78ef883e:Segment:region:华北地区:全部营业收入/经营地区": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p18及完整续页核原生region、本期29,190,632.38元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          221,
+          222
+        ],
+        "reviewed_object_index": 57,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "华北地区",
+          "value": "29,190,632.38",
+          "unit": "元",
+          "header": "全部营业收入/经营地区",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-61e96c3f76d85380:Measurement:region:华北地区:全部营业收入/经营地区": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p18及完整续页核原生region、本期29,190,632.38元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          221,
+          222
+        ],
+        "reviewed_object_index": 58,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "华北地区",
+          "value": "29,190,632.38",
+          "unit": "元",
+          "header": "全部营业收入/经营地区",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-3eb99a6c78ef883e:Segment:region:西南地区:全部营业收入/经营地区": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p18及完整续页核原生region、本期286,716,719.55元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          221,
+          222
+        ],
+        "reviewed_object_index": 59,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "西南地区",
+          "value": "286,716,719.55",
+          "unit": "元",
+          "header": "全部营业收入/经营地区",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-61e96c3f76d85380:Measurement:region:西南地区:全部营业收入/经营地区": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p18及完整续页核原生region、本期286,716,719.55元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          221,
+          222
+        ],
+        "reviewed_object_index": 60,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "西南地区",
+          "value": "286,716,719.55",
+          "unit": "元",
+          "header": "全部营业收入/经营地区",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-3eb99a6c78ef883e:Segment:region:华中地区:全部营业收入/经营地区": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p19及完整续页核原生region、本期989,863.17元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          221,
+          222
+        ],
+        "reviewed_object_index": 61,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "华中地区",
+          "value": "989,863.17",
+          "unit": "元",
+          "header": "全部营业收入/经营地区",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-61e96c3f76d85380:Measurement:region:华中地区:全部营业收入/经营地区": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p19及完整续页核原生region、本期989,863.17元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          221,
+          222
+        ],
+        "reviewed_object_index": 62,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "华中地区",
+          "value": "989,863.17",
+          "unit": "元",
+          "header": "全部营业收入/经营地区",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-3eb99a6c78ef883e:Segment:region:东北地区:全部营业收入/经营地区": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p19及完整续页核原生region、本期104,315,856.67元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          221,
+          222
+        ],
+        "reviewed_object_index": 63,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "东北地区",
+          "value": "104,315,856.67",
+          "unit": "元",
+          "header": "全部营业收入/经营地区",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-61e96c3f76d85380:Measurement:region:东北地区:全部营业收入/经营地区": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p19及完整续页核原生region、本期104,315,856.67元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          221,
+          222
+        ],
+        "reviewed_object_index": 64,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "东北地区",
+          "value": "104,315,856.67",
+          "unit": "元",
+          "header": "全部营业收入/经营地区",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-3eb99a6c78ef883e:Segment:revenue_timing:在某一时点确认:收入确认时点/主营业务": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p221按商品转让时间分类的本期首收入列；主/其他业务父项独立，确认时点不是地区或销售模式。",
+        "source_pages": [
+          221,
+          222
+        ],
+        "reviewed_object_index": 65,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "在某一时点确认",
+          "value": "4,823,262,864.55",
+          "unit": "元",
+          "header": "收入确认时点/主营业务",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-61e96c3f76d85380:Measurement:revenue_timing:在某一时点确认:收入确认时点/主营业务": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p221按商品转让时间分类的本期首收入列；主/其他业务父项独立，确认时点不是地区或销售模式。",
+        "source_pages": [
+          221,
+          222
+        ],
+        "reviewed_object_index": 66,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "在某一时点确认",
+          "value": "4,823,262,864.55",
+          "unit": "元",
+          "header": "收入确认时点/主营业务",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-3eb99a6c78ef883e:Segment:revenue_timing:在某一时点确认:收入确认时点/其他业务": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p221按商品转让时间分类的本期首收入列；主/其他业务父项独立，确认时点不是地区或销售模式。",
+        "source_pages": [
+          221,
+          222
+        ],
+        "reviewed_object_index": 67,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "在某一时点确认",
+          "value": "52,892,062.76",
+          "unit": "元",
+          "header": "收入确认时点/其他业务",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-61e96c3f76d85380:Measurement:revenue_timing:在某一时点确认:收入确认时点/其他业务": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p221按商品转让时间分类的本期首收入列；主/其他业务父项独立，确认时点不是地区或销售模式。",
+        "source_pages": [
+          221,
+          222
+        ],
+        "reviewed_object_index": 68,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "在某一时点确认",
+          "value": "52,892,062.76",
+          "unit": "元",
+          "header": "收入确认时点/其他业务",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-3eb99a6c78ef883e:Segment:product:固定资产试运行销售:固定资产试运行销售收入": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p222及完整续页核原生product、本期203,960,403.42元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          221,
+          222
+        ],
+        "reviewed_object_index": 69,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "固定资产试运行销售",
+          "value": "203,960,403.42",
+          "unit": "元",
+          "header": "固定资产试运行销售收入",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        },
+        "recall_row_index": 19
+      },
+      "owned:core-ev-61e96c3f76d85380:Measurement:product:固定资产试运行销售:固定资产试运行销售收入": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p222及完整续页核原生product、本期203,960,403.42元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          221,
+          222
+        ],
+        "reviewed_object_index": 70,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "固定资产试运行销售",
+          "value": "203,960,403.42",
+          "unit": "元",
+          "header": "固定资产试运行销售收入",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-f515d08a9c672e47:Segment:business_type:主营业务:营业收入": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p221及完整续页核原生business_type、本期4,823,262,864.55元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          221,
+          222
+        ],
+        "reviewed_object_index": 71,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "主营业务",
+          "value": "4,823,262,864.55",
+          "unit": "元",
+          "header": "营业收入",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-f515d08a9c672e47:Segment:product:水电业务:全部营业收入/商品类型/主营业务": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p18及完整续页核原生product、本期987,514,388.38元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          221,
+          222
+        ],
+        "reviewed_object_index": 72,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "水电业务",
+          "value": "987,514,388.38",
+          "unit": "元",
+          "header": "全部营业收入/商品类型/主营业务",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-f515d08a9c672e47:Segment:product:光伏业务:全部营业收入/商品类型/主营业务": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p18及完整续页核原生product、本期1,842,714,246.93元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          221,
+          222
+        ],
+        "reviewed_object_index": 73,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "光伏业务",
+          "value": "1,842,714,246.93",
+          "unit": "元",
+          "header": "全部营业收入/商品类型/主营业务",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-f515d08a9c672e47:Segment:product:风力业务:全部营业收入/商品类型/主营业务": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p18及完整续页核原生product、本期1,985,652,905.95元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          221,
+          222
+        ],
+        "reviewed_object_index": 74,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "风力业务",
+          "value": "1,985,652,905.95",
+          "unit": "元",
+          "header": "全部营业收入/商品类型/主营业务",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-f515d08a9c672e47:Segment:product:其他:全部营业收入/商品类型/主营业务": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p221商品类型1.主营业务下其他本期7,381,323.29元，为绿证；与2.其他业务父项及13,289,760.20元其他子项分开。",
+        "source_pages": [
+          221,
+          222
+        ],
+        "reviewed_object_index": 75,
+        "checks": {
+          "actor": true,
+          "action_relation": "主营内其他",
+          "native_label": "其中层级原文保留",
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "其他",
+          "value": "7,381,323.29",
+          "unit": "元",
+          "header": "全部营业收入/商品类型/主营业务",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-f515d08a9c672e47:Segment:business_type:其他业务:营业收入": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p221及完整续页核原生business_type、本期52,892,062.76元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          221,
+          222
+        ],
+        "reviewed_object_index": 76,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "其他业务",
+          "value": "52,892,062.76",
+          "unit": "元",
+          "header": "营业收入",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-f515d08a9c672e47:Segment:product:提供劳务:全部营业收入/商品类型/其他业务": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p221及完整续页核原生product、本期39,602,302.56元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          221,
+          222
+        ],
+        "reviewed_object_index": 77,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "提供劳务",
+          "value": "39,602,302.56",
+          "unit": "元",
+          "header": "全部营业收入/商品类型/其他业务",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-f515d08a9c672e47:Segment:product:其他:全部营业收入/商品类型/其他业务": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p221及完整续页核原生product、本期13,289,760.20元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          221,
+          222
+        ],
+        "reviewed_object_index": 78,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "其他",
+          "value": "13,289,760.20",
+          "unit": "元",
+          "header": "全部营业收入/商品类型/其他业务",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-f515d08a9c672e47:Segment:region:华东地区:全部营业收入/经营地区": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p18及完整续页核原生region、本期2,848,499,223.44元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          221,
+          222
+        ],
+        "reviewed_object_index": 79,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "华东地区",
+          "value": "2,848,499,223.44",
+          "unit": "元",
+          "header": "全部营业收入/经营地区",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-f515d08a9c672e47:Segment:region:西北地区:全部营业收入/经营地区": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p18及完整续页核原生region、本期1,553,550,569.34元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          221,
+          222
+        ],
+        "reviewed_object_index": 80,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "西北地区",
+          "value": "1,553,550,569.34",
+          "unit": "元",
+          "header": "全部营业收入/经营地区",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-f515d08a9c672e47:Segment:region:华北地区:全部营业收入/经营地区": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p18及完整续页核原生region、本期29,190,632.38元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          221,
+          222
+        ],
+        "reviewed_object_index": 81,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "华北地区",
+          "value": "29,190,632.38",
+          "unit": "元",
+          "header": "全部营业收入/经营地区",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-f515d08a9c672e47:Segment:region:西南地区:全部营业收入/经营地区": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p18及完整续页核原生region、本期286,716,719.55元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          221,
+          222
+        ],
+        "reviewed_object_index": 82,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "西南地区",
+          "value": "286,716,719.55",
+          "unit": "元",
+          "header": "全部营业收入/经营地区",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-f515d08a9c672e47:Segment:region:华中地区:全部营业收入/经营地区": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p19及完整续页核原生region、本期989,863.17元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          221,
+          222
+        ],
+        "reviewed_object_index": 83,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "华中地区",
+          "value": "989,863.17",
+          "unit": "元",
+          "header": "全部营业收入/经营地区",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-f515d08a9c672e47:Segment:region:东北地区:全部营业收入/经营地区": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p19及完整续页核原生region、本期104,315,856.67元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          221,
+          222
+        ],
+        "reviewed_object_index": 84,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "东北地区",
+          "value": "104,315,856.67",
+          "unit": "元",
+          "header": "全部营业收入/经营地区",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-f515d08a9c672e47:Segment:revenue_timing:在某一时点确认:收入确认时点/主营业务": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p221按商品转让时间分类的本期首收入列；主/其他业务父项独立，确认时点不是地区或销售模式。",
+        "source_pages": [
+          221,
+          222
+        ],
+        "reviewed_object_index": 85,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "在某一时点确认",
+          "value": "4,823,262,864.55",
+          "unit": "元",
+          "header": "收入确认时点/主营业务",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-f515d08a9c672e47:Segment:revenue_timing:在某一时点确认:收入确认时点/其他业务": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p221按商品转让时间分类的本期首收入列；主/其他业务父项独立，确认时点不是地区或销售模式。",
+        "source_pages": [
+          221,
+          222
+        ],
+        "reviewed_object_index": 86,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "在某一时点确认",
+          "value": "52,892,062.76",
+          "unit": "元",
+          "header": "收入确认时点/其他业务",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-f515d08a9c672e47:Segment:product:固定资产试运行销售:固定资产试运行销售收入": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p222及完整续页核原生product、本期203,960,403.42元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          221,
+          222
+        ],
+        "reviewed_object_index": 87,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "固定资产试运行销售",
+          "value": "203,960,403.42",
+          "unit": "元",
+          "header": "固定资产试运行销售收入",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-cc5458a0b58797c6:Segment:business_type:主营业务:营业收入": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p323及完整续页核原生business_type、本期7,016,743.35元；主体母公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          308,
+          323
+        ],
+        "reviewed_object_index": 88,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "issuer",
+        "source_actor": null,
+        "source_native": {
+          "name": "主营业务",
+          "value": "7,016,743.35",
+          "unit": "元",
+          "header": "营业收入",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        },
+        "recall_row_index": 20
+      },
+      "owned:core-ev-858c5914b6db0551:Measurement:business_type:主营业务:营业收入": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p323及完整续页核原生business_type、本期7,016,743.35元；主体母公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          308,
+          323
+        ],
+        "reviewed_object_index": 89,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "issuer",
+        "source_actor": null,
+        "source_native": {
+          "name": "主营业务",
+          "value": "7,016,743.35",
+          "unit": "元",
+          "header": "营业收入",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-cc5458a0b58797c6:Segment:business_type:其他业务:营业收入": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p323及完整续页核原生business_type、本期19,763,734.04元；主体母公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          308,
+          323
+        ],
+        "reviewed_object_index": 90,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "issuer",
+        "source_actor": null,
+        "source_native": {
+          "name": "其他业务",
+          "value": "19,763,734.04",
+          "unit": "元",
+          "header": "营业收入",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        },
+        "recall_row_index": 21
+      },
+      "owned:core-ev-858c5914b6db0551:Measurement:business_type:其他业务:营业收入": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p323及完整续页核原生business_type、本期19,763,734.04元；主体母公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          308,
+          323
+        ],
+        "reviewed_object_index": 91,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "issuer",
+        "source_actor": null,
+        "source_native": {
+          "name": "其他业务",
+          "value": "19,763,734.04",
+          "unit": "元",
+          "header": "营业收入",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-84ea3df3eb049f2b:Segment:product:风电:电力行业电量、收入及成本": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p31及完整续页核原生product、本期19.86亿元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          31
+        ],
+        "reviewed_object_index": 92,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "风电",
+          "value": "19.86",
+          "unit": "亿元",
+          "header": "电力行业电量、收入及成本",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        },
+        "recall_row_index": 16
+      },
+      "owned:core-ev-bb43c4be18d264ed:Measurement:product:风电:电力行业电量、收入及成本": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p31及完整续页核原生product、本期19.86亿元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          31
+        ],
+        "reviewed_object_index": 93,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "风电",
+          "value": "19.86",
+          "unit": "亿元",
+          "header": "电力行业电量、收入及成本",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-84ea3df3eb049f2b:Segment:product:水电:电力行业电量、收入及成本": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p31及完整续页核原生product、本期9.88亿元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          31
+        ],
+        "reviewed_object_index": 94,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "水电",
+          "value": "9.88",
+          "unit": "亿元",
+          "header": "电力行业电量、收入及成本",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        },
+        "recall_row_index": 17
+      },
+      "owned:core-ev-bb43c4be18d264ed:Measurement:product:水电:电力行业电量、收入及成本": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p31及完整续页核原生product、本期9.88亿元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          31
+        ],
+        "reviewed_object_index": 95,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "水电",
+          "value": "9.88",
+          "unit": "亿元",
+          "header": "电力行业电量、收入及成本",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-84ea3df3eb049f2b:Segment:product:光伏发电:电力行业电量、收入及成本": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p31及完整续页核原生product、本期18.43亿元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          31
+        ],
+        "reviewed_object_index": 96,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "光伏发电",
+          "value": "18.43",
+          "unit": "亿元",
+          "header": "电力行业电量、收入及成本",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        },
+        "recall_row_index": 18
+      },
+      "owned:core-ev-bb43c4be18d264ed:Measurement:product:光伏发电:电力行业电量、收入及成本": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p31及完整续页核原生product、本期18.43亿元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          31
+        ],
+        "reviewed_object_index": 97,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "光伏发电",
+          "value": "18.43",
+          "unit": "亿元",
+          "header": "电力行业电量、收入及成本",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-f1c92f1810d87d10:Segment:service:管理服务费:出售商品/提供劳务/本期发生额": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p267及完整续页核原生service、本期1,132,075.48元；主体本公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          265,
+          266,
+          267
+        ],
+        "reviewed_object_index": 98,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "管理服务费",
+          "value": "1,132,075.48",
+          "unit": "元",
+          "header": "出售商品/提供劳务/本期发生额",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        },
+        "recall_row_index": 22
+      },
+      "owned:core-ev-a1d16c54e44baef4:Measurement:service:管理服务费:出售商品/提供劳务/本期发生额": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p267及完整续页核原生service、本期1,132,075.48元；主体本公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          265,
+          266,
+          267
+        ],
+        "reviewed_object_index": 99,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "管理服务费",
+          "value": "1,132,075.48",
+          "unit": "元",
+          "header": "出售商品/提供劳务/本期发生额",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-b6dae7ffb560d241:Segment:lease:房屋及建筑物:本公司作为出租方/本期确认的租赁收入": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p267及完整续页核原生lease、本期100,000.00元；主体本公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          267
+        ],
+        "reviewed_object_index": 100,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "房屋及建筑物",
+          "value": "100,000.00",
+          "unit": "元",
+          "header": "本公司作为出租方/本期确认的租赁收入",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        },
+        "recall_row_index": 23
+      },
+      "owned:core-ev-407caf6ca15e9d5e:Measurement:lease:房屋及建筑物:本公司作为出租方/本期确认的租赁收入": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p267及完整续页核原生lease、本期100,000.00元；主体本公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          267
+        ],
+        "reviewed_object_index": 101,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "房屋及建筑物",
+          "value": "100,000.00",
+          "unit": "元",
+          "header": "本公司作为出租方/本期确认的租赁收入",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-b6dae7ffb560d241:Segment:lease:机器设备:本公司作为出租方/本期确认的租赁收入": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p267及完整续页核原生lease、本期1,993,903.68元；主体本公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          267
+        ],
+        "reviewed_object_index": 102,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "机器设备",
+          "value": "1,993,903.68",
+          "unit": "元",
+          "header": "本公司作为出租方/本期确认的租赁收入",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        },
+        "recall_row_index": 24
+      },
+      "owned:core-ev-407caf6ca15e9d5e:Measurement:lease:机器设备:本公司作为出租方/本期确认的租赁收入": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p267及完整续页核原生lease、本期1,993,903.68元；主体本公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          267
+        ],
+        "reviewed_object_index": 103,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "机器设备",
+          "value": "1,993,903.68",
+          "unit": "元",
+          "header": "本公司作为出租方/本期确认的租赁收入",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      }
+    },
+    "answers": {
+      "principal_business": {
+        "accurate": true,
+        "answered": true,
+        "failed_substance_groups": [],
+        "bad_supports": [],
+        "missing_original_state_limits": [],
+        "reason": "可再生能源投资开发建设运营管理，风/光/水当前主业；氢能储能保留业务方向/论证状态，不能当成已运营项目。；原文实质及主体、方向/期间/退出状态逐项核正文，关键词通过不代替限制。"
+      },
+      "products_services": {
+        "accurate": true,
+        "answered": true,
+        "failed_substance_groups": [],
+        "bad_supports": [],
+        "missing_original_state_limits": [],
+        "reason": "主要产品电力，三类发电、当期绿证交易及劳务/招待所服务；分布式电量区分自用与向用户销售，设备/安装只能保留p151会计政策披露范围，不据此猜设备种类。；原文实质及主体、方向/期间/退出状态逐项核正文，关键词通过不代替限制。"
+      },
+      "revenue_model": {
+        "accurate": true,
+        "answered": true,
+        "failed_substance_groups": [],
+        "bad_supports": [],
+        "missing_original_state_limits": [],
+        "reason": "电力销售为主要利润来源，电网及用户月度实际电量×合同电价，电力市场中长期/现货/绿电与绿证交易，当期劳务等其他收入；确认时点不冒充渠道。；原文实质及主体、方向/期间/退出状态逐项核正文，关键词通过不代替限制。"
+      }
+    }
+  },
+  "600071.SH": {
+    "facts": {
+      "owned:core-ev-bb266ed26e53f361:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "完整原页连续业务/产品/收入机制或公司提供服务/出租收入事实，逐字与原文相符；子公司与退出控制、方向/论证、条件性会计原则仍按原状态披露。",
+        "source_pages": [
+          8,
+          9
+        ],
+        "reviewed_object_index": 0,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "报告期内公司从事的业务情况",
+          "value": null,
+          "unit": null,
+          "header": null,
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-30b25d36686fd1b7:activity:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p8–9公司当前镜头/显微镜产品矩阵；原文联合列举保留，不由技术参数/下游用途或研发样机推经营/销售。",
+        "source_pages": [
+          8,
+          9
+        ],
+        "reviewed_object_index": 1,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": "operates",
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": "公司",
+        "source_native": {
+          "name": "生物显微镜",
+          "value": null,
+          "unit": null,
+          "header": null,
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-30b25d36686fd1b7:activity:2": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p8–9公司当前镜头/显微镜产品矩阵；原文联合列举保留，不由技术参数/下游用途或研发样机推经营/销售。",
+        "source_pages": [
+          8,
+          9
+        ],
+        "reviewed_object_index": 2,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": "operates",
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": "公司",
+        "source_native": {
+          "name": "荧光显微镜",
+          "value": null,
+          "unit": null,
+          "header": null,
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-30b25d36686fd1b7:activity:3": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p8–9公司当前镜头/显微镜产品矩阵；原文联合列举保留，不由技术参数/下游用途或研发样机推经营/销售。",
+        "source_pages": [
+          8,
+          9
+        ],
+        "reviewed_object_index": 3,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": "operates",
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": "公司",
+        "source_native": {
+          "name": "数码显微镜",
+          "value": null,
+          "unit": null,
+          "header": null,
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-30b25d36686fd1b7:activity:4": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p8–9公司当前镜头/显微镜产品矩阵；原文联合列举保留，不由技术参数/下游用途或研发样机推经营/销售。",
+        "source_pages": [
+          8,
+          9
+        ],
+        "reviewed_object_index": 4,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": "operates",
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": "公司",
+        "source_native": {
+          "name": "偏光显微镜",
+          "value": null,
+          "unit": null,
+          "header": null,
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-30b25d36686fd1b7:activity:5": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p8–9公司当前镜头/显微镜产品矩阵；原文联合列举保留，不由技术参数/下游用途或研发样机推经营/销售。",
+        "source_pages": [
+          8,
+          9
+        ],
+        "reviewed_object_index": 5,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": "operates",
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": "公司",
+        "source_native": {
+          "name": "体视显微镜及工业显微镜",
+          "value": null,
+          "unit": null,
+          "header": null,
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-30b25d36686fd1b7:activity:6": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p8–9公司当前镜头/显微镜产品矩阵；原文联合列举保留，不由技术参数/下游用途或研发样机推经营/销售。",
+        "source_pages": [
+          8,
+          9
+        ],
+        "reviewed_object_index": 6,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": "operates",
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": "公司",
+        "source_native": {
+          "name": "安防视频监控镜头",
+          "value": null,
+          "unit": null,
+          "header": null,
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-30b25d36686fd1b7:activity:7": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p8–9公司当前镜头/显微镜产品矩阵；原文联合列举保留，不由技术参数/下游用途或研发样机推经营/销售。",
+        "source_pages": [
+          8,
+          9
+        ],
+        "reviewed_object_index": 7,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": "operates",
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": "公司",
+        "source_native": {
+          "name": "激光雷达镜头",
+          "value": null,
+          "unit": null,
+          "header": null,
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-30b25d36686fd1b7:activity:8": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p8–9公司当前镜头/显微镜产品矩阵；原文联合列举保留，不由技术参数/下游用途或研发样机推经营/销售。",
+        "source_pages": [
+          8,
+          9
+        ],
+        "reviewed_object_index": 8,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": "operates",
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": "公司",
+        "source_native": {
+          "name": "机器视觉镜头",
+          "value": null,
+          "unit": null,
+          "header": null,
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-30b25d36686fd1b7:activity:9": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p8–9公司当前镜头/显微镜产品矩阵；原文联合列举保留，不由技术参数/下游用途或研发样机推经营/销售。",
+        "source_pages": [
+          8,
+          9
+        ],
+        "reviewed_object_index": 9,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": "operates",
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": "公司",
+        "source_native": {
+          "name": "红外镜头及医用内窥镜相关产品",
+          "value": null,
+          "unit": null,
+          "header": null,
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-60790f10876ed89b:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "完整原页连续业务/产品/收入机制或公司提供服务/出租收入事实，逐字与原文相符；子公司与退出控制、方向/论证、条件性会计原则仍按原状态披露。",
+        "source_pages": [
+          157
+        ],
+        "reviewed_object_index": 10,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "当期产品及服务披露",
+          "value": null,
+          "unit": null,
+          "header": null,
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-8f7d80da56e26d51:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "完整原页连续业务/产品/收入机制或公司提供服务/出租收入事实，逐字与原文相符；子公司与退出控制、方向/论证、条件性会计原则仍按原状态披露。",
+        "source_pages": [
+          12
+        ],
+        "reviewed_object_index": 11,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "当期产品及服务披露",
+          "value": null,
+          "unit": null,
+          "header": null,
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-2b3618a11c9393a5:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "完整原页连续业务/产品/收入机制或公司提供服务/出租收入事实，逐字与原文相符；子公司与退出控制、方向/论证、条件性会计原则仍按原状态披露。",
+        "source_pages": [
+          14
+        ],
+        "reviewed_object_index": 12,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "当期产品及服务披露",
+          "value": null,
+          "unit": null,
+          "header": null,
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-098361d9a6e41b51:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "完整原页连续业务/产品/收入机制或公司提供服务/出租收入事实，逐字与原文相符；子公司与退出控制、方向/论证、条件性会计原则仍按原状态披露。",
+        "source_pages": [
+          15
+        ],
+        "reviewed_object_index": 13,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "当期产品及服务披露",
+          "value": null,
+          "unit": null,
+          "header": null,
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-6f16c3c456e4a90a:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "完整原页连续业务/产品/收入机制或公司提供服务/出租收入事实，逐字与原文相符；子公司与退出控制、方向/论证、条件性会计原则仍按原状态披露。",
+        "source_pages": [
+          15
+        ],
+        "reviewed_object_index": 14,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "当期产品及服务披露",
+          "value": null,
+          "unit": null,
+          "header": null,
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-b334eda5e632a00f:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "完整原页连续业务/产品/收入机制或公司提供服务/出租收入事实，逐字与原文相符；子公司与退出控制、方向/论证、条件性会计原则仍按原状态披露。",
+        "source_pages": [
+          91
+        ],
+        "reviewed_object_index": 15,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "当期产品及服务披露",
+          "value": null,
+          "unit": null,
+          "header": null,
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-b38d8249b1bf17cd:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "完整原页连续业务/产品/收入机制或公司提供服务/出租收入事实，逐字与原文相符；子公司与退出控制、方向/论证、条件性会计原则仍按原状态披露。",
+        "source_pages": [
+          131
+        ],
+        "reviewed_object_index": 16,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "当期产品及服务披露",
+          "value": null,
+          "unit": null,
+          "header": null,
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-5f766bb61cc0ddec:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "完整原页连续业务/产品/收入机制或公司提供服务/出租收入事实，逐字与原文相符；子公司与退出控制、方向/论证、条件性会计原则仍按原状态披露。",
+        "source_pages": [
+          157
+        ],
+        "reviewed_object_index": 17,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "当期产品及服务披露",
+          "value": null,
+          "unit": null,
+          "header": null,
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-c750574a8715b4cf:commodity:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原产销表当期销售列或明确当期绿证交易收入绑定真实销售；目录未知保持pending，未将数量/收入作量价扩展。",
+        "source_pages": [
+          14,
+          15
+        ],
+        "reviewed_object_index": 18,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": "sells",
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": "公司",
+        "source_native": {
+          "name": "控制器",
+          "value": null,
+          "unit": null,
+          "header": null,
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        },
+        "recall_role_index": 0
+      },
+      "owned:core-ev-c750574a8715b4cf:commodity:2": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原产销表当期销售列或明确当期绿证交易收入绑定真实销售；目录未知保持pending，未将数量/收入作量价扩展。",
+        "source_pages": [
+          14,
+          15
+        ],
+        "reviewed_object_index": 19,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": "sells",
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": "公司",
+        "source_native": {
+          "name": "光学组件",
+          "value": null,
+          "unit": null,
+          "header": null,
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        },
+        "recall_role_index": 1
+      },
+      "owned:core-ev-c750574a8715b4cf:commodity:3": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原产销表当期销售列或明确当期绿证交易收入绑定真实销售；目录未知保持pending，未将数量/收入作量价扩展。",
+        "source_pages": [
+          14,
+          15
+        ],
+        "reviewed_object_index": 20,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": "sells",
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": "公司",
+        "source_native": {
+          "name": "精密加工",
+          "value": null,
+          "unit": null,
+          "header": null,
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        },
+        "recall_role_index": 2
+      },
+      "owned:core-ev-c750574a8715b4cf:commodity:4": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原产销表当期销售列或明确当期绿证交易收入绑定真实销售；目录未知保持pending，未将数量/收入作量价扩展。",
+        "source_pages": [
+          14,
+          15
+        ],
+        "reviewed_object_index": 21,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": "sells",
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": "公司",
+        "source_native": {
+          "name": "光学仪器",
+          "value": null,
+          "unit": null,
+          "header": null,
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        },
+        "recall_role_index": 3
+      },
+      "owned:core-ev-c750574a8715b4cf:commodity:5": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原产销表当期销售列或明确当期绿证交易收入绑定真实销售；目录未知保持pending，未将数量/收入作量价扩展。锂电池限定一、二月，原凤锂主体及失控/退出合并证据保留。",
+        "source_pages": [
+          14,
+          15
+        ],
+        "reviewed_object_index": 22,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": "sells",
+        "relation_type": null,
+        "subject_scope": "named_subsidiary",
+        "source_actor": "凤锂新能源（惠州）有限公司",
+        "source_native": {
+          "name": "锂电池",
+          "value": null,
+          "unit": null,
+          "header": null,
+          "qualifier": "锂电池业务本期仅统计一、二月数据",
+          "footnote_refs": [],
+          "source_aliases": []
+        },
+        "recall_role_index": 4
+      },
+      "owned:core-ev-80e162c15a169e72:segment:industry:制造业": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p13及完整续页核原生industry、本期1,574,788,603.36元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+        ],
+        "reviewed_object_index": 23,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "制造业",
+          "value": "1,574,788,603.36",
+          "unit": "元",
+          "header": null,
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        },
+        "recall_row_index": 0
+      },
+      "owned:core-ev-c57ffd7caa716f1a:revenue:industry:制造业": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p13及完整续页核原生industry、本期1,574,788,603.36元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+        ],
+        "reviewed_object_index": 24,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "制造业",
+          "value": "1,574,788,603.36",
+          "unit": "元",
+          "header": null,
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-80e162c15a169e72:segment:product:控制器": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p13及完整续页核原生product、本期514,581,127.07元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+        ],
+        "reviewed_object_index": 25,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "控制器",
+          "value": "514,581,127.07",
+          "unit": "元",
+          "header": "主营业务收入",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        },
+        "recall_row_index": 1
+      },
+      "owned:core-ev-c57ffd7caa716f1a:revenue:product:控制器": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p13及完整续页核原生product、本期514,581,127.07元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+        ],
+        "reviewed_object_index": 26,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "控制器",
+          "value": "514,581,127.07",
+          "unit": "元",
+          "header": "主营业务收入",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-80e162c15a169e72:segment:product:光学组件": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p13及完整续页核原生product、本期581,779,579.48元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+        ],
+        "reviewed_object_index": 27,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "光学组件",
+          "value": "581,779,579.48",
+          "unit": "元",
+          "header": "主营业务收入",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        },
+        "recall_row_index": 2
+      },
+      "owned:core-ev-c57ffd7caa716f1a:revenue:product:光学组件": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p13及完整续页核原生product、本期581,779,579.48元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+        ],
+        "reviewed_object_index": 28,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "光学组件",
+          "value": "581,779,579.48",
+          "unit": "元",
+          "header": "主营业务收入",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-80e162c15a169e72:segment:product:精密加工": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p13及完整续页核原生product、本期411,889,232.75元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+        ],
+        "reviewed_object_index": 29,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "精密加工",
+          "value": "411,889,232.75",
+          "unit": "元",
+          "header": "主营业务收入",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        },
+        "recall_row_index": 3
+      },
+      "owned:core-ev-c57ffd7caa716f1a:revenue:product:精密加工": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p13及完整续页核原生product、本期411,889,232.75元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+        ],
+        "reviewed_object_index": 30,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "精密加工",
+          "value": "411,889,232.75",
+          "unit": "元",
+          "header": "主营业务收入",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-80e162c15a169e72:segment:product:光学仪器": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p13及完整续页核原生product、本期47,157,491.25元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+        ],
+        "reviewed_object_index": 31,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "光学仪器",
+          "value": "47,157,491.25",
+          "unit": "元",
+          "header": "主营业务收入",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        },
+        "recall_row_index": 4
+      },
+      "owned:core-ev-c57ffd7caa716f1a:revenue:product:光学仪器": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p13及完整续页核原生product、本期47,157,491.25元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+        ],
+        "reviewed_object_index": 32,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "光学仪器",
+          "value": "47,157,491.25",
+          "unit": "元",
+          "header": "主营业务收入",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-80e162c15a169e72:segment:product:锂电池": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p13及完整续页核原生product、本期19,381,172.81元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+        ],
+        "reviewed_object_index": 33,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "锂电池",
+          "value": "19,381,172.81",
+          "unit": "元",
+          "header": "主营业务收入",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        },
+        "recall_row_index": 5
+      },
+      "owned:core-ev-c57ffd7caa716f1a:revenue:product:锂电池": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p13及完整续页核原生product、本期19,381,172.81元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+        ],
+        "reviewed_object_index": 34,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "锂电池",
+          "value": "19,381,172.81",
+          "unit": "元",
+          "header": "主营业务收入",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-80e162c15a169e72:segment:region:国内": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p14及完整续页核原生region、本期1,262,867,982.78元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+        ],
+        "reviewed_object_index": 35,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "国内",
+          "value": "1,262,867,982.78",
+          "unit": "元",
+          "header": "主营业务收入",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        },
+        "recall_row_index": 6
+      },
+      "owned:core-ev-c57ffd7caa716f1a:revenue:region:国内": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p14及完整续页核原生region、本期1,262,867,982.78元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+        ],
+        "reviewed_object_index": 36,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "国内",
+          "value": "1,262,867,982.78",
+          "unit": "元",
+          "header": "主营业务收入",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-80e162c15a169e72:segment:region:国外": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p14及完整续页核原生region、本期311,920,620.58元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+        ],
+        "reviewed_object_index": 37,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "国外",
+          "value": "311,920,620.58",
+          "unit": "元",
+          "header": "主营业务收入",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        },
+        "recall_row_index": 7
+      },
+      "owned:core-ev-c57ffd7caa716f1a:revenue:region:国外": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p14及完整续页核原生region、本期311,920,620.58元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+        ],
+        "reviewed_object_index": 38,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "国外",
+          "value": "311,920,620.58",
+          "unit": "元",
+          "header": "主营业务收入",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-80e162c15a169e72:segment:sales_mode:直销": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p14及完整续页核原生sales_mode、本期1,574,788,603.36元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+        ],
+        "reviewed_object_index": 39,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "直销",
+          "value": "1,574,788,603.36",
+          "unit": "元",
+          "header": null,
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        },
+        "recall_row_index": 8
+      },
+      "owned:core-ev-c57ffd7caa716f1a:revenue:sales_mode:直销": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p14及完整续页核原生sales_mode、本期1,574,788,603.36元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+        ],
+        "reviewed_object_index": 40,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "直销",
+          "value": "1,574,788,603.36",
+          "unit": "元",
+          "header": null,
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-af56bfe124c81972:Segment:business_type:主营业务:营业收入": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p131及完整续页核原生business_type、本期1,574,788,603.36元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          131
+        ],
+        "reviewed_object_index": 41,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "主营业务",
+          "value": "1,574,788,603.36",
+          "unit": "元",
+          "header": "营业收入",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        },
+        "recall_row_index": 9
+      },
+      "owned:core-ev-6dc13c5c0a8253cb:Measurement:business_type:主营业务:营业收入": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p131及完整续页核原生business_type、本期1,574,788,603.36元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          131
+        ],
+        "reviewed_object_index": 42,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "主营业务",
+          "value": "1,574,788,603.36",
+          "unit": "元",
+          "header": "营业收入",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-af56bfe124c81972:Segment:business_type:其他业务:营业收入": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p131及完整续页核原生business_type、本期26,276,802.54元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          131
+        ],
+        "reviewed_object_index": 43,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "其他业务",
+          "value": "26,276,802.54",
+          "unit": "元",
+          "header": "营业收入",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        },
+        "recall_row_index": 10
+      },
+      "owned:core-ev-6dc13c5c0a8253cb:Measurement:business_type:其他业务:营业收入": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p131及完整续页核原生business_type、本期26,276,802.54元；主体公司及合并子公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          131
+        ],
+        "reviewed_object_index": 44,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "其他业务",
+          "value": "26,276,802.54",
+          "unit": "元",
+          "header": "营业收入",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-77670943e4e231a1:Segment:business_type:其他业务:营业收入": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p174及完整续页核原生business_type、本期7,245,526.95元；主体母公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          163,
+          173,
+          174
+        ],
+        "reviewed_object_index": 45,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "issuer",
+        "source_actor": null,
+        "source_native": {
+          "name": "其他业务",
+          "value": "7,245,526.95",
+          "unit": "元",
+          "header": "营业收入",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        },
+        "recall_row_index": 11
+      },
+      "owned:core-ev-b06e08fda3ce4309:Measurement:business_type:其他业务:营业收入": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p174及完整续页核原生business_type、本期7,245,526.95元；主体母公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          163,
+          173,
+          174
+        ],
+        "reviewed_object_index": 46,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "issuer",
+        "source_actor": null,
+        "source_native": {
+          "name": "其他业务",
+          "value": "7,245,526.95",
+          "unit": "元",
+          "header": "营业收入",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      },
+      "owned:core-ev-6afba245ab1d9c88:Segment:lease:房屋租赁:本公司作为出租方/本期确认的租赁收入": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p157及完整续页核原生lease、本期105,638.14元；主体本公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          157
+        ],
+        "reviewed_object_index": 47,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "房屋租赁",
+          "value": "105,638.14",
+          "unit": "元",
+          "header": "本公司作为出租方/本期确认的租赁收入",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        },
+        "recall_row_index": 12
+      },
+      "owned:core-ev-fd257e4ac562f124:Measurement:lease:房屋租赁:本公司作为出租方/本期确认的租赁收入": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立原页p157及完整续页核原生lease、本期105,638.14元；主体本公司，范围/父子项不跨维度累加。",
+        "source_pages": [
+          157
+        ],
+        "reviewed_object_index": 48,
+        "checks": {
+          "actor": true,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "complete_evidence": true
+        },
+        "action": null,
+        "relation_type": null,
+        "subject_scope": "consolidated_group",
+        "source_actor": null,
+        "source_native": {
+          "name": "房屋租赁",
+          "value": "105,638.14",
+          "unit": "元",
+          "header": "本公司作为出租方/本期确认的租赁收入",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        }
+      }
+    },
+    "answers": {
+      "principal_business": {
+        "accurate": true,
+        "answered": true,
+        "failed_substance_groups": [],
+        "bad_supports": [],
+        "missing_original_state_limits": [],
+        "reason": "光学和智能控制器核心，光学零部件/镜头/仪器及控制器一站式服务；锂电池仅报告期1/2月，退出控制/合并状态保留。；原文实质及主体、方向/期间/退出状态逐项核正文，关键词通过不代替限制。"
+      },
+      "products_services": {
+        "accurate": true,
+        "answered": true,
+        "failed_substance_groups": [],
+        "bad_supports": [],
+        "missing_original_state_limits": [],
+        "reason": "完整当前光学元件/精密金属、五类镜头、六类显微镜、控制器设计制造测试认证及OEM/ODM服务；下游应用不升格产品，样机非当期销售，锂电池保留有限期。；原文实质及主体、方向/期间/退出状态逐项核正文，关键词通过不代替限制。"
+      },
+      "revenue_model": {
+        "accurate": true,
+        "answered": true,
+        "failed_substance_groups": [],
+        "bad_supports": [],
+        "missing_original_state_limits": [],
+        "reason": "当前多产品直销，锂电池收入仅1/2月；内销合同订单交付签收/外销报关，月结30–90天条款；关联购销市场价格或合理成本利润协议定价，确认时点与渠道分开。；原文实质及主体、方向/期间/退出状态逐项核正文，关键词通过不代替限制。"
+      }
+    }
+  }
+}
