@@ -1,0 +1,5591 @@
+{
+  "600033.SH": {
+    "facts": {
+      "owned:core-ev-b7953cf4d7ba5394:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p9/10主营原句、三运营路段/参股浦南、其他服务和投资边界忠实保留。",
+        "source_pages": [
+          9,
+          10
+        ],
+        "reviewed_object_index": 0,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "actor_scope": true,
+          "substance": true
+        },
+        "source_condition": null
+      },
+      "owned:core-ev-83d85411871a2556:activity:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p9当前公路投资/收费/运营原句成立；不升格投资银行或参股浦南。",
+        "source_pages": [
+          9,
+          10
+        ],
+        "reviewed_object_index": 1,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "affirmative_current_action": true
+        },
+        "source_condition": null
+      },
+      "owned:core-ev-83d85411871a2556:activity:2": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p9当前公路投资/收费/运营原句成立；不升格投资银行或参股浦南。",
+        "source_pages": [
+          9,
+          10
+        ],
+        "reviewed_object_index": 2,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "affirmative_current_action": true
+        },
+        "source_condition": null
+      },
+      "owned:core-ev-83d85411871a2556:activity:3": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p9当前公路投资/收费/运营原句成立；不升格投资银行或参股浦南。",
+        "source_pages": [
+          9,
+          10
+        ],
+        "reviewed_object_index": 3,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "affirmative_current_action": true
+        },
+        "source_condition": null
+      },
+      "owned:core-ev-fe4b03c5cd936c6b:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p155/156完整出租方及续页保留原承租方、方向、两期，不推资产销售。",
+        "source_pages": [
+          155,
+          156,
+          157
+        ],
+        "reviewed_object_index": 4,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "actor_scope": true,
+          "substance": true
+        },
+        "source_condition": null
+      },
+      "owned:core-ev-6f51678bc69bbee5:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p155福泉原受托主体、两委托方及协议收益完整。",
+        "source_pages": [
+          155
+        ],
+        "reviewed_object_index": 5,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "actor_scope": true,
+          "substance": true
+        },
+        "source_condition": null
+      },
+      "owned:core-ev-07c43505d520e666:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p93收费联网月度清算、80/20分配和免费车限定忠实。",
+        "source_pages": [
+          93
+        ],
+        "reviewed_object_index": 6,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "actor_scope": true,
+          "substance": true
+        },
+        "source_condition": null
+      },
+      "owned:core-ev-22895f6ffa8471e8:commodity:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p153原采购商品表，只保留泛称，无具名材料投入推断。",
+        "source_pages": [
+          153
+        ],
+        "reviewed_object_index": 7,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "affirmative_current_action": true
+        },
+        "source_condition": null
+      },
+      "owned:core-ev-7880ff7053f399c2:commodity:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p155本公司出售表本期发生额；福路通是客户，不猜材质。",
+        "source_pages": [
+          155
+        ],
+        "reviewed_object_index": 8,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "affirmative_current_action": true
+        },
+        "source_condition": null,
+        "recall_role_index": 0
+      },
+      "owned:core-ev-d8d4c2d58fa5497b:segment:industry:高速公路收费": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19
+        ],
+        "reviewed_object_index": 9,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "industry",
+          "name": "高速公路收费",
+          "native_aliases": [
+            "高速公路收费"
+          ],
+          "value": "3,015,477,887.78",
+          "unit": "元",
+          "page": 12,
+          "column": "营业收入",
+          "header": "主营业务分行业",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "年增减\n（%）\n毛利率比\n上年增减\n（%）\n高速公路收费 3,015,477,887.78 1,284,523,604.66 57.40 0.83 2.56 减少 0.72\n个百分点",
+          "unit_basis_page": 12,
+          "qualifier": null,
+          "counterparty": null
+        },
+        "recall_row_index": 0
+      },
+      "owned:core-ev-63a5a5809dc898af:revenue:industry:高速公路收费": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19
+        ],
+        "reviewed_object_index": 10,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "industry",
+          "name": "高速公路收费",
+          "native_aliases": [
+            "高速公路收费"
+          ],
+          "value": "3,015,477,887.78",
+          "unit": "元",
+          "page": 12,
+          "column": "营业收入",
+          "header": "主营业务分行业",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "年增减\n（%）\n毛利率比\n上年增减\n（%）\n高速公路收费 3,015,477,887.78 1,284,523,604.66 57.40 0.83 2.56 减少 0.72\n个百分点",
+          "unit_basis_page": 12,
+          "qualifier": null,
+          "counterparty": null
+        }
+      },
+      "owned:core-ev-d8d4c2d58fa5497b:segment:product:泉厦高速公路": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19
+        ],
+        "reviewed_object_index": 11,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "product",
+          "name": "泉厦高速公路",
+          "native_aliases": [
+            "泉厦高速公路"
+          ],
+          "value": "1,239,116,718.49",
+          "unit": "元",
+          "page": 12,
+          "column": "营业收入",
+          "header": "主营业务分产品",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "年增减\n（%）\n毛利率比\n上年增减\n（%）\n泉厦高速公路 1,239,116,718.49 436,203,617.58 64.80 0.97 5.64 减少 1.56\n个百分点",
+          "unit_basis_page": 12,
+          "qualifier": null,
+          "counterparty": null
+        },
+        "recall_row_index": 1
+      },
+      "owned:core-ev-63a5a5809dc898af:revenue:product:泉厦高速公路": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19
+        ],
+        "reviewed_object_index": 12,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "product",
+          "name": "泉厦高速公路",
+          "native_aliases": [
+            "泉厦高速公路"
+          ],
+          "value": "1,239,116,718.49",
+          "unit": "元",
+          "page": 12,
+          "column": "营业收入",
+          "header": "主营业务分产品",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "年增减\n（%）\n毛利率比\n上年增减\n（%）\n泉厦高速公路 1,239,116,718.49 436,203,617.58 64.80 0.97 5.64 减少 1.56\n个百分点",
+          "unit_basis_page": 12,
+          "qualifier": null,
+          "counterparty": null
+        }
+      },
+      "owned:core-ev-d8d4c2d58fa5497b:segment:product:福泉高速公路": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19
+        ],
+        "reviewed_object_index": 13,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "product",
+          "name": "福泉高速公路",
+          "native_aliases": [
+            "福泉高速公路"
+          ],
+          "value": "1,629,315,974.44",
+          "unit": "元",
+          "page": 12,
+          "column": "营业收入",
+          "header": "主营业务分产品",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "毛利率比\n上年增减\n（%）\n泉厦高速公路 1,239,116,718.49 436,203,617.58 64.80 0.97 5.64 减少 1.56\n个百分点\n福泉高速公路 1,629,315,974.44 705,974,545.44 56.67 0.39 6.22 减少 2.37\n个百分点",
+          "unit_basis_page": 12,
+          "qualifier": null,
+          "counterparty": null
+        },
+        "recall_row_index": 2
+      },
+      "owned:core-ev-63a5a5809dc898af:revenue:product:福泉高速公路": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19
+        ],
+        "reviewed_object_index": 14,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "product",
+          "name": "福泉高速公路",
+          "native_aliases": [
+            "福泉高速公路"
+          ],
+          "value": "1,629,315,974.44",
+          "unit": "元",
+          "page": 12,
+          "column": "营业收入",
+          "header": "主营业务分产品",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "毛利率比\n上年增减\n（%）\n泉厦高速公路 1,239,116,718.49 436,203,617.58 64.80 0.97 5.64 减少 1.56\n个百分点\n福泉高速公路 1,629,315,974.44 705,974,545.44 56.67 0.39 6.22 减少 2.37\n个百分点",
+          "unit_basis_page": 12,
+          "qualifier": null,
+          "counterparty": null
+        }
+      },
+      "owned:core-ev-d8d4c2d58fa5497b:segment:product:罗宁高速公路": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19
+        ],
+        "reviewed_object_index": 15,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "product",
+          "name": "罗宁高速公路",
+          "native_aliases": [
+            "罗宁高速公路"
+          ],
+          "value": "147,045,194.85",
+          "unit": "元",
+          "page": 12,
+          "column": "营业收入",
+          "header": "主营业务分产品",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "（%）\n泉厦高速公路 1,239,116,718.49 436,203,617.58 64.80 0.97 5.64 减少 1.56\n个百分点\n福泉高速公路 1,629,315,974.44 705,974,545.44 56.67 0.39 6.22 减少 2.37\n个百分点\n罗宁高速公路 147,045,194.85 142,345,441.64 3.20 4.60 -18.60 增加 27.59\n个百分点",
+          "unit_basis_page": 12,
+          "qualifier": null,
+          "counterparty": null
+        },
+        "recall_row_index": 3
+      },
+      "owned:core-ev-63a5a5809dc898af:revenue:product:罗宁高速公路": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19
+        ],
+        "reviewed_object_index": 16,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "product",
+          "name": "罗宁高速公路",
+          "native_aliases": [
+            "罗宁高速公路"
+          ],
+          "value": "147,045,194.85",
+          "unit": "元",
+          "page": 12,
+          "column": "营业收入",
+          "header": "主营业务分产品",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "（%）\n泉厦高速公路 1,239,116,718.49 436,203,617.58 64.80 0.97 5.64 减少 1.56\n个百分点\n福泉高速公路 1,629,315,974.44 705,974,545.44 56.67 0.39 6.22 减少 2.37\n个百分点\n罗宁高速公路 147,045,194.85 142,345,441.64 3.20 4.60 -18.60 增加 27.59\n个百分点",
+          "unit_basis_page": 12,
+          "qualifier": null,
+          "counterparty": null
+        }
+      },
+      "owned:core-ev-d8d4c2d58fa5497b:segment:region:福建省": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19
+        ],
+        "reviewed_object_index": 17,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "region",
+          "name": "福建省",
+          "native_aliases": [
+            "福建省"
+          ],
+          "value": "3,015,477,887.78",
+          "unit": "元",
+          "page": 13,
+          "column": "营业收入",
+          "header": "主营业务分地区",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "福建发展高速公路股份有限公司2025 年年度报告\n13 / 172\n福建省 3,015,477,887.78 1,284,523,604.66 57.40 0.83 2.56 减少 0.72\n个百分点",
+          "unit_basis_page": 12,
+          "qualifier": null,
+          "counterparty": null
+        },
+        "recall_row_index": 4
+      },
+      "owned:core-ev-63a5a5809dc898af:revenue:region:福建省": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19
+        ],
+        "reviewed_object_index": 18,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "region",
+          "name": "福建省",
+          "native_aliases": [
+            "福建省"
+          ],
+          "value": "3,015,477,887.78",
+          "unit": "元",
+          "page": 13,
+          "column": "营业收入",
+          "header": "主营业务分地区",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "福建发展高速公路股份有限公司2025 年年度报告\n13 / 172\n福建省 3,015,477,887.78 1,284,523,604.66 57.40 0.83 2.56 减少 0.72\n个百分点",
+          "unit_basis_page": 12,
+          "qualifier": null,
+          "counterparty": null
+        }
+      },
+      "owned:core-ev-31ce52557a8e510c:Segment:business_type:主营业务:营业收入:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          134
+        ],
+        "reviewed_object_index": 19,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "business_type",
+          "name": "主营业务",
+          "native_aliases": [
+            "主营业务"
+          ],
+          "value": "3,015,477,887.78",
+          "unit": "元",
+          "page": 134,
+          "column": "本期营业收入/本期确认收益",
+          "header": "合并营业收入和营业成本",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "(1).营业收入和营业成本情况\n√适用 □不适用\n单位：元 币种：人民币\n项目 本期发生额 上期发生额\n收入 成本 收入 成本\n主营业务 3,015,477,887.78 1,284,523,604.66 2,990,729,190.15 1,252,461,369.23\n其他业务 33,538,217.90 63,104,937.18 35,151,055.25 62,252,435.17",
+          "unit_basis_page": 134,
+          "qualifier": null,
+          "counterparty": null
+        },
+        "recall_row_index": 5
+      },
+      "owned:core-ev-c090b4ee030b70a6:Measurement:business_type:主营业务:营业收入:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          134
+        ],
+        "reviewed_object_index": 20,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "business_type",
+          "name": "主营业务",
+          "native_aliases": [
+            "主营业务"
+          ],
+          "value": "3,015,477,887.78",
+          "unit": "元",
+          "page": 134,
+          "column": "本期营业收入/本期确认收益",
+          "header": "合并营业收入和营业成本",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "(1).营业收入和营业成本情况\n√适用 □不适用\n单位：元 币种：人民币\n项目 本期发生额 上期发生额\n收入 成本 收入 成本\n主营业务 3,015,477,887.78 1,284,523,604.66 2,990,729,190.15 1,252,461,369.23\n其他业务 33,538,217.90 63,104,937.18 35,151,055.25 62,252,435.17",
+          "unit_basis_page": 134,
+          "qualifier": null,
+          "counterparty": null
+        }
+      },
+      "owned:core-ev-31ce52557a8e510c:Segment:business_type:其他业务:营业收入:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          134
+        ],
+        "reviewed_object_index": 21,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "business_type",
+          "name": "其他业务",
+          "native_aliases": [
+            "其他业务"
+          ],
+          "value": "33,538,217.90",
+          "unit": "元",
+          "page": 134,
+          "column": "本期营业收入/本期确认收益",
+          "header": "合并营业收入和营业成本",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "√适用 □不适用\n单位：元 币种：人民币\n项目 本期发生额 上期发生额\n收入 成本 收入 成本\n主营业务 3,015,477,887.78 1,284,523,604.66 2,990,729,190.15 1,252,461,369.23\n其他业务 33,538,217.90 63,104,937.18 35,151,055.25 62,252,435.17\n合计 3,049,016,105.68 1,347,628,541.84 3,025,880,245.40 1,314,713,804.40",
+          "unit_basis_page": 134,
+          "qualifier": null,
+          "counterparty": null
+        },
+        "recall_row_index": 6
+      },
+      "owned:core-ev-c090b4ee030b70a6:Measurement:business_type:其他业务:营业收入:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          134
+        ],
+        "reviewed_object_index": 22,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "business_type",
+          "name": "其他业务",
+          "native_aliases": [
+            "其他业务"
+          ],
+          "value": "33,538,217.90",
+          "unit": "元",
+          "page": 134,
+          "column": "本期营业收入/本期确认收益",
+          "header": "合并营业收入和营业成本",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "√适用 □不适用\n单位：元 币种：人民币\n项目 本期发生额 上期发生额\n收入 成本 收入 成本\n主营业务 3,015,477,887.78 1,284,523,604.66 2,990,729,190.15 1,252,461,369.23\n其他业务 33,538,217.90 63,104,937.18 35,151,055.25 62,252,435.17\n合计 3,049,016,105.68 1,347,628,541.84 3,025,880,245.40 1,314,713,804.40",
+          "unit_basis_page": 134,
+          "qualifier": null,
+          "counterparty": null
+        }
+      },
+      "owned:core-ev-f5c773d653ca6798:Segment:business_type:主营业务:营业收入:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          163,
+          170
+        ],
+        "reviewed_object_index": 23,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "business_type",
+          "name": "主营业务",
+          "native_aliases": [
+            "主营业务"
+          ],
+          "value": "1,239,116,718.49",
+          "unit": "元",
+          "page": 170,
+          "column": "本期营业收入/本期确认收益",
+          "header": "母公司营业收入和营业成本",
+          "reported_period": "2025-12-31",
+          "source_actor": "母公司",
+          "source_quote": "(1). 营业收入和营业成本情况\n√适用 □不适用\n单位：元 币种：人民币\n项目 本期发生额 上期发生额\n收入 成本 收入 成本\n主营业务 1,239,116,718.49 477,106,821.99 1,227,243,317.69 458,937,073.55\n其他业务 14,352,489.81 16,430,409.58 14,677,989.36 14,006,788.37",
+          "unit_basis_page": 170,
+          "qualifier": "母公司收入，不与合并或分路段重复累计",
+          "counterparty": null
+        },
+        "recall_row_index": 7
+      },
+      "owned:core-ev-cfc8ae9635f8e1e4:Measurement:business_type:主营业务:营业收入:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          163,
+          170
+        ],
+        "reviewed_object_index": 24,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "business_type",
+          "name": "主营业务",
+          "native_aliases": [
+            "主营业务"
+          ],
+          "value": "1,239,116,718.49",
+          "unit": "元",
+          "page": 170,
+          "column": "本期营业收入/本期确认收益",
+          "header": "母公司营业收入和营业成本",
+          "reported_period": "2025-12-31",
+          "source_actor": "母公司",
+          "source_quote": "(1). 营业收入和营业成本情况\n√适用 □不适用\n单位：元 币种：人民币\n项目 本期发生额 上期发生额\n收入 成本 收入 成本\n主营业务 1,239,116,718.49 477,106,821.99 1,227,243,317.69 458,937,073.55\n其他业务 14,352,489.81 16,430,409.58 14,677,989.36 14,006,788.37",
+          "unit_basis_page": 170,
+          "qualifier": "母公司收入，不与合并或分路段重复累计",
+          "counterparty": null
+        }
+      },
+      "owned:core-ev-f5c773d653ca6798:Segment:business_type:其他业务:营业收入:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          163,
+          170
+        ],
+        "reviewed_object_index": 25,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "business_type",
+          "name": "其他业务",
+          "native_aliases": [
+            "其他业务"
+          ],
+          "value": "14,352,489.81",
+          "unit": "元",
+          "page": 170,
+          "column": "本期营业收入/本期确认收益",
+          "header": "母公司营业收入和营业成本",
+          "reported_period": "2025-12-31",
+          "source_actor": "母公司",
+          "source_quote": "√适用 □不适用\n单位：元 币种：人民币\n项目 本期发生额 上期发生额\n收入 成本 收入 成本\n主营业务 1,239,116,718.49 477,106,821.99 1,227,243,317.69 458,937,073.55\n其他业务 14,352,489.81 16,430,409.58 14,677,989.36 14,006,788.37\n合计 1,253,469,208.30 493,537,231.57 1,241,921,307.05 472,943,861.92",
+          "unit_basis_page": 170,
+          "qualifier": "母公司收入，不与合并或分路段重复累计",
+          "counterparty": null
+        },
+        "recall_row_index": 8
+      },
+      "owned:core-ev-cfc8ae9635f8e1e4:Measurement:business_type:其他业务:营业收入:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          163,
+          170
+        ],
+        "reviewed_object_index": 26,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "business_type",
+          "name": "其他业务",
+          "native_aliases": [
+            "其他业务"
+          ],
+          "value": "14,352,489.81",
+          "unit": "元",
+          "page": 170,
+          "column": "本期营业收入/本期确认收益",
+          "header": "母公司营业收入和营业成本",
+          "reported_period": "2025-12-31",
+          "source_actor": "母公司",
+          "source_quote": "√适用 □不适用\n单位：元 币种：人民币\n项目 本期发生额 上期发生额\n收入 成本 收入 成本\n主营业务 1,239,116,718.49 477,106,821.99 1,227,243,317.69 458,937,073.55\n其他业务 14,352,489.81 16,430,409.58 14,677,989.36 14,006,788.37\n合计 1,253,469,208.30 493,537,231.57 1,241,921,307.05 472,943,861.92",
+          "unit_basis_page": 170,
+          "qualifier": "母公司收入，不与合并或分路段重复累计",
+          "counterparty": null
+        }
+      },
+      "owned:core-ev-3063ffa8b0268117:Segment:lease:房屋租赁:本公司作为出租方/本期确认的租赁收入:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          155,
+          156,
+          157
+        ],
+        "reviewed_object_index": 27,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "counterparty_qualifier": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "service",
+          "name": "房屋租赁",
+          "native_aliases": [
+            "房屋租赁"
+          ],
+          "value": "5,527,173.17",
+          "unit": "元",
+          "page": 155,
+          "column": "本期营业收入/本期确认收益",
+          "header": "本公司作为出租方/本期租赁收入",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "(3).关联租赁情况\n本公司作为出租方：\n√适用 □不适用\n单位：元 币种：人民币\n承租方名称 租赁资产种类 本期确认的租赁收入 上期确认的租赁收入\n省经开公司 房屋租赁 5,527,173.17 5,248,948.33\n福泉经营服务公司 房屋租赁 2,336,513.76 2,336,513.76",
+          "unit_basis_page": 155,
+          "qualifier": "保留出租方及承租方；不推商品销售/设备销售，不跨维度累计",
+          "counterparty": "省经开公司"
+        },
+        "recall_row_index": 11
+      },
+      "owned:core-ev-8040079f8edfaa88:Measurement:lease:房屋租赁:本公司作为出租方/本期确认的租赁收入:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          155,
+          156,
+          157
+        ],
+        "reviewed_object_index": 28,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "counterparty_qualifier": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "service",
+          "name": "房屋租赁",
+          "native_aliases": [
+            "房屋租赁"
+          ],
+          "value": "5,527,173.17",
+          "unit": "元",
+          "page": 155,
+          "column": "本期营业收入/本期确认收益",
+          "header": "本公司作为出租方/本期租赁收入",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "(3).关联租赁情况\n本公司作为出租方：\n√适用 □不适用\n单位：元 币种：人民币\n承租方名称 租赁资产种类 本期确认的租赁收入 上期确认的租赁收入\n省经开公司 房屋租赁 5,527,173.17 5,248,948.33\n福泉经营服务公司 房屋租赁 2,336,513.76 2,336,513.76",
+          "unit_basis_page": 155,
+          "qualifier": "保留出租方及承租方；不推商品销售/设备销售，不跨维度累计",
+          "counterparty": "省经开公司"
+        }
+      },
+      "owned:core-ev-3063ffa8b0268117:Segment:lease:房屋租赁:本公司作为出租方/本期确认的租赁收入:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          155,
+          156,
+          157
+        ],
+        "reviewed_object_index": 29,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "counterparty_qualifier": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "service",
+          "name": "房屋租赁",
+          "native_aliases": [
+            "房屋租赁"
+          ],
+          "value": "2,336,513.76",
+          "unit": "元",
+          "page": 155,
+          "column": "本期营业收入/本期确认收益",
+          "header": "本公司作为出租方/本期租赁收入",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "本公司作为出租方：\n√适用 □不适用\n单位：元 币种：人民币\n承租方名称 租赁资产种类 本期确认的租赁收入 上期确认的租赁收入\n省经开公司 房屋租赁 5,527,173.17 5,248,948.33\n福泉经营服务公司 房屋租赁 2,336,513.76 2,336,513.76\n高速中油公司 场地租赁 1,744,479.24 1,648,993.37",
+          "unit_basis_page": 155,
+          "qualifier": "保留出租方及承租方；不推商品销售/设备销售，不跨维度累计",
+          "counterparty": "福泉经营服务公司"
+        },
+        "recall_row_index": 12
+      },
+      "owned:core-ev-8040079f8edfaa88:Measurement:lease:房屋租赁:本公司作为出租方/本期确认的租赁收入:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          155,
+          156,
+          157
+        ],
+        "reviewed_object_index": 30,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "counterparty_qualifier": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "service",
+          "name": "房屋租赁",
+          "native_aliases": [
+            "房屋租赁"
+          ],
+          "value": "2,336,513.76",
+          "unit": "元",
+          "page": 155,
+          "column": "本期营业收入/本期确认收益",
+          "header": "本公司作为出租方/本期租赁收入",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "本公司作为出租方：\n√适用 □不适用\n单位：元 币种：人民币\n承租方名称 租赁资产种类 本期确认的租赁收入 上期确认的租赁收入\n省经开公司 房屋租赁 5,527,173.17 5,248,948.33\n福泉经营服务公司 房屋租赁 2,336,513.76 2,336,513.76\n高速中油公司 场地租赁 1,744,479.24 1,648,993.37",
+          "unit_basis_page": 155,
+          "qualifier": "保留出租方及承租方；不推商品销售/设备销售，不跨维度累计",
+          "counterparty": "福泉经营服务公司"
+        }
+      },
+      "owned:core-ev-3063ffa8b0268117:Segment:lease:场地租赁:本公司作为出租方/本期确认的租赁收入:row:2": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          155,
+          156,
+          157
+        ],
+        "reviewed_object_index": 31,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "counterparty_qualifier": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "service",
+          "name": "场地租赁",
+          "native_aliases": [
+            "场地租赁"
+          ],
+          "value": "1,744,479.24",
+          "unit": "元",
+          "page": 155,
+          "column": "本期营业收入/本期确认收益",
+          "header": "本公司作为出租方/本期租赁收入",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "√适用 □不适用\n单位：元 币种：人民币\n承租方名称 租赁资产种类 本期确认的租赁收入 上期确认的租赁收入\n省经开公司 房屋租赁 5,527,173.17 5,248,948.33\n福泉经营服务公司 房屋租赁 2,336,513.76 2,336,513.76\n高速中油公司 场地租赁 1,744,479.24 1,648,993.37\n高速石化公司 房屋租赁 1,501,426.60 1,501,426.60",
+          "unit_basis_page": 155,
+          "qualifier": "保留出租方及承租方；不推商品销售/设备销售，不跨维度累计",
+          "counterparty": "高速中油公司"
+        },
+        "recall_row_index": 13
+      },
+      "owned:core-ev-8040079f8edfaa88:Measurement:lease:场地租赁:本公司作为出租方/本期确认的租赁收入:row:2": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          155,
+          156,
+          157
+        ],
+        "reviewed_object_index": 32,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "counterparty_qualifier": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "service",
+          "name": "场地租赁",
+          "native_aliases": [
+            "场地租赁"
+          ],
+          "value": "1,744,479.24",
+          "unit": "元",
+          "page": 155,
+          "column": "本期营业收入/本期确认收益",
+          "header": "本公司作为出租方/本期租赁收入",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "√适用 □不适用\n单位：元 币种：人民币\n承租方名称 租赁资产种类 本期确认的租赁收入 上期确认的租赁收入\n省经开公司 房屋租赁 5,527,173.17 5,248,948.33\n福泉经营服务公司 房屋租赁 2,336,513.76 2,336,513.76\n高速中油公司 场地租赁 1,744,479.24 1,648,993.37\n高速石化公司 房屋租赁 1,501,426.60 1,501,426.60",
+          "unit_basis_page": 155,
+          "qualifier": "保留出租方及承租方；不推商品销售/设备销售，不跨维度累计",
+          "counterparty": "高速中油公司"
+        }
+      },
+      "owned:core-ev-3063ffa8b0268117:Segment:lease:房屋租赁:本公司作为出租方/本期确认的租赁收入:row:3": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          155,
+          156,
+          157
+        ],
+        "reviewed_object_index": 33,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "counterparty_qualifier": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "service",
+          "name": "房屋租赁",
+          "native_aliases": [
+            "房屋租赁"
+          ],
+          "value": "1,501,426.60",
+          "unit": "元",
+          "page": 155,
+          "column": "本期营业收入/本期确认收益",
+          "header": "本公司作为出租方/本期租赁收入",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "单位：元 币种：人民币\n承租方名称 租赁资产种类 本期确认的租赁收入 上期确认的租赁收入\n省经开公司 房屋租赁 5,527,173.17 5,248,948.33\n福泉经营服务公司 房屋租赁 2,336,513.76 2,336,513.76\n高速中油公司 场地租赁 1,744,479.24 1,648,993.37\n高速石化公司 房屋租赁 1,501,426.60 1,501,426.60\n高速石化公司 场地租赁 40,385.95 28,534.51",
+          "unit_basis_page": 155,
+          "qualifier": "保留出租方及承租方；不推商品销售/设备销售，不跨维度累计",
+          "counterparty": "高速石化公司"
+        },
+        "recall_row_index": 14
+      },
+      "owned:core-ev-8040079f8edfaa88:Measurement:lease:房屋租赁:本公司作为出租方/本期确认的租赁收入:row:3": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          155,
+          156,
+          157
+        ],
+        "reviewed_object_index": 34,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "counterparty_qualifier": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "service",
+          "name": "房屋租赁",
+          "native_aliases": [
+            "房屋租赁"
+          ],
+          "value": "1,501,426.60",
+          "unit": "元",
+          "page": 155,
+          "column": "本期营业收入/本期确认收益",
+          "header": "本公司作为出租方/本期租赁收入",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "单位：元 币种：人民币\n承租方名称 租赁资产种类 本期确认的租赁收入 上期确认的租赁收入\n省经开公司 房屋租赁 5,527,173.17 5,248,948.33\n福泉经营服务公司 房屋租赁 2,336,513.76 2,336,513.76\n高速中油公司 场地租赁 1,744,479.24 1,648,993.37\n高速石化公司 房屋租赁 1,501,426.60 1,501,426.60\n高速石化公司 场地租赁 40,385.95 28,534.51",
+          "unit_basis_page": 155,
+          "qualifier": "保留出租方及承租方；不推商品销售/设备销售，不跨维度累计",
+          "counterparty": "高速石化公司"
+        }
+      },
+      "owned:core-ev-3063ffa8b0268117:Segment:lease:场地租赁:本公司作为出租方/本期确认的租赁收入:row:4": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          155,
+          156,
+          157
+        ],
+        "reviewed_object_index": 35,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "counterparty_qualifier": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "service",
+          "name": "场地租赁",
+          "native_aliases": [
+            "场地租赁"
+          ],
+          "value": "40,385.95",
+          "unit": "元",
+          "page": 155,
+          "column": "本期营业收入/本期确认收益",
+          "header": "本公司作为出租方/本期租赁收入",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "承租方名称 租赁资产种类 本期确认的租赁收入 上期确认的租赁收入\n省经开公司 房屋租赁 5,527,173.17 5,248,948.33\n福泉经营服务公司 房屋租赁 2,336,513.76 2,336,513.76\n高速中油公司 场地租赁 1,744,479.24 1,648,993.37\n高速石化公司 房屋租赁 1,501,426.60 1,501,426.60\n高速石化公司 场地租赁 40,385.95 28,534.51\n高速能源公司 房屋租赁 1,458,821.96 1,458,821.96",
+          "unit_basis_page": 155,
+          "qualifier": "保留出租方及承租方；不推商品销售/设备销售，不跨维度累计",
+          "counterparty": "高速石化公司"
+        },
+        "recall_row_index": 15
+      },
+      "owned:core-ev-8040079f8edfaa88:Measurement:lease:场地租赁:本公司作为出租方/本期确认的租赁收入:row:4": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          155,
+          156,
+          157
+        ],
+        "reviewed_object_index": 36,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "counterparty_qualifier": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "service",
+          "name": "场地租赁",
+          "native_aliases": [
+            "场地租赁"
+          ],
+          "value": "40,385.95",
+          "unit": "元",
+          "page": 155,
+          "column": "本期营业收入/本期确认收益",
+          "header": "本公司作为出租方/本期租赁收入",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "承租方名称 租赁资产种类 本期确认的租赁收入 上期确认的租赁收入\n省经开公司 房屋租赁 5,527,173.17 5,248,948.33\n福泉经营服务公司 房屋租赁 2,336,513.76 2,336,513.76\n高速中油公司 场地租赁 1,744,479.24 1,648,993.37\n高速石化公司 房屋租赁 1,501,426.60 1,501,426.60\n高速石化公司 场地租赁 40,385.95 28,534.51\n高速能源公司 房屋租赁 1,458,821.96 1,458,821.96",
+          "unit_basis_page": 155,
+          "qualifier": "保留出租方及承租方；不推商品销售/设备销售，不跨维度累计",
+          "counterparty": "高速石化公司"
+        }
+      },
+      "owned:core-ev-3063ffa8b0268117:Segment:lease:房屋租赁:本公司作为出租方/本期确认的租赁收入:row:5": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          155,
+          156,
+          157
+        ],
+        "reviewed_object_index": 37,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "counterparty_qualifier": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "service",
+          "name": "房屋租赁",
+          "native_aliases": [
+            "房屋租赁"
+          ],
+          "value": "1,458,821.96",
+          "unit": "元",
+          "page": 155,
+          "column": "本期营业收入/本期确认收益",
+          "header": "本公司作为出租方/本期租赁收入",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "省经开公司 房屋租赁 5,527,173.17 5,248,948.33\n福泉经营服务公司 房屋租赁 2,336,513.76 2,336,513.76\n高速中油公司 场地租赁 1,744,479.24 1,648,993.37\n高速石化公司 房屋租赁 1,501,426.60 1,501,426.60\n高速石化公司 场地租赁 40,385.95 28,534.51\n高速能源公司 房屋租赁 1,458,821.96 1,458,821.96",
+          "unit_basis_page": 155,
+          "qualifier": "保留出租方及承租方；不推商品销售/设备销售，不跨维度累计",
+          "counterparty": "高速能源公司"
+        },
+        "recall_row_index": 16
+      },
+      "owned:core-ev-8040079f8edfaa88:Measurement:lease:房屋租赁:本公司作为出租方/本期确认的租赁收入:row:5": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          155,
+          156,
+          157
+        ],
+        "reviewed_object_index": 38,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "counterparty_qualifier": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "service",
+          "name": "房屋租赁",
+          "native_aliases": [
+            "房屋租赁"
+          ],
+          "value": "1,458,821.96",
+          "unit": "元",
+          "page": 155,
+          "column": "本期营业收入/本期确认收益",
+          "header": "本公司作为出租方/本期租赁收入",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "省经开公司 房屋租赁 5,527,173.17 5,248,948.33\n福泉经营服务公司 房屋租赁 2,336,513.76 2,336,513.76\n高速中油公司 场地租赁 1,744,479.24 1,648,993.37\n高速石化公司 房屋租赁 1,501,426.60 1,501,426.60\n高速石化公司 场地租赁 40,385.95 28,534.51\n高速能源公司 房屋租赁 1,458,821.96 1,458,821.96",
+          "unit_basis_page": 155,
+          "qualifier": "保留出租方及承租方；不推商品销售/设备销售，不跨维度累计",
+          "counterparty": "高速能源公司"
+        }
+      },
+      "owned:core-ev-3063ffa8b0268117:Segment:lease:场地租赁:本公司作为出租方/本期确认的租赁收入:row:6": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          155,
+          156,
+          157
+        ],
+        "reviewed_object_index": 39,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "counterparty_qualifier": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "service",
+          "name": "场地租赁",
+          "native_aliases": [
+            "场地租赁"
+          ],
+          "value": "969,431.57",
+          "unit": "元",
+          "page": 156,
+          "column": "本期营业收入/本期确认收益",
+          "header": "本公司作为出租方/本期租赁收入",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "福建发展高速公路股份有限公司2025 年年度报告\n156 / 172\n省信息科技公司 场地租赁 969,431.57 6,880.73\n高速中化公司 场地租赁 920,439.98 1,194,718.42",
+          "unit_basis_page": 155,
+          "qualifier": "保留出租方及承租方；不推商品销售/设备销售，不跨维度累计",
+          "counterparty": "省信息科技公司"
+        },
+        "recall_row_index": 17
+      },
+      "owned:core-ev-8040079f8edfaa88:Measurement:lease:场地租赁:本公司作为出租方/本期确认的租赁收入:row:6": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          155,
+          156,
+          157
+        ],
+        "reviewed_object_index": 40,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "counterparty_qualifier": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "service",
+          "name": "场地租赁",
+          "native_aliases": [
+            "场地租赁"
+          ],
+          "value": "969,431.57",
+          "unit": "元",
+          "page": 156,
+          "column": "本期营业收入/本期确认收益",
+          "header": "本公司作为出租方/本期租赁收入",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "福建发展高速公路股份有限公司2025 年年度报告\n156 / 172\n省信息科技公司 场地租赁 969,431.57 6,880.73\n高速中化公司 场地租赁 920,439.98 1,194,718.42",
+          "unit_basis_page": 155,
+          "qualifier": "保留出租方及承租方；不推商品销售/设备销售，不跨维度累计",
+          "counterparty": "省信息科技公司"
+        }
+      },
+      "owned:core-ev-3063ffa8b0268117:Segment:lease:场地租赁:本公司作为出租方/本期确认的租赁收入:row:7": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          155,
+          156,
+          157
+        ],
+        "reviewed_object_index": 41,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "counterparty_qualifier": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "service",
+          "name": "场地租赁",
+          "native_aliases": [
+            "场地租赁"
+          ],
+          "value": "920,439.98",
+          "unit": "元",
+          "page": 156,
+          "column": "本期营业收入/本期确认收益",
+          "header": "本公司作为出租方/本期租赁收入",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "福建发展高速公路股份有限公司2025 年年度报告\n156 / 172\n省信息科技公司 场地租赁 969,431.57 6,880.73\n高速中化公司 场地租赁 920,439.98 1,194,718.42\n服务区管理公司 房屋租赁 579,217.76 579,217.76",
+          "unit_basis_page": 155,
+          "qualifier": "保留出租方及承租方；不推商品销售/设备销售，不跨维度累计",
+          "counterparty": "高速中化公司"
+        },
+        "recall_row_index": 18
+      },
+      "owned:core-ev-8040079f8edfaa88:Measurement:lease:场地租赁:本公司作为出租方/本期确认的租赁收入:row:7": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          155,
+          156,
+          157
+        ],
+        "reviewed_object_index": 42,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "counterparty_qualifier": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "service",
+          "name": "场地租赁",
+          "native_aliases": [
+            "场地租赁"
+          ],
+          "value": "920,439.98",
+          "unit": "元",
+          "page": 156,
+          "column": "本期营业收入/本期确认收益",
+          "header": "本公司作为出租方/本期租赁收入",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "福建发展高速公路股份有限公司2025 年年度报告\n156 / 172\n省信息科技公司 场地租赁 969,431.57 6,880.73\n高速中化公司 场地租赁 920,439.98 1,194,718.42\n服务区管理公司 房屋租赁 579,217.76 579,217.76",
+          "unit_basis_page": 155,
+          "qualifier": "保留出租方及承租方；不推商品销售/设备销售，不跨维度累计",
+          "counterparty": "高速中化公司"
+        }
+      },
+      "owned:core-ev-3063ffa8b0268117:Segment:lease:房屋租赁:本公司作为出租方/本期确认的租赁收入:row:8": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          155,
+          156,
+          157
+        ],
+        "reviewed_object_index": 43,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "counterparty_qualifier": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "service",
+          "name": "房屋租赁",
+          "native_aliases": [
+            "房屋租赁"
+          ],
+          "value": "579,217.76",
+          "unit": "元",
+          "page": 156,
+          "column": "本期营业收入/本期确认收益",
+          "header": "本公司作为出租方/本期租赁收入",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "福建发展高速公路股份有限公司2025 年年度报告\n156 / 172\n省信息科技公司 场地租赁 969,431.57 6,880.73\n高速中化公司 场地租赁 920,439.98 1,194,718.42\n服务区管理公司 房屋租赁 579,217.76 579,217.76\n省产业投资公司 房屋租赁 550,407.32 703,365.56",
+          "unit_basis_page": 155,
+          "qualifier": "保留出租方及承租方；不推商品销售/设备销售，不跨维度累计",
+          "counterparty": "服务区管理公司"
+        },
+        "recall_row_index": 19
+      },
+      "owned:core-ev-8040079f8edfaa88:Measurement:lease:房屋租赁:本公司作为出租方/本期确认的租赁收入:row:8": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          155,
+          156,
+          157
+        ],
+        "reviewed_object_index": 44,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "counterparty_qualifier": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "service",
+          "name": "房屋租赁",
+          "native_aliases": [
+            "房屋租赁"
+          ],
+          "value": "579,217.76",
+          "unit": "元",
+          "page": 156,
+          "column": "本期营业收入/本期确认收益",
+          "header": "本公司作为出租方/本期租赁收入",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "福建发展高速公路股份有限公司2025 年年度报告\n156 / 172\n省信息科技公司 场地租赁 969,431.57 6,880.73\n高速中化公司 场地租赁 920,439.98 1,194,718.42\n服务区管理公司 房屋租赁 579,217.76 579,217.76\n省产业投资公司 房屋租赁 550,407.32 703,365.56",
+          "unit_basis_page": 155,
+          "qualifier": "保留出租方及承租方；不推商品销售/设备销售，不跨维度累计",
+          "counterparty": "服务区管理公司"
+        }
+      },
+      "owned:core-ev-3063ffa8b0268117:Segment:lease:房屋租赁:本公司作为出租方/本期确认的租赁收入:row:9": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          155,
+          156,
+          157
+        ],
+        "reviewed_object_index": 45,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "counterparty_qualifier": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "service",
+          "name": "房屋租赁",
+          "native_aliases": [
+            "房屋租赁"
+          ],
+          "value": "550,407.32",
+          "unit": "元",
+          "page": 156,
+          "column": "本期营业收入/本期确认收益",
+          "header": "本公司作为出租方/本期租赁收入",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "福建发展高速公路股份有限公司2025 年年度报告\n156 / 172\n省信息科技公司 场地租赁 969,431.57 6,880.73\n高速中化公司 场地租赁 920,439.98 1,194,718.42\n服务区管理公司 房屋租赁 579,217.76 579,217.76\n省产业投资公司 房屋租赁 550,407.32 703,365.56\n省文化传媒公司 广告经营权 352,412.25 438,981.44",
+          "unit_basis_page": 155,
+          "qualifier": "保留出租方及承租方；不推商品销售/设备销售，不跨维度累计",
+          "counterparty": "省产业投资公司"
+        },
+        "recall_row_index": 20
+      },
+      "owned:core-ev-8040079f8edfaa88:Measurement:lease:房屋租赁:本公司作为出租方/本期确认的租赁收入:row:9": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          155,
+          156,
+          157
+        ],
+        "reviewed_object_index": 46,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "counterparty_qualifier": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "service",
+          "name": "房屋租赁",
+          "native_aliases": [
+            "房屋租赁"
+          ],
+          "value": "550,407.32",
+          "unit": "元",
+          "page": 156,
+          "column": "本期营业收入/本期确认收益",
+          "header": "本公司作为出租方/本期租赁收入",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "福建发展高速公路股份有限公司2025 年年度报告\n156 / 172\n省信息科技公司 场地租赁 969,431.57 6,880.73\n高速中化公司 场地租赁 920,439.98 1,194,718.42\n服务区管理公司 房屋租赁 579,217.76 579,217.76\n省产业投资公司 房屋租赁 550,407.32 703,365.56\n省文化传媒公司 广告经营权 352,412.25 438,981.44",
+          "unit_basis_page": 155,
+          "qualifier": "保留出租方及承租方；不推商品销售/设备销售，不跨维度累计",
+          "counterparty": "省产业投资公司"
+        }
+      },
+      "owned:core-ev-3063ffa8b0268117:Segment:lease:广告经营权:本公司作为出租方/本期确认的租赁收入:row:10": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          155,
+          156,
+          157
+        ],
+        "reviewed_object_index": 47,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "counterparty_qualifier": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "service",
+          "name": "广告经营权",
+          "native_aliases": [
+            "广告经营权"
+          ],
+          "value": "352,412.25",
+          "unit": "元",
+          "page": 156,
+          "column": "本期营业收入/本期确认收益",
+          "header": "本公司作为出租方/本期租赁收入",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "156 / 172\n省信息科技公司 场地租赁 969,431.57 6,880.73\n高速中化公司 场地租赁 920,439.98 1,194,718.42\n服务区管理公司 房屋租赁 579,217.76 579,217.76\n省产业投资公司 房屋租赁 550,407.32 703,365.56\n省文化传媒公司 广告经营权 352,412.25 438,981.44\n省文化传媒公司 房屋租赁 334,882.56 334,882.56",
+          "unit_basis_page": 155,
+          "qualifier": "保留出租方及承租方；不推商品销售/设备销售，不跨维度累计",
+          "counterparty": "省文化传媒公司"
+        },
+        "recall_row_index": 21
+      },
+      "owned:core-ev-8040079f8edfaa88:Measurement:lease:广告经营权:本公司作为出租方/本期确认的租赁收入:row:10": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          155,
+          156,
+          157
+        ],
+        "reviewed_object_index": 48,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "counterparty_qualifier": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "service",
+          "name": "广告经营权",
+          "native_aliases": [
+            "广告经营权"
+          ],
+          "value": "352,412.25",
+          "unit": "元",
+          "page": 156,
+          "column": "本期营业收入/本期确认收益",
+          "header": "本公司作为出租方/本期租赁收入",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "156 / 172\n省信息科技公司 场地租赁 969,431.57 6,880.73\n高速中化公司 场地租赁 920,439.98 1,194,718.42\n服务区管理公司 房屋租赁 579,217.76 579,217.76\n省产业投资公司 房屋租赁 550,407.32 703,365.56\n省文化传媒公司 广告经营权 352,412.25 438,981.44\n省文化传媒公司 房屋租赁 334,882.56 334,882.56",
+          "unit_basis_page": 155,
+          "qualifier": "保留出租方及承租方；不推商品销售/设备销售，不跨维度累计",
+          "counterparty": "省文化传媒公司"
+        }
+      },
+      "owned:core-ev-3063ffa8b0268117:Segment:lease:房屋租赁:本公司作为出租方/本期确认的租赁收入:row:11": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          155,
+          156,
+          157
+        ],
+        "reviewed_object_index": 49,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "counterparty_qualifier": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "service",
+          "name": "房屋租赁",
+          "native_aliases": [
+            "房屋租赁"
+          ],
+          "value": "334,882.56",
+          "unit": "元",
+          "page": 156,
+          "column": "本期营业收入/本期确认收益",
+          "header": "本公司作为出租方/本期租赁收入",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "省信息科技公司 场地租赁 969,431.57 6,880.73\n高速中化公司 场地租赁 920,439.98 1,194,718.42\n服务区管理公司 房屋租赁 579,217.76 579,217.76\n省产业投资公司 房屋租赁 550,407.32 703,365.56\n省文化传媒公司 广告经营权 352,412.25 438,981.44\n省文化传媒公司 房屋租赁 334,882.56 334,882.56\n驿佳购公司 房屋租赁 300,511.28 304,525.71",
+          "unit_basis_page": 155,
+          "qualifier": "保留出租方及承租方；不推商品销售/设备销售，不跨维度累计",
+          "counterparty": "省文化传媒公司"
+        },
+        "recall_row_index": 22
+      },
+      "owned:core-ev-8040079f8edfaa88:Measurement:lease:房屋租赁:本公司作为出租方/本期确认的租赁收入:row:11": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          155,
+          156,
+          157
+        ],
+        "reviewed_object_index": 50,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "counterparty_qualifier": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "service",
+          "name": "房屋租赁",
+          "native_aliases": [
+            "房屋租赁"
+          ],
+          "value": "334,882.56",
+          "unit": "元",
+          "page": 156,
+          "column": "本期营业收入/本期确认收益",
+          "header": "本公司作为出租方/本期租赁收入",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "省信息科技公司 场地租赁 969,431.57 6,880.73\n高速中化公司 场地租赁 920,439.98 1,194,718.42\n服务区管理公司 房屋租赁 579,217.76 579,217.76\n省产业投资公司 房屋租赁 550,407.32 703,365.56\n省文化传媒公司 广告经营权 352,412.25 438,981.44\n省文化传媒公司 房屋租赁 334,882.56 334,882.56\n驿佳购公司 房屋租赁 300,511.28 304,525.71",
+          "unit_basis_page": 155,
+          "qualifier": "保留出租方及承租方；不推商品销售/设备销售，不跨维度累计",
+          "counterparty": "省文化传媒公司"
+        }
+      },
+      "owned:core-ev-3063ffa8b0268117:Segment:lease:房屋租赁:本公司作为出租方/本期确认的租赁收入:row:12": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          155,
+          156,
+          157
+        ],
+        "reviewed_object_index": 51,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "counterparty_qualifier": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "service",
+          "name": "房屋租赁",
+          "native_aliases": [
+            "房屋租赁"
+          ],
+          "value": "300,511.28",
+          "unit": "元",
+          "page": 156,
+          "column": "本期营业收入/本期确认收益",
+          "header": "本公司作为出租方/本期租赁收入",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "高速中化公司 场地租赁 920,439.98 1,194,718.42\n服务区管理公司 房屋租赁 579,217.76 579,217.76\n省产业投资公司 房屋租赁 550,407.32 703,365.56\n省文化传媒公司 广告经营权 352,412.25 438,981.44\n省文化传媒公司 房屋租赁 334,882.56 334,882.56\n驿佳购公司 房屋租赁 300,511.28 304,525.71\n高速创业投资公司 房屋租赁 203,944.28 50,986.07",
+          "unit_basis_page": 155,
+          "qualifier": "保留出租方及承租方；不推商品销售/设备销售，不跨维度累计",
+          "counterparty": "驿佳购公司"
+        },
+        "recall_row_index": 23
+      },
+      "owned:core-ev-8040079f8edfaa88:Measurement:lease:房屋租赁:本公司作为出租方/本期确认的租赁收入:row:12": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          155,
+          156,
+          157
+        ],
+        "reviewed_object_index": 52,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "counterparty_qualifier": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "service",
+          "name": "房屋租赁",
+          "native_aliases": [
+            "房屋租赁"
+          ],
+          "value": "300,511.28",
+          "unit": "元",
+          "page": 156,
+          "column": "本期营业收入/本期确认收益",
+          "header": "本公司作为出租方/本期租赁收入",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "高速中化公司 场地租赁 920,439.98 1,194,718.42\n服务区管理公司 房屋租赁 579,217.76 579,217.76\n省产业投资公司 房屋租赁 550,407.32 703,365.56\n省文化传媒公司 广告经营权 352,412.25 438,981.44\n省文化传媒公司 房屋租赁 334,882.56 334,882.56\n驿佳购公司 房屋租赁 300,511.28 304,525.71\n高速创业投资公司 房屋租赁 203,944.28 50,986.07",
+          "unit_basis_page": 155,
+          "qualifier": "保留出租方及承租方；不推商品销售/设备销售，不跨维度累计",
+          "counterparty": "驿佳购公司"
+        }
+      },
+      "owned:core-ev-3063ffa8b0268117:Segment:lease:房屋租赁:本公司作为出租方/本期确认的租赁收入:row:13": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          155,
+          156,
+          157
+        ],
+        "reviewed_object_index": 53,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "counterparty_qualifier": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "service",
+          "name": "房屋租赁",
+          "native_aliases": [
+            "房屋租赁"
+          ],
+          "value": "203,944.28",
+          "unit": "元",
+          "page": 156,
+          "column": "本期营业收入/本期确认收益",
+          "header": "本公司作为出租方/本期租赁收入",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "服务区管理公司 房屋租赁 579,217.76 579,217.76\n省产业投资公司 房屋租赁 550,407.32 703,365.56\n省文化传媒公司 广告经营权 352,412.25 438,981.44\n省文化传媒公司 房屋租赁 334,882.56 334,882.56\n驿佳购公司 房屋租赁 300,511.28 304,525.71\n高速创业投资公司 房屋租赁 203,944.28 50,986.07\n省技术咨询公司 房屋租赁 166,243.20 124,682.40",
+          "unit_basis_page": 155,
+          "qualifier": "保留出租方及承租方；不推商品销售/设备销售，不跨维度累计",
+          "counterparty": "高速创业投资公司"
+        },
+        "recall_row_index": 24
+      },
+      "owned:core-ev-8040079f8edfaa88:Measurement:lease:房屋租赁:本公司作为出租方/本期确认的租赁收入:row:13": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          155,
+          156,
+          157
+        ],
+        "reviewed_object_index": 54,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "counterparty_qualifier": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "service",
+          "name": "房屋租赁",
+          "native_aliases": [
+            "房屋租赁"
+          ],
+          "value": "203,944.28",
+          "unit": "元",
+          "page": 156,
+          "column": "本期营业收入/本期确认收益",
+          "header": "本公司作为出租方/本期租赁收入",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "服务区管理公司 房屋租赁 579,217.76 579,217.76\n省产业投资公司 房屋租赁 550,407.32 703,365.56\n省文化传媒公司 广告经营权 352,412.25 438,981.44\n省文化传媒公司 房屋租赁 334,882.56 334,882.56\n驿佳购公司 房屋租赁 300,511.28 304,525.71\n高速创业投资公司 房屋租赁 203,944.28 50,986.07\n省技术咨询公司 房屋租赁 166,243.20 124,682.40",
+          "unit_basis_page": 155,
+          "qualifier": "保留出租方及承租方；不推商品销售/设备销售，不跨维度累计",
+          "counterparty": "高速创业投资公司"
+        }
+      },
+      "owned:core-ev-3063ffa8b0268117:Segment:lease:房屋租赁:本公司作为出租方/本期确认的租赁收入:row:14": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          155,
+          156,
+          157
+        ],
+        "reviewed_object_index": 55,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "counterparty_qualifier": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "service",
+          "name": "房屋租赁",
+          "native_aliases": [
+            "房屋租赁"
+          ],
+          "value": "166,243.20",
+          "unit": "元",
+          "page": 156,
+          "column": "本期营业收入/本期确认收益",
+          "header": "本公司作为出租方/本期租赁收入",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "省产业投资公司 房屋租赁 550,407.32 703,365.56\n省文化传媒公司 广告经营权 352,412.25 438,981.44\n省文化传媒公司 房屋租赁 334,882.56 334,882.56\n驿佳购公司 房屋租赁 300,511.28 304,525.71\n高速创业投资公司 房屋租赁 203,944.28 50,986.07\n省技术咨询公司 房屋租赁 166,243.20 124,682.40\n厦门高速公路管理公司 场地租赁 135,463.40 140,510.76",
+          "unit_basis_page": 155,
+          "qualifier": "保留出租方及承租方；不推商品销售/设备销售，不跨维度累计",
+          "counterparty": "省技术咨询公司"
+        },
+        "recall_row_index": 25
+      },
+      "owned:core-ev-8040079f8edfaa88:Measurement:lease:房屋租赁:本公司作为出租方/本期确认的租赁收入:row:14": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          155,
+          156,
+          157
+        ],
+        "reviewed_object_index": 56,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "counterparty_qualifier": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "service",
+          "name": "房屋租赁",
+          "native_aliases": [
+            "房屋租赁"
+          ],
+          "value": "166,243.20",
+          "unit": "元",
+          "page": 156,
+          "column": "本期营业收入/本期确认收益",
+          "header": "本公司作为出租方/本期租赁收入",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "省产业投资公司 房屋租赁 550,407.32 703,365.56\n省文化传媒公司 广告经营权 352,412.25 438,981.44\n省文化传媒公司 房屋租赁 334,882.56 334,882.56\n驿佳购公司 房屋租赁 300,511.28 304,525.71\n高速创业投资公司 房屋租赁 203,944.28 50,986.07\n省技术咨询公司 房屋租赁 166,243.20 124,682.40\n厦门高速公路管理公司 场地租赁 135,463.40 140,510.76",
+          "unit_basis_page": 155,
+          "qualifier": "保留出租方及承租方；不推商品销售/设备销售，不跨维度累计",
+          "counterparty": "省技术咨询公司"
+        }
+      },
+      "owned:core-ev-3063ffa8b0268117:Segment:lease:场地租赁:本公司作为出租方/本期确认的租赁收入:row:15": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          155,
+          156,
+          157
+        ],
+        "reviewed_object_index": 57,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "counterparty_qualifier": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "service",
+          "name": "场地租赁",
+          "native_aliases": [
+            "场地租赁"
+          ],
+          "value": "135,463.40",
+          "unit": "元",
+          "page": 156,
+          "column": "本期营业收入/本期确认收益",
+          "header": "本公司作为出租方/本期租赁收入",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "省文化传媒公司 广告经营权 352,412.25 438,981.44\n省文化传媒公司 房屋租赁 334,882.56 334,882.56\n驿佳购公司 房屋租赁 300,511.28 304,525.71\n高速创业投资公司 房屋租赁 203,944.28 50,986.07\n省技术咨询公司 房屋租赁 166,243.20 124,682.40\n厦门高速公路管理公司 场地租赁 135,463.40 140,510.76\n宁德高速公司 房屋租赁 85,714.29 85,714.29",
+          "unit_basis_page": 155,
+          "qualifier": "保留出租方及承租方；不推商品销售/设备销售，不跨维度累计",
+          "counterparty": "厦门高速公路管理公司"
+        },
+        "recall_row_index": 26
+      },
+      "owned:core-ev-8040079f8edfaa88:Measurement:lease:场地租赁:本公司作为出租方/本期确认的租赁收入:row:15": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          155,
+          156,
+          157
+        ],
+        "reviewed_object_index": 58,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "counterparty_qualifier": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "service",
+          "name": "场地租赁",
+          "native_aliases": [
+            "场地租赁"
+          ],
+          "value": "135,463.40",
+          "unit": "元",
+          "page": 156,
+          "column": "本期营业收入/本期确认收益",
+          "header": "本公司作为出租方/本期租赁收入",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "省文化传媒公司 广告经营权 352,412.25 438,981.44\n省文化传媒公司 房屋租赁 334,882.56 334,882.56\n驿佳购公司 房屋租赁 300,511.28 304,525.71\n高速创业投资公司 房屋租赁 203,944.28 50,986.07\n省技术咨询公司 房屋租赁 166,243.20 124,682.40\n厦门高速公路管理公司 场地租赁 135,463.40 140,510.76\n宁德高速公司 房屋租赁 85,714.29 85,714.29",
+          "unit_basis_page": 155,
+          "qualifier": "保留出租方及承租方；不推商品销售/设备销售，不跨维度累计",
+          "counterparty": "厦门高速公路管理公司"
+        }
+      },
+      "owned:core-ev-3063ffa8b0268117:Segment:lease:房屋租赁:本公司作为出租方/本期确认的租赁收入:row:16": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          155,
+          156,
+          157
+        ],
+        "reviewed_object_index": 59,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "counterparty_qualifier": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "service",
+          "name": "房屋租赁",
+          "native_aliases": [
+            "房屋租赁"
+          ],
+          "value": "85,714.29",
+          "unit": "元",
+          "page": 156,
+          "column": "本期营业收入/本期确认收益",
+          "header": "本公司作为出租方/本期租赁收入",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "省文化传媒公司 房屋租赁 334,882.56 334,882.56\n驿佳购公司 房屋租赁 300,511.28 304,525.71\n高速创业投资公司 房屋租赁 203,944.28 50,986.07\n省技术咨询公司 房屋租赁 166,243.20 124,682.40\n厦门高速公路管理公司 场地租赁 135,463.40 140,510.76\n宁德高速公司 房屋租赁 85,714.29 85,714.29\n海丝新能源公司 场地租赁 42,918.08 6,880.73",
+          "unit_basis_page": 155,
+          "qualifier": "保留出租方及承租方；不推商品销售/设备销售，不跨维度累计",
+          "counterparty": "宁德高速公司"
+        },
+        "recall_row_index": 27
+      },
+      "owned:core-ev-8040079f8edfaa88:Measurement:lease:房屋租赁:本公司作为出租方/本期确认的租赁收入:row:16": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          155,
+          156,
+          157
+        ],
+        "reviewed_object_index": 60,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "counterparty_qualifier": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "service",
+          "name": "房屋租赁",
+          "native_aliases": [
+            "房屋租赁"
+          ],
+          "value": "85,714.29",
+          "unit": "元",
+          "page": 156,
+          "column": "本期营业收入/本期确认收益",
+          "header": "本公司作为出租方/本期租赁收入",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "省文化传媒公司 房屋租赁 334,882.56 334,882.56\n驿佳购公司 房屋租赁 300,511.28 304,525.71\n高速创业投资公司 房屋租赁 203,944.28 50,986.07\n省技术咨询公司 房屋租赁 166,243.20 124,682.40\n厦门高速公路管理公司 场地租赁 135,463.40 140,510.76\n宁德高速公司 房屋租赁 85,714.29 85,714.29\n海丝新能源公司 场地租赁 42,918.08 6,880.73",
+          "unit_basis_page": 155,
+          "qualifier": "保留出租方及承租方；不推商品销售/设备销售，不跨维度累计",
+          "counterparty": "宁德高速公司"
+        }
+      },
+      "owned:core-ev-3063ffa8b0268117:Segment:lease:场地租赁:本公司作为出租方/本期确认的租赁收入:row:17": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          155,
+          156,
+          157
+        ],
+        "reviewed_object_index": 61,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "counterparty_qualifier": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "service",
+          "name": "场地租赁",
+          "native_aliases": [
+            "场地租赁"
+          ],
+          "value": "42,918.08",
+          "unit": "元",
+          "page": 156,
+          "column": "本期营业收入/本期确认收益",
+          "header": "本公司作为出租方/本期租赁收入",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "驿佳购公司 房屋租赁 300,511.28 304,525.71\n高速创业投资公司 房屋租赁 203,944.28 50,986.07\n省技术咨询公司 房屋租赁 166,243.20 124,682.40\n厦门高速公路管理公司 场地租赁 135,463.40 140,510.76\n宁德高速公司 房屋租赁 85,714.29 85,714.29\n海丝新能源公司 场地租赁 42,918.08 6,880.73\n宁德养护公司 房屋租赁 35,523.81 38,095.24",
+          "unit_basis_page": 155,
+          "qualifier": "保留出租方及承租方；不推商品销售/设备销售，不跨维度累计",
+          "counterparty": "海丝新能源公司"
+        },
+        "recall_row_index": 28
+      },
+      "owned:core-ev-8040079f8edfaa88:Measurement:lease:场地租赁:本公司作为出租方/本期确认的租赁收入:row:17": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          155,
+          156,
+          157
+        ],
+        "reviewed_object_index": 62,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "counterparty_qualifier": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "service",
+          "name": "场地租赁",
+          "native_aliases": [
+            "场地租赁"
+          ],
+          "value": "42,918.08",
+          "unit": "元",
+          "page": 156,
+          "column": "本期营业收入/本期确认收益",
+          "header": "本公司作为出租方/本期租赁收入",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "驿佳购公司 房屋租赁 300,511.28 304,525.71\n高速创业投资公司 房屋租赁 203,944.28 50,986.07\n省技术咨询公司 房屋租赁 166,243.20 124,682.40\n厦门高速公路管理公司 场地租赁 135,463.40 140,510.76\n宁德高速公司 房屋租赁 85,714.29 85,714.29\n海丝新能源公司 场地租赁 42,918.08 6,880.73\n宁德养护公司 房屋租赁 35,523.81 38,095.24",
+          "unit_basis_page": 155,
+          "qualifier": "保留出租方及承租方；不推商品销售/设备销售，不跨维度累计",
+          "counterparty": "海丝新能源公司"
+        }
+      },
+      "owned:core-ev-3063ffa8b0268117:Segment:lease:房屋租赁:本公司作为出租方/本期确认的租赁收入:row:18": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          155,
+          156,
+          157
+        ],
+        "reviewed_object_index": 63,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "counterparty_qualifier": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "service",
+          "name": "房屋租赁",
+          "native_aliases": [
+            "房屋租赁"
+          ],
+          "value": "35,523.81",
+          "unit": "元",
+          "page": 156,
+          "column": "本期营业收入/本期确认收益",
+          "header": "本公司作为出租方/本期租赁收入",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "高速创业投资公司 房屋租赁 203,944.28 50,986.07\n省技术咨询公司 房屋租赁 166,243.20 124,682.40\n厦门高速公路管理公司 场地租赁 135,463.40 140,510.76\n宁德高速公司 房屋租赁 85,714.29 85,714.29\n海丝新能源公司 场地租赁 42,918.08 6,880.73\n宁德养护公司 房屋租赁 35,523.81 38,095.24\n宁德经开公司 房屋租赁 28,571.43 28,571.43",
+          "unit_basis_page": 155,
+          "qualifier": "保留出租方及承租方；不推商品销售/设备销售，不跨维度累计",
+          "counterparty": "宁德养护公司"
+        },
+        "recall_row_index": 29
+      },
+      "owned:core-ev-8040079f8edfaa88:Measurement:lease:房屋租赁:本公司作为出租方/本期确认的租赁收入:row:18": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          155,
+          156,
+          157
+        ],
+        "reviewed_object_index": 64,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "counterparty_qualifier": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "service",
+          "name": "房屋租赁",
+          "native_aliases": [
+            "房屋租赁"
+          ],
+          "value": "35,523.81",
+          "unit": "元",
+          "page": 156,
+          "column": "本期营业收入/本期确认收益",
+          "header": "本公司作为出租方/本期租赁收入",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "高速创业投资公司 房屋租赁 203,944.28 50,986.07\n省技术咨询公司 房屋租赁 166,243.20 124,682.40\n厦门高速公路管理公司 场地租赁 135,463.40 140,510.76\n宁德高速公司 房屋租赁 85,714.29 85,714.29\n海丝新能源公司 场地租赁 42,918.08 6,880.73\n宁德养护公司 房屋租赁 35,523.81 38,095.24\n宁德经开公司 房屋租赁 28,571.43 28,571.43",
+          "unit_basis_page": 155,
+          "qualifier": "保留出租方及承租方；不推商品销售/设备销售，不跨维度累计",
+          "counterparty": "宁德养护公司"
+        }
+      },
+      "owned:core-ev-3063ffa8b0268117:Segment:lease:房屋租赁:本公司作为出租方/本期确认的租赁收入:row:19": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          155,
+          156,
+          157
+        ],
+        "reviewed_object_index": 65,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "counterparty_qualifier": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "service",
+          "name": "房屋租赁",
+          "native_aliases": [
+            "房屋租赁"
+          ],
+          "value": "28,571.43",
+          "unit": "元",
+          "page": 156,
+          "column": "本期营业收入/本期确认收益",
+          "header": "本公司作为出租方/本期租赁收入",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "省技术咨询公司 房屋租赁 166,243.20 124,682.40\n厦门高速公路管理公司 场地租赁 135,463.40 140,510.76\n宁德高速公司 房屋租赁 85,714.29 85,714.29\n海丝新能源公司 场地租赁 42,918.08 6,880.73\n宁德养护公司 房屋租赁 35,523.81 38,095.24\n宁德经开公司 房屋租赁 28,571.43 28,571.43\n闽通创信公司 场地租赁 17,379.15 782,324.24",
+          "unit_basis_page": 155,
+          "qualifier": "保留出租方及承租方；不推商品销售/设备销售，不跨维度累计",
+          "counterparty": "宁德经开公司"
+        },
+        "recall_row_index": 30
+      },
+      "owned:core-ev-8040079f8edfaa88:Measurement:lease:房屋租赁:本公司作为出租方/本期确认的租赁收入:row:19": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          155,
+          156,
+          157
+        ],
+        "reviewed_object_index": 66,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "counterparty_qualifier": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "service",
+          "name": "房屋租赁",
+          "native_aliases": [
+            "房屋租赁"
+          ],
+          "value": "28,571.43",
+          "unit": "元",
+          "page": 156,
+          "column": "本期营业收入/本期确认收益",
+          "header": "本公司作为出租方/本期租赁收入",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "省技术咨询公司 房屋租赁 166,243.20 124,682.40\n厦门高速公路管理公司 场地租赁 135,463.40 140,510.76\n宁德高速公司 房屋租赁 85,714.29 85,714.29\n海丝新能源公司 场地租赁 42,918.08 6,880.73\n宁德养护公司 房屋租赁 35,523.81 38,095.24\n宁德经开公司 房屋租赁 28,571.43 28,571.43\n闽通创信公司 场地租赁 17,379.15 782,324.24",
+          "unit_basis_page": 155,
+          "qualifier": "保留出租方及承租方；不推商品销售/设备销售，不跨维度累计",
+          "counterparty": "宁德经开公司"
+        }
+      },
+      "owned:core-ev-3063ffa8b0268117:Segment:lease:场地租赁:本公司作为出租方/本期确认的租赁收入:row:20": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          155,
+          156,
+          157
+        ],
+        "reviewed_object_index": 67,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "counterparty_qualifier": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "service",
+          "name": "场地租赁",
+          "native_aliases": [
+            "场地租赁"
+          ],
+          "value": "17,379.15",
+          "unit": "元",
+          "page": 156,
+          "column": "本期营业收入/本期确认收益",
+          "header": "本公司作为出租方/本期租赁收入",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "厦门高速公路管理公司 场地租赁 135,463.40 140,510.76\n宁德高速公司 房屋租赁 85,714.29 85,714.29\n海丝新能源公司 场地租赁 42,918.08 6,880.73\n宁德养护公司 房屋租赁 35,523.81 38,095.24\n宁德经开公司 房屋租赁 28,571.43 28,571.43\n闽通创信公司 场地租赁 17,379.15 782,324.24\n福建一卡通公司 场地租赁 788,834.86",
+          "unit_basis_page": 155,
+          "qualifier": "保留出租方及承租方；不推商品销售/设备销售，不跨维度累计",
+          "counterparty": "闽通创信公司"
+        },
+        "recall_row_index": 31
+      },
+      "owned:core-ev-8040079f8edfaa88:Measurement:lease:场地租赁:本公司作为出租方/本期确认的租赁收入:row:20": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          155,
+          156,
+          157
+        ],
+        "reviewed_object_index": 68,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "counterparty_qualifier": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "service",
+          "name": "场地租赁",
+          "native_aliases": [
+            "场地租赁"
+          ],
+          "value": "17,379.15",
+          "unit": "元",
+          "page": 156,
+          "column": "本期营业收入/本期确认收益",
+          "header": "本公司作为出租方/本期租赁收入",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "厦门高速公路管理公司 场地租赁 135,463.40 140,510.76\n宁德高速公司 房屋租赁 85,714.29 85,714.29\n海丝新能源公司 场地租赁 42,918.08 6,880.73\n宁德养护公司 房屋租赁 35,523.81 38,095.24\n宁德经开公司 房屋租赁 28,571.43 28,571.43\n闽通创信公司 场地租赁 17,379.15 782,324.24\n福建一卡通公司 场地租赁 788,834.86",
+          "unit_basis_page": 155,
+          "qualifier": "保留出租方及承租方；不推商品销售/设备销售，不跨维度累计",
+          "counterparty": "闽通创信公司"
+        }
+      },
+      "owned:core-ev-c598693ff9f5ecbc:Segment:service:其他资产托管:本公司受托管理/承包/本期确认的托管收益:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          155
+        ],
+        "reviewed_object_index": 69,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "counterparty_qualifier": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "service",
+          "name": "其他资产托管",
+          "native_aliases": [
+            "其他资产托管",
+            "托管收益",
+            "托管费收入"
+          ],
+          "value": "3,895,754.72",
+          "unit": "元",
+          "page": 155,
+          "column": "本期营业收入/本期确认收益",
+          "header": "本公司受托管理/承包；本期确认托管收益",
+          "reported_period": "2025-12-31",
+          "source_actor": "福泉公司",
+          "source_quote": "包收益定价依\n据\n本期确认的托\n管收益/承包收\n益\n渔平高速公司 福泉公司 其他资产托管 2022/1/1 2026/12/31 协议价格 3,895,754.72\n平潭大桥公司 福泉公司 其他资产托管 2022/1/1 2026/12/31 协议价格 154,245.28",
+          "unit_basis_page": 155,
+          "qualifier": "协议价格，收入方福泉公司；不同于下一表委托管理支付费用",
+          "counterparty": "渔平高速公司"
+        },
+        "recall_row_index": 9
+      },
+      "owned:core-ev-8c9882f05247a2e8:Measurement:service:其他资产托管:本公司受托管理/承包/本期确认的托管收益:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          155
+        ],
+        "reviewed_object_index": 70,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "counterparty_qualifier": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "service",
+          "name": "其他资产托管",
+          "native_aliases": [
+            "其他资产托管",
+            "托管收益",
+            "托管费收入"
+          ],
+          "value": "3,895,754.72",
+          "unit": "元",
+          "page": 155,
+          "column": "本期营业收入/本期确认收益",
+          "header": "本公司受托管理/承包；本期确认托管收益",
+          "reported_period": "2025-12-31",
+          "source_actor": "福泉公司",
+          "source_quote": "包收益定价依\n据\n本期确认的托\n管收益/承包收\n益\n渔平高速公司 福泉公司 其他资产托管 2022/1/1 2026/12/31 协议价格 3,895,754.72\n平潭大桥公司 福泉公司 其他资产托管 2022/1/1 2026/12/31 协议价格 154,245.28",
+          "unit_basis_page": 155,
+          "qualifier": "协议价格，收入方福泉公司；不同于下一表委托管理支付费用",
+          "counterparty": "渔平高速公司"
+        }
+      },
+      "owned:core-ev-c598693ff9f5ecbc:Segment:service:其他资产托管:本公司受托管理/承包/本期确认的托管收益:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          155
+        ],
+        "reviewed_object_index": 71,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "counterparty_qualifier": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "service",
+          "name": "其他资产托管",
+          "native_aliases": [
+            "其他资产托管",
+            "托管收益",
+            "托管费收入"
+          ],
+          "value": "154,245.28",
+          "unit": "元",
+          "page": 155,
+          "column": "本期营业收入/本期确认收益",
+          "header": "本公司受托管理/承包；本期确认托管收益",
+          "reported_period": "2025-12-31",
+          "source_actor": "福泉公司",
+          "source_quote": "据\n本期确认的托\n管收益/承包收\n益\n渔平高速公司 福泉公司 其他资产托管 2022/1/1 2026/12/31 协议价格 3,895,754.72\n平潭大桥公司 福泉公司 其他资产托管 2022/1/1 2026/12/31 协议价格 154,245.28\n关联托管/承包情况说明",
+          "unit_basis_page": 155,
+          "qualifier": "协议价格，收入方福泉公司；不同于下一表委托管理支付费用",
+          "counterparty": "平潭大桥公司"
+        },
+        "recall_row_index": 10
+      },
+      "owned:core-ev-8c9882f05247a2e8:Measurement:service:其他资产托管:本公司受托管理/承包/本期确认的托管收益:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          155
+        ],
+        "reviewed_object_index": 72,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "counterparty_qualifier": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "service",
+          "name": "其他资产托管",
+          "native_aliases": [
+            "其他资产托管",
+            "托管收益",
+            "托管费收入"
+          ],
+          "value": "154,245.28",
+          "unit": "元",
+          "page": 155,
+          "column": "本期营业收入/本期确认收益",
+          "header": "本公司受托管理/承包；本期确认托管收益",
+          "reported_period": "2025-12-31",
+          "source_actor": "福泉公司",
+          "source_quote": "据\n本期确认的托\n管收益/承包收\n益\n渔平高速公司 福泉公司 其他资产托管 2022/1/1 2026/12/31 协议价格 3,895,754.72\n平潭大桥公司 福泉公司 其他资产托管 2022/1/1 2026/12/31 协议价格 154,245.28\n关联托管/承包情况说明",
+          "unit_basis_page": 155,
+          "qualifier": "协议价格，收入方福泉公司；不同于下一表委托管理支付费用",
+          "counterparty": "平潭大桥公司"
+        }
+      }
+    },
+    "answers": {
+      "principal_business": {
+        "accurate": true,
+        "answered": true,
+        "reason": "逐原文核主体、当前/预研状态、完整业务/租赁/受托与收费或履约机制，实质正文完整；不以answered或关键词单独作为通过依据。",
+        "failed_substance_groups": []
+      },
+      "products_services": {
+        "accurate": true,
+        "answered": true,
+        "reason": "逐原文核主体、当前/预研状态、完整业务/租赁/受托与收费或履约机制，实质正文完整；不以answered或关键词单独作为通过依据。",
+        "failed_substance_groups": []
+      },
+      "revenue_model": {
+        "accurate": true,
+        "answered": true,
+        "reason": "逐原文核主体、当前/预研状态、完整业务/租赁/受托与收费或履约机制，实质正文完整；不以answered或关键词单独作为通过依据。",
+        "failed_substance_groups": []
+      }
+    }
+  },
+  "600072.SH": {
+    "facts": {
+      "owned:core-ev-31464ffa6cd69cdd:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p11/12完整原主业及产品矩阵、子公司原主体、当前/预研限定保留。",
+        "source_pages": [
+          11,
+          12
+        ],
+        "reviewed_object_index": 0,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "actor_scope": true,
+          "substance": true
+        },
+        "source_condition": null
+      },
+      "owned:core-ev-d41bfb8065c04497:activity:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p11/12当前主机装备、塔筒和运维/寿命管理业务成立，技术规格不另推角色。",
+        "source_pages": [
+          11,
+          12
+        ],
+        "reviewed_object_index": 1,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "affirmative_current_action": true
+        },
+        "source_condition": null
+      },
+      "owned:core-ev-d41bfb8065c04497:activity:2": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p11/12当前主机装备、塔筒和运维/寿命管理业务成立，技术规格不另推角色。",
+        "source_pages": [
+          11,
+          12
+        ],
+        "reviewed_object_index": 2,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "affirmative_current_action": true
+        },
+        "source_condition": null
+      },
+      "owned:core-ev-d41bfb8065c04497:activity:3": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p11/12当前主机装备、塔筒和运维/寿命管理业务成立，技术规格不另推角色。",
+        "source_pages": [
+          11,
+          12
+        ],
+        "reviewed_object_index": 3,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "affirmative_current_action": true
+        },
+        "source_condition": null
+      },
+      "owned:core-ev-d41bfb8065c04497:activity:4": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p11/12当前主机装备、塔筒和运维/寿命管理业务成立，技术规格不另推角色。",
+        "source_pages": [
+          11,
+          12
+        ],
+        "reviewed_object_index": 4,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "affirmative_current_action": true
+        },
+        "source_condition": null
+      },
+      "owned:core-ev-d41bfb8065c04497:activity:5": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p11/12当前主机装备、塔筒和运维/寿命管理业务成立，技术规格不另推角色。",
+        "source_pages": [
+          11,
+          12
+        ],
+        "reviewed_object_index": 5,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "affirmative_current_action": true
+        },
+        "source_condition": null
+      },
+      "owned:core-ev-d41bfb8065c04497:activity:6": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p11/12当前主机装备、塔筒和运维/寿命管理业务成立，技术规格不另推角色。",
+        "source_pages": [
+          11,
+          12
+        ],
+        "reviewed_object_index": 6,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "affirmative_current_action": true
+        },
+        "source_condition": null
+      },
+      "owned:core-ev-841f446b2cb1752d:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p296/297原出租表及续页、两期空位和租赁方向保留。",
+        "source_pages": [
+          296,
+          297,
+          298
+        ],
+        "reviewed_object_index": 7,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "actor_scope": true,
+          "substance": true
+        },
+        "source_condition": null
+      },
+      "owned:core-ev-b58bd8a4078eba06:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p11主机订单、采购制造和实际销售机制保持原主体。",
+        "source_pages": [
+          11
+        ],
+        "reviewed_object_index": 8,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "actor_scope": true,
+          "substance": true
+        },
+        "source_condition": null
+      },
+      "owned:core-ev-b0c2c2df34b44df3:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p166具体客户交付、电网月度结算及工程按进度机制；政策不能另推当期船舶配件销售。",
+        "source_pages": [
+          166
+        ],
+        "reviewed_object_index": 9,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "actor_scope": true,
+          "substance": true
+        },
+        "source_condition": null
+      },
+      "owned:core-ev-d41bfb8065c04497:commodity:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原页肯定当前动作逐条核对：风电主机，原动作为sells；电站仅采用p18已完成转让佐证，不单凭收入政策。",
+        "source_pages": [
+          11,
+          12
+        ],
+        "reviewed_object_index": 10,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "affirmative_current_action": true
+        },
+        "source_condition": {
+          "instrument_id": "600072.SH",
+          "name": "风电主机",
+          "role": "product_sales",
+          "native_aliases": [
+            "风电主机",
+            "风力发电机组",
+            "风电机组"
+          ],
+          "page": 11,
+          "source_quote": "主机销售等。公司通过招投标的方式获取主机订单",
+          "source_actor": "公司及合并子公司",
+          "reported_period": "2025-12-31",
+          "source_actions": [
+            "sells"
+          ],
+          "source_relation_types": [],
+          "source_verb": "销售",
+          "qualifier": null,
+          "action_source_basis": "完整原文肯定当前动作；不从研发/订单/用途/客户供应商名称推实际销售",
+          "quantity_acceptance": "当前只核原生对象与动作，未知映射pending/ambiguous；数量和价格扩展后置"
+        },
+        "recall_role_index": 0
+      },
+      "owned:core-ev-d41bfb8065c04497:commodity:2": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原页肯定当前动作逐条核对：风机零部件，原动作为purchases；电站仅采用p18已完成转让佐证，不单凭收入政策。",
+        "source_pages": [
+          11,
+          12
+        ],
+        "reviewed_object_index": 11,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "affirmative_current_action": true
+        },
+        "source_condition": {
+          "instrument_id": "600072.SH",
+          "name": "风机零部件",
+          "role": "raw_material_input",
+          "native_aliases": [
+            "风机零部件",
+            "风电零部件"
+          ],
+          "page": 11,
+          "source_quote": "通过向符合系统集成标准的供应商采购定制化及标准化的风机零部件",
+          "source_actor": "公司及合并子公司",
+          "reported_period": "2025-12-31",
+          "source_actions": [
+            "purchases"
+          ],
+          "source_relation_types": [],
+          "source_verb": "采购",
+          "qualifier": "实际明示采购并用于主机制造，不能按泛称猜具体轴承/发电机/铜/钢",
+          "action_source_basis": "完整原文肯定当前动作；不从研发/订单/用途/客户供应商名称推实际销售",
+          "quantity_acceptance": "当前只核原生对象与动作，未知映射pending/ambiguous；数量和价格扩展后置"
+        },
+        "recall_role_index": 4
+      },
+      "owned:core-ev-d41bfb8065c04497:commodity:3": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p11双瑞复材原主体明确叶片制造，未升格公司或以订单作销售。",
+        "source_pages": [
+          11,
+          12
+        ],
+        "reviewed_object_index": 12,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "affirmative_current_action": true,
+          "actor_scope": true
+        },
+        "source_condition": null
+      },
+      "owned:core-ev-d41bfb8065c04497:commodity:4": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原页肯定当前动作逐条核对：塔筒，原动作为sells；电站仅采用p18已完成转让佐证，不单凭收入政策。",
+        "source_pages": [
+          11,
+          12
+        ],
+        "reviewed_object_index": 13,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "affirmative_current_action": true
+        },
+        "source_condition": {
+          "instrument_id": "600072.SH",
+          "name": "塔筒",
+          "role": "product_sales",
+          "native_aliases": [
+            "塔筒",
+            "风机塔筒",
+            "风电塔筒"
+          ],
+          "page": 11,
+          "source_quote": "公司的塔筒业务主要包括塔筒研发、设计、生产、制造及销售业务",
+          "source_actor": "公司及合并子公司",
+          "reported_period": "2025-12-31",
+          "source_actions": [
+            "sells"
+          ],
+          "source_relation_types": [],
+          "source_verb": "销售",
+          "qualifier": null,
+          "action_source_basis": "完整原文肯定当前动作；不从研发/订单/用途/客户供应商名称推实际销售",
+          "quantity_acceptance": "当前只核原生对象与动作，未知映射pending/ambiguous；数量和价格扩展后置"
+        },
+        "recall_role_index": 2
+      },
+      "owned:core-ev-2848b8b0495f3127:commodity:2": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原页肯定当前动作逐条核对：风机零部件，原动作为purchases；电站仅采用p18已完成转让佐证，不单凭收入政策。",
+        "source_pages": [
+          11
+        ],
+        "reviewed_object_index": 14,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "affirmative_current_action": true
+        },
+        "source_condition": {
+          "instrument_id": "600072.SH",
+          "name": "风机零部件",
+          "role": "raw_material_input",
+          "native_aliases": [
+            "风机零部件",
+            "风电零部件"
+          ],
+          "page": 11,
+          "source_quote": "通过向符合系统集成标准的供应商采购定制化及标准化的风机零部件",
+          "source_actor": "公司及合并子公司",
+          "reported_period": "2025-12-31",
+          "source_actions": [
+            "purchases"
+          ],
+          "source_relation_types": [],
+          "source_verb": "采购",
+          "qualifier": "实际明示采购并用于主机制造，不能按泛称猜具体轴承/发电机/铜/钢",
+          "action_source_basis": "完整原文肯定当前动作；不从研发/订单/用途/客户供应商名称推实际销售",
+          "quantity_acceptance": "当前只核原生对象与动作，未知映射pending/ambiguous；数量和价格扩展后置"
+        },
+        "recall_role_index": 4
+      },
+      "owned:core-ev-2848b8b0495f3127:commodity:3": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p11双瑞复材原主体明确叶片制造，未升格公司或以订单作销售。",
+        "source_pages": [
+          11
+        ],
+        "reviewed_object_index": 15,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "affirmative_current_action": true,
+          "actor_scope": true
+        },
+        "source_condition": null
+      },
+      "owned:core-ev-93668a9bf127631f:commodity:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原页肯定当前动作逐条核对：电站产品，原动作为sells；电站仅采用p18已完成转让佐证，不单凭收入政策。",
+        "source_pages": [
+          17,
+          18
+        ],
+        "reviewed_object_index": 16,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "affirmative_current_action": true
+        },
+        "source_condition": {
+          "instrument_id": "600072.SH",
+          "name": "电站产品",
+          "role": "product_sales",
+          "native_aliases": [
+            "电站产品",
+            "风光电站",
+            "风光电站项目",
+            "电站"
+          ],
+          "page": 235,
+          "source_quote": "电站产品销售收入:该项履约义务通常在电站产品交付且控制权转移时完成",
+          "source_actor": "公司及合并子公司",
+          "reported_period": "2025-12-31",
+          "source_actions": [
+            "sells"
+          ],
+          "source_relation_types": [],
+          "source_verb": "销售",
+          "qualifier": "p12滚动开发＋p18当期项目转让为当前性证据，权益转让投资收益另立口径不当发电收入",
+          "action_source_basis": "完整原文肯定当前动作；不从研发/订单/用途/客户供应商名称推实际销售",
+          "quantity_acceptance": "当前只核原生对象与动作，未知映射pending/ambiguous；数量和价格扩展后置"
+        },
+        "recall_role_index": 5
+      },
+      "owned:core-ev-f9b0f09a5b79dfdb:commodity:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原页肯定当前动作逐条核对：风机配件，原动作为sells；电站仅采用p18已完成转让佐证，不单凭收入政策。",
+        "source_pages": [
+          166
+        ],
+        "reviewed_object_index": 17,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "affirmative_current_action": true
+        },
+        "source_condition": {
+          "instrument_id": "600072.SH",
+          "name": "风机配件",
+          "role": "product_sales",
+          "native_aliases": [
+            "风机配件",
+            "风电配件",
+            "风力发电机组配件"
+          ],
+          "page": 166,
+          "source_quote": "公司风机配件销售时",
+          "source_actor": "公司及合并子公司",
+          "reported_period": "2025-12-31",
+          "source_actions": [
+            "sells"
+          ],
+          "source_relation_types": [],
+          "source_verb": "销售",
+          "qualifier": null,
+          "action_source_basis": "完整原文肯定当前动作；不从研发/订单/用途/客户供应商名称推实际销售",
+          "quantity_acceptance": "当前只核原生对象与动作，未知映射pending/ambiguous；数量和价格扩展后置"
+        },
+        "recall_role_index": 1
+      },
+      "owned:core-ev-f9b0f09a5b79dfdb:commodity:2": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原页肯定当前动作逐条核对：电力，原动作为sells；电站仅采用p18已完成转让佐证，不单凭收入政策。",
+        "source_pages": [
+          166
+        ],
+        "reviewed_object_index": 18,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "affirmative_current_action": true
+        },
+        "source_condition": {
+          "instrument_id": "600072.SH",
+          "name": "电力",
+          "role": "product_sales",
+          "native_aliases": [
+            "电力",
+            "电力产品",
+            "发电",
+            "电力销售"
+          ],
+          "page": 166,
+          "source_quote": "本公司电力产品销售于电力供应至各电厂所在地的省电网公司",
+          "source_actor": "公司及合并子公司",
+          "reported_period": "2025-12-31",
+          "source_actions": [
+            "sells"
+          ],
+          "source_relation_types": [],
+          "source_verb": "销售",
+          "qualifier": null,
+          "action_source_basis": "完整原文肯定当前动作；不从研发/订单/用途/客户供应商名称推实际销售",
+          "quantity_acceptance": "当前只核原生对象与动作，未知映射pending/ambiguous；数量和价格扩展后置"
+        },
+        "recall_role_index": 3
+      },
+      "owned:core-ev-88f89c3be76fd39c:segment:industry:风电": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "reviewed_object_index": 19,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "industry",
+          "name": "风电",
+          "native_aliases": [
+            "风电"
+          ],
+          "value": "7,563,327,779.78",
+          "unit": "元",
+          "page": 24,
+          "column": "营业收入",
+          "header": "主营业务分行业",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "本比上\n年增减\n（%）\n毛利率比上年增减\n（%）\n风电 7,563,327,779.78 9,739,378,670.83 -28.77 60.24 115.41 减少 32.98 个百分点\n工程勘察",
+          "unit_basis_page": 24,
+          "qualifier": null,
+          "counterparty": null
+        },
+        "recall_row_index": 0
+      },
+      "owned:core-ev-627472bb0f4eb328:revenue:industry:风电": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "reviewed_object_index": 20,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "industry",
+          "name": "风电",
+          "native_aliases": [
+            "风电"
+          ],
+          "value": "7,563,327,779.78",
+          "unit": "元",
+          "page": 24,
+          "column": "营业收入",
+          "header": "主营业务分行业",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "本比上\n年增减\n（%）\n毛利率比上年增减\n（%）\n风电 7,563,327,779.78 9,739,378,670.83 -28.77 60.24 115.41 减少 32.98 个百分点\n工程勘察",
+          "unit_basis_page": 24,
+          "qualifier": null,
+          "counterparty": null
+        }
+      },
+      "owned:core-ev-88f89c3be76fd39c:segment:industry:工程勘察设计": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "reviewed_object_index": 21,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "industry",
+          "name": "工程勘察设计",
+          "native_aliases": [
+            "工程勘察设计"
+          ],
+          "value": "2,638,794,009.57",
+          "unit": "元",
+          "page": 24,
+          "column": "营业收入",
+          "header": "主营业务分行业",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "（%）\n毛利率比上年增减\n（%）\n风电 7,563,327,779.78 9,739,378,670.83 -28.77 60.24 115.41 减少 32.98 个百分点\n工程勘察\n设计 2,638,794,009.57 2,543,824,996.53 3.60 -5.74 -1.13 减少 4.5 个百分点\n主营业务分产品情况",
+          "unit_basis_page": 24,
+          "qualifier": null,
+          "counterparty": null
+        },
+        "recall_row_index": 1
+      },
+      "owned:core-ev-627472bb0f4eb328:revenue:industry:工程勘察设计": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "reviewed_object_index": 22,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "industry",
+          "name": "工程勘察设计",
+          "native_aliases": [
+            "工程勘察设计"
+          ],
+          "value": "2,638,794,009.57",
+          "unit": "元",
+          "page": 24,
+          "column": "营业收入",
+          "header": "主营业务分行业",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "（%）\n毛利率比上年增减\n（%）\n风电 7,563,327,779.78 9,739,378,670.83 -28.77 60.24 115.41 减少 32.98 个百分点\n工程勘察\n设计 2,638,794,009.57 2,543,824,996.53 3.60 -5.74 -1.13 减少 4.5 个百分点\n主营业务分产品情况",
+          "unit_basis_page": 24,
+          "qualifier": null,
+          "counterparty": null
+        }
+      },
+      "owned:core-ev-88f89c3be76fd39c:segment:product:风力发电机组及配件": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "reviewed_object_index": 23,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "product",
+          "name": "风力发电机组及配件",
+          "native_aliases": [
+            "风力发电机组及配件"
+          ],
+          "value": "6,749,102,962.56",
+          "unit": "元",
+          "page": 24,
+          "column": "营业收入",
+          "header": "主营业务分产品",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "毛利率比上年增减\n（%）\n风力发电\n机组及配\n件\n6,749,102,962.56 9,466,573,614.22 -40.26 87.28 134.39 减少 28.19 个百分点\n发电收入 518,947,912.75 296,894,045.99 42.79 -44.95 -18.09 减少 18.76 个百分点",
+          "unit_basis_page": 24,
+          "qualifier": "MD&A口径；与p234合同分类差异不得抹平",
+          "counterparty": null
+        },
+        "recall_row_index": 2
+      },
+      "owned:core-ev-627472bb0f4eb328:revenue:product:风力发电机组及配件": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "reviewed_object_index": 24,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "product",
+          "name": "风力发电机组及配件",
+          "native_aliases": [
+            "风力发电机组及配件"
+          ],
+          "value": "6,749,102,962.56",
+          "unit": "元",
+          "page": 24,
+          "column": "营业收入",
+          "header": "主营业务分产品",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "毛利率比上年增减\n（%）\n风力发电\n机组及配\n件\n6,749,102,962.56 9,466,573,614.22 -40.26 87.28 134.39 减少 28.19 个百分点\n发电收入 518,947,912.75 296,894,045.99 42.79 -44.95 -18.09 减少 18.76 个百分点",
+          "unit_basis_page": 24,
+          "qualifier": "MD&A口径；与p234合同分类差异不得抹平",
+          "counterparty": null
+        }
+      },
+      "owned:core-ev-88f89c3be76fd39c:segment:product:发电收入": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "reviewed_object_index": 25,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "product",
+          "name": "发电收入",
+          "native_aliases": [
+            "发电收入"
+          ],
+          "value": "518,947,912.75",
+          "unit": "元",
+          "page": 24,
+          "column": "营业收入",
+          "header": "主营业务分产品",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "（%）\n风力发电\n机组及配\n件\n6,749,102,962.56 9,466,573,614.22 -40.26 87.28 134.39 减少 28.19 个百分点\n发电收入 518,947,912.75 296,894,045.99 42.79 -44.95 -18.09 减少 18.76 个百分点\n工程总承",
+          "unit_basis_page": 24,
+          "qualifier": "MD&A口径；与p234合同分类差异不得抹平",
+          "counterparty": null
+        },
+        "recall_row_index": 3
+      },
+      "owned:core-ev-627472bb0f4eb328:revenue:product:发电收入": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "reviewed_object_index": 26,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "product",
+          "name": "发电收入",
+          "native_aliases": [
+            "发电收入"
+          ],
+          "value": "518,947,912.75",
+          "unit": "元",
+          "page": 24,
+          "column": "营业收入",
+          "header": "主营业务分产品",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "（%）\n风力发电\n机组及配\n件\n6,749,102,962.56 9,466,573,614.22 -40.26 87.28 134.39 减少 28.19 个百分点\n发电收入 518,947,912.75 296,894,045.99 42.79 -44.95 -18.09 减少 18.76 个百分点\n工程总承",
+          "unit_basis_page": 24,
+          "qualifier": "MD&A口径；与p234合同分类差异不得抹平",
+          "counterparty": null
+        }
+      },
+      "owned:core-ev-88f89c3be76fd39c:segment:product:工程总承包": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "reviewed_object_index": 27,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "product",
+          "name": "工程总承包",
+          "native_aliases": [
+            "工程总承包"
+          ],
+          "value": "1,925,433,826.49",
+          "unit": "元",
+          "page": 24,
+          "column": "营业收入",
+          "header": "主营业务分产品",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "机组及配\n件\n6,749,102,962.56 9,466,573,614.22 -40.26 87.28 134.39 减少 28.19 个百分点\n发电收入 518,947,912.75 296,894,045.99 42.79 -44.95 -18.09 减少 18.76 个百分点\n工程总承\n包 1,925,433,826.49 1,829,440,909.95 4.99 -12.14 -12.80 增加 0.72 个百分点\n工程设",
+          "unit_basis_page": 24,
+          "qualifier": "MD&A口径；与p234合同分类差异不得抹平",
+          "counterparty": null
+        },
+        "recall_row_index": 4
+      },
+      "owned:core-ev-627472bb0f4eb328:revenue:product:工程总承包": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "reviewed_object_index": 28,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "product",
+          "name": "工程总承包",
+          "native_aliases": [
+            "工程总承包"
+          ],
+          "value": "1,925,433,826.49",
+          "unit": "元",
+          "page": 24,
+          "column": "营业收入",
+          "header": "主营业务分产品",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "机组及配\n件\n6,749,102,962.56 9,466,573,614.22 -40.26 87.28 134.39 减少 28.19 个百分点\n发电收入 518,947,912.75 296,894,045.99 42.79 -44.95 -18.09 减少 18.76 个百分点\n工程总承\n包 1,925,433,826.49 1,829,440,909.95 4.99 -12.14 -12.80 增加 0.72 个百分点\n工程设",
+          "unit_basis_page": 24,
+          "qualifier": "MD&A口径；与p234合同分类差异不得抹平",
+          "counterparty": null
+        }
+      },
+      "owned:core-ev-88f89c3be76fd39c:segment:product:工程设计、勘察、咨询和监理": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "reviewed_object_index": 29,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "product",
+          "name": "工程设计、勘察、咨询和监理",
+          "native_aliases": [
+            "工程设计、勘察、咨询和监理"
+          ],
+          "value": "713,360,183.08",
+          "unit": "元",
+          "page": 24,
+          "column": "营业收入",
+          "header": "主营业务分产品",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "包 1,925,433,826.49 1,829,440,909.95 4.99 -12.14 -12.80 增加 0.72 个百分点\n工程设\n计、勘\n察、咨询\n和监理\n713,360,183.08 559,452,920.23 21.57 18.40 18.69 减少 0.19 个百分点\n其他 295,276,904.47 130,842,176.97 55.69 64.76 5.66 增加 24.79 个百分点",
+          "unit_basis_page": 24,
+          "qualifier": "MD&A口径；与p234合同分类差异不得抹平",
+          "counterparty": null
+        },
+        "recall_row_index": 5
+      },
+      "owned:core-ev-627472bb0f4eb328:revenue:product:工程设计、勘察、咨询和监理": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "reviewed_object_index": 30,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "product",
+          "name": "工程设计、勘察、咨询和监理",
+          "native_aliases": [
+            "工程设计、勘察、咨询和监理"
+          ],
+          "value": "713,360,183.08",
+          "unit": "元",
+          "page": 24,
+          "column": "营业收入",
+          "header": "主营业务分产品",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "包 1,925,433,826.49 1,829,440,909.95 4.99 -12.14 -12.80 增加 0.72 个百分点\n工程设\n计、勘\n察、咨询\n和监理\n713,360,183.08 559,452,920.23 21.57 18.40 18.69 减少 0.19 个百分点\n其他 295,276,904.47 130,842,176.97 55.69 64.76 5.66 增加 24.79 个百分点",
+          "unit_basis_page": 24,
+          "qualifier": "MD&A口径；与p234合同分类差异不得抹平",
+          "counterparty": null
+        }
+      },
+      "owned:core-ev-88f89c3be76fd39c:segment:product:其他": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "reviewed_object_index": 31,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "product",
+          "name": "其他",
+          "native_aliases": [
+            "其他"
+          ],
+          "value": "295,276,904.47",
+          "unit": "元",
+          "page": 24,
+          "column": "营业收入",
+          "header": "主营业务分产品",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "工程设\n计、勘\n察、咨询\n和监理\n713,360,183.08 559,452,920.23 21.57 18.40 18.69 减少 0.19 个百分点\n其他 295,276,904.47 130,842,176.97 55.69 64.76 5.66 增加 24.79 个百分点\n主营业务分地区情况",
+          "unit_basis_page": 24,
+          "qualifier": "MD&A口径；与p234合同分类差异不得抹平",
+          "counterparty": null
+        },
+        "recall_row_index": 6
+      },
+      "owned:core-ev-627472bb0f4eb328:revenue:product:其他": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "reviewed_object_index": 32,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "product",
+          "name": "其他",
+          "native_aliases": [
+            "其他"
+          ],
+          "value": "295,276,904.47",
+          "unit": "元",
+          "page": 24,
+          "column": "营业收入",
+          "header": "主营业务分产品",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "工程设\n计、勘\n察、咨询\n和监理\n713,360,183.08 559,452,920.23 21.57 18.40 18.69 减少 0.19 个百分点\n其他 295,276,904.47 130,842,176.97 55.69 64.76 5.66 增加 24.79 个百分点\n主营业务分地区情况",
+          "unit_basis_page": 24,
+          "qualifier": "MD&A口径；与p234合同分类差异不得抹平",
+          "counterparty": null
+        }
+      },
+      "owned:core-ev-88f89c3be76fd39c:segment:region:国内": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "reviewed_object_index": 33,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "region",
+          "name": "国内",
+          "native_aliases": [
+            "国内"
+          ],
+          "value": "10,051,541,638.05",
+          "unit": "元",
+          "page": 24,
+          "column": "营业收入",
+          "header": "主营业务分地区",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "本比上\n年增减\n（%）\n毛利率比上年增减\n（%）\n国内 10,051,541,638.05 12,208,319,836.63 -21.46 24.32 60.95 减少 27.65 个百分点\n国外 150,580,151.30 74,883,830.73 50.27 -22.32 -41.14 增加 15.90 个百分点",
+          "unit_basis_page": 24,
+          "qualifier": null,
+          "counterparty": null
+        },
+        "recall_row_index": 7
+      },
+      "owned:core-ev-627472bb0f4eb328:revenue:region:国内": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "reviewed_object_index": 34,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "region",
+          "name": "国内",
+          "native_aliases": [
+            "国内"
+          ],
+          "value": "10,051,541,638.05",
+          "unit": "元",
+          "page": 24,
+          "column": "营业收入",
+          "header": "主营业务分地区",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "本比上\n年增减\n（%）\n毛利率比上年增减\n（%）\n国内 10,051,541,638.05 12,208,319,836.63 -21.46 24.32 60.95 减少 27.65 个百分点\n国外 150,580,151.30 74,883,830.73 50.27 -22.32 -41.14 增加 15.90 个百分点",
+          "unit_basis_page": 24,
+          "qualifier": null,
+          "counterparty": null
+        }
+      },
+      "owned:core-ev-88f89c3be76fd39c:segment:region:国外": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "reviewed_object_index": 35,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "region",
+          "name": "国外",
+          "native_aliases": [
+            "国外"
+          ],
+          "value": "150,580,151.30",
+          "unit": "元",
+          "page": 24,
+          "column": "营业收入",
+          "header": "主营业务分地区",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "年增减\n（%）\n毛利率比上年增减\n（%）\n国内 10,051,541,638.05 12,208,319,836.63 -21.46 24.32 60.95 减少 27.65 个百分点\n国外 150,580,151.30 74,883,830.73 50.27 -22.32 -41.14 增加 15.90 个百分点",
+          "unit_basis_page": 24,
+          "qualifier": null,
+          "counterparty": null
+        },
+        "recall_row_index": 8
+      },
+      "owned:core-ev-627472bb0f4eb328:revenue:region:国外": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "reviewed_object_index": 36,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "region",
+          "name": "国外",
+          "native_aliases": [
+            "国外"
+          ],
+          "value": "150,580,151.30",
+          "unit": "元",
+          "page": 24,
+          "column": "营业收入",
+          "header": "主营业务分地区",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "年增减\n（%）\n毛利率比上年增减\n（%）\n国内 10,051,541,638.05 12,208,319,836.63 -21.46 24.32 60.95 减少 27.65 个百分点\n国外 150,580,151.30 74,883,830.73 50.27 -22.32 -41.14 增加 15.90 个百分点",
+          "unit_basis_page": 24,
+          "qualifier": null,
+          "counterparty": null
+        }
+      },
+      "owned:core-ev-88f89c3be76fd39c:segment:sales_mode:直销模式": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "reviewed_object_index": 37,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "sales_mode",
+          "name": "直销模式",
+          "native_aliases": [
+            "直销模式",
+            "直销"
+          ],
+          "value": "10,202,121,789.35",
+          "unit": "元",
+          "page": 25,
+          "column": "营业收入",
+          "header": "主营业务分销售模式",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "本比上\n年增减\n（%）\n毛利率比上年增减\n（%）\n直销模式 10,202,121,789.35 12,283,203,667.36 -20.40 23.23 59.27 减少 27.25 个百分点\n主营业务分行业、分产品、分地区、分销售模式情况的说明",
+          "unit_basis_page": 24,
+          "qualifier": null,
+          "counterparty": null
+        },
+        "recall_row_index": 9
+      },
+      "owned:core-ev-627472bb0f4eb328:revenue:sales_mode:直销模式": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "reviewed_object_index": 38,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "sales_mode",
+          "name": "直销模式",
+          "native_aliases": [
+            "直销模式",
+            "直销"
+          ],
+          "value": "10,202,121,789.35",
+          "unit": "元",
+          "page": 25,
+          "column": "营业收入",
+          "header": "主营业务分销售模式",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "本比上\n年增减\n（%）\n毛利率比上年增减\n（%）\n直销模式 10,202,121,789.35 12,283,203,667.36 -20.40 23.23 59.27 减少 27.25 个百分点\n主营业务分行业、分产品、分地区、分销售模式情况的说明",
+          "unit_basis_page": 24,
+          "qualifier": null,
+          "counterparty": null
+        }
+      },
+      "owned:core-ev-779da70e99f4998d:Segment:business_type:主营业务:营业收入:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          234
+        ],
+        "reviewed_object_index": 39,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "business_type",
+          "name": "主营业务",
+          "native_aliases": [
+            "主营业务"
+          ],
+          "value": "10,202,121,789.35",
+          "unit": "元",
+          "page": 234,
+          "column": "本期营业收入/本期确认收益",
+          "header": "合并营业收入和营业成本",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "(1).营业收入和营业成本情况\n√适用 □不适用\n单位：元币种：人民币\n项目 本期发生额 上期发生额\n收入 成本 收入 成本\n主营业务 10,202,121,789.35 12,283,203,667.36 8,279,147,785.56 7,712,163,392.18\n其他业务 149,135,546.93 71,270,957.30 143,994,516.13 70,946,783.67",
+          "unit_basis_page": 234,
+          "qualifier": null,
+          "counterparty": null
+        },
+        "recall_row_index": 10
+      },
+      "owned:core-ev-f6430b511bdd4e2f:Measurement:business_type:主营业务:营业收入:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          234
+        ],
+        "reviewed_object_index": 40,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "business_type",
+          "name": "主营业务",
+          "native_aliases": [
+            "主营业务"
+          ],
+          "value": "10,202,121,789.35",
+          "unit": "元",
+          "page": 234,
+          "column": "本期营业收入/本期确认收益",
+          "header": "合并营业收入和营业成本",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "(1).营业收入和营业成本情况\n√适用 □不适用\n单位：元币种：人民币\n项目 本期发生额 上期发生额\n收入 成本 收入 成本\n主营业务 10,202,121,789.35 12,283,203,667.36 8,279,147,785.56 7,712,163,392.18\n其他业务 149,135,546.93 71,270,957.30 143,994,516.13 70,946,783.67",
+          "unit_basis_page": 234,
+          "qualifier": null,
+          "counterparty": null
+        }
+      },
+      "owned:core-ev-779da70e99f4998d:Segment:business_type:其他业务:营业收入:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          234
+        ],
+        "reviewed_object_index": 41,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "business_type",
+          "name": "其他业务",
+          "native_aliases": [
+            "其他业务"
+          ],
+          "value": "149,135,546.93",
+          "unit": "元",
+          "page": 234,
+          "column": "本期营业收入/本期确认收益",
+          "header": "合并营业收入和营业成本",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "√适用 □不适用\n单位：元币种：人民币\n项目 本期发生额 上期发生额\n收入 成本 收入 成本\n主营业务 10,202,121,789.35 12,283,203,667.36 8,279,147,785.56 7,712,163,392.18\n其他业务 149,135,546.93 71,270,957.30 143,994,516.13 70,946,783.67\n合计 10,351,257,336.28 12,354,474,624.66 8,423,142,301.69 7,783,110,175.85",
+          "unit_basis_page": 234,
+          "qualifier": null,
+          "counterparty": null
+        },
+        "recall_row_index": 11
+      },
+      "owned:core-ev-f6430b511bdd4e2f:Measurement:business_type:其他业务:营业收入:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          234
+        ],
+        "reviewed_object_index": 42,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "business_type",
+          "name": "其他业务",
+          "native_aliases": [
+            "其他业务"
+          ],
+          "value": "149,135,546.93",
+          "unit": "元",
+          "page": 234,
+          "column": "本期营业收入/本期确认收益",
+          "header": "合并营业收入和营业成本",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "√适用 □不适用\n单位：元币种：人民币\n项目 本期发生额 上期发生额\n收入 成本 收入 成本\n主营业务 10,202,121,789.35 12,283,203,667.36 8,279,147,785.56 7,712,163,392.18\n其他业务 149,135,546.93 71,270,957.30 143,994,516.13 70,946,783.67\n合计 10,351,257,336.28 12,354,474,624.66 8,423,142,301.69 7,783,110,175.85",
+          "unit_basis_page": 234,
+          "qualifier": null,
+          "counterparty": null
+        }
+      },
+      "owned:core-ev-cfd577b660bb2653:Segment:product:风力发电机组及配件:全部营业收入/商品类型:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          234
+        ],
+        "reviewed_object_index": 43,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "product",
+          "name": "风力发电机组及配件",
+          "native_aliases": [
+            "风力发电机组及配件"
+          ],
+          "value": "6,749,103,121.19",
+          "unit": "元",
+          "page": 234,
+          "column": "本期营业收入/本期确认收益",
+          "header": "合同分类/商品类型",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "单位：元币种：人民币\n合同分类 2025 年度 2024 年度\n营业收入 营业成本 营业收入 营业成本\n商品类型\n风力发电机组及配\n件 6,749,103,121.19 9,398,248,716.35 3,603,681,091.80 4,038,819,296.93\n发电收入 518,947,912.75 296,894,045.99 942,718,116.08 362,459,372.61",
+          "unit_basis_page": 234,
+          "qualifier": "附注合同分类原数，与MD&A两个差额单独交付；同额三个项目仅作佐证不重复召回",
+          "counterparty": null
+        },
+        "recall_row_index": 12
+      },
+      "owned:core-ev-4dec5c21d164e001:Measurement:product:风力发电机组及配件:全部营业收入/商品类型:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          234
+        ],
+        "reviewed_object_index": 44,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "product",
+          "name": "风力发电机组及配件",
+          "native_aliases": [
+            "风力发电机组及配件"
+          ],
+          "value": "6,749,103,121.19",
+          "unit": "元",
+          "page": 234,
+          "column": "本期营业收入/本期确认收益",
+          "header": "合同分类/商品类型",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "单位：元币种：人民币\n合同分类 2025 年度 2024 年度\n营业收入 营业成本 营业收入 营业成本\n商品类型\n风力发电机组及配\n件 6,749,103,121.19 9,398,248,716.35 3,603,681,091.80 4,038,819,296.93\n发电收入 518,947,912.75 296,894,045.99 942,718,116.08 362,459,372.61",
+          "unit_basis_page": 234,
+          "qualifier": "附注合同分类原数，与MD&A两个差额单独交付；同额三个项目仅作佐证不重复召回",
+          "counterparty": null
+        }
+      },
+      "owned:core-ev-cfd577b660bb2653:Segment:product:发电收入:全部营业收入/商品类型:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p234合同分类本期收入首列与MD&A同额来源佐证，单独接受事实计准确率，同一来源条件不重复召回。",
+        "source_pages": [
+          234
+        ],
+        "reviewed_object_index": 45,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": null
+      },
+      "owned:core-ev-4dec5c21d164e001:Measurement:product:发电收入:全部营业收入/商品类型:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p234合同分类本期收入首列与MD&A同额来源佐证，单独接受事实计准确率，同一来源条件不重复召回。",
+        "source_pages": [
+          234
+        ],
+        "reviewed_object_index": 46,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": null
+      },
+      "owned:core-ev-cfd577b660bb2653:Segment:product:工程总承包:全部营业收入/商品类型:row:2": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p234合同分类本期收入首列与MD&A同额来源佐证，单独接受事实计准确率，同一来源条件不重复召回。",
+        "source_pages": [
+          234
+        ],
+        "reviewed_object_index": 47,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": null
+      },
+      "owned:core-ev-4dec5c21d164e001:Measurement:product:工程总承包:全部营业收入/商品类型:row:2": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p234合同分类本期收入首列与MD&A同额来源佐证，单独接受事实计准确率，同一来源条件不重复召回。",
+        "source_pages": [
+          234
+        ],
+        "reviewed_object_index": 48,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": null
+      },
+      "owned:core-ev-cfd577b660bb2653:Segment:product:工程设计、勘察、咨询和监理:全部营业收入/商品类型:row:3": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p234合同分类本期收入首列与MD&A同额来源佐证，单独接受事实计准确率，同一来源条件不重复召回。",
+        "source_pages": [
+          234
+        ],
+        "reviewed_object_index": 49,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": null
+      },
+      "owned:core-ev-4dec5c21d164e001:Measurement:product:工程设计、勘察、咨询和监理:全部营业收入/商品类型:row:3": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p234合同分类本期收入首列与MD&A同额来源佐证，单独接受事实计准确率，同一来源条件不重复召回。",
+        "source_pages": [
+          234
+        ],
+        "reviewed_object_index": 50,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": null
+      },
+      "owned:core-ev-cfd577b660bb2653:Segment:product:其他:全部营业收入/商品类型:row:4": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          234
+        ],
+        "reviewed_object_index": 51,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "product",
+          "name": "其他",
+          "native_aliases": [
+            "其他"
+          ],
+          "value": "295,276,745.84",
+          "unit": "元",
+          "page": 234,
+          "column": "本期营业收入/本期确认收益",
+          "header": "合同分类/商品类型",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "发电收入 518,947,912.75 296,894,045.99 942,718,116.08 362,459,372.61\n工程总承包 1,925,433,826.49 1,829,440,909.95 2,191,437,965.00 2,097,882,305.92\n工程设计、勘察、\n咨询和监理 713,360,183.08 559,452,920.23 602,494,283.41 471,356,376.71\n船舶配件 - - 759,601,816.76 617,813,687.75\n其他 295,276,745.84 199,167,074.84 179,214,512.51 123,832,352.26\n按经营地区分类",
+          "unit_basis_page": 234,
+          "qualifier": "附注合同分类原数，与MD&A两个差额单独交付；同额三个项目仅作佐证不重复召回",
+          "counterparty": null
+        },
+        "recall_row_index": 13
+      },
+      "owned:core-ev-4dec5c21d164e001:Measurement:product:其他:全部营业收入/商品类型:row:4": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          234
+        ],
+        "reviewed_object_index": 52,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "product",
+          "name": "其他",
+          "native_aliases": [
+            "其他"
+          ],
+          "value": "295,276,745.84",
+          "unit": "元",
+          "page": 234,
+          "column": "本期营业收入/本期确认收益",
+          "header": "合同分类/商品类型",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "发电收入 518,947,912.75 296,894,045.99 942,718,116.08 362,459,372.61\n工程总承包 1,925,433,826.49 1,829,440,909.95 2,191,437,965.00 2,097,882,305.92\n工程设计、勘察、\n咨询和监理 713,360,183.08 559,452,920.23 602,494,283.41 471,356,376.71\n船舶配件 - - 759,601,816.76 617,813,687.75\n其他 295,276,745.84 199,167,074.84 179,214,512.51 123,832,352.26\n按经营地区分类",
+          "unit_basis_page": 234,
+          "qualifier": "附注合同分类原数，与MD&A两个差额单独交付；同额三个项目仅作佐证不重复召回",
+          "counterparty": null
+        }
+      },
+      "owned:core-ev-af431539ad6a8dd2:Segment:product:风力发电机组及配件:全部营业收入/商品类型:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          234,
+          235
+        ],
+        "reviewed_object_index": 53,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "product",
+          "name": "风力发电机组及配件",
+          "native_aliases": [
+            "风力发电机组及配件"
+          ],
+          "value": "6,749,103,121.19",
+          "unit": "元",
+          "page": 234,
+          "column": "本期营业收入/本期确认收益",
+          "header": "合同分类/商品类型",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "单位：元币种：人民币\n合同分类 2025 年度 2024 年度\n营业收入 营业成本 营业收入 营业成本\n商品类型\n风力发电机组及配\n件 6,749,103,121.19 9,398,248,716.35 3,603,681,091.80 4,038,819,296.93\n发电收入 518,947,912.75 296,894,045.99 942,718,116.08 362,459,372.61",
+          "unit_basis_page": 234,
+          "qualifier": "附注合同分类原数，与MD&A两个差额单独交付；同额三个项目仅作佐证不重复召回",
+          "counterparty": null
+        },
+        "recall_row_index": 12
+      },
+      "owned:core-ev-af431539ad6a8dd2:Segment:product:发电收入:全部营业收入/商品类型:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p234合同分类本期收入首列与MD&A同额来源佐证，单独接受事实计准确率，同一来源条件不重复召回。",
+        "source_pages": [
+          234,
+          235
+        ],
+        "reviewed_object_index": 54,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": null
+      },
+      "owned:core-ev-af431539ad6a8dd2:Segment:product:工程总承包:全部营业收入/商品类型:row:2": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p234合同分类本期收入首列与MD&A同额来源佐证，单独接受事实计准确率，同一来源条件不重复召回。",
+        "source_pages": [
+          234,
+          235
+        ],
+        "reviewed_object_index": 55,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": null
+      },
+      "owned:core-ev-af431539ad6a8dd2:Segment:product:工程设计、勘察、咨询和监理:全部营业收入/商品类型:row:3": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p234合同分类本期收入首列与MD&A同额来源佐证，单独接受事实计准确率，同一来源条件不重复召回。",
+        "source_pages": [
+          234,
+          235
+        ],
+        "reviewed_object_index": 56,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": null
+      },
+      "owned:core-ev-af431539ad6a8dd2:Segment:product:其他:全部营业收入/商品类型:row:4": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          234,
+          235
+        ],
+        "reviewed_object_index": 57,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "product",
+          "name": "其他",
+          "native_aliases": [
+            "其他"
+          ],
+          "value": "295,276,745.84",
+          "unit": "元",
+          "page": 234,
+          "column": "本期营业收入/本期确认收益",
+          "header": "合同分类/商品类型",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "发电收入 518,947,912.75 296,894,045.99 942,718,116.08 362,459,372.61\n工程总承包 1,925,433,826.49 1,829,440,909.95 2,191,437,965.00 2,097,882,305.92\n工程设计、勘察、\n咨询和监理 713,360,183.08 559,452,920.23 602,494,283.41 471,356,376.71\n船舶配件 - - 759,601,816.76 617,813,687.75\n其他 295,276,745.84 199,167,074.84 179,214,512.51 123,832,352.26\n按经营地区分类",
+          "unit_basis_page": 234,
+          "qualifier": "附注合同分类原数，与MD&A两个差额单独交付；同额三个项目仅作佐证不重复召回",
+          "counterparty": null
+        },
+        "recall_row_index": 13
+      },
+      "owned:core-ev-bdb9fda0c552655f:Segment:business_segment:风机总装及配件:营业收入:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          234,
+          317
+        ],
+        "reviewed_object_index": 58,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "report_segment",
+          "name": "风机总装及配件",
+          "native_aliases": [
+            "风机总装及配件",
+            "风机总装及配件"
+          ],
+          "value": "10,362,007,490.52",
+          "unit": "元",
+          "page": 317,
+          "column": "本期营业收入/本期确认收益",
+          "header": "报告分部/营业收入",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "及配件\n工程总承及\n设计、勘察、咨\n询和监理\n发电业务 其他 分部间抵销 合计\n营业收入 10,362,007,490.52 2,762,252,996.18 630,292,562.56 118,414,253.47 -3,521,709,966.45 10,351,257,336.28\n营业成本 12,392,158,389.71 2,494,134,876.62 347,637,482.67 57,120,846.96 -2,936,576,971.30 12,354,474,624.66",
+          "unit_basis_page": 234,
+          "qualifier": "四报告分部合计经-3,521,709,966.45元抵销至10,351,257,336.28元；不推对外收入，不跨维度相加",
+          "counterparty": null
+        },
+        "recall_row_index": 15
+      },
+      "owned:core-ev-ff71d0bd9535caba:Measurement:business_segment:风机总装及配件:营业收入:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          234,
+          317
+        ],
+        "reviewed_object_index": 59,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "report_segment",
+          "name": "风机总装及配件",
+          "native_aliases": [
+            "风机总装及配件",
+            "风机总装及配件"
+          ],
+          "value": "10,362,007,490.52",
+          "unit": "元",
+          "page": 317,
+          "column": "本期营业收入/本期确认收益",
+          "header": "报告分部/营业收入",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "及配件\n工程总承及\n设计、勘察、咨\n询和监理\n发电业务 其他 分部间抵销 合计\n营业收入 10,362,007,490.52 2,762,252,996.18 630,292,562.56 118,414,253.47 -3,521,709,966.45 10,351,257,336.28\n营业成本 12,392,158,389.71 2,494,134,876.62 347,637,482.67 57,120,846.96 -2,936,576,971.30 12,354,474,624.66",
+          "unit_basis_page": 234,
+          "qualifier": "四报告分部合计经-3,521,709,966.45元抵销至10,351,257,336.28元；不推对外收入，不跨维度相加",
+          "counterparty": null
+        }
+      },
+      "owned:core-ev-bdb9fda0c552655f:Segment:business_segment:工程总承及设计、勘察、咨询和监理:营业收入:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          234,
+          317
+        ],
+        "reviewed_object_index": 60,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "report_segment",
+          "name": "工程总承及设计、勘察、咨询和监理",
+          "native_aliases": [
+            "工程总承及设计、勘察、咨询和监理",
+            "工程总承包及设计、勘察、咨询和监理"
+          ],
+          "value": "2,762,252,996.18",
+          "unit": "元",
+          "page": 317,
+          "column": "本期营业收入/本期确认收益",
+          "header": "报告分部/营业收入",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "及配件\n工程总承及\n设计、勘察、咨\n询和监理\n发电业务 其他 分部间抵销 合计\n营业收入 10,362,007,490.52 2,762,252,996.18 630,292,562.56 118,414,253.47 -3,521,709,966.45 10,351,257,336.28\n营业成本 12,392,158,389.71 2,494,134,876.62 347,637,482.67 57,120,846.96 -2,936,576,971.30 12,354,474,624.66",
+          "unit_basis_page": 234,
+          "qualifier": "四报告分部合计经-3,521,709,966.45元抵销至10,351,257,336.28元；不推对外收入，不跨维度相加",
+          "counterparty": null
+        },
+        "recall_row_index": 16
+      },
+      "owned:core-ev-ff71d0bd9535caba:Measurement:business_segment:工程总承及设计、勘察、咨询和监理:营业收入:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          234,
+          317
+        ],
+        "reviewed_object_index": 61,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "report_segment",
+          "name": "工程总承及设计、勘察、咨询和监理",
+          "native_aliases": [
+            "工程总承及设计、勘察、咨询和监理",
+            "工程总承包及设计、勘察、咨询和监理"
+          ],
+          "value": "2,762,252,996.18",
+          "unit": "元",
+          "page": 317,
+          "column": "本期营业收入/本期确认收益",
+          "header": "报告分部/营业收入",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "及配件\n工程总承及\n设计、勘察、咨\n询和监理\n发电业务 其他 分部间抵销 合计\n营业收入 10,362,007,490.52 2,762,252,996.18 630,292,562.56 118,414,253.47 -3,521,709,966.45 10,351,257,336.28\n营业成本 12,392,158,389.71 2,494,134,876.62 347,637,482.67 57,120,846.96 -2,936,576,971.30 12,354,474,624.66",
+          "unit_basis_page": 234,
+          "qualifier": "四报告分部合计经-3,521,709,966.45元抵销至10,351,257,336.28元；不推对外收入，不跨维度相加",
+          "counterparty": null
+        }
+      },
+      "owned:core-ev-bdb9fda0c552655f:Segment:business_segment:发电业务:营业收入:row:2": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          234,
+          317
+        ],
+        "reviewed_object_index": 62,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "report_segment",
+          "name": "发电业务",
+          "native_aliases": [
+            "发电业务",
+            "发电业务"
+          ],
+          "value": "630,292,562.56",
+          "unit": "元",
+          "page": 317,
+          "column": "本期营业收入/本期确认收益",
+          "header": "报告分部/营业收入",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "及配件\n工程总承及\n设计、勘察、咨\n询和监理\n发电业务 其他 分部间抵销 合计\n营业收入 10,362,007,490.52 2,762,252,996.18 630,292,562.56 118,414,253.47 -3,521,709,966.45 10,351,257,336.28\n营业成本 12,392,158,389.71 2,494,134,876.62 347,637,482.67 57,120,846.96 -2,936,576,971.30 12,354,474,624.66",
+          "unit_basis_page": 234,
+          "qualifier": "四报告分部合计经-3,521,709,966.45元抵销至10,351,257,336.28元；不推对外收入，不跨维度相加",
+          "counterparty": null
+        },
+        "recall_row_index": 17
+      },
+      "owned:core-ev-ff71d0bd9535caba:Measurement:business_segment:发电业务:营业收入:row:2": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          234,
+          317
+        ],
+        "reviewed_object_index": 63,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "report_segment",
+          "name": "发电业务",
+          "native_aliases": [
+            "发电业务",
+            "发电业务"
+          ],
+          "value": "630,292,562.56",
+          "unit": "元",
+          "page": 317,
+          "column": "本期营业收入/本期确认收益",
+          "header": "报告分部/营业收入",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "及配件\n工程总承及\n设计、勘察、咨\n询和监理\n发电业务 其他 分部间抵销 合计\n营业收入 10,362,007,490.52 2,762,252,996.18 630,292,562.56 118,414,253.47 -3,521,709,966.45 10,351,257,336.28\n营业成本 12,392,158,389.71 2,494,134,876.62 347,637,482.67 57,120,846.96 -2,936,576,971.30 12,354,474,624.66",
+          "unit_basis_page": 234,
+          "qualifier": "四报告分部合计经-3,521,709,966.45元抵销至10,351,257,336.28元；不推对外收入，不跨维度相加",
+          "counterparty": null
+        }
+      },
+      "owned:core-ev-bdb9fda0c552655f:Segment:business_segment:其他:营业收入:row:3": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          234,
+          317
+        ],
+        "reviewed_object_index": 64,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "report_segment",
+          "name": "其他",
+          "native_aliases": [
+            "其他",
+            "其他"
+          ],
+          "value": "118,414,253.47",
+          "unit": "元",
+          "page": 317,
+          "column": "本期营业收入/本期确认收益",
+          "header": "报告分部/营业收入",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "及配件\n工程总承及\n设计、勘察、咨\n询和监理\n发电业务 其他 分部间抵销 合计\n营业收入 10,362,007,490.52 2,762,252,996.18 630,292,562.56 118,414,253.47 -3,521,709,966.45 10,351,257,336.28\n营业成本 12,392,158,389.71 2,494,134,876.62 347,637,482.67 57,120,846.96 -2,936,576,971.30 12,354,474,624.66",
+          "unit_basis_page": 234,
+          "qualifier": "四报告分部合计经-3,521,709,966.45元抵销至10,351,257,336.28元；不推对外收入，不跨维度相加",
+          "counterparty": null
+        },
+        "recall_row_index": 18
+      },
+      "owned:core-ev-ff71d0bd9535caba:Measurement:business_segment:其他:营业收入:row:3": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          234,
+          317
+        ],
+        "reviewed_object_index": 65,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "report_segment",
+          "name": "其他",
+          "native_aliases": [
+            "其他",
+            "其他"
+          ],
+          "value": "118,414,253.47",
+          "unit": "元",
+          "page": 317,
+          "column": "本期营业收入/本期确认收益",
+          "header": "报告分部/营业收入",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "及配件\n工程总承及\n设计、勘察、咨\n询和监理\n发电业务 其他 分部间抵销 合计\n营业收入 10,362,007,490.52 2,762,252,996.18 630,292,562.56 118,414,253.47 -3,521,709,966.45 10,351,257,336.28\n营业成本 12,392,158,389.71 2,494,134,876.62 347,637,482.67 57,120,846.96 -2,936,576,971.30 12,354,474,624.66",
+          "unit_basis_page": 234,
+          "qualifier": "四报告分部合计经-3,521,709,966.45元抵销至10,351,257,336.28元；不推对外收入，不跨维度相加",
+          "counterparty": null
+        }
+      },
+      "owned:core-ev-bdb9fda0c552655f:Segment:adjustment:分部间抵销:营业收入:row:4": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p317报告分部本期营业收入抵销原数及adjustment，不作为同级业务收入或重复累计。",
+        "source_pages": [
+          234,
+          317
+        ],
+        "reviewed_object_index": 66,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": null
+      },
+      "owned:core-ev-ff71d0bd9535caba:Measurement:adjustment:分部间抵销:营业收入:row:4": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p317报告分部本期营业收入抵销原数及adjustment，不作为同级业务收入或重复累计。",
+        "source_pages": [
+          234,
+          317
+        ],
+        "reviewed_object_index": 67,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": null
+      },
+      "owned:core-ev-36e82bdfb453bbd7:Segment:business_type:其他业务:营业收入:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          318,
+          326
+        ],
+        "reviewed_object_index": 68,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "business_type",
+          "name": "其他业务",
+          "native_aliases": [
+            "其他业务"
+          ],
+          "value": "42,407,824.85",
+          "unit": "元",
+          "page": 326,
+          "column": "本期营业收入/本期确认收益",
+          "header": "母公司营业收入和营业成本",
+          "reported_period": "2025-12-31",
+          "source_actor": "母公司",
+          "source_quote": "√适用 □不适用\n单位：元币种：人民币\n项目 本期发生额 上期发生额\n收入 成本 收入 成本\n主营业务 - - - -\n其他业务 42,407,824.85 3,979,359.72 17,113,923.14 3,555,714.26\n合计 42,407,824.85 3,979,359.72 17,113,923.14 3,555,714.26",
+          "unit_basis_page": 326,
+          "qualifier": "母公司主营为“-”，不虚构0",
+          "counterparty": null
+        },
+        "recall_row_index": 14
+      },
+      "owned:core-ev-d114c29f3f104356:Measurement:business_type:其他业务:营业收入:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          318,
+          326
+        ],
+        "reviewed_object_index": 69,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "business_type",
+          "name": "其他业务",
+          "native_aliases": [
+            "其他业务"
+          ],
+          "value": "42,407,824.85",
+          "unit": "元",
+          "page": 326,
+          "column": "本期营业收入/本期确认收益",
+          "header": "母公司营业收入和营业成本",
+          "reported_period": "2025-12-31",
+          "source_actor": "母公司",
+          "source_quote": "√适用 □不适用\n单位：元币种：人民币\n项目 本期发生额 上期发生额\n收入 成本 收入 成本\n主营业务 - - - -\n其他业务 42,407,824.85 3,979,359.72 17,113,923.14 3,555,714.26\n合计 42,407,824.85 3,979,359.72 17,113,923.14 3,555,714.26",
+          "unit_basis_page": 326,
+          "qualifier": "母公司主营为“-”，不虚构0",
+          "counterparty": null
+        }
+      },
+      "owned:core-ev-1ab9b34738cb5a38:Segment:lease:房屋建筑物:本公司作为出租方/本期确认的租赁收入:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          296,
+          297,
+          298
+        ],
+        "reviewed_object_index": 70,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "counterparty_qualifier": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "service",
+          "name": "房屋建筑物",
+          "native_aliases": [
+            "房屋建筑物"
+          ],
+          "value": "14,001,877.32",
+          "unit": "元",
+          "page": 296,
+          "column": "本期营业收入/本期确认收益",
+          "header": "本公司作为出租方/本期确认租赁收入",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "本公司作为出租方：\n√适用 □不适用\n单位：元币种：人民币\n承租方名称 租赁资产种类 本期确认的租赁收入 上期确认的租赁收入\n中国船舶集团物\n资有限公司 房屋建筑物 14,001,877.32 16,404,330.84\n洛阳双瑞橡塑科",
+          "unit_basis_page": 296,
+          "qualifier": "承租方原名及租赁方向；后两行只有上期不生成当前收入",
+          "counterparty": "中国船舶集团物资有限公司"
+        },
+        "recall_row_index": 19
+      },
+      "owned:core-ev-7d01d33940776545:Measurement:lease:房屋建筑物:本公司作为出租方/本期确认的租赁收入:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          296,
+          297,
+          298
+        ],
+        "reviewed_object_index": 71,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "counterparty_qualifier": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "service",
+          "name": "房屋建筑物",
+          "native_aliases": [
+            "房屋建筑物"
+          ],
+          "value": "14,001,877.32",
+          "unit": "元",
+          "page": 296,
+          "column": "本期营业收入/本期确认收益",
+          "header": "本公司作为出租方/本期确认租赁收入",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "本公司作为出租方：\n√适用 □不适用\n单位：元币种：人民币\n承租方名称 租赁资产种类 本期确认的租赁收入 上期确认的租赁收入\n中国船舶集团物\n资有限公司 房屋建筑物 14,001,877.32 16,404,330.84\n洛阳双瑞橡塑科",
+          "unit_basis_page": 296,
+          "qualifier": "承租方原名及租赁方向；后两行只有上期不生成当前收入",
+          "counterparty": "中国船舶集团物资有限公司"
+        }
+      },
+      "owned:core-ev-1ab9b34738cb5a38:Segment:lease:房屋建筑物、机器设备:本公司作为出租方/本期确认的租赁收入:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          296,
+          297,
+          298
+        ],
+        "reviewed_object_index": 72,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "counterparty_qualifier": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "service",
+          "name": "房屋建筑物、机器设备",
+          "native_aliases": [
+            "房屋建筑物、机器设备"
+          ],
+          "value": "1,564,330.64",
+          "unit": "元",
+          "page": 296,
+          "column": "本期营业收入/本期确认收益",
+          "header": "本公司作为出租方/本期确认租赁收入",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "中国船舶集团物\n资有限公司 房屋建筑物 14,001,877.32 16,404,330.84\n洛阳双瑞橡塑科\n技有限公司\n房屋建筑物、机器\n设备 1,564,330.64 1,708,702.86\n湖北信安通科技",
+          "unit_basis_page": 296,
+          "qualifier": "承租方原名及租赁方向；后两行只有上期不生成当前收入",
+          "counterparty": "洛阳双瑞橡塑科技有限公司"
+        },
+        "recall_row_index": 20
+      },
+      "owned:core-ev-7d01d33940776545:Measurement:lease:房屋建筑物、机器设备:本公司作为出租方/本期确认的租赁收入:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          296,
+          297,
+          298
+        ],
+        "reviewed_object_index": 73,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "counterparty_qualifier": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "service",
+          "name": "房屋建筑物、机器设备",
+          "native_aliases": [
+            "房屋建筑物、机器设备"
+          ],
+          "value": "1,564,330.64",
+          "unit": "元",
+          "page": 296,
+          "column": "本期营业收入/本期确认收益",
+          "header": "本公司作为出租方/本期确认租赁收入",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "中国船舶集团物\n资有限公司 房屋建筑物 14,001,877.32 16,404,330.84\n洛阳双瑞橡塑科\n技有限公司\n房屋建筑物、机器\n设备 1,564,330.64 1,708,702.86\n湖北信安通科技",
+          "unit_basis_page": 296,
+          "qualifier": "承租方原名及租赁方向；后两行只有上期不生成当前收入",
+          "counterparty": "洛阳双瑞橡塑科技有限公司"
+        }
+      },
+      "owned:core-ev-1ab9b34738cb5a38:Segment:lease:房屋建筑物:本公司作为出租方/本期确认的租赁收入:row:2": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          296,
+          297,
+          298
+        ],
+        "reviewed_object_index": 74,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "counterparty_qualifier": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "service",
+          "name": "房屋建筑物",
+          "native_aliases": [
+            "房屋建筑物"
+          ],
+          "value": "433,390.47",
+          "unit": "元",
+          "page": 296,
+          "column": "本期营业收入/本期确认收益",
+          "header": "本公司作为出租方/本期确认租赁收入",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "洛阳双瑞橡塑科\n技有限公司\n房屋建筑物、机器\n设备 1,564,330.64 1,708,702.86\n湖北信安通科技\n有限责任公司 房屋建筑物 433,390.47 509,401.89\n中船物业（上",
+          "unit_basis_page": 296,
+          "qualifier": "承租方原名及租赁方向；后两行只有上期不生成当前收入",
+          "counterparty": "湖北信安通科技有限责任公司"
+        },
+        "recall_row_index": 21
+      },
+      "owned:core-ev-7d01d33940776545:Measurement:lease:房屋建筑物:本公司作为出租方/本期确认的租赁收入:row:2": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          296,
+          297,
+          298
+        ],
+        "reviewed_object_index": 75,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "counterparty_qualifier": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "service",
+          "name": "房屋建筑物",
+          "native_aliases": [
+            "房屋建筑物"
+          ],
+          "value": "433,390.47",
+          "unit": "元",
+          "page": 296,
+          "column": "本期营业收入/本期确认收益",
+          "header": "本公司作为出租方/本期确认租赁收入",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "洛阳双瑞橡塑科\n技有限公司\n房屋建筑物、机器\n设备 1,564,330.64 1,708,702.86\n湖北信安通科技\n有限责任公司 房屋建筑物 433,390.47 509,401.89\n中船物业（上",
+          "unit_basis_page": 296,
+          "qualifier": "承租方原名及租赁方向；后两行只有上期不生成当前收入",
+          "counterparty": "湖北信安通科技有限责任公司"
+        }
+      },
+      "owned:core-ev-1ab9b34738cb5a38:Segment:lease:房屋建筑物:本公司作为出租方/本期确认的租赁收入:row:3": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          296,
+          297,
+          298
+        ],
+        "reviewed_object_index": 76,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "counterparty_qualifier": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "service",
+          "name": "房屋建筑物",
+          "native_aliases": [
+            "房屋建筑物"
+          ],
+          "value": "26,857.81",
+          "unit": "元",
+          "page": 296,
+          "column": "本期营业收入/本期确认收益",
+          "header": "本公司作为出租方/本期确认租赁收入",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "房屋建筑物、机器\n设备 1,564,330.64 1,708,702.86\n湖北信安通科技\n有限责任公司 房屋建筑物 433,390.47 509,401.89\n中船物业（上\n海）有限公司 房屋建筑物 26,857.81 445,464.38\n洛阳船舶材料研",
+          "unit_basis_page": 296,
+          "qualifier": "承租方原名及租赁方向；后两行只有上期不生成当前收入",
+          "counterparty": "中船物业（上海）有限公司"
+        },
+        "recall_row_index": 22
+      },
+      "owned:core-ev-7d01d33940776545:Measurement:lease:房屋建筑物:本公司作为出租方/本期确认的租赁收入:row:3": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐原表本期收入列、完整原名、金额/元、原主体及栏目核对；不同承租方各自保留，不跨维度累计。",
+        "source_pages": [
+          296,
+          297,
+          298
+        ],
+        "reviewed_object_index": 77,
+        "checks": {
+          "period": true,
+          "official_version": true,
+          "printed_amount": true,
+          "unit": true,
+          "native_label": true,
+          "current_column": true,
+          "actor_scope": true,
+          "counterparty_qualifier": true,
+          "native_column": true,
+          "not_prior_or_expense": true
+        },
+        "source_condition": {
+          "dimension": "service",
+          "name": "房屋建筑物",
+          "native_aliases": [
+            "房屋建筑物"
+          ],
+          "value": "26,857.81",
+          "unit": "元",
+          "page": 296,
+          "column": "本期营业收入/本期确认收益",
+          "header": "本公司作为出租方/本期确认租赁收入",
+          "reported_period": "2025-12-31",
+          "source_actor": "公司及合并子公司",
+          "source_quote": "房屋建筑物、机器\n设备 1,564,330.64 1,708,702.86\n湖北信安通科技\n有限责任公司 房屋建筑物 433,390.47 509,401.89\n中船物业（上\n海）有限公司 房屋建筑物 26,857.81 445,464.38\n洛阳船舶材料研",
+          "unit_basis_page": 296,
+          "qualifier": "承租方原名及租赁方向；后两行只有上期不生成当前收入",
+          "counterparty": "中船物业（上海）有限公司"
+        }
+      }
+    },
+    "answers": {
+      "principal_business": {
+        "accurate": true,
+        "answered": true,
+        "reason": "逐原文核主体、当前/预研状态、完整业务/租赁/受托与收费或履约机制，实质正文完整；不以answered或关键词单独作为通过依据。",
+        "failed_substance_groups": []
+      },
+      "products_services": {
+        "accurate": true,
+        "answered": true,
+        "reason": "逐原文核主体、当前/预研状态、完整业务/租赁/受托与收费或履约机制，实质正文完整；不以answered或关键词单独作为通过依据。",
+        "failed_substance_groups": []
+      },
+      "revenue_model": {
+        "accurate": true,
+        "answered": true,
+        "reason": "逐原文核主体、当前/预研状态、完整业务/租赁/受托与收费或履约机制，实质正文完整；不以answered或关键词单独作为通过依据。",
+        "failed_substance_groups": []
+      }
+    }
+  }
+}

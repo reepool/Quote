@@ -1,0 +1,25 @@
+{
+  "created_at": "2026-10-08T09:11:09.664744+00:00",
+  "sha256": {
+    "data/checkpoints/company_profile_common_core/reports/m4_v34_lease_subject_acceptance/plan.json": "a105ea34598b83aad9ac1ae08c3a31a936715204714875b2866685dd4c1743a6",
+    "data/checkpoints/company_profile_common_core/reports/m4_v34_lease_subject_acceptance/company_profile_live_run.v1.json": "cacfbe785474cf546f2b276596a3787dd3007b32c591d699e8d4bf76367d4ce7",
+    "data/checkpoints/company_profile_common_core/reports/m4_v34_lease_subject_acceptance/observation.json": "94ee728d448a9f342046a6d2c3625796b189a42118592162193d3bafd04cef8f",
+    "data/checkpoints/company_profile_common_core/reports/m4_v34_lease_subject_acceptance/formal_execution.json": "89c3f1de7d84d615c0f928d33799faaa8314ed27c6f3dbd3d0d417c32a388651",
+    "data/research/company_profile_common_core/m4_v34_lease_subject_acceptance/company_profile_common_core.v1/bp-work-ffef54192d5744ab6c486064.json": "946accbede7db8be11b2e7b98086fa59934b58540d44ab9fa7b4988dca01fa47",
+    "data/research/company_profile_common_core/m4_v34_lease_subject_acceptance/company_profile_common_core.v1/bp-work-ed17b3041039bc2b88cce8fc.json": "a25af06169cfa2c61ab7c187d0a1c766e428cc949ed7b87d02a40668b6c7fc23",
+    "data/research/company_profile_common_core/m4_v34_lease_subject_acceptance/company_profile_common_core.v1/scopes/600072.SH/2025-12-31/extract_segment_financials.json": "6348f5132c420d6439015e4eadc5ca974a0e6846ba1acd7950109541f6358975",
+    "data/research/company_profile_common_core/m4_v34_lease_subject_acceptance/company_profile_common_core.v1/scopes/600072.SH/2025-12-31/extract_business_overview.json": "5fb355a7a39b67e04688e2dc10506d4a0df7ccd448a6a1a3d8b8afeb9a3f2d76",
+    "data/research/company_profile_common_core/m4_v34_lease_subject_acceptance/company_profile_common_core.v1/scopes/600033.SH/2025-12-31/extract_segment_financials.json": "3a5a9a96f7d1256bf2cb53b6a61e88414e05851f2be5192ec9e404e088b2dbe9",
+    "data/research/company_profile_common_core/m4_v34_lease_subject_acceptance/company_profile_common_core.v1/scopes/600033.SH/2025-12-31/extract_business_overview.json": "2bf5c9eb35a4c77e04dbd1d352bb096a4b7b3baf0cf0b31a6640f88276552fa2",
+    "data/research/company_profile_common_core/m4_v34_lease_subject_acceptance/company_profile_common_core.v1/checkpoints/bp-work-ffef54192d5744ab6c486064.json": "43ade0a1dd6af74909c064df1eb70f1265d3a9304e18ed646638326e3be5cc60",
+    "data/research/company_profile_common_core/m4_v34_lease_subject_acceptance/company_profile_common_core.v1/checkpoints/bp-work-ed17b3041039bc2b88cce8fc.json": "ecff5aeb75c1f4af27a05cc510a7c6a39298c9831148e0833bacc5d7f23b8a6c",
+    "data/exports/m4_v34_lease_subject_acceptance/600072.SH/profiles.csv": "34803e18c17264095329878c551eb28cbe1ede03f6b3e6d78d2898eea88023e2",
+    "data/exports/m4_v34_lease_subject_acceptance/600072.SH/600072.SH_2025-12-31.json": "16e1263591e52e52bbef0f7bb2e38789cb2f60598f0599bccd629168b6fa3a37",
+    "data/exports/m4_v34_lease_subject_acceptance/600072.SH/export_manifest.json": "beaea16d9310be98d69b8ae3fb3170e014be59177f1ee1129bff9155bf9507e3",
+    "data/exports/m4_v34_lease_subject_acceptance/600033.SH/profiles.csv": "1de791ea580e9263cafd9133cfdfd0eaeb519cccb6caf6da33fbdf379f38fa76",
+    "data/exports/m4_v34_lease_subject_acceptance/600033.SH/600033.SH_2025-12-31.json": "2256220277835791fa53488e2c58265ec082edecaf32ada8b9c228bd82298f7d",
+    "data/exports/m4_v34_lease_subject_acceptance/600033.SH/export_manifest.json": "640dd88fff2a3778652edb90538d9838456c1f9016acc61af292920c8e7b7701"
+  },
+  "first_formal_index": 1,
+  "original_bytes_retained": true
+}

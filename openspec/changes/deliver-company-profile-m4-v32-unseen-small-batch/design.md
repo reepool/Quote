@@ -30,3 +30,11 @@ The independent68-condition contract preceded first execute. Actual first run-qu
 ## v33 formal failure and local correction
 
 The first successor delivered151facts and6answered bodies in189.683909seconds with0tokens and no actual five-stage reuse. Corrected substantive recall66/68 and unique accuracy153/157 fail acceptance; four objects contain a contaminated native tenant qualifier although their current amounts and units are correct. The original65/68 review and its source-anchor correction remain separately preserved. The post-formal selector now excludes the lessor title and16complete-page/boundary regressions pass, but this does not replace first delivery or prove a new formal round. The change remains unarchived and expansion pauses pending A-role review.
+
+## A角授权的v34后继正式验收
+
+5.1事后承租方标题补正已获确认，不重开4.1–4.3。5.2接通完整v34五开关、默认不变；完整owner/PDF页精确核25笔租赁后，沿原计划、官方版本、cutoff及68实质条件，用全新m4_v34_lease_subject_acceptance目录首次正式run→query→export。5.3动态唯一计分，重点原承租方、本期空位、表尾与动作边界；首次结果与v32/v33失败轨迹均原字节保留。只有新正式轮满足双100%、数字0、≤300秒、共享≤50000token，才提交A角有限审核。5.4主规格同步与归档须待A角确认，当前不归档、不扩批；生产not_authorized、规模false。
+
+## v34有限验收提交（待A角确认）
+
+首次正式轮184.458822秒、0/50000token，实际五阶段无复用及前驱继承；六正文＋55收入＋7角色召回68/68，动态准确率157/157＝151实际事实＋6答案，数字0。25笔承租方及Segment/Measurement精确一致，查询/导出/磁盘一致，1051历史和18首次交付保护通过。5.2、5.3完成；新分数限68条件和实际检查页，不推出全年报或规模结论。5.4须A角确认后另行执行，当前未归档、扩批暂停。

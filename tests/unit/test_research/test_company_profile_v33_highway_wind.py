@@ -25,9 +25,13 @@ def _fixture(i):
     return json.loads(FIXTURE.read_text())[i]
 
 
-def _delivered(tmp_path, i, pages):
+def _delivered(tmp_path, i, pages, repair_version="v33"):
     q, e = _drive(
-        tmp_path, instrument=i, fixture=_fixture(i), pages=pages, repair_version="v33"
+        tmp_path,
+        instrument=i,
+        fixture=_fixture(i),
+        pages=pages,
+        repair_version=repair_version,
     )
     assert q == e
     checkpoint = json.loads(
@@ -38,11 +42,14 @@ def _delivered(tmp_path, i, pages):
     return q, {r["record_id"]: r for r in _iter_accepted_raw(checkpoint)}
 
 
+@pytest.mark.parametrize("repair_version", ["v33", "v34"])
 @pytest.mark.parametrize("i", ["600033.SH", "600072.SH"])
 @pytest.mark.parametrize("kind", ["pages", "independent_pages"])
-def test_complete_owned_pages_deliver_income_bodies_and_actions(tmp_path, i, kind):
+def test_complete_owned_pages_deliver_income_bodies_and_actions(
+    tmp_path, i, kind, repair_version
+):
     f = _fixture(i)
-    q, raw = _delivered(tmp_path, i, f[kind])
+    q, raw = _delivered(tmp_path, i, f[kind], repair_version)
     for dim, rule in f["answers"].items():
         assert all(
             any(_compact(s) in _answer(q, dim) for s in group)
@@ -163,10 +170,11 @@ def test_policy_orders_and_costs_do_not_create_sales(tmp_path):
     assert not q["commodity_exposure"]["assessment"]["exposures"]
 
 
-def test_successor_flags_leave_default_identity_unchanged():
+@pytest.mark.parametrize("repair_version", ["v33", "v34"])
+def test_successor_flags_leave_default_identity_unchanged(repair_version):
     identity = default_processing_identity()
     assert "revenue_sentence_repair" not in identity
-    repaired = {**identity, "revenue_sentence_repair": "v33"}
+    repaired = {**identity, "revenue_sentence_repair": repair_version}
     for name in [
         "revenue_sentence_repair_requested",
         "named_role_repair_requested",
@@ -177,14 +185,17 @@ def test_successor_flags_leave_default_identity_unchanged():
         assert getattr(selection, name)(repaired)
 
 
-def test_equal_rent_values_for_distinct_tenants_remain_distinct(tmp_path):
+@pytest.mark.parametrize("repair_version", ["v33", "v34"])
+def test_equal_rent_values_for_distinct_tenants_remain_distinct(
+    tmp_path, repair_version
+):
     i = "600033.SH"
     pages = _fixture(i)["pages"]
     for p in pages:
         for field in ["text", "layout_text"]:
             if p.get(field):
                 p[field] = p[field].replace("2,336,513.76", "5,527,173.17")
-    _, raw = _delivered(tmp_path, i, pages)
+    _, raw = _delivered(tmp_path, i, pages, repair_version)
     for kind in ["Segment", "Measurement"]:
         rows = [
             r

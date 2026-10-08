@@ -59,3 +59,8 @@ Different original rows or counterparties sharing a lease asset name MUST retain
 #### Scenario: Lessor title precedes the first tenant row
 - **WHEN** the native lessor section title precedes tenant column headers and current rows
 - **THEN** the section title cannot enter the native tenant qualifier; every original tenant name remains exact, including wrapped cells
+
+#### Scenario: Corrected tenant qualifiers need a successor formal closure
+- **WHEN** A-role confirms the post-formal local tenant correction
+- **THEN** the complete v34 identity enables all five cumulative repairs without changing defaults, verifies twenty-five exact tenant qualifiers on complete pages, and performs the first existing-owner delivery in a new directory against the same sixty-eight substantive conditions
+- **AND** unique dynamic accuracy, actual five-stage reuse and whole-round timing determine finite submission; specification synchronization and archive wait for A-role confirmation, preserving prior failures
