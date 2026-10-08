@@ -22,8 +22,16 @@ v36已在125项声明来源范围获A角有限通过并归档。下一对未见�
 
 ## Impact
 
-复用CompanyProfileTaskService.freeze_m4_next_batch_plan、execute_published_task、record_published_source_review及现有单一owner，无业务代码修改和新执行框架。生产not_authorized、规模false；量价、行业、正文精简、性能和无关技术债后置，仅这两家受控验证。
+复用CompanyProfileTaskService.freeze_m4_next_batch_plan、execute_published_task、record_published_source_review及现有单一owner，同源局部业务修复，不新增执行框架。生产not_authorized、规模false；量价、行业、正文精简、性能和无关技术债后置，仅这两家受控验证。
 
 ## First formal finite failure observation
 
 The independent pre-execution contract fixed170conditions (6substantive bodies,116income conditions,48explicit actions/relations) for600037.SH and600075.SH. First owner delivery takes221.739774seconds and0/50000tokens with no five-stage or predecessor reuse. Recall59/170 and unique accuracy107/122 (118accepted facts+4answered bodies) fail acceptance;critical numeric errors are0. Two unanswered principal-business bodies count only as recall omissions. Fifteen erroneous objects comprise one three-row concatenated commodity Activity,ten incorrect native-column facts and four incomplete answers. Original source bytes,first18delivery files and two review artifacts are preserved. Scope helper-label interpretations are attached separately without changing original source actions,conditions,denominator or output. Further batches pause and this change remains unarchived;only source-backed cards4.1–4.4 are recorded. Production remains not_authorized and scale quality false.
+
+## 同源v37修复范围
+
+A角已确认首次失败，按4.1→4.3→4.2→4.4实施。复用现有选段、章节接受、查询和导出owner，局部补完整运营及收入确认原文，保留子公司/参股、试车/推广、资产交割注销等状态。产销单位和数字列与商品名分开，同物料采购Activity和实际耗用material_input Relationship分别保存；具名关联表只绑定肯定当前动作，负面或未来清单不生成销售角色。
+
+收入按原表边界及标题切换地区/确认时间状态；明细与续表、原单位、具名子公司、联营、分部抵销、经营/转租/融资收益和出租交易各自保留。承租方与原行参与记录身份；布局折行表头用原文本核栏目、layout解析原行，不把本期金额与比例合并。歌华p197和天业p220仅补母公司章节上下文，不新增召回条件；已读p43参股新能源说明和p36产能释放状态用于正文限定。
+
+后继合同另存v37-source-scope.json，把recognition_time映射revenue_timing、consumes映射material_input、能源类别映射energy_consumption及明细容器按原生栏目解释，逐项保留原170实质条件。默认身份不变，v37完整五累积开关；沿5e2e688d…原计划、两官方版本及2026-09-17，在m4_v37_network_chemicals_repair首次正式两家run/query/export，共享50000token，完整计时含重试。动态逐对象准确率不预填，达标仅提交A角有限审核，当前不归档不扩批。原首次合同、分数与制品保持原字节，生产not_authorized、规模false。

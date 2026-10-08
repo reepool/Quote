@@ -1,0 +1,24 @@
+{
+  "formal_execution_index": 1,
+  "sha256": {
+    "data/checkpoints/company_profile_common_core/reports/m4_v37_network_chemicals_repair/plan.json": "c12b452ac136c8e0daec14857f93c0f54d848211fe7a4c35ec64a3cf00ecb4ba",
+    "data/checkpoints/company_profile_common_core/reports/m4_v37_network_chemicals_repair/company_profile_live_run.v1.json": "b59f49b784450d93b4024251c2771134c9b7e97437ec1443cb2243fd953cf144",
+    "data/checkpoints/company_profile_common_core/reports/m4_v37_network_chemicals_repair/observation.json": "d6b91f493f4cfcaeee6afd6627fe64243c366e3b88e9851acb029de0149eb0f3",
+    "data/checkpoints/company_profile_common_core/reports/m4_v37_network_chemicals_repair/formal_execution.json": "340a5a9991c4dfac5b75920a21947d373e333c18ae4832704ccc9a112da07a8b",
+    "data/research/company_profile_common_core/m4_v37_network_chemicals_repair/company_profile_common_core.v1/bp-work-e89cf7db60f421009249d0c6.json": "185fefafe36a9b90d0d4f13ce590246aaf80237627914eb6fff78ef2f8ed078e",
+    "data/research/company_profile_common_core/m4_v37_network_chemicals_repair/company_profile_common_core.v1/bp-work-e6afd32c483112f46b6eb9db.json": "4e55dcd181f3819a231b118637d76886d6ad9dc4de9534561901849da72ebc44",
+    "data/research/company_profile_common_core/m4_v37_network_chemicals_repair/company_profile_common_core.v1/scopes/600037.SH/2025-12-31/extract_segment_financials.json": "d4144e7da83139b1760d77e625fa1fe7a80c5b11219c30c93a66bd1ad84558ff",
+    "data/research/company_profile_common_core/m4_v37_network_chemicals_repair/company_profile_common_core.v1/scopes/600037.SH/2025-12-31/extract_business_overview.json": "37ff9403a37f1b917790e4acae275f4b872e2598af2450bedd844af69e2a7568",
+    "data/research/company_profile_common_core/m4_v37_network_chemicals_repair/company_profile_common_core.v1/scopes/600075.SH/2025-12-31/extract_segment_financials.json": "1839d6b7d3b1d85e41f7277010be2fbc0bbf370c8d44958c48a0d1c3f775a0bc",
+    "data/research/company_profile_common_core/m4_v37_network_chemicals_repair/company_profile_common_core.v1/scopes/600075.SH/2025-12-31/extract_material_inputs.json": "5004391f82f9616d061bd9d45b1df38a157e6e6f36197273a8091c18305713fe",
+    "data/research/company_profile_common_core/m4_v37_network_chemicals_repair/company_profile_common_core.v1/scopes/600075.SH/2025-12-31/extract_business_overview.json": "e1149ec6c784d0499a4d26ae84dc1ec835b1c4d47c4ab797237d045d294f6c13",
+    "data/research/company_profile_common_core/m4_v37_network_chemicals_repair/company_profile_common_core.v1/checkpoints/bp-work-e89cf7db60f421009249d0c6.json": "346286ca696b774616e8d04bab9d1a83540ca98c5d58792d7ebfc551223d0e01",
+    "data/research/company_profile_common_core/m4_v37_network_chemicals_repair/company_profile_common_core.v1/checkpoints/bp-work-e6afd32c483112f46b6eb9db.json": "afee902f667eaf0f5e4a4817c72a04ccca66e52997e609003ac8048c7bac7581",
+    "data/exports/m4_v37_network_chemicals_repair/600037.SH/profiles.csv": "4076883523e7273d07a6d831758c39fefc237b0a9a5e9a79681ef53f84afb649",
+    "data/exports/m4_v37_network_chemicals_repair/600037.SH/600037.SH_2025-12-31.json": "62789379b039899c2de126561b8d194e6bdf46e75330db9273119356ffc9e406",
+    "data/exports/m4_v37_network_chemicals_repair/600037.SH/export_manifest.json": "661b71ddbe6ebc9a6fd3e576dfb46e878dcb61478af0ef9a216b554c29c33501",
+    "data/exports/m4_v37_network_chemicals_repair/600075.SH/profiles.csv": "0f12495525c7a84f62dad59d8aa3bfabf9e6be5944db45ae460faadb10614991",
+    "data/exports/m4_v37_network_chemicals_repair/600075.SH/600075.SH_2025-12-31.json": "1d9f3e8cc0e7547e19e73542adce5dc696b83cef369ad08c44d570a0bc8af9d3",
+    "data/exports/m4_v37_network_chemicals_repair/600075.SH/export_manifest.json": "5ae8bf62bd5f0e7a799aa7328b7a1599592cf36afd6543d5b04e15ed495eafef"
+  }
+}

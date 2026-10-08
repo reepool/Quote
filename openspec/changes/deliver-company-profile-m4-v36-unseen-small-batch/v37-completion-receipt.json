@@ -1,0 +1,47 @@
+{
+  "independent_frozen_pages": 78,
+  "actual_accuracy_pages": 70,
+  "unique_official_pages_verified": 86,
+  "historical_protection": 1254,
+  "first_formal_protection": 19,
+  "formal_review_protection": 4,
+  "executed_modules_unchanged": 38,
+  "existing_documents_unchanged": true,
+  "formal_execution_index": 1,
+  "source_fixed_before_execution": true,
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false,
+  "a_role_acceptance": "pending_finite_review",
+  "next_batch": "paused_pending_a_role_review",
+  "change_archived": false,
+  "validation": {
+    "targeted_tests": "30 passed, 7 warnings",
+    "ruff_check": "passed",
+    "ruff_format_check": "passed",
+    "openspec_strict": "passed",
+    "diff_check": "staged non-patch files passed; frozen unified-diff context preserved and reconstruction/hash passed"
+  },
+  "review": {
+    "blocking_findings": [],
+    "scope": "170 conditions and inspected official pages",
+    "unrelated_work": "untouched"
+  },
+  "source_recall": {
+    "status": "assessed",
+    "numerator": 170,
+    "denominator": 170,
+    "value": 1.0
+  },
+  "source_accuracy": {
+    "status": "assessed",
+    "numerator": 373,
+    "denominator": 373,
+    "value": 1.0
+  },
+  "critical_numeric_errors": 0,
+  "whole_round_seconds": 203.70389195438474,
+  "tokens_consumed": 0,
+  "actual_runtime_no_reuse": true,
+  "query_export_disk_equal": true,
+  "executed_code_reconstruction_verified": true
+}

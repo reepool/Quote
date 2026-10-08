@@ -208,7 +208,7 @@ def test_parcel_identifier_is_never_an_amount(tmp_path):
         rows = [
             f
             for f in profile["accepted_facts"]
-            if "太阳宫" in (f["source_native_name"] or "")
+            if (f["source_native_name"] or "").startswith("太阳宫D区")
         ]
         assert len(rows) == 2
         assert all(

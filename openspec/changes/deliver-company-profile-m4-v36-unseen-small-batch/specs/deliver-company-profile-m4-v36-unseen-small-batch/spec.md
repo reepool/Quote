@@ -43,3 +43,21 @@ The original170condition contract,59/170recall,107/122accuracy,zero critical num
 #### Scenario: A purchased energy role coexists with self-use
 - **WHEN** the official page declares separate current采购量 and耗用量
 - **THEN** purchases and material_input facts remain distinct even when the reader uses the sameenergy_consumption category
+
+### Requirement: Same-source repair preserves native bodies and transaction semantics
+Full owner and independent official pages MUST retain complete operating and revenue-mechanism narratives with original subsidiary, associate, disposal, trial and promotion qualifications. Native product units and numeric cells MUST NOT enter commodity names. Related transaction lists MUST bind only affirmative current sales or purchases. Source purchase and actual-use columns MUST produce separate purchases Activities and material_input Relationships, including energy_consumption categories without changing the underlying action.
+
+#### Scenario: A transaction list is negative or future
+- **WHEN** a full current disclosure page is changed to 不从事销售 or 拟销售 for its named goods
+- **THEN** those goods generate no sales fact or exported sales role while other supported current objects and original actors remain
+
+### Requirement: Native income boundaries survive owner layout and continuation
+Detail, subsidiary, associate, division and lessor income MUST retain the original current value, declared unit, native column and original actor or counterparty. Wrapped headings MUST update region or revenue_timing state. Cost tables MUST end income selection. Layout headers MUST be verified against original plain text without combining numeric columns. Mother-company section-start context MUST remain in evidence. Normalized successor source labels MUST map all original170 substantive conditions one to one without rewriting first artifacts or inventing amounts.
+
+#### Scenario: An interleaved rental header accompanies a continued row
+- **WHEN** layout extraction interleaves current and prior rental header fragments
+- **THEN** original plain text proves the current column and layout rows retain exact separate tenants and current amounts
+
+#### Scenario: The successor first formal round is observed
+- **WHEN** full-page regressions pass and the successor170-condition contract is frozen
+- **THEN** a fresh v37 identity and directory use the existing owner for the first formal round, preserving original failure, actual stage reuse and dynamic unique review

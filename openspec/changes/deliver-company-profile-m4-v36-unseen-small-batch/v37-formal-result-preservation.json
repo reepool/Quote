@@ -1,0 +1,10 @@
+{
+  "formal_execution_index": 1,
+  "source_scope_unchanged": true,
+  "sha256": {
+    "data/checkpoints/company_profile_common_core/reports/m4_v37_network_chemicals_repair/company_profile_source_review.v1.json": "99098ba062f2dfe1b8b993032b3b2da1cb08adfbf749b44f6128db7551448b2d",
+    "openspec/changes/deliver-company-profile-m4-v36-unseen-small-batch/v37-source-review-evidence.json": "27b484e7605a4538efc253cbb4fba3892894656bbe2a31064bd82b3513bb4984",
+    "openspec/changes/deliver-company-profile-m4-v36-unseen-small-batch/v37-actual-object-decisions.json": "1c65ecd54ae081d48df9cc8b0e950476aa7dea473d912906adcd5adea5b2a53e",
+    "openspec/changes/deliver-company-profile-m4-v36-unseen-small-batch/v37-actual-object-supplemental-source-pages.json": "e7e0786528e4d70cefac8e916fd04977fcb450c90e4a7f04acbb168f02fec776"
+  }
+}
