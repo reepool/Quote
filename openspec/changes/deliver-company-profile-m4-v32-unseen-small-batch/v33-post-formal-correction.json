@@ -1,0 +1,30 @@
+{
+  "formal_identity": {
+    "rules": "company_profile_common_core.v1",
+    "owned_page_facts": "v8",
+    "material_input_facts": "v1",
+    "revenue_sentence_repair": "v33"
+  },
+  "original_execution_commit": "5285e003",
+  "original_execution_reconstructed_sha256": {
+    "research/company_profile/core_evidence_selection.py": "a88cf141cfddc56ef918f81306c7519a0b73686ade20c7f5ff82741b4947f933",
+    "research/company_profile/core_assessment_projection.py": "cae2a9fe3b437bf3e1f0531aaf673f23aebc43c77b40de69d937dbd7b9253c3e",
+    "research/company_profile/operations.py": "7da81611c3dabebb7ff7682875c65cde597785d20c83ae597a2fbddc1636323d"
+  },
+  "current_code_sha256": {
+    "research/company_profile/core_evidence_selection.py": "8f1c910eb90e69dfccbfa98ec3eb9682aa41b0b19d789e4a0c9f11e541a017eb",
+    "research/company_profile/core_assessment_projection.py": "cae2a9fe3b437bf3e1f0531aaf673f23aebc43c77b40de69d937dbd7b9253c3e",
+    "research/company_profile/operations.py": "7da81611c3dabebb7ff7682875c65cde597785d20c83ae597a2fbddc1636323d"
+  },
+  "correction": "Skip lessor-section title before accumulating tenant cells; assert exact native tenant qualifiers for all full-page income cases.",
+  "formal_result_replaced": false,
+  "new_formal_execution_started": false,
+  "source_contract_unchanged": true,
+  "affected_formal_objects": {
+    "600033.SH": 2,
+    "600072.SH": 2
+  },
+  "critical_numeric_errors": 0,
+  "complete_owner_and_independent_pdf_tests": "16 passed, 7 warnings",
+  "correction_verified_without_new_formal_round": true
+}

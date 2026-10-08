@@ -48,3 +48,14 @@ The original68condition contract,25/68recall,70/100accuracy,23critical financial
 #### Scenario: Source-backed repair follows the first failure
 - **WHEN** A-role authorizes the recorded local cards
 - **THEN** a successor identity and independent first formal round preserve the original failed observation and dynamically determine finite acceptance
+
+### Requirement: Original lessor rows retain distinct identity
+Different original rows or counterparties sharing a lease asset name MUST retain distinct accepted Segment and Measurement identities, native amounts, periods and complete continuation evidence. Current blank cells MUST NOT inherit prior amounts; trustee income MUST retain its original actor and direction. The local repair MUST reuse the existing owner and projection without a deduplication framework.
+
+#### Scenario: Four tenants share the same asset label
+- **WHEN** four current lessor rows name house leases on the same source page
+- **THEN** all four income rows remain independently accepted, queryable and exportable with their original counterparties
+
+#### Scenario: Lessor title precedes the first tenant row
+- **WHEN** the native lessor section title precedes tenant column headers and current rows
+- **THEN** the section title cannot enter the native tenant qualifier; every original tenant name remains exact, including wrapped cells

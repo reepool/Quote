@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import json
 import logging
+import re
 import threading
 import uuid
 from collections.abc import Callable, Mapping, Sequence
@@ -274,9 +275,19 @@ class OfficialAnnualReportPageSource:
             for page in raw_pages
         ]
         # Compact PDF text loses a blank current/prior amount cell. Read layout
-        # only for the affected native project-income table; keep cached page
+        # for affected native project-income and lessor tables; keep cached page
         # artifacts and their original text unchanged.
         project_pages = [p for p in pages if "房地产销售收入分项列示如下" in p["text"]]
+        lease_active = False
+        for page in pages:
+            if "本公司作为出租方" in page["text"]:
+                lease_active = True
+            if lease_active and page not in project_pages:
+                project_pages.append(page)
+            if lease_active and re.search(
+                r"本公司作为承租方|关联租赁情况说明|[（(]4[)）]", page["text"]
+            ):
+                lease_active = False
         if project_pages:
             from pypdf import PdfReader
 

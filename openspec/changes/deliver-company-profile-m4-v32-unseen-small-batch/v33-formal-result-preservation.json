@@ -1,0 +1,31 @@
+{
+  "first_delivery": {
+    "data/checkpoints/company_profile_common_core/reports/m4_v33_highway_wind_core_repair/plan.json": "a105ea34598b83aad9ac1ae08c3a31a936715204714875b2866685dd4c1743a6",
+    "data/checkpoints/company_profile_common_core/reports/m4_v33_highway_wind_core_repair/company_profile_live_run.v1.json": "cacfbe785474cf546f2b276596a3787dd3007b32c591d699e8d4bf76367d4ce7",
+    "data/checkpoints/company_profile_common_core/reports/m4_v33_highway_wind_core_repair/observation.json": "94ee728d448a9f342046a6d2c3625796b189a42118592162193d3bafd04cef8f",
+    "data/checkpoints/company_profile_common_core/reports/m4_v33_highway_wind_core_repair/formal_execution.json": "5c2b24ad5000c3f657d01c95651a17d607a8e91d9afa4bd82d045afc3967ab23",
+    "data/research/company_profile_common_core/m4_v33_highway_wind_core_repair/company_profile_common_core.v1/bp-work-e125bf3b5a4939ea23d95500.json": "801053f34c4fc35f0e48daab070b7517cf207d3bee1395620e4dbdd5287c5b3b",
+    "data/research/company_profile_common_core/m4_v33_highway_wind_core_repair/company_profile_common_core.v1/bp-work-a875831a7da97c5b1579a5c3.json": "09b9f2d44f5c9f261ad04532c736b6a9dd1f10258c1b1083c943322d052773d1",
+    "data/research/company_profile_common_core/m4_v33_highway_wind_core_repair/company_profile_common_core.v1/scopes/600072.SH/2025-12-31/extract_segment_financials.json": "b148dc36824cbcdfbb88cdefc157c9f31a4293f6d77d28d9f77cc44d59dbf0cd",
+    "data/research/company_profile_common_core/m4_v33_highway_wind_core_repair/company_profile_common_core.v1/scopes/600072.SH/2025-12-31/extract_business_overview.json": "f14475776ed70e0917461c0524e9c638ae0e4a45cc19e15baadc33401a2c392b",
+    "data/research/company_profile_common_core/m4_v33_highway_wind_core_repair/company_profile_common_core.v1/scopes/600033.SH/2025-12-31/extract_segment_financials.json": "89907cb599c8d99fffaba84b7bf9220895e025953dfd2b28da8c1253ea236811",
+    "data/research/company_profile_common_core/m4_v33_highway_wind_core_repair/company_profile_common_core.v1/scopes/600033.SH/2025-12-31/extract_business_overview.json": "58fa73138cd167393b366fa76fd6b2172aaba6034b450436a6ca1213304c63b7",
+    "data/research/company_profile_common_core/m4_v33_highway_wind_core_repair/company_profile_common_core.v1/checkpoints/bp-work-e125bf3b5a4939ea23d95500.json": "87c05edad481a8abc841f7d41d8c0ef727aedb937d7fcdb8f411e40e67b43db3",
+    "data/research/company_profile_common_core/m4_v33_highway_wind_core_repair/company_profile_common_core.v1/checkpoints/bp-work-a875831a7da97c5b1579a5c3.json": "fb46aec503e083d4b0492c6077e87472aa266754358a574f86ad72d313fbf7fc",
+    "data/exports/m4_v33_highway_wind_core_repair/600072.SH/profiles.csv": "34803e18c17264095329878c551eb28cbe1ede03f6b3e6d78d2898eea88023e2",
+    "data/exports/m4_v33_highway_wind_core_repair/600072.SH/600072.SH_2025-12-31.json": "28bcaf95ce91b84e98f60383adfdd168bb4ce84feb8b3988f813a5ad4b11cc09",
+    "data/exports/m4_v33_highway_wind_core_repair/600072.SH/export_manifest.json": "973f8cde059416820094d49742ff8df0ea548f96c6add1b73be75f26cbb9be09",
+    "data/exports/m4_v33_highway_wind_core_repair/600033.SH/profiles.csv": "1de791ea580e9263cafd9133cfdfd0eaeb519cccb6caf6da33fbdf379f38fa76",
+    "data/exports/m4_v33_highway_wind_core_repair/600033.SH/600033.SH_2025-12-31.json": "1f1cea4cec9635b752a507bbcfca578ceae68cfd48183f052750a0bd44a5c802",
+    "data/exports/m4_v33_highway_wind_core_repair/600033.SH/export_manifest.json": "4ef37c6f30b279743c25a8e142f0fe08255c58bf3a0ee9bccc34c4b0839ba365"
+  },
+  "first_review_initial": {
+    "openspec/changes/deliver-company-profile-m4-v32-unseen-small-batch/v33-source-review-evidence.initial.json": "a2bf611b62888a7b557f9dae2617c4021dba74ce5aff783843a447e07729adad"
+  },
+  "corrected_formal_source_review": {
+    "openspec/changes/deliver-company-profile-m4-v32-unseen-small-batch/v33-source-review-evidence.json": "15cfba0383cd67b5a3059fe13087395791250e8dbc694e6fff0cf8a3dd0c74fe"
+  },
+  "review_correction_sha256": "23175d5b3fc3265901686b56fe4e3827a0707756fb0df37a3e6801129a729614",
+  "source_scope_sha256": "c2b4d037ccfd468de99a03400f4cdf568ed163d176faa3e397d793f9dbd58430",
+  "subsequent_formal_round_requires_new_identity_and_directory": true
+}

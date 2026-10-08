@@ -1,0 +1,158 @@
+{
+  "source_condition_count": 68,
+  "source_scope_sha256": "c2b4d037ccfd468de99a03400f4cdf568ed163d176faa3e397d793f9dbd58430",
+  "missing_conditions": [
+    {
+      "instrument_id": "600033.SH",
+      "kind": "native_income_cell",
+      "source": {
+        "dimension": "service",
+        "name": "房屋租赁",
+        "native_aliases": [
+          "房屋租赁"
+        ],
+        "value": "5,527,173.17",
+        "unit": "元",
+        "page": 155,
+        "column": "本期营业收入/本期确认收益",
+        "header": "本公司作为出租方/本期租赁收入",
+        "reported_period": "2025-12-31",
+        "source_actor": "公司及合并子公司",
+        "source_quote": "(3).关联租赁情况\n本公司作为出租方：\n√适用 □不适用\n单位：元 币种：人民币\n承租方名称 租赁资产种类 本期确认的租赁收入 上期确认的租赁收入\n省经开公司 房屋租赁 5,527,173.17 5,248,948.33\n福泉经营服务公司 房屋租赁 2,336,513.76 2,336,513.76",
+        "unit_basis_page": 155,
+        "qualifier": "保留出租方及承租方；不推商品销售/设备销售，不跨维度累计",
+        "counterparty": "省经开公司"
+      },
+      "present": false,
+      "accepted_record_id": null
+    },
+    {
+      "instrument_id": "600072.SH",
+      "kind": "native_income_cell",
+      "source": {
+        "dimension": "service",
+        "name": "房屋建筑物",
+        "native_aliases": [
+          "房屋建筑物"
+        ],
+        "value": "14,001,877.32",
+        "unit": "元",
+        "page": 296,
+        "column": "本期营业收入/本期确认收益",
+        "header": "本公司作为出租方/本期确认租赁收入",
+        "reported_period": "2025-12-31",
+        "source_actor": "公司及合并子公司",
+        "source_quote": "本公司作为出租方：\n√适用 □不适用\n单位：元币种：人民币\n承租方名称 租赁资产种类 本期确认的租赁收入 上期确认的租赁收入\n中国船舶集团物\n资有限公司 房屋建筑物 14,001,877.32 16,404,330.84\n洛阳双瑞橡塑科",
+        "unit_basis_page": 296,
+        "qualifier": "承租方原名及租赁方向；后两行只有上期不生成当前收入",
+        "counterparty": "中国船舶集团物资有限公司"
+      },
+      "present": false,
+      "accepted_record_id": null
+    }
+  ],
+  "incorrect_objects": [
+    {
+      "instrument_id": "600033.SH",
+      "object_id": "owned:core-ev-3063ffa8b0268117:Segment:lease:房屋租赁:本公司作为出租方/本期确认的租赁收入:row:0",
+      "object_type": "Segment",
+      "decision": {
+        "accurate": false,
+        "critical_numeric_error": false,
+        "reason": "p155首出租行承租方原名省经开公司；qualifier误写“承租方：本公司作为出租方：省经开公司”，表标题进入承租方身份。金额/单位/本期和租赁方向正确，但该原生主体限定不准确。",
+        "source_pages": [
+          155,
+          156,
+          157
+        ],
+        "reviewed_object_index": 27,
+        "checks": {
+          "actor": false,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "full_continued_evidence": true,
+          "counterparty_qualifier": false
+        }
+      }
+    },
+    {
+      "instrument_id": "600033.SH",
+      "object_id": "owned:core-ev-8040079f8edfaa88:Measurement:lease:房屋租赁:本公司作为出租方/本期确认的租赁收入:row:0",
+      "object_type": "Measurement",
+      "decision": {
+        "accurate": false,
+        "critical_numeric_error": false,
+        "reason": "p155首出租行承租方原名省经开公司；qualifier误写“承租方：本公司作为出租方：省经开公司”，表标题进入承租方身份。金额/单位/本期和租赁方向正确，但该原生主体限定不准确。",
+        "source_pages": [
+          155,
+          156,
+          157
+        ],
+        "reviewed_object_index": 28,
+        "checks": {
+          "actor": false,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "full_continued_evidence": true,
+          "counterparty_qualifier": false
+        }
+      }
+    },
+    {
+      "instrument_id": "600072.SH",
+      "object_id": "owned:core-ev-1ab9b34738cb5a38:Segment:lease:房屋建筑物:本公司作为出租方/本期确认的租赁收入:row:0",
+      "object_type": "Segment",
+      "decision": {
+        "accurate": false,
+        "critical_numeric_error": false,
+        "reason": "p296首出租行承租方原名中国船舶集团物资有限公司；qualifier误混入“本公司作为出租方”表标题。金额/单位/本期及方向正确，但承租方主体限定错误。",
+        "source_pages": [
+          296,
+          297,
+          298
+        ],
+        "reviewed_object_index": 70,
+        "checks": {
+          "actor": false,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "full_continued_evidence": true,
+          "counterparty_qualifier": false
+        }
+      }
+    },
+    {
+      "instrument_id": "600072.SH",
+      "object_id": "owned:core-ev-7d01d33940776545:Measurement:lease:房屋建筑物:本公司作为出租方/本期确认的租赁收入:row:0",
+      "object_type": "Measurement",
+      "decision": {
+        "accurate": false,
+        "critical_numeric_error": false,
+        "reason": "p296首出租行承租方原名中国船舶集团物资有限公司；qualifier误混入“本公司作为出租方”表标题。金额/单位/本期及方向正确，但承租方主体限定错误。",
+        "source_pages": [
+          296,
+          297,
+          298
+        ],
+        "reviewed_object_index": 71,
+        "checks": {
+          "actor": false,
+          "action_relation": true,
+          "native_label": true,
+          "current_period_amount": true,
+          "unit": true,
+          "full_continued_evidence": true,
+          "counterparty_qualifier": false
+        }
+      }
+    }
+  ],
+  "remaining_formal_gap": "两出租表首行的承租方限定混入表标题，共4接受对象；已事后局部补正，仍缺后继正式闭环。",
+  "status": "paused_on_formal_failure"
+}

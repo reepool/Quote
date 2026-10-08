@@ -1,0 +1,10 @@
+{
+  "reason": "电站产品的实际动作锚在p18，原合同已明示p12/p18当前转让佐证；初版仅按政策p235锚点漏计。未改交付、合同或执行代码。",
+  "original_source_recall": "65/68",
+  "corrected_source_recall": "66/68",
+  "accuracy_unchanged": "153/157",
+  "changed_fact_decisions": [
+    "owned:core-ev-93668a9bf127631f:commodity:1"
+  ],
+  "initial_review_preserved": true
+}

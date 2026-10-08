@@ -27,3 +27,11 @@ v32已获A角51项声明来源有限验收并归档。下一步验证通用核�
 ## First Formal Observation and Failure Branch
 
 The independent68-condition contract preceded first execute. Actual first run-query-export delivered both companies in199.17seconds with0/50000tokens and no five-stage reuse or predecessor inheritance. Substantive recall25/68 and unique accuracy70/100 from94facts+6answers fail the gates. Three prior-year revenue objects and twenty expense-as-revenue objects are critical financial numeric errors; two wrong mother-company business categories and one truncated activity fail accuracy, as do four incomplete bodies. The first contract, delivery and review remain immutable. The change remains unarchived and further batches pause;4.1-4.4 only register source-backed local repairs pending A-role review. Prior v32 finite archive and production/scale limits remain valid.
+
+## A角授权的v33局部修复
+
+按4.2→4.1/4.3→4.4执行。收入修复保留本期空位、明确新附注表尾，完整读取出租续页及受托收益；同页同名租赁须保留承租方/原行区别，局部修正记录身份，不建立去重框架。六正文、55收入、7角色先以完整owner/PDF页接受→查询→导出验证，再沿原计划/版本/cutoff用v33独立目录首次正式复验。68项首轮合同与25/68、70/100、23数字错误及原制品保持原字节，新合同与分数另存；默认身份、生产not_authorized和规模false不变。
+
+## v33 formal failure and local correction
+
+The first successor delivered151facts and6answered bodies in189.683909seconds with0tokens and no actual five-stage reuse. Corrected substantive recall66/68 and unique accuracy153/157 fail acceptance; four objects contain a contaminated native tenant qualifier although their current amounts and units are correct. The original65/68 review and its source-anchor correction remain separately preserved. The post-formal selector now excludes the lessor title and16complete-page/boundary regressions pass, but this does not replace first delivery or prove a new formal round. The change remains unarchived and expansion pauses pending A-role review.
