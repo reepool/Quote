@@ -43,3 +43,38 @@ The first125condition contract,36/125recall,88/101accuracy,zero critical numeric
 #### Scenario: Report segments disclose three income bases
 - **WHEN** an official report states external transactions,intersegment transactions and total segment income
 - **THEN** native bases and eliminations remain distinct without cross-dimension accumulation
+
+### Requirement: Current named actions retain their original operator and branch
+The common core MUST deliver current affirmative products from the native subsidiary branch and keep brand names as business context. Sales, external purchases and material_input MUST remain distinct, including simultaneous animal-feed sales, purchases and use. Customer purchase-project wording within the issuer sales column MUST NOT reverse the issuer action. Negated, planned and third-party actions MUST NOT establish a current issuer or subsidiary commodity role, while other affirmed branches on the same page MUST remain deliverable.
+
+#### Scenario: A subsidiary sells named goods after a product matrix
+- **WHEN** a current business branch identifies the subsidiary, named goods and actual sales/marketing delivery
+- **THEN** accepted facts, query and export preserve goods and original subsidiary identity without emitting standalone brands
+
+#### Scenario: A buyer calls the issuer sales contract a purchase project
+- **WHEN** an owned transaction table classifies the named project under sales of goods
+- **THEN** the issuer delivers sales roles and does not turn the customer's procurement wording into issuer purchases
+
+#### Scenario: Current and prior income columns and multiple segment bases coexist
+- **WHEN** a native income table supplies current/prior columns or external/internal/total segment income, including sparse current cells
+- **THEN** each printed current value, original classification, unit, tenant/operator and elimination remains independently queryable without moving prior values left or adding dimensions together
+
+#### Scenario: A payment clause continues across page columns
+- **WHEN** the accepted full payment cell states prepayment or payment within the credit term following acceptance across a page break
+- **THEN** the revenue answer retains both payment mechanisms with complete source-page evidence
+
+
+### Requirement: A local income correction cannot replace a first failed formal observation
+The v35 first125condition contract,123/125recall,261/261accuracy and original delivery/review bytes MUST remain unchanged. Complete actual-owner pages MUST retain their real fields without borrowing independent PDF layout. Regression MUST match original source page, native classification, subject, value and unit; same-valued contract-note income MUST NOT substitute for a missing MD&A row. Parenthesized wrapped labels MUST retain their full native identity. A sparse printed income with no layout MUST remain unresolved unless current/prior native table totals locate it uniquely; missing amounts or costs MUST NOT be invented. Post-formal code/evidence MUST remain separate from executed code and first formal artifacts.
+
+#### Scenario: An MD&A region and contract note share the same income
+- **WHEN** the same name and amount occur on p24 and p180 under different native tables
+- **THEN** only complete p24 evidence satisfies the p24 MD&A source condition
+
+#### Scenario: A sparse cell has lost its blank column positions
+- **WHEN** one printed cell uniquely reconciles the current income total and prior income is already fully reconciled
+- **THEN** that printed current amount is delivered without inferring any blank cost or changing a prior-year amount
+
+#### Scenario: Post-formal regression passes
+- **WHEN** local corrected owned-page acceptance, query and export succeed
+- **THEN** the original first failed score remains unchanged pending a successor formal identity and independent directory

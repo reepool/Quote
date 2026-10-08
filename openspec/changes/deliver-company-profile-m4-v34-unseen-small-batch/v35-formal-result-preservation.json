@@ -1,0 +1,30 @@
+{
+  "created_at": "2026-10-08T11:04:14.339450+00:00",
+  "first_delivery": {
+    "data/checkpoints/company_profile_common_core/reports/m4_v35_transport_food_repair/plan.json": "1750b83f31686c552ef64186e8c5289ec92d2c34a4441d65357046f02c2add47",
+    "data/checkpoints/company_profile_common_core/reports/m4_v35_transport_food_repair/company_profile_live_run.v1.json": "9f44affb65b022d712a43fd14248fc59e13bd25a341b1c4abc397f876137b95b",
+    "data/checkpoints/company_profile_common_core/reports/m4_v35_transport_food_repair/observation.json": "94cdb4f126908ca5e7a29de9df5c15b9d1326d191aeb7e0379d22e14e241f2a5",
+    "data/checkpoints/company_profile_common_core/reports/m4_v35_transport_food_repair/formal_execution.json": "0e2f6aa435d8079be309cc8c3b7a45a8e6efc0d44170c243f2e384bed45745dd",
+    "data/research/company_profile_common_core/m4_v35_transport_food_repair/company_profile_common_core.v1/bp-work-26dad7d4bae26ba36404fae8.json": "e3e95f1b79e0374177618b567ede2aa43c31877d93bec1bc1aaf6197f7542444",
+    "data/research/company_profile_common_core/m4_v35_transport_food_repair/company_profile_common_core.v1/bp-work-8c798273ae5f3015d62cc72e.json": "cc8aa9aed72a244b269dc0865ab83eb3e9237a4848df21b94c4c7bd51eafc2a1",
+    "data/research/company_profile_common_core/m4_v35_transport_food_repair/company_profile_common_core.v1/scopes/600035.SH/2025-12-31/extract_segment_financials.json": "d513908bc3411c7dfd64d5d58337fa0d19bda2bfd3e6d8186b1a512c35a2a3b5",
+    "data/research/company_profile_common_core/m4_v35_transport_food_repair/company_profile_common_core.v1/scopes/600035.SH/2025-12-31/extract_business_overview.json": "44e889b17f659c7bd1f03dc950fbcdfa14483d27437895ded28400a054e9308f",
+    "data/research/company_profile_common_core/m4_v35_transport_food_repair/company_profile_common_core.v1/scopes/600073.SH/2025-12-31/extract_segment_financials.json": "ab1b69636b7a502d884859ece435e6acf4e7a8aa4066d217c14d21734c68a7e8",
+    "data/research/company_profile_common_core/m4_v35_transport_food_repair/company_profile_common_core.v1/scopes/600073.SH/2025-12-31/extract_material_inputs.json": "a56799d220ffae6be9ed0b33c1ad53e1336a803dae78df34b6357b7ed77ef4fa",
+    "data/research/company_profile_common_core/m4_v35_transport_food_repair/company_profile_common_core.v1/scopes/600073.SH/2025-12-31/extract_business_overview.json": "764571d08c41881f76a66a40eb4cbbff6ea0c73bca75ef52aa119e3f0698d7d9",
+    "data/research/company_profile_common_core/m4_v35_transport_food_repair/company_profile_common_core.v1/checkpoints/bp-work-26dad7d4bae26ba36404fae8.json": "55e202a3170111bd852a1bad1f6eb1c8e1c6b61a909a0bdda6ae2297bbc99919",
+    "data/research/company_profile_common_core/m4_v35_transport_food_repair/company_profile_common_core.v1/checkpoints/bp-work-8c798273ae5f3015d62cc72e.json": "32a064165f31dec458aad6c8640b4ec6bc7aee8a8e22f60ab1dcdedb6dbad711",
+    "data/exports/m4_v35_transport_food_repair/600035.SH/profiles.csv": "12eb3730b1c968e0f72ee0a9882424888513d5dd349c9f0052492a59e17c8794",
+    "data/exports/m4_v35_transport_food_repair/600035.SH/600035.SH_2025-12-31.json": "212305a8a04c08900ca57936ac8dad997c6e32a3700da8427b4f7c9fd117ca08",
+    "data/exports/m4_v35_transport_food_repair/600035.SH/export_manifest.json": "596cbf14a09f91bb754f15883f018622ed9d38e0e8ab0ba7bc4353d011eaa203",
+    "data/exports/m4_v35_transport_food_repair/600073.SH/profiles.csv": "15feca96e4382076cf8658f669bae22c1e6b5fa2605ab2ebdc7c2fbb8ea78440",
+    "data/exports/m4_v35_transport_food_repair/600073.SH/600073.SH_2025-12-31.json": "9d62aea6f6c49fd4428351a64cdfc8d92b9ef6d7f0664e5a81c7a133e40e6dfa",
+    "data/exports/m4_v35_transport_food_repair/600073.SH/export_manifest.json": "be87331ad91c4d992384e4cc79d4f7f1718429a2239636fd851dda89bc9a61ee"
+  },
+  "formal_source_review": {
+    "openspec/changes/deliver-company-profile-m4-v34-unseen-small-batch/v35-source-review-evidence.json": "c354113fbc12b9273193c0ba9283ed6ac659f7741d2c2da50c8f09f9766617ba",
+    "data/checkpoints/company_profile_common_core/reports/m4_v35_transport_food_repair/company_profile_source_review.v1.json": "460942fac091d86900b8956f6386a1a61d5b3274bf350d9452003ff7b6a63c75"
+  },
+  "formal_source_contract_sha256": "3d59ae3ccd50dd6fc0cde481ebedcdaef36d5359976b3601c67334d940606f9a",
+  "subsequent_repairs_must_use_new_identity_and_directory": true
+}

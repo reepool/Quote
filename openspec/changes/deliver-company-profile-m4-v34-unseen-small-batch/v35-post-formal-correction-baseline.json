@@ -1,0 +1,14 @@
+{
+  "created_at": "2026-10-08T11:07:54.669123+00:00",
+  "pre_correction_sha256": {
+    "research/company_profile/core_evidence_selection.py": "3a2ff8d5ba4034b9e5f17bf82e94b971829bc6088fe23727d91f01c4d2613309",
+    "research/company_profile/core_assessment_projection.py": "9952157c46a02fb557ead16c683ebfd0a932e0fc0c8e9a5984c8289b2a8e79d3",
+    "tests/unit/test_research/test_company_profile_v35_transport_food.py": "767777fa66f0290353328017f06146fa56169ceeb0d1efd64018cf771dc00214",
+    "tests/fixtures/company_profile_v35_transport_food_frozen_pages.json": "49e7f4937f6d08d9a133576ced221f84044f7ab52edb1510b757c10665d4ad4a"
+  },
+  "formal_result_unchanged": {
+    "recall": "123/125",
+    "accuracy": "261/261"
+  },
+  "formal_code_reconstruction": "e5763fc5 + v35-executed-code.patch"
+}

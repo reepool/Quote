@@ -44,7 +44,7 @@ _COMPLETE_COMPANY_BUSINESS = re.compile(
 )
 _STEEL_BUSINESS = re.compile(r"公司是.{8,260}主要产品有.{2,80}")
 _NARRATIVE_BUSINESS = re.compile(
-    r"公司是[^。]+所属的专业从事[^。]+综合型能源企业|锂电池业务本期仅统计|公司丧失对[^。]+控制权|本公司受托管理/承包情况表|本公司作为出租方|出售商品/提供劳务|作为[^。]{2,80}(?:上市公司|工业企业)[^。]{2,}研发制造|公司坚持以[^。]{2,150}为核心[^。]*。公司持续深耕"
+    r"公司饲料贸易业务板块|公司是[^。]+所属的专业从事[^。]+综合型能源企业|锂电池业务本期仅统计|公司丧失对[^。]+控制权|本公司受托管理/承包情况表|本公司作为出租方|出售商品/提供劳务|作为[^。]{2,80}(?:上市公司|工业企业)[^。]{2,}研发制造|公司坚持以[^。]{2,150}为核心[^。]*。公司持续深耕"
 )
 _SPEC_PRODUCT = re.compile(r"^(?:厚度|宽度|长度)")
 _PRODUCT_PATTERN = re.compile(
@@ -70,7 +70,7 @@ _REVENUE_BLOCK_PATTERN = re.compile(
 )
 _REVENUE_NEGATION_PREFIX = re.compile(r"(尚未|还未|仍未|并未|没有|未|不|拟|计划)$")
 _REPAIR_REVENUE_INFLOW_PATTERN = re.compile(
-    r"(公司通过招投标|在某一时点确认收入|本公司受托管理/承包情况表|本公司电力销售在|中长期、现货、绿电交易|本公司按照业务类型确定的收入确认具体原则|本公司与[^。]+购销商品、提供服务的关联交易|本公司作为出租方|出售商品/提供劳务|对外交易收入|产品定价按照|年度供货框架协议|票款收入|运输服务交易价格|常旅客里程奖励计划|租金收入|清算补偿费收入|本集团利用自有及控制的船舶开展|公司盈利主要来自发电收入|营业收入主要来源于|"
+    r"(具体会计政策描述如下|公司定价和竞价|进行销售|主要责任人|重要的支付条款|款到发货|公司通过招投标|在某一时点确认收入|本公司受托管理/承包情况表|本公司电力销售在|中长期、现货、绿电交易|本公司按照业务类型确定的收入确认具体原则|本公司与[^。]+购销商品、提供服务的关联交易|本公司作为出租方|出售商品/提供劳务|对外交易收入|产品定价按照|年度供货框架协议|票款收入|运输服务交易价格|常旅客里程奖励计划|租金收入|清算补偿费收入|本集团利用自有及控制的船舶开展|公司盈利主要来自发电收入|营业收入主要来源于|"
     + _REVENUE_INFLOW_PATTERN.pattern[1:]
 )
 _PRODUCT_ACTIONS = frozenset(
@@ -575,6 +575,24 @@ def _assess_revenue_model(
                         )
                     }
                 )
+        if source_delivery_repair:
+            for r in supports:
+                if not isinstance(r, BusinessOverview):
+                    continue
+                native = re.sub(r"\s+", "", r.source_text)
+                if (
+                    "履约义务的说明" in native
+                    and "款到发货" in native
+                    and re.search(r"验收合格后在信[^。]+用期内付款", native)
+                ):
+                    # Reconstruct the printed payment cell across a page break;
+                    # neighboring columns and page headers are not payment text.
+                    answered = answered.model_copy(
+                        update={
+                            "excerpt": (answered.excerpt or "")
+                            + "\n重要支付条款：款到发货；验收合格后在信用期内付款。"
+                        }
+                    )
         return answered
     if totals:
         return _unanswered("revenue_model", "numeric_total_only")

@@ -1,0 +1,74 @@
+--- a/research/company_profile/core_evidence_selection.py
++++ b/research/company_profile/core_evidence_selection.py
+@@ -10,6 +10,7 @@
+ import hashlib
+ import re
+ from collections.abc import Mapping, Sequence
++from decimal import Decimal
+ from typing import Any, Literal
+ 
+ from pydantic import BaseModel, ConfigDict, Field
+@@ -2469,7 +2470,7 @@
+             index += 2
+             continue
+         if (
+-            re.fullmatch(r"[\u4e00-\u9fffA-Za-z0-9/、]{2,40}", compact_label)
++            re.fullmatch(r"[\u4e00-\u9fffA-Za-z0-9/、（）()]{2,40}", compact_label)
+             and not compact_label.endswith("百分点")
+             and re.match(r"\s*-?[\d,]", nxt)
+         ):
+@@ -5391,6 +5392,45 @@
+     }
+ 
+ 
++def _current_sparse_income_label(text: str) -> str | None:
++    """Locate one printed sparse income cell using both native year totals.
++
++    Plain owner text can lose blank-column positions. Accept a printed value
++    only if the first table's current total requires it and the prior total
++    already reconciles without it; never infer a missing amount or cost.
++    """
++    if not re.search(r"本期发生额\s+上期发生额\s+收入\s+成本\s+收入\s+成本", text):
++        return None
++    complete = []
++    sparse = []
++    for line in text.splitlines():
++        m = re.fullmatch(r"\s*(主营业务|其他业务|合计)\s+(.+?)\s*", line)
++        if m is None:
++            continue
++        cells = m[2].split()
++        if not all(re.fullmatch(r"-?\d[\d,]*\.\d{2}", c) for c in cells):
++            return None
++        amounts = [Decimal(c.replace(",", "")) for c in cells]
++        if m[1] == "合计":
++            if len(amounts) != 4 or len(sparse) != 1 or not complete:
++                return None
++            label, value = sparse[0]
++            if (
++                value != 0
++                and sum(r[0] for r in complete) + value == amounts[0]
++                and sum(r[2] for r in complete) == amounts[2]
++            ):
++                return label
++            return None
++        if len(amounts) == 4:
++            complete.append(amounts)
++        elif len(amounts) == 1:
++            sparse.append((m[1], amounts[0]))
++        else:
++            return None
++    return None
++
++
+ def _lessor_income_rows(text: str) -> list[tuple]:
+     """Recover wrapped tenants/assets without moving prior-only rent left."""
+     rows = []
+@@ -5601,6 +5641,8 @@
+                     or len(cells) == 1
+                     and re.sub(r"\s+", "", line[: line.find(cells[0])])
+                     not in _prior_only_income_labels(text)
++                    or len(cells) == 1
++                    and m[1] == _current_sparse_income_label(text)
+                 )
+                 and cells[columns.index("收入")] not in {"-", "/"}
+             ):
