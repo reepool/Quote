@@ -6137,14 +6137,20 @@ def _project_native_income_span(
     if title == "其他收入扣除明细":
         compact = re.sub(r"\s+", "", text)
         for m in re.finditer(
-            r"[16][.．](?P<name>正常经营之外的其他业务收入|未形成或难以形成稳定业务模式的业务所产生的收入)[\s\S]+?(?P<value>\d[\d,]*\.\d{2})(?=主要系|木方|\d[\d,]*\.\d{2})",
+            r"[16][.．](?P<name>正常经营之外的其他业务收入|未形成或难以形成稳定业务模式的业务所产生的收入)"
+            r"(?P<row>[\s\S]*?)(?=\d+[.．][\u4e00-\u9fff]|与主营业务无关的业务收入小计|[一二三四五六七八九十]+、|$)",
             compact,
         ):
+            # A blank item ends at the next native row or subtotal. Its amount
+            # cannot be recovered by scanning forward into a different item.
+            value = re.search(r"\d[\d,]*\.\d{2}", m["row"])
+            if value is None:
+                continue
             rows.append(
                 (
                     "business_type",
                     m["name"],
-                    m["value"],
+                    value.group(),
                     "其他业务收入扣除明细/本年度",
                     None,
                 )

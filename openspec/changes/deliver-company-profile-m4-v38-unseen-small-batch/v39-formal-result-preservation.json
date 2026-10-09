@@ -1,0 +1,12 @@
+{
+  "formal_execution_index": 1,
+  "source_scope_sha256": "99fc0843d8540c25cf48ce0ae18b45a48d960bb90d20abd700c0625ed66e3251",
+  "first_artifacts_manifest_sha256": "71a0f05256135882460ab3d271a4765049f9d14923c21c2e58d8e5802f3c8526",
+  "review_sha256": {
+    "openspec/changes/deliver-company-profile-m4-v38-unseen-small-batch/v39-actual-object-decisions.json": "577bacc4a5ec2057de54f662ff17b9c1664a9e1f80371e711d6c61d041a1a988",
+    "openspec/changes/deliver-company-profile-m4-v38-unseen-small-batch/v39-source-review-evidence.json": "662ab88012a26f70c25c450fd6d255084587a49dfecd05d9efbacdea832ce644",
+    "data/checkpoints/company_profile_common_core/reports/m4_v39_real_estate_phosphates_core_repair/company_profile_source_review.v1.json": "4d35c670fc943c5fab3757628fccd2e993bc210bd3842797a1781b3f3865ebb0",
+    "openspec/changes/deliver-company-profile-m4-v38-unseen-small-batch/v39-layout-review-evidence.json": "f20cccc00365550ccc4ba523f5d1fc1b68331b6a305e3608c0759bf32235c24b"
+  },
+  "formal_observation_immutable": true
+}

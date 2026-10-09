@@ -89,6 +89,16 @@ def test_complete_bodies_preserve_original_substance_and_limits(tmp_path, i, kin
             # The preserved first contract conflicts with the printed year columns.
             # Current-year output must follow the official layout, never that error.
             assert not matches, row
+            assert not any(
+                r["object_type"] in {"Segment", "Measurement"}
+                and compact(r["source_native"]["name"])
+                in set(map(compact, row["native_aliases"]))
+                and compact(r["source_native"].get("qualifier"))
+                .replace("：", ":")
+                .split(":")[-1]
+                == compact(row["counterparty"])
+                for r in raw
+            ), row  # Includes shifted prior values and invented current zeros.
             continue
         assert matches, (
             row["page"],
@@ -244,3 +254,31 @@ def test_v39_identity_inherits_all_five_switches_and_default_unchanged():
     )
     assert default_processing_identity() == before
     assert before.get("revenue_sentence_repair") != "v39"
+
+
+@pytest.mark.parametrize("kind", ["pages", "independent_pages"])
+def test_blank_deduction_item_does_not_take_following_subtotal(tmp_path, kind):
+    f = fixture("600078.SH")
+    q, raw = delivered(tmp_path, "600078.SH", f[kind])
+    blank_name = "未形成或难以形成稳定业务模式的业务所产生的收入"
+    assert not any(
+        r["object_type"] in {"Segment", "Measurement"}
+        and r["source_native"]["name"] == blank_name
+        for r in raw
+    )
+    assert blank_name not in _answer(q, "revenue_model")
+    for model in ["Segment", "Measurement"]:
+        assert any(
+            r["object_type"] == model
+            and r["source_native"]["name"] == "正常经营之外的其他业务收入"
+            and r["source_native"]["value"] == "26,044,735.71"
+            and r["source_native"]["unit"] == "元"
+            and 9 in page_numbers(r)
+            for r in raw
+        )
+    for dimension, rule in f["answers"].items():
+        text = compact(_answer(q, dimension))
+        assert all(
+            any(compact(token) in text for token in group)
+            for group in rule["required_groups"]
+        ), dimension

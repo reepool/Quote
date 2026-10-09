@@ -60,3 +60,21 @@ The authorized v39 repair MUST retain complete narrative continuations and origi
 #### Scenario: Full current source pages are projected
 - **WHEN** actual official-owner pages and independently read pages enter the existing acceptance-query-export path under full v39 identity
 - **THEN** substantive bodies, valid current income and forty named action/relationship conditions remain traceable to their own original actors, columns and affirmative current actions
+
+### Requirement: Corrected successor contract preserves the original observation
+The confirmed successor MUST freeze 205 positive conditions (six bodies,159 income cells,forty named actions) and three mandatory current-blank negatives separately. Every original208condition MUST map exactly once. Original contract and first54/208,139/167,two numeric-error observation MUST remain immutable and MUST NOT be presented as directly comparable corrected-contract scores. Actual unique facts and answered bodies MUST determine accuracy dynamically.
+
+#### Scenario: Prior-only service has a blank current cell
+- **WHEN** official p195–196 shows 26.28,8.22,0.08万元 only in the prior column
+- **THEN** no corresponding current Segment or Measurement is delivered,including invented zero,while same-page valid current transactions remain
+
+#### Scenario: The first v39 formal round closes
+- **WHEN** both owner run-query-export operations return in a fresh directory
+- **THEN** 205 positive recall,three negative decisions,actual accuracy,numeric errors,full elapsed time,shared tokens and actual five-stage reuse are independently recorded and the first outcome remains immutable
+
+### Requirement: A blank deduction item cannot take a subtotal
+A native numbered income-deduction item MUST end at the next item,subtotal or section. An undisclosed current cell MUST NOT obtain the following subtotal amount or produce a current Segment,Measurement or affirmative answer listing. Same-page valid current deduction income MUST remain. Any post-formal correction MUST remain separate from first v39 output,score and executed-code evidence.
+
+#### Scenario: Empty item six precedes a reported subtotal
+- **WHEN** p9 item six is blank and the next unrelated-business subtotal is26,044,735.71元
+- **THEN** item six has no accepted current income and no affirmative revenue-body listing,while item one retains its own printed current amount

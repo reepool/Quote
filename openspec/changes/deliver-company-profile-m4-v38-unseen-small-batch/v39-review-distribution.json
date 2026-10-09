@@ -1,0 +1,9 @@
+{
+  "original_path": "openspec/changes/deliver-company-profile-m4-v38-unseen-small-batch/v39-source-review-evidence.json",
+  "original_bytes": 131325560,
+  "original_sha256": "662ab88012a26f70c25c450fd6d255084587a49dfecd05d9efbacdea832ce644",
+  "lossless_gzip_path": "openspec/changes/deliver-company-profile-m4-v38-unseen-small-batch/v39-source-review-evidence.json.gz",
+  "gzip_sha256": "0ce770b11fc6b52787bfc0a753886d260d0a2948ce6eb7b75f3ee51a738c3109",
+  "round_trip_verified": true,
+  "original_file_unchanged": true
+}

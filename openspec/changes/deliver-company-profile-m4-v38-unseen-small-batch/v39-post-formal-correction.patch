@@ -1,0 +1,17 @@
+diff --git a/research/company_profile/core_evidence_selection.py b/research/company_profile/core_evidence_selection.py
+index 4e93e819..a5ea1149 100644
+--- a/research/company_profile/core_evidence_selection.py
++++ b/research/company_profile/core_evidence_selection.py
+@@ -6140 +6140,2 @@ def _project_native_income_span(
+-            r"[16][.．](?P<name>正常经营之外的其他业务收入|未形成或难以形成稳定业务模式的业务所产生的收入)[\s\S]+?(?P<value>\d[\d,]*\.\d{2})(?=主要系|木方|\d[\d,]*\.\d{2})",
++            r"[16][.．](?P<name>正常经营之外的其他业务收入|未形成或难以形成稳定业务模式的业务所产生的收入)"
++            r"(?P<row>[\s\S]*?)(?=\d+[.．][\u4e00-\u9fff]|与主营业务无关的业务收入小计|[一二三四五六七八九十]+、|$)",
+@@ -6142,0 +6144,5 @@ def _project_native_income_span(
++            # A blank item ends at the next native row or subtotal. Its amount
++            # cannot be recovered by scanning forward into a different item.
++            value = re.search(r"\d[\d,]*\.\d{2}", m["row"])
++            if value is None:
++                continue
+@@ -6147 +6153 @@ def _project_native_income_span(
+-                    m["value"],
++                    value.group(),
