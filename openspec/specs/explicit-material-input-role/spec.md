@@ -99,3 +99,10 @@ An explicit named input MUST still deliver the Relationship and CommodityExposur
 - **THEN** the input role is still delivered
 - **AND** `mapping_status` is `ambiguous`
 - **AND** `commodity_id` is null
+
+### Requirement: Energy read categories do not rewrite underlying transaction actions
+Separate current purchase and actual-use columns MUST remain separate source-grounded facts. An explicitly disclosed energy purchase MUST retain Activity(action=purchases), its original actor, native column and Evidence even when the existing read projection uses energy_consumption. That read category MUST NOT establish consumption or material_input. Actual self-use MUST require its own source wording or use column and retain Relationship(relation_type=material_input) with the existing energy_consumption role. The same native good MAY retain affirmative sales, purchases and actual input independently; each underlying action or relationship MUST be verified against its own source. Negative or planned transaction branches MUST NOT create current facts while independently affirmative branches remain valid.
+
+#### Scenario: Energy purchase and consumption columns coexist
+- **WHEN** an official current table separately discloses energy 采购量 and 耗用量
+- **THEN** acceptance, query and export preserve a purchases Activity and a separate material_input Relationship without converting either because they share an energy read category

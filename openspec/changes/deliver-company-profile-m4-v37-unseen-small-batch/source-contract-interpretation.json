@@ -1,0 +1,21 @@
+{
+  "source_scope_unchanged": true,
+  "substantive_conditions_one_to_one": 114,
+  "dimension_aliases": {
+    "report_segment": "business_segment",
+    "service with lessor counterparty": "lease"
+  },
+  "scope_role_semantics": "采购单独purchases，actual material_input关系不等于采购；operates/produces不能替代sells",
+  "source_group_production": "康欣p14原连续并列对象作为production集合有原文支持，其具名销售未交付不召回",
+  "negative_scope": "仅实际检查页，不推全年报完整",
+  "lessor_prior_only_auxiliary_count_correction": {
+    "original_text": 19,
+    "official_layout_count": 20,
+    "source_pages": [
+      343,
+      344
+    ],
+    "reason": "辅助笔误，仅上期行均不纳本期收入；9个本期来源条件和114总合同不变",
+    "original_contract_bytes_unchanged": true
+  }
+}

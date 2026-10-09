@@ -201,3 +201,18 @@ A corrected formal round MUST use a distinct complete processing identity and in
 - **AND** actual whole-round duration is 195.337716 seconds with 0/50000 tokens, including retries and existing PDF parse caches
 - **AND** all five stages have empty reused_scope_ids and predecessor lineage is empty, while query, export and disk agree
 - **AND** the earlier v34/v35 failed observations and production/scale authorization boundaries remain unchanged
+
+### Requirement: Continued native bodies and physical table rows preserve their substantive identity
+Full current owned operating and revenue-mechanism narratives MUST remain complete through acceptance, query and export, including original subsidiary or associate actors, asset disposal, trial operation and promotion states. Continued original payment or service-period wording MUST be judged by its substantive source meaning rather than a substitute keyword. When one physical owner line contains multiple native product rows, each product MUST retain its own name, unit and current action column; unit suffixes, numeric cells and subsequent rows MUST NOT enter commodity names. Wrapped native contract classifications MUST update parsing state: market or customer types MUST retain region basis, and transfer-time classifications MUST retain revenue_timing rather than the preceding product basis. Layout headers MUST be verified against original plain text, exact tenants and current columns; mother-company section-start evidence MUST preserve the original actor and scope. Source-unit contradictions MUST remain documented without guessed conversion.
+
+#### Scenario: Complete operating narrative contains qualified subsidiaries and future directions
+- **WHEN** continued owned pages disclose network or information services, a circular production chain and independently qualified subsidiary, associate, trial, promotion or disposal states
+- **THEN** all affected substantive bodies retain the established businesses and original qualifications without promoting planned or third-party actions
+
+#### Scenario: Multiple product rows share the owner physical line
+- **WHEN** the native line contains separate 电, 蒸汽 and 电石 rows with their own units and sales cells
+- **THEN** acceptance, query and export deliver three distinct native goods without concatenated unit or numeric text
+
+#### Scenario: Wrapped contract headings change the native income dimension
+- **WHEN** 商品类型 is followed by 市场或客户类型 and 商品转让的时间分类
+- **THEN** each Segment and paired Measurement retain the current native product, region or revenue_timing classification rather than stale parsing state

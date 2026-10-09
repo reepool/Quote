@@ -1,0 +1,58 @@
+{
+  "created_at": "2026-10-09T02:06:26.666506+00:00",
+  "task_1_1_completed": true,
+  "task_2_1_completed": true,
+  "completion_branch": "first_formal_failure_preserved",
+  "business_acceptance_passed": false,
+  "a_role_review": "pending_failure_review",
+  "source_recall": {
+    "status": "assessed",
+    "numerator": 31,
+    "denominator": 114,
+    "value": 0.2719298245614035
+  },
+  "source_accuracy": {
+    "status": "assessed",
+    "numerator": 92,
+    "denominator": 101,
+    "value": 0.9108910891089109
+  },
+  "critical_numeric_errors": {
+    "status": "assessed",
+    "value": 0
+  },
+  "accepted_facts": 95,
+  "answered_texts": 6,
+  "whole_round_seconds": 225.19747464172542,
+  "tokens_consumed": 0,
+  "shared_token_budget": 50000,
+  "actual_runtime_no_reuse": true,
+  "query_export_disk_equal": true,
+  "protected_historical_files": 2003,
+  "first_formal_artifacts": 18,
+  "source_condition_count": 114,
+  "new_batches": "paused",
+  "change_archived": false,
+  "repair_cards_registered": [
+    "4.1",
+    "4.3",
+    "4.2",
+    "4.4"
+  ],
+  "repair_started": false,
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false,
+  "validation": {
+    "fixture_normalization_tests": "4 passed,7 deselected",
+    "existing_m4_owner_tests": "20 passed",
+    "review_method": "manual source and current diff review; only current-scope defects",
+    "blocking_business_defects": "nine actual errors and83 missing substantive conditions; preserved failed observation with pending repair cards,not repaired in this task",
+    "unrelated_existing_changes_untouched": true,
+    "ruff_check": "passed: existing v37 regression, m4 owner tests and execution selection",
+    "format_current_scope": "passed: v37 tests and execution selection",
+    "format_unrelated_existing_m4_owner_test": "pre-existing would reformat, file unchanged vs HEAD; postponed",
+    "openspec_strict": "passed: new change and three synced main specs",
+    "diff_check": "passed: current paths",
+    "manual_diff_review": "no new blocking code/spec defects; failed business observation and pending cards retained"
+  }
+}

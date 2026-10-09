@@ -1,0 +1,35 @@
+{
+  "accepted_at": "2026-10-09T01:29:12.100136+00:00",
+  "reviewer": "A角独立审核",
+  "scope": "original 170 substantive conditions and actual inspected pages; not full-report completeness",
+  "source_recall": {
+    "numerator": 170,
+    "denominator": 170
+  },
+  "source_accuracy": {
+    "numerator": 373,
+    "denominator": 373,
+    "accepted_facts": 367,
+    "answered_bodies": 6
+  },
+  "critical_numeric_errors": 0,
+  "whole_round_seconds": 203.70389195438474,
+  "tokens_consumed": 0,
+  "token_budget": 50000,
+  "actual_runtime_no_reuse": true,
+  "official_source_pages_verified": 86,
+  "protected_historical_files": 1254,
+  "first_formal_artifacts": 19,
+  "formal_review_artifacts": 4,
+  "executed_modules_reconstructable": 38,
+  "independent_validation": "30 passed; Ruff/format/OpenSpec strict/diff passed",
+  "a_role_acceptance": "finite_accepted",
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false,
+  "original_failure_preserved": {
+    "recall": "59/170",
+    "accuracy": "107/122",
+    "numeric_errors": 0
+  },
+  "context_fixture_observation": "Two supplemental context fixture pages differ in layout. Replacing with real owner pages passed both local acceptance-query-export loops; may normalize in closure, no acceptance blocker."
+}
