@@ -1,0 +1,171 @@
+{
+  "reason": "三份BusinessOverview因PDF表头/跨行阅读顺序误判，独立官方layout与表头相等核验后更正三事实及五正文支持判断；不修改任何交付、前置合同或执行代码。",
+  "initial_decisions_sha256": "5484e165c51be3ff1ba717adc402f0a765dc6db34b0f8ec64278cf8c709da565",
+  "final_decisions_sha256": "a9ae980549b6575a647c6edd5a4255971cd45216e236bb2be73fbd490ff52f29",
+  "layout_evidence_sha256": "d1f4f04ab9973dc94ea312b3b59eae570adcdf78bf0d6bb5ad3f28cf47553eb8",
+  "changes": [
+    {
+      "instrument_id": "600039.SH",
+      "object_id": "owned:core-ev-7441a217f4b34b79:overview",
+      "kind": "facts",
+      "before": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          342,
+          343,
+          344,
+          345
+        ],
+        "reason": "原文完整连续业务／机制／状态段，主体、期间和参股／退出限定按原文保留，不据此生成未明示商品动作。",
+        "accurate": false
+      },
+      "after": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          342,
+          343,
+          344,
+          345
+        ],
+        "layout_review_reference": "v38-layout-review-evidence.json",
+        "layout_reason": "租赁布局逐行与官方layout连续原文一致，9笔本期/20笔仅上期及承租方金额另按独立来源条件核验。",
+        "reason": "原文完整连续业务／机制／状态段，主体、期间和参股／退出限定按原文保留，不据此生成未明示商品动作。",
+        "accurate": true
+      }
+    },
+    {
+      "instrument_id": "600039.SH",
+      "object_id": "owned:core-ev-42c2c6465e6611cb:overview",
+      "kind": "facts",
+      "before": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          295
+        ],
+        "reason": "原文完整连续业务／机制／状态段，主体、期间和参股／退出限定按原文保留，不据此生成未明示商品动作。",
+        "accurate": false
+      },
+      "after": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          295
+        ],
+        "layout_review_reference": "v38-layout-review-evidence.json",
+        "layout_reason": "只规范化取得方式/直接间接两层表头的阅读顺序，所有主体、行内容、数值与状态逐字相等。",
+        "reason": "原文完整连续业务／机制／状态段，主体、期间和参股／退出限定按原文保留，不据此生成未明示商品动作。",
+        "accurate": true
+      }
+    },
+    {
+      "instrument_id": "600039.SH",
+      "object_id": "principal_business",
+      "kind": "answers",
+      "before": {
+        "accurate": false,
+        "reason": "按原合同实质内容及完整支持事实核对；原主体、经营状态、产品矩阵、原生收入机制和退出合并边界保留。",
+        "failed_substance_groups": [],
+        "all_supporting_facts_accurate": false
+      },
+      "after": {
+        "accurate": true,
+        "reason": "按原合同实质内容及完整支持事实核对；原主体、经营状态、产品矩阵、原生收入机制和退出合并边界保留。",
+        "failed_substance_groups": [],
+        "all_supporting_facts_accurate": true
+      }
+    },
+    {
+      "instrument_id": "600039.SH",
+      "object_id": "products_services",
+      "kind": "answers",
+      "before": {
+        "accurate": false,
+        "reason": "按原合同实质内容及完整支持事实核对；原主体、经营状态、产品矩阵、原生收入机制和退出合并边界保留。",
+        "failed_substance_groups": [],
+        "all_supporting_facts_accurate": false
+      },
+      "after": {
+        "accurate": true,
+        "reason": "按原合同实质内容及完整支持事实核对；原主体、经营状态、产品矩阵、原生收入机制和退出合并边界保留。",
+        "failed_substance_groups": [],
+        "all_supporting_facts_accurate": true
+      }
+    },
+    {
+      "instrument_id": "600039.SH",
+      "object_id": "revenue_model",
+      "kind": "answers",
+      "before": {
+        "accurate": false,
+        "reason": "按原合同实质内容及完整支持事实核对；原主体、经营状态、产品矩阵、原生收入机制和退出合并边界保留。",
+        "failed_substance_groups": [],
+        "all_supporting_facts_accurate": false
+      },
+      "after": {
+        "accurate": true,
+        "reason": "按原合同实质内容及完整支持事实核对；原主体、经营状态、产品矩阵、原生收入机制和退出合并边界保留。",
+        "failed_substance_groups": [],
+        "all_supporting_facts_accurate": true
+      }
+    },
+    {
+      "instrument_id": "600076.SH",
+      "object_id": "owned:core-ev-c907e214d4ce8f0c:overview",
+      "kind": "facts",
+      "before": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          200
+        ],
+        "reason": "原文完整连续业务／机制／状态段，主体、期间和参股／退出限定按原文保留，不据此生成未明示商品动作。",
+        "accurate": false
+      },
+      "after": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          200
+        ],
+        "layout_review_reference": "v38-layout-review-evidence.json",
+        "layout_reason": "只规范化取得方式/直接间接两层表头的阅读顺序，所有主体、行内容、数值与状态逐字相等。",
+        "reason": "原文完整连续业务／机制／状态段，主体、期间和参股／退出限定按原文保留，不据此生成未明示商品动作。",
+        "accurate": true
+      }
+    },
+    {
+      "instrument_id": "600076.SH",
+      "object_id": "principal_business",
+      "kind": "answers",
+      "before": {
+        "accurate": false,
+        "reason": "按原合同实质内容及完整支持事实核对；原主体、经营状态、产品矩阵、原生收入机制和退出合并边界保留。",
+        "failed_substance_groups": [],
+        "all_supporting_facts_accurate": false
+      },
+      "after": {
+        "accurate": true,
+        "reason": "按原合同实质内容及完整支持事实核对；原主体、经营状态、产品矩阵、原生收入机制和退出合并边界保留。",
+        "failed_substance_groups": [],
+        "all_supporting_facts_accurate": true
+      }
+    },
+    {
+      "instrument_id": "600076.SH",
+      "object_id": "products_services",
+      "kind": "answers",
+      "before": {
+        "accurate": false,
+        "reason": "按原合同实质内容及完整支持事实核对；原主体、经营状态、产品矩阵、原生收入机制和退出合并边界保留。",
+        "failed_substance_groups": [],
+        "all_supporting_facts_accurate": false
+      },
+      "after": {
+        "accurate": true,
+        "reason": "按原合同实质内容及完整支持事实核对；原主体、经营状态、产品矩阵、原生收入机制和退出合并边界保留。",
+        "failed_substance_groups": [],
+        "all_supporting_facts_accurate": true
+      }
+    }
+  ],
+  "formal_delivery_modified": false,
+  "source_contract_modified": false,
+  "execution_code_modified": false
+}

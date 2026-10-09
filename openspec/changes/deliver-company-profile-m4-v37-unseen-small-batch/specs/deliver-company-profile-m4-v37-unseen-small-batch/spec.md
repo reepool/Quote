@@ -44,3 +44,18 @@ The first114condition contract and31/114recall,92/101accuracy,zero critical nume
 #### Scenario: First failed results are submitted
 - **WHEN** independent current-source review determines the first formal round failed
 - **THEN** original contract and first artifacts remain immutable and only source-backed local repair cards are registered
+
+### Requirement: The authorized successor preserves native business and table boundaries
+The v38 successor MUST use the original plan,official versions,cutoff and all114 substantive conditions in a one-to-one mapping under a full new identity with five cumulative flags and unchanged default. Six delivered bodies MUST retain complete business chains,revenue mechanisms and original associate/disposed-subsidiary limits. Named sales MUST require current affirmative actions,prior-year explanations MUST NOT affirm a denied current action,purchase MUST NOT imply input,and actual application MUST use material_input. Native income selection MUST join printed decimal fragments before table termination,read project current-income columns,preserve subsidiary/associate actors and separate pre-elimination,deduction and post-elimination bases. Lessor continuations MUST preserve exact tenants and all twenty prior-only rows MUST remain absent from current income. Original failed bytes MUST remain immutable. Full owner and independent official-page acceptance-query-export regression MUST precede first formal successor execution and dynamic unique review.
+
+#### Scenario: Current sales are denied while prior sales remain affirmative
+- **WHEN** the current deduction explanation denies or plans a named sale while its prior explanation remains affirmative
+- **THEN** no current named sale or export role is generated,and other affirmative current branches remain
+
+#### Scenario: Tenant and numeric cells wrap over source lines
+- **WHEN** a tenant ends on the next page and a printed decimal or company label spans lines
+- **THEN** the exact original row identity and current amount are delivered without shifting prior cells or contaminating the next tenant
+
+#### Scenario: The authorized first successor closes the same source contract
+- **WHEN** the first v38 owner run-query-export returns for both frozen companies
+- **THEN** all actual facts and answered bodies are uniquely reviewed with the original114-condition denominator and actual resource/reuse evidence,without a prefilled accuracy score

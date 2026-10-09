@@ -1,0 +1,16 @@
+{
+  "formal_execution_index": 1,
+  "first_artifacts_manifest_sha256": "dcc996e54b859f541b6801e75374f465e5a1538e1151df40011b9b5b3e9102a3",
+  "source_scope_sha256": "b132f76eebba1be7fed94cd6c8e2e9778368583179a3b5fc8db7dfdb173343d7",
+  "review_sha256": {
+    "openspec/changes/deliver-company-profile-m4-v37-unseen-small-batch/v38-actual-object-decisions.json": "a9ae980549b6575a647c6edd5a4255971cd45216e236bb2be73fbd490ff52f29",
+    "openspec/changes/deliver-company-profile-m4-v37-unseen-small-batch/v38-source-review-evidence.json": "bd45fe047a344d5af6b55db052747889ae8e9736c7906e78783a23d3d96264c0",
+    "openspec/changes/deliver-company-profile-m4-v37-unseen-small-batch/v38-layout-review-evidence.json": "d1f4f04ab9973dc94ea312b3b59eae570adcdf78bf0d6bb5ad3f28cf47553eb8",
+    "openspec/changes/deliver-company-profile-m4-v37-unseen-small-batch/v38-review-reading-order-correction.json": "15dfed21cda5488a9e08163b7505d5b099f95545b4ef371a9d0a95f764c5b6e1",
+    "openspec/changes/deliver-company-profile-m4-v37-unseen-small-batch/v38-initial-reading-order-decisions.json": "5484e165c51be3ff1ba717adc402f0a765dc6db34b0f8ec64278cf8c709da565",
+    "data/checkpoints/company_profile_common_core/reports/m4_v38_construction_wood_core_repair/company_profile_source_review.v1.json": "157110bb083f85f7deef804074ad55aaccf1def9c935eb898fb7733f543f3257"
+  },
+  "formal_observation_immutable": true,
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false
+}

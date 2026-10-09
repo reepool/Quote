@@ -1,0 +1,24 @@
+{
+  "formal_execution_index": 1,
+  "sha256": {
+    "data/checkpoints/company_profile_common_core/reports/m4_v38_construction_wood_core_repair/plan.json": "eecbb2bc72abe9bcd4ca7905a2ebd1800439ea9325c1c957b05d02195b3de60a",
+    "data/checkpoints/company_profile_common_core/reports/m4_v38_construction_wood_core_repair/company_profile_live_run.v1.json": "8e1c17bf5bf2c6bae07e50b9c2fbd6b6c6395a3fa8feee2b1f54939ab610b055",
+    "data/checkpoints/company_profile_common_core/reports/m4_v38_construction_wood_core_repair/observation.json": "d72f6c950817ad037ee35504f0c9be2f586819c6bbfd4d5c0419011826a69fd9",
+    "data/checkpoints/company_profile_common_core/reports/m4_v38_construction_wood_core_repair/formal_execution.json": "9e279d3ba224d8b0e059b9eb3eaa19e65be2b52a759278de44000ec4b6a14834",
+    "data/research/company_profile_common_core/m4_v38_construction_wood_core_repair/company_profile_common_core.v1/bp-work-93ae776fa9a765dd3f03cdfe.json": "1b1de89d17bbc79e05e87e00ebd649b1697758a3f4ccde8a339104cfba2bce51",
+    "data/research/company_profile_common_core/m4_v38_construction_wood_core_repair/company_profile_common_core.v1/bp-work-2edecbc341bc26f240bcde69.json": "011a7460437a44b9be1134cae13480640bea8b578068649ba3f95b3ed207209a",
+    "data/research/company_profile_common_core/m4_v38_construction_wood_core_repair/company_profile_common_core.v1/scopes/600076.SH/2025-12-31/extract_segment_financials.json": "a2a2fcdc07ab4568a39d381e14a36f94787a1b07eae0c71f36401c7d16f9a4d6",
+    "data/research/company_profile_common_core/m4_v38_construction_wood_core_repair/company_profile_common_core.v1/scopes/600076.SH/2025-12-31/extract_material_inputs.json": "62ffeea14811d8e01e8c82ac40ee70530214b8db1a41fb06b319b1be2767074a",
+    "data/research/company_profile_common_core/m4_v38_construction_wood_core_repair/company_profile_common_core.v1/scopes/600076.SH/2025-12-31/extract_business_overview.json": "b3e69b76c6c8cd74b41e81a492db773fa3ade82b551b296cd82d4e3ee0aec418",
+    "data/research/company_profile_common_core/m4_v38_construction_wood_core_repair/company_profile_common_core.v1/scopes/600039.SH/2025-12-31/extract_segment_financials.json": "56bef16ac3904bc3a09346ae1682473486d371b888856d5ce924cb044240d4cd",
+    "data/research/company_profile_common_core/m4_v38_construction_wood_core_repair/company_profile_common_core.v1/scopes/600039.SH/2025-12-31/extract_business_overview.json": "0fa221d85a37f5a5be751c474ef3b6e15044eee0de6830ec8fedb8f1b3d6198d",
+    "data/research/company_profile_common_core/m4_v38_construction_wood_core_repair/company_profile_common_core.v1/checkpoints/bp-work-93ae776fa9a765dd3f03cdfe.json": "38c8463a4c7bab411bd83f1bf821802bb39c0a1c4c199cc377e43b2ff543f069",
+    "data/research/company_profile_common_core/m4_v38_construction_wood_core_repair/company_profile_common_core.v1/checkpoints/bp-work-2edecbc341bc26f240bcde69.json": "fda4b86600e3be13825dcd1d42130e5c1d91c078307fda56a356ea4fdf30695e",
+    "data/exports/m4_v38_construction_wood_core_repair/600076.SH/profiles.csv": "6310ed59d851b661beb221075f274be495e61a0268bbe3556f0eb72b09fd80c4",
+    "data/exports/m4_v38_construction_wood_core_repair/600076.SH/600076.SH_2025-12-31.json": "bd967477618b2b2344d4e67c18a0d3d10b5ecb2ad2f98a7fd0ee1a57233a1ed4",
+    "data/exports/m4_v38_construction_wood_core_repair/600076.SH/export_manifest.json": "ef0610e6d01ad27c82749a708311e2e7328e334ce25d4720d921d912e1f6c815",
+    "data/exports/m4_v38_construction_wood_core_repair/600039.SH/profiles.csv": "2b0b91ff8e70c98debb9d84ce83c535e84c4496f014dbef57484c2a53e0eb680",
+    "data/exports/m4_v38_construction_wood_core_repair/600039.SH/600039.SH_2025-12-31.json": "e60069467d82003efe6a1fe6fd8592f0f63a8ef93fd5f87155c5281d2534d980",
+    "data/exports/m4_v38_construction_wood_core_repair/600039.SH/export_manifest.json": "0e0856599bc51f2b3ca6eabac603b79a2a84cbcb2664533b5bb5e6033b394b2b"
+  }
+}

@@ -1,0 +1,2672 @@
+{
+  "600039.SH": {
+    "facts": {
+      "owned:core-ev-8da766b6059e82ae:overview": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          12
+        ],
+        "reason": "原文完整连续业务／机制／状态段，主体、期间和参股／退出限定按原文保留，不据此生成未明示商品动作。",
+        "accurate": true
+      },
+      "owned:core-ev-c02d65d6387fb4c7:activity:1": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          12
+        ],
+        "reason": "逐对象核原名、直接动作／material_input关系及原主体；当前产销、其他收入与原子公司业务分支成立，采购不推投入、投入不推外购；父项只准确率。",
+        "accurate": true
+      },
+      "owned:core-ev-c02d65d6387fb4c7:activity:2": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          12
+        ],
+        "reason": "逐对象核原名、直接动作／material_input关系及原主体；当前产销、其他收入与原子公司业务分支成立，采购不推投入、投入不推外购；父项只准确率。",
+        "accurate": true
+      },
+      "owned:core-ev-c02d65d6387fb4c7:activity:3": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          12
+        ],
+        "reason": "逐对象核原名、直接动作／material_input关系及原主体；当前产销、其他收入与原子公司业务分支成立，采购不推投入、投入不推外购；父项只准确率。",
+        "accurate": true
+      },
+      "owned:core-ev-c02d65d6387fb4c7:activity:4": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          12
+        ],
+        "reason": "逐对象核原名、直接动作／material_input关系及原主体；当前产销、其他收入与原子公司业务分支成立，采购不推投入、投入不推外购；父项只准确率。",
+        "accurate": true
+      },
+      "owned:core-ev-4d1f2acc946109fc:overview": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          332,
+          333,
+          334,
+          335,
+          336,
+          337,
+          338,
+          339,
+          340,
+          341,
+          342
+        ],
+        "reason": "原文完整连续业务／机制／状态段，主体、期间和参股／退出限定按原文保留，不据此生成未明示商品动作。",
+        "accurate": true
+      },
+      "owned:core-ev-7441a217f4b34b79:overview": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          342,
+          343,
+          344,
+          345
+        ],
+        "layout_review_reference": "v38-layout-review-evidence.json",
+        "layout_reason": "租赁布局逐行与官方layout连续原文一致，9笔本期/20笔仅上期及承租方金额另按独立来源条件核验。",
+        "reason": "原文完整连续业务／机制／状态段，主体、期间和参股／退出限定按原文保留，不据此生成未明示商品动作。",
+        "accurate": true
+      },
+      "owned:core-ev-c5caff1024b06547:overview": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          13
+        ],
+        "reason": "原文完整连续业务／机制／状态段，主体、期间和参股／退出限定按原文保留，不据此生成未明示商品动作。",
+        "accurate": true
+      },
+      "owned:core-ev-4df703eaa3c550a8:overview": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          17
+        ],
+        "reason": "原文完整连续业务／机制／状态段，主体、期间和参股／退出限定按原文保留，不据此生成未明示商品动作。",
+        "accurate": true
+      },
+      "owned:core-ev-e30eae504e4bec3c:overview": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          19
+        ],
+        "reason": "原文完整连续业务／机制／状态段，主体、期间和参股／退出限定按原文保留，不据此生成未明示商品动作。",
+        "accurate": true
+      },
+      "owned:core-ev-9baa1d3986a181b7:overview": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          30,
+          31
+        ],
+        "reason": "原文完整连续业务／机制／状态段，主体、期间和参股／退出限定按原文保留，不据此生成未明示商品动作。",
+        "accurate": true
+      },
+      "owned:core-ev-bdd8d6ec35a27c4f:overview": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          30,
+          31
+        ],
+        "reason": "原文完整连续业务／机制／状态段，主体、期间和参股／退出限定按原文保留，不据此生成未明示商品动作。",
+        "accurate": true
+      },
+      "owned:core-ev-d35000043a6eae3a:overview": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          183,
+          184
+        ],
+        "reason": "原文完整连续业务／机制／状态段，主体、期间和参股／退出限定按原文保留，不据此生成未明示商品动作。",
+        "accurate": true
+      },
+      "owned:core-ev-2791624b13bf9dcf:overview": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          186
+        ],
+        "reason": "原文完整连续业务／机制／状态段，主体、期间和参股／退出限定按原文保留，不据此生成未明示商品动作。",
+        "accurate": true
+      },
+      "owned:core-ev-6f227ace4d20f29e:overview": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          294
+        ],
+        "reason": "原文完整连续业务／机制／状态段，主体、期间和参股／退出限定按原文保留，不据此生成未明示商品动作。",
+        "accurate": true
+      },
+      "owned:core-ev-42c2c6465e6611cb:overview": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          295
+        ],
+        "layout_review_reference": "v38-layout-review-evidence.json",
+        "layout_reason": "只规范化取得方式/直接间接两层表头的阅读顺序，所有主体、行内容、数值与状态逐字相等。",
+        "reason": "原文完整连续业务／机制／状态段，主体、期间和参股／退出限定按原文保留，不据此生成未明示商品动作。",
+        "accurate": true
+      },
+      "owned:core-ev-264ca76c0d90d534:overview": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          315
+        ],
+        "reason": "原文完整连续业务／机制／状态段，主体、期间和参股／退出限定按原文保留，不据此生成未明示商品动作。",
+        "accurate": true
+      },
+      "owned:core-ev-2421928cf30f6d20:overview": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          332
+        ],
+        "reason": "原文完整连续业务／机制／状态段，主体、期间和参股／退出限定按原文保留，不据此生成未明示商品动作。",
+        "accurate": true
+      },
+      "owned:core-ev-1fe40a0de8a1bf55:overview": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          342
+        ],
+        "reason": "原文完整连续业务／机制／状态段，主体、期间和参股／退出限定按原文保留，不据此生成未明示商品动作。",
+        "accurate": true
+      },
+      "owned:core-ev-d6bb8bd0b538f40a:segment:industry:工程施工": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23
+        ],
+        "recall_row_index": 0,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-bd8b0da303832004:revenue:industry:工程施工": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23
+        ],
+        "recall_row_index": 0,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-d6bb8bd0b538f40a:segment:industry:公路投资运营": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23
+        ],
+        "recall_row_index": 1,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-bd8b0da303832004:revenue:industry:公路投资运营": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23
+        ],
+        "recall_row_index": 1,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-d6bb8bd0b538f40a:segment:industry:贸易": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23
+        ],
+        "recall_row_index": 2,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-bd8b0da303832004:revenue:industry:贸易": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23
+        ],
+        "recall_row_index": 2,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-d6bb8bd0b538f40a:segment:industry:其他": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23
+        ],
+        "recall_row_index": 3,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-bd8b0da303832004:revenue:industry:其他": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23
+        ],
+        "recall_row_index": 3,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-d6bb8bd0b538f40a:segment:product:工程施工": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23
+        ],
+        "recall_row_index": 4,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-bd8b0da303832004:revenue:product:工程施工": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23
+        ],
+        "recall_row_index": 4,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-d6bb8bd0b538f40a:segment:product:公路投资运营": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23
+        ],
+        "recall_row_index": 5,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-bd8b0da303832004:revenue:product:公路投资运营": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23
+        ],
+        "recall_row_index": 5,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-d6bb8bd0b538f40a:segment:product:贸易": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23
+        ],
+        "recall_row_index": 6,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-bd8b0da303832004:revenue:product:贸易": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23
+        ],
+        "recall_row_index": 6,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-d6bb8bd0b538f40a:segment:product:其他": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23
+        ],
+        "recall_row_index": 7,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-bd8b0da303832004:revenue:product:其他": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23
+        ],
+        "recall_row_index": 7,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-d6bb8bd0b538f40a:segment:region:省内": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23
+        ],
+        "recall_row_index": 8,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-bd8b0da303832004:revenue:region:省内": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23
+        ],
+        "recall_row_index": 8,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-d6bb8bd0b538f40a:segment:region:省外": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23
+        ],
+        "recall_row_index": 9,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-bd8b0da303832004:revenue:region:省外": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23
+        ],
+        "recall_row_index": 9,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-d6bb8bd0b538f40a:segment:region:国外": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23
+        ],
+        "recall_row_index": 10,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-bd8b0da303832004:revenue:region:国外": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23
+        ],
+        "recall_row_index": 10,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-54e2c2fce8e375d3:Segment:business_type:建材、商贸物流业务:本期营业收入:row:0": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          19
+        ],
+        "recall_row_index": 11,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-a3f32d2a53c17628:Measurement:business_type:建材、商贸物流业务:本期营业收入:row:0": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          19
+        ],
+        "recall_row_index": 11,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-31c96de3b7667bb9:Segment:service:G7611线西昌至香格里拉（四川境）高速公路ZCB3标段:在建重大项目/本期确认收入:row:0": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          25
+        ],
+        "recall_row_index": 12,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-a9ec7b0abc67ee8e:Measurement:service:G7611线西昌至香格里拉（四川境）高速公路ZCB3标段:在建重大项目/本期确认收入:row:0": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          25
+        ],
+        "recall_row_index": 12,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-31c96de3b7667bb9:Segment:service:G4216线屏山新市至金阳段高速公路项目ZCB1标段:在建重大项目/本期确认收入:row:1": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          25
+        ],
+        "recall_row_index": 13,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-a9ec7b0abc67ee8e:Measurement:service:G4216线屏山新市至金阳段高速公路项目ZCB1标段:在建重大项目/本期确认收入:row:1": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          25
+        ],
+        "recall_row_index": 13,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-31c96de3b7667bb9:Segment:service:镇巴（川陕界）至广安高速公路通广段C合同段:在建重大项目/本期确认收入:row:2": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          25
+        ],
+        "recall_row_index": 14,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-a9ec7b0abc67ee8e:Measurement:service:镇巴（川陕界）至广安高速公路通广段C合同段:在建重大项目/本期确认收入:row:2": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          25
+        ],
+        "recall_row_index": 14,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-31c96de3b7667bb9:Segment:service:G5京昆高速广元至绵阳段扩容工程施工总承包C1合同段:在建重大项目/本期确认收入:row:3": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          25
+        ],
+        "recall_row_index": 15,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-a9ec7b0abc67ee8e:Measurement:service:G5京昆高速广元至绵阳段扩容工程施工总承包C1合同段:在建重大项目/本期确认收入:row:3": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          25
+        ],
+        "recall_row_index": 15,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-059618f80e6376d7:Segment:business_segment:四川公路桥梁建设集团有限公司:控股参股公司/营业收入:row:0": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          30,
+          31
+        ],
+        "recall_row_index": 16,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-53e7054f1b7d5927:Measurement:business_segment:四川公路桥梁建设集团有限公司:控股参股公司/营业收入:row:0": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          30,
+          31
+        ],
+        "recall_row_index": 16,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-059618f80e6376d7:Segment:business_segment:四川省交通建设集团有限责任公司:控股参股公司/营业收入:row:1": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          30,
+          31
+        ],
+        "recall_row_index": 17,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-53e7054f1b7d5927:Measurement:business_segment:四川省交通建设集团有限责任公司:控股参股公司/营业收入:row:1": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          30,
+          31
+        ],
+        "recall_row_index": 17,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-059618f80e6376d7:Segment:business_segment:四川川交路桥有限责任公司:控股参股公司/营业收入:row:2": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          30,
+          31
+        ],
+        "recall_row_index": 18,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-53e7054f1b7d5927:Measurement:business_segment:四川川交路桥有限责任公司:控股参股公司/营业收入:row:2": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          30,
+          31
+        ],
+        "recall_row_index": 18,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-059618f80e6376d7:Segment:business_segment:四川路桥盛通建筑工程有限公司:控股参股公司/营业收入:row:3": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          30,
+          31
+        ],
+        "recall_row_index": 19,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-53e7054f1b7d5927:Measurement:business_segment:四川路桥盛通建筑工程有限公司:控股参股公司/营业收入:row:3": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          30,
+          31
+        ],
+        "recall_row_index": 19,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-059618f80e6376d7:Segment:business_segment:四川省铁路建设有限公司:控股参股公司/营业收入:row:4": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          30,
+          31
+        ],
+        "recall_row_index": 20,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-53e7054f1b7d5927:Measurement:business_segment:四川省铁路建设有限公司:控股参股公司/营业收入:row:4": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          30,
+          31
+        ],
+        "recall_row_index": 20,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-059618f80e6376d7:Segment:business_segment:四川蜀道养护集团有限公司:控股参股公司/营业收入:row:5": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          30,
+          31
+        ],
+        "recall_row_index": 21,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-53e7054f1b7d5927:Measurement:business_segment:四川蜀道养护集团有限公司:控股参股公司/营业收入:row:5": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          30,
+          31
+        ],
+        "recall_row_index": 21,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-a3c762c40abd972f:Segment:business_type:主营业务:营业收入:row:0": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          274
+        ],
+        "recall_row_index": 27,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-1d622346b97f62c2:Measurement:business_type:主营业务:营业收入:row:0": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          274
+        ],
+        "recall_row_index": 27,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-a3c762c40abd972f:Segment:business_type:其他业务:营业收入:row:1": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          274
+        ],
+        "recall_row_index": 28,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-1d622346b97f62c2:Measurement:business_type:其他业务:营业收入:row:1": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          274
+        ],
+        "recall_row_index": 28,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-0c25efc904680967:Segment:product:工程施工:全部营业收入/商品类型:row:0": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          274
+        ],
+        "recall_row_index": 29,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-f12f2a821f842250:Measurement:product:工程施工:全部营业收入/商品类型:row:0": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          274
+        ],
+        "recall_row_index": 29,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-0c25efc904680967:Segment:product:贸易销售:全部营业收入/商品类型:row:1": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          274
+        ],
+        "recall_row_index": 30,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-f12f2a821f842250:Measurement:product:贸易销售:全部营业收入/商品类型:row:1": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          274
+        ],
+        "recall_row_index": 30,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-0c25efc904680967:Segment:product:公路投资运营:全部营业收入/商品类型:row:2": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          274
+        ],
+        "recall_row_index": 31,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-f12f2a821f842250:Measurement:product:公路投资运营:全部营业收入/商品类型:row:2": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          274
+        ],
+        "recall_row_index": 31,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-0c25efc904680967:Segment:product:其他:全部营业收入/商品类型:row:3": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          274
+        ],
+        "recall_row_index": 32,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-f12f2a821f842250:Measurement:product:其他:全部营业收入/商品类型:row:3": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          274
+        ],
+        "recall_row_index": 32,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-0c25efc904680967:Segment:region:省内:全部营业收入/经营地区:row:4": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          274
+        ],
+        "recall_row_index": 33,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-f12f2a821f842250:Measurement:region:省内:全部营业收入/经营地区:row:4": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          274
+        ],
+        "recall_row_index": 33,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-0c25efc904680967:Segment:region:省外:全部营业收入/经营地区:row:5": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          274
+        ],
+        "recall_row_index": 34,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-f12f2a821f842250:Measurement:region:省外:全部营业收入/经营地区:row:5": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          274
+        ],
+        "recall_row_index": 34,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-0c25efc904680967:Segment:region:国外:全部营业收入/经营地区:row:6": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          274
+        ],
+        "recall_row_index": 35,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-f12f2a821f842250:Measurement:region:国外:全部营业收入/经营地区:row:6": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          274
+        ],
+        "recall_row_index": 35,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-81381975b79f8cb4:Segment:product:工程施工:全部营业收入/商品类型:row:0": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          274
+        ],
+        "recall_row_index": 29,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-81381975b79f8cb4:Segment:product:贸易销售:全部营业收入/商品类型:row:1": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          274
+        ],
+        "recall_row_index": 30,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-81381975b79f8cb4:Segment:product:公路投资运营:全部营业收入/商品类型:row:2": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          274
+        ],
+        "recall_row_index": 31,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-81381975b79f8cb4:Segment:product:其他:全部营业收入/商品类型:row:3": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          274
+        ],
+        "recall_row_index": 32,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-81381975b79f8cb4:Segment:region:省内:全部营业收入/经营地区:row:4": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          274
+        ],
+        "recall_row_index": 33,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-81381975b79f8cb4:Segment:region:省外:全部营业收入/经营地区:row:5": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          274
+        ],
+        "recall_row_index": 34,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-81381975b79f8cb4:Segment:region:国外:全部营业收入/经营地区:row:6": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          274
+        ],
+        "recall_row_index": 35,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-2292cf5c9b17201b:Segment:business_segment:川交公司:重要非全资子公司/本期营业收入:row:0": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          301,
+          302
+        ],
+        "recall_row_index": 22,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-848527d9c34ecab2:Measurement:business_segment:川交公司:重要非全资子公司/本期营业收入:row:0": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          301,
+          302
+        ],
+        "recall_row_index": 22,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-2292cf5c9b17201b:Segment:business_segment:路航公司:重要非全资子公司/本期营业收入:row:1": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          301,
+          302
+        ],
+        "recall_row_index": 23,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-848527d9c34ecab2:Measurement:business_segment:路航公司:重要非全资子公司/本期营业收入:row:1": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          301,
+          302
+        ],
+        "recall_row_index": 23,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-2292cf5c9b17201b:Segment:business_segment:铁建公司:重要非全资子公司/本期营业收入:row:2": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          301,
+          302
+        ],
+        "recall_row_index": 24,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-848527d9c34ecab2:Measurement:business_segment:铁建公司:重要非全资子公司/本期营业收入:row:2": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          301,
+          302
+        ],
+        "recall_row_index": 24,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-e56043866a2e6f00:Segment:business_segment:清洁能源公司:重要联营企业/本期营业收入:row:0": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          304,
+          305
+        ],
+        "recall_row_index": 25,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-cad7a0c6481064e3:Measurement:business_segment:清洁能源公司:重要联营企业/本期营业收入:row:0": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          304,
+          305
+        ],
+        "recall_row_index": 25,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-e56043866a2e6f00:Segment:business_segment:蜀道矿业公司:重要联营企业/本期营业收入:row:1": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          304,
+          305
+        ],
+        "recall_row_index": 26,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-cad7a0c6481064e3:Measurement:business_segment:蜀道矿业公司:重要联营企业/本期营业收入:row:1": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          304,
+          305
+        ],
+        "recall_row_index": 26,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-fbd181faad5f1d58:Segment:business_segment:工程施工:主营业务收入/抵销前:row:0": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          404
+        ],
+        "recall_row_index": 48,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-b94af730f7d1e32b:Measurement:business_segment:工程施工:主营业务收入/抵销前:row:0": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          404
+        ],
+        "recall_row_index": 48,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-fbd181faad5f1d58:Segment:adjustment:工程施工:主营业务收入/抵销金额:row:1": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          404
+        ],
+        "recall_row_index": 49,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-b94af730f7d1e32b:Measurement:adjustment:工程施工:主营业务收入/抵销金额:row:1": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          404
+        ],
+        "recall_row_index": 49,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-fbd181faad5f1d58:Segment:business_segment:工程施工:主营业务收入/抵销后:row:2": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          404
+        ],
+        "recall_row_index": 50,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-b94af730f7d1e32b:Measurement:business_segment:工程施工:主营业务收入/抵销后:row:2": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          404
+        ],
+        "recall_row_index": 50,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-fbd181faad5f1d58:Segment:business_segment:贸易销售:主营业务收入/抵销前:row:3": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          404
+        ],
+        "recall_row_index": 51,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-b94af730f7d1e32b:Measurement:business_segment:贸易销售:主营业务收入/抵销前:row:3": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          404
+        ],
+        "recall_row_index": 51,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-fbd181faad5f1d58:Segment:adjustment:贸易销售:主营业务收入/抵销金额:row:4": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          404
+        ],
+        "recall_row_index": 52,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-b94af730f7d1e32b:Measurement:adjustment:贸易销售:主营业务收入/抵销金额:row:4": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          404
+        ],
+        "recall_row_index": 52,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-fbd181faad5f1d58:Segment:business_segment:贸易销售:主营业务收入/抵销后:row:5": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          404
+        ],
+        "recall_row_index": 53,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-b94af730f7d1e32b:Measurement:business_segment:贸易销售:主营业务收入/抵销后:row:5": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          404
+        ],
+        "recall_row_index": 53,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-fbd181faad5f1d58:Segment:business_segment:公路投资运营:主营业务收入/抵销前:row:6": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          404
+        ],
+        "recall_row_index": 54,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-b94af730f7d1e32b:Measurement:business_segment:公路投资运营:主营业务收入/抵销前:row:6": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          404
+        ],
+        "recall_row_index": 54,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-fbd181faad5f1d58:Segment:adjustment:公路投资运营:主营业务收入/抵销金额:row:7": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          404
+        ],
+        "recall_row_index": 55,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-b94af730f7d1e32b:Measurement:adjustment:公路投资运营:主营业务收入/抵销金额:row:7": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          404
+        ],
+        "recall_row_index": 55,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-fbd181faad5f1d58:Segment:business_segment:公路投资运营:主营业务收入/抵销后:row:8": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          404
+        ],
+        "recall_row_index": 56,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-b94af730f7d1e32b:Measurement:business_segment:公路投资运营:主营业务收入/抵销后:row:8": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          404
+        ],
+        "recall_row_index": 56,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-fbd181faad5f1d58:Segment:business_segment:其他:主营业务收入/抵销前:row:9": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          404
+        ],
+        "recall_row_index": 57,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-b94af730f7d1e32b:Measurement:business_segment:其他:主营业务收入/抵销前:row:9": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          404
+        ],
+        "recall_row_index": 57,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-fbd181faad5f1d58:Segment:adjustment:其他:主营业务收入/抵销金额:row:10": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          404
+        ],
+        "recall_row_index": 58,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-b94af730f7d1e32b:Measurement:adjustment:其他:主营业务收入/抵销金额:row:10": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          404
+        ],
+        "recall_row_index": 58,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-fbd181faad5f1d58:Segment:business_segment:其他:主营业务收入/抵销后:row:11": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          404
+        ],
+        "recall_row_index": 59,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-b94af730f7d1e32b:Measurement:business_segment:其他:主营业务收入/抵销后:row:11": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          404
+        ],
+        "recall_row_index": 59,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-2457b686919c3fea:Segment:business_type:主营业务:营业收入:row:0": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          405,
+          419
+        ],
+        "recall_row_index": 36,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-6ac6216ee348d482:Measurement:business_type:主营业务:营业收入:row:0": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          405,
+          419
+        ],
+        "recall_row_index": 36,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-2457b686919c3fea:Segment:business_type:其他业务:营业收入:row:1": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          405,
+          419
+        ],
+        "recall_row_index": 37,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-6ac6216ee348d482:Measurement:business_type:其他业务:营业收入:row:1": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          405,
+          419
+        ],
+        "recall_row_index": 37,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-6eeb97f9a368163a:Segment:service:经营租赁:作为出租人的经营租赁/租赁收入:row:0": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          290
+        ],
+        "recall_row_index": 38,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-cc2c8d3e2d30573d:Measurement:service:经营租赁:作为出租人的经营租赁/租赁收入:row:0": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          290
+        ],
+        "recall_row_index": 38,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-ddc8d881322617d2:Segment:lease:植物租摆:本公司作为出租方/本期确认的租赁收入:row:0": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          342,
+          343,
+          344,
+          345
+        ],
+        "recall_row_index": 39,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-9599f071b32d9bbf:Measurement:lease:植物租摆:本公司作为出租方/本期确认的租赁收入:row:0": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          342,
+          343,
+          344,
+          345
+        ],
+        "recall_row_index": 39,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-ddc8d881322617d2:Segment:lease:房屋租赁:本公司作为出租方/本期确认的租赁收入:row:1": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          342,
+          343,
+          344,
+          345
+        ],
+        "recall_row_index": 40,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-9599f071b32d9bbf:Measurement:lease:房屋租赁:本公司作为出租方/本期确认的租赁收入:row:1": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          342,
+          343,
+          344,
+          345
+        ],
+        "recall_row_index": 40,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-ddc8d881322617d2:Segment:lease:房屋租赁:本公司作为出租方/本期确认的租赁收入:row:2": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          342,
+          343,
+          344,
+          345
+        ],
+        "recall_row_index": 41,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-9599f071b32d9bbf:Measurement:lease:房屋租赁:本公司作为出租方/本期确认的租赁收入:row:2": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          342,
+          343,
+          344,
+          345
+        ],
+        "recall_row_index": 41,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-ddc8d881322617d2:Segment:lease:房屋租赁:本公司作为出租方/本期确认的租赁收入:row:3": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          342,
+          343,
+          344,
+          345
+        ],
+        "recall_row_index": 42,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-9599f071b32d9bbf:Measurement:lease:房屋租赁:本公司作为出租方/本期确认的租赁收入:row:3": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          342,
+          343,
+          344,
+          345
+        ],
+        "recall_row_index": 42,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-ddc8d881322617d2:Segment:lease:植物租摆:本公司作为出租方/本期确认的租赁收入:row:4": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          342,
+          343,
+          344,
+          345
+        ],
+        "recall_row_index": 43,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-9599f071b32d9bbf:Measurement:lease:植物租摆:本公司作为出租方/本期确认的租赁收入:row:4": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          342,
+          343,
+          344,
+          345
+        ],
+        "recall_row_index": 43,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-ddc8d881322617d2:Segment:lease:植物租摆:本公司作为出租方/本期确认的租赁收入:row:5": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          342,
+          343,
+          344,
+          345
+        ],
+        "recall_row_index": 44,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-9599f071b32d9bbf:Measurement:lease:植物租摆:本公司作为出租方/本期确认的租赁收入:row:5": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          342,
+          343,
+          344,
+          345
+        ],
+        "recall_row_index": 44,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-ddc8d881322617d2:Segment:lease:植物租摆:本公司作为出租方/本期确认的租赁收入:row:6": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          342,
+          343,
+          344,
+          345
+        ],
+        "recall_row_index": 45,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-9599f071b32d9bbf:Measurement:lease:植物租摆:本公司作为出租方/本期确认的租赁收入:row:6": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          342,
+          343,
+          344,
+          345
+        ],
+        "recall_row_index": 45,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-ddc8d881322617d2:Segment:lease:植物租摆:本公司作为出租方/本期确认的租赁收入:row:7": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          342,
+          343,
+          344,
+          345
+        ],
+        "recall_row_index": 46,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-9599f071b32d9bbf:Measurement:lease:植物租摆:本公司作为出租方/本期确认的租赁收入:row:7": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          342,
+          343,
+          344,
+          345
+        ],
+        "recall_row_index": 46,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-ddc8d881322617d2:Segment:lease:植物租摆:本公司作为出租方/本期确认的租赁收入:row:8": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          342,
+          343,
+          344,
+          345
+        ],
+        "recall_row_index": 47,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-9599f071b32d9bbf:Measurement:lease:植物租摆:本公司作为出租方/本期确认的租赁收入:row:8": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          342,
+          343,
+          344,
+          345
+        ],
+        "recall_row_index": 47,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      }
+    },
+    "answers": {
+      "principal_business": {
+        "accurate": true,
+        "reason": "按原合同实质内容及完整支持事实核对；原主体、经营状态、产品矩阵、原生收入机制和退出合并边界保留。",
+        "failed_substance_groups": [],
+        "all_supporting_facts_accurate": true
+      },
+      "products_services": {
+        "accurate": true,
+        "reason": "按原合同实质内容及完整支持事实核对；原主体、经营状态、产品矩阵、原生收入机制和退出合并边界保留。",
+        "failed_substance_groups": [],
+        "all_supporting_facts_accurate": true
+      },
+      "revenue_model": {
+        "accurate": true,
+        "reason": "按原合同实质内容及完整支持事实核对；原主体、经营状态、产品矩阵、原生收入机制和退出合并边界保留。",
+        "failed_substance_groups": [],
+        "all_supporting_facts_accurate": true
+      }
+    },
+    "actual_unique_object_count": 149
+  },
+  "600076.SH": {
+    "facts": {
+      "owned:core-ev-bb53c88c9a583426:overview": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          14,
+          15
+        ],
+        "reason": "原文完整连续业务／机制／状态段，主体、期间和参股／退出限定按原文保留，不据此生成未明示商品动作。",
+        "accurate": true
+      },
+      "owned:core-ev-bb53c88c9a583426:revenue:1": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          14,
+          15
+        ],
+        "reason": "原文完整连续业务／机制／状态段，主体、期间和参股／退出限定按原文保留，不据此生成未明示商品动作。",
+        "accurate": true
+      },
+      "owned:core-ev-55da877d0bd3f70f:activity:1": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          14,
+          15
+        ],
+        "reason": "逐对象核原名、直接动作／material_input关系及原主体；当前产销、其他收入与原子公司业务分支成立，采购不推投入、投入不推外购；父项只准确率。",
+        "accurate": true
+      },
+      "owned:core-ev-55da877d0bd3f70f:activity:2": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          14,
+          15
+        ],
+        "reason": "逐对象核原名、直接动作／material_input关系及原主体；当前产销、其他收入与原子公司业务分支成立，采购不推投入、投入不推外购；父项只准确率。",
+        "accurate": true
+      },
+      "owned:core-ev-55da877d0bd3f70f:activity:3": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          14,
+          15
+        ],
+        "reason": "逐对象核原名、直接动作／material_input关系及原主体；当前产销、其他收入与原子公司业务分支成立，采购不推投入、投入不推外购；父项只准确率。",
+        "accurate": true
+      },
+      "owned:core-ev-55da877d0bd3f70f:activity:4": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          14,
+          15
+        ],
+        "reason": "逐对象核原名、直接动作／material_input关系及原主体；当前产销、其他收入与原子公司业务分支成立，采购不推投入、投入不推外购；父项只准确率。",
+        "accurate": true
+      },
+      "owned:core-ev-55da877d0bd3f70f:activity:5": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          14,
+          15
+        ],
+        "reason": "逐对象核原名、直接动作／material_input关系及原主体；当前产销、其他收入与原子公司业务分支成立，采购不推投入、投入不推外购；父项只准确率。",
+        "accurate": true
+      },
+      "owned:core-ev-55da877d0bd3f70f:activity:6": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          14,
+          15
+        ],
+        "reason": "逐对象核原名、直接动作／material_input关系及原主体；当前产销、其他收入与原子公司业务分支成立，采购不推投入、投入不推外购；父项只准确率。",
+        "accurate": true
+      },
+      "owned:core-ev-55da877d0bd3f70f:activity:7": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          14,
+          15
+        ],
+        "reason": "逐对象核原名、直接动作／material_input关系及原主体；当前产销、其他收入与原子公司业务分支成立，采购不推投入、投入不推外购；父项只准确率。",
+        "accurate": true
+      },
+      "owned:core-ev-58d9ec374a9df871:overview": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          208,
+          209
+        ],
+        "reason": "原文完整连续业务／机制／状态段，主体、期间和参股／退出限定按原文保留，不据此生成未明示商品动作。",
+        "accurate": true
+      },
+      "owned:core-ev-9a0057c6844f2a03:overview": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          18
+        ],
+        "reason": "原文完整连续业务／机制／状态段，主体、期间和参股／退出限定按原文保留，不据此生成未明示商品动作。",
+        "accurate": true
+      },
+      "owned:core-ev-96e4476f4eed7485:overview": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          20
+        ],
+        "reason": "原文完整连续业务／机制／状态段，主体、期间和参股／退出限定按原文保留，不据此生成未明示商品动作。",
+        "accurate": true
+      },
+      "owned:core-ev-b06b65ab3f65ca9e:overview": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          21
+        ],
+        "reason": "原文完整连续业务／机制／状态段，主体、期间和参股／退出限定按原文保留，不据此生成未明示商品动作。",
+        "accurate": true
+      },
+      "owned:core-ev-60367b6dc300e6cf:overview": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          27,
+          28
+        ],
+        "reason": "原文完整连续业务／机制／状态段，主体、期间和参股／退出限定按原文保留，不据此生成未明示商品动作。",
+        "accurate": true
+      },
+      "owned:core-ev-44f3368d43a13f3a:overview": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          27,
+          28
+        ],
+        "reason": "原文完整连续业务／机制／状态段，主体、期间和参股／退出限定按原文保留，不据此生成未明示商品动作。",
+        "accurate": true
+      },
+      "owned:core-ev-626e5f2913203b60:overview": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          27,
+          28
+        ],
+        "reason": "原文完整连续业务／机制／状态段，主体、期间和参股／退出限定按原文保留，不据此生成未明示商品动作。",
+        "accurate": true
+      },
+      "owned:core-ev-ca3c39aa356db657:overview": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          124
+        ],
+        "reason": "原文完整连续业务／机制／状态段，主体、期间和参股／退出限定按原文保留，不据此生成未明示商品动作。",
+        "accurate": true
+      },
+      "owned:core-ev-4c4dc12d15db2206:overview": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          127
+        ],
+        "reason": "原文完整连续业务／机制／状态段，主体、期间和参股／退出限定按原文保留，不据此生成未明示商品动作。",
+        "accurate": true
+      },
+      "owned:core-ev-32071f141c7d76fb:overview": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          198
+        ],
+        "reason": "原文完整连续业务／机制／状态段，主体、期间和参股／退出限定按原文保留，不据此生成未明示商品动作。",
+        "accurate": true
+      },
+      "owned:core-ev-c907e214d4ce8f0c:overview": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          200
+        ],
+        "layout_review_reference": "v38-layout-review-evidence.json",
+        "layout_reason": "只规范化取得方式/直接间接两层表头的阅读顺序，所有主体、行内容、数值与状态逐字相等。",
+        "reason": "原文完整连续业务／机制／状态段，主体、期间和参股／退出限定按原文保留，不据此生成未明示商品动作。",
+        "accurate": true
+      },
+      "owned:core-ev-f7af093cecc15c71:overview": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          208
+        ],
+        "reason": "原文完整连续业务／机制／状态段，主体、期间和参股／退出限定按原文保留，不据此生成未明示商品动作。",
+        "accurate": true
+      },
+      "owned:core-ev-046907aa97f57692:overview": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          209
+        ],
+        "reason": "原文完整连续业务／机制／状态段，主体、期间和参股／退出限定按原文保留，不据此生成未明示商品动作。",
+        "accurate": true
+      },
+      "owned:core-ev-55da877d0bd3f70f:commodity:1": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          14,
+          15
+        ],
+        "recall_role_index": 0,
+        "accepted_exposure_role": "product_sales",
+        "reason": "逐对象核原名、直接动作／material_input关系及原主体；当前产销、其他收入与原子公司业务分支成立，采购不推投入、投入不推外购；父项只准确率。",
+        "accurate": true
+      },
+      "owned:core-ev-55da877d0bd3f70f:commodity:2": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          14,
+          15
+        ],
+        "recall_role_index": 1,
+        "accepted_exposure_role": "product_sales",
+        "reason": "逐对象核原名、直接动作／material_input关系及原主体；当前产销、其他收入与原子公司业务分支成立，采购不推投入、投入不推外购；父项只准确率。",
+        "accurate": true
+      },
+      "owned:core-ev-55da877d0bd3f70f:commodity:3": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          14,
+          15
+        ],
+        "recall_role_index": 2,
+        "accepted_exposure_role": "product_sales",
+        "reason": "逐对象核原名、直接动作／material_input关系及原主体；当前产销、其他收入与原子公司业务分支成立，采购不推投入、投入不推外购；父项只准确率。",
+        "accurate": true
+      },
+      "owned:core-ev-55da877d0bd3f70f:commodity:4": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          14,
+          15
+        ],
+        "recall_role_index": 6,
+        "accepted_exposure_role": "product_sales",
+        "reason": "逐对象核原名、直接动作／material_input关系及原主体；当前产销、其他收入与原子公司业务分支成立，采购不推投入、投入不推外购；父项只准确率。",
+        "accurate": true
+      },
+      "owned:core-ev-715c2c714e28a4fd:commodity:1": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          12
+        ],
+        "recall_role_index": 7,
+        "accepted_exposure_role": "product_sales",
+        "reason": "逐对象核原名、直接动作／material_input关系及原主体；当前产销、其他收入与原子公司业务分支成立，采购不推投入、投入不推外购；父项只准确率。",
+        "accurate": true
+      },
+      "owned:core-ev-715c2c714e28a4fd:commodity:2": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          12
+        ],
+        "recall_role_index": 8,
+        "accepted_exposure_role": "product_sales",
+        "reason": "逐对象核原名、直接动作／material_input关系及原主体；当前产销、其他收入与原子公司业务分支成立，采购不推投入、投入不推外购；父项只准确率。",
+        "accurate": true
+      },
+      "owned:core-ev-715c2c714e28a4fd:commodity:3": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          12
+        ],
+        "recall_role_index": 9,
+        "accepted_exposure_role": "product_sales",
+        "reason": "逐对象核原名、直接动作／material_input关系及原主体；当前产销、其他收入与原子公司业务分支成立，采购不推投入、投入不推外购；父项只准确率。",
+        "accurate": true
+      },
+      "owned:core-ev-715c2c714e28a4fd:commodity:4": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          12
+        ],
+        "recall_role_index": 10,
+        "accepted_exposure_role": "product_sales",
+        "reason": "逐对象核原名、直接动作／material_input关系及原主体；当前产销、其他收入与原子公司业务分支成立，采购不推投入、投入不推外购；父项只准确率。",
+        "accurate": true
+      },
+      "owned:core-ev-337efa81987ff37a:commodity:1": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          20
+        ],
+        "reason": "逐对象核原名、直接动作／material_input关系及原主体；当前产销、其他收入与原子公司业务分支成立，采购不推投入、投入不推外购；父项只准确率。",
+        "accurate": true
+      },
+      "owned:core-ev-337efa81987ff37a:commodity:2": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          20
+        ],
+        "recall_role_index": 3,
+        "accepted_exposure_role": "product_sales",
+        "reason": "逐对象核原名、直接动作／material_input关系及原主体；当前产销、其他收入与原子公司业务分支成立，采购不推投入、投入不推外购；父项只准确率。",
+        "accurate": true
+      },
+      "owned:core-ev-337efa81987ff37a:commodity:3": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          20
+        ],
+        "recall_role_index": 4,
+        "accepted_exposure_role": "product_sales",
+        "reason": "逐对象核原名、直接动作／material_input关系及原主体；当前产销、其他收入与原子公司业务分支成立，采购不推投入、投入不推外购；父项只准确率。",
+        "accurate": true
+      },
+      "owned:core-ev-cbb9557b2fb48635:commodity:1": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          27
+        ],
+        "reason": "逐对象核原名、直接动作／material_input关系及原主体；当前产销、其他收入与原子公司业务分支成立，采购不推投入、投入不推外购；父项只准确率。",
+        "accurate": true
+      },
+      "owned:core-ev-cbb9557b2fb48635:commodity:2": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          27
+        ],
+        "recall_role_index": 11,
+        "accepted_exposure_role": "product_sales",
+        "reason": "逐对象核原名、直接动作／material_input关系及原主体；当前产销、其他收入与原子公司业务分支成立，采购不推投入、投入不推外购；父项只准确率。",
+        "accurate": true
+      },
+      "owned:core-ev-cbb9557b2fb48635:commodity:3": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          27
+        ],
+        "recall_role_index": 12,
+        "accepted_exposure_role": "product_sales",
+        "reason": "逐对象核原名、直接动作／material_input关系及原主体；当前产销、其他收入与原子公司业务分支成立，采购不推投入、投入不推外购；父项只准确率。",
+        "accurate": true
+      },
+      "owned:core-ev-79ef813fe500438e:commodity:1": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          208,
+          209
+        ],
+        "recall_role_index": 13,
+        "accepted_exposure_role": "raw_material_input",
+        "reason": "逐对象核原名、直接动作／material_input关系及原主体；当前产销、其他收入与原子公司业务分支成立，采购不推投入、投入不推外购；父项只准确率。",
+        "accurate": true
+      },
+      "owned:core-ev-79ef813fe500438e:commodity:2": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          208,
+          209
+        ],
+        "recall_role_index": 5,
+        "accepted_exposure_role": "product_sales",
+        "reason": "逐对象核原名、直接动作／material_input关系及原主体；当前产销、其他收入与原子公司业务分支成立，采购不推投入、投入不推外购；父项只准确率。",
+        "accurate": true
+      },
+      "owned:core-ev-4589ef663e33b2a2:segment:industry:制造业": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26
+        ],
+        "recall_row_index": 0,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-587ecf3017f9ac95:revenue:industry:制造业": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26
+        ],
+        "recall_row_index": 0,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-4589ef663e33b2a2:segment:product:集装箱地板": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26
+        ],
+        "recall_row_index": 1,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-587ecf3017f9ac95:revenue:product:集装箱地板": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26
+        ],
+        "recall_row_index": 1,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-4589ef663e33b2a2:segment:product:环保板": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26
+        ],
+        "recall_row_index": 2,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-587ecf3017f9ac95:revenue:product:环保板": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26
+        ],
+        "recall_row_index": 2,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-4589ef663e33b2a2:segment:product:木结构产品": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26
+        ],
+        "recall_row_index": 3,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-587ecf3017f9ac95:revenue:product:木结构产品": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26
+        ],
+        "recall_row_index": 3,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-4589ef663e33b2a2:segment:region:湖北区域": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26
+        ],
+        "recall_row_index": 4,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-587ecf3017f9ac95:revenue:region:湖北区域": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26
+        ],
+        "recall_row_index": 4,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-4589ef663e33b2a2:segment:region:其他区域": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26
+        ],
+        "recall_row_index": 5,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-587ecf3017f9ac95:revenue:region:其他区域": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26
+        ],
+        "recall_row_index": 5,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-c1c0f5130261dd0a:Segment:business_type:正常经营之外的其他业务收入:其他业务收入扣除明细/本年度:row:0": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          12
+        ],
+        "recall_row_index": 8,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-80c9ee41ee7a2667:Measurement:business_type:正常经营之外的其他业务收入:其他业务收入扣除明细/本年度:row:0": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          12
+        ],
+        "recall_row_index": 8,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-c1c0f5130261dd0a:Segment:business_type:未形成或难以形成稳定业务模式的业务所产生的收入:其他业务收入扣除明细/本年度:row:1": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          12
+        ],
+        "recall_row_index": 9,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-80c9ee41ee7a2667:Measurement:business_type:未形成或难以形成稳定业务模式的业务所产生的收入:其他业务收入扣除明细/本年度:row:1": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          12
+        ],
+        "recall_row_index": 9,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-b8dad6c3dad4ea3d:Segment:business_segment:湖北康欣新材料科技有限责任公司:控股参股公司/营业收入:row:0": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          27,
+          28
+        ],
+        "recall_row_index": 10,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-70d026f76087f4e5:Measurement:business_segment:湖北康欣新材料科技有限责任公司:控股参股公司/营业收入:row:0": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          27,
+          28
+        ],
+        "recall_row_index": 10,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-b8dad6c3dad4ea3d:Segment:business_segment:湖北康欣科技开发有限公司:控股参股公司/营业收入:row:1": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          27,
+          28
+        ],
+        "recall_row_index": 11,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-70d026f76087f4e5:Measurement:business_segment:湖北康欣科技开发有限公司:控股参股公司/营业收入:row:1": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          27,
+          28
+        ],
+        "recall_row_index": 11,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-b8dad6c3dad4ea3d:Segment:business_segment:嘉善新华昌木业有限公司:控股参股公司/营业收入:row:2": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          27,
+          28
+        ],
+        "recall_row_index": 12,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-70d026f76087f4e5:Measurement:business_segment:嘉善新华昌木业有限公司:控股参股公司/营业收入:row:2": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          27,
+          28
+        ],
+        "recall_row_index": 12,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-b8dad6c3dad4ea3d:Segment:business_segment:无锡青山绿色建筑有限公司:控股参股公司/营业收入:row:3": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          27,
+          28
+        ],
+        "recall_row_index": 13,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-70d026f76087f4e5:Measurement:business_segment:无锡青山绿色建筑有限公司:控股参股公司/营业收入:row:3": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          27,
+          28
+        ],
+        "recall_row_index": 13,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-140de4a2dd6d0091:Segment:business_type:主营业务:营业收入:row:0": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          183,
+          184
+        ],
+        "recall_row_index": 6,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-918bf5dc22eda2d7:Measurement:business_type:主营业务:营业收入:row:0": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          183,
+          184
+        ],
+        "recall_row_index": 6,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-140de4a2dd6d0091:Segment:business_type:其他业务:营业收入:row:1": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          183,
+          184
+        ],
+        "recall_row_index": 7,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-918bf5dc22eda2d7:Measurement:business_type:其他业务:营业收入:row:1": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          183,
+          184
+        ],
+        "recall_row_index": 7,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-8f80ea8e1f8f048c:Segment:business_segment:无锡青山绿色建筑有限公司:重要非全资子公司/本期营业收入:row:0": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          201
+        ],
+        "recall_row_index": 14,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-6b88b71dd76f5faf:Measurement:business_segment:无锡青山绿色建筑有限公司:重要非全资子公司/本期营业收入:row:0": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          201
+        ],
+        "recall_row_index": 14,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-96c32289eb965cc3:Segment:business_segment:制造业分部:营业收入:row:0": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          218
+        ],
+        "recall_row_index": 16,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-948a9d12196ca3d8:Measurement:business_segment:制造业分部:营业收入:row:0": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          218
+        ],
+        "recall_row_index": 16,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-96c32289eb965cc3:Segment:business_segment:林业分部:营业收入:row:1": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          218
+        ],
+        "recall_row_index": 17,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-948a9d12196ca3d8:Measurement:business_segment:林业分部:营业收入:row:1": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          218
+        ],
+        "recall_row_index": 17,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-96c32289eb965cc3:Segment:adjustment:分部间抵销:营业收入:row:2": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          218
+        ],
+        "recall_row_index": 18,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-948a9d12196ca3d8:Measurement:adjustment:分部间抵销:营业收入:row:2": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          218
+        ],
+        "recall_row_index": 18,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-8ec4fe1b718c527d:Segment:service:租赁收入:作为出租人的经营租赁/租赁收入:row:0": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          196
+        ],
+        "recall_row_index": 15,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-a28327a67c186f5b:Measurement:service:租赁收入:作为出租人的经营租赁/租赁收入:row:0": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          196
+        ],
+        "recall_row_index": 15,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-cd48ed59db09eb81:Segment:service:木结构产品:出售商品/提供劳务/本期发生额:row:0": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          208,
+          209
+        ],
+        "recall_row_index": 19,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-3cae6788be30858f:Measurement:service:木结构产品:出售商品/提供劳务/本期发生额:row:0": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          208,
+          209
+        ],
+        "recall_row_index": 19,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-cd48ed59db09eb81:Segment:service:服务费:出售商品/提供劳务/本期发生额:row:1": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          208,
+          209
+        ],
+        "recall_row_index": 20,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-3cae6788be30858f:Measurement:service:服务费:出售商品/提供劳务/本期发生额:row:1": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          208,
+          209
+        ],
+        "recall_row_index": 20,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-cd48ed59db09eb81:Segment:service:材料:出售商品/提供劳务/本期发生额:row:2": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          208,
+          209
+        ],
+        "recall_row_index": 21,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-3cae6788be30858f:Measurement:service:材料:出售商品/提供劳务/本期发生额:row:2": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          208,
+          209
+        ],
+        "recall_row_index": 21,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-cd48ed59db09eb81:Segment:service:工程收入:出售商品/提供劳务/本期发生额:row:3": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          208,
+          209
+        ],
+        "recall_row_index": 22,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-3cae6788be30858f:Measurement:service:工程收入:出售商品/提供劳务/本期发生额:row:3": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          208,
+          209
+        ],
+        "recall_row_index": 22,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-cd48ed59db09eb81:Segment:service:非木结构工程:出售商品/提供劳务/本期发生额:row:4": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          208,
+          209
+        ],
+        "recall_row_index": 23,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-3cae6788be30858f:Measurement:service:非木结构工程:出售商品/提供劳务/本期发生额:row:4": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          208,
+          209
+        ],
+        "recall_row_index": 23,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-cd48ed59db09eb81:Segment:service:工程收入:出售商品/提供劳务/本期发生额:row:5": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          208,
+          209
+        ],
+        "recall_row_index": 24,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-3cae6788be30858f:Measurement:service:工程收入:出售商品/提供劳务/本期发生额:row:5": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          208,
+          209
+        ],
+        "recall_row_index": 24,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-cd48ed59db09eb81:Segment:service:木结构产品:出售商品/提供劳务/本期发生额:row:6": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          208,
+          209
+        ],
+        "recall_row_index": 25,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-3cae6788be30858f:Measurement:service:木结构产品:出售商品/提供劳务/本期发生额:row:6": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          208,
+          209
+        ],
+        "recall_row_index": 25,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-cd48ed59db09eb81:Segment:service:木结构产品:出售商品/提供劳务/本期发生额:row:7": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          208,
+          209
+        ],
+        "recall_row_index": 26,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-3cae6788be30858f:Measurement:service:木结构产品:出售商品/提供劳务/本期发生额:row:7": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          208,
+          209
+        ],
+        "recall_row_index": 26,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-cd48ed59db09eb81:Segment:service:工程收入:出售商品/提供劳务/本期发生额:row:8": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          208,
+          209
+        ],
+        "recall_row_index": 27,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-3cae6788be30858f:Measurement:service:工程收入:出售商品/提供劳务/本期发生额:row:8": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          208,
+          209
+        ],
+        "recall_row_index": 27,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-cd48ed59db09eb81:Segment:service:工程收入:出售商品/提供劳务/本期发生额:row:9": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          208,
+          209
+        ],
+        "recall_row_index": 28,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-3cae6788be30858f:Measurement:service:工程收入:出售商品/提供劳务/本期发生额:row:9": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          208,
+          209
+        ],
+        "recall_row_index": 28,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-cd48ed59db09eb81:Segment:service:工程收入:出售商品/提供劳务/本期发生额:row:10": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          208,
+          209
+        ],
+        "recall_row_index": 29,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-3cae6788be30858f:Measurement:service:工程收入:出售商品/提供劳务/本期发生额:row:10": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          208,
+          209
+        ],
+        "recall_row_index": 29,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-cd48ed59db09eb81:Segment:service:木结构产品:出售商品/提供劳务/本期发生额:row:11": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          208,
+          209
+        ],
+        "recall_row_index": 30,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-3cae6788be30858f:Measurement:service:木结构产品:出售商品/提供劳务/本期发生额:row:11": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          208,
+          209
+        ],
+        "recall_row_index": 30,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-cd48ed59db09eb81:Segment:service:木结构产品:出售商品/提供劳务/本期发生额:row:12": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          208,
+          209
+        ],
+        "recall_row_index": 31,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-3cae6788be30858f:Measurement:service:木结构产品:出售商品/提供劳务/本期发生额:row:12": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          208,
+          209
+        ],
+        "recall_row_index": 31,
+        "reason": "逐原页／原栏目／原主体／本期列／原金额与单位核对；Segment与Measurement各唯一评价，后者不另召回；负调整及抵销口径独立。",
+        "accurate": true
+      },
+      "owned:core-ev-61fa207a1f7b7bbb:material:意杨": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          18
+        ],
+        "recall_role_index": 14,
+        "accepted_exposure_role": "raw_material_input",
+        "reason": "逐对象核原名、直接动作／material_input关系及原主体；当前产销、其他收入与原子公司业务分支成立，采购不推投入、投入不推外购；父项只准确率。",
+        "accurate": true
+      },
+      "owned:core-ev-61fa207a1f7b7bbb:material:竹材": {
+        "critical_numeric_error": false,
+        "verified_source_pages": [
+          18
+        ],
+        "recall_role_index": 15,
+        "accepted_exposure_role": "raw_material_input",
+        "reason": "逐对象核原名、直接动作／material_input关系及原主体；当前产销、其他收入与原子公司业务分支成立，采购不推投入、投入不推外购；父项只准确率。",
+        "accurate": true
+      }
+    },
+    "answers": {
+      "principal_business": {
+        "accurate": true,
+        "reason": "按原合同实质内容及完整支持事实核对；原主体、经营状态、产品矩阵、原生收入机制和退出合并边界保留。",
+        "failed_substance_groups": [],
+        "all_supporting_facts_accurate": true
+      },
+      "products_services": {
+        "accurate": true,
+        "reason": "按原合同实质内容及完整支持事实核对；原主体、经营状态、产品矩阵、原生收入机制和退出合并边界保留。",
+        "failed_substance_groups": [],
+        "all_supporting_facts_accurate": true
+      },
+      "revenue_model": {
+        "accurate": true,
+        "reason": "按原合同实质内容及完整支持事实核对；原主体、经营状态、产品矩阵、原生收入机制和退出合并边界保留。",
+        "failed_substance_groups": [],
+        "all_supporting_facts_accurate": true
+      }
+    },
+    "actual_unique_object_count": 107
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "official_pages": [
+    {
+      "instrument_id": "600039.SH",
+      "official_pdf_sha256": "a481ea020402ed6a5b62fe1266aa1016707515f05a391be28c9a29762263e4b4",
+      "page_count": 57,
+      "all_pages_exact": true
+    },
+    {
+      "instrument_id": "600076.SH",
+      "official_pdf_sha256": "f1a949ee3abf8024b25ed3174e073516d9825cabc373ddf672e80b2a3f943e63",
+      "page_count": 36,
+      "all_pages_exact": true
+    }
+  ],
+  "total_official_page_count": 93,
+  "original_92_income_and_16_roles_exact": true,
+  "original_6_body_conditions_one_to_one": true,
+  "protected_history": 2038,
+  "first_delivery_files": 19,
+  "executed_modules_unchanged": 38,
+  "formal_review_hashes_valid": true,
+  "existing_dirty_documents_unchanged": true,
+  "ruff_check": "passed",
+  "ruff_format_check": "3 files already formatted",
+  "openspec_strict": "passed",
+  "task_diff_check": "passed",
+  "manual_review": {
+    "blocking_remaining": [],
+    "fixed": [
+      "缩写主体仅当期其他收入路径，风机主体回归35项通过"
+    ],
+    "unrelated": [
+      "皖维两项重复收入断言原HEAD同样失败，保留后置"
+    ],
+    "nonblocking": []
+  },
+  "test_commands": [
+    "PYTHONPATH=. /home/python/miniconda3/envs/Quote/bin/python -m pytest -q tests/unit/test_research/test_company_profile_v38_construction_wood.py tests/unit/test_research/test_company_profile_v33_highway_wind.py"
+  ],
+  "final_targeted_result": "35 passed",
+  "prior_broad_regression_result": "177 passed, 6 failed before actor scope correction; 4 introduced failures corrected and rechecked, 2 failures reproduce on original HEAD",
+  "test_logs_sha256": {
+    "v38_tests2.log": "b71dc1f3aeee6bee49af52545742a591ba0b19a2f7dee18acb5083727f326d37",
+    "v38_regressions.log": "4f668c1c2539997b13fb2d077131c38a12d805953b67ddcd48795f1cf97113cb",
+    "v38_final_targeted.log": "7d66f170b24db6767fe7859c257b5f64b3d2afb4870b64d150fe14b85e79a822",
+    "v38_head_test2.log": "a44f69f201e534cc4048aa2497e2488408952949209c91df47497ed5449f265b",
+    "v38_head_wind.log": "5a3e61a2c021ec0a582304976b44fe1249075555148827d43686a967647ec205"
+  },
+  "patch_format_note": "保存的标准unified diff有12条单空格上下文空行，是原patch格式，保持执行前hash；代码/文档默认diff检查，patch单独禁用blank-at-eol检查并验证38模块可重建。"
+}

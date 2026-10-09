@@ -1,0 +1,70 @@
+{
+  "created_at": "2026-10-09T03:33:26.001208+00:00",
+  "completed_cards": [
+    "4.1",
+    "4.3",
+    "4.2",
+    "4.4"
+  ],
+  "source_recall": {
+    "status": "assessed",
+    "numerator": 114,
+    "denominator": 114,
+    "value": 1.0
+  },
+  "source_accuracy": {
+    "status": "assessed",
+    "numerator": 256,
+    "denominator": 256,
+    "value": 1.0
+  },
+  "critical_numeric_errors": {
+    "status": "assessed",
+    "value": 0
+  },
+  "whole_round_seconds": 226.85718323104084,
+  "tokens_used": 0,
+  "shared_token_budget": 50000,
+  "actual_accepted_fact_count": 250,
+  "answered_text_count": 6,
+  "actual_runtime_no_reuse": true,
+  "query_export_disk_equal": true,
+  "formal_execution_index": 1,
+  "processing_identity": {
+    "rules": "company_profile_common_core.v1",
+    "owned_page_facts": "v8",
+    "material_input_facts": "v1",
+    "revenue_sentence_repair": "v38"
+  },
+  "plan_id": "02d805c7b3ad813e20eba6396a9cc682ee98d11d0751249582bbbd627cc113cd",
+  "source_fixed_before_first_execute": true,
+  "protected_historical_files_unchanged": 2038,
+  "first_formal_artifacts_unchanged": 19,
+  "execution_modules_reconstructable": 38,
+  "source_page_count": 93,
+  "initial_failed_observation_unchanged": true,
+  "a_role_acceptance": "pending_finite_review",
+  "change_archived": false,
+  "next_batch": "paused_pending_a_role_review",
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false,
+  "tests": {
+    "final_targeted_passed": 35,
+    "broad_regression_before_actor_scope_fix": {
+      "passed": 177,
+      "failed": 6
+    },
+    "introduced_failures_fixed_and_rechecked": 4,
+    "unrelated_head_failures_retained": 2
+  },
+  "review": {
+    "blocking_remaining": [],
+    "resolved": [
+      "缩写主体解析限定当期其他收入路径，双瑞原主体回归通过"
+    ],
+    "unrelated": [
+      "两项皖维重复收入测试在HEAD原代码同样失败，后置"
+    ]
+  },
+  "existing_worktree_changes_untouched": true
+}
