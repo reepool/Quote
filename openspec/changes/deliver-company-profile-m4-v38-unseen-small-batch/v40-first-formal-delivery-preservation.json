@@ -1,0 +1,24 @@
+{
+  "formal_execution_index": 1,
+  "sha256": {
+    "data/checkpoints/company_profile_common_core/reports/m4_v40_real_estate_phosphates_core_repair/plan.json": "ff1feab023834e0b0824fcb7a3c6222e3949cc738a43e2f6480222a0f3203ca4",
+    "data/checkpoints/company_profile_common_core/reports/m4_v40_real_estate_phosphates_core_repair/company_profile_live_run.v1.json": "77fd602962f50e4b1aa828f92c8fa1df35afa1cdef3db059641aa25c0b40d557",
+    "data/checkpoints/company_profile_common_core/reports/m4_v40_real_estate_phosphates_core_repair/observation.json": "bd45df8537365016b74f16dacd5e575bb5e702ea63c95165ff1b6b03a114feb3",
+    "data/checkpoints/company_profile_common_core/reports/m4_v40_real_estate_phosphates_core_repair/formal_execution.json": "5d6d00335a20a210cae77470863bfb2635c80996a640d16116d3c8bbc5be6d36",
+    "data/research/company_profile_common_core/m4_v40_real_estate_phosphates_core_repair/company_profile_common_core.v1/bp-work-d7fb09bd45271bc761b5e019.json": "619d94f37316eb725b65721fac63b66ba56cb04b6bc1e25d1b62905500363e92",
+    "data/research/company_profile_common_core/m4_v40_real_estate_phosphates_core_repair/company_profile_common_core.v1/bp-work-fb251d744dcff0bd55109c8d.json": "f1298f44149102d9652892ffcbaf823586a83a9280975b7baf84836cbbc903cd",
+    "data/research/company_profile_common_core/m4_v40_real_estate_phosphates_core_repair/company_profile_common_core.v1/scopes/600078.SH/2025-12-31/extract_segment_financials.json": "8f9a4963e31a6e624bcfbd527efd5a32a80f95881804f7c10b6b02ac3a53b018",
+    "data/research/company_profile_common_core/m4_v40_real_estate_phosphates_core_repair/company_profile_common_core.v1/scopes/600078.SH/2025-12-31/extract_material_inputs.json": "5abac0e7061ad4be850282ead772192067245d42f0dfbcb1c62a6d80f299227a",
+    "data/research/company_profile_common_core/m4_v40_real_estate_phosphates_core_repair/company_profile_common_core.v1/scopes/600078.SH/2025-12-31/extract_business_overview.json": "a936933d13ce81098d7a6c5579b301ab5e0b9c79cf479b70d47f7d140fa4febd",
+    "data/research/company_profile_common_core/m4_v40_real_estate_phosphates_core_repair/company_profile_common_core.v1/scopes/600048.SH/2025-12-31/extract_segment_financials.json": "ee431009a60f38c24c5af3c4319964909ff4ce2cb2ec156876aa21753ded0ade",
+    "data/research/company_profile_common_core/m4_v40_real_estate_phosphates_core_repair/company_profile_common_core.v1/scopes/600048.SH/2025-12-31/extract_business_overview.json": "94c8d2380f4fb118f80b75412161864107691a9a222b9d55806bebe7f8b86499",
+    "data/research/company_profile_common_core/m4_v40_real_estate_phosphates_core_repair/company_profile_common_core.v1/checkpoints/bp-work-d7fb09bd45271bc761b5e019.json": "983c47aa42dd7c49487b063631e6bfafda42d8f41230936dfc5c333230e27914",
+    "data/research/company_profile_common_core/m4_v40_real_estate_phosphates_core_repair/company_profile_common_core.v1/checkpoints/bp-work-fb251d744dcff0bd55109c8d.json": "825f62947ef476a98d5e82a038adcd9b9d1e371aa37c3c78a4562433da9433fe",
+    "data/exports/m4_v40_real_estate_phosphates_core_repair/600078.SH/profiles.csv": "214b413ffd890b0a338e758c88f799a296c7c5a64a9e8b8e1805dbaa6effe4ee",
+    "data/exports/m4_v40_real_estate_phosphates_core_repair/600078.SH/export_manifest.json": "515abee8a9907905b1772ed03df89ea4e9876d771936b476ebd8ff1ea820da5f",
+    "data/exports/m4_v40_real_estate_phosphates_core_repair/600078.SH/600078.SH_2025-12-31.json": "1e4b51a9e8e4dd006b2ed04cc0baa723b9453be95c11c9a5b1f06ebff26fe4cc",
+    "data/exports/m4_v40_real_estate_phosphates_core_repair/600048.SH/profiles.csv": "884ac6335a209fb91a1b54accabfcf4a939dfb5a40df50ca1cf6eac964ff64b8",
+    "data/exports/m4_v40_real_estate_phosphates_core_repair/600048.SH/600048.SH_2025-12-31.json": "f18f6a60f7fcdeeef5296ab7bbc07bd294a8ae19893e1acf5b21f953ad57b712",
+    "data/exports/m4_v40_real_estate_phosphates_core_repair/600048.SH/export_manifest.json": "1f4ea0005f5a76b522899997ca06b0a6138acfd732c1aa82067a9a801f2f46e6"
+  }
+}

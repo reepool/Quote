@@ -78,3 +78,10 @@ A native numbered income-deduction item MUST end at the next item,subtotal or se
 #### Scenario: Empty item six precedes a reported subtotal
 - **WHEN** p9 item six is blank and the next unrelated-business subtotal is26,044,735.71元
 - **THEN** item six has no accepted current income and no affirmative revenue-body listing,while item one retains its own printed current amount
+
+### Requirement: Successor formal delivery verifies the corrected blank item
+The authorized full v40 identity MUST inherit all five repairs without changing default identity and MUST first execute in a new independent directory under the same plan,official versions,cutoff and 205 positive plus three mandatory negative contract. Page9 item six MUST produce no accepted income fact or affirmative revenue listing; item one MUST retain26,044,735.71元. This boundary check MUST NOT change positive recall. Every actual accepted fact including contract-external output and each answered body MUST count uniquely toward dynamic accuracy. Timing MUST include PDF reads,layout parsing and all retries. First v39 artifacts and correction history MUST remain immutable. Passing gates MUST lead to finite A-role submission before main-spec synchronization or archive.
+
+#### Scenario: Corrected successor delivers both reports
+- **WHEN** full v40 owner run-query-export returns for both frozen reports
+- **THEN** 205 positive conditions,three negatives,page9 boundary,unique actual accuracy,numeric errors,whole elapsed time,shared budget and actual reuse/predecessor are recorded without prefilled results

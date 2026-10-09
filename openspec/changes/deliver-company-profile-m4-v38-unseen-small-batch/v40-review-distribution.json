@@ -1,0 +1,35 @@
+{
+  "artifacts": [
+    {
+      "original_path": "openspec/changes/deliver-company-profile-m4-v38-unseen-small-batch/v40-source-review-evidence.json",
+      "original_bytes": 131291185,
+      "original_sha256": "6b4860b0c2e5607152964ad4ccb5316ab536427ab7825c47b139b5a52812d2b6",
+      "lossless_gzip_path": "openspec/changes/deliver-company-profile-m4-v38-unseen-small-batch/v40-source-review-evidence.json.gz",
+      "gzip_bytes": 18827908,
+      "gzip_sha256": "8987ccde4809b7b1a5cfae7421abbdbb7bce21c0211417ba77095a2d63fee313",
+      "round_trip_verified": true,
+      "original_file_unchanged": true
+    },
+    {
+      "original_path": "openspec/changes/deliver-company-profile-m4-v38-unseen-small-batch/v40-initial-source-review-evidence.json",
+      "original_bytes": 131290525,
+      "original_sha256": "5dda7c9e653c173f00fa3533e1d46329381ae842fe98f82cd8b762ef43edf520",
+      "lossless_gzip_path": "openspec/changes/deliver-company-profile-m4-v38-unseen-small-batch/v40-initial-source-review-evidence.json.gz",
+      "gzip_bytes": 18827545,
+      "gzip_sha256": "70896c0bbbe0d98d44cefe190a7361fd406c3ef031eab15d7ae8f12d9c420435",
+      "round_trip_verified": true,
+      "original_file_unchanged": true
+    },
+    {
+      "original_path": "openspec/changes/deliver-company-profile-m4-v38-unseen-small-batch/v40-execution-code.patch",
+      "original_bytes": 1855,
+      "original_sha256": "432e58bd45d6eb86b84b5946124b78ad245daf208ffef3934ca502010b64c65b",
+      "lossless_gzip_path": "openspec/changes/deliver-company-profile-m4-v38-unseen-small-batch/v40-execution-code.patch.gz",
+      "gzip_bytes": 428,
+      "gzip_sha256": "2927f592fb2b8ae7e300ce152baa971c5ba1e585c8e8bf5ad7df987af441045b",
+      "round_trip_verified": true,
+      "original_file_unchanged": true,
+      "reason": "Preserve exact frozen patch bytes; patch blank context lines are not source trailing whitespace."
+    }
+  ]
+}

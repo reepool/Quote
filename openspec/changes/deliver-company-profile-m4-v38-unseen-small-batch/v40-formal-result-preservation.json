@@ -1,0 +1,10 @@
+{
+  "review_sha256": {
+    "openspec/changes/deliver-company-profile-m4-v38-unseen-small-batch/v40-source-review-evidence.json": "6b4860b0c2e5607152964ad4ccb5316ab536427ab7825c47b139b5a52812d2b6",
+    "openspec/changes/deliver-company-profile-m4-v38-unseen-small-batch/v40-actual-object-decisions.json": "e5a242fa257af21793d992892601d5c5f7d0da1a8c67335ff60323a4c9e88eb2",
+    "openspec/changes/deliver-company-profile-m4-v38-unseen-small-batch/v40-layout-review-evidence.json": "64894e6951196782ed55f07a173d4e45b63c211da04bb7a9ba39874543a6e526",
+    "data/checkpoints/company_profile_common_core/reports/m4_v40_real_estate_phosphates_core_repair/company_profile_source_review.v1.json": "2e70ccbacf2f7edae38e2dffecde3ad2cb80575aa84a445579d50cd24d7dc682"
+  },
+  "first_formal_result_preserved": true,
+  "review_correction_preserves_initial_version": true
+}

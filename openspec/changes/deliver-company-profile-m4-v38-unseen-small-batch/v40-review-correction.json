@@ -1,0 +1,61 @@
+{
+  "initial_review_preservation_sha256": "c8f2656f35060df166d4ad1367059faa6d676137dc443dabe0f07f17190e94bf",
+  "initial_evidence_sha256": "5dda7c9e653c173f00fa3533e1d46329381ae842fe98f82cd8b762ef43edf520",
+  "corrected_evidence_sha256": "6b4860b0c2e5607152964ad4ccb5316ab536427ab7825c47b139b5a52812d2b6",
+  "initial_expansion_gates_met": false,
+  "corrected_expansion_gates_met": true,
+  "reason": "Per-company semantic review coverage lacked commodity_role for issuer with no declared named-material roles; classify already reviewed products/services body under its actual product/direction/actor review dimension without adding facts or scores.",
+  "changes": [
+    {
+      "instrument_id": "600048.SH",
+      "object_id": "answer:products_services",
+      "accurate_unchanged": true,
+      "delivered_text_unchanged": true,
+      "previous_review_aspect": "core_skeleton",
+      "corrected_review_aspect": "commodity_role",
+      "basis": "Existing products/services body independently assessed for actual products/services,direction and original actors; same object scored once, no additional role fact or positive condition."
+    },
+    {
+      "instrument_id": "600078.SH",
+      "object_id": "answer:products_services",
+      "accurate_unchanged": true,
+      "delivered_text_unchanged": true,
+      "previous_review_aspect": "core_skeleton",
+      "corrected_review_aspect": "commodity_role",
+      "basis": "Existing products/services body independently assessed for actual products/services,direction and original actors; same object scored once, no additional role fact or positive condition."
+    }
+  ],
+  "explicit_metadata_only": [
+    {
+      "instrument_id": "600048.SH",
+      "object_id": "answer:principal_business",
+      "explicit_review_aspect": "core_skeleton",
+      "classification_unchanged": true
+    },
+    {
+      "instrument_id": "600048.SH",
+      "object_id": "answer:revenue_model",
+      "explicit_review_aspect": "core_skeleton",
+      "classification_unchanged": true
+    },
+    {
+      "instrument_id": "600078.SH",
+      "object_id": "answer:principal_business",
+      "explicit_review_aspect": "core_skeleton",
+      "classification_unchanged": true
+    },
+    {
+      "instrument_id": "600078.SH",
+      "object_id": "answer:revenue_model",
+      "explicit_review_aspect": "core_skeleton",
+      "classification_unchanged": true
+    }
+  ],
+  "source_scores_unchanged": true,
+  "delivery_unchanged": true,
+  "contract_unchanged": true,
+  "execution_code_unchanged": true,
+  "formal_execution_rerun": false,
+  "review_denominator_unchanged": true,
+  "negative_checks_unchanged": true
+}

@@ -1,0 +1,68 @@
+{
+  "predecessor_formal_execution_sha256": "9ec35ab64a42e349556fabbe086e2bd8e98a6c533c1b82b7d0a601e100a5d605",
+  "successor_formal_execution_sha256": "5d6d00335a20a210cae77470863bfb2635c80996a640d16116d3c8bbc5be6d36",
+  "companies": [
+    {
+      "instrument_id": "600048.SH",
+      "old_accepted_fact_count": 966,
+      "new_accepted_fact_count": 966,
+      "common_fact_count": 966,
+      "common_facts_unchanged": true,
+      "removed_facts": [],
+      "added_facts": [],
+      "changed_dimensions": []
+    },
+    {
+      "instrument_id": "600078.SH",
+      "old_accepted_fact_count": 165,
+      "new_accepted_fact_count": 163,
+      "common_fact_count": 163,
+      "common_facts_unchanged": true,
+      "removed_facts": [
+        {
+          "record_id": "owned:core-ev-0b156f74a821ccae:Measurement:business_type:未形成或难以形成稳定业务模式的业务所产生的收入:其他业务收入扣除明细/本年度:row:1",
+          "field_id": "operating_revenue",
+          "object_type": "Measurement",
+          "source_text": null,
+          "source_actor": null,
+          "source_native_name": "未形成或难以形成稳定业务模式的业务所产生的收入",
+          "source_native_header": "其他业务收入扣除明细/本年度",
+          "source_native_value": "26,044,735.71",
+          "source_native_unit": "元",
+          "knowledge_time": null,
+          "reported_period": "2025-12-31",
+          "evidence": [
+            {
+              "page": 9,
+              "bounded_quote": "营业收入扣除情况表\n单位：元 币种：人民币\n项目 本年度 具体扣除情况 上年度 具体扣除情况\n营业收入金额 3,596,286,350.46 3,355,957,546.40\n营业收入扣除项目合计金额 26,044,735.71 90,170,716.31\n营业收入扣除项目合计金额占营业收入的比重（%） 0.72 / 2.69 / 一、与主营业务无关的业务收入\n1. 正常经营之外的其他业务收入。如出租固定资产、\n无形资产、包装物，销售材料，用材料进行非货币性\n资产交换，经营受托管理业务等实现的收入，以及虽\n计入主营业务收入，但属于上市公司正常经营之外的\n收入。 26,044,735.71 90,170,716.31\n2. 不具备资质的类金融业务收入，如拆出资金利息\n收入；本会计年度以及上一会计年度新增的类金融业\n务所产生的收入，如担保、商业保理、小额贷款、融\n资租赁、典当等业务形成的收入，为销售主营产品而\n开展的融资租赁业务除外。\n3. 本会计年度以及上一会计年度新增贸易业务所产\n生的收入。\n4. 与上市公司现有正常经营业务无关的关联交易产\n生的收入。\n5. 同一控制下企业合并的子公司期初至合并日的收\n入。\n6. 未形成或难以形成稳定业务模式的业务所产生的\n收入。\n与主营业务无关的业务收入小计 26,044,735.71 90,170,716.31\n二、不具备商业实质的收入"
+            }
+          ]
+        },
+        {
+          "record_id": "owned:core-ev-7448067ae8528da2:Segment:business_type:未形成或难以形成稳定业务模式的业务所产生的收入:其他业务收入扣除明细/本年度:row:1",
+          "field_id": "segment_dimension",
+          "object_type": "Segment",
+          "source_text": null,
+          "source_actor": null,
+          "source_native_name": "未形成或难以形成稳定业务模式的业务所产生的收入",
+          "source_native_header": "其他业务收入扣除明细/本年度",
+          "source_native_value": "26,044,735.71",
+          "source_native_unit": "元",
+          "knowledge_time": null,
+          "reported_period": "2025-12-31",
+          "evidence": [
+            {
+              "page": 9,
+              "bounded_quote": "营业收入扣除情况表\n单位：元 币种：人民币\n项目 本年度 具体扣除情况 上年度 具体扣除情况\n营业收入金额 3,596,286,350.46 3,355,957,546.40\n营业收入扣除项目合计金额 26,044,735.71 90,170,716.31\n营业收入扣除项目合计金额占营业收入的比重（%） 0.72 / 2.69 / 一、与主营业务无关的业务收入\n1. 正常经营之外的其他业务收入。如出租固定资产、\n无形资产、包装物，销售材料，用材料进行非货币性\n资产交换，经营受托管理业务等实现的收入，以及虽\n计入主营业务收入，但属于上市公司正常经营之外的\n收入。 26,044,735.71 90,170,716.31\n2. 不具备资质的类金融业务收入，如拆出资金利息\n收入；本会计年度以及上一会计年度新增的类金融业\n务所产生的收入，如担保、商业保理、小额贷款、融\n资租赁、典当等业务形成的收入，为销售主营产品而\n开展的融资租赁业务除外。\n3. 本会计年度以及上一会计年度新增贸易业务所产\n生的收入。\n4. 与上市公司现有正常经营业务无关的关联交易产\n生的收入。\n5. 同一控制下企业合并的子公司期初至合并日的收\n入。\n6. 未形成或难以形成稳定业务模式的业务所产生的\n收入。\n与主营业务无关的业务收入小计 26,044,735.71 90,170,716.31\n二、不具备商业实质的收入"
+            }
+          ]
+        }
+      ],
+      "added_facts": [],
+      "changed_dimensions": [
+        "revenue_model"
+      ]
+    }
+  ],
+  "purpose": "Auxiliary regression comparison only; independent source review determines scores dynamically."
+}

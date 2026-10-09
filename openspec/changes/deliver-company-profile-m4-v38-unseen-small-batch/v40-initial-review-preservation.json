@@ -1,0 +1,15 @@
+{
+  "review_sha256": {
+    "openspec/changes/deliver-company-profile-m4-v38-unseen-small-batch/v40-initial-source-review-evidence.json": "5dda7c9e653c173f00fa3533e1d46329381ae842fe98f82cd8b762ef43edf520",
+    "openspec/changes/deliver-company-profile-m4-v38-unseen-small-batch/v40-initial-actual-object-decisions.json": "43537a51956170a470152b26b28a379687866f593889d7c483f8360e62f3192d",
+    "openspec/changes/deliver-company-profile-m4-v38-unseen-small-batch/v40-initial-layout-review-evidence.json": "64894e6951196782ed55f07a173d4e45b63c211da04bb7a9ba39874543a6e526",
+    "openspec/changes/deliver-company-profile-m4-v38-unseen-small-batch/v40-initial-company-profile-source-review.v1.json": "d2b203032fe1d4e2d5b5e075ad0028cde73960a8e0a4f20633892892e2bdac57"
+  },
+  "initial_scores": {
+    "recall": "205/205",
+    "accuracy": "1135/1135",
+    "numeric_errors": 0
+  },
+  "initial_expansion_gates_met": false,
+  "reason": "Initial review did not classify the existing products/services body under commodity_role for the issuer with no declared named material actions; no business-output failure."
+}

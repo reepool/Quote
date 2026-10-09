@@ -38,9 +38,13 @@ def page_numbers(record):
     }
 
 
-def delivered(root, i, pages):
+def delivered(root, i, pages, repair_version="v39"):
     q, e = _drive(
-        root, instrument=i, fixture=fixture(i), pages=pages, repair_version="v39"
+        root,
+        instrument=i,
+        fixture=fixture(i),
+        pages=pages,
+        repair_version=repair_version,
     )
     assert q == e
     cp = json.loads(
@@ -53,9 +57,12 @@ def delivered(root, i, pages):
 
 @pytest.mark.parametrize("i", ["600048.SH", "600078.SH"])
 @pytest.mark.parametrize("kind", ["pages", "independent_pages"])
-def test_complete_bodies_preserve_original_substance_and_limits(tmp_path, i, kind):
+@pytest.mark.parametrize("repair_version", ["v39", "v40"])
+def test_complete_bodies_preserve_original_substance_and_limits(
+    tmp_path, i, kind, repair_version
+):
     f = fixture(i)
-    q, raw = delivered(tmp_path, i, f[kind])
+    q, raw = delivered(tmp_path, i, f[kind], repair_version)
     for dim, rule in f["answers"].items():
         text = compact(_answer(q, dim))
         missing = [
@@ -236,12 +243,15 @@ def test_current_rental_rows_and_sparse_parent_income(tmp_path, kind):
     assert parent[0]["source_native"]["value"] == "477,781,402.44"
 
 
-def test_v39_identity_inherits_all_five_switches_and_default_unchanged():
+@pytest.mark.parametrize("repair_version", ["v39", "v40"])
+def test_successor_identity_inherits_all_five_switches_and_default_unchanged(
+    repair_version,
+):
     from research.company_profile import core_evidence_selection as selection
     from research.company_profile.execution import default_processing_identity
 
     before = default_processing_identity()
-    identity = {**before, "revenue_sentence_repair": "v39"}
+    identity = {**before, "revenue_sentence_repair": repair_version}
     assert all(
         check(identity)
         for check in [
@@ -253,13 +263,16 @@ def test_v39_identity_inherits_all_five_switches_and_default_unchanged():
         ]
     )
     assert default_processing_identity() == before
-    assert before.get("revenue_sentence_repair") != "v39"
+    assert before.get("revenue_sentence_repair") != repair_version
 
 
 @pytest.mark.parametrize("kind", ["pages", "independent_pages"])
-def test_blank_deduction_item_does_not_take_following_subtotal(tmp_path, kind):
+@pytest.mark.parametrize("repair_version", ["v39", "v40"])
+def test_blank_deduction_item_does_not_take_following_subtotal(
+    tmp_path, kind, repair_version
+):
     f = fixture("600078.SH")
-    q, raw = delivered(tmp_path, "600078.SH", f[kind])
+    q, raw = delivered(tmp_path, "600078.SH", f[kind], repair_version)
     blank_name = "未形成或难以形成稳定业务模式的业务所产生的收入"
     assert not any(
         r["object_type"] in {"Segment", "Measurement"}

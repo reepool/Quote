@@ -1,0 +1,79 @@
+{
+  "created_at": "2026-10-09T15:05:28.393902+00:00",
+  "task_5_2_completed": true,
+  "source_scope": "205 positive substantive conditions and 3 mandatory negatives; actual checked pages only",
+  "full_owner_and_independent_source_tests": {
+    "passed": 22
+  },
+  "ruff_lint": "passed",
+  "related_format": "passed",
+  "openspec_strict": "passed",
+  "diff_check": "passed",
+  "source_recall": {
+    "status": "assessed",
+    "numerator": 205,
+    "denominator": 205,
+    "value": 1.0
+  },
+  "source_accuracy": {
+    "status": "assessed",
+    "numerator": 1135,
+    "denominator": 1135,
+    "value": 1.0
+  },
+  "critical_numeric_errors": {
+    "status": "assessed",
+    "value": 0
+  },
+  "mandatory_negative_count": 3,
+  "mandatory_negative_passed_count": 3,
+  "p9_boundary_passed": true,
+  "whole_round_seconds": 266.306796672754,
+  "workload": {
+    "tokens_used": {
+      "status": "assessed",
+      "value": 0
+    },
+    "elapsed_seconds": {
+      "status": "assessed",
+      "value": 266.306796672754
+    },
+    "human_review_minutes": {
+      "status": "unassessed",
+      "value": null
+    }
+  },
+  "actual_accepted_fact_count": 1129,
+  "answered_text_count": 6,
+  "actual_no_reuse_or_predecessor": true,
+  "query_export_disk_equal": true,
+  "associated_income_object_count": 820,
+  "historical_files": 2177,
+  "historical_files_unchanged": true,
+  "first_formal_artifacts": 19,
+  "first_artifacts_unchanged": true,
+  "initial_reviews": 4,
+  "initial_reviews_unchanged": true,
+  "corrected_reviews": 4,
+  "corrected_reviews_unchanged": true,
+  "execution_modules_reconstructed": 38,
+  "execution_code_base": "815f38989148e4454859187203f55d26dc5093e7",
+  "default_identity_unchanged": true,
+  "previous_modified_files_unchanged": true,
+  "whole_test_suite_claim": false,
+  "preexisting_operations_failures": "Three previously reproduced old failures remain deferred",
+  "scoped_review": {
+    "blocking_business_findings": [],
+    "review_annotation_issue": "Initial products/services answer aspect classification omitted per-company commodity_role coverage",
+    "review_annotation_corrected_with_initial_preserved": true,
+    "nonblocking_unrelated_work": "deferred",
+    "new_business_logic": "None; successor identity only"
+  },
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false,
+  "change_archived": false,
+  "next_batch": "paused_pending_a_role_review",
+  "shared_budget_accounting_verified": true,
+  "actual_transport_retries": 0,
+  "initial_review_correction": "Only two existing product/service answer aspect classifications and four explicit unchanged aspect metadata fields; no changed accuracy judgment, denominator or business output."
+}

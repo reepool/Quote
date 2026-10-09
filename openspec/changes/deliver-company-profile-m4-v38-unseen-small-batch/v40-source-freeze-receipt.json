@@ -1,0 +1,108 @@
+{
+  "created_at": "2026-10-09T14:50:37.436043+00:00",
+  "processing_identity": {
+    "rules": "company_profile_common_core.v1",
+    "owned_page_facts": "v8",
+    "material_input_facts": "v1",
+    "revenue_sentence_repair": "v40"
+  },
+  "plan": {
+    "plan_id": "934834b9a644f2dde9c0e3a462701231f8bcd2edc652ec1a7c8ffc190b640c2a",
+    "knowledge_cutoff": "2026-09-17",
+    "max_companies_this_round": 2,
+    "token_budget": 50000,
+    "reports": [
+      {
+        "instrument_id": "600048.SH",
+        "asset_id": "asset_fcaaac731494a8289668cdc0e8dfa2ba",
+        "report_id": "1225123569",
+        "report_period": "2025-12-31",
+        "document_version": "830b11815f1d493465a8913335c5937b06d6221797a59e9256db00a4746c59c8",
+        "disclosure_form": "service"
+      },
+      {
+        "instrument_id": "600078.SH",
+        "asset_id": "asset_dcf734cc462f14446b6380b2af4ac099",
+        "report_id": "1225122678",
+        "report_period": "2025-12-31",
+        "document_version": "bc60122ffcb4f14c488ea6436fec952bb2e94162f9e26002986c295be7ecb60b",
+        "disclosure_form": "manufacturing"
+      }
+    ]
+  },
+  "executed_code_sha256": {
+    "research/company_profile/__init__.py": "41e5f0c5c3562e789053ce756fe342d1cb8b2c34f4049920eb246855bdbf1364",
+    "research/company_profile/acceptance_policy.py": "7891277bde00e0f54cf444ef5f23320bb81221b93e8a8d46b4295fc1bd65a897",
+    "research/company_profile/candidate_registry.py": "2d94bb5cf58957e895449c3a5ec0584360eba2285725bf1f452a4251b93217d6",
+    "research/company_profile/commodity_exposure.py": "c5a1ccc9fa73e27620859b56fa90c4de1572793ae7c4292b54067005a9672795",
+    "research/company_profile/contracts.py": "3552379634e8ecd9514b97650ec32c224f48b590f17a56d2785a64f0e8c41527",
+    "research/company_profile/core_assessment_projection.py": "972148ac4d99d02606febc2552a0e6a6617c86d3e2c3dd5710961ea850cd5bd1",
+    "research/company_profile/core_evidence_selection.py": "1648e2aa8472e7a01473252ee219691e8cba3c3f3059fc67aad8ead3d865b9ae",
+    "research/company_profile/core_skeleton.py": "7361026c9436a72c7feaab4dc6445499c2b622ab6004b75d146588388d30cf6d",
+    "research/company_profile/counterparty_research.py": "83a3779d2e6c044acfe3f4e560b59b4a8d631bdcc03af8e8a4b686962b17fd83",
+    "research/company_profile/execution.py": "8649d1c31e081e168994a7fe433fa0b1d41616ea2039b78449b99e96065e2267",
+    "research/company_profile/first_expansion.py": "a37fef38017082f82e71036d470462f08a92ed05324a4685b21572fef91bf661",
+    "research/company_profile/legacy_retirement.py": "3e01e1a88369f866790e65a7c4b04a3e9e5e4480fc099eef55303a5e34386b0c",
+    "research/company_profile/live_plan.py": "12b442cd3334e65d4de050daa70043e02b2cb9271b0b90708be36fdd8e0dd856",
+    "research/company_profile/live_run.py": "ee7208f40879a12f2e87270743475a91aaf178a7bc2ec979cb36e059b4fb1933",
+    "research/company_profile/m4_next_batch.py": "a23249872610f38d1294a9945478cacf609455bfd453790044268c3bd9dc565a",
+    "research/company_profile/material_input_research.py": "1e903edfe38d1b0d569299436e59a150ca909570de5ac14c496630831d4d37ab",
+    "research/company_profile/models.py": "34be82906d9f8ec4d1f7a865ddaa5a5203da534d40c3573a6d85a2c9e08a4f03",
+    "research/company_profile/operating_quantity_research.py": "d2dfadb2a88a5c2267daea7fda53b2147c47af2c1fe43a8eaa96c147452a029d",
+    "research/company_profile/operations.py": "51b0d9e0d28d4680b314cd9a7b9732501ba9213d47a06167f1528e806dda73f7",
+    "research/company_profile/operator_closure.py": "529dd42b014449c0ac20c0e5be3180c8c21b4f9df3cb509d5334fe65bb0232dd",
+    "research/company_profile/projection.py": "504f8446256d157219e1d21ce35474b323f3c625a799d5f0a22809d3e656536c",
+    "research/company_profile/publication.py": "d2c43d7a6199f0fbab64915beec8768a65c11df7d67d6615b25bff76300c6f36",
+    "research/company_profile/reads.py": "75b925f9e77901dd0e286f922b6ab8c7560baad4fe2990c532623b85668fdfcc",
+    "research/company_profile/runtime.py": "62025915087370670ba5400e1e3e81abf97798cb24c8382c7a0f44f4364220de",
+    "research/company_profile/segment_financial_research.py": "1c0e27469a670e68fb289b4ad3dd86e643189c3874186f724c34f763e04a8d1f",
+    "research/company_profile/shadow_batch.py": "155e54e72c43a841683833e0ec46135ebde8e2572a195284b87b6a23340e4792",
+    "research/company_profile/shadow_batch_audit.py": "04f12d98d3819bfc02c683b3620e83c753be66c6377610ae8076c5153157a2ad",
+    "research/company_profile/shadow_batch_service.py": "bc3be4bd327b49f4abbec98d83cbbd6108993f9ac1253ecf2b42620c0a5dec74",
+    "research/company_profile/shadow_evidence.py": "dc580e45feb9eb55b63e0bea608fe63c4f50bef0e8553eb0ba879da88602970b",
+    "research/company_profile/source_review.py": "4da6bcb7b1aa1be459cb1b232df59a65acef535afc8b8593d8852f26ebe02bf9",
+    "research/company_profile/stage4_restricted_read.py": "f29e14ad0754dd42a0bd950171fb077ebaf7f7175aef12bd55771a82619ccbaf",
+    "research/company_profile/stage5.py": "47de653324c80e1eb1d615e179c2818eafdf568abd328698e92459122244da0c",
+    "research/company_profile/stage5_adjudication.py": "0897c27651a83f86da877d3940c7b21af5ddcc06e92b0ca32ffad94752037773",
+    "research/company_profile/stage5_benchmark.py": "c7cc313671af27e7c66687faf8ff8e774a993c47dd7fd97b2dbf83833d27290c",
+    "research/company_profile/stage5_bundle.py": "91f688ff51ee4310c05d994856dd1a25b442345a6402e3c414ddf396fb91a92a",
+    "research/company_profile/stage5_provider.py": "279a6dcd3e623f2b83238662bb55b595a8837f84b6a11769601e3fb65fa1ba72",
+    "research/company_profile/stage5_service.py": "e53776bfe200ab3341f88d22207a41508020b6867ef03c3312ec9ec250957b11",
+    "research/company_profile/workflow.py": "96d45ea6990deb382e039783ea353354db84c92deb35063d355e15dc79e54470"
+  },
+  "source_scope_sha256": "3b4e4612b79441ecf634d3308e85da32261c9b69f52a8cac954ac6133c9ec093",
+  "source_pages_sha256": "c469364cc4974d2a7cf91eac02e8139fd74a14e665530f96ca55922330bd3b81",
+  "source_condition_count": 205,
+  "mandatory_negative_count": 3,
+  "counts": {
+    "answers": 6,
+    "income_conditions": 159,
+    "native_roles": 40
+  },
+  "fixed_before_formal_execution": true,
+  "scores_prefilled": false,
+  "accuracy_denominator_prefilled": false,
+  "repair_flags": {
+    "revenue_sentence_repair_requested": true,
+    "named_role_repair_requested": true,
+    "service_operating_energy_requested": true,
+    "core_answer_repair_requested": true,
+    "source_delivery_repair_requested": true
+  },
+  "default_identity": {
+    "rules": "company_profile_common_core.v1",
+    "owned_page_facts": "v8",
+    "material_input_facts": "v1"
+  },
+  "default_identity_unchanged": true,
+  "predecessor_scope_sha256": "99fc0843d8540c25cf48ce0ae18b45a48d960bb90d20abd700c0625ed66e3251",
+  "substantive_conditions_unchanged": true,
+  "same_original_plan": true,
+  "plan_sha256": "ff1feab023834e0b0824fcb7a3c6222e3949cc738a43e2f6480222a0f3203ca4",
+  "execution_code_base": "815f38989148e4454859187203f55d26dc5093e7",
+  "execution_patch_sha256": "432e58bd45d6eb86b84b5946124b78ad245daf208ffef3934ca502010b64c65b",
+  "official_page_count": 96,
+  "protected_historical_files_unchanged": 2177,
+  "formal_execution_started": false,
+  "p9_boundary_separate_from_recall": true
+}
