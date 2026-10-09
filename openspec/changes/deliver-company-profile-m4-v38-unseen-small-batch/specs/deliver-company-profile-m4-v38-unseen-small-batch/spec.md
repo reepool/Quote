@@ -49,3 +49,14 @@ The first208condition contract,54/208recall,139/167accuracy,two critical numeric
 #### Scenario: First failed observation closes
 - **WHEN** current-source review fails the finite gates
 - **THEN** original contract,first delivery and review are retained while expansion pauses and source-backed local repair cards await review
+
+### Requirement: Repair follows original columns and independent actors
+The authorized v39 repair MUST retain complete narrative continuations and original subsidiary control/consolidation limits in all three final dimensions. Current purchases and actual manufacturing or energy inputs MUST be distinct Activity and material_input Relationship records. Native table and row identity MUST preserve different settlement/main-revenue columns, counterparties, tenants, subsidiary and parent scopes, printed decimal continuations and explicit financial units. The existing official page owner MAY recover layout from the same bound PDF for sparse income and seller/lessor tables without changing cached original page text. Layout column positions MUST reset at repeated table headers. Current blank cells MUST NOT move prior amounts left or become invented zeros.
+
+#### Scenario: Official layout contradicts a frozen current-income condition
+- **WHEN** independent official p195–196 layout shows 26.28, 8.22 and 0.08万元 only in the prior column while the first frozen contract says current
+- **THEN** those values MUST NOT generate current income; the original 208 conditions and first scores remain unchanged, the correction evidence is stored separately, and the successor contract must be confirmed before first formal execution
+
+#### Scenario: Full current source pages are projected
+- **WHEN** actual official-owner pages and independently read pages enter the existing acceptance-query-export path under full v39 identity
+- **THEN** substantive bodies, valid current income and forty named action/relationship conditions remain traceable to their own original actors, columns and affirmative current actions

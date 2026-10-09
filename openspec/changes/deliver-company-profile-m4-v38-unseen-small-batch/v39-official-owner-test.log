@@ -1,0 +1,6 @@
+.                                                                        [100%]
+============================= slowest 10 durations =============================
+4.34s call     tests/unit/test_research/test_company_profile_operations.py::test_published_run_binds_official_annual_pages_without_injected_page_source
+
+(2 durations < 0.005s hidden.  Use -vv to show these durations.)
+1 passed, 14 deselected, 7 warnings in 5.69s

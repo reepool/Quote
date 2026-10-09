@@ -1,0 +1,13 @@
+.............                                                            [100%]
+============================= slowest 10 durations =============================
+40.06s call     tests/unit/test_research/test_company_profile_v39_real_estate_phosphates.py::test_complete_bodies_preserve_original_substance_and_limits[pages-600048.SH]
+37.45s call     tests/unit/test_research/test_company_profile_v39_real_estate_phosphates.py::test_complete_bodies_preserve_original_substance_and_limits[independent_pages-600048.SH]
+3.15s call     tests/unit/test_research/test_company_profile_v39_real_estate_phosphates.py::test_complete_bodies_preserve_original_substance_and_limits[pages-600078.SH]
+1.87s call     tests/unit/test_research/test_company_profile_v39_real_estate_phosphates.py::test_complete_bodies_preserve_original_substance_and_limits[independent_pages-600078.SH]
+1.13s call     tests/unit/test_research/test_company_profile_v39_real_estate_phosphates.py::test_current_rental_rows_and_sparse_parent_income[independent_pages]
+1.10s call     tests/unit/test_research/test_company_profile_v39_real_estate_phosphates.py::test_current_rental_rows_and_sparse_parent_income[pages]
+0.40s call     tests/unit/test_research/test_company_profile_v39_real_estate_phosphates.py::test_subsidiary_coal_actions_reject_negative_and_plans[\u62df\u5f00\u5c55-pages]
+0.39s call     tests/unit/test_research/test_company_profile_v39_real_estate_phosphates.py::test_subsidiary_coal_actions_reject_negative_and_plans[\u4e0d\u4ece\u4e8b-independent_pages]
+0.38s call     tests/unit/test_research/test_company_profile_v39_real_estate_phosphates.py::test_subsidiary_coal_actions_reject_negative_and_plans[\u4e0d\u4ece\u4e8b-pages]
+0.32s call     tests/unit/test_research/test_company_profile_v39_real_estate_phosphates.py::test_purchase_and_use_columns_are_distinct_and_uses_not_products[pages]
+13 passed, 7 warnings in 88.21s (0:01:28)

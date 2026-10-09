@@ -1,0 +1,13 @@
+..........................                                               [100%]
+============================= slowest 10 durations =============================
+44.99s call     tests/unit/test_research/test_company_profile_v39_real_estate_phosphates.py::test_complete_bodies_preserve_original_substance_and_limits[pages-600048.SH]
+44.00s call     tests/unit/test_research/test_company_profile_v39_real_estate_phosphates.py::test_complete_bodies_preserve_original_substance_and_limits[independent_pages-600048.SH]
+5.48s call     tests/unit/test_research/test_company_profile_v38_construction_wood.py::test_complete_pages_deliver_substance_income_and_roles[independent_pages-600039.SH]
+3.63s call     tests/unit/test_research/test_company_profile_v38_construction_wood.py::test_complete_page_action_modifiers_do_not_borrow_other_branches[deduction-\u5c1a\u672a\u9500\u552e]
+3.60s call     tests/unit/test_research/test_company_profile_v38_construction_wood.py::test_complete_pages_deliver_substance_income_and_roles[pages-600039.SH]
+3.60s call     tests/unit/test_research/test_company_profile_v38_construction_wood.py::test_complete_page_action_modifiers_do_not_borrow_other_branches[subsidiary-\u62df\u9500\u552e]
+3.24s call     tests/unit/test_research/test_company_profile_v39_real_estate_phosphates.py::test_complete_bodies_preserve_original_substance_and_limits[pages-600078.SH]
+3.11s call     tests/unit/test_research/test_company_profile_v39_real_estate_phosphates.py::test_complete_bodies_preserve_original_substance_and_limits[independent_pages-600078.SH]
+2.69s call     tests/unit/test_research/test_company_profile_v38_construction_wood.py::test_complete_pages_deliver_substance_income_and_roles[pages-600076.SH]
+2.47s call     tests/unit/test_research/test_company_profile_v38_construction_wood.py::test_complete_page_action_modifiers_do_not_borrow_other_branches[input-\u62df\u9500\u552e]
+26 passed, 7 warnings in 134.53s (0:02:14)

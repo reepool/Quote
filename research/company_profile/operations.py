@@ -277,15 +277,28 @@ class OfficialAnnualReportPageSource:
         # Compact PDF text loses a blank current/prior amount cell. Read layout
         # for affected native project-income and lessor tables; keep cached page
         # artifacts and their original text unchanged.
-        project_pages = [p for p in pages if "房地产销售收入分项列示如下" in p["text"]]
+        project_pages = [
+            p
+            for p in pages
+            if "房地产销售收入分项列示如下" in p["text"]
+            or "营业收入和营业成本情况" in p["text"]
+        ]
         lease_active = False
+        seller_active = False
         for page in pages:
+            if "出售商品/提供劳务情况表" in page["text"]:
+                seller_active = True
             if "本公司作为出租方" in page["text"]:
                 lease_active = True
-            if lease_active and page not in project_pages:
+            if (lease_active or seller_active) and page not in project_pages:
                 project_pages.append(page)
+            if seller_active and re.search(
+                r"采购资产|关联租赁情况|购销商品、提供和接受劳务的关联交易说明",
+                page["text"],
+            ):
+                seller_active = False
             if lease_active and re.search(
-                r"本公司作为承租方|关联租赁情况说明|[（(]4[)）]", page["text"]
+                r"本公司作为承租方|关联租赁情况说明|[（(]4[)）]|\n\s*3、", page["text"]
             ):
                 lease_active = False
         if project_pages:
@@ -294,11 +307,16 @@ class OfficialAnnualReportPageSource:
             try:
                 layout_reader = PdfReader(artifact.source_pdf_path)
                 for page in project_pages:
-                    page["layout_text"] = layout_reader.pages[page["page"] - 1].extract_text(
-                        extraction_mode="layout"
-                    ) or ""
+                    page["layout_text"] = (
+                        layout_reader.pages[page["page"] - 1].extract_text(
+                            extraction_mode="layout"
+                        )
+                        or ""
+                    )
             except Exception as exc:  # noqa: BLE001 - failed column recovery becomes machine_rework
-                logger.warning("company-profile project-income layout unavailable: %s", exc)
+                logger.warning(
+                    "company-profile project-income layout unavailable: %s", exc
+                )
                 return None
         if not pages:
             return None
@@ -456,9 +474,7 @@ class CompanyProfileTaskService:
         self.token_budget = max(0, int(token_budget))
         self.candidate_registry = candidate_registry
         self.live_plan = live_plan
-        self.plan_directory = (
-            None if plan_directory is None else Path(plan_directory)
-        )
+        self.plan_directory = None if plan_directory is None else Path(plan_directory)
         self.processing_identity = (
             dict(processing_identity)
             if processing_identity
@@ -693,8 +709,8 @@ class CompanyProfileTaskService:
                 tuple(enqueue_result.get("work_ids") or ()),
             )
             batch_plan = load_m4_next_batch_plan(
-            self.checkpoint_root, plan_directory=self.plan_directory
-        )
+                self.checkpoint_root, plan_directory=self.plan_directory
+            )
             frozen_ids = (
                 {report.instrument_id for report in batch_plan.reports}
                 if batch_plan is not None
@@ -842,6 +858,7 @@ class CompanyProfileTaskService:
         if readable is None:
             readable = self._m4_report_is_locally_readable
         if binding_for is None:
+
             def binding_for(instrument_id: str) -> Mapping[str, Any] | None:
                 return self._m4_official_bindings(
                     (instrument_id,),
@@ -1065,9 +1082,7 @@ class CompanyProfileTaskService:
             self.checkpoint_root,
             batch_plan.plan_id,
             plan_directory=self.plan_directory,
-        ) / (
-            f"{LIVE_RUN_SCHEMA_VERSION}.json"
-        )
+        ) / (f"{LIVE_RUN_SCHEMA_VERSION}.json")
         persist_live_run_report(report, self.checkpoint_root, destination=path)
         return report
 
@@ -1570,7 +1585,8 @@ def record_published_source_review(
     else:
         batch_plan = load_m4_next_batch_plan(checkpoint_root)
     if batch_plan is not None and (
-        plan_directory is not None or load_m4_next_batch_plan(checkpoint_root) is not None
+        plan_directory is not None
+        or load_m4_next_batch_plan(checkpoint_root) is not None
     ):
         load_m4_next_batch_observation_for_source_review(
             checkpoint_root, plan_directory=plan_directory

@@ -1,0 +1,45 @@
+{
+  "review_type": "scoped_uncommitted_review",
+  "formal_execution_started": false,
+  "blocking_findings_fixed": [
+    {
+      "issue": "不同地区原表同名记录覆盖导致错配收入",
+      "fix": "原表/原行身份与配对Measurement分别保存，保留万元；完整页正例核验"
+    },
+    {
+      "issue": "新seller布局路径引入跨行交易对方前后缀丢失",
+      "fix": "保留pending前缀并将原行尾片接回原交易对方；旧v38完整页与边界测试恢复"
+    },
+    {
+      "issue": "普通文本的空白被误作布局坐标",
+      "fix": "仅真实双年度几何行启用空位判定，原文本路径兼容；旧v38完整页恢复"
+    }
+  ],
+  "unrelated_preexisting_findings": [
+    {
+      "test": "test_run_uses_new_writer_and_does_not_call_legacy_semantic_writer",
+      "disposition": "原HEAD三修改模块覆盖下同样失败，不修改、不阻塞本轮局部实现"
+    },
+    {
+      "test": "test_pause_stops_further_drain_and_resume_skips_completed_scopes",
+      "disposition": "原HEAD三修改模块覆盖下同样失败，不修改、不阻塞本轮局部实现"
+    },
+    {
+      "test": "test_one_unbound_company_does_not_block_the_other",
+      "disposition": "原HEAD三修改模块覆盖下同样失败，不修改、不阻塞本轮局部实现"
+    }
+  ],
+  "source_contract_blocker": "三笔冻结本期服务收入与官方上期列冲突；待确认205正向条件或208含三空位负例",
+  "known_code_blockers_in_local_checked_scope": [],
+  "optional_framework_work": "deferred",
+  "baseline_head": "b8f1f729ce18c3c4c54a1fbe7c09f6ee2795e9e8",
+  "code_sha256": {
+    "research/company_profile/core_evidence_selection.py": "48ff283d19d6cc2f601cd65e01b90c4cd0634c187584c484a3dcca42c9750725",
+    "research/company_profile/core_assessment_projection.py": "972148ac4d99d02606febc2552a0e6a6617c86d3e2c3dd5710961ea850cd5bd1",
+    "research/company_profile/operations.py": "51b0d9e0d28d4680b314cd9a7b9732501ba9213d47a06167f1528e806dda73f7"
+  },
+  "code_patch_sha256": "3f409a4c3117b50848e428bf13ba6a690749bf0b7d6a1959bc59ccc85b14fae4",
+  "test_sha256": "60c4b05d9edb5ef2299102024420688ac3b3f315414803a9d84c0aa747b3b637",
+  "code_patch_apply_option": "git apply --unidiff-zero (zero context avoids whitespace artifacts when patch itself is added)",
+  "three_changed_modules_reconstruct_from_baseline_and_patch": true
+}
