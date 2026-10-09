@@ -1,0 +1,59 @@
+{
+  "created_at": "2026-10-09T08:54:48.019869+00:00",
+  "task_1_1_completed": true,
+  "task_2_1_completed": true,
+  "completion_branch": "first_formal_failure_preserved",
+  "business_acceptance_passed": false,
+  "a_role_review": "pending_failure_review",
+  "source_recall": {
+    "status": "assessed",
+    "numerator": 54,
+    "denominator": 208,
+    "value": 0.25961538461538464
+  },
+  "source_accuracy": {
+    "status": "assessed",
+    "numerator": 139,
+    "denominator": 167,
+    "value": 0.8323353293413174
+  },
+  "critical_numeric_errors": {
+    "status": "assessed",
+    "value": 2
+  },
+  "accepted_facts": 161,
+  "answered_texts": 6,
+  "whole_round_seconds": 295.8263782700524,
+  "tokens_consumed": 0,
+  "shared_token_budget": 50000,
+  "actual_runtime_no_reuse": true,
+  "query_export_disk_equal": true,
+  "protected_historical_files": 2084,
+  "first_formal_artifacts": 18,
+  "source_condition_count": 208,
+  "new_batches": "paused",
+  "change_archived": false,
+  "repair_cards_registered": [
+    "4.1",
+    "4.3",
+    "4.2",
+    "4.4"
+  ],
+  "repair_started": false,
+  "previous_v38_archive_original_files_unchanged": 39,
+  "business_code_modified": false,
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false,
+  "validation": {
+    "owner_tests": {
+      "command": "PYTHONPATH=. /home/python/miniconda3/envs/Quote/bin/python -m pytest tests/unit/test_research/test_company_profile_m4_next_batch.py -q",
+      "result": "20 passed, 7 warnings"
+    },
+    "ruff_lint": "passed: m4_next_batch.py, operations.py, source_review.py, reads.py",
+    "ruff_format": "existing differences in same four unchanged modules; source hashes equal baseline, deferred without edits",
+    "openspec_strict": "new change and four synchronized main specs passed",
+    "diff_check": "passed for task-owned OpenSpec changes",
+    "manual_review": "Source/action/table/units/unique denominator/preservation/archive-only changes reviewed; actual business failure preserved with source-backed repair cards; no task-owned material blocker found",
+    "existing_worktree_changes_untouched": true
+  }
+}

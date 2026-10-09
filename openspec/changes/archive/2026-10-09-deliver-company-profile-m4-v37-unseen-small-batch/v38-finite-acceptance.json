@@ -1,0 +1,24 @@
+{
+  "accepted_by": "A_role_user_review",
+  "accepted_at": "2026-10-09T08:17:03.224854+00:00",
+  "source_condition_count": 114,
+  "source_recall": {
+    "numerator": 114,
+    "denominator": 114
+  },
+  "source_accuracy": {
+    "numerator": 256,
+    "denominator": 256
+  },
+  "accepted_facts": 250,
+  "answered_bodies": 6,
+  "critical_numeric_errors": 0,
+  "whole_round_seconds": 226.85718323104084,
+  "tokens_used": 0,
+  "shared_token_budget": 50000,
+  "finite_scope": "Original 114 substantive conditions and actual checked pages only",
+  "reading_order_correction": "3 facts and 5 bodies; output/code/contract unchanged",
+  "original_failure_immutable": true,
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false
+}

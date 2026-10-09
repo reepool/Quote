@@ -69,3 +69,14 @@ When a native current-income/current-cost/prior-income/prior-cost row contains o
 #### Scenario: Native totals cannot uniquely locate a sparse amount
 - **WHEN** current/prior totals are missing, inconsistent or cannot uniquely identify the printed value's period
 - **THEN** its period remains unresolved rather than being guessed from the first extracted numeric cell or borrowed PDF layout
+
+### Requirement: Native wrapped income cells preserve project and elimination basis
+Printed decimal fragments MUST be rejoined before deciding the native income-table boundary. Project tables MUST use the explicitly headed current recognized-income column rather than project value, accumulated revenue or cash receipts. Original units, subsidiary or associate actors, parent-company scope, native table differences and negative related-income adjustments MUST remain explicit. Segment income before elimination, elimination amount and income after elimination MUST remain separate native bases without cross-basis accumulation. Lessor tenant fragments spanning pages MUST attach to their original row; a completed name MUST NOT absorb the next tenant's first fragment. Current blank lease cells MUST NOT inherit prior amounts or become zero.
+
+#### Scenario: Project and report-segment tables use different income columns
+- **WHEN** official tables print current project recognized income and separate pre-elimination, elimination and post-elimination segment columns
+- **THEN** paired Segment and Measurement retain each original column, amount and unit independently
+
+#### Scenario: A tenant ends at the following page top
+- **WHEN** a tenant's name continues across a page before the next original tenant row
+- **THEN** the tail belongs to its original tenant and prior-only rows generate no current income

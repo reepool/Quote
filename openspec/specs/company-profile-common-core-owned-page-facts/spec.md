@@ -216,3 +216,14 @@ Full current owned operating and revenue-mechanism narratives MUST remain comple
 #### Scenario: Wrapped contract headings change the native income dimension
 - **WHEN** 商品类型 is followed by 市场或客户类型 and 商品转让的时间分类
 - **THEN** each Segment and paired Measurement retain the current native product, region or revenue_timing classification rather than stale parsing state
+
+### Requirement: Continued business and current named actions retain original qualification
+Complete owned business and revenue-policy passages MUST retain necessary continuation pages, original subsidiary and associate actors, disposal or loss-of-control dates and consolidation limits through acceptance, query and export. Scale or quality evaluations MUST NOT become operating objects while affirmative actions in the same clause remain. Named sales MUST follow the original current affirmative product branch, sales table or income explanation; prior-year affirmative explanations MUST NOT establish denied or planned current sales. Production and operating facts MUST NOT substitute for named sales. Original subsidiary abbreviations MAY resolve only when the relevant current-income branch has a unique source-grounded full actor. Purchase and actual input MUST remain separate.
+
+#### Scenario: A subsidiary leaves consolidation during the report period
+- **WHEN** continued official pages identify the original subsidiary, loss-of-control date and exit from consolidation
+- **THEN** all affected bodies retain those qualifications instead of presenting its activities as unrestricted current group operations
+
+#### Scenario: Current sales branch is negated but prior-year branch is affirmative
+- **WHEN** a named product's current income explanation denies or plans sales
+- **THEN** no current sales fact or role is accepted from prior-year wording, while other affirmative current branches remain

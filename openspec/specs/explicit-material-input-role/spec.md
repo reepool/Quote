@@ -106,3 +106,10 @@ Separate current purchase and actual-use columns MUST remain separate source-gro
 #### Scenario: Energy purchase and consumption columns coexist
 - **WHEN** an official current table separately discloses energy 采购量 and 耗用量
 - **THEN** acceptance, query and export preserve a purchases Activity and a separate material_input Relationship without converting either because they share an energy read category
+
+### Requirement: Actual named application establishes input without inferring purchases
+Explicit current application of named materials in production MUST use the existing material_input Relationship with original actor, native name, period and Evidence. A separate named purchases Activity MUST require its own purchase wording or current purchase column. Neither purchase nor production alone MUST establish actual use, and negated or planned application MUST NOT create current input relationships. Named subsidiary sales and independently disclosed input roles MAY coexist without duplicate role recall.
+
+#### Scenario: Current material application and a separate box-board purchase coexist
+- **WHEN** official source states actual application of 意杨 and 竹材 and separately discloses 箱板 purchases
+- **THEN** acceptance, query and export preserve two material_input relationships and a purchases Activity without converting box-board purchase into input or actual application into external purchase

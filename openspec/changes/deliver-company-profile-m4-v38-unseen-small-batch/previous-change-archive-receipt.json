@@ -1,0 +1,23 @@
+{
+  "archive_directory": "openspec/changes/archive/2026-10-09-deliver-company-profile-m4-v37-unseen-small-batch",
+  "archive_path_mapping": {
+    "openspec/changes/deliver-company-profile-m4-v37-unseen-small-batch": "openspec/changes/archive/2026-10-09-deliver-company-profile-m4-v37-unseen-small-batch"
+  },
+  "original_files_unchanged": 39,
+  "protected_manifest_counts": {
+    "v38-protection-baseline.json": 2038,
+    "v38-first-formal-delivery-preservation.json": 19,
+    "v38-formal-result-preservation.json": 6,
+    "v38-source-freeze-receipt.json": 38
+  },
+  "main_specs_sha256": {
+    "openspec/specs/company-profile-common-core-owned-page-facts/spec.md": "1ec1505e323b752818955e27d7508030f812f9ad9e09ec9d979344ab3ccdf21a",
+    "openspec/specs/company-profile-common-core-company-total-and-income-mix/spec.md": "60575396cd82983776ad9df640d3658e299fda2116c4eb9390cb1030d1f7e6ee",
+    "openspec/specs/explicit-material-input-role/spec.md": "01fd78d91c4753f95792dbb90daf7f15db4edc0f4b46776113bb0a02c7772248",
+    "openspec/specs/deliver-company-profile-m4-v37-unseen-small-batch/spec.md": "5074c7c97c1391d2ed5cd7400f809afb3718c423f200ace05eca96cf11a71bfa"
+  },
+  "strict_validation_passed": true,
+  "a_role_finite_acceptance": "confirmed_114_conditions_actual_checked_pages_only",
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false
+}

@@ -1,0 +1,13 @@
+{
+  "formal_execution_index": 1,
+  "first_artifacts_manifest_sha256": "b79a15d1fede741c375a4bb96c79ed938e4dc0e098dd13d07eae556a6973af71",
+  "source_scope_sha256": "a7a1e9feafef7f8f330de763356b529b7d5681cd1cd92677e83bd186d1af6ac5",
+  "review_sha256": {
+    "openspec/changes/deliver-company-profile-m4-v38-unseen-small-batch/actual-object-decisions.json": "7dfd6fcb7cb8212158c21d8e6ce47235aa176cf79761e53359e85186a8f03e06",
+    "openspec/changes/deliver-company-profile-m4-v38-unseen-small-batch/source-review-evidence.json": "44c50a7b6e2f87530918b9aba3633d09b0e457ea453302dd920a91d9c0e4f484",
+    "data/checkpoints/company_profile_common_core/reports/m4_v38_unseen_small_batch/company_profile_source_review.v1.json": "e59cbe22ffb02fc1f7d6908aa76f6b1cc586e55f7c4eee1b7de10644d5c58ce6"
+  },
+  "formal_observation_immutable": true,
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false
+}

@@ -1,0 +1,14 @@
+{
+  "original_contract_unchanged": true,
+  "substantive_conditions_one_to_one": 208,
+  "role_aliases": {
+    "raw_material_procurement": "raw_material_input",
+    "material_input": "raw_material_input",
+    "energy_consumption": "energy_consumption"
+  },
+  "action_required_separately": true,
+  "role_overlap": "同主体磷酸p17及p196两条真实sells事实各准确率一次，冻结角色只召回一次；子公司同名对象不借集团角色召回",
+  "native_income": "保利主营地区与房地产结算地区不同表，前者缺单位和错配不能借后者召回；客户前五名不是销售渠道",
+  "reading_order_note": "澄星p183取得方式表头的方式位置移动不改变任何主体/动作/数值，官方逐行核对；未改输出",
+  "negative_scope": "仅实际检查页，不声称全年报完整"
+}
