@@ -44,3 +44,13 @@ v41真实两家完整闭环222.793617秒、0/50000、DB五阶段无复用/前驱
 ## Post-formal local correction
 
 v41原正式分数及制品保留后，在已核定4.2范围完成5.1原句主体边界补正：同页归母利润不支配经营收入；真正母公司/单体限定保留。完整页及全部既定条件局部19 passed＋母公司边界2 passed。4.2局部完成，4.4正式证明仍失败，5.2未执行；formal与post-correction代码hash/patch明确区分，不能用局部结果改正式分数。
+
+
+## v42 successor formal proof after A-role review
+
+A角确认v41失败收口及5.1局部补正，授权5.2同源正式复验与5.3独立逐对象审核。v42仅接续五项累积开关、精确共享资产登记/入队和释义主体展开；默认身份不变。原计划、联通2024/人福2025官方版本、cutoff2026-09-17和131正向＋9负例实质不变，新m4_v42_same_source_repair目录。先完整owner/独立PDF及真实母公司限定、否定计划边界验证，再首次run→query→export；全程计时含PDF读取、布局及全部重试，第二家使用共享余量。实际全部事实和六正文唯一核原来源，准确率动态生成不预填255；联通云/数据中心两配对事实须集团范围正确，业务分类与交叉不累计限制保留。131/131、动态100%、数字0、9负例、≤300秒/共享≤50000才提交A角，5.4等待有限通过；历史失败及补正原字节保护，不归档、不扩批。
+
+
+## v42 first formal result pending finite A-role review
+
+The successor completes both real owners in 239.367379seconds with 0/50000shared tokens. Actual unique review finds131/131positive conditions,255/255accuracy (249facts plus six bodies),zero numeric errors and nine evaluated negatives passed. Both five-stage records have no scope reuse or predecessor;query/export/disk agree. Native labels, amounts, units, actors/actions and six body text remain correct; two cloud/data-center pairs recover group scope. Ten revenue objects have sentence-bound evidence IDs refreshed by the already reviewed correction, including those four corrected subjects. The preserved v40/v41 failures remain unchanged. 5.2/5.3 are delivered for finite A-role review;5.4 waits for A-role acceptance. No archival or next batch is executed;production remains not_authorized and scale quality false.

@@ -1,0 +1,83 @@
+diff --git a/research/company_profile/core_evidence_selection.py b/research/company_profile/core_evidence_selection.py
+index 44e879a4..25dae888 100644
+--- a/research/company_profile/core_evidence_selection.py
++++ b/research/company_profile/core_evidence_selection.py
+@@ -1312,6 +1312,7 @@ REVENUE_SENTENCE_REPAIR_V38 = "v38"
+ REVENUE_SENTENCE_REPAIR_V39 = "v39"
+ REVENUE_SENTENCE_REPAIR_V40 = "v40"
+ REVENUE_SENTENCE_REPAIR_V41 = "v41"
++REVENUE_SENTENCE_REPAIR_V42 = "v42"
+ _REVENUE_SENTENCE_REPAIR_VERSIONS = frozenset(
+     {
+         REVENUE_SENTENCE_REPAIR_V1,
+@@ -1355,6 +1356,7 @@ _REVENUE_SENTENCE_REPAIR_VERSIONS = frozenset(
+         REVENUE_SENTENCE_REPAIR_V39,
+         REVENUE_SENTENCE_REPAIR_V40,
+         REVENUE_SENTENCE_REPAIR_V41,
++        REVENUE_SENTENCE_REPAIR_V42,
+     }
+ )
+ 
+@@ -1421,6 +1423,7 @@ def named_role_repair_requested(identity: Mapping[str, Any] | None) -> bool:
+         REVENUE_SENTENCE_REPAIR_V39,
+         REVENUE_SENTENCE_REPAIR_V40,
+         REVENUE_SENTENCE_REPAIR_V41,
++        REVENUE_SENTENCE_REPAIR_V42,
+     }
+ 
+ 
+@@ -1470,6 +1473,7 @@ def service_operating_energy_requested(identity: Mapping[str, Any] | None) -> bo
+         REVENUE_SENTENCE_REPAIR_V39,
+         REVENUE_SENTENCE_REPAIR_V40,
+         REVENUE_SENTENCE_REPAIR_V41,
++        REVENUE_SENTENCE_REPAIR_V42,
+     }
+ 
+ 
+@@ -1519,6 +1523,7 @@ def core_answer_repair_requested(identity: Mapping[str, Any] | None) -> bool:
+         REVENUE_SENTENCE_REPAIR_V39,
+         REVENUE_SENTENCE_REPAIR_V40,
+         REVENUE_SENTENCE_REPAIR_V41,
++        REVENUE_SENTENCE_REPAIR_V42,
+     }
+ 
+ 
+@@ -1569,6 +1574,7 @@ def source_delivery_repair_requested(identity: Mapping[str, Any] | None) -> bool
+         REVENUE_SENTENCE_REPAIR_V39,
+         REVENUE_SENTENCE_REPAIR_V40,
+         REVENUE_SENTENCE_REPAIR_V41,
++        REVENUE_SENTENCE_REPAIR_V42,
+     }
+ 
+ 
+diff --git a/research/company_profile/operations.py b/research/company_profile/operations.py
+index ae9804c6..1aaa95d6 100644
+--- a/research/company_profile/operations.py
++++ b/research/company_profile/operations.py
+@@ -1138,10 +1138,9 @@ class CompanyProfileTaskService:
+                 "work_ids": [],
+             }
+         elif enqueue and not (limit_drain_to_enqueued and not instrument_ids):
+-            if (
+-                batch_plan is not None
+-                and self.processing_identity.get("revenue_sentence_repair") == "v41"
+-            ):
++            if batch_plan is not None and self.processing_identity.get(
++                "revenue_sentence_repair"
++            ) in {"v41", "v42"}:
+                 from research.business_profile_production_operations import (
+                     register_business_profile_shared_annual_report_asset,
+                 )
+diff --git a/research/company_profile/runtime.py b/research/company_profile/runtime.py
+index 877b395a..4ea75ede 100644
+--- a/research/company_profile/runtime.py
++++ b/research/company_profile/runtime.py
+@@ -491,7 +491,7 @@ class CompanyProfileStageRuntime:
+                         expand_actor_aliases=state.processing_identity.get(
+                             "revenue_sentence_repair"
+                         )
+-                        == "v41",
++                        in {"v41", "v42"},
+                     ),
+                 )
+             )

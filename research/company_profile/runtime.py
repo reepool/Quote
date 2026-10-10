@@ -491,7 +491,7 @@ class CompanyProfileStageRuntime:
                         expand_actor_aliases=state.processing_identity.get(
                             "revenue_sentence_repair"
                         )
-                        == "v41",
+                        in {"v41", "v42"},
                     ),
                 )
             )

@@ -58,3 +58,15 @@ The repair MUST deliver the original 131 positive conditions and validate all ni
 #### Scenario: An income timing cross-table contains blank cells
 - **WHEN** amounts are disclosed across goods, services and other-business columns
 - **THEN** printed column placement and current-period values remain paired, timing uses the existing revenue_timing enum, and prior-only rows create no current revenue or zero
+
+
+### Requirement: Successor identity proves the corrected income subject through formal delivery
+The v42 identity MUST inherit all five cumulative repairs, exact frozen-asset enqueue and native actor alias expansion without changing the default identity. The original plan, official versions, cutoff and 131 positive plus nine negative substantive conditions MUST remain fixed in a new directory. All actual facts and answered bodies MUST determine the unique accuracy denominator dynamically. The two cloud/data-center income pairs MUST retain the consolidated-group scope and native business classification without cross-dimension aggregation. Historic failures, first outputs and correction trails MUST remain immutable. Finite acceptance MUST precede specification synchronization or archival.
+
+#### Scenario: Corrected subjects survive the first successor execution
+- **WHEN** v42 completes the two-company run-query-export through existing owners
+- **THEN** source recall131/131, dynamic accuracy100%, zero numeric errors, nine evaluated negatives, whole-round≤300seconds and shared≤50000tokens are checked before A-role submission
+
+#### Scenario: True parent limitations remain
+- **WHEN** an operating-income source sentence states a parent or standalone limitation
+- **THEN** that native limitation survives acceptance, query and export while unrelated same-page net-profit wording does not govern another income sentence

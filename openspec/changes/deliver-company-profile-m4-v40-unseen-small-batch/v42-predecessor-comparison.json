@@ -1,0 +1,679 @@
+{
+  "unchanged_fact_count": 239,
+  "changed_facts": [
+    {
+      "instrument_id": "600050.SH",
+      "record_id": "owned:core-ev-4e042f5c6f5f27e7:Measurement:business_segment:数据中心:经营业务/本期收入:row:1",
+      "predecessor_record_id": "owned:core-ev-04a05f7f8aa3697c:Measurement:business_segment:数据中心:经营业务/本期收入:row:1",
+      "name": "数据中心",
+      "object_type": "Measurement",
+      "changed_fields": [
+        "evidence",
+        "record_id",
+        "subject_basis",
+        "subject_scope"
+      ],
+      "before_scope": "unclear",
+      "after_scope": "consolidated_group",
+      "before_evidence": [
+        {
+          "evidence_id": "core-ev-04a05f7f8aa3697c",
+          "report": {
+            "instrument_id": "600050.SH",
+            "report_id": "asset_4b366497ffb0e433e7e8061133f25a94",
+            "document_version": "7042aab8d1bd3b1583c216e7757d107c7db627d5284854eb18def52434c44d8b",
+            "report_period": "2024-12-31",
+            "published_at": "2025-03-18T16:00:00+00:00",
+            "document_type": "annual_report"
+          },
+          "page": 10,
+          "printed_page_label": null,
+          "section_title": "经营正文收入",
+          "continuation_pages": [],
+          "subject_evidence_pages": [],
+          "anchor": {
+            "anchor_type": "text",
+            "bounded_quote": "第三节 管理层讨论与分析\n一、经营情况讨论与分析\n2024年，中国联通聚焦联网通信和算网数智两大主业，推进网络向新、技术向新、服务向新，高\n质量发展取得新突破。\n整体业绩\n2024年，中国联通营业收入稳健增长，达到人民币3,896亿元、同比提升4.6%，增速领先行业。联\n网通信1,2业务收入占服务收入76%、同比提升1.5%。算网数智3业务收入占服务收入24%、同比提升\n9.6%。盈利能力持续提升，本公司利润总额251亿元，归属于母公司净利润达到人民币90亿元、同\n比提升10.5%，加权平均净资产收益率提升至5.5%。\n公司高度重视股东回报，致力于和股东分享发展红利，鉴于过去一年良好的业绩表现，董事会建\n议派发每股末期股息4人民币元0.0621元（含税），连同已派发的中期股息每股人民币0.0959元（含\n税），全年股息合计每股人民币0.1580元（含税），同比增长19.7%。\n联网通信稳盘托底。用户规模再创新高，移动和宽带用户数达到4.7亿、净增1,952万；物联网连\n接数超过6.2亿、净增1.3亿；车联网连接数达到7,600万、保持行业第一；格物工业互联网平台纳\n管设备超过1,200万、占全国的1/8。\n算网数智扩盘提质。联通云收入5人民币686亿元、同比提升17.1%，数据中心收入人民币259亿元、\n同比提升7.4%。智算业务驱动算力服务强劲增长，去年签约金额超过人民币260亿元。\n网络向新\n公司构建高速泛在、算网融合、绿色低碳的新型基础设施，提升网络智能化水平，夯实高质量发\n展基础。公司坚持精准适度的投资策略，全面深化共建共享，全网推进智能运营，全力打造极简\n网络，实现联网算网协调发展、国内国际协同布局。\n2024年，公司资本开支人民币613.7亿元、同比下降17%，其中，算力投资同比上升19%；网络质量\n更好、效能更高。移动网络人口覆盖率达到99%，提升近1个百分点、惠及千万用户，宽带网络端\n口数同比提升5%、惠及千万家庭。设备集约、AI赋能成效明显，年化节省OPEX人民币19亿元，每\n单位业务能耗下降10%。\n推进移动和宽带网络提能升级，覆盖更广、体验更好。移动网络基站数超过450万，高铁、地铁、\n热门景点、密集小区等重点场景的网络覆盖更加深入；加快5G-A规模商用，在300个城市部署载波\n聚合，实现下行万兆、上行千兆的超高速率，在150个城市升级RedCap，实现全频段、全制式应用。\n宽带网络端口数2.8亿，10G PON端口占比超过80%，支持千兆宽带用户快速增长；加快建设万兆光\n网，助力北京、天津、上海、广州、深圳等率先打造双万兆城市。\n丰富算力和算网创新供给，规模更大、能力更强。加快推进IDC向AIDC、通算向智算升级，在上海、\n广东、香港和内蒙、宁夏、贵州等地建设大规模智算中心，建成300多个训推一体的算力资源池，\n智算规模超过17E FLOPS，更好满足人工智能训练和推理需求。建成算力智联网AINet，实现8个国\n家算力枢纽和22个省级骨干节点的全覆盖；升级联通云“星罗”算力调度平台，提升全域智能调\n10",
+            "context_before": null,
+            "context_after": null,
+            "match_index": 0
+          }
+        }
+      ],
+      "after_evidence": [
+        {
+          "evidence_id": "core-ev-4e042f5c6f5f27e7",
+          "report": {
+            "instrument_id": "600050.SH",
+            "report_id": "asset_4b366497ffb0e433e7e8061133f25a94",
+            "document_version": "7042aab8d1bd3b1583c216e7757d107c7db627d5284854eb18def52434c44d8b",
+            "report_period": "2024-12-31",
+            "published_at": "2025-03-18T16:00:00+00:00",
+            "document_type": "annual_report"
+          },
+          "page": 10,
+          "printed_page_label": null,
+          "section_title": "经营正文收入",
+          "continuation_pages": [],
+          "subject_evidence_pages": [],
+          "anchor": {
+            "anchor_type": "text",
+            "bounded_quote": "联通云收入5人民币686亿元、同比提升17.1%，数据中心收入人民币259亿元、\n同比提升7.4%。",
+            "context_before": null,
+            "context_after": null,
+            "match_index": 0
+          }
+        }
+      ]
+    },
+    {
+      "instrument_id": "600050.SH",
+      "record_id": "owned:core-ev-3ea74c965f6c3a25:Segment:business_segment:智能服务:经营业务/本期收入:row:0",
+      "predecessor_record_id": "owned:core-ev-945700fefbeab311:Segment:business_segment:智能服务:经营业务/本期收入:row:0",
+      "name": "智能服务",
+      "object_type": "Segment",
+      "changed_fields": [
+        "evidence",
+        "record_id"
+      ],
+      "before_scope": "consolidated_group",
+      "after_scope": "consolidated_group",
+      "before_evidence": [
+        {
+          "evidence_id": "core-ev-945700fefbeab311",
+          "report": {
+            "instrument_id": "600050.SH",
+            "report_id": "asset_4b366497ffb0e433e7e8061133f25a94",
+            "document_version": "7042aab8d1bd3b1583c216e7757d107c7db627d5284854eb18def52434c44d8b",
+            "report_period": "2024-12-31",
+            "published_at": "2025-03-18T16:00:00+00:00",
+            "document_type": "annual_report"
+          },
+          "page": 12,
+          "printed_page_label": null,
+          "section_title": "经营正文收入",
+          "continuation_pages": [],
+          "subject_evidence_pages": [],
+          "anchor": {
+            "anchor_type": "text",
+            "bounded_quote": "联通作为哈尔滨亚冬会通信和云服务官方合作伙伴，实现了5G-A网络和高清云转播的融合创新，\n助力云上亚冬、科技亚冬。特别是今年全国两会，联通元景MaaS平台融合推理能力和安全技术，\n以5G富媒体和AI智能体，展现了数字技术和媒体传播融合创新的巨大潜力。\n数据智能应用规模突破。公司聚焦工业互联网，发挥5G专网和格物平台优势，融合工业大数据、\n工业大模型，有效赋能设计仿真、控制优化和预测性维护等生产场景，累计实施超过2.9万个工业\n互联网项目、落地7,100余家5G工厂，实现服务能力和市场地位领先。聚焦服务数字政府，完善政\n务网、政务云、政务大数据、政务智能应用的一体化能力，服务热线智能化升级、城市智能化治\n理等领域，助力政府数字化能力提升。智能服务收入达到人民币71亿元，同比提升26.5%。数据服\n务收入达到人民币64亿元，同比提升20.8%。\n国际品牌全面焕新。2024年国际业务提速发展，收入达到人民币125亿元，同比提升15.2%。在沙\n特、秘鲁、阿联酋、乌兹别克斯坦等地增设分支机构，更好服务亿万客户全球漫游和数字化需求。\n尤其是发挥车联网的全球一体化运营优势，服务中国头部车企出海，助力智能网联新能源汽车产\n业发展。去年12月，公司发布了国际品牌UniCom，进一步加快国际化发展步伐，提升全球化经营\n水平。\n社会责任和公司治理\n公司积极履行企业ESG责任。\n践行绿色理念。发布绿色行动计划，深化网络节能，探索算电协同，引入清洁能源，获评22个国\n家级绿色数据中心。\n服务民生保障。升级“联通数村”平台，服务26万个行政村和2.8亿农村用户，助力乡村全面振\n兴。深入推进电信普遍服务，助力跨越数字鸿沟，在8,000家营业厅设立智慧助老中心。\n完善企业治理。实施数智强企，推进公司管理、运营、服务的智能化升级。积极承担上市公司责\n任，制定市值管理制度，开展各类投资者交流活动160余场，上市公司形象更加公开、透明、可\n信。公司荣获多项嘉许，包括于2024年《财富全球500强企业》中排名第279位；《福布斯全球上\n市公司2000强》中排名第299位；连续入选中国上市公司协会“公司治理最佳实践案例”“董事会\n最佳实践案例”“投资者关系管理最佳实践案例”“业绩说明会最佳实践案例”等荣誉，控股子\n公司联通红筹公司被《机构投资者》(Institutional Investor)评为“亚洲最受尊崇电信企业”。\n未来展望\n过去一年，公司拥抱智能、向新前行，全力以赴强能力、调结构、提质量、增效益，经营发展迈\n上新台阶。2025年，公司营收、利润及净资产收益率实现有力增长。预计固定资产投资在人民币\n550亿元左右，其中算力投资同比增长28%；此外，我们为人工智能重点基础设施和重大工程专项\n作了特别预算安排；公司将深入实施融合创新战略，持续推进“三个向新”，着力实现创新动力\n更足、能力优势更强、业务结构更优、经营效益更好、品牌形象卓著。\n注1：联网通信业务包含移动联网、宽带联网、电视联网、专线联网、通信业务及信息业务等六项。\n12",
+            "context_before": null,
+            "context_after": null,
+            "match_index": 0
+          }
+        }
+      ],
+      "after_evidence": [
+        {
+          "evidence_id": "core-ev-3ea74c965f6c3a25",
+          "report": {
+            "instrument_id": "600050.SH",
+            "report_id": "asset_4b366497ffb0e433e7e8061133f25a94",
+            "document_version": "7042aab8d1bd3b1583c216e7757d107c7db627d5284854eb18def52434c44d8b",
+            "report_period": "2024-12-31",
+            "published_at": "2025-03-18T16:00:00+00:00",
+            "document_type": "annual_report"
+          },
+          "page": 12,
+          "printed_page_label": null,
+          "section_title": "经营正文收入",
+          "continuation_pages": [],
+          "subject_evidence_pages": [],
+          "anchor": {
+            "anchor_type": "text",
+            "bounded_quote": "智能服务收入达到人民币71亿元，同比提升26.5%。",
+            "context_before": null,
+            "context_after": null,
+            "match_index": 0
+          }
+        }
+      ]
+    },
+    {
+      "instrument_id": "600050.SH",
+      "record_id": "owned:core-ev-cf05b05c7190bae6:Measurement:business_segment:智能服务:经营业务/本期收入:row:0",
+      "predecessor_record_id": "owned:core-ev-4fd340b523befc39:Measurement:business_segment:智能服务:经营业务/本期收入:row:0",
+      "name": "智能服务",
+      "object_type": "Measurement",
+      "changed_fields": [
+        "evidence",
+        "record_id"
+      ],
+      "before_scope": "consolidated_group",
+      "after_scope": "consolidated_group",
+      "before_evidence": [
+        {
+          "evidence_id": "core-ev-4fd340b523befc39",
+          "report": {
+            "instrument_id": "600050.SH",
+            "report_id": "asset_4b366497ffb0e433e7e8061133f25a94",
+            "document_version": "7042aab8d1bd3b1583c216e7757d107c7db627d5284854eb18def52434c44d8b",
+            "report_period": "2024-12-31",
+            "published_at": "2025-03-18T16:00:00+00:00",
+            "document_type": "annual_report"
+          },
+          "page": 12,
+          "printed_page_label": null,
+          "section_title": "经营正文收入",
+          "continuation_pages": [],
+          "subject_evidence_pages": [],
+          "anchor": {
+            "anchor_type": "text",
+            "bounded_quote": "联通作为哈尔滨亚冬会通信和云服务官方合作伙伴，实现了5G-A网络和高清云转播的融合创新，\n助力云上亚冬、科技亚冬。特别是今年全国两会，联通元景MaaS平台融合推理能力和安全技术，\n以5G富媒体和AI智能体，展现了数字技术和媒体传播融合创新的巨大潜力。\n数据智能应用规模突破。公司聚焦工业互联网，发挥5G专网和格物平台优势，融合工业大数据、\n工业大模型，有效赋能设计仿真、控制优化和预测性维护等生产场景，累计实施超过2.9万个工业\n互联网项目、落地7,100余家5G工厂，实现服务能力和市场地位领先。聚焦服务数字政府，完善政\n务网、政务云、政务大数据、政务智能应用的一体化能力，服务热线智能化升级、城市智能化治\n理等领域，助力政府数字化能力提升。智能服务收入达到人民币71亿元，同比提升26.5%。数据服\n务收入达到人民币64亿元，同比提升20.8%。\n国际品牌全面焕新。2024年国际业务提速发展，收入达到人民币125亿元，同比提升15.2%。在沙\n特、秘鲁、阿联酋、乌兹别克斯坦等地增设分支机构，更好服务亿万客户全球漫游和数字化需求。\n尤其是发挥车联网的全球一体化运营优势，服务中国头部车企出海，助力智能网联新能源汽车产\n业发展。去年12月，公司发布了国际品牌UniCom，进一步加快国际化发展步伐，提升全球化经营\n水平。\n社会责任和公司治理\n公司积极履行企业ESG责任。\n践行绿色理念。发布绿色行动计划，深化网络节能，探索算电协同，引入清洁能源，获评22个国\n家级绿色数据中心。\n服务民生保障。升级“联通数村”平台，服务26万个行政村和2.8亿农村用户，助力乡村全面振\n兴。深入推进电信普遍服务，助力跨越数字鸿沟，在8,000家营业厅设立智慧助老中心。\n完善企业治理。实施数智强企，推进公司管理、运营、服务的智能化升级。积极承担上市公司责\n任，制定市值管理制度，开展各类投资者交流活动160余场，上市公司形象更加公开、透明、可\n信。公司荣获多项嘉许，包括于2024年《财富全球500强企业》中排名第279位；《福布斯全球上\n市公司2000强》中排名第299位；连续入选中国上市公司协会“公司治理最佳实践案例”“董事会\n最佳实践案例”“投资者关系管理最佳实践案例”“业绩说明会最佳实践案例”等荣誉，控股子\n公司联通红筹公司被《机构投资者》(Institutional Investor)评为“亚洲最受尊崇电信企业”。\n未来展望\n过去一年，公司拥抱智能、向新前行，全力以赴强能力、调结构、提质量、增效益，经营发展迈\n上新台阶。2025年，公司营收、利润及净资产收益率实现有力增长。预计固定资产投资在人民币\n550亿元左右，其中算力投资同比增长28%；此外，我们为人工智能重点基础设施和重大工程专项\n作了特别预算安排；公司将深入实施融合创新战略，持续推进“三个向新”，着力实现创新动力\n更足、能力优势更强、业务结构更优、经营效益更好、品牌形象卓著。\n注1：联网通信业务包含移动联网、宽带联网、电视联网、专线联网、通信业务及信息业务等六项。\n12",
+            "context_before": null,
+            "context_after": null,
+            "match_index": 0
+          }
+        }
+      ],
+      "after_evidence": [
+        {
+          "evidence_id": "core-ev-cf05b05c7190bae6",
+          "report": {
+            "instrument_id": "600050.SH",
+            "report_id": "asset_4b366497ffb0e433e7e8061133f25a94",
+            "document_version": "7042aab8d1bd3b1583c216e7757d107c7db627d5284854eb18def52434c44d8b",
+            "report_period": "2024-12-31",
+            "published_at": "2025-03-18T16:00:00+00:00",
+            "document_type": "annual_report"
+          },
+          "page": 12,
+          "printed_page_label": null,
+          "section_title": "经营正文收入",
+          "continuation_pages": [],
+          "subject_evidence_pages": [],
+          "anchor": {
+            "anchor_type": "text",
+            "bounded_quote": "智能服务收入达到人民币71亿元，同比提升26.5%。",
+            "context_before": null,
+            "context_after": null,
+            "match_index": 0
+          }
+        }
+      ]
+    },
+    {
+      "instrument_id": "600050.SH",
+      "record_id": "owned:core-ev-c18bfb054b28b560:Measurement:business_segment:数据服务:经营业务/本期收入:row:0",
+      "predecessor_record_id": "owned:core-ev-4fd340b523befc39:Measurement:business_segment:数据服务:经营业务/本期收入:row:1",
+      "name": "数据服务",
+      "object_type": "Measurement",
+      "changed_fields": [
+        "evidence",
+        "record_id"
+      ],
+      "before_scope": "consolidated_group",
+      "after_scope": "consolidated_group",
+      "before_evidence": [
+        {
+          "evidence_id": "core-ev-4fd340b523befc39",
+          "report": {
+            "instrument_id": "600050.SH",
+            "report_id": "asset_4b366497ffb0e433e7e8061133f25a94",
+            "document_version": "7042aab8d1bd3b1583c216e7757d107c7db627d5284854eb18def52434c44d8b",
+            "report_period": "2024-12-31",
+            "published_at": "2025-03-18T16:00:00+00:00",
+            "document_type": "annual_report"
+          },
+          "page": 12,
+          "printed_page_label": null,
+          "section_title": "经营正文收入",
+          "continuation_pages": [],
+          "subject_evidence_pages": [],
+          "anchor": {
+            "anchor_type": "text",
+            "bounded_quote": "联通作为哈尔滨亚冬会通信和云服务官方合作伙伴，实现了5G-A网络和高清云转播的融合创新，\n助力云上亚冬、科技亚冬。特别是今年全国两会，联通元景MaaS平台融合推理能力和安全技术，\n以5G富媒体和AI智能体，展现了数字技术和媒体传播融合创新的巨大潜力。\n数据智能应用规模突破。公司聚焦工业互联网，发挥5G专网和格物平台优势，融合工业大数据、\n工业大模型，有效赋能设计仿真、控制优化和预测性维护等生产场景，累计实施超过2.9万个工业\n互联网项目、落地7,100余家5G工厂，实现服务能力和市场地位领先。聚焦服务数字政府，完善政\n务网、政务云、政务大数据、政务智能应用的一体化能力，服务热线智能化升级、城市智能化治\n理等领域，助力政府数字化能力提升。智能服务收入达到人民币71亿元，同比提升26.5%。数据服\n务收入达到人民币64亿元，同比提升20.8%。\n国际品牌全面焕新。2024年国际业务提速发展，收入达到人民币125亿元，同比提升15.2%。在沙\n特、秘鲁、阿联酋、乌兹别克斯坦等地增设分支机构，更好服务亿万客户全球漫游和数字化需求。\n尤其是发挥车联网的全球一体化运营优势，服务中国头部车企出海，助力智能网联新能源汽车产\n业发展。去年12月，公司发布了国际品牌UniCom，进一步加快国际化发展步伐，提升全球化经营\n水平。\n社会责任和公司治理\n公司积极履行企业ESG责任。\n践行绿色理念。发布绿色行动计划，深化网络节能，探索算电协同，引入清洁能源，获评22个国\n家级绿色数据中心。\n服务民生保障。升级“联通数村”平台，服务26万个行政村和2.8亿农村用户，助力乡村全面振\n兴。深入推进电信普遍服务，助力跨越数字鸿沟，在8,000家营业厅设立智慧助老中心。\n完善企业治理。实施数智强企，推进公司管理、运营、服务的智能化升级。积极承担上市公司责\n任，制定市值管理制度，开展各类投资者交流活动160余场，上市公司形象更加公开、透明、可\n信。公司荣获多项嘉许，包括于2024年《财富全球500强企业》中排名第279位；《福布斯全球上\n市公司2000强》中排名第299位；连续入选中国上市公司协会“公司治理最佳实践案例”“董事会\n最佳实践案例”“投资者关系管理最佳实践案例”“业绩说明会最佳实践案例”等荣誉，控股子\n公司联通红筹公司被《机构投资者》(Institutional Investor)评为“亚洲最受尊崇电信企业”。\n未来展望\n过去一年，公司拥抱智能、向新前行，全力以赴强能力、调结构、提质量、增效益，经营发展迈\n上新台阶。2025年，公司营收、利润及净资产收益率实现有力增长。预计固定资产投资在人民币\n550亿元左右，其中算力投资同比增长28%；此外，我们为人工智能重点基础设施和重大工程专项\n作了特别预算安排；公司将深入实施融合创新战略，持续推进“三个向新”，着力实现创新动力\n更足、能力优势更强、业务结构更优、经营效益更好、品牌形象卓著。\n注1：联网通信业务包含移动联网、宽带联网、电视联网、专线联网、通信业务及信息业务等六项。\n12",
+            "context_before": null,
+            "context_after": null,
+            "match_index": 0
+          }
+        }
+      ],
+      "after_evidence": [
+        {
+          "evidence_id": "core-ev-c18bfb054b28b560",
+          "report": {
+            "instrument_id": "600050.SH",
+            "report_id": "asset_4b366497ffb0e433e7e8061133f25a94",
+            "document_version": "7042aab8d1bd3b1583c216e7757d107c7db627d5284854eb18def52434c44d8b",
+            "report_period": "2024-12-31",
+            "published_at": "2025-03-18T16:00:00+00:00",
+            "document_type": "annual_report"
+          },
+          "page": 12,
+          "printed_page_label": null,
+          "section_title": "经营正文收入",
+          "continuation_pages": [],
+          "subject_evidence_pages": [],
+          "anchor": {
+            "anchor_type": "text",
+            "bounded_quote": "数据服\n务收入达到人民币64亿元，同比提升20.8%。",
+            "context_before": null,
+            "context_after": null,
+            "match_index": 0
+          }
+        }
+      ]
+    },
+    {
+      "instrument_id": "600050.SH",
+      "record_id": "owned:core-ev-a2d4c60b55ed4668:Segment:business_segment:数据中心:经营业务/本期收入:row:1",
+      "predecessor_record_id": "owned:core-ev-1f634291004ec5fe:Segment:business_segment:数据中心:经营业务/本期收入:row:1",
+      "name": "数据中心",
+      "object_type": "Segment",
+      "changed_fields": [
+        "evidence",
+        "record_id",
+        "subject_basis",
+        "subject_scope"
+      ],
+      "before_scope": "unclear",
+      "after_scope": "consolidated_group",
+      "before_evidence": [
+        {
+          "evidence_id": "core-ev-1f634291004ec5fe",
+          "report": {
+            "instrument_id": "600050.SH",
+            "report_id": "asset_4b366497ffb0e433e7e8061133f25a94",
+            "document_version": "7042aab8d1bd3b1583c216e7757d107c7db627d5284854eb18def52434c44d8b",
+            "report_period": "2024-12-31",
+            "published_at": "2025-03-18T16:00:00+00:00",
+            "document_type": "annual_report"
+          },
+          "page": 10,
+          "printed_page_label": null,
+          "section_title": "经营正文收入",
+          "continuation_pages": [],
+          "subject_evidence_pages": [],
+          "anchor": {
+            "anchor_type": "text",
+            "bounded_quote": "第三节 管理层讨论与分析\n一、经营情况讨论与分析\n2024年，中国联通聚焦联网通信和算网数智两大主业，推进网络向新、技术向新、服务向新，高\n质量发展取得新突破。\n整体业绩\n2024年，中国联通营业收入稳健增长，达到人民币3,896亿元、同比提升4.6%，增速领先行业。联\n网通信1,2业务收入占服务收入76%、同比提升1.5%。算网数智3业务收入占服务收入24%、同比提升\n9.6%。盈利能力持续提升，本公司利润总额251亿元，归属于母公司净利润达到人民币90亿元、同\n比提升10.5%，加权平均净资产收益率提升至5.5%。\n公司高度重视股东回报，致力于和股东分享发展红利，鉴于过去一年良好的业绩表现，董事会建\n议派发每股末期股息4人民币元0.0621元（含税），连同已派发的中期股息每股人民币0.0959元（含\n税），全年股息合计每股人民币0.1580元（含税），同比增长19.7%。\n联网通信稳盘托底。用户规模再创新高，移动和宽带用户数达到4.7亿、净增1,952万；物联网连\n接数超过6.2亿、净增1.3亿；车联网连接数达到7,600万、保持行业第一；格物工业互联网平台纳\n管设备超过1,200万、占全国的1/8。\n算网数智扩盘提质。联通云收入5人民币686亿元、同比提升17.1%，数据中心收入人民币259亿元、\n同比提升7.4%。智算业务驱动算力服务强劲增长，去年签约金额超过人民币260亿元。\n网络向新\n公司构建高速泛在、算网融合、绿色低碳的新型基础设施，提升网络智能化水平，夯实高质量发\n展基础。公司坚持精准适度的投资策略，全面深化共建共享，全网推进智能运营，全力打造极简\n网络，实现联网算网协调发展、国内国际协同布局。\n2024年，公司资本开支人民币613.7亿元、同比下降17%，其中，算力投资同比上升19%；网络质量\n更好、效能更高。移动网络人口覆盖率达到99%，提升近1个百分点、惠及千万用户，宽带网络端\n口数同比提升5%、惠及千万家庭。设备集约、AI赋能成效明显，年化节省OPEX人民币19亿元，每\n单位业务能耗下降10%。\n推进移动和宽带网络提能升级，覆盖更广、体验更好。移动网络基站数超过450万，高铁、地铁、\n热门景点、密集小区等重点场景的网络覆盖更加深入；加快5G-A规模商用，在300个城市部署载波\n聚合，实现下行万兆、上行千兆的超高速率，在150个城市升级RedCap，实现全频段、全制式应用。\n宽带网络端口数2.8亿，10G PON端口占比超过80%，支持千兆宽带用户快速增长；加快建设万兆光\n网，助力北京、天津、上海、广州、深圳等率先打造双万兆城市。\n丰富算力和算网创新供给，规模更大、能力更强。加快推进IDC向AIDC、通算向智算升级，在上海、\n广东、香港和内蒙、宁夏、贵州等地建设大规模智算中心，建成300多个训推一体的算力资源池，\n智算规模超过17E FLOPS，更好满足人工智能训练和推理需求。建成算力智联网AINet，实现8个国\n家算力枢纽和22个省级骨干节点的全覆盖；升级联通云“星罗”算力调度平台，提升全域智能调\n10",
+            "context_before": null,
+            "context_after": null,
+            "match_index": 0
+          }
+        }
+      ],
+      "after_evidence": [
+        {
+          "evidence_id": "core-ev-a2d4c60b55ed4668",
+          "report": {
+            "instrument_id": "600050.SH",
+            "report_id": "asset_4b366497ffb0e433e7e8061133f25a94",
+            "document_version": "7042aab8d1bd3b1583c216e7757d107c7db627d5284854eb18def52434c44d8b",
+            "report_period": "2024-12-31",
+            "published_at": "2025-03-18T16:00:00+00:00",
+            "document_type": "annual_report"
+          },
+          "page": 10,
+          "printed_page_label": null,
+          "section_title": "经营正文收入",
+          "continuation_pages": [],
+          "subject_evidence_pages": [],
+          "anchor": {
+            "anchor_type": "text",
+            "bounded_quote": "联通云收入5人民币686亿元、同比提升17.1%，数据中心收入人民币259亿元、\n同比提升7.4%。",
+            "context_before": null,
+            "context_after": null,
+            "match_index": 0
+          }
+        }
+      ]
+    },
+    {
+      "instrument_id": "600050.SH",
+      "record_id": "owned:core-ev-3672b16a65365bd0:Measurement:business_segment:国际业务:经营业务/本期收入:row:0",
+      "predecessor_record_id": "owned:core-ev-4fd340b523befc39:Measurement:business_segment:国际业务:经营业务/本期收入:row:2",
+      "name": "国际业务",
+      "object_type": "Measurement",
+      "changed_fields": [
+        "evidence",
+        "record_id"
+      ],
+      "before_scope": "consolidated_group",
+      "after_scope": "consolidated_group",
+      "before_evidence": [
+        {
+          "evidence_id": "core-ev-4fd340b523befc39",
+          "report": {
+            "instrument_id": "600050.SH",
+            "report_id": "asset_4b366497ffb0e433e7e8061133f25a94",
+            "document_version": "7042aab8d1bd3b1583c216e7757d107c7db627d5284854eb18def52434c44d8b",
+            "report_period": "2024-12-31",
+            "published_at": "2025-03-18T16:00:00+00:00",
+            "document_type": "annual_report"
+          },
+          "page": 12,
+          "printed_page_label": null,
+          "section_title": "经营正文收入",
+          "continuation_pages": [],
+          "subject_evidence_pages": [],
+          "anchor": {
+            "anchor_type": "text",
+            "bounded_quote": "联通作为哈尔滨亚冬会通信和云服务官方合作伙伴，实现了5G-A网络和高清云转播的融合创新，\n助力云上亚冬、科技亚冬。特别是今年全国两会，联通元景MaaS平台融合推理能力和安全技术，\n以5G富媒体和AI智能体，展现了数字技术和媒体传播融合创新的巨大潜力。\n数据智能应用规模突破。公司聚焦工业互联网，发挥5G专网和格物平台优势，融合工业大数据、\n工业大模型，有效赋能设计仿真、控制优化和预测性维护等生产场景，累计实施超过2.9万个工业\n互联网项目、落地7,100余家5G工厂，实现服务能力和市场地位领先。聚焦服务数字政府，完善政\n务网、政务云、政务大数据、政务智能应用的一体化能力，服务热线智能化升级、城市智能化治\n理等领域，助力政府数字化能力提升。智能服务收入达到人民币71亿元，同比提升26.5%。数据服\n务收入达到人民币64亿元，同比提升20.8%。\n国际品牌全面焕新。2024年国际业务提速发展，收入达到人民币125亿元，同比提升15.2%。在沙\n特、秘鲁、阿联酋、乌兹别克斯坦等地增设分支机构，更好服务亿万客户全球漫游和数字化需求。\n尤其是发挥车联网的全球一体化运营优势，服务中国头部车企出海，助力智能网联新能源汽车产\n业发展。去年12月，公司发布了国际品牌UniCom，进一步加快国际化发展步伐，提升全球化经营\n水平。\n社会责任和公司治理\n公司积极履行企业ESG责任。\n践行绿色理念。发布绿色行动计划，深化网络节能，探索算电协同，引入清洁能源，获评22个国\n家级绿色数据中心。\n服务民生保障。升级“联通数村”平台，服务26万个行政村和2.8亿农村用户，助力乡村全面振\n兴。深入推进电信普遍服务，助力跨越数字鸿沟，在8,000家营业厅设立智慧助老中心。\n完善企业治理。实施数智强企，推进公司管理、运营、服务的智能化升级。积极承担上市公司责\n任，制定市值管理制度，开展各类投资者交流活动160余场，上市公司形象更加公开、透明、可\n信。公司荣获多项嘉许，包括于2024年《财富全球500强企业》中排名第279位；《福布斯全球上\n市公司2000强》中排名第299位；连续入选中国上市公司协会“公司治理最佳实践案例”“董事会\n最佳实践案例”“投资者关系管理最佳实践案例”“业绩说明会最佳实践案例”等荣誉，控股子\n公司联通红筹公司被《机构投资者》(Institutional Investor)评为“亚洲最受尊崇电信企业”。\n未来展望\n过去一年，公司拥抱智能、向新前行，全力以赴强能力、调结构、提质量、增效益，经营发展迈\n上新台阶。2025年，公司营收、利润及净资产收益率实现有力增长。预计固定资产投资在人民币\n550亿元左右，其中算力投资同比增长28%；此外，我们为人工智能重点基础设施和重大工程专项\n作了特别预算安排；公司将深入实施融合创新战略，持续推进“三个向新”，着力实现创新动力\n更足、能力优势更强、业务结构更优、经营效益更好、品牌形象卓著。\n注1：联网通信业务包含移动联网、宽带联网、电视联网、专线联网、通信业务及信息业务等六项。\n12",
+            "context_before": null,
+            "context_after": null,
+            "match_index": 0
+          }
+        }
+      ],
+      "after_evidence": [
+        {
+          "evidence_id": "core-ev-3672b16a65365bd0",
+          "report": {
+            "instrument_id": "600050.SH",
+            "report_id": "asset_4b366497ffb0e433e7e8061133f25a94",
+            "document_version": "7042aab8d1bd3b1583c216e7757d107c7db627d5284854eb18def52434c44d8b",
+            "report_period": "2024-12-31",
+            "published_at": "2025-03-18T16:00:00+00:00",
+            "document_type": "annual_report"
+          },
+          "page": 12,
+          "printed_page_label": null,
+          "section_title": "经营正文收入",
+          "continuation_pages": [],
+          "subject_evidence_pages": [],
+          "anchor": {
+            "anchor_type": "text",
+            "bounded_quote": "2024年国际业务提速发展，收入达到人民币125亿元，同比提升15.2%。",
+            "context_before": null,
+            "context_after": null,
+            "match_index": 0
+          }
+        }
+      ]
+    },
+    {
+      "instrument_id": "600050.SH",
+      "record_id": "owned:core-ev-4fb2f53d755ceea8:Segment:business_segment:数据服务:经营业务/本期收入:row:0",
+      "predecessor_record_id": "owned:core-ev-945700fefbeab311:Segment:business_segment:数据服务:经营业务/本期收入:row:1",
+      "name": "数据服务",
+      "object_type": "Segment",
+      "changed_fields": [
+        "evidence",
+        "record_id"
+      ],
+      "before_scope": "consolidated_group",
+      "after_scope": "consolidated_group",
+      "before_evidence": [
+        {
+          "evidence_id": "core-ev-945700fefbeab311",
+          "report": {
+            "instrument_id": "600050.SH",
+            "report_id": "asset_4b366497ffb0e433e7e8061133f25a94",
+            "document_version": "7042aab8d1bd3b1583c216e7757d107c7db627d5284854eb18def52434c44d8b",
+            "report_period": "2024-12-31",
+            "published_at": "2025-03-18T16:00:00+00:00",
+            "document_type": "annual_report"
+          },
+          "page": 12,
+          "printed_page_label": null,
+          "section_title": "经营正文收入",
+          "continuation_pages": [],
+          "subject_evidence_pages": [],
+          "anchor": {
+            "anchor_type": "text",
+            "bounded_quote": "联通作为哈尔滨亚冬会通信和云服务官方合作伙伴，实现了5G-A网络和高清云转播的融合创新，\n助力云上亚冬、科技亚冬。特别是今年全国两会，联通元景MaaS平台融合推理能力和安全技术，\n以5G富媒体和AI智能体，展现了数字技术和媒体传播融合创新的巨大潜力。\n数据智能应用规模突破。公司聚焦工业互联网，发挥5G专网和格物平台优势，融合工业大数据、\n工业大模型，有效赋能设计仿真、控制优化和预测性维护等生产场景，累计实施超过2.9万个工业\n互联网项目、落地7,100余家5G工厂，实现服务能力和市场地位领先。聚焦服务数字政府，完善政\n务网、政务云、政务大数据、政务智能应用的一体化能力，服务热线智能化升级、城市智能化治\n理等领域，助力政府数字化能力提升。智能服务收入达到人民币71亿元，同比提升26.5%。数据服\n务收入达到人民币64亿元，同比提升20.8%。\n国际品牌全面焕新。2024年国际业务提速发展，收入达到人民币125亿元，同比提升15.2%。在沙\n特、秘鲁、阿联酋、乌兹别克斯坦等地增设分支机构，更好服务亿万客户全球漫游和数字化需求。\n尤其是发挥车联网的全球一体化运营优势，服务中国头部车企出海，助力智能网联新能源汽车产\n业发展。去年12月，公司发布了国际品牌UniCom，进一步加快国际化发展步伐，提升全球化经营\n水平。\n社会责任和公司治理\n公司积极履行企业ESG责任。\n践行绿色理念。发布绿色行动计划，深化网络节能，探索算电协同，引入清洁能源，获评22个国\n家级绿色数据中心。\n服务民生保障。升级“联通数村”平台，服务26万个行政村和2.8亿农村用户，助力乡村全面振\n兴。深入推进电信普遍服务，助力跨越数字鸿沟，在8,000家营业厅设立智慧助老中心。\n完善企业治理。实施数智强企，推进公司管理、运营、服务的智能化升级。积极承担上市公司责\n任，制定市值管理制度，开展各类投资者交流活动160余场，上市公司形象更加公开、透明、可\n信。公司荣获多项嘉许，包括于2024年《财富全球500强企业》中排名第279位；《福布斯全球上\n市公司2000强》中排名第299位；连续入选中国上市公司协会“公司治理最佳实践案例”“董事会\n最佳实践案例”“投资者关系管理最佳实践案例”“业绩说明会最佳实践案例”等荣誉，控股子\n公司联通红筹公司被《机构投资者》(Institutional Investor)评为“亚洲最受尊崇电信企业”。\n未来展望\n过去一年，公司拥抱智能、向新前行，全力以赴强能力、调结构、提质量、增效益，经营发展迈\n上新台阶。2025年，公司营收、利润及净资产收益率实现有力增长。预计固定资产投资在人民币\n550亿元左右，其中算力投资同比增长28%；此外，我们为人工智能重点基础设施和重大工程专项\n作了特别预算安排；公司将深入实施融合创新战略，持续推进“三个向新”，着力实现创新动力\n更足、能力优势更强、业务结构更优、经营效益更好、品牌形象卓著。\n注1：联网通信业务包含移动联网、宽带联网、电视联网、专线联网、通信业务及信息业务等六项。\n12",
+            "context_before": null,
+            "context_after": null,
+            "match_index": 0
+          }
+        }
+      ],
+      "after_evidence": [
+        {
+          "evidence_id": "core-ev-4fb2f53d755ceea8",
+          "report": {
+            "instrument_id": "600050.SH",
+            "report_id": "asset_4b366497ffb0e433e7e8061133f25a94",
+            "document_version": "7042aab8d1bd3b1583c216e7757d107c7db627d5284854eb18def52434c44d8b",
+            "report_period": "2024-12-31",
+            "published_at": "2025-03-18T16:00:00+00:00",
+            "document_type": "annual_report"
+          },
+          "page": 12,
+          "printed_page_label": null,
+          "section_title": "经营正文收入",
+          "continuation_pages": [],
+          "subject_evidence_pages": [],
+          "anchor": {
+            "anchor_type": "text",
+            "bounded_quote": "数据服\n务收入达到人民币64亿元，同比提升20.8%。",
+            "context_before": null,
+            "context_after": null,
+            "match_index": 0
+          }
+        }
+      ]
+    },
+    {
+      "instrument_id": "600050.SH",
+      "record_id": "owned:core-ev-a2d4c60b55ed4668:Segment:business_segment:联通云:经营业务/本期收入:row:0",
+      "predecessor_record_id": "owned:core-ev-1f634291004ec5fe:Segment:business_segment:联通云:经营业务/本期收入:row:0",
+      "name": "联通云",
+      "object_type": "Segment",
+      "changed_fields": [
+        "evidence",
+        "record_id",
+        "subject_basis",
+        "subject_scope"
+      ],
+      "before_scope": "unclear",
+      "after_scope": "consolidated_group",
+      "before_evidence": [
+        {
+          "evidence_id": "core-ev-1f634291004ec5fe",
+          "report": {
+            "instrument_id": "600050.SH",
+            "report_id": "asset_4b366497ffb0e433e7e8061133f25a94",
+            "document_version": "7042aab8d1bd3b1583c216e7757d107c7db627d5284854eb18def52434c44d8b",
+            "report_period": "2024-12-31",
+            "published_at": "2025-03-18T16:00:00+00:00",
+            "document_type": "annual_report"
+          },
+          "page": 10,
+          "printed_page_label": null,
+          "section_title": "经营正文收入",
+          "continuation_pages": [],
+          "subject_evidence_pages": [],
+          "anchor": {
+            "anchor_type": "text",
+            "bounded_quote": "第三节 管理层讨论与分析\n一、经营情况讨论与分析\n2024年，中国联通聚焦联网通信和算网数智两大主业，推进网络向新、技术向新、服务向新，高\n质量发展取得新突破。\n整体业绩\n2024年，中国联通营业收入稳健增长，达到人民币3,896亿元、同比提升4.6%，增速领先行业。联\n网通信1,2业务收入占服务收入76%、同比提升1.5%。算网数智3业务收入占服务收入24%、同比提升\n9.6%。盈利能力持续提升，本公司利润总额251亿元，归属于母公司净利润达到人民币90亿元、同\n比提升10.5%，加权平均净资产收益率提升至5.5%。\n公司高度重视股东回报，致力于和股东分享发展红利，鉴于过去一年良好的业绩表现，董事会建\n议派发每股末期股息4人民币元0.0621元（含税），连同已派发的中期股息每股人民币0.0959元（含\n税），全年股息合计每股人民币0.1580元（含税），同比增长19.7%。\n联网通信稳盘托底。用户规模再创新高，移动和宽带用户数达到4.7亿、净增1,952万；物联网连\n接数超过6.2亿、净增1.3亿；车联网连接数达到7,600万、保持行业第一；格物工业互联网平台纳\n管设备超过1,200万、占全国的1/8。\n算网数智扩盘提质。联通云收入5人民币686亿元、同比提升17.1%，数据中心收入人民币259亿元、\n同比提升7.4%。智算业务驱动算力服务强劲增长，去年签约金额超过人民币260亿元。\n网络向新\n公司构建高速泛在、算网融合、绿色低碳的新型基础设施，提升网络智能化水平，夯实高质量发\n展基础。公司坚持精准适度的投资策略，全面深化共建共享，全网推进智能运营，全力打造极简\n网络，实现联网算网协调发展、国内国际协同布局。\n2024年，公司资本开支人民币613.7亿元、同比下降17%，其中，算力投资同比上升19%；网络质量\n更好、效能更高。移动网络人口覆盖率达到99%，提升近1个百分点、惠及千万用户，宽带网络端\n口数同比提升5%、惠及千万家庭。设备集约、AI赋能成效明显，年化节省OPEX人民币19亿元，每\n单位业务能耗下降10%。\n推进移动和宽带网络提能升级，覆盖更广、体验更好。移动网络基站数超过450万，高铁、地铁、\n热门景点、密集小区等重点场景的网络覆盖更加深入；加快5G-A规模商用，在300个城市部署载波\n聚合，实现下行万兆、上行千兆的超高速率，在150个城市升级RedCap，实现全频段、全制式应用。\n宽带网络端口数2.8亿，10G PON端口占比超过80%，支持千兆宽带用户快速增长；加快建设万兆光\n网，助力北京、天津、上海、广州、深圳等率先打造双万兆城市。\n丰富算力和算网创新供给，规模更大、能力更强。加快推进IDC向AIDC、通算向智算升级，在上海、\n广东、香港和内蒙、宁夏、贵州等地建设大规模智算中心，建成300多个训推一体的算力资源池，\n智算规模超过17E FLOPS，更好满足人工智能训练和推理需求。建成算力智联网AINet，实现8个国\n家算力枢纽和22个省级骨干节点的全覆盖；升级联通云“星罗”算力调度平台，提升全域智能调\n10",
+            "context_before": null,
+            "context_after": null,
+            "match_index": 0
+          }
+        }
+      ],
+      "after_evidence": [
+        {
+          "evidence_id": "core-ev-a2d4c60b55ed4668",
+          "report": {
+            "instrument_id": "600050.SH",
+            "report_id": "asset_4b366497ffb0e433e7e8061133f25a94",
+            "document_version": "7042aab8d1bd3b1583c216e7757d107c7db627d5284854eb18def52434c44d8b",
+            "report_period": "2024-12-31",
+            "published_at": "2025-03-18T16:00:00+00:00",
+            "document_type": "annual_report"
+          },
+          "page": 10,
+          "printed_page_label": null,
+          "section_title": "经营正文收入",
+          "continuation_pages": [],
+          "subject_evidence_pages": [],
+          "anchor": {
+            "anchor_type": "text",
+            "bounded_quote": "联通云收入5人民币686亿元、同比提升17.1%，数据中心收入人民币259亿元、\n同比提升7.4%。",
+            "context_before": null,
+            "context_after": null,
+            "match_index": 0
+          }
+        }
+      ]
+    },
+    {
+      "instrument_id": "600050.SH",
+      "record_id": "owned:core-ev-2755b928abb004e6:Segment:business_segment:国际业务:经营业务/本期收入:row:0",
+      "predecessor_record_id": "owned:core-ev-945700fefbeab311:Segment:business_segment:国际业务:经营业务/本期收入:row:2",
+      "name": "国际业务",
+      "object_type": "Segment",
+      "changed_fields": [
+        "evidence",
+        "record_id"
+      ],
+      "before_scope": "consolidated_group",
+      "after_scope": "consolidated_group",
+      "before_evidence": [
+        {
+          "evidence_id": "core-ev-945700fefbeab311",
+          "report": {
+            "instrument_id": "600050.SH",
+            "report_id": "asset_4b366497ffb0e433e7e8061133f25a94",
+            "document_version": "7042aab8d1bd3b1583c216e7757d107c7db627d5284854eb18def52434c44d8b",
+            "report_period": "2024-12-31",
+            "published_at": "2025-03-18T16:00:00+00:00",
+            "document_type": "annual_report"
+          },
+          "page": 12,
+          "printed_page_label": null,
+          "section_title": "经营正文收入",
+          "continuation_pages": [],
+          "subject_evidence_pages": [],
+          "anchor": {
+            "anchor_type": "text",
+            "bounded_quote": "联通作为哈尔滨亚冬会通信和云服务官方合作伙伴，实现了5G-A网络和高清云转播的融合创新，\n助力云上亚冬、科技亚冬。特别是今年全国两会，联通元景MaaS平台融合推理能力和安全技术，\n以5G富媒体和AI智能体，展现了数字技术和媒体传播融合创新的巨大潜力。\n数据智能应用规模突破。公司聚焦工业互联网，发挥5G专网和格物平台优势，融合工业大数据、\n工业大模型，有效赋能设计仿真、控制优化和预测性维护等生产场景，累计实施超过2.9万个工业\n互联网项目、落地7,100余家5G工厂，实现服务能力和市场地位领先。聚焦服务数字政府，完善政\n务网、政务云、政务大数据、政务智能应用的一体化能力，服务热线智能化升级、城市智能化治\n理等领域，助力政府数字化能力提升。智能服务收入达到人民币71亿元，同比提升26.5%。数据服\n务收入达到人民币64亿元，同比提升20.8%。\n国际品牌全面焕新。2024年国际业务提速发展，收入达到人民币125亿元，同比提升15.2%。在沙\n特、秘鲁、阿联酋、乌兹别克斯坦等地增设分支机构，更好服务亿万客户全球漫游和数字化需求。\n尤其是发挥车联网的全球一体化运营优势，服务中国头部车企出海，助力智能网联新能源汽车产\n业发展。去年12月，公司发布了国际品牌UniCom，进一步加快国际化发展步伐，提升全球化经营\n水平。\n社会责任和公司治理\n公司积极履行企业ESG责任。\n践行绿色理念。发布绿色行动计划，深化网络节能，探索算电协同，引入清洁能源，获评22个国\n家级绿色数据中心。\n服务民生保障。升级“联通数村”平台，服务26万个行政村和2.8亿农村用户，助力乡村全面振\n兴。深入推进电信普遍服务，助力跨越数字鸿沟，在8,000家营业厅设立智慧助老中心。\n完善企业治理。实施数智强企，推进公司管理、运营、服务的智能化升级。积极承担上市公司责\n任，制定市值管理制度，开展各类投资者交流活动160余场，上市公司形象更加公开、透明、可\n信。公司荣获多项嘉许，包括于2024年《财富全球500强企业》中排名第279位；《福布斯全球上\n市公司2000强》中排名第299位；连续入选中国上市公司协会“公司治理最佳实践案例”“董事会\n最佳实践案例”“投资者关系管理最佳实践案例”“业绩说明会最佳实践案例”等荣誉，控股子\n公司联通红筹公司被《机构投资者》(Institutional Investor)评为“亚洲最受尊崇电信企业”。\n未来展望\n过去一年，公司拥抱智能、向新前行，全力以赴强能力、调结构、提质量、增效益，经营发展迈\n上新台阶。2025年，公司营收、利润及净资产收益率实现有力增长。预计固定资产投资在人民币\n550亿元左右，其中算力投资同比增长28%；此外，我们为人工智能重点基础设施和重大工程专项\n作了特别预算安排；公司将深入实施融合创新战略，持续推进“三个向新”，着力实现创新动力\n更足、能力优势更强、业务结构更优、经营效益更好、品牌形象卓著。\n注1：联网通信业务包含移动联网、宽带联网、电视联网、专线联网、通信业务及信息业务等六项。\n12",
+            "context_before": null,
+            "context_after": null,
+            "match_index": 0
+          }
+        }
+      ],
+      "after_evidence": [
+        {
+          "evidence_id": "core-ev-2755b928abb004e6",
+          "report": {
+            "instrument_id": "600050.SH",
+            "report_id": "asset_4b366497ffb0e433e7e8061133f25a94",
+            "document_version": "7042aab8d1bd3b1583c216e7757d107c7db627d5284854eb18def52434c44d8b",
+            "report_period": "2024-12-31",
+            "published_at": "2025-03-18T16:00:00+00:00",
+            "document_type": "annual_report"
+          },
+          "page": 12,
+          "printed_page_label": null,
+          "section_title": "经营正文收入",
+          "continuation_pages": [],
+          "subject_evidence_pages": [],
+          "anchor": {
+            "anchor_type": "text",
+            "bounded_quote": "2024年国际业务提速发展，收入达到人民币125亿元，同比提升15.2%。",
+            "context_before": null,
+            "context_after": null,
+            "match_index": 0
+          }
+        }
+      ]
+    },
+    {
+      "instrument_id": "600050.SH",
+      "record_id": "owned:core-ev-4e042f5c6f5f27e7:Measurement:business_segment:联通云:经营业务/本期收入:row:0",
+      "predecessor_record_id": "owned:core-ev-04a05f7f8aa3697c:Measurement:business_segment:联通云:经营业务/本期收入:row:0",
+      "name": "联通云",
+      "object_type": "Measurement",
+      "changed_fields": [
+        "evidence",
+        "record_id",
+        "subject_basis",
+        "subject_scope"
+      ],
+      "before_scope": "unclear",
+      "after_scope": "consolidated_group",
+      "before_evidence": [
+        {
+          "evidence_id": "core-ev-04a05f7f8aa3697c",
+          "report": {
+            "instrument_id": "600050.SH",
+            "report_id": "asset_4b366497ffb0e433e7e8061133f25a94",
+            "document_version": "7042aab8d1bd3b1583c216e7757d107c7db627d5284854eb18def52434c44d8b",
+            "report_period": "2024-12-31",
+            "published_at": "2025-03-18T16:00:00+00:00",
+            "document_type": "annual_report"
+          },
+          "page": 10,
+          "printed_page_label": null,
+          "section_title": "经营正文收入",
+          "continuation_pages": [],
+          "subject_evidence_pages": [],
+          "anchor": {
+            "anchor_type": "text",
+            "bounded_quote": "第三节 管理层讨论与分析\n一、经营情况讨论与分析\n2024年，中国联通聚焦联网通信和算网数智两大主业，推进网络向新、技术向新、服务向新，高\n质量发展取得新突破。\n整体业绩\n2024年，中国联通营业收入稳健增长，达到人民币3,896亿元、同比提升4.6%，增速领先行业。联\n网通信1,2业务收入占服务收入76%、同比提升1.5%。算网数智3业务收入占服务收入24%、同比提升\n9.6%。盈利能力持续提升，本公司利润总额251亿元，归属于母公司净利润达到人民币90亿元、同\n比提升10.5%，加权平均净资产收益率提升至5.5%。\n公司高度重视股东回报，致力于和股东分享发展红利，鉴于过去一年良好的业绩表现，董事会建\n议派发每股末期股息4人民币元0.0621元（含税），连同已派发的中期股息每股人民币0.0959元（含\n税），全年股息合计每股人民币0.1580元（含税），同比增长19.7%。\n联网通信稳盘托底。用户规模再创新高，移动和宽带用户数达到4.7亿、净增1,952万；物联网连\n接数超过6.2亿、净增1.3亿；车联网连接数达到7,600万、保持行业第一；格物工业互联网平台纳\n管设备超过1,200万、占全国的1/8。\n算网数智扩盘提质。联通云收入5人民币686亿元、同比提升17.1%，数据中心收入人民币259亿元、\n同比提升7.4%。智算业务驱动算力服务强劲增长，去年签约金额超过人民币260亿元。\n网络向新\n公司构建高速泛在、算网融合、绿色低碳的新型基础设施，提升网络智能化水平，夯实高质量发\n展基础。公司坚持精准适度的投资策略，全面深化共建共享，全网推进智能运营，全力打造极简\n网络，实现联网算网协调发展、国内国际协同布局。\n2024年，公司资本开支人民币613.7亿元、同比下降17%，其中，算力投资同比上升19%；网络质量\n更好、效能更高。移动网络人口覆盖率达到99%，提升近1个百分点、惠及千万用户，宽带网络端\n口数同比提升5%、惠及千万家庭。设备集约、AI赋能成效明显，年化节省OPEX人民币19亿元，每\n单位业务能耗下降10%。\n推进移动和宽带网络提能升级，覆盖更广、体验更好。移动网络基站数超过450万，高铁、地铁、\n热门景点、密集小区等重点场景的网络覆盖更加深入；加快5G-A规模商用，在300个城市部署载波\n聚合，实现下行万兆、上行千兆的超高速率，在150个城市升级RedCap，实现全频段、全制式应用。\n宽带网络端口数2.8亿，10G PON端口占比超过80%，支持千兆宽带用户快速增长；加快建设万兆光\n网，助力北京、天津、上海、广州、深圳等率先打造双万兆城市。\n丰富算力和算网创新供给，规模更大、能力更强。加快推进IDC向AIDC、通算向智算升级，在上海、\n广东、香港和内蒙、宁夏、贵州等地建设大规模智算中心，建成300多个训推一体的算力资源池，\n智算规模超过17E FLOPS，更好满足人工智能训练和推理需求。建成算力智联网AINet，实现8个国\n家算力枢纽和22个省级骨干节点的全覆盖；升级联通云“星罗”算力调度平台，提升全域智能调\n10",
+            "context_before": null,
+            "context_after": null,
+            "match_index": 0
+          }
+        }
+      ],
+      "after_evidence": [
+        {
+          "evidence_id": "core-ev-4e042f5c6f5f27e7",
+          "report": {
+            "instrument_id": "600050.SH",
+            "report_id": "asset_4b366497ffb0e433e7e8061133f25a94",
+            "document_version": "7042aab8d1bd3b1583c216e7757d107c7db627d5284854eb18def52434c44d8b",
+            "report_period": "2024-12-31",
+            "published_at": "2025-03-18T16:00:00+00:00",
+            "document_type": "annual_report"
+          },
+          "page": 10,
+          "printed_page_label": null,
+          "section_title": "经营正文收入",
+          "continuation_pages": [],
+          "subject_evidence_pages": [],
+          "anchor": {
+            "anchor_type": "text",
+            "bounded_quote": "联通云收入5人民币686亿元、同比提升17.1%，数据中心收入人民币259亿元、\n同比提升7.4%。",
+            "context_before": null,
+            "context_after": null,
+            "match_index": 0
+          }
+        }
+      ]
+    }
+  ],
+  "answers": [
+    {
+      "instrument_id": "600050.SH",
+      "dimension": "principal_business",
+      "text_unchanged": true
+    },
+    {
+      "instrument_id": "600050.SH",
+      "dimension": "products_services",
+      "text_unchanged": true
+    },
+    {
+      "instrument_id": "600050.SH",
+      "dimension": "revenue_model",
+      "text_unchanged": true
+    },
+    {
+      "instrument_id": "600079.SH",
+      "dimension": "principal_business",
+      "text_unchanged": true
+    },
+    {
+      "instrument_id": "600079.SH",
+      "dimension": "products_services",
+      "text_unchanged": true
+    },
+    {
+      "instrument_id": "600079.SH",
+      "dimension": "revenue_model",
+      "text_unchanged": true
+    }
+  ],
+  "commodity_exposure_roles_unchanged": true,
+  "checked_evidence_ids_follow_new_sentence_anchors": true,
+  "native_names_amounts_units_dimensions_and_actions_unchanged": true,
+  "method": "compare all new actual records against preserved v41 first checkpoint without modifying either; first source evidence narrowed by already reviewed correction"
+}

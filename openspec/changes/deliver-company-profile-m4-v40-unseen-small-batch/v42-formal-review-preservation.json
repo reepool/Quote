@@ -1,0 +1,11 @@
+{
+  "sha256": {
+    "openspec/changes/deliver-company-profile-m4-v40-unseen-small-batch/v42-source-review-evidence.json": "b2e817140126b01960fc80ec74c8ac3f2dee20473ada74dc8f393ffb74a74545",
+    "openspec/changes/deliver-company-profile-m4-v40-unseen-small-batch/v42-actual-object-decisions.json": "5f6159fbb28b22c40f02af65738314d86cee549219cbf0b43a9f63bea06fd437",
+    "openspec/changes/deliver-company-profile-m4-v40-unseen-small-batch/v42-actual-object-source-pages.json": "f0252bf6dd2cd93edc57db4bb928c3ab3d76de1ff7f06dde5e3ab1afc6ad531e",
+    "openspec/changes/deliver-company-profile-m4-v40-unseen-small-batch/v42-formal-source-review.json": "541ccacd7cfc956ce25f3748ed35921a335e0f2446bbf2b0af35d285c9b92f58",
+    "openspec/changes/deliver-company-profile-m4-v40-unseen-small-batch/v42-cross-page-layout-review-notes.json": "cad8e559798e08693505e2ffcebff3783730ceebb603d4474418cc637aacee99"
+  },
+  "first_formal_review": true,
+  "accuracy_denominator_from_actual_output": true
+}

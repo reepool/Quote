@@ -1,0 +1,32 @@
+{
+  "local_tests": "36 passed: both v41/v42 full owner and independent source pages, negative/plan and parent scope boundaries; includes named-investee guards",
+  "old_identity_tests": "4 passed, 18 deselected: v39/v40 phosphates native actors preserved",
+  "isolated_official_owner": "v42 telecom actual official asset and initially empty frontier complete five stages; 29 income conditions and paired subjects retained; query/export/disk equal",
+  "checks": {
+    "ruff": "passed",
+    "format": "passed",
+    "openspec_strict": "passed",
+    "scoped_diff_check": "passed",
+    "staged_diff_check": "passed for current files excluding raw *.patch evidence; unified context marker spaces retained byte-for-byte, patch SHA verified and all 38 modules rebuilt"
+  },
+  "review_scope": [
+    "research/company_profile/core_evidence_selection.py",
+    "research/company_profile/operations.py",
+    "research/company_profile/runtime.py",
+    "tests/unit/test_research/test_company_profile_v41_telecom_pharma.py",
+    "current change rolling control artifacts"
+  ],
+  "code_review": [
+    {
+      "classification": "blocking",
+      "finding": "successor would miss v41-only exact enqueue and actor expansion",
+      "resolution": "both branches explicitly include v42, five cumulative switches inherit; real owner/drift/actor and old-identity regression passed"
+    },
+    {
+      "classification": "unrelated_pre_existing",
+      "finding": "previously reproduced continuation failure and unrelated prior issues",
+      "resolution": "unchanged and deferred; no claim of full-suite success"
+    }
+  ],
+  "review_method": "scoped diff and direct call-path review; no additional blocking defects in current identity handoff"
+}

@@ -1,0 +1,4227 @@
+{
+  "600050.SH": {
+    "facts": {
+      "owned:core-ev-48ba14474cd72893:overview": {
+        "verified_source_pages": [
+          10
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "BusinessOverview",
+        "actual_native_name": "当期产品及服务披露",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "reason": "两大主业的当前经营，原年度限定保留。"
+      },
+      "owned:core-ev-2ffa6a3abcf3da26:overview": {
+        "verified_source_pages": [
+          12
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "BusinessOverview",
+        "actual_native_name": "当期产品及服务披露",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "reason": "联网通信六项原业务，作为业务背景无新增具名动作。"
+      },
+      "owned:core-ev-f5c3a960baca5699:overview": {
+        "verified_source_pages": [
+          13
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "BusinessOverview",
+        "actual_native_name": "当期产品及服务披露",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "reason": "算网数智六项原业务。"
+      },
+      "owned:core-ev-d704d491d8f98bf7:overview": {
+        "verified_source_pages": [
+          14,
+          15
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "BusinessOverview",
+        "actual_native_name": "当期产品及服务披露",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "reason": "原现行业务与产品，试点、升级、研发状态留在原句，不单独升格销售。"
+      },
+      "owned:core-ev-de50dbfff74e42ce:overview": {
+        "verified_source_pages": [
+          17
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "BusinessOverview",
+        "actual_native_name": "当期产品及服务披露",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "reason": "原单一经营分部及中国境内为主口径，不拆新分部。"
+      },
+      "owned:core-ev-aa1c133b7806f241:overview": {
+        "verified_source_pages": [
+          24,
+          25
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "BusinessOverview",
+        "actual_native_name": "当期产品及服务披露",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "reason": "控股/参股及现金股利、权益法收益原文边界，未将投资收益转营业收入。"
+      },
+      "owned:core-ev-8841cea31282d6c1:overview": {
+        "verified_source_pages": [
+          84
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "BusinessOverview",
+        "actual_native_name": "当期产品及服务披露",
+        "actual_action": null,
+        "actual_subject_scope": "unclear",
+        "reason": "上市公司只直接持BVI，实际运营与国际公司、上级集团及本集团定义完整。"
+      },
+      "owned:core-ev-49e0de8c9ae8ad40:overview": {
+        "verified_source_pages": [
+          109,
+          110,
+          111,
+          112
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "BusinessOverview",
+        "actual_native_name": "当期产品及服务披露",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "reason": "收入确认控制权、履约进度、交易价格、总净额、积分与套餐分配原全文。"
+      },
+      "owned:core-ev-6f50091a40d80e56:overview": {
+        "verified_source_pages": [
+          109,
+          110,
+          111,
+          112
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "BusinessOverview",
+        "actual_native_name": "当期产品及服务披露",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "reason": "收入确认控制权、履约进度、交易价格、总净额、积分与套餐分配原全文。"
+      },
+      "owned:core-ev-fdef1a2ba496d9a0:overview": {
+        "verified_source_pages": [
+          158
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "BusinessOverview",
+        "actual_native_name": "当期产品及服务披露",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "reason": "个人短期/政企1–5年、月固定单价×实际服务量及收款权原限制。"
+      },
+      "owned:core-ev-625acd57c769b369:overview": {
+        "verified_source_pages": [
+          178,
+          179,
+          180,
+          181,
+          182,
+          183,
+          184,
+          185,
+          186
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "BusinessOverview",
+        "actual_native_name": "当期产品及服务披露",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "reason": "集团构成原子公司、业务、持股及原币种，保留原行不新增商品动作。"
+      },
+      "owned:core-ev-61d5607d9d3508a1:overview": {
+        "verified_source_pages": [
+          178,
+          179,
+          180,
+          181,
+          182,
+          183,
+          184,
+          185,
+          186
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "BusinessOverview",
+        "actual_native_name": "当期产品及服务披露",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "reason": "集团构成原子公司、业务、持股及原币种，保留原行不新增商品动作。"
+      },
+      "owned:core-ev-728b745adf65932d:overview": {
+        "verified_source_pages": [
+          179,
+          180,
+          181,
+          182,
+          183,
+          184,
+          185,
+          186,
+          187
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "BusinessOverview",
+        "actual_native_name": "当期产品及服务披露",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "reason": "集团构成续页、原主体及持股/参股边界原文；未改集团关系为全资。"
+      },
+      "owned:core-ev-cf622b909b7f0cae:overview": {
+        "verified_source_pages": [
+          179,
+          180,
+          181,
+          182,
+          183,
+          184,
+          185,
+          186,
+          187
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "BusinessOverview",
+        "actual_native_name": "当期产品及服务披露",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "reason": "集团构成续页、原主体及持股/参股边界原文；未改集团关系为全资。"
+      },
+      "owned:core-ev-ae8b3ca116b2bef7:overview": {
+        "verified_source_pages": [
+          179,
+          180,
+          181,
+          182,
+          183,
+          184,
+          185,
+          186,
+          187
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "BusinessOverview",
+        "actual_native_name": "当期产品及服务披露",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "reason": "集团构成续页、原主体及持股/参股边界原文；未改集团关系为全资。"
+      },
+      "owned:core-ev-187f581148c33e75:overview": {
+        "verified_source_pages": [
+          179,
+          180,
+          181,
+          182,
+          183,
+          184,
+          185,
+          186,
+          187
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "BusinessOverview",
+        "actual_native_name": "当期产品及服务披露",
+        "actual_action": null,
+        "actual_subject_scope": "unclear",
+        "reason": "集团构成续页、原主体及持股/参股边界原文；未改集团关系为全资。"
+      },
+      "owned:core-ev-741f4f9676d1746d:overview": {
+        "verified_source_pages": [
+          199
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "BusinessOverview",
+        "actual_native_name": "当期产品及服务披露",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "reason": "实际综合服务原项目、政府/市场/成本加利润收费及服务时结算。"
+      },
+      "owned:core-ev-c479c1adda697228:commodity:1": {
+        "verified_source_pages": [
+          5,
+          14,
+          15
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Activity",
+        "actual_native_name": "视频云",
+        "actual_action": "sells",
+        "actual_subject_scope": "consolidated_group",
+        "recall_role_index": 0,
+        "accepted_exposure_role": "product_sales",
+        "reason": "原页具名当期销售/采购＋原主体成立。集团产销表按销售量明示，子公司清单按本分支当前肯定销售。释义页映射全名；采购不推制造投入。"
+      },
+      "owned:core-ev-c479c1adda697228:commodity:2": {
+        "verified_source_pages": [
+          5,
+          14,
+          15
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Activity",
+        "actual_native_name": "云桌面",
+        "actual_action": "sells",
+        "actual_subject_scope": "consolidated_group",
+        "recall_role_index": 1,
+        "accepted_exposure_role": "product_sales",
+        "reason": "原页具名当期销售/采购＋原主体成立。集团产销表按销售量明示，子公司清单按本分支当前肯定销售。释义页映射全名；采购不推制造投入。"
+      },
+      "owned:core-ev-b0cb13f597b091ff:commodity:1": {
+        "verified_source_pages": [
+          5,
+          111
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Activity",
+        "actual_native_name": "手机",
+        "actual_action": "sells",
+        "actual_subject_scope": "consolidated_group",
+        "recall_role_index": 2,
+        "accepted_exposure_role": "product_sales",
+        "reason": "原页具名当期销售/采购＋原主体成立。集团产销表按销售量明示，子公司清单按本分支当前肯定销售。释义页映射全名；采购不推制造投入。"
+      },
+      "owned:core-ev-b0cb13f597b091ff:commodity:2": {
+        "verified_source_pages": [
+          5,
+          111
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Activity",
+        "actual_native_name": "通信设备",
+        "actual_action": "sells",
+        "actual_subject_scope": "consolidated_group",
+        "recall_role_index": 3,
+        "accepted_exposure_role": "product_sales",
+        "reason": "原页具名当期销售/采购＋原主体成立。集团产销表按销售量明示，子公司清单按本分支当前肯定销售。释义页映射全名；采购不推制造投入。"
+      },
+      "owned:core-ev-776fe17979f2510e:segment:industry:电信业:table:None:row:11": {
+        "verified_source_pages": [
+          17
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "电信业",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 0,
+        "recall_row_index": 0,
+        "reason": "独立官方p17 主营业务分行业／电信业本期389,589百万元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-3ccbf3638d0ce37a:revenue:industry:电信业:table:None:row:11": {
+        "verified_source_pages": [
+          17
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "电信业",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 0,
+        "reason": "独立官方p17 主营业务分行业／电信业本期389,589百万元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-776fe17979f2510e:segment:product:电信服务:table:主营业务收入:row:19": {
+        "verified_source_pages": [
+          17
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "电信服务",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 1,
+        "recall_row_index": 1,
+        "reason": "独立官方p17 主营业务分产品／电信服务本期389,589百万元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-3ccbf3638d0ce37a:revenue:product:电信服务:table:主营业务收入:row:19": {
+        "verified_source_pages": [
+          17
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "电信服务",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 1,
+        "reason": "独立官方p17 主营业务分产品／电信服务本期389,589百万元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-776fe17979f2510e:segment:region:全国范围:table:主营业务收入:row:27": {
+        "verified_source_pages": [
+          17
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "全国范围",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 2,
+        "recall_row_index": 2,
+        "reason": "独立官方p17 主营业务分地区／全国范围本期389,589百万元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-3ccbf3638d0ce37a:revenue:region:全国范围:table:主营业务收入:row:27": {
+        "verified_source_pages": [
+          17
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "全国范围",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 2,
+        "reason": "独立官方p17 主营业务分地区／全国范围本期389,589百万元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-aa3fc03e4b64d1e2:Segment:product:语音通话及月租费:主营业务收入:row:0": {
+        "verified_source_pages": [
+          83,
+          158,
+          159
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "语音通话及月租费",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 3,
+        "recall_row_index": 3,
+        "reason": "独立官方p158 合并主营业务收入／语音通话及月租费本期20,399,958,555元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-b4fbf2c018cf5e66:Measurement:product:语音通话及月租费:主营业务收入:row:0": {
+        "verified_source_pages": [
+          83,
+          158,
+          159
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "语音通话及月租费",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 3,
+        "reason": "独立官方p158 合并主营业务收入／语音通话及月租费本期20,399,958,555元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-aa3fc03e4b64d1e2:Segment:product:增值服务:主营业务收入:row:1": {
+        "verified_source_pages": [
+          83,
+          158,
+          159
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "增值服务",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 4,
+        "recall_row_index": 4,
+        "reason": "独立官方p158 合并主营业务收入／增值服务本期30,189,512,985元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-b4fbf2c018cf5e66:Measurement:product:增值服务:主营业务收入:row:1": {
+        "verified_source_pages": [
+          83,
+          158,
+          159
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "增值服务",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 4,
+        "reason": "独立官方p158 合并主营业务收入／增值服务本期30,189,512,985元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-aa3fc03e4b64d1e2:Segment:product:宽带及移动数据服务:主营业务收入:row:2": {
+        "verified_source_pages": [
+          83,
+          158,
+          159
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "宽带及移动数据服务",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 5,
+        "recall_row_index": 5,
+        "reason": "独立官方p158 合并主营业务收入／宽带及移动数据服务本期154,188,610,700元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-b4fbf2c018cf5e66:Measurement:product:宽带及移动数据服务:主营业务收入:row:2": {
+        "verified_source_pages": [
+          83,
+          158,
+          159
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "宽带及移动数据服务",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 5,
+        "reason": "独立官方p158 合并主营业务收入／宽带及移动数据服务本期154,188,610,700元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-aa3fc03e4b64d1e2:Segment:product:数据及其他互联网应用收入:主营业务收入:row:3": {
+        "verified_source_pages": [
+          83,
+          158,
+          159
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "数据及其他互联网应用收入",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 6,
+        "recall_row_index": 6,
+        "reason": "独立官方p158 合并主营业务收入／数据及其他互联网应用收入本期99,357,611,232元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-b4fbf2c018cf5e66:Measurement:product:数据及其他互联网应用收入:主营业务收入:row:3": {
+        "verified_source_pages": [
+          83,
+          158,
+          159
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "数据及其他互联网应用收入",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 6,
+        "reason": "独立官方p158 合并主营业务收入／数据及其他互联网应用收入本期99,357,611,232元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-aa3fc03e4b64d1e2:Segment:product:网间结算收入:主营业务收入:row:4": {
+        "verified_source_pages": [
+          83,
+          158,
+          159
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "网间结算收入",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 7,
+        "recall_row_index": 7,
+        "reason": "独立官方p158 合并主营业务收入／网间结算收入本期12,602,265,413元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-b4fbf2c018cf5e66:Measurement:product:网间结算收入:主营业务收入:row:4": {
+        "verified_source_pages": [
+          83,
+          158,
+          159
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "网间结算收入",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 7,
+        "reason": "独立官方p158 合并主营业务收入／网间结算收入本期12,602,265,413元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-aa3fc03e4b64d1e2:Segment:product:电路及网元服务:主营业务收入:row:5": {
+        "verified_source_pages": [
+          83,
+          158,
+          159
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "电路及网元服务",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 8,
+        "recall_row_index": 8,
+        "reason": "独立官方p158 合并主营业务收入／电路及网元服务本期24,260,284,153元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-b4fbf2c018cf5e66:Measurement:product:电路及网元服务:主营业务收入:row:5": {
+        "verified_source_pages": [
+          83,
+          158,
+          159
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "电路及网元服务",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 8,
+        "reason": "独立官方p158 合并主营业务收入／电路及网元服务本期24,260,284,153元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-aa3fc03e4b64d1e2:Segment:product:其他:主营业务收入:row:6": {
+        "verified_source_pages": [
+          83,
+          158,
+          159
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "其他",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 9,
+        "recall_row_index": 9,
+        "reason": "独立官方p158 合并主营业务收入／其他本期4,977,265,472元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-b4fbf2c018cf5e66:Measurement:product:其他:主营业务收入:row:6": {
+        "verified_source_pages": [
+          83,
+          158,
+          159
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "其他",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 9,
+        "reason": "独立官方p158 合并主营业务收入／其他本期4,977,265,472元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-aa3fc03e4b64d1e2:Segment:business_type:主营业务:营业收入/主营业务收入:row:7": {
+        "verified_source_pages": [
+          83,
+          158,
+          159
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "主营业务",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 10,
+        "recall_row_index": 10,
+        "reason": "独立官方p158 合并主营小计／主营业务本期345,975,508,510元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-b4fbf2c018cf5e66:Measurement:business_type:主营业务:营业收入/主营业务收入:row:7": {
+        "verified_source_pages": [
+          83,
+          158,
+          159
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "主营业务",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 10,
+        "reason": "独立官方p158 合并主营小计／主营业务本期345,975,508,510元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-aa3fc03e4b64d1e2:Segment:product:销售通信产品:其他业务收入:row:8": {
+        "verified_source_pages": [
+          83,
+          158,
+          159
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "销售通信产品",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 11,
+        "recall_row_index": 11,
+        "reason": "独立官方p158 合并其他业务收入／销售通信产品本期43,613,711,132元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-b4fbf2c018cf5e66:Measurement:product:销售通信产品:其他业务收入:row:8": {
+        "verified_source_pages": [
+          83,
+          158,
+          159
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "销售通信产品",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 11,
+        "reason": "独立官方p158 合并其他业务收入／销售通信产品本期43,613,711,132元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-aa3fc03e4b64d1e2:Segment:business_type:合计:营业收入/其他业务收入:row:9": {
+        "verified_source_pages": [
+          83,
+          158,
+          159
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "合计",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 12,
+        "recall_row_index": 12,
+        "reason": "独立官方p158 合并营业收入／合计本期389,589,219,642元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-b4fbf2c018cf5e66:Measurement:business_type:合计:营业收入/其他业务收入:row:9": {
+        "verified_source_pages": [
+          83,
+          158,
+          159
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "合计",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 12,
+        "reason": "独立官方p158 合并营业收入／合计本期389,589,219,642元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-aa3fc03e4b64d1e2:Segment:business_type:合同产生的收入:营业收入/其他业务收入:row:10": {
+        "verified_source_pages": [
+          83,
+          158,
+          159
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "合同产生的收入",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 13,
+        "recall_row_index": 13,
+        "reason": "独立官方p158 合并营业收入／合同产生的收入本期388,336,645,394元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-b4fbf2c018cf5e66:Measurement:business_type:合同产生的收入:营业收入/其他业务收入:row:10": {
+        "verified_source_pages": [
+          83,
+          158,
+          159
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "合同产生的收入",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 13,
+        "reason": "独立官方p158 合并营业收入／合同产生的收入本期388,336,645,394元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-aa3fc03e4b64d1e2:Segment:business_type:其他收入:营业收入/其他业务收入:row:11": {
+        "verified_source_pages": [
+          83,
+          158,
+          159
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "其他收入",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 14,
+        "recall_row_index": 14,
+        "reason": "独立官方p158 合并营业收入／其他收入本期1,252,574,248元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-b4fbf2c018cf5e66:Measurement:business_type:其他收入:营业收入/其他业务收入:row:11": {
+        "verified_source_pages": [
+          83,
+          158,
+          159
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "其他收入",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 14,
+        "reason": "独立官方p158 合并营业收入／其他收入本期1,252,574,248元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-68f6f490bd317f73:Segment:business_segment:联通红筹公司及其子公司:重要非全资子公司/本期营业收入/内部交易抵销前:row:0": {
+        "verified_source_pages": [
+          83,
+          184,
+          185
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "联通红筹公司及其子公司",
+        "actual_action": null,
+        "actual_subject_scope": "named_subsidiary",
+        "matched_source_row_index": 20,
+        "recall_row_index": 20,
+        "reason": "独立官方p184 重要非全资子公司/合营/联营企业主要财务信息／联通红筹公司及其子公司本期389,589,219,642元，原主体联通红筹公司及其子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-e6252f1dcec88a13:Measurement:business_segment:联通红筹公司及其子公司:重要非全资子公司/本期营业收入/内部交易抵销前:row:0": {
+        "verified_source_pages": [
+          83,
+          184,
+          185
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "联通红筹公司及其子公司",
+        "actual_action": null,
+        "actual_subject_scope": "named_subsidiary",
+        "matched_source_row_index": 20,
+        "reason": "独立官方p184 重要非全资子公司/合营/联营企业主要财务信息／联通红筹公司及其子公司本期389,589,219,642元，原主体联通红筹公司及其子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-acbf3e852723417c:Segment:business_segment:招联:重要合营企业/本期营业收入:row:0": {
+        "verified_source_pages": [
+          83,
+          185,
+          186
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "招联",
+        "actual_action": null,
+        "actual_subject_scope": "business_segment",
+        "matched_source_row_index": 21,
+        "recall_row_index": 21,
+        "reason": "独立官方p185 重要非全资子公司/合营/联营企业主要财务信息／招联本期17,317,691,345元，原主体招联消费金融股份有限公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-98537f15995a5757:Measurement:business_segment:招联:重要合营企业/本期营业收入:row:0": {
+        "verified_source_pages": [
+          83,
+          185,
+          186
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "招联",
+        "actual_action": null,
+        "actual_subject_scope": "business_segment",
+        "matched_source_row_index": 21,
+        "reason": "独立官方p185 重要非全资子公司/合营/联营企业主要财务信息／招联本期17,317,691,345元，原主体招联消费金融股份有限公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-54ea659e18d5adf1:Segment:business_segment:铁塔公司:重要联营企业/本期营业收入:row:0": {
+        "verified_source_pages": [
+          83,
+          186,
+          187
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "铁塔公司",
+        "actual_action": null,
+        "actual_subject_scope": "business_segment",
+        "matched_source_row_index": 22,
+        "recall_row_index": 22,
+        "reason": "独立官方p186 重要非全资子公司/合营/联营企业主要财务信息／铁塔公司本期97,771,598,978元，原主体中国铁塔股份有限公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-3e6acacdc7246857:Measurement:business_segment:铁塔公司:重要联营企业/本期营业收入:row:0": {
+        "verified_source_pages": [
+          83,
+          186,
+          187
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "铁塔公司",
+        "actual_action": null,
+        "actual_subject_scope": "business_segment",
+        "matched_source_row_index": 22,
+        "reason": "独立官方p186 重要非全资子公司/合营/联营企业主要财务信息／铁塔公司本期97,771,598,978元，原主体中国铁塔股份有限公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-a2d4c60b55ed4668:Segment:business_segment:联通云:经营业务/本期收入:row:0": {
+        "verified_source_pages": [
+          10
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "联通云",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 15,
+        "recall_row_index": 15,
+        "reason": "独立官方p10 MD&A业务收入／联通云本期686亿元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-4e042f5c6f5f27e7:Measurement:business_segment:联通云:经营业务/本期收入:row:0": {
+        "verified_source_pages": [
+          10
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "联通云",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 15,
+        "reason": "独立官方p10 MD&A业务收入／联通云本期686亿元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-a2d4c60b55ed4668:Segment:business_segment:数据中心:经营业务/本期收入:row:1": {
+        "verified_source_pages": [
+          10
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "数据中心",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 16,
+        "recall_row_index": 16,
+        "reason": "独立官方p10 MD&A业务收入／数据中心本期259亿元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-4e042f5c6f5f27e7:Measurement:business_segment:数据中心:经营业务/本期收入:row:1": {
+        "verified_source_pages": [
+          10
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "数据中心",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 16,
+        "reason": "独立官方p10 MD&A业务收入／数据中心本期259亿元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-3ea74c965f6c3a25:Segment:business_segment:智能服务:经营业务/本期收入:row:0": {
+        "verified_source_pages": [
+          12
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "智能服务",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 17,
+        "recall_row_index": 17,
+        "reason": "独立官方p12 MD&A业务收入／智能服务本期71亿元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-cf05b05c7190bae6:Measurement:business_segment:智能服务:经营业务/本期收入:row:0": {
+        "verified_source_pages": [
+          12
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "智能服务",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 17,
+        "reason": "独立官方p12 MD&A业务收入／智能服务本期71亿元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-4fb2f53d755ceea8:Segment:business_segment:数据服务:经营业务/本期收入:row:0": {
+        "verified_source_pages": [
+          12
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "数据服务",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 18,
+        "recall_row_index": 18,
+        "reason": "独立官方p12 MD&A业务收入／数据服务本期64亿元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-c18bfb054b28b560:Measurement:business_segment:数据服务:经营业务/本期收入:row:0": {
+        "verified_source_pages": [
+          12
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "数据服务",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 18,
+        "reason": "独立官方p12 MD&A业务收入／数据服务本期64亿元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-2755b928abb004e6:Segment:business_segment:国际业务:经营业务/本期收入:row:0": {
+        "verified_source_pages": [
+          12
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "国际业务",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 19,
+        "recall_row_index": 19,
+        "reason": "独立官方p12 MD&A业务收入／国际业务本期125亿元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-3672b16a65365bd0:Measurement:business_segment:国际业务:经营业务/本期收入:row:0": {
+        "verified_source_pages": [
+          12
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "国际业务",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 19,
+        "reason": "独立官方p12 MD&A业务收入／国际业务本期125亿元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-28561a9170ed607d:Segment:service:利息及手续费收入:重大关联交易/本期收入:row:0": {
+        "verified_source_pages": [
+          83,
+          198
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "利息及手续费收入",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 24,
+        "recall_row_index": 24,
+        "reason": "独立官方p198 重大关联交易／利息及手续费收入本期130,999,815元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-63e27fc307b86a55:Measurement:service:利息及手续费收入:重大关联交易/本期收入:row:0": {
+        "verified_source_pages": [
+          83,
+          198
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "利息及手续费收入",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 24,
+        "reason": "独立官方p198 重大关联交易／利息及手续费收入本期130,999,815元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-28561a9170ed607d:Segment:service:综合服务收入:重大关联交易/本期收入:row:1": {
+        "verified_source_pages": [
+          83,
+          198
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "综合服务收入",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 23,
+        "recall_row_index": 23,
+        "reason": "独立官方p198 重大关联交易／综合服务收入本期239,527,728元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-63e27fc307b86a55:Measurement:service:综合服务收入:重大关联交易/本期收入:row:1": {
+        "verified_source_pages": [
+          83,
+          198
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "综合服务收入",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 23,
+        "reason": "独立官方p198 重大关联交易／综合服务收入本期239,527,728元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-28561a9170ed607d:Segment:service:综合服务收入:重大关联交易/本期收入:row:2": {
+        "verified_source_pages": [
+          83,
+          198
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "综合服务收入",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 25,
+        "recall_row_index": 25,
+        "reason": "独立官方p198 重大关联交易／综合服务收入本期859,440,676元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-63e27fc307b86a55:Measurement:service:综合服务收入:重大关联交易/本期收入:row:2": {
+        "verified_source_pages": [
+          83,
+          198
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "综合服务收入",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 25,
+        "reason": "独立官方p198 重大关联交易／综合服务收入本期859,440,676元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-28561a9170ed607d:Segment:service:工程设计施工及IT服务收入:重大关联交易/本期收入:row:3": {
+        "verified_source_pages": [
+          83,
+          198
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "工程设计施工及IT服务收入",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 26,
+        "recall_row_index": 26,
+        "reason": "独立官方p198 重大关联交易／工程设计施工及IT服务收入本期526,908,829元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-63e27fc307b86a55:Measurement:service:工程设计施工及IT服务收入:重大关联交易/本期收入:row:3": {
+        "verified_source_pages": [
+          83,
+          198
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "工程设计施工及IT服务收入",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 26,
+        "reason": "独立官方p198 重大关联交易／工程设计施工及IT服务收入本期526,908,829元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-cf9d98ed94b10d37:Segment:service:移动增值服务收入:重大关联交易/本期收入:row:0": {
+        "verified_source_pages": [
+          83,
+          199
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "移动增值服务收入",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 27,
+        "recall_row_index": 27,
+        "reason": "独立官方p199 重大关联交易／移动增值服务收入本期868,511,892元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-9f48c192c5055ef8:Measurement:service:移动增值服务收入:重大关联交易/本期收入:row:0": {
+        "verified_source_pages": [
+          83,
+          199
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "移动增值服务收入",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 27,
+        "reason": "独立官方p199 重大关联交易／移动增值服务收入本期868,511,892元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-cf9d98ed94b10d37:Segment:service:数据及互联网业务收入:重大关联交易/本期收入:row:1": {
+        "verified_source_pages": [
+          83,
+          199
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "数据及互联网业务收入",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 28,
+        "recall_row_index": 28,
+        "reason": "独立官方p199 重大关联交易／数据及互联网业务收入本期2,191,412,467元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-9f48c192c5055ef8:Measurement:service:数据及互联网业务收入:重大关联交易/本期收入:row:1": {
+        "verified_source_pages": [
+          83,
+          199
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "数据及互联网业务收入",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 28,
+        "reason": "独立官方p199 重大关联交易／数据及互联网业务收入本期2,191,412,467元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      }
+    },
+    "answers": {
+      "principal_business": {
+        "accurate": true,
+        "reason": "两主业、完整服务矩阵、BVI/实际运营主体及合联营边界、服务/设备/积分/套餐及月账单收费机制完整；6G研发、上级集团及原参股边界保持。",
+        "failed_substance_groups": [],
+        "supporting_record_ids": [
+          "owned:core-ev-48ba14474cd72893:overview",
+          "owned:core-ev-2ffa6a3abcf3da26:overview",
+          "owned:core-ev-f5c3a960baca5699:overview",
+          "owned:core-ev-d704d491d8f98bf7:overview",
+          "owned:core-ev-de50dbfff74e42ce:overview",
+          "owned:core-ev-aa1c133b7806f241:overview",
+          "owned:core-ev-8841cea31282d6c1:overview",
+          "owned:core-ev-49e0de8c9ae8ad40:overview",
+          "owned:core-ev-6f50091a40d80e56:overview",
+          "owned:core-ev-fdef1a2ba496d9a0:overview",
+          "owned:core-ev-625acd57c769b369:overview",
+          "owned:core-ev-61d5607d9d3508a1:overview",
+          "owned:core-ev-728b745adf65932d:overview",
+          "owned:core-ev-cf622b909b7f0cae:overview",
+          "owned:core-ev-ae8b3ca116b2bef7:overview",
+          "owned:core-ev-187f581148c33e75:overview",
+          "owned:core-ev-741f4f9676d1746d:overview"
+        ],
+        "source_review": "逐支持事实全文核原来源后检查实际正文实质与限制，不以answered/core_complete判通过"
+      },
+      "products_services": {
+        "accurate": true,
+        "reason": "两主业、完整服务矩阵、BVI/实际运营主体及合联营边界、服务/设备/积分/套餐及月账单收费机制完整；6G研发、上级集团及原参股边界保持。",
+        "failed_substance_groups": [],
+        "supporting_record_ids": [
+          "owned:core-ev-2ffa6a3abcf3da26:overview",
+          "owned:core-ev-f5c3a960baca5699:overview",
+          "owned:core-ev-d704d491d8f98bf7:overview",
+          "owned:core-ev-de50dbfff74e42ce:overview",
+          "owned:core-ev-aa1c133b7806f241:overview",
+          "owned:core-ev-8841cea31282d6c1:overview",
+          "owned:core-ev-49e0de8c9ae8ad40:overview",
+          "owned:core-ev-6f50091a40d80e56:overview",
+          "owned:core-ev-fdef1a2ba496d9a0:overview",
+          "owned:core-ev-625acd57c769b369:overview",
+          "owned:core-ev-61d5607d9d3508a1:overview",
+          "owned:core-ev-728b745adf65932d:overview",
+          "owned:core-ev-cf622b909b7f0cae:overview",
+          "owned:core-ev-ae8b3ca116b2bef7:overview",
+          "owned:core-ev-187f581148c33e75:overview",
+          "owned:core-ev-741f4f9676d1746d:overview",
+          "owned:core-ev-48ba14474cd72893:overview",
+          "owned:core-ev-c479c1adda697228:commodity:1",
+          "owned:core-ev-c479c1adda697228:commodity:2",
+          "owned:core-ev-b0cb13f597b091ff:commodity:1",
+          "owned:core-ev-b0cb13f597b091ff:commodity:2",
+          "owned:core-ev-776fe17979f2510e:segment:industry:电信业:table:None:row:11",
+          "owned:core-ev-776fe17979f2510e:segment:product:电信服务:table:主营业务收入:row:19",
+          "owned:core-ev-aa3fc03e4b64d1e2:Segment:product:语音通话及月租费:主营业务收入:row:0",
+          "owned:core-ev-aa3fc03e4b64d1e2:Segment:product:增值服务:主营业务收入:row:1",
+          "owned:core-ev-aa3fc03e4b64d1e2:Segment:product:宽带及移动数据服务:主营业务收入:row:2",
+          "owned:core-ev-aa3fc03e4b64d1e2:Segment:product:数据及其他互联网应用收入:主营业务收入:row:3",
+          "owned:core-ev-aa3fc03e4b64d1e2:Segment:product:网间结算收入:主营业务收入:row:4",
+          "owned:core-ev-aa3fc03e4b64d1e2:Segment:product:电路及网元服务:主营业务收入:row:5",
+          "owned:core-ev-aa3fc03e4b64d1e2:Segment:product:其他:主营业务收入:row:6",
+          "owned:core-ev-aa3fc03e4b64d1e2:Segment:product:销售通信产品:其他业务收入:row:8"
+        ],
+        "source_review": "逐支持事实全文核原来源后检查实际正文实质与限制，不以answered/core_complete判通过"
+      },
+      "revenue_model": {
+        "accurate": true,
+        "reason": "两主业、完整服务矩阵、BVI/实际运营主体及合联营边界、服务/设备/积分/套餐及月账单收费机制完整；6G研发、上级集团及原参股边界保持。",
+        "failed_substance_groups": [],
+        "supporting_record_ids": [
+          "owned:core-ev-2ffa6a3abcf3da26:overview",
+          "owned:core-ev-f5c3a960baca5699:overview",
+          "owned:core-ev-d704d491d8f98bf7:overview",
+          "owned:core-ev-49e0de8c9ae8ad40:overview",
+          "owned:core-ev-6f50091a40d80e56:overview",
+          "owned:core-ev-fdef1a2ba496d9a0:overview",
+          "owned:core-ev-741f4f9676d1746d:overview",
+          "owned:core-ev-3ccbf3638d0ce37a:revenue:industry:电信业:table:None:row:11",
+          "owned:core-ev-3ccbf3638d0ce37a:revenue:product:电信服务:table:主营业务收入:row:19",
+          "owned:core-ev-b4fbf2c018cf5e66:Measurement:product:语音通话及月租费:主营业务收入:row:0",
+          "owned:core-ev-b4fbf2c018cf5e66:Measurement:product:增值服务:主营业务收入:row:1",
+          "owned:core-ev-b4fbf2c018cf5e66:Measurement:product:宽带及移动数据服务:主营业务收入:row:2",
+          "owned:core-ev-b4fbf2c018cf5e66:Measurement:product:数据及其他互联网应用收入:主营业务收入:row:3",
+          "owned:core-ev-b4fbf2c018cf5e66:Measurement:product:网间结算收入:主营业务收入:row:4",
+          "owned:core-ev-b4fbf2c018cf5e66:Measurement:product:电路及网元服务:主营业务收入:row:5",
+          "owned:core-ev-b4fbf2c018cf5e66:Measurement:product:其他:主营业务收入:row:6",
+          "owned:core-ev-b4fbf2c018cf5e66:Measurement:business_type:主营业务:营业收入/主营业务收入:row:7",
+          "owned:core-ev-b4fbf2c018cf5e66:Measurement:product:销售通信产品:其他业务收入:row:8",
+          "owned:core-ev-b4fbf2c018cf5e66:Measurement:business_type:合同产生的收入:营业收入/其他业务收入:row:10",
+          "owned:core-ev-b4fbf2c018cf5e66:Measurement:business_type:其他收入:营业收入/其他业务收入:row:11",
+          "owned:core-ev-e6252f1dcec88a13:Measurement:business_segment:联通红筹公司及其子公司:重要非全资子公司/本期营业收入/内部交易抵销前:row:0",
+          "owned:core-ev-98537f15995a5757:Measurement:business_segment:招联:重要合营企业/本期营业收入:row:0",
+          "owned:core-ev-3e6acacdc7246857:Measurement:business_segment:铁塔公司:重要联营企业/本期营业收入:row:0",
+          "owned:core-ev-4e042f5c6f5f27e7:Measurement:business_segment:联通云:经营业务/本期收入:row:0",
+          "owned:core-ev-4e042f5c6f5f27e7:Measurement:business_segment:数据中心:经营业务/本期收入:row:1",
+          "owned:core-ev-cf05b05c7190bae6:Measurement:business_segment:智能服务:经营业务/本期收入:row:0",
+          "owned:core-ev-c18bfb054b28b560:Measurement:business_segment:数据服务:经营业务/本期收入:row:0",
+          "owned:core-ev-3672b16a65365bd0:Measurement:business_segment:国际业务:经营业务/本期收入:row:0",
+          "owned:core-ev-63e27fc307b86a55:Measurement:service:利息及手续费收入:重大关联交易/本期收入:row:0",
+          "owned:core-ev-63e27fc307b86a55:Measurement:service:综合服务收入:重大关联交易/本期收入:row:1",
+          "owned:core-ev-63e27fc307b86a55:Measurement:service:综合服务收入:重大关联交易/本期收入:row:2",
+          "owned:core-ev-63e27fc307b86a55:Measurement:service:工程设计施工及IT服务收入:重大关联交易/本期收入:row:3",
+          "owned:core-ev-9f48c192c5055ef8:Measurement:service:移动增值服务收入:重大关联交易/本期收入:row:0",
+          "owned:core-ev-9f48c192c5055ef8:Measurement:service:数据及互联网业务收入:重大关联交易/本期收入:row:1"
+        ],
+        "source_review": "逐支持事实全文核原来源后检查实际正文实质与限制，不以answered/core_complete判通过"
+      }
+    }
+  },
+  "600079.SH": {
+    "facts": {
+      "owned:core-ev-62525784d9a1a4bf:overview": {
+        "verified_source_pages": [
+          232,
+          233
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "BusinessOverview",
+        "actual_native_name": "当期产品及服务披露",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "reason": "原出售商品/提供劳务表及续页原交易行，空白本期和上期原值均作为表原文保留，未将其生成本期事实。",
+        "reading_order_or_cross_page_note": "p233首行承租/交易方尾行的布局阅读顺序，原行/金额未变。"
+      },
+      "owned:core-ev-e66c82cd16673c6e:overview": {
+        "verified_source_pages": [
+          12,
+          13
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "BusinessOverview",
+        "actual_native_name": "当期产品及服务披露",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "reason": "重组后工业为主商业为辅、完整链、产品矩阵及国内/国际分支，子公司与未来资源利用保留。"
+      },
+      "owned:core-ev-c9528d88100a5c81:overview": {
+        "verified_source_pages": [
+          12,
+          13
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "BusinessOverview",
+        "actual_native_name": "当期产品及服务披露",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "reason": "重组后工业为主商业为辅、完整链、产品矩阵及国内/国际分支，子公司与未来资源利用保留。"
+      },
+      "owned:core-ev-64bc029ff056b763:overview": {
+        "verified_source_pages": [
+          12,
+          13
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "BusinessOverview",
+        "actual_native_name": "当期产品及服务披露",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "reason": "重组后工业为主商业为辅、完整链、产品矩阵及国内/国际分支，子公司与未来资源利用保留。"
+      },
+      "owned:core-ev-7e886ddc20a2af5b:overview": {
+        "verified_source_pages": [
+          12,
+          13
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "BusinessOverview",
+        "actual_native_name": "当期产品及服务披露",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "reason": "重组后工业为主商业为辅、完整链、产品矩阵及国内/国际分支，子公司与未来资源利用保留。"
+      },
+      "owned:core-ev-bd0ac4e9bb56572a:overview": {
+        "verified_source_pages": [
+          25
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "BusinessOverview",
+        "actual_native_name": "当期产品及服务披露",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "reason": "当期产销量说明；未交付量价扩展。"
+      },
+      "owned:core-ev-a795229943de89fe:overview": {
+        "verified_source_pages": [
+          31,
+          32
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "BusinessOverview",
+        "actual_native_name": "当期产品及服务披露",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "reason": "细分行业、公司/原子公司产品和同业背景，市场预测和同业不得成为集团销售。"
+      },
+      "owned:core-ev-0767be28c532960a:overview": {
+        "verified_source_pages": [
+          43,
+          44
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "BusinessOverview",
+        "actual_native_name": "当期产品及服务披露",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "reason": "工业直销/分销、湖北统购市级分销与国际美国/欧洲/非洲销售模式，保留分支原主体。",
+        "reading_order_or_cross_page_note": "原锚点已含p44完整国际销售段；continuation_pages未列p44，按原锚点可见44/252及独立p43–44共同核验；不修改输出。"
+      },
+      "owned:core-ev-95dc9298c1ace3df:overview": {
+        "verified_source_pages": [
+          43,
+          44
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "BusinessOverview",
+        "actual_native_name": "当期产品及服务披露",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "reason": "工业直销/分销、湖北统购市级分销与国际美国/欧洲/非洲销售模式，保留分支原主体。",
+        "reading_order_or_cross_page_note": "原锚点已含p44完整国际销售段；continuation_pages未列p44，按原锚点可见44/252及独立p43–44共同核验；不修改输出。"
+      },
+      "owned:core-ev-f801bbaeee79bb09:overview": {
+        "verified_source_pages": [
+          48,
+          49
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "BusinessOverview",
+        "actual_native_name": "当期产品及服务披露",
+        "actual_action": null,
+        "actual_subject_scope": "unclear",
+        "reason": "原主要控股参股业务财务及取得/处置事项，不统一升格为发行人；并表及股转边界保留。"
+      },
+      "owned:core-ev-a983517f604954bc:overview": {
+        "verified_source_pages": [
+          48,
+          49
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "BusinessOverview",
+        "actual_native_name": "当期产品及服务披露",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "reason": "原主要控股参股业务财务及取得/处置事项，不统一升格为发行人；并表及股转边界保留。"
+      },
+      "owned:core-ev-7518b270e4d8a5c6:overview": {
+        "verified_source_pages": [
+          50
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "BusinessOverview",
+        "actual_native_name": "当期产品及服务披露",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "reason": "六原子公司股权与产品业务完整，生产经营和未来拓展保持原状态，葛店/新疆/Epic当前销售另依据原句。"
+      },
+      "owned:core-ev-8218c7179f7bb590:overview": {
+        "verified_source_pages": [
+          50
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "BusinessOverview",
+        "actual_native_name": "当期产品及服务披露",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "reason": "六原子公司股权与产品业务完整，生产经营和未来拓展保持原状态，葛店/新疆/Epic当前销售另依据原句。"
+      },
+      "owned:core-ev-b48976a4bf5ab677:overview": {
+        "verified_source_pages": [
+          50
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "BusinessOverview",
+        "actual_native_name": "当期产品及服务披露",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "reason": "六原子公司股权与产品业务完整，生产经营和未来拓展保持原状态，葛店/新疆/Epic当前销售另依据原句。"
+      },
+      "owned:core-ev-24c8d1148d94892b:overview": {
+        "verified_source_pages": [
+          50
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "BusinessOverview",
+        "actual_native_name": "当期产品及服务披露",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "reason": "六原子公司股权与产品业务完整，生产经营和未来拓展保持原状态，葛店/新疆/Epic当前销售另依据原句。"
+      },
+      "owned:core-ev-5b3a5cbf7aab61b5:overview": {
+        "verified_source_pages": [
+          50
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "BusinessOverview",
+        "actual_native_name": "当期产品及服务披露",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "reason": "六原子公司股权与产品业务完整，生产经营和未来拓展保持原状态，葛店/新疆/Epic当前销售另依据原句。"
+      },
+      "owned:core-ev-9a86ba758350ea96:overview": {
+        "verified_source_pages": [
+          50
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "BusinessOverview",
+        "actual_native_name": "当期产品及服务披露",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "reason": "六原子公司股权与产品业务完整，生产经营和未来拓展保持原状态，葛店/新疆/Epic当前销售另依据原句。"
+      },
+      "owned:core-ev-30ac6ae9268346c4:overview": {
+        "verified_source_pages": [
+          139
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "BusinessOverview",
+        "actual_native_name": "当期产品及服务披露",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "reason": "原药品/原料药控制权时点、现时收款、主要责任人总额/代理净额、定制研发履约与可补偿条件。"
+      },
+      "owned:core-ev-2218ab5ceaa0919c:overview": {
+        "verified_source_pages": [
+          139
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "BusinessOverview",
+        "actual_native_name": "当期产品及服务披露",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "reason": "原药品/原料药控制权时点、现时收款、主要责任人总额/代理净额、定制研发履约与可补偿条件。"
+      },
+      "owned:core-ev-2d0e3c957c5197af:overview": {
+        "verified_source_pages": [
+          142
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "BusinessOverview",
+        "actual_native_name": "当期产品及服务披露",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "reason": "出租会计政策原文，未由否定关联租赁表生成出租事实。"
+      },
+      "owned:core-ev-a6c8aac7ede23c62:overview": {
+        "verified_source_pages": [
+          209
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "BusinessOverview",
+        "actual_native_name": "当期产品及服务披露",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "reason": "原失控、股转时点与合并变化完整，不把退出主体持续合并。"
+      },
+      "owned:core-ev-33c7a23ed47eaa64:overview": {
+        "verified_source_pages": [
+          211,
+          212,
+          213,
+          214,
+          215,
+          216,
+          217,
+          218,
+          219
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "BusinessOverview",
+        "actual_native_name": "当期产品及服务披露",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "reason": "集团构成原主体、业务、原币种及持股原行；仅取得方式表头阅读顺序不同。",
+        "reading_order_or_cross_page_note": "p211取得方式表头阅读顺序；原子公司各行、业务、持股/注册币种完整一致。"
+      },
+      "owned:core-ev-cf48eef48d1b3c0f:overview": {
+        "verified_source_pages": [
+          232
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "BusinessOverview",
+        "actual_native_name": "当期产品及服务披露",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "reason": "原出售商品/提供劳务表及续页原交易行，空白本期和上期原值均作为表原文保留，未将其生成本期事实。"
+      },
+      "owned:core-ev-4a0bc38c94c96657:overview": {
+        "verified_source_pages": [
+          233
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "BusinessOverview",
+        "actual_native_name": "当期产品及服务披露",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "reason": "本公司作为出租方不适用为否定原文，不生成肯定租赁。"
+      },
+      "owned:core-ev-e1e23a937a78010c:commodity:1": {
+        "verified_source_pages": [
+          5,
+          24,
+          25
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Activity",
+        "actual_native_name": "枸橼酸舒芬太尼注射液",
+        "actual_action": "sells",
+        "actual_subject_scope": "consolidated_group",
+        "recall_role_index": 0,
+        "accepted_exposure_role": "product_sales",
+        "reason": "原页具名当期销售/采购＋原主体成立。集团产销表按销售量明示，子公司清单按本分支当前肯定销售。释义页映射全名；采购不推制造投入。"
+      },
+      "owned:core-ev-e1e23a937a78010c:commodity:2": {
+        "verified_source_pages": [
+          5,
+          24,
+          25
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Activity",
+        "actual_native_name": "注射用盐酸瑞芬太尼",
+        "actual_action": "sells",
+        "actual_subject_scope": "consolidated_group",
+        "recall_role_index": 1,
+        "accepted_exposure_role": "product_sales",
+        "reason": "原页具名当期销售/采购＋原主体成立。集团产销表按销售量明示，子公司清单按本分支当前肯定销售。释义页映射全名；采购不推制造投入。"
+      },
+      "owned:core-ev-e1e23a937a78010c:commodity:3": {
+        "verified_source_pages": [
+          5,
+          24,
+          25
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Activity",
+        "actual_native_name": "盐酸氢吗啡酮注射液",
+        "actual_action": "sells",
+        "actual_subject_scope": "consolidated_group",
+        "recall_role_index": 2,
+        "accepted_exposure_role": "product_sales",
+        "reason": "原页具名当期销售/采购＋原主体成立。集团产销表按销售量明示，子公司清单按本分支当前肯定销售。释义页映射全名；采购不推制造投入。"
+      },
+      "owned:core-ev-e1e23a937a78010c:commodity:4": {
+        "verified_source_pages": [
+          5,
+          24,
+          25
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Activity",
+        "actual_native_name": "盐酸纳布啡注射液",
+        "actual_action": "sells",
+        "actual_subject_scope": "consolidated_group",
+        "recall_role_index": 3,
+        "accepted_exposure_role": "product_sales",
+        "reason": "原页具名当期销售/采购＋原主体成立。集团产销表按销售量明示，子公司清单按本分支当前肯定销售。释义页映射全名；采购不推制造投入。"
+      },
+      "owned:core-ev-e1e23a937a78010c:commodity:5": {
+        "verified_source_pages": [
+          5,
+          24,
+          25
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Activity",
+        "actual_native_name": "盐酸阿芬太尼注射液",
+        "actual_action": "sells",
+        "actual_subject_scope": "consolidated_group",
+        "recall_role_index": 4,
+        "accepted_exposure_role": "product_sales",
+        "reason": "原页具名当期销售/采购＋原主体成立。集团产销表按销售量明示，子公司清单按本分支当前肯定销售。释义页映射全名；采购不推制造投入。"
+      },
+      "owned:core-ev-e1e23a937a78010c:commodity:6": {
+        "verified_source_pages": [
+          5,
+          24,
+          25
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Activity",
+        "actual_native_name": "注射用苯磺酸瑞马唑仑",
+        "actual_action": "sells",
+        "actual_subject_scope": "consolidated_group",
+        "recall_role_index": 5,
+        "accepted_exposure_role": "product_sales",
+        "reason": "原页具名当期销售/采购＋原主体成立。集团产销表按销售量明示，子公司清单按本分支当前肯定销售。释义页映射全名；采购不推制造投入。"
+      },
+      "owned:core-ev-e1e23a937a78010c:commodity:7": {
+        "verified_source_pages": [
+          5,
+          24,
+          25
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Activity",
+        "actual_native_name": "米非司酮制剂",
+        "actual_action": "sells",
+        "actual_subject_scope": "consolidated_group",
+        "recall_role_index": 6,
+        "accepted_exposure_role": "product_sales",
+        "reason": "原页具名当期销售/采购＋原主体成立。集团产销表按销售量明示，子公司清单按本分支当前肯定销售。释义页映射全名；采购不推制造投入。"
+      },
+      "owned:core-ev-e1e23a937a78010c:commodity:8": {
+        "verified_source_pages": [
+          5,
+          24,
+          25
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Activity",
+        "actual_native_name": "祖卡木颗粒",
+        "actual_action": "sells",
+        "actual_subject_scope": "consolidated_group",
+        "recall_role_index": 7,
+        "accepted_exposure_role": "product_sales",
+        "reason": "原页具名当期销售/采购＋原主体成立。集团产销表按销售量明示，子公司清单按本分支当前肯定销售。释义页映射全名；采购不推制造投入。"
+      },
+      "owned:core-ev-e1e23a937a78010c:commodity:9": {
+        "verified_source_pages": [
+          5,
+          24,
+          25
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Activity",
+        "actual_native_name": "复方木尼孜其颗粒",
+        "actual_action": "sells",
+        "actual_subject_scope": "consolidated_group",
+        "recall_role_index": 8,
+        "accepted_exposure_role": "product_sales",
+        "reason": "原页具名当期销售/采购＋原主体成立。集团产销表按销售量明示，子公司清单按本分支当前肯定销售。释义页映射全名；采购不推制造投入。"
+      },
+      "owned:core-ev-e1e23a937a78010c:commodity:10": {
+        "verified_source_pages": [
+          5,
+          24,
+          25
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Activity",
+        "actual_native_name": "注射用尿激酶",
+        "actual_action": "sells",
+        "actual_subject_scope": "consolidated_group",
+        "recall_role_index": 9,
+        "accepted_exposure_role": "product_sales",
+        "reason": "原页具名当期销售/采购＋原主体成立。集团产销表按销售量明示，子公司清单按本分支当前肯定销售。释义页映射全名；采购不推制造投入。"
+      },
+      "owned:core-ev-e1e23a937a78010c:commodity:11": {
+        "verified_source_pages": [
+          5,
+          24,
+          25
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Activity",
+        "actual_native_name": "硫酸新霉素",
+        "actual_action": "sells",
+        "actual_subject_scope": "consolidated_group",
+        "recall_role_index": 10,
+        "accepted_exposure_role": "product_sales",
+        "reason": "原页具名当期销售/采购＋原主体成立。集团产销表按销售量明示，子公司清单按本分支当前肯定销售。释义页映射全名；采购不推制造投入。"
+      },
+      "owned:core-ev-e1e23a937a78010c:commodity:12": {
+        "verified_source_pages": [
+          5,
+          24,
+          25
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Activity",
+        "actual_native_name": "黄体酮原料药",
+        "actual_action": "sells",
+        "actual_subject_scope": "consolidated_group",
+        "recall_role_index": 11,
+        "accepted_exposure_role": "product_sales",
+        "reason": "原页具名当期销售/采购＋原主体成立。集团产销表按销售量明示，子公司清单按本分支当前肯定销售。释义页映射全名；采购不推制造投入。"
+      },
+      "owned:core-ev-d51cdeb5f9da4d39:commodity:1": {
+        "verified_source_pages": [
+          5,
+          43
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Activity",
+        "actual_native_name": "药品",
+        "actual_action": "purchases",
+        "actual_subject_scope": "named_subsidiary",
+        "recall_role_index": 49,
+        "accepted_exposure_role": "raw_material_input",
+        "reason": "原页具名当期销售/采购＋原主体成立。集团产销表按销售量明示，子公司清单按本分支当前肯定销售。释义页映射全名；采购不推制造投入。"
+      },
+      "owned:core-ev-5fbedd1227935da9:commodity:1": {
+        "verified_source_pages": [
+          5,
+          49
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Activity",
+        "actual_native_name": "麻醉药",
+        "actual_action": "sells",
+        "actual_subject_scope": "named_subsidiary",
+        "recall_role_index": 41,
+        "accepted_exposure_role": "product_sales",
+        "reason": "原页具名当期销售/采购＋原主体成立。集团产销表按销售量明示，子公司清单按本分支当前肯定销售。释义页映射全名；采购不推制造投入。"
+      },
+      "owned:core-ev-5fbedd1227935da9:commodity:2": {
+        "verified_source_pages": [
+          5,
+          49
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Activity",
+        "actual_native_name": "原料药",
+        "actual_action": "sells",
+        "actual_subject_scope": "named_subsidiary",
+        "recall_role_index": 42,
+        "accepted_exposure_role": "product_sales",
+        "reason": "原页具名当期销售/采购＋原主体成立。集团产销表按销售量明示，子公司清单按本分支当前肯定销售。释义页映射全名；采购不推制造投入。"
+      },
+      "owned:core-ev-5fbedd1227935da9:commodity:3": {
+        "verified_source_pages": [
+          5,
+          49
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Activity",
+        "actual_native_name": "制剂",
+        "actual_action": "sells",
+        "actual_subject_scope": "named_subsidiary",
+        "recall_role_index": 43,
+        "accepted_exposure_role": "product_sales",
+        "reason": "原页具名当期销售/采购＋原主体成立。集团产销表按销售量明示，子公司清单按本分支当前肯定销售。释义页映射全名；采购不推制造投入。"
+      },
+      "owned:core-ev-5fbedd1227935da9:commodity:4": {
+        "verified_source_pages": [
+          5,
+          49
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Activity",
+        "actual_native_name": "甾体激素类原料药与制剂",
+        "actual_action": "sells",
+        "actual_subject_scope": "named_subsidiary",
+        "reason": "合同外原p49子公司成立父类销售或p231集团药品本期采购，动作及原主体有来源；准确率计一次，不代替具名条件或湖北采购召回。"
+      },
+      "owned:core-ev-5fbedd1227935da9:commodity:5": {
+        "verified_source_pages": [
+          5,
+          49
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Activity",
+        "actual_native_name": "维吾尔药品",
+        "actual_action": "sells",
+        "actual_subject_scope": "named_subsidiary",
+        "reason": "合同外原p49子公司成立父类销售或p231集团药品本期采购，动作及原主体有来源；准确率计一次，不代替具名条件或湖北采购召回。"
+      },
+      "owned:core-ev-5fbedd1227935da9:commodity:6": {
+        "verified_source_pages": [
+          5,
+          49
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Activity",
+        "actual_native_name": "美国化学仿制药",
+        "actual_action": "sells",
+        "actual_subject_scope": "named_subsidiary",
+        "reason": "合同外原p49子公司成立父类销售或p231集团药品本期采购，动作及原主体有来源；准确率计一次，不代替具名条件或湖北采购召回。"
+      },
+      "owned:core-ev-5fbedd1227935da9:commodity:7": {
+        "verified_source_pages": [
+          5,
+          49
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Activity",
+        "actual_native_name": "体外诊断试剂",
+        "actual_action": "sells",
+        "actual_subject_scope": "named_subsidiary",
+        "recall_role_index": 44,
+        "accepted_exposure_role": "product_sales",
+        "reason": "原页具名当期销售/采购＋原主体成立。集团产销表按销售量明示，子公司清单按本分支当前肯定销售。释义页映射全名；采购不推制造投入。"
+      },
+      "owned:core-ev-5fbedd1227935da9:commodity:8": {
+        "verified_source_pages": [
+          5,
+          49
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Activity",
+        "actual_native_name": "医疗器械",
+        "actual_action": "sells",
+        "actual_subject_scope": "named_subsidiary",
+        "recall_role_index": 45,
+        "accepted_exposure_role": "product_sales",
+        "reason": "原页具名当期销售/采购＋原主体成立。集团产销表按销售量明示，子公司清单按本分支当前肯定销售。释义页映射全名；采购不推制造投入。"
+      },
+      "owned:core-ev-5fbedd1227935da9:commodity:9": {
+        "verified_source_pages": [
+          5,
+          49
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Activity",
+        "actual_native_name": "药品",
+        "actual_action": "sells",
+        "actual_subject_scope": "named_subsidiary",
+        "recall_role_index": 46,
+        "accepted_exposure_role": "product_sales",
+        "reason": "原页具名当期销售/采购＋原主体成立。集团产销表按销售量明示，子公司清单按本分支当前肯定销售。释义页映射全名；采购不推制造投入。"
+      },
+      "owned:core-ev-5fbedd1227935da9:commodity:10": {
+        "verified_source_pages": [
+          5,
+          49
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Activity",
+        "actual_native_name": "试剂",
+        "actual_action": "sells",
+        "actual_subject_scope": "named_subsidiary",
+        "recall_role_index": 47,
+        "accepted_exposure_role": "product_sales",
+        "reason": "原页具名当期销售/采购＋原主体成立。集团产销表按销售量明示，子公司清单按本分支当前肯定销售。释义页映射全名；采购不推制造投入。"
+      },
+      "owned:core-ev-5fbedd1227935da9:commodity:11": {
+        "verified_source_pages": [
+          5,
+          49
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Activity",
+        "actual_native_name": "医疗器械",
+        "actual_action": "sells",
+        "actual_subject_scope": "named_subsidiary",
+        "recall_role_index": 48,
+        "accepted_exposure_role": "product_sales",
+        "reason": "原页具名当期销售/采购＋原主体成立。集团产销表按销售量明示，子公司清单按本分支当前肯定销售。释义页映射全名；采购不推制造投入。"
+      },
+      "owned:core-ev-c17a4b155cdf42bc:commodity:1": {
+        "verified_source_pages": [
+          5,
+          50
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Activity",
+        "actual_native_name": "（复方）米非司酮片",
+        "actual_action": "sells",
+        "actual_subject_scope": "named_subsidiary",
+        "recall_role_index": 12,
+        "accepted_exposure_role": "product_sales",
+        "reason": "原页具名当期销售/采购＋原主体成立。集团产销表按销售量明示，子公司清单按本分支当前肯定销售。释义页映射全名；采购不推制造投入。"
+      },
+      "owned:core-ev-c17a4b155cdf42bc:commodity:2": {
+        "verified_source_pages": [
+          5,
+          50
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Activity",
+        "actual_native_name": "米索前列醇片",
+        "actual_action": "sells",
+        "actual_subject_scope": "named_subsidiary",
+        "recall_role_index": 13,
+        "accepted_exposure_role": "product_sales",
+        "reason": "原页具名当期销售/采购＋原主体成立。集团产销表按销售量明示，子公司清单按本分支当前肯定销售。释义页映射全名；采购不推制造投入。"
+      },
+      "owned:core-ev-c17a4b155cdf42bc:commodity:3": {
+        "verified_source_pages": [
+          5,
+          50
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Activity",
+        "actual_native_name": "左炔诺孕酮胶囊",
+        "actual_action": "sells",
+        "actual_subject_scope": "named_subsidiary",
+        "recall_role_index": 14,
+        "accepted_exposure_role": "product_sales",
+        "reason": "原页具名当期销售/采购＋原主体成立。集团产销表按销售量明示，子公司清单按本分支当前肯定销售。释义页映射全名；采购不推制造投入。"
+      },
+      "owned:core-ev-c17a4b155cdf42bc:commodity:4": {
+        "verified_source_pages": [
+          5,
+          50
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Activity",
+        "actual_native_name": "醋酸阿比特龙片",
+        "actual_action": "sells",
+        "actual_subject_scope": "named_subsidiary",
+        "recall_role_index": 15,
+        "accepted_exposure_role": "product_sales",
+        "reason": "原页具名当期销售/采购＋原主体成立。集团产销表按销售量明示，子公司清单按本分支当前肯定销售。释义页映射全名；采购不推制造投入。"
+      },
+      "owned:core-ev-c17a4b155cdf42bc:commodity:5": {
+        "verified_source_pages": [
+          5,
+          50
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Activity",
+        "actual_native_name": "地诺孕素片",
+        "actual_action": "sells",
+        "actual_subject_scope": "named_subsidiary",
+        "recall_role_index": 16,
+        "accepted_exposure_role": "product_sales",
+        "reason": "原页具名当期销售/采购＋原主体成立。集团产销表按销售量明示，子公司清单按本分支当前肯定销售。释义页映射全名；采购不推制造投入。"
+      },
+      "owned:core-ev-c17a4b155cdf42bc:commodity:6": {
+        "verified_source_pages": [
+          5,
+          50
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Activity",
+        "actual_native_name": "黄体酮软胶囊",
+        "actual_action": "sells",
+        "actual_subject_scope": "named_subsidiary",
+        "recall_role_index": 17,
+        "accepted_exposure_role": "product_sales",
+        "reason": "原页具名当期销售/采购＋原主体成立。集团产销表按销售量明示，子公司清单按本分支当前肯定销售。释义页映射全名；采购不推制造投入。"
+      },
+      "owned:core-ev-c17a4b155cdf42bc:commodity:7": {
+        "verified_source_pages": [
+          5,
+          50
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Activity",
+        "actual_native_name": "屈螺酮炔雌醇片",
+        "actual_action": "sells",
+        "actual_subject_scope": "named_subsidiary",
+        "recall_role_index": 18,
+        "accepted_exposure_role": "product_sales",
+        "reason": "原页具名当期销售/采购＋原主体成立。集团产销表按销售量明示，子公司清单按本分支当前肯定销售。释义页映射全名；采购不推制造投入。"
+      },
+      "owned:core-ev-c17a4b155cdf42bc:commodity:8": {
+        "verified_source_pages": [
+          5,
+          50
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Activity",
+        "actual_native_name": "黄体酮",
+        "actual_action": "sells",
+        "actual_subject_scope": "named_subsidiary",
+        "recall_role_index": 19,
+        "accepted_exposure_role": "product_sales",
+        "reason": "原页具名当期销售/采购＋原主体成立。集团产销表按销售量明示，子公司清单按本分支当前肯定销售。释义页映射全名；采购不推制造投入。"
+      },
+      "owned:core-ev-c17a4b155cdf42bc:commodity:9": {
+        "verified_source_pages": [
+          5,
+          50
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Activity",
+        "actual_native_name": "非那雄胺",
+        "actual_action": "sells",
+        "actual_subject_scope": "named_subsidiary",
+        "recall_role_index": 20,
+        "accepted_exposure_role": "product_sales",
+        "reason": "原页具名当期销售/采购＋原主体成立。集团产销表按销售量明示，子公司清单按本分支当前肯定销售。释义页映射全名；采购不推制造投入。"
+      },
+      "owned:core-ev-c17a4b155cdf42bc:commodity:10": {
+        "verified_source_pages": [
+          5,
+          50
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Activity",
+        "actual_native_name": "醋酸环丙孕酮",
+        "actual_action": "sells",
+        "actual_subject_scope": "named_subsidiary",
+        "recall_role_index": 21,
+        "accepted_exposure_role": "product_sales",
+        "reason": "原页具名当期销售/采购＋原主体成立。集团产销表按销售量明示，子公司清单按本分支当前肯定销售。释义页映射全名；采购不推制造投入。"
+      },
+      "owned:core-ev-c17a4b155cdf42bc:commodity:11": {
+        "verified_source_pages": [
+          5,
+          50
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Activity",
+        "actual_native_name": "布地奈德",
+        "actual_action": "sells",
+        "actual_subject_scope": "named_subsidiary",
+        "recall_role_index": 22,
+        "accepted_exposure_role": "product_sales",
+        "reason": "原页具名当期销售/采购＋原主体成立。集团产销表按销售量明示，子公司清单按本分支当前肯定销售。释义页映射全名；采购不推制造投入。"
+      },
+      "owned:core-ev-c17a4b155cdf42bc:commodity:12": {
+        "verified_source_pages": [
+          5,
+          50
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Activity",
+        "actual_native_name": "奥卡西平",
+        "actual_action": "sells",
+        "actual_subject_scope": "named_subsidiary",
+        "recall_role_index": 23,
+        "accepted_exposure_role": "product_sales",
+        "reason": "原页具名当期销售/采购＋原主体成立。集团产销表按销售量明示，子公司清单按本分支当前肯定销售。释义页映射全名；采购不推制造投入。"
+      },
+      "owned:core-ev-c17a4b155cdf42bc:commodity:13": {
+        "verified_source_pages": [
+          5,
+          50
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Activity",
+        "actual_native_name": "去氢表雄酮",
+        "actual_action": "sells",
+        "actual_subject_scope": "named_subsidiary",
+        "recall_role_index": 24,
+        "accepted_exposure_role": "product_sales",
+        "reason": "原页具名当期销售/采购＋原主体成立。集团产销表按销售量明示，子公司清单按本分支当前肯定销售。释义页映射全名；采购不推制造投入。"
+      },
+      "owned:core-ev-c17a4b155cdf42bc:commodity:14": {
+        "verified_source_pages": [
+          5,
+          50
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Activity",
+        "actual_native_name": "度他雄胺",
+        "actual_action": "sells",
+        "actual_subject_scope": "named_subsidiary",
+        "recall_role_index": 25,
+        "accepted_exposure_role": "product_sales",
+        "reason": "原页具名当期销售/采购＋原主体成立。集团产销表按销售量明示，子公司清单按本分支当前肯定销售。释义页映射全名；采购不推制造投入。"
+      },
+      "owned:core-ev-c17a4b155cdf42bc:commodity:15": {
+        "verified_source_pages": [
+          5,
+          50
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Activity",
+        "actual_native_name": "复方木尼孜其颗粒",
+        "actual_action": "sells",
+        "actual_subject_scope": "named_subsidiary",
+        "recall_role_index": 26,
+        "accepted_exposure_role": "product_sales",
+        "reason": "原页具名当期销售/采购＋原主体成立。集团产销表按销售量明示，子公司清单按本分支当前肯定销售。释义页映射全名；采购不推制造投入。"
+      },
+      "owned:core-ev-c17a4b155cdf42bc:commodity:16": {
+        "verified_source_pages": [
+          5,
+          50
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Activity",
+        "actual_native_name": "祖卡木颗粒",
+        "actual_action": "sells",
+        "actual_subject_scope": "named_subsidiary",
+        "recall_role_index": 27,
+        "accepted_exposure_role": "product_sales",
+        "reason": "原页具名当期销售/采购＋原主体成立。集团产销表按销售量明示，子公司清单按本分支当前肯定销售。释义页映射全名；采购不推制造投入。"
+      },
+      "owned:core-ev-c17a4b155cdf42bc:commodity:17": {
+        "verified_source_pages": [
+          5,
+          50
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Activity",
+        "actual_native_name": "寒喘祖帕颗粒",
+        "actual_action": "sells",
+        "actual_subject_scope": "named_subsidiary",
+        "recall_role_index": 28,
+        "accepted_exposure_role": "product_sales",
+        "reason": "原页具名当期销售/采购＋原主体成立。集团产销表按销售量明示，子公司清单按本分支当前肯定销售。释义页映射全名；采购不推制造投入。"
+      },
+      "owned:core-ev-c17a4b155cdf42bc:commodity:18": {
+        "verified_source_pages": [
+          5,
+          50
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Activity",
+        "actual_native_name": "石榴补血糖浆",
+        "actual_action": "sells",
+        "actual_subject_scope": "named_subsidiary",
+        "recall_role_index": 29,
+        "accepted_exposure_role": "product_sales",
+        "reason": "原页具名当期销售/采购＋原主体成立。集团产销表按销售量明示，子公司清单按本分支当前肯定销售。释义页映射全名；采购不推制造投入。"
+      },
+      "owned:core-ev-c17a4b155cdf42bc:commodity:19": {
+        "verified_source_pages": [
+          5,
+          50
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Activity",
+        "actual_native_name": "养心达瓦依米西克蜜膏",
+        "actual_action": "sells",
+        "actual_subject_scope": "named_subsidiary",
+        "recall_role_index": 30,
+        "accepted_exposure_role": "product_sales",
+        "reason": "原页具名当期销售/采购＋原主体成立。集团产销表按销售量明示，子公司清单按本分支当前肯定销售。释义页映射全名；采购不推制造投入。"
+      },
+      "owned:core-ev-c17a4b155cdf42bc:commodity:20": {
+        "verified_source_pages": [
+          5,
+          50
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Activity",
+        "actual_native_name": "通滞苏润江胶囊",
+        "actual_action": "sells",
+        "actual_subject_scope": "named_subsidiary",
+        "recall_role_index": 31,
+        "accepted_exposure_role": "product_sales",
+        "reason": "原页具名当期销售/采购＋原主体成立。集团产销表按销售量明示，子公司清单按本分支当前肯定销售。释义页映射全名；采购不推制造投入。"
+      },
+      "owned:core-ev-c17a4b155cdf42bc:commodity:21": {
+        "verified_source_pages": [
+          5,
+          50
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Activity",
+        "actual_native_name": "复方高滋斑片",
+        "actual_action": "sells",
+        "actual_subject_scope": "named_subsidiary",
+        "recall_role_index": 32,
+        "accepted_exposure_role": "product_sales",
+        "reason": "原页具名当期销售/采购＋原主体成立。集团产销表按销售量明示，子公司清单按本分支当前肯定销售。释义页映射全名；采购不推制造投入。"
+      },
+      "owned:core-ev-c17a4b155cdf42bc:commodity:22": {
+        "verified_source_pages": [
+          5,
+          50
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Activity",
+        "actual_native_name": "护肝布祖热颗粒",
+        "actual_action": "sells",
+        "actual_subject_scope": "named_subsidiary",
+        "recall_role_index": 33,
+        "accepted_exposure_role": "product_sales",
+        "reason": "原页具名当期销售/采购＋原主体成立。集团产销表按销售量明示，子公司清单按本分支当前肯定销售。释义页映射全名；采购不推制造投入。"
+      },
+      "owned:core-ev-c17a4b155cdf42bc:commodity:23": {
+        "verified_source_pages": [
+          5,
+          50
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Activity",
+        "actual_native_name": "苯丙胺片",
+        "actual_action": "sells",
+        "actual_subject_scope": "named_subsidiary",
+        "recall_role_index": 34,
+        "accepted_exposure_role": "product_sales",
+        "reason": "原页具名当期销售/采购＋原主体成立。集团产销表按销售量明示，子公司清单按本分支当前肯定销售。释义页映射全名；采购不推制造投入。"
+      },
+      "owned:core-ev-c17a4b155cdf42bc:commodity:24": {
+        "verified_source_pages": [
+          5,
+          50
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Activity",
+        "actual_native_name": "熊去氧胆酸胶囊",
+        "actual_action": "sells",
+        "actual_subject_scope": "named_subsidiary",
+        "recall_role_index": 35,
+        "accepted_exposure_role": "product_sales",
+        "reason": "原页具名当期销售/采购＋原主体成立。集团产销表按销售量明示，子公司清单按本分支当前肯定销售。释义页映射全名；采购不推制造投入。"
+      },
+      "owned:core-ev-c17a4b155cdf42bc:commodity:25": {
+        "verified_source_pages": [
+          5,
+          50
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Activity",
+        "actual_native_name": "氯化钾口服粉末剂",
+        "actual_action": "sells",
+        "actual_subject_scope": "named_subsidiary",
+        "recall_role_index": 36,
+        "accepted_exposure_role": "product_sales",
+        "reason": "原页具名当期销售/采购＋原主体成立。集团产销表按销售量明示，子公司清单按本分支当前肯定销售。释义页映射全名；采购不推制造投入。"
+      },
+      "owned:core-ev-c17a4b155cdf42bc:commodity:26": {
+        "verified_source_pages": [
+          5,
+          50
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Activity",
+        "actual_native_name": "阿奇霉素干混悬剂",
+        "actual_action": "sells",
+        "actual_subject_scope": "named_subsidiary",
+        "recall_role_index": 37,
+        "accepted_exposure_role": "product_sales",
+        "reason": "原页具名当期销售/采购＋原主体成立。集团产销表按销售量明示，子公司清单按本分支当前肯定销售。释义页映射全名；采购不推制造投入。"
+      },
+      "owned:core-ev-c17a4b155cdf42bc:commodity:27": {
+        "verified_source_pages": [
+          5,
+          50
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Activity",
+        "actual_native_name": "盐酸尼卡地平片",
+        "actual_action": "sells",
+        "actual_subject_scope": "named_subsidiary",
+        "recall_role_index": 38,
+        "accepted_exposure_role": "product_sales",
+        "reason": "原页具名当期销售/采购＋原主体成立。集团产销表按销售量明示，子公司清单按本分支当前肯定销售。释义页映射全名；采购不推制造投入。"
+      },
+      "owned:core-ev-c17a4b155cdf42bc:commodity:28": {
+        "verified_source_pages": [
+          5,
+          50
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Activity",
+        "actual_native_name": "消胆胺粉末剂",
+        "actual_action": "sells",
+        "actual_subject_scope": "named_subsidiary",
+        "recall_role_index": 39,
+        "accepted_exposure_role": "product_sales",
+        "reason": "原页具名当期销售/采购＋原主体成立。集团产销表按销售量明示，子公司清单按本分支当前肯定销售。释义页映射全名；采购不推制造投入。"
+      },
+      "owned:core-ev-c17a4b155cdf42bc:commodity:29": {
+        "verified_source_pages": [
+          5,
+          50
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Activity",
+        "actual_native_name": "硫酸奎尼丁片",
+        "actual_action": "sells",
+        "actual_subject_scope": "named_subsidiary",
+        "recall_role_index": 40,
+        "accepted_exposure_role": "product_sales",
+        "reason": "原页具名当期销售/采购＋原主体成立。集团产销表按销售量明示，子公司清单按本分支当前肯定销售。释义页映射全名；采购不推制造投入。"
+      },
+      "owned:core-ev-c352d91a38cb1132:commodity:1": {
+        "verified_source_pages": [
+          5,
+          231,
+          232
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Activity",
+        "actual_native_name": "药品",
+        "actual_action": "purchases",
+        "actual_subject_scope": "consolidated_group",
+        "reason": "合同外原p49子公司成立父类销售或p231集团药品本期采购，动作及原主体有来源；准确率计一次，不代替具名条件或湖北采购召回。"
+      },
+      "owned:core-ev-9dd6499596b8867a:segment:industry:制造业:table:None:row:15": {
+        "verified_source_pages": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "制造业",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 0,
+        "recall_row_index": 0,
+        "reason": "独立官方p23 主营业务分行业／制造业本期14,213,816,932.01元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-c1ced1d139a95117:revenue:industry:制造业:table:None:row:15": {
+        "verified_source_pages": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "制造业",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 0,
+        "reason": "独立官方p23 主营业务分行业／制造业本期14,213,816,932.01元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-9dd6499596b8867a:segment:industry:批发及其他:table:None:row:17": {
+        "verified_source_pages": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "批发及其他",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 1,
+        "recall_row_index": 1,
+        "reason": "独立官方p23 主营业务分行业／批发及其他本期9,704,429,026.35元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-c1ced1d139a95117:revenue:industry:批发及其他:table:None:row:17": {
+        "verified_source_pages": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "批发及其他",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 1,
+        "reason": "独立官方p23 主营业务分行业／批发及其他本期9,704,429,026.35元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-9dd6499596b8867a:segment:product:医疗器械:table:主营业务收入:row:26": {
+        "verified_source_pages": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "医疗器械",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 2,
+        "recall_row_index": 2,
+        "reason": "独立官方p24 主营业务分产品／医疗器械本期3,904,573,917.48元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-c1ced1d139a95117:revenue:product:医疗器械:table:主营业务收入:row:26": {
+        "verified_source_pages": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "医疗器械",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 2,
+        "reason": "独立官方p24 主营业务分产品／医疗器械本期3,904,573,917.48元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-9dd6499596b8867a:segment:product:药品及其他:table:主营业务收入:row:28": {
+        "verified_source_pages": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "药品及其他",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 3,
+        "recall_row_index": 3,
+        "reason": "独立官方p24 主营业务分产品／药品及其他本期20,013,672,040.88元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-c1ced1d139a95117:revenue:product:药品及其他:table:主营业务收入:row:28": {
+        "verified_source_pages": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "药品及其他",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 3,
+        "reason": "独立官方p24 主营业务分产品／药品及其他本期20,013,672,040.88元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-9dd6499596b8867a:segment:region:国内:table:主营业务收入:row:40": {
+        "verified_source_pages": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "国内",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 4,
+        "recall_row_index": 4,
+        "reason": "独立官方p24 主营业务分地区／国内本期20,657,387,183.79元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-c1ced1d139a95117:revenue:region:国内:table:主营业务收入:row:40": {
+        "verified_source_pages": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "国内",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 4,
+        "reason": "独立官方p24 主营业务分地区／国内本期20,657,387,183.79元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-9dd6499596b8867a:segment:region:国外:table:主营业务收入:row:42": {
+        "verified_source_pages": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "国外",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 5,
+        "recall_row_index": 5,
+        "reason": "独立官方p24 主营业务分地区／国外本期3,260,858,774.57元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-c1ced1d139a95117:revenue:region:国外:table:主营业务收入:row:42": {
+        "verified_source_pages": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "国外",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 5,
+        "reason": "独立官方p24 主营业务分地区／国外本期3,260,858,774.57元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-9dd6499596b8867a:segment:sales_mode:制造业:table:None:row:54": {
+        "verified_source_pages": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "制造业",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 6,
+        "recall_row_index": 6,
+        "reason": "独立官方p24 主营业务分销售模式／制造业本期14,213,816,932.01元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-c1ced1d139a95117:revenue:sales_mode:制造业:table:None:row:54": {
+        "verified_source_pages": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "制造业",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 6,
+        "reason": "独立官方p24 主营业务分销售模式／制造业本期14,213,816,932.01元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-9dd6499596b8867a:segment:sales_mode:批发及其他:table:None:row:56": {
+        "verified_source_pages": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "批发及其他",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 7,
+        "recall_row_index": 7,
+        "reason": "独立官方p24 主营业务分销售模式／批发及其他本期9,704,429,026.35元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-c1ced1d139a95117:revenue:sales_mode:批发及其他:table:None:row:56": {
+        "verified_source_pages": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "批发及其他",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 7,
+        "reason": "独立官方p24 主营业务分销售模式／批发及其他本期9,704,429,026.35元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-e55e2a5cb69974d0:Segment:business_type:批发及其他:本期营业收入:row:0": {
+        "verified_source_pages": [
+          27
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "批发及其他",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 8,
+        "recall_row_index": 8,
+        "reason": "独立官方p27 贸易业务开展情况／批发及其他本期970,442.90万元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-d29ca0f208d97128:Measurement:business_type:批发及其他:本期营业收入:row:0": {
+        "verified_source_pages": [
+          27
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "批发及其他",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 8,
+        "reason": "独立官方p27 贸易业务开展情况／批发及其他本期970,442.90万元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-b27c250c30ef759c:Segment:business_segment:宜昌人福:控股参股公司/营业收入:row:0": {
+        "verified_source_pages": [
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47,
+          48,
+          49
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "宜昌人福",
+        "actual_action": null,
+        "actual_subject_scope": "named_subsidiary",
+        "matched_source_row_index": 12,
+        "recall_row_index": 12,
+        "reason": "独立官方p49 主要控股参股公司营业收入／宜昌人福本期881,046.71万元，原主体宜昌人福药业有限责任公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-d22479af34cb101c:Measurement:business_segment:宜昌人福:控股参股公司/营业收入:row:0": {
+        "verified_source_pages": [
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47,
+          48,
+          49
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "宜昌人福",
+        "actual_action": null,
+        "actual_subject_scope": "named_subsidiary",
+        "matched_source_row_index": 12,
+        "reason": "独立官方p49 主要控股参股公司营业收入／宜昌人福本期881,046.71万元，原主体宜昌人福药业有限责任公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-b27c250c30ef759c:Segment:business_segment:葛店人福:控股参股公司/营业收入:row:1": {
+        "verified_source_pages": [
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47,
+          48,
+          49
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "葛店人福",
+        "actual_action": null,
+        "actual_subject_scope": "named_subsidiary",
+        "matched_source_row_index": 13,
+        "recall_row_index": 13,
+        "reason": "独立官方p49 主要控股参股公司营业收入／葛店人福本期144,749.83万元，原主体湖北葛店人福药业有限责任公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-d22479af34cb101c:Measurement:business_segment:葛店人福:控股参股公司/营业收入:row:1": {
+        "verified_source_pages": [
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47,
+          48,
+          49
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "葛店人福",
+        "actual_action": null,
+        "actual_subject_scope": "named_subsidiary",
+        "matched_source_row_index": 13,
+        "reason": "独立官方p49 主要控股参股公司营业收入／葛店人福本期144,749.83万元，原主体湖北葛店人福药业有限责任公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-b27c250c30ef759c:Segment:business_segment:新疆维药:控股参股公司/营业收入:row:2": {
+        "verified_source_pages": [
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47,
+          48,
+          49
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "新疆维药",
+        "actual_action": null,
+        "actual_subject_scope": "named_subsidiary",
+        "matched_source_row_index": 14,
+        "recall_row_index": 14,
+        "reason": "独立官方p49 主要控股参股公司营业收入／新疆维药本期115,423.62万元，原主体新疆维吾尔药业有限责任公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-d22479af34cb101c:Measurement:business_segment:新疆维药:控股参股公司/营业收入:row:2": {
+        "verified_source_pages": [
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47,
+          48,
+          49
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "新疆维药",
+        "actual_action": null,
+        "actual_subject_scope": "named_subsidiary",
+        "matched_source_row_index": 14,
+        "reason": "独立官方p49 主要控股参股公司营业收入／新疆维药本期115,423.62万元，原主体新疆维吾尔药业有限责任公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-b27c250c30ef759c:Segment:business_segment:Epic Pharma:控股参股公司/营业收入:row:3": {
+        "verified_source_pages": [
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47,
+          48,
+          49
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "Epic Pharma",
+        "actual_action": null,
+        "actual_subject_scope": "named_subsidiary",
+        "matched_source_row_index": 15,
+        "recall_row_index": 15,
+        "reason": "独立官方p49 主要控股参股公司营业收入／Epic Pharma本期137,212.89万元，原主体Epic Pharma, LLC、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-d22479af34cb101c:Measurement:business_segment:Epic Pharma:控股参股公司/营业收入:row:3": {
+        "verified_source_pages": [
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47,
+          48,
+          49
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "Epic Pharma",
+        "actual_action": null,
+        "actual_subject_scope": "named_subsidiary",
+        "matched_source_row_index": 15,
+        "reason": "独立官方p49 主要控股参股公司营业收入／Epic Pharma本期137,212.89万元，原主体Epic Pharma, LLC、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-b27c250c30ef759c:Segment:business_segment:北京医疗:控股参股公司/营业收入:row:4": {
+        "verified_source_pages": [
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47,
+          48,
+          49
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "北京医疗",
+        "actual_action": null,
+        "actual_subject_scope": "named_subsidiary",
+        "matched_source_row_index": 16,
+        "recall_row_index": 16,
+        "reason": "独立官方p49 主要控股参股公司营业收入／北京医疗本期173,074.40万元，原主体北京巴瑞医疗器械有限公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-d22479af34cb101c:Measurement:business_segment:北京医疗:控股参股公司/营业收入:row:4": {
+        "verified_source_pages": [
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47,
+          48,
+          49
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "北京医疗",
+        "actual_action": null,
+        "actual_subject_scope": "named_subsidiary",
+        "matched_source_row_index": 16,
+        "reason": "独立官方p49 主要控股参股公司营业收入／北京医疗本期173,074.40万元，原主体北京巴瑞医疗器械有限公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-b27c250c30ef759c:Segment:business_segment:湖北人福:控股参股公司/营业收入:row:5": {
+        "verified_source_pages": [
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47,
+          48,
+          49
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "湖北人福",
+        "actual_action": null,
+        "actual_subject_scope": "named_subsidiary",
+        "matched_source_row_index": 17,
+        "recall_row_index": 17,
+        "reason": "独立官方p49 主要控股参股公司营业收入／湖北人福本期720,489.01万元，原主体湖北人福医药集团有限公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-d22479af34cb101c:Measurement:business_segment:湖北人福:控股参股公司/营业收入:row:5": {
+        "verified_source_pages": [
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47,
+          48,
+          49
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "湖北人福",
+        "actual_action": null,
+        "actual_subject_scope": "named_subsidiary",
+        "matched_source_row_index": 17,
+        "reason": "独立官方p49 主要控股参股公司营业收入／湖北人福本期720,489.01万元，原主体湖北人福医药集团有限公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-e5c76c3478a4da7d:Segment:product:中枢神经:治疗领域收入/主营业务:row:0": {
+        "verified_source_pages": [
+          36
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "中枢神经",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 9,
+        "recall_row_index": 9,
+        "reason": "独立官方p36 按治疗领域经营数据／中枢神经本期922,512.74万元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-89c26412c3c2a270:Measurement:product:中枢神经:治疗领域收入/主营业务:row:0": {
+        "verified_source_pages": [
+          36
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "中枢神经",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 9,
+        "reason": "独立官方p36 按治疗领域经营数据／中枢神经本期922,512.74万元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-e5c76c3478a4da7d:Segment:product:甾体激素及两性健康:治疗领域收入/主营业务:row:1": {
+        "verified_source_pages": [
+          36
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "甾体激素及两性健康",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 10,
+        "recall_row_index": 10,
+        "reason": "独立官方p36 按治疗领域经营数据／甾体激素及两性健康本期106,751.34万元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-89c26412c3c2a270:Measurement:product:甾体激素及两性健康:治疗领域收入/主营业务:row:1": {
+        "verified_source_pages": [
+          36
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "甾体激素及两性健康",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 10,
+        "reason": "独立官方p36 按治疗领域经营数据／甾体激素及两性健康本期106,751.34万元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-e5c76c3478a4da7d:Segment:product:维吾尔药:治疗领域收入/主营业务:row:2": {
+        "verified_source_pages": [
+          36
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "维吾尔药",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 11,
+        "recall_row_index": 11,
+        "reason": "独立官方p36 按治疗领域经营数据／维吾尔药本期115,160.85万元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-89c26412c3c2a270:Measurement:product:维吾尔药:治疗领域收入/主营业务:row:2": {
+        "verified_source_pages": [
+          36
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "维吾尔药",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 11,
+        "reason": "独立官方p36 按治疗领域经营数据／维吾尔药本期115,160.85万元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-00f98250968a5853:Segment:business_segment:宜昌人福:控股参股公司/营业收入:row:0": {
+        "verified_source_pages": [
+          48,
+          49
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "宜昌人福",
+        "actual_action": null,
+        "actual_subject_scope": "named_subsidiary",
+        "matched_source_row_index": 12,
+        "recall_row_index": 12,
+        "reason": "独立官方p49 主要控股参股公司营业收入／宜昌人福本期881,046.71万元，原主体宜昌人福药业有限责任公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-00f98250968a5853:Segment:business_segment:葛店人福:控股参股公司/营业收入:row:1": {
+        "verified_source_pages": [
+          48,
+          49
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "葛店人福",
+        "actual_action": null,
+        "actual_subject_scope": "named_subsidiary",
+        "matched_source_row_index": 13,
+        "recall_row_index": 13,
+        "reason": "独立官方p49 主要控股参股公司营业收入／葛店人福本期144,749.83万元，原主体湖北葛店人福药业有限责任公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-00f98250968a5853:Segment:business_segment:新疆维药:控股参股公司/营业收入:row:2": {
+        "verified_source_pages": [
+          48,
+          49
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "新疆维药",
+        "actual_action": null,
+        "actual_subject_scope": "named_subsidiary",
+        "matched_source_row_index": 14,
+        "recall_row_index": 14,
+        "reason": "独立官方p49 主要控股参股公司营业收入／新疆维药本期115,423.62万元，原主体新疆维吾尔药业有限责任公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-00f98250968a5853:Segment:business_segment:Epic Pharma:控股参股公司/营业收入:row:3": {
+        "verified_source_pages": [
+          48,
+          49
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "Epic Pharma",
+        "actual_action": null,
+        "actual_subject_scope": "named_subsidiary",
+        "matched_source_row_index": 15,
+        "recall_row_index": 15,
+        "reason": "独立官方p49 主要控股参股公司营业收入／Epic Pharma本期137,212.89万元，原主体Epic Pharma, LLC、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-00f98250968a5853:Segment:business_segment:北京医疗:控股参股公司/营业收入:row:4": {
+        "verified_source_pages": [
+          48,
+          49
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "北京医疗",
+        "actual_action": null,
+        "actual_subject_scope": "named_subsidiary",
+        "matched_source_row_index": 16,
+        "recall_row_index": 16,
+        "reason": "独立官方p49 主要控股参股公司营业收入／北京医疗本期173,074.40万元，原主体北京巴瑞医疗器械有限公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-00f98250968a5853:Segment:business_segment:湖北人福:控股参股公司/营业收入:row:5": {
+        "verified_source_pages": [
+          48,
+          49
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "湖北人福",
+        "actual_action": null,
+        "actual_subject_scope": "named_subsidiary",
+        "matched_source_row_index": 17,
+        "recall_row_index": 17,
+        "reason": "独立官方p49 主要控股参股公司营业收入／湖北人福本期720,489.01万元，原主体湖北人福医药集团有限公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-a0182a8e4eb584de:Segment:business_type:主营业务:营业收入:row:0": {
+        "verified_source_pages": [
+          194,
+          195
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "主营业务",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 20,
+        "recall_row_index": 20,
+        "reason": "独立官方p194 合并营业收入和营业成本／主营业务本期23,918,245,958.36元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-3f0a9be7df89e92d:Measurement:business_type:主营业务:营业收入:row:0": {
+        "verified_source_pages": [
+          194,
+          195
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "主营业务",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 20,
+        "reason": "独立官方p194 合并营业收入和营业成本／主营业务本期23,918,245,958.36元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-a0182a8e4eb584de:Segment:business_type:其他业务:营业收入:row:1": {
+        "verified_source_pages": [
+          194,
+          195
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "其他业务",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 21,
+        "recall_row_index": 21,
+        "reason": "独立官方p195 合并营业收入和营业成本／其他业务本期43,764,206.28元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-3f0a9be7df89e92d:Measurement:business_type:其他业务:营业收入:row:1": {
+        "verified_source_pages": [
+          194,
+          195
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "其他业务",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 21,
+        "reason": "独立官方p195 合并营业收入和营业成本／其他业务本期43,764,206.28元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-90f55551b49d5848:Segment:business_type:主营业务:营业收入:row:0": {
+        "verified_source_pages": [
+          194,
+          195
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "主营业务",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 20,
+        "recall_row_index": 20,
+        "reason": "独立官方p194 合并营业收入和营业成本／主营业务本期23,918,245,958.36元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-90f55551b49d5848:Segment:business_type:其他业务:营业收入:row:1": {
+        "verified_source_pages": [
+          194,
+          195
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "其他业务",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 21,
+        "recall_row_index": 21,
+        "reason": "独立官方p195 合并营业收入和营业成本／其他业务本期43,764,206.28元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-90f55551b49d5848:Segment:business_type:合计:营业收入/全部营业收入/商品类型/其他业务:row:2": {
+        "verified_source_pages": [
+          194,
+          195
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "合计",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 22,
+        "recall_row_index": 22,
+        "reason": "独立官方p195 合并营业收入和营业成本／合计本期23,962,010,164.64元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-6015ca328eb943f6:Measurement:business_type:合计:营业收入/全部营业收入/商品类型/其他业务:row:2": {
+        "verified_source_pages": [
+          194,
+          195
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "合计",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 22,
+        "reason": "独立官方p195 合并营业收入和营业成本／合计本期23,962,010,164.64元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-e85ab5b628ffa7b1:Segment:business_segment:宜昌人福药业有限责任公司:重要非全资子公司/本期营业收入:row:0": {
+        "verified_source_pages": [
+          221,
+          222,
+          223
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "宜昌人福药业有限责任公司",
+        "actual_action": null,
+        "actual_subject_scope": "named_subsidiary",
+        "matched_source_row_index": 18,
+        "recall_row_index": 18,
+        "reason": "独立官方p222 重要非全资子公司主要财务信息／宜昌人福药业有限责任公司本期881,046.71万元，原主体宜昌人福药业有限责任公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-87e71ad93563514d:Measurement:business_segment:宜昌人福药业有限责任公司:重要非全资子公司/本期营业收入:row:0": {
+        "verified_source_pages": [
+          221,
+          222,
+          223
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "宜昌人福药业有限责任公司",
+        "actual_action": null,
+        "actual_subject_scope": "named_subsidiary",
+        "matched_source_row_index": 18,
+        "reason": "独立官方p222 重要非全资子公司主要财务信息／宜昌人福药业有限责任公司本期881,046.71万元，原主体宜昌人福药业有限责任公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-e85ab5b628ffa7b1:Segment:business_segment:北京巴瑞医疗器械有限公司:重要非全资子公司/本期营业收入:row:1": {
+        "verified_source_pages": [
+          221,
+          222,
+          223
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "北京巴瑞医疗器械有限公司",
+        "actual_action": null,
+        "actual_subject_scope": "named_subsidiary",
+        "matched_source_row_index": 19,
+        "recall_row_index": 19,
+        "reason": "独立官方p222 重要非全资子公司主要财务信息／北京巴瑞医疗器械有限公司本期173,074.40万元，原主体北京巴瑞医疗器械有限公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-87e71ad93563514d:Measurement:business_segment:北京巴瑞医疗器械有限公司:重要非全资子公司/本期营业收入:row:1": {
+        "verified_source_pages": [
+          221,
+          222,
+          223
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "北京巴瑞医疗器械有限公司",
+        "actual_action": null,
+        "actual_subject_scope": "named_subsidiary",
+        "matched_source_row_index": 19,
+        "reason": "独立官方p222 重要非全资子公司主要财务信息／北京巴瑞医疗器械有限公司本期173,074.40万元，原主体北京巴瑞医疗器械有限公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-aa408ff10807cdf0:Segment:revenue_timing:销售商品及其他:收入确认时间/在某一时点确认:row:0": {
+        "verified_source_pages": [
+          194,
+          195
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "销售商品及其他",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 23,
+        "recall_row_index": 23,
+        "reason": "独立官方p195 收入确认时间／销售商品及其他本期23,784,266,004.51元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-d4e01e94fa481d5b:Measurement:revenue_timing:销售商品及其他:收入确认时间/在某一时点确认:row:0": {
+        "verified_source_pages": [
+          194,
+          195
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "销售商品及其他",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 23,
+        "reason": "独立官方p195 收入确认时间／销售商品及其他本期23,784,266,004.51元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-aa408ff10807cdf0:Segment:revenue_timing:其他业务收入:收入确认时间/在某一时点确认:row:1": {
+        "verified_source_pages": [
+          194,
+          195
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "其他业务收入",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 24,
+        "recall_row_index": 24,
+        "reason": "独立官方p195 收入确认时间／其他业务收入本期6,338,981.69元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-d4e01e94fa481d5b:Measurement:revenue_timing:其他业务收入:收入确认时间/在某一时点确认:row:1": {
+        "verified_source_pages": [
+          194,
+          195
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "其他业务收入",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 24,
+        "reason": "独立官方p195 收入确认时间／其他业务收入本期6,338,981.69元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-aa408ff10807cdf0:Segment:revenue_timing:提供劳务:收入确认时间/在某一时段内确认:row:2": {
+        "verified_source_pages": [
+          194,
+          195
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "提供劳务",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 25,
+        "recall_row_index": 25,
+        "reason": "独立官方p195 收入确认时间／提供劳务本期133,979,953.85元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-d4e01e94fa481d5b:Measurement:revenue_timing:提供劳务:收入确认时间/在某一时段内确认:row:2": {
+        "verified_source_pages": [
+          194,
+          195
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "提供劳务",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 25,
+        "reason": "独立官方p195 收入确认时间／提供劳务本期133,979,953.85元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-aa408ff10807cdf0:Segment:revenue_timing:其他业务收入:收入确认时间/在某一时段内确认:row:3": {
+        "verified_source_pages": [
+          194,
+          195
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "其他业务收入",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 26,
+        "recall_row_index": 26,
+        "reason": "独立官方p195 收入确认时间／其他业务收入本期37,425,224.59元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-d4e01e94fa481d5b:Measurement:revenue_timing:其他业务收入:收入确认时间/在某一时段内确认:row:3": {
+        "verified_source_pages": [
+          194,
+          195
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "其他业务收入",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 26,
+        "reason": "独立官方p195 收入确认时间／其他业务收入本期37,425,224.59元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-0aa7fb26ab07bd58:Segment:service:销售药品:出售商品/提供劳务/本期发生额:row:0": {
+        "verified_source_pages": [
+          232,
+          233
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "销售药品",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 27,
+        "recall_row_index": 27,
+        "reason": "独立官方p233 出售商品/提供劳务情况表／销售药品本期27,588.81元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-9ea871dec761bfa2:Measurement:service:销售药品:出售商品/提供劳务/本期发生额:row:0": {
+        "verified_source_pages": [
+          232,
+          233
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "销售药品",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 27,
+        "reason": "独立官方p233 出售商品/提供劳务情况表／销售药品本期27,588.81元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-0aa7fb26ab07bd58:Segment:service:销售商品:出售商品/提供劳务/本期发生额:row:1": {
+        "verified_source_pages": [
+          232,
+          233
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "销售商品",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 28,
+        "recall_row_index": 28,
+        "reason": "独立官方p233 出售商品/提供劳务情况表／销售商品本期3,213,861.95元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-9ea871dec761bfa2:Measurement:service:销售商品:出售商品/提供劳务/本期发生额:row:1": {
+        "verified_source_pages": [
+          232,
+          233
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "销售商品",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 28,
+        "reason": "独立官方p233 出售商品/提供劳务情况表／销售商品本期3,213,861.95元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-0aa7fb26ab07bd58:Segment:service:提供劳务:出售商品/提供劳务/本期发生额:row:2": {
+        "verified_source_pages": [
+          232,
+          233
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "提供劳务",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 29,
+        "recall_row_index": 29,
+        "reason": "独立官方p233 出售商品/提供劳务情况表／提供劳务本期38,584.91元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-9ea871dec761bfa2:Measurement:service:提供劳务:出售商品/提供劳务/本期发生额:row:2": {
+        "verified_source_pages": [
+          232,
+          233
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "提供劳务",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 29,
+        "reason": "独立官方p233 出售商品/提供劳务情况表／提供劳务本期38,584.91元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-0aa7fb26ab07bd58:Segment:service:销售商品:出售商品/提供劳务/本期发生额:row:3": {
+        "verified_source_pages": [
+          232,
+          233
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "销售商品",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 30,
+        "recall_row_index": 30,
+        "reason": "独立官方p233 出售商品/提供劳务情况表／销售商品本期1,689,153.10元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-9ea871dec761bfa2:Measurement:service:销售商品:出售商品/提供劳务/本期发生额:row:3": {
+        "verified_source_pages": [
+          232,
+          233
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "销售商品",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 30,
+        "reason": "独立官方p233 出售商品/提供劳务情况表／销售商品本期1,689,153.10元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-0aa7fb26ab07bd58:Segment:service:销售药品:出售商品/提供劳务/本期发生额:row:4": {
+        "verified_source_pages": [
+          232,
+          233
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "销售药品",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 31,
+        "recall_row_index": 31,
+        "reason": "独立官方p233 出售商品/提供劳务情况表／销售药品本期-2,497,699.12元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-9ea871dec761bfa2:Measurement:service:销售药品:出售商品/提供劳务/本期发生额:row:4": {
+        "verified_source_pages": [
+          232,
+          233
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "销售药品",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 31,
+        "reason": "独立官方p233 出售商品/提供劳务情况表／销售药品本期-2,497,699.12元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-0aa7fb26ab07bd58:Segment:service:销售药品:出售商品/提供劳务/本期发生额:row:5": {
+        "verified_source_pages": [
+          232,
+          233
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "销售药品",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 32,
+        "recall_row_index": 32,
+        "reason": "独立官方p233 出售商品/提供劳务情况表／销售药品本期42,775,223.89元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-9ea871dec761bfa2:Measurement:service:销售药品:出售商品/提供劳务/本期发生额:row:5": {
+        "verified_source_pages": [
+          232,
+          233
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "销售药品",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 32,
+        "reason": "独立官方p233 出售商品/提供劳务情况表／销售药品本期42,775,223.89元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-0aa7fb26ab07bd58:Segment:service:销售药品:出售商品/提供劳务/本期发生额:row:6": {
+        "verified_source_pages": [
+          232,
+          233
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "销售药品",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 33,
+        "recall_row_index": 33,
+        "reason": "独立官方p233 出售商品/提供劳务情况表／销售药品本期14,946,810.36元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-9ea871dec761bfa2:Measurement:service:销售药品:出售商品/提供劳务/本期发生额:row:6": {
+        "verified_source_pages": [
+          232,
+          233
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "销售药品",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 33,
+        "reason": "独立官方p233 出售商品/提供劳务情况表／销售药品本期14,946,810.36元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-0aa7fb26ab07bd58:Segment:service:销售商品:出售商品/提供劳务/本期发生额:row:7": {
+        "verified_source_pages": [
+          232,
+          233
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "销售商品",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 34,
+        "recall_row_index": 34,
+        "reason": "独立官方p233 出售商品/提供劳务情况表／销售商品本期61,050.00元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-9ea871dec761bfa2:Measurement:service:销售商品:出售商品/提供劳务/本期发生额:row:7": {
+        "verified_source_pages": [
+          232,
+          233
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "销售商品",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 34,
+        "reason": "独立官方p233 出售商品/提供劳务情况表／销售商品本期61,050.00元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-0aa7fb26ab07bd58:Segment:service:销售商品:出售商品/提供劳务/本期发生额:row:8": {
+        "verified_source_pages": [
+          232,
+          233
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "销售商品",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 35,
+        "recall_row_index": 35,
+        "reason": "独立官方p233 出售商品/提供劳务情况表／销售商品本期20,436.02元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-9ea871dec761bfa2:Measurement:service:销售商品:出售商品/提供劳务/本期发生额:row:8": {
+        "verified_source_pages": [
+          232,
+          233
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "销售商品",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 35,
+        "reason": "独立官方p233 出售商品/提供劳务情况表／销售商品本期20,436.02元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-0aa7fb26ab07bd58:Segment:service:提供劳务:出售商品/提供劳务/本期发生额:row:9": {
+        "verified_source_pages": [
+          232,
+          233
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "提供劳务",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 36,
+        "recall_row_index": 36,
+        "reason": "独立官方p233 出售商品/提供劳务情况表／提供劳务本期7,553,221.67元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-9ea871dec761bfa2:Measurement:service:提供劳务:出售商品/提供劳务/本期发生额:row:9": {
+        "verified_source_pages": [
+          232,
+          233
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "提供劳务",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 36,
+        "reason": "独立官方p233 出售商品/提供劳务情况表／提供劳务本期7,553,221.67元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-0aa7fb26ab07bd58:Segment:service:利息收入:出售商品/提供劳务/本期发生额:row:10": {
+        "verified_source_pages": [
+          232,
+          233
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "利息收入",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 37,
+        "recall_row_index": 37,
+        "reason": "独立官方p233 出售商品/提供劳务情况表／利息收入本期21,314,104.31元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-9ea871dec761bfa2:Measurement:service:利息收入:出售商品/提供劳务/本期发生额:row:10": {
+        "verified_source_pages": [
+          232,
+          233
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "利息收入",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 37,
+        "reason": "独立官方p233 出售商品/提供劳务情况表／利息收入本期21,314,104.31元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-0aa7fb26ab07bd58:Segment:service:销售商品:出售商品/提供劳务/本期发生额:row:11": {
+        "verified_source_pages": [
+          232,
+          233
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "销售商品",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 38,
+        "recall_row_index": 38,
+        "reason": "独立官方p233 出售商品/提供劳务情况表／销售商品本期10,619.47元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-9ea871dec761bfa2:Measurement:service:销售商品:出售商品/提供劳务/本期发生额:row:11": {
+        "verified_source_pages": [
+          232,
+          233
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "销售商品",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 38,
+        "reason": "独立官方p233 出售商品/提供劳务情况表／销售商品本期10,619.47元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-0aa7fb26ab07bd58:Segment:service:销售商品:出售商品/提供劳务/本期发生额:row:12": {
+        "verified_source_pages": [
+          232,
+          233
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "销售商品",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 39,
+        "recall_row_index": 39,
+        "reason": "独立官方p233 出售商品/提供劳务情况表／销售商品本期452.92元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-9ea871dec761bfa2:Measurement:service:销售商品:出售商品/提供劳务/本期发生额:row:12": {
+        "verified_source_pages": [
+          232,
+          233
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "销售商品",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 39,
+        "reason": "独立官方p233 出售商品/提供劳务情况表／销售商品本期452.92元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-0aa7fb26ab07bd58:Segment:service:销售商品:出售商品/提供劳务/本期发生额:row:13": {
+        "verified_source_pages": [
+          232,
+          233
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "销售商品",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 40,
+        "recall_row_index": 40,
+        "reason": "独立官方p233 出售商品/提供劳务情况表／销售商品本期530.97元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-9ea871dec761bfa2:Measurement:service:销售商品:出售商品/提供劳务/本期发生额:row:13": {
+        "verified_source_pages": [
+          232,
+          233
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "销售商品",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 40,
+        "reason": "独立官方p233 出售商品/提供劳务情况表／销售商品本期530.97元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-0aa7fb26ab07bd58:Segment:service:利息收入:出售商品/提供劳务/本期发生额:row:14": {
+        "verified_source_pages": [
+          232,
+          233
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "利息收入",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 41,
+        "recall_row_index": 41,
+        "reason": "独立官方p233 出售商品/提供劳务情况表／利息收入本期34,415.09元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      },
+      "owned:core-ev-9ea871dec761bfa2:Measurement:service:利息收入:出售商品/提供劳务/本期发生额:row:14": {
+        "verified_source_pages": [
+          232,
+          233
+        ],
+        "accurate": true,
+        "critical_numeric_error": false,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "利息收入",
+        "actual_action": null,
+        "actual_subject_scope": "consolidated_group",
+        "matched_source_row_index": 41,
+        "reason": "独立官方p233 出售商品/提供劳务情况表／利息收入本期34,415.09元，原主体公司及合并子公司、原列及限定成立；同名等额其他页不替代此来源。"
+      }
+    },
+    "answers": {
+      "principal_business": {
+        "accurate": true,
+        "reason": "工业为主商业为辅及完整药链、具名产品矩阵、子公司与原出表/失控时点、湖北统购分销与国际分支、总净额/控制权/定制研发确认机制完整；未来拓展不转当前动作。",
+        "failed_substance_groups": [],
+        "supporting_record_ids": [
+          "owned:core-ev-62525784d9a1a4bf:overview",
+          "owned:core-ev-e66c82cd16673c6e:overview",
+          "owned:core-ev-c9528d88100a5c81:overview",
+          "owned:core-ev-7e886ddc20a2af5b:overview",
+          "owned:core-ev-bd0ac4e9bb56572a:overview",
+          "owned:core-ev-a795229943de89fe:overview",
+          "owned:core-ev-0767be28c532960a:overview",
+          "owned:core-ev-95dc9298c1ace3df:overview",
+          "owned:core-ev-f801bbaeee79bb09:overview",
+          "owned:core-ev-a983517f604954bc:overview",
+          "owned:core-ev-5b3a5cbf7aab61b5:overview",
+          "owned:core-ev-2d0e3c957c5197af:overview",
+          "owned:core-ev-a6c8aac7ede23c62:overview",
+          "owned:core-ev-33c7a23ed47eaa64:overview",
+          "owned:core-ev-cf48eef48d1b3c0f:overview",
+          "owned:core-ev-4a0bc38c94c96657:overview"
+        ],
+        "source_review": "逐支持事实全文核原来源后检查实际正文实质与限制，不以answered/core_complete判通过"
+      },
+      "products_services": {
+        "accurate": true,
+        "reason": "工业为主商业为辅及完整药链、具名产品矩阵、子公司与原出表/失控时点、湖北统购分销与国际分支、总净额/控制权/定制研发确认机制完整；未来拓展不转当前动作。",
+        "failed_substance_groups": [],
+        "supporting_record_ids": [
+          "owned:core-ev-62525784d9a1a4bf:overview",
+          "owned:core-ev-e66c82cd16673c6e:overview",
+          "owned:core-ev-c9528d88100a5c81:overview",
+          "owned:core-ev-7e886ddc20a2af5b:overview",
+          "owned:core-ev-bd0ac4e9bb56572a:overview",
+          "owned:core-ev-a795229943de89fe:overview",
+          "owned:core-ev-0767be28c532960a:overview",
+          "owned:core-ev-95dc9298c1ace3df:overview",
+          "owned:core-ev-f801bbaeee79bb09:overview",
+          "owned:core-ev-a983517f604954bc:overview",
+          "owned:core-ev-b48976a4bf5ab677:overview",
+          "owned:core-ev-24c8d1148d94892b:overview",
+          "owned:core-ev-5b3a5cbf7aab61b5:overview",
+          "owned:core-ev-2d0e3c957c5197af:overview",
+          "owned:core-ev-a6c8aac7ede23c62:overview",
+          "owned:core-ev-33c7a23ed47eaa64:overview",
+          "owned:core-ev-cf48eef48d1b3c0f:overview",
+          "owned:core-ev-4a0bc38c94c96657:overview",
+          "owned:core-ev-64bc029ff056b763:overview",
+          "owned:core-ev-8218c7179f7bb590:overview",
+          "owned:core-ev-30ac6ae9268346c4:overview",
+          "owned:core-ev-e1e23a937a78010c:commodity:1",
+          "owned:core-ev-e1e23a937a78010c:commodity:2",
+          "owned:core-ev-e1e23a937a78010c:commodity:3",
+          "owned:core-ev-e1e23a937a78010c:commodity:4",
+          "owned:core-ev-e1e23a937a78010c:commodity:5",
+          "owned:core-ev-e1e23a937a78010c:commodity:6",
+          "owned:core-ev-e1e23a937a78010c:commodity:7",
+          "owned:core-ev-e1e23a937a78010c:commodity:8",
+          "owned:core-ev-e1e23a937a78010c:commodity:9",
+          "owned:core-ev-e1e23a937a78010c:commodity:10",
+          "owned:core-ev-e1e23a937a78010c:commodity:11",
+          "owned:core-ev-e1e23a937a78010c:commodity:12",
+          "owned:core-ev-5fbedd1227935da9:commodity:1",
+          "owned:core-ev-5fbedd1227935da9:commodity:2",
+          "owned:core-ev-5fbedd1227935da9:commodity:3",
+          "owned:core-ev-5fbedd1227935da9:commodity:4",
+          "owned:core-ev-5fbedd1227935da9:commodity:5",
+          "owned:core-ev-5fbedd1227935da9:commodity:6",
+          "owned:core-ev-5fbedd1227935da9:commodity:7",
+          "owned:core-ev-5fbedd1227935da9:commodity:8",
+          "owned:core-ev-5fbedd1227935da9:commodity:9",
+          "owned:core-ev-5fbedd1227935da9:commodity:10",
+          "owned:core-ev-5fbedd1227935da9:commodity:11",
+          "owned:core-ev-c17a4b155cdf42bc:commodity:1",
+          "owned:core-ev-c17a4b155cdf42bc:commodity:2",
+          "owned:core-ev-c17a4b155cdf42bc:commodity:3",
+          "owned:core-ev-c17a4b155cdf42bc:commodity:4",
+          "owned:core-ev-c17a4b155cdf42bc:commodity:5",
+          "owned:core-ev-c17a4b155cdf42bc:commodity:6",
+          "owned:core-ev-c17a4b155cdf42bc:commodity:7",
+          "owned:core-ev-c17a4b155cdf42bc:commodity:8",
+          "owned:core-ev-c17a4b155cdf42bc:commodity:9",
+          "owned:core-ev-c17a4b155cdf42bc:commodity:10",
+          "owned:core-ev-c17a4b155cdf42bc:commodity:11",
+          "owned:core-ev-c17a4b155cdf42bc:commodity:12",
+          "owned:core-ev-c17a4b155cdf42bc:commodity:13",
+          "owned:core-ev-c17a4b155cdf42bc:commodity:14",
+          "owned:core-ev-c17a4b155cdf42bc:commodity:15",
+          "owned:core-ev-c17a4b155cdf42bc:commodity:16",
+          "owned:core-ev-c17a4b155cdf42bc:commodity:17",
+          "owned:core-ev-c17a4b155cdf42bc:commodity:18",
+          "owned:core-ev-c17a4b155cdf42bc:commodity:19",
+          "owned:core-ev-c17a4b155cdf42bc:commodity:20",
+          "owned:core-ev-c17a4b155cdf42bc:commodity:21",
+          "owned:core-ev-c17a4b155cdf42bc:commodity:22",
+          "owned:core-ev-c17a4b155cdf42bc:commodity:23",
+          "owned:core-ev-c17a4b155cdf42bc:commodity:24",
+          "owned:core-ev-c17a4b155cdf42bc:commodity:25",
+          "owned:core-ev-c17a4b155cdf42bc:commodity:26",
+          "owned:core-ev-c17a4b155cdf42bc:commodity:27",
+          "owned:core-ev-c17a4b155cdf42bc:commodity:28",
+          "owned:core-ev-c17a4b155cdf42bc:commodity:29",
+          "owned:core-ev-9dd6499596b8867a:segment:industry:制造业:table:None:row:15",
+          "owned:core-ev-9dd6499596b8867a:segment:industry:批发及其他:table:None:row:17",
+          "owned:core-ev-9dd6499596b8867a:segment:product:医疗器械:table:主营业务收入:row:26",
+          "owned:core-ev-9dd6499596b8867a:segment:product:药品及其他:table:主营业务收入:row:28",
+          "owned:core-ev-e5c76c3478a4da7d:Segment:product:中枢神经:治疗领域收入/主营业务:row:0",
+          "owned:core-ev-e5c76c3478a4da7d:Segment:product:甾体激素及两性健康:治疗领域收入/主营业务:row:1",
+          "owned:core-ev-e5c76c3478a4da7d:Segment:product:维吾尔药:治疗领域收入/主营业务:row:2"
+        ],
+        "source_review": "逐支持事实全文核原来源后检查实际正文实质与限制，不以answered/core_complete判通过"
+      },
+      "revenue_model": {
+        "accurate": true,
+        "reason": "工业为主商业为辅及完整药链、具名产品矩阵、子公司与原出表/失控时点、湖北统购分销与国际分支、总净额/控制权/定制研发确认机制完整；未来拓展不转当前动作。",
+        "failed_substance_groups": [],
+        "supporting_record_ids": [
+          "owned:core-ev-62525784d9a1a4bf:overview",
+          "owned:core-ev-e66c82cd16673c6e:overview",
+          "owned:core-ev-c9528d88100a5c81:overview",
+          "owned:core-ev-7e886ddc20a2af5b:overview",
+          "owned:core-ev-0767be28c532960a:overview",
+          "owned:core-ev-95dc9298c1ace3df:overview",
+          "owned:core-ev-30ac6ae9268346c4:overview",
+          "owned:core-ev-2218ab5ceaa0919c:overview",
+          "owned:core-ev-2d0e3c957c5197af:overview",
+          "owned:core-ev-a6c8aac7ede23c62:overview",
+          "owned:core-ev-cf48eef48d1b3c0f:overview",
+          "owned:core-ev-4a0bc38c94c96657:overview",
+          "owned:core-ev-c1ced1d139a95117:revenue:industry:制造业:table:None:row:15",
+          "owned:core-ev-c1ced1d139a95117:revenue:industry:批发及其他:table:None:row:17",
+          "owned:core-ev-c1ced1d139a95117:revenue:product:医疗器械:table:主营业务收入:row:26",
+          "owned:core-ev-c1ced1d139a95117:revenue:product:药品及其他:table:主营业务收入:row:28",
+          "owned:core-ev-c1ced1d139a95117:revenue:sales_mode:制造业:table:None:row:54",
+          "owned:core-ev-c1ced1d139a95117:revenue:sales_mode:批发及其他:table:None:row:56",
+          "owned:core-ev-d29ca0f208d97128:Measurement:business_type:批发及其他:本期营业收入:row:0",
+          "owned:core-ev-d22479af34cb101c:Measurement:business_segment:宜昌人福:控股参股公司/营业收入:row:0",
+          "owned:core-ev-d22479af34cb101c:Measurement:business_segment:葛店人福:控股参股公司/营业收入:row:1",
+          "owned:core-ev-d22479af34cb101c:Measurement:business_segment:新疆维药:控股参股公司/营业收入:row:2",
+          "owned:core-ev-d22479af34cb101c:Measurement:business_segment:Epic Pharma:控股参股公司/营业收入:row:3",
+          "owned:core-ev-d22479af34cb101c:Measurement:business_segment:北京医疗:控股参股公司/营业收入:row:4",
+          "owned:core-ev-d22479af34cb101c:Measurement:business_segment:湖北人福:控股参股公司/营业收入:row:5",
+          "owned:core-ev-89c26412c3c2a270:Measurement:product:中枢神经:治疗领域收入/主营业务:row:0",
+          "owned:core-ev-89c26412c3c2a270:Measurement:product:甾体激素及两性健康:治疗领域收入/主营业务:row:1",
+          "owned:core-ev-89c26412c3c2a270:Measurement:product:维吾尔药:治疗领域收入/主营业务:row:2",
+          "owned:core-ev-3f0a9be7df89e92d:Measurement:business_type:主营业务:营业收入:row:0",
+          "owned:core-ev-3f0a9be7df89e92d:Measurement:business_type:其他业务:营业收入:row:1",
+          "owned:core-ev-87e71ad93563514d:Measurement:business_segment:宜昌人福药业有限责任公司:重要非全资子公司/本期营业收入:row:0",
+          "owned:core-ev-87e71ad93563514d:Measurement:business_segment:北京巴瑞医疗器械有限公司:重要非全资子公司/本期营业收入:row:1",
+          "owned:core-ev-d4e01e94fa481d5b:Measurement:revenue_timing:销售商品及其他:收入确认时间/在某一时点确认:row:0",
+          "owned:core-ev-d4e01e94fa481d5b:Measurement:revenue_timing:其他业务收入:收入确认时间/在某一时点确认:row:1",
+          "owned:core-ev-d4e01e94fa481d5b:Measurement:revenue_timing:提供劳务:收入确认时间/在某一时段内确认:row:2",
+          "owned:core-ev-d4e01e94fa481d5b:Measurement:revenue_timing:其他业务收入:收入确认时间/在某一时段内确认:row:3",
+          "owned:core-ev-9ea871dec761bfa2:Measurement:service:销售药品:出售商品/提供劳务/本期发生额:row:0",
+          "owned:core-ev-9ea871dec761bfa2:Measurement:service:销售商品:出售商品/提供劳务/本期发生额:row:1",
+          "owned:core-ev-9ea871dec761bfa2:Measurement:service:提供劳务:出售商品/提供劳务/本期发生额:row:2",
+          "owned:core-ev-9ea871dec761bfa2:Measurement:service:销售商品:出售商品/提供劳务/本期发生额:row:3",
+          "owned:core-ev-9ea871dec761bfa2:Measurement:service:销售药品:出售商品/提供劳务/本期发生额:row:4",
+          "owned:core-ev-9ea871dec761bfa2:Measurement:service:销售药品:出售商品/提供劳务/本期发生额:row:5",
+          "owned:core-ev-9ea871dec761bfa2:Measurement:service:销售药品:出售商品/提供劳务/本期发生额:row:6",
+          "owned:core-ev-9ea871dec761bfa2:Measurement:service:销售商品:出售商品/提供劳务/本期发生额:row:7",
+          "owned:core-ev-9ea871dec761bfa2:Measurement:service:销售商品:出售商品/提供劳务/本期发生额:row:8",
+          "owned:core-ev-9ea871dec761bfa2:Measurement:service:提供劳务:出售商品/提供劳务/本期发生额:row:9",
+          "owned:core-ev-9ea871dec761bfa2:Measurement:service:利息收入:出售商品/提供劳务/本期发生额:row:10",
+          "owned:core-ev-9ea871dec761bfa2:Measurement:service:销售商品:出售商品/提供劳务/本期发生额:row:11",
+          "owned:core-ev-9ea871dec761bfa2:Measurement:service:销售商品:出售商品/提供劳务/本期发生额:row:12",
+          "owned:core-ev-9ea871dec761bfa2:Measurement:service:销售商品:出售商品/提供劳务/本期发生额:row:13",
+          "owned:core-ev-9ea871dec761bfa2:Measurement:service:利息收入:出售商品/提供劳务/本期发生额:row:14"
+        ],
+        "source_review": "逐支持事实全文核原来源后检查实际正文实质与限制，不以answered/core_complete判通过"
+      }
+    }
+  }
+}

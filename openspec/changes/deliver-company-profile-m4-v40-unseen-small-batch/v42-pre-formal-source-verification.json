@@ -1,0 +1,12 @@
+{
+  "original_official_versions_unchanged": true,
+  "actual_source_page_count": 80,
+  "per_company": {
+    "600050.SH": 29,
+    "600079.SH": 51
+  },
+  "all_equal_to_official_pdf": true,
+  "original_scope_sha256": "4cfa34dce32844cbbc8acfaac0f480a4b8765f1cb43a95736a5fb7cf4d5b00dd",
+  "frozen_source_pages_sha256": "fdaf0ebb977ae790bb57283660a736a856253921f782446aa1eac102e2b747e1",
+  "fixture_sha256": "6855d1fd0880755faad8f3e346752451904b1b85c57482cb051979585f4f3918"
+}

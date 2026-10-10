@@ -48,9 +48,13 @@ def page_numbers(r):
     }
 
 
-def delivered(root, i, pages):
+def delivered(root, i, pages, repair_version="v41"):
     q, e = _drive(
-        root, instrument=i, fixture=fixture(i), pages=pages, repair_version="v41"
+        root,
+        instrument=i,
+        fixture=fixture(i),
+        pages=pages,
+        repair_version=repair_version,
     )
     assert q == e
     cp = json.loads(
@@ -62,7 +66,10 @@ def delivered(root, i, pages):
 
 
 @pytest.mark.parametrize("drift", [False, True, "between_reads"])
-def test_frozen_asset_enters_real_owner_without_an_existing_frontier(tmp_path, drift):
+@pytest.mark.parametrize("repair_version", ["v41", "v42"])
+def test_frozen_asset_enters_real_owner_without_an_existing_frontier(
+    tmp_path, drift, repair_version
+):
     storage = _storage(tmp_path)
     pdf_path = tmp_path / "annual.pdf"
     pdf_path.write_bytes(
@@ -94,7 +101,7 @@ def test_frozen_asset_enters_real_owner_without_an_existing_frontier(tmp_path, d
         shared_asset_access=access,
         processing_identity={
             **default_processing_identity(),
-            "revenue_sentence_repair": "v41",
+            "revenue_sentence_repair": repair_version,
         },
     )
     asset = access.get_effective_asset("600000.SH")
@@ -183,9 +190,12 @@ def test_frozen_asset_enters_real_owner_without_an_existing_frontier(tmp_path, d
 
 @pytest.mark.parametrize("i", ["600050.SH", "600079.SH"])
 @pytest.mark.parametrize("kind", ["pages", "independent_pages"])
-def test_full_source_business_bodies_income_and_named_actions(tmp_path, i, kind):
+@pytest.mark.parametrize("repair_version", ["v41", "v42"])
+def test_full_source_business_bodies_income_and_named_actions(
+    tmp_path, i, kind, repair_version
+):
     f = fixture(i)
-    q, raw = delivered(tmp_path, i, f[kind])
+    q, raw = delivered(tmp_path, i, f[kind], repair_version)
     for dim, rule in f["answers"].items():
         text = compact(_answer(q, dim))
         missing = [
@@ -258,9 +268,12 @@ def test_full_source_business_bodies_income_and_named_actions(tmp_path, i, kind)
 
 
 @pytest.mark.parametrize("i", ["600050.SH", "600079.SH"])
-def test_original_nine_negative_conditions_and_true_rows_coexist(tmp_path, i):
+@pytest.mark.parametrize("repair_version", ["v41", "v42"])
+def test_original_nine_negative_conditions_and_true_rows_coexist(
+    tmp_path, i, repair_version
+):
     f = fixture(i)
-    q, raw = delivered(tmp_path, i, f["pages"])
+    q, raw = delivered(tmp_path, i, f["pages"], repair_version)
     if i == "600050.SH":
         assert not any(
             r["object_type"] == "Activity"
@@ -311,7 +324,10 @@ def test_original_nine_negative_conditions_and_true_rows_coexist(tmp_path, i):
 
 
 @pytest.mark.parametrize("modifier", ["不销售", "拟销售"])
-def test_product_action_modifier_governs_its_own_full_source_branch(tmp_path, modifier):
+@pytest.mark.parametrize("repair_version", ["v41", "v42"])
+def test_product_action_modifier_governs_its_own_full_source_branch(
+    tmp_path, modifier, repair_version
+):
     i = "600050.SH"
     f = fixture(i)
     pages = [
@@ -323,7 +339,7 @@ def test_product_action_modifier_governs_its_own_full_source_branch(tmp_path, mo
         }
         for p in f["pages"]
     ]
-    q, raw = delivered(tmp_path, i, pages)
+    q, raw = delivered(tmp_path, i, pages, repair_version)
     assert not any(
         r["object_type"] == "Activity"
         and r["source_native"]["name"] in {"视频云", "云桌面"}
@@ -343,7 +359,10 @@ def test_product_action_modifier_governs_its_own_full_source_branch(tmp_path, mo
 
 
 @pytest.mark.parametrize("modifier", ["不销售", "拟销售"])
-def test_subsidiary_product_list_requires_its_own_current_sale(tmp_path, modifier):
+@pytest.mark.parametrize("repair_version", ["v41", "v42"])
+def test_subsidiary_product_list_requires_its_own_current_sale(
+    tmp_path, modifier, repair_version
+):
     i = "600079.SH"
     f = fixture(i)
     pages = [
@@ -356,7 +375,7 @@ def test_subsidiary_product_list_requires_its_own_current_sale(tmp_path, modifie
         }
         for p in f["pages"]
     ]
-    q, raw = delivered(tmp_path, i, pages)
+    q, raw = delivered(tmp_path, i, pages, repair_version)
     assert not any(
         r["object_type"] == "Activity"
         and r["source_actor"] == "湖北葛店人福药业有限责任公司"
@@ -462,7 +481,10 @@ def test_named_investee_revenue_does_not_become_group_income(mutation):
     ("prefix", "expected_scope"),
     [("母公司财务报表", "issuer"), ("本公司单体口径", "unclear")],
 )
-def test_operating_income_keeps_its_own_parent_scope(tmp_path, prefix, expected_scope):
+@pytest.mark.parametrize("repair_version", ["v41", "v42"])
+def test_operating_income_keeps_its_own_parent_scope(
+    tmp_path, prefix, expected_scope, repair_version
+):
     i = "600050.SH"
     f = fixture(i)
     pages = [
@@ -474,7 +496,7 @@ def test_operating_income_keeps_its_own_parent_scope(tmp_path, prefix, expected_
         }
         for p in f["pages"]
     ]
-    _, raw = delivered(tmp_path, i, pages)
+    _, raw = delivered(tmp_path, i, pages, repair_version)
     pair = [
         r
         for r in raw

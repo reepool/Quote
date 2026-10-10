@@ -1,0 +1,54 @@
+{
+  "notes": [
+    {
+      "instrument_id": "600079.SH",
+      "record_id": "owned:core-ev-62525784d9a1a4bf:overview",
+      "note": "p233首行承租/交易方尾行的布局阅读顺序，原行/金额未变。",
+      "source_pages": [
+        232,
+        233
+      ],
+      "first_output_unchanged": true
+    },
+    {
+      "instrument_id": "600079.SH",
+      "record_id": "owned:core-ev-0767be28c532960a:overview",
+      "note": "原锚点已含p44完整国际销售段；continuation_pages未列p44，按原锚点可见44/252及独立p43–44共同核验；不修改输出。",
+      "source_pages": [
+        43,
+        44
+      ],
+      "first_output_unchanged": true
+    },
+    {
+      "instrument_id": "600079.SH",
+      "record_id": "owned:core-ev-95dc9298c1ace3df:overview",
+      "note": "原锚点已含p44完整国际销售段；continuation_pages未列p44，按原锚点可见44/252及独立p43–44共同核验；不修改输出。",
+      "source_pages": [
+        43,
+        44
+      ],
+      "first_output_unchanged": true
+    },
+    {
+      "instrument_id": "600079.SH",
+      "record_id": "owned:core-ev-33c7a23ed47eaa64:overview",
+      "note": "p211取得方式表头阅读顺序；原子公司各行、业务、持股/注册币种完整一致。",
+      "source_pages": [
+        211,
+        212,
+        213,
+        214,
+        215,
+        216,
+        217,
+        218,
+        219
+      ],
+      "first_output_unchanged": true
+    }
+  ],
+  "contract_unchanged": true,
+  "output_unchanged": true,
+  "accuracy_decisions_not_changed_after_review": true
+}
