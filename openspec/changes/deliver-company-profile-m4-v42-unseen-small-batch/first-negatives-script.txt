@@ -1,0 +1,12 @@
+import json,re
+from pathlib import Path
+R=Path.cwd();C=R/'openspec/changes/deliver-company-profile-m4-v42-unseen-small-batch';read=lambda p:json.loads(p.read_text());s=read(C/'source-scope.json');e=read(C/'source-review-evidence.json');out=[]
+for j,n in enumerate(s['negative_conditions']):
+ i=n['instrument_id'];objects=[o for o in e['object_reviews'] if o['instrument_id']==i];failed=[]
+ if n['name']=='空收入不借利润':failed=[o for o in objects if o.get('fact',{}).get('source_native_name')=='陕西宜甄贸易有限公司']
+ if n['name']=='同行业收入非本公司':failed=[o for o in objects if o.get('fact',{}).get('source_native_name') in ['沃华医药','达仁堂','健民集团','特一药业','天士力','华润江中']]
+ # Inspect actual Segment/Measurement/Activity assertions; literal raw source quotes with an explicit prior column are not affirmative current facts.
+ positive_control=[o['object_id'] for o in objects if o['accurate'] and o.get('fact',{}).get('source_native_name') in (['水煤浆销售','水煤浆加工','酒店服务','临时建筑物及附属设备'] if i=='600051.SH' else ['化学药品','中成药','东区厂房','转租使用权资产取得的收入','主营业务','其他业务'])]
+ out.append(dict(condition_index=j,condition=n,evaluation_status='evaluated',actual_profile_exists=True,passed=not failed,wrong_accepted_object_ids=[o['object_id'] for o in failed],positive_control_object_ids=positive_control,reason='真实接受/导出对象及正文逐项检查，来源原行仅上期/未实质/研发/费用/承租/投资收益/客户排名未被当前收入或销售升格；原文引用保留年列及状态，不用裸关键词命中判错' if not failed else '金花实际错误对象违反来源边界：同行第三方收入/空行借其他主体金额均实际接受，不能以本期列数值存在判负例通过'))
+assert len(out)==19
+(C/'negative-review-evidence.json').write_text(json.dumps(dict(conditions=out,negative_count=len(out),actually_evaluated_count=len(out),passed_count=sum(r['passed'] for r in out),failed_count=sum(not r['passed'] for r in out),unevaluable_count=0,original_contract_unchanged=True),ensure_ascii=False,indent=2)+'\n');print('NEGATIVES',sum(r['passed'] for r in out),'/',len(out))

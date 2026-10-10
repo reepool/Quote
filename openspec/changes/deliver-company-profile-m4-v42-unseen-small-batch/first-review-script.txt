@@ -1,0 +1,71 @@
+"""Independent original-source decisions, no profile execution or projection."""
+import json,hashlib,re,sqlite3
+from pathlib import Path
+from datetime import datetime
+from research.company_profile.operations import record_published_source_review
+from research.company_profile.source_review import SemanticFinding,FreshnessObservation
+from research.company_profile.reads import _iter_accepted_raw
+R=Path.cwd();C=R/'openspec/changes/deliver-company-profile-m4-v42-unseen-small-batch';P=R/'data/checkpoints/company_profile_common_core/reports/m4_v42_unseen_small_batch';B=R/'data/research/company_profile_common_core/m4_v42_unseen_small_batch/company_profile_common_core.v1';E=R/'data/exports/m4_v42_unseen_small_batch'
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();compact=lambda s:re.sub(r'\s+','',s or '')
+scope=read(C/'source-scope.json');freeze=read(C/'source-freeze-receipt.json');formal=read(P/'formal_execution.json');pages=read(C/'independent-frozen-source-pages.json');initial=read(C/'first-formal-delivery-preservation.json')['sha256'];history=read(C/'protection-baseline.json')
+assert freeze['source_scope_sha256']==formal['source_scope_sha256']==sha(C/'source-scope.json');assert freeze['source_pages_sha256']==sha(C/'independent-frozen-source-pages.json');assert datetime.fromisoformat(freeze['created_at'])<datetime.fromisoformat(formal['started_at'])
+for baseline in [initial,history,formal['executed_code_sha256'],read(C/'initial-workspace-baseline.json')['existing_modified_sha256']]:assert all(sha(R/p)==h for p,h in baseline.items())
+source={i:{p['page']:p['text'] for p in v['pages']} for i,v in pages.items()};objects=[];findings=[];disclosures=[];missing=[];runtime=[];freshness=[];diagnostics=[]
+def add(i,oid,aspect,recall,present,accurate,numeric=False):
+ findings.append(SemanticFinding(instrument_id=i,aspect=aspect,kind='semantic',source='independently_read_official_report',disclosure_id=oid,disclosed_in_source=recall,present_in_delivery=present,fact_accurate=accurate,critical_numeric_error=numeric))
+con=sqlite3.connect('file:data/research.db?mode=ro',uri=True)
+# Per-object manual semantic decisions are attached after inspecting actual first delivery.
+manual=read(C/'actual-object-decisions.json')
+for ins,result in formal['results'].items():
+ if not result['query'].get('profiles'):
+  assert result['query']['state']=='not_found' and result['export']['state']=='not_found' and not result['export'].get('files')
+  assert not list((E/ins).rglob('*.json'))
+  for j,row in enumerate(scope['source_rows'][ins]):
+   add(ins,'missing-row:'+str(j),'important_disclosure',True,False,None);d=dict(instrument_id=ins,kind='native_income_cell',source=row,present=False,accepted_record_id=None);disclosures.append(d);missing.append(d)
+  for j,role in enumerate(r for r in scope['native_roles'] if r['instrument_id']==ins):
+   add(ins,'missing-role:'+str(j),'commodity_role',True,False,None);d=dict(instrument_id=ins,kind='native_role',source=role,present=False,accepted_record_id=None);disclosures.append(d);missing.append(d)
+  for dim,rule in scope['answers'][ins].items():
+   add(ins,'missing-substance:'+dim,'commodity_role' if dim=='products_services' else 'core_skeleton',True,False,None);d=dict(instrument_id=ins,kind='answer_substance',dimension=dim,source=rule,present=False,answered=False,delivered=None,failed_groups=rule['required_groups']);disclosures.append(d);missing.append(d)
+  assert con.execute('select count(*) from business_profile_work_items where instrument_id=?',(ins,)).fetchone()[0]==0
+  runtime.append(dict(instrument_id=ins,work_id=None,run_state=result['run']['state'],enqueue=result['run']['enqueue'],drain=result['run']['drain'],five_stages_executed=False,reused_scope_ids_by_stage={},predecessor_lineage=None,requested_token_budget=result['requested_token_budget'],note='官方资产冻结有效但frontier缺失，未入队且没有工作项，不能宣称五阶段跑通'))
+  ref=next(r for r in scope['official_reports'] if r['instrument_id']==ins)
+  freshness.append(FreshnessObservation(instrument_id=ins,report_period=ref['report_period'],published_at=con.execute('select published_at from official_announcements where instrument_id=? and source_announcement_id=?',(ins,ref['report_id'])).fetchone()[0],knowledge_cutoff=scope['knowledge_cutoff'],available_at_cutoff=True))
+  continue
+ profile=result['query']['profiles'][0];assert profile==result['export']['profiles'][0]==read(Path(result['export']['files'][0]))
+ wid=profile['work_id'];rt=read(B/(wid+'.json'));checkpoint=read(B/'checkpoints'/(wid+'.json'));raw={r['record_id']:r for r in _iter_accepted_raw(checkpoint)}
+ assert set(raw)=={f['record_id'] for f in profile['accepted_facts']}
+ rows=scope['source_rows'][ins];roles=[r for r in scope['native_roles'] if r['instrument_id']==ins];row_seen={};role_seen={};fact_accuracy={}
+ for fact in profile['accepted_facts']:
+  oid=fact['record_id'];record=raw[oid];decision=manual[ins]['facts'][oid];accurate=decision['accurate'];numeric=decision.get('critical_numeric_error',False);kind=fact['object_type'];ep=sorted({p for ev in record['evidence'] for p in [ev.get('page'),*ev.get('continuation_pages',[]),*ev.get('subject_evidence_pages',[])] if p is not None})
+  period_ok=fact['reported_period']==next(r['report_period'] for r in scope['official_reports'] if r['instrument_id']==ins);report_ok=record['report']['instrument_id']==ins and record['report']['document_version']==scope['versions'][ins]['sha256'];assert period_ok and report_ok
+  ri=decision.get('recall_row_index');ki=decision.get('recall_role_index');recall=False
+  if ri is not None and accurate and kind=='Segment' and ri not in row_seen:row_seen[ri]=oid;recall=True
+  if ki is not None and accurate and ki not in role_seen:
+   role=roles[ki];role_seen[ki]=oid;recall=True
+   # Native action or material_input remains query/export accepted fact; unknown commodity mapping is allowed.
+  add(ins,oid,'commodity_role' if kind in {'Activity','Relationship'} else 'core_skeleton' if kind=='BusinessOverview' else 'important_disclosure',recall,True,accurate,numeric);fact_accuracy[oid]=accurate
+  objects.append(dict(instrument_id=ins,object_id=oid,object_type=kind,accurate=accurate,critical_numeric_error=numeric,fact=fact,accepted_record=record,source_pages=ep,independent_decision=decision,action=record.get('action'),relation_type=record.get('relation_type'),source_actor=record.get('source_actor'),source_verb=record.get('source_verb'),subject_scope=record['subject_scope']))
+ for i,row in enumerate(rows):
+  present=i in row_seen;d=dict(instrument_id=ins,kind='native_income_cell',source=row,present=present,accepted_record_id=row_seen.get(i));disclosures.append(d)
+  if not present:add(ins,'missing-row:'+str(i),'important_disclosure',True,False,None);missing.append(d)
+ for dim in profile['dimensions']:
+  d=dim['dimension_id'];rule=scope['answers'][ins][d];present=bool(dim['answered'] and dim['excerpt']);txt=compact(dim['excerpt']);failed=[g for g in rule['required_groups'] if not any(compact(t) in txt for t in g)];decision=manual[ins]['answers'][d];accurate=bool(present and not failed and decision['accurate']);assert accurate==decision['accurate'],(ins,d,decision,failed)
+  if present:
+   add(ins,'answer:'+d,'commodity_role' if d=='products_services' else 'core_skeleton',accurate,True,accurate)
+   objects.append(dict(instrument_id=ins,object_id='answer:'+d,object_type='answer',accurate=accurate,critical_numeric_error=False,text=dim['excerpt'],supporting_record_ids=dim['supporting_record_ids'],source_condition=rule,failed_substance_groups=failed,independent_decision=decision))
+  if not accurate:add(ins,'missing-substance:'+d,'commodity_role' if d=='products_services' else 'core_skeleton',True,False,None)
+  disc=dict(instrument_id=ins,kind='answer_substance',dimension=d,source=rule,present=accurate,answered=present,delivered=dim['excerpt'],failed_groups=failed);disclosures.append(disc)
+  if not accurate:missing.append(disc)
+ for i,role in enumerate(roles):
+  present=i in role_seen;d=dict(instrument_id=ins,kind='native_role',source=role,present=present,accepted_record_id=role_seen.get(i));disclosures.append(d)
+  if not present:add(ins,'missing-role:'+str(i),'commodity_role',True,False,None);missing.append(d)
+ meta=json.loads(con.execute('select metadata_json from business_profile_work_items where work_id=?',(wid,)).fetchone()[0]);reuse={s:v['reused_scope_ids'] for s,v in meta['stage_results'].items()};assert set(reuse)=={'acquire','parse','semantic','verify','publish'};assert rt['execution']['input_identity']['processing_identity']==scope['processing_identity']
+ runtime.append(dict(instrument_id=ins,work_id=wid,reused_scope_ids_by_stage=reuse,predecessor_lineage=rt['execution']['predecessor_lineage'],provider_calls=rt['provider_calls'],token_budget=rt['execution']['token_budget'],stage_results=meta['stage_results'],requested_token_budget=result['requested_token_budget'],transport_retries=rt['execution']['transport_retries']))
+ diagnostics.append(dict(instrument_id=ins,work_id=wid,chapters=checkpoint['chapters'],semantic_disputes=rt['execution']['semantic_disputes'],gaps=profile['gaps'],evidence_gap_codes=profile['evidence_gap_codes'],core_complete=profile['core_complete']))
+ freshness.append(FreshnessObservation(instrument_id=ins,report_period=profile['report']['report_period'],published_at=profile['report']['published_at'],knowledge_cutoff='2026-09-17',available_at_cutoff=profile['report']['published_at'][:10]<='2026-09-17'))
+accepted=sum(sum(len(p['accepted_facts']) for p in v['query'].get('profiles',[])) for v in formal['results'].values());answered=sum(sum(bool(d['answered'] and d['excerpt']) for p in v['query'].get('profiles',[]) for d in p['dimensions']) for v in formal['results'].values());assert len(objects)==accepted+answered==len({(o['instrument_id'],o['object_id']) for o in objects});assert len(disclosures)==freeze['source_condition_count']==sum(f.disclosed_in_source for f in findings);assert len(objects)==sum(f.present_in_delivery for f in findings)
+obs=read(P/'observation.json');review=record_published_source_review(checkpoint_root=R/'data/checkpoints/company_profile_common_core',plan_directory=P,semantic_findings=findings,freshness=freshness,tokens_used=obs['tokens_consumed'],elapsed_seconds=formal['whole_round_seconds'])['source_review'];assert all(sha(R/p)==h for p,h in initial.items()) and all(sha(R/p)==h for p,h in history.items())
+no_reuse=all(not ids for r in runtime for ids in r['reused_scope_ids_by_stage'].values()) and all(not r['predecessor_lineage'] for r in runtime)
+e=dict(plan_id=formal['plan_id'],processing_identity=formal['processing_identity'],executed_code_sha256=formal['executed_code_sha256'],formal_execution_index=1,whole_round_seconds=formal['whole_round_seconds'],started_at=formal['started_at'],finished_at=formal['finished_at'],source_recall=review['source_recall'],source_accuracy=review['source_accuracy'],critical_numeric_errors=review['critical_numeric_errors'],workload=review['workload'],expansion_gates_met=review['expansion_gates_met'],actual_runtime_no_reuse=no_reuse,actual_accepted_fact_count=accepted,answered_text_count=answered,object_reviews=objects,source_disclosures=disclosures,missing_disclosures=missing,runtime_evidence=runtime,delivery_diagnostics=diagnostics,source_scope_sha256=formal['source_scope_sha256'],source_pages_sha256=freeze['source_pages_sha256'],source_fixed_before_first_execute=True,denominator_method=scope['denominator_method'],numeric_error_policy='Wrong printed amount or explicit wrong unit is critical;missing unit is accuracy failure;missing row is recall omission.',negative_check_scope=scope['negative_check_scope'],protected_historical_files_unchanged=len(history),first_formal_artifacts_unchanged=len(initial),query_export_disk_equal=True,next_batch='paused_pending_a_role_review' if review['expansion_gates_met'] else 'paused_on_formal_failure',change_archived=False,a_role_acceptance='pending_finite_review' if review['expansion_gates_met'] else 'pending_failure_review',production_authorization='not_authorized',scale_quality_claim_allowed=False)
+(C/'source-review-evidence.json').write_text(json.dumps(e,ensure_ascii=False,indent=2)+'\n')
+print(json.dumps({k:e[k] for k in ['source_recall','source_accuracy','critical_numeric_errors','whole_round_seconds','actual_runtime_no_reuse','actual_accepted_fact_count','answered_text_count','expansion_gates_met','protected_historical_files_unchanged','first_formal_artifacts_unchanged']},ensure_ascii=False,indent=2));print('COMPONENTS',[(k,sum(d['present'] for d in disclosures if d['kind']==k),sum(d['kind']==k for d in disclosures)) for k in ['answer_substance','native_income_cell','native_role']])

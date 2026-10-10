@@ -1,0 +1,11 @@
+import json,hashlib,re
+from pathlib import Path
+from pypdf import PdfReader
+R=Path.cwd();C=R/'openspec/changes/deliver-company-profile-m4-v42-unseen-small-batch';read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();frozen=read(C/'independent-frozen-source-pages.json');supp=read(C/'actual-object-supplemental-source-pages.json');receipt={}
+for i,item in frozen.items():
+ h=item['document_version'];p=R/'data/filings/announcements/blobs'/h[:2]/(h+'.pdf');assert sha(p)==h
+ reader=PdfReader(p);source={x['page']:x['text'] for x in [*item['pages'],*supp[i]['pages']]}
+ for page,expected in source.items():assert (reader.pages[page-1].extract_text() or '')==expected,(i,page)
+ receipt[i]=dict(document_version=h,official_pdf_sha256=sha(p),pdf_page_count=len(reader.pages),frozen_pages=[x['page'] for x in item['pages']],actual_object_supplemental_pages=[x['page'] for x in supp[i]['pages']],all_independent_page_text_equal_official=True)
+(C/'official-source-validation.json').write_text(json.dumps(dict(official_documents=receipt,frozen_page_count=sum(len(v['pages']) for v in frozen.values()),frozen_and_supplemental_union_count=sum(len(set(x['frozen_pages']+x['actual_object_supplemental_pages'])) for x in receipt.values()),original_contract_unchanged=True,no_profile_preexecution=True),ensure_ascii=False,indent=2)+'\n')
+print('OFFICIAL VERIFIED', {i:len(x['frozen_pages']) for i,x in receipt.items()})

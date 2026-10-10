@@ -1,0 +1,50 @@
+{
+  "created_at": "2026-10-10T14:26:41.238443+00:00",
+  "tasks_6_1_to_6_3_completed": true,
+  "completion_branch": "first_delivery_business_failure_preserved",
+  "business_acceptance_passed": false,
+  "a_role_review": "pending_failure_review",
+  "source_recall": {
+    "status": "assessed",
+    "numerator": 82,
+    "denominator": 253,
+    "value": 0.3241106719367589
+  },
+  "source_accuracy": {
+    "status": "assessed",
+    "numerator": 206,
+    "denominator": 259,
+    "value": 0.7953667953667953
+  },
+  "critical_numeric_errors": {
+    "status": "assessed",
+    "value": 19
+  },
+  "accepted_facts": 253,
+  "answered_texts": 6,
+  "whole_round_seconds": 237.57029044162482,
+  "tokens_consumed": 0,
+  "shared_token_budget": 50000,
+  "actual_runtime_no_reuse": true,
+  "two_company_five_stage_delivery_completed": true,
+  "query_export_disk_equal": true,
+  "protected_historical_files": 2378,
+  "first_formal_artifacts": 18,
+  "source_condition_count": 253,
+  "source_negative_count": 19,
+  "passed_negatives": 17,
+  "failed_negatives": 2,
+  "new_batches": "paused",
+  "change_archived": false,
+  "repair_cards_registered": [
+    "4.1",
+    "4.2",
+    "4.3",
+    "4.4"
+  ],
+  "repair_started": false,
+  "previous_v42_finite_archive_verified": true,
+  "business_code_modified": false,
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false
+}

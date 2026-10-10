@@ -1,0 +1,71 @@
+"""Task 1.1 only: freeze through existing owner; never execute/enqueue."""
+import hashlib
+import json
+import sqlite3
+from pathlib import Path
+from utils import config_manager
+from research.storage import ResearchStorageManager
+from research.announcement_assets import AnnouncementAssetConfig, AnnouncementAssetRepository, AnnouncementAssetService
+from research.announcement_assets.access import AnnouncementAssetAccess
+from research.company_profile.execution import default_processing_identity
+from research.company_profile.operations import CompanyProfileTaskService
+from research.company_profile.m4_next_batch import load_m4_next_batch_plan
+
+ROOT=Path.cwd()
+CHECKPOINT=ROOT/'data/checkpoints/company_profile_common_core'
+PLAN=CHECKPOINT/'reports/m4_v42_unseen_small_batch'
+OUTPUT=ROOT/'data/research/company_profile_common_core/m4_v42_unseen_small_batch'
+EXPORT=ROOT/'data/exports/m4_v42_unseen_small_batch'
+CHANGE=ROOT/'openspec/changes/deliver-company-profile-m4-v42-unseen-small-batch'
+IDENTITY={**default_processing_identity(),'revenue_sentence_repair':'v42'}
+OLD=ROOT/'openspec/changes/archive/2026-10-10-deliver-company-profile-m4-v40-unseen-small-batch'
+EXCLUDED=set(json.loads((OLD/'freeze-receipt.json').read_text())['delivered_ids']) | {'600050.SH','600079.SH'}
+assert len(EXCLUDED)==46
+assert not PLAN.exists() and not OUTPUT.exists() and not EXPORT.exists()
+# Protect every prior report, export and company-profile runtime/checkpoint snapshot.
+old_paths=set()
+for parent in (CHECKPOINT/'reports',ROOT/'data/exports',ROOT/'data/research/company_profile_common_core'):
+ for path in parent.rglob('*'):
+  if path.is_file():
+   old_paths.add(path)
+for parent in (ROOT/'openspec/changes/archive').glob('*company-profile*'):
+ for path in parent.rglob('*'):
+  if path.is_file():old_paths.add(path)
+old_hash={str(p.relative_to(ROOT)):hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(old_paths)}
+Path('/tmp/quote_v42_unseen_history_baseline.json').write_text(json.dumps(old_hash,indent=2)+'\n')
+rc=config_manager.get_research_config()
+storage=ResearchStorageManager(rc)
+cfg=AnnouncementAssetConfig.from_research_config(rc,project_root=ROOT)
+repository=AnnouncementAssetRepository(Path(str(rc.storage.db_path)).resolve())
+asset_service=AnnouncementAssetService(repository=repository,config=cfg,acquisition_service=None,attachment_retriever=None)
+access=AnnouncementAssetAccess(repository=repository,config=cfg,service=asset_service)
+service=CompanyProfileTaskService(storage=storage,shared_asset_access=access,checkpoint_root=CHECKPOINT,
+ output_root=OUTPUT,processing_identity=IDENTITY,plan_directory=PLAN)
+db=sqlite3.connect(f'file:{Path(str(rc.storage.db_path)).resolve()}?mode=ro',uri=True)
+queue_before=db.execute('select work_id from business_profile_work_items order by work_id').fetchall()
+plan=service.freeze_m4_next_batch_plan(knowledge_cutoff='2026-09-17',delivered_ids=EXCLUDED)
+first_bytes=(PLAN/'plan.json').read_bytes()
+plan2=load_m4_next_batch_plan(CHECKPOINT,plan_directory=PLAN)
+assert plan==plan2==service.freeze_m4_next_batch_plan(knowledge_cutoff='2026-09-17',delivered_ids=EXCLUDED)
+assert first_bytes==(PLAN/'plan.json').read_bytes()
+assert not {r.instrument_id for r in plan.reports} & EXCLUDED
+assert [r.disclosure_form for r in plan.reports]==['service','manufacturing']
+assert queue_before==db.execute('select work_id from business_profile_work_items order by work_id').fetchall()
+assert all(hashlib.sha256((ROOT/p).read_bytes()).hexdigest()==h for p,h in old_hash.items())
+receipt=dict(original_exclusion_count=44,total_exclusion_count=46,official_versions_verified=True,executed_code_sha256={str(p):hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(Path('research/company_profile').rglob('*.py'))},knowledge_cutoff='2026-09-17',processing_identity=IDENTITY,delivered_ids=sorted(EXCLUDED),
+ selection_order=['SSE','SZSE','BSE','code_ascending_within_exchange'],plan=plan.model_dump(mode='json'),
+ plan_directory=str(PLAN.relative_to(ROOT)),output_directory=str(OUTPUT.relative_to(ROOT)),
+ export_directory=str(EXPORT.relative_to(ROOT)),repeated_read_equal=True,
+ queue_before_count=len(queue_before),queue_after_count=len(queue_before),enqueued_in_freeze=False,
+ protected_historical_files=len(old_hash),historical_sha256=old_hash,
+ plan_sha256=hashlib.sha256(first_bytes).hexdigest(),production_authorization='not_authorized',scale_quality_claim_allowed=False)
+assert all(hashlib.sha256((ROOT/'data/filings/announcements/blobs'/r.document_version[:2]/(r.document_version+'.pdf')).read_bytes()).hexdigest()==r.document_version for r in plan.reports)
+from research.company_profile import core_evidence_selection as selection
+receipt['repair_flags']={n:getattr(selection,n)(IDENTITY) for n in ['revenue_sentence_repair_requested','named_role_repair_requested','service_operating_energy_requested','core_answer_repair_requested','source_delivery_repair_requested']}
+assert all(receipt['repair_flags'].values())
+receipt['default_identity']=default_processing_identity()
+receipt['default_identity_unchanged']=default_processing_identity().get('revenue_sentence_repair')!='v42'
+(CHANGE/'protection-baseline.json').write_text(json.dumps(old_hash,ensure_ascii=False,indent=2)+'\n')
+(CHANGE/'freeze-receipt.json').write_text(json.dumps(receipt,ensure_ascii=False,indent=2)+'\n')
+print('FROZEN',plan.model_dump_json(indent=2),flush=True)
+print('HISTORY_UNCHANGED',len(old_hash),'QUEUE_UNCHANGED',len(queue_before),flush=True)

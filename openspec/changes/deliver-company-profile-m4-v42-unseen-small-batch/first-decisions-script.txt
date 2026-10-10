@@ -1,0 +1,77 @@
+import json,hashlib,re
+from pathlib import Path
+R=Path.cwd();C=R/'openspec/changes/deliver-company-profile-m4-v42-unseen-small-batch';read=lambda p:json.loads(p.read_text());save=lambda p,v:p.write_text(json.dumps(v,ensure_ascii=False,indent=2)+'\n');compact=lambda s:re.sub(r'\s+','',s or '').replace('（','(').replace('）',')');num=lambda s:compact(s).replace(',','')
+scope=read(C/'source-scope.json');all_sources={i:read(Path('/tmp/quote_v42_unseen_source_'+i+'.json')) for i in scope['versions']};decisions={};supp={};aliases={'温州银联公司':'温州银联投资置业有限公司','热电公司':'宁波经济技术开发区热电有限责任公司','进出口公司':'宁波联合集团进出口股份有限公司','建设开发公司':'宁波联合建设开发有限公司','梁祝公司':'宁波梁祝文化产业园开发有限公司'}
+# Decisions made against independently read source pages/layouts, not presence of output or benchmark text.
+errors={
+ '600051.SH':{
+  **{j:('分类切换失败：母公司p195买卖/租赁/服务属于合同类型，实际region/市场或客户类型沿用旧状态',False) for j in range(78,84)},
+  **{j:('p195时点转让为全部母公司收入，证据栏目错误保留其他业务限定',False) for j in [84,85]},
+  **{j:('p195短期/长期为合同期限，实际revenue_timing错误沿用确认时点',False) for j in range(86,90)},
+  **{j:('p195合计误取房地产分部11,192,253.79而全母公司合计应31,802,924.70；原分部列身份未保留',True) for j in [94,95]},
+  **{j:('p178酒店服务交易对方截断：应浙江东江绿色石化技术创新中心有限公司，末尾限公司未接回原行',False) for j in [110,111]},
+  **{j:('p178上一行残字限公司污染下一交易对方：应宁波中金石化有限公司',False) for j in [112,113]},
+  **{j:('p179承租方收入收入表头污染：应精确温州和兆酒店控股有限公司',False) for j in [140,141]}},
+ '600080.SH':{
+  **{j:('p25免疫类行名称被合并单元格详见情况说明污染',False) for j in [46,47]},
+  **{j:('p25同行业公司原万元收入被挂到金花consolidated_group/product，且错标元；原第三方主体及原单位均错误',True) for j in range(52,64)},
+  **{j:('p25收入的79.68原为百分比份额，不是79.68元收入，非产品收入行',True) for j in [64,65]},
+  **{j:('p32陕西宜甄本期营业收入空白，33850.66万元属于参股常州华森；跨行借额/原主体错配',True) for j in [70,71,74]},
+  **{j:('p178业务类型是收入分类汇总，不能当其他业务中的具名产品',False) for j in [91,92]},
+  **{j:('p178药品销售应本期主营产品收入，原栏目被沿用其他业务限定',False) for j in [93,94]},
+  **{j:('p178时间分类汇总/某一时点包含全收入，不能沿用其他业务限定；同页无错误限定的原time正例保留',False) for j in range(97,101)}}}
+for ins in scope['versions']:
+ raw=read(Path('/tmp/v42_unseen_actual_'+ins+'.json'));facts={};extra=set();roles=[r for r in scope['native_roles'] if r['instrument_id']==ins]
+ for idx,r in enumerate(raw):
+  kind=r['object_type'];n=r['source_native'];ep=sorted({p for e in r['evidence'] for p in [e.get('page'),*e.get('continuation_pages',[]),*e.get('subject_evidence_pages',[])] if p});extra.update(ep);source=compact('\n'.join(all_sources[ins][p-1]['text'] for p in ep));d=dict(review_index=idx,verified_source_pages=ep,actual_object_type=kind,actual_native_name=n['name'],actual_action=r.get('action'),actual_relation_type=r.get('relation_type'),actual_subject_scope=r['subject_scope'],critical_numeric_error=False)
+  if idx in errors[ins]:reason,numeric=errors[ins][idx];d.update(accurate=False,reason=reason,critical_numeric_error=numeric)
+  else:
+   if kind in ['Segment','Measurement']:
+    assert num(n['value']) in num(source),(ins,idx,n)
+    assert n['unit'] in ['元','万元'],(ins,idx,n)
+    assert compact(n['name']) in source,(ins,idx,n)
+    if r['subject_scope']=='issuer':assert any('母公司财务报表主要项目' in all_sources[ins][p-1]['text'] for p in ep)
+    d.update(accurate=True,reason='独立原PDF对应本期原收入格成立；按原表行/列核金额、单位、主体及分类。总额合计标签与值明确，不将其叠加来源header尾部视为另一个收入条件。')
+   elif kind=='BusinessOverview':
+    d.update(accurate=True,reason='独立原PDF支持该原文片段（含适用/不适用、原业务性质/原主体或政策条件）；片段准确性不代替六正文实质完整性，也不从所列业务性质推销售。')
+   elif kind=='Activity':
+    assert ins=='600080.SH' and idx in [1,2,3,4,15]
+    d.update(accurate=True,reason='p9原报告主要业务/当前产品线经营或p163采购商品接受劳务电费支持集团电力采购，未生成投入/销售；父类operates不能替代具名sells条件。')
+   else:raise AssertionError((ins,idx,kind))
+  if d['accurate'] and kind=='Segment':
+   candidates=[]
+   for j,row in enumerate(scope['source_rows'][ins]):
+    if row['page'] not in ep or compact(n['name']) not in set(map(compact,row['native_aliases'])) or num(n['value'])!=num(row['value']) or n['unit']!=row['unit']:continue
+    dim=r['dimension'];expected=row['dimension'];h=n['header'] or '';qual=n.get('qualifier') or ''
+    equivalent=(dim==expected or (expected=='recognition_timing' and dim=='revenue_timing') or (expected=='customer_type' and dim=='region' and '市场或客户类型' in h) or (expected=='service' and dim=='lease' and '出租方' in h))
+    if not equivalent:continue
+    if row['counterparty']:
+     prefix='承租方：' if dim=='lease' else '交易对方：'
+     if compact(qual)!=compact(prefix+row['counterparty']):continue
+    actor=row['source_actor'];subject=aliases.get(r.get('subject_name'),r.get('subject_name'))
+    if actor=='公司及合并子公司':
+     if r['subject_scope']!='consolidated_group':continue
+    elif '（母公司）' in actor:
+     if r['subject_scope']!='issuer':continue
+    elif subject!=actor and aliases.get(n['name'],n['name'])!=actor:continue
+    if row.get('segment_column') not in [None,'合计']:
+     if compact(row['segment_column']) not in compact(qual):continue
+    # Different original tables with equal values cannot substitute; native header differentiates when on same page.
+    candidates.append(j)
+   if candidates:
+    assert len(candidates)==1,(ins,idx,candidates)
+    d['recall_row_index']=candidates[0];d['reason']+=' 满足前置收入条件'+scope['source_rows'][ins][candidates[0]]['condition_id']+'（多记录只一次召回）'
+  facts[r['record_id']]=d
+ answers={}
+ for dim in read(Path('/tmp/v42_unseen_answers_'+ins+'.json')):
+  rule=scope['answers'][ins][dim['dimension_id']];txt=compact(dim['excerpt']);failed=[g for g in rule['required_groups'] if not any(compact(t) in txt for t in g)]
+  assert failed,(ins,dim['dimension_id'])
+  if ins=='600051.SH':reason='正文主要为关联销售/出租、表格和零散政策；未接通p9–12三主业/全产品服务/原主体/新设与退出边界，p10/26/105差价/抄表/备案验收交房机制缺失'
+  elif dim['dimension_id']=='revenue_model':reason='p101仅一般原则前半句，p102线下合同发出签收、预期对价总额及第三方退款排除未续入；销售/租赁原完整收款机制不完整'
+  else:reason='p9主营/药品矩阵虽在，但p13上期酒店退出、原子公司/参股/八家未经营、p25–26临床审评状态及当前租赁/转租未完整保留，未满足前置实质条件'
+  answers[dim['dimension_id']]=dict(accurate=False,critical_numeric_error=False,reason=reason,failed_groups=failed,all_supporting_records_checked=True)
+ decisions[ins]=dict(facts=facts,answers=answers)
+ frozen=set(scope['versions'][ins]['checked_pages']);supp[ins]=dict(document_version=scope['versions'][ins]['sha256'],pages=[p for p in all_sources[ins] if p['page'] in extra-frozen])
+ print(ins,'accepted',len(raw),'correct',sum(d['accurate'] for d in facts.values()),'numeric',sum(d['critical_numeric_error'] for d in facts.values()),'unique rows',len(set(d['recall_row_index'] for d in facts.values() if d.get('recall_row_index') is not None)),'errors',[idx for idx in errors[ins]])
+save(C/'actual-object-decisions.json',decisions);save(C/'actual-object-supplemental-source-pages.json',supp)
+save(C/'source-contract-interpretation.json',dict(original_scope_unchanged=True,substance_or_denominator_changed=False,dimension_aliases={'recognition_timing':'revenue_timing','service出租行':'lease','customer_type国内/国外且原生header为市场或客户类型':'region'},scope='只映射辅助拼写/现有模型且保留原栏目；合同类型/期限不能继承region或revenue_timing，列身份不可丢失',income_column_policy='原分部非合计条件必须明确原分部列qualifier；未注明列的全额不能同时召回等额单分部格；同源同条件重复记录只一召回',accuracy_policy='原合同外253条真实接受记录及六个answered正文均唯一计准确率；空源格/借其他行金额/万元误元/百分比误元属关键数字错误；仅header叠加但合计标签/值正确不单独判数字错；正文按实质判'))

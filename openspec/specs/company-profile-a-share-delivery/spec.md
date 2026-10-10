@@ -100,3 +100,18 @@ Meeting the 4.1 numeric gates on the current two-report v4 sample MUST NOT be tr
 - **AND** first expansion cannot start from this result alone without the reviewed M4 change
 - **AND** the existing two-company v1 report files remain readable after a later expansion snapshot is written
 - **AND** an ordinary `run` without an expansion snapshot remains allowed while first-expansion mode is not `active`
+
+### Requirement: Exact frozen assets and explicit successor identities use the existing owner
+An explicitly registered same-source repair identity MUST inherit its validated five cumulative repair switches, exact official-asset registration and bound enqueue, and source-supported actor expansion without changing the default identity. The existing company-profile owner MUST recheck the frozen instrument, asset, report, period and document version before writing; binding drift MUST reject registration/enqueue. A valid frozen report absent from the frontier MUST enter actual acquire, parse, semantic, verify and publish through existing owners without manual SQL backfill, market-wide scans or a parallel execution system. Subsequent research rounds MUST preserve original failures and establish independent directories and source contracts.
+
+#### Scenario: Frozen official asset has no profile frontier row
+- **WHEN** the existing owner runs an approved plan with the exact official annual report and explicit repair identity
+- **THEN** exact shared-asset registration and bound enqueue permit real five-stage delivery, while an asset binding changed between reads is rejected before writing
+
+#### Scenario: Successor identity continues a reviewed correction
+- **WHEN** v42 is explicitly selected with rules=company_profile_common_core.v1, owned_page_facts=v8 and material_input_facts=v1
+- **THEN** all five cumulative repairs, exact enqueue and actor expansion apply, default identity remains unchanged, and predecessor failures remain immutable
+
+#### Scenario: Finite v42 delivery is accepted
+- **WHEN** A-role confirms131/131source recall,255/255unique accuracy,zero numeric errors,nine evaluated negatives and239.367379seconds within shared50000tokens
+- **THEN** the conclusion remains limited to the declared China Unicom2024/ Humanwell2025 source conditions and checked outputs, with production not_authorized and scale quality false

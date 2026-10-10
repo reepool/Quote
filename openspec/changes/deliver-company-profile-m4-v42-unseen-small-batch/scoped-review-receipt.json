@@ -1,0 +1,23 @@
+{
+  "review_scope": "current agent archive/specs/new source and first-delivery evidence only",
+  "blocking_findings_in_task_materials": [],
+  "business_failures_registered_not_repaired": [
+    "incomplete_bodies",
+    "missing_named_actions",
+    "income_table_column_and_classification",
+    "polluted_counterparty_continuation",
+    "peer_scope_unit_and_percent",
+    "blank_subsidiary_row_borrows_associate_income"
+  ],
+  "nonblocking_findings": [
+    "recognition_timing/revenue_timing与service/lease辅助拼写依原nativeheader映射，原合同字节/条件/分母不改",
+    "原始patch证据空白按原字节保留，不做格式改写"
+  ],
+  "unrelated_preexisting_issues_untouched": true,
+  "business_code_modified": false,
+  "existing_dirty_documents_unchanged": true,
+  "unrelated_preexisting_format_findings": [
+    "m4_next_batch.py",
+    "source_review.py"
+  ]
+}

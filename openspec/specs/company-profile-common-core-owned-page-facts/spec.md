@@ -242,3 +242,18 @@ The owned-page path MUST retain full continued bodies and original subsidiary co
 #### Scenario: Source continuation qualifies control and consolidation
 - **WHEN** a continued official passage states loss of control or lack of substantive control and consolidation
 - **THEN** final three-dimensional answers preserve the original subsidiary,period and state limits rather than promoting the passage to issuer activity
+
+### Requirement: Income sentence evidence preserves native actor scope
+Operating-income narrative evidence MUST be bounded to the original income sentence and supported context. Same-page net-profit attribution to the parent MUST NOT narrow unrelated operating income. A sentence's explicit parent or standalone limitations MUST remain. Original actor aliases MUST expand only from supported definition-page evidence under an explicitly registered repair identity; table headers MUST NOT enter actor names. Cross-column income MUST retain printed current cell placement, native revenue_timing and units, with prior-only cells remaining absent rather than invented zero. Purchase projection MUST retain its underlying purchases action and MUST NOT establish manufacturing input.
+
+#### Scenario: Parent profit and group operating income share a page
+- **WHEN** a page separately discloses parent-attributable profit and company cloud or data-center operating income
+- **THEN** each Segment and paired Measurement uses the income sentence's supported group scope and native business classification without cross-dimension aggregation
+
+#### Scenario: Income sentence explicitly states parent or standalone scope
+- **WHEN** the income evidence itself has a parent or standalone limitation
+- **THEN** that limitation survives acceptance, query and export and is not replaced by the report default group scope
+
+#### Scenario: Subsidiary sales use a defined short name
+- **WHEN** a current affirmative sales branch has an unambiguous source-supported definition-page actor
+- **THEN** the native actor and definition evidence survive without preceding table-header pollution or inference of manufacturing input from procurement

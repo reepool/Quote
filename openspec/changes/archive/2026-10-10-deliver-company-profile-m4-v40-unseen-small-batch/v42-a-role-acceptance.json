@@ -1,0 +1,15 @@
+{
+  "review_date": "2026-10-10",
+  "finite_accepted": true,
+  "scope": "600050.SH 2024 /600079.SH 2025;131 positives (6 bodies+71 income+54 named actions),9 evaluated negatives and actually checked outputs/pages only",
+  "source_recall": "131/131",
+  "source_accuracy": "255/255",
+  "actual_facts": 249,
+  "answered_bodies": 6,
+  "critical_numeric_errors": 0,
+  "whole_round_seconds": 239.3673792509362,
+  "tokens_used": 0,
+  "independent_tests_passed": 40,
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false
+}

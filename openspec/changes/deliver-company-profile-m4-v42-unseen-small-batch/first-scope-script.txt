@@ -1,0 +1,116 @@
+import json,hashlib,re
+from pathlib import Path
+from datetime import datetime,timezone
+R=Path.cwd();C=R/'openspec/changes/deliver-company-profile-m4-v42-unseen-small-batch';read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();save=lambda p,v:p.write_text(json.dumps(v,ensure_ascii=False,indent=2)+'\n');compact=lambda s:re.sub(r'\s+','',s or '')
+f=read(C/'freeze-receipt.json');plan=f['plan'];a,b='600051.SH','600080.SH';full={i:read(Path('/tmp/quote_v42_unseen_source_'+i+'.json')) for i in [a,b]};period={r['instrument_id']:r['report_period'] for r in plan['reports']};rows={a:[],b:[]};roles=[]
+checked={a:set([5,9,10,11,12,13,14,15,16,17,22,23,24,25,26,28,29,30,104,105,152,153,166,167,168,169,170,177,178,179,184,185,188,194,195]),b:set([5,9,11,12,13,14,15,16,24,25,26,27,31,32,101,102,142,143,152,153,154,155,156,157,162,163,164,169,171,177,178])}
+def quote(i,p,cont=()):return '\n'.join(full[i][n-1]['text'] for n in sorted(set([p,*cont])))
+def row(i,p,dim,n,v,actor='公司及合并子公司',column='本期收入',header='',counterparty=None,unit='元',aliases=(),unit_page=None,continuation=(),qualifier='',segment_column=None):
+ q=quote(i,p,continuation);assert compact(v) in compact(q),(i,p,n,v)
+ rows[i].append(dict(condition_id=f'{i}:income:{len(rows[i])+1:03}',dimension=dim,name=n,native_aliases=[n,*aliases],value=v,unit=unit,page=p,column=column,header=header,reported_period=period[i],source_actor=actor,source_quote=q,unit_basis_page=unit_page or p,qualifier=qualifier,counterparty=counterparty,segment_column=segment_column,continuation_pages=list(continuation)))
+def batch(i,p,dim,ns,vs,**kw):
+ for n,v in zip(ns.split('|'),vs.split('|'),strict=True):row(i,p,dim,n,v,**kw)
+actors={'热电公司':'宁波经济技术开发区热电有限责任公司','温州银联公司':'温州银联投资置业有限公司','进出口公司':'宁波联合集团进出口股份有限公司','建设开发公司':'宁波联合建设开发有限公司','梁祝公司':'宁波梁祝文化产业园开发有限公司','温州和晟公司':'温州和晟文旅投资有限公司','龙港和立公司':'龙港和立房地产有限公司','嵊泗长滩公司':'嵊泗远东长滩旅游开发有限公司'}
+batch(a,15,'industry','批发业|电力、热力生产和供应业|房地产业','19,661|41,369|16,018',header='主营业务分行业',unit='万元',unit_page=14,continuation=(14,))
+batch(a,15,'product','商品房|电、热|煤炭','16,018|41,209|18,394',header='主营业务分产品',unit='万元',unit_page=14)
+batch(a,15,'region','浙江省内|浙江省外','69,499|15,223',header='主营业务分地区',unit='万元',unit_page=14)
+row(a,15,'sales_mode','直接销售','84,604',header='主营业务分销售模式',unit='万元',unit_page=14)
+row(a,15,'product','投资性房地产','29,107',header='其他业务收入说明',unit='万元',qualifier='不含主营房地产业和商品房指标')
+row(a,17,'business_type','国内外商品贸易','19,661',header='贸易业务开展情况',unit='万元',actor=actors['进出口公司'])
+for n,v in [('天和家园二期','3,746'),('瑞和家园商业综合体','11,883'),('半山半岛一、三期','13,652'),('天和景园','13,360'),('泰和云栖','706'),('天悦湾滨海度假村A区','34'),('逸家园一期','811'),('逸家园二期','559')]:row(a,23,'project',n,v,header='房地产销售和结转情况',column='结转收入金额',unit='万元',qualifier='项目结转收入非签约金额',continuation=(24,))
+row(a,24,'project','天合家园二期','0',header='房地产销售和结转情况',column='结转收入金额',unit='万元',continuation=(23,),qualifier='原表明确打印0，非空位造零')
+row(a,24,'business_type','房地产结转收入合计','44,892',header='房地产销售和结转情况',unit='万元',continuation=(23,),aliases=('结转收入金额',))
+batch(a,25,'product','火电|光伏发电|合计','2.12|0.03|2.15',header='电量收入及成本情况-收入',unit='亿元',actor=actors['热电公司'],qualifier='左侧收入列，右侧煤/网供为成本')
+for n,v in [('温州银联公司','44,302'),('热电公司','47,232'),('进出口公司','22,753'),('建设开发公司','9,299'),('梁祝公司','3,078'),('宁波青峙化工码头有限公司','26,764'),('宁波金通融资租赁有限公司','27,650')]:row(a,29,'business_segment',n,v,actor=actors.get(n,n),header='主要控股参股公司营业收入',unit='万元',continuation=(5,),qualifier='原子公司/参股公司主体，参股收入非集团收入')
+batch(a,152,'business_type','主营业务|其他业务|合计','847,223,701.38|420,337,545.14|1,267,561,246.52',header='合并营业收入和营业成本-本期收入')
+# Independent manual transcription of nonempty current revenue cells, never cost cells.
+cols=['房地产分部','热电分部','商品贸易分部','其他分部','合计']
+def vector(i,p,dim,n,vals,header,columns,actor='公司及合并子公司',qualifier=''):
+ for col,v in zip(columns,vals.split('|'),strict=True):
+  if v:row(i,p,dim,n,v,actor=actor,header=header,column=col+'营业收入',segment_column=col,qualifier=qualifier+'；原分部/总额格独立，不跨维度累计')
+for dim,n,vs,h in [
+ ('product','商品房','451,245,728.43||||451,245,728.43','商品类型'),
+ ('product','电、热及其安装','|413,692,882.38|||413,692,882.38','商品类型'),
+ ('product','煤炭','||183,944,520.78||183,944,520.78','商品类型'),
+ ('product','其他','128,659,755.18|943,992.16|12,666,380.09|76,407,987.50|218,678,114.93','商品类型'),
+ ('region','浙江省内','579,905,483.61|414,636,874.54|44,377,723.38|76,407,987.50|1,115,328,069.03','按经营地区分类'),
+ ('region','浙江省外','||152,233,177.49||152,233,177.49','按经营地区分类'),
+ ('customer_type','国内市场','579,905,483.61|414,636,874.54|185,263,912.90|76,407,987.50|1,256,214,258.55','市场或客户类型'),
+ ('customer_type','国外市场','||11,346,987.97||11,346,987.97','市场或客户类型'),
+ ('contract_type','买卖合同','537,066,027.41|1,025,543.31|183,944,520.78|49,101,095.72|771,137,187.22','合同类型'),
+ ('contract_type','供用电、热力合同','|408,274,662.72|||408,274,662.72','合同类型'),
+ ('contract_type','租赁合同','39,679,809.24||||39,679,809.24','合同类型'),
+ ('contract_type','承揽合同','|3,812,255.05||7,458,685.04|11,270,940.09','合同类型'),
+ ('contract_type','服务合同','3,159,646.96|1,524,413.46|12,666,380.09|19,848,206.74|37,198,647.25','合同类型'),
+ ('recognition_timing','时点转让','579,905,483.61|414,636,874.54|196,610,900.87|76,407,987.50|1,267,561,246.52','按商品转让的时间分类'),
+ ('contract_term','短期合同','540,284,388.23|414,636,874.54|196,610,900.87|68,957,977.80|1,220,490,141.44','按合同期限分类'),
+ ('contract_term','长期合同','39,621,095.38|||7,450,009.70|47,071,105.08','按合同期限分类'),
+ ('sales_mode','直接销售','579,905,483.61|414,636,874.54|196,610,900.87|75,229,079.03|1,266,382,338.05','按销售渠道分类'),
+ ('sales_mode','间接销售','|||1,178,908.47|1,178,908.47','按销售渠道分类'),
+ ('business_segment','合计','579,905,483.61|414,636,874.54|196,610,900.87|76,407,987.50|1,267,561,246.52','合并合同分解合计')]:vector(a,153,dim,n,vs,h,cols)
+for n,v,sc in [('租赁收入','39,679,809.24','房地产分部'),('政府有偿回购待开发土地','84,218,505.00','房地产分部'),('水煤浆','56,159,800.47','其他分部')]:row(a,153,'product',n,v,header='商品类型其他明细说明',segment_column=sc,column=sc+'营业收入',qualifier='父项内明细不能与父项累计')
+for n,v in [('温州银联公司','443,023,735.93'),('进出口公司','227,531,669.12')]:row(a,168,'business_segment',n,v,actor=actors[n],header='重要非全资子公司主要财务信息',continuation=(5,167),qualifier='原主体抵销前收入；p29相同业务另原页')
+row(a,170,'business_segment','宁波青峙化工码头有限公司','267,644,558.85',actor='宁波青峙化工码头有限公司',header='重要联营企业主要财务信息',continuation=(169,),qualifier='权益法参股25%，非集团合并收入')
+rel=[('浙江逸盛石化有限公司','水煤浆销售','46,372,888.80'),('荣盛能源有限公司','水煤浆加工','7,450,009.70'),('宁波海能调和油有限公司','蒸汽供应','2,018,003.02'),('温州和欣公司','咨询服务','1,474,884.60'),('浙江逸盛石化有限公司','电力供应','361,507.43'),('浙江东江绿色石化技术创新中心有限公司','酒店服务','182,549.50'),('宁波中金石化有限公司','电力供应','163,633.60'),('宁波联合报关有限公司','信息服务','92,047.17'),('浙江逸盛石化有限公司','酒店服务','46,690.58'),('浙江逸盛新材料有限公司','酒店服务','44,233.02'),('宁波中金石化有限公司','酒店服务','30,551.89'),('宁波青峙化工码头有限公司','酒店服务','11,389.62'),('宁波中金石化有限公司','代理服务','9,433.96'),('宁波戚家山化工码头有限公司','酒店服务','7,347.18'),('宁波海能调和油有限公司','酒店服务','6,148.11'),('浙江石油化工有限公司','酒店服务','3,607.54'),('浙江荣盛控股集团有限公司','酒店服务','637.74'),('浙江荣通物流有限公司','酒店服务','566.04'),('海南逸盛石化有限公司','酒店服务','264.15'),('浙江逸昕化纤有限公司','酒店服务','264.15')]
+for party,n,v in rel:row(a,178,'service',n,v,counterparty=party,header='出售商品/提供劳务情况表',continuation=(179,),qualifier='原行/关联方独立，上期空白与本期不同')
+for party,n,v in [('温州和兆酒店控股有限公司','房屋建筑物及附属设备','8,511,182.27'),('温州和居物业管理有限公司','临时建筑物及附属设备','9,734.51')]:row(a,179,'service',n,v,counterparty=party,header='本公司作为出租方',column='本期确认的租赁收入',qualifier='9734.51在本期列，不是仅上期')
+for n,v in [('房地产','580,132,630.66'),('热电','415,448,343.50'),('商品贸易','226,095,454.12'),('其他','76,770,471.38'),('分部间抵销','-30,885,653.14'),('合计','1,267,561,246.52')]:row(a,184,'adjustment' if n=='分部间抵销' else 'business_segment',n,v,header='报告分部财务信息',qualifier='报告分部抵销前/抵销额/合并后不同于p153合同列')
+parent='宁波联合集团股份有限公司（母公司）'
+batch(a,195,'business_type','主营业务|其他业务|合计','20,594,703.94|11,208,220.76|31,802,924.70',actor=parent,header='母公司营业收入和营业成本',continuation=(185,))
+pcols=['房地产-分部','其他-分部','合计']
+for dim,n,vs,h in [
+ ('product','住宿和餐饮','|19,634,792.29|19,634,792.29','商品类型'),('product','其他','11,192,253.79|975,878.62|12,168,132.41','商品类型'),('region','浙江省内','11,192,253.79|20,610,670.91|31,802,924.70','按经营地区分类'),('customer_type','国内市场','11,192,253.79|20,610,670.91|31,802,924.70','市场或客户类型'),('contract_type','买卖合同','|391,304.95|391,304.95','合同类型'),('contract_type','租赁合同','11,192,253.79||11,192,253.79','合同类型'),('contract_type','服务合同','|20,219,365.96|20,219,365.96','合同类型'),('recognition_timing','时点转让','11,192,253.79|20,610,670.91|31,802,924.70','按商品转让的时间分类'),('contract_term','短期合同','1,697,155.33|20,610,670.91|22,307,826.24','按合同期限分类'),('contract_term','长期合同','9,495,098.46||9,495,098.46','按合同期限分类'),('sales_mode','直接销售','11,192,253.79|19,431,762.44|30,624,016.23','按销售渠道分类'),('sales_mode','间接销售','|1,178,908.47|1,178,908.47','按销售渠道分类'),('business_segment','合计','11,192,253.79|20,610,670.91|31,802,924.70','母公司合同分解合计')]:vector(a,195,dim,n,vs,h,pcols,actor=parent,qualifier='母公司口径；地产其他全部是租赁')
+batch(b,13,'industry','医药工业|医药商业','543,794,806.57|1,016,951.35',header='主营业务分行业',continuation=(14,))
+row(b,14,'adjustment','分部抵消','-769,694.96',header='主营业务分行业',continuation=(13,),qualifier='负调整非产品收入')
+batch(b,14,'product','骨科类|免疫类|儿童类|普药类','433,299,524.68|62,191,070.45|8,131,984.34|38,898,878.05',header='主营业务分产品')
+batch(b,14,'region','华东大区|华南大区|华中大区|东北大区|华北大区|中南大区|西南大区|西北大区','114,122,095.20|39,427,837.59|52,153,336.29|57,688,971.96|121,785,755.12|20,195,894.49|62,530,530.42|74,617,036.45',header='主营业务分地区')
+batch(b,25,'product','骨科类|免疫类|儿童类|普药类','433,299,524.68|62,191,070.45|8,131,984.34|38,898,878.05',header='按治疗领域经营数据',qualifier='与p14原表独立，同页同行业公司金额不能当金花收入')
+for n,v in [('西安济世堂医药有限责任公司','0.77'),('西安金花天格医药有限公司','100.92'),('常州华森医疗器械股份有限公司','33,850.66')]:row(b,32,'business_segment',n,v,actor=n,header='主要控股参股公司营业收入',unit='万元',qualifier='子公司/参股主体分别保存')
+batch(b,142,'business_type','主营业务|其他业务|合计','542,988,202.24|1,053,860.72|544,042,062.96',header='合并营业收入和营业成本',continuation=(143,))
+for dim,n,vs,h in [('business_segment','业务类型','543,083,329.43|958,733.53|544,042,062.96','合同分解业务类型'),('product','药品销售','542,092,011.57|896,190.67|542,988,202.24','业务类型'),('product','其他','991,317.86|62,542.86|1,053,860.72','业务类型'),('recognition_timing','某一时点转让','543,083,329.43|958,733.53|544,042,062.96','按商品转让的时间分类')]:vector(b,143,dim,n,vs,h,['医药工业-分部','医药商业-分部','合计'])
+row(b,152,'service','转租使用权资产取得的收入','511,651.37',header='作为承租人-转租收入',qualifier='此行明确转租取得收入，其余租金/利息/现金流不得收入化')
+row(b,152,'service','东区厂房','285,507.20',header='作为出租人的经营租赁',continuation=(153,))
+row(b,157,'business_segment','常州华森医疗器械股份有限公司','338,506,572.72',actor='常州华森医疗器械股份有限公司',header='重要联营企业主要财务信息',continuation=(156,),qualifier='非集团合并收入')
+parentb='金花企业（集团）股份有限公司（母公司）'
+batch(b,178,'business_type','主营业务|其他业务|合计','542,327,298.23|1,467,508.34|543,794,806.57',actor=parentb,header='母公司营业收入和营业成本',continuation=(169,))
+for dim,n,vs,h in [('business_segment','业务类型','543,794,806.57|543,794,806.57','母公司合同分解业务类型'),('product','药品销售','542,327,298.23|542,327,298.23','业务类型'),('product','其他','1,467,508.34|1,467,508.34','业务类型'),('recognition_timing','某一时点转让','543,794,806.57|543,794,806.57','按商品转让的时间分类')]:vector(b,178,dim,n,vs,h,['医药工业-分部','合计'],actor=parentb)
+def role(i,p,n,action=None,actor='公司及合并子公司',aliases=(),cont=(),qualifier='',relation=None):
+ q=quote(i,p,cont);assert compact(n) in compact(q) or any(compact(x) in compact(q) for x in aliases),(i,p,n)
+ roles.append(dict(condition_id=f'{i}:action:{sum(r["instrument_id"]==i for r in roles)+1:03}',instrument_id=i,name=n,native_aliases=[n,*aliases],role='operating_energy_input' if relation else 'product_sales' if action=='sells' else 'raw_material_procurement' if action=='purchases' else 'product_processing' if action=='processes' else 'product_production',page=p,source_quote=q,source_actor=actor,reported_period=period[i],source_actions=[action] if action else [],source_relation_types=[relation] if relation else [],qualifier=qualifier,action_source_basis='原主体当前明确动作；采购不推投入，经营生产不替代销售',quantity_acceptance='只核动作，不扩量价；未知映射pending/ambiguous',continuation_pages=list(cont)))
+role(a,11,'电力','sells',actor=actors['热电公司'],aliases=('电','电量'),cont=(9,25,26,5));role(a,11,'蒸汽','sells',actor=actors['热电公司'],aliases=('热','热量'),cont=(9,105,5));role(a,26,'电力','purchases',actor=actors['热电公司'],aliases=('电量',),cont=(25,5));role(a,16,'煤','purchases',actor=actors['热电公司'],aliases=('煤炭','购煤'),cont=(5,25));role(a,25,'煤',actor=actors['热电公司'],relation='material_input',cont=(5,9),qualifier='火电能源耗用，原本期煤成本佐证，不扩数量价格')
+for action in ['produces','processes','sells']:role(a,9,'水煤浆',action,actor=actors['热电公司'],cont=(5,105,178),qualifier='水煤浆分公司制造/受托加工/销售分别保存')
+role(a,11,'煤炭','sells',actor=actors['进出口公司'],cont=(5,15),qualifier='煤炭进口与当期销售量明确')
+role(a,11,'存量房','sells',actor=actors['温州银联公司'],cont=(5,14),qualifier='原子公司当期销售存量房');role(a,11,'存量房','sells',actor=actors['温州和晟公司'],cont=(5,),qualifier='原子公司当期销售存量房')
+role(a,12,'商品房','sells',actor=actors['嵊泗长滩公司'],cont=(5,23));role(a,12,'住宅','sells',actor=actors['梁祝公司'],cont=(5,23),qualifier='逸家园尾房销售');role(a,12,'住宅底商','sells',actor=actors['梁祝公司'],cont=(5,23),qualifier='逸家园尾房销售')
+for n in ['金天格胶囊','转移因子胶囊','转移因子口服溶液','开塞露','氨咖黄敏胶囊','小儿止咳糖浆','甲芬那酸胶囊']:role(b,14 if n in ['金天格胶囊','转移因子胶囊','转移因子口服溶液','开塞露'] else 24 if n=='氨咖黄敏胶囊' else 9,n,'sells',aliases=('转移因子口服液',) if n=='转移因子口服溶液' else (),cont=(9,24),qualifier='当前上市主要产品＋销售模式或实际销售/医疗机构实际采购；多规格不重计')
+role(b,15,'人工虎骨粉',relation='material_input',qualifier='金天格胶囊原料，投入不自动推外购');roles[-1]['role']='raw_material_input'
+for actor in ['西安济世堂医药有限责任公司','西安金花天格医药有限公司']:role(b,32,'药品','sells',actor=actor,aliases=('医药',),cont=(155,),qualifier='具名原子公司真实药品销售/营业收入')
+role(b,32,'医疗器械','sells',actor='常州华森医疗器械股份有限公司',cont=(156,157),qualifier='参股原主体医疗器械生产与销售，不升集团')
+answers={a:{'principal_business':dict(source_pages=[5,9,10,11,12,14,26,29,30],required_groups=[['电力'],['热力'],['房地产'],['批发'],['水煤浆'],['受托加工'],['酒店'],['租赁'],['合营','参股'],['不再纳入','退出合并']],substance='三主业与当前水煤浆/售电增值/酒店租赁，具名原子公司；温州和欣合营、码头/融资租赁参股；报关退出合并，新设未实质经营/前期开发保持状态'), 'products_services':dict(source_pages=[5,9,10,11,12,26,29,30,105,153,178,179],required_groups=[['电力'],['蒸汽','热力'],['水煤浆'],['住宅'],['商业'],['旅游综合体'],['煤炭'],['化工产品'],['服装'],['纺织品'],['鞋类'],['通关'],['仓储'],['外汇'],['物流'],['信保'],['校验'],['维护'],['酒店'],['咨询'],['租赁']],substance='产品住宅/海景公寓/文旅商业；进口商品及外贸综合服务，售电增值/加工/当前关联酒店咨询信息代理及出租；子公司/参股及新设未实质状态保留'), 'revenue_model':dict(source_pages=[10,26,104,105,153,179],required_groups=[['买卖差价'],['净额'],['佣金','服务费'],['主要责任人'],['代理人'],['总额'],['交付'],['抄表'],['备案'],['验收'],['交房'],['现时收款'],['批零差价'],['电力交易中心'],['电网'],['水煤浆'],['酒店'],['租赁']],substance='贸易自营差价/主责总额/代理净额佣金；电热供出抄表/可收款；房产备案完工验收收款交房；水煤浆/酒店提供客户确认现时收款；增量配网批发采购用户交付交易中心电网结算批零差价，租赁来源保留')},b:{'principal_business':dict(source_pages=[9,12,13,32,155],required_groups=[['研发'],['生产'],['销售'],['化学药'],['中成药'],['原料药'],['保健品'],['医药工业'],['西安济世堂'],['西安金花天格'],['参股'],['未发生经营','未经营'],['上年','上期'],['酒店']],substance='研发生产销售主业及子公司药品销售、参股华森设备；酒店上期处置退出；八未经营子公司、药研产业园/新厂及临床研发状态不升当前经营'), 'products_services':dict(source_pages=[9,12,14,15,24,25,26,32,152,153,155],required_groups=[[n] for n in ['金天格胶囊','小儿止咳糖浆','开塞露','氨咖黄敏胶囊','甲芬那酸胶囊']]+[['转移因子'],['骨科'],['免疫'],['儿童'],['普药'],['片剂'],['胶囊剂'],['颗粒剂'],['散剂'],['合剂'],['口服溶液剂'],['糖浆剂'],['外用溶液剂'],['人工虎骨粉'],['租赁'],['审评'],['二期临床']],substance='四系列和完整剂型/具名核心药，人工虎骨粉投入；租赁/转租服务；保健酒审评和GW临床状态不得升格销售'), 'revenue_model':dict(source_pages=[9,101,102,142,143,152,178],required_groups=[['招商代理'],['全国'],['学术'],['线下'],['合同'],['交付'],['签收'],['控制权'],['现时收款'],['对价'],['第三方'],['退还'],['租赁']],substance='以销定产采购生产闭环，招商代理全国学术推广渠道，线下销售合同交付客户接受/发出签收后确认/预期对价总额，排第三方代收退款，其他转租/厂房租赁来源独立')}}
+neg=[]
+def negative(i,p,n,rule,**kw):neg.append(dict(instrument_id=i,page=p,name=n,rule=rule,source_quote=quote(i,p),**kw))
+for party,prior,p in [('逸盛大化石化有限公司','13,828.31',178),('荣盛化学（上海）有限公司','4,537.74',178),('荣盛能源有限公司','2,000.00',178),('荣盛石化股份有限公司','1,786.80',178),('浙江浙石化销售有限公司','318.87',178),('荣盛煤炭有限公司','283.02',179),('温州和兆酒店控股有限公司','18,283.12',179)]:negative(a,p,party+'仅上期服务','本期空位不借上期不造零；同名真实本期其他交易保留',counterparty=party,prior_value=prior,native_name='水电服务' if p==179 and party=='温州和兆酒店控股有限公司' else '酒店服务')
+negative(a,30,'新设三子公司未经营','嵊泗宁联/温州旭和酒店/温州和晟美橘酒店未实质经营，不能当前经营销售；原已经营子公司正例保留')
+negative(b,14,'酒店本期空白','上期退出的酒店业本期空白不能把-100%变化当收入或造0')
+negative(b,32,'空收入不借利润','陕西宜甄贸易等本期营业收入空位不能借营业利润负90.01等，不从业务性质推已经营')
+negative(b,25,'同行业收入非本公司','沃华/达仁堂/健民等收入只能原第三方主体，不成为金花收入')
+negative(b,25,'保健酒未当前销售','保健酒审评，不得肯定当期销售；保留真实金天格/TF销售')
+negative(b,26,'研发药未当前销售','GWZ002/GWZ003二期临床、GWH001临床前/GWZ004成药性研究，不生成肯定销售')
+negative(b,152,'售后回租不构成销售','控制权未转移，不构成销售；10000000现金流不是营业收入；511651.37转租收入及285507.20出租正例保留')
+negative(b,163,'关联采购非收入','出售表不适用，采购物业水电/监理/安保等费用12119537.50不作收入')
+negative(b,164,'承租非收入','作为出租方不适用，经营租赁租金为支出不作收入；p152出租正例独立')
+negative(b,178,'投资收益非营业收入','16664430.57元投资收益不作营业收入，母公司主营/其他正确值保留')
+for i in [a,b]:negative(i,17 if i==a else 16,'客户排名非销售渠道','前五名客户不是销售渠道维度；真实客户关系保留')
+versions={r['instrument_id']:dict(sha256=r['document_version'],pdf=str(Path('data/filings/announcements/blobs')/r['document_version'][:2]/(r['document_version']+'.pdf')),checked_pages=sorted(checked[r['instrument_id']])) for r in plan['reports']}
+scope=dict(created_at=datetime.now(timezone.utc).isoformat(),fixed_before_formal_execution=True,plan_id=plan['plan_id'],processing_identity=f['processing_identity'],knowledge_cutoff=plan['knowledge_cutoff'],shared_token_budget=50000,official_reports=plan['reports'],versions=versions,answers=answers,source_rows=rows,native_roles=roles,negative_conditions=neg,denominator_method='6实质正文＋原重要收入非空本期格（原行/维度/分部列/主体唯一）＋明示具名动作/投入；Measurement仅准确率；全部接受事实及已答正文动态唯一准确率，不继承131/255。',income_sampling_policy='有限于已独立阅读MD&A重要分类/项目结转/子公司参股、合并/母公司收入合同分解全部非空收入格、报告分部抵销、重要非全资/联营、本期关联销售服务及出租/转租；分类汇总和总额重复不重计，同额不同原表维度/主体/分部格独立，跨维度不得累计；不声明全年报完整性。',dimension_mapping={'recognition_time':'recognition_timing','consumes':'material_input','合同类型':'contract_type','按合同期限分类':'contract_term','市场或客户类型':'customer_type'},negative_check_scope={i:dict(pages=sorted(checked[i]),limits='仅已检查页；原主体/当前/未经营/出表/研发及收入列边界') for i in [a,b]},acceptance_thresholds=dict(recall=1.0,accuracy=1.0,critical_numeric_errors=0,whole_round_seconds=300,shared_tokens=50000),production_authorization='not_authorized',scale_quality_claim_allowed=False)
+assert not (R/'data/checkpoints/company_profile_common_core/reports/m4_v42_unseen_small_batch/formal_execution.json').exists()
+save(C/'source-scope.json',scope);save(C/'independent-frozen-source-pages.json',{i:dict(document_version=versions[i]['sha256'],pdf=versions[i]['pdf'],pages=[p for p in full[i] if p['page'] in checked[i]]) for i in [a,b]})
+# Layout frozen separately, including sparse/current and header transitions.
+from pypdf import PdfReader
+layout={}
+for i in [a,b]:
+ reader=PdfReader(versions[i]['pdf']);ns=[15,17,23,24,25,29,152,153,168,170,178,179,184,195] if i==a else [13,14,16,24,25,32,142,143,152,153,156,157,163,164,178]
+ layout[i]=[dict(page=n,text=reader.pages[n-1].extract_text(extraction_mode='layout')) for n in ns]
+save(C/'independent-income-layout-pages.json',layout)
+counts=dict(answers=6,income_conditions=sum(map(len,rows.values())),native_roles=len(roles));save(C/'source-freeze-receipt.json',dict(created_at=datetime.now(timezone.utc).isoformat(),processing_identity=f['processing_identity'],plan=plan,executed_code_sha256=f['executed_code_sha256'],source_scope_sha256=sha(C/'source-scope.json'),source_pages_sha256=sha(C/'independent-frozen-source-pages.json'),source_layout_sha256=sha(C/'independent-income-layout-pages.json'),source_condition_count=sum(counts.values()),counts=counts,negative_count=len(neg),fixed_before_formal_execution=True,scores_prefilled=False,accuracy_denominator_prefilled=False,repair_flags=f['repair_flags'],default_identity_unchanged=True,official_page_count=sum(map(len,checked.values()))))
+print('SOURCE_FIXED',counts,sum(counts.values()),'income_by_company',{i:len(v) for i,v in rows.items()},'roles',len(roles),'negative',len(neg))

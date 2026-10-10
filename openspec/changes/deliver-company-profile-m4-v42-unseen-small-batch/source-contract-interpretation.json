@@ -1,0 +1,12 @@
+{
+  "original_scope_unchanged": true,
+  "substance_or_denominator_changed": false,
+  "dimension_aliases": {
+    "recognition_timing": "revenue_timing",
+    "service出租行": "lease",
+    "customer_type国内/国外且原生header为市场或客户类型": "region"
+  },
+  "scope": "只映射辅助拼写/现有模型且保留原栏目；合同类型/期限不能继承region或revenue_timing，列身份不可丢失",
+  "income_column_policy": "原分部非合计条件必须明确原分部列qualifier；未注明列的全额不能同时召回等额单分部格；同源同条件重复记录只一召回",
+  "accuracy_policy": "原合同外253条真实接受记录及六个answered正文均唯一计准确率；空源格/借其他行金额/万元误元/百分比误元属关键数字错误；仅header叠加但合计标签/值正确不单独判数字错；正文按实质判"
+}
