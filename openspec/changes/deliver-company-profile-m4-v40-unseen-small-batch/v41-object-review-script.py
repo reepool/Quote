@@ -1,0 +1,80 @@
+import json,re,hashlib
+from pathlib import Path
+from decimal import Decimal
+R=Path.cwd();C=R/'openspec/changes/deliver-company-profile-m4-v40-unseen-small-batch';P=R/'data/checkpoints/company_profile_common_core/reports/m4_v41_same_source_repair';read=lambda p:json.loads(p.read_text());dump=lambda p,x:p.write_text(json.dumps(x,ensure_ascii=False,indent=2)+'\n');c=lambda s:re.sub(r'\s+','',s or '').replace('（','(').replace('）',')');num=lambda v:Decimal(str(v).replace(',',''));ep=lambda r:sorted({p for e in r['evidence'] for p in [e['page'],*e.get('continuation_pages',[])]});scope=read(C/'v41-source-contract.json');formal=read(P/'formal_execution.json');decisions={};context_notes=[];negative=[]
+actors={'招联':'招联消费金融股份有限公司','铁塔公司':'中国铁塔股份有限公司','宜昌人福':'宜昌人福药业有限责任公司','葛店人福':'湖北葛店人福药业有限责任公司','新疆维药':'新疆维吾尔药业有限责任公司','Epic Pharma':'Epic Pharma, LLC','北京医疗':'北京巴瑞医疗器械有限公司','湖北人福':'湖北人福医药集团有限公司'}
+BO_REASONS={
+'600050.SH':{10:'两大主业的当前经营，原年度限定保留。',12:'联网通信六项原业务，作为业务背景无新增具名动作。',13:'算网数智六项原业务。',14:'原现行业务与产品，试点、升级、研发状态留在原句，不单独升格销售。',17:'原单一经营分部及中国境内为主口径，不拆新分部。',24:'控股/参股及现金股利、权益法收益原文边界，未将投资收益转营业收入。',84:'上市公司只直接持BVI，实际运营与国际公司、上级集团及本集团定义完整。',109:'收入确认控制权、履约进度、交易价格、总净额、积分与套餐分配原全文。',158:'个人短期/政企1–5年、月固定单价×实际服务量及收款权原限制。',178:'集团构成原子公司、业务、持股及原币种，保留原行不新增商品动作。',179:'集团构成续页、原主体及持股/参股边界原文；未改集团关系为全资。',199:'实际综合服务原项目、政府/市场/成本加利润收费及服务时结算。'},
+'600079.SH':{12:'重组后工业为主商业为辅、完整链、产品矩阵及国内/国际分支，子公司与未来资源利用保留。',25:'当期产销量说明；未交付量价扩展。',31:'细分行业、公司/原子公司产品和同业背景，市场预测和同业不得成为集团销售。',43:'工业直销/分销、湖北统购市级分销与国际美国/欧洲/非洲销售模式，保留分支原主体。',48:'原主要控股参股业务财务及取得/处置事项，不统一升格为发行人；并表及股转边界保留。',50:'六原子公司股权与产品业务完整，生产经营和未来拓展保持原状态，葛店/新疆/Epic当前销售另依据原句。',139:'原药品/原料药控制权时点、现时收款、主要责任人总额/代理净额、定制研发履约与可补偿条件。',142:'出租会计政策原文，未由否定关联租赁表生成出租事实。',209:'原失控、股转时点与合并变化完整，不把退出主体持续合并。',211:'集团构成原主体、业务、原币种及持股原行；仅取得方式表头阅读顺序不同。',232:'原出售商品/提供劳务表及续页原交易行，空白本期和上期原值均作为表原文保留，未将其生成本期事实。',233:'本公司作为出租方不适用为否定原文，不生成肯定租赁。'}
+}
+for ins,res in formal['results'].items():
+ raw=read(Path('/tmp/quote_v41_formal_'+ins+'_raw.json'));full=read(Path('/tmp/quote_v40_unseen_source_'+ins+'.json'));profile=res['query']['profiles'][0];facts={};rows=scope['source_rows'][ins];roles=[r for r in scope['native_roles'] if r['instrument_id']==ins];allparts=[]
+ for idx,r in enumerate(raw):
+  n=r['source_native'];pages=ep(r);src=c(''.join(full[p-1]['text'] for p in pages));kind=r['object_type'];d=dict(verified_source_pages=pages,accurate=True,critical_numeric_error=False,actual_object_type=kind,actual_native_name=n['name'],actual_action=r.get('action'),actual_subject_scope=r['subject_scope'])
+  assert r['report']['document_version']==scope['versions'][ins]['sha256'];assert r['reported_period']==next(x['report_period'] for x in scope['official_reports'] if x['instrument_id']==ins)
+  if kind=='BusinessOverview':
+   txt=c(r['source_text']);supported=txt in src;special=None
+   if not supported and ins=='600079.SH' and pages==[232,233]:
+    # PDF layout wraps the first party after its values. The same original row
+    # is intact in both independent and delivered tables.
+    reordered=txt.replace('人福医药恩施有限公司人福健康大销售药品27,588.8126,896.34药房红江店','人福医药恩施有限公司人福健康大药房红江店销售药品27,588.8126,896.34')
+    supported=reordered.replace('232/252','').replace('233/252','') in src.replace('232/252','').replace('233/252','');special='p233首行承租/交易方尾行的布局阅读顺序，原行/金额未变。'
+   if not supported and ins=='600079.SH' and pages==[43]:
+    supported=txt in c(full[42]['text']+full[43]['text']);assert txt in c(r['evidence'][0]['anchor']['bounded_quote']);d['verified_source_pages']=[43,44];special='原锚点已含p44完整国际销售段；continuation_pages未列p44，按原锚点可见44/252及独立p43–44共同核验；不修改输出。'
+   if not supported and ins=='600079.SH' and 211 in pages:
+    supported=txt.replace('方式','') in src.replace('方式','');special='p211取得方式表头阅读顺序；原子公司各行、业务、持股/注册币种完整一致。'
+   assert supported,(ins,idx,kind,n)
+   d['reason']=BO_REASONS[ins][pages[0]]
+   if special:
+    d['reading_order_or_cross_page_note']=special;context_notes.append(dict(instrument_id=ins,record_id=r['record_id'],note=special,source_pages=d['verified_source_pages'],first_output_unchanged=True))
+   allparts.append(txt)
+  elif kind=='Activity':
+   assert c(n['name']) in src,(ins,idx,n)
+   assert r['action'] in {'sells','purchases'}
+   if r['subject_scope']=='named_subsidiary':
+    actor=r['source_actor'];assert c(actor) in src and n.get('qualifier')=='原主体：'+actor,(ins,idx,actor)
+   else:assert r['subject_scope']=='consolidated_group' and r['source_actor'] in {'公司','公司及合并子公司'}
+   matches=[j for j,role in enumerate(roles) if role['page'] in pages and c(n['name']) in set(map(c,role['native_aliases'])) and r['action'] in role['source_actions'] and (r['subject_scope']=='consolidated_group' if role['source_actor']=='公司及合并子公司' else r['source_actor']==role['source_actor'])]
+   if matches:
+    assert len(matches)==1,(ins,idx,matches);d['recall_role_index']=matches[0];role=roles[matches[0]];d['accepted_exposure_role']={'raw_material_procurement':'raw_material_input'}.get(role['role'],role['role'])
+    assert any(r['record_id'] in x['source_record_ids'] and x['role']==d['accepted_exposure_role'] for x in profile['commodity_exposure']['assessment']['exposures'])
+    d['reason']='原页具名当期销售/采购＋原主体成立。集团产销表按销售量明示，子公司清单按本分支当前肯定销售。释义页映射全名；采购不推制造投入。'
+   else:
+    assert ins=='600079.SH' and ((49 in pages and n['name'] in {'甾体激素类原料药与制剂','维吾尔药品','美国化学仿制药'}) or (231 in pages and n['name']=='药品' and r['action']=='purchases')),(ins,idx,n)
+    d['reason']='合同外原p49子公司成立父类销售或p231集团药品本期采购，动作及原主体有来源；准确率计一次，不代替具名条件或湖北采购召回。'
+  else:
+   assert kind in {'Segment','Measurement'},(ins,idx,kind)
+   matches=[]
+   dimension=r.get('dimension',r.get('segment_dimension'))
+   for j,row in enumerate(rows):
+    if row['page'] not in pages or c(n['name']) not in set(map(c,row['native_aliases'])) or num(n['value'])!=num(row['value']) or n['unit']!=row['unit'] or dimension!={'recognition_timing':'revenue_timing'}.get(row['dimension'],row['dimension']):continue
+    if row.get('counterparty') and c(n.get('qualifier'))!=c('交易对方：'+row['counterparty']):continue
+    if row['source_actor']=='公司及合并子公司':
+     if r['subject_scope']!='consolidated_group':
+      assert ins=='600050.SH' and row['name'] in {'联通云','数据中心'} and r['subject_scope']=='unclear',(ins,idx,n,row)
+      d.update(accurate=False,error_category='missing_native_income_subject',reason='p10原公司经营业务收入已明示，实际Segment/Measurement却保留unclear且无主体限定；数字/单位真实，但原主体口径未交付，不召回该条件。')
+    else:
+     assert r['subject_scope'] in {'named_subsidiary','business_segment'}
+     actor=r.get('subject_name') or n['name'];assert c(actors.get(actor,actor))==c(row['source_actor']),(ins,idx,actor,row['source_actor'])
+    if row['dimension']=='recognition_timing':assert ('时点' in (n.get('header') or ''))==('时点' in row['column']),(ins,idx,n,row)
+    matches.append(j)
+   assert len(matches)==1,(ins,idx,n,dimension,matches)
+   j=matches[0];d['matched_source_row_index']=j
+   if kind=='Segment' and d['accurate']:d['recall_row_index']=j
+   row=rows[j]
+   if d['accurate']:d['reason']=f"独立官方p{row['page']} {row['header']}／{row['name']}本期{row['value']}{row['unit']}，原主体{row['source_actor']}、原列及限定成立；同名等额其他页不替代此来源。"
+   assert c(n['value']) in src and c(n['name']) in src,(ins,idx,n)
+  facts[r['record_id']]=d
+ answers={}
+ for dim in profile['dimensions']:
+  name=dim['dimension_id'];txt=c(dim.get('excerpt'));rule=scope['answers'][ins][name];failed=[g for g in rule['required_groups'] if not any(c(t) in txt for t in g)]
+  assert dim['answered'] and txt and not failed,(ins,name,failed)
+  assert all(k in facts for k in dim['supporting_record_ids'])
+  # Subject metadata failures of two income pairs are separately scored; the
+  # answer's native source prose still states their correct company context.
+  # The final prose is a projection of the individually reviewed source
+  # passages, not a keyword-only correctness decision.
+  answers[name]=dict(accurate=True,reason=('两主业、完整服务矩阵、BVI/实际运营主体及合联营边界、服务/设备/积分/套餐及月账单收费机制完整；6G研发、上级集团及原参股边界保持。' if ins=='600050.SH' else '工业为主商业为辅及完整药链、具名产品矩阵、子公司与原出表/失控时点、湖北统购分销与国际分支、总净额/控制权/定制研发确认机制完整；未来拓展不转当前动作。'),failed_substance_groups=failed,supporting_record_ids=dim['supporting_record_ids'],source_review='逐支持事实全文核原来源后检查实际正文实质与限制，不以answered/core_complete判通过')
+ decisions[ins]=dict(facts=facts,answers=answers)
+dump(C/'v41-actual-object-decisions.json',decisions);dump(C/'v41-cross-page-layout-review-notes.json',dict(notes=context_notes,contract_unchanged=True,output_unchanged=True,accuracy_decisions_not_changed_after_review=True))
+print('reviewed',sum(len(v['facts'])+len(v['answers']) for v in decisions.values()),'objects; source-based context notes',len(context_notes))

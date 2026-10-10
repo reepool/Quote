@@ -1,0 +1,40 @@
+{
+  "pre_formal": "19 passed, insufficient per-row income subject assertion; no claim this proved acceptance",
+  "formal": "129/131; 251/255; numeric 0; negatives 9/9",
+  "stronger_formal_gap_reproduction": "17 passed, 2 failed; both telecom owner/independent pages expose missing subject",
+  "post_formal_correction": "19 passed + 2 passed",
+  "old_identity_regression_fixed": "4 passed",
+  "shared_regression": "112 passed, 5 failed before correction; four introduced alias regressions fixed, one pre-existing continuation failure",
+  "baseline_comparison": "same continuation failure; phosphates four pass at baseline and after alias correction",
+  "checks": {
+    "ruff": "passed",
+    "ruff_format": "passed",
+    "openspec_strict": "passed",
+    "diff_check": "passed",
+    "diff_check_method": "git diff --check for implementation, plus git diff --cached --check excluding raw *.patch evidence; unified patch context markers are preserved for exact code reconstruction"
+  },
+  "code_review": [
+    {
+      "classification": "blocking",
+      "finding": "旧身份简称展开回归",
+      "resolution": "仅v41展开原主体；四项复验通过"
+    },
+    {
+      "classification": "blocking",
+      "finding": "具名被投资公司收入guard未仅核锚点",
+      "resolution": "精确锚点/表头/限定/直接来源证据与正反边界通过"
+    },
+    {
+      "classification": "blocking",
+      "finding": "联通经营正文收入同页归母利润污染主体",
+      "resolution": "首次正式失败原样保留；事后局部原句边界修复及21测试通过；后继正式证明仍未运行"
+    },
+    {
+      "classification": "unrelated_pre_existing",
+      "finding": "章节续页测试基线相同失败",
+      "resolution": "后置未修改"
+    }
+  ],
+  "a_role_review": "pending_failure_and_local_correction_review",
+  "no_new_formal_round": true
+}

@@ -1,0 +1,48 @@
+..........................................................F............. [ 61%]
+....F.F.F.F..................................                            [100%]
+=================================== FAILURES ===================================
+_____________ test_reads_through_section_and_stops_at_next_heading _____________
+tests/unit/test_research/test_company_profile_core_evidence_selection.py:265: in test_reads_through_section_and_stops_at_next_heading
+    assert selected.spans[0].continuation_pages == (15,)
+E   assert () == (15,)
+E
+E     Right contains one more item: 15
+E     Use -v to get more diff
+_ test_complete_bodies_preserve_original_substance_and_limits[v39-pages-600078.SH] _
+tests/unit/test_research/test_company_profile_v39_real_estate_phosphates.py:143: in test_complete_bodies_preserve_original_substance_and_limits
+    assert candidates, (role["name"], role["source_actor"], role["source_actions"])
+E   AssertionError: ('磷酸盐系列', '澄星日化', ['sells'])
+E   assert []
+_ test_complete_bodies_preserve_original_substance_and_limits[v39-independent_pages-600078.SH] _
+tests/unit/test_research/test_company_profile_v39_real_estate_phosphates.py:143: in test_complete_bodies_preserve_original_substance_and_limits
+    assert candidates, (role["name"], role["source_actor"], role["source_actions"])
+E   AssertionError: ('磷酸盐系列', '澄星日化', ['sells'])
+E   assert []
+_ test_complete_bodies_preserve_original_substance_and_limits[v40-pages-600078.SH] _
+tests/unit/test_research/test_company_profile_v39_real_estate_phosphates.py:143: in test_complete_bodies_preserve_original_substance_and_limits
+    assert candidates, (role["name"], role["source_actor"], role["source_actions"])
+E   AssertionError: ('磷酸盐系列', '澄星日化', ['sells'])
+E   assert []
+_ test_complete_bodies_preserve_original_substance_and_limits[v40-independent_pages-600078.SH] _
+tests/unit/test_research/test_company_profile_v39_real_estate_phosphates.py:143: in test_complete_bodies_preserve_original_substance_and_limits
+    assert candidates, (role["name"], role["source_actor"], role["source_actions"])
+E   AssertionError: ('磷酸盐系列', '澄星日化', ['sells'])
+E   assert []
+============================= slowest 10 durations =============================
+42.56s call     tests/unit/test_research/test_company_profile_v39_real_estate_phosphates.py::test_complete_bodies_preserve_original_substance_and_limits[v39-pages-600048.SH]
+40.81s call     tests/unit/test_research/test_company_profile_v39_real_estate_phosphates.py::test_complete_bodies_preserve_original_substance_and_limits[v40-independent_pages-600048.SH]
+40.38s call     tests/unit/test_research/test_company_profile_v39_real_estate_phosphates.py::test_complete_bodies_preserve_original_substance_and_limits[v39-independent_pages-600048.SH]
+37.34s call     tests/unit/test_research/test_company_profile_v39_real_estate_phosphates.py::test_complete_bodies_preserve_original_substance_and_limits[v40-pages-600048.SH]
+4.75s call     tests/unit/test_research/test_company_profile_m4_next_batch.py::test_drift_refuses_one_security_and_keeps_the_other
+4.74s call     tests/unit/test_research/test_company_profile_v39_real_estate_phosphates.py::test_blank_deduction_item_does_not_take_following_subtotal[v40-pages]
+4.23s call     tests/unit/test_research/test_company_profile_v39_real_estate_phosphates.py::test_blank_deduction_item_does_not_take_following_subtotal[v39-independent_pages]
+4.17s call     tests/unit/test_research/test_company_profile_v39_real_estate_phosphates.py::test_complete_bodies_preserve_original_substance_and_limits[v39-pages-600078.SH]
+4.17s call     tests/unit/test_research/test_company_profile_m4_next_batch.py::test_cumulative_tokens_survive_retry_reuse_and_a_restored_ledger
+3.95s call     tests/unit/test_research/test_company_profile_m4_next_batch.py::test_observation_tracks_actual_partial_scope_reuse_even_with_fresh_tokens[120]
+=========================== short test summary info ============================
+FAILED tests/unit/test_research/test_company_profile_core_evidence_selection.py::test_reads_through_section_and_stops_at_next_heading - assert () == (15,)
+FAILED tests/unit/test_research/test_company_profile_v39_real_estate_phosphates.py::test_complete_bodies_preserve_original_substance_and_limits[v39-pages-600078.SH] - AssertionError: ('磷酸盐系列', '澄星日化', ['sells'])
+FAILED tests/unit/test_research/test_company_profile_v39_real_estate_phosphates.py::test_complete_bodies_preserve_original_substance_and_limits[v39-independent_pages-600078.SH] - AssertionError: ('磷酸盐系列', '澄星日化', ['sells'])
+FAILED tests/unit/test_research/test_company_profile_v39_real_estate_phosphates.py::test_complete_bodies_preserve_original_substance_and_limits[v40-pages-600078.SH] - AssertionError: ('磷酸盐系列', '澄星日化', ['sells'])
+FAILED tests/unit/test_research/test_company_profile_v39_real_estate_phosphates.py::test_complete_bodies_preserve_original_substance_and_limits[v40-independent_pages-600078.SH] - AssertionError: ('磷酸盐系列', '澄星日化', ['sells'])
+5 failed, 112 passed, 7 warnings in 229.30s (0:03:49)

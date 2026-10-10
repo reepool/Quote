@@ -1,0 +1,13 @@
+...................                                                      [100%]
+============================= slowest 10 durations =============================
+6.77s call     tests/unit/test_research/test_company_profile_v41_telecom_pharma.py::test_subsidiary_product_list_requires_its_own_current_sale[\u62df\u9500\u552e]
+5.56s call     tests/unit/test_research/test_company_profile_v41_telecom_pharma.py::test_full_source_business_bodies_income_and_named_actions[pages-600079.SH]
+5.50s call     tests/unit/test_research/test_company_profile_v41_telecom_pharma.py::test_full_source_business_bodies_income_and_named_actions[independent_pages-600079.SH]
+5.04s call     tests/unit/test_research/test_company_profile_v41_telecom_pharma.py::test_original_nine_negative_conditions_and_true_rows_coexist[600079.SH]
+4.63s call     tests/unit/test_research/test_company_profile_v41_telecom_pharma.py::test_subsidiary_product_list_requires_its_own_current_sale[\u4e0d\u9500\u552e]
+3.51s call     tests/unit/test_research/test_company_profile_v41_telecom_pharma.py::test_frozen_asset_enters_real_owner_without_an_existing_frontier[False]
+2.24s call     tests/unit/test_research/test_company_profile_v41_telecom_pharma.py::test_full_source_business_bodies_income_and_named_actions[pages-600050.SH]
+1.75s call     tests/unit/test_research/test_company_profile_v41_telecom_pharma.py::test_full_source_business_bodies_income_and_named_actions[independent_pages-600050.SH]
+1.60s call     tests/unit/test_research/test_company_profile_v41_telecom_pharma.py::test_original_nine_negative_conditions_and_true_rows_coexist[600050.SH]
+1.56s call     tests/unit/test_research/test_company_profile_v41_telecom_pharma.py::test_frozen_asset_enters_real_owner_without_an_existing_frontier[between_reads]
+19 passed, 7 warnings in 44.09s

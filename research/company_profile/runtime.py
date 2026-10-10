@@ -87,6 +87,8 @@ SCOPE_CHECKPOINT_SCHEMA = "company_profile_scope_checkpoint.v1"
 
 class PublicationWritesStopped(ValueError):
     """Publication pause or rollback refused a new profile write."""
+
+
 QUEUE_STAGES = ("acquire", "parse", "semantic", "verify", "publish")
 _CORE_FIELDS: dict[ChapterTask, tuple[str, ...]] = {
     ChapterTask.EXTRACT_BUSINESS_OVERVIEW: (
@@ -101,7 +103,9 @@ _CORE_FIELDS: dict[ChapterTask, tuple[str, ...]] = {
 }
 _FIELD_CONTRACT: dict[
     str,
-    tuple[ObjectType, RequirementLevel, tuple[MetricType, ...], tuple[ActivityAction, ...]],
+    tuple[
+        ObjectType, RequirementLevel, tuple[MetricType, ...], tuple[ActivityAction, ...]
+    ],
 ] = {
     "business_overview_source": (
         ObjectType.BUSINESS_OVERVIEW,
@@ -247,7 +251,9 @@ class CompanyProfileResearchWriter:
                 )
             return path
         if not self.allows_new_writes():
-            raise PublicationWritesStopped("research publication has stopped new writes")
+            raise PublicationWritesStopped(
+                "research publication has stopped new writes"
+            )
         write()
         return path
 
@@ -426,15 +432,11 @@ class CompanyProfileStageRuntime:
             repair_revenue_sentence=revenue_sentence_repair_requested(
                 state.processing_identity
             ),
-            named_role_repair=named_role_repair_requested(
-                state.processing_identity
-            ),
+            named_role_repair=named_role_repair_requested(state.processing_identity),
             service_operating_energy=service_operating_energy_requested(
                 state.processing_identity
             ),
-            core_answer_repair=core_answer_repair_requested(
-                state.processing_identity
-            ),
+            core_answer_repair=core_answer_repair_requested(state.processing_identity),
             source_delivery_repair=source_delivery_repair_requested(
                 state.processing_identity
             ),
@@ -486,6 +488,10 @@ class CompanyProfileStageRuntime:
                         source_delivery_repair=source_delivery_repair_requested(
                             state.processing_identity
                         ),
+                        expand_actor_aliases=state.processing_identity.get(
+                            "revenue_sentence_repair"
+                        )
+                        == "v41",
                     ),
                 )
             )
@@ -596,9 +602,7 @@ class CompanyProfileStageRuntime:
             self._persist_scope(state, chapter, digest, result)
             self._persist_work(state)
             if self.stop_after_chapter is chapter:
-                raise RuntimeError(
-                    f"company-profile scope stop after {chapter.value}"
-                )
+                raise RuntimeError(f"company-profile scope stop after {chapter.value}")
         state.task_results = tuple(results)
         self._persist_work(state)
         return self._result(state, status="success", stage="semantic")
@@ -616,12 +620,8 @@ class CompanyProfileStageRuntime:
             repair_revenue_sentence=revenue_sentence_repair_requested(
                 state.processing_identity
             ),
-            named_role_repair=named_role_repair_requested(
-                state.processing_identity
-            ),
-            core_answer_repair=core_answer_repair_requested(
-                state.processing_identity
-            ),
+            named_role_repair=named_role_repair_requested(state.processing_identity),
+            core_answer_repair=core_answer_repair_requested(state.processing_identity),
             source_delivery_repair=source_delivery_repair_requested(
                 state.processing_identity
             ),
@@ -975,16 +975,12 @@ def _semantic_request(
     )
     allowed_metrics = tuple(
         dict.fromkeys(
-            metric
-            for field_id in fields
-            for metric in _FIELD_CONTRACT[field_id][2]
+            metric for field_id in fields for metric in _FIELD_CONTRACT[field_id][2]
         )
     )
     allowed_actions = tuple(
         dict.fromkeys(
-            action
-            for field_id in fields
-            for action in _FIELD_CONTRACT[field_id][3]
+            action for field_id in fields for action in _FIELD_CONTRACT[field_id][3]
         )
     )
     return SemanticTaskRequest(
@@ -1094,7 +1090,9 @@ def _scope_source_digest(
             )
         ],
     }
-    blob = json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+    blob = json.dumps(
+        payload, ensure_ascii=False, sort_keys=True, separators=(",", ":")
+    )
     return hashlib.sha256(blob.encode("utf-8")).hexdigest()
 
 
@@ -1217,8 +1215,7 @@ def _incomplete_field_ids(result: CompanyProfileTaskResult | None) -> frozenset[
     failed_coverage = {
         item.field_id
         for item in result.coverage
-        if item.status
-        in {CoverageStatus.EXTRACTION_FAILED, CoverageStatus.UNCLEAR}
+        if item.status in {CoverageStatus.EXTRACTION_FAILED, CoverageStatus.UNCLEAR}
     }
     return frozenset(reviewed | failed_coverage) - accepted
 
@@ -1255,10 +1252,7 @@ def _retryable_field_ids(result: CompanyProfileTaskResult | None) -> frozenset[s
         for item in result.coverage
         if item.status == CoverageStatus.EXTRACTION_FAILED
     )
-    if (
-        "extract" not in result.provider_calls
-        or _request_level_extract_failed(result)
-    ):
+    if "extract" not in result.provider_calls or _request_level_extract_failed(result):
         retryable.update(_incomplete_field_ids(result))
     return frozenset(retryable) - accepted
 

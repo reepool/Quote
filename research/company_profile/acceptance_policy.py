@@ -28,9 +28,7 @@ from .models import (
 )
 
 _SELF_ACTORS = frozenset({"公司", "本公司", "本集团", "集团", "上市公司"})
-_NARROWER_SCOPES = frozenset(
-    {"issuer", "named_subsidiary", "business_segment"}
-)
+_NARROWER_SCOPES = frozenset({"issuer", "named_subsidiary", "business_segment"})
 _DEFAULT_GROUP_BASES = frozenset({None, "", "unclear", "report_default_group_scope"})
 _SUBJECT_ASSIGNMENT_FAILURE = re.compile(r"无法归属|不可区分")
 _SUBJECT_SCOPE_CONFLICT = re.compile(
@@ -42,7 +40,9 @@ _PARENT_OR_SEGMENT_SCOPE = re.compile(r"母公司|本公司单体|业务分部")
 _GROUP_INCLUSIVE_SUBSIDIARY = re.compile(
     r"(?:本公司|本集团|公司)及(?:其)?(?:所属|全资|控股)?子公司"
 )
-_NAMED_SUBSIDIARY_PREFIX = re.compile(r"^(?:全资|控股|所属)?子公司[\u4e00-\u9fffA-Za-z0-9（）()]{1,20}公司")
+_NAMED_SUBSIDIARY_PREFIX = re.compile(
+    r"^(?:全资|控股|所属)?子公司[\u4e00-\u9fffA-Za-z0-9（）()]{1,20}公司"
+)
 _NAMED_SUBSIDIARY_FACT = re.compile(
     r"(?<![及和与])(?:全资|控股|所属)?子公司"
     r"[\u4e00-\u9fffA-Za-z0-9（）()]{1,20}公司"
@@ -242,6 +242,25 @@ def explicit_group_wording_subject_is_unsupported(record: SemanticRecord) -> boo
     if not isinstance(record, Measurement) or record.field_id != "operating_revenue":
         return False
     if "本集团" not in _local_subject_evidence_text(record):
+        return False
+    # A group can disclose a named investee's own financial information. Its
+    # reporting voice does not change the explicitly labelled income subject.
+    if (
+        record.subject_scope
+        in {SubjectScope.NAMED_SUBSIDIARY, SubjectScope.BUSINESS_SEGMENT}
+        and record.subject_basis == SubjectBasis.DIRECT_SOURCE_WORDING
+        and re.match(
+            r"重要(?:非全资子公司|合营企业|联营企业)/本期营业收入",
+            record.source_native.header or "",
+        )
+        and (record.source_native.qualifier or "").endswith(
+            "：" + record.measured_object
+        )
+        and re.sub(r"\s+", "", record.measured_object)
+        in re.sub(
+            r"\s+", "", " ".join(str(e.anchor.model_dump()) for e in record.evidence)
+        )
+    ):
         return False
     return not (
         record.subject_scope == SubjectScope.CONSOLIDATED_GROUP

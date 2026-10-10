@@ -1,0 +1,33 @@
+...F.F.............                                                      [100%]
+=================================== FAILURES ===================================
+__ test_full_source_business_bodies_income_and_named_actions[pages-600050.SH] __
+tests/unit/test_research/test_company_profile_v41_telecom_pharma.py:222: in test_full_source_business_bodies_income_and_named_actions
+    assert matches[0]["subject_scope"] == "consolidated_group", (
+E   AssertionError: (10, '联通云', 'unclear')
+E   assert 'unclear' == 'consolidated_group'
+E
+E     - consolidated_group
+E     + unclear
+_ test_full_source_business_bodies_income_and_named_actions[independent_pages-600050.SH] _
+tests/unit/test_research/test_company_profile_v41_telecom_pharma.py:222: in test_full_source_business_bodies_income_and_named_actions
+    assert matches[0]["subject_scope"] == "consolidated_group", (
+E   AssertionError: (10, '联通云', 'unclear')
+E   assert 'unclear' == 'consolidated_group'
+E
+E     - consolidated_group
+E     + unclear
+============================= slowest 10 durations =============================
+5.34s call     tests/unit/test_research/test_company_profile_v41_telecom_pharma.py::test_full_source_business_bodies_income_and_named_actions[independent_pages-600079.SH]
+5.04s call     tests/unit/test_research/test_company_profile_v41_telecom_pharma.py::test_subsidiary_product_list_requires_its_own_current_sale[\u4e0d\u9500\u552e]
+4.71s call     tests/unit/test_research/test_company_profile_v41_telecom_pharma.py::test_subsidiary_product_list_requires_its_own_current_sale[\u62df\u9500\u552e]
+4.57s call     tests/unit/test_research/test_company_profile_v41_telecom_pharma.py::test_full_source_business_bodies_income_and_named_actions[pages-600079.SH]
+4.49s call     tests/unit/test_research/test_company_profile_v41_telecom_pharma.py::test_original_nine_negative_conditions_and_true_rows_coexist[600079.SH]
+3.43s call     tests/unit/test_research/test_company_profile_v41_telecom_pharma.py::test_frozen_asset_enters_real_owner_without_an_existing_frontier[False]
+1.79s call     tests/unit/test_research/test_company_profile_v41_telecom_pharma.py::test_full_source_business_bodies_income_and_named_actions[pages-600050.SH]
+1.29s call     tests/unit/test_research/test_company_profile_v41_telecom_pharma.py::test_product_action_modifier_governs_its_own_full_source_branch[\u62df\u9500\u552e]
+1.25s call     tests/unit/test_research/test_company_profile_v41_telecom_pharma.py::test_frozen_asset_enters_real_owner_without_an_existing_frontier[True]
+1.22s call     tests/unit/test_research/test_company_profile_v41_telecom_pharma.py::test_product_action_modifier_governs_its_own_full_source_branch[\u4e0d\u9500\u552e]
+=========================== short test summary info ============================
+FAILED tests/unit/test_research/test_company_profile_v41_telecom_pharma.py::test_full_source_business_bodies_income_and_named_actions[pages-600050.SH] - AssertionError: (10, '联通云', 'unclear')
+FAILED tests/unit/test_research/test_company_profile_v41_telecom_pharma.py::test_full_source_business_bodies_income_and_named_actions[independent_pages-600050.SH] - AssertionError: (10, '联通云', 'unclear')
+2 failed, 17 passed, 7 warnings in 38.46s

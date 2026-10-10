@@ -1,0 +1,7 @@
+..                                                                       [100%]
+============================= slowest 10 durations =============================
+1.80s call     tests/unit/test_research/test_company_profile_v41_telecom_pharma.py::test_operating_income_keeps_its_own_parent_scope[\u672c\u516c\u53f8\u5355\u4f53\u53e3\u5f84-unclear]
+1.35s call     tests/unit/test_research/test_company_profile_v41_telecom_pharma.py::test_operating_income_keeps_its_own_parent_scope[\u6bcd\u516c\u53f8\u8d22\u52a1\u62a5\u8868-issuer]
+
+(4 durations < 0.005s hidden.  Use -vv to show these durations.)
+2 passed, 19 deselected, 7 warnings in 4.60s

@@ -39,3 +39,22 @@ The first131positive conditions,nine negatives,16/131recall,52/58accuracy,zero c
 #### Scenario: No profile exists for source negatives
 - **WHEN** a frozen issuer produces no current profile
 - **THEN** its source conditions remain missing and its negatives are not declared passed from an empty output
+
+
+### Requirement: Frozen official assets enter the existing owner without frontier backfill
+The v41 same-source repair MUST register and enqueue the exact frozen official shared asset through existing owners, reject binding drift before writing, retain the prior idle failure, and keep the default identity unchanged.
+
+#### Scenario: The official annual report has no frontier row
+- **WHEN** the v41 plan binds a valid official annual report without a frontier row
+- **THEN** existing exact-asset registration and bound enqueue feed actual acquire, parse, semantic, verify and publish stages, and query/export/disk agree
+
+### Requirement: Same-source repairs preserve substantive objects and native limitations
+The repair MUST deliver the original 131 positive conditions and validate all nine negatives without changing their substance. Native actors, income columns, units, subsidiary and investee limitations MUST survive acceptance, query and export. Auxiliary procurement projection MUST retain the purchases action and MUST NOT establish manufacturing input.
+
+#### Scenario: Current goods and planned products coexist
+- **WHEN** a subsidiary branch discloses current sales and later product plans
+- **THEN** only the current affirmative list creates sales facts and roles, with the native actor and definition-page evidence preserved
+
+#### Scenario: An income timing cross-table contains blank cells
+- **WHEN** amounts are disclosed across goods, services and other-business columns
+- **THEN** printed column placement and current-period values remain paired, timing uses the existing revenue_timing enum, and prior-only rows create no current revenue or zero

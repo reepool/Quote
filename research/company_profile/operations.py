@@ -282,6 +282,7 @@ class OfficialAnnualReportPageSource:
             for p in pages
             if "房地产销售收入分项列示如下" in p["text"]
             or "营业收入和营业成本情况" in p["text"]
+            or "收入确认时间" in p["text"]
         ]
         lease_active = False
         seller_active = False
@@ -974,6 +975,7 @@ class CompanyProfileTaskService:
                     asset.get("report_id")
                     or asset.get("source_asset_id")
                     or asset.get("filing_id")
+                    or asset.get("source_announcement_id")
                     or ""
                 ).strip(),
                 "report_period": str(asset.get("report_period") or "").strip(),
@@ -1136,11 +1138,67 @@ class CompanyProfileTaskService:
                 "work_ids": [],
             }
         elif enqueue and not (limit_drain_to_enqueued and not instrument_ids):
-            enqueue_result = self.repository.enqueue_latest_annual(
-                knowledge_cutoff=knowledge_cutoff,
-                processing_identity=self.processing_identity,
-                instrument_ids=instrument_ids,
-            )
+            if (
+                batch_plan is not None
+                and self.processing_identity.get("revenue_sentence_repair") == "v41"
+            ):
+                from research.business_profile_production_operations import (
+                    register_business_profile_shared_annual_report_asset,
+                )
+
+                enqueue_result["work_ids"] = []
+                for instrument_id in instrument_ids:
+                    asset = self.repository.shared_asset_access.get_effective_asset(
+                        instrument_id, knowledge_cutoff=knowledge_cutoff
+                    )
+                    report = batch_plan.report_for(instrument_id)
+                    binding = {
+                        "asset_id": str(asset.get("asset_id") or ""),
+                        "report_id": str(
+                            asset.get("report_id")
+                            or asset.get("source_asset_id")
+                            or asset.get("filing_id")
+                            or asset.get("source_announcement_id")
+                            or ""
+                        ),
+                        "report_period": str(asset.get("report_period") or ""),
+                        "document_version": str(
+                            asset.get("document_version")
+                            or asset.get("content_hash")
+                            or ""
+                        ),
+                    }
+                    reason = (
+                        drift_reason(
+                            batch_plan,
+                            report,
+                            knowledge_cutoff=knowledge_cutoff,
+                            binding=binding,
+                        )
+                        if report is not None
+                        else "unfrozen_instrument"
+                    )
+                    if reason is not None:
+                        raise ValueError(
+                            f"Frozen annual report binding changed: {reason}"
+                        )
+                    register_business_profile_shared_annual_report_asset(
+                        storage=self.repository.storage, asset=asset
+                    )
+                    bound = self.repository.enqueue_bound_annual_report_asset(
+                        knowledge_cutoff=knowledge_cutoff,
+                        processing_identity=self.processing_identity,
+                        asset=asset,
+                    )
+                    for key in ("eligible", "inserted", "reused"):
+                        enqueue_result[key] += bound[key]
+                    enqueue_result["work_ids"].extend(bound.get("work_ids") or ())
+            else:
+                enqueue_result = self.repository.enqueue_latest_annual(
+                    knowledge_cutoff=knowledge_cutoff,
+                    processing_identity=self.processing_identity,
+                    instrument_ids=instrument_ids,
+                )
         elif enqueue:
             enqueue_result = {
                 "eligible": 0,

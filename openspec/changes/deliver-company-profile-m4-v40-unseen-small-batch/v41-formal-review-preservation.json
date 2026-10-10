@@ -1,0 +1,9 @@
+{
+  "sha256": {
+    "data/checkpoints/company_profile_common_core/reports/m4_v41_same_source_repair/company_profile_source_review.v1.json": "be287e570ef0e8c413e5db091a370d27dfbbfa2a438ab1968312ff68aa0e383e",
+    "openspec/changes/deliver-company-profile-m4-v40-unseen-small-batch/v41-source-review-evidence.json": "8f314b8c425dc75cf60e8f954520f5f11bf2e61f3c1b861e725d96fbfeac038a",
+    "openspec/changes/deliver-company-profile-m4-v40-unseen-small-batch/v41-actual-object-decisions.json": "e140b46c6fd13511c93e663593bc027032b079c93dfe7cce9c17c557bff355e7",
+    "openspec/changes/deliver-company-profile-m4-v40-unseen-small-batch/v41-negative-condition-review.json": "3f36b91dd6a7b4675d410c33f09b2466918bdd911a41c81534c39a5220ed42b1",
+    "openspec/changes/deliver-company-profile-m4-v40-unseen-small-batch/v41-cross-page-layout-review-notes.json": "cad8e559798e08693505e2ffcebff3783730ceebb603d4474418cc637aacee99"
+  }
+}
