@@ -1,0 +1,13 @@
+[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[33m                                            [100%][0m
+============================= slowest 10 durations =============================
+3.89s call     tests/unit/test_research/test_company_profile_m4_next_batch.py::test_cumulative_tokens_survive_retry_reuse_and_a_restored_ledger
+2.58s call     tests/unit/test_research/test_company_profile_m4_next_batch.py::test_registry_runs_keep_both_companies_and_source_review_reads_them
+2.57s call     tests/unit/test_research/test_company_profile_m4_next_batch.py::test_observation_uses_persisted_runtime_reuse_without_local_state[0]
+2.14s call     tests/unit/test_research/test_company_profile_m4_next_batch.py::test_drift_refuses_one_security_and_keeps_the_other
+2.11s call     tests/unit/test_research/test_company_profile_m4_next_batch.py::test_observation_tracks_actual_partial_scope_reuse_even_with_fresh_tokens[0]
+1.98s call     tests/unit/test_research/test_company_profile_m4_next_batch.py::test_v6_unseen_freeze_skips_companies_observed_under_older_identities
+1.76s call     tests/unit/test_research/test_company_profile_m4_next_batch.py::test_two_runs_keep_both_outcomes_including_a_failure
+1.71s call     tests/unit/test_research/test_company_profile_m4_next_batch.py::test_observation_tracks_actual_partial_scope_reuse_even_with_fresh_tokens[120]
+1.64s call     tests/unit/test_research/test_company_profile_m4_next_batch.py::test_v7_unseen_freeze_also_skips_the_latest_observed_pair
+1.33s call     tests/unit/test_research/test_company_profile_m4_next_batch.py::test_second_company_failure_is_in_the_live_run_before_source_review
+[33m[32m29 passed[0m, [33m[1m7 warnings[0m[33m in 30.68s[0m[0m

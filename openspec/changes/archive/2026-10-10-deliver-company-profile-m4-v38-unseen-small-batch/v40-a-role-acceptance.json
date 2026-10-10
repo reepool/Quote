@@ -1,0 +1,17 @@
+{
+  "review_date": "2026-10-10",
+  "finite_accepted": true,
+  "scope": "600048.SH and 600078.SH;205 positive conditions,3 mandatory negatives,p9 boundary and actually checked outputs only",
+  "source_recall": "205/205",
+  "source_accuracy": "1135/1135",
+  "critical_numeric_errors": 0,
+  "whole_round_seconds": 266.306796672754,
+  "tokens_used": 0,
+  "independent_tests": {
+    "passed": 7,
+    "deselected": 15
+  },
+  "review_classification_correction_accepted": true,
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false
+}

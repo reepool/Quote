@@ -1,0 +1,12 @@
+{
+  "original_contract_unchanged": true,
+  "substantive_conditions_one_to_one": 131,
+  "roles_require_original_actor_and_action": true,
+  "role_aliases": {
+    "raw_material_procurement": "raw_material_input"
+  },
+  "income": "人福原简称由p5准确对应全名，p49与p222等额独立来源，重复接受record_id不重复召回；联通未交付全漏召回而无准确率输出对象",
+  "reading_order_note": "p211取得方式表头阅读顺序移动，不影响原行对象、业务、持股及数值；原PDF与owner全文比较，仅该表头差异",
+  "negative_count": 9,
+  "missing_company_negatives": "联通三项不因空交付而声明已验证业务边界；标记not_evaluable"
+}

@@ -1,0 +1,16 @@
+{
+  "formal_execution_index": 1,
+  "sha256": {
+    "data/checkpoints/company_profile_common_core/reports/m4_v40_unseen_small_batch/plan.json": "61fefc4b050aba2e6978be9a1f1c8f5e393547f741fab15d8822b7ea6416c99e",
+    "data/checkpoints/company_profile_common_core/reports/m4_v40_unseen_small_batch/company_profile_live_run.v1.json": "0d40625b2c829797fd606b64eab9e8d1884b161f416ea3efbd960745713831c5",
+    "data/checkpoints/company_profile_common_core/reports/m4_v40_unseen_small_batch/observation.json": "467480ebc4f77fc878cd965fa14c9d243c66eb36a9eb33bbff571cfc0ffc2c00",
+    "data/checkpoints/company_profile_common_core/reports/m4_v40_unseen_small_batch/formal_execution.json": "f168820981d8fc4bac4f91d1c0c055b660c806782141a26125a0504f00854826",
+    "data/research/company_profile_common_core/m4_v40_unseen_small_batch/company_profile_common_core.v1/bp-work-34b468c586adc7a7510ba18e.json": "64c0ff3785c8b6bc978711b42a03b0006287ead7acbcd550772ff5ea97afc396",
+    "data/research/company_profile_common_core/m4_v40_unseen_small_batch/company_profile_common_core.v1/scopes/600079.SH/2025-12-31/extract_segment_financials.json": "ae8698af0c7ae4d25586a1e3b57be5288cae8ca7bd680fee8bb36531057bfa5c",
+    "data/research/company_profile_common_core/m4_v40_unseen_small_batch/company_profile_common_core.v1/scopes/600079.SH/2025-12-31/extract_business_overview.json": "81030ec6b509232c01623d48653f9ffac2fd181e0163d79523efec2fd0279fae",
+    "data/research/company_profile_common_core/m4_v40_unseen_small_batch/company_profile_common_core.v1/checkpoints/bp-work-34b468c586adc7a7510ba18e.json": "b151a56c12b0e70c925ec17a8943f52b5766f9630ecbab28bdc7889d93b0e17b",
+    "data/exports/m4_v40_unseen_small_batch/600079.SH/profiles.csv": "212ae0011d9b9c928f5f7ebfe178fb2d61eb7530c610ba0f047adaa8d6e7be70",
+    "data/exports/m4_v40_unseen_small_batch/600079.SH/export_manifest.json": "6357f0a7174c0a51302755e8b24acb5e5b9878f1a8a38d1a7d95c49db39b1b9f",
+    "data/exports/m4_v40_unseen_small_batch/600079.SH/600079.SH_2025-12-31.json": "5426d345140a2e4af82b9b840937f6d3221c956a8ace2931b6b147fb3e640cf7"
+  }
+}

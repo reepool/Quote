@@ -1,0 +1,38 @@
+{
+  "validation_scope": "本轮规格同步/有限归档/冻结与首次失败材料，仅本人可隔离改动",
+  "targeted_owner_tests": {
+    "command": "PYTHONPATH=. /home/python/miniconda3/envs/Quote/bin/python -m pytest tests/unit/test_research/test_company_profile_m4_next_batch.py tests/unit/test_research/test_company_profile_source_review.py -q --disable-warnings",
+    "passed": 29,
+    "full_suite_claimed": false,
+    "business_acceptance_substitute": false
+  },
+  "openspec_strict_passed": [
+    "change:deliver-company-profile-m4-v40-unseen-small-batch",
+    "spec:deliver-company-profile-m4-v38-unseen-small-batch",
+    "spec:company-profile-common-core-owned-page-facts",
+    "spec:explicit-material-input-role"
+  ],
+  "main_spec_diff_check_passed": true,
+  "protected_historical_files": 2237,
+  "first_formal_artifacts": 11,
+  "formal_review_artifacts": 4,
+  "execution_modules": 38,
+  "official_documents": 2,
+  "official_frozen_pages": 62,
+  "official_unique_checked_pages": 80,
+  "business_code_modified": false,
+  "actual_first_delivery": {
+    "status": "assessed",
+    "numerator": 16,
+    "denominator": 131,
+    "value": 0.12213740458015267
+  },
+  "actual_first_accuracy": {
+    "status": "assessed",
+    "numerator": 52,
+    "denominator": 58,
+    "value": 0.896551724137931
+  },
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false
+}

@@ -1,0 +1,53 @@
+{
+  "created_at": "2026-10-10T01:52:30.546628+00:00",
+  "task_1_1_completed": true,
+  "task_2_1_completed": true,
+  "completion_branch": "mixed_delivery_first_attempt_failure_preserved",
+  "business_acceptance_passed": false,
+  "a_role_review": "pending_failure_review",
+  "source_recall": {
+    "status": "assessed",
+    "numerator": 16,
+    "denominator": 131,
+    "value": 0.12213740458015267
+  },
+  "source_accuracy": {
+    "status": "assessed",
+    "numerator": 52,
+    "denominator": 58,
+    "value": 0.896551724137931
+  },
+  "critical_numeric_errors": {
+    "status": "assessed",
+    "value": 0
+  },
+  "accepted_facts": 55,
+  "answered_texts": 3,
+  "whole_round_seconds": 225.20445371512324,
+  "tokens_consumed": 0,
+  "shared_token_budget": 50000,
+  "actual_runtime_no_reuse": true,
+  "two_company_five_stage_delivery_completed": false,
+  "successful_company_query_export_disk_equal": true,
+  "missing_company_query_export_not_found": true,
+  "protected_historical_files": 2237,
+  "first_formal_artifacts": 11,
+  "source_condition_count": 131,
+  "source_negative_count": 9,
+  "passed_negatives": 6,
+  "unevaluable_negatives": 3,
+  "new_batches": "paused",
+  "change_archived": false,
+  "repair_cards_registered": [
+    "4.0",
+    "4.1",
+    "4.3",
+    "4.2",
+    "4.4"
+  ],
+  "repair_started": false,
+  "previous_v40_finite_archive_verified": true,
+  "business_code_modified": false,
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false
+}

@@ -1,0 +1,23 @@
+{
+  "review_scope": "current agent changes only, excluding original dirty docs and untracked files",
+  "blocking_findings_in_task_materials": [],
+  "business_failures_registered_not_repaired": [
+    "missing_frozen_frontier",
+    "incomplete_bodies",
+    "polluted_subsidiary_actor",
+    "missing_native_income_and_actions"
+  ],
+  "nonblocking_findings": [
+    "p211原表header阅读顺序，主体/动作/数值不变"
+  ],
+  "unrelated_preexisting_issues_untouched": true,
+  "review_statement": "本轮只审本人配套规格/归档/冻结/来源合同/首次失败材料。已修正配套复核脚本对空query的假定及分报告期间核验；这些属于复核工具而非业务执行代码，首次输出未改。归档主规则对应A角已核定有效修复。没有本轮新增功能代码或框架。业务阻塞已原样列4.0–4.4；本人本轮材料无剩余阻塞性缺陷。p211表头排版差异为不影响原行的非阻塞说明，无关旧失败不修改。",
+  "resolved_material_findings": [
+    {
+      "classification": "A",
+      "finding": "主规格复制旧失败条款后无条件要求不归档，与已有限通过归档冲突。",
+      "fix": "仅在主规格限定为后继获A角有限验收前不归档/暂停；归档原spec及首轮制品不改写。",
+      "validation": "主规格严格校验及staged diff check通过"
+    }
+  ]
+}

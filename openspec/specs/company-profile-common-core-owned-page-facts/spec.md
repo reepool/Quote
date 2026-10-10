@@ -227,3 +227,18 @@ Complete owned business and revenue-policy passages MUST retain necessary contin
 #### Scenario: Current sales branch is negated but prior-year branch is affirmative
 - **WHEN** a named product's current income explanation denies or plans sales
 - **THEN** no current sales fact or role is accepted from prior-year wording, while other affirmative current branches remain
+
+### Requirement: Native continuations and income boundaries retain current source meaning
+The owned-page path MUST retain full continued bodies and original subsidiary control/consolidation limits. Separate native tables sharing region labels MUST keep their own current columns and original units in paired Segment and Measurement. A new classification header MUST reset the preceding table state; customer ranking MUST NOT inherit sales-channel classification. Seller/lessor layouts MUST preserve original row counterparties,tenants and source units; repeated headers MUST reset layout positions. Current blank cells MUST NOT borrow prior amounts or become invented zero. Numbered deduction items MUST stop at the next item,subtotal or section; an empty item MUST produce neither current income records nor affirmative final-body listing.
+
+#### Scenario: Main revenue and settlement tables share region names
+- **WHEN** distinct native tables report different current amounts for the same region
+- **THEN** both Segment/Measurement pairs preserve their own table,current amount and unit without cross-table replacement
+
+#### Scenario: A blank item precedes a subtotal
+- **WHEN** a numbered deduction item has no printed current amount and is followed by a subtotal
+- **THEN** no current fact or affirmative body item is inferred from that subtotal,and the same-page valid item retains its own amount
+
+#### Scenario: Source continuation qualifies control and consolidation
+- **WHEN** a continued official passage states loss of control or lack of substantive control and consolidation
+- **THEN** final three-dimensional answers preserve the original subsidiary,period and state limits rather than promoting the passage to issuer activity

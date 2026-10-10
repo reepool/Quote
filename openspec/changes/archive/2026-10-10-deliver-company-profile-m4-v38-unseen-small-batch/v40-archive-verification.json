@@ -1,0 +1,36 @@
+{
+  "archive_directory": "openspec/changes/archive/2026-10-10-deliver-company-profile-m4-v38-unseen-small-batch",
+  "all_original_change_files_unchanged": true,
+  "original_change_file_count": 91,
+  "mapped_protection_checks": [
+    {
+      "receipt": "v40-formal-protection-baseline.json",
+      "count": 2177,
+      "all_unchanged_after_path_mapping": true
+    },
+    {
+      "receipt": "v40-first-formal-delivery-preservation.json",
+      "count": 19,
+      "all_unchanged_after_path_mapping": true
+    },
+    {
+      "receipt": "v40-initial-review-preservation.json",
+      "count": 4,
+      "all_unchanged_after_path_mapping": true
+    },
+    {
+      "receipt": "v40-formal-result-preservation.json",
+      "count": 4,
+      "all_unchanged_after_path_mapping": true
+    }
+  ],
+  "existing_modified_files_unchanged": true,
+  "main_specs_synced": [
+    "deliver-company-profile-m4-v38-unseen-small-batch",
+    "company-profile-common-core-owned-page-facts",
+    "explicit-material-input-role"
+  ],
+  "openspec_strict_passed": true,
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false
+}

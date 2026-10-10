@@ -1,0 +1,1122 @@
+{
+  "600050.SH": {
+    "facts": {},
+    "answers": {},
+    "reason": "首次run idle；query/export not_found，无实际接受事实或已答正文。原合同全部计漏召回，不伪造准确率对象。"
+  },
+  "600079.SH": {
+    "facts": {
+      "owned:core-ev-7e886ddc20a2af5b:overview": {
+        "verified_source_pages": [
+          12,
+          13
+        ],
+        "critical_numeric_error": false,
+        "actual_object_type": "BusinessOverview",
+        "actual_native_name": "当期产品及服务披露",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group",
+        "accurate": true,
+        "reason": "p13市级分销及国际化原片段真实，但开头业务核心和全产业链未接通。"
+      },
+      "owned:core-ev-bd0ac4e9bb56572a:overview": {
+        "verified_source_pages": [
+          25
+        ],
+        "critical_numeric_error": false,
+        "actual_object_type": "BusinessOverview",
+        "actual_native_name": "当期产品及服务披露",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group",
+        "accurate": true,
+        "reason": "p25真实当期产销量说明，未生成具体销量或数量扩展。"
+      },
+      "owned:core-ev-a795229943de89fe:overview": {
+        "verified_source_pages": [
+          31,
+          32
+        ],
+        "critical_numeric_error": false,
+        "actual_object_type": "BusinessOverview",
+        "actual_native_name": "当期产品及服务披露",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group",
+        "accurate": true,
+        "reason": "p31–32细分行业及公司/原子公司业务原文，行业总体与同业名称保留为背景，未生成该同业公司的本集团经营。"
+      },
+      "owned:core-ev-1a701e5b048b0931:overview": {
+        "verified_source_pages": [
+          43
+        ],
+        "critical_numeric_error": false,
+        "actual_object_type": "BusinessOverview",
+        "actual_native_name": "当期产品及服务披露",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group",
+        "accurate": true,
+        "reason": "p43市级分销及国际市场首段真实，但前段直销/省级统购机制与p44区域化模式未进入答案。"
+      },
+      "owned:core-ev-f801bbaeee79bb09:overview": {
+        "verified_source_pages": [
+          48,
+          49
+        ],
+        "critical_numeric_error": false,
+        "actual_object_type": "BusinessOverview",
+        "actual_native_name": "当期产品及服务披露",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "unclear",
+        "accurate": true,
+        "reason": "p48–49原六子公司经营表/营业收入完整原文，unclear保守范围没有把每个原主体统一变发行人。"
+      },
+      "owned:core-ev-a983517f604954bc:overview": {
+        "verified_source_pages": [
+          48,
+          49
+        ],
+        "critical_numeric_error": false,
+        "actual_object_type": "BusinessOverview",
+        "actual_native_name": "当期产品及服务披露",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group",
+        "accurate": true,
+        "reason": "p49取得及处置子公司表原片段真实。"
+      },
+      "owned:core-ev-2d0e3c957c5197af:overview": {
+        "verified_source_pages": [
+          142
+        ],
+        "critical_numeric_error": false,
+        "actual_object_type": "BusinessOverview",
+        "actual_native_name": "当期产品及服务披露",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group",
+        "accurate": true,
+        "reason": "p142出租会计政策原文真实；不把不适用关联租赁表推当前出租收入，亦不替代p139销售/研发收入机制。"
+      },
+      "owned:core-ev-a6c8aac7ede23c62:overview": {
+        "verified_source_pages": [
+          209
+        ],
+        "critical_numeric_error": false,
+        "actual_object_type": "BusinessOverview",
+        "actual_native_name": "当期产品及服务披露",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group",
+        "accurate": true,
+        "reason": "p209四家原子公司失控时间/股权转移完整原文；持股及退出边界保留。"
+      },
+      "owned:core-ev-33c7a23ed47eaa64:overview": {
+        "verified_source_pages": [
+          211,
+          212,
+          213,
+          214,
+          215,
+          216,
+          217,
+          218,
+          219
+        ],
+        "critical_numeric_error": false,
+        "actual_object_type": "BusinessOverview",
+        "actual_native_name": "当期产品及服务披露",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group",
+        "accurate": true,
+        "reason": "p211–219企业集团构成原行/业务/持股主体真实；原表“取得方式”的“方式”阅读顺序移至“直接间接”后，逐行对象金额未变，旁挂排版核验，未改输出。"
+      },
+      "owned:core-ev-cf48eef48d1b3c0f:overview": {
+        "verified_source_pages": [
+          232
+        ],
+        "critical_numeric_error": false,
+        "actual_object_type": "BusinessOverview",
+        "actual_native_name": "当期产品及服务披露",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group",
+        "accurate": true,
+        "reason": "p232仅出售商品/提供劳务表的标题真实，不能替代p233实际本期收入行。"
+      },
+      "owned:core-ev-4a0bc38c94c96657:overview": {
+        "verified_source_pages": [
+          233
+        ],
+        "critical_numeric_error": false,
+        "actual_object_type": "BusinessOverview",
+        "actual_native_name": "当期产品及服务披露",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group",
+        "accurate": true,
+        "reason": "p233本公司出租方不适用真实否定，不生成肯定租赁收入。"
+      },
+      "owned:core-ev-30f574ed7fddbbb5:commodity:1": {
+        "verified_source_pages": [
+          49
+        ],
+        "critical_numeric_error": false,
+        "actual_object_type": "Activity",
+        "actual_native_name": "麻醉药",
+        "actual_action": "sells",
+        "actual_relation_type": null,
+        "actual_subject_scope": "named_subsidiary",
+        "accurate": false,
+        "error_category": "table_header_polluted_actor",
+        "reason": "p49原主体仅为宜昌人福（宜昌人福药业有限责任公司），表头“营业收入/营业利润/净利润”尾片被拼成source_actor“入营业利润净利润宜昌人福”。商品/销售本身真实，但错误主体成为接受事实并传播商品角色，不能用真实宜昌销售替代该错误主体。"
+      },
+      "owned:core-ev-30f574ed7fddbbb5:commodity:2": {
+        "verified_source_pages": [
+          49
+        ],
+        "critical_numeric_error": false,
+        "actual_object_type": "Activity",
+        "actual_native_name": "原料药",
+        "actual_action": "sells",
+        "actual_relation_type": null,
+        "actual_subject_scope": "named_subsidiary",
+        "accurate": false,
+        "error_category": "table_header_polluted_actor",
+        "reason": "p49原主体仅为宜昌人福（宜昌人福药业有限责任公司），表头“营业收入/营业利润/净利润”尾片被拼成source_actor“入营业利润净利润宜昌人福”。商品/销售本身真实，但错误主体成为接受事实并传播商品角色，不能用真实宜昌销售替代该错误主体。"
+      },
+      "owned:core-ev-30f574ed7fddbbb5:commodity:3": {
+        "verified_source_pages": [
+          49
+        ],
+        "critical_numeric_error": false,
+        "actual_object_type": "Activity",
+        "actual_native_name": "制剂",
+        "actual_action": "sells",
+        "actual_relation_type": null,
+        "actual_subject_scope": "named_subsidiary",
+        "accurate": false,
+        "error_category": "table_header_polluted_actor",
+        "reason": "p49原主体仅为宜昌人福（宜昌人福药业有限责任公司），表头“营业收入/营业利润/净利润”尾片被拼成source_actor“入营业利润净利润宜昌人福”。商品/销售本身真实，但错误主体成为接受事实并传播商品角色，不能用真实宜昌销售替代该错误主体。"
+      },
+      "owned:core-ev-30f574ed7fddbbb5:commodity:4": {
+        "verified_source_pages": [
+          49
+        ],
+        "critical_numeric_error": false,
+        "actual_object_type": "Activity",
+        "actual_native_name": "甾体激素类原料药与制剂",
+        "actual_action": "sells",
+        "actual_relation_type": null,
+        "actual_subject_scope": "named_subsidiary",
+        "accurate": true,
+        "reason": "p49原葛店人福/新疆维药当期“研发、生产与销售”明确支持此父类对象，原子公司简称可由p5还原；此父类不能替代p50具体产品条件，也不借集团药品销量召回。"
+      },
+      "owned:core-ev-30f574ed7fddbbb5:commodity:5": {
+        "verified_source_pages": [
+          49
+        ],
+        "critical_numeric_error": false,
+        "actual_object_type": "Activity",
+        "actual_native_name": "维吾尔药品",
+        "actual_action": "sells",
+        "actual_relation_type": null,
+        "actual_subject_scope": "named_subsidiary",
+        "accurate": true,
+        "reason": "p49原葛店人福/新疆维药当期“研发、生产与销售”明确支持此父类对象，原子公司简称可由p5还原；此父类不能替代p50具体产品条件，也不借集团药品销量召回。"
+      },
+      "owned:core-ev-b05905649de0c638:commodity:1": {
+        "verified_source_pages": [
+          231,
+          232
+        ],
+        "critical_numeric_error": false,
+        "actual_object_type": "Activity",
+        "actual_native_name": "药品",
+        "actual_action": "purchases",
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group",
+        "accurate": true,
+        "reason": "p231实际本集团采购药品关联表支持集团采购，未推制造投入。p43原湖北人福统购是另一个具名主体条件，本集团父事实不替代湖北原主体召回。"
+      },
+      "owned:core-ev-9dd6499596b8867a:segment:industry:制造业:table:None:row:15": {
+        "verified_source_pages": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ],
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "制造业",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group",
+        "accurate": true,
+        "matched_source_row_index": 0,
+        "reason": "独立官方p23 主营业务分行业，公司及合并子公司／制造业原本期14,213,816,932.01元成立；原栏目、主体及配对金额单位一致。同名等额p49/p222条件按来源独立，重复接受record_id分别准确率而同条件只召回一次。",
+        "recall_row_index": 0
+      },
+      "owned:core-ev-c1ced1d139a95117:revenue:industry:制造业:table:None:row:15": {
+        "verified_source_pages": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ],
+        "critical_numeric_error": false,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "制造业",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group",
+        "accurate": true,
+        "matched_source_row_index": 0,
+        "reason": "独立官方p23 主营业务分行业，公司及合并子公司／制造业原本期14,213,816,932.01元成立；原栏目、主体及配对金额单位一致。同名等额p49/p222条件按来源独立，重复接受record_id分别准确率而同条件只召回一次。"
+      },
+      "owned:core-ev-9dd6499596b8867a:segment:industry:批发及其他:table:None:row:17": {
+        "verified_source_pages": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ],
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "批发及其他",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group",
+        "accurate": true,
+        "matched_source_row_index": 1,
+        "reason": "独立官方p23 主营业务分行业，公司及合并子公司／批发及其他原本期9,704,429,026.35元成立；原栏目、主体及配对金额单位一致。同名等额p49/p222条件按来源独立，重复接受record_id分别准确率而同条件只召回一次。",
+        "recall_row_index": 1
+      },
+      "owned:core-ev-c1ced1d139a95117:revenue:industry:批发及其他:table:None:row:17": {
+        "verified_source_pages": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ],
+        "critical_numeric_error": false,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "批发及其他",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group",
+        "accurate": true,
+        "matched_source_row_index": 1,
+        "reason": "独立官方p23 主营业务分行业，公司及合并子公司／批发及其他原本期9,704,429,026.35元成立；原栏目、主体及配对金额单位一致。同名等额p49/p222条件按来源独立，重复接受record_id分别准确率而同条件只召回一次。"
+      },
+      "owned:core-ev-9dd6499596b8867a:segment:product:医疗器械:table:主营业务收入:row:26": {
+        "verified_source_pages": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ],
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "医疗器械",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group",
+        "accurate": true,
+        "matched_source_row_index": 2,
+        "reason": "独立官方p24 主营业务分产品，公司及合并子公司／医疗器械原本期3,904,573,917.48元成立；原栏目、主体及配对金额单位一致。同名等额p49/p222条件按来源独立，重复接受record_id分别准确率而同条件只召回一次。",
+        "recall_row_index": 2
+      },
+      "owned:core-ev-c1ced1d139a95117:revenue:product:医疗器械:table:主营业务收入:row:26": {
+        "verified_source_pages": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ],
+        "critical_numeric_error": false,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "医疗器械",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group",
+        "accurate": true,
+        "matched_source_row_index": 2,
+        "reason": "独立官方p24 主营业务分产品，公司及合并子公司／医疗器械原本期3,904,573,917.48元成立；原栏目、主体及配对金额单位一致。同名等额p49/p222条件按来源独立，重复接受record_id分别准确率而同条件只召回一次。"
+      },
+      "owned:core-ev-9dd6499596b8867a:segment:product:药品及其他:table:主营业务收入:row:28": {
+        "verified_source_pages": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ],
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "药品及其他",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group",
+        "accurate": true,
+        "matched_source_row_index": 3,
+        "reason": "独立官方p24 主营业务分产品，公司及合并子公司／药品及其他原本期20,013,672,040.88元成立；原栏目、主体及配对金额单位一致。同名等额p49/p222条件按来源独立，重复接受record_id分别准确率而同条件只召回一次。",
+        "recall_row_index": 3
+      },
+      "owned:core-ev-c1ced1d139a95117:revenue:product:药品及其他:table:主营业务收入:row:28": {
+        "verified_source_pages": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ],
+        "critical_numeric_error": false,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "药品及其他",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group",
+        "accurate": true,
+        "matched_source_row_index": 3,
+        "reason": "独立官方p24 主营业务分产品，公司及合并子公司／药品及其他原本期20,013,672,040.88元成立；原栏目、主体及配对金额单位一致。同名等额p49/p222条件按来源独立，重复接受record_id分别准确率而同条件只召回一次。"
+      },
+      "owned:core-ev-9dd6499596b8867a:segment:region:国内:table:主营业务收入:row:40": {
+        "verified_source_pages": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ],
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "国内",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group",
+        "accurate": true,
+        "matched_source_row_index": 4,
+        "reason": "独立官方p24 主营业务分地区，公司及合并子公司／国内原本期20,657,387,183.79元成立；原栏目、主体及配对金额单位一致。同名等额p49/p222条件按来源独立，重复接受record_id分别准确率而同条件只召回一次。",
+        "recall_row_index": 4
+      },
+      "owned:core-ev-c1ced1d139a95117:revenue:region:国内:table:主营业务收入:row:40": {
+        "verified_source_pages": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ],
+        "critical_numeric_error": false,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "国内",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group",
+        "accurate": true,
+        "matched_source_row_index": 4,
+        "reason": "独立官方p24 主营业务分地区，公司及合并子公司／国内原本期20,657,387,183.79元成立；原栏目、主体及配对金额单位一致。同名等额p49/p222条件按来源独立，重复接受record_id分别准确率而同条件只召回一次。"
+      },
+      "owned:core-ev-9dd6499596b8867a:segment:region:国外:table:主营业务收入:row:42": {
+        "verified_source_pages": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ],
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "国外",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group",
+        "accurate": true,
+        "matched_source_row_index": 5,
+        "reason": "独立官方p24 主营业务分地区，公司及合并子公司／国外原本期3,260,858,774.57元成立；原栏目、主体及配对金额单位一致。同名等额p49/p222条件按来源独立，重复接受record_id分别准确率而同条件只召回一次。",
+        "recall_row_index": 5
+      },
+      "owned:core-ev-c1ced1d139a95117:revenue:region:国外:table:主营业务收入:row:42": {
+        "verified_source_pages": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ],
+        "critical_numeric_error": false,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "国外",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group",
+        "accurate": true,
+        "matched_source_row_index": 5,
+        "reason": "独立官方p24 主营业务分地区，公司及合并子公司／国外原本期3,260,858,774.57元成立；原栏目、主体及配对金额单位一致。同名等额p49/p222条件按来源独立，重复接受record_id分别准确率而同条件只召回一次。"
+      },
+      "owned:core-ev-9dd6499596b8867a:segment:sales_mode:制造业:table:None:row:54": {
+        "verified_source_pages": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ],
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "制造业",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group",
+        "accurate": true,
+        "matched_source_row_index": 6,
+        "reason": "独立官方p24 主营业务分销售模式，公司及合并子公司／制造业原本期14,213,816,932.01元成立；原栏目、主体及配对金额单位一致。同名等额p49/p222条件按来源独立，重复接受record_id分别准确率而同条件只召回一次。",
+        "recall_row_index": 6
+      },
+      "owned:core-ev-c1ced1d139a95117:revenue:sales_mode:制造业:table:None:row:54": {
+        "verified_source_pages": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ],
+        "critical_numeric_error": false,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "制造业",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group",
+        "accurate": true,
+        "matched_source_row_index": 6,
+        "reason": "独立官方p24 主营业务分销售模式，公司及合并子公司／制造业原本期14,213,816,932.01元成立；原栏目、主体及配对金额单位一致。同名等额p49/p222条件按来源独立，重复接受record_id分别准确率而同条件只召回一次。"
+      },
+      "owned:core-ev-9dd6499596b8867a:segment:sales_mode:批发及其他:table:None:row:56": {
+        "verified_source_pages": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ],
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "批发及其他",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group",
+        "accurate": true,
+        "matched_source_row_index": 7,
+        "reason": "独立官方p24 主营业务分销售模式，公司及合并子公司／批发及其他原本期9,704,429,026.35元成立；原栏目、主体及配对金额单位一致。同名等额p49/p222条件按来源独立，重复接受record_id分别准确率而同条件只召回一次。",
+        "recall_row_index": 7
+      },
+      "owned:core-ev-c1ced1d139a95117:revenue:sales_mode:批发及其他:table:None:row:56": {
+        "verified_source_pages": [
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ],
+        "critical_numeric_error": false,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "批发及其他",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group",
+        "accurate": true,
+        "matched_source_row_index": 7,
+        "reason": "独立官方p24 主营业务分销售模式，公司及合并子公司／批发及其他原本期9,704,429,026.35元成立；原栏目、主体及配对金额单位一致。同名等额p49/p222条件按来源独立，重复接受record_id分别准确率而同条件只召回一次。"
+      },
+      "owned:core-ev-b27c250c30ef759c:Segment:business_segment:宜昌人福:控股参股公司/营业收入:row:0": {
+        "verified_source_pages": [
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47,
+          48,
+          49
+        ],
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "宜昌人福",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "named_subsidiary",
+        "accurate": true,
+        "matched_source_row_index": 12,
+        "reason": "独立官方p49 主要控股参股公司营业收入，宜昌人福药业有限责任公司／宜昌人福原本期881,046.71万元成立；原栏目、主体及配对金额单位一致。同名等额p49/p222条件按来源独立，重复接受record_id分别准确率而同条件只召回一次。",
+        "recall_row_index": 12
+      },
+      "owned:core-ev-d22479af34cb101c:Measurement:business_segment:宜昌人福:控股参股公司/营业收入:row:0": {
+        "verified_source_pages": [
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47,
+          48,
+          49
+        ],
+        "critical_numeric_error": false,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "宜昌人福",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "named_subsidiary",
+        "accurate": true,
+        "matched_source_row_index": 12,
+        "reason": "独立官方p49 主要控股参股公司营业收入，宜昌人福药业有限责任公司／宜昌人福原本期881,046.71万元成立；原栏目、主体及配对金额单位一致。同名等额p49/p222条件按来源独立，重复接受record_id分别准确率而同条件只召回一次。"
+      },
+      "owned:core-ev-b27c250c30ef759c:Segment:business_segment:葛店人福:控股参股公司/营业收入:row:1": {
+        "verified_source_pages": [
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47,
+          48,
+          49
+        ],
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "葛店人福",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "named_subsidiary",
+        "accurate": true,
+        "matched_source_row_index": 13,
+        "reason": "独立官方p49 主要控股参股公司营业收入，湖北葛店人福药业有限责任公司／葛店人福原本期144,749.83万元成立；原栏目、主体及配对金额单位一致。同名等额p49/p222条件按来源独立，重复接受record_id分别准确率而同条件只召回一次。",
+        "recall_row_index": 13
+      },
+      "owned:core-ev-d22479af34cb101c:Measurement:business_segment:葛店人福:控股参股公司/营业收入:row:1": {
+        "verified_source_pages": [
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47,
+          48,
+          49
+        ],
+        "critical_numeric_error": false,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "葛店人福",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "named_subsidiary",
+        "accurate": true,
+        "matched_source_row_index": 13,
+        "reason": "独立官方p49 主要控股参股公司营业收入，湖北葛店人福药业有限责任公司／葛店人福原本期144,749.83万元成立；原栏目、主体及配对金额单位一致。同名等额p49/p222条件按来源独立，重复接受record_id分别准确率而同条件只召回一次。"
+      },
+      "owned:core-ev-b27c250c30ef759c:Segment:business_segment:新疆维药:控股参股公司/营业收入:row:2": {
+        "verified_source_pages": [
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47,
+          48,
+          49
+        ],
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "新疆维药",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "named_subsidiary",
+        "accurate": true,
+        "matched_source_row_index": 14,
+        "reason": "独立官方p49 主要控股参股公司营业收入，新疆维吾尔药业有限责任公司／新疆维药原本期115,423.62万元成立；原栏目、主体及配对金额单位一致。同名等额p49/p222条件按来源独立，重复接受record_id分别准确率而同条件只召回一次。",
+        "recall_row_index": 14
+      },
+      "owned:core-ev-d22479af34cb101c:Measurement:business_segment:新疆维药:控股参股公司/营业收入:row:2": {
+        "verified_source_pages": [
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47,
+          48,
+          49
+        ],
+        "critical_numeric_error": false,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "新疆维药",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "named_subsidiary",
+        "accurate": true,
+        "matched_source_row_index": 14,
+        "reason": "独立官方p49 主要控股参股公司营业收入，新疆维吾尔药业有限责任公司／新疆维药原本期115,423.62万元成立；原栏目、主体及配对金额单位一致。同名等额p49/p222条件按来源独立，重复接受record_id分别准确率而同条件只召回一次。"
+      },
+      "owned:core-ev-b27c250c30ef759c:Segment:business_segment:北京医疗:控股参股公司/营业收入:row:3": {
+        "verified_source_pages": [
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47,
+          48,
+          49
+        ],
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "北京医疗",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "named_subsidiary",
+        "accurate": true,
+        "matched_source_row_index": 16,
+        "reason": "独立官方p49 主要控股参股公司营业收入，北京巴瑞医疗器械有限公司／北京医疗原本期173,074.40万元成立；原栏目、主体及配对金额单位一致。同名等额p49/p222条件按来源独立，重复接受record_id分别准确率而同条件只召回一次。",
+        "recall_row_index": 16
+      },
+      "owned:core-ev-d22479af34cb101c:Measurement:business_segment:北京医疗:控股参股公司/营业收入:row:3": {
+        "verified_source_pages": [
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47,
+          48,
+          49
+        ],
+        "critical_numeric_error": false,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "北京医疗",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "named_subsidiary",
+        "accurate": true,
+        "matched_source_row_index": 16,
+        "reason": "独立官方p49 主要控股参股公司营业收入，北京巴瑞医疗器械有限公司／北京医疗原本期173,074.40万元成立；原栏目、主体及配对金额单位一致。同名等额p49/p222条件按来源独立，重复接受record_id分别准确率而同条件只召回一次。"
+      },
+      "owned:core-ev-b27c250c30ef759c:Segment:business_segment:湖北人福:控股参股公司/营业收入:row:4": {
+        "verified_source_pages": [
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47,
+          48,
+          49
+        ],
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "湖北人福",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "named_subsidiary",
+        "accurate": true,
+        "matched_source_row_index": 17,
+        "reason": "独立官方p49 主要控股参股公司营业收入，湖北人福医药集团有限公司／湖北人福原本期720,489.01万元成立；原栏目、主体及配对金额单位一致。同名等额p49/p222条件按来源独立，重复接受record_id分别准确率而同条件只召回一次。",
+        "recall_row_index": 17
+      },
+      "owned:core-ev-d22479af34cb101c:Measurement:business_segment:湖北人福:控股参股公司/营业收入:row:4": {
+        "verified_source_pages": [
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47,
+          48,
+          49
+        ],
+        "critical_numeric_error": false,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "湖北人福",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "named_subsidiary",
+        "accurate": true,
+        "matched_source_row_index": 17,
+        "reason": "独立官方p49 主要控股参股公司营业收入，湖北人福医药集团有限公司／湖北人福原本期720,489.01万元成立；原栏目、主体及配对金额单位一致。同名等额p49/p222条件按来源独立，重复接受record_id分别准确率而同条件只召回一次。"
+      },
+      "owned:core-ev-00f98250968a5853:Segment:business_segment:宜昌人福:控股参股公司/营业收入:row:0": {
+        "verified_source_pages": [
+          48,
+          49
+        ],
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "宜昌人福",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "named_subsidiary",
+        "accurate": true,
+        "matched_source_row_index": 12,
+        "reason": "独立官方p49 主要控股参股公司营业收入，宜昌人福药业有限责任公司／宜昌人福原本期881,046.71万元成立；原栏目、主体及配对金额单位一致。同名等额p49/p222条件按来源独立，重复接受record_id分别准确率而同条件只召回一次。",
+        "recall_row_index": 12
+      },
+      "owned:core-ev-00f98250968a5853:Segment:business_segment:葛店人福:控股参股公司/营业收入:row:1": {
+        "verified_source_pages": [
+          48,
+          49
+        ],
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "葛店人福",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "named_subsidiary",
+        "accurate": true,
+        "matched_source_row_index": 13,
+        "reason": "独立官方p49 主要控股参股公司营业收入，湖北葛店人福药业有限责任公司／葛店人福原本期144,749.83万元成立；原栏目、主体及配对金额单位一致。同名等额p49/p222条件按来源独立，重复接受record_id分别准确率而同条件只召回一次。",
+        "recall_row_index": 13
+      },
+      "owned:core-ev-00f98250968a5853:Segment:business_segment:新疆维药:控股参股公司/营业收入:row:2": {
+        "verified_source_pages": [
+          48,
+          49
+        ],
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "新疆维药",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "named_subsidiary",
+        "accurate": true,
+        "matched_source_row_index": 14,
+        "reason": "独立官方p49 主要控股参股公司营业收入，新疆维吾尔药业有限责任公司／新疆维药原本期115,423.62万元成立；原栏目、主体及配对金额单位一致。同名等额p49/p222条件按来源独立，重复接受record_id分别准确率而同条件只召回一次。",
+        "recall_row_index": 14
+      },
+      "owned:core-ev-00f98250968a5853:Segment:business_segment:北京医疗:控股参股公司/营业收入:row:3": {
+        "verified_source_pages": [
+          48,
+          49
+        ],
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "北京医疗",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "named_subsidiary",
+        "accurate": true,
+        "matched_source_row_index": 16,
+        "reason": "独立官方p49 主要控股参股公司营业收入，北京巴瑞医疗器械有限公司／北京医疗原本期173,074.40万元成立；原栏目、主体及配对金额单位一致。同名等额p49/p222条件按来源独立，重复接受record_id分别准确率而同条件只召回一次。",
+        "recall_row_index": 16
+      },
+      "owned:core-ev-00f98250968a5853:Segment:business_segment:湖北人福:控股参股公司/营业收入:row:4": {
+        "verified_source_pages": [
+          48,
+          49
+        ],
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "湖北人福",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "named_subsidiary",
+        "accurate": true,
+        "matched_source_row_index": 17,
+        "reason": "独立官方p49 主要控股参股公司营业收入，湖北人福医药集团有限公司／湖北人福原本期720,489.01万元成立；原栏目、主体及配对金额单位一致。同名等额p49/p222条件按来源独立，重复接受record_id分别准确率而同条件只召回一次。",
+        "recall_row_index": 17
+      },
+      "owned:core-ev-e1eb11337f201ba2:Segment:business_type:主营业务:营业收入:row:0": {
+        "verified_source_pages": [
+          194
+        ],
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "主营业务",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group",
+        "accurate": true,
+        "matched_source_row_index": 20,
+        "reason": "独立官方p194 合并营业收入和营业成本，公司及合并子公司／主营业务原本期23,918,245,958.36元成立；原栏目、主体及配对金额单位一致。同名等额p49/p222条件按来源独立，重复接受record_id分别准确率而同条件只召回一次。",
+        "recall_row_index": 20
+      },
+      "owned:core-ev-3bb2709c0ec5e64b:Measurement:business_type:主营业务:营业收入:row:0": {
+        "verified_source_pages": [
+          194
+        ],
+        "critical_numeric_error": false,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "主营业务",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group",
+        "accurate": true,
+        "matched_source_row_index": 20,
+        "reason": "独立官方p194 合并营业收入和营业成本，公司及合并子公司／主营业务原本期23,918,245,958.36元成立；原栏目、主体及配对金额单位一致。同名等额p49/p222条件按来源独立，重复接受record_id分别准确率而同条件只召回一次。"
+      },
+      "owned:core-ev-ee091b34a7ccc12d:Segment:business_type:主营业务:营业收入:row:0": {
+        "verified_source_pages": [
+          194
+        ],
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "主营业务",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "consolidated_group",
+        "accurate": true,
+        "matched_source_row_index": 20,
+        "reason": "独立官方p194 合并营业收入和营业成本，公司及合并子公司／主营业务原本期23,918,245,958.36元成立；原栏目、主体及配对金额单位一致。同名等额p49/p222条件按来源独立，重复接受record_id分别准确率而同条件只召回一次。",
+        "recall_row_index": 20
+      },
+      "owned:core-ev-e85ab5b628ffa7b1:Segment:business_segment:宜昌人福药业有限责任公司:重要非全资子公司/本期营业收入:row:0": {
+        "verified_source_pages": [
+          221,
+          222,
+          223
+        ],
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "宜昌人福药业有限责任公司",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "named_subsidiary",
+        "accurate": true,
+        "matched_source_row_index": 18,
+        "reason": "独立官方p222 重要非全资子公司主要财务信息，宜昌人福药业有限责任公司／宜昌人福药业有限责任公司原本期881,046.71万元成立；原栏目、主体及配对金额单位一致。同名等额p49/p222条件按来源独立，重复接受record_id分别准确率而同条件只召回一次。",
+        "recall_row_index": 18
+      },
+      "owned:core-ev-87e71ad93563514d:Measurement:business_segment:宜昌人福药业有限责任公司:重要非全资子公司/本期营业收入:row:0": {
+        "verified_source_pages": [
+          221,
+          222,
+          223
+        ],
+        "critical_numeric_error": false,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "宜昌人福药业有限责任公司",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "named_subsidiary",
+        "accurate": true,
+        "matched_source_row_index": 18,
+        "reason": "独立官方p222 重要非全资子公司主要财务信息，宜昌人福药业有限责任公司／宜昌人福药业有限责任公司原本期881,046.71万元成立；原栏目、主体及配对金额单位一致。同名等额p49/p222条件按来源独立，重复接受record_id分别准确率而同条件只召回一次。"
+      },
+      "owned:core-ev-e85ab5b628ffa7b1:Segment:business_segment:北京巴瑞医疗器械有限公司:重要非全资子公司/本期营业收入:row:1": {
+        "verified_source_pages": [
+          221,
+          222,
+          223
+        ],
+        "critical_numeric_error": false,
+        "actual_object_type": "Segment",
+        "actual_native_name": "北京巴瑞医疗器械有限公司",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "named_subsidiary",
+        "accurate": true,
+        "matched_source_row_index": 19,
+        "reason": "独立官方p222 重要非全资子公司主要财务信息，北京巴瑞医疗器械有限公司／北京巴瑞医疗器械有限公司原本期173,074.40万元成立；原栏目、主体及配对金额单位一致。同名等额p49/p222条件按来源独立，重复接受record_id分别准确率而同条件只召回一次。",
+        "recall_row_index": 19
+      },
+      "owned:core-ev-87e71ad93563514d:Measurement:business_segment:北京巴瑞医疗器械有限公司:重要非全资子公司/本期营业收入:row:1": {
+        "verified_source_pages": [
+          221,
+          222,
+          223
+        ],
+        "critical_numeric_error": false,
+        "actual_object_type": "Measurement",
+        "actual_native_name": "北京巴瑞医疗器械有限公司",
+        "actual_action": null,
+        "actual_relation_type": null,
+        "actual_subject_scope": "named_subsidiary",
+        "accurate": true,
+        "matched_source_row_index": 19,
+        "reason": "独立官方p222 重要非全资子公司主要财务信息，北京巴瑞医疗器械有限公司／北京巴瑞医疗器械有限公司原本期173,074.40万元成立；原栏目、主体及配对金额单位一致。同名等额p49/p222条件按来源独立，重复接受record_id分别准确率而同条件只召回一次。"
+      }
+    },
+    "answers": {
+      "principal_business": {
+        "accurate": false,
+        "reason": "实际正文从p13市级公司分销残段开始，p12–13医药工业为主、商业为辅及医药中间体—原料药—药用辅料—药物制剂完整链未交付；原子公司表和国际业务背景不代替完整主营。"
+      },
+      "products_services": {
+        "accurate": false,
+        "reason": "实际正文缺p12/24–25十二核心药品中的完整枸橼酸舒芬太尼注射液、注射用盐酸瑞芬太尼、盐酸阿芬太尼注射液、注射用尿激酶及硫酸新霉素原料药，p50葛店/新疆/Epic具体矩阵未接续；支持事实含三条污染宜昌主体。行业标签/构成表不能代替完整产品及原料药制剂区别。"
+      },
+      "revenue_model": {
+        "accurate": false,
+        "reason": "实际仅片段分销/统购/出租会计及收入标签，没有p43–44完整直销及国际区域模式、p139药品/原料药控制权与现时收款、主要责任人总额/代理净额、定制研发投入法履约进度及成本可补偿机制。"
+      }
+    },
+    "review_method": "按实际record_id全对象核原页/原主体/原动作及金额、单位、栏目；合同外父角色也计准确率，Measurement不召回，来源条件只一次召回。"
+  }
+}

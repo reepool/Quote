@@ -113,3 +113,14 @@ Explicit current application of named materials in production MUST use the exist
 #### Scenario: Current material application and a separate box-board purchase coexist
 - **WHEN** official source states actual application of 意杨 and 竹材 and separately discloses 箱板 purchases
 - **THEN** acceptance, query and export preserve two material_input relationships and a purchases Activity without converting box-board purchase into input or actual application into external purchase
+
+### Requirement: Named actors and affirmative directions govern current commodity actions
+Named subsidiary actions MUST keep their native actor and affirmative current direction. Purchase and actual manufacturing or energy input MUST require separate source support; purchases MUST NOT imply material_input,and material_input MUST NOT imply external purchases. Product enumeration MUST end before downstream applications; supplier names containing sales MUST NOT become issuer sales. Known negative,planned,third-party and application-only wording MUST remain bounded while same-page valid actions remain.
+
+#### Scenario: A supplier name contains sales
+- **WHEN** a purchase table names an automobile sales company and fixed assets
+- **THEN** the issuer purchase direction remains and no fragment of the supplier name becomes a sales Activity
+
+#### Scenario: A product description continues into electronic applications
+- **WHEN** the actual chemical product is followed by semiconductor or display application wording
+- **THEN** the original product and subsidiary are retained without creating sales objects from the downstream applications
