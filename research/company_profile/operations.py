@@ -283,7 +283,17 @@ class OfficialAnnualReportPageSource:
             if "房地产销售收入分项列示如下" in p["text"]
             or "营业收入和营业成本情况" in p["text"]
             or "收入确认时间" in p["text"]
+            or "营业收入、营业成本的分解" in p["text"]
+            or "主要控股参股公司分析" in p["text"]
+            or "报告期内房地产销售和结转情况" in p["text"]
         ]
+        for page in list(project_pages):
+            if "报告期内房地产销售和结转情况" in page["text"]:
+                following = next(
+                    (p for p in pages if p["page"] == page["page"] + 1), None
+                )
+                if following and following not in project_pages:
+                    project_pages.append(following)
         lease_active = False
         seller_active = False
         for page in pages:
@@ -1140,7 +1150,7 @@ class CompanyProfileTaskService:
         elif enqueue and not (limit_drain_to_enqueued and not instrument_ids):
             if batch_plan is not None and self.processing_identity.get(
                 "revenue_sentence_repair"
-            ) in {"v41", "v42"}:
+            ) in {"v41", "v42", "v43"}:
                 from research.business_profile_production_operations import (
                     register_business_profile_shared_annual_report_asset,
                 )

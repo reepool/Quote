@@ -1,0 +1,50 @@
+{
+  "created_at": "2026-10-11T14:45:13.009719+00:00",
+  "completed_tasks": [
+    "4.1",
+    "4.2",
+    "4.3",
+    "4.4"
+  ],
+  "review_classification": {
+    "blocking": [],
+    "nonblocking": [
+      "正文精简、通用框架和既有无关失败按授权后置"
+    ],
+    "unrelated": "任务开始前的3份修改文档及所有既有未跟踪内容未触碰"
+  },
+  "validation": [
+    {
+      "command": "PYTHONPATH=. /home/python/miniconda3/envs/Quote/bin/python -m pytest -q tests/unit/test_research/test_company_profile_v43_energy_pharma.py",
+      "result": "12 passed"
+    },
+    {
+      "scope": "v43、v30、v41/v42完整页组合回归",
+      "result": "20 passed, 47 deselected"
+    },
+    {
+      "scope": "采购投影补正后的完整页回归",
+      "result": "4 passed, 8 deselected"
+    },
+    {
+      "scope": "既有commodity exposure回归",
+      "result": "12 passed"
+    },
+    {
+      "scope": "6个当前修改Python文件的Ruff lint/format",
+      "result": "passed"
+    },
+    {
+      "scope": "38个执行模块：基线f69e7d96＋冻结patch重建",
+      "result": "38/38 hashes equal"
+    },
+    {
+      "command": "git diff --cached --check -- . ':!*.patch'",
+      "result": "passed; 冻结patch内空行的单个空格是unified diff上下文标记，原字节保留，重建已校验"
+    }
+  ],
+  "full_suite_pass_claimed": false,
+  "formal_seconds": 286.2317520128563,
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false
+}

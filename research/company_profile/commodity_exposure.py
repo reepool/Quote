@@ -174,11 +174,7 @@ def _validate_exposure_references(
             raise ValueError("measurement_record_ids must belong to the same report")
         measurements.append(record)
     owned_evidence = _unique_evidence_index(
-        tuple(
-            item
-            for record in (*sources, *measurements)
-            for item in record.evidence
-        ),
+        tuple(item for record in (*sources, *measurements) for item in record.evidence),
         label="evidence_ids",
     )
     for evidence_id in exposure.evidence_ids:
@@ -300,14 +296,13 @@ class CommodityExposureAssessment(_StrictModel):
             if self.exposures:
                 raise ValueError("not_assessed assessment cannot carry exposures")
             if self.checked_evidence_ids:
-                raise ValueError("not_assessed assessment cannot carry checked evidence")
+                raise ValueError(
+                    "not_assessed assessment cannot carry checked evidence"
+                )
         elif self.assessment_status == AssessmentStatus.EXTRACTION_FAILED:
             if self.exposures:
                 raise ValueError("extraction_failed assessment cannot carry exposures")
-        elif (
-            not self.exposures
-            and not self.checked_evidence_ids
-        ):
+        elif not self.exposures and not self.checked_evidence_ids:
             raise ValueError(
                 "assessed empty exposure list requires checked evidence scope"
             )
@@ -412,9 +407,7 @@ def measurement_record_ids(records: Sequence[Any]) -> tuple[str, ...]:
     """Keep quantity only as Measurement references."""
 
     return tuple(
-        str(item.record_id)
-        for item in records
-        if isinstance(item, Measurement)
+        str(item.record_id) for item in records if isinstance(item, Measurement)
     )
 
 
@@ -447,16 +440,13 @@ def resolve_catalog_mapping(
     commodity_ids = []
     for product_id in product_ids:
         commodity_ids.extend(
-            mapping.commodity_id
-            for mapping in active.commodity_candidates(product_id)
+            mapping.commodity_id for mapping in active.commodity_candidates(product_id)
         )
     unique_commodities = tuple(dict.fromkeys(commodity_ids))
     if len(product_ids) == 1 and len(unique_commodities) == 1:
         status = MappingStatus.MAPPED
         commodity_id = unique_commodities[0]
-    elif product_ids and (
-        len(product_ids) > 1 or len(unique_commodities) > 1
-    ):
+    elif product_ids and (len(product_ids) > 1 or len(unique_commodities) > 1):
         status = MappingStatus.AMBIGUOUS
         commodity_id = None
     else:
@@ -516,10 +506,20 @@ def _is_hedge_fact(source: SemanticRecord) -> bool:
 
 
 def _is_energy_consumption_evidence(source: SemanticRecord) -> bool:
-    name = _catalog_source_name(source) if isinstance(
-        source, (Activity, Measurement, Relationship, BusinessEvent)
-    ) else ""
+    name = (
+        _catalog_source_name(source)
+        if isinstance(source, (Activity, Measurement, Relationship, BusinessEvent))
+        else ""
+    )
     verb = getattr(source, "source_verb", "") or ""
+    # Wholesale electricity acquired for onward delivery is a purchase,
+    # not evidence of the company consuming that electricity.
+    if (
+        isinstance(source, Activity)
+        and source.action == ActivityAction.PURCHASES
+        and verb == "批发采购"
+    ):
+        return False
     qualifier = ""
     native = getattr(source, "source_native", None)
     if native is not None:
@@ -567,9 +567,11 @@ def _compatible_measurements(
     allowed = _ROLE_QUANTITY_METRICS.get(role, frozenset())
     if not allowed:
         return ()
-    name = _catalog_source_name(source) if isinstance(
-        source, (Activity, Measurement, Relationship, BusinessEvent)
-    ) else ""
+    name = (
+        _catalog_source_name(source)
+        if isinstance(source, (Activity, Measurement, Relationship, BusinessEvent))
+        else ""
+    )
     attached: list[Measurement] = []
     for item in records:
         if not isinstance(item, Measurement):
@@ -694,12 +696,8 @@ def assess_commodity_exposures(
         AssessmentStatus.EXTRACTION_FAILED,
     }:
         raise ValueError(f"unsupported assessment_status: {assessment_status}")
-    scoped_records = tuple(
-        item for item in accepted_records if item.report == report
-    )
-    scoped_evidence = tuple(
-        item for item in checked_evidence if item.report == report
-    )
+    scoped_records = tuple(item for item in accepted_records if item.report == report)
+    scoped_evidence = tuple(item for item in checked_evidence if item.report == report)
     exposures = (
         project_commodity_exposures(scoped_records, catalog=catalog)
         if assessment_status == AssessmentStatus.ASSESSED

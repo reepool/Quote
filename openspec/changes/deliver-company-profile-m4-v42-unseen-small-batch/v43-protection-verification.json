@@ -1,0 +1,13 @@
+{
+  "all_protected_hashes_equal": true,
+  "verified_sets": {
+    "historical": 3538,
+    "first_formal": 20,
+    "preexisting_modified": 3,
+    "executed_code": 38
+  },
+  "original_contract_sha256": "8c2609256d9de63620400fdd4dae46e15e5c05047746ae160f9bc4caa338558c",
+  "repair_contract_sha256": "07055d68b3932d64a74186c1a4e3d712174be6584e64a9594b8da1eda0fd86dc",
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false
+}
