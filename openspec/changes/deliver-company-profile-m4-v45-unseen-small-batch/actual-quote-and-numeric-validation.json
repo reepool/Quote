@@ -1,0 +1,2391 @@
+{
+  "600054.SH": {
+    "financial_amount_checks": [
+      {
+        "record_id": "owned:core-ev-9341b0efe96caf89:segment:industry:酒店业务:table:None:row:17",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600054.SH:income:001"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-d8f58b3dfeb748d7:revenue:industry:酒店业务:table:None:row:17",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600054.SH:income:001"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-9341b0efe96caf89:segment:industry:索道及缆车业务:table:None:row:18",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600054.SH:income:002"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-d8f58b3dfeb748d7:revenue:industry:索道及缆车业务:table:None:row:18",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600054.SH:income:002"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-9341b0efe96caf89:segment:industry:景区业务:table:None:row:19",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600054.SH:income:003"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-d8f58b3dfeb748d7:revenue:industry:景区业务:table:None:row:19",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600054.SH:income:003"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-9341b0efe96caf89:segment:industry:旅游服务业务:table:None:row:20",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600054.SH:income:004"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-d8f58b3dfeb748d7:revenue:industry:旅游服务业务:table:None:row:20",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600054.SH:income:004"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-9341b0efe96caf89:segment:industry:徽菜业务:table:None:row:21",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600054.SH:income:005"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-d8f58b3dfeb748d7:revenue:industry:徽菜业务:table:None:row:21",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600054.SH:income:005"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-889bb04d264f76b6:Segment:business_segment:玉屏索道:控股参股公司/营业收入:row:0",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600054.SH:income:006"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-aa20282213154b9b:Measurement:business_segment:玉屏索道:控股参股公司/营业收入:row:0",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600054.SH:income:006"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-889bb04d264f76b6:Segment:business_segment:黄山徽商故里集团:控股参股公司/营业收入:row:1",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600054.SH:income:008"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-aa20282213154b9b:Measurement:business_segment:黄山徽商故里集团:控股参股公司/营业收入:row:1",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600054.SH:income:008"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-889bb04d264f76b6:Segment:business_segment:太平湖文旅:控股参股公司/营业收入:row:2",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600054.SH:income:009"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-aa20282213154b9b:Measurement:business_segment:太平湖文旅:控股参股公司/营业收入:row:2",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600054.SH:income:009"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-889bb04d264f76b6:Segment:business_segment:花山谜窟:控股参股公司/营业收入:row:3",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600054.SH:income:010"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-aa20282213154b9b:Measurement:business_segment:花山谜窟:控股参股公司/营业收入:row:3",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600054.SH:income:010"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-bc7f4bfcabf97d7c:Segment:business_type:主营业务:营业收入:row:0",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600054.SH:income:012"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-c4f68afa18c1dfcc:Measurement:business_type:主营业务:营业收入:row:0",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600054.SH:income:012"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-bc7f4bfcabf97d7c:Segment:business_type:其他业务:营业收入:row:1",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600054.SH:income:013"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-c4f68afa18c1dfcc:Measurement:business_type:其他业务:营业收入:row:1",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600054.SH:income:013"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-0f85573b06ac2282:Segment:business_type:主营业务:营业收入:row:0",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600054.SH:income:012"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-0f85573b06ac2282:Segment:business_type:其他业务:营业收入:row:1",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600054.SH:income:013"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-0f85573b06ac2282:Segment:business_type:合计:营业收入:row:2",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600054.SH:income:014"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-e129bf6b90520660:Measurement:business_type:合计:营业收入:row:2",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600054.SH:income:014"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-92d187b7574dba67:Segment:business_type:主营业务:营业收入:row:0",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600054.SH:income:034"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-7077762694c3f199:Measurement:business_type:主营业务:营业收入:row:0",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600054.SH:income:034"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-92d187b7574dba67:Segment:business_type:其他业务:营业收入:row:1",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600054.SH:income:035"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-7077762694c3f199:Measurement:business_type:其他业务:营业收入:row:1",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600054.SH:income:035"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-9a9fe0489114eaae:Segment:business_type:主营业务:营业收入:row:0",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600054.SH:income:034"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-9a9fe0489114eaae:Segment:business_type:其他业务:营业收入:row:1",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600054.SH:income:035"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-9a9fe0489114eaae:Segment:business_type:合计:营业收入:row:2",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600054.SH:income:036"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-aef5bb7892509825:Measurement:business_type:合计:营业收入:row:2",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600054.SH:income:036"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-021378a70a3b552d:Segment:service:租赁收入:作为出租人的经营租赁/租赁收入:row:0",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600054.SH:income:017"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-915dd8868fc4ca37:Measurement:service:租赁收入:作为出租人的经营租赁/租赁收入:row:0",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600054.SH:income:017"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-6ddfcfb42bf0f2fb:Segment:service:垃圾清运收入:出售商品/提供劳务/本期发生额:row:0",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600054.SH:income:021"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-ad3a5865225ee594:Measurement:service:垃圾清运收入:出售商品/提供劳务/本期发生额:row:0",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600054.SH:income:021"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-6ddfcfb42bf0f2fb:Segment:service:房餐费:出售商品/提供劳务/本期发生额:row:1",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600054.SH:income:023"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-ad3a5865225ee594:Measurement:service:房餐费:出售商品/提供劳务/本期发生额:row:1",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600054.SH:income:023"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-6ddfcfb42bf0f2fb:Segment:service:酒水销售:出售商品/提供劳务/本期发生额:row:2",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600054.SH:income:024"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-ad3a5865225ee594:Measurement:service:酒水销售:出售商品/提供劳务/本期发生额:row:2",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600054.SH:income:024"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-6ddfcfb42bf0f2fb:Segment:service:房餐费:出售商品/提供劳务/本期发生额:row:3",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600054.SH:income:025"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-ad3a5865225ee594:Measurement:service:房餐费:出售商品/提供劳务/本期发生额:row:3",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600054.SH:income:025"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-6ddfcfb42bf0f2fb:Segment:service:房餐费:出售商品/提供劳务/本期发生额:row:4",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600054.SH:income:026"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-ad3a5865225ee594:Measurement:service:房餐费:出售商品/提供劳务/本期发生额:row:4",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600054.SH:income:026"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-6ddfcfb42bf0f2fb:Segment:service:房餐费:出售商品/提供劳务/本期发生额:row:5",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600054.SH:income:027"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-ad3a5865225ee594:Measurement:service:房餐费:出售商品/提供劳务/本期发生额:row:5",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600054.SH:income:027"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      }
+    ],
+    "overview_quote_checks": [
+      {
+        "record_id": "owned:core-ev-f83c812000b76d3e:overview",
+        "source_quote_supported": true,
+        "original_reading_mode": "plain",
+        "independently_read_pages": [
+          9,
+          10
+        ]
+      },
+      {
+        "record_id": "owned:core-ev-f83c812000b76d3e:revenue:1",
+        "source_quote_supported": true,
+        "original_reading_mode": "plain",
+        "independently_read_pages": [
+          9,
+          10
+        ]
+      },
+      {
+        "record_id": "owned:core-ev-d53d15fb299e314f:overview",
+        "source_quote_supported": true,
+        "original_reading_mode": "plain_or_layout",
+        "independently_read_pages": [
+          164,
+          165
+        ]
+      },
+      {
+        "record_id": "owned:core-ev-db456410b298634a:overview",
+        "source_quote_supported": true,
+        "original_reading_mode": "plain",
+        "independently_read_pages": [
+          9,
+          10
+        ]
+      },
+      {
+        "record_id": "owned:core-ev-168351655b1612f3:overview",
+        "source_quote_supported": true,
+        "original_reading_mode": "plain",
+        "independently_read_pages": [
+          14
+        ]
+      },
+      {
+        "record_id": "owned:core-ev-064bf27d71528a22:overview",
+        "source_quote_supported": true,
+        "original_reading_mode": "plain",
+        "independently_read_pages": [
+          19
+        ]
+      },
+      {
+        "record_id": "owned:core-ev-4b04a21fa93ebc2f:overview",
+        "source_quote_supported": true,
+        "original_reading_mode": "plain",
+        "independently_read_pages": [
+          22,
+          23
+        ]
+      },
+      {
+        "record_id": "owned:core-ev-6981fb892c9b6ac4:overview",
+        "source_quote_supported": true,
+        "original_reading_mode": "plain",
+        "independently_read_pages": [
+          22,
+          23
+        ]
+      },
+      {
+        "record_id": "owned:core-ev-da947e727f860da6:overview",
+        "source_quote_supported": true,
+        "original_reading_mode": "plain",
+        "independently_read_pages": [
+          98
+        ]
+      },
+      {
+        "record_id": "owned:core-ev-b9a1d9b85ff47dc8:overview",
+        "source_quote_supported": true,
+        "original_reading_mode": "plain",
+        "independently_read_pages": [
+          98
+        ]
+      },
+      {
+        "record_id": "owned:core-ev-e4bd752481897d19:overview",
+        "source_quote_supported": true,
+        "original_reading_mode": "plain",
+        "independently_read_pages": [
+          150
+        ]
+      },
+      {
+        "record_id": "owned:core-ev-2dfb3c7d72e06a06:overview",
+        "source_quote_supported": true,
+        "original_reading_mode": "plain",
+        "independently_read_pages": [
+          152
+        ]
+      },
+      {
+        "record_id": "owned:core-ev-7638fee89556cd92:overview",
+        "manual_table_reading_order_review": true,
+        "manual_findings": "黄山单位美元/集团及经开区尾字和PDF页眉移位；尼雅仅表头方式移位；原行主体与业务性质及数值均原文成立。此表引用不能替代收入事实原行身份核验。",
+        "original_source_span": "企业集团的构成√适用□不适用单位：万元币种：人民币子公司名称主要经营地注册资本注册地业务性质持股比例(%)取得直接间接方式玉屏索道黄山市风景区2,000黄山市风景区索道运输80.00投资设立太平索道黄山市风景区697.5万黄山市风景区索道运输70.00投资设立美元迎客松旅服黄山市屯溪区2,000黄山市屯溪区旅游服务100.00投资设立黄山中旅黄山地区2,920黄山市屯溪区旅游服务100.00非同一控制下企业合并迎客松疗休养黄山地区500黄山市屯溪区旅游服务100.00投资设立迎客松会展黄山地区500黄山市屯溪区旅游服务100.00投资设立黄山海外黄山地区289黄山市屯溪区旅游服务100.00投资设立汤口国旅黄山地区50黄山市黄山区旅游服务51.00投资设立黄山国旅黄山地区150黄山市屯溪区旅游服务100.00非同一控制下企业合并徽文化旅游黄山市屯溪区336.8黄山市屯溪区旅游服务70.01投资设立途马科技黄山市屯溪区12,000黄山市屯溪区技术服务46.750.15投资设立黄山智慧旅游黄山地区2,000黄山市黄山区旅游服务46.90投资设立新途国旅黄山地区100黄山市屯溪区旅游服务46.90投资设立云上游黄山地区200黄山市屯溪区旅游服务46.90非同一控制下企业合并黄山途马黄山地区500黄山市屯溪区旅游服务100.00投资设立太平湖文旅黄山地区19,780黄山市黄山区景点开发59.96非同一控制下企业合并太平湖游船黄山地区2,910黄山市黄山区旅游服务59.96非同一控制下企业合并云麓酒店管理黄山市屯溪区100黄山市屯溪区酒店管理100.00投资设立崇德楼酒店黄山市屯溪区10黄山市屯溪区酒店管理100.00投资设立老徽商商贸黄山市屯溪区50黄山市屯溪区商贸经营100.00投资设立花山谜窟黄山市屯溪区10,000黄山市屯溪区景点开发100.00投资设立花海艺境黄山市屯溪区10,000黄山市屯溪区景点开发100.00投资设立西海饭店黄山市风景区222.6黄山市风景区酒店经营100.00同一控制下企业合并黄山徽商故里黄山市屯溪区10,000黄山市屯溪区商贸经营100.00投资设立集团徽商故里文化北京市西城区5,000北京市西城区餐饮服务100.00非同一控制下企业合并北徽餐饮北京市东城区3,900北京市东城区餐饮服务93.04投资设立三里河餐饮北京市西城区200北京市西城区餐饮服务100.00非同一控制下企业合并天津徽商故里天津市南开区950天津市南开区餐饮服务100.00非同一控制下企业合并杭州徽商故里杭州地区30杭州市西湖区餐饮服务100.00投资设立合肥徽商故里合肥地区200合肥市包河区餐饮服务100.00投资设立153/185黄山旅游发展股份有限公司2025年年度报告济南徽商故里济南市天桥区500济南市天桥区餐饮服务92.00投资设立元大都餐饮北京市朝阳区390北京市朝阳区餐饮服务100.00非同一控制下企业合并合肥徽商小馆合肥地区100合肥市包河区餐饮服务100.00投资设立昱安餐饮北京市东城区150北京市东城区餐饮服务70.00投资设立上海徽商故里上海市闵行区1,700上海市闵行区餐饮服务100.00投资设立宁波徽商故里宁波高新区1,000宁波高新区餐饮服务100.00投资设立阜阳徽商故里阜阳市颍州区880阜阳市颍州区餐饮服务100.00投资设立蚌埠徽商故里蚌埠市经济开865蚌埠市经济开餐饮服务100.00投资设立发区发区芜湖徽商故里芜湖市镜湖区750芜湖市镜湖区餐饮服务100.00投资设立滁州徽商故里滁州市琅琊区700滁州市琅琊区餐饮服务100.00投资设立深圳徽商故里深圳市南山区1,200深圳市南山区餐饮服务90.00投资设立淮南徽商故里淮南市田家庵650淮南市田家庵餐饮服务100.00投资设立区区昆山徽商故里苏州市昆山市100苏州市昆山市餐饮服务20.00投资设立轩辕疗休养黄山地区1,000黄山市黄山区旅游服务100.00投资设立黄山华胥氏黄山市屯溪区1,000黄山市屯溪区旅游服务51.00投资设立南徽餐饮黄山地区3,000黄山市黄山区餐饮服务100.00投资设立归隐旅游黄山地区10,000黄山市屯溪区旅游服务100.00投资设立云隐文旅黄山地区4,000黄山市屯溪区旅游服务70.00投资设立岫野文旅黄山地区5,000黄山市屯溪区旅游服务100.00投资设立云巅投资黄山市屯溪区50,000黄山市屯溪区投资管理100.00投资设立云曙管理咨询黄山市屯溪区10黄山市屯溪区管理咨询100.00投资设立云际置业黄山市屯溪区29,406黄山市屯溪区房地产开发100.00非同一控制下企业合并黄山云趣黄山市黟县9,000黄山市黟县娱乐业100.00投资设立黄山云起黄山市屯溪区5,000黄山市屯溪区文化创意100.00投资设立在子公司的持股比例不同于表决权比例的说明：无。持有半数或以下表决权但仍控制被投资单位、以及持有半数以上表决权但不控制被投资单位的依据：无。对于纳入合并范围的重要的结构化主体，控制的依据：无。确定公司是代理人还是委托人的依据：无。其他说明：无。",
+        "actual_span": "企业集团的构成√适用□不适用单位：万元币种：人民币子公司名称主要经营地注册资本注册地业务性质持股比例(%)取得直接间接方式玉屏索道黄山市风景区2,000黄山市风景区索道运输80.00投资设立太平索道黄山市风景区697.5万美元黄山市风景区索道运输70.00投资设立迎客松旅服黄山市屯溪区2,000黄山市屯溪区旅游服务100.00投资设立黄山中旅黄山地区2,920黄山市屯溪区旅游服务100.00非同一控制下企业合并迎客松疗休养黄山地区500黄山市屯溪区旅游服务100.00投资设立迎客松会展黄山地区500黄山市屯溪区旅游服务100.00投资设立黄山海外黄山地区289黄山市屯溪区旅游服务100.00投资设立汤口国旅黄山地区50黄山市黄山区旅游服务51.00投资设立黄山国旅黄山地区150黄山市屯溪区旅游服务100.00非同一控制下企业合并徽文化旅游黄山市屯溪区336.8黄山市屯溪区旅游服务70.01投资设立途马科技黄山市屯溪区12,000黄山市屯溪区技术服务46.750.15投资设立黄山智慧旅游黄山地区2,000黄山市黄山区旅游服务46.90投资设立新途国旅黄山地区100黄山市屯溪区旅游服务46.90投资设立云上游黄山地区200黄山市屯溪区旅游服务46.90非同一控制下企业合并黄山途马黄山地区500黄山市屯溪区旅游服务100.00投资设立太平湖文旅黄山地区19,780黄山市黄山区景点开发59.96非同一控制下企业合并太平湖游船黄山地区2,910黄山市黄山区旅游服务59.96非同一控制下企业合并云麓酒店管理黄山市屯溪区100黄山市屯溪区酒店管理100.00投资设立崇德楼酒店黄山市屯溪区10黄山市屯溪区酒店管理100.00投资设立老徽商商贸黄山市屯溪区50黄山市屯溪区商贸经营100.00投资设立花山谜窟黄山市屯溪区10,000黄山市屯溪区景点开发100.00投资设立花海艺境黄山市屯溪区10,000黄山市屯溪区景点开发100.00投资设立西海饭店黄山市风景区222.6黄山市风景区酒店经营100.00同一控制下企业合并黄山徽商故里集团黄山市屯溪区10,000黄山市屯溪区商贸经营100.00投资设立徽商故里文化北京市西城区5,000北京市西城区餐饮服务100.00非同一控制下企业合并北徽餐饮北京市东城区3,900北京市东城区餐饮服务93.04投资设立三里河餐饮北京市西城区200北京市西城区餐饮服务100.00非同一控制下企业合并天津徽商故里天津市南开区950天津市南开区餐饮服务100.00非同一控制下企业合并杭州徽商故里杭州地区30杭州市西湖区餐饮服务100.00投资设立合肥徽商故里合肥地区200合肥市包河区餐饮服务100.00投资设立黄山旅游发展股份有限公司2025年年度报告154/185济南徽商故里济南市天桥区500济南市天桥区餐饮服务92.00投资设立元大都餐饮北京市朝阳区390北京市朝阳区餐饮服务100.00非同一控制下企业合并合肥徽商小馆合肥地区100合肥市包河区餐饮服务100.00投资设立昱安餐饮北京市东城区150北京市东城区餐饮服务70.00投资设立上海徽商故里上海市闵行区1,700上海市闵行区餐饮服务100.00投资设立宁波徽商故里宁波高新区1,000宁波高新区餐饮服务100.00投资设立阜阳徽商故里阜阳市颍州区880阜阳市颍州区餐饮服务100.00投资设立蚌埠徽商故里蚌埠市经济开发区865蚌埠市经济开发区餐饮服务100.00投资设立芜湖徽商故里芜湖市镜湖区750芜湖市镜湖区餐饮服务100.00投资设立滁州徽商故里滁州市琅琊区700滁州市琅琊区餐饮服务100.00投资设立深圳徽商故里深圳市南山区1,200深圳市南山区餐饮服务90.00投资设立淮南徽商故里淮南市田家庵区650淮南市田家庵区餐饮服务100.00投资设立昆山徽商故里苏州市昆山市100苏州市昆山市餐饮服务20.00投资设立轩辕疗休养黄山地区1,000黄山市黄山区旅游服务100.00投资设立黄山华胥氏黄山市屯溪区1,000黄山市屯溪区旅游服务51.00投资设立南徽餐饮黄山地区3,000黄山市黄山区餐饮服务100.00投资设立归隐旅游黄山地区10,000黄山市屯溪区旅游服务100.00投资设立云隐文旅黄山地区4,000黄山市屯溪区旅游服务70.00投资设立岫野文旅黄山地区5,000黄山市屯溪区旅游服务100.00投资设立云巅投资黄山市屯溪区50,000黄山市屯溪区投资管理100.00投资设立云曙管理咨询黄山市屯溪区10黄山市屯溪区管理咨询100.00投资设立云际置业黄山市屯溪区29,406黄山市屯溪区房地产开发100.00非同一控制下企业合并黄山云趣黄山市黟县9,000黄山市黟县娱乐业100.00投资设立黄山云起黄山市屯溪区5,000黄山市屯溪区文化创意100.00投资设立在子公司的持股比例不同于表决权比例的说明：无。持有半数或以下表决权但仍控制被投资单位、以及持有半数以上表决权但不控制被投资单位的依据：无。对于纳入合并范围的重要的结构化主体，控制的依据：无。确定公司是代理人还是委托人的依据：无。其他说明：无。",
+        "source_mode": "layout"
+      },
+      {
+        "record_id": "owned:core-ev-7638fee89556cd92:overview",
+        "source_quote_supported": true,
+        "original_reading_mode": "plain_or_layout",
+        "independently_read_pages": [
+          153,
+          154
+        ]
+      },
+      {
+        "record_id": "owned:core-ev-4d527a2da42aaf97:overview",
+        "source_quote_supported": true,
+        "original_reading_mode": "plain",
+        "independently_read_pages": [
+          164
+        ]
+      },
+      {
+        "record_id": "owned:core-ev-510ff95a99cac6ad:overview",
+        "source_quote_supported": true,
+        "original_reading_mode": "plain",
+        "independently_read_pages": [
+          165
+        ]
+      }
+    ]
+  },
+  "600084.SH": {
+    "financial_amount_checks": [
+      {
+        "record_id": "owned:core-ev-983dd52fd113b848:segment:industry:酒业类:table:None:row:16",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:001"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-35002c594f5ebddb:revenue:industry:酒业类:table:None:row:16",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:001"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-983dd52fd113b848:segment:industry:其他:table:None:row:18",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:002",
+          "600084.SH:income:008"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-35002c594f5ebddb:revenue:industry:其他:table:None:row:18",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:002",
+          "600084.SH:income:008"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-983dd52fd113b848:segment:product:高档酒:table:主营业务收入:row:32",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:004"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-35002c594f5ebddb:revenue:product:高档酒:table:主营业务收入:row:32",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:004"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-983dd52fd113b848:segment:product:中低档酒:table:主营业务收入:row:34",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:005"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-35002c594f5ebddb:revenue:product:中低档酒:table:主营业务收入:row:34",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:005"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-983dd52fd113b848:segment:total:成品酒小计:table:主营业务收入:row:36",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:006"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-35002c594f5ebddb:revenue:total:成品酒小计:table:主营业务收入:row:36",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:006"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-983dd52fd113b848:segment:product:原酒:table:主营业务收入:row:38",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:007"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-35002c594f5ebddb:revenue:product:原酒:table:主营业务收入:row:38",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:007"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-983dd52fd113b848:segment:product:其他:table:主营业务收入:row:40",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:002",
+          "600084.SH:income:008"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-35002c594f5ebddb:revenue:product:其他:table:主营业务收入:row:40",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:002",
+          "600084.SH:income:008"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-983dd52fd113b848:segment:region:华北地区:table:主营业务收入:row:55",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:010"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-35002c594f5ebddb:revenue:region:华北地区:table:主营业务收入:row:55",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:010"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-983dd52fd113b848:segment:region:其他地区:table:主营业务收入:row:57",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:011"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-35002c594f5ebddb:revenue:region:其他地区:table:主营业务收入:row:57",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:011"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-983dd52fd113b848:segment:sales_mode:（含团购）:table:None:row:73",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:013"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-35002c594f5ebddb:revenue:sales_mode:（含团购）:table:None:row:73",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:013"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-983dd52fd113b848:segment:sales_mode:线上销售:table:None:row:75",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:014"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-35002c594f5ebddb:revenue:sales_mode:线上销售:table:None:row:75",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:014"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-f344c34e27d8063d:Segment:business_type:正常经营之外的其他业务收入:其他业务收入扣除明细/本年度:row:0",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [],
+        "contract_external": true,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-e95edadf8e971afe:Measurement:business_type:正常经营之外的其他业务收入:其他业务收入扣除明细/本年度:row:0",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [],
+        "contract_external": true,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-b5d95c3e61aeae33:Segment:business_segment:葡萄酒有限公司:控股参股公司/营业收入:row:0",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:036"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-47c9cb741ebbc867:Measurement:business_segment:葡萄酒有限公司:控股参股公司/营业收入:row:0",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:036"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-b5d95c3e61aeae33:Segment:business_segment:科技开发有限公司:控股参股公司/营业收入:row:1",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:037"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-47c9cb741ebbc867:Measurement:business_segment:科技开发有限公司:控股参股公司/营业收入:row:1",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:037"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-b5d95c3e61aeae33:Segment:business_segment:尼雅经贸有限公司:控股参股公司/营业收入:row:2",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:038"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-47c9cb741ebbc867:Measurement:business_segment:尼雅经贸有限公司:控股参股公司/营业收入:row:2",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:038"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-b5d95c3e61aeae33:Segment:business_segment:经贸有限公司:控股参股公司/营业收入:row:3",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:039"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-47c9cb741ebbc867:Measurement:business_segment:经贸有限公司:控股参股公司/营业收入:row:3",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:039"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-b5d95c3e61aeae33:Segment:business_segment:尼雅酒业公司:控股参股公司/营业收入:row:4",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:040"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-47c9cb741ebbc867:Measurement:business_segment:尼雅酒业公司:控股参股公司/营业收入:row:4",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:040"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-791b4e50d104395d:Segment:business_type:主营业务:营业收入:row:0",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:041"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-974cb933029a549a:Measurement:business_type:主营业务:营业收入:row:0",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:041"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-791b4e50d104395d:Segment:business_type:其他业务:营业收入:row:1",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:042"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-974cb933029a549a:Measurement:business_type:其他业务:营业收入:row:1",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:042"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-9f7b592fa1e7962b:Segment:business_type:主营业务:营业收入:row:0",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:041"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-9f7b592fa1e7962b:Segment:business_type:其他业务:营业收入:row:1",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:042"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-9f7b592fa1e7962b:Segment:business_type:合计:营业收入:row:2",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:043"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-0308fc290ccb2a62:Measurement:business_type:合计:营业收入:row:2",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:043"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-0751ef8e3e19d78c:Segment:business_type:主营业务:营业收入:row:0",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:115"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-128bce0cec886166:Measurement:business_type:主营业务:营业收入:row:0",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:115"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-0751ef8e3e19d78c:Segment:business_type:其他业务:营业收入:row:1",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:116"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-128bce0cec886166:Measurement:business_type:其他业务:营业收入:row:1",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:116"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-6db568dec1af1d14:Segment:business_type:主营业务:营业收入:row:0",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:115"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-6db568dec1af1d14:Segment:business_type:其他业务:营业收入:row:1",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:116"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-6db568dec1af1d14:Segment:business_type:合计:营业收入:row:2",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:117"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-f4a06e67a9194abb:Measurement:business_type:合计:营业收入:row:2",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:117"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:0",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:046"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:0",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:046"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:1",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:047"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:1",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:047"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:2",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:048"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:2",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:048"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:3",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:049"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:3",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:049"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:4",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:050"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:4",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:050"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:5",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:051"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:5",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:051"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:6",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:052"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:6",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:052"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:7",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:053"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:7",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:053"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:8",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:054"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:8",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:054"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:9",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:055"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:9",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:055"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:10",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:056"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:10",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:056"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:11",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:057"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:11",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:057"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:12",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:058"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:12",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:058"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:13",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:059"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:13",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:059"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:14",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:060"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:14",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:060"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:15",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:061"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:15",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:061"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:16",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:062"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:16",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:062"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:17",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:063"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:17",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:063"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:18",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:064"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:18",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:064"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:19",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:065"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:19",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:065"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:20",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:066"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:20",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:066"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:21",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:067"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:21",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:067"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:22",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:068"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:22",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:068"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:23",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:069"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:23",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:069"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:24",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:070"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:24",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:070"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:25",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:071"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:25",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:071"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:26",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:072"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:26",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:072"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:27",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:073"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:27",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:073"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:28",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:074"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:28",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:074"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:29",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:075"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:29",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:075"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:30",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:076"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:30",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:076"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:31",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:077"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:31",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:077"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:32",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:078"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:32",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:078"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:33",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:079"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:33",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:079"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:34",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:080"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:34",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:080"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:35",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:081"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:35",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:081"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:36",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:082"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:36",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:082"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:37",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:083"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:37",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:083"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:38",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:084"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:38",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:084"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:39",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:085"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:39",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:085"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:40",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:086"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:40",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:086"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:41",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:087"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:41",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:087"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:42",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:088"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:42",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:088"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:43",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:089"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:43",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:089"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:44",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:090"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:44",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:090"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:45",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:091"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:45",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:091"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:46",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:092"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:46",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:092"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:47",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:093"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:47",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:093"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:48",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:094"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:48",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:094"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:49",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:095"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:49",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:095"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:50",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:096"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:50",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:096"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:51",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:097"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:51",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:097"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:52",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:098"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:52",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:098"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:53",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:099"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:53",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:099"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:54",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:100"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:54",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:100"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:55",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:101"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:55",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:101"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:56",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:102"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:56",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:102"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:57",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:103"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:57",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:103"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:58",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:104"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:58",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:104"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:59",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:105"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:59",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:105"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:60",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:106"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:60",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:106"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:61",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:107"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:61",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:107"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:62",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:108"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:62",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:108"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:63",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:109"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:63",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:109"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:64",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:110"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:64",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:110"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:65",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:111"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:65",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:111"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:66",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:112"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:66",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:112"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:67",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:113"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:67",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:113"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:68",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:114"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      },
+      {
+        "record_id": "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:68",
+        "amount_and_unit_supported": true,
+        "matching_original_cells": [
+          "600084.SH:income:114"
+        ],
+        "contract_external": false,
+        "identity_correctness_scored_separately": true
+      }
+    ],
+    "overview_quote_checks": [
+      {
+        "record_id": "owned:core-ev-9d36eece8a1d5e13:overview",
+        "source_quote_supported": true,
+        "original_reading_mode": "plain_or_layout",
+        "independently_read_pages": [
+          191,
+          192,
+          193,
+          194
+        ]
+      },
+      {
+        "record_id": "owned:core-ev-3c45d81dc4a96745:overview",
+        "source_quote_supported": true,
+        "original_reading_mode": "plain",
+        "independently_read_pages": [
+          12
+        ]
+      },
+      {
+        "record_id": "owned:core-ev-a06619dac69f79ac:overview",
+        "source_quote_supported": true,
+        "original_reading_mode": "plain",
+        "independently_read_pages": [
+          18
+        ]
+      },
+      {
+        "record_id": "owned:core-ev-9e3c947b40e952c8:overview",
+        "source_quote_supported": true,
+        "original_reading_mode": "plain",
+        "independently_read_pages": [
+          19
+        ]
+      },
+      {
+        "record_id": "owned:core-ev-7af59ccb5be1ff8f:overview",
+        "source_quote_supported": true,
+        "original_reading_mode": "plain",
+        "independently_read_pages": [
+          30
+        ]
+      },
+      {
+        "record_id": "owned:core-ev-42f9c09c18a604bc:overview",
+        "source_quote_supported": true,
+        "original_reading_mode": "plain",
+        "independently_read_pages": [
+          31,
+          32
+        ]
+      },
+      {
+        "record_id": "owned:core-ev-4f47e4fd69f1a831:overview",
+        "source_quote_supported": true,
+        "original_reading_mode": "plain",
+        "independently_read_pages": [
+          31,
+          32
+        ]
+      },
+      {
+        "record_id": "owned:core-ev-6df0c210010e10e4:overview",
+        "source_quote_supported": true,
+        "original_reading_mode": "plain",
+        "independently_read_pages": [
+          118
+        ]
+      },
+      {
+        "record_id": "owned:core-ev-82f2d9fa1eccb1e4:overview",
+        "source_quote_supported": true,
+        "original_reading_mode": "plain",
+        "independently_read_pages": [
+          172
+        ]
+      },
+      {
+        "record_id": "owned:core-ev-21d74ae584e26ca8:overview",
+        "source_quote_supported": true,
+        "original_reading_mode": "plain",
+        "independently_read_pages": [
+          175
+        ]
+      },
+      {
+        "record_id": "owned:core-ev-2d2c2a0f9039f086:overview",
+        "manual_table_reading_order_review": true,
+        "manual_findings": "黄山单位美元/集团及经开区尾字和PDF页眉移位；尼雅仅表头方式移位；原行主体与业务性质及数值均原文成立。此表引用不能替代收入事实原行身份核验。",
+        "original_source_span": "企业集团的构成√适用□不适用单位：元币种：人民币子公司名称主要经营地注册资本注册地业务性质持股比例(%)取得方式直接间接新疆尼雅葡萄酒有限公司玛纳斯县757,255,000.00玛纳斯县生产加工97.14设立石河子市中葡尼雅葡萄酒业有限公司石河子市54,500,000.00石河子市生产加工77.33设立霍尔果斯中葡尼雅葡萄酒业有限公司伊犁霍尔果斯10,000,000.00伊犁霍尔果斯生产加工100.00设立烟台尼雅葡萄酒有限公司蓬莱市90,000,000.00蓬莱市生产加工100.00设立北京中葡尼雅经贸有限公司北京市70,000,000.00北京市销售100.00设立新疆尼雅经贸有限公司乌鲁木齐市21,014,000.00乌鲁木齐市销售100.00设立新疆尼雅生态农业科技开发有限公司石河子市95,000,000.00石河子市土地农业开发及农作物种植100.00设立新疆中葡尼雅酒业销售有限公司玛纳斯县5,000,000.00玛纳斯县销售100.00设立徐州国安尼雅徐州市150,000,000.00徐州市销售100.00设立中信尼雅葡萄酒股份有限公司2025年年度报告177/218酒业有限责任公司在子公司的持股比例不同于表决权比例的说明：不适用持有半数或以下表决权但仍控制被投资单位、以及持有半数以上表决权但不控制被投资单位的依据：不适用对于纳入合并范围的重要的结构化主体，控制的依据：不适用确定公司是代理人还是委托人的依据：不适用其他说明：不适用",
+        "actual_span": "企业集团的构成√适用□不适用单位：元币种：人民币子公司名称主要经营地注册资本注册地业务性质持股比例(%)取得直接间接方式新疆尼雅葡萄酒有限公司玛纳斯县757,255,000.00玛纳斯县生产加工97.14设立石河子市中葡尼雅葡萄酒业有限公司石河子市54,500,000.00石河子市生产加工77.33设立霍尔果斯中葡尼雅葡萄酒业有限公司伊犁霍尔果斯10,000,000.00伊犁霍尔果斯生产加工100.00设立烟台尼雅葡萄酒有限公司蓬莱市90,000,000.00蓬莱市生产加工100.00设立北京中葡尼雅经贸有限公司北京市70,000,000.00北京市销售100.00设立新疆尼雅经贸有限公司乌鲁木齐市21,014,000.00乌鲁木齐市销售100.00设立新疆尼雅生态农业科技开发有限公司石河子市95,000,000.00石河子市土地农业开发及农作物种植100.00设立新疆中葡尼雅酒业销售有限公司玛纳斯县5,000,000.00玛纳斯县销售100.00设立徐州国安尼雅徐州市150,000,000.00徐州市销售100.00设立中信尼雅葡萄酒股份有限公司2025年年度报告177/218酒业有限责任公司在子公司的持股比例不同于表决权比例的说明：不适用持有半数或以下表决权但仍控制被投资单位、以及持有半数以上表决权但不控制被投资单位的依据：不适用对于纳入合并范围的重要的结构化主体，控制的依据：不适用确定公司是代理人还是委托人的依据：不适用其他说明：不适用",
+        "source_mode": "plain"
+      },
+      {
+        "record_id": "owned:core-ev-2d2c2a0f9039f086:overview",
+        "source_quote_supported": true,
+        "original_reading_mode": "plain_or_layout",
+        "independently_read_pages": [
+          176,
+          177
+        ]
+      },
+      {
+        "record_id": "owned:core-ev-61c3759ef96724e2:overview",
+        "source_quote_supported": true,
+        "original_reading_mode": "plain",
+        "independently_read_pages": [
+          191
+        ]
+      },
+      {
+        "record_id": "owned:core-ev-a9bc7087c2790310:overview",
+        "source_quote_supported": true,
+        "original_reading_mode": "plain",
+        "independently_read_pages": [
+          193
+        ]
+      }
+    ]
+  }
+}

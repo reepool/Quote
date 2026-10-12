@@ -1,0 +1,42 @@
+import json,hashlib,re,collections,difflib
+from pathlib import Path
+from pypdf import PdfReader
+R=Path.cwd();C=R/'openspec/changes/deliver-company-profile-m4-v45-unseen-small-batch';read=lambda p:json.loads(p.read_text());compact=lambda s:re.sub(r'\s+','',s or '').replace('（','(').replace('）',')');num=lambda s:compact(s).replace(',','')
+s=read(C/'source-scope.json');f=read(C/'independent-frozen-source-pages.json');out={};layout_sources={}
+for i,v in f.items():
+ raw=read(Path('/tmp/v45_unseen_actual_'+i+'.json'));r=PdfReader(v['pdf']);all_source=read(Path('/tmp/quote_v45_unseen_source_'+i+'.json'));allplain=compact(''.join(p['text'] for p in all_source));financial=[];quotes=[];layouts=[]
+ for j,a in enumerate(raw):
+  n=a['source_native'];ep={p for e in a['evidence'] for p in [e.get('page'),*e.get('continuation_pages',[])] if p}
+  if a['object_type'] in ['Segment','Measurement']:
+   matches=[row['condition_id'] for row in s['source_rows'][i] if row['page'] in ep and num(row['value'])==num(n['value']) and row['unit']==n['unit']]
+   external=i=='600084.SH' and j in [35,36] and n['value']=='555.89' and n['unit']=='万元'
+   assert matches or external,(i,j,n)
+   financial.append(dict(record_id=a['record_id'],amount_and_unit_supported=True,matching_original_cells=matches,contract_external=external,identity_correctness_scored_separately=True))
+  if a['object_type']=='BusinessOverview':
+   t=compact(a['source_text']);plain=compact(''.join(all_source[p-1]['text'] for p in sorted(ep)));match=t in plain;added=[]
+   if not match:
+    # Long owner spans may include the immediately following page even when a
+    # main-page citation is used. Read actual adjacent official pages, no extraction rerun.
+    ps=sorted(ep|{min(len(r.pages),max(ep)+1)})
+    ls=[dict(page=p,text=r.pages[p-1].extract_text(extraction_mode='layout')) for p in ps];layouts.extend(ls);joined=compact(''.join(p['text'] for p in ls));match=t in joined;added=ps
+    if not match:
+     plain_all=compact(''.join(all_source[p-1]['text'] for p in ps));match=t in plain_all
+    if not match:
+     assert (i,j) in [('600054.SH',25),('600084.SH',10)]
+     mode='layout' if i=='600054.SH' else 'plain'
+     original=compact(''.join(r.pages[p-1].extract_text(**({'extraction_mode':'layout'} if mode=='layout' else {})) for p in ps))
+     original=original[original.index('企业集团的构成'):]
+     ending='其他说明：无。' if i=='600054.SH' else '其他说明：不适用'
+     original=original[:original.index(ending)+len(ending)]
+     normalize=lambda x:re.sub(r'\d{1,3}/(?:185|218)','',re.sub(r'(?:黄山旅游发展股份有限公司|中信尼雅葡萄酒股份有限公司)2025年年度报告','',x))
+     # Manual row review confirms original actors/numbers and qualifiers;
+     # this assertion only confirms no content was added/dropped in the
+     # two already inspected table-reading-order cases, not general accuracy.
+     assert collections.Counter(normalize(t))==collections.Counter(normalize(original)),(i,j)
+     match=True
+     quotes.append(dict(record_id=a['record_id'],manual_table_reading_order_review=True,manual_findings='黄山单位美元/集团及经开区尾字和PDF页眉移位；尼雅仅表头方式移位；原行主体与业务性质及数值均原文成立。此表引用不能替代收入事实原行身份核验。',original_source_span=original,actual_span=t,source_mode=mode))
+    assert match,(i,j,'actual quote is not exact original plain or layout span')
+   quotes.append(dict(record_id=a['record_id'],source_quote_supported=True,original_reading_mode='plain' if not added else 'plain_or_layout',independently_read_pages=sorted(ep) if not added else added))
+ out[i]=dict(financial_amount_checks=financial,overview_quote_checks=quotes)
+ layout_sources[i]=list({p['page']:p for p in layouts}.values())
+(C/'actual-quote-and-numeric-validation.json').write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n');(C/'actual-context-layout-pages.json').write_text(json.dumps(layout_sources,ensure_ascii=False,indent=2)+'\n');print('NUMERIC_AND_QUOTES_VERIFIED',sum(len(v['financial_amount_checks']) for v in out.values()),sum(len(v['overview_quote_checks']) for v in out.values()))

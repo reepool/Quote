@@ -1,0 +1,28 @@
+{
+  "accepted_by": "A_role_user_review",
+  "accepted_at": "2026-10-12T05:44:34.234010+00:00",
+  "source_recall": {
+    "status": "assessed",
+    "numerator": 209,
+    "denominator": 209,
+    "value": 1.0
+  },
+  "source_accuracy": {
+    "status": "assessed",
+    "numerator": 420,
+    "denominator": 420,
+    "value": 1.0
+  },
+  "critical_numeric_errors": 0,
+  "negative_checks": {
+    "passed": 20,
+    "total": 20
+  },
+  "whole_round_seconds": 201.25287298951298,
+  "tokens_used": 0,
+  "shared_token_budget": 50000,
+  "finite_scope": "Dongwang Times and Dongfeng Technology: original 209 positive conditions, 20 negatives and actual checked output only",
+  "independent_tests_passed": 27,
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false
+}

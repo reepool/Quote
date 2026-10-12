@@ -1,0 +1,31 @@
+{
+  "instruments": {
+    "600054.SH": {
+      "document_version": "f8fa6356c3e7808d4ea70497aa057e7be5d6fe841c9dd6145e5f6c7ec7ebc63f",
+      "additional_actual_evidence_pages": [
+        17,
+        18,
+        19,
+        20,
+        21
+      ],
+      "all_additional_texts_equal_official": true,
+      "total_distinct_verified_pages": 43
+    },
+    "600084.SH": {
+      "document_version": "4f4a995734cb1e56c13d81220b5c3abfc7388d36b45b27273ac79e1cc325d601",
+      "additional_actual_evidence_pages": [
+        22,
+        23,
+        118,
+        208
+      ],
+      "all_additional_texts_equal_official": true,
+      "total_distinct_verified_pages": 48
+    }
+  },
+  "frozen_plain_page_count": 82,
+  "additional_plain_page_count": 9,
+  "total_distinct_verified_pages": 91,
+  "count_note": "执行前82不同页，实际输出补充页独立核验，不改原合同和冻结页。"
+}

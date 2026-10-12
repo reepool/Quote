@@ -257,3 +257,18 @@ Operating-income narrative evidence MUST be bounded to the original income sente
 #### Scenario: Subsidiary sales use a defined short name
 - **WHEN** a current affirmative sales branch has an unambiguous source-supported definition-page actor
 - **THEN** the native actor and definition evidence survive without preceding table-header pollution or inference of manufacturing input from procurement
+
+### Requirement: Complete business answers preserve current actor and action boundaries
+Owned-page body continuations MUST preserve the substantive principal business, product/service matrix and revenue mechanisms together with original subsidiaries, nonconsolidated investees, exit periods and operating status through acceptance, query and export. Keyword presence or answered state alone MUST NOT establish completeness. Actual named production, sales, procurement, material input and service actions MUST follow their own original evidence; inventory sales MUST NOT imply current production and printed zero income MUST NOT imply sales. Applicability text MUST NOT become a procurement commodity.
+
+#### Scenario: Inventory is sold without current production
+- **WHEN** the original product table reports25sales and0production for an engine/gearbox row
+- **THEN** current sales survive with the original actor while no current-production action is generated
+
+#### Scenario: A payment subsidiary exits during the reporting year
+- **WHEN** an original source limits payment services to January through July and states loss of control and later exit
+- **THEN** the accepted support and final business answers retain that period and exit rather than describing unrestricted current group operations
+
+#### Scenario: Applicability follows a purchase-table heading
+- **WHEN** a purchase heading is followed by not-applicable/yes-no status text without a commodity row
+- **THEN** that status text generates no named purchase Activity and legitimate current purchase rows remain eligible

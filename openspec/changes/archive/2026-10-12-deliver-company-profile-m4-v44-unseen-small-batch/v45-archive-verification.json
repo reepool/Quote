@@ -1,0 +1,16 @@
+{
+  "archive_path": "openspec/changes/archive/2026-10-12-deliver-company-profile-m4-v44-unseen-small-batch",
+  "original_change_files": 68,
+  "original_change_hashes_unchanged": true,
+  "historical_files": 2572,
+  "historical_hashes_unchanged": true,
+  "source_contract_unchanged": true,
+  "v44_first_failure_and_v45_first_outputs_unchanged": true,
+  "specs_strict_valid": true,
+  "path_mapping": {
+    "from": "openspec/changes/deliver-company-profile-m4-v44-unseen-small-batch",
+    "to": "openspec/changes/archive/2026-10-12-deliver-company-profile-m4-v44-unseen-small-batch"
+  },
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false
+}

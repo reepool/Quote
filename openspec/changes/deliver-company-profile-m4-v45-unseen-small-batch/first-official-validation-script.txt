@@ -1,0 +1,10 @@
+import json,hashlib
+from pathlib import Path
+from pypdf import PdfReader
+C=Path('openspec/changes/deliver-company-profile-m4-v45-unseen-small-batch');f=json.loads((C/'independent-frozen-source-pages.json').read_text());l=json.loads((C/'independent-income-layout-pages.json').read_text());out={}
+for i,v in f.items():
+ p=Path(v['pdf']);assert hashlib.sha256(p.read_bytes()).hexdigest()==v['document_version'];r=PdfReader(p)
+ assert all(r.pages[d['page']-1].extract_text()==d['text'] for d in v['pages'])
+ assert all(r.pages[d['page']-1].extract_text(extraction_mode='layout')==d['text'] for d in l[i])
+ out[i]=dict(document_version=v['document_version'],source_pages=[d['page'] for d in v['pages']],all_frozen_texts_equal_official=True,layout_pages=[d['page'] for d in l[i]],all_layouts_equal_official=True)
+(C/'official-source-validation.json').write_text(json.dumps(out,indent=2)+'\n');print('OFFICIAL_SOURCE_VERIFIED',sum(len(x['source_pages']) for x in out.values()))

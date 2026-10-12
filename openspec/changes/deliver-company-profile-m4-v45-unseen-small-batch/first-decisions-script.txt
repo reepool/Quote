@@ -1,0 +1,80 @@
+"""Read-only decisions on protected first output; original source contract unchanged."""
+import json,re
+from pathlib import Path
+R=Path.cwd();C=R/'openspec/changes/deliver-company-profile-m4-v45-unseen-small-batch';read=lambda p:json.loads(p.read_text());save=lambda p,v:p.write_text(json.dumps(v,ensure_ascii=False,indent=2)+'\n');compact=lambda s:re.sub(r'\s+','',s or '').replace('（','(').replace('）',')');num=lambda s:compact(s).replace(',','')
+scope=read(C/'source-scope.json');all_sources={i:read(Path('/tmp/quote_v45_unseen_source_'+i+'.json')) for i in scope['versions']};decisions={};supp={}
+aliases={'玉屏索道':'黄山玉屏客运索道有限责任公司','太平索道':'黄山太平索道有限公司','黄山徽商故里集团':'黄山徽商故里文化发展集团有限公司','太平湖文旅':'黄山太平湖文化旅游有限公司','花山谜窟':'黄山市花山谜窟旅游开发有限责任公司','西海饭店':'黄山西海饭店有限责任公司'}
+errors={'600054.SH':{14:'p10商品原名旅游商品，在线为销售渠道，被拼入商品身份；渠道不能靠别名掩盖',64:'p164贡阳商务前混入上一行交易内容续行住宿费等，精确交易对手不成立',65:'配对Measurement同样沿用污染交易对手，金额和单位正确'},'600084.SH':{31:'p18直销（含团购）跨行截断，只保留（含团购），原销售模式身份不完整',32:'配对Measurement同样丢失直销栏目身份',**{j:'p31五具名子公司原名称被跨行截断或污染；金额正确不能替代原收入主体' for j in range(37,47)},**{j:'p191/192交易对手续行公司应归上一行；两行分别发生缺尾字及混前行尾字，配对事实错误' for j in [93,94,95,96,173,174,175,176]}}}
+def native_match(r,row):
+ n=r['source_native'];ep={p for e in r['evidence'] for p in [e.get('page'),*e.get('continuation_pages',[])] if p}
+ if row['page'] not in ep or compact(n['name']) not in set(map(compact,row['native_aliases'])) or num(n['value'])!=num(row['value']) or n['unit']!=row['unit']:return False
+ dim=r.get('dimension',r.get('segment_dimension'));h=n.get('header') or '';q=n.get('qualifier') or '';expected=row['dimension']
+ alias=(row['header']=='出售商品/提供劳务' and expected=='product' and dim=='service') or (row['name']=='成品酒小计' and expected=='product' and dim=='total' and q=='小计')
+ if dim!=expected and not alias:return False
+ if row['header'] in ['合并营业收入和营业成本','母公司营业收入和营业成本']:
+  if h!='营业收入':return False
+ elif row['header'].startswith('主营业务分'):
+  if h not in ['', '主营业务收入']:return False
+ elif row['header']=='主要控股参股公司分析':
+  if h!='控股参股公司/营业收入' or compact(q)!=compact('子公司：'+n['name']):return False
+ elif row['header']=='重要非全资子公司的主要财务信息':
+  if h!='重要非全资子公司/本期营业收入':return False
+ elif row['header']=='出售商品/提供劳务':
+  if h!='出售商品/提供劳务/本期发生额' or compact(q)!=compact('交易对方：'+row['counterparty']):return False
+ elif row['header']=='作为出租人的经营租赁':
+  if h!='作为出租人的经营租赁/租赁收入':return False
+ else:return False
+ actor=row['source_actor']
+ if actor=='公司及合并子公司':return r['subject_scope']=='consolidated_group'
+ if '（母公司）' in actor:return r['subject_scope']=='issuer'
+ return r['subject_scope']=='named_subsidiary' and compact(actor)==compact(aliases.get(n['name'],n['name']))
+role_name_alias={'黄山旅游官方平台运营':'黄山旅游官方平台','新媒体运营':'新媒体','OTA业务承接':'OTA'}
+for ins in scope['versions']:
+ raw=read(Path('/tmp/v45_unseen_actual_'+ins+'.json'));facts={};extra=set();roles=[r for r in scope['native_roles'] if r['instrument_id']==ins]
+ for idx,r in enumerate(raw):
+  kind=r['object_type'];n=r['source_native'];ep=sorted({p for e in r['evidence'] for p in [e.get('page'),*e.get('continuation_pages',[]),*e.get('subject_evidence_pages',[])] if p});extra.update(ep);source=compact('\n'.join(all_sources[ins][p-1]['text'] for p in ep));d=dict(review_index=idx,verified_source_pages=ep,actual_object_type=kind,actual_native_name=n['name'],actual_action=r.get('action'),actual_relation_type=r.get('relation_type'),actual_subject_scope=r['subject_scope'],critical_numeric_error=False)
+  if idx in errors[ins]:d.update(accurate=False,reason=errors[ins][idx])
+  elif kind in ['Segment','Measurement']:
+   assert num(n['value']) in num(source),(ins,idx,n)
+   matches=[j for j,row in enumerate(scope['source_rows'][ins]) if native_match(r,row)]
+   if not matches:
+    assert ins=='600084.SH' and idx in [35,36],(ins,idx,n)
+    assert n['name']=='正常经营之外的其他业务收入' and n['value']=='555.89' and n['unit']=='万元' and r['subject_scope']=='consolidated_group' and n['header']=='其他业务收入扣除明细/本年度'
+    d.update(accurate=True,reason='合同外p10本年度正常经营之外的其他业务收入555.89万元，原第1项及本期列明确，计准确率不新增召回条件')
+   else:
+    assert len(matches)==1,(ins,idx,matches)
+    d.update(accurate=True,reason='独立官方页和布局核本期原格、金额、单位、原栏目和精确交易对手／主体；原合并母公司及同页不同口径独立，不凭同额互替。')
+    if kind=='Segment':d['recall_row_index']=matches[0]
+  elif kind=='BusinessOverview':
+   for token in re.findall(r'\d[\d,]*(?:\.\d+)?',r['source_text']):
+    if len(token.replace(',',''))>5:assert num(token) in num(source),(ins,idx,token)
+   d.update(accurate=True,reason='逐段官方plain/layout原文支持该片段，保留原子公司、状态、原本期及上期列；原表引用不视作其全部数值的肯定营收。片段准确不替代完整最终正文。',exact_compact_quote_in_source=compact(r['source_text']) in source)
+  elif kind=='Activity':
+   assert ins=='600054.SH' and idx in range(2,14) and r['subject_scope']=='consolidated_group' and compact(n['name']) in source
+   assert r.get('source_verb') in ['涵盖','接待'],(idx,r.get('source_verb'))
+   d.update(accurate=True,reason='p10当前原智慧旅游／旅行社业务涵盖该精确对象；operates只表达当前具名业务经营，不升为生产销售。旅游产品与活动策划两片段合法，但不能单个替代合同完整联合服务对象。')
+   for j,role in enumerate(roles):
+    rn=role_name_alias.get(compact(n['name']),compact(n['name']))
+    action=r['action'] in role['source_actions'] or (idx in [2,3,4,5,7] and r['action']=='operates' and role['source_actions']==['provides_service'])
+    if rn==compact(role['name']) and action and role['page'] in ep and role['source_actor']=='公司及合并子公司':d['recall_role_index']=j
+  else:raise AssertionError((ins,idx,kind))
+  assert r['record_id'] not in facts
+  facts[r['record_id']]=d
+ # All measurements are separately scored; same native tuple and scope must have an actual paired Segment.
+ for r in raw:
+  if r['object_type']=='Measurement':
+   assert any(v['object_type']=='Segment' and v['source_native']==r['source_native'] and v['subject_scope']==r['subject_scope'] and v['reported_period']==r['reported_period'] and v.get('dimension')==r.get('segment_dimension') for v in raw),r['record_id']
+ p=read(R/'data/exports/m4_v45_unseen_small_batch'/ins/(ins+'_2025-12-31.json'));answers={}
+ for dim in p['dimensions']:
+  key=dim['dimension_id'];rule=scope['answers'][ins][key];txt=compact(dim['excerpt']);failed=[g for g in rule['required_groups'] if not any(compact(t) in txt for t in g)]
+  if ins=='600054.SH' and key=='principal_business':reason='六类主业及原子公司已进入正文；但原合同p11新项目投入运营／前期／测试状态和p156重要合营联营不适用边界尚未进入最终正文，不能仅凭七类主业关键词判完整。'
+  elif ins=='600054.SH' and key=='products_services':reason='p9–10景区索缆、酒店徽菜及旅行智慧旅游矩阵成立；缺p11AI旅行助手SaaS已拓展及智能装备公开测试／仅部分租售限定，未满足原实质合同。'
+  elif ins=='600054.SH':reason='缺p95园林票证验证扣代管委会款分成、索道票、客房餐饮收款权及三种旅行完成时点；代收代付／资源费营业成本及原抵销口径未完整进入正文。'
+  elif key=='principal_business':reason='p12采购生产销售和p31原具名子公司链成立；原合同p14–15集种植、加工、贸易、科研产业链及品牌／科研当前状态未进入正文。交易对手名称含贸易／科研不是公司该业务的实质回答。'
+  elif key=='products_services':reason='缺中低档与品牌档次矩阵、包装材料采购及农户技术指导等实质内容；p31原主体表片段不替代完整产品服务回答。'
+  else:reason='缺经销先款后货／现款现货与信用账期、交付签单／第三方网店收款／无第三方对账／自提签运单及可变返利限制；另肯定列举五个截断子公司收入主体，正文不完整且主体错误。'
+  answers[key]=dict(accurate=False,critical_numeric_error=False,reason=reason,failed_groups=failed,all_supporting_records_checked=True)
+ decisions[ins]=dict(facts=facts,answers=answers);frozen=set(scope['versions'][ins]['checked_pages']);supp[ins]=dict(document_version=scope['versions'][ins]['sha256'],pages=[p for p in all_sources[ins] if p['page'] in extra-frozen])
+ print(ins,'facts',len(raw),'correct',sum(d['accurate'] for d in facts.values()),'income',len(set(d['recall_row_index'] for d in facts.values() if 'recall_row_index' in d)),'roles',len(set(d['recall_role_index'] for d in facts.values() if 'recall_role_index' in d)))
+save(C/'actual-object-decisions.json',decisions);save(C/'actual-object-supplemental-source-pages.json',supp)
+save(C/'source-contract-interpretation.json',dict(original_scope_unchanged=True,substance_or_denominator_changed=False,dimension_aliases={'出售商品/提供劳务原栏目product':'service仅统一复合原栏目，不改酒销售商品含义、金额、精确交易方、集团范围；不是劳务重新分类','成品酒小计product':'total且小计限定'},action_aliases={'涵盖国内/入境/出境/定制/疗休养':'operates精确当前具名服务经营，可对应provides_service实质条件','平台运营/新媒体运营/OTA业务承接':'各自同一具名对象；不采用误写的跨对象别名'},joint_planning_policy='旅游产品和活动策划原完整联合条件只计一次；两个合法经营片段不单个替代完整联合策划服务',accuracy_policy='277实际record_id＋6已答正文唯一计分；Measurement配对且只准确率；合同外555.89万元计准确率；金额正确不能抵消截断主体、交易对手或销售模式；原片段表格/否定/上期不是当前肯定营收',answer_policy='required_groups只辅助；按原substance完整判断，不以关键词/core_complete判断'))

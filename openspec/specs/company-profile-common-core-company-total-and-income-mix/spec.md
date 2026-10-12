@@ -92,3 +92,15 @@ Native joint-venture and associate financial-information spans MUST be limited t
 #### Scenario: A valid joint-venture table declares its unit before the heading
 - **WHEN** an applicable native financial table has a supported financial-unit declaration before the current relation heading
 - **THEN** its current income retains that unit and original relation identity rather than borrowing another section's scope
+
+### Requirement: Wrapped native income retains original actors and independent table columns
+Native wrapped product labels, company names and counterparty names MUST be rejoined within their original row without absorbing table headings. Continuation pages MUST retain the original contract classification and report-segment columns. Each paired Segment/Measurement MUST preserve original actor, period, column, printed unit, printed zero and elimination basis; current blank cells MUST NOT borrow prior amounts or become zero. Generic company/group self-references MUST remain issuer/group references rather than expanding into a subsidiary alias. Named actor definitions MAY have multiple aliases and soft line wraps while retaining their original relationship scope.
+
+#### Scenario: A product or subsidiary name wraps through a table header
+- **WHEN** a native income row wraps its product or company name and the current table also contains a financial heading
+- **THEN** acceptance, query and export retain the complete original label and actor without header pollution, with the correctly paired Measurement
+
+#### Scenario: Related sales retain the group and native relationship category
+- **WHEN** the current related-party sale table uses company/group self-reference and separate relationship categories
+- **THEN** income keeps the seller's original consolidated-group scope and the counterparty category without making the category a subsidiary seller
+- **AND** contract-segment columns, parent income, joint ventures and associates remain distinct and are not accumulated across bases

@@ -1,0 +1,15 @@
+{
+  "original_scope_unchanged": true,
+  "substance_or_denominator_changed": false,
+  "dimension_aliases": {
+    "出售商品/提供劳务原栏目product": "service仅统一复合原栏目，不改酒销售商品含义、金额、精确交易方、集团范围；不是劳务重新分类",
+    "成品酒小计product": "total且小计限定"
+  },
+  "action_aliases": {
+    "涵盖国内/入境/出境/定制/疗休养": "operates精确当前具名服务经营，可对应provides_service实质条件",
+    "平台运营/新媒体运营/OTA业务承接": "各自同一具名对象；不采用误写的跨对象别名"
+  },
+  "joint_planning_policy": "旅游产品和活动策划原完整联合条件只计一次；两个合法经营片段不单个替代完整联合策划服务",
+  "accuracy_policy": "277实际record_id＋6已答正文唯一计分；Measurement配对且只准确率；合同外555.89万元计准确率；金额正确不能抵消截断主体、交易对手或销售模式；原片段表格/否定/上期不是当前肯定营收",
+  "answer_policy": "required_groups只辅助；按原substance完整判断，不以关键词/core_complete判断"
+}

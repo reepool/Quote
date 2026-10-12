@@ -1,0 +1,6 @@
+import json,hashlib
+from pathlib import Path
+R=Path.cwd();C=R/'openspec/changes/deliver-company-profile-m4-v45-unseen-small-batch';P=R/'data/checkpoints/company_profile_common_core/reports/m4_v45_unseen_small_batch';B=R/'data/research/company_profile_common_core/m4_v45_unseen_small_batch';E=R/'data/exports/m4_v45_unseen_small_batch';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+assert (P/'formal_execution.json').exists() and not (C/'first-formal-delivery-preservation.json').exists()
+paths=list(P.glob('*.json'))+[p for p in B.rglob('*') if p.is_file()]+[p for p in E.rglob('*') if p.is_file()]
+initial={str(p.relative_to(R)):sha(p) for p in paths};(C/'first-formal-delivery-preservation.json').write_text(json.dumps(dict(formal_execution_index=1,sha256=initial),ensure_ascii=False,indent=2)+'\n');print('Preserved',len(initial),'first formal artifacts')

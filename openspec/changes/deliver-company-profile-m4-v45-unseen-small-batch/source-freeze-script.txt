@@ -1,0 +1,117 @@
+import json,hashlib,re
+from pathlib import Path
+from datetime import datetime,timezone
+R=Path.cwd();C=R/'openspec/changes/deliver-company-profile-m4-v45-unseen-small-batch';read=lambda p:json.loads(p.read_text());save=lambda p,v:p.write_text(json.dumps(v,ensure_ascii=False,indent=2)+'\n');sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();compact=lambda s:re.sub(r'\s+','',s or '')
+f=read(C/'freeze-receipt.json');plan=f['plan'];a,b='600054.SH','600084.SH';full={i:read(Path('/tmp/quote_v45_unseen_source_'+i+'.json')) for i in [a,b]};layout=read(Path('/tmp/quote_v45_unseen_layout.json'));rows={a:[],b:[]};roles=[];neg=[]
+checked={a:set([4,5,9,10,11,12,14,15,16,22,23,24,25,54,76,94,95,97,98,139,140,150,152,153,154,155,156,163,164,165,166,167,168,169,172,173,182,183]),b:set([5,10,11,12,13,14,15,17,18,19,20,21,24,25,26,27,28,29,30,31,32,89,114,115,116,161,162,172,173,175,176,177,178,188,189,190,191,192,193,194,195,207,215,216])}
+def quote(i,p,cont=()):
+ for n in [p,*cont]:checked[i].add(n)
+ return '\n'.join(full[i][n-1]['text'] for n in [p,*cont])
+def row(i,p,dim,n,v,actor='公司及合并子公司',counterparty='',header='',unit='元',continuation=(),qualifier='',aliases=(),column='本期营业收入'):
+ q=quote(i,p,continuation);assert compact(n) in compact(q),(i,p,n);assert compact(v).replace(',','') in compact(q).replace(',',''),(i,p,n,v)
+ rows[i].append(dict(condition_id=f'{i}:income:{len(rows[i])+1:03}',page=p,dimension=dim,name=n,native_aliases=[n,*aliases],value=v,unit=unit,source_actor=actor,counterparty=counterparty,header=header,column=column,source_quote=q,qualifier=qualifier,reported_period='2025-12-31',continuation_pages=list(continuation)))
+def batch(i,p,dim,ns,vs,**kw):
+ for n,v in zip(ns.split('|'),vs.split('|'),strict=True):row(i,p,dim,n,v,**kw)
+batch(a,14,'industry','酒店业务|索道及缆车业务|景区业务|旅游服务业务|徽菜业务','492,026,389.87|842,155,363.75|293,201,670.78|532,255,057.39|245,296,390.79',header='主营业务分行业',qualifier='明确未合并抵消口径，与合并和分部表分开不累计')
+aliases_a={'玉屏索道':'黄山玉屏客运索道有限责任公司','太平索道':'黄山太平索道有限公司','黄山徽商故里集团':'黄山徽商故里文化发展集团有限公司','太平湖文旅':'黄山太平湖文化旅游有限公司','花山谜窟':'黄山市花山谜窟旅游开发有限责任公司','西海饭店':'黄山西海饭店有限责任公司'}
+for n,v in zip(aliases_a,['40,808.90','6,461.02','23,887.33','3,078.74','853.86','7,094.56'],strict=True):row(a,22,'business_segment',n,v,actor=aliases_a[n],header='主要控股参股公司分析',unit='万元',continuation=(4,))
+row(a,139,'business_type','主营业务','2,060,344,245.83',header='合并营业收入和营业成本',continuation=(140,))
+batch(a,140,'business_type','其他业务|合计','48,980,861.80|2,109,325,107.63',header='合并营业收入和营业成本',continuation=(139,))
+for n,v in [('玉屏索道','408,088,987.17'),('太平索道','64,610,231.24')]:row(a,155,'business_segment',n,v,actor=aliases_a[n],header='重要非全资子公司的主要财务信息',continuation=(4,154))
+row(a,150,'service','租赁收入','8,430,784.85',header='作为出租人的经营租赁')
+for party,n,v in [('黄山旅游集团及其子公司','房餐费、门票等','5,705,358.19'),('黄山管委会','房餐费、门票等','4,630,210.79'),('集散中心','票务手续费、餐费、住宿费等','681,021.49'),('贡阳商务','垃圾清运收入','250,763.88'),('六百里','房餐费、软件','95,905.44'),('田园徽州','房餐费','37,631.86'),('黄山见证影视','酒水销售','12,711.50'),('蓝城小镇','房餐费','11,332.98'),('安徽飞扬','房餐费','4,226.42'),('赛富基金公司','房餐费','2,358.49'),('合计','合计','11,431,521.04')]:row(a,164,'product' if n=='酒水销售' else 'service',n,v,counterparty=party,header='出售商品/提供劳务',qualifier='原本期出售劳务/商品，采购表不可收入化',continuation=(163,))
+for n,v in [('园林开发分部','26,720.83'),('旅游服务分部','175,469.62'),('其他分部','5,082.87'),('分部间抵销','-1,238.90'),('合计','206,034.42')]:row(a,173,'adjustment' if n=='分部间抵销' else 'business_segment',n,v,header='报告分部财务信息',unit='万元',qualifier='主营业务收入横向原列；原打印负抵销，与营业总收入不同',column=n,continuation=(172,))
+batch(a,182,'business_type','主营业务|其他业务|合计','1,051,348,952.01|46,199,590.81|1,097,548,542.82',actor='黄山旅游发展股份有限公司（母公司）',header='母公司营业收入和营业成本')
+batch(b,17,'industry','酒业类|其他|主营业务合计','116,645,913.82|651,614.74|117,297,528.56',header='主营业务分行业')
+batch(b,17,'product','高档酒|中低档酒|成品酒小计|原酒|其他|主营业务合计','50,607,158.27|62,414,780.74|113,021,939.01|3,623,974.81|651,614.74|117,297,528.56',header='主营业务分产品')
+batch(b,18,'region','华北地区|其他地区|主营业务合计','40,495,047.21|76,802,481.35|117,297,528.56',header='主营业务分地区')
+batch(b,18,'sales_mode','直销（含团购）|线上销售|批发代理—经销商|主营业务合计','52,820,481.26|19,772,203.39|44,704,843.91|117,297,528.56',header='主营业务分销售模式')
+batch(b,25,'product','高档|中低档','50,607,158.27|62,414,780.74',header='产品情况/销售收入',qualifier='原产品档次，代表品牌不拆成新销售事实')
+batch(b,26,'sales_mode','直销（含团购）|线上销售|批发代理—经销商','48,661,019.36|19,772,203.39|44,588,716.26',header='销售渠道/本期销售收入',qualifier='成品酒渠道，不能用主营业务金额替代')
+batch(b,27,'region','华北地区|其他地区','39,698,365.90|73,323,573.11',header='区域情况/本期销售收入',qualifier='成品酒地区原表，与主营地区不同')
+batch(b,28,'product','高档|中低档','10,049,417.68|9,722,785.71',header='线上销售情况/本期销售收入',qualifier='原电商平台及档次交叉格',counterparty='电商')
+batch(b,28,'product','高档酒|中低档酒|小计','50,607,158.27|62,414,780.74|113,021,939.01',header='主营业务构成/按产品档次')
+batch(b,28,'sales_mode','直销（含团购）|线上销售|批发代理—经销商|小计','48,661,019.36|19,772,203.39|44,588,716.26|113,021,939.01',header='主营业务构成/按销售渠道')
+batch(b,28,'region','华北地区|其他地区|小计','39,698,365.90|73,323,573.11|113,021,939.01',header='主营业务构成/按地区分部')
+for n,v in [('新疆尼雅葡萄酒有限公司','8,066.39'),('新疆尼雅生态农业科技开发有限公司','2,348.10'),('北京中葡尼雅经贸有限公司','7,646.48'),('新疆尼雅经贸有限公司','3,255.99'),('新疆中葡尼雅酒业销售有限公司','79.77')]:row(b,31,'business_segment',n,v,actor=n,unit='万元',header='主要控股参股公司分析',qualifier='徐州当期营业收入空不取营业利润158.81')
+batch(b,161,'business_type','主营业务|其他业务|合计','117,297,528.56|6,006,272.49|123,303,801.05',header='合并营业收入和营业成本')
+row(b,173,'service','租赁收入','3,767,404.67',header='作为出租人的经营租赁',continuation=(172,))
+row(b,178,'business_segment','新疆尼雅葡萄酒有限公司','80,663,853.51',actor='新疆尼雅葡萄酒有限公司',header='重要非全资子公司的主要财务信息',continuation=(177,))
+# Independent PDF layout reading distinguishes blanks from prior-only values; no production parser used.
+prior=[];rel=[]
+for pg in layout[b]:
+ if pg['page'] not in [191,192,193]:continue
+ ls=pg['text'].splitlines()
+ for j,line in enumerate(ls):
+  if '酒销售等' not in line:continue
+  party=line.split('酒销售等')[0].strip()
+  if j+1<len(ls) and ls[j+1].strip() in ['公司','司','限公司']:party+=ls[j+1].strip()
+  matches=list(re.finditer(r'-?\d[\d,]*\.\d+',line));curr=[m for m in matches if m.start()<58];prev=[m for m in matches if m.start()>=58]
+  assert len(curr)<=1 and len(prev)<=1
+  rec={'page':pg['page'],'party':party,'current':curr[0].group() if curr else None,'prior':prev[0].group() if prev else None,'layout_line':line}
+  rel.append(rec)
+  if curr:row(b,pg['page'],'product','酒销售等',curr[0].group(),counterparty=party,header='出售商品/提供劳务',continuation=(191,) if pg['page']!=191 else (),qualifier='原当期关联销售；空本期和仅上期不左移')
+  else:prior.append(rec)
+assert len(rel)==99 and len(prior)==30,(len(rel),len(prior))
+batch(b,216,'business_type','主营业务|其他业务|合计','17,470,631.91|3,538,723.76|21,009,355.67',actor='中信尼雅葡萄酒股份有限公司（母公司）',header='母公司营业收入和营业成本',continuation=(215,))
+def role(i,p,n,action,actor='公司及合并子公司',aliases=(),cont=(),qualifier=''):
+ q=quote(i,p,cont);assert compact(n) in compact(q) or any(compact(x) in compact(q) for x in aliases),(i,p,n)
+ roles.append(dict(condition_id=f'{i}:action:{sum(x["instrument_id"]==i for x in roles)+1:03}',instrument_id=i,name=n,native_aliases=[n,*aliases],source_actions=[action],source_relation_types=[],role='product_sales' if action=='sells' else 'raw_material_procurement' if action=='purchases' else 'service_provision' if action=='provides_service' else 'product_production' if action=='produces' else 'native_operating_action',page=p,source_quote=q,source_actor=actor,reported_period='2025-12-31',qualifier=qualifier,continuation_pages=list(cont),quantity_acceptance='仅证明动作，不扩量价'))
+for n in ['黄山景区','花山谜窟景区','太平湖景区']:role(a,9,n,'operates',qualifier='原公司当前景区运营')
+for n in ['黄山云谷索道','玉屏索道','太平索道','西海观光缆车']:role(a,9,n,'operates',qualifier='原公司拥有并运营客运观光')
+for n in ['住宿','餐饮']:role(a,9,n,'provides_service',cont=(10,),qualifier='酒店实际旅宿服务')
+role(a,10,'徽菜餐饮','provides_service',aliases=('徽菜餐饮等服务',))
+for n in ['国内旅游','入境旅游','出境旅游','定制游','会展服务','疗休养']:role(a,10,n,'provides_service',qualifier='当前旅行社具体服务')
+for n in ['黄山旅游官方平台','新媒体','OTA']:role(a,10,n,'operates',aliases=('黄山旅游官\n方平台',),qualifier='原智慧旅游平台业务')
+for n in ['旅游产品和活动策划','旅游服务接待']:role(a,10,n,'provides_service')
+role(a,10,'旅游商品','sells',qualifier='明确在线销售，不将政策趋势当商品')
+role(a,11,'AI旅行助手SaaS平台','provides_service',aliases=('AI 旅行助手 SaaS 平台',),qualifier='已对外拓展部分景区，不声称全市场')
+for n in ['垃圾清运','软件']:role(a,164,n,'provides_service',aliases=('垃圾清运收入',),qualifier='原本期关联服务，不按收款推采购或投入')
+role(a,164,'酒水','sells',aliases=('酒水销售',))
+role(a,164,'茶叶','purchases',aliases=('茶叶款',),qualifier='本期六百里采购，不推投入')
+role(a,150,'租赁','provides_service',aliases=('租赁收入',),qualifier='当前经营租赁，不将承租支出作为出租')
+for n in ['成品酒','原酒']:
+ for act in ['produces','sells']:role(b,19,n,act,qualifier='本期生产量／销量均正数，分别证明动作')
+for n in ['高档','中低档']:
+ for act in ['produces','sells']:role(b,25,n,act,aliases=(n+'酒',),qualifier='原葡萄酒档次，不将品牌拆成新动作')
+role(b,12,'酿酒葡萄','purchases',aliases=('酿酒葡萄原料',),cont=(25,),qualifier='原公司＋农户按合同质量标准收购；不由采购推投入')
+role(b,12,'葡萄','produces',cont=(14,),qualifier='原葡萄种植动作；与原酒生产分开')
+role(b,25,'生产管理及技术指导','provides_service',aliases=('生产管理及技术指导服务','技术指导'),cont=(12,),qualifier='对农户按合同提供实际服务，非科研计划')
+role(b,26,'包装材料','purchases',qualifier='本期明确原料采购格，不推制造投入')
+for act in ['produces','processes','sells']:role(b,31,'葡萄酒',act,actor='新疆尼雅葡萄酒有限公司',cont=(5,),qualifier='原具名子公司生产加工销售')
+for n in ['葡萄','农作物','林木']:role(b,31,n,'produces',actor='新疆尼雅生态农业科技开发有限公司',qualifier='原子公司种植，不集团化')
+for act in ['purchases','sells']:role(b,31,'农副产品',act,actor='新疆尼雅生态农业科技开发有限公司',qualifier='原子公司购销分开')
+role(b,31,'葡萄酒','sells',actor='北京中葡尼雅经贸有限公司')
+role(b,31,'预包装食品','sells',actor='新疆尼雅经贸有限公司',qualifier='原子公司批发')
+role(b,31,'预包装食品','sells',actor='徐州国安尼雅酒业有限责任公司',qualifier='原明确业务性质销售；收入本期空不凭利润造收入')
+role(b,176,'酒类','sells',actor='新疆中葡尼雅酒业销售有限公司',cont=(31,5),qualifier='集团构成实际销售及原酒类经营，不把名称单独当动作')
+answers={a:{'principal_business':dict(source_pages=[9,10,11,22,152,153,154,156],required_groups=[['景区'],['索道'],['缆车'],['酒店'],['徽菜'],['旅行社'],['智慧旅游']],substance='六业务和现有景区索道／酒店／徽菜／旅行社／智慧旅游全链；原玉屏/太平等子公司，重要合营联营不适用、少数比例不直接推参股；新项目运营/在建/前期/测试状态分开。'), 'products_services':dict(source_pages=[9,10,11,12],required_groups=[['黄山'],['花山谜窟'],['太平湖'],['云谷'],['玉屏'],['太平索道'],['西海'],['住宿'],['餐饮'],['入境'],['出境'],['会展'],['疗休养'],['OTA'],['在线销售','商品在线']],substance='具名三景区和四索缆客运观光、住宿餐饮酒店品牌作为品牌而非伪商品、徽菜、国内外/定制/会展/疗休养、官方平台/新媒体/OTA/策划接待/商品在线、AI助手已拓展部分景区；智能装备只部分出租出售不能每项推销售。'), 'revenue_model':dict(source_pages=[14,94,95,98,139,140,150,164,168,169,173,182],required_groups=[['验证'],['代扣','扣减'],['分成'],['索道票'],['客房'],['收款权利','营业款'],['离境'],['返境'],['返回本地'],['直线法'],['抵消','抵销'],['代收代付']],substance='园林单票验证消费完成扣减代管委会收款后分成，索道验证服务完成扣代扣款；客房餐饮服务及收款权；入境结束离境/出境返境/国内返本地；出租直线确认，旅游服务关联收入，代收代付不是营收，资源费改列营业成本；主营抵销前与合并/分部/母公司分开')},b:{'principal_business':dict(source_pages=[5,12,14,15,31,176,177],required_groups=[['葡萄种植','葡萄的种植'],['生产'],['加工'],['销售'],['公司+农户','公司＋农户'],['以销定产'],['库存'],['子公司']],substance='集葡萄种植生产加工销售/贸易科研产业链，原公司＋农户采购、以销定产及销量合理库存、原具名子公司生产/农业/销售，品牌非单独商品；研发与当前业务区别。'), 'products_services':dict(source_pages=[12,14,19,25,26,31],required_groups=[['葡萄酒'],['成品酒'],['原酒'],['高档'],['中低档'],['酿酒葡萄'],['包装材料'],['预包装食品'],['农副产品']],substance='葡萄酒成品酒/原酒及高档中低档、西域尼雅新天等为品牌背景；采购葡萄与包装材料、农户技术指导、具名农业公司葡萄农作物林木农副购销及原销售子公司预包装食品，不把费用或供应商名称推商品。'), 'revenue_model':dict(source_pages=[12,26,27,28,114,115,161,173,191,192,193,216],required_groups=[['经销'],['直销'],['线上'],['先款后货','现款现货'],['账期'],['签字','盖章'],['第三方支付'],['对账'],['自提'],['货运单'],['返利']],substance='经销/团购直销/抖音京东天猫C端、经销每年合同先款后货/现款现货及信用账期；交付签提货/入库/货权单、第三方网店发货收到款/无第三方发货对账/自提签运单；可变返利限制、营业/出租/母公司/关联各原口径，本期空不借上期')} }
+def negative(i,p,n,rule,cont=(),**kw):neg.append(dict(condition_id=f'{i}:negative:{sum(r["instrument_id"]==i for r in neg)+1:03}',instrument_id=i,page=p,name=n,rule=rule,source_quote=quote(i,p,cont),continuation_pages=list(cont),**kw))
+negative(a,14,'抵销前行业不混合并','五行业收入明确未抵消，不与合并总额勾稽成伪合计')
+negative(a,14,'成本表非收入','同行成本/毛利与下一成本表不可营业收入化',cont=(15,))
+negative(a,11,'测试装备不逐项销售','登山杖髌骨带外骨骼及机器狗公开测试，只有部分租售，不能推每项已售/已产')
+negative(a,11,'前期工程不当前酒店服务','黄山国际大酒店升级工程前期设计与已投入运营的酒店分开，不将工程前期当当前新项目服务')
+negative(a,10,'行业政策非公司动作','行业冰雪/低空/银发等趋势不升公司具名经营',cont=(11,))
+negative(a,156,'不适用合营联营无收入','无重要合营联营，汇总净利润和投资账面价值非营业收入')
+negative(a,164,'采购不营业收入','水电洗涤茶叶采购不作为收入；出售表合法收入保留')
+negative(a,165,'关联出租不适用','关联出租不适用不能读入p166承租款；p150真实出租8430784.85保留',cont=(166,150))
+negative(a,168,'代收非收入','258273193.40/99359311.73代收代付不可营收；2025资源费142101740.37是营业成本',cont=(169,))
+negative(a,182,'投资收益非收入','母公司三收入与下一投资收益分开',cont=(183,))
+negative(b,31,'徐州收入空不借利润','徐州当期营业收入空，158.81万元为营业利润/净利，不得造收入或零')
+negative(b,17,'跨表口径不可混并','主营地区40495047.21与成品酒39698365.90、主营直销52820481.26与成品酒48661019.36各原页保留',cont=(18,26,27,28))
+negative(b,25,'品牌不伪商品动作','西域尼雅新天代表品牌不能无具体商品/动作独立生成Activity')
+negative(b,26,'采购不推投入','包装/能源采购原表只证明购买，泛能源不推具名燃料投入')
+negative(b,24,'无在建产能','在建产能不适用，设计产能和实际产能不生成当期销售或在建产能')
+negative(b,161,'费用表不收入','收入表在62税金结束，税金销售费用非收入',cont=(162,))
+negative(b,172,'承租支出非租赁收入','利息64352.09短租1505593.24/60377.36和现金流421350不能作收入；p173真实租赁保留',cont=(173,))
+negative(b,178,'不适用权益无收入','重要合营联营不适用不得读后续政府补助生营收')
+negative(b,193,'关联出租不适用','关联出租不适用，无当前关联租赁；p173一般出租合法收入保留',cont=(194,173))
+negative(b,207,'报告分部不适用','不能从后续母公司表生成报告分部财务收入')
+negative(b,216,'母公司投资收益非收入','2755088.52是股利投资收益，不作营业收入')
+for rec in prior:negative(b,rec['page'],'仅上期销售:'+rec['party'],'该交易本期空，不左移上期、不造0、不生成本期收入',counterparty=rec['party'],prior_value=rec['prior'],cont=(191,) if rec['page']!=191 else ())
+versions={r['instrument_id']:dict(sha256=r['document_version'],pdf=str(Path('data/filings/announcements/blobs')/r['document_version'][:2]/(r['document_version']+'.pdf')),checked_pages=sorted(checked[r['instrument_id']])) for r in plan['reports']}
+scope=dict(created_at=datetime.now(timezone.utc).isoformat(),fixed_before_formal_execution=True,plan_id=plan['plan_id'],processing_identity=f['processing_identity'],knowledge_cutoff=plan['knowledge_cutoff'],shared_token_budget=50000,official_reports=plan['reports'],versions=versions,answers=answers,source_rows=rows,native_roles=roles,negative_conditions=neg,denominator_method='6实质正文＋检查表重要本期原收入格（页/原栏目/主体/单位独立）＋明确当前具名动作；Measurement只计准确率，同条件多证据/别名不重计。新分母不继承209/420，不由输出决定。',income_sampling_policy='有限原MD&A全部重要收入行、行业经营性原产品/渠道/区域/电商/酒构成、主要子公司非空收入、合并母公司主营其他合计、重要非全资、所有本期关联销售、经营出租及报告分部；非营业投资收益/代收/承租/仅上期独立负例；不声明全年报完整性。',dimension_mapping={'recognition_time':'revenue_timing','consumes':'material_input','leases':'provides_service'},acceptance_thresholds=dict(recall=1.0,accuracy=1.0,critical_numeric_errors=0,whole_round_seconds=300,shared_tokens=50000),production_authorization='not_authorized',scale_quality_claim_allowed=False)
+assert not (R/'data/checkpoints/company_profile_common_core/reports/m4_v45_unseen_small_batch/formal_execution.json').exists()
+save(C/'source-scope.json',scope);save(C/'independent-frozen-source-pages.json',{i:dict(document_version=versions[i]['sha256'],pdf=versions[i]['pdf'],pages=[p for p in full[i] if p['page'] in checked[i]]) for i in [a,b]});save(C/'independent-income-layout-pages.json',layout);save(C/'independent-associated-sales-ledger.json',{'rows':rel,'current_count':len(rel)-len(prior),'prior_only_count':len(prior),'all_prior_only_current_blank':True,'layout_method':'Official p191-193 original aligned current/prior cells; wrap tails reattached to original name; no profile extraction used'})
+counts=dict(answers=6,income_conditions=sum(map(len,rows.values())),native_roles=len(roles));save(C/'source-freeze-receipt.json',dict(created_at=datetime.now(timezone.utc).isoformat(),processing_identity=f['processing_identity'],plan=plan,executed_code_sha256=f['executed_code_sha256'],source_scope_sha256=sha(C/'source-scope.json'),source_pages_sha256=sha(C/'independent-frozen-source-pages.json'),source_layout_sha256=sha(C/'independent-income-layout-pages.json'),source_condition_count=sum(counts.values()),counts=counts,negative_count=len(neg),fixed_before_formal_execution=True,scores_prefilled=False,accuracy_denominator_prefilled=False,repair_flags=f['repair_flags'],default_identity_unchanged=True,official_page_count=sum(map(len,checked.values()))))
+print('SOURCE_FIXED',counts,'total',sum(counts.values()),'income_by_company',{i:len(v) for i,v in rows.items()},'roles_by_company',{i:sum(r['instrument_id']==i for r in roles) for i in [a,b]},'negative',len(neg))

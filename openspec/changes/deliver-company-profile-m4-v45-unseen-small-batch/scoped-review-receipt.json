@@ -1,0 +1,22 @@
+{
+  "review_scope": "本人主规格同步、有限归档路径及新change来源/执行/唯一复核/失败分支材料；业务抽取代码未改",
+  "review_method": "逐项对照原PDF和冻结合同、首轮实际对象、准确率唯一性/Measurement配对、51负例、原期间/栏目/单位/交易对手；对照任务起始Git及保护hash；只处理范围内真实性问题",
+  "blocking_material_defects": [],
+  "business_acceptance": "failed",
+  "business_defects_registered": [
+    "六正文实质缺口",
+    "旅游商品在线商品渠道混合",
+    "11收入原行身份错误及51收入条件未满足",
+    "42具名动作漏交付"
+  ],
+  "nonblocking_suggestions_deferred": [
+    "性能",
+    "行业增强",
+    "量价成本",
+    "正文精简",
+    "框架",
+    "无关旧问题"
+  ],
+  "original_worktree_modifications_untouched": true,
+  "ready_to_commit_current_task_only": true
+}

@@ -1,0 +1,23 @@
+{
+  "new_change_strict_valid": true,
+  "main_specs_strict_valid": [
+    "deliver-company-profile-m4-v44-unseen-small-batch",
+    "company-profile-common-core-company-total-and-income-mix",
+    "company-profile-common-core-owned-page-facts"
+  ],
+  "diff_check_passed": true,
+  "executed_business_rounds": 1,
+  "business_code_changed": false,
+  "pytest_run_in_this_task": false,
+  "old_v45_tests_not_new_sample_acceptance": true,
+  "actual_numeric_cells_independently_checked": 236,
+  "actual_overview_quotes_independently_checked": 28,
+  "layout_reading_order_cases_manually_verified": 2,
+  "distinct_layout_page_count": 47,
+  "historical_count": 2632,
+  "first_artifact_count": 18,
+  "execution_module_count": 38,
+  "all_protected_hashes_unchanged": true,
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false
+}

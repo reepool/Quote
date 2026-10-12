@@ -1,0 +1,33 @@
+{
+  "old_v45_spec_sync_and_archive_completed": true,
+  "new_first_round_completed": true,
+  "formal_execution_count": 1,
+  "source_recall": {
+    "status": "assessed",
+    "numerator": 112,
+    "denominator": 211,
+    "value": 0.5308056872037915
+  },
+  "source_accuracy": {
+    "status": "assessed",
+    "numerator": 254,
+    "denominator": 283,
+    "value": 0.8975265017667845
+  },
+  "critical_numeric_errors": 0,
+  "negative_count": 51,
+  "negative_passed_count": 51,
+  "whole_round_seconds": 209.14687994401902,
+  "tokens_used": 0,
+  "source_condition_count": 211,
+  "source_fixed_before_first_execute": true,
+  "actual_runtime_no_reuse": true,
+  "query_export_disk_equal": true,
+  "business_code_changed": false,
+  "business_acceptance": "failed",
+  "new_change_archived": false,
+  "next_pair_started": false,
+  "repair_tasks_registered_only": true,
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false
+}

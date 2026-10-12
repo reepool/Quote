@@ -1,0 +1,52 @@
+"""Evaluate declared negatives on actual first accepted output and answered text."""
+import json,re
+from pathlib import Path
+C=Path('openspec/changes/deliver-company-profile-m4-v45-unseen-small-batch');read=lambda p:json.loads(p.read_text());s=read(C/'source-scope.json');raw={i:read(Path('/tmp/v45_unseen_actual_'+i+'.json')) for i in s['versions']};out=[];compact=lambda x:re.sub(r'\s+','',x or '').replace(',','').replace('（','(').replace('）',')')
+for n in s['negative_conditions']:
+ i=n['instrument_id'];rr=raw[i];f=[r for r in rr if r['object_type'] in ['Segment','Measurement']];a=[r for r in rr if r['object_type'] in ['Activity','Relationship']];rule=n['name'];wrong=[];reason=''
+ if rule.startswith('仅上期销售:'):
+  party=compact(n['counterparty']);wrong=[r for r in f if compact(r['source_native'].get('qualifier'))==compact('交易对方：'+n['counterparty']) and '出售商品' in (r['source_native'].get('header') or '')]
+  reason='独立layout确认该原交易本期空；检查交易对手身份，不凭相同上期金额拒绝其他合法本期交易。原引用表保留上期数不是当前肯定收入。'
+ elif rule in ['不适用合营联营无收入','不适用权益无收入']:
+  wrong=[r for r in f if any(x in (r['source_native'].get('header') or '') for x in ['重要合营','重要联营'])];reason='章节原不适用；实际未生成对应关系栏目收入。'
+ elif rule=='关联出租不适用':
+  wrong=[r for r in f if '本公司作为出租方' in (r['source_native'].get('header') or '')];reason='关联出租不适用，实际未生成关联出租收入；一般经营租赁另有真实原栏。'
+ elif rule=='报告分部不适用':
+  wrong=[r for r in f if '报告分部' in (r['source_native'].get('header') or '')];reason='后续母公司三收入未变为报告分部。'
+ elif rule=='徐州收入空不借利润':
+  wrong=[r for r in f if '徐州' in r['source_native']['name'] or (r['source_native']['value']=='158.81' and r['source_native']['unit']=='万元')];reason='徐州本期营业收入空，营业利润/净利润158.81万元未生成收入或零。'
+ elif rule=='测试装备不逐项销售':
+  wrong=[r for r in a if any(x in r['source_native']['name'] for x in ['登山杖','髌骨带','外骨骼','机器狗']) and r.get('action') in ['sells','produces']];reason='未从部分产品租售推每项具名装备销售生产；正文未肯定每项，此负例通过不消除正向漏交付。'
+ elif rule=='前期工程不当前酒店服务':
+  wrong=[r for r in a if '升级改造' in r['source_native']['name'] and r.get('action') in ['operates','provides_service']];reason='现有国际大酒店与升级改造工程不同对象；未把前期工程升为新项目已服务。'
+ elif rule=='行业政策非公司动作':
+  wrong=[r for r in a if any(x in r['source_native']['name'] for x in ['冰雪','低空','银发'])];reason='行业趋势没有生成当前具名经营。'
+ elif rule=='品牌不伪商品动作':
+  wrong=[r for r in a if r['source_native']['name'] in ['西域','尼雅','新天','天方夜谭']];reason='未单独把品牌名转为商品动作。'
+ elif rule=='采购不推投入':
+  wrong=[r for r in a if r.get('relation_type')=='material_input' and any(x in r['source_native']['name'] for x in ['能源','包装'])];reason='只有采购原表不推实际制造投入，未推具体燃料。'
+ elif rule=='无在建产能':
+  wrong=[r for r in a if '在建产能' in r['source_native']['name']];reason='不适用在建章节未升为实际在建产能／销售。'
+ elif rule in ['抵销前行业不混合并','跨表口径不可混并']:
+  wrong=[]
+  if i=='600054.SH':
+   wrong=[r for r in f if r['source_native']['name']=='合计' and compact(r['source_native']['value'])=='2404938872.58']
+   reason='五行业金额原抵销前，合并收入另列；已答正文含原未合并抵消说明，没有强制勾稽伪合计。'
+  else:
+   wrong=[r for r in f if r['source_native']['name']=='华北地区' and compact(r['source_native']['value'])=='39698365.90' and any(e['page']==17 for e in r['evidence']) or r['source_native']['name']=='直销（含团购）' and compact(r['source_native']['value'])=='48661019.36' and any(e['page']==17 for e in r['evidence'])]
+   reason='当前主营地区/销售方式保留原金额而未借成品酒对应表金额；直销标签截断另计准确率错误，成品酒表漏项另计召回。'
+ else:
+  financial_pages={n['page'],*n.get('continuation_pages',[])}
+  # The declared exclusions refer to exact original non-income lines; pair/page/amount checked, not a keyword match.
+  values={'代收非收入':['258273193.40','99359311.73','142101740.37'],'母公司投资收益非收入':['2755088.52'],'承租支出非租赁收入':['64352.09','1505593.24','60377.36','421350.00']} .get(rule,[])
+  if rule in ['成本表非收入','采购不营业收入','投资收益非收入','费用表不收入']:
+   wrong=[r for r in f if any(x in (r['source_native'].get('header') or '') for x in {'成本表非收入':['营业成本','成本构成'],'采购不营业收入':['采购商品','接受劳务'],'投资收益非收入':['投资收益'],'费用表不收入':['销售费用','税金及附加']}[rule])]
+   reason='所有实际收入已逐对象对独立来源原营业收入格核验，没有从原成本/采购/投资/费用格转为营收；原引用表中非营收数字未视作肯定营收。'
+  else:
+   assert values,rule
+   wrong=[r for r in f if compact(r['source_native']['value']) in values];reason='逐核声明原非营业收入金额，实际未生成Segment/Measurement，已答正文未将原代收/承租/投资数肯定为营收。'
+ controls=[r['record_id'] for r in f if r['source_native']['name'] in ['主营业务','其他业务','租赁收入']]
+ p=read(Path('data/exports/m4_v45_unseen_small_batch')/i/(i+'_2025-12-31.json'))
+ out.append(dict(condition=n,evaluation_status='evaluated',actual_profile_exists=True,accepted_facts_and_all_answered_texts_checked=True,answered_dimension_ids=[d['dimension_id'] for d in p['dimensions'] if d['answered']],passed=not wrong,wrong_accepted_object_ids=[r['record_id'] for r in wrong],positive_control_object_ids=controls,reason=reason))
+assert len(out)==len(s['negative_conditions'])
+(C/'negative-review-evidence.json').write_text(json.dumps(dict(conditions=out,negative_count=len(out),actually_evaluated_count=len(out),passed_count=sum(r['passed'] for r in out),failed_count=sum(not r['passed'] for r in out),unevaluable_count=0,original_contract_unchanged=True),ensure_ascii=False,indent=2)+'\n');print('NEGATIVES',sum(r['passed'] for r in out),'/',len(out))
