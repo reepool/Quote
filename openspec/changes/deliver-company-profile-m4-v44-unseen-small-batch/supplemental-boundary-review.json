@@ -1,0 +1,209 @@
+{
+  "conditions": [
+    {
+      "condition_id": "600052.SH:negative:001",
+      "name": "政策非当前业务",
+      "instrument_id": "600052.SH",
+      "page": 12,
+      "passed": true,
+      "actually_evaluated": true,
+      "facts_and_full_answer_checked": true,
+      "independent_substance_reason": "实际唯一东望Activity为另计错误的伪采购；正文政策段保留政策主体，不将智能快递柜/无人超市陈述为公司当前经营。"
+    },
+    {
+      "condition_id": "600052.SH:negative:002",
+      "name": "影视无新项目投资",
+      "instrument_id": "600052.SH",
+      "page": 12,
+      "passed": true,
+      "actually_evaluated": true,
+      "facts_and_full_answer_checked": true,
+      "independent_substance_reason": "正文明确存量资产盘活、非战略重点；无当前新增影视制作/投资Activity。"
+    },
+    {
+      "condition_id": "600052.SH:negative:003",
+      "name": "支付渠道出表",
+      "instrument_id": "600052.SH",
+      "page": 24,
+      "passed": true,
+      "actually_evaluated": true,
+      "facts_and_full_answer_checked": true,
+      "independent_substance_reason": "正文保留1—7月、7月31日失控及8月转让/后续不开展；没有无限定支付渠道当前Activity。正文产品和收入机制漏项另计。"
+    },
+    {
+      "condition_id": "600052.SH:negative:004",
+      "name": "参股电池非集团制造销售",
+      "instrument_id": "600052.SH",
+      "page": 22,
+      "passed": true,
+      "actually_evaluated": true,
+      "facts_and_full_answer_checked": true,
+      "independent_substance_reason": "无动力/储能电池集团制造销售Activity；正文未集团化。主营漏32%不并表边界，另计漏召回及正文错误。"
+    },
+    {
+      "condition_id": "600052.SH:negative:005",
+      "name": "跃动仅上期采购",
+      "instrument_id": "600052.SH",
+      "page": 178,
+      "passed": true,
+      "actually_evaluated": true,
+      "facts_and_full_answer_checked": true,
+      "independent_substance_reason": "无跃动本期采购金额或收入，未造零/借上期21516371.68；商品不适用否为独立伪Activity错误，不以此负例通过替代准确率。"
+    },
+    {
+      "condition_id": "600052.SH:negative:006",
+      "name": "采购不收入",
+      "instrument_id": "600052.SH",
+      "page": 179,
+      "passed": true,
+      "actually_evaluated": true,
+      "facts_and_full_answer_checked": true,
+      "independent_substance_reason": "采购金额及获批额度不在收入Segment/Measurement；同页出售劳务当前收入保留；表格原文引用保留采购栏目。"
+    },
+    {
+      "condition_id": "600052.SH:negative:007",
+      "name": "资产转让非营业收入",
+      "instrument_id": "600052.SH",
+      "page": 180,
+      "passed": true,
+      "actually_evaluated": true,
+      "facts_and_full_answer_checked": true,
+      "independent_substance_reason": "股权转让价与资产采购金额不生成营业收入事实；失控原文及股权处置正文保留原性质。"
+    },
+    {
+      "condition_id": "600052.SH:negative:008",
+      "name": "合营联营不适用",
+      "instrument_id": "600052.SH",
+      "page": 171,
+      "passed": true,
+      "actually_evaluated": true,
+      "facts_and_full_answer_checked": true,
+      "independent_substance_reason": "东望无重要合营/联营收入事实或肯定收入列举，正蓝等子公司当前收入保留。"
+    },
+    {
+      "condition_id": "600052.SH:negative:009",
+      "name": "母公司无收入表",
+      "instrument_id": "600052.SH",
+      "page": 192,
+      "passed": true,
+      "actually_evaluated": true,
+      "facts_and_full_answer_checked": true,
+      "independent_substance_reason": "东望无issuer收入对象，不适用章节未读入投资收益生成收入或零。"
+    },
+    {
+      "condition_id": "600052.SH:negative:010",
+      "name": "租赁现金流非收入",
+      "instrument_id": "600052.SH",
+      "page": 165,
+      "passed": true,
+      "actually_evaluated": true,
+      "facts_and_full_answer_checked": true,
+      "independent_substance_reason": "承租费用和现金流/融资收款不生成营业收入对象；作为出租人的合法经营租赁542694.05保留。"
+    },
+    {
+      "condition_id": "600052.SH:negative:011",
+      "name": "成本表非收入",
+      "instrument_id": "600052.SH",
+      "page": 17,
+      "passed": true,
+      "actually_evaluated": true,
+      "facts_and_full_answer_checked": true,
+      "independent_substance_reason": "东望水电费、直接材料、影视剧成本不生成收入或具名投入；唯一采购伪商品另计错误。"
+    },
+    {
+      "condition_id": "600081.SH:negative:001",
+      "name": "排气无销售生产",
+      "instrument_id": "600081.SH",
+      "page": 27,
+      "passed": true,
+      "actually_evaluated": true,
+      "facts_and_full_answer_checked": true,
+      "independent_substance_reason": "东风原排气收入打印零保留，不出现排气具名sells/produces；收入列举零不等于当前销售动作。"
+    },
+    {
+      "condition_id": "600081.SH:negative:002",
+      "name": "库存销售非生产",
+      "instrument_id": "600081.SH",
+      "page": 27,
+      "passed": true,
+      "actually_evaluated": true,
+      "facts_and_full_answer_checked": true,
+      "independent_substance_reason": "东风无发动机/变速箱当前生产Activity，合法父类汽车零部件produces不将销量25推到该产品生产；实际销售漏交付另计。"
+    },
+    {
+      "condition_id": "600081.SH:negative:003",
+      "name": "关系章节不串表",
+      "instrument_id": "600081.SH",
+      "page": 185,
+      "passed": true,
+      "actually_evaluated": true,
+      "facts_and_full_answer_checked": true,
+      "independent_substance_reason": "当前输出没有将伟世通/广州座椅/制动技术联营财务收入重复作为重要合营收入；p31控股参股公司财务条件不能替代p185—187关系财务表漏项。"
+    },
+    {
+      "condition_id": "600081.SH:negative:004",
+      "name": "采购上期空不借列",
+      "instrument_id": "600081.SH",
+      "page": 198,
+      "passed": true,
+      "actually_evaluated": true,
+      "facts_and_full_answer_checked": true,
+      "independent_substance_reason": "东风无p198仅上期合营采购或当前收入事实，正文出售表原交易方向保留。"
+    },
+    {
+      "condition_id": "600081.SH:negative:005",
+      "name": "关联预算非实际收入",
+      "instrument_id": "600081.SH",
+      "page": 198,
+      "passed": true,
+      "actually_evaluated": true,
+      "facts_and_full_answer_checked": true,
+      "independent_substance_reason": "50.00亿元只在明确预计/额度原文中出现，没有作为当前收入事实或肯定实际收入；当前关联收入主体错误另计。"
+    },
+    {
+      "condition_id": "600081.SH:negative:006",
+      "name": "承租支出非出租收入",
+      "instrument_id": "600081.SH",
+      "page": 200,
+      "passed": true,
+      "actually_evaluated": true,
+      "facts_and_full_answer_checked": true,
+      "independent_substance_reason": "承租租金/利息/使用权不生成出租收入，原出租2笔保留。"
+    },
+    {
+      "condition_id": "600081.SH:negative:007",
+      "name": "母公司主营空不造零",
+      "instrument_id": "600081.SH",
+      "page": 220,
+      "passed": true,
+      "actually_evaluated": true,
+      "facts_and_full_answer_checked": true,
+      "independent_substance_reason": "母公司收入及投资收益均未生成错误主营对象；其他收入70042314.65遗漏计召回，不因遗漏宣称正向通过。"
+    },
+    {
+      "condition_id": "600081.SH:negative:008",
+      "name": "费用表终止收入",
+      "instrument_id": "600081.SH",
+      "page": 167,
+      "passed": true,
+      "actually_evaluated": true,
+      "facts_and_full_answer_checked": true,
+      "independent_substance_reason": "税金及附加/销售费用金额不生成收入，收入正文未肯定其为收入。"
+    },
+    {
+      "condition_id": "600081.SH:negative:009",
+      "name": "客户供应商非渠道",
+      "instrument_id": "600081.SH",
+      "page": 20,
+      "passed": true,
+      "actually_evaluated": true,
+      "facts_and_full_answer_checked": true,
+      "independent_substance_reason": "前五客户/供应商未生成sales_mode收入，不将排名升销售渠道；原文客户比例描述不作为当前渠道。"
+    }
+  ],
+  "passed_count": 20,
+  "actual_evaluated_count": 20,
+  "original_negative_contract_unchanged": true,
+  "initial_review_unchanged": true,
+  "does_not_replace_positive_or_accuracy_review": true
+}

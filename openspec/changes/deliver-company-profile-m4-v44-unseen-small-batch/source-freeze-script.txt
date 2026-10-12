@@ -1,0 +1,103 @@
+import json,hashlib,re
+from pathlib import Path
+from datetime import datetime,timezone
+from pypdf import PdfReader
+R=Path.cwd();C=R/'openspec/changes/deliver-company-profile-m4-v44-unseen-small-batch';read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();save=lambda p,v:p.write_text(json.dumps(v,ensure_ascii=False,indent=2)+'\n');compact=lambda s:re.sub(r'\s+','',s or '')
+f=read(C/'freeze-receipt.json');plan=f['plan'];a,b='600052.SH','600081.SH';full={i:read(Path('/tmp/quote_v44_unseen_source_'+i+'.json')) for i in [a,b]};period={r['instrument_id']:r['report_period'] for r in plan['reports']};rows={a:[],b:[]};roles=[]
+checked={a:set([5,12,13,14,15,16,17,18,19,22,24,56,57,111,112,114,115,116,117,155,156,165,167,168,169,170,171,177,178,179,180,183,192]),b:set([5,11,12,14,15,16,17,18,19,20,21,26,27,28,31,32,33,115,116,166,167,176,177,181,182,183,184,185,186,187,196,197,198,199,200,208,209,220])}
+def quote(i,p,cont=()):return '\n'.join(full[i][n-1]['text'] for n in sorted(set([p,*cont])))
+def row(i,p,dim,n,v,actor='公司及合并子公司',column='本期收入',header='',counterparty=None,unit='元',aliases=(),continuation=(),qualifier='',segment_column=None):
+ q=quote(i,p,continuation);assert compact(v) in compact(q),(i,p,n,v)
+ rows[i].append(dict(condition_id=f'{i}:income:{len(rows[i])+1:03}',dimension=dim,name=n,native_aliases=[n,*aliases],value=v,unit=unit,page=p,column=column,header=header,reported_period=period[i],source_actor=actor,source_quote=q,unit_basis_page=p,qualifier=qualifier,counterparty=counterparty,segment_column=segment_column,continuation_pages=list(continuation)))
+def batch(i,p,dim,ns,vs,**kw):
+ for n,v in zip(ns.split('|'),vs.split('|'),strict=True):row(i,p,dim,n,v,**kw)
+def vector(i,p,dim,n,vs,cols,header,**kw):
+ for col,v in zip(cols,vs.split('|'),strict=True):
+  if v:row(i,p,dim,n,v,header=header,segment_column=col,column=col+'营业收入',**kw)
+batch(a,16,'industry','影视业|园区生活服务业|其他','24,479,134.64|357,694,201.20|206,969,111.03',header='主营业务分行业')
+batch(a,16,'product','影视剧|园区生活服务|其他','24,479,134.64|357,694,201.20|206,969,111.03',header='主营业务分产品')
+batch(a,16,'region','浙江省内|浙江省外','377,825,287.21|211,317,159.66',header='主营业务分地区')
+batch(a,16,'sales_mode','影视业|园区生活服务业|其他','24,479,134.64|357,694,201.20|206,969,111.03',header='主营业务分销售模式',qualifier='原销售模式表使用行业标签，不改为别的栏目')
+row(a,19,'business_type','设备销售','114,516.43',header='贸易业务开展情况')
+actorsa={'正蓝节能':'浙江正蓝节能科技股份有限公司','汇贤优策':'重庆汇贤优策科技有限公司'}
+for n,v in [('正蓝节能','15,255.79'),('汇贤优策','20,796.95')]:row(a,24,'business_segment',n,v,actor=actorsa[n],unit='万元',header='主要控股参股公司分析',continuation=(5,))
+batch(a,155,'business_type','主营业务|其他业务|合计','564,570,593.34|24,571,853.53|589,142,446.87',header='合并营业收入和营业成本')
+cols=['影视业','园区生活服务业','其他','合计']
+for dim,n,vs,h in [('product','影视剧','24,479,134.64|||24,479,134.64','商品类型'),('product','园区生活服务','|357,694,201.20||357,694,201.20','商品类型'),('product','其他','||206,969,111.03|206,969,111.03','商品类型'),('region','浙江省内','19,856,493.12|152,005,844.47|205,962,949.62|377,825,287.21','按经营地区分类'),('region','浙江省外','4,622,641.52|205,688,356.73|1,006,161.41|211,317,159.66','按经营地区分类'),('revenue_timing','按商品转让的时间分类','24,479,134.64|357,694,201.20|206,969,111.03|589,142,446.87','按商品转让的时间分类'),('business_segment','合计','24,479,134.64|357,694,201.20|206,969,111.03|589,142,446.87','合同分解合计')]:vector(a,156,dim,n,vs,cols,h,qualifier='原表独立格，时间行未标时点或时段，不猜测填充；表间不累计')
+row(a,165,'service','经营租赁','542,694.05',header='作为出租人的经营租赁',qualifier='融资租赁销售损益/融资收益及收款额另列，不能用收款额代替此收入')
+row(a,171,'business_segment','浙江正蓝节能科技股份有限公司','152,557,851.04',actor=actorsa['正蓝节能'],header='重要非全资子公司的主要财务信息',continuation=(170,))
+for party,v in [('跃动新能源科技（浙江）有限公司','2,254,921.28'),('浙江广厦建设职业技术大学','3,848,536.06'),('东阳市广大后勤服务有限公司','1,127,039.97')]:row(a,179,'service','提供劳务',v,counterparty=party,header='出售商品/提供劳务',qualifier='关联方分类与本期金额，不从采购表拼接')
+for p,party,n,v in [(56,'跃动新能源科技（浙江）有限公司','光伏发电收入','2,254,921.28'),(56,'东阳市广大后勤服务有限公司','热水供应','621,063.53'),(56,'东阳市广大后勤服务有限公司','洗衣机服务等','505,976.44'),(56,'浙江广厦建设职业技术大学','光伏发电','1,359,639.09'),(56,'浙江广厦建设职业技术大学','零碳项目','154,826.59'),(57,'浙江广厦建设职业技术大学','热水供应','1,701,932.03'),(57,'浙江广厦建设职业技术大学','洗衣机服务等','632,138.35')]:row(a,p,'service',n,v,counterparty=party,header='临时公告未披露关联交易',continuation=(56,57),qualifier='仅提供劳务本期；合计混合购销不计营业收入')
+for n,v in [('影视业','23,859,930.19'),('园区生活服务','357,694,201.20'),('其他','210,413,452.31'),('分部间抵销','-2,825,136.83'),('合计','589,142,446.87')]:row(a,183,'adjustment' if n=='分部间抵销' else 'business_segment',n,v,header='报告分部财务信息',qualifier='分部抵销前、抵销额、后分开，非p156合同分类金额')
+# Native Dongfeng income, all important current cells in the declared checked tables.
+batch(b,17,'industry','汽车零部件生产及销售|摩托车零部件生产及销售','5,683,109,054.87|307,909,668.32',header='主营业务分行业')
+batch(b,17,'product','组合仪表、传感器及软轴|汽车制动系、供油系、压铸件、内饰件、电气产品、新能源产品及其他产品|摩托车供油系统|排气系统|调温器系统','485,413,363.44|4,706,068,390.77|307,909,668.32|0|491,627,300.66',header='主营业务分产品',qualifier='排气原表打印0，不为空位，不升当前销售')
+batch(b,17,'region','湖北|广东','4,132,092,327.27|998,324,927.87',header='主营业务分地区',continuation=(18,))
+batch(b,18,'region','河南|江苏','313,214,564.79|547,386,903.26',header='主营业务分地区',continuation=(17,))
+actorsb={'东风延锋':'东风延锋汽车座舱系统有限公司','湛江德利':'湛江德利车辆部件有限公司','东风汤姆森':'东风富士汤姆森调温器有限公司','东科克诺尔制动':'东科克诺尔商用车制动系统（十堰）有限公司','苏州精冲':'苏州东风精冲工程有限公司','东风电驱动':'东风电驱动系统有限公司','东风马勒':'东风马勒热系统有限公司','上海弗列加':'上海弗列加滤清器有限公司','伟世通电子':'上海伟世通汽车电子系统有限公司','广州座椅':'东科延锋（广州）座椅系统有限公司','东科克诺尔制动技术':'东科克诺尔商用车制动技术有限公司'}
+subvals=['3,355,880,762.38','1,382,111,195.70','495,653,081.68','16,577,820.71','322,548,669.74','782,956,291.57','1,185,351,616.95','1,022,470,863.95','1,859,579,997.33','1,972,425,902.67','1,022,105,904.08']
+for (n,actor),v in zip(actorsb.items(),subvals,strict=True):row(b,31,'business_segment',n,v,actor=actor,header='主要控股参股公司分析',continuation=(5,),qualifier='原子公司或参股主体，不能集团化；参股用权益法')
+batch(b,166,'business_type','主营业务|其他业务|合计','5,991,018,723.19|283,274,554.57|6,274,293,277.76',header='合并营业收入和营业成本')
+for dim,n,v,h in [('product','汽车零部件销售收入','5,683,109,054.87','商品类型'),('product','摩托车零部件销售收入','307,909,668.32','商品类型'),('product','租赁收入','10,213,743.84','商品类型'),('product','其他','273,060,810.73','商品类型'),('region','上海','77,732,693.21','按经营地区分类'),('region','湖北','4,280,539,223.40','按经营地区分类'),('region','广东','1,011,971,192.91','按经营地区分类'),('region','河南','314,394,725.29','按经营地区分类'),('region','江苏','589,655,442.95','按经营地区分类'),('revenue_timing','在某一时点转让','6,264,079,533.92','按商品转让的时间分类'),('revenue_timing','租赁收入','10,213,743.84','按商品转让的时间分类'),('business_segment','合计','6,274,293,277.76','合同分解合计')]:vector(b,167,dim,n,v+'|'+v,['分部1','合计'],h,continuation=(166,),qualifier='原分部1和合计独立格；租赁收入在时间分类中不猜测时点/时段')
+row(b,176,'service','租赁收入','10,213,743.84',header='作为出租人的经营租赁')
+for n,v in zip(list(actorsb)[:5],subvals[:5],strict=True):row(b,183,'business_segment',actorsb[n],v,actor=actorsb[n],header='重要非全资子公司的主要财务信息',continuation=(182,))
+for n,v in [('东风马勒','1,185,351,616.95'),('上海弗列加','1,022,470,863.95')]:row(b,186,'business_segment',actorsb[n],v,actor=actorsb[n],header='重要合营企业的主要财务信息',continuation=(185,),qualifier='合营非集团；本期各合营列不取上期')
+for n,v in [('广州座椅','1,972,425,902.67'),('伟世通电子','1,859,579,997.33'),('东科克诺尔制动技术','1,022,105,904.08')]:row(b,187,'business_segment',actorsb[n],v,actor=actorsb[n],header='重要联营企业的主要财务信息',continuation=(186,),qualifier='联营非集团；当前三主体列不串成合营')
+rel=['受东风集团股份控制','受东风集团股份共同控制','实际控制人合营方','实际控制人','受合资外方控制','母公司','联营企业','受东风汽车控制','合营企业','与本公司同受实际控制人控制','与本公司同受母公司控制','其他关联方','受东风汽车重大影响']
+values=['2,282,335,287.85','743,309,065.65','324,746,963.43','296,452,520.76','288,733,918.29','59,638,635.02','26,236,292.81','23,788,205.25','6,057,714.16','4,023,418.43','2,373,937.90','133,139.12','10,566.94']
+for party,v in zip(rel,values,strict=True):row(b,198,'product','销售商品',v,counterparty=party,header='出售商品/提供劳务',qualifier='原表关联方类别，无具名方不得造名字')
+row(b,198,'service','股权托管','46,073,566.00',actor='东风电子科技股份有限公司（母公司）',counterparty='东风汽车零部件（集团）有限公司',header='本公司受托管理/承包',continuation=(199,),qualifier='原托管收益，定价标的审计营收0.7%，不把标的收入当本公司收入')
+for party,v in [('联营企业','7,797,159.20'),('与本公司同受实际控制人控制的公司','451,094.22')]:row(b,199,'service','房屋建筑物',v,counterparty=party,header='本公司作为出租方',column='本期确认的租赁收入')
+for n,v in [('房屋租赁','10,591,102.33'),('汽车与摩托车零部件生产及销售','6,264,079,533.92'),('分部间抵销','377,358.49'),('合计','6,274,293,277.76')]:row(b,208,'adjustment' if n=='分部间抵销' else 'business_segment',n,v,header='报告分部财务信息',qualifier='抵销额打印正数，合计为分部前合计减抵销；不擅自改负号')
+batch(b,220,'business_type','其他业务|合计','70,042,314.65|70,042,314.65',actor='东风电子科技股份有限公司（母公司）',header='母公司营业收入和营业成本')
+# Only named current actions, no policy/forecast upgrades or repeated parent aliases.
+def role(i,p,n,action=None,actor='公司及合并子公司',aliases=(),cont=(),qualifier='',relation=None):
+ q=quote(i,p,cont);assert compact(n) in compact(q) or any(compact(x) in compact(q) for x in aliases),(i,p,n)
+ roles.append(dict(condition_id=f'{i}:action:{sum(r["instrument_id"]==i for r in roles)+1:03}',instrument_id=i,name=n,native_aliases=[n,*aliases],role='operating_energy_input' if relation else 'product_sales' if action=='sells' else 'raw_material_procurement' if action=='purchases' else 'service_provision' if action=='provides_service' else 'product_production',page=p,source_quote=q,source_actor=actor,reported_period=period[i],source_actions=[action] if action else [],source_relation_types=[relation] if relation else [],qualifier=qualifier,action_source_basis='当前明确动作或本期产销正数；原子公司/参股主体保存，别名不重计',quantity_acceptance='仅核动作，不扩量价',continuation_pages=list(cont)))
+for actor in actorsa.values():role(a,12,'热水供应','provides_service',actor=actor,cont=(5,),qualifier='原两子公司投资建设/运营热水服务，三模式限定保留')
+for n in ['直饮水','共享洗衣机','电吹风']:role(a,12,n,'provides_service',qualifier='校园增值生活服务，非设备销售')
+for n in ['空调','打印机']:role(a,12,n,'provides_service',aliases=(n+'租赁',n+'租赁服务'),qualifier='少量院校设备出租，不销售设备')
+role(a,19,'设备','sells',aliases=('设备销售',),qualifier='本期贸易114516.43元支持实际设备销售')
+role(a,56,'机具','purchases',aliases=('采购机具',),qualifier='当前实际购买，供应商上海加岩信息科技有限公司')
+role(a,56,'光伏发电','provides_service',cont=(12,57),qualifier='个别项目有本期收入，但模式验证未成标准化，不称规模业务')
+for n in ['组合仪表','传感器','电子产品','制动阀','ABS系','供油系','内饰件','外饰件','压铸件','起动机','发电机','新能源电机','转向业务','空压机业务','轮端产品','发动机和变速箱业务','调温器','炭罐','换挡与驻车系统','精冲件','燃料电池金属极板']:
+ role(b,27,n,'sells',qualifier='原本期销量正数；量价不扩，起动机与p28发动机标签差异不强行改名',cont=(28,))
+ if n!='发动机和变速箱业务':role(b,27,n,'produces',cont=(28,),qualifier='原本期产量正数，不由销量推生产')
+for actor,names in [('湛江德利车辆部件有限公司',['摩托车化油器','汽车配件']),('广州德利汽车零部件有限公司',['摩托车化油器','汽车配件'])]:
+ for n in names:role(b,181,n,'sells',actor=actor,qualifier='原子公司业务性质明确销售')
+for actor in ['东风马勒热系统有限公司','上海弗列加滤清器有限公司','上海伟世通汽车电子系统有限公司','东科延锋（广州）座椅系统有限公司','东科克诺尔商用车制动技术有限公司','富奥泵业（湖北）有限公司','东风佛吉亚排气控制技术有限公司','东风河西（大连）汽车饰件系统有限公司','十堰天纳克发动机零部件有限公司','东科信强汽车零部件湖北有限公司']:
+ role(b,184 if actor in list(actorsb.values())[6:] else 185,'汽车零部件','sells',actor=actor,cont=(184,185),qualifier='原具名权益法参股主体，不集团化，不与已注销襄阳子公司混同')
+answers={a:{'principal_business':dict(source_pages=[5,12,14,22,24,168,169],required_groups=[['园区生活服务'],['正蓝'],['汇贤'],['影视'],['存量'],['支付渠道'],['1-7','1—7','1至7','1月至7','1－7'],['退出','转让','失控'],['光伏'],['模式验证']],substance='园区核心/影视存量/其他设备租赁，原正蓝汇贤；支付东望数智1-7月、7月31日失控与8月交割/后续不开展；光伏电池合同能源模式验证；跃动32%参股非并表，股权投资不集团主营'), 'products_services':dict(source_pages=[5,12,19,22,56,57,165],required_groups=[['热水'],['投资'],['建设'],['运营'],['直饮水'],['洗衣'],['电吹风'],['空调'],['打印机'],['租赁'],['影视'],['技术支持'],['结算']],substance='热水三模式系统建设运营托管/饮水洗衣吹风及少量空调打印机设备租赁；影视存量项目；支付技术支持账单结算保留期间退出，贸易设备销售；试点综合能源与个别已发光伏收入保持状态'), 'revenue_model':dict(source_pages=[12,24,56,57,111,112,165],required_groups=[['用水'],['所有权'],['移交'],['一次性'],['托管'],['每月'],['消费'],['验收'],['收款'],['发行许可证'],['孰晚'],['交易资金'],['费用率'],['1-7','1—7','1至7','1月至7','1－7'],['租赁']],substance='三热水模式运营学生月消费与收款/项目完工验收建设一次性/托管自担成本；影视许可载体转移收款和上线孰晚；支付交易资金签约率/收款限1-7月；设备租赁与当前关联服务收入')},b:{'principal_business':dict(source_pages=[5,14,15,20,31,181,182,184,185,208],required_groups=[['汽车零部件'],['生产'],['销售'],['座舱'],['制动'],['电驱动'],['热管理'],['动力总成'],['摩托车'],['租赁'],['注销'],['参股']],substance='五系统汽车零部件生产制造销售、摩托车零部件和租赁/托管辅助业务；原子公司及权益法参股，不把排气整合注销升为集团当前销售'), 'products_services':dict(source_pages=[14,17,27,28,181,184,185,198,199,208],required_groups=[['组合仪表'],['传感器'],['制动阀'],['ABS'],['供油'],['内饰'],['压铸'],['新能源电机'],['调温器'],['炭罐'],['精冲'],['燃料电池金属极板'],['模具'],['租赁'],['管理']],substance='原矩阵及21实际有销量商品/20生产正例；发动机变速箱库存销量非生产，排气0且主体注销；摩托化油器具名两子公司；房屋租赁、管理派驻和股权托管，参股限定完整'), 'revenue_model':dict(source_pages=[14,15,115,116,166,167,198,199,208,220],required_groups=[['到货'],['验收'],['控制权'],['折扣'],['质量保证'],['单项履约'],['代理'],['净额'],['产出法'],['履约进度'],['0.7','0．7'],['托管'],['租赁']],substance='汽车零部件模具到货验收/控制权/现时收款/折扣与质保单项服务；贸易代理净额/上下游达成，房屋租赁管理派驻产出法完工进度及成本补偿；股权托管标的审计营收0.7%，母公司其他与集团收入不混') }}
+neg=[]
+def negative(i,p,n,rule,**kw):neg.append(dict(condition_id=f'{i}:negative:{sum(r["instrument_id"]==i for r in neg)+1:03}',instrument_id=i,page=p,name=n,rule=rule,source_quote=quote(i,p,kw.pop('cont',())),**kw))
+negative(a,12,'政策非当前业务','p13政策智能快递柜/无人超市不能升公司当前动作',cont=(13,))
+negative(a,12,'影视无新项目投资','无新增计划，不推当前新影视制作投资；存量项目实际转让保留')
+negative(a,24,'支付渠道出表','东望数智1-7月、7月31日失控，8月交割后不开展；不得无限定当前集团业务',cont=(12,168))
+negative(a,22,'参股电池非集团制造销售','跃动32%不并表，不将其锂动力/储能电池系统集团化')
+negative(a,178,'跃动仅上期采购','本期空不得借21516371.68或造0，亦非收入')
+negative(a,179,'采购不收入','采购商品接受劳务/1.00不能营业收入化；真实出售提供劳务保留',cont=(178,))
+negative(a,180,'资产转让非营业收入','股权出售270532800/25334367.50与采购固定资产非经营收入')
+negative(a,171,'合营联营不适用','不得跨不适用章节生成合营/联营收入，正蓝子公司收入保留')
+negative(a,192,'母公司无收入表','不适用表不能读取随后投资收益生成母公司营业收入或造0')
+negative(a,165,'租赁现金流非收入','承租费用1265926.68/现金流2741151.86和融资收款23734039.84不作为出租营业收入')
+negative(a,17,'成本表非收入','水电费/直接材料/影视剧成本不能作为收入，不从泛称直接材料推具名采购投入')
+negative(b,27,'排气无销售生产','排气系统本期销量产量0；原收入打印0保留，不升当前sales/produces',cont=(18,20))
+negative(b,27,'库存销售非生产','发动机和变速箱本年销量25但产量0，不能产生当前生产',cont=(28,))
+negative(b,185,'关系章节不串表','合营马勒弗列加与联营广州座椅伟世通制动技术分开；联营收入不能重复生合营',cont=(186,187))
+negative(b,198,'采购上期空不借列','合营企业42392943.50等仅上期，不生本期采购/收入；真实当前采购保留',cont=(197,))
+negative(b,198,'关联预算非实际收入','50亿元预算非实际营业收入，本期实际4057839665.61元保留')
+negative(b,200,'承租支出非出租收入','本公司作为承租人租金利息和使用权不作为营业收入')
+negative(b,220,'母公司主营空不造零','其他业务70042314.65正确；主营本期空不借其他/上期、不造0，投资收益不营收')
+negative(b,167,'费用表终止收入','税金及附加和销售费用不沿用收入分类，不作为Segment/Measurement收入')
+negative(b,20,'客户供应商非渠道','前五名客户/供应商不成为销售模式收入')
+versions={r['instrument_id']:dict(sha256=r['document_version'],pdf=str(Path('data/filings/announcements/blobs')/r['document_version'][:2]/(r['document_version']+'.pdf')),checked_pages=sorted(checked[r['instrument_id']])) for r in plan['reports']}
+scope=dict(created_at=datetime.now(timezone.utc).isoformat(),fixed_before_formal_execution=True,plan_id=plan['plan_id'],processing_identity=f['processing_identity'],knowledge_cutoff=plan['knowledge_cutoff'],shared_token_budget=50000,official_reports=plan['reports'],versions=versions,answers=answers,source_rows=rows,native_roles=roles,negative_conditions=neg,denominator_method='6实质正文＋检查表中重要非空本期原收入格（原主体/栏目/分部/页维度独立）＋明示当前具名销售/生产/服务/出租/采购；同动作别名多证据不重计，Measurement仅准确率。新分母不继承253/603。',income_sampling_policy='有限于检查MD&A分类/贸易/子公司、合并合同分解所有本期格、非全资/合营联营、关联销售服务/托管/出租及报告分部/母公司其他；跨原表差异不勾稽或累计。融资租赁损益及金融收益另类非重要营业收入条件；合同外输出照计准确率。不声明全年报完整性。',dimension_mapping={'recognition_time':'revenue_timing','consumes':'material_input','leases':'provides_service','provides_service':'provides_service'},acceptance_thresholds=dict(recall=1.0,accuracy=1.0,critical_numeric_errors=0,whole_round_seconds=300,shared_tokens=50000),production_authorization='not_authorized',scale_quality_claim_allowed=False)
+assert not (R/'data/checkpoints/company_profile_common_core/reports/m4_v44_unseen_small_batch/formal_execution.json').exists()
+save(C/'source-scope.json',scope);save(C/'independent-frozen-source-pages.json',{i:dict(document_version=versions[i]['sha256'],pdf=versions[i]['pdf'],pages=[p for p in full[i] if p['page'] in checked[i]]) for i in [a,b]})
+layout={}
+for i in [a,b]:
+ reader=PdfReader(versions[i]['pdf']);ns=[16,19,22,24,56,57,155,156,165,168,169,171,178,179,183,192] if i==a else [11,12,17,18,27,28,31,166,167,176,181,183,184,185,186,187,197,198,199,200,208,220]
+ layout[i]=[dict(page=n,text=reader.pages[n-1].extract_text(extraction_mode='layout')) for n in ns]
+save(C/'independent-income-layout-pages.json',layout)
+counts=dict(answers=6,income_conditions=sum(map(len,rows.values())),native_roles=len(roles));save(C/'source-freeze-receipt.json',dict(created_at=datetime.now(timezone.utc).isoformat(),processing_identity=f['processing_identity'],plan=plan,executed_code_sha256=f['executed_code_sha256'],source_scope_sha256=sha(C/'source-scope.json'),source_pages_sha256=sha(C/'independent-frozen-source-pages.json'),source_layout_sha256=sha(C/'independent-income-layout-pages.json'),source_condition_count=sum(counts.values()),counts=counts,negative_count=len(neg),fixed_before_formal_execution=True,scores_prefilled=False,accuracy_denominator_prefilled=False,repair_flags=f['repair_flags'],default_identity_unchanged=True,official_page_count=sum(map(len,checked.values()))))
+print('SOURCE_FIXED',counts,sum(counts.values()),'income_by_company',{i:len(v) for i,v in rows.items()},'roles',len(roles),'negative',len(neg))

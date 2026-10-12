@@ -1,0 +1,57 @@
+{
+  "review_scope": "本任务规格同步/归档迁移/新来源合同/首次业务失败证据/修复卡；未修改业务代码或测试",
+  "review_findings": {
+    "business_blocking_registered_not_implemented": [
+      "5个不完整正文",
+      "58收入漏项",
+      "65具名动作漏项",
+      "1条伪采购Activity",
+      "产品行/子公司名污染4事实",
+      "12条关联收入集团范围unclear"
+    ],
+    "delivery_material_blocking_fixed": [
+      "6.1页数72更正为实际71并旁挂解释，原合同哈希不变",
+      "补核全部实际对象引用的10个续页",
+      "负例增补实际正文和窄边界审查，伪采购单列准确率错误"
+    ],
+    "remaining_failure_delivery_material_blockers": [],
+    "nonblocking_deferred": [
+      "性能、行业、量价成本、框架、正文精简、旧无关失败"
+    ],
+    "unrelated_existing_changes": "全部任务开始前修改及未跟踪内容未触碰"
+  },
+  "validation": [
+    {
+      "command": "PYTHONPATH=. /home/python/miniconda3/envs/Quote/bin/python -m pytest -q tests/unit/test_research/test_company_profile_v44_interest_sections.py",
+      "result": "12 passed, 7 warnings in 22.18s; 针对旧已通过身份归档后的固定夹具与单位/章节边界，非新样本修复或正式重跑"
+    },
+    {
+      "command": "ruff check research/company_profile/core_evidence_selection.py tests/unit/test_research/test_company_profile_v44_interest_sections.py",
+      "result": "All checks passed"
+    },
+    {
+      "command": "ruff format --check research/company_profile/core_evidence_selection.py tests/unit/test_research/test_company_profile_v44_interest_sections.py",
+      "result": "2 files already formatted"
+    },
+    {
+      "command": "openspec validate deliver-company-profile-m4-v44-unseen-small-batch --strict",
+      "result": "valid"
+    },
+    {
+      "command": "openspec validate company-profile-common-core-company-total-and-income-mix --type spec --strict",
+      "result": "valid"
+    },
+    {
+      "command": "openspec validate deliver-company-profile-m4-v42-unseen-small-batch --type spec --strict",
+      "result": "valid"
+    },
+    {
+      "command": "git diff --cached --check",
+      "result": "passed；78历史文件零内容改动迁移，3份既有修改文档及全部未跟踪既有内容未暂存。"
+    }
+  ],
+  "full_test_suite_claimed": false,
+  "formal_execution_repeated": false,
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false
+}

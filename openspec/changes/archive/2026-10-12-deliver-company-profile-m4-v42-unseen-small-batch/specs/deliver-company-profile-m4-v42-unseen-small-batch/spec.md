@@ -26,7 +26,7 @@ All actual accepted facts including contract-external facts and each answered bo
 - **THEN** bounded evidence is submitted for A-role review without claiming full-report completeness,production or scale quality
 
 ### Requirement: Source-backed failed first delivery remains immutable
-The initial source contract and actual failed business results MUST remain immutable. A completed execution chain MUST NOT replace substantive business acceptance. Cross-table peer amounts, percentages and blank issuer rows MUST NOT become issuer income; native segment revenue columns, classification changes and original counterparty continuations MUST retain identity. Only the demonstrated body, income and named-action gaps MAY generate local repair cards, with expansion paused and the current change unarchived.
+The initial source contract and actual failed business results MUST remain immutable. A completed execution chain MUST NOT replace substantive business acceptance. Cross-table peer amounts, percentages and blank issuer rows MUST NOT become issuer income; native segment revenue columns, classification changes and original counterparty continuations MUST retain identity. Only the demonstrated body, income and named-action gaps MAY generate local repair cards, with expansion paused and the current change unarchived during the failed stage. A source-backed successor MAY be finitely archived only after explicit A-role acceptance and specification synchronization; initial failures and corrections MUST remain immutable.
 
 #### Scenario: A peer-comparison table follows issuer treatment revenue
 - **WHEN** the original source changes to peer companies with amounts in ten-thousand yuan and then a percentage explanation

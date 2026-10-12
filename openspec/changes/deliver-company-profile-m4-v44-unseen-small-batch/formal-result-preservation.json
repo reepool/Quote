@@ -1,0 +1,12 @@
+{
+  "formal_execution_index": 1,
+  "sha256": {
+    "openspec/changes/deliver-company-profile-m4-v44-unseen-small-batch/actual-object-decisions.json": "c4d2964bfbf0d704f22d1131bb32c558bbecce9c3c348bb50afaef39ac07accf",
+    "openspec/changes/deliver-company-profile-m4-v44-unseen-small-batch/source-review-evidence.json": "c41024013faf7236dc4fd216b024c1aff16f7f0993f7b5b651970f92ae970396",
+    "openspec/changes/deliver-company-profile-m4-v44-unseen-small-batch/negative-review-evidence.json": "65f6b8fbed3a9bebfcd7f990fd7d7ac4f7a0bb8cd430c9d4d5d3c88dd2c52903",
+    "openspec/changes/deliver-company-profile-m4-v44-unseen-small-batch/actual-object-supplemental-source-pages.json": "69aa196cdc339556527293b0d10800082786356396a483beb972ca11460a21a1",
+    "openspec/changes/deliver-company-profile-m4-v44-unseen-small-batch/source-contract-interpretation.json": "e6e37ea2349d8c6c97c66687992f97c75e8a3445dcec6c6205dbee5265d5de20",
+    "data/checkpoints/company_profile_common_core/reports/m4_v44_unseen_small_batch/company_profile_source_review.v1.json": "d60ae00cd2ef7aabba70a8507bec7da1e23687a5637a552ec0d395f5e5ea0fdb"
+  },
+  "original_review_preserved": true
+}

@@ -1,0 +1,30 @@
+{
+  "accepted_by": "A_role_user_review",
+  "accepted_at": "2026-10-12T02:53:17.572855+00:00",
+  "source_recall": {
+    "numerator": 253,
+    "denominator": 253
+  },
+  "source_accuracy": {
+    "numerator": 603,
+    "denominator": 603
+  },
+  "accepted_facts": 597,
+  "answered_bodies": 6,
+  "negative_checks": {
+    "passed": 20,
+    "total": 20
+  },
+  "critical_numeric_errors": 0,
+  "whole_round_seconds": 189.9679193617776,
+  "tokens_used": 0,
+  "shared_token_budget": 50000,
+  "finite_scope": "Ningbo United and Jinhua: original 253 positive source conditions, 20 negatives and actually checked output only",
+  "time_scope": "actual round with existing PDF parse caches",
+  "independent_tests": {
+    "passed": 16,
+    "deselected": 32
+  },
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false
+}

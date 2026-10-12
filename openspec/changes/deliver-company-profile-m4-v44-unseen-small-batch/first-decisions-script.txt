@@ -1,0 +1,90 @@
+import json,re
+from pathlib import Path
+R=Path.cwd();C=R/'openspec/changes/deliver-company-profile-m4-v44-unseen-small-batch';read=lambda p:json.loads(p.read_text());save=lambda p,v:p.write_text(json.dumps(v,ensure_ascii=False,indent=2)+'\n');compact=lambda s:re.sub(r'\s+','',s or '').replace('（','(').replace('）',')');num=lambda s:compact(s).replace(',','')
+scope=read(C/'source-scope.json');all_sources={i:read(Path('/tmp/quote_v44_unseen_source_'+i+'.json')) for i in scope['versions']};decisions={};supp={}
+aliases={'正蓝节能':'浙江正蓝节能科技股份有限公司','汇贤优策':'重庆汇贤优策科技有限公司','东风延锋':'东风延锋汽车座舱系统有限公司','湛江德利':'湛江德利车辆部件有限公司','东风汤姆森':'东风富士汤姆森调温器有限公司','东科克诺尔制动':'东科克诺尔商用车制动系统（十堰）有限公司','苏州精冲':'苏州东风精冲工程有限公司','东风电驱动':'东风电驱动系统有限公司','东风马勒':'东风马勒热系统有限公司','上海弗列加':'上海弗列加滤清器有限公司','伟世通电子':'上海伟世通汽车电子系统有限公司','广州座椅':'东科延锋（广州）座椅系统有限公司','东科克诺尔制动技术':'东科克诺尔商用车制动技术有限公司'}
+errors={'600052.SH':{12:('p178采购商品跨本期空白/上期数和获批额度适用列，拼出商品不适用否，原文不支持该具名商品当前采购',False)},'600081.SH':{25:('p17跨行产品名被截断，4706068390.77元为汽车制动系、供油系、压铸件、内饰件、电气产品、新能源产品及其他产品全行，不能只挂最后三品类',False),26:('配对Measurement沿用截断产品行身份，金额单位正确但产品口径错误',False),73:('p183首个子公司名称被多行本期/上期财务表头污染，应精确东风延锋汽车座舱系统有限公司',False),74:('配对Measurement原子公司名称与限定同样被表头污染',False),**{j:('p198为本集团当前关联出售商品收入，原主语不因关联方类别变成unclear；分类沿原出售栏目保存，不由同页母公司交易对方缩成母公司收入',False) for j in range(88,100)}}}
+# Manually checked original financial headers, not generated values, define permissible display spellings.
+def native_match(r,row):
+ n=r['source_native'];ep={p for e in r['evidence'] for p in [e.get('page'),*e.get('continuation_pages',[])] if p}
+ if row['page'] not in ep or compact(n['name']) not in set(map(compact,row['native_aliases'])) or num(n['value'])!=num(row['value']) or n['unit']!=row['unit']:return False
+ dim=r.get('dimension',r.get('segment_dimension'));expected=row['dimension'];h=n.get('header') or '';qual=n.get('qualifier') or ''
+ if dim!=expected and not(expected=='service' and dim=='lease' and '出租方' in h):return False
+ if row.get('segment_column'):
+  if compact(qual)!=compact('原收入列：'+row['column']):return False
+  expectedheader='合同收入/'+('合同分解合计' if row['header']=='合同分解合计' else row['header'])
+  if h!=expectedheader:return False
+ elif row['header'] in ['合并营业收入和营业成本','母公司营业收入和营业成本','报告分部财务信息']:
+  if h!='营业收入':return False
+ elif row['header'].startswith('主营业务分'):
+  if h not in ['', '主营业务收入']:return False
+ elif row['header']=='主要控股参股公司分析':
+  if h!='控股参股公司/营业收入':return False
+ elif row['header']=='重要非全资子公司的主要财务信息':
+  if h!='重要非全资子公司/本期营业收入':return False
+ elif row['header'] in ['重要合营企业的主要财务信息','重要联营企业的主要财务信息']:
+  relation='合营企业' if '合营' in row['header'] else '联营企业'
+  if h!='重要'+relation+'/本期营业收入' or compact(qual)!=compact(relation+'：'+row['source_actor']):return False
+ elif row['header']=='出售商品/提供劳务':
+  if h!='出售商品/提供劳务/本期发生额':return False
+ elif row['header']=='作为出租人的经营租赁':
+  if h!='作为出租人的经营租赁/租赁收入':return False
+ elif row['header']=='本公司作为出租方':
+  if h!='本公司作为出租方/本期确认的租赁收入':return False
+ if row['counterparty']:
+  if compact(qual)!=compact(('承租方：' if dim=='lease' else '交易对方：')+row['counterparty']):return False
+ actor=row['source_actor']
+ if actor=='公司及合并子公司':return r['subject_scope']=='consolidated_group'
+ if '（母公司）' in actor:return r['subject_scope']=='issuer'
+ found=aliases.get(n['name'],n['name']);subject=aliases.get(r.get('subject_name'),r.get('subject_name'))
+ if compact(actor) not in map(compact,[found,subject or '',r.get('source_actor') or '']):return False
+ expectedscope='business_segment' if row['header'] in ['重要合营企业的主要财务信息','重要联营企业的主要财务信息'] or n['name'] in ['东风马勒','上海弗列加','伟世通电子','广州座椅','东科克诺尔制动技术'] else 'named_subsidiary'
+ return r['subject_scope']==expectedscope
+for ins in scope['versions']:
+ raw=read(Path('/tmp/v44_unseen_actual_'+ins+'.json'));facts={};extra=set();roles=[r for r in scope['native_roles'] if r['instrument_id']==ins]
+ for idx,r in enumerate(raw):
+  kind=r['object_type'];n=r['source_native'];ep=sorted({p for e in r['evidence'] for p in [e.get('page'),*e.get('continuation_pages',[]),*e.get('subject_evidence_pages',[])] if p});extra.update(ep);source=compact('\n'.join(all_sources[ins][p-1]['text'] for p in ep));d=dict(review_index=idx,verified_source_pages=ep,actual_object_type=kind,actual_native_name=n['name'],actual_action=r.get('action'),actual_relation_type=r.get('relation_type'),actual_subject_scope=r['subject_scope'],critical_numeric_error=False)
+  if idx in errors[ins]:reason,numeric=errors[ins][idx];d.update(accurate=False,reason=reason,critical_numeric_error=numeric)
+  else:
+   if kind in ['Segment','Measurement']:
+    assert num(n['value']) in num(source),(ins,idx,n)
+    assert n['unit'] in ['元','万元'],(ins,idx,n)
+    matches=[j for j,row in enumerate(scope['source_rows'][ins]) if native_match(r,row)]
+    if kind=='Measurement':
+     # Measurement native pair has dimension in segment_dimension.
+     pass
+    if not matches:
+     assert ins=='600081.SH' and idx in [41,42],(ins,idx,n)
+     assert n['name']=='正常经营之外的其他业务收入' and n['value']=='283,274,554.57' and n['unit']=='元' and r['subject_scope']=='consolidated_group'
+     d.update(accurate=True,reason='合同外p11第1项本期283274554.57元明确；对应其他业务扣除收入，不从小计借额，单列准确率不增加召回')
+    else:
+     assert len(matches)==1,(ins,idx,matches)
+     d.update(accurate=True,reason='独立原PDF及布局核当前原收入格、单位、原行/表头/分部列、主体及关系/承租方限定；与前置条件配对。')
+     if kind=='Segment':d['recall_row_index']=matches[0]
+   elif kind=='BusinessOverview':
+    # Exact plain/layout reading order can differ; source numbers, words and qualifiers must remain.
+    for token in re.findall(r'\d[\d,]*(?:\.\d+)?',r['source_text']):
+     if len(token.replace(',',''))>5:assert num(token) in num(source),(ins,idx,token)
+    d.update(accurate=True,reason='逐段原PDF/布局支持该原文片段及其中主体、适用状态、处置或政策条件，阅读順序差异只保留原格；精确片段准确不替代六正文实质完整性。')
+   elif kind=='Activity':
+    assert ins=='600081.SH' and idx in range(1,7)
+    assert r['action'] in ['produces','operates'] and compact(n['name']) in source
+    d.update(accurate=True,reason='p14明确汽车零部件生产及五系统经营矩阵；合法父类实际经营成立，但不能替代p27原具名生产销售或原子公司条件。')
+   else:raise AssertionError((ins,idx,kind))
+  # No named role matches in this first output: only six valid parent activities and one false procurement.
+  facts[r['record_id']]=d
+ p=read(Path('data/exports/m4_v44_unseen_small_batch')/ins/(ins+'_2025-12-31.json'));answers={}
+ for dim in p['dimensions']:
+  key=dim['dimension_id'];rule=scope['answers'][ins][key];txt=compact(dim['excerpt']);failed=[g for g in rule['required_groups'] if not any(compact(t) in txt for t in g)]
+  if ins=='600052.SH' and key=='principal_business':accurate=False;reason='园区/影视存量及数智1-7月/失控正文已保留，但原p22跃动新能源32%不并表的参股边界未进入主营正文；仅出现交易对方跃动名称不满足原主体限定实质合同。'
+  elif ins=='600052.SH' and key=='products_services':accurate=False;reason='园区具体热水/生活服务/租赁在，支付原技术支持与账单结算产品服务、其原主体期间未完整进入最终正文。'
+  elif ins=='600052.SH':accurate=False;reason='缺p111–112完整三模式收费/学生每月消费/项目完工验收及发行许可上线孰晚/支付资金费率与1-7月限定；正文不完整。'
+  elif key=='products_services':accurate=False;reason='五系统和模具/租赁在，但p17/27–28当前具名产品矩阵缺失，库存销售与当期产量0边界未完整交付。'
+  elif key=='revenue_model':accurate=False;reason='到货验收/控制权/折扣质保/代理净额/服务产出进度/股权托管0.7%机制已完整，但原收入列举将p183表头污染子公司作为肯定收入主体，不能仅凭机制关键词判正文准确。'
+  else:accurate=True;reason='p14五系统主业与原生产制造销售、摩托车/房屋租赁辅助、p31原子公司/参股、p181两已注销主体及当期限定完整；原文参股不集团化，主体边界实质成立。'
+  answers[key]=dict(accurate=accurate,critical_numeric_error=False,reason=reason,failed_groups=failed,all_supporting_records_checked=True)
+ decisions[ins]=dict(facts=facts,answers=answers)
+ frozen=set(scope['versions'][ins]['checked_pages']);supp[ins]=dict(document_version=scope['versions'][ins]['sha256'],pages=[p for p in all_sources[ins] if p['page'] in extra-frozen])
+ print(ins,'accepted',len(raw),'correct',sum(d['accurate'] for d in facts.values()),'numeric',sum(d['critical_numeric_error'] for d in facts.values()),'unique rows',len(set(d['recall_row_index'] for d in facts.values() if d.get('recall_row_index') is not None)),'errors',sorted(errors[ins]))
+save(C/'actual-object-decisions.json',decisions);save(C/'actual-object-supplemental-source-pages.json',supp)
+save(C/'source-contract-interpretation.json',dict(original_scope_unchanged=True,substance_or_denominator_changed=False,dimension_aliases={'service出租行':'lease','leases':'provides_service'},income_column_policy='原分部及合计分别精确列qualifier；合营联营需原关系栏目和主体限定；同额p31与p183不得互替；原同条件重复事实只一次召回',accuracy_policy='每个record_id实际接受事实及六answered正文唯一计准确率；完整支持原文片段不是完整正文，unclear不可替代集团范围；打印排气收入0合法，但不推sells/produces；合同外p11正常经营外业务收入同样计准确率'))

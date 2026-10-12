@@ -1,0 +1,17 @@
+{
+  "historical_files_verified": 2522,
+  "first_delivery_files_verified": 18,
+  "first_review_files_verified": 6,
+  "executed_modules_reconstructed": 38,
+  "official_frozen_plain_pages_verified": 71,
+  "additional_actual_evidence_pages_verified": 10,
+  "total_distinct_official_pages_verified": 81,
+  "official_layout_pages_verified": 38,
+  "source_page_count_correction": "6.1回执72为计数笔误，实际冻结71（33+38），原合同/来源哈希不变。",
+  "archive_immutable_original_files_verified": 78,
+  "archive_migrated_files_verified": 82,
+  "archive_all_migrated_bytes_equal": true,
+  "existing_modified_files_unchanged": true,
+  "existing_untracked_files_untouched": true,
+  "business_code_unchanged": true
+}

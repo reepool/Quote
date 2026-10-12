@@ -1,0 +1,10 @@
+{
+  "original_scope_unchanged": true,
+  "substance_or_denominator_changed": false,
+  "dimension_aliases": {
+    "service出租行": "lease",
+    "leases": "provides_service"
+  },
+  "income_column_policy": "原分部及合计分别精确列qualifier；合营联营需原关系栏目和主体限定；同额p31与p183不得互替；原同条件重复事实只一次召回",
+  "accuracy_policy": "每个record_id实际接受事实及六answered正文唯一计准确率；完整支持原文片段不是完整正文，unclear不可替代集团范围；打印排气收入0合法，但不推sells/produces；合同外p11正常经营外业务收入同样计准确率"
+}

@@ -1,0 +1,42 @@
+{
+  "completed_work": [
+    "旧v44规格同步和有限归档",
+    "48排除及新官方对冻结",
+    "209正向/20负例合同独立冻结",
+    "两家首次真实闭环",
+    "动态唯一复核和首次失败保护"
+  ],
+  "completed_tasks": [
+    "6.1",
+    "6.2",
+    "6.3"
+  ],
+  "business_acceptance": "failed",
+  "source_recall": {
+    "status": "assessed",
+    "numerator": 81,
+    "denominator": 209,
+    "value": 0.3875598086124402
+  },
+  "source_accuracy": {
+    "status": "assessed",
+    "numerator": 199,
+    "denominator": 221,
+    "value": 0.9004524886877828
+  },
+  "critical_numeric_errors": 0,
+  "negative_passed": 20,
+  "negative_total": 20,
+  "whole_round_seconds": 219.46601941622794,
+  "tokens_used": 0,
+  "shared_token_budget": 50000,
+  "source_fixed_before_first_execute": true,
+  "actual_five_stages_successful": true,
+  "no_reuse_or_predecessor": true,
+  "query_export_disk_equal": true,
+  "next_sample": "paused",
+  "new_change_archived": false,
+  "formal_rerun": false,
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false
+}

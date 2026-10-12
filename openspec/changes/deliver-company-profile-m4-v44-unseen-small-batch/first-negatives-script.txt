@@ -1,0 +1,25 @@
+import json,re
+from pathlib import Path
+C=Path('openspec/changes/deliver-company-profile-m4-v44-unseen-small-batch');s=json.loads((C/'source-scope.json').read_text());raw={i:json.loads(Path('/tmp/v44_unseen_actual_'+i+'.json').read_text()) for i in s['versions']};out=[]
+for n in s['negative_conditions']:
+ i=n['instrument_id'];rr=raw[i];financial=[r for r in rr if r['object_type'] in ['Segment','Measurement']];acts=[r for r in rr if r['object_type'] in ['Activity','Relationship']];wrong=[];rule=n['name']
+ if rule=='排气无销售生产':wrong=[r for r in acts if r['source_native']['name']=='排气系统' and r.get('action') in ['sells','produces']]
+ if rule=='库存销售非生产':wrong=[r for r in acts if r['source_native']['name']=='发动机和变速箱业务' and r.get('action')=='produces']
+ if rule=='母公司主营空不造零':wrong=[r for r in financial if r['subject_scope']=='issuer' and r['source_native']['name']=='主营业务']
+ if rule=='母公司无收入表':wrong=[r for r in financial if r['subject_scope']=='issuer']
+ if rule=='关系章节不串表':wrong=[r for r in financial if '重要合营企业' in (r['source_native'].get('header') or '') and any(t in (r['source_native'].get('qualifier') or '') for t in ['伟世通','座椅系统','制动技术'])]
+ if rule=='合营联营不适用':wrong=[r for r in financial if any(t in (r['source_native'].get('header') or '') for t in ['重要合营','重要联营'])]
+ if rule in ['采购不收入','采购上期空不借列','资产转让非营业收入','租赁现金流非收入','承租支出非出租收入','费用表终止收入','成本表非收入']:
+  forbidden={'采购不收入':['939,488.80','776,479.83','477,580.24','694,983.17','9,589,079.53','1.00'],'采购上期空不借列':['42,392,943.50','1,197,123.71','286,079.28','170,788.52'],'资产转让非营业收入':['270,532,800.00','25,334,367.50','1,392,880.50'],'租赁现金流非收入':['1,265,926.68','2,741,151.86','23,734,039.84'],'承租支出非出租收入':['9,619,465.61','2,729,102.95','2,631,096.00','463,675.22','33,361.00'],'费用表终止收入':['11,379,618.28','8,693,041.18','8,190,537.83','34,343,932.66','30,694,955.13'],'成本表非收入':['106,125,173.35','9,131,720.52','5,902,988.18','8,723,865.76']}[rule]
+  wrong=[r for r in financial if r['source_native']['value'] in forbidden]
+ if rule=='跃动仅上期采购':wrong=[r for r in financial if r['source_native']['value']=='21,516,371.68']
+ if rule=='关联预算非实际收入':wrong=[r for r in financial if r['source_native']['value'] in ['50.00','5,000,000,000','5,000,000,000.00']]
+ if rule=='客户供应商非渠道':wrong=[r for r in financial if r.get('dimension',r.get('segment_dimension'))=='sales_mode']
+ if rule=='参股电池非集团制造销售':wrong=[r for r in acts if r['subject_scope']=='consolidated_group' and any(t in r['source_native']['name'] for t in ['动力电池','储能电池'])]
+ if rule=='政策非当前业务':wrong=[r for r in acts if any(t in r['source_native']['name'] for t in ['智能快递柜','无人超市'])]
+ if rule=='影视无新项目投资':wrong=[r for r in acts if r.get('action') in ['develops','produces'] and any(t in r['source_native']['name'] for t in ['影视','电影','电视剧'])]
+ if rule=='支付渠道出表':wrong=[r for r in acts if '支付渠道' in r['source_native']['name'] and not any(t in (r['source_native'].get('qualifier') or '') for t in ['1-7','7月','退出'])]
+ controls=[r['record_id'] for r in financial if r['source_native']['name'] in ['主营业务','其他业务','经营租赁','租赁收入','房屋建筑物','排气系统']]
+ out.append(dict(condition=n,evaluation_status='evaluated',actual_profile_exists=True,passed=not wrong,wrong_accepted_object_ids=[r['record_id'] for r in wrong],positive_control_object_ids=controls,reason='逐核实际当前肯定事实和已答正文；原文引用中的上期/计划/不适用不作当前肯定。否定边界通过不替代完整召回或对象准确率。采购伪商品另计准确率错误，未生成本期金额或收入。'))
+assert len(out)==20
+(C/'negative-review-evidence.json').write_text(json.dumps(dict(conditions=out,negative_count=len(out),actually_evaluated_count=len(out),passed_count=sum(r['passed'] for r in out),failed_count=sum(not r['passed'] for r in out),unevaluable_count=0,original_contract_unchanged=True),ensure_ascii=False,indent=2)+'\n');print('NEGATIVES',sum(r['passed'] for r in out),'/',len(out))

@@ -80,3 +80,15 @@ Printed decimal fragments MUST be rejoined before deciding the native income-tab
 #### Scenario: A tenant ends at the following page top
 - **WHEN** a tenant's name continues across a page before the next original tenant row
 - **THEN** the tail belongs to its original tenant and prior-only rows generate no current income
+
+### Requirement: Interest financial sections respect applicability and relation identity
+Native joint-venture and associate financial-information spans MUST be limited to the current relation heading, its applicability status and the next financial section. A not-applicable joint-venture section MUST NOT read the following applicable associate table. The native relation column, original actor and scope qualifiers MUST survive paired Segment/Measurement and substantive revenue answers. Financial-unit wording preceding the current relation heading MAY supply its declared unit; a different relation heading MUST NOT supply its identity. Review matching MUST validate native relation column and scope qualifiers, not merely page, label and amount. A Measurement MUST be matched through its accurately classified Segment and final-body review MUST reject affirmative descriptions of rejected income.
+
+#### Scenario: Inapplicable joint-venture section precedes associate income
+- **WHEN** Jinhua p156 declares joint-venture financial information not applicable and then reports Changzhou Huasen associate income338,506,572.72yuan
+- **THEN** only the correct associate Segment/Measurement and qualified revenue description survive acceptance, query and export
+- **AND** no joint-venture income fact or affirmative body description is generated from the following associate table
+
+#### Scenario: A valid joint-venture table declares its unit before the heading
+- **WHEN** an applicable native financial table has a supported financial-unit declaration before the current relation heading
+- **THEN** its current income retains that unit and original relation identity rather than borrowing another section's scope
